@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # 백엔드 API (GDB 트레이서)
+  backend:
+    build: ./backend
+    container_name: cosine-backend
+    restart: unless-stopped
+    # GDB가 ptrace 쓸 수 있게 권한 부여
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 프론트엔드 (nginx)
+  frontend:
+    build: ./frontend
+    container_name: cosine-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:8000
+
+  # (선택) 리버스 프록시 - 나중에 HTTPS 추가 시
+  # nginx:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #   depends_on:
+  #     - frontend
+  #     - backend
