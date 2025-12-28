@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String       @id @default(uuid())
+  email       String       @unique
+  name        String
+  firebaseUid String       @unique @map("firebase_uid")
+  role        String       @default("user")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  drafts      Draft[]
+  submissions Submission[]
+
+  @@map("users")
+}
+
+model Problem {
+  id          String       @id
+  number      Int          @unique
+  title       String
+  description String
+  difficulty  String       @default("bronze_5")
+  tags        String       @default("[]")
+  source      String?
+  srcUrl      String?      @map("src_url")
+  hints       String       @default("[]")
+  solution    String?
+  testCases   String       @default("[]") @map("test_cases")
+  timeLimit   Int          @default(1000) @map("time_limit")
+  memoryLimit Int          @default(256) @map("memory_limit")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  drafts      Draft[]
+  submissions Submission[]
+
+  @@index([difficulty], map: "idx_problems_difficulty")
+  @@map("problems")
+}
+
+model Submission {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  problemId     String   @map("problem_id")
+  code          String
+  verdict       String   @default("judging")
+  executionTime Int?     @map("execution_time")
+  createdAt     DateTime @default(now()) @map("created_at")
+  problem       Problem  @relation(fields: [problemId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, problemId], map: "idx_submissions_user_problem")
+  @@map("submissions")
+}
+
+model Draft {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  problemId String   @map("problem_id")
+  code      String
+  savedAt   DateTime @default(now()) @map("saved_at")
+  problem   Problem  @relation(fields: [problemId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, problemId])
+  @@map("drafts")
+}

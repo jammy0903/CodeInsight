@@ -1,0 +1,432 @@
+/**
+ * C-OSINE Theme System
+ * C-ode-to-you 사이버펑크 스타일 기반
+ * 다크모드 전용 테마
+ */
+
+@import "tw-animate-css";
+@plugin "tailwindcss-animate";
+@custom-variant dark (&:is(.dark *));
+@config "../tailwind.config.js";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Fonts
+   ============================================ */
+/* Display: 시스템 모노스페이스 (Orbitron 대체) */
+/* Sans: Pretendard (한국어 지원) */
+/* Mono: JetBrains Mono (코드용) */
+
+:root {
+  /* === Fonts === */
+  --font-display: ui-monospace, "SF Mono", "Cascadia Code", "Consolas", monospace;
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+
+  /* === shadcn/ui Base (Light - 미사용이지만 폴백용) === */
+  --radius: 0.5rem;
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+}
+
+/* ============================================
+   Dark Mode Theme (Primary)
+   ============================================ */
+:root.dark {
+  /* === Background === */
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --card: #1a1a1a;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1a;
+  --popover-foreground: #ffffff;
+
+  /* === Primary (Neon Cyan) === */
+  --primary: #00e5ff;
+  --primary-foreground: #0a0a0a;
+
+  /* === Secondary === */
+  --secondary: #2a2a2a;
+  --secondary-foreground: #b0b0b0;
+
+  /* === Muted === */
+  --muted: #2a2a2a;
+  --muted-foreground: #666666;
+
+  /* === Accent === */
+  --accent: #2a2a2a;
+  --accent-foreground: #ffffff;
+
+  /* === Destructive === */
+  --destructive: #ff4757;
+  --destructive-foreground: #ffffff;
+
+  /* === Border/Input === */
+  --border: #2a2a2a;
+  --input: #2a2a2a;
+  --ring: #00e5ff;
+
+  /* === Charts === */
+  --chart-1: #00e5ff;
+  --chart-2: #00ff88;
+  --chart-3: #ffaa00;
+  --chart-4: #0080ff;
+  --chart-5: #ff00ff;
+
+  /* === Custom Theme Variables === */
+  /* Background */
+  --color-bg: #0a0a0a;
+  --color-bg-elevated: #1a1a1a;
+  --color-bg-tertiary: #2a2a2a;
+  --color-bg-hover: #3a3a3a;
+
+  /* Text */
+  --color-text: #ffffff;
+  --color-text-secondary: #b0b0b0;
+  --color-text-tertiary: #666666;
+  --color-text-muted: #4a4a4a;
+
+  /* Neon Colors */
+  --color-neon-cyan: #00e5ff;
+  --color-neon-green: #00ff88;
+  --color-neon-magenta: #ff00ff;
+  --color-neon-yellow: #ffff00;
+  --color-neon-blue: #0080ff;
+
+  /* Primary */
+  --color-primary: #00e5ff;
+  --color-primary-hover: #00b8cc;
+  --color-primary-light: rgba(0, 229, 255, 0.15);
+  --color-primary-muted: rgba(0, 229, 255, 0.3);
+
+  /* Success */
+  --color-success: #00ff88;
+  --color-success-light: rgba(0, 255, 136, 0.15);
+  --color-success-dark: #00cc6a;
+  --color-success-muted: rgba(0, 255, 136, 0.3);
+
+  /* Warning */
+  --color-warning: #ffaa00;
+  --color-warning-light: rgba(255, 170, 0, 0.15);
+  --color-warning-dark: #cc8800;
+  --color-warning-muted: rgba(255, 170, 0, 0.3);
+
+  /* Danger */
+  --color-danger: #ff4757;
+  --color-danger-light: rgba(255, 71, 87, 0.15);
+  --color-danger-dark: #cc3945;
+  --color-danger-muted: rgba(255, 71, 87, 0.3);
+
+  /* Info */
+  --color-info: #0080ff;
+  --color-info-light: rgba(0, 128, 255, 0.15);
+  --color-info-dark: #0066cc;
+  --color-info-muted: rgba(0, 128, 255, 0.3);
+
+  /* Border */
+  --color-border: #2a2a2a;
+  --color-border-light: #3a3a3a;
+  --color-border-dark: #1a1a1a;
+
+  /* Glow */
+  --shadow-glow: 0 0 20px rgba(0, 229, 255, 0.3);
+  --shadow-glow-success: 0 0 20px rgba(0, 255, 136, 0.3);
+  --shadow-glow-danger: 0 0 20px rgba(255, 71, 87, 0.3);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* 다크모드 강제 적용 */
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ============================================
+   Typography - Display Font (Orbitron 대체)
+   ============================================ */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+h1, h2, h3, .heading {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   Scrollbar (Cyberpunk Style)
+   ============================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-light);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ============================================
+   Code
+   ============================================ */
+pre, code {
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   Focus States
+   ============================================ */
+input:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+
+/* ============================================
+   Selection
+   ============================================ */
+::selection {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* ============================================
+   shadcn/ui Theme Integration
+   ============================================ */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ============================================
+   Navigation Glow Effect
+   ============================================ */
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: var(--primary);
+}
+
+.nav-item:hover .nav-icon,
+.nav-item:hover .nav-label,
+.nav-item.active .nav-icon,
+.nav-item.active .nav-label {
+  filter: drop-shadow(0 0 6px var(--primary));
+}
+
+.nav-item:hover .nav-label,
+.nav-item.active .nav-label {
+  text-shadow: 0 0 8px var(--primary);
+}
+
+/* Underline Effect */
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 9999px;
+  transform: scaleX(0);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover::after {
+  transform: scaleX(0.7);
+  opacity: 0.5;
+}
+
+.nav-item.active::after {
+  transform: scaleX(1);
+  opacity: 1;
+  box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+}
+
+/* ============================================
+   Glow Utilities
+   ============================================ */
+.glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.glow-success {
+  box-shadow: var(--shadow-glow-success);
+}
+
+.glow-danger {
+  box-shadow: var(--shadow-glow-danger);
+}
+
+.glow-text {
+  text-shadow: 0 0 10px var(--primary);
+}
+
+/* Hover glow effect */
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: var(--shadow-glow);
+}
+
+/* ============================================
+   Neon Border Utilities
+   ============================================ */
+.neon-border {
+  border: 1px solid var(--primary);
+  box-shadow:
+    inset 0 0 10px rgba(0, 229, 255, 0.1),
+    0 0 10px rgba(0, 229, 255, 0.2);
+}
+
+.neon-border-success {
+  border: 1px solid var(--color-success);
+  box-shadow:
+    inset 0 0 10px rgba(0, 255, 136, 0.1),
+    0 0 10px rgba(0, 255, 136, 0.2);
+}
+
+/* ============================================
+   Card Enhancements
+   ============================================ */
+.card-cyber {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+}
+
+.card-cyber:hover {
+  border-color: var(--color-border-light);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   Button Enhancements
+   ============================================ */
+.btn-neon {
+  position: relative;
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  transition: all 0.3s ease;
+}
+
+.btn-neon:hover {
+  background: var(--color-primary-light);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-neon-solid {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-neon-solid:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   Badge Tier Colors (Baekjoon Style)
+   ============================================ */
+.tier-bronze { background: rgba(173, 86, 0, 0.2); color: #AD5600; }
+.tier-silver { background: rgba(67, 95, 122, 0.2); color: #6b8ba3; }
+.tier-gold { background: rgba(236, 154, 0, 0.2); color: #EC9A00; }
+.tier-platinum { background: rgba(39, 226, 164, 0.2); color: #27E2A4; }
+.tier-diamond { background: rgba(0, 180, 252, 0.2); color: #00B4FC; }
+.tier-ruby { background: rgba(255, 0, 98, 0.2); color: #FF0062; }
