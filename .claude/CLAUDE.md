@@ -435,5 +435,12 @@ features/visualizers/c/
 
 ## 12. Repository Info
 
+- Repo: `git@github.com:jammy0903/C-OSINE.git`
+- Branch: `codeinsight`
 - GitHub: jammy0903
 - Email: fuso3367@kakao.com
+
+```bash
+# Push to this branch
+git push origin codeinsight
+```
