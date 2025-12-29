@@ -9,7 +9,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { SEGMENT_COLORS, getPointerColor } from '@/features/visualizers/c/constants';
-import type { CourseMemoryBlock, CourseMemoryState } from '../../hooks/useCourseMemory';
+import type { CourseMemoryBlock } from '../../hooks/useCourseMemory';
 
 interface CourseMemoryViewProps {
   stack: CourseMemoryBlock[];

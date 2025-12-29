@@ -85,8 +85,7 @@ function HighlightedLine({ line }: { line: string }) {
   }
 
   // 간단한 토큰화 (첫 번째 매칭만)
-  let highlighted = line;
-  let elements: React.ReactNode[] = [];
+  const elements: React.ReactNode[] = [];
   let remaining = line;
   let key = 0;
 

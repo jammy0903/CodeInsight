@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { MainLayout } from './layouts';
 import { Chat } from './features';
 import { CoursesPage, DayPage } from './features/courses';
+import { LandingPage } from './features/landing';
 import { useStore } from './stores/store';
 import { onAuthChange } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
@@ -62,16 +63,29 @@ function HomePage() {
  * 라우터 설정
  */
 export const router = createBrowserRouter([
+  // 랜딩 페이지 (별도 레이아웃)
   {
     path: '/',
+    element: <LandingPage />,
+  },
+  // 앱 페이지들 (MainLayout 사용)
+  {
+    path: '/app',
     element: <RootLayout />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'simulator', element: <HomePage /> },
-      { path: 'courses', element: <CoursesPage /> },
-      { path: 'courses/:lang', element: <CoursesPage /> },
-      { path: 'courses/:lang/:day', element: <DayPage /> },
       { path: 'chat', element: <Chat /> },
+    ],
+  },
+  // 코스 페이지들 (MainLayout 사용)
+  {
+    path: '/courses',
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <CoursesPage /> },
+      { path: ':lang', element: <CoursesPage /> },
+      { path: ':lang/:day', element: <DayPage /> },
     ],
   },
 ]);
