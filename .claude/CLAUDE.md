@@ -435,7 +435,7 @@ features/visualizers/c/
 
 ## 12. Repository Info
 
-- Repo: `git@github.com:jammy0903/C-OSINE.git`
+- Repo: `git@github.com:jammy0903/CodeInsight.git`
 - Branch: `codeinsight`
 - GitHub: jammy0903
 - Email: fuso3367@kakao.com
