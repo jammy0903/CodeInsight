@@ -17,19 +17,24 @@ import { getFirebaseAuth } from '../config/firebase';
 import { prisma } from '../config/database';
 import { env } from '../config/env';
 
+// OAuth Provider 타입
+type OAuthProvider = 'google' | 'github' | 'kakao';
+
 // Express Request 타입 확장
 declare global {
   namespace Express {
     interface Request {
       user?: {
-        uid: string;
-        email?: string;
+        uid: string;           // Firebase UID (= providerId)
+        email?: string;        // Firebase에서 받은 이메일
+        provider: OAuthProvider;
         dbUser?: {
-          id: string;
-          firebaseUid: string;
-          email: string;
-          name: string;
+          nickname: string;
           role: string;
+          oauthAccounts: {
+            provider: string;
+            email: string | null;
+          }[];
         };
       };
     }
@@ -37,8 +42,24 @@ declare global {
 }
 
 /**
+ * Firebase sign_in_provider를 OAuthProvider로 변환
+ */
+function getProviderFromFirebase(signInProvider?: string): OAuthProvider {
+  switch (signInProvider) {
+    case 'google.com':
+      return 'google';
+    case 'github.com':
+      return 'github';
+    case 'oidc.kakao':
+      return 'kakao';
+    default:
+      return 'google'; // 기본값
+  }
+}
+
+/**
  * Firebase 토큰 검증 미들웨어
- * - 토큰 검증 후 req.user.uid 설정
+ * - 토큰 검증 후 req.user.uid, provider 설정
  * - DB 사용자 조회는 하지 않음 (필요시 requireDbUser 사용)
  */
 export async function requireAuth(
@@ -57,9 +78,12 @@ export async function requireAuth(
 
   try {
     const decodedToken = await getFirebaseAuth().verifyIdToken(token);
+    const provider = getProviderFromFirebase(decodedToken.firebase?.sign_in_provider);
+
     req.user = {
       uid: decodedToken.uid,
       email: decodedToken.email,
+      provider,
     };
     next();
   } catch (error) {
@@ -74,77 +98,73 @@ export async function requireAuth(
 
 /**
  * Firebase 토큰 검증 + DB 사용자 조회 미들웨어
- * - 토큰 검증 후 req.user.dbUser 설정
- * - DB에 사용자가 없으면 404 반환
+ * - requireAuth를 재사용해서 토큰 검증
+ * - DB에서 User 조회 후 req.user.dbUser 설정
+ * - DB에 사용자가 없으면 404 반환 (닉네임 등록 필요)
  */
 export async function requireDbUser(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const authHeader = req.headers.authorization;
+  // 1. 토큰 검증 (requireAuth 재사용)
+  await requireAuth(req, res, () => {});
 
-  if (!authHeader?.startsWith('Bearer ')) {
-    res.status(401).json({ error: 'Missing or invalid Authorization header' });
+  // requireAuth에서 401 반환했으면 여기서 중단
+  if (!req.user) {
     return;
   }
 
-  const token = authHeader.slice(7);
-
+  // 2. DB에서 User 조회
   try {
-    const decodedToken = await getFirebaseAuth().verifyIdToken(token);
-
-    const dbUser = await prisma.user.findUnique({
-      where: { firebaseUid: decodedToken.uid },
+    const oauthAccount = await prisma.oAuthAccount.findUnique({
+      where: {
+        provider_providerId: {
+          provider: req.user.provider,
+          providerId: req.user.uid,
+        },
+      },
+      include: {
+        user: {
+          include: {
+            oauthAccounts: {
+              select: {
+                provider: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    if (!dbUser) {
-      res.status(404).json({ error: 'User not found. Please register first.' });
+    if (!oauthAccount) {
+      // 사용자가 없음 = 닉네임 등록 필요
+      res.status(404).json({
+        error: 'User not found',
+        code: 'USER_NOT_REGISTERED',
+        message: 'Please register with a nickname first.',
+      });
       return;
     }
 
-    req.user = {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
-      dbUser: {
-        id: dbUser.id,
-        firebaseUid: dbUser.firebaseUid,
-        email: dbUser.email,
-        name: dbUser.name,
-        role: dbUser.role,
-      },
+    // 3. dbUser 정보 추가
+    req.user.dbUser = {
+      nickname: oauthAccount.user.nickname,
+      role: oauthAccount.user.role,
+      oauthAccounts: oauthAccount.user.oauthAccounts,
     };
+
     next();
   } catch (error) {
     if (env.NODE_ENV === 'development') {
-      console.error('[Auth] Token verification failed:', error);
+      console.error('[Auth] DB user lookup failed:', error);
     }
-    res.status(401).json({ error: 'Invalid or expired token' });
+    res.status(500).json({ error: 'Failed to authenticate user' });
     return;
   }
 }
 
-/**
- * Admin 권한 확인 미들웨어
- * - requireDbUser 이후에 사용
- */
-export function requireAdmin(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
-  if (!req.user?.dbUser) {
-    res.status(401).json({ error: 'Authentication required' });
-    return;
-  }
-
-  if (req.user.dbUser.role !== 'admin') {
-    res.status(403).json({ error: 'Admin access required' });
-    return;
-  }
-
-  next();
-}
 
 /**
  * 선택적 인증 미들웨어
@@ -167,9 +187,12 @@ export async function optionalAuth(
 
   try {
     const decodedToken = await getFirebaseAuth().verifyIdToken(token);
+    const provider = getProviderFromFirebase(decodedToken.firebase?.sign_in_provider);
+
     req.user = {
       uid: decodedToken.uid,
       email: decodedToken.email,
+      provider,
     };
   } catch {
     // 토큰 검증 실패해도 통과 (선택적 인증)
