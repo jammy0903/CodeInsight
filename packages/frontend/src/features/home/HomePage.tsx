@@ -10,7 +10,7 @@ import { Code2, Brain, Target } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen px-6">
+    <main className="min-h-screen px-6 home-bg">
       {/* Hero Section */}
       <section className="mx-auto text-center">
         <div>
@@ -40,14 +40,24 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex gap-4 justify-center"
           >
-            <Link to="/courses">
+            <Link to="/login">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="btn-secondary text-lg px-10 py-4 rounded-xl"
+              >
+                로그인하기
+              </motion.button>
+            </Link>
+            <Link to="/signup">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="btn-primary text-lg px-10 py-4 rounded-xl"
               >
-                무료로 시작하기 →
+                회원가입하기
               </motion.button>
             </Link>
           </motion.div>
@@ -130,15 +140,26 @@ export default function HomePage() {
             <p className="text-text-secondary">
               무료로 시작하고, 언제든 학습하세요
             </p>
-            <Link to="/courses">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="btn-primary text-lg px-10 py-4 rounded-xl"
-              >
-                지금 시작하기
-              </motion.button>
-            </Link>
+            <div className="flex gap-4 justify-center">
+              <Link to="/login">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn-secondary text-lg px-10 py-4 rounded-xl"
+                >
+                  로그인하기
+                </motion.button>
+              </Link>
+              <Link to="/signup">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn-primary text-lg px-10 py-4 rounded-xl"
+                >
+                  회원가입하기
+                </motion.button>
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>

@@ -8,6 +8,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   // === API ===
   VITE_API_URL: z.string().default('http://localhost:3002'),
+  VITE_API_VERSION: z.string().default('v1'),
 
   // === Firebase ===
   VITE_FIREBASE_API_KEY: z.string().min(1),
@@ -31,6 +32,7 @@ const envSchema = z.object({
 function getEnv() {
   return envSchema.parse({
     VITE_API_URL: import.meta.env.VITE_API_URL,
+    VITE_API_VERSION: import.meta.env.VITE_API_VERSION,
     VITE_FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
     VITE_FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
     VITE_FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID,

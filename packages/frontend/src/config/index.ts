@@ -7,7 +7,7 @@ import { env } from './env';
 
 export const config = {
   api: {
-    baseUrl: env.VITE_API_URL,
+    baseUrl: `${env.VITE_API_URL}/api/${env.VITE_API_VERSION}`,
     endpoints: {
       cRun: '/c/run',
       cJudge: '/c/judge',

@@ -35,15 +35,45 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy' });
 });
 
-// Rate limiting 적용
-app.use('/api/problems', rateLimit, problemRoutes);
-app.use('/api/memory', executeRateLimit, memoryRoutes);
-app.use('/api/submissions', rateLimit, submissionRoutes);
-app.use('/api/users', authRateLimit, userRoutes);
-app.use('/api/c', executeRateLimit, cRoutes);
-app.use('/api/ai', aiRateLimit, aiRoutes);
-app.use('/api/courses', rateLimit, courseRoutes);
-app.use('/api/admin', rateLimit, adminRoutes);
+// =============================================
+// API v1 Routes (현재 버전)
+// =============================================
+app.use('/api/v1/problems', rateLimit, problemRoutes);
+app.use('/api/v1/memory', executeRateLimit, memoryRoutes);
+app.use('/api/v1/submissions', rateLimit, submissionRoutes);
+app.use('/api/v1/users', authRateLimit, userRoutes);
+app.use('/api/v1/c', executeRateLimit, cRoutes);
+app.use('/api/v1/ai', aiRateLimit, aiRoutes);
+app.use('/api/v1/courses', rateLimit, courseRoutes);
+app.use('/api/v1/admin', rateLimit, adminRoutes);
+
+// =============================================
+// Legacy Routes (버전 없는 요청 → v1로 리다이렉트)
+// =============================================
+app.use('/api/problems', (req, res) => {
+  res.redirect(301, `/api/v1/problems${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/memory', (req, res) => {
+  res.redirect(301, `/api/v1/memory${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/submissions', (req, res) => {
+  res.redirect(301, `/api/v1/submissions${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/users', (req, res) => {
+  res.redirect(301, `/api/v1/users${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/c', (req, res) => {
+  res.redirect(301, `/api/v1/c${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/ai', (req, res) => {
+  res.redirect(301, `/api/v1/ai${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/courses', (req, res) => {
+  res.redirect(301, `/api/v1/courses${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/admin', (req, res) => {
+  res.redirect(301, `/api/v1/admin${req.path === '/' ? '' : req.path}`);
+});
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

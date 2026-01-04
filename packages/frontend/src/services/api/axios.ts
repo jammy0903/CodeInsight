@@ -7,9 +7,10 @@
 
 import axios from 'axios';
 import { auth, waitForAuth } from '../firebase';
+import { config } from '../../config';
 
-// API 기본 URL
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+// API 기본 URL (버전 포함)
+const BASE_URL = config.api.baseUrl;
 
 // 환경별 로거 (프로덕션에서는 민감 정보 출력 안 함)
 const logger = {
