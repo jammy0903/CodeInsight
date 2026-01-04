@@ -2,9 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
+import { logger } from './config/logger';
 import { initializeFirebase } from './config/firebase';
 import { swaggerSpec } from './config/swagger';
-import { rateLimit, authRateLimit, aiRateLimit, executeRateLimit } from './middleware';
+import { rateLimit, authRateLimit, aiRateLimit, executeRateLimit, requestLogger } from './middleware';
 import { problemRoutes } from './modules/problems/routes';
 import { memoryRoutes } from './modules/memory/routes';
 import { submissionRoutes } from './modules/submissions/routes';
@@ -25,6 +26,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json({ limit: config.server.jsonBodyLimit }));
+app.use(requestLogger);
 
 // Routes
 app.get('/', (req, res) => {
@@ -94,8 +96,12 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('❌ Unhandled error:', err.message);
-  console.error(err.stack);
+  logger.error('Unhandled error', {
+    message: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+  });
   res.status(500).json({
     error: 'Internal server error',
     message: config.server.isDev ? err.message : undefined
@@ -104,7 +110,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 
 // Start server
 app.listen(config.server.port, () => {
-  console.log(`Server running on http://localhost:${config.server.port}`);
+  logger.info(`Server running on http://localhost:${config.server.port}`);
 });
 
 export default app;

@@ -8,6 +8,7 @@
 
 import admin from 'firebase-admin';
 import { env } from './env';
+import { logger } from './logger';
 
 let firebaseApp: admin.app.App | null = null;
 
@@ -23,9 +24,11 @@ export function initializeFirebase(): admin.app.App {
   }
 
   // DEBUG: 환경변수 확인
-  console.log('[Firebase] DEBUG - PROJECT_ID:', env.FIREBASE_PROJECT_ID ? 'SET' : 'NOT SET');
-  console.log('[Firebase] DEBUG - CLIENT_EMAIL:', env.FIREBASE_CLIENT_EMAIL ? 'SET' : 'NOT SET');
-  console.log('[Firebase] DEBUG - PRIVATE_KEY:', env.FIREBASE_PRIVATE_KEY ? 'SET (length: ' + env.FIREBASE_PRIVATE_KEY.length + ')' : 'NOT SET');
+  logger.debug('Firebase initialization check', {
+    projectId: env.FIREBASE_PROJECT_ID ? 'SET' : 'NOT SET',
+    clientEmail: env.FIREBASE_CLIENT_EMAIL ? 'SET' : 'NOT SET',
+    privateKey: env.FIREBASE_PRIVATE_KEY ? `SET (length: ${env.FIREBASE_PRIVATE_KEY.length})` : 'NOT SET',
+  });
 
   // 환경변수로 서비스 계정 설정
   if (env.FIREBASE_PROJECT_ID && env.FIREBASE_CLIENT_EMAIL && env.FIREBASE_PRIVATE_KEY) {
@@ -37,7 +40,7 @@ export function initializeFirebase(): admin.app.App {
         privateKey: env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       }),
     });
-    console.log('[Firebase] Initialized with service account');
+    logger.info('Firebase initialized with service account');
     return firebaseApp;
   }
 
@@ -46,14 +49,14 @@ export function initializeFirebase(): admin.app.App {
     firebaseApp = admin.initializeApp({
       credential: admin.credential.applicationDefault(),
     });
-    console.log('[Firebase] Initialized with application default credentials');
+    logger.info('Firebase initialized with application default credentials');
     return firebaseApp;
   }
 
   // 개발 환경에서는 경고만 출력
   if (env.NODE_ENV === 'development') {
-    console.warn('[Firebase] No credentials found. Auth middleware will reject all requests.');
-    console.warn('[Firebase] Set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY');
+    logger.warn('Firebase: No credentials found. Auth middleware will reject all requests.');
+    logger.warn('Firebase: Set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY');
     // 초기화 없이 null 반환하면 안됨 - 빈 앱이라도 있어야 함
     firebaseApp = admin.initializeApp();
     return firebaseApp;

@@ -16,6 +16,7 @@ import { Request, Response, NextFunction } from 'express';
 import { getFirebaseAuth } from '../config/firebase';
 import { prisma } from '../config/database';
 import { env } from '../config/env';
+import { logger } from '../config/logger';
 
 // OAuth Provider 타입
 type OAuthProvider = 'google' | 'github' | 'kakao';
@@ -87,10 +88,7 @@ export async function requireAuth(
     };
     next();
   } catch (error) {
-    // 개발 환경에서 디버깅용 로그
-    if (env.NODE_ENV === 'development') {
-      console.error('[Auth] Token verification failed:', error);
-    }
+    logger.error('Auth: Token verification failed', { error });
     res.status(401).json({ error: 'Invalid or expired token' });
     return;
   }
@@ -157,9 +155,7 @@ export async function requireDbUser(
 
     next();
   } catch (error) {
-    if (env.NODE_ENV === 'development') {
-      console.error('[Auth] DB user lookup failed:', error);
-    }
+    logger.error('Auth: DB user lookup failed', { error });
     res.status(500).json({ error: 'Failed to authenticate user' });
     return;
   }
