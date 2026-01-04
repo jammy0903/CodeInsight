@@ -1,33 +1,71 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
 import { runCCode, judgeCode } from './executor';
 import { prisma } from '../../config/database';
 import { config } from '../../config';
+import { optionalAuth } from '../../middleware';
 
 export const cRoutes = Router();
 
+// =============================================
+// Zod 스키마 정의
+// =============================================
+
 /**
- * 코드 필드 검증 미들웨어
+ * /run 엔드포인트 스키마
  */
-function validateCode(req: Request, res: Response, next: NextFunction) {
-  const { code } = req.body;
+const runCodeSchema = z.object({
+  code: z
+    .string()
+    .min(1, 'code 필드가 필요합니다')
+    .max(config.execution.maxCodeLength, `코드가 너무 깁니다 (최대 ${config.execution.maxCodeLength}자)`),
+  stdin: z.string().optional().default(''),
+  timeout: z.number().int().min(1).max(config.execution.maxTimeout).optional(),
+});
 
-  if (!code || typeof code !== 'string') {
-    return res.status(400).json({
-      success: false,
-      error: 'validation_error',
-      message: 'code 필드가 필요합니다'
-    });
-  }
+/**
+ * /judge 엔드포인트 스키마
+ */
+const judgeCodeSchema = z.object({
+  code: z
+    .string()
+    .min(1, 'code 필드가 필요합니다')
+    .max(config.execution.maxCodeLength, `코드가 너무 깁니다 (최대 ${config.execution.maxCodeLength}자)`),
+  problemId: z.string().uuid().optional(),
+  testCases: z
+    .array(
+      z.object({
+        input: z.string(),
+        output: z.string(),
+      })
+    )
+    .optional(),
+});
 
-  if (code.length > config.execution.maxCodeLength) {
-    return res.status(400).json({
-      success: false,
-      error: 'validation_error',
-      message: `코드가 너무 깁니다 (최대 ${config.execution.maxCodeLength}자)`
-    });
-  }
+// =============================================
+// 검증 미들웨어
+// =============================================
 
-  next();
+/**
+ * Zod 스키마로 request body 검증하는 범용 미들웨어
+ */
+function validate(schema: z.ZodSchema) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.body);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        error: 'validation_error',
+        message: result.error.issues[0]?.message || '유효하지 않은 요청입니다',
+        details: result.error.issues,
+      });
+    }
+
+    // 검증된 데이터를 req.body에 덮어쓰기 (타입 안전성)
+    req.body = result.data;
+    next();
+  };
 }
 
 /**
@@ -55,7 +93,7 @@ function validateCode(req: Request, res: Response, next: NextFunction) {
  *       500:
  *         description: 내부 서버 에러
  */
-cRoutes.post('/run', validateCode, async (req, res) => {
+cRoutes.post('/run', validate(runCodeSchema), async (req, res) => {
   try {
     const { code, stdin = '', timeout = config.execution.defaultTimeout } = req.body;
     const timeoutSec = Math.min(Math.max(1, timeout), config.execution.maxTimeout);
@@ -110,23 +148,23 @@ cRoutes.post('/run', validateCode, async (req, res) => {
  *       500:
  *         description: 내부 서버 에러
  */
-cRoutes.post('/judge', validateCode, async (req, res) => {
+cRoutes.post('/judge', optionalAuth, validate(judgeCodeSchema), async (req, res) => {
   try {
-    const { code, problemId, firebaseUid, testCases } = req.body;
+    const { code, problemId, testCases } = req.body;
 
     let cases = testCases;
 
     if (!cases && problemId) {
       const problem = await prisma.problem.findUnique({
         where: { id: problemId },
-        select: { testCases: true }
+        select: { testCases: true },
       });
 
       if (!problem) {
         return res.status(404).json({
           success: false,
           error: 'not_found',
-          message: '문제를 찾을 수 없습니다'
+          message: '문제를 찾을 수 없습니다',
         });
       }
 
@@ -141,27 +179,34 @@ cRoutes.post('/judge', validateCode, async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'validation_error',
-        message: '테스트케이스가 필요합니다'
+        message: '테스트케이스가 필요합니다',
       });
     }
 
     const result = await judgeCode(code, cases, config.execution.judgeTimeout);
 
-    if (firebaseUid && problemId) {
+    // 로그인한 사용자면 제출 기록 저장 (OAuthAccount로 조회)
+    if (req.user && problemId) {
       try {
-        const user = await prisma.user.findUnique({
-          where: { firebaseUid }
+        const oauthAccount = await prisma.oAuthAccount.findUnique({
+          where: {
+            provider_providerId: {
+              provider: req.user.provider,
+              providerId: req.user.uid,
+            },
+          },
+          select: { userNickname: true },
         });
 
-        if (user) {
+        if (oauthAccount) {
           await prisma.submission.create({
             data: {
-              userId: user.id,
+              userNickname: oauthAccount.userNickname,
               problemId,
               code,
               verdict: result.verdict,
-              executionTime: result.executionTimeMs
-            }
+              executionTime: result.executionTimeMs,
+            },
           });
         }
       } catch (dbError) {
@@ -176,15 +221,15 @@ cRoutes.post('/judge', validateCode, async (req, res) => {
         passed: result.passed,
         total: result.total,
         execution_time_ms: result.executionTimeMs,
-        details: result.details
-      }
+        details: result.details,
+      },
     });
   } catch (error: unknown) {
     console.error('Judge error:', error);
     res.status(500).json({
       success: false,
       error: 'internal_error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 });
