@@ -8,7 +8,7 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
-import { config } from './env';
+import { env } from './env';
 
 // 로그 디렉토리
 const LOG_DIR = path.join(process.cwd(), 'logs');
@@ -59,13 +59,15 @@ const consoleTransport = new winston.transports.Console({
 });
 
 // Winston Logger 생성
+const isDev = env.NODE_ENV === 'development';
+
 export const logger = winston.createLogger({
-  level: config.server.isDev ? 'debug' : 'info',
+  level: isDev ? 'debug' : 'info',
   format: logFormat,
   transports: [
     errorFileTransport,
     combinedFileTransport,
-    ...(config.server.isDev ? [consoleTransport] : []),
+    ...(isDev ? [consoleTransport] : []),
   ],
   // Unhandled exception/rejection 처리
   exceptionHandlers: [

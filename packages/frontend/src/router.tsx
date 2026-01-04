@@ -7,7 +7,7 @@ import { createBrowserRouter, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 import { MainLayout } from './layouts';
 import { HomePage } from './features/home';
-import { LoginPage } from './features/auth';
+import { LoginPage, SignupPage } from './features/auth';
 import { CoursesPage, ChaptersPage, LessonsPage, LessonPage } from './features/courses';
 import { AdminPage, AdminRoute } from './features/admin';
 import { initializeAuthListener } from './services/firebase';
@@ -58,6 +58,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'login', element: <LoginPage /> },
+      { path: 'signup', element: <SignupPage /> },
       { path: 'simulator', element: <HomePage /> },
       { path: 'courses', element: <CoursesPage /> },
       { path: 'courses/:lang', element: <ChaptersPage /> },

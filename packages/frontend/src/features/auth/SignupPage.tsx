@@ -1,5 +1,5 @@
 /**
- * LoginPage - 로그인 페이지
+ * SignupPage - 회원가입 페이지
  * Firebase 소셜 로그인 (Google, GitHub, Kakao)
  */
 
@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { loginWithGoogle, loginWithGithub, loginWithKakao } from '@/services/firebase';
 import { Github } from 'lucide-react';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ export default function LoginPage() {
       await loginWithGoogle();
       navigate('/courses');
     } catch (err) {
-      setError('Google 로그인 실패');
+      setError('Google 회원가입 실패');
       console.error(err);
     } finally {
       setLoading(false);
@@ -35,7 +35,7 @@ export default function LoginPage() {
       await loginWithGithub();
       navigate('/courses');
     } catch (err) {
-      setError('GitHub 로그인 실패');
+      setError('GitHub 회원가입 실패');
       console.error(err);
     } finally {
       setLoading(false);
@@ -49,7 +49,7 @@ export default function LoginPage() {
       await loginWithKakao();
       navigate('/courses');
     } catch (err) {
-      setError('Kakao 로그인 실패');
+      setError('Kakao 회원가입 실패');
       console.error(err);
     } finally {
       setLoading(false);
@@ -67,7 +67,7 @@ export default function LoginPage() {
         {/* 타이틀 */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-text mb-4">
-            로그인
+            회원가입
           </h1>
           <p className="text-text-secondary">
             소셜 계정으로 간편하게 시작하세요
@@ -83,7 +83,7 @@ export default function LoginPage() {
             onClick={handleGoogleLogin}
             disabled={loading}
             className="w-16 h-16 flex items-center justify-center bg-white border-2 border-border rounded-full shadow-md hover:shadow-lg hover:border-primary transition-all disabled:opacity-50"
-            aria-label="Google로 로그인"
+            aria-label="Google로 회원가입"
           >
             <svg className="w-7 h-7" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -100,7 +100,7 @@ export default function LoginPage() {
             onClick={handleGithubLogin}
             disabled={loading}
             className="w-16 h-16 flex items-center justify-center bg-[#24292e] border-2 border-[#24292e] rounded-full shadow-md hover:shadow-lg hover:bg-[#1a1e22] transition-all disabled:opacity-50"
-            aria-label="GitHub로 로그인"
+            aria-label="GitHub로 회원가입"
           >
             <Github className="w-7 h-7 text-white" />
           </motion.button>
@@ -112,7 +112,7 @@ export default function LoginPage() {
             onClick={handleKakaoLogin}
             disabled={loading}
             className="w-16 h-16 flex items-center justify-center bg-[#FEE500] border-2 border-[#FEE500] rounded-full shadow-md hover:shadow-lg hover:bg-[#FFEB3B] transition-all disabled:opacity-50"
-            aria-label="Kakao로 로그인"
+            aria-label="Kakao로 회원가입"
           >
             <svg className="w-7 h-7 text-[#3C1E1E]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 3C6.477 3 2 6.477 2 10.75c0 2.745 1.79 5.155 4.5 6.645l-1.125 4.125c-.075.27.21.495.45.345l5.25-3.495c.315.03.63.045.945.045 5.523 0 9.98-3.477 9.98-7.75S17.523 3 12 3z"/>
@@ -133,9 +133,9 @@ export default function LoginPage() {
 
         {/* 하단 텍스트 */}
         <p className="mt-8 text-center text-sm text-text-tertiary">
-          계정이 없으신가요?{' '}
-          <a href="/signup" className="text-primary hover:underline font-medium">
-            회원가입하기
+          이미 계정이 있으신가요?{' '}
+          <a href="/login" className="text-primary hover:underline font-medium">
+            로그인하기
           </a>
         </p>
       </motion.div>

@@ -18,7 +18,12 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const { sidebarOpen, toggleSidebar } = useStore();
+  const { sidebarOpen, toggleSidebar, appUser } = useStore();
+
+  // Gmail 문의하기 링크 (제목 포함)
+  const username = appUser?.nickname || '게스트';
+  const emailSubject = encodeURIComponent(`[CodeInsight 고객문의사항] ${username}`);
+  const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=l89192164@gmail.com&su=${emailSubject}`;
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
@@ -150,11 +155,13 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-accent-orange to-accent-coral group-hover:w-full transition-all duration-300" />
               </motion.a>
               <motion.a
-                href="#"
+                href={gmailLink}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors relative group"
                 whileHover={{ y: -1 }}
               >
-                Contact
+                문의하기
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-accent-orange to-accent-coral group-hover:w-full transition-all duration-300" />
               </motion.a>
             </div>
