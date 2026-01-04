@@ -131,17 +131,17 @@ export async function getLessonFull(lessonId: string) {
 /**
  * 사용자 진행 상태 조회
  */
-export async function getUserProgress(userNickname: string, lessonId?: string) {
+export async function getUserProgress(userId: string, lessonId?: string) {
   if (lessonId) {
     return prisma.userProgress.findUnique({
       where: {
-        userNickname_lessonId: { userNickname, lessonId },
+        userId_lessonId: { userId, lessonId },
       },
     });
   }
 
   return prisma.userProgress.findMany({
-    where: { userNickname },
+    where: { userId },
     orderBy: { updatedAt: 'desc' },
   });
 }
@@ -149,7 +149,7 @@ export async function getUserProgress(userNickname: string, lessonId?: string) {
 /**
  * 챕터별 진행 상태 (레슨 포함)
  */
-export async function getChapterProgress(userNickname: string, chapterId: string) {
+export async function getChapterProgress(userId: string, chapterId: string) {
   const chapter = await prisma.chapter.findUnique({
     where: { id: chapterId },
     include: {
@@ -158,7 +158,7 @@ export async function getChapterProgress(userNickname: string, chapterId: string
         orderBy: { order: 'asc' },
         include: {
           progress: {
-            where: { userNickname },
+            where: { userId },
           },
         },
       },
@@ -186,7 +186,7 @@ export async function getChapterProgress(userNickname: string, chapterId: string
  * 진행 상태 업데이트 (upsert)
  */
 export async function updateProgress(
-  userNickname: string,
+  userId: string,
   lessonId: string,
   data: {
     status?: 'not_started' | 'in_progress' | 'completed';
@@ -199,10 +199,10 @@ export async function updateProgress(
 
   return prisma.userProgress.upsert({
     where: {
-      userNickname_lessonId: { userNickname, lessonId },
+      userId_lessonId: { userId, lessonId },
     },
     create: {
-      userNickname,
+      userId,
       lessonId,
       status: data.status || 'in_progress',
       currentStep: data.currentStep || 0,

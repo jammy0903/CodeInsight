@@ -38,7 +38,7 @@ export const submissionRoutes = Router();
 submissionRoutes.post('/', requireDbUser, async (req, res) => {
   try {
     const { problemId, code, verdict, executionTime } = req.body;
-    const userNickname = req.user!.dbUser!.nickname;
+    const userId = req.user!.dbUser!.id;
 
     if (!problemId || !code) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -46,7 +46,7 @@ submissionRoutes.post('/', requireDbUser, async (req, res) => {
 
     const submission = await prisma.submission.create({
       data: {
-        userNickname,
+        userId,
         problemId,
         code,
         verdict: verdict || 'judging',
@@ -75,10 +75,10 @@ submissionRoutes.post('/', requireDbUser, async (req, res) => {
  */
 submissionRoutes.get('/me', requireDbUser, async (req, res) => {
   try {
-    const userNickname = req.user!.dbUser!.nickname;
+    const userId = req.user!.dbUser!.id;
 
     const submissions = await prisma.submission.findMany({
-      where: { userNickname },
+      where: { userId },
       include: {
         problem: {
           select: { number: true, title: true },
@@ -107,11 +107,11 @@ submissionRoutes.get('/me', requireDbUser, async (req, res) => {
  */
 submissionRoutes.get('/me/solved', requireDbUser, async (req, res) => {
   try {
-    const userNickname = req.user!.dbUser!.nickname;
+    const userId = req.user!.dbUser!.id;
 
     const solvedSubmissions = await prisma.submission.findMany({
       where: {
-        userNickname,
+        userId,
         verdict: 'accepted',
       },
       select: { problemId: true },
@@ -119,7 +119,7 @@ submissionRoutes.get('/me/solved', requireDbUser, async (req, res) => {
     });
 
     const allSubmissions = await prisma.submission.findMany({
-      where: { userNickname },
+      where: { userId },
       select: { problemId: true },
       distinct: ['problemId'],
     });

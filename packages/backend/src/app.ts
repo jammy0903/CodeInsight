@@ -43,7 +43,7 @@ app.get('/health', (req, res) => {
 app.use('/api/v1/problems', rateLimit, problemRoutes);
 app.use('/api/v1/memory', executeRateLimit, memoryRoutes);
 app.use('/api/v1/submissions', rateLimit, submissionRoutes);
-app.use('/api/v1/users', authRateLimit, userRoutes);
+app.use('/api/v1/users', userRoutes); // Rate Limiter 제거: 중복 닉네임만 DB에서 검사
 app.use('/api/v1/c', executeRateLimit, cRoutes);
 app.use('/api/v1/ai', aiRateLimit, aiRoutes);
 app.use('/api/v1/courses', rateLimit, courseRoutes);

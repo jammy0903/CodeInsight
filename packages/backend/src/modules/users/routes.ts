@@ -330,7 +330,7 @@ userRoutes.post('/link-oauth', requireDbUser, async (req, res) => {
     // OAuth 계정 추가
     await prisma.oAuthAccount.create({
       data: {
-        userNickname: dbUser!.nickname,
+        userId: dbUser!.id,
         provider,
         providerId: uid,
         email: email || null,
@@ -339,7 +339,7 @@ userRoutes.post('/link-oauth', requireDbUser, async (req, res) => {
 
     // 업데이트된 사용자 정보 반환
     const user = await prisma.user.findUnique({
-      where: { nickname: dbUser!.nickname },
+      where: { id: dbUser!.id },
       include: {
         oauthAccounts: {
           select: {

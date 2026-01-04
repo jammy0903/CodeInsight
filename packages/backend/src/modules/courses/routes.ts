@@ -99,9 +99,9 @@ router.get('/chapters/:id', async (req, res) => {
 router.get('/chapters/:id/progress', requireDbUser, async (req, res) => {
   try {
     const { id } = req.params;
-    const userNickname = req.user!.dbUser!.nickname;
+    const userId = req.user!.dbUser!.id;
 
-    const progress = await courseService.getChapterProgress(userNickname, id);
+    const progress = await courseService.getChapterProgress(userId, id);
 
     if (!progress) {
       return res.status(404).json({ error: 'Chapter not found' });
@@ -161,9 +161,9 @@ router.get('/lessons/:id', async (req, res) => {
  */
 router.get('/progress', requireDbUser, async (req, res) => {
   try {
-    const userNickname = req.user!.dbUser!.nickname;
+    const userId = req.user!.dbUser!.id;
 
-    const progress = await courseService.getUserProgress(userNickname);
+    const progress = await courseService.getUserProgress(userId);
     res.json(progress);
   } catch (error) {
     console.error('Get progress error:', error);
@@ -179,7 +179,7 @@ router.get('/progress', requireDbUser, async (req, res) => {
  */
 router.post('/progress', requireDbUser, async (req, res) => {
   try {
-    const userNickname = req.user!.dbUser!.nickname;
+    const userId = req.user!.dbUser!.id;
 
     const parsed = progressUpdateSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -190,7 +190,7 @@ router.post('/progress', requireDbUser, async (req, res) => {
     }
 
     const { lessonId, ...data } = parsed.data;
-    const progress = await courseService.updateProgress(userNickname, lessonId, data);
+    const progress = await courseService.updateProgress(userId, lessonId, data);
 
     res.json(progress);
   } catch (error) {

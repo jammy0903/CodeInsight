@@ -8,7 +8,8 @@ datasource db {
 }
 
 model User {
-  nickname  String   @id                      // 닉네임 = Primary Key
+  id        String   @id @default(uuid())     // UUID = Primary Key (변경 불가)
+  nickname  String   @unique                  // 닉네임 (변경 가능, unique)
   role      String   @default("user")         // 'user' | 'admin'
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -24,17 +25,17 @@ model User {
 
 // OAuth 계정 (1 User : N OAuth Providers)
 model OAuthAccount {
-  id           String   @id @default(uuid())
-  userNickname String   @map("user_nickname")
-  provider     String                         // 'google' | 'github' | 'kakao'
-  providerId   String   @map("provider_id")   // OAuth provider의 고유 ID
-  email        String?                        // provider별 이메일 (nullable)
-  createdAt    DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")         // UUID 참조
+  provider   String                           // 'google' | 'github' | 'kakao'
+  providerId String   @map("provider_id")     // OAuth provider의 고유 ID
+  email      String?                          // provider별 이메일 (nullable)
+  createdAt  DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userNickname], references: [nickname], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerId])            // 같은 provider의 같은 계정 중복 방지
-  @@index([userNickname])
+  @@index([userId])
   @@map("oauth_accounts")
 }
 
@@ -62,29 +63,29 @@ model Problem {
 
 model Submission {
   id            String   @id @default(uuid())
-  userNickname  String   @map("user_nickname")
+  userId        String   @map("user_id")
   problemId     String   @map("problem_id")
   code          String
   verdict       String   @default("judging")
   executionTime Int?     @map("execution_time")
   createdAt     DateTime @default(now()) @map("created_at")
   problem       Problem  @relation(fields: [problemId], references: [id])
-  user          User     @relation(fields: [userNickname], references: [nickname])
+  user          User     @relation(fields: [userId], references: [id])
 
-  @@index([userNickname, problemId], map: "idx_submissions_user_problem")
+  @@index([userId, problemId], map: "idx_submissions_user_problem")
   @@map("submissions")
 }
 
 model Draft {
-  id           String   @id @default(uuid())
-  userNickname String   @map("user_nickname")
-  problemId    String   @map("problem_id")
-  code         String
-  savedAt      DateTime @default(now()) @map("saved_at")
-  problem      Problem  @relation(fields: [problemId], references: [id])
-  user         User     @relation(fields: [userNickname], references: [nickname])
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  problemId String   @map("problem_id")
+  code      String
+  savedAt   DateTime @default(now()) @map("saved_at")
+  problem   Problem  @relation(fields: [problemId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
-  @@unique([userNickname, problemId])
+  @@unique([userId, problemId])
   @@map("drafts")
 }
 
@@ -179,22 +180,22 @@ model Quiz {
 }
 
 model UserProgress {
-  id           String    @id @default(uuid())
-  userNickname String    @map("user_nickname")
-  lessonId     String    @map("lesson_id")
-  status       String    @default("not_started") // 'not_started', 'in_progress', 'completed'
-  currentStep  Int       @default(0) @map("current_step")
-  quizScore    Int?      @map("quiz_score")
-  quizTotal    Int?      @map("quiz_total")
-  startedAt    DateTime? @map("started_at")
-  completedAt  DateTime? @map("completed_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  lessonId    String    @map("lesson_id")
+  status      String    @default("not_started") // 'not_started', 'in_progress', 'completed'
+  currentStep Int       @default(0) @map("current_step")
+  quizScore   Int?      @map("quiz_score")
+  quizTotal   Int?      @map("quiz_total")
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   lesson Lesson @relation(fields: [lessonId], references: [id])
-  user   User   @relation(fields: [userNickname], references: [nickname])
+  user   User   @relation(fields: [userId], references: [id])
 
-  @@unique([userNickname, lessonId])
-  @@index([userNickname])
+  @@unique([userId, lessonId])
+  @@index([userId])
   @@index([lessonId])
   @@map("user_progress")
 }

@@ -33,7 +33,7 @@ export interface UserInfo {
 
 export interface SubmissionInfo {
   id: string;
-  userNickname: string;
+  userId: string;
   problemId: string;
   verdict: string;
   createdAt: string;
@@ -68,7 +68,7 @@ export class AdminService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const activeUsersToday = await prisma.submission.groupBy({
-      by: ['userNickname'],
+      by: ['userId'],
       where: {
         createdAt: {
           gte: today,
@@ -161,7 +161,7 @@ export class AdminService {
 
     return submissions.map(s => ({
       id: s.id,
-      userNickname: s.userNickname,
+      userId: s.userId,
       problemId: s.problemId,
       verdict: s.verdict,
       createdAt: s.createdAt.toISOString(),

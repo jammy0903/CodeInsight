@@ -30,6 +30,7 @@ declare global {
         email?: string;        // Firebase에서 받은 이메일
         provider: OAuthProvider;
         dbUser?: {
+          id: string;          // User UUID (PK)
           nickname: string;
           role: string;
           oauthAccounts: {
@@ -148,6 +149,7 @@ export async function requireDbUser(
 
     // 3. dbUser 정보 추가
     req.user.dbUser = {
+      id: oauthAccount.user.id,
       nickname: oauthAccount.user.nickname,
       role: oauthAccount.user.role,
       oauthAccounts: oauthAccount.user.oauthAccounts,

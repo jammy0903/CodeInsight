@@ -14,6 +14,7 @@ export interface OAuthAccountInfo {
 }
 
 export interface AppUser {
+  id: string;          // User UUID (PK)
   nickname: string;
   role: 'user' | 'admin';
   oauthAccounts: OAuthAccountInfo[];
