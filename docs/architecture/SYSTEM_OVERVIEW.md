@@ -1,6 +1,6 @@
 # CodeInsight 시스템 아키텍처
 
-> 마지막 업데이트: 2025-12-28
+> 마지막 업데이트: 2026-01-03
 
 ---
 
@@ -131,13 +131,21 @@ backend/src/
 
 | 엔드포인트 | 메서드 | 인증 | Rate Limit | 설명 |
 |-----------|--------|------|------------|------|
+| `/api/courses/languages` | GET | ❌ | 100/min | 언어 목록 |
+| `/api/courses/:lang/chapters` | GET | ❌ | 100/min | 챕터 목록 |
+| `/api/courses/chapters/:id` | GET | ❌ | 100/min | 챕터 상세 (레슨 포함) |
+| `/api/courses/chapters/:id/progress` | GET | ✅ | 100/min | 챕터 진행 상태 |
+| `/api/courses/lessons/:id` | GET | ❌ | 100/min | 레슨 상세 (콘텐츠+퀴즈) |
+| `/api/courses/progress` | GET | ✅ | 100/min | 내 전체 진행 상태 |
+| `/api/courses/progress` | POST | ✅ | 100/min | 진행 상태 업데이트 |
 | `/api/c/run` | POST | ❌ | 30/min | C 코드 실행 |
 | `/api/c/judge` | POST | ❌ | 30/min | 테스트케이스 채점 |
 | `/api/memory/trace` | POST | ❌ | 30/min | 메모리 트레이스 |
 | `/api/ai/chat` | POST | ❌ | 20/min | AI Q&A |
 | `/api/ai/explain` | GET | ❌ | 20/min | 줄 해설 |
-| `/api/users/register` | POST | ✅ | 10/min | 사용자 등록 |
-| `/api/users/me` | GET | ✅ | 10/min | 내 정보 |
+| `/api/users/nickname/check` | GET | ✅ | 30/min | 닉네임 중복 확인 |
+| `/api/users/register` | POST | ✅ | 10/min | 닉네임으로 사용자 등록 |
+| `/api/users/me` | GET | ✅ | 10/min | 내 정보 (AppUser) |
 | `/api/users/me/role` | GET | ✅ | 10/min | 내 권한 |
 | `/api/problems` | GET | ❌ | 100/min | 문제 목록 |
 | `/api/problems/:id` | GET | ❌ | 100/min | 문제 상세 |
@@ -166,12 +174,13 @@ frontend/src/
 │   ├── visualizers/c/     # 메모리 시각화
 │   ├── courses/           # 코스 학습
 │   └── chat/              # AI 채팅 (TODO)
-├── data/courses/          # 코스 데이터 (정적)
+├── data/courses/          # 레거시 (정적 데이터, 마이그레이션 예정)
 │   ├── c/
 │   ├── python/
 │   └── java/
 ├── services/
 │   ├── firebase.ts        # 인증
+│   ├── courses.ts         # 코스 API (Language/Chapter/Lesson)
 │   ├── crunner.ts         # C 실행 API
 │   ├── tracer.ts          # 메모리 트레이스 API
 │   └── ai.ts              # AI 해설 API
@@ -179,6 +188,7 @@ frontend/src/
 │   └── store.ts           # Zustand 전역 상태
 └── types/
     ├── index.ts           # 공통 타입
+    ├── course-schema.ts   # 코스 타입 (Language/Chapter/Lesson/Quiz)
     └── memory.ts          # 메모리 시각화 타입
 ```
 
@@ -189,16 +199,19 @@ frontend/src/
 | `/` | HomePage | ✅ |
 | `/simulator` | SimulatorPage | ✅ |
 | `/courses` | CoursesPage | ✅ |
-| `/courses/:lang` | CoursesPage | ✅ |
-| `/courses/:lang/:day` | DayPage | 📋 TODO |
+| `/courses/:lang` | ChaptersPage | ✅ |
+| `/courses/:lang/:chapterId` | LessonsPage | ✅ |
+| `/courses/:lang/:chapterId/:lessonId` | LessonPage | ✅ |
 | `/chat` | ChatPage | 📋 TODO |
 
 ### 상태 관리 (Zustand)
 
 ```typescript
 interface Store {
-  // 사용자
-  user: User | null;
+  // 사용자 인증 (Firebase + Backend 분리)
+  firebaseUser: FirebaseUser | null;  // Firebase Auth 상태
+  appUser: AppUser | null;            // 백엔드 사용자 정보
+  needsRegistration: boolean;         // 닉네임 등록 필요 여부
   authLoading: boolean;
 
   // 채팅
@@ -214,50 +227,134 @@ interface Store {
   steps: Step[];
   currentStep: number;
 }
+
+// AppUser 타입 (백엔드에서 조회)
+interface AppUser {
+  nickname: string;           // PK, 고유 식별자
+  role: 'user' | 'admin';
+  oauthAccounts: OAuthAccount[];
+  createdAt: string;
+}
+
+interface OAuthAccount {
+  provider: 'google' | 'github' | 'kakao';
+  email: string | null;
+}
 ```
+
+> **인증 흐름**: Firebase 로그인 → `firebaseUser` 설정 → 백엔드 `/users/me` 조회 →
+> 등록된 사용자면 `appUser` 설정, 미등록이면 `needsRegistration: true` → 닉네임 모달 표시
 
 ---
 
 ## 6. 데이터베이스 스키마
 
-### ERD
-```
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│    User     │       │   Problem   │       │ Submission  │
-├─────────────┤       ├─────────────┤       ├─────────────┤
-│ id          │───┐   │ id          │───┐   │ id          │
-│ email       │   │   │ number      │   │   │ userId      │──┐
-│ name        │   │   │ title       │   │   │ problemId   │──┼─┐
-│ firebaseUid │   │   │ description │   │   │ code        │  │ │
-│ role        │   │   │ difficulty  │   │   │ verdict     │  │ │
-│ createdAt   │   │   │ tags        │   │   │ execTime    │  │ │
-└─────────────┘   │   │ testCases   │   │   │ createdAt   │  │ │
-                  │   │ courseId*   │   │   └─────────────┘  │ │
-                  │   │ dayNumber*  │   │                    │ │
-                  │   └─────────────┘   │                    │ │
-                  │                     │                    │ │
-                  └─────────────────────┼────────────────────┘ │
-                                        └──────────────────────┘
+### ERD - 사용자 & 문제
 
-* courseId, dayNumber: 코스 연동용 (추가 예정)
+```
+┌─────────────────┐       ┌─────────────┐       ┌─────────────┐
+│      User       │       │   Problem   │       │ Submission  │
+├─────────────────┤       ├─────────────┤       ├─────────────┤
+│ nickname (PK)   │───┐   │ id          │───┐   │ id          │
+│ role            │   │   │ number      │   │   │ userNickname│──┐
+│ createdAt       │   │   │ title       │   │   │ problemId   │──┼─┐
+└─────────────────┘   │   │ description │   │   │ code        │  │ │
+        │             │   │ difficulty  │   │   │ verdict     │  │ │
+        │ 1:N         │   │ tags        │   │   │ execTime    │  │ │
+        ▼             │   │ testCases   │   │   │ createdAt   │  │ │
+┌─────────────────┐   │   │ lessonId*   │   │   └─────────────┘  │ │
+│  OAuthAccount   │   │   └─────────────┘   │                    │ │
+├─────────────────┤   │                     │                    │ │
+│ provider        │   │                     │                    │ │
+│ providerId (PK) │   └─────────────────────┼────────────────────┘ │
+│ userNickname(FK)│                         └──────────────────────┘
+│ email           │
+└─────────────────┘
+```
+
+### ERD - 코스 시스템
+
+```
+┌─────────────────┐
+│    Language     │
+├─────────────────┤
+│ id (PK)         │  'c', 'java', 'python'
+│ name            │
+│ description     │
+│ icon            │
+│ color           │
+│ isActive        │
+│ order           │
+└────────┬────────┘
+         │ 1:N
+         ▼
+┌─────────────────┐
+│    Chapter      │
+├─────────────────┤
+│ id (PK)         │
+│ languageId (FK) │──────────────────────────┐
+│ title           │                          │
+│ description     │                          │
+│ keyQuestion     │  '변수는 어디에 저장되는가?'
+│ order           │                          │
+│ isActive        │                          │
+└────────┬────────┘                          │
+         │ 1:N                               │
+         ▼                                   │
+┌─────────────────┐       ┌─────────────────┐│
+│     Lesson      │       │  LessonContent  ││
+├─────────────────┤       ├─────────────────┤│
+│ id (PK)         │──1:1──│ id (PK)         ││
+│ chapterId (FK)  │       │ lessonId (FK)   ││
+│ title           │       │ code            ││
+│ description     │       │ language        ││
+│ difficulty      │       │ steps (JSON)    ││
+│ order           │       └─────────────────┘│
+│ estimatedTime   │                          │
+│ isActive        │                          │
+└────────┬────────┘                          │
+         │ 1:N                               │
+         ▼                                   │
+┌─────────────────┐       ┌─────────────────┐│
+│      Quiz       │       │  UserProgress   ││
+├─────────────────┤       ├─────────────────┤│
+│ id (PK)         │       │ id (PK)         ││
+│ lessonId (FK)   │       │ userNickname(FK)│┘
+│ type            │       │ lessonId (FK)   │
+│ question        │       │ status          │
+│ options (JSON)  │       │ currentStep     │
+│ answer          │       │ quizScore       │
+│ explanation     │       │ completedAt     │
+│ order           │       └─────────────────┘
+└─────────────────┘
+
+구조: Language → Chapter → Lesson → (Content + Quiz)
 ```
 
 ### 테이블 상세
 
-#### User
+#### User (닉네임 기반)
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
-| id | UUID | PK |
-| email | String | 이메일 (unique) |
-| name | String | 표시 이름 |
-| firebaseUid | String | Firebase UID (unique) |
+| nickname | String | PK, 고유 식별자 (2-20자) |
 | role | String | "user" \| "admin" |
 | createdAt | DateTime | 가입일 |
+
+#### OAuthAccount (1:N with User)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| provider | String | "google" \| "github" \| "kakao" |
+| providerId | String | OAuth 제공자의 사용자 ID |
+| userNickname | String | FK → User.nickname |
+| email | String? | OAuth 이메일 (nullable) |
+
+> **복합 Unique Key**: `(provider, providerId)` - 동일 OAuth 계정 중복 등록 방지
+> **다중 OAuth 지원**: 한 User가 여러 OAuthAccount 연결 가능
 
 #### Problem
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
-| id | String | PK (예: "c-day1-swap") |
+| id | String | PK (예: "c-ch1-swap") |
 | number | Int | 문제 번호 (unique) |
 | title | String | 제목 |
 | description | String | 설명 (Markdown) |
@@ -268,14 +365,13 @@ interface Store {
 | testCases | JSON String | [{input, output}] |
 | timeLimit | Int | 시간 제한 (ms) |
 | memoryLimit | Int | 메모리 제한 (MB) |
-| courseId | String? | 📋 코스 ID (추가 예정) |
-| dayNumber | Int? | 📋 Day 번호 (추가 예정) |
+| lessonId | String? | FK → Lesson (레슨 연동) |
 
 #### Submission
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | UUID | PK |
-| userId | UUID | FK → User |
+| userNickname | String | FK → User.nickname |
 | problemId | String | FK → Problem |
 | code | String | 제출 코드 |
 | verdict | String | 채점 결과 |
@@ -286,10 +382,77 @@ interface Store {
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | UUID | PK |
-| userId | UUID | FK → User |
+| userNickname | String | FK → User.nickname |
 | problemId | String | FK → Problem |
 | code | String | 임시 저장 코드 |
 | savedAt | DateTime | 저장일 |
+
+#### Language
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | String | PK ('c', 'java', 'python') |
+| name | String | 표시 이름 ('C', 'Java', 'Python') |
+| description | String? | 설명 |
+| icon | String? | 아이콘 URL 또는 이모지 |
+| color | String? | 테마 색상 (#hex) |
+| isActive | Boolean | 활성화 여부 |
+| order | Int | 정렬 순서 |
+
+#### Chapter
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | String | PK |
+| languageId | String | FK → Language |
+| title | String | 챕터 제목 |
+| description | String? | 설명 |
+| keyQuestion | String? | 핵심 질문 |
+| order | Int | 정렬 순서 |
+| isActive | Boolean | 활성화 여부 |
+
+#### Lesson
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | String | PK |
+| chapterId | String | FK → Chapter |
+| title | String | 레슨 제목 |
+| description | String? | 설명 |
+| difficulty | String | 'basic' \| 'intermediate' \| 'advanced' |
+| order | Int | 정렬 순서 |
+| estimatedTime | Int? | 예상 소요 시간 (분) |
+| isActive | Boolean | 활성화 여부 |
+
+#### LessonContent
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | String | PK |
+| lessonId | String | FK → Lesson (1:1) |
+| code | String | 메인 코드 |
+| language | String | 프로그래밍 언어 |
+| steps | JSON | LessonStep[] (스텝 배열) |
+
+#### Quiz
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | String | PK |
+| lessonId | String | FK → Lesson |
+| type | String | 'multiple_choice' \| 'predict_output' \| 'fill_blank' \| 'code_fix' |
+| question | String | 문제 |
+| options | JSON? | 선택지 배열 (객관식) |
+| answer | String | 정답 |
+| explanation | String? | 해설 |
+| order | Int | 정렬 순서 |
+
+#### UserProgress
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | String | PK |
+| userNickname | String | FK → User.nickname |
+| lessonId | String | FK → Lesson |
+| status | String | 'not_started' \| 'in_progress' \| 'completed' |
+| currentStep | Int | 현재 스텝 |
+| quizScore | Int? | 퀴즈 점수 |
+| quizTotal | Int? | 퀴즈 총점 |
+| completedAt | DateTime? | 완료일 |
 
 ---
 
@@ -301,7 +464,12 @@ interface Store {
     ▼
 [프론트엔드 - React]
     │
-    ├─ 코스 데이터 ──────────────────► data/courses/*.ts (정적 import)
+    ├─ 코스 API ─── GET /api/courses/* ──────► [백엔드] ──► [SQLite]
+    │   - GET /courses/languages         (언어 목록)
+    │   - GET /courses/:lang/chapters    (챕터 목록)
+    │   - GET /courses/chapters/:id      (챕터+레슨)
+    │   - GET /courses/lessons/:id       (레슨+콘텐츠+퀴즈)
+    │   - POST /courses/progress         (진행 상태 저장)
     │
     ├─ 코드 실행 ─── POST /api/c/run ──────► [백엔드] ──► [Docker gcc]
     │
@@ -375,14 +543,14 @@ npm run build        # 프로덕션 빌드
 # Server
 PORT=3002
 NODE_ENV=development
-CORS_ORIGINS=http://localhost:5173,http://localhost:5174
+CORS_ORIGINS=http://localhost:5174
 
 # Docker
 DOCKER_IMAGE=gcc:latest
 DOCKER_MEMORY_LIMIT=128m
 
 # AI
-OLLAMA_URL=http://localhost:11434
+OLLAMA_URL=http://localhost:5044
 OLLAMA_MODEL=qwen2.5-coder:7b
 DEEPSEEK_API_KEY=xxx
 

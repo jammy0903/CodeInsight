@@ -1,0 +1,435 @@
+/**
+ * CodeInsight Theme System
+ * Playful & Gamified (크림 배경 + 네온 액센트)
+ */
+
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+@config "../tailwind.config.js";
+
+/* ============================================
+   Root Variables
+   ============================================ */
+:root {
+  /* === Fonts === */
+  --font-sans: "Inter", "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+
+  /* === Base Colors === */
+  --radius: 0.75rem;
+  --background: #FFF9F0;
+  --foreground: #1a1a2e;
+  --card: #FFFBF5;
+  --card-foreground: #1a1a2e;
+  --popover: #FFFBF5;
+  --popover-foreground: #1a1a2e;
+  --primary: #FFD700;
+  --primary-foreground: #1a1a2e;
+  --secondary: #F5EFE7;
+  --secondary-foreground: #1a1a2e;
+  --muted: #F5EFE7;
+  --muted-foreground: #6b7280;
+  --accent: #FFE8D6;
+  --accent-foreground: #1a1a2e;
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
+  --border: #E5D5C7;
+  --input: #FFFBF5;
+  --ring: #FFD700;
+  --chart-1: #FFD700;
+  --chart-2: #00D9FF;
+  --chart-3: #FF6B9D;
+  --chart-4: #A855F7;
+  --chart-5: #10B981;
+
+  /* === Background (크림 유지) === */
+  --color-bg: #FFF9F0;
+  --color-bg-elevated: #FFFBF5;
+  --color-bg-tertiary: #FFE8D6;
+  --color-bg-hover: #F5EFE7;
+
+  /* === Text === */
+  --color-text: #1a1a2e;
+  --color-text-secondary: #374151;
+  --color-text-tertiary: #6b7280;
+  --color-text-muted: #9ca3af;
+
+  /* === Primary (골드/옐로우) === */
+  --color-primary: #FFD700;
+  --color-primary-hover: #FFED4A;
+  --color-primary-light: rgba(255, 215, 0, 0.15);
+  --color-primary-muted: rgba(255, 215, 0, 0.3);
+
+  /* === Border === */
+  --color-border: #E5D5C7;
+  --color-border-light: #D5C5B7;
+  --color-border-dark: #C5B5A7;
+
+  /* === Neon Colors === */
+  --neon-yellow: #FFD700;
+  --neon-cyan: #00D9FF;
+  --neon-pink: #FF6B9D;
+  --neon-purple: #A855F7;
+  --neon-green: #10B981;
+  --neon-orange: #F97316;
+  --neon-blue: #3B82F6;
+
+  /* === Shadows === */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-neon-yellow: 0 0 20px rgba(255, 215, 0, 0.4);
+  --shadow-neon-cyan: 0 0 20px rgba(0, 217, 255, 0.4);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--foreground);
+  min-height: 100vh;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ============================================
+   Typography
+   ============================================ */
+h1, h2, h3, .heading {
+  font-family: var(--font-sans);
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+pre, code {
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   Scrollbar (네온 호버)
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-yellow);
+  box-shadow: var(--shadow-neon-yellow);
+}
+
+/* ============================================
+   Selection
+   ============================================ */
+::selection {
+  background: var(--neon-yellow);
+  color: #1a1a2e;
+}
+
+/* ============================================
+   Focus States
+   ============================================ */
+input:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+
+/* ============================================
+   Neon Glow Utilities
+   ============================================ */
+.glow-yellow {
+  box-shadow: var(--shadow-neon-yellow);
+}
+
+.glow-cyan {
+  box-shadow: var(--shadow-neon-cyan);
+}
+
+.text-glow-yellow {
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+/* ============================================
+   Gradient Text
+   ============================================ */
+.gradient-text-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #F97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-cyber {
+  background: linear-gradient(135deg, #00D9FF 0%, #A855F7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   XP Bar Styles
+   ============================================ */
+.xp-bar {
+  background: linear-gradient(90deg, var(--neon-green) 0%, var(--neon-cyan) 100%);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  transition: width 0.5s ease;
+}
+
+.xp-bar-container {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+/* ============================================
+   Badge Styles
+   ============================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #F59E0B 100%);
+  color: #1a1a2e;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.badge-cyan {
+  background: linear-gradient(135deg, #00D9FF 0%, #3B82F6 100%);
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+}
+
+.badge-pink {
+  background: linear-gradient(135deg, #FF6B9D 0%, #A855F7 100%);
+  color: white;
+  box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+}
+
+/* ============================================
+   Button Styles
+   ============================================ */
+.btn-primary {
+  background: linear-gradient(135deg, var(--neon-yellow) 0%, var(--neon-orange) 100%);
+  color: #1a1a2e;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--neon-yellow);
+  color: #B45309;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+/* ============================================
+   Card Hover Effects
+   ============================================ */
+.card-hover-glow {
+  transition: all 0.3s ease;
+}
+
+.card-hover-glow:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover), var(--shadow-neon-yellow);
+}
+
+/* ============================================
+   HomePage Spacing (극대화된 여백)
+   ============================================ */
+main > section {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+main > section:first-child {
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+}
+
+main h1,
+main h2 {
+  margin-bottom: 3rem;
+}
+
+main p {
+  margin-bottom: 3rem;
+  line-height: 2;
+}
+
+main > section > div {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Features 카드 간격 */
+main > section:nth-child(2) > div {
+  gap: 3rem;
+}
+
+main > section:nth-child(2) > div > div {
+  padding: 2.5rem 2rem;
+}
+
+/* 폰트 크기 재조정 */
+main h1 {
+  font-size: 4rem;
+}
+
+main h2 {
+  font-size: 2rem;
+}
+
+main h3 {
+  font-size: 1.25rem;
+}
+
+main p {
+  font-size: 1rem;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes emojiBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(-5deg); }
+  75% { transform: translateY(-5px) rotate(5deg); }
+}
+
+.emoji-bounce {
+  display: inline-block;
+  animation: emojiBounce 2s ease-in-out infinite;
+}
+
+@keyframes levelUp {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.level-up {
+  animation: levelUp 0.5s ease;
+}
+
+@keyframes firePulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+
+.streak-fire {
+  animation: firePulse 1s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ============================================
+   shadcn/ui Theme Integration
+   ============================================ */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply text-foreground;
+  }
+}
