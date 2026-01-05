@@ -339,6 +339,11 @@ curl -X POST http://localhost:3000/api/ai/chat \
 - Claude 서명 금지 (`Generated with Claude Code` 등)
 - Co-Authored-By 금지
 - 한글 커밋 메시지 OK
+- **커밋 후 반드시 push**: 매번 `git commit` 후 즉시 `git push origin codeinsight` 실행
+- **민감 정보 절대 금지**: API key, 비밀번호, 토큰 등 민감한 정보는 절대 git에 올리지 말 것
+  - `.env` 파일, API key, 인증 토큰, 비밀번호, 개인정보 등
+  - 환경변수는 `.env.example`에 예시만 작성
+  - 실제 값은 로컬 `.env`에만 보관
 
 ---
 
