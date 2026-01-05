@@ -16,8 +16,8 @@ const prisma = new PrismaClient();
 // =============================================
 
 const ch2_lesson3 = {
-  id: 'p-2-1',
-  lessonId: 'p-2-1',
+  id: 'p-2-3',
+  lessonId: 'p-2-3',
   language: 'python',
   code: `# 문자열 메서드는 새 문자열을 반환한다
 s = "hello"
@@ -103,8 +103,8 @@ print(f"원본 확인: {s}")`,
 };
 
 const ch2_lesson4 = {
-  id: 'p-2-2',
-  lessonId: 'p-2-2',
+  id: 'p-2-4',
+  lessonId: 'p-2-4',
   language: 'python',
   code: `# 튜플(tuple): 변경 불가능한 리스트
 point = (3, 4)
@@ -174,8 +174,8 @@ print(locations[(0, 0)])`,
 };
 
 const ch2_lesson5 = {
-  id: 'p-2-3',
-  lessonId: 'p-2-3',
+  id: 'p-2-5',
+  lessonId: 'p-2-5',
   language: 'python',
   code: `# Python의 정수 캐싱 (Integer Interning)
 a = 100
@@ -278,8 +278,8 @@ print(f"257 캐싱: {id(big) == id(257)}")  # 상황에 따라 다름`,
 // =============================================
 
 const ch3_lesson3 = {
-  id: 'p-2-4',
-  lessonId: 'p-2-4',
+  id: 'p-3-3',
+  lessonId: 'p-3-3',
   language: 'python',
   code: `# 얕은 복사 (Shallow Copy)
 import copy
@@ -386,8 +386,8 @@ print(f"\\nmatrix[0] is matrix_copy[0]: {matrix[0] is matrix_copy[0]}")`,
 };
 
 const ch3_lesson4 = {
-  id: 'p-2-5',
-  lessonId: 'p-2-5',
+  id: 'p-3-4',
+  lessonId: 'p-3-4',
   language: 'python',
   code: `# 깊은 복사 (Deep Copy)
 import copy
@@ -464,8 +464,8 @@ print(f"deep_matrix: {deep_matrix}")  # [[999, 2], [3, 4]]
 };
 
 const ch3_lesson5 = {
-  id: 'p-2-6',
-  lessonId: 'p-2-6',
+  id: 'p-3-5',
+  lessonId: 'p-3-5',
   language: 'python',
   code: `# 딕셔너리 기본
 person = {"name": "Alice", "age": 25}
@@ -535,8 +535,8 @@ print(f"설정: {settings}")`,
 };
 
 const ch3_lesson6 = {
-  id: 'p-2-7',
-  lessonId: 'p-2-7',
+  id: 'p-3-6',
+  lessonId: 'p-3-6',
   language: 'python',
   code: `# 딕셔너리 수정 - 가변 객체
 person = {"name": "Alice", "age": 25}
@@ -650,8 +650,8 @@ print(f"profile: {profile}")`,
 // =============================================
 
 const ch4_lesson1 = {
-  id: 'p-2-8',
-  lessonId: 'p-2-8',
+  id: 'p-4-1',
+  lessonId: 'p-4-1',
   language: 'python',
   code: `# 함수 정의와 호출
 def greet(name):
@@ -735,8 +735,8 @@ print(say_hello("Bob"))`,
 };
 
 const ch4_lesson2 = {
-  id: 'p-2-9',
-  lessonId: 'p-2-9',
+  id: 'p-4-2',
+  lessonId: 'p-4-2',
   language: 'python',
   code: `# 인자 전달의 진실: Call by Object Reference
 def show_id(x):
@@ -795,7 +795,7 @@ print(f"a is result: {a is result}")  # True!
 };
 
 const ch4_lesson3 = {
-  lessonId: 'p-2-10',
+  lessonId: 'p-4-3',
   language: 'python',
   code: `# 불변 객체를 인자로 전달
 def try_modify_number(n):
@@ -870,7 +870,7 @@ print(f"result: {result}")  # 15
 };
 
 const ch4_lesson4 = {
-  lessonId: 'p-2-11',
+  lessonId: 'p-4-4',
   language: 'python',
   code: `# 가변 객체를 인자로 전달
 def add_item(lst):
@@ -946,7 +946,7 @@ def add_item_safe(lst):
 };
 
 const ch4_lesson5 = {
-  lessonId: 'p-2-12',
+  lessonId: 'p-4-5',
   language: 'python',
   code: `# 기본값 인자의 함정
 def add_to_list(item, lst=[]):

@@ -18,8 +18,8 @@ const prisma = new PrismaClient();
 // =============================================
 
 const ch5_lesson1 = {
-  id: 'p-3-1',
-  lessonId: 'p-3-1',
+  id: 'p-5-1',
+  lessonId: 'p-5-1',
   language: 'python',
   code: `# 지역 변수와 전역 변수
 x = 10  # 전역 변수
@@ -87,8 +87,8 @@ create_local()
 };
 
 const ch5_lesson2 = {
-  id: 'p-3-2',
-  lessonId: 'p-3-2',
+  id: 'p-5-2',
+  lessonId: 'p-5-2',
   language: 'python',
   code: `# global 키워드
 counter = 0  # 전역 변수
@@ -156,8 +156,8 @@ def broken_increment():
 };
 
 const ch5_lesson3 = {
-  id: 'p-3-3',
-  lessonId: 'p-3-3',
+  id: 'p-5-3',
+  lessonId: 'p-5-3',
   language: 'python',
   code: `# LEGB 규칙: 변수를 찾는 순서
 # L: Local (지역)
@@ -232,8 +232,8 @@ print(f"len 함수: {len}")  # 내장 함수`,
 };
 
 const ch5_lesson4 = {
-  id: 'p-3-4',
-  lessonId: 'p-3-4',
+  id: 'p-5-4',
+  lessonId: 'p-5-4',
   language: 'python',
   code: `# 클로저 (Closure): 외부 변수를 기억하는 함수
 def make_multiplier(n):
@@ -317,8 +317,8 @@ print(f"저장된 값: {double.__closure__[0].cell_contents}")`,
 // =============================================
 
 const ch6_lesson1 = {
-  id: 'p-3-5',
-  lessonId: 'p-3-5',
+  id: 'p-6-1',
+  lessonId: 'p-6-1',
   language: 'python',
   code: `# 클래스 정의: 나만의 타입 만들기
 class Dog:
@@ -407,8 +407,8 @@ print(f"int는 클래스: {type(int)}")`,
 };
 
 const ch6_lesson2 = {
-  id: 'p-3-6',
-  lessonId: 'p-3-6',
+  id: 'p-6-2',
+  lessonId: 'p-6-2',
   language: 'python',
   code: `# __init__과 self
 class Dog:
@@ -482,8 +482,8 @@ print(f"max_dog.name: {max_dog.name}")
 };
 
 const ch6_lesson3 = {
-  id: 'p-3-7',
-  lessonId: 'p-3-7',
+  id: 'p-6-3',
+  lessonId: 'p-6-3',
   language: 'python',
   code: `# 인스턴스 변수: 각 객체가 독립적으로 가지는 데이터
 class BankAccount:
@@ -570,8 +570,8 @@ print(f"bob_account.owner: {bob_account.owner}")`,
 };
 
 const ch6_lesson4 = {
-  id: 'p-3-8',
-  lessonId: 'p-3-8',
+  id: 'p-6-4',
+  lessonId: 'p-6-4',
   language: 'python',
   code: `# 클래스 변수: 모든 인스턴스가 공유하는 변수
 class Dog:
@@ -663,8 +663,8 @@ print(f"Dog.species: {Dog.species}")  # Canis familiaris`,
 };
 
 const ch6_lesson5 = {
-  id: 'p-3-9',
-  lessonId: 'p-3-9',
+  id: 'p-6-5',
+  lessonId: 'p-6-5',
   language: 'python',
   code: `# 메서드: 객체가 할 수 있는 동작
 class Dog:
@@ -728,7 +728,7 @@ buddy.have_birthday()`,
 };
 
 const ch6_lesson6 = {
-  lessonId: 'p-3-10',
+  lessonId: 'p-6-6',
   language: 'python',
   code: `# 상속: 기존 클래스를 확장
 class Animal:
@@ -799,7 +799,7 @@ buddy.fetch()   # Dog만 가능`,
 // =============================================
 
 const ch7_lesson1 = {
-  lessonId: 'p-3-11',
+  lessonId: 'p-7-1',
   language: 'python',
   code: `# 참조 카운팅: 객체를 가리키는 이름표 개수
 import sys
@@ -877,7 +877,7 @@ del c
 };
 
 const ch7_lesson2 = {
-  lessonId: 'p-3-12',
+  lessonId: 'p-7-2',
   language: 'python',
   code: `# del의 진실: 객체가 아닌 이름표를 제거
 a = [1, 2, 3]
@@ -956,7 +956,7 @@ print(f"요소 삭제 후: {lst}")  # [2, 3]`,
 };
 
 const ch7_lesson3 = {
-  lessonId: 'p-3-13',
+  lessonId: 'p-7-3',
   language: 'python',
   code: `# 가비지 컬렉션: 참조 카운팅의 한계 보완
 import gc
@@ -1010,7 +1010,7 @@ print(f"수집된 객체 수: {collected}")
 };
 
 const ch7_lesson4 = {
-  lessonId: 'p-3-14',
+  lessonId: 'p-7-4',
   language: 'python',
   code: `# 순환 참조: 서로를 가리키는 객체들
 import gc

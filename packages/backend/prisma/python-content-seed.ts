@@ -449,8 +449,8 @@ print(f"a + 1 후: {a}, id: {id(a)}")`,
 // =============================================
 
 const ch2_lesson1 = {
-  id: 'p-1-6',
-  lessonId: 'p-1-6',
+  id: 'p-2-1',
+  lessonId: 'p-2-1',
   language: 'python',
   code: `# 숫자의 불변성
 
@@ -517,8 +517,8 @@ print(f"b = 10: id = {id(b)}")`,
 };
 
 const ch2_lesson2 = {
-  id: 'p-1-7',
-  lessonId: 'p-1-7',
+  id: 'p-2-2',
+  lessonId: 'p-2-2',
   language: 'python',
   code: `# 문자열의 불변성
 
@@ -574,8 +574,8 @@ print(f"수정 후: s = {s}, id = {id(s)}")`,
 // =============================================
 
 const ch3_lesson1 = {
-  id: 'p-1-8',
-  lessonId: 'p-1-8',
+  id: 'p-3-1',
+  lessonId: 'p-3-1',
   language: 'python',
   code: `# 리스트 생성과 수정
 
@@ -629,8 +629,8 @@ print(f"append(4) 후: {lst}, id = {id(lst)}")`,
 };
 
 const ch3_lesson2 = {
-  id: 'p-1-9',
-  lessonId: 'p-1-9',
+  id: 'p-3-2',
+  lessonId: 'p-3-2',
   language: 'python',
   code: `# 같은 리스트를 가리키면?
 

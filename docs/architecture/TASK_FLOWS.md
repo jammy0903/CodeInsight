@@ -160,31 +160,38 @@ graph TD
     F --> G[getChapterWithLessons 병렬 호출]
     G --> H[GET /api/v1/courses/chapters/:id 여러 번]
     H --> I[ChapterWithLessons[] 반환]
-    I --> J[Zod 검증]
-    J --> K{검증 성공?}
-    K -->|실패| L[에러 표시]
-    K -->|성공| M[ChapterAccordion 렌더링]
-    M --> N[사용자: Accordion 펼치기]
-    N --> O[레슨 목록 표시]
-    O --> P[사용자: 레슨 클릭]
-    P --> Q[navigate to /courses/:lang/:lessonId]
+    I --> J[setChapters]
+    J --> K[getUserProgress 호출]
+    K --> L[GET /api/v1/courses/progress]
+    L --> M{인증됨?}
+    M -->|아니오| N[에러 무시 미인증 사용자]
+    M -->|예| O[UserProgress[] 반환]
+    O --> P[Map으로 변환 lessonId 키]
+    N --> Q[ChapterAccordion 렌더링]
+    P --> Q
+    Q --> R[사용자: Accordion 펼치기]
+    R --> S[레슨 목록 + 진행 상태 표시]
+    S --> T[사용자: 레슨 클릭]
+    T --> U[navigate to /courses/:lang/:lessonId]
 
     style A fill:#4A90E2
     style B fill:#7ED321
     style C fill:#7ED321
     style D fill:#F5A623
     style H fill:#F5A623
+    style L fill:#F5A623
 ```
 
 **관련 파일**:
 - Frontend: `LanguageCoursePage.tsx`, `ChapterAccordion.tsx`, `services/courses.ts`
-- Backend: `modules/courses/routes.ts` (GET /courses/:lang/chapters, GET /courses/chapters/:id)
-- DB: `Chapter`, `Lesson`
+- Backend: `modules/courses/routes.ts` (GET /courses/:lang/chapters, GET /courses/chapters/:id, GET /courses/progress)
+- DB: `Chapter`, `Lesson`, `UserProgress`
 
 **주요 특징**:
 - ChaptersPage/LessonsPage 대신 **단일 페이지** (LanguageCoursePage)
 - Accordion UI로 챕터/레슨을 한 화면에 표시
 - 병렬 요청으로 모든 챕터의 레슨을 한 번에 로드
+- **진행 상태는 선택적** (미인증 사용자는 에러 무시)
 - URL 구조: `/courses/:lang/:lessonId` (chapterId 없음)
 
 ---
@@ -199,22 +206,29 @@ graph TD
     B --> C[getLessonFull 호출]
     C --> D[GET /api/v1/courses/lessons/:id]
     D --> E[Backend: Lesson 조회 + content/quiz 파싱]
-    E --> F[LessonFull 반환]
+    E --> F[LessonFull 반환 chapterId 포함]
     F --> G[Zod 검증]
     G --> H{검증 성공?}
     H -->|실패| I[에러 표시: Invalid lesson data]
     H -->|성공| J[setLesson]
-    J --> K[getChapterWithLessons 호출]
-    K --> L[다음 레슨 ID 찾기]
-    L --> M[useLessonNavigation 초기화 phase=learning]
-    M --> N[useLessonMemory 초기화]
-    N --> O[useCodeSelection 초기화]
-    O --> P[첫 스텝 렌더링 currentStepIndex=0]
+    J --> K[getChapterWithLessons lessonData.chapterId]
+    K --> L[GET /api/v1/courses/chapters/:id]
+    L --> M[ChapterWithLessons 반환]
+    M --> N[lessons.findIndex 현재 레슨]
+    N --> O{currentIdx < length - 1?}
+    O -->|예| P[setNextLessonId lessons[idx+1].id]
+    O -->|아니오| Q[setNextLessonId null]
+    P --> R[useLessonNavigation 초기화 phase=learning]
+    Q --> R
+    R --> S[useLessonMemory 초기화]
+    S --> T[useCodeSelection 초기화]
+    T --> U[첫 스텝 렌더링 currentStepIndex=0]
 
     style A fill:#4A90E2
     style B fill:#7ED321
     style D fill:#F5A623
     style E fill:#F5A623
+    style L fill:#F5A623
     style I fill:#D0021B
 ```
 
