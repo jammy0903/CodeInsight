@@ -216,7 +216,7 @@ export interface ChapterWithLessons extends Chapter {
  * 레슨 + 콘텐츠 + 퀴즈
  */
 export interface LessonFull extends Lesson {
-  content?: LessonContent;
+  content?: LessonContent | null; // Zod .nullish()와 일치
   quizzes: Quiz[];
 }
 

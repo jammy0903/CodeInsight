@@ -173,9 +173,9 @@ function QuizCardAdapter({
 }
 
 export function LessonPage() {
-  const { lang, chapterId, lessonId } = useParams<{
+  const { lang, lessonId } = useParams<{
     lang: string;
-    chapterId: string;
+    chapterId: string; // URL 구조에는 필요하지만 로직에서는 미사용
     lessonId: string;
   }>();
 
