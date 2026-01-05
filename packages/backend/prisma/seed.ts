@@ -587,9 +587,10 @@ async function seed() {
   await prisma.chapter.deleteMany();
   await prisma.language.deleteMany();
 
-  // 2. Language 생성
-  console.log('  📝 Creating Language: C');
-  const language = await prisma.language.create({
+  // 2. Languages 생성
+  console.log('  📝 Creating Languages...');
+
+  const cLanguage = await prisma.language.create({
     data: {
       id: 'c',
       name: 'C',
@@ -599,6 +600,45 @@ async function seed() {
       order: 1,
     },
   });
+  console.log('    ✅ C');
+
+  const pythonLanguage = await prisma.language.create({
+    data: {
+      id: 'python',
+      name: 'Python',
+      description: '간결하고 읽기 쉬운 문법의 고급 프로그래밍 언어',
+      icon: '🐍',
+      color: '#3776AB',
+      order: 2,
+    },
+  });
+  console.log('    ✅ Python');
+
+  const javaLanguage = await prisma.language.create({
+    data: {
+      id: 'java',
+      name: 'Java',
+      description: '객체지향 프로그래밍과 JVM 기반 언어',
+      icon: '☕',
+      color: '#007396',
+      order: 3,
+    },
+  });
+  console.log('    ✅ Java');
+
+  const jsLanguage = await prisma.language.create({
+    data: {
+      id: 'javascript',
+      name: 'JavaScript',
+      description: '웹 개발의 핵심 언어, 비동기와 프로토타입',
+      icon: '⚡',
+      color: '#F7DF1E',
+      order: 4,
+    },
+  });
+  console.log('    ✅ JavaScript');
+
+  const language = cLanguage; // 기존 변수명 유지 (아래 C 챕터 생성에서 사용)
 
   // 3. Chapter와 Lesson 생성
   console.log('  📚 Creating Chapters and Lessons...');
@@ -607,6 +647,7 @@ async function seed() {
 
     const chapter = await prisma.chapter.create({
       data: {
+        id: `c-${chapterData.order}`,
         languageId: language.id,
         title: chapterData.title,
         description: chapterData.description,
@@ -621,6 +662,7 @@ async function seed() {
 
       await prisma.lesson.create({
         data: {
+          id: `c-${chapterData.order}-${lessonData.order}`,
           chapterId: chapter.id,
           title: lessonData.title,
           description: lessonData.description,

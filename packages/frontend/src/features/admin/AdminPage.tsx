@@ -144,7 +144,7 @@ export function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-sand p-8">
+    <div className="min-h-screen bg-sand px-6 md:px-10 lg:px-16 py-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">

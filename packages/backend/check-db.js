@@ -6,35 +6,27 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function check() {
-  const languages = await prisma.language.count();
-  const chapters = await prisma.chapter.count();
-  const lessons = await prisma.lesson.count();
-  const contents = await prisma.lessonContent.count();
-  const quizzes = await prisma.quiz.count();
+  const lang = process.argv[2] || 'python'; // 기본값 python
 
-  console.log('📊 DB Stats:');
-  console.log(`  Languages: ${languages}`);
-  console.log(`  Chapters: ${chapters}`);
-  console.log(`  Lessons: ${lessons}`);
-  console.log(`  LessonContents: ${contents}`);
-  console.log(`  Quizzes: ${quizzes}`);
+  const chapters = await prisma.chapter.findMany({
+    where: { languageId: lang },
+    orderBy: { order: 'asc' },
+    include: {
+      lessons: {
+        orderBy: { order: 'asc' },
+        include: { content: true }
+      }
+    }
+  });
 
-  if (languages > 0) {
-    const cLang = await prisma.language.findUnique({ where: { id: 'c' } });
-    console.log('\n✅ C language exists:', cLang?.name);
+  console.log(`📚 ${lang.toUpperCase()} 레슨 목록:\n`);
 
-    const firstChapter = await prisma.chapter.findFirst({
-      where: { languageId: 'c' },
-      orderBy: { order: 'asc' }
-    });
-    console.log('✅ First chapter:', firstChapter?.title);
-
-    const sampleLesson = await prisma.lesson.findFirst({
-      where: { chapterId: firstChapter?.id },
-      include: { content: true }
-    });
-    console.log('✅ Sample lesson:', sampleLesson?.title);
-    console.log('   Has content?', !!sampleLesson?.content);
+  for (const chapter of chapters) {
+    console.log(`\n[Ch${chapter.order}] ${chapter.title}`);
+    for (const lesson of chapter.lessons) {
+      const hasContent = lesson.content ? '✅' : '❌';
+      console.log(`  ${hasContent} L${lesson.order}: ${lesson.title} (ID: ${lesson.id})`);
+    }
   }
 
   await prisma.$disconnect();

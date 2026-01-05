@@ -62,7 +62,7 @@ export function CoursesPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-6 md:px-8 lg:px-12 space-y-8 max-w-5xl">
+    <div className="container mx-auto py-8 px-6 md:px-10 lg:px-16 space-y-8 max-w-7xl">
       {/* 헤더 */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

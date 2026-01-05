@@ -2,12 +2,12 @@
  * LessonPage - 레슨 학습 페이지 (API 기반)
  *
  * DayPage의 API 버전. 기존 컴포넌트 99% 재사용.
- * Route: /courses/:lang/:chapterId/:lessonId
+ * Route: /courses/:lang/:lessonId
  */
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, ArrowRight, MessageSquare } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowRight, MessageSquare, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -173,9 +173,8 @@ function QuizCardAdapter({
 }
 
 export function LessonPage() {
-  const { lang, chapterId, lessonId } = useParams<{
+  const { lang, lessonId } = useParams<{
     lang: string;
-    chapterId: string;
     lessonId: string;
   }>();
 
@@ -187,37 +186,48 @@ export function LessonPage() {
 
   // 데이터 로드
   useEffect(() => {
-    if (!lessonId || !chapterId) return;
+    if (!lessonId) return;
+
+    const currentLessonId = lessonId; // TypeScript narrowing을 위한 캡처
+    let cancelled = false;
 
     async function fetchData() {
       try {
         setLoading(true);
         setError(null);
 
-        // 레슨 상세 + 챕터 정보 (다음 레슨 찾기용)
-        const [lessonData, chapterData] = await Promise.all([
-          getLessonFull(lessonId!),
-          getChapterWithLessons(chapterId!),
-        ]);
+        // 레슨 상세 먼저 가져오기
+        const lessonData = await getLessonFull(currentLessonId);
 
+        if (cancelled) return;
         setLesson(lessonData);
 
+        // 챕터 정보 가져오기 (다음 레슨 찾기용)
+        const chapterData = await getChapterWithLessons(lessonData.chapterId);
+
+        if (cancelled) return;
+
         // 다음 레슨 찾기
-        const currentIdx = chapterData.lessons.findIndex((l) => l.id === lessonId);
+        const currentIdx = chapterData.lessons.findIndex((l) => l.id === currentLessonId);
         if (currentIdx < chapterData.lessons.length - 1) {
           setNextLessonId(chapterData.lessons[currentIdx + 1].id);
         } else {
           setNextLessonId(null);
         }
       } catch (err) {
+        if (cancelled) return;
         setError(err instanceof Error ? err.message : 'Failed to load lesson');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
     fetchData();
-  }, [lessonId, chapterId]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lessonId]);
 
   // Steps 추출
   const steps: LessonStep[] = lesson?.content?.steps || [];
@@ -240,8 +250,8 @@ export function LessonPage() {
   const currentStep = steps[navigation.currentStepIndex];
 
   // 경로
-  const chapterPath = `/courses/${lang}/${chapterId}`;
-  const nextLessonPath = nextLessonId ? `/courses/${lang}/${chapterId}/${nextLessonId}` : null;
+  const languageCoursePath = `/courses/${lang}`;
+  const nextLessonPath = nextLessonId ? `/courses/${lang}/${nextLessonId}` : null;
 
   // 퀴즈 핸들러
   const handleQuizComplete = (isCorrect: boolean) => {
@@ -257,23 +267,23 @@ export function LessonPage() {
 
   // 에러
   if (error || !lesson) {
-    return <NotFoundView message={error || '레슨을 찾을 수 없습니다'} backPath={chapterPath} />;
+    return <NotFoundView message={error || '레슨을 찾을 수 없습니다'} backPath={languageCoursePath} />;
   }
 
   // 콘텐츠 없음
   if (steps.length === 0) {
-    return <NotFoundView message="레슨 콘텐츠가 없습니다" backPath={chapterPath} />;
+    return <NotFoundView message="레슨 콘텐츠가 없습니다" backPath={languageCoursePath} />;
   }
 
   return (
-    <div className="container mx-auto min-h-screen flex flex-col px-4 sm:px-6 py-6">
+    <div className="container mx-auto max-w-7xl min-h-screen flex flex-col px-6 md:px-10 lg:px-16 py-6">
       {/* 헤더 */}
       <div className="flex items-center gap-4 mb-4">
         <Link
-          to={chapterPath}
+          to={languageCoursePath}
           className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
         >
-          ← 레슨 목록
+          ← 코스 목록
         </Link>
         <div>
           <h1 className="text-xl font-bold">{lesson.title}</h1>
@@ -288,60 +298,19 @@ export function LessonPage() {
         <CompletedView
           lessonOrder={lesson.order}
           nextLessonPath={nextLessonPath}
-          chapterPath={chapterPath}
+          chapterPath={languageCoursePath}
         />
       ) : (
-        <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
-          {/* 상단: 코드 + 메모리 (60%) */}
-          <div className="h-[60%] grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
-            <CodeViewer
-              code={code}
-              highlightLine={currentStep?.line || 1}
-              onSelectionChange={setSelection}
-            />
-            <CourseMemoryView
-              stack={memoryState.stack}
-              heap={memoryState.heap}
-              changedBlocks={changedBlocks}
-            />
-          </div>
-
-          {/* 하단: 설명 + 채팅 (40%) */}
-          <div className="h-[40%] flex flex-col gap-3 overflow-hidden">
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
-              {/* 자동 설명 영역 */}
-              <div className="rounded-xl border-2 border-neon-cyan bg-stack-bg p-4 overflow-y-auto">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-neon-cyan/20 flex items-center justify-center shrink-0">
-                    <MessageSquare className="w-4 h-4 text-stack-text" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-stack-text mb-2">
-                      Step {navigation.currentStepIndex + 1} 설명
-                    </h3>
-                    <StepExplanation
-                      explanation={currentStep?.explanation || ''}
-                      stepIndex={navigation.currentStepIndex}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* AI 채팅 영역 */}
-              <div className="rounded-xl border-2 border-border bg-warm-white overflow-hidden relative">
-                {selection && (
-                  <SelectedCodeBadge selection={selection} onClear={clearSelection} />
-                )}
-                <ChatQA
-                  context={{
-                    courseDay: lesson.order,
-                    topic: lesson.title,
-                    code: code,
-                    currentLine: currentStep?.line,
-                  }}
-                  selectedText={selection?.text}
-                />
-              </div>
+        <div className="flex-1 flex gap-4 min-h-0 overflow-hidden">
+          {/* 왼쪽: 코드 + 컨트롤 (50%) */}
+          <div className="flex-1 flex flex-col gap-4 min-h-0">
+            {/* 코드 뷰어 */}
+            <div className="flex-1 min-h-0">
+              <CodeViewer
+                code={code}
+                highlightLine={currentStep?.line || 1}
+                onSelectionChange={setSelection}
+              />
             </div>
 
             {/* 스텝 컨트롤 */}
@@ -359,23 +328,75 @@ export function LessonPage() {
             </div>
           </div>
 
-          {/* Quiz Modal */}
-          {quiz && (
-            <Dialog
-              open={navigation.phase === 'quiz'}
-              onOpenChange={(open) => !open && navigation.reset()}
-            >
-              <DialogContent className="max-w-xl">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    🧠 퀴즈
-                  </DialogTitle>
-                </DialogHeader>
-                <QuizCardAdapter quiz={quiz} onComplete={handleQuizComplete} />
-              </DialogContent>
-            </Dialog>
-          )}
+          {/* 중간: 화살표 구분선 */}
+          <div className="flex items-center justify-center w-8 shrink-0 relative">
+            <div className="absolute inset-y-0 left-1/2 w-px bg-border -translate-x-1/2"></div>
+            <div className="bg-bg-elevated px-2 relative z-10">
+              <ChevronRight className="w-6 h-6 text-primary" />
+            </div>
+          </div>
+
+          {/* 오른쪽: 시뮬레이터 + 설명 + AI Chat (50%) */}
+          <div className="flex-1 flex flex-col gap-4 overflow-y-auto">
+            {/* 메모리 시뮬레이터 */}
+            <CourseMemoryView
+              stack={memoryState.stack}
+              heap={memoryState.heap}
+              changedBlocks={changedBlocks}
+            />
+
+            {/* 현재 스텝 설명 */}
+            <div className="rounded-xl border-2 border-neon-cyan bg-stack-bg p-4 shrink-0">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-neon-cyan/20 flex items-center justify-center shrink-0">
+                  <MessageSquare className="w-4 h-4 text-stack-text" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-stack-text mb-2">
+                    Step {navigation.currentStepIndex + 1} 설명
+                  </h3>
+                  <StepExplanation
+                    explanation={currentStep?.explanation || ''}
+                    stepIndex={navigation.currentStepIndex}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* AI Chat */}
+            <div className="flex-1 min-h-[300px] rounded-xl border-2 border-border bg-warm-white overflow-hidden relative">
+              {selection && (
+                <SelectedCodeBadge selection={selection} onClear={clearSelection} />
+              )}
+              <ChatQA
+                context={{
+                  courseDay: lesson.order,
+                  topic: lesson.title,
+                  code: code,
+                  currentLine: currentStep?.line,
+                }}
+                selectedText={selection?.text}
+              />
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* Quiz Modal */}
+      {quiz && (
+        <Dialog
+          open={navigation.phase === 'quiz'}
+          onOpenChange={(open) => !open && navigation.reset()}
+        >
+          <DialogContent className="max-w-xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                🧠 퀴즈
+              </DialogTitle>
+            </DialogHeader>
+            <QuizCardAdapter quiz={quiz} onComplete={handleQuizComplete} />
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

@@ -1,94 +1,110 @@
 /**
- * useLessonMemory - LessonStep.memoryChanges를 누적하여 현재 메모리 상태 계산
+ * useLessonMemory - LessonStep.memoryChanges를 시각화용 형식으로 변환
  *
- * WHY: useCourseMemory의 새 API 버전. StepMemoryState 형식 지원.
- * TRADEOFF: 별도 hook > 기존 수정 (레거시 호환성 + 타입 안전성)
+ * WHY: 통일된 스냅샷 형식(stack frames + heap objects)을 시각화 컴포넌트용으로 변환
+ * 각 스텝의 memoryChanges는 해당 시점의 전체 메모리 상태를 나타냄
  */
 
 import { useMemo } from 'react';
-import type { LessonStep, StepMemoryState } from '@/types';
+import type { LessonStep, StepMemoryState, StackFrame } from '@/types';
 
 export interface LessonMemoryBlock {
   name: string;
   address: string;
   value: string;
+  type?: string;
   points_to: string | null;
+  highlight?: boolean;
 }
 
 export interface LessonMemoryState {
   stack: LessonMemoryBlock[];
   heap: LessonMemoryBlock[];
+  frames: StackFrame[];  // 원본 프레임 데이터
 }
 
 /**
- * StepMemoryState를 현재 상태에 적용
+ * 현재 스텝의 memoryChanges를 시각화용 형식으로 변환
  */
-function applyMemoryState(
-  state: LessonMemoryState,
+function convertToVisualFormat(
   changes: StepMemoryState | undefined
-): void {
-  if (!changes) return;
-
-  // Stack 변수 처리
-  for (const v of changes.stack || []) {
-    const existingIdx = state.stack.findIndex((b) => b.name === v.name);
-
-    if (v.action === 'delete') {
-      if (existingIdx !== -1) state.stack.splice(existingIdx, 1);
-    } else if (v.action === 'update' && existingIdx !== -1) {
-      state.stack[existingIdx].value = String(v.value ?? '');
-    } else if (v.action === 'create' || existingIdx === -1) {
-      state.stack.push({
-        name: v.name,
-        address: v.address || `0x${(0x1000 + state.stack.length * 4).toString(16)}`,
-        value: String(v.value ?? ''),
-        points_to: null,
-      });
-    }
-  }
-
-  // Heap 블록 처리
-  for (const h of changes.heap || []) {
-    const existingIdx = state.heap.findIndex((b) => b.name === h.id);
-
-    if (h.action === 'delete') {
-      if (existingIdx !== -1) state.heap.splice(existingIdx, 1);
-    } else if (h.action === 'update' && existingIdx !== -1) {
-      state.heap[existingIdx].value = String(h.value ?? '');
-    } else if (h.action === 'create' || existingIdx === -1) {
-      state.heap.push({
-        name: h.id,
-        address: h.address,
-        value: String(h.value ?? ''),
-        points_to: null,
-      });
-    }
-  }
-
-  // 포인터 연결 처리
-  for (const p of changes.pointers || []) {
-    const block = state.stack.find((b) => b.name === p.from) ||
-                  state.heap.find((b) => b.name === p.from);
-    if (block) {
-      block.points_to = p.to;
-    }
-  }
-}
-
-/**
- * 0번 스텝부터 currentStepIndex까지 memoryChanges를 누적
- */
-function buildMemoryState(
-  steps: LessonStep[],
-  currentStepIndex: number
 ): LessonMemoryState {
-  const state: LessonMemoryState = { stack: [], heap: [] };
+  const state: LessonMemoryState = { stack: [], heap: [], frames: [] };
+  if (!changes) return state;
 
-  for (let i = 0; i <= currentStepIndex && i < steps.length; i++) {
-    applyMemoryState(state, steps[i].memoryChanges);
+  // Stack frames 처리
+  if (changes.stack) {
+    state.frames = changes.stack;
+    let stackAddr = 0x1000;
+
+    for (const frame of changes.stack) {
+      for (const v of frame.variables) {
+        state.stack.push({
+          name: `${frame.name}.${v.name}`,
+          address: `0x${stackAddr.toString(16)}`,
+          value: String(v.value ?? ''),
+          type: v.type,
+          points_to: v.ref || null,
+          highlight: v.highlight,
+        });
+        stackAddr += 4;
+      }
+    }
+  }
+
+  // Heap objects 처리
+  if (changes.heap && Array.isArray(changes.heap)) {
+    let heapAddr = 0x8000;
+
+    for (const h of changes.heap) {
+      const displayValue = h.fields
+        ? JSON.stringify(h.fields)
+        : String(h.value ?? '');
+
+      state.heap.push({
+        name: h.id || h.address || `heap_${heapAddr.toString(16)}`,
+        address: h.address || `0x${heapAddr.toString(16)}`,
+        value: displayValue,
+        type: h.type,
+        points_to: null,
+        highlight: h.highlight,
+      });
+      heapAddr += 16;
+    }
   }
 
   return state;
+}
+
+/**
+ * 현재 스텝에서 변경된 블록 이름 추출 (highlight된 것들)
+ */
+function getChangedBlockNames(changes: StepMemoryState | undefined): string[] {
+  if (!changes) return [];
+
+  const names: string[] = [];
+
+  // Stack에서 highlight된 변수
+  if (changes.stack) {
+    for (const frame of changes.stack) {
+      for (const v of frame.variables) {
+        if (v.highlight) {
+          names.push(`${frame.name}.${v.name}`);
+        }
+      }
+    }
+  }
+
+  // Heap에서 highlight된 객체
+  if (changes.heap && Array.isArray(changes.heap)) {
+    for (const h of changes.heap) {
+      if (h.highlight) {
+        names.push(h.id || h.address || '');
+      }
+    }
+  }
+
+  return names;
 }
 
 export interface UseLessonMemoryReturn {
@@ -101,17 +117,13 @@ export function useLessonMemory(
   currentStepIndex: number
 ): UseLessonMemoryReturn {
   const memoryState = useMemo(() => {
-    return buildMemoryState(steps, currentStepIndex);
+    const currentStep = steps[currentStepIndex];
+    return convertToVisualFormat(currentStep?.memoryChanges);
   }, [steps, currentStepIndex]);
 
   const changedBlocks = useMemo(() => {
-    const changes = steps[currentStepIndex]?.memoryChanges;
-    if (!changes) return [];
-
-    const names: string[] = [];
-    for (const v of changes.stack || []) names.push(v.name);
-    for (const h of changes.heap || []) names.push(h.id);
-    return names;
+    const currentStep = steps[currentStepIndex];
+    return getChangedBlockNames(currentStep?.memoryChanges);
   }, [steps, currentStepIndex]);
 
   return { memoryState, changedBlocks };

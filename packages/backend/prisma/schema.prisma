@@ -110,7 +110,7 @@ model Language {
 }
 
 model Chapter {
-  id          String   @id @default(uuid())
+  id          String   @id
   languageId  String   @map("language_id")
   title       String // '변수와 메모리'
   description String?
@@ -128,7 +128,7 @@ model Chapter {
 }
 
 model Lesson {
-  id            String   @id @default(uuid())
+  id            String   @id
   chapterId     String   @map("chapter_id")
   title         String // '변수 선언하기'
   description   String?
@@ -149,7 +149,7 @@ model Lesson {
 }
 
 model LessonContent {
-  id        String   @id @default(uuid())
+  id        String   @id
   lessonId  String   @unique @map("lesson_id")
   code      String // 메인 코드
   language  String // 'c', 'java', 'python'
@@ -163,7 +163,7 @@ model LessonContent {
 }
 
 model Quiz {
-  id          String   @id @default(uuid())
+  id          String   @id
   lessonId    String   @map("lesson_id")
   type        String // 'multiple_choice', 'predict_output', 'fill_blank', 'code_fix'
   question    String

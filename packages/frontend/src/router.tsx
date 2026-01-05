@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { MainLayout } from './layouts';
 import { HomePage } from './features/home';
 import { LoginPage, SignupPage } from './features/auth';
-import { CoursesPage, ChaptersPage, LessonsPage, LessonPage } from './features/courses';
+import { CoursesPage, LanguageCoursePage, LessonPage } from './features/courses';
 import { AdminPage, AdminRoute } from './features/admin';
 import { initializeAuthListener } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
@@ -61,9 +61,8 @@ export const router = createBrowserRouter([
       { path: 'signup', element: <SignupPage /> },
       { path: 'simulator', element: <HomePage /> },
       { path: 'courses', element: <CoursesPage /> },
-      { path: 'courses/:lang', element: <ChaptersPage /> },
-      { path: 'courses/:lang/:chapterId', element: <LessonsPage /> },
-      { path: 'courses/:lang/:chapterId/:lessonId', element: <LessonPage /> },
+      { path: 'courses/:lang', element: <LanguageCoursePage /> },
+      { path: 'courses/:lang/:lessonId', element: <LessonPage /> },
       { path: 'admin', element: <AdminRoute><AdminPage /></AdminRoute> },
     ],
   },

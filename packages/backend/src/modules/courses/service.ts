@@ -102,6 +102,10 @@ export async function getLessonFull(lessonId: string) {
     },
   });
 
+  console.log('[DEBUG] getLessonFull - lessonId:', lessonId);
+  console.log('[DEBUG] getLessonFull - lesson found:', !!lesson);
+  console.log('[DEBUG] getLessonFull - content:', lesson?.content);
+
   if (!lesson) return null;
 
   // steps JSON 파싱

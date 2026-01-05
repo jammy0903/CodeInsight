@@ -80,44 +80,72 @@ export interface LessonContent {
  * 스텝 (코드 실행 단계)
  */
 export interface LessonStep {
-  line: number; // 현재 줄 번호
-  highlightLines?: number[]; // 하이라이트할 줄들
-  explanation: string; // 설명
-  memoryChanges?: StepMemoryState; // 메모리 변화
+  line: number;
+  highlightLines?: number[];
+  title?: string;
+  explanation: string;
+  memoryChanges?: StepMemoryState;
+  keyInsight?: string;
+  analogy?: string;
+  misconception?: string;
+  tip?: string;
+  output?: string;
 }
 
 /**
- * 메모리 상태 (시각화용)
+ * 메모리 상태 (통일 형식)
+ * 모든 언어에서 동일한 구조 사용:
+ * - stack: 스택 프레임 배열 (main, 함수들)
+ * - heap: 힙 객체 배열
  */
 export interface StepMemoryState {
-  stack?: StackVariable[];
-  heap?: HeapBlock[];
-  pointers?: PointerConnection[];
+  stack?: StackFrame[];
+  heap?: HeapObject[];
 }
 
-export interface StackVariable {
+/**
+ * 변수 (스택 프레임 내의 개별 변수)
+ */
+export interface Variable {
   name: string;
   type: string;
   value: string | number;
-  address?: string;
-  size?: number;
-  action?: 'create' | 'update' | 'delete';
+  ref?: string;        // 힙 객체 참조 ID
+  highlight?: boolean;
 }
 
-export interface HeapBlock {
-  id: string;
-  address: string;
-  size: number;
+/**
+ * 스택 프레임 (main, 함수명 등)
+ */
+export interface StackFrame {
+  name: string;
+  variables: Variable[];
+}
+
+/**
+ * 힙 객체
+ */
+export interface HeapObject {
+  id?: string;             // 참조 ID (포인터용)
+  address?: string;        // 메모리 주소 (표시용)
+  type: string;
   value?: string | number;
-  label?: string;
-  action?: 'create' | 'update' | 'delete';
+  fields?: Record<string, unknown>;
+  highlight?: boolean;
 }
 
+/**
+ * 포인터 연결 (레거시 - 향후 제거 예정)
+ */
 export interface PointerConnection {
-  from: string; // 변수명 또는 주소
-  to: string; // 가리키는 주소
+  from: string;
+  to: string;
   label?: string;
 }
+
+// Legacy aliases
+export type StackVariable = Variable;
+export type HeapBlock = HeapObject;
 
 // =============================================
 // 퀴즈

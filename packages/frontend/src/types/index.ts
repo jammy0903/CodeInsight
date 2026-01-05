@@ -23,34 +23,41 @@ export type {
 // === Course Schema Types (DB 기반) ===
 // Language → Chapter → Lesson 계층 구조
 // Now imported from shared package (@codeinsight/shared)
-export type {
+// NOTE: `export type`이 아닌 `export`를 사용해야 Vite 개발 모드에서 정상 작동
+export {
   // 기본 엔티티
-  Language,
-  Chapter,
-  Lesson,
-  LessonDifficulty,
+  type Language,
+  type Chapter,
+  type Lesson,
+  type LessonDifficulty,
   // 콘텐츠
-  LessonContent,
-  LessonStep,
-  StepMemoryState,
-  StackVariable,
-  HeapBlock,
-  PointerConnection,
+  type LessonContent,
+  type LessonStep,
+  type StepMemoryState,
+  // 메모리 시각화 (통일 형식)
+  type Variable,
+  type StackFrame,
+  type HeapObject,
+  // 레거시 alias
+  type StackVariable,
+  type HeapBlock,
+  type PointerConnection,
   // 퀴즈
-  Quiz,
-  QuizType,
+  type Quiz,
+  type QuizType,
   // 진행 상태
-  UserProgress,
-  ProgressStatus,
+  type UserProgress,
+  type ProgressStatus,
   // API 응답
-  LanguageWithChapters,
-  ChapterWithLessons,
-  LessonFull,
-  ChapterWithProgress,
+  type LanguageWithChapters,
+  type ChapterWithLessons,
+  type LessonFull,
+  type ChapterWithProgress,
   // 유틸리티
-  LessonQuery,
-  ChapterQuery,
-  ProgressUpdateRequest,
+  type LessonQuery,
+  type ChapterQuery,
+  type ProgressUpdateRequest,
+  // 함수
+  getLessonPath,
+  getChapterPath,
 } from '@codeinsight/shared';
-
-export { getLessonPath, getChapterPath } from '@codeinsight/shared';

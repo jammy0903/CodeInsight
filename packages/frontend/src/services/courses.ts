@@ -161,6 +161,11 @@ export async function getLessonFull(lessonId: string): Promise<LessonFull> {
       throw new Error('Invalid lesson data from server');
     }
 
+    // DEBUG: 파싱 후 content 확인
+    console.log('[DEBUG] Raw response.data.content:', response.data.content);
+    console.log('[DEBUG] Parsed data.content:', parsed.data.content);
+    console.log('[DEBUG] Steps count:', parsed.data.content?.steps?.length);
+
     return parsed.data;
   } catch (err) {
     const error = handleError(err);

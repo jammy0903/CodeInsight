@@ -96,6 +96,11 @@ if [ ! -d "node_modules" ]; then
     pnpm install
 fi
 
+# Vite 캐시 삭제 (shared 패키지 변경 반영)
+echo -e "${YELLOW}[...] Vite 캐시 삭제 중...${NC}"
+rm -rf node_modules/.vite .vite 2>/dev/null || true
+echo -e "${GREEN}[✓] 캐시 삭제 완료${NC}"
+
 pnpm run dev &
 FRONTEND_PID=$!
 
