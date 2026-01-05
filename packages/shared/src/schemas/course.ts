@@ -23,7 +23,7 @@ export const LanguagesSchema = z.array(LanguageSchema);
 // =============================================
 
 export const ChapterSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),  // short ID 지원 (j-1-1, p-2-3 등)
   languageId: z.string(),
   title: z.string(),
   description: z.string().nullable().optional().transform(val => val ?? undefined),
@@ -43,8 +43,8 @@ export const ChaptersSchema = z.array(ChapterSchema);
 export const LessonDifficultySchema = z.enum(['basic', 'intermediate', 'advanced']);
 
 export const LessonSchema = z.object({
-  id: z.string().uuid(),
-  chapterId: z.string().uuid(),
+  id: z.string(),  // short ID 지원 (j-1-1, p-2-3 등)
+  chapterId: z.string(),  // short ID 지원
   title: z.string(),
   description: z.string().nullable().optional().transform(val => val ?? undefined),
   difficulty: LessonDifficultySchema,
@@ -116,8 +116,8 @@ export const StackVariableSchema = VariableSchema;
 export const HeapBlockSchema = HeapObjectSchema;
 
 export const LessonContentSchema = z.object({
-  id: z.string().uuid(),
-  lessonId: z.string().uuid(),
+  id: z.string(),  // short ID 지원
+  lessonId: z.string(),  // short ID 지원
   code: z.string(),
   language: z.string(),
   steps: z.array(LessonStepSchema),
@@ -137,8 +137,8 @@ export const QuizTypeSchema = z.enum([
 ]);
 
 export const QuizSchema = z.object({
-  id: z.string().uuid(),
-  lessonId: z.string().uuid(),
+  id: z.string(),  // short ID 지원
+  lessonId: z.string(),  // short ID 지원
   type: QuizTypeSchema,
   question: z.string(),
   options: z.array(z.string()).optional(),
@@ -157,9 +157,9 @@ export const QuizzesSchema = z.array(QuizSchema);
 export const ProgressStatusSchema = z.enum(['not_started', 'in_progress', 'completed']);
 
 export const UserProgressSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),  // short ID 또는 UUID
   userNickname: z.string(),
-  lessonId: z.string().uuid(),
+  lessonId: z.string(),  // short ID 지원
   status: ProgressStatusSchema,
   currentStep: z.number(),
   quizScore: z.number().optional(),
@@ -170,7 +170,7 @@ export const UserProgressSchema = z.object({
 });
 
 export const ProgressUpdateRequestSchema = z.object({
-  lessonId: z.string().uuid(),
+  lessonId: z.string(),  // short ID 지원
   status: ProgressStatusSchema.optional(),
   currentStep: z.number().optional(),
   quizScore: z.number().optional(),

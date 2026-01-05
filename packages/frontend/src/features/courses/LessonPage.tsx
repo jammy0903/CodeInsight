@@ -2,7 +2,7 @@
  * LessonPage - 레슨 학습 페이지 (API 기반)
  *
  * DayPage의 API 버전. 기존 컴포넌트 99% 재사용.
- * Route: /courses/:lang/:lessonId
+ * Route: /courses/:lang/:chapterId/:lessonId
  */
 
 import { useEffect, useState } from 'react';
@@ -173,8 +173,9 @@ function QuizCardAdapter({
 }
 
 export function LessonPage() {
-  const { lang, lessonId } = useParams<{
+  const { lang, chapterId, lessonId } = useParams<{
     lang: string;
+    chapterId: string;
     lessonId: string;
   }>();
 

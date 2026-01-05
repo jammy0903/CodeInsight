@@ -15,8 +15,8 @@ export function LessonItem({ lesson, progress, languageId, onClick }: LessonItem
     if (onClick) {
       onClick();
     } else {
-      // 새 라우팅 구조: /courses/:lang/:lessonId
-      navigate(`/courses/${languageId}/${lesson.id}`);
+      // 새 라우팅 구조: /courses/:lang/:chapterId/:lessonId
+      navigate(`/courses/${languageId}/${lesson.chapterId}/${lesson.id}`);
     }
   };
 
