@@ -277,9 +277,9 @@ export function LessonPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl min-h-screen flex flex-col px-6 md:px-10 lg:px-16 py-6">
+    <div className="h-full flex flex-col px-4 md:px-6 lg:px-8 py-3 overflow-hidden">
       {/* 헤더 */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-4 mb-2 shrink-0">
         <Link
           to={languageCoursePath}
           className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -302,9 +302,9 @@ export function LessonPage() {
           chapterPath={languageCoursePath}
         />
       ) : (
-        <div className="flex-1 flex gap-4 min-h-0 overflow-hidden">
+        <div className="flex-1 flex gap-3 min-h-0 overflow-hidden">
           {/* 왼쪽: 코드 + 컨트롤 (50%) */}
-          <div className="flex-1 flex flex-col gap-4 min-h-0">
+          <div className="flex-1 flex flex-col gap-3 min-h-0">
             {/* 코드 뷰어 */}
             <div className="flex-1 min-h-0">
               <CodeViewer
@@ -338,22 +338,24 @@ export function LessonPage() {
           </div>
 
           {/* 오른쪽: 시뮬레이터 + 설명 + AI Chat (50%) */}
-          <div className="flex-1 flex flex-col gap-4 overflow-y-auto">
+          <div className="flex-1 flex flex-col gap-3 min-h-0">
             {/* 메모리 시뮬레이터 */}
-            <CourseMemoryView
-              stack={memoryState.stack}
-              heap={memoryState.heap}
-              changedBlocks={changedBlocks}
-            />
+            <div className="shrink-0 max-h-[35%] min-h-[120px] rounded-xl border-2 border-border bg-bg-elevated overflow-hidden">
+              <CourseMemoryView
+                stack={memoryState.stack}
+                heap={memoryState.heap}
+                changedBlocks={changedBlocks}
+              />
+            </div>
 
             {/* 현재 스텝 설명 */}
-            <div className="rounded-xl border-2 border-neon-cyan bg-stack-bg p-4 shrink-0">
+            <div className="shrink-0 max-h-[25%] rounded-xl border-2 border-neon-cyan bg-stack-bg p-3 overflow-y-auto">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-neon-cyan/20 flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-neon-cyan/20 flex items-center justify-center shrink-0">
                   <MessageSquare className="w-4 h-4 text-stack-text" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-stack-text mb-2">
+                  <h3 className="text-xs font-semibold text-stack-text mb-1">
                     Step {navigation.currentStepIndex + 1} 설명
                   </h3>
                   <StepExplanation
@@ -365,7 +367,7 @@ export function LessonPage() {
             </div>
 
             {/* AI Chat */}
-            <div className="flex-1 min-h-[300px] rounded-xl border-2 border-border bg-warm-white overflow-hidden relative">
+            <div className="flex-1 min-h-[180px] rounded-xl border-2 border-border bg-warm-white overflow-hidden relative">
               {selection && (
                 <SelectedCodeBadge selection={selection} onClear={clearSelection} />
               )}

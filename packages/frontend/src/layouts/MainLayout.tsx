@@ -7,6 +7,7 @@
 
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import { TopBar } from './TopBar';
 import { Sidebar } from './Sidebar';
 import { NicknameModal } from '@/components/NicknameModal';
@@ -19,6 +20,10 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const { sidebarOpen, toggleSidebar, appUser } = useStore();
+  const location = useLocation();
+
+  // LessonPage인지 확인 (경로 패턴: /courses/:lang/:chapterId/:lessonId)
+  const isLessonPage = /^\/courses\/[^/]+\/[^/]+\/[^/]+$/.test(location.pathname);
 
   // Gmail 문의하기 링크 (제목 포함)
   const username = appUser?.nickname || '게스트';
@@ -55,19 +60,18 @@ export function MainLayout({ children }: MainLayoutProps) {
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {children}
-        </div>
+        {children}
       </motion.main>
 
-      {/* Footer - 2025 Modern Style */}
-      <motion.footer
-        className="shrink-0 py-6 bg-gradient-to-r from-card/80 via-card/95 to-card/80 backdrop-blur-xl border-t border-border/50 px-8"
-        animate={{
-          marginLeft: sidebarOpen ? '224px' : '0px',
-        }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      >
+      {/* Footer - 2025 Modern Style (LessonPage에서는 숨김) */}
+      {!isLessonPage && (
+        <motion.footer
+          className="shrink-0 py-6 bg-gradient-to-r from-card/80 via-card/95 to-card/80 backdrop-blur-xl border-t border-border/50 px-8"
+          animate={{
+            marginLeft: sidebarOpen ? '224px' : '0px',
+          }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Left: Brand + Copyright */}
           <motion.div
@@ -167,7 +171,8 @@ export function MainLayout({ children }: MainLayoutProps) {
             </div>
           </div>
         </div>
-      </motion.footer>
+        </motion.footer>
+      )}
     </div>
   );
 }

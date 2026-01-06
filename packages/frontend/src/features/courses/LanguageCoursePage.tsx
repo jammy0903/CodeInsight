@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import type { ChapterWithLessons, UserProgress } from '@/types';
 import { getChapters, getChapterWithLessons, getUserProgress } from '@/services/courses';
 import { ChapterAccordion } from './components/ChapterAccordion';
+import { useStore } from '@/stores/store';
 
 export function LanguageCoursePage() {
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
+  const appUser = useStore((state) => state.appUser);
 
   const [chapters, setChapters] = useState<ChapterWithLessons[]>([]);
   const [progressMap, setProgressMap] = useState<Map<string, UserProgress>>(new Map());
@@ -52,17 +54,20 @@ export function LanguageCoursePage() {
         if (cancelled) return;
         setChapters(chaptersWithLessons);
 
-        // 3. 진행 상태 가져오기 (선택적, 인증 필요)
-        try {
-          const progressList = await getUserProgress();
-          if (cancelled) return;
-          const map = new Map<string, UserProgress>();
-          progressList.forEach((p) => map.set(p.lessonId, p));
-          setProgressMap(map);
-        } catch (err) {
-          // 진행 상태는 선택적이므로 에러 무시 (미인증 사용자)
-          console.warn('Failed to get user progress (unauthenticated?):', err);
+        // 3. 진행 상태 가져오기 (로그인한 사용자만)
+        if (appUser) {
+          try {
+            const progressList = await getUserProgress();
+            if (cancelled) return;
+            const map = new Map<string, UserProgress>();
+            progressList.forEach((p) => map.set(p.lessonId, p));
+            setProgressMap(map);
+          } catch (err) {
+            // 진행 상태 조회 실패해도 코스는 볼 수 있음
+            console.warn('[courses] Progress fetch failed:', err);
+          }
         }
+        // 비로그인 사용자는 진행 상태 없이 코스만 표시
       } catch (err) {
         if (cancelled) return;
         console.error('Failed to load course data:', err);
@@ -77,7 +82,7 @@ export function LanguageCoursePage() {
     return () => {
       cancelled = true;
     };
-  }, [lang]);
+  }, [lang, appUser]);
 
   // 로딩 상태
   if (loading) {

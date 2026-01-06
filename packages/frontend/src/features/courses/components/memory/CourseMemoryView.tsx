@@ -182,17 +182,17 @@ export function CourseMemoryView({
             </tr>
           </thead>
           <tbody>
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence>
               {isEmpty ? (
-                <tr>
+                <motion.tr key="empty-row" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <td colSpan={6} className="text-sm text-gray-500 italic py-8 text-center">
                     메모리 할당 없음
                   </td>
-                </tr>
+                </motion.tr>
               ) : (
-                <>
-                  {/* Stack 영역 */}
-                  {sortedStack.map((block) => (
+                [
+                  /* Stack 영역 */
+                  ...sortedStack.map((block) => (
                     <MemoryRow
                       key={`stack-${block.name}`}
                       block={block}
@@ -200,19 +200,21 @@ export function CourseMemoryView({
                       segmentType="stack"
                       pointerIndex={getPointerIndex(block)}
                     />
-                  ))}
+                  )),
 
-                  {/* 구분선 (Stack과 Heap 사이) */}
-                  {stack.length > 0 && heap.length > 0 && (
-                    <tr>
-                      <td colSpan={6} className="py-2">
-                        <div className="border-t-2 border-dashed border-gray-300" />
-                      </td>
-                    </tr>
-                  )}
+                  /* 구분선 (Stack과 Heap 사이) */
+                  ...(stack.length > 0 && heap.length > 0
+                    ? [
+                        <motion.tr key="divider" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <td colSpan={6} className="py-2">
+                            <div className="border-t-2 border-dashed border-gray-300" />
+                          </td>
+                        </motion.tr>,
+                      ]
+                    : []),
 
-                  {/* Heap 영역 */}
-                  {sortedHeap.map((block) => (
+                  /* Heap 영역 */
+                  ...sortedHeap.map((block) => (
                     <MemoryRow
                       key={`heap-${block.name}`}
                       block={block}
@@ -220,8 +222,8 @@ export function CourseMemoryView({
                       segmentType="heap"
                       pointerIndex={getPointerIndex(block)}
                     />
-                  ))}
-                </>
+                  )),
+                ]
               )}
             </AnimatePresence>
           </tbody>
