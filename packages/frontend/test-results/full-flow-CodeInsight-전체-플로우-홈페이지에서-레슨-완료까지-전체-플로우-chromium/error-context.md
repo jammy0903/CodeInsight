@@ -1,0 +1,176 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - button "메뉴 열기" [ref=e4]:
+    - img [ref=e5]
+  - banner [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - img [ref=e10]
+        - img [ref=e15]
+      - generic [ref=e20]:
+        - heading "CodeInsight" [level=1] [ref=e21]
+        - paragraph [ref=e22]: 코드 실행 원리 학습
+  - main [ref=e23]:
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - button "← 코스 목록으로" [ref=e28]:
+          - generic [ref=e29]: ←
+          - generic [ref=e30]: 코스 목록으로
+        - heading "C언어 코스" [level=1] [ref=e31]
+        - paragraph [ref=e32]: 총 10개 챕터 · 62개 레슨
+      - generic [ref=e33]:
+        - button "📘 변수와 메모리 기초 변수가 메모리에 어떻게 저장되는지 이해 🤔 변수는 메모리 어디에 저장되는가? 0/4 시작 전 0% ▼" [active] [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - generic [ref=e38]: 📘
+              - heading "변수와 메모리 기초" [level=3] [ref=e39]
+            - paragraph [ref=e40]: 변수가 메모리에 어떻게 저장되는지 이해
+            - paragraph [ref=e41]: 🤔 변수는 메모리 어디에 저장되는가?
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - paragraph [ref=e44]: 0/4 시작 전
+              - paragraph [ref=e45]: 0%
+            - generic [ref=e46]: ▼
+        - button "📘 포인터 기본 포인터는 \"주소를 담는 변수\"라는 개념 확립 🤔 포인터는 왜 필요한가? 0/7 시작 전 0% ▼" [ref=e49]:
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - generic [ref=e52]: 📘
+              - heading "포인터 기본" [level=3] [ref=e53]
+            - paragraph [ref=e54]: 포인터는 "주소를 담는 변수"라는 개념 확립
+            - paragraph [ref=e55]: 🤔 포인터는 왜 필요한가?
+          - generic [ref=e56]:
+            - generic [ref=e57]:
+              - paragraph [ref=e58]: 0/7 시작 전
+              - paragraph [ref=e59]: 0%
+            - generic [ref=e60]: ▼
+        - button "📘 배열 배열은 연속된 메모리 블록 🤔 배열은 메모리에 어떻게 배치되는가? 0/6 시작 전 0% ▼" [ref=e63]:
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - generic [ref=e66]: 📘
+              - heading "배열" [level=3] [ref=e67]
+            - paragraph [ref=e68]: 배열은 연속된 메모리 블록
+            - paragraph [ref=e69]: 🤔 배열은 메모리에 어떻게 배치되는가?
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - paragraph [ref=e72]: 0/6 시작 전
+              - paragraph [ref=e73]: 0%
+            - generic [ref=e74]: ▼
+        - button "📘 함수와 메모리 Call by Value의 진실 🤔 함수 호출 시 메모리는 어떻게 변하는가? 0/5 시작 전 0% ▼" [ref=e77]:
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - generic [ref=e80]: 📘
+              - heading "함수와 메모리" [level=3] [ref=e81]
+            - paragraph [ref=e82]: Call by Value의 진실
+            - paragraph [ref=e83]: 🤔 함수 호출 시 메모리는 어떻게 변하는가?
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - paragraph [ref=e86]: 0/5 시작 전
+              - paragraph [ref=e87]: 0%
+            - generic [ref=e88]: ▼
+        - button "📘 동적 메모리 관리 Stack vs Heap 완벽 이해 🤔 언제 Stack을 쓰고 언제 Heap을 쓰는가? 0/7 시작 전 0% ▼" [ref=e91]:
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]: 📘
+              - heading "동적 메모리 관리" [level=3] [ref=e95]
+            - paragraph [ref=e96]: Stack vs Heap 완벽 이해
+            - paragraph [ref=e97]: 🤔 언제 Stack을 쓰고 언제 Heap을 쓰는가?
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - paragraph [ref=e100]: 0/7 시작 전
+              - paragraph [ref=e101]: 0%
+            - generic [ref=e102]: ▼
+        - button "📘 구조체 사용자 정의 타입의 메모리 구조 🤔 구조체는 메모리에 어떻게 저장되는가? 0/7 시작 전 0% ▼" [ref=e105]:
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - generic [ref=e108]: 📘
+              - heading "구조체" [level=3] [ref=e109]
+            - paragraph [ref=e110]: 사용자 정의 타입의 메모리 구조
+            - paragraph [ref=e111]: 🤔 구조체는 메모리에 어떻게 저장되는가?
+          - generic [ref=e112]:
+            - generic [ref=e113]:
+              - paragraph [ref=e114]: 0/7 시작 전
+              - paragraph [ref=e115]: 0%
+            - generic [ref=e116]: ▼
+        - button "📘 문자열 문자열은 char 배열이다 🤔 문자열은 메모리에 어떻게 저장되는가? 0/7 시작 전 0% ▼" [ref=e119]:
+          - generic [ref=e120]:
+            - generic [ref=e121]:
+              - generic [ref=e122]: 📘
+              - heading "문자열" [level=3] [ref=e123]
+            - paragraph [ref=e124]: 문자열은 char 배열이다
+            - paragraph [ref=e125]: 🤔 문자열은 메모리에 어떻게 저장되는가?
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - paragraph [ref=e128]: 0/7 시작 전
+              - paragraph [ref=e129]: 0%
+            - generic [ref=e130]: ▼
+        - button "📘 고급 포인터 복잡한 포인터 표현 이해 🤔 포인터의 포인터는 어떻게 사용하는가? 0/6 시작 전 0% ▼" [ref=e133]:
+          - generic [ref=e134]:
+            - generic [ref=e135]:
+              - generic [ref=e136]: 📘
+              - heading "고급 포인터" [level=3] [ref=e137]
+            - paragraph [ref=e138]: 복잡한 포인터 표현 이해
+            - paragraph [ref=e139]: 🤔 포인터의 포인터는 어떻게 사용하는가?
+          - generic [ref=e140]:
+            - generic [ref=e141]:
+              - paragraph [ref=e142]: 0/6 시작 전
+              - paragraph [ref=e143]: 0%
+            - generic [ref=e144]: ▼
+        - button "📘 파일과 전처리기 I/O와 컴파일 전 처리 🤔 파일은 어떻게 읽고 쓰는가? 0/6 시작 전 0% ▼" [ref=e147]:
+          - generic [ref=e148]:
+            - generic [ref=e149]:
+              - generic [ref=e150]: 📘
+              - heading "파일과 전처리기" [level=3] [ref=e151]
+            - paragraph [ref=e152]: I/O와 컴파일 전 처리
+            - paragraph [ref=e153]: 🤔 파일은 어떻게 읽고 쓰는가?
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - paragraph [ref=e156]: 0/6 시작 전
+              - paragraph [ref=e157]: 0%
+            - generic [ref=e158]: ▼
+        - button "📘 자료구조 입문 메모리 관점에서 자료구조 이해 🤔 자료구조는 메모리에 어떻게 구현되는가? 0/7 시작 전 0% ▼" [ref=e161]:
+          - generic [ref=e162]:
+            - generic [ref=e163]:
+              - generic [ref=e164]: 📘
+              - heading "자료구조 입문" [level=3] [ref=e165]
+            - paragraph [ref=e166]: 메모리 관점에서 자료구조 이해
+            - paragraph [ref=e167]: 🤔 자료구조는 메모리에 어떻게 구현되는가?
+          - generic [ref=e168]:
+            - generic [ref=e169]:
+              - paragraph [ref=e170]: 0/7 시작 전
+              - paragraph [ref=e171]: 0%
+            - generic [ref=e172]: ▼
+  - contentinfo [ref=e175]:
+    - generic [ref=e176]:
+      - generic [ref=e177]:
+        - generic [ref=e178]:
+          - generic [ref=e179]: CodeInsight
+          - generic [ref=e180]: •
+          - generic [ref=e181]: © 2025
+        - paragraph [ref=e182]:
+          - text: Made with
+          - img [ref=e183]
+          - text: for learners worldwide
+      - generic [ref=e185]:
+        - generic [ref=e186]:
+          - link [ref=e187] [cursor=pointer]:
+            - /url: https://github.com/jammy0903
+            - img [ref=e190]
+          - link [ref=e193] [cursor=pointer]:
+            - /url: mailto:fuso3367@kakao.com
+            - img [ref=e196]
+          - link [ref=e199] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e202]
+        - generic [ref=e205]:
+          - link "About" [ref=e206] [cursor=pointer]:
+            - /url: "#"
+            - text: About
+          - link "Docs" [ref=e207] [cursor=pointer]:
+            - /url: "#"
+            - text: Docs
+          - link "문의하기" [ref=e208] [cursor=pointer]:
+            - /url: https://mail.google.com/mail/?view=cm&fs=1&to=l89192164@gmail.com&su=%5BCodeInsight%20%EA%B3%A0%EA%B0%9D%EB%AC%B8%EC%9D%98%EC%82%AC%ED%95%AD%5D%20%EA%B2%8C%EC%8A%A4%ED%8A%B8
+            - text: 문의하기
+```
