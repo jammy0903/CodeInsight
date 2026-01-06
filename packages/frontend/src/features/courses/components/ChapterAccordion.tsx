@@ -28,71 +28,47 @@ export function ChapterAccordion({
   const totalCount = lessons.length;
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-  // 진행 상태 텍스트
-  const getStatusText = () => {
-    if (completedCount === 0) return '시작 전';
-    if (completedCount === totalCount) return '완료';
-    return '진행 중';
-  };
-
-  // 진행률 바 색상
-  const getProgressColor = () => {
-    if (completedCount === 0) return 'bg-gray-200';
-    if (completedCount === totalCount) return 'bg-green-500';
-    return 'bg-blue-500';
-  };
+  const isComplete = completedCount === totalCount && totalCount > 0;
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
-      {/* 챕터 헤더 (클릭 가능) */}
+    <div className="chapter-card">
+      {/* 챕터 헤더 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+        className="chapter-header"
       >
-        {/* 왼쪽: 챕터 정보 */}
-        <div className="flex-1 text-left">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📘</span>
-            <h3 className="font-bold text-gray-900">{chapter.title}</h3>
-          </div>
+        <div className="chapter-info">
+          <span className={`chapter-title ${isComplete ? 'completed' : ''}`}>
+            {chapter.title}
+          </span>
           {chapter.description && (
-            <p className="text-sm text-gray-600 mt-1">{chapter.description}</p>
-          )}
-          {chapter.keyQuestion && (
-            <p className="text-xs text-blue-600 mt-1 italic">🤔 {chapter.keyQuestion}</p>
+            <p className="chapter-desc">{chapter.description}</p>
           )}
         </div>
 
-        {/* 오른쪽: 진행률 + 토글 아이콘 */}
-        <div className="flex items-center gap-4">
-          {/* 진행률 텍스트 */}
-          <div className="text-right">
-            <p className="text-sm font-semibold text-gray-700">
-              {completedCount}/{totalCount} {getStatusText()}
-            </p>
-            <p className="text-xs text-gray-500">{progressPercent}%</p>
-          </div>
-
-          {/* 토글 아이콘 */}
-          <span className="text-gray-400 text-xl transition-transform duration-200" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-            ▼
+        <div className="chapter-meta">
+          <span className={`chapter-badge ${isComplete ? 'complete' : completedCount > 0 ? 'progress' : ''}`}>
+            {completedCount}/{totalCount}
+          </span>
+          <span className={`chapter-arrow ${isOpen ? 'open' : ''}`}>
+            ›
           </span>
         </div>
       </button>
 
       {/* 진행률 바 */}
-      <div className="h-1 bg-gray-100">
+      <div className="chapter-progress">
         <div
-          className={`h-full transition-all duration-300 ${getProgressColor()}`}
+          className={`chapter-progress-fill ${isComplete ? 'complete' : ''}`}
           style={{ width: `${progressPercent}%` }}
         />
       </div>
 
-      {/* 레슨 목록 (접었다 펼치기) */}
+      {/* 레슨 목록 */}
       {isOpen && (
-        <div className="p-4 space-y-2 bg-gray-50">
+        <div className="chapter-lessons">
           {lessons.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-4">레슨이 없습니다</p>
+            <p className="text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>레슨이 없습니다</p>
           ) : (
             lessons.map((lesson) => (
               <LessonItem

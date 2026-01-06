@@ -25,7 +25,7 @@ services:
   # ===========================
   frontend:
     build:
-      context: ./frontend
+      context: ./packages/frontend
       dockerfile: Dockerfile
       target: builder  # Builder stage까지만 실행
     container_name: codeinsight-frontend-builder
@@ -68,7 +68,7 @@ services:
   # ===========================
   backend:
     build:
-      context: ./backend
+      context: ./packages/backend
       dockerfile: Dockerfile
     container_name: codeinsight-backend
     ports:
@@ -76,13 +76,13 @@ services:
     environment:
       - NODE_ENV=production
     env_file:
-      - ./backend/.env
+      - ./packages/backend/.env
     volumes:
       # C 코드 실행을 위한 Docker 소켓 마운트
       - /var/run/docker.sock:/var/run/docker.sock
 
       # 로그 저장 (선택적)
-      - ./backend/logs:/app/logs
+      - ./packages/backend/logs:/app/logs
     restart: unless-stopped
     networks:
       - codeinsight

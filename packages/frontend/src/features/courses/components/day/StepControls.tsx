@@ -1,13 +1,12 @@
 /**
- * StepControls - 이전/다음 스텝 버튼 + 진행률
+ * StepControls - 컴팩트한 스텝 네비게이션
  */
 
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
 interface StepControlsProps {
-  currentStep: number;    // 1부터 시작 (표시용)
+  currentStep: number;
   totalSteps: number;
   canGoPrev: boolean;
   canGoNext: boolean;
@@ -27,58 +26,48 @@ export function StepControls({
   onNext,
   onGoToQuiz,
 }: StepControlsProps) {
-  return (
-    <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border">
-      {/* 이전 버튼 */}
-      <motion.div whileTap={canGoPrev ? { scale: 0.95 } : undefined}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onPrev}
-          disabled={!canGoPrev}
-          className="gap-1"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          이전
-        </Button>
-      </motion.div>
+  const progress = (currentStep / totalSteps) * 100;
 
-      {/* 진행률 */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium">
-          Step {currentStep} / {totalSteps}
-        </span>
-        <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
+  return (
+    <div className="step-controls">
+      {/* 이전 버튼 */}
+      <button
+        onClick={onPrev}
+        disabled={!canGoPrev}
+        className="step-btn"
+        aria-label="이전"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+
+      {/* 중앙: 진행률 바 + 스텝 표시 */}
+      <div className="step-progress">
+        <div className="step-progress-bar">
           <motion.div
-            className="h-full bg-primary"
+            className="step-progress-fill"
             initial={{ width: 0 }}
-            animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            animate={{ width: `${progress}%` }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           />
         </div>
+        <span className="step-label">{currentStep} / {totalSteps}</span>
       </div>
 
       {/* 다음/퀴즈 버튼 */}
       {isLastStep ? (
-        <motion.div whileTap={{ scale: 0.95 }}>
-          <Button size="sm" onClick={onGoToQuiz} className="gap-1">
-            퀴즈 풀기
-            <Play className="w-4 h-4" />
-          </Button>
-        </motion.div>
+        <button onClick={onGoToQuiz} className="step-btn step-btn-quiz">
+          <Sparkles className="w-4 h-4" />
+          <span>퀴즈</span>
+        </button>
       ) : (
-        <motion.div whileTap={canGoNext ? { scale: 0.95 } : undefined}>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onNext}
-            disabled={!canGoNext}
-            className="gap-1"
-          >
-            다음
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </motion.div>
+        <button
+          onClick={onNext}
+          disabled={!canGoNext}
+          className="step-btn"
+          aria-label="다음"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
       )}
     </div>
   );

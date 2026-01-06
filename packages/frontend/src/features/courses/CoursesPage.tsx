@@ -8,8 +8,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Loader2, AlertCircle, ChevronRight, BookOpen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2, AlertCircle, ChevronRight, BookOpen, RefreshCw } from 'lucide-react';
 import { getLanguages } from '@/services/courses';
 import type { Language } from '@/types';
 
@@ -56,13 +55,16 @@ export function CoursesPage() {
       <div className="flex flex-col items-center justify-center h-64 gap-4">
         <AlertCircle className="w-12 h-12 text-destructive" />
         <p className="text-muted-foreground">{error}</p>
-        <Button onClick={() => window.location.reload()}>다시 시도</Button>
+        <button onClick={() => window.location.reload()} className="btn-secondary px-4 py-2 flex items-center gap-2">
+          <RefreshCw className="w-4 h-4" />
+          다시 시도
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-6 md:px-10 lg:px-16 space-y-8 max-w-7xl">
+    <div className="min-h-screen py-8 space-y-8">
       {/* 헤더 */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -77,12 +79,12 @@ export function CoursesPage() {
         </p>
       </motion.div>
 
-      {/* 언어 카드 그리드 */}
+      {/* 언어 카드 리스트 (수직 배열) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        className="flex flex-col gap-4 max-w-2xl mx-auto"
       >
         {languages.map((lang, index) => (
           <LanguageCard
@@ -117,32 +119,35 @@ interface LanguageCardProps {
 function LanguageCard({ language, index, onClick }: LanguageCardProps) {
   return (
     <motion.button
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
-      whileHover={{ scale: 1.03, y: -4 }}
+      whileHover={{ scale: 1.02, x: 4 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="group relative bg-bg-elevated border-2 border-border rounded-2xl p-6 text-left
-                 hover:border-primary hover:shadow-lg transition-all duration-300"
+      className="group relative bg-bg-elevated border-2 border-border rounded-xl p-4
+                 hover:border-primary hover:shadow-lg transition-all duration-300
+                 flex items-center gap-4"
     >
       {/* 아이콘 */}
-      <div className="text-5xl mb-4">{language.icon || '📚'}</div>
+      <div className="text-4xl shrink-0">{language.icon || '📚'}</div>
 
-      {/* 언어명 */}
-      <h3 className="text-xl font-bold text-text mb-2 flex items-center gap-2">
-        {language.name}
-        <ChevronRight className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100
-                                 transform translate-x-0 group-hover:translate-x-1 transition-all" />
-      </h3>
+      {/* 텍스트 영역 */}
+      <div className="flex-1 text-left">
+        <h3 className="text-lg font-bold text-text">
+          {language.name}
+        </h3>
+        <p className="text-sm text-text-secondary line-clamp-1">
+          {language.description || '코스를 탐색해보세요'}
+        </p>
+      </div>
 
-      {/* 설명 */}
-      <p className="text-sm text-text-secondary mb-4 line-clamp-2">
-        {language.description || '코스를 탐색해보세요'}
-      </p>
+      {/* 화살표 */}
+      <ChevronRight className="w-5 h-5 text-primary opacity-50 group-hover:opacity-100
+                               transform translate-x-0 group-hover:translate-x-1 transition-all shrink-0" />
 
       {/* Hover 효과 */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/5 to-transparent
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-transparent
                       opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </motion.button>
   );

@@ -1,8 +1,9 @@
 /**
  * useLessonMemory - LessonStep.memoryChanges를 시각화용 형식으로 변환
  *
- * WHY: 통일된 스냅샷 형식(stack frames + heap objects)을 시각화 컴포넌트용으로 변환
- * 각 스텝의 memoryChanges는 해당 시점의 전체 메모리 상태를 나타냄
+ * 두 가지 형식 지원:
+ * 1. 누적 형식: stack: [{ name: 'main', variables: [...] }]
+ * 2. 액션 형식: stack: { action: 'add_variable', name: 'a', ... }
  */
 
 import { useMemo } from 'react';
@@ -20,7 +21,74 @@ export interface LessonMemoryBlock {
 export interface LessonMemoryState {
   stack: LessonMemoryBlock[];
   heap: LessonMemoryBlock[];
-  frames: StackFrame[];  // 원본 프레임 데이터
+  frames: StackFrame[];
+}
+
+// 액션 기반 memoryChanges 형식 (seed 데이터)
+interface ActionBasedStackChange {
+  action: string;
+  name?: string;
+  frame?: string;
+  type?: string;
+  size?: number;
+  value?: string | number;
+  address?: string;
+  oldValue?: string | number;
+  newValue?: string | number;
+  scope?: string;
+  reason?: string;
+  freed?: string[];
+}
+
+/**
+ * 액션 기반 형식을 시각화용으로 변환
+ */
+function convertActionBasedFormat(
+  stack: ActionBasedStackChange | undefined
+): LessonMemoryBlock[] {
+  if (!stack) return [];
+
+  const blocks: LessonMemoryBlock[] = [];
+
+  // add_variable, update_variable 액션 처리
+  if (stack.action === 'add_variable' || stack.action === 'update_variable') {
+    blocks.push({
+      name: stack.name || 'unknown',
+      address: stack.address || '0x????',
+      value: String(stack.value ?? stack.newValue ?? ''),
+      type: stack.type,
+      points_to: null,
+      highlight: true,
+    });
+  }
+
+  return blocks;
+}
+
+/**
+ * 누적 형식(StackFrame[])을 시각화용으로 변환
+ */
+function convertCumulativeFormat(
+  frames: StackFrame[]
+): { blocks: LessonMemoryBlock[]; frames: StackFrame[] } {
+  const blocks: LessonMemoryBlock[] = [];
+  let stackAddr = 0x1000;
+
+  for (const frame of frames) {
+    for (const v of frame.variables) {
+      blocks.push({
+        name: `${frame.name}.${v.name}`,
+        address: `0x${stackAddr.toString(16)}`,
+        value: String(v.value ?? ''),
+        type: v.type,
+        points_to: v.ref || null,
+        highlight: v.highlight,
+      });
+      stackAddr += 4;
+    }
+  }
+
+  return { blocks, frames };
 }
 
 /**
@@ -32,23 +100,16 @@ function convertToVisualFormat(
   const state: LessonMemoryState = { stack: [], heap: [], frames: [] };
   if (!changes) return state;
 
-  // Stack frames 처리
+  // Stack 처리 - 배열인지 객체인지 확인
   if (changes.stack) {
-    state.frames = changes.stack;
-    let stackAddr = 0x1000;
-
-    for (const frame of changes.stack) {
-      for (const v of frame.variables) {
-        state.stack.push({
-          name: `${frame.name}.${v.name}`,
-          address: `0x${stackAddr.toString(16)}`,
-          value: String(v.value ?? ''),
-          type: v.type,
-          points_to: v.ref || null,
-          highlight: v.highlight,
-        });
-        stackAddr += 4;
-      }
+    if (Array.isArray(changes.stack)) {
+      // 누적 형식: [{ name: 'main', variables: [...] }]
+      const { blocks, frames } = convertCumulativeFormat(changes.stack);
+      state.stack = blocks;
+      state.frames = frames;
+    } else if (typeof changes.stack === 'object') {
+      // 액션 형식: { action: 'add_variable', ... }
+      state.stack = convertActionBasedFormat(changes.stack as ActionBasedStackChange);
     }
   }
 
@@ -77,20 +138,28 @@ function convertToVisualFormat(
 }
 
 /**
- * 현재 스텝에서 변경된 블록 이름 추출 (highlight된 것들)
+ * 현재 스텝에서 변경된 블록 이름 추출
  */
 function getChangedBlockNames(changes: StepMemoryState | undefined): string[] {
   if (!changes) return [];
 
   const names: string[] = [];
 
-  // Stack에서 highlight된 변수
   if (changes.stack) {
-    for (const frame of changes.stack) {
-      for (const v of frame.variables) {
-        if (v.highlight) {
-          names.push(`${frame.name}.${v.name}`);
+    if (Array.isArray(changes.stack)) {
+      // 누적 형식
+      for (const frame of changes.stack) {
+        for (const v of frame.variables) {
+          if (v.highlight) {
+            names.push(`${frame.name}.${v.name}`);
+          }
         }
+      }
+    } else if (typeof changes.stack === 'object') {
+      // 액션 형식 - 액션이 있으면 해당 변수가 변경된 것
+      const stack = changes.stack as ActionBasedStackChange;
+      if (stack.name && (stack.action === 'add_variable' || stack.action === 'update_variable')) {
+        names.push(stack.name);
       }
     }
   }

@@ -4,7 +4,6 @@
  */
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -46,15 +45,13 @@ export function ChatQA({
           <span className="text-sm font-medium">Q&A 대화</span>
         </div>
         {messages.length > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={clearMessages}
-            className="h-7 text-xs"
+            className="btn-danger px-2 py-1 text-xs flex items-center gap-1"
           >
-            <Trash2 className="h-3 w-3 mr-1" />
+            <Trash2 className="h-3 w-3" />
             초기화
-          </Button>
+          </button>
         )}
       </div>
 
@@ -92,17 +89,17 @@ export function ChatQA({
               rows={1}
               disabled={isLoading}
             />
-            <Button
-              size="sm"
+            <button
               onClick={sendMessage}
               disabled={isLoading || !input.trim()}
+              className={`btn-cyan px-3 py-2 ${isLoading || !input.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Send className="h-4 w-4" />
               )}
-            </Button>
+            </button>
           </div>
         )}
       </div>

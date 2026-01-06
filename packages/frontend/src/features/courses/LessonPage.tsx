@@ -7,8 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, ArrowRight, MessageSquare, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, MessageSquare, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
@@ -52,7 +51,10 @@ function NotFoundView({ message, backPath }: { message: string; backPath: string
     <div className="flex flex-col items-center justify-center h-full gap-4">
       <AlertCircle className="w-16 h-16 text-muted-foreground" />
       <h2 className="text-xl font-semibold">{message}</h2>
-      <Button onClick={() => navigate(backPath)}>뒤로 가기</Button>
+      <button onClick={() => navigate(backPath)} className="btn-secondary px-4 py-2 flex items-center gap-1">
+        <ArrowLeft className="w-4 h-4" />
+        뒤로 가기
+      </button>
     </div>
   );
 }
@@ -83,14 +85,15 @@ function CompletedView({
             : '이 챕터의 모든 레슨을 완료했습니다!'}
         </p>
         <div className="flex gap-3 justify-center pt-4">
-          <Button variant="outline" onClick={() => navigate(chapterPath)}>
+          <button onClick={() => navigate(chapterPath)} className="btn-secondary px-4 py-2 flex items-center gap-1">
+            <ArrowLeft className="w-4 h-4" />
             레슨 목록
-          </Button>
+          </button>
           {hasNext && (
-            <Button onClick={() => navigate(nextLessonPath)} className="gap-1">
+            <button onClick={() => navigate(nextLessonPath)} className="btn-primary px-4 py-2 flex items-center gap-1">
               다음 레슨
               <ArrowRight className="w-4 h-4" />
-            </Button>
+            </button>
           )}
         </div>
       </CardContent>
@@ -159,13 +162,17 @@ function QuizCardAdapter({
 
       <div className="flex justify-end gap-2">
         {!submitted ? (
-          <Button onClick={handleSubmit} disabled={selected === null}>
+          <button
+            onClick={handleSubmit}
+            disabled={selected === null}
+            className={`btn-primary px-4 py-2 ${selected === null ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
             제출
-          </Button>
+          </button>
         ) : (
-          <Button onClick={handleContinue}>
+          <button onClick={handleContinue} className="btn-success px-4 py-2">
             {isCorrect ? '완료' : '다시 학습하기'}
-          </Button>
+          </button>
         )}
       </div>
     </div>
@@ -240,7 +247,6 @@ export function LessonPage() {
     totalSteps: steps.length,
     onComplete: () => {
       // TODO: API로 진행 상태 저장
-      console.log('Lesson completed:', lessonId);
     },
   });
 
@@ -277,19 +283,18 @@ export function LessonPage() {
   }
 
   return (
-    <div className="h-full flex flex-col px-4 md:px-6 lg:px-8 py-3 overflow-hidden">
+    <div className="h-full flex flex-col py-4 overflow-hidden lesson-page-container">
       {/* 헤더 */}
       <div className="flex items-center gap-4 mb-2 shrink-0">
-        <Link
-          to={languageCoursePath}
-          className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-        >
-          ← 코스 목록
+        <Link to={languageCoursePath} className="cyber-back-btn">
+          <span className="cyber-back-arrow">‹</span>
+          <span>EXIT</span>
         </Link>
+        <div className="cyber-divider" />
         <div>
-          <h1 className="text-xl font-bold">{lesson.title}</h1>
+          <h1 className="text-lg font-bold">{lesson.title}</h1>
           {lesson.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">{lesson.description}</p>
+            <p className="text-xs text-gray-500">{lesson.description}</p>
           )}
         </div>
       </div>

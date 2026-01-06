@@ -27,7 +27,6 @@ export class GeminiProvider implements IAIProvider {
 
     if (message.toLowerCase().startsWith('notion page:')) {
       const pageId = message.substring('notion page:'.length).trim();
-      console.log(`[GeminiProvider] Retrieving Notion page: "${pageId}"`);
       try {
         const page = await notion.pages.retrieve({ page_id: pageId });
         responseContent = `Notion page content for "${pageId}":\n\n${JSON.stringify(page, null, 2)}`;

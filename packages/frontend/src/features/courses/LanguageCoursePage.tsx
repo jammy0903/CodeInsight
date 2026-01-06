@@ -87,10 +87,10 @@ export function LanguageCoursePage() {
   // 로딩 상태
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">코스 로딩 중...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a08060] mx-auto mb-4"></div>
+          <p className="text-[#937b5d]">코스 로딩 중...</p>
         </div>
       </div>
     );
@@ -99,14 +99,14 @@ export function LanguageCoursePage() {
   // 에러 상태
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center max-w-md">
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
           <div className="text-6xl mb-4">😢</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">코스를 불러올 수 없습니다</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h2 className="text-2xl font-bold text-[#6b5a4a] mb-2">코스를 불러올 수 없습니다</h2>
+          <p className="text-[#937b5d] mb-6">{error}</p>
           <button
             onClick={() => navigate('/courses')}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="btn-primary"
           >
             코스 목록으로 돌아가기
           </button>
@@ -118,20 +118,20 @@ export function LanguageCoursePage() {
   // 챕터가 없는 경우
   if (chapters.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center max-w-md">
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
           <div className="text-6xl mb-4">📚</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-2xl font-bold text-[#6b5a4a] mb-2">
             {getLanguageName()} 코스 준비 중
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-[#937b5d] mb-6">
             아직 학습 콘텐츠가 준비되지 않았습니다.
             <br />
             곧 추가될 예정입니다!
           </p>
           <button
             onClick={() => navigate('/courses')}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="btn-primary"
           >
             다른 코스 보기
           </button>
@@ -152,61 +152,57 @@ export function LanguageCoursePage() {
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16">
-        {/* 헤더 */}
-        <div className="mb-8">
-          <button
-            onClick={() => navigate('/courses')}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
-          >
-            <span>←</span>
-            <span>코스 목록으로</span>
-          </button>
+    <div className="min-h-screen py-8">
+      {/* 헤더 */}
+      <div className="mb-8">
+        <button
+          onClick={() => navigate('/courses')}
+          className="cyber-back-btn mb-6"
+        >
+          <span className="cyber-back-arrow">‹</span>
+          <span>COURSES</span>
+        </button>
 
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{getLanguageName()} 코스</h1>
-          <p className="text-gray-600">
-            총 {chapters.length}개 챕터 · {totalLessons}개 레슨
+        <div className="course-header-card">
+          <h1 className="course-title">{getLanguageName()}</h1>
+          <p className="course-subtitle">
+            {chapters.length}개 챕터 · {totalLessons}개 레슨
           </p>
 
-          {/* 전체 진행률 */}
-          {completedLessons > 0 && (
-            <div className="mt-4">
-              <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                <span>전체 진행률</span>
-                <span className="font-semibold">
-                  {completedLessons}/{totalLessons} ({overallProgress}%)
-                </span>
-              </div>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-green-500 transition-all duration-300"
-                  style={{ width: `${overallProgress}%` }}
-                />
-              </div>
+          {/* Progress Bar */}
+          <div className="course-progress">
+            <div className="course-progress-header">
+              <span>진행률</span>
+              <span>{completedLessons}/{totalLessons}</span>
             </div>
-          )}
-        </div>
-
-        {/* 챕터 목록 (Accordion) */}
-        {lang && (
-          <div className="space-y-4">
-            {chapters.map((chapter, index) => (
-              <ChapterAccordion
-                key={chapter.id}
-                chapter={chapter}
-                lessons={chapter.lessons}
-                progressMap={progressMap}
-                languageId={lang}
-                defaultOpen={index === 0} // 첫 번째 챕터만 기본으로 열기
+            <div className="course-progress-bar">
+              <div
+                className="course-progress-fill"
+                style={{ width: `${overallProgress}%` }}
               />
-            ))}
+            </div>
           </div>
-        )}
-
-        {/* 하단 여백 */}
-        <div className="h-16" />
+        </div>
       </div>
+
+      {/* 챕터 목록 */}
+      {lang && (
+        <div className="space-y-3">
+          {chapters.map((chapter, index) => (
+            <ChapterAccordion
+              key={chapter.id}
+              chapter={chapter}
+              lessons={chapter.lessons}
+              progressMap={progressMap}
+              languageId={lang}
+              defaultOpen={index === 0}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 하단 여백 */}
+      <div className="h-16" />
     </div>
   );
 }

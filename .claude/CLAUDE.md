@@ -233,9 +233,9 @@ frontend/
 
 docs/
 ├── plans/
-│   ├── 17_new_direction_mvp.md
-│   ├── 18_refactoring_plan.md
-│   └── 19_learn_page_implementation.md
+│   ├── TODO.md                # 현재 진행 중 + 리팩토링 계획
+│   ├── FUTURE.md              # 미래 계획 (모바일 앱)
+│   └── deferred/              # 연기된 계획
 └── reference/
     ├── CURRICULUM.md
     └── COURSE_DATA_STRUCTURE.md
@@ -357,10 +357,9 @@ curl -X POST http://localhost:3000/api/ai/chat \
 ### 계획 문서
 | 문서 | 설명 |
 |------|------|
-| `docs/plans/20_remaining_tasks.md` | **남은 작업 계획** (2025-12-28) |
-| `docs/plans/17_new_direction_mvp.md` | MVP 상세 계획 |
-| `docs/plans/18_refactoring_plan.md` | 리팩토링 계획 |
-| `docs/plans/19_learn_page_implementation.md` | LearnPage 구현 계획 |
+| `docs/plans/TODO.md` | **현재 진행 중 + 리팩토링 계획** |
+| `docs/plans/FUTURE.md` | 미래 계획 (모바일 앱) |
+| `docs/plans/deferred/` | 연기된 계획 (DAU 조건부) |
 
 ### 참조 문서
 | 문서 | 설명 |

@@ -66,27 +66,27 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -SIDEBAR_WIDTH }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed left-0 top-0 h-full bg-white border-r-2 border-sand shadow-lg z-50 flex flex-col"
+            className="fixed left-0 top-0 h-full bg-[#fffbf5] border-r border-[#e5d5c7] shadow-lg z-50 flex flex-col"
             style={{ width: SIDEBAR_WIDTH }}
           >
             {/* 헤더 */}
-            <div className="p-4 border-b-2 border-sand flex items-center justify-between">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-accent-orange to-accent-coral bg-clip-text text-transparent">
+            <div className="p-4 border-b border-[#e5d5c7] flex items-center justify-between bg-[#fffbf5]">
+              <h2 className="text-xl font-bold text-[#6b5a4a]">
                 CodeInsight
               </h2>
               <motion.button
                 onClick={toggleSidebar}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg border border-sand hover:bg-sand transition-colors"
+                className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] hover:border-[#a08060] transition-colors"
                 aria-label="사이드바 닫기"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-[#937b5d]" />
               </motion.button>
             </div>
 
-            {/* 네비게이션 - Demo 스타일 박스 */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {/* 네비게이션 */}
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto bg-[#fffbf5]">
               {NAV_ITEMS.map((item) => {
                 const isActive = location.pathname === item.path ||
                   (item.path !== '/' && location.pathname.startsWith(item.path));
@@ -104,13 +104,12 @@ export function Sidebar() {
                       onClick={toggleSidebar}
                       className={`
                         flex items-center gap-3 px-4 h-12 rounded-lg
-                        border-2 transition-colors
+                        border transition-all duration-150
                         ${isActive
-                          ? 'bg-accent-orange font-semibold border-accent-orange shadow-card-hover'
-                          : 'text-gray-700 bg-white border-sand hover:border-accent-orange hover:bg-peach'
+                          ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
+                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
                         }
                       `}
-                      style={isActive ? { color: 'white' } : undefined}
                     >
                       <Icon className="w-5 h-5 shrink-0" />
                       <span className="text-sm">{item.label}</span>
@@ -131,13 +130,12 @@ export function Sidebar() {
                     onClick={toggleSidebar}
                     className={`
                       flex items-center gap-3 px-4 h-12 rounded-lg
-                      border-2 transition-colors
+                      border transition-all duration-150
                       ${location.pathname.startsWith('/admin')
-                        ? 'bg-accent-purple font-semibold border-accent-purple shadow-card-hover'
-                        : 'text-gray-700 bg-white border-sand hover:border-accent-purple hover:bg-purple-50'
+                        ? 'bg-[#7a9a7a] font-semibold border-[#6a8a6a] text-white'
+                        : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#7a9a7a] hover:bg-[#f5fff5]'
                       }
                     `}
-                    style={location.pathname.startsWith('/admin') ? { color: 'white' } : undefined}
                   >
                     <Shield className="w-5 h-5 shrink-0" />
                     <span className="text-sm">Admin</span>
@@ -147,7 +145,7 @@ export function Sidebar() {
             </nav>
 
             {/* 프로필 영역 */}
-            <div className="p-4 border-t-2 border-sand">
+            <div className="p-4 border-t border-[#e5d5c7]">
               {firebaseUser ? (
                 <div className="space-y-3">
                   {/* 닉네임 등록 필요 시 */}
@@ -155,11 +153,10 @@ export function Sidebar() {
                     <motion.button
                       onClick={() => {
                         // TODO: 닉네임 등록 모달 열기
-                        console.log('Open registration modal');
                       }}
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-accent-orange bg-accent-orange/10 border-2 border-accent-orange rounded-lg hover:bg-accent-orange/20 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#a08060] bg-[#a08060]/10 border border-[#a08060] rounded-lg hover:bg-[#a08060]/20 transition-colors"
                     >
                       <UserPlus className="w-5 h-5" />
                       닉네임 설정하기
@@ -167,13 +164,13 @@ export function Sidebar() {
                   ) : (
                     <>
                       {/* 등록 완료 상태 - 닉네임 기반 프로필 */}
-                      <div className="flex items-center gap-3 p-3 bg-peach rounded-lg border-2 border-sand">
+                      <div className="flex items-center gap-3 p-3 bg-[#fff8f0] rounded-lg border border-[#e5d5c7]">
                         <PixelAvatar seed={appUser.nickname} size={40} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-800 truncate">
+                          <p className="text-sm font-semibold text-[#6b5a4a] truncate">
                             {appUser.nickname}
                           </p>
-                          <p className="text-xs text-gray-500 truncate">
+                          <p className="text-xs text-[#937b5d] truncate">
                             {appUser.oauthAccounts[0]?.email || firebaseUser.email}
                           </p>
                         </div>
@@ -184,7 +181,7 @@ export function Sidebar() {
                     onClick={handleSignOut}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 border-2 border-sand rounded-lg hover:border-accent-red hover:text-accent-red hover:bg-red-50 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#937b5d] border border-[#e5d5c7] rounded-lg hover:border-[#c08080] hover:text-[#c08080] hover:bg-red-50/50 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     로그아웃
@@ -198,7 +195,7 @@ export function Sidebar() {
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-sand rounded-lg hover:border-accent-orange hover:bg-peach transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#6b5a4a] bg-white border border-[#e5d5c7] rounded-lg hover:border-[#a08060] hover:bg-[#fff8f0] transition-colors"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
@@ -220,7 +217,7 @@ export function Sidebar() {
                     </svg>
                     Google 로그인
                   </motion.button>
-                  <p className="text-xs text-gray-400 text-center">
+                  <p className="text-xs text-[#937b5d] text-center">
                     © 2026 CodeInsight
                   </p>
                 </div>
