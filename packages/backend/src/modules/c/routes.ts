@@ -195,13 +195,13 @@ cRoutes.post('/judge', optionalAuth, validate(judgeCodeSchema), async (req, res)
               providerId: req.user.uid,
             },
           },
-          select: { userNickname: true },
+          select: { userId: true },
         });
 
         if (oauthAccount) {
           await prisma.submission.create({
             data: {
-              userNickname: oauthAccount.userNickname,
+              userId: oauthAccount.userId,
               problemId,
               code,
               verdict: result.verdict,

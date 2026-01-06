@@ -7,6 +7,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -247,19 +248,30 @@ export async function createLanguage(data: {
  * 챕터 생성
  */
 export async function createChapter(data: {
+  id?: string;
   languageId: string;
   title: string;
   description?: string;
   keyQuestion?: string;
   order: number;
 }) {
-  return prisma.chapter.create({ data });
+  return prisma.chapter.create({
+    data: {
+      id: data.id || randomUUID(),
+      languageId: data.languageId,
+      title: data.title,
+      description: data.description,
+      keyQuestion: data.keyQuestion,
+      order: data.order,
+    },
+  });
 }
 
 /**
  * 레슨 생성 (콘텐츠 + 퀴즈 포함)
  */
 export async function createLessonWithContent(data: {
+  id?: string;
   chapterId: string;
   title: string;
   description?: string;
@@ -267,11 +279,13 @@ export async function createLessonWithContent(data: {
   order: number;
   estimatedTime?: number;
   content: {
+    id?: string;
     code: string;
     language: string;
     steps: unknown[]; // JSON으로 저장됨
   };
   quizzes?: {
+    id?: string;
     type: string;
     question: string;
     options?: string[];
@@ -280,8 +294,10 @@ export async function createLessonWithContent(data: {
     order: number;
   }[];
 }) {
+  const lessonId = data.id || randomUUID();
   return prisma.lesson.create({
     data: {
+      id: lessonId,
       chapterId: data.chapterId,
       title: data.title,
       description: data.description,
@@ -290,6 +306,7 @@ export async function createLessonWithContent(data: {
       estimatedTime: data.estimatedTime,
       content: {
         create: {
+          id: data.content.id || randomUUID(),
           code: data.content.code,
           language: data.content.language,
           steps: JSON.stringify(data.content.steps),
@@ -298,6 +315,7 @@ export async function createLessonWithContent(data: {
       quizzes: data.quizzes
         ? {
             create: data.quizzes.map((q) => ({
+              id: q.id || randomUUID(),
               type: q.type,
               question: q.question,
               options: q.options ? JSON.stringify(q.options) : null,
