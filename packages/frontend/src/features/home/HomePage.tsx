@@ -12,6 +12,19 @@ export default function HomePage() {
   const { firebaseUser } = useStore();
   const isLoggedIn = !!firebaseUser;
 
+  // 각 패널의 이미지 파일명 매핑
+  const getComicImage = (num: number): string => {
+    const imageMap: Record<number, string> = {
+      1: '/images/comic-1.jpg',
+      2: '/images/comic-2-douma.png',      // 도우마 (귀멸의 칼날) - 괴로워하며 학습
+      3: '/images/comic-3-conan.png',      // 코난 - 책상에서 열심히 공부
+      4: '/images/comic-4-killua.png',     // 킬루아 (헌터x헌터) - 코딩 시작
+      5: '/images/comic-5-levi.png',       // 리바이 (진격의 거인) - "오 코드 이런 구조였군"
+      6: '/images/comic-6-complete.png',   // 곤+킬루아+히소카 - 완성 트로피
+    };
+    return imageMap[num] || `/images/comic-${num}.svg`;
+  };
+
   return (
     <main className="min-h-screen w-full">
       {/* Hero Section - 첫 화면 전체 */}
@@ -73,7 +86,7 @@ export default function HomePage() {
       {/* 핵심 특징 - 만화 + 특징 카드 */}
       <section className="w-full grid place-items-center py-20 px-6 bg-[#f8f4ef]">
         <div className="max-w-5xl w-full space-y-16">
-          {/* 만화 6칸 (2열 3행) - public/images/comic-1.svg ~ comic-6.svg 넣으면 됨 */}
+          {/* 만화 6칸 (2열 3행) - Hunter x Hunter 캐릭터와 학습 과정 */}
           <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
             {[1, 2, 3, 4, 5, 6].map((num) => (
               <div
@@ -81,9 +94,9 @@ export default function HomePage() {
                 className="aspect-square bg-white border-2 border-[#e5d5c7] rounded-xl overflow-hidden"
               >
                 <img
-                  src={`/images/comic-${num}.svg`}
+                  src={getComicImage(num)}
                   alt={`만화 ${num}`}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                   onError={(e) => {
                     // 이미지 없으면 placeholder 표시
                     e.currentTarget.style.display = 'none';
