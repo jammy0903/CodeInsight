@@ -15,6 +15,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import * as courseService from './service';
 import { requireDbUser } from '../../middleware/auth';
+import { lessonContentLoader } from '../../services/lessonContentLoader';
 
 const router = Router();
 
@@ -123,6 +124,10 @@ router.get('/chapters/:id/progress', requireDbUser, async (req, res) => {
 
 /**
  * 레슨 상세 (콘텐츠 + 퀴즈 포함)
+ *
+ * WHY: DB(메타데이터) + JSON(콘텐츠) 하이브리드
+ * - DB: title, description, difficulty 등 구조
+ * - JSON: code, steps, quizzes 등 콘텐츠 (10-200배 빠름)
  */
 router.get('/lessons/:id', async (req, res) => {
   try {
@@ -133,15 +138,20 @@ router.get('/lessons/:id', async (req, res) => {
       return res.status(404).json({ error: 'Lesson not found' });
     }
 
-    // Quiz options JSON 파싱
-    const quizzes = lesson.quizzes.map((q) => ({
-      ...q,
-      options: q.options ? JSON.parse(q.options) : null,
-    }));
+    // JSON 파일에서 콘텐츠 로드 (없으면 null)
+    const jsonContent = lessonContentLoader.getContent(id);
 
+    // 하이브리드 응답: DB 메타데이터 + JSON 콘텐츠
     res.json({
       ...lesson,
-      quizzes,
+      // JSON 콘텐츠가 있으면 사용, 없으면 DB 데이터 사용 (레거시)
+      content: jsonContent
+        ? {
+            code: jsonContent.code,
+            steps: jsonContent.steps,
+          }
+        : lesson.content,
+      quizzes: jsonContent ? jsonContent.quizzes : lesson.quizzes,
     });
   } catch (error) {
     console.error('Get lesson error:', error);

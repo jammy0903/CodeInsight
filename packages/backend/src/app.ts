@@ -14,9 +14,16 @@ import { cRoutes } from './modules/c/routes';
 import { aiRoutes } from './modules/ai/routes';
 import { courseRoutes } from './modules/courses/routes';
 import adminRoutes from './modules/admin/admin.routes';
+import { lessonContentLoader } from './services/lessonContentLoader';
 
 // Firebase Admin 초기화
 initializeFirebase();
+
+// Lesson Content 초기화 (서버 시작 시 JSON 파일 로드)
+lessonContentLoader.loadAll().catch((err) => {
+  logger.error('Failed to load lesson contents:', err);
+  process.exit(1);
+});
 
 const app = express();
 
