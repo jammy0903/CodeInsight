@@ -4,63 +4,85 @@
   "steps": [
     {
       "line": 1,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "change 함수를 정의합니다. 매개변수로 int 포인터를 받습니다.",
       "memoryState": {
         "stack": []
       }
     },
     {
       "line": 2,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "함수 내부 코드입니다. 아직 호출되지 않았으므로 실행되지 않습니다.",
       "memoryState": {
         "stack": []
       }
     },
     {
       "line": 3,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "함수 정의가 끝났습니다.",
       "memoryState": {
         "stack": []
       }
     },
     {
       "line": 4,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "빈 줄입니다.",
       "memoryState": {
         "stack": []
       }
     },
     {
       "line": 5,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "main 함수가 시작됩니다.",
       "memoryState": {
         "stack": []
       }
     },
     {
       "line": 6,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "main의 지역 변수 a를 선언하고 10으로 초기화합니다.",
       "memoryState": {
-        "stack": []
+        "stack": [
+          {
+            "name": "a (main)",
+            "value": 10,
+            "address": "0x1000",
+            "type": "int"
+          }
+        ]
       }
     },
     {
       "line": 7,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "change(&a)를 호출합니다. a의 주소(0x1000)가 매개변수 p에 복사됩니다. 함수 내부에서 *p = 100을 실행하면 p가 가리키는 위치(즉, a)의 값이 100으로 변경됩니다. 함수가 끝나도 a의 값은 100으로 유지됩니다.",
+      "misconception": "c-4-2와 다르게, 이번에는 주소를 전달하므로 원본 변수를 변경할 수 있습니다. 포인터 p는 복사되지만, p가 가리키는 대상(a)은 원본이므로 변경이 반영됩니다.",
       "memoryState": {
-        "stack": []
+        "stack": [
+          {
+            "name": "a (main)",
+            "value": 100,
+            "address": "0x1000",
+            "type": "int"
+          }
+        ]
       }
     },
     {
       "line": 8,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "주석입니다. a의 값이 100으로 변경되었음을 확인할 수 있습니다.",
       "memoryState": {
-        "stack": []
+        "stack": [
+          {
+            "name": "a (main)",
+            "value": 100,
+            "address": "0x1000",
+            "type": "int"
+          }
+        ]
       }
     },
     {
       "line": 9,
-      "explanation": "TODO: 이 줄의 동작을 설명하세요",
+      "explanation": "main 함수가 종료됩니다.",
       "memoryState": {
         "stack": []
       }
@@ -68,14 +90,14 @@
   ],
   "quizzes": [
     {
-      "question": "함수가 끝난 후 Heap의 20은?",
+      "question": "`change(&a)` 호출 후 `a`의 값은?",
       "options": [
-        "사라진다",
-        "남아있다 (메모리 누수!)",
+        "10",
+        "100",
         "에러"
       ],
       "correctAnswer": 1,
-      "explanation": "TODO: 퀴즈 해설을 작성하세요"
+      "explanation": "포인터를 매개변수로 전달하면 주소가 복사됩니다. change 함수에서 p는 a의 주소(0x1000)를 가리키므로, *p = 100은 a의 위치에 100을 저장합니다. 값이 아닌 주소를 전달했기 때문에, 함수 내부에서 원본 변수 a를 직접 변경할 수 있습니다."
     }
   ]
 }
