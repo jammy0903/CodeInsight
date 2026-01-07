@@ -16,23 +16,46 @@ export interface MemoryState {
   heap?: MemoryVariable[];
 }
 
+export interface MemoryChange {
+  action: 'allocate' | 'update' | 'free';
+  area: 'stack' | 'heap';
+  name: string;
+  type: string;
+  size: number;
+  value: string | number;
+  address: string;
+  previousValue?: string | number;
+}
+
 export interface LessonStep {
   line: number;
+  title?: string;
   explanation: string;
-  misconception?: string; // 착각 포인트 (선택)
-  memoryState: MemoryState;
+  highlight?: number[];
+  misconception?: string;
+  memoryChanges?: MemoryChange[];
 }
 
 export interface Quiz {
   question: string;
   options: string[];
-  correctAnswer: number; // 정답 인덱스 (0-based)
+  correctIndex: number; // 정답 인덱스 (0-based)
   explanation: string;
 }
 
 export interface LessonContentData {
   lessonId: string;
-  code: string;
-  steps: LessonStep[];
-  quizzes: Quiz[];
+  title: string;
+  concept: string;
+  content: {
+    code: string;
+    steps: LessonStep[];
+  };
+  quiz: Quiz;
+  misconceptions?: Array<{
+    wrong: string;
+    correct: string;
+    why: string;
+  }>;
+  keyTakeaway: string;
 }

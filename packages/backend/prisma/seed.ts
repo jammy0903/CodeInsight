@@ -251,7 +251,7 @@ async function seed() {
                 lessonId: lesson.id,
                 type: 'multiple_choice',
                 question: content.quiz.question,
-                options: JSON.stringify(content.quiz.options),
+                options: content.quiz.options, // Prisma Json 타입은 배열을 직접 저장
                 answer: String(content.quiz.correctIndex),
                 explanation: content.quiz.explanation,
                 order: 1,

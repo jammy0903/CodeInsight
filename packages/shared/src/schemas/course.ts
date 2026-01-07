@@ -96,14 +96,26 @@ export const StepMemoryStateSchema = z.object({
   heap: z.array(HeapObjectSchema).optional(),
 });
 
+export const MemoryChangeSchema = z.object({
+  action: z.enum(['allocate', 'update', 'free']),
+  area: z.enum(['stack', 'heap']),
+  name: z.string(),
+  type: z.string(),
+  size: z.number(),
+  value: z.union([z.string(), z.number()]),
+  address: z.string(),
+  previousValue: z.union([z.string(), z.number()]).optional(),
+});
+
 export const LessonStepSchema = z.object({
   line: z.number(),
-  highlightLines: z.array(z.number()).optional(),
+  highlight: z.array(z.number()).optional(), // API는 highlight 사용
+  highlightLines: z.array(z.number()).optional(), // 레거시
   title: z.string().optional(),
   explanation: z.string(),
   // WHY: 각 언어마다 다른 메모리 모델을 사용 (C: stack/heap, Python: objects/names, Java: 혼합)
   // TRADEOFF: 타입 안전성 < 언어별 유연성
-  memoryChanges: z.record(z.any()).optional(),
+  memoryChanges: z.array(MemoryChangeSchema).optional(),
   keyInsight: z.string().optional(),
   analogy: z.string().optional(),
   misconception: z.string().optional(),

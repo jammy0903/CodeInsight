@@ -23,26 +23,39 @@ class LessonContentLoader {
 
   /**
    * 서버 시작 시 모든 JSON 파일을 로드하여 캐싱
+   * prisma/content/{lang}/lessons/*.json 구조 지원
    */
   async loadAll(): Promise<void> {
-    const lessonsDir = path.join(__dirname, '../../data/lessons');
+    const contentDir = path.join(__dirname, '../../prisma/content');
 
     try {
-      const files = await fs.readdir(lessonsDir);
-      const jsonFiles = files.filter((f) => f.endsWith('.json'));
+      // content 디렉토리의 모든 언어 폴더 읽기
+      const languages = await fs.readdir(contentDir);
+      let totalLoaded = 0;
 
-      logger.info(`Loading ${jsonFiles.length} lesson content files...`);
+      for (const lang of languages) {
+        const lessonsDir = path.join(contentDir, lang, 'lessons');
 
-      for (const file of jsonFiles) {
-        const filePath = path.join(lessonsDir, file);
-        const content = await fs.readFile(filePath, 'utf-8');
-        const data: LessonContentData = JSON.parse(content);
+        try {
+          const files = await fs.readdir(lessonsDir);
+          const jsonFiles = files.filter((f) => f.endsWith('.json'));
 
-        this.cache.set(data.lessonId, data);
+          for (const file of jsonFiles) {
+            const filePath = path.join(lessonsDir, file);
+            const content = await fs.readFile(filePath, 'utf-8');
+            const data: LessonContentData = JSON.parse(content);
+
+            this.cache.set(data.lessonId, data);
+            totalLoaded++;
+          }
+        } catch (error) {
+          // 언어 폴더에 lessons 디렉토리가 없으면 스킵
+          logger.debug(`No lessons directory for language: ${lang}`);
+        }
       }
 
       this.isLoaded = true;
-      logger.info(`${this.cache.size} lesson contents cached`);
+      logger.info(`${totalLoaded} lesson contents cached`);
     } catch (error) {
       logger.error('Failed to load lesson contents:', error);
       throw error;

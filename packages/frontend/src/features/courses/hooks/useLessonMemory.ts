@@ -181,19 +181,80 @@ export interface UseLessonMemoryReturn {
   changedBlocks: string[];
 }
 
+/**
+ * memoryChanges 배열을 누적해서 현재 스텝까지의 메모리 상태 계산
+ */
+function accumulateMemoryChanges(
+  steps: LessonStep[],
+  upToStepIndex: number
+): LessonMemoryState {
+  const state: LessonMemoryState = { stack: [], heap: [], frames: [] };
+  const stackMap = new Map<string, LessonMemoryBlock>();
+  const heapMap = new Map<string, LessonMemoryBlock>();
+
+  // 0번부터 현재 스텝까지 memoryChanges 누적
+  for (let i = 0; i <= upToStepIndex; i++) {
+    const step = steps[i];
+    if (!step?.memoryChanges || !Array.isArray(step.memoryChanges)) continue;
+
+    for (const change of step.memoryChanges) {
+      if (change.area === 'stack') {
+        if (change.action === 'allocate' || change.action === 'update') {
+          stackMap.set(change.name, {
+            name: change.name,
+            address: change.address,
+            value: String(change.value),
+            type: change.type,
+            points_to: null,
+            highlight: i === upToStepIndex, // 현재 스텝에서 변경된 것만 하이라이트
+          });
+        } else if (change.action === 'free') {
+          stackMap.delete(change.name);
+        }
+      } else if (change.area === 'heap') {
+        if (change.action === 'allocate' || change.action === 'update') {
+          heapMap.set(change.name, {
+            name: change.name,
+            address: change.address,
+            value: String(change.value),
+            type: change.type,
+            points_to: null,
+            highlight: i === upToStepIndex,
+          });
+        } else if (change.action === 'free') {
+          heapMap.delete(change.name);
+        }
+      }
+    }
+  }
+
+  state.stack = Array.from(stackMap.values());
+  state.heap = Array.from(heapMap.values());
+
+  return state;
+}
+
 export function useLessonMemory(
   steps: LessonStep[],
   currentStepIndex: number
 ): UseLessonMemoryReturn {
   const memoryState = useMemo(() => {
+    // 새 형식: memoryChanges 배열을 누적
+    if (steps[0]?.memoryChanges && Array.isArray(steps[0].memoryChanges)) {
+      return accumulateMemoryChanges(steps, currentStepIndex);
+    }
+    // 레거시 형식: 기존 방식
     const currentStep = steps[currentStepIndex];
     return convertToVisualFormat(currentStep?.memoryChanges);
   }, [steps, currentStepIndex]);
 
   const changedBlocks = useMemo(() => {
-    const currentStep = steps[currentStepIndex];
-    return getChangedBlockNames(currentStep?.memoryChanges);
-  }, [steps, currentStepIndex]);
+    // 현재 스텝에서 변경된 블록만 추출
+    return memoryState.stack
+      .concat(memoryState.heap)
+      .filter((b) => b.highlight)
+      .map((b) => b.name);
+  }, [memoryState]);
 
   return { memoryState, changedBlocks };
 }

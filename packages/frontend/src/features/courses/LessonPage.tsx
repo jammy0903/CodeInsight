@@ -115,7 +115,8 @@ function QuizCardAdapter({
   const [submitted, setSubmitted] = useState(false);
 
   const options = quiz.options || [];
-  const correctIndex = options.findIndex((opt) => opt === quiz.answer);
+  // quiz.answer는 정답 인덱스를 나타내는 문자열 (예: "2")
+  const correctIndex = parseInt(quiz.answer, 10);
   const isCorrect = selected === correctIndex;
 
   const handleSubmit = () => {
@@ -245,6 +246,7 @@ export function LessonPage() {
   // Hooks
   const navigation = useLessonNavigation({
     totalSteps: steps.length,
+    lessonId: lessonId, // 레슨 변경 시 상태 초기화
     onComplete: () => {
       // TODO: API로 진행 상태 저장
     },
@@ -258,7 +260,7 @@ export function LessonPage() {
 
   // 경로
   const languageCoursePath = `/courses/${lang}`;
-  const nextLessonPath = nextLessonId ? `/courses/${lang}/${nextLessonId}` : null;
+  const nextLessonPath = nextLessonId ? `/courses/${lang}/${lesson.chapterId}/${nextLessonId}` : null;
 
   // 퀴즈 핸들러
   const handleQuizComplete = (isCorrect: boolean) => {

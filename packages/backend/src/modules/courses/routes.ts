@@ -145,14 +145,15 @@ router.get('/lessons/:id', async (req, res) => {
     // 하이브리드 응답: DB 메타데이터 + JSON 콘텐츠
     res.json({
       ...lesson,
-      // JSON 콘텐츠가 있으면 사용, 없으면 DB 데이터 사용 (레거시)
+      // JSON 콘텐츠가 있으면 code/steps만 JSON 사용, 나머지는 DB 유지
       content: jsonContent
         ? {
-            code: jsonContent.code,
-            steps: jsonContent.steps,
+            ...lesson.content, // DB 메타데이터 유지 (id, lessonId, language, createdAt, updatedAt)
+            code: jsonContent.content.code,
+            steps: jsonContent.content.steps,
           }
         : lesson.content,
-      quizzes: jsonContent ? jsonContent.quizzes : lesson.quizzes,
+      quizzes: lesson.quizzes, // 항상 DB 데이터 사용
     });
   } catch (error) {
     logger.error('Get lesson error:', error);
