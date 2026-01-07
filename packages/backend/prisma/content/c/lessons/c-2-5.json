@@ -1,0 +1,84 @@
+{
+  "lessonId": "c-2-5",
+  "title": "NULL과 초기화되지 않은 포인터",
+  "concept": "초기화되지 않은 포인터 사용은 위험하다. NULL로 명시적 초기화하라",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p1;           // 위험! 초기화 안됨\n    int *p2 = NULL;    // 안전! 명시적 NULL\n    \n    // *p1 = 10;  // 위험! 어디에 쓸지 모름\n    // *p2 = 10;  // 에러! NULL 역참조\n    \n    if (p2 == NULL) {\n        printf(\"p2는 아무것도 가리키지 않음\\n\");\n    }\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 5,
+        "title": "초기화되지 않은 포인터 (위험!)",
+        "explanation": "p1은 쓰레기 주소를 가집니다. 어떤 메모리를 가리키는지 알 수 없습니다. 역참조하면 프로그램이 크래시할 수 있습니다!",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p1",
+            "type": "int*",
+            "size": 8,
+            "value": "0x???????? (쓰레기)",
+            "address": "0x7ffc1000",
+            "danger": true
+          }
+        ]
+      },
+      {
+        "line": 6,
+        "title": "NULL 초기화 (안전!)",
+        "explanation": "p2 = NULL은 '아무것도 가리키지 않음'을 명시적으로 표현합니다. NULL은 주소 0입니다.",
+        "highlight": [6],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p2",
+            "type": "int*",
+            "size": 8,
+            "value": "NULL (0x0)",
+            "address": "0x7ffc0ff8",
+            "safe": true
+          }
+        ]
+      },
+      {
+        "line": 8,
+        "title": "쓰레기 포인터 역참조 (금지!)",
+        "explanation": "*p1 = 10;은 임의의 메모리에 쓰는 것입니다. 시스템 메모리를 덮어쓸 수도 있습니다!",
+        "highlight": [8],
+        "memoryChanges": []
+      },
+      {
+        "line": 11,
+        "title": "NULL 체크",
+        "explanation": "포인터 사용 전 NULL 체크는 좋은 습관입니다. NULL이면 역참조하지 않습니다.",
+        "highlight": [11, 12, 13],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int *p; *p = 5; 실행 시 무슨 일이 발생할 수 있는가?",
+    "options": [
+      "정상 동작",
+      "컴파일 에러",
+      "프로그램 크래시 (Segmentation fault)",
+      "5가 출력됨"
+    ],
+    "correctIndex": 2,
+    "explanation": "초기화되지 않은 포인터는 임의의 주소를 가리킵니다. 그 주소에 접근하면 대부분 크래시합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "int *p;는 안전하다",
+      "correct": "초기화 없는 포인터는 쓰레기 주소를 가지며 매우 위험합니다.",
+      "why": "지역 변수는 자동 초기화되지 않습니다. 포인터도 마찬가지입니다."
+    },
+    {
+      "wrong": "NULL과 0은 다르다",
+      "correct": "C에서 NULL은 보통 0으로 정의됩니다. 주소 0은 '무효'를 의미합니다.",
+      "why": "주소 0은 일반적으로 접근 불가능한 영역입니다."
+    }
+  ],
+  "keyTakeaway": "포인터는 반드시 초기화! 모르면 NULL로"
+}

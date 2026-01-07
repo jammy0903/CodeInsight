@@ -1,0 +1,105 @@
+{
+  "lessonId": "c-4-2",
+  "title": "Call by Value",
+  "concept": "C의 모든 함수 인자는 값으로 전달된다. 매개변수는 복사본이다",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid addOne(int n) {\n    n = n + 1;\n    printf(\"함수 내 n: %d\\n\", n);\n}\n\nint main() {\n    int x = 10;\n    printf(\"호출 전 x: %d\\n\", x);\n    addOne(x);\n    printf(\"호출 후 x: %d\\n\", x);\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 9,
+        "title": "main에서 x 생성",
+        "explanation": "x에 10이 저장됩니다.",
+        "highlight": [9],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "x",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "frame": "main"
+          }
+        ]
+      },
+      {
+        "line": 11,
+        "title": "함수 호출 - 값 복사!",
+        "explanation": "addOne(x)가 호출되면 x의 값 10이 n에 '복사'됩니다. n은 별개의 변수입니다.",
+        "highlight": [11, 3],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "addOne",
+            "type": "frame"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "n",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "frame": "addOne",
+            "note": "x의 복사본"
+          }
+        ]
+      },
+      {
+        "line": 4,
+        "title": "n 수정 (복사본)",
+        "explanation": "n = n + 1로 n이 11이 됩니다. 하지만 x는 여전히 10입니다!",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "stack",
+            "name": "n",
+            "value": 11,
+            "previousValue": 10,
+            "frame": "addOne"
+          }
+        ]
+      },
+      {
+        "line": 12,
+        "title": "함수 종료 후 x 확인",
+        "explanation": "x는 여전히 10입니다. n의 변경은 x에 영향을 주지 않았습니다.",
+        "highlight": [12],
+        "memoryChanges": [
+          {
+            "action": "frame_end",
+            "area": "stack",
+            "name": "addOne"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "void foo(int a) { a = 100; } int x = 5; foo(x); 후 x는?",
+    "options": [
+      "100",
+      "5",
+      "105",
+      "에러"
+    ],
+    "correctIndex": 1,
+    "explanation": "a는 x의 복사본입니다. a를 변경해도 x는 변하지 않습니다. 이것이 Call by Value입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수 매개변수를 수정하면 원본도 바뀐다",
+      "correct": "매개변수는 원본의 복사본입니다. 복사본 수정은 원본에 영향 없습니다.",
+      "why": "C는 모든 인자를 값으로 전달합니다 (Call by Value). 포인터도 '주소 값'으로 전달됩니다."
+    }
+  ],
+  "keyTakeaway": "함수 인자 = 복사본. 원본 수정 불가"
+}

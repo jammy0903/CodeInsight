@@ -6,5 +6,11 @@ export default defineConfig({
   schema: path.join(__dirname, 'prisma/schema.prisma'),
   migrations: {
     path: path.join(__dirname, 'prisma/migrations'),
+    seed: 'npx tsx prisma/seed.ts',
+  },
+  datasources: {
+    db: {
+      url: `file:${path.join(__dirname, 'prisma/dev.db')}`,
+    },
   },
 });

@@ -1,0 +1,83 @@
+{
+  "lessonId": "c-2-3",
+  "title": "역참조로 값 읽기",
+  "concept": "*p는 p가 가리키는 주소에 저장된 값을 읽는다",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p = &a;\n    \n    printf(\"a의 값: %d\\n\", a);\n    printf(\"p가 가리키는 값: %d\\n\", *p);\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "변수 a 생성",
+        "explanation": "a에 값 10이 저장됩니다.",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "a",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "address": "0x7ffc1000"
+          }
+        ]
+      },
+      {
+        "line": 5,
+        "title": "포인터 p가 a를 가리킴",
+        "explanation": "p는 a의 주소를 저장합니다. 화살표로 표현하면 p → a 관계입니다.",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "size": 8,
+            "value": "0x7ffc1000",
+            "address": "0x7ffc0ff8",
+            "pointsTo": "a"
+          }
+        ]
+      },
+      {
+        "line": 7,
+        "title": "a의 값 직접 읽기",
+        "explanation": "a를 사용하면 직접 10을 가져옵니다.",
+        "highlight": [7],
+        "memoryChanges": []
+      },
+      {
+        "line": 8,
+        "title": "역참조로 값 읽기",
+        "explanation": "*p는 '포인터 따라가기'입니다. p(0x7ffc1000) → 그 주소의 값(10). a와 *p는 같은 결과!",
+        "highlight": [8],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int a=5; int *p=&a; 일 때 *p의 값은?",
+    "options": [
+      "a의 주소",
+      "p의 주소",
+      "5",
+      "포인터 p 자체"
+    ],
+    "correctIndex": 2,
+    "explanation": "*p는 p가 저장한 주소로 가서 그 위치의 값을 읽습니다. p가 a를 가리키므로 *p는 a의 값인 5입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "*p는 p의 값을 의미한다",
+      "correct": "*p는 'p가 가리키는 곳의 값'입니다. p 자체의 값은 주소입니다.",
+      "why": "p = 주소 저장, *p = 그 주소를 따라가서 값 읽기"
+    },
+    {
+      "wrong": "*는 곱셈 연산자다",
+      "correct": "포인터 앞의 *는 '역참조' 연산자입니다. 곱셈 *는 두 값 사이에 사용됩니다 (a * b).",
+      "why": "C에서 같은 기호가 문맥에 따라 다른 의미를 가집니다."
+    }
+  ],
+  "keyTakeaway": "*p = 포인터가 가리키는 주소에 있는 값"
+}

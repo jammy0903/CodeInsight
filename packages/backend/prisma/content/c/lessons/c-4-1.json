@@ -1,0 +1,117 @@
+{
+  "lessonId": "c-4-1",
+  "title": "함수 호출과 스택 프레임",
+  "concept": "함수 호출 시 스택에 새 프레임이 생성되고, 종료 시 제거된다",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid bar() {\n    int z = 30;\n    printf(\"bar: z=%d\\n\", z);\n}\n\nvoid foo() {\n    int y = 20;\n    printf(\"foo: y=%d\\n\", y);\n    bar();\n}\n\nint main() {\n    int x = 10;\n    printf(\"main: x=%d\\n\", x);\n    foo();\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 15,
+        "title": "main 스택 프레임 생성",
+        "explanation": "main()이 시작되면 스택에 main의 프레임이 생성됩니다. x가 이 프레임에 할당됩니다.",
+        "highlight": [14, 15],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "x",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "frame": "main"
+          }
+        ]
+      },
+      {
+        "line": 17,
+        "title": "foo 호출 - 새 프레임",
+        "explanation": "foo()가 호출되면 main 위에 foo 프레임이 쌓입니다.",
+        "highlight": [17, 8, 9],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "foo",
+            "type": "frame"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "y",
+            "type": "int",
+            "size": 4,
+            "value": 20,
+            "frame": "foo"
+          }
+        ]
+      },
+      {
+        "line": 11,
+        "title": "bar 호출 - 세 번째 프레임",
+        "explanation": "bar()가 호출되면 foo 위에 bar 프레임이 쌓입니다. 스택: main → foo → bar",
+        "highlight": [11, 3, 4],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "bar",
+            "type": "frame"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "z",
+            "type": "int",
+            "size": 4,
+            "value": 30,
+            "frame": "bar"
+          }
+        ]
+      },
+      {
+        "line": 6,
+        "title": "bar 종료 - 프레임 제거",
+        "explanation": "bar()가 끝나면 bar 프레임이 제거됩니다. z도 함께 사라집니다.",
+        "highlight": [6],
+        "memoryChanges": [
+          {
+            "action": "deallocate",
+            "area": "stack",
+            "name": "z",
+            "frame": "bar"
+          },
+          {
+            "action": "frame_end",
+            "area": "stack",
+            "name": "bar"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "main()에서 foo()를 호출하고, foo()에서 bar()를 호출했을 때 스택 순서는?",
+    "options": [
+      "bar → foo → main (위에서 아래)",
+      "main → foo → bar (아래서 위)",
+      "순서 없음",
+      "main만 스택에 있음"
+    ],
+    "correctIndex": 1,
+    "explanation": "함수 호출 순서대로 스택에 쌓입니다. 가장 먼저 호출된 main이 바닥, 가장 최근 bar가 위."
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수가 끝나도 지역 변수가 남아있다",
+      "correct": "함수 종료 시 해당 스택 프레임과 모든 지역 변수가 제거됩니다.",
+      "why": "스택은 LIFO(후입선출) 구조로, 가장 최근 프레임이 먼저 제거됩니다."
+    }
+  ],
+  "keyTakeaway": "함수 호출 = 스택 프레임 생성. 종료 = 프레임 제거"
+}

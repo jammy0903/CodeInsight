@@ -1,0 +1,94 @@
+{
+  "lessonId": "c-5-2",
+  "title": "malloc으로 메모리 할당",
+  "concept": "malloc(size)는 size 바이트의 Heap 메모리를 할당하고 주소를 반환한다",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    // int 하나 할당\n    int *p = malloc(sizeof(int));\n    \n    if (p == NULL) {\n        printf(\"할당 실패!\\n\");\n        return 1;\n    }\n    \n    *p = 42;\n    printf(\"*p = %d\\n\", *p);\n    \n    free(p);\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 6,
+        "title": "malloc 호출",
+        "explanation": "malloc(sizeof(int))는 4바이트를 Heap에 할당하고 그 주소를 반환합니다.",
+        "highlight": [6],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "size": 8,
+            "value": "0x55001000"
+          },
+          {
+            "action": "allocate",
+            "area": "heap",
+            "name": "(malloc)",
+            "type": "int",
+            "size": 4,
+            "value": "??? (초기화 안됨)",
+            "address": "0x55001000"
+          }
+        ]
+      },
+      {
+        "line": 8,
+        "title": "NULL 체크",
+        "explanation": "malloc이 실패하면 NULL을 반환합니다. 항상 체크해야 합니다!",
+        "highlight": [8, 9, 10, 11],
+        "memoryChanges": []
+      },
+      {
+        "line": 13,
+        "title": "Heap에 값 저장",
+        "explanation": "*p = 42로 할당된 메모리에 값을 저장합니다.",
+        "highlight": [13],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "heap",
+            "address": "0x55001000",
+            "value": 42,
+            "previousValue": "???"
+          }
+        ]
+      },
+      {
+        "line": 16,
+        "title": "free로 해제",
+        "explanation": "사용이 끝난 Heap 메모리는 반드시 free()로 해제합니다.",
+        "highlight": [16],
+        "memoryChanges": [
+          {
+            "action": "deallocate",
+            "area": "heap",
+            "address": "0x55001000"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "malloc(10)은 무엇을 반환하는가?",
+    "options": [
+      "10",
+      "10바이트 메모리의 주소",
+      "NULL",
+      "10개의 int"
+    ],
+    "correctIndex": 1,
+    "explanation": "malloc(size)는 size 바이트의 메모리를 할당하고 그 시작 주소를 반환합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "malloc은 초기화된 메모리를 반환한다",
+      "correct": "malloc은 초기화하지 않습니다. 쓰레기 값이 들어있습니다. calloc을 쓰면 0으로 초기화됩니다.",
+      "why": "초기화는 추가 작업이 필요하므로 malloc은 성능을 위해 생략합니다."
+    },
+    {
+      "wrong": "malloc 실패는 없다",
+      "correct": "메모리가 부족하면 NULL을 반환합니다. 항상 체크해야 합니다.",
+      "why": "시스템 메모리는 유한합니다. 큰 할당이나 반복 할당 시 실패할 수 있습니다."
+    }
+  ],
+  "keyTakeaway": "malloc = 할당 + NULL 체크 + 사용 + free"
+}

@@ -1,0 +1,95 @@
+{
+  "lessonId": "c-6-2",
+  "title": "char 배열 vs char 포인터",
+  "concept": "char s[]는 스택에 복사본, char *s는 읽기 전용 문자열을 가리킴",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    char arr[] = \"hello\";  // 스택에 복사\n    char *ptr = \"hello\";    // 읽기전용 영역 가리킴\n    \n    arr[0] = 'H';  // OK! 수정 가능\n    printf(\"arr: %s\\n\", arr);\n    \n    // ptr[0] = 'H';  // 위험! Segmentation fault\n    \n    printf(\"arr 주소: %p\\n\", arr);\n    printf(\"ptr 주소: %p\\n\", ptr);\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "char 배열",
+        "explanation": "char arr[]는 \"hello\"를 스택에 복사합니다. 수정 가능한 배열입니다.",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "arr",
+            "type": "char[6]",
+            "size": 6,
+            "value": "\"hello\\0\"",
+            "address": "0x7ffc1000",
+            "modifiable": true
+          }
+        ]
+      },
+      {
+        "line": 5,
+        "title": "char 포인터",
+        "explanation": "char *ptr은 읽기 전용 메모리(rodata 영역)의 \"hello\"를 가리킵니다. 수정하면 크래시!",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "rodata",
+            "name": "\"hello\"",
+            "type": "const char[]",
+            "value": "\"hello\\0\"",
+            "address": "0x00401000",
+            "readonly": true
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "ptr",
+            "type": "char*",
+            "value": "0x00401000",
+            "pointsTo": "rodata"
+          }
+        ]
+      },
+      {
+        "line": 7,
+        "title": "배열 수정 - OK",
+        "explanation": "arr는 스택에 있는 복사본이므로 수정 가능합니다.",
+        "highlight": [7],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "stack",
+            "name": "arr[0]",
+            "value": "'H'",
+            "previousValue": "'h'"
+          }
+        ]
+      },
+      {
+        "line": 10,
+        "title": "포인터 수정 - 위험!",
+        "explanation": "ptr이 가리키는 메모리는 읽기 전용입니다. 수정하면 Segmentation fault!",
+        "highlight": [10],
+        "danger": true,
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "char *s = \"hello\"; s[0] = 'H'; 의 결과는?",
+    "options": [
+      "정상 동작",
+      "컴파일 에러",
+      "런타임 에러 (크래시)",
+      "경고만 출력"
+    ],
+    "correctIndex": 2,
+    "explanation": "문자열 리터럴은 읽기 전용 메모리에 저장됩니다. 수정하면 Segmentation fault."
+  },
+  "misconceptions": [
+    {
+      "wrong": "char *s와 char s[]는 같다",
+      "correct": "char s[]는 수정 가능한 복사본, char *s는 읽기 전용 원본을 가리킵니다.",
+      "why": "문자열 리터럴은 실행 파일의 읽기 전용 섹션에 저장됩니다."
+    }
+  ],
+  "keyTakeaway": "char arr[] = 수정 가능 복사본. char *ptr = 읽기 전용 가리킴"
+}

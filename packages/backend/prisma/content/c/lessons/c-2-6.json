@@ -1,0 +1,111 @@
+{
+  "lessonId": "c-2-6",
+  "title": "포인터의 크기와 타입",
+  "concept": "모든 포인터는 같은 크기다 (8바이트, 64비트 시스템). 타입은 역참조 시 해석 방법을 결정한다",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    char c = 'A';\n    double d = 3.14;\n    \n    int *pi = &a;\n    char *pc = &c;\n    double *pd = &d;\n    \n    printf(\"int* 크기: %lu\\n\", sizeof(pi));\n    printf(\"char* 크기: %lu\\n\", sizeof(pc));\n    printf(\"double* 크기: %lu\\n\", sizeof(pd));\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "다양한 타입의 변수",
+        "explanation": "int(4B), char(1B), double(8B) - 각각 다른 크기를 가집니다.",
+        "highlight": [4, 5, 6],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "a",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "address": "0x7ffc1000"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "c",
+            "type": "char",
+            "size": 1,
+            "value": "'A'",
+            "address": "0x7ffc0fff"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "d",
+            "type": "double",
+            "size": 8,
+            "value": 3.14,
+            "address": "0x7ffc0ff0"
+          }
+        ]
+      },
+      {
+        "line": 8,
+        "title": "포인터들 생성",
+        "explanation": "세 포인터 모두 8바이트입니다! 포인터는 '주소를 저장'하는데, 64비트 시스템에서 주소는 8바이트입니다.",
+        "highlight": [8, 9, 10],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "pi",
+            "type": "int*",
+            "size": 8,
+            "value": "0x7ffc1000",
+            "pointsTo": "a"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "pc",
+            "type": "char*",
+            "size": 8,
+            "value": "0x7ffc0fff",
+            "pointsTo": "c"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "pd",
+            "type": "double*",
+            "size": 8,
+            "value": "0x7ffc0ff0",
+            "pointsTo": "d"
+          }
+        ]
+      },
+      {
+        "line": 12,
+        "title": "포인터 크기 확인",
+        "explanation": "모든 포인터는 8바이트입니다. 타입(int*, char*, double*)은 역참조할 때 '몇 바이트를 읽을지'를 결정합니다.",
+        "highlight": [12, 13, 14],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "64비트 시스템에서 char*와 double*의 크기는?",
+    "options": [
+      "1바이트, 8바이트",
+      "둘 다 4바이트",
+      "둘 다 8바이트",
+      "시스템마다 다름"
+    ],
+    "correctIndex": 2,
+    "explanation": "포인터는 주소를 저장하고, 64비트 시스템의 주소는 8바이트입니다. 가리키는 타입과 무관합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "char*는 1바이트, int*는 4바이트다",
+      "correct": "모든 포인터는 같은 크기입니다 (64비트: 8바이트, 32비트: 4바이트).",
+      "why": "포인터는 '주소'를 저장합니다. 주소의 크기는 시스템 아키텍처가 결정합니다."
+    },
+    {
+      "wrong": "포인터 타입은 의미 없다",
+      "correct": "타입은 역참조할 때 중요합니다. *pi는 4바이트를 int로 읽고, *pc는 1바이트를 char로 읽습니다.",
+      "why": "타입 정보가 없으면 컴파일러가 메모리를 어떻게 해석할지 모릅니다."
+    }
+  ],
+  "keyTakeaway": "포인터 크기 = 주소 크기 (동일). 타입 = 역참조 해석 방법"
+}
