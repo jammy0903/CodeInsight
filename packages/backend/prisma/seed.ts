@@ -7,16 +7,20 @@
  * 실행: npx prisma db seed
  */
 
+import 'dotenv/config';
 import { PrismaClient } from '.prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Create better-sqlite3 client for local SQLite file
-const dbPath = path.resolve(__dirname, 'dev.db');
-console.log('📁 Database path:', dbPath);
-const adapterFactory = new PrismaBetterSqlite3({ url: dbPath });
-const prisma = new PrismaClient({ adapter: adapterFactory });
+// PostgreSQL connection
+const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
+console.log('📁 Database:', connectionString.replace(/:[^:@]+@/, ':***@'));
+
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 // =============================================
 // JSON 로더
@@ -289,4 +293,5 @@ seed()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

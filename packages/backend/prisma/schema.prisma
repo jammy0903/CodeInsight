@@ -4,17 +4,16 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
-  id        String   @id @default(uuid())     // UUID = Primary Key (변경 불가)
-  nickname  String   @unique                  // 닉네임 (변경 가능, unique)
-  role      String   @default("user")         // 'user' | 'admin'
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(uuid()) @db.Uuid
+  nickname  String   @unique
+  role      String   @default("user")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
-  // Relations
   oauthAccounts OAuthAccount[]
   drafts        Draft[]
   submissions   Submission[]
@@ -23,37 +22,36 @@ model User {
   @@map("users")
 }
 
-// OAuth 계정 (1 User : N OAuth Providers)
 model OAuthAccount {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")         // UUID 참조
-  provider   String                           // 'google' | 'github' | 'kakao'
-  providerId String   @map("provider_id")     // OAuth provider의 고유 ID
-  email      String?                          // provider별 이메일 (nullable)
-  createdAt  DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  provider   String
+  providerId String   @map("provider_id")
+  email      String?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerId])            // 같은 provider의 같은 계정 중복 방지
+  @@unique([provider, providerId])
   @@index([userId])
   @@map("oauth_accounts")
 }
 
 model Problem {
-  id          String       @id
+  id          String       @id @db.Uuid @default(uuid())
   number      Int          @unique
   title       String
-  description String
-  difficulty  String       @default("bronze_5")
-  tags        String       @default("[]")
+  description String       @db.Text
+  difficulty  String       @default("bronze_5") @db.VarChar(20)
+  tags        Json         @default("[]")
   source      String?
   srcUrl      String?      @map("src_url")
-  hints       String       @default("[]")
-  solution    String?
-  testCases   String       @default("[]") @map("test_cases")
+  hints       Json         @default("[]")
+  solution    String?      @db.Text
+  testCases   Json         @default("[]") @map("test_cases")
   timeLimit   Int          @default(1000) @map("time_limit")
   memoryLimit Int          @default(256) @map("memory_limit")
-  createdAt   DateTime     @default(now()) @map("created_at")
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz
   drafts      Draft[]
   submissions Submission[]
 
@@ -62,13 +60,13 @@ model Problem {
 }
 
 model Submission {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  problemId     String   @map("problem_id")
-  code          String
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  problemId     String   @map("problem_id") @db.Uuid
+  code          String   @db.Text
   verdict       String   @default("judging")
   executionTime Int?     @map("execution_time")
-  createdAt     DateTime @default(now()) @map("created_at")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
   problem       Problem  @relation(fields: [problemId], references: [id])
   user          User     @relation(fields: [userId], references: [id])
 
@@ -77,11 +75,11 @@ model Submission {
 }
 
 model Draft {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  problemId String   @map("problem_id")
-  code      String
-  savedAt   DateTime @default(now()) @map("saved_at")
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  problemId String   @map("problem_id") @db.Uuid
+  code      String   @db.Text
+  savedAt   DateTime @default(now()) @map("saved_at") @db.Timestamptz
   problem   Problem  @relation(fields: [problemId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
@@ -90,19 +88,19 @@ model Draft {
 }
 
 // =============================================
-// Course System (확장 가능한 학습 코스 구조)
+// Course System
 // =============================================
 
 model Language {
-  id          String    @id // 'c', 'java', 'python'
-  name        String // 'C', 'Java', 'Python'
-  description String?
-  icon        String? // 아이콘 URL 또는 이모지
-  color       String? // 테마 색상 (#hex)
+  id          String    @id
+  name        String
+  description String?   @db.Text
+  icon        String?
+  color       String?
   isActive    Boolean   @default(true) @map("is_active")
-  order       Int // 정렬 순서
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  order       Int
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   chapters Chapter[]
 
@@ -112,15 +110,15 @@ model Language {
 model Chapter {
   id          String   @id
   languageId  String   @map("language_id")
-  title       String // '변수와 메모리'
-  description String?
-  keyQuestion String?  @map("key_question") // '변수는 메모리 어디에?'
-  part        String   @default("syntax") // 'syntax' | 'design'
-  partLabel   String?  @map("part_label") // '문법/실행' | '설계/구조'
-  order       Int // 챕터 순서
+  title       String
+  description String?  @db.Text
+  keyQuestion String?  @map("key_question") @db.Text
+  part        String   @default("syntax")
+  partLabel   String?  @map("part_label")
+  order       Int
   isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   language Language @relation(fields: [languageId], references: [id])
   lessons  Lesson[]
@@ -133,14 +131,14 @@ model Chapter {
 model Lesson {
   id            String   @id
   chapterId     String   @map("chapter_id")
-  title         String // '변수 선언하기'
-  description   String?
-  difficulty    String   @default("basic") // 'basic', 'intermediate', 'advanced'
-  order         Int // 레슨 순서
-  estimatedTime Int?     @map("estimated_time") // 예상 소요 시간 (분)
+  title         String
+  description   String?  @db.Text
+  difficulty    String   @default("basic")
+  order         Int
+  estimatedTime Int?     @map("estimated_time")
   isActive      Boolean  @default(true) @map("is_active")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   chapter  Chapter        @relation(fields: [chapterId], references: [id])
   content  LessonContent?
@@ -154,11 +152,11 @@ model Lesson {
 model LessonContent {
   id        String   @id
   lessonId  String   @unique @map("lesson_id")
-  code      String // 메인 코드
-  language  String // 'c', 'java', 'python'
-  steps     String // JSON: [{line, explanation, memoryChanges}]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  code      String   @db.Text
+  language  String
+  steps     Json
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
@@ -168,13 +166,13 @@ model LessonContent {
 model Quiz {
   id          String   @id
   lessonId    String   @map("lesson_id")
-  type        String // 'multiple_choice', 'predict_output', 'fill_blank', 'code_fix'
-  question    String
-  options     String? // JSON: ["선택지1", "선택지2", ...]
-  answer      String // 정답
-  explanation String? // 해설
+  type        String
+  question    String   @db.Text
+  options     Json?
+  answer      String
+  explanation String?  @db.Text
   order       Int
-  createdAt   DateTime @default(now()) @map("created_at")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
@@ -183,16 +181,16 @@ model Quiz {
 }
 
 model UserProgress {
-  id          String    @id @default(uuid())
-  userId      String    @map("user_id")
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
   lessonId    String    @map("lesson_id")
-  status      String    @default("not_started") // 'not_started', 'in_progress', 'completed'
+  status      String    @default("not_started")
   currentStep Int       @default(0) @map("current_step")
   quizScore   Int?      @map("quiz_score")
   quizTotal   Int?      @map("quiz_total")
-  startedAt   DateTime? @map("started_at")
-  completedAt DateTime? @map("completed_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  startedAt   DateTime? @map("started_at") @db.Timestamptz
+  completedAt DateTime? @map("completed_at") @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   lesson Lesson @relation(fields: [lessonId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
