@@ -15,6 +15,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { LessonContentData } from '../types/lesson-content';
+import { logger } from '../utils/logger';
 
 class LessonContentLoader {
   private cache = new Map<string, LessonContentData>();
@@ -30,7 +31,7 @@ class LessonContentLoader {
       const files = await fs.readdir(lessonsDir);
       const jsonFiles = files.filter((f) => f.endsWith('.json'));
 
-      console.log(`📚 Loading ${jsonFiles.length} lesson content files...`);
+      logger.info(`Loading ${jsonFiles.length} lesson content files...`);
 
       for (const file of jsonFiles) {
         const filePath = path.join(lessonsDir, file);
@@ -38,13 +39,12 @@ class LessonContentLoader {
         const data: LessonContentData = JSON.parse(content);
 
         this.cache.set(data.lessonId, data);
-        console.log(`  ✅ Loaded: ${data.lessonId}`);
       }
 
       this.isLoaded = true;
-      console.log(`✅ ${this.cache.size} lesson contents cached in memory`);
+      logger.info(`${this.cache.size} lesson contents cached`);
     } catch (error) {
-      console.error('❌ Failed to load lesson contents:', error);
+      logger.error('Failed to load lesson contents:', error);
       throw error;
     }
   }

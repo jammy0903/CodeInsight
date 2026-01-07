@@ -23,6 +23,7 @@ import type { User } from 'firebase/auth';
 import { config } from '@/config';
 import { useStore } from '@/stores/store';
 import { getCurrentUser } from './user';
+import { logger } from '@/utils/logger';
 
 // Firebase 초기화
 const app = initializeApp(config.firebase);
@@ -83,7 +84,7 @@ export function initializeAuthListener(): () => void {
           setNeedsRegistration(true);
         }
       } catch (error) {
-        console.error('Failed to fetch user info:', error);
+        logger.error('Failed to fetch user info:', error);
         setAppUser(null);
         setNeedsRegistration(true);
       }

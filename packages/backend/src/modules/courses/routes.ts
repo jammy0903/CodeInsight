@@ -16,6 +16,7 @@ import { z } from 'zod';
 import * as courseService from './service';
 import { requireDbUser } from '../../middleware/auth';
 import { lessonContentLoader } from '../../services/lessonContentLoader';
+import { logger } from '../../utils/logger';
 
 const router = Router();
 
@@ -43,7 +44,7 @@ router.get('/languages', async (req, res) => {
     const languages = await courseService.getLanguages();
     res.json(languages);
   } catch (error) {
-    console.error('Get languages error:', error);
+    logger.error('Get languages error:', error);
     res.status(500).json({
       error: 'Failed to get languages',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -64,7 +65,7 @@ router.get('/:lang/chapters', async (req, res) => {
     const chapters = await courseService.getChapters(lang);
     res.json(chapters);
   } catch (error) {
-    console.error('Get chapters error:', error);
+    logger.error('Get chapters error:', error);
     res.status(500).json({
       error: 'Failed to get chapters',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -86,7 +87,7 @@ router.get('/chapters/:id', async (req, res) => {
 
     res.json(chapter);
   } catch (error) {
-    console.error('Get chapter error:', error);
+    logger.error('Get chapter error:', error);
     res.status(500).json({
       error: 'Failed to get chapter',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -110,7 +111,7 @@ router.get('/chapters/:id/progress', requireDbUser, async (req, res) => {
 
     res.json(progress);
   } catch (error) {
-    console.error('Get chapter progress error:', error);
+    logger.error('Get chapter progress error:', error);
     res.status(500).json({
       error: 'Failed to get chapter progress',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -154,7 +155,7 @@ router.get('/lessons/:id', async (req, res) => {
       quizzes: jsonContent ? jsonContent.quizzes : lesson.quizzes,
     });
   } catch (error) {
-    console.error('Get lesson error:', error);
+    logger.error('Get lesson error:', error);
     res.status(500).json({
       error: 'Failed to get lesson',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -176,7 +177,7 @@ router.get('/progress', requireDbUser, async (req, res) => {
     const progress = await courseService.getUserProgress(userId);
     res.json(progress);
   } catch (error) {
-    console.error('Get progress error:', error);
+    logger.error('Get progress error:', error);
     res.status(500).json({
       error: 'Failed to get progress',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -204,7 +205,7 @@ router.post('/progress', requireDbUser, async (req, res) => {
 
     res.json(progress);
   } catch (error) {
-    console.error('Update progress error:', error);
+    logger.error('Update progress error:', error);
     res.status(500).json({
       error: 'Failed to update progress',
       message: error instanceof Error ? error.message : 'Unknown error',

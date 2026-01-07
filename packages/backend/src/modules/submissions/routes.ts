@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../../config/database';
 import { requireDbUser } from '../../middleware';
+import { logger } from '../../utils/logger';
 
 export const submissionRoutes = Router();
 
@@ -56,7 +57,7 @@ submissionRoutes.post('/', requireDbUser, async (req, res) => {
 
     res.status(201).json(submission);
   } catch (error) {
-    console.error('Submission error:', error);
+    logger.error('Submission error:', error);
     res.status(500).json({ error: 'Failed to create submission' });
   }
 });

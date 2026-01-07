@@ -15,6 +15,7 @@ import {
   ProviderType,
 } from './providers';
 import { getSettings } from './settings';
+import { logger } from '../../utils/logger';
 
 const router = Router();
 
@@ -144,7 +145,7 @@ router.get('/explain', async (req, res) => {
       explanation: response.content,
     });
   } catch (error) {
-    console.error('AI explain error:', error);
+    logger.error('AI explain error:', error);
     res.status(500).json({
       error: 'AI service error',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -174,7 +175,7 @@ router.post('/chat', async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('AI chat error:', error);
+    logger.error('AI chat error:', error);
     res.status(500).json({
       error: 'AI service error',
       message: error instanceof Error ? error.message : 'Unknown error',

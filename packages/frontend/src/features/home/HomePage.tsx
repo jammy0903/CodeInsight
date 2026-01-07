@@ -479,7 +479,7 @@ export default function HomePage() {
       </section>
 
       {/* Value Proposition - 메인 메시지 */}
-      <section className="min-h-screen w-full grid place-items-center py-20 px-6">
+      <section className="w-full grid place-items-center py-20 px-6">
         <div className="max-w-2xl text-center space-y-8">
           <h2 className="text-3xl md:text-5xl font-bold text-[#6b5a4a] leading-tight">
             코드가 어떻게<br />동작하는지 보세요
@@ -514,10 +514,10 @@ export default function HomePage() {
       </section>
 
       {/* 핵심 특징 - 만화 + 특징 카드 */}
-      <section className="w-full grid place-items-center pt-2 pb-20 px-4 bg-[#f8f4ef]">
-        <div className="w-full space-y-16">
+      <section className="w-full grid place-items-center mt-16 pt-8 pb-20 px-4 bg-[#f8f4ef]">
+        <div className="w-full space-y-24">
           {/* 만화 컨베이어 벨트 - 두 줄 wrapper */}
-          <div className="flex flex-col gap-16">
+          <div className="flex flex-col gap-8">
             {/* 1행 - 오른쪽에서 왼쪽으로 */}
             <div className="relative overflow-hidden">
               <motion.div
@@ -558,7 +558,7 @@ export default function HomePage() {
           </div>
 
           {/* 특징 카드 3개 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center my-32">
             {/* 인터렉티브 */}
             <div className="space-y-4 p-6">
               <div className="w-16 h-16 mx-auto bg-[#e5d5c7] rounded-2xl flex items-center justify-center">
@@ -599,7 +599,7 @@ export default function HomePage() {
       </section>
 
       {/* 학습 방식 - 시각화, AI, 실습 */}
-      <section className="w-full grid place-items-center py-20 px-6">
+      <section className="w-full grid place-items-center mt-32 py-20 px-6">
         <div className="max-w-3xl w-full text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-[#6b5a4a] mb-12">
             이렇게 배워요

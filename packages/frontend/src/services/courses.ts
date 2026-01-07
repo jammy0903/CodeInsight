@@ -25,14 +25,7 @@ import {
   UserProgressListSchema,
   ChapterWithProgressSchema,
 } from '@codeinsight/shared';
-
-// 환경별 로거 (프로덕션에서는 민감 정보 출력 안 함)
-const logger = {
-  error: (...args: unknown[]) => {
-    // 에러는 항상 출력 (디버깅 필요)
-    console.error('[courses]', ...args);
-  },
-};
+import { logger } from '@/utils/logger';
 
 // =============================================
 // API Endpoints

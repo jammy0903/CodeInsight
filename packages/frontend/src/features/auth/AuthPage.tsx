@@ -11,6 +11,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { loginWithGoogle, loginWithGithub, loginWithKakao } from '@/services/firebase';
 import { Github } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ export default function AuthPage() {
       navigate('/courses');
     } catch (err) {
       setError(`Google ${errorPrefix} 실패`);
-      console.error(err);
+      logger.error('Google login failed:', err);
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,7 @@ export default function AuthPage() {
       navigate('/courses');
     } catch (err) {
       setError(`GitHub ${errorPrefix} 실패`);
-      console.error(err);
+      logger.error('GitHub login failed:', err);
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,7 @@ export default function AuthPage() {
       navigate('/courses');
     } catch (err) {
       setError(`Kakao ${errorPrefix} 실패`);
-      console.error(err);
+      logger.error('Kakao login failed:', err);
     } finally {
       setLoading(false);
     }

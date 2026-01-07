@@ -8,27 +8,10 @@
 import axios from 'axios';
 import { auth, waitForAuth } from '../firebase';
 import { config } from '../../config';
+import { logger } from '@/utils/logger';
 
 // API 기본 URL (버전 포함)
 const BASE_URL = config.api.baseUrl;
-
-// 환경별 로거 (프로덕션에서는 민감 정보 출력 안 함)
-const logger = {
-  log: (...args: unknown[]) => {
-    if (import.meta.env.DEV) {
-      console.log('[axios]', ...args);
-    }
-  },
-  warn: (...args: unknown[]) => {
-    if (import.meta.env.DEV) {
-      console.warn('[axios]', ...args);
-    }
-  },
-  error: (...args: unknown[]) => {
-    // 에러는 항상 출력 (디버깅 필요)
-    console.error('[axios]', ...args);
-  },
-};
 
 // axios 인스턴스 생성
 export const api = axios.create({
@@ -44,18 +27,13 @@ api.interceptors.request.use(
   async (config) => {
     try {
       // Auth 초기화 완료 대기 (첫 요청 시에만 실제로 대기)
-      const authUser = await waitForAuth();
-      logger.log('waitForAuth result:', authUser?.email);
+      await waitForAuth();
 
       const user = auth.currentUser;
-      logger.log('currentUser:', user?.email);
 
       if (user) {
         const token = await user.getIdToken();
-        logger.log('Token obtained');
         config.headers.Authorization = `Bearer ${token}`;
-      } else {
-        logger.warn('No user - unauthenticated request');
       }
     } catch (error) {
       logger.error('Failed to get auth token:', error);

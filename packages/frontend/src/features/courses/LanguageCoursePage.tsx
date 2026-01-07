@@ -4,6 +4,7 @@ import type { ChapterWithLessons, UserProgress } from '@/types';
 import { getChapters, getChapterWithLessons, getUserProgress } from '@/services/courses';
 import { ChapterAccordion } from './components/ChapterAccordion';
 import { useStore } from '@/stores/store';
+import { logger } from '@/utils/logger';
 
 export function LanguageCoursePage() {
   const { lang } = useParams<{ lang: string }>();
@@ -64,13 +65,13 @@ export function LanguageCoursePage() {
             setProgressMap(map);
           } catch (err) {
             // 진행 상태 조회 실패해도 코스는 볼 수 있음
-            console.warn('[courses] Progress fetch failed:', err);
+            logger.warn('Progress fetch failed:', err);
           }
         }
         // 비로그인 사용자는 진행 상태 없이 코스만 표시
       } catch (err) {
         if (cancelled) return;
-        console.error('Failed to load course data:', err);
+        logger.error('Failed to load course data:', err);
         setError(err instanceof Error ? err.message : 'Failed to load course data');
       } finally {
         if (!cancelled) setLoading(false);

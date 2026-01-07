@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../../config/database';
 import { requireAuth, requireDbUser } from '../../middleware';
 import { requireAdmin } from '../../middleware/adminAuth';
+import { logger } from '../../utils/logger';
 
 export const userRoutes = Router();
 
@@ -108,7 +109,7 @@ userRoutes.get('/', requireAdmin, async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    console.error('Failed to fetch users:', error);
+    logger.error('Failed to fetch users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
@@ -152,7 +153,7 @@ userRoutes.get('/check-nickname/:nickname', async (req, res) => {
       error: existing ? '이미 사용 중인 닉네임입니다.' : undefined,
     });
   } catch (error) {
-    console.error('Nickname check error:', error);
+    logger.error('Nickname check error:', error);
     res.status(500).json({ error: 'Failed to check nickname' });
   }
 });
@@ -251,7 +252,7 @@ userRoutes.post('/register', requireAuth, validate(registerSchema), async (req, 
       oauthAccounts: user.oauthAccounts,
     });
   } catch (error) {
-    console.error('User registration error:', error);
+    logger.error('User registration error:', error);
     res.status(500).json({ error: 'Failed to register user' });
   }
 });
@@ -356,7 +357,7 @@ userRoutes.post('/link-oauth', requireDbUser, async (req, res) => {
       oauthAccounts: user!.oauthAccounts,
     });
   } catch (error) {
-    console.error('OAuth link error:', error);
+    logger.error('OAuth link error:', error);
     res.status(500).json({ error: 'Failed to link OAuth account' });
   }
 });

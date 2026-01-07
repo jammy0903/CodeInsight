@@ -26,6 +26,7 @@ import { AIProviderToggle } from './components/AIProviderToggle';
 import { api } from '@/services/api/axios';
 import { handleError } from '@/services/api/errors';
 import { PixelAvatar } from '@/components/PixelAvatar';
+import { logger } from '@/utils/logger';
 
 interface AdminStats {
   totalUsers: number;
@@ -102,7 +103,7 @@ export function AdminPage() {
       setSubmissions(submissionsRes.data);
       setSystem(systemRes.data);
     } catch (err) {
-      console.error('Admin data fetch error:', err);
+      logger.error('Admin data fetch error:', err);
       const error = handleError(err);
       setError(error.message);
     } finally {

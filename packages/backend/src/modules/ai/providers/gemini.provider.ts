@@ -8,6 +8,7 @@ import {
   type ChatResponse,
   type ProviderType,
 } from './types';
+import { logger } from '../../../utils/logger';
 
 // Initialize Notion client (assuming API key is in environment variables)
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
@@ -31,7 +32,7 @@ export class GeminiProvider implements IAIProvider {
         const page = await notion.pages.retrieve({ page_id: pageId });
         responseContent = `Notion page content for "${pageId}":\n\n${JSON.stringify(page, null, 2)}`;
       } catch (error) {
-        console.error('[GeminiProvider] Notion page retrieval failed:', error);
+        logger.error('[GeminiProvider] Notion page retrieval failed:', error);
         responseContent = `Sorry, I was unable to retrieve the Notion page "${pageId}". Please check the ID and API key.`;
       }
     } else {

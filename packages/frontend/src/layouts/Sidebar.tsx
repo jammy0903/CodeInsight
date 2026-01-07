@@ -15,6 +15,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
+import { logger } from '@/utils/logger';
 
 const SIDEBAR_WIDTH = 224; // 14rem
 
@@ -42,7 +43,7 @@ export function Sidebar() {
     try {
       await loginWithGoogle();
     } catch (error) {
-      console.error('로그인 실패:', error);
+      logger.error('Login failed:', error);
     }
   };
 

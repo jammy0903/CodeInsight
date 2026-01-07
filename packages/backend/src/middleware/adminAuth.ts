@@ -7,6 +7,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { auth } from '../config/firebase';
+import { logger } from '../utils/logger';
 
 const ADMIN_EMAIL = 'l89192164@gmail.com';
 
@@ -57,7 +58,7 @@ export async function requireAdmin(
 
     next();
   } catch (error) {
-    console.error('Admin auth error:', error);
+    logger.error('Admin auth error:', error);
     res.status(401).json({ error: 'Unauthorized: Invalid token' });
   }
 }

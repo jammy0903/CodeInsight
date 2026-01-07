@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { Loader2, AlertCircle, ChevronRight, BookOpen, RefreshCw } from 'lucide-react';
 import { getLanguages } from '@/services/courses';
 import type { Language } from '@/types';
+import { logger } from '@/utils/logger';
 
 export function CoursesPage() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export function CoursesPage() {
         setLanguages(data);
       } catch (err) {
         setError('언어 목록을 불러오지 못했습니다.');
-        console.error(err);
+        logger.error('Failed to load languages:', err);
       } finally {
         setLoading(false);
       }

@@ -8,6 +8,7 @@
 import { Response } from 'express';
 import { AdminRequest } from '../../middleware/adminAuth';
 import { AdminService } from './admin.service';
+import { logger } from '../../utils/logger';
 
 const adminService = new AdminService();
 
@@ -20,7 +21,7 @@ export async function getStats(req: AdminRequest, res: Response): Promise<void> 
     const stats = await adminService.getStats();
     res.json(stats);
   } catch (error) {
-    console.error('Get stats error:', error);
+    logger.error('Get stats error:', error);
     res.status(500).json({ error: 'Failed to fetch statistics' });
   }
 }
@@ -37,7 +38,7 @@ export async function getUsers(req: AdminRequest, res: Response): Promise<void> 
     const result = await adminService.getUsers(page, limit);
     res.json(result);
   } catch (error) {
-    console.error('Get users error:', error);
+    logger.error('Get users error:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 }
@@ -53,7 +54,7 @@ export async function getSubmissions(req: AdminRequest, res: Response): Promise<
     const submissions = await adminService.getRecentSubmissions(limit);
     res.json(submissions);
   } catch (error) {
-    console.error('Get submissions error:', error);
+    logger.error('Get submissions error:', error);
     res.status(500).json({ error: 'Failed to fetch submissions' });
   }
 }
@@ -67,7 +68,7 @@ export async function getSystemStatus(req: AdminRequest, res: Response): Promise
     const status = await adminService.getSystemStatus();
     res.json(status);
   } catch (error) {
-    console.error('Get system status error:', error);
+    logger.error('Get system status error:', error);
     res.status(500).json({ error: 'Failed to fetch system status' });
   }
 }

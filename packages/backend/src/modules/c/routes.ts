@@ -4,6 +4,7 @@ import { runCCode, judgeCode } from './executor';
 import { prisma } from '../../config/database';
 import { config } from '../../config';
 import { optionalAuth } from '../../middleware';
+import { logger } from '../../utils/logger';
 
 export const cRoutes = Router();
 
@@ -112,7 +113,7 @@ cRoutes.post('/run', validate(runCodeSchema), async (req, res) => {
       error: result.error
     });
   } catch (error: unknown) {
-    console.error('C run error:', error);
+    logger.error('C run error:', error);
     res.status(500).json({
       success: false,
       error: 'internal_error',
@@ -210,7 +211,7 @@ cRoutes.post('/judge', optionalAuth, validate(judgeCodeSchema), async (req, res)
           });
         }
       } catch (dbError) {
-        console.error('Failed to save submission:', dbError);
+        logger.error('Failed to save submission:', dbError);
       }
     }
 
@@ -225,7 +226,7 @@ cRoutes.post('/judge', optionalAuth, validate(judgeCodeSchema), async (req, res)
       },
     });
   } catch (error: unknown) {
-    console.error('Judge error:', error);
+    logger.error('Judge error:', error);
     res.status(500).json({
       success: false,
       error: 'internal_error',
