@@ -1,12 +1,15 @@
 import { PrismaClient } from '.prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import path from 'path';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
-// SQLite 데이터베이스 경로
-const dbPath = path.join(__dirname, '../../prisma/dev.db');
+// PostgreSQL 연결 URL
+const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
 
-// Prisma 어댑터 팩토리 생성
-const adapterFactory = new PrismaBetterSqlite3({ url: dbPath });
+// PostgreSQL Pool 생성
+const pool = new pg.Pool({ connectionString });
 
-// PrismaClient with adapter factory
-export const prisma = new PrismaClient({ adapter: adapterFactory });
+// Prisma 어댑터 생성
+const adapter = new PrismaPg(pool);
+
+// PrismaClient with adapter
+export const prisma = new PrismaClient({ adapter });
