@@ -3,14 +3,13 @@ import { defineConfig } from 'prisma/config';
 import path from 'path';
 
 export default defineConfig({
+  earlyAccess: true,
   schema: path.join(__dirname, 'prisma/schema.prisma'),
-  migrations: {
-    path: path.join(__dirname, 'prisma/migrations'),
+  migrate: {
+    schema: path.join(__dirname, 'prisma/schema.prisma'),
     seed: 'npx tsx prisma/seed.ts',
   },
-  datasources: {
-    db: {
-      url: `file:${path.join(__dirname, 'prisma/dev.db')}`,
-    },
+  datasource: {
+    url: process.env.DATABASE_URL || 'file:./prisma/dev.db',
   },
 });

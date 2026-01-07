@@ -115,6 +115,8 @@ model Chapter {
   title       String // '변수와 메모리'
   description String?
   keyQuestion String?  @map("key_question") // '변수는 메모리 어디에?'
+  part        String   @default("syntax") // 'syntax' | 'design'
+  partLabel   String?  @map("part_label") // '문법/실행' | '설계/구조'
   order       Int // 챕터 순서
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
@@ -124,6 +126,7 @@ model Chapter {
   lessons  Lesson[]
 
   @@index([languageId, order])
+  @@index([languageId, part])
   @@map("chapters")
 }
 

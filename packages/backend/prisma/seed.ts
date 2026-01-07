@@ -37,6 +37,8 @@ interface CurriculumChapter {
   title: string;
   description: string;
   keyQuestion: string;
+  part: 'syntax' | 'design';
+  partLabel: string;
   misconceptions?: string[];
   lessons: CurriculumLesson[];
 }
@@ -201,6 +203,8 @@ async function seed() {
           title: chapterData.title,
           description: chapterData.description,
           keyQuestion: chapterData.keyQuestion,
+          part: chapterData.part,
+          partLabel: chapterData.partLabel,
           order: chapterData.order,
         },
       });
