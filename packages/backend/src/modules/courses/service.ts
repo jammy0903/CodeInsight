@@ -6,10 +6,8 @@
  * TRADEOFF: 파일 분리 > 단일 파일 (테스트 용이성)
  */
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../config/database';
 import { randomUUID } from 'crypto';
-
-const prisma = new PrismaClient();
 
 // =============================================
 // Language
