@@ -7,6 +7,7 @@
 // Pages
 export { CoursesPage } from './CoursesPage';
 export { LanguageCoursePage } from './LanguageCoursePage';
+export { ChapterLessonsPage } from './ChapterLessonsPage';
 export { LessonPage } from './LessonPage';
 
 // Hooks

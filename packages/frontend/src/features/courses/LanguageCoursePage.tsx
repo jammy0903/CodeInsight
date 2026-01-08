@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { ChapterWithLessons, UserProgress } from '@/types';
 import { getChapters, getChapterWithLessons, getUserProgress } from '@/services/courses';
-import { ChapterAccordion } from './components/ChapterAccordion';
+import { CourseGrid } from './components/CourseGrid';
+import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
 import { logger } from '@/utils/logger';
-import { Zap, Trophy, Lock, ChevronLeft } from 'lucide-react';
+import { Zap, Trophy, ChevronLeft } from 'lucide-react';
 
 export function LanguageCoursePage() {
   const { lang } = useParams<{ lang: string }>();
@@ -202,7 +203,7 @@ export function LanguageCoursePage() {
                   {langInfo.name}
                 </h1>
                 <p className="text-[#00D9FF] text-sm font-mono">
-                  {chapters.length} STAGES · {totalLessons} MISSIONS
+                  {chapters.length} CHAPTERS · {totalLessons} LESSONS
                 </p>
               </div>
             </div>
@@ -250,9 +251,9 @@ export function LanguageCoursePage() {
         </div>
       </div>
 
-      {/* 스테이지 목록 */}
+      {/* 챕터 Grid */}
       {lang && (
-        <div className="space-y-4 pl-16">
+        <CourseGrid>
           {chapters.map((chapter, index) => {
             // 이전 챕터들이 모두 완료되었는지 확인
             const previousChaptersComplete = chapters.slice(0, index).every(ch => {
@@ -271,56 +272,18 @@ export function LanguageCoursePage() {
             const isActive = !isComplete && !isLocked && (index === 0 || previousChaptersComplete);
 
             return (
-              <div
+              <ChapterCard
                 key={chapter.id}
-                className="relative"
-              >
-                {/* 스테이지 번호 뱃지 */}
-                <div className="absolute -left-16 top-4 z-10">
-                  <div className={`
-                    w-12 h-12 rounded-xl flex flex-col items-center justify-center font-bold transition-all duration-300
-                    ${isComplete
-                      ? 'bg-gradient-to-br from-[#FFD700] to-[#F97316] text-[#1a1a2e] shadow-[0_0_20px_#FFD70060]'
-                      : isActive
-                        ? 'bg-gradient-to-br from-[#00D9FF] to-[#3B82F6] text-white shadow-[0_0_20px_#00D9FF60]'
-                        : 'bg-[#2a2a3e] text-white/50 border border-white/20'
-                    }
-                  `}>
-                    {isLocked ? (
-                      <Lock className="w-4 h-4" />
-                    ) : (
-                      <>
-                        <span className="text-[8px] uppercase tracking-wider opacity-80">Stage</span>
-                        <span className="text-base font-bold">{index + 1}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* 연결선 */}
-                {index < chapters.length - 1 && (
-                  <div
-                    className={`absolute -left-10 top-16 w-0.5 h-8 ${
-                      isComplete ? 'bg-[#FFD700]/50' : 'bg-white/10'
-                    }`}
-                  />
-                )}
-
-                {/* 챕터 아코디언 */}
-                <ChapterAccordion
-                  chapter={chapter}
-                  lessons={chapter.lessons}
-                  progressMap={progressMap}
-                  languageId={lang}
-                  defaultOpen={isActive}
-                  isLocked={isLocked}
-                  isActive={isActive}
-                  stageNum={index + 1}
-                />
-              </div>
+                chapter={chapter}
+                languageId={lang}
+                lessonCount={chapter.lessons.length}
+                completedCount={completedInChapter}
+                isLocked={isLocked}
+                isActive={isActive}
+              />
             );
           })}
-        </div>
+        </CourseGrid>
       )}
 
       {/* 하단 여백 */}
