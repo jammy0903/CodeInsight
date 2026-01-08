@@ -1,0 +1,88 @@
+{
+  "lessonId": "c-2-4",
+  "title": "역참조로 값 쓰기",
+  "concept": "*p = 값; 은 p가 가리키는 주소에 값을 저장한다",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p = &a;\n    \n    printf(\"변경 전 a: %d\\n\", a);\n    \n    *p = 20;\n    \n    printf(\"변경 후 a: %d\\n\", a);\n    printf(\"변경 후 *p: %d\\n\", *p);\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "a에 10 저장",
+        "explanation": "a가 생성되고 10이 저장됩니다.",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "a",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "address": "0x7ffc1000"
+          }
+        ]
+      },
+      {
+        "line": 5,
+        "title": "p가 a를 가리킴",
+        "explanation": "p는 a의 주소를 저장합니다.",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "size": 8,
+            "value": "0x7ffc1000",
+            "address": "0x7ffc0ff8",
+            "pointsTo": "a"
+          }
+        ]
+      },
+      {
+        "line": 9,
+        "title": "역참조로 값 변경!",
+        "explanation": "*p = 20;은 p가 가리키는 주소(a의 위치)에 20을 저장합니다. a 자체가 변경됩니다!",
+        "highlight": [9],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "stack",
+            "name": "a",
+            "type": "int",
+            "value": 20,
+            "previousValue": 10,
+            "updatedVia": "p"
+          }
+        ]
+      },
+      {
+        "line": 11,
+        "title": "변경 확인",
+        "explanation": "a를 직접 읽어도 20입니다. *p로 읽어도 20입니다. 같은 메모리를 가리키기 때문입니다.",
+        "highlight": [11, 12],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int x=5; int *p=&x; *p=10; 실행 후 x의 값은?",
+    "options": [
+      "5",
+      "10",
+      "15",
+      "에러"
+    ],
+    "correctIndex": 1,
+    "explanation": "*p = 10;은 p가 가리키는 x의 메모리에 10을 저장합니다. x가 직접 변경됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "*p = 20;은 p의 값을 20으로 바꾼다",
+      "correct": "*p = 20;은 p가 '가리키는' 곳(a)의 값을 20으로 바꿉니다.",
+      "why": "p = 주소 저장 변수, *p = 그 주소에 있는 값. p = 20과 *p = 20은 완전히 다릅니다!"
+    }
+  ],
+  "keyTakeaway": "*p = 값; 은 원본(a)을 포인터를 통해 간접 수정"
+}

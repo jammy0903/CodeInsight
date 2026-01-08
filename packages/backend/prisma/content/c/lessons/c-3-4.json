@@ -1,0 +1,90 @@
+{
+  "lessonId": "c-3-4",
+  "title": "배열을 함수에 전달",
+  "concept": "배열을 함수에 전달하면 포인터로 decay된다. 크기 정보가 사라진다",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid printSize(int arr[]) {\n    printf(\"함수 내 sizeof: %lu\\n\", sizeof(arr));\n}\n\nint main() {\n    int arr[5] = {1, 2, 3, 4, 5};\n    \n    printf(\"main sizeof: %lu\\n\", sizeof(arr));\n    printSize(arr);\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 8,
+        "title": "main에서 배열 생성",
+        "explanation": "arr은 5개 int 배열. sizeof(arr) = 20바이트",
+        "highlight": [8],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "arr",
+            "type": "int[5]",
+            "size": 20,
+            "value": "[1,2,3,4,5]",
+            "address": "0x7ffc1000",
+            "frame": "main"
+          }
+        ]
+      },
+      {
+        "line": 10,
+        "title": "main에서 sizeof",
+        "explanation": "main에서는 배열 전체 크기 20이 출력됩니다.",
+        "highlight": [10],
+        "memoryChanges": []
+      },
+      {
+        "line": 11,
+        "title": "함수 호출 - decay 발생!",
+        "explanation": "printSize(arr)를 호출하면 arr은 포인터로 decay됩니다. 주소만 전달됩니다.",
+        "highlight": [11, 3],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "printSize",
+            "type": "frame"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "arr (매개변수)",
+            "type": "int*",
+            "size": 8,
+            "value": "0x7ffc1000",
+            "frame": "printSize",
+            "pointsTo": "main의 arr[0]"
+          }
+        ]
+      },
+      {
+        "line": 4,
+        "title": "함수 내 sizeof",
+        "explanation": "함수 내 sizeof(arr) = 8! 포인터 크기만 나옵니다. 배열 크기 정보가 사라졌습니다.",
+        "highlight": [4],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "void foo(int arr[5])에서 sizeof(arr)는?",
+    "options": [
+      "20",
+      "8",
+      "5",
+      "4"
+    ],
+    "correctIndex": 1,
+    "explanation": "함수 매개변수에서 int arr[5]는 int *arr과 동일합니다. sizeof는 포인터 크기 8을 반환합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수에 배열을 전달하면 배열이 복사된다",
+      "correct": "배열은 복사되지 않고, 첫 요소의 주소만 전달됩니다 (decay).",
+      "why": "큰 배열을 복사하는 것은 비효율적입니다. C는 주소 전달을 선택했습니다."
+    },
+    {
+      "wrong": "void foo(int arr[5])에서 5는 의미가 있다",
+      "correct": "배열 크기 5는 무시됩니다. void foo(int *arr)과 동일합니다.",
+      "why": "함수 매개변수에서 배열 문법은 포인터로 해석됩니다."
+    }
+  ],
+  "keyTakeaway": "배열 → 함수 = 포인터로 decay. 크기는 별도 인자로!"
+}

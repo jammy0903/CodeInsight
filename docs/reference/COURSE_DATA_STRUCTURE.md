@@ -1,6 +1,13 @@
-# 코스 데이터 구조
+# 코스 데이터 구조 (레거시)
 
-> 언어별 학습 코스 데이터 구조 및 사용법
+> ⚠️ **레거시 문서**: 이 문서는 `data/courses/`의 정적 데이터 구조를 설명합니다.
+>
+> **새 구조**: `types/course-schema.ts`의 DB 기반 구조로 마이그레이션 예정
+> ```
+> Language → Chapter → Lesson → (Content + Quiz)
+> ```
+>
+> 새 구조에 대한 자세한 내용은 `docs/architecture/SYSTEM_OVERVIEW.md`를 참조하세요.
 
 ---
 

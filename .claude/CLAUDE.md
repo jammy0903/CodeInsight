@@ -131,11 +131,11 @@ import 경로도 @/features/visualizers/c로 변경됩니다.
 ### 3.3 개념 코스
 
 ```
-Day N → 오늘의 개념 → 5~10분 학습
+Language → Chapter → Lesson → 5~10분 학습
 ```
 
-- 하루 1개 개념
-- 짧은 코드 + 시뮬레이션 + 미세 실습
+- 챕터별 주제 그룹화
+- 레슨별 짧은 코드 + 시뮬레이션 + 퀴즈
 
 ### 3.4 미세 실습
 
@@ -190,7 +190,7 @@ Day N → 오늘의 개념 → 5~10분 학습
 
 | 프로젝트 | Backend | Frontend |
 |----------|---------|----------|
-| C-OSINE | 3001 | 5173 |
+| C-OSINE | 3001 | 5174 |
 | **CodeInsight** | **3002** | **5174** |
 
 ```bash
@@ -224,7 +224,7 @@ frontend/
 │   │   │   └── c/              # C 언어 시각화
 │   │   ├── chat/               # AI 해설자
 │   │   └── courses/            # 개념 코스
-│   ├── data/courses/           # 코스 데이터 (C, Python, Java)
+│   ├── data/courses/           # 레거시 정적 데이터 (마이그레이션 예정)
 │   ├── types/                  # 공유 타입
 │   ├── services/               # API 클라이언트
 │   ├── components/ui/          # shadcn/ui
@@ -233,9 +233,9 @@ frontend/
 
 docs/
 ├── plans/
-│   ├── 17_new_direction_mvp.md
-│   ├── 18_refactoring_plan.md
-│   └── 19_learn_page_implementation.md
+│   ├── TODO.md                # 현재 진행 중 + 리팩토링 계획
+│   ├── FUTURE.md              # 미래 계획 (모바일 앱)
+│   └── deferred/              # 연기된 계획
 └── reference/
     ├── CURRICULUM.md
     └── COURSE_DATA_STRUCTURE.md
@@ -303,6 +303,11 @@ function getExecErrorInfo(error: unknown) { ... }
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
+| GET | `/api/courses/languages` | 언어 목록 |
+| GET | `/api/courses/:lang/chapters` | 챕터 목록 |
+| GET | `/api/courses/chapters/:id` | 챕터 상세 (레슨 포함) |
+| GET | `/api/courses/lessons/:id` | 레슨 상세 (콘텐츠+퀴즈) |
+| POST | `/api/courses/progress` | 진행 상태 업데이트 |
 | POST | `/api/c/run` | C 코드 실행 |
 | POST | `/api/memory/trace` | 메모리 시뮬레이션 |
 | POST | `/api/ai/chat` | AI 해설자 |
@@ -334,6 +339,11 @@ curl -X POST http://localhost:3000/api/ai/chat \
 - Claude 서명 금지 (`Generated with Claude Code` 등)
 - Co-Authored-By 금지
 - 한글 커밋 메시지 OK
+- **커밋 후 반드시 push**: 매번 `git commit` 후 즉시 `git push origin codeinsight` 실행
+- **민감 정보 절대 금지**: API key, 비밀번호, 토큰 등 민감한 정보는 절대 git에 올리지 말 것
+  - `.env` 파일, API key, 인증 토큰, 비밀번호, 개인정보 등
+  - 환경변수는 `.env.example`에 예시만 작성
+  - 실제 값은 로컬 `.env`에만 보관
 
 ---
 
@@ -347,33 +357,65 @@ curl -X POST http://localhost:3000/api/ai/chat \
 ### 계획 문서
 | 문서 | 설명 |
 |------|------|
-| `docs/plans/20_remaining_tasks.md` | **남은 작업 계획** (2025-12-28) |
-| `docs/plans/17_new_direction_mvp.md` | MVP 상세 계획 |
-| `docs/plans/18_refactoring_plan.md` | 리팩토링 계획 |
-| `docs/plans/19_learn_page_implementation.md` | LearnPage 구현 계획 |
+| `docs/plans/TODO.md` | **현재 진행 중 + 리팩토링 계획** |
+| `docs/plans/FUTURE.md` | 미래 계획 (모바일 앱) |
+| `docs/plans/deferred/` | 연기된 계획 (DAU 조건부) |
 
 ### 참조 문서
 | 문서 | 설명 |
 |------|------|
 | `docs/reference/CURRICULUM.md` | C 개념 커리큘럼 |
 | `docs/reference/COURSE_DATA_STRUCTURE.md` | 코스 데이터 구조 |
+| `.claude/KEEP_FILES.md` | **삭제 금지 파일 목록** (Phase 2용) |
 
 ---
 
-## 11. 구현 현황 (2025-12-28)
+## 11. 구현 현황 (2026-01-03)
 
 ### 11.1 완료된 기능
 
 | 기능 | 위치 | 상태 |
 |------|------|------|
-| 코스 데이터 구조 | `data/courses/` | ✅ 완료 |
-| C 코스 Day 1-3 | `data/courses/c/` | ✅ 완료 |
-| Java 코스 Day 1 | `data/courses/java/` | ✅ 완료 |
-| Python 코스 Day 1 | `data/courses/python/` | ✅ 완료 |
-| CoursesPage (LearnPage) | `features/courses/` | ✅ 완료 |
-| AI 해설자 API 분리 | `backend/modules/ai/` | ✅ 완료 |
+| **사용자 스키마 (닉네임 기반)** |||
+| User + OAuthAccount 모델 | `backend/prisma/schema.prisma` | ✅ 완료 |
+| 닉네임 중복 확인 API | `backend/modules/users/routes.ts` | ✅ 완료 |
+| 닉네임 등록 API | `backend/modules/users/routes.ts` | ✅ 완료 |
+| 다중 OAuth 지원 | Google, GitHub, Kakao | ✅ 완료 |
+| NicknameModal | `components/NicknameModal.tsx` | ✅ 완료 |
+| Store 분리 (firebaseUser/appUser) | `stores/store.ts` | ✅ 완료 |
+| 역할 기반 Admin 체크 | `features/admin/AdminRoute.tsx` | ✅ 완료 |
+| **코스 시스템 (DB 기반)** |||
+| 코스 타입 정의 | `types/course-schema.ts` | ✅ 완료 |
+| 코스 API 서비스 | `services/courses.ts` | ✅ 완료 |
+| CoursesPage | `features/courses/CoursesPage.tsx` | ✅ 완료 |
+| ChaptersPage | `features/courses/ChaptersPage.tsx` | ✅ 완료 |
+| LessonsPage | `features/courses/LessonsPage.tsx` | ✅ 완료 |
+| LessonPage | `features/courses/LessonPage.tsx` | ✅ 완료 |
+| **Lesson 학습 컴포넌트** |||
+| DayHeader | `features/courses/components/day/` | ✅ 완료 |
+| CodeViewer | `features/courses/components/day/` | ✅ 완료 |
+| StepExplanation | `features/courses/components/day/` | ✅ 완료 |
+| StepControls | `features/courses/components/day/` | ✅ 완료 |
+| SelectedCodeBadge | `features/courses/components/day/` | ✅ 완료 |
+| **퀴즈 시스템** |||
+| QuizCard | `features/courses/components/quiz/` | ✅ 완료 |
+| QuizResult | `features/courses/components/quiz/` | ✅ 완료 |
+| **메모리 시각화** |||
+| CourseMemoryView | `features/courses/components/memory/` | ✅ 완료 |
 | C 메모리 시각화 | `features/visualizers/c/` | ✅ 완료 |
 | 메모리 타입 정의 | `types/memory.ts` | ✅ 완료 |
+| **AI 해설자** |||
+| ChatQA (코스 연동) | `features/chat/components/ChatQA.tsx` | ✅ 완료 |
+| AI 해설자 API | `backend/modules/ai/` | ✅ 완료 |
+| **Hooks** |||
+| useLessonNavigation | `features/courses/hooks/` | ✅ 완료 |
+| useLessonMemory | `features/courses/hooks/` | ✅ 완료 |
+| useCourseProgress | `features/courses/hooks/` | ✅ 완료 |
+| useCodeSelection | `features/courses/hooks/` | ✅ 완료 |
+| **기타 페이지** |||
+| HomePage | `features/home/` | ✅ 완료 |
+| AdminPage | `features/admin/` | ✅ 완료 |
+| **백엔드 인프라** |||
 | C 실행/트레이스 서비스 | `services/crunner.ts, tracer.ts` | ✅ 완료 |
 | 테스트 인프라 (vitest) | `backend/vitest.config.ts` | ✅ 완료 |
 | 보안 패턴 테스트 | `backend/modules/c/executor.test.ts` | ✅ 완료 |
@@ -382,19 +424,37 @@ curl -X POST http://localhost:3000/api/ai/chat \
 | Rate Limiting | `backend/middleware/rateLimit.ts` | ✅ 완료 |
 | /me 패턴 API | `backend/modules/users,submissions/` | ✅ 완료 |
 
-### 11.2 CoursesPage 컴포넌트
+### 11.2 Courses 모듈 구조
 
 ```
 features/courses/
 ├── index.ts
-├── CoursesPage.tsx
+├── CoursesPage.tsx             # 언어 선택 (Language 목록)
+├── ChaptersPage.tsx            # 챕터 목록 (Chapter 그리드)
+├── LessonsPage.tsx             # 레슨 목록 (Lesson 그리드)
+├── LessonPage.tsx              # 레슨 학습 화면 (메인)
 ├── hooks/
-│   └── useCourseProgress.ts    # localStorage 진행 상태
-└── components/
-    ├── LanguageTabs.tsx        # C/Java/Python 탭
-    ├── CourseHeader.tsx        # 언어 설명 + 진행률
-    ├── DayGrid.tsx             # Day 카드 그리드
-    └── DayCard.tsx             # 개별 Day 카드
+│   ├── useCourseProgress.ts    # 진행 상태 (API 연동)
+│   ├── useLessonNavigation.ts  # 스텝 → 퀴즈 → 완료 흐름
+│   ├── useLessonMemory.ts      # memoryChanges 누적 계산
+│   └── useCodeSelection.ts     # 코드 선택 상태
+├── components/
+│   ├── LanguageTabs.tsx        # C/Java/Python 탭
+│   ├── CourseHeader.tsx        # 언어 설명 + 진행률
+│   ├── ChapterCard.tsx         # 챕터 카드
+│   ├── LessonCard.tsx          # 레슨 카드
+│   ├── day/
+│   │   ├── DayHeader.tsx       # 레슨 제목 + 뒤로가기
+│   │   ├── CodeViewer.tsx      # 코드 뷰어 (하이라이트)
+│   │   ├── StepExplanation.tsx # 현재 스텝 설명
+│   │   ├── StepControls.tsx    # 이전/다음/퀴즈 버튼
+│   │   └── SelectedCodeBadge.tsx # 선택된 코드 표시
+│   ├── memory/
+│   │   └── CourseMemoryView.tsx # 통합 메모리 테이블
+│   └── quiz/
+│       ├── QuizCard.tsx        # 퀴즈 질문 + 선택지
+│       └── QuizResult.tsx      # 정답/오답 결과
+└── types.ts
 ```
 
 ### 11.3 Visualizers 구조 (C 메모리 시각화)
@@ -402,40 +462,33 @@ features/courses/
 ```
 features/visualizers/c/
 ├── index.tsx                   # 모듈 export
-├── ProcessMemoryVisualization.tsx
 ├── constants.ts                # 색상, 애니메이션 설정
-├── types.ts                    # 시각화 타입
-├── utils.ts                    # 유틸 함수
-├── components/
-│   ├── ProcessMemoryView.tsx   # 전체 메모리 레이아웃
-│   ├── MemorySegment.tsx       # 세그먼트 컴포넌트
-│   ├── StackDetailView.tsx     # Stack 상세
-│   └── HeapDetailView.tsx      # Heap 상세
-└── hooks/
-    └── useStepTransition.ts    # 스텝 전환 애니메이션
 ```
 
 ### 11.4 라우팅
 
 | 경로 | 컴포넌트 | 상태 |
 |------|----------|------|
+| `/` | HomePage | ✅ 완료 |
 | `/courses` | CoursesPage | ✅ 완료 |
-| `/courses/:lang` | CoursesPage | ✅ 완료 |
-| `/courses/:lang/:day` | DayPage | ⏳ TODO |
+| `/courses/:lang` | ChaptersPage | ✅ 완료 |
+| `/courses/:lang/:chapterId` | LessonsPage | ✅ 완료 |
+| `/courses/:lang/:chapterId/:lessonId` | LessonPage | ✅ 완료 |
+| `/chat` | Chat | ✅ 완료 |
+| `/admin` | AdminPage | ✅ 완료 |
 
 ### 11.5 다음 단계
 
-1. **DayPage 구현** - Day 학습 화면 (시뮬레이터 + 퀴즈 + AI 해설)
-2. **시뮬레이터 연동** - 코스 데이터의 steps와 메모리 시각화 연결
-3. **퀴즈 컴포넌트** - 결과 예측 퀴즈 UI
-4. **실습 문제 연동** - Problem을 코스 Day에 연결
-5. **프론트엔드 인증 연동** - user.ts, submission.ts 서비스 구현
+1. **프론트엔드 인증 연동** - user.ts, submission.ts 서비스 구현 (axios 도입 시점)
+2. **진행 상태 서버 저장** - localStorage → DB 마이그레이션
+3. **실습 문제 연동** - Problem을 코스 Day에 연결
+4. **Python/Java 코스 확장** - Day 2+ 콘텐츠 추가
 
 ---
 
 ## 12. Repository Info
 
-- Repo: `git@github.com:jammy0903/C-OSINE.git`
+- Repo: `git@github.com:jammy0903/CodeInsight.git`
 - Branch: `codeinsight`
 - GitHub: jammy0903
 - Email: fuso3367@kakao.com

@@ -1,0 +1,102 @@
+{
+  "lessonId": "c-5-6",
+  "title": "동적 배열",
+  "concept": "malloc으로 실행 시점에 크기가 결정되는 배열을 만들 수 있다",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int n;\n    printf(\"배열 크기: \");\n    scanf(\"%d\", &n);\n    \n    // 동적 배열 생성\n    int *arr = malloc(n * sizeof(int));\n    \n    if (arr == NULL) {\n        return 1;\n    }\n    \n    // 배열처럼 사용\n    for (int i = 0; i < n; i++) {\n        arr[i] = i * 10;\n    }\n    \n    for (int i = 0; i < n; i++) {\n        printf(\"arr[%d] = %d\\n\", i, arr[i]);\n    }\n    \n    free(arr);\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 7,
+        "title": "크기 입력",
+        "explanation": "사용자가 배열 크기를 입력합니다. 컴파일 시점에는 크기를 알 수 없습니다.",
+        "highlight": [5, 6, 7],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "n",
+            "type": "int",
+            "value": 5,
+            "note": "(예: 사용자가 5 입력)"
+          }
+        ]
+      },
+      {
+        "line": 10,
+        "title": "동적 배열 할당",
+        "explanation": "malloc(5 * 4) = malloc(20)으로 20바이트를 Heap에 할당합니다. 5개 int를 저장할 수 있습니다.",
+        "highlight": [10],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "heap",
+            "name": "arr",
+            "type": "int[]",
+            "size": 20,
+            "value": "[?,?,?,?,?]",
+            "address": "0x55001000"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "arr",
+            "type": "int*",
+            "value": "0x55001000"
+          }
+        ]
+      },
+      {
+        "line": 17,
+        "title": "배열처럼 사용",
+        "explanation": "arr[i]로 접근 가능합니다. arr[i] == *(arr+i)이므로 포인터와 배열 문법 모두 사용 가능.",
+        "highlight": [17, 18, 19],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "heap",
+            "name": "arr",
+            "value": "[0,10,20,30,40]",
+            "address": "0x55001000"
+          }
+        ]
+      },
+      {
+        "line": 25,
+        "title": "해제",
+        "explanation": "동적 배열도 반드시 free()로 해제해야 합니다.",
+        "highlight": [25],
+        "memoryChanges": [
+          {
+            "action": "deallocate",
+            "area": "heap",
+            "address": "0x55001000"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int *arr = malloc(10 * sizeof(int)); 이 할당하는 바이트 수는?",
+    "options": [
+      "10",
+      "14",
+      "40",
+      "80"
+    ],
+    "correctIndex": 2,
+    "explanation": "sizeof(int) = 4바이트. 10 * 4 = 40바이트가 할당됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "int arr[n];으로 충분하다",
+      "correct": "VLA(Variable Length Array)는 일부 컴파일러에서만 지원하고, 스택 크기 제한이 있습니다.",
+      "why": "동적 배열은 Heap을 사용하므로 훨씬 큰 배열을 만들 수 있고 이식성이 좋습니다."
+    },
+    {
+      "wrong": "동적 배열은 [] 문법을 못 쓴다",
+      "correct": "포인터에도 [] 연산자를 사용할 수 있습니다. arr[i] == *(arr+i)",
+      "why": "배열 인덱스 문법은 포인터 산술의 편리한 표기입니다."
+    }
+  ],
+  "keyTakeaway": "malloc(n * sizeof(type))으로 동적 배열 생성. 사용 후 free 필수"
+}

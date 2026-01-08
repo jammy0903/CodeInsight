@@ -1,0 +1,114 @@
+{
+  "lessonId": "c-3-5",
+  "title": "포인터로 배열 순회",
+  "concept": "포인터 증가(p++)로 배열을 순회할 수 있다",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[5] = {10, 20, 30, 40, 50};\n    int *p = arr;\n    \n    for (int i = 0; i < 5; i++) {\n        printf(\"*p = %d (주소: %p)\\n\", *p, p);\n        p++;\n    }\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "배열 생성",
+        "explanation": "5개 요소를 가진 배열이 연속된 메모리에 저장됩니다.",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "arr",
+            "type": "int[5]",
+            "size": 20,
+            "value": "[10,20,30,40,50]",
+            "address": "0x7ffc1000"
+          }
+        ]
+      },
+      {
+        "line": 5,
+        "title": "포인터 초기화",
+        "explanation": "p는 arr[0]을 가리킵니다. p = 0x7ffc1000",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "size": 8,
+            "value": "0x7ffc1000",
+            "pointsTo": "arr[0]"
+          }
+        ]
+      },
+      {
+        "line": 8,
+        "title": "첫 번째 요소",
+        "explanation": "*p = 10. p는 arr[0]을 가리키고 있습니다.",
+        "highlight": [8],
+        "memoryChanges": []
+      },
+      {
+        "line": 9,
+        "title": "포인터 증가 (첫 번째)",
+        "explanation": "p++로 p가 다음 int 위치로 이동합니다. 1000 → 1004",
+        "highlight": [9],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "stack",
+            "name": "p",
+            "value": "0x7ffc1004",
+            "previousValue": "0x7ffc1000",
+            "pointsTo": "arr[1]"
+          }
+        ]
+      },
+      {
+        "line": 8,
+        "title": "두 번째 요소",
+        "explanation": "*p = 20. 이제 p는 arr[1]을 가리킵니다.",
+        "highlight": [8],
+        "memoryChanges": []
+      },
+      {
+        "line": 9,
+        "title": "포인터 증가 (두 번째)",
+        "explanation": "p++로 1004 → 1008. arr[2]를 가리킵니다.",
+        "highlight": [9],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "stack",
+            "name": "p",
+            "value": "0x7ffc1008",
+            "previousValue": "0x7ffc1004",
+            "pointsTo": "arr[2]"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int *p가 arr[0]을 가리킬 때, p++; p++; 후 p는?",
+    "options": [
+      "arr[0]",
+      "arr[1]",
+      "arr[2]",
+      "배열 밖"
+    ],
+    "correctIndex": 2,
+    "explanation": "p++를 두 번 실행하면 두 요소 앞으로 이동합니다. arr[0] → arr[1] → arr[2]"
+  },
+  "misconceptions": [
+    {
+      "wrong": "p++는 p를 1만큼 증가시킨다",
+      "correct": "p++는 p를 sizeof(타입)만큼 증가시킵니다. int*면 4바이트.",
+      "why": "포인터 산술은 배열 순회를 위해 타입 크기를 고려합니다."
+    },
+    {
+      "wrong": "배열을 벗어나도 p++를 해도 된다",
+      "correct": "배열 범위를 벗어난 접근은 정의되지 않은 동작입니다.",
+      "why": "범위 체크는 프로그래머의 책임입니다. C는 검사하지 않습니다."
+    }
+  ],
+  "keyTakeaway": "p++ = 다음 요소로 이동. 배열 순회에 유용"
+}

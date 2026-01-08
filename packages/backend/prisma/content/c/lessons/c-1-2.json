@@ -1,0 +1,88 @@
+{
+  "lessonId": "c-1-2",
+  "title": "변수 초기화와 값 저장",
+  "concept": "int a = 10;은 메모리 할당과 값 저장을 동시에 수행한다",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int b = 20;\n    a = 30;\n    printf(\"a=%d, b=%d\\n\", a, b);\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "변수 선언과 초기화",
+        "explanation": "int a = 10;은 두 가지 작업을 합니다: 1) 4바이트 공간 할당, 2) 그 공간에 10 저장",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "a",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "address": "0x7ffc1000"
+          }
+        ]
+      },
+      {
+        "line": 5,
+        "title": "두 번째 변수 초기화",
+        "explanation": "b도 스택에 연속해서 할당됩니다. 주소가 a보다 낮은 것에 주목하세요 (스택은 아래로 자람).",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "b",
+            "type": "int",
+            "size": 4,
+            "value": 20,
+            "address": "0x7ffc0ffc"
+          }
+        ]
+      },
+      {
+        "line": 6,
+        "title": "값 변경 (재할당)",
+        "explanation": "a = 30;은 a의 메모리 위치(0x7ffc1000)에 새 값 30을 덮어씁니다. 메모리 크기는 변하지 않습니다.",
+        "highlight": [6],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "stack",
+            "name": "a",
+            "type": "int",
+            "size": 4,
+            "value": 30,
+            "previousValue": 10,
+            "address": "0x7ffc1000"
+          }
+        ]
+      },
+      {
+        "line": 7,
+        "title": "값 출력",
+        "explanation": "a=30, b=20이 출력됩니다. 각 변수는 독립적인 메모리 공간을 가집니다.",
+        "highlight": [7],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int x = 5; x = 10; 실행 후 메모리 상태는?",
+    "options": [
+      "x에 5와 10 두 값이 저장됨",
+      "x에 10만 저장됨 (5는 덮어써짐)",
+      "x에 15가 저장됨",
+      "두 개의 x 변수가 생성됨"
+    ],
+    "correctIndex": 1,
+    "explanation": "변수에 새 값을 할당하면 같은 메모리 위치에 덮어씁니다. 이전 값은 사라집니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "변수에 값을 할당할 때마다 새 메모리가 할당된다",
+      "correct": "같은 변수에 값을 재할당하면 같은 메모리 위치에 덮어씁니다.",
+      "why": "변수 이름은 메모리 주소의 별명입니다. 한 번 할당된 주소는 변수가 사라질 때까지 유지됩니다."
+    }
+  ],
+  "keyTakeaway": "변수 = 메모리 주소의 별명, 값 변경 = 같은 위치에 덮어쓰기"
+}

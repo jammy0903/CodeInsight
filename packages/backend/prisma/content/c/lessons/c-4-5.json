@@ -1,0 +1,102 @@
+{
+  "lessonId": "c-4-5",
+  "title": "지역 변수 주소 반환의 위험",
+  "concept": "지역 변수는 함수 종료 시 사라진다. 그 주소를 반환하면 Dangling Pointer가 된다",
+  "content": {
+    "code": "#include <stdio.h>\n\nint* dangerous() {\n    int local = 100;\n    return &local;  // 위험!\n}\n\nint main() {\n    int *p = dangerous();\n    printf(\"*p = %d\\n\", *p);  // 정의되지 않은 동작!\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 9,
+        "title": "dangerous() 호출",
+        "explanation": "dangerous() 함수의 스택 프레임이 생성됩니다.",
+        "highlight": [9, 3],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "dangerous",
+            "type": "frame"
+          }
+        ]
+      },
+      {
+        "line": 4,
+        "title": "지역 변수 생성",
+        "explanation": "local은 dangerous의 스택 프레임에 할당됩니다.",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "local",
+            "type": "int",
+            "size": 4,
+            "value": 100,
+            "address": "0x7ffc0ff0",
+            "frame": "dangerous"
+          }
+        ]
+      },
+      {
+        "line": 5,
+        "title": "지역 변수 주소 반환 (위험!)",
+        "explanation": "&local(0x7ffc0ff0)을 반환합니다. 하지만 이 주소는 곧 무효가 됩니다!",
+        "highlight": [5],
+        "memoryChanges": [],
+        "warning": "지역 변수 주소 반환!"
+      },
+      {
+        "line": 6,
+        "title": "함수 종료 - local 해제!",
+        "explanation": "dangerous() 종료 시 local이 해제됩니다. 0x7ffc0ff0은 이제 쓰레기입니다.",
+        "highlight": [],
+        "memoryChanges": [
+          {
+            "action": "deallocate",
+            "area": "stack",
+            "name": "local",
+            "frame": "dangerous",
+            "danger": true
+          },
+          {
+            "action": "frame_end",
+            "area": "stack",
+            "name": "dangerous"
+          }
+        ]
+      },
+      {
+        "line": 10,
+        "title": "Dangling Pointer 역참조!",
+        "explanation": "p는 해제된 메모리를 가리킵니다. *p의 결과는 예측 불가능합니다. 크래시할 수도 있습니다!",
+        "highlight": [10],
+        "memoryChanges": [],
+        "danger": true
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int* foo() { int x=5; return &x; } 이 코드의 문제는?",
+    "options": [
+      "문법 에러",
+      "x가 복사되어 반환됨",
+      "x의 주소가 함수 종료 후 무효가 됨",
+      "문제없이 정상 동작"
+    ],
+    "correctIndex": 2,
+    "explanation": "지역 변수 x는 함수 종료 시 사라집니다. 그 주소를 반환하면 Dangling Pointer가 됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "지역 변수 주소를 반환해도 된다",
+      "correct": "지역 변수는 함수 종료 시 해제됩니다. 그 주소는 무효가 됩니다.",
+      "why": "스택 메모리는 함수 종료 시 재사용됩니다. 해제된 주소 접근은 정의되지 않은 동작입니다."
+    },
+    {
+      "wrong": "반환 직후에는 값이 남아있으니 괜찮다",
+      "correct": "운이 좋으면 값이 남아있을 수 있지만, 언제든 덮어써질 수 있습니다.",
+      "why": "정의되지 않은 동작은 '어떤 일이든' 일어날 수 있습니다."
+    }
+  ],
+  "keyTakeaway": "지역 변수 주소 반환 = Dangling Pointer. 절대 금지!"
+}

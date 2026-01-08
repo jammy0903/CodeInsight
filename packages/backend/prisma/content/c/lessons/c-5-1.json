@@ -1,0 +1,107 @@
+{
+  "lessonId": "c-5-1",
+  "title": "Stack vs Heap",
+  "concept": "Stack은 자동 관리, Heap은 수동 관리. 용도가 다르다",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    // Stack: 자동 할당/해제\n    int stackVar = 10;\n    \n    // Heap: 수동 할당\n    int *heapVar = malloc(sizeof(int));\n    *heapVar = 20;\n    \n    printf(\"Stack: %d, Heap: %d\\n\", stackVar, *heapVar);\n    \n    // Heap: 수동 해제 (필수!)\n    free(heapVar);\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 6,
+        "title": "Stack 변수",
+        "explanation": "stackVar는 스택에 자동 할당됩니다. 함수 종료 시 자동 해제됩니다.",
+        "highlight": [6],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "stackVar",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "address": "0x7ffc1000",
+            "auto": true
+          }
+        ]
+      },
+      {
+        "line": 9,
+        "title": "Heap 할당 (malloc)",
+        "explanation": "malloc은 Heap에 메모리를 할당하고 그 주소를 반환합니다. heapVar는 이 주소를 저장합니다.",
+        "highlight": [9],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "heapVar",
+            "type": "int*",
+            "size": 8,
+            "value": "0x55001000",
+            "address": "0x7ffc0ff8"
+          },
+          {
+            "action": "allocate",
+            "area": "heap",
+            "name": "(anonymous)",
+            "type": "int",
+            "size": 4,
+            "value": "???",
+            "address": "0x55001000",
+            "manual": true
+          }
+        ]
+      },
+      {
+        "line": 10,
+        "title": "Heap에 값 저장",
+        "explanation": "*heapVar = 20으로 Heap 메모리에 값을 저장합니다.",
+        "highlight": [10],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "heap",
+            "name": "(via heapVar)",
+            "value": 20,
+            "address": "0x55001000"
+          }
+        ]
+      },
+      {
+        "line": 15,
+        "title": "Heap 해제 (free)",
+        "explanation": "free(heapVar)로 Heap 메모리를 반환합니다. 안 하면 Memory Leak!",
+        "highlight": [15],
+        "memoryChanges": [
+          {
+            "action": "deallocate",
+            "area": "heap",
+            "address": "0x55001000"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Stack과 Heap의 차이는?",
+    "options": [
+      "둘 다 자동 관리",
+      "Stack은 자동, Heap은 수동 관리",
+      "Heap이 더 빠르다",
+      "둘 다 수동 관리"
+    ],
+    "correctIndex": 1,
+    "explanation": "Stack은 함수 종료 시 자동 해제. Heap은 free()로 명시적 해제 필요."
+  },
+  "misconceptions": [
+    {
+      "wrong": "malloc 후 free 안 해도 된다",
+      "correct": "프로그램 종료 시 해제되지만, 장시간 실행 프로그램에선 Memory Leak이 됩니다.",
+      "why": "사용 안 하는 메모리가 쌓이면 시스템 메모리가 부족해집니다."
+    },
+    {
+      "wrong": "Stack이 더 크다",
+      "correct": "일반적으로 Heap이 훨씬 큽니다. Stack은 보통 1~8MB 제한.",
+      "why": "큰 데이터는 Heap에 할당해야 합니다."
+    }
+  ],
+  "keyTakeaway": "Stack = 자동 (작은 임시 데이터), Heap = 수동 (큰/장기 데이터)"
+}

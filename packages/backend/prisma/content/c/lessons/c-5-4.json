@@ -1,0 +1,85 @@
+{
+  "lessonId": "c-5-4",
+  "title": "Memory Leak",
+  "concept": "할당 후 free하지 않으면 메모리가 누적되어 시스템 자원을 소진한다",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nvoid leaky() {\n    int *p = malloc(1000);  // 1000 바이트 할당\n    *p = 42;\n    // free(p);  // 실수로 누락!\n}  // p는 사라지지만 Heap 메모리는 남음\n\nint main() {\n    for (int i = 0; i < 1000; i++) {\n        leaky();  // 매번 1KB 누수!\n    }\n    // 약 1MB 메모리 누수 발생\n    printf(\"프로그램 종료\\n\");\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 5,
+        "title": "첫 번째 할당",
+        "explanation": "Heap에 1000바이트가 할당되고 p가 그 주소를 가집니다.",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "heap",
+            "name": "블록 1",
+            "size": 1000,
+            "address": "0x55001000"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "value": "0x55001000",
+            "frame": "leaky"
+          }
+        ]
+      },
+      {
+        "line": 8,
+        "title": "함수 종료 - p만 사라짐",
+        "explanation": "leaky() 종료 시 p(스택)는 사라지지만, Heap 메모리(0x55001000)는 그대로 남습니다. 접근 방법이 사라졌습니다!",
+        "highlight": [8],
+        "memoryChanges": [
+          {
+            "action": "frame_end",
+            "area": "stack",
+            "name": "leaky"
+          },
+          {
+            "action": "leak",
+            "area": "heap",
+            "address": "0x55001000",
+            "size": 1000,
+            "warning": "접근 불가능한 메모리"
+          }
+        ]
+      },
+      {
+        "line": 11,
+        "title": "반복 호출 - 누적 누수",
+        "explanation": "1000번 호출하면 1000 × 1000 = 1,000,000 바이트(약 1MB)가 누수됩니다.",
+        "highlight": [11, 12],
+        "memoryChanges": [
+          {
+            "action": "leak",
+            "area": "heap",
+            "note": "매 호출마다 1KB 추가 누수"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Memory Leak의 정의는?",
+    "options": [
+      "메모리 접근 에러",
+      "할당 후 free하지 않아 접근 불가능한 메모리가 남는 것",
+      "NULL 포인터 접근",
+      "스택 오버플로우"
+    ],
+    "correctIndex": 1,
+    "explanation": "할당된 메모리의 주소를 잃어버려 free할 수 없게 되는 상황입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "프로그램 종료 시 해제되니 free 안 해도 된다",
+      "correct": "장시간 실행 프로그램(서버 등)에서는 메모리가 계속 쌓여 시스템이 느려지거나 크래시합니다.",
+      "why": "서버는 몇 달간 실행될 수 있습니다. 작은 누수도 누적되면 큰 문제가 됩니다."
+    }
+  ],
+  "keyTakeaway": "malloc마다 짝이 되는 free가 있어야 함. 빠뜨리면 누수"
+}

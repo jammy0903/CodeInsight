@@ -1,0 +1,88 @@
+{
+  "lessonId": "c-5-3",
+  "title": "free로 메모리 해제",
+  "concept": "free(ptr)는 malloc으로 할당된 메모리를 시스템에 반환한다",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = malloc(sizeof(int));\n    *p = 100;\n    \n    printf(\"해제 전: *p = %d\\n\", *p);\n    \n    free(p);\n    \n    // p = NULL;  // 좋은 습관!\n    \n    // printf(\"해제 후: *p = %d\\n\", *p);  // 위험!\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 5,
+        "title": "메모리 할당",
+        "explanation": "Heap에 4바이트가 할당되고 p가 그 주소를 가집니다.",
+        "highlight": [5, 6],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "heap",
+            "name": "(malloc)",
+            "type": "int",
+            "size": 4,
+            "value": 100,
+            "address": "0x55001000"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "value": "0x55001000",
+            "pointsTo": "heap"
+          }
+        ]
+      },
+      {
+        "line": 10,
+        "title": "free 호출",
+        "explanation": "free(p)는 0x55001000의 메모리를 시스템에 반환합니다. 하지만 p는 여전히 이 주소를 가리킵니다!",
+        "highlight": [10],
+        "memoryChanges": [
+          {
+            "action": "deallocate",
+            "area": "heap",
+            "address": "0x55001000",
+            "warning": "p는 여전히 이 주소를 가리킴"
+          }
+        ]
+      },
+      {
+        "line": 12,
+        "title": "p = NULL 권장",
+        "explanation": "free 후 p = NULL;로 설정하면 Dangling Pointer 문제를 방지할 수 있습니다.",
+        "highlight": [12],
+        "memoryChanges": []
+      },
+      {
+        "line": 14,
+        "title": "해제 후 접근 (위험!)",
+        "explanation": "free 후 *p 접근은 정의되지 않은 동작입니다. 크래시하거나 이상한 값이 나올 수 있습니다.",
+        "highlight": [14],
+        "danger": true,
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "free(p) 후 p의 값은?",
+    "options": [
+      "NULL",
+      "0",
+      "변하지 않음 (이전 주소 그대로)",
+      "쓰레기 값"
+    ],
+    "correctIndex": 2,
+    "explanation": "free는 메모리만 해제하고 p의 값은 변경하지 않습니다. 그래서 p = NULL;을 권장합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "free 후 포인터가 자동으로 NULL이 된다",
+      "correct": "free는 메모리만 해제합니다. 포인터 값은 변하지 않아 Dangling Pointer가 됩니다.",
+      "why": "free는 포인터의 값을 수정할 방법이 없습니다. 직접 NULL로 설정해야 합니다."
+    },
+    {
+      "wrong": "free(NULL)은 에러다",
+      "correct": "free(NULL)은 안전하게 아무 일도 하지 않습니다.",
+      "why": "C 표준에서 free(NULL)은 정의된 동작입니다."
+    }
+  ],
+  "keyTakeaway": "free 후 p = NULL; 습관화. Dangling Pointer 방지"
+}

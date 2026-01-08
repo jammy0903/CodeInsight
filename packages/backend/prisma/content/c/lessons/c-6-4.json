@@ -1,0 +1,100 @@
+{
+  "lessonId": "c-6-4",
+  "title": "구조체 포인터와 화살표 연산자",
+  "concept": "p->member는 (*p).member의 편리한 표기법이다",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    struct Point p = {10, 20};\n    struct Point *ptr = &p;\n    \n    // 점(.) 연산자\n    printf(\"p.x = %d\\n\", p.x);\n    \n    // 역참조 후 점\n    printf(\"(*ptr).x = %d\\n\", (*ptr).x);\n    \n    // 화살표 연산자 (더 편리!)\n    printf(\"ptr->x = %d\\n\", ptr->x);\n    \n    // 값 변경\n    ptr->y = 100;\n    printf(\"p.y = %d\\n\", p.y);\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 10,
+        "title": "구조체 생성",
+        "explanation": "p는 스택에 생성됩니다. x=10, y=20으로 초기화됩니다.",
+        "highlight": [10],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "struct Point",
+            "size": 8,
+            "value": "{x:10, y:20}",
+            "address": "0x7ffc1000"
+          }
+        ]
+      },
+      {
+        "line": 11,
+        "title": "구조체 포인터",
+        "explanation": "ptr은 p의 주소를 저장합니다. ptr이 p를 가리킵니다.",
+        "highlight": [11],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "ptr",
+            "type": "struct Point*",
+            "size": 8,
+            "value": "0x7ffc1000",
+            "pointsTo": "p"
+          }
+        ]
+      },
+      {
+        "line": 14,
+        "title": "점(.) 연산자",
+        "explanation": "구조체 변수에서 멤버에 접근할 때 p.x를 사용합니다.",
+        "highlight": [14],
+        "memoryChanges": []
+      },
+      {
+        "line": 17,
+        "title": "역참조 후 점",
+        "explanation": "(*ptr).x는 '포인터 따라가서 구조체 얻고, 그 멤버 x 접근'입니다. 괄호가 필수!",
+        "highlight": [17],
+        "memoryChanges": []
+      },
+      {
+        "line": 20,
+        "title": "화살표 연산자",
+        "explanation": "ptr->x는 (*ptr).x와 동일합니다. 더 읽기 쉽고 편리합니다!",
+        "highlight": [20],
+        "memoryChanges": []
+      },
+      {
+        "line": 23,
+        "title": "포인터로 값 변경",
+        "explanation": "ptr->y = 100으로 p.y가 변경됩니다. 포인터를 통한 간접 수정!",
+        "highlight": [23, 24],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "stack",
+            "name": "p.y",
+            "value": 100,
+            "previousValue": 20,
+            "updatedVia": "ptr"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "struct S { int a; }; struct S *p; p->a와 동일한 표현은?",
+    "options": [
+      "*p.a",
+      "(*p).a",
+      "p.a",
+      "*p->a"
+    ],
+    "correctIndex": 1,
+    "explanation": "p->a == (*p).a. 연산자 우선순위 때문에 (*p)를 괄호로 묶어야 합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "*p.a로 멤버에 접근할 수 있다",
+      "correct": ".가 *보다 우선순위가 높아서 *(p.a)로 해석됩니다. (*p).a 또는 p->a를 써야 합니다.",
+      "why": "연산자 우선순위: . > *. 괄호 없이는 의도와 다르게 동작합니다."
+    }
+  ],
+  "keyTakeaway": "포인터→멤버 접근: ptr->member == (*ptr).member"
+}

@@ -1,0 +1,79 @@
+{
+  "lessonId": "c-8-1",
+  "code": "int a = 10;\nint *p = &a;\nint **pp = &p;",
+  "steps": [
+    {
+      "line": 1,
+      "explanation": "변수 a를 선언하고 10으로 초기화합니다. Stack에 4바이트가 할당되고 정수 값 10이 저장됩니다.",
+      "memoryState": {
+        "stack": [
+          {
+            "name": "a",
+            "value": 10,
+            "address": "0x1000",
+            "type": "int"
+          }
+        ]
+      }
+    },
+    {
+      "line": 2,
+      "explanation": "포인터 p를 선언하고 a의 주소로 초기화합니다. p는 Stack에 저장되며, a의 메모리 주소(0x1000)를 값으로 가집니다.",
+      "memoryState": {
+        "stack": [
+          {
+            "name": "a",
+            "value": 10,
+            "address": "0x1000",
+            "type": "int"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "address": "0x1004",
+            "type": "int*"
+          }
+        ]
+      }
+    },
+    {
+      "line": 3,
+      "explanation": "이중 포인터 pp를 선언하고 p의 주소로 초기화합니다. pp는 포인터의 포인터로, p의 주소(0x1004)를 값으로 가집니다. pp → p → a 의 관계가 형성됩니다.",
+      "misconception": "많은 사람들이 이중 포인터를 복잡하게 생각하지만, 사실 pp도 그냥 주소를 저장하는 변수입니다. 단지 그 주소가 '포인터 변수의 주소'일 뿐입니다. *pp는 p의 값(0x1000)이고, **pp는 a의 값(10)입니다.",
+      "memoryState": {
+        "stack": [
+          {
+            "name": "a",
+            "value": 10,
+            "address": "0x1000",
+            "type": "int"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "address": "0x1004",
+            "type": "int*"
+          },
+          {
+            "name": "pp",
+            "value": "0x1004",
+            "address": "0x1008",
+            "type": "int**"
+          }
+        ]
+      }
+    }
+  ],
+  "quizzes": [
+    {
+      "question": "`**pp`의 값은?",
+      "options": [
+        "0x1000",
+        "0x1004",
+        "10"
+      ],
+      "correctAnswer": 2,
+      "explanation": "**pp를 단계별로 풀어보면: pp는 0x1004(p의 주소)를 가리킵니다. *pp는 pp가 가리키는 위치(0x1004)에 저장된 값, 즉 p의 값인 0x1000을 반환합니다. **pp는 *pp(0x1000)가 가리키는 위치에 저장된 값, 즉 a의 값인 10을 반환합니다. 따라서 **pp = 10입니다."
+    }
+  ]
+}

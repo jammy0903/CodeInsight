@@ -1,8 +1,18 @@
 #!/bin/bash
 
+# ========================================
 # CodeInsight Development Server Starter
-# Backend (3002) -> Frontend (5174) 순차 실행
-# 포트 충돌 시 자동 kill
+# ========================================
+# ⚠️  개발(development) 환경 전용 스크립트입니다.
+#
+# 프로덕션(production) 배포는:
+#   docker compose up -d 명령어를 사용하세요!
+#
+# 이 스크립트는:
+#   - Backend (3002) -> Frontend (5174) 순차 실행
+#   - 포트 충돌 시 자동 kill
+#   - Ctrl+C로 종료
+# ========================================
 
 set -e
 
@@ -54,14 +64,14 @@ kill_port $FRONTEND_PORT
 
 # Backend 실행
 echo -e "\n${CYAN}[2/4] Backend 시작 중... (port $BACKEND_PORT)${NC}"
-cd "$PROJECT_DIR/backend"
+cd "$PROJECT_DIR/packages/backend"
 
 if [ ! -d "node_modules" ]; then
-    echo -e "${YELLOW}[!] node_modules 없음 - npm install 실행${NC}"
-    npm install
+    echo -e "${YELLOW}[!] node_modules 없음 - pnpm install 실행${NC}"
+    pnpm install
 fi
 
-npm run dev &
+pnpm run dev &
 BACKEND_PID=$!
 
 # Backend 준비 대기
@@ -79,14 +89,19 @@ done
 
 # Frontend 실행
 echo -e "\n${CYAN}[3/4] Frontend 시작 중... (port $FRONTEND_PORT)${NC}"
-cd "$PROJECT_DIR/frontend"
+cd "$PROJECT_DIR/packages/frontend"
 
 if [ ! -d "node_modules" ]; then
-    echo -e "${YELLOW}[!] node_modules 없음 - npm install 실행${NC}"
-    npm install
+    echo -e "${YELLOW}[!] node_modules 없음 - pnpm install 실행${NC}"
+    pnpm install
 fi
 
-npm run dev &
+# Vite 캐시 삭제 (shared 패키지 변경 반영)
+echo -e "${YELLOW}[...] Vite 캐시 삭제 중...${NC}"
+rm -rf node_modules/.vite .vite 2>/dev/null || true
+echo -e "${GREEN}[✓] 캐시 삭제 완료${NC}"
+
+pnpm run dev &
 FRONTEND_PID=$!
 
 # Frontend 준비 대기

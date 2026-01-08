@@ -8,10 +8,10 @@
 # Backend (port 3000)
 cd backend-node && npm run dev
 
-# Frontend (port 5173)
+# Frontend (port 5174)
 cd frontend && npm run dev
 
-# Ollama (port 11434)
+# Ollama (port 5044)
 ollama serve
 ```
 

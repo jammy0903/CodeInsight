@@ -1,0 +1,83 @@
+{
+  "lessonId": "c-3-3",
+  "title": "배열과 포인터의 차이",
+  "concept": "배열 이름은 포인터로 decay되지만, 배열 자체는 포인터가 아니다",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[5] = {1, 2, 3, 4, 5};\n    int *p = arr;\n    \n    printf(\"sizeof(arr) = %lu\\n\", sizeof(arr));\n    printf(\"sizeof(p) = %lu\\n\", sizeof(p));\n    \n    // arr = p;  // 에러! 배열은 재할당 불가\n    p = arr;     // OK\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "배열 생성",
+        "explanation": "arr은 5개 int의 배열입니다. sizeof(arr) = 20바이트 (4×5)",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "arr",
+            "type": "int[5]",
+            "size": 20,
+            "value": "[1,2,3,4,5]",
+            "address": "0x7ffc1000"
+          }
+        ]
+      },
+      {
+        "line": 5,
+        "title": "포인터에 배열 할당",
+        "explanation": "배열 이름 arr은 첫 요소 주소로 'decay'됩니다. p = &arr[0]과 동일.",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "size": 8,
+            "value": "0x7ffc1000",
+            "address": "0x7ffc0ff8",
+            "pointsTo": "arr[0]"
+          }
+        ]
+      },
+      {
+        "line": 7,
+        "title": "sizeof 차이 확인",
+        "explanation": "sizeof(arr)=20 (전체 배열), sizeof(p)=8 (포인터). 배열은 크기 정보를 유지합니다!",
+        "highlight": [7, 8],
+        "memoryChanges": []
+      },
+      {
+        "line": 10,
+        "title": "배열은 상수!",
+        "explanation": "arr = p는 에러입니다. 배열 이름은 고정된 주소이며 변경할 수 없습니다.",
+        "highlight": [10, 11],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int arr[10]; int *p = arr; 에서 sizeof(arr)과 sizeof(p)의 차이는?",
+    "options": [
+      "둘 다 8",
+      "40과 8",
+      "10과 8",
+      "둘 다 40"
+    ],
+    "correctIndex": 1,
+    "explanation": "sizeof(arr)=40 (4×10), sizeof(p)=8 (포인터 크기). 배열과 포인터는 다릅니다!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "배열은 포인터다",
+      "correct": "배열은 포인터로 'decay'될 수 있지만, 배열 자체는 포인터가 아닙니다.",
+      "why": "sizeof, &연산, 할당 가능 여부에서 차이가 납니다."
+    },
+    {
+      "wrong": "sizeof(배열)은 sizeof(포인터)와 같다",
+      "correct": "sizeof(배열)은 전체 크기, sizeof(포인터)는 항상 8 (64비트).",
+      "why": "배열은 크기 정보를 가지고 있습니다. decay되면 이 정보를 잃습니다."
+    }
+  ],
+  "keyTakeaway": "배열 ≠ 포인터. decay 시 크기 정보 손실"
+}

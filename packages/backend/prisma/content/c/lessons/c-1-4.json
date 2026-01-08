@@ -1,0 +1,116 @@
+{
+  "lessonId": "c-1-4",
+  "title": "스택 메모리와 변수 생명주기",
+  "concept": "지역 변수는 함수가 끝나면 자동으로 사라진다 (스택에서 해제)",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid foo() {\n    int local = 100;\n    printf(\"foo 안: local=%d\\n\", local);\n}\n\nint main() {\n    int x = 10;\n    foo();\n    printf(\"main: x=%d\\n\", x);\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 9,
+        "title": "main 시작 - 스택 프레임 생성",
+        "explanation": "main() 함수가 시작되면 스택에 main의 프레임이 생성되고, x가 할당됩니다.",
+        "highlight": [9],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "x",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "address": "0x7ffc2000",
+            "frame": "main"
+          }
+        ]
+      },
+      {
+        "line": 10,
+        "title": "foo() 호출 - 새 스택 프레임",
+        "explanation": "foo()가 호출되면 main 위에 foo의 스택 프레임이 쌓입니다.",
+        "highlight": [10, 3],
+        "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "foo",
+            "type": "frame"
+          }
+        ]
+      },
+      {
+        "line": 4,
+        "title": "foo 안에서 local 생성",
+        "explanation": "local은 foo의 스택 프레임 안에 할당됩니다. main의 x와는 완전히 별개입니다.",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "local",
+            "type": "int",
+            "size": 4,
+            "value": 100,
+            "address": "0x7ffc1ff0",
+            "frame": "foo"
+          }
+        ]
+      },
+      {
+        "line": 6,
+        "title": "foo 종료 - 스택 프레임 해제",
+        "explanation": "foo()가 끝나면 foo의 스택 프레임 전체가 해제됩니다. local도 함께 사라집니다.",
+        "highlight": [6],
+        "memoryChanges": [
+          {
+            "action": "deallocate",
+            "area": "stack",
+            "name": "local",
+            "frame": "foo"
+          },
+          {
+            "action": "frame_end",
+            "area": "stack",
+            "name": "foo"
+          }
+        ]
+      },
+      {
+        "line": 11,
+        "title": "main으로 복귀",
+        "explanation": "main의 x는 여전히 존재합니다. 각 함수의 지역 변수는 독립적입니다.",
+        "highlight": [11],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "foo() 함수가 끝난 후 local 변수는?",
+    "options": [
+      "여전히 메모리에 남아있다",
+      "0으로 초기화된다",
+      "메모리에서 해제된다",
+      "main에서 접근할 수 있다"
+    ],
+    "correctIndex": 2,
+    "explanation": "지역 변수는 함수가 끝나면 스택에서 자동 해제됩니다. 이것이 '지역' 변수라 불리는 이유입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "지역 변수는 프로그램이 끝날 때까지 남아있다",
+      "correct": "지역 변수는 해당 함수가 끝나면 즉시 해제됩니다.",
+      "why": "스택 메모리는 함수 호출/종료와 함께 자동 관리됩니다. 이것이 스택의 장점입니다."
+    },
+    {
+      "wrong": "함수가 끝나도 지역 변수의 주소로 접근할 수 있다",
+      "correct": "해제된 메모리 접근은 정의되지 않은 동작(Undefined Behavior)입니다.",
+      "why": "해당 메모리는 다음 함수 호출에서 재사용될 수 있습니다."
+    }
+  ],
+  "keyTakeaway": "스택 = 자동 메모리 관리, 함수 끝 = 지역 변수 해제"
+}

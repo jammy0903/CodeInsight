@@ -1,0 +1,92 @@
+{
+  "lessonId": "c-2-2",
+  "title": "포인터 선언과 할당",
+  "concept": "포인터는 주소를 저장하는 변수다. 선언만으로는 가리킬 대상이 없다 (Two-Level 개념)",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p;\n    \n    p = &a;\n    \n    printf(\"a의 값: %d\\n\", a);\n    printf(\"p의 값: %p\\n\", p);\n    printf(\"a의 주소: %p\\n\", &a);\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "일반 변수 생성",
+        "explanation": "a는 값 10을 저장합니다. 이것이 나중에 포인터가 '가리킬 대상'(pointee)이 됩니다.",
+        "highlight": [4],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "a",
+            "type": "int",
+            "size": 4,
+            "value": 10,
+            "address": "0x7ffc1000"
+          }
+        ]
+      },
+      {
+        "line": 5,
+        "title": "포인터 선언 (Two-Level: Level 1만 존재)",
+        "explanation": "int *p;는 '정수의 주소를 저장할 수 있는' 변수 p를 만듭니다. 아직 p는 아무것도 가리키지 않습니다!",
+        "highlight": [5],
+        "memoryChanges": [
+          {
+            "action": "allocate",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "size": 8,
+            "value": "??? (쓰레기)",
+            "address": "0x7ffc0ff8"
+          }
+        ]
+      },
+      {
+        "line": 7,
+        "title": "포인터에 주소 할당 (Two-Level 완성)",
+        "explanation": "p = &a;로 p에 a의 주소를 저장합니다. 이제 p는 a를 '가리킵니다'. Two-Level이 완성됩니다!",
+        "highlight": [7],
+        "memoryChanges": [
+          {
+            "action": "update",
+            "area": "stack",
+            "name": "p",
+            "type": "int*",
+            "value": "0x7ffc1000",
+            "previousValue": "???",
+            "pointsTo": "a"
+          }
+        ]
+      },
+      {
+        "line": 10,
+        "title": "p의 값 = a의 주소",
+        "explanation": "p에 저장된 값은 0x7ffc1000, 이것은 a의 주소와 같습니다.",
+        "highlight": [10, 11],
+        "memoryChanges": []
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int *p; 선언 직후 p는 무엇을 가리키는가?",
+    "options": [
+      "NULL",
+      "0",
+      "아무것도 가리키지 않음 (쓰레기 주소)",
+      "자기 자신"
+    ],
+    "correctIndex": 2,
+    "explanation": "초기화 없이 선언된 포인터는 쓰레기 값(임의의 주소)을 가집니다. 이 상태에서 역참조하면 위험합니다!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "int *p; 선언으로 p가 가리킬 메모리가 자동 생성된다",
+      "correct": "포인터 선언은 '주소를 저장할 공간'만 만듭니다. 가리킬 대상은 따로 만들어야 합니다.",
+      "why": "Stanford의 Two-Level 개념: 포인터(주소 저장 공간) + 포인티(실제 데이터) 둘 다 필요합니다."
+    },
+    {
+      "wrong": "*는 포인터를 선언할 때만 사용한다",
+      "correct": "*는 선언 시 '포인터 타입'을 표시하고, 사용 시 '역참조'를 의미합니다.",
+      "why": "같은 기호가 문맥에 따라 다른 의미를 가집니다."
+    }
+  ],
+  "keyTakeaway": "포인터 선언 ≠ 가리킬 대상 생성. 둘 다 필요 (Two-Level)"
+}
