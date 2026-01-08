@@ -1,15 +1,26 @@
 /**
- * CourseMemoryView - 통합 메모리 테이블 시각화
+ * CourseMemoryView - 메모리 시각화 (변수 vs 메모리 분리)
  *
- * 레이아웃:
- * - Stack과 Heap을 하나의 테이블로 통합
- * - 컬럼 순서: 주소 → 변수 → 값 → ptr → 역할 → 세그먼트
- * - 실제 메모리 배치: Stack(높은주소→낮은주소), Heap(낮은주소→높은주소)
- * - 오른쪽에 성장 방향 라벨
+ * 새로운 레이아웃:
+ * 1. VariablesPanel (상단) - 변수는 메모리에 저장되지 않음 (단순 별칭)
+ * 2. MemoryPanel (하단) - Stack/Heap 명확히 분리, 실제 메모리 블록 표시
+ * 3. PointerLines (오버레이) - 변수 → 메모리 연결선
+ *
+ * 핵심 개념:
+ * - 변수 = 메모리 주소의 값을 참조하는 이름 (메모리에 저장 안 됨)
+ * - 메모리 = 실제 값이 저장되는 곳 (주소 + 값)
+ * - 포인터 = 주소를 값으로 갖는 변수
+ *
+ * 색상 체계: 연한 형광펜 느낌 (light neon highlighter)
+ * - Stack: 부드러운 보라색 계열
+ * - Heap: 부드러운 초록색 계열
+ * - 포인터: 밝은 오렌지/시안/핑크 계열
+ * - 변경: 밝은 노란색
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { SEGMENT_COLORS, getPointerColor } from '@/features/visualizers/c/constants';
+import { useState } from 'react';
+import { VariablesPanel } from './VariablesPanel';
+import { MemoryPanel } from './MemoryPanel';
 import type { LessonMemoryBlock } from '../../hooks/useLessonMemory';
 
 interface CourseMemoryViewProps {
@@ -18,225 +29,30 @@ interface CourseMemoryViewProps {
   changedBlocks: string[];
 }
 
-interface MemoryRowProps {
-  block: LessonMemoryBlock;
-  isChanged: boolean;
-  segmentType: 'stack' | 'heap';
-  pointerIndex?: number;
-}
-
-/**
- * 단일 메모리 행
- * 컬럼 순서: 주소 | 변수 | 값 | ptr | 역할 | 세그먼트
- */
-function MemoryRow({ block, isChanged, segmentType, pointerIndex }: MemoryRowProps) {
-  const colors = SEGMENT_COLORS[segmentType];
-  const isPointer = block.points_to !== null;
-  const pointerColor = isPointer && pointerIndex !== undefined
-    ? getPointerColor(pointerIndex)
-    : null;
-
-  // 역할 결정
-  const getRole = () => {
-    if (segmentType === 'heap') return 'malloc';
-    if (isPointer) return 'ptr';
-    return 'var';
-  };
-
-  return (
-    <motion.tr
-      layout
-      initial={{ opacity: 0, x: -10 }}
-      animate={{
-        opacity: 1,
-        x: 0,
-        backgroundColor: isChanged ? 'rgba(250, 204, 21, 0.3)' : 'transparent',
-      }}
-      exit={{ opacity: 0, x: -10 }}
-      transition={{ duration: 0.3 }}
-      className="border-b border-gray-200 hover:bg-gray-50"
-    >
-      {/* 주소 */}
-      <td className="px-3 py-2 font-mono text-xs text-gray-500">
-        {block.address}
-      </td>
-
-      {/* 변수 */}
-      <td
-        className="px-3 py-2 font-mono font-semibold text-sm"
-        style={{ color: pointerColor?.main || colors.main }}
-      >
-        {block.name}
-        {isChanged && (
-          <motion.span
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-yellow-400"
-          />
-        )}
-      </td>
-
-      {/* 값 */}
-      <td className="px-3 py-2 font-mono text-sm text-gray-800">
-        {block.value}
-      </td>
-
-      {/* ptr (포인터 화살표) */}
-      <td className="px-3 py-2 text-center">
-        {isPointer && (
-          <span
-            className="text-sm font-bold"
-            style={{ color: pointerColor?.main || '#f97316' }}
-          >
-            → {block.points_to}
-          </span>
-        )}
-      </td>
-
-      {/* 역할 */}
-      <td className="px-3 py-2 text-xs text-gray-600">
-        {getRole()}
-      </td>
-
-      {/* 세그먼트 */}
-      <td className="px-3 py-2">
-        <span
-          className="px-2 py-0.5 rounded text-xs font-medium"
-          style={{
-            backgroundColor: colors.bg,
-            color: colors.main,
-            border: `1px solid ${colors.border}`,
-          }}
-        >
-          {segmentType === 'stack' ? 'Stack' : 'Heap'}
-        </span>
-      </td>
-    </motion.tr>
-  );
-}
-
-/**
- * 성장 방향 라벨
- */
-function GrowthLabel({ type, rowCount }: { type: 'stack' | 'heap'; rowCount: number }) {
-  const isStack = type === 'stack';
-  const colors = SEGMENT_COLORS[type];
-
-  if (rowCount === 0) return null;
-
-  return (
-    <div
-      className="flex flex-col items-center justify-center px-2 text-xs"
-      style={{ color: colors.main }}
-    >
-      <span className="font-semibold">{isStack ? 'Stack' : 'Heap'}</span>
-      <span className="text-gray-500">{isStack ? '높은주소' : '낮은주소'}</span>
-      <span className="text-lg">{isStack ? '↓' : '↑'}</span>
-      <span className="text-gray-500">{isStack ? '낮은주소' : '높은주소'}</span>
-    </div>
-  );
-}
-
 export function CourseMemoryView({
   stack,
   heap,
   changedBlocks,
 }: CourseMemoryViewProps) {
-  // 포인터 인덱스 계산 (포인터 색상 구분용)
-  const allBlocks = [...stack, ...heap];
-  const pointerBlocks = allBlocks.filter((b) => b.points_to !== null);
-  const getPointerIndex = (block: LessonMemoryBlock) => {
-    if (block.points_to === null) return undefined;
-    return pointerBlocks.findIndex((p) => p.name === block.name);
-  };
-
-  // Stack: 주소 내림차순 (높은 주소가 위, 낮은 주소가 아래)
-  const sortedStack = [...stack].sort((a, b) => {
-    const addrA = parseInt(a.address, 16);
-    const addrB = parseInt(b.address, 16);
-    return addrB - addrA; // 내림차순
-  });
-
-  // Heap: 주소 오름차순 (낮은 주소가 위, 높은 주소가 아래)
-  const sortedHeap = [...heap].sort((a, b) => {
-    const addrA = parseInt(a.address, 16);
-    const addrB = parseInt(b.address, 16);
-    return addrA - addrB; // 오름차순
-  });
-
-  const isEmpty = stack.length === 0 && heap.length === 0;
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
 
   return (
-    <div className="h-full flex gap-2 overflow-auto p-2">
-      {/* 메인 테이블 */}
-      <div className="flex-1 overflow-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-100 border-b-2 border-gray-300">
-              <th className="px-3 py-2 text-xs font-bold text-gray-700 uppercase tracking-wide">주소</th>
-              <th className="px-3 py-2 text-xs font-bold text-gray-700 uppercase tracking-wide">변수</th>
-              <th className="px-3 py-2 text-xs font-bold text-gray-700 uppercase tracking-wide">값</th>
-              <th className="px-3 py-2 text-xs font-bold text-gray-700 uppercase tracking-wide text-center">ptr</th>
-              <th className="px-3 py-2 text-xs font-bold text-gray-700 uppercase tracking-wide">역할</th>
-              <th className="px-3 py-2 text-xs font-bold text-gray-700 uppercase tracking-wide">세그먼트</th>
-            </tr>
-          </thead>
-          <tbody>
-            <AnimatePresence>
-              {isEmpty ? (
-                <motion.tr key="empty-row" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <td colSpan={6} className="text-sm text-gray-500 italic py-8 text-center">
-                    메모리 할당 없음
-                  </td>
-                </motion.tr>
-              ) : (
-                [
-                  /* Stack 영역 */
-                  ...sortedStack.map((block) => (
-                    <MemoryRow
-                      key={`stack-${block.name}`}
-                      block={block}
-                      isChanged={changedBlocks.includes(block.name)}
-                      segmentType="stack"
-                      pointerIndex={getPointerIndex(block)}
-                    />
-                  )),
+    <div className="h-full flex flex-col bg-white">
+      {/* 상단: 변수 영역 (메모리 아님) */}
+      <VariablesPanel
+        stack={stack}
+        heap={heap}
+        changedBlocks={changedBlocks}
+        onVariableHover={setHoveredVariable}
+      />
 
-                  /* 구분선 (Stack과 Heap 사이) */
-                  ...(stack.length > 0 && heap.length > 0
-                    ? [
-                        <motion.tr key="divider" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <td colSpan={6} className="py-2">
-                            <div className="border-t-2 border-dashed border-gray-300" />
-                          </td>
-                        </motion.tr>,
-                      ]
-                    : []),
-
-                  /* Heap 영역 */
-                  ...sortedHeap.map((block) => (
-                    <MemoryRow
-                      key={`heap-${block.name}`}
-                      block={block}
-                      isChanged={changedBlocks.includes(block.name)}
-                      segmentType="heap"
-                      pointerIndex={getPointerIndex(block)}
-                    />
-                  )),
-                ]
-              )}
-            </AnimatePresence>
-          </tbody>
-        </table>
-      </div>
-
-      {/* 오른쪽 성장 방향 라벨 */}
-      {!isEmpty && (
-        <div className="flex flex-col justify-between shrink-0 border-l border-gray-200 pl-2">
-          <GrowthLabel type="stack" rowCount={stack.length} />
-          <GrowthLabel type="heap" rowCount={heap.length} />
-        </div>
-      )}
+      {/* 하단: 메모리 영역 (실제 값 저장) */}
+      <MemoryPanel
+        stack={stack}
+        heap={heap}
+        changedBlocks={changedBlocks}
+        hoveredVariable={hoveredVariable}
+      />
     </div>
   );
 }

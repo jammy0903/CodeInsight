@@ -137,45 +137,6 @@ function convertToVisualFormat(
   return state;
 }
 
-/**
- * 현재 스텝에서 변경된 블록 이름 추출
- */
-function getChangedBlockNames(changes: StepMemoryState | undefined): string[] {
-  if (!changes) return [];
-
-  const names: string[] = [];
-
-  if (changes.stack) {
-    if (Array.isArray(changes.stack)) {
-      // 누적 형식
-      for (const frame of changes.stack) {
-        for (const v of frame.variables) {
-          if (v.highlight) {
-            names.push(`${frame.name}.${v.name}`);
-          }
-        }
-      }
-    } else if (typeof changes.stack === 'object') {
-      // 액션 형식 - 액션이 있으면 해당 변수가 변경된 것
-      const stack = changes.stack as ActionBasedStackChange;
-      if (stack.name && (stack.action === 'add_variable' || stack.action === 'update_variable')) {
-        names.push(stack.name);
-      }
-    }
-  }
-
-  // Heap에서 highlight된 객체
-  if (changes.heap && Array.isArray(changes.heap)) {
-    for (const h of changes.heap) {
-      if (h.highlight) {
-        names.push(h.id || h.address || '');
-      }
-    }
-  }
-
-  return names;
-}
-
 export interface UseLessonMemoryReturn {
   memoryState: LessonMemoryState;
   changedBlocks: string[];

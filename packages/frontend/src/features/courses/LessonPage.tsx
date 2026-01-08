@@ -260,7 +260,7 @@ export function LessonPage() {
 
   // 경로
   const languageCoursePath = `/courses/${lang}`;
-  const nextLessonPath = nextLessonId ? `/courses/${lang}/${lesson.chapterId}/${nextLessonId}` : null;
+  const nextLessonPath = nextLessonId && lesson ? `/courses/${lang}/${lesson.chapterId}/${nextLessonId}` : null;
 
   // 퀴즈 핸들러
   const handleQuizComplete = (isCorrect: boolean) => {

@@ -22,7 +22,7 @@ export function ChapterAccordion({
   defaultOpen = false,
   isLocked = false,
   isActive = false,
-  stageNum,
+  stageNum: _stageNum,
 }: ChapterAccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
