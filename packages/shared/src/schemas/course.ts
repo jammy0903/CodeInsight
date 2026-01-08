@@ -86,7 +86,7 @@ export const HeapObjectSchema = z.object({
   address: z.string().optional(),    // 메모리 주소 (표시용)
   type: z.string(),                  // "String", "int[]", "Person"
   value: z.union([z.string(), z.number()]).optional(),
-  fields: z.record(z.unknown()).optional(),
+  fields: z.record(z.string(), z.unknown()).optional(),
   highlight: z.boolean().optional(),
 });
 

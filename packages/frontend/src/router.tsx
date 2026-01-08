@@ -9,6 +9,7 @@ import { MainLayout } from './layouts';
 import { HomePage } from './features/home';
 import { AuthPage } from './features/auth';
 import { CoursesPage, LanguageCoursePage, ChapterLessonsPage, LessonPage } from './features/courses';
+import { PlaygroundPage } from './features/playground';
 import { AdminPage, AdminRoute } from './features/admin';
 import { initializeAuthListener } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
@@ -63,6 +64,7 @@ export const router = createBrowserRouter([
       { path: 'courses/:lang', element: <LanguageCoursePage /> },
       { path: 'courses/:lang/:chapterId', element: <ChapterLessonsPage /> },
       { path: 'courses/:lang/:chapterId/:lessonId', element: <LessonPage /> },
+      { path: 'playground', element: <PlaygroundPage /> },
       { path: 'admin', element: <AdminRoute><AdminPage /></AdminRoute> },
     ],
   },

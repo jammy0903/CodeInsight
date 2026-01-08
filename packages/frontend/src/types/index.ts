@@ -5,6 +5,7 @@
  * Usage:
  *   import { Step, Message, Chapter, Lesson } from '@/types';
  *   import type { MemoryBlock, LessonStep } from '@/types';
+ *   import type { CStep, PyStep, SupportedLanguage } from '@/types';
  */
 
 // === Memory Types (실시간 트레이서용) ===
@@ -13,6 +14,61 @@ export type {
   Step,           // 실시간 트레이서 스텝
   TraceResult,
 } from './memory';
+
+// === Simulator Types (Playground용) ===
+export type {
+  Simulator,
+  CodeHandler,
+  HandlerRegistry,
+  SupportedLanguage,
+  BaseStep,
+  BaseChange,
+  HexAddress,
+  ObjectId,
+} from './simulator';
+
+// === C Simulator Types ===
+export type {
+  CSegmentType,
+  CMemoryBlock,
+  CParamDef,
+  CFunctionDef,
+  CCallFrame,
+  CFieldDef,
+  CStructDef,
+  CVariable,
+  CSimContext,
+  CChangeType,
+  CChange,
+  CStep,
+  CCodeHandler,
+} from './c-simulator';
+
+// === Python Simulator Types ===
+export type {
+  PyPrimitiveType,
+  PyCollectionType,
+  PyAdvancedType,
+  PyType,
+  PyPrimitiveValue,
+  PyObjectRef,
+  PyValue,
+  PyScope,
+  PyName,
+  PyObject,
+  PyCallFrame,
+  PySimContext,
+  PyChangeType,
+  PyChange,
+  PyStep,
+  PyCodeHandler,
+} from './py-simulator';
+
+export {
+  isPrimitiveType,
+  isCollectionType,
+  isImmutableType,
+} from './py-simulator';
 
 // === Common Types ===
 export type {

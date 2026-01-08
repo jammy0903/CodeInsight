@@ -39,35 +39,58 @@
 
 ## 현재 진행 중
 
-### 1. CourseMemoryView → 독립 페이지 + 사이드바 (예정)
-- [ ] MemoryVisualizerPage 또는 MemoryPage 생성
-- [ ] CourseMemoryView를 메인 컴포넌트로 활용
-- [ ] Sidebar에 "Memory" 메뉴 추가
-- [ ] 학습 중이 아닐 때도 메모리 상태 볼 수 있게
+### 🎯 Playground + 멀티언어 시각화 (설계 문서: `docs/logic/SIMULATOR_EXTENSION.md`)
 
-### 2. Python Executor 구현 (Phase 3)
-- [ ] PythonExecutor 클래스 생성
-- [ ] subprocess로 python 실행
-- [ ] 보안 정책 (Python 전용)
-- [ ] IExecutor 구현
+#### Phase 1: 기반 + C MVP (2주)
+- [ ] **1주차: 기반 구축**
+  - [ ] 공통 인터페이스 정의 (`types/simulator.ts`)
+  - [ ] Zustand 스토어 (`playgroundStore.ts`)
+  - [ ] PlaygroundPage 기본 레이아웃
+  - [ ] CodeEditor (Monaco) 연동
+  - [ ] LanguageTabs (C/Python/Java)
+  - [ ] StepControls (◀ ▶ Reset)
 
-### 3. Java Executor 구현 (Phase 3)
-- [ ] JavaExecutor 클래스 생성
-- [ ] javac + java subprocess
-- [ ] 보안 정책 (Java 전용)
-- [ ] IExecutor 구현
+- [ ] **2주차: C 시뮬레이터**
+  - [ ] CSimulator 클래스 (기존 핸들러 통합)
+  - [ ] CMemoryView 컴포넌트
+  - [ ] VariablesPanel, MemoryPanel
+  - [ ] PointerArrow (SVG)
 
-### 4. JavaScript/Node Executor 구현 (Phase 3)
-- [ ] JSExecutor 클래스 생성
-- [ ] node subprocess
-- [ ] 보안 정책 (JS 전용)
-- [ ] IExecutor 구현
+#### Phase 2: Python MVP (2주)
+- [ ] **3주차: Python 시뮬레이터 기반**
+  - [ ] PySimulator 클래스
+  - [ ] PyContext (names, objects)
+  - [ ] AssignHandler (기본 할당)
+  - [ ] 기본 타입 지원 (int, float, str, bool, None)
 
-### 5. Executor 테스트 작성
-- [ ] c-executor.test.ts 마이그레이션 (새 구조로)
-- [ ] python-executor.test.ts
-- [ ] java-executor.test.ts
-- [ ] js-executor.test.ts
+- [ ] **4주차: Python 시각화**
+  - [ ] PyReferenceView 컴포넌트
+  - [ ] NamesPanel, ObjectsPanel
+  - [ ] ReferenceArrow (SVG)
+  - [ ] ListHandler, TupleHandler
+  - [ ] DictHandler, SetHandler
+
+#### Phase 3: C 확장 (3주)
+- [ ] **5주차**: 전역변수, static, Data 세그먼트
+- [ ] **6주차**: 함수 정의, 함수 호출, 콜스택
+- [ ] **7주차**: 구조체, 함수 포인터
+
+#### Phase 4: Python 확장 (2주)
+- [ ] **8주차**: 함수 정의/호출, Call Frame
+- [ ] **9주차**: 클래스/인스턴스
+
+---
+
+### 백엔드: 멀티언어 Executor (나중에)
+
+| 언어 | 클래스 | 상태 |
+|------|--------|------|
+| C | CExecutor | ✅ 완료 |
+| Python | PythonExecutor | ⏳ 예정 |
+| Java | JavaExecutor | ⏳ 예정 |
+| JavaScript | JSExecutor | ⏳ 예정 |
+
+- [ ] Executor 테스트 마이그레이션
 
 ---
 
