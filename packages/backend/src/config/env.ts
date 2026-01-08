@@ -17,13 +17,6 @@ const envSchema = z.object({
   // === CORS ===
   CORS_ORIGINS: z.string().default('http://localhost:5174'),
 
-  // === Docker Execution ===
-  DOCKER_IMAGE: z.string().default('gcc:latest'),
-  DOCKER_MEMORY_LIMIT: z.string().default('128m'),
-  DOCKER_CPU_LIMIT: z.string().default('0.5'),
-  DOCKER_PID_LIMIT: z.coerce.number().default(50),
-  DOCKER_TMPFS_SIZE: z.string().default('10m'),
-
   // === C Execution Timeouts (seconds) ===
   C_RUN_DEFAULT_TIMEOUT: z.coerce.number().default(10),
   C_RUN_MAX_TIMEOUT: z.coerce.number().default(30),

@@ -1,7 +1,15 @@
 /**
- * C 코드 실행 모듈
- * - Docker 컨테이너 기반 샌드박스 실행
- * - gcc 컴파일 + 실행
+ * ⚠️ DEPRECATED: modules/executors/c/c-executor.ts를 사용하세요
+ *
+ * 이 파일은 이전 버전의 executor 구현입니다.
+ * 새로운 구조로 마이그레이션 완료됨.
+ *
+ * Before:  import { runCCode } from './executor';
+ * After:   import { cExecutor } from '../executors/c';
+ *          await cExecutor.run(code, stdin);
+ *
+ * 테스트 호환성을 위해 일시적으로 유지됩니다.
+ * TODO: executor.test.ts 마이그레이션 후 제거
  */
 
 import { exec } from 'child_process';
@@ -130,12 +138,20 @@ export function checkCodeSecurity(code: string): { safe: boolean; reason?: strin
 }
 
 /**
- * Docker로 C 코드 컴파일 및 실행
+ * 로컬 gcc로 C 코드 컴파일 및 실행
+ *
+ * 순서:
+ * 1. 보안 검사 (FORBIDDEN_PATTERNS)
+ * 2. 임시 디렉토리 생성
+ * 3. 소스 파일 저장
+ * 4. gcc 컴파일
+ * 5. 타임아웃 포함 실행
+ * 6. 결과 반환
  */
 export async function runCCode(code: string, stdin: string = '', timeout: number = config.execution.defaultTimeout): Promise<RunResult> {
   const startTime = Date.now();
 
-  // 보안 검사
+  // 1. 보안 검사
   const security = checkCodeSecurity(code);
   if (!security.safe) {
     return {
@@ -150,78 +166,65 @@ export async function runCCode(code: string, stdin: string = '', timeout: number
     };
   }
 
-  // 임시 디렉토리 생성
+  // 2. 임시 디렉토리 생성
   const tmpDir = path.join(os.tmpdir(), `c-runner-${crypto.randomBytes(8).toString('hex')}`);
+  const srcPath = path.join(tmpDir, 'main.c');
+  const binPath = path.join(tmpDir, 'a.out');
+  const inputPath = path.join(tmpDir, 'input.txt');
 
   try {
+    // 3. 소스 파일 저장
     await fs.mkdir(tmpDir, { recursive: true });
-
-    // 소스 파일 저장
-    const srcPath = path.join(tmpDir, 'main.c');
-    const inputPath = path.join(tmpDir, 'input.txt');
-
     await fs.writeFile(srcPath, code);
     await fs.writeFile(inputPath, stdin);
 
-    // Docker 명령어 구성
-    // 쉘 명령어는 따옴표로 감싸야 함
-    const shellCmd = `cp /code/main.c /tmp/main.c && gcc -o /tmp/a.out /tmp/main.c 2>&1 && timeout ${timeout}s /tmp/a.out < /code/input.txt`;
-    const dockerCmd = [
-      'docker', 'run',
-      '--rm',
-      '--network', 'none',           // 네트워크 차단
-      '--memory', config.docker.memoryLimit,
-      '--cpus', config.docker.cpuLimit,
-      '--pids-limit', String(config.docker.pidLimit),
-      '--read-only',                 // 읽기 전용
-      '--tmpfs', `/tmp:size=${config.docker.tmpfsSize},exec`,
-      '--security-opt', 'no-new-privileges:true',
-      '-v', `${tmpDir}:/code:ro`,    // 코드 마운트 (읽기 전용)
-      '-w', '/tmp',
-      config.docker.image,
-      '/bin/sh', '-c',
-      `"${shellCmd}"`
-    ].join(' ');
+    // 4. gcc 컴파일
+    const compileCmd = `gcc -o "${binPath}" "${srcPath}" 2>&1`;
+
+    let compileOutput = '';
+    try {
+      const { stdout } = await execAsync(compileCmd, {
+        timeout: 30000, // 30초
+        maxBuffer: config.execution.bufferSize
+      });
+      compileOutput = stdout;
+    } catch (error: unknown) {
+      const { stderr: errOutput } = getExecErrorInfo(error);
+      return {
+        success: false,
+        compiled: false,
+        executed: false,
+        stdout: '',
+        stderr: errOutput || '컴파일 실패',
+        exitCode: 1,
+        executionTimeMs: Date.now() - startTime,
+        error: 'compile_error'
+      };
+    }
+
+    // 5. 타임아웃 포함 실행
+    const runCmd = `timeout ${timeout}s "${binPath}" < "${inputPath}"`;
 
     try {
-      const { stdout, stderr } = await execAsync(dockerCmd, {
+      const { stdout, stderr } = await execAsync(runCmd, {
         timeout: (timeout + 5) * 1000,
         maxBuffer: config.execution.bufferSize
       });
-
-      const executionTime = Date.now() - startTime;
 
       return {
         success: true,
         compiled: true,
         executed: true,
         stdout: stdout.trim(),
-        stderr: stderr.trim(),
+        stderr: (stderr || compileOutput).trim(),
         exitCode: 0,
-        executionTimeMs: executionTime
+        executionTimeMs: Date.now() - startTime
       };
     } catch (error: unknown) {
-      const executionTime = Date.now() - startTime;
-
-      // exec 에러 정보 추출 (defensive)
-      const { stdout: output, stderr: errOutput, code, killed } = getExecErrorInfo(error);
-
-      // 컴파일 에러 감지
-      if (errOutput.includes('error:') || errOutput.includes('undefined reference')) {
-        return {
-          success: false,
-          compiled: false,
-          executed: false,
-          stdout: output,
-          stderr: errOutput,
-          exitCode: code,
-          executionTimeMs: executionTime,
-          error: 'compile_error'
-        };
-      }
+      const { stdout: output, stderr: errOutput, killed } = getExecErrorInfo(error);
 
       // 타임아웃
-      if (killed || errOutput.includes('timeout')) {
+      if (killed) {
         return {
           success: false,
           compiled: true,
@@ -229,7 +232,7 @@ export async function runCCode(code: string, stdin: string = '', timeout: number
           stdout: output,
           stderr: '실행 시간 초과 (Time Limit Exceeded)',
           exitCode: 124,
-          executionTimeMs: timeout * 1000,
+          executionTimeMs: Date.now() - startTime,
           error: 'timeout'
         };
       }
@@ -240,9 +243,9 @@ export async function runCCode(code: string, stdin: string = '', timeout: number
         compiled: true,
         executed: false,
         stdout: output,
-        stderr: errOutput,
-        exitCode: code,
-        executionTimeMs: executionTime,
+        stderr: errOutput || '실행 오류',
+        exitCode: 1,
+        executionTimeMs: Date.now() - startTime,
         error: 'runtime_error'
       };
     }

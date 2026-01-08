@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { runCCode, judgeCode } from './executor';
+import { cExecutor } from '../executors/c/index';
 import { prisma } from '../../config/database';
 import { config } from '../../config';
 import { optionalAuth } from '../../middleware';
@@ -98,7 +98,7 @@ cRoutes.post('/run', validate(runCodeSchema), async (req, res) => {
   try {
     const { code, stdin = '', timeout = config.execution.defaultTimeout } = req.body;
     const timeoutSec = Math.min(Math.max(1, timeout), config.execution.maxTimeout);
-    const result = await runCCode(code, stdin, timeoutSec);
+    const result = await cExecutor.run(code, stdin, timeoutSec);
 
     res.json({
       success: result.success,
@@ -184,7 +184,7 @@ cRoutes.post('/judge', optionalAuth, validate(judgeCodeSchema), async (req, res)
       });
     }
 
-    const result = await judgeCode(code, cases, config.execution.judgeTimeout);
+    const result = await cExecutor.judge(code, cases, config.execution.judgeTimeout);
 
     // 로그인한 사용자면 제출 기록 저장 (OAuthAccount로 조회)
     if (req.user && problemId) {

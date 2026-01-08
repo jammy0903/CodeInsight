@@ -15,14 +15,6 @@ export const config = {
     jsonBodyLimit: env.JSON_BODY_LIMIT,
   },
 
-  docker: {
-    image: env.DOCKER_IMAGE,
-    memoryLimit: env.DOCKER_MEMORY_LIMIT,
-    cpuLimit: env.DOCKER_CPU_LIMIT,
-    pidLimit: env.DOCKER_PID_LIMIT,
-    tmpfsSize: env.DOCKER_TMPFS_SIZE,
-  },
-
   execution: {
     defaultTimeout: env.C_RUN_DEFAULT_TIMEOUT,
     maxTimeout: env.C_RUN_MAX_TIMEOUT,
