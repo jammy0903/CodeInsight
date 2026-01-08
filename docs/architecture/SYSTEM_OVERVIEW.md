@@ -1,6 +1,7 @@
 # CodeInsight 시스템 아키텍처
 
-> 마지막 업데이트: 2026-01-03
+> 마지막 업데이트: 2026-01-08
+> Phase 2: Docker-in-Docker 제거 + 멀티-언어 Executor 아키텍처 도입
 
 ---
 
@@ -44,10 +45,11 @@
 | Node.js + Express | API 서버 |
 | TypeScript | 타입 안전성 |
 | Prisma + SQLite | ORM + 데이터베이스 |
-| Docker | C 코드 샌드박스 실행 |
+| **로컬 gcc/python/javac/node** | **코드 실행 (로컬 subprocess)** |
 | Firebase Admin | 토큰 검증 |
 | Zod | 스키마 검증 |
 | Vitest | 테스트 |
+| ~~Docker~~ | ~~C 코드 샌드박스~~ (제거됨: 성능 3배 향상) |
 
 ### Frontend
 | 기술 | 용도 |
@@ -82,7 +84,7 @@
 backend/src/
 ├── app.ts                 # Express 앱 진입점
 ├── config/
-│   ├── env.ts             # 환경변수 (Zod)
+│   ├── env.ts             # 환경변수 (Zod, Docker 설정 제거)
 │   ├── index.ts           # 설정 객체
 │   ├── database.ts        # Prisma 클라이언트
 │   ├── firebase.ts        # Firebase Admin SDK
@@ -91,21 +93,57 @@ backend/src/
 │   ├── auth.ts            # Firebase 토큰 검증
 │   ├── rateLimit.ts       # 요청 제한
 │   └── index.ts
-└── modules/
-    ├── c/                 # C 코드 실행
-    ├── memory/            # 메모리 트레이스
-    ├── ai/                # AI 해설자
-    ├── users/             # 사용자 관리
-    ├── problems/          # 실습 문제
-    └── submissions/       # 제출 기록
+├── modules/
+│   ├── executors/         # ⭐ 새 구조: 멀티-언어 실행기
+│   │   ├── types.ts       # IExecutor 인터페이스
+│   │   ├── c/             # C 언어
+│   │   │   ├── c-executor.ts
+│   │   │   ├── security.ts
+│   │   │   └── index.ts
+│   │   ├── python/        # 나중에 추가
+│   │   ├── java/          # 나중에 추가
+│   │   ├── javascript/    # 나중에 추가
+│   │   └── index.ts
+│   ├── c/                 # C 코드 실행 (routes만, executor는 executors/로 이동)
+│   ├── memory/            # 메모리 트레이스
+│   ├── ai/                # AI 해설자
+│   ├── users/             # 사용자 관리
+│   ├── problems/          # 실습 문제
+│   └── submissions/       # 제출 기록
 ```
 
 ### 모듈별 역할
 
-#### c/ - C 코드 실행
-- Docker 컨테이너에서 gcc 컴파일 + 실행
-- 보안: FORBIDDEN_PATTERNS로 위험 코드 차단
-- 테스트: `executor.test.ts` (47개 보안 테스트)
+#### executors/ - ⭐ 멀티-언어 코드 실행 (새 구조)
+- **IExecutor 인터페이스**: 모든 언어가 구현하는 공통 인터페이스
+  ```typescript
+  interface IExecutor {
+    checkSecurity(code): { safe, reason? }
+    run(code, stdin, timeout): ExecutionResult
+    judge(code, testcases, timeout): JudgeResult
+  }
+  ```
+
+- **C (완료)**
+  - CExecutor: 로컬 gcc로 컴파일 + 실행
+  - FORBIDDEN_PATTERNS: 금지된 함수/헤더 검사
+  - 성능: 3배 향상 (3-5초 → 0.5-1초)
+
+- **Python (준비 중)**
+  - PythonExecutor: subprocess로 python3 실행
+  - 별도 보안 정책
+
+- **Java (준비 중)**
+  - JavaExecutor: subprocess로 javac + java 실행
+
+- **JavaScript (준비 중)**
+  - JSExecutor: subprocess로 node 실행
+
+#### c/ - C 코드 API (routes만)
+- `/api/c/run`: CExecutor 호출
+- `/api/c/judge`: CExecutor.judge() 호출
+- 보안: executors/c의 FORBIDDEN_PATTERNS 사용
+- 테스트: `executor.test.ts` (나중에 executors/c로 마이그레이션)
 
 #### memory/ - 메모리 트레이스
 - C 코드 실행 시 메모리 상태 추적
