@@ -282,10 +282,19 @@ profile_react() {
         exit 1
     fi
 
-    # Windows 경로 변환 (/mnt/c/...)
-    if [[ "$json_file" == /mnt/c/* ]]; then
+    # Windows 경로 변환
+    if [[ "$json_file" =~ ^[A-Za-z]:\\ ]]; then
+        # Windows 경로: C:\Users\... → WSL 경로: /mnt/c/Users/...
+        drive=$(echo "${json_file:0:1}" | tr '[:upper:]' '[:lower:]')
+        path="${json_file:3}"  # C:\ 제거
+        path="${path//\\//}"   # \ → /
+        json_file="/mnt/${drive}/${path}"
+        print_info "Windows 경로 변환: /mnt/${drive}/${path}"
+    elif [[ "$json_file" == /mnt/c/* ]]; then
+        # 이미 WSL 경로
         json_file="$json_file"
     elif [[ "$json_file" != /* ]]; then
+        # 상대 경로 → 절대 경로
         json_file="$(pwd)/$json_file"
     fi
 
