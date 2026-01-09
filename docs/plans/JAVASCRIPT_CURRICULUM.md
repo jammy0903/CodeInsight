@@ -268,15 +268,722 @@ for (let i = 0; i < 3; i++) {
 
 ---
 
+## 시각화 유형별 상세 설계
+
+### 1. 실행 컨텍스트 스택 (Call Stack Visualizer)
+```
+┌─────────────────┐
+│   inner()       │ ← 현재 실행 중 (하이라이트)
+├─────────────────┤
+│   outer()       │
+├─────────────────┤
+│   global        │
+└─────────────────┘
+```
+**적용 챕터**: Ch 3 (함수와 실행 컨텍스트), Ch 5 (클로저)
+**구현 방식**: 스택 push/pop 애니메이션
+
+### 2. 스코프 체인 트리 (Scope Chain Visualizer)
+```
+┌─────────────────────────────────────┐
+│ Global Scope                        │
+│   └─ outer()                        │
+│        x = 10                       │
+│        └─ inner()                   │
+│             console.log(x) → 10 찾음│
+└─────────────────────────────────────┘
+```
+**적용 챕터**: Ch 1 (변수와 스코프), Ch 3 (스코프 체인), Ch 5 (렉시컬 스코프)
+**구현 방식**: 트리 구조 + 탐색 경로 화살표 애니메이션
+
+### 3. 호이스팅 코드 변환 (Hoisting Visualizer)
+```
+// 작성한 코드              // 실제 실행 순서
+┌─────────────────┐       ┌─────────────────┐
+│ console.log(x); │  →    │ var x;          │ (선언 올라감)
+│ var x = 5;      │       │ console.log(x); │ (undefined)
+│                 │       │ x = 5;          │ (할당은 그대로)
+└─────────────────┘       └─────────────────┘
+```
+**적용 챕터**: Ch 1 (Hoisting, TDZ)
+**구현 방식**: 코드 전/후 비교 + 줄 이동 애니메이션
+
+### 4. this 바인딩 다이어그램 (This Binding Visualizer)
+```
+┌────────────────────────────────────────────────┐
+│  호출 방식              │  this 값            │
+├────────────────────────────────────────────────┤
+│  obj.method()    ────→  │  obj (암시적)       │
+│  func()          ────→  │  window (기본)      │
+│  new Func()      ────→  │  새 인스턴스        │
+│  func.call(x)    ────→  │  x (명시적)         │
+│  () => {}        ────→  │  외부 this (렉시컬) │
+└────────────────────────────────────────────────┘
+```
+**적용 챕터**: Ch 4 (this 키워드)
+**구현 방식**: 호출 시점에 화살표로 바인딩 대상 표시
+
+### 5. 클로저 환경 캡처 (Closure Visualizer)
+```
+┌─────────────────────────────────────────┐
+│  outer() 실행 후 종료                    │
+│                                         │
+│  ┌──────────────────────────────────┐   │
+│  │  inner 함수                      │   │
+│  │  └── [[Environment]] ────────────┼───┼──► { count: 0 }
+│  │       (렉시컬 환경 참조)          │   │    (GC 안 됨!)
+│  └──────────────────────────────────┘   │
+│                                         │
+│  inner() 호출 → count 접근 가능!        │
+└─────────────────────────────────────────┘
+```
+**적용 챕터**: Ch 5 (클로저)
+**구현 방식**: 함수가 환경을 "캡처"하는 연결선 + 힙에 남은 환경 표시
+
+### 6. 프로토타입 체인 (Prototype Chain Visualizer)
+```
+  dog ──► Dog.prototype ──► Animal.prototype ──► Object.prototype ──► null
+   │           │                  │                     │
+ name       bark()            walk()               toString()
+
+  dog.toString() 호출 시:
+  dog (없음) → Dog.prototype (없음) → Animal.prototype (없음) → Object.prototype (찾음!)
+```
+**적용 챕터**: Ch 6 (프로토타입), Ch 7 (ES6 클래스)
+**구현 방식**: 체인 다이어그램 + 속성 탐색 경로 애니메이션
+
+### 7. 이벤트 루프 (Event Loop Visualizer) ⭐ 핵심
+```
+┌──────────────┐    ┌──────────────┐    ┌──────────────────┐
+│  Call Stack  │    │   Web APIs   │    │   Task Queue     │
+├──────────────┤    ├──────────────┤    ├──────────────────┤
+│  foo()       │    │ setTimeout   │───→│  callback        │
+│              │    │   2초 대기   │    │                  │
+└──────────────┘    └──────────────┘    └──────────────────┘
+        ↑                                        │
+        └──────────── Event Loop ────────────────┘
+                    (Stack 비면 Queue에서 가져옴)
+
+┌──────────────────────────────────────────────────────────┐
+│  Microtask Queue (우선순위 높음!)                         │
+│  [Promise.then] → [queueMicrotask]                       │
+└──────────────────────────────────────────────────────────┘
+```
+**적용 챕터**: Ch 8 (이벤트 루프), Ch 9 (Promise), Ch 10 (async/await)
+**구현 방식**: Loupe 스타일 실시간 애니메이션
+
+---
+
+## 챕터별 시각화 매핑
+
+| 챕터 | 주요 시각화 | 구현 난이도 | 우선순위 |
+|------|------------|------------|----------|
+| Ch 1 | 스코프 체인 + 호이스팅 | ⭐⭐ | 🥇 높음 |
+| Ch 2 | 타입 변환 테이블 | ⭐ | 🥉 낮음 |
+| Ch 3 | 콜 스택 + 스코프 체인 | ⭐⭐ | 🥇 높음 |
+| Ch 4 | this 바인딩 화살표 | ⭐⭐ | 🥈 중간 |
+| Ch 5 | 클로저 환경 캡처 | ⭐⭐⭐ | 🥇 높음 |
+| Ch 6 | 프로토타입 체인 | ⭐⭐ | 🥈 중간 |
+| Ch 7 | class → 프로토타입 변환 | ⭐⭐ | 🥉 낮음 |
+| Ch 8 | **이벤트 루프** | ⭐⭐⭐ | 🥇 **최우선** |
+| Ch 9 | 이벤트 루프 + Promise 상태 | ⭐⭐⭐ | 🥇 높음 |
+| Ch 10 | async/await 실행 흐름 | ⭐⭐⭐ | 🥇 높음 |
+
+---
+
+## 상세 설계
+
+### 아키텍처 결정 사항
+
+| 항목 | 결정 | 이유 |
+|------|------|------|
+| Hook 구조 | `useLessonVisualization` (리네임) | 이름이 역할을 정확히 반영, 메모리 외 시각화도 지원 |
+| 분기 위치 | `LessonPage`에서 직접 분기 | YAGNI 원칙, 2개 언어에 별도 컴포넌트는 과잉 설계 |
+| 타입 구조 | Union Type | 타입 안전성, 자동완성 지원 |
+| 애니메이션 | Framer Motion | 프로젝트에 이미 있음, 복잡한 시퀀스 가능 |
+
+---
+
+### 컴포넌트 계층 구조
+
+```
+LessonPage.tsx
+    │
+    ├── CodeViewer (코드 하이라이트)
+    ├── StepExplanation (설명)
+    │
+    └── [시각화 영역] ◄── LessonPage에서 직접 분기 (YAGNI)
+            │
+            ├── language === "c"
+            │       └── CourseMemoryView (기존)
+            │
+            └── language === "javascript"
+                    └── JSVisualizerView
+                            │
+                            ├── "callStack"   → CallStackView
+                            ├── "scopeChain"  → ScopeChainView
+                            ├── "eventLoop"   → EventLoopView
+                            ├── "closure"     → ClosureView
+                            ├── "prototype"   → PrototypeChainView
+                            ├── "thisBind"    → ThisBindingView
+                            └── "hoisting"    → HoistingView
+```
+
+**LessonPage 분기 코드 (간단):**
+```tsx
+// LessonPage.tsx
+{lesson.language === "c" && (
+  <CourseMemoryView stack={stack} heap={heap} changedBlocks={changedBlocks} />
+)}
+{lesson.language === "javascript" && (
+  <JSVisualizerView type={visualizationType} state={visualizationState} />
+)}
+```
+
+---
+
+### 데이터 플로우
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Backend: GET /api/v1/courses/lessons/js-8-1                    │
+│                                                                 │
+│  Response: {                                                    │
+│    lessonId: "js-8-1",                                          │
+│    language: "javascript",  ◄── 언어 구분                       │
+│    content: {                                                   │
+│      steps: [{                                                  │
+│        visualizationType: "eventLoop",  ◄── 시각화 타입         │
+│        visualizationState: { ... }      ◄── 시각화 데이터       │
+│      }]                                                         │
+│    }                                                            │
+│  }                                                              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  useLessonVisualization (리네임됨)                              │
+│                                                                 │
+│  - C 언어: memoryChanges → stack/heap 계산                      │
+│  - JavaScript: visualizationType 체크                           │
+│          → "eventLoop" | "closure" | ... → 그대로 전달          │
+│                                                                 │
+│  return {                                                       │
+│    // C용                                                       │
+│    stack, heap, changedBlocks,                                  │
+│    // JS용                                                      │
+│    visualizationType,                                           │
+│    visualizationState,  // Union Type                           │
+│  }                                                              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LessonPage.tsx (직접 분기 - YAGNI)                             │
+│                                                                 │
+│  const { stack, heap, visualizationType, visualizationState }   │
+│    = useLessonVisualization(steps, currentStep);                │
+│                                                                 │
+│  // C 언어                                                      │
+│  {lesson.language === "c" && (                                  │
+│    <CourseMemoryView stack={stack} heap={heap} />               │
+│  )}                                                             │
+│                                                                 │
+│  // JavaScript                                                  │
+│  {lesson.language === "javascript" && (                         │
+│    <JSVisualizerView                                            │
+│      type={visualizationType}                                   │
+│      state={visualizationState}                                 │
+│    />                                                           │
+│  )}                                                             │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 타입 정의
+
+```typescript
+// types/visualization.ts
+
+// 시각화 타입 enum
+type JSVisualizationType =
+  | "callStack"
+  | "scopeChain"
+  | "hoisting"
+  | "thisBind"
+  | "closure"
+  | "prototype"
+  | "eventLoop"
+  | "promise";
+
+// 각 시각화별 상태 타입
+interface CallStackState {
+  frames: { name: string; variables: Record<string, unknown> }[];
+  currentFrame: number;
+}
+
+interface ScopeChainState {
+  scopes: { name: string; type: "global" | "function" | "block"; variables: Record<string, unknown> }[];
+  lookupPath: string[];  // 변수 탐색 경로
+  targetVariable?: string;
+}
+
+interface HoistingState {
+  originalCode: string;
+  transformedCode: string;
+  hoistedDeclarations: { name: string; type: "var" | "function"; originalLine: number }[];
+}
+
+interface ThisBindingState {
+  bindingType: "default" | "implicit" | "explicit" | "new" | "arrow";
+  thisValue: string;
+  callSite: string;
+  explanation: string;
+}
+
+interface ClosureState {
+  outerFunction: string;
+  innerFunction: string;
+  capturedVariables: { name: string; value: unknown }[];
+  environmentChain: { scope: string; variables: Record<string, unknown> }[];
+}
+
+interface PrototypeChainState {
+  instance: { name: string; ownProperties: string[] };
+  chain: { name: string; properties: string[] }[];
+  lookupProperty?: string;
+  lookupPath?: string[];
+}
+
+interface EventLoopState {
+  callStack: string[];
+  webApis: { name: string; delay?: number; status: "waiting" | "ready" }[];
+  taskQueue: string[];
+  microtaskQueue: string[];
+  output: string[];
+  currentPhase: "executing" | "checkingMicrotasks" | "checkingTasks" | "idle";
+}
+
+interface PromiseState {
+  promises: {
+    id: string;
+    status: "pending" | "fulfilled" | "rejected";
+    value?: unknown;
+    reason?: string;
+  }[];
+  eventLoopState: EventLoopState;
+}
+
+// Union Type
+type JSVisualizationState =
+  | { type: "callStack"; data: CallStackState }
+  | { type: "scopeChain"; data: ScopeChainState }
+  | { type: "hoisting"; data: HoistingState }
+  | { type: "thisBind"; data: ThisBindingState }
+  | { type: "closure"; data: ClosureState }
+  | { type: "prototype"; data: PrototypeChainState }
+  | { type: "eventLoop"; data: EventLoopState }
+  | { type: "promise"; data: PromiseState };
+```
+
+---
+
+### Hook 설계 (useLessonVisualization)
+
+> **리네임:** `useLessonMemory` → `useLessonVisualization`
+> **이유:** "Memory"는 C 전용 느낌. JS는 Event Loop, Closure 등 메모리가 아닌 시각화도 있음.
+
+```typescript
+// hooks/useLessonVisualization.ts (리네임됨)
+
+interface UseLessonVisualizationResult {
+  // C용 (메모리 시각화)
+  stack: LessonMemoryBlock[];
+  heap: LessonMemoryBlock[];
+  changedBlocks: string[];
+
+  // JS용 (다양한 시각화)
+  visualizationType: JSVisualizationType | "memory" | null;
+  visualizationState: JSVisualizationState | null;
+}
+
+export function useLessonVisualization(
+  steps: LessonStep[],
+  currentStep: number
+): UseLessonVisualizationResult {
+  const step = steps[currentStep];
+  const vizType = step?.visualizationType ?? "memory";
+
+  // C 언어: 기존 메모리 시각화 로직
+  if (vizType === "memory" || !vizType) {
+    // 기존 memoryChanges 누적 로직 유지
+    return { stack, heap, changedBlocks, visualizationType: "memory", visualizationState: null };
+  }
+
+  // JavaScript: 시각화 상태 그대로 전달
+  return {
+    stack: [],
+    heap: [],
+    changedBlocks: [],
+    visualizationType: vizType,
+    visualizationState: step.visualizationState,
+  };
+}
+```
+
+**마이그레이션:**
+```bash
+# 파일 리네임
+mv useLessonMemory.ts useLessonVisualization.ts
+
+# import 변경 (LessonPage.tsx)
+- import { useLessonMemory } from '../hooks/useLessonMemory';
++ import { useLessonVisualization } from '../hooks/useLessonVisualization';
+```
+
+---
+
+### 컴포넌트별 Props 인터페이스
+
+```typescript
+// JSVisualizerView (JavaScript 시각화 통합)
+interface JSVisualizerViewProps {
+  type: JSVisualizationType;
+  state: JSVisualizationState;
+}
+
+// EventLoopView
+interface EventLoopViewProps {
+  state: EventLoopState;
+  animate?: boolean;
+}
+
+// ClosureView
+interface ClosureViewProps {
+  state: ClosureState;
+}
+
+// ScopeChainView
+interface ScopeChainViewProps {
+  state: ScopeChainState;
+  highlightLookup?: boolean;  // 변수 탐색 경로 강조
+}
+
+// CallStackView
+interface CallStackViewProps {
+  state: CallStackState;
+}
+```
+
+---
+
 ## 구현 계획
 
-1. `prisma/content/javascript/curriculum.json` 생성 (10챕터 구조)
-2. `js-1-1.json` ~ `js-10-4.json` (40레슨)
-3. `seed.ts`에서 JavaScript 로드
-4. 프론트엔드 JavaScript 시각화 컴포넌트
-   - Event Loop Visualizer
-   - Prototype Chain Visualizer
-   - Closure Environment Visualizer
+### Phase 1: 데이터 구조 (1주)
+1. `prisma/content/javascript/` 디렉토리 생성
+2. `chapters.json` - 10챕터 메타데이터
+3. `js-1-1.json` ~ `js-10-4.json` - 40레슨 콘텐츠
+4. `seed.ts` 업데이트 - JavaScript 데이터 로드
+
+### Phase 2: 기본 시각화 컴포넌트 (2주)
+1. `features/visualizers/js/` 디렉토리 구조
+2. `CallStackView.tsx` - 콜 스택 시각화
+3. `ScopeChainView.tsx` - 스코프 체인 트리
+4. `HoistingView.tsx` - 코드 전/후 비교
+
+### Phase 3: 고급 시각화 컴포넌트 (3주)
+1. `EventLoopView.tsx` - 이벤트 루프 (핵심!)
+2. `ClosureView.tsx` - 클로저 환경 캡처
+3. `PrototypeChainView.tsx` - 프로토타입 체인
+4. `ThisBindingView.tsx` - this 바인딩 다이어그램
+
+### Phase 4: 통합 및 테스트 (1주)
+1. `JSVisualizerView.tsx` - 통합 시각화 컴포넌트
+2. `useLessonVisualization` hook 리네임 및 확장
+3. `LessonPage` 언어별 분기 추가
+4. 애니메이션 최적화
+
+---
+
+## 파일 구조 (다국어 확장 고려)
+
+> **설계 원칙:** DRY (Don't Repeat Yourself)
+> - 공통 컴포넌트는 `shared/`에 한 번만 구현
+> - 언어별 전용 컴포넌트만 각 폴더에 구현
+
+```
+packages/frontend/src/features/
+├── courses/
+│   ├── hooks/
+│   │   └── useLessonVisualization.ts  # 리네임됨 (구 useLessonMemory)
+│   └── LessonPage.tsx                 # 직접 분기 (C/JS/Python/Java)
+│
+└── visualizers/
+    ├── shared/                        # 🔥 공통 컴포넌트 (모든 언어)
+    │   ├── index.tsx                  # 공통 export
+    │   ├── types.ts                   # SharedVisualizationType
+    │   ├── constants.ts               # 공통 색상/애니메이션
+    │   └── components/
+    │       ├── CallStackView.tsx      # ✅ 모든 언어 공통
+    │       ├── ScopeChainView.tsx     # ✅ 모든 언어 공통 (C 제외)
+    │       └── MemoryView.tsx         # ✅ Stack/Heap 기본 구조
+    │
+    ├── c/                             # C 전용
+    │   ├── index.tsx
+    │   ├── types.ts                   # CVisualizationType extends Shared
+    │   ├── CVisualizerView.tsx
+    │   └── components/
+    │       └── PointerView.tsx        # C 전용: 포인터 화살표
+    │
+    ├── js/                            # JavaScript 전용
+    │   ├── index.tsx
+    │   ├── types.ts                   # JSVisualizationType extends Shared
+    │   ├── JSVisualizerView.tsx
+    │   └── components/
+    │       ├── EventLoopView.tsx      # JS 전용
+    │       ├── ClosureView.tsx        # JS 전용
+    │       ├── PrototypeChainView.tsx # JS 전용
+    │       ├── ThisBindingView.tsx    # JS 전용
+    │       ├── HoistingView.tsx       # JS 전용
+    │       └── PromiseStateView.tsx   # JS 전용
+    │
+    ├── python/                        # 🔮 미래: Python 전용
+    │   ├── index.tsx
+    │   ├── types.ts                   # PythonVisualizationType extends Shared
+    │   ├── PythonVisualizerView.tsx
+    │   └── components/
+    │       ├── GILView.tsx            # Python 전용: Global Interpreter Lock
+    │       ├── GeneratorView.tsx      # Python 전용: yield/generator
+    │       ├── RefCountView.tsx       # Python 전용: 참조 카운팅
+    │       └── DecoratorView.tsx      # Python 전용: 데코레이터 체인
+    │
+    └── java/                          # 🔮 미래: Java 전용
+        ├── index.tsx
+        ├── types.ts                   # JavaVisualizationType extends Shared
+        ├── JavaVisualizerView.tsx
+        └── components/
+            ├── JVMMemoryView.tsx      # Java 전용: Method Area, Metaspace
+            ├── GCPhasesView.tsx       # Java 전용: GC 단계 시각화
+            ├── ClassLoaderView.tsx    # Java 전용: 클래스 로딩
+            └── ThreadStateView.tsx    # Java 전용: 스레드 상태
+```
+
+---
+
+## 타입 상속 구조 (다국어 확장)
+
+```typescript
+// ============================================
+// shared/types.ts - 공통 타입 (모든 언어)
+// ============================================
+
+// 공통 시각화 타입
+type SharedVisualizationType =
+  | "callStack"     // 모든 언어
+  | "scopeChain"    // JS, Python, Java
+  | "memory";       // C, Python, Java (Stack/Heap)
+
+// 공통 상태 인터페이스
+interface CallStackState {
+  frames: StackFrame[];
+  currentFrame: number;
+}
+
+interface StackFrame {
+  name: string;
+  variables: Record<string, unknown>;
+  line?: number;
+}
+
+interface ScopeChainState {
+  scopes: Scope[];
+  lookupPath?: string[];
+  targetVariable?: string;
+}
+
+interface MemoryState {
+  stack: MemoryBlock[];
+  heap: MemoryBlock[];
+  changedBlocks?: string[];
+}
+
+// ============================================
+// js/types.ts - JavaScript 확장
+// ============================================
+
+import { SharedVisualizationType, CallStackState, ScopeChainState } from '../shared/types';
+
+type JSOnlyVisualizationType =
+  | "eventLoop"
+  | "closure"
+  | "prototype"
+  | "thisBind"
+  | "hoisting"
+  | "promise";
+
+// 공통 + JS 전용 합치기
+type JSVisualizationType = SharedVisualizationType | JSOnlyVisualizationType;
+
+// JS 전용 상태들...
+interface EventLoopState { /* ... */ }
+interface ClosureState { /* ... */ }
+
+// ============================================
+// python/types.ts - Python 확장 (미래)
+// ============================================
+
+import { SharedVisualizationType } from '../shared/types';
+
+type PythonOnlyVisualizationType =
+  | "gil"           // Global Interpreter Lock
+  | "generator"     // yield, generator
+  | "refCount"      // 참조 카운팅 GC
+  | "decorator"     // 데코레이터 체인
+  | "comprehension" // 리스트 컴프리헨션
+  | "contextMgr";   // with 문, context manager
+
+type PythonVisualizationType = SharedVisualizationType | PythonOnlyVisualizationType;
+
+// ============================================
+// java/types.ts - Java 확장 (미래)
+// ============================================
+
+import { SharedVisualizationType } from '../shared/types';
+
+type JavaOnlyVisualizationType =
+  | "jvmMemory"     // Method Area, Metaspace, PermGen
+  | "gcPhases"      // Mark, Sweep, Compact
+  | "classLoader"   // Bootstrap, Extension, Application
+  | "threadState"   // NEW, RUNNABLE, BLOCKED, WAITING...
+  | "inheritance"   // 클래스 상속 트리
+  | "interface";    // 인터페이스 구현
+
+type JavaVisualizationType = SharedVisualizationType | JavaOnlyVisualizationType;
+```
+
+---
+
+## 언어별 시각화 매핑 테이블
+
+| 시각화 | 위치 | C | JS | Python | Java | 비고 |
+|--------|------|---|----|----|------|------|
+| **Call Stack** | `shared/` | ✅ | ✅ | ✅ | ✅ | 모든 언어 공통 |
+| **Scope Chain** | `shared/` | ❌ | ✅ | ✅ | ✅ | C는 렉시컬 스코프 없음 |
+| **Memory** | `shared/` | ✅ | ❌ | ✅ | ✅ | JS는 메모리 직접 접근 없음 |
+| Pointer | `c/` | ✅ | ❌ | ❌ | ❌ | C 전용 |
+| Event Loop | `js/` | ❌ | ✅ | ❌ | ❌ | JS 전용 (Node.js) |
+| Closure | `js/` | ❌ | ✅ | ⚠️ | ❌ | Python도 비슷하지만 다름 |
+| Prototype | `js/` | ❌ | ✅ | ❌ | ❌ | JS 전용 |
+| this Binding | `js/` | ❌ | ✅ | ❌ | ❌ | JS 전용 |
+| GIL | `python/` | ❌ | ❌ | ✅ | ❌ | Python 전용 |
+| Generator | `js/`, `python/` | ❌ | ✅ | ✅ | ❌ | 둘 다 있지만 구현 다름 |
+| JVM Memory | `java/` | ❌ | ❌ | ❌ | ✅ | Java 전용 |
+| GC Phases | `python/`, `java/` | ❌ | ❌ | ✅ | ✅ | 둘 다 있지만 알고리즘 다름 |
+
+---
+
+## 새 언어 추가 가이드 (미래)
+
+### Step 1: 폴더 생성
+```bash
+mkdir -p features/visualizers/{language}/components
+```
+
+### Step 2: 타입 정의
+```typescript
+// {language}/types.ts
+import { SharedVisualizationType } from '../shared/types';
+
+type {Language}OnlyVisualizationType =
+  | "feature1"
+  | "feature2";
+
+export type {Language}VisualizationType =
+  SharedVisualizationType | {Language}OnlyVisualizationType;
+```
+
+### Step 3: 통합 뷰 생성
+```tsx
+// {language}/{Language}VisualizerView.tsx
+import { CallStackView, ScopeChainView } from '../shared';
+import { Feature1View, Feature2View } from './components';
+
+export function {Language}VisualizerView({ type, state }) {
+  switch (type) {
+    // 공통 컴포넌트 재사용
+    case "callStack":
+      return <CallStackView state={state.data} />;
+    case "scopeChain":
+      return <ScopeChainView state={state.data} />;
+
+    // 언어 전용 컴포넌트
+    case "feature1":
+      return <Feature1View state={state.data} />;
+    default:
+      return null;
+  }
+}
+```
+
+### Step 4: LessonPage 분기 추가
+```tsx
+// LessonPage.tsx
+{lesson.language === "{language}" && (
+  <{Language}VisualizerView type={visualizationType} state={visualizationState} />
+)}
+```
+
+### Step 5: 레슨 콘텐츠 생성
+```bash
+mkdir -p prisma/content/{language}/lessons
+# chapters.json, {lang}-1-1.json 등 생성
+```
+
+---
+
+## 레슨 JSON 형식 (예시)
+
+```json
+{
+  "lessonId": "js-8-1",
+  "title": "JavaScript 런타임 구조",
+  "concept": "JavaScript는 싱글 스레드지만 비동기 처리가 가능한 이유",
+  "content": {
+    "code": "console.log('1');\nsetTimeout(() => console.log('2'), 0);\nconsole.log('3');",
+    "steps": [
+      {
+        "line": 1,
+        "title": "동기 코드 실행",
+        "explanation": "console.log('1')이 Call Stack에 올라가고 즉시 실행됩니다.",
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["console.log('1')"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["1"]
+        }
+      },
+      {
+        "line": 2,
+        "title": "setTimeout 등록",
+        "explanation": "setTimeout이 Web API로 전달됩니다. 0ms여도 즉시 실행되지 않습니다!",
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": ["setTimeout(callback, 0)"],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["1"]
+        }
+      }
+    ]
+  }
+}
+```
+
+---
 
 ## 참고 자료
 

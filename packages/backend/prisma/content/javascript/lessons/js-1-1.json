@@ -1,0 +1,157 @@
+{
+  "lessonId": "js-1-1",
+  "title": "콜 스택과 동기 실행",
+  "concept": "JavaScript는 싱글 스레드 언어로, 콜 스택을 통해 함수 실행을 관리한다",
+  "content": {
+    "code": "function first() {\n  console.log('first');\n  second();\n  console.log('first end');\n}\n\nfunction second() {\n  console.log('second');\n}\n\nfirst();\nconsole.log('done');",
+    "steps": [
+      {
+        "line": 11,
+        "title": "first() 호출",
+        "explanation": "first() 함수가 호출되면 **콜 스택**에 쌓입니다.\n\n콜 스택은 현재 실행 중인 함수들을 추적하는 자료구조입니다. LIFO(Last In First Out) 방식으로, 가장 마지막에 들어온 함수가 먼저 실행됩니다.",
+        "highlight": [11],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": [],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 2,
+        "title": "console.log('first') 실행",
+        "explanation": "first() 함수 내부로 진입합니다.\n\nconsole.log가 콜 스택에 추가되고, 바로 실행되어 'first'가 출력됩니다. 실행이 끝나면 콜 스택에서 제거됩니다.",
+        "highlight": [2],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()", "console.log('first')"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["first"],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 3,
+        "title": "second() 호출",
+        "explanation": "second() 함수가 호출됩니다.\n\nfirst()가 아직 끝나지 않은 상태에서 second()가 콜 스택 위에 쌓입니다. 이것이 **함수 호출 스택**의 핵심입니다.",
+        "highlight": [3],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()", "second()"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["first"],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 8,
+        "title": "console.log('second') 실행",
+        "explanation": "second() 함수 내부에서 console.log가 실행됩니다.\n\n'second'가 출력되고, console.log가 콜 스택에서 제거됩니다.",
+        "highlight": [8],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()", "second()", "console.log('second')"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["first", "second"],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 9,
+        "title": "second() 종료",
+        "explanation": "second() 함수가 끝나고 콜 스택에서 제거됩니다.\n\n실행 흐름이 다시 first() 함수로 돌아갑니다. 콜 스택의 맨 위가 다시 first()가 됩니다.",
+        "highlight": [9],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["first", "second"],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 4,
+        "title": "console.log('first end') 실행",
+        "explanation": "first() 함수의 나머지 코드가 실행됩니다.\n\n'first end'가 출력됩니다.",
+        "highlight": [4],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()", "console.log('first end')"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["first", "second", "first end"],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 5,
+        "title": "first() 종료",
+        "explanation": "first() 함수가 완전히 끝나고 콜 스택에서 제거됩니다.",
+        "highlight": [5],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["first", "second", "first end"],
+          "currentPhase": "idle",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 12,
+        "title": "console.log('done') 실행",
+        "explanation": "전역 코드로 돌아와서 마지막 console.log가 실행됩니다.\n\n**실행 순서**: first → second → first end → done\n\n동기 코드는 순차적으로, 함수 호출은 스택처럼 쌓여서 실행됩니다.",
+        "highlight": [12],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["console.log('done')"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["first", "second", "first end", "done"],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "아래 코드의 출력 순서는?\n\nfunction a() { console.log(1); b(); console.log(3); }\nfunction b() { console.log(2); }\na();",
+    "options": [
+      "1 → 3 → 2",
+      "1 → 2 → 3",
+      "2 → 1 → 3",
+      "3 → 2 → 1"
+    ],
+    "correctIndex": 1,
+    "explanation": "함수 호출은 콜 스택에 쌓입니다. a()가 실행되어 1 출력 → b() 호출로 2 출력 → b() 종료 후 a()로 돌아와 3 출력"
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript는 여러 함수를 동시에 실행할 수 있다",
+      "correct": "JavaScript는 싱글 스레드입니다. 한 번에 하나의 함수만 실행할 수 있습니다.",
+      "why": "콜 스택의 맨 위에 있는 함수만 실행됩니다."
+    }
+  ],
+  "keyTakeaway": "콜 스택 = 현재 실행 중인 함수 추적, LIFO 방식"
+}

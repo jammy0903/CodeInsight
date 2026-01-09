@@ -1,13 +1,21 @@
 /**
- * useLessonMemory - LessonStep.memoryChanges를 시각화용 형식으로 변환
+ * useLessonVisualization - 레슨 시각화 상태 관리 Hook
  *
- * 두 가지 형식 지원:
- * 1. 누적 형식: stack: [{ name: 'main', variables: [...] }]
- * 2. 액션 형식: stack: { action: 'add_variable', name: 'a', ... }
+ * 리네임: useLessonMemory → useLessonVisualization
+ * 이유: 메모리 외에 Event Loop, Closure 등 다양한 시각화 지원
+ *
+ * 지원 형식:
+ * 1. C 언어: memoryChanges → stack/heap 메모리 시각화
+ * 2. JavaScript: visualizationType + visualizationState → 다양한 시각화
  */
 
 import { useMemo } from 'react';
 import type { LessonStep, StepMemoryState, StackFrame } from '@/types';
+import type { JSVisualizationType, JSVisualizationState } from '@/features/visualizers/js/types';
+
+// ============================================
+// 기존 메모리 관련 타입 (C 언어용)
+// ============================================
 
 export interface LessonMemoryBlock {
   name: string;
@@ -24,7 +32,24 @@ export interface LessonMemoryState {
   frames: StackFrame[];
 }
 
-// 액션 기반 memoryChanges 형식 (seed 데이터)
+// ============================================
+// 통합 반환 타입
+// ============================================
+
+export interface UseLessonVisualizationReturn {
+  // C 언어용 (메모리 시각화)
+  memoryState: LessonMemoryState;
+  changedBlocks: string[];
+
+  // JavaScript용 (다양한 시각화)
+  visualizationType: JSVisualizationType | 'memory' | null;
+  visualizationState: JSVisualizationState | null;
+}
+
+// ============================================
+// 기존 메모리 처리 로직 (C 언어)
+// ============================================
+
 interface ActionBasedStackChange {
   action: string;
   name?: string;
@@ -40,34 +65,6 @@ interface ActionBasedStackChange {
   freed?: string[];
 }
 
-/**
- * 액션 기반 형식을 시각화용으로 변환
- */
-function convertActionBasedFormat(
-  stack: ActionBasedStackChange | undefined
-): LessonMemoryBlock[] {
-  if (!stack) return [];
-
-  const blocks: LessonMemoryBlock[] = [];
-
-  // add_variable, update_variable 액션 처리
-  if (stack.action === 'add_variable' || stack.action === 'update_variable') {
-    blocks.push({
-      name: stack.name || 'unknown',
-      address: stack.address || '0x????',
-      value: String(stack.value ?? stack.newValue ?? ''),
-      type: stack.type,
-      points_to: null,
-      highlight: true,
-    });
-  }
-
-  return blocks;
-}
-
-/**
- * 누적 형식(StackFrame[])을 시각화용으로 변환
- */
 function convertCumulativeFormat(
   frames: StackFrame[]
 ): { blocks: LessonMemoryBlock[]; frames: StackFrame[] } {
@@ -91,37 +88,26 @@ function convertCumulativeFormat(
   return { blocks, frames };
 }
 
-/**
- * 현재 스텝의 memoryChanges를 시각화용 형식으로 변환
- */
 function convertToVisualFormat(
   changes: StepMemoryState | undefined
 ): LessonMemoryState {
   const state: LessonMemoryState = { stack: [], heap: [], frames: [] };
   if (!changes) return state;
 
-  // Stack 처리 - 배열인지 객체인지 확인
   if (changes.stack) {
     if (Array.isArray(changes.stack)) {
-      // 누적 형식: [{ name: 'main', variables: [...] }]
       const { blocks, frames } = convertCumulativeFormat(changes.stack);
       state.stack = blocks;
       state.frames = frames;
-    } else if (typeof changes.stack === 'object') {
-      // 액션 형식: { action: 'add_variable', ... }
-      state.stack = convertActionBasedFormat(changes.stack as ActionBasedStackChange);
     }
   }
 
-  // Heap objects 처리
   if (changes.heap && Array.isArray(changes.heap)) {
     let heapAddr = 0x8000;
-
     for (const h of changes.heap) {
       const displayValue = h.fields
         ? JSON.stringify(h.fields)
         : String(h.value ?? '');
-
       state.heap.push({
         name: h.id || h.address || `heap_${heapAddr.toString(16)}`,
         address: h.address || `0x${heapAddr.toString(16)}`,
@@ -137,15 +123,6 @@ function convertToVisualFormat(
   return state;
 }
 
-export interface UseLessonMemoryReturn {
-  memoryState: LessonMemoryState;
-  changedBlocks: string[];
-}
-
-/**
- * memoryChanges 배열을 누적해서 현재 스텝까지의 메모리 상태 계산
- * (새 형식: memoryChanges: [{ area: 'stack', action: 'allocate', ... }])
- */
 function accumulateMemoryChanges(
   steps: LessonStep[],
   upToStepIndex: number
@@ -154,7 +131,6 @@ function accumulateMemoryChanges(
   const stackMap = new Map<string, LessonMemoryBlock>();
   const heapMap = new Map<string, LessonMemoryBlock>();
 
-  // 0번부터 현재 스텝까지 memoryChanges 누적
   for (let i = 0; i <= upToStepIndex; i++) {
     const step = steps[i];
     if (!step?.memoryChanges || !Array.isArray(step.memoryChanges)) continue;
@@ -168,7 +144,7 @@ function accumulateMemoryChanges(
             value: String(change.value),
             type: change.type,
             points_to: null,
-            highlight: i === upToStepIndex, // 현재 스텝에서 변경된 것만 하이라이트
+            highlight: i === upToStepIndex,
           });
         } else if (change.action === 'free') {
           stackMap.delete(change.name);
@@ -192,14 +168,9 @@ function accumulateMemoryChanges(
 
   state.stack = Array.from(stackMap.values());
   state.heap = Array.from(heapMap.values());
-
   return state;
 }
 
-/**
- * 액션 기반 형식(레거시)을 누적해서 현재 스텝까지의 메모리 상태 계산
- * (레거시 형식: memoryChanges: { stack: { action: 'add_variable', ... } })
- */
 function accumulateActionBasedChanges(
   steps: LessonStep[],
   upToStepIndex: number
@@ -210,13 +181,11 @@ function accumulateActionBasedChanges(
   let stackAddr = 0x1000;
   let heapAddr = 0x8000;
 
-  // 0번부터 현재 스텝까지 memoryChanges 누적
   for (let i = 0; i <= upToStepIndex; i++) {
     const step = steps[i];
     const changes = step?.memoryChanges;
     if (!changes) continue;
 
-    // Stack 변경 처리
     if (changes.stack && !Array.isArray(changes.stack)) {
       const stack = changes.stack as ActionBasedStackChange;
 
@@ -243,24 +212,20 @@ function accumulateActionBasedChanges(
       } else if (stack.action === 'remove_variable') {
         stackMap.delete(stack.name || '');
       } else if (stack.action === 'destroy_frame') {
-        // 프레임 제거 시 해당 프레임의 변수들 제거
         if (stack.freed && Array.isArray(stack.freed)) {
           for (const name of stack.freed) {
             stackMap.delete(name);
           }
         }
       }
-      // create_frame, enter_block 등은 변수 생성하지 않음 (무시)
     }
 
-    // Heap 변경 처리 (배열 형식)
     if (changes.heap && Array.isArray(changes.heap)) {
       for (const h of changes.heap) {
         const displayValue = h.fields
           ? JSON.stringify(h.fields)
           : String(h.value ?? '');
         const id = h.id || h.address || `heap_${heapAddr.toString(16)}`;
-
         heapMap.set(id, {
           name: id,
           address: h.address || `0x${heapAddr.toString(16)}`,
@@ -276,34 +241,23 @@ function accumulateActionBasedChanges(
 
   state.stack = Array.from(stackMap.values());
   state.heap = Array.from(heapMap.values());
-
   return state;
 }
 
-/**
- * 데이터 형식 감지:
- * - 새 형식: memoryChanges가 배열 [{ area: 'stack', action: '...' }]
- * - 레거시 형식: memoryChanges가 객체 { stack: { action: '...' } }
- * - 누적 형식: memoryChanges.stack이 배열 [{ name: 'main', variables: [...] }]
- */
 function detectFormat(steps: LessonStep[]): 'new-array' | 'legacy-action' | 'cumulative' | 'unknown' {
   const firstStep = steps.find(s => s?.memoryChanges);
   if (!firstStep?.memoryChanges) return 'unknown';
 
   const changes = firstStep.memoryChanges;
 
-  // 새 형식: memoryChanges가 배열
   if (Array.isArray(changes)) {
     return 'new-array';
   }
 
-  // 객체 형식 확인
   if (changes.stack) {
     if (Array.isArray(changes.stack)) {
-      // 누적 형식: stack이 StackFrame[] 배열
       return 'cumulative';
     } else if (typeof changes.stack === 'object') {
-      // 레거시 형식: stack이 액션 객체
       return 'legacy-action';
     }
   }
@@ -311,39 +265,141 @@ function detectFormat(steps: LessonStep[]): 'new-array' | 'legacy-action' | 'cum
   return 'unknown';
 }
 
-export function useLessonMemory(
+// ============================================
+// JavaScript 시각화 처리 로직
+// ============================================
+
+/**
+ * 스텝에서 시각화 타입 감지
+ */
+function detectVisualizationType(step: LessonStep | undefined): JSVisualizationType | 'memory' | null {
+  if (!step) return null;
+
+  // 명시적 visualizationType 필드가 있으면 사용
+  if (step.visualizationType) {
+    return step.visualizationType as JSVisualizationType;
+  }
+
+  // 시각화 상태 필드로 타입 추론
+  if (step.eventLoopState) return 'eventLoop';
+  if (step.closureState) return 'closure';
+  if (step.prototypeState) return 'prototype';
+  if (step.thisBindState) return 'thisBind';
+  if (step.hoistingState) return 'hoisting';
+  if (step.callStackState) return 'callStack';
+  if (step.scopeChainState) return 'scopeChain';
+
+  // memoryChanges가 있으면 메모리 시각화
+  if (step.memoryChanges) return 'memory';
+
+  return null;
+}
+
+/**
+ * 스텝에서 시각화 상태 추출
+ */
+function extractVisualizationState(step: LessonStep | undefined): JSVisualizationState | null {
+  if (!step) return null;
+
+  // 각 시각화 타입별 상태 추출
+  if (step.eventLoopState) {
+    return { type: 'eventLoop', data: step.eventLoopState };
+  }
+  if (step.closureState) {
+    return { type: 'closure', data: step.closureState };
+  }
+  if (step.prototypeState) {
+    return { type: 'prototype', data: step.prototypeState };
+  }
+  if (step.thisBindState) {
+    return { type: 'thisBind', data: step.thisBindState };
+  }
+  if (step.hoistingState) {
+    return { type: 'hoisting', data: step.hoistingState };
+  }
+  if (step.callStackState) {
+    return { type: 'callStack', data: step.callStackState };
+  }
+  if (step.scopeChainState) {
+    return { type: 'scopeChain', data: step.scopeChainState };
+  }
+
+  return null;
+}
+
+// ============================================
+// 메인 Hook
+// ============================================
+
+export function useLessonVisualization(
   steps: LessonStep[],
   currentStepIndex: number
-): UseLessonMemoryReturn {
+): UseLessonVisualizationReturn {
+  const currentStep = steps[currentStepIndex];
+
+  // 시각화 타입 감지
+  const visualizationType = useMemo(
+    () => detectVisualizationType(currentStep),
+    [currentStep]
+  );
+
+  // JavaScript 시각화 상태
+  const visualizationState = useMemo(
+    () => extractVisualizationState(currentStep),
+    [currentStep]
+  );
+
+  // C 메모리 시각화 상태
   const memoryState = useMemo(() => {
+    // JavaScript 시각화가 있으면 메모리 상태 계산 스킵
+    if (visualizationType && visualizationType !== 'memory') {
+      return { stack: [], heap: [], frames: [] };
+    }
+
     const format = detectFormat(steps);
 
     switch (format) {
       case 'new-array':
-        // 새 형식: memoryChanges 배열을 누적
         return accumulateMemoryChanges(steps, currentStepIndex);
-
       case 'legacy-action':
-        // 레거시 형식: 액션 기반 객체를 누적
         return accumulateActionBasedChanges(steps, currentStepIndex);
-
       case 'cumulative':
-        // 누적 형식: 현재 스텝의 상태를 변환
-        const currentStep = steps[currentStepIndex];
         return convertToVisualFormat(currentStep?.memoryChanges);
-
       default:
         return { stack: [], heap: [], frames: [] };
     }
-  }, [steps, currentStepIndex]);
+  }, [steps, currentStepIndex, visualizationType, currentStep]);
 
+  // 변경된 블록 추출
   const changedBlocks = useMemo(() => {
-    // 현재 스텝에서 변경된 블록만 추출
     return memoryState.stack
       .concat(memoryState.heap)
       .filter((b) => b.highlight)
       .map((b) => b.name);
   }, [memoryState]);
 
-  return { memoryState, changedBlocks };
+  return {
+    memoryState,
+    changedBlocks,
+    visualizationType,
+    visualizationState,
+  };
+}
+
+// ============================================
+// 하위 호환성: useLessonMemory 별칭
+// ============================================
+
+/**
+ * @deprecated useLessonVisualization을 사용하세요
+ */
+export function useLessonMemory(
+  steps: LessonStep[],
+  currentStepIndex: number
+) {
+  const result = useLessonVisualization(steps, currentStepIndex);
+  return {
+    memoryState: result.memoryState,
+    changedBlocks: result.changedBlocks,
+  };
 }

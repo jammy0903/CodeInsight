@@ -267,7 +267,85 @@ async function seed() {
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
   }
 
-  // 4. 결과 확인
+  // 4. JavaScript 커리큘럼 로드
+  console.log('  📚 Loading JavaScript curriculum from JSON...');
+  const jsCurriculum = loadCurriculum('javascript');
+
+  if (jsCurriculum) {
+    let contentCount = 0;
+    let quizCount = 0;
+
+    for (const chapterData of jsCurriculum.chapters) {
+      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
+
+      const chapter = await prisma.chapter.create({
+        data: {
+          id: chapterData.id,
+          languageId: 'javascript',
+          title: chapterData.title,
+          description: chapterData.description,
+          keyQuestion: chapterData.keyQuestion,
+          part: chapterData.part,
+          partLabel: chapterData.partLabel,
+          order: chapterData.order,
+        },
+      });
+
+      // 각 챕터의 레슨 생성
+      for (const lessonData of chapterData.lessons) {
+        console.log(`      ├─ Lesson ${lessonData.order}: ${lessonData.title}`);
+
+        const lesson = await prisma.lesson.create({
+          data: {
+            id: lessonData.id,
+            chapterId: chapter.id,
+            title: lessonData.title,
+            description: lessonData.description,
+            difficulty: lessonData.difficulty,
+            order: lessonData.order,
+            estimatedTime: lessonData.estimatedTime,
+          },
+        });
+
+        // 레슨 콘텐츠 로드
+        const content = loadLessonContent('javascript', lessonData.id);
+        if (content) {
+          await prisma.lessonContent.create({
+            data: {
+              id: `content-${lessonData.id}`,
+              lessonId: lesson.id,
+              code: content.content.code,
+              language: 'javascript',
+              steps: JSON.stringify(content.content.steps),
+            },
+          });
+          contentCount++;
+
+          // 퀴즈 생성
+          if (content.quiz) {
+            await prisma.quiz.create({
+              data: {
+                id: `quiz-${lessonData.id}`,
+                lessonId: lesson.id,
+                type: 'multiple_choice',
+                question: content.quiz.question,
+                options: content.quiz.options,
+                answer: String(content.quiz.correctIndex),
+                explanation: content.quiz.explanation,
+                order: 1,
+              },
+            });
+            quizCount++;
+          }
+        }
+      }
+    }
+
+    console.log(`    📄 Loaded ${contentCount} lesson contents`);
+    console.log(`    ❓ Loaded ${quizCount} quizzes`);
+  }
+
+  // 5. 결과 확인
   const stats = {
     languages: await prisma.language.count(),
     chapters: await prisma.chapter.count(),

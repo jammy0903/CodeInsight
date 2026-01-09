@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, MessageSquare, Cpu, Bot } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, MessageSquare, Cpu, Bot, Code2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
@@ -28,8 +28,11 @@ import { ChatQA } from '@/features/chat';
 
 // 새 hooks
 import { useLessonNavigation } from './hooks/useLessonNavigation';
-import { useLessonMemory } from './hooks/useLessonMemory';
+import { useLessonVisualization } from './hooks/useLessonVisualization';
 import { useCodeSelection } from './hooks/useCodeSelection';
+
+// 언어별 시각화
+import { JSVisualizerView } from '@/features/visualizers/js';
 
 /**
  * 로딩 뷰
@@ -291,7 +294,12 @@ export function LessonPage() {
     },
   });
 
-  const { memoryState, changedBlocks } = useLessonMemory(steps, navigation.currentStepIndex);
+  const {
+    memoryState,
+    changedBlocks,
+    visualizationType,
+    visualizationState,
+  } = useLessonVisualization(steps, navigation.currentStepIndex);
   const { selection, setSelection, clearSelection } = useCodeSelection();
 
   // 현재 스텝
@@ -324,9 +332,9 @@ export function LessonPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] h-[calc(100vh-80px)] flex flex-col py-4 overflow-hidden lesson-page-container">
-      {/* 헤더 */}
-      <div className="flex items-center gap-4 mb-2 shrink-0">
+    <div className="py-4 px-4 lesson-page-container">
+      {/* 헤더 - 일반 스크롤 */}
+      <div className="flex items-center gap-4 mb-4">
         <Link to={languageCoursePath} className="cyber-back-btn">
           <span className="cyber-back-arrow">‹</span>
           <span>EXIT</span>
@@ -348,27 +356,42 @@ export function LessonPage() {
           chapterPath={languageCoursePath}
         />
       ) : (
-        <div className="flex-1 flex gap-4 min-h-0 overflow-hidden">
+        <div className="flex gap-4 items-start">
           {/* 왼쪽: 코드 + 컨트롤 (55%) */}
-          <div className="w-[55%] flex flex-col gap-4 min-h-0">
+          <div className="w-[55%] flex flex-col gap-4">
             {/* 코드 뷰어 카드 */}
-            <div
-              className="flex-1 min-h-0 rounded-xl overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, #FFFBF5 0%, #FFF8F0 100%)',
-                border: '1px solid #E5D5C7',
-                boxShadow: '0 2px 12px rgba(147, 123, 93, 0.08)',
-              }}
-            >
-              <CodeViewer
-                code={code}
-                highlightLine={currentStep?.line || 1}
-                onSelectionChange={setSelection}
-              />
+            <div>
+              {/* 코드 헤더 */}
+              <div
+                className="flex items-center gap-2 px-4 py-3 rounded-t-xl text-sm font-semibold"
+                style={{
+                  background: 'linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%)',
+                  border: '1px solid #E5D5C7',
+                  borderBottom: 'none',
+                  color: '#e5e5e5',
+                }}
+              >
+                <Code2 className="w-4 h-4 text-yellow-400" />
+                코드
+              </div>
+              {/* 코드 뷰어 */}
+              <div
+                className="rounded-b-xl overflow-hidden"
+                style={{
+                  border: '1px solid #E5D5C7',
+                  borderTop: 'none',
+                }}
+              >
+                <CodeViewer
+                  code={code}
+                  highlightLine={currentStep?.line || 1}
+                  onSelectionChange={setSelection}
+                />
+              </div>
             </div>
 
             {/* 스텝 컨트롤 */}
-            <div className="shrink-0">
+            <div>
               <StepControls
                 currentStep={navigation.currentStepIndex + 1}
                 totalSteps={navigation.totalSteps}
@@ -383,10 +406,10 @@ export function LessonPage() {
           </div>
 
           {/* 오른쪽: 탭 구조 (메모리+설명 | AI Chat) */}
-          <div className="w-[45%] flex flex-col min-h-0">
+          <div className="w-[45%]">
             {/* 탭 헤더 */}
             <div
-              className="flex shrink-0 rounded-t-xl overflow-hidden"
+              className="flex rounded-t-xl overflow-hidden"
               style={{ border: '1px solid #E5D5C7', borderBottom: 'none' }}
             >
               <button
@@ -401,7 +424,7 @@ export function LessonPage() {
                 }}
               >
                 <Cpu className="w-4 h-4" />
-                메모리 + 설명
+                {lang === 'javascript' ? '시각화 + 설명' : '메모리 + 설명'}
               </button>
               <button
                 onClick={() => setActiveTab('chat')}
@@ -418,36 +441,45 @@ export function LessonPage() {
               </button>
             </div>
 
-            {/* 탭 콘텐츠 */}
+            {/* 탭 콘텐츠 - 자연스럽게 늘어남 */}
             <div
-              className="flex-1 min-h-0 rounded-b-xl overflow-hidden"
+              className="rounded-b-xl"
               style={{
                 border: '1px solid #E5D5C7',
                 borderTop: 'none',
               }}
             >
-              {/* 메모리 + 설명 탭 */}
+              {/* 메모리/시각화 + 설명 탭 */}
               {activeTab === 'memory' && (
-                <div className="h-full flex flex-col overflow-hidden">
-                  {/* 메모리 시뮬레이터 - 넓게! */}
+                <div>
+                  {/* 언어별 시각화 */}
                   <div
-                    className="flex-1 min-h-0 overflow-auto"
                     style={{
                       background: 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)',
                     }}
                   >
-                    <CourseMemoryView
-                      stack={memoryState.stack}
-                      heap={memoryState.heap}
-                      changedBlocks={changedBlocks}
-                    />
+                    {/* C 언어: 메모리 시각화 */}
+                    {(lang === 'c' || visualizationType === 'memory' || !visualizationType) && (
+                      <CourseMemoryView
+                        stack={memoryState.stack}
+                        heap={memoryState.heap}
+                        changedBlocks={changedBlocks}
+                      />
+                    )}
+
+                    {/* JavaScript: 전용 시각화 (eventLoop, closure 등) */}
+                    {lang === 'javascript' && visualizationType && visualizationType !== 'memory' && visualizationState && (
+                      <JSVisualizerView
+                        type={visualizationType}
+                        state={visualizationState}
+                      />
+                    )}
                   </div>
 
-                  {/* 현재 스텝 설명 - 하단 고정 */}
+                  {/* 현재 스텝 설명 */}
                   <div
-                    className="shrink-0 p-4 overflow-y-auto"
+                    className="p-4"
                     style={{
-                      maxHeight: '35%',
                       background: 'linear-gradient(135deg, #FFF8F0 0%, #FFF5E8 100%)',
                       borderTop: '2px solid #E8D4C4',
                     }}
@@ -481,10 +513,10 @@ export function LessonPage() {
                 </div>
               )}
 
-              {/* AI Chat 탭 */}
+              {/* AI Chat 탭 - 최소 높이 설정 */}
               {activeTab === 'chat' && (
                 <div
-                  className="h-full overflow-hidden relative"
+                  className="relative min-h-[500px]"
                   style={{
                     background: 'linear-gradient(135deg, #FFFBF5 0%, #FFF9F2 100%)',
                   }}
