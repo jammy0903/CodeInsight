@@ -22,7 +22,7 @@ export function LanguageCoursePage() {
   const getLanguageInfo = () => {
     switch (lang) {
       case 'c':
-        return { name: 'C언어', icon: 'C', color: '#00599C' };
+        return { name: 'C언어', icon: 'C', color: '#87CEEB' };
       case 'python':
         return { name: 'Python', icon: '🐍', color: '#3776AB' };
       case 'java':
@@ -169,41 +169,49 @@ export function LanguageCoursePage() {
           onClick={() => navigate('/courses')}
           className="group flex items-center gap-2 text-[#937b5d] hover:text-[#FFD700] transition-colors mb-6"
         >
-          <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-semibold tracking-wider uppercase">Select Course</span>
+          <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-2xl font-semibold tracking-wider uppercase">Select Course</span>
         </button>
 
-        {/* 메인 헤더 카드 - 네온 글로우 */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1a2e] to-[#16213e] p-8 border border-[#FFD700]/20">
-          {/* 배경 그리드 패턴 */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: 'linear-gradient(#FFD700 1px, transparent 1px), linear-gradient(90deg, #FFD700 1px, transparent 1px)',
-            backgroundSize: '40px 40px'
-          }} />
-
-          {/* 글로우 효과 */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFD700]/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#00D9FF]/10 rounded-full blur-3xl" />
+        {/* 메인 헤더 카드 - 언어 색상 기반 */}
+        <div
+          className="relative overflow-hidden rounded-2xl"
+          style={{
+            padding: '40px',
+            background: `linear-gradient(135deg, ${langInfo.color}20 0%, ${langInfo.color}35 100%)`,
+            border: `2px solid ${langInfo.color}`,
+          }}
+        >
+          {/* 바느질 스티치 */}
+          <div
+            className="absolute rounded-xl pointer-events-none"
+            style={{
+              top: '12px',
+              left: '12px',
+              right: '12px',
+              bottom: '12px',
+              border: `2px dashed ${langInfo.color}50`,
+            }}
+          />
 
           <div className="relative z-10">
             {/* 상단: 언어 아이콘 + 이름 */}
             <div className="flex items-center gap-4 mb-6">
               <div
-                className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl font-bold shadow-lg"
+                className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl font-bold text-white"
                 style={{
-                  background: `linear-gradient(135deg, ${langInfo.color}40, ${langInfo.color}20)`,
+                  background: langInfo.color,
                   border: `2px solid ${langInfo.color}`,
-                  boxShadow: `0 0 20px ${langInfo.color}40`
                 }}
               >
                 {langInfo.icon}
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight">
+                <h1 className="text-3xl font-bold tracking-tight text-gray-800">
                   {langInfo.name}
                 </h1>
-                <p className="text-[#00D9FF] text-sm font-mono">
-                  {chapters.length} CHAPTERS · {totalLessons} LESSONS
+                <p className="text-gray-500 text-sm">
+                  {chapters.length} 챕터 · {totalLessons} 레슨
                 </p>
               </div>
             </div>
@@ -211,37 +219,37 @@ export function LanguageCoursePage() {
             {/* 레벨 & XP 바 */}
             <div className="flex items-center gap-6">
               {/* 레벨 뱃지 */}
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#FFD700]/10 border border-[#FFD700]/30">
-                <Trophy className="w-5 h-5 text-[#FFD700]" />
-                <span className="text-[#FFD700] font-bold font-mono">LV.{currentLevel}</span>
+              <div
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 border border-amber-300"
+              >
+                <Trophy className="w-5 h-5 text-amber-500" />
+                <span className="font-bold font-mono text-amber-600">LV.{currentLevel}</span>
               </div>
 
               {/* XP 바 */}
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-[#00D9FF]" />
-                    <span className="text-xs text-[#00D9FF] font-mono uppercase">Experience</span>
+                    <Zap className="w-4 h-4 text-emerald-500" />
+                    <span className="text-xs font-mono uppercase text-emerald-600">Progress</span>
                   </div>
-                  <span className="text-xs text-white/60 font-mono">
-                    {completedLessons} / {totalLessons} Completed
+                  <span className="text-xs text-gray-500 font-mono">
+                    {completedLessons} / {totalLessons} 완료
                   </span>
                 </div>
-                <div className="h-3 bg-white/10 rounded-full overflow-hidden backdrop-blur">
+                <div className="h-3 bg-white rounded-full overflow-hidden border border-gray-200">
                   <div
-                    className="h-full rounded-full transition-all duration-500"
+                    className="h-full rounded-full transition-all duration-500 bg-emerald-400"
                     style={{
                       width: `${overallProgress}%`,
-                      background: 'linear-gradient(90deg, #00D9FF, #A855F7, #FF6B9D)',
-                      boxShadow: '0 0 10px #00D9FF80'
                     }}
                   />
                 </div>
                 <div className="flex justify-between mt-1">
-                  <span className="text-[10px] text-white/40 font-mono">
-                    {xpInLevel}/{xpToNextLevel} XP to next level
+                  <span className="text-[10px] text-gray-400 font-mono">
+                    {xpInLevel}/{xpToNextLevel} XP
                   </span>
-                  <span className="text-[10px] text-[#FFD700] font-mono font-bold">
+                  <span className="text-[10px] font-mono font-bold text-emerald-500">
                     {overallProgress}%
                   </span>
                 </div>
@@ -253,6 +261,7 @@ export function LanguageCoursePage() {
 
       {/* 챕터 Grid */}
       {lang && (
+        <div style={{ marginTop: '80px' }}>
         <CourseGrid>
           {chapters.map((chapter, index) => {
             // 이전 챕터들이 모두 완료되었는지 확인
@@ -284,6 +293,7 @@ export function LanguageCoursePage() {
             );
           })}
         </CourseGrid>
+        </div>
       )}
 
       {/* 하단 여백 */}

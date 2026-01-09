@@ -41,43 +41,81 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
   const isCompleted = progress?.status === 'completed';
   const isInProgress = progress?.status === 'in_progress';
 
+  // 스티치 색상 결정 (차분한 파스텔)
+  const stitchColor = isCompleted
+    ? 'rgba(16, 185, 129, 0.5)'   // 민트 그린
+    : isInProgress
+      ? 'rgba(196, 21, 122, 0.4)' // 로즈 핑크
+      : 'rgba(230, 180, 0, 0.45)'; // 머스타드
+
   return (
     <button
       onClick={handleClick}
       className={`
-        group relative rounded-xl p-5 text-left
+        group relative rounded-xl text-left
         transition-all duration-300 hover:scale-[1.02]
         ${isCompleted
-          ? 'bg-gradient-to-br from-[#1a2e1a] to-[#162e16] border border-[#10B981]/30 shadow-lg'
+          ? 'border-2 border-[#10B981]/50 shadow-lg shadow-[#10B981]/15'
           : isInProgress
-            ? 'bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-[#00D9FF]/30 shadow-[0_0_20px_-10px_#00D9FF40]'
-            : 'bg-[#1a1a2e] border border-white/10 hover:border-white/20 hover:shadow-xl'
+            ? 'border-2 border-[#C4157A]/50 shadow-lg shadow-[#C4157A]/15'
+            : 'border-2 border-[#E6B400]/40 hover:border-[#E6B400]/60 hover:shadow-lg hover:shadow-[#E6B400]/15'
         }
       `}
+      style={{
+        padding: '32px',
+        minHeight: '280px',
+        background: isCompleted
+          ? 'linear-gradient(135deg, #B8E8D4 0%, #9AD8BE 100%)'  // 연한 민트
+          : isInProgress
+            ? 'linear-gradient(135deg, #F5C6D6 0%, #E8A8BE 100%)' // 연한 핑크
+            : 'linear-gradient(135deg, #FFF2CC 0%, #FFE699 100%)' // 머스타드 옐로우
+      }}
     >
-      {/* 상태 아이콘 (좌상단) */}
-      <div className="absolute top-4 right-4">
+      {/* 바느질 스티치 테두리 */}
+      <div
+        className="absolute rounded-lg pointer-events-none"
+        style={{
+          top: '8px',
+          left: '8px',
+          right: '8px',
+          bottom: '8px',
+          border: `2px dashed ${stitchColor}`,
+          borderRadius: '8px'
+        }}
+      />
+      {/* 상태 아이콘 (우상단) */}
+      <div className="absolute top-12 right-12">
         {isCompleted ? (
           <CheckCircle2 className="w-6 h-6 text-[#10B981]" />
         ) : isInProgress ? (
-          <PlayCircle className="w-6 h-6 text-[#00D9FF] animate-pulse" />
+          <PlayCircle className="w-6 h-6 text-[#C4157A] animate-pulse" />
         ) : (
-          <div className="w-6 h-6 rounded-full border-2 border-white/20 group-hover:border-white/40 transition-colors" />
+          <div className="w-6 h-6 rounded-full border-2 border-[#E6B400]/50 group-hover:border-[#E6B400]/80 transition-colors" />
         )}
       </div>
 
       {/* 레슨 번호 뱃지 */}
       {lesson.order !== undefined && (
         <div
-          className={`
-            inline-flex items-center justify-center w-10 h-10 rounded-lg font-mono text-sm font-bold mb-3
-            ${isCompleted
-              ? 'bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30'
+          className="inline-flex items-center justify-center w-10 h-10 rounded-lg font-mono text-sm font-bold"
+          style={{
+            marginBottom: '12px',
+            backgroundColor: isCompleted
+              ? 'rgba(16, 185, 129, 0.15)'   // 민트 그린
               : isInProgress
-                ? 'bg-[#00D9FF]/20 text-[#00D9FF] border border-[#00D9FF]/30'
-                : 'bg-white/10 text-white/60 border border-white/20'
-            }
-          `}
+                ? 'rgba(233, 30, 140, 0.12)'  // 핑크
+                : 'rgba(230, 180, 0, 0.15)',  // 머스타드
+            color: isCompleted
+              ? '#059669'
+              : isInProgress
+                ? '#C4157A'
+                : '#CC9900',  // 머스타드
+            border: isCompleted
+              ? '1px solid rgba(16, 185, 129, 0.3)'
+              : isInProgress
+                ? '1px solid rgba(233, 30, 140, 0.3)'
+                : '1px solid rgba(230, 180, 0, 0.4)'
+          }}
         >
           {lesson.order}
         </div>
@@ -86,21 +124,22 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
       {/* 레슨 제목 */}
       <h3
         className={`
-          text-lg font-bold mb-2 line-clamp-2
+          text-lg font-bold line-clamp-2
           ${isCompleted
-            ? 'text-[#10B981]'
+            ? 'text-[#059669]'
             : isInProgress
-              ? 'text-white'
-              : 'text-white/80 group-hover:text-white transition-colors'
+              ? 'text-[#C4157A]'
+              : 'text-[#4A4A4A] group-hover:text-[#CC9900] transition-colors'
           }
         `}
+        style={{ marginBottom: '12px' }}
       >
         {lesson.title}
       </h3>
 
       {/* 레슨 설명 */}
       {lesson.description && (
-        <p className="text-sm text-white/50 mb-4 line-clamp-2">
+        <p className="text-sm text-[#6B6B6B] line-clamp-2" style={{ marginBottom: '20px' }}>
           {lesson.description}
         </p>
       )}
@@ -130,8 +169,8 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
 
       {/* 완료시 XP 표시 */}
       {isCompleted && (
-        <div className="mt-3 flex items-center gap-1.5 text-[#FFD700] text-xs font-mono">
-          <Zap className="w-3.5 h-3.5 fill-[#FFD700]" />
+        <div className="mt-3 flex items-center gap-1.5 text-[#E6B400] text-xs font-mono">
+          <Zap className="w-3.5 h-3.5 fill-[#E6B400]" />
           <span>+10 XP</span>
         </div>
       )}

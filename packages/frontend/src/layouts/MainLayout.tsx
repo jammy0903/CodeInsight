@@ -7,7 +7,7 @@
 
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { TopBar } from './TopBar';
 import { Sidebar } from './Sidebar';
 import { NicknameModal } from '@/components/NicknameModal';
@@ -25,6 +25,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   // 페이지 타입 확인
   const isHomePage = location.pathname === '/';
   const isLessonPage = /^\/courses\/[^/]+\/[^/]+\/[^/]+$/.test(location.pathname);
+  const isPlaygroundPage = location.pathname === '/playground';
 
   // Gmail 문의하기 링크 (제목 포함)
   const username = appUser?.nickname || '게스트';
@@ -61,24 +62,26 @@ export function MainLayout({ children }: MainLayoutProps) {
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
-        {/* 홈페이지: 전체 너비, 다른 페이지: 컨테이너 */}
-        {isHomePage ? (
+        {/* 홈/플레이그라운드: 전체 너비, 레슨: 레슨 컨테이너, 나머지: 메인 컨테이너 */}
+        {isHomePage || isPlaygroundPage ? (
           children
+        ) : isLessonPage ? (
+          <div className="lesson-content-container">{children}</div>
         ) : (
-          <div className={isLessonPage ? "lesson-content-container" : "main-content-container"}>
-            {children}
-          </div>
+          <div className="main-content-container">{children}</div>
         )}
 
         {/* Footer - Bootstrap Footer V09 스타일 */}
-        {!isLessonPage && (
+        {!isLessonPage && !isPlaygroundPage && (
           <footer className="mt-16 py-8 bg-[#f8f4ef] border-t border-[#e5d5c7]">
             <div className="main-content-container">
               {/* 2열 레이아웃 */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 {/* 왼쪽: 브랜드 + 링크 */}
                 <div className="space-y-3">
-                  <h3 className="text-lg font-bold text-[#6b5a4a]">CodeInsight</h3>
+                  <Link to="/" className="text-lg font-bold text-[#6b5a4a] hover:text-[#a08060] transition-colors no-underline hover:no-underline">
+                    CodeInsight
+                  </Link>
                   <div className="flex flex-wrap gap-4 text-sm text-[#937b5d]">
                     <a href="/courses" className="hover:text-[#6b5a4a] transition-colors">Courses</a>
                     <a href="/chat" className="hover:text-[#6b5a4a] transition-colors">AI Chat</a>

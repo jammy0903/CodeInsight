@@ -80,12 +80,13 @@ export function CoursesPage() {
         </p>
       </motion.div>
 
-      {/* 언어 카드 리스트 (수직 배열) */}
+      {/* 언어 카드 그리드 (2x2 정사각형) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="flex flex-col gap-4 max-w-2xl mx-auto"
+        className="grid grid-cols-2 gap-6 max-w-2xl mx-auto"
+        style={{ justifyContent: 'center' }}
       >
         {languages.map((lang, index) => (
           <LanguageCard
@@ -109,7 +110,7 @@ export function CoursesPage() {
 }
 
 /**
- * 언어 카드 컴포넌트
+ * 언어 카드 컴포넌트 - 바느질 디자인 + 정사각형
  */
 interface LanguageCardProps {
   language: Language;
@@ -117,39 +118,97 @@ interface LanguageCardProps {
   onClick: () => void;
 }
 
+// 언어별 색상 매핑
+const LANGUAGE_COLORS: Record<string, { bg: string; border: string; stitch: string; text: string }> = {
+  c: {
+    bg: 'linear-gradient(135deg, #E8F4FA 0%, #D0EBF7 100%)',
+    border: '#87CEEB',
+    stitch: 'rgba(135, 206, 235, 0.5)',
+    text: '#5BA3C0',
+  },
+  python: {
+    bg: 'linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%)',
+    border: '#FFD54F',
+    stitch: 'rgba(255, 193, 7, 0.5)',
+    text: '#F57C00',
+  },
+  java: {
+    bg: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)',
+    border: '#EF9A9A',
+    stitch: 'rgba(244, 67, 54, 0.4)',
+    text: '#C62828',
+  },
+  javascript: {
+    bg: 'linear-gradient(135deg, #FFF9C4 0%, #FFF59D 100%)',
+    border: '#FFF176',
+    stitch: 'rgba(255, 235, 59, 0.5)',
+    text: '#F9A825',
+  },
+};
+
+const DEFAULT_COLOR = {
+  bg: 'linear-gradient(135deg, #F5F5F5 0%, #EEEEEE 100%)',
+  border: '#BDBDBD',
+  stitch: 'rgba(158, 158, 158, 0.5)',
+  text: '#616161',
+};
+
 function LanguageCard({ language, index, onClick }: LanguageCardProps) {
+  const colors = LANGUAGE_COLORS[language.id] || DEFAULT_COLOR;
+
   return (
     <motion.button
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      whileHover={{ scale: 1.02, x: 4 }}
+      whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="group relative bg-bg-elevated border-2 border-border rounded-xl p-4
-                 hover:border-primary hover:shadow-lg transition-all duration-300
-                 flex items-center gap-4"
+      className="group relative rounded-2xl text-center transition-all duration-300
+                 hover:shadow-xl aspect-square flex flex-col items-center justify-center"
+      style={{
+        background: colors.bg,
+        border: `3px solid ${colors.border}`,
+        padding: '32px',
+      }}
     >
+      {/* 바느질 스티치 테두리 */}
+      <div
+        className="absolute rounded-xl pointer-events-none"
+        style={{
+          top: '12px',
+          left: '12px',
+          right: '12px',
+          bottom: '12px',
+          border: `2px dashed ${colors.stitch}`,
+          borderRadius: '12px',
+        }}
+      />
+
       {/* 아이콘 */}
-      <div className="text-4xl shrink-0">{language.icon || '📚'}</div>
+      <div className="text-6xl mb-4">{language.icon || '📚'}</div>
 
-      {/* 텍스트 영역 */}
-      <div className="flex-1 text-left">
-        <h3 className="text-lg font-bold text-text">
-          {language.name}
-        </h3>
-        <p className="text-sm text-text-secondary line-clamp-1">
-          {language.description || '코스를 탐색해보세요'}
-        </p>
+      {/* 언어 이름 */}
+      <h3
+        className="text-2xl font-bold mb-2"
+        style={{ color: colors.text }}
+      >
+        {language.name}
+      </h3>
+
+      {/* 설명 */}
+      <p className="text-sm text-gray-600 line-clamp-2 px-2">
+        {language.description || '코스를 탐색해보세요'}
+      </p>
+
+      {/* 화살표 (하단) */}
+      <div
+        className="mt-4 flex items-center gap-1 text-sm font-semibold opacity-60 group-hover:opacity-100 transition-opacity"
+        style={{ color: colors.text }}
+      >
+        <span>시작하기</span>
+        <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
       </div>
-
-      {/* 화살표 */}
-      <ChevronRight className="w-5 h-5 text-primary opacity-50 group-hover:opacity-100
-                               transform translate-x-0 group-hover:translate-x-1 transition-all shrink-0" />
-
-      {/* Hover 효과 */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-transparent
-                      opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </motion.button>
   );
 }

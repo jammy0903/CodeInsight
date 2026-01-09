@@ -10,7 +10,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, BookOpen, Shield, LogOut, UserPlus } from 'lucide-react';
+import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle } from '@/services/firebase';
@@ -28,6 +28,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { path: '/', label: '홈', icon: Home },
   { path: '/courses', label: 'Courses', icon: BookOpen },
+  { path: '/playground', label: 'Playground', icon: Play },
 ];
 
 export function Sidebar() {

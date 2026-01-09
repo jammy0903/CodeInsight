@@ -1,42 +1,44 @@
 /**
  * LanguageTabs - 언어 선택 탭
- * C | Python | Java 전환
+ * 컴팩트 스타일
  */
 
 import { usePlaygroundStore } from '../stores/playgroundStore';
 import type { SupportedLanguage } from '@/types';
 
-const LANGUAGES: { id: SupportedLanguage; label: string; icon: string }[] = [
-  { id: 'c', label: 'C', icon: '🔵' },
-  { id: 'python', label: 'Python', icon: '🐍' },
-  { id: 'java', label: 'Java', icon: '☕' },
+const LANGUAGES: { id: SupportedLanguage; label: string; color: string }[] = [
+  { id: 'c', label: 'C', color: '#58a6ff' },
+  { id: 'python', label: 'Python', color: '#3fb950' },
+  { id: 'java', label: 'Java', color: '#f0883e' },
 ];
 
 export function LanguageTabs() {
   const { language, setLanguage } = usePlaygroundStore();
 
   return (
-    <div className="flex items-center gap-4">
-      <span className="text-sm font-medium text-gray-600">Language:</span>
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-        {LANGUAGES.map((lang) => (
+    <div className="flex items-center gap-1 p-0.5 bg-[#21262d] rounded border border-[#30363d]">
+      {LANGUAGES.map((lang) => {
+        const isActive = language === lang.id;
+        return (
           <button
             key={lang.id}
             onClick={() => setLanguage(lang.id)}
             className={`
-              px-4 py-1.5 rounded-md text-sm font-medium transition-all
-              ${
-                language === lang.id
-                  ? 'bg-white shadow text-gray-900'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-all
+              ${isActive
+                ? 'bg-[#30363d] text-white'
+                : 'text-[#8b949e] hover:text-[#c9d1d9]'
               }
             `}
           >
-            <span className="mr-1.5">{lang.icon}</span>
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: isActive ? lang.color : '#484f58' }}
+            />
             {lang.label}
           </button>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

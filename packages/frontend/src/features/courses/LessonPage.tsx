@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, MessageSquare, ChevronRight } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, MessageSquare, Cpu, Bot } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
@@ -75,29 +75,67 @@ function CompletedView({
   const hasNext = nextLessonPath !== null;
 
   return (
-    <Card className="max-w-md mx-auto mt-12">
-      <CardContent className="pt-6 text-center space-y-4">
-        <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto" />
-        <h2 className="text-2xl font-bold">레슨 {lessonOrder} 완료!</h2>
-        <p className="text-muted-foreground">
-          {hasNext
-            ? '다음 레슨으로 계속 학습하세요.'
-            : '이 챕터의 모든 레슨을 완료했습니다!'}
-        </p>
-        <div className="flex gap-3 justify-center pt-4">
-          <button onClick={() => navigate(chapterPath)} className="btn-secondary px-4 py-2 flex items-center gap-1">
-            <ArrowLeft className="w-4 h-4" />
-            레슨 목록
+    <div
+      className="max-w-md mx-auto mt-12 rounded-2xl p-8 text-center"
+      style={{
+        background: 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)',
+        border: '1px solid #B8D4B8',
+        boxShadow: '0 8px 32px rgba(122, 154, 122, 0.15)',
+      }}
+    >
+      <div
+        className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+        style={{
+          background: 'linear-gradient(135deg, #7a9a7a 0%, #6a8a6a 100%)',
+          boxShadow: '0 4px 16px rgba(122, 154, 122, 0.3)',
+        }}
+      >
+        <CheckCircle2 className="w-10 h-10 text-white" />
+      </div>
+      <h2
+        className="text-2xl font-bold mb-2"
+        style={{ color: '#4a6a4a' }}
+      >
+        레슨 {lessonOrder} 완료!
+      </h2>
+      <p
+        className="mb-6"
+        style={{ color: '#6a8a6a' }}
+      >
+        {hasNext
+          ? '다음 레슨으로 계속 학습하세요.'
+          : '이 챕터의 모든 레슨을 완료했습니다!'}
+      </p>
+      <div className="flex gap-3 justify-center">
+        <button
+          onClick={() => navigate(chapterPath)}
+          className="px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all"
+          style={{
+            background: 'rgba(255, 255, 255, 0.8)',
+            border: '1px solid #B8D4B8',
+            color: '#5a7a5a',
+          }}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          레슨 목록
+        </button>
+        {hasNext && (
+          <button
+            onClick={() => navigate(nextLessonPath)}
+            className="px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all hover:shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, #7a9a7a 0%, #6a8a6a 100%)',
+              border: 'none',
+              color: '#fff',
+              boxShadow: '0 2px 8px rgba(122, 154, 122, 0.3)',
+            }}
+          >
+            다음 레슨
+            <ArrowRight className="w-4 h-4" />
           </button>
-          {hasNext && (
-            <button onClick={() => navigate(nextLessonPath)} className="btn-primary px-4 py-2 flex items-center gap-1">
-              다음 레슨
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -192,6 +230,7 @@ export function LessonPage() {
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'memory' | 'chat'>('memory');
 
   // 데이터 로드
   useEffect(() => {
@@ -285,7 +324,7 @@ export function LessonPage() {
   }
 
   return (
-    <div className="h-full flex flex-col py-4 overflow-hidden lesson-page-container">
+    <div className="min-h-[calc(100vh-80px)] h-[calc(100vh-80px)] flex flex-col py-4 overflow-hidden lesson-page-container">
       {/* 헤더 */}
       <div className="flex items-center gap-4 mb-2 shrink-0">
         <Link to={languageCoursePath} className="cyber-back-btn">
@@ -309,11 +348,18 @@ export function LessonPage() {
           chapterPath={languageCoursePath}
         />
       ) : (
-        <div className="flex-1 flex gap-3 min-h-0 overflow-hidden">
-          {/* 왼쪽: 코드 + 컨트롤 (50%) */}
-          <div className="flex-1 flex flex-col gap-3 min-h-0">
-            {/* 코드 뷰어 */}
-            <div className="flex-1 min-h-0">
+        <div className="flex-1 flex gap-4 min-h-0 overflow-hidden">
+          {/* 왼쪽: 코드 + 컨트롤 (55%) */}
+          <div className="w-[55%] flex flex-col gap-4 min-h-0">
+            {/* 코드 뷰어 카드 */}
+            <div
+              className="flex-1 min-h-0 rounded-xl overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #FFFBF5 0%, #FFF8F0 100%)',
+                border: '1px solid #E5D5C7',
+                boxShadow: '0 2px 12px rgba(147, 123, 93, 0.08)',
+              }}
+            >
               <CodeViewer
                 code={code}
                 highlightLine={currentStep?.line || 1}
@@ -336,57 +382,127 @@ export function LessonPage() {
             </div>
           </div>
 
-          {/* 중간: 화살표 구분선 */}
-          <div className="flex items-center justify-center w-8 shrink-0 relative">
-            <div className="absolute inset-y-0 left-1/2 w-px bg-border -translate-x-1/2"></div>
-            <div className="bg-bg-elevated px-2 relative z-10">
-              <ChevronRight className="w-6 h-6 text-primary" />
+          {/* 오른쪽: 탭 구조 (메모리+설명 | AI Chat) */}
+          <div className="w-[45%] flex flex-col min-h-0">
+            {/* 탭 헤더 */}
+            <div
+              className="flex shrink-0 rounded-t-xl overflow-hidden"
+              style={{ border: '1px solid #E5D5C7', borderBottom: 'none' }}
+            >
+              <button
+                onClick={() => setActiveTab('memory')}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all"
+                style={{
+                  background: activeTab === 'memory'
+                    ? 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)'
+                    : '#f8f4ef',
+                  color: activeTab === 'memory' ? '#4a6a4a' : '#937b5d',
+                  borderRight: '1px solid #E5D5C7',
+                }}
+              >
+                <Cpu className="w-4 h-4" />
+                메모리 + 설명
+              </button>
+              <button
+                onClick={() => setActiveTab('chat')}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all"
+                style={{
+                  background: activeTab === 'chat'
+                    ? 'linear-gradient(135deg, #FFFBF5 0%, #FFF9F2 100%)'
+                    : '#f8f4ef',
+                  color: activeTab === 'chat' ? '#7c5e3c' : '#937b5d',
+                }}
+              >
+                <Bot className="w-4 h-4" />
+                AI 튜터
+              </button>
             </div>
-          </div>
 
-          {/* 오른쪽: 시뮬레이터 + 설명 + AI Chat (50%) */}
-          <div className="flex-1 flex flex-col gap-3 min-h-0">
-            {/* 메모리 시뮬레이터 */}
-            <div className="shrink-0 max-h-[35%] min-h-[120px] rounded-xl border-2 border-border bg-bg-elevated overflow-hidden">
-              <CourseMemoryView
-                stack={memoryState.stack}
-                heap={memoryState.heap}
-                changedBlocks={changedBlocks}
-              />
-            </div>
+            {/* 탭 콘텐츠 */}
+            <div
+              className="flex-1 min-h-0 rounded-b-xl overflow-hidden"
+              style={{
+                border: '1px solid #E5D5C7',
+                borderTop: 'none',
+              }}
+            >
+              {/* 메모리 + 설명 탭 */}
+              {activeTab === 'memory' && (
+                <div className="h-full flex flex-col overflow-hidden">
+                  {/* 메모리 시뮬레이터 - 넓게! */}
+                  <div
+                    className="flex-1 min-h-0 overflow-auto"
+                    style={{
+                      background: 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)',
+                    }}
+                  >
+                    <CourseMemoryView
+                      stack={memoryState.stack}
+                      heap={memoryState.heap}
+                      changedBlocks={changedBlocks}
+                    />
+                  </div>
 
-            {/* 현재 스텝 설명 */}
-            <div className="shrink-0 max-h-[25%] rounded-xl border-2 border-neon-cyan bg-stack-bg p-3 overflow-y-auto">
-              <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-lg bg-neon-cyan/20 flex items-center justify-center shrink-0">
-                  <MessageSquare className="w-4 h-4 text-stack-text" />
+                  {/* 현재 스텝 설명 - 하단 고정 */}
+                  <div
+                    className="shrink-0 p-4 overflow-y-auto"
+                    style={{
+                      maxHeight: '35%',
+                      background: 'linear-gradient(135deg, #FFF8F0 0%, #FFF5E8 100%)',
+                      borderTop: '2px solid #E8D4C4',
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        style={{
+                          background: 'linear-gradient(135deg, #E8A87C 0%, #D4896A 100%)',
+                          boxShadow: '0 2px 8px rgba(232, 168, 124, 0.3)',
+                        }}
+                      >
+                        <MessageSquare className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3
+                          className="text-xs font-bold mb-2 tracking-wide"
+                          style={{ color: '#7c5e3c' }}
+                        >
+                          STEP {navigation.currentStepIndex + 1} 설명
+                        </h3>
+                        <div style={{ color: '#5a4a3a' }}>
+                          <StepExplanation
+                            explanation={currentStep?.explanation || ''}
+                            stepIndex={navigation.currentStepIndex}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-semibold text-stack-text mb-1">
-                    Step {navigation.currentStepIndex + 1} 설명
-                  </h3>
-                  <StepExplanation
-                    explanation={currentStep?.explanation || ''}
-                    stepIndex={navigation.currentStepIndex}
+              )}
+
+              {/* AI Chat 탭 */}
+              {activeTab === 'chat' && (
+                <div
+                  className="h-full overflow-hidden relative"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFFBF5 0%, #FFF9F2 100%)',
+                  }}
+                >
+                  {selection && (
+                    <SelectedCodeBadge selection={selection} onClear={clearSelection} />
+                  )}
+                  <ChatQA
+                    context={{
+                      courseDay: lesson.order,
+                      topic: lesson.title,
+                      code: code,
+                      currentLine: currentStep?.line,
+                    }}
+                    selectedText={selection?.text}
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* AI Chat */}
-            <div className="flex-1 min-h-[180px] rounded-xl border-2 border-border bg-warm-white overflow-hidden relative">
-              {selection && (
-                <SelectedCodeBadge selection={selection} onClear={clearSelection} />
               )}
-              <ChatQA
-                context={{
-                  courseDay: lesson.order,
-                  topic: lesson.title,
-                  code: code,
-                  currentLine: currentStep?.line,
-                }}
-                selectedText={selection?.text}
-              />
             </div>
           </div>
         </div>

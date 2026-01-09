@@ -29,8 +29,7 @@ interface MemoryBlockProps {
 }
 
 /**
- * 메모리 블록 - 단일 메모리 위치 표시
- * 강조점: 메모리에 저장되는 것은 "값"이라는 것
+ * 메모리 블록 - 넉넉한 메모리 위치 표시
  */
 function MemoryBlock({
   block,
@@ -51,67 +50,64 @@ function MemoryBlock({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -10 }}
       transition={{ duration: 0.2 }}
-      className="mb-3 rounded-lg overflow-hidden transition-all"
+      className="mb-4 rounded-xl overflow-hidden transition-all"
       style={{
         backgroundColor: isHovered ? pointerColor?.bg || segmentColor.headerBg : 'white',
         border: `2px solid ${mainColor}`,
         boxShadow: isChanged
-          ? `0 0 12px ${mainColor}60, inset 0 0 8px ${mainColor}20`
+          ? `0 0 12px ${mainColor}50`
           : isHovered
-            ? `0 0 8px ${mainColor}40`
-            : 'none',
+            ? `0 0 8px ${mainColor}30`
+            : '0 2px 8px rgba(0,0,0,0.06)',
       }}
     >
-      {/* 메모리 주소 (헤더) */}
+      {/* 주소 헤더 */}
       <div
-        className="px-3 py-2 text-xs font-bold text-white"
+        className="px-4 py-2 text-sm font-mono font-bold text-white"
         style={{ backgroundColor: mainColor }}
       >
         {block.address}
       </div>
 
-      {/* 메모리 값 (메인 콘텐츠) */}
-      <div className="px-4 py-3">
-        {/* 값 레이블 */}
-        <div className="text-xs font-semibold text-gray-600 mb-1">값:</div>
+      {/* 내용 */}
+      <div className="p-4">
+        {/* 변수명 */}
+        <div className="mb-3">
+          <span className="text-xs text-gray-500">변수:</span>
+          <span
+            className="ml-2 text-lg font-bold"
+            style={{ color: mainColor }}
+          >
+            {block.name}
+          </span>
+        </div>
 
-        {/* 값 표시 (강조됨) */}
+        {/* 값 (크게 강조) */}
         <div
-          className="px-3 py-2 rounded font-mono font-bold text-sm transition-all"
+          className="px-4 py-3 rounded-lg font-mono font-bold text-xl text-center"
           style={{
-            backgroundColor: `${mainColor}15`,
+            backgroundColor: isChanged ? '#fef3c7' : `${mainColor}15`,
             color: mainColor,
-            border: `1px solid ${mainColor}40`,
-            boxShadow: isChanged ? `0 0 8px ${mainColor}40` : 'none',
+            border: `2px solid ${mainColor}40`,
           }}
         >
           {block.value}
-
-          {/* 포인터 화살표 및 설명 */}
-          {isPointer && (
-            <div className="mt-2 text-xs" style={{ color: mainColor }}>
-              <span className="font-bold">→ 가리킴:</span> {block.points_to}
-            </div>
+          {isChanged && (
+            <span className="ml-2 text-sm text-amber-600">⚡ 변경됨</span>
           )}
         </div>
 
-        {/* 변수명 (이 메모리 위치를 참조하는 변수) */}
-        <div className="mt-2 text-xs text-gray-600">
-          <span className="font-semibold">변수:</span>{' '}
-          <span style={{ color: mainColor, fontWeight: 'bold' }}>{block.name}</span>
-          가 이 주소를 참조
-        </div>
-
-        {/* 변경 표시 */}
-        {isChanged && (
-          <motion.div
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-2 px-2 py-1 rounded text-xs font-semibold"
-            style={{ backgroundColor: '#fbbf24', color: '#78350f' }}
+        {/* 포인터 표시 */}
+        {isPointer && (
+          <div
+            className="mt-3 px-3 py-2 rounded-lg text-sm font-bold text-center"
+            style={{
+              backgroundColor: `${mainColor}10`,
+              color: mainColor,
+            }}
           >
-            ⚡ 값 변경됨
-          </motion.div>
+            → {block.points_to} 를 가리킴
+          </div>
         )}
       </div>
     </motion.div>
@@ -132,8 +128,6 @@ function MemorySection({
   changedBlocks: string[];
   hoveredVariable?: string | null;
 }) {
-  if (blocks.length === 0) return null;
-
   const colors = SEGMENT_COLORS[type];
   const pointerBlocks = blocks.filter((b) => b.points_to !== null);
 
@@ -149,51 +143,59 @@ function MemorySection({
     return type === 'stack' ? addrB - addrA : addrA - addrB;
   });
 
+  const isEmpty = blocks.length === 0;
+
   return (
-    <div className="mb-4">
+    <div className="rounded-xl overflow-hidden">
       {/* 섹션 헤더 */}
       <div
-        className="px-4 py-3 rounded-t-lg text-white font-bold text-sm"
+        className="px-4 py-3 text-white font-bold text-sm"
         style={{ backgroundColor: colors.main }}
       >
-        {type === 'stack' ? (
-          <>
-            📦 Stack (메모리 자동 관리)
-            <span className="text-xs font-normal ml-2">↓ 낮은 주소</span>
-          </>
-        ) : (
-          <>
-            🎒 Heap (수동 할당)
-            <span className="text-xs font-normal ml-2">↑ 높은 주소</span>
-          </>
-        )}
+        {type === 'stack' ? '📦 Stack' : '🎒 Heap'}
+        <span className="font-normal ml-2 opacity-80 text-xs">
+          {type === 'stack' ? '(자동 관리 영역)' : '(수동 할당 영역)'}
+        </span>
       </div>
 
       {/* 메모리 블록 리스트 */}
       <div
-        className="px-4 py-4 rounded-b-lg"
-        style={{ backgroundColor: `${colors.main}08` }}
+        className="p-4"
+        style={{
+          backgroundColor: `${colors.main}08`,
+          border: `2px solid ${colors.main}30`,
+          borderTop: 'none',
+          borderBottomLeftRadius: '12px',
+          borderBottomRightRadius: '12px',
+        }}
       >
-        <AnimatePresence>
-          {sortedBlocks.map((block) => (
-            <MemoryBlock
-              key={`mem-${type}-${block.name}`}
-              block={block}
-              isChanged={changedBlocks.includes(block.name)}
-              isPointer={block.points_to !== null}
-              pointerIndex={getPointerIndex(block)}
-              segmentType={type}
-              isHovered={hoveredVariable === block.name}
-            />
-          ))}
-        </AnimatePresence>
+        {isEmpty ? (
+          <div className="text-center py-6 text-gray-400 italic">
+            {type === 'stack' ? '스택 비어있음' : '힙 비어있음'}
+          </div>
+        ) : (
+          <AnimatePresence>
+            {sortedBlocks.map((block) => (
+              <MemoryBlock
+                key={`mem-${type}-${block.name}`}
+                block={block}
+                isChanged={changedBlocks.includes(block.name)}
+                isPointer={block.points_to !== null}
+                pointerIndex={getPointerIndex(block)}
+                segmentType={type}
+                isHovered={hoveredVariable === block.name}
+              />
+            ))}
+          </AnimatePresence>
+        )}
       </div>
     </div>
   );
 }
 
 /**
- * 메모리 패널 - Stack과 Heap을 명확히 분리
+ * 메모리 패널 - 계획서대로 세로 블록 형식
+ * 변수 영역 (상단) → Stack (중간) → Heap (하단)
  */
 export function MemoryPanel({
   stack,
@@ -207,15 +209,15 @@ export function MemoryPanel({
     <div className="flex-1 overflow-auto p-4">
       {/* 헤더 */}
       <div className="mb-4">
-        <h3 className="text-xs font-bold uppercase tracking-wide text-gray-700">
+        <h3 className="text-sm font-bold text-gray-700">
           메모리 영역 (실제 값이 저장되는 곳)
         </h3>
-        <p className="text-xs text-gray-600 mt-1">
+        <p className="text-xs text-gray-500 mt-1">
           메모리에 저장되는 것은 값뿐입니다. 포인터도 주소라는 값입니다.
         </p>
       </div>
 
-      {/* 메모리 블록들 */}
+      {/* 메모리 블록들 - 세로 배치 */}
       {isEmpty ? (
         <motion.div
           initial={{ opacity: 0 }}
@@ -225,7 +227,7 @@ export function MemoryPanel({
           메모리 할당 없음
         </motion.div>
       ) : (
-        <>
+        <div className="space-y-4">
           {/* Stack 섹션 */}
           <MemorySection
             type="stack"
@@ -241,7 +243,7 @@ export function MemoryPanel({
             changedBlocks={changedBlocks}
             hoveredVariable={hoveredVariable}
           />
-        </>
+        </div>
       )}
     </div>
   );

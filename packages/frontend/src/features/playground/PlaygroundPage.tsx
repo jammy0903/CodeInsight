@@ -1,21 +1,10 @@
 /**
- * PlaygroundPage - 멀티언어 코드 시뮬레이터 메인 페이지
- *
- * 레이아웃:
- * ┌────────────────────────────────────────────────────────────┐
- * │ Header: LanguageTabs (C | Python | Java)                   │
- * ├──────────────────────────┬─────────────────────────────────┤
- * │                          │                                 │
- * │   CodeEditor             │   Visualizer                    │
- * │   (Monaco)               │   (언어별 시각화)               │
- * │                          │                                 │
- * ├──────────────────────────┴─────────────────────────────────┤
- * │ Footer: StepControls (◀ Step N/M ▶) | Explanation          │
- * └────────────────────────────────────────────────────────────┘
- *
- * 설계 문서: docs/logic/SIMULATOR_EXTENSION.md (Part 3, Section 18)
+ * PlaygroundPage - 코드 시뮬레이터
+ * 왼쪽: 코드 에디터 + 설명 | 오른쪽: 메모리 뷰어
  */
 
+import { useState, useCallback } from 'react';
+import { Cpu } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
 import { CodeEditor } from './components/CodeEditor';
 import { StepControls } from './components/StepControls';
@@ -25,75 +14,225 @@ import { usePlaygroundStore } from './stores/playgroundStore';
 
 export function PlaygroundPage() {
   const { language, steps, currentStepIndex, error } = usePlaygroundStore();
+  const [leftWidth, setLeftWidth] = useState(50);
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
 
-  return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* Header: 언어 탭 */}
-      <header className="flex-none border-b bg-white shadow-sm">
-        <div className="px-4 py-2">
-          <LanguageTabs />
-        </div>
-      </header>
+  // 드래그 리사이저
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = leftWidth;
 
-      {/* Main: 에디터 + 시각화 */}
-      <main className="flex-1 flex overflow-hidden">
-        {/* 왼쪽: 코드 에디터 */}
-        <div className="w-1/2 border-r bg-white flex flex-col">
-          <div className="flex-none px-4 py-2 border-b bg-gray-50">
-            <h2 className="text-sm font-medium text-gray-700">
-              Code Editor ({language.toUpperCase()})
-            </h2>
+    const handleMouseMove = (e: MouseEvent) => {
+      const container = document.getElementById('playground-main');
+      if (!container) return;
+      const containerRect = container.getBoundingClientRect();
+      const deltaX = e.clientX - startX;
+      const deltaPercent = (deltaX / containerRect.width) * 100;
+      const newWidth = Math.min(Math.max(startWidth + deltaPercent, 30), 70);
+      setLeftWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [leftWidth]);
+
+  return (
+    <div
+      style={{
+        minHeight: 'calc(100vh - 64px)',
+        backgroundColor: '#0d1117',
+        overflowY: 'auto',
+        paddingBottom: currentStep ? '80px' : '0',
+      }}
+    >
+      {/* 메인 영역: 코드 + 메모리 (가로 분할) */}
+      <div
+        id="playground-main"
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          minHeight: 'calc(100vh - 64px)',
+        }}
+      >
+        {/* ===== 왼쪽: 코드 에디터 + 설명 ===== */}
+        <div
+          style={{
+            width: `${leftWidth}%`,
+            display: 'flex',
+            flexDirection: 'column',
+            borderRight: '1px solid #30363d',
+            minWidth: 0,
+          }}
+        >
+          {/* 코드 헤더: 언어탭 + 컨트롤 버튼 */}
+          <div
+            style={{
+              height: '44px',
+              padding: '0 12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid #30363d',
+              backgroundColor: '#161b22',
+              flexShrink: 0,
+            }}
+          >
+            <LanguageTabs />
+            <StepControls />
           </div>
-          <div className="flex-1 overflow-hidden">
+
+          {/* 에디터 (내부 스크롤) */}
+          <div style={{ height: '50vh', minHeight: '300px', overflow: 'hidden' }}>
             <CodeEditor />
           </div>
+
         </div>
 
-        {/* 오른쪽: 시각화 */}
-        <div className="w-1/2 flex flex-col">
-          <div className="flex-none px-4 py-2 border-b bg-gray-50">
-            <h2 className="text-sm font-medium text-gray-700">
-              {language === 'c' && 'Memory Visualization'}
-              {language === 'python' && 'Object Reference'}
-              {language === 'java' && 'Heap Visualization'}
-            </h2>
+        {/* 리사이저 */}
+        <div
+          onMouseDown={handleMouseDown}
+          style={{
+            width: '4px',
+            backgroundColor: '#30363d',
+            cursor: 'col-resize',
+            flexShrink: 0,
+            transition: 'background-color 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#58a6ff';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#30363d';
+          }}
+        />
+
+        {/* ===== 오른쪽: 메모리 뷰어 ===== */}
+        <div
+          style={{
+            width: `${100 - leftWidth}%`,
+            display: 'flex',
+            flexDirection: 'column',
+            minWidth: 0,
+          }}
+        >
+          {/* 메모리 헤더 */}
+          <div
+            style={{
+              height: '44px',
+              padding: '0 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              borderBottom: '1px solid #30363d',
+              backgroundColor: '#161b22',
+              flexShrink: 0,
+            }}
+          >
+            <Cpu size={16} color="#3fb950" />
+            <span style={{ fontSize: '13px', color: '#c9d1d9', fontWeight: 500 }}>Memory View</span>
+            {hasSteps && (
+              <span
+                style={{
+                  marginLeft: 'auto',
+                  padding: '4px 10px',
+                  fontSize: '12px',
+                  color: '#3fb950',
+                  fontFamily: 'monospace',
+                  background: 'rgba(63, 185, 80, 0.1)',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(63, 185, 80, 0.2)',
+                }}
+              >
+                Step {currentStepIndex + 1}/{steps.length}
+              </span>
+            )}
           </div>
-          <div className="flex-1 overflow-auto p-4">
+
+          {/* 메모리 시각화 */}
+          <div style={{ padding: '16px', flex: 1 }}>
             {error ? (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 font-mono text-sm">{error}</p>
+              <div
+                style={{
+                  padding: '16px',
+                  backgroundColor: 'rgba(248, 81, 73, 0.1)',
+                  border: '1px solid rgba(248, 81, 73, 0.3)',
+                  borderRadius: '8px',
+                }}
+              >
+                <p style={{ color: '#f85149', fontSize: '14px', fontFamily: 'monospace', margin: 0 }}>
+                  {error}
+                </p>
               </div>
             ) : hasSteps ? (
               <VisualizerPanel />
             ) : (
-              <div className="h-full flex items-center justify-center text-gray-400">
-                <div className="text-center">
-                  <p className="text-lg mb-2">시뮬레이션 결과가 여기에 표시됩니다</p>
-                  <p className="text-sm">▶ Run 버튼을 눌러 시작하세요</p>
+              <div
+                style={{
+                  minHeight: '300px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      margin: '0 auto 16px',
+                      borderRadius: '12px',
+                      background: 'rgba(63, 185, 80, 0.1)',
+                      border: '1px solid rgba(63, 185, 80, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Cpu size={28} color="#3fb950" />
+                  </div>
+                  <p style={{ color: '#c9d1d9', fontSize: '14px', margin: '0 0 4px 0' }}>
+                    메모리 시각화
+                  </p>
+                  <p style={{ color: '#6e7681', fontSize: '12px', margin: 0 }}>
+                    코드를 작성하고 Run을 클릭하세요
+                  </p>
                 </div>
               </div>
             )}
           </div>
         </div>
-      </main>
+      </div>
 
-      {/* Footer: 스텝 컨트롤 + 설명 */}
-      <footer className="flex-none border-t bg-white">
-        {/* 스텝 컨트롤 */}
-        <div className="px-4 py-2 border-b">
-          <StepControls />
+      {/* 설명 (화면 하단 고정) */}
+      {currentStep && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: '12px 24px',
+            backgroundColor: '#161b22',
+            borderTop: '2px solid #3fb950',
+            zIndex: 100,
+          }}
+        >
+          <StepExplanation step={currentStep} />
         </div>
-
-        {/* 현재 스텝 설명 */}
-        {currentStep && (
-          <div className="px-4 py-3">
-            <StepExplanation step={currentStep} />
-          </div>
-        )}
-      </footer>
+      )}
     </div>
   );
 }

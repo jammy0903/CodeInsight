@@ -9,6 +9,7 @@ import { ArrowRight, ChevronDown, Zap, Clock, Trophy } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
+import { MatrixRain } from './MatrixRain';
 
 // 스토리 SVG 패널 컴포넌트 (Row 1용)
 const StoryPanel = memo(({ num }: { num: number }) => {
@@ -437,12 +438,14 @@ export default function HomePage() {
   // 각 패널의 이미지 파일명 매핑
   const getComicImage = (num: number): string => {
     const imageMap: Record<number, string> = {
-      1: '/images/comic-1.jpg',
+      1: '/images/comic-question.png',     // 질문: C언어는 책으로 공부하면 되나?
       2: '/images/comic-2-douma.png',      // 도우마 (귀멸의 칼날) - 괴로워하며 학습
       3: '/images/comic-3-conan.png',      // 코난 - 책상에서 열심히 공부
+      4: '/images/comic-new-1.png',        // 새 이미지 1
       5: '/images/comic-5-levi.png',       // 리바이 (진격의 거인)
       6: '/images/comic-6-complete.png',   // 곤+킬루아+히소카 - 완성 트로피
-      // 4, 7, 8, 9는 빈 패널
+      7: '/images/comic-new-2.png',        // 새 이미지 2
+      8: '/images/comic-new-3.png',        // Gemini 생성 이미지
     };
     return imageMap[num] || '';  // 빈 패널은 이미지 없음
   };
@@ -457,88 +460,92 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen w-full">
-      {/* Hero Section - 첫 화면 전체 */}
-      <section className="h-screen w-full grid place-items-center relative">
-        <div className="text-center">
-          {/* 큰 제목 */}
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-[#6b5a4a] tracking-tight">
-            CodeInsight
-          </h1>
+      {/* Hero + Value Proposition - 매트릭스 비가 내리는 영역 */}
+      <div className="relative overflow-hidden">
+        {/* 매트릭스 배경 애니메이션 - 전체 영역 커버 */}
+        <MatrixRain color="#c4a574" fontSize={14} speed={40} />
 
-          {/* 부제 */}
-          <p className="mt-6 text-lg md:text-xl text-[#937b5d]">
-            코드의 원리를 눈으로 이해하다
-          </p>
-        </div>
+        {/* Hero Section */}
+        <section className="w-full flex flex-col items-center justify-center relative" style={{ height: 'calc(100vh - 64px)' }}>
+          <div className="text-center relative z-10" style={{ marginTop: '30px' }}>
+            {/* 큰 제목 */}
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-[#6b5a4a] tracking-tight">
+              CodeInsight
+            </h1>
 
-        {/* 스크롤 표시 */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[#a08060] animate-bounce">
-          <span className="text-sm">scroll</span>
-          <ChevronDown className="w-5 h-5" />
-        </div>
-      </section>
-
-      {/* Value Proposition - 메인 메시지 */}
-      <section className="w-full grid place-items-center py-20 px-6">
-        <div className="max-w-2xl text-center space-y-8">
-          <h2 className="text-3xl md:text-5xl font-bold text-[#6b5a4a] leading-tight">
-            코드가 어떻게<br />동작하는지 보세요
-          </h2>
-
-          <p className="text-lg text-[#937b5d] leading-relaxed">
-            포인터, 메모리, 참조...<br />
-            더 이상 외우지 마세요. 시각화로 진짜 이해하세요.
-          </p>
-
-          {/* 로그인/회원가입 버튼 */}
-          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
-            {isLoggedIn ? (
-              <Link to="/courses">
-                <button className="btn-primary text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2">
-                  학습 시작하기
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
-            ) : (
-              <>
-                <button className="btn-primary text-lg px-8 py-4 rounded-xl">
-                  회원가입
-                </button>
-                <button className="btn-secondary text-lg px-8 py-4 rounded-xl">
-                  로그인
-                </button>
-              </>
-            )}
+            {/* 부제 */}
+            <p className="text-lg md:text-xl text-[#937b5d]" style={{ marginTop: '12px' }}>
+              코드의 원리를 눈으로 이해하다
+            </p>
           </div>
-        </div>
-      </section>
+
+          {/* 이미지 슬라이드 1행 - 제목과 scroll 사이 */}
+          <div className="relative overflow-hidden w-full z-10" style={{ marginTop: '60px' }}>
+            <motion.div
+              className="flex gap-6"
+              animate={{ x: [0, -2592] }}
+              transition={{
+                x: { repeat: Infinity, repeatType: "loop", duration: 25, ease: "linear" },
+              }}
+            >
+              {[...Array(2)].map((_, setIndex) => (
+                <div key={setIndex} className="flex gap-6 shrink-0">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                    <StoryPanel key={`${setIndex}-${num}`} num={num} />
+                  ))}
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* 스크롤 표시 */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[#a08060] animate-bounce z-10" style={{ bottom: '20px' }}>
+            <span className="text-sm">scroll</span>
+            <ChevronDown className="w-5 h-5" />
+          </div>
+        </section>
+
+        {/* Value Proposition - 메인 메시지 */}
+        <section className="w-full grid place-items-center px-6 relative z-10" style={{ paddingTop: '30px', paddingBottom: '30px' }}>
+          <div className="max-w-2xl text-center space-y-8">
+            <h2 className="text-3xl md:text-5xl font-bold text-[#6b5a4a] leading-tight">
+              코드가 어떻게<br />동작하는지 보세요
+            </h2>
+
+            <p className="text-lg text-[#937b5d] leading-relaxed">
+              포인터, 메모리, 참조...<br />
+              더 이상 외우지 마세요. 시각화로 진짜 이해하세요.
+            </p>
+
+            {/* 로그인/회원가입 버튼 */}
+            <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
+              {isLoggedIn ? (
+                <Link to="/courses">
+                  <button className="btn-primary text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2">
+                    학습 시작하기
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </Link>
+              ) : (
+                <>
+                  <button className="btn-primary text-lg px-8 py-4 rounded-xl">
+                    회원가입
+                  </button>
+                  <button className="btn-secondary text-lg px-8 py-4 rounded-xl">
+                    로그인
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
 
       {/* 핵심 특징 - 만화 + 특징 카드 */}
-      <section className="w-full grid place-items-center mt-16 pt-8 pb-20 px-4 bg-[#f8f4ef]">
+      <section className="w-full grid place-items-center px-4 bg-[#f8f4ef]" style={{ marginTop: '150px', paddingTop: '80px', paddingBottom: '80px' }}>
         <div className="w-full space-y-24">
-          {/* 만화 컨베이어 벨트 - 두 줄 wrapper */}
-          <div className="flex flex-col gap-8">
-            {/* 1행 - 오른쪽에서 왼쪽으로 */}
-            <div className="relative overflow-hidden">
-              <motion.div
-                className="flex gap-6"
-                animate={{ x: [0, -2592] }}
-                transition={{
-                  x: { repeat: Infinity, repeatType: "loop", duration: 25, ease: "linear" },
-                }}
-              >
-                {[...Array(2)].map((_, setIndex) => (
-                  <div key={setIndex} className="flex gap-6 shrink-0">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                      <StoryPanel key={`${setIndex}-${num}`} num={num} />
-                    ))}
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            {/* 2행 - 왼쪽에서 오른쪽으로 (반대 방향) */}
-            <div className="relative overflow-hidden">
+          {/* 만화 컨베이어 벨트 - 2행만 (1행은 Hero로 이동) */}
+          <div className="relative overflow-hidden">
             <motion.div
               className="flex gap-6"
               animate={{ x: [-2592, 0] }}
@@ -554,11 +561,10 @@ export default function HomePage() {
                 </div>
               ))}
             </motion.div>
-            </div>
           </div>
 
           {/* 특징 카드 3개 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center my-32">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center" style={{ marginTop: '120px' }}>
             {/* 인터렉티브 */}
             <div className="space-y-4 p-6">
               <div className="w-16 h-16 mx-auto bg-[#e5d5c7] rounded-2xl flex items-center justify-center">
@@ -599,9 +605,9 @@ export default function HomePage() {
       </section>
 
       {/* 학습 방식 - 시각화, AI, 실습 */}
-      <section className="w-full grid place-items-center mt-32 py-20 px-6">
+      <section className="w-full grid place-items-center px-6" style={{ marginTop: '150px', paddingTop: '120px', paddingBottom: '120px' }}>
         <div className="max-w-3xl w-full text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#6b5a4a] mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-[#6b5a4a] mb-16">
             이렇게 배워요
           </h2>
 
@@ -626,12 +632,12 @@ export default function HomePage() {
       </section>
 
       {/* 마지막 CTA */}
-      <section className="w-full grid place-items-center py-20 px-6 bg-[#f8f4ef]">
-        <div className="text-center space-y-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#6b5a4a]">
+      <section className="w-full grid place-items-center px-6 bg-[#f8f4ef]" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+        <div className="text-center space-y-8">
+          <h2 className="text-5xl md:text-7xl font-bold text-[#6b5a4a]">
             지금 바로 시작하세요
           </h2>
-          <p className="text-[#937b5d]">
+          <p className="text-xl text-[#937b5d]">
             가입 없이 바로 체험 가능
           </p>
           <Link to="/courses">

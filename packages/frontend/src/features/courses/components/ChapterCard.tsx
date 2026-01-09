@@ -36,23 +36,55 @@ export function ChapterCard({
     }
   };
 
+  // 스티치 색상 결정 (밝은 네온 컬러)
+  const stitchColor = isComplete
+    ? 'rgba(0, 245, 212, 0.6)'
+    : isActive
+      ? 'rgba(0, 187, 249, 0.6)'
+      : isLocked
+        ? 'rgba(255, 255, 255, 0.1)'
+        : 'rgba(155, 93, 229, 0.4)';
+
   return (
     <button
       onClick={handleClick}
       disabled={isLocked}
       className={`
-        group relative rounded-xl p-6 text-left
+        group relative rounded-xl text-left
         transition-all duration-300 hover:scale-[1.02]
         ${isComplete
-          ? 'bg-gradient-to-br from-[#1a2e1a] to-[#162e16] border border-[#10B981]/30 shadow-lg'
+          ? 'border border-[#00F5D4]/50 shadow-lg shadow-[#00F5D4]/20'
           : isActive
-            ? 'bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-[#00D9FF]/30 shadow-[0_0_30px_-10px_#00D9FF40]'
+            ? 'border border-[#00BBF9]/60 shadow-[0_0_30px_-10px_#00BBF980]'
             : isLocked
-              ? 'bg-[#252535] border border-white/5 opacity-60 cursor-not-allowed'
-              : 'bg-[#1a1a2e] border border-white/10 hover:border-white/20 hover:shadow-xl'
+              ? 'border border-white/5 opacity-60 cursor-not-allowed'
+              : 'border border-[#9B5DE5]/30 hover:border-[#9B5DE5]/60 hover:shadow-xl hover:shadow-[#9B5DE5]/20'
         }
       `}
+      style={{
+        padding: '32px',
+        minHeight: '300px',
+        background: isComplete
+          ? 'linear-gradient(135deg, #1A3A35 0%, #0D4A42 100%)'
+          : isActive
+            ? 'linear-gradient(135deg, #1A2A3A 0%, #0D3A4A 100%)'
+            : isLocked
+              ? '#2A2828'
+              : 'linear-gradient(135deg, #2A2535 0%, #352D40 100%)'
+      }}
     >
+      {/* 바느질 스티치 테두리 */}
+      <div
+        className="absolute rounded-lg pointer-events-none"
+        style={{
+          top: '8px',
+          left: '8px',
+          right: '8px',
+          bottom: '8px',
+          border: `2px dashed ${stitchColor}`,
+          borderRadius: '8px'
+        }}
+      />
       {/* 완료시 별 */}
       {isComplete && (
         <div className="absolute top-4 right-4">
@@ -68,15 +100,15 @@ export function ChapterCard({
       )}
 
       {/* 상태 배지 */}
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>
         {isActive && !isComplete && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#00D9FF]/20 text-[#00D9FF] border border-[#00D9FF]/30">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#00BBF9]/20 text-[#00BBF9] border border-[#00BBF9]/40">
             <Target className="w-3 h-3" />
             Current
           </span>
         )}
         {isComplete && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#00F5D4]/20 text-[#00F5D4] border border-[#00F5D4]/40">
             <Star className="w-3 h-3" />
             Completed
           </span>
@@ -92,32 +124,36 @@ export function ChapterCard({
       {/* 챕터 제목 */}
       <h3
         className={`
-          text-xl font-bold mb-2
-          ${isComplete ? 'text-[#10B981]' : isLocked ? 'text-white/60' : 'text-white'}
+          text-xl font-bold
+          ${isComplete ? 'text-[#00F5D4]' : isLocked ? 'text-white/60' : 'text-white'}
         `}
+        style={{ marginBottom: '12px' }}
       >
         {chapter.title}
       </h3>
 
       {/* 챕터 설명 */}
       {chapter.description && (
-        <p className="text-sm text-white/60 mb-4 line-clamp-2">
+        <p className="text-sm text-white/60 line-clamp-2" style={{ marginBottom: '24px' }}>
           {chapter.description}
         </p>
       )}
 
       {/* 진행률 바 */}
-      <div className="mb-3">
+      <div style={{ marginBottom: '16px' }}>
         <div className="flex items-center justify-between text-xs text-white/50 mb-1">
           <span>Progress</span>
           <span className="font-mono font-bold">{progressPercent}%</span>
         </div>
         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              isComplete ? 'bg-[#10B981]' : 'bg-[#00D9FF]'
-            }`}
-            style={{ width: `${progressPercent}%` }}
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${progressPercent}%`,
+              background: isComplete
+                ? '#00F5D4'
+                : 'linear-gradient(90deg, #00BBF9, #9B5DE5)'
+            }}
           />
         </div>
       </div>
