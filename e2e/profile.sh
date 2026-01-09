@@ -309,42 +309,7 @@ profile_react() {
     print_info "데이터 요약 분석 중..."
     echo ""
 
-    node -e "
-    const fs = require('fs');
-    const data = JSON.parse(fs.readFileSync('$json_file', 'utf8'));
-
-    const events = data.schedulingEvents || [];
-    const suspense = data.suspenseEvents || [];
-
-    console.log('${YELLOW}═══ 요약 ═══${NC}');
-    console.log('총 이벤트:', events.length);
-    console.log('Suspense 이벤트:', suspense.length);
-
-    // 컴포넌트별 리렌더 횟수
-    const counts = {};
-    events.forEach(e => {
-        counts[e.componentName] = (counts[e.componentName] || 0) + 1;
-    });
-
-    console.log('\\n${YELLOW}═══ 컴포넌트별 리렌더 Top 10 ═══${NC}');
-    Object.entries(counts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .forEach(([name, count]) => {
-            const color = count > 20 ? '${RED}⚠️ ' : '${GREEN}✓  ';
-            console.log(\`\${color}\${count.toString().padStart(4)}x  \${name}${NC}\`);
-        });
-
-    // Suspense 로딩 시간
-    if (suspense.length > 0) {
-        const avgDuration = suspense.reduce((sum, e) => sum + e.duration, 0) / suspense.length;
-        const maxDuration = Math.max(...suspense.map(e => e.duration));
-
-        console.log('\\n${YELLOW}═══ Suspense 로딩 시간 ═══${NC}');
-        console.log('평균:', avgDuration.toFixed(2), 'ms');
-        console.log('최대:', maxDuration.toFixed(2), 'ms');
-    }
-    " 2>/dev/null || print_error "Node.js가 설치되지 않았거나 JSON 파싱 오류"
+    node "$PROJECT_ROOT/e2e/scripts/analyze-react-profiler.js" "$json_file" || print_error "JSON 파싱 오류"
 
     echo ""
 
@@ -359,8 +324,13 @@ profile_react() {
 
         sleep 3
 
-        # WSL 브라우저 열기
-        open_browser "http://localhost:9999"
+        # WSL 브라우저 열기 시도
+        if open_browser "http://localhost:9999" 2>/dev/null; then
+            print_success "브라우저가 자동으로 열렸습니다"
+        else
+            print_info "${YELLOW}브라우저를 수동으로 여세요:${NC}"
+            echo "  Windows 브라우저에서: http://localhost:9999"
+        fi
 
         print_success "Speedscope 실행 중 (PID: $speedscope_pid)"
         echo "종료하려면 Ctrl+C를 누르세요"
