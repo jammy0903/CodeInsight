@@ -5,6 +5,7 @@
  * 1. VariablesPanel (상단) - 변수는 메모리에 저장되지 않음 (단순 별칭)
  * 2. MemoryPanel (하단) - Stack/Heap 명확히 분리, 실제 메모리 블록 표시
  * 3. PointerLines (오버레이) - 변수 → 메모리 연결선
+ * 4. ReturnOverlay (조건부) - return 시 스택 프레임 pop 애니메이션
  *
  * 핵심 개념:
  * - 변수 = 메모리 주소의 값을 참조하는 이름 (메모리에 저장 안 됨)
@@ -21,23 +22,31 @@
 import { useState } from 'react';
 import { VariablesPanel } from './VariablesPanel';
 import { MemoryPanel } from './MemoryPanel';
+import { ReturnOverlay } from '@/features/visualizers/shared';
+import type { ReturnInfo } from '@/features/visualizers/shared';
 import type { LessonMemoryBlock } from '../../hooks/useLessonMemory';
 
 interface CourseMemoryViewProps {
   stack: LessonMemoryBlock[];
   heap: LessonMemoryBlock[];
   changedBlocks: string[];
+  /** return 문 실행 여부 */
+  isReturn?: boolean;
+  /** return 상세 정보 */
+  returnInfo?: ReturnInfo;
 }
 
 export function CourseMemoryView({
   stack,
   heap,
   changedBlocks,
+  isReturn = false,
+  returnInfo,
 }: CourseMemoryViewProps) {
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null);
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="relative bg-white">
       {/* 상단: 변수 영역 (메모리 아님) */}
       <VariablesPanel
         stack={stack}
@@ -52,6 +61,13 @@ export function CourseMemoryView({
         heap={heap}
         changedBlocks={changedBlocks}
         hoveredVariable={hoveredVariable}
+      />
+
+      {/* Return 오버레이 (return 문 실행 시) */}
+      <ReturnOverlay
+        isReturn={isReturn}
+        returnInfo={returnInfo}
+        theme="light"
       />
     </div>
   );

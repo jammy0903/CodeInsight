@@ -93,3 +93,36 @@ export interface ScopeChainViewProps {
 export interface MemoryViewProps {
   state: MemoryState;
 }
+
+// ============================================
+// Return 시각화 타입
+// ============================================
+
+/**
+ * Return 정보 - 레슨 step에서 제공되는 return 메타데이터
+ */
+export interface ReturnInfo {
+  /** 반환값 (문자열로 표현) */
+  value: string;
+  /** 반환의 의미 설명 */
+  meaning: string;
+  /** 반환하는 함수명 (optional) */
+  functionName?: string;
+  /** 호출자 함수명 (optional) */
+  callerName?: string;
+}
+
+/**
+ * ReturnOverlay Props
+ * WHY: 독립 컴포넌트로 Lessons와 Playground 양쪽에서 재사용
+ */
+export interface ReturnOverlayProps {
+  /** return 실행 여부 */
+  isReturn: boolean;
+  /** return 상세 정보 */
+  returnInfo?: ReturnInfo;
+  /** 테마 (다크/라이트) */
+  theme?: 'dark' | 'light';
+  /** 애니메이션 완료 콜백 */
+  onAnimationComplete?: () => void;
+}
