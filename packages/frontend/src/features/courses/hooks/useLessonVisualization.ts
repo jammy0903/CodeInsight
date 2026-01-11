@@ -271,7 +271,15 @@ function accumulateActionBasedChanges(
   return state;
 }
 
-function detectFormat(steps: LessonStep[]): 'new-array' | 'legacy-action' | 'cumulative' | 'unknown' {
+function detectFormat(steps: LessonStep[]): 'new-array' | 'legacy-action' | 'cumulative' | 'snapshot' | 'unknown' {
+  // 1. snapshot 형식 체크 (step.stack이 MemoryBlock[] 배열인 경우)
+  // Playground 시뮬레이터가 이 형식을 반환함
+  const snapshotStep = steps.find(s => s?.stack && Array.isArray(s.stack));
+  if (snapshotStep) {
+    return 'snapshot';
+  }
+
+  // 2. memoryChanges 기반 형식 체크 (Lesson JSON 데이터)
   const firstStep = steps.find(s => s?.memoryChanges);
 
   if (!firstStep?.memoryChanges) return 'unknown';
@@ -386,7 +394,20 @@ export function useLessonVisualization(
 
     const format = detectFormat(steps);
 
+    // DEBUG: 형식 감지 로그
+    console.log('[useLessonVisualization] format:', format, 'steps:', steps.length, 'currentStepIndex:', currentStepIndex);
+    if (currentStep) {
+      console.log('[useLessonVisualization] currentStep.stack:', currentStep.stack);
+    }
+
     switch (format) {
+      case 'snapshot':
+        // Playground 시뮬레이터: step.stack/heap 직접 사용
+        return {
+          stack: (currentStep?.stack as MemoryBlock[]) || [],
+          heap: (currentStep?.heap as MemoryBlock[]) || [],
+          frames: [], // snapshot 형식엔 frames 정보 없음
+        };
       case 'new-array':
         return accumulateMemoryChanges(steps, currentStepIndex);
       case 'legacy-action':
@@ -396,7 +417,7 @@ export function useLessonVisualization(
       default:
         return { stack: [], heap: [], frames: [] };
     }
-  }, [steps, currentStepIndex, visualizationType]);
+  }, [steps, currentStepIndex, visualizationType, currentStep]);
 
   // 변경된 블록 추출
   const changedBlocks = useMemo(() => {
