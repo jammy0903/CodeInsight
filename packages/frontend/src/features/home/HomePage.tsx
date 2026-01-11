@@ -467,7 +467,7 @@ export default function HomePage() {
 
         {/* Hero Section */}
         <section className="w-full flex flex-col items-center justify-center relative" style={{ height: 'calc(100vh - 64px)' }}>
-          <div className="text-center relative z-10" style={{ marginTop: '30px' }}>
+          <div className="text-center relative z-10" style={{ marginTop: '60px' }}>
             {/* 큰 제목 */}
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-[#6b5a4a] tracking-tight">
               CodeInsight
@@ -480,7 +480,7 @@ export default function HomePage() {
           </div>
 
           {/* 이미지 슬라이드 1행 - 제목과 scroll 사이 */}
-          <div className="relative overflow-hidden w-full z-10" style={{ marginTop: '60px' }}>
+          <div className="relative overflow-hidden w-full z-10" style={{ marginTop: '100px' }}>
             <motion.div
               className="flex gap-6"
               animate={{ x: [0, -2592] }}
@@ -506,15 +506,15 @@ export default function HomePage() {
         </section>
 
         {/* Value Proposition - 메인 메시지 */}
-        <section className="w-full grid place-items-center px-6 relative z-10" style={{ paddingTop: '30px', paddingBottom: '30px' }}>
+        <section className="w-full grid place-items-center px-6 relative z-10" style={{ paddingTop: '60px', paddingBottom: '60px' }}>
           <div className="max-w-2xl text-center space-y-8">
             <h2 className="text-3xl md:text-5xl font-bold text-[#6b5a4a] leading-tight">
               코드가 어떻게<br />동작하는지 보세요
             </h2>
 
             <p className="text-lg text-[#937b5d] leading-relaxed">
-              포인터, 메모리, 참조...<br />
-              더 이상 외우지 마세요. 시각화로 진짜 이해하세요.
+              포인터, 메모리, 스택, 힙...<br />
+              더 이상 외우기 싫어!
             </p>
 
             {/* 로그인/회원가입 버튼 */}
@@ -542,7 +542,7 @@ export default function HomePage() {
       </div>
 
       {/* 핵심 특징 - 만화 + 특징 카드 */}
-      <section className="w-full grid place-items-center px-4 bg-[#f8f4ef]" style={{ marginTop: '150px', paddingTop: '80px', paddingBottom: '80px' }}>
+      <section className="w-full grid place-items-center px-4 bg-[#f8f4ef]" style={{ marginTop: '200px', paddingTop: '120px', paddingBottom: '120px' }}>
         <div className="w-full space-y-24">
           {/* 만화 컨베이어 벨트 - 2행만 (1행은 Hero로 이동) */}
           <div className="relative overflow-hidden">
@@ -572,8 +572,8 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold text-[#6b5a4a]">인터렉티브 학습</h3>
               <p className="text-[#937b5d]">
-                읽기만 하는 지루한 강의 NO<br />
-                직접 조작하며 배우세요
+                코드를 직접 실행하고<br />
+                한 줄씩 따라가며 이해합니다
               </p>
             </div>
 
@@ -582,22 +582,22 @@ export default function HomePage() {
               <div className="w-16 h-16 mx-auto bg-[#e5d5c7] rounded-2xl flex items-center justify-center">
                 <Clock className="w-8 h-8 text-[#a08060]" />
               </div>
-              <h3 className="text-xl font-bold text-[#6b5a4a]">하루 10분이면 충분</h3>
+              <h3 className="text-xl font-bold text-[#6b5a4a]">하루 10분 집중</h3>
               <p className="text-[#937b5d]">
-                집중력 걱정 마세요<br />
-                짧고 강렬하게, ADHD도 OK
+                ADHD, 도파민 중독자<br />
+                모두 집중하게 되.
               </p>
             </div>
 
-            {/* 빠른 완성 */}
+            {/* 개인 프로젝트 */}
             <div className="space-y-4 p-6">
               <div className="w-16 h-16 mx-auto bg-[#e5d5c7] rounded-2xl flex items-center justify-center">
                 <Trophy className="w-8 h-8 text-[#a08060]" />
               </div>
-              <h3 className="text-xl font-bold text-[#6b5a4a]">2주면 C언어 기초 완성</h3>
+              <h3 className="text-xl font-bold text-[#6b5a4a]">솔직한 프로젝트</h3>
               <p className="text-[#937b5d]">
-                포인터, 메모리, 배열까지<br />
-                핵심만 빠르게 마스터
+                내가 공부하려고 만든 앱.<br />
+                그런데 이제 사람들에게도 뿌린.
               </p>
             </div>
           </div>
@@ -605,7 +605,7 @@ export default function HomePage() {
       </section>
 
       {/* 학습 방식 - 시각화, AI, 실습 */}
-      <section className="w-full grid place-items-center px-6" style={{ marginTop: '150px', paddingTop: '120px', paddingBottom: '120px' }}>
+      <section className="w-full grid place-items-center px-6" style={{ marginTop: '200px', paddingTop: '160px', paddingBottom: '160px' }}>
         <div className="max-w-3xl w-full text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-[#6b5a4a] mb-16">
             이렇게 배워요
@@ -632,13 +632,13 @@ export default function HomePage() {
       </section>
 
       {/* 마지막 CTA */}
-      <section className="w-full grid place-items-center px-6 bg-[#f8f4ef]" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
+      <section className="w-full grid place-items-center px-6 bg-[#f8f4ef]" style={{ paddingTop: '160px', paddingBottom: '160px' }}>
         <div className="text-center space-y-8">
           <h2 className="text-5xl md:text-7xl font-bold text-[#6b5a4a]">
             지금 바로 시작하세요
           </h2>
           <p className="text-xl text-[#937b5d]">
-            가입 없이 바로 체험 가능
+            코스 둘러보기
           </p>
           <Link to="/courses">
             <button className="btn-primary text-lg px-10 py-4 rounded-xl inline-flex items-center gap-2">
