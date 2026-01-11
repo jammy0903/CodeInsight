@@ -10,25 +10,16 @@
  */
 
 import { useMemo } from 'react';
-import type { LessonStep, StepMemoryState, StackFrame } from '@/types';
+import type { LessonStep, StepMemoryState, StackFrame, MemoryChangeAction, MemoryBlock } from '@/types';
 import type { JSVisualizationType, JSVisualizationState } from '@/features/visualizers/js/types';
 
 // ============================================
-// 기존 메모리 관련 타입 (C 언어용)
+// 메모리 상태 타입 (MemoryBlock 사용)
 // ============================================
 
-export interface LessonMemoryBlock {
-  name: string;
-  address: string;
-  value: string;
-  type?: string;
-  points_to: string | null;
-  highlight?: boolean;
-}
-
 export interface LessonMemoryState {
-  stack: LessonMemoryBlock[];
-  heap: LessonMemoryBlock[];
+  stack: MemoryBlock[];
+  heap: MemoryBlock[];
   frames: StackFrame[];
 }
 
@@ -67,8 +58,8 @@ interface ActionBasedStackChange {
 
 function convertCumulativeFormat(
   frames: StackFrame[]
-): { blocks: LessonMemoryBlock[]; frames: StackFrame[] } {
-  const blocks: LessonMemoryBlock[] = [];
+): { blocks: MemoryBlock[]; frames: StackFrame[] } {
+  const blocks: MemoryBlock[] = [];
   let stackAddr = 0x1000;
 
   for (const frame of frames) {
@@ -128,38 +119,74 @@ function accumulateMemoryChanges(
   upToStepIndex: number
 ): LessonMemoryState {
   const state: LessonMemoryState = { stack: [], heap: [], frames: [] };
-  const stackMap = new Map<string, LessonMemoryBlock>();
-  const heapMap = new Map<string, LessonMemoryBlock>();
+  const stackMap = new Map<string, MemoryBlock>();
+  const heapMap = new Map<string, MemoryBlock>();
+  const activeFrames: string[] = []; // 현재 활성화된 프레임 스택
+  let stackAddr = 0x7ffc1000;
+  let heapAddr = 0x8000;
 
   for (let i = 0; i <= upToStepIndex; i++) {
     const step = steps[i];
     if (!step?.memoryChanges || !Array.isArray(step.memoryChanges)) continue;
 
-    for (const change of step.memoryChanges) {
+    for (const change of step.memoryChanges as MemoryChangeAction[]) {
       if (change.area === 'stack') {
-        if (change.action === 'allocate' || change.action === 'update') {
-          stackMap.set(change.name, {
-            name: change.name,
-            address: change.address,
-            value: String(change.value),
+        // 프레임 생성
+        if (change.action === 'frame') {
+          activeFrames.push(change.name);
+          state.frames.push({ name: change.name, variables: [] });
+        }
+        // 변수 할당
+        else if (change.action === 'allocate' || change.action === 'update') {
+          // 프레임.변수명 형식으로 항상 저장 (함수별 구분)
+          const frameName = change.frame || activeFrames[activeFrames.length - 1] || 'global';
+          const fullName = `${frameName}.${change.name}`;
+          const addr = change.address || `0x${stackAddr.toString(16)}`;
+
+          stackMap.set(fullName, {
+            name: fullName,
+            address: addr,
+            value: String(change.value ?? ''),
             type: change.type,
             points_to: null,
             highlight: i === upToStepIndex,
           });
-        } else if (change.action === 'free') {
-          stackMap.delete(change.name);
+
+          if (!change.address) stackAddr += 4;
+        }
+        // 변수 해제 (free 또는 deallocate)
+        else if (change.action === 'free' || change.action === 'deallocate') {
+          const frameName = change.frame || activeFrames[activeFrames.length - 1] || 'global';
+          const fullName = `${frameName}.${change.name}`;
+          stackMap.delete(fullName);
+        }
+        // 프레임 종료
+        else if (change.action === 'frame_end') {
+          // 해당 프레임의 모든 변수 제거
+          const frameName = change.name;
+          for (const key of stackMap.keys()) {
+            if (key.startsWith(`${frameName}.`)) {
+              stackMap.delete(key);
+            }
+          }
+          // 프레임 스택에서 제거
+          const idx = activeFrames.indexOf(frameName);
+          if (idx !== -1) activeFrames.splice(idx, 1);
+          state.frames = state.frames.filter(f => f.name !== frameName);
         }
       } else if (change.area === 'heap') {
         if (change.action === 'allocate' || change.action === 'update') {
+          const addr = change.address || `0x${heapAddr.toString(16)}`;
           heapMap.set(change.name, {
             name: change.name,
-            address: change.address,
-            value: String(change.value),
+            address: addr,
+            value: String(change.value ?? ''),
             type: change.type,
             points_to: null,
             highlight: i === upToStepIndex,
           });
-        } else if (change.action === 'free') {
+          if (!change.address) heapAddr += 16;
+        } else if (change.action === 'free' || change.action === 'deallocate') {
           heapMap.delete(change.name);
         }
       }
@@ -176,8 +203,8 @@ function accumulateActionBasedChanges(
   upToStepIndex: number
 ): LessonMemoryState {
   const state: LessonMemoryState = { stack: [], heap: [], frames: [] };
-  const stackMap = new Map<string, LessonMemoryBlock>();
-  const heapMap = new Map<string, LessonMemoryBlock>();
+  const stackMap = new Map<string, MemoryBlock>();
+  const heapMap = new Map<string, MemoryBlock>();
   let stackAddr = 0x1000;
   let heapAddr = 0x8000;
 
@@ -246,6 +273,7 @@ function accumulateActionBasedChanges(
 
 function detectFormat(steps: LessonStep[]): 'new-array' | 'legacy-action' | 'cumulative' | 'unknown' {
   const firstStep = steps.find(s => s?.memoryChanges);
+
   if (!firstStep?.memoryChanges) return 'unknown';
 
   const changes = firstStep.memoryChanges;
@@ -368,7 +396,7 @@ export function useLessonVisualization(
       default:
         return { stack: [], heap: [], frames: [] };
     }
-  }, [steps, currentStepIndex, visualizationType, currentStep]);
+  }, [steps, currentStepIndex, visualizationType]);
 
   // 변경된 블록 추출
   const changedBlocks = useMemo(() => {

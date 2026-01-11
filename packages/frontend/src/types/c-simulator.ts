@@ -6,6 +6,7 @@
  */
 
 import type { BaseStep, BaseChange, HexAddress } from './simulator';
+import type { MemoryBlock } from '@codeinsight/shared';
 
 // ============================================================
 // 메모리 세그먼트
@@ -14,29 +15,7 @@ import type { BaseStep, BaseChange, HexAddress } from './simulator';
 /** 메모리 세그먼트 타입 */
 export type CSegmentType = 'stack' | 'heap' | 'data' | 'code';
 
-/** 메모리 블록 */
-export interface CMemoryBlock {
-  /** 메모리 주소 (16진수) */
-  address: HexAddress;
-
-  /** 변수명 */
-  name: string;
-
-  /** 타입 (int, char*, struct Point 등) */
-  type: string;
-
-  /** 값 (문자열로 표현) */
-  value: string;
-
-  /** 크기 (바이트) */
-  size: number;
-
-  /** 세그먼트 */
-  segment: CSegmentType;
-
-  /** 포인터가 가리키는 주소 (포인터인 경우) */
-  points_to?: HexAddress;
-}
+// CMemoryBlock removed - use MemoryBlock from @codeinsight/shared instead
 
 // ============================================================
 // 함수 정의 (Phase 2)
@@ -130,9 +109,9 @@ export interface CVariable {
 /** C 시뮬레이터 컨텍스트 */
 export interface CSimContext {
   // === 메모리 세그먼트 ===
-  stack: CMemoryBlock[];
-  heap: CMemoryBlock[];
-  data: CMemoryBlock[];
+  stack: MemoryBlock[];
+  heap: MemoryBlock[];
+  data: MemoryBlock[];
   code: CFunctionDef[];
 
   // === 주소 관리 ===
@@ -173,29 +152,7 @@ export interface CChange extends BaseChange {
   newValue?: string;
 }
 
-/** C 시뮬레이션 스텝 */
-export interface CStep extends BaseStep {
-  /** Stack 메모리 상태 */
-  stack: CMemoryBlock[];
+// CStep removed - use LessonStep from @codeinsight/shared instead
+// PyName, PyObject removed - use types from py-simulator.ts instead
 
-  /** Heap 메모리 상태 */
-  heap: CMemoryBlock[];
-
-  /** Data 세그먼트 상태 (Phase 2) */
-  data: CMemoryBlock[];
-
-  /** stdout 출력 */
-  stdout?: string;
-
-  /** 이 스텝에서의 변경사항 */
-  changes: CChange[];
-}
-
-// ============================================================
-// 핸들러 타입
-// ============================================================
-
-import type { CodeHandler } from './simulator';
-
-/** C 코드 핸들러 타입 */
-export type CCodeHandler = CodeHandler<CSimContext, CStep>;
+// CCodeHandler removed - C handlers are backend-only (not used in frontend)

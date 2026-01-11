@@ -5,12 +5,15 @@
  * Usage:
  *   import { Step, Message, Chapter, Lesson } from '@/types';
  *   import type { MemoryBlock, LessonStep } from '@/types';
- *   import type { CStep, PyStep, SupportedLanguage } from '@/types';
+ *   import type { PyStep, SupportedLanguage } from '@/types';
  */
 
-// === Memory Types (실시간 트레이서용) ===
+// === Memory Types (레슨/Playground 공용) ===
 export type {
+  SegmentType,
   MemoryBlock,
+  MemoryState,
+  StackRegisters,
   Step,           // 실시간 트레이서 스텝
   TraceResult,
 } from './memory';
@@ -28,9 +31,9 @@ export type {
 } from './simulator';
 
 // === C Simulator Types ===
+// Note: CStep, CMemoryBlock, CCodeHandler removed - use LessonStep and MemoryBlock from shared
 export type {
   CSegmentType,
-  CMemoryBlock,
   CParamDef,
   CFunctionDef,
   CCallFrame,
@@ -40,8 +43,6 @@ export type {
   CSimContext,
   CChangeType,
   CChange,
-  CStep,
-  CCodeHandler,
 } from './c-simulator';
 
 // === Python Simulator Types ===
@@ -90,6 +91,7 @@ export {
   type LessonContent,
   type LessonStep,
   type StepMemoryState,
+  type MemoryChangeAction,
   // 메모리 시각화 (통일 형식)
   type Variable,
   type StackFrame,
