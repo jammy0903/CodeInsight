@@ -224,11 +224,11 @@ export const UserProgressSchema = z.object({
   lessonId: z.string(),  // short ID 지원
   status: ProgressStatusSchema,
   currentStep: z.number(),
-  quizScore: z.number().optional(),
-  quizTotal: z.number().optional(),
-  startedAt: z.string().optional(),
-  completedAt: z.string().optional(),
-  updatedAt: z.string().optional(),  // Prisma @updatedAt는 항상 존재하지만 optional로 처리
+  quizScore: z.number().nullable().optional(),  // Prisma Int? → null 허용
+  quizTotal: z.number().nullable().optional(),  // Prisma Int? → null 허용
+  startedAt: z.string().nullable().optional(),  // Prisma DateTime? → null 허용
+  completedAt: z.string().nullable().optional(),  // Prisma DateTime? → null 허용
+  updatedAt: z.string().optional(),  // Prisma @updatedAt는 항상 존재
 });
 
 export const ProgressUpdateRequestSchema = z.object({
