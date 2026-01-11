@@ -90,20 +90,60 @@ export const HeapObjectSchema = z.object({
   highlight: z.boolean().optional(),
 });
 
+// MemoryBlock (Playground용 스냅샷 형식)
+// WHY: Playground는 실시간 C 코드 실행 결과를 직접 스냅샷으로 받음
+// TRADEOFF: memoryChanges 형식과 별도 관리 필요 (useLessonVisualization이 두 형식 모두 처리)
+export const MemoryBlockSchema: z.ZodType<{
+  name: string;
+  address: string;
+  value: string;
+  type?: string;
+  size?: number;
+  bytes?: number[];
+  segment?: 'stack' | 'heap' | 'data' | 'text';
+  points_to?: string | null;
+  explanation?: string;
+  highlight?: boolean;
+  isArray?: boolean;
+  arrayElements?: any[];
+  isExpanded?: boolean;
+}> = z.object({
+  name: z.string(),
+  address: z.string(),
+  value: z.string(),
+  // Optional fields
+  type: z.string().optional(),
+  size: z.number().optional(),
+  bytes: z.array(z.number()).optional(),
+  segment: z.enum(['stack', 'heap', 'data', 'text']).optional(),
+  points_to: z.string().nullable().optional(),
+  explanation: z.string().optional(),
+  highlight: z.boolean().optional(),
+  // 배열 지원 (접기/펼치기)
+  isArray: z.boolean().optional(),
+  arrayElements: z.lazy(() => z.array(MemoryBlockSchema)).optional(),
+  isExpanded: z.boolean().optional(),
+});
+
 // 메모리 상태 (C 언어 전용 - 레거시)
 export const StepMemoryStateSchema = z.object({
   stack: z.array(StackFrameSchema).optional(),
   heap: z.array(HeapObjectSchema).optional(),
 });
 
+// MemoryChangeAction - 메모리 변경 액션 (배열 형식)
+// WHY: C 메모리 시뮬레이션에서 frame 생성/종료, 변수 할당/해제를 표현
+// REVISIT: Python/Java 추가 시 언어별 분기 필요할 수 있음
 export const MemoryChangeSchema = z.object({
-  action: z.enum(['allocate', 'update', 'free']),
+  action: z.enum(['frame', 'allocate', 'update', 'free', 'deallocate', 'frame_end']),
   area: z.enum(['stack', 'heap']),
   name: z.string(),
-  type: z.string(),
-  size: z.number(),
-  value: z.union([z.string(), z.number()]),
-  address: z.string(),
+  // frame/frame_end 액션은 type, size, value, address가 없음
+  type: z.string().optional(),
+  size: z.number().optional(),
+  value: z.union([z.string(), z.number()]).optional(),
+  address: z.string().optional(),
+  frame: z.string().optional(),  // 변수가 속한 프레임명
   previousValue: z.union([z.string(), z.number()]).optional(),
 });
 
@@ -121,6 +161,16 @@ export const LessonStepSchema = z.object({
   misconception: z.string().optional(),
   tip: z.string().optional(),
   output: z.string().optional(),
+  // 터미널 출력 (시뮬레이터 불필요 시 직접 지정)
+  stdout: z.string().optional(),
+  // Python/JS 시각화 (Phase 4+)
+  visualizationType: z.string().optional(),
+  // Playground용 메모리 스냅샷 (직접 실행 결과)
+  // WHY: Playground는 실시간 C 실행 결과를 받아 즉시 시각화
+  // TRADEOFF: Lesson은 memoryChanges로 누적, Playground는 stack/heap으로 스냅샷
+  stack: z.array(MemoryBlockSchema).optional(),
+  heap: z.array(MemoryBlockSchema).optional(),
+  data: z.array(MemoryBlockSchema).optional(),
 });
 
 // Legacy aliases for backward compatibility
@@ -135,6 +185,7 @@ export const LessonContentSchema = z.object({
   steps: z.array(LessonStepSchema),
   createdAt: z.string(),
   updatedAt: z.string(),
+  showRegisters: z.boolean().optional(), // 함수 레슨에서 RSP/RBP 레지스터 표시
 });
 
 // =============================================
@@ -170,7 +221,6 @@ export const ProgressStatusSchema = z.enum(['not_started', 'in_progress', 'compl
 
 export const UserProgressSchema = z.object({
   id: z.string(),  // short ID 또는 UUID
-  userNickname: z.string(),
   lessonId: z.string(),  // short ID 지원
   status: ProgressStatusSchema,
   currentStep: z.number(),
@@ -178,7 +228,7 @@ export const UserProgressSchema = z.object({
   quizTotal: z.number().optional(),
   startedAt: z.string().optional(),
   completedAt: z.string().optional(),
-  updatedAt: z.string(),
+  updatedAt: z.string().optional(),  // Prisma @updatedAt는 항상 존재하지만 optional로 처리
 });
 
 export const ProgressUpdateRequestSchema = z.object({
@@ -213,3 +263,45 @@ export const ChapterWithProgressSchema = ChapterSchema.extend({
   completedCount: z.number(),
   totalCount: z.number(),
 });
+
+// =============================================
+// Inferred Types (Single Source of Truth)
+// WHY: Zod 스키마에서 타입을 추론하여 스키마-타입 동기화 보장
+// USAGE: types/course.ts에서 re-export
+// =============================================
+
+// 기본 엔티티
+export type Language = z.infer<typeof LanguageSchema>;
+export type Chapter = z.infer<typeof ChapterSchema>;
+export type Lesson = z.infer<typeof LessonSchema>;
+export type LessonDifficulty = z.infer<typeof LessonDifficultySchema>;
+
+// 메모리 시각화
+export type Variable = z.infer<typeof VariableSchema>;
+export type StackFrame = z.infer<typeof StackFrameSchema>;
+export type HeapObject = z.infer<typeof HeapObjectSchema>;
+export type MemoryBlock = z.infer<typeof MemoryBlockSchema>;
+export type StepMemoryState = z.infer<typeof StepMemoryStateSchema>;
+export type MemoryChangeAction = z.infer<typeof MemoryChangeSchema>;
+
+// 콘텐츠
+export type LessonStep = z.infer<typeof LessonStepSchema>;
+export type LessonContent = z.infer<typeof LessonContentSchema>;
+
+// 퀴즈
+export type QuizType = z.infer<typeof QuizTypeSchema>;
+export type Quiz = z.infer<typeof QuizSchema>;
+
+// 진행 상태
+export type ProgressStatus = z.infer<typeof ProgressStatusSchema>;
+export type UserProgress = z.infer<typeof UserProgressSchema>;
+export type ProgressUpdateRequest = z.infer<typeof ProgressUpdateRequestSchema>;
+
+// API 응답
+export type ChapterWithLessons = z.infer<typeof ChapterWithLessonsSchema>;
+export type LessonFull = z.infer<typeof LessonFullSchema>;
+export type ChapterWithProgress = z.infer<typeof ChapterWithProgressSchema>;
+
+// Legacy aliases
+export type StackVariable = Variable;
+export type HeapBlock = HeapObject;
