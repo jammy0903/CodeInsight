@@ -929,6 +929,7 @@ export function LessonPage() {
               )}
             </div>
           </div>
+        </div>
         </>
       )}
 
