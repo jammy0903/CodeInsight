@@ -1,0 +1,105 @@
+{
+  "lessonId": "js-6-1",
+  "title": "프로토타입 체인",
+  "concept": "객체는 [[Prototype]] 링크로 연결되어 있고, 속성을 찾을 때 체인을 따라 올라간다",
+  "content": {
+    "code": "const animal = {\n  eat() { return 'eating'; }\n};\n\nconst dog = {\n  bark() { return 'woof!'; }\n};\n\nObject.setPrototypeOf(dog, animal);\n\nconsole.log(dog.bark());\nconsole.log(dog.eat());\nconsole.log(dog.toString());",
+    "steps": [
+      {
+        "line": 1,
+        "title": "animal 객체 생성",
+        "explanation": "eat 메서드를 가진 animal 객체를 생성합니다.",
+        "highlight": [1, 2, 3],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            { "name": "animal", "props": ["eat()"], "proto": "Object.prototype" }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "dog 객체 생성",
+        "explanation": "bark 메서드를 가진 dog 객체를 생성합니다. 아직 animal과 연결되지 않았습니다.",
+        "highlight": [5, 6, 7],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            { "name": "animal", "props": ["eat()"], "proto": "Object.prototype" },
+            { "name": "dog", "props": ["bark()"], "proto": "Object.prototype" }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "프로토타입 연결",
+        "explanation": "dog의 [[Prototype]]을 animal로 설정합니다. 이제 dog → animal → Object.prototype 체인이 형성됩니다.",
+        "keyInsight": "[[Prototype]] = 객체 간 상속 링크",
+        "highlight": [9],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            { "name": "dog", "props": ["bark()"], "proto": "animal" },
+            { "name": "animal", "props": ["eat()"], "proto": "Object.prototype" },
+            { "name": "Object.prototype", "props": ["toString()"], "proto": "null" }
+          ],
+          "chain": ["dog", "animal", "Object.prototype", "null"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "자신의 메서드 호출",
+        "explanation": "dog.bark()는 dog 자신에게 있으므로 바로 찾습니다.",
+        "highlight": [11],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": { "property": "bark", "found": "dog", "steps": 1 },
+          "output": ["woof!"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "프로토타입 체인 탐색",
+        "explanation": "dog.eat()는 dog에 없어서 animal에서 찾습니다.",
+        "keyInsight": "속성이 없으면 [[Prototype]] 체인을 따라 올라감",
+        "highlight": [12],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": { "property": "eat", "found": "animal", "steps": 2 },
+          "output": ["woof!", "eating"]
+        }
+      },
+      {
+        "line": 13,
+        "title": "Object.prototype까지 탐색",
+        "explanation": "toString()은 dog, animal에 없어서 Object.prototype에서 찾습니다.",
+        "keyInsight": "모든 객체는 Object.prototype을 상속",
+        "highlight": [13],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": { "property": "toString", "found": "Object.prototype", "steps": 3 },
+          "output": ["woof!", "eating", "[object Object]"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "dog.fly()를 호출하면 어떻게 되나요?",
+    "options": [
+      "undefined 반환",
+      "null 반환",
+      "TypeError: dog.fly is not a function",
+      "빈 문자열 반환"
+    ],
+    "correctIndex": 2,
+    "explanation": "체인 끝(null)까지 찾아도 fly가 없으면 undefined가 반환됩니다. undefined()를 호출하면 TypeError가 발생합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "__proto__와 prototype은 같다",
+      "correct": "__proto__는 객체의 프로토타입 링크, prototype은 함수의 속성입니다.",
+      "why": "obj.__proto__ = Object.getPrototypeOf(obj), Func.prototype = new Func()의 프로토타입"
+    }
+  ],
+  "keyTakeaway": "프로토타입 체인 = 속성 탐색 경로, 없으면 체인을 따라 올라감"
+}

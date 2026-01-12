@@ -1,0 +1,123 @@
+{
+  "lessonId": "js-6-2",
+  "title": "생성자 함수와 상속",
+  "concept": "생성자 함수의 prototype 속성은 new로 생성된 객체의 [[Prototype]]이 된다",
+  "content": {
+    "code": "function Animal(name) {\n  this.name = name;\n}\nAnimal.prototype.eat = function() {\n  return this.name + ' eats';\n};\n\nfunction Dog(name) {\n  Animal.call(this, name);\n}\nDog.prototype = Object.create(Animal.prototype);\nDog.prototype.constructor = Dog;\nDog.prototype.bark = function() {\n  return 'Woof!';\n};\n\nconst buddy = new Dog('Buddy');\nconsole.log(buddy.name);\nconsole.log(buddy.eat());\nconsole.log(buddy.bark());",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Animal 생성자 정의",
+        "explanation": "Animal 함수를 정의합니다. 모든 함수는 자동으로 prototype 속성을 가집니다.",
+        "highlight": [1, 2, 3],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "functions": [
+            { "name": "Animal", "prototype": "Animal.prototype" }
+          ],
+          "objects": [
+            { "name": "Animal.prototype", "props": ["constructor"], "proto": "Object.prototype" }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "Animal.prototype에 메서드 추가",
+        "explanation": "eat 메서드를 prototype에 추가합니다. 모든 Animal 인스턴스가 공유합니다.",
+        "keyInsight": "prototype에 메서드 추가 = 모든 인스턴스가 공유",
+        "highlight": [4, 5, 6],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            { "name": "Animal.prototype", "props": ["constructor", "eat()"], "proto": "Object.prototype" }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "Dog 생성자 + 부모 호출",
+        "explanation": "Dog 생성자 내에서 Animal.call(this, name)으로 부모 생성자를 호출합니다.",
+        "keyInsight": "Animal.call(this) = 부모 생성자 실행 (super() 역할)",
+        "highlight": [8, 9, 10],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "functions": [
+            { "name": "Animal", "prototype": "Animal.prototype" },
+            { "name": "Dog", "prototype": "Dog.prototype" }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "프로토타입 체인 연결",
+        "explanation": "Dog.prototype이 Animal.prototype을 상속하도록 설정합니다.",
+        "keyInsight": "Object.create(Parent.prototype) = 상속 체인 생성",
+        "highlight": [11, 12],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            { "name": "Dog.prototype", "props": ["constructor"], "proto": "Animal.prototype" },
+            { "name": "Animal.prototype", "props": ["eat()"], "proto": "Object.prototype" }
+          ],
+          "chain": ["Dog.prototype", "Animal.prototype", "Object.prototype"]
+        }
+      },
+      {
+        "line": 13,
+        "title": "Dog.prototype에 메서드 추가",
+        "explanation": "bark 메서드를 Dog.prototype에 추가합니다.",
+        "highlight": [13, 14, 15],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            { "name": "Dog.prototype", "props": ["constructor", "bark()"], "proto": "Animal.prototype" }
+          ]
+        }
+      },
+      {
+        "line": 17,
+        "title": "인스턴스 생성",
+        "explanation": "new Dog('Buddy')로 인스턴스를 생성합니다. buddy의 [[Prototype]]은 Dog.prototype입니다.",
+        "highlight": [17],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            { "name": "buddy", "props": ["name: 'Buddy'"], "proto": "Dog.prototype" },
+            { "name": "Dog.prototype", "props": ["bark()"], "proto": "Animal.prototype" },
+            { "name": "Animal.prototype", "props": ["eat()"], "proto": "Object.prototype" }
+          ],
+          "chain": ["buddy", "Dog.prototype", "Animal.prototype", "Object.prototype"]
+        }
+      },
+      {
+        "line": 18,
+        "title": "속성/메서드 접근",
+        "explanation": "name은 자신에게, eat()은 Animal.prototype에서, bark()은 Dog.prototype에서 찾습니다.",
+        "highlight": [18, 19, 20],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": ["Buddy", "Buddy eats", "Woof!"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Dog.prototype.constructor = Dog; 를 생략하면?",
+    "options": [
+      "에러 발생",
+      "buddy.constructor가 Animal을 가리킴",
+      "상속이 작동하지 않음",
+      "아무 영향 없음"
+    ],
+    "correctIndex": 1,
+    "explanation": "Object.create()로 새 객체를 만들면 constructor가 없습니다. 체인을 따라 Animal.prototype.constructor(= Animal)를 찾게 됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Dog.prototype = Animal.prototype 하면 상속된다",
+      "correct": "이러면 Dog.prototype과 Animal.prototype이 같은 객체가 됩니다. Dog에 추가한 메서드가 Animal에도 추가됩니다.",
+      "why": "Object.create()로 새 객체를 만들어 연결해야 합니다."
+    }
+  ],
+  "keyTakeaway": "생성자 상속 = Animal.call(this) + Object.create(Animal.prototype)"
+}

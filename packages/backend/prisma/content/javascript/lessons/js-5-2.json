@@ -1,0 +1,143 @@
+{
+  "lessonId": "js-5-2",
+  "title": "얕은 복사 vs 깊은 복사",
+  "concept": "얕은 복사는 1단계만 복사하고, 깊은 복사는 모든 중첩 객체까지 복사한다",
+  "content": {
+    "code": "const original = {\n  name: 'Alice',\n  address: { city: 'Seoul' }\n};\n\n// 얕은 복사\nconst shallow = { ...original };\nshallow.name = 'Bob';\nshallow.address.city = 'Busan';\n\nconsole.log(original.name);\nconsole.log(original.address.city);\n\n// 깊은 복사\nconst deep = JSON.parse(JSON.stringify(original));\ndeep.address.city = 'Incheon';\n\nconsole.log(original.address.city);",
+    "steps": [
+      {
+        "line": 1,
+        "title": "중첩 객체 생성",
+        "explanation": "original 객체 안에 address 객체가 중첩되어 있습니다.",
+        "highlight": [1, 2, 3, 4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{ "name": "original", "value": "→ 0x001" }],
+          "heap": [
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Seoul' }" }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "얕은 복사 (Spread)",
+        "explanation": "{ ...original }은 1단계만 복사합니다. address는 여전히 같은 객체를 참조합니다!",
+        "keyInsight": "얕은 복사 = 1단계만 복사, 중첩 객체는 참조 공유",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" }
+          ],
+          "heap": [
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Seoul' }", "shared": true },
+            { "address": "0x003", "content": "{ name: 'Alice', address: → 0x002 }", "new": true }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "shallow.name 변경",
+        "explanation": "name은 원시값이므로 shallow만 변경됩니다. original.name은 그대로입니다.",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" }
+          ],
+          "heap": [
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Seoul' }" },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }", "changed": true }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "shallow.address.city 변경",
+        "explanation": "address는 공유되므로 original.address.city도 변경됩니다!",
+        "keyInsight": "얕은 복사의 함정: 중첩 객체 수정 시 원본도 변경됨",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" }
+          ],
+          "heap": [
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Busan' }", "changed": true, "warning": true },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }" }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "원본 확인",
+        "explanation": "name은 'Alice'(변경 안 됨), city는 'Busan'(변경됨)입니다.",
+        "highlight": [11, 12],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Alice", "Busan"]
+        }
+      },
+      {
+        "line": 15,
+        "title": "깊은 복사 (JSON)",
+        "explanation": "JSON.stringify → JSON.parse로 완전히 새로운 객체를 생성합니다. 모든 중첩 객체도 복사됩니다.",
+        "keyInsight": "깊은 복사 = 모든 레벨 복사, 완전히 독립적",
+        "highlight": [15],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "deep", "value": "→ 0x004" }
+          ],
+          "heap": [
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Busan' }" },
+            { "address": "0x004", "content": "{ name: 'Alice', address: → 0x005 }", "new": true },
+            { "address": "0x005", "content": "{ city: 'Busan' }", "new": true }
+          ]
+        }
+      },
+      {
+        "line": 16,
+        "title": "deep.address.city 변경",
+        "explanation": "deep은 완전히 독립적이므로 original에 영향을 주지 않습니다.",
+        "highlight": [16, 18],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            { "address": "0x002", "content": "{ city: 'Busan' }" },
+            { "address": "0x005", "content": "{ city: 'Incheon' }", "changed": true }
+          ],
+          "output": ["Alice", "Busan", "Busan"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "structuredClone()의 장점은?",
+    "options": [
+      "가장 빠르다",
+      "함수, 순환 참조 등을 처리할 수 있다",
+      "얕은 복사만 가능하다",
+      "IE에서 사용 가능하다"
+    ],
+    "correctIndex": 1,
+    "explanation": "structuredClone()은 순환 참조, Map, Set, Date 등을 처리할 수 있습니다. JSON 방식은 이런 것들을 처리하지 못합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "spread 연산자로 완전한 복사가 된다",
+      "correct": "spread는 얕은 복사입니다. 중첩 객체는 여전히 참조를 공유합니다.",
+      "why": "1단계만 복사하고, 내부 객체는 참조가 복사됩니다."
+    }
+  ],
+  "keyTakeaway": "얕은 복사: spread, Object.assign / 깊은 복사: JSON, structuredClone"
+}
