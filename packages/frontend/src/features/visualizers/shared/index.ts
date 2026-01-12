@@ -12,3 +12,4 @@ export * from './constants';
 // 컴포넌트
 export { CallStackView } from './components/CallStackView';
 export { ReturnOverlay } from './components/ReturnOverlay';
+export { TerminalOutput, type TerminalLine } from './components/TerminalOutput';
