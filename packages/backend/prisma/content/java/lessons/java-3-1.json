@@ -1,0 +1,99 @@
+{
+  "lessonId": "java-3-1",
+  "title": "기본 타입 전달",
+  "concept": "기본 타입(primitive)은 값이 복사되어 전달된다",
+  "content": {
+    "code": "void increment(int x) {\n    x = x + 1;\n    System.out.println(\"inside: \" + x);\n}\n\nint a = 10;\nSystem.out.println(\"before: \" + a);\nincrement(a);\nSystem.out.println(\"after: \" + a);",
+    "steps": [
+      {
+        "line": 6,
+        "title": "변수 a 선언",
+        "explanation": "int a = 10으로 Stack에 값 10이 저장됩니다.",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "a", "value": "10", "frame": "main"}]
+        }
+      },
+      {
+        "line": 7,
+        "title": "호출 전 출력",
+        "explanation": "a는 10입니다.",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["before: 10"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "increment(a) 호출",
+        "explanation": "a의 값 10이 복사되어 파라미터 x에 전달됩니다. x는 a와 별개입니다!",
+        "keyInsight": "기본 타입 = 값 복사, 원본과 무관",
+        "highlight": [8, 1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "10", "frame": "main"},
+            {"name": "x", "value": "10", "frame": "increment", "copied": true}
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "x 증가",
+        "explanation": "x가 11이 됩니다. 하지만 a는 영향 없음!",
+        "keyInsight": "파라미터 x 변경 -> 원본 a 영향 없음",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "10", "frame": "main"},
+            {"name": "x", "value": "11", "frame": "increment", "changed": true}
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "함수 내부 출력",
+        "explanation": "x는 11입니다.",
+        "highlight": [3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["before: 10", "inside: 11"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "함수 반환 후 출력",
+        "explanation": "a는 여전히 10입니다! 값만 복사되었기 때문입니다.",
+        "keyInsight": "기본 타입은 원본이 절대 변경되지 않음",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "a", "value": "10", "frame": "main"}],
+          "output": ["before: 10", "inside: 11", "after: 10"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Java의 기본 타입 8가지는?",
+    "options": [
+      "int, long, String, boolean, char, byte, short, double",
+      "byte, short, int, long, float, double, boolean, char",
+      "int, Integer, long, Long, double, Double, boolean, char",
+      "byte, short, int, long, float, double, String, char"
+    ],
+    "correctIndex": 1,
+    "explanation": "String은 참조 타입입니다. Integer, Long, Double은 Wrapper 클래스입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수에서 파라미터를 수정하면 원본도 바뀐다",
+      "correct": "기본 타입은 값이 복사되므로 원본에 영향이 없습니다.",
+      "why": "Java는 항상 Pass by Value입니다."
+    }
+  ],
+  "keyTakeaway": "기본 타입 = 값 복사, 원본 변경 불가"
+}

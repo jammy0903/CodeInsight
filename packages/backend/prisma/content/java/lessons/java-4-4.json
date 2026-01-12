@@ -1,0 +1,103 @@
+{
+  "lessonId": "java-4-4",
+  "title": "문자열 비교 총정리",
+  "concept": "String 비교는 상황에 따라 ==, equals(), equalsIgnoreCase(), compareTo()를 사용한다",
+  "content": {
+    "code": "String a = \"Hello\";\nString b = new String(\"Hello\");\nString c = \"hello\";\n\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));\nSystem.out.println(a.equalsIgnoreCase(c));\nSystem.out.println(a.compareTo(\"Apple\"));\nSystem.out.println(\"Hello\".equals(a));",
+    "steps": [
+      {
+        "line": 1,
+        "title": "변수 준비",
+        "explanation": "a는 Pool의 \"Hello\", b는 Heap의 새 \"Hello\", c는 Pool의 \"hello\"입니다.",
+        "highlight": [1, 2, 3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "-> Pool[0]"},
+            {"name": "b", "value": "-> Heap[0]"},
+            {"name": "c", "value": "-> Pool[1]"}
+          ],
+          "stringPool": ["\"Hello\"", "\"hello\""],
+          "heap": [{"address": "Heap[0]", "content": "\"Hello\""}]
+        }
+      },
+      {
+        "line": 5,
+        "title": "== 비교 (참조 비교)",
+        "explanation": "a와 b는 다른 객체입니다. false!",
+        "keyInsight": "== 는 주소 비교, 내용 비교 아님",
+        "highlight": [5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["false"],
+          "warning": "문자열 비교에 == 쓰지 마세요!"
+        }
+      },
+      {
+        "line": 6,
+        "title": "equals() 비교 (내용 비교)",
+        "explanation": "a와 b의 내용이 같습니다. true!",
+        "keyInsight": "equals() = 내용 비교, 항상 이거 쓰세요",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["false", "true"]
+        }
+      },
+      {
+        "line": 7,
+        "title": "equalsIgnoreCase() (대소문자 무시)",
+        "explanation": "\"Hello\"와 \"hello\"는 대소문자만 다릅니다. true!",
+        "keyInsight": "대소문자 무시 비교 = equalsIgnoreCase()",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["false", "true", "true"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "compareTo() (사전순 비교)",
+        "explanation": "\"Hello\"와 \"Apple\" 비교. 'H' > 'A'이므로 양수(7) 반환.",
+        "keyInsight": "compareTo() = 정렬용, 음수/0/양수 반환",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["false", "true", "true", "7"],
+          "note": "'H'-'A' = 72-65 = 7"
+        }
+      },
+      {
+        "line": 9,
+        "title": "리터럴.equals(변수) 패턴",
+        "explanation": "a가 null이어도 NPE가 발생하지 않습니다! 안전한 패턴!",
+        "keyInsight": "\"리터럴\".equals(변수) = null-safe",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["false", "true", "true", "7", "true"],
+          "note": "a가 null이면 false 반환 (NPE 없음)"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "null-safe한 문자열 비교 방법은?",
+    "options": [
+      "str.equals(\"value\")",
+      "\"value\".equals(str)",
+      "str == \"value\"",
+      "str.compareTo(\"value\") == 0"
+    ],
+    "correctIndex": 1,
+    "explanation": "리터럴.equals(변수) 패턴은 변수가 null이어도 false를 반환합니다. 변수.equals()는 NPE!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "== 가 가끔 true니까 써도 된다",
+      "correct": "Pool 덕분에 우연히 true가 나올 뿐입니다. 항상 equals()를 쓰세요.",
+      "why": "new String()이나 연산 결과는 Pool에 없어서 == 가 false가 됩니다."
+    }
+  ],
+  "keyTakeaway": "String 비교 = equals(), null-safe = \"리터럴\".equals(변수)"
+}

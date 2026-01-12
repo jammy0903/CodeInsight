@@ -1,0 +1,94 @@
+{
+  "lessonId": "java-7-2",
+  "title": "Map 순회와 수정",
+  "concept": "Map 순회 방법과 순회 중 수정 시 주의점을 알아야 한다",
+  "content": {
+    "code": "Map<String, Integer> map = new HashMap<>();\nmap.put(\"a\", 1);\nmap.put(\"b\", 2);\nmap.put(\"c\", 3);\n\n// 방법 1: entrySet (가장 효율적)\nfor (Map.Entry<String, Integer> e : map.entrySet()) {\n    System.out.println(e.getKey() + \"=\" + e.getValue());\n}\n\n// 방법 2: keySet (키만 필요할 때)\nfor (String key : map.keySet()) {\n    System.out.println(key);\n}\n\n// 순회 중 삭제: Iterator 사용\nIterator<Map.Entry<String, Integer>> it = map.entrySet().iterator();\nwhile (it.hasNext()) {\n    if (it.next().getValue() < 2) {\n        it.remove();\n    }\n}",
+    "steps": [
+      {
+        "line": 1,
+        "title": "HashMap 생성",
+        "explanation": "map에 3개의 키-값 쌍이 들어있습니다.",
+        "highlight": [1, 2, 3, 4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "map", "value": "-> HashMap"}],
+          "heap": [{"address": "0x001", "content": "{a:1, b:2, c:3}"}]
+        }
+      },
+      {
+        "line": 7,
+        "title": "entrySet 순회",
+        "explanation": "entrySet()은 키와 값을 동시에 가져옵니다. 가장 효율적!",
+        "keyInsight": "entrySet = 키+값 동시 접근, O(1)",
+        "highlight": [7, 8, 9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "Map.Entry<K,V> = 키와 값의 쌍",
+          "output": ["a=1", "b=2", "c=3"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "keySet 순회",
+        "explanation": "keySet()은 키만 가져옵니다. 값이 필요하면 get() 호출 필요!",
+        "highlight": [12, 13, 14],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "값 필요시 map.get(key) 추가 호출",
+          "warning": "값도 필요하면 entrySet이 효율적"
+        }
+      },
+      {
+        "line": 17,
+        "title": "Iterator로 순회",
+        "explanation": "삭제가 필요할 때는 Iterator를 직접 사용합니다.",
+        "highlight": [17, 18],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "it", "value": "-> Iterator"}]
+        }
+      },
+      {
+        "line": 19,
+        "title": "조건 체크",
+        "explanation": "값이 2 미만인 항목을 찾습니다. a:1이 해당!",
+        "highlight": [19],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "it.next().getValue() = 1 < 2 → true"
+        }
+      },
+      {
+        "line": 20,
+        "title": "Iterator.remove()",
+        "explanation": "it.remove()로 현재 항목(a:1)을 안전하게 삭제합니다.",
+        "keyInsight": "Map 순회 중 삭제도 Iterator.remove()",
+        "highlight": [20],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x001", "content": "{b:2, c:3}", "changed": true}]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "keySet()으로 순회 시 map.put(newKey, value)를 하면?",
+    "options": [
+      "정상 작동",
+      "ConcurrentModificationException",
+      "무한 루프",
+      "컴파일 에러"
+    ],
+    "correctIndex": 1,
+    "explanation": "순회 중 put()도 구조 변경이므로 ConcurrentModificationException 발생!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "keySet()으로 순회하면서 map.get(key)가 효율적이다",
+      "correct": "entrySet()이 더 효율적입니다. get() 호출 비용이 추가되기 때문입니다.",
+      "why": "entrySet은 이미 키와 값을 가지고 있어서 추가 조회가 필요 없습니다."
+    }
+  ],
+  "keyTakeaway": "Map 순회 = entrySet (효율), 삭제 = Iterator.remove()"
+}

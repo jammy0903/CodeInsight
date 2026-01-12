@@ -1,0 +1,112 @@
+{
+  "lessonId": "java-2-4",
+  "title": "null-safe 컬렉션",
+  "concept": "컬렉션마다 null 허용 정책이 다르다",
+  "content": {
+    "code": "Map<String, Integer> hashMap = new HashMap<>();\nhashMap.put(\"key\", null);\nhashMap.put(null, 100);\n\nMap<String, Integer> concurrentMap = new ConcurrentHashMap<>();\nconcurrentMap.put(\"key\", null);\n\nList<String> list = List.of(\"a\", \"b\", \"c\");\nlist.contains(null);\n\nInteger value = hashMap.getOrDefault(\"missing\", 0);",
+    "steps": [
+      {
+        "line": 1,
+        "title": "HashMap 생성",
+        "explanation": "HashMap은 null key와 null value를 모두 허용합니다.",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "hashMap", "value": "HashMap{}"}]
+        }
+      },
+      {
+        "line": 2,
+        "title": "null value 저장",
+        "explanation": "HashMap은 null value를 허용합니다.",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "hashMap", "value": "{\"key\": null}"}],
+          "note": "HashMap: null value OK"
+        }
+      },
+      {
+        "line": 3,
+        "title": "null key 저장",
+        "explanation": "HashMap은 null key도 허용합니다 (하나만).",
+        "keyInsight": "HashMap: null key 1개, null value 여러 개 가능",
+        "highlight": [3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "hashMap", "value": "{\"key\": null, null: 100}"}]
+        }
+      },
+      {
+        "line": 5,
+        "title": "ConcurrentHashMap 생성",
+        "explanation": "ConcurrentHashMap은 스레드 안전하지만 null을 허용하지 않습니다.",
+        "highlight": [5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "concurrentMap", "value": "ConcurrentHashMap{}"}]
+        }
+      },
+      {
+        "line": 6,
+        "title": "ConcurrentHashMap에 null (NPE!)",
+        "explanation": "null key나 null value를 넣으면 NullPointerException!",
+        "keyInsight": "ConcurrentHashMap: null 불가!",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "error": "NullPointerException",
+          "warning": "ConcurrentHashMap은 null key/value 불가"
+        }
+      },
+      {
+        "line": 8,
+        "title": "List.of() 불변 리스트",
+        "explanation": "List.of()로 만든 리스트는 불변이고 null을 허용하지 않습니다.",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "list", "value": "[\"a\", \"b\", \"c\"]"}],
+          "note": "List.of(): 불변, null 불가"
+        }
+      },
+      {
+        "line": 9,
+        "title": "contains(null) 호출 (NPE!)",
+        "explanation": "List.of()로 만든 리스트에서 contains(null)은 NPE!",
+        "keyInsight": "List.of(): null 요소 불가, contains(null)도 NPE",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "error": "NullPointerException"
+        }
+      },
+      {
+        "line": 11,
+        "title": "getOrDefault() - null-safe 조회",
+        "explanation": "키가 없거나 값이 null이면 기본값을 반환합니다.",
+        "keyInsight": "getOrDefault() = null 대신 기본값",
+        "highlight": [11],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "value", "value": "0"}],
+          "note": "\"missing\" 키가 없으므로 0 반환"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "null key를 허용하는 Map은?",
+    "options": ["HashMap", "TreeMap", "ConcurrentHashMap", "Hashtable"],
+    "correctIndex": 0,
+    "explanation": "HashMap만 null key를 허용합니다. TreeMap은 비교할 수 없어서, ConcurrentHashMap과 Hashtable은 설계상 불가합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "모든 컬렉션이 null을 허용한다",
+      "correct": "ConcurrentHashMap, List.of(), Set.of() 등은 null을 허용하지 않습니다.",
+      "why": "스레드 안전성이나 불변성을 위해 null을 금지하는 경우가 많습니다."
+    }
+  ],
+  "keyTakeaway": "HashMap: null OK, ConcurrentHashMap/List.of(): null 불가"
+}

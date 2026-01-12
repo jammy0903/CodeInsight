@@ -1,0 +1,102 @@
+{
+  "lessonId": "java-4-1",
+  "title": "String 불변성",
+  "concept": "String 객체는 한 번 생성되면 내용을 변경할 수 없다. 모든 수정은 새 객체를 생성한다",
+  "content": {
+    "code": "String s1 = \"Hello\";\nString s2 = s1;\n\ns1 = s1 + \" World\";\n\nSystem.out.println(s1);\nSystem.out.println(s2);\nSystem.out.println(s1 == s2);",
+    "steps": [
+      {
+        "line": 1,
+        "title": "String 리터럴 생성",
+        "explanation": "\"Hello\"는 String Pool에 저장되고, s1은 이를 참조합니다.",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "s1", "value": "-> Pool"}],
+          "stringPool": ["\"Hello\""]
+        }
+      },
+      {
+        "line": 2,
+        "title": "참조 복사",
+        "explanation": "s2도 같은 \"Hello\" 객체를 참조합니다. 복사본이 아닙니다!",
+        "keyInsight": "String 할당 = 참조 복사, 값 복사 아님",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "s1", "value": "-> Pool[0]"},
+            {"name": "s2", "value": "-> Pool[0]", "sameRef": true}
+          ],
+          "stringPool": ["\"Hello\""]
+        }
+      },
+      {
+        "line": 4,
+        "title": "문자열 연결 (새 객체 생성!)",
+        "explanation": "s1 + \" World\"는 기존 \"Hello\"를 수정하지 않고, 새로운 \"Hello World\" 객체를 생성합니다!",
+        "keyInsight": "String 수정 = 새 객체 생성, 기존 객체 불변",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "s1", "value": "-> Heap[0]", "changed": true},
+            {"name": "s2", "value": "-> Pool[0]"}
+          ],
+          "stringPool": ["\"Hello\""],
+          "heap": [{"address": "Heap[0]", "content": "\"Hello World\"", "new": true}]
+        }
+      },
+      {
+        "line": 6,
+        "title": "s1 출력",
+        "explanation": "s1은 새로 생성된 \"Hello World\"를 가리킵니다.",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Hello World"]
+        }
+      },
+      {
+        "line": 7,
+        "title": "s2 출력",
+        "explanation": "s2는 여전히 원래의 \"Hello\"를 가리킵니다! 불변성 덕분에 안전합니다.",
+        "keyInsight": "불변성 = 다른 참조에 영향 없음",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Hello World", "Hello"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "참조 비교",
+        "explanation": "s1과 s2는 이제 다른 객체를 가리킵니다. false!",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Hello World", "Hello", "false"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "String이 불변인 이유로 올바르지 않은 것은?",
+    "options": [
+      "스레드 안전성",
+      "String Pool 공유 가능",
+      "메모리 절약",
+      "수정 속도 향상"
+    ],
+    "correctIndex": 3,
+    "explanation": "불변성은 수정할 때마다 새 객체를 생성하므로 오히려 느립니다. 대신 안전성과 Pool 공유가 장점입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "String을 수정하면 원본이 바뀐다",
+      "correct": "String은 불변입니다. 모든 '수정'은 새 객체를 생성합니다.",
+      "why": "s1 = s1 + \"x\"는 s1이 새 객체를 가리키게 할 뿐, 원래 객체는 그대로입니다."
+    }
+  ],
+  "keyTakeaway": "String 불변 = 수정은 새 객체 생성, 기존 참조 안전"
+}

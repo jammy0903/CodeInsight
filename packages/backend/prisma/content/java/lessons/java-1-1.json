@@ -1,0 +1,111 @@
+{
+  "lessonId": "java-1-1",
+  "title": "== vs .equals() 기본",
+  "concept": "==는 참조(메모리 주소)를 비교하고, .equals()는 값을 비교한다",
+  "content": {
+    "code": "String a = new String(\"hello\");\nString b = new String(\"hello\");\n\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));\n\nString c = a;\nSystem.out.println(a == c);",
+    "steps": [
+      {
+        "line": 1,
+        "title": "첫 번째 String 객체 생성",
+        "explanation": "new String()은 Heap에 새 객체를 생성합니다. a는 이 객체의 주소를 저장합니다.",
+        "keyInsight": "new = 항상 새 객체 생성",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "a", "value": "-> 0x001"}],
+          "heap": [{"address": "0x001", "content": "\"hello\""}]
+        }
+      },
+      {
+        "line": 2,
+        "title": "두 번째 String 객체 생성",
+        "explanation": "또 다른 new String()은 별도의 새 객체를 생성합니다. 내용은 같지만 다른 객체입니다.",
+        "keyInsight": "내용이 같아도 다른 객체 = 다른 주소",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "-> 0x001"},
+            {"name": "b", "value": "-> 0x002"}
+          ],
+          "heap": [
+            {"address": "0x001", "content": "\"hello\""},
+            {"address": "0x002", "content": "\"hello\"", "new": true}
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "== 비교 (참조 비교)",
+        "explanation": "a == b는 주소를 비교합니다. 0x001 != 0x002 이므로 false입니다.",
+        "keyInsight": "== 는 참조(주소) 비교",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "-> 0x001"},
+            {"name": "b", "value": "-> 0x002"}
+          ],
+          "comparison": "0x001 != 0x002",
+          "output": ["false"]
+        }
+      },
+      {
+        "line": 5,
+        "title": ".equals() 비교 (값 비교)",
+        "explanation": "a.equals(b)는 내용을 비교합니다. 둘 다 \"hello\"이므로 true입니다.",
+        "keyInsight": ".equals()는 값 비교",
+        "highlight": [5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "comparison": "\"hello\" == \"hello\"",
+          "output": ["false", "true"]
+        }
+      },
+      {
+        "line": 7,
+        "title": "같은 참조 할당",
+        "explanation": "c = a는 a의 주소값을 c에 복사합니다. 이제 c도 0x001을 가리킵니다.",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "-> 0x001"},
+            {"name": "b", "value": "-> 0x002"},
+            {"name": "c", "value": "-> 0x001", "sameRef": true}
+          ],
+          "heap": [
+            {"address": "0x001", "content": "\"hello\"", "refCount": 2}
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "같은 참조 비교",
+        "explanation": "a == c는 둘 다 0x001이므로 true입니다.",
+        "keyInsight": "같은 객체를 가리키면 == 도 true",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "comparison": "0x001 == 0x001",
+          "output": ["false", "true", "true"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "다음 코드의 출력은?\n\nInteger x = new Integer(100);\nInteger y = new Integer(100);\nSystem.out.println(x == y);",
+    "options": ["true", "false", "컴파일 에러", "런타임 에러"],
+    "correctIndex": 1,
+    "explanation": "new로 생성하면 항상 다른 객체입니다. == 는 참조를 비교하므로 false입니다. 값 비교는 x.equals(y)를 사용해야 합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "==는 값을 비교한다",
+      "correct": "==는 참조(메모리 주소)를 비교합니다. 값 비교는 .equals()를 사용해야 합니다.",
+      "why": "Python의 ==는 값 비교이지만, Java의 ==는 참조 비교입니다."
+    }
+  ],
+  "keyTakeaway": "== = 참조 비교, .equals() = 값 비교"
+}

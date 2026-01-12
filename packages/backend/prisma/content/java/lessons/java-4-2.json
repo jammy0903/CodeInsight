@@ -1,0 +1,128 @@
+{
+  "lessonId": "java-4-2",
+  "title": "String vs StringBuilder",
+  "concept": "반복적인 문자열 연결에는 StringBuilder를 사용해야 한다",
+  "content": {
+    "code": "// 나쁜 예: String 연결\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// 좋은 예: StringBuilder\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
+    "steps": [
+      {
+        "line": 2,
+        "title": "빈 String 생성",
+        "explanation": "bad는 빈 문자열 \"\"을 참조합니다.",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "bad", "value": "-> \"\""}],
+          "heap": [{"address": "0x001", "content": "\"\""}]
+        }
+      },
+      {
+        "line": 4,
+        "title": "첫 번째 반복 (i=0)",
+        "explanation": "bad + 0 = \"0\". 새 String 객체 생성! 기존 \"\"는 버려집니다.",
+        "keyInsight": "매 반복마다 새 String 객체 생성 = 메모리 낭비",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "bad", "value": "-> 0x002"}],
+          "heap": [
+            {"address": "0x001", "content": "\"\"", "garbage": true},
+            {"address": "0x002", "content": "\"0\"", "new": true}
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "두 번째 반복 (i=1)",
+        "explanation": "bad + 1 = \"01\". 또 새 객체! \"0\"도 버려집니다.",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {"address": "0x002", "content": "\"0\"", "garbage": true},
+            {"address": "0x003", "content": "\"01\"", "new": true}
+          ],
+          "warning": "반복마다 객체 생성 + 복사 = O(n²)"
+        }
+      },
+      {
+        "line": 4,
+        "title": "세 번째 반복 (i=2)",
+        "explanation": "bad + 2 = \"012\". 3번 반복에 객체 3개 생성, 2개 버림!",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {"address": "0x003", "content": "\"01\"", "garbage": true},
+            {"address": "0x004", "content": "\"012\"", "new": true}
+          ],
+          "note": "n번 반복 = n개 객체 생성, n-1개 버림"
+        }
+      },
+      {
+        "line": 8,
+        "title": "StringBuilder 생성",
+        "explanation": "StringBuilder는 내부 버퍼(char[])를 가진 가변 객체입니다.",
+        "keyInsight": "StringBuilder = 가변 버퍼, 새 객체 안 만듦",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "good", "value": "-> 0x010"}],
+          "heap": [{"address": "0x010", "content": "StringBuilder{buffer: []}"}]
+        }
+      },
+      {
+        "line": 10,
+        "title": "append(0)",
+        "explanation": "같은 객체의 버퍼에 '0'을 추가합니다. 새 객체 없음!",
+        "highlight": [10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x010", "content": "StringBuilder{buffer: ['0']}", "changed": true}]
+        }
+      },
+      {
+        "line": 10,
+        "title": "append(1), append(2)",
+        "explanation": "계속 같은 객체에 추가합니다. 객체 수 변화 없음!",
+        "highlight": [10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x010", "content": "StringBuilder{buffer: ['0','1','2']}", "changed": true}],
+          "note": "n번 반복해도 객체 1개만 사용"
+        }
+      },
+      {
+        "line": 12,
+        "title": "toString()",
+        "explanation": "최종적으로 String 객체 하나만 생성합니다.",
+        "keyInsight": "StringBuilder = O(n), String 연결 = O(n²)",
+        "highlight": [12],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "result", "value": "-> 0x011"}],
+          "heap": [{"address": "0x011", "content": "\"012\""}]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "StringBuilder 대신 StringBuffer를 써야 할 때는?",
+    "options": [
+      "문자열이 긴 경우",
+      "반복 횟수가 많은 경우",
+      "멀티스레드 환경에서 공유할 경우",
+      "속도가 중요한 경우"
+    ],
+    "correctIndex": 2,
+    "explanation": "StringBuffer는 synchronized라서 스레드 안전합니다. 단일 스레드면 StringBuilder가 더 빠릅니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "String + 연산도 컴파일러가 최적화해준다",
+      "correct": "루프 안의 연결은 최적화되지 않습니다. 매번 새 StringBuilder가 생성됩니다.",
+      "why": "s += \"x\" in loop → new StringBuilder(s).append(\"x\").toString() 매번 실행"
+    }
+  ],
+  "keyTakeaway": "루프 안 String 연결 = StringBuilder 필수, 그 외는 + 연산 OK"
+}

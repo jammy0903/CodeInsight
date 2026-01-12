@@ -1,0 +1,85 @@
+{
+  "lessonId": "java-2-2",
+  "title": "null 체크 패턴",
+  "concept": "null을 안전하게 다루는 여러 가지 패턴이 있다",
+  "content": {
+    "code": "String str = getValueMaybeNull();\n\nif (str != null && str.length() > 0) {\n    System.out.println(str);\n}\n\nObjects.requireNonNull(str, \"str must not be null\");\n\nString result = (str != null) ? str : \"default\";\n\nString value = Objects.requireNonNullElse(str, \"default\");",
+    "steps": [
+      {
+        "line": 1,
+        "title": "null일 수 있는 값 받기",
+        "explanation": "외부 메서드에서 null이 반환될 수 있습니다.",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "str", "value": "null 또는 값"}],
+          "note": "외부 입력은 항상 null 가능성 고려"
+        }
+      },
+      {
+        "line": 3,
+        "title": "단축 평가 (Short-circuit)",
+        "explanation": "str != null이 false면 뒤의 str.length()는 실행되지 않습니다. NPE 방지!",
+        "keyInsight": "&& 단축 평가: 앞이 false면 뒤는 실행 안 함",
+        "highlight": [3, 4, 5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "evaluation": "str != null → false → && 뒤 실행 안 함",
+          "note": "순서가 중요! null 체크를 먼저"
+        }
+      },
+      {
+        "line": 7,
+        "title": "Objects.requireNonNull",
+        "explanation": "null이면 즉시 NullPointerException을 던집니다. 메시지 포함 가능.",
+        "keyInsight": "빠른 실패(Fail-fast) 패턴",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "null이면 명확한 에러 메시지와 함께 즉시 실패"
+        }
+      },
+      {
+        "line": 9,
+        "title": "삼항 연산자로 기본값",
+        "explanation": "null이면 \"default\"를 사용합니다.",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "result", "value": "str 또는 \"default\""}]
+        }
+      },
+      {
+        "line": 11,
+        "title": "Objects.requireNonNullElse",
+        "explanation": "Java 9+에서 제공하는 null 기본값 패턴입니다.",
+        "keyInsight": "Java 9+: requireNonNullElse, requireNonNullElseGet",
+        "highlight": [11],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "value", "value": "str 또는 \"default\""}],
+          "note": "더 읽기 쉬운 코드"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "if (str.length() > 0 && str != null)의 문제점은?",
+    "options": [
+      "문법 오류",
+      "str이 null이면 NPE 발생",
+      "항상 false 반환",
+      "문제없음"
+    ],
+    "correctIndex": 1,
+    "explanation": "순서가 잘못되었습니다. str.length()가 먼저 실행되므로 str이 null이면 NPE가 발생합니다. null 체크를 먼저 해야 합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "null 체크 순서는 상관없다",
+      "correct": "&& 연산자는 왼쪽부터 평가합니다. null 체크를 먼저 해야 합니다.",
+      "why": "단축 평가: 앞이 false면 뒤는 실행되지 않습니다."
+    }
+  ],
+  "keyTakeaway": "null 체크 먼저, Objects 유틸리티 활용, 기본값 패턴 사용"
+}

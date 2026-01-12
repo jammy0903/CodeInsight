@@ -1,0 +1,126 @@
+{
+  "lessonId": "java-3-3",
+  "title": "배열 전달",
+  "concept": "배열도 객체이므로 참조값이 복사된다. 요소 수정은 원본에 영향",
+  "content": {
+    "code": "void modifyElement(int[] arr) {\n    arr[0] = 100;\n}\n\nvoid reassignArray(int[] arr) {\n    arr = new int[]{999, 888, 777};\n}\n\nint[] nums = {1, 2, 3};\nSystem.out.println(Arrays.toString(nums));\n\nmodifyElement(nums);\nSystem.out.println(Arrays.toString(nums));\n\nreassignArray(nums);\nSystem.out.println(Arrays.toString(nums));",
+    "steps": [
+      {
+        "line": 9,
+        "title": "배열 생성",
+        "explanation": "nums는 Heap의 배열 객체를 참조합니다.",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "nums", "value": "-> 0x001"}],
+          "heap": [{"address": "0x001", "content": "[1, 2, 3]"}]
+        }
+      },
+      {
+        "line": 10,
+        "title": "초기 출력",
+        "explanation": "[1, 2, 3]이 출력됩니다.",
+        "highlight": [10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["[1, 2, 3]"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "modifyElement(nums) 호출",
+        "explanation": "nums의 참조값이 arr에 복사됩니다. 같은 배열을 가리킵니다.",
+        "highlight": [12, 1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "nums", "value": "-> 0x001", "frame": "main"},
+            {"name": "arr", "value": "-> 0x001", "frame": "modifyElement", "sameRef": true}
+          ],
+          "heap": [{"address": "0x001", "content": "[1, 2, 3]"}]
+        }
+      },
+      {
+        "line": 2,
+        "title": "요소 수정",
+        "explanation": "arr[0] = 100은 원본 배열을 수정합니다!",
+        "keyInsight": "배열 요소 수정 = 원본에 영향",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x001", "content": "[100, 2, 3]", "changed": true}]
+        }
+      },
+      {
+        "line": 13,
+        "title": "수정 확인",
+        "explanation": "nums[0]이 100으로 변경되었습니다!",
+        "highlight": [13],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["[1, 2, 3]", "[100, 2, 3]"]
+        }
+      },
+      {
+        "line": 15,
+        "title": "reassignArray(nums) 호출",
+        "explanation": "다시 nums의 참조값이 arr에 복사됩니다.",
+        "highlight": [15, 5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "nums", "value": "-> 0x001", "frame": "main"},
+            {"name": "arr", "value": "-> 0x001", "frame": "reassignArray"}
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "배열 재할당",
+        "explanation": "arr = new int[]{...}는 지역 변수 arr만 변경합니다. nums는 영향 없음!",
+        "keyInsight": "배열 재할당 = 지역 변수만, 원본 무관",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "nums", "value": "-> 0x001", "frame": "main"},
+            {"name": "arr", "value": "-> 0x002", "frame": "reassignArray", "changed": true}
+          ],
+          "heap": [
+            {"address": "0x001", "content": "[100, 2, 3]"},
+            {"address": "0x002", "content": "[999, 888, 777]", "new": true}
+          ]
+        }
+      },
+      {
+        "line": 16,
+        "title": "결과 확인",
+        "explanation": "nums는 여전히 [100, 2, 3]입니다. 재할당은 원본에 영향 없음!",
+        "highlight": [16],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["[1, 2, 3]", "[100, 2, 3]", "[100, 2, 3]"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "배열을 완전히 교체하고 싶다면?",
+    "options": [
+      "void change(int[] arr) { arr = new int[]{...}; }",
+      "int[] change(int[] arr) { return new int[]{...}; }",
+      "void change(int[] arr) { arr[0] = ...; }",
+      "불가능하다"
+    ],
+    "correctIndex": 1,
+    "explanation": "새 배열을 반환하고 호출자가 할당받아야 합니다. 파라미터 재할당은 원본에 영향 없습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "배열을 함수에 전달하면 복사본이 만들어진다",
+      "correct": "배열 참조값만 복사됩니다. 같은 배열을 공유합니다.",
+      "why": "요소 수정이 원본에 영향을 주는 이유입니다."
+    }
+  ],
+  "keyTakeaway": "배열 요소 수정 = 원본 영향, 배열 재할당 = 지역 변수만"
+}

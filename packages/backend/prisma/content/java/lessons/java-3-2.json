@@ -1,0 +1,119 @@
+{
+  "lessonId": "java-3-2",
+  "title": "객체 참조 전달",
+  "concept": "객체를 전달하면 참조값(주소)이 복사된다. 객체 내부는 수정 가능하지만 참조 자체는 변경 불가",
+  "content": {
+    "code": "class Dog {\n    String name;\n    Dog(String name) { this.name = name; }\n}\n\nvoid changeName(Dog d) {\n    d.name = \"Max\";\n}\n\nvoid reassign(Dog d) {\n    d = new Dog(\"Rex\");\n}\n\nDog myDog = new Dog(\"Buddy\");\nchangeName(myDog);\nSystem.out.println(myDog.name);\n\nreassign(myDog);\nSystem.out.println(myDog.name);",
+    "steps": [
+      {
+        "line": 14,
+        "title": "Dog 객체 생성",
+        "explanation": "myDog는 Heap의 Dog 객체를 참조합니다.",
+        "highlight": [14],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "myDog", "value": "-> 0x001"}],
+          "heap": [{"address": "0x001", "content": "Dog{name: \"Buddy\"}"}]
+        }
+      },
+      {
+        "line": 15,
+        "title": "changeName(myDog) 호출",
+        "explanation": "myDog의 참조값 0x001이 d에 복사됩니다. d도 같은 객체를 가리킵니다.",
+        "keyInsight": "참조값(주소) 복사 = 같은 객체 공유",
+        "highlight": [15, 6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "myDog", "value": "-> 0x001", "frame": "main"},
+            {"name": "d", "value": "-> 0x001", "frame": "changeName", "sameRef": true}
+          ],
+          "heap": [{"address": "0x001", "content": "Dog{name: \"Buddy\"}"}]
+        }
+      },
+      {
+        "line": 7,
+        "title": "d.name 변경",
+        "explanation": "d와 myDog가 같은 객체를 가리키므로 원본 객체가 수정됩니다!",
+        "keyInsight": "같은 객체 참조 -> 내부 수정 시 원본 영향",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x001", "content": "Dog{name: \"Max\"}", "changed": true}]
+        }
+      },
+      {
+        "line": 16,
+        "title": "변경 확인",
+        "explanation": "myDog.name이 \"Max\"로 변경되었습니다!",
+        "highlight": [16],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Max"]
+        }
+      },
+      {
+        "line": 18,
+        "title": "reassign(myDog) 호출",
+        "explanation": "다시 myDog의 참조값이 d에 복사됩니다.",
+        "highlight": [18, 10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "myDog", "value": "-> 0x001", "frame": "main"},
+            {"name": "d", "value": "-> 0x001", "frame": "reassign"}
+          ],
+          "heap": [{"address": "0x001", "content": "Dog{name: \"Max\"}"}]
+        }
+      },
+      {
+        "line": 11,
+        "title": "d에 새 객체 할당",
+        "explanation": "d = new Dog(\"Rex\")는 지역 변수 d만 변경합니다. myDog는 영향 없음!",
+        "keyInsight": "참조 재할당 = 지역 변수만 변경, 원본 무관",
+        "highlight": [11],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "myDog", "value": "-> 0x001", "frame": "main"},
+            {"name": "d", "value": "-> 0x002", "frame": "reassign", "changed": true}
+          ],
+          "heap": [
+            {"address": "0x001", "content": "Dog{name: \"Max\"}"},
+            {"address": "0x002", "content": "Dog{name: \"Rex\"}", "new": true}
+          ]
+        }
+      },
+      {
+        "line": 19,
+        "title": "결과 확인",
+        "explanation": "myDog는 여전히 0x001을 가리킵니다. \"Max\" 그대로!",
+        "highlight": [19],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "myDog", "value": "-> 0x001"}],
+          "output": ["Max", "Max"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "객체를 메서드에 전달했을 때 가능한 것은?",
+    "options": [
+      "객체 자체를 다른 객체로 교체",
+      "객체의 필드 값 변경",
+      "둘 다 가능",
+      "둘 다 불가능"
+    ],
+    "correctIndex": 1,
+    "explanation": "필드 변경은 같은 객체를 참조하므로 가능합니다. 하지만 참조를 재할당해도 원본 변수는 영향 없습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Java는 객체를 Pass by Reference로 전달한다",
+      "correct": "Java는 항상 Pass by Value입니다. 객체의 경우 '참조값'이 복사됩니다.",
+      "why": "참조 자체가 전달되면 재할당이 원본에 영향을 줘야 하지만, 그렇지 않습니다."
+    }
+  ],
+  "keyTakeaway": "참조값 복사 = 내부 수정 OK, 재할당은 지역 변수만"
+}

@@ -1,0 +1,117 @@
+{
+  "lessonId": "java-1-2",
+  "title": "String Pool의 비밀",
+  "concept": "문자열 리터럴은 String Pool에 저장되어 재사용된다",
+  "content": {
+    "code": "String a = \"hello\";\nString b = \"hello\";\nSystem.out.println(a == b);\n\nString c = new String(\"hello\");\nSystem.out.println(a == c);\n\nString d = c.intern();\nSystem.out.println(a == d);",
+    "steps": [
+      {
+        "line": 1,
+        "title": "리터럴로 String 생성",
+        "explanation": "\"hello\" 리터럴은 String Pool에 저장됩니다. a는 Pool의 객체를 참조합니다.",
+        "keyInsight": "리터럴 = String Pool에 저장",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "a", "value": "-> Pool"}],
+          "stringPool": [{"value": "\"hello\"", "address": "Pool:0x100"}],
+          "heap": []
+        }
+      },
+      {
+        "line": 2,
+        "title": "같은 리터럴 재사용",
+        "explanation": "\"hello\"가 이미 Pool에 있으므로 새로 만들지 않고 같은 객체를 참조합니다.",
+        "keyInsight": "같은 리터럴 = 같은 Pool 객체 재사용",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "-> Pool:0x100"},
+            {"name": "b", "value": "-> Pool:0x100", "sameRef": true}
+          ],
+          "stringPool": [{"value": "\"hello\"", "address": "Pool:0x100", "refCount": 2}]
+        }
+      },
+      {
+        "line": 3,
+        "title": "리터럴끼리 == 비교",
+        "explanation": "a와 b는 같은 Pool 객체를 가리키므로 == 비교가 true입니다!",
+        "keyInsight": "리터럴끼리는 == 가 true (같은 Pool 객체)",
+        "highlight": [3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "comparison": "Pool:0x100 == Pool:0x100",
+          "output": ["true"],
+          "warning": "리터럴끼리는 ==가 true! 하지만 이에 의존하면 안 됨"
+        }
+      },
+      {
+        "line": 5,
+        "title": "new로 String 생성",
+        "explanation": "new String()은 Pool을 무시하고 Heap에 새 객체를 생성합니다.",
+        "keyInsight": "new = Pool 무시, Heap에 새 객체",
+        "highlight": [5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "-> Pool:0x100"},
+            {"name": "c", "value": "-> 0x200"}
+          ],
+          "stringPool": [{"value": "\"hello\"", "address": "Pool:0x100"}],
+          "heap": [{"address": "0x200", "content": "\"hello\"", "new": true}]
+        }
+      },
+      {
+        "line": 6,
+        "title": "리터럴 vs new 비교",
+        "explanation": "a는 Pool, c는 Heap 객체. 다른 주소이므로 false입니다.",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "comparison": "Pool:0x100 != 0x200",
+          "output": ["true", "false"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "intern()으로 Pool 등록",
+        "explanation": "intern()은 Pool에서 같은 값을 찾아 반환합니다. \"hello\"가 이미 있으므로 Pool 객체를 반환합니다.",
+        "keyInsight": "intern() = Pool에서 찾거나 등록",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "-> Pool:0x100"},
+            {"name": "d", "value": "-> Pool:0x100", "sameRef": true}
+          ],
+          "stringPool": [{"value": "\"hello\"", "address": "Pool:0x100"}]
+        }
+      },
+      {
+        "line": 9,
+        "title": "intern() 결과 비교",
+        "explanation": "d는 이제 Pool 객체를 가리키므로 a == d는 true입니다.",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["true", "false", "true"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "String Pool의 목적은?",
+    "options": ["보안 강화", "메모리 절약", "속도 향상", "가비지 컬렉션 최적화"],
+    "correctIndex": 1,
+    "explanation": "같은 문자열 리터럴을 여러 번 사용해도 하나의 객체만 생성하여 메모리를 절약합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "문자열은 항상 ==로 비교하면 된다",
+      "correct": "리터럴끼리만 ==가 true입니다. new로 생성하거나 외부 입력이면 false입니다.",
+      "why": "항상 .equals()를 사용하는 것이 안전합니다."
+    }
+  ],
+  "keyTakeaway": "리터럴 = Pool 재사용, new = Heap 새 객체, 항상 .equals() 사용"
+}

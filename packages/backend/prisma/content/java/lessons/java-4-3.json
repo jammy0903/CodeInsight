@@ -1,0 +1,119 @@
+{
+  "lessonId": "java-4-3",
+  "title": "String Pool과 intern()",
+  "concept": "String Pool은 문자열 리터럴을 재사용하는 메모리 최적화 기법이다",
+  "content": {
+    "code": "String s1 = \"Hello\";\nString s2 = \"Hello\";\nString s3 = new String(\"Hello\");\nString s4 = s3.intern();\n\nSystem.out.println(s1 == s2);\nSystem.out.println(s1 == s3);\nSystem.out.println(s1 == s4);",
+    "steps": [
+      {
+        "line": 1,
+        "title": "첫 번째 리터럴",
+        "explanation": "\"Hello\"가 String Pool에 생성되고, s1이 참조합니다.",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "s1", "value": "-> Pool[0]"}],
+          "stringPool": ["\"Hello\" (0x001)"]
+        }
+      },
+      {
+        "line": 2,
+        "title": "같은 리터럴 재사용",
+        "explanation": "\"Hello\"는 이미 Pool에 있으므로 새로 만들지 않습니다. s2도 같은 객체!",
+        "keyInsight": "같은 리터럴 = Pool에서 재사용, 새 객체 안 만듦",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "s1", "value": "-> Pool[0]"},
+            {"name": "s2", "value": "-> Pool[0]", "sameRef": true}
+          ],
+          "stringPool": ["\"Hello\" (0x001)"],
+          "note": "s1 == s2 (같은 주소)"
+        }
+      },
+      {
+        "line": 3,
+        "title": "new String() - 강제 새 객체",
+        "explanation": "new 키워드는 Pool을 무시하고 Heap에 새 객체를 만듭니다!",
+        "keyInsight": "new String() = Pool 무시, 항상 새 객체",
+        "highlight": [3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "s1", "value": "-> Pool[0]"},
+            {"name": "s2", "value": "-> Pool[0]"},
+            {"name": "s3", "value": "-> Heap[0]"}
+          ],
+          "stringPool": ["\"Hello\" (0x001)"],
+          "heap": [{"address": "Heap[0]", "content": "\"Hello\" (0x002)", "new": true}],
+          "note": "s1 != s3 (다른 주소)"
+        }
+      },
+      {
+        "line": 4,
+        "title": "intern() - Pool에 등록/반환",
+        "explanation": "intern()은 Pool에 같은 문자열이 있으면 그 참조를 반환합니다.",
+        "keyInsight": "intern() = Pool 주소 반환, 내용이 같으면 같은 객체",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "s1", "value": "-> Pool[0]"},
+            {"name": "s4", "value": "-> Pool[0]", "sameRef": true}
+          ],
+          "note": "s4는 s1과 같은 Pool 객체를 참조"
+        }
+      },
+      {
+        "line": 6,
+        "title": "s1 == s2 비교",
+        "explanation": "둘 다 같은 Pool 객체를 참조. true!",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["true"]
+        }
+      },
+      {
+        "line": 7,
+        "title": "s1 == s3 비교",
+        "explanation": "s1은 Pool, s3는 Heap. 다른 객체! false!",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["true", "false"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "s1 == s4 비교",
+        "explanation": "s4는 intern()으로 Pool 참조를 얻었으므로 s1과 같습니다. true!",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["true", "false", "true"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "intern()을 과도하게 사용하면?",
+    "options": [
+      "메모리가 절약된다",
+      "속도가 빨라진다",
+      "PermGen/Metaspace가 가득 찰 수 있다",
+      "아무 문제없다"
+    ],
+    "correctIndex": 2,
+    "explanation": "String Pool은 PermGen(Java 7 이전) 또는 Metaspace(Java 8+)에 저장됩니다. 과도한 intern()은 OOM을 유발할 수 있습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "new String()도 Pool을 사용한다",
+      "correct": "new String()은 항상 Heap에 새 객체를 만듭니다.",
+      "why": "new는 '무조건 새 객체'라는 의미입니다. Pool을 거치지 않습니다."
+    }
+  ],
+  "keyTakeaway": "리터럴 = Pool 재사용, new String() = 새 객체, intern() = Pool 참조"
+}
