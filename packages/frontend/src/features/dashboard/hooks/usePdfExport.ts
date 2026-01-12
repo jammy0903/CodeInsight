@@ -1,10 +1,26 @@
 /**
  * usePdfExport Hook
  * PDF export state management with ref
+ *
+ * Uses requestAnimationFrame + setTimeout to ensure loading UI
+ * renders smoothly before heavy PDF generation starts
  */
 
 import { useState, useRef, useCallback } from 'react';
 import { exportToPdf, generatePdfFilename } from '@/utils/pdfExport';
+
+/**
+ * Waits for next animation frame + small delay
+ * This ensures React has time to render the loading state
+ * before html2pdf.js blocks the main thread
+ */
+function waitForRender(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      setTimeout(resolve, 100);
+    });
+  });
+}
 
 export function usePdfExport() {
   const reportRef = useRef<HTMLDivElement>(null);
@@ -16,6 +32,9 @@ export function usePdfExport() {
 
     setIsExporting(true);
     setError(null);
+
+    // Wait for loading UI to render before starting heavy PDF work
+    await waitForRender();
 
     try {
       await exportToPdf(reportRef.current, {
