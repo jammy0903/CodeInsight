@@ -10,10 +10,24 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { MemoryBlock } from '@/types';
+import { useThemeStore } from '@/stores/themeStore';
+import { themes } from '@/config/themes';
 
 // ============================================================
 // 타입 정의
 // ============================================================
+
+/** Data/Text 영역 아이템 */
+interface DataItem {
+  name: string;
+  value: string;
+  address: string;
+}
+
+interface TextItem {
+  name: string;
+  address: string;
+}
 
 interface MemoryPanelProps {
   stack: MemoryBlock[];
@@ -23,6 +37,10 @@ interface MemoryPanelProps {
   frames?: Array<{ name: string }>;
   /** RSP/RBP 레지스터 표시 */
   showRegisters?: boolean;
+  /** Data 영역 (문자열 리터럴, 초기화된 전역변수) */
+  dataSection?: DataItem[];
+  /** Text 영역 (함수들) */
+  textSection?: TextItem[];
 }
 
 // ============================================================
@@ -37,10 +55,10 @@ const COLORS = {
     light: '#fdf2f8',
   },
   heap: {
-    bg: '#F0FFF4',
-    border: '#198754',
-    label: '#059669',
-    light: '#ecfdf5',
+    bg: '#e8f5ec',
+    border: '#4a9d6b',
+    label: '#3d7a5a',
+    light: '#dceee2',
   },
   frame: [
     { bg: '#fef3c7', border: '#f59e0b', text: '#b45309', hover: '#fef9c3' }, // amber
@@ -618,19 +636,22 @@ function StackSection({
   if (sortedBlocks.length === 0) {
     return (
       <div
-        className="rounded-lg p-4"
+        className="rounded-lg p-3"
         style={{
           backgroundColor: COLORS.stack.bg,
           border: `1px solid ${COLORS.stack.border}25`,
         }}
       >
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-bold uppercase" style={{ color: COLORS.stack.label }}>
             📦 Stack
           </span>
+          <span className="text-[9px] text-pink-400">
+            ↓ 낮은 주소
+          </span>
         </div>
-        <div className="text-center py-6 text-gray-400 text-sm">
-          스택이 비어있습니다
+        <div className="text-center py-3 text-[10px] text-gray-400 italic">
+          (비어있음)
         </div>
       </div>
     );
@@ -757,6 +778,135 @@ function StackSection({
   );
 }
 
+/** 하위 메모리 섹션 (BSS, Data, Text) */
+function LowerMemorySections({
+  dataSection = [],
+  textSection = [],
+}: {
+  dataSection?: DataItem[];
+  textSection?: TextItem[];
+}) {
+  const SECTION_COLORS = {
+    bss: { color: '#94a3b8', bg: '#f1f5f9', border: '#94a3b8' },
+    data: { color: '#7c5ac7', bg: '#ede9f5', border: '#9d8bc7' },
+    text: { color: '#4a8a9e', bg: '#e5f0f3', border: '#7fb3c2' },
+  };
+
+  return (
+    <div className="space-y-2">
+      {/* BSS - 항상 placeholder (이 커리큘럼에서는 사용 안 함) */}
+      <div
+        className="rounded-lg px-3 py-2 flex items-center justify-between"
+        style={{
+          backgroundColor: SECTION_COLORS.bss.bg,
+          border: `1px solid ${SECTION_COLORS.bss.color}30`,
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-xs">📭</span>
+          <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.bss.color }}>
+            BSS
+          </span>
+        </div>
+        <span className="text-[9px] italic" style={{ color: SECTION_COLORS.bss.color }}>
+          (초기화 안 된 전역 변수 없음)
+        </span>
+      </div>
+
+      {/* Data 영역 - 문자열 리터럴 */}
+      <div
+        className="rounded-lg p-3"
+        style={{
+          backgroundColor: SECTION_COLORS.data.bg,
+          border: `1px solid ${SECTION_COLORS.data.border}40`,
+        }}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs">📝</span>
+            <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.data.color }}>
+              Data
+            </span>
+          </div>
+          <span className="text-[9px]" style={{ color: SECTION_COLORS.data.color }}>
+            문자열 리터럴
+          </span>
+        </div>
+
+        {dataSection.length > 0 ? (
+          <div className="space-y-1">
+            {dataSection.map((item, idx) => (
+              <div
+                key={idx}
+                className="rounded px-2 py-1.5 flex items-center gap-2"
+                style={{ backgroundColor: 'rgba(255,255,255,0.7)' }}
+              >
+                <span className="text-[10px] font-mono text-gray-400">{item.address}</span>
+                <span className="text-gray-300">|</span>
+                <span className="text-[11px] font-mono text-purple-700 truncate flex-1">
+                  "{item.value}"
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-[10px] italic text-gray-400 text-center py-1">
+            (비어있음)
+          </div>
+        )}
+      </div>
+
+      {/* Text 영역 - 함수 코드 */}
+      <div
+        className="rounded-lg p-3"
+        style={{
+          backgroundColor: SECTION_COLORS.text.bg,
+          border: `1px solid ${SECTION_COLORS.text.border}40`,
+        }}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs">⚙️</span>
+            <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.text.color }}>
+              Text
+            </span>
+          </div>
+          <span className="text-[9px]" style={{ color: SECTION_COLORS.text.color }}>
+            실행 코드
+          </span>
+        </div>
+
+        {textSection.length > 0 ? (
+          <div className="space-y-1">
+            {textSection.map((item, idx) => (
+              <div
+                key={idx}
+                className="rounded px-2 py-1.5 flex items-center gap-2"
+                style={{ backgroundColor: 'rgba(255,255,255,0.7)' }}
+              >
+                <span className="text-[10px] font-mono text-gray-400">{item.address}</span>
+                <span className="text-gray-300">|</span>
+                <span className="text-[11px] font-mono text-cyan-700">
+                  {item.name}()
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-[10px] italic text-gray-400 text-center py-1">
+            (비어있음)
+          </div>
+        )}
+      </div>
+
+      {/* 맨 아래: 낮은 주소 표시 */}
+      <div className="text-center text-[9px] text-gray-400 pt-1">
+        ↓ 0x0000 (낮은 주소)
+      </div>
+    </div>
+  );
+}
+
 /** Heap 섹션 */
 function HeapSection({
   blocks,
@@ -775,7 +925,7 @@ function HeapSection({
   }, [blocks]);
 
   if (sortedBlocks.length === 0) {
-    // 빈 Heap 컨테이너 - placeholder 2줄 표시
+    // 빈 Heap 컨테이너
     return (
       <div
         className="rounded-lg p-3"
@@ -784,8 +934,7 @@ function HeapSection({
           border: `1px solid ${COLORS.heap.border}25`,
         }}
       >
-        {/* 헤더 */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-bold uppercase" style={{ color: COLORS.heap.label }}>
             🎒 Heap
           </span>
@@ -793,35 +942,8 @@ function HeapSection({
             ↑ 높은 주소
           </span>
         </div>
-
-        {/* Placeholder 2줄 */}
-        <div className="space-y-2">
-          {['0x8000', '0x8010'].map((addr) => (
-            <div
-              key={addr}
-              className="rounded-lg px-3 py-2 border-2 border-dashed"
-              style={{
-                backgroundColor: 'white',
-                borderColor: `${COLORS.heap.border}40`,
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex items-center rounded px-2 py-1"
-                  style={{ backgroundColor: `${COLORS.heap.border}10` }}
-                >
-                  <span className="text-[11px] font-mono text-gray-400">
-                    {addr}
-                  </span>
-                  <span className="text-gray-300 mx-2">|</span>
-                  <span className="font-mono text-gray-300 text-base">-</span>
-                </div>
-                <span className="text-[10px] text-gray-400 italic">
-                  (비어있음)
-                </span>
-              </div>
-            </div>
-          ))}
+        <div className="text-center py-3 text-[10px] text-gray-400 italic">
+          (비어있음)
         </div>
       </div>
     );
@@ -874,6 +996,8 @@ export function MemoryPanel({
   changedBlocks,
   frames = [{ name: 'main' }],
   showRegisters = true,
+  dataSection = [],
+  textSection = [],
 }: MemoryPanelProps) {
   const isEmpty = stack.length === 0 && heap.length === 0;
 
@@ -927,6 +1051,10 @@ export function MemoryPanel({
           <HeapSection
             blocks={heap}
             changedBlocks={changedBlocks}
+          />
+          <LowerMemorySections
+            dataSection={dataSection}
+            textSection={textSection}
           />
         </>
       )}

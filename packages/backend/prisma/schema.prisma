@@ -17,6 +17,11 @@ model User {
   oauthAccounts OAuthAccount[]
   submissions   Submission[]
   progress      UserProgress[]
+  // 분석 리포트 관련
+  activities    LessonActivity[]
+  chatHistories ChatHistory[]
+  quizAttempts  QuizAttempt[]
+  notes         UserNote[]
 
   @@map("users")
 }
@@ -134,6 +139,10 @@ model Lesson {
   chapter       Chapter        @relation(fields: [chapterId], references: [id])
   quizzes       Quiz[]
   progress      UserProgress[]
+  // 분석 리포트 관련
+  activities    LessonActivity[]
+  chatHistories ChatHistory[]
+  notes         UserNote[]
 
   @@index([chapterId, order])
   @@map("lessons")
@@ -163,6 +172,9 @@ model Quiz {
   order       Int
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  // 분석 리포트 관련
+  attempts    QuizAttempt[]
+  notes       UserNote[]
 
   @@index([lessonId, order])
   @@map("quizzes")
@@ -186,4 +198,90 @@ model UserProgress {
   @@index([userId])
   @@index([lessonId])
   @@map("user_progress")
+}
+
+// ============================================
+// 분석 리포트 관련 모델 (2026-01-12 추가)
+// ============================================
+
+// 레슨 체류 시간 기록
+model LessonActivity {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  lessonId  String    @map("lesson_id")
+  startedAt DateTime  @map("started_at") @db.Timestamptz(6)
+  endedAt   DateTime? @map("ended_at") @db.Timestamptz(6)
+  duration  Int?      // 초 단위 (계산된 값, 빠른 집계용)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt]) // 사용자별 시간순 조회
+  @@index([lessonId])          // 레슨별 통계
+  @@index([startedAt])         // 날짜 범위 쿼리
+  @@map("lesson_activities")
+}
+
+// AI 질문 히스토리
+model ChatHistory {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  lessonId  String?  @map("lesson_id") // nullable: 레슨 밖에서도 질문 가능
+  context   String?  @db.VarChar(50)   // "lesson", "playground", "general"
+  question  String   @db.Text
+  answer    String   @db.Text
+  tokens    Int?     // AI 토큰 사용량 (비용 추적용)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt]) // 사용자별 히스토리
+  @@index([lessonId])          // 레슨별 질문 통계
+  @@index([createdAt])         // 시간 범위 쿼리 + 오래된 데이터 삭제
+  @@map("chat_histories")
+}
+
+// 퀴즈 시도 기록 (오답 분석용)
+model QuizAttempt {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  quizId     String   @map("quiz_id")
+  userAnswer String   @map("user_answer") @db.VarChar(500)
+  isCorrect  Boolean  @map("is_correct")
+  timeSpent  Int?     @map("time_spent") // 문제 풀이 시간 (초)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])  // 사용자별 시간순
+  @@index([userId, isCorrect])  // 오답만 빠르게 조회
+  @@index([quizId])             // 퀴즈별 정답률 통계
+  @@map("quiz_attempts")
+}
+
+// 사용자 개념 노트
+model UserNote {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  quizId      String?  @map("quiz_id")    // 퀴즈에서 추가 시
+  lessonId    String   @map("lesson_id")  // 어떤 레슨의 개념
+  source      String   @db.VarChar(20)    // "quiz" | "lesson" | "manual"
+  concept     String   @db.VarChar(100)   // 개념 키워드 (예: "포인터", "malloc")
+  content     String   @db.Text           // 노트 본문
+  isFromWrong Boolean  @default(false) @map("is_from_wrong") // 오답 후 추가 여부
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz   Quiz?  @relation(fields: [quizId], references: [id], onDelete: SetNull)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId, concept])     // 개념별 노트 조회
+  @@index([userId, lessonId])    // 레슨별 노트 조회
+  @@index([userId, isFromWrong]) // 오답 노트만 조회
+  @@index([concept])             // 전체 사용자 취약 개념 통계
+  @@map("user_notes")
 }

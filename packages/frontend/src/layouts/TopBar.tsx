@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Code2, Sparkles, Menu } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function TopBar() {
   const { sidebarOpen, toggleSidebar } = useStore();
@@ -71,8 +72,9 @@ export function TopBar() {
         </Link>
         </div>
 
-        {/* Actions Area - 프로필 제거, 사이드바로 이동 */}
-        <div className="flex items-center">
+        {/* Actions Area - 테마 토글 */}
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
           {/* 프로필/로그인은 사이드바에서만 표시 */}
         </div>
       </div>

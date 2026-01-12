@@ -10,7 +10,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus } from 'lucide-react';
+import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, HelpCircle, LayoutDashboard, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle } from '@/services/firebase';
@@ -23,12 +23,21 @@ interface NavItem {
   path: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  requiresAuth?: boolean; // 로그인 필요 여부
 }
 
+// 모든 사용자용 메뉴
 const NAV_ITEMS: NavItem[] = [
   { path: '/', label: '홈', icon: Home },
   { path: '/courses', label: 'Courses', icon: BookOpen },
+  { path: '/quiz', label: 'Quiz', icon: HelpCircle },
   { path: '/playground', label: 'Playground', icon: Play },
+];
+
+// 로그인 사용자 전용 메뉴
+const AUTH_NAV_ITEMS: NavItem[] = [
+  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, requiresAuth: true },
+  { path: '/profile', label: 'Profile', icon: User, requiresAuth: true },
 ];
 
 export function Sidebar() {
@@ -89,60 +98,47 @@ export function Sidebar() {
 
             {/* 네비게이션 */}
             <nav className="flex-1 p-4 space-y-2 overflow-y-auto bg-[#fffbf5]">
-              {NAV_ITEMS.map((item) => {
-                const isActive = location.pathname === item.path ||
-                  (item.path !== '/' && location.pathname.startsWith(item.path));
-                const Icon = item.icon;
+              {/* 공통 메뉴 */}
+              {NAV_ITEMS.map((item) => (
+                <NavLink key={item.path} item={item} location={location} toggleSidebar={toggleSidebar} />
+              ))}
 
-                return (
+              {/* 로그인 사용자 전용 메뉴 */}
+              {appUser && (
+                <>
+                  <div className="my-3 border-t border-[#e5d5c7]" />
+                  {AUTH_NAV_ITEMS.map((item) => (
+                    <NavLink key={item.path} item={item} location={location} toggleSidebar={toggleSidebar} />
+                  ))}
+                </>
+              )}
+
+              {/* Admin 메뉴 (관리자만 표시) */}
+              {isAdmin && (
+                <>
+                  <div className="my-3 border-t border-[#e5d5c7]" />
                   <motion.div
-                    key={item.path}
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                   >
                     <Link
-                      to={item.path}
+                      to="/admin"
                       onClick={toggleSidebar}
                       className={`
                         flex items-center gap-3 px-4 h-12 rounded-lg
                         border transition-all duration-150
-                        ${isActive
-                          ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
-                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
+                        ${location.pathname.startsWith('/admin')
+                          ? 'bg-[#7a9a7a] font-semibold border-[#6a8a6a] text-white'
+                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#7a9a7a] hover:bg-[#f5fff5]'
                         }
                       `}
                     >
-                      <Icon className="w-5 h-5 shrink-0" />
-                      <span className="text-sm">{item.label}</span>
+                      <Shield className="w-5 h-5 shrink-0" />
+                      <span className="text-sm">Admin</span>
                     </Link>
                   </motion.div>
-                );
-              })}
-
-              {/* Admin 메뉴 (관리자만 표시) */}
-              {isAdmin && (
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                >
-                  <Link
-                    to="/admin"
-                    onClick={toggleSidebar}
-                    className={`
-                      flex items-center gap-3 px-4 h-12 rounded-lg
-                      border transition-all duration-150
-                      ${location.pathname.startsWith('/admin')
-                        ? 'bg-[#7a9a7a] font-semibold border-[#6a8a6a] text-white'
-                        : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#7a9a7a] hover:bg-[#f5fff5]'
-                      }
-                    `}
-                  >
-                    <Shield className="w-5 h-5 shrink-0" />
-                    <span className="text-sm">Admin</span>
-                  </Link>
-                </motion.div>
+                </>
               )}
             </nav>
 
@@ -229,5 +225,42 @@ export function Sidebar() {
         </>
       )}
     </AnimatePresence>
+  );
+}
+
+// 네비게이션 링크 컴포넌트
+interface NavLinkProps {
+  item: NavItem;
+  location: { pathname: string };
+  toggleSidebar: () => void;
+}
+
+function NavLink({ item, location, toggleSidebar }: NavLinkProps) {
+  const isActive = location.pathname === item.path ||
+    (item.path !== '/' && location.pathname.startsWith(item.path));
+  const Icon = item.icon;
+
+  return (
+    <motion.div
+      whileHover={{ scale: 1.02, y: -2 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+    >
+      <Link
+        to={item.path}
+        onClick={toggleSidebar}
+        className={`
+          flex items-center gap-3 px-4 h-12 rounded-lg
+          border transition-all duration-150
+          ${isActive
+            ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
+            : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
+          }
+        `}
+      >
+        <Icon className="w-5 h-5 shrink-0" />
+        <span className="text-sm">{item.label}</span>
+      </Link>
+    </motion.div>
   );
 }
