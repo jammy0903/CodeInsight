@@ -20,6 +20,14 @@ export const config = {
       aiExplain: '/ai/explain',
       aiExplainStep: '/ai/explain-step',
       aiProviders: '/ai/providers',
+      // 분석 리포트
+      analyticsActivity: '/analytics/activity',
+      analyticsActivityEnd: '/analytics/activity/end',
+      analyticsQuizAttempt: '/analytics/quiz-attempt',
+      analyticsSummary: '/analytics/summary',
+      // 노트
+      notes: '/notes',
+      notesConcepts: '/notes/concepts',
     },
     timeout: {
       run: env.VITE_C_RUN_TIMEOUT,

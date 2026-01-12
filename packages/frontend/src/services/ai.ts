@@ -23,6 +23,12 @@ interface ChatContext {
   quizQuestion?: string;
 }
 
+// 분석 리포트용 추가 옵션
+interface ChatOptions {
+  lessonId?: string;           // 어떤 레슨에서 질문했는지
+  contextType?: 'lesson' | 'playground' | 'general'; // 질문 맥락
+}
+
 interface ChatResponse {
   content: string;
   model: string;
@@ -112,11 +118,13 @@ export async function getExplanation(
  * @param message 사용자 메시지
  * @param history 대화 기록
  * @param context 코스 컨텍스트 (optional)
+ * @param options 분석 리포트용 옵션 (lessonId, contextType)
  */
 export async function askAI(
   message: string,
   history: ChatMessage[] = [],
-  context?: ChatContext
+  context?: ChatContext,
+  options?: ChatOptions
 ): Promise<string> {
   try {
     const response = await api.post<ChatResponse>(
@@ -125,6 +133,9 @@ export async function askAI(
         message,
         history,
         context,
+        // 분석 리포트용 필드 (로그인 시 ChatHistory 저장에 사용)
+        lessonId: options?.lessonId,
+        contextType: options?.contextType,
       }
     );
 
@@ -326,6 +337,7 @@ export async function getStepExplanationStream(
 export type {
   ChatMessage,
   ChatContext,
+  ChatOptions,
   ChatResponse,
   ExplainResponse,
   ExplainStepRequest,
