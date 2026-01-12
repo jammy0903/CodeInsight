@@ -11,6 +11,10 @@ import { AuthPage } from './features/auth';
 import { CoursesPage, LanguageCoursePage, ChapterLessonsPage, LessonPage } from './features/courses';
 import { PlaygroundPage } from './features/playground';
 import { AdminPage, AdminRoute } from './features/admin';
+import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage } from './features/quiz';
+import { ProfilePage } from './features/profile';
+import { DashboardPage } from './features/dashboard';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { initializeAuthListener } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
 
@@ -65,6 +69,12 @@ export const router = createBrowserRouter([
       { path: 'courses/:lang/:chapterId', element: <ChapterLessonsPage /> },
       { path: 'courses/:lang/:chapterId/:lessonId', element: <LessonPage /> },
       { path: 'playground', element: <PlaygroundPage /> },
+      { path: 'quiz', element: <ProtectedRoute><QuizPage /></ProtectedRoute> },
+      { path: 'quiz/ox', element: <ProtectedRoute><OXQuizPage /></ProtectedRoute> },
+      { path: 'quiz/multiple-choice', element: <ProtectedRoute><MultipleChoiceQuizPage /></ProtectedRoute> },
+      { path: 'quiz/fill-blank', element: <ProtectedRoute><FillBlankQuizPage /></ProtectedRoute> },
+      { path: 'profile', element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
+      { path: 'dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
       { path: 'admin', element: <AdminRoute><AdminPage /></AdminRoute> },
     ],
   },

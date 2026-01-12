@@ -10,10 +10,10 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus } from 'lucide-react';
+import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/store';
-import { logout, loginWithGoogle } from '@/services/firebase';
+import { logout, loginWithGoogle, loginWithKakao } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
 import { logger } from '@/utils/logger';
 
@@ -31,6 +31,13 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/playground', label: 'Playground', icon: Play },
 ];
 
+// 로그인 필수 탭들
+const AUTH_NAV_ITEMS: NavItem[] = [
+  { path: '/quiz', label: '퀴즈', icon: FileQuestion },
+  { path: '/dashboard', label: '나의 현황', icon: BarChart3 },
+  { path: '/profile', label: '프로필', icon: User },
+];
+
 export function Sidebar() {
   const location = useLocation();
   const { sidebarOpen, toggleSidebar, firebaseUser, appUser, needsRegistration } = useStore();
@@ -44,7 +51,15 @@ export function Sidebar() {
     try {
       await loginWithGoogle();
     } catch (error) {
-      logger.error('Login failed:', error);
+      logger.error('Google login failed:', error);
+    }
+  };
+
+  const handleKakaoLogin = async () => {
+    try {
+      await loginWithKakao();
+    } catch (error) {
+      logger.error('Kakao login failed:', error);
     }
   };
 
@@ -90,6 +105,38 @@ export function Sidebar() {
             {/* 네비게이션 */}
             <nav className="flex-1 p-4 space-y-2 overflow-y-auto bg-[#fffbf5]">
               {NAV_ITEMS.map((item) => {
+                const isActive = location.pathname === item.path ||
+                  (item.path !== '/' && location.pathname.startsWith(item.path));
+                const Icon = item.icon;
+
+                return (
+                  <motion.div
+                    key={item.path}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  >
+                    <Link
+                      to={item.path}
+                      onClick={toggleSidebar}
+                      className={`
+                        flex items-center gap-3 px-4 h-12 rounded-lg
+                        border transition-all duration-150
+                        ${isActive
+                          ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
+                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
+                        }
+                      `}
+                    >
+                      <Icon className="w-5 h-5 shrink-0" />
+                      <span className="text-sm">{item.label}</span>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+
+              {/* 로그인 필수 메뉴 */}
+              {appUser && AUTH_NAV_ITEMS.map((item) => {
                 const isActive = location.pathname === item.path ||
                   (item.path !== '/' && location.pathname.startsWith(item.path));
                 const Icon = item.icon;
@@ -190,7 +237,7 @@ export function Sidebar() {
                   </motion.button>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {/* 비로그인 상태 */}
                   <motion.button
                     onClick={handleGoogleLogin}
@@ -219,7 +266,25 @@ export function Sidebar() {
                     </svg>
                     Google 로그인
                   </motion.button>
-                  <p className="text-xs text-[#937b5d] text-center">
+
+                  {/* 카카오 로그인 */}
+                  <motion.button
+                    onClick={handleKakaoLogin}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#3C1E1E] bg-[#FEE500] border border-[#FEE500] rounded-lg hover:bg-[#FDD800] transition-colors"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path
+                        fill="#3C1E1E"
+                        d="M12 3C6.477 3 2 6.463 2 10.691c0 2.693 1.775 5.063 4.445 6.412-.144.523-.926 3.369-.963 3.592 0 0-.02.166.088.229.108.063.235.015.235.015.31-.043 3.593-2.363 4.159-2.771.339.047.686.071 1.036.071 5.523 0 10-3.463 10-7.548C22 6.463 17.523 3 12 3z"
+                      />
+                    </svg>
+                    카카오 로그인
+                  </motion.button>
+
+                  <p className="text-xs text-[#937b5d] text-center pt-1">
                     © 2026 CodeInsight
                   </p>
                 </div>

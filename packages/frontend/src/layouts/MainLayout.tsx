@@ -71,14 +71,14 @@ export function MainLayout({ children }: MainLayoutProps) {
           <div className="main-content-container">{children}</div>
         )}
 
-        {/* Footer - Bootstrap Footer V09 스타일 */}
+        {/* Footer - 스크롤 영역 안에 배치 */}
         {!isLessonPage && !isPlaygroundPage && (
-          <footer className="mt-16 py-8 bg-[#f8f4ef] border-t border-[#e5d5c7]">
-            <div className="main-content-container">
+          <footer className="mt-16 py-4 bg-[#f8f4ef] border-t border-[#e5d5c7]">
+            <div className="main-content-container my-4">
               {/* 2열 레이아웃 */}
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 {/* 왼쪽: 브랜드 + 링크 */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <Link to="/" className="text-lg font-bold text-[#6b5a4a] hover:text-[#a08060] transition-colors no-underline hover:no-underline">
                     CodeInsight
                   </Link>
@@ -90,7 +90,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 </div>
 
                 {/* 오른쪽: Stay in touch + 소셜 */}
-                <div className="space-y-3 md:text-right">
+                <div className="space-y-2 md:text-right">
                   <p className="text-sm font-medium text-[#6b5a4a]">Stay in touch</p>
                   <div className="flex gap-3 md:justify-end">
                     <a
@@ -116,14 +116,12 @@ export function MainLayout({ children }: MainLayoutProps) {
               </div>
 
               {/* 하단 저작권 */}
-              <div className="mt-6 pt-4 border-t border-[#e5d5c7] text-center text-xs text-[#937b5d]">
+              <div className="mt-4 pt-3 border-t border-[#e5d5c7] text-center text-xs text-[#937b5d]">
                 © 2026 CodeInsight. All Rights Reserved.
               </div>
             </div>
           </footer>
         )}
-
-        {/* LessonPage에서는 푸터 제거 - 학습 공간 확보 */}
       </motion.main>
     </div>
   );

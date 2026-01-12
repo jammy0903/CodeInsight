@@ -4,7 +4,6 @@
  */
 
 @import "tailwindcss";
-@import "nes.css/css/nes.min.css";
 @custom-variant dark (&:is(.dark *));
 @config "../tailwind.config.js";
 
@@ -95,14 +94,8 @@
 }
 
 /* ============================================
-   Base Styles
+   Base Styles (Tailwind preflight handles reset)
    ============================================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 html {
   color-scheme: light;
 }
@@ -663,7 +656,7 @@ button:focus {
    ============================================ */
 .main-content-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin-inline: auto;  /* 좌우만 auto, 위아래는 Tailwind로 제어 가능 */
   padding-left: 32px;
   padding-right: 32px;
 }
@@ -932,4 +925,33 @@ button:focus {
    ============================================ */
 .home-bg {
   background: var(--color-bg);
+}
+
+/* ============================================
+   Mobile Safe Area (노치/홈바 대응)
+   ============================================ */
+.safe-area-inset {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* iOS Safari 100vh 문제 해결 */
+@supports (height: 100dvh) {
+  .min-h-\[100dvh\] {
+    min-height: 100dvh;
+  }
+}
+
+@supports not (height: 100dvh) {
+  .min-h-\[100dvh\] {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* 터치 최적화 */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
