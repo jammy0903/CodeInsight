@@ -9,12 +9,14 @@ import { useEffect, useRef, memo } from 'react';
 
 interface MatrixRainProps {
   color?: string;
+  bgColor?: string;  // 잔상 효과용 배경색
   fontSize?: number;
   speed?: number;
 }
 
 export const MatrixRain = memo(({
   color = '#00ff00',
+  bgColor = 'rgba(0, 0, 0, 0.05)',
   fontSize = 14,
   speed = 50
 }: MatrixRainProps) => {
@@ -62,8 +64,8 @@ export const MatrixRain = memo(({
       }
       lastTime = currentTime;
 
-      // 반투명 검정으로 덮어서 잔상 효과
-      ctx.fillStyle = 'rgba(250, 247, 242, 0.05)';
+      // 반투명으로 덮어서 잔상 효과
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = color;
@@ -93,7 +95,7 @@ export const MatrixRain = memo(({
       window.removeEventListener('resize', resizeCanvas);
       cancelAnimationFrame(animationId);
     };
-  }, [color, fontSize, speed]);
+  }, [color, bgColor, fontSize, speed]);
 
   return (
     <canvas

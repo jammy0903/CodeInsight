@@ -8,13 +8,21 @@ import { Code2, Sparkles, Menu } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useThemeStore } from '@/stores/themeStore';
+import { themes } from '@/config/themes';
 
 export function TopBar() {
   const { sidebarOpen, toggleSidebar } = useStore();
+  const currentTheme = useThemeStore((s) => s.theme);
+  const layoutColors = themes[currentTheme].layout;
 
   return (
     <header
-      className="shrink-0 bg-gradient-to-r from-card/80 via-card/95 to-card/80 backdrop-blur-xl border-b border-border/50 overflow-visible shadow-sm"
+      className="shrink-0 backdrop-blur-xl overflow-visible shadow-sm"
+      style={{
+        background: layoutColors.topBarBg,
+        borderBottom: `1px solid ${layoutColors.topBarBorder}`,
+      }}
     >
       {/* Row 1: Logo + Actions */}
       <div className="h-16 flex items-center justify-between px-6">
@@ -24,10 +32,13 @@ export function TopBar() {
           {!sidebarOpen && (
             <button
               onClick={toggleSidebar}
-              className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded-md transition-colors"
+              style={{ backgroundColor: 'transparent' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = layoutColors.topBarButtonBg}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               aria-label="메뉴 열기"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <Menu className="w-5 h-5" style={{ color: layoutColors.topBarTextMuted }} />
             </button>
           )}
 
@@ -44,7 +55,7 @@ export function TopBar() {
               whileHover={{ rotate: 180 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
-              <Code2 className="h-8 w-8 text-primary" />
+              <Code2 className="h-8 w-8" style={{ color: currentTheme === 'dark' ? '#60a5fa' : '#a855f7' }} />
               <motion.div
                 className="absolute -top-1 -right-1"
                 animate={{
@@ -57,14 +68,14 @@ export function TopBar() {
                   ease: 'linear',
                 }}
               >
-                <Sparkles className="h-4 w-4 text-accent-orange" />
+                <Sparkles className="h-4 w-4" style={{ color: currentTheme === 'dark' ? '#fbbf24' : '#f97316' }} />
               </motion.div>
             </motion.div>
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold" style={{ color: layoutColors.topBarText }}>
                 CodeInsight
               </h1>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs" style={{ color: layoutColors.topBarTextMuted }}>
                 코드 실행 원리 학습
               </p>
             </div>

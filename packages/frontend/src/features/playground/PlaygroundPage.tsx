@@ -1,5 +1,5 @@
 /**
- * PlaygroundPage - Code Simulator (Light Theme)
+ * PlaygroundPage - Code Simulator (Theme Support)
  * Left 50%: Code Editor + Output + Explanation
  * Right 50%: Memory Visualization
  */
@@ -17,7 +17,94 @@ import { usePlaygroundStore, useCurrentCode } from './stores/playgroundStore';
 import { useExplanationStore } from './stores/explanationStore';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { PyVisualizerView } from '@/features/visualizers/python';
+import { useThemeStore } from '@/stores/themeStore';
 import type { LessonStep } from '@/types';
+
+// 테마별 Playground 색상
+const playgroundColors = {
+  dark: {
+    // 배경
+    pageBg: '#09090b',           // zinc-950
+    panelBg: '#18181b',          // zinc-900
+    headerBg: '#18181b',
+    // 보더
+    border: '#27272a',           // zinc-800
+    resizeHandle: '#3f3f46',     // zinc-700
+    resizeHover: '#52525b',      // zinc-600
+    // 텍스트
+    text: '#fafafa',             // zinc-50
+    textMuted: '#a1a1aa',        // zinc-400
+    textDim: '#71717a',          // zinc-500
+    // 악센트
+    accent: '#22d3ee',           // cyan-400
+    accentBg: '#164e63',         // cyan-900
+    accentBorder: '#0e7490',     // cyan-700
+    // 설명 패널 (시안 계열)
+    explanationBg: '#0c1a1e',
+    explanationHeaderBg: '#134e4a',
+    explanationBorder: '#115e59',
+    explanationText: '#5eead4',
+    explanationTextMuted: '#2dd4bf',
+    // 에러
+    errorBg: '#1c1917',
+    errorBorder: '#7f1d1d',
+    errorText: '#fca5a5',
+    // 푸터
+    footerBg: '#0f0f10',
+    footerBorder: '#27272a',
+    footerText: '#71717a',
+  },
+  soft: {
+    pageBg: '#faf8fc',
+    panelBg: '#ffffff',
+    headerBg: '#ffffff',
+    border: '#ebe4ed',
+    resizeHandle: '#e9d5ff',
+    resizeHover: '#d8b4fe',
+    text: '#6b5a7a',
+    textMuted: '#a08eb0',
+    textDim: '#c4b5d0',
+    accent: '#a855f7',
+    accentBg: '#faf5ff',
+    accentBorder: '#e9d5ff',
+    explanationBg: '#f0fdf4',
+    explanationHeaderBg: '#dcfce7',
+    explanationBorder: '#bbf7d0',
+    explanationText: '#166534',
+    explanationTextMuted: '#16a34a',
+    errorBg: '#fef2f2',
+    errorBorder: '#fecaca',
+    errorText: '#dc2626',
+    footerBg: '#f3eef8',
+    footerBorder: '#ebe4ed',
+    footerText: '#a08eb0',
+  },
+  minimal: {
+    pageBg: '#faf9f7',
+    panelBg: '#fffffe',
+    headerBg: '#fffffe',
+    border: '#e5d5c7',
+    resizeHandle: '#d6cfc5',
+    resizeHover: '#c4b8a8',
+    text: '#5c4a3d',
+    textMuted: '#8a8279',
+    textDim: '#a39585',
+    accent: '#a08060',
+    accentBg: '#fef3c7',
+    accentBorder: '#fcd34d',
+    explanationBg: '#fefce8',
+    explanationHeaderBg: '#fef9c3',
+    explanationBorder: '#fde047',
+    explanationText: '#854d0e',
+    explanationTextMuted: '#a16207',
+    errorBg: '#fef2f2',
+    errorBorder: '#fecaca',
+    errorText: '#dc2626',
+    footerBg: '#f5f3f0',
+    footerBorder: '#e5d5c7',
+    footerText: '#8a8279',
+  },
+};
 
 const LINE_HEIGHT = 19;
 const MIN_EDITOR_HEIGHT = 150;
@@ -27,6 +114,8 @@ export function PlaygroundPage() {
   const { steps, currentStepIndex, error, registers, language } = usePlaygroundStore();
   const code = useCurrentCode();
   const { startPrefetch, stopPrefetch } = useExplanationStore();
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = playgroundColors[currentTheme];
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
@@ -71,7 +160,7 @@ export function PlaygroundPage() {
   return (
     <div
       style={{
-        backgroundColor: '#f8f9fa',
+        backgroundColor: colors.pageBg,
       }}
     >
       {/* Main area: Resizable 2-panel layout */}
@@ -93,7 +182,7 @@ export function PlaygroundPage() {
             display: 'flex',
             flexDirection: 'column',
             minWidth: 0,
-            backgroundColor: '#ffffff',
+            backgroundColor: colors.panelBg,
           }}
         >
           {/* Code Header: Language tabs + Control buttons */}
@@ -104,8 +193,8 @@ export function PlaygroundPage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              borderBottom: '1px solid #e1e4e8',
-              backgroundColor: '#ffffff',
+              borderBottom: `1px solid ${colors.border}`,
+              backgroundColor: colors.headerBg,
               flexShrink: 0,
             }}
           >
@@ -124,8 +213,8 @@ export function PlaygroundPage() {
               style={{
                 flexShrink: 0,
                 padding: '8px 12px',
-                backgroundColor: '#ffffff',
-                borderTop: '1px solid #e1e4e8',
+                backgroundColor: colors.panelBg,
+                borderTop: `1px solid ${colors.border}`,
               }}
             >
               <TerminalOutput
@@ -142,17 +231,19 @@ export function PlaygroundPage() {
               style={{
                 flexShrink: 0,
                 padding: '8px 12px 12px',
-                backgroundColor: '#ffffff',
-                borderTop: terminalLines.length === 0 ? '1px solid #e1e4e8' : 'none',
+                backgroundColor: colors.panelBg,
+                borderTop: terminalLines.length === 0 ? `1px solid ${colors.border}` : 'none',
               }}
             >
               <div
                 style={{
-                  backgroundColor: '#f0fdf4',
+                  backgroundColor: colors.explanationBg,
                   borderRadius: '8px',
                   overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(34, 197, 94, 0.12)',
-                  border: '1px solid #bbf7d0',
+                  boxShadow: currentTheme === 'dark'
+                    ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+                    : '0 2px 8px rgba(34, 197, 94, 0.12)',
+                  border: `1px solid ${colors.explanationBorder}`,
                 }}
               >
                 {/* Explanation Header */}
@@ -161,8 +252,8 @@ export function PlaygroundPage() {
                     display: 'flex',
                     alignItems: 'center',
                     padding: '6px 12px',
-                    backgroundColor: '#dcfce7',
-                    borderBottom: '1px solid #bbf7d0',
+                    backgroundColor: colors.explanationHeaderBg,
+                    borderBottom: `1px solid ${colors.explanationBorder}`,
                     gap: '8px',
                   }}
                 >
@@ -170,7 +261,7 @@ export function PlaygroundPage() {
                   <span
                     style={{
                       fontSize: '11px',
-                      color: '#166534',
+                      color: colors.explanationText,
                       fontWeight: 600,
                       fontFamily: 'system-ui, sans-serif',
                     }}
@@ -180,7 +271,7 @@ export function PlaygroundPage() {
                   <span
                     style={{
                       fontSize: '10px',
-                      color: '#16a34a',
+                      color: colors.explanationTextMuted,
                       marginLeft: 'auto',
                       fontFamily: 'monospace',
                     }}
@@ -201,16 +292,17 @@ export function PlaygroundPage() {
         <PanelResizeHandle
           style={{
             width: '8px',
-            backgroundColor: '#e1e4e8',
+            backgroundColor: colors.resizeHandle,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'col-resize',
             transition: 'background-color 0.15s ease',
           }}
-          className="hover:bg-blue-200 active:bg-blue-300"
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHover)}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHandle)}
         >
-          <GripVertical size={14} color="#9ca3af" />
+          <GripVertical size={14} color={colors.textDim} />
         </PanelResizeHandle>
 
         {/* ===== Right Panel: Memory Visualization ===== */}
@@ -223,7 +315,7 @@ export function PlaygroundPage() {
             display: 'flex',
             flexDirection: 'column',
             minWidth: 0,
-            backgroundColor: '#f8f9fa',
+            backgroundColor: colors.panelBg,
           }}
         >
           {/* Header */}
@@ -234,13 +326,13 @@ export function PlaygroundPage() {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              borderBottom: '1px solid #e1e4e8',
-              backgroundColor: '#ffffff',
+              borderBottom: `1px solid ${colors.border}`,
+              backgroundColor: colors.headerBg,
               flexShrink: 0,
             }}
           >
-            <Cpu size={18} color="#22c55e" />
-            <span style={{ fontSize: '14px', color: '#1f2937', fontWeight: 600 }}>
+            <Cpu size={18} color={colors.accent} />
+            <span style={{ fontSize: '14px', color: colors.text, fontWeight: 600 }}>
               Memory Visualization
             </span>
             {hasSteps && (
@@ -249,12 +341,12 @@ export function PlaygroundPage() {
                   marginLeft: 'auto',
                   padding: '4px 10px',
                   fontSize: '12px',
-                  color: '#22c55e',
+                  color: colors.accent,
                   fontFamily: 'monospace',
                   fontWeight: 600,
-                  background: '#f0fdf4',
+                  background: colors.accentBg,
                   borderRadius: '6px',
-                  border: '1px solid #bbf7d0',
+                  border: `1px solid ${colors.accentBorder}`,
                 }}
               >
                 Step {currentStepIndex + 1}/{steps.length}
@@ -265,8 +357,15 @@ export function PlaygroundPage() {
           {/* Memory Panel */}
           <div style={{ minHeight: '400px', padding: '16px' }}>
             {error ? (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{error}</p>
+              <div
+                style={{
+                  padding: '16px',
+                  backgroundColor: colors.errorBg,
+                  border: `1px solid ${colors.errorBorder}`,
+                  borderRadius: '8px',
+                }}
+              >
+                <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
               </div>
             ) : language === 'python' && hasSteps ? (
               <PyVisualizerView
@@ -283,7 +382,16 @@ export function PlaygroundPage() {
                 showRegisters={!!registers?.rsp || !!registers?.rbp}
               />
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  fontSize: '14px',
+                  color: colors.textMuted,
+                }}
+              >
                 {language === 'java'
                   ? 'Java simulation is not supported yet'
                   : 'Click Run button to execute code'}
@@ -297,15 +405,15 @@ export function PlaygroundPage() {
       <footer
         style={{
           padding: '8px 24px',
-          backgroundColor: '#f9fafb',
-          borderTop: '1px solid #e5e7eb',
+          backgroundColor: colors.footerBg,
+          borderTop: `1px solid ${colors.footerBorder}`,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexShrink: 0,
         }}
       >
-        <span style={{ fontSize: '11px', color: '#9ca3af' }}>
+        <span style={{ fontSize: '11px', color: colors.footerText }}>
           CodeInsight 2026
         </span>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -313,13 +421,13 @@ export function PlaygroundPage() {
             href="https://github.com/jammy0903"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: '#9ca3af', display: 'flex' }}
+            style={{ color: colors.footerText, display: 'flex' }}
           >
             <Github size={14} />
           </a>
           <a
             href="mailto:l89192164@gmail.com"
-            style={{ color: '#9ca3af', display: 'flex' }}
+            style={{ color: colors.footerText, display: 'flex' }}
           >
             <Mail size={14} />
           </a>

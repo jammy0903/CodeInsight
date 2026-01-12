@@ -222,34 +222,40 @@ function CompletedView({
 }) {
   const navigate = useNavigate();
   const hasNext = nextLessonPath !== null;
+  const currentTheme = useThemeStore((s) => s.theme);
+  const lessonColors = themes[currentTheme].lesson;
 
   return (
     <div
       className="max-w-md mx-auto mt-12 rounded-2xl p-8 text-center"
       style={{
-        background: 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)',
-        border: '1px solid #B8D4B8',
-        boxShadow: '0 8px 32px rgba(122, 154, 122, 0.15)',
+        background: lessonColors.completedBg,
+        border: `1px solid ${lessonColors.completedBorder}`,
+        boxShadow: currentTheme === 'dark'
+          ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+          : '0 8px 32px rgba(122, 154, 122, 0.15)',
       }}
     >
       <div
         className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
         style={{
-          background: 'linear-gradient(135deg, #7a9a7a 0%, #6a8a6a 100%)',
-          boxShadow: '0 4px 16px rgba(122, 154, 122, 0.3)',
+          background: lessonColors.completedIconBg,
+          boxShadow: currentTheme === 'dark'
+            ? '0 4px 16px rgba(59, 130, 246, 0.3)'
+            : '0 4px 16px rgba(122, 154, 122, 0.3)',
         }}
       >
         <CheckCircle2 className="w-10 h-10 text-white" />
       </div>
       <h2
         className="text-2xl font-bold mb-2"
-        style={{ color: '#4a6a4a' }}
+        style={{ color: lessonColors.completedText }}
       >
         레슨 {lessonOrder} 완료!
       </h2>
       <p
         className="mb-6"
-        style={{ color: '#6a8a6a' }}
+        style={{ color: lessonColors.completedTextMuted }}
       >
         {hasNext
           ? '다음 레슨으로 계속 학습하세요.'
@@ -260,9 +266,9 @@ function CompletedView({
           onClick={() => navigate(chapterPath)}
           className="px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all"
           style={{
-            background: 'rgba(255, 255, 255, 0.8)',
-            border: '1px solid #B8D4B8',
-            color: '#5a7a5a',
+            background: lessonColors.buttonSecondaryBg,
+            border: `1px solid ${lessonColors.buttonSecondaryBorder}`,
+            color: lessonColors.buttonSecondaryText,
           }}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -273,10 +279,12 @@ function CompletedView({
             onClick={() => navigate(nextLessonPath)}
             className="px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all hover:shadow-lg"
             style={{
-              background: 'linear-gradient(135deg, #7a9a7a 0%, #6a8a6a 100%)',
+              background: lessonColors.buttonPrimaryBg,
               border: 'none',
               color: '#fff',
-              boxShadow: '0 2px 8px rgba(122, 154, 122, 0.3)',
+              boxShadow: currentTheme === 'dark'
+                ? '0 2px 8px rgba(59, 130, 246, 0.3)'
+                : '0 2px 8px rgba(122, 154, 122, 0.3)',
             }}
           >
             다음 레슨
@@ -427,6 +435,7 @@ export function LessonPage() {
   // 테마
   const currentTheme = useThemeStore((s) => s.theme);
   const themeColors = themes[currentTheme];
+  const lessonColors = themeColors.lesson;
 
   // 데이터 로드
   useEffect(() => {
@@ -743,7 +752,7 @@ export function LessonPage() {
   }
 
   return (
-    <div className="lesson-page-container">
+    <div className="lesson-page-container" style={{ backgroundColor: lessonColors.pageBg }}>
       {/* Completed Phase */}
       {navigation.phase === 'completed' ? (
         <>
@@ -756,13 +765,13 @@ export function LessonPage() {
             <div className="cyber-divider" />
             <div>
               <h1 className="flex items-center gap-3">
-                <span className="text-gray-400 text-sm font-medium">
+                <span className="text-sm font-medium" style={{ color: lessonColors.headerTextMuted }}>
                   {lessonId.split('-').slice(1).join('.')}
                 </span>
-                <span className="text-lg font-bold">{lesson.title}</span>
+                <span className="text-lg font-bold" style={{ color: lessonColors.headerText }}>{lesson.title}</span>
               </h1>
               {lesson.description && (
-                <p className="text-xs text-gray-500">{lesson.description}</p>
+                <p className="text-xs" style={{ color: lessonColors.headerTextMuted }}>{lesson.description}</p>
               )}
             </div>
           </div>
@@ -783,13 +792,13 @@ export function LessonPage() {
             <div className="cyber-divider" />
             <div>
               <h1 className="flex items-center gap-3">
-                <span className="text-gray-400 text-sm font-medium">
+                <span className="text-sm font-medium" style={{ color: lessonColors.headerTextMuted }}>
                   {lessonId.split('-').slice(1).join('.')}
                 </span>
-                <span className="text-lg font-bold">{lesson.title}</span>
+                <span className="text-lg font-bold" style={{ color: lessonColors.headerText }}>{lesson.title}</span>
               </h1>
               {lesson.description && (
-                <p className="text-xs text-gray-500">{lesson.description}</p>
+                <p className="text-xs" style={{ color: lessonColors.headerTextMuted }}>{lesson.description}</p>
               )}
             </div>
           </div>
@@ -800,7 +809,7 @@ export function LessonPage() {
             <Panel defaultSize={50} minSize={30} maxSize={70}>
               <div
                 className="h-full rounded-xl overflow-hidden flex flex-col"
-                style={{ border: '1px solid #E5D5C7' }}
+                style={{ border: `1px solid ${lessonColors.panelBorder}` }}
               >
                 <PanelGroup orientation="vertical">
                   {/* 상단: 코드 + 터미널 */}
@@ -810,15 +819,15 @@ export function LessonPage() {
                       <div
                         className="flex items-center px-4 py-2 text-sm font-semibold flex-shrink-0"
                         style={{
-                          background: 'linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%)',
-                          color: '#e5e5e5',
+                          background: lessonColors.codeHeaderBg,
+                          color: lessonColors.codeHeaderText,
                         }}
                       >
                         <Code2 className="w-4 h-4 text-yellow-400 mr-2" />
                         코드
                       </div>
                       {/* 코드 뷰어 - 남은 공간 채우기 */}
-                      <div className="flex-1 overflow-y-auto bg-white">
+                      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: lessonColors.codeBg }}>
                         <CodeViewer
                           code={code}
                           highlightLine={currentStep?.line || 1}
@@ -827,7 +836,7 @@ export function LessonPage() {
                       </div>
                       {/* 터미널 출력 */}
                       {terminalLines.length > 0 && (
-                        <div className="flex-shrink-0 border-t border-gray-200">
+                        <div className="flex-shrink-0" style={{ borderTop: `1px solid ${lessonColors.terminalBorder}` }}>
                           <TerminalOutput
                             lines={terminalLines}
                             title="출력"
@@ -982,7 +991,7 @@ export function LessonPage() {
             <Panel defaultSize={50} minSize={30} maxSize={70}>
               <div
                 className="h-full rounded-xl overflow-hidden flex flex-col"
-                style={{ border: '1px solid #E5D5C7' }}
+                style={{ border: `1px solid ${lessonColors.panelBorder}` }}
               >
                 {/* 탭 헤더 - 2탭 */}
                 <div className="flex flex-shrink-0">
@@ -992,12 +1001,12 @@ export function LessonPage() {
                 className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold rounded-tl-[11px]"
                 style={{
                   background: activeTab === 'memory'
-                    ? 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)'
+                    ? lessonColors.tabActiveBg
                     : flashMemory
-                      ? 'linear-gradient(180deg, #d1fae5 0%, #ecfdf5 100%)'
-                      : '#f8f4ef',
-                  color: activeTab === 'memory' ? '#4a6a4a' : flashMemory ? '#059669' : '#937b5d',
-                  borderRight: '1px solid #E5D5C7',
+                      ? (currentTheme === 'dark' ? 'linear-gradient(180deg, #065f46 0%, #064e3b 100%)' : 'linear-gradient(180deg, #d1fae5 0%, #ecfdf5 100%)')
+                      : lessonColors.tabInactiveBg,
+                  color: activeTab === 'memory' ? lessonColors.tabActiveText : flashMemory ? (currentTheme === 'dark' ? '#34d399' : '#059669') : lessonColors.tabInactiveText,
+                  borderRight: `1px solid ${lessonColors.panelBorder}`,
                   animation: flashMemory ? 'tabGlow 0.6s ease-out' : 'none',
                   transition: 'background 0.2s, color 0.2s',
                 }}
@@ -1018,9 +1027,9 @@ export function LessonPage() {
                 className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold rounded-tr-[11px] transition-all"
                 style={{
                   background: activeTab === 'chat'
-                    ? 'linear-gradient(135deg, #FFFBF5 0%, #FFF9F2 100%)'
-                    : '#f8f4ef',
-                  color: activeTab === 'chat' ? '#7c5e3c' : '#937b5d',
+                    ? lessonColors.chatBg
+                    : lessonColors.tabInactiveBg,
+                  color: activeTab === 'chat' ? lessonColors.tabActiveText : lessonColors.tabInactiveText,
                 }}
               >
                 <Bot className="w-3.5 h-3.5" />
@@ -1035,7 +1044,7 @@ export function LessonPage() {
                     <div
                       className="p-2 h-full relative"
                       style={{
-                        background: 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)',
+                        background: lessonColors.memoryBg,
                       }}
                     >
                       {/* C 언어: 메모리 시각화 */}
@@ -1093,7 +1102,7 @@ export function LessonPage() {
                     <div
                       className="relative h-full"
                       style={{
-                        background: 'linear-gradient(135deg, #FFFBF5 0%, #FFF9F2 100%)',
+                        background: lessonColors.chatBg,
                       }}
                     >
                       {selection && (

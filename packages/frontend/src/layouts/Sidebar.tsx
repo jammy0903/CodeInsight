@@ -16,6 +16,8 @@ import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
 import { logger } from '@/utils/logger';
+import { useThemeStore } from '@/stores/themeStore';
+import { themes } from '@/config/themes';
 
 const SIDEBAR_WIDTH = 224; // 14rem
 
@@ -44,6 +46,8 @@ export function Sidebar() {
   const location = useLocation();
   const { sidebarOpen, toggleSidebar, firebaseUser, appUser, needsRegistration } = useStore();
   const isAdmin = appUser?.role === 'admin';
+  const currentTheme = useThemeStore((s) => s.theme);
+  const layoutColors = themes[currentTheme].layout;
 
   const handleSignOut = async () => {
     await logout();
@@ -67,7 +71,8 @@ export function Sidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+            className="fixed inset-0 z-40 lg:hidden"
+            style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
             onClick={toggleSidebar}
           />
 
@@ -77,27 +82,44 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -SIDEBAR_WIDTH }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed left-0 top-0 h-full bg-[#fffbf5] border-r border-[#e5d5c7] shadow-lg z-50 flex flex-col"
-            style={{ width: SIDEBAR_WIDTH }}
+            className="fixed left-0 top-0 h-full shadow-lg z-50 flex flex-col"
+            style={{
+              width: SIDEBAR_WIDTH,
+              backgroundColor: layoutColors.sidebarBg,
+              borderRight: `1px solid ${layoutColors.sidebarBorder}`,
+            }}
           >
             {/* 헤더 */}
-            <div className="p-4 border-b border-[#e5d5c7] flex items-center justify-between bg-[#fffbf5]">
-              <h2 className="text-xl font-bold text-[#6b5a4a]">
+            <div
+              className="p-4 flex items-center justify-between"
+              style={{
+                backgroundColor: layoutColors.sidebarBg,
+                borderBottom: `1px solid ${layoutColors.sidebarBorder}`,
+              }}
+            >
+              <h2 className="text-xl font-bold" style={{ color: layoutColors.sidebarText }}>
                 CodeInsight
               </h2>
               <motion.button
                 onClick={toggleSidebar}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] hover:border-[#a08060] transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{
+                  border: `1px solid ${layoutColors.sidebarBorder}`,
+                  backgroundColor: layoutColors.sidebarItemBg,
+                }}
                 aria-label="사이드바 닫기"
               >
-                <X className="w-5 h-5 text-[#937b5d]" />
+                <X className="w-5 h-5" style={{ color: layoutColors.sidebarTextMuted }} />
               </motion.button>
             </div>
 
             {/* 네비게이션 */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto bg-[#fffbf5]">
+            <nav
+              className="flex-1 p-4 space-y-2 overflow-y-auto"
+              style={{ backgroundColor: layoutColors.sidebarBg }}
+            >
               {/* 공통 메뉴 */}
               {NAV_ITEMS.map((item) => (
                 <NavLink key={item.path} item={item} location={location} toggleSidebar={toggleSidebar} />
@@ -106,7 +128,7 @@ export function Sidebar() {
               {/* 로그인 사용자 전용 메뉴 */}
               {appUser && (
                 <>
-                  <div className="my-3 border-t border-[#e5d5c7]" />
+                  <div className="my-3" style={{ borderTop: `1px solid ${layoutColors.sidebarBorder}` }} />
                   {AUTH_NAV_ITEMS.map((item) => (
                     <NavLink key={item.path} item={item} location={location} toggleSidebar={toggleSidebar} />
                   ))}
@@ -116,7 +138,7 @@ export function Sidebar() {
               {/* Admin 메뉴 (관리자만 표시) */}
               {isAdmin && (
                 <>
-                  <div className="my-3 border-t border-[#e5d5c7]" />
+                  <div className="my-3" style={{ borderTop: `1px solid ${layoutColors.sidebarBorder}` }} />
                   <motion.div
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
@@ -125,14 +147,13 @@ export function Sidebar() {
                     <Link
                       to="/admin"
                       onClick={toggleSidebar}
-                      className={`
-                        flex items-center gap-3 px-4 h-12 rounded-lg
-                        border transition-all duration-150
-                        ${location.pathname.startsWith('/admin')
-                          ? 'bg-[#7a9a7a] font-semibold border-[#6a8a6a] text-white'
-                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#7a9a7a] hover:bg-[#f5fff5]'
-                        }
-                      `}
+                      className="flex items-center gap-3 px-4 h-12 rounded-lg border transition-all duration-150"
+                      style={{
+                        backgroundColor: location.pathname.startsWith('/admin') ? '#22c55e' : layoutColors.sidebarItemBg,
+                        color: location.pathname.startsWith('/admin') ? '#ffffff' : layoutColors.sidebarText,
+                        borderColor: location.pathname.startsWith('/admin') ? '#16a34a' : layoutColors.sidebarBorder,
+                        fontWeight: location.pathname.startsWith('/admin') ? 600 : 400,
+                      }}
                     >
                       <Shield className="w-5 h-5 shrink-0" />
                       <span className="text-sm">Admin</span>
@@ -143,7 +164,10 @@ export function Sidebar() {
             </nav>
 
             {/* 프로필 영역 */}
-            <div className="p-4 border-t border-[#e5d5c7]">
+            <div
+              className="p-4"
+              style={{ borderTop: `1px solid ${layoutColors.sidebarBorder}` }}
+            >
               {firebaseUser ? (
                 <div className="space-y-3">
                   {/* 닉네임 등록 필요 시 */}
@@ -154,7 +178,12 @@ export function Sidebar() {
                       }}
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#a08060] bg-[#a08060]/10 border border-[#a08060] rounded-lg hover:bg-[#a08060]/20 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-lg transition-colors"
+                      style={{
+                        color: layoutColors.sidebarItemActive,
+                        backgroundColor: `${layoutColors.sidebarItemActive}15`,
+                        border: `1px solid ${layoutColors.sidebarItemActive}`,
+                      }}
                     >
                       <UserPlus className="w-5 h-5" />
                       닉네임 설정하기
@@ -162,13 +191,25 @@ export function Sidebar() {
                   ) : (
                     <>
                       {/* 등록 완료 상태 - 닉네임 기반 프로필 */}
-                      <div className="flex items-center gap-3 p-3 bg-[#fff8f0] rounded-lg border border-[#e5d5c7]">
+                      <div
+                        className="flex items-center gap-3 p-3 rounded-lg"
+                        style={{
+                          backgroundColor: layoutColors.sidebarItemBg,
+                          border: `1px solid ${layoutColors.sidebarBorder}`,
+                        }}
+                      >
                         <PixelAvatar seed={appUser.nickname} size={40} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-[#6b5a4a] truncate">
+                          <p
+                            className="text-sm font-semibold truncate"
+                            style={{ color: layoutColors.sidebarText }}
+                          >
                             {appUser.nickname}
                           </p>
-                          <p className="text-xs text-[#937b5d] truncate capitalize">
+                          <p
+                            className="text-xs truncate capitalize"
+                            style={{ color: layoutColors.sidebarTextMuted }}
+                          >
                             {appUser.oauthAccounts[0]?.provider || 'OAuth'}
                           </p>
                         </div>
@@ -179,7 +220,11 @@ export function Sidebar() {
                     onClick={handleSignOut}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#937b5d] border border-[#e5d5c7] rounded-lg hover:border-[#c08080] hover:text-[#c08080] hover:bg-red-50/50 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors hover:bg-red-500/10"
+                    style={{
+                      color: layoutColors.sidebarTextMuted,
+                      border: `1px solid ${layoutColors.sidebarBorder}`,
+                    }}
                   >
                     <LogOut className="w-4 h-4" />
                     로그아웃
@@ -193,7 +238,12 @@ export function Sidebar() {
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#6b5a4a] bg-white border border-[#e5d5c7] rounded-lg hover:border-[#a08060] hover:bg-[#fff8f0] transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-lg transition-colors"
+                    style={{
+                      color: layoutColors.sidebarText,
+                      backgroundColor: layoutColors.sidebarItemBg,
+                      border: `1px solid ${layoutColors.sidebarBorder}`,
+                    }}
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
@@ -215,7 +265,10 @@ export function Sidebar() {
                     </svg>
                     Google 로그인
                   </motion.button>
-                  <p className="text-xs text-[#937b5d] text-center">
+                  <p
+                    className="text-xs text-center"
+                    style={{ color: layoutColors.sidebarTextMuted }}
+                  >
                     © 2026 CodeInsight
                   </p>
                 </div>
@@ -239,6 +292,8 @@ function NavLink({ item, location, toggleSidebar }: NavLinkProps) {
   const isActive = location.pathname === item.path ||
     (item.path !== '/' && location.pathname.startsWith(item.path));
   const Icon = item.icon;
+  const currentTheme = useThemeStore((s) => s.theme);
+  const layoutColors = themes[currentTheme].layout;
 
   return (
     <motion.div
@@ -249,14 +304,13 @@ function NavLink({ item, location, toggleSidebar }: NavLinkProps) {
       <Link
         to={item.path}
         onClick={toggleSidebar}
-        className={`
-          flex items-center gap-3 px-4 h-12 rounded-lg
-          border transition-all duration-150
-          ${isActive
-            ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
-            : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
-          }
-        `}
+        className="flex items-center gap-3 px-4 h-12 rounded-lg border transition-all duration-150"
+        style={{
+          backgroundColor: isActive ? layoutColors.sidebarItemActive : layoutColors.sidebarItemBg,
+          color: isActive ? '#ffffff' : layoutColors.sidebarText,
+          borderColor: isActive ? layoutColors.sidebarItemActive : layoutColors.sidebarBorder,
+          fontWeight: isActive ? 600 : 400,
+        }}
       >
         <Icon className="w-5 h-5 shrink-0" />
         <span className="text-sm">{item.label}</span>

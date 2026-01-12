@@ -11,6 +11,7 @@
  */
 
 import { cn } from '@/lib/utils';
+import { useThemeStore } from '@/stores/themeStore';
 import type { CodeSelection } from '../../types';
 
 interface CodeViewerProps {
@@ -24,6 +25,10 @@ interface CodeViewerProps {
 export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewerProps) {
   // 외부 컨테이너에서 높이 제어 (10줄 고정 + 스크롤)
   const lines = code.split('\n');
+
+  // 테마에 따라 라이트/다크 모드 결정
+  const currentTheme = useThemeStore((s) => s.theme);
+  const isDark = currentTheme === 'dark';
 
   /**
    * 텍스트 선택 핸들러
@@ -50,11 +55,16 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
   };
 
   return (
-    <div className="bg-white font-mono text-sm">
+    <div className={cn('font-mono text-sm', isDark ? 'bg-zinc-900' : 'bg-white')}>
       <div className="flex" onMouseUp={handleTextSelect}>
         {/* Line numbers - user-select: none to prevent selection */}
         <div
-          className="flex-shrink-0 py-3 px-2 text-right text-gray-400 select-none border-r border-gray-200 bg-gray-50"
+          className={cn(
+            'flex-shrink-0 py-3 px-2 text-right select-none border-r',
+            isDark
+              ? 'text-zinc-500 border-zinc-700 bg-zinc-800'
+              : 'text-gray-400 border-gray-200 bg-gray-50'
+          )}
           style={{ userSelect: 'none' }}
         >
           {lines.map((_, idx) => (
@@ -62,7 +72,7 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
               key={idx}
               className={cn(
                 'px-2 leading-6',
-                highlightLine === idx + 1 && 'text-green-600 font-bold'
+                highlightLine === idx + 1 && (isDark ? 'text-blue-400 font-bold' : 'text-green-600 font-bold')
               )}
             >
               {idx + 1}
@@ -77,11 +87,14 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
               key={idx}
               className={cn(
                 'leading-6 whitespace-pre',
-                highlightLine === idx + 1 &&
-                  'bg-green-100 -mx-4 px-4 border-l-2 border-green-500'
+                highlightLine === idx + 1 && (
+                  isDark
+                    ? 'bg-blue-900/40 -mx-4 px-4 border-l-2 border-blue-500'
+                    : 'bg-green-100 -mx-4 px-4 border-l-2 border-green-500'
+                )
               )}
             >
-              <HighlightedLine line={line} isLight />
+              <HighlightedLine line={line} isLight={!isDark} />
             </div>
           ))}
         </div>

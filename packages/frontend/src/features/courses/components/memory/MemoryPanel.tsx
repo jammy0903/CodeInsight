@@ -142,6 +142,10 @@ function ArrayBlock({
   const firstElement = elements[0];
   const lastElement = elements[elements.length - 1];
 
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme];
+
   if (!isExpanded) {
     // 접힌 상태: 요약 표시
     return (
@@ -149,7 +153,7 @@ function ArrayBlock({
         layout
         className="rounded-lg px-3 py-2 transition-all duration-200 cursor-pointer relative"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: themeColors.memory.cardBg,
           border: `2px solid ${frameColor.border}`,
           boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         }}
@@ -161,7 +165,8 @@ function ArrayBlock({
             {/* 토글 버튼 */}
             <button
               onClick={onToggle}
-              className="text-xs p-1 hover:bg-gray-100 rounded transition-colors"
+              className="text-xs p-1 rounded transition-colors"
+              style={{ color: themeColors.memory.cardMuted }}
             >
               ▶
             </button>
@@ -170,13 +175,13 @@ function ArrayBlock({
             <span className="text-xs font-semibold" style={{ color: frameColor.text }}>
               {displayName}[0..{elementCount - 1}]
             </span>
-            <span className="text-[10px] text-gray-400">
+            <span className="text-[10px]" style={{ color: themeColors.memory.cardMuted }}>
               ({elementCount}개 요소)
             </span>
           </div>
 
           {/* 주소 범위 */}
-          <span className="text-[10px] font-mono text-gray-400">
+          <span className="text-[10px] font-mono" style={{ color: themeColors.memory.cardMuted }}>
             {firstElement.address} ~ {lastElement.address}
           </span>
         </div>
@@ -191,7 +196,8 @@ function ArrayBlock({
       <div className="flex items-center gap-2 px-2">
         <button
           onClick={onToggle}
-          className="text-xs p-1 hover:bg-gray-100 rounded transition-colors"
+          className="text-xs p-1 rounded transition-colors"
+          style={{ color: themeColors.memory.cardMuted }}
         >
           ▼
         </button>
@@ -242,6 +248,10 @@ function MemoryBlockCard({
   const valueDisplay = isGarbageValue(block.value) ? '?' : String(block.value);
   const displayName = getDisplayName(block.name);
 
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme];
+
   return (
     <motion.div
       layout
@@ -249,7 +259,7 @@ function MemoryBlockCard({
       animate={{ opacity: 1, x: 0 }}
       className="rounded-lg px-3 py-2 transition-all duration-200 cursor-pointer relative"
       style={{
-        backgroundColor: isHovered ? frameColor.hover : 'white',
+        backgroundColor: isHovered ? frameColor.hover : themeColors.memory.cardBg,
         border: `2px solid ${isChanged ? COLORS.changed.border : frameColor.border}`,
         boxShadow: isChanged
           ? `0 0 8px ${COLORS.changed.border}40`
@@ -299,24 +309,24 @@ function MemoryBlockCard({
           <span
             className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded"
             style={{
-              color: COLORS.surface.muted,
-              backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              color: themeColors.memory.cardMuted,
+              backgroundColor: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
             }}
           >
             {block.address}
           </span>
-          <span className="text-gray-300 mx-2 font-bold">|</span>
+          <span className="mx-2 font-bold" style={{ color: themeColors.memory.cardMuted }}>|</span>
           {/* 값 */}
           <span
             className="font-mono font-bold text-base min-w-[24px] text-center"
-            style={{ color: isChanged ? '#d97706' : COLORS.surface.text }}
+            style={{ color: isChanged ? '#f59e0b' : themeColors.memory.cardText }}
           >
             {valueDisplay}
           </span>
         </div>
 
         {/* 타입 */}
-        <span className="text-[10px] font-mono text-gray-400">
+        <span className="text-[10px] font-mono" style={{ color: themeColors.memory.cardMuted }}>
           {block.type || 'var'}
         </span>
 
@@ -440,20 +450,53 @@ function RegisterPanel({
   rspAddress: string;
   currentFrame: string;
 }) {
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme];
+
+  // 테마별 레지스터 색상 (zinc + cyan 팔레트)
+  const registerColors = {
+    dark: {
+      panelBg: '#18181b',         // zinc-900
+      panelBorder: '#27272a',     // zinc-800
+      headerText: '#a1a1aa',      // zinc-400
+      subText: '#71717a',         // zinc-500
+      rbp: { bg: '#27272a', border: '#f472b6', label: '#f472b6', value: '#fce7f3' },  // 핑크 포인트
+      rsp: { bg: '#27272a', border: '#22d3ee', label: '#22d3ee', value: '#cffafe' },  // 시안 포인트
+    },
+    soft: {
+      panelBg: '#f8fafc',
+      panelBorder: '#e2e8f0',
+      headerText: '#64748b',
+      subText: '#94a3b8',
+      rbp: { bg: '#fef3c7', border: '#f59e0b', label: '#b45309', value: '#92400e' },
+      rsp: { bg: '#dbeafe', border: '#60a5fa', label: '#1d4ed8', value: '#1e40af' },
+    },
+    minimal: {
+      panelBg: '#faf8f5',
+      panelBorder: '#e5d5c7',
+      headerText: '#6b5a4a',
+      subText: '#937b5d',
+      rbp: { bg: '#fef3c7', border: '#d97706', label: '#b45309', value: '#92400e' },
+      rsp: { bg: '#e0f2fe', border: '#0ea5e9', label: '#0369a1', value: '#0c4a6e' },
+    },
+  };
+  const colors = registerColors[currentTheme];
+
   return (
     <div
       className="rounded-lg p-2 mb-3"
       style={{
-        backgroundColor: '#f1f5f9',
-        border: '1px solid #cbd5e1',
+        backgroundColor: colors.panelBg,
+        border: `1px solid ${colors.panelBorder}`,
       }}
     >
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-bold uppercase text-slate-600">
+        <span className="text-[10px] font-bold uppercase" style={{ color: colors.headerText }}>
           🔧 CPU 레지스터
         </span>
-        <span className="text-[9px] text-slate-500">
+        <span className="text-[9px]" style={{ color: colors.subText }}>
           현재: {currentFrame}()
         </span>
       </div>
@@ -465,17 +508,18 @@ function RegisterPanel({
           <div
             className="rounded-md py-2 px-3 cursor-help"
             style={{
-              backgroundColor: '#fef3c7',
-              border: '1px solid #f59e0b',
+              backgroundColor: colors.rbp.bg,
+              border: `1px solid ${colors.rbp.border}`,
             }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-amber-700">RBP</span>
+              <span className="text-xs font-bold" style={{ color: colors.rbp.label }}>RBP</span>
               <motion.span
                 key={rbpAddress}
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-xs font-mono text-amber-800"
+                className="text-xs font-mono"
+                style={{ color: colors.rbp.value }}
               >
                 {rbpAddress}
               </motion.span>
@@ -498,17 +542,18 @@ function RegisterPanel({
           <div
             className="rounded-md py-2 px-3 cursor-help"
             style={{
-              backgroundColor: '#dbeafe',
-              border: '1px solid #60a5fa',
+              backgroundColor: colors.rsp.bg,
+              border: `1px solid ${colors.rsp.border}`,
             }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-blue-700">RSP</span>
+              <span className="text-xs font-bold" style={{ color: colors.rsp.label }}>RSP</span>
               <motion.span
                 key={rspAddress}
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-xs font-mono text-blue-800"
+                className="text-xs font-mono"
+                style={{ color: colors.rsp.value }}
               >
                 {rspAddress}
               </motion.span>
@@ -545,6 +590,10 @@ function StackSection({
 }) {
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [expandedArrays, setExpandedArrays] = useState<Set<string>>(new Set());
+
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme];
 
   // 현재 실행 중인 프레임 (frames 배열의 마지막)
   const currentFrame = frames[frames.length - 1]?.name || 'main';
@@ -638,19 +687,19 @@ function StackSection({
       <div
         className="rounded-lg p-3"
         style={{
-          backgroundColor: COLORS.stack.bg,
-          border: `1px solid ${COLORS.stack.border}25`,
+          backgroundColor: themeColors.memory.stackBg,
+          border: `1px solid ${themeColors.memory.stackBorder}25`,
         }}
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-bold uppercase" style={{ color: COLORS.stack.label }}>
+          <span className="text-[11px] font-bold uppercase" style={{ color: themeColors.memory.stackLabel }}>
             📦 Stack
           </span>
-          <span className="text-[9px] text-pink-400">
+          <span className="text-[9px]" style={{ color: themeColors.memory.stackLabel }}>
             ↓ 낮은 주소
           </span>
         </div>
-        <div className="text-center py-3 text-[10px] text-gray-400 italic">
+        <div className="text-center py-3 text-[10px] italic" style={{ color: themeColors.memory.cardMuted }}>
           (비어있음)
         </div>
       </div>
@@ -661,16 +710,16 @@ function StackSection({
     <div
       className="rounded-lg p-3"
       style={{
-        backgroundColor: COLORS.stack.bg,
-        border: `1px solid ${COLORS.stack.border}25`,
+        backgroundColor: themeColors.memory.stackBg,
+        border: `1px solid ${themeColors.memory.stackBorder}25`,
       }}
     >
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-bold uppercase" style={{ color: COLORS.stack.label }}>
+        <span className="text-[11px] font-bold uppercase" style={{ color: themeColors.memory.stackLabel }}>
           📦 Stack
         </span>
-        <span className="text-[9px] text-pink-400">
+        <span className="text-[9px]" style={{ color: themeColors.memory.stackLabel }}>
           ↓ 낮은 주소
         </span>
       </div>
@@ -786,10 +835,14 @@ function LowerMemorySections({
   dataSection?: DataItem[];
   textSection?: TextItem[];
 }) {
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme];
+
   const SECTION_COLORS = {
-    bss: { color: '#94a3b8', bg: '#f1f5f9', border: '#94a3b8' },
-    data: { color: '#7c5ac7', bg: '#ede9f5', border: '#9d8bc7' },
-    text: { color: '#4a8a9e', bg: '#e5f0f3', border: '#7fb3c2' },
+    bss: { color: themeColors.memory.cardMuted, bg: themeColors.memory.stackBg, border: themeColors.memory.cardMuted },
+    data: { color: themeColors.memory.dataLabel, bg: themeColors.memory.dataBg, border: themeColors.memory.dataLabel },
+    text: { color: themeColors.memory.textLabel, bg: themeColors.memory.textBg, border: themeColors.memory.textLabel },
   };
 
   return (
@@ -839,18 +892,18 @@ function LowerMemorySections({
               <div
                 key={idx}
                 className="rounded px-2 py-1.5 flex items-center gap-2"
-                style={{ backgroundColor: 'rgba(255,255,255,0.7)' }}
+                style={{ backgroundColor: `${themeColors.memory.cardBg}B3` }}
               >
-                <span className="text-[10px] font-mono text-gray-400">{item.address}</span>
-                <span className="text-gray-300">|</span>
-                <span className="text-[11px] font-mono text-purple-700 truncate flex-1">
+                <span className="text-[10px] font-mono" style={{ color: themeColors.memory.cardMuted }}>{item.address}</span>
+                <span style={{ color: themeColors.memory.cardMuted }}>|</span>
+                <span className="text-[11px] font-mono truncate flex-1" style={{ color: themeColors.memory.dataLabel }}>
                   "{item.value}"
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-[10px] italic text-gray-400 text-center py-1">
+          <div className="text-[10px] italic text-center py-1" style={{ color: themeColors.memory.cardMuted }}>
             (비어있음)
           </div>
         )}
@@ -882,25 +935,25 @@ function LowerMemorySections({
               <div
                 key={idx}
                 className="rounded px-2 py-1.5 flex items-center gap-2"
-                style={{ backgroundColor: 'rgba(255,255,255,0.7)' }}
+                style={{ backgroundColor: `${themeColors.memory.cardBg}B3` }}
               >
-                <span className="text-[10px] font-mono text-gray-400">{item.address}</span>
-                <span className="text-gray-300">|</span>
-                <span className="text-[11px] font-mono text-cyan-700">
+                <span className="text-[10px] font-mono" style={{ color: themeColors.memory.cardMuted }}>{item.address}</span>
+                <span style={{ color: themeColors.memory.cardMuted }}>|</span>
+                <span className="text-[11px] font-mono" style={{ color: themeColors.memory.textLabel }}>
                   {item.name}()
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-[10px] italic text-gray-400 text-center py-1">
+          <div className="text-[10px] italic text-center py-1" style={{ color: themeColors.memory.cardMuted }}>
             (비어있음)
           </div>
         )}
       </div>
 
       {/* 맨 아래: 낮은 주소 표시 */}
-      <div className="text-center text-[9px] text-gray-400 pt-1">
+      <div className="text-center text-[9px] pt-1" style={{ color: themeColors.memory.cardMuted }}>
         ↓ 0x0000 (낮은 주소)
       </div>
     </div>
@@ -915,6 +968,10 @@ function HeapSection({
   blocks: MemoryBlock[];
   changedBlocks: string[];
 }) {
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme];
+
   // 주소순 정렬 (낮은 주소 → 높은 주소)
   const sortedBlocks = useMemo(() => {
     return [...blocks].sort((a, b) => {
@@ -930,19 +987,19 @@ function HeapSection({
       <div
         className="rounded-lg p-3"
         style={{
-          backgroundColor: COLORS.heap.bg,
-          border: `1px solid ${COLORS.heap.border}25`,
+          backgroundColor: themeColors.memory.heapBg,
+          border: `1px solid ${themeColors.memory.heapBorder}25`,
         }}
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-bold uppercase" style={{ color: COLORS.heap.label }}>
+          <span className="text-[11px] font-bold uppercase" style={{ color: themeColors.memory.heapLabel }}>
             🎒 Heap
           </span>
-          <span className="text-[9px] text-green-500">
+          <span className="text-[9px]" style={{ color: themeColors.memory.heapLabel }}>
             ↑ 높은 주소
           </span>
         </div>
-        <div className="text-center py-3 text-[10px] text-gray-400 italic">
+        <div className="text-center py-3 text-[10px] italic" style={{ color: themeColors.memory.cardMuted }}>
           (비어있음)
         </div>
       </div>
@@ -953,16 +1010,16 @@ function HeapSection({
     <div
       className="rounded-lg p-3"
       style={{
-        backgroundColor: COLORS.heap.bg,
-        border: `1px solid ${COLORS.heap.border}25`,
+        backgroundColor: themeColors.memory.heapBg,
+        border: `1px solid ${themeColors.memory.heapBorder}25`,
       }}
     >
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-bold uppercase" style={{ color: COLORS.heap.label }}>
+        <span className="text-[11px] font-bold uppercase" style={{ color: themeColors.memory.heapLabel }}>
           🎒 Heap
         </span>
-        <span className="text-[9px] text-green-500">
+        <span className="text-[9px]" style={{ color: themeColors.memory.heapLabel }}>
           ↑ 높은 주소
         </span>
       </div>
@@ -1001,6 +1058,10 @@ export function MemoryPanel({
 }: MemoryPanelProps) {
   const isEmpty = stack.length === 0 && heap.length === 0;
 
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme];
+
   // RBP/RSP 주소 계산 (스택 정렬 후)
   const sortedStack = useMemo(() => {
     return [...stack].sort((a, b) => {
@@ -1028,7 +1089,10 @@ export function MemoryPanel({
   return (
     <div className="p-3 space-y-3">
       {isEmpty ? (
-        <div className="text-center py-8 text-gray-400 text-sm italic">
+        <div
+          className="text-center py-8 text-sm italic"
+          style={{ color: themeColors.memory.cardMuted }}
+        >
           메모리 할당 없음
         </div>
       ) : (

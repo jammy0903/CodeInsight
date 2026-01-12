@@ -12,6 +12,65 @@ import { Send, Loader2, Trash2, MessageCircle, Clock } from 'lucide-react';
 import { useChatQA } from '../hooks/useChatQA';
 import { MessageContent } from './MessageContent';
 import type { ChatContext } from '@/services/ai';
+import { useThemeStore } from '@/stores/themeStore';
+import { themes } from '@/config/themes';
+
+// 테마별 채팅 색상 (zinc + cyan 팔레트)
+const chatColors = {
+  dark: {
+    aiBubbleBg: '#27272a',      // zinc-800
+    aiBubbleBorder: '#3f3f46',  // zinc-700
+    aiBubbleText: '#fafafa',    // zinc-50
+    userBubbleBg: '#0891b2',    // cyan-600
+    userBubbleBorder: '#0e7490', // cyan-700
+    userBubbleText: '#ffffff',
+    badgeAiBg: '#3f3f46',       // zinc-700
+    badgeAiText: '#e4e4e7',     // zinc-200
+    // 입력창
+    inputBg: '#18181b',         // zinc-900
+    inputBorder: '#3f3f46',     // zinc-700
+    inputText: '#fafafa',       // zinc-50
+    inputPlaceholder: '#71717a', // zinc-500
+    // 헤더/기타
+    headerText: '#e4e4e7',      // zinc-200
+    headerBorder: '#27272a',    // zinc-800
+    mutedText: '#a1a1aa',       // zinc-400
+  },
+  soft: {
+    aiBubbleBg: '#f8fafc',
+    aiBubbleBorder: '#e2e8f0',
+    aiBubbleText: '#475569',
+    userBubbleBg: '#ec4899',
+    userBubbleBorder: '#db2777',
+    userBubbleText: '#ffffff',
+    badgeAiBg: '#f1f5f9',
+    badgeAiText: '#64748b',
+    inputBg: '#ffffff',
+    inputBorder: '#e2e8f0',
+    inputText: '#334155',
+    inputPlaceholder: '#94a3b8',
+    headerText: '#334155',
+    headerBorder: '#e2e8f0',
+    mutedText: '#64748b',
+  },
+  minimal: {
+    aiBubbleBg: '#faf8f5',
+    aiBubbleBorder: '#e5d5c7',
+    aiBubbleText: '#5c4a3d',
+    userBubbleBg: '#b45309',
+    userBubbleBorder: '#92400e',
+    userBubbleText: '#ffffff',
+    badgeAiBg: '#f5ebe0',
+    badgeAiText: '#78716c',
+    inputBg: '#fffcf8',
+    inputBorder: '#e5d5c7',
+    inputText: '#5c4a3d',
+    inputPlaceholder: '#a39585',
+    headerText: '#5c4a3d',
+    headerBorder: '#e5d5c7',
+    mutedText: '#78716c',
+  },
+};
 
 interface ChatQAProps {
   context?: ChatContext;
@@ -44,13 +103,21 @@ export function ChatQA({
     clearMessages,
   } = useChatQA({ context, selectedText, lessonId, contextType });
 
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = chatColors[currentTheme];
+
   return (
     <div className="flex flex-col h-full">
       {/* 헤더 */}
-      <div className="flex items-center justify-between px-4 py-3 border-b">
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ borderBottom: `1px solid ${colors.headerBorder}` }}
+      >
         <div className="flex items-center gap-2">
           <MessageCircle className="h-4 w-4 text-primary" />
-          <span className="text-sm font-medium">Q&A 대화</span>
+          <span className="text-sm font-medium" style={{ color: colors.headerText }}>
+            Q&A 대화
+          </span>
           {expiresAt && messages.length > 0 && (
             <ExpiryCountdown expiresAt={expiresAt} />
           )}
@@ -90,10 +157,13 @@ export function ChatQA({
       </ScrollArea>
 
       {/* 입력 영역 */}
-      <div className="border-t px-4 py-3">
+      <div
+        className="px-4 py-3"
+        style={{ borderTop: `1px solid ${colors.headerBorder}` }}
+      >
         {disabled ? (
           <div className="text-center py-2">
-            <p className="text-sm text-muted-foreground">{disabledMessage}</p>
+            <p className="text-sm" style={{ color: colors.mutedText }}>{disabledMessage}</p>
           </div>
         ) : (
           <div className="flex items-end gap-2">
@@ -103,6 +173,11 @@ export function ChatQA({
               onKeyDown={handleKeyDown}
               placeholder="이해가 안 되는 부분을 질문하세요..."
               className="flex-1 min-h-[40px] max-h-[100px] resize-none text-sm"
+              style={{
+                backgroundColor: colors.inputBg,
+                borderColor: colors.inputBorder,
+                color: colors.inputText,
+              }}
               rows={1}
               disabled={isLoading}
             />
@@ -126,14 +201,20 @@ export function ChatQA({
 
 // 빈 상태
 function EmptyState() {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = chatColors[currentTheme];
+
   return (
     <div className="h-full flex items-center justify-center py-8">
       <div className="text-center">
-        <MessageCircle className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
-        <p className="text-sm text-muted-foreground">
+        <MessageCircle
+          className="h-10 w-10 mx-auto mb-3"
+          style={{ color: colors.mutedText, opacity: 0.3 }}
+        />
+        <p className="text-sm" style={{ color: colors.mutedText }}>
           이해가 안 되는 부분을 질문해보세요
         </p>
-        <p className="text-xs text-muted-foreground/70 mt-1">
+        <p className="text-xs mt-1" style={{ color: colors.mutedText, opacity: 0.7 }}>
           예: &quot;왜 *를 붙이면 값이 바뀌어?&quot;
         </p>
       </div>
@@ -148,6 +229,8 @@ function MessageBubble({
   message: { id: string; role: 'user' | 'assistant'; content: string };
 }) {
   const isUser = message.role === 'user';
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = chatColors[currentTheme];
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -156,17 +239,22 @@ function MessageBubble({
           <Badge
             variant={isUser ? 'default' : 'secondary'}
             className="h-4 px-1.5 text-[10px] font-medium"
+            style={!isUser ? {
+              backgroundColor: colors.badgeAiBg,
+              color: colors.badgeAiText,
+            } : undefined}
           >
             {isUser ? 'You' : 'AI'}
           </Badge>
         </div>
 
         <Card
-          className={`overflow-hidden ${
-            isUser
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'bg-muted/50'
-          }`}
+          className="overflow-hidden"
+          style={{
+            backgroundColor: isUser ? colors.userBubbleBg : colors.aiBubbleBg,
+            borderColor: isUser ? colors.userBubbleBorder : colors.aiBubbleBorder,
+            color: isUser ? colors.userBubbleText : colors.aiBubbleText,
+          }}
         >
           <CardContent className="p-3 overflow-x-auto">
             <MessageContent content={message.content} isUser={isUser} />
@@ -179,18 +267,38 @@ function MessageBubble({
 
 // 스트리밍 메시지 (실시간 응답)
 function StreamingMessage({ content }: { content: string }) {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = chatColors[currentTheme];
+
   return (
     <div className="flex justify-start">
       <div className="max-w-[90%] min-w-0">
         <div className="flex items-center gap-1.5 mb-1">
-          <Badge variant="secondary" className="h-4 px-1.5 text-[10px] font-medium">
+          <Badge
+            variant="secondary"
+            className="h-4 px-1.5 text-[10px] font-medium"
+            style={{
+              backgroundColor: colors.badgeAiBg,
+              color: colors.badgeAiText,
+            }}
+          >
             AI
           </Badge>
-          <span className="text-[10px] text-muted-foreground animate-pulse">
+          <span
+            className="text-[10px] animate-pulse"
+            style={{ color: colors.aiBubbleText }}
+          >
             응답 중...
           </span>
         </div>
-        <Card className="bg-muted/50 overflow-hidden">
+        <Card
+          className="overflow-hidden"
+          style={{
+            backgroundColor: colors.aiBubbleBg,
+            borderColor: colors.aiBubbleBorder,
+            color: colors.aiBubbleText,
+          }}
+        >
           <CardContent className="p-3 overflow-x-auto">
             <MessageContent content={content} isUser={false} />
             <span className="inline-block w-1.5 h-4 bg-primary/60 animate-pulse ml-0.5" />
@@ -203,15 +311,30 @@ function StreamingMessage({ content }: { content: string }) {
 
 // 로딩 인디케이터
 function LoadingIndicator() {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = chatColors[currentTheme];
+
   return (
     <div className="flex justify-start">
       <div className="max-w-[90%]">
         <div className="flex items-center gap-1.5 mb-1">
-          <Badge variant="secondary" className="h-4 px-1.5 text-[10px] font-medium">
+          <Badge
+            variant="secondary"
+            className="h-4 px-1.5 text-[10px] font-medium"
+            style={{
+              backgroundColor: colors.badgeAiBg,
+              color: colors.badgeAiText,
+            }}
+          >
             AI
           </Badge>
         </div>
-        <Card className="bg-muted/50">
+        <Card
+          style={{
+            backgroundColor: colors.aiBubbleBg,
+            borderColor: colors.aiBubbleBorder,
+          }}
+        >
           <CardContent className="p-3">
             <div className="flex items-center gap-2">
               <div className="flex gap-1">
@@ -228,7 +351,9 @@ function LoadingIndicator() {
                   style={{ animationDelay: '300ms' }}
                 />
               </div>
-              <span className="text-muted-foreground text-xs">생각 중...</span>
+              <span className="text-xs" style={{ color: colors.aiBubbleText }}>
+                생각 중...
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -240,6 +365,8 @@ function LoadingIndicator() {
 // 만료 카운트다운
 function ExpiryCountdown({ expiresAt }: { expiresAt: number }) {
   const [remaining, setRemaining] = useState('');
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = chatColors[currentTheme];
 
   useEffect(() => {
     const updateRemaining = () => {
@@ -265,7 +392,10 @@ function ExpiryCountdown({ expiresAt }: { expiresAt: number }) {
   }, [expiresAt]);
 
   return (
-    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+    <span
+      className="text-[10px] flex items-center gap-1"
+      style={{ color: colors.mutedText }}
+    >
       <Clock className="h-3 w-3" />
       {remaining} 후 삭제
     </span>

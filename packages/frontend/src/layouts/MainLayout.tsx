@@ -13,6 +13,8 @@ import { Sidebar } from './Sidebar';
 import { NicknameModal } from '@/components/NicknameModal';
 import { Github, Mail } from 'lucide-react';
 import { useStore } from '@/stores/store';
+import { useThemeStore } from '@/stores/themeStore';
+import { themes } from '@/config/themes';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -21,6 +23,8 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const { sidebarOpen, appUser } = useStore();
   const location = useLocation();
+  const currentTheme = useThemeStore((s) => s.theme);
+  const layoutColors = themes[currentTheme].layout;
 
   // 페이지 타입 확인
   const isHomePage = location.pathname === '/';
@@ -35,7 +39,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   // LessonPage: 전체 페이지 스크롤 (헤더도 함께 스크롤)
   if (isLessonPage) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen" style={{ backgroundColor: layoutColors.pageBg }}>
         <NicknameModal />
         <Sidebar />
 
@@ -52,7 +56,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   // 기본 레이아웃: 전체 페이지 스크롤 (헤더도 함께 스크롤)
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: layoutColors.pageBg }}>
       {/* 닉네임 등록 모달 - needsRegistration 시 자동 표시 */}
       <NicknameModal />
 
@@ -81,32 +85,78 @@ export function MainLayout({ children }: MainLayoutProps) {
 
         {/* Footer - Bootstrap Footer V09 스타일 */}
         {!isLessonPage && !isPlaygroundPage && (
-          <footer className="mt-16 py-8 bg-[#f8f4ef] border-t border-[#e5d5c7]">
+          <footer
+            className="mt-16 py-8"
+            style={{
+              backgroundColor: layoutColors.footerBg,
+              borderTop: `1px solid ${layoutColors.footerBorder}`,
+            }}
+          >
             <div className="main-content-container">
               {/* 2열 레이아웃 */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 {/* 왼쪽: 브랜드 + 링크 */}
                 <div className="space-y-3">
-                  <Link to="/" className="text-lg font-bold text-[#6b5a4a] hover:text-[#a08060] transition-colors no-underline hover:no-underline">
+                  <Link
+                    to="/"
+                    className="text-lg font-bold transition-colors no-underline hover:no-underline"
+                    style={{ color: layoutColors.footerText }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = layoutColors.footerLinkHover}
+                    onMouseLeave={(e) => e.currentTarget.style.color = layoutColors.footerText}
+                  >
                     CodeInsight
                   </Link>
-                  <div className="flex flex-wrap gap-4 text-sm text-[#937b5d]">
-                    <a href="/courses" className="hover:text-[#6b5a4a] transition-colors">Courses</a>
-                    <a href="/chat" className="hover:text-[#6b5a4a] transition-colors">AI Chat</a>
-                    <a href={gmailLink} target="_blank" rel="noopener noreferrer" className="hover:text-[#6b5a4a] transition-colors">Contact</a>
+                  <div className="flex flex-wrap gap-4 text-sm" style={{ color: layoutColors.footerTextMuted }}>
+                    <a
+                      href="/courses"
+                      className="transition-colors"
+                      style={{ color: layoutColors.footerTextMuted }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = layoutColors.footerText}
+                      onMouseLeave={(e) => e.currentTarget.style.color = layoutColors.footerTextMuted}
+                    >
+                      Courses
+                    </a>
+                    <a
+                      href="/chat"
+                      className="transition-colors"
+                      style={{ color: layoutColors.footerTextMuted }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = layoutColors.footerText}
+                      onMouseLeave={(e) => e.currentTarget.style.color = layoutColors.footerTextMuted}
+                    >
+                      AI Chat
+                    </a>
+                    <a
+                      href={gmailLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="transition-colors"
+                      style={{ color: layoutColors.footerTextMuted }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = layoutColors.footerText}
+                      onMouseLeave={(e) => e.currentTarget.style.color = layoutColors.footerTextMuted}
+                    >
+                      Contact
+                    </a>
                   </div>
                 </div>
 
                 {/* 오른쪽: Stay in touch + 소셜 */}
                 <div className="space-y-3 md:text-right">
-                  <p className="text-sm font-medium text-[#6b5a4a]">Stay in touch</p>
+                  <p className="text-sm font-medium" style={{ color: layoutColors.footerText }}>Stay in touch</p>
                   <div className="flex gap-3 md:justify-end">
                     <a
                       href="https://github.com/jammy0903"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-9 h-9 rounded-full bg-[#e5d5c7] flex items-center justify-center
-                                 hover:bg-[#a08060] hover:text-white transition-colors text-[#6b5a4a]"
+                      className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                      style={{ backgroundColor: layoutColors.footerSocialBg, color: layoutColors.footerText }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = layoutColors.footerSocialHover;
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = layoutColors.footerSocialBg;
+                        e.currentTarget.style.color = layoutColors.footerText;
+                      }}
                     >
                       <Github className="w-4 h-4" />
                     </a>
@@ -114,8 +164,16 @@ export function MainLayout({ children }: MainLayoutProps) {
                       href={gmailLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-9 h-9 rounded-full bg-[#e5d5c7] flex items-center justify-center
-                                 hover:bg-[#a08060] hover:text-white transition-colors text-[#6b5a4a]"
+                      className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                      style={{ backgroundColor: layoutColors.footerSocialBg, color: layoutColors.footerText }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = layoutColors.footerSocialHover;
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = layoutColors.footerSocialBg;
+                        e.currentTarget.style.color = layoutColors.footerText;
+                      }}
                     >
                       <Mail className="w-4 h-4" />
                     </a>
@@ -124,7 +182,13 @@ export function MainLayout({ children }: MainLayoutProps) {
               </div>
 
               {/* 하단 저작권 */}
-              <div className="mt-6 pt-4 border-t border-[#e5d5c7] text-center text-xs text-[#937b5d]">
+              <div
+                className="mt-6 pt-4 text-center text-xs"
+                style={{
+                  borderTop: `1px solid ${layoutColors.footerBorder}`,
+                  color: layoutColors.footerTextMuted,
+                }}
+              >
                 © 2026 CodeInsight. All Rights Reserved.
               </div>
             </div>

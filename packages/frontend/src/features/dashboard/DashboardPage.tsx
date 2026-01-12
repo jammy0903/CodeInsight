@@ -22,6 +22,8 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useStore } from '@/stores/store';
+import { useThemeStore } from '@/stores/themeStore';
+import { themes } from '@/config/themes';
 import { getUserProgress } from '@/services/courses';
 import { logger } from '@/utils/logger';
 import { AnalyticsSection } from './components/AnalyticsSection';
@@ -42,6 +44,10 @@ export function DashboardPage() {
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme].dashboard;
 
   // API에서 진행 상태 가져오기
   useEffect(() => {
@@ -139,8 +145,8 @@ export function DashboardPage() {
   // 로딩 상태
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fffbf5] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#a08060] animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: themeColors.pageBg }}>
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: themeColors.accent }} />
       </div>
     );
   }
@@ -149,12 +155,12 @@ export function DashboardPage() {
   const hasNoProgress = progress.length === 0;
 
   return (
-    <div className="min-h-screen bg-[#fffbf5] p-6">
+    <div className="min-h-screen p-6" style={{ backgroundColor: themeColors.pageBg }}>
       <div className="max-w-4xl mx-auto">
         {/* 페이지 헤더 */}
         <div className="flex items-center gap-3 mb-8">
-          <BarChart3 className="w-8 h-8 text-[#a08060]" />
-          <h1 className="text-2xl font-bold text-[#6b5a4a]">나의 현황</h1>
+          <BarChart3 className="w-8 h-8" style={{ color: themeColors.accent }} />
+          <h1 className="text-2xl font-bold" style={{ color: themeColors.title }}>나의 현황</h1>
         </div>
 
         {error && (
@@ -165,19 +171,22 @@ export function DashboardPage() {
 
         {hasNoProgress ? (
           // 학습 시작 안내
-          <div className="bg-white rounded-xl border border-[#e5d5c7] p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#fff8f0] flex items-center justify-center">
-              <BookOpen className="w-8 h-8 text-[#a08060]" />
+          <div className="rounded-xl p-8 text-center" style={{ backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: themeColors.emptyBg }}>
+              <BookOpen className="w-8 h-8" style={{ color: themeColors.accent }} />
             </div>
-            <h2 className="text-lg font-semibold text-[#6b5a4a] mb-2">
+            <h2 className="text-lg font-semibold mb-2" style={{ color: themeColors.text }}>
               아직 학습 기록이 없습니다
             </h2>
-            <p className="text-sm text-[#937b5d] mb-6">
+            <p className="text-sm mb-6" style={{ color: themeColors.textMuted }}>
               코스를 시작하면 여기에 학습 현황이 표시됩니다.
             </p>
             <Link
               to="/courses"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-[#a08060] text-white font-medium rounded-lg hover:bg-[#8b6d4f] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 text-white font-medium rounded-lg transition-colors"
+              style={{ backgroundColor: themeColors.accent }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.accentHover}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = themeColors.accent}
             >
               코스 시작하기
               <ArrowRight className="w-4 h-4" />
@@ -313,16 +322,35 @@ function Section({
   color: 'blue' | 'yellow' | 'green';
   children: React.ReactNode;
 }) {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme].dashboard;
+
+  // 테마별 색상 매핑 (다크 테마에서는 더 진한 색상 사용)
   const colorMap = {
-    blue: 'bg-blue-50 text-blue-600 border-blue-200',
-    yellow: 'bg-yellow-50 text-yellow-600 border-yellow-200',
-    green: 'bg-green-50 text-green-600 border-green-200',
+    blue: currentTheme === 'dark'
+      ? { bg: '#1e3a5f', text: '#60a5fa', border: '#3b82f6' }
+      : { bg: '#eff6ff', text: '#2563eb', border: '#bfdbfe' },
+    yellow: currentTheme === 'dark'
+      ? { bg: '#422006', text: '#fbbf24', border: '#f59e0b' }
+      : { bg: '#fefce8', text: '#ca8a04', border: '#fde047' },
+    green: currentTheme === 'dark'
+      ? { bg: '#14532d', text: '#4ade80', border: '#22c55e' }
+      : { bg: '#f0fdf4', text: '#16a34a', border: '#bbf7d0' },
   };
 
+  const sectionColor = colorMap[color];
+
   return (
-    <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+    <div className="rounded-xl overflow-hidden" style={{ backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}>
       {/* 섹션 헤더 */}
-      <div className={`flex items-center gap-2 px-4 py-3 border-b ${colorMap[color]}`}>
+      <div
+        className="flex items-center gap-2 px-4 py-3"
+        style={{
+          backgroundColor: sectionColor.bg,
+          color: sectionColor.text,
+          borderBottom: `1px solid ${sectionColor.border}`,
+        }}
+      >
         {icon}
         <h2 className="font-semibold">{title}</h2>
       </div>
@@ -348,23 +376,27 @@ function StatCard({
   subtext?: string;
   color: 'blue' | 'green' | 'yellow' | 'gray' | 'purple';
 }) {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme].dashboard;
+
+  // 테마별 색상 매핑
   const bgMap = {
-    blue: 'bg-blue-50',
-    green: 'bg-green-50',
-    yellow: 'bg-yellow-50',
-    gray: 'bg-gray-50',
-    purple: 'bg-purple-50',
+    blue: currentTheme === 'dark' ? '#1e3a5f' : '#eff6ff',
+    green: currentTheme === 'dark' ? '#14532d' : '#f0fdf4',
+    yellow: currentTheme === 'dark' ? '#422006' : '#fefce8',
+    gray: currentTheme === 'dark' ? '#374151' : '#f9fafb',
+    purple: currentTheme === 'dark' ? '#3b0764' : '#faf5ff',
   };
 
   return (
-    <div className={`${bgMap[color]} rounded-lg p-4`}>
+    <div className="rounded-lg p-4" style={{ backgroundColor: bgMap[color] }}>
       <div className="flex items-center gap-2 mb-2">
         {icon}
-        <span className="text-sm text-[#937b5d]">{label}</span>
+        <span className="text-sm" style={{ color: themeColors.textMuted }}>{label}</span>
       </div>
-      <p className="text-2xl font-bold text-[#6b5a4a]">{value}</p>
+      <p className="text-2xl font-bold" style={{ color: themeColors.text }}>{value}</p>
       {subtext && (
-        <p className="text-xs text-[#937b5d] mt-1">{subtext}</p>
+        <p className="text-xs mt-1" style={{ color: themeColors.textMuted }}>{subtext}</p>
       )}
     </div>
   );
@@ -384,16 +416,18 @@ function LanguageCard({
   total: number;
   color: string;
 }) {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme].dashboard;
   const progress = total > 0 ? Math.round(((completed + inProgress * 0.5) / total) * 100) : 0;
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4">
+    <div className="rounded-lg p-4" style={{ backgroundColor: themeColors.statCardBg }}>
       <div className="flex items-center justify-between mb-2">
-        <span className="font-semibold text-[#6b5a4a]">{lang}</span>
-        <span className="text-sm text-[#937b5d]">{progress}%</span>
+        <span className="font-semibold" style={{ color: themeColors.text }}>{lang}</span>
+        <span className="text-sm" style={{ color: themeColors.textMuted }}>{progress}%</span>
       </div>
       {/* 프로그레스 바 */}
-      <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-2">
+      <div className="h-2 rounded-full overflow-hidden mb-2" style={{ backgroundColor: themeColors.progressBg }}>
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{
@@ -402,7 +436,7 @@ function LanguageCard({
           }}
         />
       </div>
-      <div className="flex justify-between text-xs text-[#937b5d]">
+      <div className="flex justify-between text-xs" style={{ color: themeColors.textMuted }}>
         <span>완료 {completed}</span>
         <span>진행 중 {inProgress}</span>
         <span>전체 {total}</span>
