@@ -1,5 +1,6 @@
 /**
- * 공통 유틸리티 훅
+ * Hooks Module
  */
 
 export { useEnterKey } from './useEnterKey';
+export { useTheme } from './useTheme';
