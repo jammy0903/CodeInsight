@@ -63,7 +63,7 @@ const analyzeReportSchema = z.object({
     accuracy: z.number(),
   }),
   aiQuestions: z.number(),
-  weakConcepts: z.record(z.number()), // { "포인터": 5, "배열": 3 }
+  weakConcepts: z.record(z.string(), z.number()), // { "포인터": 5, "배열": 3 }
   weekdayActivity: z.array(z.number()).length(7), // 일~토
   hourlyActivity: z.array(z.number()).length(24), // 0~23시
   recentWrongCount: z.number(),
