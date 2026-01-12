@@ -1,27 +1,92 @@
 /**
- * HomePage - Minimal Landing
- * 첫 화면: CodeInsight 큰 제목
- * 스크롤: 설명 + CTA + 특징
+ * HomePage - Linear 스타일 미니멀 랜딩
+ *
+ * 구조:
+ * 1. Hero (매트릭스 초록비 배경)
+ *    - CodeInsight 제목
+ *    - 부제
+ *    - CTA 버튼
+ *    - 만화 슬라이드 Row 1
+ * 2. 만화 슬라이드 Row 2
+ * 3. CTA 버튼
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronDown, Zap, Clock, Trophy } from 'lucide-react';
+import { ArrowRight, ChevronDown, LogIn } from 'lucide-react';
+import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { MatrixRain } from './MatrixRain';
 
+// 테마별 홈페이지 색상
+const homeColors = {
+  dark: {
+    // 배경
+    heroBg: '#09090b',           // zinc-950
+    sectionBg: '#18181b',        // zinc-900
+    // 텍스트
+    title: '#22d3ee',            // cyan-400 (파랑)
+    subtitle: '#a1a1aa',         // zinc-400
+    text: '#e4e4e7',             // zinc-200
+    textMuted: '#71717a',        // zinc-500
+    // 매트릭스 비
+    matrixColor: '#00ff41',      // 형광초록 (classic Matrix green)
+    matrixBg: 'rgba(9, 9, 11, 0.05)',
+    // 카드/아이콘
+    cardBg: '#27272a',           // zinc-800
+    iconBg: '#27272a',
+    iconColor: '#22d3ee',        // cyan-400
+  },
+  soft: {
+    heroBg: '#faf7fc',
+    sectionBg: '#f8f4ef',
+    title: '#6b5a4a',
+    subtitle: '#937b5d',
+    text: '#6b5a4a',
+    textMuted: '#a08eb0',
+    matrixColor: '#c4a574',
+    matrixBg: 'rgba(250, 247, 242, 0.05)',
+    cardBg: '#ffffff',
+    iconBg: '#e5d5c7',
+    iconColor: '#a08060',
+  },
+  minimal: {
+    heroBg: '#faf7f2',
+    sectionBg: '#f8f4ef',
+    title: '#6b5a4a',
+    subtitle: '#937b5d',
+    text: '#6b5a4a',
+    textMuted: '#a08060',
+    matrixColor: '#c4a574',
+    matrixBg: 'rgba(250, 247, 242, 0.05)',
+    cardBg: '#ffffff',
+    iconBg: '#e5d5c7',
+    iconColor: '#a08060',
+  },
+};
+
 // 스토리 SVG 패널 컴포넌트 (Row 1용)
-const StoryPanel = memo(({ num }: { num: number }) => {
+interface StoryPanelProps {
+  num: number;
+  theme: 'dark' | 'soft' | 'minimal';
+}
+
+const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
+  // 테마별 SVG 색상
+  const svgColors = theme === 'dark'
+    ? { bg: '#27272a', text: '#e4e4e7', subtext: '#a1a1aa', border: '#3f3f46', accent: '#22d3ee' }
+    : { bg: '#faf7f2', text: '#6b5a4a', subtext: '#937b5d', border: '#e5d5c7', accent: '#a08060' };
+
   const panels: Record<number, React.ReactNode> = {
     // 1. 코드 작성
     1: (
       <svg viewBox="0 0 300 300" className="w-full h-full">
         {/* 배경 */}
-        <rect width="300" height="300" fill="#faf7f2" />
+        <rect width="300" height="300" fill={svgColors.bg} />
 
         {/* 제목 */}
-        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           1. 코드 작성 ✏️
         </text>
 
@@ -58,31 +123,31 @@ const StoryPanel = memo(({ num }: { num: number }) => {
         </rect>
 
         {/* 말풍선 */}
-        <ellipse cx="220" cy="250" rx="65" ry="28" fill="white" stroke="#e5d5c7" strokeWidth="2" />
+        <ellipse cx="220" cy="250" rx="65" ry="28" fill="white" stroke={svgColors.border} strokeWidth="2" />
         <circle cx="175" cy="230" r="5" fill="white" />
         <circle cx="165" cy="220" r="3" fill="white" />
-        <text x="220" y="255" textAnchor="middle" fontSize="14" fill="#6b5a4a" fontFamily="var(--font-handwriting)">코드를 써볼까?</text>
+        <text x="220" y="255" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">코드를 써볼까?</text>
       </svg>
     ),
 
     // 2. 실행 버튼
     2: (
       <svg viewBox="0 0 300 300" className="w-full h-full">
-        <rect width="300" height="300" fill="#faf7f2" />
+        <rect width="300" height="300" fill={svgColors.bg} />
 
-        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           2. 실행! ▶️
         </text>
 
         {/* 큰 재생 버튼 */}
-        <circle cx="150" cy="140" r="60" fill="#a08060" />
+        <circle cx="150" cy="140" r="60" fill={svgColors.accent} />
         <circle cx="150" cy="140" r="55" fill="#c4a574">
           <animate attributeName="r" values="55;58;55" dur="1.5s" repeatCount="indefinite" />
         </circle>
         <polygon points="135,115 135,165 175,140" fill="white" />
 
         {/* RUN 텍스트 */}
-        <text x="150" y="225" textAnchor="middle" fontSize="28" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="225" textAnchor="middle" fontSize="28" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           RUN!
         </text>
 
@@ -93,37 +158,37 @@ const StoryPanel = memo(({ num }: { num: number }) => {
         <text x="200" y="190" fontSize="20">✨</text>
 
         {/* 말풍선 */}
-        <ellipse cx="150" cy="270" rx="60" ry="22" fill="white" stroke="#e5d5c7" strokeWidth="2" />
-        <text x="150" y="275" textAnchor="middle" fontSize="14" fill="#6b5a4a" fontFamily="var(--font-handwriting)">클릭해서 실행!</text>
+        <ellipse cx="150" cy="270" rx="60" ry="22" fill="white" stroke={svgColors.border} strokeWidth="2" />
+        <text x="150" y="275" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">클릭해서 실행!</text>
       </svg>
     ),
 
     // 3. Step 실행
     3: (
       <svg viewBox="0 0 300 300" className="w-full h-full">
-        <rect width="300" height="300" fill="#faf7f2" />
+        <rect width="300" height="300" fill={svgColors.bg} />
 
-        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           3. 한 줄씩 실행 👀
         </text>
 
         {/* 코드 박스 */}
-        <rect x="30" y="50" width="240" height="140" rx="12" fill="white" stroke="#e5d5c7" strokeWidth="2" />
+        <rect x="30" y="50" width="240" height="140" rx="12" fill="white" stroke={svgColors.border} strokeWidth="2" />
 
         {/* 라인 번호 */}
-        <text x="45" y="80" fontSize="12" fill="#a08060" fontFamily="monospace">1</text>
-        <text x="45" y="105" fontSize="12" fill="#a08060" fontFamily="monospace">2</text>
-        <text x="45" y="130" fontSize="12" fill="#a08060" fontFamily="monospace">3</text>
-        <text x="45" y="155" fontSize="12" fill="#a08060" fontFamily="monospace">4</text>
+        <text x="45" y="80" fontSize="12" fill={svgColors.accent} fontFamily="monospace">1</text>
+        <text x="45" y="105" fontSize="12" fill={svgColors.accent} fontFamily="monospace">2</text>
+        <text x="45" y="130" fontSize="12" fill={svgColors.accent} fontFamily="monospace">3</text>
+        <text x="45" y="155" fontSize="12" fill={svgColors.accent} fontFamily="monospace">4</text>
 
         {/* 현재 줄 하이라이트 */}
         <rect x="55" y="90" width="200" height="22" rx="4" fill="#fff3cd" />
 
         {/* 코드 */}
-        <text x="65" y="80" fontSize="13" fill="#6b5a4a" fontFamily="monospace">int x = 5;</text>
-        <text x="65" y="105" fontSize="13" fill="#6b5a4a" fontFamily="monospace" fontWeight="bold">int y = x + 3;</text>
-        <text x="65" y="130" fontSize="13" fill="#6b5a4a" fontFamily="monospace">printf("%d", y);</text>
-        <text x="65" y="155" fontSize="13" fill="#6b5a4a" fontFamily="monospace">return 0;</text>
+        <text x="65" y="80" fontSize="13" fill={svgColors.text} fontFamily="monospace">int x = 5;</text>
+        <text x="65" y="105" fontSize="13" fill={svgColors.text} fontFamily="monospace" fontWeight="bold">int y = x + 3;</text>
+        <text x="65" y="130" fontSize="13" fill={svgColors.text} fontFamily="monospace">printf("%d", y);</text>
+        <text x="65" y="155" fontSize="13" fill={svgColors.text} fontFamily="monospace">return 0;</text>
 
         {/* 화살표 포인터 */}
         <polygon points="25,101 40,95 40,107" fill="#ff6b6b" />
@@ -139,45 +204,45 @@ const StoryPanel = memo(({ num }: { num: number }) => {
         <text x="205" y="228" textAnchor="middle" fontSize="20">⏹️</text>
 
         {/* 말풍선 */}
-        <ellipse cx="150" cy="270" rx="70" ry="22" fill="white" stroke="#e5d5c7" strokeWidth="2" />
-        <text x="150" y="275" textAnchor="middle" fontSize="14" fill="#6b5a4a" fontFamily="var(--font-handwriting)">지금 이 줄 실행중!</text>
+        <ellipse cx="150" cy="270" rx="70" ry="22" fill="white" stroke={svgColors.border} strokeWidth="2" />
+        <text x="150" y="275" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">지금 이 줄 실행중!</text>
       </svg>
     ),
 
     // 4. 메모리 변화
     4: (
       <svg viewBox="0 0 300 300" className="w-full h-full">
-        <rect width="300" height="300" fill="#faf7f2" />
+        <rect width="300" height="300" fill={svgColors.bg} />
 
-        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           4. 메모리 변화 🧠
         </text>
 
         {/* Stack 라벨 */}
-        <rect x="40" y="55" width="100" height="30" rx="8" fill="#a08060" />
+        <rect x="40" y="55" width="100" height="30" rx="8" fill={svgColors.accent} />
         <text x="90" y="75" textAnchor="middle" fontSize="14" fill="white" fontWeight="bold">Stack</text>
 
         {/* Stack 영역 */}
-        <rect x="40" y="90" width="100" height="120" rx="8" fill="white" stroke="#e5d5c7" strokeWidth="2" />
+        <rect x="40" y="90" width="100" height="120" rx="8" fill="white" stroke={svgColors.border} strokeWidth="2" />
 
         {/* 변수 박스들 */}
         <rect x="50" y="100" width="80" height="35" rx="6" fill="#fff3cd" stroke="#ffc107" strokeWidth="2" />
-        <text x="65" y="122" fontSize="14" fill="#6b5a4a" fontFamily="monospace">x:</text>
+        <text x="65" y="122" fontSize="14" fill={svgColors.text} fontFamily="monospace">x:</text>
         <text x="100" y="122" fontSize="16" fill="#e74c3c" fontWeight="bold" fontFamily="monospace">5</text>
 
         <rect x="50" y="145" width="80" height="35" rx="6" fill="#d4edda" stroke="#28a745" strokeWidth="2">
           <animate attributeName="opacity" values="0;1" dur="0.5s" fill="freeze" />
         </rect>
-        <text x="65" y="167" fontSize="14" fill="#6b5a4a" fontFamily="monospace">y:</text>
+        <text x="65" y="167" fontSize="14" fill={svgColors.text} fontFamily="monospace">y:</text>
         <text x="100" y="167" fontSize="16" fill="#28a745" fontWeight="bold" fontFamily="monospace">8</text>
 
         {/* Heap 라벨 */}
-        <rect x="160" y="55" width="100" height="30" rx="8" fill="#937b5d" />
+        <rect x="160" y="55" width="100" height="30" rx="8" fill={svgColors.subtext} />
         <text x="210" y="75" textAnchor="middle" fontSize="14" fill="white" fontWeight="bold">Heap</text>
 
         {/* Heap 영역 */}
-        <rect x="160" y="90" width="100" height="120" rx="8" fill="white" stroke="#e5d5c7" strokeWidth="2" />
-        <text x="210" y="155" textAnchor="middle" fontSize="12" fill="#a08060">(비어있음)</text>
+        <rect x="160" y="90" width="100" height="120" rx="8" fill="white" stroke={svgColors.border} strokeWidth="2" />
+        <text x="210" y="155" textAnchor="middle" fontSize="12" fill={svgColors.accent}>(비어있음)</text>
 
         {/* 화살표 애니메이션 */}
         <path d="M 90 225 L 90 195" stroke="#ff6b6b" strokeWidth="3" fill="none" markerEnd="url(#arrowhead)" />
@@ -188,19 +253,19 @@ const StoryPanel = memo(({ num }: { num: number }) => {
         </defs>
 
         {/* 말풍선 */}
-        <ellipse cx="200" cy="255" rx="75" ry="28" fill="white" stroke="#e5d5c7" strokeWidth="2" />
+        <ellipse cx="200" cy="255" rx="75" ry="28" fill="white" stroke={svgColors.border} strokeWidth="2" />
         <circle cx="140" cy="235" r="5" fill="white" />
         <circle cx="125" cy="225" r="3" fill="white" />
-        <text x="200" y="260" textAnchor="middle" fontSize="14" fill="#6b5a4a" fontFamily="var(--font-handwriting)">메모리가 보여요!</text>
+        <text x="200" y="260" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">메모리가 보여요!</text>
       </svg>
     ),
 
     // 5. AI 해설
     5: (
       <svg viewBox="0 0 300 300" className="w-full h-full">
-        <rect width="300" height="300" fill="#faf7f2" />
+        <rect width="300" height="300" fill={svgColors.bg} />
 
-        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           5. AI가 설명해줘요 🤖
         </text>
 
@@ -211,10 +276,10 @@ const StoryPanel = memo(({ num }: { num: number }) => {
         {/* 눈 */}
         <circle cx="130" cy="110" r="12" fill="white" />
         <circle cx="170" cy="110" r="12" fill="white" />
-        <circle cx="132" cy="112" r="6" fill="#6b5a4a">
+        <circle cx="132" cy="112" r="6" fill={svgColors.text}>
           <animate attributeName="cx" values="132;135;132" dur="2s" repeatCount="indefinite" />
         </circle>
-        <circle cx="172" cy="112" r="6" fill="#6b5a4a">
+        <circle cx="172" cy="112" r="6" fill={svgColors.text}>
           <animate attributeName="cx" values="172;175;172" dur="2s" repeatCount="indefinite" />
         </circle>
 
@@ -232,10 +297,10 @@ const StoryPanel = memo(({ num }: { num: number }) => {
         <polygon points="100,185 115,170 130,185" fill="white" stroke="#c4a574" strokeWidth="2" />
         <rect x="100" y="183" width="32" height="5" fill="white" />
 
-        <text x="150" y="210" textAnchor="middle" fontSize="13" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="210" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           x+3을 계산해서
         </text>
-        <text x="150" y="230" textAnchor="middle" fontSize="13" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="230" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           y에 저장했어요! 💡
         </text>
 
@@ -249,49 +314,49 @@ const StoryPanel = memo(({ num }: { num: number }) => {
     // 6. 퀴즈
     6: (
       <svg viewBox="0 0 300 300" className="w-full h-full">
-        <rect width="300" height="300" fill="#faf7f2" />
+        <rect width="300" height="300" fill={svgColors.bg} />
 
-        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           6. 퀴즈 타임! 📝
         </text>
 
         {/* 질문 박스 */}
         <rect x="30" y="50" width="240" height="60" rx="12" fill="white" stroke="#c4a574" strokeWidth="2" />
-        <text x="150" y="75" textAnchor="middle" fontSize="15" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="75" textAnchor="middle" fontSize="15" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           Q. y의 최종 값은?
         </text>
-        <text x="150" y="98" textAnchor="middle" fontSize="13" fill="#937b5d" fontFamily="monospace">
+        <text x="150" y="98" textAnchor="middle" fontSize="13" fill={svgColors.subtext} fontFamily="monospace">
           int x=5; int y=x+3;
         </text>
 
         {/* 선택지들 */}
-        <rect x="40" y="125" width="100" height="45" rx="10" fill="white" stroke="#e5d5c7" strokeWidth="2" />
-        <text x="90" y="153" textAnchor="middle" fontSize="18" fill="#6b5a4a" fontWeight="bold">A. 5</text>
+        <rect x="40" y="125" width="100" height="45" rx="10" fill="white" stroke={svgColors.border} strokeWidth="2" />
+        <text x="90" y="153" textAnchor="middle" fontSize="18" fill={svgColors.text} fontWeight="bold">A. 5</text>
 
-        <rect x="160" y="125" width="100" height="45" rx="10" fill="white" stroke="#e5d5c7" strokeWidth="2" />
-        <text x="210" y="153" textAnchor="middle" fontSize="18" fill="#6b5a4a" fontWeight="bold">B. 8</text>
+        <rect x="160" y="125" width="100" height="45" rx="10" fill="white" stroke={svgColors.border} strokeWidth="2" />
+        <text x="210" y="153" textAnchor="middle" fontSize="18" fill={svgColors.text} fontWeight="bold">B. 8</text>
 
-        <rect x="40" y="180" width="100" height="45" rx="10" fill="white" stroke="#e5d5c7" strokeWidth="2" />
-        <text x="90" y="208" textAnchor="middle" fontSize="18" fill="#6b5a4a" fontWeight="bold">C. 3</text>
+        <rect x="40" y="180" width="100" height="45" rx="10" fill="white" stroke={svgColors.border} strokeWidth="2" />
+        <text x="90" y="208" textAnchor="middle" fontSize="18" fill={svgColors.text} fontWeight="bold">C. 3</text>
 
-        <rect x="160" y="180" width="100" height="45" rx="10" fill="white" stroke="#e5d5c7" strokeWidth="2" />
-        <text x="210" y="208" textAnchor="middle" fontSize="18" fill="#6b5a4a" fontWeight="bold">D. 15</text>
+        <rect x="160" y="180" width="100" height="45" rx="10" fill="white" stroke={svgColors.border} strokeWidth="2" />
+        <text x="210" y="208" textAnchor="middle" fontSize="18" fill={svgColors.text} fontWeight="bold">D. 15</text>
 
         {/* 생각하는 이모지 */}
         <text x="150" y="265" textAnchor="middle" fontSize="30">🤔</text>
 
         {/* 말풍선 */}
-        <ellipse cx="230" cy="265" rx="55" ry="22" fill="white" stroke="#e5d5c7" strokeWidth="2" />
-        <text x="230" y="270" textAnchor="middle" fontSize="13" fill="#6b5a4a" fontFamily="var(--font-handwriting)">음... 뭘까?</text>
+        <ellipse cx="230" cy="265" rx="55" ry="22" fill="white" stroke={svgColors.border} strokeWidth="2" />
+        <text x="230" y="270" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">음... 뭘까?</text>
       </svg>
     ),
 
     // 7. 정답 확인
     7: (
       <svg viewBox="0 0 300 300" className="w-full h-full">
-        <rect width="300" height="300" fill="#faf7f2" />
+        <rect width="300" height="300" fill={svgColors.bg} />
 
-        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           7. 정답! ✅
         </text>
 
@@ -310,7 +375,7 @@ const StoryPanel = memo(({ num }: { num: number }) => {
 
         {/* 설명 */}
         <rect x="40" y="235" width="220" height="40" rx="10" fill="white" stroke="#28a745" strokeWidth="2" />
-        <text x="150" y="260" textAnchor="middle" fontSize="13" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="260" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           x(5) + 3 = 8 이에요!
         </text>
 
@@ -327,9 +392,9 @@ const StoryPanel = memo(({ num }: { num: number }) => {
     // 8. 완료
     8: (
       <svg viewBox="0 0 300 300" className="w-full h-full">
-        <rect width="300" height="300" fill="#faf7f2" />
+        <rect width="300" height="300" fill={svgColors.bg} />
 
-        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#6b5a4a" fontFamily="var(--font-handwriting)">
+        <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
           8. 학습 완료! 🎓
         </text>
 
@@ -354,7 +419,7 @@ const StoryPanel = memo(({ num }: { num: number }) => {
         <text x="150" y="224" textAnchor="middle" fontSize="12" fill="white" fontWeight="bold">100%</text>
 
         {/* 완료 메시지 */}
-        <text x="150" y="260" textAnchor="middle" fontSize="20" fill="#6b5a4a" fontWeight="bold" fontFamily="var(--font-handwriting)">
+        <text x="150" y="260" textAnchor="middle" fontSize="20" fill={svgColors.text} fontWeight="bold" fontFamily="var(--font-handwriting)">
           Day 1 완료!
         </text>
 
@@ -369,9 +434,13 @@ const StoryPanel = memo(({ num }: { num: number }) => {
     ),
   };
 
+  const wrapperStyle = theme === 'dark'
+    ? 'bg-zinc-800 border-zinc-700'
+    : 'bg-white border-[#e5d5c7]';
+
   return (
-    <div className="w-[300px] h-[300px] bg-white border-2 border-[#e5d5c7] rounded-xl overflow-hidden relative shrink-0">
-      {panels[num] || <div className="w-full h-full bg-[#f8f4ef]" />}
+    <div className={`w-[300px] h-[300px] border-2 rounded-xl overflow-hidden relative shrink-0 ${wrapperStyle}`}>
+      {panels[num] || <div className="w-full h-full" style={{ backgroundColor: svgColors.bg }} />}
     </div>
   );
 });
@@ -432,6 +501,8 @@ const ComicPanel = memo(({ num, getImage, speeches, showImage = true }: { num: n
 ComicPanel.displayName = 'ComicPanel';
 
 export default function HomePage() {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = homeColors[currentTheme];
   const { firebaseUser } = useStore();
   const isLoggedIn = !!firebaseUser;
 
@@ -459,24 +530,48 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen w-full">
+    <main className="min-h-screen w-full" style={{ backgroundColor: colors.heroBg }}>
       {/* Hero + Value Proposition - 매트릭스 비가 내리는 영역 */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden" style={{ backgroundColor: colors.heroBg }}>
         {/* 매트릭스 배경 애니메이션 - 전체 영역 커버 */}
-        <MatrixRain color="#c4a574" fontSize={14} speed={40} />
+        <MatrixRain color={colors.matrixColor} bgColor={colors.matrixBg} fontSize={14} speed={40} />
 
         {/* Hero Section */}
         <section className="w-full flex flex-col items-center relative py-12">
           <div className="text-center relative z-10" style={{ marginTop: '30px' }}>
             {/* 큰 제목 */}
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-[#6b5a4a] tracking-tight">
+            <h1
+              className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight"
+              style={{
+                color: colors.title,
+                textShadow: currentTheme === 'dark' ? '0 0 30px rgba(34, 211, 238, 0.6)' : 'none',
+              }}
+            >
               CodeInsight
             </h1>
 
             {/* 부제 */}
-            <p className="text-lg md:text-xl text-[#937b5d]" style={{ marginTop: '12px' }}>
+            <p className="text-lg md:text-xl" style={{ marginTop: '12px', color: colors.subtitle }}>
               코드의 원리를 눈으로 이해하다
             </p>
+
+            {/* CTA 버튼 */}
+            <div className="flex items-center justify-center gap-4" style={{ marginTop: '32px' }}>
+              <Link to="/courses">
+                <button className="btn-primary px-8 py-4 rounded-lg inline-flex items-center gap-2 text-base">
+                  코스 둘러보기
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </Link>
+              {!isLoggedIn && (
+                <Link to="/login">
+                  <button className="btn-secondary px-8 py-4 rounded-lg inline-flex items-center gap-2 text-base">
+                    <LogIn className="w-5 h-5" />
+                    로그인
+                  </button>
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* 이미지 슬라이드 1행 - 제목과 scroll 사이 */}
@@ -491,7 +586,7 @@ export default function HomePage() {
               {[...Array(2)].map((_, setIndex) => (
                 <div key={setIndex} className="flex gap-6 shrink-0">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                    <StoryPanel key={`${setIndex}-${num}`} num={num} />
+                    <StoryPanel key={`${setIndex}-${num}`} num={num} theme={currentTheme} />
                   ))}
                 </div>
               ))}
@@ -499,50 +594,21 @@ export default function HomePage() {
           </div>
 
           {/* 스크롤 표시 */}
-          <div className="flex flex-col items-center gap-2 text-[#a08060] animate-bounce mt-40 mb-32">
+          <div className="flex flex-col items-center gap-2 animate-bounce mt-16 mb-8" style={{ color: colors.textMuted }}>
             <span className="text-sm">scroll</span>
             <ChevronDown className="w-5 h-5" />
           </div>
         </section>
 
-        {/* Value Proposition - 메인 메시지 */}
-        <section className="w-full grid place-items-center px-6 relative z-10" style={{ paddingTop: '60px', paddingBottom: '30px' }}>
-          <div className="max-w-2xl text-center space-y-8">
-            <h2 className="text-3xl md:text-5xl font-bold text-[#6b5a4a] leading-tight">
-              코드가 어떻게<br />동작하는지 보세요
-            </h2>
-
-            <p className="text-lg text-[#937b5d] leading-relaxed">
-              포인터, 메모리, 참조...<br />
-              더 이상 외우지 마세요. 시각화로 진짜 이해하세요.
-            </p>
-
-            {/* CTA 버튼 */}
-            <div className="pt-4 flex justify-center">
-              {isLoggedIn ? (
-                <Link to="/courses">
-                  <button className="btn-primary text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2">
-                    학습 시작하기
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </Link>
-              ) : (
-                <Link to="/login">
-                  <button className="btn-primary text-lg px-8 py-4 rounded-xl inline-flex items-center gap-2">
-                    시작하기
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </Link>
-              )}
-            </div>
-          </div>
-        </section>
       </div>
 
-      {/* 핵심 특징 - 만화 + 특징 카드 */}
-      <section className="w-full grid place-items-center px-4 bg-[#f8f4ef]" style={{ marginTop: '150px', paddingTop: '80px', paddingBottom: '80px' }}>
-        <div className="w-full space-y-24">
-          {/* 만화 컨베이어 벨트 - 2행만 (1행은 Hero로 이동) */}
+      {/* 만화 슬라이드 Row 2 */}
+      <section
+        className="w-full grid place-items-center px-4"
+        style={{ paddingTop: '60px', paddingBottom: '60px', backgroundColor: colors.sectionBg }}
+      >
+        <div className="w-full">
+          {/* 만화 컨베이어 벨트 Row 2 */}
           <div className="relative overflow-hidden">
             <motion.div
               className="flex gap-6"
@@ -561,86 +627,18 @@ export default function HomePage() {
             </motion.div>
           </div>
 
-          {/* 특징 카드 3개 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center" style={{ marginTop: '120px' }}>
-            {/* 인터렉티브 */}
-            <div className="space-y-4 p-6">
-              <div className="w-16 h-16 mx-auto bg-[#e5d5c7] rounded-2xl flex items-center justify-center">
-                <Zap className="w-8 h-8 text-[#a08060]" />
-              </div>
-              <h3 className="text-xl font-bold text-[#6b5a4a]">인터렉티브 학습</h3>
-              <p className="text-[#937b5d]">
-                읽기만 하는 지루한 강의 NO<br />
-                직접 조작하며 배우세요
-              </p>
-            </div>
-
-            {/* ADHD 친화 */}
-            <div className="space-y-4 p-6">
-              <div className="w-16 h-16 mx-auto bg-[#e5d5c7] rounded-2xl flex items-center justify-center">
-                <Clock className="w-8 h-8 text-[#a08060]" />
-              </div>
-              <h3 className="text-xl font-bold text-[#6b5a4a]">하루 10분이면 충분</h3>
-              <p className="text-[#937b5d]">
-                집중력 걱정 마세요<br />
-                짧고 강렬하게, ADHD도 OK
-              </p>
-            </div>
-
-            {/* 빠른 완성 */}
-            <div className="space-y-4 p-6">
-              <div className="w-16 h-16 mx-auto bg-[#e5d5c7] rounded-2xl flex items-center justify-center">
-                <Trophy className="w-8 h-8 text-[#a08060]" />
-              </div>
-              <h3 className="text-xl font-bold text-[#6b5a4a]">2주면 C언어 기초 완성</h3>
-              <p className="text-[#937b5d]">
-                포인터, 메모리, 배열까지<br />
-                핵심만 빠르게 마스터
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 학습 방식 - 시각화, AI, 실습 */}
-      <section className="w-full grid place-items-center px-6" style={{ marginTop: '150px', paddingTop: '120px', paddingBottom: '120px' }}>
-        <div className="max-w-3xl w-full text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-[#6b5a4a] mb-16">
-            이렇게 배워요
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-3">
-              <div className="text-5xl">👁️</div>
-              <h3 className="text-lg font-bold text-[#6b5a4a]">시각화</h3>
-              <p className="text-sm text-[#937b5d]">메모리 상태를<br />눈으로 확인</p>
-            </div>
-            <div className="space-y-3">
-              <div className="text-5xl">🤖</div>
-              <h3 className="text-lg font-bold text-[#6b5a4a]">AI 해설</h3>
-              <p className="text-sm text-[#937b5d]">왜 이렇게 동작하는지<br />친절하게 설명</p>
-            </div>
-            <div className="space-y-3">
-              <div className="text-5xl">✏️</div>
-              <h3 className="text-lg font-bold text-[#6b5a4a]">미세 실습</h3>
-              <p className="text-sm text-[#937b5d]">결과 예측으로<br />개념 확인</p>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* 마지막 CTA */}
-      <section className="w-full grid place-items-center px-6 bg-[#f8f4ef]" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
-        <div className="text-center space-y-8">
-          <h2 className="text-5xl md:text-7xl font-bold text-[#6b5a4a]">
-            지금 바로 시작하세요
-          </h2>
-          <p className="text-xl text-[#937b5d]">
-            가입 없이 바로 체험 가능
-          </p>
+      <section
+        className="w-full grid place-items-center px-6"
+        style={{ paddingTop: '60px', paddingBottom: '80px', backgroundColor: colors.sectionBg }}
+      >
+        <div className="text-center">
           <Link to="/courses">
-            <button className="btn-primary text-lg px-10 py-4 rounded-xl inline-flex items-center gap-2">
-              코스 둘러보기
+            <button className="btn-primary px-8 py-4 rounded-lg inline-flex items-center gap-2 text-base">
+              시작하기
               <ArrowRight className="w-5 h-5" />
             </button>
           </Link>
