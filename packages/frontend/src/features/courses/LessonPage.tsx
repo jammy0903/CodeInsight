@@ -16,6 +16,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { getLessonFull, getChapterWithLessons, updateProgress } from '@/services/courses';
+import {
+  startLessonActivity,
+  endLessonActivity,
+  endLessonActivityBeacon,
+  recordQuizAttempt,
+} from '@/services/analytics';
 import { useEnterKey } from '@/hooks';
 import { simulatorService } from '@/services/simulator';
 import { useLessonHistoryStore } from '@/stores/lessonHistoryStore';
@@ -287,13 +293,16 @@ function CompletedView({
  */
 function QuizCardAdapter({
   quiz,
+  lessonId,
   onComplete,
 }: {
   quiz: Quiz;
+  lessonId?: string;
   onComplete: (isCorrect: boolean) => void;
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const startTimeRef = useRef<number>(Date.now()); // 퀴즈 풀이 시간 측정
 
   const options = quiz.options || [];
   // quiz.answer는 정답 인덱스를 나타내는 문자열 (예: "2")
@@ -303,6 +312,26 @@ function QuizCardAdapter({
   const handleSubmit = () => {
     if (selected === null) return;
     setSubmitted(true);
+
+    // 분석 리포트용 퀴즈 시도 기록 (비동기, 실패해도 UX 영향 없음)
+    const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
+    recordQuizAttempt({
+      quizId: quiz.id,
+      userAnswer: String(selected),
+      isCorrect: selected === correctIndex,
+      timeSpent,
+    }).catch(() => {
+      // 로그인 안 됐거나 네트워크 오류 - 무시
+    });
+
+    if (import.meta.env.DEV) {
+      console.log('[Analytics] Quiz attempt:', {
+        quizId: quiz.id,
+        lessonId,
+        isCorrect: selected === correctIndex,
+        timeSpent,
+      });
+    }
   };
 
   const handleContinue = () => {
@@ -554,6 +583,38 @@ export function LessonPage() {
     return () => {
       if (stepSaveTimerRef.current) {
         clearTimeout(stepSaveTimerRef.current);
+      }
+    };
+  }, [lessonId]);
+
+  // === Activity Tracking (분석 리포트용 체류 시간) ===
+  useEffect(() => {
+    if (!lessonId) return;
+
+    let activityId: string | null = null;
+
+    // 활동 시작 (로그인 사용자만 서버에 저장됨)
+    startLessonActivity(lessonId).then((id) => {
+      activityId = id;
+      if (import.meta.env.DEV && id) {
+        console.log('[Analytics] Activity started:', id);
+      }
+    });
+
+    // 페이지 이탈 시 활동 종료 (sendBeacon - 브라우저가 보장)
+    const handleUnload = () => {
+      if (activityId) {
+        endLessonActivityBeacon(activityId);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      // 정상 언마운트 시에도 종료 (SPA 내 다른 페이지 이동)
+      if (activityId) {
+        endLessonActivity(activityId);
       }
     };
   }, [lessonId]);
@@ -1046,6 +1107,8 @@ export function LessonPage() {
                           currentLine: currentStep?.line,
                         }}
                         selectedText={selection?.text}
+                        lessonId={lessonId}
+                        contextType="lesson"
                       />
                     </div>
                   )}
@@ -1068,7 +1131,7 @@ export function LessonPage() {
                 🧠 퀴즈
               </DialogTitle>
             </DialogHeader>
-            <QuizCardAdapter quiz={quiz} onComplete={handleQuizComplete} />
+            <QuizCardAdapter quiz={quiz} lessonId={lessonId} onComplete={handleQuizComplete} />
           </DialogContent>
         </Dialog>
       )}

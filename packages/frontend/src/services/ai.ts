@@ -176,12 +176,14 @@ interface StreamChunk {
  * @param history 대화 기록
  * @param context 코스 컨텍스트 (optional)
  * @param onChunk 청크 수신 콜백
+ * @param options 분석 리포트용 옵션 (lessonId, contextType)
  */
 export async function askAIStream(
   message: string,
   history: ChatMessage[] = [],
   context?: ChatContext,
-  onChunk?: (content: string) => void
+  onChunk?: (content: string) => void,
+  options?: ChatOptions
 ): Promise<string> {
   const url = `${config.api.baseUrl}${config.api.endpoints.aiChatStream}`;
 
@@ -195,6 +197,9 @@ export async function askAIStream(
         message,
         history,
         context,
+        // 분석 리포트용 필드 (로그인 시 ChatHistory 저장에 사용)
+        lessonId: options?.lessonId,
+        contextType: options?.contextType,
       }),
     });
 

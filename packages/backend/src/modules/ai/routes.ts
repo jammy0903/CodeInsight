@@ -422,7 +422,8 @@ router.post('/chat', optionalDbUser, async (req, res) => {
 });
 
 // === 스트리밍 Q&A 채팅 엔드포인트 (SSE) ===
-router.post('/chat/stream', async (req, res) => {
+// optionalDbUser: 로그인 안 해도 사용 가능, 로그인 시 ChatHistory 저장
+router.post('/chat/stream', optionalDbUser, async (req, res) => {
   try {
     const parsed = chatRequestSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -432,8 +433,30 @@ router.post('/chat/stream', async (req, res) => {
       });
     }
 
-    const { message, history, context } = parsed.data;
+    const { message, history, context, lessonId, contextType } = parsed.data;
     const provider = getCurrentProvider();
+    const userId = req.user?.dbUser?.id;
+
+    // 스트리밍 응답 수집 (ChatHistory 저장용)
+    let fullResponse = '';
+
+    // ChatHistory 저장 헬퍼 (스트리밍 완료 후 호출)
+    const saveChatHistory = () => {
+      if (userId && fullResponse) {
+        prisma.chatHistory.create({
+          data: {
+            userId,
+            lessonId: lessonId || null,
+            context: contextType || null,
+            question: message,
+            answer: fullResponse,
+            tokens: null, // 스트리밍에서는 토큰 수 알 수 없음
+          },
+        }).catch((err) => {
+          logger.error('Failed to save chat history:', err);
+        });
+      }
+    };
 
     // 스트리밍 지원 확인
     if (!provider.streamChat) {
@@ -443,6 +466,9 @@ router.post('/chat/stream', async (req, res) => {
         history,
         systemPrompt: buildChatPrompt(context),
       });
+
+      fullResponse = response.content;
+      saveChatHistory();
 
       // SSE 형식으로 한 번에 전송
       res.setHeader('Content-Type', 'text/event-stream');
@@ -467,9 +493,16 @@ router.post('/chat/stream', async (req, res) => {
         systemPrompt: buildChatPrompt(context),
       },
       (chunk) => {
+        // 청크 내용 수집
+        if (chunk.content) {
+          fullResponse += chunk.content;
+        }
         res.write(`data: ${JSON.stringify(chunk)}\n\n`);
       }
     );
+
+    // 스트리밍 완료 후 ChatHistory 저장
+    saveChatHistory();
 
     res.end();
   } catch (error) {

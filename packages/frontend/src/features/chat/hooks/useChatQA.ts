@@ -21,6 +21,9 @@ interface StoredChat {
 interface UseChatQAOptions {
   context?: ChatContext;
   selectedText?: string;  // 사용자가 선택한 코드
+  // 분석 리포트용 옵션
+  lessonId?: string;
+  contextType?: 'lesson' | 'playground' | 'general';
 }
 
 const STORAGE_PREFIX = 'codeinsight_chat_';
@@ -78,7 +81,7 @@ function saveMessages(key: string, messages: Message[]): void {
 }
 
 export function useChatQA(options: UseChatQAOptions = {}) {
-  const { context, selectedText } = options;
+  const { context, selectedText, lessonId, contextType } = options;
 
   const storageKey = getStorageKey(context);
 
@@ -148,7 +151,9 @@ export function useChatQA(options: UseChatQAOptions = {}) {
         (chunk) => {
           // 청크 수신 시 실시간 업데이트
           setStreamingContent((prev) => prev + chunk);
-        }
+        },
+        // 분석 리포트용 옵션 (로그인 시 ChatHistory 저장)
+        lessonId || contextType ? { lessonId, contextType } : undefined
       );
 
       // 스트리밍 완료 후 메시지로 추가
@@ -168,7 +173,7 @@ export function useChatQA(options: UseChatQAOptions = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, context, selectedText, addMessage]);
+  }, [input, isLoading, messages, context, selectedText, addMessage, lessonId, contextType]);
 
   // Enter 키 핸들러
   const handleKeyDown = useCallback(

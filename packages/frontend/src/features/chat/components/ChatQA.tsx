@@ -18,6 +18,9 @@ interface ChatQAProps {
   selectedText?: string;  // 사용자가 선택한 코드
   disabled?: boolean;
   disabledMessage?: string;
+  // 분석 리포트용 옵션
+  lessonId?: string;
+  contextType?: 'lesson' | 'playground' | 'general';
 }
 
 export function ChatQA({
@@ -25,6 +28,8 @@ export function ChatQA({
   selectedText,
   disabled = false,
   disabledMessage = '질문할 수 없습니다.',
+  lessonId,
+  contextType = 'general',
 }: ChatQAProps) {
   const {
     input,
@@ -37,7 +42,7 @@ export function ChatQA({
     sendMessage,
     handleKeyDown,
     clearMessages,
-  } = useChatQA({ context, selectedText });
+  } = useChatQA({ context, selectedText, lessonId, contextType });
 
   return (
     <div className="flex flex-col h-full">
