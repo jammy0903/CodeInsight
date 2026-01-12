@@ -1,0 +1,205 @@
+{
+  "lessonId": "js-2-3",
+  "title": "호이스팅 (Hoisting)",
+  "concept": "JavaScript는 선언을 스코프 최상단으로 끌어올린다. 단, 초기화는 끌어올리지 않는다",
+  "content": {
+    "code": "console.log(a);\nconsole.log(b);\nconsole.log(c);\n\nvar a = 1;\nlet b = 2;\nconst c = 3;\n\nconsole.log(a, b, c);",
+    "steps": [
+      {
+        "line": 0,
+        "title": "코드 실행 전: 호이스팅 발생",
+        "explanation": "JavaScript 엔진은 코드 실행 전에 선언을 먼저 처리합니다. 이것이 호이스팅입니다.",
+        "keyInsight": "호이스팅 = 선언만 끌어올림. 값 할당(초기화)은 제자리에!",
+        "analogy": "책의 목차(선언)는 앞으로 옮기지만, 내용(값)은 그 페이지에 그대로 둡니다.",
+        "highlight": [],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "a", "value": "undefined", "keyword": "var", "hoisted": true },
+                { "name": "b", "value": "TDZ", "keyword": "let", "hoisted": true },
+                { "name": "c", "value": "TDZ", "keyword": "const", "hoisted": true }
+              ]
+            }
+          ],
+          "phase": "hoisting"
+        }
+      },
+      {
+        "line": 1,
+        "title": "console.log(a) - var는 undefined",
+        "explanation": "var a의 선언은 호이스팅되어 이미 존재합니다. 하지만 값 할당은 아직 안 됐으므로 undefined입니다.",
+        "keyInsight": "var는 호이스팅 시 undefined로 초기화됩니다.",
+        "highlight": [1],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "a", "value": "undefined", "keyword": "var", "accessed": true },
+                { "name": "b", "value": "TDZ", "keyword": "let" },
+                { "name": "c", "value": "TDZ", "keyword": "const" }
+              ]
+            }
+          ],
+          "output": ["undefined"]
+        }
+      },
+      {
+        "line": 2,
+        "title": "console.log(b) - let은 TDZ!",
+        "explanation": "let b도 호이스팅됩니다! 하지만 TDZ(Temporal Dead Zone)에 있어서 접근하면 에러가 발생합니다.",
+        "keyInsight": "TDZ = 선언은 됐지만 초기화 전까지 접근 불가 구간",
+        "tip": "TDZ는 선언 위치부터 초기화 위치 사이의 구간입니다.",
+        "highlight": [2],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "a", "value": "undefined", "keyword": "var" },
+                { "name": "b", "value": "TDZ", "keyword": "let", "accessed": true, "error": true },
+                { "name": "c", "value": "TDZ", "keyword": "const" }
+              ]
+            }
+          ],
+          "output": ["undefined", "ReferenceError: Cannot access 'b' before initialization"]
+        }
+      },
+      {
+        "line": 3,
+        "title": "console.log(c) - const도 TDZ!",
+        "explanation": "const c도 마찬가지로 TDZ에 있어서 에러가 발생합니다.",
+        "highlight": [3],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "a", "value": "undefined", "keyword": "var" },
+                { "name": "b", "value": "TDZ", "keyword": "let" },
+                { "name": "c", "value": "TDZ", "keyword": "const", "accessed": true, "error": true }
+              ]
+            }
+          ],
+          "output": ["undefined", "ReferenceError", "ReferenceError"]
+        }
+      },
+      {
+        "line": 5,
+        "title": "var a = 1 (초기화)",
+        "explanation": "이제 a에 값 1이 할당됩니다. 선언은 이미 호이스팅됐고, 여기서 값만 할당됩니다.",
+        "highlight": [5],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "a", "value": 1, "keyword": "var", "changed": true },
+                { "name": "b", "value": "TDZ", "keyword": "let" },
+                { "name": "c", "value": "TDZ", "keyword": "const" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "let b = 2 (TDZ 종료)",
+        "explanation": "이 줄에서 b가 초기화됩니다. 이제 TDZ가 끝나고 b에 접근할 수 있습니다.",
+        "keyInsight": "let/const는 초기화 줄에서 TDZ가 끝납니다.",
+        "highlight": [6],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "a", "value": 1, "keyword": "var" },
+                { "name": "b", "value": 2, "keyword": "let", "changed": true },
+                { "name": "c", "value": "TDZ", "keyword": "const" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "const c = 3 (TDZ 종료)",
+        "explanation": "c도 초기화되어 TDZ가 끝납니다.",
+        "highlight": [7],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "a", "value": 1, "keyword": "var" },
+                { "name": "b", "value": 2, "keyword": "let" },
+                { "name": "c", "value": 3, "keyword": "const", "changed": true }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "정상 출력",
+        "explanation": "이제 모든 변수가 초기화되어 정상적으로 출력됩니다.",
+        "highlight": [9],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "a", "value": 1, "keyword": "var", "accessed": true },
+                { "name": "b", "value": 2, "keyword": "let", "accessed": true },
+                { "name": "c", "value": 3, "keyword": "const", "accessed": true }
+              ]
+            }
+          ],
+          "output": ["undefined", "ReferenceError", "ReferenceError", "1 2 3"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "다음 코드의 결과는?\n\nconsole.log(typeof x);\nlet x = 5;",
+    "options": [
+      "undefined",
+      "number",
+      "ReferenceError",
+      "null"
+    ],
+    "correctIndex": 2,
+    "explanation": "let은 호이스팅되지만 TDZ에 있으므로 초기화 전에 접근하면 ReferenceError가 발생합니다. typeof도 예외가 아닙니다!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "let과 const는 호이스팅되지 않는다",
+      "correct": "let/const도 호이스팅됩니다! 단, TDZ 때문에 초기화 전 접근이 불가능합니다.",
+      "why": "호이스팅은 모든 선언에 적용됩니다. TDZ는 let/const의 안전장치입니다."
+    },
+    {
+      "wrong": "var를 선언 전에 사용하면 에러가 난다",
+      "correct": "var는 undefined로 호이스팅되어 에러 없이 undefined를 반환합니다.",
+      "why": "이것이 var의 위험한 점입니다. 버그를 숨길 수 있습니다."
+    }
+  ],
+  "keyTakeaway": "var = undefined로 호이스팅, let/const = TDZ로 호이스팅 (접근 불가)"
+}

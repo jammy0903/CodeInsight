@@ -1,0 +1,209 @@
+{
+  "lessonId": "js-2-2",
+  "title": "함수 스코프 vs 블록 스코프",
+  "concept": "var는 함수만 스코프 경계로 인식하고, let/const는 모든 블록을 인식한다",
+  "content": {
+    "code": "function example() {\n  var x = 1;\n  let y = 2;\n\n  if (true) {\n    var x = 10;\n    let y = 20;\n    console.log('inside:', x, y);\n  }\n\n  console.log('outside:', x, y);\n}\n\nexample();",
+    "steps": [
+      {
+        "line": 14,
+        "title": "example() 함수 호출",
+        "explanation": "example 함수가 호출되면 새로운 함수 스코프가 생성됩니다.",
+        "keyInsight": "함수 호출 = 새로운 스코프 생성",
+        "highlight": [14],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            { "name": "example()", "type": "function", "variables": [] }
+          ],
+          "highlightScope": "example()"
+        }
+      },
+      {
+        "line": 2,
+        "title": "var x = 1",
+        "explanation": "var로 선언한 x는 함수 스코프에 등록됩니다.",
+        "keyInsight": "var는 가장 가까운 함수 스코프에 변수를 등록합니다.",
+        "highlight": [2],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [{ "name": "x", "value": 1, "keyword": "var" }]
+            }
+          ],
+          "highlightScope": "example()",
+          "highlightVariable": "x"
+        }
+      },
+      {
+        "line": 3,
+        "title": "let y = 2",
+        "explanation": "let으로 선언한 y도 현재 블록(함수 블록)에 등록됩니다.",
+        "highlight": [3],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                { "name": "x", "value": 1, "keyword": "var" },
+                { "name": "y", "value": 2, "keyword": "let" }
+              ]
+            }
+          ],
+          "highlightScope": "example()",
+          "highlightVariable": "y"
+        }
+      },
+      {
+        "line": 5,
+        "title": "if 블록 진입",
+        "explanation": "if 블록 안으로 들어갑니다. 새로운 블록 스코프가 생성됩니다.",
+        "highlight": [5],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                { "name": "x", "value": 1, "keyword": "var" },
+                { "name": "y", "value": 2, "keyword": "let" }
+              ]
+            },
+            { "name": "if Block", "type": "block", "variables": [] }
+          ],
+          "highlightScope": "if Block"
+        }
+      },
+      {
+        "line": 6,
+        "title": "var x = 10 (함수 스코프로 올라감)",
+        "explanation": "var는 블록을 무시합니다! if 블록이 아닌 함수 스코프의 x를 덮어씁니다.",
+        "keyInsight": "var는 블록을 뚫고 함수 스코프까지 올라갑니다.",
+        "analogy": "var는 엘리베이터처럼 블록을 무시하고 함수층까지 올라갑니다.",
+        "highlight": [6],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                { "name": "x", "value": 10, "keyword": "var", "changed": true },
+                { "name": "y", "value": 2, "keyword": "let" }
+              ]
+            },
+            { "name": "if Block", "type": "block", "variables": [] }
+          ],
+          "highlightScope": "example()",
+          "highlightVariable": "x"
+        }
+      },
+      {
+        "line": 7,
+        "title": "let y = 20 (블록 스코프에 새 변수)",
+        "explanation": "let은 블록 스코프입니다. if 블록 안에 새로운 y가 생성됩니다.",
+        "keyInsight": "let은 계단을 사용합니다. 현재 블록에만 머뭅니다.",
+        "highlight": [7],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                { "name": "x", "value": 10, "keyword": "var" },
+                { "name": "y", "value": 2, "keyword": "let" }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [{ "name": "y", "value": 20, "keyword": "let", "new": true }]
+            }
+          ],
+          "highlightScope": "if Block",
+          "highlightVariable": "y"
+        }
+      },
+      {
+        "line": 8,
+        "title": "블록 내부 출력",
+        "explanation": "x는 함수 스코프(10), y는 블록 스코프(20)를 참조합니다.",
+        "highlight": [8],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                { "name": "x", "value": 10, "keyword": "var", "accessed": true },
+                { "name": "y", "value": 2, "keyword": "let" }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [{ "name": "y", "value": 20, "keyword": "let", "accessed": true }]
+            }
+          ],
+          "output": ["inside: 10 20"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "블록 종료 후 출력",
+        "explanation": "if 블록이 끝나면 블록 스코프의 y(20)는 사라집니다. 함수 스코프의 변수만 남습니다.",
+        "keyInsight": "x는 10(var가 덮어씀), y는 2(블록의 y는 사라짐)",
+        "highlight": [11],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                { "name": "x", "value": 10, "keyword": "var", "accessed": true },
+                { "name": "y", "value": 2, "keyword": "let", "accessed": true }
+              ]
+            }
+          ],
+          "output": ["inside: 10 20", "outside: 10 2"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "다음 코드의 출력은?\n\nfunction test() {\n  if (true) {\n    var a = 1;\n    let b = 2;\n  }\n  console.log(a);\n  console.log(b);\n}",
+    "options": [
+      "1, 2",
+      "1, ReferenceError",
+      "ReferenceError, 2",
+      "ReferenceError, ReferenceError"
+    ],
+    "correctIndex": 1,
+    "explanation": "var a는 함수 스코프이므로 블록 밖에서도 접근 가능(1 출력). let b는 블록 스코프이므로 블록 밖에서 접근 불가(ReferenceError)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "블록 안에서 선언한 var는 블록 안에서만 유효하다",
+      "correct": "var는 블록을 무시하고 함수 스코프에 등록됩니다.",
+      "why": "var는 함수 스코프만 인식합니다. if, for, while 등의 블록은 스코프 경계가 아닙니다."
+    }
+  ],
+  "keyTakeaway": "var = 함수까지 올라감, let/const = 현재 블록에 머뭄"
+}

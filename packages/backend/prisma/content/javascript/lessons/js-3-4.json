@@ -1,0 +1,140 @@
+{
+  "lessonId": "js-3-4",
+  "title": "call, apply, bind",
+  "concept": "call, apply, bind를 사용하면 this를 명시적으로 지정할 수 있다",
+  "content": {
+    "code": "function greet(greeting, punctuation) {\n  console.log(`${greeting}, ${this.name}${punctuation}`);\n}\n\nconst user = { name: 'Alice' };\nconst admin = { name: 'Bob' };\n\ngreet.call(user, 'Hello', '!');\ngreet.apply(admin, ['Hi', '?']);\n\nconst boundGreet = greet.bind(user, 'Hey');\nboundGreet('~');",
+    "steps": [
+      {
+        "line": 1,
+        "title": "greet 함수 정의",
+        "explanation": "this.name을 사용하는 greet 함수를 정의합니다. 이 함수는 두 개의 인자를 받습니다.",
+        "highlight": [1, 2, 3],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "function definition",
+          "functions": [
+            { "name": "greet", "params": ["greeting", "punctuation"], "usesThis": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "객체 생성",
+        "explanation": "user와 admin 두 객체를 생성합니다. 이 객체들을 this로 사용할 예정입니다.",
+        "highlight": [5, 6],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "object creation",
+          "objects": [
+            { "name": "user", "properties": [{ "key": "name", "value": "'Alice'" }] },
+            { "name": "admin", "properties": [{ "key": "name", "value": "'Bob'" }] }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "call() - this와 인자를 개별 전달",
+        "explanation": "call()은 첫 번째 인자로 this를, 나머지 인자를 개별적으로 전달합니다.",
+        "keyInsight": "call(thisArg, arg1, arg2, ...) - 인자를 개별 전달",
+        "highlight": [8],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "call()",
+          "thisValue": "user",
+          "callStack": ["<global>", "greet.call(user, ...)"],
+          "binding": {
+            "method": "call",
+            "thisArg": "user",
+            "args": ["'Hello'", "'!'"]
+          },
+          "output": ["Hello, Alice!"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "apply() - this와 인자를 배열로 전달",
+        "explanation": "apply()는 첫 번째 인자로 this를, 두 번째 인자로 인자들의 배열을 전달합니다.",
+        "keyInsight": "apply(thisArg, [arg1, arg2, ...]) - 인자를 배열로 전달",
+        "analogy": "call과 apply의 차이: call = 쉼표(Comma), apply = 배열(Array)",
+        "highlight": [9],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "apply()",
+          "thisValue": "admin",
+          "callStack": ["<global>", "greet.apply(admin, ...)"],
+          "binding": {
+            "method": "apply",
+            "thisArg": "admin",
+            "args": "['Hi', '?']"
+          },
+          "output": ["Hello, Alice!", "Hi, Bob?"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "bind() - 새 함수 반환",
+        "explanation": "bind()는 this가 고정된 새로운 함수를 반환합니다. 즉시 실행하지 않습니다!",
+        "keyInsight": "bind(thisArg, arg1, ...) - 새 함수 반환 (즉시 실행 X)",
+        "highlight": [11],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "bind()",
+          "thisValue": "user (bound)",
+          "binding": {
+            "method": "bind",
+            "thisArg": "user",
+            "partialArgs": ["'Hey'"],
+            "returns": "new function"
+          },
+          "variables": [
+            { "name": "boundGreet", "value": "function (this=user, greeting='Hey')" }
+          ]
+        }
+      },
+      {
+        "line": 12,
+        "title": "bind된 함수 호출",
+        "explanation": "boundGreet를 호출합니다. this는 이미 user로 고정되어 있고, greeting도 'Hey'로 고정되어 있습니다.",
+        "keyInsight": "bind는 부분 적용(partial application)도 가능합니다!",
+        "highlight": [12],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "bound function call",
+          "thisValue": "user (bound)",
+          "callStack": ["<global>", "boundGreet('~')"],
+          "binding": {
+            "boundThis": "user",
+            "boundArgs": ["'Hey'"],
+            "newArgs": ["'~'"]
+          },
+          "output": ["Hello, Alice!", "Hi, Bob?", "Hey, Alice~"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "다음 코드의 출력은?\n\nconst obj = { value: 10 };\nfunction double() { return this.value * 2; }\nconst bound = double.bind(obj);\nconst other = { value: 100, fn: bound };\nconsole.log(other.fn());",
+    "options": [
+      "20",
+      "200",
+      "undefined",
+      "에러 발생"
+    ],
+    "correctIndex": 0,
+    "explanation": "bind()로 this가 obj로 고정되었습니다. 다른 객체의 메서드로 호출해도 this는 변하지 않습니다. 따라서 obj.value * 2 = 20입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "bind()는 원래 함수를 변경한다",
+      "correct": "bind()는 새로운 함수를 반환합니다. 원래 함수는 그대로입니다.",
+      "why": "bind()는 원본을 수정하지 않고 새 함수를 만들어 반환합니다."
+    },
+    {
+      "wrong": "call()과 apply()의 결과가 다르다",
+      "correct": "call()과 apply()의 결과는 같습니다. 인자 전달 방식만 다릅니다.",
+      "why": "call은 인자를 개별로, apply는 배열로 전달합니다. 결과는 동일합니다."
+    }
+  ],
+  "keyTakeaway": "call(this, a, b), apply(this, [a, b]), bind(this) → 새 함수 반환"
+}

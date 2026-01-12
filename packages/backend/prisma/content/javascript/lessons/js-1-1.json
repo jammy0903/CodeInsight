@@ -7,8 +7,11 @@
     "steps": [
       {
         "line": 11,
-        "title": "first() 호출",
-        "explanation": "first() 함수가 호출되면 **콜 스택**에 쌓입니다.\n\n콜 스택은 현재 실행 중인 함수들을 추적하는 자료구조입니다. LIFO(Last In First Out) 방식으로, 가장 마지막에 들어온 함수가 먼저 실행됩니다.",
+        "title": "first() 호출 - 콜 스택에 첫 번째 함수 추가",
+        "explanation": "first() 함수가 호출되면 **콜 스택(Call Stack)**에 쌓입니다.\n\n콜 스택은 '현재 실행 중인 함수'를 추적하는 자료구조입니다.",
+        "keyInsight": "JavaScript는 **싱글 스레드**입니다. 한 번에 딱 하나의 함수만 실행할 수 있습니다.",
+        "analogy": "콜 스택 = 접시 쌓기. 새 접시(함수)는 항상 맨 위에 올리고, 치울 때도 맨 위부터 치웁니다.",
+        "tip": "**싱글 스레드**: 실행 흐름이 하나뿐. 동시에 두 가지 일을 할 수 없습니다.",
         "highlight": [11],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -24,7 +27,9 @@
       {
         "line": 2,
         "title": "console.log('first') 실행",
-        "explanation": "first() 함수 내부로 진입합니다.\n\nconsole.log가 콜 스택에 추가되고, 바로 실행되어 'first'가 출력됩니다. 실행이 끝나면 콜 스택에서 제거됩니다.",
+        "explanation": "first() 함수 내부로 진입합니다.\n\nconsole.log도 함수이므로 콜 스택에 추가됩니다. 실행이 끝나면 콜 스택에서 바로 제거됩니다.",
+        "keyInsight": "모든 함수 호출은 콜 스택에 추가됩니다. console.log도 예외가 아닙니다.",
+        "tip": "**콜 스택에 추가 → 실행 → 제거** 이 과정이 반복됩니다.",
         "highlight": [2],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -39,8 +44,12 @@
       },
       {
         "line": 3,
-        "title": "second() 호출",
-        "explanation": "second() 함수가 호출됩니다.\n\nfirst()가 아직 끝나지 않은 상태에서 second()가 콜 스택 위에 쌓입니다. 이것이 **함수 호출 스택**의 핵심입니다.",
+        "title": "second() 호출 - 콜 스택 위에 쌓임",
+        "explanation": "first() 실행 중에 second()가 호출됩니다. second()가 콜 스택 맨 위에 쌓입니다.",
+        "keyInsight": "함수 안에서 다른 함수를 호출하면, 새 함수가 콜 스택 위에 쌓입니다. **나중에 호출된 함수가 먼저 끝납니다.**",
+        "analogy": "first() 접시 위에 second() 접시를 올린 상태. second() 접시를 먼저 치워야 first() 접시에 접근할 수 있습니다.",
+        "tip": "**LIFO (Last In First Out)**: 마지막에 들어온 것이 먼저 나갑니다. 스택의 기본 원리입니다.",
+        "misconception": "동시 실행 착각 주의! second()가 완전히 끝난 후에야 first()가 이어집니다.",
         "highlight": [3],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -57,6 +66,7 @@
         "line": 8,
         "title": "console.log('second') 실행",
         "explanation": "second() 함수 내부에서 console.log가 실행됩니다.\n\n'second'가 출력되고, console.log가 콜 스택에서 제거됩니다.",
+        "keyInsight": "콜 스택의 맨 위에 있는 함수만 실행됩니다. 아래에 있는 first()는 '대기' 상태입니다.",
         "highlight": [8],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -71,8 +81,11 @@
       },
       {
         "line": 9,
-        "title": "second() 종료",
-        "explanation": "second() 함수가 끝나고 콜 스택에서 제거됩니다.\n\n실행 흐름이 다시 first() 함수로 돌아갑니다. 콜 스택의 맨 위가 다시 first()가 됩니다.",
+        "title": "second() 종료 - 콜 스택에서 제거",
+        "explanation": "second()가 끝나서 콜 스택에서 제거(pop)됩니다. first()가 다시 맨 위가 됩니다.",
+        "keyInsight": "함수가 끝나면 콜 스택에서 제거됩니다. 그러면 그 아래에 있던 함수가 이어서 실행됩니다.",
+        "analogy": "second() 접시를 치웠으니, 이제 first() 접시에 접근할 수 있습니다.",
+        "tip": "**pop**: 스택에서 맨 위 항목을 제거하는 것. 반대로 추가하는 것은 **push**입니다.",
         "highlight": [9],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -87,8 +100,10 @@
       },
       {
         "line": 4,
-        "title": "console.log('first end') 실행",
-        "explanation": "first() 함수의 나머지 코드가 실행됩니다.\n\n'first end'가 출력됩니다.",
+        "title": "first()로 복귀 - console.log('first end') 실행",
+        "explanation": "second()가 끝났으니, first() 함수의 **중단된 지점**부터 이어서 실행됩니다.\n\n'first end'가 출력됩니다.",
+        "keyInsight": "함수 호출 후 돌아올 위치를 콜 스택이 기억합니다. 이것이 '콜 스택'이라 불리는 이유입니다.",
+        "tip": "**복귀 주소**: 콜 스택은 '어디로 돌아가야 하는지'도 함께 저장합니다.",
         "highlight": [4],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -104,7 +119,8 @@
       {
         "line": 5,
         "title": "first() 종료",
-        "explanation": "first() 함수가 완전히 끝나고 콜 스택에서 제거됩니다.",
+        "explanation": "first() 함수도 끝에 도달했습니다.\n\nfirst()가 콜 스택에서 제거됩니다. 이제 콜 스택이 비었습니다.",
+        "keyInsight": "콜 스택이 비면 = 실행할 함수가 없음 = 프로그램이 다음 코드로 넘어감",
         "highlight": [5],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -119,8 +135,11 @@
       },
       {
         "line": 12,
-        "title": "console.log('done') 실행",
-        "explanation": "전역 코드로 돌아와서 마지막 console.log가 실행됩니다.\n\n**실행 순서**: first → second → first end → done\n\n동기 코드는 순차적으로, 함수 호출은 스택처럼 쌓여서 실행됩니다.",
+        "title": "console.log('done') 실행 - 전역 코드 완료",
+        "explanation": "first() 호출이 끝났으니 다음 줄이 실행됩니다.",
+        "keyInsight": "동기 코드는 위에서 아래로 순차 실행됩니다. 함수 호출이 있으면 그 함수가 완전히 끝날 때까지 기다립니다.",
+        "analogy": "요리 레시피처럼 한 단계가 끝나야 다음 단계로 넘어갑니다. 동시에 여러 단계를 할 수 없습니다.",
+        "misconception": "'done'이 먼저 출력될 것이라 예상하는 경우가 있습니다. 하지만 first()가 완전히 끝날 때까지 기다립니다.",
         "highlight": [12],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -141,17 +160,22 @@
       "1 → 3 → 2",
       "1 → 2 → 3",
       "2 → 1 → 3",
-      "3 → 2 → 1"
+      "1 → 2 → 3이 동시에 출력"
     ],
     "correctIndex": 1,
-    "explanation": "함수 호출은 콜 스택에 쌓입니다. a()가 실행되어 1 출력 → b() 호출로 2 출력 → b() 종료 후 a()로 돌아와 3 출력"
+    "explanation": "a()가 실행되어 1 출력 → b() 호출로 콜 스택에 b() 추가 → 2 출력 → b() 종료 후 a()로 복귀 → 3 출력.\n\nJavaScript는 싱글 스레드이므로 '동시에'는 불가능합니다."
   },
   "misconceptions": [
     {
       "wrong": "JavaScript는 여러 함수를 동시에 실행할 수 있다",
-      "correct": "JavaScript는 싱글 스레드입니다. 한 번에 하나의 함수만 실행할 수 있습니다.",
-      "why": "콜 스택의 맨 위에 있는 함수만 실행됩니다."
+      "correct": "JavaScript는 **싱글 스레드**입니다. 콜 스택의 맨 위에 있는 함수만 실행됩니다.",
+      "why": "브라우저의 메인 스레드는 하나뿐입니다. 동시 실행처럼 보이는 것은 '이벤트 루프' 덕분이며, 다음 레슨에서 배웁니다."
+    },
+    {
+      "wrong": "함수 안에서 다른 함수를 호출하면 두 함수가 병렬로 실행된다",
+      "correct": "새로 호출된 함수가 **완전히 끝난 후**에 원래 함수가 이어서 실행됩니다.",
+      "why": "콜 스택은 LIFO(Last In First Out) 구조입니다. 나중에 들어온 것이 먼저 나가야 합니다."
     }
   ],
-  "keyTakeaway": "콜 스택 = 현재 실행 중인 함수 추적, LIFO 방식"
+  "keyTakeaway": "콜 스택 = 현재 실행 중인 함수 추적, 싱글 스레드 = 한 번에 하나만, LIFO = 나중에 온 게 먼저 끝남"
 }

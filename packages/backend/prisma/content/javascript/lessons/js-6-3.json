@@ -1,0 +1,92 @@
+{
+  "lessonId": "js-6-3",
+  "title": "ES6 클래스",
+  "concept": "class 문법은 프로토타입 상속의 문법 설탕이다. 내부적으로 같은 방식으로 동작한다",
+  "content": {
+    "code": "class Animal {\n  constructor(name) {\n    this.name = name;\n  }\n  eat() {\n    return this.name + ' eats';\n  }\n}\n\nclass Dog extends Animal {\n  constructor(name, breed) {\n    super(name);\n    this.breed = breed;\n  }\n  bark() {\n    return 'Woof!';\n  }\n}\n\nconst buddy = new Dog('Buddy', 'Golden');\nconsole.log(buddy.name);\nconsole.log(buddy.eat());\nconsole.log(buddy.bark());",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Animal 클래스 정의",
+        "explanation": "class 키워드로 Animal을 정의합니다. 내부적으로 함수 + prototype이 생성됩니다.",
+        "keyInsight": "class = 생성자 함수 + prototype의 문법 설탕",
+        "highlight": [1, 2, 3, 4, 5, 6, 7, 8],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "classes": [
+            { "name": "Animal", "methods": ["constructor", "eat()"] }
+          ],
+          "equivalent": "function Animal(name) { this.name = name; }\nAnimal.prototype.eat = function() { ... }"
+        }
+      },
+      {
+        "line": 10,
+        "title": "Dog 클래스 (extends)",
+        "explanation": "extends로 Animal을 상속합니다. 프로토타입 체인이 자동으로 설정됩니다.",
+        "keyInsight": "extends = Object.create + 프로토타입 체인 설정",
+        "highlight": [10],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "classes": [
+            { "name": "Dog", "extends": "Animal", "methods": ["constructor", "bark()"] }
+          ],
+          "chain": ["Dog.prototype", "Animal.prototype", "Object.prototype"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "super() 호출",
+        "explanation": "super(name)은 부모의 constructor를 호출합니다. extends 사용 시 this 사용 전에 반드시 호출해야 합니다.",
+        "keyInsight": "super() = Animal.call(this, name)과 동일",
+        "highlight": [11, 12, 13, 14],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "note": "super() 호출 전에는 this 사용 불가 (ReferenceError)"
+        }
+      },
+      {
+        "line": 20,
+        "title": "인스턴스 생성",
+        "explanation": "new Dog()로 인스턴스를 생성합니다. 프로토타입 체인: buddy → Dog.prototype → Animal.prototype",
+        "highlight": [20],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            { "name": "buddy", "props": ["name: 'Buddy'", "breed: 'Golden'"], "proto": "Dog.prototype" },
+            { "name": "Dog.prototype", "props": ["bark()"], "proto": "Animal.prototype" },
+            { "name": "Animal.prototype", "props": ["eat()"], "proto": "Object.prototype" }
+          ]
+        }
+      },
+      {
+        "line": 21,
+        "title": "속성/메서드 접근",
+        "explanation": "프로토타입 체인을 따라 속성과 메서드를 찾습니다. 생성자 함수 방식과 동일하게 동작합니다.",
+        "highlight": [21, 22, 23],
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": ["Buddy", "Buddy eats", "Woof!"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "class 문법과 생성자 함수의 차이점은?",
+    "options": [
+      "class는 호이스팅되지 않는다",
+      "class는 new 없이 호출 가능하다",
+      "class의 메서드는 enumerable이다",
+      "class는 prototype을 사용하지 않는다"
+    ],
+    "correctIndex": 0,
+    "explanation": "class는 TDZ가 적용되어 선언 전 사용 불가. new 없이 호출 시 TypeError. 메서드는 non-enumerable. 내부적으로 prototype 사용."
+  },
+  "misconceptions": [
+    {
+      "wrong": "class는 다른 언어의 클래스와 같다",
+      "correct": "JavaScript class는 프로토타입 기반입니다. C++/Java의 클래스 기반 상속과 다릅니다.",
+      "why": "문법만 비슷할 뿐, 내부적으로는 프로토타입 체인으로 동작합니다."
+    }
+  ],
+  "keyTakeaway": "class = 프로토타입 상속의 문법 설탕, extends = 체인 설정, super = 부모 호출"
+}

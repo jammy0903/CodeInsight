@@ -1,0 +1,183 @@
+{
+  "lessonId": "js-2-4",
+  "title": "클로저 (Closure)",
+  "concept": "내부 함수는 외부 함수가 종료된 후에도 외부 함수의 변수에 접근할 수 있다",
+  "content": {
+    "code": "function createCounter() {\n  let count = 0;\n\n  return function increment() {\n    count++;\n    return count;\n  };\n}\n\nconst counter = createCounter();\nconsole.log(counter());\nconsole.log(counter());\nconsole.log(counter());",
+    "steps": [
+      {
+        "line": 10,
+        "title": "createCounter() 호출",
+        "explanation": "createCounter 함수가 호출됩니다. 새로운 함수 스코프가 생성됩니다.",
+        "highlight": [10],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            { "name": "createCounter()", "type": "function", "variables": [] }
+          ],
+          "highlightScope": "createCounter()"
+        }
+      },
+      {
+        "line": 2,
+        "title": "let count = 0",
+        "explanation": "createCounter 함수 내부에 count 변수가 생성됩니다.",
+        "highlight": [2],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "createCounter()",
+              "type": "function",
+              "variables": [{ "name": "count", "value": 0, "keyword": "let" }]
+            }
+          ],
+          "highlightVariable": "count"
+        }
+      },
+      {
+        "line": 4,
+        "title": "내부 함수 반환",
+        "explanation": "increment 함수가 반환됩니다. 이 함수는 외부의 count 변수를 참조합니다.",
+        "keyInsight": "내부 함수가 외부 변수를 참조하면 클로저가 형성됩니다!",
+        "analogy": "increment 함수가 count를 '기억'하는 배낭을 메고 나갑니다.",
+        "highlight": [4, 5, 6, 7],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            { "name": "Global", "type": "global", "variables": [] },
+            {
+              "name": "createCounter()",
+              "type": "function",
+              "variables": [{ "name": "count", "value": 0, "keyword": "let" }]
+            },
+            {
+              "name": "increment() [closure]",
+              "type": "closure",
+              "closureRef": "count",
+              "variables": []
+            }
+          ],
+          "highlightScope": "increment() [closure]"
+        }
+      },
+      {
+        "line": 10,
+        "title": "createCounter() 종료, counter에 함수 저장",
+        "explanation": "createCounter()가 종료됩니다. 보통은 지역 변수가 사라지지만... 클로저 덕분에 count는 살아있습니다!",
+        "keyInsight": "클로저 = 함수 + 그 함수가 참조하는 외부 변수",
+        "highlight": [10],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [{ "name": "counter", "value": "function", "keyword": "const" }]
+            },
+            {
+              "name": "Closure Scope",
+              "type": "closure",
+              "variables": [{ "name": "count", "value": 0, "keyword": "let", "preserved": true }]
+            }
+          ],
+          "highlightScope": "Closure Scope"
+        }
+      },
+      {
+        "line": 11,
+        "title": "counter() 첫 번째 호출",
+        "explanation": "counter()(=increment)가 호출됩니다. 클로저에 저장된 count에 접근하여 1 증가시킵니다.",
+        "highlight": [11],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [{ "name": "counter", "value": "function", "keyword": "const" }]
+            },
+            {
+              "name": "Closure Scope",
+              "type": "closure",
+              "variables": [{ "name": "count", "value": 1, "keyword": "let", "changed": true }]
+            }
+          ],
+          "output": ["1"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "counter() 두 번째 호출",
+        "explanation": "같은 클로저의 count를 다시 증가시킵니다. count는 계속 유지됩니다!",
+        "keyInsight": "클로저는 상태를 기억합니다. 마치 private 변수처럼!",
+        "highlight": [12],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [{ "name": "counter", "value": "function", "keyword": "const" }]
+            },
+            {
+              "name": "Closure Scope",
+              "type": "closure",
+              "variables": [{ "name": "count", "value": 2, "keyword": "let", "changed": true }]
+            }
+          ],
+          "output": ["1", "2"]
+        }
+      },
+      {
+        "line": 13,
+        "title": "counter() 세 번째 호출",
+        "explanation": "count가 3이 됩니다. 외부에서는 count에 직접 접근할 수 없고, counter()를 통해서만 조작 가능합니다.",
+        "keyInsight": "클로저로 private 변수를 구현할 수 있습니다!",
+        "highlight": [13],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [{ "name": "counter", "value": "function", "keyword": "const" }]
+            },
+            {
+              "name": "Closure Scope",
+              "type": "closure",
+              "variables": [{ "name": "count", "value": 3, "keyword": "let", "changed": true }]
+            }
+          ],
+          "output": ["1", "2", "3"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "다음 코드에서 counter1()과 counter2()의 count는 같은 값을 공유할까요?\n\nconst counter1 = createCounter();\nconst counter2 = createCounter();\ncounter1();\ncounter1();\nconsole.log(counter2());",
+    "options": [
+      "3 (같은 count 공유)",
+      "1 (각자 다른 count)",
+      "0 (초기화됨)",
+      "에러 발생"
+    ],
+    "correctIndex": 1,
+    "explanation": "createCounter()를 호출할 때마다 새로운 클로저가 생성됩니다. counter1과 counter2는 각자 독립적인 count를 가집니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수가 종료되면 지역 변수는 항상 사라진다",
+      "correct": "내부 함수가 외부 변수를 참조하면 클로저가 형성되어 변수가 유지됩니다.",
+      "why": "JavaScript 엔진은 참조가 있는 변수를 가비지 컬렉션하지 않습니다."
+    },
+    {
+      "wrong": "클로저는 어려운 고급 개념이다",
+      "correct": "클로저는 함수가 자신이 생성된 환경을 기억하는 자연스러운 현상입니다.",
+      "why": "콜백, 이벤트 핸들러, React hooks 등 일상적으로 사용됩니다."
+    }
+  ],
+  "keyTakeaway": "클로저 = 함수 + 외부 변수 참조 = 상태 유지 + private 변수"
+}

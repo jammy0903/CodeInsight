@@ -1,0 +1,126 @@
+{
+  "lessonId": "js-3-2",
+  "title": "메서드에서의 this",
+  "concept": "메서드로 호출되면 this는 그 메서드를 소유한 객체를 가리킨다",
+  "content": {
+    "code": "const user = {\n  name: 'Alice',\n  greet() {\n    console.log(`Hello, ${this.name}`);\n  }\n};\n\nuser.greet();\n\nconst greetFn = user.greet;\ngreetFn();",
+    "steps": [
+      {
+        "line": 1,
+        "title": "user 객체 생성",
+        "explanation": "name 속성과 greet 메서드를 가진 user 객체를 생성합니다.",
+        "highlight": [1, 2, 3, 4, 5, 6],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "object creation",
+          "objects": [
+            {
+              "name": "user",
+              "properties": [
+                { "key": "name", "value": "'Alice'" },
+                { "key": "greet", "value": "function" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "user.greet() 호출",
+        "explanation": "greet를 user의 메서드로 호출합니다. 점(.) 앞의 객체가 this가 됩니다!",
+        "keyInsight": "obj.method() 형태로 호출하면 this = obj",
+        "analogy": "점(.) 앞에 있는 객체가 함수의 주인이 됩니다.",
+        "highlight": [8],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "method call",
+          "thisValue": "user",
+          "callStack": ["<global>", "user.greet()"],
+          "binding": {
+            "method": "greet",
+            "object": "user",
+            "thisIs": "user"
+          }
+        }
+      },
+      {
+        "line": 4,
+        "title": "this.name 접근",
+        "explanation": "this는 user를 가리키므로 this.name은 'Alice'입니다.",
+        "highlight": [4],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "method call",
+          "thisValue": "user",
+          "callStack": ["<global>", "user.greet()"],
+          "output": ["Hello, Alice"],
+          "thisAccess": "this.name → 'Alice'"
+        }
+      },
+      {
+        "line": 10,
+        "title": "함수 참조 복사",
+        "explanation": "user.greet를 greetFn 변수에 할당합니다. 함수 자체만 복사되고, 객체와의 연결은 끊어집니다!",
+        "keyInsight": "함수를 변수에 저장하면 객체와의 연결이 끊어집니다.",
+        "highlight": [10],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "reference copy",
+          "objects": [
+            {
+              "name": "user",
+              "properties": [
+                { "key": "name", "value": "'Alice'" },
+                { "key": "greet", "value": "function" }
+              ]
+            }
+          ],
+          "variables": [
+            { "name": "greetFn", "value": "function (same as user.greet)" }
+          ],
+          "warning": "객체와의 연결 끊어짐!"
+        }
+      },
+      {
+        "line": 11,
+        "title": "greetFn() 호출 - this 손실!",
+        "explanation": "greetFn()은 일반 함수 호출입니다. 점(.) 앞에 객체가 없으므로 this는 전역(또는 undefined)입니다!",
+        "keyInsight": "메서드를 변수에 저장하고 호출하면 this를 잃어버립니다!",
+        "misconception": "greetFn이 원래 user.greet였으니 this도 user일 거라 착각하기 쉽습니다.",
+        "highlight": [11],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "function call (lost this)",
+          "thisValue": "window (or undefined in strict)",
+          "callStack": ["<global>", "greetFn()"],
+          "output": ["Hello, Alice", "Hello, undefined"],
+          "warning": "this.name = undefined!"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "다음 코드의 출력은?\n\nconst obj = {\n  value: 42,\n  getValue() { return this.value; }\n};\nconst fn = obj.getValue;\nconsole.log(fn());",
+    "options": [
+      "42",
+      "undefined",
+      "null",
+      "에러 발생"
+    ],
+    "correctIndex": 1,
+    "explanation": "fn()은 일반 함수 호출입니다. this는 전역 객체가 되고, 전역에 value가 없으므로 undefined가 반환됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수를 변수에 저장해도 this는 유지된다",
+      "correct": "함수를 변수에 저장하면 객체와의 연결이 끊어지고 this를 잃습니다.",
+      "why": "this는 함수가 정의될 때가 아니라 호출될 때 결정됩니다."
+    },
+    {
+      "wrong": "this는 함수가 정의된 객체를 가리킨다",
+      "correct": "this는 함수를 호출한 객체(점 앞의 객체)를 가리킵니다.",
+      "why": "같은 함수도 호출 방식에 따라 다른 this를 가집니다."
+    }
+  ],
+  "keyTakeaway": "obj.method() → this = obj, fn() → this = 전역 (this 손실)"
+}
