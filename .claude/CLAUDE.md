@@ -297,6 +297,32 @@ frontend/src/features/
 function getExecErrorInfo(error: unknown) { ... }
 ```
 
+### 7.5 Quick Reference (INDEX System)
+
+**Rule Index**: `.claude/index.md` → keyword-based rule file lookup
+**Function Index**: `.claude/funcindex.md` → grep-optimized function registry
+
+```
+.claude/
+├── index.md              # keyword → rule file mapping
+├── funcindex.md          # path:func:type:description (grep-friendly)
+└── rules/
+    ├── code/     (css, typescript, naming)
+    ├── dev/      (server, testing, build)
+    ├── git/      (commit, branch)
+    ├── arch/     (file-structure, patterns, decisions)
+    ├── libs/     (approved, forbidden, migration)
+    ├── refactor/ (history, pending, checklist)
+    └── tasks/    (active, backlog)
+```
+
+**Search examples:**
+```bash
+grep "handleChat" .claude/funcindex.md      # find function
+grep "routes.ts:" .claude/funcindex.md      # all funcs in file
+grep ":HOOK:" .claude/funcindex.md          # all hooks
+```
+
 ---
 
 ## 8. API Endpoints
@@ -339,7 +365,7 @@ curl -X POST http://localhost:3000/api/ai/chat \
 - Claude 서명 금지 (`Generated with Claude Code` 등)
 - Co-Authored-By 금지
 - 한글 커밋 메시지 OK
-- **커밋 후 반드시 push**: 매번 `git commit` 후 즉시 `git push origin codeinsight` 실행
+- **커밋 후 반드시 push**: 매번 `git commit` 후 즉시 `git push origin main` 실행
 - **민감 정보 절대 금지**: API key, 비밀번호, 토큰 등 민감한 정보는 절대 git에 올리지 말 것
   - `.env` 파일, API key, 인증 토큰, 비밀번호, 개인정보 등
   - 환경변수는 `.env.example`에 예시만 작성
@@ -489,11 +515,11 @@ features/visualizers/c/
 ## 12. Repository Info
 
 - Repo: `git@github.com:jammy0903/CodeInsight.git`
-- Branch: `codeinsight`
+- Branch: `main`
 - GitHub: jammy0903
 - Email: fuso3367@kakao.com
 
 ```bash
 # Push to this branch
-git push origin codeinsight
+git push origin main
 ```

@@ -8,9 +8,19 @@
       {
         "line": 5,
         "title": "메모리 할당",
-        "explanation": "Heap에 4바이트가 할당되고 p가 그 주소를 가집니다.",
-        "highlight": [5, 6],
+        "explanation": "Heap에 4바이트가 할당되고 p가 그 주소를 가집니다.\n\n**이번 레슨의 핵심 질문:** free 후에 포인터는 어떻게 될까요?\n\n**힌트:** free는 메모리만 해제하고, 포인터 변수 자체는 건드리지 않아요.",
+        "highlight": [
+          5,
+          6
+        ],
+        "stdout": "해제 전: *p = 100",
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "heap",
@@ -26,15 +36,18 @@
             "name": "p",
             "type": "int*",
             "value": "0x55001000",
-            "pointsTo": "heap"
+            "pointsTo": "heap",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 10,
         "title": "free 호출",
-        "explanation": "free(p)는 0x55001000의 메모리를 시스템에 반환합니다. 하지만 p는 여전히 이 주소를 가리킵니다!",
-        "highlight": [10],
+        "explanation": "free(p)는 0x55001000의 메모리를 **시스템에 반환**합니다.\n\n**중요한 사실:** p는 여전히 0x55001000을 가리킵니다!\n\n**왜 p가 안 바뀔까?**\n- free(p)는 p의 **값(주소)**을 받아서 해제\n- p **자체**를 수정하지 않음\n- C에서 함수는 변수 자체를 바꿀 수 없음 (Call by Value)\n\n**결과:** p는 **무효한 주소**를 가리키는 **Dangling Pointer**가 됩니다!",
+        "highlight": [
+          10
+        ],
         "memoryChanges": [
           {
             "action": "deallocate",
@@ -47,15 +60,19 @@
       {
         "line": 12,
         "title": "p = NULL 권장",
-        "explanation": "free 후 p = NULL;로 설정하면 Dangling Pointer 문제를 방지할 수 있습니다.",
-        "highlight": [12],
+        "explanation": "free 후 **p = NULL;**로 설정하면 안전합니다!\n\n**왜 NULL로 설정해야 할까?**\n\n**시나리오 1: NULL 설정 안 함**\n```c\nfree(p);\n// ... 많은 코드 ...\nif (p != NULL) {  // 여전히 true!\n    *p = 10;  // 크래시 또는 숨겨진 버그\n}\n```\n\n**시나리오 2: NULL 설정함**\n```c\nfree(p);\np = NULL;\n// ... 많은 코드 ...\nif (p != NULL) {  // false, 안전!\n    *p = 10;\n}\n```\n\n**규칙:** free 직후 반드시 p = NULL!",
+        "highlight": [
+          12
+        ],
         "memoryChanges": []
       },
       {
         "line": 14,
         "title": "해제 후 접근 (위험!)",
-        "explanation": "free 후 *p 접근은 정의되지 않은 동작입니다. 크래시하거나 이상한 값이 나올 수 있습니다.",
-        "highlight": [14],
+        "explanation": "free 후 *p 접근은 **정의되지 않은 동작(Undefined Behavior)**입니다!\n\n**가능한 결과:**\n1. 크래시 (Segmentation fault) - 가장 좋은 경우, 버그 발견 쉬움\n2. 이전 값이 나옴 - 메모리가 아직 재사용 안 됨\n3. 이상한 값 - 다른 프로그램이 그 메모리 사용 중\n4. 정상처럼 보임 - **최악!** 숨겨진 버그로 남음\n\n**free 후 하면 안 되는 것:**\n- 읽기: *p\n- 쓰기: *p = 값\n- 다시 해제: free(p) → **Double Free!**\n\n**모두 정의되지 않은 동작입니다!**",
+        "highlight": [
+          14
+        ],
         "danger": true,
         "memoryChanges": []
       }

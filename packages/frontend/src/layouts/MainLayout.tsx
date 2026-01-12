@@ -11,7 +11,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { TopBar } from './TopBar';
 import { Sidebar } from './Sidebar';
 import { NicknameModal } from '@/components/NicknameModal';
-import { Menu, Github, Mail } from 'lucide-react';
+import { Github, Mail } from 'lucide-react';
 import { useStore } from '@/stores/store';
 
 interface MainLayoutProps {
@@ -19,7 +19,7 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const { sidebarOpen, toggleSidebar, appUser } = useStore();
+  const { sidebarOpen, appUser } = useStore();
   const location = useLocation();
 
   // 페이지 타입 확인
@@ -32,36 +32,44 @@ export function MainLayout({ children }: MainLayoutProps) {
   const emailSubject = encodeURIComponent(`[CodeInsight 고객문의사항] ${username}`);
   const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=l89192164@gmail.com&su=${emailSubject}`;
 
+  // LessonPage: 전체 페이지 스크롤 (헤더도 함께 스크롤)
+  if (isLessonPage) {
+    return (
+      <div className="min-h-screen">
+        <NicknameModal />
+        <Sidebar />
+
+          <motion.div
+          animate={{ marginLeft: sidebarOpen ? '224px' : '0px' }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        >
+          <TopBar />
+          <div className="lesson-content-container">{children}</div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // 기본 레이아웃: 전체 페이지 스크롤 (헤더도 함께 스크롤)
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="min-h-screen">
       {/* 닉네임 등록 모달 - needsRegistration 시 자동 표시 */}
       <NicknameModal />
 
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Hamburger Button - Only show when sidebar is closed */}
-      {!sidebarOpen && (
-        <button
-          onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-50 p-3 rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow border border-gray-200"
-          aria-label="메뉴 열기"
-        >
-          <Menu className="w-6 h-6 text-purple-600" />
-        </button>
-      )}
-
-      {/* Header */}
-      <TopBar />
-
-      {/* Main Content - Animates with sidebar */}
-      <motion.main
-        className="flex-1 overflow-auto"
+      {/* Main Content + Header - Animates with sidebar */}
+      <motion.div
         animate={{
           marginLeft: sidebarOpen ? '224px' : '0px',
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
+        {/* Header */}
+        <TopBar />
+
+        <main>
         {/* 홈/플레이그라운드: 전체 너비, 레슨: 레슨 컨테이너, 나머지: 메인 컨테이너 */}
         {isHomePage || isPlaygroundPage ? (
           children
@@ -124,7 +132,8 @@ export function MainLayout({ children }: MainLayoutProps) {
         )}
 
         {/* LessonPage에서는 푸터 제거 - 학습 공간 확보 */}
-      </motion.main>
+        </main>
+      </motion.div>
     </div>
   );
 }

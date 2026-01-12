@@ -8,9 +8,17 @@
       {
         "line": 4,
         "title": "변수 a 생성",
-        "explanation": "a에 값 10이 저장됩니다.",
-        "highlight": [4],
+        "explanation": "a에 값 **10**이 저장됩니다. 주소는 0x7ffc1000이에요.\n\n**준비 단계:** 역참조를 배우기 위해 먼저 가리킬 대상(pointee)이 필요합니다.",
+        "highlight": [
+          4
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -18,15 +26,18 @@
             "type": "int",
             "size": 4,
             "value": 10,
-            "address": "0x7ffc1000"
+            "address": "0x7ffc1000",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 5,
         "title": "포인터 p가 a를 가리킴",
-        "explanation": "p는 a의 주소를 저장합니다. 화살표로 표현하면 p → a 관계입니다.",
-        "highlight": [5],
+        "explanation": "p는 a의 주소를 저장합니다. **p → a** 관계가 형성돼요.\n\n**int *p = &a; 해석:**\n- int * : \"int를 가리키는 포인터 타입\"\n- p : 변수 이름\n- = &a : a의 주소로 초기화\n\n선언과 초기화를 한 줄에! 안전한 방식입니다.",
+        "highlight": [
+          5
+        ],
         "memoryChanges": [
           {
             "action": "allocate",
@@ -36,22 +47,29 @@
             "size": 8,
             "value": "0x7ffc1000",
             "address": "0x7ffc0ff8",
-            "pointsTo": "a"
+            "pointsTo": "a",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 7,
         "title": "a의 값 직접 읽기",
-        "explanation": "a를 사용하면 직접 10을 가져옵니다.",
-        "highlight": [7],
+        "explanation": "a를 사용하면 **직접** 10을 가져옵니다.\n\n**직접 접근:** 변수 이름으로 값에 바로 접근하는 방식입니다. 가장 단순하고 빠른 방법이에요.",
+        "highlight": [
+          7
+        ],
+        "stdout": "a의 값: 10",
         "memoryChanges": []
       },
       {
         "line": 8,
         "title": "역참조로 값 읽기",
-        "explanation": "*p는 '포인터 따라가기'입니다. p(0x7ffc1000) → 그 주소의 값(10). a와 *p는 같은 결과!",
-        "highlight": [8],
+        "explanation": "*p는 **'역참조(dereference)'** 연산입니다. \"p가 가리키는 곳에 가서 값을 읽어와!\"라는 의미예요.\n\n**동작 원리:**\n1. p 안의 값(0x7ffc1000)을 읽음\n2. 그 주소로 이동\n3. 거기 있는 값(10)을 가져옴\n\n**결과:** a와 *p는 같은 값! 하나는 직접, 하나는 간접 접근이지만 같은 메모리를 읽습니다.\n\n**왜 '역참조'일까?** &(주소 연산자)의 반대 동작이라서 '역'참조입니다. &a → 주소, *p → 값",
+        "highlight": [
+          8
+        ],
+        "stdout": "p가 가리키는 값: 10",
         "memoryChanges": []
       }
     ]

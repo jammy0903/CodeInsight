@@ -8,8 +8,9 @@
       {
         "line": 15,
         "title": "main 스택 프레임 생성",
-        "explanation": "main()이 시작되면 스택에 main의 프레임이 생성됩니다. x가 이 프레임에 할당됩니다.",
+        "explanation": "main()이 시작되면 스택에 **main의 프레임**이 생성됩니다.\n\n**스택 프레임이란?** 함수가 사용할 메모리 공간이에요. 지역 변수, 매개변수, 반환 주소 등이 여기에 저장됩니다.\n\n**왜 프레임이 필요할까?**\n- 각 함수의 데이터를 **분리**하기 위해서예요\n- 함수 종료 시 한 번에 **정리** 가능\n- 재귀 호출도 깔끔하게 처리 가능!\n\nx는 main의 프레임에 할당됩니다.",
         "highlight": [14, 15],
+        "stdout": "main: x=10",
         "memoryChanges": [
           {
             "action": "frame",
@@ -31,8 +32,9 @@
       {
         "line": 17,
         "title": "foo 호출 - 새 프레임",
-        "explanation": "foo()가 호출되면 main 위에 foo 프레임이 쌓입니다.",
+        "explanation": "foo()가 호출되면 main **위에** foo 프레임이 쌓입니다.\n\n**왜 '위에' 쌓일까?** 스택은 **LIFO(Last In First Out)** 구조예요.\n- 나중에 호출된 함수가 먼저 종료됨\n- foo가 끝나야 main으로 돌아갈 수 있음\n\n**현재 스택 상태:**\n```\n[foo] ← 현재 실행 중\n[main]\n```\n\nfoo의 지역 변수 y는 foo 프레임에 저장됩니다.",
         "highlight": [17, 8, 9],
+        "stdout": "foo: y=20",
         "memoryChanges": [
           {
             "action": "frame",
@@ -54,8 +56,9 @@
       {
         "line": 11,
         "title": "bar 호출 - 세 번째 프레임",
-        "explanation": "bar()가 호출되면 foo 위에 bar 프레임이 쌓입니다. 스택: main → foo → bar",
+        "explanation": "bar()가 호출되면 foo 위에 bar 프레임이 쌓입니다.\n\n**현재 스택 상태:**\n```\n[bar] ← 현재 실행 중 (z=30)\n[foo]    (y=20)\n[main]   (x=10)\n```\n\n**핵심 관찰:**\n- 각 함수의 변수는 **자기 프레임**에만 존재\n- bar에서 x나 y에 직접 접근 불가 (포인터 없이는)\n- 이것이 **지역 변수의 범위(scope)** 개념!\n\n**왜 이렇게 분리할까?** 함수 간 데이터 충돌을 방지하고, 코드 모듈화를 가능하게 합니다.",
         "highlight": [11, 3, 4],
+        "stdout": "bar: z=30",
         "memoryChanges": [
           {
             "action": "frame",
@@ -77,7 +80,7 @@
       {
         "line": 6,
         "title": "bar 종료 - 프레임 제거",
-        "explanation": "bar()가 끝나면 bar 프레임이 제거됩니다. z도 함께 사라집니다.",
+        "explanation": "bar()가 끝나면 bar 프레임이 **제거**됩니다. z도 함께 사라집니다.\n\n**왜 자동으로 해제될까?** 스택의 장점이에요!\n- malloc처럼 수동 해제 불필요\n- 메모리 누수 걱정 없음\n- 함수 종료 = 자동 정리\n\n**함수 종료 후 스택:**\n```\n[foo] ← 다시 실행 중\n[main]\n```\n\n**중요:** bar의 z에 저장된 값 30은 이제 접근할 수 없어요. 해제된 메모리입니다!",
         "highlight": [6],
         "memoryChanges": [
           {

@@ -1,0 +1,115 @@
+{
+  "lessonId": "py-5-4",
+  "title": "UnboundLocalError 이해하기",
+  "concept": "왜 이 에러가 나는지 이해하면 스코프를 이해한 것!",
+  "content": {
+    "code": "x = 10\n\ndef broken():\n    print(x)    # 여기서 에러!\n    x = 20\n\ndef working():\n    y = x       # 읽기만 OK\n    print(y)\n\nworking()  # 10\nbroken()   # UnboundLocalError!",
+    "steps": [
+      {
+        "line": 1,
+        "title": "글로벌 변수 x",
+        "explanation": "`x = 10`은 글로벌 변수입니다.\n\n함수에서 이 값을 읽을 수 있을까요?\n\n**답:** 상황에 따라 다릅니다!",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "문제의 함수 broken()",
+        "explanation": "이 함수가 왜 에러날까요?\n\n```python\ndef broken():\n    print(x)  # x 읽기\n    x = 20    # x에 할당\n```\n\n**핵심:** 파이썬은 함수 전체를 먼저 분석해서\n`x = 20`을 보고 \"x는 로컬이구나!\" 라고 결정합니다.",
+        "highlight": [3, 4, 5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" },
+            { "name": "broken", "pointsTo": "func_broken" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200" },
+            { "id": "func_broken", "type": "function", "value": "broken()", "pyId": "140100" }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "정상 동작하는 함수",
+        "explanation": "`working()`은 왜 되나요?\n\n```python\ndef working():\n    y = x  # x 읽기만\n```\n\n`x`에 할당하는 코드가 없으므로,\n파이썬은 \"x는 글로벌이구나!\"라고 판단합니다.",
+        "highlight": [7, 8, 9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" },
+            { "name": "working", "pointsTo": "func_working" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200" },
+            { "id": "func_working", "type": "function", "value": "working()", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "working() 성공!",
+        "explanation": "`working()` 호출:\n\n1. `y = x` → 글로벌 x(10)를 읽음\n2. `print(y)` → 10 출력\n\n**읽기만 하면 문제없음!**",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200" }
+          ],
+          "output": ["10"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "broken() 에러!",
+        "explanation": "`broken()` 호출 시:\n\n```\nUnboundLocalError: local variable 'x' \nreferenced before assignment\n```\n\n**무슨 일이 일어났나?**\n\n1. 파이썬이 함수 전체를 스캔\n2. `x = 20` 발견 → \"x는 로컬!\"\n3. `print(x)` 실행 시점에 로컬 x가 아직 없음!\n4. → UnboundLocalError\n\n**해결책:** `global x` 선언 추가",
+        "highlight": [12],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200" }
+          ],
+          "output": ["10", "UnboundLocalError!"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "이 코드는?\n\ndata = [1, 2, 3]\ndef f():\n    data.append(4)\n    print(data)\nf()",
+    "options": [
+      "[1, 2, 3, 4]",
+      "UnboundLocalError",
+      "NameError",
+      "TypeError"
+    ],
+    "correctIndex": 0,
+    "explanation": "data에 '할당'하는 게 아니라 '메서드 호출'입니다! 할당이 없으면 로컬로 취급 안 해서 글로벌 data를 수정합니다. 리스트는 가변이라 메서드로 수정 가능!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "에러 위치가 print(x)니까 print가 문제",
+      "correct": "함수 아래쪽의 x = 20 때문에 x가 로컬로 결정됨",
+      "why": "파이썬은 실행 전에 함수 전체를 분석해서 변수 스코프를 결정합니다."
+    },
+    {
+      "wrong": "코드 순서대로 스코프가 결정된다",
+      "correct": "함수 어디든 할당이 있으면 그 변수는 로컬",
+      "why": "컴파일 시점에 할당문을 보고 스코프를 결정, 실행 시점이 아닙니다."
+    }
+  ],
+  "keyTakeaway": "함수 어디서든 x = 가 있으면 x는 로컬! 글로벌을 쓰려면 global 선언 필수!"
+}

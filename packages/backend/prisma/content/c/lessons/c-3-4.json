@@ -8,7 +8,7 @@
       {
         "line": 8,
         "title": "main에서 배열 생성",
-        "explanation": "arr은 5개 int 배열. sizeof(arr) = 20바이트",
+        "explanation": "arr은 5개 int 배열. sizeof(arr) = **20바이트**\n\n**이번 레슨의 핵심 질문:** 배열을 함수에 전달하면 무슨 일이 일어날까요?\n\n**힌트:** main에서는 sizeof(arr)=20인데, 함수 안에서는...? 직접 확인해 봅시다!",
         "highlight": [8],
         "memoryChanges": [
           {
@@ -26,14 +26,15 @@
       {
         "line": 10,
         "title": "main에서 sizeof",
-        "explanation": "main에서는 배열 전체 크기 20이 출력됩니다.",
+        "explanation": "main에서는 배열 전체 크기 **20**이 출력됩니다.\n\n**왜 20일까?** main 함수 안에서 arr은 아직 **int[5] 타입**이에요. 컴파일러가 배열 크기를 알고 있습니다.\n\n이제 이 배열을 함수에 넘겨보면...",
         "highlight": [10],
+        "stdout": "main sizeof: 20",
         "memoryChanges": []
       },
       {
         "line": 11,
         "title": "함수 호출 - decay 발생!",
-        "explanation": "printSize(arr)를 호출하면 arr은 포인터로 decay됩니다. 주소만 전달됩니다.",
+        "explanation": "printSize(arr)를 호출하면 arr은 **포인터로 decay**됩니다!\n\n**무슨 일이 일어났을까?**\n1. arr (int[5] 타입) → decay → &arr[0] (int* 타입)\n2. 주소값 0x7ffc1000만 복사됨\n3. 크기 정보(5개)는 **사라짐!**\n\n**왜 이렇게 설계했을까?** 배열 전체를 복사하면 느리니까요. 100만개 배열을 매번 복사하면 끔찍하겠죠?\n\n**결론:** 함수에 배열을 넘기면 **주소만 전달**, 크기는 손실됩니다.",
         "highlight": [11, 3],
         "memoryChanges": [
           {
@@ -57,8 +58,9 @@
       {
         "line": 4,
         "title": "함수 내 sizeof",
-        "explanation": "함수 내 sizeof(arr) = 8! 포인터 크기만 나옵니다. 배열 크기 정보가 사라졌습니다.",
+        "explanation": "함수 내 sizeof(arr) = **8**! 포인터 크기만 나옵니다.\n\n**충격적인 결과:** 배열 크기 정보가 사라졌습니다!\n\n**왜 8일까?**\n- 함수 매개변수 `int arr[]`는 사실 `int *arr`과 **동일**\n- 컴파일러가 배열 문법을 포인터로 해석해요\n- `void foo(int arr[5])`의 5도 **무시됨!**\n\n**해결책:** 크기를 별도 인자로 전달하세요.\n```c\nvoid printSize(int arr[], int size) {\n    // size를 사용\n}\n```\n\n이것이 C 함수가 항상 배열 크기를 따로 받는 이유입니다!",
         "highlight": [4],
+        "stdout": "함수 내 sizeof: 8",
         "memoryChanges": []
       }
     ]

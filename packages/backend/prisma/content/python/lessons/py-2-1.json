@@ -1,0 +1,116 @@
+{
+  "lessonId": "py-2-1",
+  "title": "정수 불변성",
+  "concept": "숫자는 제자리에서 바뀌지 않는다 - 연산은 항상 새 객체를 만든다",
+  "content": {
+    "code": "a = 10\nprint(f\"Before: a = {a}, id = {id(a)}\")\n\na += 1\nprint(f\"After a += 1: a = {a}, id = {id(a)}\")\n\n# 원래 10은 아직 존재!\nb = 10\nprint(f\"b = 10: id = {id(b)}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "정수 객체 생성",
+        "explanation": "`a = 10`은 이름 `a`를 값이 10인 정수 객체에 바인딩합니다.\n\n이 객체에 무슨 일이 생기는지 추적해봅시다.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406400", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "id 기록하기",
+        "explanation": "이 객체의 id를 기억해두세요. += 연산 후에 비교해볼 겁니다.",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406400" }
+          ],
+          "output": ["Before: a = 10, id = 9406400"]
+        }
+      },
+      {
+        "line": 4,
+        "title": "a += 1 - 생각과 다르다!",
+        "explanation": "**핵심 오해 포인트**\n\n`a += 1`은 정수 10을 수정하지 않습니다!\n\n실제로 일어나는 일:\n1. `a + 1` 계산 → 새 정수 11 생성\n2. `a`를 이 새 객체에 바인딩\n3. 원래 10은 그대로\n\n**정수는 불변(IMMUTABLE)**입니다 - 제자리에서 수정할 수 없습니다.",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_11" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406400" },
+            { "id": "int_11", "type": "int", "value": "11", "pyId": "9406432", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "id가 바뀌었다!",
+        "explanation": "**증거:** id가 달라졌습니다!\n\n이건 `a`가 이제 완전히 다른 객체를 가리킨다는 증명입니다.\n\n만약 `a += 1`이 원래 객체를 수정했다면 id가 그대로여야 합니다.",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_11" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406400" },
+            { "id": "int_11", "type": "int", "value": "11", "pyId": "9406432" }
+          ],
+          "output": ["Before: a = 10, id = 9406400", "After a += 1: a = 11, id = 9406432"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "원래 10이 아직 있다!",
+        "explanation": "**놀라운 증명:**\n\n`b = 10`은 `a`가 원래 가리키던 바로 그 10 객체에 바인딩됩니다.\n\n10은 절대 수정되지 않았습니다 - `a`가 그냥 다른 객체로 이동한 것입니다.\n\n(작은 정수 -5 ~ 256은 파이썬이 같은 객체를 재사용합니다)",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_11" },
+            { "name": "b", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406400", "highlight": true },
+            { "id": "int_11", "type": "int", "value": "11", "pyId": "9406432" }
+          ],
+          "output": ["Before: a = 10, id = 9406400", "After a += 1: a = 11, id = 9406432", "b = 10: id = 9406400"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "이 코드 후 x의 id는?\n\nx = 5\noriginal_id = id(x)\nx = x * 2",
+    "options": [
+      "original_id와 같다 (객체가 수정됨)",
+      "original_id와 다르다 (새 객체 생성됨)",
+      "None (x가 삭제됨)",
+      "에러 (곱셈 불가)"
+    ],
+    "correctIndex": 1,
+    "explanation": "x * 2는 새 정수 객체(10)를 만들고, x가 그것에 재바인딩됩니다. 다른 객체라서 id가 바뀝니다. 정수는 불변이라 연산은 항상 새 객체를 만듭니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "a += 1은 'a'에 저장된 숫자를 증가시킨다",
+      "correct": "a += 1은 새 정수를 만들고 'a'를 그것에 재바인딩한다",
+      "why": "'a에 저장된 숫자' 같은 건 없습니다. a는 그냥 객체를 가리키는 이름이고, +=는 새 객체를 만듭니다."
+    },
+    {
+      "wrong": "효율성을 위해 정수를 제자리에서 수정할 수 있다",
+      "correct": "파이썬에서 정수는 완전히 불변이다",
+      "why": "이 불변성은 설계 결정입니다. 정수를 변수 간에 안전하게 공유할 수 있게 해줍니다."
+    }
+  ],
+  "keyTakeaway": "정수는 불변(IMMUTABLE)! a += 1은 기존 객체를 수정하지 않고 새 객체를 만든다!"
+}

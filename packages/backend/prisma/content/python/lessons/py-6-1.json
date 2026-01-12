@@ -1,0 +1,113 @@
+{
+  "lessonId": "py-6-1",
+  "title": "클래스 정의",
+  "concept": "클래스는 객체를 만드는 설계도, 클래스 자체도 객체!",
+  "content": {
+    "code": "class Dog:\n    species = \"Canis familiaris\"\n    \n    def bark(self):\n        print(\"멍멍!\")\n\nprint(type(Dog))\nprint(Dog.species)\n\nmy_dog = Dog()\nprint(type(my_dog))",
+    "steps": [
+      {
+        "line": 1,
+        "title": "클래스 정의",
+        "explanation": "`class Dog:`로 새로운 클래스를 정의합니다.\n\n**파이썬에서 클래스는:**\n- 객체를 만드는 '틀' (설계도)\n- 그 자체도 객체! (type 타입의 인스턴스)\n\n이게 파이썬이 \"모든 것이 객체\"인 이유입니다.",
+        "highlight": [1, 2, 3, 4, 5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "클래스 변수",
+        "explanation": "`species = \"Canis familiaris\"`는 **클래스 변수**입니다.\n\n**특징:**\n- 클래스에 속함 (인스턴스가 아님)\n- 모든 인스턴스가 공유\n- `Dog.species`로 접근",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog [species='Canis...']", "pyId": "140100" }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "메서드 정의",
+        "explanation": "`def bark(self)`는 **인스턴스 메서드**입니다.\n\n**self가 뭐야?**\n- 이 메서드를 호출하는 인스턴스 자신\n- 첫 번째 인자로 자동 전달됨\n- 이름은 관례적으로 `self` (다른 이름도 가능하지만 쓰지 마세요!)",
+        "highlight": [4, 5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog [species, bark()]", "pyId": "140100" }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "클래스도 객체!",
+        "explanation": "`type(Dog)` → `<class 'type'>`\n\n**놀라운 사실:** 클래스 Dog 자체도 객체입니다!\n\n- Dog는 `type` 클래스의 인스턴스\n- type도 객체 (자기 자신의 인스턴스)\n\n이게 파이썬의 \"메타클래스\" 개념입니다.",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100" }
+          ],
+          "output": ["<class 'type'>"]
+        }
+      },
+      {
+        "line": 10,
+        "title": "인스턴스 생성",
+        "explanation": "`my_dog = Dog()` → 새로운 Dog 인스턴스 생성!\n\n**무슨 일이 일어나나?**\n1. 메모리에 새 객체 공간 할당\n2. `__init__` 호출 (있다면)\n3. 객체 반환\n\n`type(my_dog)` → `<class 'Dog'>`",
+        "highlight": [10, 11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" },
+            { "name": "my_dog", "pointsTo": "inst_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100" },
+            { "id": "inst_dog", "type": "Dog", "value": "Dog instance", "pyId": "140200", "highlight": true }
+          ],
+          "output": ["<class 'type'>", "Canis familiaris", "<class '__main__.Dog'>"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "클래스 변수와 인스턴스 변수의 차이는?",
+    "options": [
+      "차이 없다",
+      "클래스 변수는 모든 인스턴스가 공유, 인스턴스 변수는 각자 소유",
+      "인스턴스 변수가 더 빠르다",
+      "클래스 변수는 메서드 안에서만 사용 가능"
+    ],
+    "correctIndex": 1,
+    "explanation": "클래스 변수는 클래스에 속해서 모든 인스턴스가 공유합니다. 인스턴스 변수(self.xxx)는 각 인스턴스마다 독립적입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "class는 함수처럼 실행되는 코드",
+      "correct": "class는 새로운 타입(객체 틀)을 정의하는 것",
+      "why": "class 문은 클래스 객체를 생성하고 이름에 바인딩합니다."
+    },
+    {
+      "wrong": "self는 특별한 키워드",
+      "correct": "self는 그냥 관례적인 매개변수 이름",
+      "why": "this도 가능하지만, 파이썬 커뮤니티는 self를 사용합니다. 따르세요!"
+    }
+  ],
+  "keyTakeaway": "클래스는 객체를 만드는 설계도이면서, 그 자체도 객체! 모든 것이 객체!"
+}

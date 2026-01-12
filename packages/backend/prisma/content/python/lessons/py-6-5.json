@@ -1,0 +1,119 @@
+{
+  "lessonId": "py-6-5",
+  "title": "메서드 바인딩",
+  "concept": "obj.method()는 self가 자동으로 전달되는 바운드 메서드!",
+  "content": {
+    "code": "class Dog:\n    def bark(self):\n        print(f\"멍멍! (id: {id(self)})\")\n\nmy_dog = Dog()\n\n# 방법 1: 바운드 메서드\nmy_dog.bark()\n\n# 방법 2: 언바운드 호출\nDog.bark(my_dog)\n\n# 메서드도 객체!\nmethod = my_dog.bark\nprint(type(method))\nmethod()  # self 없이 호출 가능!",
+    "steps": [
+      {
+        "line": 2,
+        "title": "메서드 정의",
+        "explanation": "`def bark(self)`\n\n메서드는 클래스에 저장된 함수입니다.\n\n**self는 누가 전달하나요?**\n→ 파이썬이 자동으로!",
+        "highlight": [2, 3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog [bark()]", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "바운드 메서드 호출",
+        "explanation": "`my_dog.bark()`\n\n**무슨 일이 일어나나?**\n1. `my_dog.bark` → 바운드 메서드 객체 생성\n2. 이 객체는 my_dog를 \"기억\"함\n3. `()` 호출 시 self=my_dog 자동 전달\n\n**바운드 메서드 = 인스턴스 + 함수**",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" },
+            { "name": "my_dog", "pointsTo": "inst_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100" },
+            { "id": "inst_dog", "type": "Dog", "value": "Dog instance", "pyId": "140200", "highlight": true }
+          ],
+          "output": ["멍멍! (id: 140200)"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "언바운드 호출",
+        "explanation": "`Dog.bark(my_dog)`\n\n**클래스에서 직접 호출!**\n\n이 경우 self를 명시적으로 전달해야 합니다.\n\n결과는 `my_dog.bark()`와 동일!",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" },
+            { "name": "my_dog", "pointsTo": "inst_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100" },
+            { "id": "inst_dog", "type": "Dog", "value": "Dog instance", "pyId": "140200" }
+          ],
+          "output": ["멍멍! (id: 140200)", "멍멍! (id: 140200)"]
+        }
+      },
+      {
+        "line": 14,
+        "title": "메서드도 객체!",
+        "explanation": "`method = my_dog.bark`\n\n**메서드를 변수에 저장!**\n\n`type(method)` → `<class 'method'>`\n\n이 method 객체는 my_dog를 기억하고 있어서\n나중에 `method()` 호출하면 self가 자동 전달!",
+        "highlight": [14, 15],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "my_dog", "pointsTo": "inst_dog" },
+            { "name": "method", "pointsTo": "bound_method" }
+          ],
+          "objects": [
+            { "id": "inst_dog", "type": "Dog", "value": "Dog instance", "pyId": "140200" },
+            { "id": "bound_method", "type": "method", "value": "bark [self=my_dog]", "pyId": "140300", "highlight": true }
+          ],
+          "output": ["멍멍! (id: 140200)", "멍멍! (id: 140200)", "<class 'method'>"]
+        }
+      },
+      {
+        "line": 16,
+        "title": "저장한 메서드 호출",
+        "explanation": "`method()` - 인자 없이 호출!\n\n**왜 self 없이 되나요?**\n\n바운드 메서드가 이미 인스턴스를 기억하고 있어서\n호출 시 자동으로 self를 전달합니다.\n\n**콜백에 유용!** (버튼 클릭 핸들러 등)",
+        "highlight": [16],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "method", "pointsTo": "bound_method" }
+          ],
+          "objects": [
+            { "id": "bound_method", "type": "method", "value": "bark [self=my_dog]", "pyId": "140300" }
+          ],
+          "output": ["멍멍! (id: 140200)", "멍멍! (id: 140200)", "<class 'method'>", "멍멍! (id: 140200)"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "obj.method()와 Class.method(obj)의 차이는?",
+    "options": [
+      "결과가 다르다",
+      "결과는 같다 - 전자가 self를 자동 전달",
+      "후자만 동작한다",
+      "전자만 동작한다"
+    ],
+    "correctIndex": 1,
+    "explanation": "obj.method()는 self를 자동 전달하는 바운드 메서드 호출입니다. Class.method(obj)는 self를 명시적으로 전달하는 언바운드 호출입니다. 결과는 동일!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "메서드는 함수와 다른 것",
+      "correct": "메서드는 인스턴스에 바인딩된 함수",
+      "why": "obj.method는 함수 + 인스턴스가 결합된 '바운드 메서드' 객체입니다."
+    },
+    {
+      "wrong": "self는 키워드로 자동 정의된다",
+      "correct": "self는 그냥 첫 번째 매개변수 이름 (관례)",
+      "why": "파이썬은 호출 시 인스턴스를 첫 번째 인자로 전달할 뿐입니다."
+    }
+  ],
+  "keyTakeaway": "obj.method()는 바운드 메서드! self가 자동 전달되어 편리하게 호출 가능!"
+}

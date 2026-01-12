@@ -1,19 +1,21 @@
 /**
  * AI Provider Factory
  * 현재 설정된 provider를 반환
+ *
+ * 지원 Provider:
+ * - DeepSeek: 클라우드 API (유료, 스트리밍 지원)
+ * - Ollama: 로컬 LLM (무료, 스트리밍 지원)
  */
 
 import { IAIProvider, ProviderType } from './types';
 import { DeepSeekProvider } from './deepseek.provider';
 import { OllamaProvider } from './ollama.provider';
-import { GeminiProvider } from './gemini.provider';
 import { getSettings, updateSettings } from '../settings';
 
 // Singleton instances
 const providers: Record<ProviderType, IAIProvider> = {
   'deepseek': new DeepSeekProvider(),
   'ollama': new OllamaProvider(),
-  'gemini': new GeminiProvider(),
 };
 
 /**

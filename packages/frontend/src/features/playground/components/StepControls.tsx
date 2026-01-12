@@ -43,7 +43,8 @@ export function StepControls() {
         return;
       }
 
-      setSteps(result.steps);
+      // steps와 함께 stepRegisters도 저장
+      setSteps(result.steps, result.stepRegisters);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Simulation failed');
     } finally {
@@ -51,15 +52,15 @@ export function StepControls() {
     }
   };
 
-  // 공통 버튼 스타일
+  // 공통 버튼 스타일 (라이트 테마)
   const buttonBase: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '6px',
-    padding: '6px 12px',
-    fontSize: '12px',
-    fontWeight: 500,
+    gap: '4px',
+    padding: '4px 10px',
+    fontSize: '11px',
+    fontWeight: 600,
     borderRadius: '6px',
     border: 'none',
     cursor: 'pointer',
@@ -68,9 +69,9 @@ export function StepControls() {
 
   const runButtonStyle: React.CSSProperties = {
     ...buttonBase,
-    background: 'linear-gradient(135deg, #238636 0%, #2ea043 100%)',
+    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
     color: 'white',
-    boxShadow: '0 2px 8px rgba(35, 134, 54, 0.3)',
+    boxShadow: '0 1px 3px rgba(34, 197, 94, 0.3)',
   };
 
   const runButtonDisabled: React.CSSProperties = {
@@ -82,9 +83,9 @@ export function StepControls() {
 
   const secondaryButton: React.CSSProperties = {
     ...buttonBase,
-    background: 'rgba(110, 118, 129, 0.1)',
-    color: '#8b949e',
-    border: '1px solid #30363d',
+    background: '#f3f4f6',
+    color: '#6b7280',
+    border: '1px solid #e5e7eb',
   };
 
   const secondaryButtonDisabled: React.CSSProperties = {
@@ -97,12 +98,12 @@ export function StepControls() {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '28px',
-    height: '28px',
+    width: '26px',
+    height: '26px',
     borderRadius: '6px',
-    border: '1px solid #30363d',
-    background: 'rgba(110, 118, 129, 0.1)',
-    color: '#8b949e',
+    border: '1px solid #e5e7eb',
+    background: '#ffffff',
+    color: '#6b7280',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
   };
@@ -123,12 +124,12 @@ export function StepControls() {
         onMouseEnter={(e) => {
           if (!isSimulating && isSupported) {
             e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(35, 134, 54, 0.4)';
+            e.currentTarget.style.boxShadow = '0 2px 6px rgba(34, 197, 94, 0.4)';
           }
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 2px 8px rgba(35, 134, 54, 0.3)';
+          e.currentTarget.style.boxShadow = '0 1px 3px rgba(34, 197, 94, 0.3)';
         }}
       >
         {isSimulating ? (
@@ -145,22 +146,22 @@ export function StepControls() {
           onClick={reset}
           style={secondaryButton}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(110, 118, 129, 0.2)';
-            e.currentTarget.style.color = '#c9d1d9';
+            e.currentTarget.style.background = '#e5e7eb';
+            e.currentTarget.style.color = '#374151';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(110, 118, 129, 0.1)';
-            e.currentTarget.style.color = '#8b949e';
+            e.currentTarget.style.background = '#f3f4f6';
+            e.currentTarget.style.color = '#6b7280';
           }}
         >
-          <RotateCcw size={14} />
+          <RotateCcw size={12} />
           <span>Reset</span>
         </button>
       )}
 
       {/* 구분선 */}
       {hasSteps && (
-        <div style={{ width: '1px', height: '20px', background: '#30363d', margin: '0 4px' }} />
+        <div style={{ width: '1px', height: '16px', background: '#e5e7eb', margin: '0 2px' }} />
       )}
 
       {/* 이전/다음 네비게이션 */}
@@ -172,30 +173,31 @@ export function StepControls() {
             style={canGoPrev ? navButton : navButtonDisabled}
             onMouseEnter={(e) => {
               if (canGoPrev) {
-                e.currentTarget.style.background = 'rgba(110, 118, 129, 0.25)';
-                e.currentTarget.style.color = '#c9d1d9';
+                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.color = '#374151';
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(110, 118, 129, 0.1)';
-              e.currentTarget.style.color = '#8b949e';
+              e.currentTarget.style.background = '#ffffff';
+              e.currentTarget.style.color = '#6b7280';
             }}
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={14} />
           </button>
 
           <div
             style={{
-              padding: '4px 10px',
-              fontSize: '12px',
+              padding: '3px 8px',
+              fontSize: '11px',
               fontFamily: 'monospace',
-              color: '#58a6ff',
-              background: 'rgba(88, 166, 255, 0.1)',
-              borderRadius: '6px',
-              border: '1px solid rgba(88, 166, 255, 0.2)',
+              fontWeight: 600,
+              color: '#22c55e',
+              background: '#f0fdf4',
+              borderRadius: '4px',
+              border: '1px solid #bbf7d0',
             }}
           >
-            {currentStepIndex + 1} / {steps.length}
+            {currentStepIndex + 1}/{steps.length}
           </div>
 
           <button
@@ -204,36 +206,20 @@ export function StepControls() {
             style={canGoNext ? navButton : navButtonDisabled}
             onMouseEnter={(e) => {
               if (canGoNext) {
-                e.currentTarget.style.background = 'rgba(110, 118, 129, 0.25)';
-                e.currentTarget.style.color = '#c9d1d9';
+                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.color = '#374151';
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(110, 118, 129, 0.1)';
-              e.currentTarget.style.color = '#8b949e';
+              e.currentTarget.style.background = '#ffffff';
+              e.currentTarget.style.color = '#6b7280';
             }}
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={14} />
           </button>
         </div>
       )}
 
-      {/* 현재 라인 표시 */}
-      {hasSteps && (
-        <div
-          style={{
-            marginLeft: '8px',
-            padding: '4px 10px',
-            fontSize: '11px',
-            color: '#f0883e',
-            background: 'rgba(240, 136, 62, 0.1)',
-            borderRadius: '6px',
-            border: '1px solid rgba(240, 136, 62, 0.2)',
-          }}
-        >
-          Line {steps[currentStepIndex]?.line}
-        </div>
-      )}
 
       <style>{`
         @keyframes spin {

@@ -1,0 +1,102 @@
+{
+  "lessonId": "js-4-1",
+  "title": "콜백 패턴",
+  "concept": "콜백은 다른 함수에 인자로 전달되어 나중에 실행되는 함수다",
+  "content": {
+    "code": "function fetchData(callback) {\n  console.log('Fetching data...');\n  setTimeout(() => {\n    const data = { id: 1, name: 'Alice' };\n    callback(data);\n  }, 1000);\n}\n\nfunction handleData(data) {\n  console.log('Received:', data.name);\n}\n\nfetchData(handleData);\nconsole.log('Request sent!');",
+    "steps": [
+      {
+        "line": 13,
+        "title": "fetchData(handleData) 호출",
+        "explanation": "fetchData 함수에 handleData 함수를 콜백으로 전달합니다.",
+        "keyInsight": "콜백 = 나중에 실행될 함수를 인자로 전달",
+        "highlight": [13],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["fetchData(handleData)"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": [],
+          "currentPhase": "executing"
+        }
+      },
+      {
+        "line": 2,
+        "title": "console.log 실행",
+        "explanation": "'Fetching data...'가 출력됩니다.",
+        "highlight": [2],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["fetchData(handleData)", "console.log"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["Fetching data..."],
+          "currentPhase": "executing"
+        }
+      },
+      {
+        "line": 3,
+        "title": "setTimeout 등록",
+        "explanation": "setTimeout이 Web API에 콜백을 등록합니다. 1초 후에 실행됩니다.",
+        "keyInsight": "비동기 작업은 Web API에서 처리됩니다.",
+        "highlight": [3, 4, 5, 6],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [{ "id": "timer1", "name": "callback with data", "delay": 1000, "status": "waiting" }],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["Fetching data..."],
+          "currentPhase": "executing"
+        }
+      },
+      {
+        "line": 14,
+        "title": "동기 코드 계속 실행",
+        "explanation": "fetchData가 끝나고 'Request sent!'가 출력됩니다. 비동기 작업을 기다리지 않습니다!",
+        "keyInsight": "비동기 = 기다리지 않고 다음 코드 실행",
+        "highlight": [14],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["console.log"],
+          "webApis": [{ "id": "timer1", "name": "callback with data", "delay": 1000, "status": "waiting" }],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["Fetching data...", "Request sent!"],
+          "currentPhase": "executing"
+        }
+      },
+      {
+        "line": 5,
+        "title": "1초 후: 콜백 실행",
+        "explanation": "타이머가 완료되어 콜백이 Task Queue로 이동 후 실행됩니다. handleData(data)가 호출됩니다.",
+        "highlight": [5],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["callback", "handleData(data)"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["Fetching data...", "Request sent!", "Received: Alice"],
+          "currentPhase": "executing"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "다음 코드의 출력 순서는?\n\nconsole.log('A');\nsetTimeout(() => console.log('B'), 0);\nconsole.log('C');",
+    "options": ["A B C", "A C B", "B A C", "C A B"],
+    "correctIndex": 1,
+    "explanation": "동기 코드(A, C)가 먼저 실행되고, setTimeout 콜백(B)은 Task Queue를 거쳐 나중에 실행됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "콜백은 즉시 실행된다",
+      "correct": "콜백은 특정 조건(타이머, 이벤트 등)이 충족되면 실행됩니다.",
+      "why": "콜백은 '나중에' 실행될 함수입니다."
+    }
+  ],
+  "keyTakeaway": "콜백 = 나중에 실행될 함수, 비동기 = 기다리지 않고 진행"
+}

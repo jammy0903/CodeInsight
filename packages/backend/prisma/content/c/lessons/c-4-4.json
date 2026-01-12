@@ -8,8 +8,9 @@
       {
         "line": 9,
         "title": "main에서 배열 생성",
-        "explanation": "nums 배열이 스택에 생성됩니다.",
+        "explanation": "nums 배열이 스택에 생성됩니다.\n\n**이번 레슨의 핵심 질문:** 배열을 함수에 전달하면 복사될까요?\n\n**힌트:** 챕터 3에서 배운 **배열 decay**가 여기서도 적용됩니다!",
         "highlight": [9],
+        "stdout": "호출 전: 5",
         "memoryChanges": [
           {
             "action": "frame",
@@ -32,7 +33,7 @@
       {
         "line": 11,
         "title": "배열 전달 = 포인터 전달",
-        "explanation": "doubleFirst(nums)는 nums가 포인터로 decay되어 전달됩니다. 배열 자체가 복사되지 않습니다!",
+        "explanation": "doubleFirst(nums)는 nums가 **포인터로 decay**되어 전달됩니다!\n\n**배열은 복사되지 않습니다!**\n\n**왜 복사 안 할까?**\n- 배열이 100만개 요소면? 복사하면 너무 느려요\n- 주소만 전달하면 8바이트로 끝!\n\n**동작 과정:**\n1. nums(int[3]) → decay → &nums[0](int*)\n2. 주소 0x7ffc1000만 arr에 복사\n3. arr은 nums를 **직접 가리킴**\n\n**결과:** arr을 통해 nums **원본**에 접근 가능!",
         "highlight": [11, 3],
         "memoryChanges": [
           {
@@ -56,8 +57,9 @@
       {
         "line": 4,
         "title": "원본 배열 수정!",
-        "explanation": "arr[0] = arr[0] * 2는 nums[0]을 직접 수정합니다. arr은 nums를 가리키기 때문입니다.",
+        "explanation": "arr[0] = arr[0] * 2는 **nums[0]을 직접 수정**합니다!\n\n**왜 원본이 수정될까?**\n- arr은 nums의 **주소**를 가지고 있어요\n- arr[0] = *(arr+0) = nums[0]과 **같은 메모리**\n\n**int형과의 차이:**\n```c\n// int: 복사본 수정 → 원본 변경 안 됨\nvoid foo(int n) { n = 100; }\n\n// 배열: 원본 수정됨!\nvoid bar(int arr[]) { arr[0] = 100; }\n```\n\n**중요:** 배열은 **항상** 원본에 접근합니다. 실수로 수정하지 않도록 주의하세요!",
         "highlight": [4],
+        "stdout": "함수 내 arr[0]: 10",
         "memoryChanges": [
           {
             "action": "update",
@@ -73,8 +75,9 @@
       {
         "line": 12,
         "title": "원본 변경 확인",
-        "explanation": "nums[0]이 10으로 변경되었습니다. 배열 전달은 항상 '원본'에 접근합니다.",
+        "explanation": "nums[0]이 **10**으로 변경되었습니다!\n\n**정리: 함수에 전달 시 원본 수정 여부**\n| 타입 | 전달 방식 | 원본 수정 |\n|------|----------|----------|\n| int x | 값 복사 | ❌ 안 됨 |\n| int *p | 주소 복사 | ⭕ 됨 |\n| int arr[] | 주소 복사 (decay) | ⭕ 됨 |\n\n**배열 수정 방지 팁:** const 사용\n```c\nvoid readOnly(const int arr[]) {\n    // arr[0] = 10;  // 에러! const라 수정 불가\n}\n```\n\n**const**는 \"이 함수는 배열을 수정하지 않겠다\"는 약속이에요!",
         "highlight": [12],
+        "stdout": "호출 후: 10",
         "memoryChanges": []
       }
     ]

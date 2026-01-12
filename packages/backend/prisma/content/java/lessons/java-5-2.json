@@ -1,0 +1,102 @@
+{
+  "lessonId": "java-5-2",
+  "title": "final 클래스와 메서드",
+  "concept": "final 클래스는 상속 불가, final 메서드는 오버라이드 불가",
+  "content": {
+    "code": "final class ImmutablePoint {\n    private final int x, y;\n    \n    public ImmutablePoint(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n    \n    public final int getX() { return x; }\n}\n\n// class ExtendedPoint extends ImmutablePoint {}  // 에러!\n\nclass Parent {\n    public final void cannotOverride() {\n        System.out.println(\"Cannot override this!\");\n    }\n}\n\nclass Child extends Parent {\n    // public void cannotOverride() {}  // 에러!\n}",
+    "steps": [
+      {
+        "line": 1,
+        "title": "final 클래스 선언",
+        "explanation": "ImmutablePoint는 final 클래스입니다. 상속이 불가능합니다.",
+        "keyInsight": "final class = 상속 불가",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "String, Integer, LocalDate 등도 final class"
+        }
+      },
+      {
+        "line": 2,
+        "title": "final 필드들",
+        "explanation": "x, y는 final이라 생성 후 변경 불가. 진정한 불변 객체!",
+        "keyInsight": "final class + final 필드 = 불변 객체",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "모든 필드 final + setter 없음 = 불변"
+        }
+      },
+      {
+        "line": 4,
+        "title": "생성자에서 초기화",
+        "explanation": "final 필드는 생성자에서 반드시 초기화해야 합니다.",
+        "highlight": [4, 5, 6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x001", "content": "ImmutablePoint{x: 10, y: 20}"}]
+        }
+      },
+      {
+        "line": 9,
+        "title": "final 메서드",
+        "explanation": "getX()는 final 메서드. 하위 클래스에서 오버라이드 불가!",
+        "keyInsight": "final method = 오버라이드 금지",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "보안/성능 이유로 재정의 방지"
+        }
+      },
+      {
+        "line": 12,
+        "title": "final 클래스 상속 시도 (에러)",
+        "explanation": "final 클래스를 상속하면 컴파일 에러!",
+        "highlight": [12],
+        "visualizationType": "memory",
+        "memoryState": {
+          "error": "컴파일 에러: cannot inherit from final ImmutablePoint"
+        }
+      },
+      {
+        "line": 14,
+        "title": "일반 클래스의 final 메서드",
+        "explanation": "Parent 클래스는 상속 가능하지만, cannotOverride()는 final!",
+        "highlight": [14, 15, 16, 17],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "클래스는 상속 OK, 특정 메서드만 오버라이드 금지"
+        }
+      },
+      {
+        "line": 21,
+        "title": "final 메서드 오버라이드 시도 (에러)",
+        "explanation": "Child에서 cannotOverride()를 재정의하면 컴파일 에러!",
+        "highlight": [21],
+        "visualizationType": "memory",
+        "memoryState": {
+          "error": "컴파일 에러: cannotOverride() in Child cannot override cannotOverride() in Parent"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "final 클래스를 만드는 이유로 적절하지 않은 것은?",
+    "options": [
+      "불변성 보장",
+      "보안 (하위 클래스 악용 방지)",
+      "성능 최적화 (인라인화)",
+      "다형성 활용"
+    ],
+    "correctIndex": 3,
+    "explanation": "final 클래스는 상속이 불가능하므로 다형성을 활용할 수 없습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "final 메서드는 오버로딩도 안 된다",
+      "correct": "final은 오버라이드만 금지합니다. 오버로딩은 가능합니다.",
+      "why": "오버로딩은 같은 이름의 다른 메서드 추가, 오버라이드는 기존 메서드 재정의입니다."
+    }
+  ],
+  "keyTakeaway": "final class = 상속 불가, final method = 오버라이드 불가"
+}

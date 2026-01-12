@@ -1,0 +1,131 @@
+{
+  "lessonId": "py-6-6",
+  "title": "상속 기초",
+  "concept": "자식 클래스는 부모의 속성과 메서드를 물려받는다! super()로 부모 호출!",
+  "content": {
+    "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n    \n    def speak(self):\n        print(\"...\")\n\nclass Dog(Animal):\n    def __init__(self, name, breed):\n        super().__init__(name)  # 부모 초기화!\n        self.breed = breed\n    \n    def speak(self):\n        print(f\"{self.name}: 멍멍!\")\n\ndog = Dog(\"바둑이\", \"진돗개\")\ndog.speak()\nprint(dog.name, dog.breed)",
+    "steps": [
+      {
+        "line": 1,
+        "title": "부모 클래스 정의",
+        "explanation": "`class Animal` - 기본 동물 클래스\n\n**부모 클래스 (Parent/Base Class)**\n- 공통 속성과 메서드 정의\n- 자식 클래스가 물려받을 틀",
+        "highlight": [1, 2, 3, 4, 5, 6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Animal", "pointsTo": "class_animal" }
+          ],
+          "objects": [
+            { "id": "class_animal", "type": "class", "value": "Animal [__init__, speak]", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "자식 클래스 정의",
+        "explanation": "`class Dog(Animal)` - Animal을 상속!\n\n**괄호 안에 부모 클래스 이름**\n\n→ Dog는 Animal의 모든 것을 물려받음\n→ 추가로 자기만의 것도 정의 가능",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Animal", "pointsTo": "class_animal" },
+            { "name": "Dog", "pointsTo": "class_dog" }
+          ],
+          "objects": [
+            { "id": "class_animal", "type": "class", "value": "Animal", "pyId": "140100" },
+            { "id": "class_dog", "type": "class", "value": "Dog(Animal)", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "super() 호출",
+        "explanation": "`super().__init__(name)`\n\n**가장 많이 실수하는 부분!**\n\n자식의 `__init__`에서 부모의 `__init__`을 **반드시** 호출해야 함!\n\n**안 하면?**\n→ `self.name`이 설정 안 됨\n→ AttributeError 발생!",
+        "highlight": [10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Animal", "pointsTo": "class_animal" },
+            { "name": "Dog", "pointsTo": "class_dog" }
+          ],
+          "objects": [
+            { "id": "class_animal", "type": "class", "value": "Animal", "pyId": "140100" },
+            { "id": "class_dog", "type": "class", "value": "Dog [super→Animal]", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 13,
+        "title": "메서드 오버라이딩",
+        "explanation": "`def speak(self)` - 부모의 speak를 **재정의**!\n\n**오버라이딩 (Overriding)**\n- 부모와 같은 이름의 메서드 정의\n- 자식의 메서드가 부모를 덮어씀\n- dog.speak() → \"멍멍!\" (부모의 \"...\" 대신)",
+        "highlight": [13, 14],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog [speak→오버라이딩]", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 16,
+        "title": "인스턴스 생성",
+        "explanation": "`Dog(\"바둑이\", \"진돗개\")`\n\n**실행 순서:**\n1. Dog 객체 생성\n2. Dog.__init__ 호출\n3. super().__init__(name) → Animal.__init__ 실행\n4. self.name = \"바둑이\" (부모에서)\n5. self.breed = \"진돗개\" (자식에서)",
+        "highlight": [16],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Dog", "pointsTo": "class_dog" },
+            { "name": "dog", "pointsTo": "inst_dog" }
+          ],
+          "objects": [
+            { "id": "class_dog", "type": "class", "value": "Dog(Animal)", "pyId": "140200" },
+            { "id": "inst_dog", "type": "Dog", "value": "{name: 바둑이, breed: 진돗개}", "pyId": "140300", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 17,
+        "title": "오버라이딩된 메서드 호출",
+        "explanation": "`dog.speak()` → \"바둑이: 멍멍!\"\n\n**메서드 탐색 순서 (MRO)**\n1. Dog 클래스에서 speak 찾기 → 있음!\n2. Dog.speak 실행\n\n만약 Dog에 speak가 없다면?\n→ 부모 Animal의 speak 실행",
+        "highlight": [17, 18],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "dog", "pointsTo": "inst_dog" }
+          ],
+          "objects": [
+            { "id": "inst_dog", "type": "Dog", "value": "{name: 바둑이, breed: 진돗개}", "pyId": "140300" }
+          ],
+          "output": ["바둑이: 멍멍!", "바둑이 진돗개"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "super().__init__(name)을 빼먹으면?",
+    "options": [
+      "정상 동작한다",
+      "self.name이 없어서 AttributeError",
+      "자동으로 부모 __init__이 호출된다",
+      "SyntaxError"
+    ],
+    "correctIndex": 1,
+    "explanation": "파이썬은 자동으로 부모 __init__을 호출하지 않습니다! 자식 __init__에서 명시적으로 super().__init__()을 호출해야 부모의 초기화가 실행됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "자식 __init__ 정의하면 부모 __init__이 자동 호출된다",
+      "correct": "super().__init__()을 명시적으로 호출해야 한다",
+      "why": "Java와 달리 파이썬은 자동 호출 안 함! 직접 super() 써야 합니다."
+    },
+    {
+      "wrong": "상속받으면 부모 메서드를 수정할 수 없다",
+      "correct": "오버라이딩으로 재정의 가능",
+      "why": "같은 이름의 메서드를 자식에서 정의하면 부모 것을 덮어씁니다."
+    }
+  ],
+  "keyTakeaway": "상속 = 부모 물려받기! super()로 부모 호출, 오버라이딩으로 재정의!"
+}

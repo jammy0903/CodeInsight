@@ -9,9 +9,16 @@
  * - heap: [{ id, type, value?, fields?, highlight? }]
  */
 
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaClient } from '.prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
-const prisma = new PrismaClient();
+// PostgreSQL connection
+const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 // =============================================
 // Chapter 5: 스코프와 네임스페이스
@@ -1172,4 +1179,5 @@ seedPythonContent3()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

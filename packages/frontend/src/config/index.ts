@@ -16,7 +16,9 @@ export const config = {
       problems: '/problems',
       submissions: '/submissions',
       aiChat: '/ai/chat',
+      aiChatStream: '/ai/chat/stream',
       aiExplain: '/ai/explain',
+      aiExplainStep: '/ai/explain-step',
       aiProviders: '/ai/providers',
     },
     timeout: {

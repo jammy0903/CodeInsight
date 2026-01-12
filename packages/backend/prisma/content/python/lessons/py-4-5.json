@@ -1,0 +1,99 @@
+{
+  "lessonId": "py-4-5",
+  "title": "반환값과 참조",
+  "concept": "함수가 반환하는 건 값이 아니라 객체에 대한 참조!",
+  "content": {
+    "code": "def get_list():\n    data = [1, 2, 3]\n    return data\n\na = get_list()\nb = get_list()\n\nprint(f\"a: {a}\")\nprint(f\"b: {b}\")\nprint(f\"a is b: {a is b}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "리스트를 반환하는 함수",
+        "explanation": "이 함수는 매번 새로운 리스트를 만들어서 반환합니다.\n\n**헷갈리는 포인트:**\n`return data`가 리스트를 '복사'해서 주는 걸까요?",
+        "highlight": [1, 2, 3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "get_list", "pointsTo": "func_get" }
+          ],
+          "objects": [
+            { "id": "func_get", "type": "function", "value": "get_list()", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "첫 번째 호출",
+        "explanation": "`a = get_list()` 호출 시:\n\n1. 함수 안에서 새 리스트 `[1, 2, 3]` 생성\n2. `data`가 이 리스트를 가리킴\n3. `return`이 이 **참조**를 반환\n4. `a`가 같은 리스트를 가리킴\n\n**복사 아님! 같은 객체를 가리키는 것!**",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_1" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "두 번째 호출",
+        "explanation": "`b = get_list()` 호출 시:\n\n**매번 새로운 리스트를 만든다!**\n\n이번에는 완전히 새로운 `[1, 2, 3]` 객체가 생성됩니다.\n\n`a`와 `b`는 **다른 객체**를 가리킵니다.",
+        "highlight": [6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_1" },
+            { "name": "b", "pointsTo": "list_2" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140200" },
+            { "id": "list_2", "type": "list", "value": "[1, 2, 3]", "pyId": "140300", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "다른 객체!",
+        "explanation": "`a is b` → **False**\n\n값은 같지만 (`a == b`는 True), 객체는 다릅니다.\n\n**헷갈리는 포인트:**\n- 함수 호출마다 새 객체 생성 (이 경우)\n- 하지만 싱글톤이나 캐시 패턴에서는 같은 객체 반환 가능!",
+        "highlight": [10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_1" },
+            { "name": "b", "pointsTo": "list_2" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140200" },
+            { "id": "list_2", "type": "list", "value": "[1, 2, 3]", "pyId": "140300" }
+          ],
+          "output": ["a: [1, 2, 3]", "b: [1, 2, 3]", "a is b: False"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "결과는?\n\ndef get_data():\n    return [1, 2, 3]\n\nx = get_data()\ny = get_data()\nx.append(4)\nprint(y)",
+    "options": [
+      "[1, 2, 3, 4]",
+      "[1, 2, 3]",
+      "[4]",
+      "에러"
+    ],
+    "correctIndex": 1,
+    "explanation": "get_data()는 호출할 때마다 새 리스트를 만듭니다. x와 y는 다른 객체를 가리키므로, x를 수정해도 y는 영향 없습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "return은 값을 복사해서 반환한다",
+      "correct": "return은 객체에 대한 참조를 반환한다",
+      "why": "Python에서 모든 전달은 참조 전달입니다. 복사는 일어나지 않습니다."
+    },
+    {
+      "wrong": "함수 안에서 만든 객체는 함수 끝나면 사라진다",
+      "correct": "참조가 있으면 객체는 계속 존재한다",
+      "why": "Python은 참조 카운팅으로 메모리 관리. 누군가 참조하면 살아있습니다."
+    }
+  ],
+  "keyTakeaway": "return은 객체의 참조를 반환! 복사가 아니라 같은 객체를 가리키게 하는 것!"
+}

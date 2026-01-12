@@ -1,14 +1,14 @@
 {
   "lessonId": "js-1-4",
-  "title": "이벤트 루프 종합",
-  "concept": "복잡한 비동기 코드에서도 실행 순서를 정확히 예측할 수 있다",
+  "title": "Event Loop Comprehensive",
+  "concept": "Predict execution order accurately in complex async code, and understand how rendering fits in",
   "content": {
     "code": "console.log('1');\n\nsetTimeout(() => console.log('2'), 0);\n\nPromise.resolve()\n  .then(() => console.log('3'))\n  .then(() => console.log('4'));\n\nconsole.log('5');",
     "steps": [
       {
         "line": 1,
-        "title": "동기 코드 시작",
-        "explanation": "console.log('1')이 실행되어 '1'이 출력됩니다.",
+        "title": "Sync code starts",
+        "explanation": "console.log('1') executes, '1' is printed.",
         "highlight": [1],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -23,8 +23,8 @@
       },
       {
         "line": 3,
-        "title": "setTimeout 등록",
-        "explanation": "setTimeout 콜백이 Web API → Task Queue로 이동합니다.",
+        "title": "setTimeout registers",
+        "explanation": "The setTimeout callback moves to Web API, then to Task Queue.",
         "highlight": [3],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -41,8 +41,8 @@
       },
       {
         "line": 5,
-        "title": "첫 번째 Promise.then 등록",
-        "explanation": "Promise.resolve().then()의 콜백이 Microtask Queue에 추가됩니다.\n\n첫 번째 .then()의 콜백 → console.log('3')",
+        "title": "First Promise.then registers",
+        "explanation": "Promise.resolve().then() callback is added to Microtask Queue.\n\nFirst .then() callback: console.log('3')",
         "highlight": [5, 6],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -57,8 +57,8 @@
       },
       {
         "line": 9,
-        "title": "동기 코드 완료",
-        "explanation": "console.log('5')가 실행되어 '5'가 출력됩니다.\n\n**현재까지 출력**: 1, 5\n\n이제 동기 코드가 모두 끝났습니다.",
+        "title": "Sync code completes",
+        "explanation": "console.log('5') executes, '5' is printed.\n\n**Output so far**: 1, 5\n\nAll sync code is now done.",
         "highlight": [9],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -73,8 +73,8 @@
       },
       {
         "line": 6,
-        "title": "첫 번째 Microtask 실행",
-        "explanation": "Microtask Queue에서 첫 번째 콜백을 가져와 실행합니다.\n\n'3'이 출력됩니다.",
+        "title": "First Microtask executes",
+        "explanation": "The first callback is taken from Microtask Queue and executed.\n\n'3' is printed.",
         "highlight": [6],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -89,8 +89,8 @@
       },
       {
         "line": 7,
-        "title": "체이닝된 .then() 등록",
-        "explanation": "**중요!** 첫 번째 .then()이 완료되면서 두 번째 .then()의 콜백이 Microtask Queue에 추가됩니다.\n\n이벤트 루프는 Microtask Queue가 완전히 빌 때까지 계속 처리합니다!",
+        "title": "Chained .then() registers",
+        "explanation": "**Key!** When the first .then() completes, the second .then() callback is added to Microtask Queue.\n\nThe Event Loop keeps processing until Microtask Queue is COMPLETELY empty!",
         "highlight": [7],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -105,8 +105,8 @@
       },
       {
         "line": 7,
-        "title": "두 번째 Microtask 실행",
-        "explanation": "새로 추가된 Microtask도 바로 실행됩니다.\n\n'4'가 출력됩니다.\n\n이제야 Microtask Queue가 비었습니다!",
+        "title": "Second Microtask executes",
+        "explanation": "The newly added Microtask is executed immediately.\n\n'4' is printed.\n\nNOW the Microtask Queue is finally empty!",
         "highlight": [7],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -120,9 +120,25 @@
         }
       },
       {
+        "line": 7,
+        "title": "Render opportunity",
+        "explanation": "**Important!** Between Tasks, the browser gets a chance to:\n\n1. Update the DOM\n2. Repaint the screen\n3. Handle user input\n\n**This is why infinite Microtasks freeze UI** - the browser NEVER gets this render opportunity!\n\n```js\n// UI freeze example:\nwhile(true) {\n  Promise.resolve().then(() => {});\n}\n// Button clicks? Ignored. Animations? Frozen.\n```",
+        "highlight": [],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [],
+          "taskQueue": ["() => log('2')"],
+          "microtaskQueue": [],
+          "output": ["1", "5", "3", "4"],
+          "currentPhase": "rendering",
+          "highlightArea": "none"
+        }
+      },
+      {
         "line": 3,
-        "title": "Task 실행",
-        "explanation": "드디어 Task Queue의 setTimeout 콜백이 실행됩니다.\n\n'2'가 출력됩니다.\n\n**최종 순서**: 1 → 5 → 3 → 4 → 2\n\nsetTimeout이 가장 마지막에 실행되었습니다!",
+        "title": "Task executes",
+        "explanation": "Finally, the setTimeout callback from Task Queue executes.\n\n'2' is printed.\n\n**Final order**: 1 -> 5 -> 3 -> 4 -> 2\n\nsetTimeout ran LAST despite being registered first!",
         "highlight": [3],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -134,26 +150,57 @@
           "currentPhase": "executing",
           "highlightArea": "callStack"
         }
+      },
+      {
+        "line": 3,
+        "title": "Debugging tip: Chrome DevTools",
+        "explanation": "**Pro tip for real debugging:**\n\n1. Open DevTools (F12)\n2. Sources tab -> Add breakpoint\n3. Check 'Async' checkbox in Call Stack panel\n4. Step through to see the full async trace!\n\n**Performance tab** also shows Task/Microtask timing visually.\n\n**async/await secret**: `await` is just syntax sugar for `.then()` - it also uses Microtask Queue!",
+        "highlight": [],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["1", "5", "3", "4", "2"],
+          "currentPhase": "idle",
+          "highlightArea": "none"
+        }
       }
     ]
   },
   "quiz": {
-    "question": "다음 코드의 출력 순서는?\n\nsetTimeout(() => console.log('A'), 0);\nPromise.resolve().then(() => {\n  console.log('B');\n  Promise.resolve().then(() => console.log('C'));\n});\nconsole.log('D');",
+    "question": "What's the output order?\n\nsetTimeout(() => console.log('A'), 0);\nPromise.resolve().then(() => {\n  console.log('B');\n  Promise.resolve().then(() => console.log('C'));\n});\nconsole.log('D');",
     "options": [
-      "D → B → A → C",
-      "D → B → C → A",
-      "D → A → B → C",
-      "A → D → B → C"
+      "D -> B -> A -> C",
+      "D -> B -> C -> A",
+      "D -> A -> B -> C",
+      "A -> D -> B -> C"
     ],
     "correctIndex": 1,
-    "explanation": "1) 동기: D 출력\n2) Microtask: B 출력, 새 Microtask(C) 추가\n3) 새 Microtask: C 출력 (Microtask Queue가 빌 때까지 계속)\n4) Task: A 출력"
+    "explanation": "1) Sync: D printed\n2) Microtask: B printed, new Microtask(C) added\n3) New Microtask: C printed (queue must empty completely)\n4) Task: A printed"
   },
   "misconceptions": [
     {
-      "wrong": "Microtask는 한 개씩만 실행되고 Task로 넘어간다",
-      "correct": "Microtask Queue가 완전히 빌 때까지 모든 Microtask를 실행합니다.",
-      "why": "새로 추가된 Microtask도 현재 사이클에서 처리됩니다."
+      "wrong": "Microtasks run one at a time, then Task Queue gets a turn",
+      "correct": "Microtask Queue must be COMPLETELY empty before ANY Task runs.",
+      "why": "Even newly added Microtasks are processed in the current cycle."
+    },
+    {
+      "wrong": "async/await works differently from Promises",
+      "correct": "async/await is syntax sugar for Promises. `await` uses the same Microtask Queue.",
+      "why": "The code after `await` becomes a .then() callback internally."
+    },
+    {
+      "wrong": "Rendering happens after every operation",
+      "correct": "Rendering can only happen BETWEEN Tasks, when the Microtask Queue is empty.",
+      "why": "This is why infinite Microtasks freeze the UI - render never gets a chance."
+    },
+    {
+      "wrong": "Event Loop priority: Task > Microtask",
+      "correct": "Priority: Sync > Microtask > Render > Task",
+      "why": "Microtasks are processed before rendering, which happens before the next Task."
     }
   ],
-  "keyTakeaway": "이벤트 루프: 동기 코드 실행 → Microtask 전부 처리 → Task 하나 → 반복"
+  "keyTakeaway": "Event Loop cycle: Sync code -> ALL Microtasks -> Render opportunity -> ONE Task -> Repeat. Rendering happens BETWEEN Tasks!"
 }

@@ -1,0 +1,137 @@
+{
+  "lessonId": "py-6-3",
+  "title": "인스턴스 변수",
+  "concept": "각 인스턴스는 자기만의 변수를 가진다 - 완전히 독립!",
+  "content": {
+    "code": "class Counter:\n    def __init__(self):\n        self.count = 0\n    \n    def increment(self):\n        self.count += 1\n\nc1 = Counter()\nc2 = Counter()\n\nc1.increment()\nc1.increment()\nc2.increment()\n\nprint(f\"c1: {c1.count}\")  # 2\nprint(f\"c2: {c2.count}\")  # 1",
+    "steps": [
+      {
+        "line": 3,
+        "title": "인스턴스 변수 초기화",
+        "explanation": "`self.count = 0`\n\n**각 인스턴스마다 별도의 count!**\n\nc1.count와 c2.count는 완전히 다른 변수입니다.\n서로 영향을 주지 않아요.",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Counter", "pointsTo": "class_counter" }
+          ],
+          "objects": [
+            { "id": "class_counter", "type": "class", "value": "Counter", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "첫 번째 인스턴스",
+        "explanation": "`c1 = Counter()`\n\n새 Counter 객체 생성, c1.count = 0으로 초기화.\n\n**c1만의 count 변수!**",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Counter", "pointsTo": "class_counter" },
+            { "name": "c1", "pointsTo": "inst_c1" }
+          ],
+          "objects": [
+            { "id": "class_counter", "type": "class", "value": "Counter", "pyId": "140100" },
+            { "id": "inst_c1", "type": "Counter", "value": "{count: 0}", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "두 번째 인스턴스",
+        "explanation": "`c2 = Counter()`\n\n**완전히 새로운 객체!** c2.count = 0\n\nc1과 c2는 같은 클래스지만 **다른 객체**입니다.\n각자 자기만의 count를 가집니다.",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Counter", "pointsTo": "class_counter" },
+            { "name": "c1", "pointsTo": "inst_c1" },
+            { "name": "c2", "pointsTo": "inst_c2" }
+          ],
+          "objects": [
+            { "id": "class_counter", "type": "class", "value": "Counter", "pyId": "140100" },
+            { "id": "inst_c1", "type": "Counter", "value": "{count: 0}", "pyId": "140200" },
+            { "id": "inst_c2", "type": "Counter", "value": "{count: 0}", "pyId": "140300", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "c1만 증가",
+        "explanation": "`c1.increment()` 두 번 호출\n\n`self.count += 1` 에서 self는 c1!\n\nc1.count만 2가 됨. c2는 그대로.",
+        "highlight": [11, 12],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "c1", "pointsTo": "inst_c1" },
+            { "name": "c2", "pointsTo": "inst_c2" }
+          ],
+          "objects": [
+            { "id": "inst_c1", "type": "Counter", "value": "{count: 2}", "pyId": "140200", "highlight": true },
+            { "id": "inst_c2", "type": "Counter", "value": "{count: 0}", "pyId": "140300" }
+          ]
+        }
+      },
+      {
+        "line": 13,
+        "title": "c2 한 번 증가",
+        "explanation": "`c2.increment()` 한 번 호출\n\nc2.count = 1\n\n**각 인스턴스는 완전히 독립!**\nc1의 상태가 c2에 영향을 주지 않습니다.",
+        "highlight": [13],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "c1", "pointsTo": "inst_c1" },
+            { "name": "c2", "pointsTo": "inst_c2" }
+          ],
+          "objects": [
+            { "id": "inst_c1", "type": "Counter", "value": "{count: 2}", "pyId": "140200" },
+            { "id": "inst_c2", "type": "Counter", "value": "{count: 1}", "pyId": "140300", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 15,
+        "title": "각자의 값 확인",
+        "explanation": "c1.count = 2, c2.count = 1\n\n**인스턴스 변수의 핵심:**\n- 각 객체가 독립적으로 소유\n- 다른 객체에 영향 없음\n- self.를 통해 접근",
+        "highlight": [15, 16],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "c1", "pointsTo": "inst_c1" },
+            { "name": "c2", "pointsTo": "inst_c2" }
+          ],
+          "objects": [
+            { "id": "inst_c1", "type": "Counter", "value": "{count: 2}", "pyId": "140200" },
+            { "id": "inst_c2", "type": "Counter", "value": "{count: 1}", "pyId": "140300" }
+          ],
+          "output": ["c1: 2", "c2: 1"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "c1.count와 c2.count는?",
+    "options": [
+      "같은 변수를 공유한다",
+      "완전히 다른 변수다",
+      "c1이 c2보다 먼저 만들어져서 우선순위가 높다",
+      "클래스 변수를 복사한 것이다"
+    ],
+    "correctIndex": 1,
+    "explanation": "인스턴스 변수는 각 객체가 독립적으로 소유합니다. c1.count와 c2.count는 이름만 같을 뿐 완전히 다른 변수입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "같은 클래스의 인스턴스는 변수를 공유한다",
+      "correct": "인스턴스 변수(self.x)는 각 객체마다 독립",
+      "why": "공유되는 건 클래스 변수뿐입니다. 인스턴스 변수는 각자 소유."
+    },
+    {
+      "wrong": "메서드도 인스턴스마다 복사된다",
+      "correct": "메서드는 클래스에 하나만 있고, self로 인스턴스를 구분",
+      "why": "메모리 효율을 위해 메서드는 공유, 데이터(인스턴스 변수)만 분리."
+    }
+  ],
+  "keyTakeaway": "인스턴스 변수(self.x)는 각 객체가 독립적으로 소유! 서로 영향 없음!"
+}

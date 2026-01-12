@@ -25,7 +25,7 @@ const router = Router();
 // =============================================
 
 const progressUpdateSchema = z.object({
-  lessonId: z.string().uuid(),
+  lessonId: z.string().min(1),  // short ID (c-1-1) 또는 UUID 모두 허용
   status: z.enum(['not_started', 'in_progress', 'completed']).optional(),
   currentStep: z.number().min(0).optional(),
   quizScore: z.number().min(0).optional(),

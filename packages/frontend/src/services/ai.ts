@@ -38,6 +38,34 @@ interface ExplainResponse {
   explanation: string;
 }
 
+interface MemoryBlock {
+  name: string;
+  type: string;
+  value: string;
+  address: string;
+}
+
+interface MemoryChange {
+  target: string;
+  from?: string;
+  to: string;
+}
+
+interface ExplainStepRequest {
+  line: number;
+  code: string;
+  fullCode: string;
+  stack?: MemoryBlock[];
+  heap?: MemoryBlock[];
+  changes?: MemoryChange[];
+}
+
+interface ExplainStepResponse {
+  line: number;
+  explanation: string;
+  provider: string;
+}
+
 // === 자동 해설 API ===
 
 /**
@@ -75,6 +103,7 @@ export async function getExplanation(
     return `해설을 불러올 수 없습니다. (${error.status}: ${error.message})`;
   }
 }
+
 
 // === Q&A 대화 API ===
 
@@ -119,5 +148,187 @@ cd backend && npm run dev 명령어로 서버를 실행해주세요.`;
   }
 }
 
+// === 스트리밍 Q&A 대화 API ===
+
+/**
+ * 스트리밍 청크 타입
+ */
+interface StreamChunk {
+  content: string;
+  done: boolean;
+  error?: string;
+}
+
+/**
+ * AI에게 질문하기 (스트리밍)
+ * @param message 사용자 메시지
+ * @param history 대화 기록
+ * @param context 코스 컨텍스트 (optional)
+ * @param onChunk 청크 수신 콜백
+ */
+export async function askAIStream(
+  message: string,
+  history: ChatMessage[] = [],
+  context?: ChatContext,
+  onChunk?: (content: string) => void
+): Promise<string> {
+  const url = `${config.api.baseUrl}${config.api.endpoints.aiChatStream}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+        history,
+        context,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    if (!response.body) {
+      throw new Error('No response body');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullContent = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE 파싱
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data: ')) continue;
+
+        try {
+          const chunk: StreamChunk = JSON.parse(trimmed.slice(6));
+
+          if (chunk.error) {
+            throw new Error(chunk.error);
+          }
+
+          if (chunk.content) {
+            fullContent += chunk.content;
+            onChunk?.(chunk.content);
+          }
+        } catch {
+          // JSON 파싱 실패 무시
+        }
+      }
+    }
+
+    return fullContent;
+  } catch (err) {
+    // 네트워크 에러 처리
+    if (err instanceof TypeError && err.message.includes('fetch')) {
+      return `백엔드 서버에 연결할 수 없습니다.
+
+cd backend && npm run dev 명령어로 서버를 실행해주세요.`;
+    }
+
+    return `스트리밍 오류: ${err instanceof Error ? err.message : 'Unknown error'}`;
+  }
+}
+
+// === 스트리밍 스텝 설명 API ===
+
+/**
+ * 시뮬레이션 스텝에 대한 AI 설명 요청 (스트리밍)
+ * @param request 스텝 정보
+ * @param onChunk 청크 수신 콜백
+ */
+export async function getStepExplanationStream(
+  request: ExplainStepRequest,
+  onChunk?: (content: string) => void
+): Promise<string> {
+  const url = `${config.api.baseUrl}${config.api.endpoints.aiExplainStep}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    if (!response.body) {
+      throw new Error('No response body');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullContent = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE 파싱
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data: ')) continue;
+
+        try {
+          const chunk: StreamChunk = JSON.parse(trimmed.slice(6));
+
+          if (chunk.error) {
+            throw new Error(chunk.error);
+          }
+
+          if (chunk.content) {
+            fullContent += chunk.content;
+            onChunk?.(chunk.content);
+          }
+        } catch {
+          // JSON 파싱 실패 무시
+        }
+      }
+    }
+
+    return fullContent;
+  } catch (err) {
+    if (err instanceof TypeError && err.message.includes('fetch')) {
+      return '🔌 AI 서버에 연결할 수 없습니다.';
+    }
+
+    return `⚠️ 스트리밍 오류: ${err instanceof Error ? err.message : 'Unknown error'}`;
+  }
+}
+
 // === 타입 export ===
-export type { ChatMessage, ChatContext, ChatResponse, ExplainResponse };
+export type {
+  ChatMessage,
+  ChatContext,
+  ChatResponse,
+  ExplainResponse,
+  ExplainStepRequest,
+  ExplainStepResponse,
+  StreamChunk,
+};

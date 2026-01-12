@@ -8,9 +8,17 @@
       {
         "line": 5,
         "title": "첫 번째 할당",
-        "explanation": "Heap에 1000바이트가 할당되고 p가 그 주소를 가집니다.",
-        "highlight": [5],
+        "explanation": "Heap에 **1000바이트**가 할당되고 p가 그 주소를 가집니다.\n\n**이번 레슨의 핵심 주제: Memory Leak (메모리 누수)**\n\n**누수란?** 할당한 메모리를 free하지 않아서, 프로그램이 사용하지 않는데도 메모리가 점유된 상태예요.",
+        "highlight": [
+          5
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "heap",
@@ -31,8 +39,10 @@
       {
         "line": 8,
         "title": "함수 종료 - p만 사라짐",
-        "explanation": "leaky() 종료 시 p(스택)는 사라지지만, Heap 메모리(0x55001000)는 그대로 남습니다. 접근 방법이 사라졌습니다!",
-        "highlight": [8],
+        "explanation": "leaky() 종료 시 p(스택)는 사라지지만, **Heap 메모리는 그대로 남습니다!**\n\n**Memory Leak 발생!**\n\n**왜 문제일까?**\n- p가 사라져서 Heap 메모리에 **접근 불가**\n- free할 방법이 **없어짐**\n- 메모리는 **계속 점유**됨\n\n**비유:** 창고에 물건을 넣고 열쇠를 잃어버린 것. 물건을 못 쓰지만, 창고 공간은 차지하고 있어요.\n\n**이 1000바이트는 프로그램이 끝날 때까지 낭비됩니다.**",
+        "highlight": [
+          8
+        ],
         "memoryChanges": [
           {
             "action": "frame_end",
@@ -51,8 +61,12 @@
       {
         "line": 11,
         "title": "반복 호출 - 누적 누수",
-        "explanation": "1000번 호출하면 1000 × 1000 = 1,000,000 바이트(약 1MB)가 누수됩니다.",
-        "highlight": [11, 12],
+        "explanation": "1000번 호출하면 **약 1MB가 누수**됩니다!\n\n**누적 계산:**\n- 1회: 1KB 누수\n- 1000회: 1000KB = 약 1MB 누수\n\n**실제 프로그램에서의 위험:**\n| 상황 | 결과 |\n|------|------|\n| 서버 24시간 실행 | 메모리 고갈 → 크래시 |\n| 반복문 내 누수 | 빠르게 메모리 증가 |\n| 작은 누수 × 많은 횟수 | 누적되어 문제됨 |\n\n**해결책:**\n```c\nvoid fixed() {\n    int *p = malloc(1000);\n    *p = 42;\n    free(p);  // 반드시 해제!\n}\n```\n\n**규칙:** 모든 malloc에는 짝이 되는 free가 있어야 합니다!",
+        "highlight": [
+          11,
+          12
+        ],
+        "stdout": "프로그램 종료",
         "memoryChanges": [
           {
             "action": "leak",

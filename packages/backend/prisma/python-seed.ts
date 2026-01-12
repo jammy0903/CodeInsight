@@ -11,9 +11,18 @@
  * 실행: npx ts-node prisma/python-seed.ts
  */
 
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaClient } from '.prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
-const prisma = new PrismaClient();
+// PostgreSQL connection
+const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
+console.log('📁 Database:', connectionString.replace(/:[^:@]+@/, ':***@'));
+
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 // =============================================
 // Python 챕터와 레슨 구조
@@ -398,7 +407,7 @@ async function seedPython() {
 
     const chapter = await prisma.chapter.create({
       data: {
-        id: `p-${chapterData.order}`,
+        id: `python-ch${chapterData.order}`,
         languageId: language.id,
         title: chapterData.title,
         description: chapterData.description,
@@ -412,7 +421,7 @@ async function seedPython() {
 
       await prisma.lesson.create({
         data: {
-          id: `p-${chapterData.order}-${lessonData.order}`,
+          id: `py-${chapterData.order}-${lessonData.order}`,
           chapterId: chapter.id,
           title: lessonData.title,
           description: lessonData.description,
@@ -445,4 +454,5 @@ seedPython()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

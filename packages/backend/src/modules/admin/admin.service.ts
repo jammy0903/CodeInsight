@@ -19,7 +19,6 @@ export interface AdminStats {
 
 export interface OAuthAccountInfo {
   provider: string;
-  email: string | null;
 }
 
 export interface UserInfo {
@@ -119,7 +118,6 @@ export class AdminService {
         oauthAccounts: {
           select: {
             provider: true,
-            email: true,
           },
         },
         _count: {

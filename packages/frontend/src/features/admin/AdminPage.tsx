@@ -38,7 +38,6 @@ interface AdminStats {
 
 interface OAuthAccountInfo {
   provider: string;
-  email: string | null;
 }
 
 interface UserInfo {
@@ -270,10 +269,10 @@ export function AdminPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-wrap gap-1">
                           {user.oauthAccounts.map((oauth, idx) => (
-                            <span key={idx} className="text-xs text-gray-600">
-                              {oauth.provider}: {oauth.email || '-'}
+                            <span key={idx} className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded capitalize">
+                              {oauth.provider}
                             </span>
                           ))}
                         </div>

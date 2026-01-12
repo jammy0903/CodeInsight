@@ -1,0 +1,101 @@
+{
+  "lessonId": "java-1-5",
+  "title": "equals/hashCode 계약",
+  "concept": "equals()를 오버라이드하면 반드시 hashCode()도 오버라이드해야 한다",
+  "content": {
+    "code": "class Person {\n    String name;\n    Person(String name) { this.name = name; }\n\n    @Override\n    public boolean equals(Object obj) {\n        if (!(obj instanceof Person)) return false;\n        return name.equals(((Person) obj).name);\n    }\n    // hashCode() 누락!\n}\n\nPerson p1 = new Person(\"Alice\");\nPerson p2 = new Person(\"Alice\");\n\nSystem.out.println(p1.equals(p2));\n\nSet<Person> set = new HashSet<>();\nset.add(p1);\nSystem.out.println(set.contains(p2));",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Person 클래스 정의",
+        "explanation": "Person 클래스에 equals()만 오버라이드하고 hashCode()는 누락했습니다.",
+        "highlight": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "equals()는 오버라이드, hashCode()는 누락 (위험!)"
+        }
+      },
+      {
+        "line": 13,
+        "title": "두 Person 객체 생성",
+        "explanation": "p1과 p2는 같은 이름 \"Alice\"를 가진 다른 객체입니다.",
+        "highlight": [13, 14],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "p1", "value": "-> 0x001"},
+            {"name": "p2", "value": "-> 0x002"}
+          ],
+          "heap": [
+            {"address": "0x001", "content": "Person(\"Alice\")", "hashCode": "hash: 123"},
+            {"address": "0x002", "content": "Person(\"Alice\")", "hashCode": "hash: 456"}
+          ]
+        }
+      },
+      {
+        "line": 16,
+        "title": "equals() 비교",
+        "explanation": "우리가 오버라이드한 equals()가 호출됩니다. 이름이 같으므로 true입니다.",
+        "keyInsight": "equals() 오버라이드 = 값 비교 가능",
+        "highlight": [16],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["true"],
+          "note": "equals()는 정상 작동"
+        }
+      },
+      {
+        "line": 18,
+        "title": "HashSet에 p1 추가",
+        "explanation": "HashSet은 hashCode()로 버킷을 결정합니다. p1의 hashCode(기본값)로 저장됩니다.",
+        "keyInsight": "HashSet/HashMap = hashCode()로 위치 결정",
+        "highlight": [18, 19],
+        "visualizationType": "memory",
+        "memoryState": {
+          "hashSet": {
+            "buckets": [
+              {"index": "hash(123) % n", "content": "p1"}
+            ]
+          }
+        }
+      },
+      {
+        "line": 20,
+        "title": "contains(p2) 호출 (문제 발생!)",
+        "explanation": "p2의 hashCode는 p1과 다릅니다. 다른 버킷을 찾아가므로 p1을 찾지 못합니다!",
+        "keyInsight": "hashCode 다름 = 다른 버킷 = 찾기 실패",
+        "highlight": [20],
+        "visualizationType": "memory",
+        "memoryState": {
+          "hashSet": {
+            "buckets": [
+              {"index": "hash(123)", "content": "p1"},
+              {"index": "hash(456)", "content": "검색 위치", "searched": true}
+            ]
+          },
+          "output": ["true", "false"],
+          "warning": "equals()는 true인데 contains()는 false!"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "equals/hashCode 계약이란?",
+    "options": [
+      "equals()가 true면 hashCode()도 같아야 한다",
+      "hashCode()가 같으면 equals()도 true여야 한다",
+      "둘 다 항상 같은 값을 반환해야 한다",
+      "둘 중 하나만 오버라이드하면 된다"
+    ],
+    "correctIndex": 0,
+    "explanation": "a.equals(b)가 true면 a.hashCode() == b.hashCode()여야 합니다. 역은 성립하지 않아도 됩니다(해시 충돌 허용)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "equals()만 오버라이드하면 된다",
+      "correct": "HashSet, HashMap 등을 사용하려면 hashCode()도 반드시 오버라이드해야 합니다.",
+      "why": "Hash 컬렉션은 hashCode()로 버킷을 찾고, 그 안에서 equals()로 비교합니다."
+    }
+  ],
+  "keyTakeaway": "equals() 오버라이드 시 hashCode()도 필수, Objects.hash() 활용"
+}

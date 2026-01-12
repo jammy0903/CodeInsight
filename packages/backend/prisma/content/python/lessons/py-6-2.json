@@ -1,0 +1,113 @@
+{
+  "lessonId": "py-6-2",
+  "title": "__init__과 self",
+  "concept": "__init__은 생성자가 아니라 초기화자! self는 자기 자신!",
+  "content": {
+    "code": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n        print(f\"{name} 객체 초기화!\")\n\nalice = Person(\"Alice\", 25)\nprint(f\"이름: {alice.name}\")\nprint(f\"나이: {alice.age}\")",
+    "steps": [
+      {
+        "line": 2,
+        "title": "__init__ 메서드",
+        "explanation": "`__init__`은 **초기화 메서드**입니다.\n\n**헷갈리는 포인트:**\n- 생성자(constructor)가 아닙니다!\n- 객체는 이미 만들어진 상태\n- `__init__`은 그 객체를 **초기화**하는 것\n\n진짜 생성자는 `__new__` (거의 안 씀)",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Person", "pointsTo": "class_person" }
+          ],
+          "objects": [
+            { "id": "class_person", "type": "class", "value": "Person", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "self 매개변수",
+        "explanation": "`def __init__(self, name, age)`\n\n**self가 뭔데?**\n- 지금 만들어지는 인스턴스 자신\n- 파이썬이 자동으로 전달\n- 호출할 때는 안 적음!\n\n`Person(\"Alice\", 25)` → self는 자동, name=\"Alice\", age=25",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Person", "pointsTo": "class_person" }
+          ],
+          "objects": [
+            { "id": "class_person", "type": "class", "value": "Person", "pyId": "140100" }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "인스턴스 변수 생성",
+        "explanation": "`self.name = name`\n\n**이게 핵심!**\n- `self.name` → 이 인스턴스의 name 속성\n- `name` → 매개변수로 받은 값\n\n`self.`를 붙여야 인스턴스 변수가 됩니다!\n안 붙이면 그냥 로컬 변수 (함수 끝나면 사라짐)",
+        "highlight": [3, 4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Person", "pointsTo": "class_person" }
+          ],
+          "objects": [
+            { "id": "class_person", "type": "class", "value": "Person", "pyId": "140100" }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "인스턴스 생성!",
+        "explanation": "`alice = Person(\"Alice\", 25)` 호출 시:\n\n1. 새 Person 객체 생성 (메모리 할당)\n2. `__init__(새객체, \"Alice\", 25)` 호출\n3. `self.name = \"Alice\"`, `self.age = 25` 설정\n4. 객체 반환 → alice에 바인딩",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "Person", "pointsTo": "class_person" },
+            { "name": "alice", "pointsTo": "inst_alice" }
+          ],
+          "objects": [
+            { "id": "class_person", "type": "class", "value": "Person", "pyId": "140100" },
+            { "id": "inst_alice", "type": "Person", "value": "{name: Alice, age: 25}", "pyId": "140200", "highlight": true }
+          ],
+          "output": ["Alice 객체 초기화!"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "인스턴스 변수 접근",
+        "explanation": "`alice.name` → \"Alice\"\n`alice.age` → 25\n\n**점(.)으로 속성 접근!**\n\n각 인스턴스는 자기만의 name, age를 가집니다.\nbob = Person(\"Bob\", 30)을 만들어도 alice는 영향 없음!",
+        "highlight": [8, 9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "alice", "pointsTo": "inst_alice" }
+          ],
+          "objects": [
+            { "id": "inst_alice", "type": "Person", "value": "{name: Alice, age: 25}", "pyId": "140200" }
+          ],
+          "output": ["Alice 객체 초기화!", "이름: Alice", "나이: 25"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "이 코드의 문제는?\n\nclass Cat:\n    def __init__(self, name):\n        name = name\n\nc = Cat(\"Mimi\")\nprint(c.name)",
+    "options": [
+      "정상 동작, Mimi 출력",
+      "AttributeError: 'Cat' object has no attribute 'name'",
+      "NameError",
+      "SyntaxError"
+    ],
+    "correctIndex": 1,
+    "explanation": "name = name은 그냥 로컬 변수 할당입니다! self.name = name이어야 인스턴스 변수가 됩니다. self.를 빠뜨리면 c.name이 존재하지 않아요."
+  },
+  "misconceptions": [
+    {
+      "wrong": "__init__이 객체를 생성한다",
+      "correct": "__init__은 이미 생성된 객체를 초기화한다",
+      "why": "객체 생성은 __new__가 담당. __init__은 초기값 설정만 합니다."
+    },
+    {
+      "wrong": "self.x = x 없이도 x가 인스턴스 변수가 된다",
+      "correct": "self.를 붙여야만 인스턴스 변수",
+      "why": "self 없이 x = 값은 그냥 로컬 변수. 함수 끝나면 사라집니다."
+    }
+  ],
+  "keyTakeaway": "__init__은 초기화 메서드! self.변수명으로 인스턴스 변수를 만들어야 한다!"
+}

@@ -1,0 +1,104 @@
+{
+  "lessonId": "java-6-5",
+  "title": "추상 클래스 vs 인터페이스",
+  "concept": "추상 클래스는 is-a 관계의 공통 기반, 인터페이스는 can-do 관계의 능력 정의",
+  "content": {
+    "code": "abstract class Animal {\n    String name;  // 상태 가능\n    \n    Animal(String name) {\n        this.name = name;\n    }\n    \n    void sleep() {  // 구현된 메서드\n        System.out.println(name + \" sleeps\");\n    }\n    \n    abstract void sound();  // 추상 메서드\n}\n\ninterface Swimmable {\n    void swim();  // 암묵적 public abstract\n    \n    default void float_() {  // Java 8+ 기본 구현\n        System.out.println(\"Floating...\");\n    }\n}\n\nclass Duck extends Animal implements Swimmable {\n    Duck(String name) { super(name); }\n    \n    void sound() { System.out.println(\"Quack!\"); }\n    public void swim() { System.out.println(\"Duck swims\"); }\n}",
+    "steps": [
+      {
+        "line": 1,
+        "title": "추상 클래스 특징",
+        "explanation": "abstract class는 필드, 생성자, 구현된 메서드를 가질 수 있습니다.",
+        "keyInsight": "추상 클래스 = 상태 + 일부 구현 + 추상 메서드",
+        "highlight": [1, 2, 3, 4, 5, 6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "추상 클래스: 필드 O, 생성자 O, 구현 O"
+        }
+      },
+      {
+        "line": 8,
+        "title": "구현된 메서드",
+        "explanation": "sleep()은 완전히 구현되어 있어서 자식이 그대로 쓸 수 있습니다.",
+        "highlight": [8, 9, 10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "자식 클래스가 상속받아 사용"
+        }
+      },
+      {
+        "line": 12,
+        "title": "추상 메서드",
+        "explanation": "abstract void sound()는 시그니처만 있고, 자식이 반드시 구현해야 합니다.",
+        "highlight": [12],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "구현 없음 → 자식이 반드시 구현"
+        }
+      },
+      {
+        "line": 15,
+        "title": "인터페이스 특징",
+        "explanation": "interface는 메서드 시그니처만 정의합니다. 상태(필드) 없음!",
+        "keyInsight": "인터페이스 = 계약, 구현은 클래스가",
+        "highlight": [15, 16],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "인터페이스: 필드 X (상수만), 생성자 X"
+        }
+      },
+      {
+        "line": 18,
+        "title": "default 메서드 (Java 8+)",
+        "explanation": "default 키워드로 인터페이스에도 기본 구현을 넣을 수 있습니다.",
+        "keyInsight": "default method = 인터페이스에 구현 추가 (Java 8+)",
+        "highlight": [18, 19, 20],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "하위 호환성 유지하면서 기능 추가 가능"
+        }
+      },
+      {
+        "line": 23,
+        "title": "다중 상속 대안",
+        "explanation": "Duck은 Animal(하나만) 상속, Swimmable(여러 개 가능) 구현!",
+        "keyInsight": "extends 1개, implements 여러 개 = 다중 상속 대안",
+        "highlight": [23],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "class A extends B implements C, D, E {...}"
+        }
+      },
+      {
+        "line": 26,
+        "title": "추상 메서드 구현",
+        "explanation": "Animal.sound()와 Swimmable.swim() 모두 구현해야 합니다.",
+        "highlight": [26, 27],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x001", "content": "Duck{name: \"Donald\"}"}],
+          "note": "모든 추상 메서드 구현 필수"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "인터페이스에 정의할 수 없는 것은?",
+    "options": [
+      "상수 (public static final)",
+      "인스턴스 필드",
+      "default 메서드",
+      "static 메서드"
+    ],
+    "correctIndex": 1,
+    "explanation": "인터페이스는 인스턴스 필드를 가질 수 없습니다. 상수(public static final)만 가능합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "추상 클래스가 인터페이스보다 항상 낫다",
+      "correct": "용도가 다릅니다. is-a면 추상 클래스, can-do면 인터페이스!",
+      "why": "Duck is an Animal, Duck can swim. 상속은 본질, 인터페이스는 능력."
+    }
+  ],
+  "keyTakeaway": "추상 클래스 = is-a + 상태, 인터페이스 = can-do + 다중 구현"
+}

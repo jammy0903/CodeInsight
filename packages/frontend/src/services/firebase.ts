@@ -22,7 +22,8 @@ import {
 import type { User } from 'firebase/auth';
 import { config } from '@/config';
 import { useStore } from '@/stores/store';
-import { getCurrentUser } from './user';
+import { getCurrentUser, registerUser } from './user';
+import { generateTempNickname } from '@/utils/nickname';
 import { logger } from '@/utils/logger';
 
 // Firebase 초기화
@@ -72,19 +73,33 @@ export function initializeAuthListener(): () => void {
     if (firebaseUser) {
       try {
         // 백엔드에서 등록된 사용자인지 확인
-        const appUser = await getCurrentUser();
+        let appUser = await getCurrentUser();
 
         if (appUser) {
           // 이미 등록된 사용자
           setAppUser(appUser);
           setNeedsRegistration(false);
         } else {
-          // 미등록 사용자 → 닉네임 설정 필요
-          setAppUser(null);
-          setNeedsRegistration(true);
+          // 미등록 사용자 → 임시 닉네임으로 자동 생성
+          logger.info('New user detected, auto-registering with temp nickname');
+          const tempNickname = generateTempNickname();
+
+          try {
+            appUser = await registerUser(tempNickname);
+            setAppUser(appUser);
+            setNeedsRegistration(false);
+            logger.info('Auto-registration successful:', appUser.nickname);
+          } catch (regError) {
+            // 등록 실패 시 (닉네임 충돌 등) 다시 시도
+            logger.warn('Auto-registration failed, retrying:', regError);
+            const retryNickname = generateTempNickname();
+            appUser = await registerUser(retryNickname);
+            setAppUser(appUser);
+            setNeedsRegistration(false);
+          }
         }
       } catch (error) {
-        logger.error('Failed to fetch user info:', error);
+        logger.error('Failed to fetch/register user:', error);
         setAppUser(null);
         setNeedsRegistration(true);
       }

@@ -1,0 +1,139 @@
+{
+  "lessonId": "py-1-4",
+  "title": "여러 이름, 하나의 객체",
+  "concept": "여러 변수가 같은 객체를 가리키는 별칭(alias)이 될 수 있다",
+  "content": {
+    "code": "original = [1, 2, 3]\nalias = original\n\nalias.append(4)\nprint(original)\n\nalias = [7, 8, 9]\nprint(original)",
+    "steps": [
+      {
+        "line": 1,
+        "title": "리스트 생성",
+        "explanation": "리스트를 만들고 `original`을 바인딩합니다.\n\n지금은 객체 하나, 이름 하나.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "obj1" }
+          ],
+          "objects": [
+            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "id_100" }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "별칭: 두 이름, 하나의 객체",
+        "explanation": "**이게 바로 함정!**\n\n`alias = original`은 복사하지 않습니다!\n\n지금 상태:\n- 이름 두 개: `original`, `alias`\n- 객체 하나: `[1, 2, 3]`\n\n둘 다 같은 객체의 **별칭(alias)**입니다.\n\n같은 사람을 두 사람이 다른 별명으로 부르는 것과 같습니다.",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "obj1" },
+            { "name": "alias", "pointsTo": "obj1" }
+          ],
+          "objects": [
+            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "id_100" }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "별칭을 통한 변이",
+        "explanation": "**주목!**\n\n`alias.append(4)`가 객체를 수정합니다.\n\n`original`과 `alias`가 같은 객체를 가리키므로, 변화가 **둘 다**에서 보입니다!\n\n**파이썬 초보자의 버그 1위 원인입니다.**",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "obj1" },
+            { "name": "alias", "pointsTo": "obj1" }
+          ],
+          "objects": [
+            { "id": "obj1", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "id_100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "original도 변화를 봄!",
+        "explanation": "**놀라운 결과:**\n\n`alias`를 통해 수정했는데 `original`도 바뀌었습니다!\n\n출력: `[1, 2, 3, 4]`\n\n**왜?** 리스트는 하나뿐이기 때문. 두 이름 다 그것을 가리킵니다.",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "obj1" },
+            { "name": "alias", "pointsTo": "obj1" }
+          ],
+          "objects": [
+            { "id": "obj1", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "id_100" }
+          ],
+          "output": ["[1, 2, 3, 4]"]
+        }
+      },
+      {
+        "line": 7,
+        "title": "재바인딩은 별칭을 끊는다",
+        "explanation": "**재바인딩은 변이와 다릅니다!**\n\n`alias = [7, 8, 9]`는 새 리스트를 만들고 `alias`가 그것을 가리키게 합니다.\n\n`original`은 여전히 옛날 리스트를 가리킵니다.\n\n별칭 관계가 끊어졌습니다.",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "obj1" },
+            { "name": "alias", "pointsTo": "obj2" }
+          ],
+          "objects": [
+            { "id": "obj1", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "id_100" },
+            { "id": "obj2", "type": "list", "value": "[7, 8, 9]", "pyId": "id_200", "highlight": true }
+          ],
+          "output": ["[1, 2, 3, 4]"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "재바인딩으로 original 안 바뀜",
+        "explanation": "**재바인딩 vs 변이 요약:**\n\n변이 (`.append()`):\n- 객체 자체가 변함\n- 모든 별칭이 변화를 봄\n\n재바인딩 (`alias = ...`):\n- 한 이름만 새 객체로 이동\n- 다른 이름은 옛날 객체 그대로 가리킴\n\n`original`은 `[1, 2, 3, 4]` - 재바인딩에 영향 없음.",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "obj1" },
+            { "name": "alias", "pointsTo": "obj2" }
+          ],
+          "objects": [
+            { "id": "obj1", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "id_100" },
+            { "id": "obj2", "type": "list", "value": "[7, 8, 9]", "pyId": "id_200" }
+          ],
+          "output": ["[1, 2, 3, 4]", "[1, 2, 3, 4]"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "이 코드 후 x는?\n\nx = [1, 2]\ny = x\ny = y + [3]  # 주의: y.append(3)이 아님\nprint(x)",
+    "options": [
+      "[1, 2]",
+      "[1, 2, 3]",
+      "[3]",
+      "에러"
+    ],
+    "correctIndex": 0,
+    "explanation": "y = y + [3]은 새 리스트를 만들고 y를 재바인딩합니다. 이건 별칭을 끊습니다! x는 여전히 원래 [1, 2]를 가리킵니다. y.append(3)이나 y += [3]이었다면 x도 변화를 봤을 겁니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "각 변수는 리스트의 자기 복사본을 가진다",
+      "correct": "변수는 그냥 이름 - 여러 이름이 하나의 객체를 가리킬 수 있다",
+      "why": "파이썬은 할당 시 객체를 복사하지 않습니다. 별칭을 만듭니다."
+    },
+    {
+      "wrong": "변수를 바꾸면 그 변수만 영향받는다",
+      "correct": "객체를 변이하면 그 객체의 모든 별칭이 영향받는다",
+      "why": "객체가 바뀌는 것입니다. 그것을 가리키는 모든 이름이 변화를 봅니다."
+    },
+    {
+      "wrong": "y = y + [3]과 y.append(3)은 같다",
+      "correct": "y + [3]은 새 리스트 생성(재바인딩), append는 기존 것 수정(변이)",
+      "why": "이 차이가 별칭에 영향을 주는지 결정합니다!"
+    }
+  ],
+  "keyTakeaway": "여러 이름이 하나의 객체를 가리킬 수 있다. 변이는 모든 별칭에 영향. 재바인딩은 한 이름만 이동."
+}

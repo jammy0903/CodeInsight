@@ -113,3 +113,31 @@ export async function linkOAuthAccount(): Promise<AppUser> {
     throw new Error(`계정 연동 실패: ${error.message}`);
   }
 }
+
+/**
+ * 닉네임 변경
+ * @param nickname 새 닉네임 (2~20자)
+ */
+export async function updateNickname(nickname: string): Promise<AppUser> {
+  try {
+    const response = await api.patch<AppUser>(
+      `${config.api.endpoints.users}/me/nickname`,
+      { nickname }
+    );
+    return response.data;
+  } catch (err) {
+    const error = handleError(err);
+
+    // 409: 닉네임 중복
+    if (error.status === 409) {
+      throw new Error('이미 사용 중인 닉네임입니다');
+    }
+
+    // 400: 닉네임 형식 오류
+    if (error.status === 400) {
+      throw new Error(error.message);
+    }
+
+    throw new Error(`닉네임 변경 실패: ${error.message}`);
+  }
+}

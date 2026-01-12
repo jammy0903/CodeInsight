@@ -8,9 +8,17 @@
       {
         "line": 10,
         "title": "구조체 생성",
-        "explanation": "p는 스택에 생성됩니다. x=10, y=20으로 초기화됩니다.",
-        "highlight": [10],
+        "explanation": "p는 스택에 생성됩니다. {10, 20}으로 초기화됩니다.\n\n**이번 레슨의 핵심: 화살표 연산자(->)**\n\n구조체 포인터에서 멤버에 접근하는 방법을 배워봅시다!\n\n**왜 포인터가 필요할까?**\n- 함수에 구조체 전달 시 **복사 비용** 절약\n- 함수에서 **원본 수정** 가능\n- 동적 할당(malloc) 시 필수",
+        "highlight": [
+          10
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -18,15 +26,18 @@
             "type": "struct Point",
             "size": 8,
             "value": "{x:10, y:20}",
-            "address": "0x7ffc1000"
+            "address": "0x7ffc1000",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 11,
         "title": "구조체 포인터",
-        "explanation": "ptr은 p의 주소를 저장합니다. ptr이 p를 가리킵니다.",
-        "highlight": [11],
+        "explanation": "ptr은 **p의 주소**를 저장합니다. ptr이 p를 가리키게 됩니다.\n\n**메모리 구조:**\n```\nStack:\n├─ p    [x:10, y:20]  @ 0x7ffc1000\n└─ ptr  0x7ffc1000     @ 0x7ffc0ff8\n         └─→ p를 가리킴\n```\n\n**구조체 포인터의 타입:**\n- p의 타입: `struct Point`\n- ptr의 타입: `struct Point*` (포인터!)",
+        "highlight": [
+          11
+        ],
         "memoryChanges": [
           {
             "action": "allocate",
@@ -35,36 +46,50 @@
             "type": "struct Point*",
             "size": 8,
             "value": "0x7ffc1000",
-            "pointsTo": "p"
+            "pointsTo": "p",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 14,
         "title": "점(.) 연산자",
-        "explanation": "구조체 변수에서 멤버에 접근할 때 p.x를 사용합니다.",
-        "highlight": [14],
+        "explanation": "구조체 **변수**에서 멤버에 접근할 때 **점(.) 연산자**를 사용합니다.\n\n**점 연산자 규칙:**\n- 구조체 **변수** → `.` 사용\n- 구조체 **포인터** → `->` 또는 `(*ptr).` 사용\n\n```c\nstruct Point p = {10, 20};\np.x;  // ⭕ 변수니까 점\n```",
+        "highlight": [
+          14
+        ],
+        "stdout": "p.x = 10",
         "memoryChanges": []
       },
       {
         "line": 17,
         "title": "역참조 후 점",
-        "explanation": "(*ptr).x는 '포인터 따라가서 구조체 얻고, 그 멤버 x 접근'입니다. 괄호가 필수!",
-        "highlight": [17],
+        "explanation": "(*ptr).x는 '포인터 따라가서 구조체 얻고, 그 멤버 x 접근'입니다.\n\n**왜 괄호가 필수일까?**\n\n**연산자 우선순위:** `.` > `*`\n\n```c\n*ptr.x    // *(ptr.x) 로 해석됨 → 에러!\n(*ptr).x  // 의도대로 동작 ⭕\n```\n\n**비유:** 수학에서 곱셈이 덧셈보다 먼저인 것처럼,\n`.`가 `*`보다 먼저라서 괄호로 순서를 바꿔야 해요.\n\n**결론:** 이게 너무 번거로워서 `->` 연산자가 만들어졌습니다!",
+        "highlight": [
+          17
+        ],
+        "stdout": "(*ptr).x = 10",
         "memoryChanges": []
       },
       {
         "line": 20,
         "title": "화살표 연산자",
-        "explanation": "ptr->x는 (*ptr).x와 동일합니다. 더 읽기 쉽고 편리합니다!",
-        "highlight": [20],
+        "explanation": "ptr->x는 (*ptr).x와 **완전히 동일**합니다. 훨씬 읽기 쉽죠!\n\n**화살표 연산자의 의미:**\n```\nptr->x  =  (*ptr).x\n  │            │\n  └── \"ptr이 가리키는 것의 x\"\n```\n\n**언제 무엇을 쓸까?**\n| 상황 | 연산자 | 예시 |\n|------|--------|------|\n| 구조체 변수 | . | p.x |\n| 구조체 포인터 | -> | ptr->x |\n\n**화살표(→) 모양을 생각하면 외우기 쉬워요:**\n- ptr **→** x (ptr을 따라가서 x에 도착!)",
+        "highlight": [
+          20
+        ],
+        "stdout": "ptr->x = 10",
         "memoryChanges": []
       },
       {
         "line": 23,
         "title": "포인터로 값 변경",
-        "explanation": "ptr->y = 100으로 p.y가 변경됩니다. 포인터를 통한 간접 수정!",
-        "highlight": [23, 24],
+        "explanation": "ptr->y = 100으로 **p.y가 변경**됩니다. 포인터를 통한 간접 수정!\n\n**왜 p.y가 바뀔까?**\n- ptr은 p를 **가리키고** 있음\n- ptr->y는 p.y와 **같은 메모리**\n- ptr->y를 바꾸면 p.y도 바뀜!\n\n**실제 활용 예:**\n```c\nvoid moveRight(struct Point *p) {\n    p->x += 1;  // 원본 수정!\n}\n\nint main() {\n    struct Point pos = {0, 0};\n    moveRight(&pos);  // pos.x가 1이 됨\n}\n```\n\n**핵심:** 포인터로 전달하면 **함수 안에서 원본 수정 가능**!",
+        "highlight": [
+          23,
+          24
+        ],
+        "stdout": "p.y = 100",
         "memoryChanges": [
           {
             "action": "update",
@@ -72,7 +97,8 @@
             "name": "p.y",
             "value": 100,
             "previousValue": 20,
-            "updatedVia": "ptr"
+            "updatedVia": "ptr",
+            "frame": "main"
           }
         ]
       }

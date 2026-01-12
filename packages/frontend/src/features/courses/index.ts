@@ -12,12 +12,10 @@ export { LessonPage } from './LessonPage';
 
 // Hooks
 export { useLessonNavigation } from './hooks/useLessonNavigation';
-export { useLessonMemory } from './hooks/useLessonMemory';
+export { useLessonVisualization } from './hooks/useLessonVisualization';
+export { useCodeSelection } from './hooks/useCodeSelection';
 
-// Lesson Components
+// Components
 export { CodeViewer } from './components/day/CodeViewer';
 export { StepExplanation } from './components/day/StepExplanation';
-export { StepControls } from './components/day/StepControls';
-
-// Memory Components
-export { CourseMemoryView } from './components/memory/CourseMemoryView';
+export { SelectedCodeBadge } from './components/day/SelectedCodeBadge';

@@ -8,9 +8,17 @@
       {
         "line": 4,
         "title": "배열 생성",
-        "explanation": "arr은 5개 int의 배열입니다. sizeof(arr) = 20바이트 (4×5)",
-        "highlight": [4],
+        "explanation": "arr은 5개 int의 배열입니다. sizeof(arr) = **20바이트** (4×5)\n\n**핵심 질문:** 배열과 포인터, 뭐가 다를까요?\n\n**가장 큰 차이:** 배열은 **크기 정보를 가지고 있습니다!** sizeof(arr)가 전체 크기를 알려주는 이유예요.\n\n**비유:** 배열 = 책장 전체, 포인터 = 책장 첫 칸을 가리키는 손가락. 손가락은 책장 크기를 모릅니다!",
+        "highlight": [
+          4
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -18,15 +26,18 @@
             "type": "int[5]",
             "size": 20,
             "value": "[1,2,3,4,5]",
-            "address": "0x7ffc1000"
+            "address": "0x7ffc1000",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 5,
         "title": "포인터에 배열 할당",
-        "explanation": "배열 이름 arr은 첫 요소 주소로 'decay'됩니다. p = &arr[0]과 동일.",
-        "highlight": [5],
+        "explanation": "배열 이름 arr은 첫 요소 주소로 **'decay'**됩니다. p = &arr[0]과 동일.\n\n**decay(붕괴)란?** 배열이 포인터로 '변환'되는 현상이에요.\n\n**왜 decay가 발생할까?** 배열 전체를 복사하면 비효율적이니까요. 주소만 전달하면 충분합니다.\n\n**중요:** p는 arr의 **복사본**이 아닙니다. p는 arr[0]의 위치만 알고, 크기 정보는 없어요!",
+        "highlight": [
+          5
+        ],
         "memoryChanges": [
           {
             "action": "allocate",
@@ -36,22 +47,30 @@
             "size": 8,
             "value": "0x7ffc1000",
             "address": "0x7ffc0ff8",
-            "pointsTo": "arr[0]"
+            "pointsTo": "arr[0]",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 7,
         "title": "sizeof 차이 확인",
-        "explanation": "sizeof(arr)=20 (전체 배열), sizeof(p)=8 (포인터). 배열은 크기 정보를 유지합니다!",
-        "highlight": [7, 8],
+        "explanation": "sizeof(arr)=20 (전체 배열), sizeof(p)=8 (포인터).\n\n**왜 결과가 다를까?**\n- **arr**: 타입이 int[5]이므로 5개 int 크기 = 20\n- **p**: 타입이 int*이므로 포인터 크기 = 8\n\n**이것이 배열과 포인터의 본질적 차이!**\n- 배열: 메모리 블록 자체\n- 포인터: 메모리 주소를 담는 변수\n\n**실무 팁:** sizeof로 배열 길이 계산: `sizeof(arr)/sizeof(arr[0])` = 요소 개수",
+        "highlight": [
+          7,
+          8
+        ],
+        "stdout": "sizeof(arr) = 20\nsizeof(p) = 8",
         "memoryChanges": []
       },
       {
         "line": 10,
         "title": "배열은 상수!",
-        "explanation": "arr = p는 에러입니다. 배열 이름은 고정된 주소이며 변경할 수 없습니다.",
-        "highlight": [10, 11],
+        "explanation": "arr = p는 **에러**입니다! 배열 이름은 고정된 주소이며 변경할 수 없어요.\n\n**왜 배열은 재할당이 안 될까?**\n- 배열 이름 = 메모리 블록의 **시작점 상수**\n- 포인터 = 값을 바꿀 수 있는 **변수**\n\n**비유:**\n- arr은 건물 주소 (1번지는 항상 1번지)\n- p는 GPS 목적지 (언제든 바꿀 수 있음)\n\n**정리:**\n- `p = arr;` → OK (포인터에 주소 할당)\n- `arr = p;` → 에러! (상수에 할당 불가)",
+        "highlight": [
+          10,
+          11
+        ],
         "memoryChanges": []
       }
     ]

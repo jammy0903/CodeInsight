@@ -1,0 +1,133 @@
+{
+  "lessonId": "py-4-2",
+  "title": "Pass by Assignment",
+  "concept": "Python is neither pass-by-value nor pass-by-reference - it's pass-by-assignment!",
+  "content": {
+    "code": "def modify(num, lst):\n    num = num + 10\n    lst.append(4)\n    print(f\"Inside: num={num}, lst={lst}\")\n\nx = 5\nmy_list = [1, 2, 3]\n\nprint(f\"Before: x={x}, my_list={my_list}\")\nmodify(x, my_list)\nprint(f\"After: x={x}, my_list={my_list}\")",
+    "steps": [
+      {
+        "line": 6,
+        "title": "Create variables",
+        "explanation": "We have:\n- `x` pointing to integer 5 (immutable)\n- `my_list` pointing to list [1,2,3] (mutable)\n\nLet's see what happens when we pass them to a function!",
+        "highlight": [6, 7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x", "pointsTo": "int_5" },
+            { "name": "my_list", "pointsTo": "list_123" }
+          ],
+          "objects": [
+            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
+            { "id": "list_123", "type": "list", "value": "[1, 2, 3]", "pyId": "140800", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "Call the function",
+        "explanation": "**What happens on function call:**\n\n1. `num = x` → `num` points to SAME object as `x` (integer 5)\n2. `lst = my_list` → `lst` points to SAME object as `my_list` (the list)\n\n**This is PASS BY ASSIGNMENT!**\n\nParameters are bound to the same objects as the arguments.",
+        "highlight": [10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x", "pointsTo": "int_5" },
+            { "name": "my_list", "pointsTo": "list_123" },
+            { "name": "(param) num", "pointsTo": "int_5" },
+            { "name": "(param) lst", "pointsTo": "list_123" }
+          ],
+          "objects": [
+            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
+            { "id": "list_123", "type": "list", "value": "[1, 2, 3]", "pyId": "140800" }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "num = num + 10 (rebinding)",
+        "explanation": "**Inside the function:**\n\n`num = num + 10` creates a NEW integer 15 and rebinds `num` to it.\n\nBut `x` still points to the original 5!\n\n**Rebinding a local variable doesn't affect the outside variable.**",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x", "pointsTo": "int_5" },
+            { "name": "my_list", "pointsTo": "list_123" },
+            { "name": "(param) num", "pointsTo": "int_15" },
+            { "name": "(param) lst", "pointsTo": "list_123" }
+          ],
+          "objects": [
+            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
+            { "id": "int_15", "type": "int", "value": "15", "pyId": "9406520", "highlight": true },
+            { "id": "list_123", "type": "list", "value": "[1, 2, 3]", "pyId": "140800" }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "lst.append(4) (mutation)",
+        "explanation": "**THIS IS THE KEY DIFFERENCE!**\n\n`lst.append(4)` MUTATES the list object.\n\nSince `lst` and `my_list` point to the SAME object, the change is visible through both!\n\n**Mutating a shared object affects the outside.**",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x", "pointsTo": "int_5" },
+            { "name": "my_list", "pointsTo": "list_123" },
+            { "name": "(param) num", "pointsTo": "int_15" },
+            { "name": "(param) lst", "pointsTo": "list_123" }
+          ],
+          "objects": [
+            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
+            { "id": "int_15", "type": "int", "value": "15", "pyId": "9406520" },
+            { "id": "list_123", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "140800", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "After the call",
+        "explanation": "**Results:**\n\n- `x` is UNCHANGED (still 5)\n  → We only rebound the local `num`\n\n- `my_list` is CHANGED ([1,2,3,4])\n  → We mutated the shared object\n\n**The Rule:**\n- Rebinding doesn't affect outside\n- Mutation affects outside",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x", "pointsTo": "int_5" },
+            { "name": "my_list", "pointsTo": "list_123" }
+          ],
+          "objects": [
+            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
+            { "id": "list_123", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "140800" }
+          ],
+          "output": ["Before: x=5, my_list=[1, 2, 3]", "Inside: num=15, lst=[1, 2, 3, 4]", "After: x=5, my_list=[1, 2, 3, 4]"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What prints for x?\n\ndef change(x):\n    x = [4, 5, 6]\n\nx = [1, 2, 3]\nchange(x)\nprint(x)",
+    "options": [
+      "[4, 5, 6]",
+      "[1, 2, 3]",
+      "[]",
+      "Error"
+    ],
+    "correctIndex": 1,
+    "explanation": "Inside change(), x = [4,5,6] REBINDS the local x to a new list. It doesn't affect the outside x which still points to [1,2,3]. If we had used x.clear(); x.extend([4,5,6]) it would have mutated the original."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Python is pass-by-value",
+      "correct": "Python uses pass-by-assignment (also called pass-by-object-reference)",
+      "why": "The parameter gets bound to the same object as the argument. No copy is made."
+    },
+    {
+      "wrong": "Python is pass-by-reference",
+      "correct": "Rebinding a parameter doesn't change the original variable",
+      "why": "You can't reassign the caller's variable. You can only mutate shared objects."
+    },
+    {
+      "wrong": "Functions can't modify outside data",
+      "correct": "Functions CAN mutate mutable objects passed to them",
+      "why": "Mutation is different from rebinding. Mutation changes the shared object."
+    }
+  ],
+  "keyTakeaway": "Python is PASS-BY-ASSIGNMENT. Rebinding is local. Mutation affects the original!"
+}

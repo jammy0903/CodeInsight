@@ -1,9 +1,11 @@
 /**
- * StepExplanation - 현재 스텝 설명 표시
- * 다크 테마 + 코드 하이라이트
+ * StepExplanation - AI 기반 스텝 설명 표시
+ * explanationStore의 prefetch 큐에서 설명을 가져와 표시
+ * 스트리밍 중인 경우 실시간으로 텍스트가 타이핑되는 효과
  */
 
-import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import { useExplanation } from '../stores/explanationStore';
 import type { SimulationStep } from '../stores/playgroundStore';
 
 interface StepExplanationProps {
@@ -11,30 +13,84 @@ interface StepExplanationProps {
 }
 
 export function StepExplanation({ step }: StepExplanationProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="flex items-center gap-4 w-full"
-    >
-      {/* 코드 */}
-      <div className="flex-none">
-        <code className="inline-flex items-center px-4 py-2
-                        bg-[#2d333b] border border-[#444c56] rounded-lg
-                        font-mono text-sm text-[#79c0ff] font-medium">
-          {step.code}
-        </code>
-      </div>
+  const { explanation, isStreaming, streamingContent } = useExplanation(step.line, step.code);
 
-      {/* 화살표 */}
-      <div className="flex-none text-[#3fb950] text-lg">→</div>
+  // 표시할 내용 결정
+  const displayContent = isStreaming
+    ? streamingContent
+    : (explanation || step.explanation);
+
+  // 아직 설명이 없고 스트리밍도 아닌 경우 = 대기 중
+  const isWaiting = !displayContent && !isStreaming;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '8px',
+      }}
+    >
+      {/* 라인 번호 */}
+      <span
+        style={{
+          padding: '2px 8px',
+          backgroundColor: '#16a34a',
+          color: '#ffffff',
+          fontSize: '11px',
+          fontWeight: 700,
+          borderRadius: '4px',
+          fontFamily: 'monospace',
+          flexShrink: 0,
+        }}
+      >
+        L{step.line}
+      </span>
 
       {/* 설명 */}
-      <div className="flex-1">
-        <p className="text-base text-[#e6edf3] leading-relaxed font-medium">
-          {step.explanation}
-        </p>
-      </div>
-    </motion.div>
+      {isWaiting ? (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            color: '#9ca3af',
+            fontSize: '13px',
+          }}
+        >
+          <Loader2 size={14} className="animate-spin" />
+          <span>대기 중...</span>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', flex: 1 }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: '13px',
+              color: '#166534',
+              fontWeight: 500,
+              lineHeight: 1.6,
+              whiteSpace: 'pre-line',
+              flex: 1,
+            }}
+          >
+            {displayContent}
+            {isStreaming && (
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '2px',
+                  height: '14px',
+                  backgroundColor: '#16a34a',
+                  marginLeft: '2px',
+                  animation: 'blink 1s infinite',
+                  verticalAlign: 'text-bottom',
+                }}
+              />
+            )}
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

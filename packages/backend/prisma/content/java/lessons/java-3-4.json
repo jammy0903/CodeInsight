@@ -1,0 +1,139 @@
+{
+  "lessonId": "java-3-4",
+  "title": "swap이 안 되는 이유",
+  "concept": "Java에서 swap 함수가 작동하지 않는 이유는 Pass by Value 때문이다",
+  "content": {
+    "code": "void swap(Integer a, Integer b) {\n    Integer temp = a;\n    a = b;\n    b = temp;\n    System.out.println(\"inside: a=\" + a + \", b=\" + b);\n}\n\nInteger x = 1;\nInteger y = 2;\nSystem.out.println(\"before: x=\" + x + \", y=\" + y);\nswap(x, y);\nSystem.out.println(\"after: x=\" + x + \", y=\" + y);",
+    "steps": [
+      {
+        "line": 8,
+        "title": "Integer x, y 생성",
+        "explanation": "x=1, y=2가 오토박싱으로 Integer 객체가 됩니다.",
+        "highlight": [8, 9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "x", "value": "-> 0x001"},
+            {"name": "y", "value": "-> 0x002"}
+          ],
+          "heap": [
+            {"address": "0x001", "content": "Integer(1)"},
+            {"address": "0x002", "content": "Integer(2)"}
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "호출 전 출력",
+        "explanation": "x=1, y=2입니다.",
+        "highlight": [10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["before: x=1, y=2"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "swap(x, y) 호출",
+        "explanation": "x, y의 참조값이 a, b에 복사됩니다.",
+        "keyInsight": "파라미터 a, b는 x, y의 복사본",
+        "highlight": [11, 1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "x", "value": "-> 0x001", "frame": "main"},
+            {"name": "y", "value": "-> 0x002", "frame": "main"},
+            {"name": "a", "value": "-> 0x001", "frame": "swap", "copied": true},
+            {"name": "b", "value": "-> 0x002", "frame": "swap", "copied": true}
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "temp = a",
+        "explanation": "temp에 a의 참조값(0x001)을 저장합니다.",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "a", "value": "-> 0x001", "frame": "swap"},
+            {"name": "b", "value": "-> 0x002", "frame": "swap"},
+            {"name": "temp", "value": "-> 0x001", "frame": "swap"}
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "a = b",
+        "explanation": "지역 변수 a가 0x002를 가리키게 됩니다. x는 영향 없음!",
+        "keyInsight": "지역 변수 a 변경 -> 원본 x 영향 없음",
+        "highlight": [3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "x", "value": "-> 0x001", "frame": "main"},
+            {"name": "a", "value": "-> 0x002", "frame": "swap", "changed": true}
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "b = temp",
+        "explanation": "지역 변수 b가 0x001을 가리키게 됩니다. y는 영향 없음!",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "y", "value": "-> 0x002", "frame": "main"},
+            {"name": "b", "value": "-> 0x001", "frame": "swap", "changed": true}
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "함수 내부 출력",
+        "explanation": "함수 내부에서는 a=2, b=1로 교환되었습니다.",
+        "highlight": [5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["before: x=1, y=2", "inside: a=2, b=1"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "함수 반환 후 출력",
+        "explanation": "x, y는 여전히 원래 값입니다! 지역 변수만 교환되었습니다.",
+        "keyInsight": "Java에서 swap 함수는 작동하지 않음",
+        "highlight": [12],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "x", "value": "-> 0x001"},
+            {"name": "y", "value": "-> 0x002"}
+          ],
+          "output": ["before: x=1, y=2", "inside: a=2, b=1", "after: x=1, y=2"],
+          "warning": "swap 실패! x, y 그대로"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Java에서 두 값을 교환하려면?",
+    "options": [
+      "swap 함수 사용",
+      "포인터 사용",
+      "배열이나 객체의 필드로 래핑",
+      "불가능"
+    ],
+    "correctIndex": 2,
+    "explanation": "배열 요소나 객체 필드는 수정 가능합니다. int[] arr = {x, y}로 래핑하면 교환 가능합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Integer는 객체니까 swap이 된다",
+      "correct": "객체여도 참조 재할당은 원본에 영향 없습니다.",
+      "why": "객체 내부 수정만 원본에 영향을 줍니다. Integer는 불변이라 내부 수정도 불가합니다."
+    }
+  ],
+  "keyTakeaway": "Java는 항상 Pass by Value, swap 불가, 래핑으로 우회"
+}

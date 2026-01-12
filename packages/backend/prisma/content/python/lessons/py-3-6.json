@@ -1,0 +1,143 @@
+{
+  "lessonId": "py-3-6",
+  "title": "Set Mutability",
+  "concept": "Sets are mutable - add, remove, and discard modify the same object!",
+  "content": {
+    "code": "fruits = {\"apple\", \"banana\"}\nprint(f\"id = {id(fruits)}\")\n\nfruits.add(\"cherry\")\nfruits.discard(\"banana\")\nprint(f\"After changes: {fruits}\")\nprint(f\"id = {id(fruits)}\")\n\n# frozenset is the immutable version\nfrozen = frozenset([1, 2, 3])\n# frozen.add(4)  # AttributeError!",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Create a set",
+        "explanation": "`fruits = {\"apple\", \"banana\"}` creates a set object.\n\n**Sets are MUTABLE** - like lists and dicts!\n\n**Key property:** Sets contain only unique elements.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "fruits", "pointsTo": "set_1" }
+          ],
+          "objects": [
+            { "id": "set_1", "type": "set", "value": "{apple, banana}", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "Note the id",
+        "explanation": "Let's remember this id.\n\nFor mutable objects, the id stays the same after modification!",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "fruits", "pointsTo": "set_1" }
+          ],
+          "objects": [
+            { "id": "set_1", "type": "set", "value": "{apple, banana}", "pyId": "140100" }
+          ],
+          "output": ["id = 140100"]
+        }
+      },
+      {
+        "line": 4,
+        "title": "Add element",
+        "explanation": "`.add(\"cherry\")` adds a new element to the set.\n\n**In-place modification** - same set object!\n\nNote: Adding a duplicate does nothing (sets have unique elements).",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "fruits", "pointsTo": "set_1" }
+          ],
+          "objects": [
+            { "id": "set_1", "type": "set", "value": "{apple, banana, cherry}", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Remove element",
+        "explanation": "`.discard(\"banana\")` removes an element.\n\n**Still the same object!**\n\n`.discard()` vs `.remove()`:\n- `discard()` - silent if not found\n- `remove()` - raises KeyError if not found",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "fruits", "pointsTo": "set_1" }
+          ],
+          "objects": [
+            { "id": "set_1", "type": "set", "value": "{apple, cherry}", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "SAME id!",
+        "explanation": "**The id is unchanged!**\n\nThis proves all modifications happened to the same object.\n\n**Set methods that modify in place:**\n- `add()`, `remove()`, `discard()`\n- `pop()`, `clear()`\n- `update()`, `difference_update()`",
+        "highlight": [6, 7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "fruits", "pointsTo": "set_1" }
+          ],
+          "objects": [
+            { "id": "set_1", "type": "set", "value": "{apple, cherry}", "pyId": "140100" }
+          ],
+          "output": ["id = 140100", "After changes: {'apple', 'cherry'}", "id = 140100"]
+        }
+      },
+      {
+        "line": 10,
+        "title": "frozenset - immutable!",
+        "explanation": "`frozenset` is the **immutable** version of set.\n\n- Cannot add or remove elements\n- Can be used as dictionary keys\n- Can be elements of other sets",
+        "highlight": [10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "fruits", "pointsTo": "set_1" },
+            { "name": "frozen", "pointsTo": "fset_1" }
+          ],
+          "objects": [
+            { "id": "set_1", "type": "set", "value": "{apple, cherry}", "pyId": "140100" },
+            { "id": "fset_1", "type": "frozenset", "value": "frozenset({1, 2, 3})", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "frozenset can't be modified",
+        "explanation": "`frozen.add(4)` would cause:\n\n```python\nAttributeError: 'frozenset' object has no attribute 'add'\n```\n\n**set vs frozenset:**\n| set | frozenset |\n|-----|----------|\n| Mutable | Immutable |\n| Can't be dict key | Can be dict key |\n| Can't be in set | Can be in set |",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "frozen", "pointsTo": "fset_1" }
+          ],
+          "objects": [
+            { "id": "fset_1", "type": "frozenset", "value": "frozenset({1, 2, 3})", "pyId": "140200" }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Which can be used as a dictionary key?",
+    "options": [
+      "{1, 2, 3}",
+      "[1, 2, 3]",
+      "frozenset([1, 2, 3])",
+      "{'a': 1}"
+    ],
+    "correctIndex": 2,
+    "explanation": "Only immutable objects can be dictionary keys. frozenset is immutable. Regular sets, lists, and dicts are mutable and cannot be keys."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Sets can contain lists",
+      "correct": "Sets can only contain immutable (hashable) objects",
+      "why": "Lists are mutable and can't be hashed. Use tuples instead."
+    },
+    {
+      "wrong": "set() and {} are the same",
+      "correct": "{} creates an empty dict, set() creates an empty set",
+      "why": "Python uses {} for both, so empty set must use set()."
+    }
+  ],
+  "keyTakeaway": "Sets are MUTABLE - add/remove modifies in place. Use frozenset for immutable sets!"
+}

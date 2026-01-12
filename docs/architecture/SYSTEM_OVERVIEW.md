@@ -1,7 +1,7 @@
 # CodeInsight 시스템 아키텍처
 
-> 마지막 업데이트: 2026-01-08
-> Phase 2: Docker-in-Docker 제거 + 멀티-언어 Executor 아키텍처 도입
+> 마지막 업데이트: 2026-01-11
+> Phase 3: C 핸들러 확장 + Codeium 롤백 (Monaco Editor 복귀)
 
 ---
 
@@ -223,7 +223,8 @@ frontend/src/
 │   ├── tracer.ts          # 메모리 트레이스 API
 │   └── ai.ts              # AI 해설 API
 ├── stores/
-│   └── store.ts           # Zustand 전역 상태
+│   ├── store.ts           # Zustand 전역 상태
+│   └── lessonHistoryStore.ts  # 최근 학습 레슨 기록 (localStorage persist)
 └── types/
     ├── index.ts           # 공통 타입
     ├── course-schema.ts   # 코스 타입 (Language/Chapter/Lesson/Quiz)

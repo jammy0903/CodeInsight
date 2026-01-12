@@ -1,0 +1,121 @@
+{
+  "lessonId": "py-4-1",
+  "title": "Function Basics",
+  "concept": "Functions have their own local namespace for variables",
+  "content": {
+    "code": "def greet(name):\n    message = f\"Hello, {name}!\"\n    return message\n\nresult = greet(\"Alice\")\nprint(result)\n\n# name and message don't exist here!\n# print(message)  # NameError!",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Define a function",
+        "explanation": "`def greet(name)` creates a function object and binds `greet` to it.\n\nThe function object contains:\n- The code to execute\n- Parameter names (`name`)\n- A reference to the enclosing scope",
+        "highlight": [1, 2, 3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "greet", "pointsTo": "func_greet" }
+          ],
+          "objects": [
+            { "id": "func_greet", "type": "function", "value": "greet(name)", "pyId": "140700", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Call the function",
+        "explanation": "**When we call `greet(\"Alice\")`:**\n\n1. Python creates a NEW local namespace for this call\n2. `name` is bound to the string `\"Alice\"` in this namespace\n3. The function body executes\n\nThis local namespace is separate from the global one!",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "greet", "pointsTo": "func_greet" },
+            { "name": "result", "pointsTo": "str_result" }
+          ],
+          "objects": [
+            { "id": "func_greet", "type": "function", "value": "greet(name)", "pyId": "140700" },
+            { "id": "str_alice", "type": "str", "value": "\"Alice\"", "pyId": "140710" },
+            { "id": "str_result", "type": "str", "value": "\"Hello, Alice!\"", "pyId": "140720", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "Local variable created",
+        "explanation": "Inside the function:\n\n`message = f\"Hello, {name}!\"` creates a local variable.\n\nThis `message` only exists inside the function. When the function returns, it's gone!\n\n**Local namespace is temporary.**",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "greet", "pointsTo": "func_greet" },
+            { "name": "(local) name", "pointsTo": "str_alice" },
+            { "name": "(local) message", "pointsTo": "str_result" }
+          ],
+          "objects": [
+            { "id": "func_greet", "type": "function", "value": "greet(name)", "pyId": "140700" },
+            { "id": "str_alice", "type": "str", "value": "\"Alice\"", "pyId": "140710" },
+            { "id": "str_result", "type": "str", "value": "\"Hello, Alice!\"", "pyId": "140720", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "Return sends back the object",
+        "explanation": "`return message` sends the string object back to the caller.\n\n**Important:** The function returns the OBJECT, not a copy!\n\nAfter return, the local namespace is destroyed, but the object survives if someone keeps a reference to it.",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "greet", "pointsTo": "func_greet" },
+            { "name": "result", "pointsTo": "str_result" }
+          ],
+          "objects": [
+            { "id": "func_greet", "type": "function", "value": "greet(name)", "pyId": "140700" },
+            { "id": "str_result", "type": "str", "value": "\"Hello, Alice!\"", "pyId": "140720" }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Local variables are gone!",
+        "explanation": "**After the function returns:**\n\n`name` and `message` no longer exist!\n\nTrying to access `message` here would cause:\n`NameError: name 'message' is not defined`\n\n**Functions have their own temporary namespace.**",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "greet", "pointsTo": "func_greet" },
+            { "name": "result", "pointsTo": "str_result" }
+          ],
+          "objects": [
+            { "id": "func_greet", "type": "function", "value": "greet(name)", "pyId": "140700" },
+            { "id": "str_result", "type": "str", "value": "\"Hello, Alice!\"", "pyId": "140720" }
+          ],
+          "output": ["Hello, Alice!"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What happens?\n\ndef test():\n    x = 10\n\ntest()\nprint(x)",
+    "options": [
+      "Prints 10",
+      "Prints None",
+      "NameError: x is not defined",
+      "Prints 0"
+    ],
+    "correctIndex": 2,
+    "explanation": "x is a LOCAL variable inside test(). When test() returns, x is destroyed. There's no x in the global namespace, so we get NameError."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Variables created in functions become global",
+      "correct": "Variables in functions are local by default",
+      "why": "Functions have their own namespace. Local variables disappear when the function returns."
+    },
+    {
+      "wrong": "return copies the value",
+      "correct": "return sends back a reference to the object",
+      "why": "No copy is made. The caller receives a reference to the same object."
+    }
+  ],
+  "keyTakeaway": "Functions have LOCAL namespaces. Local variables disappear when the function returns!"
+}

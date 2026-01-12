@@ -162,7 +162,7 @@ export function LanguageCoursePage() {
   const xpToNextLevel = 10;
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen py-8 px-6 md:px-12 lg:px-16">
       {/* 게임 스타일 헤더 */}
       <div className="mb-10">
         <button
@@ -175,9 +175,8 @@ export function LanguageCoursePage() {
 
         {/* 메인 헤더 카드 - 언어 색상 기반 */}
         <div
-          className="relative overflow-hidden rounded-2xl"
+          className="relative overflow-hidden rounded-2xl p-4 md:p-6 lg:p-10"
           style={{
-            padding: '40px',
             background: `linear-gradient(135deg, ${langInfo.color}20 0%, ${langInfo.color}35 100%)`,
             border: `2px solid ${langInfo.color}`,
           }}
@@ -217,17 +216,17 @@ export function LanguageCoursePage() {
             </div>
 
             {/* 레벨 & XP 바 */}
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-6">
               {/* 레벨 뱃지 */}
               <div
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 border border-amber-300"
+                className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-amber-100 border border-amber-300"
               >
-                <Trophy className="w-5 h-5 text-amber-500" />
-                <span className="font-bold font-mono text-amber-600">LV.{currentLevel}</span>
+                <Trophy className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+                <span className="font-bold font-mono text-sm md:text-base text-amber-600">LV.{currentLevel}</span>
               </div>
 
               {/* XP 바 */}
-              <div className="flex-1">
+              <div className="flex-1 w-full md:w-auto">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-emerald-500" />

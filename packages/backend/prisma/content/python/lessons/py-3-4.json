@@ -1,0 +1,154 @@
+{
+  "lessonId": "py-3-4",
+  "title": "Deep Copy",
+  "concept": "copy.deepcopy() creates completely independent copies at all levels!",
+  "content": {
+    "code": "import copy\n\noriginal = [[1, 2], [3, 4]]\ndeep = copy.deepcopy(original)\n\nprint(f\"Same list? {original is deep}\")\nprint(f\"Same inner? {original[0] is deep[0]}\")\n\ndeep[0][0] = 999\nprint(f\"original: {original}\")\nprint(f\"deep: {deep}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Import copy module",
+        "explanation": "`import copy` gives us access to `deepcopy()`.\n\nThis is in Python's standard library - no installation needed!",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 3,
+        "title": "Create nested list",
+        "explanation": "Same as before: `original = [[1, 2], [3, 4]]`\n\nOuter list contains references to inner lists.",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100", "highlight": true },
+            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
+            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "Deep copy - ALL levels!",
+        "explanation": "`copy.deepcopy()` creates copies at **every level**:\n\n- New outer list ✓\n- New inner lists ✓\n- Everything is independent!\n\nNotice: ALL objects have NEW IDs.",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "deep", "pointsTo": "list_deep" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
+            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
+            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" },
+            { "id": "list_deep", "type": "list", "value": "[→, →]", "pyId": "140400", "highlight": true },
+            { "id": "list_deep1", "type": "list", "value": "[1, 2]", "pyId": "140500", "highlight": true },
+            { "id": "list_deep2", "type": "list", "value": "[3, 4]", "pyId": "140600", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Outer lists are different",
+        "explanation": "`original is deep` → **False**\n\nAs expected, outer lists are different.",
+        "highlight": [6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "deep", "pointsTo": "list_deep" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
+            { "id": "list_deep", "type": "list", "value": "[→, →]", "pyId": "140400" }
+          ],
+          "output": ["Same list? False"]
+        }
+      },
+      {
+        "line": 7,
+        "title": "Inner lists ALSO different!",
+        "explanation": "`original[0] is deep[0]` → **False**!\n\n**This is the key difference from shallow copy!**\n\nThe inner lists are **completely independent** objects.",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "deep", "pointsTo": "list_deep" }
+          ],
+          "objects": [
+            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
+            { "id": "list_deep1", "type": "list", "value": "[1, 2]", "pyId": "140500" }
+          ],
+          "output": ["Same list? False", "Same inner? False"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Modify deep copy",
+        "explanation": "`deep[0][0] = 999` modifies only the deep copy's inner list.\n\nSince it's a separate object, `original` is not affected!",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "deep", "pointsTo": "list_deep" }
+          ],
+          "objects": [
+            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
+            { "id": "list_deep1", "type": "list", "value": "[999, 2]", "pyId": "140500", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "original is UNCHANGED!",
+        "explanation": "**SUCCESS!** Only `deep` changed:\n\n```\noriginal: [[1, 2], [3, 4]]\ndeep:     [[999, 2], [3, 4]]\n```\n\n**Deep copy = complete independence!**",
+        "highlight": [10, 11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "deep", "pointsTo": "list_deep" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[[1,2], [3,4]]", "pyId": "140100" },
+            { "id": "list_deep", "type": "list", "value": "[[999,2], [3,4]]", "pyId": "140400" }
+          ],
+          "output": ["Same list? False", "Same inner? False", "original: [[1, 2], [3, 4]]", "deep: [[999, 2], [3, 4]]"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "When should you use deepcopy()?",
+    "options": [
+      "Always - it's safer",
+      "Only for flat lists like [1, 2, 3]",
+      "When you have nested structures and need complete independence",
+      "Never - it's too slow"
+    ],
+    "correctIndex": 2,
+    "explanation": "Use deepcopy() when you have nested mutable objects and need complete independence. For flat lists, shallow copy is enough and faster. For just aliasing, use assignment."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Always use deepcopy to be safe",
+      "correct": "Use deepcopy only when needed - it's slower than shallow copy",
+      "why": "Deepcopy recursively copies everything. For simple lists, shallow copy is faster and sufficient."
+    },
+    {
+      "wrong": "deepcopy works on everything",
+      "correct": "Some objects can't be deep copied (file handles, network connections)",
+      "why": "Objects tied to external resources may raise errors or behave unexpectedly."
+    }
+  ],
+  "keyTakeaway": "copy.deepcopy() creates completely independent copies at ALL levels - use it for nested structures!"
+}

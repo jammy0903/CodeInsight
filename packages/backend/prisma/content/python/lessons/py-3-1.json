@@ -1,0 +1,127 @@
+{
+  "lessonId": "py-3-1",
+  "title": "List Creation and Modification",
+  "concept": "Lists CAN be modified in place - unlike integers and strings!",
+  "content": {
+    "code": "lst = [1, 2, 3]\nprint(f\"lst = {lst}, id = {id(lst)}\")\n\nlst[0] = 100\nprint(f\"After lst[0] = 100: {lst}, id = {id(lst)}\")\n\nlst.append(4)\nprint(f\"After append(4): {lst}, id = {id(lst)}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Create a list object",
+        "explanation": "`lst = [1, 2, 3]` creates a list object.\n\n**Lists are MUTABLE** - unlike integers and strings, they CAN be modified in place!",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "lst", "pointsTo": "list_1" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140500", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "Note the id",
+        "explanation": "Let's record this id. For mutable objects, the id stays the SAME after modification!\n\nThis is the key difference from immutable objects.",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "lst", "pointsTo": "list_1" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140500" }
+          ],
+          "output": ["lst = [1, 2, 3], id = 140500"]
+        }
+      },
+      {
+        "line": 4,
+        "title": "lst[0] = 100 - SAME object modified!",
+        "explanation": "**UNLIKE strings, this WORKS!**\n\n`lst[0] = 100` modifies the list IN PLACE.\n\n**Key difference from immutable:**\n- Integer: `a = a + 1` creates NEW object\n- List: `lst[0] = 100` modifies EXISTING object\n\nThe list object itself changes. No new list is created.",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "lst", "pointsTo": "list_1" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[100, 2, 3]", "pyId": "140500", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "SAME id! Same object!",
+        "explanation": "**The id is unchanged!**\n\nThis PROVES the same object was modified.\n\nCompare to integers where `a += 1` changes the id (creates new object).",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "lst", "pointsTo": "list_1" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[100, 2, 3]", "pyId": "140500" }
+          ],
+          "output": ["lst = [1, 2, 3], id = 140500", "After lst[0] = 100: [100, 2, 3], id = 140500"]
+        }
+      },
+      {
+        "line": 7,
+        "title": "append() also modifies in place",
+        "explanation": "`lst.append(4)` adds 4 to the end of the SAME list object.\n\nNo new list is created. The existing list grows.\n\n**Most list methods modify in place:**\n- `append()`, `extend()`, `insert()`\n- `remove()`, `pop()`, `clear()`\n- `sort()`, `reverse()`",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "lst", "pointsTo": "list_1" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[100, 2, 3, 4]", "pyId": "140500", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "Still the same object!",
+        "explanation": "**The id is STILL the same!**\n\nAll modifications happened to the same list object.\n\n**WARNING:** This means if another variable points to this list, it sees ALL changes!",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "lst", "pointsTo": "list_1" }
+          ],
+          "objects": [
+            { "id": "list_1", "type": "list", "value": "[100, 2, 3, 4]", "pyId": "140500" }
+          ],
+          "output": ["lst = [1, 2, 3], id = 140500", "After lst[0] = 100: [100, 2, 3], id = 140500", "After append(4): [100, 2, 3, 4], id = 140500"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "After lst.sort(), does lst have a new id?",
+    "options": [
+      "Yes, sort creates a new sorted list",
+      "No, sort modifies the list in place",
+      "Depends on the list size",
+      "Error, lists can't be sorted"
+    ],
+    "correctIndex": 1,
+    "explanation": "lst.sort() modifies the list IN PLACE and returns None. The id stays the same. (Compare to sorted(lst) which creates a NEW list!)"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Lists work like strings - operations create new lists",
+      "correct": "Lists are mutable - most operations modify in place",
+      "why": "This is the fundamental difference between mutable and immutable types."
+    },
+    {
+      "wrong": "lst.append(x) returns the new list",
+      "correct": "lst.append(x) returns None - it modifies lst directly",
+      "why": "Methods that modify in place typically return None to signal this."
+    }
+  ],
+  "keyTakeaway": "Lists are MUTABLE - modifications happen in place. The id stays the same!"
+}

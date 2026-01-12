@@ -8,9 +8,17 @@
       {
         "line": 4,
         "title": "일반 변수 생성",
-        "explanation": "a는 값 10을 저장합니다. 이것이 나중에 포인터가 '가리킬 대상'(pointee)이 됩니다.",
-        "highlight": [4],
+        "explanation": "a는 값 **10**을 저장합니다. 이것이 나중에 포인터가 **'가리킬 대상'(pointee)**이 돼요.\n\n**Two-Level 개념:** Stanford 포인터 교육에서 강조하는 핵심입니다.\n- **Level 1:** 포인터 자체 (주소를 저장할 공간)\n- **Level 2:** 포인티 (실제 데이터가 있는 곳)\n\n둘 다 있어야 포인터가 의미가 있습니다!",
+        "highlight": [
+          4
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -18,15 +26,18 @@
             "type": "int",
             "size": 4,
             "value": 10,
-            "address": "0x7ffc1000"
+            "address": "0x7ffc1000",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 5,
         "title": "포인터 선언 (Two-Level: Level 1만 존재)",
-        "explanation": "int *p;는 '정수의 주소를 저장할 수 있는' 변수 p를 만듭니다. 아직 p는 아무것도 가리키지 않습니다!",
-        "highlight": [5],
+        "explanation": "int *p;는 **'정수의 주소를 저장할 수 있는'** 변수 p를 만듭니다. 아직 p는 아무것도 가리키지 않아요!\n\n**왜 8바이트일까?** 포인터는 주소를 저장합니다. 64비트 시스템에서 주소는 8바이트예요. int를 가리키든 char를 가리키든 포인터 크기는 같습니다.\n\n**위험!** 지금 p에는 쓰레기 값(임의의 주소)이 들어있습니다. 이 상태에서 *p를 사용하면 **크래시**할 수 있어요!",
+        "highlight": [
+          5
+        ],
         "memoryChanges": [
           {
             "action": "allocate",
@@ -35,15 +46,18 @@
             "type": "int*",
             "size": 8,
             "value": "??? (쓰레기)",
-            "address": "0x7ffc0ff8"
+            "address": "0x7ffc0ff8",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 7,
         "title": "포인터에 주소 할당 (Two-Level 완성)",
-        "explanation": "p = &a;로 p에 a의 주소를 저장합니다. 이제 p는 a를 '가리킵니다'. Two-Level이 완성됩니다!",
-        "highlight": [7],
+        "explanation": "p = &a;로 p에 a의 주소를 저장합니다. 이제 p는 a를 **'가리킵니다'**. Two-Level이 완성돼요!\n\n**화살표로 이해하기:**\n- p (0x7ffc0ff8) → a (0x7ffc1000)\n- p 안에는 a의 주소(0x7ffc1000)가 저장됨\n\n**왜 '가리킨다'고 표현할까?** p가 저장한 주소를 따라가면 a에 도달하기 때문입니다. 마치 '저기 있어!'라고 가리키는 것처럼요.",
+        "highlight": [
+          7
+        ],
         "memoryChanges": [
           {
             "action": "update",
@@ -52,15 +66,39 @@
             "type": "int*",
             "value": "0x7ffc1000",
             "previousValue": "???",
-            "pointsTo": "a"
+            "pointsTo": "a",
+            "frame": "main"
           }
         ]
       },
       {
+        "line": 9,
+        "title": "a의 값 출력",
+        "explanation": "a를 사용하면 저장된 **값 10**을 가져옵니다.",
+        "highlight": [
+          9
+        ],
+        "stdout": "a의 값: 10",
+        "memoryChanges": []
+      },
+      {
         "line": 10,
         "title": "p의 값 = a의 주소",
-        "explanation": "p에 저장된 값은 0x7ffc1000, 이것은 a의 주소와 같습니다.",
-        "highlight": [10, 11],
+        "explanation": "p에 저장된 값은 **0x7ffc1000**, 이것은 &a와 같습니다!\n\n**핵심 정리:**\n- p의 값 = a의 주소 = &a = 0x7ffc1000\n- p는 '주소를 담는 그릇', 그 안에 a의 위치가 적혀있어요\n\n이제 p를 통해 a에 접근할 수 있습니다. 이것이 **간접 접근**의 시작이에요!",
+        "highlight": [
+          10
+        ],
+        "stdout": "p의 값: 0x7ffc1000",
+        "memoryChanges": []
+      },
+      {
+        "line": 11,
+        "title": "a의 주소 확인",
+        "explanation": "&a는 a의 주소인 **0x7ffc1000**을 반환합니다. p의 값과 동일하죠?\n\n**p == &a** 가 성립합니다!",
+        "highlight": [
+          11
+        ],
+        "stdout": "a의 주소: 0x7ffc1000",
         "memoryChanges": []
       }
     ]

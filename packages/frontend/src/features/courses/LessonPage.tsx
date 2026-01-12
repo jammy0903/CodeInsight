@@ -605,7 +605,12 @@ export function LessonPage() {
             </Link>
             <div className="cyber-divider" />
             <div>
-              <h1 className="text-lg font-bold">{lesson.title}</h1>
+              <h1 className="flex items-center gap-3">
+                <span className="text-gray-400 text-sm font-medium">
+                  {lessonId.split('-').slice(1).join('.')}
+                </span>
+                <span className="text-lg font-bold">{lesson.title}</span>
+              </h1>
               {lesson.description && (
                 <p className="text-xs text-gray-500">{lesson.description}</p>
               )}
@@ -629,7 +634,12 @@ export function LessonPage() {
               </Link>
               <div className="cyber-divider" />
               <div>
-                <h1 className="text-lg font-bold">{lesson.title}</h1>
+                <h1 className="flex items-center gap-3">
+                  <span className="text-gray-400 text-sm font-medium">
+                    {lessonId.split('-').slice(1).join('.')}
+                  </span>
+                  <span className="text-lg font-bold">{lesson.title}</span>
+                </h1>
                 {lesson.description && (
                   <p className="text-xs text-gray-500">{lesson.description}</p>
                 )}

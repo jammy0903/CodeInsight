@@ -1,0 +1,107 @@
+{
+  "lessonId": "py-7-4",
+  "title": "가비지 컬렉터",
+  "concept": "gc 모듈이 순환 참조를 찾아 정리! 참조 카운팅 + gc = 완벽한 메모리 관리!",
+  "content": {
+    "code": "import gc\n\nclass Node:\n    def __init__(self, name):\n        self.name = name\n        self.next = None\n\na = Node(\"A\")\nb = Node(\"B\")\na.next = b\nb.next = a  # 순환 참조\n\ndel a\ndel b\n\nprint(f\"정리 전 쓰레기: {gc.get_count()}\")\nnum = gc.collect()  # 가비지 컬렉션 실행!\nprint(f\"정리된 객체 수: {num}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "gc 모듈",
+        "explanation": "`import gc` - 가비지 컬렉터 모듈\n\n**파이썬 메모리 관리의 두 축:**\n1. 참조 카운팅 (refcount=0 → 즉시 삭제)\n2. gc 모듈 (순환 참조 정리)\n\ngc는 주기적으로 또는 수동으로 실행!",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "gc", "pointsTo": "gc_module" }
+          ],
+          "objects": [
+            { "id": "gc_module", "type": "module", "value": "gc (garbage collector)", "pyId": "140050", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "순환 참조 생성",
+        "explanation": "`a.next = b`, `b.next = a`\n\nA ↔ B 순환 참조 완성!\n\n**지난 레슨에서 배웠듯이:**\ndel a, del b 해도 refcount > 0이라 삭제 안 됨",
+        "highlight": [10, 11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "node_a" },
+            { "name": "b", "pointsTo": "node_b" }
+          ],
+          "objects": [
+            { "id": "node_a", "type": "Node", "value": "{name: A, next: →B}", "pyId": "140100" },
+            { "id": "node_b", "type": "Node", "value": "{name: B, next: →A}", "pyId": "140200" }
+          ]
+        }
+      },
+      {
+        "line": 14,
+        "title": "변수 삭제 후",
+        "explanation": "`del a`, `del b`\n\n변수는 삭제됐지만 객체들은 살아있음!\n\n**고아 객체들:**\n- 접근 불가 (변수 없음)\n- 삭제도 안 됨 (서로 참조 중)\n\n이게 바로 gc가 처리해야 할 대상!",
+        "highlight": [13, 14],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": [
+            { "id": "node_a", "type": "Node", "value": "{A} ↔", "pyId": "140100", "highlight": true },
+            { "id": "node_b", "type": "Node", "value": "↔ {B}", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 16,
+        "title": "gc.get_count()",
+        "explanation": "`gc.get_count()` → (개수, 개수, 개수)\n\n**세대별 관리 (Generational GC)**\n- 세대 0: 새로 생성된 객체\n- 세대 1: 1번 살아남은 객체\n- 세대 2: 오래된 객체\n\n젊은 객체일수록 자주 검사!\n(대부분의 객체는 금방 사라지니까)",
+        "highlight": [16],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": [
+            { "id": "node_a", "type": "Node", "value": "{A} ↔", "pyId": "140100" },
+            { "id": "node_b", "type": "Node", "value": "↔ {B}", "pyId": "140200" }
+          ],
+          "output": ["정리 전 쓰레기: (gen0, gen1, gen2)"]
+        }
+      },
+      {
+        "line": 17,
+        "title": "gc.collect() - 강제 정리!",
+        "explanation": "`gc.collect()` - 가비지 컬렉션 수동 실행!\n\n**무슨 일이 일어나나:**\n1. 모든 객체 순회\n2. 도달 불가능한 객체 찾기\n3. 순환 참조 감지\n4. 객체들 삭제!\n\n**반환값:** 정리된 객체 수",
+        "highlight": [17, 18],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": [],
+          "output": ["정리 전 쓰레기: (gen0, gen1, gen2)", "정리된 객체 수: 2"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "gc.collect()를 직접 호출해야 하나요?",
+    "options": [
+      "반드시 매번 호출해야 한다",
+      "보통은 자동 실행되어 호출 불필요",
+      "순환 참조가 없으면 호출해야 한다",
+      "호출하면 에러가 난다"
+    ],
+    "correctIndex": 1,
+    "explanation": "파이썬 gc는 자동으로 주기적으로 실행됩니다. 명시적 호출은 메모리가 부족하거나 대용량 객체 정리 후 등 특수한 경우에만 필요합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "gc.collect()를 자주 호출하면 좋다",
+      "correct": "오히려 성능 저하! 필요할 때만 호출",
+      "why": "gc 실행 동안 프로그램이 잠시 멈춥니다 (Stop-the-World). 자동 실행으로 충분합니다."
+    },
+    {
+      "wrong": "gc를 비활성화하면 메모리가 누수된다",
+      "correct": "참조 카운팅으로 대부분 처리, 순환 참조만 문제",
+      "why": "gc.disable()해도 refcount=0인 객체는 즉시 삭제됩니다. 순환 참조만 쌓이게 됩니다."
+    }
+  ],
+  "keyTakeaway": "참조 카운팅(즉시) + gc(순환참조) = 파이썬의 완벽한 메모리 관리!"
+}

@@ -3,16 +3,35 @@
  * CodeInsight - 코드 원리 학습 앱
  */
 
-import { createBrowserRouter, Outlet } from 'react-router-dom';
-import { useEffect } from 'react';
+import { createBrowserRouter, Outlet, useLocation } from 'react-router-dom';
+import { useEffect, useLayoutEffect } from 'react';
 import { MainLayout } from './layouts';
 import { HomePage } from './features/home';
 import { AuthPage } from './features/auth';
 import { CoursesPage, LanguageCoursePage, ChapterLessonsPage, LessonPage } from './features/courses';
 import { PlaygroundPage } from './features/playground';
 import { AdminPage, AdminRoute } from './features/admin';
+import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage } from './features/quiz';
+import { DashboardPage } from './features/dashboard';
+import { ProfilePage } from './features/profile';
 import { initializeAuthListener } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
+
+/**
+ * 페이지 이동 시 스크롤 최상단 이동
+ *
+ * WHY: React Router는 페이지 이동 시 스크롤 위치를 유지함
+ * useLayoutEffect: 렌더링 전에 스크롤 → 깜빡임 방지
+ */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 /**
  * 인증 상태 초기화 컴포넌트
@@ -42,6 +61,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 function RootLayout() {
   return (
     <AuthProvider>
+      <ScrollToTop />
       <MainLayout>
         <Outlet />
       </MainLayout>
@@ -65,6 +85,12 @@ export const router = createBrowserRouter([
       { path: 'courses/:lang/:chapterId', element: <ChapterLessonsPage /> },
       { path: 'courses/:lang/:chapterId/:lessonId', element: <LessonPage /> },
       { path: 'playground', element: <PlaygroundPage /> },
+      { path: 'quiz', element: <QuizPage /> },
+      { path: 'quiz/ox', element: <OXQuizPage /> },
+      { path: 'quiz/multiple-choice', element: <MultipleChoiceQuizPage /> },
+      { path: 'quiz/fill-blank', element: <FillBlankQuizPage /> },
+      { path: 'dashboard', element: <DashboardPage /> },
+      { path: 'profile', element: <ProfilePage /> },
       { path: 'admin', element: <AdminRoute><AdminPage /></AdminRoute> },
     ],
   },

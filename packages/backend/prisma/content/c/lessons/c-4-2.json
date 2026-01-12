@@ -8,8 +8,9 @@
       {
         "line": 9,
         "title": "main에서 x 생성",
-        "explanation": "x에 10이 저장됩니다.",
+        "explanation": "x에 **10**이 저장됩니다.\n\n**이번 레슨의 핵심 질문:** 함수에서 매개변수를 수정하면 원본도 바뀔까요?\n\n**힌트:** C의 모든 함수 인자 전달은 '값에 의한 전달(Call by Value)'입니다. 무슨 의미인지 직접 확인해 봅시다!",
         "highlight": [9],
+        "stdout": "호출 전 x: 10",
         "memoryChanges": [
           {
             "action": "frame",
@@ -31,7 +32,7 @@
       {
         "line": 11,
         "title": "함수 호출 - 값 복사!",
-        "explanation": "addOne(x)가 호출되면 x의 값 10이 n에 '복사'됩니다. n은 별개의 변수입니다.",
+        "explanation": "addOne(x)가 호출되면 x의 값 10이 n에 **'복사'**됩니다!\n\n**왜 복사할까?** C의 규칙이에요 - **Call by Value**\n\n**동작 과정:**\n1. x의 값(10)을 읽음\n2. 새 변수 n을 addOne 프레임에 생성\n3. 그 값(10)을 n에 복사\n\n**핵심:** n과 x는 **완전히 별개**의 변수입니다!\n- n의 주소 ≠ x의 주소\n- n을 바꿔도 x에 영향 없음",
         "highlight": [11, 3],
         "memoryChanges": [
           {
@@ -55,8 +56,9 @@
       {
         "line": 4,
         "title": "n 수정 (복사본)",
-        "explanation": "n = n + 1로 n이 11이 됩니다. 하지만 x는 여전히 10입니다!",
+        "explanation": "n = n + 1로 n이 **11**이 됩니다. 하지만 x는 여전히 **10**입니다!\n\n**왜 x는 안 바뀔까?**\n- n은 x의 **복사본**이에요\n- 복사본을 수정해도 원본은 그대로!\n\n**비유:** 사진을 복사해서 낙서해도, 원본 사진은 깨끗하죠?\n\n**이것이 Call by Value의 핵심!**\n- 장점: 원본 보호 (의도치 않은 수정 방지)\n- 단점: 원본을 수정하고 싶을 때 불편",
         "highlight": [4],
+        "stdout": "함수 내 n: 11",
         "memoryChanges": [
           {
             "action": "update",
@@ -71,8 +73,9 @@
       {
         "line": 12,
         "title": "함수 종료 후 x 확인",
-        "explanation": "x는 여전히 10입니다. n의 변경은 x에 영향을 주지 않았습니다.",
+        "explanation": "x는 여전히 **10**입니다! n의 변경은 x에 **영향을 주지 않았습니다**.\n\n**결론:**\n- 함수 매개변수 = 원본의 **복사본**\n- 복사본 수정 → 원본 변경 ❌\n\n**그럼 원본을 수정하려면?** 다음 레슨에서 배울 **포인터**가 필요합니다!\n\n**정리:**\n```c\nvoid foo(int n) { n = 100; }  // 원본 변경 안 됨\nvoid bar(int *p) { *p = 100; } // 원본 변경 됨!\n```",
         "highlight": [12],
+        "stdout": "호출 후 x: 10",
         "memoryChanges": [
           {
             "action": "frame_end",

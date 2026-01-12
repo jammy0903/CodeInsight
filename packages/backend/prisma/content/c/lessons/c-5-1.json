@@ -8,9 +8,17 @@
       {
         "line": 6,
         "title": "Stack 변수",
-        "explanation": "stackVar는 스택에 자동 할당됩니다. 함수 종료 시 자동 해제됩니다.",
-        "highlight": [6],
+        "explanation": "stackVar는 **스택에 자동 할당**됩니다. 함수 종료 시 **자동 해제**돼요.\n\n**Stack의 특징:**\n- 선언만 하면 자동 할당\n- 함수 끝나면 자동 해제\n- 관리가 **편함**!\n\n**왜 Stack을 먼저 배웠을까?** 대부분의 지역 변수는 Stack에 저장되기 때문이에요. 간단하고 안전합니다.",
+        "highlight": [
+          6
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -19,15 +27,18 @@
             "size": 4,
             "value": 10,
             "address": "0x7ffc1000",
-            "auto": true
+            "auto": true,
+            "frame": "main"
           }
         ]
       },
       {
         "line": 9,
         "title": "Heap 할당 (malloc)",
-        "explanation": "malloc은 Heap에 메모리를 할당하고 그 주소를 반환합니다. heapVar는 이 주소를 저장합니다.",
-        "highlight": [9],
+        "explanation": "malloc은 **Heap에 메모리를 할당**하고 그 주소를 반환합니다.\n\n**왜 Heap이 필요할까?** Stack의 한계 때문이에요:\n1. **크기 제한**: Stack은 보통 1~8MB\n2. **수명 제한**: 함수 끝나면 사라짐\n3. **크기 결정**: 컴파일 시점에 크기를 알아야 함\n\n**Heap은:**\n- 훨씬 큰 메모리 사용 가능 (GB 단위)\n- 함수 끝나도 유지 가능\n- 실행 중에 크기 결정 가능\n\n**대가:** 직접 해제해야 함 (free)",
+        "highlight": [
+          9
+        ],
         "memoryChanges": [
           {
             "action": "allocate",
@@ -36,7 +47,8 @@
             "type": "int*",
             "size": 8,
             "value": "0x55001000",
-            "address": "0x7ffc0ff8"
+            "address": "0x7ffc0ff8",
+            "frame": "main"
           },
           {
             "action": "allocate",
@@ -53,8 +65,11 @@
       {
         "line": 10,
         "title": "Heap에 값 저장",
-        "explanation": "*heapVar = 20으로 Heap 메모리에 값을 저장합니다.",
-        "highlight": [10],
+        "explanation": "*heapVar = 20으로 **Heap 메모리에 값을 저장**합니다.\n\n**메모리 구조 정리:**\n```\nStack (자동)\n├─ stackVar: 10\n└─ heapVar: 0x55001000 (주소)\n\nHeap (수동)\n└─ [0x55001000]: 20 (값)\n```\n\n**핵심:** heapVar 자체는 Stack에 있고, 그것이 가리키는 메모리가 Heap에 있어요!",
+        "highlight": [
+          10
+        ],
+        "stdout": "Stack: 10, Heap: 20",
         "memoryChanges": [
           {
             "action": "update",
@@ -68,8 +83,10 @@
       {
         "line": 15,
         "title": "Heap 해제 (free)",
-        "explanation": "free(heapVar)로 Heap 메모리를 반환합니다. 안 하면 Memory Leak!",
-        "highlight": [15],
+        "explanation": "free(heapVar)로 Heap 메모리를 **반환**합니다.\n\n**왜 free가 필수일까?**\n- Heap은 **자동 해제 안 됨**\n- 프로그램이 끝날 때까지 메모리 점유\n- 안 하면 **Memory Leak** (메모리 누수)\n\n**Stack vs Heap 비교:**\n| 특성 | Stack | Heap |\n|------|-------|------|\n| 할당 | 자동 | malloc |\n| 해제 | 자동 | free (수동) |\n| 크기 | 작음 (MB) | 큼 (GB) |\n| 속도 | 빠름 | 느림 |\n| 수명 | 함수 내 | 원하는 만큼 |",
+        "highlight": [
+          15
+        ],
         "memoryChanges": [
           {
             "action": "deallocate",

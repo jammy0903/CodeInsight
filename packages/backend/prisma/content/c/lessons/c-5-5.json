@@ -8,9 +8,18 @@
       {
         "line": 5,
         "title": "메모리 할당",
-        "explanation": "정상적으로 Heap 메모리가 할당됩니다.",
-        "highlight": [5, 6],
+        "explanation": "정상적으로 Heap 메모리가 할당됩니다.\n\n**이번 레슨의 핵심 주제: Dangling Pointer**\n\n**Dangling이란?** '매달려 있는, 허공에 떠 있는'이라는 뜻이에요.\n\n**비유:** 줄 끊어진 연처럼, 가리키던 대상이 사라졌는데 포인터만 남은 상태입니다.",
+        "highlight": [
+          5,
+          6
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "heap",
@@ -25,15 +34,19 @@
             "name": "p",
             "type": "int*",
             "value": "0x55001000",
-            "pointsTo": "heap"
+            "pointsTo": "heap",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 8,
         "title": "free 호출",
-        "explanation": "메모리는 해제되지만 p는 여전히 0x55001000을 가리킵니다. 이것이 Dangling Pointer!",
-        "highlight": [8, 9],
+        "explanation": "메모리는 해제되지만 p는 **여전히 0x55001000을 가리킵니다**. 이것이 Dangling Pointer!\n\n**왜 p가 안 바뀔까?**\n- free(p)는 메모리만 반환\n- p **자체**는 수정하지 않음\n- Call by Value: free 함수 안에서 p를 바꿔도 원본은 그대로\n\n**상태 변화:**\n| 변수 | free 전 | free 후 |\n|------|---------|--------|\n| p | 0x55001000 (유효) | 0x55001000 (**무효!**) |\n| Heap | 100 저장됨 | 반환됨 (재사용 가능) |\n\n**p는 '죽은 주소'를 가리키게 됩니다!**",
+        "highlight": [
+          8,
+          9
+        ],
         "memoryChanges": [
           {
             "action": "deallocate",
@@ -46,31 +59,38 @@
       {
         "line": 12,
         "title": "해제된 메모리 읽기 (위험!)",
-        "explanation": "운이 좋으면 이전 값이 나오고, 운이 나쁘면 크래시하거나 다른 프로그램의 데이터가 나옵니다.",
-        "highlight": [12],
+        "explanation": "**운에 따라 결과가 다릅니다!** 이것이 Dangling Pointer가 무서운 이유예요.\n\n**왜 결과가 예측 불가능할까?**\n\nfree 후 해당 메모리는 '재사용 가능' 상태가 됩니다:\n1. **아직 재사용 안 됨** → 이전 값(100)이 남아있을 수 있음\n2. **다른 malloc이 사용** → 전혀 다른 값이 들어감\n3. **시스템이 보호** → 크래시 (Segmentation fault)\n\n**가장 무서운 경우:**\n- 테스트 환경: 정상 동작 (값이 남아있어서)\n- 실제 서비스: 크래시 (메모리 재사용되어서)\n- **'운 좋게 되는' 버그는 나중에 터집니다!**",
+        "highlight": [
+          12
+        ],
         "danger": true,
         "memoryChanges": []
       },
       {
         "line": 14,
         "title": "Double Free (위험!)",
-        "explanation": "같은 메모리를 두 번 free하면 메모리 관리 구조가 손상됩니다. 매우 위험!",
-        "highlight": [14],
+        "explanation": "같은 메모리를 두 번 free하면 **메모리 관리 구조가 손상됩니다!**\n\n**왜 Double Free가 위험할까?**\n\nmalloc/free는 내부적으로 '사용 가능한 메모리 목록'을 관리해요:\n```\n[Free List]\n블록A → 블록B → 블록C\n```\n\nDouble free 시:\n1. 첫 번째 free: 블록을 Free List에 추가 ✅\n2. 두 번째 free: **같은 블록을 다시 추가!** ❌\n3. 결과: 리스트가 꼬임 (순환 참조, 중복 엔트리)\n\n**실제 피해:**\n- 프로그램 크래시\n- **보안 취약점**: 해커가 이를 악용해 코드 실행 가능\n- 데이터 손상",
+        "highlight": [
+          14
+        ],
         "danger": true,
         "memoryChanges": []
       },
       {
         "line": 16,
         "title": "안전한 처리",
-        "explanation": "p = NULL로 설정하면 실수로 사용해도 즉시 크래시하여 버그를 발견할 수 있습니다.",
-        "highlight": [16],
+        "explanation": "p = NULL로 설정하면 **실수로 사용해도 즉시 크래시**하여 버그를 발견할 수 있습니다.\n\n**왜 NULL이 안전할까?**\n\n**시나리오 1: NULL 안 함**\n```c\nfree(p);\n// ... 100줄 뒤 ...\n*p = 200;  // 운 좋으면 동작, 나쁘면 크래시\n           // 버그 찾기 매우 어려움!\n```\n\n**시나리오 2: NULL로 설정**\n```c\nfree(p);\np = NULL;\n// ... 100줄 뒤 ...\n*p = 200;  // 즉시 크래시! (NULL 역참조)\n           // 버그 위치 바로 알 수 있음!\n```\n\n**free + NULL 패턴 (권장):**\n```c\nfree(p);\np = NULL;  // 항상 함께!\n```\n\n**추가 이점:** if (p != NULL) 체크가 정상 동작합니다!",
+        "highlight": [
+          16
+        ],
         "memoryChanges": [
           {
             "action": "update",
             "area": "stack",
             "name": "p",
             "value": "NULL",
-            "previousValue": "0x55001000 (해제됨)"
+            "previousValue": "0x55001000 (해제됨)",
+            "frame": "main"
           }
         ]
       }

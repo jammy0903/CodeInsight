@@ -6,9 +6,18 @@
  * 실행: npx tsx prisma/content-seed.ts
  */
 
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaClient } from '.prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
-const prisma = new PrismaClient();
+// PostgreSQL connection
+const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
+console.log('📁 Database:', connectionString.replace(/:[^:@]+@/, ':***@'));
+
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 // =============================================
 // 콘텐츠 타입 정의
@@ -59,7 +68,11 @@ int main() {
         line: 4,
         title: '변수 선언 (초기화 없음)',
         explanation:
-          "int a;는 '정수형 변수 a를 위한 4바이트 공간을 확보해라'라는 의미입니다. 아직 값을 넣지 않았으므로 쓰레기 값(garbage value)이 들어있습니다.",
+          "int a; → 이 한 줄이 하는 일:\n\n" +
+          "1️⃣ **왜 4바이트?**\n" +
+          "int는 '정수(integer)'를 저장하는 타입입니다. 현대 컴퓨터에서 int는 32비트(=4바이트)로 약 ±21억 범위의 숫자를 표현합니다. 컴파일러가 'int'를 보면 자동으로 4바이트 공간을 확보합니다.\n\n" +
+          "2️⃣ **왜 쓰레기 값?**\n" +
+          "메모리는 '재활용'됩니다. 이전에 다른 프로그램이나 함수가 쓰던 공간을 그대로 받기 때문에, 그때의 데이터 찌꺼기가 남아있습니다. C언어는 성능을 위해 자동으로 0으로 초기화해주지 않습니다.",
         memoryChanges: {
           stack: {
             action: 'add_variable',
@@ -71,7 +84,7 @@ int main() {
           },
         },
         misconception:
-          '초기화하지 않은 변수는 0이 아닙니다! 이전에 그 메모리에 있던 쓰레기 값이 그대로 있습니다.',
+          '❌ 흔한 착각: "초기화 안 하면 0이겠지?"\n✅ 진실: 이전에 그 메모리에 있던 쓰레기 값이 그대로 있습니다. 실행할 때마다 다른 값이 나올 수 있어요!',
       },
       {
         line: 5,

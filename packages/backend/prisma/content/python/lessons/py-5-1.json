@@ -1,0 +1,115 @@
+{
+  "lessonId": "py-5-1",
+  "title": "로컬 vs 글로벌",
+  "concept": "함수 안에서 만든 변수는 함수 밖에서 안 보인다!",
+  "content": {
+    "code": "x = 10  # 글로벌 변수\n\ndef my_func():\n    y = 20  # 로컬 변수\n    print(f\"함수 안: x={x}, y={y}\")\n\nmy_func()\nprint(f\"함수 밖: x={x}\")\n# print(y)  # NameError!",
+    "steps": [
+      {
+        "line": 1,
+        "title": "글로벌 변수 생성",
+        "explanation": "`x = 10`은 **전역(글로벌) 네임스페이스**에 만들어집니다.\n\n**글로벌 변수:**\n- 함수 밖에서 정의\n- 어디서든 읽을 수 있음\n- 프로그램 끝날 때까지 존재",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "함수 정의",
+        "explanation": "`def my_func()`는 함수 객체를 만듭니다.\n\n함수는 자기만의 **로컬 네임스페이스**를 갖게 됩니다.\n\n아직 함수를 호출하지 않았으므로 로컬 변수는 없습니다.",
+        "highlight": [3, 4, 5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" },
+            { "name": "my_func", "pointsTo": "func_1" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200" },
+            { "id": "func_1", "type": "function", "value": "my_func()", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "함수 호출 - 로컬 스코프 생성",
+        "explanation": "`my_func()` 호출 시:\n\n1. 새로운 **로컬 네임스페이스** 생성\n2. `y = 20`이 로컬에 만들어짐\n3. `x`는 로컬에 없으니 글로벌에서 찾음\n\n**LEGB 규칙:** Local → Enclosing → Global → Built-in",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" },
+            { "name": "y (local)", "pointsTo": "int_20" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200" },
+            { "id": "int_20", "type": "int", "value": "20", "pyId": "9406320", "highlight": true }
+          ],
+          "output": ["함수 안: x=10, y=20"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "함수 종료 - 로컬 스코프 소멸",
+        "explanation": "함수가 끝나면:\n\n1. 로컬 네임스페이스 **사라짐**\n2. `y`는 더 이상 존재하지 않음\n3. 글로벌 `x`는 그대로\n\n**헷갈리는 포인트:** 함수 밖에서 `y`를 쓰면 NameError!",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200" }
+          ],
+          "output": ["함수 안: x=10, y=20", "함수 밖: x=10"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "로컬 변수 접근 불가!",
+        "explanation": "`print(y)`를 실행하면:\n\n```python\nNameError: name 'y' is not defined\n```\n\n**왜?** `y`는 함수 안에서만 존재하는 로컬 변수!\n\n함수 끝나면 사라집니다.",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x (global)", "pointsTo": "int_10" }
+          ],
+          "objects": [
+            { "id": "int_10", "type": "int", "value": "10", "pyId": "9406200" }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "결과는?\n\na = 1\ndef f():\n    a = 2\n    print(a)\nf()\nprint(a)",
+    "options": [
+      "2, 2",
+      "2, 1",
+      "1, 1",
+      "에러"
+    ],
+    "correctIndex": 1,
+    "explanation": "함수 안의 a = 2는 새로운 로컬 변수! 글로벌 a와는 다른 변수입니다. 그래서 함수 안에서는 2, 밖에서는 1이 출력됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수 안에서 만든 변수는 함수 밖에서도 쓸 수 있다",
+      "correct": "함수 안의 변수는 함수 끝나면 사라진다",
+      "why": "로컬 네임스페이스는 함수 호출 시 생성되고 종료 시 파괴됩니다."
+    },
+    {
+      "wrong": "함수 안에서 글로벌 변수에 값을 할당하면 글로벌이 바뀐다",
+      "correct": "할당하면 새로운 로컬 변수가 만들어진다",
+      "why": "같은 이름이어도 스코프가 다르면 다른 변수! global 키워드가 필요합니다."
+    }
+  ],
+  "keyTakeaway": "함수 안의 변수는 로컬! 함수 끝나면 사라지고, 밖에서는 접근 불가!"
+}

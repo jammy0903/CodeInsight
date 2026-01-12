@@ -1,0 +1,121 @@
+{
+  "lessonId": "java-7-4",
+  "title": "Arrays.asList() 함정",
+  "concept": "Arrays.asList()는 고정 크기 리스트를 반환하여 add/remove가 불가능하다",
+  "content": {
+    "code": "// 함정 1: 고정 크기\nList<String> fixed = Arrays.asList(\"a\", \"b\", \"c\");\nfixed.set(0, \"x\");  // OK (요소 교체)\n// fixed.add(\"d\");   // UnsupportedOperationException!\n// fixed.remove(0);  // UnsupportedOperationException!\n\n// 함정 2: 원본 배열과 연결\nString[] arr = {\"a\", \"b\", \"c\"};\nList<String> linked = Arrays.asList(arr);\narr[0] = \"x\";\nSystem.out.println(linked.get(0));  // \"x\"!\n\n// 해결책: 새 ArrayList 생성\nList<String> mutable = new ArrayList<>(Arrays.asList(\"a\", \"b\", \"c\"));\nmutable.add(\"d\");  // OK!\n\n// Java 9+: List.of() (완전 불변)\nList<String> immutable = List.of(\"a\", \"b\", \"c\");\n// immutable.set(0, \"x\");  // UnsupportedOperationException!",
+    "steps": [
+      {
+        "line": 2,
+        "title": "Arrays.asList() 호출",
+        "explanation": "고정 크기 리스트를 반환합니다. ArrayList가 아닙니다!",
+        "keyInsight": "Arrays.asList() = java.util.Arrays$ArrayList (고정 크기)",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "fixed", "value": "-> Arrays$ArrayList"}],
+          "note": "이름은 ArrayList지만 다른 클래스!"
+        }
+      },
+      {
+        "line": 3,
+        "title": "요소 교체 (OK)",
+        "explanation": "set()으로 기존 요소를 다른 값으로 바꾸는 건 가능합니다.",
+        "highlight": [3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x001", "content": "[\"x\", \"b\", \"c\"]", "changed": true}]
+        }
+      },
+      {
+        "line": 4,
+        "title": "요소 추가 (에러!)",
+        "explanation": "add()는 크기를 바꾸므로 UnsupportedOperationException!",
+        "keyInsight": "고정 크기 = add/remove 불가",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "error": "UnsupportedOperationException"
+        }
+      },
+      {
+        "line": 8,
+        "title": "배열로부터 생성",
+        "explanation": "Arrays.asList(arr)은 배열을 감싸는 래퍼입니다.",
+        "highlight": [8, 9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "arr", "value": "-> 0x001"},
+            {"name": "linked", "value": "-> 래퍼(0x001)"}
+          ],
+          "heap": [{"address": "0x001", "content": "[\"a\", \"b\", \"c\"]"}],
+          "note": "linked는 arr을 직접 참조"
+        }
+      },
+      {
+        "line": 10,
+        "title": "배열 수정",
+        "explanation": "원본 배열을 수정하면 리스트도 영향받습니다!",
+        "keyInsight": "Arrays.asList() = 원본 배열과 연결됨",
+        "highlight": [10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x001", "content": "[\"x\", \"b\", \"c\"]", "changed": true}]
+        }
+      },
+      {
+        "line": 11,
+        "title": "리스트 확인",
+        "explanation": "linked.get(0)도 \"x\"입니다! 배열 수정이 리스트에 반영!",
+        "highlight": [11],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["x"]
+        }
+      },
+      {
+        "line": 14,
+        "title": "해결책: new ArrayList()",
+        "explanation": "새 ArrayList로 복사하면 독립적이고 가변입니다.",
+        "keyInsight": "new ArrayList<>(Arrays.asList(...)) = 가변 복사본",
+        "highlight": [14],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "mutable", "value": "-> 새 ArrayList"}],
+          "note": "원본과 독립, add/remove 가능"
+        }
+      },
+      {
+        "line": 18,
+        "title": "List.of() (Java 9+)",
+        "explanation": "List.of()는 완전히 불변입니다. set()도 불가!",
+        "keyInsight": "List.of() = 완전 불변, Arrays.asList() = 부분 가변",
+        "highlight": [18],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "List.of(): set도 불가, null도 불가"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Arrays.asList()와 List.of()의 차이점은?",
+    "options": [
+      "둘 다 가변이다",
+      "둘 다 불변이다",
+      "asList는 set 가능, List.of는 완전 불변",
+      "asList만 null을 허용한다"
+    ],
+    "correctIndex": 2,
+    "explanation": "Arrays.asList()는 요소 교체(set)가 가능하고 null을 허용합니다. List.of()는 완전 불변이고 null을 허용하지 않습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Arrays.asList()는 ArrayList를 반환한다",
+      "correct": "java.util.Arrays$ArrayList를 반환합니다. java.util.ArrayList와 다릅니다.",
+      "why": "Arrays 내부 클래스로, 고정 크기입니다."
+    }
+  ],
+  "keyTakeaway": "Arrays.asList = 고정 크기, 원본 연결 / 가변 원하면 new ArrayList()"
+}

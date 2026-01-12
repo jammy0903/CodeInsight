@@ -1,0 +1,119 @@
+{
+  "lessonId": "java-6-3",
+  "title": "다형성과 업캐스팅",
+  "concept": "다형성은 같은 타입의 변수가 다양한 객체를 참조하고, 각 객체에 맞는 메서드가 호출되는 것이다",
+  "content": {
+    "code": "abstract class Animal {\n    abstract void sound();\n}\n\nclass Dog extends Animal {\n    void sound() { System.out.println(\"Woof!\"); }\n}\n\nclass Cat extends Animal {\n    void sound() { System.out.println(\"Meow!\"); }\n}\n\nAnimal[] animals = {\n    new Dog(),\n    new Cat(),\n    new Dog()\n};\n\nfor (Animal a : animals) {\n    a.sound();  // 각 객체에 맞는 sound() 호출!\n}",
+    "steps": [
+      {
+        "line": 1,
+        "title": "추상 클래스",
+        "explanation": "Animal은 abstract입니다. 직접 인스턴스화 불가, 상속용!",
+        "keyInsight": "abstract class = 틀만 제공, 구현은 자식이",
+        "highlight": [1, 2, 3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "abstract void sound() = 시그니처만 정의"
+        }
+      },
+      {
+        "line": 5,
+        "title": "Dog 구현",
+        "explanation": "Dog는 sound()를 구현합니다. \"Woof!\" 출력.",
+        "highlight": [5, 6, 7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "abstract 메서드 반드시 구현해야 함"
+        }
+      },
+      {
+        "line": 9,
+        "title": "Cat 구현",
+        "explanation": "Cat도 sound()를 구현합니다. \"Meow!\" 출력.",
+        "highlight": [9, 10, 11],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "각 클래스가 자신만의 sound() 구현"
+        }
+      },
+      {
+        "line": 13,
+        "title": "Animal 배열 (다형성!)",
+        "explanation": "Animal[] 타입에 Dog, Cat 객체들이 들어갑니다. 업캐스팅!",
+        "keyInsight": "부모 타입 배열에 자식 객체들 저장 가능",
+        "highlight": [13, 14, 15, 16, 17],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "animals", "value": "-> 0x100"}],
+          "heap": [
+            {"address": "0x100", "content": "[-> 0x001, -> 0x002, -> 0x003]"},
+            {"address": "0x001", "content": "Dog{}"},
+            {"address": "0x002", "content": "Cat{}"},
+            {"address": "0x003", "content": "Dog{}"}
+          ]
+        }
+      },
+      {
+        "line": 19,
+        "title": "for-each 루프",
+        "explanation": "Animal 타입으로 순회합니다.",
+        "highlight": [19],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "a", "value": "-> 0x001 (Dog)"}]
+        }
+      },
+      {
+        "line": 20,
+        "title": "첫 번째 a.sound()",
+        "explanation": "a는 Animal 타입이지만, 실제 객체는 Dog! Dog.sound() 호출!",
+        "keyInsight": "다형성 = 같은 메서드 호출, 다른 동작",
+        "highlight": [20],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Woof!"]
+        }
+      },
+      {
+        "line": 20,
+        "title": "두 번째 a.sound()",
+        "explanation": "a가 Cat을 참조. Cat.sound() 호출!",
+        "highlight": [20],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "a", "value": "-> 0x002 (Cat)"}],
+          "output": ["Woof!", "Meow!"]
+        }
+      },
+      {
+        "line": 20,
+        "title": "세 번째 a.sound()",
+        "explanation": "a가 다시 Dog를 참조. Dog.sound() 호출!",
+        "highlight": [20],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Woof!", "Meow!", "Woof!"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "다형성의 장점이 아닌 것은?",
+    "options": [
+      "코드 재사용성",
+      "유연한 확장",
+      "타입 안전성 감소",
+      "switch/if 분기 감소"
+    ],
+    "correctIndex": 2,
+    "explanation": "다형성은 타입 안전성을 유지하면서 유연성을 제공합니다. 오히려 컴파일 타임 체크가 됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "업캐스팅하면 자식 고유 메서드를 호출할 수 있다",
+      "correct": "부모 타입으로는 부모에 정의된 메서드만 호출 가능합니다.",
+      "why": "컴파일러는 변수 타입만 보고 판단합니다. 다운캐스팅 필요!"
+    }
+  ],
+  "keyTakeaway": "다형성 = 부모 타입, 자식 객체, 자식 메서드 실행"
+}

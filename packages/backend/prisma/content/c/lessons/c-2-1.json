@@ -8,9 +8,17 @@
       {
         "line": 4,
         "title": "변수 a 생성",
-        "explanation": "a는 메모리 주소 0x7ffc1000에 할당되고, 값 10이 저장됩니다.",
-        "highlight": [4],
+        "explanation": "a는 메모리 주소 **0x7ffc1000**에 할당되고, 값 **10**이 저장됩니다.\n\n**주소란?** 메모리의 각 바이트에는 고유한 번호가 있습니다. 이 번호가 '주소'예요. 집 주소처럼, 데이터가 어디 있는지 알려줍니다.\n\n**0x7ffc1000은 뭘까?** 16진수(hex) 주소입니다. 0x는 '16진수야'라는 표시이고, 7ffc1000은 실제 주소 번호예요.",
+        "highlight": [
+          4
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -18,22 +26,29 @@
             "type": "int",
             "size": 4,
             "value": 10,
-            "address": "0x7ffc1000"
+            "address": "0x7ffc1000",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 6,
         "title": "값 출력",
-        "explanation": "a를 사용하면 a에 저장된 '값' 10을 가져옵니다.",
-        "highlight": [6],
+        "explanation": "a를 사용하면 a에 저장된 **'값' 10**을 가져옵니다.\n\n**변수 이름의 의미:** 'a'라고 쓰면 \"그 주소에 가서 값을 읽어와\"라는 뜻입니다. 컴파일러가 a를 주소(0x7ffc1000)로 변환하고, 그 위치의 값을 가져오는 거예요.",
+        "highlight": [
+          6
+        ],
+        "stdout": "a의 값: 10",
         "memoryChanges": []
       },
       {
         "line": 7,
         "title": "주소 출력",
-        "explanation": "&a는 a의 '주소' 0x7ffc1000을 반환합니다. 값이 아닌 위치 정보입니다.",
-        "highlight": [7],
+        "explanation": "&a는 a의 **'주소' 0x7ffc1000**을 반환합니다. 값이 아닌 **위치 정보**예요.\n\n**& 연산자(주소 연산자):** \"이 변수가 어디에 있어?\"라고 물어보는 연산자입니다. a는 값(10)을 주고, &a는 위치(0x7ffc1000)를 줍니다.\n\n**비유:** 친구 집에 놀러가려면 친구(값)가 아니라 친구 집 주소(위치)가 필요하죠? &는 그 '주소'를 알려줍니다.",
+        "highlight": [
+          7
+        ],
+        "stdout": "a의 주소: 0x7ffc1000",
         "memoryChanges": []
       }
     ]

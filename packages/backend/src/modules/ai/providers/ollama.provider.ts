@@ -1,9 +1,10 @@
 /**
  * Ollama Provider (Local LLM)
  * Qwen2.5-Coder 등 로컬 모델 사용
+ * 스트리밍 지원
  */
 
-import { IAIProvider, ChatRequest, ChatResponse, ProviderType } from './types';
+import { IAIProvider, ChatRequest, ChatResponse, ProviderType, StreamCallback } from './types';
 import { env } from '../../../config/env';
 
 export class OllamaProvider implements IAIProvider {
@@ -72,5 +73,83 @@ export class OllamaProvider implements IAIProvider {
         totalTokens: (data.prompt_eval_count || 0) + data.eval_count,
       } : undefined,
     };
+  }
+
+  /**
+   * 스트리밍 채팅
+   * Ollama API는 기본적으로 stream: true 지원
+   */
+  async streamChat(request: ChatRequest, onChunk: StreamCallback): Promise<void> {
+    const messages = [
+      ...(request.systemPrompt ? [{ role: 'system', content: request.systemPrompt }] : []),
+      ...(request.history || []).slice(-6),
+      { role: 'user', content: request.message },
+    ];
+
+    const response = await fetch(`${this.url}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: this.model,
+        messages,
+        stream: true,  // 스트리밍 활성화
+        options: {
+          temperature: 0.7,
+          num_predict: 1024,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ollama error (${response.status}): ${await response.text()}`);
+    }
+
+    if (!response.body) {
+      throw new Error('No response body for streaming');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          onChunk({ content: '', done: true });
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Ollama NDJSON 파싱: 각 줄이 JSON 객체
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+
+          try {
+            const json = JSON.parse(trimmed);
+            const content = json.message?.content || '';
+            if (content) {
+              onChunk({ content, done: false });
+            }
+
+            // Ollama는 done 필드로 종료 표시
+            if (json.done) {
+              onChunk({ content: '', done: true });
+              return;
+            }
+          } catch {
+            // JSON 파싱 실패 무시
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
   }
 }

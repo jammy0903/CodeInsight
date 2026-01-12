@@ -26,8 +26,10 @@ export type PyType = PyPrimitiveType | PyCollectionType | PyAdvancedType;
 /** Python 기본값 */
 export type PyPrimitiveValue = number | string | boolean | null;
 
-/** Python 객체 참조 (ObjectId) */
-export type PyObjectRef = ObjectId;
+/** Python 객체 참조 */
+export interface PyObjectRef {
+  objectId: string;
+}
 
 /** Python 값 타입 */
 export type PyValue =
@@ -40,8 +42,8 @@ export type PyValue =
 // 이름 & 객체
 // ============================================================
 
-/** 스코프 타입 */
-export type PyScope = 'global' | 'local';
+/** 스코프 타입 (프레임명: 'global', '__main__', 함수명 등) */
+export type PyScope = string;
 
 /** Python 이름 (변수명) */
 export interface PyName {

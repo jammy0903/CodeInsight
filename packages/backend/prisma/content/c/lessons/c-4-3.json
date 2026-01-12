@@ -8,8 +8,9 @@
       {
         "line": 9,
         "title": "main에서 x 생성",
-        "explanation": "x에 10이 저장됩니다. 주소는 0x7ffc1000.",
+        "explanation": "x에 **10**이 저장됩니다. 주소는 0x7ffc1000.\n\n**이전 레슨 복습:** Call by Value로는 원본 수정이 안 됐죠?\n\n**이번 레슨의 목표:** 포인터를 사용해서 원본을 수정해 볼 거예요!\n\n핵심은 **주소 전달** + **역참조**입니다.",
         "highlight": [9],
+        "stdout": "호출 전 x: 10",
         "memoryChanges": [
           {
             "action": "frame",
@@ -32,7 +33,7 @@
       {
         "line": 11,
         "title": "주소 전달",
-        "explanation": "addOne(&x)는 x의 '주소'를 전달합니다. p는 이 주소(0x7ffc1000)를 받습니다.",
+        "explanation": "addOne(**&x**)는 x의 **'주소'**를 전달합니다!\n\n**이전 레슨과의 차이:**\n- 이전: addOne(x) → 값 10이 복사됨\n- 이번: addOne(&x) → 주소 0x7ffc1000이 복사됨\n\n**왜 주소를 전달할까?**\n- 주소를 알면 **원본 위치**를 알 수 있어요\n- 그 위치에 가서 값을 **직접 수정** 가능!\n\n**p는 x의 복사본이 아닙니다!** p는 x의 **위치 정보**를 가지고 있어요.",
         "highlight": [11, 3],
         "memoryChanges": [
           {
@@ -56,8 +57,9 @@
       {
         "line": 4,
         "title": "역참조로 원본 수정!",
-        "explanation": "*p = *p + 1은 p가 가리키는 x를 11로 변경합니다. 원본이 수정됩니다!",
+        "explanation": "*p = *p + 1은 p가 가리키는 **x를 11로 변경**합니다!\n\n**마법의 순간:** 원본이 수정됐어요!\n\n**동작 분석:**\n1. *p → p가 가리키는 곳(x)의 값을 읽음 (10)\n2. 10 + 1 = 11\n3. *p = 11 → x의 메모리에 11을 **직접 씀**\n\n**왜 원본이 수정될까?**\n- p는 x의 **주소**를 알고 있음\n- *p로 그 주소에 **직접 접근**\n- 복사본이 아닌 **진짜 x**를 수정!\n\n**이것이 포인터의 힘입니다!**",
         "highlight": [4],
+        "stdout": "함수 내 *p: 11",
         "memoryChanges": [
           {
             "action": "update",
@@ -73,8 +75,9 @@
       {
         "line": 12,
         "title": "원본 변경 확인",
-        "explanation": "x가 11로 변경되었습니다. 포인터를 통해 원본을 수정할 수 있습니다.",
+        "explanation": "x가 **11**로 변경되었습니다!\n\n**Call by Value vs 포인터 전달:**\n| 방식 | 전달되는 것 | 원본 수정 |\n|------|-----------|----------|\n| void foo(int n) | 값 복사 | ❌ 불가 |\n| void foo(int *p) | 주소 복사 | ⭕ 가능 |\n\n**자주 쓰이는 패턴 - swap 함수:**\n```c\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n```\n\n**결론:** 원본 수정이 필요하면 **포인터로 주소를 전달**하세요!",
         "highlight": [12],
+        "stdout": "호출 후 x: 11",
         "memoryChanges": []
       }
     ]

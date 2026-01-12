@@ -8,7 +8,7 @@
       {
         "line": 9,
         "title": "dangerous() 호출",
-        "explanation": "dangerous() 함수의 스택 프레임이 생성됩니다.",
+        "explanation": "dangerous() 함수의 스택 프레임이 생성됩니다.\n\n**⚠️ 이번 레슨은 매우 중요합니다!**\n\n흔히 하는 **치명적인 실수**를 다룹니다. 이 패턴만 기억하면 많은 버그를 예방할 수 있어요.",
         "highlight": [9, 3],
         "memoryChanges": [
           {
@@ -22,7 +22,7 @@
       {
         "line": 4,
         "title": "지역 변수 생성",
-        "explanation": "local은 dangerous의 스택 프레임에 할당됩니다.",
+        "explanation": "local은 dangerous의 **스택 프레임에 할당**됩니다.\n\n**핵심 관찰:**\n- local의 주소: 0x7ffc0ff0\n- 이 주소는 dangerous **프레임 안**에 있어요\n\n**문제 예고:** 이 주소를 반환하면 어떻게 될까요? 함수가 끝나면 프레임이 사라지는데...",
         "highlight": [4],
         "memoryChanges": [
           {
@@ -40,7 +40,7 @@
       {
         "line": 5,
         "title": "지역 변수 주소 반환 (위험!)",
-        "explanation": "&local(0x7ffc0ff0)을 반환합니다. 하지만 이 주소는 곧 무효가 됩니다!",
+        "explanation": "&local(0x7ffc0ff0)을 반환합니다.\n\n**🚨 위험 신호!** 이 주소는 곧 **무효**가 됩니다!\n\n**왜 위험할까?**\n- 지역 변수 = 스택 프레임 안에 존재\n- 함수 종료 = 스택 프레임 **해제**\n- 해제된 주소 = **쓰레기 메모리**\n\n**비유:** 호텔 방 번호를 알려줬는데, 체크아웃하고 방을 반납한 거예요. 그 방에 다른 손님이 들어올 수 있어요!",
         "highlight": [5],
         "memoryChanges": [],
         "warning": "지역 변수 주소 반환!"
@@ -48,7 +48,7 @@
       {
         "line": 6,
         "title": "함수 종료 - local 해제!",
-        "explanation": "dangerous() 종료 시 local이 해제됩니다. 0x7ffc0ff0은 이제 쓰레기입니다.",
+        "explanation": "dangerous() 종료 시 local이 **해제**됩니다!\n\n**상태 변화:**\n- 함수 종료 전: 0x7ffc0ff0에 100이 있음\n- 함수 종료 후: 0x7ffc0ff0은 **쓰레기**\n\n**왜 쓰레기가 될까?**\n- 스택 메모리는 **재사용**됨\n- 다른 함수 호출 시 이 공간이 덮어써질 수 있음\n- 값이 남아있을 수도 있지만, **보장되지 않음**\n\n**이런 포인터를 'Dangling Pointer(허상 포인터)'라고 합니다!**",
         "highlight": [],
         "memoryChanges": [
           {
@@ -68,8 +68,9 @@
       {
         "line": 10,
         "title": "Dangling Pointer 역참조!",
-        "explanation": "p는 해제된 메모리를 가리킵니다. *p의 결과는 예측 불가능합니다. 크래시할 수도 있습니다!",
+        "explanation": "p는 **해제된 메모리**를 가리킵니다. *p의 결과는 **예측 불가능**합니다!\n\n**정의되지 않은 동작(Undefined Behavior):**\n- 운 좋으면: 100이 출력될 수도 있음\n- 운 나쁘면: 크래시 (Segmentation fault)\n- 최악: 이상한 값이 나오지만 프로그램은 계속 실행 (숨겨진 버그!)\n\n**해결책:**\n```c\n// ❌ 잘못된 방법\nint* bad() { int x = 5; return &x; }\n\n// ⭕ 올바른 방법 1: 동적 할당\nint* good1() { \n    int *p = malloc(sizeof(int));\n    *p = 5; \n    return p; \n}\n\n// ⭕ 올바른 방법 2: static 변수\nint* good2() { \n    static int x = 5; \n    return &x; \n}\n```\n\n**규칙:** 지역 변수 주소 반환 = **절대 금지!**",
         "highlight": [10],
+        "stdout": "*p = ??? (정의되지 않은 동작)",
         "memoryChanges": [],
         "danger": true
       }

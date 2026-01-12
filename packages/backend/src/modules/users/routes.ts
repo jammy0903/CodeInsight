@@ -79,7 +79,6 @@ userRoutes.get('/', requireAdmin, async (req, res) => {
         oauthAccounts: {
           select: {
             provider: true,
-            email: true,
           },
         },
         _count: {
@@ -187,7 +186,7 @@ userRoutes.get('/check-nickname/:nickname', async (req, res) => {
  */
 userRoutes.post('/register', requireAuth, validate(registerSchema), async (req, res) => {
   try {
-    const { uid, email, provider } = req.user!;
+    const { uid, provider } = req.user!;
     const { nickname } = req.body; // 이미 Zod로 검증됨
 
     const normalizedNickname = nickname.trim().toLowerCase();
@@ -231,7 +230,6 @@ userRoutes.post('/register', requireAuth, validate(registerSchema), async (req, 
           create: {
             provider,
             providerId: uid,
-            email: email || null,
           },
         },
       },
@@ -239,7 +237,6 @@ userRoutes.post('/register', requireAuth, validate(registerSchema), async (req, 
         oauthAccounts: {
           select: {
             provider: true,
-            email: true,
           },
         },
       },
@@ -309,7 +306,7 @@ userRoutes.get('/me/role', requireDbUser, async (req, res) => {
  */
 userRoutes.post('/link-oauth', requireDbUser, async (req, res) => {
   try {
-    const { uid, email, provider, dbUser } = req.user!;
+    const { uid, provider, dbUser } = req.user!;
 
     // 이미 연동된 OAuth 계정인지 확인
     const existing = await prisma.oAuthAccount.findUnique({
@@ -334,7 +331,6 @@ userRoutes.post('/link-oauth', requireDbUser, async (req, res) => {
         userId: dbUser!.id,
         provider,
         providerId: uid,
-        email: email || null,
       },
     });
 
@@ -345,7 +341,6 @@ userRoutes.post('/link-oauth', requireDbUser, async (req, res) => {
         oauthAccounts: {
           select: {
             provider: true,
-            email: true,
           },
         },
       },
@@ -359,5 +354,85 @@ userRoutes.post('/link-oauth', requireDbUser, async (req, res) => {
   } catch (error) {
     logger.error('OAuth link error:', error);
     res.status(500).json({ error: 'Failed to link OAuth account' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/users/me/nickname:
+ *   patch:
+ *     tags: [Users]
+ *     summary: 닉네임 변경
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nickname
+ *             properties:
+ *               nickname:
+ *                 type: string
+ *                 description: 새 닉네임 (2~20자)
+ *     responses:
+ *       200:
+ *         description: 닉네임 변경 성공
+ *       400:
+ *         description: 유효하지 않은 닉네임
+ *       409:
+ *         description: 이미 사용 중인 닉네임
+ */
+userRoutes.patch('/me/nickname', requireDbUser, validate(registerSchema), async (req, res) => {
+  try {
+    const { dbUser } = req.user!;
+    const { nickname } = req.body;
+
+    const normalizedNickname = nickname.trim().toLowerCase();
+
+    // 현재 닉네임과 같으면 그냥 성공 반환
+    if (dbUser!.nickname === normalizedNickname) {
+      return res.json({
+        nickname: dbUser!.nickname,
+        role: dbUser!.role,
+        oauthAccounts: dbUser!.oauthAccounts,
+      });
+    }
+
+    // 닉네임 중복 확인 (본인 제외)
+    const existingUser = await prisma.user.findUnique({
+      where: { nickname: normalizedNickname },
+    });
+
+    if (existingUser && existingUser.id !== dbUser!.id) {
+      return res.status(409).json({
+        error: 'Nickname taken',
+        code: 'NICKNAME_TAKEN',
+        message: '이미 사용 중인 닉네임입니다.',
+      });
+    }
+
+    // 닉네임 업데이트
+    const updatedUser = await prisma.user.update({
+      where: { id: dbUser!.id },
+      data: { nickname: normalizedNickname },
+      include: {
+        oauthAccounts: {
+          select: {
+            provider: true,
+          },
+        },
+      },
+    });
+
+    res.json({
+      nickname: updatedUser.nickname,
+      role: updatedUser.role,
+      oauthAccounts: updatedUser.oauthAccounts,
+    });
+  } catch (error) {
+    logger.error('Nickname update error:', error);
+    res.status(500).json({ error: 'Failed to update nickname' });
   }
 });

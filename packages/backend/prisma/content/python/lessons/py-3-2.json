@@ -1,0 +1,120 @@
+{
+  "lessonId": "py-3-2",
+  "title": "The Aliasing Trap",
+  "concept": "When two variables point to the same mutable object, changes through one affect the other!",
+  "content": {
+    "code": "a = [1, 2, 3]\nb = a  # NOT a copy!\n\nprint(f\"a = {a}\")\nprint(f\"b = {b}\")\nprint(f\"Same object? {a is b}\")\n\nb[0] = 999\n\nprint(f\"After b[0] = 999:\")\nprint(f\"a = {a}\")  # SURPRISE!\nprint(f\"b = {b}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Create a list",
+        "explanation": "Create a list and bind `a` to it.\n\nSo far, one object, one name.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_shared" }
+          ],
+          "objects": [
+            { "id": "list_shared", "type": "list", "value": "[1, 2, 3]", "pyId": "140600", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "b = a - THE TRAP!",
+        "explanation": "**THIS IS NOT A COPY!**\n\n`b = a` makes `b` point to the SAME object as `a`.\n\nNow we have:\n- Two names: `a` and `b`\n- ONE object: `[1, 2, 3]`\n\nThis is called **aliasing** - two names for the same object.",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_shared" },
+            { "name": "b", "pointsTo": "list_shared" }
+          ],
+          "objects": [
+            { "id": "list_shared", "type": "list", "value": "[1, 2, 3]", "pyId": "140600" }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "a is b → True!",
+        "explanation": "**PROOF:** `a is b` returns `True`!\n\nThis confirms they point to the EXACT SAME object.\n\nNot just equal values, but the same memory location.",
+        "highlight": [6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_shared" },
+            { "name": "b", "pointsTo": "list_shared" }
+          ],
+          "objects": [
+            { "id": "list_shared", "type": "list", "value": "[1, 2, 3]", "pyId": "140600" }
+          ],
+          "output": ["a = [1, 2, 3]", "b = [1, 2, 3]", "Same object? True"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "Modify through b...",
+        "explanation": "`b[0] = 999` modifies the list object.\n\nSince `a` and `b` both point to the SAME object...\n\n**What will `a` show?**",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_shared" },
+            { "name": "b", "pointsTo": "list_shared" }
+          ],
+          "objects": [
+            { "id": "list_shared", "type": "list", "value": "[999, 2, 3]", "pyId": "140600", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "a ALSO changed!",
+        "explanation": "**THE SURPRISE:**\n\nWe modified through `b`, but `a` also shows the change!\n\n**Why?** Because there's only ONE list. Both names point to it.\n\n**This is the #1 source of bugs for Python beginners.**",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_shared" },
+            { "name": "b", "pointsTo": "list_shared" }
+          ],
+          "objects": [
+            { "id": "list_shared", "type": "list", "value": "[999, 2, 3]", "pyId": "140600" }
+          ],
+          "output": ["a = [1, 2, 3]", "b = [1, 2, 3]", "Same object? True", "After b[0] = 999:", "a = [999, 2, 3]", "b = [999, 2, 3]"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What prints?\n\nx = [1, 2]\ny = x\ny = y + [3]\nprint(x)",
+    "options": [
+      "[1, 2, 3]",
+      "[1, 2]",
+      "[3]",
+      "Error"
+    ],
+    "correctIndex": 1,
+    "explanation": "y = y + [3] creates a NEW list and rebinds y to it. This BREAKS the alias! x still points to [1, 2]. If we had used y.append(3) or y += [3], x would see the change."
+  },
+  "misconceptions": [
+    {
+      "wrong": "b = a creates a copy of the list",
+      "correct": "b = a makes b point to the same list as a",
+      "why": "Assignment binds names to objects. It never copies objects."
+    },
+    {
+      "wrong": "Each variable has its own independent list",
+      "correct": "Multiple variables can share the same list object",
+      "why": "This aliasing is a feature, not a bug - but it can cause unexpected mutations."
+    },
+    {
+      "wrong": "Only b changed, a should be the same",
+      "correct": "There's only ONE list - both names see the change",
+      "why": "The object is shared. Mutation through any name affects all names."
+    }
+  ],
+  "keyTakeaway": "b = a creates an ALIAS, not a copy! Changes through b affect a because they're the SAME object!"
+}

@@ -2,19 +2,17 @@
  * Admin Authentication Middleware
  *
  * WHY: Admin 전용 API 접근 제어
- * SECURITY: Firebase Auth + 이메일 확인
+ * SECURITY: Firebase Auth + UID 확인 (환경변수 기반)
  */
 
 import { Request, Response, NextFunction } from 'express';
 import { auth } from '../config/firebase';
+import { env } from '../config/env';
 import { logger } from '../utils/logger';
-
-const ADMIN_EMAIL = 'l89192164@gmail.com';
 
 export interface AdminRequest extends Request {
   adminUser?: {
     uid: string;
-    email: string;
     displayName?: string;
   };
 }
@@ -40,8 +38,8 @@ export async function requireAdmin(
     // Firebase ID 토큰 검증
     const decodedToken = await auth.verifyIdToken(token);
 
-    // 이메일 확인
-    if (decodedToken.email !== ADMIN_EMAIL) {
+    // UID 확인 (환경변수에서 Admin UID 가져옴)
+    if (!env.ADMIN_FIREBASE_UID || decodedToken.uid !== env.ADMIN_FIREBASE_UID) {
       res.status(403).json({
         error: 'Forbidden: Admin access only',
         message: '관리자 권한이 필요합니다.'
@@ -52,7 +50,6 @@ export async function requireAdmin(
     // Admin 정보 저장
     req.adminUser = {
       uid: decodedToken.uid,
-      email: decodedToken.email!,
       displayName: decodedToken.name,
     };
 

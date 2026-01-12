@@ -1,0 +1,144 @@
+{
+  "lessonId": "py-3-3",
+  "title": "Shallow Copy",
+  "concept": "copy() creates a new list, but the elements are still shared!",
+  "content": {
+    "code": "original = [[1, 2], [3, 4]]\nshallow = original.copy()\n\nprint(f\"Same list? {original is shallow}\")\nprint(f\"Same inner? {original[0] is shallow[0]}\")\n\nshallow[0][0] = 999\nprint(f\"original: {original}\")\nprint(f\"shallow: {shallow}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Create nested list",
+        "explanation": "`original = [[1, 2], [3, 4]]` creates:\n- An outer list\n- Two inner lists\n\nThe outer list contains **references** to the inner lists.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100", "highlight": true },
+            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
+            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "Shallow copy",
+        "explanation": "`.copy()` creates a **shallow copy**:\n\n- Creates a NEW outer list ✓\n- But copies **references** to inner lists ✗\n\nThe inner lists are **shared**, not copied!",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "shallow", "pointsTo": "list_copy" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
+            { "id": "list_copy", "type": "list", "value": "[→, →]", "pyId": "140400", "highlight": true },
+            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
+            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "Outer lists are different",
+        "explanation": "`original is shallow` → **False**\n\nGood! The outer lists are different objects.\n\nBut wait...",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "shallow", "pointsTo": "list_copy" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
+            { "id": "list_copy", "type": "list", "value": "[→, →]", "pyId": "140400" }
+          ],
+          "output": ["Same list? False"]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Inner lists are SAME!",
+        "explanation": "`original[0] is shallow[0]` → **True**!\n\n**THE TRAP:** Inner lists are **shared**!\n\nBoth point to the same `[1, 2]` object.",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "shallow", "pointsTo": "list_copy" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
+            { "id": "list_copy", "type": "list", "value": "[→, →]", "pyId": "140400" },
+            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200", "highlight": true }
+          ],
+          "output": ["Same list? False", "Same inner? True"]
+        }
+      },
+      {
+        "line": 7,
+        "title": "Modify through shallow copy",
+        "explanation": "`shallow[0][0] = 999` modifies the **shared** inner list.\n\nSince both `original[0]` and `shallow[0]` point to the same object...",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "shallow", "pointsTo": "list_copy" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
+            { "id": "list_copy", "type": "list", "value": "[→, →]", "pyId": "140400" },
+            { "id": "list_inner1", "type": "list", "value": "[999, 2]", "pyId": "140200", "highlight": true },
+            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "original ALSO changed!",
+        "explanation": "**BOTH show the change!**\n\n```\noriginal: [[999, 2], [3, 4]]\nshallow:  [[999, 2], [3, 4]]\n```\n\n**Shallow copy only copies one level deep.**\n\nFor true independence, you need **deep copy**.",
+        "highlight": [8, 9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "original", "pointsTo": "list_outer" },
+            { "name": "shallow", "pointsTo": "list_copy" }
+          ],
+          "objects": [
+            { "id": "list_outer", "type": "list", "value": "[[999,2], [3,4]]", "pyId": "140100" },
+            { "id": "list_copy", "type": "list", "value": "[[999,2], [3,4]]", "pyId": "140400" }
+          ],
+          "output": ["Same list? False", "Same inner? True", "original: [[999, 2], [3, 4]]", "shallow: [[999, 2], [3, 4]]"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Which creates a shallow copy?\n\na = [1, 2, 3]",
+    "options": [
+      "b = a",
+      "b = a.copy()",
+      "b = a[:]",
+      "Both B and C"
+    ],
+    "correctIndex": 3,
+    "explanation": "Both .copy() and [:] (slice) create shallow copies. b = a just creates an alias (no copy at all). For nested structures, shallow copies share inner objects."
+  },
+  "misconceptions": [
+    {
+      "wrong": ".copy() creates a completely independent copy",
+      "correct": ".copy() only copies one level - nested objects are shared",
+      "why": "This is 'shallow' copying. Only the top-level container is new."
+    },
+    {
+      "wrong": "Slicing [:] creates a deep copy",
+      "correct": "Slicing [:] creates a shallow copy, same as .copy()",
+      "why": "Both methods only copy references to nested objects, not the objects themselves."
+    }
+  ],
+  "keyTakeaway": "Shallow copy (.copy() or [:]) creates new outer container but SHARES nested objects!"
+}

@@ -3,11 +3,12 @@
  * Q&A 대화 인터페이스 (코스 컨텍스트 지원)
  */
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Send, Loader2, Trash2, MessageCircle } from 'lucide-react';
+import { Send, Loader2, Trash2, MessageCircle, Clock } from 'lucide-react';
 import { useChatQA } from '../hooks/useChatQA';
 import { MessageContent } from './MessageContent';
 import type { ChatContext } from '@/services/ai';
@@ -30,6 +31,8 @@ export function ChatQA({
     setInput,
     messages,
     isLoading,
+    streamingContent,
+    expiresAt,
     messagesEndRef,
     sendMessage,
     handleKeyDown,
@@ -43,6 +46,9 @@ export function ChatQA({
         <div className="flex items-center gap-2">
           <MessageCircle className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium">Q&A 대화</span>
+          {expiresAt && messages.length > 0 && (
+            <ExpiryCountdown expiresAt={expiresAt} />
+          )}
         </div>
         {messages.length > 0 && (
           <button
@@ -65,7 +71,13 @@ export function ChatQA({
               <MessageBubble key={msg.id} message={msg} />
             ))}
 
-            {isLoading && <LoadingIndicator />}
+            {isLoading && (
+              streamingContent ? (
+                <StreamingMessage content={streamingContent} />
+              ) : (
+                <LoadingIndicator />
+              )
+            )}
 
             <div ref={messagesEndRef} />
           </div>
@@ -134,7 +146,7 @@ function MessageBubble({
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[90%] ${isUser ? 'order-2' : ''}`}>
+      <div className={`max-w-[90%] min-w-0 ${isUser ? 'order-2' : ''}`}>
         <div className={`flex items-center gap-1.5 mb-1 ${isUser ? 'justify-end' : ''}`}>
           <Badge
             variant={isUser ? 'default' : 'secondary'}
@@ -145,14 +157,38 @@ function MessageBubble({
         </div>
 
         <Card
-          className={
+          className={`overflow-hidden ${
             isUser
               ? 'bg-primary text-primary-foreground border-primary'
               : 'bg-muted/50'
-          }
+          }`}
         >
-          <CardContent className="p-3">
+          <CardContent className="p-3 overflow-x-auto">
             <MessageContent content={message.content} isUser={isUser} />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// 스트리밍 메시지 (실시간 응답)
+function StreamingMessage({ content }: { content: string }) {
+  return (
+    <div className="flex justify-start">
+      <div className="max-w-[90%] min-w-0">
+        <div className="flex items-center gap-1.5 mb-1">
+          <Badge variant="secondary" className="h-4 px-1.5 text-[10px] font-medium">
+            AI
+          </Badge>
+          <span className="text-[10px] text-muted-foreground animate-pulse">
+            응답 중...
+          </span>
+        </div>
+        <Card className="bg-muted/50 overflow-hidden">
+          <CardContent className="p-3 overflow-x-auto">
+            <MessageContent content={content} isUser={false} />
+            <span className="inline-block w-1.5 h-4 bg-primary/60 animate-pulse ml-0.5" />
           </CardContent>
         </Card>
       </div>
@@ -193,5 +229,40 @@ function LoadingIndicator() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// 만료 카운트다운
+function ExpiryCountdown({ expiresAt }: { expiresAt: number }) {
+  const [remaining, setRemaining] = useState('');
+
+  useEffect(() => {
+    const updateRemaining = () => {
+      const now = Date.now();
+      const diff = expiresAt - now;
+
+      if (diff <= 0) {
+        setRemaining('만료됨');
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setRemaining(`${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+    };
+
+    updateRemaining();
+    const interval = setInterval(updateRemaining, 1000);
+
+    return () => clearInterval(interval);
+  }, [expiresAt]);
+
+  return (
+    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+      <Clock className="h-3 w-3" />
+      {remaining} 후 삭제
+    </span>
   );
 }

@@ -8,16 +8,25 @@
       {
         "line": 6,
         "title": "malloc 호출",
-        "explanation": "malloc(sizeof(int))는 4바이트를 Heap에 할당하고 그 주소를 반환합니다.",
-        "highlight": [6],
+        "explanation": "malloc(sizeof(int))는 **4바이트를 Heap에 할당**하고 그 주소를 반환합니다.\n\n**malloc 동작 분석:**\n1. sizeof(int) = 4 (바이트 수 계산)\n2. Heap에서 4바이트 공간 찾기\n3. 그 공간의 **시작 주소**를 반환\n\n**왜 sizeof(int)를 쓸까?**\n- 하드코딩 `malloc(4)` → 다른 시스템에서 문제 가능\n- sizeof 사용 → **이식성** 보장\n\n**주의:** malloc은 메모리를 **초기화하지 않아요!** 쓰레기 값이 들어있습니다.",
+        "highlight": [
+          6
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
             "name": "p",
             "type": "int*",
             "size": 8,
-            "value": "0x55001000"
+            "value": "0x55001000",
+            "frame": "main"
           },
           {
             "action": "allocate",
@@ -33,15 +42,23 @@
       {
         "line": 8,
         "title": "NULL 체크",
-        "explanation": "malloc이 실패하면 NULL을 반환합니다. 항상 체크해야 합니다!",
-        "highlight": [8, 9, 10, 11],
+        "explanation": "malloc이 실패하면 **NULL**을 반환합니다!\n\n**왜 실패할까?**\n- 메모리 부족\n- 너무 큰 크기 요청\n- 시스템 문제\n\n**NULL 체크가 필수인 이유:**\n```c\nint *p = malloc(1000000000);  // 1GB 요청\n*p = 10;  // p가 NULL이면 크래시!\n```\n\n**좋은 패턴:**\n```c\nif (p == NULL) {\n    // 에러 처리\n    return -1;\n}\n```\n\n실제 프로그램에서 NULL 체크 없이 malloc 사용은 **금지**입니다!",
+        "highlight": [
+          8,
+          9,
+          10,
+          11
+        ],
         "memoryChanges": []
       },
       {
         "line": 13,
         "title": "Heap에 값 저장",
-        "explanation": "*p = 42로 할당된 메모리에 값을 저장합니다.",
-        "highlight": [13],
+        "explanation": "*p = 42로 할당된 메모리에 값을 저장합니다.\n\n**동작 순서:**\n1. p가 가리키는 주소(0x55001000)로 이동\n2. 그 위치에 42를 **씀**\n\n**이전 값 '???'는 어디서 왔을까?**\n- malloc은 초기화 안 함\n- 이전에 그 메모리를 쓴 프로그램의 잔여 데이터\n- 직접 값을 넣기 전에는 **쓰레기**\n\n**calloc과의 차이:**\n- malloc: 초기화 ❌\n- calloc: 0으로 초기화 ⭕",
+        "highlight": [
+          13
+        ],
+        "stdout": "*p = 42",
         "memoryChanges": [
           {
             "action": "update",
@@ -55,8 +72,10 @@
       {
         "line": 16,
         "title": "free로 해제",
-        "explanation": "사용이 끝난 Heap 메모리는 반드시 free()로 해제합니다.",
-        "highlight": [16],
+        "explanation": "사용이 끝난 Heap 메모리는 반드시 **free()**로 해제합니다!\n\n**malloc 사용 4단계:**\n```c\n// 1. 할당\nint *p = malloc(sizeof(int));\n\n// 2. NULL 체크\nif (p == NULL) return -1;\n\n// 3. 사용\n*p = 42;\nprintf(\"%d\", *p);\n\n// 4. 해제\nfree(p);\np = NULL;  // 좋은 습관!\n```\n\n**매 malloc에는 짝이 되는 free가 있어야 합니다!**",
+        "highlight": [
+          16
+        ],
         "memoryChanges": [
           {
             "action": "deallocate",

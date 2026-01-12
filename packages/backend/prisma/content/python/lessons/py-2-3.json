@@ -1,0 +1,96 @@
+{
+  "lessonId": "py-2-3",
+  "title": "튜플 불변성",
+  "concept": "튜플은 불변 시퀀스 - 요소를 바꿀 수 없다!",
+  "content": {
+    "code": "t = (1, 2, 3)\nprint(f\"t = {t}, id = {id(t)}\")\n\n# 이건 에러가 난다:\n# t[0] = 100  # TypeError!\n\n# 새 튜플을 만들 수밖에 없다\nt = (100,) + t[1:]\nprint(f\"변경 후: t = {t}, id = {id(t)}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "튜플 생성",
+        "explanation": "`t = (1, 2, 3)`은 튜플 객체를 만듭니다.\n\n**튜플은 불변입니다** - 문자열과 정수처럼 제자리에서 수정할 수 없습니다.\n\n튜플은 대괄호 `[]` 대신 소괄호 `()`를 씁니다.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "t", "pointsTo": "tuple_1" }
+          ],
+          "objects": [
+            { "id": "tuple_1", "type": "tuple", "value": "(1, 2, 3)", "pyId": "140200", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "t[0] = 100은 불법!",
+        "explanation": "**이건 에러가 납니다**\n\n```python\nTypeError: 'tuple' object does not support item assignment\n```\n\n**리스트와 달리** 튜플 요소를 수정할 수 없습니다.\n\n이게 핵심 차이입니다:\n- `list[0] = x` → OK (가변)\n- `tuple[0] = x` → ERROR (불변)",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "t", "pointsTo": "tuple_1" }
+          ],
+          "objects": [
+            { "id": "tuple_1", "type": "tuple", "value": "(1, 2, 3)", "pyId": "140200" }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "새 튜플을 만들어야!",
+        "explanation": "**해결법:** 새 튜플을 만들어라!\n\n`(100,) + t[1:]` = `(100,) + (2, 3)` = `(100, 2, 3)`\n\n**주의:** `(100,)` 의 콤마가 필수입니다 - 요소가 하나인 튜플에는 콤마가 필요해요!\n\n원래 튜플 `(1, 2, 3)`은 그대로입니다.",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "t", "pointsTo": "tuple_2" }
+          ],
+          "objects": [
+            { "id": "tuple_1", "type": "tuple", "value": "(1, 2, 3)", "pyId": "140200", "orphaned": true },
+            { "id": "tuple_2", "type": "tuple", "value": "(100, 2, 3)", "pyId": "140300", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "다른 id = 새 객체",
+        "explanation": "**id가 바뀌었습니다!**\n\n이건 `t`가 이제 완전히 다른 튜플 객체를 가리킨다는 증명입니다.\n\n**왜 튜플을 쓸까?**\n- 딕셔너리 키로 사용 가능\n- 더 안전 (실수로 수정 방지)\n- 리스트보다 약간 빠름",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "t", "pointsTo": "tuple_2" }
+          ],
+          "objects": [
+            { "id": "tuple_2", "type": "tuple", "value": "(100, 2, 3)", "pyId": "140300" }
+          ],
+          "output": ["t = (1, 2, 3), id = 140200", "변경 후: t = (100, 2, 3), id = 140300"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "결과는?\n\nt = (1, [2, 3], 4)\nt[1].append(5)\nprint(t)",
+    "options": [
+      "(1, [2, 3, 5], 4)",
+      "TypeError",
+      "(1, [2, 3], 4)",
+      "(1, [5], 4)"
+    ],
+    "correctIndex": 0,
+    "explanation": "튜플 자체는 불변이지만, 가변 객체인 리스트에 대한 참조를 담고 있습니다. 튜플이 가리키는 대상을 바꾸는 게 아니라 리스트 객체 자체를 수정하는 거예요. 이건 헷갈리기 쉬운 엣지 케이스입니다!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "튜플은 완전히 불변이다",
+      "correct": "튜플은 수정할 수 없지만, 안에 있는 가변 객체는 바꿀 수 있다",
+      "why": "튜플은 참조를 저장합니다. 참조가 가변 객체를 가리키면 그 객체는 여전히 바뀔 수 있어요."
+    },
+    {
+      "wrong": "(100)은 요소 하나짜리 튜플을 만든다",
+      "correct": "(100,) 콤마가 있어야 튜플; (100)은 그냥 괄호 묶음",
+      "why": "파이썬은 튜플과 괄호로 묶인 표현식을 구분하려면 콤마가 필요합니다."
+    }
+  ],
+  "keyTakeaway": "튜플은 문자열처럼 불변! t[0] = x는 에러. 하지만 주의: 튜플 안의 가변 객체는 여전히 바뀔 수 있다!"
+}

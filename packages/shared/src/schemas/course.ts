@@ -65,6 +65,30 @@ export const LessonsSchema = z.array(LessonSchema);
 // Memory Visualization Schemas (통일 형식)
 // =============================================
 
+// Python 타입
+export const PyTypeSchema = z.enum([
+  'int', 'float', 'str', 'bool', 'NoneType',
+  'list', 'tuple', 'dict', 'set',
+  'function', 'class', 'instance',
+]);
+
+// Python 객체
+export const PyObjectSchema = z.object({
+  id: z.string(),
+  type: PyTypeSchema,
+  value: z.unknown(),
+  mutable: z.boolean(),
+  highlight: z.boolean().optional(),
+});
+
+// Python 이름 (변수)
+export const PyNameSchema = z.object({
+  name: z.string(),
+  scope: z.string(), // 프레임명: 'global', '__main__', 함수명 등
+  pointsTo: z.string(),
+  highlight: z.boolean().optional(),
+});
+
 // 변수 (스택 프레임 내의 개별 변수)
 export const VariableSchema = z.object({
   name: z.string(),
@@ -171,6 +195,10 @@ export const LessonStepSchema = z.object({
   stack: z.array(MemoryBlockSchema).optional(),
   heap: z.array(MemoryBlockSchema).optional(),
   data: z.array(MemoryBlockSchema).optional(),
+  // Python 시각화 (Playground용)
+  // WHY: Python은 Names-Objects 모델이므로 C의 stack/heap과 다른 구조
+  pyNames: z.array(PyNameSchema).optional(),
+  pyObjects: z.array(PyObjectSchema).optional(),
 });
 
 // Legacy aliases for backward compatibility
@@ -283,6 +311,11 @@ export type HeapObject = z.infer<typeof HeapObjectSchema>;
 export type MemoryBlock = z.infer<typeof MemoryBlockSchema>;
 export type StepMemoryState = z.infer<typeof StepMemoryStateSchema>;
 export type MemoryChangeAction = z.infer<typeof MemoryChangeSchema>;
+
+// Python 메모리 시각화
+export type PyType = z.infer<typeof PyTypeSchema>;
+export type PyObject = z.infer<typeof PyObjectSchema>;
+export type PyName = z.infer<typeof PyNameSchema>;
 
 // 콘텐츠
 export type LessonStep = z.infer<typeof LessonStepSchema>;

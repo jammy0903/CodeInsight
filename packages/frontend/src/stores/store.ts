@@ -10,7 +10,6 @@ import type { Message, RunResult, Step } from '@/types/index';
 // App User 타입 (우리 DB의 User)
 export interface OAuthAccountInfo {
   provider: string;
-  email: string | null;
 }
 
 export interface AppUser {

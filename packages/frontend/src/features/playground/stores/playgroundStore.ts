@@ -6,14 +6,15 @@
  */
 
 import { create } from 'zustand';
-import type { SupportedLanguage, CStep, PyStep } from '@/types';
+import type { SupportedLanguage, LessonStep } from '@/types';
+import type { StackRegisters } from '@/features/visualizers/c';
 
 // ============================================================
 // 타입 정의
 // ============================================================
 
-/** 시뮬레이션 스텝 (언어별) */
-export type SimulationStep = CStep | PyStep;
+/** 시뮬레이션 스텝 (LessonStep 통합 형식) */
+export type SimulationStep = LessonStep;
 
 /** Playground 상태 */
 interface PlaygroundState {
@@ -28,9 +29,14 @@ interface PlaygroundState {
 
   // === 시뮬레이션 상태 ===
   steps: SimulationStep[];
-  setSteps: (steps: SimulationStep[]) => void;
+  setSteps: (steps: SimulationStep[], stepRegisters?: StackRegisters[]) => void;
   currentStepIndex: number;
   setCurrentStepIndex: (index: number) => void;
+
+  // === 레지스터 (RSP/RBP) ===
+  stepRegisters: StackRegisters[];
+  registers: StackRegisters;
+  setRegisters: (registers: StackRegisters) => void;
 
   // === 실행 상태 ===
   isSimulating: boolean;
@@ -54,19 +60,50 @@ interface PlaygroundState {
 
 const DEFAULT_C_CODE = `#include <stdio.h>
 
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
 int main() {
     int x = 10;
-    int *p = &x;
-    *p = 20;
-    printf("x = %d\\n", x);
+    int y = 20;
+    printf("Before: x=%d, y=%d\\n", x, y);
+    swap(&x, &y);
+    printf("After: x=%d, y=%d\\n", x, y);
     return 0;
 }`;
 
-const DEFAULT_PYTHON_CODE = `a = 10
-b = a
-a = 20
-lst = [1, 2, 3]
-lst[0] = 100
+const DEFAULT_PYTHON_CODE = `# 불변 타입 - 참조가 복사되지 않음
+x = 42
+y = x
+x = 100
+
+# 문자열
+name = "Alice"
+greeting = "Hello"
+
+# 리스트 (가변!) - 참조가 공유됨
+numbers = [1, 2, 3]
+nums_copy = numbers
+numbers[0] = 999
+
+# 튜플 (불변)
+point = (10, 20)
+coords = point
+
+# 딕셔너리 (가변!)
+person = {"name": "Bob", "age": 30}
+p = person
+
+# None
+empty = None
+nothing = empty
+
+# 재참조
+z = y
+w = numbers
 `;
 
 const DEFAULT_JAVA_CODE = `public class Main {
@@ -110,9 +147,27 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
 
   // === 시뮬레이션 상태 ===
   steps: [],
-  setSteps: (steps) => set({ steps, currentStepIndex: 0, error: null }),
+  setSteps: (steps, stepRegisters = []) =>
+    set({
+      steps,
+      stepRegisters,
+      currentStepIndex: 0,
+      registers: stepRegisters[0] ?? {},
+      error: null,
+    }),
   currentStepIndex: 0,
-  setCurrentStepIndex: (index) => set({ currentStepIndex: index }),
+  setCurrentStepIndex: (index) => {
+    const { stepRegisters } = get();
+    set({
+      currentStepIndex: index,
+      registers: stepRegisters[index] ?? {},
+    });
+  },
+
+  // === 레지스터 (RSP/RBP) ===
+  stepRegisters: [],
+  registers: {},
+  setRegisters: (registers) => set({ registers }),
 
   // === 실행 상태 ===
   isSimulating: false,
@@ -122,27 +177,40 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
 
   // === 액션 ===
   nextStep: () => {
-    const { steps, currentStepIndex } = get();
+    const { steps, currentStepIndex, stepRegisters } = get();
     if (currentStepIndex < steps.length - 1) {
-      set({ currentStepIndex: currentStepIndex + 1 });
+      const newIndex = currentStepIndex + 1;
+      set({
+        currentStepIndex: newIndex,
+        registers: stepRegisters[newIndex] ?? {},
+      });
     }
   },
   prevStep: () => {
-    const { currentStepIndex } = get();
+    const { currentStepIndex, stepRegisters } = get();
     if (currentStepIndex > 0) {
-      set({ currentStepIndex: currentStepIndex - 1 });
+      const newIndex = currentStepIndex - 1;
+      set({
+        currentStepIndex: newIndex,
+        registers: stepRegisters[newIndex] ?? {},
+      });
     }
   },
   goToStep: (index) => {
-    const { steps } = get();
+    const { steps, stepRegisters } = get();
     if (index >= 0 && index < steps.length) {
-      set({ currentStepIndex: index });
+      set({
+        currentStepIndex: index,
+        registers: stepRegisters[index] ?? {},
+      });
     }
   },
   reset: () => {
     set({
       steps: [],
+      stepRegisters: [],
       currentStepIndex: 0,
+      registers: {},
       isSimulating: false,
       error: null,
     });

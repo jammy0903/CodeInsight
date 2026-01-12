@@ -1,0 +1,95 @@
+{
+  "lessonId": "java-7-1",
+  "title": "List 순회 중 삭제",
+  "concept": "for-each 루프 중 List를 수정하면 ConcurrentModificationException이 발생한다",
+  "content": {
+    "code": "List<String> list = new ArrayList<>(Arrays.asList(\"a\", \"b\", \"c\"));\n\n// 잘못된 방법 (예외 발생)\nfor (String s : list) {\n    if (s.equals(\"b\")) {\n        list.remove(s);  // ConcurrentModificationException!\n    }\n}\n\n// 올바른 방법 1: Iterator\nIterator<String> it = list.iterator();\nwhile (it.hasNext()) {\n    if (it.next().equals(\"b\")) {\n        it.remove();  // OK!\n    }\n}\n\n// 올바른 방법 2: removeIf (Java 8+)\nlist.removeIf(s -> s.equals(\"b\"));",
+    "steps": [
+      {
+        "line": 1,
+        "title": "ArrayList 생성",
+        "explanation": "list에 [\"a\", \"b\", \"c\"]가 들어있습니다.",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "list", "value": "-> ArrayList"}],
+          "heap": [{"address": "0x001", "content": "[\"a\", \"b\", \"c\"]"}]
+        }
+      },
+      {
+        "line": 4,
+        "title": "for-each 순회 시작",
+        "explanation": "for-each는 내부적으로 Iterator를 사용합니다.",
+        "highlight": [4],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "for-each = Iterator 기반"
+        }
+      },
+      {
+        "line": 6,
+        "title": "순회 중 삭제 시도 (예외!)",
+        "explanation": "Iterator를 통하지 않고 list.remove()를 호출하면 예외!",
+        "keyInsight": "for-each 중 컬렉션 수정 = ConcurrentModificationException",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "error": "ConcurrentModificationException",
+          "warning": "Iterator의 예상 크기 ≠ 실제 크기"
+        }
+      },
+      {
+        "line": 11,
+        "title": "Iterator 직접 사용",
+        "explanation": "Iterator를 직접 사용하면 안전하게 삭제할 수 있습니다.",
+        "highlight": [11, 12],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "it", "value": "-> Iterator"}],
+          "note": "Iterator가 내부 상태를 관리"
+        }
+      },
+      {
+        "line": 14,
+        "title": "Iterator.remove() (안전!)",
+        "explanation": "it.remove()는 Iterator가 알고 있으므로 안전합니다.",
+        "keyInsight": "Iterator.remove() = 순회 중 안전 삭제",
+        "highlight": [14],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "0x001", "content": "[\"a\", \"c\"]", "changed": true}]
+        }
+      },
+      {
+        "line": 19,
+        "title": "removeIf() (Java 8+)",
+        "explanation": "removeIf()는 내부적으로 Iterator를 사용하여 안전하게 처리합니다.",
+        "keyInsight": "removeIf() = 가장 깔끔한 방법 (Java 8+)",
+        "highlight": [19],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "list.removeIf(condition) = 조건 맞는 요소 모두 삭제"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "for-each 중 안전한 작업은?",
+    "options": [
+      "list.add()",
+      "list.remove()",
+      "요소 읽기만",
+      "list.clear()"
+    ],
+    "correctIndex": 2,
+    "explanation": "for-each 중에는 읽기만 안전합니다. 추가/삭제/클리어 모두 ConcurrentModificationException!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "ConcurrentModificationException은 멀티스레드 문제다",
+      "correct": "단일 스레드에서도 발생합니다. Iterator 사용 중 외부 수정이 원인입니다.",
+      "why": "'Concurrent'는 '동시'라는 의미지만, 여기서는 '동시에 순회와 수정'을 뜻합니다."
+    }
+  ],
+  "keyTakeaway": "순회 중 삭제 = Iterator.remove() 또는 removeIf()"
+}

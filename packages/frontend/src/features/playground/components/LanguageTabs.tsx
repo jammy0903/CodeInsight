@@ -1,39 +1,61 @@
 /**
  * LanguageTabs - 언어 선택 탭
- * 컴팩트 스타일
+ * 컴팩트 라이트 테마 스타일
  */
 
 import { usePlaygroundStore } from '../stores/playgroundStore';
 import type { SupportedLanguage } from '@/types';
 
 const LANGUAGES: { id: SupportedLanguage; label: string; color: string }[] = [
-  { id: 'c', label: 'C', color: '#58a6ff' },
-  { id: 'python', label: 'Python', color: '#3fb950' },
-  { id: 'java', label: 'Java', color: '#f0883e' },
+  { id: 'c', label: 'C', color: '#3b82f6' },
+  { id: 'python', label: 'Py', color: '#22c55e' },
+  { id: 'java', label: 'Java', color: '#f97316' },
 ];
 
 export function LanguageTabs() {
   const { language, setLanguage } = usePlaygroundStore();
 
   return (
-    <div className="flex items-center gap-1 p-0.5 bg-[#21262d] rounded border border-[#30363d]">
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '2px',
+        padding: '2px',
+        backgroundColor: '#f3f4f6',
+        borderRadius: '6px',
+        border: '1px solid #e5e7eb',
+      }}
+    >
       {LANGUAGES.map((lang) => {
         const isActive = language === lang.id;
         return (
           <button
             key={lang.id}
             onClick={() => setLanguage(lang.id)}
-            className={`
-              flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-all
-              ${isActive
-                ? 'bg-[#30363d] text-white'
-                : 'text-[#8b949e] hover:text-[#c9d1d9]'
-              }
-            `}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontSize: '11px',
+              fontWeight: 600,
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              backgroundColor: isActive ? '#ffffff' : 'transparent',
+              color: isActive ? lang.color : '#9ca3af',
+              boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+            }}
           >
             <span
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: isActive ? lang.color : '#484f58' }}
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: isActive ? lang.color : '#d1d5db',
+              }}
             />
             {lang.label}
           </button>

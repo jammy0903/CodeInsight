@@ -5,17 +5,24 @@
  * 실행: npx ts-node prisma/python-content-seed.ts
  */
 
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaClient } from '.prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
-const prisma = new PrismaClient();
+// PostgreSQL connection
+const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 // =============================================
 // Chapter 1: 변수와 객체
 // =============================================
 
 const ch1_lesson1 = {
-  id: 'p-1-1',
-  lessonId: 'p-1-1',
+  id: 'py-1-1',
+  lessonId: 'py-1-1',
   language: 'python',
   code: `# 변수는 이름표다
 
@@ -72,8 +79,8 @@ print(f"a와 b가 같은 객체인가? {a is b}")`,
 };
 
 const ch1_lesson2 = {
-  id: 'p-1-2',
-  lessonId: 'p-1-2',
+  id: 'py-1-2',
+  lessonId: 'py-1-2',
   language: 'python',
   code: `# 모든 것은 객체
 
@@ -181,8 +188,8 @@ print(type(greet))    # <class 'function'>`,
 };
 
 const ch1_lesson3 = {
-  id: 'p-1-3',
-  lessonId: 'p-1-3',
+  id: 'py-1-3',
+  lessonId: 'py-1-3',
   language: 'python',
   code: `# id()로 정체 확인
 
@@ -291,8 +298,8 @@ print(f"c와 d 같은 객체? {id(c) == id(d)}")`,
 };
 
 const ch1_lesson4 = {
-  id: 'p-1-4',
-  lessonId: 'p-1-4',
+  id: 'py-1-4',
+  lessonId: 'py-1-4',
   language: 'python',
   code: `# is vs ==
 
@@ -382,8 +389,8 @@ print(f"a is c: {a is c}")`,
 };
 
 const ch1_lesson5 = {
-  id: 'p-1-5',
-  lessonId: 'p-1-5',
+  id: 'py-1-5',
+  lessonId: 'py-1-5',
   language: 'python',
   code: `# 재할당의 진실
 
@@ -449,8 +456,8 @@ print(f"a + 1 후: {a}, id: {id(a)}")`,
 // =============================================
 
 const ch2_lesson1 = {
-  id: 'p-2-1',
-  lessonId: 'p-2-1',
+  id: 'py-2-1',
+  lessonId: 'py-2-1',
   language: 'python',
   code: `# 숫자의 불변성
 
@@ -517,8 +524,8 @@ print(f"b = 10: id = {id(b)}")`,
 };
 
 const ch2_lesson2 = {
-  id: 'p-2-2',
-  lessonId: 'p-2-2',
+  id: 'py-2-2',
+  lessonId: 'py-2-2',
   language: 'python',
   code: `# 문자열의 불변성
 
@@ -574,8 +581,8 @@ print(f"수정 후: s = {s}, id = {id(s)}")`,
 // =============================================
 
 const ch3_lesson1 = {
-  id: 'p-3-1',
-  lessonId: 'p-3-1',
+  id: 'py-3-1',
+  lessonId: 'py-3-1',
   language: 'python',
   code: `# 리스트 생성과 수정
 
@@ -629,8 +636,8 @@ print(f"append(4) 후: {lst}, id = {id(lst)}")`,
 };
 
 const ch3_lesson2 = {
-  id: 'p-3-2',
-  lessonId: 'p-3-2',
+  id: 'py-3-2',
+  lessonId: 'py-3-2',
   language: 'python',
   code: `# 같은 리스트를 가리키면?
 
@@ -759,4 +766,5 @@ seedPythonContent()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

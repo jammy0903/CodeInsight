@@ -8,9 +8,17 @@
       {
         "line": 4,
         "title": "char 배열",
-        "explanation": "char arr[]는 \"hello\"를 스택에 복사합니다. 수정 가능한 배열입니다.",
-        "highlight": [4],
+        "explanation": "char arr[]는 \"hello\"를 **스택에 복사**합니다. 수정 가능한 배열이에요!\n\n**왜 '복사'일까?**\n\n```c\nchar arr[] = \"hello\";\n```\n\n이 코드의 실제 동작:\n1. 실행파일 어딘가에 \"hello\" 원본이 있음\n2. arr[] 선언 시 **스택에 6바이트 할당**\n3. 원본을 **복사**해서 스택에 넣음\n\n**결과:** arr는 '내 것'이라서 **마음대로 수정 가능**!\n\n**비유:** 도서관 책을 **복사해서** 내 노트에 적은 것. 내 노트는 낙서해도 됨!",
+        "highlight": [
+          4
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -19,15 +27,18 @@
             "size": 6,
             "value": "\"hello\\0\"",
             "address": "0x7ffc1000",
-            "modifiable": true
+            "modifiable": true,
+            "frame": "main"
           }
         ]
       },
       {
         "line": 5,
         "title": "char 포인터",
-        "explanation": "char *ptr은 읽기 전용 메모리(rodata 영역)의 \"hello\"를 가리킵니다. 수정하면 크래시!",
-        "highlight": [5],
+        "explanation": "char *ptr은 **읽기 전용 메모리(rodata)**의 \"hello\"를 가리킵니다.\n\n**왜 읽기 전용일까?**\n\n**rodata(Read-Only Data)란?**\n- 실행파일에 포함된 상수 데이터 영역\n- 문자열 리터럴(\"hello\" 등)이 여기 저장됨\n- OS가 **쓰기 금지** 설정\n\n```c\nchar *ptr = \"hello\";\n```\n\n이 코드의 의미:\n- ptr에 rodata 영역의 주소만 저장\n- **복사 없음!** 원본을 직접 가리킴\n\n**비유:** 도서관 책을 **가리키기만** 한 것. 원본 책에 낙서하면 안 됨!\n\n**메모리 구조:**\n```\nStack: ptr = 0x00401000\nrodata: [h][e][l][l][o][\\0]  ← 수정 불가!\n```",
+        "highlight": [
+          5
+        ],
         "memoryChanges": [
           {
             "action": "allocate",
@@ -44,30 +55,37 @@
             "name": "ptr",
             "type": "char*",
             "value": "0x00401000",
-            "pointsTo": "rodata"
+            "pointsTo": "rodata",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 7,
         "title": "배열 수정 - OK",
-        "explanation": "arr는 스택에 있는 복사본이므로 수정 가능합니다.",
-        "highlight": [7],
+        "explanation": "arr는 **스택에 있는 복사본**이므로 수정 가능합니다.\n\n**수정 전후:**\n| 인덱스 | 수정 전 | 수정 후 |\n|--------|---------|--------|\n| arr[0] | 'h' | **'H'** |\n| arr[1~5] | 변화 없음 | 변화 없음 |\n\n출력: \"Hello\" (첫 글자만 대문자로!)",
+        "highlight": [
+          7
+        ],
+        "stdout": "arr: Hello",
         "memoryChanges": [
           {
             "action": "update",
             "area": "stack",
             "name": "arr[0]",
             "value": "'H'",
-            "previousValue": "'h'"
+            "previousValue": "'h'",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 10,
         "title": "포인터 수정 - 위험!",
-        "explanation": "ptr이 가리키는 메모리는 읽기 전용입니다. 수정하면 Segmentation fault!",
-        "highlight": [10],
+        "explanation": "ptr이 가리키는 메모리는 **읽기 전용**입니다. **수정하면 Segmentation fault!**\n\n**왜 크래시할까?**\n\nOS는 rodata 영역에 **쓰기 보호**를 걸어둡니다:\n```\nrodata: 읽기(R) ⭕, 쓰기(W) ❌, 실행(X) ❌\n```\n\n쓰기 시도 → OS가 프로그램 강제 종료!\n\n**핵심 구분:**\n| 선언 | 저장 위치 | 수정 |\n|------|----------|------|\n| char arr[] = \"hi\"; | Stack | ⭕ 가능 |\n| char *ptr = \"hi\"; | rodata | ❌ 크래시 |\n\n**꿀팁:** 수정 안 할 문자열은 `const char *`로 명시하세요!\n```c\nconst char *ptr = \"hello\";  // 의도 명확!\n```",
+        "highlight": [
+          10
+        ],
         "danger": true,
         "memoryChanges": []
       }

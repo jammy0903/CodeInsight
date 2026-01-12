@@ -1,0 +1,104 @@
+{
+  "lessonId": "py-1-3",
+  "title": "할당 = 바인딩",
+  "concept": "= 연산자는 이름을 객체에 바인딩한다, 데이터를 복사하지 않는다",
+  "content": {
+    "code": "a = [1, 2, 3]\na = [4, 5, 6]\n\nb = [1, 2, 3]\nb.append(4)",
+    "steps": [
+      {
+        "line": 1,
+        "title": "첫 번째 바인딩: a → list1",
+        "explanation": "할당이 정확히 무슨 일을 하는지 추적해봅시다.\n\n`a = [1, 2, 3]`:\n1. 리스트 객체 `[1, 2, 3]` 생성\n2. 이름 `a`를 그 객체에 **바인딩**\n\n**비유:** 가게에서 상품에 라벨을 붙이는 것.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "obj1" }
+          ],
+          "objects": [
+            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "id_001" }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "재바인딩: a가 새 객체로 이동!",
+        "explanation": "**핵심 개념: 재바인딩**\n\n`a = [4, 5, 6]`:\n1. 새 리스트 객체 `[4, 5, 6]` 생성\n2. 라벨 `a`를 새 객체로 **이동**\n3. 옛날 `[1, 2, 3]`은 **고아** 됨 (가리키는 라벨 없음)\n\n**옛날 객체는 아직 존재** - 가비지 컬렉션 전까지.\n\n이건 수정이 아니라 재바인딩!",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "obj2" }
+          ],
+          "objects": [
+            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "id_001", "orphaned": true },
+            { "id": "obj2", "type": "list", "value": "[4, 5, 6]", "pyId": "id_002", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "b가 리스트를 가리킴",
+        "explanation": "이제 재바인딩과 변이(mutation)의 차이를 봅시다.\n\n`b = [1, 2, 3]`는 리스트를 만들고 `b`를 바인딩합니다.",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "obj2" },
+            { "name": "b", "pointsTo": "obj3" }
+          ],
+          "objects": [
+            { "id": "obj2", "type": "list", "value": "[4, 5, 6]", "pyId": "id_002" },
+            { "id": "obj3", "type": "list", "value": "[1, 2, 3]", "pyId": "id_003" }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "변이: 같은 객체가 변함!",
+        "explanation": "**변이(Mutation) vs 재바인딩**\n\n`b.append(4)`는 `b`를 재바인딩하지 않습니다!\n`b`가 가리키는 **객체를 수정**합니다.\n\n**재바인딩** (`b = [...]`):\n- `b`가 새 객체를 가리키게 됨\n- 옛날 객체는 그대로\n\n**변이** (`b.append(...)`):\n- `b`는 여전히 같은 객체를 가리킴\n- 객체 자체가 변함\n\n이 차이가 함수 인자 이해에 핵심!",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "obj2" },
+            { "name": "b", "pointsTo": "obj3" }
+          ],
+          "objects": [
+            { "id": "obj2", "type": "list", "value": "[4, 5, 6]", "pyId": "id_002" },
+            { "id": "obj3", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "id_003", "highlight": true }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "차이점은?\n\nx = x + [4]  # A\nx.append(4)  # B",
+    "options": [
+      "완전히 같다",
+      "A는 x를 새 리스트에 재바인딩, B는 기존 리스트를 변이",
+      "A는 변이, B는 재바인딩",
+      "둘 다 새 리스트 생성"
+    ],
+    "correctIndex": 1,
+    "explanation": "x + [4]는 새 리스트를 만들고, x =로 재바인딩합니다. x.append(4)는 기존 리스트를 직접 변이합니다. 다른 변수가 같은 리스트를 가리키면 append()만 영향을 줍니다!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "a = new_value는 객체를 수정한다",
+      "correct": "a = new_value는 a가 다른 객체를 가리키게 한다",
+      "why": "할당은 재바인딩이지 수정이 아닙니다. 이름이 새 대상으로 이동합니다."
+    },
+    {
+      "wrong": "x = x + [4]와 x.append(4)는 같다",
+      "correct": "x = x + [4]는 새 리스트에 재바인딩, x.append(4)는 기존 리스트 변이",
+      "why": "여러 이름이 같은 객체를 참조할 때 이 차이가 중요합니다!"
+    },
+    {
+      "wrong": "재할당하면 옛날 객체는 즉시 삭제된다",
+      "correct": "참조가 없는 객체는 나중에 가비지 컬렉션됨",
+      "why": "파이썬의 가비지 컬렉터가 나중에 정리합니다. 즉시 삭제가 아닙니다."
+    }
+  ],
+  "keyTakeaway": "재바인딩(a = ...)은 라벨을 옮긴다. 변이(a.append())는 객체를 바꾼다. 차이를 알아두세요!"
+}

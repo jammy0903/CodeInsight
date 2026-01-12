@@ -8,9 +8,17 @@
       {
         "line": 4,
         "title": "변수 선언과 초기화",
-        "explanation": "int a = 10;은 두 가지 작업을 합니다: 1) 4바이트 공간 할당, 2) 그 공간에 10 저장",
-        "highlight": [4],
+        "explanation": "int a = 10;은 두 가지 작업을 **한 번에** 수행합니다:\n1) **스택**에 4바이트 공간 할당\n2) 그 공간에 10 저장\n\n**왜 동시에 할까?** int a; a = 10;처럼 두 줄로 쓸 수도 있지만, 초기화를 깜빡하면 쓰레기 값 버그가 생깁니다. 한 줄로 쓰면 이런 실수를 방지할 수 있어요.\n\n**좋은 습관:** 변수는 선언할 때 바로 초기화하세요!",
+        "highlight": [
+          4
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -18,15 +26,18 @@
             "type": "int",
             "size": 4,
             "value": 10,
-            "address": "0x7ffc1000"
+            "address": "0x7ffc1000",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 5,
         "title": "두 번째 변수 초기화",
-        "explanation": "b도 스택에 연속해서 할당됩니다. 주소가 a보다 낮은 것에 주목하세요 (스택은 아래로 자람).",
-        "highlight": [5],
+        "explanation": "b도 **스택**에 연속해서 할당됩니다. 주소를 보세요: a는 0x7ffc1000, b는 0x7ffc0ffc. b가 더 **낮은 주소**에 있죠?\n\n**왜 스택은 아래로 자랄까?** 메모리에서 스택은 높은 주소에서 시작해서 낮은 주소로 자랍니다. 반대로 힙(Heap)은 낮은 주소에서 높은 주소로 자라요. 이렇게 서로 반대 방향으로 자라면 메모리를 효율적으로 쓸 수 있고, 둘이 충돌하는 걸 늦출 수 있습니다.",
+        "highlight": [
+          5
+        ],
         "memoryChanges": [
           {
             "action": "allocate",
@@ -35,15 +46,18 @@
             "type": "int",
             "size": 4,
             "value": 20,
-            "address": "0x7ffc0ffc"
+            "address": "0x7ffc0ffc",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 6,
         "title": "값 변경 (재할당)",
-        "explanation": "a = 30;은 a의 메모리 위치(0x7ffc1000)에 새 값 30을 덮어씁니다. 메모리 크기는 변하지 않습니다.",
-        "highlight": [6],
+        "explanation": "a = 30;은 a의 메모리 위치(0x7ffc1000)에 새 값 30을 **덮어씁니다**.\n\n**왜 덮어쓰기일까?** 변수는 메모리 주소의 '별명'입니다. a라는 이름은 항상 같은 주소(0x7ffc1000)를 가리켜요. 값을 바꿀 때 새 공간을 만드는 게 아니라, 같은 위치에 새 값을 써넣는 겁니다.\n\n이전 값 10은 어디로? 그냥 **사라집니다**. 메모리에는 30만 남아요.",
+        "highlight": [
+          6
+        ],
         "memoryChanges": [
           {
             "action": "update",
@@ -53,7 +67,8 @@
             "size": 4,
             "value": 30,
             "previousValue": 10,
-            "address": "0x7ffc1000"
+            "address": "0x7ffc1000",
+            "frame": "main"
           }
         ]
       },
@@ -61,7 +76,10 @@
         "line": 7,
         "title": "값 출력",
         "explanation": "a=30, b=20이 출력됩니다. 각 변수는 독립적인 메모리 공간을 가집니다.",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
+        "stdout": "a=30, b=20",
         "memoryChanges": []
       }
     ]

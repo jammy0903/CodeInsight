@@ -1,0 +1,113 @@
+{
+  "lessonId": "java-2-3",
+  "title": "Optional 사용법",
+  "concept": "Optional은 null 대신 '값이 없을 수 있음'을 명시적으로 표현한다",
+  "content": {
+    "code": "Optional<String> opt1 = Optional.of(\"hello\");\nOptional<String> opt2 = Optional.empty();\nOptional<String> opt3 = Optional.ofNullable(null);\n\nString value = opt1.get();\n\nif (opt2.isPresent()) {\n    System.out.println(opt2.get());\n}\n\nString result = opt3.orElse(\"default\");\n\nopt1.ifPresent(s -> System.out.println(s));",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Optional.of() - 값이 있는 경우",
+        "explanation": "Optional.of()는 null이 아닌 값을 감쌉니다. null을 넣으면 NPE!",
+        "keyInsight": "of() = null 불가, ofNullable() = null 가능",
+        "highlight": [1],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "opt1", "value": "Optional[\"hello\"]"}]
+        }
+      },
+      {
+        "line": 2,
+        "title": "Optional.empty() - 빈 Optional",
+        "explanation": "값이 없음을 명시적으로 표현합니다. null 대신 사용.",
+        "keyInsight": "empty() = 값 없음을 명시적으로 표현",
+        "highlight": [2],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "opt1", "value": "Optional[\"hello\"]"},
+            {"name": "opt2", "value": "Optional.empty"}
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "Optional.ofNullable() - null 허용",
+        "explanation": "null이면 empty(), 값이 있으면 of()처럼 동작합니다.",
+        "highlight": [3],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {"name": "opt3", "value": "Optional.empty"}
+          ],
+          "note": "null을 넣으면 empty()가 됨"
+        }
+      },
+      {
+        "line": 5,
+        "title": "get() - 값 꺼내기 (위험!)",
+        "explanation": "값이 있으면 반환, 없으면 NoSuchElementException!",
+        "keyInsight": "get()은 위험! isPresent() 체크 또는 orElse() 사용",
+        "highlight": [5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "value", "value": "\"hello\""}],
+          "warning": "opt2.get()이나 opt3.get()은 예외 발생!"
+        }
+      },
+      {
+        "line": 7,
+        "title": "isPresent() 체크",
+        "explanation": "값이 있는지 먼저 확인하고 get()을 호출합니다.",
+        "highlight": [7, 8, 9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "opt2는 empty이므로 블록 실행 안 됨"
+        }
+      },
+      {
+        "line": 11,
+        "title": "orElse() - 기본값 제공",
+        "explanation": "값이 없으면 기본값을 반환합니다. get()보다 안전!",
+        "keyInsight": "orElse() = 안전한 기본값 패턴",
+        "highlight": [11],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "result", "value": "\"default\""}],
+          "note": "opt3가 empty이므로 \"default\" 반환"
+        }
+      },
+      {
+        "line": 13,
+        "title": "ifPresent() - 함수형 스타일",
+        "explanation": "값이 있을 때만 람다를 실행합니다. 가장 깔끔한 패턴!",
+        "keyInsight": "ifPresent() = 값 있을 때만 실행",
+        "highlight": [13],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["hello"],
+          "note": "opt1은 값이 있으므로 실행됨"
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Optional을 사용하면 안 되는 경우는?",
+    "options": [
+      "메서드 반환 타입",
+      "클래스 필드",
+      "메서드 파라미터",
+      "2, 3번 모두"
+    ],
+    "correctIndex": 3,
+    "explanation": "Optional은 반환 타입으로만 사용하는 것이 권장됩니다. 필드나 파라미터에는 null 체크가 더 적합합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Optional을 모든 곳에 사용하면 좋다",
+      "correct": "Optional은 반환 타입에만 사용합니다. 필드, 파라미터, 컬렉션에는 부적합합니다.",
+      "why": "오버헤드가 있고, 직렬화 문제가 있습니다."
+    }
+  ],
+  "keyTakeaway": "Optional = 반환 타입용, orElse/ifPresent 사용, get() 피하기"
+}

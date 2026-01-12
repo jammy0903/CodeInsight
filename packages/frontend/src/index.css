@@ -1,10 +1,11 @@
 /**
  * CodeInsight Theme System
- * Playful & Gamified (크림 배경 + 네온 액센트)
+ * Tailwind v4 + @layer 기반 구조
+ *
+ * 우선순위: @layer base < @layer components < @layer utilities < Tailwind utilities
  */
 
 @import "tailwindcss";
-@import "nes.css/css/nes.min.css";
 @custom-variant dark (&:is(.dark *));
 @config "../tailwind.config.js";
 
@@ -20,7 +21,8 @@
 }
 
 /* ============================================
-   Root Variables
+   Root Variables (CSS Custom Properties)
+   - 레이어 밖에 있어도 OK (변수 정의일 뿐)
    ============================================ */
 :root {
   /* === Fonts === */
@@ -55,7 +57,7 @@
   --chart-4: #A855F7;
   --chart-5: #10B981;
 
-  /* === Background (아이보리 통일) === */
+  /* === Background === */
   --color-bg: #f8f4ef;
   --color-bg-elevated: #FFFBF5;
   --color-bg-tertiary: #FFE8D6;
@@ -67,7 +69,7 @@
   --color-text-tertiary: #6b7280;
   --color-text-muted: #9ca3af;
 
-  /* === Primary (골드/옐로우) === */
+  /* === Primary === */
   --color-primary: #FFD700;
   --color-primary-hover: #FFED4A;
   --color-primary-light: rgba(255, 215, 0, 0.15);
@@ -95,764 +97,762 @@
 }
 
 /* ============================================
-   Base Styles
+   @layer base - 가장 낮은 우선순위
+   HTML 요소 기본 스타일, 리셋
    ============================================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  color-scheme: light;
-}
-
-body {
-  font-family: var(--font-sans);
-  background-color: var(--color-bg);
-  color: var(--foreground);
-  min-height: 100vh;
-  letter-spacing: 0.01em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  min-height: 100vh;
-}
-
-/* ============================================
-   Typography
-   ============================================ */
-h1, h2, h3, .heading {
-  font-family: var(--font-sans);
-  letter-spacing: -0.02em;
-  font-weight: 700;
-}
-
-pre, code {
-  font-family: var(--font-mono);
-}
-
-/* ============================================
-   Scrollbar (네온 호버)
-   ============================================ */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-bg-tertiary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-yellow);
-  box-shadow: var(--shadow-neon-yellow);
-}
-
-/* ============================================
-   Selection
-   ============================================ */
-::selection {
-  background: var(--neon-yellow);
-  color: #1a1a2e;
-}
-
-/* ============================================
-   Focus States
-   ============================================ */
-input:focus,
-textarea:focus,
-button:focus {
-  outline: none;
-}
-
-/* ============================================
-   Neon Glow Utilities
-   ============================================ */
-.glow-yellow {
-  box-shadow: var(--shadow-neon-yellow);
-}
-
-.glow-cyan {
-  box-shadow: var(--shadow-neon-cyan);
-}
-
-.text-glow-yellow {
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-.text-glow-cyan {
-  text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
-}
-
-/* ============================================
-   Gradient Text
-   ============================================ */
-.gradient-text-gold {
-  background: linear-gradient(135deg, #FFD700 0%, #F97316 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-cyber {
-  background: linear-gradient(135deg, #00D9FF 0%, #A855F7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ============================================
-   XP Bar Styles
-   ============================================ */
-.xp-bar {
-  background: linear-gradient(90deg, var(--neon-green) 0%, var(--neon-cyan) 100%);
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-  transition: width 0.5s ease;
-}
-
-.xp-bar-container {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-/* ============================================
-   Badge Styles
-   ============================================ */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.badge-gold {
-  background: linear-gradient(135deg, #FFD700 0%, #F59E0B 100%);
-  color: #1a1a2e;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-}
-
-.badge-cyan {
-  background: linear-gradient(135deg, #00D9FF 0%, #3B82F6 100%);
-  color: white;
-  box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
-}
-
-.badge-pink {
-  background: linear-gradient(135deg, #FF6B9D 0%, #A855F7 100%);
-  color: white;
-  box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
-}
-
-/* ============================================
-   Button Styles (Warm Minimal)
-   ============================================ */
-
-/* Base button styles */
-.btn-base {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 6px;
-  border: 1px solid;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-decoration: none;
-}
-
-.btn-base:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Primary - 따뜻한 골드 */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 6px;
-  background: #a08060;
-  border: 1px solid #8b6d4f;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #8b6d4f;
-  box-shadow: 0 2px 8px rgba(139, 109, 79, 0.25);
-}
-
-.btn-primary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Secondary - 뉴트럴 */
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 6px;
-  background: rgba(255, 251, 245, 0.9);
-  border: 1px solid #e5d5c7;
-  color: #7a6a5a;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: #fff;
-  border-color: #d4c4b0;
-  color: #5a4a3a;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.btn-secondary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Success - 세이지 그린 */
-.btn-success {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 6px;
-  background: #7a9a7a;
-  border: 1px solid #6a8a6a;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-success:hover:not(:disabled) {
-  background: #6a8a6a;
-  box-shadow: 0 2px 8px rgba(106, 138, 106, 0.25);
-}
-
-.btn-success:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Danger - 먹스드 로즈 */
-.btn-danger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 6px;
-  background: #c08080;
-  border: 1px solid #a06a6a;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: #a06a6a;
-  box-shadow: 0 2px 8px rgba(160, 106, 106, 0.25);
-}
-
-.btn-danger:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Cyan - 먹스드 틸 */
-.btn-cyan {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 6px;
-  background: #6a9a9a;
-  border: 1px solid #5a8a8a;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-cyan:hover:not(:disabled) {
-  background: #5a8a8a;
-  box-shadow: 0 2px 8px rgba(90, 138, 138, 0.25);
-}
-
-.btn-cyan:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* ============================================
-   Course Page Styles (Warm Minimal)
-   ============================================ */
-
-/* Header Card */
-.course-header-card {
-  background: rgba(255, 251, 245, 0.95);
-  border: 1px solid #e5d5c7;
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-}
-
-.course-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--color-text);
-  margin-bottom: 4px;
-}
-
-.course-subtitle {
-  font-size: 13px;
-  color: #937b5d;
-  margin-bottom: 20px;
-}
-
-.course-progress {
-  max-width: 280px;
-  margin: 0 auto;
-}
-
-.course-progress-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  font-weight: 600;
-  color: #937b5d;
-  margin-bottom: 6px;
-}
-
-.course-progress-bar {
-  height: 6px;
-  background: #f0e6da;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.course-progress-fill {
-  height: 100%;
-  background: #7a9a7a;
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-/* Chapter Card */
-.chapter-card {
-  background: rgba(255, 251, 245, 0.95);
-  border: 1px solid #e5d5c7;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.chapter-header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.15s ease;
-}
-
-.chapter-header:hover {
-  background: rgba(0, 0, 0, 0.02);
-}
-
-.chapter-info {
-  flex: 1;
-}
-
-.chapter-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.chapter-title.completed {
-  color: #7a9a7a;
-}
-
-.chapter-desc {
-  font-size: 12px;
-  color: #937b5d;
-  margin-top: 2px;
-}
-
-.chapter-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.chapter-badge {
-  font-size: 11px;
-  font-weight: 600;
-  font-family: var(--font-mono);
-  padding: 4px 10px;
-  border-radius: 4px;
-  background: #f5efe7;
-  color: #937b5d;
-}
-
-.chapter-badge.progress {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.chapter-badge.complete {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.chapter-arrow {
-  font-size: 18px;
-  color: #c5b5a5;
-  transform: rotate(90deg);
-  transition: transform 0.2s ease;
-}
-
-.chapter-arrow.open {
-  transform: rotate(-90deg);
-}
-
-.chapter-progress {
-  height: 3px;
-  background: #f0e6da;
-}
-
-.chapter-progress-fill {
-  height: 100%;
-  background: #a08060;
-  transition: width 0.3s ease;
-}
-
-.chapter-progress-fill.complete {
-  background: #7a9a7a;
-}
-
-.chapter-lessons {
-  padding: 12px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Lesson Item */
-.lesson-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px 16px;
-  background: #fff;
-  border: 1px solid #e5d5c7;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: left;
-}
-
-.lesson-item:hover {
-  border-color: #d4c4b0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.lesson-item.completed {
-  background: #fafafa;
-  border-color: #e8e8e8;
-}
-
-.lesson-item.in-progress {
-  border-left: 3px solid #a08060;
-}
-
-.lesson-status {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #e5d5c7;
-  flex-shrink: 0;
-}
-
-.lesson-status.active {
-  background: #a08060;
-}
-
-.lesson-status.done {
-  background: #7a9a7a;
-}
-
-.lesson-title {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.lesson-title.done {
-  color: #999;
-  text-decoration: line-through;
-}
-
-.lesson-difficulty {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.lesson-difficulty.basic {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.lesson-difficulty.intermediate {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.lesson-difficulty.advanced {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-/* ============================================
-   Main Content Container (전역 중앙정렬)
-   ============================================ */
-.main-content-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-left: 32px;
-  padding-right: 32px;
-}
-
-/* LessonPage 전용 (더 넓게) */
-.lesson-content-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding-left: 32px;
-  padding-right: 32px;
-}
-
-
-/* ============================================
-   Lesson Page Layout
-   ============================================ */
-.lesson-page-container {
-  padding-left: 48px;
-  padding-right: 48px;
-}
-
-@media (min-width: 768px) {
-  .lesson-page-container {
-    padding-left: 64px;
-    padding-right: 64px;
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
-}
 
-@media (min-width: 1024px) {
-  .lesson-page-container {
-    padding-left: 80px;
-    padding-right: 80px;
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--foreground);
+    min-height: 100vh;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  /* Typography */
+  h1, h2, h3, .heading {
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+
+  pre, code {
+    font-family: var(--font-mono);
+  }
+
+  /* Focus States */
+  input:focus,
+  textarea:focus,
+  button:focus {
+    outline: none;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-tertiary);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-yellow);
+    box-shadow: var(--shadow-neon-yellow);
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--neon-yellow);
+    color: #1a1a2e;
+  }
+
+  /* shadcn/ui integration */
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply text-foreground;
   }
 }
 
 /* ============================================
-   Cyberpunk Back Button (Soft)
+   @layer components - 중간 우선순위
+   재사용 가능한 컴포넌트 스타일
+   Tailwind 유틸리티로 오버라이드 가능!
    ============================================ */
-.cyber-back-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #937b5d;
-  background: rgba(255, 248, 240, 0.8);
-  border: 1px solid #e5d5c7;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: all 0.15s ease;
-}
+@layer components {
+  /* === Buttons === */
+  .btn-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+  }
 
-.cyber-back-btn:hover {
-  color: #7c5e3c;
-  border-color: #d4c4b0;
-  background: rgba(255, 248, 240, 1);
-  box-shadow: 0 2px 8px rgba(147, 123, 93, 0.15);
-}
+  .btn-base:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 
-.cyber-back-arrow {
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1;
-}
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    background: #a08060;
+    border: 1px solid #8b6d4f;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
 
-.cyber-divider {
-  width: 1px;
-  height: 20px;
-  background: #e5d5c7;
+  .btn-primary:hover:not(:disabled) {
+    background: #8b6d4f;
+    box-shadow: 0 2px 8px rgba(139, 109, 79, 0.25);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    background: rgba(255, 251, 245, 0.9);
+    border: 1px solid #e5d5c7;
+    color: #7a6a5a;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: #fff;
+    border-color: #d4c4b0;
+    color: #5a4a3a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .btn-secondary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-success {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    background: #7a9a7a;
+    border: 1px solid #6a8a6a;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-success:hover:not(:disabled) {
+    background: #6a8a6a;
+    box-shadow: 0 2px 8px rgba(106, 138, 106, 0.25);
+  }
+
+  .btn-success:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    background: #c08080;
+    border: 1px solid #a06a6a;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background: #a06a6a;
+    box-shadow: 0 2px 8px rgba(160, 106, 106, 0.25);
+  }
+
+  .btn-danger:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-cyan {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    background: #6a9a9a;
+    border: 1px solid #5a8a8a;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-cyan:hover:not(:disabled) {
+    background: #5a8a8a;
+    box-shadow: 0 2px 8px rgba(90, 138, 138, 0.25);
+  }
+
+  .btn-cyan:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* === Badge === */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-gold {
+    background: linear-gradient(135deg, #FFD700 0%, #F59E0B 100%);
+    color: #1a1a2e;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+
+  .badge-cyan {
+    background: linear-gradient(135deg, #00D9FF 0%, #3B82F6 100%);
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+  }
+
+  .badge-pink {
+    background: linear-gradient(135deg, #FF6B9D 0%, #A855F7 100%);
+    color: white;
+    box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+  }
+
+  /* === XP Bar === */
+  .xp-bar {
+    background: linear-gradient(90deg, var(--neon-green) 0%, var(--neon-cyan) 100%);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    transition: width 0.5s ease;
+  }
+
+  .xp-bar-container {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  /* === Course Header === */
+  .course-header-card {
+    background: rgba(255, 251, 245, 0.95);
+    border: 1px solid #e5d5c7;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .course-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 4px;
+  }
+
+  .course-subtitle {
+    font-size: 13px;
+    color: #937b5d;
+    margin-bottom: 20px;
+  }
+
+  .course-progress {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .course-progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    color: #937b5d;
+    margin-bottom: 6px;
+  }
+
+  .course-progress-bar {
+    height: 6px;
+    background: #f0e6da;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .course-progress-fill {
+    height: 100%;
+    background: #7a9a7a;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  /* === Chapter Card === */
+  .chapter-card {
+    background: rgba(255, 251, 245, 0.95);
+    border: 1px solid #e5d5c7;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .chapter-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease;
+  }
+
+  .chapter-header:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .chapter-info {
+    flex: 1;
+  }
+
+  .chapter-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .chapter-title.completed {
+    color: #7a9a7a;
+  }
+
+  .chapter-desc {
+    font-size: 12px;
+    color: #937b5d;
+    margin-top: 2px;
+  }
+
+  .chapter-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .chapter-badge {
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: #f5efe7;
+    color: #937b5d;
+  }
+
+  .chapter-badge.progress {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .chapter-badge.complete {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .chapter-arrow {
+    font-size: 18px;
+    color: #c5b5a5;
+    transform: rotate(90deg);
+    transition: transform 0.2s ease;
+  }
+
+  .chapter-arrow.open {
+    transform: rotate(-90deg);
+  }
+
+  .chapter-progress {
+    height: 3px;
+    background: #f0e6da;
+  }
+
+  .chapter-progress-fill {
+    height: 100%;
+    background: #a08060;
+    transition: width 0.3s ease;
+  }
+
+  .chapter-progress-fill.complete {
+    background: #7a9a7a;
+  }
+
+  .chapter-lessons {
+    padding: 12px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* === Lesson Item === */
+  .lesson-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #e5d5c7;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+  }
+
+  .lesson-item:hover {
+    border-color: #d4c4b0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .lesson-item.completed {
+    background: #fafafa;
+    border-color: #e8e8e8;
+  }
+
+  .lesson-item.in-progress {
+    border-left: 3px solid #a08060;
+  }
+
+  .lesson-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e5d5c7;
+    flex-shrink: 0;
+  }
+
+  .lesson-status.active {
+    background: #a08060;
+  }
+
+  .lesson-status.done {
+    background: #7a9a7a;
+  }
+
+  .lesson-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .lesson-title.done {
+    color: #999;
+    text-decoration: line-through;
+  }
+
+  .lesson-difficulty {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .lesson-difficulty.basic {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .lesson-difficulty.intermediate {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .lesson-difficulty.advanced {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  /* === Containers === */
+  .main-content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .lesson-content-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .lesson-page-container {
+    padding-top: 8px;
+    padding-bottom: 16px;
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+
+  @media (min-width: 768px) {
+    .lesson-page-container {
+      padding-left: 64px;
+      padding-right: 64px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .lesson-page-container {
+      padding-left: 80px;
+      padding-right: 80px;
+    }
+  }
+
+  /* === Cyber Back Button === */
+  .cyber-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #937b5d;
+    background: rgba(255, 248, 240, 0.8);
+    border: 1px solid #e5d5c7;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .cyber-back-btn:hover {
+    color: #7c5e3c;
+    border-color: #d4c4b0;
+    background: rgba(255, 248, 240, 1);
+    box-shadow: 0 2px 8px rgba(147, 123, 93, 0.15);
+  }
+
+  .cyber-back-arrow {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  .cyber-divider {
+    width: 1px;
+    height: 20px;
+    background: #e5d5c7;
+  }
+
+  /* === Step Controls === */
+  .step-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(255, 251, 245, 0.95);
+    border: 1px solid #e5d5c7;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .step-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e5d5c7;
+    border-radius: 6px;
+    background: transparent;
+    color: #937b5d;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .step-btn:hover:not(:disabled) {
+    background: #937b5d;
+    border-color: #937b5d;
+    color: #fff;
+  }
+
+  .step-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
+
+  .step-btn-quiz {
+    width: auto;
+    padding: 0 14px;
+    background: linear-gradient(135deg, #e8a87c 0%, #d4896a 100%);
+    border-color: #d4896a;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .step-btn-quiz:hover {
+    background: linear-gradient(135deg, #f0b88c 0%, #e8a87c 100%);
+  }
+
+  .step-progress {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px;
+  }
+
+  .step-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: #f0e6da;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .step-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #e8a87c 0%, #d4896a 100%);
+    border-radius: 2px;
+  }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: #937b5d;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  /* === Card Effects === */
+  .card-hover-glow {
+    transition: all 0.3s ease;
+  }
+
+  .card-hover-glow:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover), var(--shadow-neon-yellow);
+  }
+
+  /* === Home Background === */
+  .home-bg {
+    background: var(--color-bg);
+  }
 }
 
 /* ============================================
-   Step Controls (Warm Minimal)
+   @layer utilities - 높은 우선순위
+   단일 목적 유틸리티 클래스
    ============================================ */
-.step-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  background: rgba(255, 251, 245, 0.95);
-  border: 1px solid #e5d5c7;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
+@layer utilities {
+  /* Glow Effects */
+  .glow-yellow {
+    box-shadow: var(--shadow-neon-yellow);
+  }
 
-.step-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: 32px;
-  height: 32px;
-  border: 1px solid #e5d5c7;
-  border-radius: 6px;
-  background: transparent;
-  color: #937b5d;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
+  .glow-cyan {
+    box-shadow: var(--shadow-neon-cyan);
+  }
 
-.step-btn:hover:not(:disabled) {
-  background: #937b5d;
-  border-color: #937b5d;
-  color: #fff;
-}
+  .text-glow-yellow {
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
 
-.step-btn:disabled {
-  opacity: 0.25;
-  cursor: not-allowed;
-}
+  .text-glow-cyan {
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+  }
 
-.step-btn-quiz {
-  width: auto;
-  padding: 0 14px;
-  background: linear-gradient(135deg, #e8a87c 0%, #d4896a 100%);
-  border-color: #d4896a;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
+  /* Gradient Text */
+  .gradient-text-gold {
+    background: linear-gradient(135deg, #FFD700 0%, #F97316 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-.step-btn-quiz:hover {
-  background: linear-gradient(135deg, #f0b88c 0%, #e8a87c 100%);
-}
+  .gradient-text-cyber {
+    background: linear-gradient(135deg, #00D9FF 0%, #A855F7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-.step-progress {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 8px;
-}
+  /* Animation Utilities */
+  .emoji-bounce {
+    display: inline-block;
+    animation: emojiBounce 2s ease-in-out infinite;
+  }
 
-.step-progress-bar {
-  flex: 1;
-  height: 4px;
-  background: #f0e6da;
-  border-radius: 2px;
-  overflow: hidden;
-}
+  .level-up {
+    animation: levelUp 0.5s ease;
+  }
 
-.step-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #e8a87c 0%, #d4896a 100%);
-  border-radius: 2px;
-}
+  .streak-fire {
+    animation: firePulse 1s ease-in-out infinite;
+  }
 
-.step-label {
-  font-size: 11px;
-  font-weight: 600;
-  font-family: var(--font-mono);
-  color: #937b5d;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
 }
 
 /* ============================================
-   Card Hover Effects
-   ============================================ */
-.card-hover-glow {
-  transition: all 0.3s ease;
-}
-
-.card-hover-glow:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-card-hover), var(--shadow-neon-yellow);
-}
-
-/* ============================================
-   HomePage Spacing (Removed - now inline)
-   ============================================ */
-/* HomePage uses inline Tailwind classes for spacing */
-
-/* ============================================
-   Animations
+   Keyframes (레이어 밖 - 전역 애니메이션)
    ============================================ */
 @keyframes emojiBounce {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   25% { transform: translateY(-5px) rotate(-5deg); }
   75% { transform: translateY(-5px) rotate(5deg); }
-}
-
-.emoji-bounce {
-  display: inline-block;
-  animation: emojiBounce 2s ease-in-out infinite;
 }
 
 @keyframes levelUp {
@@ -861,26 +861,14 @@ button:focus {
   100% { transform: scale(1); opacity: 1; }
 }
 
-.level-up {
-  animation: levelUp 0.5s ease;
-}
-
 @keyframes firePulse {
   0%, 100% { filter: brightness(1); }
   50% { filter: brightness(1.3); }
 }
 
-.streak-fire {
-  animation: firePulse 1s ease-in-out infinite;
-}
-
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
-}
-
-.float {
-  animation: float 3s ease-in-out infinite;
 }
 
 /* ============================================
@@ -918,18 +906,61 @@ button:focus {
   --color-chart-5: var(--chart-5);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+/* ============================================
+   Tab Notification Animations (GPU accelerated)
+   ============================================ */
+
+/* 탭 전체 부드러운 glow */
+@keyframes tabGlow {
+  0% {
+    filter: brightness(1);
   }
-  body {
-    @apply text-foreground;
+  40% {
+    filter: brightness(1.15);
+  }
+  100% {
+    filter: brightness(1);
   }
 }
 
-/* ============================================
-   HomePage Background (Clean - 배경 통일)
-   ============================================ */
-.home-bg {
-  background: var(--color-bg);
+/* 아이콘 팝 효과 */
+@keyframes iconPop {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.25) rotate(-8deg);
+  }
+  70% {
+    transform: scale(0.95) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* 텍스트 팝 효과 (아이콘보다 살짝 늦게) */
+@keyframes textPop {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(1.1) translateY(-1px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* AI 스트리밍 커서 깜박임 */
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }

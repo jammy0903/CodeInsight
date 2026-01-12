@@ -1,0 +1,117 @@
+{
+  "lessonId": "py-7-1",
+  "title": "참조 카운팅",
+  "concept": "객체는 참조 횟수가 0이 되면 자동 삭제! sys.getrefcount()로 확인!",
+  "content": {
+    "code": "import sys\n\na = [1, 2, 3]\nprint(f\"a만 참조: {sys.getrefcount(a)}\")\n\nb = a  # 같은 객체 참조\nprint(f\"a, b 참조: {sys.getrefcount(a)}\")\n\nc = a  # 또 참조\nprint(f\"a, b, c 참조: {sys.getrefcount(a)}\")\n\ndel b  # 참조 제거\nprint(f\"del b 후: {sys.getrefcount(a)}\")",
+    "steps": [
+      {
+        "line": 3,
+        "title": "객체 생성과 첫 참조",
+        "explanation": "`a = [1, 2, 3]`\n\n리스트 객체가 생성되고 `a`가 참조합니다.\n\n**참조 카운팅 (Reference Counting)**\n- 파이썬의 메모리 관리 핵심!\n- 각 객체는 \"몇 개의 이름이 나를 가리키나?\"를 기록\n- 이 숫자가 참조 횟수 (refcount)",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_obj" }
+          ],
+          "objects": [
+            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 1)", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "getrefcount 이해",
+        "explanation": "`sys.getrefcount(a)` → **2**가 나옴!\n\n**왜 1이 아니라 2?**\n- a가 가리키는 참조: 1\n- getrefcount 함수에 전달될 때 임시 참조: +1\n\n실제 refcount = 출력값 - 1",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_obj" }
+          ],
+          "objects": [
+            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 1+1)", "pyId": "140100" }
+          ],
+          "output": ["a만 참조: 2"]
+        }
+      },
+      {
+        "line": 6,
+        "title": "참조 추가 (b = a)",
+        "explanation": "`b = a` - 같은 객체를 b도 가리킴!\n\n**참조 횟수 증가!**\n- 실제 refcount: 2 (a, b)\n- getrefcount 출력: 3 (+1 임시)\n\n객체는 복사되지 않음, 화살표만 추가!",
+        "highlight": [6, 7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_obj" },
+            { "name": "b", "pointsTo": "list_obj" }
+          ],
+          "objects": [
+            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 2)", "pyId": "140100", "highlight": true }
+          ],
+          "output": ["a만 참조: 2", "a, b 참조: 3"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "참조 또 추가 (c = a)",
+        "explanation": "`c = a` - 세 번째 참조!\n\n**refcount = 3** (a, b, c)\n\n같은 메모리의 객체를 세 이름이 공유!\n→ 메모리 효율적",
+        "highlight": [9, 10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_obj" },
+            { "name": "b", "pointsTo": "list_obj" },
+            { "name": "c", "pointsTo": "list_obj" }
+          ],
+          "objects": [
+            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 3)", "pyId": "140100", "highlight": true }
+          ],
+          "output": ["a만 참조: 2", "a, b 참조: 3", "a, b, c 참조: 4"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "참조 제거 (del b)",
+        "explanation": "`del b` - b 변수 삭제!\n\n**중요:** 객체가 삭제되는 게 아님!\nb라는 이름(참조)만 제거됨\n\n**refcount 감소**: 3 → 2\n아직 a, c가 참조하므로 객체는 살아있음!",
+        "highlight": [12, 13],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "list_obj" },
+            { "name": "c", "pointsTo": "list_obj" }
+          ],
+          "objects": [
+            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 2)", "pyId": "140100", "highlight": true }
+          ],
+          "output": ["a만 참조: 2", "a, b 참조: 3", "a, b, c 참조: 4", "del b 후: 3"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "참조 횟수가 0이 되면?",
+    "options": [
+      "아무 일도 안 일어난다",
+      "객체가 즉시 메모리에서 삭제된다",
+      "에러가 발생한다",
+      "가비지 컬렉터가 나중에 삭제한다"
+    ],
+    "correctIndex": 1,
+    "explanation": "CPython에서 참조 횟수가 0이 되면 객체는 즉시 메모리에서 해제됩니다. 이것이 참조 카운팅의 장점 - 지연 없이 바로 정리!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "del은 객체를 삭제한다",
+      "correct": "del은 이름(참조)만 삭제, 객체는 refcount=0일 때 삭제",
+      "why": "다른 변수가 같은 객체를 가리키면 del 후에도 객체는 살아있습니다."
+    },
+    {
+      "wrong": "getrefcount()가 정확한 참조 수를 보여준다",
+      "correct": "함수 호출 시 임시 참조가 +1 되어 항상 1 크게 나온다",
+      "why": "인자로 전달될 때 임시 참조가 생깁니다. 실제값 = 출력값 - 1"
+    }
+  ],
+  "keyTakeaway": "파이썬은 참조 카운팅으로 메모리 관리! refcount=0이면 즉시 삭제!"
+}

@@ -1,0 +1,153 @@
+{
+  "lessonId": "py-2-5",
+  "title": "String Interning",
+  "concept": "Python reuses some string objects automatically for performance!",
+  "content": {
+    "code": "a = \"hello\"\nb = \"hello\"\nprint(f\"a is b: {a is b}\")\n\nx = \"hello world\"\ny = \"hello world\"\nprint(f\"x is y: {x is y}\")\n\ns1 = \"hello\" + \" \" + \"world\"\ns2 = \"hello world\"\nprint(f\"s1 is s2: {s1 is s2}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Create string 'hello'",
+        "explanation": "`a = \"hello\"` creates a string object.\n\nPython **interns** short, simple strings (identifiers) for efficiency.\n\n\"Interning\" means reusing the same object for identical strings.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "str_hello" }
+          ],
+          "objects": [
+            { "id": "str_hello", "type": "str", "value": "\"hello\"", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "b = 'hello' - SAME object!",
+        "explanation": "`b = \"hello\"` points to the **same** string object!\n\nPython sees that \"hello\" already exists and reuses it.\n\nThis is similar to integer caching, but the rules are different.",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "str_hello" },
+            { "name": "b", "pointsTo": "str_hello" }
+          ],
+          "objects": [
+            { "id": "str_hello", "type": "str", "value": "\"hello\"", "pyId": "140100" }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "a is b → True!",
+        "explanation": "**`a is b` returns `True`!**\n\nBoth point to the exact same string object.\n\n**When does Python intern strings?**\n- String literals that look like identifiers\n- Short strings without spaces/special chars\n- Compile-time constants",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "str_hello" },
+            { "name": "b", "pointsTo": "str_hello" }
+          ],
+          "objects": [
+            { "id": "str_hello", "type": "str", "value": "\"hello\"", "pyId": "140100" }
+          ],
+          "output": ["a is b: True"]
+        }
+      },
+      {
+        "line": 5,
+        "title": "String with space",
+        "explanation": "Now let's try \"hello world\" (with a space).\n\nStrings with spaces are **less likely** to be interned automatically.\n\n(But the exact behavior depends on Python version and context!)",
+        "highlight": [5, 6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "str_hello" },
+            { "name": "b", "pointsTo": "str_hello" },
+            { "name": "x", "pointsTo": "str_hw1" },
+            { "name": "y", "pointsTo": "str_hw1" }
+          ],
+          "objects": [
+            { "id": "str_hello", "type": "str", "value": "\"hello\"", "pyId": "140100" },
+            { "id": "str_hw1", "type": "str", "value": "\"hello world\"", "pyId": "140200" }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "May or may not be same object",
+        "explanation": "**This result varies!**\n\nIn some Python versions/contexts, `x is y` might be:\n- `True` (if optimizer interns it)\n- `False` (if not interned)\n\n**The lesson:** Never rely on string interning!",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x", "pointsTo": "str_hw1" },
+            { "name": "y", "pointsTo": "str_hw1" }
+          ],
+          "objects": [
+            { "id": "str_hw1", "type": "str", "value": "\"hello world\"", "pyId": "140200" }
+          ],
+          "output": ["a is b: True", "x is y: True"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Runtime concatenation",
+        "explanation": "`s1 = \"hello\" + \" \" + \"world\"` creates a new string at runtime.\n\nThis is **different** from compile-time constants.\n\nThe result depends on whether Python optimizes it.",
+        "highlight": [9, 10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "s1", "pointsTo": "str_hw2" },
+            { "name": "s2", "pointsTo": "str_hw1" }
+          ],
+          "objects": [
+            { "id": "str_hw1", "type": "str", "value": "\"hello world\"", "pyId": "140200" },
+            { "id": "str_hw2", "type": "str", "value": "\"hello world\"", "pyId": "140300", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "s1 is s2 - Unpredictable!",
+        "explanation": "**This result is UNPREDICTABLE!**\n\nDon't rely on string interning behavior.\n\n**The Golden Rule:**\n- Use `==` to compare string VALUES\n- Use `is` only when you need identity (rare)\n\nString interning is an **implementation detail**, not a guarantee.",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "s1", "pointsTo": "str_hw2" },
+            { "name": "s2", "pointsTo": "str_hw1" }
+          ],
+          "objects": [
+            { "id": "str_hw1", "type": "str", "value": "\"hello world\"", "pyId": "140200" },
+            { "id": "str_hw2", "type": "str", "value": "\"hello world\"", "pyId": "140300" }
+          ],
+          "output": ["a is b: True", "x is y: True", "s1 is s2: False"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Which comparison is ALWAYS correct for checking if two strings are equal?",
+    "options": [
+      "a is b",
+      "a == b",
+      "id(a) == id(b)",
+      "a is b or a == b"
+    ],
+    "correctIndex": 1,
+    "explanation": "Always use == for value comparison! 'is' checks identity (same object), which depends on Python's internal optimizations. Two equal strings might be different objects."
+  },
+  "misconceptions": [
+    {
+      "wrong": "'is' and '==' are interchangeable for strings",
+      "correct": "'is' checks identity, '==' checks value",
+      "why": "String interning is unpredictable. Always use == for string comparison."
+    },
+    {
+      "wrong": "All identical strings are the same object",
+      "correct": "Only some strings are interned, and the rules are complex",
+      "why": "Interning depends on string content, how it was created, and Python version."
+    }
+  ],
+  "keyTakeaway": "String interning is an optimization, not a guarantee. ALWAYS use == for string comparison!"
+}

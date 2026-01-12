@@ -172,8 +172,8 @@ export function Sidebar() {
                           <p className="text-sm font-semibold text-[#6b5a4a] truncate">
                             {appUser.nickname}
                           </p>
-                          <p className="text-xs text-[#937b5d] truncate">
-                            {appUser.oauthAccounts[0]?.email || firebaseUser.email}
+                          <p className="text-xs text-[#937b5d] truncate capitalize">
+                            {appUser.oauthAccounts[0]?.provider || 'OAuth'}
                           </p>
                         </div>
                       </div>

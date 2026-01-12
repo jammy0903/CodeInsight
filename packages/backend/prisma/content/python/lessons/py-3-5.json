@@ -1,0 +1,160 @@
+{
+  "lessonId": "py-3-5",
+  "title": "Dictionary Mutability",
+  "concept": "Dictionaries are mutable - adding, modifying, and removing keys changes the same object!",
+  "content": {
+    "code": "person = {\"name\": \"Alice\", \"age\": 25}\nprint(f\"id = {id(person)}\")\n\nperson[\"age\"] = 26\nperson[\"city\"] = \"Seoul\"\nprint(f\"After changes: {person}\")\nprint(f\"id = {id(person)}\")\n\nref = person\nref[\"name\"] = \"Bob\"\nprint(f\"person: {person}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Create a dictionary",
+        "explanation": "`person = {\"name\": \"Alice\", \"age\": 25}` creates a dictionary object.\n\n**Dictionaries are MUTABLE** - like lists, they can be modified in place.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "person", "pointsTo": "dict_1" }
+          ],
+          "objects": [
+            { "id": "dict_1", "type": "dict", "value": "{name: Alice, age: 25}", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "Note the id",
+        "explanation": "Let's remember this id.\n\nFor mutable objects, the id stays the same after modification!",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "person", "pointsTo": "dict_1" }
+          ],
+          "objects": [
+            { "id": "dict_1", "type": "dict", "value": "{name: Alice, age: 25}", "pyId": "140100" }
+          ],
+          "output": ["id = 140100"]
+        }
+      },
+      {
+        "line": 4,
+        "title": "Modify existing key",
+        "explanation": "`person[\"age\"] = 26` modifies the value for key \"age\".\n\n**In-place modification** - same dictionary object!",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "person", "pointsTo": "dict_1" }
+          ],
+          "objects": [
+            { "id": "dict_1", "type": "dict", "value": "{name: Alice, age: 26}", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Add new key",
+        "explanation": "`person[\"city\"] = \"Seoul\"` adds a new key-value pair.\n\n**Still the same object!** No new dictionary created.",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "person", "pointsTo": "dict_1" }
+          ],
+          "objects": [
+            { "id": "dict_1", "type": "dict", "value": "{name: Alice, age: 26, city: Seoul}", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "SAME id!",
+        "explanation": "**The id is unchanged!**\n\nThis proves all modifications happened to the same object.\n\n**Like lists:** `d[key] = value` modifies in place.",
+        "highlight": [6, 7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "person", "pointsTo": "dict_1" }
+          ],
+          "objects": [
+            { "id": "dict_1", "type": "dict", "value": "{name: Alice, age: 26, city: Seoul}", "pyId": "140100" }
+          ],
+          "output": ["id = 140100", "After changes: {'name': 'Alice', 'age': 26, 'city': 'Seoul'}", "id = 140100"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Create alias",
+        "explanation": "`ref = person` creates an **alias**.\n\nNow `ref` and `person` point to the SAME dictionary!\n\n**Same trap as lists!**",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "person", "pointsTo": "dict_1" },
+            { "name": "ref", "pointsTo": "dict_1" }
+          ],
+          "objects": [
+            { "id": "dict_1", "type": "dict", "value": "{name: Alice, age: 26, city: Seoul}", "pyId": "140100" }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "Modify through alias",
+        "explanation": "`ref[\"name\"] = \"Bob\"` modifies the shared dictionary.\n\nSince both names point to the same object...",
+        "highlight": [10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "person", "pointsTo": "dict_1" },
+            { "name": "ref", "pointsTo": "dict_1" }
+          ],
+          "objects": [
+            { "id": "dict_1", "type": "dict", "value": "{name: Bob, age: 26, city: Seoul}", "pyId": "140100", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "person ALSO changed!",
+        "explanation": "**Both see the change!**\n\n`person: {'name': 'Bob', 'age': 26, 'city': 'Seoul'}`\n\n**Dictionaries have the same aliasing trap as lists!**\n\nUse `.copy()` or `dict()` to avoid this.",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "person", "pointsTo": "dict_1" },
+            { "name": "ref", "pointsTo": "dict_1" }
+          ],
+          "objects": [
+            { "id": "dict_1", "type": "dict", "value": "{name: Bob, age: 26, city: Seoul}", "pyId": "140100" }
+          ],
+          "output": ["id = 140100", "After changes: {'name': 'Alice', 'age': 26, 'city': 'Seoul'}", "id = 140100", "person: {'name': 'Bob', 'age': 26, 'city': 'Seoul'}"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What creates an independent copy of dict d?",
+    "options": [
+      "e = d",
+      "e = d.copy()",
+      "e = dict(d)",
+      "Both B and C"
+    ],
+    "correctIndex": 3,
+    "explanation": "Both d.copy() and dict(d) create shallow copies. e = d just creates an alias. For nested dicts, use copy.deepcopy()."
+  },
+  "misconceptions": [
+    {
+      "wrong": "d2 = d1 creates a copy of the dictionary",
+      "correct": "d2 = d1 creates an alias - both point to same dict",
+      "why": "Assignment binds names to objects. It never copies objects."
+    },
+    {
+      "wrong": "Dictionary keys can be lists",
+      "correct": "Dictionary keys must be immutable (strings, numbers, tuples)",
+      "why": "Mutable objects can't be hashed consistently, so they can't be keys."
+    }
+  ],
+  "keyTakeaway": "Dictionaries are MUTABLE like lists. d[key] = value modifies in place. Watch out for aliasing!"
+}

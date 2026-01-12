@@ -8,9 +8,17 @@
       {
         "line": 4,
         "title": "배열 선언과 초기화",
-        "explanation": "int arr[5]는 4바이트 × 5 = 20바이트의 연속된 메모리를 할당합니다. 각 요소가 연속해서 배치됩니다.",
-        "highlight": [4],
+        "explanation": "int arr[5]는 4바이트 × 5 = **20바이트**의 연속된 메모리를 할당합니다.\n\n**왜 '연속'이어야 할까?** 인덱스 접근이 빠르기 때문이에요. arr[3]의 주소는 `시작주소 + 3×4`로 **즉시 계산** 가능합니다. 흩어져 있으면 매번 찾아다녀야 해요.\n\n**배열 vs 변수 5개:**\n- int a, b, c, d, e; → 각각 따로 관리\n- int arr[5]; → 하나의 덩어리로 관리\n\n연속 배치 덕분에 **반복문으로 한 번에 처리**할 수 있습니다!",
+        "highlight": [
+          4
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -18,7 +26,8 @@
             "type": "int",
             "size": 4,
             "value": 10,
-            "address": "0x7ffc1000"
+            "address": "0x7ffc1000",
+            "frame": "main"
           },
           {
             "action": "allocate",
@@ -27,7 +36,8 @@
             "type": "int",
             "size": 4,
             "value": 20,
-            "address": "0x7ffc1004"
+            "address": "0x7ffc1004",
+            "frame": "main"
           },
           {
             "action": "allocate",
@@ -36,7 +46,8 @@
             "type": "int",
             "size": 4,
             "value": 30,
-            "address": "0x7ffc1008"
+            "address": "0x7ffc1008",
+            "frame": "main"
           },
           {
             "action": "allocate",
@@ -45,7 +56,8 @@
             "type": "int",
             "size": 4,
             "value": 40,
-            "address": "0x7ffc100c"
+            "address": "0x7ffc100c",
+            "frame": "main"
           },
           {
             "action": "allocate",
@@ -54,15 +66,21 @@
             "type": "int",
             "size": 4,
             "value": 50,
-            "address": "0x7ffc1010"
+            "address": "0x7ffc1010",
+            "frame": "main"
           }
         ]
       },
       {
         "line": 6,
         "title": "배열 순회",
-        "explanation": "주소를 보면 각 요소가 4바이트씩 증가합니다: 1000, 1004, 1008... 연속 배치의 증거입니다!",
-        "highlight": [6, 7, 8],
+        "explanation": "주소를 보면 각 요소가 **4바이트씩 증가**합니다: 1000, 1004, 1008...\n\n**왜 4씩 증가할까?** int가 4바이트이기 때문이에요. 연속 배치의 증거입니다!\n\n**주소 계산 공식:**\n```\narr[i]의 주소 = arr의 주소 + i × sizeof(int)\n```\n\n**예시:**\n- arr[0]: 1000 + 0×4 = 1000\n- arr[2]: 1000 + 2×4 = 1008\n- arr[4]: 1000 + 4×4 = 1016\n\nCPU는 이 계산을 **한 번의 명령어**로 처리합니다. 이것이 배열이 빠른 이유예요!",
+        "highlight": [
+          6,
+          7,
+          8
+        ],
+        "stdout": "arr[0] = 10, 주소 = 0x7ffc1000\narr[1] = 20, 주소 = 0x7ffc1004\narr[2] = 30, 주소 = 0x7ffc1008\narr[3] = 40, 주소 = 0x7ffc100c\narr[4] = 50, 주소 = 0x7ffc1010",
         "memoryChanges": []
       }
     ]

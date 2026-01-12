@@ -1,0 +1,138 @@
+{
+  "lessonId": "py-2-4",
+  "title": "Small Integer Caching",
+  "concept": "Python pre-creates integers from -5 to 256 for performance!",
+  "content": {
+    "code": "a = 100\nb = 100\nprint(f\"a is b: {a is b}\")\nprint(f\"Same id: {id(a)} == {id(b)}\")\n\nx = 1000\ny = 1000\nprint(f\"x is y: {x is y}\")\nprint(f\"Different id: {id(x)} != {id(y)}\")",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Create integer 100",
+        "explanation": "`a = 100` binds `a` to an integer object.\n\nBut here's the secret: Python pre-creates integers from **-5 to 256** when it starts up!\n\nSo `a` doesn't create a new object - it just points to the existing 100.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_100" }
+          ],
+          "objects": [
+            { "id": "int_100", "type": "int", "value": "100", "pyId": "9406400", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "b = 100 - SAME object!",
+        "explanation": "`b = 100` also points to the SAME pre-created 100 object!\n\nPython doesn't create a new integer - it reuses the cached one.\n\nThis is called **integer caching** or **interning**.",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_100" },
+            { "name": "b", "pointsTo": "int_100" }
+          ],
+          "objects": [
+            { "id": "int_100", "type": "int", "value": "100", "pyId": "9406400" }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "a is b → True!",
+        "explanation": "**Surprise!** `a is b` returns `True`!\n\nThey're not just equal (`==`), they're the **same object** (`is`).\n\n**Why?** Performance optimization:\n- Common numbers are reused\n- Less memory usage\n- Faster comparisons",
+        "highlight": [3, 4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_100" },
+            { "name": "b", "pointsTo": "int_100" }
+          ],
+          "objects": [
+            { "id": "int_100", "type": "int", "value": "100", "pyId": "9406400" }
+          ],
+          "output": ["a is b: True", "Same id: 9406400 == 9406400"]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Create integer 1000",
+        "explanation": "Now let's try a bigger number: `x = 1000`\n\n1000 is **outside** the cached range (-5 to 256), so Python creates a new integer object.",
+        "highlight": [6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_100" },
+            { "name": "b", "pointsTo": "int_100" },
+            { "name": "x", "pointsTo": "int_1000a" }
+          ],
+          "objects": [
+            { "id": "int_100", "type": "int", "value": "100", "pyId": "9406400" },
+            { "id": "int_1000a", "type": "int", "value": "1000", "pyId": "140500", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "y = 1000 - DIFFERENT object!",
+        "explanation": "`y = 1000` creates **another** integer 1000.\n\nSince 1000 is not cached, Python creates a new object each time.\n\nNow `x` and `y` point to **different objects** with the same value.",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "a", "pointsTo": "int_100" },
+            { "name": "b", "pointsTo": "int_100" },
+            { "name": "x", "pointsTo": "int_1000a" },
+            { "name": "y", "pointsTo": "int_1000b" }
+          ],
+          "objects": [
+            { "id": "int_100", "type": "int", "value": "100", "pyId": "9406400" },
+            { "id": "int_1000a", "type": "int", "value": "1000", "pyId": "140500" },
+            { "id": "int_1000b", "type": "int", "value": "1000", "pyId": "140600", "highlight": true }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "x is y → False!",
+        "explanation": "**Now `x is y` returns `False`!**\n\nThey have the same VALUE (`x == y` is `True`), but they're DIFFERENT OBJECTS.\n\n**The Rule:**\n- `-5` to `256` → same object (cached)\n- Outside range → new object each time",
+        "highlight": [8, 9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "x", "pointsTo": "int_1000a" },
+            { "name": "y", "pointsTo": "int_1000b" }
+          ],
+          "objects": [
+            { "id": "int_1000a", "type": "int", "value": "1000", "pyId": "140500" },
+            { "id": "int_1000b", "type": "int", "value": "1000", "pyId": "140600" }
+          ],
+          "output": ["a is b: True", "Same id: 9406400 == 9406400", "x is y: False", "Different id: 140500 != 140600"]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What is the result?\n\na = 256\nb = 256\nc = 257\nd = 257\nprint(a is b, c is d)",
+    "options": [
+      "True True",
+      "True False",
+      "False False",
+      "False True"
+    ],
+    "correctIndex": 1,
+    "explanation": "256 is cached (in -5 to 256 range), so a is b is True. 257 is NOT cached, so c and d are different objects - c is d is False."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Always use 'is' to compare integers",
+      "correct": "Use '==' for value comparison, 'is' only for identity",
+      "why": "Integer caching is an implementation detail. It can change. Always use == for values."
+    },
+    {
+      "wrong": "All equal integers are the same object",
+      "correct": "Only integers -5 to 256 are guaranteed to be cached",
+      "why": "This is CPython's optimization. Other Python implementations may differ."
+    }
+  ],
+  "keyTakeaway": "Python caches integers -5 to 256. Use == for values, 'is' for identity!"
+}

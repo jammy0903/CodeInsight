@@ -8,9 +8,17 @@
       {
         "line": 5,
         "title": "초기화되지 않은 포인터 (위험!)",
-        "explanation": "p1은 쓰레기 주소를 가집니다. 어떤 메모리를 가리키는지 알 수 없습니다. 역참조하면 프로그램이 크래시할 수 있습니다!",
-        "highlight": [5],
+        "explanation": "p1은 **쓰레기 주소**를 가집니다. 어떤 메모리를 가리키는지 알 수 없어요!\n\n**왜 쓰레기일까?** 지역 변수는 자동 초기화되지 않습니다. 스택의 그 위치에 이전에 있던 값이 그대로 남아있어요.\n\n**위험도: ⚠️ 매우 높음**\n- 운 좋으면: 프로그램이 즉시 크래시 (버그 발견 쉬움)\n- 운 나쁘면: 정상 동작하는 것처럼 보이다가 나중에 크래시 (디버깅 지옥)",
+        "highlight": [
+          5
+        ],
         "memoryChanges": [
+          {
+            "action": "frame",
+            "area": "stack",
+            "name": "main",
+            "type": "frame"
+          },
           {
             "action": "allocate",
             "area": "stack",
@@ -19,15 +27,18 @@
             "size": 8,
             "value": "0x???????? (쓰레기)",
             "address": "0x7ffc1000",
-            "danger": true
+            "danger": true,
+            "frame": "main"
           }
         ]
       },
       {
         "line": 6,
         "title": "NULL 초기화 (안전!)",
-        "explanation": "p2 = NULL은 '아무것도 가리키지 않음'을 명시적으로 표현합니다. NULL은 주소 0입니다.",
-        "highlight": [6],
+        "explanation": "p2 = NULL은 **'아무것도 가리키지 않음'**을 명시적으로 표현합니다.\n\n**NULL이란?** 주소 **0**입니다. 운영체제는 이 주소를 보호해서 접근하면 즉시 크래시해요.\n\n**왜 NULL이 안전할까?**\n- 쓰레기 주소: 어디를 가리키는지 모름 → 이상한 동작 가능\n- NULL: \"가리키는 곳 없음\"이 명확 → 역참조하면 바로 크래시 → 버그 발견 쉬움!\n\n**규칙:** 가리킬 대상이 없으면 **반드시 NULL로 초기화**하세요!",
+        "highlight": [
+          6
+        ],
         "memoryChanges": [
           {
             "action": "allocate",
@@ -37,22 +48,30 @@
             "size": 8,
             "value": "NULL (0x0)",
             "address": "0x7ffc0ff8",
-            "safe": true
+            "safe": true,
+            "frame": "main"
           }
         ]
       },
       {
         "line": 8,
         "title": "쓰레기 포인터 역참조 (금지!)",
-        "explanation": "*p1 = 10;은 임의의 메모리에 쓰는 것입니다. 시스템 메모리를 덮어쓸 수도 있습니다!",
-        "highlight": [8],
+        "explanation": "*p1 = 10;은 **임의의 메모리에 쓰는 것**입니다. 시스템 메모리를 덮어쓸 수도 있어요!\n\n**최악의 시나리오:**\n- 다른 변수 값이 바뀜 (예상치 못한 버그)\n- 시스템 중요 데이터 손상 (크래시)\n- 보안 취약점 (해커가 악용 가능)\n\n이 코드는 **절대 실행하면 안 됩니다!**",
+        "highlight": [
+          8
+        ],
         "memoryChanges": []
       },
       {
         "line": 11,
         "title": "NULL 체크",
-        "explanation": "포인터 사용 전 NULL 체크는 좋은 습관입니다. NULL이면 역참조하지 않습니다.",
-        "highlight": [11, 12, 13],
+        "explanation": "포인터 사용 전 **NULL 체크**는 좋은 습관입니다!\n\n**방어적 프로그래밍:**\n```c\nif (p != NULL) {\n    *p = 10;  // 안전하게 사용\n}\n```\n\n**왜 중요할까?** 프로그램이 복잡해지면 포인터가 NULL인지 아닌지 추적하기 어려워요. 사용 전에 체크하면 크래시를 예방할 수 있습니다.\n\n**모던 C 스타일:** `if (p)` 는 `if (p != NULL)`과 같습니다. NULL은 false로 평가되거든요.",
+        "highlight": [
+          11,
+          12,
+          13
+        ],
+        "stdout": "p2는 아무것도 가리키지 않음",
         "memoryChanges": []
       }
     ]

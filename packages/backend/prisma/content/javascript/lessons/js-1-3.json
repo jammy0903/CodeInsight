@@ -1,14 +1,14 @@
 {
   "lessonId": "js-1-3",
-  "title": "Promise와 Microtask Queue",
-  "concept": "Promise의 then 콜백은 Microtask Queue에 들어가고, Task Queue보다 우선순위가 높다",
+  "title": "Promise & Microtask Queue",
+  "concept": "Promise's then callback goes to Microtask Queue, which has higher priority than Task Queue",
   "content": {
     "code": "console.log('start');\n\nsetTimeout(() => {\n  console.log('timeout');\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log('promise');\n});\n\nconsole.log('end');",
     "steps": [
       {
         "line": 1,
         "title": "console.log('start')",
-        "explanation": "프로그램 시작, 'start' 출력",
+        "explanation": "Program starts, 'start' is printed.",
         "highlight": [1],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -23,8 +23,8 @@
       },
       {
         "line": 3,
-        "title": "setTimeout 등록",
-        "explanation": "setTimeout 콜백이 Web API로 이동합니다.\n\n이전 레슨에서 배운 것처럼, 타이머 완료 후 Task Queue로 갑니다.",
+        "title": "setTimeout registers",
+        "explanation": "The setTimeout callback moves to Web API.\n\nAs learned before, it goes to Task Queue after the timer completes.",
         "highlight": [3, 4, 5],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -41,8 +41,8 @@
       },
       {
         "line": 7,
-        "title": "Promise.resolve().then() 호출",
-        "explanation": "**핵심 포인트!**\n\nPromise.resolve()는 이미 이행된(fulfilled) Promise를 반환합니다.\n\n.then()의 콜백은 **Microtask Queue**에 들어갑니다. Task Queue가 아닙니다!",
+        "title": "Promise.resolve().then() called",
+        "explanation": "**Key Point!**\n\nPromise.resolve() returns an already fulfilled Promise.\n\nThe .then() callback goes to **Microtask Queue** - NOT Task Queue!\n\n**Why a separate queue?**\nPromises need to run their callbacks as soon as possible after they resolve, but still asynchronously. The Microtask Queue provides this 'fast lane' for Promises.",
         "highlight": [7, 8, 9],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -60,7 +60,7 @@
       {
         "line": 11,
         "title": "console.log('end')",
-        "explanation": "'end'가 출력됩니다.\n\n이제 동기 코드가 모두 끝났습니다. 이벤트 루프가 큐를 확인할 차례입니다.",
+        "explanation": "'end' is printed.\n\nAll synchronous code is now done. Time for the Event Loop to check the queues.",
         "highlight": [11],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -75,8 +75,8 @@
       },
       {
         "line": 11,
-        "title": "Microtask Queue 먼저 확인",
-        "explanation": "**이벤트 루프 규칙**:\n\n1. 콜 스택이 비면\n2. **Microtask Queue를 모두 비운다** (우선순위 높음)\n3. 그 다음 Task Queue에서 하나 가져온다\n\nPromise 콜백이 setTimeout보다 먼저 실행됩니다!",
+        "title": "Microtask Queue checked FIRST",
+        "explanation": "**Event Loop Rule**:\n\n1. When Call Stack is empty\n2. **Empty the entire Microtask Queue first** (higher priority)\n3. Then take ONE task from Task Queue\n4. Repeat\n\nPromise callback runs before setTimeout!\n\n**Critical insight**: Microtask Queue must be *completely* empty before ANY Task runs.",
         "highlight": [7, 8, 9],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -91,8 +91,8 @@
       },
       {
         "line": 8,
-        "title": "Promise 콜백 실행",
-        "explanation": "Microtask Queue에서 Promise 콜백을 가져와 실행합니다.\n\n'promise'가 출력됩니다.",
+        "title": "Promise callback executes",
+        "explanation": "The Promise callback is taken from Microtask Queue and executed.\n\n'promise' is printed.",
         "highlight": [8],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -107,8 +107,8 @@
       },
       {
         "line": 8,
-        "title": "Microtask Queue 비움 확인",
-        "explanation": "Microtask Queue가 비었습니다.\n\n이제야 Task Queue를 확인합니다.",
+        "title": "Microtask Queue empty - DANGER ZONE",
+        "explanation": "Microtask Queue is now empty.\n\n**DANGER: Infinite Microtask Loop**\n```js\nfunction infiniteLoop() {\n  Promise.resolve().then(infiniteLoop);\n}\ninfiniteLoop();\n// Browser FREEZES! setTimeout NEVER runs!\n```\n\nBecause Microtask Queue must empty completely before ANY Task runs, infinite microtasks block EVERYTHING - including timers, UI updates, and user input.",
         "highlight": [],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -123,8 +123,8 @@
       },
       {
         "line": 4,
-        "title": "setTimeout 콜백 실행",
-        "explanation": "드디어 setTimeout 콜백이 실행됩니다.\n\n'timeout'이 출력됩니다.\n\n**최종 순서**: start → end → promise → timeout\n\n0ms setTimeout이 Promise.then()보다 늦게 실행되었습니다!",
+        "title": "setTimeout callback finally executes",
+        "explanation": "Finally, the setTimeout callback runs.\n\n'timeout' is printed.\n\n**Final order**: start -> end -> promise -> timeout\n\n0ms setTimeout ran AFTER Promise.then()!\n\n**Interview favorite**: This exact question appears in ~70% of JavaScript interviews about async.",
         "highlight": [4],
         "visualizationType": "eventLoop",
         "eventLoopState": {
@@ -140,27 +140,37 @@
     ]
   },
   "quiz": {
-    "question": "다음 코드의 출력 순서는?\n\nsetTimeout(() => console.log('A'), 0);\nPromise.resolve().then(() => console.log('B'));\nconsole.log('C');",
+    "question": "What's the output order?\n\nsetTimeout(() => console.log('A'), 0);\nPromise.resolve().then(() => console.log('B'));\nconsole.log('C');",
     "options": [
-      "A → B → C",
-      "C → A → B",
-      "C → B → A",
-      "B → C → A"
+      "A -> B -> C",
+      "C -> A -> B",
+      "C -> B -> A",
+      "B -> C -> A"
     ],
     "correctIndex": 2,
-    "explanation": "동기 코드(C) → Microtask(B) → Task(A) 순서로 실행됩니다. Promise의 then 콜백은 Microtask Queue에, setTimeout은 Task Queue에 들어가며, Microtask가 우선순위가 높습니다."
+    "explanation": "Sync code (C) -> Microtask (B) -> Task (A). Promise.then() goes to Microtask Queue, setTimeout to Task Queue. Microtasks have higher priority."
   },
   "misconceptions": [
     {
-      "wrong": "setTimeout(fn, 0)과 Promise.then()은 같은 큐를 사용한다",
-      "correct": "setTimeout은 Task Queue(Macrotask), Promise.then()은 Microtask Queue를 사용합니다.",
-      "why": "Microtask Queue는 항상 Task Queue보다 먼저 처리됩니다."
+      "wrong": "setTimeout(fn, 0) and Promise.then() use the same queue",
+      "correct": "setTimeout uses Task Queue (Macrotask), Promise.then() uses Microtask Queue.",
+      "why": "Microtask Queue is ALWAYS processed before Task Queue."
     },
     {
-      "wrong": "0ms가 더 짧으니까 setTimeout이 먼저 실행된다",
-      "correct": "시간이 아니라 큐의 우선순위가 중요합니다. Microtask는 항상 먼저 실행됩니다.",
-      "why": "이벤트 루프는 각 Task 사이에 Microtask Queue를 완전히 비웁니다."
+      "wrong": "0ms is shorter so setTimeout runs first",
+      "correct": "It's about queue priority, not time. Microtasks ALWAYS run first.",
+      "why": "Event Loop empties all Microtasks between each Task."
+    },
+    {
+      "wrong": "Microtask infinite loop just slows things down",
+      "correct": "Microtask infinite loop FREEZES the browser completely. setTimeout never runs, UI never updates.",
+      "why": "The Microtask Queue must empty completely before ANY Task can run. Infinite microtasks mean the queue never empties."
+    },
+    {
+      "wrong": "Only Promises create microtasks",
+      "correct": "queueMicrotask(), MutationObserver, and process.nextTick (Node.js) also create microtasks.",
+      "why": "Any API that needs 'as soon as possible but still async' uses the Microtask Queue."
     }
   ],
-  "keyTakeaway": "실행 우선순위: 동기 코드 > Microtask (Promise) > Task (setTimeout)"
+  "keyTakeaway": "Priority: Sync > Microtask (Promise) > Task (setTimeout). Microtask Queue empties COMPLETELY before any Task runs!"
 }
