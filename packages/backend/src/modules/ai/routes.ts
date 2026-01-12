@@ -266,24 +266,32 @@ function buildReportAnalysisPrompt(): string {
 - 따뜻하고 격려하는 톤으로 작성
 - 구체적인 데이터를 언급하며 신뢰감 형성
 
-## 분석 포인트
-1. **학습 시간 & 패턴**: 언제, 얼마나 학습하는지
-2. **퀴즈 성과**: 정답률과 취약 개념
-3. **학습 습관**: 꾸준함, 집중 시간대
+## 분석 포인트 (중요도 순)
+1. **구체적 맥락 (있는 경우 최우선)**:
+   - 저장한 노트 → 학생이 중요하게 생각하는 개념
+   - AI 질문 → 헷갈려하는 부분
+   - 최근 틀린 문제 → 취약점
+   - 언어별 학습 시간 → 관심 언어
+
+2. **학습 패턴**: 언제, 얼마나, 어떤 언어를 학습하는지
+3. **퀴즈 성과**: 정답률과 취약 개념
 4. **AI 활용**: 질문 빈도 (적극성 지표)
 
 ## 작성 규칙
-- **4-8문장** 분량의 줄글 (한 문단)
+- **4-10문장** 분량의 줄글 (한 문단)
 - 존댓말, 친근한 코치 톤
 - 칭찬 → 분석 → 제안 순서
-- 숫자/통계를 자연스럽게 녹여서 언급
+- **구체적인 개념/질문 언급** (노트, AI질문, 틀린 문제가 있다면 반드시!)
 - 뻔한 조언 X, 데이터 기반 인사이트 O
 
 ## 응답 형식
 JSON으로 응답하지 마세요. 순수 텍스트로 줄글만 작성하세요.
 
-## 예시 (스타일 참고용)
-"이번 달 27분이라는 학습 시간이 짧아 보일 수 있지만, 9번의 세션으로 꾸준히 접속하신 점이 인상적이에요! 특히 월요일과 저녁 시간대(18-24시)에 집중해서 학습하시는 패턴이 보이는데, 이 시간대를 '나만의 코딩 타임'으로 굳히시면 좋겠어요. 다만 퀴즈를 아직 풀어보지 않으셨네요 - 개념을 읽는 것도 중요하지만, 직접 문제를 풀어봐야 진짜 이해했는지 확인할 수 있어요. 다음 학습 때 레슨 끝의 퀴즈에 도전해보시는 건 어떨까요?"`;
+## 예시 (구체적 맥락 있는 경우)
+"C 언어에 45분, Python에 20분을 투자하셨네요! 특히 '포인터'와 'malloc' 개념을 노트에 저장하신 걸 보니 메모리 관련 주제에 관심이 많으신 것 같아요. AI에게 '역참조가 뭐야?'라고 질문하신 기록도 있는데, 포인터를 제대로 이해하려는 좋은 접근이에요. 다만 '배열과 포인터 관계' 레슨에서 퀴즈를 틀리셨더라고요 - 배열 이름이 포인터로 decay 되는 개념이 헷갈리셨을 수 있어요. 해당 레슨의 시뮬레이션을 다시 천천히 돌려보시면서 메모리 주소 변화를 관찰해보시는 걸 추천드려요!"
+
+## 예시 (기본 통계만 있는 경우)
+"이번 달 27분이라는 학습 시간이 짧아 보일 수 있지만, 9번의 세션으로 꾸준히 접속하신 점이 인상적이에요! 특히 월요일과 저녁 시간대에 집중해서 학습하시는 패턴이 보이는데, 이 시간대를 '나만의 코딩 타임'으로 굳히시면 좋겠어요."`;
 }
 
 // === 자동 해설 엔드포인트 ===
@@ -571,7 +579,8 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
 });
 
 // === 학습 리포트 AI 분석 엔드포인트 ===
-router.post('/analyze-report', async (req, res) => {
+// optionalDbUser: 로그인 시 더 풍부한 데이터로 분석
+router.post('/analyze-report', optionalDbUser, async (req, res) => {
   try {
     const parsed = analyzeReportSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -582,6 +591,7 @@ router.post('/analyze-report', async (req, res) => {
     }
 
     const data = parsed.data;
+    const userId = req.user?.dbUser?.id;
     const provider = getCurrentProvider();
 
     // 데이터를 자연어로 변환
@@ -614,6 +624,91 @@ router.post('/analyze-report', async (req, res) => {
       .map(([concept, count]) => `${concept}(${count}회 오답)`)
       .join(', ');
 
+    // === 로그인 사용자용 추가 데이터 수집 ===
+    let enrichedContext = '';
+
+    if (userId) {
+      // 1. 최근 저장한 노트 (개념 메모)
+      const recentNotes = await prisma.userNote.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: {
+          lesson: { select: { title: true } },
+        },
+      });
+
+      // 2. 최근 AI 질문들
+      const recentChats = await prisma.chatHistory.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: { question: true, context: true },
+      });
+
+      // 3. 언어별 학습 시간 (LessonActivity + Lesson + Chapter + Language)
+      const languageStats = await prisma.$queryRaw<{ language: string; totalSeconds: bigint }[]>`
+        SELECT
+          l."language_id" as language,
+          SUM(la.duration) as "totalSeconds"
+        FROM lesson_activities la
+        JOIN lessons le ON la.lesson_id = le.id
+        JOIN chapters c ON le.chapter_id = c.id
+        JOIN languages l ON c.language_id = l.id
+        WHERE la.user_id = ${userId}::uuid
+          AND la.duration IS NOT NULL
+        GROUP BY l."language_id"
+        ORDER BY "totalSeconds" DESC
+      `;
+
+      // 4. 최근 틀린 퀴즈 상세
+      const recentWrongs = await prisma.quizAttempt.findMany({
+        where: { userId, isCorrect: false },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+        include: {
+          quiz: {
+            select: {
+              question: true,
+              lesson: { select: { title: true } },
+            },
+          },
+        },
+      });
+
+      // 컨텍스트 문자열 생성
+      if (recentNotes.length > 0) {
+        const notesList = recentNotes
+          .map((n) => `- "${n.concept}" (${n.lesson.title}${n.isFromWrong ? ', 오답 후 저장' : ''})`)
+          .join('\n');
+        enrichedContext += `\n### 최근 저장한 개념 노트\n${notesList}\n`;
+      }
+
+      if (recentChats.length > 0) {
+        const chatsList = recentChats
+          .map((c) => `- "${c.question.slice(0, 50)}${c.question.length > 50 ? '...' : ''}"`)
+          .join('\n');
+        enrichedContext += `\n### 최근 AI에게 한 질문\n${chatsList}\n`;
+      }
+
+      if (languageStats.length > 0) {
+        const langList = languageStats
+          .map((l) => {
+            const mins = Math.round(Number(l.totalSeconds) / 60);
+            return `- ${l.language.toUpperCase()}: ${mins}분`;
+          })
+          .join('\n');
+        enrichedContext += `\n### 언어별 학습 시간\n${langList}\n`;
+      }
+
+      if (recentWrongs.length > 0) {
+        const wrongList = recentWrongs
+          .map((w) => `- "${w.quiz.question.slice(0, 40)}..." (${w.quiz.lesson.title})`)
+          .join('\n');
+        enrichedContext += `\n### 최근 틀린 문제\n${wrongList}\n`;
+      }
+    }
+
     const userMessage = `## 학생 학습 데이터
 
 ### 기본 통계
@@ -634,8 +729,9 @@ ${weakConceptList || '(데이터 없음)'}
 - 가장 활발한 요일: ${mostActiveDay}요일
 - 선호 시간대: ${mostActiveSlot}
 ${data.streakDays !== undefined ? `- 연속 학습: ${data.streakDays}일` : ''}
-
-위 데이터를 바탕으로 이 학생에게 맞춤형 학습 피드백을 4-8문장의 줄글로 작성해주세요.`;
+${enrichedContext}
+위 데이터를 바탕으로 이 학생에게 맞춤형 학습 피드백을 4-8문장의 줄글로 작성해주세요.
+${enrichedContext ? '특히 저장한 노트, AI 질문, 최근 틀린 문제를 참고하여 구체적인 조언을 해주세요.' : ''}`;
 
     const response = await provider.chat({
       message: userMessage,
