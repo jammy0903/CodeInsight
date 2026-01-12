@@ -15,9 +15,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { getLessonFull, getChapterWithLessons, updateProgress } from '@/services/courses';
-import { useEnterKey } from '@/hooks';
-import { simulatorService } from '@/services/simulator';
-import { useLessonHistoryStore } from '@/stores/lessonHistoryStore';
+// TODO: 다른 서버에서 파일 가져온 후 주석 해제
+// import { useEnterKey } from '@/hooks';
+// import { simulatorService } from '@/services/simulator';
+// import { useLessonHistoryStore } from '@/stores/lessonHistoryStore';
 import type { LessonFull, LessonStep, Quiz, SupportedLanguage } from '@/types';
 
 // 기존 컴포넌트 재사용
@@ -27,7 +28,8 @@ import { SelectedCodeBadge } from './components/day/SelectedCodeBadge';
 import { MemoryPanel } from './components/memory/MemoryPanel';
 import { ReturnOverlay } from '@/features/visualizers/shared';
 import { ChatQA } from '@/features/chat';
-import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
+// TODO: 다른 서버에서 파일 가져온 후 주석 해제
+// import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 
 // 새 hooks
 import { useLessonNavigation } from './hooks/useLessonNavigation';
@@ -36,7 +38,8 @@ import { useCodeSelection } from './hooks/useCodeSelection';
 
 // 언어별 시각화
 import { JSVisualizerView } from '@/features/visualizers/js';
-import { PyVisualizerView } from '@/features/visualizers/python';
+// TODO: 다른 서버에서 파일 가져온 후 주석 해제
+// import { PyVisualizerView } from '@/features/visualizers/python';
 import type { PyName, PyObject } from '@/types/py-simulator';
 
 // Python 레슨 데이터 → PyVisualizerView 변환
@@ -306,17 +309,17 @@ function QuizCardAdapter({
     onComplete(isCorrect);
   };
 
-  // Enter 키로 제출/계속하기
-  useEnterKey({
-    onEnter: () => {
-      if (!submitted && selected !== null) {
-        handleSubmit();
-      } else if (submitted) {
-        handleContinue();
-      }
-    },
-    enabled: (selected !== null && !submitted) || submitted,
-  });
+  // TODO: Enter 키로 제출/계속하기 (다른 서버에서 파일 가져온 후 주석 해제)
+  // useEnterKey({
+  //   onEnter: () => {
+  //     if (!submitted && selected !== null) {
+  //       handleSubmit();
+  //     } else if (submitted) {
+  //       handleContinue();
+  //     }
+  //   },
+  //   enabled: (selected !== null && !submitted) || submitted,
+  // });
 
   return (
     <div className="space-y-4">
@@ -390,8 +393,9 @@ export function LessonPage() {
   const [flashMemory, setFlashMemory] = useState(false);
   const prevStepIndexRef = useRef(0);
 
+  // TODO: 다른 서버에서 파일 가져온 후 주석 해제
   // Lesson 히스토리 저장 (최근 학습 기능용)
-  const addLessonHistory = useLessonHistoryStore((s) => s.addEntry);
+  // const addLessonHistory = useLessonHistoryStore((s) => s.addEntry);
 
   // 데이터 로드
   useEffect(() => {
@@ -412,15 +416,16 @@ export function LessonPage() {
         if (cancelled) return;
         setLesson(lessonData);
 
+        // TODO: 다른 서버에서 파일 가져온 후 주석 해제
         // C 언어인 경우 시뮬레이터 API 호출 (stdout 가져오기)
-        if (lang === 'c' && lessonData.content?.code) {
-          const simResult = await simulatorService.simulate('c', {
-            code: lessonData.content.code,
-          });
-          if (!cancelled && simResult.success) {
-            setSimulatorSteps(simResult.steps);
-          }
-        }
+        // if (lang === 'c' && lessonData.content?.code) {
+        //   const simResult = await simulatorService.simulate('c', {
+        //     code: lessonData.content.code,
+        //   });
+        //   if (!cancelled && simResult.success) {
+        //     setSimulatorSteps(simResult.steps);
+        //   }
+        // }
 
         // 챕터 정보 가져오기 (다음 레슨 찾기용)
         const chapterData = await getChapterWithLessons(lessonData.chapterId);
@@ -449,26 +454,27 @@ export function LessonPage() {
     };
   }, [lessonId, lang]);
 
+  // TODO: 다른 서버에서 파일 가져온 후 주석 해제
   // Lesson 히스토리에 저장 (최근 학습, 이어서 학습 기능용)
-  useEffect(() => {
-    if (!lesson || !lesson.content?.code || !lang) return;
+  // useEffect(() => {
+  //   if (!lesson || !lesson.content?.code || !lang) return;
 
-    // 지원 언어만 저장
-    const supportedLangs = ['c', 'python', 'java'];
-    if (!supportedLangs.includes(lang)) return;
+  //   // 지원 언어만 저장
+  //   const supportedLangs = ['c', 'python', 'java'];
+  //   if (!supportedLangs.includes(lang)) return;
 
-    addLessonHistory({
-      lessonId: lesson.id,
-      chapterId: lesson.chapterId,
-      title: lesson.title,
-      code: lesson.content.code,
-      language: lang as SupportedLanguage,
-    });
+  //   addLessonHistory({
+  //     lessonId: lesson.id,
+  //     chapterId: lesson.chapterId,
+  //     title: lesson.title,
+  //     code: lesson.content.code,
+  //     language: lang as SupportedLanguage,
+  //   });
 
-    if (import.meta.env.DEV) {
-      console.log('[LessonPage] Saved to history:', lesson.title);
-    }
-  }, [lesson, lang, addLessonHistory]);
+  //   if (import.meta.env.DEV) {
+  //     console.log('[LessonPage] Saved to history:', lesson.title);
+  //   }
+  // }, [lesson, lang, addLessonHistory]);
 
   // Steps 추출
   const steps: LessonStep[] = lesson?.content?.steps || [];
@@ -508,35 +514,36 @@ export function LessonPage() {
   // 현재 스텝
   const currentStep = steps[navigation.currentStepIndex];
 
+  // TODO: 다른 서버에서 파일 가져온 후 주석 해제
   // 터미널 출력 라인
   // 1순위: 레슨 JSON의 stdout (정적, 신뢰할 수 있음)
   // 2순위: 시뮬레이터 API 결과 (동적, fallback)
-  const terminalLines = useMemo((): TerminalLine[] => {
-    if (!currentStep) return [];
+  // const terminalLines = useMemo((): TerminalLine[] => {
+  //   if (!currentStep) return [];
 
-    const lines: TerminalLine[] = [];
-    const currentStepIdx = navigation.currentStepIndex;
+  //   const lines: TerminalLine[] = [];
+  //   const currentStepIdx = navigation.currentStepIndex;
 
-    // 현재 스텝까지의 모든 stdout 수집
-    for (let i = 0; i <= currentStepIdx; i++) {
-      const step = steps[i];
-      if (!step) continue;
+  //   // 현재 스텝까지의 모든 stdout 수집
+  //   for (let i = 0; i <= currentStepIdx; i++) {
+  //     const step = steps[i];
+  //     if (!step) continue;
 
-      // 1순위: 레슨 JSON에 stdout이 있으면 사용
-      if (step.stdout) {
-        lines.push({ content: step.stdout, type: 'output' });
-        continue;
-      }
+  //     // 1순위: 레슨 JSON에 stdout이 있으면 사용
+  //     if (step.stdout) {
+  //       lines.push({ content: step.stdout, type: 'output' });
+  //       continue;
+  //     }
 
-      // 2순위: 시뮬레이터 결과에서 같은 라인의 stdout 찾기
-      const simStep = simulatorSteps.find(s => s.line === step.line);
-      if (simStep?.stdout) {
-        lines.push({ content: simStep.stdout, type: 'output' });
-      }
-    }
+  //     // 2순위: 시뮬레이터 결과에서 같은 라인의 stdout 찾기
+  //     const simStep = simulatorSteps.find(s => s.line === step.line);
+  //     if (simStep?.stdout) {
+  //       lines.push({ content: simStep.stdout, type: 'output' });
+  //     }
+  //   }
 
-    return lines;
-  }, [steps, simulatorSteps, currentStep, navigation.currentStepIndex]);
+  //   return lines;
+  // }, [steps, simulatorSteps, currentStep, navigation.currentStepIndex]);
 
   // 스텝 변경 시 탭 반짝임 효과 (앞으로 갈 때만)
   useEffect(() => {
@@ -695,11 +702,10 @@ export function LessonPage() {
               </div>
               {/* 코드 뷰어 */}
               <div
-                className="overflow-hidden"
+                className="overflow-hidden rounded-b-xl"
                 style={{
                   border: '1px solid #E5D5C7',
                   borderTop: 'none',
-                  borderBottom: 'none',
                 }}
               >
                 <CodeViewer
@@ -709,8 +715,9 @@ export function LessonPage() {
                 />
               </div>
 
+              {/* TODO: 다른 서버에서 파일 가져온 후 주석 해제 */}
               {/* 터미널 출력 (VSCode 스타일) */}
-              <div
+              {/* <div
                 className="rounded-b-xl overflow-hidden"
                 style={{
                   border: '1px solid #E5D5C7',
@@ -724,7 +731,7 @@ export function LessonPage() {
                   emptyMessage="실행 결과가 여기에 표시됩니다"
                   compact
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -848,8 +855,9 @@ export function LessonPage() {
                     />
                   )}
 
+                  {/* TODO: 다른 서버에서 파일 가져온 후 주석 해제 */}
                   {/* Python: 참조 모델 시각화 */}
-                  {lang === 'python' && (() => {
+                  {/* {lang === 'python' && (() => {
                     // pythonMemoryState가 있으면 그것을 사용
                     const pyState = currentStep?.pythonMemoryState
                       || convertMemoryChangesToPyState(currentStep?.memoryChanges as MemoryChanges);
@@ -863,7 +871,7 @@ export function LessonPage() {
                         animate={true}
                       />
                     );
-                  })()}
+                  })()} */}
                 </div>
               )}
 
