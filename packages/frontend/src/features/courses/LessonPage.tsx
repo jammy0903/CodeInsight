@@ -821,7 +821,7 @@ export function LessonPage() {
               {/* 메모리/시각화 탭 - 컨테이너 꽉 채우기 */}
               {activeTab === 'memory' && (
                 <div
-                  className="p-2 h-full relative"
+                  className="p-2 min-h-[500px] relative"
                   style={{
                     background: 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)',
                   }}
@@ -878,7 +878,7 @@ export function LessonPage() {
               {/* 설명 탭 - 현재 스텝 설명 */}
               {activeTab === 'explanation' && currentStep && (
                 <div
-                  className="p-4"
+                  className="p-4 min-h-[500px]"
                   style={{
                     background: 'linear-gradient(135deg, #FFF8F0 0%, #FFF5EB 100%)',
                   }}
