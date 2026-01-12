@@ -53,6 +53,23 @@ const switchProviderSchema = z.object({
   provider: z.enum(['deepseek', 'ollama']),
 });
 
+// 리포트 분석 요청 스키마
+const analyzeReportSchema = z.object({
+  totalStudyTime: z.number(), // 초 단위
+  totalSessions: z.number(),
+  quizStats: z.object({
+    total: z.number(),
+    correct: z.number(),
+    accuracy: z.number(),
+  }),
+  aiQuestions: z.number(),
+  weakConcepts: z.record(z.number()), // { "포인터": 5, "배열": 3 }
+  weekdayActivity: z.array(z.number()).length(7), // 일~토
+  hourlyActivity: z.array(z.number()).length(24), // 0~23시
+  recentWrongCount: z.number(),
+  streakDays: z.number().optional(), // 연속 학습 일수
+});
+
 // 시뮬레이션 스텝 기반 설명 요청 스키마
 const explainStepSchema = z.object({
   line: z.number(),
@@ -235,6 +252,38 @@ function buildChatPrompt(context?: z.infer<typeof chatRequestSchema>['context'])
   }
 
   return prompt;
+}
+
+/**
+ * 학습 리포트 분석용 시스템 프롬프트
+ * 학생의 학습 데이터를 분석하여 개인화된 피드백 제공
+ */
+function buildReportAnalysisPrompt(): string {
+  return `당신은 프로그래밍 학습 코치입니다. 학생의 학습 데이터를 분석하여 **개인화된 피드백**을 작성합니다.
+
+## 역할
+- 학생의 학습 패턴, 강점, 개선점을 분석
+- 따뜻하고 격려하는 톤으로 작성
+- 구체적인 데이터를 언급하며 신뢰감 형성
+
+## 분석 포인트
+1. **학습 시간 & 패턴**: 언제, 얼마나 학습하는지
+2. **퀴즈 성과**: 정답률과 취약 개념
+3. **학습 습관**: 꾸준함, 집중 시간대
+4. **AI 활용**: 질문 빈도 (적극성 지표)
+
+## 작성 규칙
+- **4-8문장** 분량의 줄글 (한 문단)
+- 존댓말, 친근한 코치 톤
+- 칭찬 → 분석 → 제안 순서
+- 숫자/통계를 자연스럽게 녹여서 언급
+- 뻔한 조언 X, 데이터 기반 인사이트 O
+
+## 응답 형식
+JSON으로 응답하지 마세요. 순수 텍스트로 줄글만 작성하세요.
+
+## 예시 (스타일 참고용)
+"이번 달 27분이라는 학습 시간이 짧아 보일 수 있지만, 9번의 세션으로 꾸준히 접속하신 점이 인상적이에요! 특히 월요일과 저녁 시간대(18-24시)에 집중해서 학습하시는 패턴이 보이는데, 이 시간대를 '나만의 코딩 타임'으로 굳히시면 좋겠어요. 다만 퀴즈를 아직 풀어보지 않으셨네요 - 개념을 읽는 것도 중요하지만, 직접 문제를 풀어봐야 진짜 이해했는지 확인할 수 있어요. 다음 학습 때 레슨 끝의 퀴즈에 도전해보시는 건 어떨까요?"`;
 }
 
 // === 자동 해설 엔드포인트 ===
@@ -514,6 +563,92 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
       return res.end();
     }
 
+    res.status(500).json({
+      error: 'AI service error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// === 학습 리포트 AI 분석 엔드포인트 ===
+router.post('/analyze-report', async (req, res) => {
+  try {
+    const parsed = analyzeReportSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        details: parsed.error.issues,
+      });
+    }
+
+    const data = parsed.data;
+    const provider = getCurrentProvider();
+
+    // 데이터를 자연어로 변환
+    const studyHours = Math.floor(data.totalStudyTime / 3600);
+    const studyMinutes = Math.floor((data.totalStudyTime % 3600) / 60);
+    const studyTimeStr = studyHours > 0
+      ? `${studyHours}시간 ${studyMinutes}분`
+      : `${studyMinutes}분`;
+
+    // 요일별 활동 분석
+    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+    const maxWeekdayIdx = data.weekdayActivity.indexOf(Math.max(...data.weekdayActivity));
+    const mostActiveDay = weekdays[maxWeekdayIdx];
+
+    // 시간대별 활동 분석
+    const timeSlots = ['새벽(0-6시)', '오전(6-12시)', '오후(12-18시)', '저녁(18-24시)'];
+    const slotTotals = [
+      data.hourlyActivity.slice(0, 6).reduce((a, b) => a + b, 0),
+      data.hourlyActivity.slice(6, 12).reduce((a, b) => a + b, 0),
+      data.hourlyActivity.slice(12, 18).reduce((a, b) => a + b, 0),
+      data.hourlyActivity.slice(18, 24).reduce((a, b) => a + b, 0),
+    ];
+    const maxSlotIdx = slotTotals.indexOf(Math.max(...slotTotals));
+    const mostActiveSlot = timeSlots[maxSlotIdx];
+
+    // 취약 개념 정리
+    const weakConceptList = Object.entries(data.weakConcepts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([concept, count]) => `${concept}(${count}회 오답)`)
+      .join(', ');
+
+    const userMessage = `## 학생 학습 데이터
+
+### 기본 통계
+- 총 학습 시간: ${studyTimeStr}
+- 학습 세션 수: ${data.totalSessions}회
+- AI 질문 횟수: ${data.aiQuestions}회
+
+### 퀴즈 성과
+- 총 퀴즈: ${data.quizStats.total}문제
+- 정답: ${data.quizStats.correct}문제
+- 정답률: ${data.quizStats.accuracy}%
+- 최근 오답 수: ${data.recentWrongCount}개
+
+### 취약 개념 (오답 기준)
+${weakConceptList || '(데이터 없음)'}
+
+### 학습 패턴
+- 가장 활발한 요일: ${mostActiveDay}요일
+- 선호 시간대: ${mostActiveSlot}
+${data.streakDays !== undefined ? `- 연속 학습: ${data.streakDays}일` : ''}
+
+위 데이터를 바탕으로 이 학생에게 맞춤형 학습 피드백을 4-8문장의 줄글로 작성해주세요.`;
+
+    const response = await provider.chat({
+      message: userMessage,
+      history: [],
+      systemPrompt: buildReportAnalysisPrompt(),
+    });
+
+    res.json({
+      analysis: response.content,
+      provider: response.provider,
+    });
+  } catch (error) {
+    logger.error('AI analyze-report error:', error);
     res.status(500).json({
       error: 'AI service error',
       message: error instanceof Error ? error.message : 'Unknown error',

@@ -20,6 +20,7 @@ export const config = {
       aiExplain: '/ai/explain',
       aiExplainStep: '/ai/explain-step',
       aiProviders: '/ai/providers',
+      aiAnalyzeReport: '/ai/analyze-report',
       // 분석 리포트
       analyticsActivity: '/analytics/activity',
       analyticsActivityEnd: '/analytics/activity/end',

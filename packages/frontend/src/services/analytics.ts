@@ -170,3 +170,46 @@ export async function getAnalyticsSummary(
     return null;
   }
 }
+
+// === AI Report Analysis ===
+
+export interface ReportAnalysisRequest {
+  totalStudyTime: number;
+  totalSessions: number;
+  quizStats: {
+    total: number;
+    correct: number;
+    accuracy: number;
+  };
+  aiQuestions: number;
+  weakConcepts: Record<string, number>;
+  weekdayActivity: number[];
+  hourlyActivity: number[];
+  recentWrongCount: number;
+  streakDays?: number;
+}
+
+export interface ReportAnalysisResponse {
+  analysis: string;
+  provider: string;
+}
+
+/**
+ * AI 기반 학습 리포트 분석
+ * @param data 학습 데이터 요약
+ * @returns 개인화된 분석 텍스트
+ */
+export async function getReportAnalysis(
+  data: ReportAnalysisRequest
+): Promise<ReportAnalysisResponse | null> {
+  try {
+    const response = await api.post<ReportAnalysisResponse>(
+      config.api.endpoints.aiAnalyzeReport,
+      data
+    );
+    return response.data;
+  } catch (err) {
+    logger.error('Failed to get report analysis:', err);
+    return null;
+  }
+}
