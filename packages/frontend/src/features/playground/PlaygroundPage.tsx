@@ -1,6 +1,6 @@
 /**
  * PlaygroundPage - Code Simulator (Light Theme)
- * Left 50%: Code Editor + Explanation
+ * Left 50%: Code Editor + Output + Explanation
  * Right 50%: Memory Visualization
  */
 
@@ -19,6 +19,10 @@ import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared
 import { PyVisualizerView } from '@/features/visualizers/python';
 import type { LessonStep } from '@/types';
 
+const LINE_HEIGHT = 19;
+const MIN_EDITOR_HEIGHT = 150;
+const MAX_EDITOR_HEIGHT = 500;
+
 export function PlaygroundPage() {
   const { steps, currentStepIndex, error, registers, language } = usePlaygroundStore();
   const code = useCurrentCode();
@@ -26,6 +30,13 @@ export function PlaygroundPage() {
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
+
+  // Calculate editor height based on code lines
+  const editorHeight = useMemo(() => {
+    const lineCount = code.split('\n').length;
+    const calculated = lineCount * LINE_HEIGHT + 40; // 40px padding
+    return Math.max(MIN_EDITOR_HEIGHT, Math.min(calculated, MAX_EDITOR_HEIGHT));
+  }, [code]);
 
   // Start AI explanation prefetch when simulation steps change
   useEffect(() => {
@@ -72,7 +83,7 @@ export function PlaygroundPage() {
           alignItems: 'flex-start',
         }}
       >
-        {/* ===== Left Panel: Code Editor + Explanation ===== */}
+        {/* ===== Left Panel: Code Editor + Output + Explanation ===== */}
         <Panel
           id="code-editor"
           defaultSize={50}
@@ -102,18 +113,19 @@ export function PlaygroundPage() {
             <StepControls />
           </div>
 
-          {/* Editor - fixed height with internal scroll */}
-          <div style={{ height: '400px', flexShrink: 0 }}>
+          {/* Editor - dynamic height based on code lines */}
+          <div style={{ height: `${editorHeight}px`, flexShrink: 0 }}>
             <CodeEditor />
           </div>
 
-          {/* Terminal Output (printf/scanf) */}
+          {/* Terminal Output - right after code */}
           {terminalLines.length > 0 && (
             <div
               style={{
                 flexShrink: 0,
-                padding: '8px 12px 12px',
+                padding: '8px 12px',
                 backgroundColor: '#ffffff',
+                borderTop: '1px solid #e1e4e8',
               }}
             >
               <TerminalOutput
@@ -124,14 +136,14 @@ export function PlaygroundPage() {
             </div>
           )}
 
-          {/* Explanation Panel - grows with content */}
+          {/* Explanation Panel - after output (or code if no output) */}
           {currentStep && (
             <div
               style={{
-                flexGrow: 1,
-                minHeight: '140px',
-                padding: terminalLines.length > 0 ? '0 12px 12px' : '8px 12px 12px',
+                flexShrink: 0,
+                padding: '8px 12px 12px',
                 backgroundColor: '#ffffff',
+                borderTop: terminalLines.length === 0 ? '1px solid #e1e4e8' : 'none',
               }}
             >
               <div

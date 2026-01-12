@@ -35,7 +35,6 @@ declare global {
           role: string;
           oauthAccounts: {
             provider: string;
-            email: string | null;
           }[];
         };
       };
@@ -129,7 +128,6 @@ export async function requireDbUser(
             oauthAccounts: {
               select: {
                 provider: true,
-                email: true,
               },
             },
           },
