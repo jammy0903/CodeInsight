@@ -9,7 +9,7 @@
  *   - AI 분석 버튼 + 결과 모달
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -27,7 +27,12 @@ import {
   FileText,
   Loader2,
   X,
+  Brain,
+  Target,
 } from 'lucide-react';
+import { useThemeStore } from '@/stores/themeStore';
+import { themes } from '@/config/themes';
+import { getAnalyticsSummary, type AnalyticsSummary } from '@/services/analytics';
 import type { UserProgress } from '@/types';
 
 interface AnalyticsSectionProps {
@@ -49,11 +54,51 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsSummary | null>(null);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
 
-  // 주간 활동 데이터 계산
+  // 테마 적용
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme].dashboard;
+
+  // 분석 데이터 로드
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchAnalytics() {
+      setIsLoadingAnalytics(true);
+      try {
+        const data = await getAnalyticsSummary('1y');
+        if (!cancelled) {
+          setAnalyticsData(data);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingAnalytics(false);
+        }
+      }
+    }
+
+    fetchAnalytics();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 주간 활동 데이터 계산 (API 데이터 우선, 없으면 progress 기반)
   const weeklyData = useMemo(() => {
-    const counts = Array(7).fill(0);
+    if (analyticsData?.weekdayActivity) {
+      // API 데이터: 초 단위 → 분 단위로 표시
+      return WEEKDAYS.map((day, index) => ({
+        day,
+        count: Math.round((analyticsData.weekdayActivity[index] || 0) / 60),
+        unit: '분',
+      }));
+    }
 
+    // Fallback: progress 기반
+    const counts = Array(7).fill(0);
     progress.forEach((p) => {
       if (p.startedAt) {
         const date = new Date(p.startedAt);
@@ -65,13 +110,31 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
     return WEEKDAYS.map((day, index) => ({
       day,
       count: counts[index],
+      unit: '레슨',
     }));
-  }, [progress]);
+  }, [analyticsData, progress]);
 
-  // 시간대별 활동 데이터
+  // 시간대별 활동 데이터 (API 데이터 우선)
   const timeSlotData = useMemo(() => {
-    const counts = [0, 0, 0, 0]; // 새벽, 오전, 오후, 저녁
+    if (analyticsData?.hourlyActivity) {
+      // API 데이터: 시간대별 초 → 4개 슬롯으로 집계
+      const slots = [0, 0, 0, 0];
+      analyticsData.hourlyActivity.forEach((seconds, hour) => {
+        if (hour < 6) slots[0] += seconds;
+        else if (hour < 12) slots[1] += seconds;
+        else if (hour < 18) slots[2] += seconds;
+        else slots[3] += seconds;
+      });
 
+      return TIME_SLOTS.map((slot, index) => ({
+        slot,
+        count: Math.round(slots[index] / 60), // 분 단위
+        unit: '분',
+      }));
+    }
+
+    // Fallback: progress 기반
+    const counts = [0, 0, 0, 0];
     progress.forEach((p) => {
       if (p.startedAt) {
         const hour = new Date(p.startedAt).getHours();
@@ -85,24 +148,33 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
     return TIME_SLOTS.map((slot, index) => ({
       slot,
       count: counts[index],
+      unit: '레슨',
     }));
-  }, [progress]);
+  }, [analyticsData, progress]);
 
-  // 1년 달력 데이터 (최근 365일)
+  // 1년 달력 데이터 (API 데이터 우선)
   const calendarData = useMemo(() => {
     const today = new Date();
     const oneYearAgo = new Date(today);
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    // 날짜별 학습 횟수
-    const countByDate: Record<string, number> = {};
+    // 날짜별 학습 시간 (API 또는 progress)
+    let countByDate: Record<string, number> = {};
 
-    progress.forEach((p) => {
-      if (p.startedAt) {
-        const dateStr = new Date(p.startedAt).toISOString().split('T')[0];
-        countByDate[dateStr] = (countByDate[dateStr] || 0) + 1;
-      }
-    });
+    if (analyticsData?.dailyActivity) {
+      // API 데이터: 초 단위 → 분 단위로 변환
+      Object.entries(analyticsData.dailyActivity).forEach(([date, seconds]) => {
+        countByDate[date] = Math.ceil(seconds / 60);
+      });
+    } else {
+      // Fallback: progress 기반
+      progress.forEach((p) => {
+        if (p.startedAt) {
+          const dateStr = new Date(p.startedAt).toISOString().split('T')[0];
+          countByDate[dateStr] = (countByDate[dateStr] || 0) + 1;
+        }
+      });
+    }
 
     // 365일 배열 생성
     const days: { date: string; count: number; month: number }[] = [];
@@ -119,7 +191,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
     }
 
     return days;
-  }, [progress]);
+  }, [analyticsData, progress]);
 
   // AI 분석 실행
   const handleAnalyze = async () => {
@@ -127,14 +199,14 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
     setAnalysisResult(null);
 
     try {
-      // TODO: 실제 AI API 호출
-      // const result = await analyzeProgress(progress);
+      // TODO: 실제 AI API 호출로 교체 가능
+      // const result = await analyzeProgress(analyticsData);
 
-      // 임시 mock 데이터
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // 임시 지연 (AI 분석 시뮬레이션)
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      const mockResult = generateMockAnalysis(progress, weeklyData, timeSlotData);
-      setAnalysisResult(mockResult);
+      const result = generateAnalysis(analyticsData, progress, weeklyData, timeSlotData);
+      setAnalysisResult(result);
       setShowResultModal(true);
     } catch (error) {
       console.error('Analysis failed:', error);
@@ -158,20 +230,82 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
     return index >= 0 ? TIME_SLOTS[index] : '-';
   }, [timeSlotData]);
 
+  // 테마별 색상
+  const sectionHeaderBg = currentTheme === 'dark' ? '#3b0764' : '#faf5ff';
+  const sectionHeaderText = currentTheme === 'dark' ? '#c084fc' : '#9333ea';
+  const sectionHeaderBorder = currentTheme === 'dark' ? '#7c3aed' : '#e9d5ff';
+  const barActiveColor = themeColors.accent;
+  const barInactiveColor = themeColors.progressBg;
+  const badgeBg = currentTheme === 'dark' ? '#581c87' : '#f3e8ff';
+  const badgeText = currentTheme === 'dark' ? '#c084fc' : '#7c3aed';
+
   return (
-    <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+    <div className="rounded-xl overflow-hidden" style={{ backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}>
       {/* 섹션 헤더 */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b bg-purple-50 text-purple-600 border-purple-200">
+      <div
+        className="flex items-center gap-2 px-4 py-3"
+        style={{ backgroundColor: sectionHeaderBg, color: sectionHeaderText, borderBottom: `1px solid ${sectionHeaderBorder}` }}
+      >
         <TrendingUp className="w-5 h-5" />
         <h2 className="font-semibold">분석 리포트</h2>
       </div>
 
       <div className="p-4 space-y-6">
+        {/* 퀴즈 성과 & 학습 시간 요약 (API 데이터가 있을 때만) */}
+        {analyticsData && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="rounded-lg p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+              <div className="flex items-center gap-2 mb-1">
+                <Clock className="w-4 h-4" style={{ color: sectionHeaderText }} />
+                <span className="text-xs" style={{ color: themeColors.textMuted }}>총 학습 시간</span>
+              </div>
+              <p className="text-lg font-semibold" style={{ color: themeColors.text }}>
+                {Math.floor(analyticsData.totalStudyTime / 3600)}시간 {Math.floor((analyticsData.totalStudyTime % 3600) / 60)}분
+              </p>
+            </div>
+            <div className="rounded-lg p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+              <div className="flex items-center gap-2 mb-1">
+                <Target className="w-4 h-4" style={{ color: sectionHeaderText }} />
+                <span className="text-xs" style={{ color: themeColors.textMuted }}>퀴즈 정답률</span>
+              </div>
+              <p className="text-lg font-semibold" style={{ color: themeColors.text }}>
+                {analyticsData.quizStats.accuracy}%
+              </p>
+            </div>
+            <div className="rounded-lg p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+              <div className="flex items-center gap-2 mb-1">
+                <Brain className="w-4 h-4" style={{ color: sectionHeaderText }} />
+                <span className="text-xs" style={{ color: themeColors.textMuted }}>AI 질문</span>
+              </div>
+              <p className="text-lg font-semibold" style={{ color: themeColors.text }}>
+                {analyticsData.aiQuestions}회
+              </p>
+            </div>
+            <div className="rounded-lg p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+              <div className="flex items-center gap-2 mb-1">
+                <Calendar className="w-4 h-4" style={{ color: sectionHeaderText }} />
+                <span className="text-xs" style={{ color: themeColors.textMuted }}>학습 세션</span>
+              </div>
+              <p className="text-lg font-semibold" style={{ color: themeColors.text }}>
+                {analyticsData.totalSessions}회
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 로딩 중 표시 */}
+        {isLoadingAnalytics && (
+          <div className="flex items-center justify-center py-4 gap-2" style={{ color: themeColors.textMuted }}>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-sm">분석 데이터 로딩 중...</span>
+          </div>
+        )}
+
         {/* 1년 달력 (GitHub 잔디 스타일) */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Calendar className="w-4 h-4 text-[#937b5d]" />
-            <h3 className="text-sm font-medium text-[#6b5a4a]">학습 기록 (최근 1년)</h3>
+            <Calendar className="w-4 h-4" style={{ color: themeColors.textMuted }} />
+            <h3 className="text-sm font-medium" style={{ color: themeColors.text }}>학습 기록 (최근 1년)</h3>
           </div>
           <div className="overflow-x-auto">
             <ContributionCalendar data={calendarData} />
@@ -183,26 +317,31 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           {/* 주간 활동 */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Calendar className="w-4 h-4 text-[#937b5d]" />
-              <h3 className="text-sm font-medium text-[#6b5a4a]">요일별 학습</h3>
-              <span className="text-xs text-purple-500 bg-purple-50 px-2 py-0.5 rounded">
+              <Calendar className="w-4 h-4" style={{ color: themeColors.textMuted }} />
+              <h3 className="text-sm font-medium" style={{ color: themeColors.text }}>요일별 학습</h3>
+              <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeText }}>
                 {mostActiveDay}요일 가장 활발
               </span>
             </div>
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={weeklyData}>
-                  <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 12, fill: themeColors.textMuted }} />
+                  <YAxis tick={{ fontSize: 12, fill: themeColors.textMuted }} allowDecimals={false} />
                   <Tooltip
-                    formatter={(value: number) => [`${value}개 레슨`, '학습']}
-                    contentStyle={{ fontSize: 12 }}
+                    formatter={(value: number, _name, props) => {
+                      const unit = (props.payload as typeof weeklyData[0])?.unit || '분';
+                      return [`${value}${unit}`, '학습'];
+                    }}
+                    contentStyle={{ fontSize: 12, backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}
+                    labelStyle={{ color: themeColors.text }}
+                    itemStyle={{ color: themeColors.text }}
                   />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                     {weeklyData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={entry.count > 0 ? '#a08060' : '#e5d5c7'}
+                        fill={entry.count > 0 ? barActiveColor : barInactiveColor}
                       />
                     ))}
                   </Bar>
@@ -214,26 +353,31 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           {/* 시간대별 패턴 */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-4 h-4 text-[#937b5d]" />
-              <h3 className="text-sm font-medium text-[#6b5a4a]">시간대별 학습</h3>
-              <span className="text-xs text-purple-500 bg-purple-50 px-2 py-0.5 rounded">
+              <Clock className="w-4 h-4" style={{ color: themeColors.textMuted }} />
+              <h3 className="text-sm font-medium" style={{ color: themeColors.text }}>시간대별 학습</h3>
+              <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeText }}>
                 {mostActiveTimeSlot} 선호
               </span>
             </div>
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={timeSlotData} layout="vertical">
-                  <XAxis type="number" tick={{ fontSize: 12 }} allowDecimals={false} />
-                  <YAxis dataKey="slot" type="category" tick={{ fontSize: 11 }} width={80} />
+                  <XAxis type="number" tick={{ fontSize: 12, fill: themeColors.textMuted }} allowDecimals={false} />
+                  <YAxis dataKey="slot" type="category" tick={{ fontSize: 11, fill: themeColors.textMuted }} width={80} />
                   <Tooltip
-                    formatter={(value: number) => [`${value}개 레슨`, '학습']}
-                    contentStyle={{ fontSize: 12 }}
+                    formatter={(value: number, _name, props) => {
+                      const unit = (props.payload as typeof timeSlotData[0])?.unit || '분';
+                      return [`${value}${unit}`, '학습'];
+                    }}
+                    contentStyle={{ fontSize: 12, backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}
+                    labelStyle={{ color: themeColors.text }}
+                    itemStyle={{ color: themeColors.text }}
                   />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                     {timeSlotData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={entry.count > 0 ? '#8b5cf6' : '#e5d5c7'}
+                        fill={entry.count > 0 ? sectionHeaderText : barInactiveColor}
                       />
                     ))}
                   </Bar>
@@ -244,11 +388,14 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
         </div>
 
         {/* AI 분석 버튼 영역 */}
-        <div className="flex items-center gap-3 pt-4 border-t border-[#e5d5c7]">
+        <div className="flex items-center gap-3 pt-4" style={{ borderTop: `1px solid ${themeColors.cardBorder}` }}>
           <button
             onClick={handleAnalyze}
             disabled={isAnalyzing}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2.5 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ backgroundColor: themeColors.accent }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.accentHover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = themeColors.accent}
           >
             {isAnalyzing ? (
               <>
@@ -266,7 +413,8 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           {analysisResult && (
             <button
               onClick={() => setShowResultModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 border border-purple-300 text-purple-600 font-medium rounded-lg hover:bg-purple-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors"
+              style={{ border: `1px solid ${sectionHeaderBorder}`, color: sectionHeaderText }}
             >
               <FileText className="w-4 h-4" />
               분석 결과 보기
@@ -292,6 +440,15 @@ function ContributionCalendar({
 }: {
   data: { date: string; count: number; month: number }[];
 }) {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme].dashboard;
+
+  // 테마별 잔디 색상
+  const grassColors = currentTheme === 'dark'
+    ? { empty: '#374151', level1: '#6b21a8', level2: '#9333ea', level3: '#a855f7' }
+    : currentTheme === 'minimal'
+    ? { empty: '#e5e0d8', level1: '#d6cfc6', level2: '#a08060', level3: '#7a5f45' }
+    : { empty: '#f3e8ff', level1: '#e9d5ff', level2: '#c084fc', level3: '#9333ea' };
   // 52주 + 나머지 일수 계산
   const weeks: typeof data[] = [];
   let currentWeek: typeof data = [];
@@ -327,10 +484,19 @@ function ContributionCalendar({
 
   const MONTHS = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 
+  // 기여도에 따른 색상 반환
+  const getGrassColor = (count: number): string => {
+    if (count < 0) return 'transparent';
+    if (count === 0) return grassColors.empty;
+    if (count === 1) return grassColors.level1;
+    if (count <= 3) return grassColors.level2;
+    return grassColors.level3;
+  };
+
   return (
     <div className="inline-block">
       {/* 월 라벨 */}
-      <div className="flex text-xs text-[#937b5d] mb-1" style={{ marginLeft: 20 }}>
+      <div className="flex text-xs mb-1" style={{ marginLeft: 20, color: themeColors.textMuted }}>
         {monthLabels.map(({ month, weekIndex }) => (
           <span
             key={`${month}-${weekIndex}`}
@@ -346,7 +512,7 @@ function ContributionCalendar({
         {/* 요일 라벨 */}
         <div className="flex flex-col gap-0.5 mr-1">
           {['', '월', '', '수', '', '금', ''].map((day, i) => (
-            <div key={i} className="w-3 h-3 text-[9px] text-[#937b5d] flex items-center justify-center">
+            <div key={i} className="w-3 h-3 text-[9px] flex items-center justify-center" style={{ color: themeColors.textMuted }}>
               {day}
             </div>
           ))}
@@ -358,7 +524,8 @@ function ContributionCalendar({
             {week.map((day, dayIndex) => (
               <div
                 key={`${weekIndex}-${dayIndex}`}
-                className={`w-3 h-3 rounded-sm ${getContributionColor(day.count)}`}
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: getGrassColor(day.count) }}
                 title={day.date ? `${day.date}: ${day.count}개 학습` : ''}
               />
             ))}
@@ -367,25 +534,16 @@ function ContributionCalendar({
       </div>
 
       {/* 범례 */}
-      <div className="flex items-center gap-1 mt-2 text-xs text-[#937b5d]">
+      <div className="flex items-center gap-1 mt-2 text-xs" style={{ color: themeColors.textMuted }}>
         <span>적음</span>
-        <div className="w-3 h-3 rounded-sm bg-gray-100" />
-        <div className="w-3 h-3 rounded-sm bg-purple-200" />
-        <div className="w-3 h-3 rounded-sm bg-purple-400" />
-        <div className="w-3 h-3 rounded-sm bg-purple-600" />
+        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: grassColors.empty }} />
+        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: grassColors.level1 }} />
+        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: grassColors.level2 }} />
+        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: grassColors.level3 }} />
         <span>많음</span>
       </div>
     </div>
   );
-}
-
-// 기여도에 따른 색상 반환
-function getContributionColor(count: number): string {
-  if (count < 0) return 'bg-transparent'; // 빈 셀
-  if (count === 0) return 'bg-gray-100';
-  if (count === 1) return 'bg-purple-200';
-  if (count <= 3) return 'bg-purple-400';
-  return 'bg-purple-600';
 }
 
 // 분석 결과 모달
@@ -396,35 +554,45 @@ function AnalysisResultModal({
   result: string | null;
   onClose: () => void;
 }) {
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme].dashboard;
+  const iconColor = currentTheme === 'dark' ? '#c084fc' : '#a855f7';
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-lg w-full max-h-[80vh] overflow-hidden">
+      <div className="rounded-xl max-w-lg w-full max-h-[80vh] overflow-hidden" style={{ backgroundColor: themeColors.cardBg }}>
         {/* 모달 헤더 */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5d5c7]">
+        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${themeColors.cardBorder}` }}>
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-500" />
-            <h3 className="font-semibold text-[#6b5a4a]">AI 분석 결과</h3>
+            <Sparkles className="w-5 h-5" style={{ color: iconColor }} />
+            <h3 className="font-semibold" style={{ color: themeColors.text }}>AI 분석 결과</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1 rounded-lg transition-colors"
+            style={{ color: themeColors.textMuted }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.statCardBg}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <X className="w-5 h-5 text-[#937b5d]" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* 모달 본문 */}
         <div className="p-4 overflow-y-auto max-h-[60vh]">
-          <div className="prose prose-sm max-w-none text-[#6b5a4a] whitespace-pre-wrap">
+          <div className="prose prose-sm max-w-none whitespace-pre-wrap" style={{ color: themeColors.text }}>
             {result || '분석 결과가 없습니다.'}
           </div>
         </div>
 
         {/* 모달 푸터 */}
-        <div className="px-4 py-3 border-t border-[#e5d5c7] flex justify-end">
+        <div className="px-4 py-3 flex justify-end" style={{ borderTop: `1px solid ${themeColors.cardBorder}` }}>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#a08060] text-white font-medium rounded-lg hover:bg-[#8b6d4f] transition-colors"
+            className="px-4 py-2 text-white font-medium rounded-lg transition-colors"
+            style={{ backgroundColor: themeColors.accent }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.accentHover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = themeColors.accent}
           >
             확인
           </button>
@@ -434,22 +602,73 @@ function AnalysisResultModal({
   );
 }
 
-// Mock 분석 결과 생성 (TODO: 실제 AI API로 교체)
-function generateMockAnalysis(
+// 분석 결과 생성 (API 데이터 우선)
+function generateAnalysis(
+  analyticsData: AnalyticsSummary | null,
   progress: UserProgress[],
-  weeklyData: { day: string; count: number }[],
-  timeSlotData: { slot: string; count: number }[]
+  weeklyData: { day: string; count: number; unit?: string }[],
+  timeSlotData: { slot: string; count: number; unit?: string }[]
 ): string {
-  const totalLessons = progress.length;
-  const completedLessons = progress.filter((p) => p.status === 'completed').length;
-
   const mostActiveDay = weeklyData.reduce((max, curr) =>
     curr.count > max.count ? curr : max
   );
-
   const mostActiveSlot = timeSlotData.reduce((max, curr) =>
     curr.count > max.count ? curr : max
   );
+  const unit = weeklyData[0]?.unit || '분';
+
+  // API 데이터가 있는 경우: 상세 분석
+  if (analyticsData) {
+    const { totalStudyTime, totalSessions, quizStats, aiQuestions, weakConcepts } = analyticsData;
+    const studyHours = Math.floor(totalStudyTime / 3600);
+    const studyMinutes = Math.floor((totalStudyTime % 3600) / 60);
+
+    const weakConceptsList = Object.entries(weakConcepts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([concept, count]) => `  - ${concept}: ${count}회 오답`)
+      .join('\n');
+
+    return `📊 학습 패턴 분석 결과 (실제 데이터 기반)
+
+📈 전체 현황
+• 총 학습 시간: ${studyHours}시간 ${studyMinutes}분
+• 학습 세션: ${totalSessions}회
+• AI 질문 횟수: ${aiQuestions}회
+
+📝 퀴즈 성과
+• 총 ${quizStats.total}문제 풀이
+• 정답률: ${quizStats.accuracy}% (${quizStats.correct}개 정답 / ${quizStats.wrong}개 오답)
+${quizStats.accuracy >= 80
+  ? '• 🎉 훌륭한 정답률이에요! 개념을 잘 이해하고 계십니다.'
+  : quizStats.accuracy >= 60
+  ? '• 💪 좋은 진행이에요! 틀린 문제를 복습하면 더 좋아질 거예요.'
+  : '• 📚 복습이 필요해요. 틀린 개념을 다시 확인해보세요.'}
+
+📅 학습 패턴
+• 가장 활발한 요일: ${mostActiveDay.day}요일 (${mostActiveDay.count}${unit})
+• 선호하는 시간대: ${mostActiveSlot.slot} (${mostActiveSlot.count}${unit})
+
+${weakConceptsList ? `🎯 취약 개념 (오답 기준)\n${weakConceptsList}\n` : ''}
+💡 맞춤 추천
+${mostActiveSlot.slot.includes('저녁')
+  ? '• 저녁 시간에 집중력이 높으신 것 같아요. 이 시간을 활용해 어려운 개념을 학습해보세요.'
+  : mostActiveSlot.slot.includes('오전')
+  ? '• 오전에 학습하시는 습관이 좋습니다! 두뇌가 가장 활발한 시간이에요.'
+  : mostActiveSlot.slot.includes('오후')
+  ? '• 오후 시간대에 학습하시네요. 점심 후 졸릴 수 있으니 가벼운 복습부터 시작해보세요.'
+  : '• 새벽 학습자시군요! 집중이 잘 되지만, 충분한 수면도 중요해요.'}
+
+🚀 다음 단계 제안
+${quizStats.wrong > 0
+  ? '• 최근 틀린 퀴즈 다시 풀어보기'
+  : '• 새로운 챕터 시작하기'}
+• ${mostActiveDay.day}요일에 집중 학습 시간 확보하기`;
+  }
+
+  // Fallback: progress 기반 분석 (비로그인 또는 API 실패)
+  const totalLessons = progress.length;
+  const completedLessons = progress.filter((p) => p.status === 'completed').length;
 
   return `📊 학습 패턴 분석 결과
 
@@ -458,8 +677,8 @@ function generateMockAnalysis(
 • ${completedLessons}개 완료 (완료율: ${totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0}%)
 
 📅 학습 패턴
-• 가장 활발한 요일: ${mostActiveDay.day}요일 (${mostActiveDay.count}개 레슨)
-• 선호하는 시간대: ${mostActiveSlot.slot} (${mostActiveSlot.count}개 레슨)
+• 가장 활발한 요일: ${mostActiveDay.day}요일 (${mostActiveDay.count}${unit})
+• 선호하는 시간대: ${mostActiveSlot.slot} (${mostActiveSlot.count}${unit})
 
 💡 맞춤 추천
 ${mostActiveSlot.slot.includes('저녁')
@@ -474,7 +693,5 @@ ${completedLessons < totalLessons
   ? `• 아직 완료하지 않은 ${totalLessons - completedLessons}개의 레슨이 있어요. 꾸준히 진행해보세요!`
   : '• 모든 레슨을 완료하셨네요! 다음 챕터로 넘어가보세요.'}
 
-🎯 다음 목표
-• 이번 주 목표: ${Math.min(completedLessons + 3, totalLessons + 5)}개 레슨 완료하기
-• 취약 개념 복습 권장`;
+💡 더 자세한 분석을 원하시면 로그인해주세요!`;
 }
