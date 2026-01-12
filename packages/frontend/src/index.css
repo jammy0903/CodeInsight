@@ -964,3 +964,53 @@
     opacity: 0;
   }
 }
+
+/* ============================================
+   PDF Export Styles
+   html2pdf.js page break controls
+   ============================================ */
+
+/* Keep element together on same page */
+.keep-together {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Force page break before element */
+.page-break-before {
+  page-break-before: always;
+  break-before: page;
+}
+
+/* Force page break after element */
+.page-break-after {
+  page-break-after: always;
+  break-after: page;
+}
+
+/* Report card - avoid breaking */
+.report-card {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Print-specific styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide modals and overlays */
+  .fixed.inset-0.bg-black\\/50 {
+    display: none !important;
+  }
+
+  /* Ensure charts render with colors */
+  svg {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

@@ -29,11 +29,13 @@ import {
   X,
   Brain,
   Target,
+  BarChart3,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
 import { themes } from '@/config/themes';
 import { getAnalyticsSummary, type AnalyticsSummary } from '@/services/analytics';
 import type { UserProgress } from '@/types';
+import { DetailedReportModal } from './report';
 
 interface AnalyticsSectionProps {
   progress: UserProgress[];
@@ -53,6 +55,7 @@ const TIME_SLOTS = [
 export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
+  const [showDetailedReport, setShowDetailedReport] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsSummary | null>(null);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
@@ -230,14 +233,38 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
     return index >= 0 ? TIME_SLOTS[index] : '-';
   }, [timeSlotData]);
 
-  // 테마별 색상
-  const sectionHeaderBg = currentTheme === 'dark' ? '#3b0764' : '#faf5ff';
-  const sectionHeaderText = currentTheme === 'dark' ? '#c084fc' : '#9333ea';
-  const sectionHeaderBorder = currentTheme === 'dark' ? '#7c3aed' : '#e9d5ff';
+  // 테마별 색상 (각 테마별로 다른 색상 조합 사용)
+  const sectionColors = {
+    dark: {
+      headerBg: '#18181b',       // zinc-900
+      headerText: '#22d3ee',     // cyan-400
+      headerBorder: '#27272a',   // zinc-800
+      badgeBg: '#27272a',        // zinc-800
+      badgeText: '#a1a1aa',      // zinc-400
+    },
+    soft: {
+      headerBg: '#fdf2f8',       // 라벤더-핑크
+      headerText: '#be185d',     // 로즈
+      headerBorder: '#f9a8d4',
+      badgeBg: '#fce7f3',
+      badgeText: '#9d174d',
+    },
+    minimal: {
+      headerBg: '#fef3c7',       // 앰버-베이지
+      headerText: '#b45309',     // 브라운-앰버
+      headerBorder: '#fcd34d',
+      badgeBg: '#fef9c3',
+      badgeText: '#92400e',
+    },
+  };
+  const colors = sectionColors[currentTheme];
+  const sectionHeaderBg = colors.headerBg;
+  const sectionHeaderText = colors.headerText;
+  const sectionHeaderBorder = colors.headerBorder;
   const barActiveColor = themeColors.accent;
   const barInactiveColor = themeColors.progressBg;
-  const badgeBg = currentTheme === 'dark' ? '#581c87' : '#f3e8ff';
-  const badgeText = currentTheme === 'dark' ? '#c084fc' : '#7c3aed';
+  const badgeBg = colors.badgeBg;
+  const badgeText = colors.badgeText;
 
   return (
     <div className="rounded-xl overflow-hidden" style={{ backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}>
@@ -410,6 +437,15 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
             )}
           </button>
 
+          <button
+            onClick={() => setShowDetailedReport(true)}
+            className="flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors"
+            style={{ border: `1px solid ${sectionHeaderBorder}`, color: sectionHeaderText }}
+          >
+            <BarChart3 className="w-4 h-4" />
+            상세 보기
+          </button>
+
           {analysisResult && (
             <button
               onClick={() => setShowResultModal(true)}
@@ -430,6 +466,15 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           onClose={() => setShowResultModal(false)}
         />
       )}
+
+      {/* 상세 분석 리포트 모달 */}
+      <DetailedReportModal
+        isOpen={showDetailedReport}
+        onClose={() => setShowDetailedReport(false)}
+        analyticsData={analyticsData}
+        progress={progress}
+        period="1y"
+      />
     </div>
   );
 }
@@ -443,12 +488,12 @@ function ContributionCalendar({
   const currentTheme = useThemeStore((s) => s.theme);
   const themeColors = themes[currentTheme].dashboard;
 
-  // 테마별 잔디 색상
+  // 테마별 잔디 색상 (분석리포트 색상과 통일)
   const grassColors = currentTheme === 'dark'
-    ? { empty: '#374151', level1: '#6b21a8', level2: '#9333ea', level3: '#a855f7' }
+    ? { empty: '#27272a', level1: '#155e75', level2: '#0891b2', level3: '#22d3ee' }  // zinc + cyan 계열
     : currentTheme === 'minimal'
-    ? { empty: '#e5e0d8', level1: '#d6cfc6', level2: '#a08060', level3: '#7a5f45' }
-    : { empty: '#f3e8ff', level1: '#e9d5ff', level2: '#c084fc', level3: '#9333ea' };
+    ? { empty: '#fef3c7', level1: '#fcd34d', level2: '#f59e0b', level3: '#b45309' }  // 앰버 계열
+    : { empty: '#fce7f3', level1: '#f9a8d4', level2: '#ec4899', level3: '#be185d' }; // 핑크 계열
   // 52주 + 나머지 일수 계산
   const weeks: typeof data[] = [];
   let currentWeek: typeof data = [];
