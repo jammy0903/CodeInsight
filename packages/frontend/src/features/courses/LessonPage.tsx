@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, MessageSquare, Cpu, Bot, Code2, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Cpu, Bot, Code2, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -382,11 +382,10 @@ export function LessonPage() {
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'memory' | 'explanation' | 'chat'>('memory');
+  const [activeTab, setActiveTab] = useState<'memory' | 'chat'>('memory');
   // 시뮬레이터 결과 (stdout용)
   const [simulatorSteps, setSimulatorSteps] = useState<LessonStep[]>([]);
-  // 탭 반짝임 효과
-  const [flashExplanation, setFlashExplanation] = useState(false);
+  // 메모리 탭 반짝임 효과
   const [flashMemory, setFlashMemory] = useState(false);
   const prevStepIndexRef = useRef(0);
 
@@ -538,7 +537,7 @@ export function LessonPage() {
     return lines;
   }, [steps, simulatorSteps, currentStep, navigation.currentStepIndex]);
 
-  // 스텝 변경 시 탭 반짝임 효과 (앞으로 갈 때만)
+  // 스텝 변경 시 메모리 탭 반짝임 효과 (앞으로 갈 때만)
   useEffect(() => {
     const prevIndex = prevStepIndexRef.current;
     const isForward = navigation.currentStepIndex > prevIndex;
@@ -547,23 +546,14 @@ export function LessonPage() {
     // 뒤로 가거나 첫 스텝이면 무시
     if (!isForward || navigation.currentStepIndex === 0) return;
 
-    // 설명 탭 반짝임
-    setFlashExplanation(true);
-    const explanationTimer = setTimeout(() => setFlashExplanation(false), 600);
-
-    // 메모리 변경이 있으면 메모리 탭도 반짝임
+    // 메모리 변경이 있으면 메모리 탭 반짝임
     const hasMemoryChange = currentStep?.memoryChanges &&
       (Array.isArray(currentStep.memoryChanges) ? currentStep.memoryChanges.length > 0 : true);
     if (hasMemoryChange) {
       setFlashMemory(true);
       const memoryTimer = setTimeout(() => setFlashMemory(false), 600);
-      return () => {
-        clearTimeout(explanationTimer);
-        clearTimeout(memoryTimer);
-      };
+      return () => clearTimeout(memoryTimer);
     }
-
-    return () => clearTimeout(explanationTimer);
   }, [navigation.currentStepIndex, currentStep]);
 
   // 경로
@@ -719,28 +709,88 @@ export function LessonPage() {
                 />
               </div>
 
-              {/* 터미널 출력 (VSCode 스타일) */}
-              <div
-                className="rounded-b-xl overflow-hidden"
-                style={{
-                  border: '1px solid #E5D5C7',
-                  borderTop: 'none',
-                }}
-              >
-                <TerminalOutput
-                  lines={terminalLines}
-                  title="출력"
-                  maxHeight="80px"
-                  emptyMessage="실행 결과가 여기에 표시됩니다"
-                  compact
-                />
-              </div>
+              {/* 터미널 출력 (VSCode 스타일) - 출력이 있을 때만 표시 */}
+              {terminalLines.length > 0 && (
+                <div
+                  style={{
+                    border: '1px solid #E5D5C7',
+                    borderTop: 'none',
+                  }}
+                >
+                  <TerminalOutput
+                    lines={terminalLines}
+                    title="출력"
+                    maxHeight="80px"
+                    emptyMessage=""
+                    compact
+                  />
+                </div>
+              )}
+
+              {/* 설명 패널 - 코드 바로 밑에 (PlaygroundPage와 동일) */}
+              {currentStep && (
+                <div
+                  className="rounded-b-xl overflow-hidden"
+                  style={{
+                    border: '1px solid #E5D5C7',
+                    borderTop: terminalLines.length === 0 ? 'none' : '1px solid #E5D5C7',
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: '#f0fdf4',
+                      boxShadow: '0 2px 8px rgba(34, 197, 94, 0.12)',
+                    }}
+                  >
+                    {/* 설명 헤더 */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '6px 12px',
+                        backgroundColor: '#dcfce7',
+                        borderBottom: '1px solid #bbf7d0',
+                        gap: '8px',
+                      }}
+                    >
+                      <span style={{ fontSize: '14px' }}>💡</span>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          color: '#166534',
+                          fontWeight: 600,
+                          fontFamily: 'system-ui, sans-serif',
+                        }}
+                      >
+                        설명
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          color: '#16a34a',
+                          marginLeft: 'auto',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        Line {currentStep.line}
+                      </span>
+                    </div>
+                    {/* 설명 내용 */}
+                    <div style={{ padding: '10px 14px' }}>
+                      <StepExplanation
+                        explanation={currentStep.explanation}
+                        stepIndex={navigation.currentStepIndex}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* 오른쪽: 3탭 구조 (메모리 | 설명 | AI Chat) */}
+          {/* 오른쪽: 2탭 구조 (메모리 | AI Chat) - 설명은 왼쪽 코드 영역에 통합 */}
           <div className="w-1/2 flex flex-col" style={{ marginTop: '37px' }}>
-            {/* 탭 헤더 - 3탭 */}
+            {/* 탭 헤더 - 2탭 */}
             <div
               className="flex rounded-t-xl"
               style={{ border: '1px solid #E5D5C7', borderBottom: 'none', overflow: 'visible' }}
@@ -771,36 +821,10 @@ export function LessonPage() {
                 </span>
               </button>
 
-              {/* 설명 탭 */}
-              <button
-                onClick={() => setActiveTab('explanation')}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold"
-                style={{
-                  background: activeTab === 'explanation'
-                    ? 'linear-gradient(135deg, #FFF8F0 0%, #FFF5EB 100%)'
-                    : flashExplanation
-                      ? 'linear-gradient(180deg, #fef3c7 0%, #fffbeb 100%)'
-                      : '#f8f4ef',
-                  color: activeTab === 'explanation' ? '#b86e3c' : flashExplanation ? '#d97706' : '#937b5d',
-                  borderRight: '1px solid #E5D5C7',
-                  animation: flashExplanation ? 'tabGlow 0.6s ease-out' : 'none',
-                  transition: 'background 0.2s, color 0.2s',
-                }}
-              >
-                <MessageSquare className="w-3.5 h-3.5" style={{
-                  animation: flashExplanation ? 'iconPop 0.4s ease-out' : 'none'
-                }} />
-                <span style={{
-                  animation: flashExplanation ? 'textPop 0.4s ease-out 0.1s both' : 'none'
-                }}>
-                  설명
-                </span>
-              </button>
-
               {/* AI Chat 탭 */}
               <button
                 onClick={() => setActiveTab('chat')}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold transition-all"
+                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold rounded-tr-[11px] transition-all"
                 style={{
                   background: activeTab === 'chat'
                     ? 'linear-gradient(135deg, #FFFBF5 0%, #FFF9F2 100%)'
@@ -874,38 +898,6 @@ export function LessonPage() {
                       />
                     );
                   })()}
-                </div>
-              )}
-
-              {/* 설명 탭 - 현재 스텝 설명 */}
-              {activeTab === 'explanation' && currentStep && (
-                <div
-                  className="p-4"
-                  style={{
-                    background: 'linear-gradient(135deg, #FFF8F0 0%, #FFF5EB 100%)',
-                  }}
-                >
-                  {/* 라인 번호 배지 */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <span
-                      className="px-2.5 py-1 rounded-md text-xs font-bold"
-                      style={{
-                        background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
-                        color: '#fff',
-                      }}
-                    >
-                      📍 Line {currentStep.line}
-                    </span>
-                    <span className="text-xs text-amber-700 opacity-70">
-                      {navigation.currentStepIndex + 1}/{navigation.totalSteps} 단계
-                    </span>
-                  </div>
-
-                  {/* 설명 내용 */}
-                  <StepExplanation
-                    explanation={currentStep.explanation}
-                    stepIndex={navigation.currentStepIndex}
-                  />
                 </div>
               )}
 
