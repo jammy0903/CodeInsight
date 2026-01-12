@@ -613,30 +613,33 @@ export function LessonPage() {
           />
         </>
       ) : (
-        <div className="flex gap-4 items-stretch">
-          {/* 왼쪽: 코드 + 컨트롤 (50%) */}
-          <div className="w-1/2 flex flex-col gap-4">
-            {/* 헤더 - 왼쪽 컬럼 안에 배치 (오른쪽 탭 컨테이너가 위로 올라갈 수 있도록) */}
-            <div className="flex items-center gap-4">
-              <Link to={languageCoursePath} className="cyber-back-btn">
-                <span className="cyber-back-arrow">‹</span>
-                <span>EXIT</span>
-              </Link>
-              <div className="cyber-divider" />
-              <div>
-                <h1 className="flex items-center gap-3">
-                  <span className="text-gray-400 text-sm font-medium">
-                    {lessonId.split('-').slice(1).join('.')}
-                  </span>
-                  <span className="text-lg font-bold">{lesson.title}</span>
-                </h1>
-                {lesson.description && (
-                  <p className="text-xs text-gray-500">{lesson.description}</p>
-                )}
-              </div>
-            </div>
-            {/* 코드 뷰어 카드 (뚜껑 스타일) */}
+        <>
+          {/* 공통 헤더 - 패널 밖에 배치 */}
+          <div className="flex items-center gap-4 mb-4">
+            <Link to={languageCoursePath} className="cyber-back-btn">
+              <span className="cyber-back-arrow">‹</span>
+              <span>EXIT</span>
+            </Link>
+            <div className="cyber-divider" />
             <div>
+              <h1 className="flex items-center gap-3">
+                <span className="text-gray-400 text-sm font-medium">
+                  {lessonId.split('-').slice(1).join('.')}
+                </span>
+                <span className="text-lg font-bold">{lesson.title}</span>
+              </h1>
+              {lesson.description && (
+                <p className="text-xs text-gray-500">{lesson.description}</p>
+              )}
+            </div>
+          </div>
+
+          {/* 양쪽 패널 - 상단 높이 일치 */}
+          <div className="flex gap-4 items-start">
+            {/* 왼쪽: 코드 + 설명 (50%) */}
+            <div className="w-1/2 flex flex-col">
+              {/* 코드 뷰어 카드 (뚜껑 스타일) */}
+              <div>
               {/* 코드 헤더 - 뚜껑 + 스텝 컨트롤 (다크 테마) */}
               <div
                 className="flex items-center justify-between px-4 py-2 rounded-t-xl text-sm font-semibold"
@@ -693,13 +696,14 @@ export function LessonPage() {
                   )}
                 </div>
               </div>
-              {/* 코드 뷰어 */}
+              {/* 코드 뷰어 - 10줄 고정 높이 + 내부 스크롤 */}
               <div
-                className="overflow-hidden"
+                className="overflow-y-auto"
                 style={{
                   border: '1px solid #E5D5C7',
                   borderTop: 'none',
                   borderBottom: 'none',
+                  height: '264px', // 10줄 * 24px(leading-6) + 24px(py-3 패딩)
                 }}
               >
                 <CodeViewer
@@ -788,8 +792,8 @@ export function LessonPage() {
             </div>
           </div>
 
-          {/* 오른쪽: 2탭 구조 (메모리 | AI Chat) - 설명은 왼쪽 코드 영역에 통합 */}
-          <div className="w-1/2 flex flex-col" style={{ marginTop: '37px' }}>
+          {/* 오른쪽: 2탭 구조 (메모리 | AI Chat) - 상단 높이 왼쪽과 일치 */}
+          <div className="w-1/2 flex flex-col">
             {/* 탭 헤더 - 2탭 */}
             <div
               className="flex rounded-t-xl"
@@ -925,7 +929,7 @@ export function LessonPage() {
               )}
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Quiz Modal */}

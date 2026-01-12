@@ -21,14 +21,9 @@ interface CodeViewerProps {
   onSelectionChange?: (selection: CodeSelection) => void;
 }
 
-const MIN_LINES = 15;
-
 export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewerProps) {
-  const codeLines = code.split('\n');
-  // 최소 15줄 보장 (빈 줄로 패딩)
-  const lines = codeLines.length < MIN_LINES
-    ? [...codeLines, ...Array(MIN_LINES - codeLines.length).fill('')]
-    : codeLines;
+  // 외부 컨테이너에서 높이 제어 (10줄 고정 + 스크롤)
+  const lines = code.split('\n');
 
   /**
    * 텍스트 선택 핸들러
@@ -55,7 +50,7 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
   };
 
   return (
-    <div className="bg-white font-mono text-sm border border-gray-200 rounded-lg overflow-hidden">
+    <div className="bg-white font-mono text-sm">
       <div className="flex" onMouseUp={handleTextSelect}>
         {/* Line numbers - user-select: none to prevent selection */}
         <div
