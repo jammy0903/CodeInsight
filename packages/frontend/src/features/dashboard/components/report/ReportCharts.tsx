@@ -58,7 +58,7 @@ export function ReportCharts({ weeklyData, timeSlotData }: ReportChartsProps) {
   };
 
   return (
-    <div className="keep-together mb-8 page-break-before">
+    <div className="keep-together" style={{ marginBottom: '2rem' }}>
       <h2
         style={{
           fontSize: '1.125rem',
