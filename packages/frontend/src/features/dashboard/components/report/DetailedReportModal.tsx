@@ -191,10 +191,19 @@ export function DetailedReportModal({
 
         {/* Report content (scrollable) */}
         <div className="flex-1 overflow-y-auto">
+          {/*
+            PDF Export Area
+            NOTE: Using inline styles with RGB colors because html2pdf.js
+            doesn't support oklch() color function (Tailwind v4 default)
+          */}
           <div
             ref={reportRef}
-            className="bg-white text-gray-900 p-8"
-            style={{ minHeight: '100%' }}
+            className="pdf-export-area p-8"
+            style={{
+              minHeight: '100%',
+              backgroundColor: '#ffffff',
+              color: '#111827',
+            }}
           >
             <ReportHeader period={period} />
             <ReportSummaryCards data={analyticsData} />

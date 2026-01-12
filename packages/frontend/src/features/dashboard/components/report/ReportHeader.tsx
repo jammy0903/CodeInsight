@@ -1,8 +1,10 @@
 /**
  * ReportHeader - PDF report header with logo, title, date
+ * Uses inline styles with RGB colors for html2pdf.js compatibility
  */
 
 import { Code2 } from 'lucide-react';
+import { REPORT_COLORS } from './colors';
 
 interface ReportHeaderProps {
   period?: string;
@@ -23,26 +25,47 @@ export function ReportHeader({ period = '1y' }: ReportHeaderProps) {
   });
 
   return (
-    <div className="keep-together mb-8 pb-6 border-b-2 border-gray-200">
+    <div
+      className="keep-together"
+      style={{
+        marginBottom: '2rem',
+        paddingBottom: '1.5rem',
+        borderBottom: `2px solid ${REPORT_COLORS.border.light}`,
+      }}
+    >
       {/* Logo and Title */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
-          <Code2 className="w-7 h-7 text-white" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+        <div
+          style={{
+            width: '3rem',
+            height: '3rem',
+            background: 'linear-gradient(to bottom right, #8b5cf6, #4f46e5)',
+            borderRadius: '0.75rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Code2 style={{ width: '1.75rem', height: '1.75rem', color: '#ffffff' }} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">CodeInsight</h1>
-          <p className="text-sm text-gray-500">학습 분석 리포트</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: REPORT_COLORS.text.primary }}>
+            CodeInsight
+          </h1>
+          <p style={{ fontSize: '0.875rem', color: REPORT_COLORS.text.muted }}>
+            학습 분석 리포트
+          </p>
         </div>
       </div>
 
       {/* Report Info */}
-      <div className="flex items-center gap-6 text-sm text-gray-600">
-        <div className="flex items-center gap-2">
-          <span className="font-medium">생성일:</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', fontSize: '0.875rem', color: REPORT_COLORS.text.muted }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontWeight: 500 }}>생성일:</span>
           <span>{today}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-medium">분석 기간:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontWeight: 500 }}>분석 기간:</span>
           <span>최근 {periodLabel}</span>
         </div>
       </div>

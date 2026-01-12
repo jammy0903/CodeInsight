@@ -1,9 +1,11 @@
 /**
  * ReportRecommendations - PDF report AI recommendations
+ * Uses inline styles with RGB colors for html2pdf.js compatibility
  */
 
 import { Lightbulb, Target, Clock, BookOpen } from 'lucide-react';
 import type { AnalyticsSummary } from '@/services/analytics';
+import { REPORT_COLORS } from './colors';
 
 interface ReportRecommendationsProps {
   data: AnalyticsSummary;
@@ -90,26 +92,41 @@ export function ReportRecommendations({
     description: `${mostActiveDay}요일에 학습 효과가 가장 좋아요. 이 날에 중요한 개념을 학습해보세요.`,
   });
 
+  const cardStyle = {
+    background: 'linear-gradient(to bottom right, #faf5ff, #eef2ff)',
+    borderRadius: '0.5rem',
+    padding: '1rem',
+    border: `1px solid ${REPORT_COLORS.accent.purpleLight}`,
+  };
+
+  const iconBoxStyle = {
+    width: '2rem',
+    height: '2rem',
+    backgroundColor: REPORT_COLORS.bg.white,
+    borderRadius: '0.5rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+  };
+
   return (
-    <div className="keep-together mb-8">
-      <div className="flex items-center gap-2 mb-4">
-        <Lightbulb className="w-5 h-5 text-yellow-500" />
-        <h2 className="text-lg font-semibold text-gray-800">맞춤 학습 추천</h2>
+    <div className="keep-together" style={{ marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+        <Lightbulb style={{ width: '1.25rem', height: '1.25rem', color: REPORT_COLORS.accent.amber }} />
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary }}>맞춤 학습 추천</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
         {recommendations.map((rec, index) => (
-          <div
-            key={index}
-            className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-4 border border-purple-100"
-          >
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                <rec.icon className="w-4 h-4 text-purple-600" />
+          <div key={index} style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+              <div style={iconBoxStyle}>
+                <rec.icon style={{ width: '1rem', height: '1rem', color: REPORT_COLORS.accent.purple }} />
               </div>
               <div>
-                <h3 className="font-medium text-gray-800 mb-1">{rec.title}</h3>
-                <p className="text-sm text-gray-600">{rec.description}</p>
+                <h3 style={{ fontWeight: 500, color: REPORT_COLORS.text.secondary, marginBottom: '0.25rem' }}>{rec.title}</h3>
+                <p style={{ fontSize: '0.875rem', color: REPORT_COLORS.text.muted }}>{rec.description}</p>
               </div>
             </div>
           </div>

@@ -1,6 +1,9 @@
 /**
  * ReportCalendar - PDF report calendar (GitHub grass style)
+ * Uses inline styles with RGB colors for html2pdf.js compatibility
  */
+
+import { REPORT_COLORS } from './colors';
 
 interface CalendarDay {
   date: string;
@@ -14,20 +17,12 @@ interface ReportCalendarProps {
 
 const MONTHS = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 
-// PDF-friendly colors (light theme)
-const GRASS_COLORS = {
-  empty: '#f3f4f6',
-  level1: '#bbf7d0',
-  level2: '#4ade80',
-  level3: '#16a34a',
-};
-
 function getGrassColor(count: number): string {
   if (count < 0) return 'transparent';
-  if (count === 0) return GRASS_COLORS.empty;
-  if (count === 1) return GRASS_COLORS.level1;
-  if (count <= 3) return GRASS_COLORS.level2;
-  return GRASS_COLORS.level3;
+  if (count === 0) return REPORT_COLORS.grass.empty;
+  if (count === 1) return REPORT_COLORS.grass.level1;
+  if (count <= 3) return REPORT_COLORS.grass.level2;
+  return REPORT_COLORS.grass.level3;
 }
 
 export function ReportCalendar({ data }: ReportCalendarProps) {
@@ -68,45 +63,65 @@ export function ReportCalendar({ data }: ReportCalendarProps) {
   const activeDays = data.filter((d) => d.count > 0).length;
   const totalMinutes = data.reduce((sum, d) => sum + (d.count > 0 ? d.count : 0), 0);
 
+  const cardStyle = {
+    backgroundColor: REPORT_COLORS.bg.light,
+    borderRadius: '0.5rem',
+    padding: '1rem',
+    border: `1px solid ${REPORT_COLORS.border.light}`,
+  };
+
+  const cellStyle = {
+    width: '0.75rem',
+    height: '0.75rem',
+    borderRadius: '2px',
+  };
+
   return (
-    <div className="keep-together mb-8">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">
+    <div className="keep-together" style={{ marginBottom: '2rem' }}>
+      <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary, marginBottom: '1rem' }}>
         학습 기록 (최근 1년)
       </h2>
 
-      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+      <div style={cardStyle}>
         {/* Stats summary */}
-        <div className="flex gap-6 mb-4 text-sm text-gray-600">
+        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', fontSize: '0.875rem', color: REPORT_COLORS.text.muted }}>
           <div>
-            <span className="font-medium text-gray-800">{activeDays}</span>일 학습
+            <span style={{ fontWeight: 500, color: REPORT_COLORS.text.secondary }}>{activeDays}</span>일 학습
           </div>
           <div>
-            총 <span className="font-medium text-gray-800">{totalMinutes}</span>분
+            총 <span style={{ fontWeight: 500, color: REPORT_COLORS.text.secondary }}>{totalMinutes}</span>분
           </div>
         </div>
 
         {/* Calendar grid */}
-        <div className="inline-block">
+        <div style={{ display: 'inline-block' }}>
           {/* Month labels row */}
-          <div className="flex text-xs mb-1 relative" style={{ marginLeft: 20 }}>
+          <div style={{ display: 'flex', fontSize: '0.625rem', marginBottom: '0.25rem', position: 'relative', marginLeft: 20 }}>
             {monthLabels.map(({ month, weekIndex }) => (
               <span
                 key={`${month}-${weekIndex}`}
-                className="absolute text-gray-500"
-                style={{ left: weekIndex * 12 }}
+                style={{ position: 'absolute', left: weekIndex * 12, color: REPORT_COLORS.text.muted }}
               >
                 {MONTHS[month]}
               </span>
             ))}
           </div>
 
-          <div className="flex gap-0.5 mt-4">
+          <div style={{ display: 'flex', gap: '2px', marginTop: '1rem' }}>
             {/* Weekday labels */}
-            <div className="flex flex-col gap-0.5 mr-1">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginRight: '4px' }}>
               {['', '월', '', '수', '', '금', ''].map((day, i) => (
                 <div
                   key={i}
-                  className="w-3 h-3 text-[9px] flex items-center justify-center text-gray-400"
+                  style={{
+                    width: '0.75rem',
+                    height: '0.75rem',
+                    fontSize: '9px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: REPORT_COLORS.text.light,
+                  }}
                 >
                   {day}
                 </div>
@@ -115,12 +130,11 @@ export function ReportCalendar({ data }: ReportCalendarProps) {
 
             {/* Calendar cells */}
             {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-0.5">
+              <div key={weekIndex} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 {week.map((day, dayIndex) => (
                   <div
                     key={`${weekIndex}-${dayIndex}`}
-                    className="w-3 h-3 rounded-sm"
-                    style={{ backgroundColor: getGrassColor(day.count) }}
+                    style={{ ...cellStyle, backgroundColor: getGrassColor(day.count) }}
                     title={day.date ? `${day.date}: ${day.count}분` : ''}
                   />
                 ))}
@@ -129,12 +143,12 @@ export function ReportCalendar({ data }: ReportCalendarProps) {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-1 mt-3 text-xs text-gray-500">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '0.75rem', fontSize: '0.625rem', color: REPORT_COLORS.text.muted }}>
             <span>적음</span>
-            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: GRASS_COLORS.empty }} />
-            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: GRASS_COLORS.level1 }} />
-            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: GRASS_COLORS.level2 }} />
-            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: GRASS_COLORS.level3 }} />
+            <div style={{ ...cellStyle, backgroundColor: REPORT_COLORS.grass.empty }} />
+            <div style={{ ...cellStyle, backgroundColor: REPORT_COLORS.grass.level1 }} />
+            <div style={{ ...cellStyle, backgroundColor: REPORT_COLORS.grass.level2 }} />
+            <div style={{ ...cellStyle, backgroundColor: REPORT_COLORS.grass.level3 }} />
             <span>많음</span>
           </div>
         </div>

@@ -1,8 +1,10 @@
 /**
  * ReportWrongAnswers - PDF report recent wrong answers table
+ * Uses inline styles with RGB colors for html2pdf.js compatibility
  */
 
 import { XCircle } from 'lucide-react';
+import { REPORT_COLORS } from './colors';
 
 interface WrongAnswer {
   quizId: string;
@@ -23,21 +25,42 @@ export function ReportWrongAnswers({ answers }: ReportWrongAnswersProps) {
   // Take latest 10
   const recentAnswers = answers.slice(0, 10);
 
+  const cardStyle = {
+    backgroundColor: REPORT_COLORS.bg.light,
+    borderRadius: '0.5rem',
+    border: `1px solid ${REPORT_COLORS.border.light}`,
+    overflow: 'hidden',
+  };
+
+  const headerCellStyle = {
+    textAlign: 'left' as const,
+    padding: '0.5rem 1rem',
+    fontWeight: 500,
+    color: REPORT_COLORS.text.muted,
+    backgroundColor: REPORT_COLORS.bg.muted,
+    borderBottom: `1px solid ${REPORT_COLORS.border.light}`,
+  };
+
+  const cellStyle = {
+    padding: '0.5rem 1rem',
+    borderBottom: `1px solid ${REPORT_COLORS.bg.muted}`,
+  };
+
   return (
-    <div className="keep-together mb-8">
-      <div className="flex items-center gap-2 mb-4">
-        <XCircle className="w-5 h-5 text-red-500" />
-        <h2 className="text-lg font-semibold text-gray-800">최근 오답 기록</h2>
-        <span className="text-sm text-gray-500">({recentAnswers.length}개)</span>
+    <div className="keep-together" style={{ marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+        <XCircle style={{ width: '1.25rem', height: '1.25rem', color: REPORT_COLORS.accent.red }} />
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary }}>최근 오답 기록</h2>
+        <span style={{ fontSize: '0.875rem', color: REPORT_COLORS.text.muted }}>({recentAnswers.length}개)</span>
       </div>
 
-      <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+      <div style={cardStyle}>
+        <table style={{ width: '100%', fontSize: '0.875rem', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="bg-gray-100 border-b border-gray-200">
-              <th className="text-left px-4 py-2 font-medium text-gray-700">문제</th>
-              <th className="text-left px-4 py-2 font-medium text-gray-700">내 답변</th>
-              <th className="text-left px-4 py-2 font-medium text-gray-700">일시</th>
+            <tr>
+              <th style={headerCellStyle}>문제</th>
+              <th style={headerCellStyle}>내 답변</th>
+              <th style={headerCellStyle}>일시</th>
             </tr>
           </thead>
           <tbody>
@@ -53,15 +76,12 @@ export function ReportWrongAnswers({ answers }: ReportWrongAnswersProps) {
               });
 
               return (
-                <tr
-                  key={`${answer.quizId}-${index}`}
-                  className="border-b border-gray-100 last:border-b-0"
-                >
-                  <td className="px-4 py-2 text-gray-800">
+                <tr key={`${answer.quizId}-${index}`}>
+                  <td style={{ ...cellStyle, color: REPORT_COLORS.text.secondary }}>
                     {answer.question || `Quiz #${answer.quizId.slice(-6)}`}
                   </td>
-                  <td className="px-4 py-2 text-red-600">{answer.userAnswer}</td>
-                  <td className="px-4 py-2 text-gray-500">
+                  <td style={{ ...cellStyle, color: REPORT_COLORS.accent.red }}>{answer.userAnswer}</td>
+                  <td style={{ ...cellStyle, color: REPORT_COLORS.text.muted }}>
                     {dateStr} {timeStr}
                   </td>
                 </tr>
@@ -71,7 +91,7 @@ export function ReportWrongAnswers({ answers }: ReportWrongAnswersProps) {
         </table>
       </div>
 
-      <p className="text-xs text-gray-500 mt-2">
+      <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted, marginTop: '0.5rem' }}>
         * 오답 문제를 다시 풀어보세요. 같은 실수를 반복하지 않는 것이 중요합니다.
       </p>
     </div>

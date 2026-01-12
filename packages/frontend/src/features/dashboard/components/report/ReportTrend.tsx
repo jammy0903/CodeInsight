@@ -1,23 +1,25 @@
 /**
  * ReportTrend - PDF report weekly trend comparison
+ * Uses inline styles with RGB colors for html2pdf.js compatibility
  */
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { REPORT_COLORS } from './colors';
 
 interface ReportTrendProps {
   dailyActivity: Record<string, number>;
 }
 
 function getTrendIcon(percent: number) {
-  if (percent > 5) return <TrendingUp className="w-5 h-5 text-green-500" />;
-  if (percent < -5) return <TrendingDown className="w-5 h-5 text-red-500" />;
-  return <Minus className="w-5 h-5 text-gray-400" />;
+  if (percent > 5) return <TrendingUp style={{ width: '1.25rem', height: '1.25rem', color: REPORT_COLORS.accent.green }} />;
+  if (percent < -5) return <TrendingDown style={{ width: '1.25rem', height: '1.25rem', color: REPORT_COLORS.accent.red }} />;
+  return <Minus style={{ width: '1.25rem', height: '1.25rem', color: REPORT_COLORS.text.light }} />;
 }
 
 function getTrendColor(percent: number): string {
-  if (percent > 5) return 'text-green-600';
-  if (percent < -5) return 'text-red-600';
-  return 'text-gray-600';
+  if (percent > 5) return REPORT_COLORS.accent.green;
+  if (percent < -5) return REPORT_COLORS.accent.red;
+  return REPORT_COLORS.text.muted;
 }
 
 function getTrendLabel(percent: number): string {
@@ -64,41 +66,50 @@ export function ReportTrend({ dailyActivity }: ReportTrendProps) {
     ? Math.round(((thisWeekMinutes - lastWeekMinutes) / lastWeekMinutes) * 100)
     : thisWeekMinutes > 0 ? 100 : 0;
 
-  return (
-    <div className="keep-together mb-8">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">주간 트렌드</h2>
+  const cardStyle = {
+    backgroundColor: REPORT_COLORS.bg.light,
+    borderRadius: '0.5rem',
+    padding: '1rem',
+    border: `1px solid ${REPORT_COLORS.border.light}`,
+  };
 
-      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <div className="grid grid-cols-3 gap-4">
+  return (
+    <div className="keep-together" style={{ marginBottom: '2rem' }}>
+      <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary, marginBottom: '1rem' }}>
+        주간 트렌드
+      </h2>
+
+      <div style={cardStyle}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
           {/* Last week */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">지난주</p>
-            <p className="text-2xl font-bold text-gray-700">{lastWeekMinutes}</p>
-            <p className="text-xs text-gray-500">분</p>
-            <p className="text-xs text-gray-400 mt-1">{lastWeekDays}일 학습</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted, marginBottom: '0.25rem' }}>지난주</p>
+            <p style={{ fontSize: '1.5rem', fontWeight: 700, color: REPORT_COLORS.text.muted }}>{lastWeekMinutes}</p>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted }}>분</p>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.light, marginTop: '0.25rem' }}>{lastWeekDays}일 학습</p>
           </div>
 
           {/* Trend indicator */}
-          <div className="flex flex-col items-center justify-center">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             {getTrendIcon(percentChange)}
-            <p className={`text-lg font-semibold mt-1 ${getTrendColor(percentChange)}`}>
+            <p style={{ fontSize: '1.125rem', fontWeight: 600, marginTop: '0.25rem', color: getTrendColor(percentChange) }}>
               {percentChange > 0 ? '+' : ''}{percentChange}%
             </p>
-            <p className="text-xs text-gray-500">{getTrendLabel(percentChange)}</p>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted }}>{getTrendLabel(percentChange)}</p>
           </div>
 
           {/* This week */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">이번주</p>
-            <p className="text-2xl font-bold text-gray-900">{thisWeekMinutes}</p>
-            <p className="text-xs text-gray-500">분</p>
-            <p className="text-xs text-gray-400 mt-1">{thisWeekDays}일 학습</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted, marginBottom: '0.25rem' }}>이번주</p>
+            <p style={{ fontSize: '1.5rem', fontWeight: 700, color: REPORT_COLORS.text.primary }}>{thisWeekMinutes}</p>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted }}>분</p>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.light, marginTop: '0.25rem' }}>{thisWeekDays}일 학습</p>
           </div>
         </div>
 
         {/* Summary message */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-600">
+        <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: `1px solid ${REPORT_COLORS.border.light}` }}>
+          <p style={{ fontSize: '0.875rem', color: REPORT_COLORS.text.muted }}>
             {percentChange > 20 && '학습량이 크게 증가했어요! 이 추세를 유지해보세요.'}
             {percentChange > 5 && percentChange <= 20 && '학습량이 조금씩 늘고 있어요. 좋은 방향입니다!'}
             {percentChange >= -5 && percentChange <= 5 && '꾸준한 학습 패턴을 유지하고 있어요.'}
