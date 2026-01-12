@@ -55,11 +55,11 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
   };
 
   return (
-    <div className="bg-zinc-900 font-mono text-sm">
+    <div className="bg-white font-mono text-sm border border-gray-200 rounded-lg overflow-hidden">
       <div className="flex" onMouseUp={handleTextSelect}>
-        {/* 라인 번호 - user-select: none으로 선택 방지 */}
+        {/* Line numbers - user-select: none to prevent selection */}
         <div
-          className="flex-shrink-0 py-3 px-2 text-right text-zinc-500 select-none border-r border-zinc-700 bg-zinc-950"
+          className="flex-shrink-0 py-3 px-2 text-right text-gray-400 select-none border-r border-gray-200 bg-gray-50"
           style={{ userSelect: 'none' }}
         >
           {lines.map((_, idx) => (
@@ -67,7 +67,7 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
               key={idx}
               className={cn(
                 'px-2 leading-6',
-                highlightLine === idx + 1 && 'text-yellow-400 font-bold'
+                highlightLine === idx + 1 && 'text-green-600 font-bold'
               )}
             >
               {idx + 1}
@@ -75,7 +75,7 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
           ))}
         </div>
 
-        {/* 코드 */}
+        {/* Code */}
         <div className="flex-1 py-3 px-4 overflow-x-auto">
           {lines.map((line, idx) => (
             <div
@@ -83,10 +83,10 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
               className={cn(
                 'leading-6 whitespace-pre',
                 highlightLine === idx + 1 &&
-                  'bg-yellow-400/20 -mx-4 px-4 border-l-2 border-yellow-400'
+                  'bg-green-100 -mx-4 px-4 border-l-2 border-green-500'
               )}
             >
-              <HighlightedLine line={line} />
+              <HighlightedLine line={line} isLight />
             </div>
           ))}
         </div>
@@ -96,34 +96,45 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
 }
 
 /**
- * 간단한 C 구문 강조
+ * Simple C syntax highlighting
+ * isLight: true for light theme (LessonPage), false for dark theme
  */
-function HighlightedLine({ line }: { line: string }) {
-  // 기본적인 토큰 패턴
-  const patterns: Array<{ regex: RegExp; className: string }> = [
-    // 주석
+function HighlightedLine({ line, isLight = false }: { line: string; isLight?: boolean }) {
+  // Light theme colors (for white background)
+  const lightPatterns: Array<{ regex: RegExp; className: string }> = [
+    { regex: /\/\/.*$/, className: 'text-gray-500' },           // Comments
+    { regex: /"[^"]*"/, className: 'text-green-600' },          // Strings
+    { regex: /\b\d+\b/, className: 'text-purple-600' },         // Numbers
+    {
+      regex: /\b(int|char|void|return|if|else|for|while|sizeof|malloc|free|NULL|printf|scanf)\b/,
+      className: 'text-blue-600 font-medium',                   // Keywords
+    },
+    { regex: /\b(int|char|void)\s*\*/, className: 'text-cyan-600' }, // Pointer types
+    { regex: /[&*](?=\w)/, className: 'text-orange-500' },      // Operators
+  ];
+
+  // Dark theme colors (for dark background) - kept for reference
+  const darkPatterns: Array<{ regex: RegExp; className: string }> = [
     { regex: /\/\/.*$/, className: 'text-zinc-500' },
-    // 문자열
     { regex: /"[^"]*"/, className: 'text-green-400' },
-    // 숫자
     { regex: /\b\d+\b/, className: 'text-purple-400' },
-    // 키워드
     {
       regex: /\b(int|char|void|return|if|else|for|while|sizeof|malloc|free|NULL|printf|scanf)\b/,
       className: 'text-blue-400',
     },
-    // 타입/포인터
     { regex: /\b(int|char|void)\s*\*/, className: 'text-cyan-400' },
-    // 연산자
     { regex: /[&*](?=\w)/, className: 'text-yellow-400' },
   ];
 
-  // 빈 줄 처리
+  const patterns = isLight ? lightPatterns : darkPatterns;
+  const defaultTextClass = isLight ? 'text-gray-800' : 'text-zinc-100';
+
+  // Empty line handling
   if (line.trim() === '') {
     return <span>&nbsp;</span>;
   }
 
-  // 간단한 토큰화 (첫 번째 매칭만)
+  // Simple tokenization (first match only)
   let elements: React.ReactNode[] = [];
   let remaining = line;
   let key = 0;
@@ -134,15 +145,15 @@ function HighlightedLine({ line }: { line: string }) {
     for (const { regex, className } of patterns) {
       const match = remaining.match(regex);
       if (match && match.index !== undefined) {
-        // 매칭 전 텍스트
+        // Text before match
         if (match.index > 0) {
           elements.push(
-            <span key={key++} className="text-zinc-100">
+            <span key={key++} className={defaultTextClass}>
               {remaining.slice(0, match.index)}
             </span>
           );
         }
-        // 매칭된 텍스트
+        // Matched text
         elements.push(
           <span key={key++} className={className}>
             {match[0]}
@@ -155,9 +166,9 @@ function HighlightedLine({ line }: { line: string }) {
     }
 
     if (!matched) {
-      // 매칭 없으면 한 문자씩 진행
+      // No match, advance one character
       elements.push(
-        <span key={key++} className="text-zinc-100">
+        <span key={key++} className={defaultTextClass}>
           {remaining[0]}
         </span>
       );
