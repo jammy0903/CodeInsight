@@ -10,14 +10,12 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, HelpCircle, LayoutDashboard, User } from 'lucide-react';
+import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/store';
-import { logout, loginWithGoogle } from '@/services/firebase';
+import { logout, loginWithGoogle, loginWithKakao } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
 import { logger } from '@/utils/logger';
-import { useThemeStore } from '@/stores/themeStore';
-import { themes } from '@/config/themes';
 
 const SIDEBAR_WIDTH = 224; // 14rem
 
@@ -25,29 +23,25 @@ interface NavItem {
   path: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  requiresAuth?: boolean; // 로그인 필요 여부
 }
 
-// 모든 사용자용 메뉴
 const NAV_ITEMS: NavItem[] = [
   { path: '/', label: '홈', icon: Home },
   { path: '/courses', label: 'Courses', icon: BookOpen },
-  { path: '/quiz', label: 'Quiz', icon: HelpCircle },
   { path: '/playground', label: 'Playground', icon: Play },
 ];
 
-// 로그인 사용자 전용 메뉴
+// 로그인 필수 탭들
 const AUTH_NAV_ITEMS: NavItem[] = [
-  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, requiresAuth: true },
-  { path: '/profile', label: 'Profile', icon: User, requiresAuth: true },
+  { path: '/quiz', label: '퀴즈', icon: FileQuestion },
+  { path: '/dashboard', label: '나의 현황', icon: BarChart3 },
+  { path: '/profile', label: '프로필', icon: User },
 ];
 
 export function Sidebar() {
   const location = useLocation();
   const { sidebarOpen, toggleSidebar, firebaseUser, appUser, needsRegistration } = useStore();
   const isAdmin = appUser?.role === 'admin';
-  const currentTheme = useThemeStore((s) => s.theme);
-  const layoutColors = themes[currentTheme].layout;
 
   const handleSignOut = async () => {
     await logout();
@@ -57,7 +51,15 @@ export function Sidebar() {
     try {
       await loginWithGoogle();
     } catch (error) {
-      logger.error('Login failed:', error);
+      logger.error('Google login failed:', error);
+    }
+  };
+
+  const handleKakaoLogin = async () => {
+    try {
+      await loginWithKakao();
+    } catch (error) {
+      logger.error('Kakao login failed:', error);
     }
   };
 
@@ -71,8 +73,7 @@ export function Sidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 lg:hidden"
-            style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
+            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
             onClick={toggleSidebar}
           />
 
@@ -82,92 +83,118 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -SIDEBAR_WIDTH }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed left-0 top-0 h-full shadow-lg z-50 flex flex-col"
-            style={{
-              width: SIDEBAR_WIDTH,
-              backgroundColor: layoutColors.sidebarBg,
-              borderRight: `1px solid ${layoutColors.sidebarBorder}`,
-            }}
+            className="fixed left-0 top-0 h-full bg-[#fffbf5] border-r border-[#e5d5c7] shadow-lg z-50 flex flex-col"
+            style={{ width: SIDEBAR_WIDTH }}
           >
             {/* 헤더 */}
-            <div
-              className="p-4 flex items-center justify-between"
-              style={{
-                backgroundColor: layoutColors.sidebarBg,
-                borderBottom: `1px solid ${layoutColors.sidebarBorder}`,
-              }}
-            >
-              <h2 className="text-xl font-bold" style={{ color: layoutColors.sidebarText }}>
+            <div className="p-4 border-b border-[#e5d5c7] flex items-center justify-between bg-[#fffbf5]">
+              <h2 className="text-xl font-bold text-[#6b5a4a]">
                 CodeInsight
               </h2>
               <motion.button
                 onClick={toggleSidebar}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg transition-colors"
-                style={{
-                  border: `1px solid ${layoutColors.sidebarBorder}`,
-                  backgroundColor: layoutColors.sidebarItemBg,
-                }}
+                className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] hover:border-[#a08060] transition-colors"
                 aria-label="사이드바 닫기"
               >
-                <X className="w-5 h-5" style={{ color: layoutColors.sidebarTextMuted }} />
+                <X className="w-5 h-5 text-[#937b5d]" />
               </motion.button>
             </div>
 
             {/* 네비게이션 */}
-            <nav
-              className="flex-1 p-4 space-y-2 overflow-y-auto"
-              style={{ backgroundColor: layoutColors.sidebarBg }}
-            >
-              {/* 공통 메뉴 */}
-              {NAV_ITEMS.map((item) => (
-                <NavLink key={item.path} item={item} location={location} toggleSidebar={toggleSidebar} />
-              ))}
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto bg-[#fffbf5]">
+              {NAV_ITEMS.map((item) => {
+                const isActive = location.pathname === item.path ||
+                  (item.path !== '/' && location.pathname.startsWith(item.path));
+                const Icon = item.icon;
 
-              {/* 로그인 사용자 전용 메뉴 */}
-              {appUser && (
-                <>
-                  <div className="my-3" style={{ borderTop: `1px solid ${layoutColors.sidebarBorder}` }} />
-                  {AUTH_NAV_ITEMS.map((item) => (
-                    <NavLink key={item.path} item={item} location={location} toggleSidebar={toggleSidebar} />
-                  ))}
-                </>
-              )}
-
-              {/* Admin 메뉴 (관리자만 표시) */}
-              {isAdmin && (
-                <>
-                  <div className="my-3" style={{ borderTop: `1px solid ${layoutColors.sidebarBorder}` }} />
+                return (
                   <motion.div
+                    key={item.path}
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                   >
                     <Link
-                      to="/admin"
+                      to={item.path}
                       onClick={toggleSidebar}
-                      className="flex items-center gap-3 px-4 h-12 rounded-lg border transition-all duration-150"
-                      style={{
-                        backgroundColor: location.pathname.startsWith('/admin') ? '#22c55e' : layoutColors.sidebarItemBg,
-                        color: location.pathname.startsWith('/admin') ? '#ffffff' : layoutColors.sidebarText,
-                        borderColor: location.pathname.startsWith('/admin') ? '#16a34a' : layoutColors.sidebarBorder,
-                        fontWeight: location.pathname.startsWith('/admin') ? 600 : 400,
-                      }}
+                      className={`
+                        flex items-center gap-3 px-4 h-12 rounded-lg
+                        border transition-all duration-150
+                        ${isActive
+                          ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
+                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
+                        }
+                      `}
                     >
-                      <Shield className="w-5 h-5 shrink-0" />
-                      <span className="text-sm">Admin</span>
+                      <Icon className="w-5 h-5 shrink-0" />
+                      <span className="text-sm">{item.label}</span>
                     </Link>
                   </motion.div>
-                </>
+                );
+              })}
+
+              {/* 로그인 필수 메뉴 */}
+              {appUser && AUTH_NAV_ITEMS.map((item) => {
+                const isActive = location.pathname === item.path ||
+                  (item.path !== '/' && location.pathname.startsWith(item.path));
+                const Icon = item.icon;
+
+                return (
+                  <motion.div
+                    key={item.path}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  >
+                    <Link
+                      to={item.path}
+                      onClick={toggleSidebar}
+                      className={`
+                        flex items-center gap-3 px-4 h-12 rounded-lg
+                        border transition-all duration-150
+                        ${isActive
+                          ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
+                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
+                        }
+                      `}
+                    >
+                      <Icon className="w-5 h-5 shrink-0" />
+                      <span className="text-sm">{item.label}</span>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+
+              {/* Admin 메뉴 (관리자만 표시) */}
+              {isAdmin && (
+                <motion.div
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                >
+                  <Link
+                    to="/admin"
+                    onClick={toggleSidebar}
+                    className={`
+                      flex items-center gap-3 px-4 h-12 rounded-lg
+                      border transition-all duration-150
+                      ${location.pathname.startsWith('/admin')
+                        ? 'bg-[#7a9a7a] font-semibold border-[#6a8a6a] text-white'
+                        : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#7a9a7a] hover:bg-[#f5fff5]'
+                      }
+                    `}
+                  >
+                    <Shield className="w-5 h-5 shrink-0" />
+                    <span className="text-sm">Admin</span>
+                  </Link>
+                </motion.div>
               )}
             </nav>
 
             {/* 프로필 영역 */}
-            <div
-              className="p-4"
-              style={{ borderTop: `1px solid ${layoutColors.sidebarBorder}` }}
-            >
+            <div className="p-4 border-t border-[#e5d5c7]">
               {firebaseUser ? (
                 <div className="space-y-3">
                   {/* 닉네임 등록 필요 시 */}
@@ -178,12 +205,7 @@ export function Sidebar() {
                       }}
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-lg transition-colors"
-                      style={{
-                        color: layoutColors.sidebarItemActive,
-                        backgroundColor: `${layoutColors.sidebarItemActive}15`,
-                        border: `1px solid ${layoutColors.sidebarItemActive}`,
-                      }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#a08060] bg-[#a08060]/10 border border-[#a08060] rounded-lg hover:bg-[#a08060]/20 transition-colors"
                     >
                       <UserPlus className="w-5 h-5" />
                       닉네임 설정하기
@@ -191,26 +213,14 @@ export function Sidebar() {
                   ) : (
                     <>
                       {/* 등록 완료 상태 - 닉네임 기반 프로필 */}
-                      <div
-                        className="flex items-center gap-3 p-3 rounded-lg"
-                        style={{
-                          backgroundColor: layoutColors.sidebarItemBg,
-                          border: `1px solid ${layoutColors.sidebarBorder}`,
-                        }}
-                      >
+                      <div className="flex items-center gap-3 p-3 bg-[#fff8f0] rounded-lg border border-[#e5d5c7]">
                         <PixelAvatar seed={appUser.nickname} size={40} />
                         <div className="flex-1 min-w-0">
-                          <p
-                            className="text-sm font-semibold truncate"
-                            style={{ color: layoutColors.sidebarText }}
-                          >
+                          <p className="text-sm font-semibold text-[#6b5a4a] truncate">
                             {appUser.nickname}
                           </p>
-                          <p
-                            className="text-xs truncate capitalize"
-                            style={{ color: layoutColors.sidebarTextMuted }}
-                          >
-                            {appUser.oauthAccounts[0]?.provider || 'OAuth'}
+                          <p className="text-xs text-[#937b5d] truncate">
+                            {appUser.oauthAccounts[0]?.email || firebaseUser.email}
                           </p>
                         </div>
                       </div>
@@ -220,30 +230,21 @@ export function Sidebar() {
                     onClick={handleSignOut}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors hover:bg-red-500/10"
-                    style={{
-                      color: layoutColors.sidebarTextMuted,
-                      border: `1px solid ${layoutColors.sidebarBorder}`,
-                    }}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#937b5d] border border-[#e5d5c7] rounded-lg hover:border-[#c08080] hover:text-[#c08080] hover:bg-red-50/50 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     로그아웃
                   </motion.button>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {/* 비로그인 상태 */}
                   <motion.button
                     onClick={handleGoogleLogin}
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-lg transition-colors"
-                    style={{
-                      color: layoutColors.sidebarText,
-                      backgroundColor: layoutColors.sidebarItemBg,
-                      border: `1px solid ${layoutColors.sidebarBorder}`,
-                    }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#6b5a4a] bg-white border border-[#e5d5c7] rounded-lg hover:border-[#a08060] hover:bg-[#fff8f0] transition-colors"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
@@ -265,10 +266,25 @@ export function Sidebar() {
                     </svg>
                     Google 로그인
                   </motion.button>
-                  <p
-                    className="text-xs text-center"
-                    style={{ color: layoutColors.sidebarTextMuted }}
+
+                  {/* 카카오 로그인 */}
+                  <motion.button
+                    onClick={handleKakaoLogin}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#3C1E1E] bg-[#FEE500] border border-[#FEE500] rounded-lg hover:bg-[#FDD800] transition-colors"
                   >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path
+                        fill="#3C1E1E"
+                        d="M12 3C6.477 3 2 6.463 2 10.691c0 2.693 1.775 5.063 4.445 6.412-.144.523-.926 3.369-.963 3.592 0 0-.02.166.088.229.108.063.235.015.235.015.31-.043 3.593-2.363 4.159-2.771.339.047.686.071 1.036.071 5.523 0 10-3.463 10-7.548C22 6.463 17.523 3 12 3z"
+                      />
+                    </svg>
+                    카카오 로그인
+                  </motion.button>
+
+                  <p className="text-xs text-[#937b5d] text-center pt-1">
                     © 2026 CodeInsight
                   </p>
                 </div>
@@ -278,43 +294,5 @@ export function Sidebar() {
         </>
       )}
     </AnimatePresence>
-  );
-}
-
-// 네비게이션 링크 컴포넌트
-interface NavLinkProps {
-  item: NavItem;
-  location: { pathname: string };
-  toggleSidebar: () => void;
-}
-
-function NavLink({ item, location, toggleSidebar }: NavLinkProps) {
-  const isActive = location.pathname === item.path ||
-    (item.path !== '/' && location.pathname.startsWith(item.path));
-  const Icon = item.icon;
-  const currentTheme = useThemeStore((s) => s.theme);
-  const layoutColors = themes[currentTheme].layout;
-
-  return (
-    <motion.div
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-    >
-      <Link
-        to={item.path}
-        onClick={toggleSidebar}
-        className="flex items-center gap-3 px-4 h-12 rounded-lg border transition-all duration-150"
-        style={{
-          backgroundColor: isActive ? layoutColors.sidebarItemActive : layoutColors.sidebarItemBg,
-          color: isActive ? '#ffffff' : layoutColors.sidebarText,
-          borderColor: isActive ? layoutColors.sidebarItemActive : layoutColors.sidebarBorder,
-          fontWeight: isActive ? 600 : 400,
-        }}
-      >
-        <Icon className="w-5 h-5 shrink-0" />
-        <span className="text-sm">{item.label}</span>
-      </Link>
-    </motion.div>
   );
 }

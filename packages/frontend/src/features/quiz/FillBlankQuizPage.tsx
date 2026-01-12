@@ -112,18 +112,13 @@ export function FillBlankQuizPage() {
   };
 
   // 코드에서 빈칸을 하이라이트
-  // quizState에 따라 배경/텍스트 색상 결정
   const renderCode = () => {
     const parts = currentQuiz.code.split('____');
-    // question: 다크 배경 → 밝은 텍스트
-    // correct/incorrect: 밝은 배경 → 어두운 텍스트
-    const codeTextColor = quizState === 'question' ? 'text-gray-100' : 'text-[#6b5a4a]';
-
     return (
       <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap">
         {parts.map((part, index) => (
           <span key={index}>
-            <span className={codeTextColor}>{part}</span>
+            <span className="text-[#6b5a4a]">{part}</span>
             {index < parts.length - 1 && (
               <span className={`px-2 py-0.5 rounded ${
                 quizState === 'question'
@@ -256,7 +251,9 @@ export function FillBlankQuizPage() {
                   ? 'bg-red-50 border-red-300'
                   : 'bg-[#1e1e1e] border-[#333]'
               }`}>
-                {renderCode()}
+                <div className={quizState === 'question' ? 'text-gray-300' : ''}>
+                  {renderCode()}
+                </div>
               </div>
             </div>
 
