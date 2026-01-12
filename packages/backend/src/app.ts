@@ -14,6 +14,8 @@ import { userRoutes } from './modules/users/routes';
 import { cRoutes } from './modules/c/routes';
 import { aiRoutes } from './modules/ai/routes';
 import { courseRoutes } from './modules/courses/routes';
+import { analyticsRoutes } from './modules/analytics/routes';
+import { notesRoutes } from './modules/notes/routes';
 import adminRoutes from './modules/admin/admin.routes';
 import { lessonContentLoader } from './services/lessonContentLoader';
 
@@ -56,6 +58,8 @@ app.use('/api/v1/users', userRoutes); // Rate Limiter 제거: 중복 닉네임�
 app.use('/api/v1/c', executeRateLimit, cRoutes);
 app.use('/api/v1/ai', aiRateLimit, aiRoutes);
 app.use('/api/v1/courses', rateLimit, courseRoutes);
+app.use('/api/v1/analytics', rateLimit, analyticsRoutes);
+app.use('/api/v1/notes', rateLimit, notesRoutes);
 app.use('/api/v1/admin', rateLimit, adminRoutes);
 
 // =============================================
@@ -81,6 +85,12 @@ app.use('/api/ai', (req, res) => {
 });
 app.use('/api/courses', (req, res) => {
   res.redirect(301, `/api/v1/courses${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/analytics', (req, res) => {
+  res.redirect(301, `/api/v1/analytics${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/notes', (req, res) => {
+  res.redirect(301, `/api/v1/notes${req.path === '/' ? '' : req.path}`);
 });
 app.use('/api/admin', (req, res) => {
   res.redirect(301, `/api/v1/admin${req.path === '/' ? '' : req.path}`);

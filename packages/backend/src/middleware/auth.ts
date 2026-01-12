@@ -196,3 +196,69 @@ export async function optionalAuth(
 
   next();
 }
+
+/**
+ * 선택적 인증 + DB 사용자 조회 미들웨어
+ * - 토큰이 있으면 검증 + DB 조회, 없으면 통과
+ * - 로그인 선택적이지만 로그인 시 DB 사용자 정보가 필요한 엔드포인트용
+ * WHY: AI 채팅, 조회수 등 비로그인도 되지만 로그인 시 기록 저장
+ */
+export async function optionalDbUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    next();
+    return;
+  }
+
+  const token = authHeader.slice(7);
+
+  try {
+    const decodedToken = await getFirebaseAuth().verifyIdToken(token);
+    const provider = getProviderFromFirebase(decodedToken.firebase?.sign_in_provider);
+
+    req.user = {
+      uid: decodedToken.uid,
+      email: decodedToken.email,
+      provider,
+    };
+
+    // DB에서 User 조회 (선택적이므로 없어도 통과)
+    const oauthAccount = await prisma.oAuthAccount.findUnique({
+      where: {
+        provider_providerId: {
+          provider: req.user.provider,
+          providerId: req.user.uid,
+        },
+      },
+      include: {
+        user: {
+          include: {
+            oauthAccounts: {
+              select: {
+                provider: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (oauthAccount) {
+      req.user.dbUser = {
+        id: oauthAccount.user.id,
+        nickname: oauthAccount.user.nickname,
+        role: oauthAccount.user.role,
+        oauthAccounts: oauthAccount.user.oauthAccounts,
+      };
+    }
+  } catch {
+    // 토큰 검증 실패해도 통과 (선택적 인증)
+  }
+
+  next();
+}

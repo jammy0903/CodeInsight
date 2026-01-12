@@ -16,6 +16,8 @@ import {
 } from './providers';
 import { getSettings } from './settings';
 import { logger } from '../../utils/logger';
+import { prisma } from '../../config/database';
+import { optionalDbUser } from '../../middleware/auth';
 
 const router = Router();
 
@@ -42,6 +44,9 @@ const chatRequestSchema = z.object({
     currentLine: z.number().optional(),
     quizQuestion: z.string().optional(),
   }).optional(),
+  // 분석 리포트용 추가 필드
+  lessonId: z.string().optional(),           // 어떤 레슨에서 질문했는지
+  contextType: z.enum(['lesson', 'playground', 'general']).optional(), // 질문 맥락
 });
 
 const switchProviderSchema = z.object({
@@ -369,7 +374,8 @@ ${changesStr}
 });
 
 // === Q&A 채팅 엔드포인트 ===
-router.post('/chat', async (req, res) => {
+// optionalDbUser: 로그인 안 해도 사용 가능, 로그인 시 ChatHistory 저장
+router.post('/chat', optionalDbUser, async (req, res) => {
   try {
     const parsed = chatRequestSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -379,7 +385,7 @@ router.post('/chat', async (req, res) => {
       });
     }
 
-    const { message, history, context } = parsed.data;
+    const { message, history, context, lessonId, contextType } = parsed.data;
     const provider = getCurrentProvider();
 
     const response = await provider.chat({
@@ -387,6 +393,23 @@ router.post('/chat', async (req, res) => {
       history,
       systemPrompt: buildChatPrompt(context),
     });
+
+    // 로그인 사용자인 경우 ChatHistory 저장 (비동기, 실패해도 응답에 영향 없음)
+    const userId = req.user?.dbUser?.id;
+    if (userId) {
+      prisma.chatHistory.create({
+        data: {
+          userId,
+          lessonId: lessonId || null,
+          context: contextType || null,
+          question: message,
+          answer: response.content,
+          tokens: response.usage?.totalTokens || null,
+        },
+      }).catch((err) => {
+        logger.error('Failed to save chat history:', err);
+      });
+    }
 
     res.json(response);
   } catch (error) {
