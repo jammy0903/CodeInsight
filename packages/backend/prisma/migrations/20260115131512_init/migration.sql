@@ -3,8 +3,8 @@ CREATE TABLE "users" (
     "id" UUID NOT NULL,
     "nickname" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'user',
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -15,8 +15,7 @@ CREATE TABLE "oauth_accounts" (
     "user_id" UUID NOT NULL,
     "provider" TEXT NOT NULL,
     "provider_id" TEXT NOT NULL,
-    "email" TEXT,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "oauth_accounts_pkey" PRIMARY KEY ("id")
 );
@@ -36,7 +35,7 @@ CREATE TABLE "problems" (
     "test_cases" JSONB NOT NULL DEFAULT '[]',
     "time_limit" INTEGER NOT NULL DEFAULT 1000,
     "memory_limit" INTEGER NOT NULL DEFAULT 256,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "problems_pkey" PRIMARY KEY ("id")
 );
@@ -49,7 +48,7 @@ CREATE TABLE "submissions" (
     "code" TEXT NOT NULL,
     "verdict" TEXT NOT NULL DEFAULT 'judging',
     "execution_time" INTEGER,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "submissions_pkey" PRIMARY KEY ("id")
 );
@@ -60,7 +59,7 @@ CREATE TABLE "drafts" (
     "user_id" UUID NOT NULL,
     "problem_id" UUID NOT NULL,
     "code" TEXT NOT NULL,
-    "saved_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "saved_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "drafts_pkey" PRIMARY KEY ("id")
 );
@@ -73,9 +72,10 @@ CREATE TABLE "languages" (
     "icon" TEXT,
     "color" TEXT,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "is_sequential" BOOLEAN NOT NULL DEFAULT true,
     "order" INTEGER NOT NULL,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
 
     CONSTRAINT "languages_pkey" PRIMARY KEY ("id")
 );
@@ -91,8 +91,8 @@ CREATE TABLE "chapters" (
     "part_label" TEXT,
     "order" INTEGER NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
 
     CONSTRAINT "chapters_pkey" PRIMARY KEY ("id")
 );
@@ -107,8 +107,8 @@ CREATE TABLE "lessons" (
     "order" INTEGER NOT NULL,
     "estimated_time" INTEGER,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
 
     CONSTRAINT "lessons_pkey" PRIMARY KEY ("id")
 );
@@ -120,8 +120,8 @@ CREATE TABLE "lesson_contents" (
     "code" TEXT NOT NULL,
     "language" TEXT NOT NULL,
     "steps" JSONB NOT NULL,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
 
     CONSTRAINT "lesson_contents_pkey" PRIMARY KEY ("id")
 );
@@ -136,7 +136,7 @@ CREATE TABLE "quizzes" (
     "answer" TEXT NOT NULL,
     "explanation" TEXT,
     "order" INTEGER NOT NULL,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "quizzes_pkey" PRIMARY KEY ("id")
 );
@@ -150,11 +150,67 @@ CREATE TABLE "user_progress" (
     "current_step" INTEGER NOT NULL DEFAULT 0,
     "quiz_score" INTEGER,
     "quiz_total" INTEGER,
-    "started_at" TIMESTAMPTZ,
-    "completed_at" TIMESTAMPTZ,
-    "updated_at" TIMESTAMPTZ NOT NULL,
+    "started_at" TIMESTAMPTZ(6),
+    "completed_at" TIMESTAMPTZ(6),
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
 
     CONSTRAINT "user_progress_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "lesson_activities" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "lesson_id" TEXT NOT NULL,
+    "started_at" TIMESTAMPTZ(6) NOT NULL,
+    "ended_at" TIMESTAMPTZ(6),
+    "duration" INTEGER,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "lesson_activities_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "chat_histories" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "lesson_id" TEXT,
+    "context" VARCHAR(50),
+    "question" TEXT NOT NULL,
+    "answer" TEXT NOT NULL,
+    "tokens" INTEGER,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "chat_histories_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "quiz_attempts" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "quiz_id" TEXT NOT NULL,
+    "user_answer" VARCHAR(500) NOT NULL,
+    "is_correct" BOOLEAN NOT NULL,
+    "time_spent" INTEGER,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "quiz_attempts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_notes" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "quiz_id" TEXT,
+    "lesson_id" TEXT NOT NULL,
+    "source" VARCHAR(20) NOT NULL,
+    "concept" VARCHAR(100) NOT NULL,
+    "content" TEXT NOT NULL,
+    "is_from_wrong" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL,
+
+    CONSTRAINT "user_notes_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -202,6 +258,45 @@ CREATE INDEX "user_progress_lesson_id_idx" ON "user_progress"("lesson_id");
 -- CreateIndex
 CREATE UNIQUE INDEX "user_progress_user_id_lesson_id_key" ON "user_progress"("user_id", "lesson_id");
 
+-- CreateIndex
+CREATE INDEX "lesson_activities_user_id_started_at_idx" ON "lesson_activities"("user_id", "started_at");
+
+-- CreateIndex
+CREATE INDEX "lesson_activities_lesson_id_idx" ON "lesson_activities"("lesson_id");
+
+-- CreateIndex
+CREATE INDEX "lesson_activities_started_at_idx" ON "lesson_activities"("started_at");
+
+-- CreateIndex
+CREATE INDEX "chat_histories_user_id_created_at_idx" ON "chat_histories"("user_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "chat_histories_lesson_id_idx" ON "chat_histories"("lesson_id");
+
+-- CreateIndex
+CREATE INDEX "chat_histories_created_at_idx" ON "chat_histories"("created_at");
+
+-- CreateIndex
+CREATE INDEX "quiz_attempts_user_id_created_at_idx" ON "quiz_attempts"("user_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "quiz_attempts_user_id_is_correct_idx" ON "quiz_attempts"("user_id", "is_correct");
+
+-- CreateIndex
+CREATE INDEX "quiz_attempts_quiz_id_idx" ON "quiz_attempts"("quiz_id");
+
+-- CreateIndex
+CREATE INDEX "user_notes_user_id_concept_idx" ON "user_notes"("user_id", "concept");
+
+-- CreateIndex
+CREATE INDEX "user_notes_user_id_lesson_id_idx" ON "user_notes"("user_id", "lesson_id");
+
+-- CreateIndex
+CREATE INDEX "user_notes_user_id_is_from_wrong_idx" ON "user_notes"("user_id", "is_from_wrong");
+
+-- CreateIndex
+CREATE INDEX "user_notes_concept_idx" ON "user_notes"("concept");
+
 -- AddForeignKey
 ALTER TABLE "oauth_accounts" ADD CONSTRAINT "oauth_accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -234,3 +329,30 @@ ALTER TABLE "user_progress" ADD CONSTRAINT "user_progress_lesson_id_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "user_progress" ADD CONSTRAINT "user_progress_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "lesson_activities" ADD CONSTRAINT "lesson_activities_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "lesson_activities" ADD CONSTRAINT "lesson_activities_lesson_id_fkey" FOREIGN KEY ("lesson_id") REFERENCES "lessons"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chat_histories" ADD CONSTRAINT "chat_histories_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chat_histories" ADD CONSTRAINT "chat_histories_lesson_id_fkey" FOREIGN KEY ("lesson_id") REFERENCES "lessons"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "quiz_attempts" ADD CONSTRAINT "quiz_attempts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "quiz_attempts" ADD CONSTRAINT "quiz_attempts_quiz_id_fkey" FOREIGN KEY ("quiz_id") REFERENCES "quizzes"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_notes" ADD CONSTRAINT "user_notes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_notes" ADD CONSTRAINT "user_notes_quiz_id_fkey" FOREIGN KEY ("quiz_id") REFERENCES "quizzes"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_notes" ADD CONSTRAINT "user_notes_lesson_id_fkey" FOREIGN KEY ("lesson_id") REFERENCES "lessons"("id") ON DELETE CASCADE ON UPDATE CASCADE;

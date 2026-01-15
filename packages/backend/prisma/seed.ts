@@ -358,7 +358,161 @@ async function seed() {
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
   }
 
-  // 5. Python 실무 코스 커리큘럼 로드
+  // 5. Java 커리큘럼 로드
+  console.log('  📚 Loading Java curriculum from JSON...');
+  const javaCurriculum = loadCurriculum('java');
+
+  if (javaCurriculum) {
+    let javaContentCount = 0;
+    let javaQuizCount = 0;
+
+    for (const chapterData of javaCurriculum.chapters) {
+      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
+
+      const chapter = await prisma.chapter.create({
+        data: {
+          id: chapterData.chapterId,
+          languageId: 'java',
+          title: chapterData.title,
+          description: chapterData.description,
+          keyQuestion: chapterData.keyQuestion || '',
+          part: 'basics',
+          partLabel: '기초',
+          order: chapterData.order,
+        },
+      });
+
+      // 각 챕터의 레슨 생성
+      for (const lessonId of chapterData.lessons) {
+        const content = loadLessonContent('java', lessonId);
+        if (content) {
+          console.log(`      ├─ Lesson: ${content.title}`);
+
+          const lesson = await prisma.lesson.create({
+            data: {
+              id: lessonId,
+              chapterId: chapter.id,
+              title: content.title,
+              description: content.concept,
+              difficulty: 'basic',
+              order: chapterData.lessons.indexOf(lessonId) + 1,
+              estimatedTime: 10,
+            },
+          });
+
+          await prisma.lessonContent.create({
+            data: {
+              id: `content-${lessonId}`,
+              lessonId: lesson.id,
+              code: content.content.code,
+              language: 'java',
+              steps: JSON.stringify(content.content.steps),
+            },
+          });
+          javaContentCount++;
+
+          // 퀴즈 생성
+          if (content.quiz) {
+            await prisma.quiz.create({
+              data: {
+                id: `quiz-${lessonId}`,
+                lessonId: lesson.id,
+                type: 'multiple_choice',
+                question: content.quiz.question,
+                options: content.quiz.options,
+                answer: String(content.quiz.correctIndex),
+                explanation: content.quiz.explanation,
+                order: 1,
+              },
+            });
+            javaQuizCount++;
+          }
+        }
+      }
+    }
+
+    console.log(`    📄 Loaded ${javaContentCount} lesson contents`);
+    console.log(`    ❓ Loaded ${javaQuizCount} quizzes`);
+  }
+
+  // 6. Python (기초) 커리큘럼 로드
+  console.log('  📚 Loading Python curriculum from JSON...');
+  const pythonCurriculum = loadCurriculum('python');
+
+  if (pythonCurriculum) {
+    let pythonContentCount = 0;
+    let pythonQuizCount = 0;
+
+    for (const chapterData of pythonCurriculum.chapters) {
+      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
+
+      const chapter = await prisma.chapter.create({
+        data: {
+          id: chapterData.chapterId,
+          languageId: 'python',
+          title: chapterData.title,
+          description: chapterData.description,
+          keyQuestion: chapterData.keyQuestion || '',
+          part: 'basics',
+          partLabel: '기초',
+          order: chapterData.order,
+        },
+      });
+
+      // 각 챕터의 레슨 생성
+      for (const lessonId of chapterData.lessons) {
+        const content = loadLessonContent('python', lessonId);
+        if (content) {
+          console.log(`      ├─ Lesson: ${content.title}`);
+
+          const lesson = await prisma.lesson.create({
+            data: {
+              id: lessonId,
+              chapterId: chapter.id,
+              title: content.title,
+              description: content.concept,
+              difficulty: 'basic',
+              order: chapterData.lessons.indexOf(lessonId) + 1,
+              estimatedTime: 10,
+            },
+          });
+
+          await prisma.lessonContent.create({
+            data: {
+              id: `content-${lessonId}`,
+              lessonId: lesson.id,
+              code: content.content.code,
+              language: 'python',
+              steps: JSON.stringify(content.content.steps),
+            },
+          });
+          pythonContentCount++;
+
+          // 퀴즈 생성
+          if (content.quiz) {
+            await prisma.quiz.create({
+              data: {
+                id: `quiz-${lessonId}`,
+                lessonId: lesson.id,
+                type: 'multiple_choice',
+                question: content.quiz.question,
+                options: content.quiz.options,
+                answer: String(content.quiz.correctIndex),
+                explanation: content.quiz.explanation,
+                order: 1,
+              },
+            });
+            pythonQuizCount++;
+          }
+        }
+      }
+    }
+
+    console.log(`    📄 Loaded ${pythonContentCount} lesson contents`);
+    console.log(`    ❓ Loaded ${pythonQuizCount} quizzes`);
+  }
+
+  // 7. Python 실무 코스 커리큘럼 로드
   console.log('  📚 Loading Python (업무 자동화) curriculum from JSON...');
   const pythonPracticalCurriculum = loadCurriculum('python-practical');
 
