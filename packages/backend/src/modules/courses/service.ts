@@ -104,7 +104,7 @@ export async function getLessonFull(lessonId: string) {
   if (!lesson) return null;
 
   // steps JSON 파싱
-  if (lesson.content?.steps) {
+  if (lesson.content?.steps && typeof lesson.content.steps === 'string') {
     try {
       const parsedSteps = JSON.parse(lesson.content.steps);
       return {
@@ -312,7 +312,7 @@ export async function createLessonWithContent(data: {
               id: q.id || randomUUID(),
               type: q.type,
               question: q.question,
-              options: q.options ? JSON.stringify(q.options) : null,
+              options: q.options ? JSON.stringify(q.options) : undefined,
               answer: q.answer,
               explanation: q.explanation,
               order: q.order,

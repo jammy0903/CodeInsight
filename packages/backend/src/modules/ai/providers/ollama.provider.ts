@@ -86,70 +86,96 @@ export class OllamaProvider implements IAIProvider {
       { role: 'user', content: request.message },
     ];
 
-    const response = await fetch(`${this.url}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: this.model,
-        messages,
-        stream: true,  // 스트리밍 활성화
-        options: {
-          temperature: 0.7,
-          num_predict: 1024,
-        },
-      }),
-    });
+    // 최대 2번 재시도
+    const maxRetries = 2;
+    let lastError: Error | null = null;
 
-    if (!response.ok) {
-      throw new Error(`Ollama error (${response.status}): ${await response.text()}`);
-    }
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    if (!response.body) {
-      throw new Error('No response body for streaming');
-    }
+      try {
+        const response = await fetch(`${this.url}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: this.model,
+            messages,
+            stream: true,
+            options: {
+              temperature: 0.7,
+              num_predict: 1024,
+            },
+          }),
+        });
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) {
-          onChunk({ content: '', done: true });
-          break;
+        if (!response.ok) {
+          throw new Error(`Ollama error (${response.status}): ${await response.text()}`);
         }
 
-        buffer += decoder.decode(value, { stream: true });
+        if (!response.body) {
+          throw new Error('No response body for streaming');
+        }
 
-        // Ollama NDJSON 파싱: 각 줄이 JSON 객체
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed) continue;
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
 
-          try {
-            const json = JSON.parse(trimmed);
-            const content = json.message?.content || '';
-            if (content) {
-              onChunk({ content, done: false });
-            }
-
-            // Ollama는 done 필드로 종료 표시
-            if (json.done) {
+            if (done) {
               onChunk({ content: '', done: true });
               return;
             }
-          } catch {
-            // JSON 파싱 실패 무시
+
+            buffer += decoder.decode(value, { stream: true });
+
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed) continue;
+
+              try {
+                const json = JSON.parse(trimmed);
+                const content = json.message?.content || '';
+                if (content) {
+                  onChunk({ content, done: false });
+                }
+
+                if (json.done) {
+                  onChunk({ content: '', done: true });
+                  return;
+                }
+              } catch {
+                // JSON 파싱 실패 무시
+              }
+            }
           }
+        } finally {
+          reader.releaseLock();
+          clearTimeout(timeoutId);
         }
+      } catch (error) {
+        lastError = error as Error;
+        clearTimeout(timeoutId);
+
+        // 마지막 시도에서 실패하면 gracefully 종료
+        if (attempt === maxRetries - 1) {
+          onChunk({
+            content: '(AI 설명을 불러올 수 없습니다. Ollama 서버를 확인해주세요.)',
+            done: true,
+          });
+          return;
+        }
+
+        // 재시도 전 짧은 대기
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
-    } finally {
-      reader.releaseLock();
     }
   }
 }

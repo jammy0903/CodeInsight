@@ -199,6 +199,19 @@ export const LessonStepSchema = z.object({
   // WHY: Python은 Names-Objects 모델이므로 C의 stack/heap과 다른 구조
   pyNames: z.array(PyNameSchema).optional(),
   pyObjects: z.array(PyObjectSchema).optional(),
+  // JavaScript 시각화 (이벤트 루프, 클로저 등)
+  eventLoopState: z.unknown().optional(),
+  callStackState: z.unknown().optional(),
+  closureState: z.unknown().optional(),
+  thisBindState: z.unknown().optional(),
+  hoistingState: z.unknown().optional(),
+  scopeChainState: z.unknown().optional(),
+  prototypeState: z.unknown().optional(),
+  // Playground에서 필요한 코드 필드
+  code: z.string().optional(),
+  // C 시뮬레이터 return 정보
+  isReturn: z.boolean().optional(),
+  returnInfo: z.unknown().optional(),
 });
 
 // Legacy aliases for backward compatibility

@@ -40,8 +40,8 @@ export const AssignHandler: PyCodeHandler = {
     // 표현식 평가 → 객체 생성 또는 참조
     const obj = evaluateExpr(ctx, trimmedExpr);
 
-    // 이름 바인딩 (최상위 레벨은 __main__ 프레임)
-    const pyName = ctx.bindName(varName, obj.id, '__main__');
+    // 이름 바인딩 (최상위 레벨은 global 프레임)
+    const pyName = ctx.bindName(varName, obj.id, 'global');
     pyName.highlight = true;
     obj.highlight = true;
 

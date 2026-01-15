@@ -170,7 +170,7 @@ cRoutes.post('/judge', optionalAuth, validate(judgeCodeSchema), async (req, res)
       }
 
       try {
-        cases = JSON.parse(problem.testCases) as Array<{ input: string; output: string }>;
+        cases = JSON.parse(problem.testCases as string) as Array<{ input: string; output: string }>;
       } catch {
         cases = [];
       }
