@@ -1,0 +1,121 @@
+{
+  "lessonId": "py-practical-2-2",
+  "title": "데이터 필터링과 집계",
+  "concept": "조건에 맞는 행 찾기, 부서별 합계 계산 등 실무에서 가장 많이 하는 작업입니다",
+  "content": {
+    "code": "import pandas as pd\n\ndf = pd.read_excel(\"employees.xlsx\")\nhigh_salary = df[df['급여'] >= 5000000]\ndept_summary = df.groupby('부서')['급여'].sum()\nprint(dept_summary)",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Step 1: pandas 불러오기",
+        "explanation": "pandas 라이브러리를 `pd`로 import합니다.",
+        "highlight": [1],
+        "flowIcon": "📦",
+        "flowLabel": "라이브러리",
+        "flowDetail": "pandas"
+      },
+      {
+        "line": 3,
+        "title": "Step 2: Excel 읽기",
+        "explanation": "직원 데이터가 담긴 Excel 파일을 DataFrame으로 불러옵니다.\n\n**예시 데이터**:\n- 이름: 홍길동, 김철수, 이영희, 박민수\n- 부서: 개발, 영업, 개발, 영업\n- 급여: 5000000, 4500000, 5500000, 4800000",
+        "highlight": [3],
+        "flowIcon": "📁",
+        "flowLabel": "Excel 읽기",
+        "flowDetail": "employees.xlsx",
+        "dataframe": {
+          "data": [
+            ["홍길동", "개발", 5000000],
+            ["김철수", "영업", 4500000],
+            ["이영희", "개발", 5500000],
+            ["박민수", "영업", 4800000]
+          ],
+          "columns": ["이름", "부서", "급여"],
+          "shape": [4, 3]
+        },
+        "changes": [
+          "DataFrame 생성",
+          "4개 행 (직원), 3개 열"
+        ]
+      },
+      {
+        "line": 4,
+        "title": "Step 3: 조건 필터링 (급여 5백만 이상)",
+        "explanation": "`df[df['급여'] >= 5000000]`는 **조건에 맞는 행만 필터링**합니다.\n\n**동작 원리**:\n1. `df['급여'] >= 5000000` → True/False 배열 생성\n   - [True, False, True, False]\n2. `df[...]` → True인 행만 선택\n\n**결과**: 홍길동(500만), 이영희(550만)만 남음\n\n**실무 활용**:\n- 특정 기준 이상 매출만 추출\n- 재고가 부족한 상품만 필터링\n- 기한이 지난 작업만 선택",
+        "highlight": [4],
+        "flowIcon": "🔍",
+        "flowLabel": "필터링",
+        "flowDetail": "급여 >= 5000000",
+        "dataframe": {
+          "data": [
+            ["홍길동", "개발", 5000000],
+            ["이영희", "개발", 5500000]
+          ],
+          "columns": ["이름", "부서", "급여"],
+          "shape": [2, 3]
+        },
+        "changes": [
+          "조건: 급여 >= 5000000",
+          "2개 행 필터링됨"
+        ],
+        "tip": "여러 조건: df[(df['급여'] >= 5000000) & (df['부서'] == '개발')]"
+      },
+      {
+        "line": 5,
+        "title": "Step 4: 부서별 급여 합계",
+        "explanation": "`df.groupby('부서')['급여'].sum()`은 **부서별로 그룹화하여 급여 합계**를 계산합니다.\n\n**동작 과정**:\n1. `groupby('부서')` → 부서별로 그룹 나누기\n   - 개발: [홍길동, 이영희]\n   - 영업: [김철수, 박민수]\n2. `['급여']` → 급여 열만 선택\n3. `.sum()` → 각 그룹의 합계 계산\n\n**결과**:\n- 개발: 5000000 + 5500000 = 10500000\n- 영업: 4500000 + 4800000 = 9300000\n\n**실무 활용**:\n- 월별 매출 합계\n- 지점별 재고 현황\n- 프로젝트별 시간 집계",
+        "highlight": [5],
+        "flowIcon": "📊",
+        "flowLabel": "그룹 집계",
+        "flowDetail": "부서별 sum()",
+        "dataframe": {
+          "data": [
+            ["개발", 10500000],
+            ["영업", 9300000]
+          ],
+          "columns": ["부서", "급여 합계"],
+          "shape": [2, 2]
+        },
+        "changes": [
+          "groupby 실행",
+          "개발: 10500000",
+          "영업: 9300000"
+        ],
+        "tip": "다른 집계 함수: .mean() (평균), .count() (개수), .max() (최댓값), .min() (최솟값)"
+      },
+      {
+        "line": 6,
+        "title": "Step 5: 결과 출력",
+        "explanation": "부서별 급여 합계를 출력합니다.\n\n**출력 형식**:\n```\n부서\n개발    10500000\n영업     9300000\nName: 급여, dtype: int64\n```",
+        "highlight": [6],
+        "flowIcon": "🖨️",
+        "flowLabel": "출력",
+        "flowDetail": "print(dept_summary)",
+        "stdout": "부서\n개발    10500000\n영업     9300000\nName: 급여, dtype: int64"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "DataFrame에서 '나이'가 30 이상인 행만 선택하는 코드는?",
+    "options": [
+      "df[df['나이'] > 30]",
+      "df[df['나이'] >= 30]",
+      "df.filter(나이 >= 30)",
+      "df.select(나이 >= 30)"
+    ],
+    "correctIndex": 1,
+    "explanation": "pandas는 df[조건] 형식으로 필터링합니다. '30 이상'은 >= 연산자를 사용합니다. df[df['나이'] >= 30]이 정답입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "필터링은 원본 DataFrame을 변경한다",
+      "correct": "df[조건]은 **새로운 DataFrame**을 반환합니다. 원본은 변경되지 않습니다.",
+      "why": "원본을 바꾸려면: df = df[조건] 처럼 재할당해야 합니다."
+    },
+    {
+      "wrong": "groupby는 Excel의 피벗 테이블과 같다",
+      "correct": "비슷하지만, groupby는 프로그래밍 방식이고 피벗 테이블은 UI 방식입니다. groupby가 더 유연합니다.",
+      "why": "groupby는 여러 열 동시 집계, 커스텀 함수 적용 등이 가능합니다."
+    }
+  ],
+  "keyTakeaway": "필터링(df[조건]) + 집계(groupby) = Excel 작업의 90%"
+}
