@@ -11,6 +11,7 @@ export const LanguageSchema = z.object({
   icon: z.string().nullable().optional().transform(val => val ?? undefined),
   color: z.string().nullable().optional().transform(val => val ?? undefined),
   isActive: z.boolean(),
+  isSequential: z.boolean(), // 순차 잠금 여부 (true = 이전 챕터 완료 필요, false = all open)
   order: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),

@@ -90,16 +90,17 @@ model Draft {
 }
 
 model Language {
-  id          String    @id
-  name        String
-  description String?
-  icon        String?
-  color       String?
-  isActive    Boolean   @default(true) @map("is_active")
-  order       Int
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
-  chapters    Chapter[]
+  id           String    @id
+  name         String
+  description  String?
+  icon         String?
+  color        String?
+  isActive     Boolean   @default(true) @map("is_active")
+  isSequential Boolean   @default(true) @map("is_sequential") // 순차 잠금 여부 (false = all open)
+  order        Int
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  chapters     Chapter[]
 
   @@map("languages")
 }

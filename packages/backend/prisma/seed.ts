@@ -196,6 +196,7 @@ async function seed() {
       description: '급하게 배우는 파이썬 - 엑셀/PDF/PPT 자동화 & 데이터 분석',
       icon: '🚀',
       color: '#FFA500',
+      isSequential: false, // 모든 챕터 즉시 열림
       order: 5,
     },
   });

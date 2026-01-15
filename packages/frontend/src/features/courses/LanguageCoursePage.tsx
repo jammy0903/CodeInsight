@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { ChapterWithLessons, UserProgress } from '@/types';
-import { getChapters, getChapterWithLessons, getUserProgress } from '@/services/courses';
+import type { ChapterWithLessons, UserProgress, Language } from '@/types';
+import { getLanguages, getChapters, getChapterWithLessons, getUserProgress } from '@/services/courses';
 import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
@@ -13,6 +13,7 @@ export function LanguageCoursePage() {
   const navigate = useNavigate();
   const appUser = useStore((state) => state.appUser);
 
+  const [language, setLanguage] = useState<Language | null>(null);
   const [chapters, setChapters] = useState<ChapterWithLessons[]>([]);
   const [progressMap, setProgressMap] = useState<Map<string, UserProgress>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -45,6 +46,16 @@ export function LanguageCoursePage() {
       try {
         setLoading(true);
         setError(null);
+
+        // 0. 언어 정보 가져오기 (isSequential 확인용)
+        const languages = await getLanguages();
+        const currentLanguage = languages.find(l => l.id === lang);
+        if (!currentLanguage) {
+          throw new Error(`Language not found: ${lang}`);
+        }
+        setLanguage(currentLanguage);
+
+        if (cancelled) return;
 
         // 1. 챕터 목록 가져오기
         const chapterList = await getChapters(lang);
@@ -276,7 +287,10 @@ export function LanguageCoursePage() {
               l => progressMap.get(l.id)?.status === 'completed'
             ).length;
             const isComplete = completedInChapter === chapter.lessons.length && chapter.lessons.length > 0;
-            const isLocked = index > 0 && !previousChaptersComplete && completedInChapter === 0;
+            // isSequential이 false면 모든 챕터 즉시 열림
+            const isLocked = language?.isSequential
+              ? index > 0 && !previousChaptersComplete && completedInChapter === 0
+              : false;
             const isActive = !isComplete && !isLocked && (index === 0 || previousChaptersComplete);
 
             return (
