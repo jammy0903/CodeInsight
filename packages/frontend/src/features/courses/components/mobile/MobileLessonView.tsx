@@ -15,6 +15,7 @@ import { CodeViewer } from '../day/CodeViewer';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { MemoryPanel } from '../memory/MemoryPanel';
 import { FlowViewer } from '../python/FlowViewer';
+import { PyVisualizerView } from '@/features/visualizers/python';
 import { MobileAIChatFAB } from './MobileAIChatFAB';
 import { MobileAIChatModal } from './MobileAIChatModal';
 import type { LessonStep } from '@/types';
@@ -186,6 +187,20 @@ export function MobileLessonView({
 
   // 시각화 컴포넌트 렌더링
   const renderVisualization = () => {
+    // Python 메모리 시각화 (pythonMemoryState가 있으면 우선 처리)
+    const pyState = currentStep?.pythonMemoryState;
+    if (pyState && pyState.names && pyState.objects) {
+      return (
+        <PyVisualizerView
+          names={pyState.names}
+          objects={pyState.objects}
+          animate={true}
+          compact={true}
+        />
+      );
+    }
+
+    // Python 플로우 시각화
     if (config.visualType === 'flow') {
       return <FlowViewer steps={steps} currentStepIndex={currentStepIndex} />;
     }
