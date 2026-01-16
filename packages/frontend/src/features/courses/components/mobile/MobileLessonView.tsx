@@ -159,19 +159,19 @@ export function MobileLessonView({
 
   // 설명 컴포넌트 (컴팩트 + NationalPension 폰트)
   const ExplanationSection = () => (
-    <div className="bg-white rounded-xl border border-[#e5d5c7] p-3" style={{ fontFamily: 'NationalPension, cursive', fontWeight: 'normal' }}>
-      <div className="flex items-start gap-2">
-        <span className="shrink-0 px-1.5 py-0.5 rounded bg-[#6b5a4a] text-white text-xs font-bold" style={{ fontFamily: 'var(--font-sans)' }}>
+    <div className="bg-white rounded-lg border border-[#e5d5c7] p-2" style={{ fontFamily: 'NationalPension, cursive', fontWeight: 'normal' }}>
+      <div className="flex items-start gap-1.5">
+        <span className="shrink-0 px-1 py-0.5 rounded bg-[#6b5a4a] text-white text-[10px] font-bold leading-none" style={{ fontFamily: 'var(--font-sans)' }}>
           L{currentStep?.line || 1}
         </span>
-        <span className="text-base text-[#333] leading-snug whitespace-pre-wrap">
+        <span className="text-sm text-[#333] leading-tight whitespace-pre-wrap">
           {currentStep?.explanation ? formatExplanation(currentStep.explanation) : '설명이 없습니다'}
         </span>
       </div>
       {currentStep?.tip && (
-        <div className="mt-2 pl-2 border-l-2 border-amber-400">
-          <span className="text-sm text-amber-700">💡 </span>
-          <span className="text-sm text-amber-800 whitespace-pre-wrap">{currentStep.tip}</span>
+        <div className="mt-1.5 pl-1.5 border-l-2 border-amber-400">
+          <span className="text-xs text-amber-700">💡 </span>
+          <span className="text-xs text-amber-800 whitespace-pre-wrap">{currentStep.tip}</span>
         </div>
       )}
     </div>
@@ -222,26 +222,28 @@ export function MobileLessonView({
           style={{ width: '200%' }}
         >
           {/* 페이지 1: 코드 + 출력 + 설명 */}
-          <div className="w-1/2 h-full overflow-y-auto p-4 space-y-4">
+          <div className="w-1/2 h-full overflow-y-auto p-2 space-y-2">
             {/* 코드 뷰어 */}
-            <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
-              <div className="px-4 py-2 bg-gradient-to-r from-[#2d2d2d] to-[#1a1a1a] text-white text-sm font-semibold flex items-center gap-2">
-                <Code2 className="w-4 h-4" />
+            <div className="bg-white rounded-lg border border-[#e5d5c7] overflow-hidden">
+              <div className="px-3 py-1.5 bg-gradient-to-r from-[#2d2d2d] to-[#1a1a1a] text-white text-xs font-semibold flex items-center gap-2">
+                <Code2 className="w-3 h-3" />
                 {config.codeName}
               </div>
-              <CodeViewer
-                code={code}
-                highlightLine={currentStep?.line || 1}
-              />
+              <div className="max-h-[35vh] overflow-y-auto">
+                <CodeViewer
+                  code={code}
+                  highlightLine={currentStep?.line || 1}
+                />
+              </div>
             </div>
 
             {/* 터미널 출력 */}
             {terminalLines.length > 0 && (
-              <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+              <div className="bg-white rounded-lg border border-[#e5d5c7] overflow-hidden">
                 <TerminalOutput
                   lines={terminalLines}
                   title="출력"
-                  maxHeight="100px"
+                  maxHeight="60px"
                   emptyMessage=""
                   compact
                 />
@@ -253,17 +255,17 @@ export function MobileLessonView({
           </div>
 
           {/* 페이지 2: 설명 + 시각화 */}
-          <div className="w-1/2 h-full overflow-y-auto p-4 space-y-4">
+          <div className="w-1/2 h-full overflow-y-auto p-2 space-y-2">
             {/* 설명 */}
             <ExplanationSection />
 
             {/* 시각화 (메모리 or 플로우) */}
-            <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
-              <div className={`px-4 py-2 bg-gradient-to-r ${config.visualColor} text-white text-sm font-semibold flex items-center gap-2`}>
-                <VisualIcon className="w-4 h-4" />
+            <div className="bg-white rounded-lg border border-[#e5d5c7] overflow-hidden flex-1 flex flex-col">
+              <div className={`px-3 py-1.5 bg-gradient-to-r ${config.visualColor} text-white text-xs font-semibold flex items-center gap-2`}>
+                <VisualIcon className="w-3 h-3" />
                 {config.visualName}
               </div>
-              <div className="p-2 min-h-[200px]">
+              <div className="p-2 flex-1 overflow-y-auto">
                 {renderVisualization()}
               </div>
             </div>
@@ -272,7 +274,7 @@ export function MobileLessonView({
       </div>
 
       {/* 페이지 인디케이터 */}
-      <div className="flex items-center justify-center gap-2 py-3 bg-white border-t border-[#e5d5c7]">
+      <div className="flex items-center justify-center gap-2 py-2 bg-white border-t border-[#e5d5c7]">
         <button
           onClick={() => setCurrentPage(0)}
           className={`w-2.5 h-2.5 rounded-full transition-all ${

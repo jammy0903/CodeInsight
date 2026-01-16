@@ -636,7 +636,7 @@ export function LessonPage() {
         /* ===== 모바일 통합 레이아웃 (모든 언어 동일) ===== */
         <div className="flex flex-col h-[calc(100vh-120px)]">
           {/* 헤더 */}
-          <div className="flex items-center gap-4 mb-4 px-4">
+          <div className="flex items-center gap-4 mb-3 px-2">
             <Link to={languageCoursePath} className="cyber-back-btn">
               <span className="cyber-back-arrow">‹</span>
               <span>EXIT</span>
@@ -666,22 +666,22 @@ export function LessonPage() {
           </div>
 
           {/* 스텝 컨트롤 */}
-          <div className="flex items-center justify-center gap-4 py-4 border-t border-[#e5d5c7] bg-white">
+          <div className="flex items-center justify-center gap-3 py-3 px-2 border-t border-[#e5d5c7] bg-white">
             <button
               onClick={navigation.goToPrevStep}
               disabled={!navigation.canGoPrev}
-              className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors flex items-center gap-2"
+              className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors flex items-center gap-1 text-sm"
             >
               <ChevronLeft className="w-4 h-4" />
               이전
             </button>
-            <span className="text-sm text-gray-500">
+            <span className="text-xs text-gray-500">
               {navigation.currentStepIndex + 1} / {navigation.totalSteps}
             </span>
             {!navigation.isLastStep ? (
               <button
                 onClick={navigation.goToNextStep}
-                className="px-4 py-2 rounded-lg bg-[#6b5a4a] text-white hover:bg-[#5a4a3a] transition-colors flex items-center gap-2"
+                className="px-3 py-1.5 rounded-lg bg-[#6b5a4a] text-white hover:bg-[#5a4a3a] transition-colors flex items-center gap-1 text-sm"
               >
                 다음
                 <ChevronRight className="w-4 h-4" />
@@ -689,7 +689,7 @@ export function LessonPage() {
             ) : (
               <button
                 onClick={navigation.goToQuiz}
-                className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors flex items-center gap-1 text-sm"
               >
                 퀴즈 풀기
                 <Sparkles className="w-4 h-4" />

@@ -12,7 +12,8 @@ import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
 import { logger } from '@/utils/logger';
-import { ChevronLeft, BookOpen, Target } from 'lucide-react';
+import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle } from 'lucide-react';
+import { useIsMobile } from '@/hooks';
 
 // 언어별 색상 (챕터 페이지용 - 바다색)
 const getLanguageColor = (lang: string | undefined) => {
@@ -30,6 +31,7 @@ export function ChapterLessonsPage() {
   const navigate = useNavigate();
   const appUser = useStore((state) => state.appUser);
   const langColor = getLanguageColor(lang);
+  const isMobile = useIsMobile();
 
   const [chapter, setChapter] = useState<ChapterWithLessons | null>(null);
   const [progressMap, setProgressMap] = useState<Map<string, UserProgress>>(new Map());
@@ -119,7 +121,7 @@ export function ChapterLessonsPage() {
   const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen py-4 px-3 md:px-12 lg:px-16">
       {/* 뒤로가기 버튼 */}
       <button
         onClick={() => navigate(`/courses/${lang}`)}
@@ -200,7 +202,7 @@ export function ChapterLessonsPage() {
         </div>
       </div>
 
-      {/* 레슨 Grid */}
+      {/* 레슨 리스트/그리드 */}
       <div style={{ marginTop: '80px' }}>
       {chapter.lessons.length === 0 ? (
         <div className="flex items-center justify-center py-20">
@@ -214,7 +216,41 @@ export function ChapterLessonsPage() {
             </p>
           </div>
         </div>
+      ) : isMobile ? (
+        // 모바일: 리스트 형식
+        <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+          {chapter.lessons.map((lesson, index) => {
+            const progress = progressMap.get(lesson.id);
+            const isCompleted = progress?.status === 'completed';
+
+            return (
+              <div key={lesson.id}>
+                <button
+                  onClick={() => navigate(`/courses/${lang}/${chapterId}/${lesson.id}`)}
+                  className="w-full p-4 text-left transition-colors hover:bg-[#fffbf5]"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-base font-semibold text-[#333] flex items-center gap-2 flex-1">
+                      {isCompleted ? (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                      ) : (
+                        <Circle className="w-5 h-5 text-gray-300 flex-shrink-0" />
+                      )}
+                      <span className={isCompleted ? 'text-gray-400 line-through' : ''}>
+                        {lesson.title}
+                      </span>
+                    </h3>
+                  </div>
+                </button>
+                {index < chapter.lessons.length - 1 && (
+                  <div className="border-b border-[#e5d5c7]" />
+                )}
+              </div>
+            );
+          })}
+        </div>
       ) : (
+        // 데스크톱: 그리드 형식
         <CourseGrid>
           {chapter.lessons.map((lesson) => (
             <LessonCard

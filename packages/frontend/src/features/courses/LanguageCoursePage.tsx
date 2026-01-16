@@ -6,7 +6,7 @@ import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
 import { logger } from '@/utils/logger';
-import { Zap, Trophy, ChevronLeft, Lock } from 'lucide-react';
+import { ChevronLeft, Lock } from 'lucide-react';
 import { useIsMobile } from '@/hooks';
 
 export function LanguageCoursePage() {
@@ -20,19 +20,44 @@ export function LanguageCoursePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 언어 이름 & 아이콘
+  // 언어 이름 & 아이콘 & 설명
   const getLanguageInfo = () => {
     switch (lang) {
       case 'c':
-        return { name: 'C언어', icon: 'C', color: '#87CEEB' };
+        return {
+          name: 'C언어',
+          icon: 'C',
+          color: '#87CEEB',
+          description: '메모리와 포인터의 원리를 이해하는 시스템 프로그래밍'
+        };
       case 'python':
-        return { name: 'Python', icon: '🐍', color: '#3776AB' };
+        return {
+          name: 'Python',
+          icon: '🐍',
+          color: '#3776AB',
+          description: '파이썬으로 배우는 프로그래밍 기초와 데이터 처리'
+        };
       case 'java':
-        return { name: 'Java', icon: '☕', color: '#007396' };
+        return {
+          name: 'Java',
+          icon: '☕',
+          color: '#007396',
+          description: '객체지향 프로그래밍과 JVM의 동작 원리'
+        };
       case 'javascript':
-        return { name: 'JavaScript', icon: '⚡', color: '#F7DF1E' };
+        return {
+          name: 'JavaScript',
+          icon: '⚡',
+          color: '#F7DF1E',
+          description: '웹 개발을 위한 자바스크립트 핵심 개념'
+        };
       default:
-        return { name: lang?.toUpperCase() || '', icon: '📚', color: '#FFD700' };
+        return {
+          name: lang?.toUpperCase() || '',
+          icon: '📚',
+          color: '#FFD700',
+          description: '프로그래밍의 기초부터 심화까지'
+        };
     }
   };
 
@@ -158,24 +183,11 @@ export function LanguageCoursePage() {
     );
   }
 
-  // 전체 진행률 계산
+  // 전체 레슨 수 계산
   const totalLessons = chapters.reduce((sum, ch) => sum + ch.lessons.length, 0);
-  const completedLessons = chapters.reduce((sum, ch) => {
-    const completed = ch.lessons.filter(
-      (lesson) => progressMap.get(lesson.id)?.status === 'completed'
-    ).length;
-    return sum + completed;
-  }, 0);
-  const overallProgress =
-    totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-
-  // 레벨 계산 (10레슨 = 1레벨)
-  const currentLevel = Math.floor(completedLessons / 10) + 1;
-  const xpInLevel = completedLessons % 10;
-  const xpToNextLevel = 10;
 
   return (
-    <div className="min-h-screen py-8 px-6 md:px-12 lg:px-16">
+    <div className="min-h-screen py-4 px-3 md:px-12 lg:px-16">
       {/* 게임 스타일 헤더 */}
       <div className="mb-10">
         <button
@@ -208,7 +220,7 @@ export function LanguageCoursePage() {
 
           <div className="relative z-10">
             {/* 상단: 언어 아이콘 + 이름 */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4">
               <div
                 className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl font-bold text-white"
                 style={{
@@ -225,46 +237,9 @@ export function LanguageCoursePage() {
                 <p className="text-gray-500 text-sm">
                   {chapters.length} 챕터 · {totalLessons} 레슨
                 </p>
-              </div>
-            </div>
-
-            {/* 레벨 & XP 바 */}
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-6">
-              {/* 레벨 뱃지 */}
-              <div
-                className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-amber-100 border border-amber-300"
-              >
-                <Trophy className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
-                <span className="font-bold font-mono text-sm md:text-base text-amber-600">LV.{currentLevel}</span>
-              </div>
-
-              {/* XP 바 */}
-              <div className="flex-1 w-full md:w-auto">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-emerald-500" />
-                    <span className="text-xs font-mono uppercase text-emerald-600">Progress</span>
-                  </div>
-                  <span className="text-xs text-gray-500 font-mono">
-                    {completedLessons} / {totalLessons} 완료
-                  </span>
-                </div>
-                <div className="h-3 bg-white rounded-full overflow-hidden border border-gray-200">
-                  <div
-                    className="h-full rounded-full transition-all duration-500 bg-emerald-400"
-                    style={{
-                      width: `${overallProgress}%`,
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-[10px] text-gray-400 font-mono">
-                    {xpInLevel}/{xpToNextLevel} XP
-                  </span>
-                  <span className="text-[10px] font-mono font-bold text-emerald-500">
-                    {overallProgress}%
-                  </span>
-                </div>
+                <p className="text-gray-400 text-xs mt-1">
+                  {langInfo.description}
+                </p>
               </div>
             </div>
           </div>
@@ -304,20 +279,29 @@ export function LanguageCoursePage() {
                       disabled={isLocked}
                       className="w-full p-4 text-left transition-colors hover:bg-[#fffbf5] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-base font-semibold text-[#333] flex items-center gap-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="text-base font-semibold text-[#333] flex items-center gap-2 flex-shrink-0">
                           {isLocked && <Lock className="w-4 h-4 text-gray-400" />}
                           {chapter.title}
                         </h3>
-                        <span className="text-sm font-mono text-[#937b5d]">
-                          {progress}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-[#f0e6da] rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#a08060] rounded-full transition-all duration-300"
-                          style={{ width: `${progress}%` }}
-                        />
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {/* 레슨 개수만큼 동그라미 */}
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: chapter.lessons.length }).map((_, i) => (
+                              <div
+                                key={i}
+                                className="w-2 h-2 rounded-full transition-colors"
+                                style={{
+                                  backgroundColor: i < completedInChapter ? '#a08060' : '#e5d5c7',
+                                }}
+                              />
+                            ))}
+                          </div>
+                          {/* 퍼센트 */}
+                          <span className="text-sm font-mono text-[#937b5d] min-w-[3rem] text-right">
+                            {progress}%
+                          </span>
+                        </div>
                       </div>
                     </button>
                     {index < chapters.length - 1 && (
