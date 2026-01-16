@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import { Code2, GitBranch } from 'lucide-react';
 import { FlowViewer } from './FlowViewer';
+import { PyVisualizerView } from '@/features/visualizers/python';
 import { CodeViewer } from '../day/CodeViewer';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { ChatQA } from '@/features/chat/components/ChatQA';
@@ -26,6 +27,10 @@ interface PythonStep {
   flowDetail?: string;
   stdout?: string;
   tip?: string;
+  pythonMemoryState?: {
+    names: Array<{ name: string; pointsTo: string }>;
+    objects: Array<{ id: string; type: string; value: string; pyId?: string; highlight?: boolean }>;
+  };
 }
 
 interface PythonLessonViewProps {
@@ -137,13 +142,24 @@ export function PythonLessonView({
             {/* 설명 */}
             <ExplanationSection />
 
-            {/* 플로우 뷰어 */}
+            {/* 시각화 (Python 메모리 or 플로우) */}
             <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
               <div className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-semibold flex items-center gap-2">
                 <GitBranch className="w-4 h-4" />
-                실행 흐름
+                {currentStep?.pythonMemoryState ? 'Python 메모리' : '실행 흐름'}
               </div>
-              <FlowViewer steps={steps} currentStepIndex={currentStepIndex} />
+              <div className="p-4">
+                {currentStep?.pythonMemoryState ? (
+                  <PyVisualizerView
+                    names={currentStep.pythonMemoryState.names}
+                    objects={currentStep.pythonMemoryState.objects}
+                    animate={true}
+                    compact={false}
+                  />
+                ) : (
+                  <FlowViewer steps={steps} currentStepIndex={currentStepIndex} />
+                )}
+              </div>
             </div>
 
             {/* AI Chat (모바일에서 숨김) */}
