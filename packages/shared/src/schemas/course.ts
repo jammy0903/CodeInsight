@@ -76,16 +76,17 @@ export const PyTypeSchema = z.enum([
 // Python 객체
 export const PyObjectSchema = z.object({
   id: z.string(),
-  type: PyTypeSchema,
+  type: z.union([PyTypeSchema, z.string()]), // 'list' 등 추가 타입 허용
   value: z.unknown(),
-  mutable: z.boolean(),
+  mutable: z.boolean().optional(), // Lesson JSON에선 선택적
+  pyId: z.string().optional(), // 실제 Python 객체 ID (예: "140234567890")
   highlight: z.boolean().optional(),
 });
 
 // Python 이름 (변수)
 export const PyNameSchema = z.object({
   name: z.string(),
-  scope: z.string(), // 프레임명: 'global', '__main__', 함수명 등
+  scope: z.string().optional(), // Lesson JSON에선 선택적 (프레임명: 'global', '__main__', 함수명 등)
   pointsTo: z.string(),
   highlight: z.boolean().optional(),
 });
@@ -190,6 +191,13 @@ export const LessonStepSchema = z.object({
   stdout: z.string().optional(),
   // Python/JS 시각화 (Phase 4+)
   visualizationType: z.string().optional(),
+  // Python 메모리 시각화 (Lesson JSON용)
+  // WHY: Python 레슨은 names-objects 모델로 직접 시각화 데이터 제공
+  pythonMemoryState: z.object({
+    names: z.array(PyNameSchema),
+    objects: z.array(PyObjectSchema),
+    output: z.array(z.string()).optional(), // 터미널 출력 (id() 결과 등)
+  }).optional(),
   // Playground용 메모리 스냅샷 (직접 실행 결과)
   // WHY: Playground는 실시간 C 실행 결과를 받아 즉시 시각화
   // TRADEOFF: Lesson은 memoryChanges로 누적, Playground는 stack/heap으로 스냅샷
