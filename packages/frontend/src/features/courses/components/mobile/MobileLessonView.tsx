@@ -272,22 +272,51 @@ export function MobileLessonView({
         </motion.div>
       </div>
 
-      {/* 페이지 인디케이터 */}
-      <div className="flex items-center justify-center gap-2 py-2 bg-white border-t border-[#e5d5c7]">
+      {/* 페이지 네비게이션 */}
+      <div className="flex items-center justify-between px-4 py-2 bg-white border-t border-[#e5d5c7]">
+        {/* 이전 코드 버튼 */}
         <button
           onClick={() => setCurrentPage(0)}
-          className={`w-2.5 h-2.5 rounded-full transition-all ${
-            currentPage === 0 ? 'bg-[#6b5a4a] w-5' : 'bg-gray-300 hover:bg-gray-400'
-          }`}
-          aria-label="코드 페이지"
-        />
+          disabled={currentPage === 0}
+          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          style={{
+            backgroundColor: currentPage === 0 ? '#6b5a4a' : '#e5d5c7',
+            color: currentPage === 0 ? 'white' : '#6b5a4a',
+          }}
+        >
+          이전 코드
+        </button>
+
+        {/* 페이지 인디케이터 */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setCurrentPage(0)}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              currentPage === 0 ? 'bg-[#6b5a4a] w-5' : 'bg-gray-300'
+            }`}
+            aria-label="코드 페이지"
+          />
+          <button
+            onClick={() => setCurrentPage(1)}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              currentPage === 1 ? 'bg-[#6b5a4a] w-5' : 'bg-gray-300'
+            }`}
+            aria-label="시각화 페이지"
+          />
+        </div>
+
+        {/* 다음 코드 버튼 */}
         <button
           onClick={() => setCurrentPage(1)}
-          className={`w-2.5 h-2.5 rounded-full transition-all ${
-            currentPage === 1 ? 'bg-[#6b5a4a] w-5' : 'bg-gray-300 hover:bg-gray-400'
-          }`}
-          aria-label="시각화 페이지"
-        />
+          disabled={currentPage === 1}
+          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          style={{
+            backgroundColor: currentPage === 1 ? '#6b5a4a' : '#e5d5c7',
+            color: currentPage === 1 ? 'white' : '#6b5a4a',
+          }}
+        >
+          다음 코드
+        </button>
       </div>
 
       {/* AI Chat FAB + Modal */}
