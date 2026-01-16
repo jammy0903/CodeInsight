@@ -132,6 +132,11 @@ function CollectionValue({
 }) {
   const [open, close] = brackets.split('');
 
+  // items가 배열이 아니면 문자열로 표시
+  if (!Array.isArray(items)) {
+    return <span className="text-gray-400">{String(items) || brackets}</span>;
+  }
+
   if (items.length === 0) {
     return <span className="text-gray-400">{brackets}</span>;
   }

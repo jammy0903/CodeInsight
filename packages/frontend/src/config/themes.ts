@@ -90,7 +90,11 @@ export interface ThemeColors {
     panelBorder: string;
     codeHeaderBg: string;
     codeHeaderText: string;
+    codeIconColor: string;
     codeBg: string;
+    terminalBg: string;
+    terminalHeaderBg: string;
+    terminalText: string;
     terminalBorder: string;
     // 탭 (메모리/AI)
     tabActiveBg: string;
@@ -190,9 +194,13 @@ export const themes: Record<ThemeType, ThemeColors> = {
       pageBg: '#faf8fc',
       panelBg: '#ffffff',
       panelBorder: '#ebe4ed',
-      codeHeaderBg: 'linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%)',
-      codeHeaderText: '#e5e5e5',
+      codeHeaderBg: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+      codeHeaderText: '#ffffff',
+      codeIconColor: '#fde68a',
       codeBg: '#ffffff',
+      terminalBg: 'linear-gradient(135deg, #f3eef8 0%, #faf8fc 100%)',
+      terminalHeaderBg: 'linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)',
+      terminalText: '#6b5a7a',
       terminalBorder: '#ebe4ed',
       tabActiveBg: 'linear-gradient(135deg, #f3eef8 0%, #fceef0 100%)',
       tabActiveText: '#7c6b8a',
@@ -291,7 +299,11 @@ export const themes: Record<ThemeType, ThemeColors> = {
       panelBorder: '#27272a',
       codeHeaderBg: 'linear-gradient(135deg, #1c1c1f 0%, #0f0f10 100%)',
       codeHeaderText: '#e4e4e7',
+      codeIconColor: '#22d3ee',
       codeBg: '#141416',
+      terminalBg: 'linear-gradient(135deg, #18181b 0%, #0f0f10 100%)',
+      terminalHeaderBg: 'linear-gradient(135deg, #27272a 0%, #1c1c1f 100%)',
+      terminalText: '#a1a1aa',
       terminalBorder: '#27272a',
       tabActiveBg: 'linear-gradient(135deg, #1a2a2e 0%, #18181b 100%)',
       tabActiveText: '#22d3ee',
@@ -387,9 +399,13 @@ export const themes: Record<ThemeType, ThemeColors> = {
       pageBg: '#faf9f7',
       panelBg: '#fffffe',
       panelBorder: '#d6d0c7',
-      codeHeaderBg: 'linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%)',
-      codeHeaderText: '#e5e5e5',
+      codeHeaderBg: 'linear-gradient(135deg, #6b8e6b 0%, #5a7a5a 100%)',
+      codeHeaderText: '#ffffff',
+      codeIconColor: '#bbf7d0',
       codeBg: '#fffffe',
+      terminalBg: 'linear-gradient(135deg, #f0fdf4 0%, #faf9f7 100%)',
+      terminalHeaderBg: 'linear-gradient(135deg, #86efac 0%, #6b8e6b 100%)',
+      terminalText: '#3d5a3d',
       terminalBorder: '#d6d0c7',
       tabActiveBg: 'linear-gradient(135deg, #f0ede8 0%, #e8e4de 100%)',
       tabActiveText: '#5c534a',

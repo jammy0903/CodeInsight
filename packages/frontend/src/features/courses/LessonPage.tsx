@@ -35,14 +35,14 @@ import { useLessonNavigation } from './hooks/useLessonNavigation';
 import { useLessonVisualization } from './hooks/useLessonVisualization';
 import { useCodeSelection } from './hooks/useCodeSelection';
 import { useIsMobile } from '@/hooks';
+import { useThemeStore } from '@/stores/themeStore';
+import { themes } from '@/config/themes';
 
 // 언어별 시각화
 import { JSVisualizerView } from '@/features/visualizers/js';
 // TODO: 다른 서버에서 파일 가져온 후 주석 해제
 // import { PyVisualizerView } from '@/features/visualizers/python';
 
-// Python 코스 전용 컴포넌트
-import { PythonLessonView } from './components/python';
 import type { PyName, PyObject } from '@/types/py-simulator';
 
 // 모바일 컴포넌트
@@ -393,6 +393,8 @@ export function LessonPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'memory' | 'explanation' | 'chat'>('memory');
   const isMobile = useIsMobile();
+  const currentTheme = useThemeStore((s) => s.theme);
+  const themeColors = themes[currentTheme].lesson;
   // 모바일 AI Chat 상태
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   // 시뮬레이터 결과 (stdout용)
@@ -668,68 +670,8 @@ export function LessonPage() {
             />
           </div>
         </div>
-      ) : lang?.includes('python') ? (
-        /* ===== 데스크톱: Python 코스 전용 레이아웃 (슬라이딩 2페이지) ===== */
-        <div className="flex flex-col h-[calc(100vh-120px)]">
-          {/* 헤더 */}
-          <div className="flex items-center gap-4 mb-4 px-4">
-            <Link to={languageCoursePath} className="cyber-back-btn">
-              <span className="cyber-back-arrow">‹</span>
-              <span>EXIT</span>
-            </Link>
-            <div className="cyber-divider" />
-            <div className="flex-1">
-              <h1 className="text-lg font-bold">{lesson.title}</h1>
-              {lesson.description && (
-                <p className="text-xs text-gray-500">{lesson.description}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Python 레슨 뷰 */}
-          <div className="flex-1 min-h-0">
-            <PythonLessonView
-              code={code}
-              steps={steps}
-              currentStepIndex={navigation.currentStepIndex}
-              languageId={lang}
-              lessonId={lessonId || ''}
-            />
-          </div>
-
-          {/* 스텝 컨트롤 */}
-          <div className="flex items-center justify-center gap-4 py-4 border-t border-[#e5d5c7] bg-white">
-            <button
-              onClick={navigation.goToPrevStep}
-              disabled={!navigation.canGoPrev}
-              className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors flex items-center gap-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              이전
-            </button>
-            <span className="text-sm text-gray-500">
-              {navigation.currentStepIndex + 1} / {navigation.totalSteps}
-            </span>
-            {!navigation.isLastStep ? (
-              <button
-                onClick={navigation.goToNextStep}
-                className="px-4 py-2 rounded-lg bg-[#6b5a4a] text-white hover:bg-[#5a4a3a] transition-colors flex items-center gap-2"
-              >
-                다음
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={navigation.goToQuiz}
-                className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors flex items-center gap-2"
-              >
-                퀴즈 풀기
-                <Sparkles className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
       ) : (
+        /* ===== 데스크톱 레이아웃 (모든 언어 동일) ===== */
         <div className="flex flex-col md:flex-row gap-4 items-stretch">
           {/* 왼쪽: 코드 + 컨트롤 (모바일: 100%, 데스크톱: 50%) */}
           <div className="w-full md:w-1/2 flex flex-col gap-4">
@@ -753,14 +695,14 @@ export function LessonPage() {
               <div
                 className="flex items-center justify-between px-4 py-2 rounded-t-xl text-sm font-semibold"
                 style={{
-                  background: 'linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%)',
-                  border: '1px solid #E5D5C7',
+                  background: themeColors.codeHeaderBg,
+                  border: `1px solid ${themeColors.panelBorder}`,
                   borderBottom: 'none',
-                  color: '#e5e5e5',
+                  color: themeColors.codeHeaderText,
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <Code2 className="w-4 h-4 text-yellow-400" />
+                  <Code2 className="w-4 h-4" style={{ color: themeColors.codeIconColor }} />
                   코드
                 </div>
                 {/* 스텝 컨트롤 (키보드 키 스타일) */}
@@ -807,9 +749,9 @@ export function LessonPage() {
               </div>
               {/* 코드 뷰어 */}
               <div
-                className="overflow-hidden rounded-b-xl"
+                className="overflow-hidden"
                 style={{
-                  border: '1px solid #E5D5C7',
+                  border: `1px solid ${themeColors.panelBorder}`,
                   borderTop: 'none',
                 }}
               >
@@ -820,12 +762,13 @@ export function LessonPage() {
                 />
               </div>
 
-              {/* 터미널 출력 (VSCode 스타일) */}
+              {/* 터미널 출력 */}
               <div
                 className="rounded-b-xl overflow-hidden"
                 style={{
-                  border: '1px solid #E5D5C7',
+                  border: `1px solid ${themeColors.panelBorder}`,
                   borderTop: 'none',
+                  background: themeColors.terminalBg,
                 }}
               >
                 <TerminalOutput

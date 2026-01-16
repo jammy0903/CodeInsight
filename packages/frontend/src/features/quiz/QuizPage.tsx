@@ -1,14 +1,17 @@
 /**
  * QuizPage - 퀴즈 선택 페이지
  *
- * WHY: 3가지 퀴즈 유형 중 선택
+ * WHY: 3가지 퀴즈 유형 중 선택 → 언어 선택 → 퀴즈 시작
  * TYPES: OX, 객관식, 빈칸 코드 입력
  */
 
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FileQuestion, CircleDot, ListChecks, Code2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface QuizTypeButton {
+interface QuizType {
+  id: string;
   path: string;
   label: string;
   description: string;
@@ -16,8 +19,17 @@ interface QuizTypeButton {
   color: string;
 }
 
-const QUIZ_TYPES: QuizTypeButton[] = [
+interface LanguageOption {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  bgColor: string;
+}
+
+const QUIZ_TYPES: QuizType[] = [
   {
+    id: 'ox',
     path: '/quiz/ox',
     label: 'OX 퀴즈',
     description: '참/거짓을 판단하세요',
@@ -25,6 +37,7 @@ const QUIZ_TYPES: QuizTypeButton[] = [
     color: 'bg-blue-500',
   },
   {
+    id: 'multiple-choice',
     path: '/quiz/multiple-choice',
     label: '객관식',
     description: '4개 중 정답을 선택하세요',
@@ -32,6 +45,7 @@ const QUIZ_TYPES: QuizTypeButton[] = [
     color: 'bg-green-500',
   },
   {
+    id: 'fill-blank',
     path: '/quiz/fill-blank',
     label: '빈칸 코드 입력',
     description: '코드 빈칸을 채우세요',
@@ -40,7 +54,51 @@ const QUIZ_TYPES: QuizTypeButton[] = [
   },
 ];
 
+const LANGUAGES: LanguageOption[] = [
+  {
+    id: 'c',
+    name: 'C',
+    icon: 'C',
+    color: '#0077B6',
+    bgColor: 'bg-sky-100',
+  },
+  {
+    id: 'javascript',
+    name: 'JS',
+    icon: '⚡',
+    color: '#F59E0B',
+    bgColor: 'bg-amber-100',
+  },
+  {
+    id: 'java',
+    name: 'Java',
+    icon: '☕',
+    color: '#EC4899',
+    bgColor: 'bg-pink-100',
+  },
+  {
+    id: 'python',
+    name: 'Python',
+    icon: '🐍',
+    color: '#3776AB',
+    bgColor: 'bg-yellow-100',
+  },
+];
+
 export function QuizPage() {
+  const navigate = useNavigate();
+  const [selectedQuizType, setSelectedQuizType] = useState<string | null>(null);
+
+  const handleQuizTypeClick = (quizId: string) => {
+    setSelectedQuizType(quizId);
+  };
+
+  const handleLanguageClick = (langId: string) => {
+    if (selectedQuizType) {
+      navigate(`/quiz/${selectedQuizType}/${langId}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#fffbf5] p-6">
       <div className="max-w-4xl mx-auto">
@@ -54,18 +112,25 @@ export function QuizPage() {
         <div className="flex flex-col md:flex-row gap-4">
           {QUIZ_TYPES.map((quiz) => {
             const Icon = quiz.icon;
+            const isSelected = selectedQuizType === quiz.id;
             return (
-              <Link
-                key={quiz.path}
-                to={quiz.path}
-                className="flex-1 bg-white rounded-xl border border-[#e5d5c7] p-6 hover:border-[#a08060] hover:shadow-md transition-all group"
+              <button
+                key={quiz.id}
+                onClick={() => handleQuizTypeClick(quiz.id)}
+                className={`flex-1 rounded-xl border p-6 transition-all group text-left ${
+                  isSelected
+                    ? 'border-[#a08060] bg-[#fff8f0] shadow-md'
+                    : 'border-[#e5d5c7] bg-white hover:border-[#a08060] hover:shadow-md'
+                }`}
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-lg ${quiz.color} flex items-center justify-center`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-[#6b5a4a] group-hover:text-[#a08060] transition-colors">
+                    <h2 className={`text-lg font-semibold transition-colors ${
+                      isSelected ? 'text-[#a08060]' : 'text-[#6b5a4a] group-hover:text-[#a08060]'
+                    }`}>
                       {quiz.label}
                     </h2>
                     <p className="text-sm text-[#937b5d]">
@@ -73,10 +138,42 @@ export function QuizPage() {
                     </p>
                   </div>
                 </div>
-              </Link>
+              </button>
             );
           })}
         </div>
+
+        {/* 언어 선택 버튼 - 퀴즈 유형 선택 후 표시 */}
+        <AnimatePresence>
+          {selectedQuizType && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3 }}
+              className="mt-8"
+            >
+              <h3 className="text-lg font-semibold text-[#6b5a4a] mb-4">언어 선택</h3>
+              <div className="flex flex-wrap gap-3">
+                {LANGUAGES.map((lang) => (
+                  <motion.button
+                    key={lang.id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleLanguageClick(lang.id)}
+                    className={`flex items-center gap-3 px-5 py-3 rounded-xl border-2 transition-all ${lang.bgColor} hover:shadow-md`}
+                    style={{ borderColor: lang.color }}
+                  >
+                    <span className="text-2xl">{lang.icon}</span>
+                    <span className="font-bold text-lg" style={{ color: lang.color }}>
+                      {lang.name}
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

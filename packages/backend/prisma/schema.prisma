@@ -31,6 +31,7 @@ model OAuthAccount {
   userId     String   @map("user_id") @db.Uuid
   provider   String
   providerId String   @map("provider_id")
+  email      String?  // OAuth 제공자로부터 받은 이메일
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

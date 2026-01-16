@@ -34,22 +34,29 @@ export function LanguageCoursePage() {
         return {
           name: 'Python',
           icon: '🐍',
-          color: '#3776AB',
+          color: '#FFD54F',
           description: '파이썬으로 배우는 프로그래밍 기초와 데이터 처리'
         };
       case 'java':
         return {
           name: 'Java',
           icon: '☕',
-          color: '#007396',
+          color: '#EC4899',
           description: '객체지향 프로그래밍과 JVM의 동작 원리'
         };
       case 'javascript':
         return {
           name: 'JavaScript',
           icon: '⚡',
-          color: '#F7DF1E',
+          color: '#81C784',
           description: '웹 개발을 위한 자바스크립트 핵심 개념'
+        };
+      case 'python-practical':
+        return {
+          name: 'Python실용',
+          icon: '🤖',
+          color: '#9E9E9E',
+          description: '실무에서 바로 쓰는 파이썬 자동화 스크립트'
         };
       default:
         return {

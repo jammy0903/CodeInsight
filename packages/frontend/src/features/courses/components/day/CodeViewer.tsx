@@ -55,12 +55,17 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
   };
 
   return (
-    <div className={cn('font-mono text-sm', isDark ? 'bg-zinc-900' : 'bg-white')}>
+    <div className={cn(
+      'font-mono',
+      // 반응형 폰트 크기: 모바일 xs → sm → md → lg 점점 커짐
+      'text-[10px] sm:text-xs md:text-sm lg:text-base',
+      isDark ? 'bg-zinc-900' : 'bg-white'
+    )}>
       <div className="flex" onMouseUp={handleTextSelect}>
         {/* Line numbers - user-select: none to prevent selection */}
         <div
           className={cn(
-            'flex-shrink-0 py-3 px-2 text-right select-none border-r',
+            'flex-shrink-0 py-2 sm:py-3 px-1 sm:px-2 text-right select-none border-r',
             isDark
               ? 'text-zinc-500 border-zinc-700 bg-zinc-800'
               : 'text-gray-400 border-gray-200 bg-gray-50'
@@ -71,7 +76,7 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
             <div
               key={idx}
               className={cn(
-                'px-2 leading-6',
+                'px-1 sm:px-2 leading-5 sm:leading-6',
                 highlightLine === idx + 1 && (isDark ? 'text-blue-400 font-bold' : 'text-green-600 font-bold')
               )}
             >
@@ -81,16 +86,16 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
         </div>
 
         {/* Code */}
-        <div className="flex-1 py-3 px-4 overflow-x-auto">
+        <div className="flex-1 py-2 sm:py-3 px-2 sm:px-4 overflow-x-auto">
           {lines.map((line, idx) => (
             <div
               key={idx}
               className={cn(
-                'leading-6 whitespace-pre',
+                'leading-5 sm:leading-6 whitespace-pre',
                 highlightLine === idx + 1 && (
                   isDark
-                    ? 'bg-blue-900/40 -mx-4 px-4 border-l-2 border-blue-500'
-                    : 'bg-green-100 -mx-4 px-4 border-l-2 border-green-500'
+                    ? 'bg-blue-900/40 -mx-2 sm:-mx-4 px-2 sm:px-4 border-l-2 border-blue-500'
+                    : 'bg-green-100 -mx-2 sm:-mx-4 px-2 sm:px-4 border-l-2 border-green-500'
                 )
               )}
             >

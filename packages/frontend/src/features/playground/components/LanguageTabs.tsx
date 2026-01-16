@@ -9,7 +9,7 @@ import type { SupportedLanguage } from '@/types';
 const LANGUAGES: { id: SupportedLanguage; label: string; color: string }[] = [
   { id: 'c', label: 'C', color: '#3b82f6' },
   { id: 'python', label: 'Py', color: '#22c55e' },
-  { id: 'java', label: 'Java', color: '#f97316' },
+  { id: 'java', label: 'Java', color: '#EC4899' },
 ];
 
 export function LanguageTabs() {

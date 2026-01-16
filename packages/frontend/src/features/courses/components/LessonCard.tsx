@@ -9,6 +9,66 @@ import { useNavigate } from 'react-router-dom';
 import type { Lesson, UserProgress } from '@/types';
 import { CheckCircle2, PlayCircle, Clock, Zap } from 'lucide-react';
 
+// 언어별 색상 테마 (레슨 카드용 - 밝은 파스텔)
+const LANGUAGE_THEMES: Record<string, {
+  primary: string;
+  primaryLight: string;
+  bg: string;
+  bgHover: string;
+  border: string;
+  stitch: string;
+}> = {
+  c: {
+    primary: '#5BA3C0',
+    primaryLight: '#87CEEB',
+    bg: 'linear-gradient(135deg, #E8F4FA 0%, #D0EBF7 100%)',
+    bgHover: 'linear-gradient(135deg, #DCF0F8 0%, #C4E2F3 100%)',
+    border: 'rgba(135, 206, 235, 0.5)',
+    stitch: 'rgba(135, 206, 235, 0.5)',
+  },
+  python: {
+    primary: '#F57C00',
+    primaryLight: '#FFD54F',
+    bg: 'linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%)',
+    bgHover: 'linear-gradient(135deg, #FFF4D6 0%, #FFE699 100%)',
+    border: 'rgba(255, 213, 79, 0.5)',
+    stitch: 'rgba(255, 213, 79, 0.5)',
+  },
+  java: {
+    primary: '#BE185D',
+    primaryLight: '#EC4899',
+    bg: 'linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%)',
+    bgHover: 'linear-gradient(135deg, #FBEDF5 0%, #F9D5E8 100%)',
+    border: 'rgba(244, 114, 182, 0.4)',
+    stitch: 'rgba(244, 114, 182, 0.45)',
+  },
+  javascript: {
+    primary: '#2E7D32',
+    primaryLight: '#81C784',
+    bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+    bgHover: 'linear-gradient(135deg, #DCF1DD 0%, #B9DEB9 100%)',
+    border: 'rgba(129, 199, 132, 0.5)',
+    stitch: 'rgba(129, 199, 132, 0.5)',
+  },
+  'python-practical': {
+    primary: '#424242',
+    primaryLight: '#9E9E9E',
+    bg: 'linear-gradient(135deg, #F5F5F5 0%, #E0E0E0 100%)',
+    bgHover: 'linear-gradient(135deg, #EEEEEE 0%, #D6D6D6 100%)',
+    border: 'rgba(158, 158, 158, 0.5)',
+    stitch: 'rgba(117, 117, 117, 0.5)',
+  },
+};
+
+const DEFAULT_THEME = {
+  primary: '#616161',
+  primaryLight: '#9E9E9E',
+  bg: 'linear-gradient(135deg, #FAFAFA 0%, #EEEEEE 100%)',
+  bgHover: 'linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%)',
+  border: 'rgba(158, 158, 158, 0.4)',
+  stitch: 'rgba(158, 158, 158, 0.45)',
+};
+
 interface LessonCardProps {
   lesson: Lesson;
   progress?: UserProgress;
@@ -18,6 +78,7 @@ interface LessonCardProps {
 
 export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCardProps) {
   const navigate = useNavigate();
+  const theme = LANGUAGE_THEMES[languageId] || DEFAULT_THEME;
 
   const handleClick = () => {
     navigate(`/courses/${languageId}/${chapterId}/${lesson.id}`);
@@ -41,34 +102,33 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
   const isCompleted = progress?.status === 'completed';
   const isInProgress = progress?.status === 'in_progress';
 
-  // 스티치 색상 결정 (차분한 파스텔)
+  // 스티치 색상 결정 (언어별 + 상태별)
   const stitchColor = isCompleted
-    ? 'rgba(16, 185, 129, 0.5)'   // 민트 그린
+    ? 'rgba(16, 185, 129, 0.5)'   // 민트 그린 (완료)
     : isInProgress
-      ? 'rgba(196, 21, 122, 0.4)' // 로즈 핑크
-      : 'rgba(230, 180, 0, 0.45)'; // 머스타드
+      ? `${theme.stitch.replace('0.45', '0.6')}`  // 언어 색상 (진행중, 강조)
+      : theme.stitch;  // 언어 색상 (기본)
 
   return (
     <button
       onClick={handleClick}
-      className={`
-        group relative rounded-xl text-left
-        transition-all duration-300 hover:scale-[1.02]
-        ${isCompleted
-          ? 'border-2 border-[#10B981]/50 shadow-lg shadow-[#10B981]/15'
-          : isInProgress
-            ? 'border-2 border-[#C4157A]/50 shadow-lg shadow-[#C4157A]/15'
-            : 'border-2 border-[#E6B400]/40 hover:border-[#E6B400]/60 hover:shadow-lg hover:shadow-[#E6B400]/15'
-        }
-      `}
+      className="group relative rounded-xl text-left transition-all duration-300 hover:scale-[1.02]"
       style={{
         padding: '32px',
         minHeight: '280px',
         background: isCompleted
-          ? 'linear-gradient(135deg, #B8E8D4 0%, #9AD8BE 100%)'  // 연한 민트
+          ? 'linear-gradient(135deg, #B8E8D4 0%, #9AD8BE 100%)'  // 연한 민트 (완료)
+          : theme.bg,
+        border: isCompleted
+          ? '2px solid rgba(16, 185, 129, 0.5)'
           : isInProgress
-            ? 'linear-gradient(135deg, #F5C6D6 0%, #E8A8BE 100%)' // 연한 핑크
-            : 'linear-gradient(135deg, #FFF2CC 0%, #FFE699 100%)' // 머스타드 옐로우
+            ? `2px solid ${theme.border.replace('0.4', '0.6')}`
+            : `2px solid ${theme.border}`,
+        boxShadow: isCompleted
+          ? '0 10px 25px -5px rgba(16, 185, 129, 0.15)'
+          : isInProgress
+            ? `0 10px 25px -5px ${theme.border.replace('0.4', '0.2')}`
+            : undefined,
       }}
     >
       {/* 바느질 스티치 테두리 */}
@@ -88,9 +148,12 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
         {isCompleted ? (
           <CheckCircle2 className="w-6 h-6 text-[#10B981]" />
         ) : isInProgress ? (
-          <PlayCircle className="w-6 h-6 text-[#C4157A] animate-pulse" />
+          <PlayCircle className="w-6 h-6 animate-pulse" style={{ color: theme.primaryLight }} />
         ) : (
-          <div className="w-6 h-6 rounded-full border-2 border-[#E6B400]/50 group-hover:border-[#E6B400]/80 transition-colors" />
+          <div
+            className="w-6 h-6 rounded-full border-2 transition-colors"
+            style={{ borderColor: theme.border.replace('0.4', '0.5') }}
+          />
         )}
       </div>
 
@@ -101,20 +164,14 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
           style={{
             marginBottom: '12px',
             backgroundColor: isCompleted
-              ? 'rgba(16, 185, 129, 0.15)'   // 민트 그린
-              : isInProgress
-                ? 'rgba(233, 30, 140, 0.12)'  // 핑크
-                : 'rgba(230, 180, 0, 0.15)',  // 머스타드
+              ? 'rgba(16, 185, 129, 0.15)'
+              : `${theme.primary}15`,
             color: isCompleted
               ? '#059669'
-              : isInProgress
-                ? '#C4157A'
-                : '#CC9900',  // 머스타드
+              : theme.primary,
             border: isCompleted
               ? '1px solid rgba(16, 185, 129, 0.3)'
-              : isInProgress
-                ? '1px solid rgba(233, 30, 140, 0.3)'
-                : '1px solid rgba(230, 180, 0, 0.4)'
+              : `1px solid ${theme.border}`
           }}
         >
           {lesson.order}
@@ -123,16 +180,15 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
 
       {/* 레슨 제목 */}
       <h3
-        className={`
-          text-lg font-bold line-clamp-2
-          ${isCompleted
-            ? 'text-[#059669]'
+        className="text-lg font-bold line-clamp-2 transition-colors"
+        style={{
+          marginBottom: '12px',
+          color: isCompleted
+            ? '#059669'
             : isInProgress
-              ? 'text-[#C4157A]'
-              : 'text-[#4A4A4A] group-hover:text-[#CC9900] transition-colors'
-          }
-        `}
-        style={{ marginBottom: '12px' }}
+              ? theme.primary
+              : '#4A4A4A',
+        }}
       >
         {lesson.title}
       </h3>
@@ -147,7 +203,7 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
       {/* 하단 정보 */}
       <div className="flex items-center justify-between gap-2">
         {/* 예상 시간 */}
-        <div className="flex items-center gap-1.5 text-white/40 text-xs">
+        <div className="flex items-center gap-1.5 text-gray-400 text-xs">
           <Clock className="w-3.5 h-3.5" />
           <span>{lesson.estimatedTime || 5}min</span>
         </div>

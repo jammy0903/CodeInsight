@@ -20,13 +20,14 @@ export function NamesPanel({
   hoveredName,
   onNameHover,
 }: NamesPanelProps) {
-  // 스코프별 그룹화
+  // 스코프별 그룹화 (scope가 없으면 'global' 기본값)
   const scopeGroups = new Map<string, PyName[]>();
   names.forEach((n) => {
-    if (!scopeGroups.has(n.scope)) {
-      scopeGroups.set(n.scope, []);
+    const scope = n.scope || 'global';
+    if (!scopeGroups.has(scope)) {
+      scopeGroups.set(scope, []);
     }
-    scopeGroups.get(n.scope)!.push(n);
+    scopeGroups.get(scope)!.push({ ...n, scope });
   });
 
   return (
@@ -37,9 +38,9 @@ export function NamesPanel({
 
       <div className="space-y-3">
         {/* 각 스코프별 그룹 */}
-        {Array.from(scopeGroups.entries()).map(([scope, scopeNames]) => (
+        {Array.from(scopeGroups.entries()).map(([scope, scopeNames], idx) => (
           <NameGroup
-            key={scope}
+            key={`${scope || 'unknown'}-${idx}`}
             label={scope}
             names={scopeNames}
             highlightedNames={highlightedNames}
@@ -84,9 +85,9 @@ function NameGroup({
         {label}
       </div>
       <div className="flex flex-wrap gap-2">
-        {names.map((pyName) => (
+        {names.map((pyName, idx) => (
           <NameChip
-            key={pyName.name}
+            key={`${pyName.scope}:${pyName.name}:${idx}`}
             pyName={pyName}
             isHighlighted={highlightedNames.includes(pyName.name)}
             isHovered={hoveredName === pyName.name}

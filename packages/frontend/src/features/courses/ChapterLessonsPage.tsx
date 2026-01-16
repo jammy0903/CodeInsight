@@ -15,14 +15,15 @@ import { logger } from '@/utils/logger';
 import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle } from 'lucide-react';
 import { useIsMobile } from '@/hooks';
 
-// 언어별 색상 (챕터 페이지용 - 바다색)
+// 언어별 색상 (챕터 페이지용)
 const getLanguageColor = (lang: string | undefined) => {
   switch (lang) {
-    case 'c': return '#0077B6';
-    case 'python': return '#3776AB';
-    case 'java': return '#007396';
-    case 'javascript': return '#F7DF1E';
-    default: return '#0077B6';
+    case 'c': return '#87CEEB';
+    case 'python': return '#FFD54F';
+    case 'python-practical': return '#9E9E9E';
+    case 'java': return '#EC4899';
+    case 'javascript': return '#81C784';
+    default: return '#87CEEB';
   }
 };
 

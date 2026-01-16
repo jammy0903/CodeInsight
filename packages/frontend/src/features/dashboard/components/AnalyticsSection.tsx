@@ -75,6 +75,12 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
         if (!cancelled) {
           setAnalyticsData(data);
         }
+      } catch (err) {
+        // 에러 발생 시 null로 설정 (fallback 데이터 사용)
+        console.error('Analytics fetch error:', err);
+        if (!cancelled) {
+          setAnalyticsData(null);
+        }
       } finally {
         if (!cancelled) {
           setIsLoadingAnalytics(false);
@@ -268,99 +274,99 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
 
   return (
     <div className="rounded-xl overflow-hidden" style={{ backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}>
-      {/* 섹션 헤더 */}
+      {/* 섹션 헤더 - 반응형 */}
       <div
-        className="flex items-center gap-2 px-4 py-3"
+        className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3"
         style={{ backgroundColor: sectionHeaderBg, color: sectionHeaderText, borderBottom: `1px solid ${sectionHeaderBorder}` }}
       >
-        <TrendingUp className="w-5 h-5" />
-        <h2 className="font-semibold">분석 리포트</h2>
+        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
+        <h2 className="text-sm sm:text-base font-semibold">분석 리포트</h2>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* 퀴즈 성과 & 학습 시간 요약 (API 데이터가 있을 때만) */}
+      <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
+        {/* 퀴즈 성과 & 학습 시간 요약 (API 데이터가 있을 때만) - 반응형 */}
         {analyticsData && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="rounded-lg p-3" style={{ backgroundColor: themeColors.statCardBg }}>
-              <div className="flex items-center gap-2 mb-1">
-                <Clock className="w-4 h-4" style={{ color: sectionHeaderText }} />
-                <span className="text-xs" style={{ color: themeColors.textMuted }}>총 학습 시간</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: sectionHeaderText }} />
+                <span className="text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>총 학습 시간</span>
               </div>
-              <p className="text-lg font-semibold" style={{ color: themeColors.text }}>
+              <p className="text-sm sm:text-lg font-semibold" style={{ color: themeColors.text }}>
                 {Math.floor(analyticsData.totalStudyTime / 3600)}시간 {Math.floor((analyticsData.totalStudyTime % 3600) / 60)}분
               </p>
             </div>
-            <div className="rounded-lg p-3" style={{ backgroundColor: themeColors.statCardBg }}>
-              <div className="flex items-center gap-2 mb-1">
-                <Target className="w-4 h-4" style={{ color: sectionHeaderText }} />
-                <span className="text-xs" style={{ color: themeColors.textMuted }}>퀴즈 정답률</span>
+            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <Target className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: sectionHeaderText }} />
+                <span className="text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>퀴즈 정답률</span>
               </div>
-              <p className="text-lg font-semibold" style={{ color: themeColors.text }}>
+              <p className="text-sm sm:text-lg font-semibold" style={{ color: themeColors.text }}>
                 {analyticsData.quizStats.accuracy}%
               </p>
             </div>
-            <div className="rounded-lg p-3" style={{ backgroundColor: themeColors.statCardBg }}>
-              <div className="flex items-center gap-2 mb-1">
-                <Brain className="w-4 h-4" style={{ color: sectionHeaderText }} />
-                <span className="text-xs" style={{ color: themeColors.textMuted }}>AI 질문</span>
+            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <Brain className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: sectionHeaderText }} />
+                <span className="text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>AI 질문</span>
               </div>
-              <p className="text-lg font-semibold" style={{ color: themeColors.text }}>
+              <p className="text-sm sm:text-lg font-semibold" style={{ color: themeColors.text }}>
                 {analyticsData.aiQuestions}회
               </p>
             </div>
-            <div className="rounded-lg p-3" style={{ backgroundColor: themeColors.statCardBg }}>
-              <div className="flex items-center gap-2 mb-1">
-                <Calendar className="w-4 h-4" style={{ color: sectionHeaderText }} />
-                <span className="text-xs" style={{ color: themeColors.textMuted }}>학습 세션</span>
+            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: sectionHeaderText }} />
+                <span className="text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>학습 세션</span>
               </div>
-              <p className="text-lg font-semibold" style={{ color: themeColors.text }}>
+              <p className="text-sm sm:text-lg font-semibold" style={{ color: themeColors.text }}>
                 {analyticsData.totalSessions}회
               </p>
             </div>
           </div>
         )}
 
-        {/* 로딩 중 표시 */}
+        {/* 로딩 중 표시 - 반응형 */}
         {isLoadingAnalytics && (
-          <div className="flex items-center justify-center py-4 gap-2" style={{ color: themeColors.textMuted }}>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">분석 데이터 로딩 중...</span>
+          <div className="flex items-center justify-center py-3 sm:py-4 gap-1.5 sm:gap-2" style={{ color: themeColors.textMuted }}>
+            <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+            <span className="text-xs sm:text-sm">분석 데이터 로딩 중...</span>
           </div>
         )}
 
-        {/* 1년 달력 (GitHub 잔디 스타일) */}
+        {/* 1년 달력 (GitHub 잔디 스타일) - 반응형 */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Calendar className="w-4 h-4" style={{ color: themeColors.textMuted }} />
-            <h3 className="text-sm font-medium" style={{ color: themeColors.text }}>학습 기록 (최근 1년)</h3>
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+            <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: themeColors.textMuted }} />
+            <h3 className="text-xs sm:text-sm font-medium" style={{ color: themeColors.text }}>학습 기록 (최근 1년)</h3>
           </div>
           <div className="overflow-x-auto">
             <ContributionCalendar data={calendarData} />
           </div>
         </div>
 
-        {/* 주간 활동 + 시간대별 패턴 (2열) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 주간 활동 + 시간대별 패턴 (2열) - 반응형 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* 주간 활동 */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Calendar className="w-4 h-4" style={{ color: themeColors.textMuted }} />
-              <h3 className="text-sm font-medium" style={{ color: themeColors.text }}>요일별 학습</h3>
-              <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeText }}>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: themeColors.textMuted }} />
+              <h3 className="text-xs sm:text-sm font-medium" style={{ color: themeColors.text }}>요일별 학습</h3>
+              <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeText }}>
                 {mostActiveDay}요일 가장 활발
               </span>
             </div>
-            <div className="h-40">
+            <div className="h-32 sm:h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={weeklyData}>
-                  <XAxis dataKey="day" tick={{ fontSize: 12, fill: themeColors.textMuted }} />
-                  <YAxis tick={{ fontSize: 12, fill: themeColors.textMuted }} allowDecimals={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: themeColors.textMuted }} />
+                  <YAxis tick={{ fontSize: 10, fill: themeColors.textMuted }} allowDecimals={false} width={25} />
                   <Tooltip
                     formatter={(value: number, _name, props) => {
                       const unit = (props.payload as typeof weeklyData[0])?.unit || '분';
                       return [`${value}${unit}`, '학습'];
                     }}
-                    contentStyle={{ fontSize: 12, backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}
+                    contentStyle={{ fontSize: 11, backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}
                     labelStyle={{ color: themeColors.text }}
                     itemStyle={{ color: themeColors.text }}
                   />
@@ -379,24 +385,24 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
 
           {/* 시간대별 패턴 */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-4 h-4" style={{ color: themeColors.textMuted }} />
-              <h3 className="text-sm font-medium" style={{ color: themeColors.text }}>시간대별 학습</h3>
-              <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeText }}>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+              <Clock className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: themeColors.textMuted }} />
+              <h3 className="text-xs sm:text-sm font-medium" style={{ color: themeColors.text }}>시간대별 학습</h3>
+              <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeText }}>
                 {mostActiveTimeSlot} 선호
               </span>
             </div>
-            <div className="h-40">
+            <div className="h-32 sm:h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={timeSlotData} layout="vertical">
-                  <XAxis type="number" tick={{ fontSize: 12, fill: themeColors.textMuted }} allowDecimals={false} />
-                  <YAxis dataKey="slot" type="category" tick={{ fontSize: 11, fill: themeColors.textMuted }} width={80} />
+                  <XAxis type="number" tick={{ fontSize: 10, fill: themeColors.textMuted }} allowDecimals={false} />
+                  <YAxis dataKey="slot" type="category" tick={{ fontSize: 9, fill: themeColors.textMuted }} width={65} />
                   <Tooltip
                     formatter={(value: number, _name, props) => {
                       const unit = (props.payload as typeof timeSlotData[0])?.unit || '분';
                       return [`${value}${unit}`, '학습'];
                     }}
-                    contentStyle={{ fontSize: 12, backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}
+                    contentStyle={{ fontSize: 11, backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}
                     labelStyle={{ color: themeColors.text }}
                     itemStyle={{ color: themeColors.text }}
                   />
@@ -414,46 +420,50 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           </div>
         </div>
 
-        {/* AI 분석 버튼 영역 */}
-        <div className="flex items-center gap-3 pt-4" style={{ borderTop: `1px solid ${themeColors.cardBorder}` }}>
+        {/* AI 분석 버튼 영역 - 반응형 */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-3 sm:pt-4" style={{ borderTop: `1px solid ${themeColors.cardBorder}` }}>
           <button
             onClick={handleAnalyze}
             disabled={isAnalyzing}
-            className="flex items-center gap-2 px-4 py-2.5 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: themeColors.accent }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.accentHover}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = themeColors.accent}
           >
             {isAnalyzing ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                AI 분석 중...
+                <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                <span className="hidden sm:inline">AI 분석 중...</span>
+                <span className="sm:hidden">분석중</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4" />
-                AI 분석하기
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">AI 분석하기</span>
+                <span className="sm:hidden">AI 분석</span>
               </>
             )}
           </button>
 
           <button
             onClick={() => setShowDetailedReport(true)}
-            className="flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg transition-colors"
             style={{ border: `1px solid ${sectionHeaderBorder}`, color: sectionHeaderText }}
           >
-            <BarChart3 className="w-4 h-4" />
-            상세 보기
+            <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">상세 보기</span>
+            <span className="sm:hidden">상세</span>
           </button>
 
           {analysisResult && (
             <button
               onClick={() => setShowResultModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg transition-colors"
               style={{ border: `1px solid ${sectionHeaderBorder}`, color: sectionHeaderText }}
             >
-              <FileText className="w-4 h-4" />
-              분석 결과 보기
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">분석 결과 보기</span>
+              <span className="sm:hidden">결과</span>
             </button>
           )}
         </div>
@@ -540,22 +550,22 @@ function ContributionCalendar({
 
   return (
     <div className="inline-block">
-      {/* 월 라벨 */}
-      <div className="flex text-xs mb-1" style={{ marginLeft: 20, color: themeColors.textMuted }}>
+      {/* 월 라벨 - 모바일에서는 숨김 (absolute 포지셔닝 문제 방지) */}
+      <div className="hidden sm:flex text-xs mb-1 relative h-4" style={{ marginLeft: 20, color: themeColors.textMuted }}>
         {monthLabels.map(({ month, weekIndex }) => (
           <span
             key={`${month}-${weekIndex}`}
-            style={{ position: 'absolute', marginLeft: weekIndex * 12 }}
-            className="relative"
+            className="absolute"
+            style={{ left: weekIndex * 12 }}
           >
             {MONTHS[month]}
           </span>
         ))}
       </div>
 
-      <div className="flex gap-0.5 mt-4">
-        {/* 요일 라벨 */}
-        <div className="flex flex-col gap-0.5 mr-1">
+      <div className="flex gap-0.5 sm:mt-4">
+        {/* 요일 라벨 - 모바일에서는 숨김 */}
+        <div className="hidden sm:flex flex-col gap-0.5 mr-1">
           {['', '월', '', '수', '', '금', ''].map((day, i) => (
             <div key={i} className="w-3 h-3 text-[9px] flex items-center justify-center" style={{ color: themeColors.textMuted }}>
               {day}
@@ -569,7 +579,7 @@ function ContributionCalendar({
             {week.map((day, dayIndex) => (
               <div
                 key={`${weekIndex}-${dayIndex}`}
-                className="w-3 h-3 rounded-sm"
+                className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm"
                 style={{ backgroundColor: getGrassColor(day.count) }}
                 title={day.date ? `${day.date}: ${day.count}개 학습` : ''}
               />
@@ -578,20 +588,20 @@ function ContributionCalendar({
         ))}
       </div>
 
-      {/* 범례 */}
-      <div className="flex items-center gap-1 mt-2 text-xs" style={{ color: themeColors.textMuted }}>
+      {/* 범례 - 반응형 */}
+      <div className="flex items-center gap-1 mt-2 text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>
         <span>적음</span>
-        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: grassColors.empty }} />
-        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: grassColors.level1 }} />
-        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: grassColors.level2 }} />
-        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: grassColors.level3 }} />
+        <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.empty }} />
+        <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.level1 }} />
+        <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.level2 }} />
+        <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.level3 }} />
         <span>많음</span>
       </div>
     </div>
   );
 }
 
-// 분석 결과 모달
+// 분석 결과 모달 - 반응형
 function AnalysisResultModal({
   result,
   onClose,
@@ -604,13 +614,13 @@ function AnalysisResultModal({
   const iconColor = currentTheme === 'dark' ? '#c084fc' : '#a855f7';
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="rounded-xl max-w-lg w-full max-h-[80vh] overflow-hidden" style={{ backgroundColor: themeColors.cardBg }}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="rounded-xl max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] overflow-hidden" style={{ backgroundColor: themeColors.cardBg }}>
         {/* 모달 헤더 */}
-        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${themeColors.cardBorder}` }}>
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5" style={{ color: iconColor }} />
-            <h3 className="font-semibold" style={{ color: themeColors.text }}>AI 분석 결과</h3>
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3" style={{ borderBottom: `1px solid ${themeColors.cardBorder}` }}>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: iconColor }} />
+            <h3 className="text-sm sm:text-base font-semibold" style={{ color: themeColors.text }}>AI 분석 결과</h3>
           </div>
           <button
             onClick={onClose}
@@ -619,22 +629,22 @@ function AnalysisResultModal({
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.statCardBg}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* 모달 본문 */}
-        <div className="p-4 overflow-y-auto max-h-[60vh]">
-          <div className="prose prose-sm max-w-none whitespace-pre-wrap" style={{ color: themeColors.text }}>
+        <div className="p-3 sm:p-4 overflow-y-auto max-h-[65vh] sm:max-h-[60vh]">
+          <div className="prose prose-sm max-w-none whitespace-pre-wrap text-xs sm:text-sm" style={{ color: themeColors.text }}>
             {result || '분석 결과가 없습니다.'}
           </div>
         </div>
 
         {/* 모달 푸터 */}
-        <div className="px-4 py-3 flex justify-end" style={{ borderTop: `1px solid ${themeColors.cardBorder}` }}>
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex justify-end" style={{ borderTop: `1px solid ${themeColors.cardBorder}` }}>
           <button
             onClick={onClose}
-            className="px-4 py-2 text-white font-medium rounded-lg transition-colors"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-white font-medium rounded-lg transition-colors"
             style={{ backgroundColor: themeColors.accent }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.accentHover}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = themeColors.accent}

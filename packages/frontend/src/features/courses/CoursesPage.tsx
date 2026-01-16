@@ -80,13 +80,12 @@ export function CoursesPage() {
         </p>
       </motion.div>
 
-      {/* 언어 카드 그리드 (2x2 정사각형) */}
+      {/* 언어 카드 그리드 (5열) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="grid grid-cols-2 gap-6 max-w-2xl mx-auto"
-        style={{ justifyContent: 'center' }}
+        className="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-7xl mx-auto px-4"
       >
         {languages.map((lang, index) => (
           <LanguageCard
@@ -133,16 +132,22 @@ const LANGUAGE_COLORS: Record<string, { bg: string; border: string; stitch: stri
     text: '#F57C00',
   },
   java: {
-    bg: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)',
-    border: '#EF9A9A',
-    stitch: 'rgba(244, 67, 54, 0.4)',
-    text: '#C62828',
+    bg: 'linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%)',
+    border: '#F9A8D4',
+    stitch: 'rgba(244, 114, 182, 0.4)',
+    text: '#BE185D',
   },
   javascript: {
-    bg: 'linear-gradient(135deg, #FFF9C4 0%, #FFF59D 100%)',
-    border: '#FFF176',
-    stitch: 'rgba(255, 235, 59, 0.5)',
-    text: '#F9A825',
+    bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+    border: '#A5D6A7',
+    stitch: 'rgba(129, 199, 132, 0.5)',
+    text: '#2E7D32',
+  },
+  'python-practical': {
+    bg: 'linear-gradient(135deg, #F5F5F5 0%, #E0E0E0 100%)',
+    border: '#9E9E9E',
+    stitch: 'rgba(117, 117, 117, 0.5)',
+    text: '#424242',
   },
 };
 
@@ -165,11 +170,11 @@ function LanguageCard({ language, index, onClick }: LanguageCardProps) {
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className="group relative rounded-2xl text-center transition-all duration-300
-                 hover:shadow-xl aspect-square flex flex-col items-center justify-center"
+                 hover:shadow-xl flex flex-col items-center justify-center aspect-square"
       style={{
         background: colors.bg,
         border: `3px solid ${colors.border}`,
-        padding: '32px',
+        padding: '24px',
       }}
     >
       {/* 바느질 스티치 테두리 */}
@@ -186,24 +191,19 @@ function LanguageCard({ language, index, onClick }: LanguageCardProps) {
       />
 
       {/* 아이콘 */}
-      <div className="text-6xl mb-4">{language.icon || '📚'}</div>
+      <div className="text-5xl mb-4">{language.icon || '📚'}</div>
 
       {/* 언어 이름 */}
       <h3
-        className="text-2xl font-bold mb-2"
+        className="text-xl font-bold"
         style={{ color: colors.text }}
       >
         {language.name}
       </h3>
 
-      {/* 설명 */}
-      <p className="text-sm text-gray-600 line-clamp-2 px-2">
-        {language.description || '코스를 탐색해보세요'}
-      </p>
-
       {/* 화살표 (하단) */}
       <div
-        className="mt-4 flex items-center gap-1 text-sm font-semibold opacity-60 group-hover:opacity-100 transition-opacity"
+        className="mt-3 flex items-center gap-1 text-sm font-semibold opacity-60 group-hover:opacity-100 transition-opacity"
         style={{ color: colors.text }}
       >
         <span>시작하기</span>

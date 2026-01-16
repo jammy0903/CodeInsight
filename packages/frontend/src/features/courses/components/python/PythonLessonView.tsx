@@ -6,16 +6,16 @@
  * - 페이지 2: 플로우 뷰어 + 설명 + AI Chat
  */
 
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import type { PanInfo } from 'framer-motion';
-import { Code2, GitBranch } from 'lucide-react';
+import { Code2, GitBranch, Cpu } from 'lucide-react';
 import { FlowViewer } from './FlowViewer';
 import { PyVisualizerView } from '@/features/visualizers/python';
 import { CodeViewer } from '../day/CodeViewer';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { ChatQA } from '@/features/chat/components/ChatQA';
-import { useIsMobile } from '@/hooks';
+import { MemoryPanel } from '../memory/MemoryPanel';
+import { useIsMobile, useSlidingPages } from '@/hooks';
 
 interface PythonStep {
   line: number;
@@ -39,6 +39,32 @@ interface PythonLessonViewProps {
   currentStepIndex: number;
   languageId: string;
   lessonId: string;
+  // 메모리 시각화용 (C 스타일)
+  memoryState?: {
+    stack: Array<{
+      name: string;
+      variables: Array<{
+        name: string;
+        value: string | number;
+        address?: string;
+        type?: string;
+        highlight?: boolean;
+      }>;
+    }>;
+    heap: Array<{
+      id: string;
+      type: string;
+      value?: string | number;
+      address?: string;
+      highlight?: boolean;
+    }>;
+    frames?: Array<{
+      name: string;
+      startIndex: number;
+      endIndex: number;
+    }>;
+  };
+  showRegisters?: boolean;
 }
 
 export function PythonLessonView({
@@ -47,10 +73,12 @@ export function PythonLessonView({
   currentStepIndex,
   languageId,
   lessonId,
+  memoryState,
+  showRegisters,
 }: PythonLessonViewProps) {
-  const [currentPage, setCurrentPage] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const { currentPage, setCurrentPage, handleDragEnd, animateX } = useSlidingPages();
 
   const currentStep = steps[currentStepIndex];
 
@@ -62,15 +90,6 @@ export function PythonLessonView({
     }
   }
 
-  // 스와이프 핸들러
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 50;
-    if (info.offset.x < -threshold && currentPage === 0) {
-      setCurrentPage(1);
-    } else if (info.offset.x > threshold && currentPage === 1) {
-      setCurrentPage(0);
-    }
-  };
 
   // 설명 컴포넌트 (공통)
   const ExplanationSection = () => (
@@ -99,7 +118,7 @@ export function PythonLessonView({
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.2}
           onDragEnd={handleDragEnd}
-          animate={{ x: currentPage === 0 ? 0 : '-100%' }}
+          animate={{ x: animateX }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           className="flex h-full"
           style={{ width: '200%' }}
@@ -142,19 +161,38 @@ export function PythonLessonView({
             {/* 설명 */}
             <ExplanationSection />
 
-            {/* 시각화 (Python 메모리 or 플로우) */}
+            {/* 시각화 (Python 메모리 or C 메모리 or 플로우) */}
             <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
-              <div className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-semibold flex items-center gap-2">
-                <GitBranch className="w-4 h-4" />
-                {currentStep?.pythonMemoryState ? 'Python 메모리' : '실행 흐름'}
+              <div className={`px-4 py-2 bg-gradient-to-r text-white text-sm font-semibold flex items-center gap-2 ${
+                currentStep?.pythonMemoryState
+                  ? 'from-emerald-600 to-emerald-700'
+                  : memoryState && (memoryState.stack.length > 0 || memoryState.heap.length > 0)
+                    ? 'from-blue-600 to-blue-700'
+                    : 'from-emerald-600 to-emerald-700'
+              }`}>
+                {currentStep?.pythonMemoryState ? (
+                  <><GitBranch className="w-4 h-4" /> Python 메모리</>
+                ) : memoryState && (memoryState.stack.length > 0 || memoryState.heap.length > 0) ? (
+                  <><Cpu className="w-4 h-4" /> 메모리</>
+                ) : (
+                  <><GitBranch className="w-4 h-4" /> 실행 흐름</>
+                )}
               </div>
-              <div className="p-4">
+              <div className="p-4 min-h-[300px]">
                 {currentStep?.pythonMemoryState ? (
                   <PyVisualizerView
                     names={currentStep.pythonMemoryState.names}
                     objects={currentStep.pythonMemoryState.objects}
                     animate={true}
                     compact={false}
+                  />
+                ) : memoryState && (memoryState.stack.length > 0 || memoryState.heap.length > 0) ? (
+                  <MemoryPanel
+                    stack={memoryState.stack}
+                    heap={memoryState.heap}
+                    changedBlocks={[]}
+                    showRegisters={showRegisters}
+                    frames={memoryState.frames}
                   />
                 ) : (
                   <FlowViewer steps={steps} currentStepIndex={currentStepIndex} />
