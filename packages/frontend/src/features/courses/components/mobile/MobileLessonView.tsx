@@ -27,6 +27,10 @@ interface MobileLessonViewProps {
   lessonId: string;
   lessonTitle?: string;
   lessonOrder?: number;
+  // 스텝 네비게이션
+  onPrevStep: () => void;
+  onNextStep: () => void;
+  onQuiz?: () => void;
   // 메모리 시각화용
   memoryState?: {
     stack: Array<{
@@ -102,6 +106,9 @@ export function MobileLessonView({
   lessonId,
   lessonTitle,
   lessonOrder,
+  onPrevStep,
+  onNextStep,
+  onQuiz,
   memoryState,
   showRegisters,
 }: MobileLessonViewProps) {
@@ -272,22 +279,18 @@ export function MobileLessonView({
         </motion.div>
       </div>
 
-      {/* 페이지 네비게이션 */}
+      {/* 스텝 네비게이션 */}
       <div className="flex items-center justify-between px-4 py-2 bg-white border-t border-[#e5d5c7]">
         {/* 이전 코드 버튼 */}
         <button
-          onClick={() => setCurrentPage(0)}
-          disabled={currentPage === 0}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: currentPage === 0 ? '#6b5a4a' : '#e5d5c7',
-            color: currentPage === 0 ? 'white' : '#6b5a4a',
-          }}
+          onClick={onPrevStep}
+          disabled={currentStepIndex === 0}
+          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed bg-[#e5d5c7] text-[#6b5a4a] hover:bg-[#d5c5b7]"
         >
           이전 코드
         </button>
 
-        {/* 페이지 인디케이터 */}
+        {/* 페이지 인디케이터 (점만) */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage(0)}
@@ -305,18 +308,23 @@ export function MobileLessonView({
           />
         </div>
 
-        {/* 다음 코드 버튼 */}
-        <button
-          onClick={() => setCurrentPage(1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: currentPage === 1 ? '#6b5a4a' : '#e5d5c7',
-            color: currentPage === 1 ? 'white' : '#6b5a4a',
-          }}
-        >
-          다음 코드
-        </button>
+        {/* 다음 코드 / 퀴즈 풀기 버튼 */}
+        {currentStepIndex >= steps.length - 1 && onQuiz ? (
+          <button
+            onClick={onQuiz}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-emerald-500 text-white hover:bg-emerald-600"
+          >
+            퀴즈 풀기
+          </button>
+        ) : (
+          <button
+            onClick={onNextStep}
+            disabled={currentStepIndex >= steps.length - 1}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed bg-[#e5d5c7] text-[#6b5a4a] hover:bg-[#d5c5b7]"
+          >
+            다음 코드
+          </button>
+        )}
       </div>
 
       {/* AI Chat FAB + Modal */}

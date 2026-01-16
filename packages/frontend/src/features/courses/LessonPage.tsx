@@ -650,7 +650,7 @@ export function LessonPage() {
             </div>
           </div>
 
-          {/* 모바일 레슨 뷰 (모든 언어 공통) */}
+          {/* 모바일 레슨 뷰 (모든 언어 공통) - 스텝 컨트롤 내장 */}
           <div className="flex-1 min-h-0">
             <MobileLessonView
               code={code}
@@ -660,41 +660,12 @@ export function LessonPage() {
               lessonId={lessonId || ''}
               lessonTitle={lesson.title}
               lessonOrder={lesson.order}
+              onPrevStep={navigation.goToPrevStep}
+              onNextStep={navigation.goToNextStep}
+              onQuiz={navigation.goToQuiz}
               memoryState={memoryState}
               showRegisters={lesson?.content?.showRegisters}
             />
-          </div>
-
-          {/* 스텝 컨트롤 */}
-          <div className="flex items-center justify-center gap-3 py-3 px-2 border-t border-[#e5d5c7] bg-white">
-            <button
-              onClick={navigation.goToPrevStep}
-              disabled={!navigation.canGoPrev}
-              className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors flex items-center gap-1 text-sm"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              이전
-            </button>
-            <span className="text-xs text-gray-500">
-              {navigation.currentStepIndex + 1} / {navigation.totalSteps}
-            </span>
-            {!navigation.isLastStep ? (
-              <button
-                onClick={navigation.goToNextStep}
-                className="px-3 py-1.5 rounded-lg bg-[#6b5a4a] text-white hover:bg-[#5a4a3a] transition-colors flex items-center gap-1 text-sm"
-              >
-                다음
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={navigation.goToQuiz}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors flex items-center gap-1 text-sm"
-              >
-                퀴즈 풀기
-                <Sparkles className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
       ) : lang?.includes('python') ? (
