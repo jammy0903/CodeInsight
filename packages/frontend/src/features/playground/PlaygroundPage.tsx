@@ -170,16 +170,16 @@ export function PlaygroundPage() {
         orientation={isMobile ? 'vertical' : 'horizontal'}
         id="playground-main"
         style={{
-          minHeight: 'calc(100vh - 64px - 32px)',
+          minHeight: isMobile ? 'auto' : 'calc(100vh - 64px - 32px)',
           alignItems: 'flex-start',
         }}
       >
         {/* ===== Left Panel: Code Editor + Output + Explanation ===== */}
         <Panel
           id="code-editor"
-          defaultSize={50}
-          minSize={30}
-          maxSize={70}
+          defaultSize={isMobile ? 100 : 50}
+          minSize={isMobile ? 100 : 30}
+          maxSize={isMobile ? 100 : 70}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -187,34 +187,35 @@ export function PlaygroundPage() {
             backgroundColor: colors.panelBg,
           }}
         >
-          {/* Code Header: Language tabs + Control buttons */}
+          {/* Code Header: Language tabs + Control buttons - 반응형 */}
           <div
             style={{
-              height: '48px',
-              padding: '0 16px',
+              height: isMobile ? '40px' : '48px',
+              padding: isMobile ? '0 8px' : '0 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               borderBottom: `1px solid ${colors.border}`,
               backgroundColor: colors.headerBg,
               flexShrink: 0,
+              gap: isMobile ? '4px' : '8px',
             }}
           >
-            <LanguageTabs />
-            <StepControls />
+            <LanguageTabs isMobile={isMobile} />
+            <StepControls isMobile={isMobile} />
           </div>
 
-          {/* Editor - dynamic height based on code lines */}
-          <div style={{ height: `${editorHeight}px`, flexShrink: 0 }}>
+          {/* Editor - dynamic height based on code lines - 모바일에서 더 작게 */}
+          <div style={{ height: isMobile ? `${Math.min(editorHeight, 200)}px` : `${editorHeight}px`, flexShrink: 0 }}>
             <CodeEditor />
           </div>
 
-          {/* Terminal Output - right after code */}
+          {/* Terminal Output - right after code - 반응형 */}
           {terminalLines.length > 0 && (
             <div
               style={{
                 flexShrink: 0,
-                padding: '8px 12px',
+                padding: isMobile ? '6px 8px' : '8px 12px',
                 backgroundColor: colors.panelBg,
                 borderTop: `1px solid ${colors.border}`,
               }}
@@ -222,17 +223,17 @@ export function PlaygroundPage() {
               <TerminalOutput
                 lines={terminalLines}
                 title="Output"
-                maxHeight="100px"
+                maxHeight={isMobile ? '80px' : '100px'}
               />
             </div>
           )}
 
-          {/* Explanation Panel - after output (or code if no output) */}
+          {/* Explanation Panel - after output (or code if no output) - 반응형 */}
           {currentStep && (
             <div
               style={{
                 flexShrink: 0,
-                padding: '8px 12px 12px',
+                padding: isMobile ? '6px 8px 8px' : '8px 12px 12px',
                 backgroundColor: colors.panelBg,
                 borderTop: terminalLines.length === 0 ? `1px solid ${colors.border}` : 'none',
               }}
@@ -240,7 +241,7 @@ export function PlaygroundPage() {
               <div
                 style={{
                   backgroundColor: colors.explanationBg,
-                  borderRadius: '8px',
+                  borderRadius: isMobile ? '6px' : '8px',
                   overflow: 'hidden',
                   boxShadow: currentTheme === 'dark'
                     ? '0 2px 8px rgba(0, 0, 0, 0.3)'
@@ -253,16 +254,16 @@ export function PlaygroundPage() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    padding: '6px 12px',
+                    padding: isMobile ? '4px 8px' : '6px 12px',
                     backgroundColor: colors.explanationHeaderBg,
                     borderBottom: `1px solid ${colors.explanationBorder}`,
-                    gap: '8px',
+                    gap: isMobile ? '4px' : '8px',
                   }}
                 >
-                  <span style={{ fontSize: '14px' }}>💡</span>
+                  <span style={{ fontSize: isMobile ? '12px' : '14px' }}>💡</span>
                   <span
                     style={{
-                      fontSize: '11px',
+                      fontSize: isMobile ? '10px' : '11px',
                       color: colors.explanationText,
                       fontWeight: 600,
                       fontFamily: 'system-ui, sans-serif',
@@ -272,7 +273,7 @@ export function PlaygroundPage() {
                   </span>
                   <span
                     style={{
-                      fontSize: '10px',
+                      fontSize: isMobile ? '9px' : '10px',
                       color: colors.explanationTextMuted,
                       marginLeft: 'auto',
                       fontFamily: 'monospace',
@@ -282,8 +283,8 @@ export function PlaygroundPage() {
                   </span>
                 </div>
                 {/* Explanation Content */}
-                <div style={{ padding: '10px 14px' }}>
-                  <StepExplanation step={currentStep} />
+                <div style={{ padding: isMobile ? '8px 10px' : '10px 14px' }}>
+                  <StepExplanation step={currentStep} isMobile={isMobile} />
                 </div>
               </div>
             </div>
@@ -309,12 +310,12 @@ export function PlaygroundPage() {
           </PanelResizeHandle>
         )}
 
-        {/* ===== Right Panel: Memory Visualization ===== */}
+        {/* ===== Right Panel: Memory Visualization - 반응형 ===== */}
         <Panel
           id="memory-viewer"
-          defaultSize={50}
-          minSize={30}
-          maxSize={70}
+          defaultSize={isMobile ? 100 : 50}
+          minSize={isMobile ? 100 : 30}
+          maxSize={isMobile ? 100 : 70}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -322,54 +323,54 @@ export function PlaygroundPage() {
             backgroundColor: colors.panelBg,
           }}
         >
-          {/* Header */}
+          {/* Header - 반응형 */}
           <div
             style={{
-              height: '48px',
-              padding: '0 16px',
+              height: isMobile ? '36px' : '48px',
+              padding: isMobile ? '0 8px' : '0 16px',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: isMobile ? '6px' : '8px',
               borderBottom: `1px solid ${colors.border}`,
               backgroundColor: colors.headerBg,
               flexShrink: 0,
             }}
           >
-            <Cpu size={18} color={colors.accent} />
-            <span style={{ fontSize: '14px', color: colors.text, fontWeight: 600 }}>
-              Memory Visualization
+            <Cpu size={isMobile ? 14 : 18} color={colors.accent} />
+            <span style={{ fontSize: isMobile ? '12px' : '14px', color: colors.text, fontWeight: 600 }}>
+              {isMobile ? 'Memory' : 'Memory Visualization'}
             </span>
             {hasSteps && (
               <span
                 style={{
                   marginLeft: 'auto',
-                  padding: '4px 10px',
-                  fontSize: '12px',
+                  padding: isMobile ? '2px 6px' : '4px 10px',
+                  fontSize: isMobile ? '10px' : '12px',
                   color: colors.accent,
                   fontFamily: 'monospace',
                   fontWeight: 600,
                   background: colors.accentBg,
-                  borderRadius: '6px',
+                  borderRadius: isMobile ? '4px' : '6px',
                   border: `1px solid ${colors.accentBorder}`,
                 }}
               >
-                Step {currentStepIndex + 1}/{steps.length}
+                {currentStepIndex + 1}/{steps.length}
               </span>
             )}
           </div>
 
-          {/* Memory Panel */}
-          <div style={{ minHeight: '400px', padding: '16px' }}>
+          {/* Memory Panel - 반응형 */}
+          <div style={{ minHeight: isMobile ? '250px' : '400px', padding: isMobile ? '8px' : '16px' }}>
             {error ? (
               <div
                 style={{
-                  padding: '16px',
+                  padding: isMobile ? '10px' : '16px',
                   backgroundColor: colors.errorBg,
                   border: `1px solid ${colors.errorBorder}`,
-                  borderRadius: '8px',
+                  borderRadius: isMobile ? '6px' : '8px',
                 }}
               >
-                <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
+                <p style={{ fontSize: isMobile ? '12px' : '14px', color: colors.errorText }}>{error}</p>
               </div>
             ) : language === 'python' && hasSteps ? (
               <PyVisualizerView
@@ -392,23 +393,25 @@ export function PlaygroundPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   height: '100%',
-                  fontSize: '14px',
+                  fontSize: isMobile ? '12px' : '14px',
                   color: colors.textMuted,
+                  textAlign: 'center',
+                  padding: isMobile ? '0 16px' : 0,
                 }}
               >
                 {language === 'java'
                   ? 'Java simulation is not supported yet'
-                  : 'Click Run button to execute code'}
+                  : isMobile ? 'Run 버튼을 눌러 실행' : 'Click Run button to execute code'}
               </div>
             )}
           </div>
         </Panel>
       </PanelGroup>
 
-      {/* Footer - Compact */}
+      {/* Footer - Compact - 반응형 */}
       <footer
         style={{
-          padding: '8px 24px',
+          padding: isMobile ? '6px 12px' : '8px 24px',
           backgroundColor: colors.footerBg,
           borderTop: `1px solid ${colors.footerBorder}`,
           display: 'flex',
@@ -417,23 +420,23 @@ export function PlaygroundPage() {
           flexShrink: 0,
         }}
       >
-        <span style={{ fontSize: '11px', color: colors.footerText }}>
+        <span style={{ fontSize: isMobile ? '10px' : '11px', color: colors.footerText }}>
           CodeInsight 2026
         </span>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: isMobile ? '6px' : '8px' }}>
           <a
             href="https://github.com/jammy0903"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: colors.footerText, display: 'flex' }}
           >
-            <Github size={14} />
+            <Github size={isMobile ? 12 : 14} />
           </a>
           <a
             href="mailto:l89192164@gmail.com"
             style={{ color: colors.footerText, display: 'flex' }}
           >
-            <Mail size={14} />
+            <Mail size={isMobile ? 12 : 14} />
           </a>
         </div>
       </footer>

@@ -1,13 +1,18 @@
 /**
  * StepControls - 시뮬레이션 컨트롤 버튼
  * Run, Reset, 이전/다음 스텝
+ * 반응형 지원 (모바일에서 컴팩트)
  */
 
 import { Play, RotateCcw, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { usePlaygroundStore, useStepControls, useCurrentCode } from '../stores/playgroundStore';
 import { simulatorService, isLanguageSupported } from '@/services/simulator';
 
-export function StepControls() {
+interface StepControlsProps {
+  isMobile?: boolean;
+}
+
+export function StepControls({ isMobile = false }: StepControlsProps) {
   const { language, steps, currentStepIndex, isSimulating, setIsSimulating, setSteps, setError } =
     usePlaygroundStore();
   const { nextStep, prevStep, reset, canGoNext, canGoPrev } = useStepControls();
@@ -52,16 +57,16 @@ export function StepControls() {
     }
   };
 
-  // 공통 버튼 스타일 (라이트 테마)
+  // 공통 버튼 스타일 (반응형)
   const buttonBase: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '4px',
-    padding: '4px 10px',
-    fontSize: '11px',
+    gap: isMobile ? '2px' : '4px',
+    padding: isMobile ? '3px 6px' : '4px 10px',
+    fontSize: isMobile ? '10px' : '11px',
     fontWeight: 600,
-    borderRadius: '6px',
+    borderRadius: isMobile ? '4px' : '6px',
     border: 'none',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
@@ -88,19 +93,13 @@ export function StepControls() {
     border: '1px solid #e5e7eb',
   };
 
-  const secondaryButtonDisabled: React.CSSProperties = {
-    ...secondaryButton,
-    opacity: 0.4,
-    cursor: 'not-allowed',
-  };
-
   const navButton: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '26px',
-    height: '26px',
-    borderRadius: '6px',
+    width: isMobile ? '22px' : '26px',
+    height: isMobile ? '22px' : '26px',
+    borderRadius: isMobile ? '4px' : '6px',
     border: '1px solid #e5e7eb',
     background: '#ffffff',
     color: '#6b7280',
@@ -115,7 +114,7 @@ export function StepControls() {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px' }}>
       {/* Run 버튼 */}
       <button
         onClick={handleRun}
@@ -133,14 +132,14 @@ export function StepControls() {
         }}
       >
         {isSimulating ? (
-          <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
+          <Loader2 size={isMobile ? 12 : 14} style={{ animation: 'spin 1s linear infinite' }} />
         ) : (
-          <Play size={14} fill="currentColor" />
+          <Play size={isMobile ? 12 : 14} fill="currentColor" />
         )}
-        <span>{isSimulating ? 'Running' : 'Run'}</span>
+        {!isMobile && <span>{isSimulating ? 'Running' : 'Run'}</span>}
       </button>
 
-      {/* Reset 버튼 */}
+      {/* Reset 버튼 - 모바일에서는 아이콘만 */}
       {hasSteps && (
         <button
           onClick={reset}
@@ -154,19 +153,19 @@ export function StepControls() {
             e.currentTarget.style.color = '#6b7280';
           }}
         >
-          <RotateCcw size={12} />
-          <span>Reset</span>
+          <RotateCcw size={isMobile ? 10 : 12} />
+          {!isMobile && <span>Reset</span>}
         </button>
       )}
 
-      {/* 구분선 */}
-      {hasSteps && (
+      {/* 구분선 - 모바일에서는 숨김 */}
+      {hasSteps && !isMobile && (
         <div style={{ width: '1px', height: '16px', background: '#e5e7eb', margin: '0 2px' }} />
       )}
 
       {/* 이전/다음 네비게이션 */}
       {hasSteps && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '2px' : '4px' }}>
           <button
             onClick={prevStep}
             disabled={!canGoPrev}
@@ -182,13 +181,13 @@ export function StepControls() {
               e.currentTarget.style.color = '#6b7280';
             }}
           >
-            <ChevronLeft size={14} />
+            <ChevronLeft size={isMobile ? 12 : 14} />
           </button>
 
           <div
             style={{
-              padding: '3px 8px',
-              fontSize: '11px',
+              padding: isMobile ? '2px 4px' : '3px 8px',
+              fontSize: isMobile ? '9px' : '11px',
               fontFamily: 'monospace',
               fontWeight: 600,
               color: '#22c55e',
@@ -215,7 +214,7 @@ export function StepControls() {
               e.currentTarget.style.color = '#6b7280';
             }}
           >
-            <ChevronRight size={14} />
+            <ChevronRight size={isMobile ? 12 : 14} />
           </button>
         </div>
       )}
