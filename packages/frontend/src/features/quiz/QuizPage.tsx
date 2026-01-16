@@ -50,8 +50,8 @@ export function QuizPage() {
           <h1 className="text-2xl font-bold text-[#6b5a4a]">퀴즈</h1>
         </div>
 
-        {/* 퀴즈 유형 버튼들 - 수평 배치 */}
-        <div className="flex gap-4">
+        {/* 퀴즈 유형 버튼들 - 모바일: 세로, 데스크톱: 가로 */}
+        <div className="flex flex-col md:flex-row gap-4">
           {QUIZ_TYPES.map((quiz) => {
             const Icon = quiz.icon;
             return (

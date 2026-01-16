@@ -6,7 +6,8 @@ import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
 import { logger } from '@/utils/logger';
-import { Zap, Trophy, ChevronLeft } from 'lucide-react';
+import { Zap, Trophy, ChevronLeft, Lock } from 'lucide-react';
+import { useIsMobile } from '@/hooks';
 
 export function LanguageCoursePage() {
   const { lang } = useParams<{ lang: string }>();
@@ -36,6 +37,7 @@ export function LanguageCoursePage() {
   };
 
   const langInfo = getLanguageInfo();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!lang) return;
@@ -269,43 +271,99 @@ export function LanguageCoursePage() {
         </div>
       </div>
 
-      {/* 챕터 Grid */}
+      {/* 챕터 리스트 */}
       {lang && (
         <div style={{ marginTop: '80px' }}>
-        <CourseGrid>
-          {chapters.map((chapter, index) => {
-            // 이전 챕터들이 모두 완료되었는지 확인
-            const previousChaptersComplete = chapters.slice(0, index).every(ch => {
-              const completedInChapter = ch.lessons.filter(
-                l => progressMap.get(l.id)?.status === 'completed'
-              ).length;
-              return completedInChapter === ch.lessons.length;
-            });
+          {isMobile ? (
+            // 모바일: 리스트 형식
+            <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+              {chapters.map((chapter, index) => {
+                // 이전 챕터들이 모두 완료되었는지 확인
+                const previousChaptersComplete = chapters.slice(0, index).every(ch => {
+                  const completedInChapter = ch.lessons.filter(
+                    l => progressMap.get(l.id)?.status === 'completed'
+                  ).length;
+                  return completedInChapter === ch.lessons.length;
+                });
 
-            // 현재 챕터 진행률
-            const completedInChapter = chapter.lessons.filter(
-              l => progressMap.get(l.id)?.status === 'completed'
-            ).length;
-            const isComplete = completedInChapter === chapter.lessons.length && chapter.lessons.length > 0;
-            // isSequential이 false면 모든 챕터 즉시 열림
-            const isLocked = language?.isSequential
-              ? index > 0 && !previousChaptersComplete && completedInChapter === 0
-              : false;
-            const isActive = !isComplete && !isLocked && (index === 0 || previousChaptersComplete);
+                // 현재 챕터 진행률
+                const completedInChapter = chapter.lessons.filter(
+                  l => progressMap.get(l.id)?.status === 'completed'
+                ).length;
+                const progress = chapter.lessons.length > 0
+                  ? Math.round((completedInChapter / chapter.lessons.length) * 100)
+                  : 0;
+                const isLocked = language?.isSequential
+                  ? index > 0 && !previousChaptersComplete && completedInChapter === 0
+                  : false;
 
-            return (
-              <ChapterCard
-                key={chapter.id}
-                chapter={chapter}
-                languageId={lang}
-                lessonCount={chapter.lessons.length}
-                completedCount={completedInChapter}
-                isLocked={isLocked}
-                isActive={isActive}
-              />
-            );
-          })}
-        </CourseGrid>
+                return (
+                  <div key={chapter.id}>
+                    <button
+                      onClick={() => !isLocked && navigate(`/courses/${lang}/${chapter.id}`)}
+                      disabled={isLocked}
+                      className="w-full p-4 text-left transition-colors hover:bg-[#fffbf5] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-base font-semibold text-[#333] flex items-center gap-2">
+                          {isLocked && <Lock className="w-4 h-4 text-gray-400" />}
+                          {chapter.title}
+                        </h3>
+                        <span className="text-sm font-mono text-[#937b5d]">
+                          {progress}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-[#f0e6da] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#a08060] rounded-full transition-all duration-300"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </button>
+                    {index < chapters.length - 1 && (
+                      <div className="border-b border-[#e5d5c7]" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            // 데스크톱: 그리드 형식
+            <CourseGrid>
+              {chapters.map((chapter, index) => {
+                // 이전 챕터들이 모두 완료되었는지 확인
+                const previousChaptersComplete = chapters.slice(0, index).every(ch => {
+                  const completedInChapter = ch.lessons.filter(
+                    l => progressMap.get(l.id)?.status === 'completed'
+                  ).length;
+                  return completedInChapter === ch.lessons.length;
+                });
+
+                // 현재 챕터 진행률
+                const completedInChapter = chapter.lessons.filter(
+                  l => progressMap.get(l.id)?.status === 'completed'
+                ).length;
+                const isComplete = completedInChapter === chapter.lessons.length && chapter.lessons.length > 0;
+                // isSequential이 false면 모든 챕터 즉시 열림
+                const isLocked = language?.isSequential
+                  ? index > 0 && !previousChaptersComplete && completedInChapter === 0
+                  : false;
+                const isActive = !isComplete && !isLocked && (index === 0 || previousChaptersComplete);
+
+                return (
+                  <ChapterCard
+                    key={chapter.id}
+                    chapter={chapter}
+                    languageId={lang}
+                    lessonCount={chapter.lessons.length}
+                    completedCount={completedInChapter}
+                    isLocked={isLocked}
+                    isActive={isActive}
+                  />
+                );
+              })}
+            </CourseGrid>
+          )}
         </div>
       )}
 

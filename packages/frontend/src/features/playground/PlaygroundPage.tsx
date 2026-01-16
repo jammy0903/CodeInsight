@@ -6,6 +6,7 @@
 
 import { useMemo, useEffect } from 'react';
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
+import { useIsMobile } from '@/hooks';
 import { Cpu, Github, Mail, GripVertical } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
 import { CodeEditor } from './components/CodeEditor';
@@ -116,6 +117,7 @@ export function PlaygroundPage() {
   const { startPrefetch, stopPrefetch } = useExplanationStore();
   const currentTheme = useThemeStore((s) => s.theme);
   const colors = playgroundColors[currentTheme];
+  const isMobile = useIsMobile();
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
@@ -163,9 +165,9 @@ export function PlaygroundPage() {
         backgroundColor: colors.pageBg,
       }}
     >
-      {/* Main area: Resizable 2-panel layout */}
+      {/* Main area: Resizable 2-panel layout (모바일: 세로, 데스크톱: 가로) */}
       <PanelGroup
-        orientation="horizontal"
+        orientation={isMobile ? 'vertical' : 'horizontal'}
         id="playground-main"
         style={{
           minHeight: 'calc(100vh - 64px - 32px)',
@@ -288,22 +290,24 @@ export function PlaygroundPage() {
           )}
         </Panel>
 
-        {/* ===== Resize Handle ===== */}
-        <PanelResizeHandle
-          style={{
-            width: '8px',
-            backgroundColor: colors.resizeHandle,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'col-resize',
-            transition: 'background-color 0.15s ease',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHover)}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHandle)}
-        >
-          <GripVertical size={14} color={colors.textDim} />
-        </PanelResizeHandle>
+        {/* ===== Resize Handle (모바일: 숨김) ===== */}
+        {!isMobile && (
+          <PanelResizeHandle
+            style={{
+              width: '8px',
+              backgroundColor: colors.resizeHandle,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'col-resize',
+              transition: 'background-color 0.15s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHover)}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHandle)}
+          >
+            <GripVertical size={14} color={colors.textDim} />
+          </PanelResizeHandle>
+        )}
 
         {/* ===== Right Panel: Memory Visualization ===== */}
         <Panel

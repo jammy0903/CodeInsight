@@ -28,19 +28,25 @@ import { SelectedCodeBadge } from './components/day/SelectedCodeBadge';
 import { MemoryPanel } from './components/memory/MemoryPanel';
 import { ReturnOverlay } from '@/features/visualizers/shared';
 import { ChatQA } from '@/features/chat';
-// TODO: 다른 서버에서 파일 가져온 후 주석 해제
-// import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
+import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 
 // 새 hooks
 import { useLessonNavigation } from './hooks/useLessonNavigation';
 import { useLessonVisualization } from './hooks/useLessonVisualization';
 import { useCodeSelection } from './hooks/useCodeSelection';
+import { useIsMobile } from '@/hooks';
 
 // 언어별 시각화
 import { JSVisualizerView } from '@/features/visualizers/js';
 // TODO: 다른 서버에서 파일 가져온 후 주석 해제
 // import { PyVisualizerView } from '@/features/visualizers/python';
+
+// Python 코스 전용 컴포넌트
+import { PythonLessonView } from './components/python';
 import type { PyName, PyObject } from '@/types/py-simulator';
+
+// 모바일 컴포넌트
+import { MobileAIChatFAB, MobileAIChatModal, MobileLessonView } from './components/mobile';
 
 // Python 레슨 데이터 → PyVisualizerView 변환
 interface LessonPyName {
@@ -386,6 +392,9 @@ export function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'memory' | 'explanation' | 'chat'>('memory');
+  const isMobile = useIsMobile();
+  // 모바일 AI Chat 상태
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   // 시뮬레이터 결과 (stdout용)
   const [simulatorSteps, setSimulatorSteps] = useState<LessonStep[]>([]);
   // 탭 반짝임 효과
@@ -514,36 +523,35 @@ export function LessonPage() {
   // 현재 스텝
   const currentStep = steps[navigation.currentStepIndex];
 
-  // TODO: 다른 서버에서 파일 가져온 후 주석 해제
   // 터미널 출력 라인
   // 1순위: 레슨 JSON의 stdout (정적, 신뢰할 수 있음)
   // 2순위: 시뮬레이터 API 결과 (동적, fallback)
-  // const terminalLines = useMemo((): TerminalLine[] => {
-  //   if (!currentStep) return [];
+  const terminalLines = useMemo((): TerminalLine[] => {
+    if (!currentStep) return [];
 
-  //   const lines: TerminalLine[] = [];
-  //   const currentStepIdx = navigation.currentStepIndex;
+    const lines: TerminalLine[] = [];
+    const currentStepIdx = navigation.currentStepIndex;
 
-  //   // 현재 스텝까지의 모든 stdout 수집
-  //   for (let i = 0; i <= currentStepIdx; i++) {
-  //     const step = steps[i];
-  //     if (!step) continue;
+    // 현재 스텝까지의 모든 stdout 수집
+    for (let i = 0; i <= currentStepIdx; i++) {
+      const step = steps[i];
+      if (!step) continue;
 
-  //     // 1순위: 레슨 JSON에 stdout이 있으면 사용
-  //     if (step.stdout) {
-  //       lines.push({ content: step.stdout, type: 'output' });
-  //       continue;
-  //     }
+      // 1순위: 레슨 JSON에 stdout이 있으면 사용
+      if (step.stdout) {
+        lines.push({ content: step.stdout, type: 'output' });
+        continue;
+      }
 
-  //     // 2순위: 시뮬레이터 결과에서 같은 라인의 stdout 찾기
-  //     const simStep = simulatorSteps.find(s => s.line === step.line);
-  //     if (simStep?.stdout) {
-  //       lines.push({ content: simStep.stdout, type: 'output' });
-  //     }
-  //   }
+      // 2순위: 시뮬레이터 결과에서 같은 라인의 stdout 찾기
+      const simStep = simulatorSteps.find(s => s.line === step.line);
+      if (simStep?.stdout) {
+        lines.push({ content: simStep.stdout, type: 'output' });
+      }
+    }
 
-  //   return lines;
-  // }, [steps, simulatorSteps, currentStep, navigation.currentStepIndex]);
+    return lines;
+  }, [steps, simulatorSteps, currentStep, navigation.currentStepIndex]);
 
   // 스텝 변경 시 탭 반짝임 효과 (앞으로 갈 때만)
   useEffect(() => {
@@ -624,10 +632,136 @@ export function LessonPage() {
             chapterPath={languageCoursePath}
           />
         </>
+      ) : isMobile ? (
+        /* ===== 모바일 통합 레이아웃 (모든 언어 동일) ===== */
+        <div className="flex flex-col h-[calc(100vh-120px)]">
+          {/* 헤더 */}
+          <div className="flex items-center gap-4 mb-4 px-4">
+            <Link to={languageCoursePath} className="cyber-back-btn">
+              <span className="cyber-back-arrow">‹</span>
+              <span>EXIT</span>
+            </Link>
+            <div className="cyber-divider" />
+            <div className="flex-1">
+              <h1 className="text-lg font-bold">{lesson.title}</h1>
+              {lesson.description && (
+                <p className="text-xs text-gray-500">{lesson.description}</p>
+              )}
+            </div>
+          </div>
+
+          {/* 모바일 레슨 뷰 (모든 언어 공통) */}
+          <div className="flex-1 min-h-0">
+            <MobileLessonView
+              code={code}
+              steps={steps}
+              currentStepIndex={navigation.currentStepIndex}
+              languageId={lang || 'c'}
+              lessonId={lessonId || ''}
+              lessonTitle={lesson.title}
+              lessonOrder={lesson.order}
+              memoryState={memoryState}
+              showRegisters={lesson?.content?.showRegisters}
+            />
+          </div>
+
+          {/* 스텝 컨트롤 */}
+          <div className="flex items-center justify-center gap-4 py-4 border-t border-[#e5d5c7] bg-white">
+            <button
+              onClick={navigation.goToPrevStep}
+              disabled={!navigation.canGoPrev}
+              className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors flex items-center gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              이전
+            </button>
+            <span className="text-sm text-gray-500">
+              {navigation.currentStepIndex + 1} / {navigation.totalSteps}
+            </span>
+            {!navigation.isLastStep ? (
+              <button
+                onClick={navigation.goToNextStep}
+                className="px-4 py-2 rounded-lg bg-[#6b5a4a] text-white hover:bg-[#5a4a3a] transition-colors flex items-center gap-2"
+              >
+                다음
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={navigation.goToQuiz}
+                className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors flex items-center gap-2"
+              >
+                퀴즈 풀기
+                <Sparkles className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      ) : lang?.includes('python') ? (
+        /* ===== 데스크톱: Python 코스 전용 레이아웃 (슬라이딩 2페이지) ===== */
+        <div className="flex flex-col h-[calc(100vh-120px)]">
+          {/* 헤더 */}
+          <div className="flex items-center gap-4 mb-4 px-4">
+            <Link to={languageCoursePath} className="cyber-back-btn">
+              <span className="cyber-back-arrow">‹</span>
+              <span>EXIT</span>
+            </Link>
+            <div className="cyber-divider" />
+            <div className="flex-1">
+              <h1 className="text-lg font-bold">{lesson.title}</h1>
+              {lesson.description && (
+                <p className="text-xs text-gray-500">{lesson.description}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Python 레슨 뷰 */}
+          <div className="flex-1 min-h-0">
+            <PythonLessonView
+              code={code}
+              steps={steps}
+              currentStepIndex={navigation.currentStepIndex}
+              languageId={lang}
+              lessonId={lessonId || ''}
+            />
+          </div>
+
+          {/* 스텝 컨트롤 */}
+          <div className="flex items-center justify-center gap-4 py-4 border-t border-[#e5d5c7] bg-white">
+            <button
+              onClick={navigation.goToPrevStep}
+              disabled={!navigation.canGoPrev}
+              className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors flex items-center gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              이전
+            </button>
+            <span className="text-sm text-gray-500">
+              {navigation.currentStepIndex + 1} / {navigation.totalSteps}
+            </span>
+            {!navigation.isLastStep ? (
+              <button
+                onClick={navigation.goToNextStep}
+                className="px-4 py-2 rounded-lg bg-[#6b5a4a] text-white hover:bg-[#5a4a3a] transition-colors flex items-center gap-2"
+              >
+                다음
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={navigation.goToQuiz}
+                className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors flex items-center gap-2"
+              >
+                퀴즈 풀기
+                <Sparkles className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
       ) : (
-        <div className="flex gap-4 items-stretch">
-          {/* 왼쪽: 코드 + 컨트롤 (50%) */}
-          <div className="w-1/2 flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row gap-4 items-stretch">
+          {/* 왼쪽: 코드 + 컨트롤 (모바일: 100%, 데스크톱: 50%) */}
+          <div className="w-full md:w-1/2 flex flex-col gap-4">
             {/* 헤더 - 왼쪽 컬럼 안에 배치 (오른쪽 탭 컨테이너가 위로 올라갈 수 있도록) */}
             <div className="flex items-center gap-4">
               <Link to={languageCoursePath} className="cyber-back-btn">
@@ -715,9 +849,8 @@ export function LessonPage() {
                 />
               </div>
 
-              {/* TODO: 다른 서버에서 파일 가져온 후 주석 해제 */}
               {/* 터미널 출력 (VSCode 스타일) */}
-              {/* <div
+              <div
                 className="rounded-b-xl overflow-hidden"
                 style={{
                   border: '1px solid #E5D5C7',
@@ -731,12 +864,12 @@ export function LessonPage() {
                   emptyMessage="실행 결과가 여기에 표시됩니다"
                   compact
                 />
-              </div> */}
+              </div>
             </div>
           </div>
 
-          {/* 오른쪽: 3탭 구조 (메모리 | 설명 | AI Chat) */}
-          <div className="w-1/2 flex flex-col" style={{ marginTop: '37px' }}>
+          {/* 오른쪽: 3탭 구조 (모바일: 100%, 데스크톱: 50%) */}
+          <div className="w-full md:w-1/2 flex flex-col md:mt-[37px]">
             {/* 탭 헤더 - 3탭 */}
             <div
               className="flex rounded-t-xl"
@@ -794,20 +927,22 @@ export function LessonPage() {
                 </span>
               </button>
 
-              {/* AI Chat 탭 */}
-              <button
-                onClick={() => setActiveTab('chat')}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold transition-all"
-                style={{
-                  background: activeTab === 'chat'
-                    ? 'linear-gradient(135deg, #FFFBF5 0%, #FFF9F2 100%)'
-                    : '#f8f4ef',
-                  color: activeTab === 'chat' ? '#7c5e3c' : '#937b5d',
-                }}
-              >
-                <Bot className="w-3.5 h-3.5" />
-                AI 튜터
-              </button>
+              {/* AI Chat 탭 (모바일에서 숨김) */}
+              {!isMobile && (
+                <button
+                  onClick={() => setActiveTab('chat')}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold transition-all"
+                  style={{
+                    background: activeTab === 'chat'
+                      ? 'linear-gradient(135deg, #FFFBF5 0%, #FFF9F2 100%)'
+                      : '#f8f4ef',
+                    color: activeTab === 'chat' ? '#7c5e3c' : '#937b5d',
+                  }}
+                >
+                  <Bot className="w-3.5 h-3.5" />
+                  AI 튜터
+                </button>
+              )}
             </div>
 
             {/* 탭 콘텐츠 - 콘텐츠에 따라 높이 자연 확장 (스크롤 없음) */}
@@ -907,8 +1042,8 @@ export function LessonPage() {
                 </div>
               )}
 
-              {/* AI Chat 탭 - 고정 높이 + 스크롤 */}
-              {activeTab === 'chat' && (
+              {/* AI Chat 탭 - 고정 높이 + 스크롤 (모바일에서 숨김) */}
+              {!isMobile && activeTab === 'chat' && (
                 <div
                   className="relative h-[500px] overflow-y-auto"
                   style={{
@@ -949,6 +1084,27 @@ export function LessonPage() {
             <QuizCardAdapter quiz={quiz} onComplete={handleQuizComplete} />
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* 모바일 AI Chat (FAB + Modal) */}
+      {isMobile && navigation.phase !== 'completed' && (
+        <>
+          <MobileAIChatFAB
+            isOpen={isAIChatOpen}
+            onClick={() => setIsAIChatOpen(!isAIChatOpen)}
+          />
+          <MobileAIChatModal
+            isOpen={isAIChatOpen}
+            onClose={() => setIsAIChatOpen(false)}
+            context={{
+              courseDay: lesson?.order,
+              topic: lesson?.title,
+              code: code,
+              currentLine: currentStep?.line,
+            }}
+            lessonId={lessonId}
+          />
+        </>
       )}
     </div>
   );
