@@ -222,14 +222,14 @@ export function MobileLessonView({
           style={{ width: '200%' }}
         >
           {/* 페이지 1: 코드 + 출력 + 설명 */}
-          <div className="w-1/2 h-full overflow-y-auto p-2 space-y-2">
-            {/* 코드 뷰어 */}
-            <div className="bg-white rounded-lg border border-[#e5d5c7] overflow-hidden">
+          <div className="w-1/2 h-full p-2 flex flex-col gap-2">
+            {/* 코드 뷰어 - 독립 스크롤 */}
+            <div className="flex-1 bg-white rounded-lg border border-[#e5d5c7] overflow-hidden flex flex-col">
               <div className="px-3 py-1.5 bg-gradient-to-r from-[#2d2d2d] to-[#1a1a1a] text-white text-xs font-semibold flex items-center gap-2">
                 <Code2 className="w-3 h-3" />
                 {config.codeName}
               </div>
-              <div className="max-h-[35vh] overflow-y-auto">
+              <div className="flex-1 overflow-y-auto">
                 <CodeViewer
                   code={code}
                   highlightLine={currentStep?.line || 1}
@@ -250,22 +250,26 @@ export function MobileLessonView({
               </div>
             )}
 
-            {/* 설명 */}
-            <ExplanationSection />
+            {/* 설명 - 독립 스크롤 */}
+            <div className="flex-1 overflow-y-auto">
+              <ExplanationSection />
+            </div>
           </div>
 
           {/* 페이지 2: 설명 + 시각화 */}
-          <div className="w-1/2 h-full overflow-y-auto p-2 space-y-2">
-            {/* 설명 */}
-            <ExplanationSection />
+          <div className="w-1/2 h-full p-2 flex flex-col gap-2">
+            {/* 설명 - 독립 스크롤 */}
+            <div className="flex-1 overflow-y-auto">
+              <ExplanationSection />
+            </div>
 
-            {/* 시각화 (메모리 or 플로우) */}
-            <div className="bg-white rounded-lg border border-[#e5d5c7] overflow-hidden flex-1 flex flex-col">
+            {/* 시각화 (메모리 or 플로우) - 독립 스크롤 */}
+            <div className="flex-1 bg-white rounded-lg border border-[#e5d5c7] overflow-hidden flex flex-col">
               <div className={`px-3 py-1.5 bg-gradient-to-r ${config.visualColor} text-white text-xs font-semibold flex items-center gap-2`}>
                 <VisualIcon className="w-3 h-3" />
                 {config.visualName}
               </div>
-              <div className="p-2 flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto p-2">
                 {renderVisualization()}
               </div>
             </div>
