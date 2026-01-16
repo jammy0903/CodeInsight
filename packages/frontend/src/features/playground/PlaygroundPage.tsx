@@ -159,198 +159,102 @@ export function PlaygroundPage() {
     return lines;
   }, [steps, currentStepIndex, hasSteps]);
 
-  return (
-    <div
-      style={{
-        backgroundColor: colors.pageBg,
-      }}
-    >
-      {/* Main area: Resizable 2-panel layout (모바일: 세로, 데스크톱: 가로) */}
-      <PanelGroup
-        orientation={isMobile ? 'vertical' : 'horizontal'}
-        id="playground-main"
-        style={{
-          minHeight: isMobile ? 'auto' : 'calc(100vh - 64px - 32px)',
-          alignItems: 'flex-start',
-        }}
-      >
-        {/* ===== Left Panel: Code Editor + Output + Explanation ===== */}
-        <Panel
-          id="code-editor"
-          defaultSize={isMobile ? 100 : 50}
-          minSize={isMobile ? 100 : 30}
-          maxSize={isMobile ? 100 : 70}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            minWidth: 0,
-            backgroundColor: colors.panelBg,
-          }}
-        >
-          {/* Code Header: Language tabs + Control buttons - 반응형 */}
+  // 모바일 레이아웃: PanelGroup 없이 단순 스택
+  if (isMobile) {
+    return (
+      <div style={{ backgroundColor: colors.pageBg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        {/* Code Section */}
+        <div style={{ backgroundColor: colors.panelBg, flexShrink: 0 }}>
+          {/* Header */}
           <div
             style={{
-              height: isMobile ? '40px' : '48px',
-              padding: isMobile ? '0 8px' : '0 16px',
+              height: '40px',
+              padding: '0 8px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               borderBottom: `1px solid ${colors.border}`,
               backgroundColor: colors.headerBg,
-              flexShrink: 0,
-              gap: isMobile ? '4px' : '8px',
+              gap: '4px',
             }}
           >
-            <LanguageTabs isMobile={isMobile} />
-            <StepControls isMobile={isMobile} />
+            <LanguageTabs isMobile={true} />
+            <StepControls isMobile={true} />
           </div>
 
-          {/* Editor - dynamic height based on code lines - 모바일에서 더 작게 */}
-          <div style={{ height: isMobile ? `${Math.min(editorHeight, 200)}px` : `${editorHeight}px`, flexShrink: 0 }}>
+          {/* Editor */}
+          <div style={{ height: `${Math.min(editorHeight, 180)}px` }}>
             <CodeEditor />
           </div>
 
-          {/* Terminal Output - right after code - 반응형 */}
+          {/* Terminal Output */}
           {terminalLines.length > 0 && (
-            <div
-              style={{
-                flexShrink: 0,
-                padding: isMobile ? '6px 8px' : '8px 12px',
-                backgroundColor: colors.panelBg,
-                borderTop: `1px solid ${colors.border}`,
-              }}
-            >
-              <TerminalOutput
-                lines={terminalLines}
-                title="Output"
-                maxHeight={isMobile ? '80px' : '100px'}
-              />
+            <div style={{ padding: '6px 8px', borderTop: `1px solid ${colors.border}` }}>
+              <TerminalOutput lines={terminalLines} title="Output" maxHeight="60px" />
             </div>
           )}
 
-          {/* Explanation Panel - after output (or code if no output) - 반응형 */}
+          {/* Explanation */}
           {currentStep && (
-            <div
-              style={{
-                flexShrink: 0,
-                padding: isMobile ? '6px 8px 8px' : '8px 12px 12px',
-                backgroundColor: colors.panelBg,
-                borderTop: terminalLines.length === 0 ? `1px solid ${colors.border}` : 'none',
-              }}
-            >
+            <div style={{ padding: '6px 8px 8px', borderTop: terminalLines.length === 0 ? `1px solid ${colors.border}` : 'none' }}>
               <div
                 style={{
                   backgroundColor: colors.explanationBg,
-                  borderRadius: isMobile ? '6px' : '8px',
-                  overflow: 'hidden',
-                  boxShadow: currentTheme === 'dark'
-                    ? '0 2px 8px rgba(0, 0, 0, 0.3)'
-                    : '0 2px 8px rgba(34, 197, 94, 0.12)',
+                  borderRadius: '6px',
                   border: `1px solid ${colors.explanationBorder}`,
+                  overflow: 'hidden',
                 }}
               >
-                {/* Explanation Header */}
                 <div
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    padding: isMobile ? '4px 8px' : '6px 12px',
+                    padding: '4px 8px',
                     backgroundColor: colors.explanationHeaderBg,
                     borderBottom: `1px solid ${colors.explanationBorder}`,
-                    gap: isMobile ? '4px' : '8px',
+                    gap: '4px',
                   }}
                 >
-                  <span style={{ fontSize: isMobile ? '12px' : '14px' }}>💡</span>
-                  <span
-                    style={{
-                      fontSize: isMobile ? '10px' : '11px',
-                      color: colors.explanationText,
-                      fontWeight: 600,
-                      fontFamily: 'system-ui, sans-serif',
-                    }}
-                  >
-                    Explanation
-                  </span>
-                  <span
-                    style={{
-                      fontSize: isMobile ? '9px' : '10px',
-                      color: colors.explanationTextMuted,
-                      marginLeft: 'auto',
-                      fontFamily: 'monospace',
-                    }}
-                  >
+                  <span style={{ fontSize: '12px' }}>💡</span>
+                  <span style={{ fontSize: '10px', color: colors.explanationText, fontWeight: 600 }}>Explanation</span>
+                  <span style={{ fontSize: '9px', color: colors.explanationTextMuted, marginLeft: 'auto', fontFamily: 'monospace' }}>
                     Line {currentStep.line}
                   </span>
                 </div>
-                {/* Explanation Content */}
-                <div style={{ padding: isMobile ? '8px 10px' : '10px 14px' }}>
-                  <StepExplanation step={currentStep} isMobile={isMobile} />
+                <div style={{ padding: '8px 10px' }}>
+                  <StepExplanation step={currentStep} isMobile={true} />
                 </div>
               </div>
             </div>
           )}
-        </Panel>
+        </div>
 
-        {/* ===== Resize Handle (모바일: 숨김) ===== */}
-        {!isMobile && (
-          <PanelResizeHandle
-            style={{
-              width: '8px',
-              backgroundColor: colors.resizeHandle,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'col-resize',
-              transition: 'background-color 0.15s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHover)}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHandle)}
-          >
-            <GripVertical size={14} color={colors.textDim} />
-          </PanelResizeHandle>
-        )}
-
-        {/* ===== Right Panel: Memory Visualization - 반응형 ===== */}
-        <Panel
-          id="memory-viewer"
-          defaultSize={isMobile ? 100 : 50}
-          minSize={isMobile ? 100 : 30}
-          maxSize={isMobile ? 100 : 70}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            minWidth: 0,
-            backgroundColor: colors.panelBg,
-          }}
-        >
-          {/* Header - 반응형 */}
+        {/* Memory Section */}
+        <div style={{ flex: 1, backgroundColor: colors.panelBg, borderTop: `1px solid ${colors.border}`, display: 'flex', flexDirection: 'column' }}>
           <div
             style={{
-              height: isMobile ? '36px' : '48px',
-              padding: isMobile ? '0 8px' : '0 16px',
+              height: '36px',
+              padding: '0 8px',
               display: 'flex',
               alignItems: 'center',
-              gap: isMobile ? '6px' : '8px',
+              gap: '6px',
               borderBottom: `1px solid ${colors.border}`,
               backgroundColor: colors.headerBg,
-              flexShrink: 0,
             }}
           >
-            <Cpu size={isMobile ? 14 : 18} color={colors.accent} />
-            <span style={{ fontSize: isMobile ? '12px' : '14px', color: colors.text, fontWeight: 600 }}>
-              {isMobile ? 'Memory' : 'Memory Visualization'}
-            </span>
+            <Cpu size={14} color={colors.accent} />
+            <span style={{ fontSize: '12px', color: colors.text, fontWeight: 600 }}>Memory</span>
             {hasSteps && (
               <span
                 style={{
                   marginLeft: 'auto',
-                  padding: isMobile ? '2px 6px' : '4px 10px',
-                  fontSize: isMobile ? '10px' : '12px',
+                  padding: '2px 6px',
+                  fontSize: '10px',
                   color: colors.accent,
                   fontFamily: 'monospace',
                   fontWeight: 600,
                   background: colors.accentBg,
-                  borderRadius: isMobile ? '4px' : '6px',
+                  borderRadius: '4px',
                   border: `1px solid ${colors.accentBorder}`,
                 }}
               >
@@ -359,18 +263,235 @@ export function PlaygroundPage() {
             )}
           </div>
 
-          {/* Memory Panel - 반응형 */}
-          <div style={{ minHeight: isMobile ? '250px' : '400px', padding: isMobile ? '8px' : '16px' }}>
+          <div style={{ flex: 1, padding: '8px', minHeight: '200px' }}>
             {error ? (
+              <div style={{ padding: '10px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '6px' }}>
+                <p style={{ fontSize: '12px', color: colors.errorText }}>{error}</p>
+              </div>
+            ) : language === 'python' && hasSteps ? (
+              <PyVisualizerView names={currentStep?.pyNames || []} objects={currentStep?.pyObjects || []} animate={true} />
+            ) : language === 'c' && hasSteps ? (
+              <MemoryPanel
+                stack={memoryState.stack}
+                heap={memoryState.heap}
+                changedBlocks={changedBlocks}
+                frames={memoryState.frames}
+                showRegisters={!!registers?.rsp || !!registers?.rbp}
+              />
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '12px', color: colors.textMuted }}>
+                {language === 'java' ? 'Java 미지원' : 'Run 버튼을 눌러 실행'}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer
+          style={{
+            padding: '6px 12px',
+            backgroundColor: colors.footerBg,
+            borderTop: `1px solid ${colors.footerBorder}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <span style={{ fontSize: '10px', color: colors.footerText }}>CodeInsight 2026</span>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <a href="https://github.com/jammy0903" target="_blank" rel="noopener noreferrer" style={{ color: colors.footerText, display: 'flex' }}>
+              <Github size={12} />
+            </a>
+            <a href="mailto:l89192164@gmail.com" style={{ color: colors.footerText, display: 'flex' }}>
+              <Mail size={12} />
+            </a>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // 데스크톱 레이아웃: Resizable Panels
+  return (
+    <div
+      style={{
+        backgroundColor: colors.pageBg,
+      }}
+    >
+      {/* Main area: Resizable 2-panel layout */}
+      <PanelGroup
+        orientation="horizontal"
+        id="playground-main"
+        style={{
+          minHeight: 'calc(100vh - 64px - 32px)',
+          alignItems: 'flex-start',
+        }}
+      >
+        {/* ===== Left Panel: Code Editor + Output + Explanation ===== */}
+        <Panel
+          id="code-editor"
+          defaultSize={50}
+          minSize={30}
+          maxSize={70}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minWidth: 0,
+            backgroundColor: colors.panelBg,
+          }}
+        >
+          {/* Code Header */}
+          <div
+            style={{
+              height: '48px',
+              padding: '0 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: `1px solid ${colors.border}`,
+              backgroundColor: colors.headerBg,
+              flexShrink: 0,
+              gap: '8px',
+            }}
+          >
+            <LanguageTabs />
+            <StepControls />
+          </div>
+
+          {/* Editor */}
+          <div style={{ height: `${editorHeight}px`, flexShrink: 0 }}>
+            <CodeEditor />
+          </div>
+
+          {/* Terminal Output */}
+          {terminalLines.length > 0 && (
+            <div
+              style={{
+                flexShrink: 0,
+                padding: '8px 12px',
+                backgroundColor: colors.panelBg,
+                borderTop: `1px solid ${colors.border}`,
+              }}
+            >
+              <TerminalOutput lines={terminalLines} title="Output" maxHeight="100px" />
+            </div>
+          )}
+
+          {/* Explanation Panel */}
+          {currentStep && (
+            <div
+              style={{
+                flexShrink: 0,
+                padding: '8px 12px 12px',
+                backgroundColor: colors.panelBg,
+                borderTop: terminalLines.length === 0 ? `1px solid ${colors.border}` : 'none',
+              }}
+            >
               <div
                 style={{
-                  padding: isMobile ? '10px' : '16px',
-                  backgroundColor: colors.errorBg,
-                  border: `1px solid ${colors.errorBorder}`,
-                  borderRadius: isMobile ? '6px' : '8px',
+                  backgroundColor: colors.explanationBg,
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  boxShadow: currentTheme === 'dark'
+                    ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+                    : '0 2px 8px rgba(34, 197, 94, 0.12)',
+                  border: `1px solid ${colors.explanationBorder}`,
                 }}
               >
-                <p style={{ fontSize: isMobile ? '12px' : '14px', color: colors.errorText }}>{error}</p>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '6px 12px',
+                    backgroundColor: colors.explanationHeaderBg,
+                    borderBottom: `1px solid ${colors.explanationBorder}`,
+                    gap: '8px',
+                  }}
+                >
+                  <span style={{ fontSize: '14px' }}>💡</span>
+                  <span style={{ fontSize: '11px', color: colors.explanationText, fontWeight: 600, fontFamily: 'system-ui, sans-serif' }}>
+                    Explanation
+                  </span>
+                  <span style={{ fontSize: '10px', color: colors.explanationTextMuted, marginLeft: 'auto', fontFamily: 'monospace' }}>
+                    Line {currentStep.line}
+                  </span>
+                </div>
+                <div style={{ padding: '10px 14px' }}>
+                  <StepExplanation step={currentStep} />
+                </div>
+              </div>
+            </div>
+          )}
+        </Panel>
+
+        {/* Resize Handle */}
+        <PanelResizeHandle
+          style={{
+            width: '8px',
+            backgroundColor: colors.resizeHandle,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'col-resize',
+            transition: 'background-color 0.15s ease',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHover)}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHandle)}
+        >
+          <GripVertical size={14} color={colors.textDim} />
+        </PanelResizeHandle>
+
+        {/* Right Panel: Memory Visualization */}
+        <Panel
+          id="memory-viewer"
+          defaultSize={50}
+          minSize={30}
+          maxSize={70}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minWidth: 0,
+            backgroundColor: colors.panelBg,
+          }}
+        >
+          <div
+            style={{
+              height: '48px',
+              padding: '0 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              borderBottom: `1px solid ${colors.border}`,
+              backgroundColor: colors.headerBg,
+              flexShrink: 0,
+            }}
+          >
+            <Cpu size={18} color={colors.accent} />
+            <span style={{ fontSize: '14px', color: colors.text, fontWeight: 600 }}>Memory Visualization</span>
+            {hasSteps && (
+              <span
+                style={{
+                  marginLeft: 'auto',
+                  padding: '4px 10px',
+                  fontSize: '12px',
+                  color: colors.accent,
+                  fontFamily: 'monospace',
+                  fontWeight: 600,
+                  background: colors.accentBg,
+                  borderRadius: '6px',
+                  border: `1px solid ${colors.accentBorder}`,
+                }}
+              >
+                {currentStepIndex + 1}/{steps.length}
+              </span>
+            )}
+          </div>
+
+          <div style={{ minHeight: '400px', padding: '16px' }}>
+            {error ? (
+              <div style={{ padding: '16px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
+                <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
               </div>
             ) : language === 'python' && hasSteps ? (
               <PyVisualizerView
@@ -387,31 +508,18 @@ export function PlaygroundPage() {
                 showRegisters={!!registers?.rsp || !!registers?.rbp}
               />
             ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: '100%',
-                  fontSize: isMobile ? '12px' : '14px',
-                  color: colors.textMuted,
-                  textAlign: 'center',
-                  padding: isMobile ? '0 16px' : 0,
-                }}
-              >
-                {language === 'java'
-                  ? 'Java simulation is not supported yet'
-                  : isMobile ? 'Run 버튼을 눌러 실행' : 'Click Run button to execute code'}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '14px', color: colors.textMuted }}>
+                {language === 'java' ? 'Java simulation is not supported yet' : 'Click Run button to execute code'}
               </div>
             )}
           </div>
         </Panel>
       </PanelGroup>
 
-      {/* Footer - Compact - 반응형 */}
+      {/* Footer */}
       <footer
         style={{
-          padding: isMobile ? '6px 12px' : '8px 24px',
+          padding: '8px 24px',
           backgroundColor: colors.footerBg,
           borderTop: `1px solid ${colors.footerBorder}`,
           display: 'flex',
@@ -420,23 +528,13 @@ export function PlaygroundPage() {
           flexShrink: 0,
         }}
       >
-        <span style={{ fontSize: isMobile ? '10px' : '11px', color: colors.footerText }}>
-          CodeInsight 2026
-        </span>
-        <div style={{ display: 'flex', gap: isMobile ? '6px' : '8px' }}>
-          <a
-            href="https://github.com/jammy0903"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: colors.footerText, display: 'flex' }}
-          >
-            <Github size={isMobile ? 12 : 14} />
+        <span style={{ fontSize: '11px', color: colors.footerText }}>CodeInsight 2026</span>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <a href="https://github.com/jammy0903" target="_blank" rel="noopener noreferrer" style={{ color: colors.footerText, display: 'flex' }}>
+            <Github size={14} />
           </a>
-          <a
-            href="mailto:l89192164@gmail.com"
-            style={{ color: colors.footerText, display: 'flex' }}
-          >
-            <Mail size={isMobile ? 12 : 14} />
+          <a href="mailto:l89192164@gmail.com" style={{ color: colors.footerText, display: 'flex' }}>
+            <Mail size={14} />
           </a>
         </div>
       </footer>
