@@ -256,15 +256,10 @@ export function MobileLessonView({
             </div>
           </div>
 
-          {/* 페이지 2: 설명 + 시각화 */}
-          <div className="w-1/2 h-full p-2 flex flex-col gap-2">
-            {/* 설명 - 독립 스크롤 */}
-            <div className="flex-1 overflow-y-auto">
-              <ExplanationSection />
-            </div>
-
-            {/* 시각화 (메모리 or 플로우) - 독립 스크롤 */}
-            <div className="flex-1 bg-white rounded-lg border border-[#e5d5c7] overflow-hidden flex flex-col">
+          {/* 페이지 2: 시각화 전체 화면 */}
+          <div className="w-1/2 h-full p-2">
+            {/* 시각화 (메모리 or 플로우) - 전체 화면 */}
+            <div className="h-full bg-white rounded-lg border border-[#e5d5c7] overflow-hidden flex flex-col">
               <div className={`px-3 py-1.5 bg-gradient-to-r ${config.visualColor} text-white text-xs font-semibold flex items-center gap-2`}>
                 <VisualIcon className="w-3 h-3" />
                 {config.visualName}
