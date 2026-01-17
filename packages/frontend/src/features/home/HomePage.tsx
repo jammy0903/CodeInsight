@@ -16,55 +16,8 @@ import { ArrowRight, ChevronDown, LogIn } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
 import { motion } from 'framer-motion';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { MatrixRain } from './MatrixRain';
-
-// 테마별 홈페이지 색상
-const homeColors = {
-  dark: {
-    // 배경
-    heroBg: '#09090b',           // zinc-950
-    sectionBg: '#18181b',        // zinc-900
-    // 텍스트
-    title: '#22d3ee',            // cyan-400 (파랑)
-    subtitle: '#a1a1aa',         // zinc-400
-    text: '#e4e4e7',             // zinc-200
-    textMuted: '#71717a',        // zinc-500
-    // 매트릭스 비
-    matrixColor: '#00ff41',      // 형광초록 (classic Matrix green)
-    matrixBg: 'rgba(9, 9, 11, 0.05)',
-    // 카드/아이콘
-    cardBg: '#27272a',           // zinc-800
-    iconBg: '#27272a',
-    iconColor: '#22d3ee',        // cyan-400
-  },
-  soft: {
-    heroBg: '#faf7fc',
-    sectionBg: '#f8f4ef',
-    title: '#6b5a4a',
-    subtitle: '#937b5d',
-    text: '#6b5a4a',
-    textMuted: '#a08eb0',
-    matrixColor: '#c4a574',
-    matrixBg: 'rgba(250, 247, 242, 0.05)',
-    cardBg: '#ffffff',
-    iconBg: '#e5d5c7',
-    iconColor: '#a08060',
-  },
-  minimal: {
-    heroBg: '#faf7f2',
-    sectionBg: '#f8f4ef',
-    title: '#6b5a4a',
-    subtitle: '#937b5d',
-    text: '#6b5a4a',
-    textMuted: '#a08060',
-    matrixColor: '#c4a574',
-    matrixBg: 'rgba(250, 247, 242, 0.05)',
-    cardBg: '#ffffff',
-    iconBg: '#e5d5c7',
-    iconColor: '#a08060',
-  },
-};
 
 // 스토리 SVG 패널 컴포넌트 (Row 1용)
 interface StoryPanelProps {
@@ -502,9 +455,15 @@ ComicPanel.displayName = 'ComicPanel';
 
 export default function HomePage() {
   const currentTheme = useThemeStore((s) => s.theme);
-  const colors = homeColors[currentTheme];
   const { firebaseUser } = useStore();
   const isLoggedIn = !!firebaseUser;
+
+  // CSS 변수에서 매트릭스 색상 가져오기
+  const matrixColor = useMemo(() => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--theme-matrix-color')
+      .trim();
+  }, [currentTheme]);
 
   // 각 패널의 이미지 파일명 매핑
   const getComicImage = (num: number): string => {
@@ -530,28 +489,22 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen w-full" style={{ backgroundColor: colors.heroBg }}>
+    <main className="min-h-screen w-full home-hero">
       {/* Hero + Value Proposition - 매트릭스 비가 내리는 영역 */}
-      <div className="relative overflow-hidden" style={{ backgroundColor: colors.heroBg }}>
+      <div className="relative overflow-hidden home-hero">
         {/* 매트릭스 배경 애니메이션 - 전체 영역 커버 */}
-        <MatrixRain color={colors.matrixColor} bgColor={colors.matrixBg} fontSize={14} speed={40} />
+        <MatrixRain color={matrixColor} fontSize={14} speed={40} />
 
         {/* Hero Section */}
         <section className="w-full flex flex-col items-center relative py-12">
           <div className="text-center relative z-10" style={{ marginTop: '30px' }}>
             {/* 큰 제목 */}
-            <h1
-              className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight"
-              style={{
-                color: colors.title,
-                textShadow: currentTheme === 'dark' ? '0 0 30px rgba(34, 211, 238, 0.6)' : 'none',
-              }}
-            >
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight home-title">
               CodeInsight
             </h1>
 
             {/* 부제 */}
-            <p className="text-lg md:text-xl" style={{ marginTop: '12px', color: colors.subtitle }}>
+            <p className="text-lg md:text-xl home-subtitle" style={{ marginTop: '12px' }}>
               코드의 원리를 눈으로 이해하다
             </p>
 
@@ -594,7 +547,7 @@ export default function HomePage() {
           </div>
 
           {/* 스크롤 표시 */}
-          <div className="flex flex-col items-center gap-2 animate-bounce mt-16 mb-8" style={{ color: colors.textMuted }}>
+          <div className="flex flex-col items-center gap-2 animate-bounce mt-16 mb-8 home-text-muted">
             <span className="text-sm">scroll</span>
             <ChevronDown className="w-5 h-5" />
           </div>
@@ -604,8 +557,8 @@ export default function HomePage() {
 
       {/* 만화 슬라이드 Row 2 */}
       <section
-        className="w-full grid place-items-center px-4"
-        style={{ paddingTop: '60px', paddingBottom: '60px', backgroundColor: colors.sectionBg }}
+        className="w-full grid place-items-center px-4 home-section"
+        style={{ paddingTop: '60px', paddingBottom: '60px' }}
       >
         <div className="w-full">
           {/* 만화 컨베이어 벨트 Row 2 */}
@@ -632,8 +585,8 @@ export default function HomePage() {
 
       {/* 마지막 CTA */}
       <section
-        className="w-full grid place-items-center px-6"
-        style={{ paddingTop: '60px', paddingBottom: '80px', backgroundColor: colors.sectionBg }}
+        className="w-full grid place-items-center px-6 home-section"
+        style={{ paddingTop: '60px', paddingBottom: '80px' }}
       >
         <div className="text-center">
           <Link to="/courses">
