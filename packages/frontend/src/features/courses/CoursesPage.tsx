@@ -12,12 +12,19 @@ import { Loader2, AlertCircle, ChevronRight, BookOpen, RefreshCw } from 'lucide-
 import { getLanguages } from '@/services/courses';
 import type { Language } from '@/types';
 import { logger } from '@/utils/logger';
+import { useStore } from '@/stores/store';
 
 export function CoursesPage() {
   const navigate = useNavigate();
+  const { setPageTitle } = useStore();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 페이지 제목 설정
+  useEffect(() => {
+    setPageTitle('코스 목록', '학습할 언어를 선택하세요');
+  }, [setPageTitle]);
 
   // API에서 언어 목록 로드
   useEffect(() => {

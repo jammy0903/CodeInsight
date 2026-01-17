@@ -12,7 +12,7 @@ import { useIsMobile } from '@/hooks';
 export function LanguageCoursePage() {
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
-  const appUser = useStore((state) => state.appUser);
+  const { appUser, setPageTitle } = useStore();
 
   const [language, setLanguage] = useState<Language | null>(null);
   const [chapters, setChapters] = useState<ChapterWithLessons[]>([]);
@@ -70,6 +70,11 @@ export function LanguageCoursePage() {
 
   const langInfo = getLanguageInfo();
   const isMobile = useIsMobile();
+
+  // 페이지 제목 설정
+  useEffect(() => {
+    setPageTitle(`${langInfo.name} 코스`, langInfo.description);
+  }, [setPageTitle, langInfo.name, langInfo.description]);
 
   useEffect(() => {
     if (!lang) return;

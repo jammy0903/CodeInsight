@@ -25,6 +25,11 @@ interface Store {
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
 
+  // === 페이지 제목 (TopBar용) ===
+  pageTitle: string;
+  pageSubtitle: string;
+  setPageTitle: (title: string, subtitle?: string) => void;
+
   // === 사용자 (Firebase + App) ===
   firebaseUser: FirebaseUser | null;
   setFirebaseUser: (user: FirebaseUser | null) => void;
@@ -74,6 +79,11 @@ export const useStore = create<Store>((set, get) => ({
   sidebarOpen: false,
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
+
+  // === 페이지 제목 (TopBar용) ===
+  pageTitle: '',
+  pageSubtitle: '',
+  setPageTitle: (title, subtitle = '') => set({ pageTitle: title, pageSubtitle: subtitle }),
 
   // === 사용자 (Firebase + App) ===
   firebaseUser: null,

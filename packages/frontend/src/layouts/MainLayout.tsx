@@ -40,17 +40,6 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Hamburger Button - Only show when sidebar is closed */}
-      {!sidebarOpen && (
-        <button
-          onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-50 p-3 rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow border border-gray-200"
-          aria-label="메뉴 열기"
-        >
-          <Menu className="w-6 h-6 text-purple-600" />
-        </button>
-      )}
-
       {/* Header */}
       <TopBar />
 

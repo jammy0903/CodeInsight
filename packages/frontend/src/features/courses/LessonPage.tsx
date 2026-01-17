@@ -386,6 +386,9 @@ export function LessonPage() {
     lessonId: string;
   }>();
 
+  // Store
+  const { setPageTitle } = useStore();
+
   // 상태
   const [lesson, setLesson] = useState<LessonFull | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
@@ -464,6 +467,13 @@ export function LessonPage() {
       cancelled = true;
     };
   }, [lessonId, lang]);
+
+  // 페이지 제목 설정
+  useEffect(() => {
+    if (lesson) {
+      setPageTitle(lesson.title, lesson.description);
+    }
+  }, [lesson, setPageTitle]);
 
   // TODO: 다른 서버에서 파일 가져온 후 주석 해제
   // Lesson 히스토리에 저장 (최근 학습, 이어서 학습 기능용)

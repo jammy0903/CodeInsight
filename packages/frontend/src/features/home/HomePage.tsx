@@ -16,7 +16,7 @@ import { ArrowRight, ChevronDown, LogIn } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
 import { motion } from 'framer-motion';
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useEffect } from 'react';
 import { MatrixRain } from './MatrixRain';
 
 // 스토리 SVG 패널 컴포넌트 (Row 1용)
@@ -455,8 +455,13 @@ ComicPanel.displayName = 'ComicPanel';
 
 export default function HomePage() {
   const currentTheme = useThemeStore((s) => s.theme);
-  const { firebaseUser } = useStore();
+  const { firebaseUser, setPageTitle } = useStore();
   const isLoggedIn = !!firebaseUser;
+
+  // 페이지 제목 초기화 (홈페이지는 빈 문자열 = 로고만 표시)
+  useEffect(() => {
+    setPageTitle('');
+  }, [setPageTitle]);
 
   // CSS 변수에서 매트릭스 색상 가져오기
   const matrixColor = useMemo(() => {

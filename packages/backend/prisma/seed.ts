@@ -36,15 +36,26 @@ interface CurriculumLesson {
 }
 
 interface CurriculumChapter {
-  id: string;
+  id?: string;
+  chapterId?: string;  // Java/Python 형식 지원
   order: number;
   title: string;
   description: string;
-  keyQuestion: string;
-  part: 'syntax' | 'design';
-  partLabel: string;
+  keyQuestion?: string;
+  part?: 'syntax' | 'design' | string;
+  partLabel?: string;
   misconceptions?: string[];
-  lessons: CurriculumLesson[];
+  lessons: (CurriculumLesson | string)[];  // 객체 배열 또는 문자열 배열 모두 지원
+}
+
+// 챕터 ID를 추출하는 헬퍼 함수
+function getChapterId(chapter: CurriculumChapter): string {
+  return chapter.id || chapter.chapterId || `ch-${chapter.order}`;
+}
+
+// 레슨 ID를 추출하는 헬퍼 함수
+function getLessonId(lesson: CurriculumLesson | string): string {
+  return typeof lesson === 'string' ? lesson : lesson.id;
 }
 
 interface CurriculumLanguage {
@@ -213,9 +224,10 @@ async function seed() {
     for (const chapterData of cCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
+      const chapterId = getChapterId(chapterData);
       const chapter = await prisma.chapter.create({
         data: {
-          id: chapterData.id,
+          id: chapterId,
           languageId: 'c',
           title: chapterData.title,
           description: chapterData.description,
@@ -227,7 +239,12 @@ async function seed() {
       });
 
       // 각 챕터의 레슨 생성
-      for (const lessonData of chapterData.lessons) {
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonItem = chapterData.lessons[lessonIdx];
+        // C 커리큘럼은 객체 배열 형식 사용
+        const lessonData = typeof lessonItem === 'string' ? null : lessonItem;
+        if (!lessonData) continue;
+
         console.log(`      ├─ Lesson ${lessonData.order}: ${lessonData.title}`);
 
         const lesson = await prisma.lesson.create({
@@ -291,9 +308,10 @@ async function seed() {
     for (const chapterData of jsCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
+      const chapterId = getChapterId(chapterData);
       const chapter = await prisma.chapter.create({
         data: {
-          id: chapterData.id,
+          id: chapterId,
           languageId: 'javascript',
           title: chapterData.title,
           description: chapterData.description,
@@ -305,7 +323,12 @@ async function seed() {
       });
 
       // 각 챕터의 레슨 생성
-      for (const lessonData of chapterData.lessons) {
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonItem = chapterData.lessons[lessonIdx];
+        // JavaScript 커리큘럼은 객체 배열 형식 사용
+        const lessonData = typeof lessonItem === 'string' ? null : lessonItem;
+        if (!lessonData) continue;
+
         console.log(`      ├─ Lesson ${lessonData.order}: ${lessonData.title}`);
 
         const lesson = await prisma.lesson.create({
@@ -369,9 +392,10 @@ async function seed() {
     for (const chapterData of javaCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
+      const chapterId = getChapterId(chapterData);
       const chapter = await prisma.chapter.create({
         data: {
-          id: chapterData.chapterId,
+          id: chapterId,
           languageId: 'java',
           title: chapterData.title,
           description: chapterData.description,
@@ -383,7 +407,8 @@ async function seed() {
       });
 
       // 각 챕터의 레슨 생성
-      for (const lessonId of chapterData.lessons) {
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonId = getLessonId(chapterData.lessons[lessonIdx]);
         const content = loadLessonContent('java', lessonId);
         if (content) {
           console.log(`      ├─ Lesson: ${content.title}`);
@@ -395,7 +420,7 @@ async function seed() {
               title: content.title,
               description: content.concept,
               difficulty: 'basic',
-              order: chapterData.lessons.indexOf(lessonId) + 1,
+              order: lessonIdx + 1,
               estimatedTime: 10,
             },
           });
@@ -446,9 +471,10 @@ async function seed() {
     for (const chapterData of pythonCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
+      const chapterId = getChapterId(chapterData);
       const chapter = await prisma.chapter.create({
         data: {
-          id: chapterData.chapterId,
+          id: chapterId,
           languageId: 'python',
           title: chapterData.title,
           description: chapterData.description,
@@ -460,7 +486,8 @@ async function seed() {
       });
 
       // 각 챕터의 레슨 생성
-      for (const lessonId of chapterData.lessons) {
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonId = getLessonId(chapterData.lessons[lessonIdx]);
         const content = loadLessonContent('python', lessonId);
         if (content) {
           console.log(`      ├─ Lesson: ${content.title}`);
@@ -472,7 +499,7 @@ async function seed() {
               title: content.title,
               description: content.concept,
               difficulty: 'basic',
-              order: chapterData.lessons.indexOf(lessonId) + 1,
+              order: lessonIdx + 1,
               estimatedTime: 10,
             },
           });
@@ -523,9 +550,10 @@ async function seed() {
     for (const chapterData of pythonPracticalCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
+      const chapterId = getChapterId(chapterData);
       const chapter = await prisma.chapter.create({
         data: {
-          id: chapterData.id,
+          id: chapterId,
           languageId: 'python-practical',
           title: chapterData.title,
           description: chapterData.description,
@@ -537,7 +565,12 @@ async function seed() {
       });
 
       // 각 챕터의 레슨 생성
-      for (const lessonData of chapterData.lessons) {
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonItem = chapterData.lessons[lessonIdx];
+        // python-practical은 객체 배열 형식 사용
+        const lessonData = typeof lessonItem === 'string' ? null : lessonItem;
+        if (!lessonData) continue;
+
         console.log(`      ├─ Lesson ${lessonData.order}: ${lessonData.title}`);
 
         const lesson = await prisma.lesson.create({

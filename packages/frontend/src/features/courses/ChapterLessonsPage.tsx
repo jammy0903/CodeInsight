@@ -30,7 +30,7 @@ const getLanguageColor = (lang: string | undefined) => {
 export function ChapterLessonsPage() {
   const { lang, chapterId } = useParams<{ lang: string; chapterId: string }>();
   const navigate = useNavigate();
-  const appUser = useStore((state) => state.appUser);
+  const { appUser, setPageTitle } = useStore();
   const langColor = getLanguageColor(lang);
   const isMobile = useIsMobile();
 
@@ -38,6 +38,13 @@ export function ChapterLessonsPage() {
   const [progressMap, setProgressMap] = useState<Map<string, UserProgress>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 페이지 제목 설정
+  useEffect(() => {
+    if (chapter) {
+      setPageTitle(chapter.title, chapter.description);
+    }
+  }, [chapter, setPageTitle]);
 
   useEffect(() => {
     if (!chapterId) return;
