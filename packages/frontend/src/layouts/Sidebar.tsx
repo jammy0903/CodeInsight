@@ -67,13 +67,13 @@ export function Sidebar() {
     <AnimatePresence>
       {sidebarOpen && (
         <>
-          {/* 배경 오버레이 (모바일) */}
+          {/* 배경 오버레이 (모든 화면 크기) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+            className="fixed inset-0 bg-black/20 z-40"
             onClick={toggleSidebar}
           />
 

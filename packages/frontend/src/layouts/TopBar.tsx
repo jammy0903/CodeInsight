@@ -24,10 +24,10 @@ export function TopBar() {
         borderBottom: `1px solid ${layoutColors.topBarBorder}`,
       }}
     >
-      {/* Row 1: Logo + Actions */}
+      {/* Row 1: 3분할 레이아웃 (왼쪽: 로고, 중앙: 제목, 오른쪽: 액션) */}
       <div className="h-16 flex items-center justify-between px-6">
-        {/* Left: Hamburger + Logo + Page Title */}
-        <div className="flex items-center gap-3">
+        {/* Left: Hamburger + Logo */}
+        <div className="flex items-center gap-3 shrink-0">
           {/* Hamburger - 항상 표시 */}
           <button
             onClick={toggleSidebar}
@@ -74,27 +74,24 @@ export function TopBar() {
               </h1>
             </motion.div>
           </Link>
-
-          {/* 화살표 + 페이지 제목 (동적) */}
-          {pageTitle && (
-            <div className="flex items-center gap-3">
-              <span className="text-lg" style={{ color: layoutColors.topBarTextMuted }}>→</span>
-              <div className="flex flex-col">
-                <h2 className="text-xl font-bold" style={{ color: layoutColors.topBarText }}>
-                  {pageTitle}
-                </h2>
-                {pageSubtitle && (
-                  <p className="text-xs" style={{ color: layoutColors.topBarTextMuted }}>
-                    {pageSubtitle}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Actions Area - 테마 토글 */}
-        <div className="flex items-center gap-3">
+        {/* Center: 페이지 제목 (정중앙) */}
+        {pageTitle && (
+          <div className="flex-1 flex flex-col items-center justify-center px-4">
+            <h2 className="text-xl font-bold" style={{ color: layoutColors.topBarText }}>
+              {pageTitle}
+            </h2>
+            {pageSubtitle && (
+              <p className="text-xs" style={{ color: layoutColors.topBarTextMuted }}>
+                {pageSubtitle}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Right: Actions Area - 테마 토글 */}
+        <div className="flex items-center gap-3 shrink-0">
           <ThemeToggle />
           {/* 프로필/로그인은 사이드바에서만 표시 */}
         </div>

@@ -223,9 +223,11 @@ export function FillBlankQuizPage() {
   const handleSubmit = () => {
     if (!userInput.trim() || !currentQuiz) return;
 
-    const normalizedInput = userInput.trim();
+    // 공백 제거 + 대소문자 정규화
+    const normalize = (str: string) => str.replace(/\s+/g, '').toLowerCase();
+
     const isCorrect = currentQuiz.acceptedAnswers.some(
-      (accepted) => accepted.toLowerCase() === normalizedInput.toLowerCase()
+      (accepted) => normalize(accepted) === normalize(userInput)
     );
 
     if (isCorrect) {

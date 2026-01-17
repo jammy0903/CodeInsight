@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { getLessonFull, getChapterWithLessons, updateProgress } from '@/services/courses';
+import { useStore } from '@/stores/store';
 // TODO: 다른 서버에서 파일 가져온 후 주석 해제
 // import { useEnterKey } from '@/hooks';
 // import { simulatorService } from '@/services/simulator';
@@ -624,20 +625,6 @@ export function LessonPage() {
       {/* Completed Phase */}
       {navigation.phase === 'completed' ? (
         <>
-          {/* 헤더 - Completed에서도 표시 */}
-          <div className="flex items-center gap-4 mb-2">
-            <Link to={languageCoursePath} className="cyber-back-btn">
-              <span className="cyber-back-arrow">‹</span>
-              <span>EXIT</span>
-            </Link>
-            <div className="cyber-divider" />
-            <div>
-              <h1 className="text-lg font-bold">{lesson.title}</h1>
-              {lesson.description && (
-                <p className="text-xs text-gray-500">{lesson.description}</p>
-              )}
-            </div>
-          </div>
           <CompletedView
             lessonOrder={lesson.order}
             nextLessonPath={nextLessonPath}
@@ -647,21 +634,6 @@ export function LessonPage() {
       ) : isMobile ? (
         /* ===== 모바일 통합 레이아웃 (모든 언어 동일) ===== */
         <div className="flex flex-col h-[calc(100vh-120px)]">
-          {/* 헤더 */}
-          <div className="flex items-center gap-4 mb-3 px-2">
-            <Link to={languageCoursePath} className="cyber-back-btn">
-              <span className="cyber-back-arrow">‹</span>
-              <span>EXIT</span>
-            </Link>
-            <div className="cyber-divider" />
-            <div className="flex-1">
-              <h1 className="text-lg font-bold">{lesson.title}</h1>
-              {lesson.description && (
-                <p className="text-xs text-gray-500">{lesson.description}</p>
-              )}
-            </div>
-          </div>
-
           {/* 모바일 레슨 뷰 (모든 언어 공통) - 스텝 컨트롤 내장 */}
           <div className="flex-1 min-h-0">
             <MobileLessonView
@@ -685,20 +657,6 @@ export function LessonPage() {
         <div className="flex flex-col md:flex-row gap-4 items-stretch">
           {/* 왼쪽: 코드 + 컨트롤 (모바일: 100%, 데스크톱: 50%) */}
           <div className="w-full md:w-1/2 flex flex-col gap-4">
-            {/* 헤더 - 왼쪽 컬럼 안에 배치 (오른쪽 탭 컨테이너가 위로 올라갈 수 있도록) */}
-            <div className="flex items-center gap-4">
-              <Link to={languageCoursePath} className="cyber-back-btn">
-                <span className="cyber-back-arrow">‹</span>
-                <span>EXIT</span>
-              </Link>
-              <div className="cyber-divider" />
-              <div>
-                <h1 className="text-lg font-bold">{lesson.title}</h1>
-                {lesson.description && (
-                  <p className="text-xs text-gray-500">{lesson.description}</p>
-                )}
-              </div>
-            </div>
             {/* 코드 뷰어 카드 (뚜껑 스타일) */}
             <div>
               {/* 코드 헤더 - 뚜껑 + 스텝 컨트롤 (다크 테마) */}

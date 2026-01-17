@@ -5,10 +5,11 @@
  * TYPES: OX, 객관식, 빈칸 코드 입력
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileQuestion, CircleDot, ListChecks, Code2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useStore } from '@/stores/store';
 
 interface QuizType {
   id: string;
@@ -87,7 +88,13 @@ const LANGUAGES: LanguageOption[] = [
 
 export function QuizPage() {
   const navigate = useNavigate();
+  const { setPageTitle } = useStore();
   const [selectedQuizType, setSelectedQuizType] = useState<string | null>(null);
+
+  // 페이지 제목 설정
+  useEffect(() => {
+    setPageTitle('퀴즈', '학습한 내용을 확인해보세요');
+  }, [setPageTitle]);
 
   const handleQuizTypeClick = (quizId: string) => {
     setSelectedQuizType(quizId);
@@ -154,14 +161,14 @@ export function QuizPage() {
               className="mt-8"
             >
               <h3 className="text-lg font-semibold text-[#6b5a4a] mb-4">언어 선택</h3>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col md:flex-row gap-4">
                 {LANGUAGES.map((lang) => (
                   <motion.button
                     key={lang.id}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleLanguageClick(lang.id)}
-                    className={`flex items-center gap-3 px-5 py-3 rounded-xl border-2 transition-all ${lang.bgColor} hover:shadow-md`}
+                    className={`flex-1 flex items-center justify-center gap-3 px-5 py-3 rounded-xl border-2 transition-all ${lang.bgColor} hover:shadow-md`}
                     style={{ borderColor: lang.color }}
                   >
                     <span className="text-2xl">{lang.icon}</span>

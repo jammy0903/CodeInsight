@@ -19,6 +19,7 @@ import { useExplanationStore } from './stores/explanationStore';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { PyVisualizerView } from '@/features/visualizers/python';
 import { useThemeStore } from '@/stores/themeStore';
+import { useStore } from '@/stores/store';
 import type { LessonStep } from '@/types';
 
 // 테마별 Playground 색상
@@ -115,12 +116,18 @@ export function PlaygroundPage() {
   const { steps, currentStepIndex, error, registers, language } = usePlaygroundStore();
   const code = useCurrentCode();
   const { startPrefetch, stopPrefetch } = useExplanationStore();
+  const { setPageTitle } = useStore();
   const currentTheme = useThemeStore((s) => s.theme);
   const colors = playgroundColors[currentTheme];
   const isMobile = useIsMobile();
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
+
+  // 페이지 제목 설정
+  useEffect(() => {
+    setPageTitle('코드 실행 연습', '직접 코드를 작성하고 메모리 변화를 확인해보세요');
+  }, [setPageTitle]);
 
   // Calculate editor height based on code lines
   const editorHeight = useMemo(() => {
