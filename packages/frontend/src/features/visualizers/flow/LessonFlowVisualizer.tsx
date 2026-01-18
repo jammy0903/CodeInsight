@@ -9,6 +9,7 @@
 import { memo, useMemo, useRef } from 'react';
 import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared';
 import { FlowVisualizer } from './FlowVisualizer';
+import { PythonFlowView } from './components/PythonFlowView';
 import { ArrowLayer } from './components/ArrowLayer';
 import { getAdapter, createAdapter } from './adapters';
 import type { FlowTheme } from './styles';
@@ -65,6 +66,17 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   stdout,
 }: LessonFlowVisualizerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // DEBUG: 입력 데이터 확인
+  if (process.env.NODE_ENV === 'development') {
+    const swapVars = step.stack?.filter(b =>
+      b.name.includes('swap.') || b.name.includes('.temp') || b.name === 'temp'
+    );
+    if (swapVars && swapVars.length > 0) {
+      console.log('[LessonFlowVisualizer] 📥 swap variables in step:', JSON.stringify(swapVars, null, 2));
+      console.log('[LessonFlowVisualizer] 📥 memoryState provided:', !!memoryState);
+    }
+  }
 
   // 1. 어댑터 가져오기 (테마 적용)
   const adapter = useMemo(
@@ -147,6 +159,19 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     return { ...flowStep, animations };
   }, [flowStep, prevFlowStep, adapter]);
 
+  // Python은 전용 뷰 사용 (포스트잇 비유)
+  if (language === 'python') {
+    return (
+      <div className={className}>
+        <PythonFlowView
+          step={flowStepWithAnimations}
+          prevStep={prevFlowStep}
+        />
+      </div>
+    );
+  }
+
+  // C/Java 등은 기존 FlowVisualizer 사용
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <FlowVisualizer
@@ -156,7 +181,7 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
         onVariableClick={onVariableClick}
       />
 
-      {/* 포인터 화살표 */}
+      {/* 포인터 화살표 (C 전용) */}
       {showArrows && (
         <ArrowLayer
           variables={flowStepWithAnimations.variables}

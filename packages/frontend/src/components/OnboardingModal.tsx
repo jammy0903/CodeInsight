@@ -93,14 +93,14 @@ export function OnboardingModal() {
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden"
+          className="w-full max-w-lg bg-[var(--theme-dashboard-card-bg)] rounded-2xl shadow-2xl overflow-hidden"
         >
           {/* Header */}
           <div className="relative px-6 pt-6 pb-4">
             {/* 스킵 버튼 */}
             <button
               onClick={handleSkip}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              className="absolute top-4 right-4 p-2 text-[var(--theme-dashboard-text-muted)] hover:text-[var(--theme-dashboard-title)] hover:bg-[var(--theme-dashboard-section-header-bg)] rounded-full transition-colors"
               title="나중에 하기"
             >
               <X className="w-5 h-5" />
@@ -108,7 +108,7 @@ export function OnboardingModal() {
 
             {/* Progress bar */}
             <div className="mb-6">
-              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
                   initial={{ width: 0 }}
@@ -116,7 +116,7 @@ export function OnboardingModal() {
                   transition={{ duration: 0.3 }}
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-2 text-center">
+              <p className="text-xs text-[var(--theme-dashboard-text-muted)] mt-2 text-center">
                 {step + 1} / {PROFILE_QUESTIONS.length}
               </p>
             </div>
@@ -145,10 +145,10 @@ export function OnboardingModal() {
                 transition={{ duration: 0.2 }}
                 className="text-center"
               >
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)]">
                   {currentQuestion.title}
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-[var(--theme-dashboard-text-muted)] mt-1">
                   {currentQuestion.subtitle}
                 </p>
               </motion.div>
@@ -176,13 +176,13 @@ export function OnboardingModal() {
                       p-4 rounded-xl border-2 text-left transition-all
                       ${selectedValue === option.value
                         ? 'border-orange-400 bg-gradient-to-br from-orange-50 to-amber-50 shadow-md'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        : 'border-[var(--theme-dashboard-card-border)] hover:border-[var(--theme-dashboard-accent)] hover:bg-[var(--theme-dashboard-section-header-bg)]'
                       }
                     `}
                   >
                     <span className="text-2xl mb-1 block">{option.emoji}</span>
                     <span className={`text-sm font-medium ${
-                      selectedValue === option.value ? 'text-orange-700' : 'text-gray-700'
+                      selectedValue === option.value ? 'text-orange-700' : 'text-[var(--theme-dashboard-title)]'
                     }`}>
                       {option.label}
                     </span>
@@ -199,7 +199,7 @@ export function OnboardingModal() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handlePrev}
-                className="flex items-center gap-1 px-4 py-3 text-gray-600 border-2 border-gray-200 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-1 px-4 py-3 text-[var(--theme-dashboard-text-muted)] border-2 border-[var(--theme-dashboard-card-border)] rounded-xl font-medium hover:bg-[var(--theme-dashboard-section-header-bg)] transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
                 이전
@@ -215,7 +215,7 @@ export function OnboardingModal() {
                 flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all
                 ${selectedValue && !isSubmitting
                   ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:shadow-lg'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-[var(--theme-dashboard-section-header-bg)] text-[var(--theme-dashboard-text-muted)] cursor-not-allowed'
                 }
               `}
             >
@@ -246,7 +246,7 @@ export function OnboardingModal() {
           <div className="px-6 pb-4 text-center">
             <button
               onClick={handleSkip}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs text-[var(--theme-dashboard-text-muted)] hover:text-[var(--theme-dashboard-title)] transition-colors"
             >
               나중에 설정하기
             </button>

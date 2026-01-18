@@ -49,7 +49,7 @@ function StackFrameItem({
           {frame.name}()
         </span>
         {frame.line && (
-          <span className="text-xs text-gray-500">line {frame.line}</span>
+          <span className="text-xs text-[var(--theme-dashboard-text-muted)]">line {frame.line}</span>
         )}
       </div>
 
@@ -61,8 +61,8 @@ function StackFrameItem({
               key={v.name}
               className="flex items-center justify-between text-xs font-mono"
             >
-              <span className="text-gray-600">{v.name}</span>
-              <span className="text-gray-800 font-medium">
+              <span className="text-[var(--theme-dashboard-text-muted)]">{v.name}</span>
+              <span className="text-[var(--theme-dashboard-title)] font-medium">
                 {String(v.value)}
               </span>
             </div>
@@ -78,7 +78,7 @@ function StackFrameItem({
  */
 function EmptyStack() {
   return (
-    <div className="flex items-center justify-center py-8 text-gray-400 text-sm">
+    <div className="flex items-center justify-center py-8 text-[var(--theme-dashboard-text-muted)] text-sm">
       <span>스택이 비어있습니다</span>
     </div>
   );
@@ -101,8 +101,8 @@ export function CallStackView({ state, animate = true }: CallStackViewProps) {
           className="w-3 h-3 rounded-full"
           style={{ background: COLORS.stack.frameBorder }}
         />
-        <h3 className="text-sm font-semibold text-gray-700">Call Stack</h3>
-        <span className="text-xs text-gray-400">
+        <h3 className="text-sm font-semibold text-[var(--theme-dashboard-title)]">Call Stack</h3>
+        <span className="text-xs text-[var(--theme-dashboard-text-muted)]">
           ({frames.length} frame{frames.length !== 1 ? 's' : ''})
         </span>
       </div>

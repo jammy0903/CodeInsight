@@ -157,10 +157,10 @@ export function DetailedReportModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Modal header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--theme-dashboard-card-border)]">
+          <h2 className="text-xl font-semibold text-[var(--theme-dashboard-title)]">
             상세 분석 리포트
           </h2>
           <div className="flex items-center gap-2">
@@ -183,7 +183,7 @@ export function DetailedReportModal({
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-[var(--theme-dashboard-text-muted)] hover:text-[var(--theme-dashboard-title)] hover:bg-[var(--theme-dashboard-section-header-bg)] rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -229,7 +229,7 @@ export function DetailedReportModal({
             )}
 
             {/* Footer */}
-            <div className="mt-8 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
+            <div className="mt-8 pt-4 border-t border-[var(--theme-dashboard-card-border)] text-center text-sm text-[var(--theme-dashboard-text-muted)]">
               <p>CodeInsight - 코드 실행 원리 학습 플랫폼</p>
               <p className="mt-1">
                 {new Date().toLocaleDateString('ko-KR', {

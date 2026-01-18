@@ -25,8 +25,8 @@ export function HourlyChart({ hourlyActivity }: HourlyChartProps) {
   const groupedMax = Math.max(...groupedActivity.map((g) => g.value), 1);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">시간대별 학습</h3>
+    <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-4">
+      <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)] mb-3">시간대별 학습</h3>
 
       <div className="space-y-2">
         {groupedActivity.map((group, index) => {
@@ -35,8 +35,8 @@ export function HourlyChart({ hourlyActivity }: HourlyChartProps) {
           return (
             <div key={index} className="flex items-center gap-2">
               <span className="text-lg">{group.emoji}</span>
-              <span className="w-20 text-xs text-gray-500">{group.label}</span>
-              <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
+              <span className="w-20 text-xs text-[var(--theme-dashboard-text-muted)]">{group.label}</span>
+              <div className="flex-1 h-6 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.max(widthPercent, 2)}%` }}
@@ -51,7 +51,7 @@ export function HourlyChart({ hourlyActivity }: HourlyChartProps) {
                 </motion.div>
               </div>
               {widthPercent <= 20 && group.value > 0 && (
-                <span className="text-xs text-gray-400 w-12">
+                <span className="text-xs text-[var(--theme-dashboard-text-muted)] w-12">
                   {formatDuration(group.value)}
                 </span>
               )}

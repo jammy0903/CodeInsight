@@ -469,12 +469,20 @@ function createEvalContext(ctx: SimContext): EvalContext {
       return null;
     },
 
-    // 포인터 역참조
+    // 포인터 역참조 (크로스 프레임 지원)
     derefPointer: (name: string): number | null => {
       const v = ctx.variables.get(name);
       if (!v || !v.points_to) return null;
 
-      // points_to가 주소 문자열이면 해당 주소의 변수 찾기
+      // 1. 크로스 프레임 검색 (findVariableByAddress 사용)
+      if (ctx.findVariableByAddress) {
+        const target = ctx.findVariableByAddress(v.points_to);
+        if (target) {
+          return parseFloat(target.variable.value) || 0;
+        }
+      }
+
+      // 2. 현재 프레임에서 검색 (fallback)
       for (const [, target] of ctx.variables) {
         if (target.address === v.points_to) {
           return parseFloat(target.value) || 0;

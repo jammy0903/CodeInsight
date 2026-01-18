@@ -195,7 +195,7 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
 
       {/* 레슨 설명 */}
       {lesson.description && (
-        <p className="text-sm text-[#6B6B6B] line-clamp-2" style={{ marginBottom: '20px' }}>
+        <p className="text-sm text-[var(--theme-dashboard-text-muted)] line-clamp-2" style={{ marginBottom: '20px' }}>
           {lesson.description}
         </p>
       )}
@@ -203,7 +203,7 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
       {/* 하단 정보 */}
       <div className="flex items-center justify-between gap-2">
         {/* 예상 시간 */}
-        <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+        <div className="flex items-center gap-1.5 text-[var(--theme-dashboard-text-muted)] text-xs">
           <Clock className="w-3.5 h-3.5" />
           <span>{lesson.estimatedTime || 5}min</span>
         </div>

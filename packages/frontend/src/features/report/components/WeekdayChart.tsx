@@ -14,8 +14,8 @@ export function WeekdayChart({ weekdayActivity }: WeekdayChartProps) {
   const maxValue = Math.max(...weekdayActivity, 1);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">요일별 학습 패턴</h3>
+    <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-4">
+      <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)] mb-3">요일별 학습 패턴</h3>
 
       <div className="flex items-end justify-between gap-2 h-24">
         {weekdayActivity.map((value, index) => {
@@ -37,7 +37,7 @@ export function WeekdayChart({ weekdayActivity }: WeekdayChartProps) {
               />
               <span
                 className={`text-xs font-medium ${
-                  isWeekend ? 'text-rose-600' : 'text-gray-600'
+                  isWeekend ? 'text-rose-600' : 'text-[var(--theme-dashboard-text-muted)]'
                 }`}
               >
                 {WEEKDAYS[index]}
@@ -48,7 +48,7 @@ export function WeekdayChart({ weekdayActivity }: WeekdayChartProps) {
       </div>
 
       {/* 범례 */}
-      <div className="flex justify-center gap-4 mt-3 text-xs text-gray-500">
+      <div className="flex justify-center gap-4 mt-3 text-xs text-[var(--theme-dashboard-text-muted)]">
         <span className="flex items-center gap-1">
           <span className="w-3 h-3 rounded bg-blue-400" />
           평일

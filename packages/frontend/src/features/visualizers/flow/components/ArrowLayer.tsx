@@ -140,7 +140,21 @@ export const ArrowLayer = memo(function ArrowLayer({
     const result: ArrowData[] = [];
 
     variables.forEach((variable) => {
-      if (styler.shouldShowArrow(variable) && variable.pointsTo) {
+      const shouldShow = styler.shouldShowArrow(variable);
+      const hasPointsTo = !!variable.pointsTo;
+
+      // DEBUG: 화살표 후보 확인
+      if (import.meta.env.DEV && variable.isPointer) {
+        console.log('[ArrowLayer] 🏹 arrow candidate:', {
+          id: variable.id,
+          name: variable.name,
+          pointsTo: variable.pointsTo,
+          shouldShowArrow: shouldShow,
+          hasPointsTo,
+        });
+      }
+
+      if (shouldShow && hasPointsTo) {
         const target = variables.find((v) => v.id === variable.pointsTo);
         if (target) {
           result.push({
@@ -149,9 +163,15 @@ export const ArrowLayer = memo(function ArrowLayer({
             to: target,
             style: styler.getArrowStyle(variable, target),
           });
+        } else if (import.meta.env.DEV) {
+          console.log('[ArrowLayer] ⚠️ target not found:', variable.pointsTo);
         }
       }
     });
+
+    if (import.meta.env.DEV) {
+      console.log('[ArrowLayer] 📊 arrows calculated:', result.length);
+    }
 
     return result;
   }, [variables, styler]);

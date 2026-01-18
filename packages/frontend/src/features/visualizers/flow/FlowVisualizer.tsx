@@ -71,20 +71,33 @@ export const FlowVisualizer = memo(function FlowVisualizer({
   }, [step.animations, addBatch, play]);
 
   // 4. 프레임별 변수 그룹화
+  // WHY: frame.variableIds를 사용하여 변수를 프레임에 할당
+  // TRADEOFF: variable.scope 대신 variableIds 사용 → 언어별 scope 차이 해결
   const frameVariables = useMemo(() => {
     const result = new Map<string, FlowVariable[]>();
 
-    // 기본 프레임 초기화
+    // 변수 ID → 변수 객체 맵
+    const variableMap = new Map<string, FlowVariable>();
+    step.variables.forEach((v) => variableMap.set(v.id, v));
+
+    // 프레임별로 variableIds에서 변수 찾아서 할당
     step.frames.forEach((frame) => {
-      result.set(frame.name, []);
+      const frameVars: FlowVariable[] = [];
+      frame.variableIds.forEach((varId) => {
+        const variable = variableMap.get(varId);
+        if (variable) {
+          frameVars.push(variable);
+        }
+      });
+      result.set(frame.name, frameVars);
     });
 
-    // 변수를 프레임에 할당
-    step.variables.forEach((variable) => {
-      const frameName = variable.scope || 'main';
-      const existing = result.get(frameName) || [];
-      result.set(frameName, [...existing, variable]);
-    });
+    // DEBUG: 프레임별 변수 확인
+    if (import.meta.env.DEV) {
+      console.log('[FlowVisualizer] 📊 frameVariables:',
+        Array.from(result.entries()).map(([name, vars]) => `${name}(${vars.length})`)
+      );
+    }
 
     return result;
   }, [step.frames, step.variables]);

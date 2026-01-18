@@ -242,6 +242,8 @@ function MemoryBlockRow({
           padding: '3px 6px',
           backgroundColor: 'rgba(110, 118, 129, 0.2)',
           borderRadius: '4px',
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
         }}
       >
         {block.address}
@@ -254,7 +256,8 @@ function MemoryBlockRow({
           fontSize: '13px',
           color: 'var(--theme-memory-card-text)',
           fontWeight: 700,
-          flex: 1,
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
         }}
       >
         {block.value}

@@ -10,6 +10,7 @@ import type { FlowLanguage } from '@codeinsight/shared';
 import type { IFlowAdapter } from './base/types';
 import { cAdapter, createCAdapter } from './c';
 import { pythonAdapter, createPythonAdapter } from './python';
+import { javaAdapter, createJavaAdapter } from './java';
 
 // Base types
 export type { IFlowAdapter, IFlowTransformer, IFlowStyler, IFlowAnimator, BoxStyle, ArrowStyle } from './base/types';
@@ -19,6 +20,9 @@ export { cAdapter, createCAdapter, CTransformer, CStyler, CAnimator } from './c'
 
 // Python Adapter
 export { pythonAdapter, createPythonAdapter, PyTransformer, PyStyler, PyAnimator } from './python';
+
+// Java Adapter
+export { javaAdapter, createJavaAdapter, JavaTransformer, JavaStyler, JavaAnimator } from './java';
 
 // ============================================
 // Adapter Registry
@@ -30,7 +34,7 @@ type Theme = 'light' | 'dark';
 const defaultAdapters: Record<string, IFlowAdapter> = {
   c: cAdapter,
   python: pythonAdapter,
-  // java: javaAdapter,      // Phase 4
+  java: javaAdapter,
 };
 
 /**
@@ -54,8 +58,8 @@ export function createAdapter(language: FlowLanguage | string, theme: Theme = 'l
       return createCAdapter(theme);
     case 'python':
       return createPythonAdapter(theme);
-    // case 'java':
-    //   return createJavaAdapter(theme);    // Phase 4
+    case 'java':
+      return createJavaAdapter(theme);
     default:
       console.warn(`No adapter factory for language: ${language}, falling back to C`);
       return createCAdapter(theme);

@@ -15,6 +15,7 @@ interface StepExplanationProps {
 /**
  * 간단한 텍스트 포맷팅
  * - **bold** → <strong>bold</strong>
+ * - ```code``` → <code>code</code>
  * - \n\n → 단락 구분
  * - \n → <br/>
  */
@@ -27,22 +28,43 @@ function formatExplanation(text: string): React.ReactNode[] {
     const lines = paragraph.split('\n');
 
     const formattedLines = lines.map((line, lIdx) => {
-      // **bold** 처리
-      const parts = line.split(/(\*\*[^*]+\*\*)/g);
-      const formattedParts = parts.map((part, partIdx) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
+      // ```code``` 처리 (먼저)
+      const codeBlocks = line.split(/(```[^`]+```)/g);
+      const formattedCodeBlocks = codeBlocks.map((block, blockIdx) => {
+        if (block.startsWith('```') && block.endsWith('```')) {
+          // 코드 블록: ```C → C, ```python → python
+          const codeContent = block.slice(3, -3);
+          // 언어 라벨 제거 (첫 단어가 언어명인 경우)
+          const cleanCode = codeContent.replace(/^(C|c|python|java|javascript)\s*/i, '');
           return (
-            <strong key={partIdx} className="font-bold text-amber-700">
-              {part.slice(2, -2)}
-            </strong>
+            <code
+              key={blockIdx}
+              className="px-2 py-0.5 rounded text-xs font-mono bg-gray-800 text-cyan-400"
+            >
+              {cleanCode}
+            </code>
           );
         }
-        return part;
+
+        // **bold** 처리
+        const parts = block.split(/(\*\*[^*]+\*\*)/g);
+        const formattedParts = parts.map((part, partIdx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return (
+              <strong key={partIdx} className="font-bold text-amber-700">
+                {part.slice(2, -2)}
+              </strong>
+            );
+          }
+          return part;
+        });
+
+        return <span key={blockIdx}>{formattedParts}</span>;
       });
 
       return (
         <span key={lIdx}>
-          {formattedParts}
+          {formattedCodeBlocks}
           {lIdx < lines.length - 1 && <br />}
         </span>
       );

@@ -152,15 +152,15 @@ export function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fffbf5] p-6">
+    <div className="min-h-screen bg-[var(--theme-layout-page-bg)] p-6">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
-          <User className="w-8 h-8 text-[#a08060]" />
-          <h1 className="text-2xl font-bold text-[#6b5a4a]">프로필</h1>
+          <User className="w-8 h-8 text-[var(--theme-dashboard-accent)]" />
+          <h1 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">프로필</h1>
         </div>
 
         {/* 기본 정보 카드 */}
-        <div className="bg-white rounded-xl border border-[#e5d5c7] p-8 mb-6">
+        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-8 mb-6">
           {appUser ? (
             <div className="flex flex-col items-center gap-4">
               <PixelAvatar seed={appUser.nickname} size={80} />
@@ -168,12 +168,12 @@ export function ProfilePage() {
                 {/* 닉네임 표시/수정 */}
                 {!isEditingNickname ? (
                   <div className="flex items-center justify-center gap-2">
-                    <h2 className="text-xl font-bold text-[#6b5a4a]">
+                    <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)]">
                       {appUser.nickname}
                     </h2>
                     <button
                       onClick={handleStartEditNickname}
-                      className="p-1.5 rounded-lg hover:bg-[#fff8f0] transition-colors text-[#a08060]"
+                      className="p-1.5 rounded-lg hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors text-[var(--theme-dashboard-accent)]"
                       title="닉네임 변경"
                     >
                       <Edit2 className="w-4 h-4" />
@@ -205,7 +205,7 @@ export function ProfilePage() {
                       <button
                         onClick={handleCancelEditNickname}
                         disabled={isSavingNickname}
-                        className="p-2 rounded-lg hover:bg-[#fff8f0] transition-colors text-[#937b5d]"
+                        className="p-2 rounded-lg hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors text-[var(--theme-dashboard-text-muted)]"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -215,7 +215,7 @@ export function ProfilePage() {
                       <p className="text-xs text-red-500 mt-2">{nicknameError}</p>
                     )}
                     {isCheckingNickname && (
-                      <p className="text-xs text-[#937b5d] mt-2 flex items-center justify-center gap-1">
+                      <p className="text-xs text-[var(--theme-dashboard-text-muted)] mt-2 flex items-center justify-center gap-1">
                         <Loader2 className="w-3 h-3 animate-spin" />
                         확인 중...
                       </p>
@@ -226,28 +226,28 @@ export function ProfilePage() {
                   </div>
                 )}
 
-                <p className="text-sm text-[#937b5d] mt-1">
+                <p className="text-sm text-[var(--theme-dashboard-text-muted)] mt-1">
                   {appUser.oauthAccounts[0]?.email || firebaseUser?.email}
                 </p>
-                <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#a08060]/10 text-[#a08060] rounded-full">
+                <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[var(--theme-dashboard-accent)]/10 text-[var(--theme-dashboard-accent)] rounded-full">
                   {appUser.role === 'admin' ? '관리자' : '일반 사용자'}
                 </span>
               </div>
 
-              <div className="w-full mt-6 pt-6 border-t border-[#e5d5c7]">
-                <h3 className="text-sm font-semibold text-[#6b5a4a] mb-3">
+              <div className="w-full mt-6 pt-6 border-t border-[var(--theme-dashboard-card-border)]">
+                <h3 className="text-sm font-semibold text-[var(--theme-dashboard-title)] mb-3">
                   연결된 계정
                 </h3>
                 <div className="space-y-2">
                   {appUser.oauthAccounts.map((account) => (
                     <div
                       key={account.provider}
-                      className="flex items-center gap-3 p-3 bg-[#fff8f0] rounded-lg"
+                      className="flex items-center gap-3 p-3 bg-[var(--theme-dashboard-section-header-bg)] rounded-lg"
                     >
-                      <span className="text-sm font-medium text-[#6b5a4a] capitalize">
+                      <span className="text-sm font-medium text-[var(--theme-dashboard-title)] capitalize">
                         {account.provider}
                       </span>
-                      <span className="text-sm text-[#937b5d]">
+                      <span className="text-sm text-[var(--theme-dashboard-text-muted)]">
                         {account.email}
                       </span>
                     </div>
@@ -256,24 +256,24 @@ export function ProfilePage() {
               </div>
             </div>
           ) : (
-            <div className="text-center text-[#937b5d]">
+            <div className="text-center text-[var(--theme-dashboard-text-muted)]">
               프로필 정보를 불러오는 중...
             </div>
           )}
         </div>
 
         {/* 학습 프로필 카드 */}
-        <div className="bg-white rounded-xl border border-[#e5d5c7] p-6">
-          <h3 className="text-lg font-bold text-[#6b5a4a] mb-4">
+        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-6">
+          <h3 className="text-lg font-bold text-[var(--theme-dashboard-title)] mb-4">
             학습 프로필
           </h3>
-          <p className="text-sm text-[#937b5d] mb-6">
+          <p className="text-sm text-[var(--theme-dashboard-text-muted)] mb-6">
             맞춤형 학습 경험을 위한 정보입니다. 언제든 수정할 수 있어요.
           </p>
 
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 text-[#a08060] animate-spin" />
+              <Loader2 className="w-6 h-6 text-[var(--theme-dashboard-accent)] animate-spin" />
             </div>
           ) : (
             <div className="space-y-3">
@@ -287,26 +287,26 @@ export function ProfilePage() {
                     {!isEditing && (
                       <motion.button
                         onClick={() => setEditingKey(question.key)}
-                        className="w-full flex items-center justify-between p-4 bg-[#fff8f0] hover:bg-[#fff3e6] rounded-xl border border-[#e5d5c7] transition-colors text-left"
+                        className="w-full flex items-center justify-between p-4 bg-[var(--theme-dashboard-section-header-bg)] hover:bg-[var(--theme-layout-top-bar-button-hover)] rounded-xl border border-[var(--theme-dashboard-card-border)] transition-colors text-left"
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
                       >
                         <div>
-                          <p className="text-xs text-[#937b5d] mb-1">
+                          <p className="text-xs text-[var(--theme-dashboard-text-muted)] mb-1">
                             {question.title.replace('?', '')}
                           </p>
                           {value ? (
-                            <p className="text-sm font-medium text-[#6b5a4a] flex items-center gap-2">
+                            <p className="text-sm font-medium text-[var(--theme-dashboard-title)] flex items-center gap-2">
                               <span>{getProfileEmoji(question.key, value)}</span>
                               <span>{getProfileLabel(question.key, value)}</span>
                             </p>
                           ) : (
-                            <p className="text-sm text-[#b8a090]">
+                            <p className="text-sm text-[var(--theme-dashboard-text-muted)]">
                               아직 설정하지 않았어요
                             </p>
                           )}
                         </div>
-                        <ChevronRight className="w-5 h-5 text-[#a08060]" />
+                        <ChevronRight className="w-5 h-5 text-[var(--theme-dashboard-accent)]" />
                       </motion.button>
                     )}
 
@@ -321,12 +321,12 @@ export function ProfilePage() {
                         >
                           <div className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border-2 border-orange-200">
                             <div className="flex items-center justify-between mb-3">
-                              <p className="text-sm font-semibold text-[#6b5a4a]">
+                              <p className="text-sm font-semibold text-[var(--theme-dashboard-title)]">
                                 {question.title}
                               </p>
                               <button
                                 onClick={() => setEditingKey(null)}
-                                className="text-xs text-[#937b5d] hover:text-[#6b5a4a] transition-colors"
+                                className="text-xs text-[var(--theme-dashboard-text-muted)] hover:text-[var(--theme-dashboard-title)] transition-colors"
                               >
                                 취소
                               </button>
@@ -349,7 +349,7 @@ export function ProfilePage() {
                                   whileTap={!isSaving ? { scale: 0.98 } : {}}
                                 >
                                   <span className="text-lg">{option.emoji}</span>
-                                  <span className="text-sm font-medium text-[#6b5a4a]">
+                                  <span className="text-sm font-medium text-[var(--theme-dashboard-title)]">
                                     {option.label}
                                   </span>
                                   {value === option.value && (
@@ -359,7 +359,7 @@ export function ProfilePage() {
                               ))}
                             </div>
                             {isSaving && (
-                              <div className="flex items-center justify-center gap-2 mt-3 text-sm text-[#937b5d]">
+                              <div className="flex items-center justify-center gap-2 mt-3 text-sm text-[var(--theme-dashboard-text-muted)]">
                                 <Loader2 className="w-4 h-4 animate-spin" />
                                 저장 중...
                               </div>

@@ -119,8 +119,9 @@ export const HeapObjectSchema = z.object({
 // MemoryBlock (Playground용 스냅샷 형식)
 // WHY: Playground는 실시간 C 코드 실행 결과를 직접 스냅샷으로 받음
 // TRADEOFF: memoryChanges 형식과 별도 관리 필요 (useLessonVisualization이 두 형식 모두 처리)
+// NOTE: Heap blocks may not have a name (anonymous malloc blocks)
 export const MemoryBlockSchema: z.ZodType<{
-  name: string;
+  name?: string;  // Optional for heap blocks
   address: string;
   value: string;
   type?: string;
@@ -134,7 +135,7 @@ export const MemoryBlockSchema: z.ZodType<{
   arrayElements?: any[];
   isExpanded?: boolean;
 }> = z.object({
-  name: z.string(),
+  name: z.string().optional(),  // Heap blocks may be anonymous
   address: z.string(),
   value: z.string(),
   // Optional fields
@@ -163,7 +164,8 @@ export const StepMemoryStateSchema = z.object({
 export const MemoryChangeSchema = z.object({
   action: z.enum(['frame', 'allocate', 'update', 'free', 'deallocate', 'frame_end']),
   area: z.enum(['stack', 'heap']),
-  name: z.string(),
+  // deallocate, frame_end 액션은 name이 없을 수 있음
+  name: z.string().optional(),
   // frame/frame_end 액션은 type, size, value, address가 없음
   type: z.string().optional(),
   size: z.number().optional(),
@@ -200,6 +202,23 @@ export const LessonStepSchema = z.object({
     names: z.array(PyNameSchema),
     objects: z.array(PyObjectSchema),
     output: z.array(z.string()).optional(), // 터미널 출력 (id() 결과 등)
+  }).optional(),
+  // Java 메모리 시각화 (Lesson JSON용)
+  // WHY: Java 레슨은 stack/heap 모델로 참조 관계를 시각화
+  memoryState: z.object({
+    stack: z.array(z.object({
+      name: z.string(),
+      value: z.union([z.string(), z.number()]),
+      type: z.string().optional(),
+    })).optional(),
+    heap: z.array(z.object({
+      address: z.string(),
+      content: z.union([z.string(), z.number()]),
+      type: z.string().optional(),
+      new: z.boolean().optional(), // 새로 생성된 객체 하이라이트
+    })).optional(),
+    comparison: z.string().optional(), // "0x001 != 0x002" 등
+    output: z.array(z.string()).optional(), // ["false"] 등
   }).optional(),
   // Playground용 메모리 스냅샷 (직접 실행 결과)
   // WHY: Playground는 실시간 C 실행 결과를 받아 즉시 시각화

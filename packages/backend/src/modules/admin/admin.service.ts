@@ -11,10 +11,13 @@ import { prisma } from '../../config/database';
 
 export interface AdminStats {
   totalUsers: number;
-  totalSubmissions: number;
-  totalCourses: number;
   activeUsersToday: number;
-  averageProgress: number;
+  languageProgress: Array<{
+    languageId: string;
+    languageName: string;
+    progressPercentage: number;
+    activeUserProgressPercentage: number;
+  }>;
 }
 
 export interface OAuthAccountInfo {
@@ -26,8 +29,8 @@ export interface UserInfo {
   role: string;
   oauthAccounts: OAuthAccountInfo[];
   createdAt: string;
-  totalSubmissions: number;
-  solvedCount: number;
+  studyDays: number;
+  completedLessons: number;
 }
 
 export interface SubmissionInfo {
@@ -57,12 +60,6 @@ export class AdminService {
     // 전체 사용자 수
     const totalUsers = await prisma.user.count();
 
-    // 전체 제출 수
-    const totalSubmissions = await prisma.submission.count();
-
-    // 전체 코스 수 (Language 테이블에서)
-    const totalCourses = await prisma.language.count();
-
     // 오늘 활동한 사용자 수
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -75,23 +72,80 @@ export class AdminService {
       },
     });
 
-    // 평균 진도율 계산 (완료된 레슨 / 전체 레슨)
-    const totalLessons = await prisma.lesson.count();
-    const completedProgress = await prisma.userProgress.count({
-      where: { status: 'completed' },
+    // 언어별 진도율 계산
+    const languages = await prisma.language.findMany({
+      where: { isActive: true },
+      orderBy: { order: 'asc' },
     });
-    const totalProgress = await prisma.userProgress.count();
 
-    const averageProgress = totalProgress > 0 && totalLessons > 0
-      ? Math.round((completedProgress / totalProgress) * 100)
-      : 0;
+    const languageProgress = await Promise.all(
+      languages.map(async (lang) => {
+        // 해당 언어의 전체 레슨 수
+        const totalLessons = await prisma.lesson.count({
+          where: {
+            chapter: {
+              languageId: lang.id,
+            },
+          },
+        });
+
+        // 완료된 UserProgress 수
+        const completedProgress = await prisma.userProgress.count({
+          where: {
+            status: 'completed',
+            lesson: {
+              chapter: {
+                languageId: lang.id,
+              },
+            },
+          },
+        });
+
+        // 해당 언어에 대한 전체 UserProgress 수 (레슨을 시작한 사람들)
+        const totalUserProgress = await prisma.userProgress.count({
+          where: {
+            lesson: {
+              chapter: {
+                languageId: lang.id,
+              },
+            },
+          },
+        });
+
+        // 전체 평균: 전체 사용자 수 × 레슨 수
+        const totalPossibleProgress = totalUsers * totalLessons;
+        const progressPercentage = totalPossibleProgress > 0
+          ? Math.round((completedProgress / totalPossibleProgress) * 100)
+          : 0;
+
+        // 학습자 평균: UserProgress가 있는 사람들만
+        const activeUserProgressPercentage = totalUserProgress > 0
+          ? Math.round((completedProgress / totalUserProgress) * 100)
+          : 0;
+
+        // 디버그 로그
+        console.log(`\n[${lang.name}] 진도율 계산:`);
+        console.log(`  - 전체 사용자 수: ${totalUsers}명`);
+        console.log(`  - 전체 레슨 수: ${totalLessons}개`);
+        console.log(`  - 완료된 UserProgress: ${completedProgress}개`);
+        console.log(`  - 전체 UserProgress: ${totalUserProgress}개`);
+        console.log(`  - 전체 가능 진행: ${totalPossibleProgress}개 (${totalUsers} × ${totalLessons})`);
+        console.log(`  - 전체 평균: ${completedProgress}/${totalPossibleProgress} = ${progressPercentage}%`);
+        console.log(`  - 학습자 평균: ${completedProgress}/${totalUserProgress} = ${activeUserProgressPercentage}%`);
+
+        return {
+          languageId: lang.id,
+          languageName: lang.name,
+          progressPercentage,
+          activeUserProgressPercentage,
+        };
+      })
+    );
 
     return {
       totalUsers,
-      totalSubmissions,
-      totalCourses: totalCourses || 3, // 기본값 3 (C, Java, Python)
       activeUsersToday: activeUsersToday.length,
-      averageProgress,
+      languageProgress,
     };
   }
 
@@ -109,7 +163,7 @@ export class AdminService {
     // 전체 사용자 수
     const total = await prisma.user.count();
 
-    // 사용자 목록 (OAuth 계정 + 제출 통계 포함)
+    // 사용자 목록 (OAuth 계정 + 학습 통계 포함)
     const rawUsers = await prisma.user.findMany({
       skip,
       take: limit,
@@ -120,25 +174,39 @@ export class AdminService {
             provider: true,
           },
         },
-        _count: {
-          select: { submissions: true },
+        activities: {
+          select: {
+            startedAt: true,
+          },
         },
-        submissions: {
-          where: { verdict: 'accepted' },
-          select: { problemId: true },
-          distinct: ['problemId'],
+        progress: {
+          where: {
+            status: 'completed',
+          },
+          select: {
+            id: true,
+          },
         },
       },
     });
 
-    const users: UserInfo[] = rawUsers.map(user => ({
-      nickname: user.nickname,
-      role: user.role,
-      oauthAccounts: user.oauthAccounts,
-      createdAt: user.createdAt.toISOString(),
-      totalSubmissions: user._count.submissions,
-      solvedCount: user.submissions.length,
-    }));
+    const users: UserInfo[] = rawUsers.map(user => {
+      // 공부한 날짜 수: startedAt의 날짜만 추출하여 중복 제거
+      const uniqueDates = new Set(
+        user.activities.map(activity =>
+          activity.startedAt.toISOString().split('T')[0]
+        )
+      );
+
+      return {
+        nickname: user.nickname,
+        role: user.role,
+        oauthAccounts: user.oauthAccounts,
+        createdAt: user.createdAt.toISOString(),
+        studyDays: uniqueDates.size,
+        completedLessons: user.progress.length,
+      };
+    });
 
     return {
       users,

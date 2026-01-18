@@ -12,25 +12,40 @@ import type { IFlowTransformer } from '../base/types';
 
 /**
  * 값을 FlowValue로 파싱
+ *
+ * 주의: hex 주소(0x...)는 문자열로 유지해야 함
+ * 그렇지 않으면 0x7fffffffde00 → 140737488346624로 변환됨
  */
-function parseValue(value: string): string | number | boolean | null {
-  if (value === 'null' || value === 'NULL') return null;
-  if (value === 'true') return true;
-  if (value === 'false') return false;
+function parseValue(value: string | undefined | null): string | number | boolean | null {
+  // 방어적 코드: undefined, null, 빈 문자열 처리
+  if (value === undefined || value === null) {
+    return 0; // 기본값
+  }
 
-  // 숫자 시도
-  const num = Number(value);
+  const strValue = String(value); // 타입 안전성 보장
+
+  if (strValue === '' || strValue === 'null' || strValue === 'NULL') return null;
+  if (strValue === 'true') return true;
+  if (strValue === 'false') return false;
+
+  // hex 주소는 문자열로 유지 (0x로 시작하는 값)
+  if (strValue.startsWith('0x') || strValue.startsWith('0X')) {
+    return strValue;
+  }
+
+  // 숫자 시도 (10진수만)
+  const num = Number(strValue);
   if (!isNaN(num)) return num;
 
   // 문자열 (따옴표 제거)
-  if (value.startsWith('"') && value.endsWith('"')) {
-    return value.slice(1, -1);
+  if (strValue.startsWith('"') && strValue.endsWith('"')) {
+    return strValue.slice(1, -1);
   }
-  if (value.startsWith("'") && value.endsWith("'")) {
-    return value.slice(1, -1);
+  if (strValue.startsWith("'") && strValue.endsWith("'")) {
+    return strValue.slice(1, -1);
   }
 
-  return value;
+  return strValue;
 }
 
 /**
@@ -65,9 +80,21 @@ export class CTransformer implements IFlowTransformer {
     const variables: FlowVariable[] = [];
     const framesMap = new Map<string, string[]>(); // frame name → variable IDs
 
+    // DEBUG: step 데이터 확인
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[CTransformer] step.line:', step.line);
+      console.log('[CTransformer] step.stack:', JSON.stringify(step.stack, null, 2));
+    }
+
     // 1. Stack 변수 처리
     if (step.stack) {
       step.stack.forEach((block) => {
+        // DEBUG: 각 블록의 value 확인 (특히 temp, a, b 변수)
+        if (process.env.NODE_ENV === 'development' &&
+            (block.name.includes('temp') || block.name.includes('.a') || block.name.includes('.b'))) {
+          console.log(`[CTransformer] 🔍 block: "${block.name}", value: "${block.value}", type: ${typeof block.value}, points_to: ${block.points_to}`);
+        }
+
         const { frame, name } = parseVariableName(block.name);
         const variable = this.toVariable(
           {
@@ -191,6 +218,12 @@ export class CTransformer implements IFlowTransformer {
   ): FlowVariable {
     const isPointer = block.type?.includes('*') || false;
     const parsedValue = parseValue(block.value);
+
+    // DEBUG: parseValue 결과 확인 (swap 함수 관련 변수)
+    if (process.env.NODE_ENV === 'development' &&
+        (block.name === 'temp' || block.name === 'a' || block.name === 'b')) {
+      console.log(`[CTransformer.toVariable] 🎯 name: "${block.name}", scope: "${scope}", input: "${block.value}", parsedValue: ${parsedValue}, isPointer: ${isPointer}`);
+    }
 
     return {
       id: `${scope}-${block.name}-${block.address || 'no-addr'}`,

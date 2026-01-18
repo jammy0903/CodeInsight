@@ -56,7 +56,7 @@ export function StepExplanation({ step, isMobile = false }: StepExplanationProps
             display: 'flex',
             alignItems: 'center',
             gap: isMobile ? '4px' : '6px',
-            color: '#9ca3af',
+            color: 'var(--theme-dashboard-text-muted)',
             fontSize: isMobile ? '11px' : '13px',
           }}
         >

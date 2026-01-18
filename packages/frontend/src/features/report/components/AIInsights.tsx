@@ -21,8 +21,8 @@ export function AIInsights({ analysis, loading, onRequestAnalysis }: AIInsightsP
             <Bot className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">AI 학습 분석</h3>
-            <p className="text-sm text-gray-500">개인화된 학습 인사이트</p>
+            <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)]">AI 학습 분석</h3>
+            <p className="text-sm text-[var(--theme-dashboard-text-muted)]">개인화된 학습 인사이트</p>
           </div>
         </div>
 
@@ -43,7 +43,7 @@ export function AIInsights({ analysis, loading, onRequestAnalysis }: AIInsightsP
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
             <Sparkles className="w-8 h-8 text-purple-500" />
           </div>
-          <p className="text-gray-600 mb-4">
+          <p className="text-[var(--theme-dashboard-text-muted)] mb-4">
             AI가 학습 패턴을 분석하고 맞춤형 조언을 제공합니다
           </p>
           <motion.button
@@ -65,7 +65,7 @@ export function AIInsights({ analysis, loading, onRequestAnalysis }: AIInsightsP
             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
             className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-purple-200 border-t-purple-500"
           />
-          <p className="text-gray-600">학습 패턴을 분석하고 있어요...</p>
+          <p className="text-[var(--theme-dashboard-text-muted)]">학습 패턴을 분석하고 있어요...</p>
         </div>
       )}
 
@@ -86,7 +86,7 @@ export function AIInsights({ analysis, loading, onRequestAnalysis }: AIInsightsP
 
               if (isHeading) {
                 return (
-                  <h4 key={index} className="text-base font-semibold text-gray-900 mt-3 mb-2">
+                  <h4 key={index} className="text-base font-semibold text-[var(--theme-dashboard-title)] mt-3 mb-2">
                     {paragraph.replace(/^#+\s*/, '')}
                   </h4>
                 );
@@ -94,14 +94,14 @@ export function AIInsights({ analysis, loading, onRequestAnalysis }: AIInsightsP
 
               if (isBullet) {
                 return (
-                  <p key={index} className="text-gray-700 ml-4 my-1">
+                  <p key={index} className="text-[var(--theme-dashboard-title)] ml-4 my-1">
                     • {paragraph.replace(/^[-•]\s*/, '')}
                   </p>
                 );
               }
 
               return (
-                <p key={index} className="text-gray-700 my-2 leading-relaxed">
+                <p key={index} className="text-[var(--theme-dashboard-title)] my-2 leading-relaxed">
                   {paragraph}
                 </p>
               );
@@ -109,7 +109,7 @@ export function AIInsights({ analysis, loading, onRequestAnalysis }: AIInsightsP
           </div>
 
           {/* 제공자 표시 */}
-          <p className="text-xs text-gray-400 text-right">
+          <p className="text-xs text-[var(--theme-dashboard-text-muted)] text-right">
             Powered by {analysis.provider}
           </p>
         </motion.div>

@@ -111,12 +111,12 @@ export function NicknameModal() {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 m-4"
+          className="w-full max-w-md bg-[var(--theme-dashboard-card-bg)] rounded-2xl shadow-2xl p-8 m-4"
         >
           {/* Header */}
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">환영합니다!</h2>
-            <p className="text-gray-600 mt-2">
+            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">환영합니다!</h2>
+            <p className="text-[var(--theme-dashboard-text-muted)] mt-2">
               CodeInsight에서 사용할 닉네임을 설정해주세요
             </p>
           </div>
@@ -134,14 +134,14 @@ export function NicknameModal() {
                   focus:outline-none focus:ring-2 focus:ring-offset-2
                   ${status === 'valid' ? 'border-green-500 focus:ring-green-500' : ''}
                   ${status === 'invalid' ? 'border-red-500 focus:ring-red-500' : ''}
-                  ${status === 'idle' || status === 'checking' ? 'border-gray-200 focus:ring-accent-orange' : ''}
+                  ${status === 'idle' || status === 'checking' ? 'border-[var(--theme-dashboard-card-border)] focus:ring-accent-orange' : ''}
                 `}
                 maxLength={20}
                 autoFocus
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 {status === 'checking' && (
-                  <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-[var(--theme-dashboard-text-muted)] animate-spin" />
                 )}
                 {status === 'valid' && (
                   <Check className="w-5 h-5 text-green-500" />
@@ -169,7 +169,7 @@ export function NicknameModal() {
             </AnimatePresence>
 
             {/* Hint */}
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-[var(--theme-dashboard-text-muted)]">
               2-20자 / 영문, 숫자, 한글, 언더스코어(_) 사용 가능
             </p>
           </div>
@@ -180,7 +180,7 @@ export function NicknameModal() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleCancel}
-              className="flex-1 px-4 py-3 text-gray-600 border-2 border-gray-200 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-3 text-[var(--theme-dashboard-text-muted)] border-2 border-[var(--theme-dashboard-card-border)] rounded-lg font-medium hover:bg-[var(--theme-dashboard-section-header-bg)] transition-colors"
             >
               취소
             </motion.button>
@@ -193,7 +193,7 @@ export function NicknameModal() {
                 flex-1 px-4 py-3 rounded-lg font-medium transition-colors
                 ${status === 'valid' && !isSubmitting
                   ? 'bg-accent-orange text-white hover:bg-accent-orange/90'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-[var(--theme-dashboard-section-header-bg)] text-[var(--theme-dashboard-text-muted)] cursor-not-allowed'
                 }
               `}
             >

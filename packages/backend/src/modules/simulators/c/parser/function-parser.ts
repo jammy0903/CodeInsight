@@ -13,12 +13,19 @@ import type { FunctionDef, FunctionParam, ParseResult } from './types';
 // 함수 정의 패턴: returnType functionName(params) {
 const FUNCTION_DEF_PATTERN = /^(int|void|char|float|double|long|short|unsigned\s+\w+)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([^)]*)\)\s*\{?\s*$/;
 
-// 파라미터 패턴: type name
-const PARAM_PATTERN = /^\s*((?:unsigned\s+)?[a-zA-Z_][a-zA-Z0-9_]*\s*\*?)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*$/;
+// 파라미터 패턴: type name (포인터 * 위치 유연하게 지원)
+// 지원 형식:
+// - int a
+// - int* p    (타입에 * 붙음)
+// - int *p    (* 분리)
+// - int * p   (* 양쪽 공백)
+// - int **pp  (이중 포인터)
+const PARAM_PATTERN = /^\s*((?:unsigned\s+)?[a-zA-Z_][a-zA-Z0-9_]*)\s*(\*+)?\s*(\*+)?\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*$/;
 
 /**
  * 파라미터 문자열 파싱
  * "int a, int b" → [{ name: "a", type: "int" }, { name: "b", type: "int" }]
+ * "int *p" → [{ name: "p", type: "int *" }]
  */
 function parseParams(paramsStr: string): FunctionParam[] {
   if (!paramsStr.trim() || paramsStr.trim() === 'void') {
@@ -31,9 +38,21 @@ function parseParams(paramsStr: string): FunctionParam[] {
   for (const part of parts) {
     const match = part.match(PARAM_PATTERN);
     if (match) {
+      // match[1]: 기본 타입 (int, unsigned int, etc.)
+      // match[2]: 첫 번째 * (optional)
+      // match[3]: 두 번째 * (optional, 이중 포인터용)
+      // match[4]: 변수명
+      const baseType = match[1].trim();
+      const ptr1 = match[2] || '';
+      const ptr2 = match[3] || '';
+      const varName = match[4].trim();
+
+      // 타입 조합: "int" + " *" or "int" + " **"
+      const fullType = baseType + (ptr1 || ptr2 ? ' ' + ptr1 + ptr2 : '');
+
       params.push({
-        type: match[1].trim(),
-        name: match[2].trim(),
+        type: fullType,
+        name: varName,
       });
     }
   }

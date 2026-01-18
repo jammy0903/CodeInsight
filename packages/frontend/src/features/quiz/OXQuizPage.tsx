@@ -253,22 +253,22 @@ export function OXQuizPage() {
   // 챕터 목록 화면
   if (viewState === 'chapters') {
     return (
-      <div className="bg-[#fffbf5] min-h-screen px-3 py-6">
+      <div className="bg-[var(--theme-quiz-page-bg)] min-h-screen px-3 py-6">
         <div className="w-full max-w-2xl mx-auto">
           {/* 헤더 */}
           <div className="flex items-center gap-3 mb-8">
             <Link
               to="/quiz"
-              className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] transition-colors"
+              className="p-2 rounded-lg border border-[var(--theme-quiz-card-border)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-[#937b5d]" />
+              <ArrowLeft className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
             </Link>
             <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
               <CircleDot className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-[#6b5a4a]">OX 퀴즈</h1>
-              <p className="text-sm text-[#937b5d]" style={{ color: langInfo.color }}>
+              <h1 className="text-lg font-bold text-[var(--theme-quiz-title)]">OX 퀴즈</h1>
+              <p className="text-sm text-[var(--theme-quiz-text-muted)]" style={{ color: langInfo.color }}>
                 {langInfo.icon} {langInfo.name}
               </p>
             </div>
@@ -282,7 +282,7 @@ export function OXQuizPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleChapterSelect(chapter)}
-                className="w-full p-4 bg-white rounded-xl border border-[#e5d5c7] hover:border-[#a08060] hover:shadow-md transition-all text-left"
+                className="w-full p-4 bg-[var(--theme-quiz-card-bg)] rounded-xl border border-[var(--theme-quiz-card-border)] hover:border-[var(--theme-quiz-card-border-hover)] hover:shadow-md transition-all text-left"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -290,11 +290,11 @@ export function OXQuizPage() {
                       <BookOpen className="w-5 h-5" style={{ color: langInfo.color }} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#6b5a4a]">{chapter.title}</h3>
-                      <p className="text-sm text-[#937b5d]">{chapter.quizzes.length}문제</p>
+                      <h3 className="font-semibold text-[var(--theme-quiz-title)]">{chapter.title}</h3>
+                      <p className="text-sm text-[var(--theme-quiz-text-muted)]">{chapter.quizzes.length}문제</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-[#937b5d]" />
+                  <ChevronRight className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
                 </div>
               </motion.button>
             ))}
@@ -308,22 +308,22 @@ export function OXQuizPage() {
   if (viewState === 'result') {
     const percentage = Math.round((score / totalQuizzes) * 100);
     return (
-      <div className="bg-[#fffbf5] min-h-screen p-4">
+      <div className="bg-[var(--theme-quiz-page-bg)] min-h-screen p-4">
         <div className="w-full max-w-2xl mx-auto">
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={handleBackToChapters}
-              className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] transition-colors"
+              className="p-2 rounded-lg border border-[var(--theme-quiz-card-border)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-[#937b5d]" />
+              <ArrowLeft className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
             </button>
-            <h1 className="text-xl font-bold text-[#6b5a4a]">퀴즈 결과</h1>
+            <h1 className="text-xl font-bold text-[var(--theme-quiz-title)]">퀴즈 결과</h1>
           </div>
 
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-2xl border border-[#e5d5c7] p-8 text-center shadow-lg"
+            className="bg-[var(--theme-quiz-card-bg)] rounded-2xl border border-[var(--theme-quiz-card-border)] p-8 text-center shadow-lg"
           >
             <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
               percentage >= 80 ? 'bg-green-100' : percentage >= 60 ? 'bg-yellow-100' : 'bg-red-100'
@@ -335,18 +335,18 @@ export function OXQuizPage() {
               </span>
             </div>
 
-            <h2 className="text-2xl font-bold text-[#6b5a4a] mb-2">
+            <h2 className="text-2xl font-bold text-[var(--theme-quiz-title)] mb-2">
               {percentage >= 80 ? '훌륭해요! 🎉' : percentage >= 60 ? '잘했어요! 👍' : '다시 도전해보세요! 💪'}
             </h2>
-            <p className="text-[#937b5d] mb-2">{selectedChapter?.title}</p>
-            <p className="text-[#937b5d] mb-6">
+            <p className="text-[var(--theme-quiz-text-muted)] mb-2">{selectedChapter?.title}</p>
+            <p className="text-[var(--theme-quiz-text-muted)] mb-6">
               {totalQuizzes}문제 중 <span className="text-green-600 font-bold">{score}문제 정답</span>, <span className="text-red-500 font-bold">{wrongCount}문제 오답</span>
             </p>
 
             <div className="flex gap-3">
               <button
                 onClick={handleRestart}
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#e5d5c7] text-[#6b5a4a] hover:bg-[#fff8f0] transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[var(--theme-quiz-card-border)] text-[var(--theme-quiz-title)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
               >
                 <RotateCcw className="w-5 h-5" />
                 다시 풀기
@@ -366,21 +366,21 @@ export function OXQuizPage() {
 
   // 퀴즈 화면
   return (
-    <div className="bg-[#fffbf5] min-h-screen px-3 py-6">
+    <div className="bg-[var(--theme-quiz-page-bg)] min-h-screen px-3 py-6">
       <div className="w-full max-w-2xl mx-auto">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-8">
           <button
             onClick={handleBackToChapters}
-            className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] transition-colors"
+            className="p-2 rounded-lg border border-[var(--theme-quiz-card-border)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-[#937b5d]" />
+            <ArrowLeft className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
           </button>
           <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
             <CircleDot className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[#6b5a4a]">{selectedChapter?.title}</h1>
+            <h1 className="text-lg font-bold text-[var(--theme-quiz-title)]">{selectedChapter?.title}</h1>
             <p className="text-sm" style={{ color: langInfo.color }}>
               {langInfo.icon} {langInfo.name} OX 퀴즈
             </p>
@@ -396,7 +396,7 @@ export function OXQuizPage() {
                 맞춤 <span className="font-bold">{score}</span>
               </span>
             </div>
-            <div className="text-[#937b5d] font-mono text-sm">
+            <div className="text-[var(--theme-quiz-text-muted)] font-mono text-sm">
               {currentIndex + 1} / {totalQuizzes}
             </div>
             <div className="flex items-center gap-2">
@@ -406,7 +406,7 @@ export function OXQuizPage() {
               </span>
             </div>
           </div>
-          <div className="h-2 bg-[#e5d5c7] rounded-full overflow-hidden">
+          <div className="h-2 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-blue-500 rounded-full"
               initial={{ width: 0 }}
@@ -425,16 +425,16 @@ export function OXQuizPage() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -50, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className={`bg-white rounded-2xl border-2 p-6 min-h-[200px] flex flex-col shadow-lg ${
+              className={`bg-[var(--theme-quiz-card-bg)] rounded-2xl border-2 p-6 min-h-[200px] flex flex-col shadow-lg ${
                 quizState === 'correct'
                   ? 'border-green-400 bg-green-50'
                   : quizState === 'incorrect'
                   ? 'border-red-400 bg-red-50'
-                  : 'border-[#e5d5c7]'
+                  : 'border-[var(--theme-quiz-card-border)]'
               }`}
             >
               <div className="flex-1 flex items-center justify-center">
-                <p className="text-lg text-center text-[#6b5a4a] font-medium leading-relaxed">
+                <p className="text-lg text-center text-[var(--theme-quiz-title)] font-medium leading-relaxed">
                   {currentQuiz.question}
                 </p>
               </div>
@@ -459,7 +459,7 @@ export function OXQuizPage() {
                       {quizState === 'correct' ? '정답!' : '오답!'}
                     </span>
                   </div>
-                  <p className="text-sm text-[#6b5a4a]">
+                  <p className="text-sm text-[var(--theme-quiz-title)]">
                     {currentQuiz.explanation}
                   </p>
                 </motion.div>
@@ -496,7 +496,7 @@ export function OXQuizPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleNext}
-              className="w-full py-4 rounded-2xl bg-[#a08060] text-white font-semibold shadow-lg hover:bg-[#8b6d4f] transition-colors"
+              className="w-full py-4 rounded-2xl bg-[var(--theme-dashboard-accent)] text-white font-semibold shadow-lg hover:bg-[var(--theme-dashboard-accent-hover)] transition-colors"
             >
               {currentIndex < totalQuizzes - 1 ? '다음 문제' : '결과 보기'}
             </motion.button>

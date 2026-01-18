@@ -31,8 +31,8 @@ export function NamesPanel({
   });
 
   return (
-    <div className="p-4 bg-white rounded-lg border border-gray-200">
-      <h3 className="text-sm font-semibold text-gray-600 mb-3">
+    <div className="p-4 bg-[var(--theme-dashboard-card-bg)] rounded-lg border border-[var(--theme-dashboard-card-border)]">
+      <h3 className="text-sm font-semibold text-[var(--theme-dashboard-text-muted)] mb-3">
         Names (변수)
       </h3>
 
@@ -51,7 +51,7 @@ export function NamesPanel({
 
         {/* Empty state */}
         {names.length === 0 && (
-          <div className="text-sm text-gray-400 italic">
+          <div className="text-sm text-[var(--theme-dashboard-text-muted)] italic">
             아직 변수가 없습니다
           </div>
         )}
@@ -133,20 +133,12 @@ function NameChip({
       onMouseEnter={() => onHover(pyName.name)}
       onMouseLeave={() => onHover(null)}
     >
-      {/* 변수명 */}
+      {/* 변수명만 표시 (화살표는 ReferenceArrow 컴포넌트가 그림) */}
       <span
         className="font-mono font-medium text-sm"
         style={{ color: scopeColor.text }}
       >
         {pyName.name}
-      </span>
-
-      {/* 화살표 (참조 표시) */}
-      <span className="ml-2 text-gray-400 text-xs">→</span>
-
-      {/* 참조 대상 ID */}
-      <span className="ml-1 text-[10px] font-mono text-gray-500">
-        #{pyName.pointsTo}
       </span>
     </motion.div>
   );

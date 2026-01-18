@@ -24,7 +24,7 @@ export function FlowViewer({ steps, currentStepIndex }: FlowViewerProps) {
 
   if (flowSteps.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
+      <div className="flex items-center justify-center h-32 text-[var(--theme-dashboard-text-muted)] text-sm">
         실행 흐름 정보가 없습니다
       </div>
     );
@@ -43,7 +43,7 @@ export function FlowViewer({ steps, currentStepIndex }: FlowViewerProps) {
               {idx < flowSteps.length - 1 && (
                 <div
                   className={`absolute left-5 top-10 w-0.5 h-8 transition-colors duration-300 ${
-                    isActive ? 'bg-emerald-400' : 'bg-gray-200'
+                    isActive ? 'bg-emerald-400' : 'bg-[var(--theme-dashboard-progress-bg)]'
                   }`}
                 />
               )}
@@ -57,8 +57,8 @@ export function FlowViewer({ steps, currentStepIndex }: FlowViewerProps) {
                   isCurrent
                     ? 'bg-emerald-50 border-2 border-emerald-400 shadow-md'
                     : isActive
-                    ? 'bg-gray-50 border border-gray-200'
-                    : 'bg-white border border-gray-100 opacity-50'
+                    ? 'bg-[var(--theme-dashboard-card-bg)] border border-[var(--theme-dashboard-card-border)]'
+                    : 'bg-white border border-[var(--theme-dashboard-card-border)] opacity-50'
                 }`}
               >
                 {/* 아이콘 */}
@@ -68,7 +68,7 @@ export function FlowViewer({ steps, currentStepIndex }: FlowViewerProps) {
                       ? 'bg-emerald-400 shadow-lg'
                       : isActive
                       ? 'bg-emerald-100'
-                      : 'bg-gray-100'
+                      : 'bg-[var(--theme-dashboard-section-header-bg)]'
                   }`}
                 >
                   {step.flowIcon}
@@ -78,7 +78,7 @@ export function FlowViewer({ steps, currentStepIndex }: FlowViewerProps) {
                 <div className="flex-1 min-w-0">
                   <div
                     className={`font-semibold text-sm ${
-                      isCurrent ? 'text-emerald-700' : 'text-gray-700'
+                      isCurrent ? 'text-emerald-700' : 'text-[var(--theme-dashboard-title)]'
                     }`}
                   >
                     {step.flowLabel}
@@ -86,7 +86,7 @@ export function FlowViewer({ steps, currentStepIndex }: FlowViewerProps) {
                   {step.flowDetail && (
                     <div
                       className={`text-xs font-mono mt-1 ${
-                        isCurrent ? 'text-emerald-600' : 'text-gray-500'
+                        isCurrent ? 'text-emerald-600' : 'text-[var(--theme-dashboard-text-muted)]'
                       }`}
                     >
                       {step.flowDetail}
@@ -99,7 +99,7 @@ export function FlowViewer({ steps, currentStepIndex }: FlowViewerProps) {
                   className={`text-xs px-2 py-0.5 rounded ${
                     isCurrent
                       ? 'bg-emerald-200 text-emerald-800'
-                      : 'bg-gray-100 text-gray-500'
+                      : 'bg-[var(--theme-dashboard-section-header-bg)] text-[var(--theme-dashboard-text-muted)]'
                   }`}
                 >
                   L{step.line}

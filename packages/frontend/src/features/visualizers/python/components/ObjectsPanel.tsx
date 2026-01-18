@@ -31,8 +31,8 @@ export function ObjectsPanel({
   const hoveredTargetId = hoveredName ? nameToObjectMap.get(hoveredName) : null;
 
   return (
-    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-      <h3 className="text-sm font-semibold text-gray-600 mb-3">
+    <div className="p-4 bg-[var(--theme-dashboard-card-bg)] rounded-lg border border-[var(--theme-dashboard-card-border)]">
+      <h3 className="text-sm font-semibold text-[var(--theme-dashboard-text-muted)] mb-3">
         Objects (객체)
       </h3>
 
@@ -51,7 +51,7 @@ export function ObjectsPanel({
         ))}
 
         {objects.length === 0 && (
-          <div className="text-sm text-gray-400 italic">
+          <div className="text-sm text-[var(--theme-dashboard-text-muted)] italic">
             아직 객체가 없습니다
           </div>
         )}

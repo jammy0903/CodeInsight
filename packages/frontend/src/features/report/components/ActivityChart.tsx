@@ -62,12 +62,12 @@ export function ActivityChart({ dailyActivity, period }: ActivityChartProps) {
   const groupedMaxValue = Math.max(...displayData.map((d) => d.value), 1);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">일별 학습 활동</h3>
+    <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-4">
+      <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)] mb-4">일별 학습 활동</h3>
 
       <div className="relative h-48">
         {/* Y축 눈금 */}
-        <div className="absolute left-0 top-0 bottom-6 w-12 flex flex-col justify-between text-xs text-gray-400">
+        <div className="absolute left-0 top-0 bottom-6 w-12 flex flex-col justify-between text-xs text-[var(--theme-dashboard-text-muted)]">
           <span>{formatDuration(groupedMaxValue)}</span>
           <span>{formatDuration(Math.round(groupedMaxValue / 2))}</span>
           <span>0</span>
@@ -88,7 +88,7 @@ export function ActivityChart({ dailyActivity, period }: ActivityChartProps) {
                   className={`w-full max-w-8 rounded-t-sm transition-colors ${
                     data.value > 0
                       ? 'bg-gradient-to-t from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500'
-                      : 'bg-gray-200'
+                      : 'bg-[var(--theme-dashboard-progress-bg)]'
                   }`}
                   style={{ minHeight: data.value > 0 ? '4px' : '2px' }}
                 />
@@ -106,7 +106,7 @@ export function ActivityChart({ dailyActivity, period }: ActivityChartProps) {
 
         {/* X축 라벨 (7일/30일만) */}
         {(period === '7d' || period === '30d') && (
-          <div className="ml-14 flex justify-between text-xs text-gray-400 mt-1">
+          <div className="ml-14 flex justify-between text-xs text-[var(--theme-dashboard-text-muted)] mt-1">
             {period === '7d' ? (
               displayData.map((d) => (
                 <span key={d.date} className="flex-1 text-center">

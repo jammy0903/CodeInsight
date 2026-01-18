@@ -95,8 +95,8 @@ export function ChapterLessonsPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a08060] mx-auto mb-4"></div>
-          <p className="text-[#937b5d]">레슨 로딩 중...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--theme-dashboard-accent)] mx-auto mb-4"></div>
+          <p className="text-[var(--theme-dashboard-text-muted)]">레슨 로딩 중...</p>
         </div>
       </div>
     );
@@ -108,8 +108,8 @@ export function ChapterLessonsPage() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="text-6xl mb-4">😢</div>
-          <h2 className="text-2xl font-bold text-[#6b5a4a] mb-2">챕터를 불러올 수 없습니다</h2>
-          <p className="text-[#937b5d] mb-6">{error || 'Chapter not found'}</p>
+          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">챕터를 불러올 수 없습니다</h2>
+          <p className="text-[var(--theme-dashboard-text-muted)] mb-6">{error || 'Chapter not found'}</p>
           <button
             onClick={() => navigate(`/courses/${lang}`)}
             className="btn-primary"
@@ -133,7 +133,7 @@ export function ChapterLessonsPage() {
       {/* 뒤로가기 버튼 */}
       <button
         onClick={() => navigate(`/courses/${lang}`)}
-        className="group flex items-center gap-2 text-[#937b5d] hover:text-[#FFD700] transition-colors mb-6"
+        className="group flex items-center gap-2 text-[var(--theme-dashboard-text-muted)] hover:text-[#FFD700] transition-colors mb-6"
       >
         <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
         <span className="text-2xl font-semibold tracking-wider uppercase">Back to Chapters</span>
@@ -170,11 +170,11 @@ export function ChapterLessonsPage() {
               <BookOpen className="w-7 h-7 text-white" />
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-800 tracking-tight mb-2">
+              <h1 className="text-3xl font-bold text-[var(--theme-dashboard-title)] tracking-tight mb-2">
                 {chapter.title}
               </h1>
               {chapter.description && (
-                <p className="text-gray-500 text-sm">
+                <p className="text-[var(--theme-dashboard-text-muted)] text-sm">
                   {chapter.description}
                 </p>
               )}
@@ -188,18 +188,18 @@ export function ChapterLessonsPage() {
                 <Target className="w-4 h-4 text-emerald-500" />
                 <span className="text-xs text-emerald-600 font-mono uppercase">Progress</span>
               </div>
-              <span className="text-xs text-gray-500 font-mono">
+              <span className="text-xs text-[var(--theme-dashboard-text-muted)] font-mono">
                 {completedLessons} / {totalLessons} 레슨 완료
               </span>
             </div>
-            <div className="h-3 bg-white rounded-full overflow-hidden border border-gray-200">
+            <div className="h-3 bg-white rounded-full overflow-hidden border border-[var(--theme-dashboard-card-border)]">
               <div
                 className="h-full rounded-full transition-all duration-500 bg-emerald-400"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
             <div className="flex justify-between mt-1">
-              <span className="text-[10px] text-gray-400 font-mono">
+              <span className="text-[10px] text-[var(--theme-dashboard-text-muted)] font-mono">
                 {totalLessons - completedLessons} 레슨 남음
               </span>
               <span className="text-[10px] text-emerald-500 font-mono font-bold">
@@ -216,17 +216,17 @@ export function ChapterLessonsPage() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="text-6xl mb-4">📝</div>
-            <h2 className="text-2xl font-bold text-[#6b5a4a] mb-2">
+            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">
               레슨 준비 중
             </h2>
-            <p className="text-[#937b5d]">
+            <p className="text-[var(--theme-dashboard-text-muted)]">
               아직 학습 콘텐츠가 준비되지 않았습니다.
             </p>
           </div>
         </div>
       ) : isMobile ? (
         // 모바일: 리스트 형식
-        <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] overflow-hidden">
           {chapter.lessons.map((lesson, index) => {
             const progress = progressMap.get(lesson.id);
             const isCompleted = progress?.status === 'completed';
@@ -235,23 +235,23 @@ export function ChapterLessonsPage() {
               <div key={lesson.id}>
                 <button
                   onClick={() => navigate(`/courses/${lang}/${chapterId}/${lesson.id}`)}
-                  className="w-full p-4 text-left transition-colors hover:bg-[#fffbf5]"
+                  className="w-full p-4 text-left transition-colors hover:bg-[var(--theme-layout-top-bar-button-hover)]"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-base font-semibold text-[#333] flex items-center gap-2 flex-1">
                       {isCompleted ? (
                         <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                       ) : (
-                        <Circle className="w-5 h-5 text-gray-300 flex-shrink-0" />
+                        <Circle className="w-5 h-5 text-[var(--theme-dashboard-text-muted)] flex-shrink-0" />
                       )}
-                      <span className={isCompleted ? 'text-gray-400 line-through' : ''}>
+                      <span className={isCompleted ? 'text-[var(--theme-dashboard-text-muted)] line-through' : ''}>
                         {lesson.title}
                       </span>
                     </h3>
                   </div>
                 </button>
                 {index < chapter.lessons.length - 1 && (
-                  <div className="border-b border-[#e5d5c7]" />
+                  <div className="border-b border-[var(--theme-dashboard-card-border)]" />
                 )}
               </div>
             );

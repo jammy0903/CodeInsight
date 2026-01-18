@@ -20,13 +20,13 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
   // 로딩 상태
   if (loading) {
     return variant === 'compact' ? (
-      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 animate-pulse">
-        <div className="w-4 h-4 bg-gray-200 rounded" />
-        <div className="w-4 h-3 bg-gray-200 rounded" />
+      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-[var(--theme-dashboard-section-header-bg)] animate-pulse">
+        <div className="w-4 h-4 bg-[var(--theme-dashboard-progress-bg)] rounded" />
+        <div className="w-4 h-3 bg-[var(--theme-dashboard-progress-bg)] rounded" />
       </div>
     ) : (
       <div className="p-4 rounded-xl bg-white/80 backdrop-blur border animate-pulse">
-        <div className="h-16 bg-gray-100 rounded" />
+        <div className="h-16 bg-[var(--theme-dashboard-section-header-bg)] rounded" />
       </div>
     );
   }
@@ -34,12 +34,12 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
   // 스트릭 없음 (로그인 안 됨 또는 아직 시작 안 함)
   if (!streak) {
     return variant === 'compact' ? null : (
-      <div className="p-4 rounded-xl bg-white/80 backdrop-blur border border-gray-200">
-        <div className="flex items-center gap-3 text-gray-500">
+      <div className="p-4 rounded-xl bg-white/80 backdrop-blur border border-[var(--theme-dashboard-card-border)]">
+        <div className="flex items-center gap-3 text-[var(--theme-dashboard-text-muted)]">
           <Flame className="w-6 h-6" />
           <div>
             <p className="font-medium">스트릭 시작하기</p>
-            <p className="text-sm text-gray-400">첫 레슨을 완료하면 스트릭이 시작됩니다</p>
+            <p className="text-sm text-[var(--theme-dashboard-text-muted)]">첫 레슨을 완료하면 스트릭이 시작됩니다</p>
           </div>
         </div>
       </div>
@@ -115,8 +115,8 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
             />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800">연속 학습</h3>
-            <p className="text-xs text-gray-500">
+            <h3 className="font-semibold text-[var(--theme-dashboard-title)]">연속 학습</h3>
+            <p className="text-xs text-[var(--theme-dashboard-text-muted)]">
               {isActiveToday ? '오늘도 완료!' : streakAtRisk ? '오늘 학습하면 유지!' : '계속 이어가요!'}
             </p>
           </div>
@@ -149,30 +149,30 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
           >
             {currentStreak}
           </div>
-          <div className="text-xs text-gray-500">현재 스트릭</div>
+          <div className="text-xs text-[var(--theme-dashboard-text-muted)]">현재 스트릭</div>
         </div>
 
         {/* Divider */}
-        <div className="w-px h-10 bg-gray-200" />
+        <div className="w-px h-10 bg-[var(--theme-dashboard-progress-bg)]" />
 
         {/* Longest Streak */}
         <div className="text-center">
-          <div className="flex items-center gap-1 text-2xl font-bold text-gray-700">
+          <div className="flex items-center gap-1 text-2xl font-bold text-[var(--theme-dashboard-title)]">
             <Trophy className="w-5 h-5 text-yellow-500" />
             {longestStreak}
           </div>
-          <div className="text-xs text-gray-500">최장 기록</div>
+          <div className="text-xs text-[var(--theme-dashboard-text-muted)]">최장 기록</div>
         </div>
       </div>
 
       {/* Milestone progress (7일 마일스톤) */}
       {currentStreak > 0 && currentStreak < 7 && (
-        <div className="mt-4 pt-3 border-t border-gray-100">
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+        <div className="mt-4 pt-3 border-t border-[var(--theme-dashboard-card-border)]">
+          <div className="flex items-center justify-between text-xs text-[var(--theme-dashboard-text-muted)] mb-1">
             <span>7일 마일스톤</span>
             <span>{currentStreak}/7</span>
           </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-orange-400 to-orange-500 transition-all duration-500"
               style={{ width: `${(currentStreak / 7) * 100}%` }}
@@ -183,7 +183,7 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
 
       {/* 7일 달성 축하 */}
       {currentStreak >= 7 && (
-        <div className="mt-4 pt-3 border-t border-gray-100">
+        <div className="mt-4 pt-3 border-t border-[var(--theme-dashboard-card-border)]">
           <div className="flex items-center gap-2 text-sm text-green-600">
             <Trophy className="w-4 h-4 text-yellow-500" />
             <span className="font-medium">7일 마일스톤 달성!</span>
