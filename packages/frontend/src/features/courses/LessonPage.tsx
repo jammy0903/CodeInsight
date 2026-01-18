@@ -639,13 +639,16 @@ export function LessonPage() {
         <div className="flex flex-col md:flex-row gap-4 items-start pb-16">
           {/* 왼쪽: 코드 + 설명 (모바일: 100%, 데스크톱: 50%) */}
           {(() => {
-            // 코드 줄 수 계산 (10줄 기준 - 모바일/데스크톱 통일)
+            // 코드 줄 수 계산
             const lineCount = code.split('\n').length;
             const LINE_HEIGHT = 20; // Monaco Editor 기본 줄 높이
             const MAX_VISIBLE_LINES = 10;
-            const visibleLines = Math.min(lineCount, MAX_VISIBLE_LINES);
+            // 설명창 접혔을 때: 모든 줄 표시, 펼쳤을 때: 10줄 제한
+            const visibleLines = isExplanationCollapsed
+              ? lineCount  // 모든 줄 보여주기
+              : Math.min(lineCount, MAX_VISIBLE_LINES);
             const codeEditorHeight = visibleLines * LINE_HEIGHT;
-            const hasScroll = lineCount > MAX_VISIBLE_LINES;
+            const hasScroll = !isExplanationCollapsed && lineCount > MAX_VISIBLE_LINES;
             // 7줄 이상일 때만 접기 버튼 표시 (빈 공간 방지)
             const canCollapse = lineCount > 6;
 
@@ -670,13 +673,11 @@ export function LessonPage() {
                   에디터
                 </div>
 
-                {/* 코드 에디터 (접혔을 때: flex-1로 확장, 펼쳤을 때: 동적 높이) */}
+                {/* 코드 에디터 (설명창 접힘 상태에 따라 높이 조절) */}
                 <div
-                  className={`${isExplanationCollapsed ? 'flex-1' : ''} ${hasScroll ? 'overflow-y-auto' : ''}`}
+                  className={hasScroll ? 'overflow-y-auto' : ''}
                   style={{
-                    ...(isExplanationCollapsed
-                      ? { minHeight: `${codeEditorHeight}px` } // 접혔을 때: 최소 높이만, flex-1로 확장
-                      : { height: `${codeEditorHeight}px`, minHeight: `${codeEditorHeight}px` }), // 펼쳤을 때: 고정 높이
+                    height: `${codeEditorHeight}px`,
                     borderBottom: '1px solid var(--theme-lesson-panel-border)',
                   }}
                 >
