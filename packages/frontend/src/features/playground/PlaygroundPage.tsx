@@ -306,7 +306,7 @@ export function PlaygroundPage() {
           </div>
 
           {/* Tab Content */}
-          <div style={{ flex: 1, padding: '8px', minHeight: '200px' }}>
+          <div style={{ flex: 1, padding: '8px', minHeight: '200px', overflow: 'auto' }}>
             {error ? (
               <div style={{ padding: '10px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '6px' }}>
                 <p style={{ fontSize: '12px', color: colors.errorText }}>{error}</p>
@@ -586,7 +586,7 @@ export function PlaygroundPage() {
           </div>
 
           {/* Tab Content */}
-          <div style={{ minHeight: '400px', padding: '16px' }}>
+          <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
             {error ? (
               <div style={{ padding: '16px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
                 <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>

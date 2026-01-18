@@ -114,7 +114,7 @@ export const FlowVisualizer = memo(function FlowVisualizer({
 
   return (
     <div
-      className={`flow-visualizer w-full h-full overflow-auto p-4 ${className}`}
+      className={`flow-visualizer w-full min-h-full p-4 ${className}`}
       style={{ backgroundColor: canvasStyle.background }}
     >
       {/* 프레임들 (콜스택 역순 - 최근 호출이 위) */}
