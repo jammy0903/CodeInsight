@@ -10,6 +10,7 @@ import { BarChart3, BookOpen, CheckCircle, PlayCircle, Loader2 } from 'lucide-re
 import { useStore } from '@/stores/store';
 import { getUserProgress } from '@/services/courses';
 import { AnalyticsSection } from './components/AnalyticsSection';
+import { StreakCard, useStreak } from '@/features/gamification';
 import type { UserProgress } from '@/types';
 
 export function DashboardPage() {
@@ -17,6 +18,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
+  const { streak, loading: streakLoading } = useStreak();
 
   useEffect(() => {
     async function fetchProgress() {
@@ -75,9 +77,14 @@ export function DashboardPage() {
     <div className="min-h-screen bg-[#fffbf5] p-3 sm:p-6">
       <div className="max-w-4xl mx-auto">
         {/* 헤더 - 반응형 */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-8">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
           <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-[#a08060]" />
           <h1 className="text-xl sm:text-2xl font-bold text-[#6b5a4a]">나의 현황</h1>
+        </div>
+
+        {/* 스트릭 카드 */}
+        <div className="mb-4 sm:mb-6">
+          <StreakCard streak={streak} variant="full" loading={streakLoading} />
         </div>
 
         {/* 요약 카드 - 반응형 */}

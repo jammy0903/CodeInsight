@@ -8,6 +8,7 @@
 
 import { prisma } from '../../config/database';
 import { randomUUID } from 'crypto';
+import * as streakService from '../gamification/streak.service';
 
 // =============================================
 // Language
@@ -196,7 +197,7 @@ export async function updateProgress(
 ) {
   const now = new Date();
 
-  return prisma.userProgress.upsert({
+  const progress = await prisma.userProgress.upsert({
     where: {
       userId_lessonId: { userId, lessonId },
     },
@@ -218,6 +219,18 @@ export async function updateProgress(
       completedAt: data.status === 'completed' ? now : undefined,
     },
   });
+
+  // 레슨 완료 시 스트릭 업데이트
+  if (data.status === 'completed') {
+    try {
+      await streakService.updateStreak(userId);
+    } catch (error) {
+      // 스트릭 업데이트 실패해도 진행 상태는 저장됨 (비크리티컬)
+      console.error('Failed to update streak:', error);
+    }
+  }
+
+  return progress;
 }
 
 // =============================================

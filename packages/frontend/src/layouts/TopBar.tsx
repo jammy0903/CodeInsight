@@ -7,21 +7,18 @@ import { motion } from 'framer-motion';
 import { Code2, Sparkles, Menu } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { useThemeStore } from '@/stores/themeStore';
-import { themes } from '@/config/themes';
+import { StreakCard, useStreak } from '@/features/gamification';
 
 export function TopBar() {
-  const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle } = useStore();
-  const currentTheme = useThemeStore((s) => s.theme);
-  const layoutColors = themes[currentTheme].layout;
+  const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle, appUser } = useStore();
+  const { streak, loading: streakLoading } = useStreak();
 
   return (
     <header
       className="shrink-0 backdrop-blur-xl overflow-visible shadow-sm"
       style={{
-        background: layoutColors.topBarBg,
-        borderBottom: `1px solid ${layoutColors.topBarBorder}`,
+        background: 'var(--theme-layout-top-bar-bg)',
+        borderBottom: '1px solid var(--theme-layout-top-bar-border)',
       }}
     >
       {/* Row 1: 3분할 레이아웃 (왼쪽: 로고, 중앙: 제목, 오른쪽: 액션) */}
@@ -31,13 +28,10 @@ export function TopBar() {
           {/* Hamburger - 항상 표시 */}
           <button
             onClick={toggleSidebar}
-            className="p-1.5 rounded-md transition-colors shrink-0"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = layoutColors.topBarButtonBg}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            className="p-1.5 rounded-md transition-colors shrink-0 hover:bg-[var(--theme-layout-top-bar-button-hover)]"
             aria-label="메뉴 열기"
           >
-            <Menu className="w-6 h-6" style={{ color: layoutColors.topBarTextMuted }} />
+            <Menu className="w-6 h-6" style={{ color: 'var(--theme-layout-top-bar-text-muted)' }} />
           </button>
 
           {/* Logo Area - 작게 */}
@@ -53,7 +47,7 @@ export function TopBar() {
                 whileHover={{ rotate: 180 }}
                 transition={{ type: 'spring', stiffness: 200 }}
               >
-                <Code2 className="h-5 w-5" style={{ color: currentTheme === 'dark' ? '#60a5fa' : '#a855f7' }} />
+                <Code2 className="h-5 w-5" style={{ color: 'var(--theme-dashboard-accent)' }} />
                 <motion.div
                   className="absolute -top-0.5 -right-0.5"
                   animate={{
@@ -66,10 +60,10 @@ export function TopBar() {
                     ease: 'linear',
                   }}
                 >
-                  <Sparkles className="h-3 w-3" style={{ color: currentTheme === 'dark' ? '#fbbf24' : '#f97316' }} />
+                  <Sparkles className="h-3 w-3" style={{ color: 'var(--theme-layout-top-bar-text-muted)' }} />
                 </motion.div>
               </motion.div>
-              <h1 className="text-sm font-bold" style={{ color: layoutColors.topBarText }}>
+              <h1 className="hidden md:block text-sm font-bold" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
                 CodeInsight
               </h1>
             </motion.div>
@@ -79,21 +73,25 @@ export function TopBar() {
         {/* Center: 페이지 제목 (정중앙) */}
         {pageTitle && (
           <div className="flex-1 flex flex-col items-center justify-center px-4">
-            <h2 className="text-xl font-bold" style={{ color: layoutColors.topBarText }}>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
               {pageTitle}
             </h2>
             {pageSubtitle && (
-              <p className="text-xs" style={{ color: layoutColors.topBarTextMuted }}>
+              <p className="text-xs" style={{ color: 'var(--theme-layout-top-bar-text-muted)' }}>
                 {pageSubtitle}
               </p>
             )}
           </div>
         )}
 
-        {/* Right: Actions Area - 테마 토글 */}
+        {/* Right: Actions Area - 스트릭 표시 */}
         <div className="flex items-center gap-3 shrink-0">
-          <ThemeToggle />
-          {/* 프로필/로그인은 사이드바에서만 표시 */}
+          {/* 로그인 상태일 때 스트릭 표시 */}
+          {appUser && (
+            <Link to="/dashboard" title="나의 현황 보기">
+              <StreakCard streak={streak} variant="compact" loading={streakLoading} />
+            </Link>
+          )}
         </div>
       </div>
     </header>

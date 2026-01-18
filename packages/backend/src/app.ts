@@ -16,6 +16,7 @@ import { aiRoutes } from './modules/ai/routes';
 import { courseRoutes } from './modules/courses/routes';
 import { analyticsRoutes } from './modules/analytics/routes';
 import { notesRoutes } from './modules/notes/routes';
+import { gamificationRoutes } from './modules/gamification';
 import adminRoutes from './modules/admin/admin.routes';
 import { lessonContentLoader } from './services/lessonContentLoader';
 
@@ -60,6 +61,7 @@ app.use('/api/v1/ai', aiRateLimit, aiRoutes);
 app.use('/api/v1/courses', rateLimit, courseRoutes);
 app.use('/api/v1/analytics', rateLimit, analyticsRoutes);
 app.use('/api/v1/notes', rateLimit, notesRoutes);
+app.use('/api/v1/gamification', rateLimit, gamificationRoutes);
 app.use('/api/v1/admin', rateLimit, adminRoutes);
 
 // =============================================
@@ -94,6 +96,9 @@ app.use('/api/notes', (req, res) => {
 });
 app.use('/api/admin', (req, res) => {
   res.redirect(301, `/api/v1/admin${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/gamification', (req, res) => {
+  res.redirect(301, `/api/v1/gamification${req.path === '/' ? '' : req.path}`);
 });
 
 // Swagger UI

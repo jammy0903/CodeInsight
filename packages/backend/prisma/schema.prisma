@@ -18,10 +18,16 @@ model User {
   submissions   Submission[]
   progress      UserProgress[]
   // 분석 리포트 관련
-  activities    LessonActivity[]
-  chatHistories ChatHistory[]
-  quizAttempts  QuizAttempt[]
-  notes         UserNote[]
+  activities      LessonActivity[]
+  chatHistories   ChatHistory[]
+  quizAttempts    QuizAttempt[]
+  notes           UserNote[]
+  // 학습 분석 확장
+  profile         UserProfile?
+  sessionContexts SessionContext[]
+  stepActivities  StepActivity[]
+  // 게이미피케이션
+  streak          UserStreak?
 
   @@map("users")
 }
@@ -142,9 +148,10 @@ model Lesson {
   quizzes       Quiz[]
   progress      UserProgress[]
   // 분석 리포트 관련
-  activities    LessonActivity[]
-  chatHistories ChatHistory[]
-  notes         UserNote[]
+  activities     LessonActivity[]
+  chatHistories  ChatHistory[]
+  notes          UserNote[]
+  stepActivities StepActivity[]
 
   @@index([chapterId, order])
   @@map("lessons")
@@ -216,8 +223,11 @@ model LessonActivity {
   duration  Int?      // 초 단위 (계산된 값, 빠른 집계용)
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson          Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  // 학습 분석 확장
+  sessionContexts SessionContext[]
+  stepActivities  StepActivity[]
 
   @@index([userId, startedAt]) // 사용자별 시간순 조회
   @@index([lessonId])          // 레슨별 통계
@@ -286,4 +296,106 @@ model UserNote {
   @@index([userId, isFromWrong]) // 오답 노트만 조회
   @@index([concept])             // 전체 사용자 취약 개념 통계
   @@map("user_notes")
+}
+
+// ============================================
+// 학습 분석 리포트 확장 모델 (2026-01-18 추가)
+// ============================================
+
+// 사용자 프로필 (온보딩 설문)
+model UserProfile {
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String   @unique @map("user_id") @db.Uuid
+  // 온보딩 설문 결과
+  ageGroup            String?  @map("age_group") @db.VarChar(20)     // "10s", "20s", "30s", "40s+"
+  occupation          String?  @db.VarChar(30)                       // "student_middle", "student_high", "student_univ", "job_seeker", "worker", "other"
+  programmingExp      String?  @map("programming_exp") @db.VarChar(20) // "none", "less_1y", "1_3y", "3y_plus"
+  learningGoal        String?  @map("learning_goal") @db.VarChar(30)   // "basics", "job_prep", "skill_up", "curiosity"
+  // 메타
+  onboardingCompleted Boolean  @default(false) @map("onboarding_completed")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// 세션 컨텍스트 (자동 수집)
+model SessionContext {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  lessonActivityId String?  @map("lesson_activity_id") @db.Uuid // LessonActivity와 연결 (nullable: 레슨 외 활동)
+  // 디바이스 정보
+  screenWidth      Int?     @map("screen_width")
+  screenHeight     Int?     @map("screen_height")
+  orientation      String?  @db.VarChar(20)      // "portrait", "landscape"
+  inputMethod      String?  @map("input_method") @db.VarChar(10) // "touch", "mouse"
+  userAgent        String?  @map("user_agent") @db.VarChar(500)
+  language         String?  @db.VarChar(10)      // "ko", "en", etc.
+  // 네트워크 정보
+  connectionType   String?  @map("connection_type") @db.VarChar(20) // "4g", "wifi", etc.
+  effectiveType    String?  @map("effective_type") @db.VarChar(10)  // "slow-2g", "2g", "3g", "4g"
+  // 시간 컨텍스트
+  localHour        Int?     @map("local_hour")   // 0-23
+  localWeekday     Int?     @map("local_weekday") // 0-6 (일-토)
+  timezone         String?  @db.VarChar(50)      // "Asia/Seoul"
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonActivity LessonActivity? @relation(fields: [lessonActivityId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([localHour])         // 시간대별 학습 패턴
+  @@index([localWeekday])      // 요일별 학습 패턴
+  @@map("session_contexts")
+}
+
+// 스텝별 상세 행동 (Phase 0-2)
+model StepActivity {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  lessonActivityId String   @map("lesson_activity_id") @db.Uuid
+  lessonId         String   @map("lesson_id")
+  stepIndex        Int      @map("step_index")           // 0-based 스텝 인덱스
+  // Phase 0 (필수)
+  duration         Int?                                   // 체류 시간 (초)
+  wentBack         Boolean  @default(false) @map("went_back") // 이 스텝에서 뒤로 갔는지
+  // Phase 1 (권장) - 시각화
+  visHoverCount    Int?     @map("vis_hover_count")      // 메모리 블록 호버 횟수
+  visClickCount    Int?     @map("vis_click_count")      // 메모리 블록 클릭 횟수
+  // Phase 1 (권장) - AI
+  aiQuestionCount  Int?     @map("ai_question_count")    // 이 스텝에서 AI 질문 횟수
+  // Phase 2 (심화)
+  codeSelections   Int?     @map("code_selections")      // 코드 선택 횟수
+  scrollEvents     Int?     @map("scroll_events")        // 스크롤 이벤트 횟수
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonActivity LessonActivity @relation(fields: [lessonActivityId], references: [id], onDelete: Cascade)
+  lesson         Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonActivityId, stepIndex]) // 한 활동 내 스텝은 유니크
+  @@index([userId, lessonId])
+  @@index([lessonId, stepIndex])          // 스텝별 평균 시간 등 통계
+  @@map("step_activities")
+}
+
+// ============================================
+// 게이미피케이션 모델 (2026-01-18 추가)
+// ============================================
+
+// 연속 학습 스트릭
+model UserStreak {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @unique @map("user_id") @db.Uuid
+  currentStreak Int       @default(0) @map("current_streak")  // 현재 연속 일수
+  longestStreak Int       @default(0) @map("longest_streak")  // 최장 연속 기록
+  lastActiveAt  DateTime? @map("last_active_at") @db.Date     // 마지막 활동일 (날짜만)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_streaks")
 }
