@@ -9,10 +9,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ChevronRight, Check, Loader2 } from 'lucide-react';
+import { User, ChevronRight, Check, Loader2, Edit2, X } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { PixelAvatar } from '@/components/PixelAvatar';
 import { getProfile, updateProfile, type UserProfile } from '@/services/analytics';
+import { updateNickname, checkNickname } from '@/services/user';
 import {
   PROFILE_QUESTIONS,
   getProfileLabel,
@@ -21,7 +22,7 @@ import {
 } from '@/constants/profileQuestions';
 
 export function ProfilePage() {
-  const { appUser, firebaseUser } = useStore();
+  const { appUser, firebaseUser, setAppUser } = useStore();
 
   // 프로필 데이터 상태
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -30,6 +31,13 @@ export function ProfilePage() {
   // 수정 모드 상태
   const [editingKey, setEditingKey] = useState<ProfileQuestionKey | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // 닉네임 수정 상태
+  const [isEditingNickname, setIsEditingNickname] = useState(false);
+  const [newNickname, setNewNickname] = useState('');
+  const [nicknameError, setNicknameError] = useState('');
+  const [isCheckingNickname, setIsCheckingNickname] = useState(false);
+  const [isSavingNickname, setIsSavingNickname] = useState(false);
 
   // 프로필 불러오기
   useEffect(() => {
@@ -62,6 +70,87 @@ export function ProfilePage() {
     }
   };
 
+  // 닉네임 수정 시작
+  const handleStartEditNickname = () => {
+    setNewNickname(appUser?.nickname || '');
+    setNicknameError('');
+    setIsEditingNickname(true);
+  };
+
+  // 닉네임 수정 취소
+  const handleCancelEditNickname = () => {
+    setIsEditingNickname(false);
+    setNewNickname('');
+    setNicknameError('');
+  };
+
+  // 닉네임 입력 변경 (실시간 검증)
+  const handleNicknameChange = async (value: string) => {
+    setNewNickname(value);
+    setNicknameError('');
+
+    // 빈 값
+    if (!value.trim()) {
+      setNicknameError('닉네임을 입력해주세요');
+      return;
+    }
+
+    // 현재 닉네임과 같으면 검증 스킵
+    if (value.trim().toLowerCase() === appUser?.nickname) {
+      return;
+    }
+
+    // 길이 검증 (2~20자)
+    if (value.length < 2 || value.length > 20) {
+      setNicknameError('닉네임은 2~20자여야 합니다');
+      return;
+    }
+
+    // 형식 검증 (영문, 숫자, 한글, 언더스코어)
+    const regex = /^[a-zA-Z0-9가-힣_]+$/;
+    if (!regex.test(value)) {
+      setNicknameError('영문, 숫자, 한글, 언더스코어(_)만 사용 가능합니다');
+      return;
+    }
+
+    // 중복 체크 (debounce 없이 즉시)
+    setIsCheckingNickname(true);
+    try {
+      const result = await checkNickname(value);
+      if (!result.available) {
+        setNicknameError(result.message || '이미 사용 중인 닉네임입니다');
+      }
+    } catch (error) {
+      setNicknameError('닉네임 확인 중 오류가 발생했습니다');
+    } finally {
+      setIsCheckingNickname(false);
+    }
+  };
+
+  // 닉네임 저장
+  const handleSaveNickname = async () => {
+    if (nicknameError || !newNickname.trim()) {
+      return;
+    }
+
+    // 현재 닉네임과 같으면 그냥 닫기
+    if (newNickname.trim().toLowerCase() === appUser?.nickname) {
+      handleCancelEditNickname();
+      return;
+    }
+
+    setIsSavingNickname(true);
+    try {
+      const updatedUser = await updateNickname(newNickname);
+      setAppUser(updatedUser); // Zustand store 업데이트
+      handleCancelEditNickname();
+    } catch (error: any) {
+      setNicknameError(error.message || '닉네임 변경에 실패했습니다');
+    } finally {
+      setIsSavingNickname(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#fffbf5] p-6">
       <div className="max-w-2xl mx-auto">
@@ -75,10 +164,68 @@ export function ProfilePage() {
           {appUser ? (
             <div className="flex flex-col items-center gap-4">
               <PixelAvatar seed={appUser.nickname} size={80} />
-              <div className="text-center">
-                <h2 className="text-xl font-bold text-[#6b5a4a]">
-                  {appUser.nickname}
-                </h2>
+              <div className="text-center w-full">
+                {/* 닉네임 표시/수정 */}
+                {!isEditingNickname ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <h2 className="text-xl font-bold text-[#6b5a4a]">
+                      {appUser.nickname}
+                    </h2>
+                    <button
+                      onClick={handleStartEditNickname}
+                      className="p-1.5 rounded-lg hover:bg-[#fff8f0] transition-colors text-[#a08060]"
+                      title="닉네임 변경"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="max-w-sm mx-auto">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={newNickname}
+                        onChange={(e) => handleNicknameChange(e.target.value)}
+                        placeholder="새 닉네임"
+                        className="flex-1 px-3 py-2 border-2 border-orange-200 rounded-lg focus:border-orange-400 focus:outline-none text-sm"
+                        disabled={isSavingNickname}
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSaveNickname}
+                        disabled={isSavingNickname || !!nicknameError || !newNickname.trim()}
+                        className="p-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {isSavingNickname ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Check className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={handleCancelEditNickname}
+                        disabled={isSavingNickname}
+                        className="p-2 rounded-lg hover:bg-[#fff8f0] transition-colors text-[#937b5d]"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {/* 에러/상태 메시지 */}
+                    {nicknameError && (
+                      <p className="text-xs text-red-500 mt-2">{nicknameError}</p>
+                    )}
+                    {isCheckingNickname && (
+                      <p className="text-xs text-[#937b5d] mt-2 flex items-center justify-center gap-1">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        확인 중...
+                      </p>
+                    )}
+                    {!nicknameError && !isCheckingNickname && newNickname && newNickname !== appUser.nickname && (
+                      <p className="text-xs text-green-600 mt-2">✓ 사용 가능한 닉네임입니다</p>
+                    )}
+                  </div>
+                )}
+
                 <p className="text-sm text-[#937b5d] mt-1">
                   {appUser.oauthAccounts[0]?.email || firebaseUser?.email}
                 </p>
