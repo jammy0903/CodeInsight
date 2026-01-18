@@ -27,9 +27,9 @@ export function LanguageTabs({ isMobile = false }: LanguageTabsProps) {
         alignItems: 'center',
         gap: '2px',
         padding: '2px',
-        backgroundColor: '#f3f4f6',
+        backgroundColor: 'var(--theme-memory-reset-bg)',
         borderRadius: isMobile ? '4px' : '6px',
-        border: '1px solid #e5e7eb',
+        border: '1px solid var(--theme-memory-reset-border)',
       }}
     >
       {LANGUAGES.map((lang) => {
@@ -49,8 +49,8 @@ export function LanguageTabs({ isMobile = false }: LanguageTabsProps) {
               border: 'none',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              backgroundColor: isActive ? '#ffffff' : 'transparent',
-              color: isActive ? lang.color : '#9ca3af',
+              backgroundColor: isActive ? 'var(--theme-memory-lang-active-bg)' : 'var(--theme-memory-lang-inactive-bg)',
+              color: isActive ? 'var(--theme-memory-lang-active-text)' : 'var(--theme-memory-lang-inactive-text)',
               boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
             }}
           >

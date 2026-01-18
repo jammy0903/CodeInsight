@@ -12,6 +12,7 @@
 
 import { cn } from '@/lib/utils';
 import { useThemeStore } from '@/stores/themeStore';
+import { codeViewerColors } from '@/config/themes';
 import type { CodeSelection } from '../../types';
 
 interface CodeViewerProps {
@@ -26,9 +27,9 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
   // 외부 컨테이너에서 높이 제어 (10줄 고정 + 스크롤)
   const lines = code.split('\n');
 
-  // 테마에 따라 라이트/다크 모드 결정
+  // 현재 테마의 색상 가져오기
   const currentTheme = useThemeStore((s) => s.theme);
-  const isDark = currentTheme === 'dark';
+  const colors = codeViewerColors[currentTheme];
 
   /**
    * 텍스트 선택 핸들러
@@ -55,30 +56,29 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
   };
 
   return (
-    <div className={cn(
-      'font-mono',
-      // 반응형 폰트 크기: 모바일 xs → sm → md → lg 점점 커짐
-      'text-[10px] sm:text-xs md:text-sm lg:text-base',
-      isDark ? 'bg-zinc-900' : 'bg-white'
-    )}>
+    <div
+      className="font-mono text-[10px] sm:text-xs md:text-sm lg:text-base"
+      style={{ backgroundColor: colors.bg }}
+    >
       <div className="flex" onMouseUp={handleTextSelect}>
         {/* Line numbers - user-select: none to prevent selection */}
         <div
-          className={cn(
-            'flex-shrink-0 py-2 sm:py-3 px-1 sm:px-2 text-right select-none border-r',
-            isDark
-              ? 'text-zinc-500 border-zinc-700 bg-zinc-800'
-              : 'text-gray-400 border-gray-200 bg-gray-50'
-          )}
-          style={{ userSelect: 'none' }}
+          className="flex-shrink-0 py-2 sm:py-3 px-1 sm:px-2 text-right select-none border-r"
+          style={{
+            userSelect: 'none',
+            backgroundColor: colors.lineNumberBg,
+            borderColor: colors.lineNumberBorder,
+            color: colors.lineNumberText,
+          }}
         >
           {lines.map((_, idx) => (
             <div
               key={idx}
-              className={cn(
-                'px-1 sm:px-2 leading-5 sm:leading-6',
-                highlightLine === idx + 1 && (isDark ? 'text-blue-400 font-bold' : 'text-green-600 font-bold')
-              )}
+              className="px-1 sm:px-2 leading-5 sm:leading-6"
+              style={{
+                color: highlightLine === idx + 1 ? colors.lineNumberActive : undefined,
+                fontWeight: highlightLine === idx + 1 ? 'bold' : undefined,
+              }}
             >
               {idx + 1}
             </div>
@@ -87,21 +87,29 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
 
         {/* Code */}
         <div className="flex-1 py-2 sm:py-3 px-2 sm:px-4 overflow-x-auto">
-          {lines.map((line, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                'leading-5 sm:leading-6 whitespace-pre',
-                highlightLine === idx + 1 && (
-                  isDark
-                    ? 'bg-blue-900/40 -mx-2 sm:-mx-4 px-2 sm:px-4 border-l-2 border-blue-500'
-                    : 'bg-green-100 -mx-2 sm:-mx-4 px-2 sm:px-4 border-l-2 border-green-500'
-                )
-              )}
-            >
-              <HighlightedLine line={line} isLight={!isDark} />
-            </div>
-          ))}
+          {lines.map((line, idx) => {
+            const isHighlighted = highlightLine === idx + 1;
+            return (
+              <div
+                key={idx}
+                className="leading-5 sm:leading-6 whitespace-pre"
+                style={
+                  isHighlighted
+                    ? {
+                        backgroundColor: colors.highlightBg,
+                        marginLeft: '-0.5rem',
+                        marginRight: '-1rem',
+                        paddingLeft: '0.5rem',
+                        paddingRight: '1rem',
+                        borderLeft: `2px solid ${colors.highlightBorder}`,
+                      }
+                    : undefined
+                }
+              >
+                <HighlightedLine line={line} colors={colors} />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -110,37 +118,22 @@ export function CodeViewer({ code, highlightLine, onSelectionChange }: CodeViewe
 
 /**
  * Simple C syntax highlighting
- * isLight: true for light theme (LessonPage), false for dark theme
+ * colors: 현재 테마의 색상 객체
  */
-function HighlightedLine({ line, isLight = false }: { line: string; isLight?: boolean }) {
-  // Light theme colors (for white background)
-  const lightPatterns: Array<{ regex: RegExp; className: string }> = [
-    { regex: /\/\/.*$/, className: 'text-gray-500' },           // Comments
-    { regex: /"[^"]*"/, className: 'text-green-600' },          // Strings
-    { regex: /\b\d+\b/, className: 'text-purple-600' },         // Numbers
+function HighlightedLine({ line, colors }: { line: string; colors: import('@/config/themes').CodeViewerColors }) {
+  // 구문 패턴 정의
+  const patterns: Array<{ regex: RegExp; color: string; fontWeight?: string }> = [
+    { regex: /\/\/.*$/, color: colors.comment },                // Comments
+    { regex: /"[^"]*"/, color: colors.string },                 // Strings
+    { regex: /\b\d+\b/, color: colors.number },                 // Numbers
     {
       regex: /\b(int|char|void|return|if|else|for|while|sizeof|malloc|free|NULL|printf|scanf)\b/,
-      className: 'text-blue-600 font-medium',                   // Keywords
+      color: colors.keyword,
+      fontWeight: '600',                                        // Keywords (bold)
     },
-    { regex: /\b(int|char|void)\s*\*/, className: 'text-cyan-600' }, // Pointer types
-    { regex: /[&*](?=\w)/, className: 'text-orange-500' },      // Operators
+    { regex: /\b(int|char|void)\s*\*/, color: colors.type },   // Pointer types
+    { regex: /[&*](?=\w)/, color: colors.operator },           // Operators
   ];
-
-  // Dark theme colors (for dark background) - kept for reference
-  const darkPatterns: Array<{ regex: RegExp; className: string }> = [
-    { regex: /\/\/.*$/, className: 'text-zinc-500' },
-    { regex: /"[^"]*"/, className: 'text-green-400' },
-    { regex: /\b\d+\b/, className: 'text-purple-400' },
-    {
-      regex: /\b(int|char|void|return|if|else|for|while|sizeof|malloc|free|NULL|printf|scanf)\b/,
-      className: 'text-blue-400',
-    },
-    { regex: /\b(int|char|void)\s*\*/, className: 'text-cyan-400' },
-    { regex: /[&*](?=\w)/, className: 'text-yellow-400' },
-  ];
-
-  const patterns = isLight ? lightPatterns : darkPatterns;
-  const defaultTextClass = isLight ? 'text-gray-800' : 'text-zinc-100';
 
   // Empty line handling
   if (line.trim() === '') {
@@ -155,20 +148,20 @@ function HighlightedLine({ line, isLight = false }: { line: string; isLight?: bo
   while (remaining.length > 0) {
     let matched = false;
 
-    for (const { regex, className } of patterns) {
+    for (const { regex, color, fontWeight } of patterns) {
       const match = remaining.match(regex);
       if (match && match.index !== undefined) {
         // Text before match
         if (match.index > 0) {
           elements.push(
-            <span key={key++} className={defaultTextClass}>
+            <span key={key++} style={{ color: colors.text }}>
               {remaining.slice(0, match.index)}
             </span>
           );
         }
         // Matched text
         elements.push(
-          <span key={key++} className={className}>
+          <span key={key++} style={{ color, fontWeight }}>
             {match[0]}
           </span>
         );
@@ -181,7 +174,7 @@ function HighlightedLine({ line, isLight = false }: { line: string; isLight?: bo
     if (!matched) {
       // No match, advance one character
       elements.push(
-        <span key={key++} className={defaultTextClass}>
+        <span key={key++} style={{ color: colors.text }}>
           {remaining[0]}
         </span>
       );

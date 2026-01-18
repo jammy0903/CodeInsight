@@ -10,11 +10,12 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, User } from 'lucide-react';
+import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, User, TrendingUp } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle, loginWithKakao } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { logger } from '@/utils/logger';
 
 const SIDEBAR_WIDTH = 224; // 14rem
@@ -35,6 +36,7 @@ const NAV_ITEMS: NavItem[] = [
 const AUTH_NAV_ITEMS: NavItem[] = [
   { path: '/quiz', label: '퀴즈', icon: FileQuestion },
   { path: '/dashboard', label: '나의 현황', icon: BarChart3 },
+  { path: '/report', label: '학습 리포트', icon: TrendingUp },
   { path: '/profile', label: '프로필', icon: User },
 ];
 
@@ -83,27 +85,45 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -SIDEBAR_WIDTH }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed left-0 top-0 h-full bg-[#fffbf5] border-r border-[#e5d5c7] shadow-lg z-50 flex flex-col"
-            style={{ width: SIDEBAR_WIDTH }}
+            className="fixed left-0 top-0 h-full border-r shadow-lg z-50 flex flex-col"
+            style={{
+              width: SIDEBAR_WIDTH,
+              backgroundColor: 'var(--theme-sidebar-bg)',
+              borderColor: 'var(--theme-sidebar-border)'
+            }}
           >
             {/* 헤더 */}
-            <div className="p-4 border-b border-[#e5d5c7] flex items-center justify-between bg-[#fffbf5]">
-              <h2 className="text-xl font-bold text-[#6b5a4a]">
+            <div className="p-4 border-b flex items-center justify-between" style={{
+              backgroundColor: 'var(--theme-sidebar-bg)',
+              borderColor: 'var(--theme-sidebar-border)'
+            }}>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--theme-sidebar-title)' }}>
                 CodeInsight
               </h2>
               <motion.button
                 onClick={toggleSidebar}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] hover:border-[#a08060] transition-colors"
+                className="p-2 rounded-lg border transition-colors"
+                style={{
+                  borderColor: 'var(--theme-sidebar-close-btn-border)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-close-btn-hover-bg)';
+                  e.currentTarget.style.borderColor = 'var(--theme-sidebar-close-btn-hover-border)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'var(--theme-sidebar-close-btn-border)';
+                }}
                 aria-label="사이드바 닫기"
               >
-                <X className="w-5 h-5 text-[#937b5d]" />
+                <X className="w-5 h-5" style={{ color: 'var(--theme-sidebar-close-icon)' }} />
               </motion.button>
             </div>
 
             {/* 네비게이션 */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto bg-[#fffbf5]">
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto" style={{ backgroundColor: 'var(--theme-sidebar-bg)' }}>
               {NAV_ITEMS.map((item) => {
                 const isActive = location.pathname === item.path ||
                   (item.path !== '/' && location.pathname.startsWith(item.path));
@@ -122,11 +142,29 @@ export function Sidebar() {
                       className={`
                         flex items-center gap-3 px-4 h-12 rounded-lg
                         border transition-all duration-150
-                        ${isActive
-                          ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
-                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
-                        }
+                        ${isActive ? 'font-semibold' : ''}
                       `}
+                      style={isActive ? {
+                        backgroundColor: 'var(--theme-sidebar-nav-active-bg)',
+                        borderColor: 'var(--theme-sidebar-nav-active-border)',
+                        color: 'var(--theme-sidebar-nav-active-text)'
+                      } : {
+                        backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)',
+                        borderColor: 'var(--theme-sidebar-nav-inactive-border)',
+                        color: 'var(--theme-sidebar-nav-inactive-text)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
+                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
+                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
+                        }
+                      }}
                     >
                       <Icon className="w-5 h-5 shrink-0" />
                       <span className="text-sm">{item.label}</span>
@@ -154,11 +192,29 @@ export function Sidebar() {
                       className={`
                         flex items-center gap-3 px-4 h-12 rounded-lg
                         border transition-all duration-150
-                        ${isActive
-                          ? 'bg-[#a08060] font-semibold border-[#8b6d4f] text-white'
-                          : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#a08060] hover:bg-[#fff8f0]'
-                        }
+                        ${isActive ? 'font-semibold' : ''}
                       `}
+                      style={isActive ? {
+                        backgroundColor: 'var(--theme-sidebar-nav-active-bg)',
+                        borderColor: 'var(--theme-sidebar-nav-active-border)',
+                        color: 'var(--theme-sidebar-nav-active-text)'
+                      } : {
+                        backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)',
+                        borderColor: 'var(--theme-sidebar-nav-inactive-border)',
+                        color: 'var(--theme-sidebar-nav-inactive-text)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
+                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
+                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
+                        }
+                      }}
                     >
                       <Icon className="w-5 h-5 shrink-0" />
                       <span className="text-sm">{item.label}</span>
@@ -180,11 +236,29 @@ export function Sidebar() {
                     className={`
                       flex items-center gap-3 px-4 h-12 rounded-lg
                       border transition-all duration-150
-                      ${location.pathname.startsWith('/admin')
-                        ? 'bg-[#7a9a7a] font-semibold border-[#6a8a6a] text-white'
-                        : 'text-[#6b5a4a] bg-[#fffbf5] border-[#e5d5c7] hover:border-[#7a9a7a] hover:bg-[#f5fff5]'
-                      }
+                      ${location.pathname.startsWith('/admin') ? 'font-semibold' : ''}
                     `}
+                    style={location.pathname.startsWith('/admin') ? {
+                      backgroundColor: 'var(--theme-sidebar-admin-active-bg)',
+                      borderColor: 'var(--theme-sidebar-admin-active-border)',
+                      color: 'var(--theme-sidebar-nav-active-text)'
+                    } : {
+                      backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)',
+                      borderColor: 'var(--theme-sidebar-nav-inactive-border)',
+                      color: 'var(--theme-sidebar-nav-inactive-text)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!location.pathname.startsWith('/admin')) {
+                        e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-admin-inactive-hover-bg)';
+                        e.currentTarget.style.borderColor = 'var(--theme-sidebar-admin-inactive-hover-border)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!location.pathname.startsWith('/admin')) {
+                        e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
+                        e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
+                      }
+                    }}
                   >
                     <Shield className="w-5 h-5 shrink-0" />
                     <span className="text-sm">Admin</span>
@@ -194,7 +268,7 @@ export function Sidebar() {
             </nav>
 
             {/* 프로필 영역 */}
-            <div className="p-4 border-t border-[#e5d5c7]">
+            <div className="p-4 border-t border-t-[var(--theme-sidebar-profile-border)]">
               {firebaseUser ? (
                 <div className="space-y-3">
                   {/* 닉네임 등록 필요 시 */}
@@ -205,32 +279,64 @@ export function Sidebar() {
                       }}
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#a08060] bg-[#a08060]/10 border border-[#a08060] rounded-lg hover:bg-[#a08060]/20 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border rounded-lg transition-colors"
+                      style={{
+                        color: 'var(--theme-sidebar-nickname-btn-text)',
+                        backgroundColor: 'var(--theme-sidebar-nickname-btn-bg)',
+                        borderColor: 'var(--theme-sidebar-nickname-btn-border)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nickname-btn-hover-bg)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nickname-btn-bg)';
+                      }}
                     >
                       <UserPlus className="w-5 h-5" />
                       닉네임 설정하기
                     </motion.button>
                   ) : (
                     <>
+                      {/* 테마 변경 버튼 */}
+                      <div className="flex justify-center">
+                        <ThemeToggle />
+                      </div>
+
                       {/* 등록 완료 상태 - 닉네임 기반 프로필 */}
-                      <div className="flex items-center gap-3 p-3 bg-[#fff8f0] rounded-lg border border-[#e5d5c7]">
+                      <div className="flex items-center gap-3 p-3 rounded-lg border" style={{
+                        backgroundColor: 'var(--theme-sidebar-profile-card-bg)',
+                        borderColor: 'var(--theme-sidebar-profile-card-border)'
+                      }}>
                         <PixelAvatar seed={appUser.nickname} size={40} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-[#6b5a4a] truncate">
+                          <p className="text-sm font-semibold truncate" style={{ color: 'var(--theme-sidebar-nickname-text)' }}>
                             {appUser.nickname}
                           </p>
-                          <p className="text-xs text-[#937b5d] truncate">
+                          <p className="text-xs truncate" style={{ color: 'var(--theme-sidebar-email-text)' }}>
                             {appUser.oauthAccounts[0]?.email || firebaseUser.email}
                           </p>
                         </div>
                       </div>
                     </>
                   )}
+
                   <motion.button
                     onClick={handleSignOut}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#937b5d] border border-[#e5d5c7] rounded-lg hover:border-[#c08080] hover:text-[#c08080] hover:bg-red-50/50 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg transition-colors"
+                    style={{
+                      color: 'var(--theme-sidebar-logout-text)',
+                      borderColor: 'var(--theme-sidebar-logout-border)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--theme-sidebar-logout-hover-border)';
+                      e.currentTarget.style.color = 'var(--theme-sidebar-logout-hover-text)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--theme-sidebar-logout-border)';
+                      e.currentTarget.style.color = 'var(--theme-sidebar-logout-text)';
+                    }}
                   >
                     <LogOut className="w-4 h-4" />
                     로그아웃
@@ -244,7 +350,20 @@ export function Sidebar() {
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#6b5a4a] bg-white border border-[#e5d5c7] rounded-lg hover:border-[#a08060] hover:bg-[#fff8f0] transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border rounded-lg transition-colors"
+                    style={{
+                      color: 'var(--theme-sidebar-login-btn-text)',
+                      backgroundColor: 'var(--theme-sidebar-login-btn-bg)',
+                      borderColor: 'var(--theme-sidebar-login-btn-border)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--theme-sidebar-login-btn-hover-border)';
+                      e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-login-btn-hover-bg)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--theme-sidebar-login-btn-border)';
+                      e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-login-btn-bg)';
+                    }}
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
@@ -273,18 +392,29 @@ export function Sidebar() {
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#3C1E1E] bg-[#FEE500] border border-[#FEE500] rounded-lg hover:bg-[#FDD800] transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border rounded-lg transition-colors"
+                    style={{
+                      color: 'var(--theme-sidebar-kakao-btn-text)',
+                      backgroundColor: 'var(--theme-sidebar-kakao-btn-bg)',
+                      borderColor: 'var(--theme-sidebar-kakao-btn-border)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-kakao-btn-hover-bg)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-kakao-btn-bg)';
+                    }}
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
-                        fill="#3C1E1E"
+                        fill="var(--theme-sidebar-kakao-btn-text)"
                         d="M12 3C6.477 3 2 6.463 2 10.691c0 2.693 1.775 5.063 4.445 6.412-.144.523-.926 3.369-.963 3.592 0 0-.02.166.088.229.108.063.235.015.235.015.31-.043 3.593-2.363 4.159-2.771.339.047.686.071 1.036.071 5.523 0 10-3.463 10-7.548C22 6.463 17.523 3 12 3z"
                       />
                     </svg>
                     카카오 로그인
                   </motion.button>
 
-                  <p className="text-xs text-[#937b5d] text-center pt-1">
+                  <p className="text-xs text-center pt-1" style={{ color: 'var(--theme-sidebar-copyright-text)' }}>
                     © 2026 CodeInsight
                   </p>
                 </div>

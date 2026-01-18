@@ -88,6 +88,22 @@ function handleScanf(
       ? readValues.map((r) => `${r.name} = ${r.value}`).join(', ')
       : '(입력 없음)';
 
+  // Phase 4: scanf 이벤트 (변수 값 변경)
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    for (const r of readValues) {
+      const v = ctx.variables.get(r.name);
+      ctx.addEvent({
+        type: 'variable',
+        action: 'assign',
+        frame: ctx.getCurrentFrame(),
+        name: r.name,
+        varType: v?.type || 'int',
+        value: r.value,
+        address: v?.address,
+      });
+    }
+  }
+
   const explanation = `📥 scanf: 키보드 입력 받기
 
 • 형식: "${format}"
@@ -288,6 +304,15 @@ function handlePrintf(ctx: SimContext, lineNum: number, code: string): Step {
     // 실제 출력값 계산
     actualOutput = formatPrintfOutput(format, args, ctx);
     ctx.appendStdout(actualOutput);
+
+    // Phase 4: printf 출력 이벤트
+    if (ctx.addEvent && actualOutput) {
+      ctx.addEvent({
+        type: 'output',
+        stream: 'stdout',
+        text: actualOutput,
+      });
+    }
 
     if (argsStr) {
       const values = args.map((arg) => {

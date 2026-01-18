@@ -23,6 +23,7 @@ import type { User } from 'firebase/auth';
 import { config } from '@/config';
 import { useStore } from '@/stores/store';
 import { getCurrentUser, registerUser } from './user';
+import { getProfile } from './analytics';
 import { generateTempNickname } from '@/utils/nickname';
 import { logger } from '@/utils/logger';
 
@@ -65,7 +66,7 @@ export function initializeAuthListener(): () => void {
   store.setAuthLoading(true);
 
   return onAuthStateChanged(auth, async (firebaseUser) => {
-    const { setFirebaseUser, setAppUser, setNeedsRegistration, setAuthLoading } =
+    const { setFirebaseUser, setAppUser, setNeedsRegistration, setNeedsOnboarding, setAuthLoading } =
       useStore.getState();
 
     setFirebaseUser(firebaseUser);
@@ -79,6 +80,15 @@ export function initializeAuthListener(): () => void {
           // 이미 등록된 사용자
           setAppUser(appUser);
           setNeedsRegistration(false);
+
+          // 온보딩 완료 여부 확인
+          const profileResult = await getProfile();
+          if (profileResult && !profileResult.onboardingCompleted) {
+            setNeedsOnboarding(true);
+            logger.info('User needs onboarding');
+          } else {
+            setNeedsOnboarding(false);
+          }
         } else {
           // 미등록 사용자 → 임시 닉네임으로 자동 생성
           logger.info('New user detected, auto-registering with temp nickname');
@@ -88,6 +98,7 @@ export function initializeAuthListener(): () => void {
             appUser = await registerUser(tempNickname);
             setAppUser(appUser);
             setNeedsRegistration(false);
+            setNeedsOnboarding(true); // 신규 사용자는 온보딩 필요
             logger.info('Auto-registration successful:', appUser.nickname);
           } catch (regError) {
             // 등록 실패 시 (닉네임 충돌 등) 다시 시도
@@ -96,17 +107,20 @@ export function initializeAuthListener(): () => void {
             appUser = await registerUser(retryNickname);
             setAppUser(appUser);
             setNeedsRegistration(false);
+            setNeedsOnboarding(true); // 신규 사용자는 온보딩 필요
           }
         }
       } catch (error) {
         logger.error('Failed to fetch/register user:', error);
         setAppUser(null);
         setNeedsRegistration(true);
+        setNeedsOnboarding(false);
       }
     } else {
       // 로그아웃 상태
       setAppUser(null);
       setNeedsRegistration(false);
+      setNeedsOnboarding(false);
     }
 
     setAuthLoading(false);

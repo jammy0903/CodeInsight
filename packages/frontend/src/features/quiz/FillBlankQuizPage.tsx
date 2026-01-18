@@ -8,6 +8,8 @@ import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Code2, Check, X, RotateCcw, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useThemeStore } from '@/stores/themeStore';
+import { codeViewerColors } from '@/config/themes';
 
 interface Quiz {
   id: string;
@@ -194,6 +196,8 @@ type QuizState = 'question' | 'correct' | 'incorrect';
 export function FillBlankQuizPage() {
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
+  const currentTheme = useThemeStore((s) => s.theme);
+  const colors = codeViewerColors[currentTheme];
 
   const [viewState, setViewState] = useState<ViewState>('chapters');
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
@@ -223,8 +227,12 @@ export function FillBlankQuizPage() {
   const handleSubmit = () => {
     if (!userInput.trim() || !currentQuiz) return;
 
-    // 공백 제거 + 대소문자 정규화
-    const normalize = (str: string) => str.replace(/\s+/g, '').toLowerCase();
+    // 공백 제거 + 전각→반각 변환 + 대소문자 정규화
+    const normalize = (str: string) =>
+      str
+        .replace(/\s+/g, '')     // 모든 공백 제거
+        .normalize('NFKC')       // 전각 문자를 반각으로 변환
+        .toLowerCase();          // 대소문자 통일
 
     const isCorrect = currentQuiz.acceptedAnswers.some(
       (accepted) => normalize(accepted) === normalize(userInput)
@@ -273,19 +281,32 @@ export function FillBlankQuizPage() {
   const renderCode = () => {
     if (!currentQuiz) return null;
     const parts = currentQuiz.code.split('____');
+
+    // 테마별 빈칸 하이라이트 색상
+    const blankColors = {
+      soft: { bg: '#f3e8ff', text: '#7c3aed' },     // 연보라
+      minimal: { bg: '#fef3c7', text: '#92400e' },  // 연갈색
+      dark: { bg: '#312e81', text: '#a78bfa' },     // 사이버펑크 보라
+    };
+
     return (
       <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap">
         {parts.map((part, index) => (
           <span key={index}>
-            <span className="text-[#6b5a4a]">{part}</span>
+            <span style={{ color: colors.text }}>{part}</span>
             {index < parts.length - 1 && (
               <span className={`px-2 py-0.5 rounded ${
-                quizState === 'question'
-                  ? 'bg-purple-200 text-purple-700'
-                  : quizState === 'correct'
+                quizState === 'correct'
                   ? 'bg-green-200 text-green-700'
-                  : 'bg-red-200 text-red-700'
-              }`}>
+                  : quizState === 'incorrect'
+                  ? 'bg-red-200 text-red-700'
+                  : ''
+              }`}
+                style={quizState === 'question' ? {
+                  backgroundColor: blankColors[currentTheme].bg,
+                  color: blankColors[currentTheme].text,
+                } : undefined}
+              >
                 {quizState === 'question' ? '____' : currentQuiz.answer}
               </span>
             )}
@@ -471,11 +492,14 @@ export function FillBlankQuizPage() {
                   ? 'bg-green-50 border-green-300'
                   : quizState === 'incorrect'
                   ? 'bg-red-50 border-red-300'
-                  : 'bg-[#1e1e1e] border-[#333]'
-              }`}>
-                <div className={quizState === 'question' ? 'text-gray-300' : ''}>
-                  {renderCode()}
-                </div>
+                  : ''
+              }`}
+                style={quizState === 'question' ? {
+                  backgroundColor: colors.bg,
+                  borderColor: colors.lineNumberBorder,
+                } : undefined}
+              >
+                {renderCode()}
               </div>
             </div>
 

@@ -11,8 +11,7 @@ import { motion } from 'framer-motion';
 import { Code2, GitBranch, Cpu } from 'lucide-react';
 import { FlowViewer } from './FlowViewer';
 import { PyVisualizerView } from '@/features/visualizers/python';
-import { CodeViewer } from '../day/CodeViewer';
-import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
+import { LessonCodeEditor } from '../day/LessonCodeEditor';
 import { ChatQA } from '@/features/chat/components/ChatQA';
 import { MemoryPanel } from '../memory/MemoryPanel';
 import { useIsMobile, useSlidingPages } from '@/hooks';
@@ -82,15 +81,6 @@ export function PythonLessonView({
 
   const currentStep = steps[currentStepIndex];
 
-  // 터미널 출력 계산
-  const terminalLines: TerminalLine[] = [];
-  for (let i = 0; i <= currentStepIndex; i++) {
-    if (steps[i]?.stdout) {
-      terminalLines.push({ content: steps[i].stdout!, type: 'output' });
-    }
-  }
-
-
   // 설명 컴포넌트 (공통)
   const ExplanationSection = () => (
     <div className="bg-white rounded-xl border border-[#e5d5c7] p-4">
@@ -134,26 +124,14 @@ export function PythonLessonView({
                 <Code2 className="w-4 h-4" />
                 Python 코드
               </div>
-              <CodeViewer
-                code={code}
-                currentLine={currentStep?.line || 1}
-                highlightLines={currentStep?.highlight || [currentStep?.line || 1]}
-                language="python"
-              />
-            </div>
-
-            {/* 터미널 출력 */}
-            {terminalLines.length > 0 && (
-              <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
-                <TerminalOutput
-                  lines={terminalLines}
-                  title="출력"
-                  maxHeight="100px"
-                  emptyMessage=""
-                  compact
+              <div style={{ height: '400px' }}>
+                <LessonCodeEditor
+                  code={code}
+                  currentLine={currentStep?.line || 1}
+                  language="python"
                 />
               </div>
-            )}
+            </div>
           </div>
 
           {/* 페이지 2: 설명 + 플로우 + AI */}

@@ -1,280 +1,226 @@
-# CodeInsight 미래 계획
+# 미래 계획 (Future Plans)
 
-> 마지막 업데이트: 2026-01-12
-
----
-
-## 🏗️ 아키텍처 확장 로드맵
-
-### 현재 상태: Web-Queue-Worker 패턴 (MVP)
-
-```
-Frontend (React) → Backend (Express) → Docker (C Executor)
-```
-
-**특징**:
-- 동기 실행 (요청-응답)
-- Docker 샌드박스 격리
-- 단일 서버 배포
-
-**한계**:
-- 동시 실행 제한 (~10 TPS)
-- 긴 작업 시 타임아웃
-- 수평 확장 어려움
+> **마지막 업데이트**: 2026-01-18
+> **상태**: 연기됨 (DAU 조건부) 또는 Phase 2+
 
 ---
 
-### Phase 2: 비동기 처리 추가 (다음 단계)
+## 목차
 
-#### 목표
-- 높은 동시 처리량 (100+ TPS)
-- 실시간 진행 상태 피드백
-- 워커 풀 수평 확장
+1. [연기된 계획 (DAU 조건부)](#1-연기된-계획-dau-조건부)
+2. [멀티언어 커리큘럼](#2-멀티언어-커리큘럼)
+3. [Misconceptions 연구](#3-misconceptions-연구)
 
-#### 기술 스택
+---
+
+## 1. 연기된 계획 (DAU 조건부)
+
+### 1.1 Chapter 구조 개편 (DAU 50+)
+
+> **진입 조건**: DAU 50 이상 달성 시
+> **예상 작업**: 2주
+
+**현재 구조 문제점**:
+- Language → Chapter → Lesson 구조가 언어 비교 어려움
+- 같은 개념(변수, 포인터 등)을 언어별로 찾아야 함
+
+**제안 구조**:
 ```
-Frontend (React)
-    ↓ HTTP + WebSocket
-Backend (Express + Socket.io)
-    ↓ Job Queue
-BullMQ (Redis)
-    ↓ Worker Pool
-C Executor Workers (Docker)
+현재: /courses/c → /courses/c/c-1 → /courses/c/c-1/c-1-1
+제안: /concepts/variables → /concepts/variables/c, /concepts/variables/python
 ```
 
-**추가할 것**:
-- **Message Queue**: BullMQ + Redis
-- **Worker Pool**: 코드 실행 전용 워커 (스케일 아웃)
-- **WebSocket**: 실시간 진행 상태 (Socket.io)
-- **Job 상태 관리**: Pending → Processing → Completed/Failed
+**마이그레이션 계획**:
+1. ConceptPage 생성 (언어 탭 포함)
+2. 기존 Lesson을 Concept-Language 매핑
+3. URL 리다이렉트 설정
+4. SEO 고려한 점진적 전환
 
-**API 변경**:
+**DB 스키마 변경**:
+```prisma
+model Concept {
+  id          String   @id
+  name        String
+  description String?
+  lessons     Lesson[]  // 언어별 레슨 연결
+}
+
+model Lesson {
+  conceptId   String?
+  concept     Concept?  @relation(...)
+}
+```
+
+---
+
+### 1.2 Progress DB 서버 저장 (DAU 100+)
+
+> **진입 조건**: DAU 100 이상 달성 시
+> **예상 작업**: 3주
+
+**현재 상태**:
+- localStorage에 진행 상태 저장
+- 디바이스/브라우저 간 동기화 불가
+- 데이터 손실 위험
+
+**목표**:
+- 서버 DB에 진행 상태 저장
+- 크로스 디바이스 동기화
+- 학습 분석 기반 데이터 축적
+
+**구현 범위**:
 ```typescript
-// 기존 (동기)
-POST /api/c/run → { stdout, stderr, trace }
-
-// 개선 (비동기)
-POST /api/c/run → { jobId: "abc123" }
-WS /ws/jobs/abc123 → { status: "processing", progress: 50% }
-GET /api/jobs/abc123 → { status: "completed", result: {...} }
+interface UserProgress {
+  lessonId: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+  currentStep: number;
+  completedAt?: Date;
+  quizScores: QuizScore[];
+}
 ```
 
-#### 예상 소요 기간
-- Redis + BullMQ 설정: 2일
-- Worker Pool 구현: 3일
-- WebSocket 연동: 2일
-- 테스트 + 배포: 2일
-- **총**: 1-2주
+**API 설계**:
+- `GET /api/me/progress` - 전체 진행 상태
+- `PUT /api/me/progress/:lessonId` - 레슨 진행 업데이트
+- `POST /api/me/progress/sync` - 로컬 → 서버 동기화
 
-#### 진입 조건
-- DAU 50+ (동시 사용자 10+)
-- 평균 응답 시간 > 5초
-- 타임아웃 에러 빈발
-
-#### 예상 비용 (월)
-- Redis Cloud: $10 (1GB)
-- Worker 서버 x2: $20 (DigitalOcean Droplet)
-- **총**: ~$30/월
-
-#### 참고 자료
-- [BullMQ 공식 문서](https://docs.bullmq.io/)
-- [분산 태스크 큐 설계](https://www.geeksforgeeks.org/system-design/distributed-task-queue-distributed-systems/)
-- [Web-Queue-Worker 패턴](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/web-queue-worker)
+**마이그레이션 전략**:
+1. localStorage 백업 API 추가
+2. 로그인 시 localStorage → DB 동기화
+3. 점진적 localStorage 의존도 감소
 
 ---
 
-### Phase 3: 마이크로서비스 전환 (성장 시)
+## 2. 멀티언어 커리큘럼
 
-#### 목표
-- 도메인별 독립 배포
-- 장애 격리 (서비스별)
-- 팀별 개발 속도 향상
+### 2.1 Python 커리큘럼 (10 Chapters)
 
-#### 기술 스택
-```
-API Gateway (Kong/Nginx)
-    ├─→ executor-service (C 코드 실행)
-    ├─→ simulator-service (메모리 시뮬레이션)
-    ├─→ ai-service (AI 해설자)
-    ├─→ course-service (코스 관리)
-    └─→ user-service (사용자 관리)
+> **상태**: 연구 완료, 구현 대기 (Phase 4)
 
-Service Mesh (Istio)
-Event Bus (Kafka)
-```
+| Chapter | 주제 | 핵심 Misconception |
+|---------|------|-------------------|
+| 1 | 객체와 변수 | 변수는 박스가 아닌 라벨 |
+| 2 | 문자열 | 불변성, 슬라이싱 |
+| 3 | 리스트/튜플 | 얕은 복사 vs 깊은 복사 |
+| 4 | 함수 | Pass by assignment, 가변 기본값 |
+| 5 | 스코프 | LEGB 규칙, global/nonlocal |
+| 6 | 딕셔너리/집합 | 해싱, mutable key 금지 |
+| 7 | 반복자/제너레이터 | lazy evaluation |
+| 8 | 클래스 | 클래스 변수 vs 인스턴스 변수 |
+| 9 | 상속 | MRO, super() |
+| 10 | 데코레이터 | 함수는 일급 객체 |
 
-**현재 모듈 → 독립 서비스 매핑**:
-```
-packages/backend/src/modules/
-├── executors/c/     → executor-service
-├── simulators/c/    → simulator-service
-├── ai/              → ai-service
-├── courses/         → course-service
-└── users/           → user-service
-```
-
-**추가 기술**:
-- **Service Discovery**: Consul/etcd
-- **Service Mesh**: Istio (트래픽 관리, 보안)
-- **Event Bus**: Apache Kafka (서비스 간 통신)
-- **Config Management**: Spring Cloud Config / Consul KV
-- **Monitoring**: Prometheus + Grafana
-
-#### 예상 소요 기간
-- 서비스 분리: 4주
-- API Gateway 설정: 1주
-- Service Mesh 구축: 2주
-- 마이그레이션 + 테스트: 3주
-- **총**: 2-3개월
-
-#### 진입 조건
-- DAU 500+ (동시 사용자 100+)
-- 팀 크기 5+ 명
-- 다중 언어 지원 필요 (Python, Java 추가)
-- 장애 복구 시간 < 5분 요구
-
-#### 예상 비용 (월)
-- Kubernetes Cluster: $100 (AWS EKS/GKE)
-- Load Balancer: $20
-- Kafka Cluster: $50 (MSK/Confluent)
-- Monitoring Stack: $30
-- **총**: ~$200/월
-
-#### 참고 자료
-- [Microservices Pattern](https://microservices.io/patterns/microservices.html)
-- [SonarQube Architecture](https://docs.sonarsource.com/sonarqube-server/design-and-architecture/overview)
-- [Event-Driven Architecture](https://www.confluent.io/learn/event-driven-architecture/)
+**핵심 시각화**:
+- Names Panel (변수명) ↔ Objects Panel (실제 객체)
+- 화살표로 참조 관계 표시
+- id() 값 실시간 표시
 
 ---
 
-### Phase 4: 클라우드 네이티브 (글로벌 확장)
+### 2.2 Java 커리큘럼 (10 Chapters)
 
-#### 목표
-- 글로벌 배포 (Multi-region)
-- 자동 스케일링 (HPA/VPA)
-- 99.9% 가용성
+> **상태**: 연구 완료, 구현 대기 (Phase 5)
 
-#### 기술 스택
-```
-CDN (CloudFlare)
-    ↓
-Multi-region Kubernetes Clusters
-    ├─→ Asia (Seoul, Tokyo)
-    ├─→ US (Oregon, Virginia)
-    └─→ EU (Frankfurt)
+| Chapter | 주제 | 핵심 Misconception |
+|---------|------|-------------------|
+| 1 | 기본 타입 vs 참조 타입 | 메모리 저장 위치 |
+| 2 | String | String Pool, == vs equals() |
+| 3 | 배열 | 참조 타입임을 이해 |
+| 4 | 래퍼 클래스 | 오토박싱, Integer Cache |
+| 5 | 메서드 | Pass by Value (참조의 복사) |
+| 6 | 클래스/객체 | this 키워드, 생성자 |
+| 7 | static | 클래스 변수 vs 인스턴스 변수 |
+| 8 | 상속 | Override vs Overload |
+| 9 | 인터페이스/추상클래스 | 다형성 |
+| 10 | 예외 처리 | Checked vs Unchecked |
 
-Container Registry (ECR/GCR)
-Service Mesh (Istio + Linkerd)
-Auto-scaling (Kubernetes HPA)
-```
-
-**추가 기술**:
-- **Container Orchestration**: Kubernetes
-- **CI/CD**: GitLab CI / GitHub Actions + ArgoCD
-- **Serverless**: AWS Lambda (비용 최적화)
-- **CDN**: CloudFlare (프론트엔드 캐싱)
-- **Observability**: Datadog / New Relic
-- **Disaster Recovery**: Multi-region 백업
-
-#### 예상 소요 기간
-- Kubernetes 구축: 4주
-- Multi-region 배포: 3주
-- CI/CD 파이프라인: 2주
-- 모니터링 + 알람: 2주
-- DR 구축: 2주
-- **총**: 3-4개월
-
-#### 진입 조건
-- DAU 5,000+ (동시 사용자 1,000+)
-- 글로벌 사용자 (다중 리전 필요)
-- SLA 99.9% 요구
-- 투자 유치 완료
-
-#### 예상 비용 (월)
-- Multi-region Kubernetes: $500
-- CDN: $100 (CloudFlare Business)
-- Database (RDS Multi-AZ): $200
-- Monitoring: $100 (Datadog)
-- Load Balancer + Networking: $100
-- **총**: ~$1,000/월
-
-#### 참고 자료
-- [Kubernetes Architecture](https://www.datacamp.com/blog/kubernetes-architecture-explained)
-- [Cloud Native Architecture](https://gegosoft.com/cloud-native-architecture/)
-- [Docker Kanvas](https://www.infoq.com/news/2026/01/docker-kanvas-cloud-deployment/)
+**핵심 시각화**:
+- Stack (원시값 + 참조) / Heap (객체)
+- String Pool 영역 표시
+- `==` vs `equals()` 비교 애니메이션
 
 ---
 
-### 아키텍처 진화 요약
+### 2.3 JavaScript 커리큘럼 (10 Chapters)
 
-| Phase | 패턴 | TPS | DAU | 비용/월 | 기간 |
-|-------|------|-----|-----|---------|------|
-| **1** | Web-Queue-Worker | ~10 | 0-50 | $0 | ✅ 완료 |
-| **2** | 비동기 처리 | ~100 | 50-500 | $30 | 1-2주 |
-| **3** | 마이크로서비스 | ~1,000 | 500-5K | $200 | 2-3개월 |
-| **4** | 클라우드 네이티브 | ~10,000 | 5K+ | $1,000 | 3-4개월 |
+> **상태**: 일부 구현됨 (Ch 1 Event Loop)
 
----
-
-## 📱 모바일 앱 전환
-
-### 추천: Capacitor (1순위)
-
-**이유**:
-- 기존 React 코드 100% 재사용
-- 2-3주 내 iOS/Android 앱 출시 가능
-- 단일 코드베이스로 웹/모바일 동시 유지보수
-
-### 대안: PWA (2순위)
-
-- 가장 빠른 배포 (1주 이내)
-- iOS 제약 감수 가능하면 최선
-- 앱 스토어 없이도 배포 가능
-
-### 비추천: React Native
-
-- 전체 코드 재작성 필요
-- 개발 시간 3-6개월 추가
+| Chapter | 주제 | 핵심 Misconception |
+|---------|------|-------------------|
+| 1 | Event Loop | ✅ 구현됨 (js-1-1 ~ js-1-4) |
+| 2 | 타입과 강제 변환 | == vs ===, typeof quirks |
+| 3 | 함수 | 호이스팅, 기본값 |
+| 4 | this | 동적 바인딩, 화살표 함수 |
+| 5 | 클로저 | 루프 + var 트랩 |
+| 6 | 프로토타입 | 체인 룩업, 객체 참조 |
+| 7 | 클래스 | 문법적 설탕 |
+| 8 | 비동기 기초 | 콜백, 타이머 |
+| 9 | Promise | .then() 체이닝 |
+| 10 | async/await | 순차 vs 병렬 |
 
 ---
 
-## Capacitor 적용 로드맵
+## 3. Misconceptions 연구
 
-### Phase 1: 준비 (1일)
-- [ ] Capacitor, Ionic CLI 설치
-- [ ] iOS/Android 개발 환경 설정
+### 3.1 Python Misconceptions (TOP 7)
 
-### Phase 2: 웹 앱 최적화 (3-5일)
-- [ ] 반응형 디자인 점검
-- [ ] 터치 이벤트 최적화
-- [ ] 네비게이션 개선
-
-### Phase 3: 네이티브 빌드 (2-3일)
-- [ ] `npx cap init`
-- [ ] iOS/Android 플랫폼 추가
-- [ ] 앱 아이콘, 스플래시 이미지
-
-### Phase 4: 네이티브 기능 (5-7일)
-- [ ] 푸시 알림 (선택)
-- [ ] 오프라인 저장 (선택)
-
-### Phase 5: 배포 (3-5일)
-- [ ] iOS App Store 심사
-- [ ] Google Play Store 제출
-
-**총 예상 기간**: 2-3주
+| # | Misconception | 설명 | 레슨 매핑 |
+|---|--------------|------|----------|
+| 1 | **가변 기본값** | `def f(x=[])` - 리스트가 공유됨 | py-4-4 |
+| 2 | **변수는 라벨** | `b = a` - 같은 객체를 가리킴 | py-1-1 |
+| 3 | **Late Binding** | 클로저가 값이 아닌 변수 캡처 | py-5-4 |
+| 4 | **Pass by Assignment** | 재할당 vs 뮤테이션 차이 | py-4-1~3 |
+| 5 | **LEGB 스코프** | 할당이 있으면 전체 함수에서 로컬 | py-5-1~3 |
+| 6 | **Integer Caching** | -5~256 사이만 캐시됨 | py-1-2 |
+| 7 | **String 불변성** | `+=`는 새 객체 생성 | py-2-1 |
 
 ---
 
-## 진입 조건
+### 3.2 Java Misconceptions (TOP 7)
 
-- 웹 버전 안정화 완료
-- DAU 100+ 달성
-- 사용자 피드백에서 모바일 수요 확인
+| # | Misconception | 설명 | 레슨 매핑 |
+|---|--------------|------|----------|
+| 1 | **== vs equals()** | String Pool로 인한 혼란 | java-2-3 |
+| 2 | **Pass by Value** | 참조의 복사, swap 불가 | java-3-1~4 |
+| 3 | **Integer Cache** | -128~127만 캐시됨 | java-5-3 |
+| 4 | **Stack vs Heap** | 원시 vs 참조 저장 위치 | java-1-3 |
+| 5 | **static 접근** | static에서 인스턴스 접근 불가 | java-7-3~4 |
+| 6 | **String 불변성** | concat()은 원본 안 바꿈 | java-4-3~4 |
+| 7 | **Override vs Overload** | 시그니처와 해결 시점 | java-8-2~3 |
+
+---
+
+### 3.3 JavaScript Misconceptions (TOP 10)
+
+| # | Misconception | 상태 |
+|---|--------------|------|
+| 1 | setTimeout(0)은 즉시 아님 | ✅ js-1-2 |
+| 2 | Microtask > Task 우선순위 | ✅ js-1-3 |
+| 3 | 무한 Microtask 위험 | ✅ js-1-3 |
+| 4 | 렌더링 타이밍 | ✅ js-1-4 |
+| 5 | Loop + var 클로저 | 📝 js-5-4 |
+| 6 | 콜백에서 this | 📝 js-4-3 |
+| 7 | Arrow function this | 📝 js-4-4 |
+| 8 | == vs === | 📝 js-2-3 |
+| 9 | Truthy/Falsy | 📝 js-2-4 |
+| 10 | 객체 참조 vs 복사 | 📝 js-6-x |
 
 ---
 
 ## 참고 자료
 
-- [Capacitor 공식 문서](https://capacitorjs.com/)
-- [Ionic React 가이드](https://ionicframework.com/docs/react)
+### 학술 논문
+- SIGCSE 1997 - Avoiding Object Misconceptions
+- SIGCSE 2010 - Identifying Student Misconceptions
+- ACM ICER 2018 - K-12 Programming Misconceptions
+- ITiCSE 2005 - Novice Java Programmers' Conceptions
+
+### 커뮤니티/실무
+- Hitchhiker's Guide to Python - Common Gotchas
+- Stack Overflow - Most voted questions per language
+- FreeCodeCamp - Common Mistakes series
+- Baeldung - Java Interview Questions
+
+---
+
+*마지막 업데이트: 2026-01-18*

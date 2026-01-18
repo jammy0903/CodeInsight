@@ -10,9 +10,17 @@ import { simulatorService, isLanguageSupported } from '@/services/simulator';
 
 interface StepControlsProps {
   isMobile?: boolean;
+  showRun?: boolean;       // Run 버튼 표시 여부 (기본: true)
+  showReset?: boolean;     // Reset 버튼 표시 여부 (기본: true)
+  showNavigation?: boolean; // 이전/다음 버튼 표시 여부 (기본: true)
 }
 
-export function StepControls({ isMobile = false }: StepControlsProps) {
+export function StepControls({
+  isMobile = false,
+  showRun = true,
+  showReset = true,
+  showNavigation = true,
+}: StepControlsProps) {
   const { language, steps, currentStepIndex, isSimulating, setIsSimulating, setSteps, setError } =
     usePlaygroundStore();
   const { nextStep, prevStep, reset, canGoNext, canGoPrev } = useStepControls();
@@ -88,9 +96,9 @@ export function StepControls({ isMobile = false }: StepControlsProps) {
 
   const secondaryButton: React.CSSProperties = {
     ...buttonBase,
-    background: '#f3f4f6',
-    color: '#6b7280',
-    border: '1px solid #e5e7eb',
+    background: 'var(--theme-memory-reset-bg)',
+    color: 'var(--theme-memory-reset-text)',
+    border: '1px solid var(--theme-memory-reset-border)',
   };
 
   const navButton: React.CSSProperties = {
@@ -100,9 +108,9 @@ export function StepControls({ isMobile = false }: StepControlsProps) {
     width: isMobile ? '22px' : '26px',
     height: isMobile ? '22px' : '26px',
     borderRadius: isMobile ? '4px' : '6px',
-    border: '1px solid #e5e7eb',
-    background: '#ffffff',
-    color: '#6b7280',
+    border: '1px solid var(--theme-memory-reset-border)',
+    background: 'var(--theme-memory-card-bg)',
+    color: 'var(--theme-memory-reset-text)',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
   };
@@ -116,41 +124,43 @@ export function StepControls({ isMobile = false }: StepControlsProps) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px' }}>
       {/* Run 버튼 */}
-      <button
-        onClick={handleRun}
-        disabled={isSimulating || !isSupported}
-        style={isSimulating || !isSupported ? runButtonDisabled : runButtonStyle}
-        onMouseEnter={(e) => {
-          if (!isSimulating && isSupported) {
-            e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 2px 6px rgba(34, 197, 94, 0.4)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 1px 3px rgba(34, 197, 94, 0.3)';
-        }}
-      >
-        {isSimulating ? (
-          <Loader2 size={isMobile ? 12 : 14} style={{ animation: 'spin 1s linear infinite' }} />
-        ) : (
-          <Play size={isMobile ? 12 : 14} fill="currentColor" />
-        )}
-        {!isMobile && <span>{isSimulating ? 'Running' : 'Run'}</span>}
-      </button>
+      {showRun && (
+        <button
+          onClick={handleRun}
+          disabled={isSimulating || !isSupported}
+          style={isSimulating || !isSupported ? runButtonDisabled : runButtonStyle}
+          onMouseEnter={(e) => {
+            if (!isSimulating && isSupported) {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 2px 6px rgba(34, 197, 94, 0.4)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 1px 3px rgba(34, 197, 94, 0.3)';
+          }}
+        >
+          {isSimulating ? (
+            <Loader2 size={isMobile ? 12 : 14} style={{ animation: 'spin 1s linear infinite' }} />
+          ) : (
+            <Play size={isMobile ? 12 : 14} fill="currentColor" />
+          )}
+          {!isMobile && <span>{isSimulating ? 'Running' : 'Run'}</span>}
+        </button>
+      )}
 
       {/* Reset 버튼 - 모바일에서는 아이콘만 */}
-      {hasSteps && (
+      {showReset && hasSteps && (
         <button
           onClick={reset}
           style={secondaryButton}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#e5e7eb';
-            e.currentTarget.style.color = '#374151';
+            e.currentTarget.style.background = 'var(--theme-memory-reset-border)';
+            e.currentTarget.style.color = 'var(--theme-memory-card-text)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#f3f4f6';
-            e.currentTarget.style.color = '#6b7280';
+            e.currentTarget.style.background = 'var(--theme-memory-reset-bg)';
+            e.currentTarget.style.color = 'var(--theme-memory-reset-text)';
           }}
         >
           <RotateCcw size={isMobile ? 10 : 12} />
@@ -159,12 +169,12 @@ export function StepControls({ isMobile = false }: StepControlsProps) {
       )}
 
       {/* 구분선 - 모바일에서는 숨김 */}
-      {hasSteps && !isMobile && (
+      {showNavigation && hasSteps && !isMobile && (
         <div style={{ width: '1px', height: '16px', background: '#e5e7eb', margin: '0 2px' }} />
       )}
 
       {/* 이전/다음 네비게이션 */}
-      {hasSteps && (
+      {showNavigation && hasSteps && (
         <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '2px' : '4px' }}>
           <button
             onClick={prevStep}
@@ -172,13 +182,13 @@ export function StepControls({ isMobile = false }: StepControlsProps) {
             style={canGoPrev ? navButton : navButtonDisabled}
             onMouseEnter={(e) => {
               if (canGoPrev) {
-                e.currentTarget.style.background = '#f3f4f6';
-                e.currentTarget.style.color = '#374151';
+                e.currentTarget.style.background = 'var(--theme-memory-reset-bg)';
+                e.currentTarget.style.color = 'var(--theme-memory-card-text)';
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#ffffff';
-              e.currentTarget.style.color = '#6b7280';
+              e.currentTarget.style.background = 'var(--theme-memory-card-bg)';
+              e.currentTarget.style.color = 'var(--theme-memory-reset-text)';
             }}
           >
             <ChevronLeft size={isMobile ? 12 : 14} />
@@ -190,10 +200,10 @@ export function StepControls({ isMobile = false }: StepControlsProps) {
               fontSize: isMobile ? '9px' : '11px',
               fontFamily: 'monospace',
               fontWeight: 600,
-              color: '#22c55e',
-              background: '#f0fdf4',
+              color: 'var(--theme-memory-counter-text)',
+              background: 'var(--theme-memory-counter-bg)',
               borderRadius: '4px',
-              border: '1px solid #bbf7d0',
+              border: '1px solid var(--theme-memory-counter-border)',
             }}
           >
             {currentStepIndex + 1}/{steps.length}
@@ -205,13 +215,13 @@ export function StepControls({ isMobile = false }: StepControlsProps) {
             style={canGoNext ? navButton : navButtonDisabled}
             onMouseEnter={(e) => {
               if (canGoNext) {
-                e.currentTarget.style.background = '#f3f4f6';
-                e.currentTarget.style.color = '#374151';
+                e.currentTarget.style.background = 'var(--theme-memory-reset-bg)';
+                e.currentTarget.style.color = 'var(--theme-memory-card-text)';
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#ffffff';
-              e.currentTarget.style.color = '#6b7280';
+              e.currentTarget.style.background = 'var(--theme-memory-card-bg)';
+              e.currentTarget.style.color = 'var(--theme-memory-reset-text)';
             }}
           >
             <ChevronRight size={isMobile ? 12 : 14} />

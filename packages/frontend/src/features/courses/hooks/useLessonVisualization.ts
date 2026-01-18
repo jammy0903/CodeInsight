@@ -5,13 +5,17 @@
  * 이유: 메모리 외에 Event Loop, Closure 등 다양한 시각화 지원
  *
  * 지원 형식:
- * 1. C 언어: memoryChanges → stack/heap 메모리 시각화
- * 2. JavaScript: visualizationType + visualizationState → 다양한 시각화
+ * 1. Event-Driven: step.events 배열 → EventProcessor로 상태 구축 (권장)
+ * 2. Snapshot: step.stack/heap 직접 사용 (Playground)
+ * 3. MemoryChanges: memoryChanges 누적 계산 (레거시 Lesson JSON)
+ * 4. JavaScript: visualizationType + visualizationState → 다양한 시각화
  */
 
 import { useMemo } from 'react';
 import type { LessonStep, StepMemoryState, StackFrame, MemoryChangeAction, MemoryBlock } from '@/types';
 import type { JSVisualizationType, JSVisualizationState } from '@/features/visualizers/js/types';
+import type { VisualizationEvent } from '@codeinsight/shared';
+import { EventProcessor, convertToLessonMemoryState } from '@/features/visualizers/core';
 
 // ============================================
 // 메모리 상태 타입 (MemoryBlock 사용)
@@ -60,7 +64,10 @@ function convertCumulativeFormat(
   frames: StackFrame[]
 ): { blocks: MemoryBlock[]; frames: StackFrame[] } {
   const blocks: MemoryBlock[] = [];
-  let stackAddr = 0x1000;
+  // 스택은 높은 주소 → 낮은 주소로 자람
+  // 먼저 전체 변수 개수를 세서 시작 주소 계산
+  const totalVars = frames.reduce((sum, f) => sum + f.variables.length, 0);
+  let stackAddr = 0x1000 + (totalVars - 1) * 4; // 첫 변수가 가장 높은 주소
 
   for (const frame of frames) {
     for (const v of frame.variables) {
@@ -72,7 +79,7 @@ function convertCumulativeFormat(
         points_to: v.ref || null,
         highlight: v.highlight,
       });
-      stackAddr += 4;
+      stackAddr -= 4; // 스택은 아래로 자람 (주소 감소)
     }
   }
 
@@ -122,6 +129,7 @@ function accumulateMemoryChanges(
   const stackMap = new Map<string, MemoryBlock>();
   const heapMap = new Map<string, MemoryBlock>();
   const activeFrames: string[] = []; // 현재 활성화된 프레임 스택
+  // 스택: 높은 주소 → 낮은 주소로 자람 (먼저 선언된 변수가 높은 주소)
   let stackAddr = 0x7ffc1000;
   let heapAddr = 0x8000;
 
@@ -152,7 +160,7 @@ function accumulateMemoryChanges(
             highlight: i === upToStepIndex,
           });
 
-          if (!change.address) stackAddr += 4;
+          if (!change.address) stackAddr -= 4; // 스택은 아래로 자람
         }
         // 변수 해제 (free 또는 deallocate)
         else if (change.action === 'free' || change.action === 'deallocate') {
@@ -205,6 +213,7 @@ function accumulateActionBasedChanges(
   const state: LessonMemoryState = { stack: [], heap: [], frames: [] };
   const stackMap = new Map<string, MemoryBlock>();
   const heapMap = new Map<string, MemoryBlock>();
+  // 스택: 높은 주소 → 낮은 주소로 자람 (먼저 선언된 변수가 높은 주소)
   let stackAddr = 0x1000;
   let heapAddr = 0x8000;
 
@@ -226,7 +235,7 @@ function accumulateActionBasedChanges(
           points_to: null,
           highlight: i === upToStepIndex,
         });
-        stackAddr += 4;
+        stackAddr -= 4; // 스택은 아래로 자람
       } else if (stack.action === 'update_variable') {
         const existing = stackMap.get(stack.name || '');
         if (existing) {
@@ -271,7 +280,13 @@ function accumulateActionBasedChanges(
   return state;
 }
 
-function detectFormat(steps: LessonStep[]): 'new-array' | 'legacy-action' | 'cumulative' | 'snapshot' | 'unknown' {
+function detectFormat(steps: LessonStep[]): 'event-based' | 'new-array' | 'legacy-action' | 'cumulative' | 'snapshot' | 'unknown' {
+  // 0. Event-Driven 형식 체크 (step.events 배열이 있는 경우) - 최우선
+  const eventStep = steps.find(s => s?.events && Array.isArray(s.events) && s.events.length > 0);
+  if (eventStep) {
+    return 'event-based';
+  }
+
   // 1. snapshot 형식 체크 (step.stack이 MemoryBlock[] 배열인 경우)
   // Playground 시뮬레이터가 이 형식을 반환함
   const snapshotStep = steps.find(s => s?.stack && Array.isArray(s.stack));
@@ -299,6 +314,28 @@ function detectFormat(steps: LessonStep[]): 'new-array' | 'legacy-action' | 'cum
   }
 
   return 'unknown';
+}
+
+/**
+ * Event-Driven 형식 처리
+ * 각 스텝의 events 배열을 누적 적용하여 현재 상태 계산
+ */
+function processEventBasedSteps(
+  steps: LessonStep[],
+  upToStepIndex: number
+): LessonMemoryState {
+  const processor = new EventProcessor();
+
+  // 각 스텝의 events 배열 수집
+  const allStepEvents: VisualizationEvent[][] = steps.map(
+    (step) => (step?.events as VisualizationEvent[]) || []
+  );
+
+  // 이벤트 적용하여 상태 구축
+  const processedState = processor.applyEventsUpTo(allStepEvents, upToStepIndex);
+
+  // 기존 형식으로 변환 (컴포넌트 호환성)
+  return convertToLessonMemoryState(processedState);
 }
 
 // ============================================
@@ -401,6 +438,9 @@ export function useLessonVisualization(
     }
 
     switch (format) {
+      case 'event-based':
+        // Event-Driven: events 배열 처리 (권장)
+        return processEventBasedSteps(steps, currentStepIndex);
       case 'snapshot':
         // Playground 시뮬레이터: step.stack/heap 직접 사용
         return {

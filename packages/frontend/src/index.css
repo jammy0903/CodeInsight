@@ -6,6 +6,7 @@
  */
 
 @import "tailwindcss";
+@import "./config/theme.css";
 @custom-variant dark (&:is(.dark *));
 @config "../tailwind.config.js";
 
@@ -107,50 +108,6 @@
   --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
   --shadow-neon-yellow: 0 0 20px rgba(255, 215, 0, 0.4);
   --shadow-neon-cyan: 0 0 20px rgba(0, 217, 255, 0.4);
-
-  /* === 테마별 HomePage 색상 (기본값: minimal) === */
-  --theme-hero-bg: #faf7f2;
-  --theme-section-bg: #f8f4ef;
-  --theme-title: #6b5a4a;
-  --theme-subtitle: #937b5d;
-  --theme-text: #6b5a4a;
-  --theme-text-muted: #a08060;
-  --theme-matrix-color: #c4a574;
-  --theme-matrix-bg: rgba(250, 247, 242, 0.05);
-}
-
-/* === 테마별 색상 오버라이드 === */
-[data-theme="dark"] {
-  --theme-hero-bg: #09090b;
-  --theme-section-bg: #18181b;
-  --theme-title: #22d3ee;
-  --theme-subtitle: #a1a1aa;
-  --theme-text: #e4e4e7;
-  --theme-text-muted: #71717a;
-  --theme-matrix-color: #00ff41;
-  --theme-matrix-bg: rgba(9, 9, 11, 0.05);
-}
-
-[data-theme="soft"] {
-  --theme-hero-bg: #f0e8f5;
-  --theme-section-bg: #ebe0f5;
-  --theme-title: #9333ea;
-  --theme-subtitle: #7c3aed;
-  --theme-text: #5a4570;
-  --theme-text-muted: #a08eb0;
-  --theme-matrix-color: #9333ea;
-  --theme-matrix-bg: rgba(147, 51, 234, 0.03);
-}
-
-[data-theme="minimal"] {
-  --theme-hero-bg: #faf7f2;
-  --theme-section-bg: #f8f4ef;
-  --theme-title: #6b5a4a;
-  --theme-subtitle: #937b5d;
-  --theme-text: #6b5a4a;
-  --theme-text-muted: #a08060;
-  --theme-matrix-color: #c4a574;
-  --theme-matrix-bg: rgba(250, 247, 242, 0.05);
 }
 
 /* ============================================
@@ -170,7 +127,7 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: var(--color-bg);
+    background-color: var(--theme-layout-page-bg);
     color: var(--foreground);
     min-height: 100vh;
     letter-spacing: 0.01em;
@@ -274,16 +231,16 @@
     font-size: 13px;
     font-weight: 600;
     border-radius: 6px;
-    background: #a08060;
-    border: 1px solid #8b6d4f;
+    background: var(--theme-lesson-button-primary-bg);
+    border: 1px solid var(--theme-lesson-panel-border);
     color: #fff;
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: #8b6d4f;
-    box-shadow: 0 2px 8px rgba(139, 109, 79, 0.25);
+    background: var(--theme-dashboard-accent-hover);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   .btn-primary:disabled {
@@ -300,17 +257,17 @@
     font-size: 13px;
     font-weight: 600;
     border-radius: 6px;
-    background: rgba(255, 251, 245, 0.9);
-    border: 1px solid #e5d5c7;
-    color: #7a6a5a;
+    background: var(--theme-lesson-button-secondary-bg);
+    border: 1px solid var(--theme-lesson-button-secondary-border);
+    color: var(--theme-lesson-button-secondary-text);
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .btn-secondary:hover:not(:disabled) {
-    background: #fff;
-    border-color: #d4c4b0;
-    color: #5a4a3a;
+    background: var(--theme-dashboard-card-bg);
+    border-color: var(--theme-dashboard-accent);
+    color: var(--theme-dashboard-title);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
@@ -328,16 +285,16 @@
     font-size: 13px;
     font-weight: 600;
     border-radius: 6px;
-    background: #7a9a7a;
-    border: 1px solid #6a8a6a;
+    background: var(--theme-ui-success-bg);
+    border: 1px solid var(--theme-lesson-panel-border);
     color: #fff;
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .btn-success:hover:not(:disabled) {
-    background: #6a8a6a;
-    box-shadow: 0 2px 8px rgba(106, 138, 106, 0.25);
+    filter: brightness(0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   .btn-success:disabled {
@@ -354,16 +311,16 @@
     font-size: 13px;
     font-weight: 600;
     border-radius: 6px;
-    background: #c08080;
-    border: 1px solid #a06a6a;
+    background: var(--theme-ui-danger-bg);
+    border: 1px solid var(--theme-lesson-panel-border);
     color: #fff;
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .btn-danger:hover:not(:disabled) {
-    background: #a06a6a;
-    box-shadow: 0 2px 8px rgba(160, 106, 106, 0.25);
+    filter: brightness(0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   .btn-danger:disabled {
@@ -380,16 +337,16 @@
     font-size: 13px;
     font-weight: 600;
     border-radius: 6px;
-    background: #6a9a9a;
-    border: 1px solid #5a8a8a;
+    background: var(--theme-ui-cyan-bg);
+    border: 1px solid var(--theme-lesson-panel-border);
     color: #fff;
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .btn-cyan:hover:not(:disabled) {
-    background: #5a8a8a;
-    box-shadow: 0 2px 8px rgba(90, 138, 138, 0.25);
+    filter: brightness(0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   .btn-cyan:disabled {
@@ -409,20 +366,20 @@
   }
 
   .badge-gold {
-    background: linear-gradient(135deg, #FFD700 0%, #F59E0B 100%);
-    color: #1a1a2e;
+    background: var(--theme-badge-gold-bg);
+    color: var(--theme-badge-gold-text);
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
   }
 
   .badge-cyan {
-    background: linear-gradient(135deg, #00D9FF 0%, #3B82F6 100%);
-    color: white;
+    background: var(--theme-badge-cyan-bg);
+    color: var(--theme-badge-cyan-text);
     box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
   }
 
   .badge-pink {
-    background: linear-gradient(135deg, #FF6B9D 0%, #A855F7 100%);
-    color: white;
+    background: var(--theme-badge-pink-bg);
+    color: var(--theme-badge-pink-text);
     box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
   }
 
@@ -441,8 +398,8 @@
 
   /* === Course Header === */
   .course-header-card {
-    background: rgba(255, 251, 245, 0.95);
-    border: 1px solid #e5d5c7;
+    background: var(--theme-dashboard-card-bg);
+    border: 1px solid var(--theme-dashboard-card-border);
     border-radius: 12px;
     padding: 24px;
     text-align: center;
@@ -451,13 +408,13 @@
   .course-title {
     font-size: 28px;
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--theme-dashboard-title);
     margin-bottom: 4px;
   }
 
   .course-subtitle {
     font-size: 13px;
-    color: #937b5d;
+    color: var(--theme-dashboard-text-muted);
     margin-bottom: 20px;
   }
 
@@ -471,28 +428,28 @@
     justify-content: space-between;
     font-size: 11px;
     font-weight: 600;
-    color: #937b5d;
+    color: var(--theme-dashboard-text-muted);
     margin-bottom: 6px;
   }
 
   .course-progress-bar {
     height: 6px;
-    background: #f0e6da;
+    background: var(--theme-dashboard-progress-bg);
     border-radius: 3px;
     overflow: hidden;
   }
 
   .course-progress-fill {
     height: 100%;
-    background: #7a9a7a;
+    background: var(--theme-dashboard-accent);
     border-radius: 3px;
     transition: width 0.3s ease;
   }
 
   /* === Chapter Card === */
   .chapter-card {
-    background: rgba(255, 251, 245, 0.95);
-    border: 1px solid #e5d5c7;
+    background: var(--theme-dashboard-card-bg);
+    border: 1px solid var(--theme-dashboard-card-border);
     border-radius: 10px;
     overflow: hidden;
   }
@@ -511,7 +468,7 @@
   }
 
   .chapter-header:hover {
-    background: rgba(0, 0, 0, 0.02);
+    background: var(--theme-dashboard-section-header-bg);
   }
 
   .chapter-info {
@@ -521,16 +478,16 @@
   .chapter-title {
     font-size: 15px;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--theme-dashboard-title);
   }
 
   .chapter-title.completed {
-    color: #7a9a7a;
+    color: var(--theme-dashboard-accent);
   }
 
   .chapter-desc {
     font-size: 12px;
-    color: #937b5d;
+    color: var(--theme-dashboard-text-muted);
     margin-top: 2px;
   }
 
@@ -546,23 +503,23 @@
     font-family: var(--font-mono);
     padding: 4px 10px;
     border-radius: 4px;
-    background: #f5efe7;
-    color: #937b5d;
+    background: var(--theme-dashboard-section-header-bg);
+    color: var(--theme-dashboard-text-muted);
   }
 
   .chapter-badge.progress {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--theme-chapter-badge-progress-bg);
+    color: var(--theme-chapter-badge-progress-text);
   }
 
   .chapter-badge.complete {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--theme-chapter-badge-complete-bg);
+    color: var(--theme-chapter-badge-complete-text);
   }
 
   .chapter-arrow {
     font-size: 18px;
-    color: #c5b5a5;
+    color: var(--theme-dashboard-card-border);
     transform: rotate(90deg);
     transition: transform 0.2s ease;
   }
@@ -573,17 +530,17 @@
 
   .chapter-progress {
     height: 3px;
-    background: #f0e6da;
+    background: var(--theme-dashboard-progress-bg);
   }
 
   .chapter-progress-fill {
     height: 100%;
-    background: #a08060;
+    background: var(--theme-dashboard-accent);
     transition: width 0.3s ease;
   }
 
   .chapter-progress-fill.complete {
-    background: #7a9a7a;
+    background: var(--theme-dashboard-accent);
   }
 
   .chapter-lessons {
@@ -600,8 +557,8 @@
     gap: 12px;
     width: 100%;
     padding: 12px 16px;
-    background: #fff;
-    border: 1px solid #e5d5c7;
+    background: var(--theme-dashboard-card-bg);
+    border: 1px solid var(--theme-dashboard-card-border);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -609,44 +566,44 @@
   }
 
   .lesson-item:hover {
-    border-color: #d4c4b0;
+    border-color: var(--theme-dashboard-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 
   .lesson-item.completed {
-    background: #fafafa;
-    border-color: #e8e8e8;
+    background: var(--theme-dashboard-stat-card-bg);
+    border-color: var(--theme-dashboard-progress-bg);
   }
 
   .lesson-item.in-progress {
-    border-left: 3px solid #a08060;
+    border-left: 3px solid var(--theme-dashboard-accent);
   }
 
   .lesson-status {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #e5d5c7;
+    background: var(--theme-dashboard-card-border);
     flex-shrink: 0;
   }
 
   .lesson-status.active {
-    background: #a08060;
+    background: var(--theme-dashboard-accent);
   }
 
   .lesson-status.done {
-    background: #7a9a7a;
+    background: var(--theme-dashboard-accent);
   }
 
   .lesson-title {
     flex: 1;
     font-size: 13px;
     font-weight: 500;
-    color: var(--color-text);
+    color: var(--theme-dashboard-text);
   }
 
   .lesson-title.done {
-    color: #999;
+    color: var(--theme-dashboard-text-muted);
     text-decoration: line-through;
   }
 
@@ -660,18 +617,18 @@
   }
 
   .lesson-difficulty.basic {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--theme-difficulty-basic-bg);
+    color: var(--theme-difficulty-basic-text);
   }
 
   .lesson-difficulty.intermediate {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--theme-difficulty-intermediate-bg);
+    color: var(--theme-difficulty-intermediate-text);
   }
 
   .lesson-difficulty.advanced {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--theme-difficulty-advanced-bg);
+    color: var(--theme-difficulty-advanced-text);
   }
 
   /* === Containers === */
@@ -683,30 +640,30 @@
   }
 
   .lesson-content-container {
-    max-width: 1400px;
+    max-width: 1800px;
     margin: 0 auto;
-    padding-left: 32px;
-    padding-right: 32px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .lesson-page-container {
     padding-top: 8px;
     padding-bottom: 16px;
-    padding-left: 48px;
-    padding-right: 48px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   @media (min-width: 768px) {
     .lesson-page-container {
-      padding-left: 64px;
-      padding-right: 64px;
+      padding-left: 24px;
+      padding-right: 24px;
     }
   }
 
   @media (min-width: 1024px) {
     .lesson-page-container {
-      padding-left: 80px;
-      padding-right: 80px;
+      padding-left: 32px;
+      padding-right: 32px;
     }
   }
 
@@ -720,19 +677,19 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #937b5d;
-    background: rgba(255, 248, 240, 0.8);
-    border: 1px solid #e5d5c7;
+    color: var(--theme-dashboard-text-muted);
+    background: var(--theme-lesson-panel-bg);
+    border: 1px solid var(--theme-lesson-panel-border);
     border-radius: 6px;
     text-decoration: none;
     transition: all 0.15s ease;
   }
 
   .cyber-back-btn:hover {
-    color: #7c5e3c;
-    border-color: #d4c4b0;
-    background: rgba(255, 248, 240, 1);
-    box-shadow: 0 2px 8px rgba(147, 123, 93, 0.15);
+    color: var(--theme-dashboard-title);
+    border-color: var(--theme-dashboard-accent);
+    background: var(--theme-dashboard-card-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .cyber-back-arrow {
@@ -744,7 +701,7 @@
   .cyber-divider {
     width: 1px;
     height: 20px;
-    background: #e5d5c7;
+    background: var(--theme-lesson-panel-border);
   }
 
   /* === Step Controls === */
@@ -753,8 +710,8 @@
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background: rgba(255, 251, 245, 0.95);
-    border: 1px solid #e5d5c7;
+    background: var(--theme-lesson-panel-bg);
+    border: 1px solid var(--theme-lesson-panel-border);
     border-radius: 8px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   }
@@ -766,17 +723,17 @@
     gap: 4px;
     width: 32px;
     height: 32px;
-    border: 1px solid #e5d5c7;
+    border: 1px solid var(--theme-lesson-panel-border);
     border-radius: 6px;
     background: transparent;
-    color: #937b5d;
+    color: var(--theme-dashboard-text-muted);
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .step-btn:hover:not(:disabled) {
-    background: #937b5d;
-    border-color: #937b5d;
+    background: var(--theme-dashboard-accent);
+    border-color: var(--theme-dashboard-accent);
     color: #fff;
   }
 
@@ -788,8 +745,8 @@
   .step-btn-quiz {
     width: auto;
     padding: 0 14px;
-    background: linear-gradient(135deg, #e8a87c 0%, #d4896a 100%);
-    border-color: #d4896a;
+    background: var(--theme-explanation-quiz-gradient);
+    border-color: var(--theme-dashboard-accent);
     color: #fff;
     font-size: 11px;
     font-weight: 600;
@@ -797,7 +754,7 @@
   }
 
   .step-btn-quiz:hover {
-    background: linear-gradient(135deg, #f0b88c 0%, #e8a87c 100%);
+    background: var(--theme-explanation-quiz-hover-gradient);
   }
 
   .step-progress {
@@ -811,14 +768,14 @@
   .step-progress-bar {
     flex: 1;
     height: 4px;
-    background: #f0e6da;
+    background: var(--theme-dashboard-progress-bg);
     border-radius: 2px;
     overflow: hidden;
   }
 
   .step-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #e8a87c 0%, #d4896a 100%);
+    background: var(--theme-dashboard-accent);
     border-radius: 2px;
   }
 
@@ -826,7 +783,7 @@
     font-size: 11px;
     font-weight: 600;
     font-family: var(--font-mono);
-    color: #937b5d;
+    color: var(--theme-dashboard-text-muted);
     letter-spacing: 0.03em;
     white-space: nowrap;
   }
@@ -848,27 +805,27 @@
 
   /* === HomePage 테마 클래스 === */
   .home-hero {
-    background-color: var(--theme-hero-bg);
+    background-color: var(--theme-home-hero-bg);
   }
 
   .home-section {
-    background-color: var(--theme-section-bg);
+    background-color: var(--theme-home-section-bg);
   }
 
   .home-title {
-    color: var(--theme-title);
+    color: var(--theme-home-title);
   }
 
   .home-subtitle {
-    color: var(--theme-subtitle);
+    color: var(--theme-home-subtitle);
   }
 
   .home-text {
-    color: var(--theme-text);
+    color: var(--theme-home-text);
   }
 
   .home-text-muted {
-    color: var(--theme-text-muted);
+    color: var(--theme-home-text-muted);
   }
 
   /* Dark 테마 전용: title glow */

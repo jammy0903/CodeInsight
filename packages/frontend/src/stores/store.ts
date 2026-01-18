@@ -37,6 +37,8 @@ interface Store {
   setAppUser: (user: AppUser | null) => void;
   needsRegistration: boolean;
   setNeedsRegistration: (needs: boolean) => void;
+  needsOnboarding: boolean;
+  setNeedsOnboarding: (needs: boolean) => void;
   authLoading: boolean;
   setAuthLoading: (loading: boolean) => void;
 
@@ -92,6 +94,8 @@ export const useStore = create<Store>((set, get) => ({
   setAppUser: (user) => set({ appUser: user }),
   needsRegistration: false,
   setNeedsRegistration: (needs) => set({ needsRegistration: needs }),
+  needsOnboarding: false,
+  setNeedsOnboarding: (needs) => set({ needsOnboarding: needs }),
   authLoading: true,
   setAuthLoading: (loading) => set({ authLoading: loading }),
 

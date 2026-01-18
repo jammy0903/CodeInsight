@@ -173,6 +173,9 @@ export const MemoryChangeSchema = z.object({
   previousValue: z.union([z.string(), z.number()]).optional(),
 });
 
+// Event-Driven Visualization용 이벤트 타입 import
+import { VisualizationEventSchema } from './events';
+
 export const LessonStepSchema = z.object({
   line: z.number(),
   highlight: z.array(z.number()).optional(), // API는 highlight 사용
@@ -221,6 +224,10 @@ export const LessonStepSchema = z.object({
   // C 시뮬레이터 return 정보
   isReturn: z.boolean().optional(),
   returnInfo: z.unknown().optional(),
+  // Event-Driven Visualization (권장 방식)
+  // WHY: 프론트엔드가 diff 계산 불필요, 백엔드가 명시적 이벤트 전달
+  // TRADEOFF: 기존 memoryChanges/stack/heap 형식과 병존 (하위 호환성)
+  events: z.array(VisualizationEventSchema).optional(),
 });
 
 // Legacy aliases for backward compatibility

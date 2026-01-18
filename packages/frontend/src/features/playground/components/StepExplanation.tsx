@@ -37,7 +37,7 @@ export function StepExplanation({ step, isMobile = false }: StepExplanationProps
       <span
         style={{
           padding: isMobile ? '1px 5px' : '2px 8px',
-          backgroundColor: '#16a34a',
+          backgroundColor: 'var(--theme-explanation-button-text)',
           color: '#ffffff',
           fontSize: isMobile ? '9px' : '11px',
           fontWeight: 700,
@@ -69,7 +69,7 @@ export function StepExplanation({ step, isMobile = false }: StepExplanationProps
             style={{
               margin: 0,
               fontSize: isMobile ? '11px' : '13px',
-              color: '#166534',
+              color: 'var(--theme-explanation-text)',
               fontWeight: 500,
               lineHeight: isMobile ? 1.5 : 1.6,
               whiteSpace: 'pre-line',
@@ -83,7 +83,7 @@ export function StepExplanation({ step, isMobile = false }: StepExplanationProps
                   display: 'inline-block',
                   width: '2px',
                   height: isMobile ? '12px' : '14px',
-                  backgroundColor: '#16a34a',
+                  backgroundColor: 'var(--theme-explanation-button-text)',
                   marginLeft: '2px',
                   animation: 'blink 1s infinite',
                   verticalAlign: 'text-bottom',

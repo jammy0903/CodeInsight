@@ -42,6 +42,44 @@ const quizAttemptSchema = z.object({
   timeSpent: z.number().min(0).optional(),
 });
 
+// 온보딩 프로필
+const profileSchema = z.object({
+  ageGroup: z.enum(['10s', '20s', '30s', '40s+']).optional(),
+  occupation: z.enum(['student_middle', 'student_high', 'student_univ', 'job_seeker', 'worker', 'other']).optional(),
+  programmingExp: z.enum(['none', 'less_1y', '1_3y', '3y_plus']).optional(),
+  learningGoal: z.enum(['basics', 'job_prep', 'skill_up', 'curiosity']).optional(),
+});
+
+// 세션 컨텍스트
+const sessionContextSchema = z.object({
+  lessonActivityId: z.string().uuid().optional(),
+  screenWidth: z.number().int().positive().optional(),
+  screenHeight: z.number().int().positive().optional(),
+  orientation: z.enum(['portrait', 'landscape']).optional(),
+  inputMethod: z.enum(['touch', 'mouse']).optional(),
+  userAgent: z.string().max(500).optional(),
+  language: z.string().max(10).optional(),
+  connectionType: z.string().max(20).optional(),
+  effectiveType: z.enum(['slow-2g', '2g', '3g', '4g']).optional(),
+  localHour: z.number().int().min(0).max(23).optional(),
+  localWeekday: z.number().int().min(0).max(6).optional(),
+  timezone: z.string().max(50).optional(),
+});
+
+// 스텝 활동
+const stepActivitySchema = z.object({
+  lessonActivityId: z.string().uuid(),
+  lessonId: z.string().min(1),
+  stepIndex: z.number().int().min(0),
+  duration: z.number().int().min(0).optional(),
+  wentBack: z.boolean().optional(),
+  visHoverCount: z.number().int().min(0).optional(),
+  visClickCount: z.number().int().min(0).optional(),
+  aiQuestionCount: z.number().int().min(0).optional(),
+  codeSelections: z.number().int().min(0).optional(),
+  scrollEvents: z.number().int().min(0).optional(),
+});
+
 // =============================================
 // Activity Endpoints (체류 시간)
 // =============================================
@@ -369,6 +407,262 @@ router.get('/summary', requireDbUser, async (req, res) => {
     logger.error('Analytics summary error:', error);
     res.status(500).json({
       error: 'Failed to get analytics summary',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// =============================================
+// Profile Endpoints (온보딩)
+// =============================================
+
+/**
+ * 프로필 조회
+ * GET /api/analytics/profile
+ */
+router.get('/profile', requireDbUser, async (req, res) => {
+  try {
+    const userId = req.user!.dbUser!.id;
+
+    const profile = await prisma.userProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!profile) {
+      return res.json({
+        profile: null,
+        onboardingCompleted: false,
+      });
+    }
+
+    res.json({
+      profile: {
+        ageGroup: profile.ageGroup,
+        occupation: profile.occupation,
+        programmingExp: profile.programmingExp,
+        learningGoal: profile.learningGoal,
+      },
+      onboardingCompleted: profile.onboardingCompleted,
+    });
+  } catch (error) {
+    logger.error('Profile get error:', error);
+    res.status(500).json({
+      error: 'Failed to get profile',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+/**
+ * 프로필 생성/업데이트 (온보딩)
+ * POST /api/analytics/profile
+ */
+router.post('/profile', requireDbUser, async (req, res) => {
+  try {
+    const userId = req.user!.dbUser!.id;
+
+    const parsed = profileSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        details: parsed.error.issues,
+      });
+    }
+
+    const { ageGroup, occupation, programmingExp, learningGoal } = parsed.data;
+
+    // POST 요청 = 사용자가 온보딩 모달을 봤음 (스킵 또는 완료)
+    // → 다시 보여줄 필요 없으므로 무조건 완료 처리
+    const onboardingCompleted = true;
+
+    const profile = await prisma.userProfile.upsert({
+      where: { userId },
+      update: {
+        ageGroup,
+        occupation,
+        programmingExp,
+        learningGoal,
+        onboardingCompleted,
+      },
+      create: {
+        userId,
+        ageGroup,
+        occupation,
+        programmingExp,
+        learningGoal,
+        onboardingCompleted,
+      },
+    });
+
+    res.json({
+      profile: {
+        ageGroup: profile.ageGroup,
+        occupation: profile.occupation,
+        programmingExp: profile.programmingExp,
+        learningGoal: profile.learningGoal,
+      },
+      onboardingCompleted: profile.onboardingCompleted,
+    });
+  } catch (error) {
+    logger.error('Profile update error:', error);
+    res.status(500).json({
+      error: 'Failed to update profile',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// =============================================
+// Session Context Endpoints
+// =============================================
+
+/**
+ * 세션 컨텍스트 저장
+ * POST /api/analytics/session-context
+ */
+router.post('/session-context', requireDbUser, async (req, res) => {
+  try {
+    const userId = req.user!.dbUser!.id;
+
+    const parsed = sessionContextSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        details: parsed.error.issues,
+      });
+    }
+
+    const context = await prisma.sessionContext.create({
+      data: {
+        userId,
+        ...parsed.data,
+      },
+    });
+
+    res.json({
+      id: context.id,
+      createdAt: context.createdAt.toISOString(),
+    });
+  } catch (error) {
+    logger.error('Session context error:', error);
+    res.status(500).json({
+      error: 'Failed to save session context',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// =============================================
+// Step Activity Endpoints
+// =============================================
+
+/**
+ * 스텝 활동 기록 (upsert)
+ * POST /api/analytics/step-activity
+ */
+router.post('/step-activity', requireDbUser, async (req, res) => {
+  try {
+    const userId = req.user!.dbUser!.id;
+
+    const parsed = stepActivitySchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        details: parsed.error.issues,
+      });
+    }
+
+    const { lessonActivityId, lessonId, stepIndex, ...data } = parsed.data;
+
+    // upsert: 같은 (lessonActivityId, stepIndex)면 업데이트
+    const activity = await prisma.stepActivity.upsert({
+      where: {
+        lessonActivityId_stepIndex: {
+          lessonActivityId,
+          stepIndex,
+        },
+      },
+      update: {
+        ...data,
+        // 증분 업데이트가 필요한 필드들은 increment 사용 가능
+        // 여기서는 클라이언트가 누적값을 보내는 것으로 가정
+      },
+      create: {
+        userId,
+        lessonActivityId,
+        lessonId,
+        stepIndex,
+        ...data,
+      },
+    });
+
+    res.json({
+      id: activity.id,
+      createdAt: activity.createdAt.toISOString(),
+    });
+  } catch (error) {
+    logger.error('Step activity error:', error);
+    res.status(500).json({
+      error: 'Failed to save step activity',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+/**
+ * 스텝 활동 일괄 기록 (배치)
+ * POST /api/analytics/step-activities
+ *
+ * WHY: 레슨 완료 시 모든 스텝 데이터를 한 번에 전송
+ */
+router.post('/step-activities', requireDbUser, async (req, res) => {
+  try {
+    const userId = req.user!.dbUser!.id;
+
+    const batchSchema = z.object({
+      activities: z.array(stepActivitySchema).max(100),
+    });
+
+    const parsed = batchSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        details: parsed.error.issues,
+      });
+    }
+
+    const { activities } = parsed.data;
+
+    // 트랜잭션으로 일괄 upsert
+    const results = await prisma.$transaction(
+      activities.map(({ lessonActivityId, lessonId, stepIndex, ...data }) =>
+        prisma.stepActivity.upsert({
+          where: {
+            lessonActivityId_stepIndex: {
+              lessonActivityId,
+              stepIndex,
+            },
+          },
+          update: data,
+          create: {
+            userId,
+            lessonActivityId,
+            lessonId,
+            stepIndex,
+            ...data,
+          },
+        })
+      )
+    );
+
+    res.json({
+      count: results.length,
+      ids: results.map((r) => r.id),
+    });
+  } catch (error) {
+    logger.error('Batch step activities error:', error);
+    res.status(500).json({
+      error: 'Failed to save step activities',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }

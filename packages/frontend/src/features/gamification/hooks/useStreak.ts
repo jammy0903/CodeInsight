@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getStreak, type StreakStatus } from '@/services/gamification';
-import { useAuthStore } from '@/stores/store';
+import { useStore } from '@/stores/store';
 import { logger } from '@/utils/logger';
 
 interface UseStreakResult {
@@ -20,7 +20,7 @@ export function useStreak(): UseStreakResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { appUser } = useAuthStore();
+  const { appUser } = useStore();
 
   const fetchStreak = useCallback(async () => {
     // 로그인 안 된 상태

@@ -127,6 +127,30 @@ function handlePtrDecl(
       points_to: target.address,
     });
 
+    // Phase 4: 포인터 선언 이벤트
+    if (ctx.addEvent && ctx.getCurrentFrame) {
+      // 변수 선언 이벤트
+      ctx.addEvent({
+        type: 'variable',
+        action: 'declare',
+        frame: ctx.getCurrentFrame(),
+        name: ptrName,
+        varType: 'int *',
+        value: target.address,
+        address: ctx.toHex(addr),
+        size: 8,
+      });
+      // 포인터 할당 이벤트
+      ctx.addEvent({
+        type: 'pointer',
+        action: 'assign',
+        frame: ctx.getCurrentFrame(),
+        pointer: ptrName,
+        targetAddress: target.address,
+        targetName: targetName,
+      });
+    }
+
     return ctx.createStep(lineNum, code, explanation);
   }
 
@@ -145,6 +169,7 @@ function handlePtrDecl(
 
 /**
  * 포인터가 가리키는 변수 찾기 (헬퍼)
+ * @returns 변수 이름만 반환 (현재 스코프 기준)
  */
 function findTargetVariable(ctx: SimContext, ptr: { points_to?: string | null }): string | null {
   if (!ptr?.points_to) return null;
@@ -154,6 +179,44 @@ function findTargetVariable(ctx: SimContext, ptr: { points_to?: string | null })
       return name;
     }
   }
+  return null;
+}
+
+/**
+ * Phase 5: 크로스 프레임 변수 찾기 (포인터 역참조용)
+ * 모든 프레임에서 해당 주소를 가진 변수를 찾고, 프레임 정보도 반환
+ * @returns { frameName, variableName, variable } 또는 null
+ */
+function findTargetVariableCrossFrame(
+  ctx: SimContext,
+  ptr: { points_to?: string | null }
+): { frameName: string; variableName: string; variable: { value: string; bytes: number[] } } | null {
+  if (!ptr?.points_to) return null;
+
+  // Phase 5: 크로스 프레임 검색 시도
+  if (ctx.findVariableByAddress) {
+    const result = ctx.findVariableByAddress(ptr.points_to);
+    if (result) {
+      return {
+        frameName: result.frameName,
+        variableName: result.variableName,
+        variable: result.variable,
+      };
+    }
+  }
+
+  // 폴백: 현재 스코프에서만 검색
+  for (const [name, v] of ctx.variables) {
+    if (v.address === ptr.points_to) {
+      const currentFrame = ctx.getCurrentFrame?.() || 'global';
+      return {
+        frameName: currentFrame,
+        variableName: name,
+        variable: v,
+      };
+    }
+  }
+
   return null;
 }
 
@@ -169,19 +232,43 @@ function handlePtrAssignValue(
   value: number
 ): Step {
   const ptr = ctx.variables.get(ptrName);
-  const targetVar = findTargetVariable(ctx, ptr || {});
 
-  if (targetVar && ptr) {
-    const target = ctx.variables.get(targetVar)!;
+  // Phase 5: 크로스 프레임 지원
+  const targetInfo = findTargetVariableCrossFrame(ctx, ptr || {});
+
+  if (targetInfo && ptr) {
+    const { frameName: targetFrame, variableName: targetVar, variable: target } = targetInfo;
+    const currentFrame = ctx.getCurrentFrame?.() || 'global';
     const oldValue = target.value;
     target.value = String(value);
     target.bytes = ctx.intToBytes(value, 4);
+
+    // Phase 4+5: 포인터 역참조 쓰기 이벤트 (크로스 프레임 지원)
+    if (ctx.addEvent && ctx.getCurrentFrame) {
+      const isCrossFrame = targetFrame !== currentFrame;
+      ctx.addEvent({
+        type: 'pointer',
+        action: 'deref_write',
+        frame: currentFrame,
+        pointer: ptrName,
+        targetAddress: ptr.points_to!,
+        targetFrame: isCrossFrame ? targetFrame : undefined, // Phase 5: 크로스 프레임일 때만 포함
+        targetName: targetVar,
+        value: value,
+        previousValue: parseFloat(oldValue) || 0,
+      });
+    }
+
+    const currentFrameName = ctx.getCurrentFrame?.() || 'global';
+    const crossFrameNote = targetFrame !== currentFrameName
+      ? `\n\n🔥 크로스 프레임 수정! '${currentFrameName}'에서 '${targetFrame}'의 변수를 변경`
+      : '';
 
     const explanation = `✏️ 포인터를 통한 간접 수정!
 
 • *${ptrName} = ${value}
 • ${ptrName}이 가리키는 주소(${ptr.points_to})의 값을 수정
-• 실제로 '${targetVar}'의 값이 ${oldValue} → ${value}로 변경됨!
+• 실제로 '${targetVar}'의 값이 ${oldValue} → ${value}로 변경됨!${crossFrameNote}
 
 💡 포인터 역참조(*): 포인터가 가리키는 메모리에 접근`;
 
@@ -205,12 +292,14 @@ function handlePtrAssignDeref(
   const destPtr = ctx.variables.get(destPtrName);
   const srcPtr = ctx.variables.get(srcPtrName);
 
-  const destVar = findTargetVariable(ctx, destPtr || {});
-  const srcVar = findTargetVariable(ctx, srcPtr || {});
+  // Phase 5: 크로스 프레임 지원
+  const destInfo = findTargetVariableCrossFrame(ctx, destPtr || {});
+  const srcInfo = findTargetVariableCrossFrame(ctx, srcPtr || {});
 
-  if (destVar && srcVar && destPtr && srcPtr) {
-    const destTarget = ctx.variables.get(destVar)!;
-    const srcTarget = ctx.variables.get(srcVar)!;
+  if (destInfo && srcInfo && destPtr && srcPtr) {
+    const { frameName: destFrame, variableName: destVar, variable: destTarget } = destInfo;
+    const { frameName: srcFrame, variableName: srcVar, variable: srcTarget } = srcInfo;
+    const currentFrame = ctx.getCurrentFrame?.() || 'global';
 
     const oldValue = destTarget.value;
     const newValue = srcTarget.value;
@@ -218,12 +307,54 @@ function handlePtrAssignDeref(
     destTarget.value = newValue;
     destTarget.bytes = ctx.intToBytes(parseInt(newValue), 4);
 
+    // Phase 4+5: 포인터 역참조 읽기 + 쓰기 이벤트 (크로스 프레임 지원)
+    if (ctx.addEvent && ctx.getCurrentFrame) {
+      const isSrcCrossFrame = srcFrame !== currentFrame;
+      const isDestCrossFrame = destFrame !== currentFrame;
+
+      // 소스 포인터 역참조 읽기
+      ctx.addEvent({
+        type: 'pointer',
+        action: 'deref_read',
+        frame: currentFrame,
+        pointer: srcPtrName,
+        targetAddress: srcPtr.points_to!,
+        targetFrame: isSrcCrossFrame ? srcFrame : undefined, // Phase 5
+        targetName: srcVar,
+        value: parseFloat(newValue) || 0,
+      });
+      // 대상 포인터 역참조 쓰기
+      ctx.addEvent({
+        type: 'pointer',
+        action: 'deref_write',
+        frame: currentFrame,
+        pointer: destPtrName,
+        targetAddress: destPtr.points_to!,
+        targetFrame: isDestCrossFrame ? destFrame : undefined, // Phase 5
+        targetName: destVar,
+        value: parseFloat(newValue) || 0,
+        previousValue: parseFloat(oldValue) || 0,
+      });
+    }
+
+    // 크로스 프레임 설명 추가
+    const crossFrameDetails: string[] = [];
+    if (srcFrame !== currentFrame) {
+      crossFrameDetails.push(`'${srcVar}'는 '${srcFrame}' 프레임에 있음`);
+    }
+    if (destFrame !== currentFrame) {
+      crossFrameDetails.push(`'${destVar}'는 '${destFrame}' 프레임에 있음`);
+    }
+    const crossFrameNote = crossFrameDetails.length > 0
+      ? `\n\n🔥 크로스 프레임 접근!\n   ${crossFrameDetails.join('\n   ')}`
+      : '';
+
     const explanation = `✏️ 포인터를 통한 값 복사!
 
 • *${destPtrName} = *${srcPtrName}
 • ${srcPtrName}이 가리키는 값(${srcTarget.value})을
   ${destPtrName}이 가리키는 곳에 복사
-• '${destVar}': ${oldValue} → ${newValue}
+• '${destVar}': ${oldValue} → ${newValue}${crossFrameNote}
 
 💡 *${srcPtrName}은 '${srcVar}'의 값(${srcTarget.value})
    *${destPtrName}은 '${destVar}'를 가리킴`;
@@ -247,10 +378,13 @@ function handlePtrAssignFromVar(
 ): Step {
   const ptr = ctx.variables.get(ptrName);
   const srcVar = ctx.variables.get(varName);
-  const destVar = findTargetVariable(ctx, ptr || {});
 
-  if (destVar && srcVar && ptr) {
-    const destTarget = ctx.variables.get(destVar)!;
+  // Phase 5: 크로스 프레임 지원
+  const destInfo = findTargetVariableCrossFrame(ctx, ptr || {});
+
+  if (destInfo && srcVar && ptr) {
+    const { frameName: destFrame, variableName: destVar, variable: destTarget } = destInfo;
+    const currentFrame = ctx.getCurrentFrame?.() || 'global';
 
     const oldValue = destTarget.value;
     const newValue = srcVar.value;
@@ -258,12 +392,32 @@ function handlePtrAssignFromVar(
     destTarget.value = newValue;
     destTarget.bytes = ctx.intToBytes(parseInt(newValue), 4);
 
+    // Phase 4+5: 포인터 역참조 쓰기 이벤트 (크로스 프레임 지원)
+    if (ctx.addEvent && ctx.getCurrentFrame) {
+      const isCrossFrame = destFrame !== currentFrame;
+      ctx.addEvent({
+        type: 'pointer',
+        action: 'deref_write',
+        frame: currentFrame,
+        pointer: ptrName,
+        targetAddress: ptr.points_to!,
+        targetFrame: isCrossFrame ? destFrame : undefined, // Phase 5
+        targetName: destVar,
+        value: parseFloat(newValue) || 0,
+        previousValue: parseFloat(oldValue) || 0,
+      });
+    }
+
+    const crossFrameNote = destFrame !== currentFrame
+      ? `\n\n🔥 크로스 프레임 수정! '${currentFrame}'에서 '${destFrame}'의 변수를 변경`
+      : '';
+
     const explanation = `✏️ 포인터를 통한 값 저장!
 
 • *${ptrName} = ${varName}
 • ${varName}의 값(${srcVar.value})을
   ${ptrName}이 가리키는 곳에 저장
-• '${destVar}': ${oldValue} → ${newValue}
+• '${destVar}': ${oldValue} → ${newValue}${crossFrameNote}
 
 💡 포인터 역참조로 원본 변수를 수정!`;
 
@@ -293,6 +447,18 @@ function handlePtrIndexAssign(
 
       const baseAddr = parseInt(ptr.points_to!, 16);
       const elemAddr = baseAddr + offset;
+
+      // Phase 4: 힙 쓰기 이벤트
+      if (ctx.addEvent && ctx.getCurrentFrame) {
+        ctx.addEvent({
+          type: 'heap',
+          action: 'write',
+          address: ctx.toHex(elemAddr),
+          size: 4,
+          value: value,
+          name: `${name}[${index}]`,
+        });
+      }
 
       const explanation = `✏️ 힙 메모리 접근: ${name}[${index}] = ${value}
 

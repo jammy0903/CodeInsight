@@ -65,22 +65,6 @@ function handleMalloc(
   const bytesList = ctx.intToBytes(heapAddr, 8);
   const numElements = Math.floor(size / 4);
 
-  const explanation = `🗄️ 동적 메모리 할당 (malloc)
-
-• malloc(${size}) 호출
-• 힙(Heap)에 ${size}바이트 공간 할당
-• 할당된 주소: ${ctx.toHex(heapAddr)}
-
-포인터 '${name}':
-• 스택 주소: ${ctx.toHex(ptrAddr)}
-• 저장된 값: ${ctx.toHex(heapAddr)} (힙 주소)
-
-💡 스택 vs 힙:
-   스택: 자동 할당/해제, 작은 크기
-   힙: 수동 할당(malloc)/해제(free), 큰 크기 가능
-
-⚠️ malloc 후에는 반드시 free()로 해제해야 메모리 누수 방지!`;
-
   ctx.variables.set(name, {
     address: ctx.toHex(ptrAddr),
     type: 'int *',
@@ -99,6 +83,45 @@ function handleMalloc(
     is_heap: true,
   });
 
+  // Phase 4: malloc 이벤트
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    // 포인터 변수 선언
+    ctx.addEvent({
+      type: 'variable',
+      action: 'declare',
+      frame: ctx.getCurrentFrame(),
+      name: name,
+      varType: 'int *',
+      value: ctx.toHex(heapAddr),
+      address: ctx.toHex(ptrAddr),
+      size: 8,
+    });
+    // 힙 할당
+    ctx.addEvent({
+      type: 'heap',
+      action: 'allocate',
+      address: ctx.toHex(heapAddr),
+      size: size,
+      name: name,
+    });
+  }
+
+  const explanation = `🗄️ 동적 메모리 할당 (malloc)
+
+• malloc(${size}) 호출
+• 힙(Heap)에 ${size}바이트 공간 할당
+• 할당된 주소: ${ctx.toHex(heapAddr)}
+
+포인터 '${name}':
+• 스택 주소: ${ctx.toHex(ptrAddr)}
+• 저장된 값: ${ctx.toHex(heapAddr)} (힙 주소)
+
+💡 스택 vs 힙:
+   스택: 자동 할당/해제, 작은 크기
+   힙: 수동 할당(malloc)/해제(free), 큰 크기 가능
+
+⚠️ malloc 후에는 반드시 free()로 해제해야 메모리 누수 방지!`;
+
   return ctx.createStep(lineNum, code, explanation);
 }
 
@@ -110,6 +133,16 @@ function handleFree(ctx: SimContext, lineNum: number, code: string, name: string
   if (ptr && heap) {
     const heapAddr = ptr.points_to;
     ctx.heapBlocks.delete(name);
+
+    // Phase 4: free 이벤트
+    if (ctx.addEvent && ctx.getCurrentFrame) {
+      ctx.addEvent({
+        type: 'heap',
+        action: 'free',
+        address: heapAddr!,
+        name: name,
+      });
+    }
 
     const explanation = `🗑️ 동적 메모리 해제 (free)
 

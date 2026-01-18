@@ -107,12 +107,12 @@ export function QuizPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fffbf5] p-6">
+    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--theme-quiz-page-bg)' }}>
       <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-8">
-          <FileQuestion className="w-8 h-8 text-[#a08060]" />
-          <h1 className="text-2xl font-bold text-[#6b5a4a]">퀴즈</h1>
+          <FileQuestion className="w-8 h-8" style={{ color: 'var(--theme-quiz-header-icon)' }} />
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-quiz-title)' }}>퀴즈</h1>
         </div>
 
         {/* 퀴즈 유형 버튼들 - 모바일: 세로, 데스크톱: 가로 */}
@@ -124,23 +124,37 @@ export function QuizPage() {
               <button
                 key={quiz.id}
                 onClick={() => handleQuizTypeClick(quiz.id)}
-                className={`flex-1 rounded-xl border p-6 transition-all group text-left ${
-                  isSelected
-                    ? 'border-[#a08060] bg-[#fff8f0] shadow-md'
-                    : 'border-[#e5d5c7] bg-white hover:border-[#a08060] hover:shadow-md'
-                }`}
+                className="flex-1 rounded-xl border p-6 transition-all group text-left hover:shadow-md"
+                style={{
+                  backgroundColor: isSelected ? 'var(--theme-quiz-card-selected-bg)' : 'var(--theme-quiz-card-bg)',
+                  borderColor: isSelected ? 'var(--theme-quiz-card-selected-border)' : 'var(--theme-quiz-card-border)',
+                  boxShadow: isSelected ? '0 4px 6px -1px rgba(0,0,0,0.1)' : undefined,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.borderColor = 'var(--theme-quiz-card-border-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.borderColor = 'var(--theme-quiz-card-border)';
+                  }
+                }}
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-lg ${quiz.color} flex items-center justify-center`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h2 className={`text-lg font-semibold transition-colors ${
-                      isSelected ? 'text-[#a08060]' : 'text-[#6b5a4a] group-hover:text-[#a08060]'
-                    }`}>
+                    <h2
+                      className="text-lg font-semibold transition-colors"
+                      style={{
+                        color: isSelected ? 'var(--theme-quiz-text-hover)' : 'var(--theme-quiz-text)',
+                      }}
+                    >
                       {quiz.label}
                     </h2>
-                    <p className="text-sm text-[#937b5d]">
+                    <p className="text-sm" style={{ color: 'var(--theme-quiz-text-muted)' }}>
                       {quiz.description}
                     </p>
                   </div>
@@ -160,7 +174,7 @@ export function QuizPage() {
               transition={{ duration: 0.3 }}
               className="mt-8"
             >
-              <h3 className="text-lg font-semibold text-[#6b5a4a] mb-4">언어 선택</h3>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--theme-quiz-title)' }}>언어 선택</h3>
               <div className="flex flex-col md:flex-row gap-4">
                 {LANGUAGES.map((lang) => (
                   <motion.button

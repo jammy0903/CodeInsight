@@ -10,12 +10,13 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
-import { Code2, Cpu, GitBranch } from 'lucide-react';
-import { CodeViewer } from '../day/CodeViewer';
-import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
+import { Code2, Cpu, GitBranch, Play, ChevronUp, ChevronDown } from 'lucide-react';
+import { useStepGestures } from '../../hooks/useStepGestures';
+import { LessonCodeEditor } from '../day/LessonCodeEditor';
 import { MemoryPanel } from '../memory/MemoryPanel';
 import { FlowViewer } from '../python/FlowViewer';
 import { PyVisualizerView } from '@/features/visualizers/python';
+import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { MobileAIChatFAB } from './MobileAIChatFAB';
 import { MobileAIChatModal } from './MobileAIChatModal';
 import type { LessonStep } from '@/types';
@@ -115,18 +116,23 @@ export function MobileLessonView({
 }: MobileLessonViewProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+  const [visualTab, setVisualTab] = useState<'flow' | 'memory'>('flow');
+  const [isExplanationCollapsed, setIsExplanationCollapsed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[currentStepIndex];
   const config = getLanguageConfig(languageId);
+  const isLastStep = currentStepIndex >= steps.length - 1;
 
-  // 터미널 출력 계산
-  const terminalLines: TerminalLine[] = [];
-  for (let i = 0; i <= currentStepIndex; i++) {
-    if (steps[i]?.stdout) {
-      terminalLines.push({ content: steps[i].stdout!, type: 'output' });
-    }
-  }
+  // 스텝 제스처 (키보드 ← →, 탭/클릭)
+  const { handleTapArea } = useStepGestures({
+    onPrev: onPrevStep,
+    onNext: isLastStep && onQuiz ? onQuiz : onNextStep,
+    enabled: true,
+    isModalOpen: isAIChatOpen,
+    canGoPrev: currentStepIndex > 0,
+    canGoNext: !isLastStep || !!onQuiz,
+  });
 
   // 스와이프 핸들러
   const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -147,7 +153,7 @@ export function MobileLessonView({
       if (part.startsWith('**') && part.endsWith('**')) {
         const keyword = part.slice(2, -2);
         return (
-          <span key={i} className="font-bold text-[#2a1a0a] bg-[#fff3e0] px-1 rounded">
+          <span key={i} className="font-bold px-1 rounded" style={{ color: 'var(--theme-explanation-text)', backgroundColor: 'var(--theme-memory-changed-bg)' }}>
             {keyword}
           </span>
         );
@@ -156,7 +162,7 @@ export function MobileLessonView({
       if (part.startsWith('`') && part.endsWith('`')) {
         const code = part.slice(1, -1);
         return (
-          <code key={i} className="font-mono font-bold text-[#c7254e] bg-[#f9f2f4] px-1 rounded text-sm">
+          <code key={i} className="font-mono font-bold px-1 rounded text-sm" style={{ color: 'var(--theme-memory-register-rbp-text)', backgroundColor: 'var(--theme-memory-register-rbp-bg)' }}>
             {code}
           </code>
         );
@@ -165,21 +171,46 @@ export function MobileLessonView({
     });
   };
 
-  // 설명 컴포넌트 (컴팩트 + NationalPension 폰트)
-  const ExplanationSection = () => (
-    <div className="bg-white rounded-lg border border-[#e5d5c7] p-2" style={{ fontFamily: 'NationalPension, cursive', fontWeight: 'normal' }}>
-      <div className="flex items-start gap-1.5">
-        <span className="shrink-0 px-1 py-0.5 rounded bg-[#6b5a4a] text-white text-[10px] font-bold leading-none" style={{ fontFamily: 'var(--font-sans)' }}>
+  // 설명 컴포넌트 (접기/펼치기 기능 포함)
+  const ExplanationSection = ({ canCollapse }: { canCollapse: boolean }) => (
+    <div className="rounded-md border border-[var(--theme-lesson-panel-border)] overflow-hidden" style={{ fontFamily: 'NationalPension, cursive', fontWeight: 'normal', backgroundColor: 'var(--theme-lesson-panel-bg)' }}>
+      {/* 설명 헤더 (접기/펼치기 버튼 포함) */}
+      <div
+        className="flex items-center gap-1 px-1.5 py-1"
+        style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' }}
+      >
+        <span className="shrink-0 px-1 py-0.5 rounded text-white text-[9px] font-bold leading-none" style={{ fontFamily: 'var(--font-sans)', backgroundColor: 'var(--theme-explanation-text)' }}>
           L{currentStep?.line || 1}
         </span>
-        <span className="text-sm text-[#333] leading-tight whitespace-pre-wrap">
-          {currentStep?.explanation ? formatExplanation(currentStep.explanation) : '설명이 없습니다'}
-        </span>
+        <span className="text-[10px] font-semibold text-amber-800">설명</span>
+        {canCollapse && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExplanationCollapsed(!isExplanationCollapsed);
+            }}
+            className="ml-auto p-0.5 rounded hover:bg-amber-200/50 transition-colors"
+          >
+            {isExplanationCollapsed ? (
+              <ChevronUp className="w-3 h-3 text-amber-700" />
+            ) : (
+              <ChevronDown className="w-3 h-3 text-amber-700" />
+            )}
+          </button>
+        )}
       </div>
-      {currentStep?.tip && (
-        <div className="mt-1.5 pl-1.5 border-l-2 border-amber-400">
-          <span className="text-xs text-amber-700">💡 </span>
-          <span className="text-xs text-amber-800 whitespace-pre-wrap">{currentStep.tip}</span>
+      {/* 설명 내용 (접혔을 때 숨김) */}
+      {!isExplanationCollapsed && (
+        <div className="p-1.5">
+          <span className="text-xs leading-snug whitespace-pre-wrap" style={{ color: 'var(--theme-explanation-text)' }}>
+            {currentStep?.explanation ? formatExplanation(currentStep.explanation) : '설명이 없습니다'}
+          </span>
+          {currentStep?.tip && (
+            <div className="mt-1 pl-1 border-l-2 border-l-[var(--theme-memory-changed-border)]">
+              <span className="text-[10px]" style={{ color: 'var(--theme-memory-changed-border)' }}>💡 </span>
+              <span className="text-[10px] whitespace-pre-wrap" style={{ color: 'var(--theme-explanation-text)' }}>{currentStep.tip}</span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -210,7 +241,7 @@ export function MobileLessonView({
 
     if (!hasMemoryData) {
       return (
-        <div className="flex items-center justify-center h-full min-h-[150px] text-gray-400 text-sm">
+        <div className="flex items-center justify-center h-full min-h-[150px] text-sm" style={{ color: 'var(--theme-lesson-tab-inactive-text)' }}>
           이 스텝에서는 메모리 변화가 없습니다
         </div>
       );
@@ -227,8 +258,6 @@ export function MobileLessonView({
     );
   };
 
-  const VisualIcon = config.visualIcon;
-
   return (
     <div className="flex flex-col h-full relative">
       {/* 스와이프 컨테이너 */}
@@ -243,103 +272,142 @@ export function MobileLessonView({
           className="flex h-full"
           style={{ width: '200%' }}
         >
-          {/* 페이지 1: 코드 + 출력 + 설명 */}
-          <div className="w-1/2 h-full p-2 flex flex-col gap-2">
-            {/* 코드 뷰어 - 독립 스크롤 */}
-            <div className="flex-1 bg-white rounded-lg border border-[#e5d5c7] overflow-hidden flex flex-col">
-              <div className="px-3 py-1.5 bg-gradient-to-r from-[#2d2d2d] to-[#1a1a1a] text-white text-xs font-semibold flex items-center gap-2">
-                <Code2 className="w-3 h-3" />
-                {config.codeName}
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                <CodeViewer
-                  code={code}
-                  highlightLine={currentStep?.line || 1}
-                />
-              </div>
-            </div>
+          {/* 페이지 1: 코드 + 설명 */}
+          {(() => {
+            // 코드 줄 수 계산 (10줄 기준 - 모바일/데스크톱 통일)
+            const lineCount = code.split('\n').length;
+            const LINE_HEIGHT = 18; // 모바일은 약간 작은 줄 높이
+            const MAX_VISIBLE_LINES = 10;
+            const visibleLines = Math.min(lineCount, MAX_VISIBLE_LINES);
+            const codeEditorHeight = visibleLines * LINE_HEIGHT;
+            const hasScroll = lineCount > MAX_VISIBLE_LINES;
+            // 7줄 이상일 때만 접기 버튼 표시 (빈 공간 방지)
+            const canCollapse = lineCount > 6;
 
-            {/* 터미널 출력 */}
-            {terminalLines.length > 0 && (
-              <div className="bg-white rounded-lg border border-[#e5d5c7] overflow-hidden">
-                <TerminalOutput
-                  lines={terminalLines}
-                  title="출력"
-                  maxHeight="60px"
-                  emptyMessage=""
-                  compact
-                />
-              </div>
-            )}
+            return (
+              <div className="w-1/2 h-full p-1 flex flex-col" onClick={handleTapArea}>
+                {/* 코드 뷰어 (접혔을 때: flex-1로 확장, 펼쳤을 때: 동적 높이) */}
+                <div
+                  className={`rounded-lg border border-[var(--theme-lesson-panel-border)] overflow-hidden flex flex-col ${isExplanationCollapsed ? 'flex-1' : 'shrink-0'}`}
+                  style={{ backgroundColor: 'var(--theme-lesson-panel-bg)' }}
+                >
+                  <div className="px-2 py-1 bg-gradient-to-r from-[#2d2d2d] to-[#1a1a1a] text-white text-[11px] font-semibold flex items-center gap-1.5 shrink-0">
+                    <Code2 className="w-3 h-3" />
+                    {config.codeName}
+                    <span className="ml-auto opacity-60">{lineCount}줄</span>
+                  </div>
+                  <div
+                    className={`${isExplanationCollapsed ? 'flex-1' : ''} ${hasScroll ? 'overflow-y-auto' : 'overflow-hidden'}`}
+                    style={isExplanationCollapsed
+                      ? { minHeight: `${codeEditorHeight}px` }
+                      : { height: `${codeEditorHeight}px` }
+                    }
+                  >
+                    <LessonCodeEditor
+                      code={code}
+                      highlightLine={currentStep?.line || 1}
+                    />
+                  </div>
+                </div>
 
-            {/* 설명 - 독립 스크롤 */}
-            <div className="flex-1 overflow-y-auto">
-              <ExplanationSection />
-            </div>
-          </div>
-
-          {/* 페이지 2: 시각화 전체 화면 */}
-          <div className="w-1/2 h-full p-2">
-            {/* 시각화 (메모리 or 플로우) - 전체 화면 */}
-            <div className="h-full bg-white rounded-lg border border-[#e5d5c7] overflow-hidden flex flex-col">
-              <div className={`px-3 py-1.5 bg-gradient-to-r ${config.visualColor} text-white text-xs font-semibold flex items-center gap-2`}>
-                <VisualIcon className="w-3 h-3" />
-                {config.visualName}
+                {/* 설명 (접혔을 때: shrink-0, 펼쳤을 때: flex-1) */}
+                <div className={`${isExplanationCollapsed ? 'shrink-0' : 'flex-1 min-h-0 overflow-y-auto'} mt-1`}>
+                  <ExplanationSection canCollapse={canCollapse} />
+                </div>
               </div>
+            );
+          })()}
+
+          {/* 페이지 2: Flow/Memory 탭 시각화 */}
+          <div className="w-1/2 h-full p-1" onClick={handleTapArea}>
+            <div className="h-full rounded-lg border border-[var(--theme-lesson-panel-border)] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--theme-lesson-panel-bg)' }}>
+              {/* 탭 헤더 */}
+              <div className="flex border-b border-b-[var(--theme-lesson-panel-border)]">
+                {/* Flow 탭 */}
+                <button
+                  onClick={() => setVisualTab('flow')}
+                  className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-colors ${
+                    visualTab === 'flow'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                      : ''
+                  }`}
+                  style={visualTab !== 'flow' ? {
+                    backgroundColor: 'var(--theme-lesson-tab-inactive-bg)',
+                    color: 'var(--theme-lesson-tab-inactive-text)'
+                  } : {}}
+                >
+                  <Play className="w-3 h-3" />
+                  Flow
+                </button>
+                {/* Memory 탭 */}
+                <button
+                  onClick={() => setVisualTab('memory')}
+                  className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-colors ${
+                    visualTab === 'memory'
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
+                      : ''
+                  }`}
+                  style={visualTab !== 'memory' ? {
+                    backgroundColor: 'var(--theme-lesson-tab-inactive-bg)',
+                    color: 'var(--theme-lesson-tab-inactive-text)'
+                  } : {}}
+                >
+                  <Cpu className="w-3 h-3" />
+                  메모리
+                </button>
+              </div>
+
+              {/* 탭 콘텐츠 */}
               <div className="flex-1 overflow-y-auto p-2">
-                {renderVisualization()}
+                {visualTab === 'flow' ? (
+                  /* Flow 시각화 */
+                  <LessonFlowVisualizer
+                    step={currentStep}
+                    prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] : null}
+                    language={languageId as 'c' | 'python' | 'java'}
+                    fullCode={code}
+                    theme="light"
+                    memoryState={memoryState}
+                    stdout={currentStep?.stdout}
+                  />
+                ) : (
+                  /* Memory 시각화 */
+                  renderVisualization()
+                )}
               </div>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* 스텝 네비게이션 */}
-      <div className="flex items-center justify-between px-4 py-2 bg-white border-t border-[#e5d5c7]">
-        {/* 이전 코드 버튼 */}
-        <button
-          onClick={onPrevStep}
-          disabled={currentStepIndex === 0}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed bg-[#e5d5c7] text-[#6b5a4a] hover:bg-[#d5c5b7]"
-        >
-          이전 코드
-        </button>
-
-        {/* 페이지 인디케이터 (점만) */}
-        <div className="flex items-center gap-2">
+      {/* 페이지 인디케이터 - 코드/시각화 전환 */}
+      <div className="flex items-center justify-center px-2 py-1.5 border-t border-t-[var(--theme-lesson-panel-border)]" style={{ backgroundColor: 'var(--theme-lesson-panel-bg)' }}>
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => setCurrentPage(0)}
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-              currentPage === 0 ? 'bg-[#6b5a4a] w-5' : 'bg-gray-300'
+            className={`w-2 h-2 rounded-full transition-all ${
+              currentPage === 0 ? 'w-4' : ''
             }`}
+            style={{
+              backgroundColor: currentPage === 0
+                ? 'var(--theme-explanation-text)'
+                : 'var(--theme-lesson-tab-inactive-bg)'
+            }}
             aria-label="코드 페이지"
           />
           <button
             onClick={() => setCurrentPage(1)}
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-              currentPage === 1 ? 'bg-[#6b5a4a] w-5' : 'bg-gray-300'
+            className={`w-2 h-2 rounded-full transition-all ${
+              currentPage === 1 ? 'w-4' : ''
             }`}
+            style={{
+              backgroundColor: currentPage === 1
+                ? 'var(--theme-explanation-text)'
+                : 'var(--theme-lesson-tab-inactive-bg)'
+            }}
             aria-label="시각화 페이지"
           />
         </div>
-
-        {/* 다음 코드 / 퀴즈 풀기 버튼 */}
-        {currentStepIndex >= steps.length - 1 && onQuiz ? (
-          <button
-            onClick={onQuiz}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-emerald-500 text-white hover:bg-emerald-600"
-          >
-            퀴즈 풀기
-          </button>
-        ) : (
-          <button
-            onClick={onNextStep}
-            disabled={currentStepIndex >= steps.length - 1}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed bg-[#e5d5c7] text-[#6b5a4a] hover:bg-[#d5c5b7]"
-          >
-            다음 코드
-          </button>
-        )}
       </div>
 
       {/* AI Chat FAB + Modal */}

@@ -26,6 +26,10 @@ export const config = {
       analyticsActivityEnd: '/analytics/activity/end',
       analyticsQuizAttempt: '/analytics/quiz-attempt',
       analyticsSummary: '/analytics/summary',
+      analyticsProfile: '/analytics/profile',
+      analyticsSessionContext: '/analytics/session-context',
+      analyticsStepActivity: '/analytics/step-activity',
+      analyticsStepActivities: '/analytics/step-activities',
       // 노트
       notes: '/notes',
       notesConcepts: '/notes/concepts',

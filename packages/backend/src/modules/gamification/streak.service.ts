@@ -110,49 +110,64 @@ export async function checkStreakStatus(userId: string): Promise<StreakStatus> {
  * 1. 같은 날 → 스트릭 유지 (중복 방지)
  * 2. 어제 → 스트릭 +1
  * 3. 그 이전 → 스트릭 리셋 (1로)
+ *
+ * WHY Transaction: Race condition 방지
+ * - 동시에 여러 레슨 완료 시 Lost Update 문제 해결
+ * - Serializable isolation으로 일관성 보장
  */
 export async function updateStreak(userId: string) {
   const today = getUtcDateOnly();
-  const streak = await getStreak(userId);
 
-  if (!streak) {
-    // 첫 완료 → 스트릭 1로 시작
-    return prisma.userStreak.create({
+  // Transaction으로 원자적 처리
+  return prisma.$transaction(async (tx) => {
+    // 1. 기존 스트릭 조회 (트랜잭션 내에서)
+    const streak = await tx.userStreak.findUnique({
+      where: { userId },
+    });
+
+    if (!streak) {
+      // 첫 완료 → 스트릭 1로 시작
+      return tx.userStreak.create({
+        data: {
+          userId,
+          currentStreak: 1,
+          longestStreak: 1,
+          lastActiveAt: today,
+        },
+      });
+    }
+
+    const lastActive = streak.lastActiveAt;
+
+    // 같은 날 중복 완료 → 스트릭 유지 (변경 없이 반환)
+    if (lastActive && isToday(lastActive)) {
+      return streak;
+    }
+
+    let newCurrentStreak: number;
+
+    if (lastActive && isYesterday(lastActive)) {
+      // 어제 활동 → 스트릭 +1
+      newCurrentStreak = streak.currentStreak + 1;
+    } else {
+      // 그 이전 또는 첫 활동 → 스트릭 리셋 (1로)
+      newCurrentStreak = 1;
+    }
+
+    const newLongestStreak = Math.max(streak.longestStreak, newCurrentStreak);
+
+    // 2. 업데이트 (같은 트랜잭션 내에서)
+    return tx.userStreak.update({
+      where: { userId },
       data: {
-        userId,
-        currentStreak: 1,
-        longestStreak: 1,
+        currentStreak: newCurrentStreak,
+        longestStreak: newLongestStreak,
         lastActiveAt: today,
       },
     });
-  }
-
-  const lastActive = streak.lastActiveAt;
-
-  // 같은 날 중복 완료 → 스트릭 유지
-  if (lastActive && isToday(lastActive)) {
-    return streak;
-  }
-
-  let newCurrentStreak: number;
-
-  if (lastActive && isYesterday(lastActive)) {
-    // 어제 활동 → 스트릭 +1
-    newCurrentStreak = streak.currentStreak + 1;
-  } else {
-    // 그 이전 또는 첫 활동 → 스트릭 리셋 (1로)
-    newCurrentStreak = 1;
-  }
-
-  const newLongestStreak = Math.max(streak.longestStreak, newCurrentStreak);
-
-  return prisma.userStreak.update({
-    where: { userId },
-    data: {
-      currentStreak: newCurrentStreak,
-      longestStreak: newLongestStreak,
-      lastActiveAt: today,
-    },
+  }, {
+    // 격리 수준: Serializable (가장 강력한 일관성)
+    isolationLevel: 'Serializable',
   });
 }
 
@@ -160,17 +175,21 @@ export async function updateStreak(userId: string) {
  * 스트릭 리셋 (관리자용)
  */
 export async function resetStreak(userId: string) {
-  const streak = await getStreak(userId);
+  return prisma.$transaction(async (tx) => {
+    const streak = await tx.userStreak.findUnique({
+      where: { userId },
+    });
 
-  if (!streak) {
-    return null;
-  }
+    if (!streak) {
+      return null;
+    }
 
-  return prisma.userStreak.update({
-    where: { userId },
-    data: {
-      currentStreak: 0,
-      lastActiveAt: null,
-    },
+    return tx.userStreak.update({
+      where: { userId },
+      data: {
+        currentStreak: 0,
+        lastActiveAt: null,
+      },
+    });
   });
 }

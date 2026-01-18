@@ -169,4 +169,28 @@ export class CallStack {
       .reverse()
       .join('\n');
   }
+
+  /**
+   * 주소로 변수 찾기 (크로스 프레임 지원)
+   * 모든 프레임을 탐색하여 해당 주소를 가진 변수를 찾음
+   * @returns { frameName, variableName, variable } 또는 null
+   */
+  findVariableByAddress(address: string): {
+    frameName: string;
+    variableName: string;
+    variable: Variable;
+  } | null {
+    for (const frame of this.frames) {
+      for (const [name, variable] of frame.scope.variables.entries()) {
+        if (variable.address === address) {
+          return {
+            frameName: frame.functionName,
+            variableName: name,
+            variable,
+          };
+        }
+      }
+    }
+    return null;
+  }
 }

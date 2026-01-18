@@ -11,6 +11,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { TopBar } from './TopBar';
 import { Sidebar } from './Sidebar';
 import { NicknameModal } from '@/components/NicknameModal';
+import { OnboardingModal } from '@/components/OnboardingModal';
 import { Menu, Github, Mail } from 'lucide-react';
 import { useStore } from '@/stores/store';
 
@@ -37,15 +38,23 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* 닉네임 등록 모달 - needsRegistration 시 자동 표시 */}
       <NicknameModal />
 
+      {/* 온보딩 모달 - needsOnboarding 시 자동 표시 (닉네임 등록 후) */}
+      <OnboardingModal />
+
       {/* Sidebar */}
       <Sidebar />
 
       {/* Header */}
-      <TopBar />
+      <div style={{ pointerEvents: sidebarOpen ? 'none' : 'auto' }}>
+        <TopBar />
+      </div>
 
       {/* Main Content - Animates with sidebar */}
       <motion.main
         className="flex-1 overflow-auto"
+        style={{
+          pointerEvents: sidebarOpen ? 'none' : 'auto',
+        }}
         animate={{
           marginLeft: sidebarOpen ? '224px' : '0px',
         }}
@@ -62,32 +71,72 @@ export function MainLayout({ children }: MainLayoutProps) {
 
         {/* Footer - 스크롤 영역 안에 배치 */}
         {!isLessonPage && !isPlaygroundPage && (
-          <footer className="mt-16 py-4 bg-[#f8f4ef] border-t border-[#e5d5c7]">
+          <footer className="mt-16 py-4 border-t border-t-[var(--theme-layout-footer-border)]" style={{ backgroundColor: 'var(--theme-layout-footer-bg)' }}>
             <div className="main-content-container my-4">
               {/* 2열 레이아웃 */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 {/* 왼쪽: 브랜드 + 링크 */}
                 <div className="space-y-2">
-                  <Link to="/" className="text-lg font-bold text-[#6b5a4a] hover:text-[#a08060] transition-colors no-underline hover:no-underline">
+                  <Link
+                    to="/"
+                    className="text-lg font-bold transition-colors no-underline hover:no-underline"
+                    style={{ color: 'var(--theme-layout-footer-text)' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text)'; }}
+                  >
                     CodeInsight
                   </Link>
-                  <div className="flex flex-wrap gap-4 text-sm text-[#937b5d]">
-                    <a href="/courses" className="hover:text-[#6b5a4a] transition-colors">Courses</a>
-                    <a href="/chat" className="hover:text-[#6b5a4a] transition-colors">AI Chat</a>
-                    <a href={gmailLink} target="_blank" rel="noopener noreferrer" className="hover:text-[#6b5a4a] transition-colors">Contact</a>
+                  <div className="flex flex-wrap gap-4 text-sm" style={{ color: 'var(--theme-layout-footer-text-muted)' }}>
+                    <a
+                      href="/courses"
+                      className="transition-colors"
+                      style={{ color: 'var(--theme-layout-footer-text-muted)' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text-muted)'; }}
+                    >
+                      Courses
+                    </a>
+                    <a
+                      href="/chat"
+                      className="transition-colors"
+                      style={{ color: 'var(--theme-layout-footer-text-muted)' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text-muted)'; }}
+                    >
+                      AI Chat
+                    </a>
+                    <a
+                      href={gmailLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="transition-colors"
+                      style={{ color: 'var(--theme-layout-footer-text-muted)' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text-muted)'; }}
+                    >
+                      Contact
+                    </a>
                   </div>
                 </div>
 
                 {/* 오른쪽: Stay in touch + 소셜 */}
                 <div className="space-y-2 md:text-right">
-                  <p className="text-sm font-medium text-[#6b5a4a]">Stay in touch</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--theme-layout-footer-text)' }}>Stay in touch</p>
                   <div className="flex gap-3 md:justify-end">
                     <a
                       href="https://github.com/jammy0903"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-9 h-9 rounded-full bg-[#e5d5c7] flex items-center justify-center
-                                 hover:bg-[#a08060] hover:text-white transition-colors text-[#6b5a4a]"
+                      className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                      style={{ backgroundColor: 'var(--theme-layout-footer-social-bg)', color: 'var(--theme-layout-footer-text)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--theme-layout-footer-social-hover)';
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--theme-layout-footer-social-bg)';
+                        e.currentTarget.style.color = 'var(--theme-layout-footer-text)';
+                      }}
                     >
                       <Github className="w-4 h-4" />
                     </a>
@@ -95,8 +144,16 @@ export function MainLayout({ children }: MainLayoutProps) {
                       href={gmailLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-9 h-9 rounded-full bg-[#e5d5c7] flex items-center justify-center
-                                 hover:bg-[#a08060] hover:text-white transition-colors text-[#6b5a4a]"
+                      className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                      style={{ backgroundColor: 'var(--theme-layout-footer-social-bg)', color: 'var(--theme-layout-footer-text)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--theme-layout-footer-social-hover)';
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--theme-layout-footer-social-bg)';
+                        e.currentTarget.style.color = 'var(--theme-layout-footer-text)';
+                      }}
                     >
                       <Mail className="w-4 h-4" />
                     </a>
@@ -105,7 +162,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               </div>
 
               {/* 하단 저작권 */}
-              <div className="mt-4 pt-3 border-t border-[#e5d5c7] text-center text-xs text-[#937b5d]">
+              <div className="mt-4 pt-3 border-t border-t-[var(--theme-layout-footer-border)] text-center text-xs" style={{ color: 'var(--theme-layout-footer-text-muted)' }}>
                 © 2026 CodeInsight. All Rights Reserved.
               </div>
             </div>

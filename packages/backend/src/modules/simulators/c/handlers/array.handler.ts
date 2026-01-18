@@ -189,6 +189,20 @@ function handleArrayDecl(
     element_size: elemSize,
   });
 
+  // Phase 4: 배열 선언 이벤트
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    ctx.addEvent({
+      type: 'variable',
+      action: 'declare',
+      frame: ctx.getCurrentFrame(),
+      name: name,
+      varType: `${typeName}[${size}]`,
+      value: valuesStr ? `{${valuesStr}}` : '[uninitialized]',
+      address: ctx.toHex(addr),
+      size: totalSize,
+    });
+  }
+
   return ctx.createStep(lineNum, code, explanation);
 }
 
@@ -236,6 +250,19 @@ function handleArrayAssign(
       displayValue = value.toFixed(6);
     } else {
       displayValue = String(value);
+    }
+
+    // Phase 4: 배열 요소 대입 이벤트
+    if (ctx.addEvent && ctx.getCurrentFrame) {
+      ctx.addEvent({
+        type: 'variable',
+        action: 'assign',
+        frame: ctx.getCurrentFrame(),
+        name: `${name}[${index}]`,
+        varType: elemType,
+        value: value,
+        address: ctx.toHex(elemAddr),
+      });
     }
 
     explanation = `✏️ 배열 요소 '${name}[${index}]' 값 변경

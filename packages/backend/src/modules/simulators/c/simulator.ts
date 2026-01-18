@@ -2,11 +2,23 @@
  * 교육용 C 메모리 시뮬레이터 v2
  * - 함수 호출/복귀 지원
  * - 모듈화된 구조 (parser + runtime + handlers)
+ * - Event-Driven Visualization 지원
  */
 
 import { parseCode, type FunctionDef, type ParseResult } from './parser';
 import { CallStack, ScopeManager, type Step, type MemoryBlock, type Variable, type HeapBlock } from './runtime';
 import { registry, type SimContext } from './handlers';
+import type { VisualizationEvent } from '@codeinsight/shared';
+
+/**
+ * 이전 스텝 상태 스냅샷 (diff 계산용)
+ */
+interface PreviousSnapshot {
+  frames: string[];                    // 프레임 이름 목록
+  variables: Map<string, string>;      // "frame.name" -> value
+  heapBlocks: Map<string, string>;     // address -> value
+  stdout: string;
+}
 
 class CSimulator implements SimContext {
   // 파싱 결과
@@ -33,6 +45,17 @@ class CSimulator implements SimContext {
   stackBase = 0x7fffffffde00;
   stackOffset = 0;
   variables: Map<string, Variable>;
+
+  // Event-Driven Visualization용 (이전 상태 추적)
+  private previousSnapshot: PreviousSnapshot = {
+    frames: [],
+    variables: new Map(),
+    heapBlocks: new Map(),
+    stdout: '',
+  };
+
+  // 핸들러가 직접 추가한 이벤트 버퍼 (Phase 4)
+  private handlerEvents: VisualizationEvent[] = [];
 
   constructor() {
     this.callStack = new CallStack();
@@ -482,6 +505,36 @@ class CSimulator implements SimContext {
   }
 
   /**
+   * Phase 4: 핸들러가 직접 이벤트 추가
+   * createStep() 호출 전에 핸들러가 이 메서드로 이벤트를 추가하면
+   * diff 기반 이벤트 대신 핸들러 이벤트가 사용됨
+   */
+  addEvent(event: VisualizationEvent): void {
+    this.handlerEvents.push(event);
+  }
+
+  /**
+   * Phase 4: 현재 프레임 이름 반환
+   * 핸들러가 이벤트 생성 시 frame 필드에 사용
+   */
+  getCurrentFrame(): string {
+    return this.callStack.currentFunction();
+  }
+
+  /**
+   * Phase 5: 주소로 변수 찾기 (크로스 프레임 지원)
+   * 모든 프레임에서 해당 주소를 가진 변수를 찾음
+   * @returns { frameName, variableName, variable } 또는 null
+   */
+  findVariableByAddress(address: string): {
+    frameName: string;
+    variableName: string;
+    variable: Variable;
+  } | null {
+    return this.callStack.findVariableByAddress(address);
+  }
+
+  /**
    * 메모리 누수 경고 스텝 생성
    */
   private createMemoryLeakWarning(
@@ -570,6 +623,29 @@ ${blockList}
     // 다음 스텝을 위해 길이 업데이트
     this.lastStdoutLength = this.stdoutBuffer.length;
 
+    // Event-Driven: 핸들러 이벤트가 있으면 우선 사용, 없으면 diff 기반 생성
+    let events: VisualizationEvent[];
+    if (this.handlerEvents.length > 0) {
+      // Phase 4: 핸들러가 직접 추가한 이벤트 사용
+      events = [...this.handlerEvents];
+      this.handlerEvents = []; // 버퍼 비우기
+
+      // stdout 이벤트는 핸들러가 추가하지 않았을 수 있으므로 자동 추가
+      if (newStdout && !events.some(e => e.type === 'output')) {
+        events.push({
+          type: 'output',
+          stream: 'stdout',
+          text: newStdout,
+        });
+      }
+    } else {
+      // 기존: diff 기반 이벤트 생성
+      events = this.generateEvents(allVariables, heap, newStdout);
+    }
+
+    // 스냅샷 업데이트 (다음 스텝의 diff 계산용)
+    this.updateSnapshot(allVariables, heap);
+
     return {
       line: lineNum,
       code,
@@ -581,7 +657,219 @@ ${blockList}
       functionName: this.callStack.currentFunction(),
       callDepth: this.callStack.depth(),
       stdout: newStdout,
+      events, // Event-Driven Visualization 이벤트 배열
     };
+  }
+
+  /**
+   * 이전 상태와 현재 상태 비교하여 이벤트 생성
+   */
+  private generateEvents(
+    allVariables: Array<[string, Variable]>,
+    heap: MemoryBlock[],
+    newStdout: string | undefined
+  ): VisualizationEvent[] {
+    const events: VisualizationEvent[] = [];
+
+    // 1. 프레임 변경 감지
+    const currentFrames = this.getActiveFrameNames();
+    const prevFrames = this.previousSnapshot.frames;
+
+    // 새로 추가된 프레임 (push)
+    for (const frame of currentFrames) {
+      if (!prevFrames.includes(frame)) {
+        events.push({
+          type: 'frame',
+          action: 'push',
+          name: frame,
+        });
+      }
+    }
+
+    // 제거된 프레임 (pop)
+    for (const frame of prevFrames) {
+      if (!currentFrames.includes(frame)) {
+        events.push({
+          type: 'frame',
+          action: 'pop',
+          name: frame,
+        });
+      }
+    }
+
+    // 2. 변수 변경 감지
+    const currentVariables = new Map<string, Variable>();
+    for (const [name, variable] of allVariables) {
+      currentVariables.set(name, variable);
+    }
+
+    // 새로 선언된 변수 또는 값 변경
+    for (const [name, variable] of currentVariables) {
+      const prevValue = this.previousSnapshot.variables.get(name);
+      const [frameName, varName] = name.split('.');
+
+      if (prevValue === undefined) {
+        // 새 변수 선언
+        events.push({
+          type: 'variable',
+          action: 'declare',
+          frame: frameName,
+          name: varName,
+          varType: variable.type,
+          value: this.parseValue(variable.value),
+          address: variable.address,
+          size: variable.size,
+          isArray: variable.is_array,
+          arraySize: variable.array_size,
+          elementType: variable.element_type,
+        });
+      } else if (prevValue !== variable.value) {
+        // 값 변경
+        events.push({
+          type: 'variable',
+          action: 'assign',
+          frame: frameName,
+          name: varName,
+          value: this.parseValue(variable.value),
+        });
+      }
+
+      // 포인터 변경 감지 (points_to)
+      if (variable.points_to) {
+        events.push({
+          type: 'pointer',
+          action: 'assign',
+          pointer: name,
+          targetAddress: variable.points_to,
+        });
+      }
+    }
+
+    // 제거된 변수 (프레임 pop 시)
+    for (const [name] of this.previousSnapshot.variables) {
+      if (!currentVariables.has(name)) {
+        const [frameName, varName] = name.split('.');
+        events.push({
+          type: 'variable',
+          action: 'destroy',
+          frame: frameName,
+          name: varName,
+        });
+      }
+    }
+
+    // 3. 힙 변경 감지
+    const currentHeapAddrs = new Set(heap.map((h) => h.address));
+
+    // 새로 할당된 힙 블록
+    for (const block of heap) {
+      const prevValue = this.previousSnapshot.heapBlocks.get(block.address);
+      if (prevValue === undefined) {
+        events.push({
+          type: 'heap',
+          action: 'allocate',
+          address: block.address,
+          size: block.size,
+          name: block.name.replace(/^\*/, ''), // "*p" -> "p"
+          heapType: block.type,
+          value: this.parseValue(block.value),
+        });
+      } else if (prevValue !== block.value) {
+        events.push({
+          type: 'heap',
+          action: 'write',
+          address: block.address,
+          value: this.parseValue(block.value),
+          name: block.name.replace(/^\*/, ''),
+        });
+      }
+    }
+
+    // 해제된 힙 블록
+    for (const [addr, name] of this.previousSnapshot.heapBlocks) {
+      if (!currentHeapAddrs.has(addr)) {
+        events.push({
+          type: 'heap',
+          action: 'free',
+          address: addr,
+          name,
+        });
+      }
+    }
+
+    // 4. stdout 출력 이벤트
+    if (newStdout) {
+      events.push({
+        type: 'output',
+        stream: 'stdout',
+        text: newStdout,
+      });
+    }
+
+    return events;
+  }
+
+  /**
+   * 스냅샷 업데이트 (다음 스텝의 diff 계산용)
+   */
+  private updateSnapshot(
+    allVariables: Array<[string, Variable]>,
+    heap: MemoryBlock[]
+  ): void {
+    // 프레임
+    this.previousSnapshot.frames = this.getActiveFrameNames();
+
+    // 변수
+    this.previousSnapshot.variables.clear();
+    for (const [name, variable] of allVariables) {
+      this.previousSnapshot.variables.set(name, variable.value);
+    }
+
+    // 힙
+    this.previousSnapshot.heapBlocks.clear();
+    for (const block of heap) {
+      const name = block.name.replace(/^\*/, '');
+      this.previousSnapshot.heapBlocks.set(block.address, name);
+    }
+
+    // stdout
+    this.previousSnapshot.stdout = this.stdoutBuffer;
+  }
+
+  /**
+   * 현재 활성 프레임 이름 목록
+   */
+  private getActiveFrameNames(): string[] {
+    const frames: string[] = [];
+    const depth = this.callStack.depth();
+    // CallStack 내부 frames에 직접 접근할 수 없으므로 getAllVariables로 추론
+    const allVars = this.callStack.getAllVariables();
+    const seen = new Set<string>();
+    for (const [name] of allVars) {
+      const frame = name.split('.')[0];
+      if (!seen.has(frame)) {
+        seen.add(frame);
+        frames.push(frame);
+      }
+    }
+    // 변수가 없는 프레임의 경우 currentFunction으로 추가
+    const currentFrame = this.callStack.currentFunction();
+    if (!seen.has(currentFrame)) {
+      frames.push(currentFrame);
+    }
+    return frames;
+  }
+
+  /**
+   * 문자열 값을 적절한 타입으로 파싱
+   */
+  private parseValue(value: string): string | number | boolean | null {
+    if (value === 'null' || value === 'NULL') return null;
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    const num = parseFloat(value);
+    if (!isNaN(num) && isFinite(num)) return num;
+    return value;
   }
 }
 

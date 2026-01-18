@@ -154,6 +154,9 @@ function parseNumericValue(str: string): number {
 
 /**
  * 변수 선언 처리 (TypeRegistry 사용)
+ *
+ * Phase 4: 핸들러가 직접 이벤트 추가 예시
+ * ctx.addEvent()를 사용하면 diff 기반 이벤트 대신 핸들러 이벤트가 사용됨
  */
 function handleVarDecl(
   ctx: SimContext,
@@ -193,6 +196,21 @@ function handleVarDecl(
     value: String(displayValue),
   });
 
+  // Phase 4: 핸들러가 직접 이벤트 추가
+  // ctx.addEvent가 있으면 (선택적 메서드) 직접 이벤트 추가
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    ctx.addEvent({
+      type: 'variable',
+      action: 'declare',
+      frame: ctx.getCurrentFrame(),
+      name: varName,
+      varType: normalizedType,
+      value: displayValue,
+      address: ctx.toHex(addr),
+      size: size,
+    });
+  }
+
   return ctx.createStep(lineNum, code, explanation);
 }
 
@@ -226,6 +244,20 @@ function handleCharDecl(
     value: `'${charValue}'`,
   });
 
+  // Phase 4: 이벤트 직접 추가
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    ctx.addEvent({
+      type: 'variable',
+      action: 'declare',
+      frame: ctx.getCurrentFrame(),
+      name: varName,
+      varType: 'char',
+      value: byteValue,
+      address: ctx.toHex(addr),
+      size: 1,
+    });
+  }
+
   return ctx.createStep(lineNum, code, explanation);
 }
 
@@ -249,6 +281,20 @@ function handleVarAssign(
 
   v.value = String(value);
   v.bytes = typeInfo ? cTypeRegistry.toBytes(v.type, value) : ctx.intToBytes(value, v.size);
+
+  // Phase 4: 이벤트 직접 추가
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    ctx.addEvent({
+      type: 'variable',
+      action: 'assign',
+      frame: ctx.getCurrentFrame(),
+      name: varName,
+      varType: v.type,
+      value: value,
+      address: v.address,
+      previousValue: parseFloat(oldValue) || 0,
+    });
+  }
 
   const explanation = `✏️ 변수 '${varName}' 값 변경
 
@@ -279,6 +325,21 @@ function handleCharAssign(
 
   v.value = `'${charValue}'`;
   v.bytes = [byteValue];
+
+  // Phase 4: 이벤트 직접 추가
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    const oldCharCode = oldValue.startsWith("'") ? oldValue.charCodeAt(1) : 0;
+    ctx.addEvent({
+      type: 'variable',
+      action: 'assign',
+      frame: ctx.getCurrentFrame(),
+      name: varName,
+      varType: 'char',
+      value: byteValue,
+      address: v.address,
+      previousValue: oldCharCode,
+    });
+  }
 
   const explanation = `✏️ char 변수 '${varName}' 값 변경
 
@@ -471,6 +532,28 @@ function handleExprDecl(
   const addr = ctx.allocateStack(size);
   const bytes = cTypeRegistry.toBytes(normalizedType, value);
 
+  ctx.variables.set(varName, {
+    address: ctx.toHex(addr),
+    type: normalizedType,
+    size,
+    bytes,
+    value: String(value),
+  });
+
+  // Phase 4: 이벤트 직접 추가
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    ctx.addEvent({
+      type: 'variable',
+      action: 'declare',
+      frame: ctx.getCurrentFrame(),
+      name: varName,
+      varType: normalizedType,
+      value: value,
+      address: ctx.toHex(addr),
+      size: size,
+    });
+  }
+
   const explanation = `🧮 ${typeInfo.name} 변수 '${varName}' 선언 (식 계산)
 
 • 식: ${expr}
@@ -479,14 +562,6 @@ function handleExprDecl(
 • 주소: ${ctx.toHex(addr)}
 
 💡 변수값들이 연산에 사용됨`;
-
-  ctx.variables.set(varName, {
-    address: ctx.toHex(addr),
-    type: normalizedType,
-    size,
-    bytes,
-    value: String(value),
-  });
 
   return ctx.createStep(lineNum, code, explanation);
 }
@@ -512,6 +587,20 @@ function handleExprAssign(
 
   v.value = String(value);
   v.bytes = typeInfo ? cTypeRegistry.toBytes(v.type, value) : ctx.intToBytes(value, v.size);
+
+  // Phase 4: 이벤트 직접 추가
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    ctx.addEvent({
+      type: 'variable',
+      action: 'assign',
+      frame: ctx.getCurrentFrame(),
+      name: varName,
+      varType: v.type,
+      value: value,
+      address: v.address,
+      previousValue: parseFloat(oldValue) || 0,
+    });
+  }
 
   const explanation = `🧮 변수 '${varName}' 값 변경 (식 계산)
 

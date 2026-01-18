@@ -466,7 +466,7 @@ export default function HomePage() {
   // CSS 변수에서 매트릭스 색상 가져오기
   const matrixColor = useMemo(() => {
     return getComputedStyle(document.documentElement)
-      .getPropertyValue('--theme-matrix-color')
+      .getPropertyValue('--theme-home-matrix-color')
       .trim();
   }, [currentTheme]);
 

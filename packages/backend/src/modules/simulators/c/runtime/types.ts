@@ -83,4 +83,9 @@ export interface Step {
   functionName?: string;  // 현재 함수 이름
   callDepth?: number;     // 콜 스택 깊이
   stdout?: string;        // 현재 스텝까지의 누적 stdout 출력
+  /**
+   * Event-Driven Visualization용 이벤트 배열
+   * 있으면 프론트엔드가 snapshot 대신 이벤트 적용
+   */
+  events?: import('@codeinsight/shared').VisualizationEvent[];
 }

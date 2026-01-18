@@ -10,6 +10,8 @@ import type { Monaco } from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import { usePlaygroundStore, useCurrentCode } from '../stores/playgroundStore';
 import { useIsMobile } from '@/hooks';
+import { useThemeStore } from '@/stores/themeStore';
+import { monacoThemes } from '@/config/themes';
 import type { SupportedLanguage } from '@/types';
 
 /** Monaco Editor onMount 핸들러 타입 */
@@ -27,11 +29,13 @@ const MONACO_LANGUAGES: Record<SupportedLanguage, string> = {
 
 export function CodeEditor() {
   const isMobile = useIsMobile();
+  const currentTheme = useThemeStore((s) => s.theme);
   const { language, setCode, steps, currentStepIndex } = usePlaygroundStore();
   const code = useCurrentCode();
 
   const currentLine = steps[currentStepIndex]?.line;
   const editorRef = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<Monaco | null>(null);
   const decorationsRef = useRef<string[]>([]);
 
   // 현재 라인 하이라이트 업데이트
@@ -72,52 +76,42 @@ export function CodeEditor() {
   }, [currentLine]);
 
   const handleEditorMount: OnMountHandler = (editor, monaco) => {
-    // 에디터 레퍼런스 저장
     editorRef.current = editor;
+    monacoRef.current = monaco;
 
-    // 라이트 테마 정의
-    monaco.editor.defineTheme('codeinsight-light', {
-      base: 'vs',
-      inherit: true,
-      rules: [
-        { token: 'comment', foreground: '6b7280', fontStyle: 'italic' },
-        { token: 'keyword', foreground: 'dc2626' },
-        { token: 'string', foreground: '16a34a' },
-        { token: 'number', foreground: '2563eb' },
-        { token: 'type', foreground: 'ea580c' },
-        { token: 'function', foreground: '7c3aed' },
-        { token: 'variable', foreground: 'ea580c' },
-      ],
-      colors: {
-        'editor.background': '#ffffff',
-        'editor.foreground': '#1f2937',
-        'editor.lineHighlightBackground': '#f3f4f6',
-        'editor.selectionBackground': '#bfdbfe80',
-        'editorCursor.foreground': '#22c55e',
-        'editorLineNumber.foreground': '#9ca3af',
-        'editorLineNumber.activeForeground': '#374151',
-        'editor.selectionHighlightBackground': '#22c55e20',
-        'editorBracketMatch.background': '#22c55e30',
-        'editorBracketMatch.border': '#22c55e',
-      },
+    // 3가지 테마 등록
+    Object.entries(monacoThemes).forEach(([themeName, themeConfig]) => {
+      monaco.editor.defineTheme(`codeinsight-${themeName}`, themeConfig);
     });
-    monaco.editor.setTheme('codeinsight-light');
 
-    // 현재 라인 하이라이트 CSS 주입
-    const style = document.createElement('style');
-    style.textContent = `
-      .current-line-highlight {
-        background-color: rgba(34, 197, 94, 0.15) !important;
-        border-left: 3px solid #22c55e !important;
-      }
-      .current-line-glyph {
-        background-color: #22c55e;
-        border-radius: 2px;
-        margin-left: 3px;
-      }
-    `;
-    document.head.appendChild(style);
+    // 현재 테마 적용
+    monaco.editor.setTheme(`codeinsight-${currentTheme}`);
+
+    // 현재 라인 하이라이트 CSS 주입 (한 번만)
+    if (!document.getElementById('monaco-highlight-style')) {
+      const style = document.createElement('style');
+      style.id = 'monaco-highlight-style';
+      style.textContent = `
+        .current-line-highlight {
+          background-color: rgba(34, 197, 94, 0.15) !important;
+          border-left: 3px solid #22c55e !important;
+        }
+        .current-line-glyph {
+          background-color: #22c55e;
+          border-radius: 2px;
+          margin-left: 3px;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   };
+
+  // 테마 변경 시 Monaco 테마 업데이트
+  useEffect(() => {
+    if (monacoRef.current) {
+      monacoRef.current.editor.setTheme(`codeinsight-${currentTheme}`);
+    }
+  }, [currentTheme]);
 
   return (
     <Editor
@@ -125,7 +119,6 @@ export function CodeEditor() {
       language={MONACO_LANGUAGES[language]}
       value={code}
       onChange={(value) => setCode(value || '')}
-      theme="vs"
       onMount={handleEditorMount}
       options={{
         minimap: { enabled: false },

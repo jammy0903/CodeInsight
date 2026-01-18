@@ -171,6 +171,166 @@ export async function getAnalyticsSummary(
   }
 }
 
+// === Profile API (온보딩) ===
+
+export interface UserProfile {
+  ageGroup?: '10s' | '20s' | '30s' | '40s+';
+  occupation?: 'student_middle' | 'student_high' | 'student_univ' | 'job_seeker' | 'worker' | 'other';
+  programmingExp?: 'none' | 'less_1y' | '1_3y' | '3y_plus';
+  learningGoal?: 'basics' | 'job_prep' | 'skill_up' | 'curiosity';
+}
+
+export interface ProfileResponse {
+  profile: UserProfile | null;
+  onboardingCompleted: boolean;
+}
+
+/**
+ * 프로필 조회
+ */
+export async function getProfile(): Promise<ProfileResponse | null> {
+  try {
+    const response = await api.get<ProfileResponse>(
+      config.api.endpoints.analyticsProfile
+    );
+    return response.data;
+  } catch (err) {
+    const error = handleError(err);
+    if (error.status === 401 || error.status === 404) {
+      return null;
+    }
+    logger.error('Failed to get profile:', err);
+    return null;
+  }
+}
+
+/**
+ * 프로필 업데이트 (온보딩)
+ */
+export async function updateProfile(
+  data: Partial<UserProfile>
+): Promise<ProfileResponse | null> {
+  try {
+    const response = await api.post<ProfileResponse>(
+      config.api.endpoints.analyticsProfile,
+      data
+    );
+    return response.data;
+  } catch (err) {
+    logger.error('Failed to update profile:', err);
+    return null;
+  }
+}
+
+// === Session Context API ===
+
+export interface SessionContextData {
+  lessonActivityId?: string;
+  screenWidth?: number;
+  screenHeight?: number;
+  orientation?: 'portrait' | 'landscape';
+  inputMethod?: 'touch' | 'mouse';
+  userAgent?: string;
+  language?: string;
+  connectionType?: string;
+  effectiveType?: 'slow-2g' | '2g' | '3g' | '4g';
+  localHour?: number;
+  localWeekday?: number;
+  timezone?: string;
+}
+
+/**
+ * 세션 컨텍스트 저장
+ * WHY: 레슨 시작 시 디바이스/네트워크/시간 정보 수집
+ */
+export async function saveSessionContext(
+  data: SessionContextData
+): Promise<string | null> {
+  try {
+    const response = await api.post<{ id: string; createdAt: string }>(
+      config.api.endpoints.analyticsSessionContext,
+      data
+    );
+    return response.data.id;
+  } catch (err) {
+    logger.error('Failed to save session context:', err);
+    return null;
+  }
+}
+
+/**
+ * 현재 세션 컨텍스트 수집 (자동)
+ */
+export function collectSessionContext(lessonActivityId?: string): SessionContextData {
+  const now = new Date();
+
+  // Network Info API (optional)
+  const connection = (navigator as any).connection;
+
+  return {
+    lessonActivityId,
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
+    orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait',
+    inputMethod: 'ontouchstart' in window ? 'touch' : 'mouse',
+    userAgent: navigator.userAgent.slice(0, 500),
+    language: navigator.language.slice(0, 10),
+    connectionType: connection?.type,
+    effectiveType: connection?.effectiveType,
+    localHour: now.getHours(),
+    localWeekday: now.getDay(),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
+}
+
+// === Step Activity API ===
+
+export interface StepActivityData {
+  lessonActivityId: string;
+  lessonId: string;
+  stepIndex: number;
+  duration?: number;
+  wentBack?: boolean;
+  visHoverCount?: number;
+  visClickCount?: number;
+  aiQuestionCount?: number;
+  codeSelections?: number;
+  scrollEvents?: number;
+}
+
+/**
+ * 스텝 활동 기록 (단일)
+ */
+export async function saveStepActivity(
+  data: StepActivityData
+): Promise<void> {
+  try {
+    await api.post(
+      config.api.endpoints.analyticsStepActivity,
+      data
+    );
+  } catch (err) {
+    logger.error('Failed to save step activity:', err);
+  }
+}
+
+/**
+ * 스텝 활동 일괄 기록 (배치)
+ * WHY: 레슨 완료 시 한 번에 전송하여 네트워크 요청 줄임
+ */
+export async function saveStepActivities(
+  activities: StepActivityData[]
+): Promise<void> {
+  try {
+    await api.post(
+      config.api.endpoints.analyticsStepActivities,
+      { activities }
+    );
+  } catch (err) {
+    logger.error('Failed to save step activities:', err);
+  }
+}
+
 // === AI Report Analysis ===
 
 export interface ReportAnalysisRequest {
@@ -198,6 +358,9 @@ export interface ReportAnalysisResponse {
  * AI 기반 학습 리포트 분석
  * @param data 학습 데이터 요약
  * @returns 개인화된 분석 텍스트
+ *
+ * WHY: LLM 호출은 일반 API보다 오래 걸림 (1-2분)
+ * 기본 axios 타임아웃(30초)보다 긴 타임아웃 필요
  */
 export async function getReportAnalysis(
   data: ReportAnalysisRequest
@@ -205,7 +368,8 @@ export async function getReportAnalysis(
   try {
     const response = await api.post<ReportAnalysisResponse>(
       config.api.endpoints.aiAnalyzeReport,
-      data
+      data,
+      { timeout: 180000 } // 3분 (LLM 응답 시간 고려)
     );
     return response.data;
   } catch (err) {

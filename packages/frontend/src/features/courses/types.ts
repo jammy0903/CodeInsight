@@ -4,7 +4,7 @@
 
 /**
  * CodeSelection - 코드 텍스트 선택 정보
- * 사용자가 CodeViewer에서 드래그한 텍스트 정보
+ * 사용자가 LessonCodeEditor 또는 CodeViewer에서 드래그한 텍스트 정보
  */
 export interface CodeSelection {
   /** 선택된 텍스트 */

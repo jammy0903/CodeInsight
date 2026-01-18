@@ -7,11 +7,12 @@
  * - [주소 | 값] 카드 형태
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { MemoryBlock } from '@/types';
 import { useThemeStore } from '@/stores/themeStore';
-import { themes } from '@/config/themes';
+import { PointerArrow, PointerArrowOverlay } from '@/features/visualizers/c/components/PointerArrow';
+import { usePointerConnections } from '@/features/visualizers/c/hooks/usePointerConnections';
 
 // ============================================================
 // 타입 정의
@@ -61,17 +62,53 @@ const COLORS = {
     light: '#dceee2',
   },
   frame: [
-    { bg: '#fef3c7', border: '#f59e0b', text: '#b45309', hover: '#fef9c3' }, // amber
-    { bg: '#dbeafe', border: '#60a5fa', text: '#1d4ed8', hover: '#dbeafe' }, // blue
-    { bg: '#dcfce7', border: '#4ade80', text: '#16a34a', hover: '#dcfce7' }, // green
-    { bg: '#fce7f3', border: '#f472b6', text: '#db2777', hover: '#fce7f3' }, // pink
-    { bg: '#e0e7ff', border: '#818cf8', text: '#4f46e5', hover: '#e0e7ff' }, // indigo
+    {
+      bg: 'var(--theme-memory-frame-amber-bg)',
+      border: 'var(--theme-memory-frame-amber-border)',
+      text: 'var(--theme-memory-frame-amber-text)',
+      hover: 'var(--theme-memory-frame-amber-hover)'
+    },
+    {
+      bg: 'var(--theme-memory-frame-blue-bg)',
+      border: 'var(--theme-memory-frame-blue-border)',
+      text: 'var(--theme-memory-frame-blue-text)',
+      hover: 'var(--theme-memory-frame-blue-hover)'
+    },
+    {
+      bg: 'var(--theme-memory-frame-green-bg)',
+      border: 'var(--theme-memory-frame-green-border)',
+      text: 'var(--theme-memory-frame-green-text)',
+      hover: 'var(--theme-memory-frame-green-hover)'
+    },
+    {
+      bg: 'var(--theme-memory-frame-pink-bg)',
+      border: 'var(--theme-memory-frame-pink-border)',
+      text: 'var(--theme-memory-frame-pink-text)',
+      hover: 'var(--theme-memory-frame-pink-hover)'
+    },
+    {
+      bg: 'var(--theme-memory-frame-indigo-bg)',
+      border: 'var(--theme-memory-frame-indigo-border)',
+      text: 'var(--theme-memory-frame-indigo-text)',
+      hover: 'var(--theme-memory-frame-indigo-hover)'
+    },
   ],
   register: {
-    rsp: { bg: '#dbeafe', border: '#3b82f6', text: '#1d4ed8' },
-    rbp: { bg: '#fef3c7', border: '#f59e0b', text: '#b45309' },
+    rsp: {
+      bg: 'var(--theme-memory-register-rsp-bg)',
+      border: 'var(--theme-memory-register-rsp-border)',
+      text: 'var(--theme-memory-register-rsp-text)'
+    },
+    rbp: {
+      bg: 'var(--theme-memory-register-rbp-bg)',
+      border: 'var(--theme-memory-register-rbp-border)',
+      text: 'var(--theme-memory-register-rbp-text)'
+    },
   },
-  changed: { bg: '#fef3c7', border: '#f59e0b' },
+  changed: {
+    bg: 'var(--theme-memory-changed-bg)',
+    border: 'var(--theme-memory-changed-border)'
+  },
   surface: { bg: '#ffffff', border: '#e5e7eb', text: '#1f2937', muted: '#6b7280' },
 };
 
@@ -126,6 +163,7 @@ function ArrayBlock({
   onToggle,
   onMouseEnter,
   onMouseLeave,
+  registerBlock,
 }: {
   arrayName: string;
   elements: MemoryBlock[];
@@ -136,6 +174,8 @@ function ArrayBlock({
   onToggle: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  /** 블록 등록 함수 (포인터 화살표용) */
+  registerBlock?: (name: string, address: string, element: HTMLElement | null) => void;
 }) {
   const displayName = getDisplayName(arrayName);
   const elementCount = elements.length;
@@ -144,7 +184,7 @@ function ArrayBlock({
 
   // 테마 적용
   const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme];
+  
 
   if (!isExpanded) {
     // 접힌 상태: 요약 표시
@@ -153,7 +193,7 @@ function ArrayBlock({
         layout
         className="rounded-lg px-3 py-2 transition-all duration-200 cursor-pointer relative"
         style={{
-          backgroundColor: themeColors.memory.cardBg,
+          backgroundColor: 'var(--theme-memory-card-bg)',
           border: `2px solid ${frameColor.border}`,
           boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         }}
@@ -166,7 +206,7 @@ function ArrayBlock({
             <button
               onClick={onToggle}
               className="text-xs p-1 rounded transition-colors"
-              style={{ color: themeColors.memory.cardMuted }}
+              style={{ color: 'var(--theme-memory-card-muted)' }}
             >
               ▶
             </button>
@@ -175,13 +215,13 @@ function ArrayBlock({
             <span className="text-xs font-semibold" style={{ color: frameColor.text }}>
               {displayName}[0..{elementCount - 1}]
             </span>
-            <span className="text-[10px]" style={{ color: themeColors.memory.cardMuted }}>
+            <span className="text-[10px]" style={{ color: 'var(--theme-memory-card-muted)' }}>
               ({elementCount}개 요소)
             </span>
           </div>
 
           {/* 주소 범위 */}
-          <span className="text-[10px] font-mono" style={{ color: themeColors.memory.cardMuted }}>
+          <span className="text-[10px] font-mono" style={{ color: 'var(--theme-memory-card-muted)' }}>
             {firstElement.address} ~ {lastElement.address}
           </span>
         </div>
@@ -197,7 +237,7 @@ function ArrayBlock({
         <button
           onClick={onToggle}
           className="text-xs p-1 rounded transition-colors"
-          style={{ color: themeColors.memory.cardMuted }}
+          style={{ color: 'var(--theme-memory-card-muted)' }}
         >
           ▼
         </button>
@@ -218,6 +258,7 @@ function ArrayBlock({
             frameName={frameName}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onRegister={registerBlock ? (el) => registerBlock(element.name, element.address, el) : undefined}
           />
         ))}
       </div>
@@ -235,6 +276,7 @@ function MemoryBlockCard({
   registerLabel,
   onMouseEnter,
   onMouseLeave,
+  onRegister,
 }: {
   block: MemoryBlock;
   isChanged: boolean;
@@ -244,22 +286,40 @@ function MemoryBlockCard({
   registerLabel?: 'rsp' | 'rbp';
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  /** 블록 요소 등록 (포인터 화살표용) */
+  onRegister?: (element: HTMLElement | null) => void;
 }) {
   const valueDisplay = isGarbageValue(block.value) ? '?' : String(block.value);
   const displayName = getDisplayName(block.name);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // 테마 적용
   const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme];
+
+  // 블록 요소 등록
+  useEffect(() => {
+    if (onRegister && cardRef.current) {
+      onRegister(cardRef.current);
+    }
+    return () => {
+      if (onRegister) {
+        onRegister(null);
+      }
+    };
+  }, [onRegister]);
+
 
   return (
     <motion.div
+      ref={cardRef}
       layout
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       className="rounded-lg px-3 py-2 transition-all duration-200 cursor-pointer relative"
+      data-block-name={block.name}
+      data-block-address={block.address}
       style={{
-        backgroundColor: isHovered ? frameColor.hover : themeColors.memory.cardBg,
+        backgroundColor: isHovered ? frameColor.hover : 'var(--theme-memory-card-bg)',
         border: `2px solid ${isChanged ? COLORS.changed.border : frameColor.border}`,
         boxShadow: isChanged
           ? `0 0 8px ${COLORS.changed.border}40`
@@ -309,24 +369,24 @@ function MemoryBlockCard({
           <span
             className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded"
             style={{
-              color: themeColors.memory.cardMuted,
+              color: 'var(--theme-memory-card-muted)',
               backgroundColor: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
             }}
           >
             {block.address}
           </span>
-          <span className="mx-2 font-bold" style={{ color: themeColors.memory.cardMuted }}>|</span>
+          <span className="mx-2 font-bold" style={{ color: 'var(--theme-memory-card-muted)' }}>|</span>
           {/* 값 */}
           <span
             className="font-mono font-bold text-base min-w-[24px] text-center"
-            style={{ color: isChanged ? '#f59e0b' : themeColors.memory.cardText }}
+            style={{ color: isChanged ? 'var(--theme-memory-changed-border)' : 'var(--theme-memory-card-text)' }}
           >
             {valueDisplay}
           </span>
         </div>
 
         {/* 타입 */}
-        <span className="text-[10px] font-mono" style={{ color: themeColors.memory.cardMuted }}>
+        <span className="text-[10px] font-mono" style={{ color: 'var(--theme-memory-card-muted)' }}>
           {block.type || 'var'}
         </span>
 
@@ -353,7 +413,8 @@ function MemoryBlockCard({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="w-2.5 h-2.5 rounded-full bg-amber-500 ml-auto"
+            className="w-2.5 h-2.5 rounded-full ml-auto"
+            style={{ backgroundColor: 'var(--theme-memory-changed-border)' }}
           />
         )}
 
@@ -363,7 +424,6 @@ function MemoryBlockCard({
             {/* 화살표 */}
             <svg width="32" height="12" viewBox="0 0 32 12" className="flex-shrink-0">
               <line x1="8" y1="6" x2="32" y2="6" stroke={COLORS.register[registerLabel].border} strokeWidth="2" />
-              <polygon points="8,6 16,2 16,10" fill={COLORS.register[registerLabel].border} />
             </svg>
             {/* 레이블 */}
             <div
@@ -383,217 +443,27 @@ function MemoryBlockCard({
   );
 }
 
-/** RSP/RBP 인디케이터 (스택 옆에 표시) */
-function RegisterIndicator({
-  type,
-  top,
-}: {
-  type: 'rsp' | 'rbp';
-  top: number;
-}) {
-  const color = COLORS.register[type];
-  const label = type.toUpperCase();
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 10 }}
-      animate={{ opacity: 1, x: 0, top }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="absolute right-0 flex items-center gap-1 -translate-y-1/2"
-      style={{ top }}
-    >
-      {/* 화살표 */}
-      <svg width="32" height="12" viewBox="0 0 32 12" className="flex-shrink-0">
-        {/* 직선 */}
-        <line
-          x1="8"
-          y1="6"
-          x2="32"
-          y2="6"
-          stroke={color.border}
-          strokeWidth="2"
-        />
-        {/* 화살표 머리 (왼쪽 방향) */}
-        <polygon
-          points="0,6 8,2 8,10"
-          fill={color.border}
-        />
-      </svg>
-      {/* 라벨 */}
-      <div
-        className="px-2 py-1 rounded text-[10px] font-bold"
-        style={{
-          backgroundColor: color.bg,
-          border: `1px solid ${color.border}`,
-          color: color.text,
-        }}
-      >
-        {label}
-      </div>
-    </motion.div>
-  );
-}
-
-// RSP/RBP 레지스터 툴팁
-const REGISTER_TOOLTIPS = {
-  RBP: 'RBP (Base Pointer): 현재 함수의 스택 프레임 시작 위치입니다. 함수 호출 시 이전 RBP가 스택에 저장되고 새 값으로 업데이트됩니다.',
-  RSP: 'RSP (Stack Pointer): 스택의 현재 "꼭대기" 위치를 가리킵니다. 변수가 추가되면 RSP가 아래로 이동합니다.',
-};
-
-/** 레지스터 패널 - 상단에 RBP, RSP 표시 */
-function RegisterPanel({
-  rbpAddress,
-  rspAddress,
-  currentFrame,
-}: {
-  rbpAddress: string;
-  rspAddress: string;
-  currentFrame: string;
-}) {
-  // 테마 적용
-  const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme];
-
-  // 테마별 레지스터 색상 (zinc + cyan 팔레트)
-  const registerColors = {
-    dark: {
-      panelBg: '#18181b',         // zinc-900
-      panelBorder: '#27272a',     // zinc-800
-      headerText: '#a1a1aa',      // zinc-400
-      subText: '#71717a',         // zinc-500
-      rbp: { bg: '#27272a', border: '#f472b6', label: '#f472b6', value: '#fce7f3' },  // 핑크 포인트
-      rsp: { bg: '#27272a', border: '#22d3ee', label: '#22d3ee', value: '#cffafe' },  // 시안 포인트
-    },
-    soft: {
-      panelBg: '#f8fafc',
-      panelBorder: '#e2e8f0',
-      headerText: '#64748b',
-      subText: '#94a3b8',
-      rbp: { bg: '#fef3c7', border: '#f59e0b', label: '#b45309', value: '#92400e' },
-      rsp: { bg: '#dbeafe', border: '#60a5fa', label: '#1d4ed8', value: '#1e40af' },
-    },
-    minimal: {
-      panelBg: '#faf8f5',
-      panelBorder: '#e5d5c7',
-      headerText: '#6b5a4a',
-      subText: '#937b5d',
-      rbp: { bg: '#fef3c7', border: '#d97706', label: '#b45309', value: '#92400e' },
-      rsp: { bg: '#e0f2fe', border: '#0ea5e9', label: '#0369a1', value: '#0c4a6e' },
-    },
-  };
-  const colors = registerColors[currentTheme];
-
-  return (
-    <div
-      className="rounded-lg p-2 mb-3"
-      style={{
-        backgroundColor: colors.panelBg,
-        border: `1px solid ${colors.panelBorder}`,
-      }}
-    >
-      {/* 헤더 */}
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-bold uppercase" style={{ color: colors.headerText }}>
-          🔧 CPU 레지스터
-        </span>
-        <span className="text-[9px]" style={{ color: colors.subText }}>
-          현재: {currentFrame}()
-        </span>
-      </div>
-
-      {/* RBP + RSP */}
-      <div className="flex gap-3">
-        {/* RBP */}
-        <div className="group relative flex-1">
-          <div
-            className="rounded-md py-2 px-3 cursor-help"
-            style={{
-              backgroundColor: colors.rbp.bg,
-              border: `1px solid ${colors.rbp.border}`,
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold" style={{ color: colors.rbp.label }}>RBP</span>
-              <motion.span
-                key={rbpAddress}
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-xs font-mono"
-                style={{ color: colors.rbp.value }}
-              >
-                {rbpAddress}
-              </motion.span>
-            </div>
-          </div>
-          {/* 툴팁 */}
-          <div
-            className="absolute left-0 top-full mt-1 z-50 px-3 py-2 rounded-lg text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-normal max-w-[280px]"
-            style={{
-              backgroundColor: 'rgba(30, 41, 59, 0.95)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            }}
-          >
-            {REGISTER_TOOLTIPS.RBP}
-          </div>
-        </div>
-
-        {/* RSP */}
-        <div className="group relative flex-1">
-          <div
-            className="rounded-md py-2 px-3 cursor-help"
-            style={{
-              backgroundColor: colors.rsp.bg,
-              border: `1px solid ${colors.rsp.border}`,
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold" style={{ color: colors.rsp.label }}>RSP</span>
-              <motion.span
-                key={rspAddress}
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-xs font-mono"
-                style={{ color: colors.rsp.value }}
-              >
-                {rspAddress}
-              </motion.span>
-            </div>
-          </div>
-          {/* 툴팁 */}
-          <div
-            className="absolute left-0 top-full mt-1 z-50 px-3 py-2 rounded-lg text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-normal max-w-[280px]"
-            style={{
-              backgroundColor: 'rgba(30, 41, 59, 0.95)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            }}
-          >
-            {REGISTER_TOOLTIPS.RSP}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
 /** Stack 섹션 - 2열 레이아웃 */
 function StackSection({
   blocks,
   changedBlocks,
   frames,
   showRegisters,
+  registerBlock,
 }: {
   blocks: MemoryBlock[];
   changedBlocks: string[];
   frames: Array<{ name: string }>;
   showRegisters: boolean;
+  /** 블록 등록 함수 (포인터 화살표용) */
+  registerBlock?: (name: string, address: string, element: HTMLElement | null) => void;
 }) {
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [expandedArrays, setExpandedArrays] = useState<Set<string>>(new Set());
 
   // 테마 적용
   const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme];
+  
 
   // 현재 실행 중인 프레임 (frames 배열의 마지막)
   const currentFrame = frames[frames.length - 1]?.name || 'main';
@@ -687,19 +557,19 @@ function StackSection({
       <div
         className="rounded-lg p-3"
         style={{
-          backgroundColor: themeColors.memory.stackBg,
-          border: `1px solid ${themeColors.memory.stackBorder}25`,
+          backgroundColor: 'var(--theme-memory-stack-bg)',
+          border: `1px solid ${'var(--theme-memory-stack-border)'}25`,
         }}
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-bold uppercase" style={{ color: themeColors.memory.stackLabel }}>
+          <span className="text-[11px] font-bold uppercase" style={{ color: 'var(--theme-memory-stack-label)' }}>
             📦 Stack
           </span>
-          <span className="text-[9px]" style={{ color: themeColors.memory.stackLabel }}>
+          <span className="text-[9px]" style={{ color: 'var(--theme-memory-stack-label)' }}>
             ↓ 낮은 주소
           </span>
         </div>
-        <div className="text-center py-3 text-[10px] italic" style={{ color: themeColors.memory.cardMuted }}>
+        <div className="text-center py-3 text-[10px] italic" style={{ color: 'var(--theme-memory-card-muted)' }}>
           (비어있음)
         </div>
       </div>
@@ -710,16 +580,16 @@ function StackSection({
     <div
       className="rounded-lg p-3"
       style={{
-        backgroundColor: themeColors.memory.stackBg,
-        border: `1px solid ${themeColors.memory.stackBorder}25`,
+        backgroundColor: 'var(--theme-memory-stack-bg)',
+        border: `1px solid ${'var(--theme-memory-stack-border)'}25`,
       }}
     >
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-bold uppercase" style={{ color: themeColors.memory.stackLabel }}>
+        <span className="text-[11px] font-bold uppercase" style={{ color: 'var(--theme-memory-stack-label)' }}>
           📦 Stack
         </span>
-        <span className="text-[9px]" style={{ color: themeColors.memory.stackLabel }}>
+        <span className="text-[9px]" style={{ color: 'var(--theme-memory-stack-label)' }}>
           ↓ 낮은 주소
         </span>
       </div>
@@ -772,16 +642,15 @@ function StackSection({
                     onToggle={() => toggleArray(arrayName)}
                     onMouseEnter={() => setHoveredFrame(frameName)}
                     onMouseLeave={() => setHoveredFrame(null)}
+                    registerBlock={registerBlock}
                   />
                 );
               } else {
                 const block = item.data as MemoryBlock;
                 const frameName = blockFrameMap.get(block.name) || 'main';
                 const frameColor = frameColorMap.get(frameName) || COLORS.frame[0];
-                // 다중 함수일 때만 현재 프레임 강조 (단일 함수는 호버만)
-                const hasMultipleFrames = frames.length > 1;
-                const isCurrentFrame = hasMultipleFrames && frameName === currentFrame;
-                const isHovered = hoveredFrame === frameName || isCurrentFrame;
+                // 오직 호버했을 때만 오버레이 표시
+                const isHovered = hoveredFrame === frameName;
                 const isLast = index === items.length - 1;
 
                 // 현재 프레임의 첫 번째 블록인지 확인 (RBP 위치)
@@ -816,6 +685,7 @@ function StackSection({
                     registerLabel={registerLabel}
                     onMouseEnter={() => setHoveredFrame(frameName)}
                     onMouseLeave={() => setHoveredFrame(null)}
+                    onRegister={registerBlock ? (el) => registerBlock(block.name, block.address, el) : undefined}
                   />
                 );
               }
@@ -827,7 +697,7 @@ function StackSection({
   );
 }
 
-/** 하위 메모리 섹션 (BSS, Data, Text) */
+/** 하위 메모리 섹션 (BSS, Data, Text) - 빈 경우 한 줄로 축소 */
 function LowerMemorySections({
   dataSection = [],
   textSection = [],
@@ -835,143 +705,153 @@ function LowerMemorySections({
   dataSection?: DataItem[];
   textSection?: TextItem[];
 }) {
-  // 테마 적용
-  const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme];
-
   const SECTION_COLORS = {
-    bss: { color: themeColors.memory.cardMuted, bg: themeColors.memory.stackBg, border: themeColors.memory.cardMuted },
-    data: { color: themeColors.memory.dataLabel, bg: themeColors.memory.dataBg, border: themeColors.memory.dataLabel },
-    text: { color: themeColors.memory.textLabel, bg: themeColors.memory.textBg, border: themeColors.memory.textLabel },
+    bss: { color: 'var(--theme-memory-card-muted)', bg: 'var(--theme-memory-stack-bg)', border: 'var(--theme-memory-card-muted)' },
+    data: { color: 'var(--theme-memory-data-label)', bg: 'var(--theme-memory-data-bg)', border: 'var(--theme-memory-data-label)' },
+    text: { color: 'var(--theme-memory-text-label)', bg: 'var(--theme-memory-text-bg)', border: 'var(--theme-memory-text-label)' },
   };
 
   return (
-    <div className="space-y-2">
-      {/* BSS - 항상 placeholder (이 커리큘럼에서는 사용 안 함) */}
+    <div className="space-y-1">
+      {/* BSS - 항상 한 줄 (이 커리큘럼에서는 사용 안 함) */}
       <div
-        className="rounded-lg px-3 py-2 flex items-center justify-between"
+        className="rounded-md px-2 py-1.5 flex items-center justify-between"
         style={{
           backgroundColor: SECTION_COLORS.bss.bg,
-          border: `1px solid ${SECTION_COLORS.bss.color}30`,
+          border: `1px solid ${SECTION_COLORS.bss.color}20`,
         }}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-xs">📭</span>
-          <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.bss.color }}>
-            BSS
-          </span>
-        </div>
+        <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.bss.color }}>
+          📭 BSS
+        </span>
         <span className="text-[9px] italic" style={{ color: SECTION_COLORS.bss.color }}>
-          (초기화 안 된 전역 변수 없음)
+          (비어있음)
         </span>
       </div>
 
       {/* Data 영역 - 문자열 리터럴 */}
-      <div
-        className="rounded-lg p-3"
-        style={{
-          backgroundColor: SECTION_COLORS.data.bg,
-          border: `1px solid ${SECTION_COLORS.data.border}40`,
-        }}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs">📝</span>
-            <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.data.color }}>
-              Data
-            </span>
-          </div>
-          <span className="text-[9px]" style={{ color: SECTION_COLORS.data.color }}>
-            문자열 리터럴
+      {dataSection.length === 0 ? (
+        // 빈 Data - 한 줄로 축소
+        <div
+          className="rounded-md px-2 py-1.5 flex items-center justify-between"
+          style={{
+            backgroundColor: SECTION_COLORS.data.bg,
+            border: `1px solid ${SECTION_COLORS.data.border}25`,
+          }}
+        >
+          <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.data.color }}>
+            📝 Data
+          </span>
+          <span className="text-[9px] italic" style={{ color: 'var(--theme-memory-card-muted)' }}>
+            (비어있음)
           </span>
         </div>
-
-        {dataSection.length > 0 ? (
+      ) : (
+        // 데이터가 있는 경우 - 확장 표시
+        <div
+          className="rounded-lg p-2"
+          style={{
+            backgroundColor: SECTION_COLORS.data.bg,
+            border: `1px solid ${SECTION_COLORS.data.border}25`,
+          }}
+        >
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.data.color }}>
+              📝 Data
+            </span>
+            <span className="text-[9px]" style={{ color: SECTION_COLORS.data.color }}>
+              문자열 리터럴
+            </span>
+          </div>
           <div className="space-y-1">
             {dataSection.map((item, idx) => (
               <div
                 key={idx}
-                className="rounded px-2 py-1.5 flex items-center gap-2"
-                style={{ backgroundColor: `${themeColors.memory.cardBg}B3` }}
+                className="rounded px-2 py-1 flex items-center gap-2"
+                style={{ backgroundColor: `${'var(--theme-memory-card-bg)'}B3` }}
               >
-                <span className="text-[10px] font-mono" style={{ color: themeColors.memory.cardMuted }}>{item.address}</span>
-                <span style={{ color: themeColors.memory.cardMuted }}>|</span>
-                <span className="text-[11px] font-mono truncate flex-1" style={{ color: themeColors.memory.dataLabel }}>
+                <span className="text-[10px] font-mono" style={{ color: 'var(--theme-memory-card-muted)' }}>{item.address}</span>
+                <span style={{ color: 'var(--theme-memory-card-muted)' }}>|</span>
+                <span className="text-[11px] font-mono truncate flex-1" style={{ color: 'var(--theme-memory-data-label)' }}>
                   "{item.value}"
                 </span>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-[10px] italic text-center py-1" style={{ color: themeColors.memory.cardMuted }}>
-            (비어있음)
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Text 영역 - 함수 코드 */}
-      <div
-        className="rounded-lg p-3"
-        style={{
-          backgroundColor: SECTION_COLORS.text.bg,
-          border: `1px solid ${SECTION_COLORS.text.border}40`,
-        }}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs">⚙️</span>
-            <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.text.color }}>
-              Text
-            </span>
-          </div>
-          <span className="text-[9px]" style={{ color: SECTION_COLORS.text.color }}>
-            실행 코드
+      {textSection.length === 0 ? (
+        // 빈 Text - 한 줄로 축소
+        <div
+          className="rounded-md px-2 py-1.5 flex items-center justify-between"
+          style={{
+            backgroundColor: SECTION_COLORS.text.bg,
+            border: `1px solid ${SECTION_COLORS.text.border}25`,
+          }}
+        >
+          <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.text.color }}>
+            ⚙️ Text
+          </span>
+          <span className="text-[9px] italic" style={{ color: 'var(--theme-memory-card-muted)' }}>
+            (비어있음)
           </span>
         </div>
-
-        {textSection.length > 0 ? (
+      ) : (
+        // 함수가 있는 경우 - 확장 표시
+        <div
+          className="rounded-lg p-2"
+          style={{
+            backgroundColor: SECTION_COLORS.text.bg,
+            border: `1px solid ${SECTION_COLORS.text.border}25`,
+          }}
+        >
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase" style={{ color: SECTION_COLORS.text.color }}>
+              ⚙️ Text
+            </span>
+            <span className="text-[9px]" style={{ color: SECTION_COLORS.text.color }}>
+              실행 코드
+            </span>
+          </div>
           <div className="space-y-1">
             {textSection.map((item, idx) => (
               <div
                 key={idx}
-                className="rounded px-2 py-1.5 flex items-center gap-2"
-                style={{ backgroundColor: `${themeColors.memory.cardBg}B3` }}
+                className="rounded px-2 py-1 flex items-center gap-2"
+                style={{ backgroundColor: `${'var(--theme-memory-card-bg)'}B3` }}
               >
-                <span className="text-[10px] font-mono" style={{ color: themeColors.memory.cardMuted }}>{item.address}</span>
-                <span style={{ color: themeColors.memory.cardMuted }}>|</span>
-                <span className="text-[11px] font-mono" style={{ color: themeColors.memory.textLabel }}>
+                <span className="text-[10px] font-mono" style={{ color: 'var(--theme-memory-card-muted)' }}>{item.address}</span>
+                <span style={{ color: 'var(--theme-memory-card-muted)' }}>|</span>
+                <span className="text-[11px] font-mono" style={{ color: 'var(--theme-memory-text-label)' }}>
                   {item.name}()
                 </span>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-[10px] italic text-center py-1" style={{ color: themeColors.memory.cardMuted }}>
-            (비어있음)
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* 맨 아래: 낮은 주소 표시 */}
-      <div className="text-center text-[9px] pt-1" style={{ color: themeColors.memory.cardMuted }}>
+      <div className="text-center text-[9px] pt-0.5" style={{ color: 'var(--theme-memory-card-muted)' }}>
         ↓ 0x0000 (낮은 주소)
       </div>
     </div>
   );
 }
 
-/** Heap 섹션 */
+/** Heap 섹션 - 빈 경우 한 줄로 축소 */
 function HeapSection({
   blocks,
   changedBlocks,
+  registerBlock,
 }: {
   blocks: MemoryBlock[];
   changedBlocks: string[];
+  /** 블록 등록 함수 (포인터 화살표용) */
+  registerBlock?: (name: string, address: string, element: HTMLElement | null) => void;
 }) {
-  // 테마 적용
-  const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme];
-
   // 주소순 정렬 (낮은 주소 → 높은 주소)
   const sortedBlocks = useMemo(() => {
     return [...blocks].sort((a, b) => {
@@ -981,51 +861,46 @@ function HeapSection({
     });
   }, [blocks]);
 
+  // 빈 Heap - 한 줄로 축소
   if (sortedBlocks.length === 0) {
-    // 빈 Heap 컨테이너
     return (
       <div
-        className="rounded-lg p-3"
+        className="rounded-md px-2 py-1.5 flex items-center justify-between"
         style={{
-          backgroundColor: themeColors.memory.heapBg,
-          border: `1px solid ${themeColors.memory.heapBorder}25`,
+          backgroundColor: 'var(--theme-memory-heap-bg)',
+          border: `1px solid ${'var(--theme-memory-heap-border)'}25`,
         }}
       >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-bold uppercase" style={{ color: themeColors.memory.heapLabel }}>
-            🎒 Heap
-          </span>
-          <span className="text-[9px]" style={{ color: themeColors.memory.heapLabel }}>
-            ↑ 높은 주소
-          </span>
-        </div>
-        <div className="text-center py-3 text-[10px] italic" style={{ color: themeColors.memory.cardMuted }}>
+        <span className="text-[10px] font-bold uppercase" style={{ color: 'var(--theme-memory-heap-label)' }}>
+          🎒 Heap
+        </span>
+        <span className="text-[9px] italic" style={{ color: 'var(--theme-memory-card-muted)' }}>
           (비어있음)
-        </div>
+        </span>
       </div>
     );
   }
 
   return (
     <div
-      className="rounded-lg p-3"
+      className="rounded-lg p-2"
       style={{
-        backgroundColor: themeColors.memory.heapBg,
-        border: `1px solid ${themeColors.memory.heapBorder}25`,
+        backgroundColor: 'var(--theme-memory-heap-bg)',
+        border: `1px solid ${'var(--theme-memory-heap-border)'}25`,
       }}
     >
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-bold uppercase" style={{ color: themeColors.memory.heapLabel }}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] font-bold uppercase" style={{ color: 'var(--theme-memory-heap-label)' }}>
           🎒 Heap
         </span>
-        <span className="text-[9px]" style={{ color: themeColors.memory.heapLabel }}>
+        <span className="text-[9px]" style={{ color: 'var(--theme-memory-heap-label)' }}>
           ↑ 높은 주소
         </span>
       </div>
 
       {/* 메모리 블록 리스트 */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {sortedBlocks.map((block) => (
           <MemoryBlockCard
             key={`heap-${block.name}-${block.address}`}
@@ -1036,6 +911,7 @@ function HeapSection({
             frameName="heap"
             onMouseEnter={() => {}}
             onMouseLeave={() => {}}
+            onRegister={registerBlock ? (el) => registerBlock(block.name, block.address, el) : undefined}
           />
         ))}
       </div>
@@ -1058,63 +934,52 @@ export function MemoryPanel({
 }: MemoryPanelProps) {
   const isEmpty = stack.length === 0 && heap.length === 0;
 
-  // 테마 적용
-  const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme];
-
-  // RBP/RSP 주소 계산 (스택 정렬 후)
-  const sortedStack = useMemo(() => {
-    return [...stack].sort((a, b) => {
-      const addrA = parseInt(a.address, 16);
-      const addrB = parseInt(b.address, 16);
-      return addrB - addrA; // 높은 주소 → 낮은 주소
-    });
-  }, [stack]);
-
-  // 현재 실행 중인 프레임
-  const currentFrame = frames[frames.length - 1]?.name || 'main';
-
-  // RBP: 현재 프레임의 첫 번째 블록 주소 (프레임 바닥)
-  // RSP: 스택의 꼭대기 (마지막 = 가장 낮은 주소)
-  const rbpAddress = useMemo(() => {
-    // 현재 프레임에 속한 블록들 중 가장 높은 주소 찾기
-    const currentFrameBlocks = sortedStack.filter((block) => {
-      const frameName = getFrameFromBlock(block, 'main');
-      return frameName === currentFrame;
-    });
-    return currentFrameBlocks[0]?.address || '0x0000';
-  }, [sortedStack, currentFrame]);
-  const rspAddress = sortedStack[sortedStack.length - 1]?.address || '0x0000';
+  // 포인터 화살표 연결 관리
+  const { connections, containerRef, containerSize, registerBlock } =
+    usePointerConnections(stack, heap, changedBlocks);
 
   return (
-    <div className="p-3 space-y-3">
+    <div className="p-2 space-y-2 relative" ref={containerRef}>
+      {/* 포인터 화살표 오버레이 */}
+      {connections.length > 0 && (
+        <PointerArrowOverlay
+          width={containerSize.width}
+          height={containerSize.height}
+        >
+          {connections.map((conn) => (
+            <PointerArrow
+              key={conn.id}
+              id={conn.id}
+              from={conn.from}
+              to={conn.to}
+              isActive={conn.isActive}
+              isCrossFrame={conn.isCrossFrame}
+            />
+          ))}
+        </PointerArrowOverlay>
+      )}
+
       {isEmpty ? (
         <div
           className="text-center py-8 text-sm italic"
-          style={{ color: themeColors.memory.cardMuted }}
+          style={{ color: 'var(--theme-memory-card-muted)' }}
         >
           메모리 할당 없음
         </div>
       ) : (
         <>
-          {/* CPU 레지스터 패널 (Stack 위에) */}
-          {showRegisters && stack.length > 0 && (
-            <RegisterPanel
-              rbpAddress={rbpAddress}
-              rspAddress={rspAddress}
-              currentFrame={currentFrame}
-            />
-          )}
-
+          {/* RSP/RBP는 StackSection 내부 블록에 직접 표시됨 - RegisterPanel 중복 제거 */}
           <StackSection
             blocks={stack}
             changedBlocks={changedBlocks}
             frames={frames}
             showRegisters={showRegisters}
+            registerBlock={registerBlock}
           />
           <HeapSection
             blocks={heap}
             changedBlocks={changedBlocks}
+            registerBlock={registerBlock}
           />
           <LowerMemorySections
             dataSection={dataSection}

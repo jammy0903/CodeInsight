@@ -1,0 +1,171 @@
+/**
+ * LessonFlowVisualizer Component
+ *
+ * LessonStep을 받아서 FlowVisualizer에 전달
+ * - 언어별 어댑터로 LessonStep → FlowStep 변환
+ * - 포인터 화살표 렌더링
+ */
+
+import { memo, useMemo, useRef } from 'react';
+import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared';
+import { FlowVisualizer } from './FlowVisualizer';
+import { ArrowLayer } from './components/ArrowLayer';
+import { getAdapter, createAdapter } from './adapters';
+import type { FlowTheme } from './styles';
+
+// ============================================
+// 타입 정의
+// ============================================
+
+interface MemoryState {
+  stack: Array<{ name: string; type?: string; value: string; address?: string; points_to?: string | null }>;
+  heap: Array<{ name?: string; type?: string; value: string; address?: string; points_to?: string | null }>;
+}
+
+interface LessonFlowVisualizerProps {
+  /** 현재 LessonStep */
+  step: LessonStep;
+  /** 이전 LessonStep (변경 감지용) */
+  prevStep?: LessonStep | null;
+  /** 언어 */
+  language?: FlowLanguage | string;
+  /** 전체 코드 (step.code가 없을 때 line에서 추출) */
+  fullCode?: string;
+  /** 테마 */
+  theme?: FlowTheme;
+  /** 변수 클릭 핸들러 */
+  onVariableClick?: (variable: FlowVariable) => void;
+  /** 클래스명 */
+  className?: string;
+  /** 화살표 표시 여부 */
+  showArrows?: boolean;
+  /** 계산된 메모리 상태 (useLessonVisualization에서 전달) */
+  memoryState?: MemoryState;
+  /** 이전 메모리 상태 */
+  prevMemoryState?: MemoryState;
+  /** 터미널 출력 (현재 스텝의 stdout) */
+  stdout?: string;
+}
+
+// ============================================
+// 컴포넌트
+// ============================================
+
+export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
+  step,
+  prevStep = null,
+  language = 'c',
+  fullCode,
+  theme = 'light',
+  onVariableClick,
+  className = '',
+  showArrows = true,
+  memoryState,
+  prevMemoryState,
+  stdout,
+}: LessonFlowVisualizerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // 1. 어댑터 가져오기 (테마 적용)
+  const adapter = useMemo(
+    () => createAdapter(language, theme),
+    [language, theme]
+  );
+
+  // 2. memoryState와 stdout을 step에 병합
+  const enrichedStep = useMemo(() => {
+    const enriched = { ...step };
+
+    if (memoryState) {
+      enriched.stack = memoryState.stack as LessonStep['stack'];
+      enriched.heap = memoryState.heap as LessonStep['heap'];
+    }
+
+    // stdout이 제공되면 추가
+    if (stdout) {
+      enriched.stdout = stdout;
+    }
+
+    return enriched;
+  }, [step, memoryState, stdout]);
+
+  const enrichedPrevStep = useMemo(() => {
+    if (!prevStep) return null;
+    if (!prevMemoryState) return prevStep;
+    return {
+      ...prevStep,
+      stack: prevMemoryState.stack as LessonStep['stack'],
+      heap: prevMemoryState.heap as LessonStep['heap'],
+    };
+  }, [prevStep, prevMemoryState]);
+
+  // 3. LessonStep → FlowStep 변환
+  const flowStep = useMemo(
+    () => adapter.transformer.transform(enrichedStep, enrichedPrevStep ?? undefined, fullCode),
+    [adapter, enrichedStep, enrichedPrevStep, fullCode]
+  );
+
+  // 4. 이전 FlowStep 변환 (diff 계산용)
+  const prevFlowStep = useMemo(
+    () => (enrichedPrevStep ? adapter.transformer.transform(enrichedPrevStep, undefined, fullCode) : null),
+    [adapter, enrichedPrevStep, fullCode]
+  );
+
+  // 5. 애니메이션 생성 (diff 기반)
+  const flowStepWithAnimations = useMemo(() => {
+    if (!prevFlowStep) {
+      // 첫 스텝: 모든 변수 생성 애니메이션
+      const animations = flowStep.variables.flatMap((v) =>
+        adapter.animator.createVariableAnimations(v)
+      );
+      return { ...flowStep, animations };
+    }
+
+    // diff 기반 애니메이션
+    const diff = {
+      created: flowStep.variables
+        .filter((v) => !prevFlowStep.variables.find((pv) => pv.id === v.id))
+        .map((v) => v.id),
+      updated: flowStep.variables
+        .filter((v) => {
+          const prev = prevFlowStep.variables.find((pv) => pv.id === v.id);
+          return prev && prev.value !== v.value;
+        })
+        .map((v) => v.id),
+      deleted: prevFlowStep.variables
+        .filter((pv) => !flowStep.variables.find((v) => v.id === pv.id))
+        .map((pv) => pv.id),
+      unchanged: flowStep.variables
+        .filter((v) => {
+          const prev = prevFlowStep.variables.find((pv) => pv.id === v.id);
+          return prev && prev.value === v.value;
+        })
+        .map((v) => v.id),
+    };
+
+    const animations = adapter.animator.createAnimationsFromDiff(diff, flowStep, prevFlowStep);
+    return { ...flowStep, animations };
+  }, [flowStep, prevFlowStep, adapter]);
+
+  return (
+    <div ref={containerRef} className={`relative ${className}`}>
+      <FlowVisualizer
+        step={flowStepWithAnimations}
+        prevStep={prevFlowStep}
+        theme={theme}
+        onVariableClick={onVariableClick}
+      />
+
+      {/* 포인터 화살표 */}
+      {showArrows && (
+        <ArrowLayer
+          variables={flowStepWithAnimations.variables}
+          styler={adapter.styler}
+          containerRef={containerRef}
+        />
+      )}
+    </div>
+  );
+});
+
+export default LessonFlowVisualizer;

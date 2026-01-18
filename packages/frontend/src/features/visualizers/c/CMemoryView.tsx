@@ -81,53 +81,20 @@ export interface CMemoryViewProps {
 }
 
 // ============================================================
-// 색상 체계 (다크/라이트 테마)
+// 변수 색상 (아직 테마화되지 않음 - 향후 작업)
 // ============================================================
 
-const DARK_COLORS = {
-  variables: [
-    { bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6', text: '#60a5fa' },
-    { bg: 'rgba(249, 115, 22, 0.2)', border: '#f97316', text: '#fb923c' },
-    { bg: 'rgba(16, 185, 129, 0.2)', border: '#10b981', text: '#34d399' },
-    { bg: 'rgba(168, 85, 247, 0.2)', border: '#a855f7', text: '#c084fc' },
-    { bg: 'rgba(236, 72, 153, 0.2)', border: '#ec4899', text: '#f472b6' },
-    { bg: 'rgba(234, 179, 8, 0.2)', border: '#eab308', text: '#facc15' },
-  ],
-  stack: { bg: '#3a4555', border: '#3b82f6', label: '#60a5fa', desc: '지역변수, 함수 호출' },
-  heap: { bg: '#354845', border: '#10b981', label: '#34d399', desc: 'malloc 동적 할당' },
-  data: { bg: '#4a3f55', border: '#a855f7', label: '#c084fc', desc: '전역/정적 변수' },
-  text: { bg: '#4a4535', border: '#eab308', label: '#facc15', desc: '프로그램 코드 (읽기 전용)' },
-  changed: { bg: 'rgba(250, 204, 21, 0.25)', border: '#facc15' },
-  pointer: { line: '#f97316', arrow: '#fb923c' },
-  register: { rsp: '#ef4444', rbp: '#8b5cf6' },
-  surface: { bg: '#2a3140', border: '#505866', text: '#c9d1d9', muted: '#8b949e', subtle: '#6e7681' },
-};
+const VARIABLE_COLORS = [
+  { bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6', text: '#60a5fa' },
+  { bg: 'rgba(249, 115, 22, 0.2)', border: '#f97316', text: '#fb923c' },
+  { bg: 'rgba(16, 185, 129, 0.2)', border: '#10b981', text: '#34d399' },
+  { bg: 'rgba(168, 85, 247, 0.2)', border: '#a855f7', text: '#c084fc' },
+  { bg: 'rgba(236, 72, 153, 0.2)', border: '#ec4899', text: '#f472b6' },
+  { bg: 'rgba(234, 179, 8, 0.2)', border: '#eab308', text: '#facc15' },
+];
 
-const LIGHT_COLORS = {
-  variables: [
-    { bg: 'rgba(59, 130, 246, 0.15)', border: '#3b82f6', text: '#2563eb' },
-    { bg: 'rgba(249, 115, 22, 0.15)', border: '#f97316', text: '#ea580c' },
-    { bg: 'rgba(16, 185, 129, 0.15)', border: '#10b981', text: '#059669' },
-    { bg: 'rgba(168, 85, 247, 0.15)', border: '#a855f7', text: '#9333ea' },
-    { bg: 'rgba(236, 72, 153, 0.15)', border: '#ec4899', text: '#db2777' },
-    { bg: 'rgba(234, 179, 8, 0.15)', border: '#eab308', text: '#ca8a04' },
-  ],
-  stack: { bg: '#eff6ff', border: '#3b82f6', label: '#2563eb', desc: '지역변수, 함수 호출' },
-  heap: { bg: '#ecfdf5', border: '#10b981', label: '#059669', desc: 'malloc 동적 할당' },
-  data: { bg: '#faf5ff', border: '#a855f7', label: '#9333ea', desc: '전역/정적 변수' },
-  text: { bg: '#fefce8', border: '#eab308', label: '#ca8a04', desc: '프로그램 코드 (읽기 전용)' },
-  changed: { bg: 'rgba(250, 204, 21, 0.3)', border: '#eab308' },
-  pointer: { line: '#ea580c', arrow: '#f97316' },
-  register: { rsp: '#dc2626', rbp: '#7c3aed' },
-  surface: { bg: '#ffffff', border: '#e5e7eb', text: '#1f2937', muted: '#6b7280', subtle: '#9ca3af' },
-};
-
-function getColors(theme: 'dark' | 'light') {
-  return theme === 'dark' ? DARK_COLORS : LIGHT_COLORS;
-}
-
-function getVariableColor(colors: typeof DARK_COLORS, index: number) {
-  return colors.variables[index % colors.variables.length];
+function getVariableColor(index: number) {
+  return VARIABLE_COLORS[index % VARIABLE_COLORS.length];
 }
 
 // ============================================================
@@ -159,7 +126,7 @@ function RegisterBadge({
   );
 }
 
-/** 변수 태그 (변수명 + 주소) */
+/** 변수 태그 (변수명 + 주소) - 현재 사용되지 않음 */
 function VariableTag({
   name,
   address,
@@ -167,7 +134,6 @@ function VariableTag({
   isChanged,
   isPointer,
   pointsTo,
-  colors,
 }: {
   name: string;
   address: string;
@@ -175,9 +141,8 @@ function VariableTag({
   isChanged: boolean;
   isPointer: boolean;
   pointsTo?: string | null;
-  colors: typeof DARK_COLORS;
 }) {
-  const color = getVariableColor(colors, colorIndex);
+  const color = getVariableColor(colorIndex);
 
   return (
     <motion.div
@@ -189,8 +154,8 @@ function VariableTag({
         gap: '6px',
         padding: '6px 12px',
         borderRadius: '8px',
-        border: `2px solid ${isChanged ? colors.changed.border : color.border}`,
-        backgroundColor: isChanged ? colors.changed.bg : color.bg,
+        border: `2px solid ${isChanged ? '#facc15' : color.border}`,
+        backgroundColor: isChanged ? 'rgba(250, 204, 21, 0.25)' : color.bg,
         transition: 'all 0.3s ease',
       }}
     >
@@ -218,11 +183,9 @@ function VariableTag({
         style={{
           fontFamily: 'monospace',
           fontSize: '10px',
-          color: colors.surface.subtle,
+          color: 'var(--theme-memory-card-muted)',
           padding: '2px 6px',
-          backgroundColor: colors === DARK_COLORS
-            ? 'rgba(110, 118, 129, 0.2)'
-            : 'rgba(0, 0, 0, 0.05)',
+          backgroundColor: 'rgba(110, 118, 129, 0.2)',
           borderRadius: '4px',
         }}
       >
@@ -233,7 +196,7 @@ function VariableTag({
         <span
           style={{
             fontSize: '10px',
-            color: colors.pointer.arrow,
+            color: '#fb923c',
             fontWeight: 600,
           }}
         >
@@ -248,11 +211,9 @@ function VariableTag({
 function MemoryBlockRow({
   block,
   isChanged,
-  colors,
 }: {
   block: MemoryBlock;
   isChanged: boolean;
-  colors: typeof DARK_COLORS;
 }) {
   const highlighted = isChanged || block.highlight;
 
@@ -266,8 +227,8 @@ function MemoryBlockRow({
         gap: '12px',
         padding: '8px 12px',
         borderRadius: '6px',
-        border: `1px solid ${highlighted ? colors.changed.border : colors.surface.border}`,
-        backgroundColor: highlighted ? colors.changed.bg : colors.surface.bg,
+        border: `1px solid ${highlighted ? '#facc15' : 'var(--theme-memory-card-border, #e5e7eb)'}`,
+        backgroundColor: highlighted ? 'rgba(250, 204, 21, 0.25)' : 'var(--theme-memory-card-bg)',
         transition: 'all 0.3s ease',
       }}
     >
@@ -277,11 +238,9 @@ function MemoryBlockRow({
           fontFamily: 'monospace',
           fontSize: '11px',
           fontWeight: 600,
-          color: colors.surface.muted,
+          color: 'var(--theme-memory-card-muted)',
           padding: '3px 6px',
-          backgroundColor: colors === DARK_COLORS
-            ? 'rgba(110, 118, 129, 0.2)'
-            : 'rgba(0, 0, 0, 0.05)',
+          backgroundColor: 'rgba(110, 118, 129, 0.2)',
           borderRadius: '4px',
         }}
       >
@@ -293,7 +252,7 @@ function MemoryBlockRow({
         style={{
           fontFamily: 'monospace',
           fontSize: '13px',
-          color: colors.surface.text,
+          color: 'var(--theme-memory-card-text)',
           fontWeight: 700,
           flex: 1,
         }}
@@ -308,11 +267,9 @@ function MemoryBlockRow({
 function CodeBlock({
   code,
   line,
-  colors
 }: {
   code: string;
   line: number;
-  colors: typeof DARK_COLORS;
 }) {
   return (
     <div
@@ -322,17 +279,15 @@ function CodeBlock({
         gap: '12px',
         padding: '8px 12px',
         borderRadius: '6px',
-        backgroundColor: colors === DARK_COLORS
-          ? 'rgba(234, 179, 8, 0.1)'
-          : 'rgba(234, 179, 8, 0.15)',
-        border: `1px solid ${colors.text.border}30`,
+        backgroundColor: 'var(--theme-memory-text-bg)',
+        border: '1px solid rgba(234, 179, 8, 0.3)',
       }}
     >
       <span
         style={{
           fontFamily: 'monospace',
           fontSize: '11px',
-          color: colors.surface.subtle,
+          color: 'var(--theme-memory-card-muted)',
           minWidth: '30px',
         }}
       >
@@ -342,7 +297,7 @@ function CodeBlock({
         style={{
           fontFamily: 'monospace',
           fontSize: '12px',
-          color: colors.surface.text,
+          color: 'var(--theme-memory-card-text)',
         }}
       >
         {code}
@@ -355,8 +310,7 @@ function CodeBlock({
 function MemorySegment({
   title,
   blocks,
-  segmentColors,
-  colors,
+  segmentType,
   variableColorMap,
   changedSet,
   isCodeSegment = false,
@@ -365,8 +319,7 @@ function MemorySegment({
 }: {
   title: string;
   blocks: MemoryBlock[];
-  segmentColors: typeof DARK_COLORS.stack;
-  colors: typeof DARK_COLORS;
+  segmentType: 'stack' | 'heap' | 'data' | 'text';
   variableColorMap: Map<string, number>;
   changedSet: Set<string>;
   isCodeSegment?: boolean;
@@ -375,12 +328,27 @@ function MemorySegment({
 }) {
   const isEmpty = isCodeSegment ? codeLines.length === 0 : blocks.length === 0;
 
+  // 세그먼트별 설명
+  const descriptions = {
+    stack: '지역변수, 함수 호출',
+    heap: 'malloc 동적 할당',
+    data: '전역/정적 변수',
+    text: '프로그램 코드 (읽기 전용)',
+  };
+
+  // CSS 변수를 JavaScript로 미리 계산
+  const cssVars = {
+    bg: `var(--theme-memory-${segmentType}-bg)`,
+    border: `var(--theme-memory-${segmentType}-border)`,
+    label: `var(--theme-memory-${segmentType}-label)`,
+  };
+
   return (
     <div
       style={{
         borderRadius: '12px',
-        border: `1px solid ${segmentColors.border}30`,
-        backgroundColor: segmentColors.bg,
+        border: `1px solid ${cssVars.border}`,
+        backgroundColor: cssVars.bg,
         overflow: 'hidden',
       }}
     >
@@ -388,7 +356,7 @@ function MemorySegment({
       <div
         style={{
           padding: '10px 16px',
-          borderBottom: `1px solid ${segmentColors.border}30`,
+          borderBottom: `1px solid ${cssVars.border}`,
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -399,34 +367,34 @@ function MemorySegment({
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            backgroundColor: segmentColors.border,
+            backgroundColor: cssVars.border,
           }}
         />
         <span
           style={{
             fontSize: '12px',
             fontWeight: 600,
-            color: segmentColors.label,
+            color: cssVars.label,
             textTransform: 'uppercase',
             letterSpacing: '0.5px',
           }}
         >
           {title}
         </span>
-        <span style={{ fontSize: '10px', color: colors.surface.muted }}>
-          {segmentColors.desc}
+        <span style={{ fontSize: '10px', color: 'var(--theme-memory-card-muted)' }}>
+          {descriptions[segmentType]}
         </span>
 
         {/* RSP/RBP 표시 (Stack일 때만) */}
         {registers && (
           <div style={{ display: 'flex', gap: '8px', marginLeft: '8px' }}>
             {registers.rsp && (
-              <span style={{ fontSize: '10px', color: colors.register.rsp, fontWeight: 600 }}>
+              <span style={{ fontSize: '10px', color: 'var(--theme-memory-register-rsp-text)', fontWeight: 600 }}>
                 RSP: {registers.rsp}
               </span>
             )}
             {registers.rbp && (
-              <span style={{ fontSize: '10px', color: colors.register.rbp, fontWeight: 600 }}>
+              <span style={{ fontSize: '10px', color: 'var(--theme-memory-register-rbp-text)', fontWeight: 600 }}>
                 RBP: {registers.rbp}
               </span>
             )}
@@ -436,7 +404,7 @@ function MemorySegment({
         <span
           style={{
             fontSize: '11px',
-            color: colors.surface.muted,
+            color: 'var(--theme-memory-card-muted)',
             marginLeft: 'auto',
           }}
         >
@@ -453,7 +421,7 @@ function MemorySegment({
             style={{
               padding: '16px',
               textAlign: 'center',
-              color: colors.surface.muted,
+              color: 'var(--theme-memory-card-muted)',
               fontSize: '12px',
             }}
           >
@@ -461,7 +429,7 @@ function MemorySegment({
           </div>
         ) : isCodeSegment ? (
           codeLines.map((item, idx) => (
-            <CodeBlock key={idx} line={item.line} code={item.code} colors={colors} />
+            <CodeBlock key={idx} line={item.line} code={item.code} />
           ))
         ) : (
           blocks.map((block, idx) => (
@@ -469,7 +437,6 @@ function MemorySegment({
               key={`${block.address}-${idx}`}
               block={block}
               isChanged={changedSet.has(block.name) || changedSet.has(block.address)}
-              colors={colors}
             />
           ))
         )}
@@ -489,13 +456,12 @@ export function CMemoryView({
   heap,
   data = [],
   changedTargets = [],
-  theme = 'dark',
+  theme = 'dark', // @deprecated - CSS 변수가 자동으로 테마 처리
   showTextSegment = true,
   registers,
   isReturn = false,
   returnInfo,
 }: CMemoryViewProps) {
-  const colors = getColors(theme);
   const changedSet = new Set(changedTargets);
 
   // 변수별 색상 인덱스 매핑
@@ -507,11 +473,6 @@ export function CMemoryView({
     }
   });
 
-  // 변수 목록 추출 (중복 제거)
-  const variables = Array.from(
-    new Map(allBlocks.map((b) => [b.name, b])).values()
-  );
-
   // 현재 실행 중인 코드
   const codeLines = code ? [{ line, code }] : [];
 
@@ -520,8 +481,7 @@ export function CMemoryView({
         <MemorySegment
           title="Stack"
           blocks={stack}
-          segmentColors={colors.stack}
-          colors={colors}
+          segmentType="stack"
           variableColorMap={variableColorMap}
           changedSet={changedSet}
           registers={registers}
@@ -532,8 +492,7 @@ export function CMemoryView({
           <MemorySegment
             title="Heap"
             blocks={heap}
-            segmentColors={colors.heap}
-            colors={colors}
+            segmentType="heap"
             variableColorMap={variableColorMap}
             changedSet={changedSet}
           />
@@ -544,8 +503,7 @@ export function CMemoryView({
           <MemorySegment
             title="Data"
             blocks={data}
-            segmentColors={colors.data}
-            colors={colors}
+            segmentType="data"
             variableColorMap={variableColorMap}
             changedSet={changedSet}
           />
@@ -556,8 +514,7 @@ export function CMemoryView({
           <MemorySegment
             title="Text"
             blocks={[]}
-            segmentColors={colors.text}
-            colors={colors}
+            segmentType="text"
             variableColorMap={variableColorMap}
             changedSet={changedSet}
             isCodeSegment={true}

@@ -32,7 +32,6 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
-import { themes } from '@/config/themes';
 import { getAnalyticsSummary, type AnalyticsSummary } from '@/services/analytics';
 import type { UserProgress } from '@/types';
 import { DetailedReportModal } from './report';
@@ -62,7 +61,6 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
 
   // 테마 적용
   const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme].dashboard;
 
   // 분석 데이터 로드
   useEffect(() => {
@@ -267,13 +265,13 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
   const sectionHeaderBg = colors.headerBg;
   const sectionHeaderText = colors.headerText;
   const sectionHeaderBorder = colors.headerBorder;
-  const barActiveColor = themeColors.accent;
-  const barInactiveColor = themeColors.progressBg;
+  const barActiveColor = 'var(--theme-dashboard-accent)';
+  const barInactiveColor = 'var(--theme-dashboard-progress-bg)';
   const badgeBg = colors.badgeBg;
   const badgeText = colors.badgeText;
 
   return (
-    <div className="rounded-xl overflow-hidden" style={{ backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}>
+    <div className="rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--theme-dashboard-card-bg)', border: '1px solid var(--theme-dashboard-card-border)' }}>
       {/* 섹션 헤더 - 반응형 */}
       <div
         className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3"
@@ -287,39 +285,39 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
         {/* 퀴즈 성과 & 학습 시간 요약 (API 데이터가 있을 때만) - 반응형 */}
         {analyticsData && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
-            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: 'var(--theme-dashboard-stat-card-bg)' }}>
               <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
                 <Clock className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: sectionHeaderText }} />
-                <span className="text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>총 학습 시간</span>
+                <span className="text-[10px] sm:text-xs" style={{ color: 'var(--theme-dashboard-text-muted)' }}>총 학습 시간</span>
               </div>
-              <p className="text-sm sm:text-lg font-semibold" style={{ color: themeColors.text }}>
+              <p className="text-sm sm:text-lg font-semibold" style={{ color: 'var(--theme-dashboard-text)' }}>
                 {Math.floor(analyticsData.totalStudyTime / 3600)}시간 {Math.floor((analyticsData.totalStudyTime % 3600) / 60)}분
               </p>
             </div>
-            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: 'var(--theme-dashboard-stat-card-bg)' }}>
               <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
                 <Target className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: sectionHeaderText }} />
-                <span className="text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>퀴즈 정답률</span>
+                <span className="text-[10px] sm:text-xs" style={{ color: 'var(--theme-dashboard-text-muted)' }}>퀴즈 정답률</span>
               </div>
-              <p className="text-sm sm:text-lg font-semibold" style={{ color: themeColors.text }}>
+              <p className="text-sm sm:text-lg font-semibold" style={{ color: 'var(--theme-dashboard-text)' }}>
                 {analyticsData.quizStats.accuracy}%
               </p>
             </div>
-            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: 'var(--theme-dashboard-stat-card-bg)' }}>
               <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
                 <Brain className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: sectionHeaderText }} />
-                <span className="text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>AI 질문</span>
+                <span className="text-[10px] sm:text-xs" style={{ color: 'var(--theme-dashboard-text-muted)' }}>AI 질문</span>
               </div>
-              <p className="text-sm sm:text-lg font-semibold" style={{ color: themeColors.text }}>
+              <p className="text-sm sm:text-lg font-semibold" style={{ color: 'var(--theme-dashboard-text)' }}>
                 {analyticsData.aiQuestions}회
               </p>
             </div>
-            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: themeColors.statCardBg }}>
+            <div className="rounded-lg p-2 sm:p-3" style={{ backgroundColor: 'var(--theme-dashboard-stat-card-bg)' }}>
               <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
                 <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: sectionHeaderText }} />
-                <span className="text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>학습 세션</span>
+                <span className="text-[10px] sm:text-xs" style={{ color: 'var(--theme-dashboard-text-muted)' }}>학습 세션</span>
               </div>
-              <p className="text-sm sm:text-lg font-semibold" style={{ color: themeColors.text }}>
+              <p className="text-sm sm:text-lg font-semibold" style={{ color: 'var(--theme-dashboard-text)' }}>
                 {analyticsData.totalSessions}회
               </p>
             </div>
@@ -328,7 +326,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
 
         {/* 로딩 중 표시 - 반응형 */}
         {isLoadingAnalytics && (
-          <div className="flex items-center justify-center py-3 sm:py-4 gap-1.5 sm:gap-2" style={{ color: themeColors.textMuted }}>
+          <div className="flex items-center justify-center py-3 sm:py-4 gap-1.5 sm:gap-2" style={{ color: 'var(--theme-dashboard-text-muted)' }}>
             <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
             <span className="text-xs sm:text-sm">분석 데이터 로딩 중...</span>
           </div>
@@ -337,8 +335,8 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
         {/* 1년 달력 (GitHub 잔디 스타일) - 반응형 */}
         <div>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-            <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: themeColors.textMuted }} />
-            <h3 className="text-xs sm:text-sm font-medium" style={{ color: themeColors.text }}>학습 기록 (최근 1년)</h3>
+            <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: 'var(--theme-dashboard-text-muted)' }} />
+            <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>학습 기록 (최근 1년)</h3>
           </div>
           <div className="overflow-x-auto">
             <ContributionCalendar data={calendarData} />
@@ -350,8 +348,8 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           {/* 주간 활동 */}
           <div>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-              <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: themeColors.textMuted }} />
-              <h3 className="text-xs sm:text-sm font-medium" style={{ color: themeColors.text }}>요일별 학습</h3>
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: 'var(--theme-dashboard-text-muted)' }} />
+              <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>요일별 학습</h3>
               <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeText }}>
                 {mostActiveDay}요일 가장 활발
               </span>
@@ -359,16 +357,16 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
             <div className="h-32 sm:h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={weeklyData}>
-                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: themeColors.textMuted }} />
-                  <YAxis tick={{ fontSize: 10, fill: themeColors.textMuted }} allowDecimals={false} width={25} />
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'var(--theme-dashboard-text-muted)' }} />
+                  <YAxis tick={{ fontSize: 10, fill: 'var(--theme-dashboard-text-muted)' }} allowDecimals={false} width={25} />
                   <Tooltip
                     formatter={(value: number, _name, props) => {
                       const unit = (props.payload as typeof weeklyData[0])?.unit || '분';
                       return [`${value}${unit}`, '학습'];
                     }}
-                    contentStyle={{ fontSize: 11, backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}
-                    labelStyle={{ color: themeColors.text }}
-                    itemStyle={{ color: themeColors.text }}
+                    contentStyle={{ fontSize: 11, backgroundColor: 'var(--theme-dashboard-card-bg)', border: `1px solid ${'var(--theme-dashboard-card-border)'}` }}
+                    labelStyle={{ color: 'var(--theme-dashboard-text)' }}
+                    itemStyle={{ color: 'var(--theme-dashboard-text)' }}
                   />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                     {weeklyData.map((entry, index) => (
@@ -386,8 +384,8 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           {/* 시간대별 패턴 */}
           <div>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-              <Clock className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: themeColors.textMuted }} />
-              <h3 className="text-xs sm:text-sm font-medium" style={{ color: themeColors.text }}>시간대별 학습</h3>
+              <Clock className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: 'var(--theme-dashboard-text-muted)' }} />
+              <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>시간대별 학습</h3>
               <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeText }}>
                 {mostActiveTimeSlot} 선호
               </span>
@@ -395,16 +393,16 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
             <div className="h-32 sm:h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={timeSlotData} layout="vertical">
-                  <XAxis type="number" tick={{ fontSize: 10, fill: themeColors.textMuted }} allowDecimals={false} />
-                  <YAxis dataKey="slot" type="category" tick={{ fontSize: 9, fill: themeColors.textMuted }} width={65} />
+                  <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--theme-dashboard-text-muted)' }} allowDecimals={false} />
+                  <YAxis dataKey="slot" type="category" tick={{ fontSize: 9, fill: 'var(--theme-dashboard-text-muted)' }} width={65} />
                   <Tooltip
                     formatter={(value: number, _name, props) => {
                       const unit = (props.payload as typeof timeSlotData[0])?.unit || '분';
                       return [`${value}${unit}`, '학습'];
                     }}
-                    contentStyle={{ fontSize: 11, backgroundColor: themeColors.cardBg, border: `1px solid ${themeColors.cardBorder}` }}
-                    labelStyle={{ color: themeColors.text }}
-                    itemStyle={{ color: themeColors.text }}
+                    contentStyle={{ fontSize: 11, backgroundColor: 'var(--theme-dashboard-card-bg)', border: `1px solid ${'var(--theme-dashboard-card-border)'}` }}
+                    labelStyle={{ color: 'var(--theme-dashboard-text)' }}
+                    itemStyle={{ color: 'var(--theme-dashboard-text)' }}
                   />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                     {timeSlotData.map((entry, index) => (
@@ -421,14 +419,14 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
         </div>
 
         {/* AI 분석 버튼 영역 - 반응형 */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-3 sm:pt-4" style={{ borderTop: `1px solid ${themeColors.cardBorder}` }}>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-3 sm:pt-4" style={{ borderTop: `1px solid ${'var(--theme-dashboard-card-border)'}` }}>
           <button
             onClick={handleAnalyze}
             disabled={isAnalyzing}
             className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: themeColors.accent }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.accentHover}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = themeColors.accent}
+            style={{ backgroundColor: 'var(--theme-dashboard-accent)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--theme-dashboard-accent-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--theme-dashboard-accent)'}
           >
             {isAnalyzing ? (
               <>
@@ -496,7 +494,6 @@ function ContributionCalendar({
   data: { date: string; count: number; month: number }[];
 }) {
   const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme].dashboard;
 
   // 테마별 잔디 색상 (분석리포트 색상과 통일)
   const grassColors = currentTheme === 'dark'
@@ -551,7 +548,7 @@ function ContributionCalendar({
   return (
     <div className="inline-block">
       {/* 월 라벨 - 모바일에서는 숨김 (absolute 포지셔닝 문제 방지) */}
-      <div className="hidden sm:flex text-xs mb-1 relative h-4" style={{ marginLeft: 20, color: themeColors.textMuted }}>
+      <div className="hidden sm:flex text-xs mb-1 relative h-4" style={{ marginLeft: 20, color: 'var(--theme-dashboard-text-muted)' }}>
         {monthLabels.map(({ month, weekIndex }) => (
           <span
             key={`${month}-${weekIndex}`}
@@ -567,7 +564,7 @@ function ContributionCalendar({
         {/* 요일 라벨 - 모바일에서는 숨김 */}
         <div className="hidden sm:flex flex-col gap-0.5 mr-1">
           {['', '월', '', '수', '', '금', ''].map((day, i) => (
-            <div key={i} className="w-3 h-3 text-[9px] flex items-center justify-center" style={{ color: themeColors.textMuted }}>
+            <div key={i} className="w-3 h-3 text-[9px] flex items-center justify-center" style={{ color: 'var(--theme-dashboard-text-muted)' }}>
               {day}
             </div>
           ))}
@@ -589,7 +586,7 @@ function ContributionCalendar({
       </div>
 
       {/* 범례 - 반응형 */}
-      <div className="flex items-center gap-1 mt-2 text-[10px] sm:text-xs" style={{ color: themeColors.textMuted }}>
+      <div className="flex items-center gap-1 mt-2 text-[10px] sm:text-xs" style={{ color: 'var(--theme-dashboard-text-muted)' }}>
         <span>적음</span>
         <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.empty }} />
         <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.level1 }} />
@@ -610,23 +607,22 @@ function AnalysisResultModal({
   onClose: () => void;
 }) {
   const currentTheme = useThemeStore((s) => s.theme);
-  const themeColors = themes[currentTheme].dashboard;
   const iconColor = currentTheme === 'dark' ? '#c084fc' : '#a855f7';
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="rounded-xl max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] overflow-hidden" style={{ backgroundColor: themeColors.cardBg }}>
+      <div className="rounded-xl max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] overflow-hidden" style={{ backgroundColor: 'var(--theme-dashboard-card-bg)' }}>
         {/* 모달 헤더 */}
-        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3" style={{ borderBottom: `1px solid ${themeColors.cardBorder}` }}>
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3" style={{ borderBottom: `1px solid ${'var(--theme-dashboard-card-border)'}` }}>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: iconColor }} />
-            <h3 className="text-sm sm:text-base font-semibold" style={{ color: themeColors.text }}>AI 분석 결과</h3>
+            <h3 className="text-sm sm:text-base font-semibold" style={{ color: 'var(--theme-dashboard-text)' }}>AI 분석 결과</h3>
           </div>
           <button
             onClick={onClose}
             className="p-1 rounded-lg transition-colors"
-            style={{ color: themeColors.textMuted }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.statCardBg}
+            style={{ color: 'var(--theme-dashboard-text-muted)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--theme-dashboard-stat-card-bg)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -635,19 +631,19 @@ function AnalysisResultModal({
 
         {/* 모달 본문 */}
         <div className="p-3 sm:p-4 overflow-y-auto max-h-[65vh] sm:max-h-[60vh]">
-          <div className="prose prose-sm max-w-none whitespace-pre-wrap text-xs sm:text-sm" style={{ color: themeColors.text }}>
+          <div className="prose prose-sm max-w-none whitespace-pre-wrap text-xs sm:text-sm" style={{ color: 'var(--theme-dashboard-text)' }}>
             {result || '분석 결과가 없습니다.'}
           </div>
         </div>
 
         {/* 모달 푸터 */}
-        <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex justify-end" style={{ borderTop: `1px solid ${themeColors.cardBorder}` }}>
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex justify-end" style={{ borderTop: `1px solid ${'var(--theme-dashboard-card-border)'}` }}>
           <button
             onClick={onClose}
             className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-white font-medium rounded-lg transition-colors"
-            style={{ backgroundColor: themeColors.accent }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = themeColors.accentHover}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = themeColors.accent}
+            style={{ backgroundColor: 'var(--theme-dashboard-accent)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--theme-dashboard-accent-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--theme-dashboard-accent)'}
           >
             확인
           </button>

@@ -433,3 +433,173 @@ export const themeLabels: Record<ThemeType, string> = {
   dark: '다크',
   minimal: '미니멀',
 };
+
+/**
+ * Monaco Editor 테마 정의
+ * - Soft: 흰 바탕 + 파스텔 컬러 (연보라, 핑크, 연초록, 연주황)
+ * - Minimal: 흰 바탕 + 브라운 계열
+ * - Dark: 검은 바탕 + 사이버펑크 네온 (잘 보이게)
+ */
+export interface MonacoTheme {
+  base: 'vs' | 'vs-dark';
+  inherit: boolean;
+  rules: Array<{ token: string; foreground: string; fontStyle?: string }>;
+  colors: Record<string, string>;
+}
+
+/**
+ * CodeViewer (읽기 전용) 구문 강조 색상
+ * Monaco와 동일한 색상 팔레트 사용
+ */
+export interface CodeViewerColors {
+  bg: string;
+  text: string;
+  lineNumberBg: string;
+  lineNumberText: string;
+  lineNumberActive: string;
+  lineNumberBorder: string;
+  highlightBg: string;
+  highlightBorder: string;
+  // 구문 강조
+  comment: string;
+  keyword: string;
+  string: string;
+  number: string;
+  type: string;
+  function: string;
+  operator: string;
+}
+
+export const codeViewerColors: Record<ThemeType, CodeViewerColors> = {
+  soft: {
+    bg: '#ffffff',
+    text: '#6b5a7a',
+    lineNumberBg: '#faf5ff',
+    lineNumberText: '#c4b5d0',
+    lineNumberActive: '#a855f7',
+    lineNumberBorder: '#e9d5ff',
+    highlightBg: '#faf5ff',
+    highlightBorder: '#a855f7',
+    comment: '#a08eb0',
+    keyword: '#c026d3',
+    string: '#16a34a',
+    number: '#ea580c',
+    type: '#db2777',
+    function: '#7c3aed',
+    operator: '#ea580c',
+  },
+  minimal: {
+    bg: '#ffffff',
+    text: '#5c534a',
+    lineNumberBg: '#f5f3f0',
+    lineNumberText: '#c9c2b8',
+    lineNumberActive: '#a08060',
+    lineNumberBorder: '#e5d5c7',
+    highlightBg: '#f5f3f0',
+    highlightBorder: '#a08060',
+    comment: '#8a8279',
+    keyword: '#78716c',
+    string: '#7c6f5e',
+    number: '#a1887f',
+    type: '#8d6e63',
+    function: '#6b5a4a',
+    operator: '#a1887f',
+  },
+  dark: {
+    bg: '#09090b',
+    text: '#fafafa',
+    lineNumberBg: '#18181b',
+    lineNumberText: '#52525b',
+    lineNumberActive: '#22d3ee',
+    lineNumberBorder: '#27272a',
+    highlightBg: '#18181b',
+    highlightBorder: '#22d3ee',
+    comment: '#71717a',
+    keyword: '#22d3ee',
+    string: '#4ade80',
+    number: '#f472b6',
+    type: '#a78bfa',
+    function: '#fbbf24',
+    operator: '#f472b6',
+  },
+};
+
+export const monacoThemes: Record<ThemeType, MonacoTheme> = {
+  soft: {
+    base: 'vs',
+    inherit: true,
+    rules: [
+      { token: 'comment', foreground: 'a08eb0', fontStyle: 'italic' },     // 연보라 뮤트
+      { token: 'keyword', foreground: 'c026d3', fontStyle: 'bold' },       // 진한 보라
+      { token: 'string', foreground: '16a34a' },                           // 연초록
+      { token: 'number', foreground: 'ea580c' },                           // 연주황
+      { token: 'type', foreground: 'db2777' },                             // 핑크
+      { token: 'function', foreground: '7c3aed' },                         // 보라
+      { token: 'variable', foreground: '6b5a7a' },                         // 소프트 텍스트
+    ],
+    colors: {
+      'editor.background': '#ffffff',
+      'editor.foreground': '#6b5a7a',
+      'editor.lineHighlightBackground': '#faf5ff',
+      'editor.selectionBackground': '#e9d5ff80',
+      'editorCursor.foreground': '#a855f7',
+      'editorLineNumber.foreground': '#c4b5d0',
+      'editorLineNumber.activeForeground': '#a855f7',
+      'editor.selectionHighlightBackground': '#a855f720',
+      'editorBracketMatch.background': '#e9d5ff50',
+      'editorBracketMatch.border': '#a855f7',
+    },
+  },
+
+  minimal: {
+    base: 'vs',
+    inherit: true,
+    rules: [
+      { token: 'comment', foreground: '8a8279', fontStyle: 'italic' },     // 회갈색 뮤트
+      { token: 'keyword', foreground: '78716c', fontStyle: 'bold' },       // 진한 갈색
+      { token: 'string', foreground: '7c6f5e' },                           // 베이지 갈색
+      { token: 'number', foreground: 'a1887f' },                           // 연갈색
+      { token: 'type', foreground: '8d6e63' },                             // 밤색
+      { token: 'function', foreground: '6b5a4a' },                         // 진한 브라운
+      { token: 'variable', foreground: '5c534a' },                         // 미니멀 텍스트
+    ],
+    colors: {
+      'editor.background': '#ffffff',
+      'editor.foreground': '#5c534a',
+      'editor.lineHighlightBackground': '#f5f3f0',
+      'editor.selectionBackground': '#e5d5c780',
+      'editorCursor.foreground': '#a08060',
+      'editorLineNumber.foreground': '#c9c2b8',
+      'editorLineNumber.activeForeground': '#a08060',
+      'editor.selectionHighlightBackground': '#a0806020',
+      'editorBracketMatch.background': '#e5d5c750',
+      'editorBracketMatch.border': '#a08060',
+    },
+  },
+
+  dark: {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [
+      { token: 'comment', foreground: '71717a', fontStyle: 'italic' },     // zinc-500
+      { token: 'keyword', foreground: '22d3ee', fontStyle: 'bold' },       // cyan-400 네온
+      { token: 'string', foreground: '4ade80' },                           // green-400 네온
+      { token: 'number', foreground: 'f472b6' },                           // pink-400 네온
+      { token: 'type', foreground: 'a78bfa' },                             // violet-400 네온
+      { token: 'function', foreground: 'fbbf24' },                         // amber-400 네온
+      { token: 'variable', foreground: 'e4e4e7' },                         // zinc-200 밝게
+    ],
+    colors: {
+      'editor.background': '#09090b',                                      // zinc-950
+      'editor.foreground': '#fafafa',                                      // zinc-50
+      'editor.lineHighlightBackground': '#18181b',                         // zinc-900
+      'editor.selectionBackground': '#22d3ee40',                           // cyan 반투명
+      'editorCursor.foreground': '#22d3ee',                                // cyan-400
+      'editorLineNumber.foreground': '#52525b',                            // zinc-600
+      'editorLineNumber.activeForeground': '#22d3ee',                      // cyan-400
+      'editor.selectionHighlightBackground': '#22d3ee20',
+      'editorBracketMatch.background': '#22d3ee30',
+      'editorBracketMatch.border': '#22d3ee',
+    },
+  },
+};

@@ -22,13 +22,20 @@ export const useThemeStore = create<ThemeState>()(
     (set, get) => ({
       theme: 'soft',
 
-      setTheme: (theme) => set({ theme }),
+      setTheme: (theme) => {
+        // HTML에 data-theme 속성 설정
+        document.documentElement.setAttribute('data-theme', theme);
+        set({ theme });
+      },
 
       // 테마 순환 (soft → dark → minimal → soft)
       cycleTheme: () => {
         const currentIndex = THEME_ORDER.indexOf(get().theme);
         const nextIndex = (currentIndex + 1) % THEME_ORDER.length;
-        set({ theme: THEME_ORDER[nextIndex] });
+        const nextTheme = THEME_ORDER[nextIndex];
+        // HTML에 data-theme 속성 설정
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        set({ theme: nextTheme });
       },
     }),
     {

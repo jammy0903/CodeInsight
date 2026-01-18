@@ -1,73 +1,15 @@
 # CodeInsight TODO
 
-> 마지막 업데이트: 2026-01-11
+> 마지막 업데이트: 2026-01-18
 
 ---
 
 ## 완료된 항목
 
-### Phase 0: 코스 시스템 기초
-- ✅ DayPage → LessonPage 리팩토링
-- ✅ 코스 시스템 DB 기반 전환
-- ✅ User 스키마 재설계 (닉네임 기반)
-- ✅ 다중 OAuth 지원
-- ✅ Axios 인프라 구축
-- ✅ Monorepo 전환 (`packages/shared`)
-- ✅ Admin Provider Toggle
-- ✅ 인증 미들웨어 (`requireDbUser`)
-- ✅ 프로덕션 console.log 제거
-- ✅ HomePage 리디자인 (CSS 픽셀아트 → 모던 디자인)
+👉 **상세 목록**: [`COMPLETED.md`](./COMPLETED.md)
 
-### Phase 1: 아키텍처 개선 (2026-01-08 완료)
-- ✅ **codeinsight → main 브랜치 병합**
-- ✅ **Docker-in-Docker 제거**
-  - docker-compose.yml 삭제 (프로덕션은 별도)
-  - Docker Socket 연결 제거
-
-- ✅ **로컬 gcc 기반 C 실행기 구현**
-  - executor.ts → 로컬 gcc로 리팩토링
-  - FORBIDDEN_PATTERNS 보안 검사 유지
-  - 성능 3배 향상 (3-5초 → 0.5-1초)
-
-- ✅ **멀티-언어 Executor 아키텍처 설계 및 구현**
-  - `packages/backend/src/modules/executors/` 생성
-  - `IExecutor` 인터페이스 정의 (모든 언어 통일)
-  - `CExecutor` 클래스 구현
-  - 향후 Python/Java/JavaScript 확장 용이
-
-### Phase 2: Playground 기반 (2026-01-10 완료)
-- ✅ **1주차: 기반 구축**
-  - ✅ 공통 인터페이스 정의 (`types/simulator.ts`)
-  - ✅ Zustand 스토어 (`playgroundStore.ts`)
-  - ✅ PlaygroundPage 기본 레이아웃 (40/60 분할)
-  - ✅ CodeEditor (Monaco) 연동
-  - ✅ LanguageTabs (C/Python/Java)
-  - ✅ StepControls (◀ ▶ Reset)
-  - ✅ MemoryGridPanel, MetadataPanel, VisualizerPanel
-  - ✅ `/playground` 라우트
-
-- ✅ **2주차: C 시뮬레이터**
-  - ✅ CMemoryView 컴포넌트 (17KB)
-  - ✅ 기존 핸들러 통합 (backend/memory/handlers/)
-  - ✅ RSP/RBP 레지스터 추적
-
-### Phase 3: C 핸들러 확장 (2026-01-11 완료)
-- ✅ struct 지원 (struct.handler.ts)
-- ✅ 배열 다양한 타입 지원 (char[], float[], double[])
-- ✅ 함수 파라미터 지원 (pass-by-value)
-- ✅ 비트 연산 시각화 (bitwise.handler.ts)
-- ✅ 메모리 에러 감지 (leak, buffer overflow)
-
-### Codeium AI 자동완성 시도 및 롤백 (2026-01-11)
-- ✅ `@codeium/react-code-editor` 도입 시도
-- ✅ 최근 레슨 컨텍스트 연동 설계 (otherDocuments)
-- ❌ **롤백 결정**: Codeium 백엔드 서비스 500 에러 (2025-12 ~)
-  - 원인: Codeium → Windsurf 리브랜딩 후 무료 React 에디터 방치
-  - GitHub Issue: [#47](https://github.com/Exafunction/codeium-react-code-editor/issues/47)
-- ✅ Monaco Editor로 롤백
-- ✅ `lessonHistoryStore` 유지 (향후 재활용 가능)
-  - 최근 학습 레슨 기록 (localStorage persist)
-  - 다른 AI 서비스 연동 시 활용 가능
+- Phase 0~3 완료 (2026-01-08 ~ 01-11)
+- Codeium 롤백 완료 (01-11)
 
 ---
 
@@ -122,6 +64,26 @@
 
 ---
 
+### 📊 학습 분석 리포트 시스템 (2026-01-18~)
+
+👉 **상세 문서**: [`IN_PROGRESS_ANALYTICS.md`](./IN_PROGRESS_ANALYTICS.md)
+
+- 퀴즈 시스템 (OX, 객관식, 빈칸 코드 입력)
+- 데이터 수집 (체류 시간, AI 질문, 퀴즈 시도, 노트)
+- AI 학습 분석 리포트
+
+---
+
+### 🎬 Flow Visualizer + 🎮 게이미피케이션 (2026-01-18~)
+
+👉 **상세 문서**: [`IN_PROGRESS_UX.md`](./IN_PROGRESS_UX.md)
+
+- Flow Visualizer: 코드 흐름 시각화 (변수, 분기, 루프, 함수)
+- 게이미피케이션: 스트릭, 배지, XP/레벨
+- 모바일: PWA, 오프라인, 푸시 알림
+
+---
+
 ### 🎯 Playground + 멀티언어 시각화 (설계 문서: `docs/logic/SIMULATOR_EXTENSION.md`)
 
 #### Phase 4: Python MVP (2주)
@@ -173,12 +135,16 @@
 
 ---
 
-## 연기된 계획
+## 연기된 계획 & 미래 계획
 
-| 계획 | 진입 조건 | 문서 |
-|------|----------|------|
-| Chapter 구조 | DAU 50+ | `deferred/chapter_restructure.md` |
-| Progress DB 서버 저장 | DAU 100+ | `deferred/progress_tracking.md` |
+👉 **상세 문서**: [`FUTURE.md`](./FUTURE.md)
+
+| 계획 | 진입 조건 |
+|------|----------|
+| Chapter 구조 개편 | DAU 50+ |
+| Progress DB 서버 저장 | DAU 100+ |
+| Python 커리큘럼 | Phase 4 |
+| Java 커리큘럼 | Phase 5 |
 
 ---
 

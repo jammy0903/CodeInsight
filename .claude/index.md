@@ -22,6 +22,7 @@ branch:.claude/rules/git/branch.md:branch,merge,PR,rebase,main,develop
 file-structure:.claude/rules/arch/file-structure.md:folder,module,organize,features,components
 patterns:.claude/rules/arch/patterns.md:handler,registry,strategy,factory,singleton
 decisions:.claude/rules/arch/decisions.md:why,tradeoff,ADR,design decision
+visualizer-structure:.claude/rules/arch/visualizer-structure.md:memory,flow,visualizer,c,python,js,java,adapter,2-tab
 
 ## Libraries
 approved:.claude/rules/libs/approved.md:recommend,use,install,dependency
