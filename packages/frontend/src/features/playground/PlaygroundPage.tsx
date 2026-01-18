@@ -1,13 +1,12 @@
 /**
  * PlaygroundPage - Code Simulator (Theme Support)
- * Left 50%: Code Editor + Output + Explanation
+ * Left 50%: Code Editor + Explanation
  * Right 50%: Memory Visualization
  */
 
-import { useMemo, useEffect, useState } from 'react';
-import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
+import { useEffect, useState, useMemo } from 'react';
 import { useIsMobile } from '@/hooks';
-import { Cpu, Github, Mail, GripVertical, Play, ChevronDown, ChevronUp } from 'lucide-react';
+import { Cpu, Github, Mail, Play } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
 import { CodeEditor } from './components/CodeEditor';
 import { StepControls } from './components/StepControls';
@@ -16,7 +15,6 @@ import { MemoryPanel } from '@/features/courses/components/memory';
 import { useLessonVisualization } from '@/features/courses/hooks/useLessonVisualization';
 import { usePlaygroundStore, useCurrentCode } from './stores/playgroundStore';
 import { useExplanationStore } from './stores/explanationStore';
-import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { PyVisualizerView } from '@/features/visualizers/python';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { useThemeStore } from '@/stores/themeStore';
@@ -125,7 +123,6 @@ export function PlaygroundPage() {
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
   const [activeTab, setActiveTab] = useState<'flow' | 'memory'>('flow');
-  const [isTerminalCollapsed, setIsTerminalCollapsed] = useState(false);
 
   // 페이지 제목 설정
   useEffect(() => {
@@ -154,20 +151,6 @@ export function PlaygroundPage() {
     steps as LessonStep[],
     currentStepIndex
   );
-
-  // Convert printf/scanf output to terminal lines
-  const terminalLines = useMemo<TerminalLine[]>(() => {
-    if (!hasSteps) return [];
-
-    const lines: TerminalLine[] = [];
-    for (let i = 0; i <= currentStepIndex && i < steps.length; i++) {
-      const step = steps[i] as LessonStep;
-      if (step.stdout) {
-        lines.push({ type: 'output', content: step.stdout });
-      }
-    }
-    return lines;
-  }, [steps, currentStepIndex, hasSteps]);
 
   // 모바일 레이아웃: PanelGroup 없이 단순 스택
   if (isMobile) {
@@ -198,49 +181,6 @@ export function PlaygroundPage() {
             <CodeEditor />
           </div>
 
-          {/* Terminal Output (접기 가능) */}
-          {terminalLines.length > 0 && (
-            <div
-              style={{
-                flexShrink: 0,
-                borderTop: `1px solid ${colors.border}`,
-              }}
-            >
-              {/* 헤더 (접기 버튼) */}
-              <div
-                onClick={() => setIsTerminalCollapsed(!isTerminalCollapsed)}
-                style={{
-                  padding: '4px 8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer',
-                  backgroundColor: colors.explanationHeaderBg,
-                  borderBottom: isTerminalCollapsed ? 'none' : `1px solid ${colors.border}`,
-                }}
-              >
-                <span style={{ fontSize: '10px', fontWeight: 600, color: colors.text }}>
-                  📟 Output
-                </span>
-                {isTerminalCollapsed ? (
-                  <ChevronDown size={12} color={colors.textMuted} />
-                ) : (
-                  <ChevronUp size={12} color={colors.textMuted} />
-                )}
-              </div>
-              {/* 내용 */}
-              {!isTerminalCollapsed && (
-                <div style={{ padding: '6px 8px' }}>
-                  <TerminalOutput
-                    lines={terminalLines}
-                    title=""
-                    maxHeight="60px"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Navigation Controls (이전/다음만) */}
           {hasSteps && (
             <div
@@ -257,7 +197,7 @@ export function PlaygroundPage() {
 
           {/* Explanation */}
           {currentStep && (
-            <div style={{ padding: '6px 8px 8px', borderTop: terminalLines.length === 0 ? `1px solid ${colors.border}` : 'none' }}>
+            <div style={{ padding: '6px 8px 8px' }}>
               <div
                 style={{
                   backgroundColor: colors.explanationBg,
@@ -433,33 +373,34 @@ export function PlaygroundPage() {
     );
   }
 
-  // 데스크톱 레이아웃: Resizable Panels
+  // 데스크톱 레이아웃: Flex (LessonPage 스타일 - sticky 지원)
   return (
     <div
       style={{
         backgroundColor: colors.pageBg,
+        padding: '8px 16px 16px',
       }}
     >
-      {/* Main area: Resizable 2-panel layout */}
-      <PanelGroup
-        orientation="horizontal"
-        id="playground-main"
+      {/* Main area: Flex 2-column layout */}
+      <div
         style={{
-          minHeight: 'calc(100vh - 64px - 32px)',
-          alignItems: 'flex-start',
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '16px',
+          alignItems: 'flex-start', // sticky 작동을 위해 필수
         }}
       >
-        {/* ===== Left Panel: Code Editor + Output + Explanation ===== */}
-        <Panel
-          id="code-editor"
-          defaultSize={50}
-          minSize={30}
-          maxSize={70}
+        {/* ===== Left Panel: Code Editor + Explanation ===== */}
+        <div
           style={{
+            width: '50%',
             display: 'flex',
             flexDirection: 'column',
-            minWidth: 0,
             backgroundColor: colors.panelBg,
+            borderRadius: '12px',
+            border: `1px solid ${colors.border}`,
+            overflow: 'visible', // sticky 동작을 위해
+            minHeight: '400px',
           }}
         >
           {/* Code Header */}
@@ -486,50 +427,6 @@ export function PlaygroundPage() {
             <CodeEditor />
           </div>
 
-          {/* Terminal Output (접기 가능) */}
-          {terminalLines.length > 0 && (
-            <div
-              style={{
-                flexShrink: 0,
-                backgroundColor: colors.panelBg,
-                borderTop: `1px solid ${colors.border}`,
-              }}
-            >
-              {/* 헤더 (접기 버튼) */}
-              <div
-                onClick={() => setIsTerminalCollapsed(!isTerminalCollapsed)}
-                style={{
-                  padding: '6px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer',
-                  backgroundColor: colors.explanationHeaderBg,
-                  borderBottom: isTerminalCollapsed ? 'none' : `1px solid ${colors.border}`,
-                }}
-              >
-                <span style={{ fontSize: '12px', fontWeight: 600, color: colors.text }}>
-                  📟 Output
-                </span>
-                {isTerminalCollapsed ? (
-                  <ChevronDown size={16} color={colors.textMuted} />
-                ) : (
-                  <ChevronUp size={16} color={colors.textMuted} />
-                )}
-              </div>
-              {/* 내용 */}
-              {!isTerminalCollapsed && (
-                <div style={{ padding: '8px 12px' }}>
-                  <TerminalOutput
-                    lines={terminalLines}
-                    title=""
-                    maxHeight="100px"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Navigation Controls (이전/다음만) */}
           {hasSteps && (
             <div
@@ -553,7 +450,6 @@ export function PlaygroundPage() {
                 flexShrink: 0,
                 padding: '8px 12px 12px',
                 backgroundColor: colors.panelBg,
-                borderTop: terminalLines.length === 0 ? `1px solid ${colors.border}` : 'none',
               }}
             >
               <div
@@ -591,36 +487,23 @@ export function PlaygroundPage() {
               </div>
             </div>
           )}
-        </Panel>
+        </div>
 
-        {/* Resize Handle */}
-        <PanelResizeHandle
+        {/* ===== Right Panel: Flow + Memory Tabs (Sticky) ===== */}
+        <div
           style={{
-            width: '8px',
-            backgroundColor: colors.resizeHandle,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'col-resize',
-            transition: 'background-color 0.15s ease',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHover)}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.resizeHandle)}
-        >
-          <GripVertical size={14} color={colors.textDim} />
-        </PanelResizeHandle>
-
-        {/* Right Panel: Flow + Memory Tabs */}
-        <Panel
-          id="visualization-viewer"
-          defaultSize={50}
-          minSize={30}
-          maxSize={70}
-          style={{
+            width: '50%',
             display: 'flex',
             flexDirection: 'column',
-            minWidth: 0,
             backgroundColor: colors.panelBg,
+            borderRadius: '12px',
+            border: `1px solid ${colors.border}`,
+            overflow: 'hidden',
+            height: '75vh',
+            maxHeight: '700px',
+            position: 'sticky',
+            top: '16px',
+            zIndex: 10,
           }}
         >
           {/* Tab Header */}
@@ -746,8 +629,8 @@ export function PlaygroundPage() {
               )
             )}
           </div>
-        </Panel>
-      </PanelGroup>
+        </div>
+      </div>
 
       {/* Footer */}
       <footer
