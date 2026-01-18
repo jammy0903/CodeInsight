@@ -179,7 +179,7 @@ export function ChapterCard({
           </span>
         )}
         {isLocked && (
-          <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-400 border border-gray-200">
+          <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-[var(--theme-dashboard-section-header-bg)] text-[var(--theme-dashboard-text-muted)] border border-[var(--theme-dashboard-card-border)]">
             <Lock className="w-2.5 h-2.5 md:w-3 md:h-3" />
             Locked
           </span>
@@ -198,18 +198,18 @@ export function ChapterCard({
 
       {/* 챕터 설명 */}
       {chapter.description && (
-        <p className="text-[10px] md:text-xs lg:text-sm text-gray-500 line-clamp-3 mb-3 md:mb-4 lg:mb-6">
+        <p className="text-[10px] md:text-xs lg:text-sm text-[var(--theme-dashboard-text-muted)] line-clamp-3 mb-3 md:mb-4 lg:mb-6">
           {chapter.description}
         </p>
       )}
 
       {/* 진행률 바 */}
       <div className="mb-2 md:mb-3 lg:mb-4">
-        <div className="flex items-center justify-between text-[10px] md:text-xs text-gray-400 mb-1">
+        <div className="flex items-center justify-between text-[10px] md:text-xs text-[var(--theme-dashboard-text-muted)] mb-1">
           <span>Progress</span>
           <span className="font-mono font-bold">{progressPercent}%</span>
         </div>
-        <div className="h-1.5 md:h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-1.5 md:h-2 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{
@@ -223,7 +223,7 @@ export function ChapterCard({
       </div>
 
       {/* 레슨 카운트 */}
-      <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs lg:text-sm text-gray-400">
+      <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs lg:text-sm text-[var(--theme-dashboard-text-muted)]">
         <BookOpen className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
         <span>
           {completedCount} / {lessonCount} Lessons

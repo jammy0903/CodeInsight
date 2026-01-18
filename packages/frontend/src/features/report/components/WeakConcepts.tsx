@@ -25,8 +25,8 @@ export function WeakConcepts({ weakConcepts }: WeakConceptsProps) {
           <AlertTriangle className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">보완이 필요한 개념</h3>
-          <p className="text-sm text-gray-500">틀린 문제가 많은 주제예요</p>
+          <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)]">보완이 필요한 개념</h3>
+          <p className="text-sm text-[var(--theme-dashboard-text-muted)]">틀린 문제가 많은 주제예요</p>
         </div>
       </div>
 
@@ -42,7 +42,7 @@ export function WeakConcepts({ weakConcepts }: WeakConceptsProps) {
             <div className="flex items-center gap-3">
               <span className="text-2xl">{getConceptEmoji(index)}</span>
               <div>
-                <p className="font-medium text-gray-900">{concept}</p>
+                <p className="font-medium text-[var(--theme-dashboard-title)]">{concept}</p>
                 <p className="text-sm text-red-500">
                   {count}문제 틀림
                 </p>
@@ -60,7 +60,7 @@ export function WeakConcepts({ weakConcepts }: WeakConceptsProps) {
         ))}
       </div>
 
-      <p className="text-xs text-gray-400 text-center mt-4">
+      <p className="text-xs text-[var(--theme-dashboard-text-muted)] text-center mt-4">
         해당 개념이 포함된 레슨을 다시 학습해보세요
       </p>
     </div>

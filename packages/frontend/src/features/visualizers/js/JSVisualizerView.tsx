@@ -16,10 +16,10 @@ function NotImplementedView({ type }: { type: string }) {
   return (
     <div className="p-8 text-center">
       <div className="text-4xl mb-4">🚧</div>
-      <h3 className="text-lg font-semibold text-gray-700 mb-2">
+      <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)] mb-2">
         {type} 시각화
       </h3>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-[var(--theme-dashboard-text-muted)]">
         아직 구현되지 않았습니다.
       </p>
     </div>
@@ -87,14 +87,14 @@ export function JSVisualizerView({ type, state }: JSVisualizerViewProps) {
     // C 메모리 시각화 (JS에서는 사용 안 함)
     case 'memory':
       return (
-        <div className="p-8 text-center text-gray-500">
+        <div className="p-8 text-center text-[var(--theme-dashboard-text-muted)]">
           JavaScript는 메모리 직접 접근을 지원하지 않습니다.
         </div>
       );
 
     default:
       return (
-        <div className="p-8 text-center text-gray-500">
+        <div className="p-8 text-center text-[var(--theme-dashboard-text-muted)]">
           알 수 없는 시각화 타입: {type}
         </div>
       );

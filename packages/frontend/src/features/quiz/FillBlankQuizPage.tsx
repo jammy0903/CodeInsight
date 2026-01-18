@@ -319,15 +319,15 @@ export function FillBlankQuizPage() {
   // 챕터 선택 화면
   if (viewState === 'chapters') {
     return (
-      <div className="min-h-screen bg-[#fffbf5] p-6">
+      <div className="min-h-screen bg-[var(--theme-quiz-page-bg)] p-6">
         <div className="max-w-4xl mx-auto">
           {/* 헤더 */}
           <div className="flex items-center gap-3 mb-8">
             <button
               onClick={() => navigate('/quiz')}
-              className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] transition-colors"
+              className="p-2 rounded-lg border border-[var(--theme-quiz-card-border)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-[#937b5d]" />
+              <ArrowLeft className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
             </button>
             <div
               className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
@@ -336,8 +336,8 @@ export function FillBlankQuizPage() {
               {theme.icon}
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[#6b5a4a]">{theme.name} 빈칸 코드</h1>
-              <p className="text-sm text-[#937b5d]">챕터를 선택하세요</p>
+              <h1 className="text-xl font-bold text-[var(--theme-quiz-title)]">{theme.name} 빈칸 코드</h1>
+              <p className="text-sm text-[var(--theme-quiz-text-muted)]">챕터를 선택하세요</p>
             </div>
           </div>
 
@@ -349,7 +349,7 @@ export function FillBlankQuizPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleChapterSelect(chapter)}
-                className="p-6 rounded-2xl border-2 border-[#e5d5c7] bg-white hover:border-purple-300 hover:shadow-lg transition-all text-left"
+                className="p-6 rounded-2xl border-2 border-[var(--theme-quiz-card-border)] bg-[var(--theme-quiz-card-bg)] hover:border-purple-300 hover:shadow-lg transition-all text-left"
               >
                 <div className="flex items-center gap-4">
                   <div
@@ -359,10 +359,10 @@ export function FillBlankQuizPage() {
                     {idx + 1}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-[#6b5a4a] text-lg">{chapter.title}</h3>
-                    <p className="text-sm text-[#937b5d]">{chapter.quizzes.length}문제</p>
+                    <h3 className="font-bold text-[var(--theme-quiz-title)] text-lg">{chapter.title}</h3>
+                    <p className="text-sm text-[var(--theme-quiz-text-muted)]">{chapter.quizzes.length}문제</p>
                   </div>
-                  <BookOpen className="w-5 h-5 text-[#937b5d]" />
+                  <BookOpen className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
                 </div>
               </motion.button>
             ))}
@@ -376,22 +376,22 @@ export function FillBlankQuizPage() {
   if (viewState === 'result') {
     const percentage = Math.round((score / totalQuizzes) * 100);
     return (
-      <div className="min-h-screen bg-[#fffbf5] p-6">
+      <div className="min-h-screen bg-[var(--theme-quiz-page-bg)] p-6">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <button
               onClick={handleBackToChapters}
-              className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] transition-colors"
+              className="p-2 rounded-lg border border-[var(--theme-quiz-card-border)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-[#937b5d]" />
+              <ArrowLeft className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
             </button>
-            <h1 className="text-xl font-bold text-[#6b5a4a]">퀴즈 결과</h1>
+            <h1 className="text-xl font-bold text-[var(--theme-quiz-title)]">퀴즈 결과</h1>
           </div>
 
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-2xl border border-[#e5d5c7] p-8 text-center shadow-lg"
+            className="bg-[var(--theme-quiz-card-bg)] rounded-2xl border border-[var(--theme-quiz-card-border)] p-8 text-center shadow-lg"
           >
             <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
               percentage >= 80 ? 'bg-green-100' : percentage >= 60 ? 'bg-yellow-100' : 'bg-red-100'
@@ -403,20 +403,20 @@ export function FillBlankQuizPage() {
               </span>
             </div>
 
-            <h2 className="text-2xl font-bold text-[#6b5a4a] mb-2">
+            <h2 className="text-2xl font-bold text-[var(--theme-quiz-title)] mb-2">
               {percentage >= 80 ? '훌륭해요!' : percentage >= 60 ? '잘했어요!' : '다시 도전해보세요!'}
             </h2>
-            <p className="text-[#937b5d] mb-2">
+            <p className="text-[var(--theme-quiz-text-muted)] mb-2">
               {selectedChapter?.title}
             </p>
-            <p className="text-lg text-[#6b5a4a] mb-6">
+            <p className="text-lg text-[var(--theme-quiz-title)] mb-6">
               <span className="text-green-600 font-bold">{score}문제</span> 정답 / <span className="text-red-500 font-bold">{wrongCount}문제</span> 오답
             </p>
 
             <div className="flex gap-3">
               <button
                 onClick={handleRestart}
-                className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border border-[#e5d5c7] text-[#6b5a4a] hover:bg-[#fff8f0] transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border border-[var(--theme-quiz-card-border)] text-[var(--theme-quiz-title)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
               >
                 <RotateCcw className="w-5 h-5" />
                 다시 풀기
@@ -436,24 +436,24 @@ export function FillBlankQuizPage() {
 
   // 퀴즈 화면
   return (
-    <div className="min-h-screen bg-[#fffbf5] p-6">
+    <div className="min-h-screen bg-[var(--theme-quiz-page-bg)] p-6">
       <div className="max-w-2xl mx-auto">
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={handleBackToChapters}
-            className="p-2 rounded-lg border border-[#e5d5c7] hover:bg-[#fff8f0] transition-colors"
+            className="p-2 rounded-lg border border-[var(--theme-quiz-card-border)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-[#937b5d]" />
+            <ArrowLeft className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
           </button>
           <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
             <Code2 className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-[#6b5a4a]">{selectedChapter?.title}</h1>
+            <h1 className="text-lg font-bold text-[var(--theme-quiz-title)]">{selectedChapter?.title}</h1>
             <div className="flex items-center gap-3 text-sm">
               <span className="text-green-600">맞춤 {score}</span>
-              <span className="text-[#937b5d]">{currentIndex + 1}/{totalQuizzes}</span>
+              <span className="text-[var(--theme-quiz-text-muted)]">{currentIndex + 1}/{totalQuizzes}</span>
               <span className="text-red-500">틀림 {wrongCount}</span>
             </div>
           </div>
@@ -461,7 +461,7 @@ export function FillBlankQuizPage() {
 
         {/* 진행률 */}
         <div className="mb-6">
-          <div className="h-2 bg-[#e5d5c7] rounded-full overflow-hidden">
+          <div className="h-2 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-purple-500 rounded-full"
               initial={{ width: 0 }}
@@ -481,8 +481,8 @@ export function FillBlankQuizPage() {
             transition={{ duration: 0.3 }}
           >
             {/* 질문 */}
-            <div className="bg-white rounded-2xl border-2 border-[#e5d5c7] p-6 mb-4 shadow-lg">
-              <p className="text-[#6b5a4a] font-medium mb-4">
+            <div className="bg-[var(--theme-quiz-card-bg)] rounded-2xl border-2 border-[var(--theme-quiz-card-border)] p-6 mb-4 shadow-lg">
+              <p className="text-[var(--theme-quiz-title)] font-medium mb-4">
                 {currentQuiz?.question}
               </p>
 
@@ -512,7 +512,7 @@ export function FillBlankQuizPage() {
                   onChange={(e) => setUserInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="빈칸에 들어갈 코드"
-                  className="flex-1 px-4 py-3 rounded-xl border-2 border-[#e5d5c7] focus:border-purple-400 focus:outline-none font-mono text-lg"
+                  className="flex-1 px-4 py-3 rounded-xl border-2 border-[var(--theme-quiz-card-border)] focus:border-purple-400 focus:outline-none font-mono text-lg"
                   autoFocus
                 />
                 <motion.button
@@ -534,7 +534,7 @@ export function FillBlankQuizPage() {
                     : 'border-red-400 bg-red-50'
                 }`}>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm text-[#937b5d]">내 답변:</span>
+                    <span className="text-sm text-[var(--theme-quiz-text-muted)]">내 답변:</span>
                     <code className={`px-2 py-1 rounded font-mono text-sm ${
                       quizState === 'correct' ? 'bg-green-200 text-green-700' : 'bg-red-200 text-red-700'
                     }`}>
@@ -543,7 +543,7 @@ export function FillBlankQuizPage() {
                   </div>
                   {quizState === 'incorrect' && (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-[#937b5d]">정답:</span>
+                      <span className="text-sm text-[var(--theme-quiz-text-muted)]">정답:</span>
                       <code className="px-2 py-1 rounded font-mono text-sm bg-green-200 text-green-700">
                         {currentQuiz?.answer}
                       </code>
@@ -571,7 +571,7 @@ export function FillBlankQuizPage() {
                       {quizState === 'correct' ? '정답!' : '오답!'}
                     </span>
                   </div>
-                  <p className="text-sm text-[#6b5a4a]">
+                  <p className="text-sm text-[var(--theme-quiz-title)]">
                     {currentQuiz?.explanation}
                   </p>
                 </motion.div>
@@ -588,7 +588,7 @@ export function FillBlankQuizPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleNext}
-            className="w-full mt-6 py-4 rounded-2xl bg-[#a08060] text-white font-semibold shadow-lg hover:bg-[#8b6d4f] transition-colors"
+            className="w-full mt-6 py-4 rounded-2xl bg-[var(--theme-dashboard-accent)] text-white font-semibold shadow-lg hover:bg-[var(--theme-dashboard-accent-hover)] transition-colors"
           >
             {currentIndex < totalQuizzes - 1 ? '다음 문제' : '결과 보기'}
           </motion.button>

@@ -1092,18 +1092,32 @@ print(f"GC가 수집한 객체: {collected}")`,
     },
     {
       line: 17,
-      title: '외부 참조 제거',
+      title: 'del a - 첫 번째 참조 제거',
       explanation:
-        'del a, del b로 변수를 제거해도, 객체들은 서로를 가리키고 있어서 참조 카운트가 0이 아닙니다.',
-      memoryChanges: {
-        stack: [
-          { name: 'global', variables: [] },
+        'del a로 a 변수를 제거합니다. 하지만 Node(1) 객체는 b.next가 여전히 가리키고 있어서 삭제되지 않습니다.',
+      pythonMemoryState: {
+        names: [
+          { name: 'b', pointsTo: 'node_b' },
         ],
-        heap: [
-          { id: 'node_a', type: 'Node', fields: { value: 1, next: '→node_b', note: '고아 객체' } },
-          { id: 'node_b', type: 'Node', fields: { value: 2, next: '→node_a', note: '고아 객체' } },
+        objects: [
+          { id: 'node_a', type: 'Node', value: '{value: 1, next: →B}', highlight: true },
+          { id: 'node_b', type: 'Node', value: '{value: 2, next: →A}' },
         ],
       },
+    },
+    {
+      line: 18,
+      title: 'del b - 두 번째 참조 제거',
+      explanation:
+        'del b로 b 변수도 제거합니다. 이제 외부에서 두 객체에 접근할 방법이 없지만, 서로를 가리키고 있어서 참조 카운트가 0이 아닙니다!',
+      pythonMemoryState: {
+        names: [],
+        objects: [
+          { id: 'node_a', type: 'Node', value: '{value: 1, next: →B}', highlight: true },
+          { id: 'node_b', type: 'Node', value: '{value: 2, next: →A}', highlight: true },
+        ],
+      },
+      keyInsight: '순환 참조 문제: 외부 참조가 없어도 서로를 가리키면 참조 카운트가 0이 되지 않습니다.',
     },
     {
       line: 24,
@@ -1144,26 +1158,33 @@ async function seedPythonContent3() {
   ];
 
   for (const content of contents) {
-    // 기존 콘텐츠 삭제
-    await prisma.lessonContent.deleteMany({
-      where: { lessonId: content.lessonId },
+    // 레슨 존재 확인
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: content.lessonId },
     });
 
-    // 새 콘텐츠 생성
-    await prisma.lessonContent.create({
-      data: {
+    if (!lesson) {
+      console.log(`⏭️ Skipping ${content.lessonId} - Lesson not found (run python-seed.ts first)`);
+      continue;
+    }
+
+    // upsert로 콘텐츠 생성/업데이트
+    await prisma.lessonContent.upsert({
+      where: { lessonId: content.lessonId },
+      create: {
         id: content.lessonId,
         lessonId: content.lessonId,
         language: content.language,
         code: content.code,
         steps: content.steps,
       },
+      update: {
+        code: content.code,
+        steps: content.steps,
+      },
     });
 
-    const lesson = await prisma.lesson.findUnique({
-      where: { id: content.lessonId },
-    });
-    console.log(`✅ ${lesson?.title}`);
+    console.log(`✅ ${lesson.title}`);
   }
 
   const total = await prisma.lessonContent.count({

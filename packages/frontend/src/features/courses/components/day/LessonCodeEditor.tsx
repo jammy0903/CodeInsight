@@ -11,11 +11,18 @@ import { useIsMobile } from '@/hooks';
 import { useThemeStore } from '@/stores/themeStore';
 import { monacoThemes } from '@/config/themes';
 
+interface CodeSelection {
+  text: string;
+  lineStart: number;
+  lineEnd: number;
+  fullLineCode: string;
+}
+
 interface LessonCodeEditorProps {
   code: string;
   highlightLine?: number;
   currentLine?: number; // PythonLessonView 호환성
-  onSelectionChange?: (selection: string) => void;
+  onSelectionChange?: (selection: CodeSelection) => void;
   language?: 'c' | 'python' | 'java'; // 언어 선택
 }
 
@@ -79,22 +86,11 @@ export function LessonCodeEditor({
     editorRef.current.revealLineInCenter(lineToHighlight);
   }, [lineToHighlight]);
 
-  // 텍스트 선택 이벤트 처리
-  useEffect(() => {
-    if (!editorRef.current || !onSelectionChange) return;
-
-    const editor = editorRef.current;
-    const disposable = editor.onDidChangeCursorSelection((e) => {
-      const selection = editor.getModel()?.getValueInRange(e.selection);
-      if (selection) {
-        onSelectionChange(selection);
-      }
-    });
-
-    return () => disposable.dispose();
-  }, [onSelectionChange]);
+  // NOTE: 텍스트 선택 이벤트는 handleEditorMount에서 직접 등록
+  // useEffect로 하면 editor mount 전에 실행돼서 등록이 안 됨
 
   const handleEditorMount: OnMountHandler = (editor, monaco) => {
+    console.log('[LessonCodeEditor] Editor mounted!');
     editorRef.current = editor;
     monacoRef.current = monaco;
 
@@ -122,6 +118,33 @@ export function LessonCodeEditor({
         }
       `;
       document.head.appendChild(style);
+    }
+
+    // 텍스트 선택 이벤트 등록 (mount 시점에 바로 등록)
+    if (onSelectionChange) {
+      console.log('[LessonCodeEditor] 선택 이벤트 리스너 등록 (mount 시)');
+      const model = editor.getModel();
+      if (model) {
+        editor.onDidChangeCursorSelection((e) => {
+          const selectedText = model.getValueInRange(e.selection);
+          const lineStart = e.selection.startLineNumber;
+          const lineEnd = e.selection.endLineNumber;
+          const fullLineCode = model.getLineContent(lineStart);
+
+          const codeSelection: CodeSelection = {
+            text: selectedText,
+            lineStart,
+            lineEnd,
+            fullLineCode,
+          };
+
+          if (selectedText) {
+            console.log('[LessonCodeEditor] 선택됨 (mount handler):', codeSelection);
+          }
+
+          onSelectionChange(codeSelection);
+        });
+      }
     }
   };
 

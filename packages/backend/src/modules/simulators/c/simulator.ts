@@ -1,32 +1,40 @@
 /**
- * 교육용 C 메모리 시뮬레이터 v2
- * - 함수 호출/복귀 지원
- * - 모듈화된 구조 (parser + runtime + handlers)
+ * 교육용 C 메모리 시뮬레이터 v3
+ * - ExpressionEvaluator: 식 평가 (재사용 가능)
+ * - FrameManager: 스택 프레임 생명주기
+ * - ParameterSetup: 파라미터 타입별 처리
  * - Event-Driven Visualization 지원
  */
 
 import { parseCode, type FunctionDef, type ParseResult } from './parser';
 import { CallStack, ScopeManager, type Step, type MemoryBlock, type Variable, type HeapBlock } from './runtime';
 import { registry, type SimContext } from './handlers';
+import { ExpressionEvaluator, type EvalContext } from './evaluator';
+import { FrameManager, ParameterSetup } from './execution';
 import type { VisualizationEvent } from '@codeinsight/shared';
 
 /**
  * 이전 스텝 상태 스냅샷 (diff 계산용)
  */
 interface PreviousSnapshot {
-  frames: string[];                    // 프레임 이름 목록
-  variables: Map<string, string>;      // "frame.name" -> value
-  heapBlocks: Map<string, string>;     // address -> value
+  frames: string[];
+  variables: Map<string, string>;
+  heapBlocks: Map<string, string>;
   stdout: string;
 }
 
-class CSimulator implements SimContext {
+class CSimulator implements SimContext, EvalContext {
   // 파싱 결과
   private parseResult: ParseResult | null = null;
 
   // 런타임
   private callStack: CallStack;
   private scopeManager: ScopeManager;
+
+  // ⭐ 새로운 모듈들
+  evaluator!: ExpressionEvaluator;
+  private frameManager: FrameManager;
+  private parameterSetup!: ParameterSetup;
 
   // 힙 메모리
   heapBase = 0x555555559000;
@@ -37,30 +45,33 @@ class CSimulator implements SimContext {
   stdinBuffer: string[] = [];
   stdinIndex = 0;
 
-  // stdout (printf 출력 누적)
+  // stdout
   stdoutBuffer: string = '';
-  lastStdoutLength: number = 0; // 마지막 스텝까지의 stdout 길이
+  lastStdoutLength: number = 0;
 
-  // SimContext 호환용 (핸들러가 접근)
+  // SimContext 호환
   stackBase = 0x7fffffffde00;
   stackOffset = 0;
   variables: Map<string, Variable>;
 
-  // Event-Driven Visualization용 (이전 상태 추적)
+  // Event-Driven
   private previousSnapshot: PreviousSnapshot = {
     frames: [],
     variables: new Map(),
     heapBlocks: new Map(),
     stdout: '',
   };
-
-  // 핸들러가 직접 추가한 이벤트 버퍼 (Phase 4)
   private handlerEvents: VisualizationEvent[] = [];
 
   constructor() {
     this.callStack = new CallStack();
     this.scopeManager = new ScopeManager(this.callStack);
     this.variables = this.scopeManager.getVariablesMap();
+
+    // 새 모듈 초기화
+    this.frameManager = new FrameManager(this.callStack);
+    this.evaluator = new ExpressionEvaluator(this);
+    this.parameterSetup = new ParameterSetup(this.evaluator, this);
   }
 
   /**
@@ -104,81 +115,84 @@ class CSimulator implements SimContext {
   }
 
   /**
-   * 함수 프레임 설정 (push + 매개변수 추가)
-   * 재사용을 위해 분리
+   * 함수 프레임 설정 (FrameManager + ParameterSetup 사용)
    */
   private setupFunctionFrame(
     func: FunctionDef,
-    args: { name: string; value: number; type: string }[] = []
-  ): void {
-    // 콜 스택에 함수 프레임 추가
-    const scope = this.callStack.push(func.name, -1, func.bodyStart);
-    this.variables = scope.variables;
+    argExprs: string[] = []
+  ): VisualizationEvent[] {
+    // 1. 프레임 생성
+    const frameResult = this.frameManager.enter(func.name, -1, func.bodyStart);
+    this.variables = frameResult.scopeVariables;
 
-    // 매개변수를 지역 변수로 추가 (Pass by Value)
-    for (let i = 0; i < func.params.length && i < args.length; i++) {
+    // Evaluator 컨텍스트 업데이트
+    this.evaluator.updateContext(this);
+
+    const allEvents: VisualizationEvent[] = [...frameResult.events];
+
+    // 2. 파라미터 설정
+    for (let i = 0; i < func.params.length && i < argExprs.length; i++) {
       const param = func.params[i];
-      const arg = args[i];
-      const size = this.getTypeSize(param.type);
-      const addr = this.allocateStack(size);
+      const argExpr = argExprs[i];
 
-      this.variables.set(param.name, {
-        address: this.toHex(addr),
-        type: param.type,
-        size,
-        bytes: this.intToBytes(arg.value, size),
-        value: String(arg.value),
-      });
+      try {
+        const paramResult = this.parameterSetup.setup(param, argExpr);
+
+        // 변수 맵에 추가
+        this.variables.set(param.name, paramResult.variable);
+
+        // 이벤트 수집
+        allEvents.push(...paramResult.events);
+      } catch (e) {
+        console.error(`[setupFunctionFrame] Error setting param ${param.name}:`, e);
+      }
     }
+
+    return allEvents;
   }
 
   /**
    * 함수 실행
-   * @param args 호출 시 전달된 인자값 배열
-   * @param options.skipPush 이미 프레임이 push된 경우 true
    */
   private executeFunction(
     func: FunctionDef,
     sourceLines: string[],
-    args: { name: string; value: number; type: string }[] = [],
+    argExprs: string[] = [],
     options: { skipPush?: boolean } = {}
   ): Step[] {
     const steps: Step[] = [];
 
-    // 프레임 설정 (skipPush가 아닌 경우)
+    // 프레임 설정
     if (!options.skipPush) {
-      this.setupFunctionFrame(func, args);
+      const setupEvents = this.setupFunctionFrame(func, argExprs);
+      // 이벤트는 첫 번째 스텝에서 사용됨
+      setupEvents.forEach(e => this.addEvent(e));
     }
 
     // 함수 본문 실행
     for (let i = 0; i < func.lines.length; i++) {
       const line = func.lines[i];
-      const lineNum = func.bodyStart + i + 1; // 실제 라인 번호
+      const lineNum = func.bodyStart + i + 1;
 
       const stripped = line.trim();
       if (!stripped || stripped === '{' || stripped === '}') continue;
-
-      // 주석 무시
       if (stripped.startsWith('//')) continue;
 
       // return 처리
       if (stripped.startsWith('return')) {
-        // main 함수에서 return 시 메모리 누수 검사
         if (func.name === 'main' && this.heapBlocks.size > 0) {
           const leakedBlocks = Array.from(this.heapBlocks.entries());
-          const leakWarning = this.createMemoryLeakWarning(lineNum, leakedBlocks);
-          steps.push(leakWarning);
+          steps.push(this.createMemoryLeakWarning(lineNum, leakedBlocks));
         }
 
         steps.push(this.createStep(lineNum, stripped, '함수 종료 및 값 반환'));
 
-        // 콜 스택에서 pop (main이 아닌 경우에만)
+        // 프레임 정리
         if (this.callStack.depth() > 1) {
-          this.callStack.pop();
-          const parentScope = this.callStack.currentScope();
-          if (parentScope) {
-            this.variables = parentScope.variables;
-          }
+          const exitResult = this.frameManager.exit();
+          this.variables = this.frameManager.getParentVariables() || new Map();
+          this.evaluator.updateContext(this);
+          exitResult.events.forEach(e => this.addEvent(e));
         }
         break;
       }
@@ -195,16 +209,15 @@ class CSimulator implements SimContext {
         const calledFunc = this.parseResult?.functions.get(calledFuncName);
 
         if (calledFunc && !['printf', 'scanf', 'malloc', 'free'].includes(calledFuncName)) {
-          const parsedArgs = this.parseArguments(argsString, calledFunc.params);
+          // 인자 표현식 파싱 (값이 아닌 표현식 문자열)
+          const argExprs = this.parseArgumentExpressions(argsString);
 
-          // 1. 먼저 프레임 생성 (스텝에서 새 프레임이 보이도록)
-          this.setupFunctionFrame(calledFunc, parsedArgs);
+          // 프레임 설정
+          const setupEvents = this.setupFunctionFrame(calledFunc, argExprs);
+          setupEvents.forEach(e => this.addEvent(e));
 
-          const argsExplanation = parsedArgs.length > 0
-            ? `\n   인자 전달: ${parsedArgs.map(a => `${a.name}=${a.value}`).join(', ')} (값 복사)`
-            : '';
+          const argsExplanation = this.buildArgsExplanation(calledFunc.params, argExprs);
 
-          // 2. 함수 호출 스텝 추가 (이제 스택에 새 프레임이 보임!)
           steps.push(
             this.createStep(
               lineNum,
@@ -215,11 +228,13 @@ class CSimulator implements SimContext {
             )
           );
 
-          // 3. 함수 실행 (skipPush: 이미 프레임 push됨)
-          const { steps: innerSteps, returnValue } = this.executeFunctionWithReturn(calledFunc, sourceLines, parsedArgs, { skipPush: true });
+          // 함수 실행
+          const { steps: innerSteps, returnValue } = this.executeFunctionWithReturn(
+            calledFunc, sourceLines, argExprs, { skipPush: true }
+          );
           steps.push(...innerSteps);
 
-          // 반환값을 변수에 할당
+          // 반환값 할당
           const size = this.getTypeSize(varType);
           const addr = this.allocateStack(size);
           this.variables.set(varName, {
@@ -244,27 +259,22 @@ class CSimulator implements SimContext {
         }
       }
 
-      // 단순 함수 호출 감지: func(args);
+      // 단순 함수 호출: func(args);
       const funcCallMatch = stripped.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([^)]*)\);?$/);
       if (funcCallMatch) {
         const calledFuncName = funcCallMatch[1];
         const argsString = funcCallMatch[2].trim();
         const calledFunc = this.parseResult?.functions.get(calledFuncName);
 
-        // 시스템 함수가 아닌 사용자 정의 함수인 경우
         if (calledFunc && !['printf', 'scanf', 'malloc', 'free'].includes(calledFuncName)) {
-          // 인자 파싱 및 값 평가
-          const parsedArgs = this.parseArguments(argsString, calledFunc.params);
+          const argExprs = this.parseArgumentExpressions(argsString);
 
-          // 1. 먼저 프레임 생성 (스텝에서 새 프레임이 보이도록)
-          this.setupFunctionFrame(calledFunc, parsedArgs);
+          // 프레임 설정
+          const setupEvents = this.setupFunctionFrame(calledFunc, argExprs);
+          setupEvents.forEach(e => this.addEvent(e));
 
-          // 인자 전달 설명 생성
-          const argsExplanation = parsedArgs.length > 0
-            ? `\n   인자 전달: ${parsedArgs.map(a => `${a.name}=${a.value}`).join(', ')} (값 복사)`
-            : '';
+          const argsExplanation = this.buildArgsExplanation(calledFunc.params, argExprs);
 
-          // 2. 함수 호출 스텝 추가 (이제 스택에 새 프레임이 보임!)
           steps.push(
             this.createStep(
               lineNum,
@@ -275,11 +285,20 @@ class CSimulator implements SimContext {
             )
           );
 
-          // 3. 함수 본문 실행 (skipPush: 이미 프레임 push됨)
-          const innerSteps = this.executeFunction(calledFunc, sourceLines, parsedArgs, { skipPush: true });
+          // 함수 본문 실행
+          const innerSteps = this.executeFunction(calledFunc, sourceLines, argExprs, { skipPush: true });
           steps.push(...innerSteps);
 
-          // 4. 복귀 스텝
+          // void 함수 프레임 정리 (return 문 없이 종료된 경우)
+          // 현재 프레임이 calledFuncName이면 아직 exit 안 된 것
+          if (this.frameManager.getCurrentFrame() === calledFuncName) {
+            const exitResult = this.frameManager.exit();
+            this.variables = this.frameManager.getParentVariables() || new Map();
+            this.evaluator.updateContext(this);
+            exitResult.events.forEach(e => this.addEvent(e));
+          }
+
+          // 복귀 스텝
           steps.push(
             this.createStep(
               lineNum,
@@ -304,10 +323,114 @@ class CSimulator implements SimContext {
   }
 
   /**
+   * 함수 실행 (반환값 포함)
+   */
+  private executeFunctionWithReturn(
+    func: FunctionDef,
+    sourceLines: string[],
+    argExprs: string[] = [],
+    options: { skipPush?: boolean } = {}
+  ): { steps: Step[]; returnValue: number } {
+    const steps: Step[] = [];
+    let returnValue = 0;
+
+    if (!options.skipPush) {
+      const setupEvents = this.setupFunctionFrame(func, argExprs);
+      setupEvents.forEach(e => this.addEvent(e));
+    }
+
+    for (let i = 0; i < func.lines.length; i++) {
+      const line = func.lines[i];
+      const lineNum = func.bodyStart + i + 1;
+
+      const stripped = line.trim();
+      if (!stripped || stripped === '{' || stripped === '}') continue;
+      if (stripped.startsWith('//')) continue;
+
+      if (stripped.startsWith('return')) {
+        const returnMatch = stripped.match(/^return\s+(.+?)\s*;?$/);
+        if (returnMatch) {
+          try {
+            const evalResult = this.evaluator.evaluate(returnMatch[1]);
+            returnValue = typeof evalResult.value === 'number'
+              ? evalResult.value
+              : parseFloat(String(evalResult.value)) || 0;
+          } catch {
+            returnValue = 0;
+          }
+        }
+
+        steps.push(
+          this.createStep(
+            lineNum,
+            stripped,
+            `↩️ 함수 종료: return ${returnValue}\n\n` +
+              `💡 ${func.name} 함수가 ${returnValue}을(를) 반환하고 종료합니다.`
+          )
+        );
+
+        // 프레임 정리
+        if (this.callStack.depth() > 1) {
+          const exitResult = this.frameManager.exit();
+          this.variables = this.frameManager.getParentVariables() || new Map();
+          this.evaluator.updateContext(this);
+          exitResult.events.forEach(e => this.addEvent(e));
+        }
+        break;
+      }
+
+      const cleanCode = stripped.replace(/;$/, '').trim();
+      const step = this.analyzeLine(lineNum, cleanCode);
+      if (step) steps.push(step);
+    }
+
+    return { steps, returnValue };
+  }
+
+  /**
+   * 인자 표현식 문자열 파싱 (값이 아닌 표현식 유지)
+   * "x, &y, 10" → ["x", "&y", "10"]
+   */
+  private parseArgumentExpressions(argsString: string): string[] {
+    if (!argsString.trim()) return [];
+    return argsString.split(',').map(s => s.trim());
+  }
+
+  /**
+   * 인자 전달 설명 생성
+   */
+  private buildArgsExplanation(
+    params: { name: string; type: string }[],
+    argExprs: string[]
+  ): string {
+    if (argExprs.length === 0) return '';
+
+    const explanations: string[] = [];
+    for (let i = 0; i < params.length && i < argExprs.length; i++) {
+      const param = params[i];
+      const argExpr = argExprs[i];
+
+      if (param.type.includes('*')) {
+        // 포인터 파라미터
+        explanations.push(`${param.name} ← ${argExpr} (주소 전달)`);
+      } else {
+        // 값 타입 파라미터
+        try {
+          const evalResult = this.evaluator.evaluate(argExpr);
+          explanations.push(`${param.name}=${evalResult.value} (값 복사)`);
+        } catch {
+          explanations.push(`${param.name} ← ${argExpr}`);
+        }
+      }
+    }
+
+    return explanations.length > 0 ? `\n   인자 전달: ${explanations.join(', ')}` : '';
+  }
+
+  /**
    * 한 줄 분석 - 핸들러에 위임
    */
   private analyzeLine(lineNum: number, code: string): Step | null {
-    // 폴백 지원 핸들러 찾기 (배열/포인터 구분)
     const handler = registry.findHandlerWithFallback(code, { variables: this.variables });
     if (handler) {
       return handler.handle(this, lineNum, code);
@@ -315,7 +438,7 @@ class CSimulator implements SimContext {
     return null;
   }
 
-  // === SimContext 인터페이스 구현 ===
+  // === SimContext & EvalContext 인터페이스 구현 ===
 
   toHex(n: number): string {
     return '0x' + n.toString(16);
@@ -333,7 +456,7 @@ class CSimulator implements SimContext {
   }
 
   allocateStack(size: number): number {
-    return this.callStack.allocateStack(size);
+    return this.frameManager.allocateStack(size);
   }
 
   allocateHeap(size: number): number {
@@ -343,7 +466,6 @@ class CSimulator implements SimContext {
   }
 
   getTypeSize(typeName: string): number {
-    // TypeRegistry에서 타입 크기 조회
     const typeMap: Record<string, number> = {
       'int': 4,
       'float': 4,
@@ -358,180 +480,66 @@ class CSimulator implements SimContext {
       'unsigned long': 8,
       'void': 0,
     };
-    // 포인터 타입은 8바이트 (64bit)
     if (typeName.includes('*')) return 8;
     return typeMap[typeName] || 4;
-  }
-
-  /**
-   * 함수 실행 (반환값 포함)
-   * - executeFunction과 동일하지만 return 값을 캡처
-   * @param options.skipPush 이미 프레임이 push된 경우 true
-   */
-  private executeFunctionWithReturn(
-    func: FunctionDef,
-    sourceLines: string[],
-    args: { name: string; value: number; type: string }[] = [],
-    options: { skipPush?: boolean } = {}
-  ): { steps: Step[]; returnValue: number } {
-    const steps: Step[] = [];
-    let returnValue = 0;
-
-    // 프레임 설정 (skipPush가 아닌 경우)
-    if (!options.skipPush) {
-      this.setupFunctionFrame(func, args);
-    }
-
-    // 함수 본문 실행
-    for (let i = 0; i < func.lines.length; i++) {
-      const line = func.lines[i];
-      const lineNum = func.bodyStart + i + 1;
-
-      const stripped = line.trim();
-      if (!stripped || stripped === '{' || stripped === '}') continue;
-      if (stripped.startsWith('//')) continue;
-
-      // return 처리 (값 캡처)
-      if (stripped.startsWith('return')) {
-        const returnMatch = stripped.match(/^return\s+(.+?)\s*;?$/);
-        if (returnMatch) {
-          returnValue = this.evaluateExpression(returnMatch[1]);
-        }
-
-        steps.push(
-          this.createStep(
-            lineNum,
-            stripped,
-            `↩️ 함수 종료: return ${returnValue}\n\n` +
-              `💡 ${func.name} 함수가 ${returnValue}을(를) 반환하고 종료합니다.`
-          )
-        );
-
-        // 콜 스택에서 pop
-        if (this.callStack.depth() > 1) {
-          this.callStack.pop();
-          const parentScope = this.callStack.currentScope();
-          if (parentScope) {
-            this.variables = parentScope.variables;
-          }
-        }
-        break;
-      }
-
-      // 일반 코드 처리
-      const cleanCode = stripped.replace(/;$/, '').trim();
-      const step = this.analyzeLine(lineNum, cleanCode);
-      if (step) steps.push(step);
-    }
-
-    return { steps, returnValue };
-  }
-
-  /**
-   * 함수 호출 인자 파싱
-   * - 인자 문자열을 파싱하여 값으로 평가
-   * - 변수 참조 시 현재 스코프에서 값 조회
-   */
-  private parseArguments(
-    argsString: string,
-    params: { name: string; type: string }[]
-  ): { name: string; value: number; type: string }[] {
-    if (!argsString) return [];
-
-    const argTokens = argsString.split(',').map(s => s.trim());
-    const result: { name: string; value: number; type: string }[] = [];
-
-    for (let i = 0; i < argTokens.length && i < params.length; i++) {
-      const argExpr = argTokens[i];
-      const param = params[i];
-      const value = this.evaluateExpression(argExpr);
-
-      result.push({
-        name: param.name,
-        value,
-        type: param.type,
-      });
-    }
-
-    return result;
-  }
-
-  /**
-   * 식 평가 (변수, 리터럴, 간단한 연산)
-   */
-  private evaluateExpression(expr: string): number {
-    const trimmed = expr.trim();
-
-    // 숫자 리터럴
-    if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
-      return parseFloat(trimmed);
-    }
-
-    // 16진수 리터럴
-    if (/^0x[0-9a-fA-F]+$/.test(trimmed)) {
-      return parseInt(trimmed, 16);
-    }
-
-    // 문자 리터럴
-    if (/^'(.)'$/.test(trimmed)) {
-      return trimmed.charCodeAt(1);
-    }
-
-    // 변수 참조
-    const variable = this.variables.get(trimmed);
-    if (variable) {
-      return parseFloat(variable.value) || 0;
-    }
-
-    // 간단한 이항 연산 (a + b, a - b, a * b, a / b)
-    const binOpMatch = trimmed.match(/^(.+?)\s*([+\-*/])\s*(.+)$/);
-    if (binOpMatch) {
-      const left = this.evaluateExpression(binOpMatch[1]);
-      const op = binOpMatch[2];
-      const right = this.evaluateExpression(binOpMatch[3]);
-      switch (op) {
-        case '+': return left + right;
-        case '-': return left - right;
-        case '*': return left * right;
-        case '/': return right !== 0 ? left / right : 0;
-      }
-    }
-
-    return 0;
   }
 
   appendStdout(text: string): void {
     this.stdoutBuffer += text;
   }
 
-  /**
-   * Phase 4: 핸들러가 직접 이벤트 추가
-   * createStep() 호출 전에 핸들러가 이 메서드로 이벤트를 추가하면
-   * diff 기반 이벤트 대신 핸들러 이벤트가 사용됨
-   */
   addEvent(event: VisualizationEvent): void {
     this.handlerEvents.push(event);
   }
 
-  /**
-   * Phase 4: 현재 프레임 이름 반환
-   * 핸들러가 이벤트 생성 시 frame 필드에 사용
-   */
   getCurrentFrame(): string {
-    return this.callStack.currentFunction();
+    return this.frameManager.getCurrentFrame();
   }
 
-  /**
-   * Phase 5: 주소로 변수 찾기 (크로스 프레임 지원)
-   * 모든 프레임에서 해당 주소를 가진 변수를 찾음
-   * @returns { frameName, variableName, variable } 또는 null
-   */
   findVariableByAddress(address: string): {
     frameName: string;
     variableName: string;
     variable: Variable;
   } | null {
-    return this.callStack.findVariableByAddress(address);
+    return this.frameManager.findVariableByAddress(address);
+  }
+
+  /**
+   * 이름으로 변수 찾기 (크로스 프레임 지원)
+   * 모든 프레임에서 변수명으로 검색
+   * 용도: &x 평가 시 호출자 프레임의 변수 참조
+   */
+  findVariableByName(name: string): {
+    frameName: string;
+    variableName: string;
+    variable: Variable;
+  } | null {
+    // 모든 프레임의 변수 검색
+    const allVars = this.frameManager.getAllVariables();
+    for (const [fullName, variable] of allVars) {
+      // fullName: "main.x", "swap.temp"
+      const parts = fullName.split('.');
+      const varName = parts[parts.length - 1];
+      const frameName = parts.slice(0, -1).join('.');
+
+      if (varName === name) {
+        return {
+          frameName,
+          variableName: varName,
+          variable,
+        };
+      }
+    }
+    return null;
+  }
+
+  getHeapBlock(address: string): HeapBlock | null {
+    for (const [, block] of this.heapBlocks) {
+      if (block.address === address) {
+        return block;
+      }
+    }
+    return null;
   }
 
   /**
@@ -557,12 +565,7 @@ ${blockList}
 
 🔧 해결 방법:
    • 프로그램 종료 전 모든 malloc에 대해 free() 호출
-   • 할당된 포인터를 추적하는 변수 관리 필요
-
-⚡ 메모리 누수의 위험:
-   • 장시간 실행 시 메모리 고갈
-   • 시스템 성능 저하
-   • 심한 경우 프로그램 크래시`;
+   • 할당된 포인터를 추적하는 변수 관리 필요`;
 
     return {
       line: lineNum,
@@ -579,16 +582,15 @@ ${blockList}
         explanation: '해제되지 않은 메모리',
       })),
       explanation,
-      rsp: this.callStack.getRsp(),
-      rbp: this.callStack.getRbp(),
+      rsp: this.frameManager.getRsp(),
+      rbp: this.frameManager.getRbp(),
       functionName: 'main',
       callDepth: 1,
     };
   }
 
   createStep(lineNum: number, code: string, explanation: string): Step {
-    // 모든 스코프의 변수 수집 (이름과 함께)
-    const allVariables = this.callStack.getAllVariables();
+    const allVariables = this.frameManager.getAllVariables();
 
     const stack: MemoryBlock[] = allVariables.map(([name, v]) => ({
       name,
@@ -615,22 +617,17 @@ ${blockList}
       });
     }
 
-    // 이번 스텝에서 새로 추가된 stdout만 추출
     const newStdout = this.stdoutBuffer.length > this.lastStdoutLength
       ? this.stdoutBuffer.slice(this.lastStdoutLength)
       : undefined;
-
-    // 다음 스텝을 위해 길이 업데이트
     this.lastStdoutLength = this.stdoutBuffer.length;
 
-    // Event-Driven: 핸들러 이벤트가 있으면 우선 사용, 없으면 diff 기반 생성
+    // Event-Driven
     let events: VisualizationEvent[];
     if (this.handlerEvents.length > 0) {
-      // Phase 4: 핸들러가 직접 추가한 이벤트 사용
       events = [...this.handlerEvents];
-      this.handlerEvents = []; // 버퍼 비우기
+      this.handlerEvents = [];
 
-      // stdout 이벤트는 핸들러가 추가하지 않았을 수 있으므로 자동 추가
       if (newStdout && !events.some(e => e.type === 'output')) {
         events.push({
           type: 'output',
@@ -639,11 +636,9 @@ ${blockList}
         });
       }
     } else {
-      // 기존: diff 기반 이벤트 생성
       events = this.generateEvents(allVariables, heap, newStdout);
     }
 
-    // 스냅샷 업데이트 (다음 스텝의 diff 계산용)
     this.updateSnapshot(allVariables, heap);
 
     return {
@@ -652,18 +647,15 @@ ${blockList}
       stack,
       heap,
       explanation,
-      rsp: this.callStack.getRsp(),
-      rbp: this.callStack.getRbp(),
-      functionName: this.callStack.currentFunction(),
-      callDepth: this.callStack.depth(),
+      rsp: this.frameManager.getRsp(),
+      rbp: this.frameManager.getRbp(),
+      functionName: this.frameManager.getCurrentFrame(),
+      callDepth: this.frameManager.getDepth(),
       stdout: newStdout,
-      events, // Event-Driven Visualization 이벤트 배열
+      events,
     };
   }
 
-  /**
-   * 이전 상태와 현재 상태 비교하여 이벤트 생성
-   */
   private generateEvents(
     allVariables: Array<[string, Variable]>,
     heap: MemoryBlock[],
@@ -675,25 +667,15 @@ ${blockList}
     const currentFrames = this.getActiveFrameNames();
     const prevFrames = this.previousSnapshot.frames;
 
-    // 새로 추가된 프레임 (push)
     for (const frame of currentFrames) {
       if (!prevFrames.includes(frame)) {
-        events.push({
-          type: 'frame',
-          action: 'push',
-          name: frame,
-        });
+        events.push({ type: 'frame', action: 'push', name: frame });
       }
     }
 
-    // 제거된 프레임 (pop)
     for (const frame of prevFrames) {
       if (!currentFrames.includes(frame)) {
-        events.push({
-          type: 'frame',
-          action: 'pop',
-          name: frame,
-        });
+        events.push({ type: 'frame', action: 'pop', name: frame });
       }
     }
 
@@ -703,13 +685,11 @@ ${blockList}
       currentVariables.set(name, variable);
     }
 
-    // 새로 선언된 변수 또는 값 변경
     for (const [name, variable] of currentVariables) {
       const prevValue = this.previousSnapshot.variables.get(name);
       const [frameName, varName] = name.split('.');
 
       if (prevValue === undefined) {
-        // 새 변수 선언
         events.push({
           type: 'variable',
           action: 'declare',
@@ -724,7 +704,6 @@ ${blockList}
           elementType: variable.element_type,
         });
       } else if (prevValue !== variable.value) {
-        // 값 변경
         events.push({
           type: 'variable',
           action: 'assign',
@@ -734,7 +713,6 @@ ${blockList}
         });
       }
 
-      // 포인터 변경 감지 (points_to)
       if (variable.points_to) {
         events.push({
           type: 'pointer',
@@ -745,7 +723,6 @@ ${blockList}
       }
     }
 
-    // 제거된 변수 (프레임 pop 시)
     for (const [name] of this.previousSnapshot.variables) {
       if (!currentVariables.has(name)) {
         const [frameName, varName] = name.split('.');
@@ -761,7 +738,6 @@ ${blockList}
     // 3. 힙 변경 감지
     const currentHeapAddrs = new Set(heap.map((h) => h.address));
 
-    // 새로 할당된 힙 블록
     for (const block of heap) {
       const prevValue = this.previousSnapshot.heapBlocks.get(block.address);
       if (prevValue === undefined) {
@@ -770,7 +746,7 @@ ${blockList}
           action: 'allocate',
           address: block.address,
           size: block.size,
-          name: block.name.replace(/^\*/, ''), // "*p" -> "p"
+          name: block.name.replace(/^\*/, ''),
           heapType: block.type,
           value: this.parseValue(block.value),
         });
@@ -785,7 +761,6 @@ ${blockList}
       }
     }
 
-    // 해제된 힙 블록
     for (const [addr, name] of this.previousSnapshot.heapBlocks) {
       if (!currentHeapAddrs.has(addr)) {
         events.push({
@@ -797,7 +772,7 @@ ${blockList}
       }
     }
 
-    // 4. stdout 출력 이벤트
+    // 4. stdout
     if (newStdout) {
       events.push({
         type: 'output',
@@ -809,42 +784,31 @@ ${blockList}
     return events;
   }
 
-  /**
-   * 스냅샷 업데이트 (다음 스텝의 diff 계산용)
-   */
   private updateSnapshot(
     allVariables: Array<[string, Variable]>,
     heap: MemoryBlock[]
   ): void {
-    // 프레임
     this.previousSnapshot.frames = this.getActiveFrameNames();
 
-    // 변수
     this.previousSnapshot.variables.clear();
     for (const [name, variable] of allVariables) {
       this.previousSnapshot.variables.set(name, variable.value);
     }
 
-    // 힙
     this.previousSnapshot.heapBlocks.clear();
     for (const block of heap) {
       const name = block.name.replace(/^\*/, '');
       this.previousSnapshot.heapBlocks.set(block.address, name);
     }
 
-    // stdout
     this.previousSnapshot.stdout = this.stdoutBuffer;
   }
 
-  /**
-   * 현재 활성 프레임 이름 목록
-   */
   private getActiveFrameNames(): string[] {
     const frames: string[] = [];
-    const depth = this.callStack.depth();
-    // CallStack 내부 frames에 직접 접근할 수 없으므로 getAllVariables로 추론
-    const allVars = this.callStack.getAllVariables();
+    const allVars = this.frameManager.getAllVariables();
     const seen = new Set<string>();
+
     for (const [name] of allVars) {
       const frame = name.split('.')[0];
       if (!seen.has(frame)) {
@@ -852,17 +816,15 @@ ${blockList}
         frames.push(frame);
       }
     }
-    // 변수가 없는 프레임의 경우 currentFunction으로 추가
-    const currentFrame = this.callStack.currentFunction();
+
+    const currentFrame = this.frameManager.getCurrentFrame();
     if (!seen.has(currentFrame)) {
       frames.push(currentFrame);
     }
+
     return frames;
   }
 
-  /**
-   * 문자열 값을 적절한 타입으로 파싱
-   */
   private parseValue(value: string): string | number | boolean | null {
     if (value === 'null' || value === 'NULL') return null;
     if (value === 'true') return true;

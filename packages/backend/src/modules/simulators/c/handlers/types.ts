@@ -13,6 +13,7 @@ import type {
   HeapBlock,
 } from '../runtime/types';
 import type { VisualizationEvent } from '@codeinsight/shared';
+import type { ExpressionEvaluator } from '../evaluator';
 
 // runtime 타입 re-export
 export type { MemoryBlock, Step, Variable, HeapBlock };
@@ -43,6 +44,11 @@ export interface SimContext {
   allocateStack(size: number): number;
   allocateHeap(size: number): number;
   createStep(lineNum: number, code: string, explanation: string): Step;
+  getTypeSize(typeName: string): number;
+
+  // ⭐ 식 평가기 (Phase 6: 포인터 파라미터 지원)
+  // 핸들러가 &x, *p 같은 표현식을 평가할 때 사용
+  evaluator: ExpressionEvaluator;
 
   // Event-Driven: 핸들러가 직접 이벤트 추가 (Phase 4)
   // 핸들러가 명시적으로 이벤트를 추가하면 diff 기반 이벤트보다 우선
@@ -58,6 +64,9 @@ export interface SimContext {
     variableName: string;
     variable: Variable;
   } | null;
+
+  // Phase 6: 힙 블록 조회 (포인터가 힙을 가리킬 때)
+  getHeapBlock?(address: string): HeapBlock | null;
 }
 
 /**

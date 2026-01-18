@@ -24,36 +24,36 @@ import type { LessonStep } from '@/types';
 // 테마별 Playground 색상
 const playgroundColors = {
   dark: {
-    // 배경
-    pageBg: '#09090b',           // zinc-950
-    panelBg: '#18181b',          // zinc-900
-    headerBg: '#18181b',
+    // 배경 (남색 기반)
+    pageBg: '#0a0f1a',           // deep navy
+    panelBg: '#0d1525',          // navy panel
+    headerBg: '#0d1525',
     // 보더
-    border: '#27272a',           // zinc-800
-    resizeHandle: '#3f3f46',     // zinc-700
-    resizeHover: '#52525b',      // zinc-600
+    border: '#1a2540',           // navy border
+    resizeHandle: '#1a2d4a',     // navy handle
+    resizeHover: '#2a3d5a',      // navy hover
     // 텍스트
-    text: '#fafafa',             // zinc-50
-    textMuted: '#a1a1aa',        // zinc-400
-    textDim: '#71717a',          // zinc-500
-    // 악센트
-    accent: '#22d3ee',           // cyan-400
-    accentBg: '#164e63',         // cyan-900
-    accentBorder: '#0e7490',     // cyan-700
-    // 설명 패널 (시안 계열)
-    explanationBg: '#0c1a1e',
-    explanationHeaderBg: '#134e4a',
-    explanationBorder: '#115e59',
-    explanationText: '#5eead4',
-    explanationTextMuted: '#2dd4bf',
+    text: '#e8f0ff',             // bright white-blue
+    textMuted: '#b8c8e8',        // light blue-gray
+    textDim: '#8ba3cf',          // medium blue-gray
+    // 악센트 (네온 시안)
+    accent: '#00ffff',           // neon cyan
+    accentBg: '#0a2040',         // dark cyan bg
+    accentBorder: '#00aaff',     // bright cyan border
+    // 설명 패널 (네온 시안 계열)
+    explanationBg: '#081820',
+    explanationHeaderBg: '#0a2540',
+    explanationBorder: '#00aaff',
+    explanationText: '#00ffff',
+    explanationTextMuted: '#00ddff',
     // 에러
-    errorBg: '#1c1917',
-    errorBorder: '#7f1d1d',
-    errorText: '#fca5a5',
+    errorBg: '#180810',
+    errorBorder: '#ff3366',
+    errorText: '#ff5577',
     // 푸터
-    footerBg: '#0f0f10',
-    footerBorder: '#27272a',
-    footerText: '#71717a',
+    footerBg: '#080d18',
+    footerBorder: '#1a2540',
+    footerText: '#b8c8e8',
   },
   soft: {
     pageBg: '#faf8fc',

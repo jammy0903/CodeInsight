@@ -62,7 +62,7 @@ export function StatsCards({ summary }: StatsCardsProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
-          className={`${stat.bgColor} rounded-xl p-4 border border-gray-100`}
+          className={`${stat.bgColor} rounded-xl p-4 border border-[var(--theme-dashboard-card-border)]`}
         >
           <div className="flex items-start justify-between mb-3">
             <div
@@ -71,10 +71,10 @@ export function StatsCards({ summary }: StatsCardsProps) {
               <stat.icon className="w-5 h-5 text-white" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-          <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+          <p className="text-2xl font-bold text-[var(--theme-dashboard-title)]">{stat.value}</p>
+          <p className="text-sm text-[var(--theme-dashboard-text-muted)] mt-1">{stat.label}</p>
           {stat.subValue && (
-            <p className="text-xs text-gray-400 mt-0.5">{stat.subValue}</p>
+            <p className="text-xs text-[var(--theme-dashboard-text-muted)] mt-0.5">{stat.subValue}</p>
           )}
         </motion.div>
       ))}

@@ -12,8 +12,9 @@
 export type SegmentType = 'stack' | 'heap' | 'data' | 'text';
 
 // Memory block representing a variable in stack or heap
+// NOTE: Heap blocks may not have a name (anonymous malloc blocks)
 export interface MemoryBlock {
-  name: string;
+  name?: string;  // Optional for heap blocks (e.g., malloc'd memory without variable)
   address: string;
   value: string;
   // Optional fields (레슨/Playground 공용)

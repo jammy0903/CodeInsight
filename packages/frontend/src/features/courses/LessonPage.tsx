@@ -41,8 +41,8 @@ import { useIsMobile } from '@/hooks';
 // 언어별 시각화
 import { JSVisualizerView } from '@/features/visualizers/js';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
-// TODO: 다른 서버에서 파일 가져온 후 주석 해제
-// import { PyVisualizerView } from '@/features/visualizers/python';
+import { PyVisualizerView } from '@/features/visualizers/python';
+import { JavaReferenceView } from '@/features/visualizers/java';
 
 import type { PyName, PyObject } from '@/types/py-simulator';
 
@@ -228,9 +228,9 @@ function CompletedView({
     <div
       className="max-w-md mx-auto mt-12 rounded-2xl p-8 text-center"
       style={{
-        background: 'linear-gradient(135deg, #F0FAF0 0%, #E8F5E8 100%)',
-        border: '1px solid #B8D4B8',
-        boxShadow: '0 8px 32px rgba(122, 154, 122, 0.15)',
+        background: 'var(--theme-lesson-memory-bg)',
+        border: '1px solid var(--theme-lesson-panel-border)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
       }}
     >
       <div
@@ -243,14 +243,12 @@ function CompletedView({
         <CheckCircle2 className="w-10 h-10 text-white" />
       </div>
       <h2
-        className="text-2xl font-bold mb-2"
-        style={{ color: '#4a6a4a' }}
+        className="text-2xl font-bold mb-2 text-[var(--theme-dashboard-title)]"
       >
         레슨 {lessonOrder} 완료!
       </h2>
       <p
-        className="mb-6"
-        style={{ color: '#6a8a6a' }}
+        className="mb-6 text-[var(--theme-dashboard-text)]"
       >
         {hasNext
           ? '다음 레슨으로 계속 학습하세요.'
@@ -259,12 +257,7 @@ function CompletedView({
       <div className="flex gap-3 justify-center">
         <button
           onClick={() => navigate(chapterPath)}
-          className="px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all"
-          style={{
-            background: 'rgba(255, 255, 255, 0.8)',
-            border: '1px solid #B8D4B8',
-            color: '#5a7a5a',
-          }}
+          className="px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all bg-[var(--theme-lesson-button-secondary-bg)] border border-[var(--theme-lesson-button-secondary-border)] text-[var(--theme-lesson-button-secondary-text)]"
         >
           <ArrowLeft className="w-4 h-4" />
           레슨 목록
@@ -330,7 +323,10 @@ function QuizCardAdapter({
 
   return (
     <div className="space-y-4">
-      <p className="text-lg font-medium">{quiz.question}</p>
+      {/* 질문: 코드 블록이 있으면 줄바꿈 유지 + 고정폭 폰트 */}
+      <pre className="text-lg font-medium whitespace-pre-wrap font-sans">
+        {quiz.question}
+      </pre>
 
       <div className="space-y-2">
         {options.map((option, idx) => (
@@ -338,16 +334,16 @@ function QuizCardAdapter({
             key={idx}
             onClick={() => !submitted && setSelected(idx)}
             disabled={submitted}
-            className={`w-full p-3 text-left rounded-lg border-2 transition-colors ${
+            className={`w-full p-3 text-left rounded-lg border-2 transition-colors whitespace-pre-wrap ${
               submitted
                 ? idx === correctIndex
                   ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                   : idx === selected
                     ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                    : 'border-gray-200 dark:border-gray-700'
+                    : 'border-[var(--theme-dashboard-card-border)]'
                 : selected === idx
                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                  : 'border-[var(--theme-dashboard-card-border)] hover:border-[var(--theme-dashboard-progress-bg)]'
             }`}
           >
             {option}
@@ -395,7 +391,10 @@ export function LessonPage() {
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>('flow');
+  // Python은 Flow 탭 없이 Memory만 사용
+  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>(
+    lang === 'python' ? 'memory' : 'flow'
+  );
   const isMobile = useIsMobile();
   // 모바일 AI Chat 상태
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
@@ -755,31 +754,33 @@ export function LessonPage() {
               className="flex shrink-0"
               style={{ borderBottom: '1px solid var(--theme-lesson-panel-border)', height: '40px' }}
             >
-              {/* Flow 탭 (첫 번째) */}
-              <button
-                onClick={() => setActiveTab('flow')}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold"
-                style={{
-                  background: activeTab === 'flow'
-                    ? 'var(--theme-lesson-tab-active-bg)'
-                    : flashFlow
-                      ? 'linear-gradient(180deg, #dbeafe 0%, #eff6ff 100%)'
-                      : 'var(--theme-lesson-tab-inactive-bg)',
-                  color: activeTab === 'flow' ? 'var(--theme-lesson-tab-active-text)' : flashFlow ? '#2563eb' : 'var(--theme-lesson-tab-inactive-text)',
-                  borderRight: '1px solid var(--theme-lesson-panel-border)',
-                  animation: flashFlow ? 'tabGlow 0.6s ease-out' : 'none',
-                  transition: 'background 0.2s, color 0.2s',
-                }}
-              >
-                <Play className="w-3.5 h-3.5" style={{
-                  animation: flashFlow ? 'iconPop 0.4s ease-out' : 'none'
-                }} />
-                <span style={{
-                  animation: flashFlow ? 'textPop 0.4s ease-out 0.1s both' : 'none'
-                }}>
-                  Flow
-                </span>
-              </button>
+              {/* Flow 탭 (첫 번째) - Python은 Memory만 사용 */}
+              {lang !== 'python' && (
+                <button
+                  onClick={() => setActiveTab('flow')}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold"
+                  style={{
+                    background: activeTab === 'flow'
+                      ? 'var(--theme-lesson-tab-active-bg)'
+                      : flashFlow
+                        ? 'linear-gradient(180deg, #dbeafe 0%, #eff6ff 100%)'
+                        : 'var(--theme-lesson-tab-inactive-bg)',
+                    color: activeTab === 'flow' ? 'var(--theme-lesson-tab-active-text)' : flashFlow ? '#2563eb' : 'var(--theme-lesson-tab-inactive-text)',
+                    borderRight: '1px solid var(--theme-lesson-panel-border)',
+                    animation: flashFlow ? 'tabGlow 0.6s ease-out' : 'none',
+                    transition: 'background 0.2s, color 0.2s',
+                  }}
+                >
+                  <Play className="w-3.5 h-3.5" style={{
+                    animation: flashFlow ? 'iconPop 0.4s ease-out' : 'none'
+                  }} />
+                  <span style={{
+                    animation: flashFlow ? 'textPop 0.4s ease-out 0.1s both' : 'none'
+                  }}>
+                    Flow
+                  </span>
+                </button>
+              )}
 
               {/* 메모리 탭 */}
               <button
@@ -827,8 +828,8 @@ export function LessonPage() {
 
             {/* 탭 콘텐츠 - 컨텐츠에 따라 늘어남 */}
             <div>
-              {/* Flow 탭 - 애니메이션 시각화 */}
-              {activeTab === 'flow' && (
+              {/* Flow 탭 - 애니메이션 시각화 (Python 제외) */}
+              {activeTab === 'flow' && lang !== 'python' && (
                 <div
                   className="p-4 relative"
                   style={{
@@ -856,7 +857,7 @@ export function LessonPage() {
                   }}
                 >
                   {/* C 언어: 메모리 시각화 */}
-                  {(lang === 'c' || visualizationType === 'memory' || !visualizationType) && (
+                  {lang === 'c' && (
                     <>
                       <MemoryPanel
                         stack={memoryState.stack}
@@ -876,6 +877,14 @@ export function LessonPage() {
                     </>
                   )}
 
+                  {/* Java: 참조 관계 시각화 */}
+                  {lang === 'java' && (
+                    <JavaReferenceView
+                      stack={currentStep?.memoryState?.stack as any}
+                      heap={currentStep?.memoryState?.heap as any}
+                    />
+                  )}
+
                   {/* JavaScript: 전용 시각화 (eventLoop, closure 등) */}
                   {lang === 'javascript' && visualizationType && visualizationType !== 'memory' && visualizationState && (
                     <JSVisualizerView
@@ -884,23 +893,24 @@ export function LessonPage() {
                     />
                   )}
 
-                  {/* TODO: 다른 서버에서 파일 가져온 후 주석 해제 */}
                   {/* Python: 참조 모델 시각화 */}
-                  {/* {lang === 'python' && (() => {
-                    // pythonMemoryState가 있으면 그것을 사용
-                    const pyState = currentStep?.pythonMemoryState
-                      || convertMemoryChangesToPyState(currentStep?.memoryChanges as MemoryChanges);
+                  {lang === 'python' && (() => {
+                    // Flow와 동일한 폴백 로직: pythonMemoryState > pyNames/pyObjects > names/objects
+                    const pyState = currentStep?.pythonMemoryState;
+                    const stepAny = currentStep as any;
+                    const names = pyState?.names || stepAny?.pyNames || stepAny?.names;
+                    const objects = pyState?.objects || stepAny?.pyObjects || stepAny?.objects;
 
-                    if (!pyState) return null;
+                    if (!names && !objects) return null;
 
                     return (
                       <PyVisualizerView
-                        names={transformPyNames(pyState.names)}
-                        objects={transformPyObjects(pyState.objects)}
+                        names={transformPyNames(names)}
+                        objects={transformPyObjects(objects)}
                         animate={true}
                       />
                     );
-                  })()} */}
+                  })()}
                 </div>
               )}
 
@@ -955,7 +965,7 @@ export function LessonPage() {
             }}
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>이전</span>
+            <span>이전코드</span>
             {navigation.canGoPrev && (
               <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono opacity-70 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(0,0,0,0.2)' }}>
                 ←
@@ -965,13 +975,13 @@ export function LessonPage() {
 
           {/* 중앙 진행률 */}
           <div className="flex flex-col items-center gap-1">
-            <div className="w-32 h-1.5 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+            <div className="w-32 h-1.5 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden shadow-inner">
               <div
                 className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
                 style={{ width: `${((navigation.currentStepIndex + 1) / navigation.totalSteps) * 100}%` }}
               />
             </div>
-            <span className="text-xs font-semibold text-gray-600 tabular-nums">
+            <span className="text-xs font-semibold text-[var(--theme-dashboard-text-muted)] tabular-nums">
               {navigation.currentStepIndex + 1} / {navigation.totalSteps}
             </span>
           </div>
@@ -1001,12 +1011,12 @@ export function LessonPage() {
               style={{
                 background: navigation.canGoNext
                   ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
-                  : '#e5e7eb',
-                color: navigation.canGoNext ? '#fff' : '#9ca3af',
-                border: navigation.canGoNext ? '1px solid #1d4ed8' : '1px solid #d1d5db',
+                  : 'var(--theme-dashboard-section-header-bg)',
+                color: navigation.canGoNext ? '#fff' : 'var(--theme-dashboard-text-muted)',
+                border: navigation.canGoNext ? '1px solid #1d4ed8' : '1px solid var(--theme-dashboard-card-border)',
               }}
             >
-              <span>다음</span>
+              <span>다음코드</span>
               <ChevronRight className="w-4 h-4" />
               {navigation.canGoNext && (
                 <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono opacity-70 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(0,0,0,0.2)' }}>
@@ -1024,7 +1034,7 @@ export function LessonPage() {
           open={navigation.phase === 'quiz'}
           onOpenChange={(open) => !open && navigation.reset()}
         >
-          <DialogContent className="max-w-xl">
+          <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 🧠 퀴즈

@@ -74,10 +74,10 @@ export function AIProviderToggle() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border-2 border-sand p-6">
+      <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-          <span className="ml-3 text-gray-600">Provider 목록 로딩 중...</span>
+          <Loader2 className="w-6 h-6 animate-spin text-[var(--theme-dashboard-text-muted)]" />
+          <span className="ml-3 text-[var(--theme-dashboard-text-muted)]">Provider 목록 로딩 중...</span>
         </div>
       </div>
     );
@@ -85,7 +85,7 @@ export function AIProviderToggle() {
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl border-2 border-sand p-6">
+      <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
         <div className="flex items-center gap-3 text-red-600">
           <XCircle className="w-6 h-6" />
           <span>{error}</span>
@@ -96,8 +96,8 @@ export function AIProviderToggle() {
 
   return (
     <>
-      <div className="bg-white rounded-xl border-2 border-sand p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+      <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
+        <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4 flex items-center gap-3">
           <Cpu className="w-6 h-6" />
           AI Provider 설정
         </h2>
@@ -116,10 +116,10 @@ export function AIProviderToggle() {
         </div>
 
         {/* 현재 Provider 표시 */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="mt-6 pt-6 border-t border-[var(--theme-dashboard-card-border)]">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600">현재 사용 중:</span>
-            <span className="font-semibold text-gray-900">
+            <span className="text-sm text-[var(--theme-dashboard-text-muted)]">현재 사용 중:</span>
+            <span className="font-semibold text-[var(--theme-dashboard-title)]">
               {getProviderDisplayName(currentProvider)}
             </span>
             <CheckCircle className="w-5 h-5 text-green-500" />
@@ -174,12 +174,12 @@ function ProviderCard({ provider, isCurrent, onSwitch, switching, displayName }:
       disabled={isDisabled}
       className={`
         p-4 rounded-lg border-2 transition-all
-        ${isCurrent ? 'border-accent-purple bg-purple-50' : 'border-gray-200 bg-white'}
+        ${isCurrent ? 'border-accent-purple bg-purple-50' : 'border-[var(--theme-dashboard-card-border)] bg-[var(--theme-dashboard-card-bg)]'}
         ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-accent-purple cursor-pointer'}
       `}
     >
       <div className="flex items-center justify-between mb-3">
-        <span className="font-semibold text-gray-900">{displayName}</span>
+        <span className="font-semibold text-[var(--theme-dashboard-title)]">{displayName}</span>
         {provider.available ? (
           <CheckCircle className="w-5 h-5 text-green-500" />
         ) : (
@@ -193,7 +193,7 @@ function ProviderCard({ provider, isCurrent, onSwitch, switching, displayName }:
             provider.available ? 'bg-green-500' : 'bg-red-500'
           }`}
         />
-        <span className="text-gray-600">
+        <span className="text-[var(--theme-dashboard-text-muted)]">
           {provider.available ? '사용 가능' : '사용 불가'}
         </span>
       </div>

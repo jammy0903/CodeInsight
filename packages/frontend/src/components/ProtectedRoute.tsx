@@ -18,8 +18,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // 인증 상태 로딩 중이면 대기
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#fffbf5]">
-        <div className="text-lg text-[#937b5d]">인증 확인 중...</div>
+      <div className="flex items-center justify-center min-h-screen bg-[var(--theme-layout-page-bg)]">
+        <div className="text-lg text-[var(--theme-dashboard-text-muted)]">인증 확인 중...</div>
       </div>
     );
   }

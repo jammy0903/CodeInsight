@@ -389,7 +389,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
   const wrapperStyle = theme === 'dark'
     ? 'bg-zinc-800 border-zinc-700'
-    : 'bg-white border-[#e5d5c7]';
+    : 'bg-white border-[var(--theme-dashboard-card-border)]';
 
   return (
     <div className={`w-[300px] h-[300px] border-2 rounded-xl overflow-hidden relative shrink-0 ${wrapperStyle}`}>
@@ -406,7 +406,7 @@ const ComicPanel = memo(({ num, getImage, speeches, showImage = true }: { num: n
   const speech = showImage ? speeches[num] : undefined;
 
   return (
-    <div className="w-[300px] h-[300px] bg-white border-2 border-[#e5d5c7] rounded-xl overflow-hidden relative shrink-0">
+    <div className="w-[300px] h-[300px] bg-white border-2 border-[var(--theme-dashboard-card-border)] rounded-xl overflow-hidden relative shrink-0">
       {imageSrc ? (
         <img
           src={imageSrc}
@@ -415,7 +415,7 @@ const ComicPanel = memo(({ num, getImage, speeches, showImage = true }: { num: n
           loading="lazy"
         />
       ) : (
-        <div className="w-full h-full bg-[#f8f4ef]" />
+        <div className="w-full h-full bg-[var(--theme-home-section-bg)]" />
       )}
 
       {speech && (

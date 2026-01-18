@@ -115,8 +115,8 @@ export function ReportPage() {
           <LogIn className="w-10 h-10 text-amber-600" />
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">로그인이 필요합니다</h2>
-          <p className="text-gray-600">학습 리포트를 보려면 먼저 로그인해주세요.</p>
+          <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)] mb-2">로그인이 필요합니다</h2>
+          <p className="text-[var(--theme-dashboard-text-muted)]">학습 리포트를 보려면 먼저 로그인해주세요.</p>
         </div>
         <Link
           to="/"
@@ -138,7 +138,7 @@ export function ReportPage() {
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             className="w-10 h-10 border-3 border-amber-200 border-t-amber-500 rounded-full"
           />
-          <p className="text-gray-500">데이터를 불러오는 중...</p>
+          <p className="text-[var(--theme-dashboard-text-muted)]">데이터를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -149,10 +149,10 @@ export function ReportPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <AlertCircle className="w-16 h-16 text-red-400" />
-        <p className="text-gray-600">{error}</p>
+        <p className="text-[var(--theme-dashboard-text-muted)]">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          className="px-4 py-2 bg-[var(--theme-dashboard-section-header-bg)] hover:bg-[var(--theme-dashboard-progress-bg)] rounded-lg transition-colors"
         >
           다시 시도
         </button>
@@ -164,12 +164,12 @@ export function ReportPage() {
   if (!summary || summary.totalSessions === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
-          <TrendingUp className="w-10 h-10 text-gray-400" />
+        <div className="w-20 h-20 rounded-full bg-[var(--theme-dashboard-section-header-bg)] flex items-center justify-center">
+          <TrendingUp className="w-10 h-10 text-[var(--theme-dashboard-text-muted)]" />
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">아직 학습 데이터가 없어요</h2>
-          <p className="text-gray-600">레슨을 학습하면 여기에 분석 결과가 표시됩니다.</p>
+          <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)] mb-2">아직 학습 데이터가 없어요</h2>
+          <p className="text-[var(--theme-dashboard-text-muted)]">레슨을 학습하면 여기에 분석 결과가 표시됩니다.</p>
         </div>
         <Link
           to="/courses"
@@ -186,10 +186,10 @@ export function ReportPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">
             {appUser.nickname}님의 학습 리포트
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-[var(--theme-dashboard-text-muted)] mt-1">
             <Calendar className="w-4 h-4 inline-block mr-1" />
             {PERIOD_LABELS[period]} 기준
           </p>
@@ -204,7 +204,7 @@ export function ReportPage() {
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 period === p
                   ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-[var(--theme-dashboard-section-header-bg)] text-[var(--theme-dashboard-text-muted)] hover:bg-[var(--theme-dashboard-progress-bg)]'
               }`}
             >
               {PERIOD_LABELS[p]}

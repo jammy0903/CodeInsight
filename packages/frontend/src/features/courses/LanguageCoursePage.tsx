@@ -144,8 +144,8 @@ export function LanguageCoursePage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a08060] mx-auto mb-4"></div>
-          <p className="text-[#937b5d]">코스 로딩 중...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--theme-dashboard-accent)] mx-auto mb-4"></div>
+          <p className="text-[var(--theme-dashboard-text-muted)]">코스 로딩 중...</p>
         </div>
       </div>
     );
@@ -157,8 +157,8 @@ export function LanguageCoursePage() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="text-6xl mb-4">😢</div>
-          <h2 className="text-2xl font-bold text-[#6b5a4a] mb-2">코스를 불러올 수 없습니다</h2>
-          <p className="text-[#937b5d] mb-6">{error}</p>
+          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">코스를 불러올 수 없습니다</h2>
+          <p className="text-[var(--theme-dashboard-text-muted)] mb-6">{error}</p>
           <button
             onClick={() => navigate('/courses')}
             className="btn-primary"
@@ -176,10 +176,10 @@ export function LanguageCoursePage() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="text-6xl mb-4">📚</div>
-          <h2 className="text-2xl font-bold text-[#6b5a4a] mb-2">
+          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">
             {langInfo.name} 코스 준비 중
           </h2>
-          <p className="text-[#937b5d] mb-6">
+          <p className="text-[var(--theme-dashboard-text-muted)] mb-6">
             아직 학습 콘텐츠가 준비되지 않았습니다.
             <br />
             곧 추가될 예정입니다!
@@ -204,7 +204,7 @@ export function LanguageCoursePage() {
       <div className="mb-10">
         <button
           onClick={() => navigate('/courses')}
-          className="group flex items-center gap-2 text-[#937b5d] hover:text-[#FFD700] transition-colors mb-6"
+          className="group flex items-center gap-2 text-[var(--theme-dashboard-text-muted)] hover:text-[#FFD700] transition-colors mb-6"
         >
           <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
           <span className="text-2xl font-semibold tracking-wider uppercase">Select Course</span>
@@ -243,13 +243,13 @@ export function LanguageCoursePage() {
                 {langInfo.icon}
               </div>
               <div>
-                <h1 className="text-3xl font-bold tracking-tight text-gray-800">
+                <h1 className="text-3xl font-bold tracking-tight text-[var(--theme-dashboard-title)]">
                   {langInfo.name}
                 </h1>
-                <p className="text-gray-500 text-sm">
+                <p className="text-[var(--theme-dashboard-text-muted)] text-sm">
                   {chapters.length} 챕터 · {totalLessons} 레슨
                 </p>
-                <p className="text-gray-400 text-xs mt-1">
+                <p className="text-[var(--theme-dashboard-text-muted)] text-xs mt-1">
                   {langInfo.description}
                 </p>
               </div>
@@ -263,7 +263,7 @@ export function LanguageCoursePage() {
         <div style={{ marginTop: '80px' }}>
           {isMobile ? (
             // 모바일: 리스트 형식
-            <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+            <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] overflow-hidden">
               {chapters.map((chapter, index) => {
                 // 이전 챕터들이 모두 완료되었는지 확인
                 const previousChaptersComplete = chapters.slice(0, index).every(ch => {
@@ -289,11 +289,11 @@ export function LanguageCoursePage() {
                     <button
                       onClick={() => !isLocked && navigate(`/courses/${lang}/${chapter.id}`)}
                       disabled={isLocked}
-                      className="w-full p-4 text-left transition-colors hover:bg-[#fffbf5] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full p-4 text-left transition-colors hover:bg-[var(--theme-layout-top-bar-button-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <h3 className="text-base font-semibold text-[#333] flex items-center gap-2 flex-shrink-0">
-                          {isLocked && <Lock className="w-4 h-4 text-gray-400" />}
+                          {isLocked && <Lock className="w-4 h-4 text-[var(--theme-dashboard-text-muted)]" />}
                           {chapter.title}
                         </h3>
                         <div className="flex items-center gap-2 flex-shrink-0">
@@ -310,14 +310,14 @@ export function LanguageCoursePage() {
                             ))}
                           </div>
                           {/* 퍼센트 */}
-                          <span className="text-sm font-mono text-[#937b5d] min-w-[3rem] text-right">
+                          <span className="text-sm font-mono text-[var(--theme-dashboard-text-muted)] min-w-[3rem] text-right">
                             {progress}%
                           </span>
                         </div>
                       </div>
                     </button>
                     {index < chapters.length - 1 && (
-                      <div className="border-b border-[#e5d5c7]" />
+                      <div className="border-b border-[var(--theme-dashboard-card-border)]" />
                     )}
                   </div>
                 );

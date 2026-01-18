@@ -83,11 +83,11 @@ export function PythonLessonView({
 
   // 설명 컴포넌트 (공통)
   const ExplanationSection = () => (
-    <div className="bg-white rounded-xl border border-[#e5d5c7] p-4">
-      <h3 className="text-sm font-semibold text-[#6b5a4a] mb-2">
+    <div className="bg-white rounded-xl border border-[var(--theme-dashboard-card-border)] p-4">
+      <h3 className="text-sm font-semibold text-[var(--theme-dashboard-title)] mb-2">
         {currentStep?.title || `Step ${currentStepIndex + 1}`}
       </h3>
-      <div className="text-sm text-[#4a4a4a] whitespace-pre-wrap leading-relaxed">
+      <div className="text-sm text-[var(--theme-dashboard-text)] whitespace-pre-wrap leading-relaxed">
         {currentStep?.explanation || '설명이 없습니다'}
       </div>
       {currentStep?.tip && (
@@ -119,7 +119,7 @@ export function PythonLessonView({
             <ExplanationSection />
 
             {/* 코드 뷰어 */}
-            <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+            <div className="bg-white rounded-xl border border-[var(--theme-dashboard-card-border)] overflow-hidden">
               <div className="px-4 py-2 bg-gradient-to-r from-[#2d2d2d] to-[#1a1a1a] text-white text-sm font-semibold flex items-center gap-2">
                 <Code2 className="w-4 h-4" />
                 Python 코드
@@ -140,7 +140,7 @@ export function PythonLessonView({
             <ExplanationSection />
 
             {/* 시각화 (Python 메모리 or C 메모리 or 플로우) */}
-            <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+            <div className="bg-white rounded-xl border border-[var(--theme-dashboard-card-border)] overflow-hidden">
               <div className={`px-4 py-2 bg-gradient-to-r text-white text-sm font-semibold flex items-center gap-2 ${
                 currentStep?.pythonMemoryState
                   ? 'from-emerald-600 to-emerald-700'
@@ -180,7 +180,7 @@ export function PythonLessonView({
 
             {/* AI Chat (모바일에서 숨김) */}
             {!isMobile && (
-              <div className="bg-white rounded-xl border border-[#e5d5c7] overflow-hidden">
+              <div className="bg-white rounded-xl border border-[var(--theme-dashboard-card-border)] overflow-hidden">
                 <ChatQA
                   languageId={languageId}
                   lessonId={lessonId}
@@ -195,18 +195,18 @@ export function PythonLessonView({
       </div>
 
       {/* 페이지 인디케이터 (하단 점 두 개) */}
-      <div className="flex items-center justify-center gap-2 py-3 bg-white border-t border-[#e5d5c7]">
+      <div className="flex items-center justify-center gap-2 py-3 bg-[var(--theme-dashboard-card-bg)] border-t border-[var(--theme-dashboard-card-border)]">
         <button
           onClick={() => setCurrentPage(0)}
           className={`w-2.5 h-2.5 rounded-full transition-all ${
-            currentPage === 0 ? 'bg-[#6b5a4a] w-5' : 'bg-gray-300 hover:bg-gray-400'
+            currentPage === 0 ? 'bg-[var(--theme-dashboard-title)] w-5' : 'bg-[var(--theme-dashboard-progress-bg)] hover:bg-[var(--theme-dashboard-card-border)]'
           }`}
           aria-label="코드 페이지"
         />
         <button
           onClick={() => setCurrentPage(1)}
           className={`w-2.5 h-2.5 rounded-full transition-all ${
-            currentPage === 1 ? 'bg-[#6b5a4a] w-5' : 'bg-gray-300 hover:bg-gray-400'
+            currentPage === 1 ? 'bg-[var(--theme-dashboard-title)] w-5' : 'bg-[var(--theme-dashboard-progress-bg)] hover:bg-[var(--theme-dashboard-card-border)]'
           }`}
           aria-label="플로우 페이지"
         />

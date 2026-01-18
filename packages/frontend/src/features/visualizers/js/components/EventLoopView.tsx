@@ -133,7 +133,7 @@ function Section({
       {/* 콘텐츠 */}
       <div className="p-2 min-h-[60px]">
         {isEmpty ? (
-          <div className="flex items-center justify-center h-full text-xs text-gray-400">
+          <div className="flex items-center justify-center h-full text-xs text-[var(--theme-dashboard-text-muted)]">
             {emptyText || '비어있음'}
           </div>
         ) : (
@@ -202,7 +202,7 @@ function OutputPanel({ output }: { output: string[] }) {
       </div>
       <div className="p-2 font-mono text-xs max-h-[100px] overflow-y-auto">
         {output.length === 0 ? (
-          <span className="text-gray-400">// 출력 없음</span>
+          <span className="text-[var(--theme-dashboard-text-muted)]">// 출력 없음</span>
         ) : (
           output.map((line, idx) => (
             <motion.div
@@ -339,7 +339,7 @@ export function EventLoopView({
       {showOutput && <OutputPanel output={output} />}
 
       {/* 실행 순서 힌트 */}
-      <div className="text-xs text-gray-500 text-center">
+      <div className="text-xs text-[var(--theme-dashboard-text-muted)] text-center">
         실행 순서: Call Stack 비움 → Microtask 전부 → Task 하나 → 반복
       </div>
     </div>

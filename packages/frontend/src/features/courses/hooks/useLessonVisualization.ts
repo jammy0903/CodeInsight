@@ -280,7 +280,7 @@ function accumulateActionBasedChanges(
   return state;
 }
 
-function detectFormat(steps: LessonStep[]): 'event-based' | 'new-array' | 'legacy-action' | 'cumulative' | 'snapshot' | 'unknown' {
+function detectFormat(steps: LessonStep[]): 'event-based' | 'new-array' | 'legacy-action' | 'cumulative' | 'snapshot' | 'memoryState' | 'unknown' {
   // 0. Event-Driven 형식 체크 (step.events 배열이 있는 경우) - 최우선
   const eventStep = steps.find(s => s?.events && Array.isArray(s.events) && s.events.length > 0);
   if (eventStep) {
@@ -294,7 +294,14 @@ function detectFormat(steps: LessonStep[]): 'event-based' | 'new-array' | 'legac
     return 'snapshot';
   }
 
-  // 2. memoryChanges 기반 형식 체크 (Lesson JSON 데이터)
+  // 2. memoryState 형식 체크 (step.memoryState.stack / heap)
+  // Java, Python 등 일부 언어의 lesson이 이 형식 사용
+  const memoryStateStep = steps.find(s => s?.memoryState);
+  if (memoryStateStep) {
+    return 'memoryState';
+  }
+
+  // 3. memoryChanges 기반 형식 체크 (Lesson JSON 데이터)
   const firstStep = steps.find(s => s?.memoryChanges);
 
   if (!firstStep?.memoryChanges) return 'unknown';
@@ -447,6 +454,14 @@ export function useLessonVisualization(
           stack: (currentStep?.stack as MemoryBlock[]) || [],
           heap: (currentStep?.heap as MemoryBlock[]) || [],
           frames: [], // snapshot 형식엔 frames 정보 없음
+        };
+      case 'memoryState':
+        // Java, Python 등: step.memoryState.stack/heap 형식
+        // Transformer에서 직접 처리하도록 원본 형식 유지
+        return {
+          stack: (currentStep?.memoryState?.stack as any) || [],
+          heap: (currentStep?.memoryState?.heap as any) || [],
+          frames: [], // memoryState 형식엔 frames 정보 없음
         };
       case 'new-array':
         return accumulateMemoryChanges(steps, currentStepIndex);

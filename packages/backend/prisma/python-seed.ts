@@ -387,28 +387,23 @@ async function seedPython() {
     console.log('✅ Python language already exists');
   }
 
-  // 2. 기존 Python 챕터/레슨 삭제 (개발용)
-  console.log('🗑️  Cleaning existing Python data...');
-  const existingChapters = await prisma.chapter.findMany({
-    where: { languageId: 'python' },
-  });
-  for (const ch of existingChapters) {
-    await prisma.lessonContent.deleteMany({
-      where: { lesson: { chapterId: ch.id } },
-    });
-    await prisma.lesson.deleteMany({ where: { chapterId: ch.id } });
-  }
-  await prisma.chapter.deleteMany({ where: { languageId: 'python' } });
-
-  // 3. 챕터와 레슨 생성
-  console.log('\n📚 Creating Chapters and Lessons...');
+  // 2. 챕터와 레슨 생성/업데이트 (upsert 패턴 - user_progress 보존)
+  console.log('\n📚 Creating/Updating Chapters and Lessons...');
   for (const chapterData of pythonChapters) {
     console.log(`\n[Ch${chapterData.order}] ${chapterData.title}`);
 
-    const chapter = await prisma.chapter.create({
-      data: {
-        id: `python-ch${chapterData.order}`,
+    const chapterId = `python-ch${chapterData.order}`;
+    const chapter = await prisma.chapter.upsert({
+      where: { id: chapterId },
+      create: {
+        id: chapterId,
         languageId: language.id,
+        title: chapterData.title,
+        description: chapterData.description,
+        keyQuestion: chapterData.keyQuestion,
+        order: chapterData.order,
+      },
+      update: {
         title: chapterData.title,
         description: chapterData.description,
         keyQuestion: chapterData.keyQuestion,
@@ -419,10 +414,23 @@ async function seedPython() {
     for (const lessonData of chapterData.lessons) {
       console.log(`  ├─ L${lessonData.order}: ${lessonData.title}`);
 
-      await prisma.lesson.create({
-        data: {
-          id: `py-${chapterData.order}-${lessonData.order}`,
+      // Chapter 5+ 는 p-* 패턴, Chapter 1-4는 py-* 패턴 (기존 데이터 호환)
+      const lessonId = chapterData.order >= 5
+        ? `p-${chapterData.order}-${lessonData.order}`
+        : `py-${chapterData.order}-${lessonData.order}`;
+
+      await prisma.lesson.upsert({
+        where: { id: lessonId },
+        create: {
+          id: lessonId,
           chapterId: chapter.id,
+          title: lessonData.title,
+          description: lessonData.description,
+          difficulty: lessonData.difficulty,
+          order: lessonData.order,
+          estimatedTime: lessonData.estimatedTime,
+        },
+        update: {
           title: lessonData.title,
           description: lessonData.description,
           difficulty: lessonData.difficulty,

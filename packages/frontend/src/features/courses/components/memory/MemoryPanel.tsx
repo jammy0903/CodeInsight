@@ -124,26 +124,31 @@ function isGarbageValue(value: string | number | null | undefined): boolean {
 }
 
 function getFrameFromBlock(block: MemoryBlock, defaultFrame: string): string {
+  if (!block.name) return defaultFrame;
   const dotIndex = block.name.indexOf('.');
   return dotIndex > 0 ? block.name.substring(0, dotIndex) : defaultFrame;
 }
 
-function getDisplayName(name: string): string {
+function getDisplayName(name: string | undefined): string {
+  if (!name) return '(unnamed)';
   return name.includes('.') ? name.split('.')[1] : name;
 }
 
 /** 배열 요소인지 확인 (예: "main.arr[0]" → true) */
-function isArrayElement(name: string): boolean {
+function isArrayElement(name: string | undefined): boolean {
+  if (!name) return false;
   return /\[\d+\]$/.test(name);
 }
 
 /** 배열 이름 추출 (예: "main.arr[0]" → "main.arr") */
-function getArrayBaseName(name: string): string {
+function getArrayBaseName(name: string | undefined): string {
+  if (!name) return '';
   return name.replace(/\[\d+\]$/, '');
 }
 
 /** 배열 인덱스 추출 (예: "main.arr[5]" → 5) */
-function getArrayIndex(name: string): number {
+function getArrayIndex(name: string | undefined): number {
+  if (!name) return -1;
   const match = name.match(/\[(\d+)\]$/);
   return match ? parseInt(match[1], 10) : -1;
 }
@@ -367,7 +372,7 @@ function MemoryBlockCard({
         >
           {/* 주소 배지 */}
           <span
-            className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded"
+            className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded flex-shrink-0 whitespace-nowrap"
             style={{
               color: 'var(--theme-memory-card-muted)',
               backgroundColor: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
@@ -375,10 +380,10 @@ function MemoryBlockCard({
           >
             {block.address}
           </span>
-          <span className="mx-2 font-bold" style={{ color: 'var(--theme-memory-card-muted)' }}>|</span>
+          <span className="mx-2 font-bold flex-shrink-0" style={{ color: 'var(--theme-memory-card-muted)' }}>|</span>
           {/* 값 */}
           <span
-            className="font-mono font-bold text-base min-w-[24px] text-center"
+            className="font-mono font-bold text-base flex-shrink-0 whitespace-nowrap"
             style={{ color: isChanged ? 'var(--theme-memory-changed-border)' : 'var(--theme-memory-card-text)' }}
           >
             {valueDisplay}

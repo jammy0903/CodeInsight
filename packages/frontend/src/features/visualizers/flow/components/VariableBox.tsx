@@ -148,11 +148,11 @@ export const VariableBox = memo(function VariableBox({
       className="variable-box relative flex flex-col items-center justify-center cursor-pointer select-none"
       data-variable-id={variable.id}
       style={{
-        width: FLOW_SIZES.box.width,
+        width: 'auto', // 내용에 맞게 자동 조절
         minWidth: FLOW_SIZES.box.minWidth,
         height: FLOW_SIZES.box.height,
         minHeight: FLOW_SIZES.box.minHeight,
-        padding: FLOW_SIZES.box.padding,
+        padding: `${FLOW_SIZES.box.padding}px ${FLOW_SIZES.box.padding + 8}px`, // 좌우 패딩 추가
         borderRadius: FLOW_SIZES.box.borderRadius,
         borderWidth: FLOW_SIZES.box.borderWidth,
         borderStyle: 'solid',
@@ -185,7 +185,7 @@ export const VariableBox = memo(function VariableBox({
       <AnimatePresence mode="wait">
         <motion.span
           key={String(variable.value)}
-          className="font-mono font-bold text-center"
+          className="font-mono font-bold text-center whitespace-nowrap"
           style={{
             fontSize: FLOW_SIZES.font.value,
             color: style.value,

@@ -13,7 +13,7 @@ import type { IFlowTransformer } from '../base/types';
 // Python 백엔드 타입 (PyStep 구조)
 interface PyName {
   name: string;
-  scope: string;
+  scope?: string;  // 레슨 JSON에서는 없을 수 있음 (기본값: 'local')
   pointsTo: string;
   highlight?: boolean;
 }
@@ -21,9 +21,10 @@ interface PyName {
 interface PyObject {
   id: string;
   type: string;
-  value: unknown;
-  mutable: boolean;
+  value: unknown;  // string (레슨 JSON) 또는 복잡한 객체 (Playground)
+  mutable?: boolean;
   highlight?: boolean;
+  pyId?: string;  // 실제 Python 메모리 주소 (레슨 JSON에서 사용)
 }
 
 interface PyObjectRef {
@@ -91,9 +92,11 @@ export class PyTransformer implements IFlowTransformer {
     const variables: FlowVariable[] = [];
     const framesMap = new Map<string, string[]>();
 
-    // Python step 데이터 추출 (pyNames, pyObjects 또는 names, objects)
-    const names: PyName[] = (step as any).pyNames || (step as any).names || [];
-    const objectsArray: PyObject[] = (step as any).pyObjects || (step as any).objects || [];
+    // Python step 데이터 추출
+    // 우선순위: pythonMemoryState > pyNames/pyObjects > names/objects
+    const pyState = (step as any).pythonMemoryState;
+    const names: PyName[] = pyState?.names || (step as any).pyNames || (step as any).names || [];
+    const objectsArray: PyObject[] = pyState?.objects || (step as any).pyObjects || (step as any).objects || [];
 
     // 객체를 Map으로 변환 (빠른 조회용)
     const objectsMap = new Map<string, PyObject>();
@@ -116,8 +119,9 @@ export class PyTransformer implements IFlowTransformer {
       const variable = this.nameToVariable(name, obj);
       variables.push(variable);
 
-      // 스코프별 프레임에 추가
-      const frameName = name.scope === 'global' ? 'global' : name.scope;
+      // 스코프별 프레임에 추가 (기본값: 'local')
+      const scope = name.scope || 'local';
+      const frameName = scope === 'global' ? 'global' : scope;
       const frameVars = framesMap.get(frameName) || [];
       frameVars.push(variable.id);
       framesMap.set(frameName, frameVars);
@@ -126,15 +130,21 @@ export class PyTransformer implements IFlowTransformer {
     // 3. 프레임 배열 생성
     const frames: FlowFrame[] = [];
 
+    // 'local'은 '__main__'과 동일하게 취급 (레슨 JSON 호환)
+    const mainFrameIds = [
+      ...(framesMap.get('__main__') || []),
+      ...(framesMap.get('local') || []),
+    ];
+
     // global → __main__ → 기타 함수 → objects 순서
     if (framesMap.has('global')) {
       frames.push({ name: 'global', variableIds: framesMap.get('global')! });
     }
-    if (framesMap.has('__main__')) {
-      frames.push({ name: '__main__', variableIds: framesMap.get('__main__')! });
+    if (mainFrameIds.length > 0) {
+      frames.push({ name: '__main__', variableIds: mainFrameIds });
     }
     framesMap.forEach((varIds, frameName) => {
-      if (frameName !== 'global' && frameName !== '__main__' && frameName !== 'objects') {
+      if (frameName !== 'global' && frameName !== '__main__' && frameName !== 'local' && frameName !== 'objects') {
         frames.push({ name: frameName, variableIds: varIds });
       }
     });
@@ -151,7 +161,11 @@ export class PyTransformer implements IFlowTransformer {
     const code = step.code || (fullCode ? this.getCodeAtLine(fullCode, step.line) : '');
 
     // 5. 터미널 출력
-    const stdout = (step as any).stdout || step.output;
+    // pythonMemoryState.output은 배열일 수 있음 (예: ["140234567890", "140234567890", "True"])
+    const pyOutput = pyState?.output;
+    const stdout = pyOutput
+      ? (Array.isArray(pyOutput) ? pyOutput.join('\n') : pyOutput)
+      : ((step as any).stdout || step.output);
     const terminalOutput = stdout ? { text: stdout } : undefined;
 
     return {
@@ -188,14 +202,15 @@ export class PyTransformer implements IFlowTransformer {
     const displayValue = targetObj
       ? formatValue(targetObj.value, targetObj.type)
       : '→';
+    const scope = name.scope || 'local';
 
     return {
-      id: `name-${name.scope}-${name.name}`,
+      id: `name-${scope}-${name.name}`,
       name: name.name,
       value: displayValue,
       type: targetObj?.type || 'ref',
       state: name.highlight ? 'updating' : 'idle',
-      scope: name.scope,
+      scope,
       isPointer: true, // Python 변수는 항상 참조
       pointsTo: `obj-${name.pointsTo}`, // 객체 ID와 연결
     };
