@@ -742,9 +742,9 @@ export function LessonPage() {
             );
           })()}
 
-          {/* 오른쪽: 3탭 구조 (Flow | Memory | AI Chat) - 스크롤 따라다님 */}
+          {/* 오른쪽: 3탭 구조 (Flow | Memory | AI Chat) - 컨텐츠에 따라 늘어남 */}
           <div
-            className="w-full md:w-1/2 flex flex-col rounded-xl overflow-hidden h-[75vh] max-h-[700px] md:sticky md:top-4 z-10"
+            className="w-full md:w-1/2 flex flex-col rounded-xl md:sticky md:top-4 z-10"
             style={{
               border: '1px solid var(--theme-lesson-panel-border)',
             }}
@@ -824,12 +824,12 @@ export function LessonPage() {
               )}
             </div>
 
-            {/* 탭 콘텐츠 - flex-1로 남은 공간 채움 (500px) */}
-            <div className="flex-1 min-h-0">
+            {/* 탭 콘텐츠 - 컨텐츠에 따라 늘어남 */}
+            <div>
               {/* Flow 탭 - 애니메이션 시각화 */}
               {activeTab === 'flow' && (
                 <div
-                  className="p-4 h-full overflow-y-auto relative"
+                  className="p-4 relative"
                   style={{
                     background: 'var(--theme-lesson-flow-bg)',
                   }}
@@ -849,7 +849,7 @@ export function LessonPage() {
               {/* 메모리/시각화 탭 */}
               {activeTab === 'memory' && (
                 <div
-                  className="p-2 h-full overflow-y-auto relative"
+                  className="p-2 relative"
                   style={{
                     background: 'var(--theme-lesson-memory-bg)',
                   }}
@@ -906,9 +906,10 @@ export function LessonPage() {
               {/* AI Chat 탭 (모바일에서 숨김) */}
               {!isMobile && activeTab === 'chat' && (
                 <div
-                  className="relative h-full overflow-y-auto"
+                  className="relative"
                   style={{
                     background: 'var(--theme-lesson-chat-bg)',
+                    minHeight: '400px', // AI Chat은 최소 높이 유지
                   }}
                 >
                   {selection && (

@@ -230,8 +230,8 @@ export function PlaygroundPage() {
           )}
         </div>
 
-        {/* Visualization Section (Flow + Memory Tabs) */}
-        <div style={{ flex: 1, backgroundColor: colors.panelBg, borderTop: `1px solid ${colors.border}`, display: 'flex', flexDirection: 'column' }}>
+        {/* Visualization Section (Flow + Memory Tabs) - 컨텐츠에 따라 늘어남 */}
+        <div style={{ backgroundColor: colors.panelBg, borderTop: `1px solid ${colors.border}`, display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
           {/* Tab Header */}
           <div
             style={{
@@ -305,8 +305,8 @@ export function PlaygroundPage() {
             )}
           </div>
 
-          {/* Tab Content */}
-          <div style={{ flex: 1, padding: '8px', minHeight: '200px', overflow: 'auto' }}>
+          {/* Tab Content - 컨텐츠에 따라 늘어남 */}
+          <div style={{ padding: '8px', minHeight: '200px' }}>
             {error ? (
               <div style={{ padding: '10px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '6px' }}>
                 <p style={{ fontSize: '12px', color: colors.errorText }}>{error}</p>
@@ -489,7 +489,7 @@ export function PlaygroundPage() {
           )}
         </div>
 
-        {/* ===== Right Panel: Flow + Memory Tabs (Sticky) ===== */}
+        {/* ===== Right Panel: Flow + Memory Tabs - 컨텐츠에 따라 늘어남 ===== */}
         <div
           style={{
             width: '50%',
@@ -498,9 +498,6 @@ export function PlaygroundPage() {
             backgroundColor: colors.panelBg,
             borderRadius: '12px',
             border: `1px solid ${colors.border}`,
-            overflow: 'hidden',
-            height: '75vh',
-            maxHeight: '700px',
             position: 'sticky',
             top: '16px',
             zIndex: 10,
@@ -585,8 +582,8 @@ export function PlaygroundPage() {
             )}
           </div>
 
-          {/* Tab Content */}
-          <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
+          {/* Tab Content - 컨텐츠에 따라 늘어남 */}
+          <div style={{ padding: '16px' }}>
             {error ? (
               <div style={{ padding: '16px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
                 <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
