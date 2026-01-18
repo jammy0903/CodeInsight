@@ -4,7 +4,7 @@
  * Right 50%: Memory Visualization
  */
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useIsMobile } from '@/hooks';
 import { Cpu, Github, Mail, Play } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
@@ -13,7 +13,7 @@ import { StepControls } from './components/StepControls';
 import { StepExplanation } from './components/StepExplanation';
 import { MemoryPanel } from '@/features/courses/components/memory';
 import { useLessonVisualization } from '@/features/courses/hooks/useLessonVisualization';
-import { usePlaygroundStore, useCurrentCode } from './stores/playgroundStore';
+import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/playgroundStore';
 import { useExplanationStore } from './stores/explanationStore';
 import { PyVisualizerView } from '@/features/visualizers/python';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
@@ -119,6 +119,7 @@ export function PlaygroundPage() {
   const currentTheme = useThemeStore((s) => s.theme);
   const colors = playgroundColors[currentTheme];
   const isMobile = useIsMobile();
+  const { nextStep, prevStep, canGoNext, canGoPrev } = useStepControls();
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
@@ -128,6 +129,25 @@ export function PlaygroundPage() {
   useEffect(() => {
     setPageTitle('코드 실행 연습', '직접 코드를 작성하고 메모리 변화를 확인해보세요');
   }, [setPageTitle]);
+
+  // 키보드 좌우 화살표 키로 스텝 이동
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // 에디터에 포커스가 있으면 무시 (코드 입력 중)
+    const activeElement = document.activeElement;
+    const isEditorFocused = activeElement?.closest('.monaco-editor') !== null;
+    if (isEditorFocused) return;
+
+    if (e.key === 'ArrowLeft' && canGoPrev) {
+      prevStep();
+    } else if (e.key === 'ArrowRight' && canGoNext) {
+      nextStep();
+    }
+  }, [canGoPrev, canGoNext, prevStep, nextStep]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   // Calculate editor height based on code lines
   const editorHeight = useMemo(() => {
@@ -172,28 +192,14 @@ export function PlaygroundPage() {
             }}
           >
             <LanguageTabs isMobile={true} />
-            {/* Run + Reset 버튼 (헤더) */}
-            <StepControls isMobile={true} showRun={true} showReset={true} showNavigation={false} />
+            {/* Run + Reset + Navigation 버튼 (헤더) */}
+            <StepControls isMobile={true} showRun={true} showReset={true} showNavigation={true} />
           </div>
 
           {/* Editor */}
           <div style={{ height: `${Math.min(editorHeight, 180)}px` }}>
             <CodeEditor />
           </div>
-
-          {/* Navigation Controls (이전/다음만) */}
-          {hasSteps && (
-            <div
-              style={{
-                padding: '6px 8px',
-                borderTop: `1px solid ${colors.border}`,
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              <StepControls isMobile={true} showRun={false} showReset={false} showNavigation={true} />
-            </div>
-          )}
 
           {/* Explanation */}
           {currentStep && (
@@ -313,17 +319,17 @@ export function PlaygroundPage() {
               </div>
             ) : activeTab === 'flow' ? (
               /* Flow Tab Content */
-              language === 'c' && hasSteps ? (
+              (language === 'c' || language === 'python') && hasSteps ? (
                 <LessonFlowVisualizer
                   step={currentStep as LessonStep}
                   prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
-                  language="c"
+                  language={language}
                   fullCode={code}
                   theme={currentTheme === 'dark' ? 'dark' : 'light'}
                 />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
-                  {language === 'java' ? 'Java 미지원' : language === 'python' ? 'Memory 탭에서 확인' : 'Run 버튼을 눌러 실행'}
+                  {language === 'java' ? 'Java 미지원' : 'Run 버튼을 눌러 실행'}
                 </div>
               )
             ) : (
@@ -418,30 +424,14 @@ export function PlaygroundPage() {
             }}
           >
             <LanguageTabs />
-            {/* Run + Reset 버튼 (헤더) */}
-            <StepControls showRun={true} showReset={true} showNavigation={false} />
+            {/* Run + Reset + Navigation 버튼 (헤더) */}
+            <StepControls showRun={true} showReset={true} showNavigation={true} />
           </div>
 
           {/* Editor */}
           <div style={{ height: `${editorHeight}px`, flexShrink: 0 }}>
             <CodeEditor />
           </div>
-
-          {/* Navigation Controls (이전/다음만) */}
-          {hasSteps && (
-            <div
-              style={{
-                flexShrink: 0,
-                padding: '8px 12px',
-                backgroundColor: colors.panelBg,
-                borderTop: `1px solid ${colors.border}`,
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              <StepControls showRun={false} showReset={false} showNavigation={true} />
-            </div>
-          )}
 
           {/* Explanation Panel */}
           {currentStep && (
@@ -590,17 +580,17 @@ export function PlaygroundPage() {
               </div>
             ) : activeTab === 'flow' ? (
               /* Flow Tab Content */
-              language === 'c' && hasSteps ? (
+              (language === 'c' || language === 'python') && hasSteps ? (
                 <LessonFlowVisualizer
                   step={currentStep as LessonStep}
                   prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
-                  language="c"
+                  language={language}
                   fullCode={code}
                   theme={currentTheme === 'dark' ? 'dark' : 'light'}
                 />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
-                  {language === 'java' ? 'Java simulation is not supported yet' : language === 'python' ? 'Switch to Memory tab for Python visualization' : 'Click Run button to execute code'}
+                  {language === 'java' ? 'Java simulation is not supported yet' : 'Click Run button to execute code'}
                 </div>
               )
             ) : (

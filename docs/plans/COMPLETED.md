@@ -14,3 +14,6 @@
 | 01-11 | Phase 3: C 핸들러 확장 | struct, 배열 다양한 타입, 함수 파라미터, 비트연산, 메모리 에러 감지 |
 | 01-11 | Codeium 롤백 | 백엔드 500 에러로 Monaco 롤백, lessonHistoryStore 유지 |
 | 01-11 | MemoryPanel 고정 슬롯 | 수직 나열, RegisterSlot, RSP/RBP 표시 완료 |
+| 01-17 | 테마 시스템 리뉴얼 | CSS 변수 중앙화, soft/minimal/dark 테마, cyberpunk 다크 모드 |
+| 01-18 | Sticky 패널 구현 | LessonPage/PlaygroundPage 우측 패널 스크롤 추적 |
+| 01-18 | Playground 리팩토링 | react-resizable-panels 제거, flex 레이아웃, Terminal Output 제거 |

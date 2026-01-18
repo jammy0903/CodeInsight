@@ -236,6 +236,7 @@ export const simulatorService = {
         // Python 스텝을 LessonStep 형태로 변환
         const lessonSteps: LessonStep[] = data.steps.map((step) => ({
           line: step.line,
+          code: step.code, // 현재 실행 중인 코드 라인
           explanation: step.explanation,
           stdout: step.stdout,
           // Python 시각화 데이터

@@ -400,20 +400,7 @@ userRoutes.patch('/me/nickname', requireDbUser, validate(registerSchema), async 
       });
     }
 
-    // 닉네임 중복 확인 (본인 제외)
-    const existingUser = await prisma.user.findUnique({
-      where: { nickname: normalizedNickname },
-    });
-
-    if (existingUser && existingUser.id !== dbUser!.id) {
-      return res.status(409).json({
-        error: 'Nickname taken',
-        code: 'NICKNAME_TAKEN',
-        message: '이미 사용 중인 닉네임입니다.',
-      });
-    }
-
-    // 닉네임 업데이트
+    // 닉네임 업데이트 (DB unique constraint가 race condition 방지)
     const updatedUser = await prisma.user.update({
       where: { id: dbUser!.id },
       data: { nickname: normalizedNickname },
@@ -421,17 +408,30 @@ userRoutes.patch('/me/nickname', requireDbUser, validate(registerSchema), async 
         oauthAccounts: {
           select: {
             provider: true,
+            email: true,
           },
         },
       },
     });
 
     res.json({
+      id: updatedUser.id,
       nickname: updatedUser.nickname,
       role: updatedUser.role,
       oauthAccounts: updatedUser.oauthAccounts,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Prisma P2002 = Unique constraint violation
+    if (error.code === 'P2002') {
+      return res.status(409).json({
+        error: 'Nickname taken',
+        code: 'NICKNAME_TAKEN',
+        message: '이미 사용 중인 닉네임입니다.',
+      });
+    }
+
     logger.error('Nickname update error:', error);
     res.status(500).json({ error: 'Failed to update nickname' });
   }

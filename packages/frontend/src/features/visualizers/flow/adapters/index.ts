@@ -9,12 +9,16 @@
 import type { FlowLanguage } from '@codeinsight/shared';
 import type { IFlowAdapter } from './base/types';
 import { cAdapter, createCAdapter } from './c';
+import { pythonAdapter, createPythonAdapter } from './python';
 
 // Base types
 export type { IFlowAdapter, IFlowTransformer, IFlowStyler, IFlowAnimator, BoxStyle, ArrowStyle } from './base/types';
 
 // C Adapter
 export { cAdapter, createCAdapter, CTransformer, CStyler, CAnimator } from './c';
+
+// Python Adapter
+export { pythonAdapter, createPythonAdapter, PyTransformer, PyStyler, PyAnimator } from './python';
 
 // ============================================
 // Adapter Registry
@@ -25,7 +29,7 @@ type Theme = 'light' | 'dark';
 // 기본 어댑터 (light 테마)
 const defaultAdapters: Record<string, IFlowAdapter> = {
   c: cAdapter,
-  // python: pythonAdapter,  // Phase 4
+  python: pythonAdapter,
   // java: javaAdapter,      // Phase 4
 };
 
@@ -48,8 +52,8 @@ export function createAdapter(language: FlowLanguage | string, theme: Theme = 'l
   switch (language) {
     case 'c':
       return createCAdapter(theme);
-    // case 'python':
-    //   return createPythonAdapter(theme);  // Phase 4
+    case 'python':
+      return createPythonAdapter(theme);
     // case 'java':
     //   return createJavaAdapter(theme);    // Phase 4
     default:
