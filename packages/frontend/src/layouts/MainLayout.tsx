@@ -44,12 +44,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Header */}
-      <div style={{ pointerEvents: sidebarOpen ? 'none' : 'auto' }}>
-        <TopBar />
-      </div>
-
-      {/* Main Content - Animates with sidebar */}
+      {/* Main Content - TopBar도 함께 스크롤 */}
       <motion.main
         className="flex-1 overflow-auto"
         style={{
@@ -60,6 +55,8 @@ export function MainLayout({ children }: MainLayoutProps) {
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
+        {/* Header - 컨텐츠와 함께 스크롤 */}
+        <TopBar />
         {/* 홈/플레이그라운드: 전체 너비, 레슨: 레슨 컨테이너, 나머지: 메인 컨테이너 */}
         {isHomePage || isPlaygroundPage ? (
           children
