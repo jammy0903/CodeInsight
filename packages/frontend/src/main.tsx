@@ -16,14 +16,22 @@ if (import.meta.env.DEV) {
 const initTheme = () => {
   try {
     const stored = localStorage.getItem('codeinsight-theme');
+    // 기본 테마를 'soft'로 설정
+    let theme = 'soft';
+
     if (stored) {
       const { state } = JSON.parse(stored);
+      // 저장된 테마가 유효하면 그 값으로 변경
       if (state?.theme) {
-        document.documentElement.setAttribute('data-theme', state.theme);
+        theme = state.theme;
       }
     }
+    // 최종적으로 결정된 테마를 HTML에 적용
+    document.documentElement.setAttribute('data-theme', theme);
   } catch (error) {
-    console.error('Failed to load theme:', error);
+    // 파싱 오류 등 예외 발생 시에도 기본 'soft' 테마를 적용
+    console.error('Failed to apply theme, falling back to default:', error);
+    document.documentElement.setAttribute('data-theme', 'soft');
   }
 };
 

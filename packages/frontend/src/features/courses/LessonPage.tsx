@@ -17,7 +17,7 @@ import {
 import { getLessonFull, getChapterWithLessons, updateProgress } from '@/services/courses';
 import { useStore } from '@/stores/store';
 // TODO: 다른 서버에서 파일 가져온 후 주석 해제
-// import { useEnterKey } from '@/hooks';
+import { useEnterKey } from '@/hooks/useEnterKey';
 // import { simulatorService } from '@/services/simulator';
 // import { useLessonHistoryStore } from '@/stores/lessonHistoryStore';
 import type { LessonFull, LessonStep, Quiz, SupportedLanguage } from '@/types';
@@ -294,6 +294,7 @@ function QuizCardAdapter({
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const quizContainerRef = useRef<HTMLDivElement>(null);
 
   const options = quiz.options || [];
   // quiz.answer는 정답 인덱스를 나타내는 문자열 (예: "2")
@@ -309,20 +310,30 @@ function QuizCardAdapter({
     onComplete(isCorrect);
   };
 
-  // TODO: Enter 키로 제출/계속하기 (다른 서버에서 파일 가져온 후 주석 해제)
-  // useEnterKey({
-  //   onEnter: () => {
-  //     if (!submitted && selected !== null) {
-  //       handleSubmit();
-  //     } else if (submitted) {
-  //       handleContinue();
-  //     }
-  //   },
-  //   enabled: (selected !== null && !submitted) || submitted,
-  // });
+  // Enter 키로 제출/계속하기
+  useEnterKey({
+    onEnter: () => {
+      if (!submitted && selected !== null) {
+        handleSubmit();
+      } else if (submitted) {
+        handleContinue();
+      }
+    },
+    enabled: (selected !== null && !submitted) || submitted,
+    targetRef: quizContainerRef,
+  });
+
+  // 모달이 열릴 때 컨테이너에 포커스
+  useEffect(() => {
+    // Radix Dialog의 애니메이션을 고려하여 약간의 딜레이 후 포커스
+    const timer = setTimeout(() => {
+      quizContainerRef.current?.focus({ preventScroll: true });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 outline-none" ref={quizContainerRef} tabIndex={-1}>
       {/* 질문: 코드 블록이 있으면 줄바꿈 유지 + 고정폭 폰트 */}
       <pre className="text-lg font-medium whitespace-pre-wrap font-sans">
         {quiz.question}

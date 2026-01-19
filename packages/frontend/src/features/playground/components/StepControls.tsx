@@ -126,6 +126,7 @@ export function StepControls({
       {/* Run 버튼 */}
       {showRun && (
         <button
+          id="playground-run-button"
           onClick={handleRun}
           disabled={isSimulating || !isSupported}
           style={isSimulating || !isSupported ? runButtonDisabled : runButtonStyle}

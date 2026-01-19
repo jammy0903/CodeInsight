@@ -13,6 +13,8 @@ import { StepControls } from './components/StepControls';
 import { StepExplanation } from './components/StepExplanation';
 import { MemoryPanel } from '@/features/courses/components/memory';
 import { useLessonVisualization } from '@/features/courses/hooks/useLessonVisualization';
+import { useStepGestures } from '@/features/courses/hooks/useStepGestures';
+import { useEnterKey } from '@/hooks/useEnterKey';
 import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/playgroundStore';
 import { useExplanationStore } from './stores/explanationStore';
 import { PyVisualizerView } from '@/features/visualizers/python';
@@ -131,23 +133,21 @@ export function PlaygroundPage() {
   }, [setPageTitle]);
 
   // 키보드 좌우 화살표 키로 스텝 이동
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    // 에디터에 포커스가 있으면 무시 (코드 입력 중)
-    const activeElement = document.activeElement;
-    const isEditorFocused = activeElement?.closest('.monaco-editor') !== null;
-    if (isEditorFocused) return;
+  useStepGestures({
+    onPrev: prevStep,
+    onNext: nextStep,
+    enabled: hasSteps,
+    canGoPrev,
+    canGoNext,
+  });
 
-    if (e.key === 'ArrowLeft' && canGoPrev) {
-      prevStep();
-    } else if (e.key === 'ArrowRight' && canGoNext) {
-      nextStep();
-    }
-  }, [canGoPrev, canGoNext, prevStep, nextStep]);
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+  // Enter 키로 Run 버튼 실행
+  useEnterKey({
+    onEnter: () => {
+      (document.getElementById('playground-run-button') as HTMLButtonElement)?.click();
+    },
+    enabled: true, // 항상 활성화 (훅 내부에서 입력창 포커스 시 자동 비활성화)
+  });
 
   // Calculate editor height based on code lines
   const editorHeight = useMemo(() => {
