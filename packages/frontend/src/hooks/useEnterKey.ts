@@ -1,14 +1,48 @@
-/**
- * useEnterKey - STUB
- * TODO: 다른 서버에서 실제 파일 가져온 후 교체
- */
+import { useEffect, RefObject } from 'react';
 
 interface UseEnterKeyOptions {
   onEnter: () => void;
   enabled?: boolean;
+  targetRef?: RefObject<HTMLElement>;
 }
 
-export function useEnterKey(_options: UseEnterKeyOptions): void {
-  // STUB: 아무 동작 안함
-  // 실제 구현에서는 Enter 키 이벤트 리스너 등록
+export function useEnterKey({ onEnter, enabled = true, targetRef }: UseEnterKeyOptions): void {
+  useEffect(() => {
+    if (!enabled) return;
+
+    const targetElement = targetRef?.current || window;
+
+    const handleKeyDown = (e: Event) => {
+      // Type guard for KeyboardEvent
+      if (!('key' in e)) return;
+
+      // Ignore if typing in an input/textarea
+      const activeElement = document.activeElement;
+      const activeTag = activeElement?.tagName;
+      if (
+        activeTag === 'INPUT' ||
+        activeTag === 'TEXTAREA' ||
+        (activeElement as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+      
+      // Ignore if modifier keys are pressed
+      if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) {
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent default action (e.g., form submission)
+        onEnter();
+      }
+    };
+
+    targetElement.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      targetElement.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onEnter, enabled, targetRef]); // Rerun the effect only if onEnter or enabled changes
 }
