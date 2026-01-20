@@ -12,43 +12,39 @@
  * - 모달 열림 시 비활성화
  */
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 
 export interface UseStepGesturesOptions {
-  /** 이전 스텝으로 이동 */
   onPrev: () => void;
-  /** 다음 스텝으로 이동 */
   onNext: () => void;
-  /** 활성화 여부 (기본: true) */
   enabled?: boolean;
-  /** 모달이 열려있는지 (열려있으면 비활성화) */
   isModalOpen?: boolean;
-  /** 이전 스텝 가능 여부 */
   canGoPrev?: boolean;
-  /** 다음 스텝 가능 여부 */
   canGoNext?: boolean;
 }
 
 export interface UseStepGesturesReturn {
-  /** 탭/클릭 영역에 적용할 핸들러 */
   handleTapArea: (e: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>) => void;
 }
 
 export function useStepGestures(options: UseStepGesturesOptions): UseStepGesturesReturn {
-  const {
-    onPrev,
-    onNext,
-    enabled = true,
-    isModalOpen = false,
-    canGoPrev = true,
-    canGoNext = true,
-  } = options;
+  const optionsRef = useRef(options);
+  optionsRef.current = options; // 렌더링될 때마다 항상 최신 props를 ref에 저장
 
-  // 키보드 이벤트 리스너
   useEffect(() => {
-    if (!enabled || isModalOpen) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
+      // 이벤트 발생 시, 항상 ref에 저장된 최신 props를 읽어옴
+      const {
+        enabled = true,
+        isModalOpen = false,
+        onPrev,
+        onNext,
+        canGoPrev = true,
+        canGoNext = true,
+      } = optionsRef.current;
+
+      if (!enabled || isModalOpen) return;
+
       // input, textarea에 포커스가 있으면 무시
       const activeTag = document.activeElement?.tagName;
       if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
@@ -70,37 +66,39 @@ export function useStepGestures(options: UseStepGesturesOptions): UseStepGesture
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [enabled, isModalOpen, onPrev, onNext, canGoPrev, canGoNext]);
+  }, []); // 마운트/언마운트 시에만 리스너를 등록/해제
 
-  // 탭/클릭 핸들러
   const handleTapArea = useCallback(
     (e: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>) => {
+      // 탭 핸들러도 최신 props를 사용하도록 ref를 참조
+      const {
+        enabled = true,
+        isModalOpen = false,
+        onPrev,
+        onNext,
+        canGoPrev = true,
+        canGoNext = true,
+      } = optionsRef.current;
+
       if (!enabled || isModalOpen) return;
 
-      // 버튼, 링크, 인풋 클릭은 무시
       const target = e.target as HTMLElement;
       if (target.closest('button, a, input, textarea, [role="button"]')) return;
 
-      // 텍스트 선택 중이면 무시
       const selection = window.getSelection();
       if (selection && selection.toString().length > 0) return;
 
-      // 클릭/터치 좌표 계산
       const rect = e.currentTarget.getBoundingClientRect();
       let clientX: number;
 
       if ('touches' in e) {
-        // TouchEvent
         if (e.touches.length === 0) return;
         clientX = e.touches[0].clientX;
       } else {
-        // MouseEvent
         clientX = e.clientX;
       }
 
-      // 좌/우 반 판단
-      const relativeX = clientX - rect.left;
-      const isLeftHalf = relativeX < rect.width / 2;
+      const isLeftHalf = clientX - rect.left < rect.width / 2;
 
       if (isLeftHalf && canGoPrev) {
         onPrev();
@@ -108,7 +106,7 @@ export function useStepGestures(options: UseStepGesturesOptions): UseStepGesture
         onNext();
       }
     },
-    [enabled, isModalOpen, onPrev, onNext, canGoPrev, canGoNext]
+    [] // 의존성 배열이 비어있어도, optionsRef를 통해 항상 최신 값에 접근 가능
   );
 
   return { handleTapArea };

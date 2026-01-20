@@ -10,6 +10,7 @@ import { ArrowLeft, Code2, Check, X, RotateCcw, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useThemeStore } from '@/stores/themeStore';
 import { codeViewerColors } from '@/config/themes';
+import { Timer } from './components/Timer';
 
 interface Quiz {
   id: string;
@@ -257,6 +258,13 @@ export function FillBlankQuizPage() {
     }
   };
 
+  const handleTimeout = () => {
+    if (!currentQuiz) return;
+    setWrongCount(wrongCount + 1);
+    setQuizState('incorrect');
+    setUserInput(''); // Clear input
+  };
+
   const handleRestart = () => {
     setCurrentIndex(0);
     setQuizState('question');
@@ -469,6 +477,16 @@ export function FillBlankQuizPage() {
               transition={{ duration: 0.3 }}
             />
           </div>
+        </div>
+
+        {/* 타이머 */}
+        <div className="mb-4 flex justify-center">
+          <Timer
+            key={currentIndex}
+            duration={15}
+            onTimeout={handleTimeout}
+            isPaused={quizState !== 'question'}
+          />
         </div>
 
         {/* 퀴즈 카드 */}
