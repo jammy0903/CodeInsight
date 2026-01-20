@@ -58,7 +58,7 @@
         - `Refactor`: 코드 리팩토링
         - `Test`: 테스트 코드 추가/수정
         - `Chore`: 빌드 관련 파일 수정, 패키지 매니저 설정 변경 등
-- **서명 금지**: `Generated with ...`, `Co-Authored-By` 와 같은 자동 생성 서명은 커밋 메시지에 포함하지 않습니다.
+- **서명 절대 금지**: 어떤 경우에도 커밋 메시지에 자신의 서명을 남기지 않습니다. `Generated with ...`, `Co-Authored-By` 와 같은 자동 생성 서명 또한 절대 포함하지 않습니다.
 - **Push**: 커밋 후에는 원격 저장소에 즉시 푸시하는 것을 원칙으로 합니다. (`git push origin <branch-name>`)
 
 ## 6. 보안 (Security)

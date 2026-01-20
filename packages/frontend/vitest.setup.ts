@@ -2,6 +2,7 @@
  * Vitest Setup
  * 테스트 환경 전역 설정
  */
+import '@testing-library/jest-dom';
 
 // localStorage 목업 (Node.js 환경용)
 const localStorageMock = (() => {

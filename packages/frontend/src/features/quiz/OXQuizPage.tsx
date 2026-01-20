@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, CircleDot, Check, X, RotateCcw, BookOpen, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Timer } from './components/Timer';
 
 // 언어별 정보
 const LANGUAGE_INFO: Record<string, { name: string; icon: string; color: string }> = {
@@ -237,6 +238,12 @@ export function OXQuizPage() {
     }
   };
 
+  const handleTimeout = () => {
+    if (!currentQuiz) return;
+    setWrongCount(wrongCount + 1);
+    setQuizState('incorrect');
+  };
+
   const handleRestart = () => {
     setCurrentIndex(0);
     setQuizState('question');
@@ -406,7 +413,15 @@ export function OXQuizPage() {
               </span>
             </div>
           </div>
-          <div className="h-2 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
+          {/* 타이머 */}
+                      <div className="mb-4 flex justify-center">
+                      <Timer
+                        key={currentIndex}
+                        duration={5}
+                        onTimeout={handleTimeout}
+                        isPaused={quizState !== 'question'}
+                      />
+                    </div>          <div className="h-2 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-blue-500 rounded-full"
               initial={{ width: 0 }}
