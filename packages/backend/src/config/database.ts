@@ -12,4 +12,5 @@ const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
 // PrismaClient with adapter
+// Neon (serverless Postgres) 및 로컬 PostgreSQL 모두 pg adapter 사용
 export const prisma = new PrismaClient({ adapter });
