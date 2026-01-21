@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="C-OSINE Backend" language="TypeScript">
+  <description>
+    Node.js (Express) + Prisma 기반 모듈형 백엔드 API 서버.
+    핵심 기능: 사용자 관리, 코딩 문제/제출 관리, C/Python 코드 시뮬레이터.
+    아키텍처: .gemini/context/backend_arch.md 참조
+  </description>
+
+  <!-- 🚀 진입점 & 설정 -->
+  <file path="packages/backend/src/app.ts">
+    <description>Express 서버 메인 진입점. 미들웨어 설정 및 모듈 라우터 동적 등록</description>
+  </file>
+
+  <file path="packages/backend/src/index.ts">
+    <description>서버 부트스트랩. 포트 바인딩 및 에러 핸들링</description>
+  </file>
+
+  <file path="packages/backend/src/config/env.ts">
+    <description>환경 변수 검증 (Zod). 타입 안전한 env 객체 제공</description>
+  </file>
+
+  <!-- 🔐 인증 미들웨어 -->
+  <file path="packages/backend/src/middleware/auth.ts">
+    <description>Firebase ID 토큰 검증 미들웨어. req.user 주입</description>
+  </file>
+
+  <!-- 👤 사용자 모듈 -->
+  <file path="packages/backend/src/modules/users/routes.ts">
+    <description>사용자 CRUD API 엔드포인트</description>
+  </file>
+
+  <file path="packages/backend/src/modules/users/service.ts">
+    <description>사용자 비즈니스 로직. Prisma를 통한 DB 접근</description>
+  </file>
+
+  <!-- 📝 문제 모듈 -->
+  <file path="packages/backend/src/modules/problems/routes.ts">
+    <description>코딩 문제 관련 API (목록 조회, 상세 정보)</description>
+  </file>
+
+  <file path="packages/backend/src/modules/problems/service.ts">
+    <description>문제 비즈니스 로직</description>
+  </file>
+
+  <!-- 📤 제출 모듈 -->
+  <file path="packages/backend/src/modules/submissions/routes.ts">
+    <description>코드 제출 관련 API (제출 생성, 채점 결과 조회)</description>
+  </file>
+
+  <file path="packages/backend/src/modules/submissions/service.ts">
+    <description>코드 제출 및 채점 로직</description>
+  </file>
+
+  <!-- 📚 코스 모듈 -->
+  <file path="packages/backend/src/modules/courses/routes.ts">
+    <description>코스/레슨 관련 API (코스 목록, 레슨 상세)</description>
+  </file>
+
+  <file path="packages/backend/src/modules/courses/service.ts">
+    <description>코스 비즈니스 로직</description>
+  </file>
+
+  <!-- 🤖 AI 모듈 -->
+  <file path="packages/backend/src/modules/ai/routes.ts">
+    <description>AI 기능 API (코드 설명, 힌트 생성)</description>
+  </file>
+
+  <file path="packages/backend/src/modules/ai/providers/ollama.provider.ts">
+    <description>Ollama AI 프로바이더 구현체</description>
+  </file>
+
+  <!-- 🖥️ C 시뮬레이터 (핵심 기능) -->
+  <file path="packages/backend/src/modules/simulators/c/simulator.ts">
+    <description>C 언어 시뮬레이터 메인 엔진. 코드 파싱 및 단계별 실행</description>
+  </file>
+
+  <file path="packages/backend/src/modules/simulators/c/execution/frame-manager.ts">
+    <description>실행 스택 프레임 관리. 함수 호출, 변수 선언, 스코프 처리</description>
+  </file>
+
+  <file path="packages/backend/src/modules/simulators/c/execution/memory-manager.ts">
+    <description>메모리 관리자. Stack/Heap 할당 및 해제</description>
+  </file>
+
+  <file path="packages/backend/src/modules/simulators/c/handlers/index.ts">
+    <description>C 언어 구문 핸들러 인덱스. 각 AST 노드별 실행 로직 매핑</description>
+  </file>
+
+  <!-- 🐍 Python 시뮬레이터 -->
+  <file path="packages/backend/src/modules/simulators/python/simulator.ts">
+    <description>Python 시뮬레이터 메인 엔진</description>
+  </file>
+
+  <!-- 🗄️ 데이터베이스 -->
+  <file path="packages/backend/prisma/schema.prisma">
+    <description>Prisma 스키마 정의. 모든 DB 모델 선언</description>
+  </file>
+
+  <!-- ⚙️ 설정 파일 -->
+  <file path="packages/backend/tsconfig.json">
+    <description>TypeScript 컴파일러 설정</description>
+  </file>
+
+  <file path="packages/backend/package.json">
+    <description>의존성 및 스크립트 정의</description>
+  </file>
+
+</project>
