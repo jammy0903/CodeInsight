@@ -18,6 +18,9 @@ import { useEnterKey } from '@/hooks/useEnterKey';
 import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/playgroundStore';
 import { useExplanationStore } from './stores/explanationStore';
 import { PyVisualizerView } from '@/features/visualizers/python';
+import { JavaMemoryView } from '@/features/visualizers/java';
+import { JSMemoryFlowView } from '@/features/js-visualizer/components/JSMemoryFlowView';
+import { useJsToFlow } from '@/features/js-visualizer/hooks/useJsToFlow';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
@@ -172,6 +175,8 @@ export function PlaygroundPage() {
     currentStepIndex
   );
 
+  const { nodes: jsNodes, edges: jsEdges } = useJsToFlow(steps, currentStepIndex);
+
   // 모바일 레이아웃: PanelGroup 없이 단순 스택
   if (isMobile) {
     return (
@@ -319,7 +324,7 @@ export function PlaygroundPage() {
               </div>
             ) : activeTab === 'flow' ? (
               /* Flow Tab Content */
-              (language === 'c' || language === 'python') && hasSteps ? (
+              (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
                 <LessonFlowVisualizer
                   step={currentStep as LessonStep}
                   prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
@@ -329,7 +334,7 @@ export function PlaygroundPage() {
                 />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
-                  {language === 'java' ? 'Java 미지원' : 'Run 버튼을 눌러 실행'}
+                  Run 버튼을 눌러 실행
                 </div>
               )
             ) : (
@@ -344,9 +349,16 @@ export function PlaygroundPage() {
                   frames={memoryState.frames}
                   showRegisters={!!registers?.rsp || !!registers?.rbp}
                 />
+              ) : language === 'java' && hasSteps ? (
+                <JavaMemoryView
+                  currentStep={currentStep as any}
+                  theme={currentTheme}
+                />
+              ) : language === 'javascript' && hasSteps ? (
+                <JSMemoryFlowView nodes={jsNodes} edges={jsEdges} />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
-                  {language === 'java' ? 'Java 미지원' : 'Run 버튼을 눌러 실행'}
+                  Run 버튼을 눌러 실행
                 </div>
               )
             )}
@@ -580,7 +592,7 @@ export function PlaygroundPage() {
               </div>
             ) : activeTab === 'flow' ? (
               /* Flow Tab Content */
-              (language === 'c' || language === 'python') && hasSteps ? (
+              (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
                 <LessonFlowVisualizer
                   step={currentStep as LessonStep}
                   prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
@@ -590,7 +602,7 @@ export function PlaygroundPage() {
                 />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
-                  {language === 'java' ? 'Java simulation is not supported yet' : 'Click Run button to execute code'}
+                  Click Run button to execute code
                 </div>
               )
             ) : (
@@ -609,9 +621,16 @@ export function PlaygroundPage() {
                   frames={memoryState.frames}
                   showRegisters={!!registers?.rsp || !!registers?.rbp}
                 />
+              ) : language === 'java' && hasSteps ? (
+                <JavaMemoryView
+                  currentStep={currentStep as any}
+                  theme={currentTheme}
+                />
+              ) : language === 'javascript' && hasSteps ? (
+                <JSMemoryFlowView nodes={jsNodes} edges={jsEdges} />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
-                  {language === 'java' ? 'Java simulation is not supported yet' : 'Click Run button to execute code'}
+                  Click Run button to execute code
                 </div>
               )
             )}

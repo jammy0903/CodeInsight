@@ -41,6 +41,8 @@ import { JSVisualizerView } from '@/features/visualizers/js';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { PyVisualizerView } from '@/features/visualizers/python';
 import { JavaReferenceView } from '@/features/visualizers/java';
+import { JSMemoryFlowView } from '@/features/js-visualizer/components/JSMemoryFlowView';
+import { useJsToFlow } from '@/features/js-visualizer/hooks/useJsToFlow';
 
 import type { PyName, PyObject } from '@/types/py-simulator';
 
@@ -345,9 +347,12 @@ export function LessonPage() {
 
   useEffect(() => {
     if (lesson) {
-      setPageTitle(lesson.title, lesson.description);
+      setPageTitle(lesson.title, lesson.description, lang as SupportedLanguage);
     }
-  }, [lesson, setPageTitle]);
+    return () => {
+      setPageTitle('', '');
+    };
+  }, [lesson, setPageTitle, lang]);
 
   const steps: LessonStep[] = lesson?.content?.steps || [];
   const code = lesson?.content?.code || '';
@@ -383,6 +388,8 @@ export function LessonPage() {
     navigation.currentStepIndex
   );
   const { selection, setSelection, clearSelection } = useCodeSelection();
+
+  const { nodes: jsNodes, edges: jsEdges } = useJsToFlow(steps, navigation.currentStepIndex);
 
   useStepGestures({
     onPrev: navigation.goToPrevStep,
@@ -587,8 +594,63 @@ export function LessonPage() {
                 </button>
               )}
             </div>
-            <div>
-              {/* Tab Content Here */}
+            <div
+              className="flex-1 overflow-y-auto"
+              style={{
+                background: 'var(--theme-lesson-memory-bg)',
+                minHeight: '400px',
+              }}
+            >
+              {activeTab === 'flow' && (
+                <div className="p-4">
+                  {lang === 'javascript' && visualizationType === 'js' ? (
+                    <JSVisualizerView state={visualizationState} animate={true} compact={false} />
+                  ) : lang === 'java' ? (
+                    <JavaReferenceView state={visualizationState} animate={true} />
+                  ) : currentStep ? (
+                    <LessonFlowVisualizer
+                      step={currentStep}
+                      prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
+                      language={lang || 'c'}
+                      fullCode={code}
+                      memoryState={memoryState}
+                      stdout={currentStep.stdout}
+                    />
+                  ) : null}
+                </div>
+              )}
+              {activeTab === 'memory' && (
+                <div className="p-4">
+                  {lang === 'python' && visualizationType === 'python' ? (
+                    <PyVisualizerView
+                      names={transformPyNames((visualizationState as any)?.names)}
+                      objects={transformPyObjects((visualizationState as any)?.objects)}
+                      animate={true}
+                      compact={false}
+                    />
+                  ) : lang === 'javascript' ? (
+                    <JSMemoryFlowView nodes={jsNodes} edges={jsEdges} />
+                  ) : (
+                    <MemoryPanel
+                      stack={memoryState.stack}
+                      heap={memoryState.heap}
+                      changedBlocks={changedBlocks}
+                      showRegisters={lesson?.content?.showRegisters}
+                      frames={memoryState.frames}
+                    />
+                  )}
+                </div>
+              )}
+              {activeTab === 'chat' && !isMobile && (
+                <div className="h-full">
+                  <ChatQA
+                    languageId={lang || 'c'}
+                    lessonId={lessonId || ''}
+                    currentCode={code}
+                    currentLine={currentStep?.line || 1}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

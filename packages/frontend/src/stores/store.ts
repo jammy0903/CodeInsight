@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { Message, RunResult, Step } from '@/types/index';
+import type { SupportedLanguage } from '@/services/simulator';
 
 // App User 타입 (우리 DB의 User)
 export interface OAuthAccountInfo {
@@ -28,7 +29,8 @@ interface Store {
   // === 페이지 제목 (TopBar용) ===
   pageTitle: string;
   pageSubtitle: string;
-  setPageTitle: (title: string, subtitle?: string) => void;
+  pageLanguage: SupportedLanguage | null;
+  setPageTitle: (title: string, subtitle?: string, language?: SupportedLanguage | null) => void;
 
   // === 사용자 (Firebase + App) ===
   firebaseUser: FirebaseUser | null;
@@ -85,7 +87,8 @@ export const useStore = create<Store>((set, get) => ({
   // === 페이지 제목 (TopBar용) ===
   pageTitle: '',
   pageSubtitle: '',
-  setPageTitle: (title, subtitle = '') => set({ pageTitle: title, pageSubtitle: subtitle }),
+  pageLanguage: null,
+  setPageTitle: (title, subtitle = '', language = null) => set({ pageTitle: title, pageSubtitle: subtitle, pageLanguage: language }),
 
   // === 사용자 (Firebase + App) ===
   firebaseUser: null,

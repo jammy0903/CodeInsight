@@ -8,9 +8,10 @@ import { Code2, Sparkles, Menu } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
 import { StreakCard, useStreak } from '@/features/gamification';
+import { LanguageBadge } from '@/components/ui/LanguageBadge';
 
 export function TopBar() {
-  const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle, appUser } = useStore();
+  const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle, pageLanguage, appUser } = useStore();
   const { streak, loading: streakLoading } = useStreak();
 
   return (
@@ -73,9 +74,12 @@ export function TopBar() {
         {/* Center: 페이지 제목 (정중앙) */}
         {pageTitle && (
           <div className="flex-1 flex flex-col items-center justify-center px-4">
-            <h2 className="text-xl font-bold" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
-              {pageTitle}
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
+                {pageTitle}
+              </h2>
+              {pageLanguage && <LanguageBadge language={pageLanguage} />}
+            </div>
             {pageSubtitle && (
               <p className="text-xs" style={{ color: 'var(--theme-layout-top-bar-text-muted)' }}>
                 {pageSubtitle}
