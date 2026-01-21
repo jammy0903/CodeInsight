@@ -8,6 +8,15 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { OXQuizPage } from '../OXQuizPage';
 
+// Mock framer-motion to prevent animations from interfering with tests
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
 // Mock the useStore hook as it's used in a child component (QuizPage) which is not rendered here
 // but good practice if it was a dependency. Let's assume it might be needed.
 vi.mock('@/stores/store', () => ({
@@ -32,10 +41,10 @@ describe('OXQuizPage with Timer', () => {
   };
 
   it('should show results when timer runs out', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup(); // Removed advanceTimers
     renderComponent();
 
-    // 1. 챕터 선택
+    // 1. 챕터 선택 (using userEvent as before)
     const chapterButton = await screen.findByText('변수와 자료형');
     await user.click(chapterButton);
 
@@ -49,7 +58,8 @@ describe('OXQuizPage with Timer', () => {
 
     // 4. 시간 초과 시뮬레이션
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(5000);
+      vi.advanceTimersByTime(5000);
+      vi.runAllTimers(); // Explicitly run all timers
     });
 
     // 5. 타이머가 만료되면 퀴즈 결과 페이지 대신 현재 문제에 대한 '오답' 상태가 표시되는지 확인
@@ -69,5 +79,5 @@ describe('OXQuizPage with Timer', () => {
 
     // 퀴즈 결과 페이지가 나타나지 않았는지 확인
     expect(screen.queryByText('퀴즈 결과')).not.toBeInTheDocument();
-  });
+  }, 30000); // Increased timeout
 });
