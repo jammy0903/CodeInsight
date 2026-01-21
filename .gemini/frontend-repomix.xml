@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="C-OSINE Frontend" language="TypeScript">
+  <description>
+    React (Vite) + TypeScript 기반 모노레포 프론트엔드.
+    Zustand 상태 관리, Tailwind CSS 스타일링.
+    핵심 기능: C/Python 코드 시뮬레이터, 코딩 학습 강좌, 대시보드.
+    아키텍처: .gemini/context/frontend_arch.md 참조
+  </description>
+
+  <!-- 🚀 진입점 & 라우팅 -->
+  <file path="packages/frontend/src/main.tsx">
+    <description>애플리케이션 진입점. React DOM 렌더링 및 라우터 프로바이더 설정</description>
+  </file>
+
+  <file path="packages/frontend/src/router.tsx">
+    <description>전체 URL 라우팅 정의. ProtectedRoute로 인증 페이지 보호</description>
+  </file>
+
+  <!-- 🔐 인증 -->
+  <file path="packages/frontend/src/features/auth/AuthPage.tsx">
+    <description>로그인/회원가입 UI. Firebase 소셜 로그인 처리</description>
+  </file>
+
+  <file path="packages/frontend/src/lib/firebase.ts">
+    <description>Firebase 초기화 및 인증 설정</description>
+  </file>
+
+  <!-- 📚 코스/레슨 (핵심 기능) -->
+  <file path="packages/frontend/src/features/courses/LessonPage.tsx">
+    <description>강의 수강 핵심 페이지. 코드 에디터 + 문제 설명 + 시각화 패널 통합</description>
+  </file>
+
+  <file path="packages/frontend/src/features/courses/hooks/useLessonNavigation.ts">
+    <description>강의 단계 이동 로직. 이전/다음 네비게이션 처리</description>
+  </file>
+
+  <file path="packages/frontend/src/features/courses/hooks/useCourseMemory.ts">
+    <description>코스용 메모리 시뮬레이터 훅. Stack/Heap 상태 관리</description>
+  </file>
+
+  <file path="packages/frontend/src/features/courses/components/memory/MemoryPanel.tsx">
+    <description>C 코드 메모리 상태 시각화 컴포넌트 (스택/힙)</description>
+  </file>
+
+  <file path="packages/frontend/src/features/courses/components/memory/CourseMemoryView.tsx">
+    <description>코스용 간소화 메모리 시각화 뷰</description>
+  </file>
+
+  <!-- 🎮 플레이그라운드 -->
+  <file path="packages/frontend/src/features/playground/PlaygroundPage.tsx">
+    <description>코드 실습 플레이그라운드 메인 페이지</description>
+  </file>
+
+  <file path="packages/frontend/src/features/playground/stores/playgroundStore.ts">
+    <description>플레이그라운드 상태 관리 (코드, 언어, 실행 상태)</description>
+  </file>
+
+  <file path="packages/frontend/src/features/playground/components/CodeEditor.tsx">
+    <description>Monaco Editor 래퍼. 코드 에디터 공통 컴포넌트</description>
+  </file>
+
+  <!-- 📊 상태 관리 (Zustand Stores) -->
+  <file path="packages/frontend/src/stores/useAuthStore.ts">
+    <description>사용자 인증 상태 전역 관리</description>
+  </file>
+
+  <file path="packages/frontend/src/stores/useLessonHistoryStore.ts">
+    <description>학습 이력 관리 (완료 강의, 퀴즈 정답 등)</description>
+  </file>
+
+  <!-- 🛠️ API 서비스 -->
+  <file path="packages/frontend/src/services/api.ts">
+    <description>백엔드 API 호출 클라이언트. Axios 기반 HTTP 요청</description>
+  </file>
+
+  <file path="packages/frontend/src/services/courseService.ts">
+    <description>코스/레슨 관련 API 호출 로직</description>
+  </file>
+
+  <!-- 🎨 UI 컴포넌트 (재사용) -->
+  <file path="packages/frontend/src/components/ui/button.tsx">
+    <description>디자인 시스템 버튼 컴포넌트 (CVA + Tailwind)</description>
+  </file>
+
+  <file path="packages/frontend/src/components/layouts/MainLayout.tsx">
+    <description>메인 레이아웃 (헤더, 사이드바, 컨텐츠 영역)</description>
+  </file>
+
+  <!-- ⚙️ 설정 파일 -->
+  <file path="packages/frontend/vite.config.ts">
+    <description>Vite 빌드 설정</description>
+  </file>
+
+  <file path="packages/frontend/tsconfig.json">
+    <description>TypeScript 컴파일러 설정</description>
+  </file>
+
+  <file path="packages/frontend/tailwind.config.js">
+    <description>Tailwind CSS 커스터마이징 설정</description>
+  </file>
+
+</project>
