@@ -9,6 +9,8 @@ import { rateLimit, authRateLimit, aiRateLimit, executeRateLimit, requestLogger 
 import { problemRoutes } from './modules/problems/routes';
 import { memoryRoutes } from './modules/simulators/c/routes';
 import pythonSimulatorRoutes from './modules/simulators/python/routes';
+import javaSimulatorRoutes from './modules/simulators/java/routes';
+import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
 import { submissionRoutes } from './modules/submissions/routes';
 import { userRoutes } from './modules/users/routes';
 import { cRoutes } from './modules/c/routes';
@@ -54,6 +56,8 @@ app.get('/health', (req, res) => {
 app.use('/api/v1/problems', rateLimit, problemRoutes);
 app.use('/api/v1/memory', memoryRoutes); // C 시뮬레이터 (레거시)
 app.use('/api/v1/simulators/python', pythonSimulatorRoutes); // Python 시뮬레이터
+app.use('/api/v1/simulators/java', javaSimulatorRoutes); // Java 시뮬레이터
+app.use('/api/v1/simulators/javascript', javascriptSimulatorRoutes); // Javascript 시뮬레이터
 app.use('/api/v1/submissions', rateLimit, submissionRoutes);
 app.use('/api/v1/users', userRoutes); // Rate Limiter 제거: 중복 닉네임만 DB에서 검사
 app.use('/api/v1/c', executeRateLimit, cRoutes);

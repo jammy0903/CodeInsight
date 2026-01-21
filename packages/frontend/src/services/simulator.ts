@@ -56,7 +56,7 @@ interface PySimulateResult {
 }
 
 // 지원 언어
-export type SupportedLanguage = 'c' | 'python' | 'java';
+export type SupportedLanguage = 'c' | 'python' | 'java' | 'javascript';
 
 // 시뮬레이션 요청
 interface SimulateRequest {
@@ -114,51 +114,12 @@ interface SimulateResult {
  * 언어별 지원 여부 확인
  * MVP: C, Python 지원
  */
-export function isLanguageSupported(language: string): boolean {
-  return language === 'c' || language === 'python';
+export function isLanguageSupported(language: string): boolean: boolean {
+  return language === 'c' || language === 'python' || language === 'javascript';
 }
 
-/**
- * 백엔드 메모리 블록을 MemoryBlock으로 변환 (LessonStep 형식)
- */
-function toMemoryBlock(
-  block: BackendMemoryBlock
-): MemoryBlock {
-  return {
-    name: block.name,
-    address: block.address,
-    value: block.value,
-    type: block.type,
-    size: block.size,
-    points_to: block.points_to,
-    explanation: block.explanation,
-  };
-}
+// ... inside simulatorService ...
 
-/**
- * 백엔드 응답을 LessonStep[]으로 변환 (Playground용 스냅샷 형식)
- * WHY: Playground는 실시간 C 코드 실행 결과를 MemoryBlock[] 형태로 받음
- */
-function toSteps(backendSteps: BackendStep[]): LessonStep[] {
-  return backendSteps.map((step) => ({
-    line: step.line,
-    explanation: step.explanation,
-    // Playground 확장 필드 (스냅샷 형식)
-    stack: step.stack.map(toMemoryBlock),
-    heap: step.heap.map(toMemoryBlock),
-    stdout: step.stdout,
-  }));
-}
-
-/**
- * 시뮬레이터 서비스
- */
-export const simulatorService = {
-  /**
-   * 코드 시뮬레이션 실행
-   * C: /api/memory/trace 호출
-   * Python: /api/v1/simulators/python 호출
-   */
   async simulate(
     language: string,
     request: SimulateRequest
@@ -175,6 +136,11 @@ export const simulatorService = {
       // Python 언어
       if (language === 'python') {
         return this.simulatePython(request);
+      }
+      
+      // JavaScript 언어
+      if (language === 'javascript') {
+        return this.simulateJavaScript(request);
       }
 
       // C 언어: 메모리 트레이스 API 사용
@@ -254,6 +220,56 @@ export const simulatorService = {
         success: false,
         steps: [],
         error: data.error || 'Python simulation failed',
+      };
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return {
+          success: false,
+          steps: [],
+          error: error.response?.data?.error || error.message,
+        };
+      }
+
+      return {
+        success: false,
+        steps: [],
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  },
+
+  /**
+   * JavaScript 시뮬레이션
+   */
+  async simulateJavaScript(request: SimulateRequest): Promise<SimulateResult> {
+    try {
+      const response = await api.post<any>('/simulators/javascript/execute', { // Adjust 'any' to a specific type later
+        code: request.code,
+      });
+
+      const data = response.data;
+
+      if (data.steps) {
+        // The backend already returns data in a format that's mostly compatible.
+        // We just need to ensure it fits the LessonStep[] structure.
+        const lessonSteps: LessonStep[] = data.steps.map((step: any) => ({
+          line: step.line,
+          code: step.code,
+          explanation: step.explanation,
+          stack: step.stack,
+          heap: step.heap,
+        }));
+
+        return {
+          success: true,
+          steps: lessonSteps,
+        };
+      }
+
+      return {
+        success: false,
+        steps: [],
+        error: data.error || 'JavaScript simulation failed',
       };
     } catch (error) {
       if (error instanceof AxiosError) {

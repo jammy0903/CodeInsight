@@ -113,6 +113,16 @@ const DEFAULT_JAVA_CODE = `public class Main {
     }
 }`;
 
+const DEFAULT_JAVASCRIPT_CODE = `// Welcome to the JavaScript Visualizer!
+// Click 'Run' to see the visualization.
+
+let name = "CodeInsight";
+const version = 1.0;
+let isAwesome = true;
+
+name = "CodeInsight Rocks!";
+`;
+
 // ============================================================
 // 스토어 생성
 // ============================================================
@@ -129,6 +139,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     c: DEFAULT_C_CODE,
     python: DEFAULT_PYTHON_CODE,
     java: DEFAULT_JAVA_CODE,
+    javascript: DEFAULT_JAVASCRIPT_CODE,
   },
   setCode: (code) => {
     const { language, codes } = get();
