@@ -103,7 +103,11 @@ router.get('/chapters/:id/progress', requireDbUser, async (req, res) => {
     const { id } = req.params;
     const userId = req.user!.dbUser!.id;
 
-    const progress = await courseService.getChapterProgress(userId, id);
+    const chapterId = Array.isArray(id) ? id[0] : id;
+    if (!chapterId) {
+      return res.status(400).json({ message: 'Chapter ID is required.' });
+    }
+    const progress = await courseService.getChapterProgress(userId, chapterId);
 
     if (!progress) {
       return res.status(404).json({ error: 'Chapter not found' });

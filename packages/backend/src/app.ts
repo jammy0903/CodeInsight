@@ -9,7 +9,7 @@ import { rateLimit, authRateLimit, aiRateLimit, executeRateLimit, requestLogger 
 import { problemRoutes } from './modules/problems/routes';
 import { memoryRoutes } from './modules/simulators/c/routes';
 import pythonSimulatorRoutes from './modules/simulators/python/routes';
-import javaSimulatorRoutes from './modules/simulators/java/routes';
+import { javaSimulatorRoutes } from './modules/simulators/java/routes';
 import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
 import { submissionRoutes } from './modules/submissions/routes';
 import { userRoutes } from './modules/users/routes';
