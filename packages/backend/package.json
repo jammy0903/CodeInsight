@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "build": "tsc",
+    "build": "(cd src/modules/simulators/java/agent && mkdir -p build/classes && javac -encoding UTF-8 -d build/classes src/main/java/com/vis/*.java && jar cfe build/debugger-agent.jar com.vis.DebuggerAgent -C build/classes .) && tsc",
     "start": "node dist/app.js",
     "seed": "ts-node prisma/seed.ts",
     "backup": "ts-node scripts/backup.ts",
@@ -49,8 +49,8 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
-    "@types/babel__traverse": "^7.20.6",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/babel__traverse": "^7.20.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.3",

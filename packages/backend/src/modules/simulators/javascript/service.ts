@@ -63,7 +63,7 @@ class JavaScriptSimulator {
         const declarator = path.node;
         if (declarator.id.type === 'Identifier') {
           const varName = declarator.id.name;
-          const value = this.evaluateExpression(declarator.init);
+          const value = this.evaluateExpression(declarator.init ?? null);
           this.globalScope[varName] = value;
 
           const line = declarator.loc?.start.line ?? 0;

@@ -196,6 +196,10 @@ router.patch('/:id', requireDbUser, async (req, res) => {
   try {
     const userId = req.user!.dbUser!.id;
     const { id } = req.params;
+    const noteId = Array.isArray(id) ? id[0] : id;
+    if (!noteId) {
+      return res.status(400).json({ message: 'Note ID is required.' });
+    }
 
     const parsed = updateNoteSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -207,14 +211,14 @@ router.patch('/:id', requireDbUser, async (req, res) => {
 
     // 본인 노트인지 확인
     const existing = await prisma.userNote.findFirst({
-      where: { id, userId },
+      where: { id: noteId, userId },
     });
     if (!existing) {
       return res.status(404).json({ error: 'Note not found' });
     }
 
     const note = await prisma.userNote.update({
-      where: { id },
+      where: { id: noteId },
       data: parsed.data,
     });
 
@@ -241,17 +245,21 @@ router.delete('/:id', requireDbUser, async (req, res) => {
   try {
     const userId = req.user!.dbUser!.id;
     const { id } = req.params;
+    const noteId = Array.isArray(id) ? id[0] : id;
+    if (!noteId) {
+      return res.status(400).json({ message: 'Note ID is required.' });
+    }
 
     // 본인 노트인지 확인
     const existing = await prisma.userNote.findFirst({
-      where: { id, userId },
+      where: { id: noteId, userId },
     });
     if (!existing) {
       return res.status(404).json({ error: 'Note not found' });
     }
 
     await prisma.userNote.delete({
-      where: { id },
+      where: { id: noteId },
     });
 
     res.json({ ok: true });

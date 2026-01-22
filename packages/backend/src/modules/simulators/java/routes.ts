@@ -1,53 +1,32 @@
-/**
- * Java Simulator API Routes
- */
-
-import { Router, Request, Response } from 'express';
-import { createSimulator } from './simulator';
+import { Router, Request, Response, NextFunction } from 'express';
+import { JavaSimulationService } from './java-simulation.service';
 
 const router = Router();
 
-/**
- * POST /api/v1/simulators/java
- * Java 코드 시뮬레이션
- */
-router.post('/', async (req: Request, res: Response) => {
-  try {
-    const { code } = req.body;
+router.post('/simulate', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { sourceCode } = req.body;
 
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({
-        success: false,
-        error: 'Code is required and must be a string'
-      });
+        if (!sourceCode) {
+            return res.status(400).json({ message: 'sourceCode is required.' });
+        }
+
+        // The service is now stateless, so we can create a new instance each time.
+        const simulationService = new JavaSimulationService();
+        const result = await simulationService.simulate(sourceCode);
+
+        if (result.success) {
+            res.json(result);
+        } else {
+            // If the simulation failed (e.g., compile error, runtime error), return a 400 or 500.
+            // Using 400 for user-code-related errors.
+            res.status(400).json(result);
+        }
+
+    } catch (error: any) {
+        next(error); // Pass any unexpected errors to the global error handler
     }
-
-    // 시뮬레이터 생성 및 실행
-    const simulator = createSimulator();
-    const result = await simulator.simulate(code);
-
-    return res.json(result);
-
-  } catch (error: any) {
-    console.error('Java simulation error:', error);
-
-    return res.status(500).json({
-      success: false,
-      error: error.message || 'Internal server error'
-    });
-  }
 });
 
-/**
- * GET /api/v1/simulators/java/health
- * 헬스 체크
- */
-router.get('/health', (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    simulator: 'java',
-    version: '1.0.0'
-  });
-});
 
-export default router;
+export { router as javaSimulatorRoutes };
