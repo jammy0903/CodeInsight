@@ -8,7 +8,6 @@
  *   3. 미등록 시 needsRegistration: true → 닉네임 설정 화면으로
  *   4. 등록 완료 시 appUser 설정
  */
-
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -17,7 +16,7 @@ import {
   GithubAuthProvider,
   OAuthProvider,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { config } from '@/config';
@@ -26,6 +25,7 @@ import { getCurrentUser, registerUser } from './user';
 import { getProfile } from './analytics';
 import { generateTempNickname } from '@/utils/nickname';
 import { logger } from '@/utils/logger';
+import { setAuthToken } from './api/tokenManager';
 
 // Firebase 초기화
 const app = initializeApp(config.firebase);
@@ -36,29 +36,8 @@ const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 const kakaoProvider = new OAuthProvider('oidc.kakao');
 
-// Auth 초기화 완료를 기다리는 Promise
-let authReady: Promise<User | null>;
-let authReadyResolve: (user: User | null) => void;
-
-authReady = new Promise((resolve) => {
-  authReadyResolve = resolve;
-});
-
-// 첫 번째 auth 상태 변경 시 Promise resolve
-const unsubscribeInitial = onAuthStateChanged(auth, (user) => {
-  authReadyResolve(user);
-  unsubscribeInitial(); // 첫 번째 콜백 후 구독 해제
-});
-
 /**
- * Auth가 초기화될 때까지 대기
- */
-export function waitForAuth(): Promise<User | null> {
-  return authReady;
-}
-
-/**
- * 인증 상태 변경 시 store 업데이트
+ * 인증 상태 변경 시 store 업데이트 및 토큰 설정
  * NOTE: 앱 초기화 시 한 번 호출
  */
 export function initializeAuthListener(): () => void {
@@ -66,12 +45,20 @@ export function initializeAuthListener(): () => void {
   store.setAuthLoading(true);
 
   return onAuthStateChanged(auth, async (firebaseUser) => {
-    const { setFirebaseUser, setAppUser, setNeedsRegistration, setNeedsOnboarding, setAuthLoading } =
-      useStore.getState();
+    const {
+      setFirebaseUser,
+      setAppUser,
+      setNeedsRegistration,
+      setNeedsOnboarding,
+      setAuthLoading,
+    } = useStore.getState();
 
     setFirebaseUser(firebaseUser);
 
     if (firebaseUser) {
+      const token = await firebaseUser.getIdToken();
+      setAuthToken(token); // PUSH TOKEN
+
       try {
         // 백엔드에서 등록된 사용자인지 확인
         let appUser = await getCurrentUser();
@@ -118,6 +105,7 @@ export function initializeAuthListener(): () => void {
       }
     } else {
       // 로그아웃 상태
+      setAuthToken(null); // CLEAR TOKEN
       setAppUser(null);
       setNeedsRegistration(false);
       setNeedsOnboarding(false);
@@ -157,14 +145,5 @@ export async function loginWithKakao(): Promise<User> {
  */
 export async function logout(): Promise<void> {
   await signOut(auth);
-  // store 초기화는 onAuthStateChanged에서 처리됨
-}
-
-/**
- * 현재 사용자의 ID 토큰 가져오기 (API 요청용)
- */
-export async function getIdToken(): Promise<string | null> {
-  const user = auth.currentUser;
-  if (!user) return null;
-  return user.getIdToken();
+  // store 초기화 및 토큰 제거는 onAuthStateChanged에서 처리됨
 }
