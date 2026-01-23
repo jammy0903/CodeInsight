@@ -575,6 +575,8 @@ export function LessonPage() {
                     <StepExplanation
                       explanation={currentStep.explanation}
                       stepIndex={navigation.currentStepIndex}
+                      line={currentStep.line}
+                      code={code}
                     />
                   </div>
                 )}
