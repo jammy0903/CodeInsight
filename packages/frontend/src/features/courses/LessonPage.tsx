@@ -38,6 +38,7 @@ import { useLessonAnalytics } from './hooks/useLessonAnalytics';
 import { useStepGestures } from './hooks/useStepGestures';
 import { useFocusCycle } from '@/hooks/useFocusCycle';
 import { useIsMobile } from '@/hooks';
+import { useExplanationStore } from '@/features/playground/stores/explanationStore';
 
 // 언어별 시각화
 import { JSVisualizerView } from '@/features/visualizers/js';
@@ -316,6 +317,7 @@ export function LessonPage() {
   const [flashMemory, setFlashMemory] = useState(false);
   const prevStepIndexRef = useRef(0);
   const [isExplanationCollapsed, setIsExplanationCollapsed] = useState(false);
+  const { startPrefetch, stopPrefetch } = useExplanationStore();
 
   useEffect(() => {
     if (!lessonId) return;
@@ -366,6 +368,8 @@ export function LessonPage() {
           const result = await simulatorService.simulate(lang, { code: lesson.content.code });
           if (result.success) {
             setLiveSteps(result.steps);
+            // AI 설명 생성 시작 (Playground와 동일한 로직)
+            startPrefetch(result.steps, lesson.content.code);
           } else {
             console.error("Simulation failed:", result.error);
             setError(result.error || 'Failed to simulate code.');
@@ -382,7 +386,12 @@ export function LessonPage() {
       // Fallback for non-supported languages or lessons without code
       setLiveSteps(lesson.content?.steps || []);
     }
-  }, [lesson, lang]);
+
+    // Cleanup
+    return () => {
+      stopPrefetch();
+    };
+  }, [lesson, lang, startPrefetch, stopPrefetch]);
 
   const steps: LessonStep[] = useMemo(() => {
     return liveSteps || [];

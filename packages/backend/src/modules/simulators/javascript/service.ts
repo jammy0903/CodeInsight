@@ -67,7 +67,7 @@ class JavaScriptSimulator {
           this.globalScope[varName] = value;
 
           const line = declarator.loc?.start.line ?? 0;
-          this.addStep(line, `변수 '${varName}' 선언 및 값 '${value}' 할당.`);
+          this.addStep(line, `변수 '${varName}' 선언 및 초기값 '${value}' 할당.`);
         }
       },
       AssignmentExpression: (path) => {
@@ -78,9 +78,40 @@ class JavaScriptSimulator {
           this.globalScope[varName] = value;
 
           const line = assignment.loc?.start.line ?? 0;
-          this.addStep(line, `변수 '${varName}'에 값 '${value}' 할당.`);
+          this.addStep(line, `변수 '${varName}'의 값을 '${value}'(으)로 변경.`);
         }
       },
+      CallExpression: (path) => {
+        const node = path.node;
+        const line = node.loc?.start.line ?? 0;
+
+        // console.log 처리
+        if (
+          node.callee.type === 'MemberExpression' &&
+          node.callee.object.type === 'Identifier' &&
+          node.callee.object.name === 'console' &&
+          node.callee.property.type === 'Identifier' &&
+          node.callee.property.name === 'log'
+        ) {
+          const args = node.arguments.map(arg => {
+            if (arg.type === 'StringLiteral') return arg.value;
+            if (arg.type === 'NumericLiteral') return arg.value;
+            if (arg.type === 'Identifier') return this.globalScope[arg.name];
+            return '?';
+          });
+          const output = args.join(' ');
+
+          this.addStep(line, `console.log() 실행: "${output}" 출력.`);
+          // (실제 stdout 버퍼에도 추가하는 로직이 있으면 좋음)
+        } else {
+          // 일반 함수 호출 (간략 설명)
+          this.addStep(line, `함수 호출 실행.`);
+        }
+      },
+      IfStatement: (path) => {
+        const line = path.node.loc?.start.line ?? 0;
+        this.addStep(line, `조건문(If) 확인.`);
+      }
     });
 
     return { steps: this.steps, source_lines: this.source_lines };
