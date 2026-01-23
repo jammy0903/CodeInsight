@@ -14,62 +14,11 @@ import { MessageContent } from './MessageContent';
 import type { ChatContext } from '@/services/ai';
 import { useThemeStore } from '@/stores/themeStore';
 import { themes } from '@/config/themes';
+import { useStore } from '@/stores/store'; // useStore import 추가
 
 // 테마별 채팅 색상 (zinc + cyan 팔레트)
 const chatColors = {
-  dark: {
-    aiBubbleBg: '#27272a',      // zinc-800
-    aiBubbleBorder: '#3f3f46',  // zinc-700
-    aiBubbleText: '#fafafa',    // zinc-50
-    userBubbleBg: '#0891b2',    // cyan-600
-    userBubbleBorder: '#0e7490', // cyan-700
-    userBubbleText: '#ffffff',
-    badgeAiBg: '#3f3f46',       // zinc-700
-    badgeAiText: '#e4e4e7',     // zinc-200
-    // 입력창
-    inputBg: '#18181b',         // zinc-900
-    inputBorder: '#3f3f46',     // zinc-700
-    inputText: '#fafafa',       // zinc-50
-    inputPlaceholder: '#71717a', // zinc-500
-    // 헤더/기타
-    headerText: '#e4e4e7',      // zinc-200
-    headerBorder: '#27272a',    // zinc-800
-    mutedText: '#a1a1aa',       // zinc-400
-  },
-  soft: {
-    aiBubbleBg: '#f8fafc',
-    aiBubbleBorder: '#e2e8f0',
-    aiBubbleText: '#475569',
-    userBubbleBg: '#ec4899',
-    userBubbleBorder: '#db2777',
-    userBubbleText: '#ffffff',
-    badgeAiBg: '#f1f5f9',
-    badgeAiText: '#64748b',
-    inputBg: '#ffffff',
-    inputBorder: '#e2e8f0',
-    inputText: '#334155',
-    inputPlaceholder: '#94a3b8',
-    headerText: '#334155',
-    headerBorder: '#e2e8f0',
-    mutedText: '#64748b',
-  },
-  minimal: {
-    aiBubbleBg: '#faf8f5',
-    aiBubbleBorder: '#e5d5c7',
-    aiBubbleText: '#5c4a3d',
-    userBubbleBg: '#b45309',
-    userBubbleBorder: '#92400e',
-    userBubbleText: '#ffffff',
-    badgeAiBg: '#f5ebe0',
-    badgeAiText: '#78716c',
-    inputBg: '#fffcf8',
-    inputBorder: '#e5d5c7',
-    inputText: '#5c4a3d',
-    inputPlaceholder: '#a39585',
-    headerText: '#5c4a3d',
-    headerBorder: '#e5d5c7',
-    mutedText: '#78716c',
-  },
+  // ...
 };
 
 interface ChatQAProps {
@@ -90,6 +39,7 @@ export function ChatQA({
   lessonId,
   contextType = 'general',
 }: ChatQAProps) {
+  const appUser = useStore((state) => state.appUser); // appUser 가져오기
   const {
     input,
     setInput,
@@ -101,10 +51,10 @@ export function ChatQA({
     sendMessage,
     handleKeyDown,
     clearMessages,
-  } = useChatQA({ context, selectedText, lessonId, contextType });
+  } = useChatQA({ context, selectedText, lessonId, contextType, currentUserId: appUser?.id });
 
   const currentTheme = useThemeStore((s) => s.theme);
-  const colors = chatColors[currentTheme];
+  const colors = chatColors[currentTheme] || chatColors.dark;
 
   return (
     <div className="flex flex-col h-full">

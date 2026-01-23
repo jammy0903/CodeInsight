@@ -14,7 +14,12 @@
 - **진입점**: `src/main.tsx`가 애플리케이션의 메인 진입점이며, React DOM을 렌더링하고 라우터를 설정합니다.
 - **라우팅**: `src/router.tsx` 파일에서 모든 페이지 경로와 해당 경로에 렌더링될 컴포넌트를 정의합니다. `pages` 디렉토리 대신, `features` 디렉토리 내의 컴포넌트들이 페이지 역할을 수행하는 경우가 많습니다.
 - **상태 관리**: `src/stores` 디렉토리 내에서 Zustand를 사용하여 전역 상태를 관리합니다. 각 store는 특정 도메인(예: `useAuthStore`, `useVimStore`)의 상태와 액션을 담당합니다.
-- **API 통신**: `src/services/api/axios.ts` 에 정의된 `api` 인스턴스를 사용하여 백엔드와 통신합니다. 이 인스턴스는 요청 시 자동으로 Firebase 인증 토큰을 헤더에 추가하는 인터셉터를 포함하고 있습니다. 모든 API 서비스는 이 `api` 인스턴스를 import하여 사용해야 합니다.
+- **API 통신**: `src/services/api/axios.ts` 에 정의된 `api` 인스턴스를 사용하여 백엔드와 통신합니다. 이 인스턴스는 요청 시 자동으로 Firebase 인증 토큰을 헤더에 추가하는 인터셉터를 포함하고 있습니다.
+- **실시간 시뮬레이션 흐름**: 
+  1. `LessonPage.tsx` 로드 시 백엔드에서 레슨 메타데이터(JSON)를 가져옵니다.
+  2. 레슨에 `code`가 포함되어 있고 시뮬레이션이 가능한 언어(`c`, `python`, `java`)인 경우, `simulatorService`가 백엔드 시뮬레이터 API를 호출합니다.
+  3. 백엔드에서 생성된 `steps` 데이터를 실시간으로 수신하여 시각화 컴포넌트(`FlowVisualizer`, `PyVisualizerView`, `JavaReferenceView`)에 전달합니다.
+  4. 시뮬레이션 불능 언어이거나 에러 발생 시, JSON에 미리 작성된 `steps`를 폴백으로 사용합니다.
 
 ### 주요 디렉토리 구조 (`src/`)
 - **`components/`**: 버튼, 입력창, 모달 등 재사용 가능한 공통 UI 컴포넌트.

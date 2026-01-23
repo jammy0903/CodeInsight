@@ -24,6 +24,7 @@ interface UseChatQAOptions {
   // 분석 리포트용 옵션
   lessonId?: string;
   contextType?: 'lesson' | 'playground' | 'general';
+  currentUserId?: string; // 추가
 }
 
 const STORAGE_PREFIX = 'codeinsight_chat_';
@@ -32,13 +33,14 @@ const EXPIRY_MS = 24 * 60 * 60 * 1000; // 24시간
 /**
  * 레슨별 저장 키 생성
  */
-function getStorageKey(context?: ChatContext): string {
+function getStorageKey(currentUserId: string | undefined, context?: ChatContext): string {
+  const userPrefix = currentUserId ? `${currentUserId}_` : '';
   if (context?.courseDay && context?.topic) {
-    // 레슨별 저장: "codeinsight_chat_day3_포인터"
-    return `${STORAGE_PREFIX}day${context.courseDay}_${context.topic}`;
+    // 레슨별 저장: "codeinsight_chat_USERID_day3_포인터"
+    return `${STORAGE_PREFIX}${userPrefix}day${context.courseDay}_${context.topic}`;
   }
   // 일반 채팅
-  return `${STORAGE_PREFIX}global`;
+  return `${STORAGE_PREFIX}${userPrefix}global`;
 }
 
 /**
@@ -81,9 +83,9 @@ function saveMessages(key: string, messages: Message[]): void {
 }
 
 export function useChatQA(options: UseChatQAOptions = {}) {
-  const { context, selectedText, lessonId, contextType } = options;
+  const { context, selectedText, lessonId, contextType, currentUserId } = options; // currentUserId 추가
 
-  const storageKey = getStorageKey(context);
+  const storageKey = getStorageKey(currentUserId, context); // 호출 변경
 
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>(() => loadMessages(storageKey).messages);

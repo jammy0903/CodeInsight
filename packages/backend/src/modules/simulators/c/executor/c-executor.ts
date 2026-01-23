@@ -17,8 +17,8 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
 import * as crypto from 'crypto';
-import { config } from '../../../config';
-import type { ExecutionResult, IExecutor, JudgeResult } from '../types';
+import { config } from '../../../../config';
+import type { ExecutionResult, IExecutor, JudgeResult } from '../../../executors/types';
 import { checkCodeSecurity } from './security';
 
 const execAsync = promisify(exec);

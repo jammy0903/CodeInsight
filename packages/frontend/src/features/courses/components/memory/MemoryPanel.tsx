@@ -30,10 +30,16 @@ interface TextItem {
   address: string;
 }
 
+/** 변경된 블록 타입 */
+interface ChangedBlocksType {
+  stack: string[];
+  heap: string[];
+}
+
 interface MemoryPanelProps {
   stack: MemoryBlock[];
   heap: MemoryBlock[];
-  changedBlocks: string[];
+  changedBlocks: ChangedBlocksType; // Updated to use ChangedBlocksType
   /** 스택 프레임 정보 (함수별 구분용) */
   frames?: Array<{ name: string }>;
   /** RSP/RBP 레지스터 표시 */
@@ -457,7 +463,7 @@ function StackSection({
   registerBlock,
 }: {
   blocks: MemoryBlock[];
-  changedBlocks: string[];
+  changedBlocks: ChangedBlocksType;
   frames: Array<{ name: string }>;
   showRegisters: boolean;
   /** 블록 등록 함수 (포인터 화살표용) */
@@ -633,7 +639,7 @@ function StackSection({
                 const [arrayName, elements] = item.data as [string, MemoryBlock[]];
                 const frameName = blockFrameMap.get(elements[0].name) || 'main';
                 const frameColor = frameColorMap.get(frameName) || COLORS.frame[0];
-                const isChanged = elements.some((el) => changedBlocks.includes(el.name));
+                const isChanged = elements.some((el) => changedBlocks.stack.includes(el.name) || changedBlocks.heap.includes(el.name));
 
                 return (
                   <ArrayBlock
@@ -683,7 +689,7 @@ function StackSection({
                   <MemoryBlockCard
                     key={`stack-${block.name}-${block.address}`}
                     block={block}
-                    isChanged={changedBlocks.includes(block.name)}
+                    isChanged={changedBlocks.stack.includes(block.name) || changedBlocks.heap.includes(block.name)}
                     isHovered={isHovered}
                     frameColor={frameColor}
                     frameName={frameName}
@@ -853,7 +859,7 @@ function HeapSection({
   registerBlock,
 }: {
   blocks: MemoryBlock[];
-  changedBlocks: string[];
+  changedBlocks: ChangedBlocksType;
   /** 블록 등록 함수 (포인터 화살표용) */
   registerBlock?: (name: string, address: string, element: HTMLElement | null) => void;
 }) {
@@ -910,7 +916,7 @@ function HeapSection({
           <MemoryBlockCard
             key={`heap-${block.name}-${block.address}`}
             block={block}
-            isChanged={changedBlocks.includes(block.name)}
+            isChanged={changedBlocks.stack.includes(block.name) || changedBlocks.heap.includes(block.name)}
             isHovered={false}
             frameColor={COLORS.frame[2]} // green
             frameName="heap"
@@ -928,10 +934,12 @@ function HeapSection({
 // 메인 컴포넌트
 // ============================================================
 
+const INITIAL_CHANGED_BLOCKS: ChangedBlocksType = { stack: [], heap: [] };
+
 export function MemoryPanel({
   stack,
   heap,
-  changedBlocks,
+  changedBlocks = INITIAL_CHANGED_BLOCKS,
   frames = [{ name: 'main' }],
   showRegisters = true,
   dataSection = [],

@@ -14,6 +14,9 @@ import { analyticsRoutes } from './modules/analytics/routes';
 import { notesRoutes } from './modules/notes/routes';
 import { gamificationRoutes } from './modules/gamification';
 import adminRoutes from './modules/admin/admin.routes';
+import { userRoutes } from './modules/users/routes';
+import pythonSimulatorRoutes from './modules/simulators/python/routes';
+import { javaSimulatorRoutes } from './modules/simulators/java/routes';
 import { lessonContentLoader } from './services/lessonContentLoader';
 
 // Firebase Admin 초기화
@@ -49,12 +52,15 @@ app.get('/health', (req, res) => {
 // =============================================
 app.use('/api/v1/problems', rateLimit, problemRoutes);
 app.use('/api/v1/simulators/c', executeRateLimit, cSimulatorRoutes);
+app.use('/api/v1/simulators/python', executeRateLimit, pythonSimulatorRoutes);
+app.use('/api/v1/simulators/java', executeRateLimit, javaSimulatorRoutes);
 app.use('/api/v1/ai', aiRateLimit, aiRoutes);
 app.use('/api/v1/courses', rateLimit, courseRoutes);
 app.use('/api/v1/analytics', rateLimit, analyticsRoutes);
 app.use('/api/v1/notes', rateLimit, notesRoutes);
 app.use('/api/v1/gamification', rateLimit, gamificationRoutes);
 app.use('/api/v1/admin', rateLimit, adminRoutes);
+app.use('/api/v1/users', rateLimit, userRoutes);
 
 // =============================================
 // Legacy Routes (버전 없는 요청 → v1로 리다이렉트)
@@ -63,7 +69,7 @@ app.use('/api/problems', (req, res) => {
   res.redirect(301, `/api/v1/problems${req.path === '/' ? '' : req.path}`);
 });
 app.use('/api/memory', (req, res) => {
-  res.redirect(301, `/api/v1/memory${req.path === '/' ? '' : req.path}`);
+  res.redirect(301, `/api/v1/simulators/c/trace${req.path === '/' ? '' : req.path}`);
 });
 app.use('/api/submissions', (req, res) => {
   res.redirect(301, `/api/v1/submissions${req.path === '/' ? '' : req.path}`);

@@ -5,15 +5,16 @@ const router = Router();
 
 router.post('/simulate', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { sourceCode } = req.body;
+        const { code, sourceCode } = req.body;
+        const finalCode = code || sourceCode;
 
-        if (!sourceCode) {
-            return res.status(400).json({ message: 'sourceCode is required.' });
+        if (!finalCode) {
+            return res.status(400).json({ message: 'code is required.' });
         }
 
         // The service is now stateless, so we can create a new instance each time.
         const simulationService = new JavaSimulationService();
-        const result = await simulationService.simulate(sourceCode);
+        const result = await simulationService.simulate(finalCode);
 
         if (result.success) {
             res.json(result);

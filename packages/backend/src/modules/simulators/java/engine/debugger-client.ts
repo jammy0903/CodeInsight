@@ -54,15 +54,14 @@ export class DebuggerClient {
     if (child.killed) {
       throw new Error('Time Limit Exceeded (5s)');
     }
-    
-    // If the process exited with an error code...
+
+    // Prioritize stderr for error reporting, as the JVM might exit with code 0 even after an exception.
+    if (stderrData.trim()) {
+      throw new Error(`Runtime Error:\n${stderrData.trim()}`);
+    }
+
     if (exitCode !== 0) {
-      // ...but we didn't get any snapshots, it was a genuine runtime error before simulation began.
-      if (stdoutData.trim() === '') {
-        throw new Error(`Runtime Error (Exit Code ${exitCode}):\n${stderrData}`);
-      }
-      // ...and we DID get snapshots, it was likely the graceful disconnect crash.
-      // We can ignore the error and proceed to parse the valid snapshots we received.
+      throw new Error(`Runtime Error: Process exited with code ${exitCode}`);
     }
 
     if (stdoutData.trim() === '' && stderrData.trim() !== '') {

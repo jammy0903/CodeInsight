@@ -7,7 +7,6 @@
 
 import type { LessonStep } from '@/types';
 import type { StackRegisters } from '@/features/visualizers/c';
-import type { JavaSimulationResult } from '@/features/visualizers/java';
 
 export type SupportedLanguage = 'c' | 'python' | 'java' | 'javascript';
 
@@ -23,20 +22,35 @@ interface SimulateResult {
   error?: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+// Java 시뮬레이션 응답 타입
+interface JavaStep {
+  line: number;
+  event: string;
+  stack: any[];
+  // heap: any[]; // 백엔드 미구현
+  // events: any[]; // single event string
+}
+
+interface JavaSimulationResult {
+  success: boolean;
+  steps: JavaStep[];
+  error?: string;
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 /**
  * 지원 언어 체크
  */
 export function isLanguageSupported(language: string): boolean {
-  return ['c', 'python', 'java'].includes(language);
+  return ['c', 'python', 'java', 'javascript'].includes(language);
 }
 
 /**
  * C 시뮬레이션 (레거시 API)
  */
 async function simulateC(code: string): Promise<SimulateResult> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/memory/trace`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/simulators/c/trace`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),
@@ -63,7 +77,7 @@ async function simulateC(code: string): Promise<SimulateResult> {
  * Python 시뮬레이션
  */
 async function simulatePython(code: string): Promise<SimulateResult> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/simulators/python`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/simulators/python/simulate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),
@@ -91,43 +105,59 @@ async function simulatePython(code: string): Promise<SimulateResult> {
  * Java 결과를 LessonStep 형식으로 변환
  */
 async function simulateJava(code: string): Promise<SimulateResult> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/simulators/java`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code }),
-  });
+  console.log('[Simulator] Request:', `${API_BASE_URL}/api/v1/simulators/java/simulate`, { code });
 
-  const data: JavaSimulationResult = await response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/simulators/java/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
 
-  if (!data.success) {
+    if (!response.ok) {
+      throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data: JavaSimulationResult = await response.json();
+    console.log('[Simulator] Response:', data);
+
+    if (!data.success) {
+      return {
+        success: false,
+        steps: [],
+        error: data.error || 'Java simulation failed (Backend returned false)',
+      };
+    }
+
+    // Java Step을 LessonStep으로 변환
+    const lessonSteps: LessonStep[] = data.steps.map((javaStep) => ({
+      line: javaStep.line,
+      code: '',
+      explanation: `Line ${javaStep.line}`,
+
+      // Java 전용 데이터 (확장 필드)
+      javaStack: javaStep.stack || [],
+      javaHeap: [],
+      javaEvents: javaStep.event ? [{ type: javaStep.event }] : [],
+
+      // 기본 필드 (호환성)
+      stack: [],
+      heap: [],
+      data: [],
+    }));
+
+    return {
+      success: true,
+      steps: lessonSteps,
+    };
+  } catch (e: any) {
+    console.error('[Simulator] Error:', e);
     return {
       success: false,
       steps: [],
-      error: data.error || 'Java simulation failed',
+      error: e.message || 'Unknown Network Error',
     };
   }
-
-  // Java Step을 LessonStep으로 변환
-  const lessonSteps: LessonStep[] = data.steps.map((javaStep) => ({
-    line: javaStep.lineNumber,
-    code: javaStep.code,
-    explanation: javaStep.explanation,
-
-    // Java 전용 데이터 (확장 필드)
-    javaStack: javaStep.stack,
-    javaHeap: javaStep.heap,
-    javaEvents: javaStep.events,
-
-    // 기본 필드 (호환성)
-    stack: [],
-    heap: [],
-    data: [],
-  }));
-
-  return {
-    success: true,
-    steps: lessonSteps,
-  };
 }
 
 /**

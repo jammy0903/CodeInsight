@@ -1,14 +1,15 @@
-# 시각화 미작동 원인 분석 및 해결
+## 📊 시뮬레이터 실시간 작동 현황 (Current Status)
 
-## ✅ 해결 완료!
-
-### 작동하는 언어
-- ✅ Python - `/api/v1/simulators/python`
-- ✅ JavaScript - `/api/v1/simulators/javascript/execute`
-- ✅ **Java - `/api/v1/simulators/java/simulate` (수정 완료)**
-- ✅ C - `/api/memory/trace`
+| 언어 | 백엔드 API | 상태 | 발견된 문제점 |
+|------|------------|------|---------------|
+| **Python** | `/api/v1/simulators/python` | ✅ 시뮬레이션 작동 | - |
+| **Java** | `/api/v1/simulators/java/simulate` | ⚠️ **연결 필요** | `app.ts`에 라우트 등록 누락, 프론트-백 간 필드명(`steps` vs `snapshots`) 불일치 가능성 |
+| **C** | `/api/v1/simulators/c/trace` | ⚠️ **경로 불일치** | 프론트엔드가 레거시 경로(`/api/memory/trace`)를 호출 중 |
+| **JavaScript**| `/api/v1/simulators/javascript/execute`| ✅ 시뮬레이션 작동 | - |
 
 ---
+
+## 🔍 시급한 해결 과제
 
 ## 🔍 발견된 문제점 및 해결
 

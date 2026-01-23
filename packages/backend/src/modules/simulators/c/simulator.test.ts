@@ -212,9 +212,8 @@ int main() {
 
     it('에러 처리 - 빈 코드', () => {
       const result = simulateCode('');
-
-      expect(result.success).toBe(true);
-      expect(result.steps).toHaveLength(0);
+      expect(result.success).toBe(false);
+      expect(result.message).toBeTruthy();
     });
   });
 });
