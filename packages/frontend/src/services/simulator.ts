@@ -171,6 +171,7 @@ function pythonSimulator(pySteps: PyStep[]): LessonStep[] {
     // Python 시각화 데이터 (Names-Objects 모델)
     pyNames: step.names,
     pyObjects: step.objects,
+    visualizationType: 'python',
   }));
 }
 
@@ -187,6 +188,7 @@ function javaSimulator(javaSteps: any[]): LessonStep[] {
       stack: snapshot.stack || [],
       heap: snapshot.heap || [],
     },
+    visualizationType: 'java',
     stdout: snapshot.stdout,
   }));
 }
@@ -272,7 +274,7 @@ export const simulatorService = {
    */
   async simulatePython(request: SimulateRequest): Promise<SimulateResult> {
     try {
-      const response = await api.post<PySimulateResult>('/simulators/python', {
+      const response = await api.post<PySimulateResult>('/simulators/python/simulate', {
         code: request.code,
       });
 
