@@ -162,7 +162,7 @@ export const simulatorService = {
       }
 
       // C 언어: 메모리 트레이스 API 사용
-      const response = await api.post<BackendTraceResponse>('/memory/trace', {
+      const response = await api.post<BackendTraceResponse>('/simulators/c/trace', {
         code: request.code,
       });
 
@@ -371,7 +371,7 @@ export const simulatorService = {
     }
 
     try {
-      const response = await api.post('/c/run', {
+      const response = await api.post('/simulators/c/run', {
         code: request.code,
       });
 
