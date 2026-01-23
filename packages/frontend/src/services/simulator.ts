@@ -63,6 +63,14 @@ interface SimulateRequest {
   code: string;
 }
 
+// Java 시뮬레이션 응답 타입
+interface JavaSimulateResponse {
+  success: boolean;
+  snapshots?: any[]; // 백엔드가 snapshots로 반환
+  error?: string;
+  message?: string;
+}
+
 // 백엔드 응답 타입 (실제 API 응답 구조)
 interface BackendMemoryBlock {
   name: string;
@@ -112,14 +120,19 @@ interface SimulateResult {
 
 /**
  * 언어별 지원 여부 확인
- * MVP: C, Python 지원
+ * 지원: C, Python, JavaScript, Java
  */
-export function isLanguageSupported(language: string): boolean: boolean {
-  return language === 'c' || language === 'python' || language === 'javascript';
+export function isLanguageSupported(language: string): boolean {
+  return language === 'c'
+    || language === 'python'
+    || language === 'javascript'
+    || language === 'java';
 }
 
-// ... inside simulatorService ...
-
+/**
+ * Simulator Service - 코드 시뮬레이션 통합 서비스
+ */
+export const simulatorService = {
   async simulate(
     language: string,
     request: SimulateRequest
@@ -137,10 +150,15 @@ export function isLanguageSupported(language: string): boolean: boolean {
       if (language === 'python') {
         return this.simulatePython(request);
       }
-      
+
       // JavaScript 언어
       if (language === 'javascript') {
         return this.simulateJavaScript(request);
+      }
+
+      // Java 언어
+      if (language === 'java') {
+        return this.simulateJava(request);
       }
 
       // C 언어: 메모리 트레이스 API 사용
@@ -270,6 +288,56 @@ export function isLanguageSupported(language: string): boolean: boolean {
         success: false,
         steps: [],
         error: data.error || 'JavaScript simulation failed',
+      };
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return {
+          success: false,
+          steps: [],
+          error: error.response?.data?.error || error.message,
+        };
+      }
+
+      return {
+        success: false,
+        steps: [],
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  },
+
+  /**
+   * Java 시뮬레이션
+   */
+  async simulateJava(request: SimulateRequest): Promise<SimulateResult> {
+    try {
+      const response = await api.post<JavaSimulateResponse>('/simulators/java/simulate', {
+        sourceCode: request.code, // 백엔드가 기대하는 파라미터명
+      });
+
+      const data = response.data;
+
+      if (data.success && data.snapshots) {
+        // 백엔드가 snapshots로 반환함
+        // Java 스냅샷을 LessonStep 형식으로 변환
+        const lessonSteps: LessonStep[] = data.snapshots.map((snapshot: any) => ({
+          line: snapshot.lineNumber || 0,
+          code: snapshot.code || '',
+          explanation: snapshot.explanation || '',
+          // Java 시각화 데이터
+          javaSnapshot: snapshot, // 전체 스냅샷 데이터 보존
+        }));
+
+        return {
+          success: true,
+          steps: lessonSteps,
+        };
+      }
+
+      return {
+        success: false,
+        steps: [],
+        error: data.error || data.message || 'Java simulation failed',
       };
     } catch (error) {
       if (error instanceof AxiosError) {

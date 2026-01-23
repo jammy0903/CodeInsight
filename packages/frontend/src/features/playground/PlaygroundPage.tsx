@@ -19,8 +19,7 @@ import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/pl
 import { useExplanationStore } from './stores/explanationStore';
 import { PyVisualizerView } from '@/features/visualizers/python';
 import { JavaMemoryView } from '@/features/visualizers/java';
-import { JSMemoryFlowView } from '@/features/js-visualizer/components/JSMemoryFlowView';
-import { useJsToFlow } from '@/features/js-visualizer/hooks/useJsToFlow';
+import { JSVisualizerView } from '@/features/visualizers/js';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
@@ -170,12 +169,10 @@ export function PlaygroundPage() {
   }, [steps, code, startPrefetch, stopPrefetch]);
 
   // Use useLessonVisualization hook (unified Lesson and Playground)
-  const { memoryState, changedBlocks } = useLessonVisualization(
+  const { memoryState, changedBlocks, visualizationType, visualizationState } = useLessonVisualization(
     steps as LessonStep[],
     currentStepIndex
   );
-
-  const { nodes: jsNodes, edges: jsEdges } = useJsToFlow(steps, currentStepIndex);
 
   // 모바일 레이아웃: PanelGroup 없이 단순 스택
   if (isMobile) {
@@ -355,7 +352,7 @@ export function PlaygroundPage() {
                   theme={currentTheme}
                 />
               ) : language === 'javascript' && hasSteps ? (
-                <JSMemoryFlowView nodes={jsNodes} edges={jsEdges} />
+                <JSVisualizerView state={visualizationState} type={visualizationType} />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
                   Run 버튼을 눌러 실행
@@ -627,7 +624,7 @@ export function PlaygroundPage() {
                   theme={currentTheme}
                 />
               ) : language === 'javascript' && hasSteps ? (
-                <JSMemoryFlowView nodes={jsNodes} edges={jsEdges} />
+                <JSVisualizerView state={visualizationState} type={visualizationType} />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
                   Click Run button to execute code

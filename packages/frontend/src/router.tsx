@@ -10,7 +10,7 @@ import { HomePage } from './features/home';
 import { AuthPage } from './features/auth';
 import { CoursesPage, LanguageCoursePage, ChapterLessonsPage, LessonPage } from './features/courses';
 import { PlaygroundPage } from './features/playground';
-import { JSVisualizerPage } from './features/js-visualizer/JSVisualizerPage';
+import { JSVisualizerPage } from './features/visualizers/js/JSVisualizerPage';
 import { AdminPage, AdminRoute } from './features/admin';
 import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage } from './features/quiz';
 import { ProfilePage } from './features/profile';
@@ -71,7 +71,7 @@ export const router = createBrowserRouter([
       { path: 'courses/:lang/:chapterId', element: <ChapterLessonsPage /> },
       { path: 'courses/:lang/:chapterId/:lessonId', element: <LessonPage /> },
       { path: 'playground', element: <PlaygroundPage /> },
-      { path: 'js-visualizer', element: <JSVisualizerPage /> },
+      { path: 'visualizers/js', element: <JSVisualizerPage /> },
       { path: 'quiz', element: <ProtectedRoute><QuizPage /></ProtectedRoute> },
       { path: 'quiz/ox/:lang', element: <ProtectedRoute><OXQuizPage /></ProtectedRoute> },
       { path: 'quiz/multiple-choice/:lang', element: <ProtectedRoute><MultipleChoiceQuizPage /></ProtectedRoute> },

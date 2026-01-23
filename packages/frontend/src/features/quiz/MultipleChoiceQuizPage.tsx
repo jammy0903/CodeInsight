@@ -8,8 +8,10 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ListChecks, Check, X, RotateCcw, BookOpen, ChevronRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Timer } from './components/Timer';
+import { useStore } from '@/stores/store'; // useStore import 추가
+import type { SupportedLanguage } from '@/types'; // SupportedLanguage import 추가
 
 // 언어별 정보
 const LANGUAGE_INFO: Record<string, { name: string; icon: string; color: string }> = {
@@ -188,6 +190,16 @@ export function MultipleChoiceQuizPage() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
+
+  const { setPageTitle } = useStore(); // useStore 훅 사용
+
+  useEffect(() => {
+    setPageTitle(
+      `${langInfo.name} 객관식 퀴즈`,
+      '4개 중 정답을 골라보세요',
+      lang as SupportedLanguage
+    );
+  }, [setPageTitle, langInfo.name, lang]);
 
   const currentQuiz = selectedChapter?.quizzes[currentIndex];
   const totalQuizzes = selectedChapter?.quizzes.length || 0;

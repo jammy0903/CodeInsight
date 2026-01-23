@@ -9,10 +9,28 @@ import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
 import { StreakCard, useStreak } from '@/features/gamification';
 import { LanguageBadge } from '@/components/ui/LanguageBadge';
+import { useIsMobile } from '@/hooks'; // useIsMobile import
+import type { SupportedLanguage } from '@/types'; // SupportedLanguage import
+
+// 언어 정보 (LanguageCoursePage.tsx에서 가져옴)
+const getLanguageInfo = (lang: SupportedLanguage | null) => {
+  if (!lang) return null;
+  switch (lang) {
+    case 'c': return { name: 'C언어', icon: 'C', color: '#0077B6' };
+    case 'python': return { name: 'Python', icon: '🐍', color: '#FFD54F' };
+    case 'java': return { name: 'Java', icon: '☕', color: '#EC4899' };
+    case 'javascript': return { name: 'JavaScript', icon: '⚡', color: '#81C784' };
+    case 'python-practical': return { name: 'Python실용', icon: '🤖', color: '#9E9E9E' };
+    default: return { name: lang.toUpperCase(), icon: '📚', color: '#FFD700' };
+  }
+};
 
 export function TopBar() {
   const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle, pageLanguage, appUser } = useStore();
   const { streak, loading: streakLoading } = useStreak();
+  const isMobile = useIsMobile(); // isMobile 훅 사용
+
+  const langInfo = pageLanguage ? getLanguageInfo(pageLanguage) : null;
 
   return (
     <header
@@ -73,17 +91,34 @@ export function TopBar() {
 
         {/* Center: 페이지 제목 (정중앙) */}
         {pageTitle && (
-          <div className="flex-1 flex flex-col items-center justify-center px-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
-                {pageTitle}
-              </h2>
-              {pageLanguage && <LanguageBadge language={pageLanguage} />}
-            </div>
-            {pageSubtitle && (
-              <p className="text-xs" style={{ color: 'var(--theme-layout-top-bar-text-muted)' }}>
-                {pageSubtitle}
-              </p>
+          <div className="flex-1 flex flex-col items-center justify-center px-4 overflow-hidden">
+            {isMobile && langInfo ? (
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-lg"
+                  style={{ color: langInfo.color }}
+                >
+                  {langInfo.icon}
+                </span>
+                <h2 className="text-base font-bold text-ellipsis whitespace-nowrap overflow-hidden" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
+                  {pageTitle}
+                </h2>
+              </div>
+            ) : (
+              // 데스크톱 또는 모바일인데 언어 정보가 없거나, 언어 정보가 필요 없는 페이지
+              <>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
+                    {pageTitle}
+                  </h2>
+                  {pageLanguage && <LanguageBadge language={pageLanguage} />}
+                </div>
+                {pageSubtitle && (
+                  <p className="text-xs text-ellipsis whitespace-nowrap overflow-hidden" style={{ color: 'var(--theme-layout-top-bar-text-muted)' }}>
+                    {pageSubtitle}
+                  </p>
+                )}
+              </>
             )}
           </div>
         )}
