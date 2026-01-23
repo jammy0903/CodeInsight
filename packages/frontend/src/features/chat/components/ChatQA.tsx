@@ -18,7 +18,38 @@ import { useStore } from '@/stores/store'; // useStore import 추가
 
 // 테마별 채팅 색상 (zinc + cyan 팔레트)
 const chatColors = {
-  // ...
+  light: {
+    headerBorder: '#e5e7eb',
+    headerText: '#374151',
+    inputBg: '#ffffff',
+    inputBorder: '#d1d5db',
+    inputText: '#111827',
+    mutedText: '#6b7280',
+    userBubbleBg: '#eff6ff',
+    userBubbleBorder: '#dbeafe',
+    userBubbleText: '#1e40af',
+    aiBubbleBg: '#f9fafb',
+    aiBubbleBorder: '#f3f4f6',
+    aiBubbleText: '#111827',
+    badgeAiBg: '#f3f4f6',
+    badgeAiText: '#374151',
+  },
+  dark: {
+    headerBorder: '#374151',
+    headerText: '#f3f4f6',
+    inputBg: '#1f2937',
+    inputBorder: '#374151',
+    inputText: '#f9fafb',
+    mutedText: '#9ca3af',
+    userBubbleBg: '#1e3a8a',
+    userBubbleBorder: '#1e40af',
+    userBubbleText: '#dbeafe',
+    aiBubbleBg: '#374151',
+    aiBubbleBorder: '#4b5563',
+    aiBubbleText: '#f9fafb',
+    badgeAiBg: '#4b5563',
+    badgeAiText: '#f3f4f6',
+  },
 };
 
 interface ChatQAProps {
@@ -152,7 +183,7 @@ export function ChatQA({
 // 빈 상태
 function EmptyState() {
   const currentTheme = useThemeStore((s) => s.theme);
-  const colors = chatColors[currentTheme];
+  const colors = chatColors[currentTheme] || chatColors.dark;
 
   return (
     <div className="h-full flex items-center justify-center py-8">
@@ -180,7 +211,7 @@ function MessageBubble({
 }) {
   const isUser = message.role === 'user';
   const currentTheme = useThemeStore((s) => s.theme);
-  const colors = chatColors[currentTheme];
+  const colors = chatColors[currentTheme] || chatColors.dark;
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -218,7 +249,7 @@ function MessageBubble({
 // 스트리밍 메시지 (실시간 응답)
 function StreamingMessage({ content }: { content: string }) {
   const currentTheme = useThemeStore((s) => s.theme);
-  const colors = chatColors[currentTheme];
+  const colors = chatColors[currentTheme] || chatColors.dark;
 
   return (
     <div className="flex justify-start">
@@ -262,7 +293,7 @@ function StreamingMessage({ content }: { content: string }) {
 // 로딩 인디케이터
 function LoadingIndicator() {
   const currentTheme = useThemeStore((s) => s.theme);
-  const colors = chatColors[currentTheme];
+  const colors = chatColors[currentTheme] || chatColors.dark;
 
   return (
     <div className="flex justify-start">
@@ -316,7 +347,7 @@ function LoadingIndicator() {
 function ExpiryCountdown({ expiresAt }: { expiresAt: number }) {
   const [remaining, setRemaining] = useState('');
   const currentTheme = useThemeStore((s) => s.theme);
-  const colors = chatColors[currentTheme];
+  const colors = chatColors[currentTheme] || chatColors.dark;
 
   useEffect(() => {
     const updateRemaining = () => {

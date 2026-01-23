@@ -3,6 +3,6 @@ import * as controller from './controller';
 
 const router = Router();
 
-router.post('/execute', controller.execute);
+router.post('/simulate', controller.execute);
 
 export default router;

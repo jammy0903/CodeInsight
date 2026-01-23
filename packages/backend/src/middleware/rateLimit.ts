@@ -111,16 +111,16 @@ export const authRateLimit = createRateLimiter({
   message: 'Too many authentication attempts. Please wait.',
 });
 
-/** AI API용 (비용 고려, 20 req/min) - Ollama/외부 API 비용 */
+/** AI API용 (비용 고려, 50 req/min) - Ollama/외부 API 비용 */
 export const aiRateLimit = createRateLimiter({
   windowMs: 60 * 1000,
-  maxRequests: 20,
+  maxRequests: 50,
   message: 'AI request limit reached. Please wait.',
 });
 
-/** 코드 실행용 (리소스 보호, 30 req/min) - Docker 컨테이너 부하 */
+/** 코드 실행용 (리소스 보호, 100 req/min) - Docker 컨테이너 부하 */
 export const executeRateLimit = createRateLimiter({
   windowMs: 60 * 1000,
-  maxRequests: 30,
+  maxRequests: 100, // 개발 편의를 위해 완화 (원래 30)
   message: 'Code execution limit reached. Please wait.',
 });

@@ -34,9 +34,21 @@ export class JavaSimulationService {
             // 3. Run the debugger agent and get all snapshot steps.
             const snapshots = await this.debuggerClient.run(projectPath, mainClassName);
 
+            // 4. Adjust line numbers if code was wrapped
+            // FileManager adds 5 lines of wrapper when wrapping user code:
+            // Line 1: empty, Line 2: imports, Line 3: empty, Line 4: class Main {, Line 5: main method
+            const needsWrapper = !sourceCode.includes('class Main');
+            const LINE_OFFSET = needsWrapper ? 5 : 0;
+
+            const adjustedSnapshots = snapshots.map((snapshot: any) => ({
+                ...snapshot,
+                line: snapshot.line ? Math.max(1, snapshot.line - LINE_OFFSET) : snapshot.line,
+                lineNumber: snapshot.lineNumber ? Math.max(1, snapshot.lineNumber - LINE_OFFSET) : snapshot.lineNumber,
+            }));
+
             return {
                 success: true,
-                steps: snapshots,
+                steps: adjustedSnapshots,
             };
 
         } catch (error: any) {

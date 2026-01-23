@@ -13,5 +13,8 @@ export { LessonCodeEditor } from './day/LessonCodeEditor'; // Monaco 기반 읽�
 export { StepExplanation } from './day/StepExplanation';
 export { SelectedCodeBadge } from './day/SelectedCodeBadge';
 
+// Navigation Components
+export { StepNavigationArrows } from './StepNavigationArrows';
+
 // Memory Components
 export { MemoryPanel } from './memory/MemoryPanel';
