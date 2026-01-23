@@ -17,6 +17,7 @@ import adminRoutes from './modules/admin/admin.routes';
 import { userRoutes } from './modules/users/routes';
 import pythonSimulatorRoutes from './modules/simulators/python/routes';
 import { javaSimulatorRoutes } from './modules/simulators/java/routes';
+import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
 import { lessonContentLoader } from './services/lessonContentLoader';
 
 // Firebase Admin 초기화
@@ -54,6 +55,7 @@ app.use('/api/v1/problems', rateLimit, problemRoutes);
 app.use('/api/v1/simulators/c', executeRateLimit, cSimulatorRoutes);
 app.use('/api/v1/simulators/python', executeRateLimit, pythonSimulatorRoutes);
 app.use('/api/v1/simulators/java', executeRateLimit, javaSimulatorRoutes);
+app.use('/api/v1/simulators/javascript', executeRateLimit, javascriptSimulatorRoutes);
 app.use('/api/v1/ai', aiRateLimit, aiRoutes);
 app.use('/api/v1/courses', rateLimit, courseRoutes);
 app.use('/api/v1/analytics', rateLimit, analyticsRoutes);

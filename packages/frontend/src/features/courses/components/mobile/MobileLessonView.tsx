@@ -12,10 +12,13 @@ import { motion } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import { Code2, Cpu, GitBranch, Play, ChevronUp, ChevronDown } from 'lucide-react';
 import { useStepGestures } from '../../hooks/useStepGestures';
+import { useLessonVisualization } from '../../hooks/useLessonVisualization';
 import { LessonCodeEditor } from '../day/LessonCodeEditor';
 import { MemoryPanel } from '../memory/MemoryPanel';
 import { FlowViewer } from '../python/FlowViewer';
 import { PyVisualizerView } from '@/features/visualizers/python';
+import { JSVisualizerView } from '@/features/visualizers/js';
+import { JavaReferenceView } from '@/features/visualizers/java';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { MobileAIChatFAB } from './MobileAIChatFAB';
 import { MobileAIChatModal } from './MobileAIChatModal';
@@ -33,31 +36,6 @@ interface MobileLessonViewProps {
   onPrevStep: () => void;
   onNextStep: () => void;
   onQuiz?: () => void;
-  // 메모리 시각화용
-  memoryState?: {
-    stack: Array<{
-      name: string;
-      variables: Array<{
-        name: string;
-        value: string | number;
-        address?: string;
-        type?: string;
-        highlight?: boolean;
-      }>;
-    }>;
-    heap: Array<{
-      id: string;
-      type: string;
-      value?: string | number;
-      address?: string;
-      highlight?: boolean;
-    }>;
-    frames?: Array<{
-      name: string;
-      startIndex: number;
-      endIndex: number;
-    }>;
-  };
   showRegisters?: boolean;
 }
 
@@ -111,18 +89,25 @@ export function MobileLessonView({
   onPrevStep,
   onNextStep,
   onQuiz,
-  memoryState,
   showRegisters,
 }: MobileLessonViewProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
-  const [visualTab, setVisualTab] = useState<'flow' | 'memory'>('flow');
+  const [visualTab, setVisualTab] = useState<'flow' | 'memory'>(
+    (languageId === 'python' || languageId === 'py' || languageId === 'javascript' || languageId === 'js') ? 'memory' : 'flow'
+  );
   const [isExplanationCollapsed, setIsExplanationCollapsed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[currentStepIndex];
   const config = getLanguageConfig(languageId);
   const isLastStep = currentStepIndex >= steps.length - 1;
+
+  // 데스크톱과 동일한 시각화 훅 사용
+  const { memoryState, changedBlocks, visualizationType, visualizationState } = useLessonVisualization(
+    steps,
+    currentStepIndex
+  );
 
   // 스텝 제스처 (키보드 ← →, 탭/클릭)
   const { handleTapArea } = useStepGestures({
@@ -216,45 +201,58 @@ export function MobileLessonView({
     </div>
   );
 
-  // 시각화 컴포넌트 렌더링
+  // 시각화 컴포넌트 렌더링 (데스크톱과 동일한 로직)
   const renderVisualization = () => {
-    // Python 메모리 시각화 (pythonMemoryState가 있으면 우선 처리)
-    const pyState = currentStep?.pythonMemoryState;
-    if (pyState && pyState.names && pyState.objects) {
+    // JavaScript 시각화
+    if ((languageId === 'javascript' || languageId === 'js') && visualizationType === 'javascript') {
+      return (
+        <JSVisualizerView
+          type={visualizationType as any}
+          state={visualizationState}
+        />
+      );
+    }
+
+    // Python 시각화
+    if ((languageId === 'python' || languageId === 'py') && visualizationType === 'python') {
       return (
         <PyVisualizerView
-          names={pyState.names}
-          objects={pyState.objects}
+          names={(visualizationState as any)?.names || []}
+          objects={(visualizationState as any)?.objects || []}
           animate={true}
           compact={true}
         />
       );
     }
 
-    // Python 플로우 시각화
-    if (config.visualType === 'flow') {
-      return <FlowViewer steps={steps} currentStepIndex={currentStepIndex} />;
-    }
-
-    // 메모리 시각화 (C, Java, JS 등)
-    const hasMemoryData = memoryState && (memoryState.stack.length > 0 || memoryState.heap.length > 0);
-
-    if (!hasMemoryData) {
+    // Java Flow 시각화
+    if (languageId === 'java' && visualTab === 'flow') {
       return (
-        <div className="flex items-center justify-center h-full min-h-[150px] text-sm" style={{ color: 'var(--theme-lesson-tab-inactive-text)' }}>
-          이 스텝에서는 메모리 변화가 없습니다
-        </div>
+        <JavaReferenceView
+          stack={visualizationState?.stack}
+          heap={visualizationState?.heap}
+        />
       );
     }
 
+    // 일반 메모리 시각화 (C, Java Memory 탭 등)
+    if (memoryState) {
+      return (
+        <MemoryPanel
+          stack={memoryState.stack}
+          heap={memoryState.heap}
+          changedBlocks={changedBlocks}
+          showRegisters={showRegisters}
+          frames={memoryState.frames}
+        />
+      );
+    }
+
+    // 데이터 없음
     return (
-      <MemoryPanel
-        stack={memoryState.stack}
-        heap={memoryState.heap}
-        changedBlocks={[]}
-        showRegisters={showRegisters}
-        frames={memoryState.frames}
-      />
+      <div className="flex items-center justify-center h-full min-h-[150px] text-sm" style={{ color: 'var(--theme-lesson-tab-inactive-text)' }}>
+        이 스텝에서는 시각화 데이터가 없습니다
+      </div>
     );
   };
 
@@ -324,36 +322,36 @@ export function MobileLessonView({
               {/* 탭 헤더 */}
               <div className="flex border-b border-b-[var(--theme-lesson-panel-border)]">
                 {/* Flow 탭 */}
-                <button
-                  onClick={() => setVisualTab('flow')}
-                  className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-colors ${
-                    visualTab === 'flow'
+                {(languageId !== 'python' && languageId !== 'py' && languageId !== 'javascript' && languageId !== 'js') && (
+                  <button
+                    onClick={() => setVisualTab('flow')}
+                    className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-colors ${visualTab === 'flow'
                       ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
                       : ''
-                  }`}
-                  style={visualTab !== 'flow' ? {
-                    backgroundColor: 'var(--theme-lesson-tab-inactive-bg)',
-                    color: 'var(--theme-lesson-tab-inactive-text)'
-                  } : {}}
-                >
-                  <Play className="w-3 h-3" />
-                  Flow
-                </button>
+                      }`}
+                    style={visualTab !== 'flow' ? {
+                      backgroundColor: 'var(--theme-lesson-tab-inactive-bg)',
+                      color: 'var(--theme-lesson-tab-inactive-text)'
+                    } : {}}
+                  >
+                    <Play className="w-3 h-3" />
+                    Flow
+                  </button>
+                )}
                 {/* Memory 탭 */}
                 <button
                   onClick={() => setVisualTab('memory')}
-                  className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-colors ${
-                    visualTab === 'memory'
-                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
-                      : ''
-                  }`}
+                  className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-colors ${visualTab === 'memory'
+                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
+                    : ''
+                    }`}
                   style={visualTab !== 'memory' ? {
                     backgroundColor: 'var(--theme-lesson-tab-inactive-bg)',
                     color: 'var(--theme-lesson-tab-inactive-text)'
                   } : {}}
                 >
                   <Cpu className="w-3 h-3" />
-                  메모리
+                  {(languageId === 'javascript' || languageId === 'js' || languageId === 'python' || languageId === 'py') ? '시각화' : '메모리'}
                 </button>
               </div>
 
@@ -367,7 +365,11 @@ export function MobileLessonView({
                     language={languageId as 'c' | 'python' | 'java'}
                     fullCode={code}
                     theme="light"
-                    memoryState={memoryState}
+                    memoryState={memoryState ? {
+                      stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
+                      heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' })),
+                      frames: memoryState.frames.map(f => ({ ...f, name: f.name || '?' }))
+                    } : undefined}
                     stdout={currentStep?.stdout}
                   />
                 ) : (
@@ -385,9 +387,8 @@ export function MobileLessonView({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setCurrentPage(0)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              currentPage === 0 ? 'w-4' : ''
-            }`}
+            className={`w-2 h-2 rounded-full transition-all ${currentPage === 0 ? 'w-4' : ''
+              }`}
             style={{
               backgroundColor: currentPage === 0
                 ? 'var(--theme-explanation-text)'
@@ -397,9 +398,8 @@ export function MobileLessonView({
           />
           <button
             onClick={() => setCurrentPage(1)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              currentPage === 1 ? 'w-4' : ''
-            }`}
+            className={`w-2 h-2 rounded-full transition-all ${currentPage === 1 ? 'w-4' : ''
+              }`}
             style={{
               backgroundColor: currentPage === 1
                 ? 'var(--theme-explanation-text)'

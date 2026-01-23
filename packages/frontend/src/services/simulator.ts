@@ -123,10 +123,11 @@ interface SimulateResult {
  * 지원: C, Python, JavaScript, Java
  */
 export function isLanguageSupported(language: string): boolean {
-  return language === 'c'
-    || language === 'python'
-    || language === 'javascript'
-    || language === 'java';
+  const lang = language.toLowerCase();
+  return lang === 'c'
+    || lang === 'python' || lang === 'py'
+    || lang === 'javascript' || lang === 'js'
+    || lang === 'java';
 }
 
 /**
@@ -201,7 +202,9 @@ export const simulatorService = {
     language: string,
     request: SimulateRequest
   ): Promise<SimulateResult> {
-    if (!isLanguageSupported(language)) {
+    const lang = language.toLowerCase();
+
+    if (!isLanguageSupported(lang)) {
       return {
         success: false,
         steps: [],
@@ -211,45 +214,53 @@ export const simulatorService = {
 
     try {
       // Python 언어
-      if (language === 'python') {
+      if (lang === 'python' || lang === 'py') {
         return this.simulatePython(request);
       }
 
       // JavaScript 언어
-      if (language === 'javascript') {
+      if (lang === 'javascript' || lang === 'js') {
         return this.simulateJavaScript(request);
       }
 
       // Java 언어
-      if (language === 'java') {
+      if (lang === 'java') {
         return this.simulateJava(request);
       }
 
       // C 언어: 메모리 트레이스 API 사용
-      const response = await api.post<BackendTraceResponse>('/simulators/c/trace', {
-        code: request.code,
-      });
+      if (lang === 'c') {
+        const response = await api.post<BackendTraceResponse>('/simulators/c/trace', {
+          code: request.code,
+        });
 
-      const data = response.data;
+        const data = response.data;
 
-      if (data.success && data.steps) {
-        // 각 스텝별 레지스터 추출
-        const stepRegisters = data.steps.map((step) => ({
-          rsp: step.rsp,
-          rbp: step.rbp,
-        }));
+        if (data.success && data.steps) {
+          // 각 스텝별 레지스터 추출
+          const stepRegisters = data.steps.map((step) => ({
+            rsp: step.rsp,
+            rbp: step.rbp,
+          }));
+
+          return {
+            success: true,
+            steps: cSimulator(data.steps),
+            stepRegisters,
+          };
+        }
 
         return {
-          success: true,
-          steps: cSimulator(data.steps),
-          stepRegisters,
+          success: false,
+          steps: [],
+          error: data.error || data.message || 'Simulation failed',
         };
       }
 
       return {
         success: false,
         steps: [],
-        error: data.error || data.message || 'Simulation failed',
+        error: 'Unsupported language for simulation',
       };
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -314,21 +325,22 @@ export const simulatorService = {
    */
   async simulateJavaScript(request: SimulateRequest): Promise<SimulateResult> {
     try {
-      const response = await api.post<any>('/simulators/javascript/execute', { // Adjust 'any' to a specific type later
+      const response = await api.post<any>('/simulators/javascript/simulate', {
         code: request.code,
       });
 
       const data = response.data;
 
-      if (data.steps) {
-        // The backend already returns data in a format that's mostly compatible.
-        // We just need to ensure it fits the LessonStep[] structure.
+      if (data.success && data.steps) {
         const lessonSteps: LessonStep[] = data.steps.map((step: any) => ({
           line: step.line,
           code: step.code,
           explanation: step.explanation,
           stack: step.stack,
           heap: step.heap,
+          stdout: step.stdout,
+          visualizationType: 'javascript',
+          visualizationState: step.visualizationState,
         }));
 
         return {
@@ -365,12 +377,11 @@ export const simulatorService = {
   async simulateJava(request: SimulateRequest): Promise<SimulateResult> {
     try {
       const response = await api.post<JavaSimulateResponse>('/simulators/java/simulate', {
-        sourceCode: request.code, // 백엔드가 기대하는 파라미터명
+        sourceCode: request.code,
       });
 
       const data = response.data;
 
-      // 백엔드는 'steps' 필드로 반환함 (java-simulation.service.ts 확인됨)
       if (data.success && (data as any).steps) {
         return {
           success: true,
@@ -407,7 +418,8 @@ export const simulatorService = {
     language: string,
     request: SimulateRequest
   ): Promise<{ success: boolean; output?: string; error?: string }> {
-    if (language !== 'c') {
+    const lang = language.toLowerCase();
+    if (lang !== 'c') {
       return {
         success: false,
         error: `${language.toUpperCase()} 실행은 아직 지원되지 않습니다`,
@@ -415,7 +427,7 @@ export const simulatorService = {
     }
 
     try {
-      const response = await api.post('/simulators/c/run', {
+      const response = await api.post('/simulators/c/simulate', {
         code: request.code,
       });
 

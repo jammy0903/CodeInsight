@@ -5,6 +5,7 @@
  */
 
 import { CallStackView } from '../shared/components/CallStackView';
+import { ScopeChainView } from '../shared/components/ScopeChainView';
 import { EventLoopView } from './components/EventLoopView';
 import type { JSVisualizerViewProps, JSVisualizationState } from './types';
 import type { CallStackState, ScopeChainState } from '../shared/types';
@@ -35,6 +36,12 @@ function isCallStackState(
   return state.type === 'callStack';
 }
 
+function isScopeChainState(
+  state: JSVisualizationState
+): state is { type: 'scopeChain'; data: ScopeChainState } {
+  return state.type === 'scopeChain';
+}
+
 function isEventLoopState(
   state: JSVisualizationState
 ): state is { type: 'eventLoop'; data: import('./types').EventLoopState } {
@@ -54,9 +61,13 @@ export function JSVisualizerView({ type, state }: JSVisualizerViewProps) {
       }
       break;
 
-    // TODO: ScopeChain 공통 컴포넌트 추가 후 활성화
-    // case 'scopeChain':
-    //   return <ScopeChainView state={state.data} />;
+    // JavaScript 기본 시각화 (scopeChain)
+    case 'javascript':
+    case 'scopeChain':
+      if (isScopeChainState(state)) {
+        return <ScopeChainView state={state.data} />;
+      }
+      return <NotImplementedView type="Scope Chain" />;
 
     // JS 전용 컴포넌트
     case 'eventLoop':
@@ -66,9 +77,6 @@ export function JSVisualizerView({ type, state }: JSVisualizerViewProps) {
       break;
 
     // 미구현 시각화들
-    case 'scopeChain':
-      return <NotImplementedView type="Scope Chain" />;
-
     case 'closure':
       return <NotImplementedView type="Closure" />;
 

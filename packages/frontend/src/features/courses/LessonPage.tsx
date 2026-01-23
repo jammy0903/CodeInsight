@@ -26,6 +26,7 @@ import { LessonCodeEditor } from './components/day/LessonCodeEditor';
 import { StepExplanation } from './components/day/StepExplanation';
 import { SelectedCodeBadge } from './components/day/SelectedCodeBadge';
 import { MemoryPanel } from './components/memory/MemoryPanel';
+import { StepNavigationArrows } from './components/StepNavigationArrows';
 import { ReturnOverlay } from '@/features/visualizers/shared';
 import { ChatQA } from '@/features/chat';
 
@@ -307,7 +308,7 @@ export function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>(
-    lang === 'python' ? 'memory' : 'flow'
+    (lang === 'python' || lang === 'py' || lang === 'javascript' || lang === 'js') ? 'memory' : 'flow'
   );
   const isMobile = useIsMobile();
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
@@ -485,26 +486,6 @@ export function LessonPage() {
               onPrevStep={navigation.goToPrevStep}
               onNextStep={navigation.goToNextStep}
               onQuiz={navigation.goToQuiz}
-              // MobileLessonView가 기대하는 형식으로 변환 (stack.variables 구조)
-              memoryState={memoryState ? {
-                stack: memoryState.frames.map(f => ({
-                  name: f.name,
-                  variables: memoryState.stack
-                    .filter(v => v.name?.startsWith(`${f.name}.`))
-                    .map(v => ({
-                      name: v.name?.split('.')[1] || v.name || '?',
-                      value: v.value,
-                      address: v.address,
-                      type: v.type,
-                    }))
-                })),
-                heap: memoryState.heap.map(h => ({
-                  id: h.name || h.address,
-                  type: h.type || 'void*',
-                  value: h.value,
-                  address: h.address,
-                }))
-              } : undefined}
               showRegisters={lesson?.content?.showRegisters}
             />
           </div>
@@ -603,7 +584,7 @@ export function LessonPage() {
               className="flex shrink-0"
               style={{ borderBottom: '1px solid var(--theme-lesson-panel-border)', height: '40px' }}
             >
-              {lang !== 'python' && (
+              {(lang !== 'python' && lang !== 'py' && lang !== 'javascript' && lang !== 'js') && (
                 <button
                   onClick={() => setActiveTab('flow')}
                   className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold"
@@ -627,7 +608,9 @@ export function LessonPage() {
                 }}
               >
                 <Cpu className="w-3.5 h-3.5" />
-                <span>{lang === 'javascript' ? '시각화' : '메모리'}</span>
+                <span>
+                  {(lang === 'javascript' || lang === 'js' || lang === 'python' || lang === 'py') ? '시각화' : '메모리'}
+                </span>
               </button>
               {!isMobile && (
                 <button
@@ -652,12 +635,7 @@ export function LessonPage() {
             >
               {activeTab === 'flow' && (
                 <div className="p-4">
-                  {lang === 'javascript' && visualizationType === 'js' ? (
-                    <JSVisualizerView
-                      type={visualizationType as any}
-                      state={visualizationState}
-                    />
-                  ) : lang === 'java' ? (
+                  {lang === 'java' ? (
                     <JavaReferenceView
                       stack={visualizationState?.stack}
                       heap={visualizationState?.heap}
@@ -679,14 +657,14 @@ export function LessonPage() {
               )}
               {activeTab === 'memory' && (
                 <div className="p-4">
-                  {lang === 'python' && visualizationType === 'python' ? (
+                  {(lang === 'python' || lang === 'py') && visualizationType === 'python' ? (
                     <PyVisualizerView
                       names={transformPyNames((visualizationState as any)?.names)}
                       objects={transformPyObjects((visualizationState as any)?.objects)}
                       animate={true}
                       compact={false}
                     />
-                  ) : lang === 'javascript' ? (
+                  ) : (lang === 'javascript' || lang === 'js') && visualizationType === 'javascript' ? (
                     <JSVisualizerView
                       type={visualizationType as any}
                       state={visualizationState}
@@ -723,8 +701,51 @@ export function LessonPage() {
         </div>
       )}
 
-      {/* Bottom Nav Bar */}
-      {/* ... */}
+      {/* Bottom Nav Bar (데스크톱 전용) */}
+      {navigation.phase !== 'completed' && !isMobile && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center py-4"
+          style={{
+            background: 'var(--theme-lesson-memory-bg)',
+            borderTop: '1px solid var(--theme-lesson-panel-border)',
+            boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <div className="flex items-center gap-4">
+            {/* 진행률 표시 */}
+            <div className="text-sm font-medium text-[var(--theme-dashboard-text)]">
+              <span className="text-[var(--theme-dashboard-title)]">{navigation.currentStepIndex + 1}</span>
+              {' / '}
+              {steps.length}
+            </div>
+
+            {/* 화살표 버튼 */}
+            <StepNavigationArrows
+              onPrev={navigation.goToPrevStep}
+              onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
+              canGoPrev={navigation.canGoPrev}
+              canGoNext={true}
+              nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
+              size="md"
+              variant="inline"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Nav Bar (모바일 전용) */}
+      {navigation.phase !== 'completed' && isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-[var(--theme-lesson-memory-bg)] border-t border-[var(--theme-lesson-panel-border)] shadow-lg">
+          <StepNavigationArrows
+            onPrev={navigation.goToPrevStep}
+            onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
+            canGoPrev={navigation.canGoPrev}
+            canGoNext={true}
+            nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
+            variant="mobile"
+          />
+        </div>
+      )}
 
       {quiz && (
         <Dialog

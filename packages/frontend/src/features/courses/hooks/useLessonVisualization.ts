@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { LessonStep, MemoryState, StackFrame as NewStackFrame, Variable, HeapObject } from '@codeinsight/shared';
+import type { LessonStep, StepMemoryState, StackFrame, Variable, HeapObject } from '@/types';
 import { processMemoryChanges } from '../utils/memoryUtils';
 import type {
   JSVisualizationState,
@@ -23,10 +23,10 @@ interface UseLessonVisualizationResult {
 const INITIAL_MEMORY_STATE = { stack: [], heap: [], frames: [] };
 const INITIAL_CHANGED_BLOCKS = { stack: [], heap: [] };
 
-function adaptMemoryState(memoryState: MemoryState): { stack: MemoryBlock[], heap: MemoryBlock[], frames: { name: string }[] } {
+function adaptMemoryState(memoryState: StepMemoryState): { stack: MemoryBlock[], heap: MemoryBlock[], frames: { name: string }[] } {
   const newStack: MemoryBlock[] = [];
-  memoryState.stack.forEach(frame => {
-    frame.variables.forEach(variable => {
+  memoryState.stack.forEach((frame: StackFrame) => {
+    frame.variables.forEach((variable: Variable) => {
       newStack.push({
         name: `${frame.name}.${variable.name}`,
         address: variable.address || '???',
@@ -37,7 +37,7 @@ function adaptMemoryState(memoryState: MemoryState): { stack: MemoryBlock[], hea
     });
   });
 
-  const newHeap: MemoryBlock[] = memoryState.heap.map(heapObj => ({
+  const newHeap: MemoryBlock[] = memoryState.heap.map((heapObj: HeapObject) => ({
     name: heapObj.id,
     address: heapObj.address || '???',
     value: String(heapObj.value),
@@ -67,35 +67,144 @@ export function useLessonVisualization(
 
     const vizType = currentStep.visualizationType || 'memory';
 
-    if (vizType === 'js' || vizType === 'javascript') {
+    if (vizType === 'javascript') {
+      const stack: MemoryBlock[] = [];
+      const frames: { name: string }[] = [];
+
+      if (currentStep.stack && Array.isArray(currentStep.stack)) {
+        currentStep.stack.forEach((frame: any) => {
+          const frameName = frame.functionName || 'anonymous';
+          frames.push({ name: frameName });
+
+          if (frame.variables) {
+            Object.entries(frame.variables).forEach(([name, value]: [string, any]) => {
+              stack.push({
+                name: `${frameName}.${name}`,
+                address: '',
+                value: typeof value === 'object' ? JSON.stringify(value) : String(value),
+                type: typeof value,
+              });
+            });
+          }
+        });
+      }
+
+      const heap: MemoryBlock[] = (currentStep.heap || []).map((item: any) => ({
+        name: item.id || '?',
+        address: item.address || '',
+        value: typeof item.value === 'object' ? JSON.stringify(item.value) : String(item.value ?? ''),
+        type: item.type || 'object',
+      }));
+
+      const memoryState = (stack.length > 0 || heap.length > 0) ? { stack, heap, frames } : null;
+
       return {
-        memoryState: null,
+        memoryState,
         changedBlocks: INITIAL_CHANGED_BLOCKS,
-        visualizationType: 'js',
+        visualizationType: 'javascript',
         visualizationState: (currentStep as any).visualizationState as JSVisualizationState,
       };
     }
 
     // Python (정적 JSON or 실시간 시뮬레이션)
     if (vizType === 'python' || currentStep.pythonMemoryState || currentStep.pyNames) {
+      const pyState = currentStep.pythonMemoryState || {
+        names: currentStep.pyNames,
+        objects: currentStep.pyObjects
+      };
+
+      // Memory 탭에서도 표시되도록 memoryState 구조 제공
+      const memoryState = pyState ? {
+        stack: (pyState.names || []).map((item: any) => ({
+          name: item.name || '?',
+          address: item.pointsTo || 'ref',
+          value: item.pointsTo || 'None',
+          type: item.scope || 'local',
+        })),
+        heap: (pyState.objects || []).map((item: any) => ({
+          name: item.id || '?',
+          address: item.id || '???',
+          value: String(item.value ?? ''),
+          type: item.type || 'unknown',
+        })),
+        frames: [{ name: 'global' }],
+      } : null;
+
       return {
-        memoryState: null,
+        memoryState,
         changedBlocks: INITIAL_CHANGED_BLOCKS,
         visualizationType: 'python',
-        visualizationState: currentStep.pythonMemoryState || {
-          names: currentStep.pyNames,
-          objects: currentStep.pyObjects
-        },
+        visualizationState: pyState,
       };
     }
 
     // Java (정적 JSON or 실시간 시뮬레이션)
     if (vizType === 'java' || currentStep.memoryState) {
+      const javaMemoryState = currentStep.memoryState;
+      const stack: MemoryBlock[] = [];
+      const frames: { name: string }[] = [];
+
+      // Java simulator returns stack as StackFrame[]
+      const stackFrames = javaMemoryState?.stack || (currentStep.stack as any[]) || [];
+
+      stackFrames.forEach((frame: any) => {
+        const frameName = frame.methodName || frame.name || 'main';
+        frames.push({ name: frameName });
+
+        if (frame.variables) {
+          Object.entries(frame.variables).forEach(([name, val]: [string, any]) => {
+            // Java variables can be primitive values or objects with metadata
+            let value = '';
+            let type = 'unknown';
+            let address = '';
+
+            if (val && typeof val === 'object') {
+              if ('value' in val) {
+                value = String(val.value);
+                type = val.type || typeof val.value;
+                address = val.id || '';
+              } else if (val.type === 'Reference' || val.id) {
+                // Handle Reference types or objects with ID but no direct value property
+                value = val.id ? `@${val.id}` : 'null';
+                type = val.class || val.type || 'Reference';
+                address = val.id || '';
+              } else {
+                // Fallback for complex objects without known structure
+                value = JSON.stringify(val);
+                type = 'object';
+              }
+            } else {
+              value = String(val);
+              type = typeof val;
+            }
+
+            stack.push({
+              name: `${frameName}.${name}`,
+              value,
+              type,
+              address,
+              points_to: address // If it's a reference
+            });
+          });
+        }
+      });
+
+      const heap: MemoryBlock[] = (javaMemoryState?.heap || currentStep.heap || []).map((item: any) => ({
+        name: item.id || item.name || '?',
+        address: item.address || '',
+        value: String(item.value ?? ''),
+        type: item.type || 'unknown',
+      }));
+
+      const memoryState = (stack.length > 0 || heap.length > 0)
+        ? { stack, heap, frames }
+        : null;
+
       return {
-        memoryState: null,
+        memoryState,
         changedBlocks: INITIAL_CHANGED_BLOCKS,
         visualizationType: 'java',
-        visualizationState: currentStep.memoryState,
+        visualizationState: javaMemoryState,
       };
     }
 

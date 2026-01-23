@@ -169,7 +169,7 @@ cSimulatorRoutes.post('/trace', (req, res) => {
  *       500:
  *         description: 내부 서버 에러
  */
-cSimulatorRoutes.post('/run', validate(runCodeSchema), async (req, res) => {
+cSimulatorRoutes.post('/simulate', validate(runCodeSchema), async (req, res) => {
   try {
     const { code, stdin = '', timeout = config.execution.defaultTimeout } = req.body;
     const timeoutSec = Math.min(Math.max(1, timeout), config.execution.maxTimeout);
