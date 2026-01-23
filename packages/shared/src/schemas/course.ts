@@ -96,6 +96,7 @@ export const VariableSchema = z.object({
   name: z.string(),
   type: z.string(),
   value: z.union([z.string(), z.number()]),
+  address: z.string().optional(),
   ref: z.string().optional(),        // 힙 객체 참조 ID
   highlight: z.boolean().optional(),
 });

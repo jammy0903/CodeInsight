@@ -41,10 +41,9 @@ import { JSVisualizerView } from '@/features/visualizers/js';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { PyVisualizerView } from '@/features/visualizers/python';
 import { JavaReferenceView } from '@/features/visualizers/java';
-import { JSMemoryFlowView } from '@/features/js-visualizer/components/JSMemoryFlowView';
-import { useJsToFlow } from '@/features/js-visualizer/hooks/useJsToFlow';
 
 import type { PyName, PyObject } from '@/types/py-simulator';
+
 
 // 모바일 컴포넌트
 import { MobileAIChatFAB, MobileAIChatModal, MobileLessonView } from './components/mobile';
@@ -389,8 +388,6 @@ export function LessonPage() {
   );
   const { selection, setSelection, clearSelection } = useCodeSelection();
 
-  const { nodes: jsNodes, edges: jsEdges } = useJsToFlow(steps, navigation.currentStepIndex);
-
   useStepGestures({
     onPrev: navigation.goToPrevStep,
     onNext: navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep,
@@ -629,8 +626,9 @@ export function LessonPage() {
                       compact={false}
                     />
                   ) : lang === 'javascript' ? (
-                    <JSMemoryFlowView nodes={jsNodes} edges={jsEdges} />
+                    <JSVisualizerView state={visualizationState} type={visualizationType} />
                   ) : (
+                    memoryState ? (
                     <MemoryPanel
                       stack={memoryState.stack}
                       heap={memoryState.heap}
@@ -638,6 +636,7 @@ export function LessonPage() {
                       showRegisters={lesson?.content?.showRegisters}
                       frames={memoryState.frames}
                     />
+                  ) : null
                   )}
                 </div>
               )}
