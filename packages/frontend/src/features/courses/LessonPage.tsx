@@ -485,7 +485,26 @@ export function LessonPage() {
               onPrevStep={navigation.goToPrevStep}
               onNextStep={navigation.goToNextStep}
               onQuiz={navigation.goToQuiz}
-              memoryState={memoryState}
+              // MobileLessonView가 기대하는 형식으로 변환 (stack.variables 구조)
+              memoryState={memoryState ? {
+                stack: memoryState.frames.map(f => ({
+                  name: f.name,
+                  variables: memoryState.stack
+                    .filter(v => v.name?.startsWith(`${f.name}.`))
+                    .map(v => ({
+                      name: v.name?.split('.')[1] || v.name || '?',
+                      value: v.value,
+                      address: v.address,
+                      type: v.type,
+                    }))
+                })),
+                heap: memoryState.heap.map(h => ({
+                  id: h.name || h.address,
+                  type: h.type || 'void*',
+                  value: h.value,
+                  address: h.address,
+                }))
+              } : undefined}
               showRegisters={lesson?.content?.showRegisters}
             />
           </div>
@@ -634,7 +653,10 @@ export function LessonPage() {
               {activeTab === 'flow' && (
                 <div className="p-4">
                   {lang === 'javascript' && visualizationType === 'js' ? (
-                    <JSVisualizerView state={visualizationState} animate={true} compact={false} />
+                    <JSVisualizerView
+                      type={visualizationType as any}
+                      state={visualizationState}
+                    />
                   ) : lang === 'java' ? (
                     <JavaReferenceView
                       stack={visualizationState?.stack}
@@ -646,7 +668,10 @@ export function LessonPage() {
                       prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
                       language={lang || 'c'}
                       fullCode={code}
-                      memoryState={memoryState}
+                      memoryState={memoryState ? {
+                        stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
+                        heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' }))
+                      } : undefined}
                       stdout={currentStep.stdout}
                     />
                   ) : null}
@@ -662,7 +687,10 @@ export function LessonPage() {
                       compact={false}
                     />
                   ) : lang === 'javascript' ? (
-                    <JSVisualizerView state={visualizationState} type={visualizationType} />
+                    <JSVisualizerView
+                      type={visualizationType as any}
+                      state={visualizationState}
+                    />
                   ) : (
                     memoryState ? (
                       <MemoryPanel
@@ -679,10 +707,14 @@ export function LessonPage() {
               {activeTab === 'chat' && !isMobile && (
                 <div className="h-full">
                   <ChatQA
-                    languageId={lang || 'c'}
-                    lessonId={lessonId || ''}
-                    currentCode={code}
-                    currentLine={currentStep?.line || 1}
+                    lessonId={lessonId}
+                    context={{
+                      courseDay: lesson.order,
+                      topic: lesson.title,
+                      code: code,
+                      currentLine: currentStep?.line || 1
+                    }}
+                    contextType="lesson"
                   />
                 </div>
               )}

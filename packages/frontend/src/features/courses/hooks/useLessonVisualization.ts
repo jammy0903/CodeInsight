@@ -11,9 +11,9 @@ import type { MemoryBlock } from '@/types/memory';
 // The return type of the hook
 interface UseLessonVisualizationResult {
   memoryState: {
-      stack: MemoryBlock[];
-      heap: MemoryBlock[];
-      frames: {name: string}[];
+    stack: MemoryBlock[];
+    heap: MemoryBlock[];
+    frames: { name: string }[];
   } | null;
   changedBlocks: { stack: string[]; heap: string[] };
   visualizationType: JSVisualizationType | 'python' | 'java' | 'memory' | string;
@@ -23,30 +23,30 @@ interface UseLessonVisualizationResult {
 const INITIAL_MEMORY_STATE = { stack: [], heap: [], frames: [] };
 const INITIAL_CHANGED_BLOCKS = { stack: [], heap: [] };
 
-function adaptMemoryState(memoryState: MemoryState): { stack: MemoryBlock[], heap: MemoryBlock[], frames: {name: string}[]} {
-    const newStack: MemoryBlock[] = [];
-    memoryState.stack.forEach(frame => {
-        frame.variables.forEach(variable => {
-            newStack.push({
-                name: `${frame.name}.${variable.name}`,
-                address: variable.address || '???',
-                value: String(variable.value),
-                type: variable.type,
-                points_to: variable.ref
-            });
-        });
+function adaptMemoryState(memoryState: MemoryState): { stack: MemoryBlock[], heap: MemoryBlock[], frames: { name: string }[] } {
+  const newStack: MemoryBlock[] = [];
+  memoryState.stack.forEach(frame => {
+    frame.variables.forEach(variable => {
+      newStack.push({
+        name: `${frame.name}.${variable.name}`,
+        address: variable.address || '???',
+        value: String(variable.value),
+        type: variable.type,
+        points_to: variable.ref
+      });
     });
+  });
 
-    const newHeap: MemoryBlock[] = memoryState.heap.map(heapObj => ({
-        name: heapObj.id,
-        address: heapObj.address || '???',
-        value: String(heapObj.value),
-        type: heapObj.type,
-    }));
+  const newHeap: MemoryBlock[] = memoryState.heap.map(heapObj => ({
+    name: heapObj.id,
+    address: heapObj.address || '???',
+    value: String(heapObj.value),
+    type: heapObj.type,
+  }));
 
-    const frames = memoryState.stack.map(f => ({name: f.name}));
+  const frames = memoryState.stack.map(f => ({ name: f.name }));
 
-    return { stack: newStack, heap: newHeap, frames };
+  return { stack: newStack, heap: newHeap, frames };
 }
 
 export function useLessonVisualization(
@@ -72,25 +72,30 @@ export function useLessonVisualization(
         memoryState: null,
         changedBlocks: INITIAL_CHANGED_BLOCKS,
         visualizationType: 'js',
-        visualizationState: currentStep.visualizationState as JSVisualizationState,
+        visualizationState: (currentStep as any).visualizationState as JSVisualizationState,
       };
     }
-    
-    if (vizType === 'python' && currentStep.pythonMemoryState) {
-        return {
-            memoryState: null,
-            changedBlocks: INITIAL_CHANGED_BLOCKS,
-            visualizationType: 'python',
-            visualizationState: currentStep.pythonMemoryState,
-        };
-    }
-    
-    if (vizType === 'java' && currentStep.memoryState) {
+
+    // Python (정적 JSON or 실시간 시뮬레이션)
+    if (vizType === 'python' || currentStep.pythonMemoryState || currentStep.pyNames) {
       return {
-          memoryState: null,
-          changedBlocks: INITIAL_CHANGED_BLOCKS,
-          visualizationType: 'java',
-          visualizationState: currentStep.memoryState,
+        memoryState: null,
+        changedBlocks: INITIAL_CHANGED_BLOCKS,
+        visualizationType: 'python',
+        visualizationState: currentStep.pythonMemoryState || {
+          names: currentStep.pyNames,
+          objects: currentStep.pyObjects
+        },
+      };
+    }
+
+    // Java (정적 JSON or 실시간 시뮬레이션)
+    if (vizType === 'java' || currentStep.memoryState) {
+      return {
+        memoryState: null,
+        changedBlocks: INITIAL_CHANGED_BLOCKS,
+        visualizationType: 'java',
+        visualizationState: currentStep.memoryState,
       };
     }
 
@@ -98,7 +103,7 @@ export function useLessonVisualization(
       const memoryState = {
         stack: currentStep.stack,
         heap: currentStep.heap,
-        frames: [{name: 'main'}]
+        frames: [{ name: 'main' }]
       };
       return {
         memoryState,
@@ -118,7 +123,7 @@ export function useLessonVisualization(
         visualizationState: null,
       };
     }
-    
+
     return {
       memoryState: INITIAL_MEMORY_STATE,
       changedBlocks: INITIAL_CHANGED_BLOCKS,
