@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import type { LessonStep, MemoryState, StackFrame as NewStackFrame, Variable, HeapObject } from '@codeinsight/shared';
 import { processMemoryChanges } from '../utils/memoryUtils';
-import {
+import type {
   JSVisualizationState,
   JSVisualizationType,
 } from '@/features/visualizers/js/types';
-import { MemoryBlock } from '@/types/memory';
+import type { MemoryBlock } from '@/types/memory';
 
 
 // The return type of the hook

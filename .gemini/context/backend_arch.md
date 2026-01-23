@@ -31,3 +31,15 @@
 - `users`: 사용자 관리
 
 `memory` 모듈은 내부에 `handlers`, `types`, `simulator.ts` 등을 포함하며, C 코드 실행 시 메모리 상태를 시뮬레이션하는 역할을 합니다.
+
+### Data Storage & Seeding
+
+This section describes how application data, especially course content and AI configurations, is managed and initialized within the backend.
+
+-   **`data/` Directory**: This directory serves as a repository for static content and configuration files that are crucial for the application's functionality.
+    -   **`ai-settings.json`**: Stores configurations for AI-related features, such as model parameters or prompt templates.
+    -   **`lessons/**/*.json`**: Contains the raw, structured content for various programming language lessons (e.g., C, Python, Java). These JSON files define the lesson structure, problem statements, example codes, and other pedagogical elements.
+
+-   **`prisma/` Directory (Seeding Scripts)**: The `prisma` directory, in addition to defining the database schema (`schema.prisma`), houses scripts responsible for populating the database with initial and content-related data.
+    -   **`*-seed.ts` files (e.g., `c-json-content-seed.ts`, `java-content-seed.ts`)**: These TypeScript files read the structured JSON data from the `data/lessons` directory and use Prisma Client to insert this content into the corresponding database tables (e.g., `Courses`, `Lessons`, `Problems`). They are essential for setting up development environments and deploying new content.
+    -   **`seed.ts`**: The main seeding script that orchestrates the execution of all individual `*-seed.ts` files, ensuring the database is fully populated with necessary content upon initialization.

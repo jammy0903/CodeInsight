@@ -6,9 +6,9 @@
  */
 
 import axios from 'axios';
-import { auth, waitForAuth } from '../firebase';
 import { config } from '../../config';
 import { logger } from '@/utils/logger';
+import { getAuthToken } from './tokenManager';
 
 // API 기본 URL (버전 포함)
 const BASE_URL = config.api.baseUrl;
@@ -24,23 +24,16 @@ export const api = axios.create({
 
 // Request Interceptor: 인증 토큰 자동 추가
 api.interceptors.request.use(
-  async (config) => {
-    try {
-      // Auth 초기화 완료 대기 (첫 요청 시에만 실제로 대기)
-      await waitForAuth();
-
-      const user = auth.currentUser;
-
-      if (user) {
-        const token = await user.getIdToken();
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (error) {
-      logger.error('Failed to get auth token:', error);
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    // 이 에러는 요청을 보내기 전에 발생하는 에러 (네트워크 문제 등)
+    logger.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
