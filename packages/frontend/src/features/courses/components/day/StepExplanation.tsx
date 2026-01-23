@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface StepExplanationProps {
   explanation: string;
   stepIndex: number;
+  line?: number;
+  code?: string;
 }
 
 /**
@@ -78,7 +80,17 @@ function formatExplanation(text: string): React.ReactNode[] {
   });
 }
 
-export function StepExplanation({ explanation, stepIndex }: StepExplanationProps) {
+import { useExplanation } from '@/features/playground/stores/explanationStore';
+
+// ... (existing helper function)
+
+export function StepExplanation({ explanation, stepIndex, line, code }: StepExplanationProps) {
+  // AI 설명 훅 사용 (line과 code가 있을 때만)
+  const { explanation: aiExplanation, isStreaming, streamingContent } = useExplanation(line || 0, code || '');
+
+  // 표시할 설명 결정: AI 설명 > 스트리밍 > 기본 설명
+  const displayExplanation = aiExplanation || (isStreaming ? streamingContent : explanation);
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -89,7 +101,8 @@ export function StepExplanation({ explanation, stepIndex }: StepExplanationProps
         transition={{ duration: 0.2 }}
         className="text-sm leading-relaxed text-stack-text"
       >
-        {formatExplanation(explanation)}
+        {isStreaming && <span className="text-xs text-blue-400 font-mono mb-1 block">🤖 AI 생성 중...</span>}
+        {formatExplanation(displayExplanation || '')}
       </motion.div>
     </AnimatePresence>
   );
