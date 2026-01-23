@@ -42,9 +42,9 @@ export function ChapterLessonsPage() {
   // 페이지 제목 설정
   useEffect(() => {
     if (chapter) {
-      setPageTitle(chapter.title, chapter.description);
+      setPageTitle(chapter.title, chapter.description, lang as SupportedLanguage);
     }
-  }, [chapter, setPageTitle]);
+  }, [chapter, setPageTitle, lang]);
 
   useEffect(() => {
     if (!chapterId) return;

@@ -8,6 +8,8 @@
 
 export { JavaMessagesView } from './JavaMessagesView';
 export { JavaReferenceView } from './JavaReferenceView';
+// Alias for backward compatibility
+export { JavaReferenceView as JavaMemoryView } from './JavaReferenceView';
 export type {
   JavaMessageEvent,
   PolymorphismInfo,

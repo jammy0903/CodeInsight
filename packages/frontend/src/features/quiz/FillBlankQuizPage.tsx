@@ -7,10 +7,12 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Code2, Check, X, RotateCcw, BookOpen } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useThemeStore } from '@/stores/themeStore';
 import { codeViewerColors } from '@/config/themes';
 import { Timer } from './components/Timer';
+import { useStore } from '@/stores/store'; // useStore import 추가
+import type { SupportedLanguage } from '@/types'; // SupportedLanguage import 추가
 
 interface Quiz {
   id: string;
@@ -207,6 +209,16 @@ export function FillBlankQuizPage() {
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
+
+  const { setPageTitle } = useStore(); // useStore 훅 사용
+
+  useEffect(() => {
+    setPageTitle(
+      `${theme.name} 빈칸 퀴즈`,
+      '제시된 코드의 빈칸을 채워보세요',
+      lang as SupportedLanguage
+    );
+  }, [setPageTitle, theme.name, lang]);
 
   const theme = LANGUAGE_THEMES[lang || 'c'] || LANGUAGE_THEMES.c;
   const chapters = QUIZ_DATA[lang || 'c'] || QUIZ_DATA.c;

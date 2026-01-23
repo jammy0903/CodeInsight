@@ -42,6 +42,46 @@
 #### 3. 리팩토링 시 Golden Samples 참조
 **⚠️ 리팩토링을 시작하기 전에 `C-OSINE/.gemini/golden_samples/` 디렉토리를 반드시 확인하여 프로젝트의 모범 사례와 패턴을 숙지하세요.**
 
+#### 4. 🔴 리팩토링 필수 검증 사항 (절대 무시 금지!)
+
+**모든 파일 이동/리팩토링 작업 시 반드시 실행:**
+
+```bash
+# STEP 1: 의존성 파악 (이동 전 필수!)
+grep -r "이동할_파일명" packages/frontend/src --include="*.tsx" --include="*.ts"
+
+# STEP 2: 파일 이동
+git mv OLD_PATH NEW_PATH
+
+# STEP 3: Import 경로 업데이트 (STEP 1에서 찾은 모든 파일)
+
+# STEP 4: 누락 검증 (OLD_PATH가 0개여야 함!)
+grep -r "OLD_PATH" packages/frontend/src --include="*.tsx" --include="*.ts"
+
+# STEP 5: 빌드 검증 (에러 없어야 함!)
+pnpm dev
+```
+
+**⚠️ 한 단계라도 건너뛰면 프로덕션 빌드 실패 위험!**
+
+### 권장 사항
+
+**리팩토링 후 자동 검증**:
+```bash
+./.gemini/scripts/verify-refactoring.sh
+```
+
+**Pre-commit Hook 설정** (선택):
+```bash
+cat > .git/hooks/pre-commit << 'EOF'
+#!/bin/bash
+./.gemini/scripts/verify-refactoring.sh || exit 1
+EOF
+chmod +x .git/hooks/pre-commit
+```
+
+상세 규칙: `C-OSINE/.gemini/rules/REFACTORING.md` 참조
+
 ---
 
 ## 🚀 Quick Start

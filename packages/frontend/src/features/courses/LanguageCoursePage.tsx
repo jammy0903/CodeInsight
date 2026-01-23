@@ -73,8 +73,8 @@ export function LanguageCoursePage() {
 
   // 페이지 제목 설정
   useEffect(() => {
-    setPageTitle(`${langInfo.name} 코스`, langInfo.description);
-  }, [setPageTitle, langInfo.name, langInfo.description]);
+    setPageTitle(`${langInfo.name} 코스`, langInfo.description, lang as SupportedLanguage);
+  }, [setPageTitle, langInfo.name, langInfo.description, lang]);
 
   useEffect(() => {
     if (!lang) return;
