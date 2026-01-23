@@ -13,24 +13,54 @@
 - **메인 진입점**: `src/app.ts` 파일이 Express 앱의 메인 진입점 역할을 하며, 모든 모듈의 라우터를 등록하고 CORS, JSON 파서 등의 공통 미들웨어를 설정합니다.
 - **설정 관리**: `src/config` 디렉토리에서 환경 변수를 `zod`로 검증하고, 애플리케이션 전반에 사용될 설정 객체를 생성하여 제공합니다.
 
-### 모듈 구조 (`src/modules`)
+### 디렉토리 구조 상세
+
+백엔드 아키텍처는 **모듈 기반 구조**와 **공용 디렉토리 구조**를 함께 사용합니다.
+
+- **`src/modules/`**: **핵심 원칙: 특정 도메인에 종속적인 코드를 위치시킵니다.**
+  - 각 디렉토리가 하나의 기능(도메인)을 담당합니다. (예: `users`, `courses`)
+  - 모듈 내에는 해당 도메인에서만 사용하는 라우트, 서비스, 타입 정의, 데이터베이스 관련 로직 등이 포함됩니다.
+  - **새로운 기능을 추가할 때는 먼저 `modules` 아래에 새로운 모듈을 생성하는 것을 고려해야 합니다.**
+
+- **`src/services/`**, **`src/utils/`**, **`src/types/`**, **`src/middleware/`** (최상위 공용 디렉토리)
+  - **핵심 원칙: 둘 이상의 모듈에서 재사용되는 공통 코드를 위치시킵니다.**
+  - `services/`: 여러 도메인에서 공통으로 사용되는 비즈니스 로직. (예: 통합 알림 서비스)
+  - `utils/`: 특정 도메인에 종속되지 않는 순수 유틸리티 함수. (예: 날짜 포매팅, 문자열 처리)
+  - `types/`: 여러 모듈에서 공통으로 사용되는 전역 타입 정의.
+  - `middleware/`: 여러 라우트 또는 모듈에서 공통으로 사용되는 Express 미들웨어.
+
+> **⚠️ 언제 공용 디렉토리를 사용해야 하나요?**
+>
+> 코드를 작성하기 전에 "이 로직이 다른 모듈에서도 사용될 가능성이 있는가?"를 먼저 자문해보세요.
+> - **"아니오"**: 현재 작업 중인 모듈(`modules/my-module/`) 내에 작성하세요.
+> - **"예"**: 최상위 공용 디렉토리(`services/`, `utils/` 등)에 작성하여 재사용성을 높이세요.
+
+### 모듈 종류 (`src/modules`)
 현재 다음과 같은 모듈들이 존재합니다:
 - `admin`: 관리자 기능
 - `ai`: AI 관련 기능 (코드 설명 등)
 - `analytics`: 통계 데이터
-- `c`: C 언어 실행 관련 시뮬레이터
-- `courses`: 강좌 및 레슨
-- `executors`: 코드 실행 로직
-- `gamification`: 게임화 요소 (업적 등)
-- `memory`: C 언어 메모리 시뮬레이터 (레거시)
-- `notes`: 사용자 노트
-- `problems`: 문제
-- `shared`: 여러 모듈에서 공유하는 로직
-- `simulators`: Python 등 다른 언어 시뮬레이터
-- `submissions`: 제출된 코드
-- `users`: 사용자 관리
+- `courses`: 강좌 및 레슨 (가장 중요한 비즈니스 로직)
+- `executors`: 실제 코드 실행 로직 (Docker 기반)
+- `gamification`: 게임화 요소 (업적, 스트릭 등)
+- `notes`: 사용자 학습 노트
+- `problems`: 연습 문제 및 알고리즘 문제
+- `shared`: 여러 모듈에서 공유하는 공통 로직 (Expression Evaluator 등)
+- **`simulators`**: 교육용 실시간 코드 시뮬레이터 (핵심 차별화 요소)
+  - `c`: C 언어 메모리/포인터 시뮬레이터 (기본 V3 엔진)
+  - `python`: Python 참조 모델 시뮬레이터 (Names -> Objects)
+  - `java`: Java 객체 참조/메모리 시뮬레이터
+  - `javascript`: JS 엔진 동작(Event Loop, Closure 등) 시뮬레이터
+- `submissions`: 제출된 코드 관리
+- `users`: 사용자 프로필 및 인증 관리
 
-`memory` 모듈은 내부에 `handlers`, `types`, `simulator.ts` 등을 포함하며, C 코드 실행 시 메모리 상태를 시뮬레이션하는 역할을 합니다.
+#### 통합 시뮬레이터 API 패턴
+모든 시뮬레이터는 다음과 같은 통일된 API 경로를 제공합니다:
+- `POST /api/v1/simulators/{lang}/simulate` 또는 `trace`
+- 입력: `{ code: string, stdin?: string }`
+- 출력: `{ success: boolean, steps: Step[], error?: string }`
+
+이러한 구조를 통해 프론트엔드에서는 언어에 관계없이 동일한 `simulatorService` 인터페이스를 통해 실시간 시각화 데이터를 획득할 수 있습니다.
 
 ### Data Storage & Seeding
 

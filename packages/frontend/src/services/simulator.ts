@@ -130,6 +130,68 @@ export function isLanguageSupported(language: string): boolean {
 }
 
 /**
+ * BackendMemoryBlock -> MemoryBlock 변환 (C 시뮬레이터 전용)
+ */
+function cMemoryBlock(block: BackendMemoryBlock): MemoryBlock {
+  return {
+    name: block.name,
+    address: block.address,
+    value: block.value,
+    type: block.type,
+    size: block.size,
+    bytes: block.bytes,
+    points_to: block.points_to,
+    explanation: block.explanation,
+  };
+}
+
+/**
+ * BackendStep -> LessonStep 변환 (C 시뮬레이터 전용)
+ */
+function cSimulator(backendSteps: BackendStep[]): LessonStep[] {
+  return backendSteps.map((step) => ({
+    line: step.line,
+    code: step.code,
+    explanation: step.explanation,
+    stack: step.stack.map(cMemoryBlock),
+    heap: step.heap.map(cMemoryBlock),
+    stdout: step.stdout,
+  }));
+}
+
+/**
+ * PyStep -> LessonStep 변환 (Python 시뮬레이터 전용)
+ */
+function pythonSimulator(pySteps: PyStep[]): LessonStep[] {
+  return pySteps.map((step) => ({
+    line: step.line,
+    code: step.code,
+    explanation: step.explanation,
+    stdout: step.stdout,
+    // Python 시각화 데이터 (Names-Objects 모델)
+    pyNames: step.names,
+    pyObjects: step.objects,
+  }));
+}
+
+/**
+ * Java 단계별 상태 -> LessonStep 변환 (Java 시뮬레이터 전용)
+ */
+function javaSimulator(javaSteps: any[]): LessonStep[] {
+  return javaSteps.map((snapshot) => ({
+    line: snapshot.line || snapshot.lineNumber || 0,
+    code: snapshot.code || '',
+    explanation: snapshot.explanation || `Java 한 줄 실행 (Line ${snapshot.line || snapshot.lineNumber})`,
+    // Java 시각화 데이터 (Stack-Heap 참조 모델)
+    memoryState: {
+      stack: snapshot.stack || [],
+      heap: snapshot.heap || [],
+    },
+    stdout: snapshot.stdout,
+  }));
+}
+
+/**
  * Simulator Service - 코드 시뮬레이션 통합 서비스
  */
 export const simulatorService = {
@@ -177,7 +239,7 @@ export const simulatorService = {
 
         return {
           success: true,
-          steps: toSteps(data.steps),
+          steps: cSimulator(data.steps),
           stepRegisters,
         };
       }
@@ -217,20 +279,9 @@ export const simulatorService = {
       const data = response.data;
 
       if (data.success && data.steps) {
-        // Python 스텝을 LessonStep 형태로 변환
-        const lessonSteps: LessonStep[] = data.steps.map((step) => ({
-          line: step.line,
-          code: step.code, // 현재 실행 중인 코드 라인
-          explanation: step.explanation,
-          stdout: step.stdout,
-          // Python 시각화 데이터
-          pyNames: step.names,
-          pyObjects: step.objects,
-        }));
-
         return {
           success: true,
-          steps: lessonSteps,
+          steps: pythonSimulator(data.steps),
         };
       }
 
@@ -317,20 +368,11 @@ export const simulatorService = {
 
       const data = response.data;
 
-      if (data.success && data.snapshots) {
-        // 백엔드가 snapshots로 반환함
-        // Java 스냅샷을 LessonStep 형식으로 변환
-        const lessonSteps: LessonStep[] = data.snapshots.map((snapshot: any) => ({
-          line: snapshot.lineNumber || 0,
-          code: snapshot.code || '',
-          explanation: snapshot.explanation || '',
-          // Java 시각화 데이터
-          javaSnapshot: snapshot, // 전체 스냅샷 데이터 보존
-        }));
-
+      // 백엔드는 'steps' 필드로 반환함 (java-simulation.service.ts 확인됨)
+      if (data.success && (data as any).steps) {
         return {
           success: true,
-          steps: lessonSteps,
+          steps: javaSimulator((data as any).steps),
         };
       }
 

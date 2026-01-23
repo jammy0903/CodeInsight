@@ -36,7 +36,7 @@ export class JavaSimulationService {
 
             return {
                 success: true,
-                snapshots: snapshots,
+                steps: snapshots,
             };
 
         } catch (error: any) {

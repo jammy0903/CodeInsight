@@ -8,7 +8,7 @@ export class FileManager {
 
   constructor() {
     // 기본 tmp 폴더가 없으면 생성
-    fs.mkdir(this.BASE_DIR, { recursive: true }).catch(() => {});
+    fs.mkdir(this.BASE_DIR, { recursive: true }).catch(() => { });
   }
 
   /**
@@ -19,13 +19,31 @@ export class FileManager {
   async createProject(code: string): Promise<string> {
     const projectId = crypto.randomUUID();
     const projectPath = path.join(this.BASE_DIR, projectId);
-    
+
     // 1. 프로젝트 폴더 생성
     await fs.mkdir(projectPath, { recursive: true });
 
     // 2. Main.java 파일 작성
-    // (주의: 사용자 코드는 반드시 'public class Main' 혹은 class Main'이어야 함)
-    await fs.writeFile(path.join(projectPath, 'Main.java'), code, 'utf-8');
+    let finalCode = code;
+
+    // "class Main"이 없으면 자동 래핑 (Snippet 지원)
+    if (!code.includes('class Main')) {
+      const lines = code.split('\n');
+      const imports = lines.filter(line => line.trim().startsWith('import '));
+      const bodyLines = lines.filter(line => !line.trim().startsWith('import '));
+
+      finalCode = `
+${imports.join('\n')}
+
+public class Main {
+    public static void main(String[] args) {
+${bodyLines.join('\n')}
+    }
+}
+`;
+    }
+
+    await fs.writeFile(path.join(projectPath, 'Main.java'), finalCode, 'utf-8');
 
     return projectPath;
   }

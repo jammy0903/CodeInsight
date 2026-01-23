@@ -1,11 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { simulateCode } from './simulator';
-import { cExecutor } from '../../../executors/c/index';
-import { prisma } from '../../config/database';
-import { config } from '../../config';
-import { optionalAuth } from '../../middleware';
-import { logger } from '../../utils/logger';
+import { cExecutor } from './executor';
+import { prisma } from '../../../config/database';
+import { config } from '../../../config';
+import { optionalAuth } from '../../../middleware';
+import { logger } from '../../../utils/logger';
 
 export const cSimulatorRoutes = Router();
 

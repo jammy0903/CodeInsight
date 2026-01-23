@@ -13,7 +13,7 @@ const router = Router();
  * POST /api/v1/simulators/python
  * Python 코드 시뮬레이션
  */
-router.post('/', (req, res) => {
+router.post('/simulate', (req, res) => {
   const { code, stdin } = req.body;
 
   if (!code || typeof code !== 'string') {

@@ -13,8 +13,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { getLessonFull, getChapterWithLessons, updateProgress } from '@/services/courses';
+import { simulatorService, isLanguageSupported } from '@/services/simulator';
 import { useStore } from '@/stores/store';
 import { useEnterKey } from '@/hooks/useEnterKey';
 import type { LessonFull, LessonStep, Quiz, SupportedLanguage } from '@/types';
@@ -251,17 +253,16 @@ function QuizCardAdapter({
             key={idx}
             onClick={() => !submitted && setSelected(idx)}
             disabled={submitted}
-            className={`w-full p-3 text-left rounded-lg border-2 transition-colors whitespace-pre-wrap ${ 
-              submitted
-                ? idx === correctIndex
-                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                  : idx === selected
-                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                    : 'border-[var(--theme-dashboard-card-border)]'
-                : selected === idx
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-[var(--theme-dashboard-card-border)] hover:border-[var(--theme-dashboard-progress-bg)]'
-            }`}
+            className={`w-full p-3 text-left rounded-lg border-2 transition-colors whitespace-pre-wrap ${submitted
+              ? idx === correctIndex
+                ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                : idx === selected
+                  ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                  : 'border-[var(--theme-dashboard-card-border)]'
+              : selected === idx
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                : 'border-[var(--theme-dashboard-card-border)] hover:border-[var(--theme-dashboard-progress-bg)]'
+              }`}
           >
             {option}
           </button>
@@ -292,7 +293,7 @@ function QuizCardAdapter({
 }
 
 export function LessonPage() {
-  const { lang, lessonId } = useParams<{ 
+  const { lang, lessonId } = useParams<{
     lang: string;
     chapterId: string;
     lessonId: string;
@@ -300,10 +301,12 @@ export function LessonPage() {
 
   const { setPageTitle } = useStore();
   const [lesson, setLesson] = useState<LessonFull | null>(null);
+  const [liveSteps, setLiveSteps] = useState<LessonStep[] | null>(null);
+  const [simulating, setSimulating] = useState(false);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>( 
+  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>(
     lang === 'python' ? 'memory' : 'flow'
   );
   const isMobile = useIsMobile();
@@ -353,10 +356,40 @@ export function LessonPage() {
     };
   }, [lesson, setPageTitle, lang]);
 
-  const steps: LessonStep[] = lesson?.content?.steps || [];
+  // Live simulation for all supported languages
+  useEffect(() => {
+    if (lesson && lang && isLanguageSupported(lang) && lesson.content?.code) {
+      const runSimulation = async () => {
+        setSimulating(true);
+        try {
+          const result = await simulatorService.simulate(lang, { code: lesson.content.code });
+          if (result.success) {
+            setLiveSteps(result.steps);
+          } else {
+            console.error("Simulation failed:", result.error);
+            setError(result.error || 'Failed to simulate code.');
+          }
+        } catch (e) {
+          console.error("Simulation exception:", e);
+          setError(e instanceof Error ? e.message : 'An unknown error occurred during simulation.');
+        } finally {
+          setSimulating(false);
+        }
+      };
+      runSimulation();
+    } else if (lesson) {
+      // Fallback for non-supported languages or lessons without code
+      setLiveSteps(lesson.content?.steps || []);
+    }
+  }, [lesson, lang]);
+
+  const steps: LessonStep[] = useMemo(() => {
+    return liveSteps || [];
+  }, [liveSteps]);
+
   const code = lesson?.content?.code || '';
   const quiz = lesson?.quizzes?.[0];
-  const analyticsRef = useRef<{ finishTracking: () => void }>({ finishTracking: () => {} });
+  const analyticsRef = useRef<{ finishTracking: () => void }>({ finishTracking: () => { } });
 
   const navigation = useLessonNavigation({
     totalSteps: steps.length,
@@ -425,8 +458,8 @@ export function LessonPage() {
       navigation.reset();
     }
   };
-  
-  if (loading) return <LoadingView />;
+
+  if (loading || simulating) return <LoadingView />;
   if (error || !lesson) return <NotFoundView message={error || '레슨을 찾을 수 없습니다'} backPath={languageCoursePath} />;
   if (steps.length === 0) return <NotFoundView message="레슨 콘텐츠가 없습니다" backPath={languageCoursePath} />;
 
@@ -461,84 +494,84 @@ export function LessonPage() {
         <div className="flex flex-col md:flex-row gap-4 items-start pb-16">
           {/* Left Panel */}
           <div className="w-full md:w-1/2 flex flex-col rounded-xl"
+            style={{
+              border: '1px solid var(--theme-lesson-panel-border)',
+              minHeight: '400px',
+              overflow: 'visible',
+            }}
+          >
+            <div
+              className="flex items-center px-3 py-1 text-xs font-medium shrink-0"
+              style={{
+                background: 'var(--theme-lesson-editor-header-bg)',
+                color: 'var(--theme-lesson-editor-header-text)',
+                borderBottom: '1px solid var(--theme-lesson-panel-border)',
+              }}
+            >
+              <Code2 className="w-3 h-3 mr-1.5" />
+              에디터
+            </div>
+            <div
+              className={(code.split('\n').length > 10 && !isExplanationCollapsed) ? 'overflow-y-auto' : ''}
+              style={{
+                height: `${(isExplanationCollapsed ? code.split('\n').length : Math.min(code.split('\n').length, 10)) * 20}px`,
+                borderBottom: '1px solid var(--theme-lesson-panel-border)',
+              }}
+            >
+              <LessonCodeEditor
+                code={code}
+                highlightLine={currentStep?.line || 1}
+                onSelectionChange={setSelection}
+              />
+            </div>
+            {currentStep && (
+              <div
+                className={`relative ${isExplanationCollapsed ? 'shrink-0' : ''}`}
                 style={{
-                  border: '1px solid var(--theme-lesson-panel-border)',
-                  minHeight: '400px',
-                  overflow: 'visible',
+                  background: 'var(--theme-lesson-explanation-bg)',
+                  borderTop: '1px solid var(--theme-lesson-panel-border)',
+                  minHeight: isExplanationCollapsed ? 'auto' : '200px',
                 }}
               >
-                <div
-                  className="flex items-center px-3 py-1 text-xs font-medium shrink-0"
-                  style={{
-                    background: 'var(--theme-lesson-editor-header-bg)',
-                    color: 'var(--theme-lesson-editor-header-text)',
-                    borderBottom: '1px solid var(--theme-lesson-panel-border)',
-                  }}
-                >
-                  <Code2 className="w-3 h-3 mr-1.5" />
-                  에디터
-                </div>
-                <div
-                  className={(code.split('\n').length > 10 && !isExplanationCollapsed) ? 'overflow-y-auto' : ''}
-                  style={{
-                    height: `${(isExplanationCollapsed ? code.split('\n').length : Math.min(code.split('\n').length, 10)) * 20}px`,
-                    borderBottom: '1px solid var(--theme-lesson-panel-border)',
-                  }}
-                >
-                  <LessonCodeEditor
-                    code={code}
-                    highlightLine={currentStep?.line || 1}
-                    onSelectionChange={setSelection}
-                  />
-                </div>
-                {currentStep && (
-                  <div
-                    className={`relative ${isExplanationCollapsed ? 'shrink-0' : ''}`}
+                <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+                  <span
+                    className="px-2 py-0.5 rounded-md text-xs font-bold"
                     style={{
-                      background: 'var(--theme-lesson-explanation-bg)',
-                      borderTop: '1px solid var(--theme-lesson-panel-border)',
-                      minHeight: isExplanationCollapsed ? 'auto' : '200px',
+                      background: 'var(--theme-lesson-explanation-line-badge-bg)',
+                      color: '#fff',
                     }}
                   >
-                    <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
-                      <span
-                        className="px-2 py-0.5 rounded-md text-xs font-bold"
-                        style={{
-                          background: 'var(--theme-lesson-explanation-line-badge-bg)',
-                          color: '#fff',
-                        }}
-                      >
-                        L{currentStep.line}
-                      </span>
-                      {(code.split('\n').length > 6) && (
-                        <button
-                          onClick={() => setIsExplanationCollapsed(!isExplanationCollapsed)}
-                          className="p-1 rounded-md bg-transparent hover:bg-amber-200/50 transition-colors"
-                          title={isExplanationCollapsed ? '설명 펼치기' : '설명 접기'}
-                        >
-                          {isExplanationCollapsed ? (
-                            <ChevronUp className="w-4 h-4 text-amber-700" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4 text-amber-700" />
-                          )}
-                        </button>
+                    L{currentStep.line}
+                  </span>
+                  {(code.split('\n').length > 6) && (
+                    <button
+                      onClick={() => setIsExplanationCollapsed(!isExplanationCollapsed)}
+                      className="p-1 rounded-md bg-transparent hover:bg-amber-200/50 transition-colors"
+                      title={isExplanationCollapsed ? '설명 펼치기' : '설명 접기'}
+                    >
+                      {isExplanationCollapsed ? (
+                        <ChevronUp className="w-4 h-4 text-amber-700" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-amber-700" />
                       )}
-                    </div>
-                    {isExplanationCollapsed ? (
-                      <div className="p-2 text-xs text-amber-700 cursor-pointer" onClick={() => setIsExplanationCollapsed(false)}>
-                        클릭하여 설명 보기
-                      </div>
-                    ) : (
-                      <div className="p-4 pr-20">
-                        <StepExplanation
-                          explanation={currentStep.explanation}
-                          stepIndex={navigation.currentStepIndex}
-                        />
-                      </div>
-                    )}
+                    </button>
+                  )}
+                </div>
+                {isExplanationCollapsed ? (
+                  <div className="p-2 text-xs text-amber-700 cursor-pointer" onClick={() => setIsExplanationCollapsed(false)}>
+                    클릭하여 설명 보기
+                  </div>
+                ) : (
+                  <div className="p-4 pr-20">
+                    <StepExplanation
+                      explanation={currentStep.explanation}
+                      stepIndex={navigation.currentStepIndex}
+                    />
                   </div>
                 )}
               </div>
+            )}
+          </div>
 
           {/* Right Panel */}
           <div
@@ -603,7 +636,10 @@ export function LessonPage() {
                   {lang === 'javascript' && visualizationType === 'js' ? (
                     <JSVisualizerView state={visualizationState} animate={true} compact={false} />
                   ) : lang === 'java' ? (
-                    <JavaReferenceView state={visualizationState} animate={true} />
+                    <JavaReferenceView
+                      stack={visualizationState?.stack}
+                      heap={visualizationState?.heap}
+                    />
                   ) : currentStep ? (
                     <LessonFlowVisualizer
                       step={currentStep}
@@ -629,14 +665,14 @@ export function LessonPage() {
                     <JSVisualizerView state={visualizationState} type={visualizationType} />
                   ) : (
                     memoryState ? (
-                    <MemoryPanel
-                      stack={memoryState.stack}
-                      heap={memoryState.heap}
-                      changedBlocks={changedBlocks}
-                      showRegisters={lesson?.content?.showRegisters}
-                      frames={memoryState.frames}
-                    />
-                  ) : null
+                      <MemoryPanel
+                        stack={memoryState.stack}
+                        heap={memoryState.heap}
+                        changedBlocks={changedBlocks}
+                        showRegisters={lesson?.content?.showRegisters}
+                        frames={memoryState.frames}
+                      />
+                    ) : null
                   )}
                 </div>
               )}
@@ -666,6 +702,9 @@ export function LessonPage() {
           <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">🧠 퀴즈</DialogTitle>
+              <DialogDescription className="sr-only">
+                레슨 내용을 확인하는 퀴즈 세션입니다.
+              </DialogDescription>
             </DialogHeader>
             <QuizCardAdapter quiz={quiz} onComplete={handleQuizComplete} />
           </DialogContent>

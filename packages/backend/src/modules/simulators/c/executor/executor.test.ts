@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { checkCodeSecurity, FORBIDDEN_PATTERNS } from '../../../../executors/c/c-executor';
+import { checkCodeSecurity, FORBIDDEN_PATTERNS } from './index';
 
 describe('FORBIDDEN_PATTERNS', () => {
   describe('프로세스/시스템 호출 차단', () => {

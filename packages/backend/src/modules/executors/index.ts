@@ -15,10 +15,6 @@
 export type { ExecutionResult, IExecutor, JudgeResult } from './types';
 export { Language } from './types';
 
-// C Executor
-export { CExecutor, cExecutor } from './c/index';
-export { checkCodeSecurity as checkCCodeSecurity } from './c/index';
-
 // TODO: Python Executor (Phase 2)
 // export { PythonExecutor, pythonExecutor } from './python/index';
 

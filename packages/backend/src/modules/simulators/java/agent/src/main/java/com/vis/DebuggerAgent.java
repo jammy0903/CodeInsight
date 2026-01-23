@@ -44,9 +44,14 @@ public class DebuggerAgent {
         vm = launchTarget(targetClassName);
 
         EventRequestManager mgr = vm.eventRequestManager();
+        
+        // Request class preparation events
         ClassPrepareRequest cpr = mgr.createClassPrepareRequest();
         cpr.addClassFilter(targetClassName);
         cpr.enable();
+
+        // Request exception events
+        mgr.createExceptionRequest(null, true, true).enable();
 
         eventLoop(vm);
     }
@@ -56,12 +61,12 @@ public class DebuggerAgent {
         Map<String, Connector.Argument> arguments = connector.defaultArguments();
         
         arguments.get("main").setValue(mainClass);
+        arguments.get("suspend").setValue("true");
         return connector.launch(arguments);
     }
 
     private void eventLoop(VirtualMachine vm) throws InterruptedException {
         EventQueue eventQueue = vm.eventQueue();
-        vm.resume(); 
 
         boolean connected = true;
         while (connected) {
@@ -73,6 +78,10 @@ public class DebuggerAgent {
                     createStepRequest(vm, (ClassPrepareEvent) event);
                 } else if (event instanceof StepEvent) {
                     processStep((StepEvent) event);
+                } else if (event instanceof ExceptionEvent) {
+                    ExceptionEvent exceptionEvent = (ExceptionEvent) event;
+                    System.err.println("Exception occurred in target VM: " + exceptionEvent.exception());
+                    connected = false; // Terminate on exception
                 }
             }
             if (connected) {
@@ -93,6 +102,7 @@ public class DebuggerAgent {
         stepReq.addClassExclusionFilter("jdk.*");
         
         stepReq.enable();
+        vm.resume();
     }
 
     private void processStep(StepEvent event) {
