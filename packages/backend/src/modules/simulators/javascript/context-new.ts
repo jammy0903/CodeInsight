@@ -44,10 +44,15 @@ export function createJsContext(): JsSimContext {
 
     createStep(lineNum: number, code: string, explanation: string): JsStep {
       // Stack frame 생성 (현재는 global만)
+      const varsObject = Object.fromEntries(globalScope.entries());
+
+      console.log(`[JS Sim] Line ${lineNum}: globalScope size = ${globalScope.size}`);
+      console.log(`[JS Sim] Line ${lineNum}: variables =`, varsObject);
+
       const stack: JsStackFrame[] = [
         {
           functionName: '(global)',
-          variables: Object.fromEntries(globalScope.entries()),
+          variables: varsObject,
         },
       ];
 
@@ -63,7 +68,7 @@ export function createJsContext(): JsSimContext {
               id: 'scope-0',
               name: 'global',
               type: 'global' as const,
-              variables: Object.fromEntries(globalScope.entries()),
+              variables: varsObject,
             },
           ],
           currentScopeId: 'scope-0',

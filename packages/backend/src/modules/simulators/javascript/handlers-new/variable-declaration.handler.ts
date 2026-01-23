@@ -24,11 +24,17 @@ export const VariableDeclarationHandler: JsCodeHandler = {
     const [, keyword, varName, valueExpr] = match;
     const trimmedExpr = valueExpr.trim().replace(/;$/, '');
 
+    console.log(`[VarDecl Handler] Line ${lineNum}: ${keyword} ${varName} = ${trimmedExpr}`);
+
     // 값 평가
     const value = evaluateExpression(ctx, trimmedExpr);
 
+    console.log(`[VarDecl Handler] Evaluated value:`, value);
+
     // 변수 설정
     ctx.setVariable(varName, value);
+
+    console.log(`[VarDecl Handler] After setVariable, checking globalScope...`);
 
     // 설명 생성
     const explanation = `${keyword} 키워드로 변수 '${varName}' 선언, 값 ${formatValue(value)} 할당`;
