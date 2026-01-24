@@ -74,6 +74,7 @@ public class DebuggerAgent {
             for (Event event : eventSet) {
                 if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
                     connected = false;
+                    break; // VM이 종료되었으므로 현재 EventSet 처리를 중단
                 } else if (event instanceof ClassPrepareEvent) {
                     createStepRequest(vm, (ClassPrepareEvent) event);
                 } else if (event instanceof StepEvent) {
@@ -101,8 +102,13 @@ public class DebuggerAgent {
         stepReq.addClassExclusionFilter("sun.*");
         stepReq.addClassExclusionFilter("jdk.*");
         
-        stepReq.enable();
-        vm.resume();
+        try {
+            stepReq.enable();
+            vm.resume();
+        } catch (VMDisconnectedException e) {
+            System.out.println("타겟 프로그램이 종료되어 StepRequest를 활성화할 수 없습니다.");
+            return;
+        }
     }
 
     private void processStep(StepEvent event) {
