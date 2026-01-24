@@ -361,6 +361,26 @@ const pythonChapters: ChapterData[] = [
   },
 ];
 
+// ========== Chapter 8: Python 자동화 ==========
+const pythonAutomationChapter: ChapterData = {
+  order: 8,
+  title: 'Python 자동화',
+  description: '반복적인 작업을 자동화하여 생산성을 높입니다',
+  keyQuestion: 'Python으로 무엇을 자동화할 수 있는가?',
+  lessons: [
+    {
+      order: 1,
+      title: '첫 자동화 스크립트',
+      description: '간단한 스크립트로 자동화의 첫걸음을 뗍니다.',
+      difficulty: 'basic',
+      estimatedTime: 5,
+    },
+  ],
+};
+
+pythonChapters.push(pythonAutomationChapter);
+
+
 // =============================================
 // Seed 함수
 // =============================================

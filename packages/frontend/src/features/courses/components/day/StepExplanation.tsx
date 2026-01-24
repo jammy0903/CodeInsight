@@ -88,8 +88,8 @@ export function StepExplanation({ explanation, stepIndex, line, code }: StepExpl
   // AI 설명 훅 사용 (line과 code가 있을 때만)
   const { explanation: aiExplanation, isStreaming, streamingContent } = useExplanation(line || 0, code || '');
 
-  // 표시할 설명 결정: AI 설명 > 스트리밍 > 기본 설명
-  const displayExplanation = aiExplanation || (isStreaming ? streamingContent : explanation);
+  // 표시할 설명 결정: AI 설명만 사용 (미리 정해진 설명 무시)
+  const displayExplanation = isStreaming ? streamingContent : (aiExplanation || '설명을 불러오는 중...');
 
   return (
     <AnimatePresence mode="wait">

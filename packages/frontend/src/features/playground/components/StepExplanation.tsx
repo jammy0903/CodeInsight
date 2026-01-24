@@ -17,10 +17,10 @@ interface StepExplanationProps {
 export function StepExplanation({ step, isMobile = false }: StepExplanationProps) {
   const { explanation, isStreaming, streamingContent } = useExplanation(step.line, step.code);
 
-  // 표시할 내용 결정
+  // 표시할 내용 결정 (AI 설명만 사용)
   const displayContent = isStreaming
     ? streamingContent
-    : (explanation || step.explanation);
+    : explanation;
 
   // 아직 설명이 없고 스트리밍도 아닌 경우 = 대기 중
   const isWaiting = !displayContent && !isStreaming;

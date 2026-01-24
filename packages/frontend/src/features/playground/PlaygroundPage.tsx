@@ -143,13 +143,13 @@ export function PlaygroundPage() {
     canGoNext,
   });
 
-  // Enter 키로 Run 버튼 실행
-  useEnterKey({
-    onEnter: () => {
-      (document.getElementById('playground-run-button') as HTMLButtonElement)?.click();
-    },
-    enabled: true, // 항상 활성화 (훅 내부에서 입력창 포커스 시 자동 비활성화)
-  });
+  // Enter 키로 Run 버튼 실행 - DISABLED (코드 에디터에서 Enter는 줄바꿈용)
+  // useEnterKey({
+  //   onEnter: () => {
+  //     (document.getElementById('playground-run-button') as HTMLButtonElement)?.click();
+  //   },
+  //   enabled: true, // 항상 활성화 (훅 내부에서 입력창 포커스 시 자동 비활성화)
+  // });
 
   // Calculate editor height based on code lines
   const editorHeight = useMemo(() => {
@@ -161,12 +161,12 @@ export function PlaygroundPage() {
   // Start AI explanation prefetch when simulation steps change
   useEffect(() => {
     if (steps.length > 0 && code) {
-      startPrefetch(steps as LessonStep[], code);
+      startPrefetch(steps as LessonStep[], code, language);
     }
     return () => {
       stopPrefetch();
     };
-  }, [steps, code, startPrefetch, stopPrefetch]);
+  }, [steps, code, language, startPrefetch, stopPrefetch]);
 
   // Use useLessonVisualization hook (unified Lesson and Playground)
   const { memoryState, changedBlocks, visualizationType, visualizationState } = useLessonVisualization(

@@ -64,6 +64,23 @@ pnpm dev
 
 **⚠️ 한 단계라도 건너뛰면 프로덕션 빌드 실패 위험!**
 
+#### 5. 📱 모바일 UI 애니메이션 규칙 (CRITICAL)
+- **모든 슬라이딩/화면 전환은 반드시 `framer-motion`의 `variants`를 사용해야 합니다.**
+- **Hardcoded Animation 금지**: `animate={{ x: '-50%' }}`와 같은 매직 넘버 하드코딩은 절대 허용하지 않습니다.
+- **상태 기반 선언**: `state` (예: `"code"`, `"visual"`)에 따라 `variants`가 동작하도록 구현합니다.
+
+```tsx
+// ✅ Good
+const slideVariants = {
+  code: { x: 0 },
+  visual: { x: '-50%' }
+};
+<motion.div variants={slideVariants} animate={state} ... />
+
+// ❌ Bad (절대 금지)
+<motion.div animate={{ x: isCode ? 0 : '-50%' }} ... />
+```
+
 ### 권장 사항
 
 **리팩토링 후 자동 검증**:
@@ -117,3 +134,9 @@ Git, 원격 서버 배포 등 버전 관리에 대한 모든 규칙은 아래 �
 - `C-OSINE/.gemini/context/` - 백엔드/프론트엔드 아키텍처 문서
 - `C-OSINE/.gemini/golden_samples/` - 패턴 및 모범 사례
 - `C-OSINE/.gemini/rules/` - 데이터 스키마, 리팩토링, 버전 관리 규칙
+
+---
+
+## ⚙️ 일반 프로젝트 컨벤션
+
+-   **환경 변수 관리**: 프로젝트에서는 `.env.example` 파일을 사용하지 않고, **오직 `.env` 파일만을 사용하여 환경 변수를 관리합니다.** 개발 및 배포 환경에 따라 `.env` 파일 내 변수를 직접 설정합니다.

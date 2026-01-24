@@ -58,12 +58,19 @@ interface MemoryChange {
 }
 
 interface ExplainStepRequest {
+  language: 'c' | 'javascript' | 'python';
   line: number;
   code: string;
   fullCode: string;
   stack?: MemoryBlock[];
   heap?: MemoryBlock[];
   changes?: MemoryChange[];
+  // JavaScript용 필드
+  jsStack?: Array<{ functionName: string; variables: Record<string, any> }>;
+  jsHeap?: Array<{ id: string; type: 'Object' | 'Array' | 'Function'; value: any }>;
+  // Python용 필드
+  pyNames?: Array<{ name: string; pointsTo: string }>;
+  pyObjects?: Array<{ id: string; type: string; value: any }>;
 }
 
 interface ExplainStepResponse {
