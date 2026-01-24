@@ -369,7 +369,9 @@ export function LessonPage() {
           if (result.success) {
             setLiveSteps(result.steps);
             // AI 설명 생성 시작 (Playground와 동일한 로직)
-            startPrefetch(result.steps, lesson.content.code);
+            // lang을 정규화 ('c', 'javascript', 'python')
+            const normalizedLang = lang === 'py' ? 'python' : lang === 'js' ? 'javascript' : lang as ('c' | 'javascript' | 'python');
+            startPrefetch(result.steps, lesson.content.code, normalizedLang);
           } else {
             console.error("Simulation failed:", result.error);
             setError(result.error || 'Failed to simulate code.');

@@ -20,23 +20,25 @@ import { logger } from '../utils/logger';
 import { config } from '../config';
 
 class LessonContentLoader {
+  // 캐시: 이미 읽은 파일 내용 (Memory Cache)
   private cache = new Map<string, LessonContentData>();
-  private isLoaded = false;
+  // 파일 맵: 레슨ID -> 파일경로 (Lazy Loading용)
+  private fileMap = new Map<string, string>();
+
+  private isScanned = false;
   private watchers: FSWatcher[] = [];
-  private reloadTimers = new Map<string, NodeJS.Timeout>(); // 디바운싱용
 
   /**
-   * 서버 시작 시 모든 JSON 파일을 로드하여 캐싱
-   * prisma/content/{lang}/lessons/*.json 구조 지원
-   * DEV MODE: 파일 변경 감지 활성화
+   * 서버 시작 시 파일 경로만 스캔 (Lazy Loading 준비)
+   * 내용(JSON)은 읽지 않으므로 매우 빠름
    */
-  async loadAll(): Promise<void> {
+  async scanFilePaths(): Promise<void> {
     const contentDir = path.join(__dirname, '../../prisma/content');
 
     try {
       // content 디렉토리의 모든 언어 폴더 읽기
       const languages = await fs.readdir(contentDir);
-      let totalLoaded = 0;
+      let totalFiles = 0;
 
       for (const lang of languages) {
         const lessonsDir = path.join(contentDir, lang, 'lessons');
@@ -47,11 +49,12 @@ class LessonContentLoader {
 
           for (const file of jsonFiles) {
             const filePath = path.join(lessonsDir, file);
-            const content = await fs.readFile(filePath, 'utf-8');
-            const data: LessonContentData = JSON.parse(content);
+            // 파일명에서 lessonId 추출 (예: 'c-1-1.json' -> 'c-1-1')
+            // 가정: 파일명이 곧 lessonId와 일치함
+            const lessonId = path.basename(file, '.json');
 
-            this.cache.set(data.lessonId, data);
-            totalLoaded++;
+            this.fileMap.set(lessonId, filePath);
+            totalFiles++;
           }
 
           // DEV MODE: 파일 변경 감지
@@ -64,51 +67,36 @@ class LessonContentLoader {
         }
       }
 
-      this.isLoaded = true;
-      logger.info(`${totalLoaded} lesson contents cached`);
+      this.isScanned = true;
+      logger.info(`${totalFiles} lesson paths scanned (Lazy Loading enabled)`);
 
       if (config.server.isDev) {
         logger.info(`[DEV] File watching enabled for lesson content`);
       }
     } catch (error) {
-      logger.error('Failed to load lesson contents:', error);
+      logger.error('Failed to scan lesson contents:', error);
       throw error;
     }
   }
 
   /**
    * 디렉토리 내 JSON 파일 변경 감지 (DEV MODE)
-   * 디바운싱: 100ms 내 중복 이벤트 무시
+   * 변경 시 캐시를 비워서 다음 요청 때 다시 읽게 함
    */
   private watchDirectory(dir: string): void {
     const watcher = watch(dir, (eventType, filename) => {
       if (!filename || !filename.endsWith('.json')) return;
 
-      const filePath = path.join(dir, filename);
+      const lessonId = path.basename(filename, '.json');
 
-      // 디바운싱: 이전 타이머 취소
-      const existingTimer = this.reloadTimers.get(filePath);
-      if (existingTimer) {
-        clearTimeout(existingTimer);
+      // 캐시 무효화 (Invalidate Cache)
+      if (this.cache.has(lessonId)) {
+        this.cache.delete(lessonId);
+        logger.info(`[HMR] Cache invalidated: ${lessonId}`);
       }
 
-      // 100ms 후 리로드 (중복 이벤트 방지)
-      const timer = setTimeout(async () => {
-        this.reloadTimers.delete(filePath);
-
-        try {
-          const content = await fs.readFile(filePath, 'utf-8');
-          const data: LessonContentData = JSON.parse(content);
-
-          this.cache.set(data.lessonId, data);
-          logger.info(`[HMR] ♻️  Reloaded: ${data.lessonId}`);
-        } catch {
-          // 파일 삭제 시 에러 발생 - 무시
-          logger.debug(`[HMR] File changed but could not reload: ${filename}`);
-        }
-      }, 100);
-
-      this.reloadTimers.set(filePath, timer);
+      // 새 파일이 추가되었을 수 있으므로 fileMap 업데이트는 필요할 수 있으나,
+      // 간단하게는 다음에 서버 재시작을 유도하거나, 여기서는 캐시 삭제만 처리
     });
 
     this.watchers.push(watcher);
@@ -125,30 +113,58 @@ class LessonContentLoader {
   }
 
   /**
-   * 특정 레슨의 콘텐츠를 조회 (O(1) 메모리 조회)
+   * 레슨 콘텐츠 조회 (Async Lazy Loading)
+   * 1. 캐시에 있으면 즉시 반환
+   * 2. 없으면 파일 읽어서 캐싱 후 반환
    */
-  getContent(lessonId: string): LessonContentData | null {
-    if (!this.isLoaded) {
+  async getContent(lessonId: string): Promise<LessonContentData | null> {
+    if (!this.isScanned) {
       throw new Error(
-        'LessonContentLoader not initialized. Call loadAll() first.'
+        'LessonContentLoader not initialized. Call scanFilePaths() first.'
       );
     }
 
-    return this.cache.get(lessonId) || null;
+    // 1. Memory Cache Hit
+    if (this.cache.has(lessonId)) {
+      return this.cache.get(lessonId)!;
+    }
+
+    // 2. Cache Miss - Load from Disk
+    const filePath = this.fileMap.get(lessonId);
+    if (!filePath) {
+      return null;
+    }
+
+    try {
+      const content = await fs.readFile(filePath, 'utf-8');
+      const data: LessonContentData = JSON.parse(content);
+
+      // Validate: JSON 내부 ID와 파일명 ID가 일치하는지 (선택사항)
+      if (data.lessonId !== lessonId) {
+        logger.warn(`Lesson ID mismatch in file ${filePath}: expected ${lessonId}, found ${data.lessonId}`);
+      }
+
+      // Store in Cache
+      this.cache.set(lessonId, data);
+      return data;
+    } catch (err) {
+      logger.error(`Failed to load lesson file: ${filePath}`, err);
+      return null;
+    }
   }
 
   /**
-   * 캐시된 레슨 개수 반환
+   * 현재 메모리에 캐시된 레슨 개수
    */
   getCachedCount(): number {
     return this.cache.size;
   }
 
   /**
-   * 특정 레슨에 콘텐츠가 있는지 확인
+   * 레슨 존재 여부 확인 (파일 맵 기준)
    */
   hasContent(lessonId: string): boolean {
-    return this.cache.has(lessonId);
+    return this.fileMap.has(lessonId);
   }
 }
 

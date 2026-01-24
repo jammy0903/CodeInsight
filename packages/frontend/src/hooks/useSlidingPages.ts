@@ -28,8 +28,6 @@ interface UseSlidingPagesReturn {
   goToPrevPage: () => void;
   /** framer-motion onDragEnd 핸들러 */
   handleDragEnd: (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void;
-  /** framer-motion animate x값 (예: 0 또는 '-50%') */
-  animateX: number | string;
   /** 첫 페이지인지 */
   isFirstPage: boolean;
   /** 마지막 페이지인지 */
@@ -67,18 +65,12 @@ export function useSlidingPages(options: UseSlidingPagesOptions = {}): UseSlidin
     [currentPage, totalPages, threshold]
   );
 
-  // 2페이지 기준: 0 → 0 (number), 1 → '-50%' (string)
-  // 컨테이너가 width: 200%이므로 각 페이지는 50%씩 차지
-  // framer-motion은 페이지 0일 때 숫자 0을 기대
-  const animateX: number | string = currentPage === 0 ? 0 : `-${(currentPage / totalPages) * 100}%`;
-
   return {
     currentPage,
     setCurrentPage,
     goToNextPage,
     goToPrevPage,
     handleDragEnd,
-    animateX,
     isFirstPage: currentPage === 0,
     isLastPage: currentPage === totalPages - 1,
   };

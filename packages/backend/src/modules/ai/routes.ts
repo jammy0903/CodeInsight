@@ -70,29 +70,65 @@ const analyzeReportSchema = z.object({
   streakDays: z.number().optional(), // 연속 학습 일수
 });
 
-// 시뮬레이션 스텝 기반 설명 요청 스키마
-const explainStepSchema = z.object({
-  line: z.number(),
-  code: z.string(),
-  fullCode: z.string(),
-  stack: z.array(z.object({
-    name: z.string(),
-    type: z.string(),
-    value: z.string(),
-    address: z.string(),
-  })).optional().default([]),
-  heap: z.array(z.object({
-    name: z.string(),
-    type: z.string(),
-    value: z.string(),
-    address: z.string(),
-  })).optional().default([]),
-  changes: z.array(z.object({
-    target: z.string(),
-    from: z.string().optional(),
-    to: z.string(),
-  })).optional().default([]),
-});
+// 시뮬레이션 스텝 기반 설명 요청 스키마 (언어별)
+const explainStepSchema = z.discriminatedUnion('language', [
+  // C 언어
+  z.object({
+    language: z.literal('c'),
+    line: z.number(),
+    code: z.string(),
+    fullCode: z.string(),
+    stack: z.array(z.object({
+      name: z.string(),
+      type: z.string(),
+      value: z.string(),
+      address: z.string(),
+    })).optional().default([]),
+    heap: z.array(z.object({
+      name: z.string(),
+      type: z.string(),
+      value: z.string(),
+      address: z.string(),
+    })).optional().default([]),
+    changes: z.array(z.object({
+      target: z.string(),
+      from: z.string().optional(),
+      to: z.string(),
+    })).optional().default([]),
+  }),
+  // JavaScript
+  z.object({
+    language: z.literal('javascript'),
+    line: z.number(),
+    code: z.string(),
+    fullCode: z.string(),
+    stack: z.array(z.object({
+      functionName: z.string(),
+      variables: z.record(z.string(), z.unknown()),
+    })).optional().default([]),
+    heap: z.array(z.object({
+      id: z.string(),
+      type: z.enum(['Object', 'Array', 'Function']),
+      value: z.unknown(),
+    })).optional().default([]),
+  }),
+  // Python
+  z.object({
+    language: z.literal('python'),
+    line: z.number(),
+    code: z.string(),
+    fullCode: z.string(),
+    names: z.array(z.object({
+      name: z.string(),
+      pointsTo: z.string(),
+    })).optional().default([]),
+    objects: z.array(z.object({
+      id: z.string(),
+      type: z.string(),
+      value: z.unknown(),
+    })).optional().default([]),
+  }),
+]);
 
 // === 프롬프트 생성 함수 ===
 
@@ -153,6 +189,136 @@ function buildStepExplainPrompt(): string {
 ## 절대 하지 말 것
 - 모든 줄에 설명 달기 ❌
 - 당연한 것 설명하기 ❌ (변수에 값 저장됨 등)
+- 길게 설명하기 ❌`;
+}
+
+/**
+ * JavaScript 스텝 설명용 프롬프트
+ * 클로저, this, 참조 등 JavaScript 초보자가 헷갈리는 개념 집중 설명
+ */
+function buildJsStepExplainPrompt(): string {
+  return `당신은 JavaScript 초보자가 **헷갈려하는 개념만** 콕 짚어주는 선생님입니다.
+
+## 핵심 규칙
+
+### 1. 단순한 코드는 "SKIP" 응답
+다음은 설명할 필요 없어요. 정확히 "SKIP"이라고만 답해주세요:
+- 변수 선언: \`let x = 10;\`, \`const name = 'hello';\`
+- 단순 산술: \`x = a + b;\`
+- console.log 호출
+- return 문
+- 중괄호 \`{\` \`}\`
+- 함수 시그니처: \`function add(a, b)\`
+
+### 2. 헷갈리는 개념만 설명
+다음 상황에서만 설명해주세요:
+
+**참조 vs 값 복사:**
+- \`const obj2 = obj1;\` → 두 변수가 **같은 객체**를 가리킴!
+- 원시 타입(number, string)은 값 복사, 객체는 참조 복사
+- 배열/객체 수정 시 원본도 변경되는 이유
+
+**클로저(Closure):**
+- 함수 안에서 외부 변수 접근
+- 함수가 끝나도 변수가 살아있는 이유
+- \`function outer() { let x = 1; return function() { return x; } }\`
+
+**this 바인딩:**
+- 화살표 함수 vs 일반 함수의 this 차이
+- 메서드 호출 시 this는 호출한 객체
+- \`.bind()\`, \`.call()\`, \`.apply()\`
+
+**호이스팅(Hoisting):**
+- \`var\`는 선언이 위로 끌어올려짐
+- \`let\`/\`const\`는 TDZ(Temporal Dead Zone)
+
+**비동기 (선택적):**
+- Promise, async/await
+- 콜백 함수가 나중에 실행되는 이유
+
+## 스타일
+- 한국어, 친근한 반말
+- **1-2문장**으로 핵심만!
+- "💡 ~라고 착각하기 쉬운데..." 형식 선호
+- 비유는 한 줄로 직관적으로
+
+## 응답 예시
+
+참조 복사 시:
+"🔗 obj2는 obj1을 **복사한 게 아니라 가리키는 거**야! 둘 다 같은 객체를 봐."
+
+클로저 시:
+"💡 inner 함수가 끝난 후에도 x는 **메모리에 살아있어**. inner가 x를 기억하고 있거든!"
+
+this 바인딩 시:
+"🎯 화살표 함수의 this는 **만들어질 때** 정해지지만, 일반 함수는 **호출될 때** 정해져!"
+
+## 절대 하지 말 것
+- 모든 줄에 설명 달기 ❌
+- 당연한 것 설명하기 ❌ (변수에 값 저장됨 등)
+- 길게 설명하기 ❌`;
+}
+
+/**
+ * Python 스텝 설명용 프롬프트
+ * Names-Objects 참조 모델, mutable/immutable 등 Python 고유 개념 집중
+ */
+function buildPyStepExplainPrompt(): string {
+  return `당신은 Python 초보자가 **헷갈려하는 개념만** 콕 짚어주는 선생님입니다.
+
+## 핵심 규칙
+
+### 1. 단순한 코드는 "SKIP" 응답
+다음은 설명할 필요 없어요. 정확히 "SKIP"이라고만 답해주세요:
+- 변수 할당: \`x = 10\`, \`name = 'hello'\`
+- 단순 산술: \`x = a + b\`
+- print 호출
+- return 문
+- 콜론 \`:\`
+- 함수 시그니처: \`def add(a, b):\`
+
+### 2. 헷갈리는 개념만 설명
+다음 상황에서만 설명해주세요:
+
+**Names와 Objects:**
+- \`x = [1, 2]\` → x는 리스트를 담은 게 **아니라 가리킴**!
+- \`y = x\` → 두 이름이 **같은 객체**를 가리킴
+- \`id()\` 함수로 객체 ID 확인
+
+**Mutable vs Immutable:**
+- 리스트, 딕셔너리는 수정 가능(mutable)
+- 숫자, 문자열, 튜플은 수정 불가(immutable)
+- \`x = x + 1\`은 재할당이지 수정이 아님!
+
+**함수 파라미터:**
+- Python은 **pass by object reference**
+- mutable 객체 전달 시 원본 변경 가능
+- immutable 객체는 변경 불가
+
+**리스트 슬라이싱:**
+- \`lst[1:3]\`은 **새 리스트** 생성 (복사)
+- \`lst.append()\`는 **원본** 수정
+
+## 스타일
+- 한국어, 친근한 반말
+- **1-2문장**으로 핵심만!
+- "💡 ~라고 착각하기 쉬운데..." 형식 선호
+- 비유는 한 줄로 직관적으로
+
+## 응답 예시
+
+참조 할당 시:
+"🔗 y는 x를 **복사한 게 아니라 가리키는 거**야! 둘 다 같은 리스트를 봐."
+
+Mutable 수정 시:
+"💡 리스트는 **수정 가능**해! 그래서 \`lst.append()\` 하면 원본이 바뀌지."
+
+Immutable 재할당 시:
+"💡 문자열은 **수정 불가**야! \`s = s + 'a'\`는 새 문자열을 만들어서 s에 다시 할당하는 거야."
+
+## 절대 하지 말 것
+- 모든 줄에 설명 달기 ❌
+- 당연한 것 설명하기 ❌
 - 길게 설명하기 ❌`;
 }
 
@@ -366,23 +532,29 @@ router.post('/explain-step', async (req, res) => {
       });
     }
 
-    const { line, code, fullCode, stack, heap, changes } = parsed.data;
     const provider = getCurrentProvider();
+    const data = parsed.data;
+    let userMessage = '';
+    let systemPrompt = '';
 
-    // 메모리 상태를 문자열로 변환
-    const stackStr = stack.length > 0
-      ? stack.map(v => `  ${v.name}: ${v.value} (${v.type}, ${v.address})`).join('\n')
-      : '  (비어있음)';
+    // 언어별 메시지 및 프롬프트 생성
+    if (data.language === 'c') {
+      // C 언어
+      const { line, code, fullCode, stack, heap, changes } = data;
 
-    const heapStr = heap.length > 0
-      ? heap.map(v => `  ${v.name}: ${v.value} (${v.type}, ${v.address})`).join('\n')
-      : '  (비어있음)';
+      const stackStr = stack.length > 0
+        ? stack.map(v => `  ${v.name}: ${v.value} (${v.type}, ${v.address})`).join('\n')
+        : '  (비어있음)';
 
-    const changesStr = changes.length > 0
-      ? changes.map(c => c.from ? `  ${c.target}: ${c.from} → ${c.to}` : `  ${c.target}: ${c.to} (새로 생성)`).join('\n')
-      : '  (변경 없음)';
+      const heapStr = heap.length > 0
+        ? heap.map(v => `  ${v.name}: ${v.value} (${v.type}, ${v.address})`).join('\n')
+        : '  (비어있음)';
 
-    const userMessage = `## 현재 실행 중인 코드
+      const changesStr = changes.length > 0
+        ? changes.map(c => c.from ? `  ${c.target}: ${c.from} → ${c.to}` : `  ${c.target}: ${c.to} (새로 생성)`).join('\n')
+        : '  (변경 없음)';
+
+      userMessage = `## 현재 실행 중인 코드
 \`${code.trim()}\` (${line}번째 줄)
 
 ## 전체 코드
@@ -401,13 +573,80 @@ ${changesStr}
 
 위 상황을 바탕으로 이 줄이 무엇을 하는지 설명해줘!`;
 
+      systemPrompt = buildStepExplainPrompt();
+
+    } else if (data.language === 'javascript') {
+      // JavaScript
+      const { line, code, fullCode, stack, heap } = data;
+
+      const stackStr = stack.length > 0
+        ? stack.map(f => `  함수: ${f.functionName}\n${Object.entries(f.variables).map(([k, v]) => `    ${k}: ${JSON.stringify(v)}`).join('\n')}`).join('\n\n')
+        : '  (비어있음)';
+
+      const heapStr = heap.length > 0
+        ? heap.map(h => `  [${h.id}] ${h.type}: ${JSON.stringify(h.value)}`).join('\n')
+        : '  (비어있음)';
+
+      userMessage = `## 현재 실행 중인 코드
+\`${code.trim()}\` (${line}번째 줄)
+
+## 전체 코드
+\`\`\`javascript
+${fullCode}
+\`\`\`
+
+## 현재 Call Stack (함수 실행 스택)
+${stackStr}
+
+## 현재 Heap 메모리 (객체들)
+${heapStr}
+
+위 상황을 바탕으로 이 줄이 무엇을 하는지 설명해줘!`;
+
+      systemPrompt = buildJsStepExplainPrompt();
+
+    } else if (data.language === 'python') {
+      // Python
+      const { line, code, fullCode, names, objects } = data;
+
+      const namesStr = names.length > 0
+        ? names.map(n => `  ${n.name} → ${n.pointsTo}`).join('\n')
+        : '  (비어있음)';
+
+      const objectsStr = objects.length > 0
+        ? objects.map(o => `  [${o.id}] ${o.type}: ${JSON.stringify(o.value)}`).join('\n')
+        : '  (비어있음)';
+
+      userMessage = `## 현재 실행 중인 코드
+\`${code.trim()}\` (${line}번째 줄)
+
+## 전체 코드
+\`\`\`python
+${fullCode}
+\`\`\`
+
+## 현재 Names (변수들)
+${namesStr}
+
+## 현재 Objects (객체들)
+${objectsStr}
+
+위 상황을 바탕으로 이 줄이 무엇을 하는지 설명해줘!`;
+
+      systemPrompt = buildPyStepExplainPrompt();
+
+    } else {
+      // Fallback (should not happen due to Zod validation)
+      throw new Error(`Unsupported language: ${(data as any).language}`);
+    }
+
     // 스트리밍 지원 확인
     if (!provider.streamChat) {
       // 스트리밍 미지원 시 일반 응답으로 fallback
       const response = await provider.chat({
         message: userMessage,
         history: [],
-        systemPrompt: buildStepExplainPrompt(),
+        systemPrompt,
       });
 
       res.setHeader('Content-Type', 'text/event-stream');
@@ -430,7 +669,7 @@ ${changesStr}
       {
         message: userMessage,
         history: [],
-        systemPrompt: buildStepExplainPrompt(),
+        systemPrompt,
       },
       (chunk) => {
         res.write(`data: ${JSON.stringify(chunk)}\n\n`);

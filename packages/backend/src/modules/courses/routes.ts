@@ -144,7 +144,8 @@ router.get('/lessons/:id', async (req, res) => {
     }
 
     // JSON 파일에서 콘텐츠 로드 (없으면 null)
-    const jsonContent = lessonContentLoader.getContent(id);
+    // Lazy Loading: await 필수
+    const jsonContent = await lessonContentLoader.getContent(id);
 
     // 하이브리드 응답: DB 메타데이터 + JSON 콘텐츠
     res.json({
@@ -152,10 +153,10 @@ router.get('/lessons/:id', async (req, res) => {
       // JSON 콘텐츠가 있으면 code/steps만 JSON 사용, 나머지는 DB 유지
       content: jsonContent
         ? {
-            ...lesson.content, // DB 메타데이터 유지 (id, lessonId, language, createdAt, updatedAt)
-            code: jsonContent.content.code,
-            steps: jsonContent.content.steps,
-          }
+          ...lesson.content, // DB 메타데이터 유지 (id, lessonId, language, createdAt, updatedAt)
+          code: jsonContent.content.code,
+          steps: jsonContent.content.steps,
+        }
         : lesson.content,
       quizzes: lesson.quizzes, // 항상 DB 데이터 사용
     });

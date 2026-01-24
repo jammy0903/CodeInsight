@@ -16,10 +16,10 @@ const BASE_URL = config.api.baseUrl;
 // axios 인스턴스 생성
 export const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 30000, // 30초
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 60000, // 60초
 });
 
 // Request Interceptor: 인증 토큰 자동 추가
@@ -47,4 +47,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+

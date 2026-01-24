@@ -9,13 +9,13 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import type { PanInfo } from 'framer-motion';
 import { Code2, Cpu, GitBranch, Play, ChevronUp, ChevronDown } from 'lucide-react';
 import { useStepGestures } from '../../hooks/useStepGestures';
 import { useLessonVisualization } from '../../hooks/useLessonVisualization';
+import { useSlidingPages } from '@/hooks/useSlidingPages';
 import { LessonCodeEditor } from '../day/LessonCodeEditor';
 import { MemoryPanel } from '../memory/MemoryPanel';
-import { FlowViewer } from '../python/FlowViewer';
+
 import { PyVisualizerView } from '@/features/visualizers/python';
 import { JSVisualizerView } from '@/features/visualizers/js';
 import { JavaReferenceView } from '@/features/visualizers/java';
@@ -91,8 +91,22 @@ export function MobileLessonView({
   onQuiz,
   showRegisters,
 }: MobileLessonViewProps) {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+  // useSlidingPages 훅을 사용하여 슬라이딩 로직 위임
+  const {
+    currentPage,
+    setCurrentPage,
+    handleDragEnd
+  } = useSlidingPages({ totalPages: 2 });
+
+  // Variants 정의: 매직 넘버 제거 및 명확한 상태 정의
+  const slideVariants = {
+    code: { x: 0 },
+    visual: { x: '-50%' }
+  };
+
+  const isAIChatOpenState = useState(false);
+  const [isAIChatOpen, setIsAIChatOpen] = isAIChatOpenState;
+
   const [visualTab, setVisualTab] = useState<'flow' | 'memory'>(
     (languageId === 'python' || languageId === 'py' || languageId === 'javascript' || languageId === 'js') ? 'memory' : 'flow'
   );
@@ -118,16 +132,6 @@ export function MobileLessonView({
     canGoPrev: currentStepIndex > 0,
     canGoNext: !isLastStep || !!onQuiz,
   });
-
-  // 스와이프 핸들러
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 50;
-    if (info.offset.x < -threshold && currentPage === 0) {
-      setCurrentPage(1);
-    } else if (info.offset.x > threshold && currentPage === 1) {
-      setCurrentPage(0);
-    }
-  };
 
   // 설명 텍스트에서 **굵게** 와 `코드`를 강조 처리
   const formatExplanation = (text: string) => {
@@ -265,7 +269,8 @@ export function MobileLessonView({
           dragConstraints={{ left: -300, right: 300 }}
           dragElastic={0.3}
           onDragEnd={handleDragEnd}
-          animate={{ x: currentPage === 0 ? 0 : '-50%' }}
+          variants={slideVariants}
+          animate={currentPage === 0 ? "code" : "visual"}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           className="flex h-full"
           style={{ width: '200%' }}

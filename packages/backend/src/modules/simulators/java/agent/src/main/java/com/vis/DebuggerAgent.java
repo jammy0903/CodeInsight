@@ -6,9 +6,9 @@ import com.sun.jdi.connect.LaunchingConnector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import com.sun.jdi.connect.VMStartException;
 import com.sun.jdi.event.*;
+import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequestManager;
-import com.sun.jdi.request.StepRequest;
 
 import java.io.IOException;
 import java.util.Map;
@@ -35,22 +35,21 @@ public class DebuggerAgent {
         try {
             new DebuggerAgent(args[0]).run();
         } catch (Exception e) {
-            e.printStackTrace();
+            // Print a more informative error to stderr for the Node.js parent process
+            System.err.println("DebuggerAgent failed: " + e.getMessage());
+            e.printStackTrace(System.err);
             System.exit(1);
         }
     }
 
     public void run() throws Exception {
         vm = launchTarget(targetClassName);
-
         EventRequestManager mgr = vm.eventRequestManager();
         
-        // Request class preparation events
         ClassPrepareRequest cpr = mgr.createClassPrepareRequest();
         cpr.addClassFilter(targetClassName);
         cpr.enable();
 
-        // Request exception events
         mgr.createExceptionRequest(null, true, true).enable();
 
         eventLoop(vm);
@@ -65,7 +64,7 @@ public class DebuggerAgent {
         return connector.launch(arguments);
     }
 
-    private void eventLoop(VirtualMachine vm) throws InterruptedException {
+    private void eventLoop(VirtualMachine vm) throws InterruptedException, AbsentInformationException {
         EventQueue eventQueue = vm.eventQueue();
 
         boolean connected = true;
@@ -74,15 +73,24 @@ public class DebuggerAgent {
             for (Event event : eventSet) {
                 if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
                     connected = false;
-                    break; // VM이 종료되었으므로 현재 EventSet 처리를 중단
+                    break;
                 } else if (event instanceof ClassPrepareEvent) {
-                    createStepRequest(vm, (ClassPrepareEvent) event);
-                } else if (event instanceof StepEvent) {
-                    processStep((StepEvent) event);
+                    createBreakpointRequests(vm, (ClassPrepareEvent) event);
+                } else if (event instanceof BreakpointEvent) {
+                    processBreakpoint((BreakpointEvent) event);
                 } else if (event instanceof ExceptionEvent) {
                     ExceptionEvent exceptionEvent = (ExceptionEvent) event;
-                    System.err.println("Exception occurred in target VM: " + exceptionEvent.exception());
-                    connected = false; // Terminate on exception
+                    // Print full stack trace for better diagnostics
+                    System.err.println("Exception in target VM: " + exceptionEvent.exception());
+                    exceptionEvent.thread().suspend();
+                    try {
+                        for (StackFrame frame : exceptionEvent.thread().frames()) {
+                            System.err.println("    at " + frame.location());
+                        }
+                    } catch (IncompatibleThreadStateException e) {
+                        System.err.println("    (Could not get stack trace: " + e.getMessage() + ")");
+                    }
+                    connected = false;
                 }
             }
             if (connected) {
@@ -91,32 +99,28 @@ public class DebuggerAgent {
         }
     }
 
-    private void createStepRequest(VirtualMachine vm, ClassPrepareEvent event) {
+    private void createBreakpointRequests(VirtualMachine vm, ClassPrepareEvent event) throws AbsentInformationException {
         EventRequestManager mgr = vm.eventRequestManager();
-        ThreadReference thread = event.thread();
+        ReferenceType refType = event.referenceType();
 
-        StepRequest stepReq = mgr.createStepRequest(thread, StepRequest.STEP_LINE, StepRequest.STEP_INTO);
-        
-        stepReq.addClassExclusionFilter("java.*");
-        stepReq.addClassExclusionFilter("javax.*");
-        stepReq.addClassExclusionFilter("sun.*");
-        stepReq.addClassExclusionFilter("jdk.*");
-        
-        try {
-            stepReq.enable();
-            vm.resume();
-        } catch (VMDisconnectedException e) {
-            System.out.println("타겟 프로그램이 종료되어 StepRequest를 활성화할 수 없습니다.");
-            return;
+        // Set a breakpoint at every executable line
+        for (Location loc : refType.allLineLocations()) {
+            if (loc.lineNumber() != -1) { // Only valid lines
+                BreakpointRequest req = mgr.createBreakpointRequest(loc);
+                req.enable();
+            }
         }
+
+        vm.resume(); // Resume the VM after setting breakpoints
     }
 
-    private void processStep(StepEvent event) {
+    private void processBreakpoint(BreakpointEvent event) {
         try {
             Map<String, Object> snapshot = snapshotMaker.capture(event.thread(), event.location().lineNumber());
             jsonWriter.print(snapshot);
         } catch (Exception e) {
-            System.err.println("Error processing step: " + e.getMessage());
+            System.err.println("Error processing breakpoint: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
 }

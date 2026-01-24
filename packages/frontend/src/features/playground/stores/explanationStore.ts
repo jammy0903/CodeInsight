@@ -29,6 +29,7 @@ interface QueueItem {
   step: LessonStep;
   fullCode: string;
   cacheKey: string;
+  language: 'c' | 'javascript' | 'python';
 }
 
 // 스토어 상태
@@ -45,7 +46,7 @@ interface ExplanationState {
   isProcessing: boolean;
 
   // 액션
-  startPrefetch: (steps: LessonStep[], fullCode: string) => void;
+  startPrefetch: (steps: LessonStep[], fullCode: string, language: 'c' | 'javascript' | 'python') => void;
   stopPrefetch: () => void;
   getExplanation: (line: number, code: string) => string | null;
   isStreaming: (line: number, code: string) => boolean;
@@ -69,25 +70,42 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
 
     try {
       const codeAtLine = getCodeAtLine(current.fullCode, current.step.line);
+
+      // 언어별 요청 데이터 구성
+      let requestData: any = {
+        language: current.language,
+        line: current.step.line,
+        code: codeAtLine,
+        fullCode: current.fullCode,
+      };
+
+      if (current.language === 'c') {
+        // C 언어
+        requestData.stack = current.step.stack?.map(v => ({
+          name: v.name,
+          type: v.type || '',
+          value: v.value,
+          address: v.address,
+        })) || [];
+        requestData.heap = current.step.heap?.map(v => ({
+          name: v.name,
+          type: v.type || '',
+          value: v.value,
+          address: v.address,
+        })) || [];
+        requestData.changes = [];
+      } else if (current.language === 'javascript') {
+        // JavaScript
+        requestData.stack = current.step.stack || [];
+        requestData.heap = current.step.heap || [];
+      } else if (current.language === 'python') {
+        // Python
+        requestData.names = current.step.pyNames || [];
+        requestData.objects = current.step.pyObjects || [];
+      }
+
       const result = await getStepExplanationStream(
-        {
-          line: current.step.line,
-          code: codeAtLine,
-          fullCode: current.fullCode,
-          stack: current.step.stack?.map(v => ({
-            name: v.name,
-            type: v.type || '',
-            value: v.value,
-            address: v.address,
-          })) || [],
-          heap: current.step.heap?.map(v => ({
-            name: v.name,
-            type: v.type || '',
-            value: v.value,
-            address: v.address,
-          })) || [],
-          changes: [],  // LessonStep doesn't have changes field anymore
-        },
+        requestData,
         // 스트리밍 청크 콜백
         (chunk) => {
           set((s) => ({
@@ -103,11 +121,12 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
         newCache.set(current.cacheKey, finalResult);
         return { cache: newCache };
       });
-    } catch {
-      // 에러 시 기본 설명 사용
+    } catch (error) {
+      // 에러 시 에러 메시지 표시
+      console.error('AI explanation fetch failed:', error);
       set((s) => {
         const newCache = new Map(s.cache);
-        newCache.set(current.cacheKey, current.step.explanation || '설명을 불러올 수 없습니다.');
+        newCache.set(current.cacheKey, '⚠️ AI 설명을 불러올 수 없습니다.');
         return { cache: newCache };
       });
     }
@@ -129,7 +148,7 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
     queue: [],
     isProcessing: false,
 
-    startPrefetch: (steps, fullCode) => {
+    startPrefetch: (steps, fullCode, language) => {
       // 기존 처리 중지
       if (abortController) {
         abortController.abort();
@@ -140,6 +159,7 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
       const newQueue: QueueItem[] = steps.map((step) => ({
         step,
         fullCode,
+        language,
         cacheKey: getCacheKey(step.line, getCodeAtLine(fullCode, step.line)),
       }));
 
