@@ -150,6 +150,44 @@ Git, 원격 서버 배포 등 버전 관리에 대한 모든 규칙은 아래 �
 
 ---
 
+## 🔧 시뮬레이터 아키텍처 (Debugger-Based)
+
+모든 언어 시뮬레이터는 **실제 디버거 기반** 접근 방식을 사용합니다:
+
+| 언어 | 디버거 방식 | 디렉토리 |
+|------|------------|----------|
+| Java | JDI (Java Debug Interface) | `simulators/java/agent/` |
+| Python | `sys.settrace()` | `simulators/python/agent/` |
+| JavaScript | Node.js `vm` + AST 계측 | `simulators/javascript/agent/` |
+| C | gcc + 메모리 시뮬레이션 | `simulators/c/` |
+
+**공통 4단계 파이프라인**: Setup → Compile → Debug → Cleanup
+
+**에러 처리 원칙**: 재시도 없이 즉시 에러 반환 → 프론트엔드 Toast 알림
+
+상세: `C-OSINE/.claude/context/backend_arch.md` 참조
+
+---
+
+## 🔔 Toast 알림 시스템
+
+모든 사용자 알림은 **중앙화된 Toast 모듈**을 통해 처리합니다:
+
+```typescript
+import { notifyAI, notifySimulator, handleSimulatorError } from '@/components/common/Toast';
+
+// AI Provider 알림
+notifyAI.ollamaDisconnected();
+notifyAI.backendDisconnected();
+
+// 시뮬레이터 에러 자동 분류
+handleSimulatorError('Python', errorMessage);
+```
+
+상세: `C-OSINE/.claude/context/frontend_arch.md` 참조
+
+---
+
 ## ⚙️ 일반 프로젝트 컨벤션
 
 -   **환경 변수 관리**: 프로젝트에서는 `.env.example` 파일을 사용하지 않고, **오직 `.env` 파일만을 사용하여 환경 변수를 관리합니다.** 개발 및 배포 환경에 따라 `.env` 파일 내 변수를 직접 설정합니다.

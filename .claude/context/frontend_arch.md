@@ -192,3 +192,107 @@ features/visualizers/
 - `js-visualizer/` 경로는 **폐기됨** → `visualizers/js/` 사용
 - 새로운 시각화 추가 시 해당 언어 폴더 아래에 배치
 - 여러 언어에서 공통으로 사용하는 컴포넌트는 `shared/`에 배치
+
+---
+
+### Toast 알림 시스템 (Centralized Notifications)
+
+**핵심 원칙: 모든 알림은 중앙화된 Toast 모듈을 통해 처리**
+
+`sonner` 라이브러리 기반의 통합 알림 시스템입니다.
+
+#### 디렉토리 구조
+
+```
+components/common/Toast/
+├── index.ts           # 모듈 export
+└── notifications.ts   # 중앙화된 알림 함수들
+```
+
+#### 알림 카테고리
+
+```typescript
+// 1. AI Provider 관련 알림
+export const notifyAI = {
+  ollamaDisconnected: () => { ... },      // Ollama 연결 끊김
+  deepseekDisconnected: () => { ... },    // DeepSeek 연결 끊김
+  backendDisconnected: () => { ... },     // 백엔드 서버 연결 실패
+  creditExhausted: () => { ... },         // API 크레딧 소진
+  providerSwitched: (name) => { ... },    // Provider 전환 성공
+  providerSwitchFailed: (name) => { ... },// Provider 전환 실패
+};
+
+// 2. 시뮬레이터 관련 알림
+export const notifySimulator = {
+  timeout: (language) => { ... },         // 실행 시간 초과
+  compileError: (language, msg) => { ... },// 컴파일 에러
+  runtimeError: (language, msg) => { ... },// 런타임 에러
+};
+
+// 3. 네트워크 관련 알림
+export const notifyNetwork = {
+  connectionFailed: () => { ... },        // 네트워크 연결 실패
+  serverError: (status) => { ... },       // 서버 에러 (5xx)
+};
+
+// 4. 관리자 알림
+export const notifyAdmin = {
+  settingsSaved: () => { ... },           // 설정 저장 완료
+  settingsFailed: () => { ... },          // 설정 저장 실패
+};
+```
+
+#### 헬퍼 함수
+
+```typescript
+// 시뮬레이터 에러 자동 분류 및 토스팅
+export function handleSimulatorError(language: string, errorMessage: string) {
+  if (errorMessage.includes('Time Limit Exceeded')) {
+    notifySimulator.timeout(language);
+  } else if (errorMessage.includes('Compile Error')) {
+    notifySimulator.compileError(language, errorMessage);
+  } else {
+    notifySimulator.runtimeError(language, errorMessage);
+  }
+}
+
+// API 에러 자동 분류 및 토스팅
+export function handleAPIError(status: number, message?: string) {
+  if (status === 402) {
+    notifyAI.creditExhausted();
+  } else if (status >= 500) {
+    notifyNetwork.serverError(status);
+  }
+}
+```
+
+#### 사용 예시
+
+```typescript
+// ❌ 잘못된 패턴 (분산된 toast 호출)
+import { toast } from 'sonner';
+toast.error('Ollama 연결 실패');
+
+// ✅ 올바른 패턴 (중앙화된 알림)
+import { notifyAI } from '@/components/common/Toast';
+notifyAI.ollamaDisconnected();
+```
+
+#### Toaster 설정 (main.tsx)
+
+```tsx
+import { Toaster } from 'sonner';
+
+<Toaster
+  position="top-right"
+  expand={false}
+  richColors
+  closeButton
+/>
+```
+
+**장점**:
+- ✅ **일관성**: 동일 유형 에러는 항상 같은 메시지 표시
+- ✅ **유지보수**: 메시지 수정 시 한 곳만 변경
+- ✅ **타입 안전**: TypeScript로 알림 함수 자동완성
+- ✅ **테스트 용이**: 알림 로직 단위 테스트 가능

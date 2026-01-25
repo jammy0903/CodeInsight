@@ -82,11 +82,17 @@ public class DebuggerAgent {
                     ExceptionEvent exceptionEvent = (ExceptionEvent) event;
                     // Print full stack trace for better diagnostics
                     System.err.println("Exception in target VM: " + exceptionEvent.exception());
-                    exceptionEvent.thread().suspend();
                     try {
-                        for (StackFrame frame : exceptionEvent.thread().frames()) {
-                            System.err.println("    at " + frame.location());
+                        ThreadReference thread = exceptionEvent.thread();
+                        // VM이 이미 종료되었을 수 있으므로 try-catch로 감쌈
+                        if (thread.isSuspended()) {
+                            for (StackFrame frame : thread.frames()) {
+                                System.err.println("    at " + frame.location());
+                            }
                         }
+                    } catch (VMDisconnectedException e) {
+                        // VM이 이미 종료됨 - 정상적인 상황
+                        System.err.println("    (VM already disconnected)");
                     } catch (IncompatibleThreadStateException e) {
                         System.err.println("    (Could not get stack trace: " + e.getMessage() + ")");
                     }
@@ -127,6 +133,9 @@ public class DebuggerAgent {
             Map<String, Object> snapshot = snapshotMaker.capture(thread, event.location().lineNumber());
             jsonWriter.print(snapshot);
 
+        } catch (VMDisconnectedException e) {
+            // VM이 이미 종료됨 - 정상적인 상황 (프로그램 종료 시 발생)
+            // 마지막 breakpoint 처리 중 VM이 종료될 수 있음
         } catch (IncompatibleThreadStateException e) {
             // Race condition 발생 시 재시도
             System.err.println("Thread state incompatible, retrying after explicit suspend...");
@@ -134,6 +143,8 @@ public class DebuggerAgent {
                 thread.suspend();
                 Map<String, Object> snapshot = snapshotMaker.capture(thread, event.location().lineNumber());
                 jsonWriter.print(snapshot);
+            } catch (VMDisconnectedException vme) {
+                // VM이 이미 종료됨 - 정상적인 상황
             } catch (Exception retryException) {
                 System.err.println("Retry failed: " + retryException.getMessage());
                 retryException.printStackTrace(System.err);

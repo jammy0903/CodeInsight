@@ -99,5 +99,5 @@ describe('JavaSimulationService', () => {
 
         expect(result.success).toBe(false);
         expect(result.error).toContain('Time Limit Exceeded');
-    }, 15000);
+    }, 15000); // 실행 타임아웃(10초)보다 길게 설정
 });
