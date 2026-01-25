@@ -5,9 +5,9 @@
  * Route: /courses/:lang/:chapterId/:lessonId
  */
 
-import { useEffect, useState, useMemo, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, MessageSquare, Cpu, Bot, Code2, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Sparkles, Play } from 'lucide-react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Cpu, Bot, Code2, ChevronUp, ChevronDown, Play } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -15,10 +15,10 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { getLessonFull, getChapterWithLessons, updateProgress } from '@/services/courses';
+import { updateProgress } from '@/services/courses';
 import { simulatorService, isLanguageSupported } from '@/services/simulator';
 import { useStore } from '@/stores/store';
-import { useEnterKey } from '@/hooks/useEnterKey';
+import { useEnterKey, useLesson, useChapter } from '@/hooks';
 import type { LessonFull, LessonStep, Quiz, SupportedLanguage } from '@/types';
 
 // 기존 컴포넌트 재사용
@@ -38,51 +38,16 @@ import { useLessonAnalytics } from './hooks/useLessonAnalytics';
 import { useStepGestures } from './hooks/useStepGestures';
 import { useFocusCycle } from '@/hooks/useFocusCycle';
 import { useIsMobile } from '@/hooks';
-import { useExplanationStore } from '@/features/playground/stores/explanationStore';
 
 // 언어별 시각화
 import { JSVisualizerView } from '@/features/visualizers/js';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
-import { PyVisualizerView } from '@/features/visualizers/python';
 import { JavaReferenceView } from '@/features/visualizers/java';
-
-import type { PyName, PyObject } from '@/types/py-simulator';
+import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 
 
 // 모바일 컴포넌트
 import { MobileAIChatFAB, MobileAIChatModal, MobileLessonView } from './components/mobile';
-
-// Helper functions
-function transformPyNames(names: any[] | undefined): PyName[] {
-  if (!names) return [];
-  return names.map((n) => ({
-    name: n.name,
-    scope: 'local' as const,
-    pointsTo: n.pointsTo,
-  }));
-}
-
-function transformPyObjects(objects: any[] | undefined): PyObject[] {
-  if (!objects) return [];
-  return objects.map((obj) => ({
-    id: obj.id,
-    type: obj.type as PyObject['type'],
-    value: parseObjectValue(obj.type, obj.value),
-    mutable: ['list', 'dict', 'set'].includes(obj.type),
-    refCount: undefined,
-  }));
-}
-
-function parseObjectValue(type: string, value: string | number): PyObject['value'] {
-  if (typeof value === 'number') return value;
-  switch (type) {
-    case 'int': return parseInt(value, 10);
-    case 'float': return parseFloat(value);
-    case 'bool': return value === 'True' || value === 'true';
-    case 'NoneType': return null;
-    default: return value;
-  }
-}
 
 // Top-level Component Definitions
 
@@ -295,60 +260,40 @@ function QuizCardAdapter({
 }
 
 export function LessonPage() {
-  const { lang, lessonId } = useParams<{
+  const { lang, chapterId, lessonId } = useParams<{
     lang: string;
     chapterId: string;
     lessonId: string;
   }>();
 
   const { setPageTitle } = useStore();
-  const [lesson, setLesson] = useState<LessonFull | null>(null);
+
+  // TanStack Query: 레슨 데이터 + 챕터 데이터
+  const { data: lesson, isLoading, isError, error } = useLesson(lessonId);
+  const { data: chapterData } = useChapter(chapterId);
+
   const [liveSteps, setLiveSteps] = useState<LessonStep[] | null>(null);
   const [simulating, setSimulating] = useState(false);
-  const [nextLessonId, setNextLessonId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>(
-    (lang === 'python' || lang === 'py' || lang === 'javascript' || lang === 'js') ? 'memory' : 'flow'
-  );
+  const [activeTab, setActiveTab] = useState<'flow' | 'chat'>('flow');
+
+  const memoryScrollRef = useRef<HTMLDivElement>(null);
+
   const isMobile = useIsMobile();
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [flashFlow, setFlashFlow] = useState(false);
   const [flashMemory, setFlashMemory] = useState(false);
   const prevStepIndexRef = useRef(0);
   const [isExplanationCollapsed, setIsExplanationCollapsed] = useState(false);
-  const { startPrefetch, stopPrefetch } = useExplanationStore();
 
-  useEffect(() => {
-    if (!lessonId) return;
-    let cancelled = false;
-    async function fetchData() {
-      try {
-        setLoading(true);
-        setError(null);
-        const lessonData = await getLessonFull(lessonId);
-        if (cancelled) return;
-        setLesson(lessonData);
-        const chapterData = await getChapterWithLessons(lessonData.chapterId);
-        if (cancelled) return;
-        const currentIdx = chapterData.lessons.findIndex((l) => l.id === lessonId);
-        if (currentIdx < chapterData.lessons.length - 1) {
-          setNextLessonId(chapterData.lessons[currentIdx + 1].id);
-        } else {
-          setNextLessonId(null);
-        }
-      } catch (err) {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'Failed to load lesson');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+  // 다음 레슨 ID 계산 (useMemo로 최적화)
+  const nextLessonId = useMemo(() => {
+    if (!chapterData || !lessonId) return null;
+    const currentIdx = chapterData.lessons.findIndex((l) => l.id === lessonId);
+    if (currentIdx !== -1 && currentIdx < chapterData.lessons.length - 1) {
+      return chapterData.lessons[currentIdx + 1].id;
     }
-    fetchData();
-    return () => {
-      cancelled = true;
-    };
-  }, [lessonId, lang]);
+    return null;
+  }, [chapterData, lessonId]);
 
   useEffect(() => {
     if (lesson) {
@@ -359,41 +304,106 @@ export function LessonPage() {
     };
   }, [lesson, setPageTitle, lang]);
 
+  // useMemo for memoized code string to prevent unnecessary re-runs
+  const memoizedCode = useMemo(() => lesson?.content?.code || '', [lesson?.content?.code]);
+
+  // Cache for simulation results to avoid re-fetching
+  const simulationCache = useRef<Record<string, LessonStep[]>>({});
+  const lastSimulatedCodeRef = useRef<string>('');
+
   // Live simulation for all supported languages
   useEffect(() => {
-    if (lesson && lang && isLanguageSupported(lang) && lesson.content?.code) {
-      const runSimulation = async () => {
-        setSimulating(true);
-        try {
-          const result = await simulatorService.simulate(lang, { code: lesson.content.code });
-          if (result.success) {
-            setLiveSteps(result.steps);
-            // AI 설명 생성 시작 (Playground와 동일한 로직)
-            // lang을 정규화 ('c', 'javascript', 'python')
-            const normalizedLang = lang === 'py' ? 'python' : lang === 'js' ? 'javascript' : lang as ('c' | 'javascript' | 'python');
-            startPrefetch(result.steps, lesson.content.code, normalizedLang);
-          } else {
-            console.error("Simulation failed:", result.error);
-            setError(result.error || 'Failed to simulate code.');
-          }
-        } catch (e) {
-          console.error("Simulation exception:", e);
-          setError(e instanceof Error ? e.message : 'An unknown error occurred during simulation.');
-        } finally {
-          setSimulating(false);
-        }
-      };
-      runSimulation();
-    } else if (lesson) {
-      // Fallback for non-supported languages or lessons without code
-      setLiveSteps(lesson.content?.steps || []);
+    if (!lesson || !lang) return;
+
+    // 1. If we already have stored steps in lesson content and no code to run, just use them
+    if (!lesson.content?.code && lesson.content?.steps) {
+      setLiveSteps(lesson.content.steps);
+      return;
     }
 
-    // Cleanup
-    return () => {
-      stopPrefetch();
+    // 2. Check if we have valid code to simulate
+    if (!isLanguageSupported(lang) || !memoizedCode) {
+      if (lesson.content?.steps) {
+        setLiveSteps(lesson.content.steps);
+      }
+      return;
+    }
+
+    // 3. Check cache to prevent N+1 requests
+    if (simulationCache.current[memoizedCode]) {
+      setLiveSteps(simulationCache.current[memoizedCode]);
+      // Still need to trigger prefetch if needed, but debounced via separate effect
+      return;
+    }
+
+    // 4. Code changed, verify if it's different from last run to be safe
+    if (lastSimulatedCodeRef.current === memoizedCode) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const runSimulation = async () => {
+      // Avoid rapid simulation requests
+      if (cancelled) return;
+
+      setSimulating(true);
+      try {
+        let codeToRun = memoizedCode;
+
+        // C Wrapper logic
+        if (lang === 'c' && !codeToRun.includes('main')) {
+          codeToRun = `#include <stdio.h>\n\nint main() {\n${codeToRun
+            .split('\n')
+            .map(line => '  ' + line)
+            .join('\n')}\n  return 0;\n}`;
+        }
+
+        const result = await simulatorService.simulate(lang, { code: codeToRun });
+
+        if (cancelled) return;
+
+        if (result.success) {
+          // JSON 파일의 steps에서 explanation 가져와서 병합
+          // WHY: 시뮬레이터는 메모리 상태만 생성, 상세 설명은 JSON에 있음
+          const jsonSteps = lesson.content?.steps || [];
+
+          const mergedSteps = result.steps.map((simStep) => {
+            // 같은 line을 가진 JSON step 찾기
+            const jsonStep = jsonSteps.find((js: LessonStep) => js.line === simStep.line);
+            return {
+              ...simStep,
+              // JSON explanation이 있으면 우선 사용, 없으면 시뮬레이터 설명 사용
+              explanation: jsonStep?.explanation || simStep.explanation,
+            };
+          });
+
+          // Update Cache
+          simulationCache.current[memoizedCode] = mergedSteps;
+          lastSimulatedCodeRef.current = memoizedCode;
+
+          setLiveSteps(mergedSteps);
+        } else {
+          console.error("Simulation failed:", result.error);
+          setError(result.error || 'Failed to simulate code.');
+        }
+      } catch (e) {
+        if (cancelled) return;
+        console.error("Simulation exception:", e);
+        setError(e instanceof Error ? e.message : 'An unknown error occurred during simulation.');
+      } finally {
+        if (!cancelled) setSimulating(false);
+      }
     };
-  }, [lesson, lang, startPrefetch, stopPrefetch]);
+
+    // Debounce simulation slightly to prevent double-firing on rapid mounts
+    const timer = setTimeout(runSimulation, 100);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [lesson, lang, memoizedCode]);
 
   const steps: LessonStep[] = useMemo(() => {
     return liveSteps || [];
@@ -444,6 +454,28 @@ export function LessonPage() {
 
   const currentStep = steps[navigation.currentStepIndex];
 
+  // [Fix] C언어 시뮬레이터가 main 진입점 라인을 0 또는 1(#include)로 잘못 보고하는 문제 보정
+  const displayLine = useMemo(() => {
+    if (!currentStep) return 1;
+    const rawLine = currentStep.line;
+
+    // C/C++이고 라인이 1 이하(또는 falsy)인 경우 보정 시도
+    if ((lang === 'c' || lang === 'cpp') && (!rawLine || rawLine <= 1)) {
+      const lines = code.split('\n');
+      // 첫 줄이 #include 인데 하이라이트가 1번이면 문제라고 판단
+      if (lines.length > 0 && lines[0].trim().startsWith('#')) {
+        // main 함수 위치 검색
+        const mainIndex = lines.findIndex(l =>
+          /^(?:int|void)\s+main\s*\(/.test(l.trim())
+        );
+        if (mainIndex !== -1) {
+          return mainIndex + 1; // main 함수 선언부로 이동
+        }
+      }
+    }
+    return rawLine || 1;
+  }, [currentStep, code, lang]);
+
   useEffect(() => {
     const prevIndex = prevStepIndexRef.current;
     const isForward = navigation.currentStepIndex > prevIndex;
@@ -460,6 +492,36 @@ export function LessonPage() {
     return () => timers.forEach(clearTimeout);
   }, [navigation.currentStepIndex, currentStep]);
 
+  // 메모리 탭 자동 중앙 정렬 - 단순화된 버전
+  // ResizeObserver 대신 직접 스크롤 실행 (min-h-full 요소는 크기 변화 감지 안 됨)
+  useEffect(() => {
+    if (activeTab !== 'memory') return;
+
+    const container = memoryScrollRef.current;
+    if (!container) return;
+
+    // 레이아웃이 완료된 후 스크롤 (2단계 rAF로 확실하게)
+    const timeoutId = setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (!container) return;
+          const { scrollHeight, clientHeight, scrollWidth, clientWidth } = container;
+
+          // 오버플로우가 있을 때만 중앙으로 스크롤
+          if (scrollHeight > clientHeight || scrollWidth > clientWidth) {
+            container.scrollTo({
+              top: Math.max(0, (scrollHeight - clientHeight) / 2),
+              left: Math.max(0, (scrollWidth - clientWidth) / 2),
+              behavior: 'instant'
+            });
+          }
+        });
+      });
+    }, 50); // 약간의 딜레이로 컨텐츠 렌더링 대기
+
+    return () => clearTimeout(timeoutId);
+  }, [activeTab, navigation.currentStepIndex]);
+
   const languageCoursePath = `/courses/${lang}`;
   const nextLessonPath = nextLessonId && lesson ? `/courses/${lang}/${lesson.chapterId}/${nextLessonId}` : null;
 
@@ -471,8 +533,8 @@ export function LessonPage() {
     }
   };
 
-  if (loading || simulating) return <LoadingView />;
-  if (error || !lesson) return <NotFoundView message={error || '레슨을 찾을 수 없습니다'} backPath={languageCoursePath} />;
+  if (isLoading || simulating) return <LoadingView />;
+  if (isError || !lesson) return <NotFoundView message={error instanceof Error ? error.message : '레슨을 찾을 수 없습니다'} backPath={languageCoursePath} />;
   if (steps.length === 0) return <NotFoundView message="레슨 콘텐츠가 없습니다" backPath={languageCoursePath} />;
 
   return (
@@ -531,7 +593,7 @@ export function LessonPage() {
             >
               <LessonCodeEditor
                 code={code}
-                highlightLine={currentStep?.line || 1}
+                highlightLine={displayLine}
                 onSelectionChange={setSelection}
               />
             </div>
@@ -552,7 +614,7 @@ export function LessonPage() {
                       color: '#fff',
                     }}
                   >
-                    L{currentStep.line}
+                    L{displayLine}
                   </span>
                   {(code.split('\n').length > 6) && (
                     <button
@@ -577,7 +639,7 @@ export function LessonPage() {
                     <StepExplanation
                       explanation={currentStep.explanation}
                       stepIndex={navigation.currentStepIndex}
-                      line={currentStep.line}
+                      line={displayLine}
                       code={code}
                     />
                   </div>
@@ -597,33 +659,17 @@ export function LessonPage() {
               className="flex shrink-0"
               style={{ borderBottom: '1px solid var(--theme-lesson-panel-border)', height: '40px' }}
             >
-              {(lang !== 'python' && lang !== 'py' && lang !== 'javascript' && lang !== 'js') && (
-                <button
-                  onClick={() => setActiveTab('flow')}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold"
-                  style={{
-                    background: activeTab === 'flow' ? 'var(--theme-lesson-tab-active-bg)' : 'var(--theme-lesson-tab-inactive-bg)',
-                    color: activeTab === 'flow' ? 'var(--theme-lesson-tab-active-text)' : 'var(--theme-lesson-tab-inactive-text)',
-                    borderRight: '1px solid var(--theme-lesson-panel-border)',
-                  }}
-                >
-                  <Play className="w-3.5 h-3.5" />
-                  <span>Flow</span>
-                </button>
-              )}
               <button
-                onClick={() => setActiveTab('memory')}
+                onClick={() => setActiveTab('flow')}
                 className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold"
                 style={{
-                  background: activeTab === 'memory' ? 'var(--theme-lesson-tab-active-bg)' : 'var(--theme-lesson-tab-inactive-bg)',
-                  color: activeTab === 'memory' ? 'var(--theme-lesson-tab-active-text)' : 'var(--theme-lesson-tab-inactive-text)',
+                  background: activeTab === 'flow' ? 'var(--theme-lesson-tab-active-bg)' : 'var(--theme-lesson-tab-inactive-bg)',
+                  color: activeTab === 'flow' ? 'var(--theme-lesson-tab-active-text)' : 'var(--theme-lesson-tab-inactive-text)',
                   borderRight: '1px solid var(--theme-lesson-panel-border)',
                 }}
               >
-                <Cpu className="w-3.5 h-3.5" />
-                <span>
-                  {(lang === 'javascript' || lang === 'js' || lang === 'python' || lang === 'py') ? '시각화' : '메모리'}
-                </span>
+                <Play className="w-3.5 h-3.5" />
+                <span>Flow</span>
               </button>
               {!isMobile && (
                 <button
@@ -640,59 +686,42 @@ export function LessonPage() {
               )}
             </div>
             <div
-              className="flex-1 overflow-y-auto"
+              className="flex-1 overflow-hidden"
               style={{
                 background: 'var(--theme-lesson-memory-bg)',
                 minHeight: '400px',
               }}
             >
               {activeTab === 'flow' && (
-                <div className="p-4">
-                  {lang === 'java' ? (
-                    <JavaReferenceView
-                      stack={visualizationState?.stack}
-                      heap={visualizationState?.heap}
-                    />
-                  ) : currentStep ? (
-                    <LessonFlowVisualizer
-                      step={currentStep}
-                      prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
-                      language={lang || 'c'}
-                      fullCode={code}
-                      memoryState={memoryState ? {
-                        stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
-                        heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' }))
-                      } : undefined}
-                      stdout={currentStep.stdout}
-                    />
-                  ) : null}
-                </div>
-              )}
-              {activeTab === 'memory' && (
-                <div className="p-4">
-                  {(lang === 'python' || lang === 'py') && visualizationType === 'python' ? (
-                    <PyVisualizerView
-                      names={transformPyNames((visualizationState as any)?.names)}
-                      objects={transformPyObjects((visualizationState as any)?.objects)}
-                      animate={true}
-                      compact={false}
-                    />
-                  ) : (lang === 'javascript' || lang === 'js') && visualizationType === 'javascript' ? (
-                    <JSVisualizerView
-                      type={visualizationType as any}
-                      state={visualizationState}
-                    />
-                  ) : (
-                    memoryState ? (
-                      <MemoryPanel
-                        stack={memoryState.stack}
-                        heap={memoryState.heap}
-                        changedBlocks={changedBlocks}
-                        showRegisters={lesson?.content?.showRegisters}
-                        frames={memoryState.frames}
+                <div className="w-full h-full overflow-y-auto">
+                  <div className="p-4">
+                    {lang === 'java' ? (
+                      <JavaReferenceView
+                        stack={visualizationState?.stack}
+                        heap={visualizationState?.heap}
                       />
-                    ) : null
-                  )}
+                    ) : currentStep ? (
+                      <LessonFlowVisualizer
+                        step={currentStep}
+                        prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
+                        language={lang || 'c'}
+                        fullCode={code}
+                        // stack/heap for Python flow view might be needed?
+                        // PythonFlowView logic inside LessonFlowVisualizer uses `step.variables` which comes from `adapter.transformer.transform`.
+                        // The transformer needs `stack` and `heap` from the step.
+                        // `currentStep` from `liveSteps` (simulator service) has `pyNames`/`pyObjects`.
+                        // But `LessonFlowVisualizer` enrichment logic:
+                        // if (memoryState) { enriched.stack = memoryState.stack; ... }
+                        // `useLessonVisualization` returns `memoryState` for Python too (adapted from names/objects).
+                        // So we need to pass `memoryState` to `LessonFlowVisualizer`.
+                        memoryState={memoryState ? {
+                          stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
+                          heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' }))
+                        } : undefined}
+                        stdout={currentStep.stdout}
+                      />
+                    ) : null}
+                  </div>
                 </div>
               )}
               {activeTab === 'chat' && !isMobile && (
@@ -765,7 +794,16 @@ export function LessonPage() {
           open={navigation.phase === 'quiz'}
           onOpenChange={(open) => !open && navigation.reset()}
         >
-          <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
+          <DialogContent
+            className="max-w-xl max-h-[85vh] overflow-y-auto"
+            onKeyDown={(e) => {
+              // Dialog 내부에서 ← 키로 이전 스텝 이동 허용
+              if (e.key === 'ArrowLeft' && navigation.canGoPrev) {
+                e.preventDefault();
+                navigation.goToPrevStep();
+              }
+            }}
+          >
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">🧠 퀴즈</DialogTitle>
               <DialogDescription className="sr-only">
