@@ -1,0 +1,222 @@
+{
+  "lessonId": "py-practical-5-1",
+  "title": "데이터 탐색 (EDA)",
+  "concept": "데이터를 받으면 가장 먼저 해야 할 일: 결측치 확인, 기술 통계로 전체 파악, 중복 제거",
+  "content": {
+    "code": "import pandas as pd\n\ndf = pd.read_csv('sales.csv')\nprint(df.info())\nprint(df.describe())\nprint(df.isnull().sum())\ndf_clean = df.dropna()\nprint(f'원본: {len(df)}행 → 정제: {len(df_clean)}행')",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Step 1: pandas 불러오기",
+        "explanation": "데이터 분석의 핵심 라이브러리 pandas를 import합니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 3,
+        "title": "Step 2: CSV 파일 읽기",
+        "explanation": "`pd.read_csv('sales.csv')`로 **CSV 파일을 DataFrame**으로 불러옵니다.\n\n**CSV (Comma-Separated Values)**: 엑셀보다 가벼운 데이터 형식\n- 예: `이름,부서,급여\\n홍길동,개발,500만`\n\n**실무에서 가장 많이 쓰는 형식**: 데이터베이스 추출, 로그 파일 등",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "Step 3: 데이터 구조 확인",
+        "explanation": "`df.info()`는 **DataFrame의 전체 구조**를 보여줍니다.\n\n**출력 내용**:\n- 행 개수 (예: 1000 rows)\n- 각 열의 이름, 타입, 결측치 개수\n- 메모리 사용량\n\n**언제 쓸까?** 데이터 분석 시작 전 '어떤 데이터인지' 파악\n\n**실무 필수**: 데이터를 받으면 가장 먼저 실행하는 명령입니다.",
+        "highlight": [
+          4
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Step 4: 기술 통계 확인",
+        "explanation": "`df.describe()`는 **숫자 열의 통계**를 보여줍니다.\n\n**출력 내용** (숫자 열만):\n- count: 개수 (결측치 제외)\n- mean: 평균\n- std: 표준편차\n- min, 25%, 50%, 75%, max: 분위수\n\n**왜 중요한가?** 평균, 최솟값, 최댓값으로 데이터 범위를 빠르게 파악합니다.\n\n**실무 활용**: 급여가 음수? → 데이터 오류 발견",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Step 5: 결측치 개수 확인",
+        "explanation": "`df.isnull().sum()`으로 **각 열의 결측치 개수**를 확인합니다.\n\n**동작 과정**:\n1. `df.isnull()` → True/False DataFrame 생성\n2. `.sum()` → True 개수 합계 (True=1, False=0)\n\n**결측치(null)**:\n- 비어있는 값 (None, NaN)\n- 데이터 수집 실패, 입력 누락 등\n\n**왜 확인할까?** 결측치가 많으면 분석 결과가 왜곡됩니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "Step 6: 결측치 제거",
+        "explanation": "`df.dropna()`는 **결측치가 있는 행을 제거**합니다.\n\n**동작**: 어떤 열이든 결측치가 하나라도 있으면 그 행 전체를 삭제\n\n**주의**: 원본 df는 변경 안 됨. 새 DataFrame 반환\n\n**대안**:\n- `df.dropna(subset=['급여'])`: 급여 열만 확인\n- `df.fillna(0)`: 결측치를 0으로 채우기\n- `df.fillna(method='ffill')`: 이전 값으로 채우기",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            },
+            {
+              "name": "df_clean",
+              "pointsTo": "obj_df_clean"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_df_clean",
+              "type": "object",
+              "value": "df.dropna()",
+              "pyId": "5002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "Step 7: 정제 결과 확인",
+        "explanation": "f-string으로 **정제 전후 행 개수**를 비교합니다.\n\n**len(df)**: DataFrame의 행 개수\n\n**출력 예시**: \"원본: 3행 → 정제: 2행\"\n\n**실무 활용**: 결측치 제거율 확인 → 30% 이상 삭제되면 다른 방법 고려",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            },
+            {
+              "name": "df_clean",
+              "pointsTo": "obj_df_clean"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_df_clean",
+              "type": "object",
+              "value": "df.dropna()",
+              "pyId": "5002"
+            }
+          ],
+          "output": [
+            "원본: {len(df)}행 → 정제: {len(df_clean)}행"
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "결측치를 제거하지 않고 평균값으로 채우려면?",
+    "options": [
+      "df.fillna(df.mean())",
+      "df.dropna(fill=True)",
+      "df.replace(NaN, mean())",
+      "df.isnull().fill()"
+    ],
+    "correctIndex": 0,
+    "explanation": "df.fillna(df.mean())은 결측치를 각 열의 평균값으로 채웁니다. dropna()는 제거만 하고, fillna()는 값을 채웁니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "df.dropna()하면 원본이 바뀐다",
+      "correct": "dropna()는 새 DataFrame을 반환합니다. 원본을 바꾸려면 df = df.dropna() 또는 df.dropna(inplace=True)",
+      "why": "pandas는 대부분 원본을 보존합니다. 명시적으로 재할당해야 변경됩니다."
+    },
+    {
+      "wrong": "describe()는 모든 열의 통계를 보여준다",
+      "correct": "기본값은 숫자 열만입니다. 문자열 열도 보려면 df.describe(include='all')",
+      "why": "평균, 표준편차 등은 숫자 열에만 의미가 있습니다."
+    }
+  ],
+  "keyTakeaway": "EDA = info() + describe() + isnull().sum() (데이터 파악 3종 세트)"
+}
