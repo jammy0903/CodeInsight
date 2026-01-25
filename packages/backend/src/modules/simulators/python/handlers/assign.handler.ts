@@ -56,14 +56,17 @@ export const AssignHandler: PyCodeHandler = {
     // 표현식 평가 → 객체 생성 또는 참조
     const obj = evaluateExpr(ctx, trimmedExpr);
 
-    // 이름 바인딩 (현재 스코프: 함수 내부면 로컬, 아니면 글로벌)
-    const scope = ctx.getCurrentScope();
+    // 이름 바인딩 스코프 결정
+    // - global 선언된 변수 → 전역 스코프
+    // - 그 외 → 현재 스코프 (함수 내부면 로컬, 아니면 글로벌)
+    const frame = ctx.getCurrentFrame();
+    const isGlobalVar = frame?.globalVars?.has(varName);
+    const scope = isGlobalVar ? 'global' : ctx.getCurrentScope();
     const pyName = ctx.bindName(varName, obj.id, scope);
     pyName.highlight = true;
     obj.highlight = true;
 
     // unboundLocals에서 제거 (변수가 바인딩되었으므로)
-    const frame = ctx.getCurrentFrame();
     if (frame?.unboundLocals) {
       frame.unboundLocals.delete(varName);
     }
@@ -152,6 +155,39 @@ function evaluateExpr(ctx: PySimContext, expr: string): PyObject {
   // 빈 딕셔너리
   if (trimmed === '{}') {
     return ctx.createObject('dict', []);
+  }
+
+  // 산술 연산: a + b, a - b, a * b, a / b
+  // 비탐욕적 매칭으로 왼쪽에서 오른쪽 결합 (left-to-right associativity)
+  // 예: a + b + c → (a + b) + c
+  const binaryMatch = trimmed.match(/^(.+?)\s*([+\-*/])\s*(.+)$/);
+  if (binaryMatch) {
+    const [, leftExpr, operator, rightExpr] = binaryMatch;
+
+    // 재귀적으로 좌변, 우변 평가
+    const leftObj = evaluateExpr(ctx, leftExpr.trim());
+    const rightObj = evaluateExpr(ctx, rightExpr.trim());
+
+    // 타입 체크: 숫자 타입만 산술 연산 지원
+    if (!isNumeric(leftObj) || !isNumeric(rightObj)) {
+      const leftType = leftObj.type;
+      const rightType = rightObj.type;
+      throw new Error(
+        `TypeError: unsupported operand type(s) for ${operator}: '${leftType}' and '${rightType}'`
+      );
+    }
+
+    // 연산 수행
+    const leftVal = leftObj.value as number;
+    const rightVal = rightObj.value as number;
+    const result = performArithmetic(leftVal, operator, rightVal);
+
+    // 결과 타입 결정: int + float = float (Python 동작)
+    const resultType = (leftObj.type === 'float' || rightObj.type === 'float')
+      ? 'float'
+      : 'int';
+
+    return ctx.createObject(resultType, result);
   }
 
   // 변수 참조 (현재 프레임 로컬 → 글로벌 순서로 탐색)
@@ -354,10 +390,15 @@ function formatValue(obj: PyObject): string {
 }
 
 /**
- * 컨텍스트에서 객체 가져오기 (프레임 로컬 우선)
+ * 컨텍스트에서 객체 가져오기 (프레임 로컬 우선, global 선언 고려)
  */
 function getObjectFromContext(ctx: PySimContext, name: string): PyObject | null {
   const frame = ctx.getCurrentFrame();
+
+  // global 선언된 변수는 전역에서만 찾기
+  if (frame?.globalVars?.has(name)) {
+    return getObjectByName(ctx, name) || null;
+  }
 
   // 1. 현재 프레임의 로컬 변수에서 찾기
   if (frame) {
@@ -417,4 +458,33 @@ function checkUnboundLocalInExpr(ctx: PySimContext, expr: string): string | null
   }
 
   return null;
+}
+
+/**
+ * 숫자 타입 체크 (int 또는 float)
+ */
+function isNumeric(obj: PyObject): boolean {
+  return obj.type === 'int' || obj.type === 'float';
+}
+
+/**
+ * 산술 연산 수행
+ * @throws ZeroDivisionError (0으로 나눌 때)
+ */
+function performArithmetic(left: number, op: string, right: number): number {
+  switch (op) {
+    case '+':
+      return left + right;
+    case '-':
+      return left - right;
+    case '*':
+      return left * right;
+    case '/':
+      if (right === 0) {
+        throw new Error('ZeroDivisionError: division by zero');
+      }
+      return left / right;
+    default:
+      throw new Error(`Unknown operator: ${op}`);
+  }
 }
