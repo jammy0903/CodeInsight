@@ -28,44 +28,14 @@ export class PythonDebuggerClient {
   );
 
   private readonly EXECUTION_TIMEOUT = 10000; // 10 seconds
-  private readonly MAX_RETRIES = 1;
 
   /**
    * Runs the Python debugger agent and captures snapshots.
+   * No retry logic - errors are immediately propagated to the client for toast notification.
    * @param projectPath The project directory containing main.py
    * @returns Array of execution snapshots
    */
   async run(projectPath: string): Promise<PythonSnapshot[]> {
-    let lastError: Error | null = null;
-
-    for (let attempt = 0; attempt <= this.MAX_RETRIES; attempt++) {
-      try {
-        return await this.executeOnce(projectPath);
-      } catch (error: any) {
-        lastError = error;
-        console.warn(
-          `Python execution attempt ${attempt + 1} failed: ${error.message}`
-        );
-
-        // Don't retry timeout errors
-        if (error.message.includes('Time Limit Exceeded')) {
-          throw error;
-        }
-
-        // Wait before retry
-        if (attempt < this.MAX_RETRIES) {
-          await this.sleep(500);
-        }
-      }
-    }
-
-    throw lastError || new Error('Python execution failed after retries');
-  }
-
-  /**
-   * Single execution attempt
-   */
-  private async executeOnce(projectPath: string): Promise<PythonSnapshot[]> {
     const sourcePath = path.join(projectPath, 'main.py');
 
     const child = spawn('python3', [this.AGENT_PATH, sourcePath], {
@@ -157,9 +127,5 @@ export class PythonDebuggerClient {
     }
 
     return snapshots.filter((s) => s.event === 'STEP');
-  }
-
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
