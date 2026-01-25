@@ -63,6 +63,8 @@ export function useLessonNavigation(
     if (currentStepIndex > 0) {
       const newIndex = currentStepIndex - 1;
       setCurrentStepIndex(newIndex);
+      // 퀴즈/완료 상태에서 이전 스텝으로 가면 학습 모드로 전환
+      setPhase('learning');
       onStepChange?.(newIndex);
     }
   }, [currentStepIndex, onStepChange]);
