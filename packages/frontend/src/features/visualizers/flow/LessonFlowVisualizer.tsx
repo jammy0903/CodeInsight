@@ -10,6 +10,7 @@ import { memo, useMemo, useRef } from 'react';
 import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared';
 import { FlowVisualizer } from './FlowVisualizer';
 import { PythonFlowView } from './components/PythonFlowView';
+import { JavaFlowView } from './components/JavaFlowView';
 import { ArrowLayer } from './components/ArrowLayer';
 import { getAdapter, createAdapter } from './adapters';
 import type { FlowTheme } from './styles';
@@ -172,7 +173,19 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     );
   }
 
-  // C/Java 등은 기존 FlowVisualizer 사용
+  // Java는 전용 뷰 사용 (호버 하이라이트, 화살표 없음)
+  if (language === 'java') {
+    return (
+      <div className={className}>
+        <JavaFlowView
+          step={flowStepWithAnimations}
+          prevStep={prevFlowStep}
+        />
+      </div>
+    );
+  }
+
+  // C 등은 기존 FlowVisualizer 사용
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <FlowVisualizer
