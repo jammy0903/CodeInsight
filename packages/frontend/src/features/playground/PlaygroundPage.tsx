@@ -6,20 +6,15 @@
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useIsMobile } from '@/hooks';
-import { Cpu, Github, Mail, Play } from 'lucide-react';
+import { Github, Mail, Play } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
 import { CodeEditor } from './components/CodeEditor';
 import { StepControls } from './components/StepControls';
 import { StepExplanation } from './components/StepExplanation';
-import { MemoryPanel } from '@/features/courses/components/memory';
 import { useLessonVisualization } from '@/features/courses/hooks/useLessonVisualization';
 import { useStepGestures } from '@/features/courses/hooks/useStepGestures';
-import { useEnterKey } from '@/hooks/useEnterKey';
 import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/playgroundStore';
 import { useExplanationStore } from './stores/explanationStore';
-import { PyVisualizerView } from '@/features/visualizers/python';
-import { JavaMemoryView } from '@/features/visualizers/java';
-import { JSVisualizerView } from '@/features/visualizers/js';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
@@ -127,7 +122,6 @@ export function PlaygroundPage() {
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
-  const [activeTab, setActiveTab] = useState<'flow' | 'memory'>('flow');
 
   // 페이지 제목 설정
   useEffect(() => {
@@ -238,9 +232,9 @@ export function PlaygroundPage() {
           )}
         </div>
 
-        {/* Visualization Section (Flow + Memory Tabs) - 컨텐츠에 따라 늘어남 */}
+        {/* Visualization Section - Flow Only */}
         <div style={{ backgroundColor: colors.panelBg, borderTop: `1px solid ${colors.border}`, display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
-          {/* Tab Header */}
+          {/* Header */}
           <div
             style={{
               height: '36px',
@@ -252,9 +246,7 @@ export function PlaygroundPage() {
               backgroundColor: colors.headerBg,
             }}
           >
-            {/* Flow Tab */}
-            <button
-              onClick={() => setActiveTab('flow')}
+            <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -262,37 +254,12 @@ export function PlaygroundPage() {
                 padding: '4px 10px',
                 fontSize: '11px',
                 fontWeight: 600,
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                backgroundColor: activeTab === 'flow' ? colors.accentBg : 'transparent',
-                color: activeTab === 'flow' ? colors.accent : colors.textMuted,
+                color: colors.accent,
               }}
             >
               <Play size={12} />
               Flow
-            </button>
-
-            {/* Memory Tab */}
-            <button
-              onClick={() => setActiveTab('memory')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                padding: '4px 10px',
-                fontSize: '11px',
-                fontWeight: 600,
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                backgroundColor: activeTab === 'memory' ? colors.accentBg : 'transparent',
-                color: activeTab === 'memory' ? colors.accent : colors.textMuted,
-              }}
-            >
-              <Cpu size={12} />
-              Memory
-            </button>
+            </div>
 
             {hasSteps && (
               <span
@@ -313,51 +280,25 @@ export function PlaygroundPage() {
             )}
           </div>
 
-          {/* Tab Content - 컨텐츠에 따라 늘어남 */}
+          {/* Content */}
           <div style={{ padding: '8px', minHeight: '200px' }}>
             {error ? (
               <div style={{ padding: '10px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '6px' }}>
                 <p style={{ fontSize: '12px', color: colors.errorText }}>{error}</p>
               </div>
-            ) : activeTab === 'flow' ? (
-              /* Flow Tab Content */
-              (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
-                <LessonFlowVisualizer
-                  step={currentStep as LessonStep}
-                  prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
-                  language={language}
-                  fullCode={code}
-                  theme={currentTheme === 'dark' ? 'dark' : 'light'}
-                />
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
-                  Run 버튼을 눌러 실행
-                </div>
-              )
+            ) : (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
+              <LessonFlowVisualizer
+                step={currentStep as LessonStep}
+                prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
+                language={language}
+                fullCode={code}
+                theme={currentTheme === 'dark' ? 'dark' : 'light'}
+                stdout={currentStep?.stdout}
+              />
             ) : (
-              /* Memory Tab Content */
-              language === 'python' && hasSteps ? (
-                <PyVisualizerView names={currentStep?.pyNames || []} objects={currentStep?.pyObjects || []} animate={true} />
-              ) : language === 'c' && hasSteps ? (
-                <MemoryPanel
-                  stack={memoryState.stack}
-                  heap={memoryState.heap}
-                  changedBlocks={changedBlocks}
-                  frames={memoryState.frames}
-                  showRegisters={!!registers?.rsp || !!registers?.rbp}
-                />
-              ) : language === 'java' && hasSteps ? (
-                <JavaMemoryView
-                  currentStep={currentStep as any}
-                  theme={currentTheme}
-                />
-              ) : language === 'javascript' && hasSteps ? (
-                <JSVisualizerView state={visualizationState} type={visualizationType} />
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
-                  Run 버튼을 눌러 실행
-                </div>
-              )
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
+                Run 버튼을 눌러 실행
+              </div>
             )}
           </div>
         </div>
@@ -502,7 +443,7 @@ export function PlaygroundPage() {
             zIndex: 10,
           }}
         >
-          {/* Tab Header */}
+          {/* Header */}
           <div
             style={{
               height: '48px',
@@ -515,9 +456,7 @@ export function PlaygroundPage() {
               flexShrink: 0,
             }}
           >
-            {/* Flow Tab */}
-            <button
-              onClick={() => setActiveTab('flow')}
+            <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -525,41 +464,12 @@ export function PlaygroundPage() {
                 padding: '8px 16px',
                 fontSize: '13px',
                 fontWeight: 600,
-                borderRadius: '8px 8px 0 0',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                backgroundColor: activeTab === 'flow' ? colors.accentBg : 'transparent',
-                color: activeTab === 'flow' ? colors.accent : colors.textMuted,
-                borderBottom: activeTab === 'flow' ? `2px solid ${colors.accent}` : '2px solid transparent',
+                color: colors.accent,
               }}
             >
               <Play size={14} />
               Flow
-            </button>
-
-            {/* Memory Tab */}
-            <button
-              onClick={() => setActiveTab('memory')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '8px 16px',
-                fontSize: '13px',
-                fontWeight: 600,
-                borderRadius: '8px 8px 0 0',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                backgroundColor: activeTab === 'memory' ? colors.accentBg : 'transparent',
-                color: activeTab === 'memory' ? colors.accent : colors.textMuted,
-                borderBottom: activeTab === 'memory' ? `2px solid ${colors.accent}` : '2px solid transparent',
-              }}
-            >
-              <Cpu size={14} />
-              Memory
-            </button>
+            </div>
 
             {/* Step Counter */}
             {hasSteps && (
@@ -581,55 +491,25 @@ export function PlaygroundPage() {
             )}
           </div>
 
-          {/* Tab Content - 컨텐츠에 따라 늘어남 */}
+          {/* Content */}
           <div style={{ padding: '16px' }}>
             {error ? (
               <div style={{ padding: '16px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
                 <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
               </div>
-            ) : activeTab === 'flow' ? (
-              /* Flow Tab Content */
-              (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
-                <LessonFlowVisualizer
-                  step={currentStep as LessonStep}
-                  prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
-                  language={language}
-                  fullCode={code}
-                  theme={currentTheme === 'dark' ? 'dark' : 'light'}
-                />
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
-                  Click Run button to execute code
-                </div>
-              )
+            ) : (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
+              <LessonFlowVisualizer
+                step={currentStep as LessonStep}
+                prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
+                language={language}
+                fullCode={code}
+                theme={currentTheme === 'dark' ? 'dark' : 'light'}
+                stdout={currentStep?.stdout}
+              />
             ) : (
-              /* Memory Tab Content */
-              language === 'python' && hasSteps ? (
-                <PyVisualizerView
-                  names={currentStep?.pyNames || []}
-                  objects={currentStep?.pyObjects || []}
-                  animate={true}
-                />
-              ) : language === 'c' && hasSteps ? (
-                <MemoryPanel
-                  stack={memoryState.stack}
-                  heap={memoryState.heap}
-                  changedBlocks={changedBlocks}
-                  frames={memoryState.frames}
-                  showRegisters={!!registers?.rsp || !!registers?.rbp}
-                />
-              ) : language === 'java' && hasSteps ? (
-                <JavaMemoryView
-                  currentStep={currentStep as any}
-                  theme={currentTheme}
-                />
-              ) : language === 'javascript' && hasSteps ? (
-                <JSVisualizerView state={visualizationState} type={visualizationType} />
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
-                  Click Run button to execute code
-                </div>
-              )
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
+                Click Run button to execute code
+              </div>
             )}
           </div>
         </div>
