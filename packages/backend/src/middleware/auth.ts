@@ -87,9 +87,23 @@ export async function requireAuth(
       provider,
     };
     next();
-  } catch (error) {
-    logger.error('Auth: Token verification failed', { error });
-    res.status(401).json({ error: 'Invalid or expired token' });
+  } catch (error: any) {
+    // 토큰 만료는 정상적인 세션 만료 (error가 아님)
+    const isExpired = error?.code === 'auth/id-token-expired' || error?.errorInfo?.code === 'auth/id-token-expired';
+
+    if (isExpired) {
+      // 만료는 info 레벨 (단일 사용자 정보는 로그 생략)
+      logger.info('Auth: Session expired (token refresh needed)');
+      res.status(401).json({
+        error: 'Session expired',
+        message: 'Please refresh the page to continue',
+        code: 'TOKEN_EXPIRED'
+      });
+    } else {
+      // 다른 검증 실패는 error 레벨
+      logger.error('Auth: Token verification failed', { error });
+      res.status(401).json({ error: 'Invalid token' });
+    }
     return;
   }
 }
