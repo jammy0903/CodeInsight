@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { JavaSimulationService } from './java-simulation.service';
 import * as path from 'path';
 import { exec } from 'child_process';
@@ -44,14 +44,15 @@ describe('JavaSimulationService', () => {
         const result = await service.simulate(code);
 
         // For debugging purposes
-        // console.log(JSON.stringify(result.snapshots, null, 2));
+        // console.log(JSON.stringify(result.steps, null, 2));
 
         expect(result.success).toBe(true);
-        expect(result.snapshots).toBeInstanceOf(Array);
-        expect(result.snapshots.length).toBeGreaterThan(0);
+        expect(result.steps).toBeDefined();
+        expect(result.steps).toBeInstanceOf(Array);
+        expect(result.steps!.length).toBeGreaterThan(0);
 
         // Check the last step, after all assignments have been made
-        const lastStep = result.snapshots[result.snapshots.length - 1];
+        const lastStep = result.steps![result.steps!.length - 1];
         expect(lastStep).toHaveProperty('line');
         expect(lastStep).toHaveProperty('event', 'STEP');
         expect(lastStep).toHaveProperty('stack');

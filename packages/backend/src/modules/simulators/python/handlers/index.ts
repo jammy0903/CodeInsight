@@ -15,10 +15,13 @@ import { AttributeAssignHandler } from './attribute.handler';
 import { FunctionDefHandler } from './function-def.handler';
 import { ClassDefHandler } from './class-def.handler';
 import { GlobalNonlocalHandler } from './global.handler';
+import { BuiltinFunctionHandler, AssignBuiltinHandler } from './builtin.handler';
 
 // 기본 핸들러 목록 (우선순위순)
 const defaultHandlers: PyCodeHandler[] = [
   ReturnHandler, // priority: 30
+  AssignBuiltinHandler, // priority: 29 - id(), type(), len() 할당
+  BuiltinFunctionHandler, // priority: 28 - id(), type(), len() 단독
   AssignMethodCallHandler, // priority: 27
   InstanceCreateHandler, // priority: 26
   AssignFunctionCallHandler, // priority: 25
@@ -142,3 +145,4 @@ export { AttributeAssignHandler } from './attribute.handler';
 export { FunctionDefHandler } from './function-def.handler';
 export { ClassDefHandler } from './class-def.handler';
 export { GlobalNonlocalHandler } from './global.handler';
+export { BuiltinFunctionHandler, AssignBuiltinHandler, evaluateBuiltinExpression } from './builtin.handler';

@@ -30,14 +30,10 @@ export async function getLanguages() {
  * WHY: DRY 원칙 - 진행률 계산은 백엔드에서만
  * - userId 제공 시: 챕터별 진행률 계산하여 포함
  * - userId 미제공 시: 코스 구조만 반환
- */
-/**
- * 언어 상세 (챕터 포함)
  *
- * OPTIMIZATION (2025-01-25):
- * - Payload Optimization: ~50KB -> ~3KB
- * - Fetch minimal lesson structure (IDs only)
- * - Calculate progress via separate aggregate query
+ * OPTIMIZATION (2025-01-25): Payload ~50KB → ~3KB
+ * - lesson.id만 조회 (description, difficulty 등 제외)
+ * - 진행률은 별도 쿼리로 completed만 집계
  */
 export async function getLanguageWithChapters(languageId: string, userId?: string) {
   // 1. Structure (Lightweight - Lessons ID only)

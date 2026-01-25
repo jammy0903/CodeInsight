@@ -223,7 +223,7 @@ packages/
 
 ```bash
 # 리팩토링 완료 후 실행
-./.gemini/scripts/verify-refactoring.sh
+./.claude/scripts/verify-refactoring.sh
 ```
 
 **검증 항목**:
@@ -259,7 +259,7 @@ grep -r "JSMemoryFlowView" packages/frontend/src --include="*.tsx" --include="*.
 
 ```bash
 # 모든 리팩토링 작업 완료 후
-./.gemini/scripts/verify-refactoring.sh
+./.claude/scripts/verify-refactoring.sh
 
 # 통과하면:
 # ✅ 리팩토링 검증 통과!
@@ -278,7 +278,7 @@ grep -r "JSMemoryFlowView" packages/frontend/src --include="*.tsx" --include="*.
 cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
 # 리팩토링 검증
-./.gemini/scripts/verify-refactoring.sh || exit 1
+./.claude/scripts/verify-refactoring.sh || exit 1
 EOF
 
 # 실행 권한 부여
@@ -294,5 +294,5 @@ chmod +x .git/hooks/pre-commit
 
 ## 📚 참고 자료
 
-- `C-OSINE/.gemini/golden_samples/` - 패턴 및 모범 사례
-- `C-OSINE/.gemini/scripts/verify-refactoring.sh` - 자동 검증 스크립트
+- `C-OSINE/.claude/golden_samples/` - 패턴 및 모범 사례
+- `C-OSINE/.claude/scripts/verify-refactoring.sh` - 자동 검증 스크립트
