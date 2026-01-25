@@ -45,6 +45,9 @@ export const FunctionDefHandler: PyBlockHandler = {
       ? bodyLines[bodyLines.length - 1].lineNum
       : lineNum;
 
+    // 본문에서 선언된 로컬 변수 추출 (Python two-pass)
+    const declaredLocals = extractDeclaredLocals(bodyLines, params.map(p => p.name));
+
     // 함수 객체 값 생성
     const funcValue: PyFunctionValue = {
       name,
@@ -55,6 +58,7 @@ export const FunctionDefHandler: PyBlockHandler = {
       startLine: lineNum,
       endLine,
       bodyLines: bodyLines.filter((l) => l.code), // 빈 줄 제외
+      declaredLocals,
     };
 
     // 함수 객체 생성
@@ -87,3 +91,42 @@ export const FunctionDefHandler: PyBlockHandler = {
     return step;
   },
 };
+
+/**
+ * 함수 본문에서 선언된 로컬 변수 추출
+ * Python은 함수 실행 전에 본문을 스캔하여 할당문의 좌변 변수를 로컬로 간주함
+ *
+ * @param bodyLines 함수 본문 코드
+ * @param params 파라미터 이름들 (제외 대상)
+ * @returns 로컬로 선언된 변수 이름 배열
+ */
+function extractDeclaredLocals(bodyLines: PyCodeLine[], params: string[]): string[] {
+  const locals = new Set<string>();
+  const paramSet = new Set(params);
+
+  // 할당문 패턴들
+  const patterns = [
+    /^(\w+)\s*=\s*.+$/,           // x = value
+    /^(\w+)\s*[+\-*\/]?=\s*.+$/,  // x += value (augmented assignment)
+    /^for\s+(\w+)\s+in\s+/,       // for x in ...
+  ];
+
+  for (const line of bodyLines) {
+    const code = line.code.trim();
+    if (!code || code.startsWith('#')) continue;
+
+    for (const pattern of patterns) {
+      const match = code.match(pattern);
+      if (match) {
+        const varName = match[1];
+        // 파라미터가 아니고, self가 아니면 로컬로 등록
+        if (!paramSet.has(varName) && varName !== 'self') {
+          locals.add(varName);
+        }
+        break;
+      }
+    }
+  }
+
+  return Array.from(locals);
+}
