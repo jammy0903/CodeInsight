@@ -40,8 +40,9 @@ export const AssignHandler: PyCodeHandler = {
     // 표현식 평가 → 객체 생성 또는 참조
     const obj = evaluateExpr(ctx, trimmedExpr);
 
-    // 이름 바인딩 (최상위 레벨은 global 프레임)
-    const pyName = ctx.bindName(varName, obj.id, 'global');
+    // 이름 바인딩 (현재 스코프: 함수 내부면 로컬, 아니면 글로벌)
+    const scope = ctx.getCurrentScope();
+    const pyName = ctx.bindName(varName, obj.id, scope);
     pyName.highlight = true;
     obj.highlight = true;
 
@@ -131,8 +132,8 @@ function evaluateExpr(ctx: PySimContext, expr: string): PyObject {
     return ctx.createObject('dict', []);
   }
 
-  // 변수 참조 (기존 객체 반환)
-  const existingObj = getObjectByName(ctx, trimmed);
+  // 변수 참조 (현재 프레임 로컬 → 글로벌 순서로 탐색)
+  const existingObj = getObjectFromContext(ctx, trimmed);
   if (existingObj) {
     return existingObj;
   }
@@ -328,4 +329,23 @@ function formatValue(obj: PyObject): string {
     return `(${(obj.value as any[]).length}개 쌍)`;
   }
   return String(obj.value);
+}
+
+/**
+ * 컨텍스트에서 객체 가져오기 (프레임 로컬 우선)
+ */
+function getObjectFromContext(ctx: PySimContext, name: string): PyObject | null {
+  const frame = ctx.getCurrentFrame();
+
+  // 1. 현재 프레임의 로컬 변수에서 찾기
+  if (frame) {
+    const localName = frame.localNames.get(name);
+    if (localName) {
+      const obj = ctx.getObject(localName.pointsTo);
+      if (obj) return obj;
+    }
+  }
+
+  // 2. 글로벌에서 찾기
+  return getObjectByName(ctx, name) || null;
 }
