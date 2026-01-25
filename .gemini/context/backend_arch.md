@@ -232,70 +232,238 @@ This section describes how application data, especially course content and AI co
 
 ---
 
-### Python 시뮬레이터 상세 (`src/modules/simulators/python`)
+---
 
-Python 시뮬레이터는 **Names → Objects 참조 모델**을 시각화합니다. C와 달리 Python은 변수가 메모리 공간이 아닌 **객체를 참조**하는 "이름표" 역할을 합니다.
+## 🔧 디버거 기반 시뮬레이터 아키텍처 (Debugger-Based Simulators)
 
-#### 아키텍처 개요
+### 개요
+
+모든 언어 시뮬레이터는 **실제 디버거/인터프리터 기반** 접근 방식을 사용합니다. 패턴 매칭 시뮬레이션이 아닌, 실제 코드를 실행하며 상태를 캡처합니다.
+
+| 언어 | 디버거 방식 | 상태 |
+|------|------------|------|
+| Java | JDI (Java Debug Interface) | ✅ 완료 |
+| Python | `sys.settrace()` | ✅ 완료 |
+| JavaScript | Node.js `vm` 모듈 + AST 계측 | ✅ 완료 |
+| C | gcc + 메모리 시뮬레이션 | 유지 |
+
+### 4단계 파이프라인 (공통 패턴)
+
+모든 디버거 기반 시뮬레이터는 동일한 파이프라인을 따릅니다:
 
 ```
-simulators/python/
-├── routes.ts          # API 라우트 (POST /simulate)
-├── simulator.ts       # 메인 시뮬레이터 로직
-├── context.ts         # PySimContext - 상태 관리
-├── types.ts           # 타입 정의 (PyObject, PyName, PyStep 등)
-└── handlers/          # 코드 패턴별 핸들러
-    ├── index.ts       # 핸들러 레지스트리
-    ├── assign.handler.ts      # 할당문: a = 10, b = a + b
-    ├── function-def.handler.ts # 함수 정의: def foo():
-    ├── function-call.handler.ts # 함수 호출: foo()
-    ├── class-def.handler.ts    # 클래스 정의: class Foo:
-    ├── instance-create.handler.ts # 인스턴스 생성: obj = Foo()
-    ├── method-call.handler.ts  # 메서드 호출: obj.method()
-    └── global.handler.ts       # global 선언
+1. Setup    → 임시 디렉토리 생성 + 소스 파일 작성
+2. Compile  → 언어별 컴파일/문법 검증
+3. Debug    → 디버거 에이전트 실행 → 스냅샷 캡처
+4. Cleanup  → 임시 파일 정리 (finally 블록에서)
 ```
 
-#### 핸들러 패턴
-
-각 핸들러는 `PyCodeHandler` 인터페이스를 구현합니다:
+### 통일된 스냅샷 포맷 (JSON)
 
 ```typescript
-interface PyCodeHandler {
-  name: string;
-  priority: number;  // 낮을수록 먼저 매칭 시도
-  canHandle(code: string): boolean;  // 이 핸들러가 처리 가능한지
-  handle(ctx: PySimContext, lineNum: number, code: string): PyStep | null;
+interface Snapshot {
+  line: number;
+  event: "STEP";
+  stack: StackFrame[];
+  heap: HeapObject[];
+}
+
+interface StackFrame {
+  methodName: string;
+  className: string;
+  variables: Record<string, Value>;
+}
+
+interface HeapObject {
+  address: string;      // "0xNNN"
+  type: string;
+  content: string;
+  length?: number;      // 배열인 경우
 }
 ```
 
-#### 지원 기능 (assign.handler.ts)
+### 에러 처리 원칙 (Critical!)
 
-**표현식 평가 (`evaluateExpr`)**:
-- 리터럴: `int`, `float`, `str`, `bool`, `None`
-- 컬렉션: `list`, `tuple`, `dict`, `set`
-- 변수 참조: `a`, `b` (스코프 기반 탐색)
-- **산술 연산**: `+`, `-`, `*`, `/` (재귀적 평가)
+**⚠️ 재시도(Retry) 로직 없음**:
+- 모든 디버거 클라이언트는 재시도 없이 에러를 즉시 반환
+- 에러는 프론트엔드에서 Toast 알림으로 사용자에게 표시
+- 이유: 사용자에게 빠른 피드백 제공, 불필요한 지연 방지
 
-**산술 연산 구현**:
 ```typescript
-// 비탐욕적 정규식으로 왼쪽에서 오른쪽 결합
-const binaryMatch = trimmed.match(/^(.+?)\s*([+\-*/])\s*(.+)$/);
-// a + b + c → (a + b) + c
+// ❌ 잘못된 패턴 (재시도 로직)
+async run(projectPath: string): Promise<any[]> {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await this.execute(projectPath);
+    } catch (e) {
+      if (attempt < 2) continue;
+      throw e;
+    }
+  }
+}
+
+// ✅ 올바른 패턴 (즉시 에러 반환)
+async run(projectPath: string): Promise<any[]> {
+  // 에러 발생 시 즉시 throw → 프론트엔드 Toast로 표시
+  return await this.execute(projectPath);
+}
 ```
 
-- 타입 체크: `int`/`float`만 지원
-- 결과 타입: `int + float = float` (Python 동작 준수)
-- 에러 처리:
-  - `TypeError`: 숫자가 아닌 타입 연산 시
-  - `ZeroDivisionError`: 0으로 나누기
+---
 
-**에러 처리**:
-- `UnboundLocalError`: 함수 내 로컬 변수가 할당 전 참조될 때
+### Python 시뮬레이터 상세 (`src/modules/simulators/python`)
 
-#### 향후 확장 계획
+Python 시뮬레이터는 **`sys.settrace()` 기반** 실제 디버거를 사용합니다.
 
-- `%` (모듈로), `**` (거듭제곱), `//` (정수 나눗셈)
-- 괄호 표현식: `(a + b) * c`
-- 비교 연산자: `>`, `<`, `==`, `!=`
-- 문자열 연결: `"hello" + " world"`
-- 조건문/반복문: `if`, `for`, `while`
+#### 디렉토리 구조
+
+```
+simulators/python/
+├── python-simulation.service.ts  # 메인 오케스트레이터 (4단계 파이프라인)
+├── routes.ts                     # API 라우트 (POST /simulate)
+├── types.ts                      # 타입 정의
+├── engine/
+│   ├── file-manager.ts           # 임시 파일 관리
+│   └── debugger-client.ts        # Python 에이전트 실행 (spawn)
+└── agent/
+    └── debugger_agent.py         # sys.settrace() 기반 디버거
+```
+
+#### debugger_agent.py 핵심 로직
+
+```python
+import sys
+import json
+
+class DebuggerAgent:
+    def trace_func(self, frame, event, arg):
+        if event == 'line':
+            # 이전 라인의 상태를 캡처 (settrace는 라인 실행 전 호출됨)
+            if self.pending_line is not None:
+                snapshot = self.capture(frame, self.pending_line)
+                print(json.dumps(snapshot))  # stdout으로 출력
+            self.pending_line = frame.f_lineno
+        return self.trace_func
+```
+
+**주의사항**:
+- `sys.settrace()`는 라인 실행 **전**에 호출됨
+- 따라서 **이전 라인**의 상태를 캡처해야 변수 값이 올바름
+- `flush_pending()` 메서드로 마지막 라인 상태 캡처
+
+#### 지원 기능
+
+- **Primitive 타입**: `int`, `float`, `str`, `bool`, `None`
+- **컬렉션**: `list`, `dict`, `tuple`, `set`
+- **객체**: 클래스 인스턴스, `__dict__` 속성 캡처
+- **함수/메서드**: 콜스택 추적, 지역/전역 변수 분리
+- **힙 참조**: 객체는 힙에 저장, 스택에서 참조
+
+---
+
+### JavaScript 시뮬레이터 상세 (`src/modules/simulators/javascript`)
+
+JavaScript 시뮬레이터는 **Node.js `vm` 모듈 + AST 계측**을 사용합니다.
+
+#### 디렉토리 구조
+
+```
+simulators/javascript/
+├── javascript-simulation.service.ts  # 메인 오케스트레이터
+├── routes.ts
+├── types.ts
+├── engine/
+│   ├── file-manager.ts
+│   └── debugger-client.ts
+└── agent/
+    └── debugger_agent.js             # vm 모듈 기반 디버거
+```
+
+#### debugger_agent.js 핵심 로직
+
+**AST 계측 방식**:
+```javascript
+const acorn = require('acorn');
+const escodegen = require('escodegen');
+
+// AST 파싱 → 각 statement 후 __capture__ 호출 삽입
+function instrument(code) {
+  const ast = acorn.parse(code, { locations: true });
+  // ... statement마다 캡처 코드 삽입
+  return escodegen.generate(ast);
+}
+```
+
+**Simple 모드 (AST 파싱 실패 시 폴백)**:
+```javascript
+// let/const → var 변환 (vm 컨텍스트 접근을 위해)
+const transformed = code
+  .replace(/\blet\s+/g, 'var ')
+  .replace(/\bconst\s+/g, 'var ');
+```
+
+#### 지원 기능
+
+- **Primitive 타입**: `number`, `string`, `boolean`, `null`, `undefined`
+- **배열/객체**: 힙 참조 모델
+- **함수**: 함수 객체로 힙에 저장
+- **스코프**: 변수 스코프 추적
+
+---
+
+### Java 시뮬레이터 상세 (`src/modules/simulators/java`)
+
+Java 시뮬레이터는 **JDI (Java Debug Interface)** 를 사용합니다.
+
+#### 디렉토리 구조
+
+```
+simulators/java/
+├── java-simulation.service.ts   # 메인 오케스트레이터
+├── routes.ts
+├── engine/
+│   ├── file-manager.ts
+│   ├── java-compiler.ts         # javac 컴파일
+│   └── debugger-client.ts       # JAR 에이전트 실행
+└── agent/
+    ├── src/main/java/com/vis/DebuggerAgent.java  # JDI 기반 디버거
+    └── build/debugger-agent.jar                  # 빌드된 에이전트
+```
+
+#### 에이전트 실행
+
+```typescript
+// debugger-client.ts
+const child = spawn('java', [
+  '-jar',
+  this.AGENT_JAR_PATH,
+  mainClass
+], {
+  cwd: projectPath,
+});
+```
+
+---
+
+### 공통 타입 정의 (types.ts 패턴)
+
+각 시뮬레이터는 동일한 형식의 타입을 정의합니다:
+
+```typescript
+// 스텝 응답
+interface SimulateResponse {
+  success: boolean;
+  steps: Step[];
+  error?: string;
+}
+
+// 개별 스텝
+interface Step {
+  line: number;
+  code: string;
+  explanation: string;
+  stack: StackFrame[];
+  heap: HeapObject[];
+  stdout?: string;
+}
+```

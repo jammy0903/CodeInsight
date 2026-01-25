@@ -1,5 +1,12 @@
 # Refactoring Plan: Unifying Simulator Modules
 
+> **상태**: ✅ **완료** (2026-01-26)
+>
+> Python, JavaScript 시뮬레이터가 디버거 기반으로 재구현되었습니다.
+> - Python: `sys.settrace()` 기반
+> - JavaScript: Node.js `vm` 모듈 + AST 계측
+> - 공통 4단계 파이프라인: Setup → Compile → Debug → Cleanup
+
 ## 🎯 Goal
 Consolidate all language simulator-related backend modules under a unified `packages/backend/src/modules/simulators/` directory for improved clarity, consistency, and maintainability.
 

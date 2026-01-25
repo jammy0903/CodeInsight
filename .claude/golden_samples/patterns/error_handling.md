@@ -99,7 +99,119 @@ const [globalError, setGlobalError] = useState(null);
 
 ---
 
+## 🔔 중앙화된 Toast 알림 시스템 (Centralized Notifications)
+
+### 핵심 원칙
+
+1. **모든 에러 알림은 `components/common/Toast` 모듈을 통해 처리**
+2. **재시도 로직 제거** - 에러 발생 시 즉시 사용자에게 알림
+3. **카테고리별 알림 함수 분리** - AI, 시뮬레이터, 네트워크, 관리자
+
+### 알림 모듈 구조
+
+```typescript
+// components/common/Toast/notifications.ts
+
+// AI Provider 관련
+export const notifyAI = {
+  ollamaDisconnected: () => toast.error('Ollama 연결 끊김', { ... }),
+  deepseekDisconnected: () => toast.error('DeepSeek 연결 끊김', { ... }),
+  backendDisconnected: () => toast.error('백엔드 서버 연결 실패', { ... }),
+  creditExhausted: () => toast.warning('API 크레딧 소진', { ... }),
+};
+
+// 시뮬레이터 관련
+export const notifySimulator = {
+  timeout: (lang) => toast.error(`${lang} 실행 시간 초과 (10초)`, { ... }),
+  compileError: (lang, msg) => toast.error(`${lang} 컴파일 에러`, { ... }),
+  runtimeError: (lang, msg) => toast.error(`${lang} 런타임 에러`, { ... }),
+};
+
+// 네트워크 관련
+export const notifyNetwork = {
+  connectionFailed: () => toast.error('네트워크 연결 실패', { ... }),
+  serverError: (status) => toast.error(`서버 에러 (${status})`, { ... }),
+};
+```
+
+### 사용 패턴
+
+```typescript
+// ❌ 잘못된 패턴 - 분산된 toast 호출
+import { toast } from 'sonner';
+
+try {
+  await api.call();
+} catch (e) {
+  toast.error('에러가 발생했습니다');  // 일관성 없는 메시지
+}
+
+// ✅ 올바른 패턴 - 중앙화된 알림
+import { notifyAI, handleSimulatorError } from '@/components/common/Toast';
+
+try {
+  await api.call();
+} catch (e) {
+  notifyAI.backendDisconnected();  // 일관된 메시지
+}
+
+// 시뮬레이터 에러 자동 분류
+try {
+  await simulatorService.simulate('python', { code });
+} catch (e) {
+  handleSimulatorError('Python', e.message);  // 에러 타입 자동 분류
+}
+```
+
+### 에러 분류 헬퍼
+
+```typescript
+// handleSimulatorError - 에러 메시지 분석 후 적절한 토스트 호출
+export function handleSimulatorError(language: string, errorMessage: string) {
+  if (errorMessage.includes('Time Limit Exceeded')) {
+    notifySimulator.timeout(language);
+  } else if (errorMessage.includes('Compile Error') || errorMessage.includes('SyntaxError')) {
+    notifySimulator.compileError(language, errorMessage);
+  } else {
+    notifySimulator.runtimeError(language, errorMessage);
+  }
+}
+
+// handleAPIError - HTTP 상태 코드 기반 분류
+export function handleAPIError(status: number, message?: string) {
+  if (status === 402) {
+    notifyAI.creditExhausted();
+  } else if (status >= 500) {
+    notifyNetwork.serverError(status);
+  }
+}
+```
+
+### 백엔드 에러 처리 원칙
+
+**⚠️ 재시도(Retry) 로직 제거**:
+- 시뮬레이터 디버거 클라이언트에서 재시도 로직 완전 제거
+- 에러 발생 시 즉시 throw → 프론트엔드에서 Toast 표시
+- 사용자에게 빠른 피드백 제공
+
+```typescript
+// ❌ 제거된 패턴 - 재시도 로직
+for (let attempt = 0; attempt < 3; attempt++) {
+  try { ... } catch (e) { if (attempt < 2) continue; }
+}
+
+// ✅ 현재 패턴 - 즉시 에러 반환
+async run(projectPath: string): Promise<any[]> {
+  // 에러 발생 시 즉시 throw
+  return await this.execute(projectPath);
+}
+```
+
+---
+
 ## 📚 참고 자료
 
-- 백엔드 에러 핸들러: `C-OSINE/packages/backend/src/api/error_handlers.js` (예시)
-- 프론트엔드 API 클라이언트: `C-OSINE/packages/frontend/src/services/api_client.js` (예시)
+- **Toast 모듈**: `packages/frontend/src/components/common/Toast/`
+- **시뮬레이터 서비스**: `packages/frontend/src/services/simulator.ts`
+- **AI 서비스**: `packages/frontend/src/services/ai.ts`
+- **백엔드 디버거 클라이언트**: `packages/backend/src/modules/simulators/*/engine/debugger-client.ts`
