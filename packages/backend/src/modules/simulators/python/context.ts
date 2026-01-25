@@ -14,6 +14,8 @@ import type {
   PyType,
   PyValue,
   PyStep,
+  PyCallFrame,
+  PyCallFrameSnapshot,
 } from './types';
 
 /**
@@ -24,6 +26,7 @@ export function createPyContext(): PySimContext {
   const globalNames = new Map<string, PyName>();
   const localNames = new Map<string, PyName>();
   const objects = new Map<string, PyObject>();
+  const callStack: PyCallFrame[] = [];
   let stdoutBuffer = '';
   let currentLine = 0;
 
@@ -31,6 +34,7 @@ export function createPyContext(): PySimContext {
     globalNames,
     localNames,
     objects,
+    callStack,
     get nextId() {
       return nextId;
     },
@@ -66,17 +70,25 @@ export function createPyContext(): PySimContext {
      * 이름 바인딩
      * @param scope - 프레임명 (예: 'global', '__main__', 함수명)
      */
-    bindName(name: string, objectId: string, scope: string = '__main__'): PyName {
+    bindName(name: string, objectId: string, scope?: string): PyName {
+      // scope가 지정되지 않으면 현재 스코프 사용
+      const actualScope = scope ?? ctx.getCurrentScope();
+
       const pyName: PyName = {
         name,
-        scope,
+        scope: actualScope,
         pointsTo: objectId,
       };
 
-      // 'global' scope는 globalNames에, 나머지는 localNames에
-      if (scope === 'global') {
+      // 콜스택이 있으면 현재 프레임의 localNames에 저장
+      const currentFrame = ctx.getCurrentFrame();
+      if (currentFrame && actualScope === currentFrame.functionName) {
+        currentFrame.localNames.set(name, pyName);
+      } else if (actualScope === 'global' || actualScope === '__main__') {
+        // 글로벌 스코프
         globalNames.set(name, pyName);
       } else {
+        // 기본: localNames에 저장
         localNames.set(name, pyName);
       }
 
@@ -98,6 +110,35 @@ export function createPyContext(): PySimContext {
     },
 
     /**
+     * 콜스택 프레임 푸시
+     */
+    pushFrame(frame: PyCallFrame): void {
+      callStack.push(frame);
+    },
+
+    /**
+     * 콜스택 프레임 팝
+     */
+    popFrame(): PyCallFrame | undefined {
+      return callStack.pop();
+    },
+
+    /**
+     * 현재 콜스택 프레임 가져오기
+     */
+    getCurrentFrame(): PyCallFrame | undefined {
+      return callStack.length > 0 ? callStack[callStack.length - 1] : undefined;
+    },
+
+    /**
+     * 현재 스코프 이름 가져오기
+     */
+    getCurrentScope(): string {
+      const frame = ctx.getCurrentFrame();
+      return frame ? frame.functionName : 'global';
+    },
+
+    /**
      * 스텝 생성
      */
     createStep(lineNum: number, code: string, explanation: string): PyStep {
@@ -106,6 +147,11 @@ export function createPyContext(): PySimContext {
         ...Array.from(globalNames.values()),
         ...Array.from(localNames.values()),
       ];
+
+      // 콜스택의 로컬 변수도 포함
+      for (const frame of callStack) {
+        allNames.push(...Array.from(frame.localNames.values()));
+      }
 
       const allObjects = Array.from(objects.values());
 
@@ -121,6 +167,15 @@ export function createPyContext(): PySimContext {
       if (stdoutBuffer) {
         step.stdout = stdoutBuffer;
         stdoutBuffer = '';
+      }
+
+      // 콜스택 스냅샷 추가
+      if (callStack.length > 0) {
+        step.callStack = callStack.map((frame): PyCallFrameSnapshot => ({
+          functionName: frame.functionName,
+          depth: frame.depth,
+          localNames: Array.from(frame.localNames.values()),
+        }));
       }
 
       return step;
@@ -164,8 +219,33 @@ export function getObjectByName(ctx: PySimContext, name: string): PyObject | und
 }
 
 /**
- * 이름 조회
+ * 이름 조회 (콜스택 고려)
  */
 export function getName(ctx: PySimContext, name: string): PyName | undefined {
-  return ctx.localNames.get(name) ?? ctx.globalNames.get(name);
+  // 1. 현재 프레임의 로컬 변수에서 찾기
+  const currentFrame = ctx.getCurrentFrame();
+  if (currentFrame) {
+    const localName = currentFrame.localNames.get(name);
+    if (localName) return localName;
+  }
+
+  // 2. 기존 localNames에서 찾기
+  const local = ctx.localNames.get(name);
+  if (local) return local;
+
+  // 3. globalNames에서 찾기
+  return ctx.globalNames.get(name);
+}
+
+/**
+ * 이름으로 객체 조회 (콜스택 고려)
+ */
+export function resolveNameToObject(ctx: PySimContext, name: string): { pyName: PyName; object: PyObject } | undefined {
+  const pyName = getName(ctx, name);
+  if (!pyName) return undefined;
+
+  const object = ctx.getObject(pyName.pointsTo);
+  if (!object) return undefined;
+
+  return { pyName, object };
 }
