@@ -12,6 +12,7 @@
 
 import { memo, useMemo, useState, useCallback } from 'react';
 import type { FlowStep, FlowVariable, FlowFrame } from '@codeinsight/shared';
+import { TerminalOutput, type TerminalLine } from '../../shared';
 
 // ============================================
 // 타입 정의
@@ -482,10 +483,15 @@ export const JavaFlowView = memo(function JavaFlowView({
 
       {/* 터미널 출력 */}
       {step.terminalOutput?.text && (
-        <div className="mt-6 p-3 bg-gray-900 text-green-400 rounded-lg font-mono text-sm">
-          <div className="text-xs text-gray-500 mb-1">출력:</div>
-          <pre className="whitespace-pre-wrap">{step.terminalOutput.text}</pre>
-        </div>
+        <TerminalOutput
+          lines={step.terminalOutput.text.split('\n').filter(Boolean).map((line): TerminalLine => ({
+            content: line,
+            type: 'stdout',
+          }))}
+          title="출력"
+          compact
+          className="mt-6"
+        />
       )}
 
       {/* 범례 */}
