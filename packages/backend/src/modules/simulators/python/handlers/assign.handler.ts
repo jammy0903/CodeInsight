@@ -157,10 +157,11 @@ function evaluateExpr(ctx: PySimContext, expr: string): PyObject {
     return ctx.createObject('dict', []);
   }
 
-  // 산술 연산: a + b, a - b, a * b, a / b
+  // 산술 연산: +, -, *, /, %, **, //
   // 비탐욕적 매칭으로 왼쪽에서 오른쪽 결합 (left-to-right associativity)
   // 예: a + b + c → (a + b) + c
-  const binaryMatch = trimmed.match(/^(.+?)\s*([+\-*/])\s*(.+)$/);
+  // 2글자 연산자(**,//)를 먼저 매칭하고, 그 다음 1글자 연산자 매칭
+  const binaryMatch = trimmed.match(/^(.+?)\s*(\*\*|\/\/|[+\-*/%])\s*(.+)$/);
   if (binaryMatch) {
     const [, leftExpr, operator, rightExpr] = binaryMatch;
 
@@ -484,6 +485,20 @@ function performArithmetic(left: number, op: string, right: number): number {
         throw new Error('ZeroDivisionError: division by zero');
       }
       return left / right;
+    case '%':
+      if (right === 0) {
+        throw new Error('ZeroDivisionError: integer modulo by zero');
+      }
+      // Python의 % 연산자는 항상 right와 같은 부호의 결과를 반환
+      return ((left % right) + right) % right;
+    case '**':
+      return Math.pow(left, right);
+    case '//':
+      if (right === 0) {
+        throw new Error('ZeroDivisionError: integer floor division by zero');
+      }
+      // Python의 // 연산자는 floor division (음수 방향으로 내림)
+      return Math.floor(left / right);
     default:
       throw new Error(`Unknown operator: ${op}`);
   }
