@@ -87,17 +87,29 @@ export class DebuggerClient {
       throw new Error('Time Limit Exceeded (15s)');
     }
 
-    // Prioritize stderr for error reporting, as the JVM might exit with code 0 even after an exception.
-    if (stderrData.trim()) {
-      throw new Error(`Runtime Error:\n${stderrData.trim()}`);
+    // stderr를 실제 에러와 경고로 구분 처리
+    const stderrLines = stderrData.trim().split('\n');
+    const errorLines = stderrLines.filter(line => {
+      const trimmed = line.trim();
+      // Warning, Info 메시지는 무시
+      if (trimmed.startsWith('Warning:')) return false;
+      if (trimmed.startsWith('(node:')) return false; // Node.js 경고 무시
+      if (trimmed.includes('SECURITY WARNING:')) return false;
+      if (trimmed.startsWith('In the next major version')) return false;
+      if (trimmed.startsWith('To prepare for this change:')) return false;
+      if (trimmed.startsWith('- If you want')) return false;
+      if (trimmed.startsWith('See https://')) return false;
+      if (trimmed.startsWith('(Use `node')) return false;
+      return trimmed.length > 0;
+    });
+
+    // 실제 에러가 있는 경우에만 예외 발생
+    if (errorLines.length > 0) {
+      throw new Error(`Runtime Error:\n${errorLines.join('\n')}`);
     }
 
     if (exitCode !== 0) {
       throw new Error(`Runtime Error: Process exited with code ${exitCode}`);
-    }
-
-    if (stdoutData.trim() === '' && stderrData.trim() !== '') {
-      throw new Error(`Simulation resulted in an error:\n${stderrData}`);
     }
 
     try {

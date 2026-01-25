@@ -96,15 +96,29 @@ export const FunctionDefHandler: PyBlockHandler = {
  * 함수 본문에서 선언된 로컬 변수 추출
  * Python은 함수 실행 전에 본문을 스캔하여 할당문의 좌변 변수를 로컬로 간주함
  *
+ * 단, `global` 또는 `nonlocal`로 선언된 변수는 제외
+ *
  * @param bodyLines 함수 본문 코드
  * @param params 파라미터 이름들 (제외 대상)
  * @returns 로컬로 선언된 변수 이름 배열
  */
-function extractDeclaredLocals(bodyLines: PyCodeLine[], params: string[]): string[] {
+export function extractDeclaredLocals(bodyLines: PyCodeLine[], params: string[]): string[] {
   const locals = new Set<string>();
   const paramSet = new Set(params);
 
-  // 할당문 패턴들
+  // 1. 먼저 global/nonlocal 선언된 변수들 추출 (제외 대상)
+  const globalVars = new Set<string>();
+  for (const line of bodyLines) {
+    const code = line.code.trim();
+    // global x, y, z 또는 nonlocal x, y, z
+    const globalMatch = code.match(/^(?:global|nonlocal)\s+(.+)$/);
+    if (globalMatch) {
+      const vars = globalMatch[1].split(',').map((v) => v.trim());
+      vars.forEach((v) => globalVars.add(v));
+    }
+  }
+
+  // 2. 할당문 패턴들
   const patterns = [
     /^(\w+)\s*=\s*.+$/,           // x = value
     /^(\w+)\s*[+\-*\/]?=\s*.+$/,  // x += value (augmented assignment)
@@ -114,13 +128,15 @@ function extractDeclaredLocals(bodyLines: PyCodeLine[], params: string[]): strin
   for (const line of bodyLines) {
     const code = line.code.trim();
     if (!code || code.startsWith('#')) continue;
+    // global/nonlocal 문은 스킵
+    if (/^(?:global|nonlocal)\s+/.test(code)) continue;
 
     for (const pattern of patterns) {
       const match = code.match(pattern);
       if (match) {
         const varName = match[1];
-        // 파라미터가 아니고, self가 아니면 로컬로 등록
-        if (!paramSet.has(varName) && varName !== 'self') {
+        // 파라미터가 아니고, self가 아니고, global 선언도 아니면 로컬로 등록
+        if (!paramSet.has(varName) && varName !== 'self' && !globalVars.has(varName)) {
           locals.add(varName);
         }
         break;

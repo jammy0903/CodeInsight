@@ -4,16 +4,14 @@
  * URL: /courses/:lang/:chapterId
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { ChapterWithLessons, UserProgress } from '@/types';
-import { getChapterWithLessons, getUserProgress } from '@/services/courses';
+import type { UserProgress } from '@/types';
 import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
-import { logger } from '@/utils/logger';
 import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle } from 'lucide-react';
-import { useIsMobile } from '@/hooks';
+import { useIsMobile, useChapter, useUserProgress } from '@/hooks';
 
 // 언어별 색상 (챕터 페이지용)
 const getLanguageColor = (lang: string | undefined) => {
@@ -30,14 +28,20 @@ const getLanguageColor = (lang: string | undefined) => {
 export function ChapterLessonsPage() {
   const { lang, chapterId } = useParams<{ lang: string; chapterId: string }>();
   const navigate = useNavigate();
-  const { appUser, setPageTitle } = useStore();
+  const { setPageTitle } = useStore();
   const langColor = getLanguageColor(lang);
   const isMobile = useIsMobile();
 
-  const [chapter, setChapter] = useState<ChapterWithLessons | null>(null);
-  const [progressMap, setProgressMap] = useState<Map<string, UserProgress>>(new Map());
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // TanStack Query: 챕터 데이터 + 진행 상태
+  const { data: chapter, isLoading, isError, error } = useChapter(chapterId);
+  const { data: progressList } = useUserProgress();
+
+  // 진행 상태 Map 변환 (useMemo로 최적화)
+  const progressMap = useMemo(() => {
+    const map = new Map<string, UserProgress>();
+    progressList?.forEach((p) => map.set(p.lessonId, p));
+    return map;
+  }, [progressList]);
 
   // 페이지 제목 설정
   useEffect(() => {
@@ -46,70 +50,16 @@ export function ChapterLessonsPage() {
     }
   }, [chapter, setPageTitle, lang]);
 
-  useEffect(() => {
-    if (!chapterId) return;
-
-    let cancelled = false;
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // 1. 챕터 + 레슨 목록 가져오기
-        const chapterData = await getChapterWithLessons(chapterId);
-
-        if (cancelled) return;
-        setChapter(chapterData);
-
-        // 2. 진행 상태 가져오기 (로그인한 사용자만)
-        if (appUser) {
-          try {
-            const progressList = await getUserProgress();
-            if (cancelled) return;
-            const map = new Map<string, UserProgress>();
-            progressList.forEach((p) => map.set(p.lessonId, p));
-            setProgressMap(map);
-          } catch (err) {
-            logger.warn('Progress fetch failed:', err);
-          }
-        }
-      } catch (err) {
-        if (cancelled) return;
-        logger.error('Failed to load chapter data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load chapter data');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [chapterId, appUser]);
-
-  // 로딩 상태
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--theme-dashboard-accent)] mx-auto mb-4"></div>
-          <p className="text-[var(--theme-dashboard-text-muted)]">레슨 로딩 중...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // 에러 상태
-  if (error || !chapter) {
+  // 에러 상태만 early return
+  if (isError) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="text-6xl mb-4">😢</div>
           <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">챕터를 불러올 수 없습니다</h2>
-          <p className="text-[var(--theme-dashboard-text-muted)] mb-6">{error || 'Chapter not found'}</p>
+          <p className="text-[var(--theme-dashboard-text-muted)] mb-6">
+            {error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다'}
+          </p>
           <button
             onClick={() => navigate(`/courses/${lang}`)}
             className="btn-primary"
@@ -121,11 +71,11 @@ export function ChapterLessonsPage() {
     );
   }
 
-  // 진행률 계산
-  const totalLessons = chapter.lessons.length;
-  const completedLessons = chapter.lessons.filter(
+  // 진행률 계산 (로딩 중에는 0으로 표시)
+  const totalLessons = chapter?.lessons.length || 0;
+  const completedLessons = chapter?.lessons.filter(
     (lesson) => progressMap.get(lesson.id)?.status === 'completed'
-  ).length;
+  ).length || 0;
   const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
@@ -171,9 +121,9 @@ export function ChapterLessonsPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-[var(--theme-dashboard-title)] tracking-tight mb-2">
-                {chapter.title}
+                {chapter?.title || '로딩 중...'}
               </h1>
-              {chapter.description && (
+              {chapter?.description && (
                 <p className="text-[var(--theme-dashboard-text-muted)] text-sm">
                   {chapter.description}
                 </p>
@@ -189,7 +139,7 @@ export function ChapterLessonsPage() {
                 <span className="text-xs text-emerald-600 font-mono uppercase">Progress</span>
               </div>
               <span className="text-xs text-[var(--theme-dashboard-text-muted)] font-mono">
-                {completedLessons} / {totalLessons} 레슨 완료
+                {isLoading ? '계산 중...' : `${completedLessons} / ${totalLessons} 레슨 완료`}
               </span>
             </div>
             <div className="h-3 bg-white rounded-full overflow-hidden border border-[var(--theme-dashboard-card-border)]">
@@ -212,7 +162,26 @@ export function ChapterLessonsPage() {
 
       {/* 레슨 리스트/그리드 */}
       <div style={{ marginTop: '80px' }}>
-      {chapter.lessons.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--theme-dashboard-accent)] mx-auto mb-4"></div>
+            <p className="text-[var(--theme-dashboard-text-muted)]">레슨 로딩 중...</p>
+          </div>
+        </div>
+      ) : !chapter ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="text-6xl mb-4">📚</div>
+            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">
+              챕터 정보 없음
+            </h2>
+            <p className="text-[var(--theme-dashboard-text-muted)]">
+              챕터 데이터를 불러올 수 없습니다.
+            </p>
+          </div>
+        </div>
+      ) : chapter.lessons.length === 0 ? (
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="text-6xl mb-4">📝</div>

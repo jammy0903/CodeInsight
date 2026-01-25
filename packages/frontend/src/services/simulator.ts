@@ -38,6 +38,13 @@ export interface PyName {
   highlight?: boolean;
 }
 
+/** Python 콜스택 프레임 스냅샷 */
+export interface PyCallFrameSnapshot {
+  functionName: string;
+  depth: number;
+  localNames: PyName[];
+}
+
 /** Python 실행 스텝 */
 export interface PyStep {
   line: number;
@@ -46,6 +53,7 @@ export interface PyStep {
   names: PyName[];
   objects: PyObject[];
   stdout?: string;
+  callStack?: PyCallFrameSnapshot[];
 }
 
 /** Python 시뮬레이션 결과 */
@@ -172,6 +180,8 @@ function pythonSimulator(pySteps: PyStep[]): LessonStep[] {
     // Python 시각화 데이터 (Names-Objects 모델)
     pyNames: step.names,
     pyObjects: step.objects,
+    // Python 콜스택 (함수 호출 시각화)
+    callStack: step.callStack,
     visualizationType: 'python',
   }));
 }

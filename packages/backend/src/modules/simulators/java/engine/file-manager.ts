@@ -26,8 +26,11 @@ export class FileManager {
     // 2. Main.java 파일 작성
     let finalCode = code;
 
-    // "class Main"이 없으면 자동 래핑 (Snippet 지원)
-    if (!code.includes('class Main')) {
+    // 클래스 정의가 없으면 자동 래핑 (Snippet 지원)
+    // 패턴: "public class", "class", "interface", "enum" 등 타입 정의 체크
+    const hasClassDefinition = /\b(public\s+)?(class|interface|enum)\s+\w+/.test(code);
+
+    if (!hasClassDefinition) {
       const lines = code.split('\n');
       const imports = lines.filter(line => line.trim().startsWith('import '));
       const bodyLines = lines.filter(line => !line.trim().startsWith('import '));
@@ -43,6 +46,9 @@ ${bodyLines.join('\n')}
     }
 }
 `;
+    } else if (!code.includes('class Main')) {
+      // 다른 클래스 이름을 사용했다면, Main으로 변경
+      finalCode = code.replace(/\b(public\s+)?class\s+(\w+)/, 'public class Main');
     }
 
     await fs.writeFile(path.join(projectPath, 'Main.java'), finalCode, 'utf-8');

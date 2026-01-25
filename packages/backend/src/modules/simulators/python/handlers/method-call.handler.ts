@@ -143,6 +143,8 @@ function executeMethodCall(
     returnLine: lineNum,
     depth: ctx.callStack.length + 1,
     selfObjectId: instanceResult.object.id,
+    unboundLocals: new Set(methodValue.declaredLocals || []),
+    globalVars: new Set(),
   };
 
   ctx.pushFrame(frame);

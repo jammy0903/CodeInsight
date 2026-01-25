@@ -231,6 +231,13 @@ export const LessonStepSchema = z.object({
   // WHY: Python은 Names-Objects 모델이므로 C의 stack/heap과 다른 구조
   pyNames: z.array(PyNameSchema).optional(),
   pyObjects: z.array(PyObjectSchema).optional(),
+  // Python 콜스택 (함수 호출 시각화)
+  // WHY: 함수 호출/반환 시 프레임 생성/삭제 시각화
+  callStack: z.array(z.object({
+    functionName: z.string(),
+    depth: z.number(),
+    localNames: z.array(PyNameSchema),
+  })).optional(),
   // JavaScript 시각화 (이벤트 루프, 클로저 등)
   eventLoopState: z.unknown().optional(),
   callStackState: z.unknown().optional(),
@@ -319,11 +326,26 @@ export const ProgressUpdateRequestSchema = z.object({
 export const UserProgressListSchema = z.array(UserProgressSchema);
 
 // =============================================
+// Progress Schemas
+// =============================================
+
+/**
+ * 챕터별 집계된 진행률
+ * WHY: 백엔드에서 계산하여 제공 (DRY 원칙)
+ */
+export const ChapterProgressSchema = z.object({
+  total: z.number(),       // 전체 레슨 수
+  completed: z.number(),   // 완료한 레슨 수
+  percentage: z.number(),  // 완료율 (0-100)
+});
+
+// =============================================
 // API Response Schemas
 // =============================================
 
 export const ChapterWithLessonsSchema = ChapterSchema.extend({
   lessons: LessonsSchema,
+  progress: ChapterProgressSchema.optional(), // 로그인 시에만 포함
 });
 
 export const LessonFullSchema = LessonSchema.extend({
@@ -378,6 +400,7 @@ export type Quiz = z.infer<typeof QuizSchema>;
 export type ProgressStatus = z.infer<typeof ProgressStatusSchema>;
 export type UserProgress = z.infer<typeof UserProgressSchema>;
 export type ProgressUpdateRequest = z.infer<typeof ProgressUpdateRequestSchema>;
+export type ChapterProgress = z.infer<typeof ChapterProgressSchema>;
 
 // API 응답
 export type ChapterWithLessons = z.infer<typeof ChapterWithLessonsSchema>;

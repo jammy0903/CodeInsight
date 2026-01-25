@@ -193,6 +193,12 @@ export interface PyCallFrame {
    * → 접근 시 여기 있으면 UnboundLocalError
    */
   unboundLocals: Set<string>;
+
+  /**
+   * global 선언된 변수들
+   * 이 변수들에 할당하면 로컬이 아닌 전역 스코프에 바인딩됨
+   */
+  globalVars: Set<string>;
 }
 
 // =============================================

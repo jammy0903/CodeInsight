@@ -19,6 +19,7 @@ import type {
   PyChange,
 } from '../types';
 import { parseClassHeader, parseFunctionHeader, getIndentLevel } from '../parser/block-parser';
+import { extractDeclaredLocals } from './function-def.handler';
 
 // 클래스 정의 패턴
 const CLASS_DEF_PATTERN = /^class\s+\w+(\s*\(.*\))?\s*:$/;
@@ -55,6 +56,7 @@ export const ClassDefHandler: PyBlockHandler = {
       if (!methodParsed) continue;
 
       // 메서드용 함수 객체 생성
+      const paramNames = methodParsed.params.map((p) => p.name);
       const funcValue: PyFunctionValue = {
         name: methodParsed.name,
         params: methodParsed.params.map((p) => ({
@@ -65,6 +67,7 @@ export const ClassDefHandler: PyBlockHandler = {
         endLine: methodBlock.endLine,
         bodyLines: methodBlock.bodyLines,
         className: name,
+        declaredLocals: extractDeclaredLocals(methodBlock.bodyLines, paramNames),
       };
 
       const funcObj = ctx.createObject('function', funcValue, false);
