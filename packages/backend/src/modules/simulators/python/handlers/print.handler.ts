@@ -6,6 +6,7 @@
 
 import type { PyCodeHandler, PySimContext, PyStep } from '../types';
 import { getObjectByName } from '../context';
+import { evaluateBuiltinExpression } from './builtin.handler';
 
 // print 패턴
 const PRINT_PATTERN = /^print\s*\((.*)\)$/;
@@ -184,7 +185,13 @@ function formatObjectValue(obj: { type: string; value: unknown }): string {
 }
 
 /**
- * f-string 평가 (간단한 형태)
+ * f-string 평가 (함수 호출 지원)
+ *
+ * 지원 형태:
+ * - {변수명}: 변수 값 출력
+ * - {id(변수명)}: 객체 ID 출력
+ * - {type(변수명)}: 타입 출력
+ * - {len(변수명)}: 길이 출력
  */
 function evaluateFString(ctx: PySimContext, fstr: string): string {
   // f"Hello {name}" → "Hello " + name
@@ -195,19 +202,15 @@ function evaluateFString(ctx: PySimContext, fstr: string): string {
 
   while (i < inner.length) {
     if (inner[i] === '{') {
-      const endIdx = inner.indexOf('}', i);
+      const endIdx = findMatchingBrace(inner, i);
       if (endIdx === -1) {
         result += inner.slice(i);
         break;
       }
 
-      const varName = inner.slice(i + 1, endIdx).trim();
-      const obj = getObjectByName(ctx, varName);
-      if (obj) {
-        result += formatObjectValue(obj);
-      } else {
-        result += `{${varName}}`;
-      }
+      const expr = inner.slice(i + 1, endIdx).trim();
+      const evaluated = evaluateFStringExpression(ctx, expr);
+      result += evaluated;
       i = endIdx + 1;
     } else {
       result += inner[i];
@@ -216,6 +219,61 @@ function evaluateFString(ctx: PySimContext, fstr: string): string {
   }
 
   return result;
+}
+
+/**
+ * 중첩된 괄호를 고려하여 매칭되는 } 찾기
+ */
+function findMatchingBrace(str: string, startIdx: number): number {
+  let depth = 0;
+  for (let i = startIdx; i < str.length; i++) {
+    if (str[i] === '{') depth++;
+    else if (str[i] === '}') {
+      depth--;
+      if (depth === 0) return i;
+    }
+  }
+  return -1;
+}
+
+/**
+ * f-string 내부 표현식 평가
+ */
+function evaluateFStringExpression(ctx: PySimContext, expr: string): string {
+  // 1. 내장 함수 호출: id(x), type(x), len(x)
+  const funcMatch = expr.match(/^(id|type|len)\s*\((.+)\)$/);
+  if (funcMatch) {
+    const [, funcName, argExpr] = funcMatch;
+    const result = evaluateBuiltinExpression(ctx, funcName, argExpr.trim());
+    if (result !== null) {
+      return result;
+    }
+    return `{${expr}}`; // 평가 실패 시 원본 반환
+  }
+
+  // 2. 속성 접근: obj.attr
+  const attrMatch = expr.match(/^(\w+)\.(\w+)$/);
+  if (attrMatch) {
+    const [, objName, attrName] = attrMatch;
+    const attrValue = evaluateAttribute(ctx, objName, attrName);
+    if (attrValue !== null) {
+      return attrValue;
+    }
+  }
+
+  // 3. 단순 변수
+  const obj = getObjectByName(ctx, expr);
+  if (obj) {
+    return formatObjectValue(obj);
+  }
+
+  // 4. 프레임 로컬 변수 체크
+  const localObj = getObjectFromContext(ctx, expr);
+  if (localObj) {
+    return formatObjectValue(localObj);
+  }
+
+  return `{${expr}}`; // 평가 실패 시 원본 반환
 }
 
 /**

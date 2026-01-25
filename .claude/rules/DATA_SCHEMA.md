@@ -66,5 +66,5 @@
 
 ## 📝 참고 문서
 
-- `C-OSINE/.gemini/context/backend_arch.md`
-- `C-OSINE/.gemini/context/frontend_arch.md`
+- `C-OSINE/.claude/context/backend_arch.md`
+- `C-OSINE/.claude/context/frontend_arch.md`
