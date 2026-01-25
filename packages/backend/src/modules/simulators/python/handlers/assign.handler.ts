@@ -33,6 +33,22 @@ export const AssignHandler: PyCodeHandler = {
     const [, varName, expr] = match;
     const trimmedExpr = expr.trim();
 
+    // UnboundLocalError 체크 (표현식에서 참조하는 변수가 unbound local인지)
+    const unboundVar = checkUnboundLocalInExpr(ctx, trimmedExpr);
+    if (unboundVar) {
+      const step = ctx.createStep(
+        lineNum,
+        code,
+        `UnboundLocalError: 로컬 변수 '${unboundVar}'가 할당 전에 참조됨`
+      );
+      step.error = {
+        type: 'UnboundLocalError',
+        message: `local variable '${unboundVar}' referenced before assignment`,
+        variable: unboundVar,
+      };
+      return step;
+    }
+
     // 이전 바인딩 확인 (재할당 감지)
     const oldName = getName(ctx, varName);
     const oldObjectId = oldName?.pointsTo;
@@ -45,6 +61,12 @@ export const AssignHandler: PyCodeHandler = {
     const pyName = ctx.bindName(varName, obj.id, scope);
     pyName.highlight = true;
     obj.highlight = true;
+
+    // unboundLocals에서 제거 (변수가 바인딩되었으므로)
+    const frame = ctx.getCurrentFrame();
+    if (frame?.unboundLocals) {
+      frame.unboundLocals.delete(varName);
+    }
 
     // 변경 사항 추적
     const changes: PyChange[] = [];
@@ -348,4 +370,51 @@ function getObjectFromContext(ctx: PySimContext, name: string): PyObject | null 
 
   // 2. 글로벌에서 찾기
   return getObjectByName(ctx, name) || null;
+}
+
+/**
+ * 표현식에서 UnboundLocalError 체크
+ * 표현식에 사용된 변수 중 unbound local이 있으면 해당 변수명 반환
+ *
+ * Python 동작:
+ * - 함수 본문에서 할당되는 변수는 "로컬"로 간주됨
+ * - 해당 변수가 할당 전에 참조되면 UnboundLocalError
+ */
+function checkUnboundLocalInExpr(ctx: PySimContext, expr: string): string | null {
+  const frame = ctx.getCurrentFrame();
+  if (!frame?.unboundLocals || frame.unboundLocals.size === 0) {
+    return null;
+  }
+
+  // 표현식에서 변수명 추출 (간단한 패턴)
+  // 리터럴(숫자, 문자열, bool, None)이 아닌 식별자
+  const trimmed = expr.trim();
+
+  // 리터럴 체크
+  if (/^-?\d+(\.\d+)?$/.test(trimmed)) return null;  // 숫자
+  if (/^["'].*["']$/.test(trimmed)) return null;     // 문자열
+  if (['True', 'False', 'None'].includes(trimmed)) return null;
+  if (/^[\[\(\{]/.test(trimmed)) return null;        // 컬렉션
+
+  // 단순 변수 참조
+  if (/^\w+$/.test(trimmed)) {
+    if (frame.unboundLocals.has(trimmed)) {
+      return trimmed;
+    }
+    return null;
+  }
+
+  // 복합 표현식 (a + b, func(x) 등)에서 변수 추출
+  const identifiers = trimmed.match(/\b([a-zA-Z_]\w*)\b/g) || [];
+  for (const id of identifiers) {
+    // 예약어 및 내장 함수 제외
+    if (['True', 'False', 'None', 'and', 'or', 'not', 'in', 'is', 'print', 'len', 'range', 'str', 'int', 'float', 'list', 'dict', 'set', 'tuple'].includes(id)) {
+      continue;
+    }
+    if (frame.unboundLocals.has(id)) {
+      return id;
+    }
+  }
+
+  return null;
 }

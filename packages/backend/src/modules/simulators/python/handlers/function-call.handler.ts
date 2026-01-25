@@ -113,11 +113,13 @@ function executeFunctionCall(
   }
 
   // 새 콜스택 프레임 생성
+  // unboundLocals: 함수 본문에서 할당되는 변수들 (아직 값이 없는 상태)
   const frame: PyCallFrame = {
     functionName: funcName,
     localNames: new Map(),
     returnLine: lineNum,
     depth: ctx.callStack.length + 1,
+    unboundLocals: new Set(funcValue.declaredLocals || []),
   };
 
   ctx.pushFrame(frame);

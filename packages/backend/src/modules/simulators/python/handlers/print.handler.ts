@@ -24,6 +24,22 @@ export const PrintHandler: PyCodeHandler = {
 
     const argsStr = match[1].trim();
 
+    // UnboundLocalError 체크
+    const unboundVar = checkUnboundLocalInExpr(ctx, argsStr);
+    if (unboundVar) {
+      const step = ctx.createStep(
+        lineNum,
+        code,
+        `UnboundLocalError: 로컬 변수 '${unboundVar}'가 할당 전에 참조됨`
+      );
+      step.error = {
+        type: 'UnboundLocalError',
+        message: `local variable '${unboundVar}' referenced before assignment`,
+        variable: unboundVar,
+      };
+      return step;
+    }
+
     // 인자 평가
     const output = evaluatePrintArgs(ctx, argsStr);
 
@@ -254,4 +270,42 @@ function splitPrintArgs(str: string): string[] {
   }
 
   return result;
+}
+
+/**
+ * 표현식에서 UnboundLocalError 체크
+ */
+function checkUnboundLocalInExpr(ctx: PySimContext, expr: string): string | null {
+  const frame = ctx.getCurrentFrame();
+  if (!frame?.unboundLocals || frame.unboundLocals.size === 0) {
+    return null;
+  }
+
+  const trimmed = expr.trim();
+
+  // 리터럴 체크
+  if (/^-?\d+(\.\d+)?$/.test(trimmed)) return null;
+  if (/^["'].*["']$/.test(trimmed)) return null;
+  if (['True', 'False', 'None'].includes(trimmed)) return null;
+  if (/^[\[\(\{]/.test(trimmed)) return null;
+
+  // 단순 변수
+  if (/^\w+$/.test(trimmed)) {
+    if (frame.unboundLocals.has(trimmed)) {
+      return trimmed;
+    }
+    return null;
+  }
+
+  // 복합 표현식
+  const identifiers = trimmed.match(/\b([a-zA-Z_]\w*)\b/g) || [];
+  const reserved = ['True', 'False', 'None', 'and', 'or', 'not', 'in', 'is', 'print', 'len', 'range', 'str', 'int', 'float', 'list', 'dict', 'set', 'tuple'];
+  for (const id of identifiers) {
+    if (reserved.includes(id)) continue;
+    if (frame.unboundLocals.has(id)) {
+      return id;
+    }
+  }
+
+  return null;
 }

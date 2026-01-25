@@ -107,6 +107,13 @@ export interface PyFunctionValue {
 
   /** 정의된 클래스명 (메서드인 경우) */
   className?: string;
+
+  /**
+   * 선언된 로컬 변수 목록 (본문에서 할당되는 변수들)
+   * Python은 함수 실행 전에 본문을 스캔하여 로컬 변수를 미리 결정함
+   * → UnboundLocalError 감지에 사용
+   */
+  declaredLocals: string[];
 }
 
 /**
@@ -178,6 +185,14 @@ export interface PyCallFrame {
 
   /** 인스턴스 (메서드 호출 시 self) */
   selfObjectId?: string;
+
+  /**
+   * 아직 바인딩되지 않은 로컬 변수들
+   * 함수 진입 시 declaredLocals로 초기화되고,
+   * 변수에 값이 할당되면 제거됨
+   * → 접근 시 여기 있으면 UnboundLocalError
+   */
+  unboundLocals: Set<string>;
 }
 
 // =============================================
@@ -233,6 +248,13 @@ export interface PyStep {
 
   /** 현재 콜스택 (시각화용) */
   callStack?: PyCallFrameSnapshot[];
+
+  /** 에러 정보 (UnboundLocalError 등) */
+  error?: {
+    type: string;
+    message: string;
+    variable?: string;
+  };
 }
 
 /**
