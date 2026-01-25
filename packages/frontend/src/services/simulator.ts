@@ -10,6 +10,7 @@
 import { api } from './api/axios';
 import { AxiosError } from 'axios';
 import type { LessonStep, MemoryBlock } from '@/types';
+import { handleSimulatorError } from '@/components/common/Toast';
 
 // =============================================
 // Python 타입 정의
@@ -260,10 +261,12 @@ export const simulatorService = {
           };
         }
 
+        const errorMessage = data.error || data.message || 'Simulation failed';
+        handleSimulatorError('C', errorMessage);
         return {
           success: false,
           steps: [],
-          error: data.error || data.message || 'Simulation failed',
+          error: errorMessage,
         };
       }
 
@@ -273,19 +276,21 @@ export const simulatorService = {
         error: 'Unsupported language for simulation',
       };
     } catch (error) {
-      if (error instanceof AxiosError) {
-        const message = error.response?.data?.error || error.message;
-        return {
-          success: false,
-          steps: [],
-          error: message,
-        };
+      const errorMessage = error instanceof AxiosError
+        ? error.response?.data?.error || error.message
+        : error instanceof Error ? error.message : 'Unknown error';
+
+      // 언어별로 적절한 에러 처리
+      const lang = language.toLowerCase();
+      if (lang === 'c') {
+        handleSimulatorError('C', errorMessage);
       }
+      // Python, JavaScript, Java는 개별 메서드에서 처리됨
 
       return {
         success: false,
         steps: [],
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
       };
     }
   },
@@ -308,24 +313,23 @@ export const simulatorService = {
         };
       }
 
+      const errorMessage = data.error || 'Python simulation failed';
+      handleSimulatorError('Python', errorMessage);
       return {
         success: false,
         steps: [],
-        error: data.error || 'Python simulation failed',
+        error: errorMessage,
       };
     } catch (error) {
-      if (error instanceof AxiosError) {
-        return {
-          success: false,
-          steps: [],
-          error: error.response?.data?.error || error.message,
-        };
-      }
+      const errorMessage = error instanceof AxiosError
+        ? error.response?.data?.error || error.message
+        : error instanceof Error ? error.message : 'Unknown error';
 
+      handleSimulatorError('Python', errorMessage);
       return {
         success: false,
         steps: [],
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
       };
     }
   },
@@ -359,24 +363,23 @@ export const simulatorService = {
         };
       }
 
+      const errorMessage = data.error || 'JavaScript simulation failed';
+      handleSimulatorError('JavaScript', errorMessage);
       return {
         success: false,
         steps: [],
-        error: data.error || 'JavaScript simulation failed',
+        error: errorMessage,
       };
     } catch (error) {
-      if (error instanceof AxiosError) {
-        return {
-          success: false,
-          steps: [],
-          error: error.response?.data?.error || error.message,
-        };
-      }
+      const errorMessage = error instanceof AxiosError
+        ? error.response?.data?.error || error.message
+        : error instanceof Error ? error.message : 'Unknown error';
 
+      handleSimulatorError('JavaScript', errorMessage);
       return {
         success: false,
         steps: [],
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
       };
     }
   },
@@ -399,24 +402,23 @@ export const simulatorService = {
         };
       }
 
+      const errorMessage = data.error || data.message || 'Java simulation failed';
+      handleSimulatorError('Java', errorMessage);
       return {
         success: false,
         steps: [],
-        error: data.error || data.message || 'Java simulation failed',
+        error: errorMessage,
       };
     } catch (error) {
-      if (error instanceof AxiosError) {
-        return {
-          success: false,
-          steps: [],
-          error: error.response?.data?.error || error.message,
-        };
-      }
+      const errorMessage = error instanceof AxiosError
+        ? error.response?.data?.error || error.message
+        : error instanceof Error ? error.message : 'Unknown error';
 
+      handleSimulatorError('Java', errorMessage);
       return {
         success: false,
         steps: [],
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
       };
     }
   },

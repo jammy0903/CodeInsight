@@ -7,6 +7,7 @@
 import { api } from './api/axios';
 import { handleError } from './api/errors';
 import { config } from '@/config';
+import { notifyAI, notifyNetwork } from '@/components/common/Toast';
 
 // === 타입 정의 ===
 
@@ -110,6 +111,7 @@ export async function getExplanation(
 
     // 네트워크 에러는 특별 처리
     if (error.code === 'NETWORK_ERROR') {
+      notifyAI.backendDisconnected();
       return '백엔드 서버에 연결할 수 없습니다.';
     }
 
@@ -152,6 +154,7 @@ export async function askAI(
 
     // 네트워크 에러는 특별 처리
     if (error.code === 'NETWORK_ERROR') {
+      notifyAI.backendDisconnected();
       return `백엔드 서버에 연결할 수 없습니다.
 
 cd backend && npm run dev 명령어로 서버를 실행해주세요.`;
@@ -159,6 +162,7 @@ cd backend && npm run dev 명령어로 서버를 실행해주세요.`;
 
     // API 크레딧 부족
     if (error.status === 402) {
+      notifyAI.creditExhausted();
       return 'AI 크레딧이 부족합니다. Provider를 전환하거나 크레딧을 충전해주세요.';
     }
 
@@ -259,6 +263,7 @@ export async function askAIStream(
   } catch (err) {
     // 네트워크 에러 처리
     if (err instanceof TypeError && err.message.includes('fetch')) {
+      notifyAI.backendDisconnected();
       return `백엔드 서버에 연결할 수 없습니다.
 
 cd backend && npm run dev 명령어로 서버를 실행해주세요.`;
@@ -338,6 +343,7 @@ export async function getStepExplanationStream(
     return fullContent;
   } catch (err) {
     if (err instanceof TypeError && err.message.includes('fetch')) {
+      notifyAI.backendDisconnected();
       return '🔌 AI 서버에 연결할 수 없습니다.';
     }
 

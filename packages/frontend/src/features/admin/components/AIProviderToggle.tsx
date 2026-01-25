@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Cpu, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { getAIProviders, switchAIProvider } from '@/services/admin';
 import type { AIProvider } from '@/services/api/types';
+import { notifyAI } from '@/components/common/Toast';
 
 export function AIProviderToggle() {
   const [providers, setProviders] = useState<AIProvider[]>([]);
@@ -15,7 +16,6 @@ export function AIProviderToggle() {
   const [loading, setLoading] = useState(true);
   const [switching, setSwitching] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Provider 목록 조회
   useEffect(() => {
@@ -47,19 +47,14 @@ export function AIProviderToggle() {
       await fetchProviders();
 
       // 성공 토스트
-      showToast(`${result.name}(으)로 전환되었습니다`, 'success');
+      notifyAI.providerSwitched(result.name);
     } catch (err) {
       // 실패 토스트
-      showToast(err instanceof Error ? err.message : 'Provider 전환 실패', 'error');
+      const providerName = getProviderDisplayName(providerType);
+      notifyAI.providerSwitchFailed(providerName);
     } finally {
       setSwitching(false);
     }
-  }
-
-  // 토스트 표시
-  function showToast(message: string, type: 'success' | 'error') {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
   }
 
   // Provider 이름 한글화
@@ -95,63 +90,36 @@ export function AIProviderToggle() {
   }
 
   return (
-    <>
-      <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
-        <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4 flex items-center gap-3">
-          <Cpu className="w-6 h-6" />
-          AI Provider 설정
-        </h2>
+    <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
+      <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4 flex items-center gap-3">
+        <Cpu className="w-6 h-6" />
+        AI Provider 설정
+      </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {providers.map((provider) => (
-            <ProviderCard
-              key={provider.type}
-              provider={provider}
-              isCurrent={provider.current}
-              onSwitch={() => handleSwitch(provider.type)}
-              switching={switching}
-              displayName={getProviderDisplayName(provider.type)}
-            />
-          ))}
-        </div>
-
-        {/* 현재 Provider 표시 */}
-        <div className="mt-6 pt-6 border-t border-[var(--theme-dashboard-card-border)]">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-[var(--theme-dashboard-text-muted)]">현재 사용 중:</span>
-            <span className="font-semibold text-[var(--theme-dashboard-title)]">
-              {getProviderDisplayName(currentProvider)}
-            </span>
-            <CheckCircle className="w-5 h-5 text-green-500" />
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {providers.map((provider) => (
+          <ProviderCard
+            key={provider.type}
+            provider={provider}
+            isCurrent={provider.current}
+            onSwitch={() => handleSwitch(provider.type)}
+            switching={switching}
+            displayName={getProviderDisplayName(provider.type)}
+          />
+        ))}
       </div>
 
-      {/* 토스트 메시지 */}
-      {toast && (
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-8 right-8 z-50"
-        >
-          <div
-            className={`px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 ${
-              toast.type === 'success'
-                ? 'bg-green-500 text-white'
-                : 'bg-red-500 text-white'
-            }`}
-          >
-            {toast.type === 'success' ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <XCircle className="w-5 h-5" />
-            )}
-            <span className="font-medium">{toast.message}</span>
-          </div>
-        </motion.div>
-      )}
-    </>
+      {/* 현재 Provider 표시 */}
+      <div className="mt-6 pt-6 border-t border-[var(--theme-dashboard-card-border)]">
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-[var(--theme-dashboard-text-muted)]">현재 사용 중:</span>
+          <span className="font-semibold text-[var(--theme-dashboard-title)]">
+            {getProviderDisplayName(currentProvider)}
+          </span>
+          <CheckCircle className="w-5 h-5 text-green-500" />
+        </div>
+      </div>
+    </div>
   );
 }
 
