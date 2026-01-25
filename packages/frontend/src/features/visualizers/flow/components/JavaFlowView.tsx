@@ -1,13 +1,12 @@
 /**
  * JavaFlowView Component
  *
- * Java 전용 Flow 시각화 - Stack/Heap + 포스트잇 스타일
+ * Java 전용 Flow 시각화 - Python 포스트잇 스타일
  *
  * 컨셉:
- * - Stack 프레임별로 변수 표시 (main, method 등)
- * - Heap에 참조 객체 표시 (String, Array, Object)
- * - 화살표 대신 호버 시 연결된 요소 하이라이트
- * - Python처럼 귀여운 디자인
+ * - 값(객체)이 주인공, 변수명은 포스트잇(이름표)
+ * - 같은 객체를 참조하면 하나의 박스에 이름표 여러 개
+ * - 화살표 없이 호버 하이라이트
  */
 
 import { memo, useMemo, useState, useCallback } from 'react';
@@ -24,48 +23,36 @@ interface JavaFlowViewProps {
   className?: string;
 }
 
+interface ObjectWithNames {
+  object: FlowVariable;    // Heap 객체 또는 Primitive 값
+  names: FlowVariable[];   // 이 객체를 가리키는 변수 이름들
+}
+
 // ============================================
-// 상수
+// 상수 - 귀여운 파스텔톤
 // ============================================
 
-// 타입별 색상 (귀여운 파스텔톤)
 const TYPE_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  // Primitive
-  int: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' },
-  double: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' },
-  float: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' },
-  boolean: { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af' },
-  char: { bg: '#fce7f3', border: '#ec4899', text: '#9d174d' },
-  // Reference
-  String: { bg: '#d1fae5', border: '#10b981', text: '#065f46' },
-  'int[]': { bg: '#ffedd5', border: '#f97316', text: '#9a3412' },
-  'String[]': { bg: '#e0e7ff', border: '#6366f1', text: '#3730a3' },
-  Array: { bg: '#ffedd5', border: '#f97316', text: '#9a3412' },
-  Object: { bg: '#f3e8ff', border: '#a855f7', text: '#6b21a8' },
+  // Primitive (노란 계열)
+  int: { bg: '#fef9c3', border: '#facc15', text: '#854d0e' },
+  double: { bg: '#fef9c3', border: '#facc15', text: '#854d0e' },
+  float: { bg: '#fef9c3', border: '#facc15', text: '#854d0e' },
+  boolean: { bg: '#dbeafe', border: '#60a5fa', text: '#1e40af' },
+  char: { bg: '#fce7f3', border: '#f472b6', text: '#9d174d' },
+  // Reference (각각 다른 색)
+  String: { bg: '#d1fae5', border: '#34d399', text: '#065f46' },
+  'java.lang.String': { bg: '#d1fae5', border: '#34d399', text: '#065f46' },
+  'int[]': { bg: '#ffedd5', border: '#fb923c', text: '#9a3412' },
+  'String[]': { bg: '#e0e7ff', border: '#818cf8', text: '#3730a3' },
+  Array: { bg: '#ffedd5', border: '#fb923c', text: '#9a3412' },
+  Object: { bg: '#f3e8ff', border: '#c084fc', text: '#6b21a8' },
   // Default
-  default: { bg: '#f3f4f6', border: '#6b7280', text: '#374151' },
+  default: { bg: '#f3f4f6', border: '#9ca3af', text: '#374151' },
 };
 
-// 프레임별 색상
-const FRAME_COLORS: Record<string, { bg: string; border: string; header: string; label: string }> = {
-  main: {
-    bg: '#eff6ff',
-    border: '#3b82f6',
-    header: '#dbeafe',
-    label: '#1d4ed8',
-  },
-  heap: {
-    bg: '#fefce8',
-    border: '#eab308',
-    header: '#fef08a',
-    label: '#a16207',
-  },
-  method: {
-    bg: '#f0fdf4',
-    border: '#22c55e',
-    header: '#dcfce7',
-    label: '#15803d',
-  },
+const FRAME_COLORS = {
+  main: { bg: '#eff6ff', border: '#3b82f6', header: '#dbeafe', label: '#1d4ed8' },
+  method: { bg: '#f0fdf4', border: '#22c55e', header: '#dcfce7', label: '#15803d' },
 };
 
 // ============================================
@@ -73,64 +60,78 @@ const FRAME_COLORS: Record<string, { bg: string; border: string; header: string;
 // ============================================
 
 function getTypeColor(type: string) {
-  // Array 타입 체크
-  if (type.includes('[]')) {
-    return TYPE_COLORS['Array'];
-  }
+  if (type.includes('[]')) return TYPE_COLORS['Array'];
+  if (type.includes('String')) return TYPE_COLORS['String'];
   return TYPE_COLORS[type] || TYPE_COLORS.default;
 }
 
-function getFrameColor(name: string) {
-  if (name === 'main') return FRAME_COLORS.main;
-  if (name === 'heap') return FRAME_COLORS.heap;
-  return FRAME_COLORS.method;
+function getTypeEmoji(type: string): string {
+  if (type.includes('String')) return '📝';
+  if (type.includes('[]')) return '📋';
+  if (type === 'int' || type === 'double' || type === 'float') return '🔢';
+  if (type === 'boolean') return '✓';
+  if (type === 'char') return '🔤';
+  return '📦';
 }
 
-function formatValue(value: unknown): string {
+function formatValue(value: unknown, type: string): string {
   if (value === null || value === undefined) return 'null';
-  if (typeof value === 'string') {
-    // 참조 표시
-    if (value.startsWith('→')) return value;
-    // 문자열 값
-    if (value.length > 10) return `"${value.slice(0, 8)}..."`;
-    return value.startsWith('"') ? value : `"${value}"`;
+
+  const strValue = String(value);
+
+  // 참조 표시 제거 (-> 0x001 → 그냥 값으로)
+  if (strValue.startsWith('->') || strValue.startsWith('→')) {
+    return strValue; // 이건 나중에 객체로 대체될 예정
   }
-  if (typeof value === 'boolean') return value ? 'true' : 'false';
-  if (Array.isArray(value)) {
-    if (value.length === 0) return '[]';
-    if (value.length <= 4) return `[${value.join(', ')}]`;
-    return `[${value.slice(0, 3).join(', ')}, ...]`;
+
+  // 문자열
+  if (type.includes('String')) {
+    if (strValue.startsWith('"') && strValue.endsWith('"')) {
+      return strValue;
+    }
+    return `"${strValue}"`;
   }
-  return String(value);
+
+  // 배열
+  if (type.includes('[]')) {
+    if (strValue.startsWith('{') && strValue.endsWith('}')) {
+      return strValue.replace('{', '[').replace('}', ']');
+    }
+    return strValue;
+  }
+
+  return strValue;
 }
 
 // ============================================
-// VariableCard 컴포넌트 (포스트잇 스타일)
+// ObjectCard 컴포넌트 (객체 + 이름표들)
 // ============================================
 
-interface VariableCardProps {
-  variable: FlowVariable;
+interface ObjectCardProps {
+  object: FlowVariable;
+  names: FlowVariable[];
   isHighlighted: boolean;
-  onHover: (refAddress: string | null) => void;
+  onHover: (id: string | null) => void;
   isNew?: boolean;
   isUpdated?: boolean;
 }
 
-const VariableCard = memo(function VariableCard({
-  variable,
+const ObjectCard = memo(function ObjectCard({
+  object,
+  names,
   isHighlighted,
   onHover,
   isNew,
   isUpdated,
-}: VariableCardProps) {
-  const colors = getTypeColor(variable.type);
-  const hasRef = variable.pointsTo != null;
-  const displayValue = formatValue(variable.value);
+}: ObjectCardProps) {
+  const colors = getTypeColor(object.type);
+  const emoji = getTypeEmoji(object.type);
+  const displayValue = formatValue(object.value, object.type);
 
   return (
     <div
       className={`
-        relative px-3 py-2 rounded-lg border-2 cursor-pointer select-none
+        relative px-4 py-3 rounded-xl border-2 cursor-pointer select-none
         transition-all duration-150 ease-out
         ${isHighlighted ? 'ring-2 ring-blue-400 shadow-lg scale-105' : 'hover:scale-102'}
         ${isNew ? 'animate-bounce-in' : ''}
@@ -141,98 +142,31 @@ const VariableCard = memo(function VariableCard({
         borderColor: isHighlighted ? '#3b82f6' : colors.border,
         boxShadow: isHighlighted ? '0 0 12px rgba(59, 130, 246, 0.5)' : undefined,
       }}
-      onMouseEnter={() => hasRef && onHover(variable.pointsTo!)}
+      onMouseEnter={() => onHover(object.id)}
       onMouseLeave={() => onHover(null)}
     >
-      {/* 변수명 라벨 (포스트잇) */}
-      <span
-        className="absolute -top-2.5 left-2 px-1.5 py-0.5 rounded text-xs font-bold"
-        style={{
-          backgroundColor: '#fef3c7',
-          color: '#92400e',
-          border: '1px solid #f59e0b',
-        }}
-      >
-        {variable.name}
-      </span>
-
-      {/* 값 */}
-      <span
-        className="font-mono font-semibold text-sm"
-        style={{ color: colors.text }}
-      >
-        {displayValue}
-      </span>
-
-      {/* 타입 */}
-      <span
-        className="absolute -bottom-2 right-2 px-1 rounded text-[10px] opacity-70"
-        style={{
-          backgroundColor: colors.bg,
-          color: colors.text,
-        }}
-      >
-        {variable.type}
-      </span>
-
-      {/* 참조 표시 */}
-      {hasRef && (
-        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-500" />
+      {/* 이름표들 (포스트잇) - 상단에 나란히 */}
+      {names.length > 0 && (
+        <div className="absolute -top-3 left-2 flex gap-1">
+          {names.map((nameVar) => (
+            <span
+              key={nameVar.id}
+              className="px-2 py-0.5 rounded text-xs font-bold shadow-sm"
+              style={{
+                backgroundColor: '#fef3c7',
+                color: '#92400e',
+                border: '1px solid #fbbf24',
+              }}
+            >
+              {nameVar.name}
+            </span>
+          ))}
+        </div>
       )}
-    </div>
-  );
-});
 
-// ============================================
-// HeapObjectCard 컴포넌트
-// ============================================
-
-interface HeapObjectCardProps {
-  variable: FlowVariable;
-  isHighlighted: boolean;
-  onHover: (address: string | null) => void;
-}
-
-const HeapObjectCard = memo(function HeapObjectCard({
-  variable,
-  isHighlighted,
-  onHover,
-}: HeapObjectCardProps) {
-  const colors = getTypeColor(variable.type);
-  const displayValue = formatValue(variable.value);
-
-  return (
-    <div
-      className={`
-        relative px-4 py-3 rounded-xl border-2 cursor-pointer select-none
-        transition-all duration-150 ease-out
-        ${isHighlighted ? 'ring-2 ring-blue-400 shadow-lg scale-105' : ''}
-      `}
-      style={{
-        backgroundColor: isHighlighted ? '#dbeafe' : colors.bg,
-        borderColor: isHighlighted ? '#3b82f6' : colors.border,
-        boxShadow: isHighlighted ? '0 0 12px rgba(59, 130, 246, 0.5)' : undefined,
-      }}
-      onMouseEnter={() => variable.id && onHover(variable.id)}
-      onMouseLeave={() => onHover(null)}
-    >
-      {/* 주소 라벨 */}
-      <span
-        className="absolute -top-2.5 left-3 px-1.5 py-0.5 rounded text-[10px] font-mono"
-        style={{
-          backgroundColor: '#e5e7eb',
-          color: '#4b5563',
-        }}
-      >
-        {variable.address || variable.id}
-      </span>
-
-      {/* 타입 이모지 + 값 */}
-      <div className="flex items-center gap-2">
-        <span className="text-lg">
-          {variable.type.includes('String') ? '📝' :
-           variable.type.includes('[]') ? '📋' : '📦'}
-        </span>
+      {/* 값 (이모지 + 내용) */}
+      <div className="flex items-center gap-2 mt-1">
+        <span className="text-lg">{emoji}</span>
         <span
           className="font-mono font-semibold text-sm"
           style={{ color: colors.text }}
@@ -241,16 +175,16 @@ const HeapObjectCard = memo(function HeapObjectCard({
         </span>
       </div>
 
-      {/* 타입 */}
+      {/* 타입 - 우하단 */}
       <span
-        className="absolute -bottom-2 right-3 px-1.5 rounded text-[10px]"
+        className="absolute -bottom-2 right-2 px-1.5 py-0.5 rounded text-[10px]"
         style={{
           backgroundColor: colors.bg,
           color: colors.text,
           border: `1px solid ${colors.border}`,
         }}
       >
-        {variable.type}
+        {object.type}
       </span>
     </div>
   );
@@ -261,28 +195,27 @@ const HeapObjectCard = memo(function HeapObjectCard({
 // ============================================
 
 interface FrameCardProps {
-  frame: FlowFrame;
-  variables: FlowVariable[];
-  hoveredRef: string | null;
-  onHover: (ref: string | null) => void;
+  name: string;
+  objects: ObjectWithNames[];
+  hoveredId: string | null;
+  onHover: (id: string | null) => void;
   isActive?: boolean;
   prevStep?: FlowStep | null;
 }
 
 const FrameCard = memo(function FrameCard({
-  frame,
-  variables,
-  hoveredRef,
+  name,
+  objects,
+  hoveredId,
   onHover,
   isActive,
   prevStep,
 }: FrameCardProps) {
-  const colors = getFrameColor(frame.name);
-  const isHeap = frame.name === 'heap';
+  const colors = name === 'main' ? FRAME_COLORS.main : FRAME_COLORS.method;
 
-  // 변경된 변수 ID 목록
-  const prevVarIds = new Set(prevStep?.variables.map(v => v.id) || []);
-  const prevVarValues = new Map(prevStep?.variables.map(v => [v.id, v.value]) || []);
+  // 이전 스텝 객체들
+  const prevObjIds = new Set(prevStep?.variables.map(v => v.id) || []);
+  const prevObjValues = new Map(prevStep?.variables.map(v => [v.id, v.value]) || []);
 
   return (
     <div
@@ -300,14 +233,12 @@ const FrameCard = memo(function FrameCard({
         className="flex items-center gap-2 px-3 py-2"
         style={{ backgroundColor: colors.header }}
       >
-        <span className="text-sm">
-          {isHeap ? '📦' : frame.name === 'main' ? '▶' : '→'}
-        </span>
+        <span className="text-sm">{name === 'main' ? '▶' : '→'}</span>
         <span
           className="font-mono text-sm font-semibold"
           style={{ color: colors.label }}
         >
-          {isHeap ? 'Heap (객체들)' : `${frame.name}()`}
+          {name}()
         </span>
         {isActive && (
           <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-blue-500 text-white">
@@ -316,28 +247,19 @@ const FrameCard = memo(function FrameCard({
         )}
       </div>
 
-      {/* 변수들 */}
-      <div className="p-4 flex flex-wrap gap-4 min-h-[60px]">
-        {variables.length > 0 ? (
-          variables.map((variable) => {
-            const isNew = !prevVarIds.has(variable.id);
-            const isUpdated = prevVarValues.get(variable.id) !== variable.value;
-            const isHighlighted = hoveredRef != null && (
-              variable.pointsTo === hoveredRef ||
-              variable.id === hoveredRef
-            );
+      {/* 객체들 (포스트잇 스타일) */}
+      <div className="p-4 pt-5 flex flex-wrap gap-6 min-h-[80px]">
+        {objects.length > 0 ? (
+          objects.map(({ object, names }) => {
+            const isNew = !prevObjIds.has(object.id);
+            const isUpdated = !isNew && prevObjValues.get(object.id) !== object.value;
+            const isHighlighted = hoveredId === object.id;
 
-            return isHeap ? (
-              <HeapObjectCard
-                key={variable.id}
-                variable={variable}
-                isHighlighted={isHighlighted}
-                onHover={onHover}
-              />
-            ) : (
-              <VariableCard
-                key={variable.id}
-                variable={variable}
+            return (
+              <ObjectCard
+                key={object.id}
+                object={object}
+                names={names}
                 isHighlighted={isHighlighted}
                 onHover={onHover}
                 isNew={isNew}
@@ -362,65 +284,124 @@ export const JavaFlowView = memo(function JavaFlowView({
   prevStep,
   className = '',
 }: JavaFlowViewProps) {
-  // 호버 상태 (연결된 요소 하이라이트용)
-  const [hoveredRef, setHoveredRef] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  const handleHover = useCallback((ref: string | null) => {
-    setHoveredRef(ref);
+  const handleHover = useCallback((id: string | null) => {
+    setHoveredId(id);
   }, []);
 
-  // 프레임별 변수 분류
-  const { frameData, heapVariables } = useMemo(() => {
-    const frames: Array<{ frame: FlowFrame; variables: FlowVariable[] }> = [];
-    const heap: FlowVariable[] = [];
+  // ========================================
+  // Python 스타일: 객체 중심 + 이름표 그룹화
+  // ========================================
+  const { frameData } = useMemo(() => {
+    // 1. 변수 맵 생성
+    const variableMap = new Map<string, FlowVariable>();
+    step.variables.forEach((v) => variableMap.set(v.id, v));
 
-    // 프레임 기반 정리
+    // 2. Heap 객체들 (scope === 'heap')
+    const heapObjects = new Map<string, FlowVariable>();
+    step.variables.forEach((v) => {
+      if (v.scope === 'heap') {
+        heapObjects.set(v.id, v);
+      }
+    });
+
+    // 3. 각 객체를 가리키는 이름들 그룹화
+    const namesByObject = new Map<string, FlowVariable[]>();
+    step.variables.forEach((v) => {
+      if (v.pointsTo) {
+        const names = namesByObject.get(v.pointsTo) || [];
+        names.push(v);
+        namesByObject.set(v.pointsTo, names);
+      }
+    });
+
+    // 4. 프레임별 ObjectWithNames 생성
+    const frames: Array<{ name: string; objects: ObjectWithNames[] }> = [];
+    const processedObjectIds = new Set<string>();
+
+    // 프레임 기반
     if (step.frames && step.frames.length > 0) {
       step.frames.forEach((frame) => {
+        // Heap 프레임은 스킵 (객체들은 이름과 함께 표시됨)
         if (frame.name === 'heap' || frame.name === 'Objects (Heap)') {
-          // Heap 변수들
-          frame.variableIds.forEach((varId) => {
-            const v = step.variables.find((sv) => sv.id === varId);
-            if (v) heap.push(v);
-          });
-        } else {
-          // Stack 프레임
-          const frameVars = frame.variableIds
-            .map((varId) => step.variables.find((sv) => sv.id === varId))
-            .filter((v): v is FlowVariable => v != null);
+          return;
+        }
 
-          if (frameVars.length > 0 || frame.name === 'main') {
-            frames.push({ frame, variables: frameVars });
+        const frameObjects: ObjectWithNames[] = [];
+
+        frame.variableIds.forEach((varId) => {
+          const variable = variableMap.get(varId);
+          if (!variable) return;
+
+          // 참조가 있는 경우 → 해당 Heap 객체 + 이름들
+          if (variable.pointsTo) {
+            const targetObj = variableMap.get(variable.pointsTo);
+            if (targetObj && !processedObjectIds.has(targetObj.id)) {
+              const allNames = namesByObject.get(targetObj.id) || [];
+              // 같은 프레임의 이름들만 필터
+              const frameNames = allNames.filter((n) => n.scope === frame.name);
+              if (frameNames.length > 0) {
+                frameObjects.push({ object: targetObj, names: frameNames });
+                processedObjectIds.add(targetObj.id);
+              }
+            }
           }
+          // Primitive 값 (참조 없음)
+          else if (variable.scope !== 'heap') {
+            // Primitive도 ObjectWithNames로 (이름표 = 자기 자신)
+            frameObjects.push({
+              object: variable,
+              names: [variable], // 자기 이름이 이름표
+            });
+          }
+        });
+
+        if (frameObjects.length > 0 || frame.name === 'main') {
+          frames.push({ name: frame.name, objects: frameObjects });
         }
       });
     } else {
-      // 프레임이 없으면 scope 기반 분류
-      step.variables.forEach((v) => {
-        if (v.scope === 'heap' || v.scope === 'objects') {
-          heap.push(v);
+      // 프레임이 없으면 모든 변수를 main으로
+      const mainObjects: ObjectWithNames[] = [];
+
+      // Heap 객체들에 이름 붙이기
+      heapObjects.forEach((obj, objId) => {
+        if (!processedObjectIds.has(objId)) {
+          const names = namesByObject.get(objId) || [];
+          mainObjects.push({ object: obj, names });
+          processedObjectIds.add(objId);
         }
       });
 
-      // main 프레임 생성
-      const stackVars = step.variables.filter(
-        (v) => v.scope !== 'heap' && v.scope !== 'objects'
-      );
-      if (stackVars.length > 0) {
-        frames.push({
-          frame: { name: 'main', variableIds: stackVars.map((v) => v.id) },
-          variables: stackVars,
-        });
+      // Primitive 변수들
+      step.variables.forEach((v) => {
+        if (v.scope !== 'heap' && !v.pointsTo) {
+          mainObjects.push({ object: v, names: [v] });
+        }
+      });
+
+      if (mainObjects.length > 0) {
+        frames.push({ name: 'main', objects: mainObjects });
       }
     }
 
-    return { frameData: frames, heapVariables: heap };
+    return { frameData: frames };
   }, [step]);
 
   // 마지막 프레임이 활성
   const activeFrameName = frameData.length > 0
-    ? frameData[frameData.length - 1].frame.name
+    ? frameData[frameData.length - 1].name
     : null;
+
+  // 터미널 출력 라인 변환
+  const terminalLines = useMemo((): TerminalLine[] => {
+    if (!step.terminalOutput?.text) return [];
+    return step.terminalOutput.text
+      .split('\n')
+      .filter(Boolean)
+      .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+  }, [step.terminalOutput]);
 
   return (
     <div className={`java-flow-view p-4 ${className}`}>
@@ -443,37 +424,26 @@ export const JavaFlowView = memo(function JavaFlowView({
       {/* 헤더 */}
       <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
         <span>☕</span>
-        <span>Java 메모리: 변수를 호버하면 연결된 객체가 반짝여요</span>
+        <span>Java 메모리: 같은 객체면 이름표가 함께 붙어요</span>
       </div>
 
-      {/* Stack 프레임들 (역순 - 최근 호출이 위) */}
+      {/* 프레임들 (역순 - 최근 호출이 위) */}
       <div className="flex flex-col gap-4">
-        {frameData.slice().reverse().map(({ frame, variables }) => (
+        {frameData.slice().reverse().map(({ name, objects }) => (
           <FrameCard
-            key={frame.name}
-            frame={frame}
-            variables={variables}
-            hoveredRef={hoveredRef}
+            key={name}
+            name={name}
+            objects={objects}
+            hoveredId={hoveredId}
             onHover={handleHover}
-            isActive={frame.name === activeFrameName}
+            isActive={name === activeFrameName}
             prevStep={prevStep}
           />
         ))}
-
-        {/* Heap */}
-        {heapVariables.length > 0 && (
-          <FrameCard
-            frame={{ name: 'heap', variableIds: heapVariables.map((v) => v.id) }}
-            variables={heapVariables}
-            hoveredRef={hoveredRef}
-            onHover={handleHover}
-            prevStep={prevStep}
-          />
-        )}
       </div>
 
       {/* 빈 상태 */}
-      {frameData.length === 0 && heapVariables.length === 0 && (
+      {frameData.length === 0 && (
         <div className="text-center py-12 text-gray-400">
           <span className="text-4xl mb-2 block">☕</span>
           <p>아직 생성된 변수가 없어요</p>
@@ -482,12 +452,9 @@ export const JavaFlowView = memo(function JavaFlowView({
       )}
 
       {/* 터미널 출력 */}
-      {step.terminalOutput?.text && (
+      {terminalLines.length > 0 && (
         <TerminalOutput
-          lines={step.terminalOutput.text.split('\n').filter(Boolean).map((line): TerminalLine => ({
-            content: line,
-            type: 'stdout',
-          }))}
+          lines={terminalLines}
           title="출력"
           compact
           className="mt-6"
@@ -498,24 +465,22 @@ export const JavaFlowView = memo(function JavaFlowView({
       <div className="mt-6 pt-4 border-t border-gray-200">
         <div className="flex flex-wrap gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#fef3c7', border: '1px solid #f59e0b' }} />
+            <div className="px-1.5 py-0.5 rounded text-[10px]" style={{ backgroundColor: '#fef3c7', color: '#92400e', border: '1px solid #fbbf24' }}>
+              이름
+            </div>
+            <span>변수 이름표</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#fef9c3', border: '1px solid #facc15' }} />
             <span>숫자</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#d1fae5', border: '1px solid #10b981' }} />
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#d1fae5', border: '1px solid #34d399' }} />
             <span>String</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ffedd5', border: '1px solid #f97316' }} />
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ffedd5', border: '1px solid #fb923c' }} />
             <span>배열</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#f3e8ff', border: '1px solid #a855f7' }} />
-            <span>객체</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-blue-500" />
-            <span>참조 연결</span>
           </div>
         </div>
       </div>

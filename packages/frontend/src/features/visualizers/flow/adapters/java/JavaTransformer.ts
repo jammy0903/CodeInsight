@@ -93,28 +93,83 @@ export class JavaTransformer implements IFlowTransformer {
     // 1. Stack 변수 처리 (main 프레임)
     // step.memoryState?.stack (원본) 또는 step.stack (enriched) 둘 다 체크
     const stackData = step.memoryState?.stack || (step.stack as any);
-    if (stackData) {
+    if (stackData && Array.isArray(stackData)) {
       stackData.forEach((item: any) => {
-        const pointsTo = extractPointsTo(item.value);
-        const isReference = !!pointsTo;
+        // 형태 1: 단순 형태 {name, value, type?} - 레슨 JSON
+        if (item.name && (item.value !== undefined || item.value === null)) {
+          const pointsTo = extractPointsTo(item.value);
+          const isReference = !!pointsTo;
 
-        const variable: FlowVariable = {
-          id: `main-${item.name}`,
-          name: item.name,
-          value: parseValue(item.value),
-          type: item.type || 'unknown',
-          state: 'idle',
-          scope: 'main',
-          isPointer: isReference,
-          pointsTo,
-        };
+          const variable: FlowVariable = {
+            id: `main-${item.name}`,
+            name: item.name,
+            value: parseValue(item.value),
+            type: item.type || 'unknown',
+            state: 'idle',
+            scope: 'main',
+            isPointer: isReference,
+            // ArrowLayer는 variable.id로 매칭하므로 heap-${address} 형식 필요
+            pointsTo: pointsTo ? `heap-${pointsTo}` : undefined,
+          };
 
-        variables.push(variable);
-        mainFrameVars.push(variable.id);
+          variables.push(variable);
+          mainFrameVars.push(variable.id);
 
-        // DEBUG
-        if (import.meta.env.DEV) {
-          console.log('[JavaTransformer] stack variable:', variable);
+          if (import.meta.env.DEV) {
+            console.log('[JavaTransformer] stack variable (simple):', variable);
+          }
+        }
+        // 형태 2: 복잡한 형태 {methodName, variables: {...}} - 시뮬레이터
+        else if (item.methodName || item.variables) {
+          const frameName = item.methodName || 'main';
+
+          if (item.variables && typeof item.variables === 'object') {
+            Object.entries(item.variables).forEach(([varName, val]: [string, any]) => {
+              let value: string | number | boolean | null = null;
+              let type = 'unknown';
+              let pointsToAddr: string | undefined = undefined;
+
+              if (val && typeof val === 'object') {
+                if ('value' in val) {
+                  value = parseValue(val.value);
+                  type = val.type || typeof val.value;
+                } else if (val.type === 'Reference' || val.type === 'Array' || val.id) {
+                  // 참조 타입: displayValue가 있으면 표시, 없으면 주소
+                  if (val.displayValue !== undefined) {
+                    value = val.displayValue;
+                  } else {
+                    value = val.id ? `-> ${val.id}` : null;
+                  }
+                  type = val.class || val.type || 'Reference';
+                  pointsToAddr = val.id;
+                } else {
+                  value = JSON.stringify(val);
+                  type = 'object';
+                }
+              } else {
+                value = parseValue(val);
+                type = typeof val;
+              }
+
+              const variable: FlowVariable = {
+                id: `${frameName}-${varName}`,
+                name: varName,
+                value,
+                type,
+                state: 'idle',
+                scope: frameName,
+                isPointer: !!pointsToAddr,
+                pointsTo: pointsToAddr ? `heap-${pointsToAddr}` : undefined,
+              };
+
+              variables.push(variable);
+              mainFrameVars.push(variable.id);
+
+              if (import.meta.env.DEV) {
+                console.log('[JavaTransformer] stack variable (complex):', variable);
+              }
+            });
+          }
         }
       });
     }
@@ -122,16 +177,17 @@ export class JavaTransformer implements IFlowTransformer {
     // 2. Heap 변수 처리
     // step.memoryState?.heap (원본) 또는 step.heap (enriched) 둘 다 체크
     const heapData = step.memoryState?.heap || (step.heap as any);
-    if (heapData) {
+    if (heapData && Array.isArray(heapData)) {
       heapData.forEach((item: any) => {
+        const address = item.address || item.id || 'unknown';
         const variable: FlowVariable = {
-          id: `heap-${item.address}`,
-          name: item.address || 'unknown',
+          id: `heap-${address}`,
+          name: address,
           value: parseValue(item.content || item.value),
-          type: 'Object',
+          type: item.type || 'Object',
           state: 'idle',
           scope: 'heap',
-          address: item.address,
+          address: address,
           isPointer: false,
         };
 
@@ -157,9 +213,15 @@ export class JavaTransformer implements IFlowTransformer {
     // 4. 코드 추출
     const code = step.code || (fullCode ? getCodeAtLine(fullCode, step.line) : '');
 
-    // 5. 터미널 출력 (comparison, output 처리)
+    // 5. 터미널 출력 (stdout 또는 memoryState.output)
     let terminalOutput: { text: string } | undefined = undefined;
-    if (step.memoryState?.output) {
+
+    // 시뮬레이터: step.stdout 직접 전달
+    if ((step as any).stdout) {
+      terminalOutput = { text: String((step as any).stdout) };
+    }
+    // 레슨 JSON: step.memoryState.output
+    else if (step.memoryState?.output) {
       terminalOutput = {
         text: Array.isArray(step.memoryState.output)
           ? step.memoryState.output.join('\n')

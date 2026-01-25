@@ -1,11 +1,11 @@
 /**
  * Print Handler
- * System.out.println 처리
+ * System.out.println / System.out.print 처리
  *
  * 패턴:
  * - System.out.println(x);
  * - System.out.println("Hello");
- * - System.out.println(a + b);
+ * - System.out.print(a + b);
  */
 
 import { JavaHandler, HandlerResult } from './types';
@@ -18,10 +18,10 @@ export class PrintHandler implements JavaHandler {
   priority = 15;
 
   /**
-   * System.out.println 패턴 확인
+   * System.out.print / println 패턴 확인
    */
   canHandle(line: string, context: JavaContext): boolean {
-    return line.includes('System.out.println');
+    return line.includes('System.out.print');
   }
 
   /**
@@ -37,14 +37,18 @@ export class PrintHandler implements JavaHandler {
     const evaluator = new ExpressionEvaluator(stack, heap);
     const events: JavaEvent[] = [];
 
-    // System.out.println(expr);
-    const match = line.match(/System\.out\.println\s*\(\s*(.+?)\s*\)\s*;?/);
+    // println인지 print인지 확인
+    const isPrintln = line.includes('System.out.println');
+    const printType = isPrintln ? 'println' : 'print';
+
+    // System.out.println(expr); 또는 System.out.print(expr);
+    const match = line.match(/System\.out\.print(?:ln)?\s*\(\s*(.+?)\s*\)\s*;?/);
     if (!match) {
       return {
         success: false,
-        explanation: 'println 파싱 실패',
+        explanation: `${printType} 파싱 실패`,
         events: [],
-        error: 'Invalid println syntax'
+        error: `Invalid ${printType} syntax`
       };
     }
 
@@ -70,11 +74,12 @@ export class PrintHandler implements JavaHandler {
         outputStr = String(value.value);
       }
 
-      context.stdout += outputStr + '\n';
+      // println은 줄바꿈 추가, print는 줄바꿈 없음
+      context.stdout += isPrintln ? outputStr + '\n' : outputStr;
 
       events.push({
         type: 'OutputEvent',
-        action: 'println',
+        action: printType,
         target: 'stdout',
         message: outputStr
       });
