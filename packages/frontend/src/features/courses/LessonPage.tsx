@@ -42,8 +42,9 @@ import { useIsMobile } from '@/hooks';
 // 언어별 시각화
 import { JSVisualizerView } from '@/features/visualizers/js';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
-import { JavaReferenceView } from '@/features/visualizers/java';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
+import { JavaMemoryView, toJavaMemoryViewProps } from '@/features/visualizers/java';
+import { Layers } from 'lucide-react';
 
 
 // 모바일 컴포넌트
@@ -274,7 +275,8 @@ export function LessonPage() {
 
   const [liveSteps, setLiveSteps] = useState<LessonStep[] | null>(null);
   const [simulating, setSimulating] = useState(false);
-  const [activeTab, setActiveTab] = useState<'flow' | 'chat'>('flow');
+  const [simulationError, setSimulationError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>('flow');
 
   const memoryScrollRef = useRef<HTMLDivElement>(null);
 
@@ -382,15 +384,16 @@ export function LessonPage() {
           simulationCache.current[memoizedCode] = mergedSteps;
           lastSimulatedCodeRef.current = memoizedCode;
 
+          setSimulationError(null);
           setLiveSteps(mergedSteps);
         } else {
           console.error("Simulation failed:", result.error);
-          setError(result.error || 'Failed to simulate code.');
+          setSimulationError(result.error || 'Failed to simulate code.');
         }
       } catch (e) {
         if (cancelled) return;
         console.error("Simulation exception:", e);
-        setError(e instanceof Error ? e.message : 'An unknown error occurred during simulation.');
+        setSimulationError(e instanceof Error ? e.message : 'An unknown error occurred during simulation.');
       } finally {
         if (!cancelled) setSimulating(false);
       }
@@ -437,7 +440,7 @@ export function LessonPage() {
     analyticsRef.current = { finishTracking: analytics.finishTracking };
   }, [analytics.finishTracking]);
 
-  const { memoryState, changedBlocks, visualizationType, visualizationState } = useLessonVisualization(
+  const { memoryState } = useLessonVisualization(
     steps,
     navigation.currentStepIndex
   );
@@ -559,7 +562,6 @@ export function LessonPage() {
               onPrevStep={navigation.goToPrevStep}
               onNextStep={navigation.goToNextStep}
               onQuiz={navigation.goToQuiz}
-              showRegisters={lesson?.content?.showRegisters}
             />
           </div>
         </div>
@@ -587,7 +589,7 @@ export function LessonPage() {
             <div
               className={(code.split('\n').length > 10 && !isExplanationCollapsed) ? 'overflow-y-auto' : ''}
               style={{
-                height: `${(isExplanationCollapsed ? code.split('\n').length : Math.min(code.split('\n').length, 10)) * 20}px`,
+                height: `${(isExplanationCollapsed ? code.split('\n').length : Math.max(code.split('\n').length, 10)) * 20}px`,
                 borderBottom: '1px solid var(--theme-lesson-panel-border)',
               }}
             >
@@ -671,6 +673,20 @@ export function LessonPage() {
                 <Play className="w-3.5 h-3.5" />
                 <span>Flow</span>
               </button>
+              {lang === 'java' && (
+                <button
+                  onClick={() => setActiveTab('memory')}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold transition-all"
+                  style={{
+                    background: activeTab === 'memory' ? 'var(--theme-lesson-tab-active-bg)' : 'var(--theme-lesson-tab-inactive-bg)',
+                    color: activeTab === 'memory' ? 'var(--theme-lesson-tab-active-text)' : 'var(--theme-lesson-tab-inactive-text)',
+                    borderRight: '1px solid var(--theme-lesson-panel-border)',
+                  }}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  Memory
+                </button>
+              )}
               {!isMobile && (
                 <button
                   onClick={() => setActiveTab('chat')}
@@ -695,33 +711,25 @@ export function LessonPage() {
               {activeTab === 'flow' && (
                 <div className="w-full h-full overflow-y-auto">
                   <div className="p-4">
-                    {lang === 'java' ? (
-                      <JavaReferenceView
-                        stack={visualizationState?.stack}
-                        heap={visualizationState?.heap}
-                      />
-                    ) : currentStep ? (
+                    {currentStep && (
                       <LessonFlowVisualizer
                         step={currentStep}
                         prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
-                        language={lang || 'c'}
+                        language={lang === 'python-practical' ? 'python' : (lang || 'c')}
                         fullCode={code}
-                        // stack/heap for Python flow view might be needed?
-                        // PythonFlowView logic inside LessonFlowVisualizer uses `step.variables` which comes from `adapter.transformer.transform`.
-                        // The transformer needs `stack` and `heap` from the step.
-                        // `currentStep` from `liveSteps` (simulator service) has `pyNames`/`pyObjects`.
-                        // But `LessonFlowVisualizer` enrichment logic:
-                        // if (memoryState) { enriched.stack = memoryState.stack; ... }
-                        // `useLessonVisualization` returns `memoryState` for Python too (adapted from names/objects).
-                        // So we need to pass `memoryState` to `LessonFlowVisualizer`.
                         memoryState={memoryState ? {
                           stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
                           heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' }))
                         } : undefined}
                         stdout={currentStep.stdout}
                       />
-                    ) : null}
+                    )}
                   </div>
+                </div>
+              )}
+              {activeTab === 'memory' && lang === 'java' && currentStep && (
+                <div className="w-full h-full overflow-y-auto p-4">
+                  <JavaMemoryView {...toJavaMemoryViewProps(currentStep)} />
                 </div>
               )}
               {activeTab === 'chat' && !isMobile && (

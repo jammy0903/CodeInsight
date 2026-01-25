@@ -9,7 +9,7 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Code2, Cpu, GitBranch, Play, ChevronUp, ChevronDown } from 'lucide-react';
+import { Code2, Play, ChevronUp, ChevronDown } from 'lucide-react';
 import { useStepGestures } from '../../hooks/useStepGestures';
 import { useLessonVisualization } from '../../hooks/useLessonVisualization';
 import { useSlidingPages } from '@/hooks/useSlidingPages';
@@ -32,46 +32,14 @@ interface MobileLessonViewProps {
   onPrevStep: () => void;
   onNextStep: () => void;
   onQuiz?: () => void;
-  showRegisters?: boolean;
 }
 
-// 언어별 설정
-function getLanguageConfig(languageId: string) {
-  if (languageId.includes('python')) {
-    return {
-      codeName: 'Python 코드',
-      visualName: '실행 흐름',
-      visualIcon: GitBranch,
-      visualColor: 'from-emerald-600 to-emerald-700',
-      visualType: 'flow' as const,
-    };
-  }
-  if (languageId.includes('java')) {
-    return {
-      codeName: 'Java 코드',
-      visualName: '메모리',
-      visualIcon: Cpu,
-      visualColor: 'from-orange-600 to-orange-700',
-      visualType: 'memory' as const,
-    };
-  }
-  if (languageId.includes('javascript') || languageId.includes('js')) {
-    return {
-      codeName: 'JavaScript 코드',
-      visualName: '메모리',
-      visualIcon: Cpu,
-      visualColor: 'from-yellow-500 to-yellow-600',
-      visualType: 'memory' as const,
-    };
-  }
-  // C, 기타
-  return {
-    codeName: 'C 코드',
-    visualName: '메모리',
-    visualIcon: Cpu,
-    visualColor: 'from-blue-600 to-blue-700',
-    visualType: 'memory' as const,
-  };
+// 언어별 코드 이름 반환
+function getCodeName(languageId: string): string {
+  if (languageId.includes('python')) return 'Python 코드';
+  if (languageId.includes('java')) return 'Java 코드';
+  if (languageId.includes('javascript') || languageId.includes('js')) return 'JavaScript 코드';
+  return 'C 코드';
 }
 
 export function MobileLessonView({
@@ -85,7 +53,6 @@ export function MobileLessonView({
   onPrevStep,
   onNextStep,
   onQuiz,
-  showRegisters,
 }: MobileLessonViewProps) {
   // useSlidingPages 훅을 사용하여 슬라이딩 로직 위임
   const {
@@ -107,11 +74,11 @@ export function MobileLessonView({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[currentStepIndex];
-  const config = getLanguageConfig(languageId);
+  const codeName = getCodeName(languageId);
   const isLastStep = currentStepIndex >= steps.length - 1;
 
   // 데스크톱과 동일한 시각화 훅 사용
-  const { memoryState, changedBlocks, visualizationType, visualizationState } = useLessonVisualization(
+  const { memoryState } = useLessonVisualization(
     steps,
     currentStepIndex
   );
@@ -234,7 +201,7 @@ export function MobileLessonView({
                 >
                   <div className="px-2 py-1 bg-gradient-to-r from-[#2d2d2d] to-[#1a1a1a] text-white text-[11px] font-semibold flex items-center gap-1.5 shrink-0">
                     <Code2 className="w-3 h-3" />
-                    {config.codeName}
+                    {codeName}
                     <span className="ml-auto opacity-60">{lineCount}줄</span>
                   </div>
                   <div
@@ -273,7 +240,7 @@ export function MobileLessonView({
                 <LessonFlowVisualizer
                   step={currentStep}
                   prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] : null}
-                  language={languageId as 'c' | 'python' | 'java'}
+                  language={languageId === 'python-practical' ? 'python' : (languageId as 'c' | 'python' | 'java')}
                   fullCode={code}
                   theme="light"
                   memoryState={memoryState ? {
