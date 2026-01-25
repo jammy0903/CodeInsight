@@ -61,9 +61,11 @@ export type PyValue =
   | string // str
   | boolean // bool
   | null // None
-  | PyObjectRef[] // list, tuple (내부 요소는 참조)
+  | PyObjectRef[] // list, tuple, set (내부 요소는 참조)
   | PyDictEntry[] // dict
-  | PyObjectRef[]; // set
+  | PyFunctionValue // function
+  | PyClassValue // class
+  | PyInstanceValue; // instance
 
 /**
  * 객체 참조 (list/dict 내부 요소용)
@@ -78,6 +80,104 @@ export interface PyObjectRef {
 export interface PyDictEntry {
   key: PyObjectRef;
   value: PyObjectRef;
+}
+
+// =============================================
+// 함수 & 클래스 (Phase 2)
+// =============================================
+
+/**
+ * 함수 객체의 값
+ */
+export interface PyFunctionValue {
+  /** 함수명 */
+  name: string;
+
+  /** 파라미터 목록 */
+  params: PyFunctionParam[];
+
+  /** 함수 본문 시작 줄 */
+  startLine: number;
+
+  /** 함수 본문 끝 줄 */
+  endLine: number;
+
+  /** 함수 본문 코드 */
+  bodyLines: PyCodeLine[];
+
+  /** 정의된 클래스명 (메서드인 경우) */
+  className?: string;
+}
+
+/**
+ * 함수 파라미터
+ */
+export interface PyFunctionParam {
+  name: string;
+  defaultValue?: string;
+}
+
+/**
+ * 코드 라인
+ */
+export interface PyCodeLine {
+  lineNum: number;
+  code: string;
+  indent: number;
+}
+
+/**
+ * 클래스 객체의 값
+ */
+export interface PyClassValue {
+  /** 클래스명 */
+  name: string;
+
+  /** 메서드 목록 (함수 객체 ID) */
+  methods: Record<string, string>;
+
+  /** 클래스 속성 (객체 ID) */
+  classAttributes: Record<string, string>;
+
+  /** 시작 줄 */
+  startLine: number;
+
+  /** 끝 줄 */
+  endLine: number;
+}
+
+/**
+ * 인스턴스 객체의 값
+ */
+export interface PyInstanceValue {
+  /** 클래스명 */
+  className: string;
+
+  /** 클래스 객체 ID */
+  classId: string;
+
+  /** 인스턴스 속성 (이름 → 객체 ID) */
+  attributes: Record<string, string>;
+}
+
+/**
+ * 콜스택 프레임
+ */
+export interface PyCallFrame {
+  /** 함수명 */
+  functionName: string;
+
+  /** 로컬 네임스페이스 */
+  localNames: Map<string, PyName>;
+
+  /** 반환할 줄 번호 */
+  returnLine: number;
+
+  /** 호출 깊이 */
+  depth: number;
+
+  /** 인스턴스 (메서드 호출 시 self) */
+  selfObjectId?: string;
 }
 
 // =============================================
@@ -130,6 +230,18 @@ export interface PyStep {
 
   /** 변경 사항 (애니메이션용) */
   changes?: PyChange[];
+
+  /** 현재 콜스택 (시각화용) */
+  callStack?: PyCallFrameSnapshot[];
+}
+
+/**
+ * 콜스택 프레임 스냅샷 (시각화용)
+ */
+export interface PyCallFrameSnapshot {
+  functionName: string;
+  depth: number;
+  localNames: PyName[];
 }
 
 /**
@@ -158,6 +270,9 @@ export interface PySimContext {
   objects: Map<string, PyObject>;
   nextId: number;
 
+  // 콜스택
+  callStack: PyCallFrame[];
+
   // 실행 상태
   currentLine: number;
 
@@ -166,10 +281,16 @@ export interface PySimContext {
 
   // 유틸리티 메서드
   createObject(type: PyType, value: PyValue, mutable?: boolean): PyObject;
-  bindName(name: string, objectId: string, scope?: 'local' | 'global'): PyName;
+  bindName(name: string, objectId: string, scope?: string): PyName;
   getObject(id: string): PyObject | undefined;
   appendStdout(text: string): void;
   createStep(lineNum: number, code: string, explanation: string): PyStep;
+
+  // 콜스택 관리 메서드
+  pushFrame(frame: PyCallFrame): void;
+  popFrame(): PyCallFrame | undefined;
+  getCurrentFrame(): PyCallFrame | undefined;
+  getCurrentScope(): string;
 }
 
 // =============================================
@@ -191,4 +312,26 @@ export interface PyCodeHandler {
 
   /** 코드 처리 */
   handle(ctx: PySimContext, lineNum: number, code: string): PyStep | null;
+}
+
+/**
+ * 블록 핸들러 인터페이스 (함수, 클래스 등)
+ */
+export interface PyBlockHandler {
+  /** 핸들러 이름 */
+  name: string;
+
+  /** 우선순위 (높을수록 먼저) */
+  priority: number;
+
+  /** 블록 시작 가능 여부 */
+  canHandle(code: string): boolean;
+
+  /** 블록 정의 처리 (def, class 등) */
+  handleDefinition(
+    ctx: PySimContext,
+    lineNum: number,
+    code: string,
+    bodyLines: PyCodeLine[]
+  ): PyStep | null;
 }

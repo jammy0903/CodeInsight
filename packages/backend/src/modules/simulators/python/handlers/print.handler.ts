@@ -68,8 +68,18 @@ function evaluateArg(ctx: PySimContext, arg: string): string {
   if (arg === 'False') return 'False';
   if (arg === 'None') return 'None';
 
-  // 변수 참조
-  const obj = getObjectByName(ctx, arg);
+  // 속성 접근 (self.name, obj.attr 등)
+  const attrMatch = arg.match(/^(\w+)\.(\w+)$/);
+  if (attrMatch) {
+    const [, objName, attrName] = attrMatch;
+    const attrValue = evaluateAttribute(ctx, objName, attrName);
+    if (attrValue !== null) {
+      return attrValue;
+    }
+  }
+
+  // 변수 참조 (현재 프레임 로컬 → 글로벌)
+  const obj = getObjectFromContext(ctx, arg);
   if (obj) {
     return formatObjectValue(obj);
   }
@@ -80,6 +90,54 @@ function evaluateArg(ctx: PySimContext, arg: string): string {
   }
 
   return arg;
+}
+
+/**
+ * 컨텍스트에서 객체 가져오기 (프레임 로컬 우선)
+ */
+function getObjectFromContext(ctx: PySimContext, name: string): ReturnType<typeof ctx.getObject> | null {
+  const frame = ctx.getCurrentFrame();
+
+  // 1. 현재 프레임의 로컬 변수에서 찾기
+  if (frame) {
+    const localName = frame.localNames.get(name);
+    if (localName) {
+      const obj = ctx.getObject(localName.pointsTo);
+      if (obj) return obj;
+    }
+  }
+
+  // 2. 일반적인 방법으로 찾기 (글로벌 포함)
+  return getObjectByName(ctx, name) || null;
+}
+
+/**
+ * 속성 값 평가 (self.name, obj.attr 등)
+ */
+function evaluateAttribute(ctx: PySimContext, objName: string, attrName: string): string | null {
+  let instanceObj;
+
+  if (objName === 'self') {
+    // 현재 프레임에서 self 찾기
+    const frame = ctx.getCurrentFrame();
+    if (!frame?.selfObjectId) return null;
+    instanceObj = ctx.getObject(frame.selfObjectId);
+  } else {
+    // 일반 변수에서 찾기
+    instanceObj = getObjectFromContext(ctx, objName);
+  }
+
+  if (!instanceObj || instanceObj.type !== 'instance') return null;
+
+  // 인스턴스 속성에서 값 찾기
+  const instanceValue = instanceObj.value as { attributes: Record<string, string> };
+  const attrObjId = instanceValue.attributes[attrName];
+  if (!attrObjId) return null;
+
+  const attrObj = ctx.getObject(attrObjId);
+  if (!attrObj) return null;
+
+  return formatObjectValue(attrObj);
 }
 
 /**

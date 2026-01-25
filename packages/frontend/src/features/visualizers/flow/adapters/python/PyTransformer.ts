@@ -36,6 +36,36 @@ interface PyDictEntry {
   value: PyObjectRef;
 }
 
+// Phase 2: 함수/클래스 타입
+interface PyFunctionValue {
+  name: string;
+  params: { name: string; defaultValue?: string }[];
+  startLine: number;
+  endLine: number;
+  bodyLines: { lineNum: number; code: string; indent: number }[];
+  className?: string;
+}
+
+interface PyClassValue {
+  name: string;
+  methods: Record<string, string>;
+  classAttributes: Record<string, string>;
+  startLine: number;
+  endLine: number;
+}
+
+interface PyInstanceValue {
+  className: string;
+  classId: string;
+  attributes: Record<string, string>;
+}
+
+interface PyCallFrameSnapshot {
+  functionName: string;
+  depth: number;
+  localNames: PyName[];
+}
+
 /**
  * Python 값을 FlowValue로 변환
  */
@@ -71,6 +101,28 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
     return `{${pairs.join(', ')}}`;
   }
 
+  // function의 경우
+  if (type === 'function') {
+    const funcValue = value as PyFunctionValue;
+    const params = funcValue.params.map((p) => p.name).join(', ');
+    const prefix = funcValue.className ? `${funcValue.className}.` : '';
+    return `${prefix}${funcValue.name}(${params})`;
+  }
+
+  // class의 경우
+  if (type === 'class') {
+    const classValue = value as PyClassValue;
+    const methodNames = Object.keys(classValue.methods);
+    return `class ${classValue.name} [${methodNames.length} methods]`;
+  }
+
+  // instance의 경우
+  if (type === 'instance') {
+    const instanceValue = value as PyInstanceValue;
+    const attrCount = Object.keys(instanceValue.attributes).length;
+    return `${instanceValue.className} instance (${attrCount} attrs)`;
+  }
+
   return String(value);
 }
 
@@ -81,6 +133,18 @@ function formatValue(value: unknown, type: string): string {
   if (value === null) return 'None';
   if (type === 'str') return `"${value}"`;
   if (type === 'bool') return value ? 'True' : 'False';
+  if (type === 'function') {
+    const funcValue = value as PyFunctionValue;
+    return `<function ${funcValue.name}>`;
+  }
+  if (type === 'class') {
+    const classValue = value as PyClassValue;
+    return `<class '${classValue.name}'>`;
+  }
+  if (type === 'instance') {
+    const instanceValue = value as PyInstanceValue;
+    return `<${instanceValue.className} instance>`;
+  }
   return String(value);
 }
 
@@ -183,9 +247,24 @@ export class PyTransformer implements IFlowTransformer {
    * PyObject → FlowVariable 변환 (참조 대상)
    */
   private objectToVariable(obj: PyObject, objectsMap: Map<string, PyObject>): FlowVariable {
+    // 함수, 클래스, 인스턴스는 더 의미있는 이름 사용
+    let displayName = `${obj.type}@${obj.id.slice(-4)}`;
+
+    if (obj.type === 'function') {
+      const funcValue = obj.value as PyFunctionValue;
+      const prefix = funcValue.className ? `${funcValue.className}.` : '';
+      displayName = `${prefix}${funcValue.name}()`;
+    } else if (obj.type === 'class') {
+      const classValue = obj.value as PyClassValue;
+      displayName = `class ${classValue.name}`;
+    } else if (obj.type === 'instance') {
+      const instanceValue = obj.value as PyInstanceValue;
+      displayName = `${instanceValue.className} instance`;
+    }
+
     return {
       id: `obj-${obj.id}`,
-      name: `${obj.type}@${obj.id.slice(-4)}`, // 예: "list@1234"
+      name: displayName,
       value: convertPyValue(obj.value, obj.type, objectsMap),
       type: obj.type,
       state: obj.highlight ? 'updating' : 'idle',
