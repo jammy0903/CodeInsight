@@ -143,17 +143,6 @@ export const ArrowLayer = memo(function ArrowLayer({
       const shouldShow = styler.shouldShowArrow(variable);
       const hasPointsTo = !!variable.pointsTo;
 
-      // DEBUG: 화살표 후보 확인
-      if (import.meta.env.DEV && variable.isPointer) {
-        console.log('[ArrowLayer] 🏹 arrow candidate:', {
-          id: variable.id,
-          name: variable.name,
-          pointsTo: variable.pointsTo,
-          shouldShowArrow: shouldShow,
-          hasPointsTo,
-        });
-      }
-
       if (shouldShow && hasPointsTo) {
         const target = variables.find((v) => v.id === variable.pointsTo);
         if (target) {
@@ -163,31 +152,30 @@ export const ArrowLayer = memo(function ArrowLayer({
             to: target,
             style: styler.getArrowStyle(variable, target),
           });
-        } else if (import.meta.env.DEV) {
-          console.log('[ArrowLayer] ⚠️ target not found:', variable.pointsTo);
         }
       }
     });
 
-    if (import.meta.env.DEV) {
-      console.log('[ArrowLayer] 📊 arrows calculated:', result.length);
-    }
-
     return result;
   }, [variables, styler]);
 
-  // 변수 위치 업데이트 (DOM에서 읽기)
-  useEffect(() => {
-    if (!containerRef?.current) return;
+  // 변수 위치 업데이트 함수를 ref에 저장
+  const variablesRef = useRef(variables);
+  const updatePositionsRef = useRef<() => void>();
 
-    const updatePositions = () => {
-      const container = containerRef.current;
+  useEffect(() => {
+    variablesRef.current = variables;
+  }, [variables]);
+
+  useEffect(() => {
+    updatePositionsRef.current = () => {
+      const container = containerRef?.current;
       if (!container) return;
 
       const containerRect = container.getBoundingClientRect();
       const newPositions = new Map<string, Position>();
 
-      variables.forEach((variable) => {
+      variablesRef.current.forEach((variable) => {
         const element = container.querySelector(`[data-variable-id="${variable.id}"]`);
         if (element) {
           const rect = element.getBoundingClientRect();
@@ -200,16 +188,29 @@ export const ArrowLayer = memo(function ArrowLayer({
 
       setPositions(newPositions);
     };
+  }, [containerRef]);
 
-    // 초기 위치 계산
-    updatePositions();
+  // variables 변경 시 위치 재계산
+  useEffect(() => {
+    if (updatePositionsRef.current) {
+      requestAnimationFrame(() => {
+        updatePositionsRef.current?.();
+      });
+    }
+  }, [variables]);
 
-    // ResizeObserver로 크기 변경 감지
-    const observer = new ResizeObserver(updatePositions);
+  // ResizeObserver는 mount 시 1회만 생성 (성능 최적화)
+  useEffect(() => {
+    if (!containerRef?.current) return;
+
+    const observer = new ResizeObserver(() => {
+      updatePositionsRef.current?.();
+    });
+
     observer.observe(containerRef.current);
 
     return () => observer.disconnect();
-  }, [variables, containerRef]);
+  }, [containerRef]);
 
   // 화살표가 없으면 렌더링하지 않음
   if (arrows.length === 0) {

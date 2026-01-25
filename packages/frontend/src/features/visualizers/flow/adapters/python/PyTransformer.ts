@@ -151,81 +151,150 @@ function formatValue(value: unknown, type: string): string {
 export class PyTransformer implements IFlowTransformer {
   /**
    * LessonStep (Python 형식) → FlowStep 변환
+   *
+   * 콜스택 기반 프레임 생성:
+   * - callStack이 있으면 → 동적 프레임 (함수 호출/반환 시 생성/삭제)
+   * - callStack이 없으면 → 정적 프레임 (레슨 JSON 호환)
    */
   transform(step: LessonStep, prevStep?: LessonStep, fullCode?: string): FlowStep {
     const variables: FlowVariable[] = [];
-    const framesMap = new Map<string, string[]>();
 
     // Python step 데이터 추출
     // 우선순위: pythonMemoryState > pyNames/pyObjects > names/objects
     const pyState = (step as any).pythonMemoryState;
     const names: PyName[] = pyState?.names || (step as any).pyNames || (step as any).names || [];
     const objectsArray: PyObject[] = pyState?.objects || (step as any).pyObjects || (step as any).objects || [];
+    const callStack: PyCallFrameSnapshot[] = (step as any).callStack || [];
 
     // 객체를 Map으로 변환 (빠른 조회용)
     const objectsMap = new Map<string, PyObject>();
     objectsArray.forEach((obj) => objectsMap.set(obj.id, obj));
 
     // 1. 객체들을 먼저 FlowVariable로 변환 (참조 대상)
+    const objectVarIds: string[] = [];
     objectsArray.forEach((obj) => {
       const variable = this.objectToVariable(obj, objectsMap);
       variables.push(variable);
-
-      // 객체 프레임에 추가 (시각적으로 별도 영역)
-      const objFrameVars = framesMap.get('objects') || [];
-      objFrameVars.push(variable.id);
-      framesMap.set('objects', objFrameVars);
+      objectVarIds.push(variable.id);
     });
 
     // 2. 이름들을 FlowVariable로 변환 (참조 변수)
+    const nameVarMap = new Map<string, FlowVariable>();
     names.forEach((name) => {
       const obj = objectsMap.get(name.pointsTo);
       const variable = this.nameToVariable(name, obj);
       variables.push(variable);
-
-      // 스코프별 프레임에 추가 (기본값: 'local')
-      const scope = name.scope || 'local';
-      const frameName = scope === 'global' ? 'global' : scope;
-      const frameVars = framesMap.get(frameName) || [];
-      frameVars.push(variable.id);
-      framesMap.set(frameName, frameVars);
+      // scope-name을 키로 저장 (콜스택에서 찾기 위해)
+      const scope = name.scope || 'global';
+      nameVarMap.set(`${scope}-${name.name}`, variable);
     });
 
-    // 3. 프레임 배열 생성
+    // 3. 프레임 생성 (콜스택 기반 or 정적)
     const frames: FlowFrame[] = [];
 
-    // 'local'은 '__main__'과 동일하게 취급 (레슨 JSON 호환)
-    const mainFrameIds = [
-      ...(framesMap.get('__main__') || []),
-      ...(framesMap.get('local') || []),
-    ];
+    if (callStack.length > 0) {
+      // === 콜스택 기반 프레임 생성 (동적) ===
 
-    // global → __main__ → 기타 함수 → objects 순서
-    if (framesMap.has('global')) {
-      frames.push({ name: 'global', variableIds: framesMap.get('global')! });
-    }
-    if (mainFrameIds.length > 0) {
-      frames.push({ name: '__main__', variableIds: mainFrameIds });
-    }
-    framesMap.forEach((varIds, frameName) => {
-      if (frameName !== 'global' && frameName !== '__main__' && frameName !== 'local' && frameName !== 'objects') {
-        frames.push({ name: frameName, variableIds: varIds });
+      // 3-1. 글로벌 프레임 (글로벌 스코프 변수들)
+      const globalVarIds: string[] = [];
+      names.forEach((name) => {
+        if (name.scope === 'global' || !name.scope) {
+          // 콜스택에 속하지 않는 글로벌 변수
+          const isInCallStack = callStack.some((frame) =>
+            frame.localNames.some((ln) => ln.name === name.name)
+          );
+          if (!isInCallStack || name.scope === 'global') {
+            const varKey = `${name.scope || 'global'}-${name.name}`;
+            const variable = nameVarMap.get(varKey);
+            if (variable && !globalVarIds.includes(variable.id)) {
+              globalVarIds.push(variable.id);
+            }
+          }
+        }
+      });
+
+      if (globalVarIds.length > 0) {
+        frames.push({ name: 'global', variableIds: globalVarIds });
       }
-    });
-    if (framesMap.has('objects')) {
-      frames.push({ name: 'Objects (Heap)', variableIds: framesMap.get('objects')! });
-    }
 
-    // __main__이 없으면 기본 추가
-    if (frames.length === 0 || !frames.some((f) => f.name === '__main__')) {
-      frames.unshift({ name: '__main__', variableIds: [] });
+      // 3-2. 콜스택 프레임들 (depth 순서로 - 아래가 먼저 호출된 것)
+      const sortedCallStack = [...callStack].sort((a, b) => a.depth - b.depth);
+
+      sortedCallStack.forEach((frame) => {
+        const frameVarIds: string[] = [];
+
+        // 프레임의 로컬 변수들
+        frame.localNames.forEach((localName) => {
+          const varKey = `${frame.functionName}-${localName.name}`;
+          const variable = nameVarMap.get(varKey);
+          if (variable) {
+            frameVarIds.push(variable.id);
+          }
+        });
+
+        frames.push({
+          name: frame.functionName,
+          variableIds: frameVarIds,
+        });
+      });
+
+      // 3-3. Objects(Heap) 프레임
+      if (objectVarIds.length > 0) {
+        frames.push({ name: 'Objects (Heap)', variableIds: objectVarIds });
+      }
+
+    } else {
+      // === 정적 프레임 생성 (레슨 JSON 호환) ===
+      const framesMap = new Map<string, string[]>();
+
+      // 객체 프레임
+      framesMap.set('objects', objectVarIds);
+
+      // 스코프별 프레임
+      names.forEach((name) => {
+        const scope = name.scope || 'local';
+        const frameName = scope === 'global' ? 'global' : scope;
+        const varKey = `${scope}-${name.name}`;
+        const variable = nameVarMap.get(varKey);
+        if (variable) {
+          const frameVars = framesMap.get(frameName) || [];
+          frameVars.push(variable.id);
+          framesMap.set(frameName, frameVars);
+        }
+      });
+
+      // 'local'은 '__main__'과 동일하게 취급
+      const mainFrameIds = [
+        ...(framesMap.get('__main__') || []),
+        ...(framesMap.get('local') || []),
+      ];
+
+      // global → __main__ → 기타 함수 → objects 순서
+      if (framesMap.has('global')) {
+        frames.push({ name: 'global', variableIds: framesMap.get('global')! });
+      }
+      if (mainFrameIds.length > 0) {
+        frames.push({ name: '__main__', variableIds: mainFrameIds });
+      }
+      framesMap.forEach((varIds, frameName) => {
+        if (frameName !== 'global' && frameName !== '__main__' && frameName !== 'local' && frameName !== 'objects') {
+          frames.push({ name: frameName, variableIds: varIds });
+        }
+      });
+      if (framesMap.has('objects') && framesMap.get('objects')!.length > 0) {
+        frames.push({ name: 'Objects (Heap)', variableIds: framesMap.get('objects')! });
+      }
+
+      // __main__이 없으면 기본 추가
+      if (frames.length === 0 || !frames.some((f) => f.name === '__main__' || f.name === 'global')) {
+        frames.unshift({ name: '__main__', variableIds: [] });
+      }
     }
 
     // 4. 코드 추출
     const code = step.code || (fullCode ? this.getCodeAtLine(fullCode, step.line) : '');
 
     // 5. 터미널 출력
-    // pythonMemoryState.output은 배열일 수 있음 (예: ["140234567890", "140234567890", "True"])
     const pyOutput = pyState?.output;
     const stdout = pyOutput
       ? (Array.isArray(pyOutput) ? pyOutput.join('\n') : pyOutput)

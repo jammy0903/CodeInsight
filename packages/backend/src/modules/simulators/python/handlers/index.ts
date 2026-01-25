@@ -14,6 +14,7 @@ import { InstanceCreateHandler } from './instance-create.handler';
 import { AttributeAssignHandler } from './attribute.handler';
 import { FunctionDefHandler } from './function-def.handler';
 import { ClassDefHandler } from './class-def.handler';
+import { GlobalNonlocalHandler } from './global.handler';
 
 // 기본 핸들러 목록 (우선순위순)
 const defaultHandlers: PyCodeHandler[] = [
@@ -26,6 +27,7 @@ const defaultHandlers: PyCodeHandler[] = [
   FunctionCallHandler, // priority: 20
   PrintHandler, // priority: 15
   AssignHandler, // priority: 10
+  GlobalNonlocalHandler, // priority: 5 (global/nonlocal 선언문 스킵)
 ];
 
 // 블록 핸들러 목록 (함수, 클래스 정의 등)
@@ -139,3 +141,4 @@ export { InstanceCreateHandler } from './instance-create.handler';
 export { AttributeAssignHandler } from './attribute.handler';
 export { FunctionDefHandler } from './function-def.handler';
 export { ClassDefHandler } from './class-def.handler';
+export { GlobalNonlocalHandler } from './global.handler';

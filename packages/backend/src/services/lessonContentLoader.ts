@@ -33,6 +33,7 @@ class LessonContentLoader {
    * 내용(JSON)은 읽지 않으므로 매우 빠름
    */
   async scanFilePaths(): Promise<void> {
+    // 1. 레슨 파일이 있는 디렉토리 (packages/backend/prisma/content - 최신 데이터 경로)
     const contentDir = path.join(__dirname, '../../prisma/content');
 
     try {
@@ -50,7 +51,6 @@ class LessonContentLoader {
           for (const file of jsonFiles) {
             const filePath = path.join(lessonsDir, file);
             // 파일명에서 lessonId 추출 (예: 'c-1-1.json' -> 'c-1-1')
-            // 가정: 파일명이 곧 lessonId와 일치함
             const lessonId = path.basename(file, '.json');
 
             this.fileMap.set(lessonId, filePath);

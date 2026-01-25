@@ -81,6 +81,8 @@ export const InstanceCreateHandler: PyCodeHandler = {
           returnLine: lineNum,
           depth: ctx.callStack.length + 1,
           selfObjectId: instanceObj.id,
+          unboundLocals: new Set(initValue.declaredLocals || []),
+          globalVars: new Set(),
         };
 
         ctx.pushFrame(frame);

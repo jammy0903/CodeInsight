@@ -7,7 +7,6 @@ import type {
 } from '@/features/visualizers/js/types';
 import type { MemoryBlock } from '@/types/memory';
 
-
 // The return type of the hook
 interface UseLessonVisualizationResult {
   memoryState: {
@@ -48,6 +47,14 @@ function adaptMemoryState(memoryState: StepMemoryState): { stack: MemoryBlock[],
 
   return { stack: newStack, heap: newHeap, frames };
 }
+
+// Memoize helper function to avoid recreating it
+const getInitialState = () => ({
+  memoryState: INITIAL_MEMORY_STATE,
+  changedBlocks: INITIAL_CHANGED_BLOCKS,
+  visualizationType: 'memory',
+  visualizationState: null,
+});
 
 export function useLessonVisualization(
   steps: LessonStep[],
@@ -142,58 +149,71 @@ export function useLessonVisualization(
     if (vizType === 'java' || currentStep.memoryState) {
       const javaMemoryState = currentStep.memoryState;
       const stack: MemoryBlock[] = [];
-      const frames: { name: string }[] = [];
+      const frames: { name: string }[] = [{ name: 'main' }];
 
-      // Java simulator returns stack as StackFrame[]
-      const stackFrames = javaMemoryState?.stack || (currentStep.stack as any[]) || [];
+      // Java 레슨 JSON 형태: stack: [{name, value, type?}]
+      // Java 시뮬레이터 형태: stack: [{methodName, variables: {...}}]
+      const stackData = javaMemoryState?.stack || (currentStep.stack as any[]) || [];
 
-      stackFrames.forEach((frame: any) => {
-        const frameName = frame.methodName || frame.name || 'main';
-        frames.push({ name: frameName });
-
-        if (frame.variables) {
-          Object.entries(frame.variables).forEach(([name, val]: [string, any]) => {
-            // Java variables can be primitive values or objects with metadata
-            let value = '';
-            let type = 'unknown';
-            let address = '';
-
-            if (val && typeof val === 'object') {
-              if ('value' in val) {
-                value = String(val.value);
-                type = val.type || typeof val.value;
-                address = val.id || '';
-              } else if (val.type === 'Reference' || val.id) {
-                // Handle Reference types or objects with ID but no direct value property
-                value = val.id ? `@${val.id}` : 'null';
-                type = val.class || val.type || 'Reference';
-                address = val.id || '';
-              } else {
-                // Fallback for complex objects without known structure
-                value = JSON.stringify(val);
-                type = 'object';
-              }
-            } else {
-              value = String(val);
-              type = typeof val;
-            }
-
-            stack.push({
-              name: `${frameName}.${name}`,
-              value,
-              type,
-              address,
-              points_to: address // If it's a reference
-            });
+      stackData.forEach((item: any) => {
+        // 단순 형태: {name, value, type?} - 레슨 JSON
+        if (item.name && (item.value !== undefined || item.value === null)) {
+          stack.push({
+            name: item.name,
+            value: String(item.value ?? ''),
+            type: item.type || 'unknown',
+            address: '',
+            points_to: undefined,
           });
+        }
+        // 복잡한 형태: {methodName, variables: {...}} - 시뮬레이터
+        else if (item.methodName || item.variables) {
+          const frameName = item.methodName || item.name || 'main';
+          if (!frames.find(f => f.name === frameName)) {
+            frames.push({ name: frameName });
+          }
+
+          if (item.variables) {
+            Object.entries(item.variables).forEach(([name, val]: [string, any]) => {
+              let value = '';
+              let type = 'unknown';
+              let address = '';
+
+              if (val && typeof val === 'object') {
+                if ('value' in val) {
+                  value = String(val.value);
+                  type = val.type || typeof val.value;
+                  address = val.id || '';
+                } else if (val.type === 'Reference' || val.id) {
+                  value = val.id ? `@${val.id}` : 'null';
+                  type = val.class || val.type || 'Reference';
+                  address = val.id || '';
+                } else {
+                  value = JSON.stringify(val);
+                  type = 'object';
+                }
+              } else {
+                value = String(val);
+                type = typeof val;
+              }
+
+              stack.push({
+                name: `${frameName}.${name}`,
+                value,
+                type,
+                address,
+                points_to: address
+              });
+            });
+          }
         }
       });
 
       const heap: MemoryBlock[] = (javaMemoryState?.heap || currentStep.heap || []).map((item: any) => ({
-        name: item.id || item.name || '?',
+        name: item.id || item.name || item.address || '?',
         address: item.address || '',
-        value: String(item.value ?? ''),
-        type: item.type || 'unknown',
+        value: String(item.content ?? item.value ?? ''),
+        type: item.type || 'Object',
       }));
 
       const memoryState = (stack.length > 0 || heap.length > 0)
@@ -222,6 +242,7 @@ export function useLessonVisualization(
       };
     }
 
+    // 🚨 복구: memoryChanges가 있는 경우 (Diff 방식 지원)
     if (currentStep.memoryChanges) {
       const { memoryState, changedBlocks } = processMemoryChanges(steps, currentStepIndex);
       const adaptedState = adaptMemoryState(memoryState);

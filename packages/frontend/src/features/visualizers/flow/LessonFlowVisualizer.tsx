@@ -168,6 +168,8 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
         <PythonFlowView
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
+          rawStep={enrichedStep}
+          rawPrevStep={enrichedPrevStep}
         />
       </div>
     );

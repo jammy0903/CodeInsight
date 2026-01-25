@@ -30,7 +30,6 @@ export { ArrowLayer } from './components/ArrowLayer';
 export { FunctionFrame } from './components/FunctionFrame';
 export { ControlFlowOverlay } from './components/ControlFlowOverlay';
 export { LoopTrack } from './components/LoopTrack';
-export { TerminalOutputComponent } from './components/TerminalOutput';
 export { PythonFlowView } from './components/PythonFlowView';
 
 // Adapters

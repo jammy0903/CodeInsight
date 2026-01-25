@@ -53,11 +53,25 @@ function parseValue(value: string | undefined | null): string | number | boolean
  * 예: "main.x" → { frame: "main", name: "x" }
  * 예: "foo.local" → { frame: "foo", name: "local" }
  */
+/**
+ * 변수명에서 함수 프레임 추출
+ * 예: "main.x" → { frame: "main", name: "x" }
+ * 예: "x" → { frame: "main", name: "x" } (기본값)
+ */
 function parseVariableName(fullName: string): { frame: string; name: string } {
+  // 방어적 코드: 빈 문자열 처리
+  if (!fullName) {
+    return { frame: 'main', name: 'unknown' };
+  }
+
   const dotIndex = fullName.indexOf('.');
+
+  // 점(.)이 없는 경우: 기본적으로 'main' 프레임으로 간주
+  // 단, 'global'이나 'heap' 등 특수 키워드가 이름에 포함된 경우(예비)는 고려하지 않음 (이름 자체로 식별)
   if (dotIndex === -1) {
     return { frame: 'main', name: fullName };
   }
+
   return {
     frame: fullName.slice(0, dotIndex),
     name: fullName.slice(dotIndex + 1),
@@ -80,21 +94,9 @@ export class CTransformer implements IFlowTransformer {
     const variables: FlowVariable[] = [];
     const framesMap = new Map<string, string[]>(); // frame name → variable IDs
 
-    // DEBUG: step 데이터 확인
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[CTransformer] step.line:', step.line);
-      console.log('[CTransformer] step.stack:', JSON.stringify(step.stack, null, 2));
-    }
-
     // 1. Stack 변수 처리
     if (step.stack) {
       step.stack.forEach((block) => {
-        // DEBUG: 각 블록의 value 확인 (특히 temp, a, b 변수)
-        if (process.env.NODE_ENV === 'development' &&
-            (block.name.includes('temp') || block.name.includes('.a') || block.name.includes('.b'))) {
-          console.log(`[CTransformer] 🔍 block: "${block.name}", value: "${block.value}", type: ${typeof block.value}, points_to: ${block.points_to}`);
-        }
-
         const { frame, name } = parseVariableName(block.name);
         const variable = this.toVariable(
           {
@@ -218,12 +220,6 @@ export class CTransformer implements IFlowTransformer {
   ): FlowVariable {
     const isPointer = block.type?.includes('*') || false;
     const parsedValue = parseValue(block.value);
-
-    // DEBUG: parseValue 결과 확인 (swap 함수 관련 변수)
-    if (process.env.NODE_ENV === 'development' &&
-        (block.name === 'temp' || block.name === 'a' || block.name === 'b')) {
-      console.log(`[CTransformer.toVariable] 🎯 name: "${block.name}", scope: "${scope}", input: "${block.value}", parsedValue: ${parsedValue}, isPointer: ${isPointer}`);
-    }
 
     return {
       id: `${scope}-${block.name}-${block.address || 'no-addr'}`,

@@ -14,7 +14,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import * as courseService from './service';
-import { requireDbUser } from '../../middleware/auth';
+import { requireDbUser, optionalDbUser } from '../../middleware/auth';
 import { lessonContentLoader } from '../../services/lessonContentLoader';
 import { logger } from '../../utils/logger';
 
@@ -55,6 +55,42 @@ router.get('/languages', async (req, res) => {
 // =============================================
 // Chapter Endpoints
 // =============================================
+
+/**
+ * 언어 상세 (챕터 + 레슨 구조 포함)
+ *
+ * WHY: optionalDbUser로 인증 선택적 처리
+ * - 로그인 시: 챕터별 진행률 포함
+ * - 비로그인 시: 코스 구조만 반환
+ */
+router.get('/:id', optionalDbUser, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    // 'chapter'나 'lesson' 등의 키워드가 id로 오면 패스 (안전장치)
+    if (id === 'chapters' || id === 'lessons' || id === 'progress') {
+      return next();
+    }
+
+    if (typeof id !== 'string') {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    const userId = req.user?.dbUser?.id;
+    const language = await courseService.getLanguageWithChapters(id, userId);
+
+    if (!language) {
+      return res.status(404).json({ error: 'Language not found' });
+    }
+
+    res.json(language);
+  } catch (error) {
+    logger.error('Get language error:', error);
+    res.status(500).json({
+      error: 'Failed to get language',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
 
 /**
  * 언어별 챕터 목록
@@ -148,16 +184,31 @@ router.get('/lessons/:id', async (req, res) => {
     const jsonContent = await lessonContentLoader.getContent(id);
 
     // 하이브리드 응답: DB 메타데이터 + JSON 콘텐츠
+    // JSON 구조가 Flat한 경우(code, steps가 최상위)와 Nested된 경우(content 내부) 모두 지원
+    let mergedContent = lesson.content;
+
+    if (jsonContent) {
+      // 1. Nested Structure check
+      if ('content' in jsonContent && (jsonContent as any).content) {
+        mergedContent = {
+          ...lesson.content,
+          code: (jsonContent as any).content.code,
+          steps: (jsonContent as any).content.steps,
+        } as any;
+      }
+      // 2. Flat Structure check (User's current format)
+      else if ('code' in jsonContent || 'steps' in jsonContent) {
+        mergedContent = {
+          ...lesson.content,
+          code: (jsonContent as any).code,
+          steps: (jsonContent as any).steps,
+        } as any;
+      }
+    }
+
     res.json({
       ...lesson,
-      // JSON 콘텐츠가 있으면 code/steps만 JSON 사용, 나머지는 DB 유지
-      content: jsonContent
-        ? {
-          ...lesson.content, // DB 메타데이터 유지 (id, lessonId, language, createdAt, updatedAt)
-          code: jsonContent.content.code,
-          steps: jsonContent.content.steps,
-        }
-        : lesson.content,
+      content: mergedContent,
       quizzes: lesson.quizzes, // 항상 DB 데이터 사용
     });
   } catch (error) {

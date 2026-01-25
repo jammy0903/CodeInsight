@@ -43,8 +43,6 @@ export function useStepGestures(options: UseStepGesturesOptions): UseStepGesture
         canGoNext = true,
       } = optionsRef.current;
 
-      if (!enabled || isModalOpen) return;
-
       // input, textarea에 포커스가 있으면 무시
       const activeTag = document.activeElement?.tagName;
       if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
@@ -55,10 +53,17 @@ export function useStepGestures(options: UseStepGesturesOptions): UseStepGesture
       // 수정 키와 함께 누르면 무시 (Ctrl+←는 단어 이동 등)
       if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
 
+      // 이전 스텝 (←): 퀴즈 팝업에서도 항상 허용 (이전으로 돌아가기)
       if (e.key === 'ArrowLeft' && canGoPrev) {
         e.preventDefault();
         onPrev();
-      } else if (e.key === 'ArrowRight' && canGoNext) {
+        return;
+      }
+
+      // 다음 스텝 (→): enabled 상태이고 모달이 없을 때만
+      if (!enabled || isModalOpen) return;
+
+      if (e.key === 'ArrowRight' && canGoNext) {
         e.preventDefault();
         onNext();
       }

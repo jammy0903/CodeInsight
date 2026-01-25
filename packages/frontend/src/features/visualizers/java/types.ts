@@ -1,15 +1,13 @@
 /**
  * Java Messages Visualizer Types
  *
- * 목적: 리모컨 비유로 다형성 시각화
+ * 목적: 리모컨 비유로 다형성 시각화 (JavaMessagesView에서 사용)
  * - 변수 = 리모컨 (선언 타입)
  * - 객체 = 실제 기기 (실제 타입)
  * - 메서드 호출 = 버튼 누르기
+ *
+ * 참조 시각화는 FlowVisualizer (JavaTransformer)로 통합됨
  */
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Messages 탭: 메시지 전달 + 다형성
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 /**
  * 메시지 전달 이벤트
@@ -111,18 +109,6 @@ export interface JavaFieldInfo {
 }
 
 /**
- * 메시지 플로우 (타임라인)
- */
-export interface MessageFlow {
-  events: JavaMessageEvent[];
-  currentIndex: number;
-
-  // 활성 객체들
-  activeDevices: JavaDevice[];
-  activeRemotes: RemoteControl[];
-}
-
-/**
  * 기기 색상 (타입별)
  */
 export type DeviceColor =
@@ -131,50 +117,3 @@ export type DeviceColor =
   | 'purple'  // 🟣 Bird
   | 'orange'  // 🟠 Fish
   | 'gray';   // ⚫ Object (기본)
-
-/**
- * 애니메이션 상태
- */
-export interface MessageAnimation {
-  type: 'button-press' | 'signal-send' | 'method-execute' | 'return';
-  from: string;
-  to: string;
-  progress: number;  // 0.0 ~ 1.0
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Reference 탭: 참조 관계 (향후 구현)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-/**
- * Java 변수 (메모 스티커)
- */
-export interface JavaVariable {
-  name: string;
-  declaredType: string;
-  objectId: string | null;
-  scope: 'local' | 'parameter' | 'field';
-}
-
-/**
- * Java 객체 (실제 물건)
- */
-export interface JavaObject {
-  id: string;
-  actualType: string;
-  fields: JavaFieldInfo[];
-
-  // 참조 추적
-  referencedBy: string[];  // ["a", "b", "c"]
-}
-
-/**
- * 참조 관계 상태
- */
-export interface JavaReferenceState {
-  variables: JavaVariable[];
-  objects: JavaObject[];
-
-  // 같은 객체를 가리키는 변수 그룹
-  sharedReferences: Map<string, string[]>;  // objectId → [변수명들]
-}

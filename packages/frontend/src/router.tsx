@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { MainLayout } from './layouts';
 import { HomePage } from './features/home';
 import { AuthPage } from './features/auth';
-import { CoursesPage, LanguageCoursePage, ChapterLessonsPage, LessonPage } from './features/courses';
+
 import { PlaygroundPage } from './features/playground';
 import { JSVisualizerPage } from './features/visualizers/js/JSVisualizerPage';
 import { AdminPage, AdminRoute } from './features/admin';
@@ -66,10 +66,34 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'login', element: <AuthPage /> },
       { path: 'signup', element: <AuthPage /> },
-      { path: 'courses', element: <CoursesPage /> },
-      { path: 'courses/:lang', element: <LanguageCoursePage /> },
-      { path: 'courses/:lang/:chapterId', element: <ChapterLessonsPage /> },
-      { path: 'courses/:lang/:chapterId/:lessonId', element: <LessonPage /> },
+      {
+        path: 'courses',
+        lazy: async () => {
+          const { CoursesPage } = await import('./features/courses/CoursesPage');
+          return { Component: CoursesPage };
+        }
+      },
+      {
+        path: 'courses/:lang',
+        lazy: async () => {
+          const { LanguageCoursePage } = await import('./features/courses/LanguageCoursePage');
+          return { Component: LanguageCoursePage };
+        }
+      },
+      {
+        path: 'courses/:lang/:chapterId',
+        lazy: async () => {
+          const { ChapterLessonsPage } = await import('./features/courses/ChapterLessonsPage');
+          return { Component: ChapterLessonsPage };
+        }
+      },
+      {
+        path: 'courses/:lang/:chapterId/:lessonId',
+        lazy: async () => {
+          const { LessonPage } = await import('./features/courses/LessonPage');
+          return { Component: LessonPage };
+        }
+      },
       { path: 'playground', element: <PlaygroundPage /> },
       { path: 'visualizers/js', element: <JSVisualizerPage /> },
       { path: 'quiz', element: <ProtectedRoute><QuizPage /></ProtectedRoute> },

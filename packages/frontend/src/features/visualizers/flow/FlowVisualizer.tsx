@@ -20,7 +20,7 @@ import { useAnimationQueue } from './hooks/useAnimationQueue';
 import { FunctionFrame } from './components/FunctionFrame';
 import { ControlFlowOverlay } from './components/ControlFlowOverlay';
 import { LoopTrack } from './components/LoopTrack';
-import { TerminalOutputComponent } from './components/TerminalOutput';
+import { TerminalOutput } from '@/features/visualizers/shared';
 import {
   FLOW_THEMES,
   FLOW_SIZES,
@@ -92,13 +92,6 @@ export const FlowVisualizer = memo(function FlowVisualizer({
       result.set(frame.name, frameVars);
     });
 
-    // DEBUG: 프레임별 변수 확인
-    if (import.meta.env.DEV) {
-      console.log('[FlowVisualizer] 📊 frameVariables:',
-        Array.from(result.entries()).map(([name, vars]) => `${name}(${vars.length})`)
-      );
-    }
-
     return result;
   }, [step.frames, step.variables]);
 
@@ -112,17 +105,18 @@ export const FlowVisualizer = memo(function FlowVisualizer({
 
   const canvasStyle = FLOW_THEMES[theme].canvas;
 
-  // 6. 터미널 출력 객체 메모이제이션
+  // 6. 터미널 출력 라인 메모이제이션
   // ⚠️ 중요: Date.now() 사용 금지!
-  // 이전에 timestamp: Date.now()를 사용했더니 매 렌더마다 새 객체 생성 → 무한 애니메이션 재실행
   // text를 key로 사용하면 같은 출력일 때 안정적인 참조 유지
-  const terminalOutputData = useMemo(() => {
-    if (!step.terminalOutput) return null;
-    return {
-      type: 'stdout' as const,
-      value: step.terminalOutput.text,
-      timestamp: step.terminalOutput.text, // DO NOT use Date.now() here!
-    };
+  const terminalLines = useMemo(() => {
+    if (!step.terminalOutput?.text) return [];
+    return step.terminalOutput.text
+      .split('\n')
+      .filter(Boolean)
+      .map((content) => ({
+        content,
+        type: 'stdout' as const,
+      }));
   }, [step.terminalOutput]);
 
   return (
@@ -193,12 +187,9 @@ export const FlowVisualizer = memo(function FlowVisualizer({
       )}
 
       {/* 터미널 출력 */}
-      {terminalOutputData && (
+      {terminalLines.length > 0 && (
         <div className="mt-4">
-          <TerminalOutputComponent
-            output={terminalOutputData}
-            theme={theme}
-          />
+          <TerminalOutput lines={terminalLines} title="출력" />
         </div>
       )}
 

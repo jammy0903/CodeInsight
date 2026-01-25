@@ -115,9 +115,29 @@ public class DebuggerAgent {
     }
 
     private void processBreakpoint(BreakpointEvent event) {
+        ThreadReference thread = event.thread();
+
         try {
-            Map<String, Object> snapshot = snapshotMaker.capture(event.thread(), event.location().lineNumber());
+            // 스레드가 suspended 상태인지 확인 (defensive check)
+            if (!thread.isSuspended()) {
+                System.err.println("Warning: Thread not suspended at breakpoint, suspending now...");
+                thread.suspend();
+            }
+
+            Map<String, Object> snapshot = snapshotMaker.capture(thread, event.location().lineNumber());
             jsonWriter.print(snapshot);
+
+        } catch (IncompatibleThreadStateException e) {
+            // Race condition 발생 시 재시도
+            System.err.println("Thread state incompatible, retrying after explicit suspend...");
+            try {
+                thread.suspend();
+                Map<String, Object> snapshot = snapshotMaker.capture(thread, event.location().lineNumber());
+                jsonWriter.print(snapshot);
+            } catch (Exception retryException) {
+                System.err.println("Retry failed: " + retryException.getMessage());
+                retryException.printStackTrace(System.err);
+            }
         } catch (Exception e) {
             System.err.println("Error processing breakpoint: " + e.getMessage());
             e.printStackTrace(System.err);

@@ -66,6 +66,22 @@ export async function getLanguages(): Promise<Language[]> {
   }
 }
 
+
+/**
+ * 언어 상세 (챕터 + 레슨 포함)
+ */
+export async function getLanguageWithChapters(languageId: string): Promise<Language & { chapters: ChapterWithLessons[] }> {
+  try {
+    const response = await api.get<Language & { chapters: ChapterWithLessons[] }>(`/courses/${languageId}`);
+    // Note: Zod schema verification omitted for creating composite type dynamically or assuming server correctness for perf
+    return response.data;
+  } catch (err) {
+    const error = handleError(err);
+    logger.error('Failed to get language with chapters:', error);
+    throw error;
+  }
+}
+
 // =============================================
 // Chapter API
 // =============================================
