@@ -115,13 +115,35 @@ class DebuggerAgent {
 
   /**
    * 스킵할 변수 확인
+   * - 내부 변수 (__로 시작)
+   * - 샌드박스 내장 객체들 (Array, Object, String 등)
+   * - 사용자가 정의하지 않은 전역 객체들
    */
   shouldSkipVariable(name) {
+    // 내부 변수
     if (name.startsWith('__')) return true;
+
+    // Node.js 내장
     if (name === 'console') return true;
     if (name === 'require') return true;
     if (name === 'module') return true;
     if (name === 'exports') return true;
+
+    // JavaScript 내장 생성자/객체 - 사용자 변수가 아님!
+    const builtins = [
+      'Array', 'Object', 'String', 'Number', 'Boolean',
+      'Math', 'Date', 'JSON', 'RegExp',
+      'Map', 'Set', 'WeakMap', 'WeakSet',
+      'Promise', 'Symbol',
+      'Error', 'TypeError', 'RangeError', 'SyntaxError', 'ReferenceError',
+      'parseInt', 'parseFloat', 'isNaN', 'isFinite',
+      'encodeURI', 'decodeURI', 'encodeURIComponent', 'decodeURIComponent',
+      'undefined', 'NaN', 'Infinity',
+      // 비동기 시뮬레이션 함수들
+      'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval',
+    ];
+    if (builtins.includes(name)) return true;
+
     return false;
   }
 
@@ -348,12 +370,18 @@ class DebuggerAgent {
 
   /**
    * 코드 계측 (각 라인에 캡처 호출 삽입)
+   *
+   * 주의: 객체 리터럴, 배열 리터럴, 함수 본문 내부에서는
+   * __capture__ 삽입 시 구문 오류가 발생할 수 있음
    */
   instrumentCode(code) {
     const lines = code.split('\n');
     const instrumentedLines = [];
-    let inMultilineString = false;
     let inMultilineComment = false;
+    let braceDepth = 0;        // { } 깊이
+    let bracketDepth = 0;      // [ ] 깊이
+    let inObjectLiteral = false;
+    let objectStartDepth = 0;
 
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
@@ -374,6 +402,36 @@ class DebuggerAgent {
         continue;
       }
 
+      // 중괄호/대괄호 깊이 계산 (문자열 내부 제외 - 간단한 처리)
+      const lineWithoutStrings = trimmed
+        .replace(/'[^']*'/g, '')
+        .replace(/"[^"]*"/g, '')
+        .replace(/`[^`]*`/g, '');
+
+      const openBraces = (lineWithoutStrings.match(/{/g) || []).length;
+      const closeBraces = (lineWithoutStrings.match(/}/g) || []).length;
+      const openBrackets = (lineWithoutStrings.match(/\[/g) || []).length;
+      const closeBrackets = (lineWithoutStrings.match(/\]/g) || []).length;
+
+      // 객체 리터럴 시작 감지: = { 또는 : { 또는 ( {
+      if (!inObjectLiteral && (
+        /=\s*\{/.test(lineWithoutStrings) ||
+        /:\s*\{/.test(lineWithoutStrings) ||
+        /\(\s*\{/.test(lineWithoutStrings) ||
+        /,\s*\{/.test(lineWithoutStrings)
+      )) {
+        inObjectLiteral = true;
+        objectStartDepth = braceDepth;
+      }
+
+      braceDepth += openBraces - closeBraces;
+      bracketDepth += openBrackets - closeBrackets;
+
+      // 객체 리터럴 종료 감지
+      if (inObjectLiteral && braceDepth <= objectStartDepth) {
+        inObjectLiteral = false;
+      }
+
       // 스킵할 라인
       if (this.shouldSkipLine(trimmed)) {
         instrumentedLines.push(line);
@@ -381,8 +439,22 @@ class DebuggerAgent {
       }
 
       // let/const를 var로 변환 (스코프 접근을 위해)
+      // ⚠️ 객체 리터럴 체크보다 먼저 해야 함!
+      // `const user = {` 같은 라인도 var로 변환되어야 샌드박스에서 접근 가능
       if (/^(let|const)\s+/.test(trimmed)) {
         line = line.replace(/^(\s*)(let|const)\s+/, '$1var ');
+      }
+
+      // 객체/배열 리터럴 내부에서는 캡처 삽입 안 함 (변환된 라인은 그대로 추가)
+      if (inObjectLiteral || bracketDepth > 0) {
+        instrumentedLines.push(line);
+        continue;
+      }
+
+      // 속성 정의 라인 스킵 (name: value 형태)
+      if (/^\w+\s*:/.test(trimmed) && !trimmed.includes('?') && !trimmed.includes('=>')) {
+        instrumentedLines.push(line);
+        continue;
       }
 
       // 원본 라인 추가
@@ -536,6 +608,13 @@ class DebuggerAgent {
     // 코드 계측
     const instrumentedCode = this.instrumentCode(code);
 
+    // ========================================
+    // 비동기 시뮬레이션을 위한 Task Queue
+    // ========================================
+    const taskQueue = [];
+    let taskIdCounter = 1;
+    const cancelledTasks = new Set();
+
     // 샌드박스 생성
     const sandbox = {
       // 캡처 함수
@@ -567,6 +646,44 @@ class DebuggerAgent {
           const output = args.map(a => agent.stringify(a)).join(' ');
           agent.stdoutBuffer.push(output);
         },
+      },
+
+      // ========================================
+      // 시뮬레이션된 setTimeout/setInterval
+      // 실제 비동기가 아닌 학습용 동기 시뮬레이션
+      // 메인 코드 실행 후 Task Queue에서 순서대로 실행
+      // ========================================
+      setTimeout: (callback, delay = 0, ...args) => {
+        const taskId = taskIdCounter++;
+        taskQueue.push({
+          id: taskId,
+          callback,
+          args,
+          delay: delay || 0,
+          type: 'timeout',
+        });
+        return taskId;
+      },
+
+      setInterval: (callback, delay = 0, ...args) => {
+        // 학습용: setInterval은 1회만 실행 (무한 루프 방지)
+        const taskId = taskIdCounter++;
+        taskQueue.push({
+          id: taskId,
+          callback,
+          args,
+          delay: delay || 0,
+          type: 'interval',
+        });
+        return taskId;
+      },
+
+      clearTimeout: (taskId) => {
+        cancelledTasks.add(taskId);
+      },
+
+      clearInterval: (taskId) => {
+        cancelledTasks.add(taskId);
       },
 
       // 허용되는 내장 객체
@@ -603,10 +720,48 @@ class DebuggerAgent {
     const context = vm.createContext(sandbox);
 
     try {
+      // 1. 메인 코드 실행 (동기)
       vm.runInContext(instrumentedCode, context, {
         timeout: EXECUTION_TIMEOUT,
         displayErrors: true,
       });
+
+      // 2. Task Queue 처리 (비동기 시뮬레이션)
+      // delay 순으로 정렬 후 순차 실행
+      if (taskQueue.length > 0) {
+        // "[Async] Task Queue 처리 중..." 메시지 추가
+        agent.stdoutBuffer.push('[Async] Task Queue 실행 시작');
+
+        // delay 순으로 정렬
+        taskQueue.sort((a, b) => a.delay - b.delay);
+
+        // 각 태스크 실행
+        for (const task of taskQueue) {
+          // 취소된 태스크는 스킵
+          if (cancelledTasks.has(task.id)) {
+            continue;
+          }
+
+          try {
+            // 콜백 실행
+            task.callback.apply(undefined, task.args);
+
+            // 콜백 실행 후 상태 캡처
+            const vars = {};
+            for (const key of Object.keys(sandbox)) {
+              if (!agent.shouldSkipVariable(key)) {
+                vars[key] = sandbox[key];
+              }
+            }
+            // Task Queue에서 실행된 것을 표시 (라인 번호 대신 특별 표시)
+            agent.capture(-1, vars, `[Callback] ${task.type}`);
+          } catch (callbackError) {
+            // 콜백 에러는 잡히지 않음 (실제 동작과 동일)
+            agent.stdoutBuffer.push(`[Uncaught in ${task.type}] ${callbackError.message}`);
+          }
+        }
+      }
+
     } catch (e) {
       // 에러 스냅샷 출력
       const errorSnapshot = {
