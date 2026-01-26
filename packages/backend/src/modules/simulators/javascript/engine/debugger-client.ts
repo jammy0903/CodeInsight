@@ -10,6 +10,7 @@ export interface JavaScriptSnapshot {
     variables: Record<string, any>;
   }>;
   heap: Array<{
+    id: string;
     address: string;
     type: string;
     content: string;

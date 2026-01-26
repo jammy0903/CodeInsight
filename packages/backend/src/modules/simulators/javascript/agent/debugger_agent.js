@@ -139,8 +139,13 @@ class DebuggerAgent {
       return value.toString() + 'n';
     }
 
-    // Strings -> heap reference
+    // Strings -> primitive for short strings, heap reference for long ones
     if (typeof value === 'string') {
+      // Store short strings (< 50 chars) as primitive values
+      // Store long strings in heap for memory visualization
+      if (value.length < 50) {
+        return value;
+      }
       return this.addStringToHeap(value, collected);
     }
 
@@ -321,7 +326,17 @@ class DebuggerAgent {
       // Instrument each statement
       this.instrumentStatements(ast.body);
 
-      return escodegen.generate(ast);
+      let generated = escodegen.generate(ast);
+
+      // Transform let/const to var for vm context accessibility
+      // This ensures all variables are accessible in the global context
+      generated = generated.replace(/\b(let|const)\s+/g, 'var ');
+
+      // For declarations without initialization, explicitly set to undefined
+      // e.g., "var x;" -> "var x = undefined;"
+      generated = generated.replace(/^(\s*)var\s+(\w+)\s*;$/gm, '$1var $2 = undefined;');
+
+      return generated;
     } catch (e) {
       // Fallback to simple approach on parse error
       return this.instrumentCodeSimple(code);
@@ -491,6 +506,12 @@ class DebuggerAgent {
       // This is a simplification - in production, you'd want proper scoping
       if (/^(let|const)\s+/.test(trimmed)) {
         line = line.replace(/^(\s*)(let|const)\s+/, '$1var ');
+
+        // For declarations without initialization, explicitly set to undefined
+        // e.g., "var x;" -> "var x = undefined;"
+        if (/^var\s+\w+\s*;/.test(line.trim())) {
+          line = line.replace(/^(\s*var\s+\w+)\s*;/, '$1 = undefined;');
+        }
       }
 
       // Add the line first, then capture AFTER execution
@@ -512,9 +533,12 @@ class DebuggerAgent {
     const context = vm.createContext({
       __capture__: (lineNumber) => {
         // Get all variables from the context
+        // Use Reflect.ownKeys to get all enumerable and non-enumerable properties
         const vars = {};
-        for (const key of Object.keys(context)) {
-          if (!key.startsWith('__') && key !== 'console') {
+        const allKeys = Object.getOwnPropertyNames(context);
+        for (const key of allKeys) {
+          if (!key.startsWith('__') && key !== 'console' && key !== 'require') {
+            // Include undefined values
             vars[key] = context[key];
           }
         }
