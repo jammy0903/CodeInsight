@@ -141,3 +141,16 @@ export async function updateNickname(nickname: string): Promise<AppUser> {
     throw new Error(`닉네임 변경 실패: ${error.message}`);
   }
 }
+
+/**
+ * 계정 탈퇴 (회원 삭제)
+ * 주의: 이 작업은 되돌릴 수 없습니다
+ */
+export async function deleteAccount(): Promise<void> {
+  try {
+    await api.delete(`${config.api.endpoints.users}/me`);
+  } catch (err) {
+    const error = handleError(err);
+    throw new Error(`계정 삭제 실패: ${error.message}`);
+  }
+}
