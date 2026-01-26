@@ -21,10 +21,6 @@ export type {
 // Context
 export { createPyContext, getObjectByName, getName } from './context';
 
-// Simulator
-export { simulatePython, PySimulator } from './simulator';
-export type { PySimulateRequest, PySimulateResult } from './simulator';
-
 // Handlers
 export { pyHandlerRegistry, PyHandlerRegistry } from './handlers';
 export { AssignHandler } from './handlers/assign.handler';
