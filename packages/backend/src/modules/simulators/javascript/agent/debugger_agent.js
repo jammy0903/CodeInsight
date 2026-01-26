@@ -90,32 +90,54 @@ class DebuggerAgent {
       variables[name] = this.parseValue(value, collectedThisSnapshot);
     }
 
+    // Build full call stack (bottom to top)
+    const stackFrames = this.callStack.map((frame, index) => ({
+      methodName: frame.name,
+      className: index === 0 ? 'Main' : 'Function',
+      variables: index === this.callStack.length - 1 ? variables : frame.variables,
+    }));
+
     const snapshot = {
       line: lineNumber,
       event: 'STEP',
-      stack: [
-        {
-          methodName: this.callStack[this.callStack.length - 1].name,
-          className: 'Main',
-          variables: variables,
-        },
-      ],
+      stack: stackFrames,
       heap: this.heapObjects,
     };
 
-    console.log(JSON.stringify(snapshot));
+    // Custom replacer to handle special values (undefined, NaN, Infinity)
+    console.log(JSON.stringify(snapshot, (key, value) => {
+      if (value === undefined) return '@@UNDEFINED@@';
+      if (typeof value === 'number') {
+        if (Number.isNaN(value)) return '@@NaN@@';
+        if (value === Infinity) return '@@INFINITY@@';
+        if (value === -Infinity) return '@@-INFINITY@@';
+      }
+      return value;
+    }));
   }
 
   parseValue(value, collected) {
-    // null/undefined
+    // null
     if (value === null) return null;
-    if (value === undefined) return null;
+
+    // undefined (keep as-is, will be handled by JSON replacer)
+    if (value === undefined) return undefined;
 
     // Booleans
     if (typeof value === 'boolean') return value;
 
-    // Numbers
-    if (typeof value === 'number') return value;
+    // Special numbers (NaN, Infinity)
+    if (typeof value === 'number') {
+      if (Number.isNaN(value)) return NaN;
+      if (value === Infinity) return Infinity;
+      if (value === -Infinity) return -Infinity;
+      return value;
+    }
+
+    // BigInt
+    if (typeof value === 'bigint') {
+      return value.toString() + 'n';
+    }
 
     // Strings -> heap reference
     if (typeof value === 'string') {
@@ -146,6 +168,7 @@ class DebuggerAgent {
     if (!collected.has(address)) {
       collected.add(address);
       this.heapObjects.push({
+        id: address,
         address: address,
         type: 'String',
         content: `"${value}"`,
@@ -166,6 +189,7 @@ class DebuggerAgent {
     if (!collected.has(address)) {
       collected.add(address);
       this.heapObjects.push({
+        id: address,
         address: address,
         type: 'Array',
         content: this.formatArrayContent(value),
@@ -188,6 +212,7 @@ class DebuggerAgent {
     if (!collected.has(address)) {
       collected.add(address);
       this.heapObjects.push({
+        id: address,
         address: address,
         type: 'Function',
         content: `<function ${funcName}>`,
@@ -209,6 +234,7 @@ class DebuggerAgent {
     if (!collected.has(address)) {
       collected.add(address);
       this.heapObjects.push({
+        id: address,
         address: address,
         type: className,
         content: this.formatObjectContent(value),
@@ -302,16 +328,110 @@ class DebuggerAgent {
     }
   }
 
+  /**
+   * Helper: Get statements array from a node (handles BlockStatement vs single statement)
+   */
+  getStatements(node) {
+    if (!node) return [];
+    if (node.type === 'BlockStatement') return node.body;
+    return [node];
+  }
+
+  /**
+   * Helper: Recursively instrument child nodes
+   */
+  instrumentNode(node) {
+    if (!node) return;
+
+    switch (node.type) {
+      case 'BlockStatement':
+        this.instrumentStatements(node.body);
+        break;
+      case 'IfStatement':
+        this.instrumentNode(node.consequent);
+        this.instrumentNode(node.alternate);
+        break;
+      case 'ForStatement':
+      case 'WhileStatement':
+      case 'DoWhileStatement':
+        this.instrumentNode(node.body);
+        break;
+      case 'ForInStatement':
+      case 'ForOfStatement':
+        this.instrumentNode(node.body);
+        break;
+      case 'SwitchStatement':
+        node.cases?.forEach(caseNode => {
+          if (caseNode.consequent) {
+            this.instrumentStatements(caseNode.consequent);
+          }
+        });
+        break;
+      case 'TryStatement':
+        this.instrumentNode(node.block);
+        this.instrumentNode(node.handler?.body);
+        this.instrumentNode(node.finalizer);
+        break;
+      case 'FunctionDeclaration':
+      case 'FunctionExpression':
+      case 'ArrowFunctionExpression':
+        this.instrumentNode(node.body);
+        break;
+    }
+  }
+
   instrumentStatements(statements) {
     for (let i = statements.length - 1; i >= 0; i--) {
       const stmt = statements[i];
       const line = stmt.loc?.start?.line || 1;
 
-      // Don't instrument function declarations (they're hoisted)
+      // Instrument function declarations with enter/exit tracking
       if (stmt.type === 'FunctionDeclaration') {
-        // Instrument the function body instead
-        if (stmt.body && stmt.body.body) {
-          this.instrumentStatements(stmt.body.body);
+        const funcName = stmt.id?.name || 'anonymous';
+
+        // Wrap function body with try-finally
+        if (stmt.body && stmt.body.type === 'BlockStatement') {
+          const originalBody = stmt.body.body;
+
+          // Create __enterFunction__ call
+          const enterCall = {
+            type: 'ExpressionStatement',
+            expression: {
+              type: 'CallExpression',
+              callee: { type: 'Identifier', name: '__enterFunction__' },
+              arguments: [{ type: 'Literal', value: funcName }],
+            },
+          };
+
+          // Create __exitFunction__ call
+          const exitCall = {
+            type: 'ExpressionStatement',
+            expression: {
+              type: 'CallExpression',
+              callee: { type: 'Identifier', name: '__exitFunction__' },
+              arguments: [],
+            },
+          };
+
+          // Wrap in try-finally
+          stmt.body.body = [
+            enterCall,
+            {
+              type: 'TryStatement',
+              block: {
+                type: 'BlockStatement',
+                body: originalBody,
+              },
+              handler: null,
+              finalizer: {
+                type: 'BlockStatement',
+                body: [exitCall],
+              },
+            },
+          ];
+
+          // Now instrument the original body
+          this.instrumentStatements(originalBody);
         }
         continue;
       }
@@ -329,17 +449,8 @@ class DebuggerAgent {
       // Insert before the statement
       statements.splice(i, 0, captureCall);
 
-      // Recursively instrument block statements
-      if (stmt.type === 'BlockStatement' && stmt.body) {
-        this.instrumentStatements(stmt.body);
-      }
-      if (stmt.type === 'IfStatement') {
-        if (stmt.consequent?.body) this.instrumentStatements(stmt.consequent.body);
-        if (stmt.alternate?.body) this.instrumentStatements(stmt.alternate.body);
-      }
-      if (stmt.type === 'ForStatement' || stmt.type === 'WhileStatement') {
-        if (stmt.body?.body) this.instrumentStatements(stmt.body.body);
-      }
+      // Recursively instrument child nodes
+      this.instrumentNode(stmt);
     }
   }
 
@@ -409,6 +520,14 @@ class DebuggerAgent {
         }
         agent.capture(lineNumber, vars);
       },
+      __enterFunction__: (functionName) => {
+        agent.callStack.push({ name: functionName, variables: {} });
+      },
+      __exitFunction__: () => {
+        if (agent.callStack.length > 1) {
+          agent.callStack.pop();
+        }
+      },
       console: {
         log: (...args) => {
           // Capture console.log output (could add to snapshot if needed)
@@ -433,7 +552,16 @@ class DebuggerAgent {
         stack: [],
         heap: [],
       };
-      console.log(JSON.stringify(errorSnapshot));
+      // Use same replacer for consistency
+      console.log(JSON.stringify(errorSnapshot, (key, value) => {
+        if (value === undefined) return '@@UNDEFINED@@';
+        if (typeof value === 'number') {
+          if (Number.isNaN(value)) return '@@NaN@@';
+          if (value === Infinity) return '@@INFINITY@@';
+          if (value === -Infinity) return '@@-INFINITY@@';
+        }
+        return value;
+      }));
     }
   }
 }

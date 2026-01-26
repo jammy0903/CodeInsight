@@ -96,7 +96,14 @@ export class JavaScriptDebuggerClient {
 
     for (const line of lines) {
       try {
-        const snapshot = JSON.parse(line);
+        // Custom reviver to restore special values (undefined, NaN, Infinity)
+        const snapshot = JSON.parse(line, (key, value) => {
+          if (value === '@@UNDEFINED@@') return undefined;
+          if (value === '@@NaN@@') return NaN;
+          if (value === '@@INFINITY@@') return Infinity;
+          if (value === '@@-INFINITY@@') return -Infinity;
+          return value;
+        });
         snapshots.push(snapshot);
       } catch (e) {
         // Skip non-JSON output
