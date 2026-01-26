@@ -436,3 +436,37 @@ userRoutes.patch('/me/nickname', requireDbUser, validate(registerSchema), async 
     res.status(500).json({ error: 'Failed to update nickname' });
   }
 });
+
+/**
+ * @swagger
+ * /api/users/me:
+ *   delete:
+ *     tags: [Users]
+ *     summary: 계정 탈퇴 (회원삭제)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 계정이 성공적으로 삭제됨
+ *       401:
+ *         description: 인증 안 됨
+ *       500:
+ *         description: 서버 오류
+ */
+userRoutes.delete('/me', requireDbUser, async (req, res) => {
+  try {
+    const { dbUser } = req.user!;
+
+    // 사용자 계정 삭제 (트랜잭션으로 관련 데이터도 함께 삭제)
+    // Prisma의 cascade delete 규칙에 따라 자동으로 정리됨
+    await prisma.user.delete({
+      where: { id: dbUser!.id },
+    });
+
+    logger.info(`User account deleted: ${dbUser!.id}`);
+    res.json({ message: '계정이 성공적으로 삭제되었습니다.' });
+  } catch (error) {
+    logger.error('Account deletion error:', error);
+    res.status(500).json({ error: 'Failed to delete account' });
+  }
+});
