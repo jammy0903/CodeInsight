@@ -30,7 +30,7 @@ let z = x + y;`;
   }, 15000);
 
   it('should capture strings on heap', async () => {
-    const code = `let name = "hello";`;
+    const code = `let name = "This is a very long string that should be stored in heap because it exceeds 50 characters limit";`;
     const result = await service.simulate(code);
 
     expect(result.success).toBe(true);
@@ -39,7 +39,7 @@ let z = x + y;`;
     const lastStep = result.steps![result.steps!.length - 1];
     expect(lastStep.heap.length).toBeGreaterThan(0);
     expect(lastStep.heap[0].type).toBe('String');
-    expect(lastStep.heap[0].content).toContain('hello');
+    expect(lastStep.heap[0].content).toContain('This is a very long string');
   }, 15000);
 
   it('should capture arrays on heap', async () => {
