@@ -274,7 +274,22 @@ export class PyTransformer implements IFlowTransformer {
     const objectsMap = new Map<string, PyObject>();
     objectsArray.forEach((obj) => objectsMap.set(obj.id, obj));
 
-    // 이름들을 FlowVariable로 변환 (참조 변수)
+    // 1. 객체들을 먼저 FlowVariable로 변환 (참조 대상)
+    const objectVarIds: string[] = [];
+    objectsArray.forEach((obj) => {
+      const variable: FlowVariable = {
+        id: `obj-${obj.id}`,
+        name: obj.type,
+        value: convertPyValue(obj.value, obj.type, objectsMap),
+        type: obj.type,
+        state: obj.highlight ? 'updating' : 'idle',
+        scope: 'objects', // PythonFlowView가 찾는 스코프!
+      };
+      variables.push(variable);
+      objectVarIds.push(variable.id);
+    });
+
+    // 2. 이름들을 FlowVariable로 변환 (참조 변수)
     const nameVarMap = new Map<string, FlowVariable>();
     names.forEach((name) => {
       const obj = objectsMap.get(name.pointsTo);
@@ -405,7 +420,7 @@ export class PyTransformer implements IFlowTransformer {
     const displayValue = targetObj
       ? formatValue(targetObj.value, targetObj.type)
       : '→';
-    const scope = name.scope || 'local';
+    const scope = name.scope || 'global';
 
     return {
       id: `name-${scope}-${name.name}`,
