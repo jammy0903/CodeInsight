@@ -150,6 +150,93 @@ function formatValue(value: unknown, type: string): string {
 
 export class PyTransformer implements IFlowTransformer {
   /**
+   * Java 형식 step → Python 형식 step 변환
+   *
+   * 백엔드가 Java 형식 {stack: [{methodName, variables}]}을 보낼 때
+   * Python 형식 {names: [], objects: []}로 변환
+   */
+  private convertJavaFormatToPython(step: LessonStep): any {
+    const anyStep = step as any;
+
+    console.log('[convertJavaFormatToPython] 실행', {
+      hasNames: !!anyStep.names,
+      hasPyNames: !!anyStep.pyNames,
+      hasPythonMemoryState: !!anyStep.pythonMemoryState,
+      hasStack: !!anyStep.stack,
+      stackLength: anyStep.stack?.length,
+      firstFrame: anyStep.stack?.[0]
+    });
+
+    // 이미 Python 형식이면 그대로 반환
+    if (anyStep.names || anyStep.pyNames || anyStep.pythonMemoryState) {
+      console.log('[convertJavaFormatToPython] Python 형식 감지 → 스킵');
+      return step;
+    }
+
+    // Java 형식 감지: stack[].methodName 존재
+    if (anyStep.stack && anyStep.stack[0]?.methodName) {
+      console.log('[convertJavaFormatToPython] Java 형식 감지 → 변환 시작');
+      const names: PyName[] = [];
+      const objects: PyObject[] = [];
+      let objectIdCounter = 0;
+
+      // Java stack → Python names/objects 변환
+      anyStep.stack.forEach((frame: any, idx: number) => {
+        const variableKeys = Object.keys(frame.variables || {});
+        console.log(`[convertJavaFormatToPython] Frame ${idx}: methodName=${frame.methodName}, variables=${variableKeys.length}개`, variableKeys);
+
+        const scope = (frame.methodName === 'main' || frame.methodName === '__main__') ? 'global' : frame.methodName;
+
+        Object.entries(frame.variables || {}).forEach(([varName, varValue]) => {
+          // 객체 생성
+          const objectId = `obj-${objectIdCounter++}`;
+          objects.push({
+            id: objectId,
+            type: this.inferType(varValue),
+            value: varValue,
+          });
+
+          // 이름 생성 (포인터)
+          names.push({
+            name: varName,
+            scope,
+            pointsTo: objectId,
+          });
+        });
+      });
+
+      const converted = {
+        ...step,
+        names,
+        objects,
+      };
+
+      console.log('[PyTransformer] Converted:', {
+        names: names.map(n => ({name: n.name, scope: n.scope})),
+        objects: objects.map(o => ({id: o.id, type: o.type, value: o.value}))
+      });
+
+      return converted;
+    }
+
+    // 변환 불필요
+    return step;
+  }
+
+  /**
+   * JavaScript 값에서 Python 타입 추론
+   */
+  private inferType(value: unknown): string {
+    if (value === null || value === undefined) return 'NoneType';
+    if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'float';
+    if (typeof value === 'string') return 'str';
+    if (typeof value === 'boolean') return 'bool';
+    if (Array.isArray(value)) return 'list';
+    if (typeof value === 'object') return 'dict';
+    return 'object';
+  }
+
+  /**
    * LessonStep (Python 형식) → FlowStep 변환
    *
    * 콜스택 기반 프레임 생성:
@@ -157,28 +244,37 @@ export class PyTransformer implements IFlowTransformer {
    * - callStack이 없으면 → 정적 프레임 (레슨 JSON 호환)
    */
   transform(step: LessonStep, prevStep?: LessonStep, fullCode?: string): FlowStep {
+    console.log('[PyTransformer] transform() 호출됨!', {
+      hasStack: !!(step as any).stack,
+      hasPythonMemoryState: !!(step as any).pythonMemoryState,
+      hasNames: !!(step as any).names,
+    });
+
     const variables: FlowVariable[] = [];
+
+    // Java 형식 → Python 형식 변환 (백엔드 호환성)
+    const convertedStep = this.convertJavaFormatToPython(step);
 
     // Python step 데이터 추출
     // 우선순위: pythonMemoryState > pyNames/pyObjects > names/objects
-    const pyState = (step as any).pythonMemoryState;
-    const names: PyName[] = pyState?.names || (step as any).pyNames || (step as any).names || [];
-    const objectsArray: PyObject[] = pyState?.objects || (step as any).pyObjects || (step as any).objects || [];
-    const callStack: PyCallFrameSnapshot[] = (step as any).callStack || [];
+    const pyState = (convertedStep as any).pythonMemoryState;
+    const names: PyName[] = pyState?.names || (convertedStep as any).pyNames || (convertedStep as any).names || [];
+    const objectsArray: PyObject[] = pyState?.objects || (convertedStep as any).pyObjects || (convertedStep as any).objects || [];
+    const callStack: PyCallFrameSnapshot[] = (convertedStep as any).callStack || [];
+
+    console.log('[PyTransformer] 데이터 추출:', {
+      namesCount: names.length,
+      objectsCount: objectsArray.length,
+      callStackLength: callStack.length,
+      firstNameSample: names[0],
+      firstObjectSample: objectsArray[0]
+    });
 
     // 객체를 Map으로 변환 (빠른 조회용)
     const objectsMap = new Map<string, PyObject>();
     objectsArray.forEach((obj) => objectsMap.set(obj.id, obj));
 
-    // 1. 객체들을 먼저 FlowVariable로 변환 (참조 대상)
-    const objectVarIds: string[] = [];
-    objectsArray.forEach((obj) => {
-      const variable = this.objectToVariable(obj, objectsMap);
-      variables.push(variable);
-      objectVarIds.push(variable.id);
-    });
-
-    // 2. 이름들을 FlowVariable로 변환 (참조 변수)
+    // 이름들을 FlowVariable로 변환 (참조 변수)
     const nameVarMap = new Map<string, FlowVariable>();
     names.forEach((name) => {
       const obj = objectsMap.get(name.pointsTo);
@@ -238,21 +334,14 @@ export class PyTransformer implements IFlowTransformer {
         });
       });
 
-      // 3-3. Objects(Heap) 프레임
-      if (objectVarIds.length > 0) {
-        frames.push({ name: 'Objects (Heap)', variableIds: objectVarIds });
-      }
-
     } else {
       // === 정적 프레임 생성 (레슨 JSON 호환) ===
       const framesMap = new Map<string, string[]>();
 
-      // 객체 프레임
-      framesMap.set('objects', objectVarIds);
-
       // 스코프별 프레임
       names.forEach((name) => {
-        const scope = name.scope || 'local';
+        // JSON에서 scope가 없으면 global로 처리 (Python 레슨 JSON 호환)
+        const scope = name.scope || 'global';
         const frameName = scope === 'global' ? 'global' : scope;
         const varKey = `${scope}-${name.name}`;
         const variable = nameVarMap.get(varKey);
@@ -277,13 +366,10 @@ export class PyTransformer implements IFlowTransformer {
         frames.push({ name: '__main__', variableIds: mainFrameIds });
       }
       framesMap.forEach((varIds, frameName) => {
-        if (frameName !== 'global' && frameName !== '__main__' && frameName !== 'local' && frameName !== 'objects') {
+        if (frameName !== 'global' && frameName !== '__main__' && frameName !== 'local') {
           frames.push({ name: frameName, variableIds: varIds });
         }
       });
-      if (framesMap.has('objects') && framesMap.get('objects')!.length > 0) {
-        frames.push({ name: 'Objects (Heap)', variableIds: framesMap.get('objects')! });
-      }
 
       // __main__이 없으면 기본 추가
       if (frames.length === 0 || !frames.some((f) => f.name === '__main__' || f.name === 'global')) {
@@ -309,37 +395,6 @@ export class PyTransformer implements IFlowTransformer {
       animations: [], // Animator가 채움
       frames,
       terminalOutput,
-    };
-  }
-
-  /**
-   * PyObject → FlowVariable 변환 (참조 대상)
-   */
-  private objectToVariable(obj: PyObject, objectsMap: Map<string, PyObject>): FlowVariable {
-    // 함수, 클래스, 인스턴스는 더 의미있는 이름 사용
-    let displayName = `${obj.type}@${obj.id.slice(-4)}`;
-
-    if (obj.type === 'function') {
-      const funcValue = obj.value as PyFunctionValue;
-      const prefix = funcValue.className ? `${funcValue.className}.` : '';
-      displayName = `${prefix}${funcValue.name}()`;
-    } else if (obj.type === 'class') {
-      const classValue = obj.value as PyClassValue;
-      displayName = `class ${classValue.name}`;
-    } else if (obj.type === 'instance') {
-      const instanceValue = obj.value as PyInstanceValue;
-      displayName = `${instanceValue.className} instance`;
-    }
-
-    return {
-      id: `obj-${obj.id}`,
-      name: displayName,
-      value: convertPyValue(obj.value, obj.type, objectsMap),
-      type: obj.type,
-      state: obj.highlight ? 'updating' : 'idle',
-      scope: 'objects',
-      isPointer: false, // 객체 자체는 포인터가 아님
-      address: obj.id,
     };
   }
 

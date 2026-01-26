@@ -72,26 +72,11 @@ export class PyStyler implements IFlowStyler {
       type: themeColors.box.type,
     };
 
-    // idle 상태일 때 타입에 따라 색상 변경
+    // idle 상태일 때 이름 변수는 포스트잇 색상
     if (state === 'idle') {
-      // 객체 영역의 변수 (참조 대상)
-      if (variable.scope === 'objects') {
-        const isMutable = this.isMutableType(variable.type);
-        if (variable.type === 'NoneType' || variable.value === 'None') {
-          baseStyle.border = PY_COLORS.none.border;
-          baseStyle.glow = PY_COLORS.none.glow;
-        } else if (isMutable) {
-          baseStyle.border = PY_COLORS.mutable.border;
-          baseStyle.glow = PY_COLORS.mutable.glow;
-        } else {
-          baseStyle.border = PY_COLORS.immutable.border;
-          baseStyle.glow = PY_COLORS.immutable.glow;
-        }
-      } else {
-        // 이름 변수 (참조 박스)
-        baseStyle.border = PY_COLORS.name.border;
-        baseStyle.glow = PY_COLORS.name.glow;
-      }
+      // 모든 변수는 이름 변수 (포스트잇 비유)
+      baseStyle.border = PY_COLORS.name.border;
+      baseStyle.glow = PY_COLORS.name.glow;
     }
 
     // Python 변수는 참조이므로 value 색상을 화살표 색으로
@@ -121,8 +106,8 @@ export class PyStyler implements IFlowStyler {
    * Python은 모든 변수가 참조 → pointsTo가 있으면 항상 화살표 표시
    */
   shouldShowArrow(variable: FlowVariable): boolean {
-    // 이름 변수만 화살표 표시 (객체 자체는 제외)
-    return Boolean(variable.isPointer && variable.pointsTo && variable.scope !== 'objects');
+    // 참조 변수는 화살표 표시
+    return Boolean(variable.isPointer && variable.pointsTo);
   }
 
   /**
