@@ -306,12 +306,6 @@ export const PythonFlowView = memo(function PythonFlowView({
   rawStep,
   rawPrevStep,
 }: PythonFlowViewProps) {
-  console.log('[PythonFlowView] 렌더링!', {
-    variablesCount: step.variables.length,
-    firstVariable: step.variables[0],
-    rawStepCallStack: (rawStep as any)?.callStack
-  });
-
   // 변수 ID → 변수 맵
   const variableMap = useMemo(() => {
     const map = new Map<string, FlowVariable>();
@@ -358,11 +352,6 @@ export const PythonFlowView = memo(function PythonFlowView({
     objectMap.forEach((object, objectId) => {
       const names = namesByObject.get(objectId) || [];
       const globalNames = names.filter((n) => n.scope === 'global' || !n.scope);
-
-      console.log('[PythonFlowView] Object:', objectId, {
-        allNames: names.map(n => ({name: n.name, scope: n.scope})),
-        globalNames: globalNames.map(n => ({name: n.name, scope: n.scope}))
-      });
 
       if (globalNames.length > 0) {
         globalObjects.push({ object, names: globalNames });
