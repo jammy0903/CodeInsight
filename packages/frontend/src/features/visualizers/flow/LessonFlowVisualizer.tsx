@@ -163,6 +163,11 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
 
   // Python은 전용 뷰 사용 (포스트잇 비유)
   if (language === 'python') {
+    console.log('[LessonFlowVisualizer] Python 분기 진입!', {
+      language,
+      flowStepVariables: flowStepWithAnimations.variables.length
+    });
+
     return (
       <div className={className}>
         <PythonFlowView
