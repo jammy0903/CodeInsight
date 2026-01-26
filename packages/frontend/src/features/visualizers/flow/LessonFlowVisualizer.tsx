@@ -72,7 +72,7 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   // DEBUG: 입력 데이터 확인
   if (process.env.NODE_ENV === 'development') {
     const swapVars = step.stack?.filter(b =>
-      b.name.includes('swap.') || b.name.includes('.temp') || b.name === 'temp'
+      b?.name && (b.name.includes('swap.') || b.name.includes('.temp') || b.name === 'temp')
     );
     if (swapVars && swapVars.length > 0) {
       console.log('[LessonFlowVisualizer] 📥 swap variables in step:', JSON.stringify(swapVars, null, 2));

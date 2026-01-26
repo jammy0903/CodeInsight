@@ -276,6 +276,12 @@ export function LessonPage() {
   const [liveSteps, setLiveSteps] = useState<LessonStep[] | null>(null);
   const [simulating, setSimulating] = useState(false);
   const [simulationError, setSimulationError] = useState<string | null>(null);
+
+  // 레슨 변경 시 상태 리셋 (이전 레슨 데이터가 잠깐 보이는 문제 방지)
+  useEffect(() => {
+    setLiveSteps(null);
+    setSimulationError(null);
+  }, [lessonId]);
   const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>('flow');
 
   const memoryScrollRef = useRef<HTMLDivElement>(null);
@@ -399,12 +405,11 @@ export function LessonPage() {
       }
     };
 
-    // Debounce simulation slightly to prevent double-firing on rapid mounts
-    const timer = setTimeout(runSimulation, 100);
+    // 즉시 실행 (캐시 시스템이 중복 요청 방지)
+    runSimulation();
 
     return () => {
       cancelled = true;
-      clearTimeout(timer);
     };
   }, [lesson, lang, memoizedCode]);
 
@@ -419,6 +424,8 @@ export function LessonPage() {
   const navigation = useLessonNavigation({
     totalSteps: steps.length,
     lessonId: lessonId,
+    code, // 빈 줄 감지용
+    steps, // 빈 줄 감지용
     onComplete: async () => {
       if (!lessonId) return;
       try {
@@ -536,7 +543,13 @@ export function LessonPage() {
     }
   };
 
-  if (isLoading || simulating) return <LoadingView />;
+  // 시뮬레이션 대기 중: 코드가 있는데 아직 liveSteps가 없으면 로딩 표시
+  const isSimulationPending = lesson?.content?.code &&
+    isLanguageSupported(lang || '') &&
+    liveSteps === null &&
+    !simulating;
+
+  if (isLoading || simulating || isSimulationPending) return <LoadingView />;
   if (isError || !lesson) return <NotFoundView message={error instanceof Error ? error.message : '레슨을 찾을 수 없습니다'} backPath={languageCoursePath} />;
   if (steps.length === 0) return <NotFoundView message="레슨 콘텐츠가 없습니다" backPath={languageCoursePath} />;
 
