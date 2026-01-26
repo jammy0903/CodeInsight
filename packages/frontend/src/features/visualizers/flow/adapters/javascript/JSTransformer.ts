@@ -94,6 +94,13 @@ export class JSTransformer implements IFlowTransformer {
       console.log('[JSTransformer] step.line:', step.line);
       console.log('[JSTransformer] step.memoryState:', step.memoryState);
       console.log('[JSTransformer] step.stack:', step.stack);
+      console.log('[JSTransformer] step.heap:', (step as any).heap);
+      // 상세 변수 로그
+      if (step.stack && Array.isArray(step.stack)) {
+        step.stack.forEach((frame: any, i: number) => {
+          console.log(`[JSTransformer] stack[${i}].variables:`, JSON.stringify(frame.variables || frame));
+        });
+      }
     }
 
     // 1. Stack 변수 처리 (여러 프레임 지원)

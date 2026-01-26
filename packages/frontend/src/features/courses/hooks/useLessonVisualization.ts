@@ -80,7 +80,8 @@ export function useLessonVisualization(
 
       if (currentStep.stack && Array.isArray(currentStep.stack)) {
         currentStep.stack.forEach((frame: any) => {
-          const frameName = frame.functionName || 'anonymous';
+          // 백엔드는 methodName을 사용함 (functionName이 아님!)
+          const frameName = frame.methodName || frame.functionName || '__main__';
           frames.push({ name: frameName });
 
           if (frame.variables) {

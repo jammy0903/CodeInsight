@@ -11,6 +11,7 @@ import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared
 import { FlowVisualizer } from './FlowVisualizer';
 import { PythonFlowView } from './components/PythonFlowView';
 import { JavaFlowView } from './components/JavaFlowView';
+import { JSFlowView } from './components/JSFlowView';
 import { ArrowLayer } from './components/ArrowLayer';
 import { getAdapter, createAdapter } from './adapters';
 import type { FlowTheme } from './styles';
@@ -87,10 +88,13 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   );
 
   // 2. memoryState와 stdout을 step에 병합
+  // JavaScript는 원본 step.stack/heap 형식을 사용 (JSTransformer가 {methodName, variables} 형식 기대)
   const enrichedStep = useMemo(() => {
     const enriched = { ...step };
 
-    if (memoryState) {
+    // JavaScript는 memoryState 덮어쓰기 안 함 - 원본 형식 유지
+    const isJavaScript = language === 'javascript' || language === 'js';
+    if (memoryState && !isJavaScript) {
       enriched.stack = memoryState.stack as LessonStep['stack'];
       enriched.heap = memoryState.heap as LessonStep['heap'];
     }
@@ -101,17 +105,20 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     }
 
     return enriched;
-  }, [step, memoryState, stdout]);
+  }, [step, memoryState, stdout, language]);
 
   const enrichedPrevStep = useMemo(() => {
     if (!prevStep) return null;
     if (!prevMemoryState) return prevStep;
+    // JavaScript는 memoryState 덮어쓰기 안 함 - 원본 형식 유지
+    const isJavaScript = language === 'javascript' || language === 'js';
+    if (isJavaScript) return prevStep;
     return {
       ...prevStep,
       stack: prevMemoryState.stack as LessonStep['stack'],
       heap: prevMemoryState.heap as LessonStep['heap'],
     };
-  }, [prevStep, prevMemoryState]);
+  }, [prevStep, prevMemoryState, language]);
 
   // 3. LessonStep → FlowStep 변환
   const flowStep = useMemo(
@@ -185,6 +192,18 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     return (
       <div className={className}>
         <JavaFlowView
+          step={flowStepWithAnimations}
+          prevStep={prevFlowStep}
+        />
+      </div>
+    );
+  }
+
+  // JavaScript는 전용 뷰 사용 (호버 하이라이트, 화살표 없음, 초급자 친화적)
+  if (language === 'javascript' || language === 'js') {
+    return (
+      <div className={className}>
+        <JSFlowView
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
         />
