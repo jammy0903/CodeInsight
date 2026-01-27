@@ -10,7 +10,7 @@
 import { api } from './api/axios';
 import { AxiosError } from 'axios';
 import type { LessonStep, MemoryBlock } from '@/types';
-import { handleSimulatorError } from '@/components/common/Toast';
+import { handleSimulatorError, notifySimulator } from '@/components/common/Toast';
 
 // =============================================
 // Python 타입 정의
@@ -109,6 +109,10 @@ interface BackendTraceResponse {
   source_lines: string[];
   message?: string;
   error?: string;
+  /** Emscripten 컴파일 에러 상세 목록 */
+  details?: string[];
+  /** Emscripten 경고 목록 */
+  warnings?: string[];
 }
 
 // 스텝별 레지스터 정보
@@ -261,6 +265,17 @@ export const simulatorService = {
           };
         }
 
+        // 컴파일 에러 (Emscripten 검증 실패)
+        if (data.error === 'compilation_error' && data.details && data.details.length > 0) {
+          notifySimulator.compilationErrors('C', data.details);
+          return {
+            success: false,
+            steps: [],
+            error: data.message || '컴파일 에러',
+          };
+        }
+
+        // 기타 에러
         const errorMessage = data.error || data.message || 'Simulation failed';
         handleSimulatorError('C', errorMessage);
         return {
@@ -276,12 +291,37 @@ export const simulatorService = {
         error: 'Unsupported language for simulation',
       };
     } catch (error) {
+      // 언어별로 적절한 에러 처리
+      const lang = language.toLowerCase();
+
+      if (lang === 'c' && error instanceof AxiosError && error.response?.data) {
+        const errorData = error.response.data;
+
+        // Emscripten 컴파일 에러 (상세 표시)
+        if (errorData.error === 'compilation_error' && errorData.details && errorData.details.length > 0) {
+          notifySimulator.compilationErrors('C', errorData.details);
+          return {
+            success: false,
+            steps: [],
+            error: errorData.message || '컴파일 에러',
+          };
+        }
+
+        // 기타 C 에러
+        const errorMessage = errorData.error || errorData.message || error.message;
+        handleSimulatorError('C', errorMessage);
+        return {
+          success: false,
+          steps: [],
+          error: errorMessage,
+        };
+      }
+
+      // 일반 에러 처리
       const errorMessage = error instanceof AxiosError
         ? error.response?.data?.error || error.message
         : error instanceof Error ? error.message : 'Unknown error';
 
-      // 언어별로 적절한 에러 처리
-      const lang = language.toLowerCase();
       if (lang === 'c') {
         handleSimulatorError('C', errorMessage);
       }

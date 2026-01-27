@@ -217,6 +217,28 @@ function MemoryBlockRow({
 }) {
   const highlighted = isChanged || block.highlight;
 
+  // 함수 포인터 감지
+  const isFunctionPointer =
+    block.type === 'function_pointer' || block.type.toLowerCase().includes('function');
+
+  // 이중 포인터 감지
+  const isDoublePointer = block.type.includes('**');
+
+  // 포인터 타입 결정
+  let pointerIcon = null;
+  let pointerColor = null;
+
+  if (isFunctionPointer) {
+    pointerIcon = '⚡'; // 함수 포인터 아이콘
+    pointerColor = '#a855f7'; // 보라색
+  } else if (isDoublePointer) {
+    pointerIcon = '🔗🔗'; // 이중 포인터 아이콘
+    pointerColor = '#f59e0b'; // 주황색
+  } else if (block.type.includes('*') || block.points_to) {
+    pointerIcon = '➜'; // 일반 포인터
+    pointerColor = '#3b82f6'; // 파란색
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -232,6 +254,40 @@ function MemoryBlockRow({
         transition: 'all 0.3s ease',
       }}
     >
+      {/* 포인터 타입 아이콘 */}
+      {pointerIcon && (
+        <span
+          style={{
+            fontSize: '14px',
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+          title={
+            isFunctionPointer
+              ? 'Function Pointer'
+              : isDoublePointer
+              ? 'Double Pointer'
+              : 'Pointer'
+          }
+        >
+          {pointerIcon}
+        </span>
+      )}
+
+      {/* 변수명 */}
+      <span
+        style={{
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          fontWeight: 600,
+          color: pointerColor || 'var(--theme-memory-card-text)',
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {block.name}
+      </span>
+
       {/* 주소 */}
       <span
         style={{
@@ -262,6 +318,20 @@ function MemoryBlockRow({
       >
         {block.value}
       </span>
+
+      {/* 포인터가 가리키는 대상 */}
+      {block.points_to && (
+        <span
+          style={{
+            fontSize: '11px',
+            color: pointerColor || '#fb923c',
+            fontWeight: 600,
+            flexShrink: 0,
+          }}
+        >
+          → {block.points_to}
+        </span>
+      )}
     </motion.div>
   );
 }

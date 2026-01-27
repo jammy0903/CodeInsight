@@ -133,6 +133,17 @@ export const notifySimulator = {
     });
   },
 
+  /** Emscripten 컴파일 에러 (상세 - 여러 에러 표시) */
+  compilationErrors: (language: string, errors: string[]) => {
+    const errorList = errors.slice(0, 3).map((err) => `• ${err}`).join('\n');
+    const moreCount = errors.length > 3 ? `\n\n+${errors.length - 3}개 더` : '';
+
+    toast.error(`${language} 컴파일 에러`, {
+      description: errorList + moreCount,
+      duration: 8000,
+    });
+  },
+
   /** 런타임 에러 */
   runtimeError: (language: string, errorMessage?: string) => {
     notify.error(`${language} 런타임 에러`, {

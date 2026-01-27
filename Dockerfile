@@ -19,6 +19,9 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     lsb-release \
+    # Emscripten dependencies
+    git \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Docker CLI
@@ -29,9 +32,21 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get install -y docker-ce-cli && \
     rm -rf /var/lib/apt/lists/*
 
+# Install Emscripten SDK
+ENV EMSDK_VERSION=3.1.50
+RUN git clone https://github.com/emscripten-core/emsdk.git /emsdk && \
+    cd /emsdk && \
+    ./emsdk install ${EMSDK_VERSION} && \
+    ./emsdk activate ${EMSDK_VERSION} && \
+    rm -rf /emsdk/.git
+
 # Set environment variables for Java
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Set environment variables for Emscripten
+ENV EMSDK=/emsdk
+ENV PATH="/emsdk:/emsdk/upstream/emscripten:${PATH}"
 
 # Install pnpm globally
 RUN npm install -g pnpm@10.27.0
