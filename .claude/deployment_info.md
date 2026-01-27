@@ -2,21 +2,41 @@
 
 | 구분 | 값 |
 |------|-----|
-| 로컬 경로 | `/home/jammy/projects/C-OSINE` |
-| 원격 서버 IP | `[원격 서버 IP 주소]` |
-| Git Remote | `[Git 원격 저장소 주소, 예: user@your_server:/path/to/repo.git]` |
-| 원격 작업 경로 | `[원격 서버의 프로젝트 배포 경로]` |
-| Branch | `main` (또는 주력 브랜치) |
-| SSH 접속 정보 | `SSH 키 또는 .env 파일에 저장된 비밀번호 사용 권장` |
+| 로컬 경로 | `/home/jammy/projects/cosine/CodeInsight` |
+| 프론트엔드 배포 | Vercel (https://codeinsight.vercel.app) |
+| 백엔드 배포 | Render (Docker) |
+| 데이터베이스 | Neon PostgreSQL |
+| Git Remote | `https://github.com/jammy0903/CodeInsight.git` |
+| Branch | `main` |
 
-### 커밋 & 배포
+### API Keys & Credentials
 
-현재 프로젝트의 자동화된 배포 스크립트나 `docker-compose` 설정이 확인되지 않았습니다.
-배포 프로세스를 여기에 문서화해야 합니다.
+| 서비스 | Key 이름 | 용도 |
+|--------|---------|------|
+| Render | `coin` | 배포 자동화 (rnd_8QlbsM81Vm9YCQe0RWeo6nwhxHnP) |
+| DeepSeek | - | AI Tutor 기능 (sk-327987f9e36648d7b394b1c98fd4e4ec) |
+| Neon | - | PostgreSQL 데이터베이스 |
+| Firebase | - | 사용자 인증 |
+| Fal.ai | - | 이미지 생성 |
 
-일반적인 워크플로우는 다음과 같을 수 있습니다:
-1. 원격 서버에 SSH로 접속합니다.
-2. `git pull`을 사용하여 최신 코드를 가져옵니다.
-3. `pnpm install`로 의존성을 설치합니다.
-4. `pnpm build`로 프로젝트를 빌드합니다.
-5. `pm2`, `systemd` 등의 프로세스 매니저를 사용하여 애플리케이션을 재시작합니다.
+### 자동 배포 워크플로우
+
+**Git Push → 자동 배포**
+
+1. **코드 변경 및 커밋**
+   ```bash
+   git add .
+   git commit -m "feat: 새로운 기능 추가"
+   git push origin main
+   ```
+
+2. **자동 배포 트리거**
+   - **프론트엔드**: Vercel이 자동으로 빌드 및 배포
+   - **백엔드**: Render가 Docker 이미지 빌드 및 배포 (10-15분 소요)
+
+3. **헬스체크**
+   - GitHub Actions가 2분 후 `/health` 엔드포인트 확인
+   - 5분간 20회 재시도 (15초 간격)
+
+4. **롤백 (필요 시)**
+   - Render Dashboard → Services → Events → "Rollback" 버튼 클릭

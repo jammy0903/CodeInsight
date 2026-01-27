@@ -2,12 +2,22 @@
 
 | 구분 | 값 |
 |------|-----|
-| 로컬 경로 | `/home/jammy/projects/C-OSINE` |
-| 원격 서버 IP | `[원격 서버 IP 주소]` |
-| Git Remote | `[Git 원격 저장소 주소, 예: user@your_server:/path/to/repo.git]` |
-| 원격 작업 경로 | `[원격 서버의 프로젝트 배포 경로]` |
-| Branch | `main` (또는 주력 브랜치) |
-| SSH 접속 정보 | `SSH 키 또는 .env 파일에 저장된 비밀번호 사용 권장` |
+| 로컬 경로 | `/home/jammy/projects/cosine/CodeInsight` |
+| 프론트엔드 배포 | Vercel (https://codeinsight.vercel.app) |
+| 백엔드 배포 | Render (Docker) |
+| 데이터베이스 | Neon PostgreSQL |
+| Git Remote | `https://github.com/jammy0903/CodeInsight.git` |
+| Branch | `main` |
+
+### API Keys & Credentials
+
+| 서비스 | Key 이름 | 용도 |
+|--------|---------|------|
+| Render | `coin` | 배포 자동화 (rnd_8QlbsM81Vm9YCQe0RWeo6nwhxHnP) |
+| DeepSeek | - | AI Tutor 기능 (sk-327987f9e36648d7b394b1c98fd4e4ec) |
+| Neon | - | PostgreSQL 데이터베이스 |
+| Firebase | - | 사용자 인증 |
+| Fal.ai | - | 이미지 생성 |
 
 ### 커밋 & 배포
 
