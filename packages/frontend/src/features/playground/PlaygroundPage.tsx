@@ -150,9 +150,12 @@ export function PlaygroundPage() {
     if (!isMobile) return;
 
     const handleScroll = () => {
-      // 150px 이상 스크롤하면 하단 네비게이션 표시
-      setShowBottomNav(window.scrollY > 150);
+      // 100px 이상 스크롤하면 하단 네비게이션 표시
+      setShowBottomNav(window.scrollY > 100);
     };
+
+    // 초기 스크롤 위치 체크
+    handleScroll();
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -223,8 +226,8 @@ export function PlaygroundPage() {
             }}
           >
             <LanguageTabs isMobile={true} />
-            {/* Run + Reset 버튼만 (Navigation은 하단으로 이동) */}
-            <StepControls isMobile={true} showRun={true} showReset={true} showNavigation={false} />
+            {/* Run + Reset + Navigation 버튼 (하단에도 추가로 표시) */}
+            <StepControls isMobile={true} showRun={true} showReset={true} showNavigation={true} />
           </div>
 
           {/* Editor */}
