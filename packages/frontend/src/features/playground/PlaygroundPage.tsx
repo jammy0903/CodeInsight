@@ -5,7 +5,6 @@
  */
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useIsMobile } from '@/hooks';
 import { Github, Mail, Play, Layers } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
@@ -143,23 +142,6 @@ export function PlaygroundPage() {
   // Memory 탭 표시 여부 (Java, C만)
   const showMemoryTab = language === 'java' || language === 'c';
 
-  // 스크롤 감지 (모바일 하단 네비게이션 표시/숨김)
-  const [showBottomNav, setShowBottomNav] = useState(false);
-
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const handleScroll = () => {
-      // 100px 이상 스크롤하면 하단 네비게이션 표시
-      setShowBottomNav(window.scrollY > 100);
-    };
-
-    // 초기 스크롤 위치 체크
-    handleScroll();
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isMobile]);
 
   // 페이지 제목 설정
   useEffect(() => {
@@ -405,50 +387,44 @@ export function PlaygroundPage() {
           </div>
         </div>
 
-        {/* Bottom Navigation Bar (모바일 전용 - 스크롤 시 나타남) */}
-        <AnimatePresence>
-          {hasSteps && showBottomNav && (
-            <motion.div
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 100, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              style={{
-                position: 'fixed',
-                bottom: '8px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 50,
-                padding: '6px 12px',
-                backgroundColor: currentTheme === 'dark'
-                  ? 'rgba(13, 21, 37, 0.85)'  // dark navy with transparency
-                  : 'rgba(255, 255, 255, 0.85)',  // white with transparency
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',  // Safari support
-                borderRadius: '20px',
-                border: `1px solid ${currentTheme === 'dark'
-                  ? 'rgba(26, 37, 64, 0.6)'
-                  : 'rgba(229, 229, 229, 0.6)'}`,
-                boxShadow: currentTheme === 'dark'
-                  ? '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)'
-                  : '0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-                maxWidth: '320px',
-              }}
-            >
-              <div style={{ transform: 'scale(0.85)' }}>
-                <StepNavigationArrows
-                  onPrev={prevStep}
-                  onNext={nextStep}
-                  canGoPrev={canGoPrev}
-                  canGoNext={canGoNext}
-                  nextLabel="다음"
-                  size="sm"
-                  variant="inline"
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Bottom Navigation Bar (모바일 전용 - 항상 표시) */}
+        {isMobile && hasSteps && (
+          <div
+            style={{
+              position: 'fixed',
+              bottom: '8px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 50,
+              padding: '6px 12px',
+              backgroundColor: currentTheme === 'dark'
+                ? 'rgba(13, 21, 37, 0.85)'  // dark navy with transparency
+                : 'rgba(255, 255, 255, 0.85)',  // white with transparency
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',  // Safari support
+              borderRadius: '20px',
+              border: `1px solid ${currentTheme === 'dark'
+                ? 'rgba(26, 37, 64, 0.6)'
+                : 'rgba(229, 229, 229, 0.6)'}`,
+              boxShadow: currentTheme === 'dark'
+                ? '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                : '0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+              maxWidth: '320px',
+            }}
+          >
+            <div style={{ transform: 'scale(0.85)' }}>
+              <StepNavigationArrows
+                onPrev={prevStep}
+                onNext={nextStep}
+                canGoPrev={canGoPrev}
+                canGoNext={canGoNext}
+                nextLabel="다음"
+                size="sm"
+                variant="inline"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <footer
