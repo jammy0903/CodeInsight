@@ -129,12 +129,6 @@ export function PlaygroundPage() {
   // Flow/Memory 탭 상태
   const [activeTab, setActiveTab] = useState<'flow' | 'memory'>('flow');
 
-  // 메모리 시각화 데이터
-  const { memoryState, changedBlocks } = useLessonVisualization(
-    steps as LessonStep[],
-    currentStepIndex
-  );
-
   // 터미널 출력 라인 변환
   const terminalLines = useMemo((): TerminalLine[] => {
     if (!currentStep?.stdout) return [];
