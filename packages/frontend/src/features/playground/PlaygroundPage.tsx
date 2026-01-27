@@ -19,6 +19,7 @@ import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { MemoryPanel } from '@/features/courses/components/memory/MemoryPanel';
 import { JavaMemoryView, toJavaMemoryViewProps } from '@/features/visualizers/java';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
+import { StepNavigationArrows } from '@/features/courses/components/StepNavigationArrows';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
 import type { LessonStep } from '@/types';
@@ -206,8 +207,8 @@ export function PlaygroundPage() {
             }}
           >
             <LanguageTabs isMobile={true} />
-            {/* Run + Reset + Navigation 버튼 (헤더) */}
-            <StepControls isMobile={true} showRun={true} showReset={true} showNavigation={true} />
+            {/* Run + Reset 버튼만 (Navigation은 하단으로 이동) */}
+            <StepControls isMobile={true} showRun={true} showReset={true} showNavigation={false} />
           </div>
 
           {/* Editor */}
@@ -297,6 +298,7 @@ export function PlaygroundPage() {
                   backgroundColor: activeTab === 'memory' ? colors.accent : 'transparent',
                   color: activeTab === 'memory' ? '#fff' : colors.textMuted,
                   border: 'none',
+                  borderRight: `1px solid ${colors.border}`,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -316,7 +318,6 @@ export function PlaygroundPage() {
                   fontFamily: 'monospace',
                   fontWeight: 600,
                   background: colors.accentBg,
-                  borderLeft: `1px solid ${colors.border}`,
                 }}
               >
                 {currentStepIndex + 1}/{steps.length}
@@ -385,6 +386,33 @@ export function PlaygroundPage() {
           </div>
         </div>
 
+        {/* Bottom Navigation Bar (모바일 전용) */}
+        {hasSteps && (
+          <div
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 50,
+              padding: '12px 16px',
+              backgroundColor: colors.panelBg,
+              borderTop: `1px solid ${colors.border}`,
+              boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <StepNavigationArrows
+              onPrev={prevStep}
+              onNext={nextStep}
+              canGoPrev={canGoPrev}
+              canGoNext={canGoNext}
+              nextLabel="다음"
+              size="md"
+              variant="mobile"
+            />
+          </div>
+        )}
+
         {/* Footer */}
         <footer
           style={{
@@ -395,6 +423,7 @@ export function PlaygroundPage() {
             justifyContent: 'space-between',
             alignItems: 'center',
             flexShrink: 0,
+            marginBottom: hasSteps ? '60px' : '0', // 네비게이션 바 공간 확보
           }}
         >
           <span style={{ fontSize: '10px', color: colors.footerText }}>CodeInsight 2026</span>
