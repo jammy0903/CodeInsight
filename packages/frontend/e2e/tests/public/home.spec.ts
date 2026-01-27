@@ -1,11 +1,15 @@
 /**
- * HomePage E2E 테스트
+ * HomePage E2E 테스트 (Public Route)
+ *
+ * Route: / (HomePage)
+ * Auth: 로그인 불필요
+ * Fixture: page (비로그인)
  */
 
-import { test, expect, BASE_URL } from '../fixtures/test-base';
-import { HomePage } from '../pages';
+import { test, expect } from '../../fixtures/test-base';
+import { HomePage } from '../../pages';
 
-test.describe('HomePage', () => {
+test.describe('HomePage - Public Route', () => {
   let homePage: HomePage;
 
   test.beforeEach(async ({ page }) => {
@@ -21,7 +25,7 @@ test.describe('HomePage', () => {
     await expect(homePage.heroTitle).toBeVisible();
   });
 
-  test('로그인 버튼 표시', async () => {
+  test('로그인 버튼 표시 (비로그인 상태)', async () => {
     await expect(homePage.loginButton).toBeVisible();
   });
 
@@ -42,16 +46,22 @@ test.describe('HomePage', () => {
     const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
     expect(scrollHeight).toBeGreaterThan(0);
   });
+});
 
-  test('반응형 레이아웃 - 모바일', async ({ page }) => {
+test.describe('HomePage - 반응형 레이아웃', () => {
+  test('모바일 뷰포트', async ({ page }) => {
+    const homePage = new HomePage(page);
+
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.reload();
+    await homePage.goto();
     await expect(homePage.heroTitle).toBeVisible();
   });
 
-  test('반응형 레이아웃 - 태블릿', async ({ page }) => {
+  test('태블릿 뷰포트', async ({ page }) => {
+    const homePage = new HomePage(page);
+
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.reload();
+    await homePage.goto();
     await expect(homePage.heroTitle).toBeVisible();
   });
 });
