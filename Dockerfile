@@ -91,6 +91,10 @@ RUN mkdir -p build/classes && \
     javac -encoding UTF-8 -d build/classes src/main/java/com/vis/*.java && \
     jar cfe build/debugger-agent.jar com.vis.DebuggerAgent -C build/classes .
 
+# Generate Prisma Client (required for .prisma/client)
+WORKDIR /app/packages/backend
+RUN pnpm prisma generate
+
 # Build TypeScript (backend)
 WORKDIR /app
 RUN pnpm --filter @codeinsight/backend build
