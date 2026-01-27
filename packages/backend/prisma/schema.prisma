@@ -8,26 +8,28 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid()) @db.Uuid
-  nickname      String         @unique
-  role          String         @default("user")
-  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
-  drafts        Draft[]
-  oauthAccounts OAuthAccount[]
-  submissions   Submission[]
-  progress      UserProgress[]
+  id                     String                  @id @default(uuid()) @db.Uuid
+  nickname               String                  @unique
+  role                   String                  @default("user")
+  createdAt              DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
+  drafts                 Draft[]
+  oauthAccounts          OAuthAccount[]
+  submissions            Submission[]
+  progress               UserProgress[]
   // 분석 리포트 관련
-  activities      LessonActivity[]
-  chatHistories   ChatHistory[]
-  quizAttempts    QuizAttempt[]
-  notes           UserNote[]
+  activities             LessonActivity[]
+  chatHistories          ChatHistory[]
+  quizAttempts           QuizAttempt[]
+  notes                  UserNote[]
   // 학습 분석 확장
-  profile         UserProfile?
-  sessionContexts SessionContext[]
-  stepActivities  StepActivity[]
+  profile                UserProfile?
+  sessionContexts        SessionContext[]
+  stepActivities         StepActivity[]
   // 게이미피케이션
-  streak          UserStreak?
+  streak                 UserStreak?
+  // 독립 퀴즈 (퀴즈 페이지용)
+  standaloneQuizAttempts StandaloneQuizAttempt[]
 
   @@map("users")
 }
@@ -37,7 +39,7 @@ model OAuthAccount {
   userId     String   @map("user_id") @db.Uuid
   provider   String
   providerId String   @map("provider_id")
-  email      String?  // OAuth 제공자로부터 받은 이메일
+  email      String? // OAuth 제공자로부터 받은 이메일
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -133,20 +135,20 @@ model Chapter {
 }
 
 model Lesson {
-  id            String         @id
-  chapterId     String         @map("chapter_id")
-  title         String
-  description   String?
-  difficulty    String         @default("basic")
-  order         Int
-  estimatedTime Int?           @map("estimated_time")
-  isActive      Boolean        @default(true) @map("is_active")
-  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
-  content       LessonContent?
-  chapter       Chapter        @relation(fields: [chapterId], references: [id])
-  quizzes       Quiz[]
-  progress      UserProgress[]
+  id             String           @id
+  chapterId      String           @map("chapter_id")
+  title          String
+  description    String?
+  difficulty     String           @default("basic")
+  order          Int
+  estimatedTime  Int?             @map("estimated_time")
+  isActive       Boolean          @default(true) @map("is_active")
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  content        LessonContent?
+  chapter        Chapter          @relation(fields: [chapterId], references: [id])
+  quizzes        Quiz[]
+  progress       UserProgress[]
   // 분석 리포트 관련
   activities     LessonActivity[]
   chatHistories  ChatHistory[]
@@ -171,16 +173,16 @@ model LessonContent {
 }
 
 model Quiz {
-  id          String   @id
-  lessonId    String   @map("lesson_id")
+  id          String        @id
+  lessonId    String        @map("lesson_id")
   type        String
   question    String
   options     Json?
   answer      String
   explanation String?
   order       Int
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  lesson      Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   // 분석 리포트 관련
   attempts    QuizAttempt[]
   notes       UserNote[]
@@ -220,7 +222,7 @@ model LessonActivity {
   lessonId  String    @map("lesson_id")
   startedAt DateTime  @map("started_at") @db.Timestamptz(6)
   endedAt   DateTime? @map("ended_at") @db.Timestamptz(6)
-  duration  Int?      // 초 단위 (계산된 값, 빠른 집계용)
+  duration  Int? // 초 단위 (계산된 값, 빠른 집계용)
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -230,8 +232,8 @@ model LessonActivity {
   stepActivities  StepActivity[]
 
   @@index([userId, startedAt]) // 사용자별 시간순 조회
-  @@index([lessonId])          // 레슨별 통계
-  @@index([startedAt])         // 날짜 범위 쿼리
+  @@index([lessonId]) // 레슨별 통계
+  @@index([startedAt]) // 날짜 범위 쿼리
   @@map("lesson_activities")
 }
 
@@ -240,18 +242,18 @@ model ChatHistory {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @map("user_id") @db.Uuid
   lessonId  String?  @map("lesson_id") // nullable: 레슨 밖에서도 질문 가능
-  context   String?  @db.VarChar(50)   // "lesson", "playground", "general"
+  context   String?  @db.VarChar(50) // "lesson", "playground", "general"
   question  String   @db.Text
   answer    String   @db.Text
-  tokens    Int?     // AI 토큰 사용량 (비용 추적용)
+  tokens    Int? // AI 토큰 사용량 (비용 추적용)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt]) // 사용자별 히스토리
-  @@index([lessonId])          // 레슨별 질문 통계
-  @@index([createdAt])         // 시간 범위 쿼리 + 오래된 데이터 삭제
+  @@index([lessonId]) // 레슨별 질문 통계
+  @@index([createdAt]) // 시간 범위 쿼리 + 오래된 데이터 삭제
   @@map("chat_histories")
 }
 
@@ -268,9 +270,9 @@ model QuizAttempt {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
-  @@index([userId, createdAt])  // 사용자별 시간순
-  @@index([userId, isCorrect])  // 오답만 빠르게 조회
-  @@index([quizId])             // 퀴즈별 정답률 통계
+  @@index([userId, createdAt]) // 사용자별 시간순
+  @@index([userId, isCorrect]) // 오답만 빠르게 조회
+  @@index([quizId]) // 퀴즈별 정답률 통계
   @@map("quiz_attempts")
 }
 
@@ -278,11 +280,11 @@ model QuizAttempt {
 model UserNote {
   id          String   @id @default(uuid()) @db.Uuid
   userId      String   @map("user_id") @db.Uuid
-  quizId      String?  @map("quiz_id")    // 퀴즈에서 추가 시
-  lessonId    String   @map("lesson_id")  // 어떤 레슨의 개념
-  source      String   @db.VarChar(20)    // "quiz" | "lesson" | "manual"
-  concept     String   @db.VarChar(100)   // 개념 키워드 (예: "포인터", "malloc")
-  content     String   @db.Text           // 노트 본문
+  quizId      String?  @map("quiz_id") // 퀴즈에서 추가 시
+  lessonId    String   @map("lesson_id") // 어떤 레슨의 개념
+  source      String   @db.VarChar(20) // "quiz" | "lesson" | "manual"
+  concept     String   @db.VarChar(100) // 개념 키워드 (예: "포인터", "malloc")
+  content     String   @db.Text // 노트 본문
   isFromWrong Boolean  @default(false) @map("is_from_wrong") // 오답 후 추가 여부
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
@@ -291,10 +293,10 @@ model UserNote {
   quiz   Quiz?  @relation(fields: [quizId], references: [id], onDelete: SetNull)
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
-  @@index([userId, concept])     // 개념별 노트 조회
-  @@index([userId, lessonId])    // 레슨별 노트 조회
+  @@index([userId, concept]) // 개념별 노트 조회
+  @@index([userId, lessonId]) // 레슨별 노트 조회
   @@index([userId, isFromWrong]) // 오답 노트만 조회
-  @@index([concept])             // 전체 사용자 취약 개념 통계
+  @@index([concept]) // 전체 사용자 취약 개념 통계
   @@map("user_notes")
 }
 
@@ -307,10 +309,10 @@ model UserProfile {
   id                  String   @id @default(uuid()) @db.Uuid
   userId              String   @unique @map("user_id") @db.Uuid
   // 온보딩 설문 결과
-  ageGroup            String?  @map("age_group") @db.VarChar(20)     // "10s", "20s", "30s", "40s+"
-  occupation          String?  @db.VarChar(30)                       // "student_middle", "student_high", "student_univ", "job_seeker", "worker", "other"
+  ageGroup            String?  @map("age_group") @db.VarChar(20) // "10s", "20s", "30s", "40s+"
+  occupation          String?  @db.VarChar(30) // "student_middle", "student_high", "student_univ", "job_seeker", "worker", "other"
   programmingExp      String?  @map("programming_exp") @db.VarChar(20) // "none", "less_1y", "1_3y", "3y_plus"
-  learningGoal        String?  @map("learning_goal") @db.VarChar(30)   // "basics", "job_prep", "skill_up", "curiosity"
+  learningGoal        String?  @map("learning_goal") @db.VarChar(30) // "basics", "job_prep", "skill_up", "curiosity"
   // 메타
   onboardingCompleted Boolean  @default(false) @map("onboarding_completed")
   createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -329,25 +331,25 @@ model SessionContext {
   // 디바이스 정보
   screenWidth      Int?     @map("screen_width")
   screenHeight     Int?     @map("screen_height")
-  orientation      String?  @db.VarChar(20)      // "portrait", "landscape"
+  orientation      String?  @db.VarChar(20) // "portrait", "landscape"
   inputMethod      String?  @map("input_method") @db.VarChar(10) // "touch", "mouse"
   userAgent        String?  @map("user_agent") @db.VarChar(500)
-  language         String?  @db.VarChar(10)      // "ko", "en", etc.
+  language         String?  @db.VarChar(10) // "ko", "en", etc.
   // 네트워크 정보
   connectionType   String?  @map("connection_type") @db.VarChar(20) // "4g", "wifi", etc.
-  effectiveType    String?  @map("effective_type") @db.VarChar(10)  // "slow-2g", "2g", "3g", "4g"
+  effectiveType    String?  @map("effective_type") @db.VarChar(10) // "slow-2g", "2g", "3g", "4g"
   // 시간 컨텍스트
-  localHour        Int?     @map("local_hour")   // 0-23
+  localHour        Int?     @map("local_hour") // 0-23
   localWeekday     Int?     @map("local_weekday") // 0-6 (일-토)
-  timezone         String?  @db.VarChar(50)      // "Asia/Seoul"
+  timezone         String?  @db.VarChar(50) // "Asia/Seoul"
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   lessonActivity LessonActivity? @relation(fields: [lessonActivityId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
-  @@index([localHour])         // 시간대별 학습 패턴
-  @@index([localWeekday])      // 요일별 학습 패턴
+  @@index([localHour]) // 시간대별 학습 패턴
+  @@index([localWeekday]) // 요일별 학습 패턴
   @@map("session_contexts")
 }
 
@@ -357,18 +359,18 @@ model StepActivity {
   userId           String   @map("user_id") @db.Uuid
   lessonActivityId String   @map("lesson_activity_id") @db.Uuid
   lessonId         String   @map("lesson_id")
-  stepIndex        Int      @map("step_index")           // 0-based 스텝 인덱스
+  stepIndex        Int      @map("step_index") // 0-based 스텝 인덱스
   // Phase 0 (필수)
-  duration         Int?                                   // 체류 시간 (초)
+  duration         Int? // 체류 시간 (초)
   wentBack         Boolean  @default(false) @map("went_back") // 이 스텝에서 뒤로 갔는지
   // Phase 1 (권장) - 시각화
-  visHoverCount    Int?     @map("vis_hover_count")      // 메모리 블록 호버 횟수
-  visClickCount    Int?     @map("vis_click_count")      // 메모리 블록 클릭 횟수
+  visHoverCount    Int?     @map("vis_hover_count") // 메모리 블록 호버 횟수
+  visClickCount    Int?     @map("vis_click_count") // 메모리 블록 클릭 횟수
   // Phase 1 (권장) - AI
-  aiQuestionCount  Int?     @map("ai_question_count")    // 이 스텝에서 AI 질문 횟수
+  aiQuestionCount  Int?     @map("ai_question_count") // 이 스텝에서 AI 질문 횟수
   // Phase 2 (심화)
-  codeSelections   Int?     @map("code_selections")      // 코드 선택 횟수
-  scrollEvents     Int?     @map("scroll_events")        // 스크롤 이벤트 횟수
+  codeSelections   Int?     @map("code_selections") // 코드 선택 횟수
+  scrollEvents     Int?     @map("scroll_events") // 스크롤 이벤트 횟수
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -377,7 +379,7 @@ model StepActivity {
 
   @@unique([lessonActivityId, stepIndex]) // 한 활동 내 스텝은 유니크
   @@index([userId, lessonId])
-  @@index([lessonId, stepIndex])          // 스텝별 평균 시간 등 통계
+  @@index([lessonId, stepIndex]) // 스텝별 평균 시간 등 통계
   @@map("step_activities")
 }
 
@@ -389,13 +391,80 @@ model StepActivity {
 model UserStreak {
   id            String    @id @default(uuid()) @db.Uuid
   userId        String    @unique @map("user_id") @db.Uuid
-  currentStreak Int       @default(0) @map("current_streak")  // 현재 연속 일수
-  longestStreak Int       @default(0) @map("longest_streak")  // 최장 연속 기록
-  lastActiveAt  DateTime? @map("last_active_at") @db.Date     // 마지막 활동일 (날짜만)
+  currentStreak Int       @default(0) @map("current_streak") // 현재 연속 일수
+  longestStreak Int       @default(0) @map("longest_streak") // 최장 연속 기록
+  lastActiveAt  DateTime? @map("last_active_at") @db.Date // 마지막 활동일 (날짜만)
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_streaks")
+}
+
+// ============================================
+// 독립 퀴즈 시스템 (2026-01-27 추가)
+// WHY: 레슨과 분리된 퀴즈 페이지용 (학습 분석, 취약 개념 추적)
+// ============================================
+
+// 독립 퀴즈 문제 정의
+model StandaloneQuiz {
+  id String @id // "ox-c-ptr-q1" 형식
+
+  // 📂 분류 정보
+  language     String @db.VarChar(20) // "c", "javascript", "java", "python"
+  quizType     String @map("quiz_type") @db.VarChar(30) // "ox", "multiple-choice", "fill-blank"
+  chapterId    String @map("chapter_id") @db.VarChar(50) // "c-var", "c-ptr"
+  chapterTitle String @map("chapter_title") @db.VarChar(100) // "변수와 자료형"
+
+  // 📝 문제 내용
+  question    String @db.Text // 문제 원문
+  options     Json? // 객관식 선택지 (["A", "B", "C", "D"])
+  answer      String @db.VarChar(500) // 정답 ("true", "A", "malloc")
+  explanation String @db.Text // 해설
+
+  // 🎯 분석용 메타데이터
+  concepts   String[] @default([]) // 개념 태그 ["포인터", "메모리주소"]
+  difficulty String   @default("medium") @db.VarChar(20) // "easy", "medium", "hard"
+  orderNum   Int      @map("order_num") // 챕터 내 순서
+
+  // 메타
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // 관계
+  attempts StandaloneQuizAttempt[]
+
+  @@index([language, quizType]) // 언어+유형별 조회
+  @@index([language, chapterId]) // 언어+챕터별 조회
+  @@index([language, quizType, chapterId]) // 복합 조회
+  @@map("standalone_quizzes")
+}
+
+// 독립 퀴즈 시도 기록
+model StandaloneQuizAttempt {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  quizId String @map("quiz_id")
+
+  // 📊 시도 데이터
+  userAnswer String  @map("user_answer") @db.VarChar(500)
+  isCorrect  Boolean @map("is_correct")
+  timeSpent  Int?    @map("time_spent") // 풀이 시간 (초)
+
+  // 🔄 재시도 추적
+  attemptNumber Int @default(1) @map("attempt_number")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // 관계
+  user User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz StandaloneQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt]) // 사용자별 시간순
+  @@index([userId, isCorrect]) // 오답만 빠르게 조회
+  @@index([quizId]) // 퀴즈별 정답률 통계
+  @@index([userId, quizId]) // 재시도 횟수 계산용
+  @@map("standalone_quiz_attempts")
 }

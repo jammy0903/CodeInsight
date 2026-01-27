@@ -7,6 +7,7 @@
 import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { UserProgress } from '@/types';
+import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
