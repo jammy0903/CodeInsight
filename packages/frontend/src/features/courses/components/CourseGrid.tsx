@@ -5,7 +5,7 @@
  * 반응형: 1열(모바일) → 2열(태블릿) → 3열(데스크톱)
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface CourseGridProps {
   children: ReactNode;

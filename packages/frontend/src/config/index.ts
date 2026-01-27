@@ -33,6 +33,11 @@ export const config = {
       // 노트
       notes: '/notes',
       notesConcepts: '/notes/concepts',
+      // Standalone Quiz
+      standaloneQuizChapters: '/standalone-quizzes/chapters',
+      standaloneQuizzes: '/standalone-quizzes',
+      standaloneQuizAttempt: '/standalone-quizzes/attempt',
+      standaloneQuizWeakConcepts: '/standalone-quizzes/weak-concepts',
     },
     timeout: {
       run: env.VITE_C_RUN_TIMEOUT,
