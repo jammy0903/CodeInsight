@@ -1,9 +1,12 @@
 /**
- * Standalone Quiz (OX) E2E Tests
- * OX 퀴즈 시스템 전체 플로우 검증
+ * OX Quiz E2E 테스트 (Protected Route)
+ *
+ * Route: /quiz/ox/:lang (OXQuizPage)
+ * Auth: 로그인 필요 (ProtectedRoute)
+ * Fixture: quizWithData, quizNoData, page (401 테스트용)
  *
  * Priority:
- * - P0: 필수 시나리오 (비로그인, Happy Path, 정답/오답)
+ * - P0: 필수 시나리오 (비로그인 401, Happy Path, 정답/오답)
  * - P1: 중요 시나리오 (재시도, 이전 시도 기록, 에러 처리)
  *
  * Coverage:
@@ -13,17 +16,17 @@
  * - 에러 처리 및 재시도
  */
 
-import { test, expect } from '../fixtures/test-base';
-import { OXQuizPage } from '../pages';
-import { mockAuthError, mockUnauthenticated } from '../fixtures/auth-mock';
-import { mockStandaloneQuizAPIs } from '../fixtures/quiz-mock';
+import { test, expect } from '../../fixtures/test-base';
+import { OXQuizPage } from '../../pages';
+import { mockAuthError, mockUnauthenticated } from '../../fixtures/auth-mock';
+import { mockStandaloneQuizAPIs } from '../../fixtures/quiz-mock';
 
 // =============================================
 // P0: 인증 상태별 시나리오
 // =============================================
 
-test.describe('OX Quiz - 인증 상태별', () => {
-  test('P0-1: 비로그인 시 401 에러 메시지 표시', async ({ page }) => {
+test.describe('OX Quiz - 접근 제어 (Protected Route)', () => {
+  test('P0-1: 비로그인 시 401 에러 또는 리다이렉트', async ({ page }) => {
     const oxQuizPage = new OXQuizPage(page);
 
     // 비로그인 상태 모킹
@@ -33,8 +36,6 @@ test.describe('OX Quiz - 인증 상태별', () => {
     await oxQuizPage.goto('c');
 
     // 에러 메시지 또는 로딩 실패 상태 확인
-    // Note: 실제 앱에서 401 에러를 어떻게 처리하는지에 따라 다름
-    // 예: 토스트 알림, 에러 페이지, 리다이렉트 등
     await page.waitForTimeout(2000);
 
     // 챕터 목록이 로드되지 않아야 함

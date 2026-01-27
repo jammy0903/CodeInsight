@@ -1,9 +1,15 @@
 /**
- * Courses E2E 테스트
+ * CoursesPage E2E 테스트 (Public Route)
+ *
+ * Routes:
+ *   - /courses (CoursesPage - 언어 선택)
+ *   - /courses/:lang (LanguageCoursePage - 챕터 선택)
+ * Auth: 로그인 불필요
+ * Fixture: page (비로그인)
  */
 
-import { test, expect } from '../fixtures/test-base';
-import { CoursesPage, LanguageCoursePage } from '../pages';
+import { test, expect } from '../../fixtures/test-base';
+import { CoursesPage, LanguageCoursePage } from '../../pages';
 
 test.describe('CoursesPage - 언어 선택', () => {
   let coursesPage: CoursesPage;
@@ -48,7 +54,7 @@ test.describe('LanguageCoursePage - 챕터/레슨 선택', () => {
     await expect(page).toHaveURL(/\/courses\/c$/);
   });
 
-  test('챕터 아코디언 표시', async ({ page }) => {
+  test('챕터 아코디언 표시', async () => {
     await languagePage.isLoaded();
     const count = await languagePage.chapterAccordions.count();
     expect(count).toBeGreaterThan(0);
@@ -72,7 +78,7 @@ test.describe('LanguageCoursePage - 챕터/레슨 선택', () => {
     const lessonCount = await languagePage.lessonItems.count();
     if (lessonCount > 0) {
       await languagePage.selectFirstLesson();
-      await expect(page).toHaveURL(/\/courses\/c\/\d+\/\d+$/);
+      await expect(page).toHaveURL(/\/courses\/c\/\d+\/[\w-]+$/);
     }
   });
 
@@ -85,7 +91,7 @@ test.describe('LanguageCoursePage - 챕터/레슨 선택', () => {
   });
 });
 
-test.describe('Courses 네비게이션', () => {
+test.describe('Courses - 전체 네비게이션 플로우', () => {
   test('홈 → 코스 → 챕터 → 레슨 플로우', async ({ page }) => {
     // 1. 홈에서 시작
     await page.goto('/');
@@ -95,7 +101,7 @@ test.describe('Courses 네비게이션', () => {
     await page.goto('/courses');
     await expect(page).toHaveURL(/\/courses$/);
 
-    // 3. 언어 선택
+    // 3. 언어 선택 (C 언어)
     const languageCard = page.locator('button.group').first();
     await languageCard.waitFor({ state: 'visible', timeout: 10000 });
     await languageCard.click();
@@ -110,7 +116,7 @@ test.describe('Courses 네비게이션', () => {
     const lesson = page.locator('[class*="cursor-pointer"]').first();
     if (await lesson.isVisible()) {
       await lesson.click();
-      await expect(page).toHaveURL(/\/courses\/[a-z]+\/\d+\/\d+$/);
+      await expect(page).toHaveURL(/\/courses\/[a-z]+\/\d+\/[\w-]+$/);
     }
   });
 });

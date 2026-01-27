@@ -1,6 +1,9 @@
 /**
- * Standalone Quiz Report E2E Tests
- * 리포트 페이지의 퀴즈 취약 개념 섹션 검증
+ * Quiz Report E2E 테스트 (Protected Route)
+ *
+ * Route: /report (ReportPage)
+ * Auth: 로그인 필요 (ProtectedRoute)
+ * Fixture: quizWithData, quizNoData
  *
  * Priority: P0 (필수)
  *
@@ -11,14 +14,14 @@
  * - 데이터 없을 때 메시지 표시
  */
 
-import { test, expect } from '../fixtures/test-base';
-import { ReportPage, OXQuizPage } from '../pages';
+import { test, expect } from '../../fixtures/test-base';
+import { ReportPage, OXQuizPage } from '../../pages';
 
 // =============================================
 // P0: 리포트 페이지 - 취약 개념
 // =============================================
 
-test.describe('Report Page - 퀴즈 취약 개념', () => {
+test.describe('Report Page - 퀴즈 취약 개념 (Protected)', () => {
   test('P0-1: 리포트 페이지 접근 및 퀴즈 섹션 표시', async ({ quizWithData }) => {
     const reportPage = new ReportPage(quizWithData);
 
