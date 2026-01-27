@@ -10,11 +10,26 @@
         "title": "Animal 클래스 정의",
         "explanation": "class 키워드로 Animal을 정의합니다. 내부적으로 함수 + prototype이 생성됩니다.",
         "keyInsight": "class = 생성자 함수 + prototype의 문법 설탕",
-        "highlight": [1, 2, 3, 4, 5, 6, 7, 8],
+        "highlight": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "classes": [
-            { "name": "Animal", "methods": ["constructor", "eat()"] }
+            {
+              "name": "Animal",
+              "methods": [
+                "constructor",
+                "eat()"
+              ]
+            }
           ],
           "equivalent": "function Animal(name) { this.name = name; }\nAnimal.prototype.eat = function() { ... }"
         }
@@ -24,21 +39,39 @@
         "title": "Dog 클래스 (extends)",
         "explanation": "extends로 Animal을 상속합니다. 프로토타입 체인이 자동으로 설정됩니다.",
         "keyInsight": "extends = Object.create + 프로토타입 체인 설정",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "classes": [
-            { "name": "Dog", "extends": "Animal", "methods": ["constructor", "bark()"] }
+            {
+              "name": "Dog",
+              "extends": "Animal",
+              "methods": [
+                "constructor",
+                "bark()"
+              ]
+            }
           ],
-          "chain": ["Dog.prototype", "Animal.prototype", "Object.prototype"]
+          "chain": [
+            "Dog.prototype",
+            "Animal.prototype",
+            "Object.prototype"
+          ]
         }
       },
       {
         "line": 11,
         "title": "super() 호출",
-        "explanation": "super(name)은 부모의 constructor를 호출합니다. extends 사용 시 this 사용 전에 반드시 호출해야 합니다.",
-        "keyInsight": "super() = Animal.call(this, name)과 동일",
-        "highlight": [11, 12, 13, 14],
+        "explanation": "super(name)은 부모의 constructor를 호출합니다. 사실상 `Animal.call(this, name)`을 실행하는 것과 같습니다.",
+        "keyInsight": "super() = 부모 생성자 호출 (this 초기화)",
+        "highlight": [
+          11,
+          12,
+          13,
+          14
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "note": "super() 호출 전에는 this 사용 불가 (ReferenceError)"
@@ -48,13 +81,34 @@
         "line": 20,
         "title": "인스턴스 생성",
         "explanation": "new Dog()로 인스턴스를 생성합니다. 프로토타입 체인: buddy → Dog.prototype → Animal.prototype",
-        "highlight": [20],
+        "highlight": [
+          20
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            { "name": "buddy", "props": ["name: 'Buddy'", "breed: 'Golden'"], "proto": "Dog.prototype" },
-            { "name": "Dog.prototype", "props": ["bark()"], "proto": "Animal.prototype" },
-            { "name": "Animal.prototype", "props": ["eat()"], "proto": "Object.prototype" }
+            {
+              "name": "buddy",
+              "props": [
+                "name: 'Buddy'",
+                "breed: 'Golden'"
+              ],
+              "proto": "Dog.prototype"
+            },
+            {
+              "name": "Dog.prototype",
+              "props": [
+                "bark()"
+              ],
+              "proto": "Animal.prototype"
+            },
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
           ]
         }
       },
@@ -62,10 +116,18 @@
         "line": 21,
         "title": "속성/메서드 접근",
         "explanation": "프로토타입 체인을 따라 속성과 메서드를 찾습니다. 생성자 함수 방식과 동일하게 동작합니다.",
-        "highlight": [21, 22, 23],
+        "highlight": [
+          21,
+          22,
+          23
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
-          "output": ["Buddy", "Buddy eats", "Woof!"]
+          "output": [
+            "Buddy",
+            "Buddy eats",
+            "Woof!"
+          ]
         }
       }
     ]

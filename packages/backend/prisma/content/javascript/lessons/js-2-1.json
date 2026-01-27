@@ -10,14 +10,22 @@
         "title": "var a = 1 (전역 선언)",
         "explanation": "var로 선언한 변수는 함수 스코프를 가집니다. 여기서는 전역에서 선언했으므로 전역 변수가 됩니다.",
         "keyInsight": "var는 함수 스코프. 블록({})을 무시합니다.",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
             {
               "name": "Global",
               "type": "global",
-              "variables": [{ "name": "a", "value": 1, "keyword": "var" }]
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                }
+              ]
             }
           ],
           "highlightScope": "Global",
@@ -29,7 +37,9 @@
         "title": "let b = 2 (전역 선언)",
         "explanation": "let으로 선언한 변수는 블록 스코프를 가집니다. 현재는 전역 블록에 있습니다.",
         "keyInsight": "let은 블록 스코프. 가장 가까운 {}안에서만 유효합니다.",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -37,8 +47,16 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                { "name": "a", "value": 1, "keyword": "var" },
-                { "name": "b", "value": 2, "keyword": "let" }
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                }
               ]
             }
           ],
@@ -51,7 +69,9 @@
         "title": "const c = 3 (전역 선언)",
         "explanation": "const도 블록 스코프입니다. let과 같지만 재할당이 불가능합니다.",
         "keyInsight": "const = let + 재할당 금지",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -59,9 +79,21 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                { "name": "a", "value": 1, "keyword": "var" },
-                { "name": "b", "value": 2, "keyword": "let" },
-                { "name": "c", "value": 3, "keyword": "const" }
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
               ]
             }
           ],
@@ -74,7 +106,9 @@
         "title": "if 블록 진입",
         "explanation": "if 블록 안으로 들어갑니다. 새로운 블록 스코프가 생성됩니다.",
         "keyInsight": "{}가 나오면 새로운 블록 스코프가 생깁니다.",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -82,9 +116,21 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                { "name": "a", "value": 1, "keyword": "var" },
-                { "name": "b", "value": 2, "keyword": "let" },
-                { "name": "c", "value": 3, "keyword": "const" }
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
               ]
             },
             {
@@ -98,11 +144,13 @@
       },
       {
         "line": 6,
-        "title": "var a = 10 (블록 내부)",
-        "explanation": "var는 블록을 무시합니다! 새 변수가 아니라 전역의 a를 덮어씁니다.",
-        "keyInsight": "var는 블록 스코프가 없어서 전역 a가 10으로 변경됩니다!",
-        "analogy": "var는 벽(블록)을 뚫고 나가는 유령 같은 존재입니다.",
-        "highlight": [6],
+        "title": "var a = 10 (함수 스코프의 한계)",
+        "explanation": "var는 블록({})을 투명 인간 취급합니다.\n자신을 감싸고 있는 가장 가까운 **함수 스코프(Function Scope)**나 **전역 스코프**에 변수를 등록해버립니다.",
+        "keyInsight": "var는 블록 경계를 무시하고 위로 올라가서 꽂힙니다 (Hoisting과 관련).",
+        "analogy": "호텔 방(블록) 안에서 담배를 피웠는데(var), 방 벽을 뚫고 호텔 로비(전역)까지 연기가 퍼지는 상황입니다.",
+        "highlight": [
+          6
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -110,9 +158,22 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                { "name": "a", "value": 10, "keyword": "var", "changed": true },
-                { "name": "b", "value": 2, "keyword": "let" },
-                { "name": "c", "value": 3, "keyword": "const" }
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "changed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
               ]
             },
             {
@@ -130,7 +191,9 @@
         "title": "let b = 20 (블록 내부)",
         "explanation": "let은 블록 스코프입니다. if 블록 안에 새로운 b가 생성됩니다. 전역의 b와는 다른 변수입니다!",
         "keyInsight": "블록 안의 let b와 전역의 let b는 완전히 다른 변수입니다.",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -138,16 +201,33 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                { "name": "a", "value": 10, "keyword": "var" },
-                { "name": "b", "value": 2, "keyword": "let" },
-                { "name": "c", "value": 3, "keyword": "const" }
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
               ]
             },
             {
               "name": "if Block",
               "type": "block",
               "variables": [
-                { "name": "b", "value": 20, "keyword": "let", "new": true }
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let",
+                  "new": true
+                }
               ]
             }
           ],
@@ -159,7 +239,9 @@
         "line": 8,
         "title": "const c = 30 (블록 내부)",
         "explanation": "const도 블록 스코프입니다. if 블록 안에 새로운 c가 생성됩니다.",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -167,17 +249,38 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                { "name": "a", "value": 10, "keyword": "var" },
-                { "name": "b", "value": 2, "keyword": "let" },
-                { "name": "c", "value": 3, "keyword": "const" }
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
               ]
             },
             {
               "name": "if Block",
               "type": "block",
               "variables": [
-                { "name": "b", "value": 20, "keyword": "let" },
-                { "name": "c", "value": 30, "keyword": "const", "new": true }
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 30,
+                  "keyword": "const",
+                  "new": true
+                }
               ]
             }
           ],
@@ -190,7 +293,9 @@
         "title": "블록 내부 console.log",
         "explanation": "블록 안에서 a, b, c를 출력합니다. a는 전역(10), b와 c는 블록 스코프(20, 30)를 참조합니다.",
         "keyInsight": "가장 가까운 스코프의 변수를 먼저 찾습니다.",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -198,21 +303,46 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                { "name": "a", "value": 10, "keyword": "var", "accessed": true },
-                { "name": "b", "value": 2, "keyword": "let" },
-                { "name": "c", "value": 3, "keyword": "const" }
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "accessed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
               ]
             },
             {
               "name": "if Block",
               "type": "block",
               "variables": [
-                { "name": "b", "value": 20, "keyword": "let", "accessed": true },
-                { "name": "c", "value": 30, "keyword": "const", "accessed": true }
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let",
+                  "accessed": true
+                },
+                {
+                  "name": "c",
+                  "value": 30,
+                  "keyword": "const",
+                  "accessed": true
+                }
               ]
             }
           ],
-          "output": ["10 20 30"]
+          "output": [
+            "10 20 30"
+          ]
         }
       },
       {
@@ -221,7 +351,9 @@
         "explanation": "블록이 끝나면 블록 스코프 변수(let b, const c)는 사라집니다. 전역 변수만 남습니다.",
         "keyInsight": "a는 10(var가 전역을 덮어씀), b는 2, c는 3 (블록 변수는 사라짐)",
         "misconception": "var a도 블록 안에서만 10일 거라고 착각하기 쉽습니다. 실제로는 전역 a가 변경됩니다!",
-        "highlight": [12],
+        "highlight": [
+          12
+        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -229,13 +361,31 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                { "name": "a", "value": 10, "keyword": "var", "accessed": true },
-                { "name": "b", "value": 2, "keyword": "let", "accessed": true },
-                { "name": "c", "value": 3, "keyword": "const", "accessed": true }
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "accessed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let",
+                  "accessed": true
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const",
+                  "accessed": true
+                }
               ]
             }
           ],
-          "output": ["10 20 30", "10 2 3"]
+          "output": [
+            "10 20 30",
+            "10 2 3"
+          ]
         }
       }
     ]
@@ -254,8 +404,8 @@
   "misconceptions": [
     {
       "wrong": "var도 블록 안에서만 유효하다",
-      "correct": "var는 블록 스코프가 없습니다. 함수 스코프만 인식합니다.",
-      "why": "var는 ES6 이전 문법으로, 블록({})을 스코프 경계로 인식하지 않습니다."
+      "correct": "var는 **함수 스코프**만 따릅니다. if문, for문 블록은 무시하고 전역 변수처럼 동작해버릴 위험이 있습니다.",
+      "why": "JS 초기에 설계된 유물입니다. 의도치 않게 전역 변수를 덮어쓰는 버그의 주범이라 모던 JS에서는 사용하지 않습니다."
     },
     {
       "wrong": "let과 const는 같은 것이다",

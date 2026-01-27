@@ -10,10 +10,14 @@
         "title": "main() 호출",
         "explanation": "async 함수 main()이 호출됩니다. async 함수는 항상 Promise를 반환합니다.",
         "keyInsight": "async 함수 = Promise를 반환하는 함수",
-        "highlight": [18],
+        "highlight": [
+          18
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["main()"],
+          "callStack": [
+            "main()"
+          ],
           "webApis": [],
           "taskQueue": [],
           "microtaskQueue": [],
@@ -25,24 +29,37 @@
         "line": 13,
         "title": "console.log('Start')",
         "explanation": "'Start'가 출력됩니다.",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["main()", "console.log"],
-          "output": ["Start"],
+          "callStack": [
+            "main()",
+            "console.log"
+          ],
+          "output": [
+            "Start"
+          ],
           "currentPhase": "executing"
         }
       },
       {
         "line": 14,
         "title": "await fetchUser()",
-        "explanation": "fetchUser()를 호출하고 await로 결과를 기다립니다. await는 Promise가 완료될 때까지 함수 실행을 일시 중지합니다.",
-        "keyInsight": "await = Promise 완료까지 일시 중지 (함수 밖 코드는 계속 실행!)",
-        "highlight": [14],
+        "explanation": "await를 만나면 함수의 실행이 잠시 **일시 정지(Suspend)**되고, 제어권이 호출자에게 돌아갑니다.\n마치 게임을 '일시 정지'하고 밖으로 나가는 것과 같습니다.",
+        "keyInsight": "await는 함수의 실행 상태를 저장하고 스택에서 빠져나옵니다 (Non-blocking).",
+        "highlight": [
+          14
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["fetchUser()"],
-          "output": ["Start"],
+          "callStack": [
+            "fetchUser()"
+          ],
+          "output": [
+            "Start"
+          ],
           "currentPhase": "executing",
           "suspended": "main() - await에서 일시 중지"
         }
@@ -51,12 +68,28 @@
         "line": 6,
         "title": "fetchUser 내부 실행",
         "explanation": "'Fetching...'이 출력되고 delay(1000)을 await합니다.",
-        "highlight": [6, 7],
+        "highlight": [
+          6,
+          7
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["fetchUser()", "delay()"],
-          "webApis": [{ "id": "timer1", "name": "delay", "delay": 1000, "status": "waiting" }],
-          "output": ["Start", "Fetching..."],
+          "callStack": [
+            "fetchUser()",
+            "delay()"
+          ],
+          "webApis": [
+            {
+              "id": "timer1",
+              "name": "delay",
+              "delay": 1000,
+              "status": "waiting"
+            }
+          ],
+          "output": [
+            "Start",
+            "Fetching..."
+          ],
           "currentPhase": "executing"
         }
       },
@@ -65,12 +98,24 @@
         "title": "await delay(1000)",
         "explanation": "fetchUser도 await에서 일시 중지됩니다. 콜 스택이 비고 다른 코드가 실행될 수 있습니다.",
         "keyInsight": "await는 블로킹이 아닙니다! 다른 코드가 실행될 수 있습니다.",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
           "callStack": [],
-          "webApis": [{ "id": "timer1", "name": "delay", "delay": 1000, "status": "waiting" }],
-          "output": ["Start", "Fetching..."],
+          "webApis": [
+            {
+              "id": "timer1",
+              "name": "delay",
+              "delay": 1000,
+              "status": "waiting"
+            }
+          ],
+          "output": [
+            "Start",
+            "Fetching..."
+          ],
           "currentPhase": "idle",
           "suspended": "main(), fetchUser() - 둘 다 일시 중지"
         }
@@ -79,11 +124,20 @@
         "line": 8,
         "title": "1초 후: delay 완료",
         "explanation": "타이머가 완료되어 fetchUser()가 재개됩니다. 'User loaded'가 출력됩니다.",
-        "highlight": [8, 9],
+        "highlight": [
+          8,
+          9
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["fetchUser() resumed"],
-          "output": ["Start", "Fetching...", "User loaded"],
+          "callStack": [
+            "fetchUser() resumed"
+          ],
+          "output": [
+            "Start",
+            "Fetching...",
+            "User loaded"
+          ],
           "currentPhase": "executing"
         }
       },
@@ -91,11 +145,23 @@
         "line": 14,
         "title": "fetchUser 완료, main 재개",
         "explanation": "fetchUser()가 { name: 'Alice' }를 반환하고, main()이 재개됩니다.",
-        "highlight": [14, 15, 16],
+        "highlight": [
+          14,
+          15,
+          16
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["main() resumed"],
-          "output": ["Start", "Fetching...", "User loaded", "Got: Alice", "End"],
+          "callStack": [
+            "main() resumed"
+          ],
+          "output": [
+            "Start",
+            "Fetching...",
+            "User loaded",
+            "Got: Alice",
+            "End"
+          ],
           "currentPhase": "executing"
         }
       }
@@ -103,15 +169,20 @@
   },
   "quiz": {
     "question": "다음 코드의 출력 순서는?\n\nasync function test() {\n  console.log('A');\n  await Promise.resolve();\n  console.log('B');\n}\ntest();\nconsole.log('C');",
-    "options": ["A B C", "A C B", "C A B", "B A C"],
+    "options": [
+      "A B C",
+      "A C B",
+      "C A B",
+      "B A C"
+    ],
     "correctIndex": 1,
     "explanation": "A 출력 → await에서 일시 중지 → C 출력(동기) → B 출력(await 후 재개)"
   },
   "misconceptions": [
     {
       "wrong": "await는 전체 프로그램을 멈춘다",
-      "correct": "await는 해당 async 함수만 일시 중지합니다. 다른 코드는 계속 실행됩니다.",
-      "why": "await는 비동기적입니다. 콜 스택을 비우고 다른 작업을 허용합니다."
+      "correct": "await는 해당 `async` 함수 내부만 멈춥니다! 함수 밖의 코드(이벤트 루프)는 계속 돌아갑니다.",
+      "why": "await는 내부적으로 Promise.then()을 사용하는 것과 같습니다. 메인 스레드를 차단하지 않습니다."
     }
   ],
   "keyTakeaway": "async/await = Promise의 문법 설탕, await = 일시 중지 (블로킹 X)"

@@ -1,0 +1,84 @@
+{
+    "lessonId": "js-7-2",
+    "title": "V8 메모리 구조 (GC)",
+    "concept": "V8의 힙 메모리는 '어린 세대(Young)'와 '늙은 세대(Old)'로 나뉘어 관리된다",
+    "content": {
+        "code": "// 1. 짧게 살다 가는 객체 (Young Generation)\nfunction createTemp() {\n  const temp = { id: Math.random() };\n  // 함수 끝나면 temp는 가비지(Garbage)가 됨\n}\n\n// 2. 오래 살아남는 객체 (Old Generation)\nconst cache = [];\nfunction save(data) {\n  cache.push(data); // 전역 변수에 붙어있어서 안 죽음\n}\n\ncreateTemp();\ncreateTemp(); // Scavenger(청소부)가 슥 훑고 지나감\n\nsave({ type: 'important' }); // 몇 번의 청소를 버티면 승진(Promotion)함",
+        "steps": [
+            {
+                "line": 2,
+                "title": "Young Generation 할당",
+                "explanation": "새로운 객체 `{ id: ... }`는 **Young Generation(New Space)**이라는 작은 공간에 할당됩니다.\n여기는 매우 활발하게 생성되고 죽는 곳입니다.",
+                "keyInsight": "New Space = 유치원 (대부분 여기서 일찍 죽음)",
+                "highlight": [
+                    2,
+                    3
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "heap": [
+                        {
+                            "address": "0xNew1",
+                            "content": "{ id: 0.1 }",
+                            "label": "Young Gen (Nursery)"
+                        }
+                    ]
+                }
+            },
+            {
+                "line": 10,
+                "title": "가비지 컬렉션 (Scavenge)",
+                "explanation": "`createTemp()`가 끝나면 `temp` 객체는 접근 불가능해집니다.\n**Scavenger**가 재빠르게 돌면서 살아있는 것만 옆방(Survivor Space)으로 옮기고 방을 비웁니다.",
+                "highlight": [
+                    9,
+                    10
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "heap": [],
+                    "note": "0xNew1 객체는 도달 불가능해서 수거됨(Evacuated)"
+                }
+            },
+            {
+                "line": 13,
+                "title": "Old Generation 승진 (Promotion)",
+                "explanation": "`cache` 배열에 담긴 데이터는 계속 살아있습니다.\nScavenge(청소)를 2번 이상 버틴 객체는 **Old Generation**으로 '이사'를 갑니다.",
+                "keyInsight": "오래된 객체는 넓은 Old Space로 옮겨서, 자주 건드리지 않습니다.",
+                "highlight": [
+                    13,
+                    14,
+                    15
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "heap": [
+                        {
+                            "address": "0xOld1",
+                            "content": "{ type: 'important' }",
+                            "label": "Old Gen (Promoted)"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "quiz": {
+        "question": "대부분의 객체는 어디서 죽을까?",
+        "options": [
+            "Old Generation에서 오랫동안 살다가 죽는다",
+            "Young Generation에서 생성되자마자 금방 죽는다",
+            "스택(Stack)에서 죽는다",
+            "코드 영역에서 죽는다"
+        ],
+        "correctIndex": 1,
+        "explanation": "'가설: 대부분의 객체는 일찍 죽는다(The Generational Hypothesis)'에 따라 V8은 Young Generation 청소를 매우 자주, 빠르게 수행합니다."
+    },
+    "misconceptions": [
+        {
+            "wrong": "GC가 돌면 프로그램이 멈추지 않는다",
+            "correct": "멈춥니다(Stop-the-world). 하지만 V8은 이를 아주 짧게 쪼개서(Incremental) 사용자가 눈치채지 못하게 합니다.",
+            "why": "메모리를 정리하는 동안에는 메모리 주소가 바뀔 수 있어서 JS 실행을 잠깐 멈춰야 합니다."
+        }
+    ],
+    "keyTakeaway": "객체 수명주기: Young(빠른 생성/사망) -> (생존) -> Old(느린 정리, 거대함)"
+}

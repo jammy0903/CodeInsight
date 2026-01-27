@@ -1,0 +1,71 @@
+{
+    "lessonId": "js-7-3",
+    "title": "최적화 킬러 (Deoptimization)",
+    "concept": "엔진이 세운 '가정'을 깨뜨리면, 최적화된 코드를 버리고 느린 모드로 돌아간다(Deopt)",
+    "content": {
+        "code": "function add(a, b) {\n  return a + b;\n}\n\n// 1. 학습 기간: 계속 숫자만 넣음\nfor (let i = 0; i < 10000; i++) {\n  add(i, i);\n}\n// -> 엔진: \"아, add 함수는 (int, int)만 받는구나!\" (기계어로 컴파일)\n\n// 2. 배신: 갑자기 문자열을 넣음\nadd('Hello', 'World');\n// -> 엔진: \"?? 숫자가 아니네?\"\n// -> 최적화된 기계어 폐기 (Deopt) -> 느린 실행",
+        "steps": [
+            {
+                "line": 1,
+                "title": "TurboFan의 감시",
+                "explanation": "엔진(TurboFan)은 코드를 실행하면서 입력값의 타입을 유심히 지켜봅니다.",
+                "highlight": [
+                    1,
+                    2,
+                    3
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "note": "add 함수: Profiling 중..."
+                }
+            },
+            {
+                "line": 6,
+                "title": "핫(Hot) 함수 최적화",
+                "explanation": "반복문으로 10,000번 실행하면 이 함수는 'Hot'해집니다.\n엔진은 \"a와 b는 무조건 정수(Smi)\"라고 **가정(Speculation)**하고 최적화된 기계어를 만듭니다.",
+                "keyInsight": "JS가 빠른 이유 = 타입을 추측해서 미리 컴파일하기 때문",
+                "highlight": [
+                    6,
+                    7,
+                    8
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "note": "Optimized Code 생성됨 (Only for Integers)"
+                }
+            },
+            {
+                "line": 12,
+                "title": "Deoptimization (최적화 해제)",
+                "explanation": "갑자기 문자열 'Hello'가 들어옵니다. '정수만 들어온다'는 가정이 깨졌습니다.\n엔진은 즉시 최적화 코드를 버리고(Deopt), 안전하지만 느린 바이트코드 해석기로 돌아갑니다.",
+                "highlight": [
+                    12
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "note": "Deopt! -> Bailout to Interpreter",
+                    "warning": "성능 저하 발생"
+                }
+            }
+        ]
+    },
+    "quiz": {
+        "question": "함수의 성능을 유지하려면 어떻게 해야 할까?",
+        "options": [
+            "최대한 다양한 타입을 인자로 넘긴다",
+            "항상 같은 타입의 매개변수를 받도록 작성한다 (Monomorphic)",
+            "함수 내부를 최대한 복잡하게 만든다",
+            "eval()을 자주 사용한다"
+        ],
+        "correctIndex": 1,
+        "explanation": "같은 타입(모양)의 데이터만 들어와야(Monomorphic) 엔진의 가정이 깨지지 않고 최적화 상태가 유지됩니다. 여러 타입이 섞이면(Polymorphic/Megamorphic) 느려집니다."
+    },
+    "misconceptions": [
+        {
+            "wrong": "JS는 컴파일 언어가 아니다",
+            "correct": "현대 JS(V8)는 **JIT(Just-In-Time) 컴파일러**를 사용합니다. 실행 중에 실시간으로 기계어로 번역합니다.",
+            "why": "단순 인터프리터 방식으로는 지금의 웹 성능을 낼 수 없습니다."
+        }
+    ],
+    "keyTakeaway": "변수나 함수의 인자 타입을 일관되게 유지해야(Monomorphic) 최고 성능이 나옵니다."
+}

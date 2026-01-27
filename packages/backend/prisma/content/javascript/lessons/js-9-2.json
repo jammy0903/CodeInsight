@@ -1,0 +1,119 @@
+{
+    "lessonId": "js-9-2",
+    "title": "제너레이터 (Generators)",
+    "concept": "함수의 실행을 중간에 멈췄다가(yield), 나중에 다시 이어서(next) 실행할 수 있다",
+    "content": {
+        "code": "function* counter() {\n  console.log('Start');\n  yield 1;\n  console.log('Resume');\n  yield 2;\n  console.log('End');\n}\n\nconst gen = counter(); // 실행 안 됨! 이터레이터 반환\n\nconsole.log(gen.next()); // { value: 1, done: false }\nconsole.log(gen.next()); // { value: 2, done: false }\nconsole.log(gen.next()); // { value: undefined, done: true }",
+        "steps": [
+            {
+                "line": 1,
+                "title": "제너레이터 정의",
+                "explanation": "`function*` 문법을 사용합니다. 이 함수는 호출해도 코드가 바로 실행되지 않습니다.",
+                "highlight": [
+                    1
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "stack": [
+                        {
+                            "name": "counter",
+                            "value": "GeneratorFunction"
+                        }
+                    ]
+                }
+            },
+            {
+                "line": 8,
+                "title": "이터레이터 생성",
+                "explanation": "`counter()`를 호출하면 제어 객체(Generator Object)만 반환하고 멈춰있습니다(Suspended).",
+                "keyInsight": "Execution Context가 생성되었지만, 실행은 보류됨.",
+                "highlight": [
+                    8
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "stack": [
+                        {
+                            "name": "gen",
+                            "value": "→ 0xGen"
+                        }
+                    ],
+                    "heap": [
+                        {
+                            "address": "0xGen",
+                            "content": "Generator { status: 'suspended' }"
+                        }
+                    ]
+                }
+            },
+            {
+                "line": 10,
+                "title": "첫 번째 yield",
+                "explanation": "`gen.next()`를 하면 'Start'를 찍고 `yield 1`에서 멈춥니다.\n값 1을 밖으로 던져줍니다.",
+                "highlight": [
+                    2,
+                    3,
+                    10
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "output": [
+                        "Start",
+                        "{ value: 1, done: false }"
+                    ],
+                    "heap": [
+                        {
+                            "address": "0xGen",
+                            "content": "Generator { status: 'suspended', line: 3 }"
+                        }
+                    ]
+                }
+            },
+            {
+                "line": 11,
+                "title": "재개 (Resume)",
+                "explanation": "다시 `next()`를 호출하면 멈췄던 곳(Line 3)부터 다시 실행합니다.\n'Resume'을 찍고 `yield 2`에서 또 멈춥니다.",
+                "keyInsight": "함수의 스택 프레임(변수 등)이 사라지지 않고 유지됩니다.",
+                "highlight": [
+                    4,
+                    5,
+                    11
+                ],
+                "visualizationType": "memory",
+                "memoryState": {
+                    "output": [
+                        "Start",
+                        "{ value: 1, done: false }",
+                        "Resume",
+                        "{ value: 2, done: false }"
+                    ],
+                    "heap": [
+                        {
+                            "address": "0xGen",
+                            "content": "Generator { status: 'suspended', line: 5 }"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "quiz": {
+        "question": "제너레이터는 언제 종료(done: true)될까?",
+        "options": [
+            "yield를 만났을 때",
+            "함수 끝(return)에 도달했을 때",
+            "next()를 처음 호출했을 때",
+            "영원히 종료되지 않는다"
+        ],
+        "correctIndex": 1,
+        "explanation": "더 이상 실행할 코드가 없거나 `return`문을 만나면 `{ value: ..., done: true }`가 반환됩니다."
+    },
+    "misconceptions": [
+        {
+            "wrong": "제너레이터는 멀티 스레드다",
+            "correct": "아닙니다. 싱글 스레드입니다. 단지 실행을 '협력적(Cooperative)'으로 양보할 뿐입니다.",
+            "why": "한 번에 한 줄만 실행됩니다. 병렬 실행이 아닙니다."
+        }
+    ],
+    "keyTakeaway": "Redux-Saga 같은 곳에서 비동기 흐름을 동기 코드처럼 제어할 때 쓰임."
+}
