@@ -46,6 +46,11 @@ export function StepControls({
     try {
       const result = await simulatorService.simulate(language, { code });
 
+      // DEBUG: 시뮬레이션 결과 확인
+      if (import.meta.env.DEV && result.steps?.length > 0) {
+        console.log('[StepControls] First step:', JSON.stringify(result.steps[0], null, 2));
+      }
+
       if (!result.success) {
         setError(result.error || 'Simulation failed');
         return;
