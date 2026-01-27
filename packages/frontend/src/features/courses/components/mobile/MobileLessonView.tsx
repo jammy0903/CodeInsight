@@ -7,15 +7,18 @@
  * - 페이지 2: 설명 + 시각화 (메모리 or 플로우)
  */
 
-import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Code2, Play, ChevronUp, ChevronDown } from 'lucide-react';
+import { useState, useRef, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Code2, Play, ChevronUp, ChevronDown, Layers } from 'lucide-react';
 import { useStepGestures } from '../../hooks/useStepGestures';
 import { useLessonVisualization } from '../../hooks/useLessonVisualization';
 import { useSlidingPages } from '@/hooks/useSlidingPages';
 import { LessonCodeEditor } from '../day/LessonCodeEditor';
+import { MemoryPanel } from '../memory/MemoryPanel';
 
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
+import { JavaMemoryView, toJavaMemoryViewProps } from '@/features/visualizers/java';
+import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { MobileAIChatFAB } from './MobileAIChatFAB';
 import { MobileAIChatModal } from './MobileAIChatModal';
 import type { LessonStep } from '@/types';
@@ -67,10 +70,28 @@ export function MobileLessonView({
     visual: { x: '-50%' }
   };
 
+  // 시각화 탭 전환 Variants (Flow ↔ Memory)
+  const visualizationVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 10 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.3, ease: 'easeOut' }
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.95,
+      y: -10,
+      transition: { duration: 0.2 }
+    }
+  };
+
   const isAIChatOpenState = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = isAIChatOpenState;
 
   const [isExplanationCollapsed, setIsExplanationCollapsed] = useState(false);
+  const [activeVisualizationTab, setActiveVisualizationTab] = useState<'flow' | 'memory'>('flow');
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[currentStepIndex];
@@ -78,10 +99,22 @@ export function MobileLessonView({
   const isLastStep = currentStepIndex >= steps.length - 1;
 
   // 데스크톱과 동일한 시각화 훅 사용
-  const { memoryState } = useLessonVisualization(
+  const { memoryState, changedBlocks } = useLessonVisualization(
     steps,
     currentStepIndex
   );
+
+  // 터미널 출력 라인 변환 (데스크톱과 동일)
+  const terminalLines = useMemo((): TerminalLine[] => {
+    if (!currentStep?.stdout) return [];
+    return currentStep.stdout
+      .split('\n')
+      .filter(Boolean)
+      .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+  }, [currentStep?.stdout]);
+
+  // Memory 탭 표시 여부 (Java, C만)
+  const showMemoryTab = languageId === 'java' || languageId === 'c';
 
   // 스텝 제스처 (키보드 ← →, 탭/클릭)
   const { handleTapArea } = useStepGestures({
@@ -226,30 +259,117 @@ export function MobileLessonView({
             );
           })()}
 
-          {/* 페이지 2: Flow 시각화 */}
+          {/* 페이지 2: Flow/Memory 시각화 */}
           <div className="w-1/2 h-full p-1" onClick={handleTapArea}>
             <div className="h-full rounded-lg border border-[var(--theme-lesson-panel-border)] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--theme-lesson-panel-bg)' }}>
-              {/* 헤더 */}
-              <div className="flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                <Play className="w-3 h-3" />
-                Flow
+              {/* 헤더: Flow/Memory 탭 버튼 */}
+              <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--theme-lesson-panel-border)' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveVisualizationTab('flow');
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-all"
+                  style={{
+                    background: activeVisualizationTab === 'flow'
+                      ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                      : 'var(--theme-lesson-tab-inactive-bg)',
+                    color: activeVisualizationTab === 'flow' ? '#fff' : 'var(--theme-lesson-tab-inactive-text)',
+                    borderRight: '1px solid var(--theme-lesson-panel-border)',
+                  }}
+                >
+                  <Play className="w-3 h-3" />
+                  Flow
+                </button>
+                {showMemoryTab && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveVisualizationTab('memory');
+                    }}
+                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-all"
+                    style={{
+                      background: activeVisualizationTab === 'memory'
+                        ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                        : 'var(--theme-lesson-tab-inactive-bg)',
+                      color: activeVisualizationTab === 'memory' ? '#fff' : 'var(--theme-lesson-tab-inactive-text)',
+                    }}
+                  >
+                    <Layers className="w-3 h-3" />
+                    Memory
+                  </button>
+                )}
               </div>
 
-              {/* 콘텐츠 */}
-              <div className="flex-1 overflow-y-auto p-2">
-                <LessonFlowVisualizer
-                  step={currentStep}
-                  prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] : null}
-                  language={languageId === 'python-practical' ? 'python' : (languageId as 'c' | 'python' | 'java')}
-                  fullCode={code}
-                  theme="light"
-                  memoryState={memoryState ? {
-                    stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
-                    heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' })),
-                    frames: memoryState.frames.map(f => ({ ...f, name: f.name || '?' }))
-                  } : undefined}
-                  stdout={currentStep?.stdout}
-                />
+              {/* 콘텐츠: AnimatePresence + variants로 전환 */}
+              <div className="flex-1 overflow-y-auto p-2 relative">
+                <AnimatePresence mode="wait">
+                  {activeVisualizationTab === 'flow' ? (
+                    <motion.div
+                      key="flow"
+                      variants={visualizationVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="w-full"
+                    >
+                      <LessonFlowVisualizer
+                        step={currentStep}
+                        prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] : null}
+                        language={languageId === 'python-practical' ? 'python' : (languageId as 'c' | 'python' | 'java')}
+                        fullCode={code}
+                        theme="light"
+                        memoryState={memoryState ? {
+                          stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
+                          heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' })),
+                          frames: memoryState.frames.map(f => ({ ...f, name: f.name || '?' }))
+                        } : undefined}
+                        stdout={currentStep?.stdout}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="memory"
+                      variants={visualizationVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="w-full"
+                    >
+                      {languageId === 'java' ? (
+                        <>
+                          <JavaMemoryView {...toJavaMemoryViewProps(currentStep)} />
+                          {terminalLines.length > 0 && (
+                            <TerminalOutput
+                              lines={terminalLines}
+                              title="출력"
+                              compact
+                              className="mt-4"
+                            />
+                          )}
+                        </>
+                      ) : languageId === 'c' && memoryState ? (
+                        <>
+                          <MemoryPanel
+                            stack={memoryState.stack}
+                            heap={memoryState.heap}
+                            changedBlocks={changedBlocks}
+                            frames={memoryState.frames}
+                            showRegisters={true}
+                          />
+                          {terminalLines.length > 0 && (
+                            <TerminalOutput
+                              lines={terminalLines}
+                              title="출력"
+                              compact
+                              className="mt-4"
+                            />
+                          )}
+                        </>
+                      ) : null}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
