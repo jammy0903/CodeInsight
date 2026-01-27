@@ -1,4 +1,4 @@
-import { useEffect, RefObject } from 'react';
+import { useEffect, type RefObject } from 'react';
 
 interface UseFocusCycleOptions {
   // 포커스를 관리할 요소들이 담긴 부모 컨테이너의 ref
