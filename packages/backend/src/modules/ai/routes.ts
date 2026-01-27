@@ -343,7 +343,10 @@ ${topic ? `## 현재 학습 주제\n${topic}` : ''}`;
 /**
  * Q&A 대화용 시스템 프롬프트 (상세하게)
  */
-function buildChatPrompt(context?: z.infer<typeof chatRequestSchema>['context']): string {
+function buildChatPrompt(
+  context?: z.infer<typeof chatRequestSchema>['context'],
+  history?: Array<{ role: string; content: string }>
+): string {
   let prompt = `당신은 코드 실행 원리를 설명하는 친절한 해설자입니다.
 사용자는 코드가 "왜" 그렇게 동작하는지 이해하려는 학습자입니다.
 
@@ -374,17 +377,23 @@ function buildChatPrompt(context?: z.infer<typeof chatRequestSchema>['context'])
 - 응답: "음... 그건 지금 배우는 내용이 아니에요! 😅 현재 코드에 대해 궁금한 게 있으면 물어봐 주세요~"
 
 ## 스타일 (매우 중요!)
-- 한국어, 친근한 반말
+- **한국어, 친근한 반말** (필수!)
+- **친화적이고 공감하는 말투**: "~해!", "~야", "~지?", 이모지 적극 사용 😊
 - **무조건 3줄 이내** (3문장 = 3줄)
 - 비유는 한 줄로 직관적으로
-- 코드 예시 금지 (공간 낭비, 설명으로만)
+- **코드 예시는 한 줄만**: \`int x = 5;\` 처럼 짧게 (여러 줄 금지)
 - 착각 포인트는 "💡 ~라고 착각하기 쉬운데..." 형식
 
-## ✅ 좋은 응답 예시 (3줄)
+## ✅ 좋은 응답 예시 (3줄, 친화적 말투)
 Q: "포인터가 뭐야?"
-A: "포인터는 메모리 주소를 저장하는 변수야!
-집 주소 적어둔 메모지라고 생각하면 돼.
+A: "포인터는 메모리 주소를 저장하는 변수야! 😊
+집 주소 적어둔 메모지처럼 생각하면 돼.
 💡 많은 사람들이 포인터 자체가 값을 갖는다고 착각하는데, 주소만 갖고 있어!"
+
+Q: "어떻게 사용해?"
+A: "\`int *ptr = &x;\` 이렇게 &로 주소를 가져와서 포인터에 저장해!
+그럼 ptr은 x의 주소를 가리키게 돼.
+\`*ptr\`로 x의 값을 읽거나 바꿀 수 있어. 🎯"
 
 ## ❌ 나쁜 응답 예시 (4줄 이상 - 절대 금지!)
 "포인터는 메모리 주소를 저장하는 변수예요.
@@ -392,6 +401,25 @@ C언어의 핵심 개념 중 하나죠.
 집 주소를 적어둔 메모지처럼 생각하면 이해하기 쉬워요.
 포인터를 사용하면 메모리를 직접 제어할 수 있어요."
 → 4줄이라서 절대 금지! 3줄로 줄여야 함!`;
+
+  // 5번째 질문부터 이전 대화 요약 추가 (history.length >= 8이면 4쌍 존재)
+  if (history && history.length >= 8) {
+    const recentHistory = history.slice(-8); // 마지막 4쌍 (8개 메시지)
+    let summaryText = '\n\n## 📝 이전 대화 요약 (참고용)\n';
+
+    for (let i = 0; i < recentHistory.length; i += 2) {
+      const userMsg = recentHistory[i];
+      const assistantMsg = recentHistory[i + 1];
+
+      if (userMsg && assistantMsg) {
+        const qNum = Math.floor(i / 2) + 1;
+        summaryText += `Q${qNum}: ${userMsg.content}\nA${qNum}: ${assistantMsg.content}\n\n`;
+      }
+    }
+
+    summaryText += '위 대화를 참고하여 이번 질문에 답변해주세요. (새로운 답변도 3줄 제한 유지!)';
+    prompt += summaryText;
+  }
 
   if (context) {
     if (context.courseDay && context.topic) {
@@ -709,7 +737,7 @@ router.post('/chat', optionalDbUser, async (req, res) => {
     const response = await provider.chat({
       message,
       history,
-      systemPrompt: buildChatPrompt(context),
+      systemPrompt: buildChatPrompt(context, history),
     });
 
     // 로그인 사용자인 경우 ChatHistory 저장 (비동기, 실패해도 응답에 영향 없음)
@@ -782,7 +810,7 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
       const response = await provider.chat({
         message,
         history,
-        systemPrompt: buildChatPrompt(context),
+        systemPrompt: buildChatPrompt(context, history),
       });
 
       fullResponse = response.content;
@@ -808,7 +836,7 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
       {
         message,
         history,
-        systemPrompt: buildChatPrompt(context),
+        systemPrompt: buildChatPrompt(context, history),
       },
       (chunk) => {
         // 청크 내용 수집
