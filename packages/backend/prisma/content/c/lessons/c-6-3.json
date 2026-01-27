@@ -1,120 +1,67 @@
 {
   "lessonId": "c-6-3",
-  "title": "구조체 기본",
-  "concept": "구조체는 여러 타입의 데이터를 하나로 묶는다",
+  "title": "Struct Basics",
+  "concept": "여러 변수를 하나로 묶어주는 꾸러미 (사용자 정의 타입)",
   "content": {
-    "code": "#include <stdio.h>\n\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    struct Point p1;\n    p1.x = 10;\n    p1.y = 20;\n    \n    struct Point p2 = {30, 40};\n    \n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);\n    printf(\"sizeof(Point): %lu\\n\", sizeof(struct Point));\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\n// Point라는 설계도 작성\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    // 객체(구조체 변수) 생성\n    struct Point p1 = {10, 20};\n    \n    // 멤버 접근 (.)\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    \n    // 대입 연산\n    struct Point p2 = p1; // 전체 복사!\n    p2.x = 99;\n    \n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);\n    \n    return 0;\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "구조체 정의",
-        "explanation": "struct Point는 int x와 int y를 포함하는 **새로운 타입**을 정의합니다.\n\n**왜 구조체가 필요할까?**\n\n**문제:** 관련된 데이터를 따로 관리하면 불편함\n```c\n// 점 3개를 관리하려면...\nint x1, y1;  // 점1\nint x2, y2;  // 점2\nint x3, y3;  // 점3\n// 변수가 너무 많아짐!\n```\n\n**해결:** 구조체로 묶기\n```c\nstruct Point p1, p2, p3;  // 깔끔!\n```\n\n**구조체의 역할:**\n- 관련 데이터를 **하나의 단위**로 묶음\n- 함수에 **한 번에** 전달 가능\n- 배열로 만들어 **여러 개** 관리 가능",
-        "highlight": [
-          3,
-          4,
-          5,
-          6
-        ],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          }
-        ]
-      },
-      {
         "line": 9,
-        "title": "구조체 변수 선언",
-        "explanation": "p1이 스택에 할당됩니다. **x와 y가 연속된 메모리에 배치**됩니다.\n\n**메모리 레이아웃:**\n```\np1의 시작 주소: 0x7ffc1000\n├─ x: 0x7ffc1000 (4바이트)\n└─ y: 0x7ffc1004 (4바이트)\n총 8바이트\n```\n\n**왜 연속일까?**\n- 구조체 멤버는 **선언 순서대로** 배치\n- p1의 주소 = **첫 번째 멤버(x)의 주소**\n- 배열처럼 **연속된 메모리** 사용",
+        "title": "구조체 메모리 배치",
+        "explanation": "**`struct Point p1;`**\n`int` 두 개가 연속으로 붙어있는 8바이트 공간이 생깁니다.\n배열은 같은 타입만 묶지만, 구조체는 다른 타입도 묶을 수 있습니다.",
         "highlight": [
-          9,
-          10,
-          11
+          9
         ],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p1.x",
-            "type": "int",
-            "size": 4,
-            "value": 10,
-            "address": "0x7ffc1000",
-            "frame": "main"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p1.y",
-            "type": "int",
-            "size": 4,
-            "value": 20,
-            "address": "0x7ffc1004",
-            "frame": "main"
-          }
-        ]
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "{x:10, y:20}",
+              "type": "Point",
+              "size": 8
+            }
+          ],
+          "output": [
+            "p1: (10, 20)"
+          ]
+        }
       },
       {
-        "line": 13,
-        "title": "초기화 문법",
-        "explanation": "{30, 40}으로 **선언과 동시에 초기화**할 수 있습니다.\n\n**여러 초기화 방법:**\n```c\n// 방법 1: 선언 후 개별 설정\nstruct Point p1;\np1.x = 10;\np1.y = 20;\n\n// 방법 2: 중괄호 초기화 (순서대로)\nstruct Point p2 = {30, 40};\n\n// 방법 3: 지정 초기화 (C99+)\nstruct Point p3 = {.x = 50, .y = 60};\nstruct Point p4 = {.y = 80, .x = 70};  // 순서 바꿔도 OK!\n```\n\n**추천:** 지정 초기화가 가장 명확합니다!",
+        "line": 15,
+        "title": "구조체 복사",
+        "explanation": "**`p2 = p1;`**\n놀랍게도 C언어 구조체는 대입(`=`)하면 **모든 멤버가 통째로 복사**됩니다.\n\nJava나 Python처럼 '참조'가 넘어가는 게 아닙니다. 완전히 독립된 `p2`가 생깁니다.\n그래서 `p2`를 고쳐도 `p1`은 멀쩡합니다.",
         "highlight": [
-          13
+          15,
+          16
         ],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p2.x",
-            "type": "int",
-            "size": 4,
-            "value": 30,
-            "address": "0x7ffc0ff8",
-            "frame": "main"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p2.y",
-            "type": "int",
-            "size": 4,
-            "value": 40,
-            "address": "0x7ffc0ffc",
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 17,
-        "title": "구조체 크기",
-        "explanation": "sizeof(struct Point) = 8. int 두 개(4+4)입니다.\n\n**왜 패딩이 생길까?**\n\nCPU는 **정렬된 주소**에서 더 빠르게 읽습니다:\n- int는 4의 배수 주소에서 읽는 게 효율적\n- 컴파일러가 **빈 공간(패딩)**을 추가해서 정렬\n\n**패딩 예시:**\n```c\nstruct Bad {\n    char a;   // 1바이트\n    // 패딩 3바이트 (int 정렬용)\n    int b;    // 4바이트\n};  // 총 8바이트 (5 아님!)\n\nstruct Good {\n    int b;    // 4바이트\n    char a;   // 1바이트\n    // 패딩 3바이트 (구조체 정렬용)\n};  // 총 8바이트\n```\n\n**팁:** 큰 타입부터 선언하면 패딩을 줄일 수 있어요!",
-        "highlight": [
-          17
-        ],
-        "stdout": "p1: (10, 20)\np2: (30, 40)\nsizeof(Point): 8",
-        "memoryChanges": []
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "p1: (10, 20)",
+            "p2: (99, 20)"
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "struct { int a; char b; }의 크기는? (64비트, 일반적인 경우)",
+    "question": "구조체 멤버에 접근하는 연산자는?",
     "options": [
-      "5",
-      "8",
-      "12",
-      "컴파일러마다 다름"
+      "->",
+      ".",
+      "::",
+      "$"
     ],
     "correctIndex": 1,
-    "explanation": "int(4) + char(1) = 5이지만, 정렬을 위해 패딩 3바이트가 추가되어 8바이트입니다."
+    "explanation": "변수 자체에서 멤버로 들어갈 땐 점(`.`)을 씁니다. 포인터일 땐 화살표(`->`)를 씁니다."
   },
   "misconceptions": [
     {
-      "wrong": "구조체 멤버는 빈틈없이 저장된다",
-      "correct": "정렬(alignment)을 위해 패딩 바이트가 추가될 수 있습니다.",
-      "why": "CPU가 정렬된 주소에서 더 빠르게 데이터를 읽기 때문입니다."
+      "wrong": "구조체 크기는 멤버들 크기의 합이다",
+      "correct": "대부분 맞지만, 패딩(Padding) 때문에 더 클 수 있습니다.",
+      "why": "CPU가 데이터를 빠르게 읽기 위해 중간중간 빈 공간(Padding)을 끼워넣어 줄을 맞춥니다 (Memory Alignment)."
     }
   ],
-  "keyTakeaway": "구조체 = 여러 변수를 하나로 묶은 사용자 정의 타입"
+  "keyTakeaway": "연관된 데이터는 `struct`로 묶자. `=` 쓰면 값이 통째로 복사된다."
 }

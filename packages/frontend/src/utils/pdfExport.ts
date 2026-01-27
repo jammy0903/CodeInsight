@@ -62,7 +62,7 @@ export async function exportToPdf(
       after: '.page-break-after',
       avoid: ['.keep-together', '.report-card', 'tr', 'thead'],
     },
-  };
+  } as const;
 
   try {
     await html2pdf().set(opt).from(element).save();

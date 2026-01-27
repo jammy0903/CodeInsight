@@ -21,7 +21,6 @@ const getLanguageInfo = (lang: SupportedLanguage | null) => {
     case 'java': return { name: 'Java', icon: '☕', color: '#EC4899' };
     case 'javascript': return { name: 'JavaScript', icon: '⚡', color: '#81C784' };
     case 'python-practical': return { name: 'Python실용', icon: '🤖', color: '#9E9E9E' };
-    default: return { name: lang.toUpperCase(), icon: '📚', color: '#FFD700' };
   }
 };
 

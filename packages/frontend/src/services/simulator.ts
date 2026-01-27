@@ -9,7 +9,7 @@
 
 import { api } from './api/axios';
 import { AxiosError } from 'axios';
-import type { LessonStep, MemoryBlock } from '@/types';
+import type { LessonStep, MemoryBlock, SupportedLanguage } from '@/types';
 import { handleSimulatorError, notifySimulator } from '@/components/common/Toast';
 
 // =============================================
@@ -63,9 +63,6 @@ interface PySimulateResult {
   steps: PyStep[];
   error?: string;
 }
-
-// 지원 언어
-export type SupportedLanguage = 'c' | 'python' | 'java' | 'javascript';
 
 // 시뮬레이션 요청
 interface SimulateRequest {

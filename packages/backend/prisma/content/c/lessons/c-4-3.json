@@ -1,104 +1,85 @@
 {
   "lessonId": "c-4-3",
-  "title": "포인터로 원본 수정",
-  "concept": "포인터를 전달하면 원본의 주소를 알 수 있어 간접적으로 수정 가능",
+  "title": "Call by Reference (Pointer)",
+  "concept": "원본을 바꾸고 싶다면, 변수의 '주소'를 넘겨라",
   "content": {
-    "code": "#include <stdio.h>\n\nvoid addOne(int *p) {\n    *p = *p + 1;\n    printf(\"함수 내 *p: %d\\n\", *p);\n}\n\nint main() {\n    int x = 10;\n    printf(\"호출 전 x: %d\\n\", x);\n    addOne(&x);\n    printf(\"호출 후 x: %d\\n\", x);\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nvoid reallyChange(int *p) {\n    *p = 999; // 주소를 찾아가서 값 변경\n    printf(\"Inside func: Changed!\\n\");\n}\n\nint main() {\n    int a = 10;\n    \n    printf(\"Before: %d\\n\", a);\n    reallyChange(&a); // 주소(&) 전달\n    printf(\"After:  %d\\n\", a);\n    \n    return 0;\n}",
     "steps": [
       {
-        "line": 9,
-        "title": "main에서 x 생성",
-        "explanation": "x에 **10**이 저장됩니다. 주소는 0x7ffc1000.\n\n**이전 레슨 복습:** Call by Value로는 원본 수정이 안 됐죠?\n\n**이번 레슨의 목표:** 포인터를 사용해서 원본을 수정해 볼 거예요!\n\n핵심은 **주소 전달** + **역참조**입니다.",
-        "highlight": [9],
-        "stdout": "호출 전 x: 10",
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "x",
-            "type": "int",
-            "size": 4,
-            "value": 10,
-            "address": "0x7ffc1000",
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 11,
-        "title": "주소 전달",
-        "explanation": "addOne(**&x**)는 x의 **'주소'**를 전달합니다!\n\n**이전 레슨과의 차이:**\n- 이전: addOne(x) → 값 10이 복사됨\n- 이번: addOne(&x) → 주소 0x7ffc1000이 복사됨\n\n**왜 주소를 전달할까?**\n- 주소를 알면 **원본 위치**를 알 수 있어요\n- 그 위치에 가서 값을 **직접 수정** 가능!\n\n**p는 x의 복사본이 아닙니다!** p는 x의 **위치 정보**를 가지고 있어요.",
-        "highlight": [11, 3],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "addOne",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p",
-            "type": "int*",
-            "size": 8,
-            "value": "0x7ffc1000",
-            "frame": "addOne",
-            "pointsTo": "x"
-          }
-        ]
+        "line": 3,
+        "title": "주소 전달 (Pass by Address)",
+        "explanation": "`reallyChange(&a)`\n값을 복사하는 대신, `a`가 있는 **주소**를 알려줍니다.\n\n매개변수 `p`는 이제 `a`가 있는 곳을 가리키는 포인터가 됩니다.",
+        "highlight": [
+          3,
+          11
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "type": "int",
+              "frame": "main",
+              "address": "0x1000"
+            },
+            {
+              "name": "p",
+              "value": "0x1000",
+              "type": "int*",
+              "frame": "reallyChange",
+              "pointsTo": "a"
+            }
+          ],
+          "output": [
+            "Before: 10"
+          ]
+        }
       },
       {
         "line": 4,
-        "title": "역참조로 원본 수정!",
-        "explanation": "*p = *p + 1은 p가 가리키는 **x를 11로 변경**합니다!\n\n**마법의 순간:** 원본이 수정됐어요!\n\n**동작 분석:**\n1. *p → p가 가리키는 곳(x)의 값을 읽음 (10)\n2. 10 + 1 = 11\n3. *p = 11 → x의 메모리에 11을 **직접 씀**\n\n**왜 원본이 수정될까?**\n- p는 x의 **주소**를 알고 있음\n- *p로 그 주소에 **직접 접근**\n- 복사본이 아닌 **진짜 x**를 수정!\n\n**이것이 포인터의 힘입니다!**",
-        "highlight": [4],
-        "stdout": "함수 내 *p: 11",
-        "memoryChanges": [
-          {
-            "action": "update",
-            "area": "stack",
-            "name": "x",
-            "value": 11,
-            "previousValue": 10,
-            "frame": "main",
-            "updatedVia": "p"
-          }
-        ]
-      },
-      {
-        "line": 12,
-        "title": "원본 변경 확인",
-        "explanation": "x가 **11**로 변경되었습니다!\n\n**Call by Value vs 포인터 전달:**\n| 방식 | 전달되는 것 | 원본 수정 |\n|------|-----------|----------|\n| void foo(int n) | 값 복사 | ❌ 불가 |\n| void foo(int *p) | 주소 복사 | ⭕ 가능 |\n\n**자주 쓰이는 패턴 - swap 함수:**\n```c\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n```\n\n**결론:** 원본 수정이 필요하면 **포인터로 주소를 전달**하세요!",
-        "highlight": [12],
-        "stdout": "호출 후 x: 11",
-        "memoryChanges": []
+        "title": "역참조로 수정",
+        "explanation": "**`*p = 999`**\n\"`p`가 가리키는 곳(`a`의 집)으로 가서 내용을 999로 바꿔라!\"\n이번엔 원본 `a`가 직접 수정됩니다.\n\n이것을 C언어에서는 **Call by Reference** 흉내내기(Simulated Call by Reference)라고 합니다.",
+        "highlight": [
+          4
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "999",
+              "type": "int",
+              "frame": "main",
+              "address": "0x1000",
+              "highlight": true
+            }
+          ],
+          "output": [
+            "Inside func: Changed!",
+            "After:  999"
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "void swap(int *a, int *b) { int t=*a; *a=*b; *b=t; } 호출 후 x,y가 교환되는가?",
+    "question": "두 변수 a, b의 값을 서로 바꾸는 swap 함수를 만들려면 매개변수는?",
     "options": [
-      "예, 교환된다",
-      "아니오, 그대로다",
-      "컴파일 에러",
-      "결과를 알 수 없다"
+      "void swap(int x, int y)",
+      "void swap(int *x, int *y)",
+      "void swap(int &x, int &y)",
+      "int swap(int x, int y)"
     ],
-    "correctIndex": 0,
-    "explanation": "포인터로 원본 주소를 받아 역참조로 수정하면 원본이 변경됩니다."
+    "correctIndex": 1,
+    "explanation": "C언어에서 원본을 바꾸려면 포인터를 받아야 합니다. `swap(&a, &b)` 이렇게 호출합니다. (C++은 & 참조자가 있지만 C는 없습니다)"
   },
   "misconceptions": [
     {
-      "wrong": "C에서 원본을 수정할 수 없다",
-      "correct": "포인터를 전달하면 원본 주소를 알 수 있어 역참조로 수정 가능합니다.",
-      "why": "포인터도 '값으로' 전달되지만, 그 값이 주소이므로 원본에 접근할 수 있습니다."
+      "wrong": "Call by Reference는 메모리 복사가 안 일어난다",
+      "correct": "사실 '주소값'이 복사되는 것입니다.",
+      "why": "엄밀히 말하면 C는 **Call by Value**만 존재합니다. 단지 '주소라는 값'을 넘겨서 참조(Reference) 효과를 낼 뿐입니다."
     }
   ],
-  "keyTakeaway": "원본 수정 = 포인터 전달 + 역참조"
+  "keyTakeaway": "함수에서 원본을 바꾸려면 `&`로 주소를 넘기고, `*`로 받아서 고친다."
 }

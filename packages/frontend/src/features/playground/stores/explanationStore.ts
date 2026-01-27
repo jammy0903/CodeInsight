@@ -11,7 +11,7 @@
 
 import { create } from 'zustand';
 import { getStepExplanationStream } from '@/services/ai';
-import type { LessonStep } from '@/types';
+import type { LessonStep, SupportedLanguage } from '@/types';
 
 // 캐시 키 생성
 function getCacheKey(line: number, code: string): string {
@@ -29,7 +29,7 @@ interface QueueItem {
   step: LessonStep;
   fullCode: string;
   cacheKey: string;
-  language: 'c' | 'javascript' | 'python';
+  language: SupportedLanguage;
 }
 
 // 스토어 상태
@@ -46,7 +46,7 @@ interface ExplanationState {
   isProcessing: boolean;
 
   // 액션
-  startPrefetch: (steps: LessonStep[], fullCode: string, language: 'c' | 'javascript' | 'python') => void;
+  startPrefetch: (steps: LessonStep[], fullCode: string, language: SupportedLanguage) => void;
   stopPrefetch: () => void;
   getExplanation: (line: number, code: string) => string | null;
   isStreaming: (line: number, code: string) => boolean;

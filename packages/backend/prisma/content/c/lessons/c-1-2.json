@@ -1,106 +1,74 @@
 {
   "lessonId": "c-1-2",
-  "title": "변수 초기화와 값 저장",
-  "concept": "int a = 10;은 메모리 할당과 값 저장을 동시에 수행한다",
+  "title": "Initialization & Garbage Values",
+  "concept": "변수를 안전하게 쓰려면 반드시 초기화(Initialization) 해야 한다",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int b = 20;\n    a = 30;\n    printf(\"a=%d, b=%d\\n\", a, b);\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    // 1. 선언과 동시에 초기화\n    int score = 100;\n    \n    // 2. 나중에 할당\n    int level;\n    level = 1;\n    \n    printf(\"Score: %d, Level: %d\\n\", score, level);\n    return 0;\n}",
     "steps": [
       {
-        "line": 4,
-        "title": "변수 선언과 초기화",
-        "explanation": "int a = 10;은 두 가지 작업을 **한 번에** 수행합니다:\n1) **스택**에 4바이트 공간 할당\n2) 그 공간에 10 저장\n\n**왜 동시에 할까?** int a; a = 10;처럼 두 줄로 쓸 수도 있지만, 초기화를 깜빡하면 쓰레기 값 버그가 생깁니다. 한 줄로 쓰면 이런 실수를 방지할 수 있어요.\n\n**좋은 습관:** 변수는 선언할 때 바로 초기화하세요!",
-        "highlight": [
-          4
-        ],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "a",
-            "type": "int",
-            "size": 4,
-            "value": 10,
-            "address": "0x7ffc1000",
-            "frame": "main"
-          }
-        ]
-      },
-      {
         "line": 5,
-        "title": "두 번째 변수 초기화",
-        "explanation": "b도 **스택**에 연속해서 할당됩니다. 주소를 보세요: a는 0x7ffc1000, b는 0x7ffc0ffc. b가 더 **낮은 주소**에 있죠?\n\n**왜 스택은 아래로 자랄까?** 메모리에서 스택은 높은 주소에서 시작해서 낮은 주소로 자랍니다. 반대로 힙(Heap)은 낮은 주소에서 높은 주소로 자라요. 이렇게 서로 반대 방향으로 자라면 메모리를 효율적으로 쓸 수 있고, 둘이 충돌하는 걸 늦출 수 있습니다.",
+        "title": "초기화 (Initialization)",
+        "explanation": "**`int score = 100;`**\n메모리를 잡는 동시에 값 `100`을 채워 넣습니다.\n가장 안전하고 권장되는 방식입니다.\n\n이러면 쓰레기 값이 들어갈 틈이 없습니다.",
         "highlight": [
           5
         ],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "b",
-            "type": "int",
-            "size": 4,
-            "value": 20,
-            "address": "0x7ffc0ffc",
-            "frame": "main"
-          }
-        ]
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "score",
+              "value": "100",
+              "type": "int",
+              "address": "0x1004"
+            }
+          ]
+        }
       },
       {
-        "line": 6,
-        "title": "값 변경 (재할당)",
-        "explanation": "a = 30;은 a의 메모리 위치(0x7ffc1000)에 새 값 30을 **덮어씁니다**.\n\n**왜 덮어쓰기일까?** 변수는 메모리 주소의 '별명'입니다. a라는 이름은 항상 같은 주소(0x7ffc1000)를 가리켜요. 값을 바꿀 때 새 공간을 만드는 게 아니라, 같은 위치에 새 값을 써넣는 겁니다.\n\n이전 값 10은 어디로? 그냥 **사라집니다**. 메모리에는 30만 남아요.",
+        "line": 8,
+        "title": "선언 후 할당 (Assignment)",
+        "explanation": "**`int level;`** → 이 시점엔 쓰레기 값.\n**`level = 1;`** → 이제야 1이 저장됨.\n\n가능하면 변수는 사용하기 직전에 만드는 것이 좋습니다.",
         "highlight": [
-          6
+          8,
+          9
         ],
-        "memoryChanges": [
-          {
-            "action": "update",
-            "area": "stack",
-            "name": "a",
-            "type": "int",
-            "size": 4,
-            "value": 30,
-            "previousValue": 10,
-            "address": "0x7ffc1000",
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 7,
-        "title": "값 출력",
-        "explanation": "a=30, b=20이 출력됩니다. 각 변수는 독립적인 메모리 공간을 가집니다.",
-        "highlight": [
-          7
-        ],
-        "stdout": "a=30, b=20",
-        "memoryChanges": []
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "score",
+              "value": "100",
+              "type": "int",
+              "address": "0x1004"
+            },
+            {
+              "name": "level",
+              "value": "1",
+              "type": "int",
+              "address": "0x1000"
+            }
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "int x = 5; x = 10; 실행 후 메모리 상태는?",
+    "question": "변수 초기화를 깜빡하면 발생하는 문제는?",
     "options": [
-      "x에 5와 10 두 값이 저장됨",
-      "x에 10만 저장됨 (5는 덮어써짐)",
-      "x에 15가 저장됨",
-      "두 개의 x 변수가 생성됨"
+      "컴파일 에러가 나서 실행이 안 된다",
+      "항상 0으로 계산된다",
+      "쓰레기 값 때문에 엉뚱한 결과가 나오거나 버그가 생긴다",
+      "컴퓨터가 재부팅된다"
     ],
-    "correctIndex": 1,
-    "explanation": "변수에 새 값을 할당하면 같은 메모리 위치에 덮어씁니다. 이전 값은 사라집니다."
+    "correctIndex": 2,
+    "explanation": "대부분의 최신 컴파일러는 경고(Warning)를 주지만, 실행은 됩니다. 그리고 예측 불가능한 동작(Undefined Behavior)을 유발합니다."
   },
   "misconceptions": [
     {
-      "wrong": "변수에 값을 할당할 때마다 새 메모리가 할당된다",
-      "correct": "같은 변수에 값을 재할당하면 같은 메모리 위치에 덮어씁니다.",
-      "why": "변수 이름은 메모리 주소의 별명입니다. 한 번 할당된 주소는 변수가 사라질 때까지 유지됩니다."
+      "wrong": "나중에 값을 넣을 거니까 선언만 해둬도 된다",
+      "correct": "가능하다면 `int a = 0;` 처럼 기본값이라도 넣어두세요.",
+      "why": "코드가 길어지면 어디서 초기화했는지 잊어버리기 십상입니다."
     }
   ],
-  "keyTakeaway": "변수 = 메모리 주소의 별명, 값 변경 = 같은 위치에 덮어쓰기"
+  "keyTakeaway": "선언과 동시에 값을 넣어라. 그게 제일 안전하다."
 }

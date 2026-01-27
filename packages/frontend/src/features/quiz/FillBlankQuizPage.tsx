@@ -4,7 +4,7 @@
  * DESIGN: 언어별 챕터 선택 → 10문제 퀴즈 → 결과
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Code2, Check, X, RotateCcw, BookOpen } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -211,6 +211,7 @@ export function FillBlankQuizPage() {
   const [wrongCount, setWrongCount] = useState(0);
 
   const { setPageTitle } = useStore(); // useStore 훅 사용
+  const theme = LANGUAGE_THEMES[lang || 'c'] || LANGUAGE_THEMES.c;
 
   useEffect(() => {
     setPageTitle(
@@ -220,7 +221,6 @@ export function FillBlankQuizPage() {
     );
   }, [setPageTitle, theme.name, lang]);
 
-  const theme = LANGUAGE_THEMES[lang || 'c'] || LANGUAGE_THEMES.c;
   const chapters = QUIZ_DATA[lang || 'c'] || QUIZ_DATA.c;
 
   const currentQuiz = selectedChapter?.quizzes[currentIndex];

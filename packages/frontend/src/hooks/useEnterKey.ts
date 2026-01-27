@@ -12,7 +12,7 @@ export function useEnterKey({ onEnter, enabled = true, targetRef }: UseEnterKeyO
 
     const targetElement = targetRef?.current || window;
 
-    const handleKeyDown = (e: Event) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       // Type guard for KeyboardEvent
       if (!('key' in e)) return;
 

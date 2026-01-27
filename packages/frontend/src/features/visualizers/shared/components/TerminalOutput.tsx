@@ -54,7 +54,7 @@ const containerVariants = {
     y: 0,
     transition: { duration: 0.3, ease: 'easeOut' },
   },
-};
+} as const;
 
 const lineVariants = {
   hidden: { opacity: 0, x: -10 },

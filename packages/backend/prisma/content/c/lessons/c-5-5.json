@@ -1,123 +1,58 @@
 {
   "lessonId": "c-5-5",
-  "title": "Dangling Pointer",
-  "concept": "free 후에도 포인터를 사용하면 해제된 메모리에 접근하게 된다",
+  "title": "Dangling Pointers",
+  "concept": "반납한 주소증(포인터)을 계속 들고 있다가 사고 친다",
   "content": {
-    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = malloc(sizeof(int));\n    *p = 100;\n    \n    free(p);\n    // 여기서 p는 Dangling Pointer!\n    \n    // 위험한 시도들:\n    // printf(\"%d\\n\", *p);  // 해제된 메모리 읽기\n    // *p = 200;            // 해제된 메모리 쓰기\n    // free(p);             // Double free!\n    \n    p = NULL;  // 안전한 처리\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 10;\n    \n    free(p); // 반납 완료\n    // p는 이제 '유령(Dangling Pointer)'입니다.\n    \n    // *p = 20; // ❌ 위험! Use-After-Free 버그\n    \n    p = NULL; // ✅ 안전하게 무효화\n    \n    return 0;\n}",
     "steps": [
       {
-        "line": 5,
-        "title": "메모리 할당",
-        "explanation": "정상적으로 Heap 메모리가 할당됩니다.\n\n**이번 레슨의 핵심 주제: Dangling Pointer**\n\n**Dangling이란?** '매달려 있는, 허공에 떠 있는'이라는 뜻이에요.\n\n**비유:** 줄 끊어진 연처럼, 가리키던 대상이 사라졌는데 포인터만 남은 상태입니다.",
-        "highlight": [
-          5,
-          6
-        ],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "heap",
-            "type": "int",
-            "size": 4,
-            "value": 100,
-            "address": "0x55001000"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p",
-            "type": "int*",
-            "value": "0x55001000",
-            "pointsTo": "heap",
-            "frame": "main"
-          }
-        ]
-      },
-      {
         "line": 8,
-        "title": "free 호출",
-        "explanation": "메모리는 해제되지만 p는 **여전히 0x55001000을 가리킵니다**. 이것이 Dangling Pointer!\n\n**왜 p가 안 바뀔까?**\n- free(p)는 메모리만 반환\n- p **자체**는 수정하지 않음\n- Call by Value: free 함수 안에서 p를 바꿔도 원본은 그대로\n\n**상태 변화:**\n| 변수 | free 전 | free 후 |\n|------|---------|--------|\n| p | 0x55001000 (유효) | 0x55001000 (**무효!**) |\n| Heap | 100 저장됨 | 반환됨 (재사용 가능) |\n\n**p는 '죽은 주소'를 가리키게 됩니다!**",
+        "title": "Use-After-Free",
+        "explanation": "`free(p)`를 한 직후, `p`에는 여전히 아까 그 힙 메모리 주소가 남아있습니다.\n하지만 그 주소는 이제 내 것이 아닙니다.\n\n거기에 접근(`*p`)하면 운 나쁘게 다른 데이터가 덮어씌워져 있거나, 프로그램이 충돌합니다.",
         "highlight": [
           8,
-          9
+          11
         ],
-        "memoryChanges": [
-          {
-            "action": "deallocate",
-            "area": "heap",
-            "address": "0x55001000"
-          }
-        ],
-        "warning": "p는 해제된 메모리를 가리킴"
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "p",
+              "value": "0xDEADBEEF (Invalid)",
+              "type": "int*"
+            }
+          ],
+          "heap": [],
+          "note": "Accessing 0xDEADBEEF causes Crash"
+        }
       },
       {
-        "line": 12,
-        "title": "해제된 메모리 읽기 (위험!)",
-        "explanation": "**운에 따라 결과가 다릅니다!** 이것이 Dangling Pointer가 무서운 이유예요.\n\n**왜 결과가 예측 불가능할까?**\n\nfree 후 해당 메모리는 '재사용 가능' 상태가 됩니다:\n1. **아직 재사용 안 됨** → 이전 값(100)이 남아있을 수 있음\n2. **다른 malloc이 사용** → 전혀 다른 값이 들어감\n3. **시스템이 보호** → 크래시 (Segmentation fault)\n\n**가장 무서운 경우:**\n- 테스트 환경: 정상 동작 (값이 남아있어서)\n- 실제 서비스: 크래시 (메모리 재사용되어서)\n- **'운 좋게 되는' 버그는 나중에 터집니다!**",
+        "line": 13,
+        "title": "NULL 테크닉",
+        "explanation": "그래서 고수들은 `free(p);` 바로 뒷줄에 `p = NULL;`을 적습니다.\n`NULL` 포인터는 접근하면 바로 죽기 때문에, 나중에 실수로 썼을 때 버그를 잡기 쉽습니다 (Fail-Fast).",
         "highlight": [
-          12
-        ],
-        "danger": true,
-        "memoryChanges": []
-      },
-      {
-        "line": 14,
-        "title": "Double Free (위험!)",
-        "explanation": "같은 메모리를 두 번 free하면 **메모리 관리 구조가 손상됩니다!**\n\n**왜 Double Free가 위험할까?**\n\nmalloc/free는 내부적으로 '사용 가능한 메모리 목록'을 관리해요:\n```\n[Free List]\n블록A → 블록B → 블록C\n```\n\nDouble free 시:\n1. 첫 번째 free: 블록을 Free List에 추가 ✅\n2. 두 번째 free: **같은 블록을 다시 추가!** ❌\n3. 결과: 리스트가 꼬임 (순환 참조, 중복 엔트리)\n\n**실제 피해:**\n- 프로그램 크래시\n- **보안 취약점**: 해커가 이를 악용해 코드 실행 가능\n- 데이터 손상",
-        "highlight": [
-          14
-        ],
-        "danger": true,
-        "memoryChanges": []
-      },
-      {
-        "line": 16,
-        "title": "안전한 처리",
-        "explanation": "p = NULL로 설정하면 **실수로 사용해도 즉시 크래시**하여 버그를 발견할 수 있습니다.\n\n**왜 NULL이 안전할까?**\n\n**시나리오 1: NULL 안 함**\n```c\nfree(p);\n// ... 100줄 뒤 ...\n*p = 200;  // 운 좋으면 동작, 나쁘면 크래시\n           // 버그 찾기 매우 어려움!\n```\n\n**시나리오 2: NULL로 설정**\n```c\nfree(p);\np = NULL;\n// ... 100줄 뒤 ...\n*p = 200;  // 즉시 크래시! (NULL 역참조)\n           // 버그 위치 바로 알 수 있음!\n```\n\n**free + NULL 패턴 (권장):**\n```c\nfree(p);\np = NULL;  // 항상 함께!\n```\n\n**추가 이점:** if (p != NULL) 체크가 정상 동작합니다!",
-        "highlight": [
-          16
-        ],
-        "memoryChanges": [
-          {
-            "action": "update",
-            "area": "stack",
-            "name": "p",
-            "value": "NULL",
-            "previousValue": "0x55001000 (해제됨)",
-            "frame": "main"
-          }
+          13
         ]
       }
     ]
   },
   "quiz": {
-    "question": "Dangling Pointer란?",
+    "question": "Dangling Pointer(댕글링 포인터)란?",
     "options": [
+      "초기화 안 된 포인터",
       "NULL 포인터",
-      "초기화되지 않은 포인터",
-      "해제된 메모리를 가리키는 포인터",
-      "배열 끝을 지나는 포인터"
+      "유효하지 않은(해제된) 메모리를 가리키고 있는 포인터",
+      "void 포인터"
     ],
     "correctIndex": 2,
-    "explanation": "free 후에도 해제된 주소를 가리키는 포인터를 Dangling Pointer라고 합니다."
+    "explanation": "대롱대롱 매달려있다(Dangle)는 뜻입니다. 갈 곳 잃은 포인터를 말합니다."
   },
   "misconceptions": [
     {
-      "wrong": "free 후 메모리에 접근하면 항상 크래시한다",
-      "correct": "운에 따라 정상 동작할 수도 있어서 버그 발견이 어렵습니다.",
-      "why": "해제된 메모리가 아직 재사용 안 됐으면 이전 값이 남아있을 수 있습니다."
-    },
-    {
-      "wrong": "Double free는 괜찮다",
-      "correct": "Double free는 heap 구조를 손상시켜 보안 취약점이 될 수 있습니다.",
-      "why": "메모리 할당자가 같은 블록을 두 번 반환받으면 내부 상태가 망가집니다."
+      "wrong": "free(p) 하면 p는 자동으로 NULL이 된다",
+      "correct": "C언어는 그렇게 친절하지 않습니다.",
+      "why": "직접 `p = NULL;` 해주는 것이 C언어 프로그래머의 매너이자 생존 기술입니다."
     }
   ],
-  "keyTakeaway": "free 후 반드시 p = NULL. Dangling Pointer와 Double Free 방지"
+  "keyTakeaway": "`free` 하고 나면 내 손에 있는 영수증(`p`)도 찢어버려라(`NULL`)."
 }

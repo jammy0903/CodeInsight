@@ -18,6 +18,7 @@ import { ReportPage } from './features/report';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { initializeAuthListener } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
+import { CoursesPage } from './features/courses/CoursesPage';
 
 /**
  * 인증 상태 초기화 컴포넌트
@@ -67,10 +68,7 @@ export const router = createBrowserRouter([
       { path: 'signup', element: <AuthPage /> },
       {
         path: 'courses',
-        lazy: async () => {
-          const { CoursesPage } = await import('./features/courses/CoursesPage');
-          return { Component: CoursesPage };
-        }
+        element: <CoursesPage />,
       },
       {
         path: 'courses/:lang',

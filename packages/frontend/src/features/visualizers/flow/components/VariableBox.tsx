@@ -126,7 +126,7 @@ export const VariableBox = memo(function VariableBox({
       boxShadow: `0 0 12px ${style.glow}`,
       transition: { repeat: 2, duration: 0.3 },
     },
-  };
+  } as const;
 
   // 값 애니메이션 variants
   const valueVariants = {
@@ -141,7 +141,7 @@ export const VariableBox = memo(function VariableBox({
       },
     },
     exit: { y: 20, opacity: 0 },
-  };
+  } as const;
 
   return (
     <motion.div
