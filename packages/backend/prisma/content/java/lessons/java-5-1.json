@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "final 기본 타입",
-        "explanation": "`final int x = 10;`\n`x`라는 상자에는 `10`이 들어있고, 이제 이 상자는 **용접**되어 내용을 바꿀 수 없습니다.",
+        "explanation": "**용접된 상자:**\n`final int x = 10;`은 `x`라는 상자에 `10`을 넣고 뚜껑을 **용접**해버린 것과 같습니다. 이제 내용물을 바꿀 수 없습니다.",
         "highlight": [
           1
         ],
@@ -25,7 +25,7 @@
       {
         "line": 2,
         "title": "재할당 시도 (에러)",
-        "explanation": "이미 용접된 `x` 상자에 `20`을 넣으려 하면 컴파일러가 막습니다.",
+        "explanation": "이미 용접된 `x` 상자에 `20`을 억지로 넣으려 하면 컴파일러가 빨간 줄을 긋습니다.",
         "keyInsight": "final 변수 = 값 변경 불가 (상수)",
         "highlight": [
           2
@@ -38,7 +38,7 @@
       {
         "line": 4,
         "title": "final 배열 참조",
-        "explanation": "`final int[] arr`\n`arr` 변수가 `0x001` 주소를 가리키고, 이 **화살표가 고정**됩니다.\n이제 `arr`가 다른 주소(다른 배열)를 가리키게 할 수는 없습니다.",
+        "explanation": "**고정된 화살표:**\n`final int[] arr`은 `arr`가 가리키는 **화살표의 방향(주소)**을 고정시킨 것입니다.\n이제 `arr` 변수는 오직 저쪽 집(`0x001`)만 가리킬 수 있습니다.",
         "highlight": [
           4
         ],
@@ -61,8 +61,8 @@
       {
         "line": 5,
         "title": "배열 요소 수정 (OK!)",
-        "explanation": "**중요:** `arr` 변수(화살표)는 고정되어 있지만, 화살표가 가리키는 **저쪽 집(Heap)의 냉장고 내용물**(`arr[0]`)은 바꿀 수 있습니다!\n\"주소를 못 바꿀 뿐, 그 주소에 있는 물건은 건드릴 수 있다.\"",
-        "keyInsight": "final = 참조 고정, 내부 상태는 변경 가능",
+        "explanation": "**중요한 구분:**\n화살표 방향(주소)은 못 바꾸지만, 화살표가 가리키는 **집 안의 냉장고 내용물**(`arr[0]`)은 마음대로 바꿀 수 있습니다!\n\"이사는 못 가지만 리모델링은 된다\"고 생각하면 됩니다.",
+        "keyInsight": "final = 주소 고정, 내부 상태는 자유",
         "highlight": [
           5
         ],
@@ -81,7 +81,7 @@
       {
         "line": 6,
         "title": "배열 재할당 (에러)",
-        "explanation": "`arr`가 `new int[]`(새 주소)를 가리키게 하려 하면 에러가 납니다.\n화살표가 고정되어 있기 때문입니다.",
+        "explanation": "`arr = new int[]...`는 `arr`의 화살표를 다른 집(새 주소)으로 돌리려는 시도입니다.\n`final`로 고정되어 있으므로 에러가 납니다.",
         "highlight": [
           6
         ],
@@ -116,7 +116,7 @@
       {
         "line": 9,
         "title": "내용 수정 (OK!)",
-        "explanation": "`sb.append()`는 `0x002` 객체 내부의 데이터를 바꿉니다. `sb`가 가리키는 주소 자체는 변하지 않았으므로 OK입니다.",
+        "explanation": "`sb.append()`는 객체(`0x002`) 내부의 데이터를 바꿉니다.\n`sb`라는 화살표 자체는 움직이지 않았으니 `final` 규칙 위반이 아닙니다.",
         "keyInsight": "final ≠ 불변 객체(Immutable Object)",
         "highlight": [
           9
@@ -135,7 +135,7 @@
       {
         "line": 10,
         "title": "재할당 시도 (에러)",
-        "explanation": "`sb = new ...` 처럼 화살표 방향을 바꾸려는 시도는 막힙니다.",
+        "explanation": "`sb`에게 다른 주소를 담으려 하면 컴파일러가 막습니다.",
         "highlight": [
           10
         ],
@@ -147,27 +147,27 @@
     ]
   },
   "quiz": {
-    "question": "final List<String> list = new ArrayList<>(); 에서 가능한 것은?",
+    "question": "final List list = new ArrayList(); 에서 가능한 코드는?",
     "options": [
-      "list = new ArrayList<>()",
+      "list = new ArrayList()",
       "list.add(\"item\")",
       "list = null",
       "list = List.of()"
     ],
     "correctIndex": 1,
-    "explanation": "final은 참조 재할당만 금지합니다. list.add()는 객체 내부 수정이므로 가능합니다."
+    "explanation": "final은 변수의 '재할당'만 금지합니다. 참조된 객체 내부(`list.add()`)를 수정하는 것은 아무 상관없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "final 객체는 불변(Immutable)이다",
-      "correct": "아닙니다! 변수(참조)만 못 바꿀 뿐, 객체 내부(필드, 배열 값)는 얼마든지 바꿀 수 있습니다.",
+      "wrong": "final 변수가 가리키는 객체는 불변(Immutable)이다",
+      "correct": "아닙니다! 변수(껍데기)만 고정될 뿐, 알맹이(객체)는 변할 수 있습니다.",
       "why": "완전한 불변을 원하면 `final` 클래스에 모든 필드를 `final`로 만들고 setter를 없애야 합니다(예: String)."
     },
     {
       "wrong": "메서드 파라미터에 final을 붙이면 값을 못 바꾼다",
-      "correct": "맞지만, 참조형 파라미터라면 그 객체의 내부는 여전히 바꿀 수 있습니다.",
+      "correct": "맞지만, 참조형 파라미터라면 그 객체의 '속성'은 여전히 바꿀 수 있습니다.",
       "why": "`void func(final int[] a)`에서 `a = new...`는 안 되지만 `a[0] = 99`는 됩니다."
     }
   ],
-  "keyTakeaway": "final = 참조 고정, 객체 내부 수정은 가능"
+  "keyTakeaway": "final은 '화살표 고정'이다. 가리키는 대상의 내부까지 얼리는 건 아니다."
 }

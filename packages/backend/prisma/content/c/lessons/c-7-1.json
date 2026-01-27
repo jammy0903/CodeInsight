@@ -1,0 +1,118 @@
+{
+  "lessonId": "c-7-1",
+  "title": "Double Pointers (int **)",
+  "concept": "Core concept for Double Pointers (int **)",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p = &a;\n    int **pp = &p;\n\n    printf(\"a = %d\\n\", a);\n    \n    // Using double pointer to change value\n    **pp = 20;\n    \n    printf(\"a = %d\\n\", a);\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 4,
+        "title": "변수 a 선언",
+        "explanation": "먼저 정수형 변수 `a`를 선언하고 10으로 초기화합니다. 메모리상의 특정 주소(예: 0x100)에 10이라는 값이 저장됩니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "address": "0x100"
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "싱글 포인터 p",
+        "explanation": "`p`는 `a`의 주소를 담는 포인터입니다. `p` 자체도 메모리 어딘가(예: 0x104)에 저장되며, 그 값은 `a`의 주소인 0x100이 됩니다.",
+        "keyInsight": "포인터도 '값'을 가진 변수입니다. 그 값이 주소일 뿐입니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "address": "0x100"
+            },
+            {
+              "name": "p",
+              "value": "-> 0x100",
+              "address": "0x104"
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "더블 포인터 pp",
+        "explanation": "`pp`는 **포인터의 포인터**입니다. `p`의 주소(0x104)를 저장합니다. 별이 2개(`**`)라는 것은 두 번 따라가야 원래 값(int)이 나온다는 뜻입니다.",
+        "keyInsight": "int **pp는 (int*) 타입의 변수 주소를 담습니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "address": "0x100"
+            },
+            {
+              "name": "p",
+              "value": "-> 0x100",
+              "address": "0x104"
+            },
+            {
+              "name": "pp",
+              "value": "-> 0x104",
+              "address": "0x108"
+            }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "이중 역참조 (**pp)",
+        "explanation": "`**pp`는 2단계 점프를 수행합니다.\n1. `pp`가 가리키는 `p`로 갑니다.\n2. `p`가 가리키는 `a`로 갑니다.\n결국 `a`의 메모리 공간에 20을 대입하게 됩니다.",
+        "keyInsight": "*(*pp)와 같습니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 20,
+              "address": "0x100",
+              "highlight": true
+            },
+            {
+              "name": "p",
+              "value": "-> 0x100",
+              "address": "0x104"
+            },
+            {
+              "name": "pp",
+              "value": "-> 0x104",
+              "address": "0x108"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "int val = 5; int *p = &val; int **pp = &p; 일 때, val의 값을 읽는 방법이 아닌 것은?",
+    "options": [
+      "val",
+      "*p",
+      "**pp",
+      "&p"
+    ],
+    "correctIndex": 3,
+    "explanation": "&p는 포인터 p의 주소(pp의 값)이므로 5가 아닙니다. val == *p == **pp 입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "포인터의 포인터는 특별한 하드웨어 기능이다.",
+      "correct": "그냥 주소를 담는 변수의 주소를 담는 변수일 뿐입니다.",
+      "why": "메모리 관점에서는 모든 포인터가 크기가 같은(32/64비트) 정수형 변수입니다."
+    }
+  ],
+  "keyTakeaway": "이중 포인터(Double Pointer)는 포인터 변수의 값을 '참조'를 통해 변경하고 싶을 때 사용합니다."
+}

@@ -1,0 +1,56 @@
+{
+  "lessonId": "c-9-4",
+  "title": "Token Pasting",
+  "concept": "Core concept for Token Pasting",
+  "content": {
+    "code": "#include <stdio.h>\n\n// Token Pasting Operator (##)\n#define MAKE_VAR(type, name) type var_##name\n\n// Generic Getter Helper\n#define GETTER(name) int get_##name() { return var_##name; }\n\n// 1. Create variables\nMAKE_VAR(int, apple);  // int var_apple;\nMAKE_VAR(int, banana); // int var_banana;\n\n// 2. Create functions automatically\nGETTER(apple)  // int get_apple() { return var_apple; }\nGETTER(banana) // int get_banana() { return var_banana; }\n\nint main() {\n    var_apple = 100;\n    printf(\"Apple: %d\\n\", get_apple());\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 9,
+        "title": "Token Pasting (##)",
+        "explanation": "`var_##name`은 `name` 자리에 들어온 텍스트를 `var_` 뒤에 붙여서 하나의 새로운 식별자(변수명)를 만듭니다.\n`MAKE_VAR(int, apple)` -> `int var_apple;`",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "var_apple",
+              "value": 100,
+              "address": "0x100"
+            }
+          ]
+        }
+      },
+      {
+        "line": 13,
+        "title": "함수 자동 생성",
+        "explanation": "`GETTER(apple)`은 `int get_apple() { return var_apple; }`이라는 함수 정의 코드를 자동으로 만들어냅니다.\n반복적인 코드를 줄이는 데 매우 강력합니다.",
+        "keyInsight": "C++의 템플릿처럼 흉내낼 수 있는 강력한 기능입니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "Apple: 100"
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "매크로 연산자 ##의 역할은?",
+    "options": [
+      "주석 처리",
+      "문자열화 (Stringify)",
+      "두 개의 토큰을 하나로 합침 (Token Pasting)",
+      "매크로 함수 종료"
+    ],
+    "correctIndex": 2,
+    "explanation": "## 연산자는 앞뒤의 토큰을 물리적으로 붙여서 새로운 변수명이나 함수명 등을 만들어낼 때 사용합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "# 연산자와 ## 연산자는 같다.",
+      "correct": "#은 인자를 문자열(\" \")로 바꾸는 것이고, ##은 인자를 합쳐서 코드 토큰으로 만드는 것입니다.",
+      "why": "#x -> \"x\", x##y -> xy"
+    }
+  ],
+  "keyTakeaway": "## 연산자를 활용하면 비슷한 패턴의 변수나 함수 수십 개를 단 몇 줄의 매크로로 자동 생성할 수 있습니다."
+}

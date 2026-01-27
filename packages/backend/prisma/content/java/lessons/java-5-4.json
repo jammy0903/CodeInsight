@@ -8,8 +8,8 @@
       {
         "line": 2,
         "title": "static 메서드 선언",
-        "explanation": "`add()`는 `static`입니다. 객체를 만들지 않아도 기능 수행이 가능한 **독립적인 함수**입니다.",
-        "keyInsight": "static method = input만 있으면 되는 순수 함수",
+        "explanation": "**독립적인 도구:**\n`add()`는 `static`입니다. 객체(`new`)를 만들지 않아도 바로 쓸 수 있는 **자판기** 같은 녀석입니다.\n입력값(`a`, `b`)만 주면 결과가 튀어나옵니다.",
+        "keyInsight": "static method = 순수 함수 (Pure Function)",
         "highlight": [
           2,
           3,
@@ -29,7 +29,7 @@
       {
         "line": 6,
         "title": "인스턴스 필드",
-        "explanation": "`instanceValue`는 `new MathUtil()`을 해서 힙에 객체를 만들어야만 생성되는 값입니다.",
+        "explanation": "`instanceValue`는 `new MathUtil()`을 해서 힙에 객체를 만들어야만 비로소 생겨나는 값입니다.",
         "highlight": [
           6
         ],
@@ -41,56 +41,44 @@
       {
         "line": 9,
         "title": "static에서 인스턴스 접근 (에러)",
-        "explanation": "`tryAccessInstance()`는 객체 없이 실행될 수 있는데, `instanceValue`를 찾으려 하니 모순입니다.\n\"어느 객체의 instanceValue를 말하는 거니?\"",
-        "keyInsight": "static context에는 '나(this)'라는 개념이 없음",
+        "explanation": "**논리적 모순:**\n`tryAccessInstance()`는 객체 없이 실행될 수 있습니다.\n그런데 \"내 뱃속에 있는 `instanceValue`를 내놔\"라고 하면, JVM은 \"너는 뱃속(객체) 자체가 없는데 뭔 소리냐?\"라고 에러를 냅니다.",
+        "keyInsight": "static 안에서는 '나(this)'를 찾을 수 없다",
         "highlight": [
           9
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "error": "컴파일 에러: non-static variable instanceValue cannot be referenced from a static context"
+          "error": "컴파일 에러: non-static variable cannot be referenced from a static context"
         }
       },
       {
         "line": 10,
         "title": "static에서 this 사용 (에러)",
-        "explanation": "`this`는 '현재 실행 중인 객체'를 뜻하는데, `static` 메서드는 객체 없이 실행되므로 `this` 자체가 존재하지 않습니다.",
+        "explanation": "`this`는 '현재 실행 중인 객체 나 자신'을 뜻합니다.\n`static` 메서드는 '객체 없이' 실행되므로 `this`라는 개념 자체가 존재하지 않습니다.",
         "highlight": [
           10
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "error": "컴파일 에러: 'this' cannot be referenced from a static context"
+          "error": "컴파일 에러: 'this' cannot be used in static context"
         }
       },
       {
         "line": 14,
         "title": "인스턴스에서 static 접근 (OK)",
-        "explanation": "`instanceMethod()`는 이미 객체가 생성된 후에 호출되므로, 공용인 `add` 메서드(static)를 맘대로 부를 수 있습니다.",
+        "explanation": "**반대는 가능:**\n`instanceMethod()`는 이미 객체가 생성된 후에 호출됩니다.\n객체가 있는 상태에서 \"공용 도구(`add`) 좀 빌려 쓸게\"라고 하는 건 전혀 문제되지 않습니다.",
         "highlight": [
           14
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "개별 객체는 공용 도구를 쓸 수 있음"
-        }
-      },
-      {
-        "line": 15,
-        "title": "인스턴스에서 인스턴스 접근 (OK)",
-        "explanation": "당연히 자기 자신(`this`)의 필드인 `instanceValue`에 접근할 수 있습니다.",
-        "highlight": [
-          15
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "this.instanceValue 접근 가능"
+          "note": "개별 객체는 공용 도구 사용 가능"
         }
       },
       {
         "line": 19,
-        "title": "클래스명으로 static 호출",
-        "explanation": "`new` 없이 바로 `MathUtil.add(3, 5)`를 호출합니다.\n아주 깔끔하고 효율적입니다.",
+        "title": "클래스명으로 호출",
+        "explanation": "`new MathUtil()` 따위는 필요 없습니다.\n바로 `MathUtil.add(3, 5)`를 호출합니다.\n무거운 객체를 안 만들어도 되니 **빠르고 효율적**입니다. `Math.max()`, `Arrays.sort()` 같은 유틸리티들이 다 이렇게 생겼습니다.",
         "keyInsight": "유틸리티 함수는 static이 국룰",
         "highlight": [
           19
@@ -114,7 +102,7 @@
       {
         "line": 20,
         "title": "결과 출력",
-        "explanation": "결과 8이 반환됩니다. 객체 생성 비용(Heap 할당, GC 등)이 전혀 들지 않았습니다.",
+        "explanation": "결과 8이 반환됩니다. 메모리 낭비 없이 깔끔하게 계산만 수행했습니다.",
         "highlight": [
           20
         ],
@@ -136,25 +124,25 @@
   "quiz": {
     "question": "main 메서드가 static인 이유는?",
     "options": [
-      "성능 최적화",
-      "인스턴스 없이 프로그램 시작 가능",
-      "보안",
-      "관례"
+      "메모리를 아끼려고",
+      "인스턴스 생성 없이 JVM이 바로 실행하려고",
+      "보안 때문에",
+      "아무 이유 없다"
     ],
     "correctIndex": 1,
-    "explanation": "프로그램 시작 시점에는 아무 객체도 없습니다. main이 static이어야 JVM이 호출할 수 있습니다."
+    "explanation": "프로그램이 시작될 때는 아직 아무런 객체도 없습니다. 그래서 JVM이 \"객체 없어도 실행 가능한\" `static` 메서드인 `main`을 찾아서 호출하는 것입니다."
   },
   "misconceptions": [
     {
-      "wrong": "static 메서드 내에서 super를 쓸 수 있다",
-      "correct": "쓸 수 없습니다. `this`도 없고 `super`도 없습니다.",
-      "why": "`this`와 `super`는 모두 인스턴스와 관련된 키워드이기 때문입니다."
+      "wrong": "static 메서드 안에서 super를 쓸 수 있다",
+      "correct": "못 씁니다. `this`도 없고 `super`도 없습니다.",
+      "why": "`this`, `super` 모두 '인스턴스'가 있어야 성립하는 개념입니다."
     },
     {
-      "wrong": "static 메서드는 오버라이딩이 된다",
-      "correct": "오버라이딩(Overriding)이 아니라 **하이딩(Hiding)**이라고 부릅니다. 다형성이 적용되지 않습니다.",
-      "why": "변수 타입(Parent)을 보고 호출 대상을 결정하지, 실제 객체(Child)를 보고 결정하지 않습니다."
+      "wrong": "static 메서드는 오버라이딩(Overriding) 된다",
+      "correct": "아닙니다. **하이딩(Hiding)**이라고 부르며, 다형성(Polymorphism)이 적용되지 않습니다.",
+      "why": "변수의 '타입'만 보고 호출되지, 실제 '객체'가 뭔지는 보지 않기 때문입니다."
     }
   ],
-  "keyTakeaway": "static = 인스턴스 없이 호출, 인스턴스 멤버 접근 불가"
+  "keyTakeaway": "static 메서드는 '도구 상자'다. 객체 없이 쓸 수 있지만, 객체 내부(this)는 못 건드린다."
 }

@@ -1,14 +1,14 @@
 {
     "lessonId": "js-9-3",
     "title": "WeakMap과 메모리 누수 방지",
-    "concept": "WeakMap은 키(Key)로 사용된 객체를 '약하게' 참조하여, 가비지 컬렉션(GC)을 방해하지 않는다",
+    "concept": "WeakMap은 객체에 대한 '약한 참조(Weak Reference)'를 사용하여 메모리 누수를 방지합니다.",
     "content": {
-        "code": "let user = { name: 'Alice' };\n\n// 1. 일반 Map (강한 참조)\nconst strongMap = new Map();\nstrongMap.set(user, 'Data');\n\n// 2. WeakMap (약한 참조)\nconst weakMap = new WeakMap();\nweakMap.set(user, 'Secret');\n\n// user 객체 삭제 (참조 끊기)\nuser = null;\n\n// 결과:\n// strongMap은 여전히 Alice를 붙잡고 있음 (메모리 누수)\n// weakMap은 Alice를 놓아줌 (GC 수거 대상)",
+        "code": "let user = { name: 'Alice' };\n\n// 1. 일반 Map (강한 참조)\nconst strongMap = new Map();\nstrongMap.set(user, 'Data');\n\n// 2. WeakMap (약한 참조)\nconst weakMap = new WeakMap();\nweakMap.set(user, 'Secret');\n\n// user 객체 삭제 (참조 끊기)\nuser = null;\n\n// 결과:\n// strongMap은 여전히 Alice를 잡고 있음 (메모리 해제 안 됨)\n// weakMap은 Alice를 놓아줌 (GC 수거됨)",
         "steps": [
             {
                 "line": 1,
                 "title": "객체 생성",
-                "explanation": "Heap에 `{ name: 'Alice' }` 객체가 생성되고, `user` 변수가 이를 가리킵니다.",
+                "explanation": "Heap 메모리에 `{ name: 'Alice' }` 객체가 생성되고, `user` 변수가 이를 가리킵니다.",
                 "highlight": [
                     1
                 ],
@@ -25,8 +25,8 @@
             },
             {
                 "line": 5,
-                "title": "Strong Map 저장",
-                "explanation": "일반 `Map`은 키 객체를 **강하게(Strongly)** 붙잡습니다.\n`user` 변수가 사라져도 Map이 살아있으면 Alice도 영원히 살아있습니다.",
+                "title": "Strong Map: 강한 참조",
+                "explanation": "일반 `Map`에 Alice를 키로 등록했습니다. 이 방식은 **강한 참조(Strong Reference)**입니다.\n\n**강한 참조란?**\n\"내가 보고 있으니까 절대 없애지 마!\"라고 GC에게 말하는 것입니다. 그래서 `user` 변수가 사라져도 Map이 살아있는 한 Alice도 메모리에서 사라지지 않습니다.",
                 "highlight": [
                     4,
                     5
@@ -45,8 +45,8 @@
             },
             {
                 "line": 9,
-                "title": "WeakMap 저장",
-                "explanation": "`WeakMap`은 키 객체를 **약하게(Weakly)** 참조합니다.\n\"나만 얘를 알고 있다면, 그냥 죽게 내버려 둬\"라는 뜻입니다.",
+                "title": "WeakMap: 약한 참조",
+                "explanation": "`WeakMap`에도 Alice를 등록했습니다. 하지만 얘는 **약한 참조(Weak Reference)**를 합니다.\n\n**약한 참조란?**\n\"나는 얘를 보고는 있지만, 굳이 나 때문에 살려둘 필요는 없어\"라고 말하는 것입니다. 다른 누군가(변수)가 Alice를 찾지 않으면, WeakMap의 참조는 무시되고 GC가 일어납니다.",
                 "highlight": [
                     8,
                     9
@@ -58,8 +58,8 @@
             },
             {
                 "line": 12,
-                "title": "참조 제거 (user = null)",
-                "explanation": "`user` 변수와의 연결을 끊었습니다.\n- StrongMap: 여전히 참조 중 (수거 안 됨)\n- WeakMap: 참조자가 나뿐이네? (수거 대상)",
+                "title": "참조 해제 (user = null)",
+                "explanation": "`user = null`을 실행해 변수와의 연결을 끊었습니다. 이제 Alice를 찾는 건 Map들뿐입니다.\n\n*   **StrongMap**: 꽉 잡고 있어서 Alice가 메모리에 남습니다. (누수)\n*   **WeakMap**: 약한 참조이므로 GC가 Alice를 수거해갑니다.",
                 "highlight": [
                     12
                 ],
@@ -80,20 +80,20 @@
     "quiz": {
         "question": "WeakMap의 키(Key)로 사용할 수 없는 것은?",
         "options": [
-            "DOM 엘리먼트",
-            "일반 객체 {}",
-            "문자열 'hello'",
-            "함수 function() {}"
+            "DOM 엘리먼트 (document.body)",
+            "빈 객체 ({})",
+            "문자열 (\"hello\")",
+            "함수 (function() {})"
         ],
         "correctIndex": 2,
-        "explanation": "WeakMap의 키는 반드시 **객체(Object)**여야 합니다. 원시값(문자열, 숫자 등)은 GC 대상이 아니고 수명이 명확해서 쓸 수 없습니다 (Symbol 제외)."
+        "explanation": "WeakMap의 키는 반드시 **참조 타입(객체)**이어야 합니다. 문자열이나 숫자 같은 원시 타입은 GC의 관리(Reference Counting) 대상이 아니기 때문입니다."
     },
     "misconceptions": [
         {
-            "wrong": "WeakMap은 size 속성으로 크기를 알 수 있다",
-            "correct": "없습니다. `size`, `clear()`, `keys()` 등이 없습니다.",
-            "why": "GC가 언제 돌지 모르기 때문에, 현재 몇 개가 남았는지 보장할 수 없어서(Non-deterministic) 막아놨습니다."
+            "wrong": "WeakMap.size로 크기를 알 수 있다",
+            "correct": "알 수 없습니다. (size 프로퍼티 없음)",
+            "why": "GC가 언제 돌아서 객체를 지울지 예측할 수 없기 때문에(비결정적), 현재 몇 개가 남아있는지 세는 것이 불가능합니다."
         }
     ],
-    "keyTakeaway": "캐시(Cache)나 DOM 관련 데이터를 저장할 때는 WeakMap을 써야 메모리 누수를 막는다."
+    "keyTakeaway": "캐시(Cache)나 임시 데이터를 저장할 때는 WeakMap을 사용해야 메모리 누수 없이 안전합니다."
 }

@@ -1,14 +1,14 @@
 {
     "lessonId": "js-8-1",
     "title": "브라우저 렌더링 파이프라인 (Frame Budget)",
-    "concept": "부드러운 애니메이션(60fps)을 위해 브라우저는 16.6ms마다 화면을 그린다. JS가 길어지면 프레임이 떨어진다(Jank).",
+    "concept": "브라우저는 16.6ms(60fps)라는 엄격한 'Frame Budget(시간 예산)' 내에 렌더링을 마쳐야 합니다.",
     "content": {
-        "code": "// 60fps = 1초에 60장 = 1장당 16.6ms\nfunction animate() {\n  // 1. JS 실행 (너무 길면 안 됨!)\n  heavyCalculation();\n\n  // 2. Style (CSS 계산)\n  // 3. Layout (위치 계산)\n  // 4. Paint (픽셀 그리기)\n  // 5. Composite (레이어 합성)\n}\n\nfunction heavyCalculation() {\n  // 50ms 동안 멈춤 (프레임 드랍 발생!)\n  const start = Date.now();\n  while (Date.now() - start < 50) {}\n}",
+        "code": "// 60fps 목표 = 1프레임당 약 16.6ms\nfunction animate() {\n  // 1. JS 실행 (Long Task 발생!)\n  heavyCalculation();\n\n  // 2. Style (스타일 재계산)\n  // 3. Layout (레이아웃 배치)\n  // 4. Paint (픽셀 그리기)\n  // 5. Composite (레이어 합성)\n}\n\nfunction heavyCalculation() {\n  // 50ms 동안 메인 스레드 점유 (Frame Budget 초과)\n  const start = Date.now();\n  while (Date.now() - start < 50) {}\n}",
         "steps": [
             {
                 "line": 2,
-                "title": "Frame 시작",
-                "explanation": "브라우저가 새로운 프레임(Frame)을 그릴 준비를 합니다.\n주어진 시간은 단 **16.6ms**입니다.",
+                "title": "Frame Budget 시작",
+                "explanation": "브라우저가 새로운 화면 프레임을 그릴 준비를 합니다.\n\n**Frame Budget이란?**\n부드러운 화면(60fps)을 유지하기 위해 프레임 하나당 주어진 시간 제한입니다. 1초(1000ms) ÷ 60장 = 약 **16.6ms**입니다. 이 안에 모든 걸 끝내야 합니다.",
                 "highlight": [
                     2
                 ],
@@ -20,9 +20,9 @@
             },
             {
                 "line": 4,
-                "title": "JS 실행 (Blocking)",
-                "explanation": "`heavyCalculation()`이 50ms 동안 메인 스레드를 잡아먹습니다.\n16.6ms가 지났지만 JS가 안 끝나서 화면을 그릴 수 없습니다.",
-                "keyInsight": "JS 실행 시간 + 렌더링 시간 < 16.6ms여야 함",
+                "title": "Long Task: 메인 스레드 점유",
+                "explanation": "`heavyCalculation()`이 50ms 동안 멈추지 않고 실행됩니다.\n\n**Long Task란?**\n메인 스레드를 50ms 이상 점유하는 작업을 말합니다. 이 시간 동안 브라우저는 화면을 그릴 수도, 클릭 이벤트를 받을 수도 없습니다(Blocking).",
+                "keyInsight": "JS 실행 시간이 10ms를 넘기면 렌더링 시간을 침범하여 프레임 드랍 위험이 커집니다.",
                 "highlight": [
                     4,
                     11,
@@ -42,8 +42,8 @@
             },
             {
                 "line": 6,
-                "title": "렌더링 단계 (Style ~ Composite)",
-                "explanation": "JS가 끝나야 비로소 스타일 계산, 레이아웃, 페인팅이 일어납니다.\n하지만 이미 50ms가 지나서 사용자는 '버벅임(Jank)'을 느꼈습니다.",
+                "title": "지연된 렌더링 (Jank 발생)",
+                "explanation": "JS가 50ms 후에 끝났습니다. 브라우저는 그제서야 Style, Layout, Paint 단계를 수행합니다.\n\n**Jank란?**\n화면 갱신이 제때 이뤄지지 않아 뚝뚝 끊기는 현상입니다. 사용자는 \"어? 렉 걸렸네?\"라고 느끼게 됩니다.",
                 "highlight": [
                     7,
                     8,
@@ -59,22 +59,22 @@
         ]
     },
     "quiz": {
-        "question": "부드러운 애니메이션을 위해 JS 실행 시간은 최대 몇 ms가 적당할까?",
+        "question": "60fps 애니메이션을 위해 자바스크립트 실행 시간은 어느 정도로 제한해야 할까요?",
         "options": [
             "100ms",
             "50ms",
-            "10ms (렌더링 시간 포함 16ms 이내)",
+            "약 10ms 이내",
             "1초"
         ],
         "correctIndex": 2,
-        "explanation": "브라우저 내부 작업(Style, Layout, Paint) 시간을 고려하면, 순수 JS 실행은 10ms 이내로 끝내야 안전합니다."
+        "explanation": "총 예산이 16.6ms이고, 브라우저 내부 렌더링(Style, Layout, Paint 등)에 약 6ms가 필요하므로, 순수 자바스크립트 실행은 10ms 이내로 끝마치는 것이 안전합니다."
     },
     "misconceptions": [
         {
             "wrong": "setTimeout(fn, 0)은 렌더링 직후에 실행된다",
-            "correct": "보장되지 않습니다. 렌더링은 브라우저 스케줄에 따르며, setTimeout은 그저 콜 스택이 비면 실행될 뿐입니다.",
-            "why": "렌더링 직전에 코드를 실행하려면 `requestAnimationFrame`을 써야 합니다."
+            "correct": "보장되지 않습니다. Task Queue 순서에 따를 뿐입니다.",
+            "why": "setTimeout은 브라우저의 렌더링 주기와 무관하게 동작하므로, 애니메이션에는 부적합합니다."
         }
     ],
-    "keyTakeaway": "메인 스레드를 오래 점유하지 마라 (Long Task 금지)."
+    "keyTakeaway": "Long Task(50ms+)는 사용자 경험의 적입니다. 메인 스레드는 항상 쾌적하게 유지하세요."
 }

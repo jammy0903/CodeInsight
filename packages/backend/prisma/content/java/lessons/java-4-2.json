@@ -3,12 +3,12 @@
   "title": "String vs StringBuilder",
   "concept": "반복적인 문자열 연결에는 StringBuilder를 사용해야 한다",
   "content": {
-    "code": "// 나쁜 예: String 연결\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// 좋은 예: StringBuilder\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
+    "code": "// 나쁜 예: String 연결 (쓰레기 생성)\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// 좋은 예: StringBuilder (재사용)\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
     "steps": [
       {
         "line": 2,
         "title": "빈 String 생성",
-        "explanation": "`bad` 변수는 빈 문자열 `\"\"`를 가리킵니다.",
+        "explanation": "`bad` 변수는 빈 문자열 `\"\"`를 가리킵니다. 이제부터 비효율의 극치를 보여드리겠습니다.",
         "highlight": [
           2
         ],
@@ -30,8 +30,8 @@
       },
       {
         "line": 4,
-        "title": "첫 번째 반복 (i=0) - 비효율의 시작",
-        "explanation": "문자열 더하기(`+`)는 **새 객체**를 만듭니다.\n1. `\"\"` + `\"0\"` -> `\"0\"` (새 객체 0x002)\n2. `bad`는 이제 `0x002`를 가리킵니다.\n3. 아까 `\"\"`(`0x001`)는 버려집니다(Garbage).",
+        "title": "반복 (i=0) - 쓰레기 발생",
+        "explanation": "String은 불변이라 `+` 연산을 하면 **새 객체**를 만듭니다.\n1. `\"\"` + `\"0\"` -> `\"0\"` (새 객체 0x002)\n2. `bad`는 이제 `0x002`를 가리킵니다.\n3. 아까 `\"\"`(`0x001`)는 바로 버려지는 **쓰레기(Garbage)**가 됩니다.",
         "keyInsight": "연산마다 쓰레기 객체 생성",
         "highlight": [
           4
@@ -60,8 +60,8 @@
       },
       {
         "line": 4,
-        "title": "두 번째 반복 (i=1) - 쓰레기 누적",
-        "explanation": "`\"0\"` + `\"1\"` -> `\"01\"` (새 객체 0x003)\n또 새 객체를 만들고, 방금 만든 `\"0\"`(`0x002`)은 바로 버려집니다.",
+        "title": "반복 (i=1) - 쓰레기 누적",
+        "explanation": "`\"0\"` + `\"1\"` -> `\"01\"` (새 객체 0x003)\n또 새 객체를 만들고, 방금 만든 `\"0\"`(`0x002`)은 쓰레기통으로 갑니다.\n\n이 짓을 반복 횟수만큼 합니다. 만약 루프가 10,000번이라면 쓰레기도 10,000개!",
         "highlight": [
           4
         ],
@@ -79,37 +79,13 @@
               "new": true
             }
           ],
-          "warning": "반복 10만 번이면 쓰레기도 10만 개!"
-        }
-      },
-      {
-        "line": 4,
-        "title": "세 번째 반복 (i=2) - 스노우볼 효과",
-        "explanation": "`\"01\"` + `\"2\"` -> `\"012\"` (새 객체 0x004)\n문자열이 길어질수록 복사하는 비용도 눈덩이처럼 불어납니다(O(n²)).",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "0x003",
-              "content": "\"01\"",
-              "garbage": true
-            },
-            {
-              "address": "0x004",
-              "content": "\"012\"",
-              "new": true
-            }
-          ],
-          "note": "메모리와 시간이 낭비됨"
+          "warning": "메모리 낭비 심각 (O(n²))"
         }
       },
       {
         "line": 8,
         "title": "StringBuilder 생성 (구세주)",
-        "explanation": "`StringBuilder`는 안에 넓은 공간(Buffer, `char[]`)을 미리 확보해 둔 **수정 가능한 객체**입니다.",
+        "explanation": "`StringBuilder`는 수정 가능한 **화이트보드**와 같습니다.\n내부에 넉넉한 공간(Buffer)을 미리 확보해 둬서 글자를 썼다 지웠다 할 수 있습니다.",
         "keyInsight": "StringBuilder = 가변 버퍼 (미리 공간 확보)",
         "highlight": [
           8
@@ -132,8 +108,8 @@
       },
       {
         "line": 10,
-        "title": "append(0)",
-        "explanation": "빈 공간에 `0`을 쓱 써넣습니다. **새 객체를 만들지 않습니다.**",
+        "title": "append(0) - 쓱 써넣기",
+        "explanation": "빈 공간에 `0`을 쓱 써넣습니다.\n**새 객체를 만들지 않습니다!** 그냥 있던 화이트보드에 추가만 합니다.",
         "highlight": [
           10
         ],
@@ -150,8 +126,8 @@
       },
       {
         "line": 10,
-        "title": "append(1), append(2) - 재사용",
-        "explanation": "남은 공간에 `1`, `2`를 계속 채워 넣습니다.\n공간이 부족하면 그때서야 늘리지만, 기본적으로 **하나의 객체**만 계속 씁니다.",
+        "title": "append(1), (2) - 재사용",
+        "explanation": "남은 공간에 `1`, `2`를 계속 이어 씁니다.\n쓰레기가 하나도 안 나옵니다. 정말 효율적이죠.",
         "keyInsight": "객체 재사용 = 메모리 절약 + 속도 빠름",
         "highlight": [
           10
@@ -170,8 +146,8 @@
       },
       {
         "line": 12,
-        "title": "toString() - 최종 포장",
-        "explanation": "완성된 내용을 예쁘게 포장해서 `String` 객체로 딱 한 번 내보냅니다.",
+        "title": "toString() - 최종 제출",
+        "explanation": "화이트보드에 쓴 내용을 사진 찍듯이 `String`으로 예쁘게 포장해서 내보냅니다.\n이때 딱 한 번 새로운 `String` 객체가 만들어집니다.",
         "highlight": [
           12
         ],
@@ -196,20 +172,20 @@
   "quiz": {
     "question": "StringBuilder 대신 StringBuffer를 써야 할 때는?",
     "options": [
-      "문자열이 긴 경우",
-      "반복 횟수가 많은 경우",
-      "멀티스레드 환경에서 공유할 경우",
-      "속도가 중요한 경우"
+      "문자열이 아주 길 때",
+      "반복 횟수가 많을 때",
+      "멀티스레드가 동시에 접근할 때",
+      "메모리가 부족할 때"
     ],
     "correctIndex": 2,
-    "explanation": "StringBuffer는 synchronized라서 스레드 안전합니다. 단일 스레드면 StringBuilder가 더 빠릅니다."
+    "explanation": "StringBuffer는 동기화(Synchronized)되어 있어서 스레드 안전(Thread-safe)합니다. 혼자 쓸 때는 StringBuilder가 더 빠릅니다."
   },
   "misconceptions": [
     {
-      "wrong": "요즘 컴파일러는 String + 연산도 최적화해준다",
-      "correct": "한 줄짜리 `\"A\" + \"B\"`는 최적화해주지만, **반복문 안(Loop)**에서의 `+`는 최적화하지 못합니다.",
-      "why": "반복문 내부에서는 매번 `new StringBuilder`를 만들었다가 버리는 구조가 되기 때문에, 명시적으로 `StringBuilder`를 하나 만들어서 써야 합니다."
+      "wrong": "요즘 컴파일러는 + 연산도 알아서 최적화해준다",
+      "correct": "`a` + `b` 한 번 하는 건 최적화해주지만, **반복문(Loop)** 안에서는 최적화를 못 해줍니다.",
+      "why": "반복문 안에서는 매번 새로운 StringBuilder를 만들었다 버리는 비효율적인 코드로 변환되기 십상입니다. 루프 안에서는 무조건 명시적으로 `StringBuilder`를 쓰세요."
     }
   ],
-  "keyTakeaway": "루프 안 String 연결 = StringBuilder 필수, 그 외는 + 연산 OK"
+  "keyTakeaway": "루프 돌면서 문자열 합칠 땐 무조건 StringBuilder! 그냥 + 쓰면 메모리 테러."
 }

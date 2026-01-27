@@ -1,0 +1,87 @@
+{
+  "lessonId": "c-7-4",
+  "title": "Void Pointers",
+  "concept": "Core concept for Void Pointers",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 65;\n    float b = 3.14;\n    \n    // Void Pointer can hold any type's address\n    void *ptr;\n    \n    ptr = &a;\n    // Must cast before dereferencing\n    printf(\"int: %d\\n\", *(int *)ptr);\n    \n    ptr = &b;\n    printf(\"float: %.2f\\n\", *(float *)ptr);\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 7,
+        "title": "Void 포인터 선언",
+        "explanation": "`void *ptr`은 '타입이 없는 포인터'입니다. 주소값은 담을 수 있지만, 그 주소에 있는 데이터의 크기나 타입은 모릅니다.",
+        "keyInsight": "모든 포인터 주소를 에러 없이 담을 수 있는 만능 상자입니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 65,
+              "address": "0x100"
+            },
+            {
+              "name": "b",
+              "value": 3.14,
+              "address": "0x104"
+            },
+            {
+              "name": "ptr",
+              "value": "Undefined",
+              "address": "0x108"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "int 변수 주소 저장",
+        "explanation": "`ptr = &a`를 실행하면 `ptr`은 0x100을 가리킵니다. 하지만 컴파일러는 이게 int라고 '가정'하지 않습니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 65,
+              "address": "0x100"
+            },
+            {
+              "name": "ptr",
+              "value": "-> 0x100 (Type Unknown)",
+              "address": "0x108"
+            }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "형변환 후 역참조",
+        "explanation": "`*ptr`처럼 그냥 역참조하면 에러가 납니다.\n`(int *)ptr`로 캐스팅하여 '이 주소에 4바이트 정수가 있어'라고 알려준 뒤 맨 앞에 `*`를 붙여 읽습니다.",
+        "keyInsight": "*(int *)ptr : 주거 침입 전에 신분증(Type)을 보여주는 것과 같습니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "int: 65"
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "void 포인터 ptr에 대해 불가능한 연산은?",
+    "options": [
+      "ptr = &num;",
+      "ptr = malloc(10);",
+      "*ptr = 10;",
+      "(int *)ptr"
+    ],
+    "correctIndex": 2,
+    "explanation": "void 포인터는 대상의 크기(byte size)를 모르기 때문에, 캐스팅 없이 직접 역참조(*ptr)할 수 없습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "void *에는 아무 값이나 넣을 수 있다 (예: int, float 값 자체).",
+      "correct": "오직 '주소'만 넣을 수 있습니다. 값 자체를 넣으면 그 값을 주소로 해석해버립니다.",
+      "why": "포인터 변수는 값을 담는 그릇이 아니라 위치를 가리키는 화살표입니다."
+    }
+  ],
+  "keyTakeaway": "Void 포인터는 데이터 타입을 숨기고 일반화된 코드를 작성할 때(예: memcpy, qsort) 필수적입니다."
+}

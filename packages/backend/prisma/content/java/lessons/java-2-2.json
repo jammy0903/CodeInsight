@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "null일 수 있는 값 받기",
-        "explanation": "**상황:** 외부(DB, API, 사용자 입력)에서 값을 받아오면 항상 `null`일 수 있다고 가정해야 합니다.\n이 `str`은 시한폭탄과 같습니다.",
+        "explanation": "**상황:** 외부(DB, API, 사용자 입력)에서 값을 받아오면 항상 `null`일 수 있다고 의심해야 합니다.\n이 `str`은 언제 터질지 모르는 시한폭탄과 같습니다.",
         "highlight": [
           1
         ],
@@ -26,7 +26,7 @@
       {
         "line": 3,
         "title": "단축 평가 (Short-circuit Evaluation)",
-        "explanation": "**논리 연산의 마법:**\n`A && B`에서 A가 `false`면 B는 쳐다보지도 않습니다.\n\n1. `str != null` 검사 -> 만약 `false`(null)라면?\n2. 뒤에 있는 `str.length()`는 **실행조차 안 됨**\n3. 덕분에 NPE를 피하고 안전하게 넘어갑니다.\n\n**주의:** 순서를 바꿔서 `str.length() > 0 && str != null`로 쓰면 망합니다. (NPE 발생)",
+        "explanation": "**논리 연산의 마법:**\n`&&`(AND) 연산자는 앞의 조건이 `false`면 뒤쪽은 쳐다보지도 않습니다.\n\n1. `str != null` 검사 -> 만약 `false`(null)라면?\n2. 뒤에 있는 `str.length()`는 **실행조차 안 됨**\n3. 덕분에 NPE를 피하고 안전하게 넘어갑니다.\n\n**단축 평가란?**\n결과가 확실해지면 남은 연산을 생략하는 효율적인 계산 방식입니다.\n\n**주의:** 순서를 바꿔서 `str.length() > 0 && str != null`로 쓰면 망합니다. (앞에서 이미 터짐)",
         "keyInsight": "&& 단축 평가: 앞이 false면 뒤는 실행 안 함",
         "highlight": [
           3,
@@ -42,7 +42,7 @@
       {
         "line": 7,
         "title": "Objects.requireNonNull (Fail-fast)",
-        "explanation": "**Fail-fast 전략:**\n\"문제가 있다면 나중에 이상하게 터지지 말고, 지금 당장 명확하게 터져라!\"\n\n`str`이 `null`이면 즉시 예외를 던져서, 디버깅할 때 \"아, 여기서 null이 들어왔구나\" 하고 바로 알 수 있게 해줍니다.",
+        "explanation": "**Fail-fast(빠른 실패) 전략:**\n\"문제가 있다면 나중에 이상하게 터지지 말고, 지금 당장 명확하게 터져라!\"\n\n`str`이 `null`이면 즉시 예외를 던져서, 디버깅할 때 \"아, 여기서 null이 들어왔구나\" 하고 바로 알 수 있게 해줍니다.",
         "keyInsight": "빠른 실패(Fail-fast) 패턴",
         "highlight": [
           7
@@ -72,8 +72,8 @@
       {
         "line": 11,
         "title": "Objects.requireNonNullElse",
-        "explanation": "Java 9부터는 삼항 연산자 대신 이 표준 메서드를 쓸 수 있습니다.\n\"null이면 이거 써\"라고 읽히므로 가독성이 훨씬 좋습니다.",
-        "keyInsight": "Java 9+: requireNonNullElse, requireNonNullElseGet",
+        "explanation": "Java 9부터는 삼항 연산자 대신 이 표준 메서드를 쓸 수 있습니다.\n\"null이면 이거 써\"라고 읽히므로 가독성이 훨씬 좋습니다. `Objects` 클래스에는 이런 꿀 같은 유틸리티가 많습니다.",
+        "keyInsight": "Java 9+: requireNonNullElse 사용",
         "highlight": [
           11
         ],
@@ -99,7 +99,7 @@
       "문제없음"
     ],
     "correctIndex": 1,
-    "explanation": "순서가 잘못되었습니다. str.length()가 먼저 실행되므로 str이 null이면 NPE가 발생합니다. null 체크를 먼저 해야 합니다."
+    "explanation": "순서가 잘못되었습니다. str.length()가 먼저 실행되므로 str이 null이면 NPE가 발생합니다. null 체크를 무조건 맨 앞에 둬야 합니다."
   },
   "misconceptions": [
     {
@@ -108,5 +108,5 @@
       "why": "오른쪽부터 체크하면 이미 `null.메서드()`가 실행되어 NPE가 터져버립니다. `&&`는 왼쪽부터 읽다가 `false`가 나오면 즉시 멈춥니다(단축 평가)."
     }
   ],
-  "keyTakeaway": "null 체크 먼저, Objects 유틸리티 활용, 기본값 패턴 사용"
+  "keyTakeaway": "null 체크는 항상 맨 앞에. Objects 유틸리티를 활용하면 코드가 깔끔해집니다."
 }

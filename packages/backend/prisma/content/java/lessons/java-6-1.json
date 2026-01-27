@@ -1,95 +1,61 @@
 {
   "lessonId": "java-6-1",
-  "title": "상속과 super",
-  "concept": "자식 클래스는 부모의 필드와 메서드를 상속받고, super로 부모에 접근한다",
+  "title": "Stack Trace & Try-Catch",
+  "concept": "Core concept for Stack Trace & Try-Catch",
   "content": {
-    "code": "class Animal {\n    String name;\n    \n    Animal(String name) {\n        this.name = name;\n    }\n    \n    void speak() {\n        System.out.println(name + \" makes a sound\");\n    }\n}\n\nclass Dog extends Animal {\n    String breed;\n    \n    Dog(String name, String breed) {\n        super(name);  // 부모 생성자 호출\n        this.breed = breed;\n    }\n    \n    void speak() {\n        super.speak();  // 부모 메서드 호출\n        System.out.println(name + \" barks!\");\n    }\n}\n\nDog dog = new Dog(\"Max\", \"Labrador\");",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. Error (Serious, usually fatal)\n        // StackOverflowError error = new StackOverflowError();\n        \n        // 2. RuntimeException (Unchecked - Logic bugs)\n        RuntimeException bug = new NullPointerException(\"oops\");\n        \n        // 3. Exception (Checked - External failure)\n        Exception failure = new java.io.IOException(\"File not found\");\n        \n        System.out.println(\"Hierarchy loaded\");\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "부모 클래스 Animal",
-        "explanation": "설계도 정의:\n`Animal`은 `name`이라는 상태와 `speak()`라는 행동을 가집니다.",
-        "highlight": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10
-        ],
+        "line": 3,
+        "title": "Throwable 계층 구조",
+        "explanation": "Java의 모든 예외와 에러는 `Throwable` 클래스를 상속받습니다. 크게 `Error`와 `Exception` 두 가지로 나뉩니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "note": "부모 클래스 정의"
-        }
-      },
-      {
-        "line": 13,
-        "title": "자식 클래스 Dog",
-        "explanation": "`Dog`는 `Animal`을 확장(extends)합니다.\n즉, `Animal`이 가진 모든 것(`name`, `speak`)을 물려받고, 자신만의 `breed`를 추가합니다.",
-        "keyInsight": "extends = 부모 + 알파",
-        "highlight": [
-          13
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "Dog는 name(상속) + breed(자체) 필드를 가짐"
-        }
-      },
-      {
-        "line": 17,
-        "title": "super() - 부모 초기화 (필수)",
-        "explanation": "**중요:** 자식이 태어나려면 부모가 먼저 초기화되어야 합니다.\n`super(name)`은 부모 생성자를 호출하여 물려받은 `name` 필드를 먼저 세팅합니다.",
-        "keyInsight": "생성자 첫 줄엔 무조건 super()가 숨어있음",
-        "highlight": [
-          17
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "super()",
-              "value": "calling Animal()..."
-            }
-          ],
-          "note": "부모 생성자 완료 전엔 자식 필드 접근 불가"
-        }
-      },
-      {
-        "line": 22,
-        "title": "super.method() - 부모 기능 사용",
-        "explanation": "`super.speak()`는 \"내(Dog) 방식대로 짖기 전에, 부모(Animal)가 하던 대로 먼저 해봐\"라는 뜻입니다.",
-        "highlight": [
-          22
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "기존 기능 재사용 + 추가 기능 구현 패턴"
-        }
-      },
-      {
-        "line": 27,
-        "title": "Dog 인스턴스 생성 및 메모리",
-        "explanation": "`new Dog()`를 하면 힙(Heap)에 하나의 큰 덩어리가 생깁니다.\n이 덩어리 안에는 **Animal 영역(name)**과 **Dog 영역(breed)**이 합쳐져 있습니다.",
-        "highlight": [
-          27
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "dog",
-              "value": "-> 0x001"
-            }
-          ],
           "heap": [
             {
-              "address": "0x001",
-              "content": "Dog { [Animal part] name: \"Max\", [Dog part] breed: \"Labrador\" }",
-              "note": "부모와 자식이 한 몸(객체)에 있음"
+              "id": 1,
+              "class": "NullPointerException",
+              "extends": "RuntimeException"
+            },
+            {
+              "id": 2,
+              "class": "IOException",
+              "extends": "Exception"
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "RuntimeException (Unchecked)",
+        "explanation": "프로그래머의 실수(버그)로 발생하는 예외들입니다. 컴파일러가 처리를 강제하지 않습니다 (Unchecked).\n예: `NullPointerException`, `IndexOutOfBoundsException`",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "bug",
+              "type": "RuntimeException",
+              "value": "ref: 1"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Exception (Checked)",
+        "explanation": "외부 시스템(파일, 네트워크 등) 문제로 발생할 수 있는 예외입니다. 반드시 `try-catch`로 처리하거나 `throws` 해야 합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "bug",
+              "type": "RuntimeException",
+              "value": "ref: 1"
+            },
+            {
+              "name": "failure",
+              "type": "Exception",
+              "value": "ref: 2"
             }
           ]
         }
@@ -97,27 +63,22 @@
     ]
   },
   "quiz": {
-    "question": "super()를 생략하면?",
+    "question": "다음 중 개발자가 'catch'를 통해 복구하려고 시도하면 안 되는 것은?",
     "options": [
-      "컴파일 에러",
-      "자동으로 super() 호출 (기본 생성자)",
-      "부모 초기화 안 됨",
-      "런타임 에러"
+      "FileNotFoundException",
+      "OutOfMemoryError",
+      "NullPointerException",
+      "SQLException"
     ],
     "correctIndex": 1,
-    "explanation": "super()를 생략하면 컴파일러가 자동으로 super()를 추가합니다. 단, 부모에 기본 생성자가 없으면 컴파일 에러!"
+    "explanation": "`Error` 클래스(OutOfMemoryError 등)는 시스템 레벨의 심각한 문제이므로, 애플리케이션에서 복구하는 것이 불가능하거나 권장되지 않습니다."
   },
   "misconceptions": [
     {
-      "wrong": "부모 객체를 먼저 만들고 자식 객체를 만든다",
-      "correct": "아닙니다. 객체(`Dog`)는 딱 하나만 만들어집니다.",
-      "why": "하나의 `Dog` 객체 내부에 `Animal`의 속성(필드)들이 포함되어 생성되는 구조입니다. 부모 객체가 따로 힙에 둥둥 떠다니는 게 아닙니다."
-    },
-    {
-      "wrong": "super()를 안 써도 알아서 된다",
-      "correct": "부모에게 '기본 생성자(파라미터 없는 거)'가 있을 때만 자동입니다.",
-      "why": "부모에게 생성자가 있는데 기본 생성자가 없다면, 자식은 반드시 명시적으로 `super(인자)`를 호출해줘야 합니다. 아니면 컴파일 에러!"
+      "wrong": "모든 예외는 Exception 클래스를 상속받는다.",
+      "correct": "아닙니다. `Error`는 `Exception`이 아닌 `Throwable`을 상속받으며, 이는 일반적인 예외 처리 대상이 아닙니다.",
+      "why": "Throwable > Error, Exception 구조입니다."
     }
   ],
-  "keyTakeaway": "extends = 상속, super() = 부모 생성자, super.method() = 부모 메서드"
+  "keyTakeaway": "예외 계층(Hierarchy)을 이해해야 어떤 예외를 잡아야 하고(Checked), 어떤 예외는 코드를 고쳐야 하는지(Unchecked) 구분할 수 있습니다."
 }

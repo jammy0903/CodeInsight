@@ -1,0 +1,51 @@
+{
+  "lessonId": "c-9-3",
+  "title": "Conditional Compilation",
+  "concept": "Core concept for Conditional Compilation",
+  "content": {
+    "code": "#include <stdio.h>\n\n#define DEBUG_MODE 1\n\nint main() {\n    printf(\"Program Start\\n\");\n\n#ifdef DEBUG_MODE\n    // This code only exists if DEBUG_MODE is defined\n    printf(\"[DEBUG] Variable x checking...\\n\");\n#endif\n\n#if DEBUG_MODE == 0\n    printf(\"Release Mode\\n\");\n#endif\n\n    printf(\"Program End\\n\");\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 6,
+        "title": "#ifdef 조건부 컴파일",
+        "explanation": "`#ifdef DEBUG_MODE` 블록 안의 코드는 `DEBUG_MODE` 매크로가 정의되어 있을 때만 컴파일에 포함됩니다.\n만약 정의되어 있지 않다면, 컴파일러는 이 코드를 아예 보지도 못합니다 (삭제됨).",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "Program Start",
+            "[DEBUG] Variable x checking...",
+            "Program End"
+          ]
+        }
+      },
+      {
+        "line": 13,
+        "title": "#if 값 비교",
+        "explanation": "`#if`를 사용하면 매크로의 값을 비교할 수도 있습니다. 단순 정의 여부뿐만 아니라 버전에 따른 분기 처리에 유용합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": []
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Header Guard(#ifndef HEADER_H ...)를 사용하는 주된 이유는?",
+    "options": [
+      "컴파일 속도 향상",
+      "헤더 파일 중복 포함 방지 (재정의 에러 방지)",
+      "외부 라이브러리 사용 권한 체크",
+      "메모리 사용량 감소"
+    ],
+    "correctIndex": 1,
+    "explanation": "한 소스 파일에서 같은 헤더를 여러 번 include하게 되면(직/간접적으로), 구조체나 함수가 중복 정의되어 컴파일 에러가 발생합니다. 헤더 가드는 이를 막아줍니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "#ifdef로 뺀 코드는 런타임에 if문처럼 검사된다.",
+      "correct": "런타임에는 조건 검사조차 하지 않습니다. 전처리 단계에서 코드 자체가 사라지거나 남거나 둘 중 하나입니다.",
+      "why": "실행 파일 크기 자체에 영향을 줍니다."
+    }
+  ],
+  "keyTakeaway": "조건부 컴파일을 사용하면 하나의 소스 코드로 디버그용, 릴리즈용, OS별(Windows/Linux) 실행 파일을 따로 만들 수 있습니다."
+}

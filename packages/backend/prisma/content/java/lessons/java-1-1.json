@@ -8,104 +8,173 @@
       {
         "line": 1,
         "title": "첫 번째 String 객체 생성",
-        "explanation": "**메모리에서 일어나는 일:**\n1. **Heap** 영역에 String 객체 \"hello\" 생성\n2. 객체가 저장된 주소(0x001) 반환\n3. **Stack**의 변수 a에 그 주소 저장\n\n**왜 Heap일까?** new 키워드는 항상 Heap에 객체를 생성합니다. Heap은 프로그램이 동적으로 메모리를 할당하는 공간이에요.\n\n**용어 정리:**\n- **new String()**: Heap에 새 String 객체 생성 연산자\n- **Heap**: 동적 할당 메모리 영역 (GC가 관리)\n- **Stack**: 지역 변수(참조)를 저장하는 영역\n- **a**: 참조 변수. 객체가 아니라 주소를 저장\n\n**자주 하는 오해:**\n변수 a 안에 \"hello\" 문자열이 들어있는 게 아닙니다! a는 그저 \"hello\" 객체가 있는 위치(주소)를 가리킬 뿐이에요.",
-        "keyInsight": "new = 항상 새 객체 생성",
-        "highlight": [1],
+        "explanation": "**메모리에서 일어나는 일:**\n1. `new String(...)`이 호출되어 **Heap** 영역에 \"hello\" 객체가 만들어집니다.\n2. 그 객체의 위치(주소: 0x001)를 `a`에게 줍니다.\n\n**Heap이란?**\n프로그램 실행 중에 데이터를 자유롭게 저장할 수 있는 거대한 메모리 공간입니다. `new`로 만드는 모든 것은 여기로 갑니다.\n\n**참조 변수(a)란?**\n객체 자체가 아니라, 객체가 **어디에 있는지** 알려주는 주소(표지판)만 들고 있는 변수입니다.",
+        "keyInsight": "new = 항상 새 객체 생성 (Heap)",
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "a", "value": "-> 0x001"}],
-          "heap": [{"address": "0x001", "content": "\"hello\""}]
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "\"hello\""
+            }
+          ]
         }
       },
       {
         "line": 2,
         "title": "두 번째 String 객체 생성",
-        "explanation": "**메모리에서 일어나는 일:**\n1. **또 다른** Heap 영역에 String 객체 \"hello\" 생성\n2. 새 주소(0x002) 반환 (0x001과 다름!)\n3. Stack의 변수 b에 그 주소 저장\n\n**핵심 포인트:** 내용이 \"hello\"로 동일하지만, **메모리상 별개의 객체**입니다!\n\n```\nHeap:\n  0x001: \"hello\"  ← a가 가리킴\n  0x002: \"hello\"  ← b가 가리킴 (다른 객체!)\n```\n\n**왜 같은 \"hello\"인데 새로 만들까?**\nnew 키워드는 \"기존 객체를 재활용하지 말고 무조건 새로 만들어라\"는 명령입니다.\n\n**자주 하는 오해:**\n\"hello\"가 하나만 있고 a와 b가 같이 가리킬 거라 생각하는데, new를 쓰면 항상 별개의 객체가 생깁니다.",
+        "explanation": "또 `new`를 사용했군요! JVM은 기존 것을 재사용하지 않고 무조건 **새로운 객체**를 만듭니다.\n주소는 0x002입니다.\n\n내용은 둘 다 \"hello\"로 똑같지만, **사는 집(주소)**이 완전히 다릅니다. 쌍둥이가 서로 다른 집에 사는 것과 같습니다.",
         "keyInsight": "내용이 같아도 다른 객체 = 다른 주소",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "-> 0x001"},
-            {"name": "b", "value": "-> 0x002"}
+            {
+              "name": "a",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x002"
+            }
           ],
           "heap": [
-            {"address": "0x001", "content": "\"hello\""},
-            {"address": "0x002", "content": "\"hello\"", "new": true}
+            {
+              "address": "0x001",
+              "content": "\"hello\""
+            },
+            {
+              "address": "0x002",
+              "content": "\"hello\"",
+              "new": true
+            }
           ]
         }
       },
       {
         "line": 4,
         "title": "== 비교 (참조 비교)",
-        "explanation": "**동작 원리:**\n1. a의 값 읽기 → 0x001\n2. b의 값 읽기 → 0x002\n3. 두 주소를 비교: 0x001 == 0x002?\n4. 결과: false (다른 주소!)\n\n**왜 false일까?** == 연산자는 **참조(주소) 자체**를 비교합니다. 객체의 내용이 아니라, 변수에 저장된 주소값을 비교해요!\n\n**용어 정리:**\n- **참조 비교**: 같은 객체를 가리키는지 확인 (주소 비교)\n- **값 비교**: 객체의 내용이 같은지 확인 (.equals())\n\n**자주 하는 오해:**\n\"hello\"가 같으니까 true 아니야? → ❌\nJava의 ==는 \"같은 물건인가?\"를 묻는 게 아니라 \"같은 위치인가?\"를 묻습니다!\n\n**면접 단골 질문:**\nQ: a == b가 false인데 둘 다 \"hello\" 아닌가요?\nA: 맞지만 **다른 위치**에 있는 \"hello\"입니다. 쌍둥이처럼 내용은 같지만 별개의 존재예요.",
-        "keyInsight": "== 는 참조(주소) 비교",
-        "highlight": [4],
+        "explanation": "`==` 연산자는 매우 단순합니다. **변수 안에 들어있는 값**만 비교합니다.\n\n`a`에는 0x001이,\n`b`에는 0x002가 들어있습니다.\n\n`0x001 == 0x002` ? 당연히 **false**죠!\n\n**참조 비교란?**\n'내용물'을 뜯어보는 게 아니라, '포장지(주소)'가 같은지만 확인하는 것입니다.",
+        "keyInsight": "== 는 주소값 비교",
+        "highlight": [
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "-> 0x001"},
-            {"name": "b", "value": "-> 0x002"}
+            {
+              "name": "a",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x002"
+            }
           ],
           "comparison": "0x001 != 0x002",
-          "output": ["false"]
+          "output": [
+            "false"
+          ]
         }
       },
       {
         "line": 5,
         "title": ".equals() 비교 (값 비교)",
-        "explanation": "**동작 원리:**\n1. a.equals(b) 메서드 호출\n2. a가 가리키는 객체(0x001)로 이동\n3. 그 객체의 내용(\"hello\")을 b가 가리키는 객체(0x002)의 내용(\"hello\")과 비교\n4. 결과: true (내용이 같음!)\n\n**왜 true일까?** .equals()는 **객체의 내용**을 비교하도록 설계된 메서드입니다. 주소가 아니라 \"hello\" vs \"hello\"를 비교해요!\n\n**== vs .equals() 핵심 차이:**\n```java\na == b       → 주소 비교: 0x001 == 0x002? → false\na.equals(b)  → 내용 비교: \"hello\" == \"hello\"? → true\n```\n\n**용어 정리:**\n- **.equals()**: Object 클래스의 메서드. String에서 재정의(override)됨\n- **재정의(Override)**: String 클래스가 \"문자열 내용 비교\"로 동작 변경\n\n**실전 팁:**\nString 비교는 **거의 항상** .equals()를 써야 합니다!\n```java\n// ❌ 잘못된 코드\nif (name == \"Alice\") { ... }\n\n// ✅ 올바른 코드\nif (name.equals(\"Alice\")) { ... }\n```",
-        "keyInsight": ".equals()는 값 비교",
-        "highlight": [5],
+        "explanation": "반면 `.equals()`는 꼼꼼합니다. 주소를 따라가서 그 안에 있는 **실제 내용물**(\"hello\")을 확인합니다.\n\n\"hello\"와 \"hello\"는 같으니까 **true**입니다.\n\n**값 비교(Value Comparison)란?**\n객체의 메모리 위치가 달라도, 논리적으로 담고 있는 데이터가 같은지 확인하는 것입니다.",
+        "keyInsight": ".equals()는 내용물 비교",
+        "highlight": [
+          5
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "comparison": "\"hello\" == \"hello\"",
-          "output": ["false", "true"]
+          "output": [
+            "false",
+            "true"
+          ]
         }
       },
       {
         "line": 7,
         "title": "같은 참조 할당",
-        "explanation": "**메모리에서 일어나는 일:**\n1. a의 값(주소) 읽기 → 0x001\n2. 그 값을 c에 **복사**\n3. 이제 a와 c 둘 다 0x001을 저장\n\n**핵심:** 객체를 복사하는 게 아니라, **주소를 복사**합니다!\n\n```\nStack:         Heap:\n  a → 0x001 ──┐\n              ├──→ [0x001: \"hello\"]\n  c → 0x001 ──┘\n  b → 0x002 ────→ [0x002: \"hello\"]\n```\n\n**왜 객체가 복사되지 않을까?** Java에서 참조 변수 할당(=)은 항상 **얕은 복사(Shallow Copy)**입니다. 주소만 복사되고, 객체는 하나 그대로예요.\n\n**자주 하는 오해:**\n\"c = a를 하면 c에 새 'hello' 객체가 생기겠지?\" → ❌\n\n실제로는 a와 c가 **같은 객체를 공유**합니다. 이걸 **별칭(Aliasing)**이라고 해요.\n\n**실전 위험:**\n```java\nString c = a;\nc를 수정하면? → a도 영향받음! (같은 객체)\n```\n단, String은 불변(Immutable)이라 수정이 안 되지만, 다른 객체는 조심해야 합니다!",
-        "highlight": [7],
+        "explanation": "`String c = a;`\n이 코드는 객체를 복사하는 게 아닙니다. `a`가 가지고 있던 **주소(0x001)**만 `c`에게 복사해줍니다.\n\n이제 `a`와 `c`는 **같은 집**을 가리키게 되었습니다.\n\n**별칭(Aliasing)이란?**\n하나의 객체를 여러 변수가 동시에 가리키는 상황입니다. `c`는 `a`의 또 다른 이름일 뿐입니다.",
+        "highlight": [
+          7
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "-> 0x001"},
-            {"name": "b", "value": "-> 0x002"},
-            {"name": "c", "value": "-> 0x001", "sameRef": true}
+            {
+              "name": "a",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x002"
+            },
+            {
+              "name": "c",
+              "value": "-> 0x001",
+              "sameRef": true
+            }
           ],
           "heap": [
-            {"address": "0x001", "content": "\"hello\"", "refCount": 2}
+            {
+              "address": "0x001",
+              "content": "\"hello\"",
+              "refCount": 2
+            }
           ]
         }
       },
       {
         "line": 8,
         "title": "같은 참조 비교",
-        "explanation": "**동작 원리:**\n1. a의 값 읽기 → 0x001\n2. c의 값 읽기 → 0x001\n3. 두 주소를 비교: 0x001 == 0x001?\n4. 결과: true (같은 주소!)\n\n**왜 이제는 true일까?** a와 c가 **같은 객체**를 가리키기 때문입니다!\n\n**정리: == 연산자의 동작 규칙**\n```java\na == b  → false  (0x001 != 0x002, 다른 객체)\na == c  → true   (0x001 == 0x001, 같은 객체)\na.equals(b) → true (\"hello\" == \"hello\", 내용 같음)\n```\n\n**핵심 교훈:**\n- **같은 객체**를 가리키면 → == true\n- **다른 객체**지만 내용 같으면 → == false, .equals() true\n\n**실전 활용:**\n```java\n// 객체 동일성 확인 (같은 인스턴스인지)\nif (user1 == user2) { ... }\n\n// 값 동등성 확인 (내용이 같은지)\nif (user1.equals(user2)) { ... }\n```\n\n**주의사항:**\nPython의 `is`와 Java의 `==`는 같은 역할입니다 (참조 비교).\nPython의 `==`와 Java의 `.equals()`가 같은 역할입니다 (값 비교).",
+        "explanation": "`a`와 `c`는 같은 주소(0x001)를 가지고 있으니 `==` 비교 결과는 **true**입니다.\n\n**총정리:**\n- `==`: 너네 **같은 집**에 살아? (주소 비교)\n- `.equals()`: 너네 **생긴 것(내용)**이 똑같아? (값 비교)",
         "keyInsight": "같은 객체를 가리키면 == 도 true",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "comparison": "0x001 == 0x001",
-          "output": ["false", "true", "true"]
+          "output": [
+            "false",
+            "true",
+            "true"
+          ]
         }
       }
     ]
   },
   "quiz": {
     "question": "다음 코드의 출력은?\n\nInteger x = new Integer(100);\nInteger y = new Integer(100);\nSystem.out.println(x == y);",
-    "options": ["true", "false", "컴파일 에러", "런타임 에러"],
+    "options": [
+      "true",
+      "false",
+      "컴파일 에러",
+      "런타임 에러"
+    ],
     "correctIndex": 1,
-    "explanation": "new로 생성하면 항상 다른 객체입니다. == 는 참조를 비교하므로 false입니다. 값 비교는 x.equals(y)를 사용해야 합니다."
+    "explanation": "new 키워드는 무조건 새로운 메모리 주소(새 객체)를 만듭니다. 주소가 다르므로 == 는 false입니다."
   },
   "misconceptions": [
     {
-      "wrong": "==는 값을 비교한다",
-      "correct": "==는 참조(메모리 주소)를 비교합니다. 값 비교는 .equals()를 사용해야 합니다.",
-      "why": "Python의 ==는 값 비교이지만, Java의 ==는 참조 비교입니다."
+      "wrong": "==는 내용을 비교한다",
+      "correct": "==는 참조(메모리 주소)를 비교합니다. 내용 비교는 .equals()입니다.",
+      "why": "C++의 연산자 오버로딩이나 Python의 ==와 헷갈리기 쉽지만, Java의 ==는 객체에 대해서는 오직 주소만 비교합니다."
     }
   ],
-  "keyTakeaway": "== = 참조 비교, .equals() = 값 비교"
+  "keyTakeaway": "객체 비교는 무조건 .equals()를 쓰세요. ==는 원시 타입(int, boolean 등)에만 씁시다."
 }

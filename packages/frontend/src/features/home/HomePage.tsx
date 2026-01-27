@@ -6,9 +6,8 @@
  *    - CodeInsight 제목
  *    - 부제
  *    - CTA 버튼
- *    - 만화 슬라이드 Row 1
- * 2. 만화 슬라이드 Row 2
- * 3. CTA 버튼
+ *    - SVG 스토리 슬라이드
+ * 2. CTA 버튼
  */
 
 import { Link } from 'react-router-dom';
@@ -400,59 +399,6 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
 StoryPanel.displayName = 'StoryPanel';
 
-// 패널 컴포넌트를 메모이제이션하여 불필요한 재렌더링 방지
-const ComicPanel = memo(({ num, getImage, speeches, showImage = true }: { num: number; getImage: (n: number) => string; speeches: Record<number, string>; showImage?: boolean }) => {
-  const imageSrc = showImage ? getImage(num) : '';
-  const speech = showImage ? speeches[num] : undefined;
-
-  return (
-    <div className="w-[300px] h-[300px] bg-white border-2 border-[var(--theme-dashboard-card-border)] rounded-xl overflow-hidden relative shrink-0">
-      {imageSrc ? (
-        <img
-          src={imageSrc}
-          alt={`만화 ${num}`}
-          className={`w-full h-full object-cover ${num === 5 ? 'object-[30%]' : ''}`}
-          loading="lazy"
-        />
-      ) : (
-        <div className="w-full h-full bg-[var(--theme-home-section-bg)]" />
-      )}
-
-      {speech && (
-        <div className={`absolute top-2 pointer-events-none ${num === 2 || num === 3 || num === 6 ? 'right-3' : 'left-3'}`}>
-          <svg viewBox="0 0 200 55" className="w-full h-auto max-w-[85%] drop-shadow-xl">
-            <rect x="0" y="0" width="200" height="45" rx="22" fill="white" stroke="#e5e7eb" strokeWidth="1" />
-            {num === 2 || num === 3 ? (
-              <>
-                <circle cx="100" cy="45" r="6" fill="white" />
-                <circle cx="100" cy="50" r="4" fill="white" />
-                <circle cx="100" cy="53" r="2.5" fill="white" />
-              </>
-            ) : num === 6 ? (
-              <>
-                <circle cx="170" cy="45" r="6" fill="white" />
-                <circle cx="175" cy="50" r="4" fill="white" />
-                <circle cx="178" cy="53" r="2.5" fill="white" />
-              </>
-            ) : (
-              <>
-                <circle cx="30" cy="45" r="6" fill="white" />
-                <circle cx="25" cy="50" r="4" fill="white" />
-                <circle cx="22" cy="53" r="2.5" fill="white" />
-              </>
-            )}
-            <text x="100" y="28" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#1f2937" fontFamily="var(--font-handwriting)">
-              {speech}
-            </text>
-          </svg>
-        </div>
-      )}
-    </div>
-  );
-});
-
-ComicPanel.displayName = 'ComicPanel';
-
 export default function HomePage() {
   const currentTheme = useThemeStore((s) => s.theme);
   const { firebaseUser, setPageTitle } = useStore();
@@ -469,29 +415,6 @@ export default function HomePage() {
       .getPropertyValue('--theme-home-matrix-color')
       .trim();
   }, [currentTheme]);
-
-  // 각 패널의 이미지 파일명 매핑
-  const getComicImage = (num: number): string => {
-    const imageMap: Record<number, string> = {
-      1: '/images/comic-question.png',     // 질문: C언어는 책으로 공부하면 되나?
-      2: '/images/comic-2-douma.png',      // 도우마 (귀멸의 칼날) - 괴로워하며 학습
-      3: '/images/comic-3-conan.png',      // 코난 - 책상에서 열심히 공부
-      4: '/images/comic-new-1.png',        // 새 이미지 1
-      5: '/images/comic-5-levi.png',       // 리바이 (진격의 거인)
-      6: '/images/comic-6-complete.png',   // 곤+킬루아+히소카 - 완성 트로피
-      7: '/images/comic-new-2.png',        // 새 이미지 2
-      8: '/images/comic-new-3.png',        // Gemini 생성 이미지
-    };
-    return imageMap[num] || '';  // 빈 패널은 이미지 없음
-  };
-
-  // 각 패널의 말풍선 내용
-  const speechBubbles: Record<number, string> = {
-    2: '포인터가 뭐야... 왜 이렇게 어려워...',
-    3: '난 ADHD라서 집중이 안되는데',
-    4: '어? 시각화로 보니까 이해된다!',
-    6: '나 이제 컴퓨터 박사야!',
-  };
 
   return (
     <main className="min-h-screen w-full home-hero">
@@ -559,34 +482,6 @@ export default function HomePage() {
         </section>
 
       </div>
-
-      {/* 만화 슬라이드 Row 2 */}
-      <section
-        className="w-full grid place-items-center px-4 home-section"
-        style={{ paddingTop: '60px', paddingBottom: '60px' }}
-      >
-        <div className="w-full">
-          {/* 만화 컨베이어 벨트 Row 2 */}
-          <div className="relative overflow-hidden">
-            <motion.div
-              className="flex gap-6"
-              animate={{ x: [-2592, 0] }}
-              transition={{
-                x: { repeat: Infinity, repeatType: "loop", duration: 25, ease: "linear" },
-              }}
-            >
-              {[...Array(2)].map((_, setIndex) => (
-                <div key={`row2-${setIndex}`} className="flex gap-6 shrink-0">
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                    <ComicPanel key={`row2-${setIndex}-${num}`} num={num} getImage={getComicImage} speeches={speechBubbles} />
-                  ))}
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-        </div>
-      </section>
 
       {/* 마지막 CTA */}
       <section

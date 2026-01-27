@@ -142,6 +142,16 @@ async function seed() {
 
   // 1. 기존 데이터 삭제 (개발용)
   console.log('  🗑️  Cleaning existing data...');
+  // 자식 테이블부터 삭제 (FK 제약조건 방지)
+  await prisma.stepActivity.deleteMany();
+  await prisma.sessionContext.deleteMany();
+  await prisma.lessonActivity.deleteMany();
+  await prisma.chatHistory.deleteMany();
+  await prisma.quizAttempt.deleteMany();
+  await prisma.userNote.deleteMany();
+  await prisma.userStreak.deleteMany();
+  await prisma.userProfile.deleteMany();
+
   await prisma.userProgress.deleteMany();
   await prisma.quiz.deleteMany();
   await prisma.lessonContent.deleteMany();

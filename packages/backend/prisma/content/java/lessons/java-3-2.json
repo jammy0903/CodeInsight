@@ -8,7 +8,7 @@
       {
         "line": 14,
         "title": "Dog 객체 생성",
-        "explanation": "**메모리 상태:**\n1. `Heap`: 실제 `Dog` 객체가 생성됩니다. (주소: `0x100`)\n2. `Stack`: `myDog` 변수에는 **주소(0x100)**가 저장됩니다.\n\n**비유:** `myDog`는 TV 리모컨이고, 객체는 TV입니다.",
+        "explanation": "**메모리 상태:**\n1. `Heap`: 실제 `Dog` 객체(TV)가 생성됩니다. (주소: `0x100`)\n2. `Stack`: `myDog`(리모컨)에는 **주소(0x100)**가 저장됩니다.\n\n**비유:** `myDog`는 TV가 아니라 **TV 리모컨**입니다. 0x100번 TV를 조종할 수 있는 리모컨이죠.",
         "highlight": [
           14
         ],
@@ -31,8 +31,8 @@
       {
         "line": 15,
         "title": "changeName(myDog) 호출",
-        "explanation": "**참조값(주소) 복사:**\n`myDog`가 가진 주소 `0x100`이 복사되어 파라미터 `d`에 전달됩니다.\n이제 `d`도 똑같은 `0x100`을 가리킵니다. (리모컨 복제)",
-        "keyInsight": "주소 복사 = 같은 객체 공유",
+        "explanation": "**참조값(주소) 복사:**\n`myDog`가 가진 주소 `0x100`이 복사되어 파라미터 `d`에 전달됩니다.\n이제 `d`라는 **복제된 리모컨**이 생겼고, 이 리모컨도 똑같은 0x100번 TV를 가리킵니다.",
+        "keyInsight": "주소 복사 = 리모컨 복제",
         "highlight": [
           15,
           6
@@ -63,8 +63,8 @@
       {
         "line": 7,
         "title": "d.name 변경 (성공)",
-        "explanation": "**리모컨 작동:**\n`d`가 가리키는 `0x100`으로 가서 `name`을 바꿉니다.\n`myDog`도 같은 `0x100`을 보고 있으므로, `main`에서도 변경된 이름이 보입니다.",
-        "keyInsight": "참조를 타고 가서 바꾸면 원본도 바뀜",
+        "explanation": "**리모컨 작동:**\n`d` 리모컨으로 TV 채널(`name`)을 바꿉니다.\n`d`가 가리키는 `0x100`으로 가서 이름을 \"Max\"로 수정합니다.\n\n`myDog`도 같은 TV(`0x100`)를 보고 있으니, `main`에서도 바뀐 이름이 보입니다!",
+        "keyInsight": "리모컨으로 대상(Heap)을 조작하면 원본 영향 받음",
         "highlight": [
           7
         ],
@@ -82,7 +82,7 @@
       {
         "line": 18,
         "title": "reassign(myDog) 호출",
-        "explanation": "이번에도 주소 `0x100`이 복사되어 `reassign`의 파라미터 `d`에 전달됩니다.",
+        "explanation": "이번에도 주소 `0x100`이 복사되어 `reassign` 메서드의 `d` 리모컨으로 전달됩니다.",
         "highlight": [
           18,
           10
@@ -106,8 +106,8 @@
       {
         "line": 11,
         "title": "d에 새 객체 할당 (실패?)",
-        "explanation": "**중요한 차이:**\n1. `new Dog(\"Rex\")`가 Heap에 새 객체(`0x200`)를 만듭니다.\n2. `d`가 이제 `0x200`을 가리키도록 **갈아끼워집니다.**\n3. 하지만 `main`의 `myDog`는 여전히 `0x100`을 보고 있습니다.\n\n**비유:** 복사해준 리모컨(`d`)이 다른 TV(`0x200`)에 연결된 것일 뿐, 내 리모컨(`myDog`)은 그대로입니다.",
-        "keyInsight": "변수 재할당 = 내 리모컨만 바뀜",
+        "explanation": "**중요한 차이:**\n1. `new Dog(\"Rex\")`가 Heap에 새 TV(`0x200`)를 만듭니다.\n2. `d` 리모컨을 이 새 TV(`0x200`)로 **연결(페어링)**합니다.\n3. 하지만 `main`의 `myDog` 리모컨은 여전히 옛날 TV(`0x100`)를 가리키고 있습니다.\n\n**비유:** 친구 리모컨(`d`)을 뺏어서 다른 TV로 연결해봐야, 내 리모컨(`myDog`) 연결은 끊기지 않습니다.",
+        "keyInsight": "변수 재할당 = 내 리모컨 연결만 바뀜",
         "highlight": [
           11
         ],
@@ -142,7 +142,7 @@
       {
         "line": 19,
         "title": "결과 확인",
-        "explanation": "`myDog`는 여전히 `Max`(`0x100`)입니다. 재할당은 원본에 영향을 주지 못했습니다.",
+        "explanation": "`myDog`는 여전히 \"Max\"(`0x100`)입니다. 메서드 안에서의 재할당은 원본에 아무런 영향을 주지 못합니다.",
         "highlight": [
           19
         ],
@@ -163,27 +163,22 @@
     ]
   },
   "quiz": {
-    "question": "객체를 메서드에 전달했을 때 가능한 것은?",
+    "question": "객체를 메서드 파라미터로 넘길 때 복사되는 것은?",
     "options": [
-      "객체 자체를 다른 객체로 교체",
-      "객체의 필드 값 변경",
-      "둘 다 가능",
-      "둘 다 불가능"
+      "객체 전체 (Deep Copy)",
+      "객체의 참조값(주소) (Reference Copy)",
+      "객체의 첫 번째 필드값",
+      "아무것도 복사되지 않음"
     ],
     "correctIndex": 1,
-    "explanation": "필드 변경은 같은 객체를 참조하므로 가능합니다. 하지만 참조를 재할당해도 원본 변수는 영향 없습니다."
+    "explanation": "Java는 항상 값을 복사합니다. 객체의 경우 그 값은 '메모리 주소'입니다. 그래서 리모컨을 복사해준다고 생각하면 쉽습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Java는 객체를 Pass by Reference로 전달한다",
-      "correct": "Java는 오직 **Call by Value**만 존재합니다. 단지 그 값이 '참조값(주소)'일 뿐입니다.",
-      "why": "진짜 Call by Reference(C++ 참조 변수 등)라면 `d = new Dog()` 했을 때 `myDog`도 바뀌어야 하는데, Java는 그렇지 않습니다."
-    },
-    {
-      "wrong": "final 변수는 내부 값도 못 바꾼다",
-      "correct": "`final Dog d`는 `d`가 가리키는 **대상(주소)**을 못 바꿀 뿐, `d.name` 같은 내부 상태는 변경 가능합니다.",
-      "why": "final은 재할당을 막는 것이지, 불변 객체(Immutable)를 만드는 것이 아닙니다."
+      "wrong": "Java는 Call by Reference다",
+      "correct": "Java는 100% **Call by Value**입니다.",
+      "why": "참조값(주소)이라는 값을 복사해서 주기 때문에 Call by Value입니다. 진짜 Call by Reference라면 `d = new Dog()` 했을 때 `myDog`도 바뀌어야 합니다."
     }
   ],
-  "keyTakeaway": "참조값 복사 = 내부 수정 OK, 재할당은 지역 변수만"
+  "keyTakeaway": "리모컨(참조)을 복사해주는 것이다. 채널(내부)은 바꿀 수 있지만, 리모컨 연결(주소)을 끊을 순 없다."
 }

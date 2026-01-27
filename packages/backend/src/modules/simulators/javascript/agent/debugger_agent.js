@@ -21,6 +21,8 @@
 
 const vm = require('vm');
 const fs = require('fs');
+const acorn = require('acorn');
+const walk = require('acorn-walk');
 
 // ============================================
 // 상수
@@ -393,6 +395,109 @@ class DebuggerAgent {
   }
 
   /**
+   * Promise/setTimeout 콜백 계측 (AST 기반)
+   */
+  instrumentAsyncCallbacks(code) {
+    try {
+      const ast = acorn.parse(code, {
+        ecmaVersion: 2020,
+        locations: true,
+      });
+
+      const insertions = [];
+
+      walk.simple(ast, {
+        CallExpression(node) {
+          // Promise.then() 계측
+          if (
+            node.callee?.type === 'MemberExpression' &&
+            node.callee.property?.name === 'then'
+          ) {
+            const callback = node.arguments[0];
+            if (callback && callback.type === 'ArrowFunctionExpression') {
+              const callbackLine = callback.loc.start.line;
+
+              if (callback.body.type === 'BlockStatement') {
+                // { } 블록: 끝나기 직전에 삽입
+                const insertPos = callback.body.end - 1;
+                insertions.push({
+                  start: insertPos,
+                  end: insertPos,
+                  replacement: ` __captureMicrotask__(${callbackLine}); `
+                });
+              } else {
+                // 한 줄 표현식: 실행 후 캡처
+                const arrowPos = code.indexOf('=>', callback.start);
+                const exprStart = callback.body.start;
+                const exprEnd = callback.body.end;
+
+                insertions.push({
+                  start: arrowPos + 2,
+                  end: exprEnd,
+                  replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMicrotask__(${callbackLine}); return __result__; }`
+                });
+              }
+            }
+          }
+
+          // setTimeout() 계측
+          if (
+            node.callee?.type === 'Identifier' &&
+            node.callee.name === 'setTimeout'
+          ) {
+            const callback = node.arguments[0];
+            const delay = node.arguments[1];
+
+            let delayValue = 0;
+            if (delay && delay.type === 'Literal') {
+              delayValue = delay.value;
+            }
+
+            if (callback && callback.type === 'ArrowFunctionExpression') {
+              const callbackLine = callback.loc.start.line;
+
+              if (callback.body.type === 'BlockStatement') {
+                // { } 블록: 끝나기 직전에 삽입
+                const insertPos = callback.body.end - 1;
+                insertions.push({
+                  start: insertPos,
+                  end: insertPos,
+                  replacement: ` __captureMacrotask__(${callbackLine}, ${delayValue}); `
+                });
+              } else {
+                // 한 줄 표현식: 실행 후 캡처
+                const arrowPos = code.indexOf('=>', callback.start);
+                const exprStart = callback.body.start;
+                const exprEnd = callback.body.end;
+
+                insertions.push({
+                  start: arrowPos + 2,
+                  end: exprEnd,
+                  replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMacrotask__(${callbackLine}, ${delayValue}); return __result__; }`
+                });
+              }
+            }
+          }
+        }
+      });
+
+      // 역순 정렬
+      insertions.sort((a, b) => b.start - a.start);
+
+      let instrumented = code;
+      for (const { start, end, replacement } of insertions) {
+        instrumented = instrumented.substring(0, start) + replacement + instrumented.substring(end);
+      }
+
+      return instrumented;
+    } catch (e) {
+      // AST 파싱 실패 시 원본 반환
+      console.error('[instrumentAsyncCallbacks] Parse error:', e.message);
+      return code;
+    }
+  }
+
+  /**
    * 코드 계측 (라인 기반)
    */
   instrumentCode(code) {
@@ -483,6 +588,20 @@ class DebuggerAgent {
 
       // 원본 라인 추가
       instrumentedLines.push(line);
+
+      // 다음 라인이 .으로 시작하면 캡처 스킵 (메소드 체이닝)
+      // 주석이나 공백 라인은 건너뛰고 확인
+      let nextLineIndex = i + 1;
+      let nextLine = lines[nextLineIndex];
+      while (nextLineIndex < lines.length && (!nextLine || !nextLine.trim() || nextLine.trim().startsWith('//'))) {
+        nextLineIndex++;
+        nextLine = lines[nextLineIndex];
+      }
+
+      if (nextLine && nextLine.trim().startsWith('.')) {
+        continue;
+      }
+
       // 캡처 호출 추가
       instrumentedLines.push(`__capture__(${lineNum});`);
     }
@@ -496,6 +615,7 @@ class DebuggerAgent {
   shouldSkipLine(trimmed) {
     if (!trimmed) return true;
     if (trimmed.startsWith('//')) return true;
+    if (trimmed.startsWith('.')) return true;
     if (trimmed === '{') return true;
     if (trimmed === '}') return true;
     if (trimmed === '};') return true;
@@ -535,16 +655,21 @@ class DebuggerAgent {
   /**
    * 코드 실행 (비동기 시뮬레이션 포함)
    */
-  run(code) {
+  /**
+   * 코드 실행 (비동기 시뮬레이션 포함)
+   */
+  async run(code) {
     const agent = this;
 
-    // 코드 계측
-    const instrumentedCode = this.instrumentCode(code);
+    // 코드 계측: Promise/setTimeout 콜백 먼저, 그 다음 라인 기반
+    let instrumentedCode = this.instrumentAsyncCallbacks(code);
+    instrumentedCode = this.instrumentCode(instrumentedCode);
 
     // ========================================
-    // 비동기 시뮬레이션을 위한 Task Queue
+    // 비동기 시뮬레이션을 위한 Queue 분리
     // ========================================
-    const taskQueue = [];
+    const microtaskQueue = []; // Promise.then()
+    const macrotaskQueue = []; // setTimeout()
     let taskIdCounter = 1;
     const cancelledTasks = new Set();
 
@@ -592,12 +717,34 @@ class DebuggerAgent {
         },
       },
 
+      // Microtask 캡처 (Promise.then() 콜백 내부에서 호출됨)
+      __captureMicrotask__: (lineNumber) => {
+        const vars = {};
+        for (const key of Object.keys(sandbox)) {
+          if (!agent.shouldSkipVariable(key)) {
+            vars[key] = sandbox[key];
+          }
+        }
+        agent.capture(lineNumber, vars);
+      },
+
+      // Macrotask 캡처 (setTimeout() 콜백 내부에서 호출됨)
+      __captureMacrotask__: (lineNumber, delay) => {
+        const vars = {};
+        for (const key of Object.keys(sandbox)) {
+          if (!agent.shouldSkipVariable(key)) {
+            vars[key] = sandbox[key];
+          }
+        }
+        agent.capture(lineNumber, vars);
+      },
+
       // ========================================
       // 시뮬레이션된 setTimeout/setInterval
       // ========================================
       setTimeout: (callback, delay = 0, ...args) => {
         const taskId = taskIdCounter++;
-        taskQueue.push({
+        macrotaskQueue.push({
           id: taskId,
           callback,
           args,
@@ -609,7 +756,7 @@ class DebuggerAgent {
 
       setInterval: (callback, delay = 0, ...args) => {
         const taskId = taskIdCounter++;
-        taskQueue.push({
+        macrotaskQueue.push({
           id: taskId,
           callback,
           args,
@@ -627,6 +774,10 @@ class DebuggerAgent {
         cancelledTasks.add(taskId);
       },
 
+      // Promise는 Native Promise 사용
+      // (계측된 코드가 이미 __captureMicrotask__를 포함함)
+      Promise,
+
       // 허용되는 내장 객체
       Array,
       Object,
@@ -641,7 +792,6 @@ class DebuggerAgent {
       Set,
       WeakMap,
       WeakSet,
-      Promise,
       Symbol,
       Error,
       TypeError,
@@ -661,38 +811,43 @@ class DebuggerAgent {
     const context = vm.createContext(sandbox);
 
     try {
-      // 1. 메인 코드 실행 (동기)
+      // ========================================
+      // 이벤트 루프 시뮬레이션
+      // ========================================
+
+      // 1. 동기 코드 실행
       vm.runInContext(instrumentedCode, context, {
         timeout: EXECUTION_TIMEOUT,
         displayErrors: true,
       });
 
-      // 2. Task Queue 처리 (비동기 시뮬레이션)
-      if (taskQueue.length > 0) {
-        agent.stdoutBuffer.push('[Async] Task Queue 실행 시작');
+      // 2. Native Microtask Queue 실행 대기 (Promise.then())
+      // Node.js는 자동으로 Microtask를 실행하지만, 우리 코드로 제어권이 넘어가기 전에
+      // Promise들이 resolve되도록 여러 틱을 기다립니다
+      for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => process.nextTick(resolve));
+      }
 
+      // 3. Macrotask Queue 실행 (setTimeout())
+      if (macrotaskQueue.length > 0) {
         // delay 순으로 정렬
-        taskQueue.sort((a, b) => a.delay - b.delay);
+        macrotaskQueue.sort((a, b) => a.delay - b.delay);
 
-        // 각 태스크 실행
-        for (const task of taskQueue) {
-          if (cancelledTasks.has(task.id)) {
+        for (const macrotask of macrotaskQueue) {
+          if (cancelledTasks.has(macrotask.id)) {
             continue;
           }
 
           try {
-            task.callback.apply(undefined, task.args);
+            macrotask.callback.apply(undefined, macrotask.args);
+            // __captureMacrotask__()가 콜백 내부에서 호출됨 (계측된 코드)
 
-            // 콜백 실행 후 상태 캡처
-            const vars = {};
-            for (const key of Object.keys(sandbox)) {
-              if (!agent.shouldSkipVariable(key)) {
-                vars[key] = sandbox[key];
-              }
+            // 각 Macrotask 후 Microtask 대기
+            for (let i = 0; i < 5; i++) {
+              await new Promise(resolve => process.nextTick(resolve));
             }
-            agent.capture(-1, vars, `[Callback] ${task.type}`);
           } catch (callbackError) {
-            agent.stdoutBuffer.push(`[Uncaught in ${task.type}] ${callbackError.message}`);
+            agent.stdoutBuffer.push(`[Uncaught in ${macrotask.type}] ${callbackError.message}`);
           }
         }
       }

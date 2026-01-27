@@ -1,144 +1,59 @@
 {
   "lessonId": "java-7-2",
-  "title": "Map 순회와 수정",
-  "concept": "Map 순회 방법과 순회 중 수정 시 주의점을 알아야 한다",
+  "title": "Type Erasure",
+  "concept": "Core concept for Type Erasure",
   "content": {
-    "code": "Map<String, Integer> map = new HashMap<>();\nmap.put(\"a\", 1);\nmap.put(\"b\", 2);\nmap.put(\"c\", 3);\n\n// 방법 1: entrySet (가장 효율적)\nfor (Map.Entry<String, Integer> e : map.entrySet()) {\n    System.out.println(e.getKey() + \"=\" + e.getValue());\n}\n\n// 방법 2: keySet (키만 필요할 때)\nfor (String key : map.keySet()) {\n    System.out.println(key);\n}\n\n// 순회 중 삭제: Iterator 사용\nIterator<Map.Entry<String, Integer>> it = map.entrySet().iterator();\nwhile (it.hasNext()) {\n    if (it.next().getValue() < 2) {\n        it.remove();\n    }\n}",
+    "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<String> list = new ArrayList<>();\n        list.add(\"Hello\");\n        \n        // 1. Compile-time Check\n        // list.add(123); // Error\n        \n        // 2. Runtime Reality (Type Erasure)\n        // Inside JVM, it is just ArrayList (raw type)\n        String s = list.get(0); \n        // Compiler inserts: (String) list.get(0)\n        \n        System.out.println(s);\n        \n        // Proof: getClass() is same for all generic types\n        ArrayList<Integer> intList = new ArrayList<>();\n        boolean sameClass = list.getClass() == intList.getClass();\n        System.out.println(\"Same Class? \" + sameClass);\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "HashMap 생성",
-        "explanation": "map에 3개의 키-값 쌍이 들어있습니다.",
-        "highlight": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "line": 13,
+        "title": "Type Erasure (타입 소거)",
+        "explanation": "컴파일이 끝나면 제네릭 타입 정보(`<String>`)는 모두 지워집니다(Soggeo). JVM은 `list`가 String 전용인지 Integer 전용인지 모릅니다. 그냥 `Object`들의 리스트로 취급합니다.",
+        "keyInsight": "하위 호환성(Java 5 이전 코드와 호환)을 유지하기 위해 이렇게 설계되었습니다.",
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "map",
-              "value": "-> HashMap"
+              "name": "list",
+              "value": "ArrayList (Raw)"
             }
           ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "{a:1, b:2, c:3}"
-            }
-          ]
-        }
-      },
-      {
-        "line": 7,
-        "title": "entrySet 순회",
-        "explanation": "entrySet()은 키와 값을 동시에 가져옵니다. 가장 효율적!",
-        "keyInsight": "entrySet = 키+값 동시 접근, O(1)",
-        "highlight": [
-          7,
-          8,
-          9
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "Map.Entry<K,V> = 키와 값의 쌍",
           "output": [
-            "a=1",
-            "b=2",
-            "c=3"
+            "Hello"
           ]
-        }
-      },
-      {
-        "line": 12,
-        "title": "keySet 순회",
-        "explanation": "keySet()은 키만 가져옵니다. 값이 필요하면 get() 호출 필요!",
-        "highlight": [
-          12,
-          13,
-          14
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "값 필요시 map.get(key) 추가 호출",
-          "warning": "값도 필요하면 entrySet이 효율적"
-        }
-      },
-      {
-        "line": 17,
-        "title": "Iterator로 순회",
-        "explanation": "삭제가 필요할 때는 Iterator를 직접 사용합니다.",
-        "highlight": [
-          17,
-          18
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "it",
-              "value": "-> Iterator"
-            }
-          ]
-        }
-      },
-      {
-        "line": 19,
-        "title": "조건 체크",
-        "explanation": "값이 2 미만인 항목을 찾습니다. a:1이 해당!",
-        "highlight": [
-          19
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "it.next().getValue() = 1 < 2 → true"
         }
       },
       {
         "line": 20,
-        "title": "Iterator.remove()",
-        "explanation": "it.remove()로 현재 항목(a:1)을 안전하게 삭제합니다.",
-        "keyInsight": "Map 순회 중 삭제도 Iterator.remove()",
-        "highlight": [
-          20
-        ],
+        "title": "런타임 클래스 정보",
+        "explanation": "`ArrayList<String>`이나 `ArrayList<Integer>`나 런타임에는 똑같은 `ArrayList.class`입니다. 그래서 `instanceof ArrayList<String>` 같은 코드는 불가능합니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "{b:2, c:3}",
-              "changed": true
-            }
+          "output": [
+            "Hello",
+            "Same Class? true"
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "keySet()으로 순회 시 map.put(newKey, value)를 하면?",
+    "question": "Type Erasure로 인해 런타임에 불가능한 작업은?",
     "options": [
-      "정상 작동",
-      "ConcurrentModificationException",
-      "무한 루프",
-      "컴파일 에러"
+      "new T() (제네릭 타입 인스턴스 생성)",
+      "list.get(0) 호출",
+      "null 체크",
+      "객체 메서드 호출"
     ],
-    "correctIndex": 1,
-    "explanation": "순회 중 put()도 구조 변경이므로 ConcurrentModificationException 발생!"
+    "correctIndex": 0,
+    "explanation": "런타임에는 T가 무슨 타입인지 모르기 때문에(Object로 취급), `new T()`처럼 생성자를 호출하거나 `new T[10]`처럼 배열을 만드는 것이 불가능합니다."
   },
   "misconceptions": [
     {
-      "wrong": "keySet()으로 순회하면서 map.get(key)가 효율적이다",
-      "correct": "entrySet()이 훨씬 빠릅니다. get()을 호출할 때마다 매번 해시 계산과 검색을 다시 합니다.",
-      "why": "열쇠(Key)만 쥐고, 매번 금고(Map) 문을 열어서 돈(Value)을 꺼내는 것과 같습니다. `entrySet`은 이미 꺼낸 돈다발을 줍니다."
-    },
-    {
-      "wrong": "Map도 stream().forEach()로 돌릴 수 있다",
-      "correct": "Map은 Collection이 아니라서 `stream()`이 바로 없습니다. `entrySet().stream()`으로 해야 합니다.",
-      "why": "Map은 자료구조의 성격이 조금 다릅니다(Key-Value 쌍). 그래서 `Set(Keys)`이나 `Set(Entries)`로 변환 후 순회해야 합니다."
+      "wrong": "C++ 템플릿처럼 타입별로 코드가 새로 생성된다.",
+      "correct": "아닙니다. Java 제네릭은 코드가 하나입니다. 컴파일러가 캐스팅(`(String)`)을 자동으로 넣어주고 타입을 지우는 방식입니다.",
+      "why": "이를 통해 코드 팽창(Code Bloat)을 막습니다."
     }
   ],
-  "keyTakeaway": "Map 순회 = entrySet (효율), 삭제 = Iterator.remove()"
+  "keyTakeaway": "제네릭은 '컴파일 타임용' 안전장치이며, 런타임에는 타입 정보가 사라진다는 점(Erasure)을 꼭 기억해야 리플렉션이나 오버로딩 시 혼란을 피할 수 있습니다."
 }

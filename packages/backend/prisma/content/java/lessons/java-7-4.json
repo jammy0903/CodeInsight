@@ -1,121 +1,51 @@
 {
   "lessonId": "java-7-4",
-  "title": "Arrays.asList() 함정",
-  "concept": "Arrays.asList()는 고정 크기 리스트를 반환하여 add/remove가 불가능하다",
+  "title": "Wildcards & Bounds",
+  "concept": "Core concept for Wildcards & Bounds",
   "content": {
-    "code": "// 함정 1: 고정 크기\nList<String> fixed = Arrays.asList(\"a\", \"b\", \"c\");\nfixed.set(0, \"x\");  // OK (요소 교체)\n// fixed.add(\"d\");   // UnsupportedOperationException!\n// fixed.remove(0);  // UnsupportedOperationException!\n\n// 함정 2: 원본 배열과 연결\nString[] arr = {\"a\", \"b\", \"c\"};\nList<String> linked = Arrays.asList(arr);\narr[0] = \"x\";\nSystem.out.println(linked.get(0));  // \"x\"!\n\n// 해결책: 새 ArrayList 생성\nList<String> mutable = new ArrayList<>(Arrays.asList(\"a\", \"b\", \"c\"));\nmutable.add(\"d\");  // OK!\n\n// Java 9+: List.of() (완전 불변)\nList<String> immutable = List.of(\"a\", \"b\", \"c\");\n// immutable.set(0, \"x\");  // UnsupportedOperationException!",
+    "code": "import java.util.List;\nimport java.util.ArrayList;\n\npublic class Main {\n    // Upper Bounded Wildcard: accept Number or its subclasses (Integer, Double...)\n    public static double sum(List<? extends Number> list) {\n        double sum = 0;\n        for (Number n : list) {\n            sum += n.doubleValue();\n        }\n        // list.add(10); // Error! Read-only (mostly)\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        List<Integer> ints = new ArrayList<>();\n        ints.add(1);\n        ints.add(2);\n        \n        List<Double> doubles = new ArrayList<>();\n        doubles.add(3.5);\n        \n        // Both work thanks to wildcard\n        System.out.println(\"Sum Ints: \" + sum(ints));\n        System.out.println(\"Sum Doubles: \" + sum(doubles));\n    }\n}",
     "steps": [
       {
-        "line": 2,
-        "title": "Arrays.asList()의 정체",
-        "explanation": "여기서 반환되는 리스트는 진짜 `ArrayList`가 아닙니다!\n`Arrays` 클래스 안에 숨겨진 `Arrays$ArrayList`라는 별개의 클래스입니다.\n이 녀석은 크기를 바꿀 수 없는(Fixed-size) 특징이 있습니다.",
-        "keyInsight": "이름은 같지만, 완전히 다른 가짜 ArrayList",
-        "highlight": [
-          2
-        ],
+        "line": 5,
+        "title": "와일드카드 (? extends Number)",
+        "explanation": "`?`는 '알 수 없는 타입'을 의미합니다. `? extends Number`는 \"Number나 그 자식들을 담고 있는 리스트\"를 받겠다는 뜻입니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "fixed",
-              "value": "-> Arrays$ArrayList"
-            }
-          ],
-          "note": "add/remove 기능이 구현 안 됨"
-        }
-      },
-      {
-        "line": 4,
-        "title": "add() 호출 시 에러",
-        "explanation": "크기가 고정되어 있어서 요소를 더 넣을 수 없습니다. 공간을 늘릴 능력이 없습니다.",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "UnsupportedOperationException"
-        }
-      },
-      {
-        "line": 8,
-        "title": "배열과 연결된 리스트 (View)",
-        "explanation": "`Arrays.asList(arr)`은 배열을 복사하는 게 아니라, 배열을 감싸는 **창문(View)**을 만듭니다.\n창문을 통해 안을 들여다보는 것일 뿐입니다.",
-        "highlight": [
-          8,
-          9
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "String[] { \"a\", \"b\", \"c\" }"
-            }
-          ],
-          "note": "리스트가 이 배열을 직접 가리킴 (참조 공유)"
+          "stack": []
         }
       },
       {
         "line": 10,
-        "title": "원본 배열 수정의 여파",
-        "explanation": "원본 배열 `arr`의 내용을 바꾸면, 창문(`linked`)으로 볼 때도 바뀐 내용(`x`)이 보입니다.\n서로 연결되어 있기 때문입니다.",
-        "keyInsight": "독립된 리스트가 아님! 원본 배열 수정 시 영향 받음",
-        "highlight": [
-          10
-        ],
+        "title": "쓰기 불가 (Immutability)",
+        "explanation": "`List<? extends Number>`로 받으면, 그 리스트가 `List<Integer>`인지 `List<Double>`인지 알 수 없으므로, 값을 추가(add)하는 것은 위험해서 컴파일러가 막습니다.",
+        "keyInsight": "꺼내서 읽을(Read) 수는 있지만, 안전하게 저장(Write)할 수는 없습니다 (PECS - Producer Extends).",
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "String[] { \"x\", \"b\", \"c\" }",
-              "changed": true
-            }
+          "output": [
+            "Sum Ints: 3.0",
+            "Sum Doubles: 3.5"
           ]
-        }
-      },
-      {
-        "line": 14,
-        "title": "진짜 독립된 ArrayList 만들기",
-        "explanation": "`new ArrayList<>(...)` 생성자에 넣으면, 데이터를 **새로 복사**해서, 완전히 독립적인 방을 만듭니다.\n이제는 원본 배열과 상관없이 마음대로 늘리고 줄일 수 있습니다.",
-        "highlight": [
-          14
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "mutable",
-              "value": "-> Real ArrayList"
-            }
-          ],
-          "note": "완전 분리 & 크기 조절 가능"
         }
       }
     ]
   },
   "quiz": {
-    "question": "Arrays.asList()와 List.of()의 차이점은?",
+    "question": "List<? super Integer>의 의미는?",
     "options": [
-      "둘 다 가변이다",
-      "둘 다 불변이다",
-      "asList는 set 가능, List.of는 완전 불변",
-      "asList만 null을 허용한다"
+      "Integer를 상속받은 모든 클래스",
+      "Integer 혹은 그 조상(부모) 클래스들",
+      "모든 타입 가능",
+      "Integer만 가능"
     ],
-    "correctIndex": 2,
-    "explanation": "Arrays.asList()는 요소 교체(set)가 가능하고 null을 허용합니다. List.of()는 완전 불변이고 null을 허용하지 않습니다."
+    "correctIndex": 1,
+    "explanation": "`super`는 하한 경계(Lower Bound)를 설정합니다. Integer 본인이나 그 상위 부모(Number, Object 등) 타입의 리스트를 의미하며, 주로 데이터를 저장(Write/Consume)할 때 사용됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "List.of()는 null을 넣을 수 있다",
-      "correct": "절대 안 됩니다. `List.of`는 `null`을 매우 싫어해서 `NullPointerException`을 던집니다.",
-      "why": "불변 컬렉션의 무결성을 위해서입니다. `Arrays.asList`는 `null`도 받을 수 있습니다."
-    },
-    {
-      "wrong": "toArray()로 만든 배열은 원본 리스트와 연결된다",
-      "correct": "아닙니다. `toArray()`는 데이터를 복사해서 **새로운 배열**을 줍니다.",
-      "why": "`Arrays.asList()`는 배열 -> 리스트로 **감싸는** 것이고, `toArray()`는 리스트 -> 배열로 **복제**하는 것입니다. 방향이 다릅니다."
+      "wrong": "List<Object>는 List<String>의 부모다.",
+      "correct": "아닙니다! 제네릭은 불공변(Invariant)입니다. `List<Object>` 변수에 `List<String>`을 대입할 수 없습니다. 그래서 와일드카드(`? extends Object`)가 필요한 것입니다.",
+      "why": "만약 대입이 되면, String 리스트에 Integer를 넣는 사고가 발생할 수 있기 때문입니다."
     }
   ],
-  "keyTakeaway": "Arrays.asList = 고정 크기, 원본 연결 / 가변 원하면 new ArrayList()"
+  "keyTakeaway": "유연한 API를 만들려면 와일드카드를 써야 합니다. 읽을 땐 `extends`, 쓸 땐 `super` 공식을 기억하세요."
 }

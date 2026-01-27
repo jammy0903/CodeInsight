@@ -1,0 +1,92 @@
+{
+  "lessonId": "c-8-1",
+  "title": "Function Pointer Syntax",
+  "concept": "Core concept for Function Pointer Syntax",
+  "content": {
+    "code": "#include <stdio.h>\n\nint add(int a, int b) {\n    return a + b;\n}\n\nint sub(int a, int b) {\n    return a - b;\n}\n\nint main() {\n    // 1. Declare function pointer\n    int (*op)(int, int);\n\n    // 2. Assign function address\n    op = add;\n    printf(\"add: %d\\n\", op(10, 20));\n\n    // 3. Reassign to another function\n    op = sub;\n    printf(\"sub: %d\\n\", op(10, 20));\n\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 10,
+        "title": "함수 포인터 선언",
+        "explanation": "`int (*op)(int, int)`는 'int 2개를 받고 int를 반환하는 함수'의 주소를 담는 포인터 변수 `op`를 선언합니다.",
+        "keyInsight": "괄호 `(*op)`가 없으면 'int 포인터를 반환하는 함수'가 되어버립니다!",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "op",
+              "value": "Undefined",
+              "address": "0x100"
+            }
+          ]
+        }
+      },
+      {
+        "line": 13,
+        "title": "함수 주소 할당",
+        "explanation": "함수 이름 `add`는 그 자체로 함수가 시작되는 메모리 주소(Code Segment)를 의미합니다. 이를 `op`에 저장합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "op",
+              "value": "-> <add function>",
+              "address": "0x100"
+            }
+          ]
+        }
+      },
+      {
+        "line": 14,
+        "title": "포인터를 통한 호출",
+        "explanation": "`op(10, 20)`을 실행하면 `op`가 가리키는 주소(`add`)로 점프하여 코드를 실행합니다.",
+        "keyInsight": "마치 `add(10, 20)`을 호출하는 것과 똑같이 동작합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "add: 30"
+          ]
+        }
+      },
+      {
+        "line": 17,
+        "title": "동적 바인딩 (Reassignment)",
+        "explanation": "이제 `op`가 `sub` 함수의 주소를 가리키도록 변경합니다. 똑같은 `op(10, 20)` 코드가 이번에는 뺄셈을 수행합니다.",
+        "keyInsight": "이것이 바로 '다형성(Polymorphism)'의 기초입니다. 같은 코드가 상황에 따라 다르게 동작합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "op",
+              "value": "-> <sub function>",
+              "address": "0x100"
+            }
+          ],
+          "output": [
+            "add: 30",
+            "sub: -10"
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "void func(int x) 함수를 가리키는 포인터 선언으로 올바른 것은?",
+    "options": [
+      "void *p(int);",
+      "void (*p)(int);",
+      "void *p(int x);",
+      "void (p*)(int);"
+    ],
+    "correctIndex": 1,
+    "explanation": "반환타입 (*변수명)(파라미터타입) 형식을 따라야 합니다. `(*p)` 괄호가 핵심입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수 포인터는 변수 포인터와 메모리 구조가 다르다.",
+      "correct": "똑같이 32/64비트 주소값을 담는 변수입니다. 단지 가리키는 곳이 데이터 영역이 아니라 코드 영역일 뿐입니다.",
+      "why": "CPU 입장에서는 데이터 주소나 코드 주소나 다 같은 숫자입니다."
+    }
+  ],
+  "keyTakeaway": "함수 포인터를 사용하면 런타임에 실행할 함수를 교체(Switching)할 수 있어 유연한 설계를 가능하게 합니다."
+}
