@@ -22,7 +22,13 @@ import { standaloneQuizzesRoutes } from './modules/standalone-quizzes/routes';
 import { lessonContentLoader } from './services/lessonContentLoader';
 
 // Firebase Admin 초기화
-initializeFirebase();
+try {
+  initializeFirebase();
+  logger.info('Firebase initialized successfully');
+} catch (error) {
+  logger.error('Firebase initialization failed:', error);
+  logger.warn('App will continue without Firebase authentication');
+}
 
 // Lesson Content 초기화 (서버 시작 시 파일 경로 스캔)
 lessonContentLoader.scanFilePaths().catch((err) => {
