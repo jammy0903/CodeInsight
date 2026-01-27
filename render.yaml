@@ -1,0 +1,48 @@
+services:
+  # Backend API Service (Docker 기반)
+  - type: web
+    name: codeinsight-backend
+    runtime: docker
+    region: oregon
+    plan: free
+    repo: https://github.com/jammy0903/CodeInsight
+    branch: main
+    rootDir: packages/backend
+    dockerfilePath: packages/backend/Dockerfile
+    dockerContext: ../..
+
+    # 환경 변수
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3002
+      - key: DATABASE_URL
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://api.deepseek.com
+      - key: CORS_ORIGINS
+        value: https://codeinsight.vercel.app
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: ADMIN_FIREBASE_UID
+        sync: false
+      - key: OLLAMA_URL
+        value: http://localhost:11434
+      - key: OLLAMA_MODEL
+        value: qwen2.5-coder:1.5b
+
+    # 헬스체크 & 자동 배포
+    healthCheckPath: /health
+    autoDeploy: true
+
+    # 자동 롤백 (헬스체크 실패 시)
+    autoRollback: true

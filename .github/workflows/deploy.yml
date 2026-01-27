@@ -1,0 +1,39 @@
+name: Health Check & Auto Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Backend Health Check (배포 후 확인)
+  health-check:
+    name: Backend Health Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting 2 minutes for Render deployment..."
+          sleep 120
+
+      - name: Check backend health
+        run: |
+          echo "🏥 Checking backend health..."
+          for i in {1..20}; do
+            if curl -f -s https://codeinsight-backend.onrender.com/health > /dev/null 2>&1; then
+              echo "✅ Backend is healthy!"
+              exit 0
+            fi
+            echo "Attempt $i/20 failed, retrying in 15s..."
+            sleep 15
+          done
+          echo "❌ Backend health check failed after 5 minutes"
+          exit 1
+
+      - name: Deployment status
+        if: success()
+        run: echo "🎉 Deployment successful and healthy!"
