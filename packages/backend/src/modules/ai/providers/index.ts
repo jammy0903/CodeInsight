@@ -43,7 +43,12 @@ export async function getAllProviders(): Promise<Array<{
   current: boolean;
 }>> {
   const settings = getSettings();
-  const results = [];
+  const results: Array<{
+    type: ProviderType;
+    name: string;
+    available: boolean;
+    current: boolean;
+  }> = [];
 
   for (const [type, provider] of Object.entries(providers)) {
     results.push({
