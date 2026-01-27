@@ -74,8 +74,10 @@ class LessonContentLoader {
         logger.info(`[DEV] File watching enabled for lesson content`);
       }
     } catch (error) {
-      logger.error('Failed to scan lesson contents:', error);
-      throw error;
+      logger.warn('Lesson content directory not found. Lesson content will not be available.', error);
+      // Production 환경에서는 에러를 throw하지 않고 경고만 출력
+      // 앱이 계속 실행되도록 함
+      this.isScanned = true; // 스캔 완료로 표시하여 앱이 계속 실행되도록
     }
   }
 
