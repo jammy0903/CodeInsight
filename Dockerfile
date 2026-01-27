@@ -36,6 +36,9 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 # Install pnpm globally
 RUN npm install -g pnpm@10.27.0
 
+# Set CI environment variable for pnpm
+ENV CI=true
+
 WORKDIR /app
 
 # ==================================================
