@@ -40,7 +40,6 @@ import { useFocusCycle } from '@/hooks/useFocusCycle';
 import { useIsMobile } from '@/hooks';
 
 // 언어별 시각화
-import { JSVisualizerView } from '@/features/visualizers/js';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { JavaMemoryView, toJavaMemoryViewProps } from '@/features/visualizers/java';
@@ -276,6 +275,12 @@ export function LessonPage() {
   const [liveSteps, setLiveSteps] = useState<LessonStep[] | null>(null);
   const [simulating, setSimulating] = useState(false);
   const [simulationError, setSimulationError] = useState<string | null>(null);
+
+  // 레슨 변경 시 상태 리셋 (이전 레슨 데이터가 잠깐 보이는 문제 방지)
+  useEffect(() => {
+    setLiveSteps(null);
+    setSimulationError(null);
+  }, [lessonId]);
   const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>('flow');
 
   const memoryScrollRef = useRef<HTMLDivElement>(null);
@@ -323,7 +328,15 @@ export function LessonPage() {
       return;
     }
 
-    // 2. Check if we have valid code to simulate
+    // 2. Python은 이미 pythonMemoryState를 가지고 있으므로 시뮬레이션 스킵
+    if (lang === 'python' || lang === 'python-practical') {
+      if (lesson.content?.steps) {
+        setLiveSteps(lesson.content.steps);
+      }
+      return;
+    }
+
+    // 3. Check if we have valid code to simulate
     if (!isLanguageSupported(lang) || !memoizedCode) {
       if (lesson.content?.steps) {
         setLiveSteps(lesson.content.steps);
@@ -377,6 +390,8 @@ export function LessonPage() {
               ...simStep,
               // JSON explanation이 있으면 우선 사용, 없으면 시뮬레이터 설명 사용
               explanation: jsonStep?.explanation || simStep.explanation,
+              // Python의 경우 pythonMemoryState도 보존
+              pythonMemoryState: (jsonStep as any)?.pythonMemoryState || (simStep as any).pythonMemoryState,
             };
           });
 
@@ -399,12 +414,11 @@ export function LessonPage() {
       }
     };
 
-    // Debounce simulation slightly to prevent double-firing on rapid mounts
-    const timer = setTimeout(runSimulation, 100);
+    // 즉시 실행 (캐시 시스템이 중복 요청 방지)
+    runSimulation();
 
     return () => {
       cancelled = true;
-      clearTimeout(timer);
     };
   }, [lesson, lang, memoizedCode]);
 
@@ -419,6 +433,8 @@ export function LessonPage() {
   const navigation = useLessonNavigation({
     totalSteps: steps.length,
     lessonId: lessonId,
+    code, // 빈 줄 감지용
+    steps, // 빈 줄 감지용
     onComplete: async () => {
       if (!lessonId) return;
       try {
@@ -536,7 +552,13 @@ export function LessonPage() {
     }
   };
 
-  if (isLoading || simulating) return <LoadingView />;
+  // 시뮬레이션 대기 중: 코드가 있는데 아직 liveSteps가 없으면 로딩 표시
+  const isSimulationPending = lesson?.content?.code &&
+    isLanguageSupported(lang || '') &&
+    liveSteps === null &&
+    !simulating;
+
+  if (isLoading || simulating || isSimulationPending) return <LoadingView />;
   if (isError || !lesson) return <NotFoundView message={error instanceof Error ? error.message : '레슨을 찾을 수 없습니다'} backPath={languageCoursePath} />;
   if (steps.length === 0) return <NotFoundView message="레슨 콘텐츠가 없습니다" backPath={languageCoursePath} />;
 
@@ -712,17 +734,27 @@ export function LessonPage() {
                 <div className="w-full h-full overflow-y-auto">
                   <div className="p-4">
                     {currentStep && (
-                      <LessonFlowVisualizer
-                        step={currentStep}
-                        prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
-                        language={lang === 'python-practical' ? 'python' : (lang || 'c')}
-                        fullCode={code}
-                        memoryState={memoryState ? {
-                          stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
-                          heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' }))
-                        } : undefined}
-                        stdout={currentStep.stdout}
-                      />
+                      <>
+                        {console.log('[LessonPage] currentStep 전체:', currentStep)}
+                        {console.log('[LessonPage] stack 상세:', {
+                          hasStack: !!(currentStep as any).stack,
+                          stackLength: (currentStep as any).stack?.length,
+                          stack: (currentStep as any).stack,
+                          hasPythonMemoryState: !!(currentStep as any).pythonMemoryState,
+                          pythonMemoryState: (currentStep as any).pythonMemoryState
+                        })}
+                        <LessonFlowVisualizer
+                          step={currentStep}
+                          prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
+                          language={lang === 'python-practical' ? 'python' : (lang || 'c')}
+                          fullCode={code}
+                          memoryState={memoryState ? {
+                            stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
+                            heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' }))
+                          } : undefined}
+                          stdout={currentStep.stdout}
+                        />
+                      </>
                     )}
                   </div>
                 </div>

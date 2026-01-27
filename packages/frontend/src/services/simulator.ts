@@ -345,6 +345,11 @@ export const simulatorService = {
 
       const data = response.data;
 
+      // DEBUG: API 응답 확인
+      if (import.meta.env.DEV) {
+        console.log('[simulateJavaScript] API response:', JSON.stringify(data, null, 2));
+      }
+
       if (data.success && data.steps) {
         const lessonSteps: LessonStep[] = data.steps.map((step: any) => ({
           line: step.line,

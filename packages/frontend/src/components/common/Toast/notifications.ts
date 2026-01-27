@@ -263,20 +263,32 @@ export const notifyAdmin = {
 /**
  * 시뮬레이터 에러 메시지를 파싱하여 적절한 알림을 표시합니다.
  */
-export function handleSimulatorError(language: string, errorMessage: string) {
-  const upperLang = language.toUpperCase();
-  const lowerError = errorMessage.toLowerCase();
+export function handleSimulatorError(language: string, errorMessage: unknown) {
+  const upperLang = (language || 'Unknown').toUpperCase();
+
+  // errorMessage가 문자열이 아닐 경우 안전하게 변환
+  let messageStr: string;
+  if (typeof errorMessage === 'string') {
+    messageStr = errorMessage;
+  } else if (errorMessage && typeof errorMessage === 'object') {
+    // 객체인 경우 message 속성 확인 또는 JSON 문자열화
+    messageStr = (errorMessage as any).message || JSON.stringify(errorMessage);
+  } else {
+    messageStr = String(errorMessage || 'Unknown error');
+  }
+
+  const lowerError = messageStr.toLowerCase();
 
   if (lowerError.includes('time limit exceeded') || lowerError.includes('timeout')) {
     notifySimulator.timeout(upperLang);
   } else if (lowerError.includes('compilation error') || lowerError.includes('syntax error')) {
-    notifySimulator.compileError(upperLang, errorMessage);
+    notifySimulator.compileError(upperLang, messageStr);
   } else if (lowerError.includes('runtime error')) {
-    notifySimulator.runtimeError(upperLang, errorMessage);
+    notifySimulator.runtimeError(upperLang, messageStr);
   } else if (lowerError.includes('dangerous')) {
     notifySimulator.dangerousCode();
   } else {
-    notifySimulator.simulationFailed(upperLang, errorMessage);
+    notifySimulator.simulationFailed(upperLang, messageStr);
   }
 }
 

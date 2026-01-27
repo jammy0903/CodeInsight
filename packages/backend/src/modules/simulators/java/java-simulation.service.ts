@@ -43,9 +43,10 @@ export class JavaSimulationService {
             // Line 5: empty
             // Line 6: public class Main {
             // Line 7: public static void main(String[] args) {
-            // Line 8: USER CODE STARTS
+            // Line 8: USER CODE LINE 1 STARTS
+            // Therefore: user line = wrapper line - 7
             const hasClassDefinition = /\b(public\s+)?(class|interface|enum)\s+\w+/.test(sourceCode);
-            const LINE_OFFSET = !hasClassDefinition ? 8 : 0;
+            const LINE_OFFSET = !hasClassDefinition ? 7 : 0;
 
             const adjustedSnapshots = snapshots
                 // 첫 번째 스텝 필터링 (실행 전 상태, line <= 0)

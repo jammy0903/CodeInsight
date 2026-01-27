@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import type { LessonStep, StepMemoryState, StackFrame, Variable, HeapObject } from '@/types';
 import { processMemoryChanges } from '../utils/memoryUtils';
-import type {
-  JSVisualizationState,
-  JSVisualizationType,
-} from '@/features/visualizers/js/types';
 import type { MemoryBlock } from '@/types/memory';
+
+// JavaScript visualization types (inlined from legacy - kept for backwards compatibility)
+type JSVisualizationType = 'memory' | 'callStack' | 'scopeChain' | 'eventLoop' | 'closure' | 'prototype' | 'thisBind' | 'hoisting' | 'promise';
+type JSVisualizationState = Record<string, unknown>; // Simplified - legacy visualization states no longer rendered
 
 // The return type of the hook
 interface UseLessonVisualizationResult {
@@ -80,7 +80,8 @@ export function useLessonVisualization(
 
       if (currentStep.stack && Array.isArray(currentStep.stack)) {
         currentStep.stack.forEach((frame: any) => {
-          const frameName = frame.functionName || 'anonymous';
+          // 백엔드는 methodName을 사용함 (functionName이 아님!)
+          const frameName = frame.methodName || frame.functionName || '__main__';
           frames.push({ name: frameName });
 
           if (frame.variables) {

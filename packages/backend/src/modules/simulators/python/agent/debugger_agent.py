@@ -110,8 +110,13 @@ class DebuggerAgent:
 
             # Only include frames from our target file
             if filename == self.target_file or filename == '<string>':
+                # Python 글로벌 스코프는 __main__으로 표시 (main이 아님!)
+                method_name = code.co_name
+                if code.co_name == '<module>':
+                    method_name = "__main__"
+
                 frame_data = {
-                    "methodName": code.co_name if code.co_name != '<module>' else "main",
+                    "methodName": method_name,
                     "className": "Main",
                     "variables": self._extract_variables(current_frame.f_locals)
                 }

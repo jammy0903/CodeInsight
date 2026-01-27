@@ -352,6 +352,7 @@ export const PythonFlowView = memo(function PythonFlowView({
     objectMap.forEach((object, objectId) => {
       const names = namesByObject.get(objectId) || [];
       const globalNames = names.filter((n) => n.scope === 'global' || !n.scope);
+
       if (globalNames.length > 0) {
         globalObjects.push({ object, names: globalNames });
       }

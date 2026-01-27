@@ -9,11 +9,20 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ChevronRight, Check, Loader2, Edit2, X } from 'lucide-react';
+import { User, ChevronRight, Check, Loader2, Edit2, X, LogOut, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/stores/store';
 import { PixelAvatar } from '@/components/PixelAvatar';
 import { getProfile, updateProfile, type UserProfile } from '@/services/analytics';
-import { updateNickname, checkNickname } from '@/services/user';
+import { updateNickname, checkNickname, deleteAccount } from '@/services/user';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   PROFILE_QUESTIONS,
   getProfileLabel,
@@ -22,7 +31,8 @@ import {
 } from '@/constants/profileQuestions';
 
 export function ProfilePage() {
-  const { appUser, firebaseUser, setAppUser } = useStore();
+  const navigate = useNavigate();
+  const { appUser, firebaseUser, setAppUser, setFirebaseUser } = useStore();
 
   // 프로필 데이터 상태
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -38,6 +48,10 @@ export function ProfilePage() {
   const [nicknameError, setNicknameError] = useState('');
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [isSavingNickname, setIsSavingNickname] = useState(false);
+
+  // 회원탈퇴 상태
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   // 프로필 불러오기
   useEffect(() => {
@@ -151,6 +165,37 @@ export function ProfilePage() {
     }
   };
 
+  // 회원탈퇴 확인 다이얼로그 열기
+  const handleOpenDeleteDialog = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  // 회원탈퇴 확인 다이얼로그 닫기
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+  };
+
+  // 회원탈퇴 실행
+  const handleConfirmDelete = async () => {
+    setIsDeletingAccount(true);
+    try {
+      await deleteAccount();
+
+      // 로그아웃 처리
+      setFirebaseUser(null);
+      setAppUser(null);
+
+      // 로그인 페이지로 이동
+      navigate('/auth', { replace: true });
+    } catch (error: any) {
+      console.error('Account deletion error:', error);
+      alert(error.message || '계정 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsDeletingAccount(false);
+      handleCloseDeleteDialog();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[var(--theme-layout-page-bg)] p-6">
       <div className="max-w-2xl mx-auto">
@@ -227,7 +272,7 @@ export function ProfilePage() {
                 )}
 
                 <p className="text-sm text-[var(--theme-dashboard-text-muted)] mt-1">
-                  {appUser.oauthAccounts[0]?.email || firebaseUser?.email}
+                  {firebaseUser?.email}
                 </p>
                 <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[var(--theme-dashboard-accent)]/10 text-[var(--theme-dashboard-accent)] rounded-full">
                   {appUser.role === 'admin' ? '관리자' : '일반 사용자'}
@@ -248,7 +293,7 @@ export function ProfilePage() {
                         {account.provider}
                       </span>
                       <span className="text-sm text-[var(--theme-dashboard-text-muted)]">
-                        {account.email}
+                        {firebaseUser?.email}
                       </span>
                     </div>
                   ))}
@@ -263,7 +308,7 @@ export function ProfilePage() {
         </div>
 
         {/* 학습 프로필 카드 */}
-        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-6">
+        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-6 mb-6">
           <h3 className="text-lg font-bold text-[var(--theme-dashboard-title)] mb-4">
             학습 프로필
           </h3>
@@ -374,6 +419,97 @@ export function ProfilePage() {
             </div>
           )}
         </div>
+
+        {/* 계정 관리 카드 */}
+        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-6">
+          <h3 className="text-lg font-bold text-[var(--theme-dashboard-title)] mb-4">
+            계정 관리
+          </h3>
+
+          <motion.button
+            onClick={handleOpenDeleteDialog}
+            className="w-full flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 rounded-xl border-2 border-red-200 transition-colors text-left"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+          >
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div>
+                <p className="text-sm font-semibold text-red-700">계정 탈퇴</p>
+                <p className="text-xs text-red-600 mt-1">
+                  계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다
+                </p>
+              </div>
+            </div>
+            <LogOut className="w-5 h-5 text-red-600" />
+          </motion.button>
+        </div>
+
+        {/* 계정 탈퇴 확인 다이얼로그 */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-700">
+                <AlertTriangle className="w-5 h-5" />
+                계정을 삭제하시겠습니까?
+              </DialogTitle>
+              <DialogDescription>
+                이 작업은 되돌릴 수 없습니다. 계정을 삭제하면:
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-2 text-sm text-[var(--theme-dashboard-text-muted)]">
+              <p className="flex items-start gap-2">
+                <span className="text-red-600 font-bold mt-0.5">•</span>
+                <span>모든 제출 기록과 드래프트가 삭제됩니다</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="text-red-600 font-bold mt-0.5">•</span>
+                <span>학습 진도 데이터가 모두 제거됩니다</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="text-red-600 font-bold mt-0.5">•</span>
+                <span>같은 이메일로 다시 가입할 수 없습니다</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="text-red-600 font-bold mt-0.5">•</span>
+                <span>계정 정보가 즉시 삭제됩니다</span>
+              </p>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <motion.button
+                onClick={handleCloseDeleteDialog}
+                disabled={isDeletingAccount}
+                className="px-4 py-2 rounded-lg border border-[var(--theme-dashboard-card-border)] text-[var(--theme-dashboard-text-muted)] hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                whileHover={!isDeletingAccount ? { scale: 1.02 } : {}}
+                whileTap={!isDeletingAccount ? { scale: 0.98 } : {}}
+              >
+                취소
+              </motion.button>
+
+              <motion.button
+                onClick={handleConfirmDelete}
+                disabled={isDeletingAccount}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                whileHover={!isDeletingAccount ? { scale: 1.02 } : {}}
+                whileTap={!isDeletingAccount ? { scale: 0.98 } : {}}
+              >
+                {isDeletingAccount ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    삭제 중...
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="w-4 h-4" />
+                    계정 삭제
+                  </>
+                )}
+              </motion.button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

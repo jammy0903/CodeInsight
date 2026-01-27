@@ -10,7 +10,6 @@ import { HomePage } from './features/home';
 import { AuthPage } from './features/auth';
 
 import { PlaygroundPage } from './features/playground';
-import { JSVisualizerPage } from './features/visualizers/js/JSVisualizerPage';
 import { AdminPage, AdminRoute } from './features/admin';
 import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage } from './features/quiz';
 import { ProfilePage } from './features/profile';
@@ -95,7 +94,6 @@ export const router = createBrowserRouter([
         }
       },
       { path: 'playground', element: <PlaygroundPage /> },
-      { path: 'visualizers/js', element: <JSVisualizerPage /> },
       { path: 'quiz', element: <ProtectedRoute><QuizPage /></ProtectedRoute> },
       { path: 'quiz/ox/:lang', element: <ProtectedRoute><OXQuizPage /></ProtectedRoute> },
       { path: 'quiz/multiple-choice/:lang', element: <ProtectedRoute><MultipleChoiceQuizPage /></ProtectedRoute> },
