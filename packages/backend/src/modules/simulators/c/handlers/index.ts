@@ -12,10 +12,14 @@ import { IOHandler } from './io.handler';
 import { FunctionCallHandler } from './function.handler';
 import { StructHandler } from './struct.handler';
 import { BitwiseHandler } from './bitwise.handler';
+import { FunctionPointerHandler } from './function-pointer.handler';
+import { DoublePointerHandler } from './double-pointer.handler';
 
 // 기본 핸들러 목록 (우선순위순으로 정렬됨)
 const defaultHandlers: CodeHandler[] = [
   MallocHandler, // priority: 30
+  FunctionPointerHandler, // priority: 27 (NEW!)
+  DoublePointerHandler, // priority: 26 (NEW!)
   PointerHandler, // priority: 25
   StructHandler, // priority: 22 (struct 정의/선언/멤버접근)
   ArrayHandler, // priority: 20
@@ -122,6 +126,8 @@ export { IOHandler } from './io.handler';
 export { FunctionCallHandler } from './function.handler';
 export { StructHandler } from './struct.handler';
 export { BitwiseHandler } from './bitwise.handler';
+export { FunctionPointerHandler } from './function-pointer.handler';
+export { DoublePointerHandler } from './double-pointer.handler';
 
 // TypeRegistry re-export
 export { cTypeRegistry, TypeRegistry, type TypeInfo } from '../types';
