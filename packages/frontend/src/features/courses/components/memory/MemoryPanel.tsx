@@ -949,7 +949,7 @@ export function MemoryPanel({
 
   // 포인터 화살표 연결 관리
   const { connections, containerRef, containerSize, registerBlock } =
-    usePointerConnections(stack, heap, changedBlocks);
+    usePointerConnections(stack, heap, [...changedBlocks.stack, ...changedBlocks.heap]);
 
   return (
     <div className="p-2 space-y-2 relative" ref={containerRef}>

@@ -5,11 +5,11 @@
 import { test, expect } from '../fixtures/test-base';
 import { LessonPage } from '../pages';
 
-// 테스트용 레슨 경로 (실제 데이터에 맞게 조정 필요)
+// 테스트용 레슨 경로 (실제 DB 데이터 형식에 맞춤)
 const TEST_LESSON = {
   lang: 'c',
   chapterId: '1',
-  lessonId: '1',
+  lessonId: 'c-1-1',  // DB에 저장된 실제 lessonId 형식
 };
 
 test.describe('LessonPage - 학습 화면', () => {

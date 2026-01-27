@@ -1,103 +1,66 @@
 {
   "lessonId": "c-2-5",
-  "title": "NULL과 초기화되지 않은 포인터",
-  "concept": "초기화되지 않은 포인터 사용은 위험하다. NULL로 명시적 초기화하라",
+  "title": "The NULL Pointer",
+  "concept": "가리킬 곳이 없을 때는 NULL로 설정해야 안전하다",
   "content": {
-    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p1;           // 위험! 초기화 안됨\n    int *p2 = NULL;    // 안전! 명시적 NULL\n    \n    // *p1 = 10;  // 위험! 어디에 쓸지 모름\n    // *p2 = 10;  // 에러! NULL 역참조\n    \n    if (p2 == NULL) {\n        printf(\"p2는 아무것도 가리키지 않음\\n\");\n    }\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    // 1. 안전한 포인터 초기화\n    int *ptr = NULL;\n    \n    // 2. 체크하고 사용하기\n    if (ptr != NULL) {\n        printf(\"Value: %d\\n\", *ptr);\n    } else {\n        printf(\"Pointer is NULL! Safe.\\n\");\n    }\n    \n    // *ptr = 100; // 펑! (Segmentation Fault)\n    return 0;\n}",
     "steps": [
       {
         "line": 5,
-        "title": "초기화되지 않은 포인터 (위험!)",
-        "explanation": "p1은 **쓰레기 주소**를 가집니다. 어떤 메모리를 가리키는지 알 수 없어요!\n\n**왜 쓰레기일까?** 지역 변수는 자동 초기화되지 않습니다. 스택의 그 위치에 이전에 있던 값이 그대로 남아있어요.\n\n**위험도: ⚠️ 매우 높음**\n- 운 좋으면: 프로그램이 즉시 크래시 (버그 발견 쉬움)\n- 운 나쁘면: 정상 동작하는 것처럼 보이다가 나중에 크래시 (디버깅 지옥)",
+        "title": "NULL 초기화",
+        "explanation": "**`int *ptr = NULL;`**\n\"이 포인터는 지금 아무것도 가리키지 않아!\"라고 명찰을 달아주는 것입니다.\n초기화하지 않으면 쓰레기 주소를 가리키게 되어 매우 위험합니다.",
         "highlight": [
           5
         ],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p1",
-            "type": "int*",
-            "size": 8,
-            "value": "0x???????? (쓰레기)",
-            "address": "0x7ffc1000",
-            "danger": true,
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 6,
-        "title": "NULL 초기화 (안전!)",
-        "explanation": "p2 = NULL은 **'아무것도 가리키지 않음'**을 명시적으로 표현합니다.\n\n**NULL이란?** 주소 **0**입니다. 운영체제는 이 주소를 보호해서 접근하면 즉시 크래시해요.\n\n**왜 NULL이 안전할까?**\n- 쓰레기 주소: 어디를 가리키는지 모름 → 이상한 동작 가능\n- NULL: \"가리키는 곳 없음\"이 명확 → 역참조하면 바로 크래시 → 버그 발견 쉬움!\n\n**규칙:** 가리킬 대상이 없으면 **반드시 NULL로 초기화**하세요!",
-        "highlight": [
-          6
-        ],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p2",
-            "type": "int*",
-            "size": 8,
-            "value": "NULL (0x0)",
-            "address": "0x7ffc0ff8",
-            "safe": true,
-            "frame": "main"
-          }
-        ]
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "ptr",
+              "value": "NULL (0x0)",
+              "type": "int*",
+              "address": "0x5000"
+            }
+          ],
+          "output": []
+        }
       },
       {
         "line": 8,
-        "title": "쓰레기 포인터 역참조 (금지!)",
-        "explanation": "*p1 = 10;은 **임의의 메모리에 쓰는 것**입니다. 시스템 메모리를 덮어쓸 수도 있어요!\n\n**최악의 시나리오:**\n- 다른 변수 값이 바뀜 (예상치 못한 버그)\n- 시스템 중요 데이터 손상 (크래시)\n- 보안 취약점 (해커가 악용 가능)\n\n이 코드는 **절대 실행하면 안 됩니다!**",
-        "highlight": [
-          8
-        ],
-        "memoryChanges": []
-      },
-      {
-        "line": 11,
         "title": "NULL 체크",
-        "explanation": "포인터 사용 전 **NULL 체크**는 좋은 습관입니다!\n\n**방어적 프로그래밍:**\n```c\nif (p != NULL) {\n    *p = 10;  // 안전하게 사용\n}\n```\n\n**왜 중요할까?** 프로그램이 복잡해지면 포인터가 NULL인지 아닌지 추적하기 어려워요. 사용 전에 체크하면 크래시를 예방할 수 있습니다.\n\n**모던 C 스타일:** `if (p)` 는 `if (p != NULL)`과 같습니다. NULL은 false로 평가되거든요.",
+        "explanation": "**`if (ptr != NULL)`**\n포인터를 역참조(`*ptr`)하기 전에는 항상 유효한 곳을 가리키는지 검사하는 습관이 필요합니다.\n\n`NULL`인 상태에서 `*ptr`을 시도하면 프로그램이 즉시 강제 종료됩니다.",
         "highlight": [
-          11,
-          12,
-          13
+          8,
+          9,
+          10,
+          11
         ],
-        "stdout": "p2는 아무것도 가리키지 않음",
-        "memoryChanges": []
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "Pointer is NULL! Safe."
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "int *p; *p = 5; 실행 시 무슨 일이 발생할 수 있는가?",
+    "question": "포인터가 아무것도 가리키지 않을 때 설정해야 하는 값은?",
     "options": [
-      "정상 동작",
-      "컴파일 에러",
-      "프로그램 크래시 (Segmentation fault)",
-      "5가 출력됨"
+      "0",
+      "void",
+      "NULL",
+      "undefined"
     ],
     "correctIndex": 2,
-    "explanation": "초기화되지 않은 포인터는 임의의 주소를 가리킵니다. 그 주소에 접근하면 대부분 크래시합니다."
+    "explanation": "C언어 표준에서 `NULL` 매크로(보통 0으로 정의됨)를 사용합니다. \"주소 없음\"을 의미하는 명시적인 표시입니다."
   },
   "misconceptions": [
     {
-      "wrong": "int *p;는 안전하다",
-      "correct": "초기화 없는 포인터는 쓰레기 주소를 가지며 매우 위험합니다.",
-      "why": "지역 변수는 자동 초기화되지 않습니다. 포인터도 마찬가지입니다."
-    },
-    {
-      "wrong": "NULL과 0은 다르다",
-      "correct": "C에서 NULL은 보통 0으로 정의됩니다. 주소 0은 '무효'를 의미합니다.",
-      "why": "주소 0은 일반적으로 접근 불가능한 영역입니다."
+      "wrong": "NULL 포인터도 주소니까 읽을 수 있다",
+      "correct": "읽기/쓰기 모두 불법입니다.",
+      "why": "메모리 0번지 등은 운영체제가 보호하는 영역입니다. 접근 시 `Segmentation Fault` (세그폴트) 에러가 발생합니다."
     }
   ],
-  "keyTakeaway": "포인터는 반드시 초기화! 모르면 NULL로"
+  "keyTakeaway": "빈 총(초기화 안 된 포인터)보다 안전장치 걸린 총(NULL)이 낫다. 쓰기 전에 항상 체킹!"
 }

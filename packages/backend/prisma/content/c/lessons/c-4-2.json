@@ -1,108 +1,77 @@
 {
   "lessonId": "c-4-2",
   "title": "Call by Value",
-  "concept": "C의 모든 함수 인자는 값으로 전달된다. 매개변수는 복사본이다",
+  "concept": "함수에 변수를 넘기면 '복사본'이 넘어간다. 원본은 안전하다.",
   "content": {
-    "code": "#include <stdio.h>\n\nvoid addOne(int n) {\n    n = n + 1;\n    printf(\"함수 내 n: %d\\n\", n);\n}\n\nint main() {\n    int x = 10;\n    printf(\"호출 전 x: %d\\n\", x);\n    addOne(x);\n    printf(\"호출 후 x: %d\\n\", x);\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nvoid tryToChange(int x) {\n    x = 999;\n    printf(\"Inside func: x=%d\\n\", x);\n}\n\nint main() {\n    int a = 10;\n    \n    printf(\"Before: %d\\n\", a);\n    tryToChange(a);\n    printf(\"After:  %d\\n\", a);\n    \n    return 0;\n}",
     "steps": [
       {
-        "line": 9,
-        "title": "main에서 x 생성",
-        "explanation": "x에 **10**이 저장됩니다.\n\n**이번 레슨의 핵심 질문:** 함수에서 매개변수를 수정하면 원본도 바뀔까요?\n\n**힌트:** C의 모든 함수 인자 전달은 '값에 의한 전달(Call by Value)'입니다. 무슨 의미인지 직접 확인해 봅시다!",
-        "highlight": [9],
-        "stdout": "호출 전 x: 10",
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "x",
-            "type": "int",
-            "size": 4,
-            "value": 10,
-            "frame": "main"
-          }
-        ]
+        "line": 3,
+        "title": "값의 복사",
+        "explanation": "`tryToChange(a)`를 호출할 때, `a`의 값(10)이 복사되어 매개변수 `x`로 들어갑니다.\n`a`와 `x`는 서로 다른 메모리 주소를 가진 **별개의 변수**입니다.",
+        "highlight": [
+          3,
+          4
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "type": "int",
+              "frame": "main",
+              "address": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "999",
+              "type": "int",
+              "frame": "tryToChange",
+              "address": "0x2000"
+            }
+          ],
+          "output": [
+            "Before: 10",
+            "Inside func: x=999"
+          ]
+        }
       },
       {
         "line": 11,
-        "title": "함수 호출 - 값 복사!",
-        "explanation": "addOne(x)가 호출되면 x의 값 10이 n에 **'복사'**됩니다!\n\n**왜 복사할까?** C의 규칙이에요 - **Call by Value**\n\n**동작 과정:**\n1. x의 값(10)을 읽음\n2. 새 변수 n을 addOne 프레임에 생성\n3. 그 값(10)을 n에 복사\n\n**핵심:** n과 x는 **완전히 별개**의 변수입니다!\n- n의 주소 ≠ x의 주소\n- n을 바꿔도 x에 영향 없음",
-        "highlight": [11, 3],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "addOne",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "n",
-            "type": "int",
-            "size": 4,
-            "value": 10,
-            "frame": "addOne",
-            "note": "x의 복사본"
-          }
-        ]
-      },
-      {
-        "line": 4,
-        "title": "n 수정 (복사본)",
-        "explanation": "n = n + 1로 n이 **11**이 됩니다. 하지만 x는 여전히 **10**입니다!\n\n**왜 x는 안 바뀔까?**\n- n은 x의 **복사본**이에요\n- 복사본을 수정해도 원본은 그대로!\n\n**비유:** 사진을 복사해서 낙서해도, 원본 사진은 깨끗하죠?\n\n**이것이 Call by Value의 핵심!**\n- 장점: 원본 보호 (의도치 않은 수정 방지)\n- 단점: 원본을 수정하고 싶을 때 불편",
-        "highlight": [4],
-        "stdout": "함수 내 n: 11",
-        "memoryChanges": [
-          {
-            "action": "update",
-            "area": "stack",
-            "name": "n",
-            "value": 11,
-            "previousValue": 10,
-            "frame": "addOne"
-          }
-        ]
-      },
-      {
-        "line": 12,
-        "title": "함수 종료 후 x 확인",
-        "explanation": "x는 여전히 **10**입니다! n의 변경은 x에 **영향을 주지 않았습니다**.\n\n**결론:**\n- 함수 매개변수 = 원본의 **복사본**\n- 복사본 수정 → 원본 변경 ❌\n\n**그럼 원본을 수정하려면?** 다음 레슨에서 배울 **포인터**가 필요합니다!\n\n**정리:**\n```c\nvoid foo(int n) { n = 100; }  // 원본 변경 안 됨\nvoid bar(int *p) { *p = 100; } // 원본 변경 됨!\n```",
-        "highlight": [12],
-        "stdout": "호출 후 x: 10",
-        "memoryChanges": [
-          {
-            "action": "frame_end",
-            "area": "stack",
-            "name": "addOne"
-          }
-        ]
+        "title": "원본은 그대로",
+        "explanation": "함수 안에서 `x`를 999로 바꿨지만, 이것은 복사본을 찢어버린 것과 같습니다.\n원본 문서인 `main`의 `a`에는 아무런 영향이 없습니다.\n\n이를 **Call by Value(값에 의한 호출)**라고 합니다.",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "Before: 10",
+            "Inside func: x=999",
+            "After:  10"
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "void foo(int a) { a = 100; } int x = 5; foo(x); 후 x는?",
+    "question": "다음 함수 호출 후 a의 값은?\nvoid inc(int n) { n++; }\n...\nint a = 5; inc(a);",
     "options": [
-      "100",
       "5",
-      "105",
+      "6",
+      "0",
       "에러"
     ],
-    "correctIndex": 1,
-    "explanation": "a는 x의 복사본입니다. a를 변경해도 x는 변하지 않습니다. 이것이 Call by Value입니다."
+    "correctIndex": 0,
+    "explanation": "증가된 것은 복사본 `n`뿐입니다. 원본 `a`는 변하지 않고 5 그대로입니다."
   },
   "misconceptions": [
     {
-      "wrong": "함수 매개변수를 수정하면 원본도 바뀐다",
-      "correct": "매개변수는 원본의 복사본입니다. 복사본 수정은 원본에 영향 없습니다.",
-      "why": "C는 모든 인자를 값으로 전달합니다 (Call by Value). 포인터도 '주소 값'으로 전달됩니다."
+      "wrong": "함수에 변수를 넣으면 연결된다",
+      "correct": "연결되는 게 아니라 'Ctrl+C, Ctrl+V' 복사되는 것입니다.",
+      "why": "데이터 보호를 위한 기본 동작입니다. 바꾸고 싶다면 포인터를 써야 합니다."
     }
   ],
-  "keyTakeaway": "함수 인자 = 복사본. 원본 수정 불가"
+  "keyTakeaway": "함수에 변수를 던지면 값만 복사된다. 원본을 바꾸고 싶다면?"
 }

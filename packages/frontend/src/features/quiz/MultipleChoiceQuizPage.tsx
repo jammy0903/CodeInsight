@@ -5,7 +5,7 @@
  * URL: /quiz/multiple-choice/:lang
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ListChecks, Check, X, RotateCcw, BookOpen, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';

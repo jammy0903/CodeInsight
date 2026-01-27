@@ -63,7 +63,6 @@ export function VisualizerPanel() {
             <TerminalOutput
               lines={terminalLines}
               title="출력 (stdout)"
-              maxHeight={120}
               emptyMessage="프로그램 출력이 여기에 표시됩니다"
               compact
             />

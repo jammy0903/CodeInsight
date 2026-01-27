@@ -239,6 +239,35 @@ export class JavaTransformer implements IFlowTransformer {
       terminalOutput,
     };
   }
+
+  /**
+   * MemoryBlock → FlowVariable 변환
+   * (Java 어댑터에서는 transform에서 통합 처리하므로, 여기는 기본 구현)
+   */
+  toVariable(
+    block: {
+      name: string;
+      value: string;
+      type?: string;
+      address?: string;
+      points_to?: string | null;
+      segment?: string;
+    },
+    scope: string
+  ): FlowVariable {
+    const isReference = !!block.points_to;
+    return {
+      id: `${scope}-${block.name}`,
+      name: block.name,
+      value: parseValue(block.value),
+      type: block.type || 'unknown',
+      state: 'idle',
+      scope,
+      isPointer: isReference,
+      pointsTo: block.points_to ? `heap-${block.points_to}` : undefined,
+      address: block.address,
+    };
+  }
 }
 
 // 싱글톤 인스턴스

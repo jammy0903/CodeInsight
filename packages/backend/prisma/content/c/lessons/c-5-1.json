@@ -1,124 +1,79 @@
 {
   "lessonId": "c-5-1",
   "title": "Stack vs Heap",
-  "concept": "Stack은 자동 관리, Heap은 수동 관리. 용도가 다르다",
+  "concept": "스택은 자동이지만 좁고, 힙은 수동이지만 넓다",
   "content": {
-    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    // Stack: 자동 할당/해제\n    int stackVar = 10;\n    \n    // Heap: 수동 할당\n    int *heapVar = malloc(sizeof(int));\n    *heapVar = 20;\n    \n    printf(\"Stack: %d, Heap: %d\\n\", stackVar, *heapVar);\n    \n    // Heap: 수동 해제 (필수!)\n    free(heapVar);\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    // Stack: 작고 빠름, 자동 관리\n    int stackErr[1000]; \n    // int stackBomb[10000000]; // 스택 오버플로우 위험!\n    \n    // Heap: 크고 느림, 수동 관리\n    int *heapArr = (int*)malloc(sizeof(int) * 10000000);\n    \n    if (heapArr != NULL) {\n        printf(\"Heap allocation success!\\n\");\n        free(heapArr);\n    }\n    \n    return 0;\n}",
     "steps": [
       {
-        "line": 6,
-        "title": "Stack 변수",
-        "explanation": "stackVar는 **스택에 자동 할당**됩니다. 함수 종료 시 **자동 해제**돼요.\n\n**Stack의 특징:**\n- 선언만 하면 자동 할당\n- 함수 끝나면 자동 해제\n- 관리가 **편함**!\n\n**왜 Stack을 먼저 배웠을까?** 대부분의 지역 변수는 Stack에 저장되기 때문이에요. 간단하고 안전합니다.",
+        "line": 5,
+        "title": "Stack (스택)",
+        "explanation": "**특징**: 함수 호출 시 자동 생성, 리턴 시 자동 삭제.\n**장점**: 매우 빠름. 관리 불필요.\n**단점**: 크기가 작음 (보통 1MB~8MB). 큰 배열을 만들면 터짐.",
         "highlight": [
-          6
+          5
         ],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "stackVar",
-            "type": "int",
-            "size": 4,
-            "value": 10,
-            "address": "0x7ffc1000",
-            "auto": true,
-            "frame": "main"
-          }
-        ]
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "stackErr",
+              "value": "...",
+              "type": "int[1000]",
+              "frame": "main"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
       },
       {
         "line": 9,
-        "title": "Heap 할당 (malloc)",
-        "explanation": "malloc은 **Heap에 메모리를 할당**하고 그 주소를 반환합니다.\n\n**왜 Heap이 필요할까?** Stack의 한계 때문이에요:\n1. **크기 제한**: Stack은 보통 1~8MB\n2. **수명 제한**: 함수 끝나면 사라짐\n3. **크기 결정**: 컴파일 시점에 크기를 알아야 함\n\n**Heap은:**\n- 훨씬 큰 메모리 사용 가능 (GB 단위)\n- 함수 끝나도 유지 가능\n- 실행 중에 크기 결정 가능\n\n**대가:** 직접 해제해야 함 (free)",
+        "title": "Heap (힙)",
+        "explanation": "**특징**: 프로그래머가 원할 때 `malloc`으로 만들고, 원할 때 `free`로 지움.\n**장점**: 메모리(RAM)가 허용하는 한 엄청 크게 만들 수 있음.\n**단점**: 관리가 귀찮음. 깜빡하면 메모리 누수(Leak) 발생.",
         "highlight": [
           9
         ],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "heapVar",
-            "type": "int*",
-            "size": 8,
-            "value": "0x55001000",
-            "address": "0x7ffc0ff8",
-            "frame": "main"
-          },
-          {
-            "action": "allocate",
-            "area": "heap",
-            "name": "(anonymous)",
-            "type": "int",
-            "size": 4,
-            "value": "???",
-            "address": "0x55001000",
-            "manual": true
-          }
-        ]
-      },
-      {
-        "line": 10,
-        "title": "Heap에 값 저장",
-        "explanation": "*heapVar = 20으로 **Heap 메모리에 값을 저장**합니다.\n\n**메모리 구조 정리:**\n```\nStack (자동)\n├─ stackVar: 10\n└─ heapVar: 0x55001000 (주소)\n\nHeap (수동)\n└─ [0x55001000]: 20 (값)\n```\n\n**핵심:** heapVar 자체는 Stack에 있고, 그것이 가리키는 메모리가 Heap에 있어요!",
-        "highlight": [
-          10
-        ],
-        "stdout": "Stack: 10, Heap: 20",
-        "memoryChanges": [
-          {
-            "action": "update",
-            "area": "heap",
-            "name": "(via heapVar)",
-            "value": 20,
-            "address": "0x55001000"
-          }
-        ]
-      },
-      {
-        "line": 15,
-        "title": "Heap 해제 (free)",
-        "explanation": "free(heapVar)로 Heap 메모리를 **반환**합니다.\n\n**왜 free가 필수일까?**\n- Heap은 **자동 해제 안 됨**\n- 프로그램이 끝날 때까지 메모리 점유\n- 안 하면 **Memory Leak** (메모리 누수)\n\n**Stack vs Heap 비교:**\n| 특성 | Stack | Heap |\n|------|-------|------|\n| 할당 | 자동 | malloc |\n| 해제 | 자동 | free (수동) |\n| 크기 | 작음 (MB) | 큼 (GB) |\n| 속도 | 빠름 | 느림 |\n| 수명 | 함수 내 | 원하는 만큼 |",
-        "highlight": [
-          15
-        ],
-        "memoryChanges": [
-          {
-            "action": "deallocate",
-            "area": "heap",
-            "address": "0x55001000"
-          }
-        ]
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "heapArr",
+              "value": "0x5000",
+              "type": "int*",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x5000",
+              "size": "40MB",
+              "value": "..."
+            }
+          ],
+          "output": [
+            "Heap allocation success!"
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "Stack과 Heap의 차이는?",
+    "question": "다음 중 Heap 영역을 써야 하는 상황은?",
     "options": [
-      "둘 다 자동 관리",
-      "Stack은 자동, Heap은 수동 관리",
-      "Heap이 더 빠르다",
-      "둘 다 수동 관리"
+      "변수 하나(int)만 저장할 때",
+      "함수가 끝나면 사라져도 되는 임시 변수",
+      "사용자가 입력한 크기만큼(동적으로) 큰 배열을 만들어야 할 때",
+      "가장 빠른 속도가 필요할 때"
     ],
-    "correctIndex": 1,
-    "explanation": "Stack은 함수 종료 시 자동 해제. Heap은 free()로 명시적 해제 필요."
+    "correctIndex": 2,
+    "explanation": "배열 크기가 컴파일 타임에 정해지지 않거나(동적), 아주 큰 데이터를 다룰 때는 힙을 써야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "malloc 후 free 안 해도 된다",
-      "correct": "프로그램 종료 시 해제되지만, 장시간 실행 프로그램에선 Memory Leak이 됩니다.",
-      "why": "사용 안 하는 메모리가 쌓이면 시스템 메모리가 부족해집니다."
-    },
-    {
-      "wrong": "Stack이 더 크다",
-      "correct": "일반적으로 Heap이 훨씬 큽니다. Stack은 보통 1~8MB 제한.",
-      "why": "큰 데이터는 Heap에 할당해야 합니다."
+      "wrong": "Heap이 Stack보다 빠르다",
+      "correct": "Stack이 훨씬 빠릅니다.",
+      "why": "Stack은 CPU가 직접 관리하는 단순 구조지만, Heap은 빈 공간을 찾아다니는 복잡한 알고리즘이 필요하기 때문입니다."
     }
   ],
-  "keyTakeaway": "Stack = 자동 (작은 임시 데이터), Heap = 수동 (큰/장기 데이터)"
+  "keyTakeaway": "작고 빠른 건 스택, 크고 오래가는 건 힙."
 }

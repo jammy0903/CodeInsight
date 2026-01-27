@@ -4,18 +4,18 @@ import type {
   StackFrame,
   Variable,
   HeapObject,
-  MemoryState,
+  StepMemoryState,
 } from '@codeinsight/shared';
 
 interface ProcessedMemoryState {
-  memoryState: MemoryState;
+  memoryState: StepMemoryState;
   changedBlocks: {
     stack: string[];
     heap: string[];
   };
 }
 
-const INITIAL_MEMORY_STATE: MemoryState = {
+const INITIAL_MEMORY_STATE: StepMemoryState = {
   stack: [],
   heap: [],
 };
@@ -36,7 +36,7 @@ export function processMemoryChanges(
   };
 }
 
-function calculateStateForStep(steps: LessonStep[], stepIndex: number): MemoryState {
+function calculateStateForStep(steps: LessonStep[], stepIndex: number): StepMemoryState {
     const slicedSteps = steps.slice(0, stepIndex + 1);
     const finalState = slicedSteps.reduce((currentState, step) => {
         if (!step.memoryChanges || step.memoryChanges.length === 0) {
@@ -49,9 +49,9 @@ function calculateStateForStep(steps: LessonStep[], stepIndex: number): MemorySt
 
 
 function applyMemoryChanges(
-  state: MemoryState,
+  state: StepMemoryState,
   changes: MemoryChangeAction[]
-): MemoryState {
+): StepMemoryState {
   const newState = structuredClone(state);
 
   for (const change of changes) {
@@ -148,7 +148,7 @@ function applyMemoryChanges(
   return newState;
 }
 
-function diffStates(prevState: MemoryState, currentState: MemoryState): ProcessedMemoryState['changedBlocks'] {
+function diffStates(prevState: StepMemoryState, currentState: StepMemoryState): ProcessedMemoryState['changedBlocks'] {
     const changedBlocks: ProcessedMemoryState['changedBlocks'] = {
         stack: [],
         heap: []

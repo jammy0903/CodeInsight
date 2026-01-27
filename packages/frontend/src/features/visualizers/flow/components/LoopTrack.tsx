@@ -135,7 +135,7 @@ export const LoopTrack = memo(function LoopTrack({
   theme,
   maxIterations = 10,
 }: LoopTrackProps) {
-  const { type, condition, iteration = 0 } = controlFlow;
+  const { type, condition, loopIndex = 0 } = controlFlow;
   const colors = FLOW_THEMES[theme].control;
 
   // 루프 타입별 아이콘
@@ -167,10 +167,10 @@ export const LoopTrack = memo(function LoopTrack({
   }, [type]);
 
   // 진행률 계산 (0-1)
-  const progress = Math.min(iteration / maxIterations, 1);
+  const progress = Math.min(loopIndex / maxIterations, 1);
 
-  // 활성 상태 (iteration이 0보다 크면 활성)
-  const isActive = iteration > 0;
+  // 활성 상태 (loopIndex이 0보다 크면 활성)
+  const isActive = loopIndex > 0;
 
   return (
     <motion.div
@@ -195,10 +195,10 @@ export const LoopTrack = memo(function LoopTrack({
           backgroundColor={`${colors.loop}30`}
         />
 
-        {/* 중앙 iteration 숫자 */}
+        {/* 중앙 loopIndex 숫자 */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
-          key={iteration}
+          key={loopIndex}
           initial={{ scale: 1.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -207,7 +207,7 @@ export const LoopTrack = memo(function LoopTrack({
             className="font-mono font-bold text-xl"
             style={{ color: colors.loop }}
           >
-            {iteration}
+            {loopIndex}
           </span>
         </motion.div>
 
@@ -248,11 +248,11 @@ export const LoopTrack = memo(function LoopTrack({
           animate={{ opacity: 0.6 }}
           transition={{ delay: 0.2 }}
         >
-          {iteration === 0
+          {loopIndex === 0
             ? '반복 시작 전'
-            : iteration === 1
+            : loopIndex === 1
             ? '첫 번째 반복'
-            : `${iteration}번째 반복`}
+            : `${loopIndex}번째 반복`}
         </motion.span>
       </div>
 
@@ -278,7 +278,7 @@ export const LoopTrack = memo(function LoopTrack({
           className="text-xs opacity-50 mt-1 block text-center"
           style={{ color: colors.loop }}
         >
-          {iteration}/{maxIterations}
+          {loopIndex}/{maxIterations}
         </span>
       </div>
     </motion.div>

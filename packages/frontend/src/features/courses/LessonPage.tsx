@@ -287,8 +287,8 @@ export function LessonPage() {
 
   const memoryScrollRef = useRef<HTMLDivElement>(null);
 
+  const { resolvedTheme } = useTheme();
   const isMobile = useIsMobile();
-  const { currentTheme } = useTheme();
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [flashFlow, setFlashFlow] = useState(false);
   const [flashMemory, setFlashMemory] = useState(false);
@@ -822,16 +822,16 @@ export function LessonPage() {
             transform: 'translateX(-50%)',
             zIndex: 50,
             padding: '6px 12px',
-            backgroundColor: currentTheme === 'dark'
+            backgroundColor: resolvedTheme === 'dark'
               ? 'rgba(13, 21, 37, 0.85)'  // dark navy with transparency
               : 'rgba(255, 255, 255, 0.85)',  // white with transparency
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',  // Safari support
             borderRadius: '20px',
-            border: `1px solid ${currentTheme === 'dark'
+            border: `1px solid ${resolvedTheme === 'dark'
               ? 'rgba(26, 37, 64, 0.6)'
               : 'rgba(229, 229, 229, 0.6)'}`,
-            boxShadow: currentTheme === 'dark'
+            boxShadow: resolvedTheme === 'dark'
               ? '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)'
               : '0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
             maxWidth: '320px',
@@ -861,16 +861,16 @@ export function LessonPage() {
             transform: 'translateX(-50%)',
             zIndex: 50,
             padding: '6px 12px',
-            backgroundColor: currentTheme === 'dark'
+            backgroundColor: resolvedTheme === 'dark'
               ? 'rgba(13, 21, 37, 0.85)'
               : 'rgba(255, 255, 255, 0.85)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             borderRadius: '20px',
-            border: `1px solid ${currentTheme === 'dark'
+            border: `1px solid ${resolvedTheme === 'dark'
               ? 'rgba(26, 37, 64, 0.6)'
               : 'rgba(229, 229, 229, 0.6)'}`,
-            boxShadow: currentTheme === 'dark'
+            boxShadow: resolvedTheme === 'dark'
               ? '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)'
               : '0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
             maxWidth: '320px',

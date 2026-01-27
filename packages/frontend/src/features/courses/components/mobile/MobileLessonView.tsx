@@ -68,7 +68,7 @@ export function MobileLessonView({
   const slideVariants = {
     code: { x: 0 },
     visual: { x: '-50%' }
-  };
+  } as const;
 
   // 시각화 탭 전환 Variants (Flow ↔ Memory)
   const visualizationVariants = {
@@ -77,15 +77,15 @@ export function MobileLessonView({
       opacity: 1,
       scale: 1,
       y: 0,
-      transition: { duration: 0.3, ease: 'easeOut' }
+      transition: { duration: 0.3, ease: 'easeOut' },
     },
     exit: {
       opacity: 0,
       scale: 0.95,
       y: -10,
-      transition: { duration: 0.2 }
-    }
-  };
+      transition: { duration: 0.2 },
+    },
+  } as const;
 
   const isAIChatOpenState = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = isAIChatOpenState;

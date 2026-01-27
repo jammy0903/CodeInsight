@@ -1,92 +1,90 @@
 {
   "lessonId": "c-3-4",
-  "title": "배열을 함수에 전달",
-  "concept": "배열을 함수에 전달하면 포인터로 decay된다. 크기 정보가 사라진다",
+  "title": "Arrays as Function Args",
+  "concept": "함수에 배열을 넘길 때, 사실은 배열 전체가 아니라 '주소'만 넘어간다",
   "content": {
-    "code": "#include <stdio.h>\n\nvoid printSize(int arr[]) {\n    printf(\"함수 내 sizeof: %lu\\n\", sizeof(arr));\n}\n\nint main() {\n    int arr[5] = {1, 2, 3, 4, 5};\n    \n    printf(\"main sizeof: %lu\\n\", sizeof(arr));\n    printSize(arr);\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\n// 매개변수 모양만 배열이지, 사실은 포인터(int *arr)입니다!\nvoid printSize(int arr[]) {\n    printf(\"Inside func: %lu\\n\", sizeof(arr));\n    arr[0] = 999; // 원본 수정 가능!\n}\n\nint main() {\n    int nums[5] = {1, 2, 3, 4, 5};\n    \n    printf(\"Inside main: %lu\\n\", sizeof(nums));\n    printSize(nums);\n    \n    printf(\"After func: %d\\n\", nums[0]);\n    return 0;\n}",
     "steps": [
       {
-        "line": 8,
-        "title": "main에서 배열 생성",
-        "explanation": "arr은 5개 int 배열. sizeof(arr) = **20바이트**\n\n**이번 레슨의 핵심 질문:** 배열을 함수에 전달하면 무슨 일이 일어날까요?\n\n**힌트:** main에서는 sizeof(arr)=20인데, 함수 안에서는...? 직접 확인해 봅시다!",
-        "highlight": [8],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "arr",
-            "type": "int[5]",
-            "size": 20,
-            "value": "[1,2,3,4,5]",
-            "address": "0x7ffc1000",
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 10,
-        "title": "main에서 sizeof",
-        "explanation": "main에서는 배열 전체 크기 **20**이 출력됩니다.\n\n**왜 20일까?** main 함수 안에서 arr은 아직 **int[5] 타입**이에요. 컴파일러가 배열 크기를 알고 있습니다.\n\n이제 이 배열을 함수에 넘겨보면...",
-        "highlight": [10],
-        "stdout": "main sizeof: 20",
-        "memoryChanges": []
-      },
-      {
-        "line": 11,
-        "title": "함수 호출 - decay 발생!",
-        "explanation": "printSize(arr)를 호출하면 arr은 **포인터로 decay**됩니다!\n\n**무슨 일이 일어났을까?**\n1. arr (int[5] 타입) → decay → &arr[0] (int* 타입)\n2. 주소값 0x7ffc1000만 복사됨\n3. 크기 정보(5개)는 **사라짐!**\n\n**왜 이렇게 설계했을까?** 배열 전체를 복사하면 느리니까요. 100만개 배열을 매번 복사하면 끔찍하겠죠?\n\n**결론:** 함수에 배열을 넘기면 **주소만 전달**, 크기는 손실됩니다.",
-        "highlight": [11, 3],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "printSize",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "arr (매개변수)",
-            "type": "int*",
-            "size": 8,
-            "value": "0x7ffc1000",
-            "frame": "printSize",
-            "pointsTo": "main의 arr[0]"
-          }
-        ]
-      },
-      {
         "line": 4,
-        "title": "함수 내 sizeof",
-        "explanation": "함수 내 sizeof(arr) = **8**! 포인터 크기만 나옵니다.\n\n**충격적인 결과:** 배열 크기 정보가 사라졌습니다!\n\n**왜 8일까?**\n- 함수 매개변수 `int arr[]`는 사실 `int *arr`과 **동일**\n- 컴파일러가 배열 문법을 포인터로 해석해요\n- `void foo(int arr[5])`의 5도 **무시됨!**\n\n**해결책:** 크기를 별도 인자로 전달하세요.\n```c\nvoid printSize(int arr[], int size) {\n    // size를 사용\n}\n```\n\n이것이 C 함수가 항상 배열 크기를 따로 받는 이유입니다!",
-        "highlight": [4],
-        "stdout": "함수 내 sizeof: 8",
-        "memoryChanges": []
+        "title": "Array Decay (배열의 퇴화)",
+        "explanation": "함수 인자로 `int arr[]`를 써도, 컴파일러는 이를 `int *arr`로 번역해버립니다.\n배열 전체를 복사해서 넘기면 너무 느리기 때문에, **첫 번째 요소의 주소값** 하나만 띡 넘깁니다.\n\n이것을 **Array Decay(배열 퇴화)**라고 합니다.",
+        "highlight": [
+          4,
+          5
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "{1,2...}",
+              "type": "int[5]",
+              "frame": "main"
+            },
+            {
+              "name": "arr",
+              "value": "0x1000",
+              "type": "int*",
+              "frame": "printSize"
+            }
+          ],
+          "output": [
+            "Inside main: 20"
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "sizeof의 배신",
+        "explanation": "그래서 함수 안에서 `sizeof(arr)`을 찍으면 20(배열크기)이 아니라 **8(포인터크기)**이 나옵니다.\n함수 안에서는 배열의 진짜 크기를 알 방법이 없습니다.\n\n그래서 C언어에서는 항상 `printSize(int *arr, int len)` 처럼 길이를 같이 넘겨줘야 합니다.",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "Inside main: 20",
+            "Inside func: 8"
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "원본 파괴 가능",
+        "explanation": "주소만 넘겨받았지만, 그 주소를 통해 `main`에 있는 원본 배열을 수정할 수 있습니다 (`arr[0]=999`).\n이게 의도한 게 아니라면 `const int arr[]`로 선언해서 방어해야 합니다.",
+        "highlight": [
+          6,
+          11
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "Inside main: 20",
+            "Inside func: 8",
+            "After func: 999"
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "void foo(int arr[5])에서 sizeof(arr)는?",
+    "question": "함수에서 배열의 요소 개수를 알고 싶다면?",
     "options": [
-      "20",
-      "8",
-      "5",
-      "4"
+      "sizeof(arr) / sizeof(int)를 쓴다",
+      "arr.length를 쓴다",
+      "따로 길이 인자를 받아서 쓴다",
+      "알 방법이 없다"
     ],
-    "correctIndex": 1,
-    "explanation": "함수 매개변수에서 int arr[5]는 int *arr과 동일합니다. sizeof는 포인터 크기 8을 반환합니다."
+    "correctIndex": 2,
+    "explanation": "함수 내부에서는 포인터로 퇴화하므로 `sizeof` 꼼수가 안 통합니다. 무조건 인자로 개수(`int size`)를 같이 받아야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "함수에 배열을 전달하면 배열이 복사된다",
-      "correct": "배열은 복사되지 않고, 첫 요소의 주소만 전달됩니다 (decay).",
-      "why": "큰 배열을 복사하는 것은 비효율적입니다. C는 주소 전달을 선택했습니다."
-    },
-    {
-      "wrong": "void foo(int arr[5])에서 5는 의미가 있다",
-      "correct": "배열 크기 5는 무시됩니다. void foo(int *arr)과 동일합니다.",
-      "why": "함수 매개변수에서 배열 문법은 포인터로 해석됩니다."
+      "wrong": "매개변수에 `int arr[10]`이라고 적으면, 10개짜리 배열이 복사된다",
+      "correct": "숫자 10은 무시되고 그냥 `int *arr`가 됩니다.",
+      "why": "C언어는 배열 복사를 자동으로 해주지 않습니다. 프로그래머에게 힌트를 주는 주석 역할만 할 뿐입니다."
     }
   ],
-  "keyTakeaway": "배열 → 함수 = 포인터로 decay. 크기는 별도 인자로!"
+  "keyTakeaway": "함수에 배열 넘길 땐 '주소'만 간다. 길이(Length)도 꼭 같이 챙겨 보내자."
 }

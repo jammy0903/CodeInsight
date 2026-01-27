@@ -1,103 +1,72 @@
 {
   "lessonId": "c-4-5",
-  "title": "지역 변수 주소 반환의 위험",
-  "concept": "지역 변수는 함수 종료 시 사라진다. 그 주소를 반환하면 Dangling Pointer가 된다",
+  "title": "Returning Stack Addresses",
+  "concept": "함수가 끝나면 사라질 방 열쇠를 쥐어주지 마라 (치명적인 버그)",
   "content": {
-    "code": "#include <stdio.h>\n\nint* dangerous() {\n    int local = 100;\n    return &local;  // 위험!\n}\n\nint main() {\n    int *p = dangerous();\n    printf(\"*p = %d\\n\", *p);  // 정의되지 않은 동작!\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint* dangerousFunc() {\n    int x = 100;\n    return &x; // ❌ 절대 금지!\n}\n\nint main() {\n    int *p = dangerousFunc();\n    \n    // 이미 x는 사라졌는데 접근 시도\n    printf(\"%d\\n\", *p); // 운 좋으면 100, 아니면 쓰레기값\n    return 0;\n}",
     "steps": [
       {
-        "line": 9,
-        "title": "dangerous() 호출",
-        "explanation": "dangerous() 함수의 스택 프레임이 생성됩니다.\n\n**⚠️ 이번 레슨은 매우 중요합니다!**\n\n흔히 하는 **치명적인 실수**를 다룹니다. 이 패턴만 기억하면 많은 버그를 예방할 수 있어요.",
-        "highlight": [9, 3],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "dangerous",
-            "type": "frame"
-          }
-        ]
-      },
-      {
-        "line": 4,
-        "title": "지역 변수 생성",
-        "explanation": "local은 dangerous의 **스택 프레임에 할당**됩니다.\n\n**핵심 관찰:**\n- local의 주소: 0x7ffc0ff0\n- 이 주소는 dangerous **프레임 안**에 있어요\n\n**문제 예고:** 이 주소를 반환하면 어떻게 될까요? 함수가 끝나면 프레임이 사라지는데...",
-        "highlight": [4],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "local",
-            "type": "int",
-            "size": 4,
-            "value": 100,
-            "address": "0x7ffc0ff0",
-            "frame": "dangerous"
-          }
-        ]
-      },
-      {
         "line": 5,
-        "title": "지역 변수 주소 반환 (위험!)",
-        "explanation": "&local(0x7ffc0ff0)을 반환합니다.\n\n**🚨 위험 신호!** 이 주소는 곧 **무효**가 됩니다!\n\n**왜 위험할까?**\n- 지역 변수 = 스택 프레임 안에 존재\n- 함수 종료 = 스택 프레임 **해제**\n- 해제된 주소 = **쓰레기 메모리**\n\n**비유:** 호텔 방 번호를 알려줬는데, 체크아웃하고 방을 반납한 거예요. 그 방에 다른 손님이 들어올 수 있어요!",
-        "highlight": [5],
-        "memoryChanges": [],
-        "warning": "지역 변수 주소 반환!"
+        "title": "지역 변수의 주소 리턴",
+        "explanation": "`return &x;`\n`x`는 `dangerousFunc`의 지역 변수입니다.\n이 함수가 리턴하는 순간, 스택 프레임이 파괴되면서 `x`도 사라집니다.\n\n즉, 철거될 집의 열쇠를 주는 꼴입니다.",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "100",
+              "type": "int",
+              "frame": "dangerousFunc"
+            }
+          ],
+          "output": []
+        }
       },
       {
-        "line": 6,
-        "title": "함수 종료 - local 해제!",
-        "explanation": "dangerous() 종료 시 local이 **해제**됩니다!\n\n**상태 변화:**\n- 함수 종료 전: 0x7ffc0ff0에 100이 있음\n- 함수 종료 후: 0x7ffc0ff0은 **쓰레기**\n\n**왜 쓰레기가 될까?**\n- 스택 메모리는 **재사용**됨\n- 다른 함수 호출 시 이 공간이 덮어써질 수 있음\n- 값이 남아있을 수도 있지만, **보장되지 않음**\n\n**이런 포인터를 'Dangling Pointer(허상 포인터)'라고 합니다!**",
-        "highlight": [],
-        "memoryChanges": [
-          {
-            "action": "deallocate",
-            "area": "stack",
-            "name": "local",
-            "frame": "dangerous",
-            "danger": true
-          },
-          {
-            "action": "frame_end",
-            "area": "stack",
-            "name": "dangerous"
-          }
-        ]
-      },
-      {
-        "line": 10,
-        "title": "Dangling Pointer 역참조!",
-        "explanation": "p는 **해제된 메모리**를 가리킵니다. *p의 결과는 **예측 불가능**합니다!\n\n**정의되지 않은 동작(Undefined Behavior):**\n- 운 좋으면: 100이 출력될 수도 있음\n- 운 나쁘면: 크래시 (Segmentation fault)\n- 최악: 이상한 값이 나오지만 프로그램은 계속 실행 (숨겨진 버그!)\n\n**해결책:**\n```c\n// ❌ 잘못된 방법\nint* bad() { int x = 5; return &x; }\n\n// ⭕ 올바른 방법 1: 동적 할당\nint* good1() { \n    int *p = malloc(sizeof(int));\n    *p = 5; \n    return p; \n}\n\n// ⭕ 올바른 방법 2: static 변수\nint* good2() { \n    static int x = 5; \n    return &x; \n}\n```\n\n**규칙:** 지역 변수 주소 반환 = **절대 금지!**",
-        "highlight": [10],
-        "stdout": "*p = ??? (정의되지 않은 동작)",
-        "memoryChanges": [],
-        "danger": true
+        "line": 9,
+        "title": "Dangling Pointer",
+        "explanation": "`p`가 리턴받은 주소는 이제 아무도 살지 않는(또는 다른 누군가가 덮어쓴) 폐허입니다.\n이것을 **Dangling Pointer (매달린 포인터)**라고 합니다.\n이 주소를 읽으면 운 좋으면 100이 나오지만, 다른 함수가 스택을 덮어쓰면 엉뚱한 값이 나옵니다.",
+        "highlight": [
+          9,
+          12
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "p",
+              "value": "0xINVALID",
+              "type": "int*",
+              "address": "Wait..."
+            }
+          ],
+          "output": [
+            "??? (Undefined Behavior)"
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "int* foo() { int x=5; return &x; } 이 코드의 문제는?",
+    "question": "함수에서 생성한 데이터를 리턴하고 싶을 때 안전한 방법은?",
     "options": [
-      "문법 에러",
-      "x가 복사되어 반환됨",
-      "x의 주소가 함수 종료 후 무효가 됨",
-      "문제없이 정상 동작"
+      "지역 변수의 주소를 리턴한다",
+      "전역 변수를 쓴다",
+      "static 변수나 malloc(동적 할당)된 주소를 리턴한다",
+      "함수 안에서 printf로 출력하고 끝낸다"
     ],
     "correctIndex": 2,
-    "explanation": "지역 변수 x는 함수 종료 시 사라집니다. 그 주소를 반환하면 Dangling Pointer가 됩니다."
+    "explanation": "`static` 변수는 데이터 영역에, `malloc`은 힙 영역에 저장되어 함수가 끝나도 사라지지 않습니다."
   },
   "misconceptions": [
     {
-      "wrong": "지역 변수 주소를 반환해도 된다",
-      "correct": "지역 변수는 함수 종료 시 해제됩니다. 그 주소는 무효가 됩니다.",
-      "why": "스택 메모리는 함수 종료 시 재사용됩니다. 해제된 주소 접근은 정의되지 않은 동작입니다."
-    },
-    {
-      "wrong": "반환 직후에는 값이 남아있으니 괜찮다",
-      "correct": "운이 좋으면 값이 남아있을 수 있지만, 언제든 덮어써질 수 있습니다.",
-      "why": "정의되지 않은 동작은 '어떤 일이든' 일어날 수 있습니다."
+      "wrong": "C언어는 return &x 해도 컴파일 에러가 안 난다",
+      "correct": "대부분 경고(Warning)만 주고 넘어갑니다.",
+      "why": "그래서 초보자들이 가장 많이 저지르는 실수 중 하나입니다. \"Address of stack memory associated with local variable 'x' returned\" 경고를 절대 무시하지 마세요."
     }
   ],
-  "keyTakeaway": "지역 변수 주소 반환 = Dangling Pointer. 절대 금지!"
+  "keyTakeaway": "사라질 지역 변수의 주소(&local)를 절대 밖으로 내보내지 마라."
 }

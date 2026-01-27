@@ -313,7 +313,7 @@ export function Sidebar() {
                             {appUser.nickname}
                           </p>
                           <p className="text-xs truncate" style={{ color: 'var(--theme-sidebar-email-text)' }}>
-                            {appUser.oauthAccounts[0]?.email || firebaseUser.email}
+                            {firebaseUser.email}
                           </p>
                         </div>
                       </div>

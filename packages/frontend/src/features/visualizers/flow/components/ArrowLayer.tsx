@@ -161,7 +161,7 @@ export const ArrowLayer = memo(function ArrowLayer({
 
   // 변수 위치 업데이트 함수를 ref에 저장
   const variablesRef = useRef(variables);
-  const updatePositionsRef = useRef<() => void>();
+  const updatePositionsRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     variablesRef.current = variables;

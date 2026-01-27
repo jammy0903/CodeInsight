@@ -1,50 +1,9 @@
-/**
- * Java 시뮬레이터 데이터 → JavaMemoryView Props 변환
- *
- * 입력 (시뮬레이터):
- * {
- *   stack: [{ methodName: "main", variables: { x: 10, arr: {type: "Array", id: "0x001"} } }],
- *   heap: [{ address: "0x001", type: "int[]", content: "{1, 2, 3}" }]
- * }
- *
- * 출력 (JavaMemoryView):
- * {
- *   frames: [{ name: "main", variables: [...] }],
- *   heap: [{ address: "0x001", type: "int[]", content: "{1, 2, 3}" }]
- * }
- */
-
+import type { LessonStep } from '@codeinsight/shared';
 import type {
   JavaStackFrame,
   JavaVariable,
   JavaHeapObject,
 } from '../JavaMemoryView';
-
-interface SimulatorStackFrame {
-  methodName?: string;
-  className?: string;
-  variables?: Record<string, any>;
-}
-
-interface SimulatorHeapObject {
-  address: string;
-  type: string;
-  content: string;
-  length?: number;
-}
-
-interface SimulatorStep {
-  // 직접 접근 (시뮬레이터 원시 출력)
-  stack?: SimulatorStackFrame[];
-  heap?: SimulatorHeapObject[];
-  // memoryState 래퍼 (LessonStep 형식)
-  memoryState?: {
-    stack?: SimulatorStackFrame[];
-    heap?: SimulatorHeapObject[];
-  };
-  line?: number;
-  lineNumber?: number;
-}
 
 /**
  * 시뮬레이터 변수 값을 JavaVariable로 변환
@@ -119,8 +78,8 @@ function parseVariable(name: string, value: any): JavaVariable {
 /**
  * 시뮬레이터 스택 프레임을 JavaStackFrame으로 변환
  */
-function parseStackFrame(frame: SimulatorStackFrame): JavaStackFrame {
-  const frameName = frame.methodName || 'unknown';
+function parseStackFrame(frame: any): JavaStackFrame {
+  const frameName = frame.methodName || frame.name || 'unknown';
   const variables: JavaVariable[] = [];
 
   if (frame.variables && typeof frame.variables === 'object') {
@@ -142,9 +101,10 @@ function parseStackFrame(frame: SimulatorStackFrame): JavaStackFrame {
  * 시뮬레이터 힙 객체를 JavaHeapObject로 변환
  * args 배열은 제외 (main 메서드 파라미터)
  */
-function parseHeapObjects(heap: SimulatorHeapObject[]): JavaHeapObject[] {
+function parseHeapObjects(heap: any[]): JavaHeapObject[] {
   return heap
     .filter(obj => {
+      if (typeof obj !== 'object' || obj === null) return false;
       // args 배열 스킵 (java.lang.String[] with empty content)
       if (obj.type === 'java.lang.String[]' && obj.content === '[]') {
         return false;
@@ -154,38 +114,50 @@ function parseHeapObjects(heap: SimulatorHeapObject[]): JavaHeapObject[] {
     .map(obj => ({
       address: obj.address,
       type: obj.type,
-      content: obj.content,
+      content: String(obj.content),
     }));
 }
 
 /**
  * 시뮬레이터 스텝 데이터를 JavaMemoryView props로 변환
  */
-export function toJavaMemoryViewProps(step: SimulatorStep): {
+export function toJavaMemoryViewProps(step: LessonStep): {
   frames: JavaStackFrame[];
   heap: JavaHeapObject[];
 } {
   const frames: JavaStackFrame[] = [];
   const heap: JavaHeapObject[] = [];
 
-  // memoryState 래퍼 또는 직접 접근 지원
-  const stackData = step.memoryState?.stack || step.stack;
-  const heapData = step.memoryState?.heap || step.heap;
+  // `step.stack` (C-style MemoryBlock[]) is structurally different and will be ignored by the logic below.
+  const stackData = step.memoryState?.stack || (step as any).stack;
+  const heapData = step.memoryState?.heap || (step as any).heap;
 
   // Stack 처리
-  if (stackData && Array.isArray(stackData)) {
-    for (const frame of stackData) {
-      // Main 클래스 프레임만 처리 (JDK 내부 프레임 제외)
-      if (frame.className?.startsWith('java.') ||
-          frame.className?.startsWith('sun.') ||
-          frame.className?.startsWith('jdk.')) {
-        continue;
-      }
+  if (stackData && Array.isArray(stackData) && stackData.length > 0) {
+    const firstEl = stackData[0];
+    // Case 1: Array of Frames (from live simulator)
+    if (typeof firstEl === 'object' && firstEl !== null && 'variables' in firstEl) {
+      for (const frame of stackData) {
+        // Main 클래스 프레임만 처리 (JDK 내부 프레임 제외)
+        if ((frame as any).className?.startsWith('java.') ||
+            (frame as any).className?.startsWith('sun.') ||
+            (frame as any).className?.startsWith('jdk.')) {
+          continue;
+        }
 
-      const parsed = parseStackFrame(frame);
-      if (parsed.variables.length > 0 || parsed.name === 'main') {
-        frames.push(parsed);
+        const parsed = parseStackFrame(frame);
+        if (parsed.variables.length > 0 || parsed.name === 'main') {
+          frames.push(parsed);
+        }
       }
+    }
+    // Case 2: Flat array of variables (from lesson JSON)
+    else if (typeof firstEl === 'object' && firstEl !== null && 'name' in firstEl && 'value' in firstEl) {
+      const mainFrame: JavaStackFrame = {
+        name: 'main',
+        variables: stackData.map(v => parseVariable(v.name, v.value)),
+      };
+      frames.push(mainFrame);
     }
   }
 

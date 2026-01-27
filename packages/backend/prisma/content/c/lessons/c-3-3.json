@@ -1,102 +1,55 @@
 {
   "lessonId": "c-3-3",
-  "title": "배열과 포인터의 차이",
-  "concept": "배열 이름은 포인터로 decay되지만, 배열 자체는 포인터가 아니다",
+  "title": "Array Name vs Pointer",
+  "concept": "배열 이름은 포인터처럼 쓰이지만, 진짜 포인터 변수는 아니다",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int arr[5] = {1, 2, 3, 4, 5};\n    int *p = arr;\n    \n    printf(\"sizeof(arr) = %lu\\n\", sizeof(arr));\n    printf(\"sizeof(p) = %lu\\n\", sizeof(p));\n    \n    // arr = p;  // 에러! 배열은 재할당 불가\n    p = arr;     // OK\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[5];\n    int *p = arr;\n    \n    // 1. 크기 차이 (가장 중요!)\n    printf(\"sizeof(arr): %lu\\n\", sizeof(arr));\n    printf(\"sizeof(p):   %lu\\n\", sizeof(p));\n    \n    // 2. 대입 불가\n    // arr = p; // 에러! 배열 주소는 절대 못 바꿈\n    p = arr;    // 가능. 포인터는 변수니까\n    \n    return 0;\n}",
     "steps": [
       {
-        "line": 4,
-        "title": "배열 생성",
-        "explanation": "arr은 5개 int의 배열입니다. sizeof(arr) = **20바이트** (4×5)\n\n**핵심 질문:** 배열과 포인터, 뭐가 다를까요?\n\n**가장 큰 차이:** 배열은 **크기 정보를 가지고 있습니다!** sizeof(arr)가 전체 크기를 알려주는 이유예요.\n\n**비유:** 배열 = 책장 전체, 포인터 = 책장 첫 칸을 가리키는 손가락. 손가락은 책장 크기를 모릅니다!",
-        "highlight": [
-          4
-        ],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "arr",
-            "type": "int[5]",
-            "size": 20,
-            "value": "[1,2,3,4,5]",
-            "address": "0x7ffc1000",
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 5,
-        "title": "포인터에 배열 할당",
-        "explanation": "배열 이름 arr은 첫 요소 주소로 **'decay'**됩니다. p = &arr[0]과 동일.\n\n**decay(붕괴)란?** 배열이 포인터로 '변환'되는 현상이에요.\n\n**왜 decay가 발생할까?** 배열 전체를 복사하면 비효율적이니까요. 주소만 전달하면 충분합니다.\n\n**중요:** p는 arr의 **복사본**이 아닙니다. p는 arr[0]의 위치만 알고, 크기 정보는 없어요!",
-        "highlight": [
-          5
-        ],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p",
-            "type": "int*",
-            "size": 8,
-            "value": "0x7ffc1000",
-            "address": "0x7ffc0ff8",
-            "pointsTo": "arr[0]",
-            "frame": "main"
-          }
-        ]
-      },
-      {
         "line": 7,
-        "title": "sizeof 차이 확인",
-        "explanation": "sizeof(arr)=20 (전체 배열), sizeof(p)=8 (포인터).\n\n**왜 결과가 다를까?**\n- **arr**: 타입이 int[5]이므로 5개 int 크기 = 20\n- **p**: 타입이 int*이므로 포인터 크기 = 8\n\n**이것이 배열과 포인터의 본질적 차이!**\n- 배열: 메모리 블록 자체\n- 포인터: 메모리 주소를 담는 변수\n\n**실무 팁:** sizeof로 배열 길이 계산: `sizeof(arr)/sizeof(arr[0])` = 요소 개수",
+        "title": "sizeof의 차이",
+        "explanation": "**`sizeof(arr)`**\n배열 전체 크기를 반환합니다. `int` 5개니까 20바이트.\n\n**`sizeof(p)`**\n포인터 변수 자체의 크기만 반환합니다. (64비트면 8바이트).\n\n이것이 배열과 포인터의 결정적인 차이입니다.",
         "highlight": [
           7,
           8
         ],
-        "stdout": "sizeof(arr) = 20\nsizeof(p) = 8",
-        "memoryChanges": []
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "sizeof(arr): 20",
+            "sizeof(p):   8"
+          ]
+        }
       },
       {
-        "line": 10,
-        "title": "배열은 상수!",
-        "explanation": "arr = p는 **에러**입니다! 배열 이름은 고정된 주소이며 변경할 수 없어요.\n\n**왜 배열은 재할당이 안 될까?**\n- 배열 이름 = 메모리 블록의 **시작점 상수**\n- 포인터 = 값을 바꿀 수 있는 **변수**\n\n**비유:**\n- arr은 건물 주소 (1번지는 항상 1번지)\n- p는 GPS 목적지 (언제든 바꿀 수 있음)\n\n**정리:**\n- `p = arr;` → OK (포인터에 주소 할당)\n- `arr = p;` → 에러! (상수에 할당 불가)",
+        "line": 11,
+        "title": "상수 vs 변수",
+        "explanation": "배열 이름 `arr`은 메모리에 고정된 **지박령(Constant Pointer-like)**입니다.\n다른 주소를 가리키게 바꿀 수 없습니다 (`arr = ...` 불가).\n\n반면 포인터 `p`는 자유로운 영혼입니다. 언제든 다른 곳을 가리킬 수 있습니다.",
         "highlight": [
-          10,
-          11
-        ],
-        "memoryChanges": []
+          11,
+          12,
+          13
+        ]
       }
     ]
   },
   "quiz": {
-    "question": "int arr[10]; int *p = arr; 에서 sizeof(arr)과 sizeof(p)의 차이는?",
+    "question": "배열 이름 `arr`과 포인터 `p`의 공통점은?",
     "options": [
-      "둘 다 8",
-      "40과 8",
-      "10과 8",
-      "둘 다 40"
+      "sizeof 크기가 같다",
+      "값을 변경할 수 있다 (Mutable)",
+      "둘 다 주소값을 나타내는 표현식으로 쓸 수 있다",
+      "아무 공통점이 없다"
     ],
-    "correctIndex": 1,
-    "explanation": "sizeof(arr)=40 (4×10), sizeof(p)=8 (포인터 크기). 배열과 포인터는 다릅니다!"
+    "correctIndex": 2,
+    "explanation": "둘 다 `*arr`, `*p` 처럼 역참조하거나, `arr[i]`, `p[i]` 처럼 인덱싱할 수 있습니다(Decay 성질 때문)."
   },
   "misconceptions": [
     {
       "wrong": "배열은 포인터다",
-      "correct": "배열은 포인터로 'decay'될 수 있지만, 배열 자체는 포인터가 아닙니다.",
-      "why": "sizeof, &연산, 할당 가능 여부에서 차이가 납니다."
-    },
-    {
-      "wrong": "sizeof(배열)은 sizeof(포인터)와 같다",
-      "correct": "sizeof(배열)은 전체 크기, sizeof(포인터)는 항상 8 (64비트).",
-      "why": "배열은 크기 정보를 가지고 있습니다. decay되면 이 정보를 잃습니다."
+      "correct": "배열은 배열이고, 포인터는 포인터입니다.",
+      "why": "배열 이름이 식(Expression)에서 쓰일 때 포인터로 '변신(Decay)'하는 것뿐입니다. `sizeof` 찍어보면 본색이 드러납니다."
     }
   ],
-  "keyTakeaway": "배열 ≠ 포인터. decay 시 크기 정보 손실"
+  "keyTakeaway": "배열 이름은 상수 주소, 포인터는 변수 주소. `sizeof` 결과가 다르다!"
 }

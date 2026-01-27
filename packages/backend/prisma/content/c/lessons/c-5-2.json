@@ -1,113 +1,90 @@
 {
   "lessonId": "c-5-2",
-  "title": "malloc으로 메모리 할당",
-  "concept": "malloc(size)는 size 바이트의 Heap 메모리를 할당하고 주소를 반환한다",
+  "title": "malloc usage",
+  "concept": "malloc: \"메모리 좀 빌려주세요!\"",
   "content": {
-    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    // int 하나 할당\n    int *p = malloc(sizeof(int));\n    \n    if (p == NULL) {\n        printf(\"할당 실패!\\n\");\n        return 1;\n    }\n    \n    *p = 42;\n    printf(\"*p = %d\\n\", *p);\n    \n    free(p);\n    return 0;\n}",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    // int 1개 크기(4바이트)만큼 힙에 요청\n    int *p = (int*)malloc(sizeof(int));\n    \n    if (p == NULL) {\n        printf(\"Memory full!\\n\");\n        return 1;\n    }\n    \n    *p = 100; // 빌린 공간 사용\n    printf(\"Stored in heap: %d\\n\", *p);\n    \n    free(p); // 반납 필수\n    return 0;\n}",
     "steps": [
       {
         "line": 6,
         "title": "malloc 호출",
-        "explanation": "malloc(sizeof(int))는 **4바이트를 Heap에 할당**하고 그 주소를 반환합니다.\n\n**malloc 동작 분석:**\n1. sizeof(int) = 4 (바이트 수 계산)\n2. Heap에서 4바이트 공간 찾기\n3. 그 공간의 **시작 주소**를 반환\n\n**왜 sizeof(int)를 쓸까?**\n- 하드코딩 `malloc(4)` → 다른 시스템에서 문제 가능\n- sizeof 사용 → **이식성** 보장\n\n**주의:** malloc은 메모리를 **초기화하지 않아요!** 쓰레기 값이 들어있습니다.",
+        "explanation": "**`malloc(size)`** (Memory Allocation)\n운영체제에게 `size` 바이트만큼 힙 메모리를 달라고 요청합니다.\n성공하면 시작 주소를, 실패하면 `NULL`을 줍니다.",
         "highlight": [
           6
         ],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p",
-            "type": "int*",
-            "size": 8,
-            "value": "0x55001000",
-            "frame": "main"
-          },
-          {
-            "action": "allocate",
-            "area": "heap",
-            "name": "(malloc)",
-            "type": "int",
-            "size": 4,
-            "value": "??? (초기화 안됨)",
-            "address": "0x55001000"
-          }
-        ]
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "p",
+              "value": "0xHEAP",
+              "type": "int*",
+              "address": "0x1000"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xHEAP",
+              "size": "4 bytes",
+              "value": "???"
+            }
+          ],
+          "output": []
+        }
       },
       {
         "line": 8,
         "title": "NULL 체크",
-        "explanation": "malloc이 실패하면 **NULL**을 반환합니다!\n\n**왜 실패할까?**\n- 메모리 부족\n- 너무 큰 크기 요청\n- 시스템 문제\n\n**NULL 체크가 필수인 이유:**\n```c\nint *p = malloc(1000000000);  // 1GB 요청\n*p = 10;  // p가 NULL이면 크래시!\n```\n\n**좋은 패턴:**\n```c\nif (p == NULL) {\n    // 에러 처리\n    return -1;\n}\n```\n\n실제 프로그램에서 NULL 체크 없이 malloc 사용은 **금지**입니다!",
+        "explanation": "메모리가 부족하면 `NULL`을 리턴할 수 있습니다.\n실무 코드에서는 반드시 `CHECK_NULL` 매크로 등을 써서 방어해야 합니다.",
         "highlight": [
           8,
           9,
           10,
           11
-        ],
-        "memoryChanges": []
+        ]
       },
       {
         "line": 13,
-        "title": "Heap에 값 저장",
-        "explanation": "*p = 42로 할당된 메모리에 값을 저장합니다.\n\n**동작 순서:**\n1. p가 가리키는 주소(0x55001000)로 이동\n2. 그 위치에 42를 **씀**\n\n**이전 값 '???'는 어디서 왔을까?**\n- malloc은 초기화 안 함\n- 이전에 그 메모리를 쓴 프로그램의 잔여 데이터\n- 직접 값을 넣기 전에는 **쓰레기**\n\n**calloc과의 차이:**\n- malloc: 초기화 ❌\n- calloc: 0으로 초기화 ⭕",
+        "title": "사용",
+        "explanation": "포인터 `p`를 통해 힙 메모리에 접근(`*p`)합니다.\n스택에 있는 변수처럼 똑같이 쓸 수 있습니다.",
         "highlight": [
-          13
+          13,
+          14
         ],
-        "stdout": "*p = 42",
-        "memoryChanges": [
-          {
-            "action": "update",
-            "area": "heap",
-            "address": "0x55001000",
-            "value": 42,
-            "previousValue": "???"
-          }
-        ]
-      },
-      {
-        "line": 16,
-        "title": "free로 해제",
-        "explanation": "사용이 끝난 Heap 메모리는 반드시 **free()**로 해제합니다!\n\n**malloc 사용 4단계:**\n```c\n// 1. 할당\nint *p = malloc(sizeof(int));\n\n// 2. NULL 체크\nif (p == NULL) return -1;\n\n// 3. 사용\n*p = 42;\nprintf(\"%d\", *p);\n\n// 4. 해제\nfree(p);\np = NULL;  // 좋은 습관!\n```\n\n**매 malloc에는 짝이 되는 free가 있어야 합니다!**",
-        "highlight": [
-          16
-        ],
-        "memoryChanges": [
-          {
-            "action": "deallocate",
-            "area": "heap",
-            "address": "0x55001000"
-          }
-        ]
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "heap": [
+            {
+              "address": "0xHEAP",
+              "size": "4 bytes",
+              "value": "100",
+              "highlight": true
+            }
+          ],
+          "output": [
+            "Stored in heap: 100"
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "malloc(10)은 무엇을 반환하는가?",
+    "question": "malloc의 리턴 타입은 `void*`입니다. 무슨 뜻일까요?",
     "options": [
-      "10",
-      "10바이트 메모리의 주소",
-      "NULL",
-      "10개의 int"
+      "아무것도 리턴하지 않는다",
+      "에러를 리턴한다",
+      "타입이 없는(결정되지 않은) 주소다",
+      "0을 리턴한다"
     ],
-    "correctIndex": 1,
-    "explanation": "malloc(size)는 size 바이트의 메모리를 할당하고 그 시작 주소를 반환합니다."
+    "correctIndex": 2,
+    "explanation": "`void*`는 '무슨 타입인지 모르는 주소'입니다. 그래서 `(int*)` 처럼 캐스팅해서 사용하는 것이 정석입니다."
   },
   "misconceptions": [
     {
-      "wrong": "malloc은 초기화된 메모리를 반환한다",
-      "correct": "malloc은 초기화하지 않습니다. 쓰레기 값이 들어있습니다. calloc을 쓰면 0으로 초기화됩니다.",
-      "why": "초기화는 추가 작업이 필요하므로 malloc은 성능을 위해 생략합니다."
-    },
-    {
-      "wrong": "malloc 실패는 없다",
-      "correct": "메모리가 부족하면 NULL을 반환합니다. 항상 체크해야 합니다.",
-      "why": "시스템 메모리는 유한합니다. 큰 할당이나 반복 할당 시 실패할 수 있습니다."
+      "wrong": "malloc으로 잡은 메모리는 0으로 초기화된다",
+      "correct": "쓰레기 값이 들어있습니다.",
+      "why": "0으로 초기화된 메모리가 필요하면 `calloc`을 써야 합니다. `malloc`은 속도를 위해 초기화를 안 합니다."
     }
   ],
-  "keyTakeaway": "malloc = 할당 + NULL 체크 + 사용 + free"
+  "keyTakeaway": "`malloc(sizeof(type))`으로 빌리고, `NULL` 체크하고, 포인터로 쓴다."
 }

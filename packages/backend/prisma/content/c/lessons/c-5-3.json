@@ -1,105 +1,49 @@
 {
   "lessonId": "c-5-3",
-  "title": "free로 메모리 해제",
-  "concept": "free(ptr)는 malloc으로 할당된 메모리를 시스템에 반환한다",
+  "title": "free usage",
+  "concept": "free: \"다 썼으니 돌려드릴게요!\"",
   "content": {
-    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = malloc(sizeof(int));\n    *p = 100;\n    \n    printf(\"해제 전: *p = %d\\n\", *p);\n    \n    free(p);\n    \n    // p = NULL;  // 좋은 습관!\n    \n    // printf(\"해제 후: *p = %d\\n\", *p);  // 위험!\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 100;\n    \n    printf(\"Using memory...\\n\");\n    \n    // 반납!\n    free(p);\n    \n    // p = NULL; // 반납 후에는 NULL로 미는 습관!\n    return 0;\n}",
     "steps": [
       {
-        "line": 5,
-        "title": "메모리 할당",
-        "explanation": "Heap에 4바이트가 할당되고 p가 그 주소를 가집니다.\n\n**이번 레슨의 핵심 질문:** free 후에 포인터는 어떻게 될까요?\n\n**힌트:** free는 메모리만 해제하고, 포인터 변수 자체는 건드리지 않아요.",
-        "highlight": [
-          5,
-          6
-        ],
-        "stdout": "해제 전: *p = 100",
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "heap",
-            "name": "(malloc)",
-            "type": "int",
-            "size": 4,
-            "value": 100,
-            "address": "0x55001000"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p",
-            "type": "int*",
-            "value": "0x55001000",
-            "pointsTo": "heap",
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 10,
+        "line": 9,
         "title": "free 호출",
-        "explanation": "free(p)는 0x55001000의 메모리를 **시스템에 반환**합니다.\n\n**중요한 사실:** p는 여전히 0x55001000을 가리킵니다!\n\n**왜 p가 안 바뀔까?**\n- free(p)는 p의 **값(주소)**을 받아서 해제\n- p **자체**를 수정하지 않음\n- C에서 함수는 변수 자체를 바꿀 수 없음 (Call by Value)\n\n**결과:** p는 **무효한 주소**를 가리키는 **Dangling Pointer**가 됩니다!",
+        "explanation": "**`free(p)`**\n`p`가 가리키던 힙 메모리를 운영체제에 반납합니다.\n이제 이 땅은 다시 공유지가 되어 남들이 쓸 수 있습니다.",
         "highlight": [
-          10
+          9
         ],
-        "memoryChanges": [
-          {
-            "action": "deallocate",
-            "area": "heap",
-            "address": "0x55001000",
-            "warning": "p는 여전히 이 주소를 가리킴"
-          }
-        ]
-      },
-      {
-        "line": 12,
-        "title": "p = NULL 권장",
-        "explanation": "free 후 **p = NULL;**로 설정하면 안전합니다!\n\n**왜 NULL로 설정해야 할까?**\n\n**시나리오 1: NULL 설정 안 함**\n```c\nfree(p);\n// ... 많은 코드 ...\nif (p != NULL) {  // 여전히 true!\n    *p = 10;  // 크래시 또는 숨겨진 버그\n}\n```\n\n**시나리오 2: NULL 설정함**\n```c\nfree(p);\np = NULL;\n// ... 많은 코드 ...\nif (p != NULL) {  // false, 안전!\n    *p = 10;\n}\n```\n\n**규칙:** free 직후 반드시 p = NULL!",
-        "highlight": [
-          12
-        ],
-        "memoryChanges": []
-      },
-      {
-        "line": 14,
-        "title": "해제 후 접근 (위험!)",
-        "explanation": "free 후 *p 접근은 **정의되지 않은 동작(Undefined Behavior)**입니다!\n\n**가능한 결과:**\n1. 크래시 (Segmentation fault) - 가장 좋은 경우, 버그 발견 쉬움\n2. 이전 값이 나옴 - 메모리가 아직 재사용 안 됨\n3. 이상한 값 - 다른 프로그램이 그 메모리 사용 중\n4. 정상처럼 보임 - **최악!** 숨겨진 버그로 남음\n\n**free 후 하면 안 되는 것:**\n- 읽기: *p\n- 쓰기: *p = 값\n- 다시 해제: free(p) → **Double Free!**\n\n**모두 정의되지 않은 동작입니다!**",
-        "highlight": [
-          14
-        ],
-        "danger": true,
-        "memoryChanges": []
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "p",
+              "value": "0xHEAP (Dangling)",
+              "type": "int*"
+            }
+          ],
+          "heap": [],
+          "note": "Heap block is gone"
+        }
       }
     ]
   },
   "quiz": {
-    "question": "free(p) 후 p의 값은?",
+    "question": "스택 변수(지역 변수)의 주소를 free() 하면 어떻게 될까?",
     "options": [
-      "NULL",
-      "0",
-      "변하지 않음 (이전 주소 그대로)",
-      "쓰레기 값"
+      "성공적으로 비워진다",
+      "아무 일도 안 일어난다",
+      "프로그램이 죽는다 (Crash)",
+      "컴파일 에러가 난다"
     ],
     "correctIndex": 2,
-    "explanation": "free는 메모리만 해제하고 p의 값은 변경하지 않습니다. 그래서 p = NULL;을 권장합니다."
+    "explanation": "`free`는 오직 `malloc/calloc/realloc`으로 할당받은 주소만 처리할 수 있습니다. 엉뚱한 주소를 넣으면 메모리 관리자가 혼란에 빠져 프로그램을 강제 종료시킵니다."
   },
   "misconceptions": [
     {
-      "wrong": "free 후 포인터가 자동으로 NULL이 된다",
-      "correct": "free는 메모리만 해제합니다. 포인터 값은 변하지 않아 Dangling Pointer가 됩니다.",
-      "why": "free는 포인터의 값을 수정할 방법이 없습니다. 직접 NULL로 설정해야 합니다."
-    },
-    {
-      "wrong": "free(NULL)은 에러다",
-      "correct": "free(NULL)은 안전하게 아무 일도 하지 않습니다.",
-      "why": "C 표준에서 free(NULL)은 정의된 동작입니다."
+      "wrong": "free(p) 하면 p 변수 자체가 사라진다",
+      "correct": "p 변수는 그대로 있습니다.",
+      "why": "단지 p가 가리키던 '집'이 철거된 것입니다. p는 여전히 철거된 집 주소를 들고 있습니다(Dangling Pointer)."
     }
   ],
-  "keyTakeaway": "free 후 p = NULL; 습관화. Dangling Pointer 방지"
+  "keyTakeaway": "빌린 건 반드시 `free`로 갚자. `malloc`과 `free`는 한 쌍이다."
 }

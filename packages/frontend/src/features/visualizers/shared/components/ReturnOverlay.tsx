@@ -72,7 +72,7 @@ const cardVariants = {
     scale: 0.9,
     transition: { duration: 0.3 },
   },
-};
+} as const;
 
 const arrowVariants = {
   hidden: { pathLength: 0, opacity: 0 },
@@ -91,7 +91,7 @@ const valueVariants = {
     y: 0,
     transition: { delay: 0.4, type: 'spring', stiffness: 200 },
   },
-};
+} as const;
 
 // ============================================
 // 컴포넌트

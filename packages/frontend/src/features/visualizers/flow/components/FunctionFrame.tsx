@@ -64,7 +64,7 @@ const frameVariants = {
       duration: FLOW_ANIMATION.duration.normal / 1000,
     },
   },
-};
+} as const;
 
 const headerVariants = {
   initial: { opacity: 0, x: -10 },

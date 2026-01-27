@@ -1,138 +1,73 @@
 {
   "lessonId": "c-3-5",
-  "title": "포인터로 배열 순회",
-  "concept": "포인터 증가(p++)로 배열을 순회할 수 있다",
+  "title": "Traversing with Pointers",
+  "concept": "인덱스(i) 대신 포인터(p)를 이동시켜서 배열을 훑을 수 있다",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int arr[5] = {10, 20, 30, 40, 50};\n    int *p = arr;\n    \n    for (int i = 0; i < 5; i++) {\n        printf(\"*p = %d (주소: %p)\\n\", *p, p);\n        p++;\n    }\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[] = {10, 20, 30, -1}; // -1은 끝 표시(Sentinel)\n    int *p = arr;\n    \n    // 포인터가 가리키는 값이 -1이 아닐 때까지 반복\n    while (*p != -1) {\n        printf(\"%d \", *p);\n        p++; // 포인터를 다음 칸으로 이동 (4바이트 전진)\n    }\n    \n    return 0;\n}",
     "steps": [
       {
-        "line": 4,
-        "title": "배열 생성",
-        "explanation": "5개 요소를 가진 배열이 **연속된 메모리**에 저장됩니다.\n\n**이번 레슨의 목표:** 포인터를 사용해서 배열을 순회해 볼 거예요.\n\n**왜 포인터로 순회할까?** 사실 `arr[i]`도 내부적으로 포인터 연산입니다. 직접 해보면 포인터가 더 잘 이해돼요!",
-        "highlight": [
-          4
-        ],
-        "memoryChanges": [
-          {
-            "action": "frame",
-            "area": "stack",
-            "name": "main",
-            "type": "frame"
-          },
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "arr",
-            "type": "int[5]",
-            "size": 20,
-            "value": "[10,20,30,40,50]",
-            "address": "0x7ffc1000",
-            "frame": "main"
-          }
-        ]
-      },
-      {
         "line": 5,
-        "title": "포인터 초기화",
-        "explanation": "p는 arr[0]을 가리킵니다. p = 0x7ffc1000\n\n**왜 int *p = arr;로 초기화할까?**\n- arr은 첫 요소 주소로 decay됨\n- p에 그 주소가 복사됨\n- 이제 p로 배열을 탐색할 수 있어요!\n\n**차이점:** arr은 고정(상수), p는 이동 가능(변수). 그래서 p++가 가능합니다!",
+        "title": "while (*p != -1)",
+        "explanation": "배열 길이를 몰라도, 특정 값(-1)을 만날 때까지 달리게 할 수 있습니다.\n문자열(`char*`)이 `\\0`을 만날 때까지 출력하는 것과 똑같은 원리입니다.",
         "highlight": [
-          5
-        ],
-        "memoryChanges": [
-          {
-            "action": "allocate",
-            "area": "stack",
-            "name": "p",
-            "type": "int*",
-            "size": 8,
-            "value": "0x7ffc1000",
-            "pointsTo": "arr[0]",
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 8,
-        "title": "첫 번째 요소",
-        "explanation": "*p = 10. p는 arr[0]을 가리키고 있습니다.\n\n**역참조 복습:**\n- p = 주소 (0x7ffc1000)\n- *p = 그 주소에 있는 **값** (10)\n\n이제 p++로 다음 요소로 이동해 볼게요!",
-        "highlight": [
+          5,
+          6,
+          7,
           8
         ],
-        "stdout": "*p = 10 (주소: 0x7ffc1000)",
-        "memoryChanges": []
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "arr",
+              "value": "{10, 20, 30, -1}",
+              "type": "int[]"
+            },
+            {
+              "name": "p",
+              "value": "Address(20)",
+              "type": "int*",
+              "highlight": true
+            }
+          ],
+          "output": [
+            "10 20 "
+          ]
+        }
       },
       {
-        "line": 9,
-        "title": "포인터 증가 (첫 번째)",
-        "explanation": "p++로 p가 **다음 int 위치**로 이동합니다. 1000 → 1004\n\n**왜 4가 더해질까?** p는 int*이므로 +1은 sizeof(int)=4만큼 증가해요.\n\n**포인터 산술의 마법:**\n- p++은 `p = p + 1`\n- `p + 1`은 `p + 1*sizeof(int)` = `p + 4`\n\n**만약 char *p였다면?** p++은 1만 증가합니다. 타입이 이동 단위를 결정해요!",
+        "line": 7,
+        "title": "p++ (Pointer Increment)",
+        "explanation": "**`p++`**\n`p = p + 1`과 같습니다.\n다음 요소로 포인터를 이동시킵니다.\n임베디드나 시스템 프로그래밍에서 매우 자주 보이는 패턴입니다.",
         "highlight": [
-          9
+          7
         ],
-        "memoryChanges": [
-          {
-            "action": "update",
-            "area": "stack",
-            "name": "p",
-            "value": "0x7ffc1004",
-            "previousValue": "0x7ffc1000",
-            "pointsTo": "arr[1]",
-            "frame": "main"
-          }
-        ]
-      },
-      {
-        "line": 8,
-        "title": "두 번째 요소",
-        "explanation": "*p = 20. 이제 p는 arr[1]을 가리킵니다.\n\n**잠깐, arr[1]과 *p가 같다고?**\n- p++로 이동 후 *p → arr[1]의 값\n- arr[1] → 같은 값!\n\n**두 방식의 비교:**\n```c\n// 인덱스 방식\nfor (int i = 0; i < 5; i++) arr[i];\n\n// 포인터 방식\nfor (int *p = arr; p < arr+5; p++) *p;\n```\n\n둘 다 같은 결과! 상황에 따라 편한 걸 쓰세요.",
-        "highlight": [
-          8
-        ],
-        "stdout": "*p = 20 (주소: 0x7ffc1004)",
-        "memoryChanges": []
-      },
-      {
-        "line": 9,
-        "title": "포인터 증가 (두 번째)",
-        "explanation": "p++로 1004 → 1008. arr[2]를 가리킵니다.\n\n**패턴이 보이나요?**\n- p++ 한 번 → arr[1]\n- p++ 두 번 → arr[2]\n- p++ n번 → arr[n]\n\n**주의사항:** 배열 범위를 벗어나지 마세요!\n- arr[5]는 유효하지 않음 (5개 요소면 0~4까지)\n- C는 범위 체크를 **안 합니다** → 크래시 위험\n\n**교훈:** 포인터는 강력하지만, **책임**도 프로그래머 몫입니다!",
-        "highlight": [
-          9
-        ],
-        "memoryChanges": [
-          {
-            "action": "update",
-            "area": "stack",
-            "name": "p",
-            "value": "0x7ffc1008",
-            "previousValue": "0x7ffc1004",
-            "pointsTo": "arr[2]",
-            "frame": "main"
-          }
-        ]
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "10 20 30 "
+          ]
+        }
       }
     ]
   },
   "quiz": {
-    "question": "int *p가 arr[0]을 가리킬 때, p++; p++; 후 p는?",
+    "question": "포인터 p로 배열을 순회할 때 주의할 점은?",
     "options": [
-      "arr[0]",
-      "arr[1]",
-      "arr[2]",
-      "배열 밖"
+      "인덱스보다 느리다",
+      "배열 범위를 벗어날 위험(Out of Bounds)이 있다",
+      "p++는 1바이트씩만 이동한다",
+      "사용할 수 없다"
     ],
-    "correctIndex": 2,
-    "explanation": "p++를 두 번 실행하면 두 요소 앞으로 이동합니다. arr[0] → arr[1] → arr[2]"
+    "correctIndex": 1,
+    "explanation": "포인터는 브레이크가 없습니다. 종료 조건(`length` 도달 or `NULL` 문자)을 잘못 짜면 배열 끝을 넘어서 계속 읽다가 메모리 오류를 냅니다."
   },
   "misconceptions": [
     {
-      "wrong": "p++는 p를 1만큼 증가시킨다",
-      "correct": "p++는 p를 sizeof(타입)만큼 증가시킵니다. int*면 4바이트.",
-      "why": "포인터 산술은 배열 순회를 위해 타입 크기를 고려합니다."
-    },
-    {
-      "wrong": "배열을 벗어나도 p++를 해도 된다",
-      "correct": "배열 범위를 벗어난 접근은 정의되지 않은 동작입니다.",
-      "why": "범위 체크는 프로그래머의 책임입니다. C는 검사하지 않습니다."
+      "wrong": "요즘 컴파일러는 인덱스(arr[i])보다 포인터(p++)가 훨씬 빠르다",
+      "correct": "옛날엔 그랬지만, 지금은 컴파일러 최적화가 좋아서 비슷합니다.",
+      "why": "가독성을 위해 인덱스(`arr[i]`)를 쓰는 게 더 좋을 때가 많습니다. 억지로 포인터를 쓸 필요는 없습니다."
     }
   ],
-  "keyTakeaway": "p++ = 다음 요소로 이동. 배열 순회에 유용"
+  "keyTakeaway": "`p++`로 배열을 훑는 건 C언어의 로망. 하지만 낭떠러지(범위 초과) 조심."
 }
