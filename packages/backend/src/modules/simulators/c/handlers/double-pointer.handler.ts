@@ -215,10 +215,10 @@ function handleDoubleDeref(
 ): Step {
   const pp = ctx.variables.get(ppName);
   if (!pp) {
-    throw new Error(`${ppName} not found. Available vars: ${Array.from(ctx.variables.keys()).join(', ')}`);
+    throw new Error(`Variable '${ppName}' not found`);
   }
   if (!pp.points_to) {
-    throw new Error(`${ppName} is not properly initialized. Type: ${pp.type}, Value: ${pp.value}, points_to: ${pp.points_to}`);
+    throw new Error(`${ppName} is not properly initialized`);
   }
 
   // 1단계: *pp → 첫 번째 포인터 찾기
