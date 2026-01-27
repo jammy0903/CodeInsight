@@ -717,7 +717,6 @@ class DebuggerAgent {
 
       // Use same replacer for consistency
       console.log(JSON.stringify(errorSnapshot, (key, value) => {
-        if (value === undefined) return '@@UNDEFINED@@';
         if (typeof value === 'number') {
           if (Number.isNaN(value)) return '@@NaN@@';
           if (value === Infinity) return '@@INFINITY@@';
