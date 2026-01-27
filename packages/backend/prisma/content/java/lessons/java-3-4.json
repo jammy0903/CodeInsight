@@ -8,111 +8,131 @@
       {
         "line": 8,
         "title": "Integer x, y 생성",
-        "explanation": "x=1, y=2가 오토박싱으로 Integer 객체가 됩니다.",
-        "highlight": [8, 9],
+        "explanation": "**메모리 상태:**\n`x`와 `y`는 각각 Heap의 `Integer(1)`과 `Integer(2)`를 가리킵니다.\n(여기서 `Integer`는 불변 객체입니다)",
+        "highlight": [
+          8,
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "x", "value": "-> 0x001"},
-            {"name": "y", "value": "-> 0x002"}
+            {
+              "name": "x",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x002"
+            }
           ],
           "heap": [
-            {"address": "0x001", "content": "Integer(1)"},
-            {"address": "0x002", "content": "Integer(2)"}
+            {
+              "address": "0x001",
+              "content": "Integer(1)"
+            },
+            {
+              "address": "0x002",
+              "content": "Integer(2)"
+            }
           ]
-        }
-      },
-      {
-        "line": 10,
-        "title": "호출 전 출력",
-        "explanation": "x=1, y=2입니다.",
-        "highlight": [10],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": ["before: x=1, y=2"]
         }
       },
       {
         "line": 11,
         "title": "swap(x, y) 호출",
-        "explanation": "x, y의 참조값이 a, b에 복사됩니다.",
-        "keyInsight": "파라미터 a, b는 x, y의 복사본",
-        "highlight": [11, 1],
+        "explanation": "**참조값 복사:**\n`x`의 주소(`0x001`)가 `a`에, `y`의 주소(`0x002`)가 `b`에 복사됩니다.\n이제 `swap` 메서드 안에서 `a`와 `b`를 아무리 바꿔도, 바깥의 `x`, `y`와는 연결 고리가 없습니다.",
+        "keyInsight": "파라미터: 주소값의 '복사본'",
+        "highlight": [
+          11,
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "x", "value": "-> 0x001", "frame": "main"},
-            {"name": "y", "value": "-> 0x002", "frame": "main"},
-            {"name": "a", "value": "-> 0x001", "frame": "swap", "copied": true},
-            {"name": "b", "value": "-> 0x002", "frame": "swap", "copied": true}
+            {
+              "name": "x",
+              "value": "-> 0x001",
+              "frame": "main"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x002",
+              "frame": "main"
+            },
+            {
+              "name": "a",
+              "value": "-> 0x001",
+              "frame": "swap",
+              "copied": true
+            },
+            {
+              "name": "b",
+              "value": "-> 0x002",
+              "frame": "swap",
+              "copied": true
+            }
           ]
         }
       },
       {
         "line": 2,
-        "title": "temp = a",
-        "explanation": "temp에 a의 참조값(0x001)을 저장합니다.",
-        "highlight": [2],
+        "title": "지역 변수 교환 (Swap)",
+        "explanation": "`swap` 메서드 내부에서는 `a`와 `b`가 서로의 값을 교환했습니다.\n- `a`는 이제 `0x002`를 가리킵니다.\n- `b`는 이제 `0x001`을 가리킵니다.\n- **하지만 이건 `swap` 방 안에서 일어난 일일 뿐입니다.**",
+        "highlight": [
+          2,
+          3,
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "-> 0x001", "frame": "swap"},
-            {"name": "b", "value": "-> 0x002", "frame": "swap"},
-            {"name": "temp", "value": "-> 0x001", "frame": "swap"}
-          ]
-        }
-      },
-      {
-        "line": 3,
-        "title": "a = b",
-        "explanation": "지역 변수 a가 0x002를 가리키게 됩니다. x는 영향 없음!",
-        "keyInsight": "지역 변수 a 변경 -> 원본 x 영향 없음",
-        "highlight": [3],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {"name": "x", "value": "-> 0x001", "frame": "main"},
-            {"name": "a", "value": "-> 0x002", "frame": "swap", "changed": true}
-          ]
-        }
-      },
-      {
-        "line": 4,
-        "title": "b = temp",
-        "explanation": "지역 변수 b가 0x001을 가리키게 됩니다. y는 영향 없음!",
-        "highlight": [4],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {"name": "y", "value": "-> 0x002", "frame": "main"},
-            {"name": "b", "value": "-> 0x001", "frame": "swap", "changed": true}
-          ]
-        }
-      },
-      {
-        "line": 5,
-        "title": "함수 내부 출력",
-        "explanation": "함수 내부에서는 a=2, b=1로 교환되었습니다.",
-        "highlight": [5],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": ["before: x=1, y=2", "inside: a=2, b=1"]
+            {
+              "name": "x",
+              "value": "-> 0x001",
+              "frame": "main"
+            },
+            {
+              "name": "a",
+              "value": "-> 0x002",
+              "frame": "swap",
+              "changed": true
+            },
+            {
+              "name": "b",
+              "value": "-> 0x001",
+              "frame": "swap",
+              "changed": true
+            }
+          ],
+          "note": "a, b만 바뀌고 x, y는 그대로"
         }
       },
       {
         "line": 12,
-        "title": "함수 반환 후 출력",
-        "explanation": "x, y는 여전히 원래 값입니다! 지역 변수만 교환되었습니다.",
-        "keyInsight": "Java에서 swap 함수는 작동하지 않음",
-        "highlight": [12],
+        "title": "함수 반환 후 (Swap 실패 확인)",
+        "explanation": "`swap` 메서드가 종료되고 Stack 프레임이 사라집니다. `a`, `b`도 같이 사라졌습니다.\n`main`에 남아있는 `x`, `y`는 처음 그 주소 그대로입니다.\n\n**결론:** Java에서는 변수 자체의 내용을 교환하는 `swap` 함수를 만들 수 없습니다.",
+        "keyInsight": "변수 재할당은 함수 밖으로 전파되지 않음",
+        "highlight": [
+          12
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "x", "value": "-> 0x001"},
-            {"name": "y", "value": "-> 0x002"}
+            {
+              "name": "x",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x002"
+            }
           ],
-          "output": ["before: x=1, y=2", "inside: a=2, b=1", "after: x=1, y=2"],
-          "warning": "swap 실패! x, y 그대로"
+          "output": [
+            "before: x=1, y=2",
+            "inside: a=2, b=1",
+            "after: x=1, y=2"
+          ],
+          "warning": "Swap 효과 없음!"
         }
       }
     ]
@@ -131,8 +151,8 @@
   "misconceptions": [
     {
       "wrong": "Integer는 객체니까 swap이 된다",
-      "correct": "객체여도 참조 재할당은 원본에 영향 없습니다.",
-      "why": "객체 내부 수정만 원본에 영향을 줍니다. Integer는 불변이라 내부 수정도 불가합니다."
+      "correct": "두 가지 이유로 안 됩니다. 1) 재할당은 지역적이고, 2) `Integer` 클래스는 불변(Immutable)이라 내부 값도 수정 못합니다.",
+      "why": "그래서 Java에서 swap을 하려면 배열(`int[]`)이나 AtomicInteger 같은 수정 가능한 객체(Mutable Object)에 담아서 전달해야 합니다."
     }
   ],
   "keyTakeaway": "Java는 항상 Pass by Value, swap 불가, 래핑으로 우회"

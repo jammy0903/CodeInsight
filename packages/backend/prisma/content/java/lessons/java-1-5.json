@@ -8,8 +8,19 @@
       {
         "line": 1,
         "title": "Person 클래스 정의",
-        "explanation": "Person 클래스에 equals()만 오버라이드하고 hashCode()는 누락했습니다.",
-        "highlight": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "explanation": "`equals()`는 재정의했지만, `hashCode()`는 빠뜨린 '반쪽짜리' 클래스입니다.\n이 클래스를 해시 기반 자료구조(HashMap, HashSet)에 넣으면 **재앙**이 일어납니다.",
+        "highlight": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "equals()는 오버라이드, hashCode()는 누락 (위험!)"
@@ -18,62 +29,101 @@
       {
         "line": 13,
         "title": "두 Person 객체 생성",
-        "explanation": "p1과 p2는 같은 이름 \"Alice\"를 가진 다른 객체입니다.",
-        "highlight": [13, 14],
+        "explanation": "`p1`과 `p2`는 내용(\"Alice\")이 같습니다.\n하지만 새로운 `new`로 만들어졌기에 메모리 주소는 다릅니다.\n\n**문제:** `hashCode`를 재정의 안 했으므로, **메모리 주소 기반의 기본 해시값**을 가집니다.\n`p1` 해시: 123 (가정)\n`p2` 해시: 456 (가정)\n**서로 다름!**",
+        "highlight": [
+          13,
+          14
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "p1", "value": "-> 0x001"},
-            {"name": "p2", "value": "-> 0x002"}
+            {
+              "name": "p1",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "p2",
+              "value": "-> 0x002"
+            }
           ],
           "heap": [
-            {"address": "0x001", "content": "Person(\"Alice\")", "hashCode": "hash: 123"},
-            {"address": "0x002", "content": "Person(\"Alice\")", "hashCode": "hash: 456"}
+            {
+              "address": "0x001",
+              "content": "Person(\"Alice\")",
+              "hashCode": "hash: 123"
+            },
+            {
+              "address": "0x002",
+              "content": "Person(\"Alice\")",
+              "hashCode": "hash: 456"
+            }
           ]
         }
       },
       {
         "line": 16,
         "title": "equals() 비교",
-        "explanation": "우리가 오버라이드한 equals()가 호출됩니다. 이름이 같으므로 true입니다.",
+        "explanation": "`p1.equals(p2)`는 우리가 작성한 코드대로 **이름(String)**을 비교합니다.\n\"Alice\" == \"Alice\" 이므로 `true`입니다.\n\n**여기까진 좋았습니다.** 문제는 다음부터입니다.",
         "keyInsight": "equals() 오버라이드 = 값 비교 가능",
-        "highlight": [16],
+        "highlight": [
+          16
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["true"],
+          "output": [
+            "true"
+          ],
           "note": "equals()는 정상 작동"
         }
       },
       {
         "line": 18,
         "title": "HashSet에 p1 추가",
-        "explanation": "HashSet은 hashCode()로 버킷을 결정합니다. p1의 hashCode(기본값)로 저장됩니다.",
+        "explanation": "**HashSet 내부 동작:**\n1. `p1.hashCode()` 호출 -> 123\n2. 123번에 해당하는 **버킷(방)**을 찾음\n3. 그 방에 `p1`을 저장\n\n`p1`은 '123번 방'에 잘 들어갔습니다.",
         "keyInsight": "HashSet/HashMap = hashCode()로 위치 결정",
-        "highlight": [18, 19],
+        "highlight": [
+          18,
+          19
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "hashSet": {
             "buckets": [
-              {"index": "hash(123) % n", "content": "p1"}
+              {
+                "index": "hash(123) % n",
+                "content": "p1"
+              }
             ]
           }
         }
       },
       {
         "line": 20,
-        "title": "contains(p2) 호출 (문제 발생!)",
-        "explanation": "p2의 hashCode는 p1과 다릅니다. 다른 버킷을 찾아가므로 p1을 찾지 못합니다!",
+        "title": "contains(p2) 호출 (검색 실패)",
+        "explanation": "**HashSet 검색 동작:**\n1. `p2.hashCode()` 호출 -> 456 (다른 주소니까!)\n2. 456번 버킷을 찾아감\n3. 방이 비어있음 -> **\"없네요\"** (false 반환)\n\n**충격적인 사실:**\n`equals`로 보면 둘은 쌍둥이인데, `hashCode`가 달라서 **서로 다른 방**을 뒤지고 있는 겁니다.",
         "keyInsight": "hashCode 다름 = 다른 버킷 = 찾기 실패",
-        "highlight": [20],
+        "highlight": [
+          20
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "hashSet": {
             "buckets": [
-              {"index": "hash(123)", "content": "p1"},
-              {"index": "hash(456)", "content": "검색 위치", "searched": true}
+              {
+                "index": "hash(123)",
+                "content": "p1"
+              },
+              {
+                "index": "hash(456)",
+                "content": "검색 위치",
+                "searched": true
+              }
             ]
           },
-          "output": ["true", "false"],
+          "output": [
+            "true",
+            "false"
+          ],
           "warning": "equals()는 true인데 contains()는 false!"
         }
       }
@@ -93,8 +143,13 @@
   "misconceptions": [
     {
       "wrong": "equals()만 오버라이드하면 된다",
-      "correct": "HashSet, HashMap 등을 사용하려면 hashCode()도 반드시 오버라이드해야 합니다.",
-      "why": "Hash 컬렉션은 hashCode()로 버킷을 찾고, 그 안에서 equals()로 비교합니다."
+      "correct": "반드시 `hashCode()`도 같이 오버라이드해야 합니다.",
+      "why": "HashMap, HashSet 같은 자료구조는 효율적인 검색을 위해 `hashCode`로 1차 분류(Bucket)를 하고, 그 안에서 `equals`로 2차 확인을 합니다. 1차 분류가 다르면 2차 확인 기회조차 얻지 못합니다."
+    },
+    {
+      "wrong": "hashCode는 유일한 값을 리턴해야 한다",
+      "correct": "유일하면 좋지만, 필수는 아닙니다(충돌 허용).",
+      "why": "하지만 다른 객체가 같은 해시코드를 가지면(해시 충돌), 버킷 안에 데이터가 쌓여 검색 성능이 느려집니다. 최대한 고르게 분산시키는 것이 좋습니다."
     }
   ],
   "keyTakeaway": "equals() 오버라이드 시 hashCode()도 필수, Objects.hash() 활용"

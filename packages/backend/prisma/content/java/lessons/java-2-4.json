@@ -8,51 +8,81 @@
       {
         "line": 1,
         "title": "HashMap 생성",
-        "explanation": "HashMap은 null key와 null value를 모두 허용합니다.",
-        "highlight": [1],
+        "explanation": "**HashMap의 정책:** \"뭐든 다 받아줍니다.\"\n`null` 키도, `null` 값도 저장할 수 있는 관대한 친구입니다.",
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "hashMap", "value": "HashMap{}"}]
+          "stack": [
+            {
+              "name": "hashMap",
+              "value": "HashMap{}"
+            }
+          ]
         }
       },
       {
         "line": 2,
         "title": "null value 저장",
-        "explanation": "HashMap은 null value를 허용합니다.",
-        "highlight": [2],
+        "explanation": "값을 `null`로 저장했습니다.\n\"이 키에 대한 데이터는 없음\"을 표시하고 싶을 때 쓸 수 있습니다.",
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "hashMap", "value": "{\"key\": null}"}],
+          "stack": [
+            {
+              "name": "hashMap",
+              "value": "{\"key\": null}"
+            }
+          ],
           "note": "HashMap: null value OK"
         }
       },
       {
         "line": 3,
         "title": "null key 저장",
-        "explanation": "HashMap은 null key도 허용합니다 (하나만).",
+        "explanation": "**특이점:** Key가 `null`인 것도 저장됩니다!\n내부적으로 해시값을 0으로 처리해서 0번 버킷에 저장합니다.\n단, Key는 유일해야 하므로 `null` Key는 딱 하나만 가질 수 있습니다.",
         "keyInsight": "HashMap: null key 1개, null value 여러 개 가능",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "hashMap", "value": "{\"key\": null, null: 100}"}]
+          "stack": [
+            {
+              "name": "hashMap",
+              "value": "{\"key\": null, null: 100}"
+            }
+          ]
         }
       },
       {
         "line": 5,
         "title": "ConcurrentHashMap 생성",
-        "explanation": "ConcurrentHashMap은 스레드 안전하지만 null을 허용하지 않습니다.",
-        "highlight": [5],
+        "explanation": "**ConcurrentHashMap의 정책:** \"null은 절대 사절!\"\n멀티스레드 환경을 위해 설계된 이 맵은 아주 엄격합니다.",
+        "highlight": [
+          5
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "concurrentMap", "value": "ConcurrentHashMap{}"}]
+          "stack": [
+            {
+              "name": "concurrentMap",
+              "value": "ConcurrentHashMap{}"
+            }
+          ]
         }
       },
       {
         "line": 6,
-        "title": "ConcurrentHashMap에 null (NPE!)",
-        "explanation": "null key나 null value를 넣으면 NullPointerException!",
+        "title": "ConcurrentHashMap에 null 넣기 (NPE!)",
+        "explanation": "Key나 Value에 `null`을 넣는 순간 `NullPointerException`이 발생합니다.\n\n**왜 이렇게 깐깐할까?**\n멀티스레드에서 `get(key)`가 `null`을 반환했을 때, \"값이 진짜 `null`인 건지\" 아니면 \"키가 없는 건지\" 구분할 수 없기 때문입니다. (모호함 제거)",
         "keyInsight": "ConcurrentHashMap: null 불가!",
-        "highlight": [6],
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "NullPointerException",
@@ -62,20 +92,29 @@
       {
         "line": 8,
         "title": "List.of() 불변 리스트",
-        "explanation": "List.of()로 만든 리스트는 불변이고 null을 허용하지 않습니다.",
-        "highlight": [8],
+        "explanation": "Java 9에 나온 `List.of()` 역시 `null`을 허용하지 않습니다.\n\"불변 리스트는 깔끔해야 한다\"는 철학 때문입니다.",
+        "highlight": [
+          8
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "list", "value": "[\"a\", \"b\", \"c\"]"}],
+          "stack": [
+            {
+              "name": "list",
+              "value": "[\"a\", \"b\", \"c\"]"
+            }
+          ],
           "note": "List.of(): 불변, null 불가"
         }
       },
       {
         "line": 9,
         "title": "contains(null) 호출 (NPE!)",
-        "explanation": "List.of()로 만든 리스트에서 contains(null)은 NPE!",
+        "explanation": "심지어 \"`null`이 들어있니?\"라고 물어보는 것(`contains`)조차 허용하지 않고 NPE를 던집니다.\n\"우리 리스트엔 `null` 같은 건 있을 리가 없어!\"라는 뜻입니다.",
         "keyInsight": "List.of(): null 요소 불가, contains(null)도 NPE",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "NullPointerException"
@@ -84,12 +123,19 @@
       {
         "line": 11,
         "title": "getOrDefault() - null-safe 조회",
-        "explanation": "키가 없거나 값이 null이면 기본값을 반환합니다.",
+        "explanation": "**추천 메서드:**\n\"키가 없으면 `null` 말고 0을 달라.\"\n`null` 처리를 매번 `if`문으로 하기 귀찮을 때 쓰는 '치트키'입니다.",
         "keyInsight": "getOrDefault() = null 대신 기본값",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "value", "value": "0"}],
+          "stack": [
+            {
+              "name": "value",
+              "value": "0"
+            }
+          ],
           "note": "\"missing\" 키가 없으므로 0 반환"
         }
       }
@@ -97,15 +143,25 @@
   },
   "quiz": {
     "question": "null key를 허용하는 Map은?",
-    "options": ["HashMap", "TreeMap", "ConcurrentHashMap", "Hashtable"],
+    "options": [
+      "HashMap",
+      "TreeMap",
+      "ConcurrentHashMap",
+      "Hashtable"
+    ],
     "correctIndex": 0,
     "explanation": "HashMap만 null key를 허용합니다. TreeMap은 비교할 수 없어서, ConcurrentHashMap과 Hashtable은 설계상 불가합니다."
   },
   "misconceptions": [
     {
-      "wrong": "모든 컬렉션이 null을 허용한다",
-      "correct": "ConcurrentHashMap, List.of(), Set.of() 등은 null을 허용하지 않습니다.",
-      "why": "스레드 안전성이나 불변성을 위해 null을 금지하는 경우가 많습니다."
+      "wrong": "모든 Map은 null을 허용한다",
+      "correct": "구현체마다 다릅니다! `HashMap`은 허용, `Hashtable`과 `ConcurrentHashMap`은 불가입니다.",
+      "why": "오래된 라이브러리(`Hashtable`)나 동시성 라이브러리(`ConcurrentHashMap`)는 null을 엄격히 금지합니다. 문서를 꼭 확인하세요."
+    },
+    {
+      "wrong": "List.of(null)은 [null]이 된다",
+      "correct": "바로 `NullPointerException`이 발생합니다.",
+      "why": "최신 Java API들은 '불변 컬렉션에는 null을 넣지 말자'는 원칙을 강하게 지킵니다."
     }
   ],
   "keyTakeaway": "HashMap: null OK, ConcurrentHashMap/List.of(): null 불가"

@@ -7,92 +7,82 @@
     "steps": [
       {
         "line": 1,
-        "title": "추상 클래스",
-        "explanation": "Animal은 abstract입니다. 직접 인스턴스화 불가, 상속용!",
-        "keyInsight": "abstract class = 틀만 제공, 구현은 자식이",
-        "highlight": [1, 2, 3],
+        "title": "추상 클래스 선언",
+        "explanation": "`Animal`은 \"동물이라면 소리를 낸다\"는 규칙(`abstract method`)만 정해두고, 구체적인 방법은 자식에게 떠넘깁니다.",
+        "keyInsight": "abstract = 강제성 (구현 안 하면 에러)",
+        "highlight": [
+          1,
+          2,
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "abstract void sound() = 시그니처만 정의"
-        }
-      },
-      {
-        "line": 5,
-        "title": "Dog 구현",
-        "explanation": "Dog는 sound()를 구현합니다. \"Woof!\" 출력.",
-        "highlight": [5, 6, 7],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "abstract 메서드 반드시 구현해야 함"
-        }
-      },
-      {
-        "line": 9,
-        "title": "Cat 구현",
-        "explanation": "Cat도 sound()를 구현합니다. \"Meow!\" 출력.",
-        "highlight": [9, 10, 11],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "각 클래스가 자신만의 sound() 구현"
+          "note": "Animal은 인스턴스화 불가 (new Animal X)"
         }
       },
       {
         "line": 13,
-        "title": "Animal 배열 (다형성!)",
-        "explanation": "Animal[] 타입에 Dog, Cat 객체들이 들어갑니다. 업캐스팅!",
-        "keyInsight": "부모 타입 배열에 자식 객체들 저장 가능",
-        "highlight": [13, 14, 15, 16, 17],
+        "title": "다형성 배열 (핵심)",
+        "explanation": "`Animal[]` 배열이 생성됩니다.\n이 배열에는 `Animal`의 자식이라면 누구든(`Dog`, `Cat`) 들어갈 수 있습니다.\n마치 \"동물 보호소\" 케이지에 개, 고양이, 사자가 다 들어가는 것과 같습니다.",
+        "keyInsight": "부모 타입 배열 하나로 여러 자식 관리",
+        "highlight": [
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "animals", "value": "-> 0x100"}],
+          "stack": [
+            {
+              "name": "animals",
+              "value": "-> 0x100"
+            }
+          ],
           "heap": [
-            {"address": "0x100", "content": "[-> 0x001, -> 0x002, -> 0x003]"},
-            {"address": "0x001", "content": "Dog{}"},
-            {"address": "0x002", "content": "Cat{}"},
-            {"address": "0x003", "content": "Dog{}"}
+            {
+              "address": "0x100",
+              "content": "[-> 0x001, -> 0x002, -> 0x003]",
+              "note": "각 원소는 서로 다른 객체를 가리킴"
+            },
+            {
+              "address": "0x001",
+              "content": "Dog{}"
+            },
+            {
+              "address": "0x002",
+              "content": "Cat{}"
+            },
+            {
+              "address": "0x003",
+              "content": "Dog{}"
+            }
           ]
         }
       },
       {
-        "line": 19,
-        "title": "for-each 루프",
-        "explanation": "Animal 타입으로 순회합니다.",
-        "highlight": [19],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [{"name": "a", "value": "-> 0x001 (Dog)"}]
-        }
-      },
-      {
         "line": 20,
-        "title": "첫 번째 a.sound()",
-        "explanation": "a는 Animal 타입이지만, 실제 객체는 Dog! Dog.sound() 호출!",
-        "keyInsight": "다형성 = 같은 메서드 호출, 다른 동작",
-        "highlight": [20],
+        "title": "반복문과 다형성 실행",
+        "explanation": "반복문이 돌면서 `a.sound()`를 호출합니다.\n코드는 똑같은 `a.sound()`인데, 결과는 매번 다릅니다.\n1. 첫 번째: `Dog`니까 \"Woof!\"\n2. 두 번째: `Cat`이니까 \"Meow!\"\n3. 세 번째: `Dog`니까 \"Woof!\"",
+        "keyInsight": "하나의 코드로 여러 동작 수행 (Poly-morphism)",
+        "highlight": [
+          20
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["Woof!"]
-        }
-      },
-      {
-        "line": 20,
-        "title": "두 번째 a.sound()",
-        "explanation": "a가 Cat을 참조. Cat.sound() 호출!",
-        "highlight": [20],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [{"name": "a", "value": "-> 0x002 (Cat)"}],
-          "output": ["Woof!", "Meow!"]
-        }
-      },
-      {
-        "line": 20,
-        "title": "세 번째 a.sound()",
-        "explanation": "a가 다시 Dog를 참조. Dog.sound() 호출!",
-        "highlight": [20],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": ["Woof!", "Meow!", "Woof!"]
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x003 (Dog)"
+            }
+          ],
+          "output": [
+            "Woof!",
+            "Meow!",
+            "Woof!"
+          ],
+          "note": "런타임에 객체 타입을 확인하고 호출"
         }
       }
     ]
@@ -110,9 +100,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "업캐스팅하면 자식 고유 메서드를 호출할 수 있다",
-      "correct": "부모 타입으로는 부모에 정의된 메서드만 호출 가능합니다.",
-      "why": "컴파일러는 변수 타입만 보고 판단합니다. 다운캐스팅 필요!"
+      "wrong": "자식 타입 배열을 부모 타입 배열 변수에 넣을 수 있다",
+      "correct": "Java에서는 가능합니다(공변성). 하지만 위험합니다.",
+      "why": "`Dog[]`을 `Animal[]`에 넣은 뒤, `Cat`을 집어넣으려 하면 런타임 에러(ArrayStoreException)가 납니다."
+    },
+    {
+      "wrong": "다형성은 성능이 느리다",
+      "correct": "아주 미세한 성능 비용(메서드 테이블 조회)이 있지만, 현대 JVM에서는 거의 무시할 수준입니다.",
+      "why": "오히려 if문으로 타입을 일일이 검사하는 것보다 훨씬 깔끔하고 유지보수가 쉽습니다."
     }
   ],
   "keyTakeaway": "다형성 = 부모 타입, 자식 객체, 자식 메서드 실행"

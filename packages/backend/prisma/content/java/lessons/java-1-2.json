@@ -8,109 +8,194 @@
       {
         "line": 1,
         "title": "리터럴로 String 생성",
-        "explanation": "\"hello\" 리터럴은 String Pool에 저장됩니다. a는 Pool의 객체를 참조합니다.",
+        "explanation": "**메모리에서 일어나는 일:**\n1. JVM이 **String Constant Pool**을 스캔합니다.\n2. \"hello\"라는 문자열이 없으면, Pool에 **새 객체**를 만듭니다.\n3. 그 객체의 참조(주소)를 `a`에 저장합니다.\n\n**왜 String Pool을 쓸까?**\nString은 자바에서 가장 많이 쓰이는 객체입니다. 매번 `new`로 만들면 메모리 낭비가 심하겠죠? 그래서 자주 쓰는 문자열을 모아두고 **재사용**하는 특별 구역을 만들었습니다.\n\n**용어 정리:**\n- **Literal**: 코드에 직접 쓴 값 (`\"hello\"`)\n- **String Pool**: 힙 영역 안의 **문자열 전용 캐시**\n- **JVM**: 자바 프로그램을 실행하는 가상 머신",
         "keyInsight": "리터럴 = String Pool에 저장",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "a", "value": "-> Pool"}],
-          "stringPool": [{"value": "\"hello\"", "address": "Pool:0x100"}],
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
           "heap": []
         }
       },
       {
         "line": 2,
         "title": "같은 리터럴 재사용",
-        "explanation": "\"hello\"가 이미 Pool에 있으므로 새로 만들지 않고 같은 객체를 참조합니다.",
+        "explanation": "**메모리에서 일어나는 일:**\n1. JVM이 Pool을 다시 스캔합니다.\n2. \"hello\"가 이미 존재함을 확인합니다!\n3. 새로 만들지 않고, **기존 객체의 주소**를 `b`에 줍니다.\n\n**결과:** `a`와 `b`는 **완벽하게 같은 객체**를 가리킵니다.\n\n**자주 하는 오해:**\n\"변수 `b`를 위해 또다른 `\"hello\"`가 생긴다\" (X)\n\"재활용한다\" (O)",
         "keyInsight": "같은 리터럴 = 같은 Pool 객체 재사용",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "-> Pool:0x100"},
-            {"name": "b", "value": "-> Pool:0x100", "sameRef": true}
+            {
+              "name": "a",
+              "value": "-> Pool:0x100"
+            },
+            {
+              "name": "b",
+              "value": "-> Pool:0x100",
+              "sameRef": true
+            }
           ],
-          "stringPool": [{"value": "\"hello\"", "address": "Pool:0x100", "refCount": 2}]
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100",
+              "refCount": 2
+            }
+          ]
         }
       },
       {
         "line": 3,
         "title": "리터럴끼리 == 비교",
-        "explanation": "a와 b는 같은 Pool 객체를 가리키므로 == 비교가 true입니다!",
+        "explanation": "`a`와 `b`는 같은 주소(Pool:0x100)를 가지고 있습니다. 따라서 `==` 비교(주소 비교) 결과는 `true`입니다.\n\n**주의할 점:**\n이건 '운이 좋아서' 같은 겁니다. 문자열 내용은 항상 `.equals()`로 비교하는 습관을 들이세요!",
         "keyInsight": "리터럴끼리는 == 가 true (같은 Pool 객체)",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "comparison": "Pool:0x100 == Pool:0x100",
-          "output": ["true"],
+          "output": [
+            "true"
+          ],
           "warning": "리터럴끼리는 ==가 true! 하지만 이에 의존하면 안 됨"
         }
       },
       {
         "line": 5,
         "title": "new로 String 생성",
-        "explanation": "new String()은 Pool을 무시하고 Heap에 새 객체를 생성합니다.",
+        "explanation": "**메모리에서 일어나는 일:**\n1. `new` 키워드를 보자마자 **Heap**에 무조건 **새 객체**를 만듭니다.\n2. Pool에 \"hello\"가 있든 말든 신경 쓰지 않습니다.\n3. 새 주소(0x200)를 `c`에 저장합니다.\n\n**왜 이렇게 할까?**\n개발자가 \"나는 꼭 별개의 객체가 필요해!\"라고 명시적으로 요청(`new`)했기 때문입니다. JVM은 개발자의 명령을 따릅니다.\n\n**용어 정리:**\n- **Interned String**: Pool에 있는 문자열\n- **Heap String**: 일반 Heap에 있는 문자열 (GC 대상)",
         "keyInsight": "new = Pool 무시, Heap에 새 객체",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "-> Pool:0x100"},
-            {"name": "c", "value": "-> 0x200"}
+            {
+              "name": "a",
+              "value": "-> Pool:0x100"
+            },
+            {
+              "name": "c",
+              "value": "-> 0x200"
+            }
           ],
-          "stringPool": [{"value": "\"hello\"", "address": "Pool:0x100"}],
-          "heap": [{"address": "0x200", "content": "\"hello\"", "new": true}]
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x200",
+              "content": "\"hello\"",
+              "new": true
+            }
+          ]
         }
       },
       {
         "line": 6,
         "title": "리터럴 vs new 비교",
-        "explanation": "a는 Pool, c는 Heap 객체. 다른 주소이므로 false입니다.",
-        "highlight": [6],
+        "explanation": "`a`는 Pool(0x100)에 있고, `c`는 Heap(0x200)에 있습니다.\n서로 다른 동네에 살고 있으니 주소가 다릅니다. `false`!\n\n**그림으로 보면:**\n- `a` -> [Pool \"hello\"]\n- `c` -> [Heap \"hello\"]",
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "comparison": "Pool:0x100 != 0x200",
-          "output": ["true", "false"]
+          "output": [
+            "true",
+            "false"
+          ]
         }
       },
       {
         "line": 8,
         "title": "intern()으로 Pool 등록",
-        "explanation": "intern()은 Pool에서 같은 값을 찾아 반환합니다. \"hello\"가 이미 있으므로 Pool 객체를 반환합니다.",
+        "explanation": "`intern()` 메서드는 **\"나도 Pool에 들어가고 싶어!\"** 라고 요청합니다.\n\n**동작 과정:**\n1. Pool에 \"hello\"가 있는지 확인합니다.\n2. 이미 있으니, 그 **기존 Pool 객체의 주소**를 반환합니다.\n3. `d`는 이제 `a`와 같은 곳을 가리킵니다.\n\n**만약 Pool에 없었다면?**\n자신의 복사본을 Pool에 등록하고 그 주소를 반환했을 겁니다.",
         "keyInsight": "intern() = Pool에서 찾거나 등록",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "-> Pool:0x100"},
-            {"name": "d", "value": "-> Pool:0x100", "sameRef": true}
+            {
+              "name": "a",
+              "value": "-> Pool:0x100"
+            },
+            {
+              "name": "d",
+              "value": "-> Pool:0x100",
+              "sameRef": true
+            }
           ],
-          "stringPool": [{"value": "\"hello\"", "address": "Pool:0x100"}]
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ]
         }
       },
       {
         "line": 9,
         "title": "intern() 결과 비교",
-        "explanation": "d는 이제 Pool 객체를 가리키므로 a == d는 true입니다.",
-        "highlight": [9],
+        "explanation": "`d`는 `intern()`을 통해 Pool 주소를 얻었습니다.\n`a`도 원래 Pool 주소였습니다.\n둘은 만났습니다! `true`.\n\n**실무 팁:**\n`intern()`은 메모리를 절약할 수 있지만, Pool 자체가 무거워질 수 있으니 신중히 사용해야 합니다.",
+        "highlight": [
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["true", "false", "true"]
+          "output": [
+            "true",
+            "false",
+            "true"
+          ]
         }
       }
     ]
   },
   "quiz": {
     "question": "String Pool의 목적은?",
-    "options": ["보안 강화", "메모리 절약", "속도 향상", "가비지 컬렉션 최적화"],
+    "options": [
+      "보안 강화",
+      "메모리 절약",
+      "속도 향상",
+      "가비지 컬렉션 최적화"
+    ],
     "correctIndex": 1,
     "explanation": "같은 문자열 리터럴을 여러 번 사용해도 하나의 객체만 생성하여 메모리를 절약합니다."
   },
   "misconceptions": [
     {
       "wrong": "문자열은 항상 ==로 비교하면 된다",
-      "correct": "리터럴끼리만 ==가 true입니다. new로 생성하거나 외부 입력이면 false입니다.",
-      "why": "항상 .equals()를 사용하는 것이 안전합니다."
+      "correct": "문자열 비교는 무조건 `.equals()`를 사용해야 합니다.",
+      "why": "리터럴(\"...\")은 Pool 때문에 `==`가 통하지만, 사용자 입력이나 파일 로딩 등 런타임에 만들어진 문자열은 `new` 객체처럼 취급되어 `==`가 실패합니다. 안전한 코딩을 위해 예외 없이 `.equals()`를 쓰세요."
+    },
+    {
+      "wrong": "String Pool은 Garbage Collection이 안 된다",
+      "correct": "String Pool의 문자열도 참조가 없으면 GC의 대상이 됩니다.",
+      "why": "Java 7 이전에는 PermGen이라는 고정 영역에 있어서 OOM(Out of Memory) 위험이 있었지만, Java 7부터는 일반 Heap으로 이동하여 GC가 정상적으로 작동합니다."
     }
   ],
   "keyTakeaway": "리터럴 = Pool 재사용, new = Heap 새 객체, 항상 .equals() 사용"

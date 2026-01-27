@@ -8,106 +8,190 @@
       {
         "line": 1,
         "title": "첫 번째 배열 생성",
-        "explanation": "arr1은 Heap에 생성된 배열 객체를 참조합니다.",
-        "highlight": [1],
+        "explanation": "**메모리에서 일어나는 일:**\n1. Heap에 정수 3개를 담을 공간(`[1, 2, 3]`) 할당\n2. 주소(0x001) 반환\n3. `arr1` 변수에 저장\n\n**배열도 객체다:** Java에서 배열은 특수한 **객체**입니다. 하지만 `equals` 메서드를 재정의하지 않은 불친절한 객체죠.",
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "arr1", "value": "-> 0x001"}],
-          "heap": [{"address": "0x001", "content": "[1, 2, 3]"}]
+          "stack": [
+            {
+              "name": "arr1",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[1, 2, 3]"
+            }
+          ]
         }
       },
       {
         "line": 2,
         "title": "두 번째 배열 생성",
-        "explanation": "arr2는 별도의 배열 객체입니다. 내용은 같지만 다른 객체입니다.",
-        "highlight": [2],
+        "explanation": "똑같은 내용(`[1, 2, 3]`)이지만,\nHeap의 **다른 공간**에 새로운 배열을 만듭니다.\n주소는 0x002입니다.",
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "arr1", "value": "-> 0x001"},
-            {"name": "arr2", "value": "-> 0x002"}
+            {
+              "name": "arr1",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "arr2",
+              "value": "-> 0x002"
+            }
           ],
           "heap": [
-            {"address": "0x001", "content": "[1, 2, 3]"},
-            {"address": "0x002", "content": "[1, 2, 3]", "new": true}
+            {
+              "address": "0x001",
+              "content": "[1, 2, 3]"
+            },
+            {
+              "address": "0x002",
+              "content": "[1, 2, 3]",
+              "new": true
+            }
           ]
         }
       },
       {
         "line": 4,
-        "title": "== 비교",
-        "explanation": "다른 객체이므로 false입니다. 예상대로입니다.",
-        "highlight": [4],
+        "title": "== 비교 (참조 비교)",
+        "explanation": "0x001(arr1) == 0x002(arr2)?\n당연히 `false`입니다. 서로 다른 객체니까요.",
+        "highlight": [
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["false"]
+          "output": [
+            "false"
+          ]
         }
       },
       {
         "line": 5,
-        "title": ".equals() 비교 (함정!)",
-        "explanation": "배열은 equals()를 오버라이드하지 않습니다! Object.equals() = 참조 비교이므로 false입니다.",
+        "title": ".equals() 비교 (배열의 함정!)",
+        "explanation": "여기서 많이 속습니다!\n배열의 `.equals()`는 내용을 비교하지 않습니다.\n**`Object.equals()`를 그대로 상속받아 사용**하므로, `==`와 똑같이 **주소 비교**를 합니다.\n\n**왜 이렇게 만들었을까?**\n배열은 아주 단순한 구조라 메서드 오버라이딩을 최소화했습니다. 대신 유틸리티 클래스(`Arrays`)를 제공합니다.",
         "keyInsight": "배열.equals() = Object.equals() = 참조 비교!",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["false", "false"],
+          "output": [
+            "false",
+            "false"
+          ],
           "warning": ".equals()도 false! 배열은 Object.equals() 사용"
         }
       },
       {
         "line": 6,
         "title": "Arrays.equals() 사용",
-        "explanation": "Arrays.equals()는 배열의 내용을 비교합니다. 올바른 방법입니다.",
+        "explanation": "`Arrays.equals(a, b)`는 우리가 원하는 동작을 합니다.\n\n**동작 방식:**\n1. 두 배열의 길이가 같은지 확인\n2. 처음부터 끝까지 루프를 돌며 `arr1[i] == arr2[i]` 검사\n3. 모두 같으면 `true` 반환",
         "keyInsight": "배열 비교 = Arrays.equals() 사용",
-        "highlight": [6],
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["false", "false", "true"]
+          "output": [
+            "false",
+            "false",
+            "true"
+          ]
         }
       },
       {
         "line": 8,
         "title": "2차원 배열 생성",
-        "explanation": "deep1은 배열의 배열입니다. 각 내부 배열도 별도 객체입니다.",
-        "highlight": [8, 9],
+        "explanation": "2차원 배열은 **'배열을 가리키는 배열'**입니다.\n`deep1`은 `[주소1, 주소2]`를 담고 있습니다.\n\n각각의 내부 배열도 별도의 객체로 힙에 존재합니다.",
+        "highlight": [
+          8,
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "deep1", "value": "-> 0x010"},
-            {"name": "deep2", "value": "-> 0x020"}
+            {
+              "name": "deep1",
+              "value": "-> 0x010"
+            },
+            {
+              "name": "deep2",
+              "value": "-> 0x020"
+            }
           ],
           "heap": [
-            {"address": "0x010", "content": "[-> 0x011, -> 0x012]"},
-            {"address": "0x011", "content": "[1, 2]"},
-            {"address": "0x012", "content": "[3, 4]"},
-            {"address": "0x020", "content": "[-> 0x021, -> 0x022]"},
-            {"address": "0x021", "content": "[1, 2]"},
-            {"address": "0x022", "content": "[3, 4]"}
+            {
+              "address": "0x010",
+              "content": "[-> 0x011, -> 0x012]"
+            },
+            {
+              "address": "0x011",
+              "content": "[1, 2]"
+            },
+            {
+              "address": "0x012",
+              "content": "[3, 4]"
+            },
+            {
+              "address": "0x020",
+              "content": "[-> 0x021, -> 0x022]"
+            },
+            {
+              "address": "0x021",
+              "content": "[1, 2]"
+            },
+            {
+              "address": "0x022",
+              "content": "[3, 4]"
+            }
           ]
         }
       },
       {
         "line": 10,
         "title": "Arrays.equals() - 2차원 (함정!)",
-        "explanation": "Arrays.equals()는 1차원만 비교합니다. 내부 배열은 참조만 비교하므로 false!",
+        "explanation": "`Arrays.equals`는 **겉껍데기(1차원)**만 비교합니다.\n\n`deep1[0]`(0x011) 과 `deep2[0]`(0x021)을 비교하는데, 주소가 다르니 `false`가 나옵니다.\n내용(`{1, 2}`)까지는 안 봅니다!",
         "keyInsight": "Arrays.equals()는 1차원만 비교",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["false", "false", "true", "false"],
+          "output": [
+            "false",
+            "false",
+            "true",
+            "false"
+          ],
           "warning": "내부 배열 주소가 다르므로 false!"
         }
       },
       {
         "line": 11,
         "title": "Arrays.deepEquals() 사용",
-        "explanation": "Arrays.deepEquals()는 모든 중첩 배열의 내용까지 비교합니다.",
+        "explanation": "**해결사 등장:** `Arrays.deepEquals()`\n\n재귀적으로 파고들어서 끝까지 비교합니다.\n\"배열 안에 또 배열이 있어? 그럼 안으로 들어가서 또 확인해!\"\n\n결과: `true`",
         "keyInsight": "다차원 배열 = Arrays.deepEquals() 사용",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["false", "false", "true", "false", "true"]
+          "output": [
+            "false",
+            "false",
+            "true",
+            "false",
+            "true"
+          ]
         }
       }
     ]
@@ -126,8 +210,13 @@
   "misconceptions": [
     {
       "wrong": "배열도 .equals()로 비교하면 된다",
-      "correct": "배열은 equals()를 오버라이드하지 않습니다. Arrays.equals()를 사용해야 합니다.",
-      "why": "Object.equals()는 참조 비교만 합니다."
+      "correct": "배열은 `Arrays.equals()`로 비교해야 합니다.",
+      "why": "배열 클래스는 `.equals()`를 오버라이드하지 않았습니다. 즉, `p1.equals(p2)`라고 쓰는 것은 `p1 == p2`(주소 비교)라고 쓰는 것과 완전히 똑같습니다."
+    },
+    {
+      "wrong": "배열 내용은 값을 담고 있다",
+      "correct": "객체 배열(`String[]` 등)은 참조(주소)를 담고 있습니다.",
+      "why": "`int[]` 같은 원시 타입 배열은 실제 값을 담지만, 객체 배열은 객체를 가리키는 화살표들의 모음일 뿐입니다."
     }
   ],
   "keyTakeaway": "1차원: Arrays.equals(), 다차원: Arrays.deepEquals()"

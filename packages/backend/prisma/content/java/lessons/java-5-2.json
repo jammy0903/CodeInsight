@@ -8,51 +8,68 @@
       {
         "line": 1,
         "title": "final 클래스 선언",
-        "explanation": "ImmutablePoint는 final 클래스입니다. 상속이 불가능합니다.",
-        "keyInsight": "final class = 상속 불가",
-        "highlight": [1],
+        "explanation": "`final class`는 **\"더 이상 자식은 없다\"**는 선언입니다.\n이 클래스를 상속받아 기능을 수정하거나 악용하는 것을 원천 차단합니다.",
+        "keyInsight": "final class = 상속 금지 (가계도 끝)",
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "String, Integer, LocalDate 등도 final class"
+          "note": "String, Integer 등이 대표적인 final 클래스"
         }
       },
       {
         "line": 2,
         "title": "final 필드들",
-        "explanation": "x, y는 final이라 생성 후 변경 불가. 진정한 불변 객체!",
-        "keyInsight": "final class + final 필드 = 불변 객체",
-        "highlight": [2],
+        "explanation": "필드까지 `final`이면 생성자에서 딱 한 번 값을 정하고, 이후 **절대 변경할 수 없습니다.**\n-> 이것이 바로 **불변 객체(Immutable Object)**입니다.",
+        "keyInsight": "final class + final fields = 완전 불변",
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "모든 필드 final + setter 없음 = 불변"
+          "note": "Setter가 없어야 함"
         }
       },
       {
         "line": 4,
         "title": "생성자에서 초기화",
-        "explanation": "final 필드는 생성자에서 반드시 초기화해야 합니다.",
-        "highlight": [4, 5, 6],
+        "explanation": "`final` 필드는 **반드시** 생성자가 끝날 때까지 초기화되어야 합니다.\n(값을 안 넣고 넘어가면 컴파일 에러)",
+        "highlight": [
+          4,
+          5,
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [{"address": "0x001", "content": "ImmutablePoint{x: 10, y: 20}"}]
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "ImmutablePoint{x: 10, y: 20}"
+            }
+          ]
         }
       },
       {
         "line": 9,
         "title": "final 메서드",
-        "explanation": "getX()는 final 메서드. 하위 클래스에서 오버라이드 불가!",
+        "explanation": "`getX()`에 `final`이 붙으면, 자식 클래스에서 이 메서드의 로직을 **바꿀(Override) 수 없습니다.**\n\"내 동작 방식은 완벽하니 건드리지 마라.\"",
         "keyInsight": "final method = 오버라이드 금지",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "보안/성능 이유로 재정의 방지"
+          "note": "중요한 로직 보안/무결성 유지"
         }
       },
       {
         "line": 12,
         "title": "final 클래스 상속 시도 (에러)",
-        "explanation": "final 클래스를 상속하면 컴파일 에러!",
-        "highlight": [12],
+        "explanation": "`final`인 `ImmutablePoint`를 상속받으려 하면 컴파일러가 막습니다.",
+        "highlight": [
+          12
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "컴파일 에러: cannot inherit from final ImmutablePoint"
@@ -61,21 +78,28 @@
       {
         "line": 14,
         "title": "일반 클래스의 final 메서드",
-        "explanation": "Parent 클래스는 상속 가능하지만, cannotOverride()는 final!",
-        "highlight": [14, 15, 16, 17],
+        "explanation": "`Parent` 클래스 자체는 상속해줘도 되지만, `cannotOverride` 메서드만큼은 바꾸지 못하게 막고 싶을 때 씁니다.",
+        "highlight": [
+          14,
+          15,
+          16,
+          17
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "클래스는 상속 OK, 특정 메서드만 오버라이드 금지"
+          "note": "부분적인 상속 제한"
         }
       },
       {
         "line": 21,
         "title": "final 메서드 오버라이드 시도 (에러)",
-        "explanation": "Child에서 cannotOverride()를 재정의하면 컴파일 에러!",
-        "highlight": [21],
+        "explanation": "자식(`Child`)이 `Parent`의 `final` 메서드를 자기 입맛대로 바꾸려(Override) 하면 에러가 납니다.\n부모가 정한 규칙을 따라야 합니다.",
+        "highlight": [
+          21
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "error": "컴파일 에러: cannotOverride() in Child cannot override cannotOverride() in Parent"
+          "error": "컴파일 에러: overridden method is final"
         }
       }
     ]
@@ -94,8 +118,13 @@
   "misconceptions": [
     {
       "wrong": "final 메서드는 오버로딩도 안 된다",
-      "correct": "final은 오버라이드만 금지합니다. 오버로딩은 가능합니다.",
-      "why": "오버로딩은 같은 이름의 다른 메서드 추가, 오버라이드는 기존 메서드 재정의입니다."
+      "correct": "오버라이드(덮어쓰기)만 안 될 뿐, 오버로딩(새로 추가하기)은 가능합니다.",
+      "why": "파라미터가 다르면 아예 다른 메서드로 취급하기 때문에 상관없습니다."
+    },
+    {
+      "wrong": "모든 메서드는 기본적으로 final이다",
+      "correct": "Java는 기본적으로 `override` 허용입니다(Open). `final`을 붙여야 금지(Closed)됩니다.",
+      "why": "C#나 Kotlin은 반대로 기본이 금지, `open` 키워드로 허용하는 방식이라 헷갈릴 수 있습니다."
     }
   ],
   "keyTakeaway": "final class = 상속 불가, final method = 오버라이드 불가"

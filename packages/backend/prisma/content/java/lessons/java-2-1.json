@@ -8,43 +8,66 @@
       {
         "line": 1,
         "title": "null 할당",
-        "explanation": "str 변수에 null을 할당합니다. 어떤 객체도 참조하지 않습니다.",
-        "keyInsight": "null = 아무것도 참조하지 않음",
-        "highlight": [1],
+        "explanation": "**메모리에서 일어나는 일:**\n1. Stack에 `str`이라는 변수 공간을 만듭니다.\n2. 그 공간에 `null`이라는 특별한 값을 채웁니다.\n\n**null이란?**\n\"아무것도 가리키지 않는다\"는 뜻의 표식입니다. 내부적으로는 보통 **0x0** 같은 유효하지 않은 주소로 표현됩니다.",
+        "keyInsight": "null = 참조 없음 (주소 0x0)",
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "str", "value": "null"}],
+          "stack": [
+            {
+              "name": "str",
+              "value": "null"
+            }
+          ],
           "heap": []
         }
       },
       {
         "line": 3,
-        "title": "null에서 메서드 호출",
-        "explanation": "str.length()를 호출하지만 str은 null입니다. NullPointerException 발생!",
+        "title": "null에서 메서드 호출 (NPE 발생)",
+        "explanation": "**동작 원리:**\n1. `str.length()`를 호출하려면 `str`이 가리키는 **주소로 이동(역참조)**해야 합니다.\n2. JVM이 확인해보니 주소가 `null`입니다.\n3. \"갈 곳이 없는데?\"라며 즉시 **`NullPointerException`**을 던지고 프로그램을 중단시킵니다.\n\n**용어 정리:**\n- **Dereference (역참조)**: 주소를 따라가서 실제 객체에 접근하는 것 (`.` 연산자)",
         "keyInsight": "null.메서드() = NullPointerException",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "str", "value": "null"}],
+          "stack": [
+            {
+              "name": "str",
+              "value": "null"
+            }
+          ],
           "error": "NullPointerException: Cannot invoke \"String.length()\" because \"str\" is null"
         }
       },
       {
         "line": 5,
         "title": "또 다른 null 변수",
-        "explanation": "text도 null입니다.",
-        "highlight": [5],
+        "explanation": "`text` 변수도 마찬가지로 아무런 객체도 가리키지 않는 상태(`null`)로 초기화됩니다.",
+        "highlight": [
+          5
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "text", "value": "null"}]
+          "stack": [
+            {
+              "name": "text",
+              "value": "null"
+            }
+          ]
         }
       },
       {
         "line": 6,
-        "title": "null.equals() 호출",
-        "explanation": "text.equals(\"hello\")도 NullPointerException입니다.",
+        "title": "null.equals() 호출 (위험!)",
+        "explanation": "`text`가 `null`이므로, `text`를 통해 무언가를 하려는 시도(`.equals`)는 무조건 실패합니다.\n\n**경고:**\n변수가 `null`일 가능성이 1%라도 있다면, 절대로 메서드를 먼저 호출하지 마세요.",
         "keyInsight": "null.equals(x) = NPE!",
-        "highlight": [6],
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "NullPointerException"
@@ -52,13 +75,20 @@
       },
       {
         "line": 8,
-        "title": "안전한 비교 방법",
-        "explanation": "\"hello\".equals(text)는 안전합니다. 리터럴에서 호출하므로 NPE 없음!",
+        "title": "안전한 비교 방법 (Yoda Condition)",
+        "explanation": "**순서만 바꿨을 뿐인데?**\n1. `\"hello\"`는 리터럴이므로 **String Pool에 존재하는 실제 객체**입니다. (절대 null이 아님)\n2. `실제객체.equals(null)`을 호출합니다.\n3. `equals` 메서드 내부는 인자가 `null`이면 우아하게 `false`를 반환하도록 짜여 있습니다.\n\n**결과:** 에러 없이 안전하게 `false`가 됩니다.",
         "keyInsight": "\"리터럴\".equals(변수) = null-safe",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "safe", "value": "false"}],
+          "stack": [
+            {
+              "name": "safe",
+              "value": "false"
+            }
+          ],
           "note": "\"hello\"는 null이 아니므로 안전하게 false 반환"
         }
       }
@@ -78,8 +108,13 @@
   "misconceptions": [
     {
       "wrong": "null 체크 없이 메서드를 호출해도 된다",
-      "correct": "null일 가능성이 있는 변수는 반드시 체크하거나 안전한 패턴을 사용해야 합니다.",
-      "why": "NPE는 가장 흔한 런타임 에러입니다."
+      "correct": "외부에서 온 데이터나 null 가능성이 있는 변수는 **반드시** 사용 전 null 체크를 해야 합니다.",
+      "why": "NPE는 컴파일 타임에 잡히지 않는 가장 치명적인 런타임 에러입니다. 앱이 갑자기 죽는 주범입니다."
+    },
+    {
+      "wrong": "null은 '0'이나 '공백'과 같다",
+      "correct": "완전히 다릅니다. 0은 숫자이고 공백은 문자열이지만, null은 **'존재하지 않음'**이라는 상태입니다.",
+      "why": "0으로 초기화된 int는 존재하지만, null로 초기화된 객체 변수는 껍데기만 있는 상태입니다."
     }
   ],
   "keyTakeaway": "null.메서드() = NPE, \"리터럴\".equals(변수) = 안전"

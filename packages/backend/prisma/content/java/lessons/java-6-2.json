@@ -9,7 +9,11 @@
         "line": 2,
         "title": "부모 메서드 정의",
         "explanation": "Shape.draw()는 \"Drawing shape\"를 출력합니다.",
-        "highlight": [2, 3, 4],
+        "highlight": [
+          2,
+          3,
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "Shape 클래스의 draw() 메서드"
@@ -20,7 +24,9 @@
         "title": "@Override 어노테이션",
         "explanation": "@Override는 '이 메서드가 부모를 재정의함'을 명시합니다. 실수 방지!",
         "keyInsight": "@Override = 컴파일러가 오버라이드 검증",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "@Override 없어도 작동하지만, 권장!"
@@ -30,7 +36,11 @@
         "line": 9,
         "title": "자식 메서드 정의",
         "explanation": "Circle.draw()는 \"Drawing circle\"을 출력합니다.",
-        "highlight": [9, 10, 11],
+        "highlight": [
+          9,
+          10,
+          11
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "Circle이 Shape.draw()를 재정의"
@@ -40,11 +50,23 @@
         "line": 14,
         "title": "Shape 인스턴스 생성",
         "explanation": "s1은 Shape 타입, Shape 객체입니다.",
-        "highlight": [14],
+        "highlight": [
+          14
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "s1", "value": "-> Shape"}],
-          "heap": [{"address": "0x001", "content": "Shape{}"}]
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Shape"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Shape{}"
+            }
+          ]
         }
       },
       {
@@ -52,16 +74,32 @@
         "title": "업캐스팅 (중요!)",
         "explanation": "s2는 Shape 타입이지만, 실제 객체는 Circle입니다!",
         "keyInsight": "부모 타입 변수 = 자식 인스턴스 (업캐스팅)",
-        "highlight": [15],
+        "highlight": [
+          15
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "s1", "value": "-> Shape"},
-            {"name": "s2", "value": "-> Circle", "note": "타입은 Shape"}
+            {
+              "name": "s1",
+              "value": "-> Shape"
+            },
+            {
+              "name": "s2",
+              "value": "-> Circle",
+              "note": "타입은 Shape"
+            }
           ],
           "heap": [
-            {"address": "0x001", "content": "Shape{}"},
-            {"address": "0x002", "content": "Circle{}", "highlight": true}
+            {
+              "address": "0x001",
+              "content": "Shape{}"
+            },
+            {
+              "address": "0x002",
+              "content": "Circle{}",
+              "highlight": true
+            }
           ]
         }
       },
@@ -69,10 +107,14 @@
         "line": 17,
         "title": "s1.draw() 호출",
         "explanation": "s1은 Shape 객체 → Shape.draw() 실행",
-        "highlight": [17],
+        "highlight": [
+          17
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["Drawing shape"]
+          "output": [
+            "Drawing shape"
+          ]
         }
       },
       {
@@ -80,10 +122,15 @@
         "title": "s2.draw() 호출 (동적 바인딩!)",
         "explanation": "s2의 타입은 Shape이지만, 실제 객체는 Circle! Circle.draw() 실행!",
         "keyInsight": "런타임에 실제 객체 타입의 메서드 호출 = 동적 바인딩",
-        "highlight": [18],
+        "highlight": [
+          18
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["Drawing shape", "Drawing circle"],
+          "output": [
+            "Drawing shape",
+            "Drawing circle"
+          ],
           "note": "컴파일: Shape.draw(), 런타임: Circle.draw()"
         }
       }
@@ -102,9 +149,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "오버라이딩과 오버로딩은 같다",
-      "correct": "오버라이딩 = 재정의(같은 시그니처), 오버로딩 = 다른 파라미터로 새 메서드 추가",
-      "why": "오버로딩은 컴파일 타임, 오버라이딩은 런타임에 결정됩니다."
+      "wrong": "필드(변수)도 오버라이딩 된다",
+      "correct": "필드는 오버라이딩되지 않고 **가려질(Hidden) 뿐**입니다.",
+      "why": "`s2.field`를 호출하면 실제 객체가 아니라 **변수의 타입(Shape)**에 있는 필드를 봅니다. 메서드와 정반대입니다!"
+    },
+    {
+      "wrong": "static 메서드도 오버라이딩 된다",
+      "correct": "static 메서드는 오버라이딩 대상이 아닙니다.",
+      "why": "static은 클래스 레벨이라, 다형성(런타임 객체 확인)이 적용되지 않습니다."
     }
   ],
   "keyTakeaway": "오버라이딩 = 런타임에 실제 객체의 메서드 호출 (동적 바인딩)"

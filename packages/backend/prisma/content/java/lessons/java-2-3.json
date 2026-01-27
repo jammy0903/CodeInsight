@@ -7,59 +7,90 @@
     "steps": [
       {
         "line": 1,
-        "title": "Optional.of() - 값이 있는 경우",
-        "explanation": "Optional.of()는 null이 아닌 값을 감쌉니다. null을 넣으면 NPE!",
+        "title": "Optional.of() - 상자 만들기",
+        "explanation": "**메모리에서 일어나는 일:**\n1. Heap에 `Optional`이라는 **단단한 상자(Wrapper)**를 만듭니다.\n2. \"hello\" 문자열을 그 상자 안에 안전하게 넣습니다.\n\n**규칙:** `of()`는 **null을 절대 허용하지 않습니다.** null을 넣으려 하면 상자를 만들기도 전에 에러(NPE)가 납니다.",
         "keyInsight": "of() = null 불가, ofNullable() = null 가능",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "opt1", "value": "Optional[\"hello\"]"}]
+          "stack": [
+            {
+              "name": "opt1",
+              "value": "Optional[\"hello\"]"
+            }
+          ]
         }
       },
       {
         "line": 2,
-        "title": "Optional.empty() - 빈 Optional",
-        "explanation": "값이 없음을 명시적으로 표현합니다. null 대신 사용.",
+        "title": "Optional.empty() - 빈 상자",
+        "explanation": "내용물이 없는 '빈 상자' 객체를 만듭니다.\n`null`을 쓰는 대신 \"상자는 있는데 내용은 없어\"라고 명확하게 말하는 방식입니다.",
         "keyInsight": "empty() = 값 없음을 명시적으로 표현",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "opt1", "value": "Optional[\"hello\"]"},
-            {"name": "opt2", "value": "Optional.empty"}
+            {
+              "name": "opt1",
+              "value": "Optional[\"hello\"]"
+            },
+            {
+              "name": "opt2",
+              "value": "Optional.empty"
+            }
           ]
         }
       },
       {
         "line": 3,
-        "title": "Optional.ofNullable() - null 허용",
-        "explanation": "null이면 empty(), 값이 있으면 of()처럼 동작합니다.",
-        "highlight": [3],
+        "title": "Optional.ofNullable() - 유연한 상자",
+        "explanation": "값이 있으면 상자에 넣고(`of`), `null`이면 빈 상자(`empty`)를 만듭니다.\n가장 많이 쓰이는 생성 방식입니다.",
+        "highlight": [
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "opt3", "value": "Optional.empty"}
+            {
+              "name": "opt3",
+              "value": "Optional.empty"
+            }
           ],
           "note": "null을 넣으면 empty()가 됨"
         }
       },
       {
         "line": 5,
-        "title": "get() - 값 꺼내기 (위험!)",
-        "explanation": "값이 있으면 반환, 없으면 NoSuchElementException!",
+        "title": "get() - 강제로 꺼내기 (위험!!)",
+        "explanation": "상자를 무작정 엽니다.\n- 내용이 있으면: 다행입니다. 값을 꺼냅니다.\n- 내용이 없으면: **`NoSuchElementException`** 예외가 폭발합니다.\n\n**경고:** `get()`은 최후의 수단입니다. 되도록 쓰지 마세요.",
         "keyInsight": "get()은 위험! isPresent() 체크 또는 orElse() 사용",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "value", "value": "\"hello\""}],
+          "stack": [
+            {
+              "name": "value",
+              "value": "\"hello\""
+            }
+          ],
           "warning": "opt2.get()이나 opt3.get()은 예외 발생!"
         }
       },
       {
         "line": 7,
-        "title": "isPresent() 체크",
-        "explanation": "값이 있는지 먼저 확인하고 get()을 호출합니다.",
-        "highlight": [7, 8, 9],
+        "title": "isPresent() - 확인하고 꺼내기",
+        "explanation": "고전적인 방식입니다.\n\"상자에 값이 있나요?\"(`isPresent`) 확인하고, \"있으면 꺼냅니다\"(`get`).\n안전하지만 코드가 좀 길어집니다.",
+        "highlight": [
+          7,
+          8,
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "opt2는 empty이므로 블록 실행 안 됨"
@@ -67,25 +98,36 @@
       },
       {
         "line": 11,
-        "title": "orElse() - 기본값 제공",
-        "explanation": "값이 없으면 기본값을 반환합니다. get()보다 안전!",
+        "title": "orElse() - 안전한 기본값 제공",
+        "explanation": "**가장 권장하는 방식:**\n\"상자를 열어봐. 값이 있으면 그거 쓰고, **비어있으면 'default'를 대신 써.**\"\n한 줄로 깔끔하고 안전하게 처리됩니다.",
         "keyInsight": "orElse() = 안전한 기본값 패턴",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "result", "value": "\"default\""}],
+          "stack": [
+            {
+              "name": "result",
+              "value": "\"default\""
+            }
+          ],
           "note": "opt3가 empty이므로 \"default\" 반환"
         }
       },
       {
         "line": 13,
         "title": "ifPresent() - 함수형 스타일",
-        "explanation": "값이 있을 때만 람다를 실행합니다. 가장 깔끔한 패턴!",
+        "explanation": "\"값이 있으면 이 함수를 실행 해줘. 없으면 말고.\"\n값을 굳이 꺼내지 않고, 상자 안에서 작업을 처리하도록 시키는 세련된 방법입니다.",
         "keyInsight": "ifPresent() = 값 있을 때만 실행",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["hello"],
+          "output": [
+            "hello"
+          ],
           "note": "opt1은 값이 있으므로 실행됨"
         }
       }
@@ -104,9 +146,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "Optional을 모든 곳에 사용하면 좋다",
-      "correct": "Optional은 반환 타입에만 사용합니다. 필드, 파라미터, 컬렉션에는 부적합합니다.",
-      "why": "오버헤드가 있고, 직렬화 문제가 있습니다."
+      "wrong": "Optional을 모든 곳(필드, 파라미터)에 쓰면 좋다",
+      "correct": "Optional은 오직 **리턴 타입**으로만 쓰도록 설계되었습니다.",
+      "why": "Optional은 데이터를 감싸는 '래퍼 객체'라 메모리를 더 씁니다. 만약 필드로 쓰면 직렬화(Serialization)도 안 됩니다. 파라미터나 필드는 그냥 null 체크를 하는 게 더 효율적입니다."
+    },
+    {
+      "wrong": "isPresent() + get() 패턴이 제일 좋다",
+      "correct": "`orElse()`나 `ifPresent()` 같은 메서드를 쓰는 게 'Optional스러운' 사용법입니다.",
+      "why": "`if (opt.isPresent()) { ... get() }`은 기존의 `if (x != null)`과 다를 바가 없어서 Optional을 쓰는 장점이 사라집니다."
     }
   ],
   "keyTakeaway": "Optional = 반환 타입용, orElse/ifPresent 사용, get() 피하기"

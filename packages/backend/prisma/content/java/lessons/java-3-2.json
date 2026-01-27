@@ -8,91 +8,156 @@
       {
         "line": 14,
         "title": "Dog 객체 생성",
-        "explanation": "myDog는 Heap의 Dog 객체를 참조합니다.",
-        "highlight": [14],
+        "explanation": "**메모리 상태:**\n1. `Heap`: 실제 `Dog` 객체가 생성됩니다. (주소: `0x100`)\n2. `Stack`: `myDog` 변수에는 **주소(0x100)**가 저장됩니다.\n\n**비유:** `myDog`는 TV 리모컨이고, 객체는 TV입니다.",
+        "highlight": [
+          14
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "myDog", "value": "-> 0x001"}],
-          "heap": [{"address": "0x001", "content": "Dog{name: \"Buddy\"}"}]
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Buddy\"}"
+            }
+          ]
         }
       },
       {
         "line": 15,
         "title": "changeName(myDog) 호출",
-        "explanation": "myDog의 참조값 0x001이 d에 복사됩니다. d도 같은 객체를 가리킵니다.",
-        "keyInsight": "참조값(주소) 복사 = 같은 객체 공유",
-        "highlight": [15, 6],
+        "explanation": "**참조값(주소) 복사:**\n`myDog`가 가진 주소 `0x100`이 복사되어 파라미터 `d`에 전달됩니다.\n이제 `d`도 똑같은 `0x100`을 가리킵니다. (리모컨 복제)",
+        "keyInsight": "주소 복사 = 같은 객체 공유",
+        "highlight": [
+          15,
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "myDog", "value": "-> 0x001", "frame": "main"},
-            {"name": "d", "value": "-> 0x001", "frame": "changeName", "sameRef": true}
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x100",
+              "frame": "changeName",
+              "sameRef": true
+            }
           ],
-          "heap": [{"address": "0x001", "content": "Dog{name: \"Buddy\"}"}]
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Buddy\"}"
+            }
+          ]
         }
       },
       {
         "line": 7,
-        "title": "d.name 변경",
-        "explanation": "d와 myDog가 같은 객체를 가리키므로 원본 객체가 수정됩니다!",
-        "keyInsight": "같은 객체 참조 -> 내부 수정 시 원본 영향",
-        "highlight": [7],
+        "title": "d.name 변경 (성공)",
+        "explanation": "**리모컨 작동:**\n`d`가 가리키는 `0x100`으로 가서 `name`을 바꿉니다.\n`myDog`도 같은 `0x100`을 보고 있으므로, `main`에서도 변경된 이름이 보입니다.",
+        "keyInsight": "참조를 타고 가서 바꾸면 원본도 바뀜",
+        "highlight": [
+          7
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [{"address": "0x001", "content": "Dog{name: \"Max\"}", "changed": true}]
-        }
-      },
-      {
-        "line": 16,
-        "title": "변경 확인",
-        "explanation": "myDog.name이 \"Max\"로 변경되었습니다!",
-        "highlight": [16],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": ["Max"]
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "changed": true
+            }
+          ]
         }
       },
       {
         "line": 18,
         "title": "reassign(myDog) 호출",
-        "explanation": "다시 myDog의 참조값이 d에 복사됩니다.",
-        "highlight": [18, 10],
+        "explanation": "이번에도 주소 `0x100`이 복사되어 `reassign`의 파라미터 `d`에 전달됩니다.",
+        "highlight": [
+          18,
+          10
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "myDog", "value": "-> 0x001", "frame": "main"},
-            {"name": "d", "value": "-> 0x001", "frame": "reassign"}
-          ],
-          "heap": [{"address": "0x001", "content": "Dog{name: \"Max\"}"}]
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x100",
+              "frame": "reassign"
+            }
+          ]
         }
       },
       {
         "line": 11,
-        "title": "d에 새 객체 할당",
-        "explanation": "d = new Dog(\"Rex\")는 지역 변수 d만 변경합니다. myDog는 영향 없음!",
-        "keyInsight": "참조 재할당 = 지역 변수만 변경, 원본 무관",
-        "highlight": [11],
+        "title": "d에 새 객체 할당 (실패?)",
+        "explanation": "**중요한 차이:**\n1. `new Dog(\"Rex\")`가 Heap에 새 객체(`0x200`)를 만듭니다.\n2. `d`가 이제 `0x200`을 가리키도록 **갈아끼워집니다.**\n3. 하지만 `main`의 `myDog`는 여전히 `0x100`을 보고 있습니다.\n\n**비유:** 복사해준 리모컨(`d`)이 다른 TV(`0x200`)에 연결된 것일 뿐, 내 리모컨(`myDog`)은 그대로입니다.",
+        "keyInsight": "변수 재할당 = 내 리모컨만 바뀜",
+        "highlight": [
+          11
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "myDog", "value": "-> 0x001", "frame": "main"},
-            {"name": "d", "value": "-> 0x002", "frame": "reassign", "changed": true}
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x200",
+              "frame": "reassign",
+              "changed": true
+            }
           ],
           "heap": [
-            {"address": "0x001", "content": "Dog{name: \"Max\"}"},
-            {"address": "0x002", "content": "Dog{name: \"Rex\"}", "new": true}
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}"
+            },
+            {
+              "address": "0x200",
+              "content": "Dog{name: \"Rex\"}",
+              "new": true
+            }
           ]
         }
       },
       {
         "line": 19,
         "title": "결과 확인",
-        "explanation": "myDog는 여전히 0x001을 가리킵니다. \"Max\" 그대로!",
-        "highlight": [19],
+        "explanation": "`myDog`는 여전히 `Max`(`0x100`)입니다. 재할당은 원본에 영향을 주지 못했습니다.",
+        "highlight": [
+          19
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "myDog", "value": "-> 0x001"}],
-          "output": ["Max", "Max"]
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100"
+            }
+          ],
+          "output": [
+            "Max",
+            "Max"
+          ]
         }
       }
     ]
@@ -111,8 +176,13 @@
   "misconceptions": [
     {
       "wrong": "Java는 객체를 Pass by Reference로 전달한다",
-      "correct": "Java는 항상 Pass by Value입니다. 객체의 경우 '참조값'이 복사됩니다.",
-      "why": "참조 자체가 전달되면 재할당이 원본에 영향을 줘야 하지만, 그렇지 않습니다."
+      "correct": "Java는 오직 **Call by Value**만 존재합니다. 단지 그 값이 '참조값(주소)'일 뿐입니다.",
+      "why": "진짜 Call by Reference(C++ 참조 변수 등)라면 `d = new Dog()` 했을 때 `myDog`도 바뀌어야 하는데, Java는 그렇지 않습니다."
+    },
+    {
+      "wrong": "final 변수는 내부 값도 못 바꾼다",
+      "correct": "`final Dog d`는 `d`가 가리키는 **대상(주소)**을 못 바꿀 뿐, `d.name` 같은 내부 상태는 변경 가능합니다.",
+      "why": "final은 재할당을 막는 것이지, 불변 객체(Immutable)를 만드는 것이 아닙니다."
     }
   ],
   "keyTakeaway": "참조값 복사 = 내부 수정 OK, 재할당은 지역 변수만"

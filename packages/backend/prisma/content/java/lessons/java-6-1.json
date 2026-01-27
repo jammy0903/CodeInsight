@@ -8,8 +8,19 @@
       {
         "line": 1,
         "title": "부모 클래스 Animal",
-        "explanation": "Animal 클래스에는 name 필드와 speak() 메서드가 있습니다.",
-        "highlight": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "explanation": "설계도 정의:\n`Animal`은 `name`이라는 상태와 `speak()`라는 행동을 가집니다.",
+        "highlight": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "부모 클래스 정의"
@@ -18,9 +29,11 @@
       {
         "line": 13,
         "title": "자식 클래스 Dog",
-        "explanation": "Dog는 Animal을 상속(extends)합니다. name도 물려받습니다.",
-        "keyInsight": "extends = 부모의 필드/메서드 상속",
-        "highlight": [13],
+        "explanation": "`Dog`는 `Animal`을 확장(extends)합니다.\n즉, `Animal`이 가진 모든 것(`name`, `speak`)을 물려받고, 자신만의 `breed`를 추가합니다.",
+        "keyInsight": "extends = 부모 + 알파",
+        "highlight": [
+          13
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "Dog는 name(상속) + breed(자체) 필드를 가짐"
@@ -28,50 +41,55 @@
       },
       {
         "line": 17,
-        "title": "super() - 부모 생성자 호출",
-        "explanation": "super(name)은 Animal(String name) 생성자를 호출합니다.",
-        "keyInsight": "super()는 생성자 첫 줄에 있어야 함",
-        "highlight": [17],
+        "title": "super() - 부모 초기화 (필수)",
+        "explanation": "**중요:** 자식이 태어나려면 부모가 먼저 초기화되어야 합니다.\n`super(name)`은 부모 생성자를 호출하여 물려받은 `name` 필드를 먼저 세팅합니다.",
+        "keyInsight": "생성자 첫 줄엔 무조건 super()가 숨어있음",
+        "highlight": [
+          17
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "자식 생성자 → super() → 부모 초기화 → 자식 초기화"
+          "stack": [
+            {
+              "name": "super()",
+              "value": "calling Animal()..."
+            }
+          ],
+          "note": "부모 생성자 완료 전엔 자식 필드 접근 불가"
         }
       },
       {
         "line": 22,
-        "title": "super.method() - 부모 메서드 호출",
-        "explanation": "super.speak()로 오버라이드된 부모 메서드를 호출할 수 있습니다.",
-        "keyInsight": "super.method() = 부모 버전 호출",
-        "highlight": [22],
+        "title": "super.method() - 부모 기능 사용",
+        "explanation": "`super.speak()`는 \"내(Dog) 방식대로 짖기 전에, 부모(Animal)가 하던 대로 먼저 해봐\"라는 뜻입니다.",
+        "highlight": [
+          22
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "super.speak() → Animal.speak() 실행"
+          "note": "기존 기능 재사용 + 추가 기능 구현 패턴"
         }
       },
       {
         "line": 27,
-        "title": "Dog 인스턴스 생성",
-        "explanation": "Dog 생성자 호출 → super(\"Max\") → Animal 초기화 → Dog 초기화",
-        "highlight": [27],
+        "title": "Dog 인스턴스 생성 및 메모리",
+        "explanation": "`new Dog()`를 하면 힙(Heap)에 하나의 큰 덩어리가 생깁니다.\n이 덩어리 안에는 **Animal 영역(name)**과 **Dog 영역(breed)**이 합쳐져 있습니다.",
+        "highlight": [
+          27
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "dog", "value": "-> 0x001"}],
-          "heap": [{"address": "0x001", "content": "Dog{name: \"Max\", breed: \"Labrador\"}"}]
-        }
-      },
-      {
-        "line": 27,
-        "title": "메모리 구조",
-        "explanation": "Dog 객체 안에 부모(Animal)의 name과 자신의 breed가 함께 저장됩니다.",
-        "keyInsight": "상속 = 부모 필드가 자식 객체 안에 포함",
-        "highlight": [27],
-        "visualizationType": "memory",
-        "memoryState": {
+          "stack": [
+            {
+              "name": "dog",
+              "value": "-> 0x001"
+            }
+          ],
           "heap": [
             {
               "address": "0x001",
-              "content": "Dog { [Animal] name: \"Max\", breed: \"Labrador\" }",
-              "note": "부모 부분도 객체 안에 있음"
+              "content": "Dog { [Animal part] name: \"Max\", [Dog part] breed: \"Labrador\" }",
+              "note": "부모와 자식이 한 몸(객체)에 있음"
             }
           ]
         }
@@ -91,9 +109,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "Java는 다중 상속을 지원한다",
-      "correct": "Java는 단일 상속만 지원합니다. 다중 상속은 인터페이스로 대체합니다.",
-      "why": "다중 상속의 다이아몬드 문제를 피하기 위함입니다."
+      "wrong": "부모 객체를 먼저 만들고 자식 객체를 만든다",
+      "correct": "아닙니다. 객체(`Dog`)는 딱 하나만 만들어집니다.",
+      "why": "하나의 `Dog` 객체 내부에 `Animal`의 속성(필드)들이 포함되어 생성되는 구조입니다. 부모 객체가 따로 힙에 둥둥 떠다니는 게 아닙니다."
+    },
+    {
+      "wrong": "super()를 안 써도 알아서 된다",
+      "correct": "부모에게 '기본 생성자(파라미터 없는 거)'가 있을 때만 자동입니다.",
+      "why": "부모에게 생성자가 있는데 기본 생성자가 없다면, 자식은 반드시 명시적으로 `super(인자)`를 호출해줘야 합니다. 아니면 컴파일 에러!"
     }
   ],
   "keyTakeaway": "extends = 상속, super() = 부모 생성자, super.method() = 부모 메서드"
