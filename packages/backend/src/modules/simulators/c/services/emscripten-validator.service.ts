@@ -1,8 +1,8 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { randomUUID } from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 
 const execAsync = promisify(exec);
 
@@ -63,7 +63,7 @@ export class EmscriptenValidatorService {
       };
     }
 
-    const sessionId = uuidv4();
+    const sessionId = randomUUID();
     const tempFile = path.join(this.tempDir, `${sessionId}.c`);
 
     try {
