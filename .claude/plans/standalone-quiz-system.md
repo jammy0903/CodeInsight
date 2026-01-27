@@ -81,7 +81,7 @@ CREATE INDEX ON standalone_quiz_attempts(user_id, quiz_id);  -- 재시도 횟수
 
 ---
 
-## Phase 2: 마이그레이션 실행 (대기)
+## Phase 2: 마이그레이션 실행 (✅ 완료)
 
 ```bash
 cd packages/backend
@@ -89,9 +89,11 @@ pnpm prisma migrate dev --name add_standalone_quiz_system
 pnpm prisma generate
 ```
 
+**실행일**: 2026-01-27
+
 ---
 
-## Phase 3: 퀴즈 데이터 시드 (TODO)
+## Phase 3: 퀴즈 데이터 시드 (✅ 완료)
 
 ### 3.1 시드 데이터 구조
 
@@ -185,29 +187,40 @@ async function seedQuizzes() {
 
 ---
 
-## Phase 4: 백엔드 API (TODO)
+**완료 내용**:
+- C 언어 OX 퀴즈 30개 생성 (변수, 포인터, 동적메모리)
+- 시드 스크립트 작성 및 실행 완료
+- 개념 태그 추가 (취약 개념 분석용)
 
-### 4.1 API 엔드포인트
+**실행일**: 2026-01-27
 
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| GET | `/api/quizzes` | 퀴즈 목록 (필터: language, type, chapter) |
-| GET | `/api/quizzes/:id` | 퀴즈 상세 |
-| GET | `/api/quizzes/chapters` | 챕터 목록 (언어+유형별) |
-| POST | `/api/quizzes/attempt` | 퀴즈 시도 기록 |
-| GET | `/api/quizzes/stats` | 사용자 퀴즈 통계 |
-| GET | `/api/quizzes/weak-concepts` | 취약 개념 분석 |
+---
 
-### 4.2 API 구현 파일
+## Phase 4: 백엔드 API (✅ 완료)
+
+### 4.1 API 엔드포인트 (구현 완료)
+
+| Method | Endpoint | 설명 | 상태 |
+|--------|----------|------|------|
+| GET | `/api/v1/standalone-quizzes/chapters` | 챕터별 통계 조회 | ✅ |
+| GET | `/api/v1/standalone-quizzes` | 퀴즈 목록 (필터링) | ✅ |
+| POST | `/api/v1/standalone-quizzes/attempt` | 퀴즈 시도 기록 | ✅ |
+| GET | `/api/v1/standalone-quizzes/weak-concepts` | 취약 개념 분석 | ✅ |
+
+### 4.2 API 구현 파일 (완료)
 
 ```
-packages/backend/src/modules/standalone-quiz/
-├── routes.ts          # 라우터 정의
-├── service.ts         # 비즈니스 로직
-├── types.ts           # 타입 정의
-└── utils/
-    └── concept-analyzer.ts  # 취약 개념 분석 로직
+packages/backend/src/modules/standalone-quizzes/
+└── routes.ts          # 전체 API 구현 (라우터 + 로직)
 ```
+
+**주요 기능**:
+- 챕터별 통계 계산 (시도한 퀴즈 수, 정답률)
+- 퀴즈 필터링 (언어, 타입, 챕터, 난이도)
+- 시도 기록 자동 저장 (attemptNumber 자동 증가)
+- 취약 개념 분석 (오답률 기반 정렬)
+
+**실행일**: 2026-01-27
 
 ### 4.3 주요 API 상세
 
@@ -282,12 +295,22 @@ packages/backend/src/modules/standalone-quiz/
 
 ---
 
-## Phase 5: 프론트엔드 (TODO)
+## Phase 5: 프론트엔드 (✅ 완료)
 
-### 5.1 서비스 레이어
+**완료 내용**:
+- 서비스 레이어 작성 (`services/standalone-quiz.ts`)
+- OXQuizPage API 통합 (하드코딩 데이터 제거)
+- 챕터별 통계 표시 (시도 수, 정답률)
+- 이전 시도 기록 표시 (배지)
+- 시도 기록 자동 저장 (타이밍 포함)
+- 로딩 상태 및 에러 처리
+
+**실행일**: 2026-01-27
+
+### 5.1 서비스 레이어 (완료)
 
 ```typescript
-// packages/frontend/src/services/standalone-quiz.ts
+// packages/frontend/src/services/standalone-quiz.ts (구현 완료)
 export interface StandaloneQuiz {
   id: string;
   language: string;
@@ -430,21 +453,23 @@ export function QuizResultBadge({ attempted, correct, lastAttemptAt }: Props) {
 
 ## 구현 순서 (체크리스트)
 
-### 즉시 (Today)
+### ✅ 완료 (2026-01-27)
 - [x] DB 스키마 설계 (StandaloneQuiz, StandaloneQuizAttempt)
-- [ ] Prisma 마이그레이션 실행
-- [ ] Prisma Client 재생성
+- [x] Prisma 마이그레이션 실행
+- [x] Prisma Client 재생성
+- [x] 시드 데이터 구조 설계
+- [x] C언어 OX 퀴즈 30개 JSON 생성
+- [x] 시드 스크립트 작성 및 실행
+- [x] 백엔드 API 구현 (CRUD, 통계, 취약 개념 분석)
+- [x] 프론트엔드 서비스 레이어
+- [x] 퀴즈 페이지 API 연동
+- [x] 결과 배지 표시 (챕터별 통계)
+- [x] 이전 시도 기록 표시
 
-### 단기 (This Week)
-- [ ] 시드 데이터 구조 설계
-- [ ] 기존 하드코딩 퀴즈 → JSON 변환
-- [ ] 시드 스크립트 작성 및 실행
-
-### 중기 (Next Week)
-- [ ] 백엔드 API 구현 (CRUD, 통계)
-- [ ] 프론트엔드 서비스 레이어
-- [ ] 퀴즈 페이지 API 연동
-- [ ] 결과 배지 컴포넌트
+### TODO (Next)
+- [ ] JavaScript, Java, Python 퀴즈 데이터 추가
+- [ ] 객관식, 빈칸 채우기 퀴즈 타입 추가
+- [ ] 퀴즈 난이도별 필터링 UI
 
 ### 장기 (Month)
 - [ ] 취약 개념 분석 고도화
