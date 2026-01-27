@@ -8,74 +8,127 @@
       {
         "line": 1,
         "title": "String 리터럴 생성",
-        "explanation": "\"Hello\"는 String Pool에 저장되고, s1은 이를 참조합니다.",
-        "highlight": [1],
+        "explanation": "**String Pool:**\nJVM이 `\"Hello\"` 리터럴을 보고 String Pool에 저장합니다.\n`s1`은 이 Pool 상의 주소를 가리킵니다.",
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "s1", "value": "-> Pool"}],
-          "stringPool": ["\"Hello\""]
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]"
+            }
+          ],
+          "stringPool": [
+            "\"Hello\""
+          ]
         }
       },
       {
         "line": 2,
-        "title": "참조 복사",
-        "explanation": "s2도 같은 \"Hello\" 객체를 참조합니다. 복사본이 아닙니다!",
-        "keyInsight": "String 할당 = 참조 복사, 값 복사 아님",
-        "highlight": [2],
+        "title": "참조 복사 (Alias)",
+        "explanation": "`s2 = s1`:\n주소만 복사합니다. `s1`과 `s2`는 **같은 객체**를 보고 있습니다.\n(데이터 자체가 복사되는 것이 아님)",
+        "keyInsight": "String 할당 = 참조 복사",
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "s1", "value": "-> Pool[0]"},
-            {"name": "s2", "value": "-> Pool[0]", "sameRef": true}
+            {
+              "name": "s1",
+              "value": "-> Pool[0]"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "sameRef": true
+            }
           ],
-          "stringPool": ["\"Hello\""]
+          "stringPool": [
+            "\"Hello\""
+          ]
         }
       },
       {
         "line": 4,
-        "title": "문자열 연결 (새 객체 생성!)",
-        "explanation": "s1 + \" World\"는 기존 \"Hello\"를 수정하지 않고, 새로운 \"Hello World\" 객체를 생성합니다!",
-        "keyInsight": "String 수정 = 새 객체 생성, 기존 객체 불변",
-        "highlight": [4],
+        "title": "문자열 연결 (불변성 발동!)",
+        "explanation": "**중요한 순간:**\n1. \"Hello\"와 \" World\"를 붙이려 합니다.\n2. 하지만 `String`은 **불변(Immutable)**이라 기존 \"Hello\"를 수정할 수 없습니다.\n3. 어쩔 수 없이 Heap에 **새로운 객체** `\"Hello World\"`를 만듭니다.\n4. `s1`은 이제 이 **새 객체**를 가리킵니다.",
+        "keyInsight": "수정 불가 -> 새 객체 생성",
+        "highlight": [
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "s1", "value": "-> Heap[0]", "changed": true},
-            {"name": "s2", "value": "-> Pool[0]"}
+            {
+              "name": "s1",
+              "value": "-> Heap[0]",
+              "changed": true
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]"
+            }
           ],
-          "stringPool": ["\"Hello\""],
-          "heap": [{"address": "Heap[0]", "content": "\"Hello World\"", "new": true}]
+          "stringPool": [
+            "\"Hello\""
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello World\"",
+              "new": true
+            }
+          ],
+          "note": "s1이 가리키는 곳이 바뀜! (Rebinding)"
         }
       },
       {
         "line": 6,
-        "title": "s1 출력",
-        "explanation": "s1은 새로 생성된 \"Hello World\"를 가리킵니다.",
-        "highlight": [6],
+        "title": "s1 출력 (새 값)",
+        "explanation": "`s1`은 새로 만든 `\"Hello World\"`를 출력합니다.",
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["Hello World"]
+          "output": [
+            "Hello World"
+          ]
         }
       },
       {
         "line": 7,
-        "title": "s2 출력",
-        "explanation": "s2는 여전히 원래의 \"Hello\"를 가리킵니다! 불변성 덕분에 안전합니다.",
-        "keyInsight": "불변성 = 다른 참조에 영향 없음",
-        "highlight": [7],
+        "title": "s2 출력 (원본 유지)",
+        "explanation": "**불변성의 장점:**\n`s1`이 배신(?)하고 떠났지만, `s2`가 가리키던 원래 `\"Hello\"` 객체는 **아무런 흠집 없이 그대로** 있습니다.\n만약 `String`이 가변이었다면, `s2`의 값도 `\"Hello World\"`로 바 뀌었을 것입니다(사이드 이펙트).",
+        "keyInsight": "불변성 = 사이드 이펙트 방지",
+        "highlight": [
+          7
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["Hello World", "Hello"]
+          "output": [
+            "Hello World",
+            "Hello"
+          ]
         }
       },
       {
         "line": 8,
         "title": "참조 비교",
-        "explanation": "s1과 s2는 이제 다른 객체를 가리킵니다. false!",
-        "highlight": [8],
+        "explanation": "`s1`(Heap의 새 객체)과 `s2`(Pool의 옛 객체)는 주소가 다릅니다.\n결과는 `false`입니다.",
+        "highlight": [
+          8
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["Hello World", "Hello", "false"]
+          "output": [
+            "Hello World",
+            "Hello",
+            "false"
+          ]
         }
       }
     ]
@@ -94,8 +147,13 @@
   "misconceptions": [
     {
       "wrong": "String을 수정하면 원본이 바뀐다",
-      "correct": "String은 불변입니다. 모든 '수정'은 새 객체를 생성합니다.",
-      "why": "s1 = s1 + \"x\"는 s1이 새 객체를 가리키게 할 뿐, 원래 객체는 그대로입니다."
+      "correct": "String은 **불변(Immutable)**이라 절대 바뀌지 않습니다. 우리가 '수정'했다고 생각하는 건 사실 **새 객체로 갈아타는 것(Rebinding)**입니다.",
+      "why": "배열(`char[]`)를 내부에서 `private final`로 꽁꽁 숨겨뒀기 때문입니다."
+    },
+    {
+      "wrong": "불변이면 메모리 낭비 아닌가요?",
+      "correct": "수정이 잦으면 낭비가 맞습니다(그래서 `StringBuilder`를 씁니다). 하지만 **읽기**가 잦은 대부분의 경우엔, 하나의 객체를 안심하고 공유할 수 있어 오히려 메모리를 절약합니다(String Pool).",
+      "why": "공유했다가 누가 몰래 바꾸면 큰일나니까, 아예 못 바꾸게 막아둔 것입니다."
     }
   ],
   "keyTakeaway": "String 불변 = 수정은 새 객체 생성, 기존 참조 안전"

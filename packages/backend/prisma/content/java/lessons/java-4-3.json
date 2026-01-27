@@ -8,91 +8,139 @@
       {
         "line": 1,
         "title": "첫 번째 리터럴",
-        "explanation": "\"Hello\"가 String Pool에 생성되고, s1이 참조합니다.",
-        "highlight": [1],
+        "explanation": "**Pool 스캔:**\nJVM: \"String Pool에 `Hello`가 있나?\"\n없으면 Pool에 새로 만들고 `s1`이 가리키게 합니다.",
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "s1", "value": "-> Pool[0]"}],
-          "stringPool": ["\"Hello\" (0x001)"]
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]"
+            }
+          ],
+          "stringPool": [
+            "\"Hello\" (0x001)"
+          ]
         }
       },
       {
         "line": 2,
         "title": "같은 리터럴 재사용",
-        "explanation": "\"Hello\"는 이미 Pool에 있으므로 새로 만들지 않습니다. s2도 같은 객체!",
-        "keyInsight": "같은 리터럴 = Pool에서 재사용, 새 객체 안 만듦",
-        "highlight": [2],
+        "explanation": "**Pool 스캔:**\nJVM: \"Pool에 `Hello`가 있나?\" -> \"있네!\"\n새로 만들지 않고, 아까 그 주소(`0x001`)를 `s2`에게 줍니다.",
+        "keyInsight": "같은 리터럴 = Pool에서 재사용, 메모리 절약",
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "s1", "value": "-> Pool[0]"},
-            {"name": "s2", "value": "-> Pool[0]", "sameRef": true}
+            {
+              "name": "s1",
+              "value": "-> Pool[0]"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "sameRef": true
+            }
           ],
-          "stringPool": ["\"Hello\" (0x001)"],
+          "stringPool": [
+            "\"Hello\" (0x001)"
+          ],
           "note": "s1 == s2 (같은 주소)"
         }
       },
       {
         "line": 3,
         "title": "new String() - 강제 새 객체",
-        "explanation": "new 키워드는 Pool을 무시하고 Heap에 새 객체를 만듭니다!",
-        "keyInsight": "new String() = Pool 무시, 항상 새 객체",
-        "highlight": [3],
+        "explanation": "**Heap 할당:**\n`new`는 Pool을 무시합니다. 무조건 Heap 메모리에 독립된 **새 객체**를 만듭니다.\n(참고: 리터럴 \"Hello\"가 Pool에 없었다면, 이 코드 한 줄로 Pool에 1개, Heap에 1개, 총 2개가 만들어질 수도 있습니다!)",
+        "keyInsight": "new String() = Pool 무시, 항상 Heap",
+        "highlight": [
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "s1", "value": "-> Pool[0]"},
-            {"name": "s2", "value": "-> Pool[0]"},
-            {"name": "s3", "value": "-> Heap[0]"}
+            {
+              "name": "s3",
+              "value": "-> Heap[0]"
+            }
           ],
-          "stringPool": ["\"Hello\" (0x001)"],
-          "heap": [{"address": "Heap[0]", "content": "\"Hello\" (0x002)", "new": true}],
-          "note": "s1 != s3 (다른 주소)"
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello\" (0x002)",
+              "new": true
+            }
+          ],
+          "note": "s1 != s3 (완전히 다른 존재)"
         }
       },
       {
         "line": 4,
-        "title": "intern() - Pool에 등록/반환",
-        "explanation": "intern()은 Pool에 같은 문자열이 있으면 그 참조를 반환합니다.",
-        "keyInsight": "intern() = Pool 주소 반환, 내용이 같으면 같은 객체",
-        "highlight": [4],
+        "title": "intern() - Pool 명찰 찾기",
+        "explanation": "`intern()` 메서드:\n\"나랑 내용이 똑같은 녀석이 Pool에 있니? 있으면 **걔 주소** 좀 줘.\"\nPool에는 이미 `s1`이 만든 `\"Hello\"`(`0x001`)가 있으므로, 그 주소를 받아옵니다.",
+        "keyInsight": "intern() = Pool 주소 반환(없으면 등록)",
+        "highlight": [
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "s1", "value": "-> Pool[0]"},
-            {"name": "s4", "value": "-> Pool[0]", "sameRef": true}
+            {
+              "name": "s4",
+              "value": "-> Pool[0]",
+              "sameRef": true
+            }
           ],
-          "note": "s4는 s1과 같은 Pool 객체를 참조"
+          "note": "s4는 s1과 같은 0x001을 가리키게 됨"
         }
       },
       {
         "line": 6,
         "title": "s1 == s2 비교",
-        "explanation": "둘 다 같은 Pool 객체를 참조. true!",
-        "highlight": [6],
+        "explanation": "둘 다 Pool의 같은 객체입니다. (0x001 == 0x001) -> `true`",
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["true"]
+          "output": [
+            "true"
+          ]
         }
       },
       {
         "line": 7,
         "title": "s1 == s3 비교",
-        "explanation": "s1은 Pool, s3는 Heap. 다른 객체! false!",
-        "highlight": [7],
+        "explanation": "하나는 Pool(0x001), 하나는 Heap(0x002). -> `false`",
+        "highlight": [
+          7
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["true", "false"]
+          "output": [
+            "true",
+            "false"
+          ]
         }
       },
       {
         "line": 8,
         "title": "s1 == s4 비교",
-        "explanation": "s4는 intern()으로 Pool 참조를 얻었으므로 s1과 같습니다. true!",
-        "highlight": [8],
+        "explanation": "`intern()`을 통해 족보를 세탁(?)하고 Pool 주소(0x001)를 받아왔습니다.\n`s1`과 같아졌습니다. -> `true`",
+        "highlight": [
+          8
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["true", "false", "true"]
+          "output": [
+            "true",
+            "false",
+            "true"
+          ]
         }
       }
     ]
@@ -110,9 +158,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "new String()도 Pool을 사용한다",
-      "correct": "new String()은 항상 Heap에 새 객체를 만듭니다.",
-      "why": "new는 '무조건 새 객체'라는 의미입니다. Pool을 거치지 않습니다."
+      "wrong": "new String('A')은 객체를 하나만 만든다",
+      "correct": "상황에 따라 2개를 만듭니다. 1) Pool에 'A'가 없으면 Pool에 하나, 2) 그리고 Heap에 무조건 하나.",
+      "why": "리터럴 'A'를 처리할 때 Pool을 쓰고, `new` 키워드를 처리할 때 Heap을 또 씁니다."
+    },
+    {
+      "wrong": "String Pool은 Garbage Collection이 안 된다",
+      "correct": "Java 7부터는 String Pool이 Heap영역으로 들어와서 GC의 대상이 됩니다.",
+      "why": "옛날(Java 6 이전 PermGen 시절) 이야기입니다. 지금은 안 쓰는 문자열은 Pool에서도 청소됩니다."
     }
   ],
   "keyTakeaway": "리터럴 = Pool 재사용, new String() = 새 객체, intern() = Pool 참조"

@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "첫 번째 String 객체 생성",
-        "explanation": "new String()은 Heap에 새 객체를 생성합니다. a는 이 객체의 주소를 저장합니다.",
+        "explanation": "**메모리에서 일어나는 일:**\n1. **Heap** 영역에 String 객체 \"hello\" 생성\n2. 객체가 저장된 주소(0x001) 반환\n3. **Stack**의 변수 a에 그 주소 저장\n\n**왜 Heap일까?** new 키워드는 항상 Heap에 객체를 생성합니다. Heap은 프로그램이 동적으로 메모리를 할당하는 공간이에요.\n\n**용어 정리:**\n- **new String()**: Heap에 새 String 객체 생성 연산자\n- **Heap**: 동적 할당 메모리 영역 (GC가 관리)\n- **Stack**: 지역 변수(참조)를 저장하는 영역\n- **a**: 참조 변수. 객체가 아니라 주소를 저장\n\n**자주 하는 오해:**\n변수 a 안에 \"hello\" 문자열이 들어있는 게 아닙니다! a는 그저 \"hello\" 객체가 있는 위치(주소)를 가리킬 뿐이에요.",
         "keyInsight": "new = 항상 새 객체 생성",
         "highlight": [1],
         "visualizationType": "memory",
@@ -20,7 +20,7 @@
       {
         "line": 2,
         "title": "두 번째 String 객체 생성",
-        "explanation": "또 다른 new String()은 별도의 새 객체를 생성합니다. 내용은 같지만 다른 객체입니다.",
+        "explanation": "**메모리에서 일어나는 일:**\n1. **또 다른** Heap 영역에 String 객체 \"hello\" 생성\n2. 새 주소(0x002) 반환 (0x001과 다름!)\n3. Stack의 변수 b에 그 주소 저장\n\n**핵심 포인트:** 내용이 \"hello\"로 동일하지만, **메모리상 별개의 객체**입니다!\n\n```\nHeap:\n  0x001: \"hello\"  ← a가 가리킴\n  0x002: \"hello\"  ← b가 가리킴 (다른 객체!)\n```\n\n**왜 같은 \"hello\"인데 새로 만들까?**\nnew 키워드는 \"기존 객체를 재활용하지 말고 무조건 새로 만들어라\"는 명령입니다.\n\n**자주 하는 오해:**\n\"hello\"가 하나만 있고 a와 b가 같이 가리킬 거라 생각하는데, new를 쓰면 항상 별개의 객체가 생깁니다.",
         "keyInsight": "내용이 같아도 다른 객체 = 다른 주소",
         "highlight": [2],
         "visualizationType": "memory",
@@ -38,7 +38,7 @@
       {
         "line": 4,
         "title": "== 비교 (참조 비교)",
-        "explanation": "a == b는 주소를 비교합니다. 0x001 != 0x002 이므로 false입니다.",
+        "explanation": "**동작 원리:**\n1. a의 값 읽기 → 0x001\n2. b의 값 읽기 → 0x002\n3. 두 주소를 비교: 0x001 == 0x002?\n4. 결과: false (다른 주소!)\n\n**왜 false일까?** == 연산자는 **참조(주소) 자체**를 비교합니다. 객체의 내용이 아니라, 변수에 저장된 주소값을 비교해요!\n\n**용어 정리:**\n- **참조 비교**: 같은 객체를 가리키는지 확인 (주소 비교)\n- **값 비교**: 객체의 내용이 같은지 확인 (.equals())\n\n**자주 하는 오해:**\n\"hello\"가 같으니까 true 아니야? → ❌\nJava의 ==는 \"같은 물건인가?\"를 묻는 게 아니라 \"같은 위치인가?\"를 묻습니다!\n\n**면접 단골 질문:**\nQ: a == b가 false인데 둘 다 \"hello\" 아닌가요?\nA: 맞지만 **다른 위치**에 있는 \"hello\"입니다. 쌍둥이처럼 내용은 같지만 별개의 존재예요.",
         "keyInsight": "== 는 참조(주소) 비교",
         "highlight": [4],
         "visualizationType": "memory",
@@ -54,7 +54,7 @@
       {
         "line": 5,
         "title": ".equals() 비교 (값 비교)",
-        "explanation": "a.equals(b)는 내용을 비교합니다. 둘 다 \"hello\"이므로 true입니다.",
+        "explanation": "**동작 원리:**\n1. a.equals(b) 메서드 호출\n2. a가 가리키는 객체(0x001)로 이동\n3. 그 객체의 내용(\"hello\")을 b가 가리키는 객체(0x002)의 내용(\"hello\")과 비교\n4. 결과: true (내용이 같음!)\n\n**왜 true일까?** .equals()는 **객체의 내용**을 비교하도록 설계된 메서드입니다. 주소가 아니라 \"hello\" vs \"hello\"를 비교해요!\n\n**== vs .equals() 핵심 차이:**\n```java\na == b       → 주소 비교: 0x001 == 0x002? → false\na.equals(b)  → 내용 비교: \"hello\" == \"hello\"? → true\n```\n\n**용어 정리:**\n- **.equals()**: Object 클래스의 메서드. String에서 재정의(override)됨\n- **재정의(Override)**: String 클래스가 \"문자열 내용 비교\"로 동작 변경\n\n**실전 팁:**\nString 비교는 **거의 항상** .equals()를 써야 합니다!\n```java\n// ❌ 잘못된 코드\nif (name == \"Alice\") { ... }\n\n// ✅ 올바른 코드\nif (name.equals(\"Alice\")) { ... }\n```",
         "keyInsight": ".equals()는 값 비교",
         "highlight": [5],
         "visualizationType": "memory",
@@ -66,7 +66,7 @@
       {
         "line": 7,
         "title": "같은 참조 할당",
-        "explanation": "c = a는 a의 주소값을 c에 복사합니다. 이제 c도 0x001을 가리킵니다.",
+        "explanation": "**메모리에서 일어나는 일:**\n1. a의 값(주소) 읽기 → 0x001\n2. 그 값을 c에 **복사**\n3. 이제 a와 c 둘 다 0x001을 저장\n\n**핵심:** 객체를 복사하는 게 아니라, **주소를 복사**합니다!\n\n```\nStack:         Heap:\n  a → 0x001 ──┐\n              ├──→ [0x001: \"hello\"]\n  c → 0x001 ──┘\n  b → 0x002 ────→ [0x002: \"hello\"]\n```\n\n**왜 객체가 복사되지 않을까?** Java에서 참조 변수 할당(=)은 항상 **얕은 복사(Shallow Copy)**입니다. 주소만 복사되고, 객체는 하나 그대로예요.\n\n**자주 하는 오해:**\n\"c = a를 하면 c에 새 'hello' 객체가 생기겠지?\" → ❌\n\n실제로는 a와 c가 **같은 객체를 공유**합니다. 이걸 **별칭(Aliasing)**이라고 해요.\n\n**실전 위험:**\n```java\nString c = a;\nc를 수정하면? → a도 영향받음! (같은 객체)\n```\n단, String은 불변(Immutable)이라 수정이 안 되지만, 다른 객체는 조심해야 합니다!",
         "highlight": [7],
         "visualizationType": "memory",
         "memoryState": {
@@ -83,7 +83,7 @@
       {
         "line": 8,
         "title": "같은 참조 비교",
-        "explanation": "a == c는 둘 다 0x001이므로 true입니다.",
+        "explanation": "**동작 원리:**\n1. a의 값 읽기 → 0x001\n2. c의 값 읽기 → 0x001\n3. 두 주소를 비교: 0x001 == 0x001?\n4. 결과: true (같은 주소!)\n\n**왜 이제는 true일까?** a와 c가 **같은 객체**를 가리키기 때문입니다!\n\n**정리: == 연산자의 동작 규칙**\n```java\na == b  → false  (0x001 != 0x002, 다른 객체)\na == c  → true   (0x001 == 0x001, 같은 객체)\na.equals(b) → true (\"hello\" == \"hello\", 내용 같음)\n```\n\n**핵심 교훈:**\n- **같은 객체**를 가리키면 → == true\n- **다른 객체**지만 내용 같으면 → == false, .equals() true\n\n**실전 활용:**\n```java\n// 객체 동일성 확인 (같은 인스턴스인지)\nif (user1 == user2) { ... }\n\n// 값 동등성 확인 (내용이 같은지)\nif (user1.equals(user2)) { ... }\n```\n\n**주의사항:**\nPython의 `is`와 Java의 `==`는 같은 역할입니다 (참조 비교).\nPython의 `==`와 Java의 `.equals()`가 같은 역할입니다 (값 비교).",
         "keyInsight": "같은 객체를 가리키면 == 도 true",
         "highlight": [8],
         "visualizationType": "memory",

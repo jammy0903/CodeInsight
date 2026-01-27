@@ -281,7 +281,9 @@ export function LessonPage() {
     setLiveSteps(null);
     setSimulationError(null);
   }, [lessonId]);
-  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>('flow');
+  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'chat'>(
+    lang === 'c' ? 'memory' : 'flow'
+  );
 
   const memoryScrollRef = useRef<HTMLDivElement>(null);
 
@@ -456,7 +458,7 @@ export function LessonPage() {
     analyticsRef.current = { finishTracking: analytics.finishTracking };
   }, [analytics.finishTracking]);
 
-  const { memoryState } = useLessonVisualization(
+  const { memoryState, changedBlocks } = useLessonVisualization(
     steps,
     navigation.currentStepIndex
   );
@@ -473,27 +475,18 @@ export function LessonPage() {
 
   const currentStep = steps[navigation.currentStepIndex];
 
-  // [Fix] C언어 시뮬레이터가 main 진입점 라인을 0 또는 1(#include)로 잘못 보고하는 문제 보정
-  const displayLine = useMemo(() => {
-    if (!currentStep) return 1;
-    const rawLine = currentStep.line;
+  // 백엔드가 이제 올바른 라인 번호를 보내므로 직접 사용
+  // (이전 workaround 코드 제거됨 - 2026-01-27)
+  const displayLine = currentStep?.line || 1;
 
-    // C/C++이고 라인이 1 이하(또는 falsy)인 경우 보정 시도
-    if ((lang === 'c' || lang === 'cpp') && (!rawLine || rawLine <= 1)) {
-      const lines = code.split('\n');
-      // 첫 줄이 #include 인데 하이라이트가 1번이면 문제라고 판단
-      if (lines.length > 0 && lines[0].trim().startsWith('#')) {
-        // main 함수 위치 검색
-        const mainIndex = lines.findIndex(l =>
-          /^(?:int|void)\s+main\s*\(/.test(l.trim())
-        );
-        if (mainIndex !== -1) {
-          return mainIndex + 1; // main 함수 선언부로 이동
-        }
-      }
-    }
-    return rawLine || 1;
-  }, [currentStep, code, lang]);
+  // 터미널 출력 라인 변환 (Java/C 공통)
+  const terminalLines = useMemo((): TerminalLine[] => {
+    if (!currentStep?.stdout) return [];
+    return currentStep.stdout
+      .split('\n')
+      .filter(Boolean)
+      .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+  }, [currentStep?.stdout]);
 
   useEffect(() => {
     const prevIndex = prevStepIndexRef.current;
@@ -695,7 +688,7 @@ export function LessonPage() {
                 <Play className="w-3.5 h-3.5" />
                 <span>Flow</span>
               </button>
-              {lang === 'java' && (
+              {(lang === 'java' || lang === 'c') && (
                 <button
                   onClick={() => setActiveTab('memory')}
                   className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold transition-all"
@@ -759,9 +752,44 @@ export function LessonPage() {
                   </div>
                 </div>
               )}
-              {activeTab === 'memory' && lang === 'java' && currentStep && (
-                <div className="w-full h-full overflow-y-auto p-4">
-                  <JavaMemoryView {...toJavaMemoryViewProps(currentStep)} />
+              {activeTab === 'memory' && currentStep && (
+                <div
+                  ref={memoryScrollRef}
+                  className="w-full h-full overflow-auto p-4"
+                >
+                  {lang === 'java' ? (
+                    <>
+                      <JavaMemoryView {...toJavaMemoryViewProps(currentStep)} />
+                      {/* 터미널 출력 */}
+                      {terminalLines.length > 0 && (
+                        <TerminalOutput
+                          lines={terminalLines}
+                          title="출력"
+                          compact
+                          className="mt-6"
+                        />
+                      )}
+                    </>
+                  ) : lang === 'c' && memoryState ? (
+                    <>
+                      <MemoryPanel
+                        stack={memoryState.stack}
+                        heap={memoryState.heap}
+                        changedBlocks={changedBlocks}
+                        frames={memoryState.frames}
+                        showRegisters={true}
+                      />
+                      {/* 터미널 출력 */}
+                      {terminalLines.length > 0 && (
+                        <TerminalOutput
+                          lines={terminalLines}
+                          title="출력"
+                          compact
+                          className="mt-6"
+                        />
+                      )}
+                    </>
+                  ) : null}
                 </div>
               )}
               {activeTab === 'chat' && !isMobile && (

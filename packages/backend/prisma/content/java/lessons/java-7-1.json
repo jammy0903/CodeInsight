@@ -9,18 +9,32 @@
         "line": 1,
         "title": "ArrayList 생성",
         "explanation": "list에 [\"a\", \"b\", \"c\"]가 들어있습니다.",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "list", "value": "-> ArrayList"}],
-          "heap": [{"address": "0x001", "content": "[\"a\", \"b\", \"c\"]"}]
+          "stack": [
+            {
+              "name": "list",
+              "value": "-> ArrayList"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[\"a\", \"b\", \"c\"]"
+            }
+          ]
         }
       },
       {
         "line": 4,
         "title": "for-each 순회 시작",
         "explanation": "for-each는 내부적으로 Iterator를 사용합니다.",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "for-each = Iterator 기반"
@@ -31,7 +45,9 @@
         "title": "순회 중 삭제 시도 (예외!)",
         "explanation": "Iterator를 통하지 않고 list.remove()를 호출하면 예외!",
         "keyInsight": "for-each 중 컬렉션 수정 = ConcurrentModificationException",
-        "highlight": [6],
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "ConcurrentModificationException",
@@ -42,10 +58,18 @@
         "line": 11,
         "title": "Iterator 직접 사용",
         "explanation": "Iterator를 직접 사용하면 안전하게 삭제할 수 있습니다.",
-        "highlight": [11, 12],
+        "highlight": [
+          11,
+          12
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "it", "value": "-> Iterator"}],
+          "stack": [
+            {
+              "name": "it",
+              "value": "-> Iterator"
+            }
+          ],
           "note": "Iterator가 내부 상태를 관리"
         }
       },
@@ -54,10 +78,18 @@
         "title": "Iterator.remove() (안전!)",
         "explanation": "it.remove()는 Iterator가 알고 있으므로 안전합니다.",
         "keyInsight": "Iterator.remove() = 순회 중 안전 삭제",
-        "highlight": [14],
+        "highlight": [
+          14
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [{"address": "0x001", "content": "[\"a\", \"c\"]", "changed": true}]
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[\"a\", \"c\"]",
+              "changed": true
+            }
+          ]
         }
       },
       {
@@ -65,7 +97,9 @@
         "title": "removeIf() (Java 8+)",
         "explanation": "removeIf()는 내부적으로 Iterator를 사용하여 안전하게 처리합니다.",
         "keyInsight": "removeIf() = 가장 깔끔한 방법 (Java 8+)",
-        "highlight": [19],
+        "highlight": [
+          19
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "list.removeIf(condition) = 조건 맞는 요소 모두 삭제"
@@ -87,8 +121,13 @@
   "misconceptions": [
     {
       "wrong": "ConcurrentModificationException은 멀티스레드 문제다",
-      "correct": "단일 스레드에서도 발생합니다. Iterator 사용 중 외부 수정이 원인입니다.",
-      "why": "'Concurrent'는 '동시'라는 의미지만, 여기서는 '동시에 순회와 수정'을 뜻합니다."
+      "correct": "단일 스레드에서도 발생합니다. Iterator 사용 중 컬렉션을 외부에서 건드리면 발생합니다.",
+      "why": "Iterator의 'Fail-Fast' 설계 때문입니다. 문제가 생길 바에야 빨리 죽어버리는 게 낫다는 철학입니다."
+    },
+    {
+      "wrong": "for문(인덱스)으로 돌면서 remove하면 안전하다",
+      "correct": "예외는 안 나지만, **인덱스가 밀리는 문제**가 생깁니다.",
+      "why": "3번 인덱스를 지우면 뒤에 있던 친구들이 앞으로 당겨져서, 하나씩 건너뛰는 버그가 생깁니다. 뒤에서부터 지우면 괜찮습니다."
     }
   ],
   "keyTakeaway": "순회 중 삭제 = Iterator.remove() 또는 removeIf()"

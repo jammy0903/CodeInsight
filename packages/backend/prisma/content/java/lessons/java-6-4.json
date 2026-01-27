@@ -8,20 +8,35 @@
       {
         "line": 9,
         "title": "업캐스팅된 객체",
-        "explanation": "a는 Animal 타입이지만 실제로는 Dog 객체입니다.",
-        "highlight": [9],
+        "explanation": "`Animal a = new Dog();`\n메모리 상에는 `Dog` 객체가 만들어졌지만, 우리는 이것을 `Animal`이라고만 부르고 있습니다.",
+        "highlight": [
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "a", "value": "-> Dog", "note": "타입: Animal"}],
-          "heap": [{"address": "0x001", "content": "Dog{}"}]
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Dog",
+              "note": "타입: Animal"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Dog{}"
+            }
+          ]
         }
       },
       {
         "line": 12,
         "title": "잘못된 다운캐스팅 (런타임 에러)",
-        "explanation": "a는 Dog인데 Cat으로 캐스팅하면 ClassCastException!",
-        "keyInsight": "실제 타입과 다른 타입으로 캐스팅 = 런타임 에러",
-        "highlight": [12],
+        "explanation": "JVM: \"`a`가 가리키는 건 `Dog`인데, 왜 `Cat`이라고 우기는 거야?\"\n거짓말이 들통나서 `ClassCastException`을 던지고 프로그램을 종료합니다.",
+        "keyInsight": "강제 형변환 실패 = 프로그램 종료 (치명적)",
+        "highlight": [
+          12
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "ClassCastException: Dog cannot be cast to Cat"
@@ -29,10 +44,12 @@
       },
       {
         "line": 15,
-        "title": "instanceof 체크",
-        "explanation": "a instanceof Dog는 a가 Dog 타입인지 확인합니다. true!",
-        "keyInsight": "instanceof = 런타임 타입 체크",
-        "highlight": [15],
+        "title": "instanceof 체크 (안전장치)",
+        "explanation": "`a instanceof Dog`\nJVM에게 물어봅니다. \"`a`가 가리키는 실제 객체가 `Dog` 맞니?\"\n맞다면 `true`를 반환합니다.",
+        "keyInsight": "실행하기 전에 꼭 물어보세요 (Look before you leap)",
+        "highlight": [
+          15
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "a instanceof Dog → true"
@@ -41,46 +58,43 @@
       {
         "line": 16,
         "title": "안전한 다운캐스팅",
-        "explanation": "instanceof 확인 후 캐스팅하면 안전합니다.",
-        "highlight": [16],
+        "explanation": "`Dog d = (Dog) a;`\n이제 안전하게 `Animal` 간판을 떼고, 원래의 `Dog` 간판을 달아줍니다.\n이제 `Dog`만의 기능(`bark`)을 쓸 수 있습니다.",
+        "highlight": [
+          16
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "-> Dog"},
-            {"name": "d", "value": "-> Dog", "note": "같은 객체, 타입만 Dog"}
+            {
+              "name": "a",
+              "value": "-> Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> Dog",
+              "note": "같은 객체, 타입만 Dog"
+            }
           ]
         }
       },
       {
-        "line": 17,
-        "title": "자식 메서드 호출",
-        "explanation": "이제 Dog 타입이므로 bark()를 호출할 수 있습니다.",
-        "highlight": [17],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": ["Woof!"]
-        }
-      },
-      {
         "line": 21,
-        "title": "Java 16+ 패턴 매칭",
-        "explanation": "instanceof Dog d는 체크 + 캐스팅 + 변수 선언을 한 번에!",
-        "keyInsight": "패턴 매칭 = instanceof 체크와 캐스팅 동시에",
-        "highlight": [21],
+        "title": "Java 16+ 패턴 매칭 (스마트)",
+        "explanation": "`if (a instanceof Dog d)`\n확인(`instanceof`)과 동시에 변수 선언(`Dog d`)과 캐스팅을 한 번에 끝냅니다.\n코드가 훨씬 간결해집니다.",
+        "keyInsight": "Modern Java 문법",
+        "highlight": [
+          21
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "d", "value": "-> Dog", "note": "자동 생성"}],
-          "note": "if (a instanceof Dog d) = 체크 + 캐스팅 + 선언"
-        }
-      },
-      {
-        "line": 22,
-        "title": "패턴 매칭 사용",
-        "explanation": "d는 이미 Dog 타입으로 사용 가능합니다.",
-        "highlight": [22],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": ["Woof!", "Woof!"]
+          "stack": [
+            {
+              "name": "d",
+              "value": "-> Dog",
+              "note": "자동 생성"
+            }
+          ],
+          "note": "번거로운 (Dog) a; 과정 생략"
         }
       }
     ]
@@ -98,9 +112,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "다운캐스팅은 객체를 변환한다",
-      "correct": "캐스팅은 참조의 타입만 바꿉니다. 객체 자체는 변하지 않습니다.",
-      "why": "(Dog) a는 a가 가리키는 객체를 Dog 타입으로 '보겠다'는 의미입니다."
+      "wrong": "캐스팅하면 객체 자체가 바뀐다",
+      "correct": "아닙니다! 객체는 힙에 그대로 있고, 단지 그 객체를 **가리키는 변수의 타입(보는 관점)**만 바뀝니다.",
+      "why": "`Dog`를 `Animal`로 부르든 `Object`로 부르든 `Dog`는 `Dog`입니다."
+    },
+    {
+      "wrong": "부모 객체를 자식으로 캐스팅할 수 있다",
+      "correct": "절대 안 됩니다. `Animal`로 태어난 객체는 죽을 때까지 `Animal`입니다. `Dog`로 캐스팅하면 에러납니다.",
+      "why": "태생이 `Dog`였는데 잠시 `Animal` 행세를 하던 녀석만 다시 `Dog`로 돌아갈 수 있습니다."
     }
   ],
   "keyTakeaway": "다운캐스팅 전 instanceof 체크 필수, Java 16+는 패턴 매칭"

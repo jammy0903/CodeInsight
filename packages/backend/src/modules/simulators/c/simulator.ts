@@ -103,15 +103,224 @@ class CSimulator implements SimContext, EvalContext {
       };
     }
 
-    // 실행
-    const steps = this.executeFunction(mainFunc, sourceLines);
+    // 1. 전처리기(#include 등) 스텝 생성
+    const preprocessorSteps = this.createPreprocessorSteps(sourceLines);
+
+    // 2. main() 함수 진입 스텝 생성 (프레임 설정 포함)
+    const mainEntryStep = this.createFunctionEntryStep(mainFunc);
+
+    // 3. 함수 본문 실행 (프레임은 이미 설정됨)
+    const execSteps = this.executeFunction(mainFunc, sourceLines, [], { skipPush: true });
+
+    // 전체 스텝 합치기
+    const allSteps = [...preprocessorSteps, mainEntryStep, ...execSteps];
 
     return {
       success: true,
-      steps,
+      steps: allSteps,
       source_lines: sourceLines,
       message: '',
     };
+  }
+
+  /**
+   * 전처리기 지시문 스텝 생성 (#include, #define 등)
+   */
+  private createPreprocessorSteps(sourceLines: string[]): Step[] {
+    const steps: Step[] = [];
+    const includes: { line: number; header: string; isStd: boolean }[] = [];
+
+    // #include 라인 수집
+    for (let i = 0; i < sourceLines.length; i++) {
+      const line = sourceLines[i].trim();
+      if (line.startsWith('#include')) {
+        const stdMatch = line.match(/#include\s*<([^>]+)>/);
+        const localMatch = line.match(/#include\s*"([^"]+)"/);
+
+        if (stdMatch) {
+          includes.push({ line: i + 1, header: stdMatch[1], isStd: true });
+        } else if (localMatch) {
+          includes.push({ line: i + 1, header: localMatch[1], isStd: false });
+        }
+      }
+    }
+
+    // #include가 있으면 설명 스텝 생성
+    if (includes.length > 0) {
+      const firstInclude = includes[0];
+      const includeList = includes
+        .map(inc => `   • ${inc.isStd ? '<' + inc.header + '>' : '"' + inc.header + '"'}`)
+        .join('\n');
+
+      const headerExplanations = includes.map(inc => {
+        if (inc.header === 'stdio.h') {
+          return '   - stdio.h: printf, scanf 등 입출력 함수';
+        } else if (inc.header === 'stdlib.h') {
+          return '   - stdlib.h: malloc, free 등 메모리/유틸리티 함수';
+        } else if (inc.header === 'string.h') {
+          return '   - string.h: strcpy, strlen 등 문자열 함수';
+        } else if (inc.header === 'math.h') {
+          return '   - math.h: sqrt, pow 등 수학 함수';
+        } else {
+          return `   - ${inc.header}: 사용자/외부 헤더 파일`;
+        }
+      }).join('\n');
+
+      steps.push({
+        line: firstInclude.line,
+        code: sourceLines[firstInclude.line - 1].trim(),
+        stack: [],
+        heap: [],
+        explanation: `📚 전처리기 지시문 (Preprocessor Directive)
+
+#include는 컴파일 전에 헤더 파일의 내용을 포함시킵니다.
+
+📦 포함된 헤더 파일:
+${includeList}
+
+💡 각 헤더의 역할:
+${headerExplanations}
+
+⚙️ 이 단계는 컴파일 전에 처리되며, 실행 시간에는 영향을 주지 않습니다.`,
+        rsp: this.toHex(this.stackBase),
+        rbp: this.toHex(this.stackBase),
+        functionName: '(global)',
+        callDepth: 0,
+      });
+    }
+
+    return steps;
+  }
+
+  /**
+   * 함수 진입 스텝 생성
+   */
+  private createFunctionEntryStep(func: FunctionDef): Step {
+    const paramsDesc = func.params.length > 0
+      ? func.params.map(p => `${p.type} ${p.name}`).join(', ')
+      : 'void';
+
+    const explanation = func.name === 'main'
+      ? `🚀 프로그램 시작: main() 함수 진입
+
+C 프로그램의 실행은 항상 main() 함수에서 시작됩니다.
+
+📌 함수 시그니처: ${func.returnType} ${func.name}(${paramsDesc})
+
+💡 main 함수의 역할:
+   • 프로그램의 진입점 (Entry Point)
+   • 운영체제가 프로그램을 실행할 때 호출
+   • 반환값 0: 정상 종료
+   • 반환값 0 이외: 오류 발생
+
+📍 스택 프레임이 생성되고 지역 변수들이 여기에 저장됩니다.`
+      : `📞 함수 진입: ${func.name}()
+
+${func.returnType} ${func.name}(${paramsDesc})
+
+💡 새로운 스택 프레임이 생성됩니다.`;
+
+    // main 함수 시작 시 프레임 설정 (setupFunctionFrame 대신 여기서 처리)
+    const setupEvents = this.setupFunctionFrame(func, []);
+    setupEvents.forEach(e => this.addEvent(e));
+
+    // 이벤트 캡처 후 초기화
+    const events = [...this.handlerEvents];
+    this.handlerEvents = [];
+
+    return {
+      line: func.bodyStart,
+      code: `${func.returnType} ${func.name}(${paramsDesc}) {`,
+      stack: [],
+      heap: [],
+      explanation,
+      rsp: this.frameManager.getRsp(),
+      rbp: this.frameManager.getRbp(),
+      functionName: func.name,
+      callDepth: this.frameManager.getDepth(),
+      events,
+    };
+  }
+
+  /**
+   * 호출된 함수의 진입 스텝 생성 (main이 아닌 사용자 정의 함수용)
+   * 프레임 설정 후 호출해야 함 (이미 새 프레임 컨텍스트에서)
+   */
+  private createCalleeEntryStep(func: FunctionDef, argExprs: string[]): Step {
+    const paramsDesc = func.params.length > 0
+      ? func.params.map(p => `${p.type} ${p.name}`).join(', ')
+      : 'void';
+
+    // 파라미터 전달 설명
+    const paramDetails = func.params.map((p, i) => {
+      const argExpr = argExprs[i] || '?';
+      const variable = this.variables.get(p.name);
+      const value = variable?.value || '?';
+      return `   • ${p.name} = ${value} (from ${argExpr})`;
+    }).join('\n');
+
+    const explanation = `📥 함수 진입: ${func.name}()
+
+${func.returnType} ${func.name}(${paramsDesc})
+
+💡 새로운 스택 프레임이 생성되었습니다.
+   콜 스택 깊이: ${this.callStack.depth()}
+
+${func.params.length > 0 ? `📋 전달받은 파라미터:\n${paramDetails}` : '📋 파라미터 없음'}`;
+
+    // 이벤트 캡처 후 초기화
+    const events = [...this.handlerEvents];
+    this.handlerEvents = [];
+
+    return {
+      line: func.bodyStart,
+      code: `${func.returnType} ${func.name}(${paramsDesc}) {`,
+      stack: this.buildStackSnapshot(),
+      heap: this.buildHeapSnapshot(),
+      explanation,
+      rsp: this.frameManager.getRsp(),
+      rbp: this.frameManager.getRbp(),
+      functionName: func.name,
+      callDepth: this.frameManager.getDepth(),
+      events,
+    };
+  }
+
+  /**
+   * 현재 스택 상태 스냅샷 생성
+   */
+  private buildStackSnapshot(): MemoryBlock[] {
+    const allVariables = this.frameManager.getAllVariables();
+    return allVariables.map(([name, v]) => ({
+      name,
+      address: v.address,
+      type: v.type,
+      size: v.size,
+      bytes: v.bytes,
+      value: v.value,
+      points_to: v.points_to || null,
+      explanation: '',
+    }));
+  }
+
+  /**
+   * 현재 힙 상태 스냅샷 생성
+   */
+  private buildHeapSnapshot(): MemoryBlock[] {
+    const heap: MemoryBlock[] = [];
+    for (const [name, block] of this.heapBlocks) {
+      heap.push({
+        name: `*${name}`,
+        address: block.address,
+        type: block.type,
+        size: block.size,
+        bytes: block.bytes,
+        value: block.value,
+        points_to: null,
+        explanation: '',
+      });
+    }
+    return heap;
   }
 
   /**
@@ -211,30 +420,30 @@ class CSimulator implements SimContext, EvalContext {
         if (calledFunc && !['printf', 'scanf', 'malloc', 'free'].includes(calledFuncName)) {
           // 인자 표현식 파싱 (값이 아닌 표현식 문자열)
           const argExprs = this.parseArgumentExpressions(argsString);
-
-          // 프레임 설정
-          const setupEvents = this.setupFunctionFrame(calledFunc, argExprs);
-          setupEvents.forEach(e => this.addEvent(e));
-
           const argsExplanation = this.buildArgsExplanation(calledFunc.params, argExprs);
 
+          // 1. 호출 스텝 생성 (프레임 변경 전, 호출자 컨텍스트에서)
+          //    함수 호출은 한 번만 설명하고, 바로 내부 실행으로 진입
           steps.push(
             this.createStep(
               lineNum,
               stripped,
-              `📞 함수 호출 + 할당: ${varType} ${varName} = ${calledFuncName}(${argsString})\n\n` +
-                `💡 ${calledFuncName} 함수를 호출하고 반환값을 ${varName}에 저장합니다.${argsExplanation}\n` +
-                `   콜 스택 깊이: ${this.callStack.depth()}`
+              `📞 함수 호출: ${varType} ${varName} = ${calledFuncName}(${argsString})\n\n` +
+                `💡 ${calledFuncName} 함수를 호출하고 반환값을 ${varName}에 저장합니다.${argsExplanation}`
             )
           );
 
-          // 함수 실행
+          // 2. 프레임 설정
+          const setupEvents = this.setupFunctionFrame(calledFunc, argExprs);
+          setupEvents.forEach(e => this.addEvent(e));
+
+          // 3. 함수 본문 실행 (진입 스텝 없이 바로 실행)
           const { steps: innerSteps, returnValue } = this.executeFunctionWithReturn(
             calledFunc, sourceLines, argExprs, { skipPush: true }
           );
           steps.push(...innerSteps);
 
-          // 반환값 할당
+          // 4. 반환값 할당 (스텝 생성 없이 내부 처리만)
           const size = this.getTypeSize(varType);
           const addr = this.allocateStack(size);
           this.variables.set(varName, {
@@ -244,16 +453,6 @@ class CSimulator implements SimContext, EvalContext {
             bytes: this.intToBytes(returnValue, size),
             value: String(returnValue),
           });
-
-          steps.push(
-            this.createStep(
-              lineNum,
-              `// ${calledFuncName}() → ${varName} = ${returnValue}`,
-              `↩️ ${calledFuncName}() 반환값 저장\n\n` +
-                `💡 반환값 ${returnValue}이(가) ${varName}에 저장되었습니다.\n` +
-                `   콜 스택 깊이: ${this.callStack.depth()}`
-            )
-          );
 
           continue;
         }
@@ -268,46 +467,35 @@ class CSimulator implements SimContext, EvalContext {
 
         if (calledFunc && !['printf', 'scanf', 'malloc', 'free'].includes(calledFuncName)) {
           const argExprs = this.parseArgumentExpressions(argsString);
-
-          // 프레임 설정
-          const setupEvents = this.setupFunctionFrame(calledFunc, argExprs);
-          setupEvents.forEach(e => this.addEvent(e));
-
           const argsExplanation = this.buildArgsExplanation(calledFunc.params, argExprs);
 
+          // 1. 호출 스텝 생성 (프레임 변경 전, 호출자 컨텍스트에서)
+          //    함수 호출은 한 번만 설명하고, 바로 내부 실행으로 진입
           steps.push(
             this.createStep(
               lineNum,
               stripped,
               `📞 함수 호출: ${calledFuncName}(${argsString})\n\n` +
-                `💡 ${calledFuncName} 함수로 진입합니다.${argsExplanation}\n` +
-                `   콜 스택 깊이: ${this.callStack.depth()}`
+                `💡 ${calledFuncName} 함수를 호출합니다.${argsExplanation}`
             )
           );
 
-          // 함수 본문 실행
+          // 2. 프레임 설정
+          const setupEvents = this.setupFunctionFrame(calledFunc, argExprs);
+          setupEvents.forEach(e => this.addEvent(e));
+
+          // 3. 함수 본문 실행 (진입 스텝 없이 바로 실행)
           const innerSteps = this.executeFunction(calledFunc, sourceLines, argExprs, { skipPush: true });
           steps.push(...innerSteps);
 
-          // void 함수 프레임 정리 (return 문 없이 종료된 경우)
-          // 현재 프레임이 calledFuncName이면 아직 exit 안 된 것
+          // 4. void 함수 프레임 정리 (return 문 없이 종료된 경우)
           if (this.frameManager.getCurrentFrame() === calledFuncName) {
             const exitResult = this.frameManager.exit();
             this.variables = this.frameManager.getParentVariables() || new Map();
             this.evaluator.updateContext(this);
             exitResult.events.forEach(e => this.addEvent(e));
           }
-
-          // 복귀 스텝
-          steps.push(
-            this.createStep(
-              lineNum,
-              `// ${calledFuncName}() 복귀`,
-              `↩️ ${calledFuncName}() 함수에서 복귀\n\n` +
-                `💡 함수 실행이 완료되어 원래 위치로 돌아옵니다.\n` +
-                `   콜 스택 깊이: ${this.callStack.depth()}`
-            )
-          );
+          // 복귀 스텝 없이 바로 다음 줄로 진행
 
           continue;
         }
@@ -617,6 +805,7 @@ ${blockList}
       });
     }
 
+    // 이번 스텝에서 새로 추가된 출력 (이벤트용)
     const newStdout = this.stdoutBuffer.length > this.lastStdoutLength
       ? this.stdoutBuffer.slice(this.lastStdoutLength)
       : undefined;
@@ -651,7 +840,8 @@ ${blockList}
       rbp: this.frameManager.getRbp(),
       functionName: this.frameManager.getCurrentFrame(),
       callDepth: this.frameManager.getDepth(),
-      stdout: newStdout,
+      // 누적된 전체 stdout 반환 (Step 타입 정의에 맞춤)
+      stdout: this.stdoutBuffer || undefined,
       events,
     };
   }

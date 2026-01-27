@@ -9,7 +9,11 @@
         "line": 1,
         "title": "Person 클래스",
         "explanation": "name 필드 하나를 가진 간단한 클래스입니다.",
-        "highlight": [1, 2, 3],
+        "highlight": [
+          1,
+          2,
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "Person 클래스 정의"
@@ -19,7 +23,15 @@
         "line": 6,
         "title": "equals() 오버라이드",
         "explanation": "이름이 같으면 같은 Person으로 취급합니다.",
-        "highlight": [6, 7, 8, 9, 10, 11, 12],
+        "highlight": [
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "note": "equals만 오버라이드, hashCode는 기본값"
@@ -30,20 +42,34 @@
         "title": "HashSet 생성",
         "explanation": "HashSet은 hashCode()로 버킷을 찾고, equals()로 동등성을 확인합니다.",
         "keyInsight": "HashSet = hashCode로 위치 → equals로 비교",
-        "highlight": [15],
+        "highlight": [
+          15
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "set", "value": "-> HashSet"}]
+          "stack": [
+            {
+              "name": "set",
+              "value": "-> HashSet"
+            }
+          ]
         }
       },
       {
         "line": 16,
         "title": "첫 번째 Alice 추가",
         "explanation": "hashCode()가 특정 버킷을 가리킵니다.",
-        "highlight": [16],
+        "highlight": [
+          16
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [{"address": "HashSet", "content": "bucket[7]: Person(Alice)"}]
+          "heap": [
+            {
+              "address": "HashSet",
+              "content": "bucket[7]: Person(Alice)"
+            }
+          ]
         }
       },
       {
@@ -51,11 +77,16 @@
         "title": "두 번째 Alice 추가 (문제!)",
         "explanation": "새 Person의 hashCode()가 다른 버킷을 가리킵니다! equals() 비교 안 함!",
         "keyInsight": "hashCode 다르면 다른 버킷 → equals 비교 안 함",
-        "highlight": [17],
+        "highlight": [
+          17
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "heap": [
-            {"address": "HashSet", "content": "bucket[7]: Person(Alice), bucket[12]: Person(Alice)"}
+            {
+              "address": "HashSet",
+              "content": "bucket[7]: Person(Alice), bucket[12]: Person(Alice)"
+            }
           ],
           "warning": "같은 이름인데 2개가 들어감!"
         }
@@ -64,10 +95,14 @@
         "line": 19,
         "title": "size() 확인",
         "explanation": "2입니다! hashCode가 달라서 중복으로 인식하지 못함!",
-        "highlight": [19],
+        "highlight": [
+          19
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["2"],
+          "output": [
+            "2"
+          ],
           "error": "예상은 1인데 2가 나옴"
         }
       },
@@ -75,10 +110,15 @@
         "line": 23,
         "title": "equals() 비교",
         "explanation": "p1.equals(p2)는 true입니다. 이름이 같으니까!",
-        "highlight": [23],
+        "highlight": [
+          23
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["2", "true"]
+          "output": [
+            "2",
+            "true"
+          ]
         }
       },
       {
@@ -86,10 +126,16 @@
         "title": "hashCode() 비교",
         "explanation": "Object의 기본 hashCode()는 객체 주소 기반! 다른 객체니까 다름!",
         "keyInsight": "equals가 true면 hashCode도 같아야 함 (계약 위반!)",
-        "highlight": [24],
+        "highlight": [
+          24
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["2", "true", "false"],
+          "output": [
+            "2",
+            "true",
+            "false"
+          ],
           "error": "equals/hashCode 계약 위반!"
         }
       }
@@ -108,9 +154,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "equals만 오버라이드하면 HashSet이 잘 동작한다",
-      "correct": "hashCode도 함께 오버라이드해야 합니다. 둘은 세트입니다.",
-      "why": "HashSet은 hashCode로 버킷을 먼저 찾고, 그 안에서 equals를 비교합니다."
+      "wrong": "hashCode는 유일한(Unique) 값을 리턴해야 한다",
+      "correct": "유일하면 좋지만(성능상), 반드시 유일할 필요는 없습니다.",
+      "why": "hashCode가 우연히 같으면(충돌), 같은 버킷 안에 리스트로 연결해서 저장합니다. 하지만 너무 많이 충돌하면 성능이 느려집니다."
+    },
+    {
+      "wrong": "equals를 구현 안 해도 필드 값이 같으면 같은 객체다",
+      "correct": "아닙니다. `equals` 구현이 없으면 `==`(주소 비교)와 똑같이 동작합니다.",
+      "why": "`Object` 클래스의 기본 `equals` 구현이 단순히 `this == obj`이기 때문입니다."
     }
   ],
   "keyTakeaway": "equals 오버라이드 = hashCode도 필수, IDE 자동 생성 사용"

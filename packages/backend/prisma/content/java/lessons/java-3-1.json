@@ -8,71 +8,111 @@
       {
         "line": 6,
         "title": "변수 a 선언",
-        "explanation": "int a = 10으로 Stack에 값 10이 저장됩니다.",
-        "highlight": [6],
+        "explanation": "**메모리 상태:**\nStack 메모리의 `main` 프레임에 `a`라는 상자가 생기고 `10`이 들어갑니다.",
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "a", "value": "10", "frame": "main"}]
-        }
-      },
-      {
-        "line": 7,
-        "title": "호출 전 출력",
-        "explanation": "a는 10입니다.",
-        "highlight": [7],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": ["before: 10"]
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main"
+            }
+          ]
         }
       },
       {
         "line": 8,
         "title": "increment(a) 호출",
-        "explanation": "a의 값 10이 복사되어 파라미터 x에 전달됩니다. x는 a와 별개입니다!",
+        "explanation": "**값의 복사 (Pass by Value):**\n1. `increment` 메서드를 위한 **새로운 Stack 프레임**이 생성됩니다.\n2. `main`의 `a` 값인 **10**이 복사되어, `increment`의 파라미터 `x`에 전달됩니다.\n\n**중요:** `x`는 `a`의 복사본일 뿐, `a`와는 완전히 남남입니다.",
         "keyInsight": "기본 타입 = 값 복사, 원본과 무관",
-        "highlight": [8, 1],
+        "highlight": [
+          8,
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "10", "frame": "main"},
-            {"name": "x", "value": "10", "frame": "increment", "copied": true}
-          ]
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main"
+            },
+            {
+              "name": "x",
+              "value": "10",
+              "frame": "increment",
+              "copied": true
+            }
+          ],
+          "note": "a의 값이 복사됨"
         }
       },
       {
         "line": 2,
         "title": "x 증가",
-        "explanation": "x가 11이 됩니다. 하지만 a는 영향 없음!",
+        "explanation": "`increment` 프레임 안에 있는 `x`의 값이 11로 바뀝니다.\n하지만 `main` 프레임의 `a`는 건드리지 못합니다. 벽으로 막혀있는 다른 방이라고 생각하세요.",
         "keyInsight": "파라미터 x 변경 -> 원본 a 영향 없음",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "10", "frame": "main"},
-            {"name": "x", "value": "11", "frame": "increment", "changed": true}
-          ]
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main"
+            },
+            {
+              "name": "x",
+              "value": "11",
+              "frame": "increment",
+              "changed": true
+            }
+          ],
+          "note": "Stack 프레임이 다름"
         }
       },
       {
         "line": 3,
         "title": "함수 내부 출력",
-        "explanation": "x는 11입니다.",
-        "highlight": [3],
+        "explanation": "여기서는 `x`가 11로 출력됩니다.",
+        "highlight": [
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["before: 10", "inside: 11"]
+          "output": [
+            "before: 10",
+            "inside: 11"
+          ]
         }
       },
       {
         "line": 9,
         "title": "함수 반환 후 출력",
-        "explanation": "a는 여전히 10입니다! 값만 복사되었기 때문입니다.",
-        "keyInsight": "기본 타입은 원본이 절대 변경되지 않음",
-        "highlight": [9],
+        "explanation": "`increment` 메서드가 끝나고 Stack 프레임이 사라집니다.\n`main`으로 돌아와보니 `a`는 여전히 10입니다.\n\n**결론:** 기본 타입 변수를 메서드에 넘겨서 원본을 바꿀 수는 없습니다.",
+        "keyInsight": "메서드 종료 -> 복사본 x 소멸",
+        "highlight": [
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "a", "value": "10", "frame": "main"}],
-          "output": ["before: 10", "inside: 11", "after: 10"]
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "before: 10",
+            "inside: 11",
+            "after: 10"
+          ]
         }
       }
     ]
@@ -91,8 +131,8 @@
   "misconceptions": [
     {
       "wrong": "함수에서 파라미터를 수정하면 원본도 바뀐다",
-      "correct": "기본 타입은 값이 복사되므로 원본에 영향이 없습니다.",
-      "why": "Java는 항상 Pass by Value입니다."
+      "correct": "기본 타입(primitive)은 **값(Value)**만 복사되므로, 원본 변수와 파라미터는 서로 다른 메모리 공간을 씁니다.",
+      "why": "Java는 모든 전달 방식이 **Call by Value**입니다. 변수의 알맹이(값)만 복사해서 주기 때문입니다."
     }
   ],
   "keyTakeaway": "기본 타입 = 값 복사, 원본 변경 불가"

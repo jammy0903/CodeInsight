@@ -258,6 +258,64 @@ This section describes how application data, especially course content and AI co
 4. Cleanup  → 임시 파일 정리 (finally 블록에서)
 ```
 
+### C 시뮬레이터 스텝 생성 구조 (2026-01-27 업데이트)
+
+C 시뮬레이터는 다음 순서로 스텝을 생성합니다:
+
+```
+1. 전처리기 스텝 (#include 등) → createPreprocessorSteps()
+2. 함수 진입 스텝 (main 포함) → createFunctionEntryStep()
+3. 함수 본문 스텝들        → executeFunction()
+4. 함수 호출/복귀 스텝     → executeFunction() 내부
+```
+
+**스텝 생성 흐름 예시:**
+```c
+#include <stdio.h>    // Step 1: 전처리기 설명
+
+int main() {          // Step 2: main() 함수 진입 설명
+    int a = 5;        // Step 3: 변수 선언
+    printf("%d", a);  // Step 4: printf 출력
+    return 0;         // Step 5: 함수 종료
+}
+```
+
+**함수 호출 시 스텝 흐름 (간결화됨, 2026-01-27):**
+```c
+// main() 함수 내부에서...
+int sum = add(a, b);  // Step N: 📞 함수 호출 (한 번만 설명!)
+// ↓ add() 함수 내부로 바로 진입 (진입 스텝 없음)
+int result = x + y;   // Step N+1: add() 변수 선언
+return result;        // Step N+2: add() 종료
+// ↓ 호출자로 바로 복귀 (복귀 스텝 없음)
+printf("sum=%d", sum);// Step N+3: main() 다음 줄 바로 실행
+```
+
+**핵심 원칙: 함수 호출은 한 번만 설명!**
+- ~~함수 진입 스텝~~ 제거 (중복)
+- ~~복귀 스텝~~ 제거 (불필요)
+- 호출 설명 후 바로 함수 내부 실행
+- 함수 종료 후 바로 다음 줄 실행
+
+```typescript
+// 1. 호출 스텝 (호출자 컨텍스트에서, 한 번만!)
+steps.push(this.createStep(lineNum, code, "📞 함수 호출..."));
+
+// 2. 프레임 변경
+this.setupFunctionFrame(calledFunc, argExprs);
+
+// 3. 함수 본문 실행 (진입 스텝 없이 바로!)
+steps.push(...innerSteps);
+
+// 4. 프레임 정리 후 바로 다음 줄 (복귀 스텝 없음)
+```
+
+**주요 메서드 (simulator.ts):**
+- `simulate()`: 메인 진입점, 전체 스텝 조합
+- `createPreprocessorSteps()`: `#include` 등 전처리기 스텝 생성
+- `createFunctionEntryStep()`: main 함수 진입 스텝 생성
+- `executeFunction()`: 함수 본문 스텝 생성 (재귀적 함수 호출 지원)
+
 ### 통일된 스냅샷 포맷 (JSON)
 
 ```typescript

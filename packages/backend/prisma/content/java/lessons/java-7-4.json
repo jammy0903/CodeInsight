@@ -7,32 +7,30 @@
     "steps": [
       {
         "line": 2,
-        "title": "Arrays.asList() 호출",
-        "explanation": "고정 크기 리스트를 반환합니다. ArrayList가 아닙니다!",
-        "keyInsight": "Arrays.asList() = java.util.Arrays$ArrayList (고정 크기)",
-        "highlight": [2],
+        "title": "Arrays.asList()의 정체",
+        "explanation": "여기서 반환되는 리스트는 진짜 `ArrayList`가 아닙니다!\n`Arrays` 클래스 안에 숨겨진 `Arrays$ArrayList`라는 별개의 클래스입니다.\n이 녀석은 크기를 바꿀 수 없는(Fixed-size) 특징이 있습니다.",
+        "keyInsight": "이름은 같지만, 완전히 다른 가짜 ArrayList",
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "fixed", "value": "-> Arrays$ArrayList"}],
-          "note": "이름은 ArrayList지만 다른 클래스!"
-        }
-      },
-      {
-        "line": 3,
-        "title": "요소 교체 (OK)",
-        "explanation": "set()으로 기존 요소를 다른 값으로 바꾸는 건 가능합니다.",
-        "highlight": [3],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [{"address": "0x001", "content": "[\"x\", \"b\", \"c\"]", "changed": true}]
+          "stack": [
+            {
+              "name": "fixed",
+              "value": "-> Arrays$ArrayList"
+            }
+          ],
+          "note": "add/remove 기능이 구현 안 됨"
         }
       },
       {
         "line": 4,
-        "title": "요소 추가 (에러!)",
-        "explanation": "add()는 크기를 바꾸므로 UnsupportedOperationException!",
-        "keyInsight": "고정 크기 = add/remove 불가",
-        "highlight": [4],
+        "title": "add() 호출 시 에러",
+        "explanation": "크기가 고정되어 있어서 요소를 더 넣을 수 없습니다. 공간을 늘릴 능력이 없습니다.",
+        "highlight": [
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "UnsupportedOperationException"
@@ -40,61 +38,58 @@
       },
       {
         "line": 8,
-        "title": "배열로부터 생성",
-        "explanation": "Arrays.asList(arr)은 배열을 감싸는 래퍼입니다.",
-        "highlight": [8, 9],
+        "title": "배열과 연결된 리스트 (View)",
+        "explanation": "`Arrays.asList(arr)`은 배열을 복사하는 게 아니라, 배열을 감싸는 **창문(View)**을 만듭니다.\n창문을 통해 안을 들여다보는 것일 뿐입니다.",
+        "highlight": [
+          8,
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {"name": "arr", "value": "-> 0x001"},
-            {"name": "linked", "value": "-> 래퍼(0x001)"}
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "String[] { \"a\", \"b\", \"c\" }"
+            }
           ],
-          "heap": [{"address": "0x001", "content": "[\"a\", \"b\", \"c\"]"}],
-          "note": "linked는 arr을 직접 참조"
+          "note": "리스트가 이 배열을 직접 가리킴 (참조 공유)"
         }
       },
       {
         "line": 10,
-        "title": "배열 수정",
-        "explanation": "원본 배열을 수정하면 리스트도 영향받습니다!",
-        "keyInsight": "Arrays.asList() = 원본 배열과 연결됨",
-        "highlight": [10],
+        "title": "원본 배열 수정의 여파",
+        "explanation": "원본 배열 `arr`의 내용을 바꾸면, 창문(`linked`)으로 볼 때도 바뀐 내용(`x`)이 보입니다.\n서로 연결되어 있기 때문입니다.",
+        "keyInsight": "독립된 리스트가 아님! 원본 배열 수정 시 영향 받음",
+        "highlight": [
+          10
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [{"address": "0x001", "content": "[\"x\", \"b\", \"c\"]", "changed": true}]
-        }
-      },
-      {
-        "line": 11,
-        "title": "리스트 확인",
-        "explanation": "linked.get(0)도 \"x\"입니다! 배열 수정이 리스트에 반영!",
-        "highlight": [11],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": ["x"]
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "String[] { \"x\", \"b\", \"c\" }",
+              "changed": true
+            }
+          ]
         }
       },
       {
         "line": 14,
-        "title": "해결책: new ArrayList()",
-        "explanation": "새 ArrayList로 복사하면 독립적이고 가변입니다.",
-        "keyInsight": "new ArrayList<>(Arrays.asList(...)) = 가변 복사본",
-        "highlight": [14],
+        "title": "진짜 독립된 ArrayList 만들기",
+        "explanation": "`new ArrayList<>(...)` 생성자에 넣으면, 데이터를 **새로 복사**해서, 완전히 독립적인 방을 만듭니다.\n이제는 원본 배열과 상관없이 마음대로 늘리고 줄일 수 있습니다.",
+        "highlight": [
+          14
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "mutable", "value": "-> 새 ArrayList"}],
-          "note": "원본과 독립, add/remove 가능"
-        }
-      },
-      {
-        "line": 18,
-        "title": "List.of() (Java 9+)",
-        "explanation": "List.of()는 완전히 불변입니다. set()도 불가!",
-        "keyInsight": "List.of() = 완전 불변, Arrays.asList() = 부분 가변",
-        "highlight": [18],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "List.of(): set도 불가, null도 불가"
+          "stack": [
+            {
+              "name": "mutable",
+              "value": "-> Real ArrayList"
+            }
+          ],
+          "note": "완전 분리 & 크기 조절 가능"
         }
       }
     ]
@@ -112,9 +107,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "Arrays.asList()는 ArrayList를 반환한다",
-      "correct": "java.util.Arrays$ArrayList를 반환합니다. java.util.ArrayList와 다릅니다.",
-      "why": "Arrays 내부 클래스로, 고정 크기입니다."
+      "wrong": "List.of()는 null을 넣을 수 있다",
+      "correct": "절대 안 됩니다. `List.of`는 `null`을 매우 싫어해서 `NullPointerException`을 던집니다.",
+      "why": "불변 컬렉션의 무결성을 위해서입니다. `Arrays.asList`는 `null`도 받을 수 있습니다."
+    },
+    {
+      "wrong": "toArray()로 만든 배열은 원본 리스트와 연결된다",
+      "correct": "아닙니다. `toArray()`는 데이터를 복사해서 **새로운 배열**을 줍니다.",
+      "why": "`Arrays.asList()`는 배열 -> 리스트로 **감싸는** 것이고, `toArray()`는 리스트 -> 배열로 **복제**하는 것입니다. 방향이 다릅니다."
     }
   ],
   "keyTakeaway": "Arrays.asList = 고정 크기, 원본 연결 / 가변 원하면 new ArrayList()"

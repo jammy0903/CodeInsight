@@ -8,31 +8,44 @@
       {
         "line": 2,
         "title": "static 메서드 선언",
-        "explanation": "add()는 static! 인스턴스 없이 호출 가능합니다.",
-        "keyInsight": "static method = 인스턴스 불필요",
-        "highlight": [2, 3, 4],
+        "explanation": "`add()`는 `static`입니다. 객체를 만들지 않아도 기능 수행이 가능한 **독립적인 함수**입니다.",
+        "keyInsight": "static method = input만 있으면 되는 순수 함수",
+        "highlight": [
+          2,
+          3,
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "metaspace": [{"name": "MathUtil.add()", "value": "method"}],
-          "note": "유틸리티 함수에 적합"
+          "metaspace": [
+            {
+              "name": "MathUtil.add()",
+              "value": "method"
+            }
+          ],
+          "note": "상태(필드)가 필요 없는 유틸리티"
         }
       },
       {
         "line": 6,
         "title": "인스턴스 필드",
-        "explanation": "instanceValue는 각 인스턴스에 속합니다.",
-        "highlight": [6],
+        "explanation": "`instanceValue`는 `new MathUtil()`을 해서 힙에 객체를 만들어야만 생성되는 값입니다.",
+        "highlight": [
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "인스턴스 필드는 new로 생성 시 만들어짐"
+          "note": "아직 객체가 없으니 이 변수도 없음"
         }
       },
       {
         "line": 9,
         "title": "static에서 인스턴스 접근 (에러)",
-        "explanation": "static 메서드는 어떤 인스턴스의 것인지 알 수 없어서 접근 불가!",
-        "keyInsight": "static에서는 인스턴스 멤버 접근 불가",
-        "highlight": [9],
+        "explanation": "`tryAccessInstance()`는 객체 없이 실행될 수 있는데, `instanceValue`를 찾으려 하니 모순입니다.\n\"어느 객체의 instanceValue를 말하는 거니?\"",
+        "keyInsight": "static context에는 '나(this)'라는 개념이 없음",
+        "highlight": [
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "컴파일 에러: non-static variable instanceValue cannot be referenced from a static context"
@@ -41,9 +54,10 @@
       {
         "line": 10,
         "title": "static에서 this 사용 (에러)",
-        "explanation": "this는 '현재 인스턴스'를 의미하지만, static에는 인스턴스가 없습니다!",
-        "keyInsight": "static 메서드에서 this 사용 불가",
-        "highlight": [10],
+        "explanation": "`this`는 '현재 실행 중인 객체'를 뜻하는데, `static` 메서드는 객체 없이 실행되므로 `this` 자체가 존재하지 않습니다.",
+        "highlight": [
+          10
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "error": "컴파일 에러: 'this' cannot be referenced from a static context"
@@ -52,46 +66,69 @@
       {
         "line": 14,
         "title": "인스턴스에서 static 접근 (OK)",
-        "explanation": "인스턴스 메서드에서 static 메서드 호출 가능!",
-        "highlight": [14],
+        "explanation": "`instanceMethod()`는 이미 객체가 생성된 후에 호출되므로, 공용인 `add` 메서드(static)를 맘대로 부를 수 있습니다.",
+        "highlight": [
+          14
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "인스턴스 → static: OK, static → 인스턴스: X"
+          "note": "개별 객체는 공용 도구를 쓸 수 있음"
         }
       },
       {
         "line": 15,
         "title": "인스턴스에서 인스턴스 접근 (OK)",
-        "explanation": "인스턴스 메서드는 같은 인스턴스의 필드에 접근 가능!",
-        "highlight": [15],
+        "explanation": "당연히 자기 자신(`this`)의 필드인 `instanceValue`에 접근할 수 있습니다.",
+        "highlight": [
+          15
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "this가 암묵적으로 전달됨"
+          "note": "this.instanceValue 접근 가능"
         }
       },
       {
         "line": 19,
         "title": "클래스명으로 static 호출",
-        "explanation": "MathUtil.add(3, 5)처럼 클래스명으로 호출합니다.",
-        "keyInsight": "static 메서드 = 클래스명.메서드()",
-        "highlight": [19],
+        "explanation": "`new` 없이 바로 `MathUtil.add(3, 5)`를 호출합니다.\n아주 깔끔하고 효율적입니다.",
+        "keyInsight": "유틸리티 함수는 static이 국룰",
+        "highlight": [
+          19
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {"name": "a", "value": "3", "frame": "add"},
-            {"name": "b", "value": "5", "frame": "add"}
+            {
+              "name": "a",
+              "value": "3",
+              "frame": "add"
+            },
+            {
+              "name": "b",
+              "value": "5",
+              "frame": "add"
+            }
           ]
         }
       },
       {
         "line": 20,
         "title": "결과 출력",
-        "explanation": "result = 8입니다.",
-        "highlight": [20],
+        "explanation": "결과 8이 반환됩니다. 객체 생성 비용(Heap 할당, GC 등)이 전혀 들지 않았습니다.",
+        "highlight": [
+          20
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "result", "value": "8"}],
-          "output": ["8"]
+          "stack": [
+            {
+              "name": "result",
+              "value": "8"
+            }
+          ],
+          "output": [
+            "8"
+          ]
         }
       }
     ]
@@ -109,9 +146,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "static 메서드에서 인스턴스 필드를 읽을 수 있다",
-      "correct": "static 메서드는 어떤 인스턴스인지 알 수 없어서 접근 불가합니다.",
-      "why": "파라미터로 인스턴스를 받으면 그 인스턴스의 필드는 접근 가능합니다."
+      "wrong": "static 메서드 내에서 super를 쓸 수 있다",
+      "correct": "쓸 수 없습니다. `this`도 없고 `super`도 없습니다.",
+      "why": "`this`와 `super`는 모두 인스턴스와 관련된 키워드이기 때문입니다."
+    },
+    {
+      "wrong": "static 메서드는 오버라이딩이 된다",
+      "correct": "오버라이딩(Overriding)이 아니라 **하이딩(Hiding)**이라고 부릅니다. 다형성이 적용되지 않습니다.",
+      "why": "변수 타입(Parent)을 보고 호출 대상을 결정하지, 실제 객체(Child)를 보고 결정하지 않습니다."
     }
   ],
   "keyTakeaway": "static = 인스턴스 없이 호출, 인스턴스 멤버 접근 불가"
