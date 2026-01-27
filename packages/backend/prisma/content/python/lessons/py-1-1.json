@@ -1,120 +1,119 @@
 {
   "lessonId": "py-1-1",
-  "title": "변수는 라벨이다",
-  "concept": "변수는 값을 '담는' 상자가 아니라 객체를 '가리키는' 이름표!",
+  "title": "Hello Python & Variables",
+  "concept": "파이썬 변수는 상자가 아니라 '이름표(Label)'입니다",
   "content": {
-    "code": "a = [1, 2, 3]\nprint(id(a))\n\nb = a\nprint(id(b))\n\nprint(a is b)",
+    "code": "print(\"Hello, Python!\")\n\n# 변수 정의: 이름표 붙이기\nmessage = \"Python is fun\"\nprint(message)\n\n# 같은 객체에 다른 이름표 붙이기\na = [1, 2, 3]\nb = a\n\nprint(id(a))\nprint(id(b))",
     "steps": [
       {
         "line": 1,
-        "title": "리스트 객체 생성",
-        "explanation": "**가장 먼저 버려야 할 개념: '변수 = 상자'**\n\n`a = [1, 2, 3]`은 두 가지를 합니다:\n1. 메모리에 리스트 객체 `[1, 2, 3]` 생성\n2. `a`라는 이름표를 그 객체에 붙임\n\n**❌ 틀린 생각:** 'a라는 상자에 [1,2,3]을 넣는다'\n**✅ 맞는 생각:** 'a라는 이름표를 리스트 객체에 붙인다'",
-        "highlight": [1],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "140234567890" }
+        "title": "Hello World",
+        "explanation": "**`print()` 함수:**\n괄호 안의 내용을 화면에 출력합니다. 파이썬은 `main` 함수나 `class` 감싸기 없이 바로 실행됩니다.\n\n**심플함:** 이게 파이썬의 최대 장점입니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "Hello, Python!"
           ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "id()로 객체 신원 확인",
-        "explanation": "모든 객체는 고유한 신원 번호(id)를 가집니다.\n\n`id(a)` → a가 가리키는 객체의 메모리 주소 반환\n\n**비유:** 상품의 바코드와 같습니다.\n같은 바코드 = 같은 물건!",
-        "highlight": [2],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "140234567890", "highlight": true }
-          ],
-          "output": ["140234567890"]
         }
       },
       {
         "line": 4,
-        "title": "b = a - 가장 많이 실수하는 부분!",
-        "explanation": "**이 한 줄이 파이썬에서 가장 많은 버그를 만듭니다.**\n\n`b = a`는 리스트를 복사하지 않습니다!\n\n같은 객체에 두 번째 이름표를 붙이는 것입니다.\n\n```\na ----+\n      +---> [1, 2, 3]\nb ----+\n```\n\n**면접 단골 질문:** b를 수정하면 a는?",
-        "highlight": [4],
+        "title": "변수는 이름표다",
+        "explanation": "**`message = \"...\"`**\n1. 메모리에 문자열 객체 `\"Python is fun\"`을 만듭니다.\n2. `message`라는 **이름표**를 그 객체에 붙입니다.\n\n**상자가 아닙니다!**\nC나 Java처럼 변수라는 그릇에 값을 담는 게 아니라, 둥둥 떠다니는 객체에 꼬리표를 다는 것입니다.",
+        "highlight": [
+          4,
+          5
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "a", "pointsTo": "obj1" },
-            { "name": "b", "pointsTo": "obj1" }
+            {
+              "name": "message",
+              "pointsTo": "str1"
+            }
           ],
           "objects": [
-            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "140234567890" }
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python is fun\"",
+              "pyId": "1001"
+            }
+          ],
+          "output": [
+            "Python is fun"
           ]
         }
       },
       {
-        "line": 5,
-        "title": "같은 id() - 증거!",
-        "explanation": "`a`와 `b`가 같은 id를 가집니다.\n\n**이게 증명하는 것:**\n메모리의 같은 객체를 가리킨다!\n\n**만약 복사였다면:**\n- 다른 id를 가졌을 것\n- 하나 수정해도 다른 하나는 그대로",
-        "highlight": [5],
+        "line": 8,
+        "title": "이름표 공유 (Aliasing)",
+        "explanation": "**`b = a`**\n`a`가 가리키던 리스트 객체에 `b`라는 **새 이름표**를 하나 더 붙입니다.\n\n이제 하나의 리스트를 `a`와 `b` 두 이름으로 부를 수 있습니다.\n복사된 게 아닙니다! 같은 녀석입니다.",
+        "keyInsight": "변수 할당 = 이름표 달기",
+        "highlight": [
+          8,
+          9
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "a", "pointsTo": "obj1" },
-            { "name": "b", "pointsTo": "obj1" }
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "140234567890", "highlight": true }
-          ],
-          "output": ["140234567890", "140234567890"]
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2002"
+            }
+          ]
         }
       },
       {
-        "line": 7,
-        "title": "is 연산자 - 동일성 검사",
-        "explanation": "**`is` vs `==` - 자주 헷갈리는 부분!**\n\n- `a == b` → 값이 같은가?\n- `a is b` → 같은 객체인가?\n\n`a is b`가 `True` → 같은 객체!\n\n**흔한 버그:**\n```python\nb.append(4)\nprint(a)  # [1, 2, 3, 4] - 어?!\n```\n\na와 b는 하나의 리스트에 붙은 두 개의 이름표!",
-        "highlight": [7],
+        "line": 11,
+        "title": "id() 확인",
+        "explanation": "**`id()`**: 객체의 고유 번호(메모리 주소)를 보여줍니다.\n두 변수의 id가 같다는 것은, **완전히 같은 객체**라는 뜻입니다.",
+        "highlight": [
+          11,
+          12
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "obj1" },
-            { "name": "b", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "140234567890" }
-          ],
-          "output": ["140234567890", "140234567890", "True"]
+          "output": [
+            "14023...",
+            "14023... (Same!)"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "출력 결과는?\n\nx = [1, 2]\ny = x\ny.append(3)\nprint(x)",
+    "question": "파이썬에서 `a = 10`의 의미로 가장 적절한 비유는?",
     "options": [
-      "[1, 2]",
-      "[1, 2, 3]",
-      "에러",
-      "[3]"
+      "변수 a라는 상자에 숫자 10을 넣는다",
+      "변수 a를 선언하고 메모리 공간을 확보한다",
+      "숫자 10 객체에 a라는 이름표를 붙인다",
+      "a는 10이 저장된 하드디스크 위치다"
     ],
-    "correctIndex": 1,
-    "explanation": "y = x는 y가 x와 같은 리스트를 가리키게 합니다. y.append(3)은 그 공유된 리스트를 수정합니다. x도 같은 객체를 가리키므로 변화가 보입니다!"
+    "correctIndex": 2,
+    "explanation": "파이썬의 변수는 객체를 가리키는 참조(Reference)입니다. '이름표' 비유가 가장 정확합니다."
   },
   "misconceptions": [
     {
-      "wrong": "변수는 값을 담는 상자다",
-      "correct": "변수는 객체를 가리키는 이름표(라벨)다",
-      "why": "파이썬에서 객체는 독립적으로 존재하고, 변수는 그저 참조합니다. 여러 변수가 같은 객체를 참조할 수 있어요."
-    },
-    {
-      "wrong": "a = b는 b의 값을 a에 복사한다",
-      "correct": "a = b는 a가 b와 같은 객체를 가리키게 한다",
-      "why": "할당은 이름을 객체에 바인딩합니다. 복사하지 않습니다!"
-    },
-    {
-      "wrong": "각 변수는 자기만의 데이터 복사본을 가진다",
-      "correct": "여러 변수가 같은 객체를 공유할 수 있다",
-      "why": "이것을 '별칭(aliasing)'이라 하며 파이썬의 가장 흔한 함정입니다."
+      "wrong": "변수를 선언해야 한다 (int a;)",
+      "correct": "파이썬은 타입 선언이 없습니다. 그냥 값을 넣으면 변수가 생깁니다.",
+      "why": "동적 타이핑(Dynamic Typing) 언어이기 때문입니다. 타입은 변수가 아니라 '객체'가 가지고 있습니다."
     }
   ],
-  "keyTakeaway": "변수는 상자가 아니라 이름표! a=b는 하나의 객체에 두 개의 이름표!"
+  "keyTakeaway": "파이썬은 심플하다. 변수는 값을 담는 상자가 아니라 객체를 가리키는 이름표다."
 }

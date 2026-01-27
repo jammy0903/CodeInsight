@@ -1,117 +1,100 @@
 {
   "lessonId": "py-2-2",
-  "title": "문자열 불변성",
-  "concept": "문자열은 바꿀 수 없다 - s[0] = 'X'는 에러!",
+  "title": "While Loops",
+  "concept": "조건이 True인 동안 계속 반복한다 (무한 루프 주의)",
   "content": {
-    "code": "s = \"hello\"\nprint(f\"s = {s}, id = {id(s)}\")\n\n# 이건 에러가 난다:\n# s[0] = \"H\"  # TypeError!\n\n# 새 문자열을 만들어야 한다\ns = \"H\" + s[1:]\nprint(f\"변경 후: s = {s}, id = {id(s)}\")",
+    "code": "count = 3\n\nwhile count > 0:\n    print(f\"Count: {count}\")\n    count = count - 1\n\nprint(\"Liftoff!\")",
     "steps": [
       {
-        "line": 1,
-        "title": "문자열 객체 생성",
-        "explanation": "`s = \"hello\"`는 문자열 객체를 만들고 `s`를 바인딩합니다.\n\n문자열도 정수처럼 **불변**입니다.",
-        "highlight": [1],
+        "line": 3,
+        "title": "조건 검사",
+        "explanation": "`while count > 0:`\n조건이 참(True)이면 아래 들여쓰기 된 블록을 실행합니다.\n\n현재 `count`가 3이므로 실행!",
+        "highlight": [
+          3
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "s", "pointsTo": "str_hello" }
+            {
+              "name": "count",
+              "pointsTo": "int_3"
+            }
           ],
           "objects": [
-            { "id": "str_hello", "type": "str", "value": "\"hello\"", "pyId": "140001", "highlight": true }
+            {
+              "id": "int_3",
+              "type": "int",
+              "value": "3"
+            }
           ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "id 기록",
-        "explanation": "이 문자열 객체의 id를 기억해두세요.\n\n문자열을 \"수정\"하면 id가 바뀌는 걸 볼 겁니다.",
-        "highlight": [2],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "s", "pointsTo": "str_hello" }
-          ],
-          "objects": [
-            { "id": "str_hello", "type": "str", "value": "\"hello\"", "pyId": "140001" }
-          ],
-          "output": ["s = hello, id = 140001"]
         }
       },
       {
         "line": 5,
-        "title": "s[0] = 'H'는 불법!",
-        "explanation": "**이건 에러가 납니다**\n\n```python\nTypeError: 'str' object does not support item assignment\n```\n\n**왜?** 문자열은 불변이니까요!\n\n문자열 안의 글자 하나를 바꿀 수 없습니다. 한번 만들어지면 문자열 객체는 영원히 고정됩니다.",
-        "highlight": [5],
+        "title": "상태 변경",
+        "explanation": "`count = count - 1`\n이 줄이 없으면 `count`는 영원히 3이고, 반복문은 영원히 끝나지 않습니다 (**무한 루프**).\n반드시 반복을 멈출 수 있는 코드가 있어야 합니다.",
+        "highlight": [
+          5
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "s", "pointsTo": "str_hello" }
+            {
+              "name": "count",
+              "pointsTo": "int_2"
+            }
           ],
           "objects": [
-            { "id": "str_hello", "type": "str", "value": "\"hello\"", "pyId": "140001" }
+            {
+              "id": "int_3",
+              "type": "int",
+              "value": "3"
+            },
+            {
+              "id": "int_2",
+              "type": "int",
+              "value": "2",
+              "new": true
+            }
           ]
         }
       },
       {
-        "line": 8,
-        "title": "새 문자열을 만들어야!",
-        "explanation": "**해결법:** 새 문자열을 만들어라!\n\n`\"H\" + s[1:]` = `\"H\" + \"ello\"` = `\"Hello\"`\n\n이건 완전히 새로운 문자열 객체를 만들고, `s`가 그것을 가리키게 재바인딩합니다.\n\n원래 \"hello\"는 그대로입니다.",
-        "highlight": [8],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "s", "pointsTo": "str_Hello" }
-          ],
-          "objects": [
-            { "id": "str_hello", "type": "str", "value": "\"hello\"", "pyId": "140001", "orphaned": true },
-            { "id": "str_Hello", "type": "str", "value": "\"Hello\"", "pyId": "140099", "highlight": true }
+        "line": 7,
+        "title": "종료",
+        "explanation": "`count`가 0이 되면 `while` 조건이 거짓(False)이 되어 빠져나옵니다.",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "Count: 3",
+            "Count: 2",
+            "Count: 1",
+            "Liftoff!"
           ]
-        }
-      },
-      {
-        "line": 9,
-        "title": "다른 id = 새 객체",
-        "explanation": "**id가 바뀌었습니다!**\n\n이건 `s`가 이제 완전히 다른 문자열 객체를 가리킨다는 증명입니다.\n\n**핵심:** `.upper()`, `.replace()`, `.strip()` 같은 문자열 메서드도 새 문자열을 반환합니다 - 원래 것을 수정하지 않습니다.",
-        "highlight": [9],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "s", "pointsTo": "str_Hello" }
-          ],
-          "objects": [
-            { "id": "str_Hello", "type": "str", "value": "\"Hello\"", "pyId": "140099" }
-          ],
-          "output": ["s = hello, id = 140001", "변경 후: s = Hello, id = 140099"]
         }
       }
     ]
   },
   "quiz": {
-    "question": "이 코드의 출력은?\n\nname = \"alice\"\nname.upper()\nprint(name)",
+    "question": "다음 중 while문이 영원히 멈추지 않는(무한 루프) 경우는?",
     "options": [
-      "ALICE",
-      "alice",
-      "Alice",
-      "에러"
+      "while False: print(1)",
+      "i=5\nwhile i > 0: i -= 1",
+      "while True: print('Run')",
+      "while 1 == 0: pass"
     ],
-    "correctIndex": 1,
-    "explanation": "name.upper()는 새 문자열 \"ALICE\"를 반환하지만 저장하지 않았습니다! 원래 'name'은 여전히 \"alice\"를 가리킵니다. name을 바꾸려면: name = name.upper()"
+    "correctIndex": 2,
+    "explanation": "`while True:`는 종료 조건이 없으면 영원히 실행됩니다. `Ctrl + C`로 강제 종료해야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "s[0] = 'X'는 첫 글자를 바꾼다",
-      "correct": "s[0] = 'X'는 문자열이 불변이라 TypeError를 일으킨다",
-      "why": "리스트와 달리 문자열은 제자리에서 수정할 수 없습니다. 새 문자열을 만들어야 합니다."
-    },
-    {
-      "wrong": "s.upper()는 s를 대문자로 바꾼다",
-      "correct": "s.upper()는 새 문자열을 반환하고 s는 그대로다",
-      "why": "모든 문자열 메서드는 새 문자열을 반환합니다. 원래 것을 절대 수정하지 않습니다."
-    },
-    {
-      "wrong": "문자열 '수정'은 비효율적이다",
-      "correct": "파이썬이 내부적으로 많은 문자열 연산을 최적화한다",
-      "why": "새 객체를 만들긴 하지만, 파이썬은 문자열 인터닝 같은 여러 최적화를 사용합니다."
+      "wrong": "count-- 가 있다",
+      "correct": "파이썬에는 `++`, `--` 연산자가 없습니다.",
+      "why": "`i += 1` 또는 `i -= 1`을 써야 합니다."
     }
   ],
-  "keyTakeaway": "문자열은 불변(IMMUTABLE)! s[0] = 'X'는 에러. 문자열 메서드는 새 문자열을 반환!"
+  "keyTakeaway": "while은 조건이 참일 때 돈다. 변수 값을 바꿔서 언젠가 멈추게 해야 한다."
 }

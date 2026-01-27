@@ -1,5 +1,5 @@
 import React from 'react';
-import type { SupportedLanguage } from '@/services/simulator';
+import type { SupportedLanguage } from '@/types/simulator';
 
 interface LanguageBadgeProps {
   language: SupportedLanguage;
@@ -10,6 +10,7 @@ const languageStyles: Record<SupportedLanguage, { bg: string; text: string; bord
   python: { bg: '#dcfce7', text: '#16a34a', border: '#86efac' },
   java: { bg: '#fff7ed', text: '#f97316', border: '#fdba74' },
   javascript: { bg: '#fefce8', text: '#eab308', border: '#fde047' },
+  'python-practical': { bg: '#f1f5f9', text: '#475569', border: '#cbd5e1' },
 };
 
 export function LanguageBadge({ language }: LanguageBadgeProps) {

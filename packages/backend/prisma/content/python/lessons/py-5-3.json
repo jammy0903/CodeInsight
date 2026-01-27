@@ -1,111 +1,64 @@
 {
   "lessonId": "py-5-3",
-  "title": "nonlocal 키워드 (클로저)",
-  "concept": "중첩 함수에서 바깥 함수의 변수를 수정하려면 nonlocal!",
+  "title": "Constructor (__init__)",
+  "concept": "객체가 태어날 때 자동으로 호출되는 초기화 메서드",
   "content": {
-    "code": "def outer():\n    count = 0\n    \n    def inner():\n        nonlocal count\n        count += 1\n        return count\n    \n    return inner\n\ncounter = outer()\nprint(counter())  # 1\nprint(counter())  # 2\nprint(counter())  # 3",
+    "code": "class User:\n    # 생성자 (Constructor)\n    def __init__(self, name, age):\n        print(f\"Creating user {name}...\")\n        self.name = name\n        self.age = age\n\n    def introduce(self):\n        print(f\"I am {self.name}, {self.age} years old.\")\n\n# 객체 생성 시 __init__ 자동 호출\nu = User(\"Alice\", 20)\nu.introduce()",
     "steps": [
       {
-        "line": 1,
-        "title": "외부 함수 정의",
-        "explanation": "`outer()`는 내부에 `count` 변수를 가집니다.\n\n그리고 `inner()` 함수를 정의해서 반환합니다.\n\n**클로저(Closure):** 내부 함수가 외부 함수의 변수를 기억하는 것!",
-        "highlight": [1, 2, 3, 9],
+        "line": 3,
+        "title": "__init__ 메서드",
+        "explanation": "**매직 메서드(Magic Method):** 앞뒤에 `__`가 붙은 메서드는 파이썬이 특별한 상황에 자동으로 부릅니다.\n\n`__init__`은 **객체를 생성할 때(`User(...)`)** 자동으로 실행됩니다.\n주로 속성(`self.name` 등)을 초기화하는 용도입니다.",
+        "highlight": [
+          3,
+          4,
+          5,
+          6
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
-            { "name": "outer", "pointsTo": "func_outer" }
-          ],
-          "objects": [
-            { "id": "func_outer", "type": "function", "value": "outer()", "pyId": "140100", "highlight": true }
-          ]
-        }
-      },
-      {
-        "line": 5,
-        "title": "nonlocal 선언",
-        "explanation": "`nonlocal count`가 핵심!\n\n**의미:** \"count는 내 로컬도 아니고, 글로벌도 아니야. 바깥 함수(outer)의 변수야!\"\n\n**global vs nonlocal:**\n- `global` → 글로벌 스코프\n- `nonlocal` → 바깥 함수 스코프 (Enclosing)",
-        "highlight": [5],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "outer", "pointsTo": "func_outer" }
-          ],
-          "objects": [
-            { "id": "func_outer", "type": "function", "value": "outer()", "pyId": "140100" }
-          ]
-        }
-      },
-      {
-        "line": 11,
-        "title": "클로저 생성",
-        "explanation": "`counter = outer()` 호출 시:\n\n1. `outer()` 실행\n2. `count = 0` 생성\n3. `inner` 함수 생성 (count를 기억!)\n4. `inner` 함수 반환\n\n**놀라운 점:** outer()는 끝났지만 count는 살아있음!",
-        "highlight": [11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "counter", "pointsTo": "closure" }
-          ],
-          "objects": [
-            { "id": "closure", "type": "function", "value": "inner() [count=0]", "pyId": "140200", "highlight": true }
+          "output": [
+            "Creating user Alice..."
           ]
         }
       },
       {
         "line": 12,
-        "title": "첫 번째 호출",
-        "explanation": "`counter()` 호출:\n\n1. `nonlocal count` → 클로저의 count 참조\n2. `count += 1` → 0 + 1 = 1\n3. return 1\n\n**클로저가 count를 \"기억\"하고 있음!**",
-        "highlight": [12],
+        "title": "인자 전달",
+        "explanation": "`User(\"Alice\", 20)`의 인자들은 고스란히 `__init__`의 `name`, `age`로 전달됩니다.\n`self`는 자동으로 처리되니 신경 안 써도 됩니다.",
+        "highlight": [
+          12
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
-            { "name": "counter", "pointsTo": "closure" }
-          ],
           "objects": [
-            { "id": "closure", "type": "function", "value": "inner() [count=1]", "pyId": "140200", "highlight": true }
-          ],
-          "output": ["1"]
-        }
-      },
-      {
-        "line": 13,
-        "title": "두 번째, 세 번째 호출",
-        "explanation": "호출할 때마다 count가 증가!\n\n**클로저의 힘:**\n- 함수가 자기만의 상태(state)를 가짐\n- 마치 객체처럼 동작!\n\n이게 바로 **함수형 프로그래밍**의 핵심 개념.",
-        "highlight": [13, 14],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "counter", "pointsTo": "closure" }
-          ],
-          "objects": [
-            { "id": "closure", "type": "function", "value": "inner() [count=3]", "pyId": "140200" }
-          ],
-          "output": ["1", "2", "3"]
+            {
+              "id": "u",
+              "type": "User",
+              "value": "{'name': 'Alice', 'age': 20}"
+            }
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "nonlocal 없이 count += 1 하면?",
+    "question": "파이썬 생성자의 정확한 이름은?",
     "options": [
-      "정상 동작",
-      "NameError",
-      "UnboundLocalError",
-      "SyntaxError"
+      "User()",
+      "__create__",
+      "__init__",
+      "constructor"
     ],
     "correctIndex": 2,
-    "explanation": "nonlocal 없으면 count는 inner의 로컬 변수로 취급됩니다. += 연산에서 아직 정의 안 된 로컬 변수를 읽으려 해서 UnboundLocalError!"
+    "explanation": "initialize(초기화)의 약자인 `__init__`입니다. 언더바가 양쪽에 두 개씩(`__`) 있습니다. (일명 '던더 이닛')"
   },
   "misconceptions": [
     {
-      "wrong": "global을 쓰면 바깥 함수의 변수에 접근할 수 있다",
-      "correct": "global은 글로벌만, 바깥 함수 스코프는 nonlocal로!",
-      "why": "LEGB 규칙에서 E(Enclosing)는 nonlocal, G(Global)는 global입니다."
-    },
-    {
-      "wrong": "함수가 끝나면 그 안의 변수는 무조건 사라진다",
-      "correct": "클로저가 참조하면 변수가 살아남는다",
-      "why": "클로저는 외부 함수의 변수를 캡처(capture)해서 유지합니다."
+      "wrong": "__init__에서 return 값을 줄 수 있다",
+      "correct": "생성자는 반드시 `None`을 반환해야 합니다.",
+      "why": "객체 자체를 반환하는 건 `__new__` 메서드가 할 일이고, `__init__`은 초기화만 담당하기 때문입니다."
     }
   ],
-  "keyTakeaway": "nonlocal은 중첩 함수에서 바깥 함수 변수를 수정할 때! 클로저의 핵심 키워드!"
+  "keyTakeaway": "객체 생성 시 필수 데이터는 `__init__`으로 받아서 세팅하자."
 }

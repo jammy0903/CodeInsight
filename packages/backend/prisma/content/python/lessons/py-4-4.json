@@ -1,154 +1,77 @@
 {
   "lessonId": "py-4-4",
-  "title": "The Mutable Default Argument Trap",
-  "concept": "Default arguments are evaluated ONCE at function definition time, not at each call",
+  "title": "Modules & Imports",
+  "concept": "다른 파일에 있는 코드를 가져와서 사용한다 (라이브러리)",
   "content": {
-    "code": "def add_item(item, items=[]):\n    items.append(item)\n    return items\n\nresult1 = add_item('apple')\nprint(result1)\n\nresult2 = add_item('banana')\nprint(result2)\n\nresult3 = add_item('cherry')\nprint(result3)",
+    "code": "import math\n\n# 1. 모듈 전체 가져오기\nprint(math.pi)\nprint(math.sqrt(16))\n\n# 2. 특정 함수만 가져오기\nfrom random import randint\nprint(randint(1, 10))\n\n# 3. 별명 붙이기 (Alias)\nimport datetime as dt\nnow = dt.datetime.now()\nprint(now)",
     "steps": [
       {
         "line": 1,
-        "title": "Function definition with default list",
-        "explanation": "**THE WORST PYTHON BUG**\n\n`def add_item(item, items=[]):`\n\nLooks innocent, right? But this line contains one of Python's most notorious gotchas!\n\n**What happens at definition time:**\n- Python creates ONE list object `[]` as the default\n- This SAME object will be used for ALL calls that don't pass `items`\n\n**The trap:** The default `[]` is created ONCE, not per call!",
-        "highlight": [1, 2, 3],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "add_item", "pointsTo": "func1" }
-          ],
-          "objects": [
-            { "id": "func1", "type": "function", "value": "add_item(item, items=[])", "pyId": "func_001", "defaults": ["[]"] }
+        "title": "import math",
+        "explanation": "수학 관련 기능이 담긴 표준 라이브러리 `math`를 불러옵니다.\n이제 `math.`을 찍으면 그 안의 모든 도구를 쓸 수 있습니다.",
+        "highlight": [
+          1,
+          4,
+          5
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "3.14159...",
+            "4.0"
           ]
-        }
-      },
-      {
-        "line": 5,
-        "title": "First call: add_item('apple')",
-        "explanation": "First call without `items` argument.\n\nPython uses the default list.\n- `item` = 'apple'\n- `items` = the ONE default list (currently empty)\n\n`items.append('apple')` mutates the default list!",
-        "highlight": [5],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "add_item", "pointsTo": "func1" },
-            { "name": "item", "pointsTo": "str1" },
-            { "name": "items", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "func1", "type": "function", "value": "add_item", "pyId": "func_001" },
-            { "id": "str1", "type": "str", "value": "'apple'", "pyId": "str_001" },
-            { "id": "default_list", "type": "list", "value": "['apple']", "pyId": "list_001", "highlight": true, "isDefault": true }
-          ]
-        }
-      },
-      {
-        "line": 6,
-        "title": "result1 = ['apple'] - Expected",
-        "explanation": "First result is `['apple']`.\n\nLooks correct! But the default list is now `['apple']`, not `[]`.\n\n**The problem is building up...**",
-        "highlight": [6],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "result1", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "default_list", "type": "list", "value": "['apple']", "pyId": "list_001", "isDefault": true }
-          ],
-          "output": ["['apple']"]
         }
       },
       {
         "line": 8,
-        "title": "Second call: WHERE'S THE BUG?!",
-        "explanation": "**THE BUG APPEARS!**\n\n`add_item('banana')` uses the SAME default list.\n\nBut that list is NOT empty anymore - it's `['apple']` from the first call!\n\n`items.append('banana')` adds to it:\n`['apple', 'banana']`\n\n**You expected ['banana'] but got ['apple', 'banana']!**",
-        "highlight": [8],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "result1", "pointsTo": "default_list" },
-            { "name": "result2", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "default_list", "type": "list", "value": "['apple', 'banana']", "pyId": "list_001", "highlight": true, "isDefault": true }
-          ],
-          "output": ["['apple']"]
-        }
-      },
-      {
-        "line": 9,
-        "title": "Surprise output!",
-        "explanation": "**Expected:** `['banana']`\n**Actual:** `['apple', 'banana']`\n\nThe default list REMEMBERS previous calls!\n\n**This bug is SO common:**\n- Called 'The WORST noob error' (2025 YouTube)\n- Appears in ~80% of Python interviews\n- Listed in every 'Python Gotchas' article",
-        "highlight": [9],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "result1", "pointsTo": "default_list" },
-            { "name": "result2", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "default_list", "type": "list", "value": "['apple', 'banana']", "pyId": "list_001", "isDefault": true }
-          ],
-          "output": ["['apple']", "['apple', 'banana']"]
-        }
-      },
-      {
-        "line": 11,
-        "title": "Third call: It keeps growing!",
-        "explanation": "By now you know what happens.\n\nThe default list is `['apple', 'banana']`.\n\n`items.append('cherry')` makes it `['apple', 'banana', 'cherry']`.\n\n**All three results point to the SAME list!**",
-        "highlight": [11, 12],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "result1", "pointsTo": "default_list" },
-            { "name": "result2", "pointsTo": "default_list" },
-            { "name": "result3", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "default_list", "type": "list", "value": "['apple', 'banana', 'cherry']", "pyId": "list_001", "isDefault": true, "highlight": true }
-          ],
-          "output": ["['apple']", "['apple', 'banana']", "['apple', 'banana', 'cherry']"]
+        "title": "from ... import",
+        "explanation": "`math.sqrt` 처럼 매번 모듈 이름을 쓰기 귀찮으면,\n`from 모듈 import 함수`를 써서 함수만 쏙 꺼내올 수 있습니다.",
+        "highlight": [
+          8,
+          9
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "(Random Number)"
+          ]
         }
       },
       {
         "line": 12,
-        "title": "THE FIX: Use None!",
-        "explanation": "**GOLDEN RULE: Never use mutable defaults!**\n\n```python\ndef add_item(item, items=None):\n    if items is None:\n        items = []  # Fresh list each call!\n    items.append(item)\n    return items\n```\n\n**Why this works:**\n- `None` is immutable, safe as default\n- `items = []` runs at CALL time\n- Each call gets a FRESH empty list\n\n**Linting tools** (PyLint, Flake8) warn about mutable defaults!",
-        "highlight": [],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [],
-          "objects": [],
-          "output": ["['apple']", "['apple', 'banana']", "['apple', 'banana', 'cherry']"],
-          "fix": "def add_item(item, items=None):\n    if items is None:\n        items = []\n    items.append(item)\n    return items"
+        "title": "as (별명)",
+        "explanation": "이름이 너무 길면 `as`로 줄여 부를 수 있습니다.\n데이터 분석에서 `import pandas as pd`, `import numpy as np`는 국룰입니다.",
+        "highlight": [
+          12,
+          13,
+          14
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "2026-01-27 ..."
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What's wrong with this function?\n\ndef log_message(msg, log=[]):\n    log.append(msg)\n    return log",
+    "question": "내가 만든 `my_lib.py`를 다른 파일에서 불러오려면?",
     "options": [
-      "Nothing wrong, it works correctly",
-      "The log list grows across all calls - should use None default",
-      "append() doesn't work on lists",
-      "msg should have a default too"
+      "include my_lib",
+      "import my_lib.py",
+      "import my_lib",
+      "require my_lib"
     ],
-    "correctIndex": 1,
-    "explanation": "This is the mutable default argument bug! The log list is created ONCE and reused. Each call adds to the SAME list. Fix: def log_message(msg, log=None): if log is None: log = []"
+    "correctIndex": 2,
+    "explanation": "확장자 `.py`는 빼고 파일 이름만 `import` 하면 됩니다. (단, 같은 폴더에 있거나 경로가 설정되어 있어야 합니다)"
   },
   "misconceptions": [
     {
-      "wrong": "Default arguments are created fresh for each function call",
-      "correct": "Default arguments are evaluated ONCE when the function is DEFINED",
-      "why": "The def line runs once. The default object is created then and reused for all calls."
-    },
-    {
-      "wrong": "Using [] as default is fine since it looks empty",
-      "correct": "[] creates ONE list object that persists across calls",
-      "why": "That 'empty' list gets mutated and keeps growing with each call."
-    },
-    {
-      "wrong": "This bug is rare in real code",
-      "correct": "This is one of the most common Python bugs - appears in ~80% of interviews",
-      "why": "The Hitchhiker's Guide, Toptal Top 10, every 'Python Gotchas' list includes this."
+      "wrong": "from import * 은 편하고 좋다",
+      "correct": "가능하면 쓰지 마세요 (Wildcard Import).",
+      "why": "모듈 안의 모든 이름을 다 가져오면, 내 코드의 변수 이름과 겹쳐서 충돌(Name Conflict)이 날 수 있고 출처를 알기 어렵습니다."
     }
   ],
-  "keyTakeaway": "NEVER use mutable defaults ([], {}). Use None and create fresh objects inside the function!"
+  "keyTakeaway": "남이 만든 바퀴(라이브러리)를 `import` 해서 쓰자. `*.py` 빼고 이름만!"
 }

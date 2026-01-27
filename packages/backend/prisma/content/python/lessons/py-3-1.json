@@ -1,127 +1,79 @@
 {
   "lessonId": "py-3-1",
-  "title": "List Creation and Modification",
-  "concept": "Lists CAN be modified in place - unlike integers and strings!",
+  "title": "Lists (Mutable)",
+  "concept": "순서가 있고 수정 가능한 데이터 모음",
   "content": {
-    "code": "lst = [1, 2, 3]\nprint(f\"lst = {lst}, id = {id(lst)}\")\n\nlst[0] = 100\nprint(f\"After lst[0] = 100: {lst}, id = {id(lst)}\")\n\nlst.append(4)\nprint(f\"After append(4): {lst}, id = {id(lst)}\")",
+    "code": "# 1. 리스트 생성\nfruits = [\"Apple\", \"Banana\"]\n\n# 2. 추가/수정 (Mutable)\nfruits.append(\"Orange\")\nfruits[0] = \"Grape\"\n\n# 3. 삭제\ndel fruits[1] # Banana 삭제\n\nprint(fruits)",
     "steps": [
       {
-        "line": 1,
-        "title": "Create a list object",
-        "explanation": "`lst = [1, 2, 3]` creates a list object.\n\n**Lists are MUTABLE** - unlike integers and strings, they CAN be modified in place!",
-        "highlight": [1],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "lst", "pointsTo": "list_1" }
-          ],
-          "objects": [
-            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140500", "highlight": true }
-          ]
-        }
-      },
-      {
         "line": 2,
-        "title": "Note the id",
-        "explanation": "Let's record this id. For mutable objects, the id stays the SAME after modification!\n\nThis is the key difference from immutable objects.",
-        "highlight": [2],
+        "title": "리스트 생성",
+        "explanation": "**`[...]`**: 대괄호로 만듭니다.\n순서가 중요하며(Ordered), 인덱스 0부터 시작합니다.",
+        "highlight": [
+          2
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "lst", "pointsTo": "list_1" }
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140500" }
-          ],
-          "output": ["lst = [1, 2, 3], id = 140500"]
-        }
-      },
-      {
-        "line": 4,
-        "title": "lst[0] = 100 - SAME object modified!",
-        "explanation": "**UNLIKE strings, this WORKS!**\n\n`lst[0] = 100` modifies the list IN PLACE.\n\n**Key difference from immutable:**\n- Integer: `a = a + 1` creates NEW object\n- List: `lst[0] = 100` modifies EXISTING object\n\nThe list object itself changes. No new list is created.",
-        "highlight": [4],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "lst", "pointsTo": "list_1" }
-          ],
-          "objects": [
-            { "id": "list_1", "type": "list", "value": "[100, 2, 3]", "pyId": "140500", "highlight": true }
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]"
+            }
           ]
         }
       },
       {
         "line": 5,
-        "title": "SAME id! Same object!",
-        "explanation": "**The id is unchanged!**\n\nThis PROVES the same object was modified.\n\nCompare to integers where `a += 1` changes the id (creates new object).",
-        "highlight": [5],
+        "title": "Mutable (수정 가능)",
+        "explanation": "**`append`**: 뒤에 붙입니다.\n**`fruits[0] = ...`**: 내용을 바꿉니다.\n\n중요한 건, **새 리스트를 만드는 게 아니라 기존 리스트 내용물만 바뀐다는 점**입니다. (id가 그대로 유지됨)",
+        "highlight": [
+          5,
+          6
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "lst", "pointsTo": "list_1" }
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "list_1", "type": "list", "value": "[100, 2, 3]", "pyId": "140500" }
-          ],
-          "output": ["lst = [1, 2, 3], id = 140500", "After lst[0] = 100: [100, 2, 3], id = 140500"]
-        }
-      },
-      {
-        "line": 7,
-        "title": "append() also modifies in place",
-        "explanation": "`lst.append(4)` adds 4 to the end of the SAME list object.\n\nNo new list is created. The existing list grows.\n\n**Most list methods modify in place:**\n- `append()`, `extend()`, `insert()`\n- `remove()`, `pop()`, `clear()`\n- `sort()`, `reverse()`",
-        "highlight": [7],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "lst", "pointsTo": "list_1" }
-          ],
-          "objects": [
-            { "id": "list_1", "type": "list", "value": "[100, 2, 3, 4]", "pyId": "140500", "highlight": true }
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Grape\", \"Banana\", \"Orange\"]",
+              "highlight": true
+            }
           ]
-        }
-      },
-      {
-        "line": 8,
-        "title": "Still the same object!",
-        "explanation": "**The id is STILL the same!**\n\nAll modifications happened to the same list object.\n\n**WARNING:** This means if another variable points to this list, it sees ALL changes!",
-        "highlight": [8],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "lst", "pointsTo": "list_1" }
-          ],
-          "objects": [
-            { "id": "list_1", "type": "list", "value": "[100, 2, 3, 4]", "pyId": "140500" }
-          ],
-          "output": ["lst = [1, 2, 3], id = 140500", "After lst[0] = 100: [100, 2, 3], id = 140500", "After append(4): [100, 2, 3, 4], id = 140500"]
         }
       }
     ]
   },
   "quiz": {
-    "question": "After lst.sort(), does lst have a new id?",
+    "question": "다음 중 리스트의 특징이 아닌 것은?",
     "options": [
-      "Yes, sort creates a new sorted list",
-      "No, sort modifies the list in place",
-      "Depends on the list size",
-      "Error, lists can't be sorted"
+      "순서가 있다 (Ordered)",
+      "내용을 바꿀 수 있다 (Mutable)",
+      "중복된 값을 허용하지 않는다",
+      "어떤 타입이든 섞어서 담을 수 있다"
     ],
-    "correctIndex": 1,
-    "explanation": "lst.sort() modifies the list IN PLACE and returns None. The id stays the same. (Compare to sorted(lst) which creates a NEW list!)"
+    "correctIndex": 2,
+    "explanation": "리스트는 중복을 허용합니다(`[1, 1, 1]` 가능). 중복을 허용하지 않는 것은 **세트(Set)**입니다."
   },
   "misconceptions": [
     {
-      "wrong": "Lists work like strings - operations create new lists",
-      "correct": "Lists are mutable - most operations modify in place",
-      "why": "This is the fundamental difference between mutable and immutable types."
-    },
-    {
-      "wrong": "lst.append(x) returns the new list",
-      "correct": "lst.append(x) returns None - it modifies lst directly",
-      "why": "Methods that modify in place typically return None to signal this."
+      "wrong": "리스트를 복사하면(b=a) 따로따로 쓸 수 있다",
+      "correct": "단순 할당은 '얕은 복사'도 아니고 그냥 주소 공유입니다.",
+      "why": "복사본을 만들려면 `b = a[:]`나 `b = list(a)`를 써야 합니다."
     }
   ],
-  "keyTakeaway": "Lists are MUTABLE - modifications happen in place. The id stays the same!"
+  "keyTakeaway": "리스트는 맘대로 바꾸고 늘리고 줄일 수 있는 만능 가방이다."
 }

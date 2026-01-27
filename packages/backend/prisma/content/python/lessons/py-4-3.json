@@ -1,133 +1,57 @@
 {
   "lessonId": "py-4-3",
-  "title": "Default Argument Trap",
-  "concept": "Mutable default arguments are shared between calls - a classic Python gotcha!",
+  "title": "Lambda Functions",
+  "concept": "이름 없는 한 줄짜리 함수 (익명 함수)",
   "content": {
-    "code": "def add_item(item, items=[]):\n    items.append(item)\n    return items\n\nresult1 = add_item(\"apple\")\nprint(f\"result1: {result1}\")\n\nresult2 = add_item(\"banana\")\nprint(f\"result2: {result2}\")\n\nprint(f\"result1 is result2: {result1 is result2}\")",
+    "code": "# 일반 함수\ndef add(x, y):\n    return x + y\n\n# 람다 함수 (동일한 기능)\nadd_lambda = lambda x, y: x + y\n\nprint(add(2, 3))\nprint(add_lambda(2, 3))\n\n# 활용: 정렬 키\npairs = [(1, 'one'), (3, 'three'), (2, 'two')]\npairs.sort(key=lambda p: p[1]) # 두 번째 요소(글자)로 정렬\nprint(pairs)",
     "steps": [
       {
-        "line": 1,
-        "title": "Function with default list",
-        "explanation": "`def add_item(item, items=[])` defines a function with a **default mutable argument**.\n\n**THE TRAP:** The default `[]` is created ONCE when the function is defined, not on each call!\n\nThis single list object is reused for every call.",
-        "highlight": [1, 2, 3],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "add_item", "pointsTo": "func_add" }
-          ],
-          "objects": [
-            { "id": "func_add", "type": "function", "value": "add_item(item, items=[])", "pyId": "140100", "highlight": true },
-            { "id": "default_list", "type": "list", "value": "[]", "pyId": "140200" }
-          ]
-        }
-      },
-      {
-        "line": 5,
-        "title": "First call",
-        "explanation": "`add_item(\"apple\")` - no second argument, so `items` uses the default.\n\nThe function appends \"apple\" to the DEFAULT list.",
-        "highlight": [5],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "add_item", "pointsTo": "func_add" },
-            { "name": "result1", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "func_add", "type": "function", "value": "add_item(item, items=[...])", "pyId": "140100" },
-            { "id": "default_list", "type": "list", "value": "[apple]", "pyId": "140200", "highlight": true }
-          ]
-        }
-      },
-      {
         "line": 6,
-        "title": "First result",
-        "explanation": "`result1: ['apple']` - looks correct!\n\nBut notice: `result1` points to the **same list** that's stored as the default.",
-        "highlight": [6],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "result1", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "default_list", "type": "list", "value": "[apple]", "pyId": "140200" }
-          ],
-          "output": ["result1: ['apple']"]
+        "title": "lambda 문법",
+        "explanation": "**`lambda 인자: 표현식`**\n`return` 키워드 없이 결과값만 딱 적습니다.\n주로 다른 함수의 인자(`key`, `callback`)로 잠깐 쓰고 버릴 때 사용합니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": []
         }
       },
       {
-        "line": 8,
-        "title": "Second call - THE SURPRISE!",
-        "explanation": "`add_item(\"banana\")` - again uses the default.\n\nBut the default is **still the same list** from before!\n\nIt now contains \"apple\" from the first call.",
-        "highlight": [8],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "result1", "pointsTo": "default_list" },
-            { "name": "result2", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "default_list", "type": "list", "value": "[apple, banana]", "pyId": "140200", "highlight": true }
+        "line": 13,
+        "title": "실전 활용 (sort)",
+        "explanation": "`key=lambda p: p[1]`\n\"리스트의 각 요소 `p`를 받아서, 정렬 기준으로 `p[1]`을 써라\"라는 뜻입니다.\n이거 없이 별도 함수(`def get_second...`)를 만들면 코드가 길어집니다.",
+        "highlight": [
+          13
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "5",
+            "5",
+            "[(1, 'one'), (3, 'three'), (2, 'two')]"
           ]
-        }
-      },
-      {
-        "line": 9,
-        "title": "Unexpected result!",
-        "explanation": "**SURPRISE!**\n\n`result2: ['apple', 'banana']`\n\nWe expected just `['banana']`, but got both items!\n\n**Why?** Both calls modified the SAME default list.",
-        "highlight": [9],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "result1", "pointsTo": "default_list" },
-            { "name": "result2", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "default_list", "type": "list", "value": "[apple, banana]", "pyId": "140200" }
-          ],
-          "output": ["result1: ['apple']", "result2: ['apple', 'banana']"]
-        }
-      },
-      {
-        "line": 11,
-        "title": "They're the SAME object!",
-        "explanation": "`result1 is result2` → **True**!\n\nBoth return values are the SAME list object.\n\n**THE FIX:** Use `None` as default:\n```python\ndef add_item(item, items=None):\n    if items is None:\n        items = []\n    items.append(item)\n    return items\n```",
-        "highlight": [11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "result1", "pointsTo": "default_list" },
-            { "name": "result2", "pointsTo": "default_list" }
-          ],
-          "objects": [
-            { "id": "default_list", "type": "list", "value": "[apple, banana]", "pyId": "140200" }
-          ],
-          "output": ["result1: ['apple']", "result2: ['apple', 'banana']", "result1 is result2: True"]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What's the correct way to have a default empty list?",
+    "question": "람다 함수에 대한 설명으로 틀린 것은?",
     "options": [
-      "def f(items=[])",
-      "def f(items=list())",
-      "def f(items=None): if items is None: items = []",
-      "def f(items={})"
+      "이름이 없다 (익명 함수)",
+      "여러 줄의 복잡한 로직을 담을 수 있다",
+      "표현식(Expression) 하나만 올 수 있다",
+      "변수에 할당해서 쓸 수 있다"
     ],
-    "correctIndex": 2,
-    "explanation": "Use None as default, then create a new list inside the function. This creates a fresh list on each call. Options A and B both create a single shared object at definition time."
+    "correctIndex": 1,
+    "explanation": "람다는 오직 **단일 표현식**만 가능합니다. `if-else`도 한 줄(`True if cond else False`)로 써야 하며, 여러 줄이나 복잡한 문장(`for`, `while`)은 못 씁니다."
   },
   "misconceptions": [
     {
-      "wrong": "Default arguments are evaluated on each call",
-      "correct": "Default arguments are evaluated ONCE at function definition",
-      "why": "The default object is created when 'def' runs, not when the function is called."
-    },
-    {
-      "wrong": "Using list() instead of [] fixes the problem",
-      "correct": "list() has the same problem - it's evaluated once at definition",
-      "why": "Any mutable default ([], {}, set()) is shared between calls."
+      "wrong": "람다는 일반 함수보다 빠르다",
+      "correct": "속도 차이는 없습니다.",
+      "why": "단지 코드를 간결하게(Syntactic Sugar) 만드는 용도일 뿐, 내부적으로는 똑같은 Function 객체입니다."
     }
   ],
-  "keyTakeaway": "NEVER use mutable defaults ([], {}, set()). Use None and create a new object inside!"
+  "keyTakeaway": "간단한 함수는 `lambda`로 한 줄 컷! 정렬이나 필터링에 아주 유용하다."
 }

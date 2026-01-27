@@ -1,133 +1,65 @@
 {
   "lessonId": "py-4-2",
-  "title": "Pass by Assignment",
-  "concept": "Python is neither pass-by-value nor pass-by-reference - it's pass-by-assignment!",
+  "title": "Arguments & Return",
+  "concept": "함수에 값을 전달하고(Argument) 결과를 받아온다(Return)",
   "content": {
-    "code": "def modify(num, lst):\n    num = num + 10\n    lst.append(4)\n    print(f\"Inside: num={num}, lst={lst}\")\n\nx = 5\nmy_list = [1, 2, 3]\n\nprint(f\"Before: x={x}, my_list={my_list}\")\nmodify(x, my_list)\nprint(f\"After: x={x}, my_list={my_list}\")",
+    "code": "def add(a, b=10):\n    return a + b\n\n# 1. 위치 인자 (Positional)\nres1 = add(5, 3) # 5+3\n\n# 2. 키워드 인자 (Keyword)\nres2 = add(b=5, a=3) # 순서 바꿔도 OK\n\n# 3. 디폴트 인자 (Default)\nres3 = add(7) # 7+10 (b는 기본값)\n\nprint(res1, res2, res3)",
     "steps": [
       {
-        "line": 6,
-        "title": "Create variables",
-        "explanation": "We have:\n- `x` pointing to integer 5 (immutable)\n- `my_list` pointing to list [1,2,3] (mutable)\n\nLet's see what happens when we pass them to a function!",
-        "highlight": [6, 7],
+        "line": 1,
+        "title": "매개변수와 디폴트 값",
+        "explanation": "**`b=10`**: 호출할 때 `b` 값을 안 주면 자동으로 10을 씁니다.\n유연한 함수를 만들 때 필수입니다.",
+        "highlight": [
+          1
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "int_5" },
-            { "name": "my_list", "pointsTo": "list_123" }
-          ],
-          "objects": [
-            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
-            { "id": "list_123", "type": "list", "value": "[1, 2, 3]", "pyId": "140800", "highlight": true }
-          ]
+          "note": "add 함수 정의됨"
         }
       },
       {
-        "line": 10,
-        "title": "Call the function",
-        "explanation": "**What happens on function call:**\n\n1. `num = x` → `num` points to SAME object as `x` (integer 5)\n2. `lst = my_list` → `lst` points to SAME object as `my_list` (the list)\n\n**This is PASS BY ASSIGNMENT!**\n\nParameters are bound to the same objects as the arguments.",
-        "highlight": [10],
+        "line": 9,
+        "title": "키워드 인자",
+        "explanation": "**`이름=값`** 형태로 전달하면 순서를 신경 쓰지 않아도 됩니다.\n인자가 많을 때 가독성이 엄청나게 좋아집니다.",
+        "highlight": [
+          9
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "x", "pointsTo": "int_5" },
-            { "name": "my_list", "pointsTo": "list_123" },
-            { "name": "(param) num", "pointsTo": "int_5" },
-            { "name": "(param) lst", "pointsTo": "list_123" }
+            {
+              "name": "res2",
+              "pointsTo": "int8"
+            }
           ],
           "objects": [
-            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
-            { "id": "list_123", "type": "list", "value": "[1, 2, 3]", "pyId": "140800" }
+            {
+              "id": "int8",
+              "type": "int",
+              "value": "8"
+            }
           ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "num = num + 10 (rebinding)",
-        "explanation": "**Inside the function:**\n\n`num = num + 10` creates a NEW integer 15 and rebinds `num` to it.\n\nBut `x` still points to the original 5!\n\n**Rebinding a local variable doesn't affect the outside variable.**",
-        "highlight": [2],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "int_5" },
-            { "name": "my_list", "pointsTo": "list_123" },
-            { "name": "(param) num", "pointsTo": "int_15" },
-            { "name": "(param) lst", "pointsTo": "list_123" }
-          ],
-          "objects": [
-            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
-            { "id": "int_15", "type": "int", "value": "15", "pyId": "9406520", "highlight": true },
-            { "id": "list_123", "type": "list", "value": "[1, 2, 3]", "pyId": "140800" }
-          ]
-        }
-      },
-      {
-        "line": 3,
-        "title": "lst.append(4) (mutation)",
-        "explanation": "**THIS IS THE KEY DIFFERENCE!**\n\n`lst.append(4)` MUTATES the list object.\n\nSince `lst` and `my_list` point to the SAME object, the change is visible through both!\n\n**Mutating a shared object affects the outside.**",
-        "highlight": [3],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "int_5" },
-            { "name": "my_list", "pointsTo": "list_123" },
-            { "name": "(param) num", "pointsTo": "int_15" },
-            { "name": "(param) lst", "pointsTo": "list_123" }
-          ],
-          "objects": [
-            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
-            { "id": "int_15", "type": "int", "value": "15", "pyId": "9406520" },
-            { "id": "list_123", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "140800", "highlight": true }
-          ]
-        }
-      },
-      {
-        "line": 11,
-        "title": "After the call",
-        "explanation": "**Results:**\n\n- `x` is UNCHANGED (still 5)\n  → We only rebound the local `num`\n\n- `my_list` is CHANGED ([1,2,3,4])\n  → We mutated the shared object\n\n**The Rule:**\n- Rebinding doesn't affect outside\n- Mutation affects outside",
-        "highlight": [11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "int_5" },
-            { "name": "my_list", "pointsTo": "list_123" }
-          ],
-          "objects": [
-            { "id": "int_5", "type": "int", "value": "5", "pyId": "9406200" },
-            { "id": "list_123", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "140800" }
-          ],
-          "output": ["Before: x=5, my_list=[1, 2, 3]", "Inside: num=15, lst=[1, 2, 3, 4]", "After: x=5, my_list=[1, 2, 3, 4]"]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What prints for x?\n\ndef change(x):\n    x = [4, 5, 6]\n\nx = [1, 2, 3]\nchange(x)\nprint(x)",
+    "question": "def func(a, b=[]): ... 의 문제점은?",
     "options": [
-      "[4, 5, 6]",
-      "[1, 2, 3]",
-      "[]",
-      "Error"
+      "문법 에러다",
+      "b의 기본값 리스트가 모든 호출에서 공유된다 (Mutable Default Argument)",
+      "리스트는 디폴트 인자로 쓸 수 없다",
+      "문제 없다"
     ],
     "correctIndex": 1,
-    "explanation": "Inside change(), x = [4,5,6] REBINDS the local x to a new list. It doesn't affect the outside x which still points to [1,2,3]. If we had used x.clear(); x.extend([4,5,6]) it would have mutated the original."
+    "explanation": "리스트 같은 가변 객체(Mutable)를 디폴트로 쓰면, 함수가 실행될 때마다 그 리스트가 계속 재사용됩니다. 데이터가 누적되는 끔찍한 버그가 생깁니다! (대신 `b=None`을 쓰세요)"
   },
   "misconceptions": [
     {
-      "wrong": "Python is pass-by-value",
-      "correct": "Python uses pass-by-assignment (also called pass-by-object-reference)",
-      "why": "The parameter gets bound to the same object as the argument. No copy is made."
-    },
-    {
-      "wrong": "Python is pass-by-reference",
-      "correct": "Rebinding a parameter doesn't change the original variable",
-      "why": "You can't reassign the caller's variable. You can only mutate shared objects."
-    },
-    {
-      "wrong": "Functions can't modify outside data",
-      "correct": "Functions CAN mutate mutable objects passed to them",
-      "why": "Mutation is different from rebinding. Mutation changes the shared object."
+      "wrong": "파이썬은 Call by Value다",
+      "correct": "파이썬은 **Call by Object Reference** (또는 Call by Assignment) 입니다.",
+      "why": "함수에 객체를 넘기면 이름표(참조)가 복사됩니다. 리스트를 넘겨서 내부를 `append`하면 원본도 바뀝니다!"
     }
   ],
-  "keyTakeaway": "Python is PASS-BY-ASSIGNMENT. Rebinding is local. Mutation affects the original!"
+  "keyTakeaway": "키워드 인자로 명확하게! 가변 객체(List)는 절대 디폴트 값으로 쓰지 말자."
 }

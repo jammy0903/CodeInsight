@@ -1,104 +1,99 @@
 {
   "lessonId": "py-1-3",
-  "title": "할당 = 바인딩",
-  "concept": "= 연산자는 이름을 객체에 바인딩한다, 데이터를 복사하지 않는다",
+  "title": "Strings & Indexing",
+  "concept": "문자열은 문자의 나열이며, 인덱싱과 슬라이싱이 강력하다",
   "content": {
-    "code": "a = [1, 2, 3]\na = [4, 5, 6]\n\nb = [1, 2, 3]\nb.append(4)",
+    "code": "s = \"Python\"\n\n# 1. 인덱싱 (Indexing)\nprint(s[0])   # 'P'\nprint(s[-1])  # 'n' (뒤에서 첫 번째!)\n\n# 2. 슬라이싱 (Slicing)\nprint(s[0:2]) # \"Py\" (0부터 2 직전까지)\nprint(s[2:])  # \"thon\" (2부터 끝까지)\n\n# 3. 불변성 (Immutability)\n# s[0] = 'J'  # 에러 발생!\ns = \"J\" + s[1:]\nprint(s)      # \"Jython\"",
     "steps": [
       {
-        "line": 1,
-        "title": "첫 번째 바인딩: a → list1",
-        "explanation": "할당이 정확히 무슨 일을 하는지 추적해봅시다.\n\n`a = [1, 2, 3]`:\n1. 리스트 객체 `[1, 2, 3]` 생성\n2. 이름 `a`를 그 객체에 **바인딩**\n\n**비유:** 가게에서 상품에 라벨을 붙이는 것.",
-        "highlight": [1],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "id_001" }
-          ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "재바인딩: a가 새 객체로 이동!",
-        "explanation": "**핵심 개념: 재바인딩**\n\n`a = [4, 5, 6]`:\n1. 새 리스트 객체 `[4, 5, 6]` 생성\n2. 라벨 `a`를 새 객체로 **이동**\n3. 옛날 `[1, 2, 3]`은 **고아** 됨 (가리키는 라벨 없음)\n\n**옛날 객체는 아직 존재** - 가비지 컬렉션 전까지.\n\n이건 수정이 아니라 재바인딩!",
-        "highlight": [2],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "obj2" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "list", "value": "[1, 2, 3]", "pyId": "id_001", "orphaned": true },
-            { "id": "obj2", "type": "list", "value": "[4, 5, 6]", "pyId": "id_002", "highlight": true }
-          ]
-        }
-      },
-      {
-        "line": 4,
-        "title": "b가 리스트를 가리킴",
-        "explanation": "이제 재바인딩과 변이(mutation)의 차이를 봅시다.\n\n`b = [1, 2, 3]`는 리스트를 만들고 `b`를 바인딩합니다.",
-        "highlight": [4],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "obj2" },
-            { "name": "b", "pointsTo": "obj3" }
-          ],
-          "objects": [
-            { "id": "obj2", "type": "list", "value": "[4, 5, 6]", "pyId": "id_002" },
-            { "id": "obj3", "type": "list", "value": "[1, 2, 3]", "pyId": "id_003" }
-          ]
-        }
-      },
-      {
         "line": 5,
-        "title": "변이: 같은 객체가 변함!",
-        "explanation": "**변이(Mutation) vs 재바인딩**\n\n`b.append(4)`는 `b`를 재바인딩하지 않습니다!\n`b`가 가리키는 **객체를 수정**합니다.\n\n**재바인딩** (`b = [...]`):\n- `b`가 새 객체를 가리키게 됨\n- 옛날 객체는 그대로\n\n**변이** (`b.append(...)`):\n- `b`는 여전히 같은 객체를 가리킴\n- 객체 자체가 변함\n\n이 차이가 함수 인자 이해에 핵심!",
-        "highlight": [5],
+        "title": "인덱싱 (Indexing)",
+        "explanation": "**0부터 시작:** 첫 글자는 `s[0]`입니다.\n**음수 인덱스:** `s[-1]`은 마지막 글자, `s[-2]`는 뒤에서 두 번째입니다. 파이썬만의 꿀기능!",
+        "highlight": [
+          5,
+          6
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "P",
+            "n"
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "슬라이싱 (Slicing)",
+        "explanation": "**`start:end`**\n`start`는 포함, `end`는 **미포함**입니다.\n`s[0:2]`는 인덱스 0, 1만 가져옵니다 (2는 제외).\n\n비우면? `s[2:]`는 \"끝까지\", `s[:2]`는 \"처음부터\"라는 뜻입니다.",
+        "highlight": [
+          9,
+          10
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "Py",
+            "thon"
+          ]
+        }
+      },
+      {
+        "line": 13,
+        "title": "문자열은 불변이다",
+        "explanation": "한 번 만들어진 문자열은 내부를 바꿀 수 없습니다.\n`s[0] = 'J'`처럼 수정하려고 하면 에러가 납니다.\n\n바꾸고 싶다면, 슬라이싱으로 잘라내서 **새로운 문자열**을 만들어야 합니다.",
+        "highlight": [
+          13,
+          14,
+          15,
+          16
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "a", "pointsTo": "obj2" },
-            { "name": "b", "pointsTo": "obj3" }
+            {
+              "name": "s",
+              "pointsTo": "str2"
+            }
           ],
           "objects": [
-            { "id": "obj2", "type": "list", "value": "[4, 5, 6]", "pyId": "id_002" },
-            { "id": "obj3", "type": "list", "value": "[1, 2, 3, 4]", "pyId": "id_003", "highlight": true }
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "7001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Jython\"",
+              "pyId": "7002",
+              "new": true
+            }
+          ],
+          "output": [
+            "Jython"
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "차이점은?\n\nx = x + [4]  # A\nx.append(4)  # B",
+    "question": "s = \"Hello\" 일 때, \"ell\"을 뽑아내는 슬라이싱은?",
     "options": [
-      "완전히 같다",
-      "A는 x를 새 리스트에 재바인딩, B는 기존 리스트를 변이",
-      "A는 변이, B는 재바인딩",
-      "둘 다 새 리스트 생성"
+      "s[1:3]",
+      "s[1:4]",
+      "s[2:4]",
+      "s[1:-1]"
     ],
     "correctIndex": 1,
-    "explanation": "x + [4]는 새 리스트를 만들고, x =로 재바인딩합니다. x.append(4)는 기존 리스트를 직접 변이합니다. 다른 변수가 같은 리스트를 가리키면 append()만 영향을 줍니다!"
+    "explanation": "'e'는 인덱스 1입니다. 'o' 직전까지 뽑아야 하므로 인덱스 4를 끝으로 잡아야 합니다 (0:H, 1:e, 2:l, 3:l, 4:o). 즉, 1부터 4 '직전'까지."
   },
   "misconceptions": [
     {
-      "wrong": "a = new_value는 객체를 수정한다",
-      "correct": "a = new_value는 a가 다른 객체를 가리키게 한다",
-      "why": "할당은 재바인딩이지 수정이 아닙니다. 이름이 새 대상으로 이동합니다."
-    },
-    {
-      "wrong": "x = x + [4]와 x.append(4)는 같다",
-      "correct": "x = x + [4]는 새 리스트에 재바인딩, x.append(4)는 기존 리스트 변이",
-      "why": "여러 이름이 같은 객체를 참조할 때 이 차이가 중요합니다!"
-    },
-    {
-      "wrong": "재할당하면 옛날 객체는 즉시 삭제된다",
-      "correct": "참조가 없는 객체는 나중에 가비지 컬렉션됨",
-      "why": "파이썬의 가비지 컬렉터가 나중에 정리합니다. 즉시 삭제가 아닙니다."
+      "wrong": "문자열의 한 글자만 바꿀 수 있다",
+      "correct": "절대 안 됩니다. 문자열은 **불변(Immutable)**입니다.",
+      "why": "리스트(`list`)는 수정 가능하지만, 튜플(`tuple`)과 문자열(`str`)은 수정 불가능합니다."
     }
   ],
-  "keyTakeaway": "재바인딩(a = ...)은 라벨을 옮긴다. 변이(a.append())는 객체를 바꾼다. 차이를 알아두세요!"
+  "keyTakeaway": "음수 인덱스(-1)와 슬라이싱(:)을 자유자재로 쓰자. 단, 수정은 안 된다."
 }
