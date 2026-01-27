@@ -18,6 +18,7 @@ import { userRoutes } from './modules/users/routes';
 import pythonSimulatorRoutes from './modules/simulators/python/routes';
 import { javaSimulatorRoutes } from './modules/simulators/java/routes';
 import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
+import { standaloneQuizzesRoutes } from './modules/standalone-quizzes/routes';
 import { lessonContentLoader } from './services/lessonContentLoader';
 
 // Firebase Admin 초기화
@@ -63,6 +64,7 @@ app.use('/api/v1/notes', rateLimit, notesRoutes);
 app.use('/api/v1/gamification', rateLimit, gamificationRoutes);
 app.use('/api/v1/admin', rateLimit, adminRoutes);
 app.use('/api/v1/users', rateLimit, userRoutes);
+app.use('/api/v1/standalone-quizzes', rateLimit, standaloneQuizzesRoutes);
 
 // =============================================
 // Legacy Routes (버전 없는 요청 → v1로 리다이렉트)
@@ -99,6 +101,9 @@ app.use('/api/admin', (req, res) => {
 });
 app.use('/api/gamification', (req, res) => {
   res.redirect(301, `/api/v1/gamification${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/standalone-quizzes', (req, res) => {
+  res.redirect(301, `/api/v1/standalone-quizzes${req.path === '/' ? '' : req.path}`);
 });
 
 // Swagger UI
