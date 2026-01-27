@@ -6,7 +6,7 @@
 import { create } from 'zustand';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { Message, RunResult, Step } from '@/types/index';
-import type { SupportedLanguage } from '@/services/simulator';
+import type { SupportedLanguage } from '@/types/simulator';
 
 // App User 타입 (우리 DB의 User)
 export interface OAuthAccountInfo {
