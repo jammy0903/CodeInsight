@@ -10,10 +10,27 @@
         "title": "Promise 생성",
         "explanation": "new Promise()로 Promise 객체를 생성합니다. executor 함수가 즉시 실행됩니다.",
         "keyInsight": "Promise = 미래의 값을 나타내는 객체",
-        "highlight": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "highlight": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "promise", "state": "pending", "value": null }],
+          "promises": [
+            {
+              "id": "promise",
+              "state": "pending",
+              "value": null
+            }
+          ],
           "phase": "executor running"
         }
       },
@@ -21,22 +38,49 @@
         "line": 2,
         "title": "setTimeout 등록",
         "explanation": "비동기 작업(setTimeout)이 시작됩니다. Promise는 아직 pending 상태입니다.",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "promise", "state": "pending", "value": null }],
-          "timer": { "delay": 1000, "status": "waiting" }
+          "promises": [
+            {
+              "id": "promise",
+              "state": "pending",
+              "value": null
+            }
+          ],
+          "timer": {
+            "delay": 1000,
+            "status": "waiting"
+          }
         }
       },
       {
         "line": 12,
         "title": ".then() 등록",
-        "explanation": ".then()으로 성공 핸들러를 등록합니다. Promise가 resolve되면 실행됩니다.",
-        "keyInsight": ".then()은 콜백을 등록만 하고, 실행은 나중에!",
-        "highlight": [12, 13, 14, 15, 16],
+        "explanation": ".then()으로 성공 핸들러를 등록합니다. 이 핸들러는 **Microtask Queue**에 예약됩니다.",
+        "keyInsight": "Promise는 이벤트 루프의 VIP입니다 (Microtask Priority).",
+        "highlight": [
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "promise", "state": "pending", "handlers": [".then(result => ...)", ".then(processed => ...)", ".catch(error => ...)"] }]
+          "promises": [
+            {
+              "id": "promise",
+              "state": "pending",
+              "handlers": [
+                ".then(result => ...)",
+                ".then(processed => ...)",
+                ".catch(error => ...)"
+              ]
+            }
+          ]
         }
       },
       {
@@ -44,21 +88,41 @@
         "title": "resolve() 호출",
         "explanation": "1초 후 resolve('Data loaded!')가 호출됩니다. Promise가 fulfilled 상태가 됩니다.",
         "keyInsight": "resolve() = Promise를 성공 상태로 변경",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "promise", "state": "fulfilled", "value": "'Data loaded!'" }]
+          "promises": [
+            {
+              "id": "promise",
+              "state": "fulfilled",
+              "value": "'Data loaded!'"
+            }
+          ]
         }
       },
       {
         "line": 13,
         "title": "첫 번째 then 실행",
         "explanation": "Promise가 fulfilled되어 첫 번째 .then()의 콜백이 실행됩니다.",
-        "highlight": [13, 14, 15],
+        "highlight": [
+          13,
+          14,
+          15
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "promise", "state": "fulfilled", "value": "'Data loaded!'" }],
-          "output": ["Data loaded!"],
+          "promises": [
+            {
+              "id": "promise",
+              "state": "fulfilled",
+              "value": "'Data loaded!'"
+            }
+          ],
+          "output": [
+            "Data loaded!"
+          ],
           "returnValue": "'Processed: Data loaded!'"
         }
       },
@@ -67,11 +131,23 @@
         "title": "두 번째 then 실행 (체이닝)",
         "explanation": "첫 번째 then의 return 값이 다음 then으로 전달됩니다. 이것이 Promise 체이닝입니다!",
         "keyInsight": ".then()의 return 값 = 다음 .then()의 인자",
-        "highlight": [17, 18, 19],
+        "highlight": [
+          17,
+          18,
+          19
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "promise", "state": "fulfilled" }],
-          "output": ["Data loaded!", "Processed: Data loaded!"],
+          "promises": [
+            {
+              "id": "promise",
+              "state": "fulfilled"
+            }
+          ],
+          "output": [
+            "Data loaded!",
+            "Processed: Data loaded!"
+          ],
           "chaining": true
         }
       }
@@ -79,15 +155,25 @@
   },
   "quiz": {
     "question": "다음 코드의 출력은?\n\nPromise.resolve(1)\n  .then(x => x + 1)\n  .then(x => x * 2)\n  .then(x => console.log(x));",
-    "options": ["1", "2", "4", "undefined"],
+    "options": [
+      "1",
+      "2",
+      "4",
+      "undefined"
+    ],
     "correctIndex": 2,
     "explanation": "1 → +1 → 2 → *2 → 4. 각 then의 return 값이 다음 then으로 전달됩니다."
   },
   "misconceptions": [
     {
       "wrong": ".then()은 즉시 실행된다",
-      "correct": ".then()은 핸들러를 등록만 하고, Promise가 resolve/reject되면 실행됩니다.",
-      "why": ".then() 콜백은 Microtask Queue를 거쳐 실행됩니다."
+      "correct": "Promise가 resolve된 직후가 아니라, 현재 스택이 비워진 후 **Microtask Queue** 순서가 와야 실행됩니다.",
+      "why": "JS 엔진은 '하던 일(Call Stack)'을 절대 멈추지 않습니다. 다 끝나야 큐를 봅니다."
+    },
+    {
+      "wrong": "new Promise() 내부는 비동기다",
+      "correct": "아닙니다. Executor 함수 `(resolve, reject) => { ... }`는 **동기적으로 즉시** 실행됩니다.",
+      "why": "Promise 생성자 자체는 동기입니다. 그 안의 setTimeout 같은 것만 비동기입니다."
     }
   ],
   "keyTakeaway": "Promise = 미래값 객체, .then() 체이닝으로 순차 처리"

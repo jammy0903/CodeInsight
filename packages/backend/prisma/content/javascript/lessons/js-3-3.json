@@ -9,7 +9,21 @@
         "line": 1,
         "title": "user 객체 생성",
         "explanation": "두 개의 메서드를 가진 user 객체를 생성합니다. greetRegular는 일반 함수를, greetArrow는 화살표 함수를 콜백으로 사용합니다.",
-        "highlight": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        "highlight": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "object creation",
@@ -17,9 +31,18 @@
             {
               "name": "user",
               "properties": [
-                { "key": "name", "value": "'Alice'" },
-                { "key": "greetRegular", "value": "function" },
-                { "key": "greetArrow", "value": "function" }
+                {
+                  "key": "name",
+                  "value": "'Alice'"
+                },
+                {
+                  "key": "greetRegular",
+                  "value": "function"
+                },
+                {
+                  "key": "greetArrow",
+                  "value": "function"
+                }
               ]
             }
           ]
@@ -29,12 +52,17 @@
         "line": 15,
         "title": "user.greetRegular() 호출",
         "explanation": "greetRegular 메서드가 호출됩니다. 이 시점에서 this는 user입니다.",
-        "highlight": [15],
+        "highlight": [
+          15
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "method call",
           "thisValue": "user",
-          "callStack": ["<global>", "user.greetRegular()"]
+          "callStack": [
+            "<global>",
+            "user.greetRegular()"
+          ]
         }
       },
       {
@@ -42,13 +70,22 @@
         "title": "setTimeout 콜백 (일반 함수)",
         "explanation": "100ms 후 콜백이 실행됩니다. 일반 함수는 자신만의 this를 갖습니다. 콜백으로 호출되면 this는 전역 객체가 됩니다!",
         "keyInsight": "일반 함수 콜백의 this는 전역 객체 (또는 undefined)",
-        "highlight": [4, 5, 6],
+        "highlight": [
+          4,
+          5,
+          6
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "callback (regular function)",
           "thisValue": "window",
-          "callStack": ["<global>", "setTimeout callback"],
-          "output": ["Regular: undefined"],
+          "callStack": [
+            "<global>",
+            "setTimeout callback"
+          ],
+          "output": [
+            "Regular: undefined"
+          ],
           "warning": "this가 user가 아니라 window!"
         }
       },
@@ -56,27 +93,42 @@
         "line": 16,
         "title": "user.greetArrow() 호출",
         "explanation": "greetArrow 메서드가 호출됩니다. 이 시점에서 this는 user입니다.",
-        "highlight": [16],
+        "highlight": [
+          16
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "method call",
           "thisValue": "user",
-          "callStack": ["<global>", "user.greetArrow()"]
+          "callStack": [
+            "<global>",
+            "user.greetArrow()"
+          ]
         }
       },
       {
         "line": 9,
         "title": "setTimeout 콜백 (화살표 함수)",
-        "explanation": "화살표 함수는 자신만의 this를 갖지 않습니다! 정의된 시점의 상위 스코프(greetArrow)의 this를 사용합니다.",
-        "keyInsight": "화살표 함수 this = 상위 스코프의 this (렉시컬 this)",
-        "analogy": "화살표 함수는 부모의 this를 물려받습니다.",
-        "highlight": [9, 10, 11],
+        "explanation": "화살표 함수는 **자신만의 this를 생성하지 않습니다.**\n대신 자신이 태어난 곳(Lexical Scope)인 `greetArrow` 함수의 this를 그대로 가져다 씁니다(Lookup).",
+        "keyInsight": "화살표 함수 this = 내 부모의 this (상속)",
+        "analogy": "화살표 함수는 '개인 통장'이 없습니다. 돈(this)이 필요하면 부모님 지갑을 씁니다.",
+        "highlight": [
+          9,
+          10,
+          11
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "callback (arrow function)",
           "thisValue": "user (inherited from greetArrow)",
-          "callStack": ["<global>", "setTimeout callback"],
-          "output": ["Regular: undefined", "Arrow: Alice"],
+          "callStack": [
+            "<global>",
+            "setTimeout callback"
+          ],
+          "output": [
+            "Regular: undefined",
+            "Arrow: Alice"
+          ],
           "lexicalThis": true
         }
       },
@@ -85,7 +137,9 @@
         "title": "this.name 접근 성공",
         "explanation": "화살표 함수의 this는 greetArrow가 호출될 때의 this(user)를 그대로 사용합니다. 그래서 this.name은 'Alice'입니다!",
         "keyInsight": "화살표 함수는 this 문제를 해결하는 가장 쉬운 방법입니다.",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "arrow function this access",
@@ -109,9 +163,9 @@
   },
   "misconceptions": [
     {
-      "wrong": "화살표 함수의 this는 항상 상위 객체를 가리킨다",
-      "correct": "화살표 함수의 this는 상위 스코프(함수)의 this를 사용합니다. 객체는 스코프가 아닙니다!",
-      "why": "객체 리터럴 {}은 새로운 스코프를 만들지 않습니다. 함수만 스코프를 만듭니다."
+      "wrong": "화살표 함수의 this는 상위 객체를 가리킨다",
+      "correct": "아닙니다. **상위 '함수' 스코프**를 가리킵니다. 객체 리터럴 `{}`은 스코프가 아닙니다.",
+      "why": "객체는 스코프 역할을 하지 못합니다. 따라서 객체 안에서 쓴 화살표 함수는 전역(Window)을 가리키게 됩니다."
     },
     {
       "wrong": "화살표 함수도 call/apply/bind로 this를 바꿀 수 있다",

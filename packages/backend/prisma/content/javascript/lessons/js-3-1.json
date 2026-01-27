@@ -10,13 +10,19 @@
         "title": "전역에서 this",
         "explanation": "전역 컨텍스트에서 this는 전역 객체를 가리킵니다. 브라우저에서는 window, Node.js에서는 global입니다.",
         "keyInsight": "전역 this = window (브라우저) 또는 global (Node.js)",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "global",
           "thisValue": "window",
-          "callStack": ["<global>"],
-          "output": ["Window {...}"]
+          "callStack": [
+            "<global>"
+          ],
+          "output": [
+            "Window {...}"
+          ]
         }
       },
       {
@@ -25,25 +31,38 @@
         "explanation": "showThis()를 일반 함수로 호출합니다. 일반 함수 호출에서 this는 전역 객체입니다.",
         "keyInsight": "일반 함수 호출 = this는 전역 객체",
         "analogy": "주인 없이 불려진 함수는 전역이 주인이 됩니다.",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "function call",
           "thisValue": "window",
-          "callStack": ["<global>", "showThis()"],
-          "output": ["Window {...}", "Window {...}"]
+          "callStack": [
+            "<global>",
+            "showThis()"
+          ],
+          "output": [
+            "Window {...}",
+            "Window {...}"
+          ]
         }
       },
       {
         "line": 4,
         "title": "함수 내부의 this",
         "explanation": "함수 내부에서 this를 출력합니다. 일반 함수 호출이므로 this는 전역 객체입니다.",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "function call",
           "thisValue": "window",
-          "callStack": ["<global>", "showThis()"],
+          "callStack": [
+            "<global>",
+            "showThis()"
+          ],
           "highlightThis": true
         }
       },
@@ -51,13 +70,22 @@
         "line": 14,
         "title": "strict mode 함수 호출",
         "explanation": "strictThis()를 호출합니다. 이 함수는 strict mode입니다.",
-        "highlight": [14],
+        "highlight": [
+          14
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "strict function call",
           "thisValue": "undefined",
-          "callStack": ["<global>", "strictThis()"],
-          "output": ["Window {...}", "Window {...}", "undefined"]
+          "callStack": [
+            "<global>",
+            "strictThis()"
+          ],
+          "output": [
+            "Window {...}",
+            "Window {...}",
+            "undefined"
+          ]
         }
       },
       {
@@ -67,12 +95,18 @@
         "keyInsight": "strict mode + 일반 함수 호출 = this는 undefined",
         "tip": "ES6 모듈은 자동으로 strict mode입니다.",
         "misconception": "strict mode는 실수로 전역 객체를 수정하는 것을 방지합니다.",
-        "highlight": [11, 12],
+        "highlight": [
+          11,
+          12
+        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "strict function call",
           "thisValue": "undefined",
-          "callStack": ["<global>", "strictThis()"],
+          "callStack": [
+            "<global>",
+            "strictThis()"
+          ],
           "highlightThis": true,
           "isStrict": true
         }
@@ -92,14 +126,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "this는 항상 현재 함수를 가리킨다",
-      "correct": "this는 함수가 어떻게 호출되었는지에 따라 결정됩니다.",
-      "why": "this는 정의 시점이 아니라 호출 시점에 바인딩됩니다."
+      "wrong": "this는 자기 자신(함수)을 가리킨다",
+      "correct": "절대 아닙니다. this는 **함수가 호출되는 방식(Call Site)**에 따라 결정되는 실행 컨텍스트의 속성입니다.",
+      "why": "this는 함수 정의(Lexical)가 아니라 함수 호출(Execution) 시점에 결정됩니다. (화살표 함수 제외)"
     },
     {
-      "wrong": "함수 안의 this는 항상 같다",
-      "correct": "일반 함수의 this는 호출 방식에 따라 달라집니다.",
-      "why": "obj.method()와 method()는 다른 this를 가집니다."
+      "wrong": "함수 안의 this는 항상 일정하다",
+      "correct": "아닙니다. 같은 함수라도 `obj.method()`로 부르냐 `method()`로 부르냐에 따라 천지차이입니다.",
+      "why": "누가(어떤 객체가) 호출했느냐가 this를 결정짓습니다."
     }
   ],
   "keyTakeaway": "전역 this = window, 일반함수 this = window (strict: undefined)"

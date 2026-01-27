@@ -92,8 +92,8 @@ export class OllamaProvider implements IAIProvider {
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       const controller = new AbortController();
-      // Ollama 모델 로딩 + 첫 응답까지 최대 30초 허용
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      // Ollama 모델 로딩 + 첫 응답까지 최대 90초 허용 (1.5B 모델 로딩 시간 고려)
+      const timeoutId = setTimeout(() => controller.abort(), 90000);
 
       try {
         const response = await fetch(`${this.url}/api/chat`, {

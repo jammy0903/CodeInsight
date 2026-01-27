@@ -9,14 +9,27 @@
         "line": 1,
         "title": "Animal 생성자 정의",
         "explanation": "Animal 함수를 정의합니다. 모든 함수는 자동으로 prototype 속성을 가집니다.",
-        "highlight": [1, 2, 3],
+        "highlight": [
+          1,
+          2,
+          3
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "functions": [
-            { "name": "Animal", "prototype": "Animal.prototype" }
+            {
+              "name": "Animal",
+              "prototype": "Animal.prototype"
+            }
           ],
           "objects": [
-            { "name": "Animal.prototype", "props": ["constructor"], "proto": "Object.prototype" }
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "constructor"
+              ],
+              "proto": "Object.prototype"
+            }
           ]
         }
       },
@@ -25,11 +38,22 @@
         "title": "Animal.prototype에 메서드 추가",
         "explanation": "eat 메서드를 prototype에 추가합니다. 모든 Animal 인스턴스가 공유합니다.",
         "keyInsight": "prototype에 메서드 추가 = 모든 인스턴스가 공유",
-        "highlight": [4, 5, 6],
+        "highlight": [
+          4,
+          5,
+          6
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            { "name": "Animal.prototype", "props": ["constructor", "eat()"], "proto": "Object.prototype" }
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "constructor",
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
           ]
         }
       },
@@ -38,39 +62,79 @@
         "title": "Dog 생성자 + 부모 호출",
         "explanation": "Dog 생성자 내에서 Animal.call(this, name)으로 부모 생성자를 호출합니다.",
         "keyInsight": "Animal.call(this) = 부모 생성자 실행 (super() 역할)",
-        "highlight": [8, 9, 10],
+        "highlight": [
+          8,
+          9,
+          10
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "functions": [
-            { "name": "Animal", "prototype": "Animal.prototype" },
-            { "name": "Dog", "prototype": "Dog.prototype" }
+            {
+              "name": "Animal",
+              "prototype": "Animal.prototype"
+            },
+            {
+              "name": "Dog",
+              "prototype": "Dog.prototype"
+            }
           ]
         }
       },
       {
         "line": 11,
         "title": "프로토타입 체인 연결",
-        "explanation": "Dog.prototype이 Animal.prototype을 상속하도록 설정합니다.",
-        "keyInsight": "Object.create(Parent.prototype) = 상속 체인 생성",
-        "highlight": [11, 12],
+        "explanation": "Dog.prototype이 Animal.prototype을 상속하도록 설정합니다.\n`Object.create()`는 인자로 받은 객체를 `__proto__`로 하는 **새로운 빈 객체**를 만듭니다.",
+        "keyInsight": "Object.create(Parent.prototype) = 상속 체인 연결 (Link)",
+        "highlight": [
+          11,
+          12
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            { "name": "Dog.prototype", "props": ["constructor"], "proto": "Animal.prototype" },
-            { "name": "Animal.prototype", "props": ["eat()"], "proto": "Object.prototype" }
+            {
+              "name": "Dog.prototype",
+              "props": [
+                "constructor"
+              ],
+              "proto": "Animal.prototype"
+            },
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
           ],
-          "chain": ["Dog.prototype", "Animal.prototype", "Object.prototype"]
+          "chain": [
+            "Dog.prototype",
+            "Animal.prototype",
+            "Object.prototype"
+          ]
         }
       },
       {
         "line": 13,
         "title": "Dog.prototype에 메서드 추가",
         "explanation": "bark 메서드를 Dog.prototype에 추가합니다.",
-        "highlight": [13, 14, 15],
+        "highlight": [
+          13,
+          14,
+          15
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            { "name": "Dog.prototype", "props": ["constructor", "bark()"], "proto": "Animal.prototype" }
+            {
+              "name": "Dog.prototype",
+              "props": [
+                "constructor",
+                "bark()"
+              ],
+              "proto": "Animal.prototype"
+            }
           ]
         }
       },
@@ -78,25 +142,58 @@
         "line": 17,
         "title": "인스턴스 생성",
         "explanation": "new Dog('Buddy')로 인스턴스를 생성합니다. buddy의 [[Prototype]]은 Dog.prototype입니다.",
-        "highlight": [17],
+        "highlight": [
+          17
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            { "name": "buddy", "props": ["name: 'Buddy'"], "proto": "Dog.prototype" },
-            { "name": "Dog.prototype", "props": ["bark()"], "proto": "Animal.prototype" },
-            { "name": "Animal.prototype", "props": ["eat()"], "proto": "Object.prototype" }
+            {
+              "name": "buddy",
+              "props": [
+                "name: 'Buddy'"
+              ],
+              "proto": "Dog.prototype"
+            },
+            {
+              "name": "Dog.prototype",
+              "props": [
+                "bark()"
+              ],
+              "proto": "Animal.prototype"
+            },
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
           ],
-          "chain": ["buddy", "Dog.prototype", "Animal.prototype", "Object.prototype"]
+          "chain": [
+            "buddy",
+            "Dog.prototype",
+            "Animal.prototype",
+            "Object.prototype"
+          ]
         }
       },
       {
         "line": 18,
         "title": "속성/메서드 접근",
         "explanation": "name은 자신에게, eat()은 Animal.prototype에서, bark()은 Dog.prototype에서 찾습니다.",
-        "highlight": [18, 19, 20],
+        "highlight": [
+          18,
+          19,
+          20
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
-          "output": ["Buddy", "Buddy eats", "Woof!"]
+          "output": [
+            "Buddy",
+            "Buddy eats",
+            "Woof!"
+          ]
         }
       }
     ]

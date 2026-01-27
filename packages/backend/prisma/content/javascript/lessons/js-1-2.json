@@ -9,30 +9,45 @@
         "line": 1,
         "title": "console.log('start') 실행",
         "explanation": "프로그램이 시작되면 첫 번째 console.log가 실행됩니다.\n\n'start'가 즉시 출력됩니다.",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["console.log('start')"],
+          "callStack": [
+            "console.log('start')"
+          ],
           "webApis": [],
           "taskQueue": [],
           "microtaskQueue": [],
-          "output": ["start"],
+          "output": [
+            "start"
+          ],
           "currentPhase": "executing",
           "highlightArea": "callStack"
         }
       },
       {
         "line": 3,
-        "title": "setTimeout 호출",
-        "explanation": "setTimeout이 호출됩니다.\n\n**중요**: setTimeout은 JavaScript 엔진의 일부가 아닙니다. 브라우저(또는 Node.js)가 제공하는 **Web API**입니다.\n\nsetTimeout은 콜백 함수를 Web API 영역으로 넘기고 바로 종료됩니다.",
-        "highlight": [3, 4, 5],
+        "title": "setTimeout 호출 - Web API 위임",
+        "explanation": "JavaScript 엔진(Call Stack)이 `setTimeout`을 만나면, 브라우저의 **Web API**에게 타이머 작업을 떠넘깁니다.\n\n\"0ms 뒤에 이 콜백을 실행해줘\"라고 부탁하고, 엔진은 **즉시** 다음 코드로 넘어갑니다.",
+        "keyInsight": "JavaScript 엔진은 타이머를 직접 세지 않습니다. 브라우저가 대신 셉니다.",
+        "highlight": [
+          3,
+          4,
+          5
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["setTimeout()"],
+          "callStack": [
+            "setTimeout()"
+          ],
           "webApis": [],
           "taskQueue": [],
           "microtaskQueue": [],
-          "output": ["start"],
+          "output": [
+            "start"
+          ],
           "currentPhase": "executing",
           "highlightArea": "callStack"
         }
@@ -41,16 +56,27 @@
         "line": 3,
         "title": "Web API로 콜백 이동",
         "explanation": "setTimeout의 콜백이 **Web API 영역**으로 이동합니다.\n\n0ms 타이머가 시작됩니다. 타이머가 0ms여도 바로 실행되지 않습니다!",
-        "highlight": [3, 4, 5],
+        "highlight": [
+          3,
+          4,
+          5
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
           "callStack": [],
           "webApis": [
-            { "id": "timer1", "name": "setTimeout callback", "delay": 0, "status": "waiting" }
+            {
+              "id": "timer1",
+              "name": "setTimeout callback",
+              "delay": 0,
+              "status": "waiting"
+            }
           ],
           "taskQueue": [],
           "microtaskQueue": [],
-          "output": ["start"],
+          "output": [
+            "start"
+          ],
           "currentPhase": "executing",
           "highlightArea": "webApis"
         }
@@ -59,16 +85,28 @@
         "line": 7,
         "title": "console.log('end') 실행",
         "explanation": "setTimeout이 Web API로 넘겨진 후, 다음 코드가 바로 실행됩니다.\n\n'end'가 출력됩니다. 아직 'timeout'은 출력되지 않았습니다!",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["console.log('end')"],
+          "callStack": [
+            "console.log('end')"
+          ],
           "webApis": [
-            { "id": "timer1", "name": "setTimeout callback", "delay": 0, "status": "ready" }
+            {
+              "id": "timer1",
+              "name": "setTimeout callback",
+              "delay": 0,
+              "status": "ready"
+            }
           ],
           "taskQueue": [],
           "microtaskQueue": [],
-          "output": ["start", "end"],
+          "output": [
+            "start",
+            "end"
+          ],
           "currentPhase": "executing",
           "highlightArea": "callStack"
         }
@@ -77,14 +115,21 @@
         "line": 7,
         "title": "타이머 완료 → Task Queue로 이동",
         "explanation": "0ms 타이머가 완료되어 콜백이 **Task Queue**로 이동합니다.\n\n하지만 아직 실행되지 않습니다! 이벤트 루프는 **콜 스택이 비어야만** Task Queue를 확인합니다.",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
           "callStack": [],
           "webApis": [],
-          "taskQueue": ["setTimeout callback"],
+          "taskQueue": [
+            "setTimeout callback"
+          ],
           "microtaskQueue": [],
-          "output": ["start", "end"],
+          "output": [
+            "start",
+            "end"
+          ],
           "currentPhase": "checkingTasks",
           "highlightArea": "taskQueue"
         }
@@ -93,14 +138,23 @@
         "line": 4,
         "title": "콜백 실행",
         "explanation": "콜 스택이 비었으므로 이벤트 루프가 Task Queue에서 콜백을 가져와 실행합니다.\n\n드디어 'timeout'이 출력됩니다!\n\n**최종 출력 순서**: start → end → timeout",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["setTimeout callback", "console.log('timeout')"],
+          "callStack": [
+            "setTimeout callback",
+            "console.log('timeout')"
+          ],
           "webApis": [],
           "taskQueue": [],
           "microtaskQueue": [],
-          "output": ["start", "end", "timeout"],
+          "output": [
+            "start",
+            "end",
+            "timeout"
+          ],
           "currentPhase": "executing",
           "highlightArea": "callStack"
         }
@@ -121,8 +175,8 @@
   "misconceptions": [
     {
       "wrong": "setTimeout(fn, 0)은 즉시 실행된다",
-      "correct": "0ms여도 Web API → Task Queue를 거치므로, 현재 실행 중인 모든 동기 코드가 끝난 후에 실행됩니다.",
-      "why": "이벤트 루프는 콜 스택이 완전히 비어야 Task Queue를 확인합니다."
+      "correct": "아닙니다. 0ms 후 '대기열(Task Queue)'에 들어갈 뿐입니다.",
+      "why": "**Run-to-Completion**: 현재 스택에 있는 모든 코드가 **완전히 끝날 때까지** 이벤트 루프는 새로운 작업을 스택에 넣지 못합니다. 0ms라도 '나중'입니다."
     }
   ],
   "keyTakeaway": "setTimeout = Web API로 등록 → 타이머 완료 시 Task Queue → 콜 스택 비면 실행"

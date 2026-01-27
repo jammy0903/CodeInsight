@@ -1,0 +1,88 @@
+{
+    "lessonId": "js-8-3",
+    "title": "작업 쪼개기 (Task Splitting)",
+    "concept": "오래 걸리는 작업(Long Task)을 여러 개의 작은 작업으로 쪼개서, 중간중간 렌더링이나 유저 입력을 처리할 틈을 준다 (Yielding)",
+    "content": {
+        "code": "// Blocking: 한 번에 10억 번 돌기 (화면 멈춤!)\nfunction heavy() {\n  for (let i = 0; i < 1000000000; i++) {}\n}\n\n// Non-blocking: 잘게 쪼개서 실행 (Yielding)\nlet i = 0;\nfunction heavyChunk() {\n  // 1. 조금만 함\n  const end = i + 1000000;\n  while (i < end) { i++; }\n\n  // 2. 나머지는 다음 틱으로 양보 (Yield)\n  if (i < 1000000000) {\n    setTimeout(heavyChunk, 0);\n  }\n}",
+        "steps": [
+            {
+                "line": 1,
+                "title": "Blocking 방식 (나쁜 예)",
+                "explanation": "for문이 끝날 때까지 Call Stack을 점유합니다. 그동안 클릭도 안 되고 화면 갱신도 안 됩니다.",
+                "highlight": [
+                    1,
+                    2,
+                    3
+                ],
+                "visualizationType": "eventLoop",
+                "eventLoopState": {
+                    "callStack": [
+                        "heavy (Running...)"
+                    ],
+                    "taskQueue": [
+                        "User Click Event (Blocked!)"
+                    ],
+                    "warning": "UI Freezing"
+                }
+            },
+            {
+                "line": 7,
+                "title": "Chunk 실행 (1단계)",
+                "explanation": "작업을 조금만(100만 번) 수행하고 함수를 종료합니다.\nCall Stack이 비워집니다!",
+                "keyInsight": "함수 종료 = 렌더링 기회 제공",
+                "highlight": [
+                    7,
+                    8,
+                    9,
+                    10
+                ],
+                "visualizationType": "eventLoop",
+                "eventLoopState": {
+                    "callStack": [
+                        "heavyChunk"
+                    ],
+                    "currentPhase": "executing"
+                }
+            },
+            {
+                "line": 13,
+                "title": "양보 (Yield to Main Thread)",
+                "explanation": "`setTimeout(..., 0)`으로 다음 조각을 Task Queue 뒤로 보냅니다.\n이 틈에 브라우저는 밀린 화면을 그리고 클릭 이벤트를 처리합니다.",
+                "keyInsight": "Yielding = 줄 서 있는 다른 친구(렌더링/입력)에게 순서 양보",
+                "highlight": [
+                    13,
+                    14,
+                    15
+                ],
+                "visualizationType": "eventLoop",
+                "eventLoopState": {
+                    "callStack": [],
+                    "taskQueue": [
+                        "User Click Event",
+                        "heavyChunk (Next Part)"
+                    ],
+                    "note": "Interactivity Restored!"
+                }
+            }
+        ]
+    },
+    "quiz": {
+        "question": "최신 브라우저에서 추천하는 Yielding 방식은?",
+        "options": [
+            "while(true) {}",
+            "scheduler.yield() 또는 await scheduler.postTask()",
+            "alert()",
+            "prompt()"
+        ],
+        "correctIndex": 1,
+        "explanation": "`setTimeout(f, 0)`도 좋지만, 최신 `scheduler` API는 우선순위 제어가 가능하여 더 효율적입니다."
+    },
+    "misconceptions": [
+        {
+            "wrong": "Promise.resolve().then()으로 쪼개도 된다",
+            "correct": "안 됩니다. 마이크로태스크(Promise)는 렌더링 전에 싹 다 실행되므로, 화면 갱신을 막는 건 똑같습니다.",
+            "why": "렌더링 틈을 주려면 매크로태스크(setTimeout)나 scheduler API를 써야 합니다."
+        }
+    ],
+    "keyTakeaway": "거대한 루프는 쪼개라(Chunking). 중간중간 브라우저가 숨 쉴 틈(Yield)을 줘라."
+}

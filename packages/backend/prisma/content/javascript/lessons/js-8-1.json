@@ -1,0 +1,80 @@
+{
+    "lessonId": "js-8-1",
+    "title": "브라우저 렌더링 파이프라인 (Frame Budget)",
+    "concept": "부드러운 애니메이션(60fps)을 위해 브라우저는 16.6ms마다 화면을 그린다. JS가 길어지면 프레임이 떨어진다(Jank).",
+    "content": {
+        "code": "// 60fps = 1초에 60장 = 1장당 16.6ms\nfunction animate() {\n  // 1. JS 실행 (너무 길면 안 됨!)\n  heavyCalculation();\n\n  // 2. Style (CSS 계산)\n  // 3. Layout (위치 계산)\n  // 4. Paint (픽셀 그리기)\n  // 5. Composite (레이어 합성)\n}\n\nfunction heavyCalculation() {\n  // 50ms 동안 멈춤 (프레임 드랍 발생!)\n  const start = Date.now();\n  while (Date.now() - start < 50) {}\n}",
+        "steps": [
+            {
+                "line": 2,
+                "title": "Frame 시작",
+                "explanation": "브라우저가 새로운 프레임(Frame)을 그릴 준비를 합니다.\n주어진 시간은 단 **16.6ms**입니다.",
+                "highlight": [
+                    2
+                ],
+                "visualizationType": "eventLoop",
+                "eventLoopState": {
+                    "note": "Frame Budget: 16.6ms remaining",
+                    "currentPhase": "idle"
+                }
+            },
+            {
+                "line": 4,
+                "title": "JS 실행 (Blocking)",
+                "explanation": "`heavyCalculation()`이 50ms 동안 메인 스레드를 잡아먹습니다.\n16.6ms가 지났지만 JS가 안 끝나서 화면을 그릴 수 없습니다.",
+                "keyInsight": "JS 실행 시간 + 렌더링 시간 < 16.6ms여야 함",
+                "highlight": [
+                    4,
+                    11,
+                    12,
+                    13,
+                    14
+                ],
+                "visualizationType": "eventLoop",
+                "eventLoopState": {
+                    "callStack": [
+                        "animate",
+                        "heavyCalculation"
+                    ],
+                    "note": "Time Elapsed: 50ms (Budget Exceeded!)",
+                    "warning": "Frame Dropped (Jank)"
+                }
+            },
+            {
+                "line": 6,
+                "title": "렌더링 단계 (Style ~ Composite)",
+                "explanation": "JS가 끝나야 비로소 스타일 계산, 레이아웃, 페인팅이 일어납니다.\n하지만 이미 50ms가 지나서 사용자는 '버벅임(Jank)'을 느꼈습니다.",
+                "highlight": [
+                    7,
+                    8,
+                    9,
+                    10
+                ],
+                "visualizationType": "eventLoop",
+                "eventLoopState": {
+                    "currentPhase": "rendering",
+                    "note": "Delayed Frame Rendered"
+                }
+            }
+        ]
+    },
+    "quiz": {
+        "question": "부드러운 애니메이션을 위해 JS 실행 시간은 최대 몇 ms가 적당할까?",
+        "options": [
+            "100ms",
+            "50ms",
+            "10ms (렌더링 시간 포함 16ms 이내)",
+            "1초"
+        ],
+        "correctIndex": 2,
+        "explanation": "브라우저 내부 작업(Style, Layout, Paint) 시간을 고려하면, 순수 JS 실행은 10ms 이내로 끝내야 안전합니다."
+    },
+    "misconceptions": [
+        {
+            "wrong": "setTimeout(fn, 0)은 렌더링 직후에 실행된다",
+            "correct": "보장되지 않습니다. 렌더링은 브라우저 스케줄에 따르며, setTimeout은 그저 콜 스택이 비면 실행될 뿐입니다.",
+            "why": "렌더링 직전에 코드를 실행하려면 `requestAnimationFrame`을 써야 합니다."
+        }
+    ],
+    "keyTakeaway": "메인 스레드를 오래 점유하지 마라 (Long Task 금지)."
+}

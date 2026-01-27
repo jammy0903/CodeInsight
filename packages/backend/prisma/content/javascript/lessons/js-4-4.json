@@ -10,11 +10,23 @@
         "title": "Promise .catch() 방식",
         "explanation": "riskyOperation()을 호출하고 .catch()로 에러를 처리합니다.",
         "keyInsight": ".catch() = Promise의 에러 핸들러",
-        "highlight": [16, 17, 18],
+        "highlight": [
+          16,
+          17,
+          18
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "riskyOperation", "state": "pending" }],
-          "handlers": [".then()", ".catch()"]
+          "promises": [
+            {
+              "id": "riskyOperation",
+              "state": "pending"
+            }
+          ],
+          "handlers": [
+            ".then()",
+            ".catch()"
+          ]
         }
       },
       {
@@ -22,10 +34,18 @@
         "title": "에러 발생 (throw)",
         "explanation": "riskyOperation 내부에서 Error가 throw됩니다. Promise가 rejected 상태가 됩니다.",
         "keyInsight": "async 함수에서 throw = Promise reject",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "riskyOperation", "state": "rejected", "error": "Error: Something went wrong!" }]
+          "promises": [
+            {
+              "id": "riskyOperation",
+              "state": "rejected",
+              "error": "Error: Something went wrong!"
+            }
+          ]
         }
       },
       {
@@ -33,11 +53,20 @@
         "title": ".catch()가 에러 처리",
         "explanation": "Promise가 rejected되어 .catch()가 실행됩니다. .then()은 건너뜁니다.",
         "keyInsight": "rejected Promise → .then() 스킵, .catch() 실행",
-        "highlight": [18],
+        "highlight": [
+          18
+        ],
         "visualizationType": "promise",
         "promiseState": {
-          "promises": [{ "id": "riskyOperation", "state": "rejected" }],
-          "output": ["Caught: Something went wrong!"],
+          "promises": [
+            {
+              "id": "riskyOperation",
+              "state": "rejected"
+            }
+          ],
+          "output": [
+            "Caught: Something went wrong!"
+          ],
           "handler": ".catch() executed"
         }
       },
@@ -45,11 +74,17 @@
         "line": 20,
         "title": "try/catch 방식 호출",
         "explanation": "handleWithTryCatch()를 호출합니다. 내부에서 try/catch로 에러를 처리합니다.",
-        "highlight": [20],
+        "highlight": [
+          20
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["handleWithTryCatch()"],
-          "output": ["Caught: Something went wrong!"]
+          "callStack": [
+            "handleWithTryCatch()"
+          ],
+          "output": [
+            "Caught: Something went wrong!"
+          ]
         }
       },
       {
@@ -57,10 +92,15 @@
         "title": "await에서 에러 발생",
         "explanation": "await riskyOperation()에서 에러가 발생합니다. try/catch가 에러를 잡습니다.",
         "keyInsight": "await에서 rejected Promise = throw와 같음",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["handleWithTryCatch()", "riskyOperation()"],
+          "callStack": [
+            "handleWithTryCatch()",
+            "riskyOperation()"
+          ],
           "error": "Error thrown at await"
         }
       },
@@ -68,11 +108,20 @@
         "line": 10,
         "title": "catch 블록 실행",
         "explanation": "에러가 catch 블록으로 전달됩니다. error.message를 출력합니다.",
-        "highlight": [10, 11, 12],
+        "highlight": [
+          10,
+          11,
+          12
+        ],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["handleWithTryCatch() - catch block"],
-          "output": ["Caught: Something went wrong!", "Caught: Something went wrong!"]
+          "callStack": [
+            "handleWithTryCatch() - catch block"
+          ],
+          "output": [
+            "Caught: Something went wrong!",
+            "Caught: Something went wrong!"
+          ]
         }
       }
     ]
@@ -91,8 +140,8 @@
   "misconceptions": [
     {
       "wrong": "try/catch는 모든 에러를 잡는다",
-      "correct": "try/catch는 동기 코드와 await의 에러만 잡습니다. 콜백 에러는 잡지 못합니다.",
-      "why": "콜백은 try/catch 블록이 끝난 후에 실행되기 때문입니다."
+      "correct": "try/catch는 동기 코드와 **await된 Promise**만 잡습니다. 둥둥 떠다니는 콜백 에러는 못 잡습니다.",
+      "why": "try/catch는 실행 시점(Stack)에 에러가 있어야 잡는데, 콜백은 나중에 다른 스택(Queue)에서 실행되기 때문입니다."
     }
   ],
   "keyTakeaway": "async/await → try/catch, Promise → .catch(), 콜백 에러는 별도 처리"

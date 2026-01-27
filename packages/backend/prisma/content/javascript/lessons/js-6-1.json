@@ -7,13 +7,23 @@
     "steps": [
       {
         "line": 1,
-        "title": "animal 객체 생성",
-        "explanation": "eat 메서드를 가진 animal 객체를 생성합니다.",
-        "highlight": [1, 2, 3],
+        "title": "animal 객체 (공유 메서드)",
+        "explanation": "animal 객체를 만듭니다. 여기에 있는 `eat` 메서드는 나중에 `rabbit`이 빌려 쓸 것입니다.\n각 객체가 메서드를 복사해 갖는 게 아니라, 하나를 **공유(Share)**해서 메모리를 아낍니다.",
+        "highlight": [
+          1,
+          2,
+          3
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            { "name": "animal", "props": ["eat()"], "proto": "Object.prototype" }
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
           ]
         }
       },
@@ -21,12 +31,28 @@
         "line": 5,
         "title": "dog 객체 생성",
         "explanation": "bark 메서드를 가진 dog 객체를 생성합니다. 아직 animal과 연결되지 않았습니다.",
-        "highlight": [5, 6, 7],
+        "highlight": [
+          5,
+          6,
+          7
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            { "name": "animal", "props": ["eat()"], "proto": "Object.prototype" },
-            { "name": "dog", "props": ["bark()"], "proto": "Object.prototype" }
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            },
+            {
+              "name": "dog",
+              "props": [
+                "bark()"
+              ],
+              "proto": "Object.prototype"
+            }
           ]
         }
       },
@@ -35,26 +61,59 @@
         "title": "프로토타입 연결",
         "explanation": "dog의 [[Prototype]]을 animal로 설정합니다. 이제 dog → animal → Object.prototype 체인이 형성됩니다.",
         "keyInsight": "[[Prototype]] = 객체 간 상속 링크",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            { "name": "dog", "props": ["bark()"], "proto": "animal" },
-            { "name": "animal", "props": ["eat()"], "proto": "Object.prototype" },
-            { "name": "Object.prototype", "props": ["toString()"], "proto": "null" }
+            {
+              "name": "dog",
+              "props": [
+                "bark()"
+              ],
+              "proto": "animal"
+            },
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            },
+            {
+              "name": "Object.prototype",
+              "props": [
+                "toString()"
+              ],
+              "proto": "null"
+            }
           ],
-          "chain": ["dog", "animal", "Object.prototype", "null"]
+          "chain": [
+            "dog",
+            "animal",
+            "Object.prototype",
+            "null"
+          ]
         }
       },
       {
         "line": 11,
         "title": "자신의 메서드 호출",
         "explanation": "dog.bark()는 dog 자신에게 있으므로 바로 찾습니다.",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
-          "lookup": { "property": "bark", "found": "dog", "steps": 1 },
-          "output": ["woof!"]
+          "lookup": {
+            "property": "bark",
+            "found": "dog",
+            "steps": 1
+          },
+          "output": [
+            "woof!"
+          ]
         }
       },
       {
@@ -62,11 +121,20 @@
         "title": "프로토타입 체인 탐색",
         "explanation": "dog.eat()는 dog에 없어서 animal에서 찾습니다.",
         "keyInsight": "속성이 없으면 [[Prototype]] 체인을 따라 올라감",
-        "highlight": [12],
+        "highlight": [
+          12
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
-          "lookup": { "property": "eat", "found": "animal", "steps": 2 },
-          "output": ["woof!", "eating"]
+          "lookup": {
+            "property": "eat",
+            "found": "animal",
+            "steps": 2
+          },
+          "output": [
+            "woof!",
+            "eating"
+          ]
         }
       },
       {
@@ -74,11 +142,21 @@
         "title": "Object.prototype까지 탐색",
         "explanation": "toString()은 dog, animal에 없어서 Object.prototype에서 찾습니다.",
         "keyInsight": "모든 객체는 Object.prototype을 상속",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "prototype",
         "prototypeState": {
-          "lookup": { "property": "toString", "found": "Object.prototype", "steps": 3 },
-          "output": ["woof!", "eating", "[object Object]"]
+          "lookup": {
+            "property": "toString",
+            "found": "Object.prototype",
+            "steps": 3
+          },
+          "output": [
+            "woof!",
+            "eating",
+            "[object Object]"
+          ]
         }
       }
     ]
@@ -96,9 +174,14 @@
   },
   "misconceptions": [
     {
-      "wrong": "__proto__와 prototype은 같다",
-      "correct": "__proto__는 객체의 프로토타입 링크, prototype은 함수의 속성입니다.",
-      "why": "obj.__proto__ = Object.getPrototypeOf(obj), Func.prototype = new Func()의 프로토타입"
+      "wrong": "자바스크립트도 클래스 기반이다",
+      "correct": "ES6 class 키워드가 있어도, 내부적으로는 **프로토타입(객체 간의 연결)**으로 동작합니다.",
+      "why": "클래스가 청사진을 찍어내는 방식이라면, 프로토타입은 부모 객체를 '참조'하는 방식입니다(Delegation)."
+    },
+    {
+      "wrong": "__proto__는 표준이다",
+      "correct": "대부분의 브라우저가 지원하지만, 공식적으로는 `Object.getPrototypeOf()` 사용을 권장합니다.",
+      "why": "__proto__는 성능 이슈와 표준 호환성 문제로 직접 사용을 지양해야 합니다."
     }
   ],
   "keyTakeaway": "프로토타입 체인 = 속성 탐색 경로, 없으면 체인을 따라 올라감"
