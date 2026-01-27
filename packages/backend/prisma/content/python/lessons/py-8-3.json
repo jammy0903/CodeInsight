@@ -1,43 +1,51 @@
 {
   "lessonId": "py-8-3",
   "title": "Generator Expressions",
-  "concept": "Core concept for Generator Expressions",
+  "concept": "CORE_CONCEPT_GENERATOR_EXPRESSION",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Generator Expressions\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "import sys\n\ndef example():\n    # List Comprehension (괄호: 대괄호 [])\n    # Creates entire list in memory immediately\n    list_comp = [x ** 2 for x in range(10000)]\n    \n    # Generator Expression (괄호: 소괄호 ())\n    # Creates generator object, no calculation yet\n    gen_exp = (x ** 2 for x in range(10000))\n    \n    print(f\"List Type: {type(list_comp)}\")\n    print(f\"Gen  Type: {type(gen_exp)}\")\n    \n    # Memory Comparison (Approximate)\n    print(f\"List Size: {sys.getsizeof(list_comp)} bytes\")\n    print(f\"Gen  Size: {sys.getsizeof(gen_exp)} bytes\")\n    \n    # Usage is same (Iteration)\n    print(f\"Gen First: {next(gen_exp)}\")\n\nif __name__ == '__main__':\n    example()",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 9,
+        "title": "생김새의 차이 (괄호)",
+        "explanation": "리스트 컴프리헨션은 `[...]`를 쓰고, 제너레이터 표현식은 `(...)`를 씁니다. 문법은 똑같지만 결과물은 완전히 다릅니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "variables": {
+            "list_comp": "[0, 1, 4, ... (big list)]",
+            "gen_exp": "<generator object>"
+          }
+        }
+      },
+      {
+        "line": 16,
+        "title": "압도적인 메모리 효율",
+        "explanation": "리스트는 1만 개의 숫자를 모두 계산해서 메모리에 저장하므로 용량이 큽니다. 반면 제너레이터는 '계산 식'만 기억하고 있다가 요청할 때 하나씩 계산하므로 메모리를 거의 차지하지 않습니다(항상 일정).",
+        "keyInsight": "데이터가 무한하거나 너무 커서 메모리에 담을 수 없을 때 필수적입니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "List Size: 85176 bytes\nGen Size: 112 bytes"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Generator Expressions?",
+    "question": "다음 중 Generator Expression을 사용하기에 가장 적합한 상황은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "데이터를 반복해서 여러 번 순회해야 할 때",
+      "데이터의 특정 인덱스(indexing)에 자주 접근해야 할 때",
+      "거대한 로그 파일을 한 줄씩 읽어서 처리할 때",
+      "리스트의 길이를 미리 알고 싶을 때"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "로그 파일은 매우 클 수 있으므로 한 줄씩 읽어서 메모리를 아끼는 Generator가 제격입니다. 인덱싱이나 Len()은 Generator에서 지원하지 않거나 비효율적입니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "Tuple Comprehension은 (...)로 만든다.",
+      "correct": "파이썬에 'Tuple Comprehension' 문법은 없습니다. `(...)`는 Generator Expression입니다. 튜플로 만들고 싶다면 `tuple(x for x in ...)` 처럼 생성자를 써야 합니다.",
+      "why": "소괄호가 Generator 문법으로 예약되었기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Generator Expressions is crucial for advanced Python."
+  "keyTakeaway": "단순히 한 번 반복(One-pass)하고 버릴 데이터라면, 리스트 대신 Generator Expression을 써서 메모리를 아끼세요."
 }

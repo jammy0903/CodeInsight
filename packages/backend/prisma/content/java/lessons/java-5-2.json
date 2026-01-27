@@ -1,130 +1,81 @@
 {
   "lessonId": "java-5-2",
-  "title": "final 클래스와 메서드",
-  "concept": "final 클래스는 상속 불가, final 메서드는 오버라이드 불가",
+  "title": "Polymorphism",
+  "concept": "다형성은 하나의 객체가 여러 가지 타입(모습)으로 취급될 수 있는 성질이다",
   "content": {
-    "code": "final class ImmutablePoint {\n    private final int x, y;\n    \n    public ImmutablePoint(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n    \n    public final int getX() { return x; }\n}\n\n// class ExtendedPoint extends ImmutablePoint {}  // 에러!\n\nclass Parent {\n    public final void cannotOverride() {\n        System.out.println(\"Cannot override this!\");\n    }\n}\n\nclass Child extends Parent {\n    // public void cannotOverride() {}  // 에러!\n}",
+    "code": "class Animal {\n    void sound() { System.out.println(\"...\"); }\n}\nclass Dog extends Animal {\n    void sound() { System.out.println(\"Bark\"); }\n}\nclass Cat extends Animal {\n    void sound() { System.out.println(\"Meow\"); }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // 업캐스팅 (자식 -> 부모)\n        // \"개도 동물이고 고양이도 동물이다\"\n        Animal[] zoo = new Animal[2];\n        zoo[0] = new Dog();\n        zoo[1] = new Cat();\n        \n        for (Animal a : zoo) {\n            a.sound(); // 알아서 Bark, Meow 실행\n        }\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "final 클래스 선언",
-        "explanation": "`final class`는 **\"나는 자식을 거부한다\"**는 선언입니다.\n이 클래스를 상속받아 기능을 제멋대로 바꾸거나 해킹하는 것을 원천 봉쇄합니다. 보안상 중요하거나 완벽하게 설계된 클래스(String 등)에 붙입니다.",
-        "keyInsight": "final class = 상속 금지 (가계도 끝)",
+        "line": 13,
+        "title": "업캐스팅 (Upcasting)",
+        "explanation": "**`Animal a = new Dog()`**:\n개(Dog) 객체를 동물(Animal) 타입 변수에 담았습니다.\n가능한 이유: 개는 동물의 일종(**Kind of**)이기 때문입니다.\n\n이것 덕분에 `Dog`, `Cat`, `Lion` 등 서로 다른 클래스들을 `Animal`이라는 하나의 타입으로 묶어서 관리할 수 있습니다.",
+        "keyInsight": "하나의 배열에 여러 종류 객체 저장 가능",
         "highlight": [
-          1
+          13,
+          14,
+          15
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "String, Integer 등이 대표적인 final 클래스"
-        }
-      },
-      {
-        "line": 2,
-        "title": "final 필드들",
-        "explanation": "필드까지 `final`이면 생성자에서 딱 한 번 값을 정하고, 이후 **절대 변경할 수 없습니다.**\n-> 이것이 바로 안전한 **불변 객체(Immutable Object)**를 만드는 비결입니다.",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "Setter가 없어야 함"
-        }
-      },
-      {
-        "line": 4,
-        "title": "생성자에서 초기화",
-        "explanation": "`final` 필드는 **무조건** 생성자 안에서 초기화해야 합니다.\n\"태어날 때 값을 정하지 않으면 평생 빈 깡통\"이 되기 때문에 컴파일러가 강제합니다.",
-        "highlight": [
-          4,
-          5,
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
+          "stack": [
+            {
+              "name": "zoo",
+              "value": "-> 0xArr"
+            }
+          ],
           "heap": [
             {
-              "address": "0x001",
-              "content": "ImmutablePoint{x: 10, y: 20}"
+              "address": "0xArr",
+              "content": "[-> DogObj, -> CatObj]"
+            },
+            {
+              "address": "DogObj",
+              "content": "Dog"
+            },
+            {
+              "address": "CatObj",
+              "content": "Cat"
             }
           ]
         }
       },
       {
-        "line": 9,
-        "title": "final 메서드",
-        "explanation": "`getX()`에 `final`이 붙으면, 자식 클래스에서 이 메서드의 로직을 **바꿀(Override) 수 없습니다.**\n\"내 동작 방식은 완벽하니 건드리지 마라\"는 일종의 **계약 확정**입니다.",
-        "keyInsight": "final method = 오버라이드 금지",
+        "line": 17,
+        "title": "동적 바인딩 (Dynamic Binding)",
+        "explanation": "`a.sound()`를 호출하면, 컴파일러는 \"음, Animal에 sound가 있으니까 일단 OK\"라고 합니다.\n\n**실행 시점(Runtime):**\nJVM이 \"잠깐, 이 변수가 가리키는 실제 객체가 뭐지?\" 확인합니다.\n- 첫 번째는 `Dog`네? -> \"Bark\"\n- 두 번째는 `Cat`이네? -> \"Meow\"\n\n마법처럼 각자의 메서드가 실행됩니다!",
+        "keyInsight": "코드는 한 줄인데 동작은 제각각",
         "highlight": [
-          9
+          17,
+          18,
+          19
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "중요한 로직 보안/무결성 유지"
-        }
-      },
-      {
-        "line": 12,
-        "title": "final 클래스 상속 시도 (에러)",
-        "explanation": "`final`인 `ImmutablePoint`를 상속받으려 하면 컴파일러가 막습니다.\n\"이 가문은 대가 끊겼다\"며 에러를 냅니다.",
-        "highlight": [
-          12
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "컴파일 에러: cannot inherit from final ImmutablePoint"
-        }
-      },
-      {
-        "line": 14,
-        "title": "일반 클래스의 final 메서드",
-        "explanation": "`Parent` 클래스 자체는 상속해줘도 되지만, `cannotOverride` 메서드만큼은 마음대로 바꾸지 못하게 막고 싶을 때 씁니다.",
-        "highlight": [
-          14,
-          15,
-          16,
-          17
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "부분적인 상속 제한"
-        }
-      },
-      {
-        "line": 21,
-        "title": "final 메서드 오버라이드 시도 (에러)",
-        "explanation": "자식(`Child`)이 부모의 `final` 메서드를 자기 식대로 바꾸려(Override) 하면 에러가 납니다.\n부모가 정한 규칙을 그대로 따라야 합니다.",
-        "highlight": [
-          21
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "컴파일 에러: overridden method is final"
+          "output": [
+            "Bark",
+            "Meow"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "final 메서드의 특징은?",
+    "question": "부모 타입으로 변환된(Upcasting) 객체에서 자식의 고유 메서드를 쓰려면?",
     "options": [
-      "절대 호출할 수 없다",
-      "자식 클래스에서 내용을 변경(Override)할 수 없다",
-      "오버로딩(Overloading)할 수 없다",
-      "반환값이 항상 일정하다"
+      "그냥 쓴다",
+      "다운캐스팅(Downcasting)을 해야 한다",
+      "불가능하다",
+      "static 메서드로 바꾼다"
     ],
     "correctIndex": 1,
-    "explanation": "final 메서드는 상속은 되지만, 자식 클래스에서 내용을 덮어쓰기(Override)할 수 없습니다. 오버로딩(파라미터 다르게 정의)은 가능합니다."
+    "explanation": "`Animal a = new Dog()` 상태에서는 Dog만의 기능(예: `bite`)을 쓸 수 없습니다. `(Dog) a` 처럼 다시 자식 타입으로 강제 변환(다운캐스팅)해야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "final 메서드는 오버로딩도 안 된다",
-      "correct": "오버라이드(덮어쓰기)만 안 될 뿐, 오버로딩(새로 추가하기)은 가능합니다.",
-      "why": "이름만 같을 뿐 파라미터가 다르면 아예 다른 메서드로 취급하기 때문입니다."
-    },
-    {
-      "wrong": "모든 메서드는 기본적으로 final이다",
-      "correct": "Java는 기본적으로 `override` 허용(Open)입니다. `final`을 붙여야 금지(Closed)됩니다.",
-      "why": "반대로 Kotlin 같은 최신 언어는 기본이 금지이고 `open` 키워드를 써야 열리는 방식이라 헷갈릴 수 있습니다."
+      "wrong": "다형성은 코드를 복잡하게 만든다",
+      "correct": "오히려 `if (type == DOG) ... else if (type == CAT)` 같은 지저분한 조건문을 싹 없애줍니다.",
+      "why": "새로운 동물(Class)을 추가할 때 기존 코드를 수정할 필요가 없어지는(OCP 원칙) 강력한 확장성을 제공합니다."
     }
   ],
-  "keyTakeaway": "final class는 대를 끊고, final method는 수정을 막는다."
+  "keyTakeaway": "부모 타입으로 묶어서 관리하고, 실행은 자식 메서드가 알아서 한다."
 }

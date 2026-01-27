@@ -1,43 +1,62 @@
 {
   "lessonId": "py-8-4",
   "title": "Itertools Module",
-  "concept": "Core concept for Itertools Module",
+  "concept": "CORE_CONCEPT_ITERTOOLS",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Itertools Module\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "import itertools\n\ndef example():\n    # 1. Infinite Iterators (무한리필)\n    # count(start, step): 10, 12, 14, ...\n    counter = itertools.count(10, 2)\n    print(\"--- Count ---\")\n    print(next(counter))\n    print(next(counter))\n    \n    # 2. Cycle (무한반복)\n    # 'ABC' -> A, B, C, A, B, C, ...\n    cycler = itertools.cycle('AB')\n    print(\"--- Cycle ---\")\n    print(next(cycler))\n    print(next(cycler))\n    print(next(cycler))\n    \n    # 3. Chain (이어붙이기)\n    # [1, 2] + [3, 4] but using lazy iterators\n    chained = itertools.chain([1, 2], [3, 4])\n    print(\"--- Chain ---\")\n    print(list(chained))\n\nif __name__ == '__main__':\n    example()",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 6,
+        "title": "itertools.count",
+        "explanation": "시작 숫자부터 무한히 숫자를 세는 Iterator를 만듭니다. `for i in count(10):` 처럼 쓰면 무한 루프가 되니 조심해야 합니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "variables": {
+            "counter": "count(10, 2)"
+          },
+          "stdout": "--- Count ---\n10\n12"
+        }
+      },
+      {
+        "line": 12,
+        "title": "itertools.cycle",
+        "explanation": "제공된 시퀀스를 무한히 뺑글뺑글 돕니다. 라운드 로빈(Round Robin) 스케줄링 등을 구현할 때 유용합니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "variables": {
+            "cycler": "cycle('AB')"
+          },
+          "stdout": "...\n--- Cycle ---\nA\nB\nA"
+        }
+      },
+      {
+        "line": 19,
+        "title": "itertools.chain",
+        "explanation": "여러 리스트나 이터러블을 마치 하나인 것처럼 연결해줍니다. `list1 + list2`는 새로운 거대 리스트를 만들지만, `chain`은 메모리 복사 없이 연결만 해줘서 효율적입니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "...\n--- Chain ---\n[1, 2, 3, 4]"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Itertools Module?",
+    "question": "itertools.combinations([1, 2, 3], 2)의 결과 개수는?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "3개 ((1,2), (1,3), (2,3))",
+      "6개 ((1,2), (2,1)...)",
+      "2개",
+      "무한개"
     ],
     "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "explanation": "조합(Combination)은 순서를 따지지 않고 뽑는 경우의 수입니다. 3개 중 2개를 뽑는 조합은 3C2 = 3가지입니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "itertools는 복잡해서 몰라도 된다.",
+      "correct": "알고리즘 문제나 효율적인 데이터 처리에서 치트키 수준입니다. 직접 for문 중첩해서 짜는 것보다 C로 구현된 `itertools`가 훨씬 빠르고 깔끔합니다.",
+      "why": "Python의 for loop overhead를 줄여주기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Itertools Module is crucial for advanced Python."
+  "keyTakeaway": "반복문으로 복잡한 로직(순열, 조합, 무한반복 등)을 짜야 한다면, 먼저 `itertools`를 찾아보세요. 이미 다 있습니다."
 }

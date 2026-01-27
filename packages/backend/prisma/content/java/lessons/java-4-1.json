@@ -1,160 +1,121 @@
 {
   "lessonId": "java-4-1",
-  "title": "String 불변성",
-  "concept": "String 객체는 한 번 생성되면 내용을 변경할 수 없다. 모든 수정은 새 객체를 생성한다",
+  "title": "Class & Object",
+  "concept": "클래스는 설계도(붕어빵 틀)이고, 객체는 실체(붕어빵)이다",
   "content": {
-    "code": "String s1 = \"Hello\";\nString s2 = s1;\n\ns1 = s1 + \" World\";\n\nSystem.out.println(s1);\nSystem.out.println(s2);\nSystem.out.println(s1 == s2);",
+    "code": "class Car {\n    String color; // 속성 (필드)\n    int speed;    // 속성 (필드)\n\n    void drive() { // 행동 (메서드)\n        System.out.println(color + \" Car driving!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // 객체 생성 (인스턴스화)\n        Car myCar = new Car();\n        myCar.color = \"Red\";\n        \n        Car yourCar = new Car();\n        yourCar.color = \"Blue\";\n\n        myCar.drive();\n        yourCar.drive();\n    }\n}",
     "steps": [
       {
         "line": 1,
-        "title": "String 리터럴 생성",
-        "explanation": "**String Pool:**\nJVM이 `\"Hello\"`라는 리터럴을 보고 String Pool에 저장합니다.\n`s1`은 이 Pool 상의 주소를 가리킵니다.",
+        "title": "클래스 (설계도)",
+        "explanation": "**Class:** 객체를 만들기 위한 틀입니다.\n\"자동차는 색깔(`color`)과 속도(`speed`)를 가지고 있고, 달릴 수(`drive`) 있다\"라고 정의만 해둔 상태입니다. 아직 실제 자동차는 없습니다.",
         "highlight": [
-          1
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s1",
-              "value": "-> Pool[0]"
-            }
-          ],
-          "stringPool": [
-            "\"Hello\""
-          ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "참조 복사 (Alias)",
-        "explanation": "`s2 = s1`:\n주소만 복사합니다. `s1`과 `s2`는 **같은 객체(Pool[0])**를 보고 있습니다.\n\n**비유:** 두 사람이 같은 책(`\"Hello\"`)을 보고 있는 상황입니다.",
-        "keyInsight": "String 할당 = 참조 복사",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s1",
-              "value": "-> Pool[0]"
-            },
-            {
-              "name": "s2",
-              "value": "-> Pool[0]",
-              "sameRef": true
-            }
-          ],
-          "stringPool": [
-            "\"Hello\""
-          ]
-        }
-      },
-      {
-        "line": 4,
-        "title": "문자열 연결 (불변성 발동!)",
-        "explanation": "**중요한 순간:**\n1. \"Hello\" 뒤에 \" World\"를 붙이려 합니다.\n2. 하지만 `String`은 **불변(Immutable)**이라, 책에 글씨를 덧쓸 수 없습니다.\n3. 대신 **새로운 책**(`\"Hello World\"`)을 만들어서 Heap에 저장합니다.\n4. `s1`은 이제 이 **새 책**을 가리키게 됩니다.\n\n**불변성(Immutability)이란?**\n생성 후 상태를 절대 바꿀 수 없는 성질입니다. 수정처럼 보이는 모든 작업은 사실 '새 객체 생성'입니다.",
-        "keyInsight": "수정 불가 -> 새 객체 생성",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s1",
-              "value": "-> Heap[0]",
-              "changed": true
-            },
-            {
-              "name": "s2",
-              "value": "-> Pool[0]"
-            }
-          ],
-          "stringPool": [
-            "\"Hello\""
-          ],
-          "heap": [
-            {
-              "address": "Heap[0]",
-              "content": "\"Hello World\"",
-              "new": true
-            }
-          ],
-          "note": "s1이 가리키는 곳이 바뀜! (Rebinding)"
-        }
-      },
-      {
-        "line": 6,
-        "title": "s1 출력 (새 값)",
-        "explanation": "`s1`은 새로 만든 `\"Hello World\"`를 출력합니다.",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Hello World"
-          ]
-        }
-      },
-      {
-        "line": 7,
-        "title": "s2 출력 (원본 유지)",
-        "explanation": "**불변성의 장점:**\n`s1`이 다른 책(`\"Hello World\"`)을 보러 떠났지만, `s2`가 보고 있던 원래 책(`\"Hello\"`)은 **아무런 손상 없이 그대로** 있습니다.\n\n만약 String이 가변이었다면, `s1`이 바뀔 때 `s2`도 덩달아 바뀌는 **부작용(Side Effect)**이 일어났을 것입니다.",
-        "keyInsight": "불변성 = 사이드 이펙트 방지",
-        "highlight": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
           7
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "Hello World",
-            "Hello"
+          "note": "Car 클래스 정의됨 (Method Area)"
+        }
+      },
+      {
+        "line": 12,
+        "title": "객체 생성 (new)",
+        "explanation": "**`new Car()`**: 설계도를 보고 실제 메모리(Heap)에 자동차 한 대를 만듭니다.\n`myCar`는 그 자동차를 조종하는 리모컨(참조 변수)입니다.",
+        "highlight": [
+          12
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "myCar",
+              "value": "-> 0x100"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Car{color: null, speed: 0}"
+            }
           ]
         }
       },
       {
-        "line": 8,
-        "title": "참조 비교",
-        "explanation": "`s1`(Heap의 새 객체)과 `s2`(Pool의 옛 객체)는 주소가 다릅니다.\n결과는 `false`입니다.",
+        "line": 13,
+        "title": "필드 접근 (.)",
+        "explanation": "**`myCar.color`**: \"`myCar` 리모컨이 가리키는 자동차의 `color`를 바꿔라!\"\n0x100번 자동차의 색상이 \"Red\"가 됩니다.",
         "highlight": [
-          8
+          13
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "Hello World",
-            "Hello",
-            "false"
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Car{color: \"Red\", speed: 0}",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 15,
+        "title": "두 번째 객체 생성",
+        "explanation": "이번엔 `new`로 또 다른 자동차를 만들었습니다.\n설계도(`class`)는 하나지만, 제품(`object`)은 무한히 찍어낼 수 있습니다.\n\n`myCar`(빨강)와 `yourCar`(파랑)는 서로 다른 메모리 공간을 쓰는 **독립적인 존재**입니다.",
+        "highlight": [
+          15,
+          16
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "myCar",
+              "value": "-> 0x100"
+            },
+            {
+              "name": "yourCar",
+              "value": "-> 0x200"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Car{color: \"Red\", speed: 0}"
+            },
+            {
+              "address": "0x200",
+              "content": "Car{color: \"Blue\", speed: 0}",
+              "new": true
+            }
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "String이 불변인 이유로 올바르지 않은 것은?",
+    "question": "클래스와 객체의 관계로 적절하지 않은 비유는?",
     "options": [
-      "스레드 안전성(Thread Safety)",
-      "String Pool을 통한 메모리 절약",
-      "보안(Security)",
-      "수정(Update) 속도 향상"
+      "붕어빵 틀 - 붕어빵",
+      "설계도 - 건물",
+      "변수 - 값",
+      "공장 - 제품"
     ],
-    "correctIndex": 3,
-    "explanation": "불변성은 수정할 때마다 새 객체를 메모리에 할당해야 하므로 오히려 속도가 느립니다. 그래서 반복 수정 시에는 `StringBuilder`를 써야 합니다."
+    "correctIndex": 2,
+    "explanation": "클래스:객체는 'Type:Instance'의 관계입니다. 변수:값은 저장 공간과 데이터의 관계라 조금 다릅니다. '붕어빵 틀(Class)에서 붕어빵(Object)이 나온다'가 가장 유명한 비유입니다."
   },
   "misconceptions": [
     {
-      "wrong": "String에 += 쓰면 원본이 바뀐다",
-      "correct": "String은 절대 변하지 않습니다. 변수(`s1`)가 가리키는 **화살표**가 새 객체로 이동했을 뿐입니다.",
-      "why": "이를 **Rebinding(재연결)**이라고 합니다. 원본 객체는 메모리 어딘가에 그대로 남아있다가 나중에 GC(청소부)가 치워갑니다."
-    },
-    {
-      "wrong": "불변이면 메모리 낭비 아닌가요?",
-      "correct": "수정이 잦으면 낭비가 맞지만, **읽기**가 잦은 대부분의 경우엔 공유할 수 있어 오히려 이득입니다.",
-      "why": "공유해도 안전하다(Thread-safe)는 확신이 있기 때문에 `String Pool` 같은 최적화가 가능한 것입니다."
+      "wrong": "클래스는 메모리를 차지한다",
+      "correct": "클래스 자체(코드)는 Method Area에 한 번만 로딩되고, 실제 데이터(상태)를 저장하는 건 `new`로 만든 **객체(Object)**입니다.",
+      "why": "설계도 종이 한 장 무게와, 실제 건물 무게가 다른 것과 같습니다."
     }
   ],
-  "keyTakeaway": "String은 '돌판'과 같아서 고칠 수 없다. 수정하면 새 돌판을 파야 한다."
+  "keyTakeaway": "클래스는 하나지만 객체는 여러 개 (`new` 할 때마다 생성!)."
 }

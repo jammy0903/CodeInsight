@@ -1,43 +1,67 @@
 {
   "lessonId": "py-8-1",
   "title": "Iterator Protocol",
-  "concept": "Core concept for Iterator Protocol",
+  "concept": "CORE_CONCEPT_ITERATOR_PROTOCOL",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Iterator Protocol\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "def example():\n    # 1. Iterable (리스트)\n    fruits = [\"Apple\", \"Banana\", \"Cherry\"]\n    \n    # 2. Iterator 가져오기 (책갈피 꽂기)\n    # for fruit in fruits: 내부에서 일어나는 일\n    iterator = iter(fruits)\n    \n    print(f\"Iterator Type: {type(iterator)}\")\n    \n    # 3. 하나씩 꺼내기 (next)\n    print(next(iterator)) # Apple\n    print(next(iterator)) # Banana\n    print(next(iterator)) # Cherry\n    \n    # 4. 끝난 후 또 꺼내면?\n    try:\n        print(next(iterator)) \n    except StopIteration:\n        print(\"End of Iterator!\")\n\nif __name__ == '__main__':\n    example()",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 6,
+        "title": "Iterable과 Iterator",
+        "explanation": "`Iterable`(반복 가능한 것)은 책 그 자체이고, `Iterator`(반복자)는 현재 어디를 읽고 있는지 표시하는 '책갈피'입니다. `iter()` 함수로 책갈피를 꽂습니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "variables": {
+            "fruits": [
+              "Apple",
+              "Banana",
+              "Cherry"
+            ],
+            "iterator": "list_iterator(index=0)"
+          }
+        }
+      },
+      {
+        "line": 11,
+        "title": "next() 함수",
+        "explanation": "`next()`를 호출할 때마다 책갈피가 한 칸씩 뒤로 이동하며 값을 반환합니다. 이전으로 돌아갈 수는 없습니다 (One-way).",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "variables": {
+            "iterator": "list_iterator(index=1)"
+          },
+          "stdout": "Iterator Type: <class 'list_iterator'>\nApple"
+        }
+      },
+      {
+        "line": 17,
+        "title": "StopIteration 예외",
+        "explanation": "더 이상 꺼낼게 없는데 `next()`를 부르면 `StopIteration` 에러가 발생합니다. `for` 반복문은 이 에러를 내부적으로 잡아서 조용히 종료하는 구조로 되어 있습니다.",
+        "keyInsight": "for 루프의 마법은 `try-except StopIteration` 입니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "Apple\nBanana\nCherry\nEnd of Iterator!"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Iterator Protocol?",
+    "question": "Python의 for 루프가 종료되는 시점은 언제인가?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "리스트의 길이가 0이 될 때",
+      "StopIteration 예외가 발생했을 때",
+      "Iterator가 None을 반환할 때",
+      "IndexError가 발생했을 때"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "Iterator가 더 이상 줄 값이 없어서 `StopIteration` 예외를 던지면, `for` 루프가 이를 감지하고 반복을 멈춥니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "리스트(List)는 그 자체로 Iterator다.",
+      "correct": "아닙니다. 리스트는 `Iterable`입니다. 리스트에서 `next()`를 바로 호출할 수 없고, 반드시 `iter(list)`를 통해 `Iterator`를 얻어야 합니다.",
+      "why": "책(List)과 책갈피(Iterator)는 다른 존재이기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Iterator Protocol is crucial for advanced Python."
+  "keyTakeaway": "모든 반복문(for)의 뒤에는 `iter()`와 `next()`, 그리고 `StopIteration`이 숨어 있습니다."
 }

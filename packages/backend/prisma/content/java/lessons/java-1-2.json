@@ -1,202 +1,95 @@
 {
   "lessonId": "java-1-2",
-  "title": "String Pool의 비밀",
-  "concept": "문자열 리터럴은 String Pool에 저장되어 재사용된다",
+  "title": "Variables & Constants",
+  "concept": "변수는 데이터를 담는 그릇이고, 상수는 변하지 않는 값이다",
   "content": {
-    "code": "String a = \"hello\";\nString b = \"hello\";\nSystem.out.println(a == b);\n\nString c = new String(\"hello\");\nSystem.out.println(a == c);\n\nString d = c.intern();\nSystem.out.println(a == d);",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        // 변수: 값을 바꿀 수 있음\n        int age = 20;\n        System.out.println(age);\n        \n        age = 21;\n        System.out.println(age);\n\n        // 상수: 값을 바꿀 수 없음\n        final double PI = 3.14;\n        // PI = 3.14159; // 에러 발생!\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "리터럴로 String 생성",
-        "explanation": "**메모리에서 일어나는 일:**\n1. JVM이 **String Pool**을 뒤져봅니다.\n2. \"hello\"가 없으니 새로 만들어서 Pool에 넣습니다.\n3. 그 주소(Pool:0x100)를 `a`에게 줍니다.\n\n**String Pool이란?**\n자주 쓰는 문자열을 모아두는 '재활용 센터'입니다. Java는 메모리를 아끼기 위해 똑같은 문자열 리터럴은 하나만 만들어서 공유합니다.\n\n**리터럴(Literal)이란?**\n코드에 직접 타이핑한 값(`\"hello\"`)들을 말합니다.",
-        "keyInsight": "따옴표(\"\")로 만들면 Pool에 저장됨",
+        "line": 4,
+        "title": "변수 선언과 초기화",
+        "explanation": "**`int age = 20;`**의 의미:\n1. 메모리(Stack)에 정수(int)를 담을 `age`라는 이름의 상자를 만듭니다.\n2. 그 상자에 20을 넣습니다.\n\n이것을 '초기화(Initialization)'라고 합니다.",
+        "keyInsight": "변수 = 이름 붙은 메모리 공간",
         "highlight": [
-          1
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "a",
-              "value": "-> Pool"
-            }
-          ],
-          "stringPool": [
-            {
-              "value": "\"hello\"",
-              "address": "Pool:0x100"
-            }
-          ],
-          "heap": []
-        }
-      },
-      {
-        "line": 2,
-        "title": "같은 리터럴 재사용",
-        "explanation": "또 \"hello\"를 만들려고 하네요?\nJVM은 Pool을 뒤져보고, \"어? 아까 만든 게 있네?\" 하고 **기존 주소**를 재사용합니다.\n\n그래서 `b`도 `a`와 똑같은 **Pool:0x100**을 가리키게 됩니다.\n\n**Flyweight 패턴:**\n똑같은 객체를 많이 만들지 않고 공유해서 메모리를 절약하는 디자인 패턴입니다. String Pool이 바로 이 패턴입니다.",
-        "keyInsight": "같은 리터럴 = 같은 주소 재사용",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "a",
-              "value": "-> Pool:0x100"
-            },
-            {
-              "name": "b",
-              "value": "-> Pool:0x100",
-              "sameRef": true
-            }
-          ],
-          "stringPool": [
-            {
-              "value": "\"hello\"",
-              "address": "Pool:0x100",
-              "refCount": 2
-            }
-          ]
-        }
-      },
-      {
-        "line": 3,
-        "title": "리터럴끼리 == 비교",
-        "explanation": "`a`와 `b`는 **같은 주소**를 가리키고 있으니 `==`(주소 비교) 결과는 **true**입니다.\n\n하지만 주의하세요! 이건 문자열이 같아서가 아니라, **우연히 같은 객체를 공유**했기 때문입니다.",
-        "keyInsight": "리터럴끼리는 == 가 true (하지만 .equals 권장)",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "comparison": "Pool:0x100 == Pool:0x100",
-          "output": [
-            "true"
-          ],
-          "warning": "리터럴끼리는 ==가 true! 하지만 이에 의존하면 안 됨"
-        }
-      },
-      {
-        "line": 5,
-        "title": "new로 String 생성",
-        "explanation": "`new` 키워드는 **\"재활용하지 말고 무조건 새 거 내놔!\"** 라는 명령입니다.\nPool에 \"hello\"가 있든 말든 신경 쓰지 않고, 일반 **Heap** 영역에 새로운 객체를 만듭니다.\n\n**Heap String vs Pooled String:**\n- `new`: 나만의 전용 객체 (재사용 X)\n- `\"...\"`: 공용 객체 (재사용 O)",
-        "keyInsight": "new = 재활용 거부, 무조건 새 객체",
-        "highlight": [
+          4,
           5
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "-> Pool:0x100"
-            },
-            {
-              "name": "c",
-              "value": "-> 0x200"
+              "name": "age",
+              "value": "20"
             }
           ],
-          "stringPool": [
-            {
-              "value": "\"hello\"",
-              "address": "Pool:0x100"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x200",
-              "content": "\"hello\"",
-              "new": true
-            }
-          ]
+          "note": "Stack 메모리에 생성됨"
         }
       },
       {
-        "line": 6,
-        "title": "리터럴 vs new 비교",
-        "explanation": "`a`는 재활용 센터(Pool) 출신이고,\n`c`는 공장(Heap)에서 갓 찍어낸 신상입니다.\n\n출신 성분이 다르니 주소도 다릅니다. `false`!",
+        "line": 7,
+        "title": "변수 값 변경",
+        "explanation": "`age = 21;`\n`age` 상자에 있던 20을 버리고, 새로운 값 21을 채워 넣습니다. 변수(Variable)라는 이름처럼 언제든 값을 바꿀 수 있습니다.",
         "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "comparison": "Pool:0x100 != 0x200",
-          "output": [
-            "true",
-            "false"
-          ]
-        }
-      },
-      {
-        "line": 8,
-        "title": "intern()으로 Pool 등록",
-        "explanation": "`intern()` 메서드는 **\"나도 저 Pool 무리에 끼워줘\"** 라고 요청하는 것입니다.\n\n1. Pool에 \"hello\"가 있는지 확인합니다.\n2. 이미 있으니, 그 **Pool 객체의 주소**를 반환합니다.\n\n결국 `d`는 `a`와 같은 주소를 가지게 됩니다.",
-        "keyInsight": "intern() = Heap 문자열을 Pool 주소로 변환",
-        "highlight": [
+          7,
           8
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "-> Pool:0x100"
-            },
-            {
-              "name": "d",
-              "value": "-> Pool:0x100",
-              "sameRef": true
+              "name": "age",
+              "value": "21",
+              "highlight": true
             }
           ],
-          "stringPool": [
-            {
-              "value": "\"hello\"",
-              "address": "Pool:0x100"
-            }
+          "output": [
+            "20",
+            "21"
           ]
         }
       },
       {
-        "line": 9,
-        "title": "intern() 결과 비교",
-        "explanation": "`a`와 `d`는 이제 같은 Pool 객체를 가리킵니다. `true`!\n\n**실무 팁:**\n수백만 개의 중복된 문자열을 다뤄야 할 때 `intern()`을 쓰면 메모리를 획기적으로 줄일 수 있습니다.",
+        "line": 11,
+        "title": "상수 (final)",
+        "explanation": "**`final` double PI**:\n`final`이 붙으면 '최종 결정'이라는 뜻입니다. 한 번 값을 넣으면 누구도 바꿀 수 없습니다. 보통 대문자로 이름을 짓습니다(관례).",
+        "keyInsight": "final = 읽기 전용 (Read-only)",
         "highlight": [
-          9
+          11
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "true",
-            "false",
-            "true"
+          "stack": [
+            {
+              "name": "age",
+              "value": "21"
+            },
+            {
+              "name": "PI",
+              "value": "3.14",
+              "readonly": true
+            }
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "String Pool의 목적은?",
+    "question": "값을 변경할 수 없는 상수를 만들 때 쓰는 키워드는?",
     "options": [
-      "보안 강화",
-      "메모리 절약",
-      "속도 향상",
-      "가비지 컬렉션 최적화"
+      "const",
+      "static",
+      "final",
+      "readonly"
     ],
-    "correctIndex": 1,
-    "explanation": "같은 문자열 리터럴을 여러 번 사용해도 하나의 객체만 생성하여 메모리를 절약합니다."
+    "correctIndex": 2,
+    "explanation": "Java에서는 `final` 키워드를 사용하여 상수를 정의합니다. (C++이나 JS의 const와 비슷합니다)"
   },
   "misconceptions": [
     {
-      "wrong": "문자열은 항상 ==로 비교하면 된다",
-      "correct": "문자열 비교는 무조건 `.equals()`를 사용해야 합니다.",
-      "why": "리터럴은 Pool 때문에 운 좋게 `==`가 통할 수 있지만, 사용자 입력이나 파일에서 읽은 문자열은 `new` 객체처럼 취급되어 `==`가 실패합니다."
-    },
-    {
-      "wrong": "String Pool은 메모리가 꽉 차도 안 비워진다",
-      "correct": "String Pool도 GC(가비지 컬렉션)의 대상입니다.",
-      "why": "Java 7 이전에는 PermGen 영역에 있어서 메모리 부족 문제가 있었지만, Java 7부터는 일반 Heap으로 옮겨져서 참조가 없으면 자동으로 청소됩니다."
+      "wrong": "변수를 선언하지 않고 쓸 수 있다",
+      "correct": "자바는 엄격합니다. `age = 20;`처럼 타입을 안 적으면 에러가 납니다.",
+      "why": "Phython이나 JS와 달리 Java는 정적 타입(Statically Typed) 언어라서, '이 변수에 무엇이 들어갈지' 미리 신고해야 합니다."
     }
   ],
-  "keyTakeaway": "리터럴은 Pool에서 재사용되고, new는 항상 새 객체를 만듭니다. 비교는 .equals()!"
+  "keyTakeaway": "변수는 `type name = value;`, 상수는 `final`을 붙인다."
 }

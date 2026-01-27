@@ -1,43 +1,58 @@
 {
   "lessonId": "java-8-3",
-  "title": "Set & Queue",
-  "concept": "Core concept for Set & Queue",
+  "title": "HashSet & Equals/HashCode",
+  "concept": "CORE_CONCEPT_HASHSET_EQUALS",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Set & Queue\n    }\n}",
+    "code": "import java.util.HashSet;\n\nclass Student {\n    String name;\n    public Student(String name) { this.name = name; }\n\n    // What if we remove these methods?\n    public int hashCode() { return name.hashCode(); }\n    public boolean equals(Object o) {\n        return ((Student)o).name.equals(this.name);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        HashSet<Student> set = new HashSet<>();\n        \n        set.add(new Student(\"Jammy\"));\n        set.add(new Student(\"Jammy\")); // Duplicate?\n        \n        // If hashCode/equals are missing -> size is 2 (Wrong)\n        // If present -> size is 1 (Correct)\n        System.out.println(\"Size: \" + set.size());\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 6,
+        "title": "HashSet의 중복 제거 원리",
+        "explanation": "`HashSet`은 내부적으로 `HashMap`을 사용합니다. 데이터를 저장할 때 먼저 `hashCode()`를 비교하고, 같으면 `equals()`로 데이터를 확인합니다. 둘 다 같아야 '중복'으로 판단합니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "stack": []
+        }
+      },
+      {
+        "line": 15,
+        "title": "객체의 동등성(Equality)",
+        "explanation": "우리가 보기에 \"Jammy\" 두 명은 같은 사람이지만, 컴퓨터는 메모리 주소가 다르면 다른 객체로 봅니다. 그래서 `equals()`를 직접 구현해서 \"이름이 같으면 같은 사람이야\"라고 알려줘야 합니다.",
+        "keyInsight": "HashSet에 객체를 담을 때는 반드시 hashCode와 equals를 오버라이딩해야 합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "class": "HashSet",
+              "elements": [
+                "Student(Jammy)"
+              ]
+            }
+          ],
+          "output": [
+            "Size: 1"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Set & Queue?",
+    "question": "HashSet 동작 방식 순서로 올바른 것은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "equals() 확인 -> true면 hashCode() 확인",
+      "무조건 equals()만 확인",
+      "hashCode() 확인 -> 같으면 equals() 확인",
+      "랜덤하게 확인"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "빠른 비교를 위해 정수값인 `hashCode()`를 먼저 봅니다. 해시코드가 다르면 아예 다른 객체입니다. 해시코드가 같을 때만 비싼 연산인 `equals()`를 실행합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "Set은 정렬 되어 있다.",
+      "correct": "`HashSet`은 순서가 없습니다. 정렬된 Set이 필요하면 이진 트리 구조인 `TreeSet`을 사용해야 합니다.",
+      "why": "해시 버킷 인덱스는 데이터 내용에 따라 무작위로 결정되기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Set & Queue is crucial for advanced Java."
+  "keyTakeaway": "Set은 중복을 허용하지 않는 주머니입니다. 하지만 '중복'의 기준을 컴퓨터에게 알려주려면 hashCode/equals가 필수입니다."
 }

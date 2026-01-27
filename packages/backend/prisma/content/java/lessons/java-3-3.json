@@ -1,16 +1,40 @@
 {
   "lessonId": "java-3-3",
-  "title": "배열 전달",
-  "concept": "배열도 객체이므로 참조값이 복사된다. 요소 수정은 원본에 영향",
+  "title": "Call by Value",
+  "concept": "자바는 오직 '값에 의한 호출(Call by Value)'만 존재한다",
   "content": {
-    "code": "void modifyElement(int[] arr) {\n    arr[0] = 100;\n}\n\nvoid reassignArray(int[] arr) {\n    arr = new int[]{999, 888, 777};\n}\n\nint[] nums = {1, 2, 3};\nSystem.out.println(Arrays.toString(nums));\n\nmodifyElement(nums);\nSystem.out.println(Arrays.toString(nums));\n\nreassignArray(nums);\nSystem.out.println(Arrays.toString(nums));",
+    "code": "public class Main {\n    public static void swap(int x, int y) {\n        int temp = x; x = y; y = temp;\n    }\n\n    public static void changeArr(int[] arr) {\n        arr[0] = 999;\n    }\n\n    public static void main(String[] args) {\n        // 1. Primitive Swap 실패\n        int a = 1, b = 2;\n        swap(a, b); \n        System.out.println(a); // 여전히 1\n\n        // 2. Reference Mutation 성공\n        int[] nums = {1, 2, 3};\n        changeArr(nums);\n        System.out.println(nums[0]); // 999\n    }\n}",
     "steps": [
       {
-        "line": 9,
-        "title": "배열 생성",
-        "explanation": "**배열도 객체다:**\nHeap에 `[1, 2, 3]`이라는 배열이 생기고, `nums`는 그 주소(`0x100`)를 가집니다.\n배열을 '여러 칸 짜리 사물함'이라고 생각해보세요.",
+        "line": 10,
+        "title": "기본 타입 전달 (복사)",
+        "explanation": "`swap(a, b)`를 호출할 때 `a`, `b` 통째로 가는 게 아닙니다.\n`a`안에 든 `1`이라는 값만 복사해서 `swap` 함수에게 줍니다.\n\n`swap` 함수가 그 복사본(`x`, `y`)을 지지고 볶아도, 원본 `a`는 영향받지 않습니다.",
+        "keyInsight": "Primitive: 값만 복사됨 (영향 X)",
         "highlight": [
-          9
+          10
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "1"
+            },
+            {
+              "name": "b",
+              "value": "2"
+            }
+          ],
+          "note": "swap 함수 내부 변화는 main에 영향 없음"
+        }
+      },
+      {
+        "line": 15,
+        "title": "참조 타입 전달 (주소 복사)",
+        "explanation": "`changeArr(nums)` 호출 시:\n`nums`가 가진 **참조값(주소: 0x100)**이 복사되어 전달됩니다.\n\n이제 `changeArr` 함수도 `0x100` 열쇠를 가지게 되었습니다.\n이 열쇠로 사물함(`arr[0]`)을 열어서 값을 바꾸면, 원본 사물함이 바뀝니다.",
+        "keyInsight": "Object: 주소가 복사됨 (내용 변경 가능)",
+        "highlight": [
+          15
         ],
         "visualizationType": "memory",
         "memoryState": {
@@ -23,156 +47,31 @@
           "heap": [
             {
               "address": "0x100",
-              "content": "[1, 2, 3]"
-            }
-          ]
-        }
-      },
-      {
-        "line": 12,
-        "title": "modifyElement(nums) 호출",
-        "explanation": "`nums`의 주소 `0x100`이 `arr`에 복사됩니다.\n이제 `nums`와 `arr` 두 리모컨 모두 **같은 사물함(0x100)**을 가리킵니다.",
-        "highlight": [
-          12,
-          1
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "nums",
-              "value": "-> 0x100",
-              "frame": "main"
-            },
-            {
-              "name": "arr",
-              "value": "-> 0x100",
-              "frame": "modifyElement",
-              "sameRef": true
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "[1, 2, 3]"
-            }
-          ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "요소 수정 (성공)",
-        "explanation": "`arr[0] = 100`은...\n1. `arr`이 가리키는 사물함(`0x100`)으로 간다.\n2. 첫 번째 칸을 열어서 100으로 바꾼다.\n3. **결과:** 원본 사물함 자체가 변했습니다!",
-        "keyInsight": "배열 내용물 수정 = 원본 변경",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "[100, 2, 3]",
+              "content": "[999, 2, 3]",
               "changed": true
             }
-          ]
-        }
-      },
-      {
-        "line": 15,
-        "title": "reassignArray(nums) 호출",
-        "explanation": "다시 주소 `0x100`이 복사되어 전달됩니다.",
-        "highlight": [
-          15,
-          5
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "nums",
-              "value": "-> 0x100",
-              "frame": "main"
-            },
-            {
-              "name": "arr",
-              "value": "-> 0x100",
-              "frame": "reassignArray"
-            }
-          ]
-        }
-      },
-      {
-        "line": 6,
-        "title": "배열 재할당 (실패)",
-        "explanation": "`arr = new int[]{...}`:\n1. Heap에 새 사물함(`0x300`)을 새로 샀습니다.\n2. `arr` 리모컨을 이 새 사물함(`0x300`)으로 연결을 바꿉니다.\n3. `nums` 리모컨은 여전히 옛날 사물함(`0x100`)을 가리키고 있습니다.\n\n**다시 말해서:** `arr` 변수 혼자만 딴 곳을 보게 된 것입니다.",
-        "keyInsight": "변수 재할당 = 지역 변수만 변경됨",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "nums",
-              "value": "-> 0x100",
-              "frame": "main"
-            },
-            {
-              "name": "arr",
-              "value": "-> 0x300",
-              "frame": "reassignArray",
-              "changed": true
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "[100, 2, 3]"
-            },
-            {
-              "address": "0x300",
-              "content": "[999, 888, 777]",
-              "new": true
-            }
-          ]
-        }
-      },
-      {
-        "line": 16,
-        "title": "결과 확인",
-        "explanation": "재할당은 실패(지역적)했지만, 요소 수정은 성공(전역적)했습니다.\n\n**불변 객체(Immutable Object)란?**\n`String`처럼 한 번 만들면 내부 내용을 절대 바꿀 수 없는 객체를 말합니다. 배열은 반대로 아주 자유롭게 내용을 바꿀 수 있는 **가변 객체(Mutable Object)**입니다.",
-        "highlight": [
-          16
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "[1, 2, 3]",
-            "[100, 2, 3]",
-            "[100, 2, 3]"
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "배열 내용을 함수 안에서 바꾸면서 원본은 지키고 싶다면?",
+    "question": "Java의 파라미터 전달 방식은?",
     "options": [
-      "그냥 전달하면 된다",
-      "배열을 복사(clone)해서 전달한다",
-      "final 키워드를 쓴다",
-      "방법이 없다"
+      "무조건 Call by Reference",
+      "무조건 Call by Value",
+      "기본 타입은 Value, 객체는 Reference",
+      "상황에 따라 다름"
     ],
     "correctIndex": 1,
-    "explanation": "배열은 가변 객체이므로 원본을 보호하려면 `Arrays.copyOf()`나 `.clone()`으로 복사본을 만들어 넘겨야 합니다 (방어적 복사, Defensive Copy)."
+    "explanation": "Java는 **언제나 Call by Value**입니다. 객체를 넘길 때는 '주소값'이 복사되어 전달되는 것입니다. (C++의 참조자 & 와는 다릅니다)"
   },
   "misconceptions": [
     {
-      "wrong": "String은 배열인데 왜 수정이 안 되나요?",
-      "correct": "Java의 `String`은 내부 배열을 `private`으로 꽁꽁 숨겨놓고 수정 메서드를 제공하지 않는 **불변(Immutable)** 클래스이기 때문입니다.",
-      "why": "배열이라서가 아니라, 클래스 설계자가 안전을 위해 그렇게 막아둔 것입니다. 반면 `int[]`, `char[]`은 막혀있지 않습니다."
+      "wrong": "객체를 넘기면 Call by Reference다",
+      "correct": "개념적으로 비슷해 보이지만, 정확히는 **'참조값(Address Value)'의 Pass by Value**입니다.",
+      "why": "진짜 Call by Reference라면, 함수 안에서 `arr = new int[]` 했을 때 원본 `nums` 변수도 새 배열을 가리켜야 합니다. 하지만 Java는 그렇지 않습니다."
     }
   ],
-  "keyTakeaway": "배열 내부 수정은 즉시 반영되지만, 배열 변수 자체를 바꾸는 건 안 된다."
+  "keyTakeaway": "변수의 값을 항상 '복사'해서 준다. 주소를 복사해주면 내용 수정은 가능하다."
 }

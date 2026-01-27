@@ -1,43 +1,67 @@
 {
   "lessonId": "java-10-1",
-  "title": "Thread Creation",
-  "concept": "Core concept for Thread Creation",
+  "title": "Thread vs Runnable",
+  "concept": "CORE_CONCEPT_THREAD_RUNNABLE",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Thread Creation\n    }\n}",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. Extend Thread\n        Thread t1 = new MyThread();\n        t1.start();\n\n        // 2. Implement Runnable (Preferred)\n        Runnable task = new MyTask();\n        Thread t2 = new Thread(task);\n        t2.start();\n        \n        System.out.println(\"Main thread ends\");\n    }\n}\n\nclass MyThread extends Thread {\n    public void run() {\n        System.out.println(\"Thread A running\");\n    }\n}\n\nclass MyTask implements Runnable {\n    public void run() {\n        System.out.println(\"Task B running\");\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 5,
+        "title": "Thread 클래스 상속",
+        "explanation": "`Thread` 클래스를 상속받아 `run()`을 오버라이딩합니다. 하지만 Java는 단일 상속만 지원하므로, 다른 클래스를 상속받을 수 없다는 단점이 있습니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "stack": [
+            {
+              "name": "t1",
+              "value": "Thread-0"
+            }
+          ],
+          "output": [
+            "Main thread ends",
+            "Thread A running"
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Runnable 인터페이스 구현",
+        "explanation": "`Runnable` 인터페이스를 구현해서 `Thread` 생성자에 넘겨주는 방식을 권장합니다. 클래스 상속의 제약이 없고, '할 일(Task)'과 '실행자(Thread)'를 분리할 수 있어 유연합니다.",
+        "keyInsight": "`run()`을 직접 호출하면 안 됩니다! 반드시 `start()`를 호출해야 새로운 호출 스택(Call Stack)이 생성되어 병렬로 실행됩니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "t2",
+              "value": "Thread-1"
+            }
+          ],
+          "output": [
+            "Main thread ends",
+            "Thread A running",
+            "Task B running"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Thread Creation?",
+    "question": "Thread의 run() 메서드를 직접 호출하면 발생하는 일은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "새로운 스레드가 생성되어 실행된다.",
+      "컴파일 에러가 발생한다.",
+      "현재 스레드(main)에서 일반 메서드처럼 순차적으로 실행된다.",
+      "런타임 예외가 발생한다."
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "`start()`는 OS에게 스레드 생성을 요청하는 시스템 콜을 수행하지만, `run()`은 단순히 클래스 내부의 메서드를 실행하는 것뿐입니다. 멀티스레딩 효과가 전혀 없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "스레드 순서는 코딩한 순서대로 실행된다.",
+      "correct": "보장되지 않습니다. OS의 스케줄러가 누구를 먼저 실행할지 결정하므로, 실행할 때마다 결과가 달라질 수 있습니다.",
+      "why": "Context Switching 은 매우 빠르게 불규칙적으로 일어납니다."
     }
   ],
-  "keyTakeaway": "Understanding Thread Creation is crucial for advanced Java."
+  "keyTakeaway": "유연성을 위해 `Runnable`을 구현하여 `new Thread(runnable).start()` 패턴을 주로 사용하세요."
 }

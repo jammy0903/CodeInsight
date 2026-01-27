@@ -1,43 +1,55 @@
 {
   "lessonId": "java-8-4",
-  "title": "Collections Utility",
-  "concept": "Core concept for Collections Utility",
+  "title": "Iterator & Fail-Fast",
+  "concept": "CORE_CONCEPT_ITERATOR_FAIL_FAST",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Collections Utility\n    }\n}",
+    "code": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> list = new ArrayList<>();\n        list.add(\"A\");\n        list.add(\"B\");\n        list.add(\"C\");\n\n        // 1. Iterator Pattern\n        Iterator<String> it = list.iterator();\n        while(it.hasNext()) {\n            String s = it.next();\n            if (s.equals(\"B\")) {\n                it.remove(); // Safe Removal\n                // list.remove(\"B\"); // Fail-Fast Error!\n            }\n        }\n        \n        System.out.println(list);\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 8,
+        "title": "반복자 (Iterator)",
+        "explanation": "리스트, 셋, 맵 등 컬렉션의 종류와 상관없이 요소를 하나씩 꺼낼 수 있게 해주는 표준 도구입니다. `hasNext()`와 `next()`로 순회합니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "stack": [
+            {
+              "name": "it",
+              "value": "Iterator Cursor -> Index 0"
+            }
+          ]
+        }
+      },
+      {
+        "line": 13,
+        "title": "ConcurrentModificationException",
+        "explanation": "반복문 도중에 `list.remove()`로 직접 데이터를 삭제하면 에러가 터집니다(Fail-Fast). 반복자는 리스트 구조가 중간에 바뀌었는지 감시하고 있다가, 이상하면 즉시 작업을 멈춥니다.",
+        "keyInsight": "안전하게 삭제하려면 반드시 `it.remove()`를 써야 합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "[A, C]"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Collections Utility?",
+    "question": "향상된 for문 (for-each) 내부에서 리스트 요소를 삭제(remove)하면 발생하는 일은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "정상적으로 삭제된다.",
+      "컴파일 에러가 발생한다.",
+      "ConcurrentModificationException 발생",
+      "아무 일도 일어나지 않는다."
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "향상된 for문은 내부적으로 Iterator를 사용합니다. 하지만 Iterator의 remove가 아닌 원본 리스트의 remove를 호출하게 되므로, Fail-Fast 정책에 의해 예외가 발생합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "for(int i=0...) 반복문에서는 삭제해도 괜찮다.",
+      "correct": "에러는 안 나지만, 인덱스가 밀려서(Shift) 요소를 건너뛰는 논리적 버그가 생기기 쉽습니다. 삭제할 때는 뒤에서부터 돌거나 Iterator를 쓰는 게 정석입니다.",
+      "why": "삭제되면 사이즈가 줄고 인덱스가 당겨지기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Collections Utility is crucial for advanced Java."
+  "keyTakeaway": "컬렉션을 순회하면서 내용을 변경할 때는 반드시 Iterator를 사용해야 안전합니다."
 }

@@ -1,173 +1,85 @@
 {
   "lessonId": "java-5-1",
-  "title": "final 변수",
-  "concept": "final 변수는 재할당이 불가능하지만, 참조하는 객체의 내부는 수정 가능하다",
+  "title": "Encapsulation & Access Modifiers",
+  "concept": "데이터를 숨기고(private) 필요한 메서드만 공개(public)하여 객체를 보호한다",
   "content": {
-    "code": "final int x = 10;\n// x = 20;  // 컴파일 에러!\n\nfinal int[] arr = {1, 2, 3};\narr[0] = 100;  // OK!\n// arr = new int[]{4, 5, 6};  // 컴파일 에러!\n\nfinal StringBuilder sb = new StringBuilder(\"Hello\");\nsb.append(\" World\");  // OK!\n// sb = new StringBuilder();  // 컴파일 에러!",
+    "code": "class BankAccount {\n    // 1. 데이터 숨기기 (Private)\n    private int balance = 0;\n\n    // 2. 공개 메서드로만 접근 허용 (Public)\n    public void deposit(int amount) {\n        if (amount > 0) {\n            balance += amount;\n        }\n    }\n\n    public int getBalance() {\n        return balance;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        BankAccount myAcc = new BankAccount();\n        \n        // myAcc.balance = -5000; // 에러! 직접 접근 불가\n        \n        myAcc.deposit(100);\n        System.out.println(\"Balance: \" + myAcc.getBalance());\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "final 기본 타입",
-        "explanation": "**용접된 상자:**\n`final int x = 10;`은 `x`라는 상자에 `10`을 넣고 뚜껑을 **용접**해버린 것과 같습니다. 이제 내용물을 바꿀 수 없습니다.",
+        "line": 3,
+        "title": "접근 제어자 (private)",
+        "explanation": "**`private`**: \"내 클래스 안에서만 볼 수 있다.\"\n외부에서 함부로 값을 바꾸거나 망가뜨리는 것을 막는 **자물쇠**입니다.",
         "highlight": [
-          1
+          3
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "x (final)",
-              "value": "10"
-            }
-          ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "재할당 시도 (에러)",
-        "explanation": "이미 용접된 `x` 상자에 `20`을 억지로 넣으려 하면 컴파일러가 빨간 줄을 긋습니다.",
-        "keyInsight": "final 변수 = 값 변경 불가 (상수)",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "컴파일 에러: cannot assign a value to final variable x"
-        }
-      },
-      {
-        "line": 4,
-        "title": "final 배열 참조",
-        "explanation": "**고정된 화살표:**\n`final int[] arr`은 `arr`가 가리키는 **화살표의 방향(주소)**을 고정시킨 것입니다.\n이제 `arr` 변수는 오직 저쪽 집(`0x001`)만 가리킬 수 있습니다.",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "arr (final)",
-              "value": "-> 0x001"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "[1, 2, 3]"
-            }
-          ]
-        }
-      },
-      {
-        "line": 5,
-        "title": "배열 요소 수정 (OK!)",
-        "explanation": "**중요한 구분:**\n화살표 방향(주소)은 못 바꾸지만, 화살표가 가리키는 **집 안의 냉장고 내용물**(`arr[0]`)은 마음대로 바꿀 수 있습니다!\n\"이사는 못 가지만 리모델링은 된다\"고 생각하면 됩니다.",
-        "keyInsight": "final = 주소 고정, 내부 상태는 자유",
-        "highlight": [
-          5
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "[100, 2, 3]",
-              "changed": true
-            }
-          ],
-          "note": "내용물 변경 성공!"
+          "note": "balance는 외부에서 안 보임 (숨겨짐)"
         }
       },
       {
         "line": 6,
-        "title": "배열 재할당 (에러)",
-        "explanation": "`arr = new int[]...`는 `arr`의 화살표를 다른 집(새 주소)으로 돌리려는 시도입니다.\n`final`로 고정되어 있으므로 에러가 납니다.",
+        "title": "Setter 메서드 (deposit)",
+        "explanation": "데이터를 바꿀 수 있는 유일한 **창구**입니다.\n여기서 `if (amount > 0)` 같은 **검문소(Validation)**를 세울 수 있습니다.\n덕분에 통장 잔고가 마이너스가 되거나 이상해지는 것을 막을 수 있습니다.",
+        "keyInsight": "메서드를 통하면 '검증'이 가능하다",
         "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "컴파일 에러: cannot assign a value to final variable arr"
-        }
-      },
-      {
-        "line": 8,
-        "title": "final StringBuilder",
-        "explanation": "`sb` 변수도 마찬가지로 `0x002` 주소로 고정됩니다.",
-        "highlight": [
-          8
+          6,
+          7,
+          8,
+          9
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "sb (final)",
-              "value": "-> 0x002"
+              "name": "amount",
+              "value": "100"
             }
           ],
           "heap": [
             {
-              "address": "0x002",
-              "content": "StringBuilder{\"Hello\"}"
-            }
-          ]
-        }
-      },
-      {
-        "line": 9,
-        "title": "내용 수정 (OK!)",
-        "explanation": "`sb.append()`는 객체(`0x002`) 내부의 데이터를 바꿉니다.\n`sb`라는 화살표 자체는 움직이지 않았으니 `final` 규칙 위반이 아닙니다.",
-        "keyInsight": "final ≠ 불변 객체(Immutable Object)",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "0x002",
-              "content": "StringBuilder{\"Hello World\"}",
+              "address": "0x100",
+              "content": "BankAccount{balance: 100}",
               "changed": true
             }
           ]
         }
       },
       {
-        "line": 10,
-        "title": "재할당 시도 (에러)",
-        "explanation": "`sb`에게 다른 주소를 담으려 하면 컴파일러가 막습니다.",
+        "line": 12,
+        "title": "Getter 메서드 (getBalance)",
+        "explanation": "내부 데이터를 안전하게 조회만 할 수 있게 해줍니다.\n읽기 전용(Read-only) 속성을 만들 때 유용합니다.",
         "highlight": [
-          10
+          12,
+          13,
+          14
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "error": "컴파일 에러: cannot assign a value to final variable sb"
+          "output": [
+            "Balance: 100"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "final List list = new ArrayList(); 에서 가능한 코드는?",
+    "question": "가장 폐쇄적인(엄격한) 접근 제어자부터 순서대로 나열하면?",
     "options": [
-      "list = new ArrayList()",
-      "list.add(\"item\")",
-      "list = null",
-      "list = List.of()"
+      "private -> default -> protected -> public",
+      "public -> protected -> default -> private",
+      "protected -> private -> default -> public",
+      "default -> private -> protected -> public"
     ],
-    "correctIndex": 1,
-    "explanation": "final은 변수의 '재할당'만 금지합니다. 참조된 객체 내부(`list.add()`)를 수정하는 것은 아무 상관없습니다."
+    "correctIndex": 0,
+    "explanation": "private(나만) -> default(같은 패키지) -> protected(상속받은 자식까지) -> public(누구나) 순서입니다."
   },
   "misconceptions": [
     {
-      "wrong": "final 변수가 가리키는 객체는 불변(Immutable)이다",
-      "correct": "아닙니다! 변수(껍데기)만 고정될 뿐, 알맹이(객체)는 변할 수 있습니다.",
-      "why": "완전한 불변을 원하면 `final` 클래스에 모든 필드를 `final`로 만들고 setter를 없애야 합니다(예: String)."
-    },
-    {
-      "wrong": "메서드 파라미터에 final을 붙이면 값을 못 바꾼다",
-      "correct": "맞지만, 참조형 파라미터라면 그 객체의 '속성'은 여전히 바꿀 수 있습니다.",
-      "why": "`void func(final int[] a)`에서 `a = new...`는 안 되지만 `a[0] = 99`는 됩니다."
+      "wrong": "Getter/Setter는 무조건 다 만들어야 한다",
+      "correct": "아닙니다. 외부에서 몰라도 되는 데이터는 아예 접근 메서드를 안 만드는 게 더 안전합니다(완전 정보 은닉).",
+      "why": "IDE가 자동으로 만들어준다고 생각 없이 다 public으로 여는 것은 캡슐화를 깨뜨리는 나쁜 습관입니다."
     }
   ],
-  "keyTakeaway": "final은 '화살표 고정'이다. 가리키는 대상의 내부까지 얼리는 건 아니다."
+  "keyTakeaway": "변수는 `private`, 메서드는 `public`. 들어오는 길, 나가는 길을 통제하라."
 }

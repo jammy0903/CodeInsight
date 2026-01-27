@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/stores/store';
 import { checkNickname, registerUser } from '@/services/user';
@@ -94,9 +95,35 @@ export function NicknameModal() {
     }
   };
 
-  // 취소 (로그아웃)
-  const handleCancel = async () => {
-    await logout();
+  // 나중에 하기 (임시 닉네임 생성)
+  const handleSkip = async () => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    // user_{8-char-uuid}
+    const tempNickname = `user_${uuidv4().slice(0, 8)}`;
+
+    try {
+      const appUser = await registerUser(tempNickname);
+      setAppUser(appUser);
+      setNeedsRegistration(false);
+    } catch (error) {
+      // 닉네임 중복 시 (매우 희박) 재시도
+      if ((error as any)?.code === 'NICKNAME_TAKEN') {
+        const tempNickname2 = `user_${uuidv4().slice(0, 8)}`;
+        try {
+          const appUser = await registerUser(tempNickname2);
+          setAppUser(appUser);
+          setNeedsRegistration(false);
+        } catch (retryError) {
+          setMessage('임시 닉네임 생성에 실패했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        setMessage(error instanceof Error ? error.message : '등록에 실패했습니다');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -179,10 +206,11 @@ export function NicknameModal() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={handleCancel}
-              className="flex-1 px-4 py-3 text-[var(--theme-dashboard-text-muted)] border-2 border-[var(--theme-dashboard-card-border)] rounded-lg font-medium hover:bg-[var(--theme-dashboard-section-header-bg)] transition-colors"
+              onClick={handleSkip}
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-3 text-[var(--theme-dashboard-text-muted)] border-2 border-[var(--theme-dashboard-card-border)] rounded-lg font-medium hover:bg-[var(--theme-dashboard-section-header-bg)] transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
-              취소
+              나중에 하기
             </motion.button>
             <motion.button
               whileHover={{ scale: status === 'valid' ? 1.02 : 1 }}

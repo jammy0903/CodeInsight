@@ -1,43 +1,58 @@
 {
   "lessonId": "java-10-2",
-  "title": "Synchronization",
-  "concept": "Core concept for Synchronization",
+  "title": "Race Conditions",
+  "concept": "CORE_CONCEPT_RACE_CONDITIONS",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Synchronization\n    }\n}",
+    "code": "public class Main {\n    static int count = 0;\n\n    public static void main(String[] args) throws InterruptedException {\n        Runnable task = () -> {\n            for (int i = 0; i < 10000; i++) {\n                count++; \n                // count = count + 1\n                // 1. Read count\n                // 2. Add 1\n                // 3. Write count\n            }\n        };\n\n        Thread t1 = new Thread(task);\n        Thread t2 = new Thread(task);\n\n        t1.start();\n        t2.start();\n        \n        t1.join(); // Wait for t1 to finish\n        t2.join(); // Wait for t2 to finish\n        \n        // Expected: 20000, Actual: ??? (e.g. 15432)\n        System.out.println(\"Count: \" + count);\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 7,
+        "title": "동시성 문제 (Race Condition)",
+        "explanation": "`count++`는 한 줄 같지만 기계어로는 '읽기 -> 더하기 -> 저장하기' 3단계입니다. 두 스레드가 동시에 '읽기'를 해버리면, 둘 다 같은 값(예: 100)을 읽고 101로 저장해서, 결과적으로 1번만 증가하는 손실이 발생합니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "name": "static count",
+              "value": "15432 (Loss occurred)"
+            }
+          ]
+        }
+      },
+      {
+        "line": 18,
+        "title": "join() 메서드",
+        "explanation": "`join()`을 호출하면 해당 스레드가 끝날 때까지 메인 스레드가 기다립니다. 정확한 결과 확인을 위해 사용했습니다.",
+        "keyInsight": "멀티스레드 환경에서는 공유 자원(Shared Variable)에 동시에 접근할 때 반드시 동기화(Synchronization)가 필요합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "status": "Waiting for t1, t2"
+            }
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Synchronization?",
+    "question": "Race Condition이 발생하는 근본적인 이유는?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "스레드 개수가 너무 많아서",
+      "CPU 성능이 부족해서",
+      "공유 자원에 대한 비원자적(Non-atomic) 연산을 동시에 수행해서",
+      "메모리가 부족해서"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "작업이 원자적(Atomic, 더 이상 쪼갤 수 없는 단위)이지 않아서, 작업 중간에 다른 스레드가 끼어들 틈이 있기 때문입니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "변수에 volatile 키워드를 붙이면 원자성이 보장되어 해결된다.",
+      "correct": "틀렸습니다. `volatile`은 '가시성(Visibility, 최신 값 읽기)'만 보장할 뿐, `count++` 같은 복합 연산의 원자성을 보장하지 않습니다. 여전히 동기화가 필요합니다.",
+      "why": "Read-Modify-Write 패턴은 volatile로 해결되지 않습니다."
     }
   ],
-  "keyTakeaway": "Understanding Synchronization is crucial for advanced Java."
+  "keyTakeaway": "공유 변수를 여러 스레드가 동시에 수정하면 데이터가 깨질 수 있습니다(Thread-Unsafe). 이 위험 구간을 '임계 영역(Critical Section)'이라고 합니다."
 }

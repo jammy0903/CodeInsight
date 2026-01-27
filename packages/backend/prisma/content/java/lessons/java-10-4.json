@@ -1,43 +1,57 @@
 {
   "lessonId": "java-10-4",
-  "title": "Executors",
-  "concept": "Core concept for Executors",
+  "title": "Wait & Notify",
+  "concept": "CORE_CONCEPT_WAIT_NOTIFY",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Executors\n    }\n}",
+    "code": "public class Main {\n    static final Object lock = new Object();\n    static boolean isDataReady = false;\n\n    public static void main(String[] args) {\n        Thread consumer = new Thread(() -> {\n            synchronized (lock) {\n                while (!isDataReady) { // 1. Check condition\n                    try {\n                        System.out.println(\"Consumer waiting...\");\n                        lock.wait(); // 2. Release lock & Wait\n                    } catch (InterruptedException e) {}\n                }\n                System.out.println(\"Consumer process data!\");\n            }\n        });\n\n        Thread producer = new Thread(() -> {\n            synchronized (lock) {\n                System.out.println(\"Producer preparing data...\");\n                isDataReady = true;\n                lock.notify(); // 3. Wake up waiting thread\n            }\n        });\n\n        consumer.start();\n        try { Thread.sleep(100); } catch (Exception e) {}\n        producer.start();\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 9,
+        "title": "wait() 메서드",
+        "explanation": "스레드가 작업을 할 수 없는 상태일 때, 자발적으로 락을 반납하고 '대기실(Wait Set)'로 들어가서 잡니다. CPU를 낭비하지 않기 위함입니다. 반드시 `synchronized` 블록 안에서만 호출할 수 있습니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "stack": [
+            {
+              "name": "Consumer",
+              "status": "WAITING (in Wait Set)"
+            }
+          ]
+        }
+      },
+      {
+        "line": 21,
+        "title": "notify() 메서드",
+        "explanation": "작업 준비가 완료된 스레드가 '대기실'에 있는 친구를 깨웁니다(Wake up). 깨어난 스레드는 다시 락을 얻으려고 경쟁하고, 락을 얻으면 멈췄던 곳(`wait` 다음 줄)부터 실행을 재개합니다.",
+        "keyInsight": "`wait`는 항상 `while` 문 안에서 조건(`!isDataReady`)과 함께 사용해야 합니다 (Spurious Wakeup 방지).",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "Consumer waiting...",
+            "Producer preparing data...",
+            "Consumer process data!"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Executors?",
+    "question": "wait()와 sleep()의 가장 큰 차이점은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "시간 설정 가능 여부",
+      "락(Lock)을 놓아주는지(Release) 여부",
+      "static 메서드 여부",
+      "InterruptedException 발생 여부"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "`sleep()`은 락을 쥔 채로 잠들어서 아무도 못 들어오게 하지만, `wait()`는 락을 잠시 반납하고 다른 스레드에게 기회를 줍니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "notify()를 호출하면 대기 중인 특정 스레드를 지정해서 깨울 수 있다.",
+      "correct": "불가능합니다. `notify()`는 대기 중인 스레드 중 '무작위'로 하나를 깨웁니다. 모두 깨우려면 `notifyAll()`을 써야 합니다.",
+      "why": "스레드 관리는 전적으로 OS 스케줄러 영역입니다."
     }
   ],
-  "keyTakeaway": "Understanding Executors is crucial for advanced Java."
+  "keyTakeaway": "스레드 간 협력(Cooperation)이 필요할 땐 `wait/notify`를 사용합니다. 현대 Java에서는 더 추상화된 `BlockingQueue`나 `ExecutorService`를 주로 사용합니다."
 }

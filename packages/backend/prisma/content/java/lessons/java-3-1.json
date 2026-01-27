@@ -1,139 +1,105 @@
 {
   "lessonId": "java-3-1",
-  "title": "기본 타입 전달",
-  "concept": "기본 타입(primitive)은 값이 복사되어 전달된다",
+  "title": "Array Basics",
+  "concept": "배열은 같은 타입의 데이터를 순서대로 저장하는 고정 크기 상자다",
   "content": {
-    "code": "void increment(int x) {\n    x = x + 1;\n    System.out.println(\"inside: \" + x);\n}\n\nint a = 10;\nSystem.out.println(\"before: \" + a);\nincrement(a);\nSystem.out.println(\"after: \" + a);",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. 선언과 동시에 생성\n        int[] numbers = new int[3]; // [0, 0, 0]\n        \n        // 2. 값 넣기\n        numbers[0] = 10;\n        numbers[1] = 20;\n        numbers[2] = 30;\n        \n        // 3. 리터럴로 생성 (더 편함)\n        String[] fruits = {\"Apple\", \"Banana\"};\n        \n        // 4. 길이 확인\n        System.out.println(numbers.length); // 3\n    }\n}",
     "steps": [
       {
-        "line": 6,
-        "title": "변수 a 선언",
-        "explanation": "**메모리 상태:**\nStack 메모리의 `main` 방(Stack Frame)에 `a`라는 이름표가 붙은 상자가 생기고, 그 안에 숫자 `10`이 들어갑니다.",
+        "line": 4,
+        "title": "배열 생성 (new)",
+        "explanation": "**`new int[3]`**: Heap 영역에 정수 3개를 담을 수 있는 연속된 공간을 만듭니다.\n자바는 친절하게도 모든 칸을 `0`으로 자동 초기화해줍니다.",
+        "keyInsight": "배열 크기는 고정됨 (불변)",
         "highlight": [
-          6
+          4
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "10",
-              "frame": "main"
+              "name": "numbers",
+              "value": "-> 0x100"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[0, 0, 0]"
             }
           ]
         }
       },
       {
-        "line": 8,
-        "title": "increment(a) 호출",
-        "explanation": "**값의 복사 (Pass by Value):**\n1. `increment` 메서드를 위한 **새로운 방(Stack Frame)**이 만들어집니다.\n2. `main` 방에 있는 `a`의 값(10)을 **복사**해서 `x`에게 줍니다.\n\n**비유:** 숙제를 친구에게 보여줄 때, 내 공책을 통째로 주는 게 아니라 **복사본**만 주는 것과 같습니다. 친구가 복사본에 낙서해도 내 원본은 멀쩡하죠.",
-        "keyInsight": "기본 타입 = 값만 복사, 원본과 완전 남남",
+        "line": 7,
+        "title": "인덱스로 접근",
+        "explanation": "인덱스는 **0부터 시작**합니다. (Zero-based Indexing)\n`numbers[0]`은 첫 번째 칸을 의미합니다.",
         "highlight": [
+          7,
           8,
-          1
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "a",
-              "value": "10",
-              "frame": "main"
-            },
-            {
-              "name": "x",
-              "value": "10",
-              "frame": "increment",
-              "copied": true
-            }
-          ],
-          "note": "a의 값이 복사됨"
-        }
-      },
-      {
-        "line": 2,
-        "title": "x 증가",
-        "explanation": "`increment` 방 안에 있는 `x`의 값이 11로 바뀝니다.\n하지만 `main` 방에 있는 `a`는 끄떡없습니다. 벽으로 막혀있는 다른 방이기 때문입니다.",
-        "keyInsight": "파라미터 변경 -> 원본 영향 없음",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "a",
-              "value": "10",
-              "frame": "main"
-            },
-            {
-              "name": "x",
-              "value": "11",
-              "frame": "increment",
-              "changed": true
-            }
-          ],
-          "note": "Stack 프레임이 다름"
-        }
-      },
-      {
-        "line": 3,
-        "title": "함수 내부 출력",
-        "explanation": "이 방(`increment`) 안에서는 `x`가 11로 보입니다.",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "before: 10",
-            "inside: 11"
-          ]
-        }
-      },
-      {
-        "line": 9,
-        "title": "함수 반환 후 출력",
-        "explanation": "`increment` 메서드가 끝나고 그 방(Stack Frame)은 사라집니다. `x`도 함께 사라졌습니다.\n`main`으로 돌아와서 `a`를 보니 여전히 깔끔한 10입니다.\n\n**스택 프레임(Stack Frame)이란?**\n메서드가 호출될 때마다 생기는 독립적인 메모리 공간입니다. 지역변수들은 모두 이 안에 삽니다.",
-        "keyInsight": "메서드 종료 -> 복사본 x 소멸",
-        "highlight": [
           9
         ],
         "visualizationType": "memory",
         "memoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[10, 20, 30]",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 12,
+        "title": "리터럴 문법",
+        "explanation": "**`{...}`**: 배열을 만들면서 값까지 바로 채워 넣는 간편한 방법입니다.\n내부적으로는 똑같이 Heap에 생성됩니다.",
+        "highlight": [
+          12
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "10",
-              "frame": "main"
+              "name": "numbers",
+              "value": "-> 0x100"
+            },
+            {
+              "name": "fruits",
+              "value": "-> 0x200"
             }
           ],
-          "output": [
-            "before: 10",
-            "inside: 11",
-            "after: 10"
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[10, 20, 30]"
+            },
+            {
+              "address": "0x200",
+              "content": "[\"Apple\", \"Banana\"]",
+              "new": true
+            }
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "Java의 기본 타입 호출 방식은?",
+    "question": "int[] arr = new int[5]; 실행 직후 arr[0]의 값은?",
     "options": [
-      "Call by Reference",
-      "Call by Value",
-      "Call by Name",
-      "Call by Need"
+      "null",
+      "0",
+      "쓰레기값(Garbage)",
+      "undefined"
     ],
     "correctIndex": 1,
-    "explanation": "Java는 오직 **Call by Value(값에 의한 호출)**만 존재합니다. 변수의 값을 복사해서 전달합니다."
+    "explanation": "Java의 배열은 생성 시 자동으로 기본값으로 초기화됩니다. int는 0, boolean은 false, 객체는 null이 됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "함수에서 파라미터를 수정하면 원본도 바뀐다",
-      "correct": "기본 타입(primitive)은 **값(Value)**만 복사되므로, 원본 변수는 절대 영향을 받지 않습니다.",
-      "why": "마치 엑셀 파일을 이메일로 보낸 것과 같습니다. 받은 사람이 엑셀을 수정해도 내 컴퓨터에 있는 파일은 그대로인 것과 같은 원리입니다."
+      "wrong": "배열 길이를 나중에 늘릴 수 있다",
+      "correct": "한 번 생성된 배열의 크기는 절대 바꿀 수 없습니다.",
+      "why": "크기를 바꾸려면 더 큰 배열을 새로 만들고 이사(복사)를 가야 합니다. 크기가 변해야 한다면 `ArrayList`를 써야 합니다."
     }
   ],
-  "keyTakeaway": "기본 타입은 '복사본'이 전달된다. 원본은 안전하다."
+  "keyTakeaway": "배열은 '고정 크기' 객체다. 인덱스는 0부터 시작한다."
 }

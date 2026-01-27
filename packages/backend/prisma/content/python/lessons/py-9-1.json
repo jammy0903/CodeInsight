@@ -1,43 +1,51 @@
 {
   "lessonId": "py-9-1",
   "title": "Closures & Scope",
-  "concept": "Core concept for Closures & Scope",
+  "concept": "CORE_CONCEPT_CLOSURE",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Closures & Scope\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "def outer_func(name):\n    # outer_func의 지역 변수\n    greeting = \"Hello\"\n    \n    def inner_func():\n        # 외부 함수(outer)의 변수(name, greeting)를 참조 (Closure)\n        print(f\"{greeting}, {name}!\")\n        \n    return inner_func # 함수 자체를 리턴 (실행 X)\n\ndef example():\n    # 1. Closure 생성\n    my_closure = outer_func(\"Python\")\n    \n    # outer_func는 이미 종료되었지만...\n    print(\"Outer function finished.\")\n    \n    # 2. Closure 실행\n    # inner_func는 여전히 'greeting'과 'name'을 기억하고 있음\n    my_closure()\n    \n    # 심층 확인 (__closure__)\n    print(f\"Captured: {my_closure.__closure__[0].cell_contents}\")\n\nif __name__ == '__main__':\n    example()",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 10,
+        "title": "함수 상태의 저장 (Closure)",
+        "explanation": "`outer_func`가 리턴되면서 실행은 끝났지만, `inner_func`는 태어난 곳(`outer`의 스코프)의 변수들(`greeting`, `name`)을 자신의 등에 짊어지고 나옵니다. 이 '배낭'을 **클로저(Closure)**라고 합니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "variables": {
+            "my_closure": "<function inner_func at ...>"
+          },
+          "stdout": "Outer function finished."
+        }
+      },
+      {
+        "line": 16,
+        "title": "기억된 변수 접근",
+        "explanation": "이미 사라졌어야 할 `name=\"Python\"` 변수가 살아있습니다. `my_closure` 함수 객체 안에 `__closure__`라는 속성으로 저장되어 있기 때문입니다.",
+        "keyInsight": "함수와 그 함수가 선언될 당시의 환경(Environment)을 묶은 것입니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "Outer function finished.\nHello, Python!\nCaptured: Hello"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Closures & Scope?",
+    "question": "클로저(Closure)가 형성되기 위한 조건이 아닌 것은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "어떤 함수의 내부에 중첩 함수(Nested Function)가 있어야 한다.",
+      "중첩 함수가 외부 함수의 변수를 참조해야 한다.",
+      "외부 함수가 중첩 함수를 반환해야 한다.",
+      "반드시 클래스 내부에서 정의되어야 한다."
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 3,
+    "explanation": "클로저는 함수 중첩과 관련이 있으며, 클래스와는 무관합니다. 일반 함수에서도 만들 수 있습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "내부 함수(Inner function)는 무조건 클로저다.",
+      "correct": "아닙니다. 내부 함수가 외부 함수의 변수를 '참조(Refer)'하지 않으면 클로저가 생성되지 않습니다. 단순히 중첩되었다고 클로저는 아닙니다.",
+      "why": "기억할 게 없으면 배낭(Closure)을 메지 않습니다."
     }
   ],
-  "keyTakeaway": "Understanding Closures & Scope is crucial for advanced Python."
+  "keyTakeaway": "클로저는 '데이터(변수)'와 '코드(함수)'를 하나로 묶는 기술입니다. 이는 나중에 배울 **데코레이터(Decorator)**의 핵심 원리가 됩니다."
 }

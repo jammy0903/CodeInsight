@@ -1,169 +1,80 @@
 {
   "lessonId": "java-4-3",
-  "title": "String Pool과 intern()",
-  "concept": "String Pool은 문자열 리터럴을 재사용하는 메모리 최적화 기법이다",
+  "title": "Inheritance",
+  "concept": "상속(extends)을 통해 부모의 기능을 물려받아 재사용한다",
   "content": {
-    "code": "String s1 = \"Hello\";\nString s2 = \"Hello\";\nString s3 = new String(\"Hello\");\nString s4 = s3.intern();\n\nSystem.out.println(s1 == s2);\nSystem.out.println(s1 == s3);\nSystem.out.println(s1 == s4);",
+    "code": "class Animal {\n    void eat() {\n        System.out.println(\"Yum!\");\n    }\n}\n\nclass Cat extends Animal {\n    void meow() {\n        System.out.println(\"Meow~\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Cat myCat = new Cat();\n        \n        myCat.meow(); // 자기 기능\n        myCat.eat();  // 부모 기능 (상속받음)\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "첫 번째 리터럴",
-        "explanation": "**Pool 스캔:**\nJVM: \"재활용 센터(String Pool)에 `Hello`라는 물건이 있나?\"\n없으면 Pool에 새로 만들고 `s1`이 가리키게 합니다.",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s1",
-              "value": "-> Pool[0]"
-            }
-          ],
-          "stringPool": [
-            "\"Hello\" (0x001)"
-          ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "같은 리터럴 재사용",
-        "explanation": "**Pool 스캔:**\nJVM: \"`Hello`가 있나?\" -> \"어, 아까 만든 거 있네!\"\n새로 만들지 않고, 아까 그 주소(`0x001`)를 `s2`에게 그대로 줍니다.\n\n**리터럴(Literal)이란?**\n소스 코드에 `\"...\"`로 직접 박혀있는 고정된 값을 말합니다.",
-        "keyInsight": "같은 리터럴 = Pool에서 재사용, 메모리 절약",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s1",
-              "value": "-> Pool[0]"
-            },
-            {
-              "name": "s2",
-              "value": "-> Pool[0]",
-              "sameRef": true
-            }
-          ],
-          "note": "s1 == s2 (같은 주소)"
-        }
-      },
-      {
-        "line": 3,
-        "title": "new String() - 강제 새 객체",
-        "explanation": "**Heap 할당:**\n`new`는 명령은 강력합니다. \"재활용 따위 필요 없어, 새 거 내놔!\"\nPool을 무시하고 Heap에 독립된 **새 객체**(`0x002`)를 만듭니다.",
-        "keyInsight": "new String() = Pool 무시, 항상 Heap",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s3",
-              "value": "-> Heap[0]"
-            }
-          ],
-          "heap": [
-            {
-              "address": "Heap[0]",
-              "content": "\"Hello\" (0x002)",
-              "new": true
-            }
-          ],
-          "note": "s1 != s3 (완전히 다른 존재)"
-        }
-      },
-      {
-        "line": 4,
-        "title": "intern() - Pool 명찰 찾기",
-        "explanation": "`intern()` 메서드:\n\"나랑 내용(Hello)이 똑같은 녀석이 Pool에 공식적으로 등록되어 있니? 있으면 **등록증(주소)** 좀 줘.\"\n\nPool에는 이미 `s1`이 만든 원조 `\"Hello\"`(`0x001`)가 있으므로, 그 주소를 받아옵니다.",
-        "keyInsight": "intern() = Pool 주소 반환(없으면 등록)",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s4",
-              "value": "-> Pool[0]",
-              "sameRef": true
-            }
-          ],
-          "note": "s4는 s1과 같은 0x001을 가리키게 됨"
-        }
-      },
-      {
-        "line": 6,
-        "title": "s1 == s2 비교",
-        "explanation": "둘 다 Pool 출신 동기입니다. (0x001 == 0x001) -> `true`",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "true"
-          ]
-        }
-      },
-      {
         "line": 7,
-        "title": "s1 == s3 비교",
-        "explanation": "하나는 Pool(재활용 센터), 하나는 Heap(공장). 출신 성분이 다릅니다. -> `false`",
+        "title": "class Cat extends Animal",
+        "explanation": "**`extends`**: \"확장하다\"라는 뜻입니다.\nCat은 Animal의 모든 것(필드, 메서드)을 흡수하고, 거기에 자기만의 기능(`meow`)을 추가합니다.\n\n**관계:** Cat **is an** Animal (고양이는 동물이다).",
         "highlight": [
           7
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "true",
-            "false"
+          "note": "Cat ⊃ Animal"
+        }
+      },
+      {
+        "line": 14,
+        "title": "Cat 객체 생성",
+        "explanation": "Heap에 `Cat` 객체를 만들면, 그 안에는 `Animal`의 부분도 포함되어 있습니다.\n그래서 `Cat` 객체 하나만 있어도 `eat()`과 `meow()`를 둘 다 쓸 수 있습니다.",
+        "highlight": [
+          14
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "myCat",
+              "value": "-> 0x100"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Cat { Animal: {eat()}, meow() }"
+            }
           ]
         }
       },
       {
-        "line": 8,
-        "title": "s1 == s4 비교",
-        "explanation": "`intern()`을 통해 족보를 세탁(?)하고 Pool 주소(0x001)를 받아왔습니다.\n`s1`과 같아졌습니다. -> `true`",
+        "line": 17,
+        "title": "상속받은 메서드 호출",
+        "explanation": "`myCat.eat()`을 호출하면...\n1. Cat 클래스에서 `eat`을 찾습니다.\n2. \"어? 없네? 부모한테 있나?\"\n3. Animal 클래스에 있는 `eat`을 발견하고 실행합니다.",
+        "keyInsight": "자식에게 없으면 부모에게서 찾음",
         "highlight": [
-          8
+          17
         ],
         "visualizationType": "memory",
         "memoryState": {
           "output": [
-            "true",
-            "false",
-            "true"
+            "Meow~",
+            "Yum!"
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "intern()을 과도하게 사용하면 발생할 수 있는 문제는?",
+    "question": "Java에서 상속에 대한 설명으로 옳은 것은?",
     "options": [
-      "메모리 절약",
-      "속도 향상",
-      "메모리 부족(OOM) 오류",
-      "컴파일 에러"
+      "여러 클래스를 동시에 상속받을 수 있다 (다중 상속)",
+      "private 필드도 자식이 마음대로 쓴다",
+      "자바는 단일 상속(하나의 부모)만 지원한다",
+      "부모 클래스는 자식 클래스의 메서드를 쓸 수 있다"
     ],
     "correctIndex": 2,
-    "explanation": "모든 문자열을 억지로 Pool에 등록하면, Pool이 너무 커져서 관리 비용이 늘어나고 메모리가 부족해질 수 있습니다. 꼭 필요한 중복 문자열에만 써야 합니다."
+    "explanation": "Java는 `extends` 뒤에 오직 하나의 클래스만 올 수 있습니다(단일 상속). 다중 상속의 문제(Diamond Problem)를 피하기 위해서입니다."
   },
   "misconceptions": [
     {
-      "wrong": "new String('A')은 객체를 하나만 만든다",
-      "correct": "상황에 따라 2개를 만듭니다.",
-      "why": "1. 리터럴 'A'를 위해 Pool에 하나.\n2. `new` 때문에 Heap에 하나.\n그래서 `new String(...)`은 웬만하면 쓰지 말라는 것입니다."
-    },
-    {
-      "wrong": "String Pool은 Garbage Collection이 안 된다",
-      "correct": "Java 7부터는 String Pool이 Heap영역으로 이사 와서 GC의 대상이 됩니다.",
-      "why": "참조하는 변수가 아무도 없으면 Pool에 있는 문자열도 청소부가 치워갑니다."
+      "wrong": "상속은 코드를 복사해오는 것이다",
+      "correct": "복사가 아니라 **연결**입니다.",
+      "why": "자식 객체 내부에 부모 객체의 인스턴스가 생성되어 포함되는 구조입니다. 단순히 코드 텍스트를 복붙하는 게 아닙니다."
     }
   ],
-  "keyTakeaway": "리터럴은 Pool에서 자동 재사용, new는 강제 생성. 되도록 리터럴을 쓰자."
+  "keyTakeaway": "상속을 쓰면 코드를 재사용할 수 있다. `extends` = 부모의 능력을 물려받기."
 }

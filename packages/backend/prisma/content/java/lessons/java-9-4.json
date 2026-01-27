@@ -1,43 +1,62 @@
 {
   "lessonId": "java-9-4",
-  "title": "Memory Leaks",
-  "concept": "Core concept for Memory Leaks",
+  "title": "Reference Types & Leaks",
+  "concept": "CORE_CONCEPT_REFERENCE_TYPES",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Memory Leaks\n    }\n}",
+    "code": "import java.lang.ref.WeakReference;\n\npublic class Main {\n    public static void main(String[] args) {\n        // 1. Strong Reference (Default)\n        Person strong = new Person(\"Strong\");\n        \n        // 2. Weak Reference\n        // If GC happens, 'weak' points to null instantly\n        WeakReference<Person> weak = new WeakReference<>(new Person(\"Weak\"));\n        \n        System.out.println(\"Before GC: \" + weak.get());\n        \n        System.gc(); // Hint GC (For Demo)\n        \n        // 'Strong' is still there. 'Weak' is gone.\n        System.out.println(\"After GC: \" + weak.get());\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 5,
+        "title": "강한 참조 (Strong Reference)",
+        "explanation": "`Person p = new...` 처럼 일반적으로 우리가 쓰는 참조입니다. 강한 참조가 연결된 객체는 GC가 절대 건드리지 않습니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "stack": [
+            {
+              "name": "strong",
+              "value": "Ref(Person-Strong)"
+            }
+          ],
+          "heap": [
+            {
+              "name": "Person-Strong",
+              "status": "Protected"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "약한 참조 (Weak Reference)",
+        "explanation": "`WeakReference`로 감싼 객체는, 다른 강한 참조가 없다면 GC 발생 시 즉시 수거됩니다. 주로 캐싱(Cache) 용도로 쓰입니다. (메모리 부족할 때 알아서 지워지도록)",
+        "keyInsight": "메모리 누수를 방지하기 위한 고급 기법입니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "Before GC: Person@Hash",
+            "After GC: null"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Memory Leaks?",
+    "question": "메모리 누수(Memory Leak)의 주된 원인은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "너무 많은 변수 선언",
+      "닫지 않은 리소스(Unclosed Stream)나 static 컬렉션에 계속 쌓이는 객체",
+      "무한 루프",
+      "재귀 호출"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "더 이상 쓰지 않는 객체인데 `static List` 같은 곳에 강한 참조로 남아있으면 GC가 못 지웁니다. 이게 쌓이면 OutOfMemoryError가 발생합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "Java는 GC가 있으니 메모리 관리를 전혀 안 해도 된다.",
+      "correct": "아닙니다. '쓰지 않는 참조를 null로 밀어주기'나 '리소스 닫기(close)' 등은 개발자의 몫입니다. 특히 Cache나 Listener List를 조심해야 합니다.",
+      "why": "GC는 '참조가 없는' 것만 지울 수 있기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Memory Leaks is crucial for advanced Java."
+  "keyTakeaway": "Strong 참조만 쓰면 누수가 생길 수 있습니다. 캐시 같은 기능에는 Weak/Soft 참조를 고려하세요."
 }

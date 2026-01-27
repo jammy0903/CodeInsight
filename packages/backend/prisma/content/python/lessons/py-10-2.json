@@ -1,43 +1,48 @@
 {
   "lessonId": "py-10-2",
   "title": "Threading vs Multiprocessing",
-  "concept": "Core concept for Threading vs Multiprocessing",
+  "concept": "CORE_CONCEPT_MULTIPROCESSING",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Threading vs Multiprocessing\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "from multiprocessing import Process\nimport threading\nimport os\n\ndef worker(name):\n    # PID: Process ID (주민등록번호)\n    print(f\"[{name}] My PID: {os.getpid()}\")\n\ndef example():\n    print(f\"Main Process PID: {os.getpid()}\")\n    \n    # 1. Threading\n    # 같은 프로세스 안에서 실행됨 -> PID가 같음\n    print(\"\\n--- Threading ---\")\n    t = threading.Thread(target=worker, args=(\"Thread\",))\n    t.start()\n    t.join()\n    \n    # 2. Multiprocessing\n    # 완전히 새로운 프로세스를 복제 -> PID가 다름\n    # (주의: 윈도우/맥에서는 동작 방식이 다를 수 있음)\n    print(\"\\n--- Multiprocessing ---\")\n    p = Process(target=worker, args=(\"Process\",))\n    p.start()\n    p.join()\n\nif __name__ == '__main__':\n    example()",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 13,
+        "title": "Threading의 특징",
+        "explanation": "스레드는 한 집(Process) 안에 사는 가족입니다. `PID`가 메인 프로세스와 똑같습니다. 메모리(거실, 주방)를 공유하므로 데이터 교환이 쉽지만, GIL 때문에 한 번에 한 명만 요리할 수 있습니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "stdout": "Main Process PID: 1000\n\n--- Threading ---\n[Thread] My PID: 1000"
+        }
+      },
+      {
+        "line": 21,
+        "title": "Multiprocessing의 특징",
+        "explanation": "프로세스는 아예 옆집을 새로 짓는 것과 같습니다. `PID`가 다르고, 메모리 공간이 완전히 분리되어 있습니다(Share Nothing). 그래서 변수를 공유하려면 복잡한 통신(IPC)이 필요합니다.",
+        "keyInsight": "대신 GIL의 제약을 받지 않아 CPU 코어를 온전히 병렬로 쓸 수 있습니다(True Parallelism).",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "...\n--- Multiprocessing ---\n[Process] My PID: 1001"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Threading vs Multiprocessing?",
+    "question": "Multiprocessing의 가장 큰 단점은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "코드 작성이 너무 어렵다",
+      "GIL 때문에 느리다",
+      "프로세스 생성 비용과 메모리 사용량이 크다",
+      "비동기 처리를 지원하지 않는다"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "프로세스를 새로 만드는 건 스레드를 만드는 것보다 훨씬 무거운 작업입니다(Heavyweight). 메모리도 복제해야 하므로 자원을 많이 먹습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "항상 Multiprocessing이 더 빠르다.",
+      "correct": "아닙니다. 가벼운 작업이나 I/O 위주의 작업이라면, 프로세스를 만드는 오버헤드 때문에 Threading이 훨씬 효율적이고 빠릅니다.",
+      "why": "닭 잡는데 소 잡는 칼을 쓰는 격입니다."
     }
   ],
-  "keyTakeaway": "Understanding Threading vs Multiprocessing is crucial for advanced Python."
+  "keyTakeaway": "CPU를 불태워야 하면 `Process`, 기다림이 많으면 `Thread`. 이것이 Python 병렬처리의 대원칙입니다."
 }

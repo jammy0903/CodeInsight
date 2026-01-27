@@ -1,43 +1,48 @@
 {
   "lessonId": "py-9-3",
   "title": "Decorators with Arguments",
-  "concept": "Core concept for Decorators with Arguments",
+  "concept": "CORE_CONCEPT_DECORATOR_ARGS",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Decorators with Arguments\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "# 3중 함수 구조 (Triple Nested)\ndef repeat(num_times):\n    print(f\"Decorator factory called with {num_times}\")\n    def decorator_func(func):\n        print(\"Decorator called\")\n        def wrapper(*args, **kwargs):\n            print(\"Wrapper called\")\n            for _ in range(num_times):\n                result = func(*args, **kwargs)\n            return result\n        return wrapper\n    return decorator_func\n\n@repeat(num_times=3)\ndef greet(name):\n    print(f\"Hello {name}\")\n\ndef example():\n    print(\"--- Start ---\")\n    greet(\"World\")\n\nif __name__ == '__main__':\n    # 주의: @ 구문 사용 시 이미 factory와 decorator는 실행됨\n    example()",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 2,
+        "title": "Decorator Factory",
+        "explanation": "인자를 받으려면 함수를 하나 더 감싸야 합니다. 제일 바깥 함수(`repeat`)는 '데코레이터를 만드는 공장(Factory)' 역할을 하고, 설정값(`num_times`)을 클로저로 저장합니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "stdout": "Decorator factory called with 3\nDecorator called"
+        }
+      },
+      {
+        "line": 15,
+        "title": "함수 호출 시점",
+        "explanation": "실제 `greet('World')`를 호출하면, 가장 안쪽의 `wrapper`가 실행됩니다. 이때 `wrapper`는 `num_times=3`이라는 외부 변수를 기억하고 있어서 3번 반복할 수 있습니다.",
+        "keyInsight": "구조: `Factory(인자) -> Decorator(함수) -> Wrapper(실제 실행)` 순입니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "Decorator factory called with 3\nDecorator called\n--- Start ---\nWrapper called\nHello World\nHello World\nHello World"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Decorators with Arguments?",
+    "question": "@repeat(3)을 수동으로 코드로 풀어서 쓴다면 다음 중 어느 것인가?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "repeat(greet, 3)",
+      "repeat(3)(greet)",
+      "repeat(greet)(3)",
+      "wrapper(greet, 3)"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "`repeat(3)` 실행 결과로 `decorator` 함수가 나오고, 그 함수에 `greet`를 넣어서(`decorator(greet)`) 최종적으로 `wrapper`를 얻습니다. 즉 `repeat(3)(greet)` 형태가 됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "인자가 있는 데코레이터와 없는 데코레이터는 구조가 같다.",
+      "correct": "다릅니다. 인자가 있으면 '맨 바깥 함수'가 하나 더 추가되어 총 3단계 중첩 구조가 필요합니다. 인자가 없으면 2단계입니다.",
+      "why": "데코레이터 문법(`@`)이 인자를 바로 함수에 넘기지 않고, '인자를 처리하는 함수'를 먼저 호출하기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Decorators with Arguments is crucial for advanced Python."
+  "keyTakeaway": "데코레이터에 옵션을 주고 싶다면, 데코레이터를 리턴하는 함수(Factory)를 만드세요."
 }

@@ -1,43 +1,66 @@
 {
   "lessonId": "java-9-3",
-  "title": "GC Algorithms",
-  "concept": "Core concept for GC Algorithms",
+  "title": "GC Algorithms (Mark & Sweep)",
+  "concept": "CORE_CONCEPT_GC_MARK_SWEEP",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for GC Algorithms\n    }\n}",
+    "code": "// Pseudocode explaining Steps of GC\npublic class GCProcess {\n    public void runGC() {\n        // Step 1: Stop-The-World\n        // (Application threads paused)\n        \n        // Step 2: Mark Phase\n        // Traverse from GC Roots and mark all reachable objects\n        markReachableObjects();\n        \n        // Step 3: Sweep Phase\n        // Remove unmarked objects from Heap\n        sweepUnmarkedObjects();\n        \n        // Step 4: Resume Application\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 6,
+        "title": "Mark (마킹) 단계",
+        "explanation": "GC가 모든 변수(Root)를 뒤져서 살아있는 객체에 '생존' 도장을 찍습니다. 이때 순간적으로 프로그램이 멈출 수 있습니다 (Stop-The-World).",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "obj": "A",
+              "mark": "ALIVE"
+            },
+            {
+              "obj": "B",
+              "mark": "DEAD (No Mark)"
+            }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "Sweep (청소) 단계",
+        "explanation": "도장이 없는 객체들을 빗자루로 쓸어내듯 힙 메모리에서 제거합니다. 남은 공간은 비워져서 새 객체를 받을 준비를 합니다.",
+        "keyInsight": "빈 공간을 압축(Compacting)해서 모으는 추가 단계가 있기도 합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "obj": "A",
+              "mark": "ALIVE"
+            },
+            {
+              "obj": "Free Space",
+              "size": "Big"
+            }
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of GC Algorithms?",
+    "question": "Stop-The-World (STW) 현상이란?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "GC 실행을 위해 애플리케이션의 모든 스레드가 일시 정지하는 것",
+      "프로그램이 영구적으로 멈추는 버그",
+      "객체 생성을 멈추는 것",
+      "전원이 꺼지는 현상"
     ],
     "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "explanation": "청소 중에 물건(메모리)을 옮기면 안 되기 때문에, GC는 아주 짧은 순간 동안 모든 작업을 멈추게 합니다. GC 튜닝의 목표는 이 시간을 줄이는 것입니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "System.gc()를 호출하면 즉시 GC가 실행된다.",
+      "correct": "아닙니다. 'GC 좀 해주세요'라고 JVM에게 부탁(Hint)만 할 뿐, 실제 실행 시점은 JVM 마음입니다. 성능에 악영향을 주므로 실무 코드에서는 절대 사용하지 마세요.",
+      "why": "STW를 유발하여 서버 전체를 멈칫하게 할 수 있습니다."
     }
   ],
-  "keyTakeaway": "Understanding GC Algorithms is crucial for advanced Java."
+  "keyTakeaway": "GC는 마법이 아니라 '멈추고, 찾고, 지우는' 비용이 드는 작업입니다. 불필요한 객체 생성을 줄이는 것이 최고의 최적화입니다."
 }

@@ -10,6 +10,7 @@
 import { api } from './api/axios';
 import { AxiosError } from 'axios';
 import type { LessonStep, MemoryBlock } from '@/types';
+import type { SupportedLanguage } from '@/types/simulator';
 import { handleSimulatorError, notifySimulator } from '@/components/common/Toast';
 
 // =============================================
@@ -65,7 +66,7 @@ interface PySimulateResult {
 }
 
 // 지원 언어
-export type SupportedLanguage = 'c' | 'python' | 'java' | 'javascript';
+// (types/simulator.ts에서 가져옴)
 
 // 시뮬레이션 요청
 interface SimulateRequest {

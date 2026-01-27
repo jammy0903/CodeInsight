@@ -1,43 +1,48 @@
 {
   "lessonId": "py-10-4",
-  "title": "Async / Await Patterns",
-  "concept": "Core concept for Async / Await Patterns",
+  "title": "Async / Await Pattern",
+  "concept": "CORE_CONCEPT_ASYNC_AWAIT",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Async / Await Patterns\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "import asyncio\nimport time\n\nasync def make_coffee():\n    print(\"☕ Start Coffee\")\n    await asyncio.sleep(2) # 2초 걸림\n    print(\"☕ Coffee Ready\")\n    return \"Americano\"\n\nasync def toast_bread():\n    print(\"🍞 Start Toast\")\n    await asyncio.sleep(1) # 1초 걸림\n    print(\"🍞 Toast Ready\")\n    return \"Toast\"\n\nasync def main():\n    print(\"--- Start Breakfast ---\")\n    start = time.time()\n    \n    # gather: 여러 코루틴을 동시에(Concurrent) 예약\n    # 하나씩 기다리는게 아니라 한번에 던짐\n    result = await asyncio.gather(make_coffee(), toast_bread())\n    \n    end = time.time()\n    print(f\"--- Done in {end - start:.2f}s ---\")\n    print(f\"Menu: {result}\")\n\nif __name__ == '__main__':\n    asyncio.run(main())",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 19,
+        "title": "asyncio.gather",
+        "explanation": "커피(2초)와 토스트(1초)를 순서대로 `await`하면 총 3초가 걸리지만, `gather`로 묶어서 동시에 던지면 가장 오래 걸리는 2초 만에 아침 준비가 끝납니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "stdout": "--- Start Breakfast ---\n☕ Start Coffee\n🍞 Start Toast\n🍞 Toast Ready\n☕ Coffee Ready"
+        }
+      },
+      {
+        "line": 22,
+        "title": "동시성과 순서",
+        "explanation": "출력 결과를 보면 토스트(1초)가 커피(2초)보다 먼저 완성됩니다. 시작은 동시에 했지만 끝나는 시간은 제각각입니다. `gather`는 모든 작업이 끝날 때까지 기다렸다가 결과를 리스트로 모아줍니다.",
+        "keyInsight": "이것이 비동기 프로그래밍의 강력함입니다. 노는 시간(Idle Time)을 최소화합니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "...\n--- Done in 2.01s ---\nMenu: ['Americano', 'Toast']"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Async / Await Patterns?",
+    "question": "async 함수 내부에서 일반(동기) 함수인 `time.sleep(10)`을 호출하면 벌어지는 일은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "10초 동안 전체 프로그램이 멈춘다(Freeze)",
+      "10초 동안 다른 async 작업들이 실행된다",
+      "에러가 발생한다",
+      "자동으로 비동기로 변환된다"
     ],
     "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "explanation": "치명적인 실수입니다. `async` 함수 안이라도 일반적인 블로킹 함수를 쓰면, 이벤트 루프 자체가 멈춰버려서 다른 어떤 작업도 처리할 수 없게 됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "await는 그냥 기다리라는 뜻이다.",
+      "correct": "단순 대기(`wait`)가 아닙니다. '이 작업 완료를 기다리는 동안, 제어권을 루프에 돌려줄테니 다른 일을 하라'는 **양보(Yield)**의 의미가 강합니다.",
+      "why": "그래서 `await` 뒷부분은 콜백(Callback)처럼 나중에 실행됩니다."
     }
   ],
-  "keyTakeaway": "Understanding Async / Await Patterns is crucial for advanced Python."
+  "keyTakeaway": "현대적 웹 프로그래밍(FastAPI 등)에서는 `async/await`가 필수입니다. 블로킹 함수만 피하면 최고의 성능을 낼 수 있습니다."
 }

@@ -1,184 +1,77 @@
 {
   "lessonId": "java-3-2",
-  "title": "객체 참조 전달",
-  "concept": "객체를 전달하면 참조값(주소)이 복사된다. 객체 내부는 수정 가능하지만 참조 자체는 변경 불가",
+  "title": "Method Syntax",
+  "concept": "메서드는 입력(Parameter)을 받아 작업하고 결과(Return)를 반환하는 공장이다",
   "content": {
-    "code": "class Dog {\n    String name;\n    Dog(String name) { this.name = name; }\n}\n\nvoid changeName(Dog d) {\n    d.name = \"Max\";\n}\n\nvoid reassign(Dog d) {\n    d = new Dog(\"Rex\");\n}\n\nDog myDog = new Dog(\"Buddy\");\nchangeName(myDog);\nSystem.out.println(myDog.name);\n\nreassign(myDog);\nSystem.out.println(myDog.name);",
+    "code": "public class Main {\n    // 메서드 정의\n    public static int add(int a, int b) {\n        return a + b;\n    }\n\n    public static void greet(String name) {\n        System.out.println(\"Hello, \" + name);\n    }\n\n    public static void main(String[] args) {\n        int result = add(3, 5);\n        greet(\"Java\");\n    }\n}",
     "steps": [
       {
-        "line": 14,
-        "title": "Dog 객체 생성",
-        "explanation": "**메모리 상태:**\n1. `Heap`: 실제 `Dog` 객체(TV)가 생성됩니다. (주소: `0x100`)\n2. `Stack`: `myDog`(리모컨)에는 **주소(0x100)**가 저장됩니다.\n\n**비유:** `myDog`는 TV가 아니라 **TV 리모컨**입니다. 0x100번 TV를 조종할 수 있는 리모컨이죠.",
+        "line": 3,
+        "title": "메서드 정의 (add)",
+        "explanation": "**`int add(int a, int b)`**:\n- `int`: 반환할 결과물의 타입 (출구)\n- `add`: 메서드 이름 (간판)\n- `(int a, int b)`: 입력받을 재료들 (입구)\n\n`return`을 만나면 값을 들고 즉시 메서드를 탈출합니다.",
         "highlight": [
-          14
+          3,
+          4,
+          5
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "myDog",
-              "value": "-> 0x100"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "Dog{name: \"Buddy\"}"
-            }
-          ]
+          "note": "메서드 코드 영역에 정의됨"
         }
       },
       {
-        "line": 15,
-        "title": "changeName(myDog) 호출",
-        "explanation": "**참조값(주소) 복사:**\n`myDog`가 가진 주소 `0x100`이 복사되어 파라미터 `d`에 전달됩니다.\n이제 `d`라는 **복제된 리모컨**이 생겼고, 이 리모컨도 똑같은 0x100번 TV를 가리킵니다.",
-        "keyInsight": "주소 복사 = 리모컨 복제",
+        "line": 12,
+        "title": "add 호출",
+        "explanation": "`add(3, 5)`를 호출하면:\n1. Stack에 `add`를 위한 방이 생깁니다.\n2. `a=3`, `b=5`가 채워집니다.\n3. 계산 결과 `8`을 `result`에 던져주고 방은 사라집니다.",
         "highlight": [
-          15,
-          6
+          12
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "myDog",
-              "value": "-> 0x100",
-              "frame": "main"
-            },
-            {
-              "name": "d",
-              "value": "-> 0x100",
-              "frame": "changeName",
-              "sameRef": true
+              "name": "result",
+              "value": "8"
             }
           ],
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "Dog{name: \"Buddy\"}"
-            }
-          ]
+          "output": []
         }
       },
       {
         "line": 7,
-        "title": "d.name 변경 (성공)",
-        "explanation": "**리모컨 작동:**\n`d` 리모컨으로 TV 채널(`name`)을 바꿉니다.\n`d`가 가리키는 `0x100`으로 가서 이름을 \"Max\"로 수정합니다.\n\n`myDog`도 같은 TV(`0x100`)를 보고 있으니, `main`에서도 바뀐 이름이 보입니다!",
-        "keyInsight": "리모컨으로 대상(Heap)을 조작하면 원본 영향 받음",
+        "title": "void 메서드 (greet)",
+        "explanation": "**`void`**: \"반환값이 없다(비어있다)\"는 뜻입니다.\n일을 시키기만 하고 결과물은 필요 없을 때(예: 출력) 사용합니다.\n`return` 문이 없어도 자동으로 끝까지 실행되면 종료됩니다.",
         "highlight": [
-          7
+          7,
+          8,
+          9
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "Dog{name: \"Max\"}",
-              "changed": true
-            }
-          ]
-        }
-      },
-      {
-        "line": 18,
-        "title": "reassign(myDog) 호출",
-        "explanation": "이번에도 주소 `0x100`이 복사되어 `reassign` 메서드의 `d` 리모컨으로 전달됩니다.",
-        "highlight": [
-          18,
-          10
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "myDog",
-              "value": "-> 0x100",
-              "frame": "main"
-            },
-            {
-              "name": "d",
-              "value": "-> 0x100",
-              "frame": "reassign"
-            }
-          ]
-        }
-      },
-      {
-        "line": 11,
-        "title": "d에 새 객체 할당 (실패?)",
-        "explanation": "**중요한 차이:**\n1. `new Dog(\"Rex\")`가 Heap에 새 TV(`0x200`)를 만듭니다.\n2. `d` 리모컨을 이 새 TV(`0x200`)로 **연결(페어링)**합니다.\n3. 하지만 `main`의 `myDog` 리모컨은 여전히 옛날 TV(`0x100`)를 가리키고 있습니다.\n\n**비유:** 친구 리모컨(`d`)을 뺏어서 다른 TV로 연결해봐야, 내 리모컨(`myDog`) 연결은 끊기지 않습니다.",
-        "keyInsight": "변수 재할당 = 내 리모컨 연결만 바뀜",
-        "highlight": [
-          11
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "myDog",
-              "value": "-> 0x100",
-              "frame": "main"
-            },
-            {
-              "name": "d",
-              "value": "-> 0x200",
-              "frame": "reassign",
-              "changed": true
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "Dog{name: \"Max\"}"
-            },
-            {
-              "address": "0x200",
-              "content": "Dog{name: \"Rex\"}",
-              "new": true
-            }
-          ]
-        }
-      },
-      {
-        "line": 19,
-        "title": "결과 확인",
-        "explanation": "`myDog`는 여전히 \"Max\"(`0x100`)입니다. 메서드 안에서의 재할당은 원본에 아무런 영향을 주지 못합니다.",
-        "highlight": [
-          19
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "myDog",
-              "value": "-> 0x100"
-            }
-          ],
           "output": [
-            "Max",
-            "Max"
+            "Hello, Java"
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "객체를 메서드 파라미터로 넘길 때 복사되는 것은?",
+    "question": "반환값이 없는 메서드를 정의할 때 쓰는 키워드는?",
     "options": [
-      "객체 전체 (Deep Copy)",
-      "객체의 참조값(주소) (Reference Copy)",
-      "객체의 첫 번째 필드값",
-      "아무것도 복사되지 않음"
+      "null",
+      "empty",
+      "void",
+      "blank"
     ],
-    "correctIndex": 1,
-    "explanation": "Java는 항상 값을 복사합니다. 객체의 경우 그 값은 '메모리 주소'입니다. 그래서 리모컨을 복사해준다고 생각하면 쉽습니다."
+    "correctIndex": 2,
+    "explanation": "void는 '공허하다'는 뜻으로, 리턴할 값이 없음을 명시할 때 사용합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Java는 Call by Reference다",
-      "correct": "Java는 100% **Call by Value**입니다.",
-      "why": "참조값(주소)이라는 값을 복사해서 주기 때문에 Call by Value입니다. 진짜 Call by Reference라면 `d = new Dog()` 했을 때 `myDog`도 바뀌어야 합니다."
+      "wrong": "void 메서드에서는 return을 쓸 수 없다",
+      "correct": "`return;` 이라고만 쓰면 \"여기서 함수 끝내!\" 라는 뜻으로 쓸 수 있습니다.",
+      "why": "값을 가지고 나가는 건 안 되지만, 탈출 용도로 사용하는 것은 가능합니다."
     }
   ],
-  "keyTakeaway": "리모컨(참조)을 복사해주는 것이다. 채널(내부)은 바꿀 수 있지만, 리모컨 연결(주소)을 끊을 순 없다."
+  "keyTakeaway": "입력은 `(Type name)`, 출력은 함수 이름 앞에. 없으면 `void`."
 }

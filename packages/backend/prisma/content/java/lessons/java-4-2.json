@@ -1,191 +1,73 @@
 {
   "lessonId": "java-4-2",
-  "title": "String vs StringBuilder",
-  "concept": "반복적인 문자열 연결에는 StringBuilder를 사용해야 한다",
+  "title": "Constructors",
+  "concept": "생성자는 객체가 태어날 때(new) 딱 한 번 실행되는 초기화 메서드다",
   "content": {
-    "code": "// 나쁜 예: String 연결 (쓰레기 생성)\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// 좋은 예: StringBuilder (재사용)\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
+    "code": "class User {\n    String name;\n    int age;\n\n    // 생성자 (Constructor)\n    User(String name, int age) {\n        this.name = name;\n        this.age = age;\n        System.out.println(\"User Created: \" + this.name);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        User u1 = new User(\"Alice\", 20);\n        User u2 = new User(\"Bob\", 25);\n    }\n}",
     "steps": [
       {
-        "line": 2,
-        "title": "빈 String 생성",
-        "explanation": "`bad` 변수는 빈 문자열 `\"\"`를 가리킵니다. 이제부터 비효율의 극치를 보여드리겠습니다.",
+        "line": 6,
+        "title": "생성자 정의",
+        "explanation": "**특징:**\n1. 클래스 이름과 **똑같아야** 합니다.\n2. 리턴 타입(void, int 등)이 **없습니다**.\n\n**`this` 키워드:**\n\"나 자신\"을 가리킵니다. `this.name`은 내 필드, 그냥 `name`은 파라미터로 받은 값입니다.",
         "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "bad",
-              "value": "-> \"\""
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "\"\""
-            }
-          ]
-        }
-      },
-      {
-        "line": 4,
-        "title": "반복 (i=0) - 쓰레기 발생",
-        "explanation": "String은 불변이라 `+` 연산을 하면 **새 객체**를 만듭니다.\n1. `\"\"` + `\"0\"` -> `\"0\"` (새 객체 0x002)\n2. `bad`는 이제 `0x002`를 가리킵니다.\n3. 아까 `\"\"`(`0x001`)는 바로 버려지는 **쓰레기(Garbage)**가 됩니다.",
-        "keyInsight": "연산마다 쓰레기 객체 생성",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "bad",
-              "value": "-> 0x002"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "\"\"",
-              "garbage": true
-            },
-            {
-              "address": "0x002",
-              "content": "\"0\"",
-              "new": true
-            }
-          ]
-        }
-      },
-      {
-        "line": 4,
-        "title": "반복 (i=1) - 쓰레기 누적",
-        "explanation": "`\"0\"` + `\"1\"` -> `\"01\"` (새 객체 0x003)\n또 새 객체를 만들고, 방금 만든 `\"0\"`(`0x002`)은 쓰레기통으로 갑니다.\n\n이 짓을 반복 횟수만큼 합니다. 만약 루프가 10,000번이라면 쓰레기도 10,000개!",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "0x002",
-              "content": "\"0\"",
-              "garbage": true
-            },
-            {
-              "address": "0x003",
-              "content": "\"01\"",
-              "new": true
-            }
-          ],
-          "warning": "메모리 낭비 심각 (O(n²))"
-        }
-      },
-      {
-        "line": 8,
-        "title": "StringBuilder 생성 (구세주)",
-        "explanation": "`StringBuilder`는 수정 가능한 **화이트보드**와 같습니다.\n내부에 넉넉한 공간(Buffer)을 미리 확보해 둬서 글자를 썼다 지웠다 할 수 있습니다.",
-        "keyInsight": "StringBuilder = 가변 버퍼 (미리 공간 확보)",
-        "highlight": [
-          8
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "good",
-              "value": "-> 0x010"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x010",
-              "content": "StringBuilder{buffer: []}"
-            }
-          ]
-        }
-      },
-      {
-        "line": 10,
-        "title": "append(0) - 쓱 써넣기",
-        "explanation": "빈 공간에 `0`을 쓱 써넣습니다.\n**새 객체를 만들지 않습니다!** 그냥 있던 화이트보드에 추가만 합니다.",
-        "highlight": [
+          6,
+          7,
+          8,
+          9,
           10
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "address": "0x010",
-              "content": "StringBuilder{buffer: ['0']}",
-              "changed": true
-            }
-          ]
+          "note": "객체 생성 시 호출될 특별한 코드"
         }
       },
       {
-        "line": 10,
-        "title": "append(1), (2) - 재사용",
-        "explanation": "남은 공간에 `1`, `2`를 계속 이어 씁니다.\n쓰레기가 하나도 안 나옵니다. 정말 효율적이죠.",
-        "keyInsight": "객체 재사용 = 메모리 절약 + 속도 빠름",
+        "line": 14,
+        "title": "객체 생성과 초기화",
+        "explanation": "`new User(\"Alice\", 20)` 호출 순서:\n1. Heap에 빈 객체 생성 (`name=null`, `age=0`)\n2. 생성자 호출!\n3. `this.name = \"Alice\"` -> 객체 필드 채움\n4. `this.age = 20` -> 객체 필드 채움\n5. 완성된 객체의 주소 반환",
+        "keyInsight": "new = 1.생성 + 2.생성자 실행",
         "highlight": [
-          10
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "0x010",
-              "content": "StringBuilder{buffer: ['0','1','2']}",
-              "changed": true
-            }
-          ],
-          "note": "쓰레기가 전혀 발생하지 않음"
-        }
-      },
-      {
-        "line": 12,
-        "title": "toString() - 최종 제출",
-        "explanation": "화이트보드에 쓴 내용을 사진 찍듯이 `String`으로 예쁘게 포장해서 내보냅니다.\n이때 딱 한 번 새로운 `String` 객체가 만들어집니다.",
-        "highlight": [
-          12
+          14
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "result",
-              "value": "-> 0x011"
+              "name": "u1",
+              "value": "-> 0x100"
             }
           ],
           "heap": [
             {
-              "address": "0x011",
-              "content": "\"012\""
+              "address": "0x100",
+              "content": "User{name: \"Alice\", age: 20}",
+              "new": true
             }
+          ],
+          "output": [
+            "User Created: Alice"
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "StringBuilder 대신 StringBuffer를 써야 할 때는?",
+    "question": "생성자(Constructor)에 대한 설명으로 틀린 것은?",
     "options": [
-      "문자열이 아주 길 때",
-      "반복 횟수가 많을 때",
-      "멀티스레드가 동시에 접근할 때",
-      "메모리가 부족할 때"
+      "메서드처럼 호출할 수 있다 (u1.User())",
+      "리턴 타입이 없다",
+      "클래스 이름과 같아야 한다",
+      "객체 생성 시 자동 호출된다"
     ],
-    "correctIndex": 2,
-    "explanation": "StringBuffer는 동기화(Synchronized)되어 있어서 스레드 안전(Thread-safe)합니다. 혼자 쓸 때는 StringBuilder가 더 빠릅니다."
+    "correctIndex": 0,
+    "explanation": "생성자는 오직 `new` 키워드와 함께 객체를 만들 때만 호출됩니다. 일반 메서드처럼 `u1.User()` 이렇게 부를 수 없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "요즘 컴파일러는 + 연산도 알아서 최적화해준다",
-      "correct": "`a` + `b` 한 번 하는 건 최적화해주지만, **반복문(Loop)** 안에서는 최적화를 못 해줍니다.",
-      "why": "반복문 안에서는 매번 새로운 StringBuilder를 만들었다 버리는 비효율적인 코드로 변환되기 십상입니다. 루프 안에서는 무조건 명시적으로 `StringBuilder`를 쓰세요."
+      "wrong": "생성자가 없으면 객체를 못 만든다",
+      "correct": "생성자를 하나도 안 적으면, 컴파일러가 아무 일도 안 하는 **기본 생성자(Default Constructor)**를 몰래 만들어줍니다.",
+      "why": "그래서 `new User()`가 가능했던 것입니다. 하지만 내가 생성자를 하나라도 적으면(매개변수 있는 것 등), 기본 생성자는 자동 생성되지 않습니다."
     }
   ],
-  "keyTakeaway": "루프 돌면서 문자열 합칠 땐 무조건 StringBuilder! 그냥 + 쓰면 메모리 테러."
+  "keyTakeaway": "생성자는 객체의 '출생 신고' 및 '초기 셋팅' 담당. `this`로 필드와 파라미터를 구분한다."
 }

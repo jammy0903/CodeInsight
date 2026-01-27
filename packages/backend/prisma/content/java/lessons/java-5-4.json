@@ -1,15 +1,14 @@
 {
   "lessonId": "java-5-4",
-  "title": "static 메서드",
-  "concept": "static 메서드는 인스턴스 없이 호출 가능하지만, 인스턴스 멤버에 접근할 수 없다",
+  "title": "Interface",
+  "concept": "인터페이스는 구현 없이 '기능의 목록(계약서)'만 정의한 것이다",
   "content": {
-    "code": "class MathUtil {\n    static int add(int a, int b) {\n        return a + b;\n    }\n    \n    int instanceValue = 10;\n    \n    static void tryAccessInstance() {\n        // System.out.println(instanceValue);  // 에러!\n        // System.out.println(this.instanceValue);  // 에러!\n    }\n    \n    void instanceMethod() {\n        System.out.println(add(1, 2));  // OK!\n        System.out.println(instanceValue);  // OK!\n    }\n}\n\nint result = MathUtil.add(3, 5);\nSystem.out.println(result);",
+    "code": "// ~할 수 있는 (Able)\ninterface Flyable {\n    void fly(); // public abstract 생략됨\n}\n\ninterface Swimable {\n    void swim();\n}\n\n// 다중 구현 가능 (콤마 ,)\nclass Duck implements Flyable, Swimable {\n    public void fly() {\n        System.out.println(\"Duck flying\");\n    }\n    public void swim() {\n        System.out.println(\"Duck swimming\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Duck d = new Duck();\n        d.fly();\n        d.swim();\n        \n        Flyable f = new Duck();\n        f.fly();\n        // f.swim(); // 에러! Flyable로는 날 수만 있음\n    }\n}",
     "steps": [
       {
         "line": 2,
-        "title": "static 메서드 선언",
-        "explanation": "**독립적인 도구:**\n`add()`는 `static`입니다. 객체(`new`)를 만들지 않아도 바로 쓸 수 있는 **자판기** 같은 녀석입니다.\n입력값(`a`, `b`)만 주면 결과가 튀어나옵니다.",
-        "keyInsight": "static method = 순수 함수 (Pure Function)",
+        "title": "인터페이스 정의",
+        "explanation": "**`interface`**: 순도 100% 추상화된 설계도입니다.\n안에 적힌 모든 메서드는 자동으로 `public abstract`가 됩니다. \"이 기능을 반드시 가져야 해!\"라는 **계약서(Contract)**와 같습니다.",
         "highlight": [
           2,
           3,
@@ -17,132 +16,74 @@
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "metaspace": [
-            {
-              "name": "MathUtil.add()",
-              "value": "method"
-            }
-          ],
-          "note": "상태(필드)가 필요 없는 유틸리티"
+          "note": "기능 명세서 역할"
         }
       },
       {
-        "line": 6,
-        "title": "인스턴스 필드",
-        "explanation": "`instanceValue`는 `new MathUtil()`을 해서 힙에 객체를 만들어야만 비로소 생겨나는 값입니다.",
+        "line": 11,
+        "title": "다중 구현 (implements)",
+        "explanation": "**`implements A, B`**: 클래스는 부모를 하나만(`extends`) 가질 수 있지만, 인터페이스는 여러 개 가질 수 있습니다.\n\"오리는 날기도 하고(Flyable), 수영도 한다(Swimable)\"를 표현할 때 완벽합니다.",
+        "keyInsight": "Java의 다중 상속 해결책 = Interface",
         "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "아직 객체가 없으니 이 변수도 없음"
-        }
-      },
-      {
-        "line": 9,
-        "title": "static에서 인스턴스 접근 (에러)",
-        "explanation": "**논리적 모순:**\n`tryAccessInstance()`는 객체 없이 실행될 수 있습니다.\n그런데 \"내 뱃속에 있는 `instanceValue`를 내놔\"라고 하면, JVM은 \"너는 뱃속(객체) 자체가 없는데 뭔 소리냐?\"라고 에러를 냅니다.",
-        "keyInsight": "static 안에서는 '나(this)'를 찾을 수 없다",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "컴파일 에러: non-static variable cannot be referenced from a static context"
-        }
-      },
-      {
-        "line": 10,
-        "title": "static에서 this 사용 (에러)",
-        "explanation": "`this`는 '현재 실행 중인 객체 나 자신'을 뜻합니다.\n`static` 메서드는 '객체 없이' 실행되므로 `this`라는 개념 자체가 존재하지 않습니다.",
-        "highlight": [
-          10
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "컴파일 에러: 'this' cannot be used in static context"
-        }
-      },
-      {
-        "line": 14,
-        "title": "인스턴스에서 static 접근 (OK)",
-        "explanation": "**반대는 가능:**\n`instanceMethod()`는 이미 객체가 생성된 후에 호출됩니다.\n객체가 있는 상태에서 \"공용 도구(`add`) 좀 빌려 쓸게\"라고 하는 건 전혀 문제되지 않습니다.",
-        "highlight": [
-          14
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "개별 객체는 공용 도구 사용 가능"
-        }
-      },
-      {
-        "line": 19,
-        "title": "클래스명으로 호출",
-        "explanation": "`new MathUtil()` 따위는 필요 없습니다.\n바로 `MathUtil.add(3, 5)`를 호출합니다.\n무거운 객체를 안 만들어도 되니 **빠르고 효율적**입니다. `Math.max()`, `Arrays.sort()` 같은 유틸리티들이 다 이렇게 생겼습니다.",
-        "keyInsight": "유틸리티 함수는 static이 국룰",
-        "highlight": [
-          19
+          11
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "3",
-              "frame": "add"
-            },
+              "name": "d",
+              "value": "-> 0xDuck"
+            }
+          ],
+          "heap": [
             {
-              "name": "b",
-              "value": "5",
-              "frame": "add"
+              "address": "0xDuck",
+              "content": "Duck (Flyable, Swimable)"
             }
           ]
         }
       },
       {
-        "line": 20,
-        "title": "결과 출력",
-        "explanation": "결과 8이 반환됩니다. 메모리 낭비 없이 깔끔하게 계산만 수행했습니다.",
+        "line": 23,
+        "title": "인터페이스 타입 사용",
+        "explanation": "`Flyable f = new Duck();`\n오리를 '날 수 있는 존재'로만 취급합니다. 그래서 `f.fly()`는 되지만 `f.swim()`은 안 보입니다.\n\"나는 너를 나는 용도로만 쓸 거야\"라는 의미입니다.",
         "highlight": [
-          20
+          23,
+          24,
+          25
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "result",
-              "value": "8"
+              "name": "f",
+              "value": "-> 0xDuck"
             }
           ],
           "output": [
-            "8"
+            "Duck flying"
           ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "main 메서드가 static인 이유는?",
+    "question": "인터페이스와 추상 클래스의 가장 큰 차이점은?",
     "options": [
-      "메모리를 아끼려고",
-      "인스턴스 생성 없이 JVM이 바로 실행하려고",
-      "보안 때문에",
-      "아무 이유 없다"
+      "인터페이스는 메서드를 가질 수 없다",
+      "인터페이스는 다중 구현(implements)이 가능하다",
+      "추상 클래스는 new가 가능하다",
+      "차이가 없다"
     ],
     "correctIndex": 1,
-    "explanation": "프로그램이 시작될 때는 아직 아무런 객체도 없습니다. 그래서 JVM이 \"객체 없어도 실행 가능한\" `static` 메서드인 `main`을 찾아서 호출하는 것입니다."
+    "explanation": "클래스 상속(`extends`)은 하나만 되지만, 인터페이스 구현(`implements`)은 제한이 없습니다. 이것이 가장 결정적인 차이입니다."
   },
   "misconceptions": [
     {
-      "wrong": "static 메서드 안에서 super를 쓸 수 있다",
-      "correct": "못 씁니다. `this`도 없고 `super`도 없습니다.",
-      "why": "`this`, `super` 모두 '인스턴스'가 있어야 성립하는 개념입니다."
-    },
-    {
-      "wrong": "static 메서드는 오버라이딩(Overriding) 된다",
-      "correct": "아닙니다. **하이딩(Hiding)**이라고 부르며, 다형성(Polymorphism)이 적용되지 않습니다.",
-      "why": "변수의 '타입'만 보고 호출되지, 실제 '객체'가 뭔지는 보지 않기 때문입니다."
+      "wrong": "인터페이스에는 변수를 쓸 수 없다",
+      "correct": "쓸 수 있지만, 자동으로 `public static final`(상수)이 됩니다.",
+      "why": "인터페이스는 '상태'를 가질 수 없고 '행동'의 약속만 정의하기 때문입니다."
     }
   ],
-  "keyTakeaway": "static 메서드는 '도구 상자'다. 객체 없이 쓸 수 있지만, 객체 내부(this)는 못 건드린다."
+  "keyTakeaway": "인터페이스는 '기능 설명서'다. `implements`로 여러 기능을 장착할 수 있다."
 }

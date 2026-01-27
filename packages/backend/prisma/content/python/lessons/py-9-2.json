@@ -1,43 +1,51 @@
 {
   "lessonId": "py-9-2",
   "title": "Function Decorators",
-  "concept": "Core concept for Function Decorators",
+  "concept": "CORE_CONCEPT_DECORATOR_BASICS",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Function Decorators\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "# 1. 데코레이터 정의 (액자 만들기)\ndef my_decorator(func):\n    def wrapper():\n        print(\"Something is happening before the function is called.\")\n        func() # 원본 함수 실행\n        print(\"Something is happening after the function is called.\")\n    return wrapper\n\n# 2. @ 문법 적용 (액자 끼우기)\n@my_decorator\ndef say_hello():\n    print(\"Hello!\")\n\ndef example():\n    print(f\"Function Name: {say_hello.__name__}\")\n    # 실제 실행되는 건 wrapper 함수\n    say_hello()\n\nif __name__ == '__main__':\n    example()",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 8,
+        "title": "@ (Syntactic Sugar)",
+        "explanation": "`@my_decorator`는 `say_hello = my_decorator(say_hello)`와 100% 똑같은 코드입니다. 원본 함수(`say_hello`)를 `wrapper` 함수로 교체해버립니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
+          "variables": {
+            "say_hello": "<function wrapper at ...>"
+          },
           "stdout": ""
+        }
+      },
+      {
+        "line": 15,
+        "title": "Wrapper 실행",
+        "explanation": "`say_hello()`를 호출했지만, 실제로는 `decorator`가 리턴한 `wrapper()`가 실행됩니다. 그래서 전/후에 추가한 `print`문들이 실행되는 것입니다.",
+        "keyInsight": "기존 코드는 건드리지 않고(Open-Closed Principle), 기능(로깅, 인증, 타이머 등)을 추가할 때 강력합니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "Function Name: wrapper\nSomething is happening before the function is called.\nHello!\nSomething is happening after the function is called."
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Function Decorators?",
+    "question": "다음 중 데코레이터를 사용하는 주된 목적이 아닌 것은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "코드의 재사용성 향상 (로깅, 권한 체크 등)",
+      "함수의 실행 속도 자체를 물리적으로 빠르게 만들기",
+      "기존 함수를 수정하지 않고 기능 추가",
+      "관심사의 분리 (Aspect-Oriented Programming)"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "데코레이터는 기능을 덧붙이는 것이지, 알고리즘을 최적화하여 실행 속도를 높여주는 마법이 아닙니다. 오히려 함수 호출 비용(Overhead)이 살짝 추가됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "데코레이터는 실행 시점(Runtime)에 함수를 수식한다.",
+      "correct": "반은 맞고 반은 틀립니다. 데코레이터 함수가 **적용(Definition Time)**되는 건 파이썬 파일이 로딩될 때(Import Time) 딱 한 번입니다. 실행은 호출할 때마다 됩니다.",
+      "why": "함수 정의(`def` 문)가 실행될 때 데코레이터가 즉시 작동하여 함수를 교체해버리기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Function Decorators is crucial for advanced Python."
+  "keyTakeaway": "데코레이터는 '함수를 받아서 함수를 리턴하는 함수'일 뿐입니다. 어렵게 생각하지 마세요."
 }

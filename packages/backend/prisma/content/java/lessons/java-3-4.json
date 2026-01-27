@@ -1,159 +1,75 @@
 {
   "lessonId": "java-3-4",
-  "title": "swap이 안 되는 이유",
-  "concept": "Java에서 swap 함수가 작동하지 않는 이유는 Pass by Value 때문이다",
+  "title": "Method Overloading",
+  "concept": "이름은 같지만 매개변수가 다른 메서드를 여러 개 만들 수 있다",
   "content": {
-    "code": "void swap(Integer a, Integer b) {\n    Integer temp = a;\n    a = b;\n    b = temp;\n    System.out.println(\"inside: a=\" + a + \", b=\" + b);\n}\n\nInteger x = 1;\nInteger y = 2;\nSystem.out.println(\"before: x=\" + x + \", y=\" + y);\nswap(x, y);\nSystem.out.println(\"after: x=\" + x + \", y=\" + y);",
+    "code": "public class Main {\n    // 1. 정수 더하기\n    public static int add(int a, int b) {\n        return a + b;\n    }\n\n    // 2. 실수 더하기 (이름이 같아도 OK)\n    public static double add(double a, double b) {\n        return a + b;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(add(3, 7));       // 1번 호출\n        System.out.println(add(3.5, 4.5));   // 2번 호출\n    }\n}",
     "steps": [
       {
+        "line": 3,
+        "title": "첫 번째 add (int)",
+        "explanation": "`add(int, int)` 메서드입니다.\n파라미터 타입이 정수형 두 개입니다.",
+        "highlight": [
+          3,
+          4,
+          5
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [],
+          "heap": []
+        }
+      },
+      {
         "line": 8,
-        "title": "Integer x, y 생성",
-        "explanation": "**메모리 상태:**\n`x`와 `y`는 각각 Heap의 `Integer(1)`과 `Integer(2)`를 가리킵니다.\n여기서 `Integer`는 **불변(Immutable) 객체**입니다. 값을 바꿀 수 없습니다.",
+        "title": "오버로딩 (Overloading)",
+        "explanation": "똑같이 `add`라는 이름을 썼지만 에러가 안 납니다!\n**파라미터의 타입이나 개수**가 다르면 JVM이 구분할 수 있기 때문입니다.\n\n이것을 **메서드 오버로딩**이라고 합니다.",
+        "keyInsight": "이름 같아도 파라미터 다르면 OK",
         "highlight": [
           8,
-          9
+          9,
+          10
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "x",
-              "value": "-> 0x001"
-            },
-            {
-              "name": "y",
-              "value": "-> 0x002"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "Integer(1)"
-            },
-            {
-              "address": "0x002",
-              "content": "Integer(2)"
-            }
-          ]
+          "note": "add(double, double) 정의됨"
         }
       },
       {
-        "line": 11,
-        "title": "swap(x, y) 호출",
-        "explanation": "**참조값 복사:**\n`x`의 주소(`0x001`)가 `a`에 복사되고,\n`y`의 주소(`0x002`)가 `b`에 복사됩니다.\n\n이제 `a`와 `b`는 `x`, `y`의 **복사본 리모컨**입니다.",
-        "keyInsight": "파라미터 = 주소값의 복사본",
+        "line": 13,
+        "title": "메서드 선택",
+        "explanation": "`add(3, 7)` -> 정수형이네? -> 1번 `add` 실행\n`add(3.5, 4.5)` -> 실수형이네? -> 2번 `add` 실행\n\n컴파일러가 알아서 알맞은 짝을 찾아줍니다.",
         "highlight": [
-          11,
-          1
+          13,
+          14
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "x",
-              "value": "-> 0x001",
-              "frame": "main"
-            },
-            {
-              "name": "y",
-              "value": "-> 0x002",
-              "frame": "main"
-            },
-            {
-              "name": "a",
-              "value": "-> 0x001",
-              "frame": "swap",
-              "copied": true
-            },
-            {
-              "name": "b",
-              "value": "-> 0x002",
-              "frame": "swap",
-              "copied": true
-            }
-          ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "지역 변수 교환 (Swap)",
-        "explanation": "`swap` 메서드 안에서 `a`와 `b`가 서로 주소를 교환합니다.\n- `a` → 0x002\n- `b` → 0x001\n\n하지만 이건 **`swap` 방 안에서 복사본들끼리 자리 바꾼 것**에 불과합니다.\n`main` 방에 있는 `x`, `y`는 이 사실을 전혀 모릅니다.",
-        "highlight": [
-          2,
-          3,
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "x",
-              "value": "-> 0x001",
-              "frame": "main"
-            },
-            {
-              "name": "a",
-              "value": "-> 0x002",
-              "frame": "swap",
-              "changed": true
-            },
-            {
-              "name": "b",
-              "value": "-> 0x001",
-              "frame": "swap",
-              "changed": true
-            }
-          ],
-          "note": "a, b만 바뀌고 x, y는 그대로 (영향력 0)"
-        }
-      },
-      {
-        "line": 12,
-        "title": "함수 반환 후 (Swap 실패 확인)",
-        "explanation": "`swap` 메서드가 종료되고 `a`, `b`는 사라집니다.\n`main`에 돌아와 보니 `x`, `y`는 여전히 1, 2 그대로입니다.\n\n**해결책은?**\n만약 진짜 값을 바꾸고 싶다면, `int[]` 같은 그릇(Wrapper)을 만들어서 넘겨야 합니다. 그릇의 내용물은 바꿀 수 있으니까요!",
-        "keyInsight": "Java에서 swap 함수 구현 불가",
-        "highlight": [
-          12
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "x",
-              "value": "-> 0x001"
-            },
-            {
-              "name": "y",
-              "value": "-> 0x002"
-            }
-          ],
           "output": [
-            "before: x=1, y=2",
-            "inside: a=2, b=1",
-            "after: x=1, y=2"
-          ],
-          "warning": "Swap 효과 없음!"
+            "10",
+            "8.0"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "Java에서 두 값을 교환하려면?",
+    "question": "다음 중 오버로딩으로 인정되지 않는 것은?",
     "options": [
-      "swap 함수 사용",
-      "포인터 사용",
-      "배열이나 객체의 필드로 래핑해서 전달",
-      "불가능"
+      "void print(int a) vs void print(double a)",
+      "void print(int a) vs void print(int a, int b)",
+      "void print(int a) vs void print(String a)",
+      "int print(int a) vs void print(int a)"
     ],
-    "correctIndex": 2,
-    "explanation": "배열(`int[]`)이나 객체 필드는 참조를 통해 수정할 수 있습니다. `void swap(int[] arr)` 처럼 만들어서 `arr[0]`과 `arr[1]`을 바꾸면 됩니다."
+    "correctIndex": 3,
+    "explanation": "리턴 타입(int vs void)만 다른 것은 오버로딩이 아닙니다. 컴파일러는 오직 **메서드 이름과 파라미터 타입/순서**만으로 구분합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Integer는 객체니까 내부 값을 바꾸면 되지 않나?",
-      "correct": "안타깝게도 `Integer`, `String`, `Double` 등은 **불변(Immutable)** 클래스입니다.",
-      "why": "한 번 생성되면 내부 값을 절대 바꿀 수 없습니다. 그래서 래퍼 클래스는 값 변경(Mutation)이 불가능합니다. `AtomicInteger`는 가능합니다."
+      "wrong": "리턴 타입만 다르면 다른 메서드다",
+      "correct": "절대 아닙니다. 컴파일 에러가 발생합니다.",
+      "why": "호출하는 쪽에서 `add(3, 5);` 라고만 썼을 때, 리턴값을 안 받으면 어떤 메서드를 불렀는지 알 방법이 없기 때문입니다."
     }
   ],
-  "keyTakeaway": "Java는 Pass by Value라서 변수 스왑 함수를 직접 만들 수 없다. 래핑이 필요하다."
+  "keyTakeaway": "이름은 하나지만 기능은 여러 개! 파라미터로 구분한다."
 }

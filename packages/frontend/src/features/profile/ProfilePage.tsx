@@ -321,7 +321,7 @@ export function ProfilePage() {
               <Loader2 className="w-6 h-6 text-[var(--theme-dashboard-accent)] animate-spin" />
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-4">
               {PROFILE_QUESTIONS.map((question) => {
                 const value = profile?.[question.key];
                 const isEditing = editingKey === question.key;

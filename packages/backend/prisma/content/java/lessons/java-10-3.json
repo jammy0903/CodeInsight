@@ -1,43 +1,62 @@
 {
   "lessonId": "java-10-3",
-  "title": "Race Conditions",
-  "concept": "Core concept for Race Conditions",
+  "title": "Synchronized Keyword",
+  "concept": "CORE_CONCEPT_SYNCHRONIZED",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Race Conditions\n    }\n}",
+    "code": "public class Main {\n    static int count = 0;\n    static final Object lock = new Object();\n\n    public static void main(String[] args) throws InterruptedException {\n        Runnable task = () -> {\n            for (int i = 0; i < 10000; i++) {\n                // Critical Section\n                synchronized (lock) {\n                    count++; \n                }\n            }\n        };\n\n        Thread t1 = new Thread(task);\n        Thread t2 = new Thread(task);\n\n        t1.start();\n        t2.start();\n        t1.join();\n        t2.join();\n        \n        // Guaranteed: 20000\n        System.out.println(\"Count: \" + count);\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 8,
+        "title": "동기화 블록 (Synchronized)",
+        "explanation": "`synchronized(락_객체)`로 감싸면, 한 번에 오직 하나의 스레드만 이 블록에 들어갈 수 있습니다. 문(Lock)을 잠그고 들어가는 것과 같습니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "name": "lock",
+              "status": "LOCKED by Thread-0"
+            },
+            {
+              "name": "count",
+              "value": "20000"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "임계 영역 보호",
+        "explanation": "이제 '읽기-수정-쓰기' 과정이 쪼개지지 않고 원자적으로 수행됩니다. 다른 스레드인 `Thread-1`은 `Thread-0`이 나올 때까지 밖에서 대기(Block)해야 합니다.",
+        "keyInsight": "너무 넓은 범위를 동기화하면, 병렬 처리가 안 되어서 성능이 떨어집니다. 꼭 필요한 부분만 최소한으로 잡으세요.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "t2",
+              "status": "BLOCKED (Waiting for lock)"
+            }
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Race Conditions?",
+    "question": "synchronized 블록의 락(Lock)으로 사용할 수 없는 것은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "this (현재 객체)",
+      "Main.class (클래스 객체)",
+      "new Object() (임의의 객체)",
+      "int value (원시 타입 변수)"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 3,
+    "explanation": "락은 반드시 '객체(Object)'여야 합니다. `int`, `double` 같은 원시 타입(Primitive Type)은 락으로 사용할 수 없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "synchronized는 무조건 안전하니까 많이 쓸수록 좋다.",
+      "correct": "아닙니다. 과도한 동기화는 성능 저하(Context Switching 비용)와 교착 상태(Deadlock, 서로 락을 쥐고 안 놓는 상황)를 유발할 수 있습니다.",
+      "why": "병목 현상(Bottleneck)이 되기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Race Conditions is crucial for advanced Java."
+  "keyTakeaway": "공유 자원을 안전하게 지키려면 `synchronized`로 보호해야 하지만, 성능을 위해 범위를 최소화해야 합니다."
 }

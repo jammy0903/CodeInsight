@@ -1,112 +1,82 @@
 {
   "lessonId": "java-2-2",
-  "title": "null 체크 패턴",
-  "concept": "null을 안전하게 다루는 여러 가지 패턴이 있다",
+  "title": "If-Else & Switch",
+  "concept": "조건에 따라 흐름을 제어하는 분기문",
   "content": {
-    "code": "String str = getValueMaybeNull();\n\nif (str != null && str.length() > 0) {\n    System.out.println(str);\n}\n\nObjects.requireNonNull(str, \"str must not be null\");\n\nString result = (str != null) ? str : \"default\";\n\nString value = Objects.requireNonNullElse(str, \"default\");",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        int score = 85;\n\n        // If-Else\n        if (score >= 90) {\n            System.out.println(\"A\");\n        } else if (score >= 80) {\n            System.out.println(\"B\");\n        } else {\n            System.out.println(\"C\");\n        }\n\n        // Switch Expression (Java 14+ Style)\n        String day = \"SAT\";\n        String type = switch (day) {\n            case \"SAT\", \"SUN\" -> \"Weekend\";\n            case \"MON\" -> \"Start\";\n            default -> \"Weekday\";\n        };\n        System.out.println(type);\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "null일 수 있는 값 받기",
-        "explanation": "**상황:** 외부(DB, API, 사용자 입력)에서 값을 받아오면 항상 `null`일 수 있다고 의심해야 합니다.\n이 `str`은 언제 터질지 모르는 시한폭탄과 같습니다.",
+        "line": 4,
+        "title": "If-Else 조건문",
+        "explanation": "위에서부터 순서대로 조건을 검사합니다.\n1. `score >= 90`? (85 >= 90 → 거짓)\n2. `score >= 80`? (85 >= 80 → 참!)\n\n참인 블록을 실행하고 나머지는 건너뜁니다.",
         "highlight": [
-          1
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "str",
-              "value": "null 또는 값"
+              "name": "score",
+              "value": "85"
             }
           ],
-          "note": "외부 입력은 항상 null 가능성 고려"
-        }
-      },
-      {
-        "line": 3,
-        "title": "단축 평가 (Short-circuit Evaluation)",
-        "explanation": "**논리 연산의 마법:**\n`&&`(AND) 연산자는 앞의 조건이 `false`면 뒤쪽은 쳐다보지도 않습니다.\n\n1. `str != null` 검사 -> 만약 `false`(null)라면?\n2. 뒤에 있는 `str.length()`는 **실행조차 안 됨**\n3. 덕분에 NPE를 피하고 안전하게 넘어갑니다.\n\n**단축 평가란?**\n결과가 확실해지면 남은 연산을 생략하는 효율적인 계산 방식입니다.\n\n**주의:** 순서를 바꿔서 `str.length() > 0 && str != null`로 쓰면 망합니다. (앞에서 이미 터짐)",
-        "keyInsight": "&& 단축 평가: 앞이 false면 뒤는 실행 안 함",
-        "highlight": [
-          3,
-          4,
-          5
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "evaluation": "str != null → false → && 뒤 실행 안 함",
-          "note": "순서가 중요! null 체크를 먼저"
-        }
-      },
-      {
-        "line": 7,
-        "title": "Objects.requireNonNull (Fail-fast)",
-        "explanation": "**Fail-fast(빠른 실패) 전략:**\n\"문제가 있다면 나중에 이상하게 터지지 말고, 지금 당장 명확하게 터져라!\"\n\n`str`이 `null`이면 즉시 예외를 던져서, 디버깅할 때 \"아, 여기서 null이 들어왔구나\" 하고 바로 알 수 있게 해줍니다.",
-        "keyInsight": "빠른 실패(Fail-fast) 패턴",
-        "highlight": [
-          7
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "null이면 명확한 에러 메시지와 함께 즉시 실패"
-        }
-      },
-      {
-        "line": 9,
-        "title": "삼항 연산자로 기본값",
-        "explanation": "if-else를 한 줄로 줄인 것입니다.\n`str`이 살아있으면 `str`을 쓰고, 아니면 예비타이어(`\"default\"`)를 씁니다.",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "result",
-              "value": "str 또는 \"default\""
-            }
+          "output": [
+            "B"
           ]
         }
       },
       {
-        "line": 11,
-        "title": "Objects.requireNonNullElse",
-        "explanation": "Java 9부터는 삼항 연산자 대신 이 표준 메서드를 쓸 수 있습니다.\n\"null이면 이거 써\"라고 읽히므로 가독성이 훨씬 좋습니다. `Objects` 클래스에는 이런 꿀 같은 유틸리티가 많습니다.",
-        "keyInsight": "Java 9+: requireNonNullElse 사용",
+        "line": 13,
+        "title": "Switch Expression",
+        "explanation": "Java 14부터 도입된 **화살표 구문(`->`)**입니다.\n기존 `switch`보다 훨씬 직관적이며, `break`를 안 써도 됩니다.\n심지어 결과를 변수(`type`)에 바로 담을 수도 있습니다!",
+        "keyInsight": "Modern Java: 화살표 Switch 사용 권장",
         "highlight": [
-          11
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "value",
-              "value": "str 또는 \"default\""
+              "name": "day",
+              "value": "\"SAT\""
+            },
+            {
+              "name": "type",
+              "value": "\"Weekend\""
             }
-          ],
-          "note": "더 읽기 쉬운 코드"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "if (str.length() > 0 && str != null)의 문제점은?",
+    "question": "If문에서 조건이 참일 때 실행되는 부분은?",
     "options": [
-      "문법 오류",
-      "str이 null이면 NPE 발생",
-      "항상 false 반환",
-      "문제없음"
+      "else 블록",
+      "switch 블록",
+      "then 블록 (Java에는 없음)",
+      "if 바로 뒤의 중괄호 {} 블록"
     ],
-    "correctIndex": 1,
-    "explanation": "순서가 잘못되었습니다. str.length()가 먼저 실행되므로 str이 null이면 NPE가 발생합니다. null 체크를 무조건 맨 앞에 둬야 합니다."
+    "correctIndex": 3,
+    "explanation": "조건이 true면 if문 바로 뒤에 있는 코드 블록 `{ ... }`이 실행됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "null 체크 순서는 상관없다",
-      "correct": "순서가 생명입니다. 무조건 `null` 체크가 가장 앞에(왼쪽) 와야 합니다.",
-      "why": "오른쪽부터 체크하면 이미 `null.메서드()`가 실행되어 NPE가 터져버립니다. `&&`는 왼쪽부터 읽다가 `false`가 나오면 즉시 멈춥니다(단축 평가)."
+      "wrong": "조건을 비교할 때 '='을 쓴다",
+      "correct": "비교는 `==`, 대입은 `=`입니다.",
+      "why": "`if (score = 100)`이라고 쓰면 자바는 \"boolean이 와야 하는데 왜 int를 넣니?\"라고 에러를 냅니다. (C언어와 다른 점)"
     }
   ],
-  "keyTakeaway": "null 체크는 항상 맨 앞에. Objects 유틸리티를 활용하면 코드가 깔끔해집니다."
+  "keyTakeaway": "상황에 따라 if-else나 switch를 골라 쓰자. 최신 버전이라면 화살표 switch가 깔끔하다."
 }

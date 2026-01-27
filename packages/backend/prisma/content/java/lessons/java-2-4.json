@@ -1,99 +1,38 @@
 {
   "lessonId": "java-2-4",
-  "title": "null-safe 컬렉션",
-  "concept": "컬렉션마다 null 허용 정책이 다르다",
+  "title": "Stack & Heap Basics",
+  "concept": "자바 메모리는 크게 스택(지역 변수)과 힙(객체)으로 나뉜다",
   "content": {
-    "code": "Map<String, Integer> hashMap = new HashMap<>();\nhashMap.put(\"key\", null);\nhashMap.put(null, 100);\n\nMap<String, Integer> concurrentMap = new ConcurrentHashMap<>();\nconcurrentMap.put(\"key\", null);\n\nList<String> list = List.of(\"a\", \"b\", \"c\");\nlist.contains(null);\n\nInteger value = hashMap.getOrDefault(\"missing\", 0);",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        // Stack만 사용\n        int a = 10;\n        int b = 20;\n        \n        // Stack + Heap 사용\n        String name = new String(\"Java\");\n        \n        // 스코프 예시\n        if (a < 100) {\n            int temp = 50;\n            // temp는 여기(Stack)서만 존재\n        }\n        // temp는 여기서 사라짐 (Pop)\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "HashMap 생성",
-        "explanation": "**HashMap의 정책:** \"뭐든 다 받아줍니다.\"\n`null` 키도, `null` 값도 저장할 수 있는 관대한 친구입니다. 가장 흔하게 쓰이는 Map 구현체죠.",
+        "line": 4,
+        "title": "Stack 메모리",
+        "explanation": "**특징:** 메서드가 실행될 때마다 '프레임(Frame)'이라는 블록이 쌓이고, 메서드가 끝나면 사라집니다.\n`int`, `double` 같은 **기본 타입** 변수들은 이 Stack 프레임 안에 값을 직접 저장합니다.",
+        "keyInsight": "Stack = 임시 작업 공간 (빠름)",
         "highlight": [
-          1
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "hashMap",
-              "value": "HashMap{}"
-            }
-          ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "null value 저장",
-        "explanation": "값을 `null`로 저장했습니다.\n\"이 키에 대한 데이터는 없음\"을 표시하고 싶을 때 쓸 수 있지만, `get()` 했을 때 \"키가 없는 건지 값이 null인 건지\" 헷갈릴 수 있습니다.",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "hashMap",
-              "value": "{\"key\": null}"
-            }
-          ],
-          "note": "HashMap: null value OK"
-        }
-      },
-      {
-        "line": 3,
-        "title": "null key 저장",
-        "explanation": "**특이점:** Key가 `null`인 것도 저장됩니다!\n내부적으로는 해시값을 계산할 수 없어서 0번 버킷에 따로 모셔둡니다.\n물론 Key는 유일해야 하므로 `null` Key는 딱 하나만 가질 수 있습니다.",
-        "keyInsight": "HashMap: null key 1개, null value 무제한 가능",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "hashMap",
-              "value": "{\"key\": null, null: 100}"
-            }
-          ]
-        }
-      },
-      {
-        "line": 5,
-        "title": "ConcurrentHashMap 생성",
-        "explanation": "**ConcurrentHashMap의 정책:** \"null은 절대 사절!\"\n멀티스레드 환경을 위해 설계된 이 맵은 아주 엄격합니다.\n\n**ConcurrentHashMap이란?**\n여러 스레드가 동시에 접근해도 안전(Thread-safe)하도록 락(Lock)을 쪼개서 관리하는 고성능 Map입니다.",
-        "highlight": [
+          4,
           5
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "concurrentMap",
-              "value": "ConcurrentHashMap{}"
+              "name": "a",
+              "value": "10"
+            },
+            {
+              "name": "b",
+              "value": "20"
             }
           ]
         }
       },
       {
-        "line": 6,
-        "title": "ConcurrentHashMap에 null 넣기 (NPE!)",
-        "explanation": "Key나 Value에 `null`을 넣는 순간 `NullPointerException`이 발생합니다.\n\n**왜 이렇게 깐깐할까?**\n멀티스레드 환경에서 `get(key)`가 `null`을 반환했을 때 모호하기 때문입니다. 누군가 방금 `remove`해서 없는 건지, 원래 `null`이었는지 확실하지 않으면 동시성 버그가 생기기 쉽습니다.",
-        "keyInsight": "ConcurrentHashMap: null 절대 불가!",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "NullPointerException",
-          "warning": "ConcurrentHashMap은 null key/value 불가"
-        }
-      },
-      {
         "line": 8,
-        "title": "List.of() 불변 리스트",
-        "explanation": "Java 9에 나온 `List.of()` 역시 `null`을 허용하지 않습니다.\n\"불변 객체(Immutable Object)는 깔끔하고 완전해야 한다\"는 최신 Java의 철학 때문입니다.",
-        "keyInsight": "List.of(): 불변 리스트, null 포함 불가",
+        "title": "Heap 메모리 연결",
+        "explanation": "`new`로 만든 객체는 **Heap**이라는 거대한 공용 창고에 저장됩니다.\n\n그러면 Stack에 있는 `name` 변수는?\nHeap에 있는 객체의 **주소(참조)**만 가집니다. \"저기 100번지에 내 데이터 있어\"라고 가리키는 것입니다.",
+        "keyInsight": "Heap = 객체 창고 (크고 느림)",
         "highlight": [
           8
         ],
@@ -101,68 +40,66 @@
         "memoryState": {
           "stack": [
             {
-              "name": "list",
-              "value": "[\"a\", \"b\", \"c\"]"
+              "name": "name",
+              "value": "-> 0x100"
             }
           ],
-          "note": "List.of(): 불변, null 불가"
-        }
-      },
-      {
-        "line": 9,
-        "title": "contains(null) 호출 (NPE!)",
-        "explanation": "심지어 \"`null`이 들어있니?\"라고 물어보는 것(`contains`)조차 허용하지 않고 NPE를 던집니다.\n\"우리 리스트엔 애초에 `null` 같은 건 들어올 수 없어! 물어보지도 마!\"라고 화내는 격입니다.",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "NullPointerException"
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "\"Java\""
+            }
+          ]
         }
       },
       {
         "line": 11,
-        "title": "getOrDefault() - null-safe 조회",
-        "explanation": "**추천 메서드:**\n\"키가 없으면 `null` 말고 0을 달라.\"\n`null` 처리를 매번 `if`문으로 하기 귀찮을 때 쓰는 '치트키'입니다.",
-        "keyInsight": "getOrDefault() = null 대신 기본값 받기",
+        "title": "스코프와 수명 (Life Cycle)",
+        "explanation": "`temp` 변수는 `if` 블록 안에서 태어났습니다.\n블록 `}`이 닫히는 순간, `temp`는 Stack에서 팝(Pop)되어 흔적도 없이 사라집니다.",
         "highlight": [
-          11
+          11,
+          12,
+          13,
+          14
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
-              "name": "value",
-              "value": "0"
+              "name": "a",
+              "value": "10"
+            },
+            {
+              "name": "b",
+              "value": "20"
+            },
+            {
+              "name": "name",
+              "value": "-> 0x100"
             }
           ],
-          "note": "\"missing\" 키가 없으므로 0 반환"
+          "note": "temp 변수는 사라짐"
         }
       }
     ]
   },
   "quiz": {
-    "question": "null key를 허용하는 Map은?",
+    "question": "new 키워드로 생성된 객체가 저장되는 메모리 공간은?",
     "options": [
-      "HashMap",
-      "TreeMap",
-      "ConcurrentHashMap",
-      "Hashtable"
+      "Stack",
+      "Heap",
+      "CPU Register",
+      "Hard Disk"
     ],
-    "correctIndex": 0,
-    "explanation": "HashMap만 null key를 허용합니다. TreeMap은 정렬해야 해서, ConcurrentHashMap과 Hashtable은 설계상 허용하지 않습니다."
+    "correctIndex": 1,
+    "explanation": "모든 객체와 인스턴스 배열은 힙(Heap) 영역에 생성됩니다. 스택(Stack)은 메서드 호출과 지역 변수를 위한 공간입니다."
   },
   "misconceptions": [
     {
-      "wrong": "모든 Map은 null을 허용한다",
-      "correct": "구현체마다 다릅니다!",
-      "why": "`HashMap`, `LinkedHashMap`은 허용하지만, `TreeMap`, `Hashtable`, `ConcurrentHashMap`은 Key 또는 Value에 null을 허용하지 않습니다. API 문서를 꼭 확인해야 합니다."
-    },
-    {
-      "wrong": "List.of(null)은 [null]이 된다",
-      "correct": "바로 `NullPointerException`이 발생합니다.",
-      "why": "Java 9+의 팩토리 메서드(`List.of`, `Set.of`, `Map.of`)는 null을 매우 싫어합니다."
+      "wrong": "모든 변수는 Stack에 있다",
+      "correct": "반은 맞고 반은 틀립니다.",
+      "why": "지역 변수(Local Variable)는 Stack에 있지만, 객체 내부의 필드(멤버 변수)는 객체와 함께 Heap에 존재합니다."
     }
   ],
-  "keyTakeaway": "HashMap은 관대하지만, 최신 컬렉션과 Concurrent 컬렉션은 null에 엄격합니다."
+  "keyTakeaway": "변수는 Stack, 객체는 Heap. 블록{}이 끝나면 지역 변수는 사라진다."
 }

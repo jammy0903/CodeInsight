@@ -1,43 +1,51 @@
 {
   "lessonId": "py-10-3",
   "title": "AsyncIO Basics",
-  "concept": "Core concept for AsyncIO Basics",
+  "concept": "CORE_CONCEPT_ASYNCIO",
   "content": {
-    "code": "def example():\n    # TODO: Add code for AsyncIO Basics\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "import asyncio\n\n# 일반 함수 (동기)\ndef normal_brew():\n    print(\"Brewing Coffee (Sync)...\")\n    # time.sleep(1) # Block! 아무것도 못함\n    print(\"Coffee Ready!\")\n\n# 코루틴 함수 (비동기)\nasync def async_brew():\n    print(\"Start Brewing (Async)...\")\n    # await: \"커피 끓는 동안 다른 손님 주문 받으세요\"\n    await asyncio.sleep(1) \n    print(\"Coffee Served!\")\n\nasync def main():\n    # 1. 코루틴 객체 생성 (실행 X)\n    coro = async_brew()\n    print(f\"Type: {type(coro)}\")\n    \n    # 2. 이벤트 루프에 등록해서 실행\n    print(\"--- Awaiting ---\")\n    await coro\n\nif __name__ == '__main__':\n    # asyncio 진입점\n    asyncio.run(main())",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 9,
+        "title": "async def (코루틴 정의)",
+        "explanation": "`async def`로 정의된 함수는 호출 시 바로 실행되지 않고 '코루틴 객체'를 반환합니다. 이는 예약 주문서와 같습니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "variables": {
+            "coro": "<coroutine object async_brew>"
+          },
+          "stdout": "Type: <class 'coroutine'>"
+        }
+      },
+      {
+        "line": 12,
+        "title": "await (제어권 양보)",
+        "explanation": "`await`를 만나면 \"이 작업이 끝날 때까지 기다릴 건데, 그냥 멍때리는 게 아니라 CPU 소유권을 반납할게\"라고 선언합니다. 그 사이 **이벤트 루프(Event Loop)**가 다른 밀린 작업을 처리합니다.",
+        "keyInsight": "Non-blocking I/O의 핵심입니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "Type: <class 'coroutine'>\n--- Awaiting ---\nStart Brewing (Async)...\n(Pause 1 sec)\nCoffee Served!"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of AsyncIO Basics?",
+    "question": "asyncio.sleep(1)과 time.sleep(1)의 결정적 차이는?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "시간의 정확도",
+      "Block 여부 (CPU 양보 여부)",
+      "함수 이름 길이",
+      "지원하는 파이썬 버전"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "`time.sleep`은 전체 프로그램을 멈춰 세우지만(Blocking), `asyncio.sleep`은 \"나 잘거니까 그동안 딴 일 해\"라며 자리를 비켜줍니다(Non-blocking)."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "async는 멀티스레드처럼 병렬로 실행된다.",
+      "correct": "아닙니다. Python의 `asyncio`는 기본적으로 **싱글 스레드**입니다. 매우 빠른 속도로 작업을 교차(Concurrently)해서 동시에 하는 것처럼 보일 뿐입니다.",
+      "why": "혼자서 요리, 주문, 청소를 번갈아가며 하는 '슈퍼 알바생' 모델입니다."
     }
   ],
-  "keyTakeaway": "Understanding AsyncIO Basics is crucial for advanced Python."
+  "keyTakeaway": "I/O 대기 시간이 긴 작업이 많을 때 `asyncio`를 쓰면, 스레드를 많이 만들지 않고도 높은 성능을 낼 수 있습니다."
 }

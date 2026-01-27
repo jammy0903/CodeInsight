@@ -65,7 +65,7 @@ export interface HandlerRegistry<TContext, TStep> {
 // ============================================================
 
 /** 지원 언어 */
-export type SupportedLanguage = 'c' | 'python' | 'java';
+export type SupportedLanguage = 'c' | 'python' | 'java' | 'javascript';
 
 /** 변경 사항 기본 타입 */
 export interface BaseChange {

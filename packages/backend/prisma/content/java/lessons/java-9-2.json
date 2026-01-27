@@ -1,43 +1,86 @@
 {
   "lessonId": "java-9-2",
-  "title": "Garbage Collection Basics",
-  "concept": "Core concept for Garbage Collection Basics",
+  "title": "GC Roots & Reachability",
+  "concept": "CORE_CONCEPT_GC_ROOTS",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Garbage Collection Basics\n    }\n}",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        Person p1 = new Person(\"A\");\n        Person p2 = new Person(\"B\");\n        \n        p1.friend = p2; // p1 references p2\n        \n        p2 = null; \n        // Is Person(\"B\") garbage? NO.\n        // p1 (Stack/GC Root) -> Person(\"A\") -> Person(\"B\")\n        // \"B\" is still REACHABLE through \"A\".\n        \n        p1 = null;\n        // Now Stack -> x\n        // Both Person(\"A\") and Person(\"B\") are unreachable.\n        // GC will collect both.\n    }\n}\n\nclass Person {\n    String name;\n    Person friend;\n    public Person(String name) { this.name = name; }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          3
-        ],
+        "line": 5,
+        "title": "GC Root (뿌리)",
+        "explanation": "GC는 '청소할 것'을 찾는 게 아니라 '살려둘 것'을 찾습니다. 그 시작점이 되는 녀석들을 GC Root라고 합니다. 대표적으로 스택의 지역변수, static 변수 등이 있습니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "stack": [
+            {
+              "name": "p1",
+              "value": "Ref(A)"
+            },
+            {
+              "name": "p2",
+              "value": "Ref(B)"
+            }
+          ],
+          "heap": [
+            {
+              "name": "Person(A)",
+              "friend": "Ref(B)"
+            },
+            {
+              "name": "Person(B)",
+              "friend": "null"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "도달 가능성 (Reachability)",
+        "explanation": "`p2` 변수를 끊어도(`null`), `p1` 변수를 통해 `Person(A)`를 거쳐 `Person(B)`에 닿을 수 있다면(Reachable), `Person(B)`는 살아남습니다.",
+        "keyInsight": "어디선가 연결되어 있으면 죽지 않습니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "Ref(A)"
+            },
+            {
+              "name": "p2",
+              "value": "null"
+            }
+          ],
+          "heap": [
+            {
+              "name": "Person(A)",
+              "friend": "Ref(B)"
+            },
+            {
+              "name": "Person(B)",
+              "status": "ALIVE (Reachable from A)"
+            }
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Garbage Collection Basics?",
+    "question": "다음 중 GC Root가 될 수 없는 것은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "실행 중인 메서드의 지역 변수",
+      "static 키워드가 붙은 클래스 변수",
+      "이미 힙에 있는데 아무도 참조하지 않는 고아 객체",
+      "JNI(네이티브 코드)에서 참조하는 객체"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "GC Root는 '확실히 살아있는' 시작점입니다. 힙 내부의 고아 객체는 시작점이 될 수 없으며, 오히려 수거 대상입니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "서로 참조(Circular Reference)하고 있는 객체는 삭제되지 않는다.",
+      "correct": "과거 Reference Counting 방식의 문제입니다. Java의 Reachability 방식에서는 두 객체가 서로 참조하더라도 GC Root에서 도달할 수 없다면 둘 다 사이좋게 삭제됩니다.",
+      "why": "GC는 Root에서부터 그래프 탐색을 하기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Garbage Collection Basics is crucial for advanced Java."
+  "keyTakeaway": "GC의 핵심은 '어딘가(Stack, Static 등)에서 연결되어 있는가?'입니다. 연결이 끊긴 섬(Island of Isolation)은 통째로 수거됩니다."
 }

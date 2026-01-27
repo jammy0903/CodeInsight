@@ -1,43 +1,50 @@
 {
   "lessonId": "py-9-4",
-  "title": "Class Decorators",
-  "concept": "Core concept for Class Decorators",
+  "title": "Functools Wraps",
+  "concept": "CORE_CONCEPT_FUNCTOOLS_WRAPS",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Class Decorators\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "import functools\n\ndef my_decorator(func):\n    # 1. @wraps를 쓰지 않으면?\n    # wrapper.__name__ = \"wrapper\"가 됨\n    \n    @functools.wraps(func) # 2. 원본 함수의 메타데이터 복사\n    def wrapper(*args, **kwargs):\n        \"\"\"This is the wrapper function\"\"\"\n        print(\"Call Decorator\")\n        return func(*args, **kwargs)\n    return wrapper\n\n@my_decorator\ndef add(a, b):\n    \"\"\"두 수를 더하는 함수입니다.\"\"\"\n    return a + b\n\ndef example():\n    print(f\"Function Name: {add.__name__}\")\n    print(f\"Docstring: {add.__doc__}\")\n    \n    # 만약 @wraps가 없다면 Name은 'wrapper', Docstring은 wrapper의 것이 출력됨\n    print(f\"Result: {add(10, 20)}\")\n\nif __name__ == '__main__':\n    example()",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
+        "line": 7,
+        "title": "@functools.wraps(func)",
+        "explanation": "이 데코레이터는 마법이 아닙니다. 단순히 `func`의 `__name__`, `__doc__`, `__module__` 같은 속성들을 `wrapper` 함수로 복사해주는 역할을 합니다.",
         "visualizationType": "python-visualizer",
         "pythonState": {
-          "variables": {},
-          "stdout": ""
+          "variables": {
+            "wrapper.__name__": "'add'",
+            "wrapper.__doc__": "'두 수를 더하는 함수입니다.'"
+          }
+        }
+      },
+      {
+        "line": 19,
+        "title": "Identity 보존",
+        "explanation": "데코레이터를 썼지만, 사용자 입장에서는 여전히 `add` 함수를 쓰는 것처럼 느껴집니다. 디버깅하거나 자동 문서화 도구를 돌릴 때 매우 중요합니다.",
+        "visualizationType": "python-visualizer",
+        "pythonState": {
+          "stdout": "Function Name: add\nDocstring: 두 수를 더하는 함수입니다.\nCall Decorator\nResult: 30"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Class Decorators?",
+    "question": "functools.wraps를 사용하지 않았을 때 발생하는 가장 큰 문제는?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "함수가 실행되지 않는다 (Runtime Error)",
+      "함수의 실행 속도가 느려진다",
+      "원본 함수의 이름과 설명(Docstring)이 사라지고 wrapper의 정보로 덮어씌워진다",
+      "메모리 누수가 발생한다"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "기능상 문제는 없지만, `help(add)`를 쳤을 때 엉뚱한 wrapper 설명이 나와서 코드를 사용하는 사람을 혼란스럽게 만듭니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "wraps는 데코레이터의 성능을 향상시킨다.",
+      "correct": "전혀 상관없습니다. 오직 메타데이터(이름, 문서 등) 유지를 위한 도구입니다. 성능과는 무관합니다.",
+      "why": "단순한 속성 복사(`update_wrapper`) 작업이기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Class Decorators is crucial for advanced Python."
+  "keyTakeaway": "데코레이터를 직접 만든다면, 예의상(?) 반드시 `@functools.wraps(func)`를 붙여주는 게 좋습니다."
 }
