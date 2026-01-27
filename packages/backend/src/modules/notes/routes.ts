@@ -97,7 +97,7 @@ router.get('/', requireDbUser, async (req, res) => {
     ]);
 
     res.json({
-      notes: notes.map((n) => ({
+      notes: notes.map((n: any) => ({
         id: n.id,
         lessonId: n.lessonId,
         lessonTitle: n.lesson.title,
@@ -306,11 +306,11 @@ router.get('/concepts', requireDbUser, async (req, res) => {
     });
 
     res.json({
-      topConcepts: notes.map((n) => ({
+      topConcepts: notes.map((n: any) => ({
         concept: n.concept,
         count: n._count.concept,
       })),
-      weakConcepts: wrongNotes.map((n) => ({
+      weakConcepts: wrongNotes.map((n: any) => ({
         concept: n.concept,
         count: n._count.concept,
       })),
