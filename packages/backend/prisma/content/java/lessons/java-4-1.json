@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "String 리터럴 생성",
-        "explanation": "**String Pool:**\nJVM이 `\"Hello\"` 리터럴을 보고 String Pool에 저장합니다.\n`s1`은 이 Pool 상의 주소를 가리킵니다.",
+        "explanation": "**String Pool:**\nJVM이 `\"Hello\"`라는 리터럴을 보고 String Pool에 저장합니다.\n`s1`은 이 Pool 상의 주소를 가리킵니다.",
         "highlight": [
           1
         ],
@@ -28,7 +28,7 @@
       {
         "line": 2,
         "title": "참조 복사 (Alias)",
-        "explanation": "`s2 = s1`:\n주소만 복사합니다. `s1`과 `s2`는 **같은 객체**를 보고 있습니다.\n(데이터 자체가 복사되는 것이 아님)",
+        "explanation": "`s2 = s1`:\n주소만 복사합니다. `s1`과 `s2`는 **같은 객체(Pool[0])**를 보고 있습니다.\n\n**비유:** 두 사람이 같은 책(`\"Hello\"`)을 보고 있는 상황입니다.",
         "keyInsight": "String 할당 = 참조 복사",
         "highlight": [
           2
@@ -54,7 +54,7 @@
       {
         "line": 4,
         "title": "문자열 연결 (불변성 발동!)",
-        "explanation": "**중요한 순간:**\n1. \"Hello\"와 \" World\"를 붙이려 합니다.\n2. 하지만 `String`은 **불변(Immutable)**이라 기존 \"Hello\"를 수정할 수 없습니다.\n3. 어쩔 수 없이 Heap에 **새로운 객체** `\"Hello World\"`를 만듭니다.\n4. `s1`은 이제 이 **새 객체**를 가리킵니다.",
+        "explanation": "**중요한 순간:**\n1. \"Hello\" 뒤에 \" World\"를 붙이려 합니다.\n2. 하지만 `String`은 **불변(Immutable)**이라, 책에 글씨를 덧쓸 수 없습니다.\n3. 대신 **새로운 책**(`\"Hello World\"`)을 만들어서 Heap에 저장합니다.\n4. `s1`은 이제 이 **새 책**을 가리키게 됩니다.\n\n**불변성(Immutability)이란?**\n생성 후 상태를 절대 바꿀 수 없는 성질입니다. 수정처럼 보이는 모든 작업은 사실 '새 객체 생성'입니다.",
         "keyInsight": "수정 불가 -> 새 객체 생성",
         "highlight": [
           4
@@ -102,7 +102,7 @@
       {
         "line": 7,
         "title": "s2 출력 (원본 유지)",
-        "explanation": "**불변성의 장점:**\n`s1`이 배신(?)하고 떠났지만, `s2`가 가리키던 원래 `\"Hello\"` 객체는 **아무런 흠집 없이 그대로** 있습니다.\n만약 `String`이 가변이었다면, `s2`의 값도 `\"Hello World\"`로 바 뀌었을 것입니다(사이드 이펙트).",
+        "explanation": "**불변성의 장점:**\n`s1`이 다른 책(`\"Hello World\"`)을 보러 떠났지만, `s2`가 보고 있던 원래 책(`\"Hello\"`)은 **아무런 손상 없이 그대로** 있습니다.\n\n만약 String이 가변이었다면, `s1`이 바뀔 때 `s2`도 덩달아 바뀌는 **부작용(Side Effect)**이 일어났을 것입니다.",
         "keyInsight": "불변성 = 사이드 이펙트 방지",
         "highlight": [
           7
@@ -136,25 +136,25 @@
   "quiz": {
     "question": "String이 불변인 이유로 올바르지 않은 것은?",
     "options": [
-      "스레드 안전성",
-      "String Pool 공유 가능",
-      "메모리 절약",
-      "수정 속도 향상"
+      "스레드 안전성(Thread Safety)",
+      "String Pool을 통한 메모리 절약",
+      "보안(Security)",
+      "수정(Update) 속도 향상"
     ],
     "correctIndex": 3,
-    "explanation": "불변성은 수정할 때마다 새 객체를 생성하므로 오히려 느립니다. 대신 안전성과 Pool 공유가 장점입니다."
+    "explanation": "불변성은 수정할 때마다 새 객체를 메모리에 할당해야 하므로 오히려 속도가 느립니다. 그래서 반복 수정 시에는 `StringBuilder`를 써야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "String을 수정하면 원본이 바뀐다",
-      "correct": "String은 **불변(Immutable)**이라 절대 바뀌지 않습니다. 우리가 '수정'했다고 생각하는 건 사실 **새 객체로 갈아타는 것(Rebinding)**입니다.",
-      "why": "배열(`char[]`)를 내부에서 `private final`로 꽁꽁 숨겨뒀기 때문입니다."
+      "wrong": "String에 += 쓰면 원본이 바뀐다",
+      "correct": "String은 절대 변하지 않습니다. 변수(`s1`)가 가리키는 **화살표**가 새 객체로 이동했을 뿐입니다.",
+      "why": "이를 **Rebinding(재연결)**이라고 합니다. 원본 객체는 메모리 어딘가에 그대로 남아있다가 나중에 GC(청소부)가 치워갑니다."
     },
     {
       "wrong": "불변이면 메모리 낭비 아닌가요?",
-      "correct": "수정이 잦으면 낭비가 맞습니다(그래서 `StringBuilder`를 씁니다). 하지만 **읽기**가 잦은 대부분의 경우엔, 하나의 객체를 안심하고 공유할 수 있어 오히려 메모리를 절약합니다(String Pool).",
-      "why": "공유했다가 누가 몰래 바꾸면 큰일나니까, 아예 못 바꾸게 막아둔 것입니다."
+      "correct": "수정이 잦으면 낭비가 맞지만, **읽기**가 잦은 대부분의 경우엔 공유할 수 있어 오히려 이득입니다.",
+      "why": "공유해도 안전하다(Thread-safe)는 확신이 있기 때문에 `String Pool` 같은 최적화가 가능한 것입니다."
     }
   ],
-  "keyTakeaway": "String 불변 = 수정은 새 객체 생성, 기존 참조 안전"
+  "keyTakeaway": "String은 '돌판'과 같아서 고칠 수 없다. 수정하면 새 돌판을 파야 한다."
 }

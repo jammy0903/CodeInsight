@@ -1,0 +1,55 @@
+{
+  "lessonId": "c-10-1",
+  "title": "Standard Streams",
+  "concept": "Core concept for Standard Streams",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    // 1. Standard Output (stdout)\n    fprintf(stdout, \"This uses stdout\\n\");\n    printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");\n\n    // 2. Standard Error (stderr)\n    fprintf(stderr, \"Error: Something went wrong!\\n\");\n\n    // 3. Standard Input (stdin)\n    int n;\n    fprintf(stdout, \"Enter a number: \");\n    // Assuming user inputs 5\n    // fscanf(stdin, \"%d\", &n);\n    n = 5; \n    \n    fprintf(stdout, \"You entered: %d\\n\", n);\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 6,
+        "title": "stdout (표준 출력)",
+        "explanation": "`printf`는 사실 `fprintf(stdout, ...)`의 단축형입니다. 운영체제는 기본적으로 모니터(터미널)를 표준 출력으로 연결해둡니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "This uses stdout",
+            "printf is a shortcut for fprintf(stdout, ...)"
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "stderr (표준 에러)",
+        "explanation": "`stderr`는 에러 메시지를 출력하기 위한 별도의 채널입니다. 프로그램 출력을 파일로 리다이렉션(`>`) 해도 `stderr` 내용은 여전히 화면에 나옵니다.",
+        "keyInsight": "로그와 에러를 분리하기 위해 반드시 사용해야 합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "This uses stdout",
+            "printf is a shortcut for fprintf(stdout, ...)",
+            "Error: Something went wrong!"
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "터미널에서 ./app > log.txt 로 실행했을 때, 화면에 출력되는 것은?",
+    "options": [
+      "모든 출력",
+      "stdout으로 출력한 내용",
+      "stderr로 출력한 내용",
+      "아무것도 출력되지 않음"
+    ],
+    "correctIndex": 2,
+    "explanation": "`>` 연산자는 stdout만 파일로 보냅니다. stderr는 여전히 화면(터미널)으로 출력되므로, 에러 메시지를 즉시 확인할 수 있습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "printf만 쓰면 되지 fprintf를 쓸 이유가 없다.",
+      "correct": "파일 입출력을 배우면 `fprintf(file, ...)` 형식이 필요해지며, stdout/stderr를 구분하는 것이 시스템 프로그래밍의 기초입니다.",
+      "why": "Unix 철학(파이프라인)을 따르려면 스트림 분리가 필수적입니다."
+    }
+  ],
+  "keyTakeaway": "stdin, stdout, stderr는 프로그램 시작 시 자동으로 열리는 파일 포인터이며, 이를 통해 운영체제와 소통합니다."
+}

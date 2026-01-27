@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "final 클래스 선언",
-        "explanation": "`final class`는 **\"더 이상 자식은 없다\"**는 선언입니다.\n이 클래스를 상속받아 기능을 수정하거나 악용하는 것을 원천 차단합니다.",
+        "explanation": "`final class`는 **\"나는 자식을 거부한다\"**는 선언입니다.\n이 클래스를 상속받아 기능을 제멋대로 바꾸거나 해킹하는 것을 원천 봉쇄합니다. 보안상 중요하거나 완벽하게 설계된 클래스(String 등)에 붙입니다.",
         "keyInsight": "final class = 상속 금지 (가계도 끝)",
         "highlight": [
           1
@@ -21,8 +21,7 @@
       {
         "line": 2,
         "title": "final 필드들",
-        "explanation": "필드까지 `final`이면 생성자에서 딱 한 번 값을 정하고, 이후 **절대 변경할 수 없습니다.**\n-> 이것이 바로 **불변 객체(Immutable Object)**입니다.",
-        "keyInsight": "final class + final fields = 완전 불변",
+        "explanation": "필드까지 `final`이면 생성자에서 딱 한 번 값을 정하고, 이후 **절대 변경할 수 없습니다.**\n-> 이것이 바로 안전한 **불변 객체(Immutable Object)**를 만드는 비결입니다.",
         "highlight": [
           2
         ],
@@ -34,7 +33,7 @@
       {
         "line": 4,
         "title": "생성자에서 초기화",
-        "explanation": "`final` 필드는 **반드시** 생성자가 끝날 때까지 초기화되어야 합니다.\n(값을 안 넣고 넘어가면 컴파일 에러)",
+        "explanation": "`final` 필드는 **무조건** 생성자 안에서 초기화해야 합니다.\n\"태어날 때 값을 정하지 않으면 평생 빈 깡통\"이 되기 때문에 컴파일러가 강제합니다.",
         "highlight": [
           4,
           5,
@@ -53,7 +52,7 @@
       {
         "line": 9,
         "title": "final 메서드",
-        "explanation": "`getX()`에 `final`이 붙으면, 자식 클래스에서 이 메서드의 로직을 **바꿀(Override) 수 없습니다.**\n\"내 동작 방식은 완벽하니 건드리지 마라.\"",
+        "explanation": "`getX()`에 `final`이 붙으면, 자식 클래스에서 이 메서드의 로직을 **바꿀(Override) 수 없습니다.**\n\"내 동작 방식은 완벽하니 건드리지 마라\"는 일종의 **계약 확정**입니다.",
         "keyInsight": "final method = 오버라이드 금지",
         "highlight": [
           9
@@ -66,7 +65,7 @@
       {
         "line": 12,
         "title": "final 클래스 상속 시도 (에러)",
-        "explanation": "`final`인 `ImmutablePoint`를 상속받으려 하면 컴파일러가 막습니다.",
+        "explanation": "`final`인 `ImmutablePoint`를 상속받으려 하면 컴파일러가 막습니다.\n\"이 가문은 대가 끊겼다\"며 에러를 냅니다.",
         "highlight": [
           12
         ],
@@ -78,7 +77,7 @@
       {
         "line": 14,
         "title": "일반 클래스의 final 메서드",
-        "explanation": "`Parent` 클래스 자체는 상속해줘도 되지만, `cannotOverride` 메서드만큼은 바꾸지 못하게 막고 싶을 때 씁니다.",
+        "explanation": "`Parent` 클래스 자체는 상속해줘도 되지만, `cannotOverride` 메서드만큼은 마음대로 바꾸지 못하게 막고 싶을 때 씁니다.",
         "highlight": [
           14,
           15,
@@ -93,7 +92,7 @@
       {
         "line": 21,
         "title": "final 메서드 오버라이드 시도 (에러)",
-        "explanation": "자식(`Child`)이 `Parent`의 `final` 메서드를 자기 입맛대로 바꾸려(Override) 하면 에러가 납니다.\n부모가 정한 규칙을 따라야 합니다.",
+        "explanation": "자식(`Child`)이 부모의 `final` 메서드를 자기 식대로 바꾸려(Override) 하면 에러가 납니다.\n부모가 정한 규칙을 그대로 따라야 합니다.",
         "highlight": [
           21
         ],
@@ -105,27 +104,27 @@
     ]
   },
   "quiz": {
-    "question": "final 클래스를 만드는 이유로 적절하지 않은 것은?",
+    "question": "final 메서드의 특징은?",
     "options": [
-      "불변성 보장",
-      "보안 (하위 클래스 악용 방지)",
-      "성능 최적화 (인라인화)",
-      "다형성 활용"
+      "절대 호출할 수 없다",
+      "자식 클래스에서 내용을 변경(Override)할 수 없다",
+      "오버로딩(Overloading)할 수 없다",
+      "반환값이 항상 일정하다"
     ],
-    "correctIndex": 3,
-    "explanation": "final 클래스는 상속이 불가능하므로 다형성을 활용할 수 없습니다."
+    "correctIndex": 1,
+    "explanation": "final 메서드는 상속은 되지만, 자식 클래스에서 내용을 덮어쓰기(Override)할 수 없습니다. 오버로딩(파라미터 다르게 정의)은 가능합니다."
   },
   "misconceptions": [
     {
       "wrong": "final 메서드는 오버로딩도 안 된다",
       "correct": "오버라이드(덮어쓰기)만 안 될 뿐, 오버로딩(새로 추가하기)은 가능합니다.",
-      "why": "파라미터가 다르면 아예 다른 메서드로 취급하기 때문에 상관없습니다."
+      "why": "이름만 같을 뿐 파라미터가 다르면 아예 다른 메서드로 취급하기 때문입니다."
     },
     {
       "wrong": "모든 메서드는 기본적으로 final이다",
-      "correct": "Java는 기본적으로 `override` 허용입니다(Open). `final`을 붙여야 금지(Closed)됩니다.",
-      "why": "C#나 Kotlin은 반대로 기본이 금지, `open` 키워드로 허용하는 방식이라 헷갈릴 수 있습니다."
+      "correct": "Java는 기본적으로 `override` 허용(Open)입니다. `final`을 붙여야 금지(Closed)됩니다.",
+      "why": "반대로 Kotlin 같은 최신 언어는 기본이 금지이고 `open` 키워드를 써야 열리는 방식이라 헷갈릴 수 있습니다."
     }
   ],
-  "keyTakeaway": "final class = 상속 불가, final method = 오버라이드 불가"
+  "keyTakeaway": "final class는 대를 끊고, final method는 수정을 막는다."
 }

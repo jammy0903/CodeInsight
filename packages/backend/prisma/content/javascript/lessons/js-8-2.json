@@ -1,54 +1,54 @@
 {
     "lessonId": "js-8-2",
-    "title": "requestAnimationFrame (rAF)",
-    "concept": "requestAnimationFrame은 브라우저의 렌더링 주기에 맞춰(Sync) 코드를 실행한다",
+    "title": "requestAnimationFrame (V-Sync)",
+    "concept": "requestAnimationFrame(rAF)은 브라우저의 화면 갱신 주기(V-Sync)에 맞춰 코드를 실행합니다.",
     "content": {
-        "code": "// 나쁜 예: setTimeout은 프레임과 싱크가 안 맞음\nlet box1 = 0;\nfunction badAni() {\n  box1 += 1;\n  // 60fps보다 빠르거나 느리게 실행될 수 있음 (Jank 유발)\n  setTimeout(badAni, 10);\n}\n\n// 좋은 예: rAF는 화면 주사율에 딱 맞춤\nlet box2 = 0;\nfunction goodAni() {\n  box2 += 1;\n  // 브라우저: \"다음 그림 그리기 직전에 불러줄게!\"\n  requestAnimationFrame(goodAni);\n}\n\nrequestAnimationFrame(goodAni);",
+        "code": "// 1. setTimeout (렌더링 주기 무시)\nfunction badAni() {\n  // 10ms마다 실행하려 하지만 실제 프레임 생성 시점과 어긋남\n  moveBox();\n  setTimeout(badAni, 10);\n}\n\n// 2. requestAnimationFrame (렌더링 주기 동기화)\nfunction goodAni() {\n  moveBox();\n  // 브라우저: \"다음 Paint 직전에 실행시켜 줄게\"\n  requestAnimationFrame(goodAni);\n}\n\nrequestAnimationFrame(goodAni);",
         "steps": [
             {
                 "line": 4,
-                "title": "setTimeout 애니메이션",
-                "explanation": "10ms마다 실행하려 하지만, 브라우저가 화면을 그리는 타이밍(16.6ms)과 엇박자가 납니다.\n한 프레임에 두 번 실행되거나, 아예 건너뛸 수도 있습니다.",
-                "keyInsight": "setTimeout = 렌더링과 무관하게 실행됨 (Tearing/Jank 위험)",
+                "title": "setTimeout: 프레임 미동기화",
+                "explanation": "setTimeout은 설정한 시간이 지나면 코드를 실행합니다. 하지만 화면이 언제 그려지는지는 모릅니다.\n\n이로 인해 화면 갱신 시점과 코드 실행 시점이 어긋나(**Out of Sync**), 화면이 찢어지거나 프레임이 건너뛰어질 수 있습니다.",
                 "highlight": [
                     4,
+                    5,
                     6
                 ],
                 "visualizationType": "eventLoop",
                 "eventLoopState": {
                     "taskQueue": [
-                        "badAni (10ms)"
+                        "badAni"
                     ],
                     "note": "Sync Failed: Render Cycle vs Timer"
                 }
             },
             {
                 "line": 13,
-                "title": "requestAnimationFrame 등록",
-                "explanation": "rAF는 \"다음 페인트(Paint) 직전\"에 실행을 예약합니다.\n모니터 주사율이 60Hz면 60번, 144Hz면 144번 호출됩니다.",
+                "title": "rAF 예약: V-Sync 대기",
+                "explanation": "`requestAnimationFrame`은 브라우저에게 예약을 겁니다.\n\"다음 화면 갱신(V-Sync) 때 나를 깨워줘!\"\n\n**V-Sync(수직 동기화)란?**\n모니터가 화면을 다시 그리는 주기를 말합니다. 60Hz 모니터라면 1초에 60번, 일정한 간격으로 신호가 옵니다.",
                 "highlight": [
                     13,
-                    17
+                    15
                 ],
                 "visualizationType": "eventLoop",
                 "eventLoopState": {
                     "webApis": [
                         {
                             "name": "rAF",
-                            "status": "waiting for next frame"
+                            "status": "waiting for V-Sync"
                         }
                     ],
                     "note": "Aligned with V-Sync"
                 }
             },
             {
-                "line": 11,
-                "title": "rAF 콜백 실행",
-                "explanation": "브라우저가 화면을 그리기 바로 직전에 콜백을 실행합니다.\n코드가 끝나자마자 바로 렌더링이 이어져서 매우 부드럽습니다.",
+                "line": 12,
+                "title": "rAF 실행: 렌더링 파이프라인 진입",
+                "explanation": "브라우저가 화면을 그리기(Paint) 바로 직전에 예약해둔 `goodAni`를 실행합니다.\n\n이 타이밍에 스타일을 변경하면, 곧바로 이어지는 렌더링 단계에서 화면에 반영되므로 가장 부드러운 움직임을 보여줍니다.",
                 "highlight": [
-                    11,
                     12,
-                    13
+                    13,
+                    14
                 ],
                 "visualizationType": "eventLoop",
                 "eventLoopState": {
@@ -62,22 +62,22 @@
         ]
     },
     "quiz": {
-        "question": "rAF의 특징이 아닌 것은?",
+        "question": "requestAnimationFrame의 주요 특징이 아닌 것은?",
         "options": [
-            "백그라운드 탭에서는 멈추거나 느려진다 (배터리 절약)",
-            "모니터 주사율에 맞춰 실행된다",
-            "항상 1ms 후에 실행된다",
-            "CSS 애니메이션과 비슷하게 최적화된다"
+            "백그라운드 탭에서는 실행이 중지되어 배터리를 절약한다",
+            "모니터 주사율(Hz)에 맞춰 호출 횟수가 자동 조절된다",
+            "항상 1ms 후에 정확히 실행된다",
+            "프레임 드랍(Jank)을 줄이는 데 효과적이다"
         ],
         "correctIndex": 2,
-        "explanation": "rAF는 시간이 아니라 '화면 갱신 주기'에 맞춰집니다. 1ms 후에 실행을 보장하지 않습니다."
+        "explanation": "rAF는 시간이 아니라 '화면 갱신 주기'를 따릅니다. 디스플레이 환경에 따라 실행 간격이 유동적으로 변합니다."
     },
     "misconceptions": [
         {
-            "wrong": "rAF는 CSS 애니메이션보다 항상 빠르다",
-            "correct": "보통 CSS 애니메이션(Compositor Thread)이 메인 스레드를 안 써서 더 빠릅니다. rAF는 JS 제어가 필요할 때 씁니다.",
-            "why": "rAF는 메인 스레드에서 돌기 때문에, 다른 JS가 바쁘면 밀릴 수 있습니다."
+            "wrong": "CSS 애니메이션보다 JS 애니메이션(rAF)이 항상 빠르다",
+            "correct": "상황에 따라 다릅니다.",
+            "why": "단순한 이동은 CSS가 메인 스레드를 쓰지 않고(Compositor Thread) 처리해서 더 빠를 수 있습니다. rAF는 물리 엔진 등 복잡한 계산이 필요할 때 씁니다."
         }
     ],
-    "keyTakeaway": "애니메이션은 무조건 requestAnimationFrame 사용 (setTimeout 금지)"
+    "keyTakeaway": "JS 애니메이션은 반드시 rAF를 사용해야 V-Sync에 맞춰 부드럽게 동작합니다."
 }

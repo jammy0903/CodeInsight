@@ -1,134 +1,61 @@
 {
   "lessonId": "java-7-1",
-  "title": "List 순회 중 삭제",
-  "concept": "for-each 루프 중 List를 수정하면 ConcurrentModificationException이 발생한다",
+  "title": "Generics Basics",
+  "concept": "Core concept for Generics Basics",
   "content": {
-    "code": "List<String> list = new ArrayList<>(Arrays.asList(\"a\", \"b\", \"c\"));\n\n// 잘못된 방법 (예외 발생)\nfor (String s : list) {\n    if (s.equals(\"b\")) {\n        list.remove(s);  // ConcurrentModificationException!\n    }\n}\n\n// 올바른 방법 1: Iterator\nIterator<String> it = list.iterator();\nwhile (it.hasNext()) {\n    if (it.next().equals(\"b\")) {\n        it.remove();  // OK!\n    }\n}\n\n// 올바른 방법 2: removeIf (Java 8+)\nlist.removeIf(s -> s.equals(\"b\"));",
+    "code": "// 1. Generic Class Definition\nclass Box<T> {\n    private T value;\n\n    public void set(T value) {\n        this.value = value;\n    }\n\n    public T get() {\n        return value;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // 2. Type Inference (Diamond Operator)\n        Box<String> stringBox = new Box<>();\n        stringBox.set(\"Hello Generics\");\n\n        // 3. Compile-time Type Safety\n        // stringBox.set(123); // Compile Error!\n\n        System.out.println(stringBox.get());\n        \n        Box<Integer> intBox = new Box<>();\n        intBox.set(42);\n        System.out.println(intBox.get());\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "ArrayList 생성",
-        "explanation": "list에 [\"a\", \"b\", \"c\"]가 들어있습니다.",
-        "highlight": [
-          1
-        ],
+        "line": 2,
+        "title": "제네릭 클래스 선언 (<T>)",
+        "explanation": "클래스 이름 뒤에 `<T>`를 붙여서 '타입 파라미터'를 선언합니다. `T`는 나중에 실제 사용할 때 구체적인 타입(String, Integer 등)으로 대체됩니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "list",
-              "value": "-> ArrayList"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "[\"a\", \"b\", \"c\"]"
-            }
-          ]
+          "stack": []
         }
       },
       {
-        "line": 4,
-        "title": "for-each 순회 시작",
-        "explanation": "for-each는 내부적으로 Iterator를 사용합니다.",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "for-each = Iterator 기반"
-        }
-      },
-      {
-        "line": 6,
-        "title": "순회 중 삭제 시도 (예외!)",
-        "explanation": "Iterator를 통하지 않고 list.remove()를 호출하면 예외!",
-        "keyInsight": "for-each 중 컬렉션 수정 = ConcurrentModificationException",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "ConcurrentModificationException",
-          "warning": "Iterator의 예상 크기 ≠ 실제 크기"
-        }
-      },
-      {
-        "line": 11,
-        "title": "Iterator 직접 사용",
-        "explanation": "Iterator를 직접 사용하면 안전하게 삭제할 수 있습니다.",
-        "highlight": [
-          11,
-          12
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "it",
-              "value": "-> Iterator"
-            }
-          ],
-          "note": "Iterator가 내부 상태를 관리"
-        }
-      },
-      {
-        "line": 14,
-        "title": "Iterator.remove() (안전!)",
-        "explanation": "it.remove()는 Iterator가 알고 있으므로 안전합니다.",
-        "keyInsight": "Iterator.remove() = 순회 중 안전 삭제",
-        "highlight": [
-          14
-        ],
+        "line": 15,
+        "title": "타입 안정성 (Type Safety)",
+        "explanation": "`Box<String>`으로 선언하면, 이 상자에는 오직 String만 담을 수 있게 컴파일러가 감시합니다. `Integer`를 넣으려고 하면 컴파일 에러가 발생하여 버그를 미리 막아줍니다.",
+        "keyInsight": "제네릭의 핵심 목표는 '컴파일 타임'에 타입을 체크하는 것입니다.",
         "visualizationType": "memory",
         "memoryState": {
           "heap": [
             {
-              "address": "0x001",
-              "content": "[\"a\", \"c\"]",
-              "changed": true
+              "class": "Box",
+              "value": "Hello Generics"
+            },
+            {
+              "class": "Box",
+              "value": 42
             }
+          ],
+          "output": [
+            "Hello Generics",
+            "42"
           ]
-        }
-      },
-      {
-        "line": 19,
-        "title": "removeIf() (Java 8+)",
-        "explanation": "removeIf()는 내부적으로 Iterator를 사용하여 안전하게 처리합니다.",
-        "keyInsight": "removeIf() = 가장 깔끔한 방법 (Java 8+)",
-        "highlight": [
-          19
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "list.removeIf(condition) = 조건 맞는 요소 모두 삭제"
         }
       }
     ]
   },
   "quiz": {
-    "question": "for-each 중 안전한 작업은?",
+    "question": "Java 제네릭에서 T에 들어갈 수 없는 타입은?",
     "options": [
-      "list.add()",
-      "list.remove()",
-      "요소 읽기만",
-      "list.clear()"
+      "String",
+      "Object",
+      "int (원시 타입)",
+      "List<String>"
     ],
     "correctIndex": 2,
-    "explanation": "for-each 중에는 읽기만 안전합니다. 추가/삭제/클리어 모두 ConcurrentModificationException!"
+    "explanation": "제네릭 타입 파라미터에는 참조 타입(Reference Type)만 올 수 있습니다. `int` 대신 `Integer` Wrapper 클래스를 사용해야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "ConcurrentModificationException은 멀티스레드 문제다",
-      "correct": "단일 스레드에서도 발생합니다. Iterator 사용 중 컬렉션을 외부에서 건드리면 발생합니다.",
-      "why": "Iterator의 'Fail-Fast' 설계 때문입니다. 문제가 생길 바에야 빨리 죽어버리는 게 낫다는 철학입니다."
-    },
-    {
-      "wrong": "for문(인덱스)으로 돌면서 remove하면 안전하다",
-      "correct": "예외는 안 나지만, **인덱스가 밀리는 문제**가 생깁니다.",
-      "why": "3번 인덱스를 지우면 뒤에 있던 친구들이 앞으로 당겨져서, 하나씩 건너뛰는 버그가 생깁니다. 뒤에서부터 지우면 괜찮습니다."
+      "wrong": "제네릭을 쓰면 실행 속도가 빨라진다.",
+      "correct": "실행 속도와는 관계없습니다. 오히려 컴파일러가 캐스팅 코드를 자동으로 넣어주는 방식이라 런타임 성능은 동일하거나 미세한 차이뿐입니다.",
+      "why": "제네릭은 성능 최적화 도구가 아니라 '타입 안정성' 도구입니다."
     }
   ],
-  "keyTakeaway": "순회 중 삭제 = Iterator.remove() 또는 removeIf()"
+  "keyTakeaway": "제네릭을 사용하면 캐스팅(형변환) 코드 없이도 강력한 타입 체크를 받을 수 있어, 런타임 에러(ClassCastException)를 방지할 수 있습니다."
 }

@@ -32,10 +32,15 @@ export class OllamaProvider implements IAIProvider {
   }
 
   async chat(request: ChatRequest): Promise<ChatResponse> {
+    // 🐛 Workaround: Ollama Qwen 버그 - system prompt를 user message에 포함
+    // https://github.com/ollama/ollama/issues/6873
+    const systemPromptPrefix = request.systemPrompt
+      ? `[규칙]\n${request.systemPrompt}\n\n[질문]\n`
+      : '';
+
     const messages = [
-      ...(request.systemPrompt ? [{ role: 'system', content: request.systemPrompt }] : []),
       ...(request.history || []).slice(-6),
-      { role: 'user', content: request.message },
+      { role: 'user', content: `${systemPromptPrefix}${request.message}` },
     ];
 
     const response = await fetch(`${this.url}/api/chat`, {
@@ -46,8 +51,11 @@ export class OllamaProvider implements IAIProvider {
         messages,
         stream: false,
         options: {
-          temperature: 0.7,
-          num_predict: 1024,
+          temperature: 0.2,        // 더 낮춤
+          num_predict: 80,         // 대폭 줄임: 3문장 = 60-80 토큰
+          top_p: 0.85,
+          stop: ['\n\n\n', '\n\n', '```', '---', '###', '\n4.', '\n4)'],  // 강력한 중단
+          repeat_penalty: 1.3,
         },
       }),
     });
@@ -80,10 +88,14 @@ export class OllamaProvider implements IAIProvider {
    * Ollama API는 기본적으로 stream: true 지원
    */
   async streamChat(request: ChatRequest, onChunk: StreamCallback): Promise<void> {
+    // 🐛 Workaround: Ollama Qwen 버그 - system prompt를 user message에 포함
+    const systemPromptPrefix = request.systemPrompt
+      ? `[규칙]\n${request.systemPrompt}\n\n[질문]\n`
+      : '';
+
     const messages = [
-      ...(request.systemPrompt ? [{ role: 'system', content: request.systemPrompt }] : []),
       ...(request.history || []).slice(-6),
-      { role: 'user', content: request.message },
+      { role: 'user', content: `${systemPromptPrefix}${request.message}` },
     ];
 
     // 최대 2번 재시도
@@ -105,8 +117,11 @@ export class OllamaProvider implements IAIProvider {
             messages,
             stream: true,
             options: {
-              temperature: 0.7,
-              num_predict: 1024,
+              temperature: 0.2,        // 더 낮춤
+              num_predict: 80,         // 대폭 줄임: 3문장 = 60-80 토큰
+              top_p: 0.85,
+              stop: ['\n\n\n', '\n\n', '```', '---', '###', '\n4.', '\n4)'],  // 강력한 중단
+              repeat_penalty: 1.3,
             },
           }),
         });

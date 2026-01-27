@@ -1,0 +1,65 @@
+{
+  "lessonId": "c-10-2",
+  "title": "File Modes",
+  "concept": "Core concept for File Modes",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    FILE *fp;\n    \n    // 1. Write Mode (\"w\")\n    // Creates data.txt (Overwrites if exists)\n    fp = fopen(\"data.txt\", \"w\");\n    if (fp) {\n        fprintf(fp, \"Hello File!\");\n        fclose(fp);\n    }\n\n    // 2. Append Mode (\"a\")\n    // Adds to the end\n    fp = fopen(\"data.txt\", \"a\");\n    if (fp) {\n        fprintf(fp, \" Append me.\");\n        fclose(fp);\n    }\n    \n    // 3. Read Mode (\"r\")\n    fp = fopen(\"data.txt\", \"r\");\n    char buffer[50];\n    if (fp) {\n        fgets(buffer, 50, fp);\n        printf(\"Read: %s\\n\", buffer);\n        fclose(fp);\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 6,
+        "title": "파일 열기 (쓰기 모드 \"w\")",
+        "explanation": "`fopen(\"filename\", \"w\")`는 파일 쓰기 권한을 요청합니다. 주의! 파일이 이미 존재하면 내용을 **싹 지우고** 새로 만듭니다.",
+        "keyInsight": "fopen은 파일 구조체(FILE)에 대한 주소를 반환합니다. 실패 시 NULL을 반환하므로 체크 필수!",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "fp",
+              "value": "-> FILE Struct",
+              "address": "0x100"
+            }
+          ]
+        }
+      },
+      {
+        "line": 14,
+        "title": "추가 모드 (\"a\")",
+        "explanation": "\"a\" 모드는 파일의 끝(EOF)에서부터 쓰기를 시작합니다. 기존 내용을 보존하고 싶을 때 사용합니다 (로그 기록 등).",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": []
+        }
+      },
+      {
+        "line": 25,
+        "title": "읽은 내용 확인",
+        "explanation": "파일에서 읽어온 문자열 \"Hello File! Append me.\"가 버퍼에 담겨 출력됩니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "Read: Hello File! Append me."
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "fopen에서 \"w\" 모드와 \"r+\" 모드의 차이점은?",
+    "options": [
+      "r+는 파일을 생성하지 않지만 w는 생성한다.",
+      "w는 기존 내용을 지우지만(Truncate), r+는 지우지 않고 덮어쓴다.",
+      "w는 읽기가 불가능하지만 r+는 둘 다 가능하다.",
+      "위 모두 해당"
+    ],
+    "correctIndex": 3,
+    "explanation": "\"w\"는 파괴적(생성+초기화)이고, \"r+\"는 보존적(수정)입니다. \"w\"는 읽기를 할 수 없지만 \"r+\"는 읽/쓰기가 모두 가능합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "fclose를 안 해도 프로그램 종료 시 저장된다.",
+      "correct": "대부분 그렇지만 보장되지 않습니다. 버퍼에 남아있는 데이터가 디스크에 안 쓰일 수도 있습니다.",
+      "why": "반드시 `fclose`로 명시적인 리소스 해제와 버퍼 비우기(Flush)를 해야 합니다."
+    }
+  ],
+  "keyTakeaway": "파일 모드(r, w, a, r+, w+, a+)의 차이를 정확히 알고 용도에 맞게 선택해야 데이터 유실을 막을 수 있습니다."
+}

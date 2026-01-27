@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "Person 클래스 정의",
-        "explanation": "`equals()`는 재정의했지만, `hashCode()`는 빠뜨린 '반쪽짜리' 클래스입니다.\n이 클래스를 해시 기반 자료구조(HashMap, HashSet)에 넣으면 **재앙**이 일어납니다.",
+        "explanation": "`equals()`는 재정의했지만, `hashCode()`는 빠뜨린 '반쪽짜리' 클래스입니다.\n이 클래스를 `HashSet`이나 `HashMap` 같은 곳에 쓰면 **대형 사고**가 터집니다.",
         "highlight": [
           1,
           2,
@@ -29,7 +29,7 @@
       {
         "line": 13,
         "title": "두 Person 객체 생성",
-        "explanation": "`p1`과 `p2`는 내용(\"Alice\")이 같습니다.\n하지만 새로운 `new`로 만들어졌기에 메모리 주소는 다릅니다.\n\n**문제:** `hashCode`를 재정의 안 했으므로, **메모리 주소 기반의 기본 해시값**을 가집니다.\n`p1` 해시: 123 (가정)\n`p2` 해시: 456 (가정)\n**서로 다름!**",
+        "explanation": "`p1`과 `p2`는 내용(\"Alice\")이 같지만, 서로 다른 주소를 가집니다.\n\n**문제:** `hashCode`를 재정의 안 했으므로, **메모리 주소**를 기반으로 한 기본 해시코드를 사용합니다.\n`p1`의 해시: 123 (가정)\n`p2`의 해시: 456 (가정)\n**서로 다릅니다!**",
         "highlight": [
           13,
           14
@@ -49,12 +49,12 @@
           "heap": [
             {
               "address": "0x001",
-              "content": "Person(\"Alice\")",
+              "content": "Person(Alice)",
               "hashCode": "hash: 123"
             },
             {
               "address": "0x002",
-              "content": "Person(\"Alice\")",
+              "content": "Person(Alice)",
               "hashCode": "hash: 456"
             }
           ]
@@ -63,7 +63,7 @@
       {
         "line": 16,
         "title": "equals() 비교",
-        "explanation": "`p1.equals(p2)`는 우리가 작성한 코드대로 **이름(String)**을 비교합니다.\n\"Alice\" == \"Alice\" 이므로 `true`입니다.\n\n**여기까진 좋았습니다.** 문제는 다음부터입니다.",
+        "explanation": "`p1.equals(p2)`는 우리가 작성한 코드대로 이름(\"Alice\")을 비교합니다.\n`true`가 나옵니다.\n\n여기까지는 아무 문제가 없어 보입니다. **진짜 문제는 자료구조에 넣을 때 발생합니다.**",
         "keyInsight": "equals() 오버라이드 = 값 비교 가능",
         "highlight": [
           16
@@ -79,8 +79,8 @@
       {
         "line": 18,
         "title": "HashSet에 p1 추가",
-        "explanation": "**HashSet 내부 동작:**\n1. `p1.hashCode()` 호출 -> 123\n2. 123번에 해당하는 **버킷(방)**을 찾음\n3. 그 방에 `p1`을 저장\n\n`p1`은 '123번 방'에 잘 들어갔습니다.",
-        "keyInsight": "HashSet/HashMap = hashCode()로 위치 결정",
+        "explanation": "**HashSet의 동작 방식:**\n1. `p1.hashCode()`를 호출합니다 -> 123\n2. 123번 **버킷(방)**을 찾아서 그 안에 `p1`을 저장합니다.\n\n**버킷(Bucket)이란?**\nHashing에서 데이터를 나누어 담는 작은 방들을 말합니다.",
+        "keyInsight": "HashSet/HashMap = hashCode()로 방 배정",
         "highlight": [
           18,
           19
@@ -90,7 +90,7 @@
           "hashSet": {
             "buckets": [
               {
-                "index": "hash(123) % n",
+                "index": "hash(123)",
                 "content": "p1"
               }
             ]
@@ -100,7 +100,7 @@
       {
         "line": 20,
         "title": "contains(p2) 호출 (검색 실패)",
-        "explanation": "**HashSet 검색 동작:**\n1. `p2.hashCode()` 호출 -> 456 (다른 주소니까!)\n2. 456번 버킷을 찾아감\n3. 방이 비어있음 -> **\"없네요\"** (false 반환)\n\n**충격적인 사실:**\n`equals`로 보면 둘은 쌍둥이인데, `hashCode`가 달라서 **서로 다른 방**을 뒤지고 있는 겁니다.",
+        "explanation": "이제 Set에서 `p2`를 찾아봅니다.\n\n1. `p2.hashCode()` 호출 -> 456 (주소가 다르니까!)\n2. 456번 방으로 갑니다.\n3. **방이 비어있습니다.** -> \"없는데요?\" (`false`)\n\n**충격적인 결말:**\n`equals`로 보면 둘은 쌍둥이인데, `hashCode`가 달라서 **서로 다른 방**을 뒤지고 있는 겁니다. 아예 만날 기회조차 없습니다.",
         "keyInsight": "hashCode 다름 = 다른 버킷 = 찾기 실패",
         "highlight": [
           20
@@ -138,19 +138,14 @@
       "둘 중 하나만 오버라이드하면 된다"
     ],
     "correctIndex": 0,
-    "explanation": "a.equals(b)가 true면 a.hashCode() == b.hashCode()여야 합니다. 역은 성립하지 않아도 됩니다(해시 충돌 허용)."
+    "explanation": "반드시 기억하세요: equals()가 같으면 hashCode()도 무조건 같아야 합니다! (역은 성립하지 않아도 됨)"
   },
   "misconceptions": [
     {
       "wrong": "equals()만 오버라이드하면 된다",
       "correct": "반드시 `hashCode()`도 같이 오버라이드해야 합니다.",
-      "why": "HashMap, HashSet 같은 자료구조는 효율적인 검색을 위해 `hashCode`로 1차 분류(Bucket)를 하고, 그 안에서 `equals`로 2차 확인을 합니다. 1차 분류가 다르면 2차 확인 기회조차 얻지 못합니다."
-    },
-    {
-      "wrong": "hashCode는 유일한 값을 리턴해야 한다",
-      "correct": "유일하면 좋지만, 필수는 아닙니다(충돌 허용).",
-      "why": "하지만 다른 객체가 같은 해시코드를 가지면(해시 충돌), 버킷 안에 데이터가 쌓여 검색 성능이 느려집니다. 최대한 고르게 분산시키는 것이 좋습니다."
+      "why": "HashMap, HashSet 같은 자료구조는 `hashCode`로 1차 분류(구 이름)를 하고, 그 안에서 `equals`로 2차 확인(번지수)을 합니다. 구 이름이 다르면 집을 절대 못 찾습니다."
     }
   ],
-  "keyTakeaway": "equals() 오버라이드 시 hashCode()도 필수, Objects.hash() 활용"
+  "keyTakeaway": "equals() 오버라이드 시 hashCode()도 필수입니다. IDE의 자동 생성 기능을 활용하세요."
 }

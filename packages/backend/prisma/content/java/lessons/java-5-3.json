@@ -8,8 +8,8 @@
       {
         "line": 2,
         "title": "static 필드 선언",
-        "explanation": "**클래스 로딩 시점:**\n`Counter` 클래스가 처음 사용될 때, `count` 변수는 **Metaspace(Static 영역)**에 딱 하나 생성됩니다.\n아직 `new Counter()`를 하지 않아도 존재합니다!",
-        "keyInsight": "static = 클래스에 붙어있는 단 하나뿐인 변수",
+        "explanation": "**공용 화이트보드:**\n`static int count`는 모든 `Counter` 객체가 공유하는 **단 하나뿐인 변수**입니다.\n객체(인스턴스)가 죽든 살든 상관없이, 프로그램 시작부터 끝까지 `Metaspace`라는 특별한 구역에 살아있습니다.",
+        "keyInsight": "static = 클래스당 1개 (공유)",
         "highlight": [
           2
         ],
@@ -27,7 +27,7 @@
       {
         "line": 3,
         "title": "인스턴스 필드",
-        "explanation": "`id`는 `new` 할 때마다 Heap에 생기는 **인스턴스별 변수**입니다.",
+        "explanation": "**개인 수첩:**\n`id`는 `int` 앞에 `static`이 없습니다. 즉, `new` 할 때마다 각 객체(Heap) 뱃속에 따로따로 생기는 **개별 변수**입니다.",
         "highlight": [
           3
         ],
@@ -39,7 +39,7 @@
       {
         "line": 11,
         "title": "첫 번째 인스턴스 (c1) 생성",
-        "explanation": "1. 생성자 호출 -> `count++`: 공유 변수 `count`가 0->1이 됨.\n2. `id = count`: `c1`의 `id`는 1이 됨.\n`count`는 **공용 칠판** 같은 것입니다.",
+        "explanation": "1. 생성자가 실행됩니다.\n2. `count++`: 공용 화이트보드의 숫자를 0->1로 고칩니다.\n3. `id = count`: 내 개인 수첩(`c1.id`)에 현재 값 1을 적습니다.",
         "highlight": [
           11,
           5,
@@ -72,7 +72,7 @@
       {
         "line": 12,
         "title": "두 번째 인스턴스 (c2) 생성",
-        "explanation": "1. 생성자 호출 -> `count++`: 아까 그 **공용 칠판**의 숫자를 지우고 2로 씁니다.\n2. `id = count`: `c2`의 `id`는 2가 됩니다.\n`c1`의 `id`는 여전히 1입니다!",
+        "explanation": "1. 생성자 실행.\n2. `count++`: 공용 화이트보으의 숫자를 1->2로 고칩니다. (c1도 이 변화를 봅니다!)\n3. `id = count`: 내 개인 수첩(`c2.id`)에 2를 적습니다.\n\n**결과:** `c1`은 1번 번호표, `c2`는 2번 번호표를 가졌습니다.",
         "highlight": [
           12
         ],
@@ -99,23 +99,10 @@
       },
       {
         "line": 14,
-        "title": "c1.id 출력",
-        "explanation": "`c1` 뱃속에 저장된 `id`는 1입니다.",
+        "title": "c1.id, c2.id 출력",
+        "explanation": "각자 개인 수첩에 적힌 번호(1, 2)는 서로 다릅니다. 이게 인스턴스 변수입니다.",
         "highlight": [
-          14
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "1"
-          ]
-        }
-      },
-      {
-        "line": 15,
-        "title": "c2.id 출력",
-        "explanation": "`c2` 뱃속에 저장된 `id`는 2입니다.",
-        "highlight": [
+          14,
           15
         ],
         "visualizationType": "memory",
@@ -129,7 +116,7 @@
       {
         "line": 16,
         "title": "Counter.count 출력",
-        "explanation": "공용 칠판(`static`)의 현재 값은 2입니다.\n클래스 이름으로 접근하는 것이 정석입니다.",
+        "explanation": "공용 화이트보드(`static`)의 현재 값은 2입니다.\n`static` 변수는 이렇게 `클래스이름.변수명`으로 접근하는 것이 정석입니다.",
         "keyInsight": "Class.field 로 접근하세요",
         "highlight": [
           16
@@ -146,7 +133,7 @@
       {
         "line": 17,
         "title": "함정: c1.count",
-        "explanation": "`c1.count`라고 써도 실행은 되지만, 사실 `Counter.count`를 가리킵니다.\n`c1`만의 `count`가 따로 있는 게 아닙니다! 헷갈리니 쓰지 마세요.",
+        "explanation": "**주의:** `c1.count`라고 써도 실행은 되지만, 사실 `Counter.count`를 가리킵니다.\n마치 `c1`만의 `count`가 있는 것처럼 보여서 코드를 읽는 사람을 헷갈리게 합니다. 쓰지 마세요.",
         "highlight": [
           17
         ],
@@ -164,27 +151,27 @@
     ]
   },
   "quiz": {
-    "question": "static 필드를 사용하기 좋은 경우는?",
+    "question": "static 필드를 쓰기에 가장 적합한 것은?",
     "options": [
-      "인스턴스별로 다른 값이 필요할 때",
-      "상수나 공유 카운터",
-      "스레드별로 다른 값이 필요할 때",
-      "객체 상태를 저장할 때"
+      "각 학생의 이름",
+      "각 학생의 성적",
+      "학교의 이름 (모든 학생이 공유)",
+      "학생 개인의 출석률"
     ],
-    "correctIndex": 1,
-    "explanation": "상수(static final)나 공유 카운터처럼 모든 인스턴스가 같은 값을 참조해야 할 때 적합합니다."
+    "correctIndex": 2,
+    "explanation": "모든 인스턴스(학생)가 공통적으로 공유해야 하는 값(학교 이름) 같은 경우에 static을 씁니다."
   },
   "misconceptions": [
     {
       "wrong": "인스턴스 변수로 static 변수에 접근하면 안 된다",
-      "correct": "에러는 안 나지만, **강력하게 비추천**합니다. IDE에서도 경고(노란줄)를 띄웁니다.",
-      "why": "`c1.count`라고 쓰면 코드를 읽는 사람이 \"어? count가 c1에만 있는 건가?\"라고 오해하기 쉽습니다. `Counter.count`라고 명확히 써야 합니다."
+      "correct": "문법적으로 에러는 아니지만, **매우매우 비추천**합니다.",
+      "why": "코드를 읽을 때 \"이게 공유 변수인지 개인 변수인지\" 헷갈리게 만들기 때문입니다. `ClassName.variable` 형식을 쓰세요."
     },
     {
-      "wrong": "static은 메모리를 덜 먹는다",
-      "correct": "객체 생성을 안 하니까 덜 먹을 수도 있지만, 프로그램 종료 때까지 **절대 사라지지 않음**(GC 안 됨)을 주의해야 합니다.",
-      "why": "너무 큰 데이터를 static으로 잡으면 메모리 누수(Memory Leak)의 주범이 됩니다."
+      "wrong": "static은 메모리를 적게 먹는다",
+      "correct": "객체 생성을 안 하니 적을 수도 있지만, 프로그램 끝날 때까지 **절대 안 사라짐(GC 안 됨)**을 조심해야 합니다.",
+      "why": "너무 큰 데이터를 static으로 잡으면 메모리 누수(Memory Leak)처럼 동작할 수 있습니다."
     }
   ],
-  "keyTakeaway": "static 필드 = 클래스당 1개, 모든 인스턴스 공유"
+  "keyTakeaway": "static은 '공용 화이트보드', 인스턴스 변수는 '개인 수첩'."
 }

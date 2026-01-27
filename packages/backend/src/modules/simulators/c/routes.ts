@@ -2,10 +2,14 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { simulateCode } from './simulator';
 import { cExecutor } from './executor';
+import { EmscriptenValidatorService } from './services/emscripten-validator.service';
 import { prisma } from '../../../config/database';
 import { config } from '../../../config';
 import { optionalAuth } from '../../../middleware';
 import { logger } from '../../../utils/logger';
+
+// Emscripten 검증 서비스 인스턴스
+const emscriptenValidator = new EmscriptenValidatorService();
 
 export const cSimulatorRoutes = Router();
 
@@ -111,17 +115,49 @@ function validate(schema: z.ZodSchema) {
  *                       heap:
  *                         type: array
  *       400:
- *         description: 코드 필수
+ *         description: 코드 필수 또는 컴파일 에러
  */
-cSimulatorRoutes.post('/trace', (req, res) => {
+cSimulatorRoutes.post('/trace', async (req, res) => {
   const { code, stdin = '' } = req.body;
 
   if (!code || typeof code !== 'string') {
     return res.status(400).json({ error: 'Code is required' });
   }
 
-  const result = simulateCode(code, stdin);
-  res.json(result);
+  try {
+    // 1️⃣ Emscripten 검증 단계 (NEW!)
+    const validation = await emscriptenValidator.validate(code);
+
+    if (!validation.isValid) {
+      return res.status(400).json({
+        success: false,
+        error: 'compilation_error',
+        message: '컴파일 에러가 발생했습니다.',
+        details: validation.errors,
+      });
+    }
+
+    // 경고가 있으면 로그 (에러는 아님)
+    if (validation.warnings && validation.warnings.length > 0) {
+      logger.info('Compilation warnings:', validation.warnings);
+    }
+
+    // 2️⃣ 인터프리터 실행 (기존 그대로)
+    const result = simulateCode(code, stdin);
+
+    // 3️⃣ 경고 포함해서 응답
+    res.json({
+      ...result,
+      warnings: validation.warnings,
+    });
+  } catch (error: unknown) {
+    logger.error('Simulation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'internal_error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 });
 
 // =============================================

@@ -1,163 +1,80 @@
 {
   "lessonId": "java-6-2",
-  "title": "메서드 오버라이딩",
-  "concept": "자식 클래스가 부모 메서드를 재정의하면, 런타임에 자식 버전이 호출된다",
+  "title": "Checked vs Unchecked",
+  "concept": "Core concept for Checked vs Unchecked",
   "content": {
-    "code": "class Shape {\n    void draw() {\n        System.out.println(\"Drawing shape\");\n    }\n}\n\nclass Circle extends Shape {\n    @Override\n    void draw() {\n        System.out.println(\"Drawing circle\");\n    }\n}\n\nShape s1 = new Shape();\nShape s2 = new Circle();  // 업캐스팅!\n\ns1.draw();\ns2.draw();",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            System.out.println(\"1. Start\");\n            String s = null;\n            System.out.println(s.length()); // NPE occurs here\n            System.out.println(\"2. This line is skipped\");\n            \n        } catch (NullPointerException e) {\n            System.out.println(\"3. Caught NPE!\");\n            // e.printStackTrace();\n            \n        } catch (Exception e) {\n            System.out.println(\"4. General Handler\");\n        }\n        \n        System.out.println(\"5. Program Continues\");\n    }\n}",
     "steps": [
       {
-        "line": 2,
-        "title": "부모 메서드 정의",
-        "explanation": "Shape.draw()는 \"Drawing shape\"를 출력합니다.",
-        "highlight": [
-          2,
-          3,
-          4
-        ],
+        "line": 3,
+        "title": "try 블록의 실행",
+        "explanation": "`try` 블록 안의 코드는 순서대로 실행됩니다. 예외가 발생하기 전까지는 정상적인 흐름을 따릅니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "note": "Shape 클래스의 draw() 메서드"
+          "output": [
+            "1. Start"
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "예외 발생 (Throw)",
+        "explanation": "`s.length()`에서 `s`가 null이므로 `NullPointerException` 객체가 생성되어 던져집니다(Throw). 즉시 실행흐름이 중단됩니다.",
+        "keyInsight": "예외가 발생하자마자 현재 블록을 탈출하여 적절한 `catch` 블록을 찾습니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "class": "NullPointerException",
+              "message": "Cannot invoke..."
+            }
+          ]
         }
       },
       {
         "line": 8,
-        "title": "@Override 어노테이션",
-        "explanation": "@Override는 '이 메서드가 부모를 재정의함'을 명시합니다. 실수 방지!",
-        "keyInsight": "@Override = 컴파일러가 오버라이드 검증",
-        "highlight": [
-          8
-        ],
+        "title": "catch 블록 포착",
+        "explanation": "`NullPointerException`과 일치하는 첫 번째 `catch` 블록이 실행됩니다. 그 뒤의 `Exception` 캐치 블록은 무시됩니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "note": "@Override 없어도 작동하지만, 권장!"
-        }
-      },
-      {
-        "line": 9,
-        "title": "자식 메서드 정의",
-        "explanation": "Circle.draw()는 \"Drawing circle\"을 출력합니다.",
-        "highlight": [
-          9,
-          10,
-          11
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "Circle이 Shape.draw()를 재정의"
-        }
-      },
-      {
-        "line": 14,
-        "title": "Shape 인스턴스 생성",
-        "explanation": "s1은 Shape 타입, Shape 객체입니다.",
-        "highlight": [
-          14
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s1",
-              "value": "-> Shape"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "Shape{}"
-            }
+          "output": [
+            "1. Start",
+            "3. Caught NPE!"
           ]
         }
       },
       {
         "line": 15,
-        "title": "업캐스팅 (중요!)",
-        "explanation": "s2는 Shape 타입이지만, 실제 객체는 Circle입니다!",
-        "keyInsight": "부모 타입 변수 = 자식 인스턴스 (업캐스팅)",
-        "highlight": [
-          15
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "s1",
-              "value": "-> Shape"
-            },
-            {
-              "name": "s2",
-              "value": "-> Circle",
-              "note": "타입은 Shape"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "Shape{}"
-            },
-            {
-              "address": "0x002",
-              "content": "Circle{}",
-              "highlight": true
-            }
-          ]
-        }
-      },
-      {
-        "line": 17,
-        "title": "s1.draw() 호출",
-        "explanation": "s1은 Shape 객체 → Shape.draw() 실행",
-        "highlight": [
-          17
-        ],
+        "title": "정상 흐름 복귀",
+        "explanation": "`try-catch` 문을 빠져나와 프로그램이 죽지 않고 계속 실행됩니다. 이것이 예외 처리의 목적입니다.",
         "visualizationType": "memory",
         "memoryState": {
           "output": [
-            "Drawing shape"
+            "1. Start",
+            "3. Caught NPE!",
+            "5. Program Continues"
           ]
-        }
-      },
-      {
-        "line": 18,
-        "title": "s2.draw() 호출 (동적 바인딩!)",
-        "explanation": "s2의 타입은 Shape이지만, 실제 객체는 Circle! Circle.draw() 실행!",
-        "keyInsight": "런타임에 실제 객체 타입의 메서드 호출 = 동적 바인딩",
-        "highlight": [
-          18
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Drawing shape",
-            "Drawing circle"
-          ],
-          "note": "컴파일: Shape.draw(), 런타임: Circle.draw()"
         }
       }
     ]
   },
   "quiz": {
-    "question": "오버라이딩 규칙으로 틀린 것은?",
+    "question": "다중 catch 블록을 작성할 때의 순서 규칙은?",
     "options": [
-      "메서드 이름, 파라미터가 같아야 한다",
-      "리턴 타입은 같거나 하위 타입이어야 한다",
-      "접근 제어자를 더 좁게 변경할 수 있다",
-      "private 메서드는 오버라이드 불가"
+      "상관없다.",
+      "부모 예외(Exception)를 먼저, 자식 예외(NPE)를 나중에 작성해야 한다.",
+      "자식 예외(NPE)를 먼저, 부모 예외(Exception)를 나중에 작성해야 한다.",
+      "알파벳 순서로 작성해야 한다."
     ],
     "correctIndex": 2,
-    "explanation": "오버라이딩 시 접근 제어자는 같거나 더 넓어야 합니다. 좁히면 컴파일 에러!"
+    "explanation": "부모 예외(`Exception`)를 먼저 쓰면 모든 예외가 거기서 잡혀버려, 뒤에 있는 구체적인 자식 예외 핸들러는 'Unreachable code'가 됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "필드(변수)도 오버라이딩 된다",
-      "correct": "필드는 오버라이딩되지 않고 **가려질(Hidden) 뿐**입니다.",
-      "why": "`s2.field`를 호출하면 실제 객체가 아니라 **변수의 타입(Shape)**에 있는 필드를 봅니다. 메서드와 정반대입니다!"
-    },
-    {
-      "wrong": "static 메서드도 오버라이딩 된다",
-      "correct": "static 메서드는 오버라이딩 대상이 아닙니다.",
-      "why": "static은 클래스 레벨이라, 다형성(런타임 객체 확인)이 적용되지 않습니다."
+      "wrong": "예외가 발생하면 무조건 프로그램이 종료된다.",
+      "correct": "Uncaught Exception일 때만 종료됩니다. `try-catch`로 잡으면 프로그램은 계속 동작합니다.",
+      "why": "예외 처리는 프로그램의 비정상 종료를 막기 위한 안전장치입니다."
     }
   ],
-  "keyTakeaway": "오버라이딩 = 런타임에 실제 객체의 메서드 호출 (동적 바인딩)"
+  "keyTakeaway": "Try-Catch는 예외 발생 시 흐름을 제어하여 시스템 붕괴를 막고, 다형성을 이용해 구체적인 예외부터 처리해야 합니다."
 }

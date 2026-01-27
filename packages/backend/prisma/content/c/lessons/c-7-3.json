@@ -1,0 +1,102 @@
+{
+  "lessonId": "c-7-3",
+  "title": "Dynamic 2D Arrays",
+  "concept": "Core concept for Dynamic 2D Arrays",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int rows = 2, cols = 3;\n\n    // 1. Allocate array of row pointers\n    int **matrix = (int **)malloc(rows * sizeof(int *));\n\n    // 2. Allocate memory for each row\n    for (int i = 0; i < rows; i++) {\n        matrix[i] = (int *)malloc(cols * sizeof(int));\n    }\n\n    // 3. Use the array\n    matrix[0][1] = 99;\n    printf(\"matrix[0][1] = %d\\n\", matrix[0][1]);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 8,
+        "title": "행 포인터 배열 할당",
+        "explanation": "`int*` (행의 시작 주소)들을 담을 공간을 먼저 할당합니다. 행의 개수만큼 포인터가 필요합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0x200",
+              "size": "8 bytes",
+              "label": "matrix[0] (ptr)"
+            },
+            {
+              "address": "0x208",
+              "size": "8 bytes",
+              "label": "matrix[1] (ptr)"
+            }
+          ],
+          "stack": [
+            {
+              "name": "matrix",
+              "value": "-> 0x200",
+              "address": "0x100"
+            }
+          ]
+        }
+      },
+      {
+        "line": 12,
+        "title": "각 행의 메모리 할당",
+        "explanation": "반복문을 돌면서 각 행(row)에 들어갈 정수들의 공간(`cols`개)을 할당하고, 그 주소를 `matrix[i]`에 저장합니다.",
+        "keyInsight": "각 행은 메모리상에서 연속적이지 않을 수 있습니다!",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0x200",
+              "value": "-> 0x300",
+              "label": "matrix[0]"
+            },
+            {
+              "address": "0x208",
+              "value": "-> 0x310",
+              "label": "matrix[1]"
+            },
+            {
+              "address": "0x300",
+              "size": "12 bytes",
+              "label": "Row 0 Data"
+            },
+            {
+              "address": "0x310",
+              "size": "12 bytes",
+              "label": "Row 1 Data"
+            }
+          ]
+        }
+      },
+      {
+        "line": 16,
+        "title": "값 접근 및 사용",
+        "explanation": "`matrix[0][1]`은 `*(*(matrix + 0) + 1)`과 같으며, 자연스럽게 2차원 배열처럼 쓸 수 있습니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0x304",
+              "value": 99,
+              "label": "Row 0, Col 1"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "동적 할당된 2차원 배열(이중 포인터 방식)을 해제(free)하는 올바른 순서는?",
+    "options": [
+      "행 포인터 배열 먼저 해제",
+      "각 행의 내용을 먼저 해제하고, 마지막에 행 포인터 배열 해제",
+      "둘 다 동시에 해제",
+      "운영체제가 알아서 하므로 불필요"
+    ],
+    "correctIndex": 1,
+    "explanation": "행 포인터 배열(`matrix`)을 먼저 해제해 버리면, 각 행(`matrix[i]`)의 주소를 잃어버려서 메모리 누수(Leak)가 발생합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "동적 2차원 배열은 메모리에서 항상 연속적이다.",
+      "correct": "각 행(Row)은 따로 malloc되므로 서로 떨어진 주소에 있을 수 있습니다.",
+      "why": "한 번에 큰 덩어리를 `rows * cols`만큼 할당하지 않는 이상 불연속적입니다."
+    }
+  ],
+  "keyTakeaway": "malloc을 2번(포인터 배열 + 각 행) 써야 동적 2차원 배열을 만들 수 있으며, 해제는 역순으로 해야 합니다."
+}

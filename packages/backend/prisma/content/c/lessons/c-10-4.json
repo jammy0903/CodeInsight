@@ -1,0 +1,57 @@
+{
+  "lessonId": "c-10-4",
+  "title": "Binary Input/Output",
+  "concept": "Core concept for Binary Input/Output",
+  "content": {
+    "code": "#include <stdio.h>\n\nstruct Player {\n    int id;\n    double hp;\n};\n\nint main() {\n    struct Player saved = {1, 99.5};\n    struct Player loaded;\n\n    // 1. Write Binary (\"wb\")\n    FILE *fp = fopen(\"save.bin\", \"wb\");\n    if (fp) {\n        // Dump memory content directly to file\n        fwrite(&saved, sizeof(struct Player), 1, fp);\n        fclose(fp);\n    }\n\n    // 2. Read Binary (\"rb\")\n    fp = fopen(\"save.bin\", \"rb\");\n    if (fp) {\n        // Load memory content directly from file\n        fread(&loaded, sizeof(struct Player), 1, fp);\n        printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);\n        fclose(fp);\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 13,
+        "title": "fwrite (메모리 덤프)",
+        "explanation": "`fwrite`는 구조체 데이터를 텍스트로 변환하지 않고, 메모리에 있는 0과 1 상태 그대로(Binary) 파일에 씁니다.",
+        "keyInsight": "텍스트 파싱 비용이 없어 매우 빠르고 효율적입니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": []
+        }
+      },
+      {
+        "line": 21,
+        "title": "fread (메모리 로드)",
+        "explanation": "`fread`는 파일의 바이트들을 읽어서 변수의 메모리 공간에 그대로 채워 넣습니다. 즉시 구조체가 복원됩니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "loaded",
+              "value": "{id: 1, hp: 99.5}",
+              "address": "0x110"
+            }
+          ],
+          "output": [
+            "Loaded ID: 1, HP: 99.5"
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "텍스트 파일(\"w\")과 바이너리 파일(\"wb\") 입출력의 가장 큰 차이는?",
+    "options": [
+      "파일 확장자 이름",
+      "데이터 저장 방식 (변환 여부)",
+      "저장 가능한 용량",
+      "파일 접근 권한"
+    ],
+    "correctIndex": 1,
+    "explanation": "텍스트 모드는 숫자를 문자열(\"123\")로 변환하지만, 바이너리 모드는 메모리의 비트 패턴 그대로 저장합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "바이너리 파일은 다른 컴퓨터에서도 항상 잘 읽힌다.",
+      "correct": "Endianness(리틀/빅 엔디안)나 패딩(Padding) 방식이 다른 시스템에서는 깨질 수 있습니다.",
+      "why": "이식성(Portability)을 위해서는 직렬화(Serialization) 프로토콜이나 텍스트(JSON)를 써야 합니다."
+    }
+  ],
+  "keyTakeaway": "fread/fwrite는 데이터를 가장 빠르고 간편하게 저장하는 방법이지만, 플랫폼 간 호환성에는 주의가 필요합니다."
+}

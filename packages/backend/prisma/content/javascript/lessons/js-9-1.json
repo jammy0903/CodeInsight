@@ -1,14 +1,14 @@
 {
     "lessonId": "js-9-1",
     "title": "Proxy & Reflect (메타프로그래밍)",
-    "concept": "Proxy는 객체의 기본 동작(읽기, 쓰기 등)을 가로채서(Intercept) 재정의할 수 있게 해준다",
+    "concept": "Proxy는 대상 객체(Target) 앞에서 동작을 가로채고 재정의하는 '중개자(Interceptor)' 역할을 합니다.",
     "content": {
-        "code": "const target = {\n  secret: 'shhh',\n  public: 'hello'\n};\n\nconst handler = {\n  // 1. get(읽기) 가로채기\n  get(obj, prop) {\n    if (prop === 'secret') {\n      return 'Access Denied!';\n    }\n    return Reflect.get(obj, prop);\n  }\n};\n\nconst proxy = new Proxy(target, handler);\n\nconsole.log(proxy.public); // hello\nconsole.log(proxy.secret); // Access Denied!",
+        "code": "const target = { \n  secret: 'shhh',\n  public: 'hello'\n};\n\nconst handler = {\n  // 1. 읽기(Get) 동작을 가로채는 Trap\n  get(obj, prop) {\n    if (prop === 'secret') {\n      return 'Access Denied!';\n    }\n    // 2. 나머지는 원본 객체에게 전달 (Forwarding)\n    return Reflect.get(obj, prop);\n  }\n};\n\n// 원본(Target)을 감싸는 Proxy 생성\nconst proxy = new Proxy(target, handler);\n\nconsole.log(proxy.public); // hello\nconsole.log(proxy.secret); // Access Denied!",
         "steps": [
             {
                 "line": 1,
-                "title": "타겟 객체 생성",
-                "explanation": "감시 대상이 될 원본 객체(`target`)를 만듭니다.",
+                "title": "Target(원본) 객체 생성",
+                "explanation": "대상이 되는 원본 객체 `target`입니다. Proxy가 감싸게 될 실제 데이터(Real Subject)입니다.",
                 "highlight": [
                     1,
                     2,
@@ -27,9 +27,8 @@
             },
             {
                 "line": 6,
-                "title": "핸들러(Trap) 정의",
-                "explanation": "`get` 트랩을 정의합니다. 누군가 속성을 읽으려 하면 이 함수가 먼저 실행됩니다.",
-                "keyInsight": "Trap = 덫 (동작을 가로채는 메서드)",
+                "title": "Handler 및 Trap 정의",
+                "explanation": "`handler` 객체는 Proxy의 행동 수칙을 정의합니다. 여기서 `get` 메서드는 **Trap(함정)**입니다.\n\n**Trap이란?**\n객체의 기본 동작(읽기, 쓰기, 호출 등)이 발생했을 때 이를 가로채서 대신 실행되는 메서드를 말합니다. 여기서는 '속성 읽기'를 가로챕니다.",
                 "highlight": [
                     6,
                     7,
@@ -42,13 +41,13 @@
                 ],
                 "visualizationType": "memory",
                 "memoryState": {
-                    "note": "Handler prepared"
+                    "note": "Handler prepared with 'get' trap"
                 }
             },
             {
                 "line": 15,
-                "title": "Proxy 생성",
-                "explanation": "`new Proxy(target, handler)`로 대리자(Proxy)를 만듭니다.\n이제 `proxy`를 통해 접근해야 감시가 작동합니다.",
+                "title": "Proxy 인스턴스 생성",
+                "explanation": "`new Proxy(target, handler)`를 통해 원본을 감싸는 대리자(Proxy)를 생성했습니다.\n이제 모든 접근은 이 `proxy` 객체를 통해 이루어지며, 핸들러의 규칙을 따릅니다.",
                 "highlight": [
                     15
                 ],
@@ -68,7 +67,7 @@
                         {
                             "address": "0xProxy",
                             "content": "Proxy(Target, Handler)",
-                            "label": "Intercepting..."
+                            "label": "Interceptor"
                         }
                     ]
                 }
@@ -76,8 +75,7 @@
             {
                 "line": 18,
                 "title": "접근 차단 (Intercept)",
-                "explanation": "`proxy.secret`에 접근하자 `get` 트랩이 발동합니다.\n'secret' 조건을 감지하고 'Access Denied!'를 반환합니다.",
-                "keyInsight": "Reflect.get()은 원본 동작을 그대로 수행합니다 (forwarding).",
+                "explanation": "`proxy.secret`을 요청하자, `get` 트랩이 이를 가로챕니다.\n'secret' 속성에 대한 접근임을 확인하고 'Access Denied!'를 반환합니다. 원본 객체에는 접근조차 못 했습니다.\n\n**Forwarding(전달)이란?**\n가로챈 작업을 `Reflect` API를 통해 다시 원본 객체로 넘겨주는 것을 말합니다. (Line 11)",
                 "highlight": [
                     18
                 ],
@@ -92,22 +90,22 @@
         ]
     },
     "quiz": {
-        "question": "Proxy로 할 수 없는 것은?",
+        "question": "Proxy의 Handler에서 정의할 수 있는 'Trap'에 해당하지 않는 것은?",
         "options": [
-            "속성 읽기/쓰기 가로채기",
-            "함수 호출 가로채기 (apply 트랩)",
-            "private (#) 필드에 직접 접근하기",
-            "생성자 호출 가로채기 (construct 트랩)"
+            "get (속성 읽기)",
+            "set (속성 쓰기)",
+            "construct (new 호출)",
+            "private (#) 필드 직접 접근"
         ],
-        "correctIndex": 2,
-        "explanation": "Proxy는 public 인터페이스만 가로챌 수 있습니다. 객체 내부의 private 슬롯(#field)에는 접근 권한이 없어 투명하게 전달하지 못하는 경우가 많습니다."
+        "correctIndex": 3,
+        "explanation": "Proxy는 객체의 공개적인 동작(Public Interception)만 가로챌 수 있습니다. 객체 내부 깊숙한 Private(#) 필드나 슬롯에는 직접 개입할 수 없습니다."
     },
     "misconceptions": [
         {
-            "wrong": "Proxy는 원본 객체를 복사한다",
-            "correct": "아닙니다. Proxy는 원본 객체를 감싸는 포장지(Wrapper)일 뿐입니다. 데이터는 원본에 저장됩니다.",
-            "why": "Proxy는 저장소가 아니라 '검문소'입니다."
+            "wrong": "Proxy는 원본 객체를 복사해서 사용한다",
+            "correct": "아닙니다. 원본 객체에 대한 '참조'를 가지고 중개할 뿐입니다.",
+            "why": "Proxy 자신은 데이터를 저장하지 않습니다. 모든 요청을 핸들러를 거쳐 원본(Target)에게 전달하거나 차단하는 껍데기(Wrapper)입니다."
         }
     ],
-    "keyTakeaway": "라이브러리(MobX, Vue)의 마법은 대부분 Proxy로 구현된다."
+    "keyTakeaway": "Vue 3의 반응성 시스템 등 최신 라이브러리의 마법은 Proxy를 통해 구현됩니다."
 }

@@ -1,0 +1,63 @@
+{
+  "lessonId": "c-9-1",
+  "title": "Preprocessor Phases",
+  "concept": "Core concept for Preprocessor Phases",
+  "content": {
+    "code": "#include <stdio.h>\n#define PI 3.14159\n#define HELLO \"Hello, World!\"\n\nint main() {\n    // Text substitution happens BEFORE compilation\n    printf(\"%s\\n\", HELLO);\n    \n    double r = 10.0;\n    double area = PI * r * r;\n    \n    printf(\"Area: %.2f\\n\", area);\n    return 0;\n}",
+    "steps": [
+      {
+        "line": 6,
+        "title": "#include와 #define",
+        "explanation": "컴파일러가 코드를 기계어로 번역하기 전에 '전처리기(Preprocessor)'가 먼저 실행됩니다.\n`#include`는 파일 내용을 복사해오고, `#define`은 텍스트를 단순 치환합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": []
+        }
+      },
+      {
+        "line": 9,
+        "title": "텍스트 치환 결과",
+        "explanation": "전처리가 끝나면 코드는 `double area = 3.14159 * r * r;`로 바뀝니다.\n변수처럼 보이지만 실제로는 메모리를 차지하지 않는 상수(Literal)로 박힙니다.",
+        "keyInsight": "매크로는 단순 '복사-붙여넣기'라는 점을 명심해야 합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "r",
+              "value": 10.0,
+              "address": "0x100"
+            },
+            {
+              "name": "area",
+              "value": 314.159,
+              "address": "0x108"
+            }
+          ],
+          "output": [
+            "Hello, World!",
+            "Area: 314.16"
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "#define MAX 100 으로 정의된 상수의 메모리 주소를 &MAX로 가져올 수 있나요?",
+    "options": [
+      "가능하다. 전역 변수와 같다.",
+      "불가능하다. 컴파일 전에 숫자로 치환되므로 주소가 없다.",
+      "특정 옵션을 켜면 가능하다.",
+      "스택 영역에 주소가 있다."
+    ],
+    "correctIndex": 1,
+    "explanation": "매크로 상수 `#define`은 전처리기 단계에서 소스 코드의 텍스트가 해당 값으로 바뀌는 것이므로, 런타임에는 변수로 존재하지 않습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "#define은 변수 정의와 같다.",
+      "correct": "전혀 다릅니다. 변수는 메모리 공간을 차지하지만, 매크로는 소스 코드 상의 텍스트 치환일 뿐입니다.",
+      "why": "타입 체크도 하지 않고 무조건 텍스트를 바꿉니다."
+    }
+  ],
+  "keyTakeaway": "전처리기는 컴파일러가 코드를 보기 전에 '코드 텍스트' 자체를 변형하는 단계입니다."
+}

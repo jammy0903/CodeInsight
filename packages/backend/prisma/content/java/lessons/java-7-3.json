@@ -1,168 +1,50 @@
 {
   "lessonId": "java-7-3",
-  "title": "Set과 equals/hashCode",
-  "concept": "HashSet/HashMap에 객체를 넣으려면 equals()와 hashCode()를 함께 오버라이드해야 한다",
+  "title": "Generic Methods",
+  "concept": "Core concept for Generic Methods",
   "content": {
-    "code": "class Person {\n    String name;\n    Person(String name) { this.name = name; }\n    \n    // equals만 오버라이드 (hashCode 누락!)\n    @Override\n    public boolean equals(Object o) {\n        if (o instanceof Person p) {\n            return name.equals(p.name);\n        }\n        return false;\n    }\n}\n\nSet<Person> set = new HashSet<>();\nset.add(new Person(\"Alice\"));\nset.add(new Person(\"Alice\"));\n\nSystem.out.println(set.size());  // 2! (예상: 1)\n\nPerson p1 = new Person(\"Alice\");\nPerson p2 = new Person(\"Alice\");\nSystem.out.println(p1.equals(p2));  // true\nSystem.out.println(p1.hashCode() == p2.hashCode());  // false!",
+    "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "Person 클래스",
-        "explanation": "name 필드 하나를 가진 간단한 클래스입니다.",
-        "highlight": [
-          1,
-          2,
-          3
-        ],
+        "line": 3,
+        "title": "제네릭 메서드 선언",
+        "explanation": "메서드 선언부의 리턴 타입 앞에 `<T>`를 붙이면, 해당 메서드 내에서만 사용할 수 있는 독자적인 제네릭 타입을 정의할 수 있습니다.",
         "visualizationType": "memory",
         "memoryState": {
-          "note": "Person 클래스 정의"
-        }
-      },
-      {
-        "line": 6,
-        "title": "equals() 오버라이드",
-        "explanation": "이름이 같으면 같은 Person으로 취급합니다.",
-        "highlight": [
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "equals만 오버라이드, hashCode는 기본값"
+          "stack": []
         }
       },
       {
         "line": 15,
-        "title": "HashSet 생성",
-        "explanation": "HashSet은 hashCode()로 버킷을 찾고, equals()로 동등성을 확인합니다.",
-        "keyInsight": "HashSet = hashCode로 위치 → equals로 비교",
-        "highlight": [
-          15
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "set",
-              "value": "-> HashSet"
-            }
-          ]
-        }
-      },
-      {
-        "line": 16,
-        "title": "첫 번째 Alice 추가",
-        "explanation": "hashCode()가 특정 버킷을 가리킵니다.",
-        "highlight": [
-          16
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "HashSet",
-              "content": "bucket[7]: Person(Alice)"
-            }
-          ]
-        }
-      },
-      {
-        "line": 17,
-        "title": "두 번째 Alice 추가 (문제!)",
-        "explanation": "새 Person의 hashCode()가 다른 버킷을 가리킵니다! equals() 비교 안 함!",
-        "keyInsight": "hashCode 다르면 다른 버킷 → equals 비교 안 함",
-        "highlight": [
-          17
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "HashSet",
-              "content": "bucket[7]: Person(Alice), bucket[12]: Person(Alice)"
-            }
-          ],
-          "warning": "같은 이름인데 2개가 들어감!"
-        }
-      },
-      {
-        "line": 19,
-        "title": "size() 확인",
-        "explanation": "2입니다! hashCode가 달라서 중복으로 인식하지 못함!",
-        "highlight": [
-          19
-        ],
+        "title": "타입 추론 (Type Inference)",
+        "explanation": "`printArray(intArray)`를 호출할 때, 컴파일러가 인자의 타입을 보고 `T`가 `Integer`라고 스스로 추론합니다. 굳이 `Main.<Integer>printArray(...)`라고 쓸 필요가 없습니다.",
         "visualizationType": "memory",
         "memoryState": {
           "output": [
-            "2"
-          ],
-          "error": "예상은 1인데 2가 나옴"
-        }
-      },
-      {
-        "line": 23,
-        "title": "equals() 비교",
-        "explanation": "p1.equals(p2)는 true입니다. 이름이 같으니까!",
-        "highlight": [
-          23
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "2",
-            "true"
+            "Integer Array: 1 2 3 ",
+            "String Array: A B C "
           ]
-        }
-      },
-      {
-        "line": 24,
-        "title": "hashCode() 비교",
-        "explanation": "Object의 기본 hashCode()는 객체 주소 기반! 다른 객체니까 다름!",
-        "keyInsight": "equals가 true면 hashCode도 같아야 함 (계약 위반!)",
-        "highlight": [
-          24
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "2",
-            "true",
-            "false"
-          ],
-          "error": "equals/hashCode 계약 위반!"
         }
       }
     ]
   },
   "quiz": {
-    "question": "equals/hashCode 계약으로 올바른 것은?",
+    "question": "제네릭 메서드의 타입 파라미터 <T>의 스코프(유효 범위)는?",
     "options": [
-      "hashCode가 같으면 equals도 true",
-      "equals가 true면 hashCode도 같아야 함",
-      "hashCode는 항상 달라야 함",
-      "equals만 오버라이드하면 됨"
+      "클래스 전체",
+      "패키지 전체",
+      "해당 메서드 내부",
+      "프로그램 전체"
     ],
-    "correctIndex": 1,
-    "explanation": "equals()가 true인 두 객체는 hashCode()도 같아야 합니다. 역은 성립하지 않습니다(충돌 가능)."
+    "correctIndex": 2,
+    "explanation": "제네릭 메서드의 `<T>`는 해당 메서드가 실행되는 동안에만 유효하며, 클래스의 제네릭 타입 `<T>`와 이름이 같아도 전혀 다른 별개의 존재(Shadowing)입니다."
   },
   "misconceptions": [
     {
-      "wrong": "hashCode는 유일한(Unique) 값을 리턴해야 한다",
-      "correct": "유일하면 좋지만(성능상), 반드시 유일할 필요는 없습니다.",
-      "why": "hashCode가 우연히 같으면(충돌), 같은 버킷 안에 리스트로 연결해서 저장합니다. 하지만 너무 많이 충돌하면 성능이 느려집니다."
-    },
-    {
-      "wrong": "equals를 구현 안 해도 필드 값이 같으면 같은 객체다",
-      "correct": "아닙니다. `equals` 구현이 없으면 `==`(주소 비교)와 똑같이 동작합니다.",
-      "why": "`Object` 클래스의 기본 `equals` 구현이 단순히 `this == obj`이기 때문입니다."
+      "wrong": "static 메서드는 클래스의 제네릭 타입 T를 사용할 수 있다.",
+      "correct": "불가능합니다. static 메서드는 객체 생성 전에 메모리에 올라가는데, 클래스의 T는 객체 생성 시(`new Box<Integer>`)에 정해지기 때문입니다. 그래서 제네릭 메서드로 따로 선언해야 합니다.",
+      "why": "static 문맥과 인스턴스 문맥의 차이입니다."
     }
   ],
-  "keyTakeaway": "equals 오버라이드 = hashCode도 필수, IDE 자동 생성 사용"
+  "keyTakeaway": "클래스에 제네릭을 붙이지 않아도, 특정 메서드만 독립적으로 제네릭하게 만들 수 있어 유틸리티 함수 제작에 매우 유용합니다."
 }

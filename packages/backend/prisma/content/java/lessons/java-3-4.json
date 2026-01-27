@@ -8,7 +8,7 @@
       {
         "line": 8,
         "title": "Integer x, y 생성",
-        "explanation": "**메모리 상태:**\n`x`와 `y`는 각각 Heap의 `Integer(1)`과 `Integer(2)`를 가리킵니다.\n(여기서 `Integer`는 불변 객체입니다)",
+        "explanation": "**메모리 상태:**\n`x`와 `y`는 각각 Heap의 `Integer(1)`과 `Integer(2)`를 가리킵니다.\n여기서 `Integer`는 **불변(Immutable) 객체**입니다. 값을 바꿀 수 없습니다.",
         "highlight": [
           8,
           9
@@ -40,8 +40,8 @@
       {
         "line": 11,
         "title": "swap(x, y) 호출",
-        "explanation": "**참조값 복사:**\n`x`의 주소(`0x001`)가 `a`에, `y`의 주소(`0x002`)가 `b`에 복사됩니다.\n이제 `swap` 메서드 안에서 `a`와 `b`를 아무리 바꿔도, 바깥의 `x`, `y`와는 연결 고리가 없습니다.",
-        "keyInsight": "파라미터: 주소값의 '복사본'",
+        "explanation": "**참조값 복사:**\n`x`의 주소(`0x001`)가 `a`에 복사되고,\n`y`의 주소(`0x002`)가 `b`에 복사됩니다.\n\n이제 `a`와 `b`는 `x`, `y`의 **복사본 리모컨**입니다.",
+        "keyInsight": "파라미터 = 주소값의 복사본",
         "highlight": [
           11,
           1
@@ -77,7 +77,7 @@
       {
         "line": 2,
         "title": "지역 변수 교환 (Swap)",
-        "explanation": "`swap` 메서드 내부에서는 `a`와 `b`가 서로의 값을 교환했습니다.\n- `a`는 이제 `0x002`를 가리킵니다.\n- `b`는 이제 `0x001`을 가리킵니다.\n- **하지만 이건 `swap` 방 안에서 일어난 일일 뿐입니다.**",
+        "explanation": "`swap` 메서드 안에서 `a`와 `b`가 서로 주소를 교환합니다.\n- `a` → 0x002\n- `b` → 0x001\n\n하지만 이건 **`swap` 방 안에서 복사본들끼리 자리 바꾼 것**에 불과합니다.\n`main` 방에 있는 `x`, `y`는 이 사실을 전혀 모릅니다.",
         "highlight": [
           2,
           3,
@@ -104,14 +104,14 @@
               "changed": true
             }
           ],
-          "note": "a, b만 바뀌고 x, y는 그대로"
+          "note": "a, b만 바뀌고 x, y는 그대로 (영향력 0)"
         }
       },
       {
         "line": 12,
         "title": "함수 반환 후 (Swap 실패 확인)",
-        "explanation": "`swap` 메서드가 종료되고 Stack 프레임이 사라집니다. `a`, `b`도 같이 사라졌습니다.\n`main`에 남아있는 `x`, `y`는 처음 그 주소 그대로입니다.\n\n**결론:** Java에서는 변수 자체의 내용을 교환하는 `swap` 함수를 만들 수 없습니다.",
-        "keyInsight": "변수 재할당은 함수 밖으로 전파되지 않음",
+        "explanation": "`swap` 메서드가 종료되고 `a`, `b`는 사라집니다.\n`main`에 돌아와 보니 `x`, `y`는 여전히 1, 2 그대로입니다.\n\n**해결책은?**\n만약 진짜 값을 바꾸고 싶다면, `int[]` 같은 그릇(Wrapper)을 만들어서 넘겨야 합니다. 그릇의 내용물은 바꿀 수 있으니까요!",
+        "keyInsight": "Java에서 swap 함수 구현 불가",
         "highlight": [
           12
         ],
@@ -142,18 +142,18 @@
     "options": [
       "swap 함수 사용",
       "포인터 사용",
-      "배열이나 객체의 필드로 래핑",
+      "배열이나 객체의 필드로 래핑해서 전달",
       "불가능"
     ],
     "correctIndex": 2,
-    "explanation": "배열 요소나 객체 필드는 수정 가능합니다. int[] arr = {x, y}로 래핑하면 교환 가능합니다."
+    "explanation": "배열(`int[]`)이나 객체 필드는 참조를 통해 수정할 수 있습니다. `void swap(int[] arr)` 처럼 만들어서 `arr[0]`과 `arr[1]`을 바꾸면 됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "Integer는 객체니까 swap이 된다",
-      "correct": "두 가지 이유로 안 됩니다. 1) 재할당은 지역적이고, 2) `Integer` 클래스는 불변(Immutable)이라 내부 값도 수정 못합니다.",
-      "why": "그래서 Java에서 swap을 하려면 배열(`int[]`)이나 AtomicInteger 같은 수정 가능한 객체(Mutable Object)에 담아서 전달해야 합니다."
+      "wrong": "Integer는 객체니까 내부 값을 바꾸면 되지 않나?",
+      "correct": "안타깝게도 `Integer`, `String`, `Double` 등은 **불변(Immutable)** 클래스입니다.",
+      "why": "한 번 생성되면 내부 값을 절대 바꿀 수 없습니다. 그래서 래퍼 클래스는 값 변경(Mutation)이 불가능합니다. `AtomicInteger`는 가능합니다."
     }
   ],
-  "keyTakeaway": "Java는 항상 Pass by Value, swap 불가, 래핑으로 우회"
+  "keyTakeaway": "Java는 Pass by Value라서 변수 스왑 함수를 직접 만들 수 없다. 래핑이 필요하다."
 }

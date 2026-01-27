@@ -71,6 +71,11 @@ if [ ! -d "node_modules" ]; then
     pnpm install
 fi
 
+# Backend 캐시 삭제 (TypeScript 빌드 캐시)
+echo -e "${YELLOW}[...] Backend 캐시 삭제 중...${NC}"
+rm -rf dist node_modules/.cache .tsbuildinfo 2>/dev/null || true
+echo -e "${GREEN}[✓] Backend 캐시 삭제 완료${NC}"
+
 pnpm run dev &
 BACKEND_PID=$!
 

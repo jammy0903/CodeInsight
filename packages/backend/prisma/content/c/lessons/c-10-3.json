@@ -1,0 +1,62 @@
+{
+  "lessonId": "c-10-3",
+  "title": "Buffered I/O",
+  "concept": "Core concept for Buffered I/O",
+  "content": {
+    "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    // Output is buffered by default\n    printf(\"Example 1... \");\n    // sleep(2); // Wait 2 sec\n    \n    // Manually flush buffer\n    fflush(stdout);\n    printf(\"Printed immediately!\\n\");\n\n    // Line Buffering: \\n automatically flushes\n    printf(\"Example 2 with newline\\n\");\n    \n    return 0;\n}",
+    "steps": [
+      {
+        "line": 5,
+        "title": "버퍼링 (Buffering)",
+        "explanation": "`printf`를 호출한다고 화면에 바로 글자가 뜨는 게 아닙니다. 효율성을 위해 '출력 버퍼'에 데이터를 모아둡니다.",
+        "keyInsight": "물방울 하나하나 옮기는 것보다 양동이에 모아서 한 번에 붓는 것이 빠른 원리입니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": []
+        }
+      },
+      {
+        "line": 9,
+        "title": "fflush (강제 출력)",
+        "explanation": "`fflush(stdout)`을 호출하면 양동이를 강제로 비웁니다. 버퍼에 쌓여있던 \"Example 1... \"이 이때 화면에 나타납니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "Example 1... Printed immediately!"
+          ]
+        }
+      },
+      {
+        "line": 13,
+        "title": "Line Buffering",
+        "explanation": "표준 출력(stdout)은 보통 '줄 단위 버퍼링'을 합니다. 즉, 개행 문자 `\\n`을 만나면 알아서 flush를 수행합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "Example 1... Printed immediately!",
+            "Example 2 with newline"
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "프로그램이 충돌(Crash)하여 종료되었을 때, printf 내용이 화면에 안 나올 수 있는 이유는?",
+    "options": [
+      "운영체제 버그",
+      "출력 버퍼가 비워지지 못하고 프로세스가 죽었기 때문",
+      "printf 함수가 느려서",
+      "메모리 부족"
+    ],
+    "correctIndex": 1,
+    "explanation": "개행(\\n)이나 fflush 없이 버퍼에만 데이터가 있다가 크래시가 나면, 그 데이터는 화면에 나오지 못하고 사라집니다. 디버깅 시 주의해야 합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "모든 입출력은 즉시 처리된다.",
+      "correct": "디스크 I/O와 시스템 콜 비용을 줄이기 위해 거의 항상 버퍼링이 개입합니다 (Full, Line, No buffering).",
+      "why": "system call은 비싼 연산이기 때문입니다."
+    }
+  ],
+  "keyTakeaway": "버퍼링은 성능을 높여주지만, 실시간 출력이 필요하거나 디버깅 중일 때는 fflush의 중요성을 이해해야 합니다."
+}
