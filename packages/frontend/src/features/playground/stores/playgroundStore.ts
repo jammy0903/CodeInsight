@@ -6,7 +6,8 @@
  */
 
 import { create } from 'zustand';
-import type { SupportedLanguage, LessonStep } from '@/types';
+import type { LessonStep } from '@/types';
+import type { SupportedLanguage } from '@/types/simulator';
 import type { StackRegisters } from '@/features/visualizers/c';
 
 // ============================================================
@@ -123,6 +124,14 @@ let isAwesome = true;
 name = "CodeInsight Rocks!";
 `;
 
+const DEFAULT_PYTHON_PRACTICAL_CODE = `# 실용 파이썬 예제
+import os
+
+# 현재 디렉토리의 파일 목록 가져오기
+files = os.listdir('.')
+print(f"Files in current directory: {files}")
+`;
+
 // ============================================================
 // 스토어 생성
 // ============================================================
@@ -140,6 +149,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     python: DEFAULT_PYTHON_CODE,
     java: DEFAULT_JAVA_CODE,
     javascript: DEFAULT_JAVASCRIPT_CODE,
+    'python-practical': DEFAULT_PYTHON_PRACTICAL_CODE,
   },
   setCode: (code) => {
     const { language, codes } = get();
