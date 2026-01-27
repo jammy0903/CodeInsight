@@ -1,120 +1,99 @@
 {
   "lessonId": "py-3-2",
-  "title": "The Aliasing Trap",
-  "concept": "When two variables point to the same mutable object, changes through one affect the other!",
+  "title": "Tuples (Immutable)",
+  "concept": "리스트와 비슷하지만, 한 번 만들면 수정할 수 없다",
   "content": {
-    "code": "a = [1, 2, 3]\nb = a  # NOT a copy!\n\nprint(f\"a = {a}\")\nprint(f\"b = {b}\")\nprint(f\"Same object? {a is b}\")\n\nb[0] = 999\n\nprint(f\"After b[0] = 999:\")\nprint(f\"a = {a}\")  # SURPRISE!\nprint(f\"b = {b}\")",
+    "code": "# 1. 튜플 생성 (소괄호)\npoint = (10, 20)\n\n# 2. 읽기는 가능\nprint(point[0])\n\n# 3. 수정은 불가능!\n# point[0] = 99  # TypeError!\n\n# 4. 언패킹 (Unpacking)\nx, y = point\nprint(f\"x={x}, y={y}\")",
     "steps": [
       {
-        "line": 1,
-        "title": "Create a list",
-        "explanation": "Create a list and bind `a` to it.\n\nSo far, one object, one name.",
-        "highlight": [1],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_shared" }
-          ],
-          "objects": [
-            { "id": "list_shared", "type": "list", "value": "[1, 2, 3]", "pyId": "140600", "highlight": true }
-          ]
-        }
-      },
-      {
         "line": 2,
-        "title": "b = a - THE TRAP!",
-        "explanation": "**THIS IS NOT A COPY!**\n\n`b = a` makes `b` point to the SAME object as `a`.\n\nNow we have:\n- Two names: `a` and `b`\n- ONE object: `[1, 2, 3]`\n\nThis is called **aliasing** - two names for the same object.",
-        "highlight": [2],
+        "title": "튜플 생성",
+        "explanation": "**`(...)`**: 소괄호를 씁니다. (사실 괄호 없이 `10, 20`만 써도 튜플이 됩니다)\n**용도:** 좌표, 설정값 등 **절대 변하면 안 되는 데이터**를 담을 때 씁니다.",
+        "highlight": [
+          2
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "a", "pointsTo": "list_shared" },
-            { "name": "b", "pointsTo": "list_shared" }
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            }
           ],
           "objects": [
-            { "id": "list_shared", "type": "list", "value": "[1, 2, 3]", "pyId": "140600" }
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)"
+            }
           ]
         }
       },
       {
-        "line": 6,
-        "title": "a is b → True!",
-        "explanation": "**PROOF:** `a is b` returns `True`!\n\nThis confirms they point to the EXACT SAME object.\n\nNot just equal values, but the same memory location.",
-        "highlight": [6],
+        "line": 10,
+        "title": "언패킹 (Unpacking)",
+        "explanation": "**`x, y = point`**\n튜플 안에 있는 값을 변수 여러 개에 한 방에 꽂아줍니다.\n파이썬에서 가장 우아하고 자주 쓰이는 문법 중 하나입니다.",
+        "highlight": [
+          10,
+          11
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "a", "pointsTo": "list_shared" },
-            { "name": "b", "pointsTo": "list_shared" }
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "int10"
+            },
+            {
+              "name": "y",
+              "pointsTo": "int20"
+            }
           ],
           "objects": [
-            { "id": "list_shared", "type": "list", "value": "[1, 2, 3]", "pyId": "140600" }
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)"
+            },
+            {
+              "id": "int10",
+              "type": "int",
+              "value": "10"
+            },
+            {
+              "id": "int20",
+              "type": "int",
+              "value": "20"
+            }
           ],
-          "output": ["a = [1, 2, 3]", "b = [1, 2, 3]", "Same object? True"]
-        }
-      },
-      {
-        "line": 8,
-        "title": "Modify through b...",
-        "explanation": "`b[0] = 999` modifies the list object.\n\nSince `a` and `b` both point to the SAME object...\n\n**What will `a` show?**",
-        "highlight": [8],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_shared" },
-            { "name": "b", "pointsTo": "list_shared" }
-          ],
-          "objects": [
-            { "id": "list_shared", "type": "list", "value": "[999, 2, 3]", "pyId": "140600", "highlight": true }
+          "output": [
+            "x=10, y=20"
           ]
-        }
-      },
-      {
-        "line": 11,
-        "title": "a ALSO changed!",
-        "explanation": "**THE SURPRISE:**\n\nWe modified through `b`, but `a` also shows the change!\n\n**Why?** Because there's only ONE list. Both names point to it.\n\n**This is the #1 source of bugs for Python beginners.**",
-        "highlight": [11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_shared" },
-            { "name": "b", "pointsTo": "list_shared" }
-          ],
-          "objects": [
-            { "id": "list_shared", "type": "list", "value": "[999, 2, 3]", "pyId": "140600" }
-          ],
-          "output": ["a = [1, 2, 3]", "b = [1, 2, 3]", "Same object? True", "After b[0] = 999:", "a = [999, 2, 3]", "b = [999, 2, 3]"]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What prints?\n\nx = [1, 2]\ny = x\ny = y + [3]\nprint(x)",
+    "question": "요소가 하나만 있는 튜플을 만들 때 올바른 표기법은?",
     "options": [
-      "[1, 2, 3]",
-      "[1, 2]",
-      "[3]",
-      "Error"
+      "(1)",
+      "[1]",
+      "(1,)",
+      "tuple(1)"
     ],
-    "correctIndex": 1,
-    "explanation": "y = y + [3] creates a NEW list and rebinds y to it. This BREAKS the alias! x still points to [1, 2]. If we had used y.append(3) or y += [3], x would see the change."
+    "correctIndex": 2,
+    "explanation": "`(1)`은 그냥 수학 괄호로 인식되어 정수 1이 됩니다. 튜플임을 알리려면 쉼표를 꼭 찍어야 합니다: `(1,)`"
   },
   "misconceptions": [
     {
-      "wrong": "b = a creates a copy of the list",
-      "correct": "b = a makes b point to the same list as a",
-      "why": "Assignment binds names to objects. It never copies objects."
-    },
-    {
-      "wrong": "Each variable has its own independent list",
-      "correct": "Multiple variables can share the same list object",
-      "why": "This aliasing is a feature, not a bug - but it can cause unexpected mutations."
-    },
-    {
-      "wrong": "Only b changed, a should be the same",
-      "correct": "There's only ONE list - both names see the change",
-      "why": "The object is shared. Mutation through any name affects all names."
+      "wrong": "튜플은 리스트보다 기능이 적어서 안 좋다",
+      "correct": "오히려 **더 빠르고 가볍고 안전**합니다.",
+      "why": "데이터가 변하지 않는다는 보장이 있으면 최적화가 가능하기 때문입니다. 딕셔너리의 키(Key)로도 쓸 수 있습니다(리스트는 불가)."
     }
   ],
-  "keyTakeaway": "b = a creates an ALIAS, not a copy! Changes through b affect a because they're the SAME object!"
+  "keyTakeaway": "변하면 안 되는 데이터는 튜플로! `(val,)` 쉼표 주의."
 }

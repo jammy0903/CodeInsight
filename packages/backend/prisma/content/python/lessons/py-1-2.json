@@ -1,136 +1,78 @@
 {
   "lessonId": "py-1-2",
-  "title": "객체의 세 얼굴: id, type, value",
-  "concept": "모든 파이썬 객체는 신원(id), 타입(type), 값(value)을 가진다",
+  "title": "Numeric Types",
+  "concept": "정수(int)와 실수(float)는 다르게 동작하며, 불변 객체다",
   "content": {
-    "code": "x = 42\nprint(id(x))\nprint(type(x))\nprint(x)\n\ny = 42\nprint(x is y)",
+    "code": "# 정수 (Integers)\na = 10\nb = 3\n\nprint(a + b)  # 13\nprint(a / b)  # 3.333... (항상 float 반환)\nprint(a // b) # 3 (몫, 정수)\nprint(a % b)  # 1 (나머지)\n\n# 실수 (Floats)\npi = 3.14\nradius = 2.0\narea = pi * (radius ** 2)\nprint(area)",
     "steps": [
       {
-        "line": 1,
-        "title": "정수 객체 생성",
-        "explanation": "`x = 42`를 실행하면:\n1. 값이 42인 정수 객체 생성\n2. 이름 `x`를 그 객체에 바인딩\n\n**모든 객체의 세 가지 속성:**\n- **id**: 고유 신원 (메모리 주소)\n- **type**: 종류 (int, str, list...)\n- **value**: 실제 데이터",
-        "highlight": [1],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "int", "value": "42", "pyId": "9406720" }
+        "line": 6,
+        "title": "나눗셈의 비밀 (/ vs //)",
+        "explanation": "**`/` (True Division):**\n결과가 항상 **실수(float)**입니다. `10 / 2`도 `5.0`이 됩니다.\n\n**`//` (Floor Division):**\n소수점을 버리고 **정수(int)** 몫만 구합니다. 인덱스 계산할 때 유용합니다.",
+        "highlight": [
+          6,
+          7
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "13",
+            "3.3333333333333335"
           ]
         }
       },
       {
-        "line": 2,
-        "title": "id() - 객체의 지문",
-        "explanation": "**id(x)**는 객체의 고유 신원을 반환합니다.\n\n객체의 지문이나 바코드라고 생각하세요.\n\n**핵심:** 같은 id()를 가진 두 것은 같은 객체! 복사본이 아니라 동일 객체!",
-        "highlight": [2],
+        "line": 12,
+        "title": "거듭제곱 (**)",
+        "explanation": "파이썬은 `^`가 아니라 `**`로 제곱을 구합니다.\n`radius ** 2`는 반지름의 제곱입니다.",
+        "highlight": [
+          13
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "x", "pointsTo": "obj1" }
+            {
+              "name": "area",
+              "pointsTo": "f1"
+            }
           ],
           "objects": [
-            { "id": "obj1", "type": "int", "value": "42", "pyId": "9406720", "highlight": true }
+            {
+              "id": "f1",
+              "type": "float",
+              "value": "12.56",
+              "pyId": "5005"
+            }
           ],
-          "output": ["9406720"]
-        }
-      },
-      {
-        "line": 3,
-        "title": "type() - 객체의 종류",
-        "explanation": "**type(x)**는 객체가 어떤 종류인지 알려줍니다.\n\n타입이 결정하는 것:\n- 어떤 연산이 가능한지\n- 가변인지 불변인지\n\n`<class 'int'>` = x가 정수 객체를 가리킴",
-        "highlight": [3],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "int", "value": "42", "pyId": "9406720" }
-          ],
-          "output": ["9406720", "<class 'int'>"]
-        }
-      },
-      {
-        "line": 4,
-        "title": "value - 데이터 자체",
-        "explanation": "값은 우리가 보통 생각하는 것 - 실제 데이터입니다.\n\n이 정수 객체는:\n- id: 9406720 (고유 신원)\n- type: int (정수)\n- value: 42 (값)\n\n**핵심:** id와 type은 절대 변하지 않음. value는 가변 객체면 바뀔 수 있음.",
-        "highlight": [4],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "int", "value": "42", "pyId": "9406720" }
-          ],
-          "output": ["9406720", "<class 'int'>", "42"]
-        }
-      },
-      {
-        "line": 6,
-        "title": "y = 42 - 같은 객체? 다른 객체?",
-        "explanation": "**파이썬의 비밀 최적화: 정수 캐싱!**\n\n파이썬은 -5 ~ 256 범위의 정수 객체를 미리 만들어두고 재사용합니다.\n\n`y = 42`는 새 객체를 만들지 않고 기존 42를 재사용!\n\n**주의:** 이건 구현 세부사항이라 의존하면 안 됨!",
-        "highlight": [6],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "obj1" },
-            { "name": "y", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "int", "value": "42", "pyId": "9406720" }
-          ],
-          "output": ["9406720", "<class 'int'>", "42"]
-        }
-      },
-      {
-        "line": 7,
-        "title": "x is y - 놀라운 결과!",
-        "explanation": "**x is y가 True!**\n\n작은 정수는 같은 객체를 재사용하기 때문입니다.\n\n```python\na = 257\nb = 257\na is b  # 종종 False! (캐시 범위 밖)\n```\n\n**황금 규칙:**\n- 값 비교는 `==` 사용\n- `is`는 None에만: `if x is None`\n- 숫자나 문자열에 `is` 쓰지 마세요!",
-        "highlight": [7],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "x", "pointsTo": "obj1" },
-            { "name": "y", "pointsTo": "obj1" }
-          ],
-          "objects": [
-            { "id": "obj1", "type": "int", "value": "42", "pyId": "9406720" }
-          ],
-          "output": ["9406720", "<class 'int'>", "42", "True"]
+          "output": [
+            "12.56"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "x is y의 결과는?\n\nx = 1000\ny = 1000",
+    "question": "파이썬에서 `5 / 2`의 결과는?",
     "options": [
-      "항상 True",
-      "항상 False",
-      "상황에 따라 다름 (구현 세부사항)",
-      "에러"
+      "2 (정수)",
+      "2.5 (실수)",
+      "2.0 (실수)",
+      "오류 발생"
     ],
-    "correctIndex": 2,
-    "explanation": "1000은 파이썬 정수 캐시 범위(-5 ~ 256) 밖입니다. x와 y가 같은 객체를 가리킬지는 구현에 따라 다릅니다. 숫자 비교에 절대 `is` 쓰지 마세요 - `==`를 쓰세요!"
+    "correctIndex": 1,
+    "explanation": "Python 3부터 `/` 연산자는 항상 정확한 실수 결과(2.5)를 반환합니다. 정수 몫을 원하면 `//`를 써야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "`is`와 `==`는 같다",
-      "correct": "`==`는 값 비교, `is`는 동일성 비교 (같은 객체인지)",
-      "why": "서로 다른 객체가 같은 값을 가질 수 있지만 신원은 다릅니다."
+      "wrong": "a^b가 제곱이다",
+      "correct": "아닙니다! `^`는 비트 연산자(XOR)입니다. 제곱은 `**`입니다.",
+      "why": "다른 언어(C 등)나 수학 표기법 때문에 자주 하는 실수입니다."
     },
     {
-      "wrong": "같은 값을 가진 변수는 항상 같은 객체를 가리킨다",
-      "correct": "작은 정수(-5~256)와 일부 문자열만 캐싱됨",
-      "why": "파이썬이 성능을 위해 캐싱하지만, 구현 세부사항이라 의존하면 안 됩니다."
-    },
-    {
-      "wrong": "각 변수는 숫자의 자기 복사본을 가진다",
-      "correct": "여러 변수가 종종 같은 정수 객체를 공유한다",
-      "why": "정수는 불변이라 공유해도 안전하고 효율적입니다."
+      "wrong": "0.1 + 0.2 == 0.3",
+      "correct": "False입니다. 부동소수점 오차로 `0.30000000000000004`가 됩니다.",
+      "why": "컴퓨터는 2진수로 실수를 표현하기에 10진수 소수를 완벽하게 저장 못 할 때가 있습니다."
     }
   ],
-  "keyTakeaway": "모든 객체는 id(신원), type(타입), value(값)를 가진다. 값 비교는 ==, is는 None에만!"
+  "keyTakeaway": "나눗셈 `/`는 항상 float다. 제곱은 `**`다."
 }

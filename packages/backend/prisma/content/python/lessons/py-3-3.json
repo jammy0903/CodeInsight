@@ -1,144 +1,76 @@
 {
   "lessonId": "py-3-3",
-  "title": "Shallow Copy",
-  "concept": "copy() creates a new list, but the elements are still shared!",
+  "title": "Dictionaries",
+  "concept": "Key와 Value의 쌍으로 데이터를 저장하는 해시맵",
   "content": {
-    "code": "original = [[1, 2], [3, 4]]\nshallow = original.copy()\n\nprint(f\"Same list? {original is shallow}\")\nprint(f\"Same inner? {original[0] is shallow[0]}\")\n\nshallow[0][0] = 999\nprint(f\"original: {original}\")\nprint(f\"shallow: {shallow}\")",
+    "code": "# 1. 딕셔너리 생성\nuser = {\n    \"name\": \"Alice\",\n    \"age\": 25\n}\n\n# 2. 접근 및 수정\nprint(user[\"name\"])\nuser[\"age\"] = 26      # 수정\nuser[\"city\"] = \"Seoul\" # 추가\n\n# 3. 키 확인\nif \"job\" in user:\n    print(user[\"job\"])",
     "steps": [
       {
-        "line": 1,
-        "title": "Create nested list",
-        "explanation": "`original = [[1, 2], [3, 4]]` creates:\n- An outer list\n- Two inner lists\n\nThe outer list contains **references** to the inner lists.",
-        "highlight": [1],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" }
-          ],
-          "objects": [
-            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100", "highlight": true },
-            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
-            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" }
-          ]
-        }
-      },
-      {
         "line": 2,
-        "title": "Shallow copy",
-        "explanation": "`.copy()` creates a **shallow copy**:\n\n- Creates a NEW outer list ✓\n- But copies **references** to inner lists ✗\n\nThe inner lists are **shared**, not copied!",
-        "highlight": [2],
+        "title": "딕셔너리 생성",
+        "explanation": "**`{ key: value }`** 구조입니다.\n리스트는 숫자로 찾지만(`list[0]`), 딕셔너리는 **키워드(Key)**로 값을 찾습니다.",
+        "highlight": [
+          2,
+          3,
+          4,
+          5
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "shallow", "pointsTo": "list_copy" }
+            {
+              "name": "user",
+              "pointsTo": "dict1"
+            }
           ],
           "objects": [
-            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
-            { "id": "list_copy", "type": "list", "value": "[→, →]", "pyId": "140400", "highlight": true },
-            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
-            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" }
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{'name': 'Alice', 'age': 25}"
+            }
           ]
         }
       },
       {
-        "line": 4,
-        "title": "Outer lists are different",
-        "explanation": "`original is shallow` → **False**\n\nGood! The outer lists are different objects.\n\nBut wait...",
-        "highlight": [4],
+        "line": 9,
+        "title": "추가와 수정",
+        "explanation": "`user[\"age\"] = 26`: 기존 키가 있으면 값을 덮어씁니다.\n`user[\"city\"] = \"Seoul\"`: 없는 키면 새로 만듭니다.\n\n매우 유연하고 빠릅니다(해시 테이블 방식).",
+        "highlight": [
+          9,
+          10
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "shallow", "pointsTo": "list_copy" }
-          ],
           "objects": [
-            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
-            { "id": "list_copy", "type": "list", "value": "[→, →]", "pyId": "140400" }
-          ],
-          "output": ["Same list? False"]
-        }
-      },
-      {
-        "line": 5,
-        "title": "Inner lists are SAME!",
-        "explanation": "`original[0] is shallow[0]` → **True**!\n\n**THE TRAP:** Inner lists are **shared**!\n\nBoth point to the same `[1, 2]` object.",
-        "highlight": [5],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "shallow", "pointsTo": "list_copy" }
-          ],
-          "objects": [
-            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
-            { "id": "list_copy", "type": "list", "value": "[→, →]", "pyId": "140400" },
-            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200", "highlight": true }
-          ],
-          "output": ["Same list? False", "Same inner? True"]
-        }
-      },
-      {
-        "line": 7,
-        "title": "Modify through shallow copy",
-        "explanation": "`shallow[0][0] = 999` modifies the **shared** inner list.\n\nSince both `original[0]` and `shallow[0]` point to the same object...",
-        "highlight": [7],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "shallow", "pointsTo": "list_copy" }
-          ],
-          "objects": [
-            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
-            { "id": "list_copy", "type": "list", "value": "[→, →]", "pyId": "140400" },
-            { "id": "list_inner1", "type": "list", "value": "[999, 2]", "pyId": "140200", "highlight": true },
-            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" }
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{'name': 'Alice', 'age': 26, 'city': 'Seoul'}",
+              "highlight": true
+            }
           ]
-        }
-      },
-      {
-        "line": 8,
-        "title": "original ALSO changed!",
-        "explanation": "**BOTH show the change!**\n\n```\noriginal: [[999, 2], [3, 4]]\nshallow:  [[999, 2], [3, 4]]\n```\n\n**Shallow copy only copies one level deep.**\n\nFor true independence, you need **deep copy**.",
-        "highlight": [8, 9],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "shallow", "pointsTo": "list_copy" }
-          ],
-          "objects": [
-            { "id": "list_outer", "type": "list", "value": "[[999,2], [3,4]]", "pyId": "140100" },
-            { "id": "list_copy", "type": "list", "value": "[[999,2], [3,4]]", "pyId": "140400" }
-          ],
-          "output": ["Same list? False", "Same inner? True", "original: [[999, 2], [3, 4]]", "shallow: [[999, 2], [3, 4]]"]
         }
       }
     ]
   },
   "quiz": {
-    "question": "Which creates a shallow copy?\n\na = [1, 2, 3]",
+    "question": "없는 키를 조회했을 때 에러(KeyError)를 피하고 싶다면?",
     "options": [
-      "b = a",
-      "b = a.copy()",
-      "b = a[:]",
-      "Both B and C"
+      "user[key]",
+      "user.get(key)",
+      "user.find(key)",
+      "user.search(key)"
     ],
-    "correctIndex": 3,
-    "explanation": "Both .copy() and [:] (slice) create shallow copies. b = a just creates an alias (no copy at all). For nested structures, shallow copies share inner objects."
+    "correctIndex": 1,
+    "explanation": "`user.get(\"job\")`을 쓰면 키가 없을 때 에러 대신 `None`을 반환합니다. `user.get(\"job\", \"Unknown\")` 처럼 기본값도 줄 수 있습니다."
   },
   "misconceptions": [
     {
-      "wrong": ".copy() creates a completely independent copy",
-      "correct": ".copy() only copies one level - nested objects are shared",
-      "why": "This is 'shallow' copying. Only the top-level container is new."
-    },
-    {
-      "wrong": "Slicing [:] creates a deep copy",
-      "correct": "Slicing [:] creates a shallow copy, same as .copy()",
-      "why": "Both methods only copy references to nested objects, not the objects themselves."
+      "wrong": "리스트를 딕셔너리 키로 쓸 수 있다",
+      "correct": "불가능합니다. 키는 **불변(Immutable)** 타입이어야 합니다.",
+      "why": "리스트 같은 가변 객체는 값이 바뀌면 해시값도 바뀌어야 해서, 키로 쓰면 딕셔너리가 망가집니다. 튜플은 가능합니다."
     }
   ],
-  "keyTakeaway": "Shallow copy (.copy() or [:]) creates new outer container but SHARES nested objects!"
+  "keyTakeaway": "이름으로 데이터를 찾을 땐 딕셔너리. `get()`으로 안전하게 조회하자."
 }

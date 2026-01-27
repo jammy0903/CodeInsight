@@ -12,7 +12,7 @@ import { usePlaygroundStore, useCurrentCode } from '../stores/playgroundStore';
 import { useIsMobile } from '@/hooks';
 import { useThemeStore } from '@/stores/themeStore';
 import { monacoThemes } from '@/config/themes';
-import type { SupportedLanguage } from '@/types';
+import type { SupportedLanguage } from '@/types/simulator';
 
 /** Monaco Editor onMount 핸들러 타입 */
 type OnMountHandler = (
@@ -25,6 +25,8 @@ const MONACO_LANGUAGES: Record<SupportedLanguage, string> = {
   c: 'c',
   python: 'python',
   java: 'java',
+  javascript: 'javascript',
+  'python-practical': 'python',
 };
 
 export function CodeEditor() {

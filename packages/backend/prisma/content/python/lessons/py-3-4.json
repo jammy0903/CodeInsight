@@ -1,154 +1,75 @@
 {
   "lessonId": "py-3-4",
-  "title": "Deep Copy",
-  "concept": "copy.deepcopy() creates completely independent copies at all levels!",
+  "title": "Sets (Unique)",
+  "concept": "중복을 허용하지 않고 순서가 없는 집합",
   "content": {
-    "code": "import copy\n\noriginal = [[1, 2], [3, 4]]\ndeep = copy.deepcopy(original)\n\nprint(f\"Same list? {original is deep}\")\nprint(f\"Same inner? {original[0] is deep[0]}\")\n\ndeep[0][0] = 999\nprint(f\"original: {original}\")\nprint(f\"deep: {deep}\")",
+    "code": "# 1. 세트 생성\nnums = {1, 2, 2, 3, 3, 3}\nprint(nums)  # {1, 2, 3} (중복 제거됨)\n\n# 2. 추가/삭제\nnums.add(4)\nnums.remove(1)\n\n# 3. 집합 연산\na = {1, 2, 3}\nb = {3, 4, 5}\n\nprint(a & b) # 교집합 {3}\nprint(a | b) # 합집합 {1, 2, 3, 4, 5}",
     "steps": [
       {
-        "line": 1,
-        "title": "Import copy module",
-        "explanation": "`import copy` gives us access to `deepcopy()`.\n\nThis is in Python's standard library - no installation needed!",
-        "highlight": [1],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 3,
-        "title": "Create nested list",
-        "explanation": "Same as before: `original = [[1, 2], [3, 4]]`\n\nOuter list contains references to inner lists.",
-        "highlight": [3],
+        "line": 2,
+        "title": "중복 제거의 마법",
+        "explanation": "`{...}`를 쓰지만 키:값이 없으면 세트입니다.\n리스트에 있는 중복을 없애고 싶을 때 `list(set(my_list))` 콤보를 자주 씁니다.",
+        "highlight": [
+          2,
+          3
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
-            { "name": "original", "pointsTo": "list_outer" }
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            }
           ],
           "objects": [
-            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100", "highlight": true },
-            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
-            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" }
-          ]
-        }
-      },
-      {
-        "line": 4,
-        "title": "Deep copy - ALL levels!",
-        "explanation": "`copy.deepcopy()` creates copies at **every level**:\n\n- New outer list ✓\n- New inner lists ✓\n- Everything is independent!\n\nNotice: ALL objects have NEW IDs.",
-        "highlight": [4],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "deep", "pointsTo": "list_deep" }
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{1, 2, 3}"
+            }
           ],
-          "objects": [
-            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
-            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
-            { "id": "list_inner2", "type": "list", "value": "[3, 4]", "pyId": "140300" },
-            { "id": "list_deep", "type": "list", "value": "[→, →]", "pyId": "140400", "highlight": true },
-            { "id": "list_deep1", "type": "list", "value": "[1, 2]", "pyId": "140500", "highlight": true },
-            { "id": "list_deep2", "type": "list", "value": "[3, 4]", "pyId": "140600", "highlight": true }
-          ]
-        }
-      },
-      {
-        "line": 6,
-        "title": "Outer lists are different",
-        "explanation": "`original is deep` → **False**\n\nAs expected, outer lists are different.",
-        "highlight": [6],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "deep", "pointsTo": "list_deep" }
-          ],
-          "objects": [
-            { "id": "list_outer", "type": "list", "value": "[→, →]", "pyId": "140100" },
-            { "id": "list_deep", "type": "list", "value": "[→, →]", "pyId": "140400" }
-          ],
-          "output": ["Same list? False"]
-        }
-      },
-      {
-        "line": 7,
-        "title": "Inner lists ALSO different!",
-        "explanation": "`original[0] is deep[0]` → **False**!\n\n**This is the key difference from shallow copy!**\n\nThe inner lists are **completely independent** objects.",
-        "highlight": [7],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "deep", "pointsTo": "list_deep" }
-          ],
-          "objects": [
-            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
-            { "id": "list_deep1", "type": "list", "value": "[1, 2]", "pyId": "140500" }
-          ],
-          "output": ["Same list? False", "Same inner? False"]
-        }
-      },
-      {
-        "line": 9,
-        "title": "Modify deep copy",
-        "explanation": "`deep[0][0] = 999` modifies only the deep copy's inner list.\n\nSince it's a separate object, `original` is not affected!",
-        "highlight": [9],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "deep", "pointsTo": "list_deep" }
-          ],
-          "objects": [
-            { "id": "list_inner1", "type": "list", "value": "[1, 2]", "pyId": "140200" },
-            { "id": "list_deep1", "type": "list", "value": "[999, 2]", "pyId": "140500", "highlight": true }
+          "output": [
+            "{1, 2, 3}"
           ]
         }
       },
       {
         "line": 10,
-        "title": "original is UNCHANGED!",
-        "explanation": "**SUCCESS!** Only `deep` changed:\n\n```\noriginal: [[1, 2], [3, 4]]\ndeep:     [[999, 2], [3, 4]]\n```\n\n**Deep copy = complete independence!**",
-        "highlight": [10, 11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "original", "pointsTo": "list_outer" },
-            { "name": "deep", "pointsTo": "list_deep" }
-          ],
-          "objects": [
-            { "id": "list_outer", "type": "list", "value": "[[1,2], [3,4]]", "pyId": "140100" },
-            { "id": "list_deep", "type": "list", "value": "[[999,2], [3,4]]", "pyId": "140400" }
-          ],
-          "output": ["Same list? False", "Same inner? False", "original: [[1, 2], [3, 4]]", "deep: [[999, 2], [3, 4]]"]
+        "title": "집합 연산 (교/합/차)",
+        "explanation": "수학시간에 배운 벤 다이어그램을 코드로 구현할 수 있습니다.\n`&` (교집합), `|` (합집합), `-` (차집합) 연산자가 매우 빠릅니다.",
+        "highlight": [
+          10,
+          11,
+          13,
+          14
+        ],
+        "visualizationType": "terminal",
+        "memoryState": {
+          "output": [
+            "{3}",
+            "{1, 2, 3, 4, 5}"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "When should you use deepcopy()?",
+    "question": "빈 세트를 만들 때 올바른 방법은?",
     "options": [
-      "Always - it's safer",
-      "Only for flat lists like [1, 2, 3]",
-      "When you have nested structures and need complete independence",
-      "Never - it's too slow"
+      "{}",
+      "set()",
+      "[]",
+      "(,)"
     ],
-    "correctIndex": 2,
-    "explanation": "Use deepcopy() when you have nested mutable objects and need complete independence. For flat lists, shallow copy is enough and faster. For just aliasing, use assignment."
+    "correctIndex": 1,
+    "explanation": "`{}`는 빈 **딕셔너리**를 만듭니다. 빈 세트는 반드시 `set()`으로 만들어야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Always use deepcopy to be safe",
-      "correct": "Use deepcopy only when needed - it's slower than shallow copy",
-      "why": "Deepcopy recursively copies everything. For simple lists, shallow copy is faster and sufficient."
-    },
-    {
-      "wrong": "deepcopy works on everything",
-      "correct": "Some objects can't be deep copied (file handles, network connections)",
-      "why": "Objects tied to external resources may raise errors or behave unexpectedly."
+      "wrong": "세트는 순서가 있다 (s[0] 가능)",
+      "correct": "세트는 순서가 없습니다(Unordered). 인덱싱 불가능!",
+      "why": "내부적으로 해시 테이블을 쓰기 때문에 데이터가 무작위(처럼 보이는 순서)로 저장됩니다."
     }
   ],
-  "keyTakeaway": "copy.deepcopy() creates completely independent copies at ALL levels - use it for nested structures!"
+  "keyTakeaway": "중복을 없애거나 집합 연산이 필요할 땐 Set. 순서는 보장되지 않는다."
 }
