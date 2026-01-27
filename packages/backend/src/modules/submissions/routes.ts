@@ -125,10 +125,10 @@ submissionRoutes.get('/me/solved', requireDbUser, async (req, res) => {
       distinct: ['problemId'],
     });
 
-    const solvedIds = solvedSubmissions.map((s) => s.problemId);
+    const solvedIds = solvedSubmissions.map((s: any) => s.problemId);
     const attemptedIds = allSubmissions
-      .map((s) => s.problemId)
-      .filter((id) => !solvedIds.includes(id));
+      .map((s: any) => s.problemId)
+      .filter((id: any) => !solvedIds.includes(id));
 
     res.json({
       solved: solvedIds,

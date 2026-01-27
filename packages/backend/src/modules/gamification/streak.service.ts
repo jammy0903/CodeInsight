@@ -119,7 +119,7 @@ export async function updateStreak(userId: string) {
   const today = getUtcDateOnly();
 
   // Transaction으로 원자적 처리
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: any) => {
     // 1. 기존 스트릭 조회 (트랜잭션 내에서)
     const streak = await tx.userStreak.findUnique({
       where: { userId },
@@ -175,7 +175,7 @@ export async function updateStreak(userId: string) {
  * 스트릭 리셋 (관리자용)
  */
 export async function resetStreak(userId: string) {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: any) => {
     const streak = await tx.userStreak.findUnique({
       where: { userId },
     });

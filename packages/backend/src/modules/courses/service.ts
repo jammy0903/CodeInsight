@@ -59,7 +59,7 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
   if (!userId) {
     return {
       ...language,
-      chapters: language.chapters.map(chapter => ({
+      chapters: language.chapters.map((chapter: any) => ({
         ...chapter,
         lessons: undefined, // Remove lessons from payload
         progress: {
@@ -81,15 +81,15 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
         lesson: { chapter: { languageId } },
       },
       select: { lessonId: true },
-    })).map(p => p.lessonId)
+    })).map((p: any) => p.lessonId)
   );
 
   // 4. Transform & Combine
   return {
     ...language,
-    chapters: language.chapters.map(chapter => {
+    chapters: language.chapters.map((chapter: any) => {
       const total = chapter.lessons.length;
-      const completed = chapter.lessons.filter(l =>
+      const completed = chapter.lessons.filter((l: any) =>
         completedLessonIds.has(l.id)
       ).length;
 
@@ -249,14 +249,14 @@ export async function getChapterProgress(userId: string, chapterId: string) {
   if (!chapter) return null;
 
   const completedCount = chapter.lessons.filter(
-    (l) => l.progress[0]?.status === 'completed'
+    (l: any) => l.progress[0]?.status === 'completed'
   ).length;
 
   return {
     ...chapter,
     completedCount,
     totalCount: chapter.lessons.length,
-    lessons: chapter.lessons.map((l) => ({
+    lessons: chapter.lessons.map((l: any) => ({
       ...l,
       progress: l.progress[0] || null,
     })),

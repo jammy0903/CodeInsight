@@ -346,34 +346,34 @@ router.get('/summary', requireDbUser, async (req, res) => {
     ]);
 
     // 통계 계산
-    const totalStudyTime = activities.reduce((sum, a) => sum + (a.duration || 0), 0);
-    const correctAttempts = quizAttempts.filter((a) => a.isCorrect).length;
-    const wrongAttempts = quizAttempts.filter((a) => !a.isCorrect);
+    const totalStudyTime = activities.reduce((sum, a: any) => sum + (a.duration || 0), 0);
+    const correctAttempts = quizAttempts.filter((a: any) => a.isCorrect).length;
+    const wrongAttempts = quizAttempts.filter((a: any) => !a.isCorrect);
 
     // 일별 활동 (캘린더용)
     const dailyActivity: Record<string, number> = {};
-    activities.forEach((a) => {
+    activities.forEach((a: any) => {
       const date = a.startedAt.toISOString().split('T')[0];
       dailyActivity[date] = (dailyActivity[date] || 0) + (a.duration || 0);
     });
 
     // 시간대별 활동
     const hourlyActivity = Array(24).fill(0);
-    activities.forEach((a) => {
+    activities.forEach((a: any) => {
       const hour = a.startedAt.getHours();
       hourlyActivity[hour] += a.duration || 0;
     });
 
     // 요일별 활동
     const weekdayActivity = Array(7).fill(0);
-    activities.forEach((a) => {
+    activities.forEach((a: any) => {
       const day = a.startedAt.getDay();
       weekdayActivity[day] += a.duration || 0;
     });
 
     // 취약 개념 추출 (오답 기반)
     const weakConcepts: Record<string, number> = {};
-    wrongAttempts.forEach((a) => {
+    wrongAttempts.forEach((a: any) => {
       const concept = a.quiz?.lessonId || 'unknown';
       weakConcepts[concept] = (weakConcepts[concept] || 0) + 1;
     });
@@ -396,7 +396,7 @@ router.get('/summary', requireDbUser, async (req, res) => {
       hourlyActivity,
       weekdayActivity,
       weakConcepts,
-      recentWrongAnswers: wrongAttempts.slice(0, 10).map((a) => ({
+      recentWrongAnswers: wrongAttempts.slice(0, 10).map((a: any) => ({
         quizId: a.quizId,
         question: a.quiz?.question,
         userAnswer: a.userAnswer,
@@ -657,7 +657,7 @@ router.post('/step-activities', requireDbUser, async (req, res) => {
 
     res.json({
       count: results.length,
-      ids: results.map((r) => r.id),
+      ids: results.map((r: any) => r.id),
     });
   } catch (error) {
     logger.error('Batch step activities error:', error);

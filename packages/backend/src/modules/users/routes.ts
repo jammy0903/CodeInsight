@@ -96,7 +96,7 @@ userRoutes.get('/', requireAdmin, async (req, res) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    const result = users.map((user) => ({
+    const result = users.map((user: any) => ({
       nickname: user.nickname,
       role: user.role,
       createdAt: user.createdAt,
