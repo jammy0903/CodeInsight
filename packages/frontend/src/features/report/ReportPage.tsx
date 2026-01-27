@@ -26,6 +26,7 @@ import { WeekdayChart } from './components/WeekdayChart';
 import { HourlyChart } from './components/HourlyChart';
 import { AIInsights } from './components/AIInsights';
 import { WeakConcepts } from './components/WeakConcepts';
+import { StandaloneQuizSection } from './components/StandaloneQuizSection';
 
 type Period = '7d' | '30d' | '90d' | '1y';
 
@@ -235,10 +236,13 @@ export function ReportPage() {
         onRequestAnalysis={handleRequestAIAnalysis}
       />
 
-      {/* Weak Concepts */}
+      {/* Weak Concepts (Lesson-based) */}
       {Object.keys(summary.weakConcepts).length > 0 && (
         <WeakConcepts weakConcepts={summary.weakConcepts} />
       )}
+
+      {/* Standalone Quiz Weak Concepts */}
+      <StandaloneQuizSection />
     </div>
   );
 }
