@@ -18,7 +18,7 @@ import {
 import { updateProgress } from '@/services/courses';
 import { simulatorService, isLanguageSupported } from '@/services/simulator';
 import { useStore } from '@/stores/store';
-import { useEnterKey, useLesson, useChapter } from '@/hooks';
+import { useEnterKey, useLesson, useChapter, useTheme } from '@/hooks';
 import type { LessonFull, LessonStep, Quiz, SupportedLanguage } from '@/types';
 
 // 기존 컴포넌트 재사용
@@ -288,6 +288,7 @@ export function LessonPage() {
   const memoryScrollRef = useRef<HTMLDivElement>(null);
 
   const isMobile = useIsMobile();
+  const { currentTheme } = useTheme();
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [flashFlow, setFlashFlow] = useState(false);
   const [flashMemory, setFlashMemory] = useState(false);
@@ -814,46 +815,93 @@ export function LessonPage() {
       {/* Bottom Nav Bar (데스크톱 전용) */}
       {navigation.phase !== 'completed' && !isMobile && (
         <div
-          className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center py-4"
           style={{
-            background: 'var(--theme-lesson-memory-bg)',
-            borderTop: '1px solid var(--theme-lesson-panel-border)',
-            boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.1)',
+            position: 'fixed',
+            bottom: '8px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 50,
+            padding: '8px 16px',
+            backgroundColor: currentTheme === 'dark'
+              ? 'rgba(13, 21, 37, 0.85)'
+              : 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: '20px',
+            border: `1px solid ${currentTheme === 'dark'
+              ? 'rgba(26, 37, 64, 0.6)'
+              : 'rgba(229, 229, 229, 0.6)'}`,
+            boxShadow: currentTheme === 'dark'
+              ? '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+              : '0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+            maxWidth: '420px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
           }}
         >
-          <div className="flex items-center gap-4">
-            {/* 진행률 표시 */}
-            <div className="text-sm font-medium text-[var(--theme-dashboard-text)]">
-              <span className="text-[var(--theme-dashboard-title)]">{navigation.currentStepIndex + 1}</span>
-              {' / '}
-              {steps.length}
-            </div>
-
-            {/* 화살표 버튼 */}
-            <StepNavigationArrows
-              onPrev={navigation.goToPrevStep}
-              onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
-              canGoPrev={navigation.canGoPrev}
-              canGoNext={true}
-              nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
-              size="md"
-              variant="inline"
-            />
+          {/* 진행률 표시 */}
+          <div style={{
+            fontSize: '14px',
+            fontWeight: 600,
+            color: currentTheme === 'dark' ? 'rgba(148, 163, 184, 1)' : 'rgba(71, 85, 105, 1)',
+            whiteSpace: 'nowrap'
+          }}>
+            <span style={{ color: currentTheme === 'dark' ? 'rgba(226, 232, 240, 1)' : 'rgba(15, 23, 42, 1)' }}>
+              {navigation.currentStepIndex + 1}
+            </span>
+            {' / '}
+            {steps.length}
           </div>
-        </div>
-      )}
 
-      {/* Bottom Nav Bar (모바일 전용) */}
-      {navigation.phase !== 'completed' && isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-[var(--theme-lesson-memory-bg)] border-t border-[var(--theme-lesson-panel-border)] shadow-lg">
+          {/* 화살표 버튼 */}
           <StepNavigationArrows
             onPrev={navigation.goToPrevStep}
             onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
             canGoPrev={navigation.canGoPrev}
             canGoNext={true}
             nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
-            variant="mobile"
+            size="md"
+            variant="inline"
           />
+        </div>
+      )}
+
+      {/* Bottom Nav Bar (모바일 전용) */}
+      {navigation.phase !== 'completed' && isMobile && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '8px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 50,
+            padding: '6px 12px',
+            backgroundColor: currentTheme === 'dark'
+              ? 'rgba(13, 21, 37, 0.85)'
+              : 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: '20px',
+            border: `1px solid ${currentTheme === 'dark'
+              ? 'rgba(26, 37, 64, 0.6)'
+              : 'rgba(229, 229, 229, 0.6)'}`,
+            boxShadow: currentTheme === 'dark'
+              ? '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+              : '0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+            maxWidth: '320px',
+          }}
+        >
+          <div style={{ transform: 'scale(0.85)' }}>
+            <StepNavigationArrows
+              onPrev={navigation.goToPrevStep}
+              onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
+              canGoPrev={navigation.canGoPrev}
+              canGoNext={true}
+              nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
+              variant="mobile"
+            />
+          </div>
         </div>
       )}
 
