@@ -821,12 +821,12 @@ export function LessonPage() {
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 50,
-            padding: '8px 16px',
+            padding: '6px 12px',
             backgroundColor: currentTheme === 'dark'
-              ? 'rgba(13, 21, 37, 0.85)'
-              : 'rgba(255, 255, 255, 0.85)',
+              ? 'rgba(13, 21, 37, 0.85)'  // dark navy with transparency
+              : 'rgba(255, 255, 255, 0.85)',  // white with transparency
             backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',  // Safari support
             borderRadius: '20px',
             border: `1px solid ${currentTheme === 'dark'
               ? 'rgba(26, 37, 64, 0.6)'
@@ -834,36 +834,20 @@ export function LessonPage() {
             boxShadow: currentTheme === 'dark'
               ? '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)'
               : '0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-            maxWidth: '420px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
+            maxWidth: '320px',
           }}
         >
-          {/* 진행률 표시 */}
-          <div style={{
-            fontSize: '14px',
-            fontWeight: 600,
-            color: currentTheme === 'dark' ? 'rgba(148, 163, 184, 1)' : 'rgba(71, 85, 105, 1)',
-            whiteSpace: 'nowrap'
-          }}>
-            <span style={{ color: currentTheme === 'dark' ? 'rgba(226, 232, 240, 1)' : 'rgba(15, 23, 42, 1)' }}>
-              {navigation.currentStepIndex + 1}
-            </span>
-            {' / '}
-            {steps.length}
+          <div style={{ transform: 'scale(0.85)' }}>
+            <StepNavigationArrows
+              onPrev={navigation.goToPrevStep}
+              onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
+              canGoPrev={navigation.canGoPrev}
+              canGoNext={true}
+              nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
+              size="sm"
+              variant="inline"
+            />
           </div>
-
-          {/* 화살표 버튼 */}
-          <StepNavigationArrows
-            onPrev={navigation.goToPrevStep}
-            onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
-            canGoPrev={navigation.canGoPrev}
-            canGoNext={true}
-            nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
-            size="md"
-            variant="inline"
-          />
         </div>
       )}
 
@@ -899,7 +883,8 @@ export function LessonPage() {
               canGoPrev={navigation.canGoPrev}
               canGoNext={true}
               nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
-              variant="mobile"
+              size="sm"
+              variant="inline"
             />
           </div>
         </div>
