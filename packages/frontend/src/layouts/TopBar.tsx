@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { StreakCard, useStreak } from '@/features/gamification';
 import { LanguageBadge } from '@/components/ui/LanguageBadge';
 import { useIsMobile } from '@/hooks'; // useIsMobile import
-import type { SupportedLanguage } from '@/types'; // SupportedLanguage import
+import type { SupportedLanguage } from '@/types/simulator'; // SupportedLanguage import
 
 // 언어 정보 (LanguageCoursePage.tsx에서 가져옴)
 const getLanguageInfo = (lang: SupportedLanguage | null) => {
