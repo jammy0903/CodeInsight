@@ -33,7 +33,7 @@ try {
 // Lesson Content 초기화 (서버 시작 시 파일 경로 스캔)
 lessonContentLoader.scanFilePaths().catch((err) => {
   logger.error('Failed to load lesson contents:', err);
-  process.exit(1);
+  logger.warn('App will continue without pre-loaded lesson contents');
 });
 
 const app = express();
