@@ -50,7 +50,7 @@ export function RemoteControl({
       </div>
 
       {/* 연결 상태 */}
-      <div className="mb-4 p-3 bg-white/80 rounded-lg">
+      <div className="mb-4 p-3 bg-white bg-opacity-80 rounded-lg">
         {remote.connectedDevice ? (
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />

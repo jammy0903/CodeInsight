@@ -610,7 +610,7 @@ function AnalysisResultModal({
   const iconColor = currentTheme === 'dark' ? '#c084fc' : '#a855f7';
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="rounded-xl max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] overflow-hidden" style={{ backgroundColor: 'var(--theme-dashboard-card-bg)' }}>
         {/* 모달 헤더 */}
         <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3" style={{ borderBottom: `1px solid ${'var(--theme-dashboard-card-border)'}` }}>

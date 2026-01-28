@@ -25,7 +25,7 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
         <div className="w-4 h-3 bg-[var(--theme-dashboard-progress-bg)] rounded" />
       </div>
     ) : (
-      <div className="p-4 rounded-xl bg-white/80 backdrop-blur border animate-pulse">
+      <div className="p-4 rounded-xl bg-white bg-opacity-80 backdrop-blur border animate-pulse">
         <div className="h-16 bg-[var(--theme-dashboard-section-header-bg)] rounded" />
       </div>
     );
@@ -34,7 +34,7 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
   // 스트릭 없음 (로그인 안 됨 또는 아직 시작 안 함)
   if (!streak) {
     return variant === 'compact' ? null : (
-      <div className="p-4 rounded-xl bg-white/80 backdrop-blur border border-[var(--theme-dashboard-card-border)]">
+      <div className="p-4 rounded-xl bg-white bg-opacity-80 backdrop-blur border border-[var(--theme-dashboard-card-border)]">
         <div className="flex items-center gap-3 text-[var(--theme-dashboard-text-muted)]">
           <Flame className="w-6 h-6" />
           <div>
@@ -87,10 +87,10 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
         p-4 rounded-xl backdrop-blur border transition-all duration-300
         ${
           streakAtRisk
-            ? 'bg-amber-50/80 border-amber-200'
+            ? 'bg-amber-50 bg-opacity-80 border-amber-200'
             : isActiveToday
-              ? 'bg-green-50/80 border-green-200'
-              : 'bg-orange-50/80 border-orange-200'
+              ? 'bg-green-50 bg-opacity-80 border-green-200'
+              : 'bg-orange-50 bg-opacity-80 border-orange-200'
         }
       `}
     >

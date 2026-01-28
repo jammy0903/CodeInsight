@@ -103,7 +103,7 @@ export function MobileAIChatModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-white/20 hover:bg-white/30 transition-colors"
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-white bg-opacity-20 hover:bg-white bg-opacity-30 transition-colors"
                 >
                   <X className="w-5 h-5 text-white" />
                 </button>

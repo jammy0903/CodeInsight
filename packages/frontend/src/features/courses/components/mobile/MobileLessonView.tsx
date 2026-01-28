@@ -171,7 +171,7 @@ export function MobileLessonView({
               e.stopPropagation();
               setIsExplanationCollapsed(!isExplanationCollapsed);
             }}
-            className="ml-auto p-0.5 rounded hover:bg-amber-200/50 transition-colors"
+            className="ml-auto p-0.5 rounded hover:bg-amber-200 bg-opacity-50 transition-colors"
           >
             {isExplanationCollapsed ? (
               <ChevronUp className="w-3 h-3 text-amber-700" />

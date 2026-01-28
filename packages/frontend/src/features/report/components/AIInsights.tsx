@@ -76,7 +76,7 @@ export function AIInsights({ analysis, loading, onRequestAnalysis }: AIInsightsP
           className="space-y-4"
         >
           {/* 분석 내용 */}
-          <div className="bg-white/70 rounded-lg p-4 prose prose-sm max-w-none">
+          <div className="bg-white bg-opacity-70 rounded-lg p-4 prose prose-sm max-w-none">
             {analysis.analysis.split('\n').map((paragraph, index) => {
               if (!paragraph.trim()) return null;
 

@@ -136,7 +136,7 @@ export const FunctionFrame = memo(function FunctionFrame({
         <span>{name === 'heap' ? 'Heap' : `${name}()`}</span>
         {isActive && (
           <motion.span
-            className="ml-auto text-xs px-1.5 py-0.5 rounded bg-white/20"
+            className="ml-auto text-xs px-1.5 py-0.5 rounded bg-white bg-opacity-20"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
           >
@@ -145,7 +145,7 @@ export const FunctionFrame = memo(function FunctionFrame({
         )}
         {isExiting && (
           <motion.span
-            className="ml-auto text-xs px-1.5 py-0.5 rounded bg-red-500/20 text-red-300"
+            className="ml-auto text-xs px-1.5 py-0.5 rounded bg-red-500 bg-opacity-20 text-red-300"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >

@@ -37,7 +37,7 @@ export function WeakConcepts({ weakConcepts }: WeakConceptsProps) {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="flex items-center justify-between p-3 bg-white/70 rounded-lg"
+            className="flex items-center justify-between p-3 bg-white bg-opacity-70 rounded-lg"
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">{getConceptEmoji(index)}</span>
