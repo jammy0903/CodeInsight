@@ -309,6 +309,11 @@ export function ProfilePage() {
 
         {/* 학습 프로필 카드 */}
         <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-6 mb-6">
+          {/* ... 기존 학습 프로필 카드 내용 ... */}
+        </div>
+
+        {/* 학습 프로필 카드 */}
+        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-6 mb-6">
           <h3 className="text-lg font-bold text-[var(--theme-dashboard-title)] mb-4">
             학습 프로필
           </h3>
@@ -321,7 +326,7 @@ export function ProfilePage() {
               <Loader2 className="w-6 h-6 text-[var(--theme-dashboard-accent)] animate-spin" />
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-4">
               {PROFILE_QUESTIONS.map((question) => {
                 const value = profile?.[question.key];
                 const isEditing = editingKey === question.key;
@@ -420,30 +425,17 @@ export function ProfilePage() {
           )}
         </div>
 
-        {/* 계정 관리 카드 */}
-        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-6">
-          <h3 className="text-lg font-bold text-[var(--theme-dashboard-title)] mb-4">
-            계정 관리
-          </h3>
-
-          <motion.button
+        {/* 계정 탈퇴 링크 (작게, 맨 밑으로 이동, 가운데 정렬) */}
+        <div className="text-center mt-8 mb-6"> {/* 상하 마진 추가 */}
+          <button
             onClick={handleOpenDeleteDialog}
-            className="w-full flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 rounded-xl border-2 border-red-200 transition-colors text-left"
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            className="text-sm text-red-500 hover:underline transition-colors"
           >
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
-              <div>
-                <p className="text-sm font-semibold text-red-700">계정 탈퇴</p>
-                <p className="text-xs text-red-600 mt-1">
-                  계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다
-                </p>
-              </div>
-            </div>
-            <LogOut className="w-5 h-5 text-red-600" />
-          </motion.button>
+            계정 탈퇴
+          </button>
         </div>
+
+
 
         {/* 계정 탈퇴 확인 다이얼로그 */}
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
