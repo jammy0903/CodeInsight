@@ -6,6 +6,7 @@ import { Toaster } from 'sonner'
 import { router } from './router'
 import { queryClient } from './config/queryClient'
 import './index.css'
+import './i18n' // i18n 설정 파일 임포트
 import { useStore } from './stores/store'
 import { auth } from './services/firebase'
 
