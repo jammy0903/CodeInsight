@@ -12,8 +12,8 @@ import { LessonPage } from '../../pages';
 // 테스트용 레슨 경로 (실제 DB 데이터 형식에 맞춤)
 const TEST_LESSON = {
   lang: 'c',
-  chapterId: '1',
-  lessonId: 'c-1-1', // DB에 저장된 실제 lessonId 형식
+  chapterId: 'c-1',  // ✅ 실제 DB의 챕터 ID: "c-1"
+  lessonId: 'c-1-1', // ✅ 실제 DB의 레슨 ID: "c-1-1"
 };
 
 test.describe('LessonPage - 학습 화면 (Public)', () => {
@@ -25,7 +25,7 @@ test.describe('LessonPage - 학습 화면 (Public)', () => {
   });
 
   test('페이지 로드 및 URL 확인', async ({ page }) => {
-    await expect(page).toHaveURL(/\/courses\/c\/\d+\/[\w-]+$/);
+    await expect(page).toHaveURL(/\/courses\/c\/[\w-]+\/[\w-]+$/);
   });
 
   test('코드 뷰어 표시', async () => {
