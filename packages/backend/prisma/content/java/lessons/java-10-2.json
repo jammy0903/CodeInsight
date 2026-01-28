@@ -1,43 +1,75 @@
 {
   "lessonId": "java-10-2",
-  "title": "Synchronization",
-  "concept": "Core concept for Synchronization",
+  "title": "동기화: 하나씩 차례대로!",
+  "concept": "공유된 자원(화장실 한 칸)에 여러 쓰레드가 동시에 들어가면 사고가 납니다. 이때 필요한 것이 '자물쇠(synchronized)'입니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Synchronization\n    }\n}",
+    "code": "class BankAccount {\n    private int balance = 1000;\n\n    public synchronized void withdraw(int amount) {\n        balance -= amount;\n        System.out.println(\"출금 완료! 잔액: \" + balance);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        BankAccount account = new BankAccount();\n        // 두 일꾼이 동시에 돈을 뽑으려 한다고 가정합시다.\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
+        "line": 4,
+        "title": "synchronized 키워드",
+        "explanation": "메서드 앞에 `synchronized`가 붙으면, 이 메서드는 이제 '열쇠가 있는 사람만 들어올 수 있는 방'이 됩니다.\n\n**모니터 락(Monitor Lock):**\nJava의 모든 객체는 보이지 않는 '하나의 열쇠'를 가지고 있습니다. 한 쓰레드가 이 메서드에 들어가는 순간, उस 객체의 열쇠를 주머니에 넣고 문을 잠가버립니다.",
         "highlight": [
-          3
+          4,
+          5,
+          6,
+          7
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "BankAccount Object",
+              "hasLock": true,
+              "lockedBy": "Thread-A"
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "데이터 보호",
+        "explanation": "열쇠를 가진 쓰레드만 `balance -= amount` 연산을 수행할 수 있습니다.\n뒤늦게 온 쓰레드는 앞사람이 일을 마치고 열쇠를 반납할 때까지 문밖에서 줄을 서서 기다려야 합니다.\n\n**왜 이렇게 하나요?**\n만약 두 명이 동시에 돈을 빼면, 잔액 계산이 꼬여서 1000원에서 500원씩 두 번 뺐는데 잔액이 500원이 남는 대참사가 일어날 수 있기 때문입니다.",
+        "keyInsight": "동기화 = 데이터 무결성 보호",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "threadPool": [
+            {
+              "name": "Thread-A",
+              "action": "Working in method",
+              "hasKey": true
+            },
+            {
+              "name": "Thread-B",
+              "action": "WAITING (Blocked)",
+              "hasKey": false
+            }
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Synchronization?",
+    "question": "Java 객체가 가질 수 있는 락(Lock)의 개수는 몇 개인가요?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "1개",
+      "2개",
+      "쓰레드 개수만큼",
+      "제한 없음"
     ],
     "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "explanation": "Java의 모든 객체는 단 하나의 '모니터 락'을 가집니다. 그래서 한 번에 오직 하나의 쓰레드만 synchronized 영역에 진입할 수 있습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "synchronized를 많이 쓸수록 프로그램이 빨라진다.",
+      "correct": "아니요! 동기화는 쓰레드를 줄 세우기 때문에 오히려 성능이 떨어집니다.",
+      "why": "기다리는 시간(Waiting Time)이 발생하기 때문입니다. 꼭 필요한 공유 자원에만 최소한으로 써야 합니다."
     }
   ],
-  "keyTakeaway": "Understanding Synchronization is crucial for advanced Java."
+  "keyTakeaway": "synchronized는 '데이터가 꼬이지 않게 보호하는 방어막'입니다. 열쇠는 객체당 하나뿐임을 기억하세요!"
 }

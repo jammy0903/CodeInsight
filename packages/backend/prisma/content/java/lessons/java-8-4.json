@@ -1,43 +1,84 @@
 {
   "lessonId": "java-8-4",
-  "title": "Collections Utility",
-  "concept": "Core concept for Collections Utility",
+  "title": "LinkedList: 데이터의 기차놀이",
+  "concept": "LinkedList는 데이터들이 서로의 손을 잡고 연결된 '기차'와 같은 구조입니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Collections Utility\n    }\n}",
+    "code": "import java.util.LinkedList;\n\npublic class Main {\n    public static void main(String[] args) {\n        LinkedList<String> train = new LinkedList<>();\n        \n        train.add(\"기관차\");\n        train.add(\"객차1\");\n        train.add(\"객차2\");\n        \n        train.add(1, \"새 객차\"); // 중간에 끼워넣기!\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
+        "line": 7,
+        "title": "노드(Node) 연결",
+        "explanation": "ArrayList가 긴 의자라면, LinkedList는 각자 의자를 들고 옆 사람의 손을 잡고 있는 것과 같습니다.\n각 데이터는 'Node'라는 상자에 담기며, 앞뒤 노드의 주소를 기억합니다.",
         "highlight": [
-          3
+          7,
+          8,
+          9
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "id": "Node1",
+              "data": "기관차",
+              "next": "Node2"
+            },
+            {
+              "id": "Node2",
+              "data": "객차1",
+              "next": "Node3"
+            }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "중간 삽입의 마법",
+        "explanation": "중간에 데이터를 넣을 때, ArrayList는 뒤에 있는 모든 사람을 한 칸씩 밀어야 해서 힘듭니다.\n하지만 LinkedList는 연결된 **손만 바꿔 잡으면** 끝납니다!\n\n**비유:** 기차 중간에 새 객차를 넣을 때, 선로를 끊고 새 객차를 연결하는 것과 같습니다.",
+        "keyInsight": "중간 삽입/삭제가 매우 빠름 (O(1) - 노드 위치를 알 때)",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "id": "Node1",
+              "data": "기관차",
+              "next": "NewNode"
+            },
+            {
+              "id": "NewNode",
+              "data": "새 객차",
+              "next": "Node2",
+              "new": true
+            },
+            {
+              "id": "Node2",
+              "data": "객차1",
+              "next": "Node3"
+            }
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Collections Utility?",
+    "question": "데이터의 검색(Search)이 빈번하게 일어날 때 더 유리한 자료구조는?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "ArrayList",
+      "LinkedList",
+      "둘 다 똑같다",
+      "순서가 있다면 LinkedList"
     ],
     "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "explanation": "ArrayList는 인덱스로 즉시 접근이 가능하지만, LinkedList는 처음부터 손을 하나씩 타고 가야 해서 찾기가 훨씬 느립니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "LinkedList는 항상 ArrayList보다 좋다.",
+      "correct": "아니요! 데이터를 찾는 속도는 ArrayList가 압도적으로 빠릅니다.",
+      "why": "LinkedList는 기차 끝 칸을 가려면 앞 칸을 다 거쳐가야 하기 때문입니다 (Random Access 불가능)."
     }
   ],
-  "keyTakeaway": "Understanding Collections Utility is crucial for advanced Java."
+  "keyTakeaway": "중간에 넣고 빼는 게 많다면 LinkedList, 검색이 많다면 ArrayList를 선택하세요!"
 }

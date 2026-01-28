@@ -1,6 +1,6 @@
 {
   "lessonId": "java-7-2",
-  "title": "Type Erasure",
+  "title": "타입 소거 (Type Erasure)의 비밀",
   "concept": "Core concept for Type Erasure",
   "content": {
     "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<String> list = new ArrayList<>();\n        list.add(\"Hello\");\n        \n        // 1. Compile-time Check\n        // list.add(123); // Error\n        \n        // 2. Runtime Reality (Type Erasure)\n        // Inside JVM, it is just ArrayList (raw type)\n        String s = list.get(0); \n        // Compiler inserts: (String) list.get(0)\n        \n        System.out.println(s);\n        \n        // Proof: getClass() is same for all generic types\n        ArrayList<Integer> intList = new ArrayList<>();\n        boolean sameClass = list.getClass() == intList.getClass();\n        System.out.println(\"Same Class? \" + sameClass);\n    }\n}",

@@ -1,6 +1,6 @@
 {
   "lessonId": "java-6-4",
-  "title": "Custom Exceptions",
+  "title": "사용자 정의 예외 만들기",
   "concept": "Core concept for Custom Exceptions",
   "content": {
     "code": "// 1. Define Custom Exception\nclass BankException extends Exception {\n    public BankException(String message) {\n        super(message);\n    }\n}\n\nclass InsufficientFundsException extends BankException {\n    public InsufficientFundsException(double amt) {\n        super(\"Need \" + amt + \" more\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        try {\n            withdraw(1000);\n        } catch (InsufficientFundsException e) {\n            System.out.println(\"Error: \" + e.getMessage());\n        } catch (BankException e) {\n            System.out.println(\"Bank Error\");\n        }\n    }\n\n    static void withdraw(double amount) throws BankException {\n        double balance = 500;\n        if (amount > balance) {\n            // 2. Throw Custom Exception\n            throw new InsufficientFundsException(amount - balance);\n        }\n    }\n}",

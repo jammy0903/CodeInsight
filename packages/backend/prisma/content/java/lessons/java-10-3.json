@@ -1,43 +1,72 @@
 {
   "lessonId": "java-10-3",
-  "title": "Race Conditions",
-  "concept": "Core concept for Race Conditions",
+  "title": "경쟁 상태: 누가 먼저 도착할까?",
+  "concept": "경쟁 상태(Race Condition)는 두 명 이상의 일꾼이 같은 데이터를 동시에 고치려 할 때 결과가 엉망이 되는 현상입니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Race Conditions\n    }\n}",
+    "code": "public class Counter {\n    private int count = 0;\n\n    public void increment() {\n        count = count + 1;\n    }\n    \n    public int getCount() { return count; }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
+        "line": 5,
+        "title": "count + 1의 정체",
+        "explanation": "겉보기엔 한 줄이지만, CPU는 이 과정을 세 단계로 나눠서 처리합니다.\n1. 현재의 `count` 값을 읽어온다.\n2. 그 값에 1을 더한다.\n3. 더한 결과를 다시 `count`에 저장한다.",
         "highlight": [
-          3
+          5
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "cpu": [
+            {
+              "step": "1. READ",
+              "value": "0"
+            },
+            {
+              "step": "2. ADD",
+              "value": "1"
+            },
+            {
+              "step": "3. WRITE",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "사고 발생 시나리오",
+        "explanation": "**일꾼 A**가 1번(읽기)을 하고 있는 도중, 갑자기 **일꾼 B**가 끼어들어 똑같이 1번(읽기)을 했다고 생각해봅시다.\n\n둘 다 '지금은 0이구나!'라고 생각하고 똑같이 1을 더해서 저장합니다.\n결과는 원래 2가 되어야 하지만, 실제로는 1이 되어버립니다. 데이터가 증발한 것이죠!",
+        "keyInsight": "동시에 같은 데이터에 접근하면 업데이트가 누락됨",
+        "visualizationType": "memory",
+        "memoryState": {
+          "threadA": {
+            "read": "0",
+            "willWrite": "1"
+          },
+          "threadB": {
+            "read": "0",
+            "willWrite": "1"
+          },
+          "finalCount": "1 (Error! Expect 2)"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Race Conditions?",
+    "question": "다음 중 경쟁 상태를 해결하는 방법이 아닌 것은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "synchronized 키워드 사용",
+      "AtomicInteger 클래스 사용",
+      "지역 변수(Local Variable)만 사용",
+      "static 변수 사용"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 3,
+    "explanation": "static 변수는 오히려 모든 인스턴스가 공유하는 자원이기 때문에, 적절한 보호 조치 없이는 경쟁 상태가 더 잘 발생합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "count++는 한 번의 연산이라 안전하다.",
+      "correct": "아니요! count++도 내부적으로는 읽기-수정-쓰기의 세 단계로 나뉩니다.",
+      "why": "이를 '원자적(Atomic)이지 않다'고 표현합니다. 중간에 다른 쓰레드가 개입할 틈이 충분합니다."
     }
   ],
-  "keyTakeaway": "Understanding Race Conditions is crucial for advanced Java."
+  "keyTakeaway": "공유 데이터에 여러 쓰레드가 붙을 때는 반드시 '원자성'을 보장하는 조치가 필요합니다."
 }
