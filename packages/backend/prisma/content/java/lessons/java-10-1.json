@@ -1,43 +1,99 @@
 {
   "lessonId": "java-10-1",
-  "title": "Thread Creation",
-  "concept": "Core concept for Thread Creation",
+  "title": "쓰레드: 우리 공장의 새로운 일꾼",
+  "concept": "쓰레드(Thread)는 하나의 프로그램(공장) 안에서 동시에 일을 하는 '일꾼'과 같습니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Thread Creation\n    }\n}",
+    "code": "class MyWorker extends Thread {\n    public void run() {\n        System.out.println(\"새로운 일꾼이 일을 시작합니다!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        MyWorker worker = new MyWorker();\n        worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.\n        \n        System.out.println(\"메인 일꾼도 자기 일을 합니다.\");\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
+        "line": 1,
+        "title": "Thread 클래스 상속",
+        "explanation": "Java에서 새로운 일꾼(쓰레드)을 만드는 가장 쉬운 방법은 `Thread` 클래스를 상속받는 것입니다.\n\n**왜 상속받나요?**\n`Thread`라는 설계도에는 '일을 하는 능력'이 이미 들어있습니다. 우리는 그 안에 구체적으로 '무슨 일(`run`)'을 할지만 적어주면 됩니다.",
         "highlight": [
-          3
+          1,
+          2,
+          3,
+          4,
+          5
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "name": "MyWorker Class",
+              "type": "Metaspace"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "일꾼 객체 생성",
+        "explanation": "이제 메모리(`Heap`)에 실제 일꾼 객체를 만듭니다.\n하지만 아직 일을 시작한 건 아닙니다. 일꾼이 공장에 출근은 했지만, 아직 대기 중인 상태라고 생각하세요.",
+        "keyInsight": "new Thread() = 일꾼 준비 완료 (Ready)",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "worker",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "MyWorker (Thread Object)",
+              "state": "NEW"
+            }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "작업 시작 (start)",
+        "explanation": "**매우 중요:** `run()`을 직접 부르는 게 아니라 `start()`를 불러야 합니다!\n`start()`는 새로운 실행 티켓(Stack)을 끊어주고, JVM에게 '이 일꾼 이제 일 시켜라'라고 명령합니다.\n\n**비유:** 요리사에게 '요리해!'라고 소리치는 게 아니라, 주방(CPU)에 요리사 한 명을 더 투입하는 것과 같습니다.",
+        "keyInsight": "start()는 새로운 스택 프레임을 생성함",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main thread stack",
+              "content": "main()"
+            },
+            {
+              "name": "MyWorker stack",
+              "content": "run()",
+              "new": true
+            }
+          ],
+          "note": "화면(공장)에 두 개의 일이 동시에 돌아가기 시작합니다!"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Thread Creation?",
+    "question": "쓰레드를 실행하기 위해 반드시 호출해야 하는 메서드는?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "run()",
+      "start()",
+      "execute()",
+      "begin()"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "run()을 직접 호출하면 그냥 현재 쓰레드에서 메서드를 실행할 뿐입니다. 새로운 실행 흐름을 만들려면 반드시 start()를 써야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "run()을 호출하면 멀티쓰레드로 동작한다.",
+      "correct": "아니요! run()은 그냥 일반 메서드 호출입니다. start()만이 새로운 쓰레드를 탄생시킵니다.",
+      "why": "start() 메서드 내부에서 네이티브 코드를 호출해 OS 수준의 쓰레드를 생성하기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Thread Creation is crucial for advanced Java."
+  "keyTakeaway": "Thread는 독립적인 Stack을 갖는 실행 단위입니다. start()로 엔진을 켜주세요!"
 }

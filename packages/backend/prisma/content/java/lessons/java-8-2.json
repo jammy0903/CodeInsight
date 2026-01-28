@@ -1,43 +1,60 @@
 {
   "lessonId": "java-8-2",
-  "title": "HashMap Internals",
-  "concept": "Core concept for HashMap Internals",
+  "title": "HashMap: 해시 함수의 마법",
+  "concept": "HashMap은 '키(Key)'를 넣으면 '값(Value)'을 즉시 찾아주는 마법의 사전과 같습니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for HashMap Internals\n    }\n}",
+    "code": "import java.util.HashMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        HashMap<String, Integer> scores = new HashMap<>();\n        \n        scores.put(\"Alice\", 90);\n        scores.put(\"Bob\", 85);\n        \n        System.out.println(scores.get(\"Alice\")); // 90\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
+        "line": 7,
+        "title": "데이터 저장 (put)",
+        "explanation": "Alice라는 이름을 구멍(Bucket)에 넣으려 합니다.\nHashMap은 내부적으로 '해시 함수'를 사용하여 \"Alice\"를 숫자 주소로 변환합니다. \n\n**비유:** 'Alice'라는 글자를 보고 '102번 서랍'이라는 숫자를 계산해내는 요리사와 같습니다.",
         "highlight": [
-          3
+          7
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "address": "Bucket[102]",
+              "key": "Alice",
+              "value": 90
+            }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "데이터 찾기 (get)",
+        "explanation": "이름으로 점수를 찾을 때도 다시 해시 함수를 씁니다.\n\"Alice\"를 요리사에게 보여주면 바로 \"102번 서랍에 있어요!\"라고 알려줍니다.\n\n**장점:** 데이터가 100만 개가 있어도, 서랍 번호만 계산하면 바로 찾을 수 있어 매우 빠릅니다.",
+        "keyInsight": "Key -> Hash Function -> Index",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "시간 복잡도 O(1): 검색 속도가 데이터 양과 상관없이 일정함"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of HashMap Internals?",
+    "question": "HashMap에서 같은 Key로 데이터를 다시 put()하면 어떻게 될까요?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "에러가 발생한다",
+      "기존 데이터가 새로운 데이터로 덮어씌워진다",
+      "두 데이터가 모두 리스트로 저장된다",
+      "무시된다"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "Map에서 Key는 유일해야 합니다. 동일한 Key로 저장하면 기존에 있던 Value가 새로운 값으로 교체됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "HashMap은 데이터를 넣은 순서대로 저장한다.",
+      "correct": "아니요! HashMap은 순서를 보장하지 않습니다.",
+      "why": "해시 함수 결과값에 따라 임의의 위치(Bucket)에 분산 저장되기 때문입니다. 순서가 중요하다면 LinkedHashMap을 써야 합니다."
     }
   ],
-  "keyTakeaway": "Understanding HashMap Internals is crucial for advanced Java."
+  "keyTakeaway": "Key-Value 쌍으로 데이터를 광속으로 찾고 싶을 땐 HashMap이 정답입니다!"
 }

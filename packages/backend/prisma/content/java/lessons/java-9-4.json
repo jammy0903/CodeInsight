@@ -1,43 +1,60 @@
 {
   "lessonId": "java-9-4",
-  "title": "Memory Leaks",
-  "concept": "Core concept for Memory Leaks",
+  "title": "메모리 누수: 도망간 객체를 잡아라",
+  "concept": "메모리 누수(Memory Leak)는 더 이상 안 쓸 건데 실수로 화살표(참조)를 남겨두어, GC가 청소를 못 하게 방해하는 현상입니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Memory Leaks\n    }\n}",
+    "code": "import java.util.*;\n\npublic class MemoryLeak {\n    static List<Object> list = new ArrayList<>(); // static 변수는 위험해요!\n\n    public static void main(String[] args) {\n        while(true) {\n            list.add(new byte[1024 * 1024]); // 1MB씩 무한 추가\n        }\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
+        "line": 4,
+        "title": "static의 함정",
+        "explanation": "`static` 변수는 프로그램이 끝날 때까지 메모리에서 사라지지 않습니다.\n여기에 계속 데이터를 넣고 비워주지 않으면, GC는 \"누군가 이 리스트를 계속 보고 있네?\"라고 오해해서 내용물을 절대 안 치웁니다.",
         "highlight": [
-          3
+          4
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "name": "Static List",
+              "refCount": "Infinite",
+              "size": "Growing..."
+            }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "OutOfMemoryError (OOM)",
+        "explanation": "결국 Heap이 꽉 차고 더 이상 청소로도 공간을 만들 수 없게 되면, 자바 가상 머신은 백기를 들고 프로그램을 종료시킵니다.\n이것이 바로 `OutOfMemoryError`입니다.",
+        "keyInsight": "누수 = 사용하지 않는데 참조가 끊기지 않음",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "error": "java.lang.OutOfMemoryError: Java heap space"
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Memory Leaks?",
+    "question": "Java에서 메모리 누수가 발생하는 가장 흔한 원인은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "new 키워드를 너무 많이 씀",
+      "사용하지 않는 객체에 대한 참조를 유지함",
+      "GC 알고리즘이 부실해서",
+      "램(RAM) 용량이 작아서"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "GC는 Unreachable(참조 없음) 객체만 치울 수 있습니다. 안 쓰는 객체를 컬렉션 등에 넣어두면 GC가 개입할 수 없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "GC가 있으니까 메모리 해제는 신경 안 써도 된다.",
+      "correct": "아닙니다! 안 쓰는 객체는 확실히 화살표를 끊어주거나(null) 스코프 밖으로 보내야 합니다.",
+      "why": "의도치 않은 참조 유지가 누수의 주범입니다."
     }
   ],
-  "keyTakeaway": "Understanding Memory Leaks is crucial for advanced Java."
+  "keyTakeaway": "참조를 최소한으로 유지하고, 특히 static 변수 사용에 주의하세요!"
 }

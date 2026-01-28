@@ -1,6 +1,6 @@
 {
   "lessonId": "java-7-4",
-  "title": "Wildcards & Bounds",
+  "title": "와일드카드와 타입 제한",
   "concept": "Core concept for Wildcards & Bounds",
   "content": {
     "code": "import java.util.List;\nimport java.util.ArrayList;\n\npublic class Main {\n    // Upper Bounded Wildcard: accept Number or its subclasses (Integer, Double...)\n    public static double sum(List<? extends Number> list) {\n        double sum = 0;\n        for (Number n : list) {\n            sum += n.doubleValue();\n        }\n        // list.add(10); // Error! Read-only (mostly)\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        List<Integer> ints = new ArrayList<>();\n        ints.add(1);\n        ints.add(2);\n        \n        List<Double> doubles = new ArrayList<>();\n        doubles.add(3.5);\n        \n        // Both work thanks to wildcard\n        System.out.println(\"Sum Ints: \" + sum(ints));\n        System.out.println(\"Sum Doubles: \" + sum(doubles));\n    }\n}",

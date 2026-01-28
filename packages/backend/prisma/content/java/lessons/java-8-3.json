@@ -1,43 +1,65 @@
 {
   "lessonId": "java-8-3",
-  "title": "Set & Queue",
-  "concept": "Core concept for Set & Queue",
+  "title": "HashSet: 중복은 절대 금지!",
+  "concept": "HashSet은 중복을 허용하지 않는 주머니와 같습니다. 이미 있는 물건을 넣으려 하면 거부합니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Set & Queue\n    }\n}",
+    "code": "import java.util.HashSet;\n\npublic class Main {\n    public static void main(String[] args) {\n        HashSet<String> set = new HashSet<>();\n        \n        set.add(\"Java\");\n        set.add(\"Java\"); // 중복! \n        \n        System.out.println(\"크기: \" + set.size()); // 1\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
+        "line": 7,
+        "title": "첫 번째 데이터 추가",
+        "explanation": "\"Java\"를 주머니에 넣습니다. 처음 들어오는 데이터이므로 안전하게 저장됩니다.",
         "highlight": [
-          3
+          7
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "class": "HashSet",
+              "elements": "[\"Java\"]"
+            }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "중복 데이터 추가 시도",
+        "explanation": "이미 \"Java\"가 들어있는데 또 넣으려고 하면, HashSet은 내부적으로 `equals()`와 `hashCode()`를 체크하여 동일한 객체임을 인지하고 무시합니다.\n\n**비유:** 똑같은 회원카드를 두 번 발급해주지 않는 시스템과 같습니다.",
+        "keyInsight": "Set은 유일성(Uniqueness)을 보장함",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "class": "HashSet",
+              "elements": "[\"Java\"]",
+              "note": "Size remains 1"
+            }
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Set & Queue?",
+    "question": "HashSet이 중복을 확인하기 위해 사용하는 메서드 쌍은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "toString() & equals()",
+      "hashCode() & equals()",
+      "clone() & hashCode()",
+      "compareTo() & equals()"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 1,
+    "explanation": "먼저 hashCode()로 같은 상자인지 확인하고, 같다면 equals()로 알맹이까지 같은지 확인하여 최종적으로 중복을 가려냅니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "List처럼 인덱스(get(0))로 꺼낼 수 있다.",
+      "correct": "아니요! Set은 순서가 없어서 번호표(인덱스)가 없습니다. Iterator나 향상된 for문을 써서 꺼내야 합니다.",
+      "why": "데이터가 어디에 들어있는지 순서가 정해져 있지 않기 때문입니다."
     }
   ],
-  "keyTakeaway": "Understanding Set & Queue is crucial for advanced Java."
+  "keyTakeaway": "고유한 항목들을 관리하거나 중복을 제거하고 싶을 땐 Set을 사용하세요!"
 }

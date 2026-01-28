@@ -1,43 +1,76 @@
 {
   "lessonId": "java-10-4",
-  "title": "Executors",
-  "concept": "Core concept for Executors",
+  "title": "쓰레드 풀: 일꾼 인력 사무소",
+  "concept": "쓰레드를 매번 새로 만드는 건 비용이 많이 듭니다. 미리 일꾼들을 대기시켜두고 일감만 던져주는 '인력 사무소'가 필요합니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // TODO: Add code for Executors\n    }\n}",
+    "code": "import java.util.concurrent.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // 1. 일꾼 3명이 대기하는 사무소 건설\n        ExecutorService office = Executors.newFixedThreadPool(3);\n\n        // 2. 사무소에 일감을 던짐\n        office.execute(() -> System.out.println(\"A 작업 처리 중...\"));\n        office.execute(() -> System.out.println(\"B 작업 처리 중...\"));\n\n        // 3. 사무소 문을 닫음\n        office.shutdown();\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
+        "line": 6,
+        "title": "사무소(ThreadPool) 생성",
+        "explanation": "`Executors.newFixedThreadPool(3)`은 미리 3명의 정규직 일꾼을 고용해둡니다.\n쓰레드를 새로 만드는 것은 메모리나 CPU 입장에서 꽤나 무거운 작업인데, 이렇게 미리 만들어두면 훨씬 빠릅니다.",
         "highlight": [
-          3
+          6
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "name": "ThreadPool",
+              "size": 3,
+              "state": "Waiting for tasks"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "일감(Task) 제출",
+        "explanation": "`execute()` 메서드로 해야 할 일을 사무소에 전달합니다.\n비어있는 일꾼 중 한 명이 냉큼 달려와 작업을 처리하고, 일이 끝나면 다시 대기 장소로 복귀합니다.\n\n**장점:** 일꾼 열 명을 새로 뽑았다 해고했다 할 필요 없이, 세 명의 정규직으로 수백 개의 일을 처리할 수 있습니다.",
+        "keyInsight": "재사용성(Reusability) = 효율적인 자원 관리",
+        "highlight": [
+          9,
+          10
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "worker1": "Executing task A",
+          "worker2": "Executing task B",
+          "worker3": "IDLE"
+        }
+      },
+      {
+        "line": 13,
+        "title": "사무소 폐쇄 (shutdown)",
+        "explanation": "작업이 다 끝났다면 사무소 문을 닫아야 합니다.\n이걸 잊으면 정규직 일꾼들이 퇴근도 못 하고 계속 대기하면서 메모리를 차지하게 됩니다.",
+        "highlight": [
+          13
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "threadPool": "SHUTTING_DOWN",
+          "note": "모든 작업이 끝나면 쓰레드들도 안전하게 소멸합니다."
         }
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Executors?",
+    "question": "쓰레드 풀을 사용하는 주된 이유가 아닌 것은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "쓰레드 생성 및 삭제 비용 절감",
+      "갑작스러운 작업 폭주 대응",
+      "전체 프로그램의 종료 속도 향상",
+      "자원(메모리 및 CPU)의 효율적 사용"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "오히려 쓰레드 풀을 제대로 닫지 않으면 프로세스가 종료되지 않고 계속 살아있을 수 있습니다. 종료 속도와는 직접적인 상관이 없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "쓰레드가 많을수록 무조건 빠르다.",
+      "correct": "아니요! CPU의 개수보다 쓰레드가 너무 많으면 일은 안 하고 '누가 먼저 할지' 눈치 싸움(Context Switch) 하느라 더 느려집니다.",
+      "why": "쓰레드 풀은 시스템 사양에 맞는 적절한 일꾼 숫자를 조절하기 위해 사용합니다."
     }
   ],
-  "keyTakeaway": "Understanding Executors is crucial for advanced Java."
+  "keyTakeaway": "ExecutorService는 현대 Java 동시성 프로그래밍의 핵심입니다. 직접 쓰레드를 생성하기보다 풀을 사용하세요!"
 }
