@@ -391,7 +391,7 @@ export function ProfilePage() {
                                     p-3 rounded-lg border-2 text-left transition-all flex items-center gap-2
                                     ${value === option.value
                                       ? 'border-orange-400 bg-white shadow-sm'
-                                      : 'border-transparent bg-white/50 hover:bg-white hover:border-orange-200'
+                                      : 'border-transparent bg-white bg-opacity-50 hover:bg-white hover:border-orange-200'
                                     }
                                     ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}
                                   `}

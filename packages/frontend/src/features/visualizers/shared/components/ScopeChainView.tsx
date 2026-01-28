@@ -30,7 +30,7 @@ export function ScopeChainView({ state, highlightLookup = false }: ScopeChainVie
               className={`
                 p-4 rounded-lg border-2 transition-all
                 ${isActive
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 bg-opacity-20'
                   : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800'
                 }
                 ${isInLookupPath && highlightLookup
@@ -63,8 +63,8 @@ export function ScopeChainView({ state, highlightLookup = false }: ScopeChainVie
                         className={`
                           flex items-center gap-2 text-sm p-2 rounded
                           ${isTarget
-                            ? 'bg-yellow-100 dark:bg-yellow-900/30 font-semibold'
-                            : 'bg-gray-50 dark:bg-gray-900/50'
+                            ? 'bg-yellow-100 dark:bg-yellow-900 bg-opacity-30 font-semibold'
+                            : 'bg-gray-50 dark:bg-gray-900 bg-opacity-50'
                           }
                         `}
                       >
@@ -89,7 +89,7 @@ export function ScopeChainView({ state, highlightLookup = false }: ScopeChainVie
       </div>
 
       {targetVariable && highlightLookup && (
-        <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-300 dark:border-yellow-700">
+        <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900 bg-opacity-20 rounded-lg border border-yellow-300 dark:border-yellow-700">
           <div className="text-sm">
             <span className="font-semibold">변수 탐색:</span>{' '}
             <span className="font-mono text-[var(--theme-dashboard-accent)]">{targetVariable}</span>

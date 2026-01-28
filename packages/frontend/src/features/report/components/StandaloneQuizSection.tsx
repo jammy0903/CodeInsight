@@ -68,7 +68,7 @@ export function StandaloneQuizSection() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
               selectedLanguage === lang
                 ? 'bg-white shadow-md'
-                : 'bg-white/50 hover:bg-white/70'
+                : 'bg-white bg-opacity-50 hover:bg-white bg-opacity-70'
             }`}
             style={{
               borderWidth: '2px',

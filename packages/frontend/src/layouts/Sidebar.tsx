@@ -75,7 +75,7 @@ export function Sidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/20 z-40"
+            className="fixed inset-0 bg-black bg-opacity-20 z-40"
             onClick={toggleSidebar}
           />
 

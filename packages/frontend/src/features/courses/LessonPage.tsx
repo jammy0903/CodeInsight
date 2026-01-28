@@ -222,12 +222,12 @@ function QuizCardAdapter({
             disabled={submitted}
             className={`w-full p-3 text-left rounded-lg border-2 transition-colors whitespace-pre-wrap ${submitted
               ? idx === correctIndex
-                ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                ? 'border-green-500 bg-green-50 dark:bg-green-900 bg-opacity-20'
                 : idx === selected
-                  ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                  ? 'border-red-500 bg-red-50 dark:bg-red-900 bg-opacity-20'
                   : 'border-[var(--theme-dashboard-card-border)]'
               : selected === idx
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 bg-opacity-20'
                 : 'border-[var(--theme-dashboard-card-border)] hover:border-[var(--theme-dashboard-progress-bg)]'
               }`}
           >
@@ -637,7 +637,7 @@ export function LessonPage() {
                   {(code.split('\n').length > 6) && (
                     <button
                       onClick={() => setIsExplanationCollapsed(!isExplanationCollapsed)}
-                      className="p-1 rounded-md bg-transparent hover:bg-amber-200/50 transition-colors"
+                      className="p-1 rounded-md bg-transparent hover:bg-amber-200 bg-opacity-50 transition-colors"
                       title={isExplanationCollapsed ? '설명 펼치기' : '설명 접기'}
                     >
                       {isExplanationCollapsed ? (

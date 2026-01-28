@@ -10,9 +10,9 @@ interface StatCardProps {
 
 const variantStyles = {
   primary: 'bg-primary/10 border-primary/20 text-primary',
-  success: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500',
-  warning: 'bg-amber-500/10 border-amber-500/20 text-amber-500',
-  info: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-500',
+  success: 'bg-emerald-500 bg-opacity-10 border-emerald-500 border-opacity-20 text-emerald-500',
+  warning: 'bg-amber-500 bg-opacity-10 border-amber-500 border-opacity-20 text-amber-500',
+  info: 'bg-cyan-500 bg-opacity-10 border-cyan-500 border-opacity-20 text-cyan-500',
 };
 
 export function StatCard({ title, value, variant, icon, percent }: StatCardProps) {

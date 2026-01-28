@@ -57,12 +57,12 @@ const MUTABLE_TYPES = new Set(['list', 'dict', 'set', 'instance']);
 // 색상
 const COLORS = {
   mutable: {
-    bg: 'bg-green-50 dark:bg-green-900/20',
+    bg: 'bg-green-50 dark:bg-green-900 bg-opacity-20',
     border: 'border-green-400',
     badge: 'bg-green-100 text-green-700',
   },
   immutable: {
-    bg: 'bg-purple-50 dark:bg-purple-900/20',
+    bg: 'bg-purple-50 dark:bg-purple-900 bg-opacity-20',
     border: 'border-purple-400',
     badge: 'bg-purple-100 text-purple-700',
   },
@@ -73,7 +73,7 @@ const COLORS = {
     shadow: 'shadow-amber-200',
   },
   highlight: {
-    bg: 'bg-blue-100 dark:bg-blue-900/30',
+    bg: 'bg-blue-100 dark:bg-blue-900 bg-opacity-30',
     border: 'border-blue-500',
     ring: 'ring-2 ring-blue-400',
   },
@@ -137,7 +137,7 @@ const ObjectCard = memo(function ObjectCard({ object, names, isNew, isUpdated }:
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-lg z-10"
+          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 rounded-lg z-10"
         >
           <span className="text-white font-bold text-sm">
             {object.type}
@@ -195,19 +195,19 @@ interface FrameCardProps {
 
 const FRAME_COLORS: Record<string, { bg: string; border: string; header: string; label: string }> = {
   global: {
-    bg: 'bg-slate-50 dark:bg-slate-800/50',
+    bg: 'bg-slate-50 dark:bg-slate-800 bg-opacity-50',
     border: 'border-slate-300 dark:border-slate-600',
     header: 'bg-slate-200 dark:bg-slate-700',
     label: 'text-slate-700 dark:text-slate-300',
   },
   function: {
-    bg: 'bg-blue-50 dark:bg-blue-900/30',
+    bg: 'bg-blue-50 dark:bg-blue-900 bg-opacity-30',
     border: 'border-blue-400 dark:border-blue-500',
     header: 'bg-blue-200 dark:bg-blue-800',
     label: 'text-blue-800 dark:text-blue-200',
   },
   heap: {
-    bg: 'bg-amber-50 dark:bg-amber-900/20',
+    bg: 'bg-amber-50 dark:bg-amber-900 bg-opacity-20',
     border: 'border-amber-400 dark:border-amber-500',
     header: 'bg-amber-200 dark:bg-amber-800',
     label: 'text-amber-800 dark:text-amber-200',
