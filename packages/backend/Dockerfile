@@ -78,14 +78,14 @@ COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
 COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
 COPY --from=builder /app/packages/backend/src/modules/simulators ./packages/backend/src/modules/simulators
 
-# 프로덕션 의존성 설치
-RUN pnpm install --prod --frozen-lockfile
-
-# Builder에서 생성된 Prisma 클라이언트 복사
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/packages/backend/node_modules/.prisma ./packages/backend/node_modules/.prisma
+# 프로덕션 의존성 설치 (prisma CLI 포함)
+RUN pnpm install --prod --frozen-lockfile && \
+    pnpm add -D prisma@7.2.0
 
 WORKDIR /app/packages/backend
+
+# Prisma 클라이언트 생성
+RUN pnpm prisma generate
 
 # 포트 노출
 EXPOSE 3002
