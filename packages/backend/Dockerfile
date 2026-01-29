@@ -49,9 +49,10 @@ RUN npx prisma generate
 # 3. TypeScript 빌드
 RUN npx tsc
 
-# 4. JavaScript/Python Agent 파일들을 dist로 복사 (TypeScript 컴파일 대상 아님)
+# 4. JavaScript/Python/Java Agent 파일들을 dist로 복사 (TypeScript 컴파일 대상 아님)
 RUN cp -r src/modules/simulators/javascript/agent dist/modules/simulators/javascript/ && \
-    cp -r src/modules/simulators/python/agent dist/modules/simulators/python/
+    cp -r src/modules/simulators/python/agent dist/modules/simulators/python/ && \
+    cp -r src/modules/simulators/java/agent dist/modules/simulators/java/
 
 # ==========================================
 # Stage 3: Production Runtime
