@@ -2,12 +2,11 @@ services:
   # Backend API Service
   - type: web
     name: c-osine-backend
-    runtime: node
+    runtime: docker
     plan: starter
     region: oregon
-    rootDir: packages/backend
-    buildCommand: pnpm install && pnpm build
-    startCommand: pnpm start
+    dockerfilePath: ./packages/backend/Dockerfile
+    dockerContext: ./
     autoDeploy: true
     envVars:
       - key: NODE_ENV
