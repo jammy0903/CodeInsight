@@ -6,7 +6,7 @@ FROM eclipse-temurin:17-jdk-jammy AS java-builder
 WORKDIR /build
 
 # Java 소스 복사 및 컴파일
-COPY src/modules/simulators/java/agent /build
+COPY packages/backend/src/modules/simulators/java/agent /build
 RUN mkdir -p build/classes && \
     javac -encoding UTF-8 -d build/classes src/main/java/com/vis/*.java && \
     jar cfe build/debugger-agent.jar com.vis.DebuggerAgent -C build/classes .
@@ -21,8 +21,10 @@ WORKDIR /app
 # pnpm 설치
 RUN npm install -g pnpm
 
+# pnpm workspace 파일 복사
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+
 # 의존성 파일만 먼저 복사 (캐시 최적화)
-COPY package.json pnpm-lock.yaml ./
 COPY packages/backend/package.json ./packages/backend/
 COPY packages/shared/package.json ./packages/shared/
 
@@ -36,9 +38,9 @@ COPY packages/shared ./packages/shared
 # Java agent 복사
 COPY --from=java-builder /build/build/debugger-agent.jar ./packages/backend/src/modules/simulators/java/agent/build/
 
-# TypeScript 빌드
+# TypeScript 빌드 (Java 컴파일 단계는 건너뛰기)
 WORKDIR /app/packages/backend
-RUN pnpm build
+RUN npx tsc
 
 # ==========================================
 # Stage 3: Production Runtime
@@ -59,8 +61,10 @@ RUN apt-get update && apt-get install -y \
     default-jre \
     && rm -rf /var/lib/apt/lists/*
 
+# pnpm workspace 파일 복사
+COPY --from=builder /app/package.json /app/pnpm-workspace.yaml /app/pnpm-lock.yaml ./
+
 # 빌드된 파일 복사
-COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 COPY --from=builder /app/packages/backend/package.json ./packages/backend/
 COPY --from=builder /app/packages/shared ./packages/shared
 COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
