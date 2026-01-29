@@ -40,11 +40,11 @@ COPY --from=java-builder /build/build/debugger-agent.jar ./packages/backend/src/
 
 # 1. Shared 패키지 빌드 (workspace 의존성)
 WORKDIR /app/packages/shared
-RUN pnpm build
+RUN pnpm build && ls -la dist/
 
 # 2. Prisma 클라이언트 생성
 WORKDIR /app/packages/backend
-RUN npx prisma generate
+RUN npx prisma generate && ls -la node_modules/.prisma/
 
 # 3. TypeScript 빌드
 RUN npx tsc
