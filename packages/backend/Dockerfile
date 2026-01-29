@@ -38,8 +38,15 @@ COPY packages/shared ./packages/shared
 # Java agent 복사
 COPY --from=java-builder /build/build/debugger-agent.jar ./packages/backend/src/modules/simulators/java/agent/build/
 
-# TypeScript 빌드 (Java 컴파일 단계는 건너뛰기)
+# 1. Shared 패키지 빌드 (workspace 의존성)
+WORKDIR /app/packages/shared
+RUN pnpm build
+
+# 2. Prisma 클라이언트 생성
 WORKDIR /app/packages/backend
+RUN npx prisma generate
+
+# 3. TypeScript 빌드
 RUN npx tsc
 
 # ==========================================
