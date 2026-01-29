@@ -78,9 +78,8 @@ COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
 COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
 COPY --from=builder /app/packages/backend/src/modules/simulators ./packages/backend/src/modules/simulators
 
-# 프로덕션 의존성 설치 (prisma CLI 포함)
-RUN pnpm install --prod --frozen-lockfile && \
-    pnpm add -D prisma@7.2.0
+# 의존성 설치 (devDependencies 포함 - prisma CLI 필요)
+RUN pnpm install --frozen-lockfile
 
 WORKDIR /app/packages/backend
 
