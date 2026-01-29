@@ -6,8 +6,10 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
 
-// .env 파일 로드
-dotenv.config();
+// .env 파일 로드 (개발 환경에서만)
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const envSchema = z.object({
   // === Server ===
