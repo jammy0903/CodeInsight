@@ -9,7 +9,6 @@
  * - 함수 프레임 표시
  * - 포인터/참조 화살표
  * - 제어 흐름 시각화 (if/else, 반복문)
- * - 터미널 출력 애니메이션
  */
 
 import { memo, useMemo, useEffect, useCallback } from 'react';
@@ -20,7 +19,6 @@ import { useAnimationQueue } from './hooks/useAnimationQueue';
 import { FunctionFrame } from './components/FunctionFrame';
 import { ControlFlowOverlay } from './components/ControlFlowOverlay';
 import { LoopTrack } from './components/LoopTrack';
-import { TerminalOutput } from '@/features/visualizers/shared';
 import {
   FLOW_THEMES,
   FLOW_SIZES,
@@ -105,20 +103,6 @@ export const FlowVisualizer = memo(function FlowVisualizer({
 
   const canvasStyle = FLOW_THEMES[theme].canvas;
 
-  // 6. 터미널 출력 라인 메모이제이션
-  // ⚠️ 중요: Date.now() 사용 금지!
-  // text를 key로 사용하면 같은 출력일 때 안정적인 참조 유지
-  const terminalLines = useMemo(() => {
-    if (!step.terminalOutput?.text) return [];
-    return step.terminalOutput.text
-      .split('\n')
-      .filter(Boolean)
-      .map((content) => ({
-        content,
-        type: 'stdout' as const,
-      }));
-  }, [step.terminalOutput]);
-
   return (
     <div
       className={`flow-visualizer w-full min-h-full p-4 ${className}`}
@@ -183,13 +167,6 @@ export const FlowVisualizer = memo(function FlowVisualizer({
             step.controlFlow.type === 'function-return') && (
             <ControlFlowOverlay controlFlow={step.controlFlow} theme={theme} />
           )}
-        </div>
-      )}
-
-      {/* 터미널 출력 */}
-      {terminalLines.length > 0 && (
-        <div className="mt-4">
-          <TerminalOutput lines={terminalLines} title="출력" />
         </div>
       )}
 

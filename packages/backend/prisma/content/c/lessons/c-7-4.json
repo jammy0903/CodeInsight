@@ -3,64 +3,118 @@
   "title": "Void Pointers",
   "concept": "Core concept for Void Pointers",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int a = 65;\n    float b = 3.14;\n    \n    // Void Pointer can hold any type's address\n    void *ptr;\n    \n    ptr = &a;\n    // Must cast before dereferencing\n    printf(\"int: %d\\n\", *(int *)ptr);\n    \n    ptr = &b;\n    printf(\"float: %.2f\\n\", *(float *)ptr);\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 65;\n    float b = 3.14;\n\n    void *ptr;\n\n    ptr = &a;\n    printf(\"int: %d\\n\", *(int *)ptr);\n\n    ptr = &b;\n    printf(\"float: %.2f\\n\", *(float *)ptr);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 7,
-        "title": "Void 포인터 선언",
-        "explanation": "`void *ptr`은 '타입이 없는 포인터'입니다. 주소값은 담을 수 있지만, 그 주소에 있는 데이터의 크기나 타입은 모릅니다.",
-        "keyInsight": "모든 포인터 주소를 에러 없이 담을 수 있는 만능 상자입니다.",
-        "visualizationType": "memory",
-        "memoryState": {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
+        "line": 3,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
+        "highlight": [3],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
+        "line": 4,
+        "title": "변수 선언",
+        "explanation": "**`int a = 65;`** 와 **`float b = 3.14;`**\n\n서로 다른 타입의 변수 `a`와 `b`를 스택에 생성합니다.",
+        "highlight": [4, 5],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
           "stack": [
-            {
-              "name": "a",
-              "value": 65,
-              "address": "0x100"
-            },
-            {
-              "name": "b",
-              "value": 3.14,
-              "address": "0x104"
-            },
-            {
-              "name": "ptr",
-              "value": "Undefined",
-              "address": "0x108"
-            }
+            { "name": "a", "type": "int", "value": "65", "address": "0x100" },
+            { "name": "b", "type": "float", "value": "3.14", "address": "0x104" }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "void 포인터 선언",
+        "explanation": "**`void *ptr;`**\n\n`void` 포인터 `ptr`을 선언합니다. `void*`는 '타입을 가리지 않는 포인터'로, 어떤 변수의 주소든 저장할 수 있는 만능 주소 보관함입니다. 하지만 `ptr` 자체는 그 주소에 어떤 타입의 데이터가 있는지 전혀 알지 못합니다.",
+        "highlight": [7],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "a", "type": "int", "value": "65", "address": "0x100" },
+            { "name": "b", "type": "float", "value": "3.14", "address": "0x104" },
+            { "name": "ptr", "type": "void*", "value": "???", "address": "0x108" }
           ]
         }
       },
       {
         "line": 9,
-        "title": "int 변수 주소 저장",
-        "explanation": "`ptr = &a`를 실행하면 `ptr`은 0x100을 가리킵니다. 하지만 컴파일러는 이게 int라고 '가정'하지 않습니다.",
-        "visualizationType": "memory",
-        "memoryState": {
+        "title": "int 변수의 주소 저장",
+        "explanation": "**`ptr = &a;`**\n\n`void` 포인터 `ptr`에 `int` 변수 `a`의 주소(`0x100`)를 저장합니다. `void*`는 모든 타입의 주소를 담을 수 있으므로 이 작업은 완벽하게 안전합니다.",
+        "highlight": [9],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
           "stack": [
-            {
-              "name": "a",
-              "value": 65,
-              "address": "0x100"
-            },
-            {
-              "name": "ptr",
-              "value": "-> 0x100 (Type Unknown)",
-              "address": "0x108"
-            }
+            { "name": "a", "type": "int", "value": "65", "address": "0x100" },
+            { "name": "b", "type": "float", "value": "3.14", "address": "0x104" },
+            { "name": "ptr", "type": "void*", "value": "0x100", "address": "0x108" }
           ]
         }
       },
       {
-        "line": 11,
-        "title": "형변환 후 역참조",
-        "explanation": "`*ptr`처럼 그냥 역참조하면 에러가 납니다.\n`(int *)ptr`로 캐스팅하여 '이 주소에 4바이트 정수가 있어'라고 알려준 뒤 맨 앞에 `*`를 붙여 읽습니다.",
-        "keyInsight": "*(int *)ptr : 주거 침입 전에 신분증(Type)을 보여주는 것과 같습니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "int: 65"
-          ]
+        "line": 10,
+        "title": "형변환(Casting) 후 역참조 (int)",
+        "explanation": "**`printf(\"int: %d\\n\", *(int *)ptr);`**\n\n`void` 포인터는 타입 정보를 모르기 때문에 `*ptr`과 같이 직접 역참조할 수 없습니다. 따라서 `(int *)ptr`와 같이 `ptr`을 '`int`를 가리키는 포인터'라고 컴파일러에게 알려준(형변환) 뒤에, 바깥의 `*`로 역참조하여 값을 읽어야 합니다.",
+        "highlight": [10],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "a", "type": "int", "value": "65", "address": "0x100" },
+            { "name": "b", "type": "float", "value": "3.14", "address": "0x104" },
+            { "name": "ptr", "type": "void*", "value": "0x100", "address": "0x108" }
+          ],
+          "output": ["int: 65"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "float 변수의 주소 저장",
+        "explanation": "**`ptr = &b;`**\n\n이제 `void` 포인터 `ptr`에 `float` 변수 `b`의 주소(`0x104`)를 저장합니다. `ptr`은 이전에 무엇을 가리켰는지 잊고 새로운 주소를 담습니다.",
+        "highlight": [12],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "a", "type": "int", "value": "65", "address": "0x100" },
+            { "name": "b", "type": "float", "value": "3.14", "address": "0x104" },
+            { "name": "ptr", "type": "void*", "value": "0x104", "address": "0x108" }
+          ],
+          "output": ["int: 65"]
+        }
+      },
+      {
+        "line": 13,
+        "title": "형변환(Casting) 후 역참조 (float)",
+        "explanation": "**`printf(\"float: %.2f\\n\", *(float *)ptr);`**\n\n이번에는 `ptr`이 `float` 변수를 가리키고 있으므로, `(float *)`로 올바르게 형변환한 뒤 역참조하여 값을 읽습니다. 잘못된 타입으로 형변환하면 쓰레기 값이 나오거나 프로그램이 비정상 종료될 수 있습니다.",
+        "highlight": [13],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "a", "type": "int", "value": "65", "address": "0x100" },
+            { "name": "b", "type": "float", "value": "3.14", "address": "0x104" },
+            { "name": "ptr", "type": "void*", "value": "0x104", "address": "0x108" }
+          ],
+          "output": ["int: 65", "float: 3.14"]
+        }
+      },
+      {
+        "line": 15,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
+        "highlight": [15],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [], "heap": [], "output": ["int: 65", "float: 3.14"]
         }
       }
     ]

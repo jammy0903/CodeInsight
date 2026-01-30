@@ -3,12 +3,28 @@
   "title": "주소 연산자 (&): 집 주소 찾기",
   "concept": "메모리 주소는 '집 주소'와 같다. & 변수명으로 찾는다.",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int a = 100;\n    \n    // 1. 값 출력\n    printf(\"Value of a: %d\\n\", a);\n    \n    // 2. 주소 출력\n    printf(\"Address of a: %p\\n\", &a);\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 100;\n\n    printf(\"Value of a: %d\\n\", a);\n\n    printf(\"Address of a: %p\\n\", &a);\n\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 표준 입출력 라이브러리 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 3,
+        "title": "main 함수 정의",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
+        "highlight": [3],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
         "line": 4,
-        "title": "변수의 정체",
-        "explanation": "`int a = 100;`\n이 코드는 두 가지 의미를 가집니다:\n1. **Value (값)**: 42라는 실제 데이터\n2. **Address (주소)**: 메모리 상의 위치 (예: 0x1000)\n\n대부분의 언어는 '값'만 보여주지만, C는 '주소'도 보여줍니다.",
+        "title": "변수의 선언과 값",
+        "explanation": "**`int a = 100;`**\n\n정수형 변수 `a`를 선언하고 값 `100`을 할당합니다. 이 순간, 메모리의 특정 위치(주소)에 `a`를 위한 공간이 마련되고 그 안에 `100`이 저장됩니다.",
         "highlight": [
           4
         ],
@@ -26,14 +42,59 @@
         }
       },
       {
+        "line": 6,
+        "title": "변수의 값 출력",
+        "explanation": "**`printf(\"Value of a: %d\\n\", a);`**\n\n변수 `a`에 저장된 **값**을 `%d` 형식 지정자를 사용하여 화면에 출력합니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "100",
+              "type": "int",
+              "address": "0x1FF0"
+            }
+          ],
+          "output": [
+            "Value of a: 100"
+          ]
+        }
+      },
+      {
         "line": 8,
-        "title": "& (Ampersand)",
-        "explanation": "**Ampersand(&) 연산자**\n\"Where is a?\" 라고 묻는 것입니다.\n변수 앞에 붙이면 그 변수가 살고 있는 **메모리 시작 주소**를 반환합니다.",
+        "title": "변수의 주소 확인 (& 연산자)",
+        "explanation": "**`printf(\"Address of a: %p\\n\", &a);`**\n\n`&` (Ampersand) 연산자는 '...의 주소(Address of)'를 의미합니다. 변수 `a` 앞에 붙여 `a`가 저장된 메모리의 시작 **주소**를 알아냅니다. 이 주소는 `%p` 형식 지정자를 사용하여 16진수로 출력합니다.",
         "highlight": [
           8
         ],
-        "visualizationType": "terminal",
-        "memoryState": {
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "100",
+              "type": "int",
+              "address": "0x1FF0"
+            }
+          ],
+          "output": [
+            "Value of a: 100",
+            "Address of a: 0x1FF0"
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 모든 작업을 성공적으로 마쳤음을 운영체제에 알리며 프로그램을 종료합니다.",
+        "highlight": [10],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
           "output": [
             "Value of a: 100",
             "Address of a: 0x1FF0"

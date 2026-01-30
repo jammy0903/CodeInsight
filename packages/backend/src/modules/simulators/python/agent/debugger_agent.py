@@ -117,8 +117,9 @@ class DebuggerAgent:
         self.collected_ids = set()
         self.heap_objects = []
 
-        # 현재까지의 stdout 캡처 (누적)
+        # 현재 스텝에서 발생한 stdout만 캡처 (이전 스텝 출력은 제외)
         stdout_value = self.stdout_capture.getvalue()
+        self.stdout_capture.clear()  # 버퍼 비우기 - 다음 스텝은 새로운 출력만 포함
 
         snapshot = {
             "line": line_number,

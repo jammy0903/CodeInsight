@@ -25,7 +25,6 @@ import type { LessonFull, LessonStep, Quiz, SupportedLanguage } from '@/types';
 import { LessonCodeEditor } from './components/day/LessonCodeEditor';
 import { StepExplanation } from './components/day/StepExplanation';
 import { SelectedCodeBadge } from './components/day/SelectedCodeBadge';
-import { MemoryPanel } from './components/memory/MemoryPanel';
 import { StepNavigationArrows } from './components/StepNavigationArrows';
 import { ReturnOverlay } from '@/features/visualizers/shared';
 import { ChatQA } from '@/features/chat';
@@ -41,8 +40,8 @@ import { useIsMobile } from '@/hooks';
 
 // 언어별 시각화
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
+import { LessonMemoryVisualizer } from '@/features/visualizers/memory';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
-import { JavaMemoryView, toJavaMemoryViewProps } from '@/features/visualizers/java';
 import { Layers } from 'lucide-react';
 
 
@@ -331,15 +330,7 @@ export function LessonPage() {
       return;
     }
 
-    // 2. Python은 이미 pythonMemoryState를 가지고 있으므로 시뮬레이션 스킵
-    if (lang === 'python' || lang === 'python-practical') {
-      if (lesson.content?.steps) {
-        setLiveSteps(lesson.content.steps);
-      }
-      return;
-    }
-
-    // 3. Check if we have valid code to simulate
+    // 2. Check if we have valid code to simulate
     if (!isLanguageSupported(lang) || !memoizedCode) {
       if (lesson.content?.steps) {
         setLiveSteps(lesson.content.steps);
@@ -389,12 +380,67 @@ export function LessonPage() {
           const mergedSteps = result.steps.map((simStep) => {
             // 같은 line을 가진 JSON step 찾기
             const jsonStep = jsonSteps.find((js: LessonStep) => js.line === simStep.line);
+
+            // Python: 시뮬레이터 stack/heap을 pythonMemoryState로 변환 (C 방식)
+            // JSON의 pythonMemoryState는 무시하고 항상 시뮬레이터 결과 사용
+            let pythonMemoryState = undefined;
+
+            if (lang === 'python' || lang === 'python-practical') {
+              if (simStep.stack && simStep.heap) {
+                const names: any[] = [];
+                const objects: any[] = [];
+
+                // stack에서 variables 추출
+                simStep.stack.forEach((frame: any) => {
+                  Object.entries(frame.variables || {}).forEach(([varName, varData]: [string, any]) => {
+                    if (typeof varData === 'object' && varData !== null && varData.id) {
+                      // Reference 타입 (str, list, dict 등)
+                      names.push({
+                        name: varName,
+                        pointsTo: varData.id.replace('0x', 'obj-')
+                      });
+                    } else {
+                      // 원시값 (int, float, bool 등) - object로 변환
+                      const primitiveId = `primitive-${varName}-${simStep.line}`;
+                      names.push({
+                        name: varName,
+                        pointsTo: primitiveId
+                      });
+                      objects.push({
+                        id: primitiveId,
+                        type: typeof varData,
+                        value: String(varData),
+                        pyId: primitiveId
+                      });
+                    }
+                  });
+                });
+
+                // heap에서 objects 추출
+                simStep.heap.forEach((heapObj: any) => {
+                  objects.push({
+                    id: heapObj.address.replace('0x', 'obj-'),
+                    type: heapObj.type,
+                    value: heapObj.content,
+                    pyId: heapObj.address
+                  });
+                });
+
+                // stdout 추출 (누적)
+                const output = simStep.stdout ? simStep.stdout.split('\n').filter(Boolean) : [];
+
+                pythonMemoryState = { names, objects, output };
+              }
+            }
+
             return {
               ...simStep,
               // JSON explanation이 있으면 우선 사용, 없으면 시뮬레이터 설명 사용
               explanation: jsonStep?.explanation || simStep.explanation,
-              // Python의 경우 pythonMemoryState도 보존
-              pythonMemoryState: (jsonStep as any)?.pythonMemoryState || (simStep as any).pythonMemoryState,
+              title: jsonStep?.title || `Line ${simStep.line}`,
+              highlight: jsonStep?.highlight || [simStep.line],
+              // Python의 경우 pythonMemoryState는 항상 시뮬레이터 결과 사용
+              pythonMemoryState,
             };
           });
 
@@ -480,14 +526,27 @@ export function LessonPage() {
   // (이전 workaround 코드 제거됨 - 2026-01-27)
   const displayLine = currentStep?.line || 1;
 
-  // 터미널 출력 라인 변환 (Java/C 공통)
+  // 터미널 출력 라인 변환 (C/Java/Python 모두 지원)
   const terminalLines = useMemo((): TerminalLine[] => {
-    if (!currentStep?.stdout) return [];
-    return currentStep.stdout
-      .split('\n')
-      .filter(Boolean)
-      .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
-  }, [currentStep?.stdout]);
+    // 1. stdout 우선 (C, Java)
+    if (currentStep?.stdout) {
+      return currentStep.stdout
+        .split('\n')
+        .filter(Boolean)
+        .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+    }
+
+    // 2. Python: pythonMemoryState.output
+    const pythonOutput = (currentStep as any)?.pythonMemoryState?.output;
+    if (Array.isArray(pythonOutput)) {
+      return pythonOutput.map((line): TerminalLine => ({
+        content: String(line),
+        type: 'stdout'
+      }));
+    }
+
+    return [];
+  }, [currentStep]);
 
   useEffect(() => {
     const prevIndex = prevStepIndexRef.current;
@@ -617,11 +676,11 @@ export function LessonPage() {
             </div>
             {currentStep && (
               <div
-                className={`relative ${isExplanationCollapsed ? 'shrink-0' : ''}`}
+                className={`relative ${isExplanationCollapsed ? 'shrink-0' : 'overflow-y-auto'}`}
                 style={{
                   background: 'var(--theme-lesson-explanation-bg)',
                   borderTop: '1px solid var(--theme-lesson-panel-border)',
-                  minHeight: isExplanationCollapsed ? 'auto' : '200px',
+                  height: isExplanationCollapsed ? 'auto' : `${Math.max(code.split('\n').length, 10) * 20}px`,
                 }}
               >
                 <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
@@ -728,16 +787,7 @@ export function LessonPage() {
                 <div className="w-full h-full overflow-y-auto">
                   <div className="p-4">
                     {currentStep && (
-                      <>
-                        {console.log('[LessonPage] currentStep 전체:', currentStep)}
-                        {console.log('[LessonPage] stack 상세:', {
-                          hasStack: !!(currentStep as any).stack,
-                          stackLength: (currentStep as any).stack?.length,
-                          stack: (currentStep as any).stack,
-                          hasPythonMemoryState: !!(currentStep as any).pythonMemoryState,
-                          pythonMemoryState: (currentStep as any).pythonMemoryState
-                        })}
-                        <LessonFlowVisualizer
+                      <LessonFlowVisualizer
                           step={currentStep}
                           prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
                           language={lang === 'python-practical' ? 'python' : (lang || 'c')}
@@ -748,7 +798,6 @@ export function LessonPage() {
                           } : undefined}
                           stdout={currentStep.stdout}
                         />
-                      </>
                     )}
                   </div>
                 </div>
@@ -758,39 +807,23 @@ export function LessonPage() {
                   ref={memoryScrollRef}
                   className="w-full h-full overflow-auto p-4"
                 >
-                  {lang === 'java' ? (
-                    <>
-                      <JavaMemoryView {...toJavaMemoryViewProps(currentStep)} />
-                      {/* 터미널 출력 */}
-                      {terminalLines.length > 0 && (
-                        <TerminalOutput
-                          lines={terminalLines}
-                          title="출력"
-                          compact
-                          className="mt-6"
-                        />
-                      )}
-                    </>
-                  ) : lang === 'c' && memoryState ? (
-                    <>
-                      <MemoryPanel
-                        stack={memoryState.stack}
-                        heap={memoryState.heap}
-                        changedBlocks={changedBlocks}
-                        frames={memoryState.frames}
-                        showRegisters={true}
+                  <>
+                    <LessonMemoryVisualizer
+                      step={currentStep}
+                      language={lang}
+                      memoryState={memoryState}
+                      changedBlocks={changedBlocks}
+                    />
+                    {/* 터미널 출력 */}
+                    {terminalLines.length > 0 && (
+                      <TerminalOutput
+                        lines={terminalLines}
+                        title="출력"
+                        compact
+                        className="mt-6"
                       />
-                      {/* 터미널 출력 */}
-                      {terminalLines.length > 0 && (
-                        <TerminalOutput
-                          lines={terminalLines}
-                          title="출력"
-                          compact
-                          className="mt-6"
-                        />
-                      )}
-                    </>
-                  ) : null}
+                    )}
+                  </>
                 </div>
               )}
               {activeTab === 'chat' && !isMobile && (

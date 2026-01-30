@@ -3,50 +3,84 @@
   "title": "역참조: 주소로 가서 값 읽기",
   "concept": "주소를 따라가서 실제 값을 가져온다 (보물찾기 지도)",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int money = 1000;\n    int *p = &money;\n    \n    // 1. 직접 접근\n    printf(\"Money: %d\\n\", money);\n    \n    // 2. 간접 접근 (역참조)\n    printf(\"Money via *p: %d\\n\", *p);\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int money = 1000;\n    int *p = &money;\n\n    printf(\"Money: %d\\n\", money);\n\n    printf(\"Money via *p: %d\\n\", *p);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 5,
-        "title": "포인터 연결",
-        "explanation": "`p`가 `money`의 주소를 가지고 있습니다.\n이제 `p`는 `money`의 위치를 알고 있습니다.",
-        "highlight": [
-          5
-        ],
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 3,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
+        "highlight": [3],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 4,
+        "title": "변수 선언",
+        "explanation": "**`int money = 1000;`**\n\n`money` 변수를 선언하고 1000으로 초기화합니다. 이 변수는 특정 메모리 주소(예: `0x2000`)에 할당됩니다.",
+        "highlight": [4],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "money",
-              "value": "1000",
-              "type": "int",
-              "address": "0x2000"
-            },
-            {
-              "name": "p",
-              "value": "0x2000",
-              "type": "int*",
-              "address": "0x2004",
-              "pointsTo": "money"
-            }
-          ],
-          "output": [
-            "Money: 1000"
+            { "name": "money", "value": "1000", "type": "int", "address": "0x2000" }
           ]
         }
       },
       {
-        "line": 9,
-        "title": "역참조 (Dereference)",
-        "explanation": "**`*p` 연산자**\n\"`p`가 가진 주소로 **이동해!** 그리고 거기에 있는 **값을 가져와!**\"\n\n마치 보물지도를 보고 실제 보물이 묻힌 곳으로 찾아가서 상자를 여는 것과 같습니다.\n결과는 `money`의 값인 1000이 됩니다.",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "terminal",
-        "memoryState": {
-          "output": [
-            "Money via *p: 1000"
+        "line": 5,
+        "title": "포인터에 주소 할당",
+        "explanation": "**`int *p = &money;`**\n\n포인터 `p`를 선언하고 `money`의 주소(`0x2000`)를 값으로 가집니다. 이제 `p`는 `money`를 가리킵니다.",
+        "highlight": [5],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "money", "value": "1000", "type": "int", "address": "0x2000" },
+            { "name": "p", "value": "0x2000", "type": "int*", "address": "0x2004" }
           ]
         }
+      },
+      {
+        "line": 7,
+        "title": "값 직접 출력",
+        "explanation": "**`printf(\"Money: %d\\n\", money);`**\n\n변수 `money`의 값을 직접 읽어서 화면에 출력합니다.",
+        "highlight": [7],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "money", "value": "1000", "type": "int", "address": "0x2000" },
+            { "name": "p", "value": "0x2000", "type": "int*", "address": "0x2004" }
+          ],
+          "output": ["Money: 1000"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "포인터로 값 간접 출력 (역참조)",
+        "explanation": "**`printf(\"Money via *p: %d\\n\", *p);`**\n\n`*` 연산자(역참조, Dereference)는 포인터 `p`에 저장된 **주소로 찾아가서**, 그곳에 있는 **실제 값**을 가져오라는 명령어입니다. `p`는 `0x2000`을 갖고 있으므로, `0x2000`번지로 찾아가 그곳의 값 `1000`을 읽어와 출력합니다. 결국 `money`를 직접 출력한 것과 같은 결과가 나옵니다.",
+        "highlight": [9],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "money", "value": "1000", "type": "int", "address": "0x2000" },
+            { "name": "p", "value": "0x2000", "type": "int*", "address": "0x2004" }
+          ],
+          "output": ["Money: 1000", "Money via *p: 1000"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [] }
       }
     ]
   },

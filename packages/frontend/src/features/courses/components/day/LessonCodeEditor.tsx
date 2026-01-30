@@ -167,11 +167,11 @@ export function LessonCodeEditor({
         fontSize: isMobile ? 12 : 14,
         fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
         lineNumbers: 'on',
-        scrollBeyondLastLine: false,
+        scrollBeyondLastLine: true, // 마지막 줄 아래로 스크롤 가능
         automaticLayout: true,
         tabSize: isMobile ? 2 : 4,
         wordWrap: 'on',
-        padding: { top: isMobile ? 8 : 16, bottom: isMobile ? 8 : 16 },
+        padding: { top: isMobile ? 8 : 16, bottom: isMobile ? 200 : 300 }, // 하단 여백 증가
         renderLineHighlight: 'all',
         cursorBlinking: 'smooth',
         cursorSmoothCaretAnimation: 'on',

@@ -3,95 +3,119 @@
   "title": "Double Pointers (int **)",
   "concept": "Core concept for Double Pointers (int **)",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p = &a;\n    int **pp = &p;\n\n    printf(\"a = %d\\n\", a);\n    \n    // Using double pointer to change value\n    **pp = 20;\n    \n    printf(\"a = %d\\n\", a);\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p = &a;\n    int **pp = &p;\n\n    printf(\"a = %d\\n\", a);\n\n    **pp = 20;\n\n    printf(\"a = %d\\n\", a);\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
+        "line": 3,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
+        "highlight": [3],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
         "line": 4,
-        "title": "변수 a 선언",
-        "explanation": "먼저 정수형 변수 `a`를 선언하고 10으로 초기화합니다. 메모리상의 특정 주소(예: 0x100)에 10이라는 값이 저장됩니다.",
-        "visualizationType": "memory",
-        "memoryState": {
+        "title": "1. 정수 변수 선언",
+        "explanation": "**`int a = 10;`**\n\n정수 변수 `a`를 선언하고 값 `10`으로 초기화합니다. 스택 메모리에 `a`를 위한 공간이 할당됩니다 (예: 주소 `0x100`).",
+        "highlight": [4],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
           "stack": [
-            {
-              "name": "a",
-              "value": 10,
-              "address": "0x100"
-            }
+            { "name": "a", "type": "int", "address": "0x100", "value": "10" }
           ]
         }
       },
       {
         "line": 5,
-        "title": "싱글 포인터 p",
-        "explanation": "`p`는 `a`의 주소를 담는 포인터입니다. `p` 자체도 메모리 어딘가(예: 0x104)에 저장되며, 그 값은 `a`의 주소인 0x100이 됩니다.",
-        "keyInsight": "포인터도 '값'을 가진 변수입니다. 그 값이 주소일 뿐입니다.",
-        "visualizationType": "memory",
-        "memoryState": {
+        "title": "2. 싱글 포인터 선언",
+        "explanation": "**`int *p = &a;`**\n\n`int`형 변수를 가리키는 포인터 `p`를 선언합니다. `&a`는 변수 `a`의 메모리 주소(`0x100`)를 의미하며, 이 주소값이 포인터 `p`에 저장됩니다. `p` 자체도 스택에 자신만의 주소(예: `0x108`)를 가집니다.",
+        "highlight": [5],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
           "stack": [
-            {
-              "name": "a",
-              "value": 10,
-              "address": "0x100"
-            },
-            {
-              "name": "p",
-              "value": "-> 0x100",
-              "address": "0x104"
-            }
+            { "name": "a", "type": "int", "address": "0x100", "value": "10" },
+            { "name": "p", "type": "int*", "address": "0x108", "value": "0x100" }
           ]
         }
       },
       {
         "line": 6,
-        "title": "더블 포인터 pp",
-        "explanation": "`pp`는 **포인터의 포인터**입니다. `p`의 주소(0x104)를 저장합니다. 별이 2개(`**`)라는 것은 두 번 따라가야 원래 값(int)이 나온다는 뜻입니다.",
-        "keyInsight": "int **pp는 (int*) 타입의 변수 주소를 담습니다.",
-        "visualizationType": "memory",
-        "memoryState": {
+        "title": "3. 더블 포인터 선언",
+        "explanation": "**`int **pp = &p;`**\n\n`int*`형 변수를 가리키는 이중 포인터 `pp`를 선언합니다. `&p`는 포인터 변수 `p`의 메모리 주소(`0x108`)이며, 이 주소값이 `pp`에 저장됩니다. `pp`는 '포인터의 주소를 담는 포인터'입니다.",
+        "highlight": [6],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
           "stack": [
-            {
-              "name": "a",
-              "value": 10,
-              "address": "0x100"
-            },
-            {
-              "name": "p",
-              "value": "-> 0x100",
-              "address": "0x104"
-            },
-            {
-              "name": "pp",
-              "value": "-> 0x104",
-              "address": "0x108"
-            }
-          ]
+            { "name": "a", "type": "int", "address": "0x100", "value": "10" },
+            { "name": "p", "type": "int*", "address": "0x108", "value": "0x100" },
+            { "name": "pp", "type": "int**", "address": "0x110", "value": "0x108" }
+          ],
+          "note": "pp는 p를, p는 a를 가리키는 체인이 완성되었습니다."
+        }
+      },
+      {
+        "line": 8,
+        "title": "초기값 출력",
+        "explanation": "**`printf(\"a = %d\\n\", a);`**\n\n현재 변수 `a`의 값을 출력합니다.",
+        "highlight": [8],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "a", "type": "int", "address": "0x100", "value": "10" },
+            { "name": "p", "type": "int*", "address": "0x108", "value": "0x100" },
+            { "name": "pp", "type": "int**", "address": "0x110", "value": "0x108" }
+          ],
+          "output": ["a = 10"]
         }
       },
       {
         "line": 10,
-        "title": "이중 역참조 (**pp)",
-        "explanation": "`**pp`는 2단계 점프를 수행합니다.\n1. `pp`가 가리키는 `p`로 갑니다.\n2. `p`가 가리키는 `a`로 갑니다.\n결국 `a`의 메모리 공간에 20을 대입하게 됩니다.",
-        "keyInsight": "*(*pp)와 같습니다.",
-        "visualizationType": "memory",
-        "memoryState": {
+        "title": "이중 역참조를 통한 값 변경",
+        "explanation": "**`**pp = 20;`**\n\n이중 포인터 `pp`를 두 번 역참조(`*`)하여 `a`의 값을 변경합니다.\n- `*pp`는 `p`와 같습니다. (pp가 가리키는 곳의 값 = p)\n- `**pp`는 `*p`와 같습니다. (p가 가리키는 곳의 값 = a)\n결국 `a = 20;`과 동일한 작업을 수행하게 됩니다.",
+        "highlight": [10],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
           "stack": [
-            {
-              "name": "a",
-              "value": 20,
-              "address": "0x100",
-              "highlight": true
-            },
-            {
-              "name": "p",
-              "value": "-> 0x100",
-              "address": "0x104"
-            },
-            {
-              "name": "pp",
-              "value": "-> 0x104",
-              "address": "0x108"
-            }
-          ]
+            { "name": "a", "type": "int", "address": "0x100", "value": "20", "highlight": true },
+            { "name": "p", "type": "int*", "address": "0x108", "value": "0x100" },
+            { "name": "pp", "type": "int**", "address": "0x110", "value": "0x108" }
+          ],
+          "output": ["a = 10"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "변경된 값 확인",
+        "explanation": "**`printf(\"a = %d\\n\", a);`**\n\n이중 포인터를 통해 값이 변경된 `a`를 출력하여 확인합니다.",
+        "highlight": [12],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "a", "type": "int", "address": "0x100", "value": "20" },
+            { "name": "p", "type": "int*", "address": "0x108", "value": "0x100" },
+            { "name": "pp", "type": "int**", "address": "0x110", "value": "0x108" }
+          ],
+          "output": ["a = 10", "a = 20"]
+        }
+      },
+      {
+        "line": 13,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
+        "highlight": [13],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": ["a = 10", "a = 20"]
         }
       }
     ]

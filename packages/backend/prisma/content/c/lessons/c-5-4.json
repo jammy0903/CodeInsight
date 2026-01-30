@@ -3,48 +3,177 @@
   "title": "Memory Leaks",
   "concept": "메모리 누수: 빌려놓고 갚지를 않아서, 남은 메모리가 고갈되는 현상",
   "content": {
-    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nvoid leak() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 10;\n    // free(p); // 까먹음!\n}\n// 함수가 끝나면 p 변수(스택)는 사라지지만,\n// 힙에 할당된 4바이트는 영원히 남아있습니다.\n\nint main() {\n    for(int i=0; i<3; i++) {\n        leak();\n        printf(\"Memory leaked %d times\\n\", i+1);\n    }\n    return 0;\n}",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nvoid leak() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 10;\n}\n\nint main() {\n    for(int i=0; i<3; i++) {\n        leak();\n        printf(\"Memory leaked %d times\\n\", i+1);\n    }\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 표준 입출력 라이브러리를 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
+        "line": 2,
+        "title": "stdlib.h 헤더 포함",
+        "explanation": "**`#include <stdlib.h>`**\n\n`malloc` 함수를 사용하기 위해 표준 라이브러리를 포함합니다.",
+        "highlight": [2],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
         "line": 4,
-        "title": "누수 발생 (Leak)",
-        "explanation": "`leak()` 함수 안에서 `malloc`을 했지만 `free`를 안 했습니다.\n지역 변수 `p`는 함수가 끝나면 사라집니다(스택이니까).\n\n하지만 힙에 잡힌 4바이트는 주인님(`p`)을 잃고 고아가 됩니다. 주소를 아는 변수가 없어서 `free`를 할 수도 없습니다.",
-        "highlight": [
-          4,
-          5,
-          6
-        ],
+        "title": "leak 함수 정의",
+        "explanation": "**`void leak() {`**\n\n메모리 누수를 유발하는 `leak` 함수를 정의합니다.",
+        "highlight": [4],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
+        "line": 9,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n프로그램 실행이 시작되는 `main` 함수입니다.",
+        "highlight": [9],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
+        "line": 10,
+        "title": "반복문 시작 (i=0)",
+        "explanation": "**`for(int i=0; i<3; i++)`**\n\n`leak` 함수를 3번 호출하기 위한 반복문을 시작합니다. 변수 `i`가 `0`으로 초기화됩니다.",
+        "highlight": [10],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "heap": [
-            {
-              "address": "0xA000",
-              "size": "4",
-              "status": "LEAKED"
-            },
-            {
-              "address": "0xB000",
-              "size": "4",
-              "status": "LEAKED"
-            }
-          ],
-          "output": [
-            "Memory leaked 1 times",
-            "Memory leaked 2 times"
-          ]
+          "stack": [{ "name": "i", "value": "0", "type": "int" }],
+          "heap": [],
+          "output": []
         }
       },
       {
-        "line": 13,
-        "title": "재앙의 시작",
-        "explanation": "이 함수를 반복문(`while(1)`)으로 돌리면 어떻게 될까요?\n메모리가 야금야금 줄어들다가, 결국 시스템 메모리가 0이 되어 **OOM(Out Of Memory)**으로 프로그램이 죽습니다.",
-        "highlight": [
-          12,
-          13,
-          14,
-          15
-        ]
+        "line": 11,
+        "title": "leak() 함수 호출 #1",
+        "explanation": "**`leak();`**\n\n`leak` 함수를 호출합니다. 이 때 `leak` 함수를 위한 새로운 스택 프레임이 생성됩니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "i", "value": "0", "type": "int", "frame": "main" },
+            { "name": "p", "value": "0xA000", "type": "int*", "frame": "leak" }
+          ],
+          "heap": [{ "address": "0xA000", "size": "4", "value": "10" }],
+          "note": "leak() 함수 내부: 힙에 메모리를 할당했지만 free()를 하지 않습니다."
+        }
+      },
+      {
+        "line": 7,
+        "title": "leak() 함수 종료 #1",
+        "explanation": "**`}`**\n\n`leak` 함수가 종료됩니다. 스택에 있던 포인터 `p`는 사라지지만, `p`가 가리키던 힙 메모리는 해제되지 않고 그대로 남아 '메모리 누수'가 발생합니다.",
+        "highlight": [7],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "i", "value": "0", "type": "int", "frame": "main" }],
+          "heap": [{ "address": "0xA000", "size": "4", "value": "10", "status": "LEAKED" }],
+          "note": "포인터 p는 사라졌지만 힙 메모리는 그대로 남아 주소를 잃어버렸습니다."
+        }
+      },
+      {
+        "line": 12,
+        "title": "누수 발생 메시지 출력 #1",
+        "explanation": "**`printf(\"Memory leaked %d times\\n\", i+1);`**\n\n첫 번째 메모리 누수가 발생했음을 알리는 메시지를 출력합니다.",
+        "highlight": [12],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "i", "value": "0", "type": "int", "frame": "main" }],
+          "heap": [{ "address": "0xA000", "size": "4", "value": "10", "status": "LEAKED" }],
+          "output": ["Memory leaked 1 times"]
+        }
+      },
+      {
+        "line": 10,
+        "title": "반복문 계속 (i=1)",
+        "explanation": "**`for(int i=0; i<3; i++)`**\n\n`i`가 1로 증가하고, 반복문이 계속됩니다.",
+        "highlight": [10],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "i", "value": "1", "type": "int" }],
+          "heap": [{ "address": "0xA000", "size": "4", "value": "10", "status": "LEAKED" }],
+          "output": ["Memory leaked 1 times"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "leak() 함수 호출 #2",
+        "explanation": "**`leak();`**\n\n`leak` 함수가 다시 호출되고, 또 다른 힙 메모리 공간이 할당됩니다. 이전에 누수된 메모리는 그대로 남아있습니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "i", "value": "1", "type": "int", "frame": "main" },
+            { "name": "p", "value": "0xB000", "type": "int*", "frame": "leak" }
+          ],
+          "heap": [
+            { "address": "0xA000", "size": "4", "value": "10", "status": "LEAKED" },
+            { "address": "0xB000", "size": "4", "value": "10" }
+          ],
+          "note": "두 번째 메모리 누수가 발생하고 있습니다."
+        }
+      },
+      {
+        "line": 7,
+        "title": "leak() 함수 종료 #2",
+        "explanation": "**`}`**\n\n`leak` 함수가 또 종료됩니다. 두 번째로 할당된 힙 메모리도 주인을 잃고 누수됩니다.",
+        "highlight": [7],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "i", "value": "1", "type": "int", "frame": "main" }],
+          "heap": [
+            { "address": "0xA000", "size": "4", "value": "10", "status": "LEAKED" },
+            { "address": "0xB000", "size": "4", "value": "10", "status": "LEAKED" }
+          ]
+        }
+      },
+       {
+        "line": 12,
+        "title": "누수 발생 메시지 출력 #2",
+        "explanation": "**`printf(\"Memory leaked %d times\\n\", i+1);`**\n\n두 번째 메모리 누수가 발생했음을 알리는 메시지를 출력합니다.",
+        "highlight": [12],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "i", "value": "1", "type": "int", "frame": "main" }],
+          "heap": [
+            { "address": "0xA000", "size": "4", "value": "10", "status": "LEAKED" },
+            { "address": "0xB000", "size": "4", "value": "10", "status": "LEAKED" }
+          ],
+          "output": ["Memory leaked 1 times", "Memory leaked 2 times"]
+        }
+      },
+      {
+        "line": 10,
+        "title": "반복문 계속 (i=2) ...",
+        "explanation": "이 과정이 반복되면서 힙 영역에 회수되지 않는 쓰레기 메모리가 계속 쌓이게 됩니다. 프로그램이 오래 실행될수록 사용 가능한 메모리가 줄어들어 결국 시스템 전체에 영향을 미칠 수 있습니다.",
+        "highlight": [10],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "i", "value": "2", "type": "int" }],
+          "heap": [
+            { "address": "0xA000", "size": "4", "status": "LEAKED" },
+            { "address": "0xB000", "size": "4", "status": "LEAKED" },
+            { "address": "0xC000", "size": "4", "status": "LEAKED" }
+          ],
+          "output": ["Memory leaked 1 times", "Memory leaked 2 times", "Memory leaked 3 times"]
+        }
+      },
+      {
+        "line": 14,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 종료됩니다. 프로그램이 종료되면 운영체제가 이 프로세스에 할당했던 모든 메모리(누수된 힙 메모리 포함)를 강제로 회수합니다.",
+        "highlight": [14],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": ["Memory leaked 1 times", "Memory leaked 2 times", "Memory leaked 3 times"]
+        }
       }
     ]
   },

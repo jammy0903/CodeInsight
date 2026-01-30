@@ -1,0 +1,86 @@
+/**
+ * MobileLessonView - Swiper.js 스타일 커스터마이징
+ *
+ * 터치감 극대화:
+ * - Momentum scroll (부드러운 감속)
+ * - Snap to page (정확한 포지셔닝)
+ * - 최소 터치 거리 설정
+ */
+
+.swiper {
+  width: 100%;
+  height: 100%;
+  --swiper-theme-color: #1e40af; /* 파란색 테마 */
+}
+
+/* Pagination 도트 스타일 */
+.swiper-pagination {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.swiper-pagination-bullet {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.swiper-pagination-bullet-active {
+  width: 24px;
+  border-radius: 3px;
+  background: var(--theme-explanation-text, #2d3748);
+  opacity: 1;
+}
+
+.swiper-pagination-bullet:hover {
+  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Swiper 터치 제스처 최적화 */
+.swiper-wrapper {
+  /* 부드러운 가속도 곡선 */
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* 슬라이드 사이 간격 제거 (정확히 한 페이지씩) */
+.swiper-slide {
+  width: 100%;
+  height: 100%;
+}
+
+/* 터치 드래그 중 커서 변경 */
+.swiper-button-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* 모바일 최적화: 터치 스크롤 부드럽게 */
+@supports (scroll-behavior: smooth) {
+  .swiper-container {
+    scroll-behavior: smooth;
+  }
+}
+
+/* 고DPI 디스플레이에서 도트 선명하게 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .swiper-pagination-bullet {
+    width: 7px;
+    height: 7px;
+  }
+
+  .swiper-pagination-bullet-active {
+    width: 28px;
+  }
+}

@@ -3,51 +3,116 @@
   "title": "Pointer Arithmetic",
   "concept": "포인터 덧셈은 '다음 칸'으로 이동하는 것이다 (1 증가 아님!)",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n    int *p = arr;\n    \n    printf(\"*p     = %d\\n\", *p);     // 10\n    printf(\"*(p+1) = %d\\n\", *(p+1)); // 20\n    printf(\"*(p+2) = %d\\n\", *(p+2)); // 30\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n    int *p = arr;\n\n    printf(\"*p     = %d\\n\", *p);\n    printf(\"*(p+1) = %d\\n\", *(p+1));\n    printf(\"*(p+2) = %d\\n\", *(p+2));\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 5,
-        "title": "포인터 초기화",
-        "explanation": "`int *p = arr;`\n배열의 이름 `arr`은 첫 번째 요소의 주소(`&arr[0]`)와 같습니다.\n즉, `p`는 배열의 시작점을 가리킵니다.",
-        "highlight": [
-          5
-        ],
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 표준 입출력 라이브러리 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 3,
+        "title": "main 함수 정의",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
+        "highlight": [3],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 4,
+        "title": "배열 선언",
+        "explanation": "**`int arr[3] = {10, 20, 30};`**\n\n3개의 정수를 담는 배열 `arr`을 스택에 생성합니다. 배열의 요소들은 메모리 상에 연속적으로 배치됩니다.",
+        "highlight": [4],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
             {
               "name": "arr",
-              "value": "{10, 20, 30}",
               "type": "int[3]",
-              "address": "0x1000"
+              "address": "0x1000",
+              "value": ["10", "20", "30"]
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "포인터를 배열의 시작점에 초기화",
+        "explanation": "**`int *p = arr;`**\n\n포인터 `p`를 선언하고, `arr`로 초기화합니다. 배열의 이름(`arr`)은 배열의 첫 번째 요소의 주소(`&arr[0]`)와 같으므로, `p`는 `10`이 저장된 `0x1000` 주소를 가리키게 됩니다.",
+        "highlight": [5],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "arr",
+              "type": "int[3]",
+              "address": "0x1000",
+              "value": ["10", "20", "30"]
             },
             {
               "name": "p",
-              "value": "0x1000",
               "type": "int*",
               "address": "0x100C",
-              "pointsTo": "arr"
+              "value": "0x1000"
             }
-          ],
-          "output": []
+          ]
         }
       },
       {
         "line": 7,
-        "title": "p vs p+1",
-        "explanation": "**`p + 1`의 진실**\n그냥 숫자 1을 더하는 게 아닙니다.\n\"다음 **칸(Element)**을 가리켜라\"는 뜻입니다.\n\n`int*`니까 4바이트, `double*`면 8바이트 뒤로 점프합니다.\n이것을 **포인터 연산(Pointer Arithmetic)**이라고 합니다.",
-        "highlight": [
-          7,
-          8,
-          9
-        ],
-        "visualizationType": "terminal",
-        "memoryState": {
-          "output": [
-            "*p     = 10",
-            "*(p+1) = 20",
-            "*(p+2) = 30"
-          ]
+        "title": "포인터 역참조",
+        "explanation": "**`printf(\"*p     = %d\\n\", *p);`**\n\n`*p`는 포인터 `p`가 가리키는 주소(`0x1000`)의 값을 읽어옵니다. 따라서 `arr[0]`의 값인 `10`이 출력됩니다.",
+        "highlight": [7],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "arr", "type": "int[3]", "address": "0x1000", "value": ["10", "20", "30"] },
+            { "name": "p", "type": "int*", "address": "0x100C", "value": "0x1000" }
+          ],
+          "output": ["*p     = 10"]
+        }
+      },
+      {
+        "line": 8,
+        "title": "포인터 연산 1: p + 1",
+        "explanation": "**`printf(\"*(p+1) = %d\\n\", *(p+1));`**\n\n`p + 1`은 주소값에 1을 더하는 것이 아니라, '`p`가 가리키는 타입(`int`)의 크기만큼 다음 주소로 이동하라'는 의미입니다. `int`가 4바이트이므로, `0x1000 + 4`인 `0x1004` 주소로 이동합니다. 그곳의 값 `20`을 `*`로 읽어와 출력합니다.",
+        "highlight": [8],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+           "stack": [
+            { "name": "arr", "type": "int[3]", "address": "0x1000", "value": ["10", "20", "30"] },
+            { "name": "p", "type": "int*", "address": "0x100C", "value": "0x1000" }
+          ],
+          "output": ["*p     = 10", "*(p+1) = 20"]
+        }
+      },
+      {
+        "line": 9,
+        "title": "포인터 연산 2: p + 2",
+        "explanation": "**`printf(\"*(p+2) = %d\\n\", *(p+2));`**\n\n`p + 2`는 시작 주소에서 `sizeof(int) * 2` 만큼 떨어진 주소(`0x1008`)를 의미합니다. 그곳의 값 `30`을 `*`로 읽어와 출력합니다. 이는 `arr[2]`에 접근하는 것과 동일합니다.",
+        "highlight": [9],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+           "stack": [
+            { "name": "arr", "type": "int[3]", "address": "0x1000", "value": ["10", "20", "30"] },
+            { "name": "p", "type": "int*", "address": "0x100C", "value": "0x1000" }
+          ],
+          "output": ["*p     = 10", "*(p+1) = 20", "*(p+2) = 30"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 운영체제에 알리며 프로그램을 종료합니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": ["*p     = 10", "*(p+1) = 20", "*(p+2) = 30"]
         }
       }
     ]

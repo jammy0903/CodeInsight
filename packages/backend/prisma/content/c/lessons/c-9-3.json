@@ -3,29 +3,82 @@
   "title": "Conditional Compilation",
   "concept": "Core concept for Conditional Compilation",
   "content": {
-    "code": "#include <stdio.h>\n\n#define DEBUG_MODE 1\n\nint main() {\n    printf(\"Program Start\\n\");\n\n#ifdef DEBUG_MODE\n    // This code only exists if DEBUG_MODE is defined\n    printf(\"[DEBUG] Variable x checking...\\n\");\n#endif\n\n#if DEBUG_MODE == 0\n    printf(\"Release Mode\\n\");\n#endif\n\n    printf(\"Program End\\n\");\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\n#define DEBUG_MODE 1\n\nint main() {\n    printf(\"Program Start\\n\");\n\n#ifdef DEBUG_MODE\n    printf(\"[DEBUG] Variable x checking...\\n\");\n#endif\n\n#if DEBUG_MODE == 0\n    printf(\"Release Mode\\n\");\n#endif\n\n    printf(\"Program End\\n\");\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 전처리기에게 `stdio.h` 파일 내용을 여기에 포함하라고 지시합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": {}
+      },
+      {
+        "line": 3,
+        "title": "컴파일 조건 스위치 정의",
+        "explanation": "**`#define DEBUG_MODE 1`**\n\n`DEBUG_MODE` 라는 매크로를 `1`로 정의합니다. 이 정의는 아래의 `#ifdef`와 `#if` 지시문이 어떤 코드를 컴파일에 포함할지 결정하는 '스위치' 역할을 합니다.",
+        "highlight": [3],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "note": "DEBUG_MODE가 1로 정의되었습니다." }
+      },
+      {
+        "line": 5,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() { ... }`**\n\n프로그램의 실행 시작점입니다.",
+        "highlight": [5],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "output": [] }
+      },
+      {
         "line": 6,
-        "title": "#ifdef 조건부 컴파일",
-        "explanation": "`#ifdef DEBUG_MODE` 블록 안의 코드는 `DEBUG_MODE` 매크로가 정의되어 있을 때만 컴파일에 포함됩니다.\n만약 정의되어 있지 않다면, 컴파일러는 이 코드를 아예 보지도 못합니다 (삭제됨).",
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Program Start",
-            "[DEBUG] Variable x checking...",
-            "Program End"
-          ]
+        "title": "첫 번째 출력",
+        "explanation": "**`printf(\"Program Start\\n\");`**\n\n이 코드는 조건과 상관없이 항상 컴파일되고 실행됩니다.",
+        "highlight": [6],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "output": ["Program Start"] }
+      },
+      {
+        "line": 8,
+        "title": "조건부 컴파일 1: #ifdef",
+        "explanation": "**`#ifdef DEBUG_MODE`**\n\n전처리기가 `DEBUG_MODE`라는 매크로가 **정의되었는지** 확인합니다. 현재 파일 위쪽에서 정의했으므로, 조건은 참(true)이 됩니다. 따라서 `#ifdef`와 `#endif` 사이의 코드가 컴파일에 포함됩니다.",
+        "highlight": [8, 10],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "output": ["Program Start"], "note": "DEBUG_MODE가 정의되어 있으므로, 내부 코드가 살아남습니다." }
+      },
+      {
+        "line": 9,
+        "title": "디버그 코드 실행",
+        "explanation": "**`printf(\"[DEBUG] Variable x checking...\\n\");`**\n\n`#ifdef` 조건이 참이었기 때문에 이 줄은 컴파일러에게 전달되어 실행됩니다. 디버깅 목적으로만 필요한 코드를 넣기에 유용합니다.",
+        "highlight": [9],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "output": ["Program Start", "[DEBUG] Variable x checking..."] }
+      },
+      {
+        "line": 12,
+        "title": "조건부 컴파일 2: #if",
+        "explanation": "**`#if DEBUG_MODE == 0`**\n\n전처리기가 `DEBUG_MODE`의 **값**을 직접 비교합니다. `1 == 0` 은 거짓(false)이므로, 이 `#if`와 `#endif` 사이의 코드는 전처리기 단계에서 **완전히 삭제**됩니다. 컴파일러는 이 코드를 아예 보지도 못합니다.",
+        "highlight": [12, 14],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "output": ["Program Start", "[DEBUG] Variable x checking..."],
+          "note": "조건이 거짓이므로, 내부 코드는 컴파일러에게 전달되기 전에 삭제됩니다."
         }
       },
       {
-        "line": 13,
-        "title": "#if 값 비교",
-        "explanation": "`#if`를 사용하면 매크로의 값을 비교할 수도 있습니다. 단순 정의 여부뿐만 아니라 버전에 따른 분기 처리에 유용합니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": []
-        }
+        "line": 16,
+        "title": "마지막 출력",
+        "explanation": "**`printf(\"Program End\\n\");`**\n\n조건과 상관없이 항상 실행되는 마지막 코드입니다.",
+        "highlight": [16],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "output": ["Program Start", "[DEBUG] Variable x checking...", "Program End"] }
+      },
+      {
+        "line": 17,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
+        "highlight": [17],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": ["Program Start", "[DEBUG] Variable x checking...", "Program End"] }
       }
     ]
   },
