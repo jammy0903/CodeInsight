@@ -30,16 +30,39 @@ Output format (one JSON per line):
 import sys
 import json
 import os
+import io
+
+
+# 원본 stdout 저장 (JSON 스냅샷 출력용)
+_original_stdout = sys.stdout
+
+
+class StdoutCapture:
+    """사용자 print 출력을 캡처하는 클래스"""
+    def __init__(self):
+        self.buffer = io.StringIO()
+
+    def write(self, text):
+        self.buffer.write(text)
+
+    def flush(self):
+        pass  # StringIO는 flush 불필요
+
+    def getvalue(self):
+        return self.buffer.getvalue()
+
+    def clear(self):
+        self.buffer = io.StringIO()
 
 
 class DebuggerAgent:
-    def __init__(self, target_file: str):
+    def __init__(self, target_file: str, stdout_capture: StdoutCapture):
         self.target_file = target_file
+        self.stdout_capture = stdout_capture  # 사용자 print 출력 캡처
         self.collected_ids = set()
         self.heap_objects = []
         self.object_id_counter = 1
         self.id_map = {}  # Maps Python id() to our hex address
-        self.stdout_buffer = []
         self.last_line = -1  # Track last line to avoid duplicate snapshots
         self.pending_frame = None  # Frame from previous line (to capture AFTER execution)
         self.pending_line = -1
@@ -69,8 +92,9 @@ class DebuggerAgent:
         # This way we capture the state AFTER the line ran
         if self.pending_line > 0:
             snapshot = self.capture(frame, self.pending_line)
-            print(json.dumps(snapshot, ensure_ascii=False))
-            sys.stdout.flush()
+            # JSON 스냅샷은 원본 stdout으로 출력 (사용자 print와 분리)
+            _original_stdout.write(json.dumps(snapshot, ensure_ascii=False) + '\n')
+            _original_stdout.flush()
 
         # Store current line as pending (will output on next line event)
         self.pending_frame = frame
@@ -82,8 +106,9 @@ class DebuggerAgent:
         """Output the last pending line's state."""
         if self.pending_line > 0 and frame:
             snapshot = self.capture(frame, self.pending_line)
-            print(json.dumps(snapshot, ensure_ascii=False))
-            sys.stdout.flush()
+            # JSON 스냅샷은 원본 stdout으로 출력 (사용자 print와 분리)
+            _original_stdout.write(json.dumps(snapshot, ensure_ascii=False) + '\n')
+            _original_stdout.flush()
             self.pending_line = -1
 
     def capture(self, frame, line_number: int) -> dict:
@@ -92,12 +117,21 @@ class DebuggerAgent:
         self.collected_ids = set()
         self.heap_objects = []
 
-        return {
+        # 현재까지의 stdout 캡처 (누적)
+        stdout_value = self.stdout_capture.getvalue()
+
+        snapshot = {
             "line": line_number,
             "event": "STEP",
             "stack": self._build_stack(frame),
             "heap": self.heap_objects
         }
+
+        # stdout이 있으면 포함
+        if stdout_value:
+            snapshot["stdout"] = stdout_value
+
+        return snapshot
 
     def _build_stack(self, frame) -> list:
         """Build the call stack from the current frame."""
@@ -457,12 +491,15 @@ class DebuggerAgent:
 
 def run_with_trace(code: str, target_file: str):
     """Run the code with tracing enabled."""
-    agent = DebuggerAgent(target_file)
+    # stdout 캡처 설정 (사용자 print 출력 분리)
+    stdout_capture = StdoutCapture()
+    sys.stdout = stdout_capture  # 사용자 print → 캡처 버퍼로
+
+    agent = DebuggerAgent(target_file, stdout_capture)
 
     # Set the trace function
     sys.settrace(agent.trace_func)
 
-    last_frame = None
     try:
         # Create a clean namespace for execution
         namespace = {
@@ -486,6 +523,8 @@ def run_with_trace(code: str, target_file: str):
 
     except Exception as e:
         # Output error as a special snapshot
+        # 에러 시에도 현재까지의 stdout 포함
+        stdout_value = stdout_capture.getvalue()
         error_snapshot = {
             "line": agent.pending_line if agent.pending_line > 0 else 1,
             "event": "ERROR",
@@ -496,11 +535,15 @@ def run_with_trace(code: str, target_file: str):
             "stack": [],
             "heap": []
         }
-        print(json.dumps(error_snapshot, ensure_ascii=False))
-        sys.stdout.flush()
+        if stdout_value:
+            error_snapshot["stdout"] = stdout_value
+
+        _original_stdout.write(json.dumps(error_snapshot, ensure_ascii=False) + '\n')
+        _original_stdout.flush()
 
     finally:
         sys.settrace(None)
+        sys.stdout = _original_stdout  # stdout 복원
 
 
 if __name__ == '__main__':

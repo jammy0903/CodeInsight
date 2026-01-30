@@ -172,6 +172,12 @@ function cSimulator(backendSteps: BackendStep[]): LessonStep[] {
 
 /**
  * PyStep -> LessonStep 변환 (Python 시뮬레이터 전용)
+ *
+ * 백엔드 PythonSnapshot 형식:
+ *   - stack: Array<{ methodName, className, variables }>
+ *   - heap: Array<{ address, type, content }>
+ *
+ * LessonPage에서 pythonMemoryState로 변환됨
  */
 function pythonSimulator(pySteps: PyStep[]): LessonStep[] {
   return pySteps.map((step) => ({
@@ -179,7 +185,10 @@ function pythonSimulator(pySteps: PyStep[]): LessonStep[] {
     code: step.code,
     explanation: step.explanation,
     stdout: step.stdout,
-    // Python 시각화 데이터 (Names-Objects 모델)
+    // 백엔드에서 오는 stack/heap 그대로 전달 (LessonPage에서 pythonMemoryState로 변환)
+    stack: (step as any).stack,
+    heap: (step as any).heap,
+    // Python 시각화 데이터 (Names-Objects 모델) - 레거시 호환
     pyNames: step.names,
     pyObjects: step.objects,
     // Python 콜스택 (함수 호출 시각화)
