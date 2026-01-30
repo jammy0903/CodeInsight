@@ -3,6 +3,7 @@
 | 구분 | 값 |
 |------|-----|
 | 로컬 경로 | `/home/jammy/projects/C-OSINE` |
+| **프로덕션 도메인** | **https://codeinsight.online** 🎉 |
 | 프론트엔드 배포 | **Render** (https://c-osine-frontend-5z56.onrender.com) |
 | 백엔드 배포 | **Render** (Docker) |
 | 데이터베이스 | Neon PostgreSQL |
