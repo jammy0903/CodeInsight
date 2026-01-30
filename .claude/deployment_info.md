@@ -2,9 +2,9 @@
 
 | 구분 | 값 |
 |------|-----|
-| 로컬 경로 | `/home/jammy/projects/cosine/CodeInsight` |
-| 프론트엔드 배포 | Vercel (https://codeinsight.vercel.app) |
-| 백엔드 배포 | Render (Docker) |
+| 로컬 경로 | `/home/jammy/projects/C-OSINE` |
+| 프론트엔드 배포 | **Render** (https://c-osine-frontend-5z56.onrender.com) |
+| 백엔드 배포 | **Render** (Docker) |
 | 데이터베이스 | Neon PostgreSQL |
 | Git Remote | `https://github.com/jammy0903/CodeInsight.git` |
 | Branch | `main` |
@@ -19,7 +19,7 @@
 | Firebase | - | 사용자 인증 |
 | Fal.ai | - | 이미지 생성 |
 
-### 자동 배포 워크플로우
+### 자동 배포 워크플로우 (Render)
 
 **Git Push → 자동 배포**
 
@@ -31,12 +31,13 @@
    ```
 
 2. **자동 배포 트리거**
-   - **프론트엔드**: Vercel이 자동으로 빌드 및 배포
+   - **프론트엔드**: Render가 자동으로 빌드 및 배포 (render.yaml)
    - **백엔드**: Render가 Docker 이미지 빌드 및 배포 (10-15분 소요)
 
-3. **헬스체크**
-   - GitHub Actions가 2분 후 `/health` 엔드포인트 확인
-   - 5분간 20회 재시도 (15초 간격)
+3. **환경 변수 관리**
+   - **로컬 개발**: `packages/backend/.env`, `packages/frontend/.env`
+   - **프로덕션**: Render Dashboard → Environment Variables
+   - ⚠️ `.env.production` 파일은 사용하지 않음 (Render 대시보드에서 직접 관리)
 
 4. **롤백 (필요 시)**
    - Render Dashboard → Services → Events → "Rollback" 버튼 클릭

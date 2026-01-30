@@ -3,8 +3,53 @@
   "title": "Dynamic Arrays",
   "concept": "실행 중에 크기가 정해지는 배열 (사용자 입력 크기)",
   "content": {
-    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int size;\n    printf(\"How many numbers? \");\n    // scanf(\"%d\", &size); // 사용자 입력 (예: 5)\n    size = 5; \n\n    // 크기만큼 힙 할당\n    int *arr = (int*)malloc(sizeof(int) * size);\n    \n    // 배열처럼 사용\n    for(int i=0; i<size; i++) {\n        arr[i] = i * 10;\n        printf(\"%d \", arr[i]);\n    }\n    \n    free(arr); // 전체 해제\n    return 0;\n}",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int size;\n    printf(\"How many numbers? \");\n    size = 5;\n\n    int *arr = (int*)malloc(sizeof(int) * size);\n\n    for(int i=0; i<size; i++) {\n        arr[i] = i * 10;\n        printf(\"%d \", arr[i]);\n    }\n\n    free(arr);\n    return 0;\n}",
     "steps": [
+      {
+        "line": 3,
+        "title": "main 함수 정의",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "line": 6,
+        "title": "출력 (Output)",
+        "explanation": "**`printf(\"How many numbers? \");`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "output": [
+            "[Output will be shown here]"
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "동적 메모리 할당 (malloc)",
+        "explanation": "**`int *arr = (int*)malloc(sizeof(int) * size);`**\n\n힙(Heap) 영역에서 지정된 크기의 메모리를 할당하고 포인터를 반환합니다.\n\n사용 후 반드시 free()로 해제해야 합니다.",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "heap": [
+            {
+              "size": "[allocated]"
+            }
+          ]
+        }
+      },
       {
         "line": 10,
         "title": "동적 할당 배열",
@@ -42,6 +87,18 @@
           14,
           15
         ]
+      },
+      {
+        "line": 16,
+        "title": "메모리 해제 (free)",
+        "explanation": "**`free(arr);`**\n\nmalloc()으로 할당한 메모리를 해제하고 리소스를 반환합니다.\n\nmalloc/free는 반드시 쌍으로 사용해야 메모리 누수를 방지할 수 있습니다.",
+        "highlight": [
+          16
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "heap": []
+        }
       }
     ]
   },

@@ -3,45 +3,107 @@
   "title": "스택 메모리의 생명주기",
   "concept": "함수 안에서 만든 변수(지역 변수)는 함수가 끝나면 사라진다",
   "content": {
-    "code": "#include <stdio.h>\n\nvoid func() {\n    int a = 10;\n    printf(\"Inside func: %d, Addr: %p\\n\", a, &a);\n}\n\nint main() {\n    func(); // 함수 실행\n    \n    // 여기서는 a에 접근 불가!\n    // printf(\"%d\", a); // 에러 발생\n    \n    printf(\"Back in main\\n\");\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nvoid func() {\n    int a = 10;\n    printf(\"Inside func: %d, Addr: %p\\n\", a, &a);\n}\n\nint main() {\n    func();\n\n\n    printf(\"Back in main\\n\");\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
         "line": 3,
-        "title": "스택 프레임 생성",
-        "explanation": "`func()`가 호출되면, **스택(Stack)**이라는 메모리 공간에 `func`만을 위한 영역(Frame)이 생깁니다.\n변수 `a`는 이 영역 안에 만들어집니다.",
-        "highlight": [
-          3,
-          4,
-          5
-        ],
+        "title": "func 함수 설계도",
+        "explanation": "**`void func() { ... }`**\n\n`func`라는 이름의 함수를 정의합니다. 이 코드는 프로그램의 코드(Code/Text) 영역에 저장되며, `main` 함수에서 호출하기 전까지는 실행되지 않습니다.",
+        "highlight": [3, 4, 5, 6],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "readOnlyData": [{ "label": "func() code" }] }
+      },
+      {
+        "line": 8,
+        "title": "프로그램 실행 시작",
+        "explanation": "**`int main() {`**\n\n프로그램이 시작되면, 운영체제는 `main` 함수를 호출합니다. 이 때 `main` 함수를 위한 첫 번째 스택 프레임이 스택 메모리에 생성됩니다.",
+        "highlight": [8],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [{ "frame": "main" }] }
+      },
+      {
+        "line": 9,
+        "title": "func() 함수 호출 (Push)",
+        "explanation": "**`func();`**\n\n`main` 함수가 `func` 함수를 호출합니다. 이 순간, `main`의 실행은 잠시 멈추고, `func`를 위한 새로운 스택 프레임이 `main`의 스택 프레임 **위**에 쌓입니다(Push). 프로그램의 제어권이 `func`로 넘어갑니다.",
+        "highlight": [9],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "a",
-              "value": "10",
-              "type": "int",
-              "frame": "func"
-            }
+            { "frame": "main" },
+            { "frame": "func", "highlight": true }
           ],
-          "output": [
-            "Inside func: 10, Addr: 0x..."
+          "note": "func()의 스택 프레임이 새로 생성되었습니다."
+        }
+      },
+      {
+        "line": 4,
+        "title": "func의 지역 변수 생성",
+        "explanation": "**`int a = 10;`**\n\n`func`의 스택 프레임 안에 `a`라는 지역 변수가 생성되고 `10`으로 초기화됩니다. 이 변수 `a`는 오직 `func` 함수 안에서만 접근할 수 있습니다.",
+        "highlight": [4],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "frame": "main" },
+            { "frame": "func", "variables": [{ "name": "a", "type": "int", "value": "10" }] }
           ]
         }
       },
       {
-        "line": 6,
-        "title": "함수 종료 (Pop)",
-        "explanation": "함수가 끝나면 중괄호 `}`를 만납니다.\n이때 `func`의 스택 프레임이 **통째로 날아갑니다(Pop)**.\n\n따라서 변수 `a`도 메모리에서 사라집니다. 그렇기 때문에 `main`에서 `a`를 찾을 수 없는 것입니다.",
-        "highlight": [
-          6
-        ],
+        "line": 5,
+        "title": "func 내부에서 출력",
+        "explanation": "**`printf(\"Inside func: %d, Addr: %p\\n\", a, &a);`**\n\n`func`의 지역 변수 `a`의 값과 주소를 출력합니다.",
+        "highlight": [5],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "output": [
-            "Back in main"
-          ]
+          "stack": [
+            { "frame": "main" },
+            { "frame": "func", "variables": [{ "name": "a", "type": "int", "value": "10" }] }
+          ],
+          "output": ["Inside func: 10, Addr: 0x..."]
+        }
+      },
+      {
+        "line": 6,
+        "title": "func() 함수 종료 (Pop)",
+        "explanation": "**`}`**\n\n`func` 함수가 끝나는 닫는 중괄호를 만나면, `func`의 스택 프레임 전체가 스택에서 제거됩니다(Pop). 프레임 안에 있던 지역 변수 `a`도 함께 **완전히 사라집니다**.",
+        "highlight": [6],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "frame": "main", "highlight": true }
+          ],
+          "output": ["Inside func: 10, Addr: 0x..."],
+          "note": "func()의 스택 프레임과 지역 변수 a가 사라졌습니다."
+        }
+      },
+      {
+        "line": 12,
+        "title": "main으로 복귀",
+        "explanation": "**`printf(\"Back in main\\n\");`**\n\n`func` 함수가 종료되었으므로, 프로그램의 제어권은 다시 `main` 함수로 돌아와 다음 코드를 실행합니다.",
+        "highlight": [12],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "frame": "main" }],
+          "output": ["Inside func: 10, Addr: 0x...", "Back in main"]
+        }
+      },
+      {
+        "line": 13,
+        "title": "main 함수 종료",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 종료되고, `main`의 스택 프레임도 스택에서 제거됩니다. 스택이 비워지고 프로그램이 최종적으로 끝납니다.",
+        "highlight": [13],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [], "heap": [],
+          "output": ["Inside func: 10, Addr: 0x...", "Back in main"]
         }
       }
     ]

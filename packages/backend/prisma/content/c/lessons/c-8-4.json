@@ -3,8 +3,53 @@
   "title": "Jump Tables",
   "concept": "Core concept for Jump Tables",
   "content": {
-    "code": "#include <stdio.h>\n\nvoid item() { printf(\"Item Used\\n\"); }\nvoid map()  { printf(\"Map Opened\\n\"); }\nvoid save() { printf(\"Game Saved\\n\"); }\n\nint main() {\n    int choice = 1;\n    \n    // Jump Table: Array of functions\n    void (*actions[3])() = {item, map, save};\n\n    if (choice >= 0 && choice < 3) {\n        actions[choice](); // Direct jump\n    }\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nvoid item() { printf(\"Item Used\\n\"); }\nvoid map()  { printf(\"Map Opened\\n\"); }\nvoid save() { printf(\"Game Saved\\n\"); }\n\nint main() {\n    int choice = 1;\n\n    void (*actions[3])() = {item, map, save};\n\n    if (choice >= 0 && choice < 3) {\n        actions[choice]();\n    }\n\n    return 0;\n}",
     "steps": [
+      {
+        "line": 3,
+        "title": "출력 (Output)",
+        "explanation": "**`void item() { printf(\"Item Used\\n\"); }`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "output": [
+            "[Output will be shown here]"
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "출력 (Output)",
+        "explanation": "**`void map()  { printf(\"Map Opened\\n\"); }`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
+        "highlight": [
+          4
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "output": [
+            "[Output will be shown here]"
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "출력 (Output)",
+        "explanation": "**`void save() { printf(\"Game Saved\\n\"); }`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "output": [
+            "[Output will be shown here]"
+          ]
+        }
+      },
       {
         "line": 9,
         "title": "점프 테이블 생성",
@@ -27,7 +72,7 @@
         }
       },
       {
-        "line": 12,
+        "line": 11,
         "title": "인덱스로 실행",
         "explanation": "`choice` 값(1)을 인덱스로 사용하여 `actions[1]`에 저장된 `map` 함수를 즉시 호출합니다.",
         "visualizationType": "memory",

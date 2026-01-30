@@ -3,15 +3,29 @@
   "title": "포인터 선언 (*): 주소를 담는 변수",
   "concept": "포인터는 '주소'를 저장하는 특별한 변수다",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int num = 10;\n    \n    // 포인터 선언 (정수 주소를 담는 변수)\n    int *ptr = &num;\n    \n    printf(\"num value:   %d\\n\", num);\n    printf(\"num address: %p\\n\", &num);\n    printf(\"ptr value:   %p\\n\", ptr);\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int num = 10;\n\n    int *ptr = &num;\n\n    printf(\"num value:   %d\\n\", num);\n    printf(\"num address: %p\\n\", &num);\n    printf(\"ptr value:   %p\\n\", ptr);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 5,
-        "title": "포인터 선언",
-        "explanation": "**`int *ptr`**\n\"`ptr`은 변수인데, 내용은 **`int`형 변수의 주소**야\" 라는 뜻입니다.\n\n이때 `*`는 \"이건 포인터 변수야\"라고 알려주는 **선언용 기호**입니다.\n(곱셈이랑 다릅니다! 역참조랑도 다릅니다!)",
-        "highlight": [
-          5
-        ],
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 3,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
+        "highlight": [3],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 4,
+        "title": "정수 변수 선언",
+        "explanation": "**`int num = 10;`**\n\n정수형 변수 `num`을 선언하고 10으로 초기화합니다. 이 변수는 메모리 어딘가에 자리를 잡습니다(예: 주소 `0x1000`).",
+        "highlight": [4],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
@@ -20,32 +34,73 @@
               "value": "10",
               "type": "int",
               "address": "0x1000"
-            },
-            {
-              "name": "ptr",
-              "value": "0x1000",
-              "type": "int*",
-              "address": "0x1004"
             }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "포인터 변수 선언 및 초기화",
+        "explanation": "**`int *ptr = &num;`**\n\n`int *ptr`은 '`int` 타입 변수의 주소를 저장하는 포인터 변수 `ptr`'을 선언하는 것입니다. 여기에 `&num` (num의 주소)을 대입하여, `ptr`이 `num`을 가리키도록 합니다. `ptr` 자체도 변수이므로 자신만의 주소(예: `0x1004`)를 가집니다.",
+        "highlight": [6],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "num", "value": "10", "type": "int", "address": "0x1000" },
+            { "name": "ptr", "value": "0x1000", "type": "int*", "address": "0x1004" }
           ],
-          "output": []
+          "note": "ptr의 '값'은 num의 '주소'입니다."
+        }
+      },
+      {
+        "line": 8,
+        "title": "num의 값 출력",
+        "explanation": "**`printf(\"num value:   %d\\n\", num);`**\n\n변수 `num`에 저장된 값을 출력합니다.",
+        "highlight": [8],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "num", "value": "10", "type": "int", "address": "0x1000" },
+            { "name": "ptr", "value": "0x1000", "type": "int*", "address": "0x1004" }
+          ],
+          "output": ["num value:   10"]
         }
       },
       {
         "line": 9,
-        "title": "포인터의 값",
-        "explanation": "`ptr` 변수의 내용물(Value)은 `num`의 주소(Address)와 똑같습니다.\n\n즉, `ptr`이 `num`을 **가리킨다(Point to)**고 말합니다.\n메모리 시각화에서 화살표로 연결되는 이유입니다.",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "terminal",
-        "memoryState": {
-          "output": [
-            "num value: 10",
-            "num address: 0x1000",
-            "ptr value: 0x1000"
-          ]
+        "title": "num의 주소 출력",
+        "explanation": "**`printf(\"num address: %p\\n\", &num);`**\n\n`&` 연산자를 이용해 `num`의 실제 메모리 주소를 출력합니다.",
+        "highlight": [9],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "num", "value": "10", "type": "int", "address": "0x1000" },
+            { "name": "ptr", "value": "0x1000", "type": "int*", "address": "0x1004" }
+          ],
+          "output": ["num value:   10", "num address: 0x1000"]
         }
+      },
+      {
+        "line": 10,
+        "title": "ptr의 값 출력",
+        "explanation": "**`printf(\"ptr value:   %p\\n\", ptr);`**\n\n포인터 변수 `ptr`에 저장된 **값**을 출력합니다. 이 값은 `num`의 주소와 정확히 일치함을 확인할 수 있습니다. 이것이 '포인터가 가리킨다'는 것의 실제 의미입니다.",
+        "highlight": [10],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "num", "value": "10", "type": "int", "address": "0x1000" },
+            { "name": "ptr", "value": "0x1000", "type": "int*", "address": "0x1004" }
+          ],
+          "output": ["num value:   10", "num address: 0x1000", "ptr value:   0x1000"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
+        "highlight": [12],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [] }
       }
     ]
   },

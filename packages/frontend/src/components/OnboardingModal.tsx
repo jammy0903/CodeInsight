@@ -16,7 +16,7 @@ import { ChevronLeft, ChevronRight, Sparkles, X } from 'lucide-react';
 import { PROFILE_QUESTIONS, type ProfileQuestionKey } from '@/constants/profileQuestions';
 
 export function OnboardingModal() {
-  const { needsOnboarding, setNeedsOnboarding, appUser } = useStore();
+  const { needsOnboarding, setNeedsOnboarding, appUser, setSidebarOpen } = useStore();
 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<UserProfile>>({});
@@ -32,7 +32,26 @@ export function OnboardingModal() {
       ...prev,
       [currentQuestion.key]: value,
     }));
-  }, [currentQuestion.key]);
+  }, [currentQuestion]);
+
+  // 제출 (handleNext보다 먼저 정의되어야 함)
+  const handleSubmit = useCallback(async () => {
+    setIsSubmitting(true);
+    try {
+      const result = await updateProfile(answers);
+      console.log('Profile saved successfully:', result);
+      // 성공 시 모달과 사이드바 모두 닫기
+      setNeedsOnboarding(false);
+      setSidebarOpen(false);
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      // 실패해도 모달 닫기 (UX 우선)
+      setNeedsOnboarding(false);
+      setSidebarOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [answers]);
 
   // 다음 단계
   const handleNext = useCallback(() => {
@@ -41,7 +60,7 @@ export function OnboardingModal() {
     } else {
       setStep((prev) => prev + 1);
     }
-  }, [isLastStep]);
+  }, [isLastStep, handleSubmit]);
 
   // 이전 단계
   const handlePrev = useCallback(() => {
@@ -49,21 +68,6 @@ export function OnboardingModal() {
       setStep((prev) => prev - 1);
     }
   }, [step]);
-
-  // 제출
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    try {
-      await updateProfile(answers);
-      setNeedsOnboarding(false);
-    } catch (error) {
-      console.error('Failed to save profile:', error);
-      // 실패해도 모달 닫기 (UX 우선)
-      setNeedsOnboarding(false);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   // 스킵 (나중에 하기)
   const handleSkip = async () => {

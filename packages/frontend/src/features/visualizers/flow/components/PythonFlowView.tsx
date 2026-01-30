@@ -410,9 +410,6 @@ export const PythonFlowView = memo(function PythonFlowView({
     return result;
   }, [step, callStack, variableMap, objectMap, namesByObject, prevStep]);
 
-  // 터미널 출력
-  const terminalOutput = step.terminalOutput?.text;
-
   // 콜스택에 함수 호출이 있는 경우
   const hasFrames = callStack && callStack.length > 0;
 
@@ -451,18 +448,6 @@ export const PythonFlowView = memo(function PythonFlowView({
           <p>아직 생성된 값이 없어요</p>
           <p className="text-sm">코드가 실행되면 여기에 값들이 나타납니다</p>
         </div>
-      )}
-
-      {/* 터미널 출력 */}
-      {terminalOutput && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 p-3 bg-gray-900 text-green-400 rounded-lg font-mono text-sm"
-        >
-          <div className="text-xs text-gray-500 mb-1">출력:</div>
-          <pre className="whitespace-pre-wrap">{terminalOutput}</pre>
-        </motion.div>
       )}
 
       {/* 범례 */}

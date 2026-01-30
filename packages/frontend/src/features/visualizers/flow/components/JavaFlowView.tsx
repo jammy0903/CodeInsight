@@ -11,7 +11,6 @@
 
 import { memo, useMemo, useState, useCallback } from 'react';
 import type { FlowStep, FlowVariable, FlowFrame } from '@codeinsight/shared';
-import { TerminalOutput, type TerminalLine } from '../../shared';
 
 // ============================================
 // 타입 정의
@@ -394,15 +393,6 @@ export const JavaFlowView = memo(function JavaFlowView({
     ? frameData[frameData.length - 1].name
     : null;
 
-  // 터미널 출력 라인 변환
-  const terminalLines = useMemo((): TerminalLine[] => {
-    if (!step.terminalOutput?.text) return [];
-    return step.terminalOutput.text
-      .split('\n')
-      .filter(Boolean)
-      .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
-  }, [step.terminalOutput]);
-
   return (
     <div className={`java-flow-view p-4 ${className}`}>
       {/* CSS for animations */}
@@ -449,16 +439,6 @@ export const JavaFlowView = memo(function JavaFlowView({
           <p>아직 생성된 변수가 없어요</p>
           <p className="text-sm">코드가 실행되면 여기에 변수들이 나타납니다</p>
         </div>
-      )}
-
-      {/* 터미널 출력 */}
-      {terminalLines.length > 0 && (
-        <TerminalOutput
-          lines={terminalLines}
-          title="출력"
-          compact
-          className="mt-6"
-        />
       )}
 
       {/* 범례 */}

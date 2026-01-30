@@ -3,39 +3,79 @@
   "title": "Buffered I/O",
   "concept": "Core concept for Buffered I/O",
   "content": {
-    "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    // Output is buffered by default\n    printf(\"Example 1... \");\n    // sleep(2); // Wait 2 sec\n    \n    // Manually flush buffer\n    fflush(stdout);\n    printf(\"Printed immediately!\\n\");\n\n    // Line Buffering: \\n automatically flushes\n    printf(\"Example 2 with newline\\n\");\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    printf(\"Example 1... \");\n\n    fflush(stdout);\n    printf(\"Printed immediately!\\n\");\n\n    printf(\"Example 2 with newline\\n\");\n\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf`, `fflush` 등 표준 입출력 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": {}
+      },
+      {
+        "line": 4,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() { ... }`**\n\n프로그램의 실행 시작점입니다.",
+        "highlight": [4],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
         "line": 5,
-        "title": "버퍼링 (Buffering)",
-        "explanation": "`printf`를 호출한다고 화면에 바로 글자가 뜨는 게 아닙니다. 효율성을 위해 '출력 버퍼'에 데이터를 모아둡니다.",
-        "keyInsight": "물방울 하나하나 옮기는 것보다 양동이에 모아서 한 번에 붓는 것이 빠른 원리입니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": []
+        "title": "데이터를 버퍼에 저장",
+        "explanation": "**`printf(\"Example 1... \");`**\n\n`printf`를 호출했지만, 문자열 끝에 개행 문자(`\\n`)가 없습니다. 대부분의 시스템에서 `stdout`은 '줄 단위 버퍼링'으로 동작하므로, 이 텍스트는 즉시 화면에 출력되지 않고 메모리 상의 '출력 버퍼'에 임시로 저장됩니다.",
+        "highlight": [5],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "output": [],
+          "stdout_buffer": "Example 1... ",
+          "note": "텍스트가 화면이 아닌 메모리 버퍼에 먼저 쌓입니다."
         }
       },
       {
-        "line": 9,
-        "title": "fflush (강제 출력)",
-        "explanation": "`fflush(stdout)`을 호출하면 양동이를 강제로 비웁니다. 버퍼에 쌓여있던 \"Example 1... \"이 이때 화면에 나타납니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Example 1... Printed immediately!"
-          ]
+        "line": 7,
+        "title": "버퍼 강제 비우기 (Flush)",
+        "explanation": "**`fflush(stdout);`**\n\n`fflush` 함수는 지정된 스트림의 버퍼를 강제로 비워, 내용물을 목적지(여기서는 터미널 화면)로 보냅니다. 이 시점에 'Example 1... '이 화면에 출력됩니다.",
+        "highlight": [7],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "output": ["Example 1... "],
+          "stdout_buffer": "",
+          "note": "fflush로 인해 버퍼가 비워지면서 화면에 출력됩니다."
         }
       },
       {
-        "line": 13,
-        "title": "Line Buffering",
-        "explanation": "표준 출력(stdout)은 보통 '줄 단위 버퍼링'을 합니다. 즉, 개행 문자 `\\n`을 만나면 알아서 flush를 수행합니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Example 1... Printed immediately!",
-            "Example 2 with newline"
-          ]
+        "line": 8,
+        "title": "개행 문자가 있는 출력",
+        "explanation": "**`printf(\"Printed immediately!\\n\");`**\n\n이 `printf`는 문자열 끝에 개행 문자(`\\n`)를 포함하고 있습니다. 줄 단위 버퍼링 환경에서는 개행 문자를 만나면 버퍼가 자동으로 비워지므로 `fflush` 없이도 이 텍스트는 거의 즉시 화면에 출력됩니다.",
+        "highlight": [8],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "output": ["Example 1... Printed immediately!"],
+          "stdout_buffer": ""
+        }
+      },
+      {
+        "line": 10,
+        "title": "자동 플러시 재확인",
+        "explanation": "**`printf(\"Example 2 with newline\\n\");`**\n\n이전과 마찬가지로, 개행 문자(`\\n`)가 포함되어 있으므로 버퍼에 쌓이지 않고 바로 화면으로 출력됩니다.",
+        "highlight": [10],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "output": ["Example 1... Printed immediately!", "Example 2 with newline"],
+          "stdout_buffer": ""
+        }
+      },
+      {
+        "line": 12,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n프로그램이 정상적으로 종료될 때, 열려있는 모든 스트림의 버퍼는 자동으로 비워집니다. 하지만 프로그램이 비정상적으로 종료(충돌)되면 버퍼의 내용은 유실될 수 있습니다.",
+        "highlight": [12],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [], "heap": [],
+          "output": ["Example 1... Printed immediately!", "Example 2 with newline"]
         }
       }
     ]

@@ -3,14 +3,28 @@
   "title": "선언과 메모리 할당",
   "concept": "변수를 선언하는 순간, 메모리에 방을 잡는다 (초기화는 아님)",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    // 1. 변수 선언 (메모리 예약)\n    int a;\n    \n    // 2. 값 출력 (쓰레기 값!)\n    printf(\"Value of a: %d\\n\", a);\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int a;\n\n    printf(\"Value of a: %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 5,
+        "line": 3,
+        "title": "main 함수 정의",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.\n\n- `int`: 함수가 정수값을 반환함을 의미\n- `main`: 프로그램이 실행될 때 가장 먼저 호출되는 특별한 함수\n- `()`: 함수의 입력값(파라미터)이 없음을 의미\n- `{`: 함수 본문의 시작\n\n**스택에 main 함수의 스택 프레임이 생성됩니다.**",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "line": 4,
         "title": "변수 선언",
         "explanation": "**`int a;`**\n이 한 줄이 실행되면 4바이트(32비트 시스템 기준)의 메모리 공간이 확보됩니다.\n\n중요한 점은 **'청소'를 하지 않는다**는 것입니다. 이전에 이 자리를 쓰던 데이터가 그대로 남아있습니다.\n\n**비유:** 호텔 방을 체크인만 하고, 청소가 안 된 상태로 들어간 것과 같습니다.",
         "highlight": [
-          5
+          4
         ],
         "visualizationType": "cMemory",
         "cMemoryState": {
@@ -27,11 +41,11 @@
         }
       },
       {
-        "line": 8,
+        "line": 6,
         "title": "쓰레기 값(Garbage Value)",
         "explanation": "변수 `a`를 초기화하지 않고 읽으면, 예측할 수 없는 값(쓰레기 값)이 나옵니다.\n-12044332 같은 이상한 숫자가 나올 수 있습니다.\n\n**C언어의 철학:** \"프로그래머가 시키지 않은 일(초기화)은 하지 않는다.\"",
         "highlight": [
-          8
+          6
         ],
         "visualizationType": "terminal",
         "memoryState": {

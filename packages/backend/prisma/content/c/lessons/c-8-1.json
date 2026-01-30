@@ -3,69 +3,114 @@
   "title": "Function Pointer Syntax",
   "concept": "Core concept for Function Pointer Syntax",
   "content": {
-    "code": "#include <stdio.h>\n\nint add(int a, int b) {\n    return a + b;\n}\n\nint sub(int a, int b) {\n    return a - b;\n}\n\nint main() {\n    // 1. Declare function pointer\n    int (*op)(int, int);\n\n    // 2. Assign function address\n    op = add;\n    printf(\"add: %d\\n\", op(10, 20));\n\n    // 3. Reassign to another function\n    op = sub;\n    printf(\"sub: %d\\n\", op(10, 20));\n\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint add(int a, int b) {\n    return a + b;\n}\n\nint sub(int a, int b) {\n    return a - b;\n}\n\nint main() {\n    int (*op)(int, int);\n\n    op = add;\n    printf(\"add: %d\\n\", op(10, 20));\n\n    op = sub;\n    printf(\"sub: %d\\n\", op(10, 20));\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 10,
-        "title": "함수 포인터 선언",
-        "explanation": "`int (*op)(int, int)`는 'int 2개를 받고 int를 반환하는 함수'의 주소를 담는 포인터 변수 `op`를 선언합니다.",
-        "keyInsight": "괄호 `(*op)`가 없으면 'int 포인터를 반환하는 함수'가 되어버립니다!",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "op",
-              "value": "Undefined",
-              "address": "0x100"
-            }
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
+        "line": 3,
+        "title": "add 함수 정의",
+        "explanation": "**`int add(int a, int b) { ... }`**\n\n두 정수를 더하는 `add` 함수를 정의합니다. 이 함수의 코드는 컴파일 후 프로그램의 **코드(Code/Text) 영역**에 저장됩니다.",
+        "highlight": [3, 4, 5],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "readOnlyData": [{ "label": "add() function code", "address": "0xCODE1" }] }
+      },
+      {
+        "line": 7,
+        "title": "sub 함수 정의",
+        "explanation": "**`int sub(int a, int b) { ... }`**\n\n두 정수를 빼는 `sub` 함수를 정의합니다. 이 함수의 코드 역시 **코드 영역**에 저장됩니다.",
+        "highlight": [7, 8, 9],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "readOnlyData": [
+            { "label": "add() function code", "address": "0xCODE1" },
+            { "label": "sub() function code", "address": "0xCODE2" }
           ]
         }
       },
       {
-        "line": 13,
-        "title": "함수 주소 할당",
-        "explanation": "함수 이름 `add`는 그 자체로 함수가 시작되는 메모리 주소(Code Segment)를 의미합니다. 이를 `op`에 저장합니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "op",
-              "value": "-> <add function>",
-              "address": "0x100"
-            }
-          ]
+        "line": 11,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [] }
+      },
+      {
+        "line": 12,
+        "title": "함수 포인터 선언",
+        "explanation": "**`int (*op)(int, int);`**\n\n'두 개의 `int`를 인자로 받고 `int`를 반환하는 함수'의 주소를 저장할 수 있는 함수 포인터 `op`를 선언합니다. `(*op)`의 괄호는 `op`가 포인터임을 명확히 하기 위해 필수적입니다.",
+        "highlight": [12],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "op", "type": "int (*)(int, int)", "value": "???" }]
         }
       },
       {
         "line": 14,
-        "title": "포인터를 통한 호출",
-        "explanation": "`op(10, 20)`을 실행하면 `op`가 가리키는 주소(`add`)로 점프하여 코드를 실행합니다.",
-        "keyInsight": "마치 `add(10, 20)`을 호출하는 것과 똑같이 동작합니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "add: 30"
+        "title": "add 함수의 주소 할당",
+        "explanation": "**`op = add;`**\n\n함수 포인터 `op`에 `add` 함수의 시작 주소를 할당합니다. 함수 이름은 그 자체로 코드 영역에 있는 함수의 주소로 사용될 수 있습니다.",
+        "highlight": [14],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "op", "type": "int (*)(int, int)", "value": "0xCODE1" }],
+          "readOnlyData": [
+            { "label": "add() function code", "address": "0xCODE1", "highlight": true },
+            { "label": "sub() function code", "address": "0xCODE2" }
           ]
         }
       },
       {
+        "line": 15,
+        "title": "포인터를 통해 add 함수 호출",
+        "explanation": "**`printf(\"add: %d\\n\", op(10, 20));`**\n\n`op`에 저장된 주소(`add` 함수)로 이동하여 함수를 호출합니다. `op(10, 20)`은 `add(10, 20)`과 정확히 동일하게 동작하여 30을 반환합니다.",
+        "highlight": [15],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "op", "type": "int (*)(int, int)", "value": "0xCODE1" }],
+          "output": ["add: 30"]
+        }
+      },
+      {
         "line": 17,
-        "title": "동적 바인딩 (Reassignment)",
-        "explanation": "이제 `op`가 `sub` 함수의 주소를 가리키도록 변경합니다. 똑같은 `op(10, 20)` 코드가 이번에는 뺄셈을 수행합니다.",
-        "keyInsight": "이것이 바로 '다형성(Polymorphism)'의 기초입니다. 같은 코드가 상황에 따라 다르게 동작합니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "op",
-              "value": "-> <sub function>",
-              "address": "0x100"
-            }
+        "title": "sub 함수의 주소 재할당",
+        "explanation": "**`op = sub;`**\n\n`op`가 이제 `sub` 함수의 시작 주소를 가리키도록 변경합니다. 이것이 함수 포인터의 핵심적인 유연성입니다.",
+        "highlight": [17],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "op", "type": "int (*)(int, int)", "value": "0xCODE2" }],
+          "readOnlyData": [
+            { "label": "add() function code", "address": "0xCODE1" },
+            { "label": "sub() function code", "address": "0xCODE2", "highlight": true }
           ],
-          "output": [
-            "add: 30",
-            "sub: -10"
-          ]
+          "output": ["add: 30"]
+        }
+      },
+      {
+        "line": 18,
+        "title": "포인터를 통해 sub 함수 호출",
+        "explanation": "**`printf(\"sub: %d\\n\", op(10, 20));`**\n\n이전과 똑같은 `op(10, 20)` 코드를 실행했지만, `op`가 가리키는 대상이 `sub` 함수로 바뀌었기 때문에 이번에는 `sub(10, 20)`가 호출되어 -10을 반환합니다. 상황에 따라 코드가 다르게 동작하는 다형성(Polymorphism)의 한 예입니다.",
+        "highlight": [18],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{ "name": "op", "type": "int (*)(int, int)", "value": "0xCODE2" }],
+          "output": ["add: 30", "sub: -10"]
+        }
+      },
+      {
+        "line": 20,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
+        "highlight": [20],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [], "heap": [], "output": ["add: 30", "sub: -10"]
         }
       }
     ]

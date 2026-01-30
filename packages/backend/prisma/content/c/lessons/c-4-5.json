@@ -3,8 +3,22 @@
   "title": "Returning Stack Addresses",
   "concept": "함수가 끝나면 사라질 방 열쇠를 쥐어주지 마라 (치명적인 버그)",
   "content": {
-    "code": "#include <stdio.h>\n\nint* dangerousFunc() {\n    int x = 100;\n    return &x; // ❌ 절대 금지!\n}\n\nint main() {\n    int *p = dangerousFunc();\n    \n    // 이미 x는 사라졌는데 접근 시도\n    printf(\"%d\\n\", *p); // 운 좋으면 100, 아니면 쓰레기값\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint* dangerousFunc() {\n    int x = 100;\n    return &x;\n}\n\nint main() {\n    int *p = dangerousFunc();\n\n    printf(\"%d\\n\", *p);\n    return 0;\n}",
     "steps": [
+      {
+        "line": 3,
+        "title": "main 함수 정의",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
       {
         "line": 5,
         "title": "지역 변수의 주소 리턴",
@@ -45,6 +59,21 @@
           ],
           "output": [
             "??? (Undefined Behavior)"
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "출력 (Output)",
+        "explanation": "**`printf(\"%d\\n\", *p);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "output": [
+            "[Output will be shown here]"
           ]
         }
       }

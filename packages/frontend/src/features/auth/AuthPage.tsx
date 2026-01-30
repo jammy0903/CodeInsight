@@ -12,10 +12,12 @@ import { motion } from 'framer-motion';
 import { loginWithGoogle, loginWithGithub, loginWithKakao } from '@/services/firebase';
 import { Github } from 'lucide-react';
 import { logger } from '@/utils/logger';
+import { useStore } from '@/stores/store';
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { setSidebarOpen } = useStore();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -32,6 +34,7 @@ export default function AuthPage() {
       setError(null);
       setLoading(true);
       await loginWithGoogle();
+      setSidebarOpen(false); // 로그인 성공 시 사이드바 닫기
       navigate('/courses');
     } catch (err) {
       setError(`Google ${errorPrefix} 실패`);
@@ -46,6 +49,7 @@ export default function AuthPage() {
       setError(null);
       setLoading(true);
       await loginWithGithub();
+      setSidebarOpen(false); // 로그인 성공 시 사이드바 닫기
       navigate('/courses');
     } catch (err) {
       setError(`GitHub ${errorPrefix} 실패`);
@@ -60,6 +64,7 @@ export default function AuthPage() {
       setError(null);
       setLoading(true);
       await loginWithKakao();
+      setSidebarOpen(false); // 로그인 성공 시 사이드바 닫기
       navigate('/courses');
     } catch (err) {
       setError(`Kakao ${errorPrefix} 실패`);

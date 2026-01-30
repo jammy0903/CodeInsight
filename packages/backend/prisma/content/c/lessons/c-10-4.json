@@ -3,35 +3,104 @@
   "title": "Binary Input/Output",
   "concept": "Core concept for Binary Input/Output",
   "content": {
-    "code": "#include <stdio.h>\n\nstruct Player {\n    int id;\n    double hp;\n};\n\nint main() {\n    struct Player saved = {1, 99.5};\n    struct Player loaded;\n\n    // 1. Write Binary (\"wb\")\n    FILE *fp = fopen(\"save.bin\", \"wb\");\n    if (fp) {\n        // Dump memory content directly to file\n        fwrite(&saved, sizeof(struct Player), 1, fp);\n        fclose(fp);\n    }\n\n    // 2. Read Binary (\"rb\")\n    fp = fopen(\"save.bin\", \"rb\");\n    if (fp) {\n        // Load memory content directly from file\n        fread(&loaded, sizeof(struct Player), 1, fp);\n        printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);\n        fclose(fp);\n    }\n\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nstruct Player {\n    int id;\n    double hp;\n};\n\nint main() {\n    struct Player saved = {1, 99.5};\n    struct Player loaded;\n\n    FILE *fp = fopen(\"save.bin\", \"wb\");\n    if (fp) {\n        fwrite(&saved, sizeof(struct Player), 1, fp);\n        fclose(fp);\n    }\n\n    fp = fopen(\"save.bin\", \"rb\");\n    if (fp) {\n        fread(&loaded, sizeof(struct Player), 1, fp);\n        printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);\n        fclose(fp);\n    }\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 13,
-        "title": "fwrite (메모리 덤프)",
-        "explanation": "`fwrite`는 구조체 데이터를 텍스트로 변환하지 않고, 메모리에 있는 0과 1 상태 그대로(Binary) 파일에 씁니다.",
-        "keyInsight": "텍스트 파싱 비용이 없어 매우 빠르고 효율적입니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": []
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n바이너리 파일 입출력 함수(`fopen`, `fwrite`, `fread`, `fclose`)를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": {}
+      },
+      {
+        "line": 3,
+        "title": "저장할 데이터 구조 정의",
+        "explanation": "**`struct Player { ... };`**\n\n파일에 저장하고 불러올 데이터의 '틀'인 `Player` 구조체를 정의합니다. 바이너리 입출력은 이런 구조체 데이터를 통째로 다룰 때 매우 유용합니다.",
+        "highlight": [3, 4, 5, 6],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "note": "Player라는 데이터 설계도가 만들어졌습니다." }
+      },
+      {
+        "line": 8,
+        "title": "main 함수와 변수 준비",
+        "explanation": "**`int main() { ... }`**\n\n파일에 저장할 원본 데이터(`saved`)와, 파일에서 불러온 데이터를 담을 비어있는 변수(`loaded`)를 스택에 준비합니다. `loaded`에는 현재 쓰레기값이 들어있습니다.",
+        "highlight": [8, 9],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "saved", "type": "struct Player", "value": [{ "key": "id", "value": "1" }, { "key": "hp", "value": "99.5" }] },
+            { "name": "loaded", "type": "struct Player", "value": [{ "key": "id", "value": "???" }, { "key": "hp", "value": "???" }] }
+          ]
         }
       },
       {
-        "line": 21,
-        "title": "fread (메모리 로드)",
-        "explanation": "`fread`는 파일의 바이트들을 읽어서 변수의 메모리 공간에 그대로 채워 넣습니다. 즉시 구조체가 복원됩니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "loaded",
-              "value": "{id: 1, hp: 99.5}",
-              "address": "0x110"
-            }
-          ],
-          "output": [
-            "Loaded ID: 1, HP: 99.5"
-          ]
+        "line": 11,
+        "title": "1. 바이너리 쓰기 모드로 파일 열기",
+        "explanation": "**`FILE *fp = fopen(\"save.bin\", \"wb\");`**\n\n`\"wb\"` 모드는 '쓰기(write) 바이너리(binary)'를 의미합니다. 데이터를 텍스트로 변환하지 않고, 메모리에 있는 비트 패턴 그대로 파일에 쓰겠다는 의미입니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "fileSystem": { "save.bin": "" },
+          "note": "바이너리 쓰기 모드로 'save.bin' 파일이 열립니다."
         }
+      },
+      {
+        "line": 13,
+        "title": "메모리 내용을 파일에 쓰기 (fwrite)",
+        "explanation": "**`fwrite(&saved, sizeof(struct Player), 1, fp);`**\n\n`saved` 구조체의 메모리 내용을 파일에 그대로 '덤프'합니다.\n- `&saved`: 쓸 데이터가 있는 메모리의 시작 주소\n- `sizeof(struct Player)`: 한 덩어리(chunk)의 크기\n- `1`: 쓸 덩어리의 개수\n- `fp`: 데이터를 쓸 파일",
+        "highlight": [13],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "fileSystem": { "save.bin": "[Binary data of 'saved' struct]" },
+          "note": "'saved' 구조체의 바이트들이 파일에 기록되었습니다."
+        }
+      },
+      {
+        "line": 14,
+        "title": "쓰기 후 파일 닫기",
+        "explanation": "**`fclose(fp);`**\n\n파일을 닫아 쓰기 작업을 완료합니다.",
+        "highlight": [14],
+        "visualizationType": "cMemory",
+        "cMemoryState": {}
+      },
+      {
+        "line": 17,
+        "title": "2. 바이너리 읽기 모드로 파일 열기",
+        "explanation": "**`fp = fopen(\"save.bin\", \"rb\");`**\n\n이제 반대로, 파일에서 데이터를 읽어오기 위해 `\"rb\"` (읽기 바이너리) 모드로 같은 파일을 엽니다.",
+        "highlight": [17],
+        "visualizationType": "cMemory",
+        "cMemoryState": {}
+      },
+      {
+        "line": 19,
+        "title": "파일 내용을 메모리에 읽기 (fread)",
+        "explanation": "**`fread(&loaded, sizeof(struct Player), 1, fp);`**\n\n파일의 바이트들을 읽어 `loaded` 구조체의 메모리 공간에 그대로 '덮어씌웁니다'.\n- `&loaded`: 읽은 데이터를 채워넣을 메모리의 시작 주소\n- `sizeof(struct Player)`: 읽을 한 덩어리의 크기\n- `1`: 읽을 덩어리의 개수\n- `fp`: 데이터를 읽어올 파일",
+        "highlight": [19],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "saved", "type": "struct Player", "value": [{ "key": "id", "value": "1" }, { "key": "hp", "value": "99.5" }] },
+            { "name": "loaded", "type": "struct Player", "value": [{ "key": "id", "value": "1" }, { "key": "hp", "value": "99.5" }], "highlight": true }
+          ],
+          "note": "파일의 바이트들이 'loaded' 구조체에 복사되어 복원되었습니다."
+        }
+      },
+      {
+        "line": 20,
+        "title": "복원된 데이터 확인",
+        "explanation": "**`printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);`**\n\n파일에서 읽어온 데이터가 `loaded` 구조체에 성공적으로 복원되었는지 화면에 출력하여 확인합니다.",
+        "highlight": [20],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "output": ["Loaded ID: 1, HP: 99.5"] }
+      },
+      {
+        "line": 21,
+        "title": "읽기 후 파일 닫기 및 종료",
+        "explanation": "**`fclose(fp); return 0;`**\n\n모든 파일 작업을 마치고 프로그램을 성공적으로 종료합니다.",
+        "highlight": [21, 24],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": ["Loaded ID: 1, HP: 99.5"] }
       }
     ]
   },

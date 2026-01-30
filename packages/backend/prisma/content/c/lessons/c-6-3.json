@@ -3,45 +3,122 @@
   "title": "Struct Basics",
   "concept": "여러 변수를 하나로 묶어주는 꾸러미 (사용자 정의 타입)",
   "content": {
-    "code": "#include <stdio.h>\n\n// Point라는 설계도 작성\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    // 객체(구조체 변수) 생성\n    struct Point p1 = {10, 20};\n    \n    // 멤버 접근 (.)\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    \n    // 대입 연산\n    struct Point p2 = p1; // 전체 복사!\n    p2.x = 99;\n    \n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);\n    \n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    struct Point p1 = {10, 20};\n\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n\n    struct Point p2 = p1;\n    p2.x = 99;\n\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);\n\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
+        "line": 3,
+        "title": "구조체 '틀' 정의",
+        "explanation": "**`struct Point { ... };`**\n\n`int` 타입의 `x`와 `y`를 멤버로 갖는 `Point`라는 이름의 새로운 구조체 '틀(blueprint)'을 정의합니다. 이 자체만으로는 메모리를 차지하지 않고, 이런 모양의 변수를 만들 수 있다는 약속입니다.",
+        "highlight": [3, 4, 5, 6],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [], "note": "Point라는 새로운 타입의 설계도가 만들어졌습니다." }
+      },
+      {
+        "line": 8,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n프로그램 실행이 시작되는 지점입니다.",
+        "highlight": [8],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+      },
+      {
         "line": 9,
-        "title": "구조체 메모리 배치",
-        "explanation": "**`struct Point p1;`**\n`int` 두 개가 연속으로 붙어있는 8바이트 공간이 생깁니다.\n배열은 같은 타입만 묶지만, 구조체는 다른 타입도 묶을 수 있습니다.",
-        "highlight": [
-          9
-        ],
+        "title": "구조체 변수 선언 및 초기화",
+        "explanation": "**`struct Point p1 = {10, 20};`**\n\n앞서 정의한 `Point`라는 틀을 사용하여 `p1`이라는 변수를 스택에 생성합니다. `int` 두 개를 담을 수 있는 공간(8바이트)이 할당되고, 멤버 `x`에는 10, `y`에는 20이 저장됩니다.",
+        "highlight": [9],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "p1",
-              "value": "{x:10, y:20}",
-              "type": "Point",
-              "size": 8
-            }
+            { "name": "p1", "type": "struct Point", "value": [{ "key": "x", "value": "10" }, { "key": "y", "value": "20" }] }
           ],
-          "output": [
-            "p1: (10, 20)"
-          ]
+          "heap": [], "output": []
         }
       },
       {
-        "line": 15,
-        "title": "구조체 복사",
-        "explanation": "**`p2 = p1;`**\n놀랍게도 C언어 구조체는 대입(`=`)하면 **모든 멤버가 통째로 복사**됩니다.\n\nJava나 Python처럼 '참조'가 넘어가는 게 아닙니다. 완전히 독립된 `p2`가 생깁니다.\n그래서 `p2`를 고쳐도 `p1`은 멀쩡합니다.",
-        "highlight": [
-          15,
-          16
-        ],
-        "visualizationType": "terminal",
-        "memoryState": {
-          "output": [
-            "p1: (10, 20)",
-            "p2: (99, 20)"
-          ]
+        "line": 11,
+        "title": "구조체 멤버 접근 및 출력",
+        "explanation": "**`printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);`**\n\n점(`.`) 연산자를 사용하여 구조체 변수 `p1`의 멤버 `x`와 `y`에 접근하여 그 값을 화면에 출력합니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "p1", "type": "struct Point", "value": [{ "key": "x", "value": "10" }, { "key": "y", "value": "20" }] }
+          ],
+          "output": ["p1: (10, 20)"]
         }
+      },
+      {
+        "line": 13,
+        "title": "구조체 복사 (값 복사)",
+        "explanation": "**`struct Point p2 = p1;`**\n\n새로운 구조체 변수 `p2`를 선언하면서 `p1`을 대입합니다. C에서 구조체 대입은 **값의 복사**가 일어납니다. `p1`의 모든 멤버 값이 `p2`로 그대로 복사되어, 완전히 독립적인 새로운 `p2` 변수가 스택에 생성됩니다.",
+        "highlight": [13],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "p1", "type": "struct Point", "value": [{ "key": "x", "value": "10" }, { "key": "y", "value": "20" }] },
+            { "name": "p2", "type": "struct Point", "value": [{ "key": "x", "value": "10" }, { "key": "y", "value": "20" }], "highlight": true }
+          ],
+          "output": ["p1: (10, 20)"],
+          "note": "p1의 내용이 그대로 복사된 p2가 새로 생겼습니다."
+        }
+      },
+      {
+        "line": 14,
+        "title": "복사된 구조체 멤버 수정",
+        "explanation": "**`p2.x = 99;`**\n\n복사본인 `p2`의 `x` 멤버 값을 `99`로 변경합니다. 이 작업은 원본인 `p1`에 아무런 영향을 주지 않습니다.",
+        "highlight": [14],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "p1", "type": "struct Point", "value": [{ "key": "x", "value": "10" }, { "key": "y", "value": "20" }] },
+            { "name": "p2", "type": "struct Point", "value": [{ "key": "x", "value": "99", "highlight": true }, { "key": "y", "value": "20" }] }
+          ],
+          "output": ["p1: (10, 20)"]
+        }
+      },
+      {
+        "line": 16,
+        "title": "원본(p1) 값 확인",
+        "explanation": "**`printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);`**\n\n`p1`의 값을 출력합니다. `p2`의 값을 변경했지만, `p1`의 값은 (10, 20)으로 그대로 유지되었음을 확인할 수 있습니다.",
+        "highlight": [16],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "p1", "type": "struct Point", "value": [{ "key": "x", "value": "10" }, { "key": "y", "value": "20" }] },
+            { "name": "p2", "type": "struct Point", "value": [{ "key": "x", "value": "99" }, { "key": "y", "value": "20" }] }
+          ],
+          "output": ["p1: (10, 20)", "p1: (10, 20)"]
+        }
+      },
+      {
+        "line": 17,
+        "title": "사본(p2) 값 확인",
+        "explanation": "**`printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);`**\n\n`p2`의 값을 출력합니다. 변경된 값 (99, 20)이 올바르게 출력됩니다.",
+        "highlight": [17],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            { "name": "p1", "type": "struct Point", "value": [{ "key": "x", "value": "10" }, { "key": "y", "value": "20" }] },
+            { "name": "p2", "type": "struct Point", "value": [{ "key": "x", "value": "99" }, { "key": "y", "value": "20" }] }
+          ],
+          "output": ["p1: (10, 20)", "p1: (10, 20)", "p2: (99, 20)"]
+        }
+      },
+      {
+        "line": 19,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
+        "highlight": [19],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "stack": [], "heap": [], "output": ["p1: (10, 20)", "p1: (10, 20)", "p2: (99, 20)"] }
       }
     ]
   },

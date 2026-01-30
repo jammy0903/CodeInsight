@@ -3,33 +3,101 @@
   "title": "Token Pasting",
   "concept": "Core concept for Token Pasting",
   "content": {
-    "code": "#include <stdio.h>\n\n// Token Pasting Operator (##)\n#define MAKE_VAR(type, name) type var_##name\n\n// Generic Getter Helper\n#define GETTER(name) int get_##name() { return var_##name; }\n\n// 1. Create variables\nMAKE_VAR(int, apple);  // int var_apple;\nMAKE_VAR(int, banana); // int var_banana;\n\n// 2. Create functions automatically\nGETTER(apple)  // int get_apple() { return var_apple; }\nGETTER(banana) // int get_banana() { return var_banana; }\n\nint main() {\n    var_apple = 100;\n    printf(\"Apple: %d\\n\", get_apple());\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\n#define MAKE_VAR(type, name) type var_##name\n\n#define GETTER(name) int get_##name() { return var_##name; }\n\nMAKE_VAR(int, apple);\nMAKE_VAR(int, banana);\n\nGETTER(apple)\nGETTER(banana)\n\nint main() {\n    var_apple = 100;\n    printf(\"Apple: %d\\n\", get_apple());\n    return 0;\n}",
     "steps": [
       {
-        "line": 9,
-        "title": "Token Pasting (##)",
-        "explanation": "`var_##name`은 `name` 자리에 들어온 텍스트를 `var_` 뒤에 붙여서 하나의 새로운 식별자(변수명)를 만듭니다.\n`MAKE_VAR(int, apple)` -> `int var_apple;`",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "var_apple",
-              "value": 100,
-              "address": "0x100"
-            }
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [1],
+        "visualizationType": "cMemory",
+        "cMemoryState": {}
+      },
+      {
+        "line": 3,
+        "title": "매크로 정의 1: 변수 생성기",
+        "explanation": "**`#define MAKE_VAR(type, name) type var_##name`**\n\n`##` 연산자(토큰 붙이기)를 사용하는 매크로입니다. `##`는 `var_`라는 텍스트와 `name`으로 전달된 텍스트를 합쳐서 하나의 새로운 단어(토큰)로 만듭니다. 예를 들어 `MAKE_VAR(int, apple)`은 `int var_apple` 코드로 변환됩니다.",
+        "highlight": [3],
+        "visualizationType": "cMemory",
+        "cMemoryState": {}
+      },
+      {
+        "line": 5,
+        "title": "매크로 정의 2: Getter 함수 생성기",
+        "explanation": "**`#define GETTER(name) int get_##name() { return var_##name; }`**\n\n`##`를 두 번 사용하여 함수 이름(`get_name`)과 그 안에서 사용될 변수 이름(`var_name`)을 동적으로 생성하는 매크로입니다.",
+        "highlight": [5],
+        "visualizationType": "cMemory",
+        "cMemoryState": {}
+      },
+      {
+        "line": 7,
+        "title": "전처리기 실행: 변수 생성",
+        "explanation": "**`MAKE_VAR(int, apple);`** 와 **`MAKE_VAR(int, banana);`**\n\n전처리기가 이 두 줄을 만나면, 아래와 같은 실제 C 코드로 치환합니다:\n```c\nint var_apple;\nint var_banana;\n```\n컴파일러는 이 생성된 코드를 보게 됩니다. 이 변수들은 전역 변수입니다.",
+        "highlight": [7, 8],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "globals": [
+            { "name": "var_apple", "type": "int", "value": "???" },
+            { "name": "var_banana", "type": "int", "value": "???" }
           ]
         }
       },
       {
+        "line": 10,
+        "title": "전처리기 실행: 함수 생성",
+        "explanation": "**`GETTER(apple)`** 와 **`GETTER(banana)`**\n\n마찬가지로 전처리기는 이 두 줄을 완전한 함수 정의 코드로 치환합니다:\n```c\nint get_apple() { return var_apple; }\nint get_banana() { return var_banana; }\n```",
+        "highlight": [10, 11],
+        "visualizationType": "cMemory",
+        "cMemoryState": { "note": "get_apple()과 get_banana() 함수가 자동으로 생성되었습니다." }
+      },
+      {
         "line": 13,
-        "title": "함수 자동 생성",
-        "explanation": "`GETTER(apple)`은 `int get_apple() { return var_apple; }`이라는 함수 정의 코드를 자동으로 만들어냅니다.\n반복적인 코드를 줄이는 데 매우 강력합니다.",
-        "keyInsight": "C++의 템플릿처럼 흉내낼 수 있는 강력한 기능입니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Apple: 100"
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n이제 컴파일러는 전처리기가 생성한 모든 변수와 함수를 인식한 상태로 `main` 함수를 번역하기 시작합니다.",
+        "highlight": [13],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "globals": [
+            { "name": "var_apple", "type": "int", "value": "???" },
+            { "name": "var_banana", "type": "int", "value": "???" }
           ]
+        }
+      },
+      {
+        "line": 14,
+        "title": "생성된 변수에 값 할당",
+        "explanation": "**`var_apple = 100;`**\n\n매크로를 통해 자동으로 생성된 전역 변수 `var_apple`에 값을 할당합니다.",
+        "highlight": [14],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "globals": [
+            { "name": "var_apple", "type": "int", "value": "100" },
+            { "name": "var_banana", "type": "int", "value": "???" }
+          ]
+        }
+      },
+      {
+        "line": 15,
+        "title": "생성된 함수 호출",
+        "explanation": "**`printf(\"Apple: %d\\n\", get_apple());`**\n\n매크로를 통해 자동으로 생성된 `get_apple()` 함수를 호출합니다. 이 함수는 `var_apple`의 값을 반환하므로, `100`이 출력됩니다.",
+        "highlight": [15],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "globals": [
+            { "name": "var_apple", "type": "int", "value": "100" },
+            { "name": "var_banana", "type": "int", "value": "???" }
+          ],
+          "output": ["Apple: 100"]
+        }
+      },
+      {
+        "line": 16,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
+        "highlight": [16],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "globals": [], "stack": [], "heap": [], "output": ["Apple: 100"]
         }
       }
     ]

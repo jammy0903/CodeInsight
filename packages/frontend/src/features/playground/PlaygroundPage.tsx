@@ -16,8 +16,7 @@ import { useStepGestures } from '@/features/courses/hooks/useStepGestures';
 import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/playgroundStore';
 import { useExplanationStore } from './stores/explanationStore';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
-import { MemoryPanel } from '@/features/courses/components/memory/MemoryPanel';
-import { JavaMemoryView, toJavaMemoryViewProps } from '@/features/visualizers/java';
+import { LessonMemoryVisualizer } from '@/features/visualizers/memory';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { StepNavigationArrows } from '@/features/courses/components/StepNavigationArrows';
 import { useThemeStore } from '@/stores/themeStore';
@@ -345,37 +344,20 @@ export function PlaygroundPage() {
                   />
                 ) : (
                   <>
-                    {language === 'java' ? (
-                      <>
-                        <JavaMemoryView {...toJavaMemoryViewProps(currentStep as LessonStep)} />
-                        {terminalLines.length > 0 && (
-                          <TerminalOutput
-                            lines={terminalLines}
-                            title="출력"
-                            compact
-                            className="mt-4"
-                          />
-                        )}
-                      </>
-                    ) : language === 'c' && memoryState ? (
-                      <>
-                        <MemoryPanel
-                          stack={memoryState.stack}
-                          heap={memoryState.heap}
-                          changedBlocks={changedBlocks}
-                          frames={memoryState.frames}
-                          showRegisters={true}
-                        />
-                        {terminalLines.length > 0 && (
-                          <TerminalOutput
-                            lines={terminalLines}
-                            title="출력"
-                            compact
-                            className="mt-4"
-                          />
-                        )}
-                      </>
-                    ) : null}
+                    <LessonMemoryVisualizer
+                      step={currentStep as LessonStep}
+                      language={language}
+                      memoryState={memoryState}
+                      changedBlocks={changedBlocks}
+                    />
+                    {terminalLines.length > 0 && (
+                      <TerminalOutput
+                        lines={terminalLines}
+                        title="출력"
+                        compact
+                        className="mt-4"
+                      />
+                    )}
                   </>
                 )}
               </>
@@ -659,37 +641,20 @@ export function PlaygroundPage() {
                   />
                 ) : (
                   <>
-                    {language === 'java' ? (
-                      <>
-                        <JavaMemoryView {...toJavaMemoryViewProps(currentStep as LessonStep)} />
-                        {terminalLines.length > 0 && (
-                          <TerminalOutput
-                            lines={terminalLines}
-                            title="출력"
-                            compact
-                            className="mt-6"
-                          />
-                        )}
-                      </>
-                    ) : language === 'c' && memoryState ? (
-                      <>
-                        <MemoryPanel
-                          stack={memoryState.stack}
-                          heap={memoryState.heap}
-                          changedBlocks={changedBlocks}
-                          frames={memoryState.frames}
-                          showRegisters={true}
-                        />
-                        {terminalLines.length > 0 && (
-                          <TerminalOutput
-                            lines={terminalLines}
-                            title="출력"
-                            compact
-                            className="mt-6"
-                          />
-                        )}
-                      </>
-                    ) : null}
+                    <LessonMemoryVisualizer
+                      step={currentStep as LessonStep}
+                      language={language}
+                      memoryState={memoryState}
+                      changedBlocks={changedBlocks}
+                    />
+                    {terminalLines.length > 0 && (
+                      <TerminalOutput
+                        lines={terminalLines}
+                        title="출력"
+                        compact
+                        className="mt-6"
+                      />
+                    )}
                   </>
                 )}
               </>

@@ -33,133 +33,6 @@ const progressUpdateSchema = z.object({
 });
 
 // =============================================
-// Language Endpoints
-// =============================================
-
-/**
- * 언어 목록
- */
-router.get('/languages', async (req, res) => {
-  try {
-    const languages = await courseService.getLanguages();
-    res.json(languages);
-  } catch (error) {
-    logger.error('Get languages error:', error);
-    res.status(500).json({
-      error: 'Failed to get languages',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// =============================================
-// Chapter Endpoints
-// =============================================
-
-/**
- * 언어 상세 (챕터 + 레슨 구조 포함)
- *
- * WHY: optionalDbUser로 인증 선택적 처리
- * - 로그인 시: 챕터별 진행률 포함
- * - 비로그인 시: 코스 구조만 반환
- */
-router.get('/:id', optionalDbUser, async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    // 'chapter'나 'lesson' 등의 키워드가 id로 오면 패스 (안전장치)
-    if (id === 'chapters' || id === 'lessons' || id === 'progress') {
-      return next();
-    }
-
-    if (typeof id !== 'string') {
-      return res.status(400).json({ error: 'Invalid ID' });
-    }
-
-    const userId = req.user?.dbUser?.id;
-    const language = await courseService.getLanguageWithChapters(id, userId);
-
-    if (!language) {
-      return res.status(404).json({ error: 'Language not found' });
-    }
-
-    res.json(language);
-  } catch (error) {
-    logger.error('Get language error:', error);
-    res.status(500).json({
-      error: 'Failed to get language',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-/**
- * 언어별 챕터 목록
- */
-router.get('/:lang/chapters', async (req, res) => {
-  try {
-    const { lang } = req.params;
-    const chapters = await courseService.getChapters(lang);
-    res.json(chapters);
-  } catch (error) {
-    logger.error('Get chapters error:', error);
-    res.status(500).json({
-      error: 'Failed to get chapters',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-/**
- * 챕터 상세 (레슨 목록 포함)
- */
-router.get('/chapters/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const chapter = await courseService.getChapterWithLessons(id);
-
-    if (!chapter) {
-      return res.status(404).json({ error: 'Chapter not found' });
-    }
-
-    res.json(chapter);
-  } catch (error) {
-    logger.error('Get chapter error:', error);
-    res.status(500).json({
-      error: 'Failed to get chapter',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-/**
- * 챕터 진행 상태 (인증 필요)
- */
-router.get('/chapters/:id/progress', requireDbUser, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user!.dbUser!.id;
-
-    const chapterId = Array.isArray(id) ? id[0] : id;
-    if (!chapterId) {
-      return res.status(400).json({ message: 'Chapter ID is required.' });
-    }
-    const progress = await courseService.getChapterProgress(userId, chapterId);
-
-    if (!progress) {
-      return res.status(404).json({ error: 'Chapter not found' });
-    }
-
-    res.json(progress);
-  } catch (error) {
-    logger.error('Get chapter progress error:', error);
-    res.status(500).json({
-      error: 'Failed to get chapter progress',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// =============================================
 // Lesson Endpoints
 // =============================================
 
@@ -221,6 +94,80 @@ router.get('/lessons/:id', async (req, res) => {
 });
 
 // =============================================
+// Language Endpoints
+// =============================================
+
+/**
+ * 언어 목록
+ */
+router.get('/languages', async (req, res) => {
+  try {
+    const languages = await courseService.getLanguages();
+    res.json(languages);
+  } catch (error) {
+    logger.error('Get languages error:', error);
+    res.status(500).json({
+      error: 'Failed to get languages',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// =============================================
+// Chapter Endpoints
+// =============================================
+
+/**
+ * 챕터 상세 (레슨 목록 포함)
+ */
+router.get('/chapters/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const chapter = await courseService.getChapterWithLessons(id);
+
+    if (!chapter) {
+      return res.status(404).json({ error: 'Chapter not found' });
+    }
+
+    res.json(chapter);
+  } catch (error) {
+    logger.error('Get chapter error:', error);
+    res.status(500).json({
+      error: 'Failed to get chapter',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+/**
+ * 챕터 진행 상태 (인증 필요)
+ */
+router.get('/chapters/:id/progress', requireDbUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user!.dbUser!.id;
+
+    const chapterId = Array.isArray(id) ? id[0] : id;
+    if (!chapterId) {
+      return res.status(400).json({ message: 'Chapter ID is required.' });
+    }
+    const progress = await courseService.getChapterProgress(userId, chapterId);
+
+    if (!progress) {
+      return res.status(404).json({ error: 'Chapter not found' });
+    }
+
+    res.json(progress);
+  } catch (error) {
+    logger.error('Get chapter progress error:', error);
+    res.status(500).json({
+      error: 'Failed to get chapter progress',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// =============================================
 // Progress Endpoints
 // =============================================
 
@@ -265,6 +212,63 @@ router.post('/progress', requireDbUser, async (req, res) => {
     logger.error('Update progress error:', error);
     res.status(500).json({
       error: 'Failed to update progress',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// =============================================
+// Generic Language/Chapter Endpoints (MUST BE LAST)
+// =============================================
+
+/**
+ * 언어 상세 (챕터 + 레슨 구조 포함)
+ *
+ * WHY: optionalDbUser로 인증 선택적 처리
+ * - 로그인 시: 챕터별 진행률 포함
+ * - 비로그인 시: 코스 구조만 반환
+ */
+router.get('/:id', optionalDbUser, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    // 'chapter'나 'lesson' 등의 키워드가 id로 오면 패스 (안전장치)
+    if (id === 'chapters' || id === 'lessons' || id === 'progress' || id === 'languages') {
+      return next();
+    }
+
+    if (typeof id !== 'string') {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    const userId = req.user?.dbUser?.id;
+    const language = await courseService.getLanguageWithChapters(id, userId);
+
+    if (!language) {
+      return res.status(404).json({ error: 'Language not found' });
+    }
+
+    res.json(language);
+  } catch (error) {
+    logger.error('Get language error:', error);
+    res.status(500).json({
+      error: 'Failed to get language',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+/**
+ * 언어별 챕터 목록
+ */
+router.get('/:lang/chapters', async (req, res) => {
+  try {
+    const { lang } = req.params;
+    const chapters = await courseService.getChapters(lang);
+    res.json(chapters);
+  } catch (error) {
+    logger.error('Get chapters error:', error);
+    res.status(500).json({
+      error: 'Failed to get chapters',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
