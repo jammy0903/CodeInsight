@@ -787,7 +787,8 @@ export function LessonPage() {
                 <div className="w-full h-full overflow-y-auto">
                   <div className="p-4">
                     {currentStep && (
-                      <LessonFlowVisualizer
+                      <>
+                        <LessonFlowVisualizer
                           step={currentStep}
                           prevStep={navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null}
                           language={lang === 'python-practical' ? 'python' : (lang || 'c')}
@@ -798,6 +799,16 @@ export function LessonPage() {
                           } : undefined}
                           stdout={currentStep.stdout}
                         />
+                        {/* 터미널 출력 */}
+                        {terminalLines.length > 0 && (
+                          <TerminalOutput
+                            lines={terminalLines}
+                            title="출력"
+                            compact
+                            className="mt-6"
+                          />
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
