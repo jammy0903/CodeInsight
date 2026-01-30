@@ -14,9 +14,9 @@ NC='\033[0m' # No Color
 # 프로젝트 루트로 이동
 cd "$(dirname "$0")"
 
-# .env 파일 로드
+# .env 파일에서 RENDER_ 변수만 로드 (멀티라인 값 문제 방지)
 if [ -f .env ]; then
-  export $(cat .env | grep -v '^#' | grep -v '^$' | xargs)
+  export $(cat .env | grep '^RENDER_' | xargs)
 else
   echo -e "${RED}❌ .env 파일이 없습니다!${NC}"
   exit 1
