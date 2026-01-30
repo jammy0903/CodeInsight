@@ -15,6 +15,7 @@ export interface PythonSnapshot {
     content: string;
     length?: number;
   }>;
+  stdout?: string;  // 누적 print 출력
   error?: {
     type: string;
     message: string;
