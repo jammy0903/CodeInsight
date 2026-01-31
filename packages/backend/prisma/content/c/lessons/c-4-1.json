@@ -6,130 +6,140 @@
     "code": "#include <stdio.h>\n\nvoid funcB(int x) {\n    int b = x + 1;\n    printf(\"Inside funcB: b=%d\\n\", b);\n}\n\nvoid funcA() {\n    int a = 10;\n    funcB(a);\n}\n\nint main() {\n    funcA();\n    return 0;\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "funcB 함수 정의",
-        "explanation": "**`void funcB(int x) {`**\n\nint 파라미터 `x`를 받는 함수입니다.",
-        "highlight": [3],
-        "visualizationType": "cMemory",
-        "cMemoryState": {"stack": [], "heap": [], "output": []}
-      },
-      {
-        "line": 3,
-        "title": "funcB 호출",
-        "explanation": "`funcB(a)`를 호하면, 또다시 `funcA` 위에 `funcB` 층이 쌓입니다.\n스택이 점점 높아집니다.\n\n이렇게 층층이 쌓이기 때문에 **스택(Stack, 무더기)**이라고 부릅니다.",
-        "highlight": [
-          3,
-          4,
-          5
-        ],
+        "line": 13,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n프로그램이 시작되면 `main` 함수의 스택 프레임이 가장 먼저 생깁니다. 이곳은 `main`의 지역 변수들을 위한 공간입니다.",
+        "highlight": [13],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "main_frame",
-              "type": "frame",
-              "func": "main"
-            },
-            {
-              "name": "funcA_frame",
-              "type": "frame",
-              "func": "funcA"
-            },
-            {
-              "name": "a",
-              "value": "10",
-              "type": "int",
-              "frame": "funcA"
-            },
-            {
-              "name": "funcB_frame",
-              "type": "frame",
-              "func": "funcB"
-            },
-            {
-              "name": "x",
-              "value": "10",
-              "type": "int",
-              "frame": "funcB"
-            },
-            {
-              "name": "b",
-              "value": "11",
-              "type": "int",
-              "frame": "funcB"
-            }
+            {"name": "main", "type": "frame", "func": "main"}
           ],
-          "output": [
-            "Inside funcB: b=11"
-          ]
+          "output": []
+        }
+      },
+      {
+        "line": 14,
+        "title": "funcA 호출",
+        "explanation": "**`funcA();`**\n\n`funcA()`를 호출하면, `main` 프레임 위에 `funcA`의 프레임이 쌓입니다(Push). 스택이 한 층 더 높아집니다.",
+        "highlight": [14, 8],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "main", "type": "frame", "func": "main"},
+            {"name": "funcA", "type": "frame", "func": "funcA"}
+          ],
+          "output": []
+        }
+      },
+      {
+        "line": 9,
+        "title": "funcA 내부: 변수 a 생성",
+        "explanation": "**`int a = 10;`**\n\n`funcA`의 스택 프레임 안에 지역 변수 `a`가 생성됩니다. 이 변수는 `funcA`만의 공간에 있으므로 다른 함수에서 직접 접근할 수 없습니다.",
+        "highlight": [9],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "main", "type": "frame", "func": "main"},
+            {"name": "funcA", "type": "frame", "func": "funcA"},
+            {"name": "a", "value": "10", "type": "int", "frame": "funcA"}
+          ],
+          "output": []
+        }
+      },
+      {
+        "line": 10,
+        "title": "funcB 호출 (스택 Push)",
+        "explanation": "**`funcB(a);`**\n\n`funcB(a)`를 호출하면, 또다시 `funcA` 위에 `funcB` 층이 쌓입니다. `a`의 값(10)이 `x`로 복사되어 전달됩니다.\n\n이렇게 층층이 쌓이기 때문에 **스택(Stack, 무더기)**이라고 부릅니다.",
+        "highlight": [10, 3],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "main", "type": "frame", "func": "main"},
+            {"name": "funcA", "type": "frame", "func": "funcA"},
+            {"name": "a", "value": "10", "type": "int", "frame": "funcA"},
+            {"name": "funcB", "type": "frame", "func": "funcB"},
+            {"name": "x", "value": "10", "type": "int", "frame": "funcB"}
+          ],
+          "output": []
+        }
+      },
+      {
+        "line": 4,
+        "title": "funcB 내부: 변수 b 생성",
+        "explanation": "**`int b = x + 1;`**\n\n`funcB`의 스택 프레임 안에 지역 변수 `b`가 생성되고, `x + 1` (= 11)로 초기화됩니다.",
+        "highlight": [4],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "main", "type": "frame", "func": "main"},
+            {"name": "funcA", "type": "frame", "func": "funcA"},
+            {"name": "a", "value": "10", "type": "int", "frame": "funcA"},
+            {"name": "funcB", "type": "frame", "func": "funcB"},
+            {"name": "x", "value": "10", "type": "int", "frame": "funcB"},
+            {"name": "b", "value": "11", "type": "int", "frame": "funcB"}
+          ],
+          "output": []
         }
       },
       {
         "line": 5,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"Inside funcB: b=%d\\n\", b);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          5
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
-        }
-      },
-      {
-        "line": 8,
-        "title": "funcA 호출",
-        "explanation": "`funcA()`를 부르면, `main` 프레임 위에 `funcA`의 프레임이 쌓입니다(Push).\n`funcA`의 변수 `a`는 이 새로운 층에 저장됩니다.",
-        "highlight": [
-          8,
-          9,
-          10
-        ],
+        "title": "funcB: 결과 출력",
+        "explanation": "**`printf(\"Inside funcB: b=%d\\n\", b);`**\n\n`funcB` 안에서 계산된 `b`의 값을 출력합니다.",
+        "highlight": [5],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "main_frame",
-              "type": "frame",
-              "func": "main"
-            },
-            {
-              "name": "funcA_frame",
-              "type": "frame",
-              "func": "funcA"
-            },
-            {
-              "name": "a",
-              "value": "10",
-              "type": "int",
-              "frame": "funcA"
-            }
+            {"name": "main", "type": "frame", "func": "main"},
+            {"name": "funcA", "type": "frame", "func": "funcA"},
+            {"name": "a", "value": "10", "type": "int", "frame": "funcA"},
+            {"name": "funcB", "type": "frame", "func": "funcB"},
+            {"name": "x", "value": "10", "type": "int", "frame": "funcB"},
+            {"name": "b", "value": "11", "type": "int", "frame": "funcB"}
           ],
-          "output": []
+          "output": ["Inside funcB: b=11"]
+        }
+      },
+      {
+        "line": 6,
+        "title": "funcB 종료 (스택 Pop)",
+        "explanation": "**`}`**\n\n`funcB`가 종료되면, `funcB`의 스택 프레임이 통째로 사라집니다(Pop). 지역 변수 `x`, `b`도 함께 파괴됩니다. 제어권은 `funcA`로 돌아갑니다.",
+        "highlight": [6],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "main", "type": "frame", "func": "main"},
+            {"name": "funcA", "type": "frame", "func": "funcA"},
+            {"name": "a", "value": "10", "type": "int", "frame": "funcA"}
+          ],
+          "output": ["Inside funcB: b=11"],
+          "note": "funcB 프레임이 스택에서 제거됨 (Pop)"
         }
       },
       {
         "line": 11,
-        "title": "main 실행",
-        "explanation": "프로그램이 시작되면 `main` 함수의 스택 프레임이 가장 먼저 생깁니다.\n이곳은 `main`의 지역 변수들을 위한 공간입니다.",
-        "highlight": [
-          11,
-          12,
-          13
-        ],
+        "title": "funcA 종료 (스택 Pop)",
+        "explanation": "**`}`**\n\n`funcA`도 종료되어 프레임이 사라집니다. 변수 `a`도 파괴됩니다. 제어권은 `main`으로 돌아갑니다.",
+        "highlight": [11],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "main_frame",
-              "type": "frame",
-              "func": "main"
-            }
+            {"name": "main", "type": "frame", "func": "main"}
           ],
-          "output": []
+          "output": ["Inside funcB: b=11"],
+          "note": "funcA 프레임이 스택에서 제거됨 (Pop)"
+        }
+      },
+      {
+        "line": 15,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n`main`이 종료되면 프로그램이 끝납니다. 함수 호출은 스택에 쌓고(Push), 리턴하면 빼는(Pop) 구조입니다.",
+        "highlight": [15],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": ["Inside funcB: b=11"]
         }
       }
     ]
