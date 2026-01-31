@@ -7,45 +7,63 @@
     "steps": [
       {
         "line": 1,
-        "title": "데코레이터 함수 정의",
-        "explanation": "`logger`라는 함수를 정의합니다. 이 함수는 다른 함수(`func`)를 인자로 받아서, 그 함수를 감싸는 새로운 함수(`wrapper`)를 만들어 반환합니다.",
+        "title": "logger 함수 정의",
+        "explanation": "`def logger(func):`\n데코레이터 함수를 정의합니다. 다른 함수를 인자로 받습니다.",
         "highlight": [1, 2, 3, 4, 5, 6, 7]
       },
       {
-        "line": 9,
-        "title": "데코레이터 적용",
-        "explanation": "`@logger`\n`say_hello` 함수 바로 위에 골뱅이(`@`)와 함께 데코레이터 함수 이름을 적어줍니다. 이것은 `say_hello = logger(say_hello)` 코드와 완전히 똑같이 동작하는 '문법 설탕'입니다.",
-        "highlight": [9]
+        "line": 10,
+        "title": "@logger 데코레이터 적용 및 say_hello 정의",
+        "explanation": "`@logger` + `def say_hello(name):`\n@logger는 `say_hello = logger(say_hello)`와 동일합니다. logger가 호출됩니다.",
+        "highlight": [9, 10, 11]
       },
       {
-        "line": 10,
-        "title": "꾸밈을 받을 함수 정의",
-        "explanation": "`def say_hello(name):`\n핵심 로직을 담고 있는 원본 함수입니다. 이 함수는 이제 `logger` 데코레이터에 의해 '꾸며진' 상태입니다.",
-        "highlight": [10, 11]
+        "line": 2,
+        "title": "wrapper 함수 정의",
+        "explanation": "`def wrapper(*args, **kwargs):`\nlogger 함수 안에서 wrapper 함수를 정의합니다. say_hello(func)를 감싸는 클로저입니다.",
+        "highlight": [2, 3, 4, 5, 6]
+      },
+      {
+        "line": 7,
+        "title": "wrapper 반환",
+        "explanation": "`return wrapper`\nwrapper 함수를 반환합니다. say_hello는 이제 wrapper를 가리킵니다.",
+        "highlight": [7]
       },
       {
         "line": 13,
-        "title": "꾸며진 함수 호출",
-        "explanation": "`say_hello(\"앨리스\")`\n`say_hello`를 호출했지만, 실제로는 `logger`가 반환한 `wrapper` 함수가 호출됩니다.",
+        "title": "say_hello 호출 (wrapper 호출)",
+        "explanation": "`say_hello(\"앨리스\")`\nsay_hello를 호출하지만 실제로는 wrapper가 호출됩니다.",
         "highlight": [13]
       },
       {
         "line": 3,
-        "title": "wrapper 함수 실행 (시작)",
-        "explanation": "`print(f\"--- {func.__name__} 시작 ---\")`\n`wrapper` 함수가 먼저 실행되어, 원본 함수의 이름(`say_hello`)을 포함한 시작 로그를 출력합니다.",
+        "title": "wrapper 실행 - 시작 로그",
+        "explanation": "`print(f\"--- {func.__name__} 시작 ---\")`\n\"--- say_hello 시작 ---\"을 출력합니다.",
         "highlight": [3]
       },
       {
         "line": 4,
-        "title": "원본 함수 실행",
-        "explanation": "`result = func(*args, **kwargs)`\n`wrapper` 함수 안에서 드디어 원본 `say_hello` 함수가 호출됩니다. `\"안녕하세요, 앨리스님!\"`이 출력됩니다.",
+        "title": "원본 함수 호출",
+        "explanation": "`result = func(*args, **kwargs)`\n원본 say_hello 함수를 호출합니다.",
         "highlight": [4]
       },
       {
+        "line": 11,
+        "title": "say_hello 본문 실행",
+        "explanation": "`print(f\"안녕하세요, {name}님!\")`\n\"안녕하세요, 앨리스님!\"을 출력합니다.",
+        "highlight": [11]
+      },
+      {
         "line": 5,
-        "title": "wrapper 함수 실행 (종료)",
-        "explanation": "`print(f\"--- {func.__name__} 종료 ---\")`\n원본 함수 실행이 끝난 후, `wrapper` 함수는 종료 로그를 출력합니다.",
+        "title": "wrapper 실행 - 종료 로그",
+        "explanation": "`print(f\"--- {func.__name__} 종료 ---\")`\n\"--- say_hello 종료 ---\"를 출력합니다.",
         "highlight": [5]
+      },
+      {
+        "line": 6,
+        "title": "결과 반환",
+        "explanation": "`return result`\n원본 함수의 결과(None)를 반환합니다.",
+        "highlight": [6]
       }
     ]
   },

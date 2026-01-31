@@ -7,45 +7,111 @@
     "steps": [
       {
         "line": 1,
-        "title": "인자있는 데코레이터 정의",
-        "explanation": "`repeat(n)` 함수는 데코레이터 자체에 인자(`n`)를 받기 위해 3단 중첩 구조를 가집니다. 가장 바깥 함수(`repeat`)는 인자를 받고, 그 안의 `decorator` 함수가 꾸밀 함수를 받으며, 가장 안쪽의 `wrapper`가 실제 로직을 실행합니다.",
+        "title": "repeat 함수 정의",
+        "explanation": "`def repeat(n):`\n3단 중첩 구조의 가장 바깥 함수입니다. 데코레이터 인자 n을 받습니다.",
         "highlight": [1, 2, 3, 4, 5, 6, 7, 8]
       },
       {
         "line": 10,
-        "title": "데코레이터에 인자 전달",
-        "explanation": "`@repeat(3)`\n데코레이터에 숫자 `3`을 전달하며 적용합니다. 이 코드는 두 단계로 실행됩니다:\n1. `repeat(3)`이 먼저 호출되어, `n=3`을 기억하는 `decorator` 함수가 반환됩니다.\n2. 반환된 `decorator`가 `greet` 함수를 꾸밉니다. (`greet = decorator(greet)`)",
+        "title": "@repeat(3) 적용",
+        "explanation": "`@repeat(3)`\nrepeat(3)이 먼저 호출됩니다. n=3을 기억하는 decorator 함수가 반환됩니다.",
         "highlight": [10]
       },
       {
+        "line": 2,
+        "title": "decorator 함수 정의",
+        "explanation": "`def decorator(func):`\nn=3을 기억하는 decorator 함수가 정의됩니다.",
+        "highlight": [2, 3, 4, 5, 6, 7]
+      },
+      {
+        "line": 8,
+        "title": "decorator 반환",
+        "explanation": "`return decorator`\ndecorator 함수를 반환합니다. 이것이 실제 데코레이터가 됩니다.",
+        "highlight": [8]
+      },
+      {
         "line": 11,
-        "title": "꾸밈을 받을 함수 정의",
-        "explanation": "`def greet(name):`\n핵심 로직을 담고 있는 원본 함수입니다.",
+        "title": "greet 함수 정의 및 꾸미기",
+        "explanation": "`def greet(name):`\ngreet 함수가 정의되고, decorator(greet)가 호출됩니다.",
         "highlight": [11, 12]
       },
       {
+        "line": 3,
+        "title": "wrapper 함수 정의",
+        "explanation": "`def wrapper(*args, **kwargs):`\ndecorator 안에서 wrapper 함수가 정의됩니다.",
+        "highlight": [3, 4, 5, 6]
+      },
+      {
+        "line": 7,
+        "title": "wrapper 반환",
+        "explanation": "`return wrapper`\nwrapper를 반환합니다. greet은 이제 wrapper를 가리킵니다.",
+        "highlight": [7]
+      },
+      {
         "line": 14,
-        "title": "꾸며진 함수 호출",
-        "explanation": "`greet(\"World\")`\n`greet`을 호출하면, `repeat(3)`이 만들었던 `wrapper` 함수가 실행됩니다. `\"World\"`는 `wrapper`를 통해 원본 `greet` 함수에 전달됩니다.",
+        "title": "greet 호출 (wrapper 호출)",
+        "explanation": "`greet(\"World\")`\ngreet을 호출하면 wrapper가 실행됩니다.",
         "highlight": [14]
       },
       {
         "line": 4,
-        "title": "wrapper 함수 실행",
-        "explanation": "`print(f\"{n}번 반복합니다:\")`\n`wrapper` 함수가 실행됩니다. `repeat` 함수가 받았던 인자 `n` (값: 3)을 기억하고 있는 클로저이므로, `3번 반복합니다:`를 출력합니다.",
+        "title": "wrapper 실행 - 메시지 출력",
+        "explanation": "`print(f\"{n}번 반복합니다:\")`\n\"3번 반복합니다:\"를 출력합니다.",
         "highlight": [4]
       },
       {
         "line": 5,
-        "title": "반복문 실행",
-        "explanation": "`for _ in range(n):`\n기억하고 있던 `n`(3)만큼 `for` 루프를 실행합니다.",
+        "title": "for 루프 시작 - 첫 번째",
+        "explanation": "`for _ in range(n):`\n3번 반복할 for 루프가 시작됩니다.",
         "highlight": [5]
       },
       {
         "line": 6,
-        "title": "원본 함수 반복 호출",
-        "explanation": "`func(*args, **kwargs)`\n루프 안에서 원본 함수 `greet`를 반복해서 호출합니다. 그 결과 \"Hello, World!\"가 세 번 출력됩니다.",
+        "title": "원본 함수 호출 (1)",
+        "explanation": "`func(*args, **kwargs)`\n원본 greet 함수를 호출합니다.",
         "highlight": [6]
+      },
+      {
+        "line": 12,
+        "title": "greet 본문 실행 (1)",
+        "explanation": "`print(f\"Hello, {name}!\")`\n\"Hello, World!\"를 출력합니다.",
+        "highlight": [12]
+      },
+      {
+        "line": 5,
+        "title": "for 루프 - 두 번째",
+        "explanation": "두 번째 반복입니다.",
+        "highlight": [5]
+      },
+      {
+        "line": 6,
+        "title": "원본 함수 호출 (2)",
+        "explanation": "`func(*args, **kwargs)`\ngreet 함수를 두 번째로 호출합니다.",
+        "highlight": [6]
+      },
+      {
+        "line": 12,
+        "title": "greet 본문 실행 (2)",
+        "explanation": "`print(f\"Hello, {name}!\")`\n\"Hello, World!\"를 두 번째로 출력합니다.",
+        "highlight": [12]
+      },
+      {
+        "line": 5,
+        "title": "for 루프 - 세 번째",
+        "explanation": "세 번째 반복입니다.",
+        "highlight": [5]
+      },
+      {
+        "line": 6,
+        "title": "원본 함수 호출 (3)",
+        "explanation": "`func(*args, **kwargs)`\ngreet 함수를 세 번째로 호출합니다.",
+        "highlight": [6]
+      },
+      {
+        "line": 12,
+        "title": "greet 본문 실행 (3)",
+        "explanation": "`print(f\"Hello, {name}!\")`\n\"Hello, World!\"를 세 번째로 출력합니다. for 루프가 종료됩니다.",
+        "highlight": [12]
       }
     ]
   },
