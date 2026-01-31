@@ -1,6 +1,6 @@
 {
   "lessonId": "py-4-5",
-  "title": "반환값과 참조",
+  "title": "Return & Reference",
   "concept": "함수가 반환하는 건 값이 아니라 객체에 대한 참조!",
   "content": {
     "code": "def get_list():\n    data = [1, 2, 3]\n    return data\n\na = get_list()\nb = get_list()\n\nprint(f\"a: {a}\")\nprint(f\"b: {b}\")\nprint(f\"a is b: {a is b}\")",
@@ -8,62 +8,153 @@
       {
         "line": 1,
         "title": "리스트를 반환하는 함수 정의",
-        "explanation": "`def get_list():`\n이 함수는 호출될 때마다 새로운 리스트 객체를 생성하고 반환합니다.",
-        "highlight": [1, 2, 3]
+        "explanation": "**`def get_list():`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 리스트를 반환하는 `get_list` 함수를 정의합니다.\n\n**return의 역할**: 함수 내부에서 생성한 리스트 객체를 **호출한 곳으로 돌려줍니다**. 매번 호출될 때마다 **새로운 리스트 객체**가 생성됩니다.\n\n**왜 이 순서인가?** 함수를 먼저 정의해야 아래에서 호출할 수 있습니다.\n\n**실행 순서**: def 실행 → get_list 함수 등록 → line 5",
+        "highlight": [1, 2, 3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"}
+          ],
+          "output": [],
+          "note": "함수 정의됨 (코드 실행 안 됨)"
+        }
     },
     {
         "line": 5,
         "title": "첫 번째 함수 호출",
-        "explanation": "`a = get_list()`\n`get_list` 함수를 호출합니다. 실행 흐름이 함수 내부로 이동합니다.",
-        "highlight": [5]
+        "explanation": "**`a = get_list()`**\n\n**함수 호출**: 정의된 `get_list` 함수를 호출합니다.\n\n**실행 흐름 점프**: 호출 순간, 프로그램의 실행 흐름이 **함수 내부(line 2)**로 이동합니다.\n\n**왜 이 순서인가?** 함수 정의 후, 순서대로 다음 줄을 실행하다가 함수 호출을 만나면 함수 내부로 점프합니다.\n\n**실행 순서**: line 5 → get_list() 호출 → line 2로 점프",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"}
+          ],
+          "output": [],
+          "note": "get_list() 호출 → line 2로 점프 예정"
+        }
     },
     {
         "line": 2,
         "title": "리스트 생성 (첫 번째)",
-        "explanation": "`data = [1, 2, 3]`\n새로운 리스트 객체 `[1, 2, 3]`을 생성하고 `data`에 할당합니다.",
-        "highlight": [2]
+        "explanation": "**`data = [1, 2, 3]`**\n\n함수 내부로 들어와서 **새로운 리스트 객체 `[1, 2, 3]`**을 생성합니다. 이 객체는 메모리의 특정 위치(예: 0x2000)에 저장됩니다.\n\n**왜 새 객체를 만드는가?** Python에서 리스트 리터럴 `[1, 2, 3]`은 평가될 때마다 **새로운 객체**를 생성합니다.\n\n**함수 스코프**: `data`는 함수 내부에서만 존재하는 **지역 변수**입니다.\n\n**실행 순서**: line 2 → 리스트 객체 생성 (0x2000) → data = 0x2000 → line 3",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"},
+            {"name": "data", "value": "[1, 2, 3]", "type": "list", "id": "0x2000", "highlight": true}
+          ],
+          "output": [],
+          "note": "새 리스트 객체 0x2000 생성"
+        }
     },
     {
         "line": 3,
         "title": "리스트 반환 (첫 번째)",
-        "explanation": "`return data`\n생성된 리스트 객체에 대한 참조를 반환합니다. `a`가 이 객체를 가리킵니다.",
-        "highlight": [3]
+        "explanation": "**`return data`**\n\n생성된 리스트 객체(0x2000)에 대한 **참조를 반환**합니다.\n\n**return의 동작**:\n1. `data`가 가리키는 객체의 **참조(주소)**를 반환\n2. **복사가 아님**: 리스트 내용을 복사하지 않고, 같은 객체를 가리키게 함\n3. 함수 종료 후 **line 5로 돌아감**\n\n반환된 참조가 `a`에 할당되어, **`a`도 0x2000 객체를 가리킵니다**.\n\n**왜 data가 사라지지 않는가?** `a`가 참조하고 있으므로, Python 가비지 컬렉터가 이 객체를 보존합니다.\n\n**실행 순서**: return 실행 → 0x2000 참조 반환 → line 5로 돌아감 → a = 0x2000 → line 6",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"},
+            {"name": "a", "value": "[1, 2, 3]", "type": "list", "id": "0x2000"}
+          ],
+          "output": [],
+          "note": "a = 0x2000 (첫 번째 리스트 참조)"
+        }
     },
     {
         "line": 6,
         "title": "두 번째 함수 호출",
-        "explanation": "`b = get_list()`\n`get_list` 함수를 다시 호출합니다.",
-        "highlight": [6]
+        "explanation": "**`b = get_list()`**\n\n**같은 함수를 다시 호출**합니다. 이번에도 실행 흐름이 **함수 내부(line 2)**로 이동합니다.\n\n**중요**: 이전 호출과 **완전히 독립적인 새로운 실행**입니다. 이전에 만들었던 리스트(0x2000)와는 별개입니다.\n\n**왜 이 순서인가?** 이전 함수 호출이 완료되고, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 6 → get_list() 호출 → line 2로 점프",
+        "highlight": [6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"},
+            {"name": "a", "value": "[1, 2, 3]", "type": "list", "id": "0x2000"}
+          ],
+          "output": [],
+          "note": "get_list() 다시 호출 → line 2로 점프 예정"
+        }
     },
     {
         "line": 2,
         "title": "리스트 생성 (두 번째)",
-        "explanation": "`data = [1, 2, 3]`\n**또 다른 새로운** 리스트 객체를 생성합니다. 첫 번째와 다른 객체입니다!",
-        "highlight": [2]
+        "explanation": "**`data = [1, 2, 3]`**\n\n**또 다른 새로운** 리스트 객체를 생성합니다. 이번 객체는 다른 메모리 위치(예: 0x3000)에 저장됩니다.\n\n**왜 새 객체인가?**\n- 리스트 리터럴 `[1, 2, 3]`은 **평가될 때마다** 새 객체 생성\n- 첫 번째 호출의 리스트(0x2000)와 **완전히 다른 객체**\n- 내용은 같아도(`[1, 2, 3]`), **메모리 주소는 다름**\n\n**함수 호출마다 독립적**: 각 함수 호출은 자신만의 지역 변수 `data`를 가집니다.\n\n**실행 순서**: line 2 → 리스트 객체 생성 (0x3000) → data = 0x3000 → line 3",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"},
+            {"name": "a", "value": "[1, 2, 3]", "type": "list", "id": "0x2000"},
+            {"name": "data", "value": "[1, 2, 3]", "type": "list", "id": "0x3000", "highlight": true}
+          ],
+          "output": [],
+          "note": "새 리스트 객체 0x3000 생성 (0x2000과 다름!)"
+        }
     },
     {
         "line": 3,
         "title": "리스트 반환 (두 번째)",
-        "explanation": "`return data`\n새로 생성된 리스트 객체에 대한 참조를 반환합니다. `b`가 이 객체를 가리킵니다.",
-        "highlight": [3]
+        "explanation": "**`return data`**\n\n새로 생성된 리스트 객체(0x3000)에 대한 **참조를 반환**합니다.\n\n반환된 참조가 `b`에 할당되어, **`b`는 0x3000 객체를 가리킵니다**.\n\n**중요한 차이**:\n- `a` → 0x2000 (첫 번째 호출)\n- `b` → 0x3000 (두 번째 호출)\n- **서로 다른 객체**를 가리킴!\n\n**실행 순서**: return 실행 → 0x3000 참조 반환 → line 6으로 돌아감 → b = 0x3000 → line 8",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"},
+            {"name": "a", "value": "[1, 2, 3]", "type": "list", "id": "0x2000"},
+            {"name": "b", "value": "[1, 2, 3]", "type": "list", "id": "0x3000"}
+          ],
+          "output": [],
+          "note": "b = 0x3000 (두 번째 리스트 참조, a와 다름)"
+        }
     },
     {
         "line": 8,
         "title": "변수 a의 내용 출력",
-        "explanation": "`print(f\"a: {a}\")`\n변수 `a`가 가리키는 리스트의 내용을 출력합니다.",
-        "highlight": [8]
+        "explanation": "**`print(f\"a: {a}\")`**\n\n변수 `a`가 가리키는 리스트(0x2000)의 내용을 출력합니다. 결과: `a: [1, 2, 3]`\n\n**실행 순서**: a 읽기 (0x2000 참조) → 리스트 내용 평가 → f-string 평가 → print 실행 → line 9",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"},
+            {"name": "a", "value": "[1, 2, 3]", "type": "list", "id": "0x2000"},
+            {"name": "b", "value": "[1, 2, 3]", "type": "list", "id": "0x3000"}
+          ],
+          "output": ["a: [1, 2, 3]"]
+        }
     },
     {
         "line": 9,
         "title": "변수 b의 내용 출력",
-        "explanation": "`print(f\"b: {b}\")`\n변수 `b`가 가리키는 리스트의 내용을 출력합니다. `a`와 값은 같아 보입니다.",
-        "highlight": [9]
+        "explanation": "**`print(f\"b: {b}\")`**\n\n변수 `b`가 가리키는 리스트(0x3000)의 내용을 출력합니다. 결과: `b: [1, 2, 3]`\n\n**왜 a와 같아 보이는가?** 내용(`[1, 2, 3]`)은 같지만, **서로 다른 객체**입니다. 마치 쌍둥이처럼 겉모습은 같지만 별개의 존재입니다.\n\n**실행 순서**: b 읽기 (0x3000 참조) → 리스트 내용 평가 → f-string 평가 → print 실행 → line 10",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"},
+            {"name": "a", "value": "[1, 2, 3]", "type": "list", "id": "0x2000"},
+            {"name": "b", "value": "[1, 2, 3]", "type": "list", "id": "0x3000"}
+          ],
+          "output": ["a: [1, 2, 3]", "b: [1, 2, 3]"]
+        }
     },
     {
         "line": 10,
-        "title": "객체 동일성 검사",
-        "explanation": "`print(f\"a is b: {a is b}\")`\n`is` 연산자로 `a`와 `b`가 '완전히 같은 객체'인지를 확인합니다. `get_list()` 함수는 호출될 때마다 새로운 리스트 객체를 생성하므로, 두 변수는 서로 다른 객체를 가리킵니다. 따라서 `False`가 출력됩니다.",
-        "highlight": [10]
+        "title": "객체 동일성 검사 (is)",
+        "explanation": "**`print(f\"a is b: {a is b}\")`**\n\n**`is` 연산자**: 두 변수가 **완전히 같은 객체**를 가리키는지 확인합니다 (메모리 주소 비교).\n\n**동작 원리**:\n- `a is b` → `0x2000 is 0x3000` → `False`\n- `a`와 `b`는 **서로 다른 메모리 주소**를 가리킴\n\n**is vs ==**:\n- `is`: 객체의 **동일성(identity)** 확인 (같은 객체인가?)\n- `==`: 객체의 **값(value)** 확인 (내용이 같은가?)\n\n**왜 False인가?** `get_list()` 함수는 호출될 때마다 **새로운 리스트 객체**를 생성하므로, 두 변수는 다른 객체를 가리킵니다.\n\n만약 `a == b`를 했다면 `True`가 나옵니다 (내용은 같으므로).\n\n**실행 순서**: a is b 평가 (False) → f-string 평가 → print 실행 → 프로그램 종료",
+        "highlight": [10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "get_list", "value": "<function>", "type": "function", "id": "0x1000"},
+            {"name": "a", "value": "[1, 2, 3]", "type": "list", "id": "0x2000"},
+            {"name": "b", "value": "[1, 2, 3]", "type": "list", "id": "0x3000"}
+          ],
+          "output": ["a: [1, 2, 3]", "b: [1, 2, 3]", "a is b: False"],
+          "note": "a와 b는 다른 객체 (0x2000 ≠ 0x3000)"
+        }
     }
     ]
   },
