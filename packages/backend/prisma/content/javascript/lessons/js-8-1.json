@@ -3,58 +3,73 @@
     "title": "브라우저 렌더링 파이프라인 (Frame Budget)",
     "concept": "브라우저는 16.6ms(60fps)라는 엄격한 'Frame Budget(시간 예산)' 내에 렌더링을 마쳐야 합니다.",
     "content": {
-        "code": "// 60fps 목표 = 1프레임당 약 16.6ms\nfunction animate() {\n  // 1. JS 실행 (Long Task 발생!)\n  heavyCalculation();\n\n  // 2. Style (스타일 재계산)\n  // 3. Layout (레이아웃 배치)\n  // 4. Paint (픽셀 그리기)\n  // 5. Composite (레이어 합성)\n}\n\nfunction heavyCalculation() {\n  // 50ms 동안 메인 스레드 점유 (Frame Budget 초과)\n  const start = Date.now();\n  while (Date.now() - start < 50) {}\n}",
+        "code": "// 60fps 목표 = 1프레임당 약 16.6ms\nfunction animate() {
+  // 1. JS 실행 (Long Task 발생!)
+  heavyCalculation();
+
+  // 2. Style (스타일 재계산)
+  // 3. Layout (레이아웃 배치)
+  // 4. Paint (픽셀 그리기)
+  // 5. Composite (레이어 합성)
+}
+
+function heavyCalculation() {
+  // 50ms 동안 메인 스레드 점유 (Frame Budget 초과)
+  const start = Date.now();
+  while (Date.now() - start < 50) {}
+}",
         "steps": [
             {
-                "line": 2,
-                "title": "Frame Budget 시작",
-                "explanation": "브라우저가 새로운 화면 프레임을 그릴 준비를 합니다.\n\n**Frame Budget이란?**\n부드러운 화면(60fps)을 유지하기 위해 프레임 하나당 주어진 시간 제한입니다. 1초(1000ms) ÷ 60장 = 약 **16.6ms**입니다. 이 안에 모든 걸 끝내야 합니다.",
-                "highlight": [
-                    2
-                ],
+                "line": 4,
+                "title": "1. JavaScript 실행 (Long Task)",
+                "explanation": "`heavyCalculation()` 함수가 호출되어 메인 스레드를 50ms 동안 독점합니다. 이처럼 50ms 이상 실행되는 작업을 'Long Task'라고 합니다.",
+                "keyInsight": "JS가 실행되는 동안 브라우저는 다른 아무 작업도 할 수 없습니다 (Blocking).",
+                "highlight": [4, 11, 12, 13, 14],
                 "visualizationType": "eventLoop",
-                "eventLoopState": {
-                    "note": "Frame Budget: 16.6ms remaining",
-                    "currentPhase": "idle"
-                }
+                "eventLoopState": { "callStack": ["animate", "heavyCalculation"], "note": "Main thread is blocked for 50ms..." }
             },
             {
                 "line": 4,
-                "title": "Long Task: 메인 스레드 점유",
-                "explanation": "`heavyCalculation()`이 50ms 동안 멈추지 않고 실행됩니다.\n\n**Long Task란?**\n메인 스레드를 50ms 이상 점유하는 작업을 말합니다. 이 시간 동안 브라우저는 화면을 그릴 수도, 클릭 이벤트를 받을 수도 없습니다(Blocking).",
-                "keyInsight": "JS 실행 시간이 10ms를 넘기면 렌더링 시간을 침범하여 프레임 드랍 위험이 커집니다.",
-                "highlight": [
-                    4,
-                    11,
-                    12,
-                    13,
-                    14
-                ],
+                "title": "Frame Budget 초과",
+                "explanation": "50ms의 실행 시간은 한 프레임 예산인 16.6ms를 훨씬 초과했습니다. 이번 프레임은 이미 '망했습니다'. 브라우저는 제시간에 화면을 그릴 기회를 놓쳤습니다.",
+                "highlight": [4],
                 "visualizationType": "eventLoop",
                 "eventLoopState": {
-                    "callStack": [
-                        "animate",
-                        "heavyCalculation"
-                    ],
                     "note": "Time Elapsed: 50ms (Budget Exceeded!)",
                     "warning": "Frame Dropped (Jank)"
                 }
             },
             {
-                "line": 6,
-                "title": "지연된 렌더링 (Jank 발생)",
-                "explanation": "JS가 50ms 후에 끝났습니다. 브라우저는 그제서야 Style, Layout, Paint 단계를 수행합니다.\n\n**Jank란?**\n화면 갱신이 제때 이뤄지지 않아 뚝뚝 끊기는 현상입니다. 사용자는 \"어? 렉 걸렸네?\"라고 느끼게 됩니다.",
-                "highlight": [
-                    7,
-                    8,
-                    9,
-                    10
-                ],
+                "line": 7,
+                "title": "2. 스타일 (Style)",
+                "explanation": "JS 실행이 끝난 후에야 브라우저는 렌더링 파이프라인을 시작합니다. 먼저 CSS를 기반으로 각 요소에 어떤 스타일이 적용될지 계산합니다.",
+                "highlight": [7],
                 "visualizationType": "eventLoop",
-                "eventLoopState": {
-                    "currentPhase": "rendering",
-                    "note": "Delayed Frame Rendered"
-                }
+                "eventLoopState": { "currentPhase": "Style" }
+            },
+            {
+                "line": 8,
+                "title": "3. 레이아웃 (Layout)",
+                "explanation": "각 요소가 화면의 어디에, 어떤 크기로 배치될지 계산합니다. 이 단계는 '리플로우(Reflow)'라고도 불리며 비용이 비쌉니다.",
+                "highlight": [8],
+                "visualizationType": "eventLoop",
+                "eventLoopState": { "currentPhase": "Layout" }
+            },
+            {
+                "line": 9,
+                "title": "4. 페인트 (Paint)",
+                "explanation": "계산된 레이아웃에 따라 픽셀을 채워넣는 과정입니다. 텍스트, 색상, 이미지 등을 그립니다.",
+                "highlight": [9],
+                "visualizationType": "eventLoop",
+                "eventLoopState": { "currentPhase": "Paint" }
+            },
+            {
+                "line": 10,
+                "title": "5. 합성 (Composite)",
+                "explanation": "여러 레이어를 순서대로 쌓아서 최종 화면을 만듭니다. `transform`, `opacity`와 같이 레이아웃에 영향을 주지 않는 속성은 이 단계에서만 처리되어 성능에 유리합니다.",
+                "highlight": [10],
+                "visualizationType": "eventLoop",
+                "eventLoopState": { "currentPhase": "Composite", "note": "Delayed frame is finally on screen." }
             }
         ]
     },
