@@ -372,12 +372,6 @@ export function LessonPage() {
 
         if (cancelled) return;
 
-        console.log('[LessonPage] Simulation result:', {
-          success: result.success,
-          stepsLength: result.steps?.length,
-          error: result.error
-        });
-
         if (result.success) {
           // JSON 파일의 steps에서 explanation 가져와서 병합
           // WHY: 시뮬레이터는 메모리 상태만 생성, 상세 설명은 JSON에 있음
@@ -471,11 +465,6 @@ export function LessonPage() {
             return acc;
           }, []);
 
-          console.log('[LessonPage] Filtered steps:', {
-            originalCount: mergedSteps.length,
-            filteredCount: filteredSteps.length
-          });
-
           // Update Cache
           simulationCache.current[memoizedCode] = filteredSteps;
           lastSimulatedCodeRef.current = memoizedCode;
@@ -514,14 +503,7 @@ export function LessonPage() {
   }, [lesson, lang, memoizedCode]);
 
   const steps: LessonStep[] = useMemo(() => {
-    const result = liveSteps || [];
-    console.log('[LessonPage] steps computed:', {
-      liveStepsNull: liveSteps === null,
-      liveStepsLength: liveSteps?.length,
-      resultLength: result.length,
-      firstStep: result[0]?.explanation?.substring(0, 50)
-    });
-    return result;
+    return liveSteps || [];
   }, [liveSteps]);
 
   const code = lesson?.content?.code || '';
