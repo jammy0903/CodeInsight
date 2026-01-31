@@ -7,63 +7,145 @@
     "steps": [
       {
         "line": 1,
-        "title": "클래스 정의 시작",
-        "explanation": "**`class User:`**\n사용자 정보를 담을 `User` 클래스를 정의합니다.",
-        "highlight": [ 1 ]
-      },
-      {
-        "line": 1,
-        "title": "클래스 본문 진입",
-        "explanation": "클래스 본문으로 진입합니다. 내부의 메서드 정의가 실행됩니다.",
-        "highlight": [ 1, 3, 4, 5, 6, 8, 9 ]
+        "title": "클래스 정의 (User)",
+        "explanation": "**`class User:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `User` 클래스(사용자 설계도)를 정의합니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class User 실행 → User 클래스 등록 시작 → line 3",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class>", "type": "class", "id": "0x1000"}
+          ],
+          "output": [],
+          "note": "클래스 정의 시작"
+        }
       },
       {
         "line": 3,
-        "title": "__init__ 메서드 정의",
-        "explanation": "`def __init__(self, name, age):`\n생성자 메서드를 정의합니다. 객체 생성 시 자동 호출됩니다.",
-        "highlight": [ 3, 4, 5, 6 ]
+        "title": "생성자 (__init__) 정의",
+        "explanation": "**`def __init__(self, name, age):`**\n\n**생성자(Constructor)**: `__init__`는 **특별한 메서드**로, 객체가 생성될 때 **자동으로 호출**됩니다.\n\n**언더스코어(__) 의미**: 앞뒤에 언더스코어가 2개씩 있는 메서드는 Python의 **매직 메서드(Magic Method)** 또는 **던더 메서드(Dunder Method)**라고 부릅니다. Python이 특정 상황에서 자동으로 호출합니다.\n\n**__init__의 역할**:\n1. 객체 생성 시 **자동 호출**\n2. 객체의 **초기 속성 설정**\n3. 필수 데이터를 **매개변수로 받아서** 저장\n\n**왜 생성자가 필요한가?** 객체를 만들 때마다 일일이 속성을 추가하는 대신, 생성 시점에 **한 번에 초기화**할 수 있습니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def __init__ 실행 → __init__ 메서드 등록 → line 8",
+        "highlight": [3, 4, 5, 6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class with __init__>", "type": "class", "id": "0x1000"}
+          ],
+          "output": [],
+          "note": "__init__ 메서드 정의됨 (아직 호출 안 됨)"
+        }
       },
       {
         "line": 8,
         "title": "introduce 메서드 정의",
-        "explanation": "`def introduce(self):`\n자기소개 메서드를 정의합니다.",
-        "highlight": [ 8, 9 ]
+        "explanation": "**`def introduce(self):`**\n\n자기소개를 하는 일반 메서드를 정의합니다.\n\n**왜 이 순서인가?** 생성자 정의 후, 순서대로 다음 메서드를 정의합니다.\n\n**실행 순서**: def introduce 실행 → introduce 메서드 등록 → User 클래스 정의 완료 → line 12",
+        "highlight": [8, 9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class with __init__, introduce>", "type": "class", "id": "0x1000"}
+          ],
+          "output": [],
+          "note": "introduce 메서드 정의됨"
+        }
       },
       {
         "line": 12,
-        "title": "객체 생성",
-        "explanation": "**`u = User(\"Alice\", 20)`**\n`User` 객체를 생성합니다. `__init__`이 자동 호출됩니다.",
-        "highlight": [ 12 ]
+        "title": "객체 생성 (__init__ 자동 호출)",
+        "explanation": "**`u = User(\"Alice\", 20)`**\n\n**객체 생성과 동시에 생성자 자동 호출!**\n\n**Python이 내부적으로 하는 일**:\n1. 새 객체 공간 할당 (0x2000)\n2. `__init__(u, \"Alice\", 20)` **자동 호출** ← 핵심!\n3. 초기화 완료 후 객체 참조를 `u`에 할당\n\n**사용자 입장**:\n```python\nu = User(\"Alice\", 20)  # 우리가 쓴 코드\n```\n\n**Python 내부 동작**:\n```python\nu = object.__new__(User)  # 1. 빈 객체 생성\nu.__init__(\"Alice\", 20)   # 2. 초기화 메서드 자동 호출\n```\n\n**왜 이 순서인가?** 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: User(\"Alice\", 20) 호출 → 객체 0x2000 생성 → __init__ 자동 호출 → line 4로 점프",
+        "highlight": [12],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "u", "value": "<User object>", "type": "instance", "id": "0x2000", "highlight": true}
+          ],
+          "output": [],
+          "note": "객체 생성 → __init__ 자동 호출 예정"
+        }
       },
       {
         "line": 4,
-        "title": "__init__ 실행 (1)",
-        "explanation": "`print(f\"Creating user {name}...\")`\n\"Creating user Alice...\"를 출력합니다.",
-        "highlight": [ 4 ]
+        "title": "__init__ 실행 (1/3)",
+        "explanation": "**`print(f\"Creating user {name}...\")`**\n\n**__init__ 내부로 진입**: 생성자가 자동으로 호출되어 실행됩니다.\n\n**매개변수 바인딩**:\n- `self` = `u` (0x2000 객체)\n- `name` = `\"Alice\"`\n- `age` = `20`\n\n\"Creating user Alice...\"를 출력합니다.\n\n**왜 이 순서인가?** 객체 생성(line 12)에서 __init__이 자동 호출되어 점프해왔습니다.\n\n**실행 순서**: name=\"Alice\" 읽기 → f-string 평가 → print 실행 → line 5",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "u", "value": "<User object>", "type": "instance", "id": "0x2000"},
+            {"name": "self", "value": "→ u (0x2000)", "type": "parameter", "highlight": true},
+            {"name": "name", "value": "\"Alice\"", "type": "parameter"},
+            {"name": "age", "value": "20", "type": "parameter"}
+          ],
+          "output": ["Creating user Alice..."],
+          "note": "__init__ 실행 중 (self = u)"
+        }
       },
       {
         "line": 5,
-        "title": "__init__ 실행 (2)",
-        "explanation": "`self.name = name`\n`u` 객체에 `name` 속성을 추가하고 `\"Alice\"`를 저장합니다.",
-        "highlight": [ 5 ]
+        "title": "__init__ 실행 (2/3)",
+        "explanation": "**`self.name = name`**\n\n**인스턴스 속성 추가**: `self`(u 객체, 0x2000)에 `name` 속성을 추가하고 `\"Alice\"`를 할당합니다.\n\n**왜 생성자에서 속성을 추가하는가?**\n- **일관성**: 모든 User 객체가 name과 age 속성을 가지도록 보장\n- **편리성**: 객체 생성과 동시에 초기화 완료\n- **필수 데이터 강제**: name과 age 없이는 User 객체를 만들 수 없음\n\n**실행 순서**: self.name = name → u 객체에 name=\"Alice\" 추가 → line 6",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "u", "value": "<User object, name='Alice'>", "type": "instance", "id": "0x2000", "highlight": true},
+            {"name": "self", "value": "→ u (0x2000)", "type": "parameter", "highlight": true},
+            {"name": "name", "value": "\"Alice\"", "type": "parameter"},
+            {"name": "age", "value": "20", "type": "parameter"}
+          ],
+          "output": ["Creating user Alice..."],
+          "note": "u 객체에 name 속성 추가"
+        }
       },
       {
         "line": 6,
-        "title": "__init__ 실행 (3)",
-        "explanation": "`self.age = age`\n`u` 객체에 `age` 속성을 추가하고 `20`을 저장합니다.",
-        "highlight": [ 6 ]
+        "title": "__init__ 실행 (3/3)",
+        "explanation": "**`self.age = age`**\n\n**인스턴스 속성 추가**: `self`(u 객체, 0x2000)에 `age` 속성을 추가하고 `20`을 할당합니다.\n\n**생성자 완료**: 이제 `u` 객체는 `name`과 `age` 속성을 가진 완전한 User 객체가 되었습니다!\n\n**생성자 vs 수동 설정**:\n```python\n# ✅ 생성자 사용 (권장)\nu = User(\"Alice\", 20)  # 한 줄로 끝!\n\n# ❌ 수동 설정 (비권장)\nu = User()\nu.name = \"Alice\"\nu.age = 20\n```\n\n**실행 순서**: self.age = age → u 객체에 age=20 추가 → __init__ 종료 → line 12로 돌아감 → line 13",
+        "highlight": [6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "u", "value": "<User object, name='Alice', age=20>", "type": "instance", "id": "0x2000", "highlight": true},
+            {"name": "self", "value": "→ u (0x2000)", "type": "parameter", "highlight": true},
+            {"name": "name", "value": "\"Alice\"", "type": "parameter"},
+            {"name": "age", "value": "20", "type": "parameter"}
+          ],
+          "output": ["Creating user Alice..."],
+          "note": "u 객체 초기화 완료! (name, age 모두 설정됨)"
+        }
       },
       {
         "line": 13,
-        "title": "introduce 호출",
-        "explanation": "**`u.introduce()`**\n`introduce` 메서드를 호출합니다.",
-        "highlight": [ 13 ]
+        "title": "introduce 메서드 호출",
+        "explanation": "**`u.introduce()`**\n\n초기화가 완료된 `u` 객체의 `introduce` 메서드를 호출합니다.\n\n**self에 무엇이 들어가는가?**\n- `self` = `u` (0x2000 객체)\n\n**왜 이 순서인가?** 객체 생성 및 초기화 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 13 → introduce 호출 → line 9로 점프 → self=u",
+        "highlight": [13],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "u", "value": "<User object, name='Alice', age=20>", "type": "instance", "id": "0x2000"}
+          ],
+          "output": ["Creating user Alice..."],
+          "note": "introduce 호출 → line 9로 점프 예정"
+        }
       },
       {
         "line": 9,
         "title": "introduce 실행",
-        "explanation": "`print(f\"I am {self.name}, {self.age} years old.\")`\n\"I am Alice, 20 years old.\"를 출력합니다.",
-        "highlight": [ 9 ]
+        "explanation": "**`print(f\"I am {self.name}, {self.age} years old.\")`**\n\n`self`(u)의 `name`과 `age` 속성에 접근하여 출력합니다.\n\n**실행 흐름**:\n1. `self` → u (0x2000)\n2. `self.name` → u.name → \"Alice\"\n3. `self.age` → u.age → 20\n4. f-string 평가 → \"I am Alice, 20 years old.\"\n5. print 실행\n\n**왜 속성에 접근할 수 있는가?** __init__에서 이미 name과 age 속성을 추가했기 때문입니다!\n\n**생성자의 장점**: __init__에서 미리 속성을 설정해두면, 다른 메서드에서 안심하고 사용할 수 있습니다.\n\n**실행 순서**: self.name, self.age 읽기 → f-string 평가 → print 실행 → 함수 종료 → 프로그램 종료",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "User", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "u", "value": "<User object, name='Alice', age=20>", "type": "instance", "id": "0x2000"},
+            {"name": "self", "value": "→ u (0x2000)", "type": "parameter", "highlight": true}
+          ],
+          "output": ["Creating user Alice...", "I am Alice, 20 years old."],
+          "note": "__init__에서 설정한 속성 사용"
+        }
       }
     ]
   },
