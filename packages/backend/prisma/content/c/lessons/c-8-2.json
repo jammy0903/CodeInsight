@@ -63,29 +63,14 @@
       },
       {
         "line": 12,
-        "title": "execute 함수에 greet 함수를 전달하며 호출",
-        "explanation": "**`execute(greet);`**\n\n`execute` 함수를 호출하면서, 인자로 `greet` 함수의 주소를 전달합니다. 이제 `execute` 함수 내부의 `func` 포인터는 `greet` 함수를 가리키게 됩니다.",
-        "highlight": [
-          12
-        ],
+        "title": "main에서 execute 호출 - 함수를 인자로 전달",
+        "explanation": "**`execute(greet);`**\n\nC 프로그램은 `main`에서 시작합니다. `execute` 함수를 호출하면서, 인자로 `greet` **함수 자체**(정확히는 함수의 주소 0xCODE1)를 전달합니다.\n\n**왜 이 순서인가?** 함수 이름은 함수 포인터로 자동 변환됩니다. `execute`는 이제 `greet`을 받아 실행할 수 있습니다.",
+        "highlight": [12],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [
-            {
-              "name": "func",
-              "type": "void (*)()",
-              "value": "0xCODE1",
-              "frame": "execute"
-            }
-          ],
-          "readOnlyData": [
-            {
-              "label": "greet() code",
-              "address": "0xCODE1",
-              "highlight": true
-            }
-          ],
-          "note": "execute 함수의 func 포인터가 main에서 넘겨준 greet 함수의 주소를 가리킵니다."
+          "stack": [{"name": "func", "type": "void (*)()", "value": "0xCODE1", "frame": "execute"}],
+          "readOnlyData": [{"label": "greet() code", "address": "0xCODE1", "highlight": true}],
+          "note": "execute 스택 프레임 생성. func는 greet의 주소를 담음."
         }
       },
       {

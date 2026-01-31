@@ -6,114 +6,87 @@
     "code": "#include <stdio.h>\n\nvoid tryToChange(int x) {\n    x = 999;\n    printf(\"Inside func: x=%d\\n\", x);\n}\n\nint main() {\n    int a = 10;\n\n    printf(\"Before: %d\\n\", a);\n    tryToChange(a);\n    printf(\"After:  %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "tryToChange 함수",
-        "explanation": "**`void tryToChange(int x) {`**\n\nint 파라미터 `x`를 받는 함수입니다.",
-        "highlight": [3],
-        "visualizationType": "cMemory",
-        "cMemoryState": {"stack": [], "heap": [], "output": []}
-      },
-      {
         "line": 8,
-        "title": "main 함수",
-        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main`에서 시작합니다. 위에 정의된 `tryToChange` 함수는 아직 호출되지 않았으므로 실행되지 않습니다.",
         "highlight": [8],
         "visualizationType": "cMemory",
         "cMemoryState": {"stack": [], "heap": [], "output": []}
       },
       {
         "line": 9,
-        "title": "정수 변수 선언",
-        "explanation": "**`int a = 10;`**\n\n변수 `a`를 만들고 10으로 초기화합니다.",
+        "title": "변수 a 선언 및 초기화",
+        "explanation": "**`int a = 10;`**\n\n`main` 스택 프레임에 변수 `a`를 생성하고 10으로 초기화합니다. 이 변수가 함수에 전달될 때 어떻게 복사되는지 관찰해봅시다.",
         "highlight": [9],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [
-            {
-              "name": "a",
-              "value": "10",
-              "type": "int",
-              "address": "0x1000"
-            }
-          ]
-        }
-      },
-      {
-        "line": 3,
-        "title": "값의 복사",
-        "explanation": "`tryToChange(a)`를 호출할 때, `a`의 값(10)이 복사되어 매개변수 `x`로 들어갑니다.\n`a`와 `x`는 서로 다른 메모리 주소를 가진 **별개의 변수**입니다.",
-        "highlight": [
-          3,
-          4
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {
-              "name": "a",
-              "value": "10",
-              "type": "int",
-              "frame": "main",
-              "address": "0x1000"
-            },
-            {
-              "name": "x",
-              "value": "999",
-              "type": "int",
-              "frame": "tryToChange",
-              "address": "0x2000"
-            }
-          ],
-          "output": [
-            "Before: 10",
-            "Inside func: x=999"
-          ]
-        }
-      },
-      {
-        "line": 5,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"Inside func: x=%d\\n\", x);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          5
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
+          "stack": [{"name": "a", "value": "10", "type": "int", "address": "0x1000"}]
         }
       },
       {
         "line": 11,
-        "title": "원본은 그대로",
-        "explanation": "함수 안에서 `x`를 999로 바꿨지만, 이것은 복사본을 찢어버린 것과 같습니다.\n원본 문서인 `main`의 `a`에는 아무런 영향이 없습니다.\n\n이를 **Call by Value(값에 의한 호출)**라고 합니다.",
-        "highlight": [
-          11
-        ],
-        "visualizationType": "terminal",
-        "memoryState": {
-          "output": [
-            "Before: 10",
-            "Inside func: x=999",
-            "After:  10"
-          ]
+        "title": "Before 값 출력",
+        "explanation": "**`printf(\"Before: %d\\n\", a);`**\n\n함수 호출 전에 `a`의 현재 값(10)을 출력합니다. 이 값을 기억해두면 나중에 Call by Value의 효과를 확인할 수 있습니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{"name": "a", "value": "10", "type": "int", "address": "0x1000"}],
+          "output": ["Before: 10"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "함수 호출과 값 복사",
+        "explanation": "**`tryToChange(a);`**\n\n`tryToChange` 함수가 호출됩니다. 이때 `a`의 **값(10)만 복사**되어 매개변수 `x`로 전달됩니다. `a`와 `x`는 서로 다른 메모리 주소(0x1000 vs 0x2000)를 가진 **완전히 별개의 변수**입니다.\n\n**왜 이 순서인가?** Before를 출력한 후 함수를 호출해야 변경 전후를 비교할 수 있습니다.",
+        "highlight": [12, 3],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "a", "value": "10", "type": "int", "frame": "main", "address": "0x1000"},
+            {"name": "x", "value": "10", "type": "int", "frame": "tryToChange", "address": "0x2000"}
+          ],
+          "output": ["Before: 10"],
+          "note": "tryToChange 스택 프레임이 Push됨. x는 a의 값을 복사받음."
+        }
+      },
+      {
+        "line": 4,
+        "title": "복사본 x 변경",
+        "explanation": "**`x = 999;`**\n\n함수 내부에서 `x`를 999로 변경합니다. 하지만 `x`는 `a`의 복사본일 뿐이므로, **원본 `a`는 여전히 10**입니다. 마치 복사본 문서를 수정해도 원본 문서는 변하지 않는 것과 같습니다.",
+        "highlight": [4],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "a", "value": "10", "type": "int", "frame": "main", "address": "0x1000"},
+            {"name": "x", "value": "999", "type": "int", "frame": "tryToChange", "address": "0x2000", "highlight": true}
+          ],
+          "output": ["Before: 10"],
+          "note": "x만 999로 변경됨. a는 그대로 10."
+        }
+      },
+      {
+        "line": 5,
+        "title": "함수 내부 출력",
+        "explanation": "**`printf(\"Inside func: x=%d\\n\", x);`**\n\n변경된 `x`의 값(999)을 출력하여 확인합니다.",
+        "highlight": [5],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "a", "value": "10", "type": "int", "frame": "main", "address": "0x1000"},
+            {"name": "x", "value": "999", "type": "int", "frame": "tryToChange", "address": "0x2000"}
+          ],
+          "output": ["Before: 10", "Inside func: x=999"]
         }
       },
       {
         "line": 13,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"After:  %d\\n\", a);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          13
-        ],
+        "title": "After 출력 - 원본은 그대로",
+        "explanation": "**`printf(\"After:  %d\\n\", a);`**\n\n`tryToChange` 함수가 종료되고 `main`으로 돌아왔습니다. 함수 안에서 `x`를 999로 바꿨지만, 이것은 **복사본을 찢어버린 것**과 같습니다. 원본인 `a`는 여전히 **10**입니다.\n\n이를 **Call by Value(값에 의한 호출)**라고 합니다. C언어의 기본 동작이며, 데이터 보호를 위한 안전장치입니다.",
+        "highlight": [13],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
+          "stack": [{"name": "a", "value": "10", "type": "int", "highlight": true}],
+          "output": ["Before: 10", "Inside func: x=999", "After:  10"]
         }
       }
     ]
