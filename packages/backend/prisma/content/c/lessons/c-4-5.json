@@ -7,74 +7,49 @@
     "steps": [
       {
         "line": 8,
-        "title": "main 함수 정의",
-        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
-        "highlight": [
-          8
-        ],
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다. 이 예제는 **절대 해서는 안 되는 위험한 패턴**을 보여줍니다: 지역 변수의 주소를 함수 밖으로 반환하는 것입니다.",
+        "highlight": [8],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 9,
+        "title": "dangerousFunc 호출",
+        "explanation": "**`int *p = dangerousFunc();`**\n\n`dangerousFunc` 함수를 호출합니다. 이 함수는 내부에서 지역 변수 `x`를 생성하고 그 주소를 반환할 것입니다.",
+        "highlight": [9, 3],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": []
+          "stack": [
+            {"name": "p", "value": "???", "type": "int*", "frame": "main"},
+            {"name": "x", "value": "100", "type": "int", "frame": "dangerousFunc", "address": "0x2000"}
+          ],
+          "note": "dangerousFunc 스택 프레임이 생성됨"
         }
       },
       {
         "line": 5,
-        "title": "지역 변수의 주소 리턴",
-        "explanation": "`return &x;`\n`x`는 `dangerousFunc`의 지역 변수입니다.\n이 함수가 리턴하는 순간, 스택 프레임이 파괴되면서 `x`도 사라집니다.\n\n즉, 철거될 집의 열쇠를 주는 꼴입니다.",
-        "highlight": [
-          5
-        ],
+        "title": "위험한 반환 - 지역 변수의 주소",
+        "explanation": "**`return &x;`**\n\n`x`는 `dangerousFunc`의 지역 변수입니다. 이 함수가 return하는 순간, **스택 프레임이 파괴**되면서 `x`도 사라집니다.\n\n하지만 그 주소(0x2000)는 반환됩니다. 즉, **철거될 집의 열쇠를 주는 꼴**입니다. 컴파일러는 경고를 주지만 막지는 않습니다.",
+        "highlight": [5],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "x",
-              "value": "100",
-              "type": "int",
-              "frame": "dangerousFunc"
-            }
+            {"name": "p", "value": "0x2000", "type": "int*", "frame": "main", "dangling": true}
           ],
-          "output": []
-        }
-      },
-      {
-        "line": 9,
-        "title": "Dangling Pointer",
-        "explanation": "`p`가 리턴받은 주소는 이제 아무도 살지 않는(또는 다른 누군가가 덮어쓴) 폐허입니다.\n이것을 **Dangling Pointer (매달린 포인터)**라고 합니다.\n이 주소를 읽으면 운 좋으면 100이 나오지만, 다른 함수가 스택을 덮어쓰면 엉뚱한 값이 나옵니다.",
-        "highlight": [
-          9,
-          12
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {
-              "name": "p",
-              "value": "0xINVALID",
-              "type": "int*",
-              "address": "Wait..."
-            }
-          ],
-          "output": [
-            "??? (Undefined Behavior)"
-          ]
+          "output": [],
+          "note": "dangerousFunc가 끝나며 x가 사라졌지만, p는 여전히 그 주소(0x2000)를 가리킴"
         }
       },
       {
         "line": 11,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"%d\\n\", *p);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          11
-        ],
+        "title": "Dangling Pointer 역참조 - Undefined Behavior",
+        "explanation": "**`printf(\"%d\\n\", *p);`**\n\n`p`가 가리키는 주소(0x2000)는 이미 해제된 스택 영역입니다. 이 메모리를 읽는 것은 **Undefined Behavior(정의되지 않은 동작)**입니다.\n\n- **운이 좋으면**: 메모리가 아직 덮어써지지 않아 100이 나옴\n- **운이 나쁘면**: 쓰레기 값이나 Segmentation Fault\n\n이것이 **Dangling Pointer (댕글링 포인터)**의 위험성입니다.",
+        "highlight": [11],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
+          "stack": [{"name": "p", "value": "0x2000", "type": "int*", "dangling": true}],
+          "output": ["??? (100일수도, 쓰레기값일수도, Crash일수도)"]
         }
       }
     ]
