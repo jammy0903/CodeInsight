@@ -16,85 +16,50 @@
       {
         "line": 10,
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
+        "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main`에서 시작합니다. 위에 정의된 `printArr` 함수는 아직 호출되지 않았으므로 실행되지 않습니다. **함수 정의는 '도구를 만들어두는 것'이고, 함수 호출은 '도구를 실제로 사용하는 것'입니다.**",
         "highlight": [10],
         "visualizationType": "cMemory",
         "cMemoryState": {"stack": [], "heap": [], "output": []}
       },
       {
         "line": 11,
-        "title": "배열 선언",
-        "explanation": "**`int data[3] = {10, 20, 30};`**\n\n3개의 정수를 담는 배열 `data`를 스택에 생성하고 초기화합니다.",
+        "title": "배열 선언 및 초기화",
+        "explanation": "**`int data[3] = {10, 20, 30};`**\n\n`main` 스택 프레임에 3개의 정수를 담는 배열 `data`를 생성하고 초기화합니다. 이 배열은 연속된 12바이트(4×3) 메모리를 차지합니다.",
         "highlight": [11],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [
-            {
-              "name": "data",
-              "value": "{10, 20, 30}",
-              "type": "int[3]",
-              "frame": "main"
-            }
-          ]
+          "stack": [{"name": "data", "value": "{10, 20, 30}", "type": "int[3]", "frame": "main", "address": "0x1000"}]
         }
       },
       {
         "line": 13,
         "title": "배열 전달 (Array Decay)",
-        "explanation": "이전 챕터에서 배웠듯, 배열을 함수로 넘기면 포인터(`int*`)로 변신합니다.\nCall by Reference 효과가 나기 때문에, 함수 안에서 `arr[i] = 0` 하면 원본 배열도 바뀝니다.",
-        "highlight": [
-          3,
-          4
-        ],
+        "explanation": "**`printArr(data, 3);`**\n\n`printArr` 함수가 호출됩니다. `data`는 배열이지만, 함수에 전달될 때 **자동으로 첫 번째 요소의 주소(포인터)로 변환**됩니다. 이것을 'Array Decay(배열 붕괴)'라고 합니다.\n\n**왜 배열 전체가 복사되지 않을까요?** 배열은 덩치가 클 수 있기 때문에, 매번 복사하면 느리고 메모리를 낭비합니다. 그래서 C는 주소만 넘기는 효율적인 방식을 선택했습니다.",
+        "highlight": [13, 3],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "data",
-              "value": "{10, 20, 30}",
-              "type": "int[3]",
-              "frame": "main"
-            },
-            {
-              "name": "arr",
-              "value": "Address(data)",
-              "type": "int*",
-              "frame": "printArr"
-            }
+            {"name": "data", "value": "{10, 20, 30}", "type": "int[3]", "frame": "main"},
+            {"name": "arr", "value": "0x1000", "type": "int*", "frame": "printArr"},
+            {"name": "len", "value": "3", "type": "int", "frame": "printArr"}
           ],
-          "output": [
-            "10 20 30 "
-          ]
+          "note": "printArr 스택 프레임이 Push됨. arr은 data의 주소를 담은 포인터."
         }
       },
       {
-        "line": 5,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"%d \", arr[i]);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          5
-        ],
+        "line": 4,
+        "title": "for 루프 순회",
+        "explanation": "**`for (int i = 0; i < len; i++) { printf(\"%d \", arr[i]); }`**\n\n`arr`은 포인터이지만, `arr[i]` 문법으로 마치 배열처럼 접근할 수 있습니다. 컴파일러가 `arr[i]`를 `*(arr + i)`로 변환하기 때문입니다.\n\n포인터에 정수를 더하면 '해당 타입 크기 × 정수'만큼 주소가 이동합니다. 그래서 `arr[0]`, `arr[1]`, `arr[2]`가 각각 10, 20, 30을 출력합니다.",
+        "highlight": [4, 5, 6],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
-        }
-      },
-      {
-        "line": 7,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"\\n\");`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          7
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
+          "stack": [
+            {"name": "data", "value": "{10, 20, 30}", "type": "int[3]", "frame": "main"},
+            {"name": "arr", "value": "Address(data)", "type": "int*", "frame": "printArr"},
+            {"name": "len", "value": "3", "type": "int", "frame": "printArr"},
+            {"name": "i", "value": "0→1→2", "type": "int", "frame": "printArr"}
+          ],
+          "output": ["10 20 30 "]
         }
       },
       {

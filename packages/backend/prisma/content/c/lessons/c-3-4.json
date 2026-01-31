@@ -7,8 +7,8 @@
     "steps": [
       {
         "line": 8,
-        "title": "main 함수 정의",
-        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main`에서 시작합니다. 위에 정의된 `printSize` 함수는 아직 호출되지 않았으므로 건너뜁니다. **컴파일러는 함수 정의를 기억해두고, 실제 호출될 때만 실행합니다.**",
         "highlight": [8],
         "visualizationType": "cMemory",
         "cMemoryState": {"stack": [], "heap": [], "output": []}
@@ -106,17 +106,15 @@
       },
       {
         "line": 14,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"After func: %d\\n\", nums[0]);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          14
-        ],
+        "title": "원본 변경 확인",
+        "explanation": "**`printf(\"After func: %d\\n\", nums[0]);`**\n\n`printSize` 함수가 종료된 후 `main`으로 돌아왔습니다. 함수 내부에서 `arr[0] = 999`를 실행했는데, `arr`은 `nums`의 주소를 가리키고 있었으므로 **원본 배열 `nums[0]`이 999로 바뀌어 있습니다**.\n\n이것이 Array Decay의 결과입니다: 배열을 함수에 넘기면 포인터로 전달되어 원본 수정이 가능합니다.",
+        "highlight": [14],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
+          "stack": [
+            {"name": "nums", "value": "{999, 2, 3, 4, 5}", "type": "int[5]", "highlight": true}
+          ],
+          "output": ["Inside main: 20", "Inside func: 8", "After func: 999"]
         }
       }
     ]
