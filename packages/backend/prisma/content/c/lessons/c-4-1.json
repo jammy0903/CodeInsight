@@ -8,20 +8,18 @@
       {
         "line": 13,
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\n프로그램이 시작되면 `main` 함수의 스택 프레임이 가장 먼저 생깁니다. 이곳은 `main`의 지역 변수들을 위한 공간입니다.",
+        "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main`에서 시작합니다. 위에 정의된 `funcA`, `funcB` 함수들은 아직 호출되지 않았으므로 실행되지 않습니다.\n\n프로그램이 시작되면 `main` 함수의 스택 프레임이 가장 먼저 생깁니다. **왜 스택인가?** 함수 호출은 '가장 나중에 호출된 것이 가장 먼저 끝나는(LIFO)' 구조이기 때문입니다.",
         "highlight": [13],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [
-            {"name": "main", "type": "frame", "func": "main"}
-          ],
+          "stack": [{"name": "main", "type": "frame", "func": "main"}],
           "output": []
         }
       },
       {
         "line": 14,
-        "title": "funcA 호출",
-        "explanation": "**`funcA();`**\n\n`funcA()`를 호출하면, `main` 프레임 위에 `funcA`의 프레임이 쌓입니다(Push). 스택이 한 층 더 높아집니다.",
+        "title": "funcA 호출 (스택 Push)",
+        "explanation": "**`funcA();`**\n\n`funcA()`를 호출하면, `main` 프레임 위에 `funcA`의 프레임이 쌓입니다(Push). 스택이 한 층 더 높아집니다.\n\n**실행 순서**: main의 line 14 실행 → funcA의 line 8로 점프 → funcA 내부 코드 실행.",
         "highlight": [14, 8],
         "visualizationType": "cMemory",
         "cMemoryState": {
@@ -29,7 +27,8 @@
             {"name": "main", "type": "frame", "func": "main"},
             {"name": "funcA", "type": "frame", "func": "funcA"}
           ],
-          "output": []
+          "output": [],
+          "note": "funcA 스택 프레임이 main 위에 Push됨"
         }
       },
       {
