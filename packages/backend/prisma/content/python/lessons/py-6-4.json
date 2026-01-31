@@ -7,33 +7,63 @@
     "steps": [
       {
         "line": 1,
-        "title": "클래스 정의와 클래스 변수",
-        "explanation": "`Student` 클래스를 정의합니다. 이때 `grades = []`는 **클래스 변수**로, 이 클래스로 만드는 모든 객체가 **하나의 리스트를 공유**하게 되는, 흔히 발생하는 버그의 원인입니다.",
+        "title": "클래스 정의 시작",
+        "explanation": "`Student` 클래스를 정의합니다.",
+        "highlight": [1]
+    },
+    {
+        "line": 1,
+        "title": "클래스 본문 진입",
+        "explanation": "클래스 본문으로 진입합니다.",
         "highlight": [1, 2, 4, 5]
+    },
+    {
+        "line": 2,
+        "title": "클래스 변수 정의 (함정!)",
+        "explanation": "`grades = []`\n**클래스 변수**로 빈 리스트를 정의합니다. 모든 인스턴스가 이 리스트를 공유하게 됩니다!",
+        "highlight": [2]
+    },
+    {
+        "line": 4,
+        "title": "add_grade 메서드 정의",
+        "explanation": "`def add_grade(self, grade):`\n성적을 추가하는 메서드를 정의합니다.",
+        "highlight": [4, 5]
     },
     {
         "line": 7,
         "title": "첫 번째 학생 생성",
-        "explanation": "`s1 = Student()`\n첫 번째 `Student` 객체를 생성합니다. `s1`은 클래스에 있는 공유 `grades` 리스트를 사용하게 됩니다.",
+        "explanation": "`s1 = Student()`\n첫 번째 `Student` 객체를 생성합니다.",
         "highlight": [7]
     },
     {
         "line": 8,
         "title": "두 번째 학생 생성",
-        "explanation": "`s2 = Student()`\n두 번째 `Student` 객체를 생성합니다. `s2` 역시 `s1`과 **똑같은 공유 `grades` 리스트**를 바라보게 됩니다.",
+        "explanation": "`s2 = Student()`\n두 번째 `Student` 객체를 생성합니다. `s1`과 같은 `grades` 리스트를 공유합니다!",
         "highlight": [8]
     },
     {
         "line": 10,
-        "title": "s1에 성적 추가",
-        "explanation": "`s1.add_grade(90)`\n`s1`을 통해 공유 `grades` 리스트에 `90`을 추가합니다. 이제 공유 리스트는 `[90]`이 됩니다.",
+        "title": "s1.add_grade(90) 호출",
+        "explanation": "`s1.add_grade(90)`\n`s1`의 `add_grade` 메서드를 호출합니다.",
         "highlight": [10]
     },
     {
+        "line": 5,
+        "title": "공유 리스트에 90 추가",
+        "explanation": "`self.grades.append(grade)`\n공유 `grades` 리스트에 `90`을 추가합니다. `[90]`",
+        "highlight": [5]
+    },
+    {
         "line": 11,
-        "title": "s2에 성적 추가",
-        "explanation": "`s2.add_grade(80)`\n`s2`를 통해 **같은 공유 `grades` 리스트**에 `80`을 추가합니다. 이제 공유 리스트는 `[90, 80]`이 됩니다.",
+        "title": "s2.add_grade(80) 호출",
+        "explanation": "`s2.add_grade(80)`\n`s2`의 `add_grade` 메서드를 호출합니다.",
         "highlight": [11]
+    },
+    {
+        "line": 5,
+        "title": "같은 공유 리스트에 80 추가",
+        "explanation": "`self.grades.append(grade)`\n**같은** 공유 `grades` 리스트에 `80`을 추가합니다. `[90, 80]`",
+        "highlight": [5]
     },
     {
         "line": 13,
