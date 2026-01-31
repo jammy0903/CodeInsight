@@ -16,7 +16,7 @@
       {
         "line": 4,
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다. 이 예제에서는 **실행 시점에 크기가 결정되는 배열**을 만드는 방법을 배웁니다. 정적 배열(`int arr[5]`)은 컴파일 시 크기가 고정되지만, 동적 배열은 사용자 입력에 따라 크기가 바뀔 수 있습니다.",
         "highlight": [4],
         "visualizationType": "cMemory",
         "cMemoryState": {"stack": [], "heap": [], "output": []}
@@ -56,28 +56,35 @@
       {
         "line": 9,
         "title": "동적 메모리 할당 (malloc)",
-        "explanation": "**`int *arr = (int*)malloc(sizeof(int) * size);`**\n\n힙(Heap) 영역에서 지정된 크기의 메모리를 할당하고 포인터를 반환합니다.\n\n사용 후 반드시 free()로 해제해야 합니다.",
-        "highlight": [
-          9
-        ],
+        "explanation": "**`int *arr = (int*)malloc(sizeof(int) * size);`**\n\n`size` 변수에 저장된 값(5)을 사용해 힙에서 20바이트(4×5)를 할당합니다.\n\n**왜 정적 배열 대신 malloc을 쓰나요?**\n- `int arr[size];`는 C99 이전 표준에서 불가능합니다 (VLA).\n- 스택은 크기 제한이 있지만, 힙은 훨씬 큽니다.\n- 함수가 끝나도 데이터를 유지하고 싶을 때 필요합니다.\n\n`(int*)`는 `void*`를 `int*`로 캐스팅하는 것입니다.",
+        "highlight": [9],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "heap": [
-            {
-              "size": "[allocated]"
-            }
-          ]
+          "stack": [
+            {"name": "size", "value": "5", "type": "int"},
+            {"name": "arr", "value": "0xHEAP", "type": "int*"}
+          ],
+          "heap": [{"address": "0xHEAP", "size": "20 bytes", "value": "??? ??? ??? ??? ???"}],
+          "note": "힙에 5개의 int 공간이 할당됨 (아직 초기화 안 됨)"
         }
       },
       {
-        "line": 13,
-        "title": "포인터와 배열의 호환성",
-        "explanation": "`arr`은 포인터 변수지만, `arr[i]` 문법을 그대로 쓸 수 있습니다.\n힙에 있든 스택에 있든, 컴파일러에게는 \"시작 주소에서 i만큼 가서 읽어라\"는 뜻으로 동일하기 때문입니다.",
-        "highlight": [
-          13,
-          14,
-          15
-        ]
+        "line": 11,
+        "title": "for 루프로 배열 초기화 및 출력",
+        "explanation": "**`for(int i=0; i<size; i++) { arr[i] = i * 10; printf(\"%d \", arr[i]); }`**\n\n`arr`은 포인터 변수지만, `arr[i]` 문법을 그대로 쓸 수 있습니다. 컴파일러가 `arr[i]`를 `*(arr + i)`로 변환하기 때문입니다.\n\n힙 메모리에 있든 스택에 있든, '시작 주소에서 i번째 칸으로 가서 읽어라'는 뜻은 동일합니다. 동적으로 할당한 메모리도 배열처럼 편하게 다룰 수 있다는 것이 핵심입니다.",
+        "highlight": [11, 12, 13, 14],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {"name": "size", "value": "5", "type": "int"},
+            {"name": "arr", "value": "0xHEAP", "type": "int*"},
+            {"name": "i", "value": "0→1→2→3→4", "type": "int"}
+          ],
+          "heap": [
+            {"address": "0xHEAP", "size": "20 bytes", "value": "{0, 10, 20, 30, 40}"}
+          ],
+          "output": ["How many numbers? ", "0 10 20 30 40 "]
+        }
       },
       {
         "line": 16,

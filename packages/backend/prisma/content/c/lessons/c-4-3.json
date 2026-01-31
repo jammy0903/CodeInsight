@@ -6,81 +6,47 @@
     "code": "#include <stdio.h>\n\nvoid reallyChange(int *p) {\n    *p = 999;\n    printf(\"Inside func: Changed!\\n\");\n}\n\nint main() {\n    int a = 10;\n\n    printf(\"Before: %d\\n\", a);\n    reallyChange(&a);\n    printf(\"After:  %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "reallyChange 함수",
-        "explanation": "**`void reallyChange(int *p) {`**\n\n포인터 파라미터 `p`를 받는 함수입니다.",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": []
-        }
-      },
-      {
         "line": 8,
-        "title": "main 함수",
-        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
-        "highlight": [
-          8
-        ],
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main` 함수에서 시작합니다. 위에 정의된 `reallyChange` 함수는 아직 호출되지 않았으므로 실행되지 않습니다. **함수 정의와 함수 호출은 다릅니다** - 정의는 '레시피를 적어두는 것'이고, 호출은 '실제로 요리하는 것'입니다.",
+        "highlight": [8],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": []
-        }
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
       },
       {
         "line": 9,
-        "title": "정수 변수 선언",
-        "explanation": "**`int a = 10;`**\n\n변수 `a`를 만들고 10으로 초기화합니다.",
-        "highlight": [
-          9
-        ],
+        "title": "변수 a 선언 및 초기화",
+        "explanation": "**`int a = 10;`**\n\n`main` 함수 스택 프레임에 변수 `a`를 생성하고 10으로 초기화합니다. 이 변수의 메모리 주소(예: 0x1000)가 나중에 함수에 전달될 핵심 정보입니다.",
+        "highlight": [9],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [
-            {
-              "name": "a",
-              "value": "10",
-              "type": "int",
-              "address": "0x1000"
-            }
-          ]
+          "stack": [{"name": "a", "value": "10", "type": "int", "address": "0x1000"}]
         }
       },
       {
-        "line": 3,
-        "title": "주소 전달 (Pass by Address)",
-        "explanation": "`reallyChange(&a)`\n값을 복사하는 대신, `a`가 있는 **주소**를 알려줍니다.\n\n매개변수 `p`는 이제 `a`가 있는 곳을 가리키는 포인터가 됩니다.",
-        "highlight": [
-          3,
-          11
-        ],
+        "line": 11,
+        "title": "Before 값 출력",
+        "explanation": "**`printf(\"Before: %d\\n\", a);`**\n\n함수 호출 전에 `a`의 현재 값(10)을 출력합니다. 이 값을 기억해두면 나중에 Call by Reference로 값이 바뀌었는지 확인할 수 있습니다.",
+        "highlight": [11],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{"name": "a", "value": "10", "type": "int", "address": "0x1000"}],
+          "output": ["Before: 10"]
+        }
+      },
+      {
+        "line": 12,
+        "title": "함수 호출과 주소 전달",
+        "explanation": "**`reallyChange(&a);`**\n\n이제 `reallyChange` 함수가 호출됩니다. `&a`는 변수 `a`의 메모리 주소(0x1000)입니다. **값(10)이 아니라 주소가 전달**되는 것이 Call by Reference의 핵심입니다.\n\n새로운 스택 프레임이 생기고, 매개변수 `p`에 주소값이 복사됩니다. `p`는 이제 `a`를 가리키는 포인터가 됩니다.",
+        "highlight": [12, 3],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            {
-              "name": "a",
-              "value": "10",
-              "type": "int",
-              "frame": "main",
-              "address": "0x1000"
-            },
-            {
-              "name": "p",
-              "value": "0x1000",
-              "type": "int*",
-              "frame": "reallyChange",
-              "pointsTo": "a"
-            }
+            {"name": "a", "value": "10", "type": "int", "frame": "main", "address": "0x1000"},
+            {"name": "p", "value": "0x1000", "type": "int*", "frame": "reallyChange", "pointsTo": "a"}
           ],
-          "output": [
-            "Before: 10"
-          ]
+          "output": ["Before: 10"],
+          "note": "reallyChange 스택 프레임이 main 위에 Push됨"
         }
       },
       {
@@ -147,33 +113,16 @@
         }
       },
       {
-        "line": 11,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"Before: %d\\n\", a);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          11
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
-        }
-      },
-      {
         "line": 13,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"After:  %d\\n\", a);`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          13
-        ],
+        "title": "변경 확인 (After 출력)",
+        "explanation": "**`printf(\"After:  %d\\n\", a);`**\n\n`reallyChange` 함수가 끝나고 `main`으로 돌아왔습니다. 함수의 스택 프레임은 사라졌지만, **포인터를 통해 수정한 `a`의 값(999)은 그대로 유지**됩니다.\n\n이것이 Call by Reference의 핵심입니다: 함수가 종료되어도 원본 변경은 영구적입니다.",
+        "highlight": [13],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
+          "stack": [
+            {"name": "a", "value": "999", "type": "int", "frame": "main", "highlight": true}
+          ],
+          "output": ["Before: 10", "Inside func: Changed!", "After:  999"]
         }
       }
     ]
