@@ -6,58 +6,38 @@
         "code": "// 1. setTimeout (렌더링 주기 무시)\nfunction badAni() {\n  // 10ms마다 실행하려 하지만 실제 프레임 생성 시점과 어긋남\n  moveBox();\n  setTimeout(badAni, 10);\n}\n\n// 2. requestAnimationFrame (렌더링 주기 동기화)\nfunction goodAni() {\n  moveBox();\n  // 브라우저: \"다음 Paint 직전에 실행시켜 줄게\"\n  requestAnimationFrame(goodAni);\n}\n\nrequestAnimationFrame(goodAni);",
         "steps": [
             {
-                "line": 4,
-                "title": "setTimeout: 프레임 미동기화",
-                "explanation": "setTimeout은 설정한 시간이 지나면 코드를 실행합니다. 하지만 화면이 언제 그려지는지는 모릅니다.\n\n이로 인해 화면 갱신 시점과 코드 실행 시점이 어긋나(**Out of Sync**), 화면이 찢어지거나 프레임이 건너뛰어질 수 있습니다.",
-                "highlight": [
-                    4,
-                    5,
-                    6
-                ],
+                "line": 15,
+                "title": "애니메이션 시작",
+                "explanation": "`requestAnimationFrame(goodAni)`를 호출하여 애니메이션 루프를 시작합니다. 이는 브라우저에게 \"다음 화면을 그릴 준비가 되면 `goodAni` 함수를 실행해줘\"라고 예약하는 것과 같습니다.",
+                "keyInsight": "rAF는 특정 시간이 아닌, 브라우저의 렌더링 사이클에 작업을 맞춥니다.",
+                "highlight": [15],
                 "visualizationType": "eventLoop",
-                "eventLoopState": {
-                    "taskQueue": [
-                        "badAni"
-                    ],
-                    "note": "Sync Failed: Render Cycle vs Timer"
-                }
+                "eventLoopState": { "webApis": [{"name": "rAF(goodAni)", "status": "scheduled"}] }
+            },
+            {
+                "line": 11,
+                "title": "프레임 실행",
+                "explanation": "브라우저가 다음 프레임을 그리기 직전, 예약된 `goodAni` 함수를 실행합니다. 먼저 `moveBox()`가 호출되어 요소의 위치를 변경합니다.",
+                "highlight": [11],
+                "visualizationType": "eventLoop",
+                "eventLoopState": { "callStack": ["goodAni", "moveBox"] }
             },
             {
                 "line": 13,
-                "title": "rAF 예약: V-Sync 대기",
-                "explanation": "`requestAnimationFrame`은 브라우저에게 예약을 겁니다.\n\"다음 화면 갱신(V-Sync) 때 나를 깨워줘!\"\n\n**V-Sync(수직 동기화)란?**\n모니터가 화면을 다시 그리는 주기를 말합니다. 60Hz 모니터라면 1초에 60번, 일정한 간격으로 신호가 옵니다.",
-                "highlight": [
-                    13,
-                    15
-                ],
+                "title": "다음 프레임 예약",
+                "explanation": "`goodAni` 함수 내부에서 다시 `requestAnimationFrame(goodAni)`를 호출하여 다음 프레임에 대한 애니메이션을 예약합니다. 이것이 바로 'rAF 루프'이며, 부드러운 애니메이션의 핵심입니다.",
+                "highlight": [13],
                 "visualizationType": "eventLoop",
-                "eventLoopState": {
-                    "webApis": [
-                        {
-                            "name": "rAF",
-                            "status": "waiting for V-Sync"
-                        }
-                    ],
-                    "note": "Aligned with V-Sync"
-                }
+                "eventLoopState": { "webApis": [{"name": "rAF(goodAni)", "status": "scheduled"}], "note": "Looping animation scheduled" }
             },
             {
-                "line": 12,
-                "title": "rAF 실행: 렌더링 파이프라인 진입",
-                "explanation": "브라우저가 화면을 그리기(Paint) 바로 직전에 예약해둔 `goodAni`를 실행합니다.\n\n이 타이밍에 스타일을 변경하면, 곧바로 이어지는 렌더링 단계에서 화면에 반영되므로 가장 부드러운 움직임을 보여줍니다.",
-                "highlight": [
-                    12,
-                    13,
-                    14
-                ],
+                "line": 5,
+                "title": "참고: 잘못된 setTimeout 방식",
+                "explanation": "`badAni` 함수처럼 `setTimeout`을 사용하면, JS 실행 타이밍이 브라우저의 렌더링 주기와 어긋날 수 있습니다. 예를 들어, 렌더링이 막 끝난 시점에 `moveBox`가 실행되면 다음 렌더링까지 16ms를 기다려야 하므로, 화면이 뚝뚝 끊겨 보이는 'Jank' 현상이 발생할 수 있습니다.",
+                "keyInsight": "JS 애니메이션에는 `setTimeout` 대신 `requestAnimationFrame`을 사용해야 합니다.",
+                "highlight": [5],
                 "visualizationType": "eventLoop",
-                "eventLoopState": {
-                    "callStack": [
-                        "goodAni"
-                    ],
-                    "currentPhase": "rendering",
-                    "note": "Executed right before Paint"
-                }
+                "eventLoopState": { "warning": "setTimeout timing is not synced with rendering." }
             }
         ]
     },
