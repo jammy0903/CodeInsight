@@ -287,11 +287,175 @@ async function seed() {
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
   }
 
-  // 4. JavaScript 커리큘럼 (임시 비활성화)
-  console.log('  ⏭️  Skipping JavaScript curriculum...');
+  // 4. JavaScript 커리큘럼 upsert
+  console.log('  📚 Loading JavaScript curriculum from JSON...');
+  const jsCurriculum = loadCurriculum('javascript');
 
-  // 5. Java 커리큘럼 (임시 비활성화)
-  console.log('  ⏭️  Skipping Java curriculum...');
+  if (jsCurriculum) {
+    let jsContentCount = 0;
+    let jsQuizCount = 0;
+
+    for (const chapterData of jsCurriculum.chapters) {
+      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
+
+      const chapterId = getChapterId(chapterData);
+      const chapterPayload = {
+        languageId: 'javascript',
+        title: chapterData.title,
+        description: chapterData.description,
+        keyQuestion: chapterData.keyQuestion || '',
+        part: 'basics',
+        partLabel: '기초',
+        order: chapterData.order,
+      };
+      const chapter = await prisma.chapter.upsert({
+        where: { id: chapterId },
+        update: chapterPayload,
+        create: { id: chapterId, ...chapterPayload },
+      });
+
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonId = getLessonId(chapterData.lessons[lessonIdx]);
+        const content = loadLessonContent('javascript', lessonId);
+        if (content) {
+          console.log(`      ├─ Lesson: ${content.title}`);
+
+          const lessonPayload = {
+            chapterId: chapter.id,
+            title: content.title,
+            description: content.concept,
+            difficulty: 'basic',
+            order: lessonIdx + 1,
+            estimatedTime: 10,
+          };
+          const lesson = await prisma.lesson.upsert({
+            where: { id: lessonId },
+            update: lessonPayload,
+            create: { id: lessonId, ...lessonPayload },
+          });
+
+          const contentPayload = {
+            lessonId: lesson.id,
+            code: content.content.code,
+            language: 'javascript',
+            steps: JSON.stringify(content.content.steps),
+          };
+          await prisma.lessonContent.upsert({
+            where: { id: `content-${lessonId}` },
+            update: contentPayload,
+            create: { id: `content-${lessonId}`, ...contentPayload },
+          });
+          jsContentCount++;
+
+          if (content.quiz) {
+            const quizPayload = {
+              lessonId: lesson.id,
+              type: 'multiple_choice',
+              question: content.quiz.question,
+              options: content.quiz.options,
+              answer: String(content.quiz.correctIndex),
+              explanation: content.quiz.explanation,
+              order: 1,
+            };
+            await prisma.quiz.upsert({
+              where: { id: `quiz-${lessonId}` },
+              update: quizPayload,
+              create: { id: `quiz-${lessonId}`, ...quizPayload },
+            });
+            jsQuizCount++;
+          }
+        }
+      }
+    }
+
+    console.log(`    📄 Loaded ${jsContentCount} lesson contents`);
+    console.log(`    ❓ Loaded ${jsQuizCount} quizzes`);
+  }
+
+  // 5. Java 커리큘럼 upsert
+  console.log('  📚 Loading Java curriculum from JSON...');
+  const javaCurriculum = loadCurriculum('java');
+
+  if (javaCurriculum) {
+    let javaContentCount = 0;
+    let javaQuizCount = 0;
+
+    for (const chapterData of javaCurriculum.chapters) {
+      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
+
+      const chapterId = getChapterId(chapterData);
+      const chapterPayload = {
+        languageId: 'java',
+        title: chapterData.title,
+        description: chapterData.description,
+        keyQuestion: chapterData.keyQuestion || '',
+        part: 'basics',
+        partLabel: '기초',
+        order: chapterData.order,
+      };
+      const chapter = await prisma.chapter.upsert({
+        where: { id: chapterId },
+        update: chapterPayload,
+        create: { id: chapterId, ...chapterPayload },
+      });
+
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonId = getLessonId(chapterData.lessons[lessonIdx]);
+        const content = loadLessonContent('java', lessonId);
+        if (content) {
+          console.log(`      ├─ Lesson: ${content.title}`);
+
+          const lessonPayload = {
+            chapterId: chapter.id,
+            title: content.title,
+            description: content.concept,
+            difficulty: 'basic',
+            order: lessonIdx + 1,
+            estimatedTime: 10,
+          };
+          const lesson = await prisma.lesson.upsert({
+            where: { id: lessonId },
+            update: lessonPayload,
+            create: { id: lessonId, ...lessonPayload },
+          });
+
+          const contentPayload = {
+            lessonId: lesson.id,
+            code: content.content.code,
+            language: 'java',
+            steps: JSON.stringify(content.content.steps),
+          };
+          await prisma.lessonContent.upsert({
+            where: { id: `content-${lessonId}` },
+            update: contentPayload,
+            create: { id: `content-${lessonId}`, ...contentPayload },
+          });
+          javaContentCount++;
+
+          if (content.quiz) {
+            const quizPayload = {
+              lessonId: lesson.id,
+              type: 'multiple_choice',
+              question: content.quiz.question,
+              options: content.quiz.options,
+              answer: String(content.quiz.correctIndex),
+              explanation: content.quiz.explanation,
+              order: 1,
+            };
+            await prisma.quiz.upsert({
+              where: { id: `quiz-${lessonId}` },
+              update: quizPayload,
+              create: { id: `quiz-${lessonId}`, ...quizPayload },
+            });
+            javaQuizCount++;
+          }
+        }
+      }
+    }
+
+    console.log(`    📄 Loaded ${javaContentCount} lesson contents`);
+    console.log(`    ❓ Loaded ${javaQuizCount} quizzes`);
+  }
 
   // 6. Python (기초) 커리큘럼 upsert
   console.log('  📚 Loading Python curriculum from JSON...');
