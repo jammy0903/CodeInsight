@@ -7,33 +7,35 @@
     "steps": [
       {
         "line": 4,
-        "title": "static의 함정",
-        "explanation": "`static` 변수는 프로그램이 끝날 때까지 메모리에서 사라지지 않습니다.\n여기에 계속 데이터를 넣고 비워주지 않으면, GC는 \"누군가 이 리스트를 계속 보고 있네?\"라고 오해해서 내용물을 절대 안 치웁니다.",
-        "highlight": [
-          4
-        ],
+        "title": "static 리스트 생성",
+        "explanation": "`static` 키워드 때문에 이 `list`는 프로그램 시작 시 생성되어 프로그램이 끝날 때까지 메모리에 계속 남아있습니다. 여기에 담긴 객체들은 GC의 대상이 되기 매우 어렵습니다.",
+        "keyInsight": "static 변수는 GC의 주시 대상에서 벗어나기 쉽습니다.",
+        "highlight": [4],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "name": "Static List",
-              "refCount": "Infinite",
-              "size": "Growing..."
-            }
-          ]
+            "metaspace": [{"name": "MemoryLeak.list", "value": "-> ArrayList"}]
+        }
+      },
+      {
+        "line": 7,
+        "title": "무한 루프 시작",
+        "explanation": "`while(true)`를 통해 멈추지 않는 무한 루프에 진입합니다.",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+            "note": "Loop starts"
         }
       },
       {
         "line": 8,
-        "title": "OutOfMemoryError (OOM)",
-        "explanation": "결국 Heap이 꽉 차고 더 이상 청소로도 공간을 만들 수 없게 되면, 자바 가상 머신은 백기를 들고 프로그램을 종료시킵니다.\n이것이 바로 `OutOfMemoryError`입니다.",
+        "title": "객체 무한 추가 (메모리 누수 발생)",
+        "explanation": "루프가 돌 때마다 1MB 크기의 새로운 `byte` 배열 객체가 생성되어 `static` 리스트에 계속 추가됩니다. 리스트가 `static`이라서 이 객체들에 대한 참조가 절대 사라지지 않으므로, GC는 이들을 쓰레기로 인지하지 못합니다. 결국 Heap 메모리가 가득 차 `OutOfMemoryError`가 발생하며 프로그램이 강제 종료됩니다.",
         "keyInsight": "누수 = 사용하지 않는데 참조가 끊기지 않음",
-        "highlight": [
-          8
-        ],
+        "highlight": [8],
         "visualizationType": "memory",
         "memoryState": {
-          "error": "java.lang.OutOfMemoryError: Java heap space"
+            "heap": [{"address": "ArrayList", "content": "[..., byte[], byte[], ...]", "size": "Growing..."}],
+            "error": "java.lang.OutOfMemoryError: Java heap space"
         }
       }
     ]

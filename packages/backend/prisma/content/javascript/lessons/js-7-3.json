@@ -1,50 +1,125 @@
 {
-    "lessonId": "js-7-3",
-    "title": "최적화 해제 (Deoptimization)",
-    "concept": "엔진의 예측을 깨뜨리는 코드는 '최적화 해제(Deopt)'를 유발하여 성능을 떨어뜨립니다.",
-    "content": {
-        "code": "function add(a, b) {\n  return a + b;\n}\n\n// 1. 학습 및 최적화 (Optimizing)\nfor (let i = 0; i < 10000; i++) {\n  add(i, i);\n}\n// -> 엔진 판단: \"이 함수는 (Int, Int) 입력만 받는구나!\" -> 기계어 컴파일 완료\n\n// 2. 타입 변경 (Deoptimization 유발!)\nadd('Hello', 'World');\n// -> 엔진 당황: \"어? 문자열이네?\" \n// -> 기계어 폐기 및 인터프리터 모드로 복귀 (느려짐)",
-        "steps": [
-            {
-                "line": 6,
-                "title": "1. 학습 및 최적화 (Profiling & Optimizing)",
-                "explanation": "`for` 루프가 돌면서 `add` 함수가 숫자 인자만으로 반복 호출됩니다. V8의 JIT 컴파일러는 이 패턴을 '학습(Profiling)'하고, \"이 함수는 항상 숫자를 더하는군!\"이라고 확신하게 되면, 숫자 덧셈에만 특화된 매우 빠른 기계어 코드를 생성합니다(Optimization).",
-                "keyInsight": "자바스크립트 엔진은 '타입이 변하지 않는다'는 가정하에 공격적인 최적화를 수행합니다.",
-                "highlight": [6, 7, 8],
-                "visualizationType": "memory",
-                "memoryState": { "note": "Function is 'hot' -> Optimized Code generated for (Number, Number)" }
-            },
-            {
-                "line": 12,
-                "title": "2. 예측 실패 및 최적화 해제 (Deoptimization)",
-                "explanation": "갑자기 `add` 함수가 문자열 인자와 함께 호출됩니다. 엔진의 \"항상 숫자가 들어올 거야\"라는 예측이 깨졌습니다! 이 순간, 엔진은 힘들게 만들었던 최적화된 기계어 코드를 버리고, 어떤 타입이든 처리할 수 있는 느린 인터프리터 모드로 되돌아갑니다. 이 과정을 '최적화 해제(Deoptimization)'라고 합니다.",
-                "keyInsight": "일관되지 않은 타입 사용은 최적화를 무효화시켜 성능을 저하시킵니다.",
-                "highlight": [12],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "note": "Deopt! -> Bailout to Interpreter",
-                    "warning": "Performance hit!"
-                }
-            }
-        ]
-    },
-    "quiz": {
-        "question": "JIT 컴파일러의 최적화를 유지하기 위한 방법은?",
-        "options": [
-            "변수에 최대한 다양한 타입의 값을 넣는다",
-            "함수의 인자 타입을 일관되게 유지한다(Monomorphic)",
-            "함수를 아주 길게 작성한다",
-            "eval() 함수를 자주 사용한다"
-        ],
-        "correctIndex": 1,
-        "explanation": "V8은 함수가 항상 같은 타입의 인자를 받을 때(Monomorphic) 가장 빠릅니다. 숫자, 문자열, 객체를 번갈아 넣으면(Polymorphic) 최적화를 포기합니다."
-    },
-    "misconceptions": [
-        {
-            "wrong": "자바스크립트는 컴파일을 하지 않는다",
-            "correct": "실행 중에 실시간으로 컴파일(JIT)합니다.",
-            "why": "JIT(Just-In-Time) 컴파일러가 실행 시점(Runtime)에 코드를 기계어로 번역하기 때문에, 특정 패턴에서는 정적 언어(C++/Java)에 준하는 성능을 낼 수 있습니다."
+  "lessonId": "js-7-3",
+  "title": "최적화 해제 (Deoptimization)",
+  "concept": "엔진의 예측을 깨뜨리는 코드는 '최적화 해제(Deopt)'를 유발하여 성능을 떨어뜨립니다.",
+  "content": {
+    "code": "function add(a, b) {\n  return a + b;\n}\n\nconst results = [];\n\nresults.push(add(1, 2));\nresults.push(add(3, 4));\nresults.push(add(5, 6));\n\nconst optimized = results.slice();\n\nresults.push(add('Hello', 'World'));\n\nconst afterDeopt = results.slice();\n\nconsole.log(optimized);\nconsole.log(afterDeopt);",
+    "steps": [
+      {
+        "line": 1,
+        "title": "add 함수 정의",
+        "explanation": "`add` 함수를 정의합니다. 현재는 어떤 타입이든 받을 수 있는 상태입니다.",
+        "keyInsight": "JavaScript 함수는 타입 정보가 없습니다. 런타임에 어떤 타입이든 들어올 수 있습니다.",
+        "highlight": [1, 2, 3],
+        "visualizationType": "memory"
+      },
+      {
+        "line": 5,
+        "title": "결과 배열 생성",
+        "explanation": "`results` 배열을 생성합니다. 함수 호출 결과를 저장할 것입니다.",
+        "highlight": [5],
+        "visualizationType": "memory"
+      },
+      {
+        "line": 7,
+        "title": "첫 번째 숫자 덧셈",
+        "explanation": "`add(1, 2)` = 3. 엔진이 \"아, 이 함수는 숫자를 받는구나\"라고 학습 시작합니다.",
+        "keyInsight": "V8 엔진은 함수 호출 패턴을 관찰하고 '프로파일링'합니다.",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+          "profiling": "add() called with (Number, Number)",
+          "results": [3]
         }
+      },
+      {
+        "line": 8,
+        "title": "두 번째 숫자 덧셈",
+        "explanation": "`add(3, 4)` = 7. 또 숫자! 엔진의 확신이 커집니다. \"이 함수는 숫자 전용이야!\"",
+        "keyInsight": "같은 타입으로 반복 호출되면 엔진이 '최적화' 결정을 내립니다.",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+          "profiling": "Consistent (Number, Number) pattern",
+          "results": [3, 7]
+        }
+      },
+      {
+        "line": 9,
+        "title": "세 번째 숫자 덧셈 + 최적화",
+        "explanation": "`add(5, 6)` = 11. 패턴이 확인되어 V8이 최적화된 기계어 코드를 생성합니다.",
+        "keyInsight": "JIT 컴파일러가 숫자 덧셈 전용 기계어를 만듭니다. 타입 체크 없이 바로 덧셈!",
+        "analogy": "자주 가는 단골 식당에서 \"평소 먹던 거요\"라고 주문하면 빠르게 나오는 것처럼.",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "status": "OPTIMIZED",
+          "optimizedFor": "(Number, Number) → Number",
+          "results": [3, 7, 11]
+        }
+      },
+      {
+        "line": 11,
+        "title": "최적화된 상태 저장",
+        "explanation": "현재까지의 결과 [3, 7, 11]을 `optimized`에 복사합니다. 이 시점에서 함수는 최적화 상태입니다.",
+        "highlight": [11],
+        "visualizationType": "memory"
+      },
+      {
+        "line": 13,
+        "title": "타입 변경 - Deoptimization!",
+        "explanation": "`add('Hello', 'World')` = 'HelloWorld'. 갑자기 문자열이 들어왔습니다! 엔진의 예측이 깨졌습니다.",
+        "keyInsight": "타입이 바뀌면 최적화된 기계어를 버리고 인터프리터 모드로 돌아갑니다 (Bailout).",
+        "analogy": "단골 식당에서 갑자기 \"메뉴에 없는 거 주세요\"라고 하면 시간이 오래 걸리는 것처럼.",
+        "highlight": [13],
+        "visualizationType": "memory",
+        "memoryState": {
+          "status": "DEOPTIMIZED",
+          "reason": "Type mismatch: expected Number, got String",
+          "warning": "Performance hit!",
+          "results": [3, 7, 11, "HelloWorld"]
+        }
+      },
+      {
+        "line": 15,
+        "title": "Deopt 후 상태 저장",
+        "explanation": "최적화 해제 후의 결과를 `afterDeopt`에 저장합니다. 결과는 정확하지만 성능이 저하되었습니다.",
+        "keyInsight": "기능적으로는 문제없지만, 같은 함수가 이제 더 느려졌습니다.",
+        "highlight": [15],
+        "visualizationType": "memory"
+      },
+      {
+        "line": 17,
+        "title": "결과 비교",
+        "explanation": "optimized = [3, 7, 11], afterDeopt = [3, 7, 11, 'HelloWorld']. 문자열 결과도 잘 나오지만, 내부적으로 성능 손실이 발생했습니다.",
+        "keyInsight": "Deopt는 눈에 안 보이지만 성능에 영향을 줍니다. DevTools Performance 탭에서 확인할 수 있습니다.",
+        "highlight": [17, 18],
+        "visualizationType": "memory"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "JIT 컴파일러의 최적화를 유지하기 위한 방법은?",
+    "options": [
+      "변수에 최대한 다양한 타입의 값을 넣는다",
+      "함수의 인자 타입을 일관되게 유지한다 (Monomorphic)",
+      "함수를 아주 길게 작성한다",
+      "eval() 함수를 자주 사용한다"
     ],
-    "keyTakeaway": "함수의 입력 타입(Signature)을 바꾸지 마세요. 엔진의 믿음을 지켜주는 것이 성능 최적화의 핵심입니다."
+    "correctIndex": 1,
+    "explanation": "V8은 함수가 항상 같은 타입의 인자를 받을 때(Monomorphic) 가장 빠릅니다. 숫자, 문자열, 객체를 번갈아 넣으면(Polymorphic) 최적화를 포기합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "자바스크립트는 컴파일을 하지 않는다",
+      "correct": "실행 중에 실시간으로 컴파일(JIT)합니다.",
+      "why": "JIT(Just-In-Time) 컴파일러가 실행 시점(Runtime)에 코드를 기계어로 번역하기 때문에, 특정 패턴에서는 정적 언어(C++/Java)에 준하는 성능을 낼 수 있습니다."
+    },
+    {
+      "wrong": "타입이 바뀌어도 결과만 맞으면 된다",
+      "correct": "결과는 맞지만 성능이 저하됩니다.",
+      "why": "엔진이 최적화된 코드를 버리고 느린 인터프리터 모드로 돌아가기 때문입니다. 고성능이 필요한 코드에서는 타입 일관성이 중요합니다."
+    }
+  ],
+  "keyTakeaway": "함수의 입력 타입(Signature)을 바꾸지 마세요. 엔진의 믿음을 지켜주는 것이 성능 최적화의 핵심입니다."
 }

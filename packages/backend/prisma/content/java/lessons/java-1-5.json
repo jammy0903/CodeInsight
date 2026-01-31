@@ -28,10 +28,33 @@
       },
       {
         "line": 13,
-        "title": "두 Person 객체 생성",
-        "explanation": "`p1`과 `p2`는 내용(\"Alice\")이 같지만, 서로 다른 주소를 가집니다.\n\n**문제:** `hashCode`를 재정의 안 했으므로, **메모리 주소**를 기반으로 한 기본 해시코드를 사용합니다.\n`p1`의 해시: 123 (가정)\n`p2`의 해시: 456 (가정)\n**서로 다릅니다!**",
+        "title": "첫 번째 Person 객체 생성",
+        "explanation": "`new Person(\"Alice\")`를 통해 첫 번째 Person 객체를 생성하고 `p1` 변수에 할당합니다. 이 객체는 고유한 메모리 주소(예: 0x001)와 그에 기반한 기본 해시코드(예: 123)를 갖습니다.",
         "highlight": [
-          13,
+          13
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            }
+          ]
+        }
+      },
+      {
+        "line": 14,
+        "title": "두 번째 Person 객체 생성",
+        "explanation": "`p2` 역시 `new` 키워드로 생성되었기 때문에, 내용이 같더라도 `p1`과는 다른 메모리 주소(예: 0x002)와 다른 해시코드(예: 456)를 갖게 됩니다. `hashCode()`가 재정의되지 않았기 때문입니다.",
+        "highlight": [
           14
         ],
         "visualizationType": "memory",
@@ -55,7 +78,8 @@
             {
               "address": "0x002",
               "content": "Person(Alice)",
-              "hashCode": "hash: 456"
+              "hashCode": "hash: 456",
+              "new": true
             }
           ]
         }
@@ -63,7 +87,7 @@
       {
         "line": 16,
         "title": "equals() 비교",
-        "explanation": "`p1.equals(p2)`는 우리가 작성한 코드대로 이름(\"Alice\")을 비교합니다.\n`true`가 나옵니다.\n\n여기까지는 아무 문제가 없어 보입니다. **진짜 문제는 자료구조에 넣을 때 발생합니다.**",
+        "explanation": "`p1.equals(p2)`는 우리가 재정의한 `equals` 메서드를 호출하여 이름(\"Alice\")을 비교합니다. 결과는 `true`입니다. 여기까지는 문제가 없어 보입니다.",
         "keyInsight": "equals() 오버라이드 = 값 비교 가능",
         "highlight": [
           16
@@ -78,11 +102,51 @@
       },
       {
         "line": 18,
+        "title": "HashSet 생성",
+        "explanation": "Person 객체를 저장할 `HashSet`을 생성합니다. 해시 기반 자료구조는 객체를 저장하고 검색할 때 `hashCode()`를 사용합니다.",
+        "highlight": [
+          18
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "p2",
+              "value": "-> 0x002"
+            },
+            {
+              "name": "set",
+              "value": "-> 0x100"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            },
+            {
+              "address": "0x002",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 456"
+            },
+            {
+              "address": "0x100",
+              "content": "HashSet"
+            }
+          ]
+        }
+      },
+      {
+        "line": 19,
         "title": "HashSet에 p1 추가",
-        "explanation": "**HashSet의 동작 방식:**\n1. `p1.hashCode()`를 호출합니다 -> 123\n2. 123번 **버킷(방)**을 찾아서 그 안에 `p1`을 저장합니다.\n\n**버킷(Bucket)이란?**\nHashing에서 데이터를 나누어 담는 작은 방들을 말합니다.",
+        "explanation": "`set.add(p1)`이 실행되면, `p1.hashCode()`(123)를 호출하여 123번 버킷(방)에 `p1`을 저장합니다.",
         "keyInsight": "HashSet/HashMap = hashCode()로 방 배정",
         "highlight": [
-          18,
           19
         ],
         "visualizationType": "memory",
@@ -100,7 +164,7 @@
       {
         "line": 20,
         "title": "contains(p2) 호출 (검색 실패)",
-        "explanation": "이제 Set에서 `p2`를 찾아봅니다.\n\n1. `p2.hashCode()` 호출 -> 456 (주소가 다르니까!)\n2. 456번 방으로 갑니다.\n3. **방이 비어있습니다.** -> \"없는데요?\" (`false`)\n\n**충격적인 결말:**\n`equals`로 보면 둘은 쌍둥이인데, `hashCode`가 달라서 **서로 다른 방**을 뒤지고 있는 겁니다. 아예 만날 기회조차 없습니다.",
+        "explanation": "`set.contains(p2)`가 실행되면, `p2.hashCode()`(456)를 호출하여 456번 방을 확인합니다. 그 방은 비어있으므로 `false`를 반환합니다. `equals()`가 `true`임에도 불구하고, `hashCode()`가 달라 `p2`를 찾지 못하는 심각한 문제가 발생합니다.",
         "keyInsight": "hashCode 다름 = 다른 버킷 = 찾기 실패",
         "highlight": [
           20

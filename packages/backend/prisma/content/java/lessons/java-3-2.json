@@ -8,7 +8,7 @@
       {
         "line": 14,
         "title": "Dog 객체 생성",
-        "explanation": "**메모리 상태:**\n1. `Heap`: 실제 `Dog` 객체(TV)가 생성됩니다. (주소: `0x100`)\n2. `Stack`: `myDog`(리모컨)에는 **주소(0x100)**가 저장됩니다.\n\n**비유:** `myDog`는 TV가 아니라 **TV 리모컨**입니다. 0x100번 TV를 조종할 수 있는 리모컨이죠.",
+        "explanation": "**메모리 상태:** `Heap`에 `Dog` 객체(TV)가 생성되고(주소: 0x100), `Stack`의 `myDog`(리모컨) 변수는 그 주소를 저장합니다.",
         "highlight": [
           14
         ],
@@ -17,7 +17,8 @@
           "stack": [
             {
               "name": "myDog",
-              "value": "-> 0x100"
+              "value": "-> 0x100",
+              "frame": "main"
             }
           ],
           "heap": [
@@ -31,11 +32,10 @@
       {
         "line": 15,
         "title": "changeName(myDog) 호출",
-        "explanation": "**참조값(주소) 복사:**\n`myDog`가 가진 주소 `0x100`이 복사되어 파라미터 `d`에 전달됩니다.\n이제 `d`라는 **복제된 리모컨**이 생겼고, 이 리모컨도 똑같은 0x100번 TV를 가리킵니다.",
+        "explanation": "**참조값(주소) 복사:** `myDog`가 가진 주소 `0x100`이 복사되어 `changeName` 메서드의 파라미터 `d`에 전달됩니다. 이제 `myDog`와 `d`라는 두 개의 리모컨이 같은 TV(객체)를 가리킵니다.",
         "keyInsight": "주소 복사 = 리모컨 복제",
         "highlight": [
-          15,
-          6
+          15
         ],
         "visualizationType": "memory",
         "memoryState": {
@@ -62,8 +62,8 @@
       },
       {
         "line": 7,
-        "title": "d.name 변경 (성공)",
-        "explanation": "**리모컨 작동:**\n`d` 리모컨으로 TV 채널(`name`)을 바꿉니다.\n`d`가 가리키는 `0x100`으로 가서 이름을 \"Max\"로 수정합니다.\n\n`myDog`도 같은 TV(`0x100`)를 보고 있으니, `main`에서도 바뀐 이름이 보입니다!",
+        "title": "객체 내부 변경",
+        "explanation": "`d` 리모컨으로 `0x100`번 TV의 채널(`name`)을 바꿉니다. `d`가 가리키는 객체의 `name`을 \"Max\"로 수정합니다. 원본 객체가 변경됩니다.",
         "keyInsight": "리모컨으로 대상(Heap)을 조작하면 원본 영향 받음",
         "highlight": [
           7
@@ -80,12 +80,25 @@
         }
       },
       {
+        "line": 16,
+        "title": "첫 번째 결과 확인",
+        "explanation": "`changeName` 메서드가 종료되고, `myDog`의 이름을 출력합니다. `myDog` 리모컨이 가리키는 TV의 이름이 \"Max\"로 바뀌었으므로 \"Max\"가 출력됩니다.",
+        "highlight": [
+          16
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "Max"
+          ]
+        }
+      },
+      {
         "line": 18,
         "title": "reassign(myDog) 호출",
-        "explanation": "이번에도 주소 `0x100`이 복사되어 `reassign` 메서드의 `d` 리모컨으로 전달됩니다.",
+        "explanation": "다시 `myDog`의 주소 `0x100`이 복사되어 `reassign` 메서드의 `d` 리모컨으로 전달됩니다.",
         "highlight": [
-          18,
-          10
+          18
         ],
         "visualizationType": "memory",
         "memoryState": {
@@ -105,8 +118,8 @@
       },
       {
         "line": 11,
-        "title": "d에 새 객체 할당 (실패?)",
-        "explanation": "**중요한 차이:**\n1. `new Dog(\"Rex\")`가 Heap에 새 TV(`0x200`)를 만듭니다.\n2. `d` 리모컨을 이 새 TV(`0x200`)로 **연결(페어링)**합니다.\n3. 하지만 `main`의 `myDog` 리모컨은 여전히 옛날 TV(`0x100`)를 가리키고 있습니다.\n\n**비유:** 친구 리모컨(`d`)을 뺏어서 다른 TV로 연결해봐야, 내 리모컨(`myDog`) 연결은 끊기지 않습니다.",
+        "title": "파라미터 재할당 (원본 영향 없음)",
+        "explanation": "메서드 안의 `d` 리모컨이 새로운 `Dog(\"Rex\")` 객체(0x200번 TV)를 가리키도록 변경됩니다. 하지만 `main`의 `myDog` 리모컨은 여전히 원래의 `0x100`번 TV를 가리키고 있습니다. 남의 리모컨을 바꾼다고 내 리모컨이 바뀌진 않습니다.",
         "keyInsight": "변수 재할당 = 내 리모컨 연결만 바뀜",
         "highlight": [
           11
@@ -141,19 +154,13 @@
       },
       {
         "line": 19,
-        "title": "결과 확인",
-        "explanation": "`myDog`는 여전히 \"Max\"(`0x100`)입니다. 메서드 안에서의 재할당은 원본에 아무런 영향을 주지 못합니다.",
+        "title": "최종 결과 확인",
+        "explanation": "`reassign` 메서드가 종료되고 `myDog`의 이름을 출력합니다. `reassign` 안에서의 변경은 `d`라는 로컬 변수에만 영향을 줬을 뿐, `myDog`는 그대로이므로 여전히 \"Max\"가 출력됩니다.",
         "highlight": [
           19
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "myDog",
-              "value": "-> 0x100"
-            }
-          ],
           "output": [
             "Max",
             "Max"

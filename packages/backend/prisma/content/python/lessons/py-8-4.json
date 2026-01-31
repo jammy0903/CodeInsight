@@ -1,43 +1,89 @@
 {
   "lessonId": "py-8-4",
-  "title": "Itertools Module",
-  "concept": "Core concept for Itertools Module",
+  "title": "itertools: 효율적인 반복 도구 상자",
+  "concept": "무한 반복, 순환, 연결 등 복잡한 반복을 간결하게 처리하는 `itertools`의 함수들을 알아봅니다.",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Itertools Module\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "import itertools\n\n# 1. count: 무한 카운터\ncounter = itertools.count(start=10, step=2)\nprint(next(counter))\nprint(next(counter))\n\n# 2. cycle: 무한 순환\ncycler = itertools.cycle(['A', 'B', 'C'])\nprint(next(cycler))\nprint(next(cycler))\nprint(next(cycler))\nprint(next(cycler))\n\n# 3. chain: 여러 이터러블 연결\nchained = itertools.chain([1, 2], ['a', 'b'])\nfor item in chained:\n    print(item, end=' ')",
     "steps": [
       {
         "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "python-visualizer",
-        "pythonState": {
-          "variables": {},
-          "stdout": ""
-        }
-      }
+        "title": "itertools 모듈 임포트",
+        "explanation": "`import itertools`\n효율적인 반복을 위한 강력한 도구들이 모여있는 `itertools` 모듈을 가져옵니다.",
+        "highlight": [1]
+      },
+      {
+        "line": 4,
+        "title": "무한 카운터 생성 (count)",
+        "explanation": "`counter = itertools.count(start=10, step=2)`\n`10`에서 시작하여 `2`씩 무한히 증가하는 카운터 이터레이터를 생성합니다. 이 자체로는 아무것도 계산하지 않고, '어떻게' 셀 지에 대한 정보만 가집니다.",
+        "highlight": [4]
+      },
+      {
+        "line": 5,
+        "title": "첫 번째 값 가져오기",
+        "explanation": "`print(next(counter))`\n`next()` 함수로 카운터의 첫 번째 값을 요청합니다. 시작값인 `10`이 출력됩니다.",
+        "highlight": [5]
+      },
+      {
+        "line": 6,
+        "title": "두 번째 값 가져오기",
+        "explanation": "`print(next(counter))`\n다시 `next()`를 호출하면, `step`인 `2`만큼 증가한 다음 값 `12`가 출력됩니다. 이 카운터는 멈추지 않고 계속해서 값을 만들어낼 수 있습니다.",
+        "highlight": [6]
+      },
+      {
+        "line": 9,
+        "title": "무한 순환 이터레이터 생성 (cycle)",
+        "explanation": "`cycler = itertools.cycle(['A', 'B', 'C'])`\n리스트 `['A', 'B', 'C']`의 항목을 무한히 순환하는 이터레이터를 생성합니다.",
+        "highlight": [9]
+      },
+      {
+        "line": 10,
+        "title": "순환 이터레이터 사용",
+        "explanation": "`print(next(cycler))`\n`next()`를 호출할 때마다 'A', 'B', 'C'가 차례대로 나옵니다. 첫 호출이므로 'A'가 출력됩니다.",
+        "highlight": [10]
+      },
+      {
+        "line": 13,
+        "title": "순환의 마지막, 그리고 다시 시작",
+        "explanation": "`print(next(cycler))`\n'B', 'C'를 거쳐 마지막 항목까지 온 후 다시 `next()`를 호출하면, 처음인 'A'로 돌아갑니다. `cycle`은 영원히 순환합니다.",
+        "highlight": [13]
+      },
+      {
+        "line": 16,
+        "title": "이터러블 연결 (chain)",
+        "explanation": "`chained = itertools.chain([1, 2], ['a', 'b'])`\n여러 개의 리스트를 마치 하나인 것처럼 연결해주는 이터레이터를 생성합니다. 메모리에 새로운 큰 리스트를 만들지 않아 효율적입니다.",
+        "highlight": [16]
+      },
+      {
+        "line": 17,
+        "title": "연결된 이터레이터 순회",
+        "explanation": "`for item in chained:`\n`for` 루프가 `chained` 이터레이터를 순회합니다. 첫 번째 리스트 `[1, 2]`가 모두 소진되면, 자동으로 두 번째 리스트 `['a', 'b']`로 넘어가서 순회를 계속합니다.",
+        "highlight": [17]
+      },
+      {
+        "line": 18,
+        "title": "연결된 결과 출력",
+        "explanation": "`print(item, end=' ')`\n두 리스트가 연결된 결과인 `1 2 a b`가 공백으로 구분되어 출력됩니다.",
+        "highlight": [18]
+    }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Itertools Module?",
+    "question": "`itertools.cycle('XYZ')` 이터레이터에서 4번째로 나오는 값은?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "X",
+      "Y",
+      "Z",
+      "에러 발생"
     ],
     "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "explanation": "`cycle`은 순환의 끝에 도달하면 다시 처음으로 돌아옵니다. X -> Y -> Z -> X 순서이므로 4번째 값은 X입니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "`itertools`는 리스트를 반환한다.",
+      "correct": "아닙니다. 이터레이터(제너레이터)를 반환합니다.",
+      "why": "`itertools`의 핵심은 모든 값을 미리 만들지 않고, 필요할 때마다 하나씩 계산하는 '게으른(lazy)' 방식으로 메모리를 절약하는 것입니다."
     }
   ],
-  "keyTakeaway": "Understanding Itertools Module is crucial for advanced Python."
+  "keyTakeaway": "`itertools`는 빠르고 메모리 효율적인 반복을 위한 최고의 도구입니다. 복잡한 `for` 루프는 `itertools`로 해결할 수 있는지 먼저 생각해보세요."
 }

@@ -68,7 +68,7 @@ export function initializeAuthListener(): () => void {
           setAppUser(appUser);
           setNeedsRegistration(false);
 
-          // 온보딩 완료 여부 확인
+          // 온보딩 완료 여부 확인 (백엔드만 사용)
           const profileResult = await getProfile();
           if (profileResult && !profileResult.onboardingCompleted) {
             setNeedsOnboarding(true);

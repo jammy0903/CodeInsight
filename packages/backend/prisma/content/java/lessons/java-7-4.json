@@ -3,28 +3,93 @@
   "title": "와일드카드와 타입 제한",
   "concept": "Core concept for Wildcards & Bounds",
   "content": {
-    "code": "import java.util.List;\nimport java.util.ArrayList;\n\npublic class Main {\n    // Upper Bounded Wildcard: accept Number or its subclasses (Integer, Double...)\n    public static double sum(List<? extends Number> list) {\n        double sum = 0;\n        for (Number n : list) {\n            sum += n.doubleValue();\n        }\n        // list.add(10); // Error! Read-only (mostly)\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        List<Integer> ints = new ArrayList<>();\n        ints.add(1);\n        ints.add(2);\n        \n        List<Double> doubles = new ArrayList<>();\n        doubles.add(3.5);\n        \n        // Both work thanks to wildcard\n        System.out.println(\"Sum Ints: \" + sum(ints));\n        System.out.println(\"Sum Doubles: \" + sum(doubles));\n    }\n}",
+    "code": "import java.util.List;\nimport java.util.ArrayList;\n\npublic class Main {\n    // Upper Bounded Wildcard: accept Number or its subclasses (Integer, Double...)\n    public static double sum(List<? extends Number> list) {\n        double sum = 0;\n        for (Number n : list) {\n            sum += n.doubleValue();\n        }\n        // list.add(10); // Error! Read-only (mostly)\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        List<Integer> ints = new ArrayList<>();\n        ints.add(1);\n        ints.add(2);\n        \n        List<Double> doubles = new ArrayList<>();\n        doubles.add(3.5);\n        \n        // Both work thanks to wildcard\n        System.out.println(\"Sum Ints: " + sum(ints));\n        System.out.println(\"Sum Doubles: " + sum(doubles));\n    }\n}",
     "steps": [
       {
-        "line": 5,
-        "title": "와일드카드 (? extends Number)",
-        "explanation": "`?`는 '알 수 없는 타입'을 의미합니다. `? extends Number`는 \"Number나 그 자식들을 담고 있는 리스트\"를 받겠다는 뜻입니다.",
+        "line": 6,
+        "title": "제네릭 와일드카드 메서드",
+        "explanation": "`List<? extends Number>`는 'Number 클래스를 상속받는 어떤 타입이든 담고 있는 리스트'를 매개변수로 받겠다는 의미입니다. 이를 통해 `List<Integer>`와 `List<Double>`을 모두 처리할 수 있는 유연한 메서드를 만들 수 있습니다.",
+        "highlight": [6, 7, 8, 9, 10, 11, 12, 13],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": []
+            "note": "sum(? extends Number) 설계도 정의"
         }
       },
       {
-        "line": 10,
-        "title": "쓰기 불가 (Immutability)",
-        "explanation": "`List<? extends Number>`로 받으면, 그 리스트가 `List<Integer>`인지 `List<Double>`인지 알 수 없으므로, 값을 추가(add)하는 것은 위험해서 컴파일러가 막습니다.",
-        "keyInsight": "꺼내서 읽을(Read) 수는 있지만, 안전하게 저장(Write)할 수는 없습니다 (PECS - Producer Extends).",
+        "line": 16,
+        "title": "Integer 리스트 생성",
+        "explanation": "`Integer` 타입을 담을 `ArrayList`를 생성합니다.",
+        "highlight": [16],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "Sum Ints: 3.0",
-            "Sum Doubles: 3.5"
-          ]
+            "stack": [{"name": "ints", "value": "-> List<Integer>"}]
+        }
+      },
+      {
+        "line": 17,
+        "title": "요소 추가",
+        "explanation": "리스트에 정수 1을 추가합니다.",
+        "highlight": [17],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [{"address": "List<Integer>", "content": "[1]"}]
+        }
+      },
+      {
+        "line": 18,
+        "title": "요소 추가",
+        "explanation": "리스트에 정수 2를 추가합니다.",
+        "highlight": [18],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [{"address": "List<Integer>", "content": "[1, 2]"}]
+        }
+      },
+      {
+        "line": 20,
+        "title": "Double 리스트 생성",
+        "explanation": "`Double` 타입을 담을 `ArrayList`를 생성합니다.",
+        "highlight": [20],
+        "visualizationType": "memory",
+        "memoryState": {
+            "stack": [
+                {"name": "ints", "value": "-> List<Integer>"},
+                {"name": "doubles", "value": "-> List<Double>"}
+            ]
+        }
+      },
+      {
+        "line": 21,
+        "title": "요소 추가",
+        "explanation": "리스트에 실수 3.5를 추가합니다.",
+        "highlight": [21],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [
+                {"address": "List<Integer>", "content": "[1, 2]"},
+                {"address": "List<Double>", "content": "[3.5]"}
+            ]
+        }
+      },
+      {
+        "line": 24,
+        "title": "sum(ints) 호출",
+        "explanation": "`sum` 메서드를 `List<Integer>` 타입의 `ints`와 함께 호출합니다. 와일드카드 `? extends Number` 덕분에 `Number`의 자식 클래스인 `Integer`의 리스트를 인자로 전달할 수 있습니다. 메서드는 리스트의 합계인 3.0을 계산하여 출력합니다.",
+        "keyInsight": "상한 경계 와일드카드(? extends)는 유연한 '읽기' API를 만듭니다.",
+        "highlight": [24],
+        "visualizationType": "memory",
+        "memoryState": {
+            "output": ["Sum Ints: 3.0"]
+        }
+      },
+      {
+        "line": 25,
+        "title": "sum(doubles) 호출",
+        "explanation": "동일한 `sum` 메서드를 이번에는 `List<Double>` 타입의 `doubles`와 함께 호출합니다. `Double` 역시 `Number`의 자식 클래스이므로 와일드카드 규칙에 의해 허용됩니다. 메서드는 합계 3.5를 계산하여 출력합니다.",
+        "highlight": [25],
+        "visualizationType": "memory",
+        "memoryState": {
+            "output": ["Sum Ints: 3.0", "Sum Doubles: 3.5"]
         }
       }
     ]

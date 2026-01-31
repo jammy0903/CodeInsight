@@ -372,6 +372,12 @@ export function LessonPage() {
 
         if (cancelled) return;
 
+        console.log('[LessonPage] Simulation result:', {
+          success: result.success,
+          stepsLength: result.steps?.length,
+          error: result.error
+        });
+
         if (result.success) {
           // JSON 파일의 steps에서 explanation 가져와서 병합
           // WHY: 시뮬레이터는 메모리 상태만 생성, 상세 설명은 JSON에 있음
@@ -444,20 +450,56 @@ export function LessonPage() {
             };
           });
 
+          // Filter consecutive duplicate lines (fixes asyncio import flooding)
+          // Keep only the LAST step for each consecutive group of same-line steps
+          const filteredSteps = mergedSteps.reduce((acc: typeof mergedSteps, step, idx) => {
+            const prevStep = mergedSteps[idx - 1];
+            const nextStep = mergedSteps[idx + 1];
+
+            // Skip if this is part of a consecutive same-line sequence, but keep the last one
+            if (prevStep?.line === step.line && nextStep?.line === step.line) {
+              return acc; // Skip middle steps in a sequence
+            }
+
+            // Keep this step if:
+            // - It's the first step with this line (no prev or prev has different line)
+            // - It's the last step with this line (no next or next has different line)
+            if (!nextStep || nextStep.line !== step.line) {
+              acc.push(step);
+            }
+
+            return acc;
+          }, []);
+
+          console.log('[LessonPage] Filtered steps:', {
+            originalCount: mergedSteps.length,
+            filteredCount: filteredSteps.length
+          });
+
           // Update Cache
-          simulationCache.current[memoizedCode] = mergedSteps;
+          simulationCache.current[memoizedCode] = filteredSteps;
           lastSimulatedCodeRef.current = memoizedCode;
 
           setSimulationError(null);
-          setLiveSteps(mergedSteps);
+          setLiveSteps(filteredSteps);
         } else {
           console.error("Simulation failed:", result.error);
           setSimulationError(result.error || 'Failed to simulate code.');
+          // Fallback to static JSON steps if available
+          if (lesson.content?.steps) {
+            console.log("Using fallback static steps from JSON");
+            setLiveSteps(lesson.content.steps);
+          }
         }
       } catch (e) {
         if (cancelled) return;
         console.error("Simulation exception:", e);
         setSimulationError(e instanceof Error ? e.message : 'An unknown error occurred during simulation.');
+        // Fallback to static JSON steps if available
+        if (lesson.content?.steps) {
+          console.log("Using fallback static steps from JSON (after exception)");
+          setLiveSteps(lesson.content.steps);
+        }
       } finally {
         if (!cancelled) setSimulating(false);
       }
@@ -472,7 +514,14 @@ export function LessonPage() {
   }, [lesson, lang, memoizedCode]);
 
   const steps: LessonStep[] = useMemo(() => {
-    return liveSteps || [];
+    const result = liveSteps || [];
+    console.log('[LessonPage] steps computed:', {
+      liveStepsNull: liveSteps === null,
+      liveStepsLength: liveSteps?.length,
+      resultLength: result.length,
+      firstStep: result[0]?.explanation?.substring(0, 50)
+    });
+    return result;
   }, [liveSteps]);
 
   const code = lesson?.content?.code || '';

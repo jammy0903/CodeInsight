@@ -1,43 +1,83 @@
 {
   "lessonId": "py-8-3",
-  "title": "Generator Expressions",
-  "concept": "Core concept for Generator Expressions",
+  "title": "제너레이터 표현식: 메모리 효율적인 한 줄 루프",
+  "concept": "리스트 컴프리헨션과 비슷하지만, 대괄호 `[]` 대신 소괄호 `()`를 사용하여 메모리를 아끼는 제너레이터를 만듭니다.",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Generator Expressions\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "import sys\n\n# 리스트 컴프리헨션: 모든 값을 메모리에 올림\nlist_comp = [i * i for i in range(5)]\nprint(f\"List: {list_comp}\")\nprint(f\"Size: {sys.getsizeof(list_comp)}\")\n\n# 제너레이터 표현식: 객체만 생성\ngen_exp = (i * i for i in range(5))\nprint(f\"Generator: {gen_exp}\")\nprint(f\"Size: {sys.getsizeof(gen_exp)}\")\n\n# 제너레이터는 필요할 때 값을 계산\nfor num in gen_exp:\n    print(num, end=' ')",
     "steps": [
       {
         "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "python-visualizer",
-        "pythonState": {
-          "variables": {},
-          "stdout": ""
-        }
+        "title": "sys 모듈 임포트",
+        "explanation": "`import sys`\n메모리 크기를 확인하는 `sys.getsizeof()` 함수를 사용하기 위해 `sys` 모듈을 가져옵니다.",
+        "highlight": [1]
+      },
+      {
+        "line": 4,
+        "title": "리스트 컴프리헨션",
+        "explanation": "`list_comp = [i * i for i in range(5)]`\n대괄호`[]`를 사용한 리스트 컴프리헨션입니다. `0, 1, 2, 3, 4`의 제곱 값을 '모두' 계산하여 '미리' 리스트로 만들어 메모리에 올립니다.",
+        "highlight": [4]
+      },
+      {
+        "line": 5,
+        "title": "리스트 내용 출력",
+        "explanation": "`print(f\"List: {list_comp}\")`\n생성된 리스트 `[0, 1, 4, 9, 16]` 전체를 출력합니다.",
+        "highlight": [5]
+      },
+      {
+        "line": 6,
+        "title": "리스트 메모리 크기",
+        "explanation": "`print(f\"Size: {sys.getsizeof(list_comp)}\")`\n리스트가 차지하는 메모리의 크기를 출력합니다. 리스트의 크기에 비례하여 메모리 사용량이 커집니다.",
+        "highlight": [6]
+      },
+      {
+        "line": 9,
+        "title": "제너레이터 표현식",
+        "explanation": "`gen_exp = (i * i for i in range(5))`\n리스트 컴프리헨션과 똑같이 생겼지만, 대괄호`[]` 대신 소괄호`()`를 사용했습니다. 이 코드는 리스트를 만들지 않고, 값을 어떻게 만들지에 대한 '레시피'만 담고 있는 작은 '제너레이터 객체'를 생성합니다.",
+        "highlight": [9]
+      },
+      {
+        "line": 10,
+        "title": "제너레이터 객체 출력",
+        "explanation": "`print(f\"Generator: {gen_exp}\")`\n제너레이터 객체 자체를 출력합니다. 리스트 내용이 아닌, `<generator object ...>` 와 같은 정보가 표시됩니다.",
+        "highlight": [10]
+      },
+      {
+        "line": 11,
+        "title": "제너레이터 메모리 크기",
+        "explanation": "`print(f\"Size: {sys.getsizeof(gen_exp)}\")`\n제너레이터 객체의 메모리 크기를 출력합니다. `range`의 크기와 상관없이 항상 작은 크기를 차지하는 것을 볼 수 있습니다.",
+        "highlight": [11]
+      },
+      {
+        "line": 14,
+        "title": "제너레이터 순회",
+        "explanation": "`for num in gen_exp:`\n`for` 루프가 제너레이터를 순회합니다. 루프는 `next()`를 호출할 때마다, 제너레이터에게 다음 값을 '요청'하고, 제너레이터는 그제서야 값을 하나씩 계산해서 `yield`합니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 15,
+        "title": "값 순차적 출력",
+        "explanation": "`print(num, end=' ')`\n제너레이터로부터 하나씩 받은 값 `0, 1, 4, 9, 16`을 차례대로 출력합니다. 결과는 리스트와 같지만, 모든 값을 메모리에 미리 올려두지 않아 훨씬 효율적입니다.",
+        "highlight": [15]
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Generator Expressions?",
+    "question": "리스트 컴프리헨션 대신 제너레이터 표현식을 쓰는 가장 큰 이유는?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "코드가 더 짧아져서",
+      "실행 속도가 더 빨라서",
+      "메모리를 효율적으로 사용하기 위해",
+      "더 많은 기능을 제공해서"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "제너레이터 표현식은 모든 값을 미리 만들지 않고 필요할 때마다 하나씩 생성하므로, 대용량 데이터를 다룰 때 메모리 사용량을 획기적으로 줄일 수 있습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "제너레이터 표현식은 리스트보다 항상 빠르다.",
+      "correct": "작은 데이터에서는 리스트가 더 빠를 수 있습니다. 제너레이터는 호출 오버헤드가 있기 때문입니다.",
+      "why": "제너레이터의 진가는 '대용량' 데이터를 다룰 때 메모리 절약에서 나타납니다."
     }
   ],
-  "keyTakeaway": "Understanding Generator Expressions is crucial for advanced Python."
+  "keyTakeaway": "대용량 데이터를 다룰 땐 리스트 컴프리헨션(`[]`) 대신 제너레이터 표현식(`()`)을 사용해 메모리를 절약하세요."
 }

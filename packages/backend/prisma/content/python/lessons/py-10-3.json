@@ -1,43 +1,83 @@
 {
   "lessonId": "py-10-3",
-  "title": "AsyncIO Basics",
-  "concept": "Core concept for AsyncIO Basics",
+  "title": "asyncio: 하나의 스레드로 동시성 처리하기",
+  "concept": "`async`/`await` 구문을 사용하여, I/O 작업을 기다리는 동안 다른 작업을 수행하는 협력적 멀티태스킹을 구현합니다.",
   "content": {
-    "code": "def example():\n    # TODO: Add code for AsyncIO Basics\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "import asyncio\nimport time\n\nasync def say_after(delay, what):\n    print(f\"'{what}' 작업 시작\")\n    await asyncio.sleep(delay)\n    print(what)\n\nasync def main():\n    start = time.time()\n\n    task1 = asyncio.create_task(say_after(1, 'hello'))\n    task2 = asyncio.create_task(say_after(2, 'world'))\n\n    print(\"--- 작업 예약 완료 ---\")\n    await task1\n    await task2\n    print(f\"총 소요 시간: {time.time() - start:.4f}s\")\n\nasyncio.run(main())",
     "steps": [
       {
         "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "python-visualizer",
-        "pythonState": {
-          "variables": {},
-          "stdout": ""
-        }
+        "title": "모듈 임포트",
+        "explanation": "비동기 I/O를 위한 `asyncio`와 시간 측정을 위한 `time` 모듈을 가져옵니다.",
+        "highlight": [1, 2]
+      },
+      {
+        "line": 4,
+        "title": "코루틴 함수 정의",
+        "explanation": "`async def`로 정의된 함수는 '코루틴'이라고 부릅니다. `await` 키워드를 만나면, 해당 작업이 끝날 때까지 기다리지 않고 다른 작업을 할 수 있도록 제어권을 이벤트 루프에 넘깁니다.",
+        "highlight": [4, 5, 6, 7]
+      },
+      {
+        "line": 9,
+        "title": "메인 코루틴 정의",
+        "explanation": "`async def main():`\n비동기 프로그램의 메인 진입점 역할을 할 `main` 코루틴을 정의합니다.",
+        "highlight": [9]
+      },
+      {
+        "line": 12,
+        "title": "동시 실행 작업 생성 (task)",
+        "explanation": "`asyncio.create_task(...)`\n`say_after` 코루틴을 '태스크'로 만들어, 이벤트 루프에서 즉시 실행되도록 예약합니다. 코드는 여기서 멈추지 않고 바로 다음 라인으로 넘어갑니다.",
+        "highlight": [12]
+      },
+      {
+        "line": 13,
+        "title": "두 번째 작업 생성",
+        "explanation": "`task2`도 마찬가지로 즉시 실행되도록 예약합니다. 이제 `task1`과 `task2`는 이벤트 루프 내에서 '동시에' 실행 대기 상태가 됩니다.",
+        "highlight": [13]
+      },
+      {
+        "line": 16,
+        "title": "작업 기다리기 (await)",
+        "explanation": "`await task1`\n`task1`이 완료될 때까지 `main` 함수의 실행을 멈추고 기다립니다. `task1`은 `asyncio.sleep(1)`을 실행하며 1초간 '대기' 상태에 들어가고, 이 동안 이벤트 루프는 다른 작업(`task2`)을 실행할 수 있습니다.",
+        "highlight": [16]
+      },
+      {
+        "line": 17,
+        "title": "두 번째 작업 기다리기",
+        "explanation": "`await task2`\n`task1`이 완료된 후, `task2`가 완료되기를 기다립니다. `task2`는 총 2초가 걸리므로, 프로그램은 여기서 약 1초를 더 기다리게 됩니다.",
+        "highlight": [17]
+      },
+      {
+        "line": 18,
+        "title": "총 소요 시간 확인",
+        "explanation": "`print(...)`\n총 소요 시간은 약 2초가 출력됩니다. 1초와 2초짜리 작업을 순서대로 실행했다면 3초가 걸렸겠지만, `asyncio`는 `sleep`으로 대기하는 동안 다른 작업을 동시에 처리했기 때문에 가장 오래 걸리는 작업 시간(2초)만큼만 소요되었습니다.",
+        "highlight": [18]
+      },
+      {
+        "line": 20,
+        "title": "이벤트 루프 실행",
+        "explanation": "`asyncio.run(main())`\n`asyncio` 이벤트 루프를 시작하고, `main` 코루틴을 실행하도록 지시합니다. 이 라인에서 비동기 프로그램 전체가 시작됩니다.",
+        "highlight": [20]
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of AsyncIO Basics?",
+    "question": "`await` 키워드의 역할은 무엇인가요?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "함수를 즉시 종료한다.",
+      "오래 걸리는 작업이 끝날 때까지 프로그램 전체를 멈춘다.",
+      "오래 걸리는 작업이 끝날 때까지 제어권을 이벤트 루프에 넘겨 다른 작업을 하게 한다.",
+      "새로운 스레드를 생성한다."
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "`await`는 현재 작업을 '일시정지'하고, `await` 대상 작업이 완료될 때까지 `asyncio` 이벤트 루프가 다른 작업을 실행할 수 있도록 허용합니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "`async`/`await`는 멀티스레딩처럼 동작한다.",
+      "correct": "아닙니다. `asyncio`는 기본적으로 **하나의 스레드**에서 동작합니다.",
+      "why": "여러 스레드를 쓰는 대신, 하나의 스레드 내에서 여러 작업 사이를 효율적으로 전환하며 동시성을 달성하는 '협력적 멀티태스킹' 방식입니다."
     }
   ],
-  "keyTakeaway": "Understanding AsyncIO Basics is crucial for advanced Python."
+  "keyTakeaway": "`asyncio`는 하나의 스레드에서 작동하며, I/O 대기 시간에 다른 작업을 효율적으로 처리하는 데 최적화되어 있습니다."
 }

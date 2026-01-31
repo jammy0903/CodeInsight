@@ -8,230 +8,101 @@
       {
         "line": 1,
         "title": "중첩 객체 생성",
-        "explanation": "original 객체 안에 address 객체가 중첩되어 있습니다.",
-        "highlight": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "explanation": "`original` 객체는 `address`라는 또 다른 객체를 속성으로 가집니다. `original` 변수는 힙에 있는 객체의 주소를 참조합니다.",
+        "highlight": [1, 2, 3, 4],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "original",
-              "value": "→ 0x001"
-            }
-          ],
+          "stack": [{"name": "original", "value": "→ 0x001"}],
           "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Seoul' }"
-            }
+            {"address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }"},
+            {"address": "0x002", "content": "{ city: 'Seoul' }"}
           ]
         }
       },
       {
         "line": 7,
         "title": "얕은 복사 (Spread)",
-        "explanation": "{ ...original }은 1단계만 복사합니다. address는 여전히 같은 객체를 참조합니다!",
+        "explanation": "전개 연산자 `{ ...original }`는 `original` 객체의 속성을 1단계만 복사하여 새로운 `shallow` 객체를 만듭니다. `name`과 같은 원시값 속성은 복사되지만, `address`와 같은 참조값 속성은 주소만 복사되어 두 객체가 같은 `address` 객체를 공유하게 됩니다.",
         "keyInsight": "얕은 복사 = 1단계만 복사, 중첩 객체는 참조 공유",
-        "highlight": [
-          7
-        ],
+        "highlight": [7],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "original",
-              "value": "→ 0x001"
-            },
-            {
-              "name": "shallow",
-              "value": "→ 0x003"
-            }
-          ],
+          "stack": [{"name": "shallow", "value": "→ 0x003"}],
           "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Seoul' }",
-              "shared": true
-            },
-            {
-              "address": "0x003",
-              "content": "{ name: 'Alice', address: → 0x002 }",
-              "new": true
-            }
+            {"address": "0x002", "content": "{ city: 'Seoul' }", "shared": true},
+            {"address": "0x003", "content": "{ name: 'Alice', address: → 0x002 }", "new": true}
           ]
         }
       },
       {
         "line": 8,
-        "title": "shallow.name 변경",
-        "explanation": "name은 원시값이므로 shallow만 변경됩니다. original.name은 그대로입니다.",
-        "highlight": [
-          8
-        ],
+        "title": "원시값 속성 변경",
+        "explanation": "`shallow.name`을 변경합니다. `name`은 복사된 원시값이므로 `shallow` 객체만 변경되고, `original` 객체에는 영향을 주지 않습니다.",
+        "highlight": [8],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "original",
-              "value": "→ 0x001"
-            },
-            {
-              "name": "shallow",
-              "value": "→ 0x003"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Seoul' }"
-            },
-            {
-              "address": "0x003",
-              "content": "{ name: 'Bob', address: → 0x002 }",
-              "changed": true
-            }
-          ]
+          "heap": [{"address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }", "changed": true}]
         }
       },
       {
         "line": 9,
-        "title": "shallow.address.city 변경",
-        "explanation": "address는 공유되므로 original.address.city도 변경됩니다!\n이것이 **참조 공유(Shared Reference)**의 위험성입니다.",
-        "keyInsight": "얕은 복사의 함정: 겉만 복사하고 속은 공유함 (Side Effect 발생)",
-        "highlight": [
-          9
-        ],
+        "title": "참조값 속성 변경 (Side Effect!)",
+        "explanation": "`shallow.address.city`를 변경합니다. `address`는 `original`과 `shallow`가 공유하는 객체이므로, 이 변경은 두 객체 모두에 영향을 미칩니다. 이것이 얕은 복사의 대표적인 부작용(Side Effect)입니다.",
+        "keyInsight": "얕은 복사의 함정: 겉만 복사하고 속은 공유함",
+        "highlight": [9],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "original",
-              "value": "→ 0x001"
-            },
-            {
-              "name": "shallow",
-              "value": "→ 0x003"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Busan' }",
-              "changed": true,
-              "warning": true
-            },
-            {
-              "address": "0x003",
-              "content": "{ name: 'Bob', address: → 0x002 }"
-            }
-          ]
+          "heap": [{"address": "0x002", "content": "{ city: 'Busan' }", "changed": true, "warning": true}]
         }
       },
       {
         "line": 11,
-        "title": "원본 확인",
-        "explanation": "name은 'Alice'(변경 안 됨), city는 'Busan'(변경됨)입니다.",
-        "highlight": [
-          11,
-          12
-        ],
+        "title": "원본 name 확인",
+        "explanation": "`original.name`은 얕은 복사의 영향을 받지 않았으므로 'Alice'가 그대로 출력됩니다.",
+        "highlight": [11],
         "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Alice",
-            "Busan"
-          ]
-        }
+        "memoryState": { "output": ["Alice"] }
+      },
+      {
+        "line": 12,
+        "title": "원본 address.city 확인",
+        "explanation": "`original.address.city`는 공유된 참조로 인해 `shallow` 객체의 변경사항이 반영되어 'Busan'이 출력됩니다.",
+        "highlight": [12],
+        "visualizationType": "memory",
+        "memoryState": { "output": ["Alice", "Busan"] }
       },
       {
         "line": 15,
-        "title": "깊은 복사 (JSON)",
-        "explanation": "JSON.stringify → JSON.parse로 완전히 새로운 객체를 생성합니다. 모든 중첩 객체도 복사됩니다.",
+        "title": "깊은 복사 (JSON 트릭)",
+        "explanation": "`JSON.stringify`로 객체를 문자열로 변환한 뒤, `JSON.parse`로 다시 객체로 만듭니다. 이 과정에서 모든 중첩 구조가 값으로 변환되었다가 새로 생성되므로, 원본과 완전히 독립된 새로운 객체가 만들어집니다.",
         "keyInsight": "깊은 복사 = 모든 레벨 복사, 완전히 독립적",
-        "highlight": [
-          15
-        ],
+        "highlight": [15],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [
-            {
-              "name": "original",
-              "value": "→ 0x001"
-            },
-            {
-              "name": "deep",
-              "value": "→ 0x004"
-            }
-          ],
+          "stack": [{"name": "deep", "value": "→ 0x004"}],
           "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Busan' }"
-            },
-            {
-              "address": "0x004",
-              "content": "{ name: 'Alice', address: → 0x005 }",
-              "new": true
-            },
-            {
-              "address": "0x005",
-              "content": "{ city: 'Busan' }",
-              "new": true
-            }
+            {"address": "0x004", "content": "{ name: 'Alice', address: → 0x005 }", "new": true},
+            {"address": "0x005", "content": "{ city: 'Busan' }", "new": true}
           ]
         }
       },
       {
         "line": 16,
-        "title": "deep.address.city 변경",
-        "explanation": "deep은 완전히 독립적이므로 original에 영향을 주지 않습니다.",
-        "highlight": [
-          16,
-          18
-        ],
+        "title": "깊은 복사된 객체 변경",
+        "explanation": "`deep` 객체의 `address.city`를 변경합니다. `deep`은 `original`과 완전히 분리되어 있으므로 원본에 아무런 영향을 주지 않습니다.",
+        "highlight": [16],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "address": "0x002",
-              "content": "{ city: 'Busan' }"
-            },
-            {
-              "address": "0x005",
-              "content": "{ city: 'Incheon' }",
-              "changed": true
-            }
-          ],
-          "output": [
-            "Alice",
-            "Busan",
-            "Busan"
-          ]
+          "heap": [{"address": "0x005", "content": "{ city: 'Incheon' }", "changed": true}]
         }
+      },
+      {
+        "line": 18,
+        "title": "최종 원본 확인",
+        "explanation": "`deep` 객체의 변경 후에도 `original.address.city`는 이전 `shallow` 복사 시 변경되었던 'Busan' 값을 그대로 유지하고 있습니다.",
+        "highlight": [18],
+        "visualizationType": "memory",
+        "memoryState": { "output": ["Alice", "Busan", "Busan"] }
       }
     ]
   },

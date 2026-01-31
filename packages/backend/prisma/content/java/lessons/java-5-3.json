@@ -8,7 +8,7 @@
       {
         "line": 2,
         "title": "static 필드 선언",
-        "explanation": "**공용 화이트보드:**\n`static int count`는 모든 `Counter` 객체가 공유하는 **단 하나뿐인 변수**입니다.\n객체(인스턴스)가 죽든 살든 상관없이, 프로그램 시작부터 끝까지 `Metaspace`라는 특별한 구역에 살아있습니다.",
+        "explanation": "`static int count`는 모든 `Counter` 객체가 공유하는 단 하나뿐인 '공용 변수'입니다. 프로그램 시작 시 Metaspace 영역에 0으로 초기화됩니다.",
         "keyInsight": "static = 클래스당 1개 (공유)",
         "highlight": [
           2
@@ -20,31 +20,15 @@
               "name": "Counter.count",
               "value": "0"
             }
-          ],
-          "note": "인스턴스 생성 전부터 존재"
-        }
-      },
-      {
-        "line": 3,
-        "title": "인스턴스 필드",
-        "explanation": "**개인 수첩:**\n`id`는 `int` 앞에 `static`이 없습니다. 즉, `new` 할 때마다 각 객체(Heap) 뱃속에 따로따로 생기는 **개별 변수**입니다.",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "아직 인스턴스가 없어서 id는 없음"
+          ]
         }
       },
       {
         "line": 11,
-        "title": "첫 번째 인스턴스 (c1) 생성",
-        "explanation": "1. 생성자가 실행됩니다.\n2. `count++`: 공용 화이트보드의 숫자를 0->1로 고칩니다.\n3. `id = count`: 내 개인 수첩(`c1.id`)에 현재 값 1을 적습니다.",
+        "title": "첫 번째 인스턴스(c1) 생성",
+        "explanation": "`new Counter()`가 생성자를 호출합니다. 생성자 내부에서 공용 변수 `count`가 1로 증가하고, 그 값이 `c1`의 개인 변수 `id`에 할당됩니다.",
         "highlight": [
-          11,
-          5,
-          6,
-          7
+          11
         ],
         "visualizationType": "memory",
         "memoryState": {
@@ -60,19 +44,13 @@
               "address": "c1",
               "content": "Counter{id: 1}"
             }
-          ],
-          "stack": [
-            {
-              "name": "c1",
-              "value": "-> Heap[0]"
-            }
           ]
         }
       },
       {
         "line": 12,
-        "title": "두 번째 인스턴스 (c2) 생성",
-        "explanation": "1. 생성자 실행.\n2. `count++`: 공용 화이트보으의 숫자를 1->2로 고칩니다. (c1도 이 변화를 봅니다!)\n3. `id = count`: 내 개인 수첩(`c2.id`)에 2를 적습니다.\n\n**결과:** `c1`은 1번 번호표, `c2`는 2번 번호표를 가졌습니다.",
+        "title": "두 번째 인스턴스(c2) 생성",
+        "explanation": "다시 생성자가 호출됩니다. 공용 변수 `count`가 2로 증가하고, 그 값이 **새로운** 인스턴스 `c2`의 개인 변수 `id`에 할당됩니다.",
         "highlight": [
           12
         ],
@@ -92,17 +70,31 @@
             },
             {
               "address": "c2",
-              "content": "Counter{id: 2}"
+              "content": "Counter{id: 2}",
+              "new": true
             }
           ]
         }
       },
       {
         "line": 14,
-        "title": "c1.id, c2.id 출력",
-        "explanation": "각자 개인 수첩에 적힌 번호(1, 2)는 서로 다릅니다. 이게 인스턴스 변수입니다.",
+        "title": "c1.id 출력",
+        "explanation": "`c1` 객체의 개인 변수 `id`의 값인 1을 출력합니다.",
         "highlight": [
-          14,
+          14
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "1"
+          ]
+        }
+      },
+      {
+        "line": 15,
+        "title": "c2.id 출력",
+        "explanation": "`c2` 객체의 개인 변수 `id`의 값인 2를 출력합니다. 각 인스턴스는 `id`를 별도로 가집니다.",
+        "highlight": [
           15
         ],
         "visualizationType": "memory",
@@ -116,7 +108,7 @@
       {
         "line": 16,
         "title": "Counter.count 출력",
-        "explanation": "공용 화이트보드(`static`)의 현재 값은 2입니다.\n`static` 변수는 이렇게 `클래스이름.변수명`으로 접근하는 것이 정석입니다.",
+        "explanation": "클래스 이름을 통해 공용 변수 `count`에 접근합니다. 최종값인 2가 출력됩니다. 이 방식이 정석입니다.",
         "keyInsight": "Class.field 로 접근하세요",
         "highlight": [
           16
@@ -132,8 +124,8 @@
       },
       {
         "line": 17,
-        "title": "함정: c1.count",
-        "explanation": "**주의:** `c1.count`라고 써도 실행은 되지만, 사실 `Counter.count`를 가리킵니다.\n마치 `c1`만의 `count`가 있는 것처럼 보여서 코드를 읽는 사람을 헷갈리게 합니다. 쓰지 마세요.",
+        "title": "공유 변수 비교",
+        "explanation": "`c1.count`와 `c2.count` 모두 실제로는 동일한 `Counter.count`를 가리킵니다. 따라서 `2 == 2`가 되어 `true`가 출력됩니다. 하지만 이런 접근 방식은 코드를 헷갈리게 만드므로 피해야 합니다.",
         "highlight": [
           17
         ],

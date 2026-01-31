@@ -3,23 +3,36 @@
   "title": "콜 스택과 동기 실행",
   "concept": "JavaScript는 싱글 스레드 언어로, 콜 스택을 통해 함수 실행을 관리한다",
   "content": {
-    "code": "function first() {\n  console.log('first');\n  second();\n  console.log('first end');\n}\n\nfunction second() {\n  console.log('second');\n}\n\nfirst();\nconsole.log('done');",
+    "code": "const log = [];\n\nfunction first() {\n  log.push('first start');\n  second();\n  log.push('first end');\n}\n\nfunction second() {\n  log.push('second');\n}\n\nfirst();\nlog.push('done');\n\nconsole.log(log);",
     "steps": [
       {
-        "line": 11,
+        "line": 1,
+        "title": "로그 배열 초기화",
+        "explanation": "`log` 배열을 생성합니다. 함수 실행 순서를 이 배열에 기록할 것입니다.",
+        "keyInsight": "배열은 힙(Heap)에 저장되고, 변수는 이 배열의 주소를 참조합니다.",
+        "highlight": [1],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": [],
+          "currentPhase": "idle",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 13,
         "title": "first() 호출 - 스택 프레임 생성",
-        "explanation": "first() 함수가 호출되면 **스택 프레임(Stack Frame)**이 만들어져 콜 스택에 푸시(Push)됩니다.\n\n이 프레임에는 함수의 매개변수, 지역 변수, 그리고 **복귀 주소(Return Address)**가 담깁니다.",
+        "explanation": "first() 함수가 호출되면 **스택 프레임(Stack Frame)**이 만들어져 콜 스택에 푸시(Push)됩니다. 이 프레임에는 함수의 매개변수, 지역 변수, 그리고 **복귀 주소(Return Address)**가 담깁니다.",
         "keyInsight": "함수 호출 = 스택 프레임 생성 (메모리 할당)",
         "analogy": "책상 위에 'first 프로젝트' 서류철을 펼치는 것과 같습니다. 다른 작업은 잠시 중단됩니다.",
         "tip": "프레임이 너무 많이 쌓이면 **Stack Overflow** 에러가 발생합니다.",
-        "highlight": [
-          11
-        ],
+        "highlight": [13],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": [
-            "first()"
-          ],
+          "callStack": ["first()"],
           "webApis": [],
           "taskQueue": [],
           "microtaskQueue": [],
@@ -29,183 +42,144 @@
         }
       },
       {
-        "line": 2,
-        "title": "console.log('first') 실행",
-        "explanation": "first() 함수 내부로 진입합니다.\n\nconsole.log도 함수이므로 콜 스택에 추가됩니다. 실행이 끝나면 콜 스택에서 바로 제거됩니다.",
-        "keyInsight": "모든 함수 호출은 콜 스택에 추가됩니다. console.log도 예외가 아닙니다.",
-        "tip": "**콜 스택에 추가 → 실행 → 제거** 이 과정이 반복됩니다.",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "eventLoop",
-        "eventLoopState": {
-          "callStack": [
-            "first()",
-            "console.log('first')"
-          ],
-          "webApis": [],
-          "taskQueue": [],
-          "microtaskQueue": [],
-          "output": [
-            "first"
-          ],
-          "currentPhase": "executing",
-          "highlightArea": "callStack"
-        }
-      },
-      {
-        "line": 3,
-        "title": "second() 호출 - 콜 스택 위에 쌓임",
-        "explanation": "first() 실행 중에 second()가 호출됩니다. second()가 콜 스택 맨 위에 쌓입니다.",
-        "keyInsight": "함수 안에서 다른 함수를 호출하면, 새 함수가 콜 스택 위에 쌓입니다. **나중에 호출된 함수가 먼저 끝납니다.**",
-        "analogy": "first() 접시 위에 second() 접시를 올린 상태. second() 접시를 먼저 치워야 first() 접시에 접근할 수 있습니다.",
-        "tip": "**LIFO (Last In First Out)**: 마지막에 들어온 것이 먼저 나갑니다. 스택의 기본 원리입니다.",
-        "misconception": "동시 실행 착각 주의! second()가 완전히 끝난 후에야 first()가 이어집니다.",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "eventLoop",
-        "eventLoopState": {
-          "callStack": [
-            "first()",
-            "second()"
-          ],
-          "webApis": [],
-          "taskQueue": [],
-          "microtaskQueue": [],
-          "output": [
-            "first"
-          ],
-          "currentPhase": "executing",
-          "highlightArea": "callStack"
-        }
-      },
-      {
-        "line": 8,
-        "title": "console.log('second') 실행",
-        "explanation": "second() 함수 내부에서 console.log가 실행됩니다.\n\n'second'가 출력되고, console.log가 콜 스택에서 제거됩니다.",
-        "keyInsight": "콜 스택의 맨 위에 있는 함수만 실행됩니다. 아래에 있는 first()는 '대기' 상태입니다.",
-        "highlight": [
-          8
-        ],
-        "visualizationType": "eventLoop",
-        "eventLoopState": {
-          "callStack": [
-            "first()",
-            "second()",
-            "console.log('second')"
-          ],
-          "webApis": [],
-          "taskQueue": [],
-          "microtaskQueue": [],
-          "output": [
-            "first",
-            "second"
-          ],
-          "currentPhase": "executing",
-          "highlightArea": "callStack"
-        }
-      },
-      {
-        "line": 9,
-        "title": "second() 종료 - 콜 스택에서 제거",
-        "explanation": "second()가 끝나서 콜 스택에서 제거(pop)됩니다. first()가 다시 맨 위가 됩니다.",
-        "keyInsight": "함수가 끝나면 콜 스택에서 제거됩니다. 그러면 그 아래에 있던 함수가 이어서 실행됩니다.",
-        "analogy": "second() 접시를 치웠으니, 이제 first() 접시에 접근할 수 있습니다.",
-        "tip": "**pop**: 스택에서 맨 위 항목을 제거하는 것. 반대로 추가하는 것은 **push**입니다.",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "eventLoop",
-        "eventLoopState": {
-          "callStack": [
-            "first()"
-          ],
-          "webApis": [],
-          "taskQueue": [],
-          "microtaskQueue": [],
-          "output": [
-            "first",
-            "second"
-          ],
-          "currentPhase": "executing",
-          "highlightArea": "callStack"
-        }
-      },
-      {
         "line": 4,
-        "title": "first()로 복귀 - console.log('first end') 실행",
-        "explanation": "second()가 끝났으니, first() 함수의 **중단된 지점**부터 이어서 실행됩니다.\n\n'first end'가 출력됩니다.",
-        "keyInsight": "함수 호출 후 돌아올 위치를 콜 스택이 기억합니다. 이것이 '콜 스택'이라 불리는 이유입니다.",
-        "tip": "**복귀 주소**: 콜 스택은 '어디로 돌아가야 하는지'도 함께 저장합니다.",
-        "highlight": [
-          4
-        ],
+        "title": "log.push('first start') 실행",
+        "explanation": "first() 함수 내부로 진입합니다. `log` 배열에 'first start'를 추가합니다. 이제 log = ['first start']입니다.",
+        "keyInsight": "배열의 push()는 원본 배열을 변경합니다 (Mutate).",
+        "highlight": [4],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": [
-            "first()",
-            "console.log('first end')"
-          ],
+          "callStack": ["first()", "log.push()"],
           "webApis": [],
           "taskQueue": [],
           "microtaskQueue": [],
-          "output": [
-            "first",
-            "second",
-            "first end"
-          ],
+          "output": [],
           "currentPhase": "executing",
           "highlightArea": "callStack"
         }
       },
       {
         "line": 5,
+        "title": "second() 호출 - 콜 스택 위에 쌓임",
+        "explanation": "first() 실행 중에 second()가 호출됩니다. second()가 콜 스택 맨 위에 쌓입니다.",
+        "keyInsight": "함수 안에서 다른 함수를 호출하면, 새 함수가 콜 스택 위에 쌓입니다. **나중에 호출된 함수가 먼저 끝납니다.**",
+        "analogy": "first() 접시 위에 second() 접시를 올린 상태. second() 접시를 먼저 치워야 first() 접시에 접근할 수 있습니다.",
+        "tip": "**LIFO (Last In First Out)**: 마지막에 들어온 것이 먼저 나갑니다. 스택의 기본 원리입니다.",
+        "misconception": "동시 실행 착각 주의! second()가 완전히 끝난 후에야 first()가 이어집니다.",
+        "highlight": [5],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()", "second()"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": [],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 10,
+        "title": "log.push('second') 실행",
+        "explanation": "second() 함수 내부에서 log.push('second')가 실행됩니다. 이제 log = ['first start', 'second']입니다.",
+        "keyInsight": "콜 스택의 맨 위에 있는 함수만 실행됩니다. 아래에 있는 first()는 '대기' 상태입니다.",
+        "highlight": [10],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()", "second()", "log.push()"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": [],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 11,
+        "title": "second() 종료 - 콜 스택에서 제거",
+        "explanation": "second()가 끝나서 콜 스택에서 제거(pop)됩니다. first()가 다시 맨 위가 됩니다.",
+        "keyInsight": "함수가 끝나면 콜 스택에서 제거됩니다. 그러면 그 아래에 있던 함수가 이어서 실행됩니다.",
+        "analogy": "second() 접시를 치웠으니, 이제 first() 접시에 접근할 수 있습니다.",
+        "tip": "**pop**: 스택에서 맨 위 항목을 제거하는 것. 반대로 추가하는 것은 **push**입니다.",
+        "highlight": [11],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": [],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 6,
+        "title": "first()로 복귀 - log.push('first end')",
+        "explanation": "second()가 끝났으니, first() 함수의 **중단된 지점**부터 이어서 실행됩니다. log = ['first start', 'second', 'first end']가 됩니다.",
+        "keyInsight": "함수 호출 후 돌아올 위치를 콜 스택이 기억합니다. 이것이 '콜 스택'이라 불리는 이유입니다.",
+        "tip": "**복귀 주소**: 콜 스택은 '어디로 돌아가야 하는지'도 함께 저장합니다.",
+        "highlight": [6],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["first()", "log.push()"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": [],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 7,
         "title": "first() 종료",
-        "explanation": "first() 함수도 끝에 도달했습니다.\n\nfirst()가 콜 스택에서 제거됩니다. 이제 콜 스택이 비었습니다.",
+        "explanation": "first() 함수도 끝에 도달했습니다. first()가 콜 스택에서 제거됩니다. 이제 콜 스택이 비었습니다.",
         "keyInsight": "콜 스택이 비면 = 실행할 함수가 없음 = 프로그램이 다음 코드로 넘어감",
-        "highlight": [
-          5
-        ],
+        "highlight": [7],
         "visualizationType": "eventLoop",
         "eventLoopState": {
           "callStack": [],
           "webApis": [],
           "taskQueue": [],
           "microtaskQueue": [],
-          "output": [
-            "first",
-            "second",
-            "first end"
-          ],
+          "output": [],
           "currentPhase": "idle",
           "highlightArea": "callStack"
         }
       },
       {
-        "line": 12,
-        "title": "console.log('done') 실행 - 전역 코드 완료",
-        "explanation": "first() 호출이 끝났으니 다음 줄이 실행됩니다.",
+        "line": 14,
+        "title": "log.push('done') - 전역 코드 실행",
+        "explanation": "first() 호출이 끝났으니 다음 줄이 실행됩니다. log = ['first start', 'second', 'first end', 'done']",
         "keyInsight": "동기 코드는 위에서 아래로 순차 실행됩니다. 함수 호출이 있으면 그 함수가 완전히 끝날 때까지 기다립니다.",
         "analogy": "요리 레시피처럼 한 단계가 끝나야 다음 단계로 넘어갑니다. 동시에 여러 단계를 할 수 없습니다.",
-        "misconception": "'done'이 먼저 출력될 것이라 예상하는 경우가 있습니다. 하지만 first()가 완전히 끝날 때까지 기다립니다.",
-        "highlight": [
-          12
-        ],
+        "highlight": [14],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": [
-            "console.log('done')"
-          ],
+          "callStack": ["log.push()"],
           "webApis": [],
           "taskQueue": [],
           "microtaskQueue": [],
-          "output": [
-            "first",
-            "second",
-            "first end",
-            "done"
-          ],
+          "output": [],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "line": 16,
+        "title": "최종 결과 확인",
+        "explanation": "log 배열을 출력합니다. ['first start', 'second', 'first end', 'done'] 순서로 기록되어 있습니다. 이 순서가 콜 스택의 LIFO 동작을 증명합니다.",
+        "keyInsight": "second가 first end보다 먼저 기록된 이유: second()가 완전히 끝난 후에야 first()가 이어졌기 때문입니다.",
+        "highlight": [16],
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": ["console.log()"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": ["['first start', 'second', 'first end', 'done']"],
           "currentPhase": "executing",
           "highlightArea": "callStack"
         }
@@ -213,15 +187,15 @@
     ]
   },
   "quiz": {
-    "question": "아래 코드의 출력 순서는?\n\nfunction a() { console.log(1); b(); console.log(3); }\nfunction b() { console.log(2); }\na();",
+    "question": "아래 코드 실행 후 log 배열의 내용은?\n\nconst log = [];\nfunction a() { log.push(1); b(); log.push(3); }\nfunction b() { log.push(2); }\na();",
     "options": [
-      "1 → 3 → 2",
-      "1 → 2 → 3",
-      "2 → 1 → 3",
-      "1 → 2 → 3이 동시에 출력"
+      "[1, 3, 2]",
+      "[1, 2, 3]",
+      "[2, 1, 3]",
+      "[1, 2, 3]이 동시에 추가"
     ],
     "correctIndex": 1,
-    "explanation": "a()가 실행되어 1 출력 → b() 호출로 콜 스택에 b() 추가 → 2 출력 → b() 종료 후 a()로 복귀 → 3 출력.\n\nJavaScript는 싱글 스레드이므로 '동시에'는 불가능합니다."
+    "explanation": "a()가 실행되어 1 추가 → b() 호출로 콜 스택에 b() 추가 → 2 추가 → b() 종료 후 a()로 복귀 → 3 추가. JavaScript는 싱글 스레드이므로 '동시에'는 불가능합니다."
   },
   "misconceptions": [
     {

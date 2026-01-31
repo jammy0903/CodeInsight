@@ -8,68 +8,39 @@
       {
         "line": 1,
         "title": "리스트를 반환하는 함수",
-        "explanation": "이 함수는 매번 새로운 리스트를 만들어서 반환합니다.\n\n**헷갈리는 포인트:**\n`return data`가 리스트를 '복사'해서 주는 걸까요?",
-        "highlight": [1, 2, 3],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "get_list", "pointsTo": "func_get" }
-          ],
-          "objects": [
-            { "id": "func_get", "type": "function", "value": "get_list()", "pyId": "140100", "highlight": true }
-          ]
-        }
-      },
-      {
+        "explanation": "`def get_list():`\n이 함수는 호출될 때마다 `[1, 2, 3]`이라는 새로운 리스트 객체를 생성하고, 그 객체에 대한 참조를 반환합니다.",
+        "highlight": [1, 2, 3]
+    },
+    {
         "line": 5,
-        "title": "첫 번째 호출",
-        "explanation": "`a = get_list()` 호출 시:\n\n1. 함수 안에서 새 리스트 `[1, 2, 3]` 생성\n2. `data`가 이 리스트를 가리킴\n3. `return`이 이 **참조**를 반환\n4. `a`가 같은 리스트를 가리킴\n\n**복사 아님! 같은 객체를 가리키는 것!**",
-        "highlight": [5],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_1" }
-          ],
-          "objects": [
-            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140200", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "첫 번째 함수 호출",
+        "explanation": "`a = get_list()`\n`get_list` 함수를 호출하여 반환된 첫 번째 리스트 객체를 변수 `a`가 가리키도록 합니다.",
+        "highlight": [5]
+    },
+    {
         "line": 6,
-        "title": "두 번째 호출",
-        "explanation": "`b = get_list()` 호출 시:\n\n**매번 새로운 리스트를 만든다!**\n\n이번에는 완전히 새로운 `[1, 2, 3]` 객체가 생성됩니다.\n\n`a`와 `b`는 **다른 객체**를 가리킵니다.",
-        "highlight": [6],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_1" },
-            { "name": "b", "pointsTo": "list_2" }
-          ],
-          "objects": [
-            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140200" },
-            { "id": "list_2", "type": "list", "value": "[1, 2, 3]", "pyId": "140300", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "두 번째 함수 호출",
+        "explanation": "`b = get_list()`\n`get_list` 함수를 다시 호출합니다. 함수는 **또 다른 새로운** 리스트 객체를 생성하여 반환하고, 변수 `b`는 이 두 번째 객체를 가리킵니다.",
+        "highlight": [6]
+    },
+    {
+        "line": 8,
+        "title": "변수 a의 내용 출력",
+        "explanation": "`print(f\"a: {a}\")`\n변수 `a`가 가리키는 리스트의 내용을 출력합니다.",
+        "highlight": [8]
+    },
+    {
+        "line": 9,
+        "title": "변수 b의 내용 출력",
+        "explanation": "`print(f\"b: {b}\")`\n변수 `b`가 가리키는 리스트의 내용을 출력합니다. `a`와 값은 같아 보입니다.",
+        "highlight": [9]
+    },
+    {
         "line": 10,
-        "title": "다른 객체!",
-        "explanation": "`a is b` → **False**\n\n값은 같지만 (`a == b`는 True), 객체는 다릅니다.\n\n**헷갈리는 포인트:**\n- 함수 호출마다 새 객체 생성 (이 경우)\n- 하지만 싱글톤이나 캐시 패턴에서는 같은 객체 반환 가능!",
-        "highlight": [10],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_1" },
-            { "name": "b", "pointsTo": "list_2" }
-          ],
-          "objects": [
-            { "id": "list_1", "type": "list", "value": "[1, 2, 3]", "pyId": "140200" },
-            { "id": "list_2", "type": "list", "value": "[1, 2, 3]", "pyId": "140300" }
-          ],
-          "output": ["a: [1, 2, 3]", "b: [1, 2, 3]", "a is b: False"]
-        }
-      }
+        "title": "객체 동일성 검사",
+        "explanation": "`print(f\"a is b: {a is b}\")`\n`is` 연산자로 `a`와 `b`가 '완전히 같은 객체'인지를 확인합니다. `get_list()` 함수는 호출될 때마다 새로운 리스트 객체를 생성하므로, 두 변수는 서로 다른 객체를 가리킵니다. 따라서 `False`가 출력됩니다.",
+        "highlight": [10]
+    }
     ]
   },
   "quiz": {

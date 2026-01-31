@@ -69,14 +69,15 @@ export function Sidebar() {
     <AnimatePresence>
       {sidebarOpen && (
         <>
-          {/* 배경 오버레이 (모든 화면 크기) */}
+          {/* 반투명 배경 (Backdrop) - 클릭 시 사이드바 닫기 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black bg-opacity-20 z-40"
             onClick={toggleSidebar}
+            className="fixed inset-0 bg-black/50 z-40"
+            aria-label="사이드바 닫기"
           />
 
           {/* 사이드바 */}

@@ -8,7 +8,7 @@
       {
         "line": 2,
         "title": "빈 String 생성",
-        "explanation": "`bad` 변수는 빈 문자열 `\"\"`를 가리킵니다. 이제부터 비효율의 극치를 보여드리겠습니다.",
+        "explanation": "`bad` 변수는 빈 문자열 `\"\"`를 가리킵니다. 반복문 안에서 문자열을 더하는 비효율적인 로직의 시작입니다.",
         "highlight": [
           2
         ],
@@ -19,49 +19,24 @@
               "name": "bad",
               "value": "-> \"\""
             }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "\"\""
-            }
           ]
         }
       },
       {
-        "line": 4,
-        "title": "반복 (i=0) - 쓰레기 발생",
-        "explanation": "String은 불변이라 `+` 연산을 하면 **새 객체**를 만듭니다.\n1. `\"\"` + `\"0\"` -> `\"0\"` (새 객체 0x002)\n2. `bad`는 이제 `0x002`를 가리킵니다.\n3. 아까 `\"\"`(`0x001`)는 바로 버려지는 **쓰레기(Garbage)**가 됩니다.",
-        "keyInsight": "연산마다 쓰레기 객체 생성",
+        "line": 3,
+        "title": "첫 번째 반복문 시작",
+        "explanation": "`i`가 0부터 2까지 총 3번 반복하는 루프를 시작합니다.",
         "highlight": [
-          4
+          3
         ],
         "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "bad",
-              "value": "-> 0x002"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "\"\"",
-              "garbage": true
-            },
-            {
-              "address": "0x002",
-              "content": "\"0\"",
-              "new": true
-            }
-          ]
-        }
+        "memoryState": {}
       },
       {
         "line": 4,
-        "title": "반복 (i=1) - 쓰레기 누적",
-        "explanation": "`\"0\"` + `\"1\"` -> `\"01\"` (새 객체 0x003)\n또 새 객체를 만들고, 방금 만든 `\"0\"`(`0x002`)은 쓰레기통으로 갑니다.\n\n이 짓을 반복 횟수만큼 합니다. 만약 루프가 10,000번이라면 쓰레기도 10,000개!",
+        "title": "비효율적인 String 연결",
+        "explanation": "루프가 돌 때마다 `bad + i` 연산은 새로운 String 객체를 생성합니다. 기존 문자열은 버려져 쓰레기(Garbage)가 됩니다. 이 과정이 반복되면서 메모리 낭비와 성능 저하가 발생합니다.",
+        "keyInsight": "반복문 안의 '+' 연산은 쓰레기 객체를 대량 생성",
         "highlight": [
           4
         ],
@@ -69,13 +44,13 @@
         "memoryState": {
           "heap": [
             {
-              "address": "0x002",
-              "content": "\"0\"",
+              "address": "...",
+              "content": "쓰레기들",
               "garbage": true
             },
             {
-              "address": "0x003",
-              "content": "\"01\"",
+              "address": "0x00N",
+              "content": "\"012\"",
               "new": true
             }
           ],
@@ -84,8 +59,8 @@
       },
       {
         "line": 8,
-        "title": "StringBuilder 생성 (구세주)",
-        "explanation": "`StringBuilder`는 수정 가능한 **화이트보드**와 같습니다.\n내부에 넉넉한 공간(Buffer)을 미리 확보해 둬서 글자를 썼다 지웠다 할 수 있습니다.",
+        "title": "StringBuilder 생성",
+        "explanation": "`StringBuilder`는 내부적으로 수정 가능한 문자 배열(버퍼)을 가집니다. 문자열을 추가해도 새 객체를 만들지 않고 내부 배열을 효율적으로 사용합니다.",
         "keyInsight": "StringBuilder = 가변 버퍼 (미리 공간 확보)",
         "highlight": [
           8
@@ -107,27 +82,19 @@
         }
       },
       {
-        "line": 10,
-        "title": "append(0) - 쓱 써넣기",
-        "explanation": "빈 공간에 `0`을 쓱 써넣습니다.\n**새 객체를 만들지 않습니다!** 그냥 있던 화이트보드에 추가만 합니다.",
+        "line": 9,
+        "title": "두 번째 반복문 시작",
+        "explanation": "효율적인 `StringBuilder`를 사용하는 두 번째 루프를 시작합니다.",
         "highlight": [
-          10
+          9
         ],
         "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "0x010",
-              "content": "StringBuilder{buffer: ['0']}",
-              "changed": true
-            }
-          ]
-        }
+        "memoryState": {}
       },
       {
         "line": 10,
-        "title": "append(1), (2) - 재사용",
-        "explanation": "남은 공간에 `1`, `2`를 계속 이어 씁니다.\n쓰레기가 하나도 안 나옵니다. 정말 효율적이죠.",
+        "title": "효율적인 append",
+        "explanation": "`append` 메서드는 새 객체를 만들지 않고, 내부 버퍼에 문자를 추가합니다. 루프가 반복되어도 쓰레기가 발생하지 않아 매우 효율적입니다.",
         "keyInsight": "객체 재사용 = 메모리 절약 + 속도 빠름",
         "highlight": [
           10
@@ -140,14 +107,13 @@
               "content": "StringBuilder{buffer: ['0','1','2']}",
               "changed": true
             }
-          ],
-          "note": "쓰레기가 전혀 발생하지 않음"
+          ]
         }
       },
       {
         "line": 12,
-        "title": "toString() - 최종 제출",
-        "explanation": "화이트보드에 쓴 내용을 사진 찍듯이 `String`으로 예쁘게 포장해서 내보냅니다.\n이때 딱 한 번 새로운 `String` 객체가 만들어집니다.",
+        "title": "toString()으로 최종 변환",
+        "explanation": "반복문이 끝난 후, `StringBuilder`의 최종 결과를 `String` 객체로 변환합니다. 이 때 단 한 번만 새로운 String 객체가 생성됩니다.",
         "highlight": [
           12
         ],

@@ -6,108 +6,53 @@
     "code": "class Counter:\n    def __init__(self):\n        self.count = 0\n    \n    def increment(self):\n        self.count += 1\n\nc1 = Counter()\nc2 = Counter()\n\nc1.increment()\nc1.increment()\nc2.increment()\n\nprint(f\"c1: {c1.count}\")  # 2\nprint(f\"c2: {c2.count}\")  # 1",
     "steps": [
       {
-        "line": 3,
-        "title": "인스턴스 변수 초기화",
-        "explanation": "`self.count = 0`\n\n**각 인스턴스마다 별도의 count!**\n\nc1.count와 c2.count는 완전히 다른 변수입니다.\n서로 영향을 주지 않아요.",
-        "highlight": [3],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Counter", "pointsTo": "class_counter" }
-          ],
-          "objects": [
-            { "id": "class_counter", "type": "class", "value": "Counter", "pyId": "140100", "highlight": true }
-          ]
-        }
-      },
-      {
+        "line": 1,
+        "title": "Counter 클래스 정의",
+        "explanation": "`Counter` 클래스를 정의합니다. 이 클래스의 객체는 생성될 때(`__init__`) `count`라는 자신만의 변수를 0으로 갖고, `increment` 메서드를 통해 이 `count`를 1씩 증가시킬 수 있습니다.",
+        "highlight": [1, 2, 3, 5, 6]
+    },
+    {
         "line": 8,
-        "title": "첫 번째 인스턴스",
-        "explanation": "`c1 = Counter()`\n\n새 Counter 객체 생성, c1.count = 0으로 초기화.\n\n**c1만의 count 변수!**",
-        "highlight": [8],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Counter", "pointsTo": "class_counter" },
-            { "name": "c1", "pointsTo": "inst_c1" }
-          ],
-          "objects": [
-            { "id": "class_counter", "type": "class", "value": "Counter", "pyId": "140100" },
-            { "id": "inst_c1", "type": "Counter", "value": "{count: 0}", "pyId": "140200", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "첫 번째 카운터 생성",
+        "explanation": "`c1 = Counter()`\n첫 번째 `Counter` 객체를 생성합니다. `c1`은 자신만의 `count` 변수를 가지며, 이 값은 `0`으로 초기화됩니다.",
+        "highlight": [8]
+    },
+    {
         "line": 9,
-        "title": "두 번째 인스턴스",
-        "explanation": "`c2 = Counter()`\n\n**완전히 새로운 객체!** c2.count = 0\n\nc1과 c2는 같은 클래스지만 **다른 객체**입니다.\n각자 자기만의 count를 가집니다.",
-        "highlight": [9],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Counter", "pointsTo": "class_counter" },
-            { "name": "c1", "pointsTo": "inst_c1" },
-            { "name": "c2", "pointsTo": "inst_c2" }
-          ],
-          "objects": [
-            { "id": "class_counter", "type": "class", "value": "Counter", "pyId": "140100" },
-            { "id": "inst_c1", "type": "Counter", "value": "{count: 0}", "pyId": "140200" },
-            { "id": "inst_c2", "type": "Counter", "value": "{count: 0}", "pyId": "140300", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "두 번째 카운터 생성",
+        "explanation": "`c2 = Counter()`\n두 번째 `Counter` 객체를 생성합니다. `c2` 역시 자신만의 `count` 변수를 가지며, 이 값도 `0`으로 초기화됩니다. `c1.count`와 `c2.count`는 완전히 별개의 변수입니다.",
+        "highlight": [9]
+    },
+    {
         "line": 11,
-        "title": "c1만 증가",
-        "explanation": "`c1.increment()` 두 번 호출\n\n`self.count += 1` 에서 self는 c1!\n\nc1.count만 2가 됨. c2는 그대로.",
-        "highlight": [11, 12],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "c1", "pointsTo": "inst_c1" },
-            { "name": "c2", "pointsTo": "inst_c2" }
-          ],
-          "objects": [
-            { "id": "inst_c1", "type": "Counter", "value": "{count: 2}", "pyId": "140200", "highlight": true },
-            { "id": "inst_c2", "type": "Counter", "value": "{count: 0}", "pyId": "140300" }
-          ]
-        }
-      },
-      {
+        "title": "c1 증가 (1번째)",
+        "explanation": "`c1.increment()`\n`c1` 객체의 `increment` 메서드를 호출합니다. `c1`의 `count`가 1 증가하여 `1`이 됩니다.",
+        "highlight": [11]
+    },
+    {
+        "line": 12,
+        "title": "c1 증가 (2번째)",
+        "explanation": "`c1.increment()`\n`c1` 객체의 `increment` 메서드를 한 번 더 호출합니다. `c1`의 `count`가 다시 1 증가하여 `2`가 됩니다. `c2`의 `count`는 여전히 `0`입니다.",
+        "highlight": [12]
+    },
+    {
         "line": 13,
-        "title": "c2 한 번 증가",
-        "explanation": "`c2.increment()` 한 번 호출\n\nc2.count = 1\n\n**각 인스턴스는 완전히 독립!**\nc1의 상태가 c2에 영향을 주지 않습니다.",
-        "highlight": [13],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "c1", "pointsTo": "inst_c1" },
-            { "name": "c2", "pointsTo": "inst_c2" }
-          ],
-          "objects": [
-            { "id": "inst_c1", "type": "Counter", "value": "{count: 2}", "pyId": "140200" },
-            { "id": "inst_c2", "type": "Counter", "value": "{count: 1}", "pyId": "140300", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "c2 증가",
+        "explanation": "`c2.increment()`\n`c2` 객체의 `increment` 메서드를 호출합니다. `c2`의 `count`가 1 증가하여 `1`이 됩니다. 이 작업은 `c1`에 아무런 영향을 주지 않습니다.",
+        "highlight": [13]
+    },
+    {
         "line": 15,
-        "title": "각자의 값 확인",
-        "explanation": "c1.count = 2, c2.count = 1\n\n**인스턴스 변수의 핵심:**\n- 각 객체가 독립적으로 소유\n- 다른 객체에 영향 없음\n- self.를 통해 접근",
-        "highlight": [15, 16],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "c1", "pointsTo": "inst_c1" },
-            { "name": "c2", "pointsTo": "inst_c2" }
-          ],
-          "objects": [
-            { "id": "inst_c1", "type": "Counter", "value": "{count: 2}", "pyId": "140200" },
-            { "id": "inst_c2", "type": "Counter", "value": "{count: 1}", "pyId": "140300" }
-          ],
-          "output": ["c1: 2", "c2: 1"]
-        }
-      }
+        "title": "c1의 최종값 출력",
+        "explanation": "`print(f\"c1: {c1.count}\")`\n`c1`의 `count` 값을 출력합니다. 두 번 증가했으므로 `2`가 출력됩니다.",
+        "highlight": [15]
+    },
+    {
+        "line": 16,
+        "title": "c2의 최종값 출력",
+        "explanation": "`print(f\"c2: {c2.count}\")`\n`c2`의 `count` 값을 출력합니다. 한 번 증가했으므로 `1`이 출력됩니다. 이로써 두 객체가 완전히 독립적임을 알 수 있습니다.",
+        "highlight": [16]
+    }
     ]
   },
   "quiz": {

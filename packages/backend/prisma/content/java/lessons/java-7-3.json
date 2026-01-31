@@ -3,28 +3,81 @@
   "title": "제네릭 메서드와 타입 추론",
   "concept": "Core concept for Generic Methods",
   "content": {
-    "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
+    "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \\\");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
     "steps": [
       {
         "line": 3,
         "title": "제네릭 메서드 선언",
-        "explanation": "메서드 선언부의 리턴 타입 앞에 `<T>`를 붙이면, 해당 메서드 내에서만 사용할 수 있는 독자적인 제네릭 타입을 정의할 수 있습니다.",
+        "explanation": "메서드의 리턴 타입 앞에 <T>를 붙여, 이 메서드 안에서만 독립적으로 사용할 제네릭 타입 T를 선언합니다. 클래스 전체가 아닌 특정 메서드만 제네릭으로 만들 수 있습니다.",
+        "highlight": [3, 4, 5, 6, 7, 8],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": []
+            "note": "printArray<T> 설계도 정의"
+        }
+      },
+      {
+        "line": 12,
+        "title": "Integer 배열 생성",
+        "explanation": "`printArray` 메서드에 전달할 `Integer` 타입의 배열을 생성합니다.",
+        "highlight": [12],
+        "visualizationType": "memory",
+        "memoryState": {
+            "stack": [{"name": "intArray", "value": "-> [1, 2, 3]"}]
+        }
+      },
+      {
+        "line": 13,
+        "title": "String 배열 생성",
+        "explanation": "`printArray` 메서드에 전달할 `String` 타입의 배열을 생성합니다.",
+        "highlight": [13],
+        "visualizationType": "memory",
+        "memoryState": {
+            "stack": [
+                {"name": "intArray", "value": "-> [1, 2, 3]"},
+                {"name": "strArray", "value": "-> [A, B, C]"}
+            ]
         }
       },
       {
         "line": 15,
-        "title": "타입 추론 (Type Inference)",
-        "explanation": "`printArray(intArray)`를 호출할 때, 컴파일러가 인자의 타입을 보고 `T`가 `Integer`라고 스스로 추론합니다. 굳이 `Main.<Integer>printArray(...)`라고 쓸 필요가 없습니다.",
+        "title": "레이블 출력",
+        "explanation": "배열 내용을 출력하기 전에 설명 레이블을 먼저 출력합니다.",
+        "highlight": [15],
         "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Integer Array: 1 2 3 ",
-            "String Array: A B C "
-          ]
-        }
+        "memoryState": { "output": ["Integer Array: "] }
+      },
+      {
+        "line": 16,
+        "title": "제네릭 메서드 호출 (Integer)",
+        "explanation": "`printArray`를 `Integer` 배열과 함께 호출합니다. 이때 컴파일러가 전달된 인자(`intArray`)를 보고 제네릭 타입 `T`가 `Integer`여야 한다고 스스로 추론(Type Inference)합니다.",
+        "keyInsight": "컴파일러가 타입을 추론하므로 `Main.<Integer>printArray(...)`라고 명시할 필요가 없습니다.",
+        "highlight": [16],
+        "visualizationType": "memory",
+        "memoryState": { "note": "T가 Integer로 추론됨" }
+      },
+      {
+        "line": 18,
+        "title": "두 번째 레이블 출력",
+        "explanation": "다음 배열 내용을 출력하기 위해 설명 레이블을 출력합니다.",
+        "highlight": [18],
+        "visualizationType": "memory",
+        "memoryState": { "output": ["Integer Array: 1 2 3 \n", "String Array: "] }
+      },
+      {
+        "line": 19,
+        "title": "제네릭 메서드 호출 (String)",
+        "explanation": "이번에는 `String` 배열과 함께 `printArray`를 호출합니다. 컴파일러는 `T`가 `String`이라고 추론하고, 동일한 메서드 코드를 재사용하여 `String` 배열의 요소를 출력합니다.",
+        "highlight": [19],
+        "visualizationType": "memory",
+        "memoryState": { "output": ["Integer Array: 1 2 3 \n", "String Array: A B C \n"] }
+      },
+      {
+        "line": 21,
+        "title": "원시 타입 에러",
+        "explanation": "제네릭 타입 파라미터 `T`에는 참조 타입(객체)만 올 수 있습니다. `int`와 같은 원시 타입(primitive type)은 올 수 없으므로, 이 라인의 주석을 풀면 컴파일 에러가 발생합니다. `Integer`와 같은 래퍼 클래스를 사용해야 합니다.",
+        "highlight": [21],
+        "visualizationType": "memory",
+        "memoryState": { "error": "Compile Error: Generic type cannot be primitive" }
       }
     ]
   },

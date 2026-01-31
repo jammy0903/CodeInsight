@@ -6,58 +6,54 @@
     "code": "import java.util.LinkedList;\n\npublic class Main {\n    public static void main(String[] args) {\n        LinkedList<String> train = new LinkedList<>();\n        \n        train.add(\"기관차\");\n        train.add(\"객차1\");\n        train.add(\"객차2\");\n        \n        train.add(1, \"새 객차\"); // 중간에 끼워넣기!\n    }\n}",
     "steps": [
       {
-        "line": 7,
-        "title": "노드(Node) 연결",
-        "explanation": "ArrayList가 긴 의자라면, LinkedList는 각자 의자를 들고 옆 사람의 손을 잡고 있는 것과 같습니다.\n각 데이터는 'Node'라는 상자에 담기며, 앞뒤 노드의 주소를 기억합니다.",
-        "highlight": [
-          7,
-          8,
-          9
-        ],
+        "line": 5,
+        "title": "LinkedList 생성",
+        "explanation": "데이터를 기차처럼 연결하여 관리하는 `LinkedList`를 생성합니다. 각 데이터(노드)는 다음 데이터의 위치를 알고 있습니다.",
+        "highlight": [5],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "id": "Node1",
-              "data": "기관차",
-              "next": "Node2"
-            },
-            {
-              "id": "Node2",
-              "data": "객차1",
-              "next": "Node3"
-            }
-          ]
+            "heap": [{"address": "train", "class": "LinkedList", "nodes": []}]
+        }
+      },
+      {
+        "line": 7,
+        "title": "첫 번째 노드 추가",
+        "explanation": "리스트의 맨 끝에 \"기관차\" 노드를 추가합니다. 이제 리스트의 시작과 끝은 이 노드를 가리킵니다.",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [{"address": "train", "nodes": [{"data": "기관차"}]}]
+        }
+      },
+      {
+        "line": 8,
+        "title": "두 번째 노드 추가",
+        "explanation": "맨 끝에 \"객차1\" 노드를 추가합니다. 기존의 마지막 노드(\"기관차\")가 이 새로운 노드를 가리키게 됩니다.",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [{"address": "train", "nodes": [{"data": "기관차"}, {"data": "객차1"}]}]
+        }
+      },
+      {
+        "line": 9,
+        "title": "세 번째 노드 추가",
+        "explanation": "같은 방식으로 맨 끝에 \"객차2\" 노드를 추가합니다.",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [{"address": "train", "nodes": [{"data": "기관차"}, {"data": "객차1"}, {"data": "객차2"}]}]
         }
       },
       {
         "line": 11,
-        "title": "중간 삽입의 마법",
-        "explanation": "중간에 데이터를 넣을 때, ArrayList는 뒤에 있는 모든 사람을 한 칸씩 밀어야 해서 힘듭니다.\n하지만 LinkedList는 연결된 **손만 바꿔 잡으면** 끝납니다!\n\n**비유:** 기차 중간에 새 객차를 넣을 때, 선로를 끊고 새 객차를 연결하는 것과 같습니다.",
+        "title": "중간에 노드 삽입",
+        "explanation": "인덱스 1 위치(두 번째)에 \"새 객차\"를 삽입합니다. `LinkedList`는 기존 요소들을 밀어내는 대신, 앞뒤 노드의 연결(링크)만 바꿔주면 되므로 이 작업이 매우 효율적입니다. \"기관차\"는 이제 \"새 객차\"를, \"새 객차\"는 \"객차1\"을 가리키게 됩니다.",
         "keyInsight": "중간 삽입/삭제가 매우 빠름 (O(1) - 노드 위치를 알 때)",
-        "highlight": [
-          11
-        ],
+        "highlight": [11],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "id": "Node1",
-              "data": "기관차",
-              "next": "NewNode"
-            },
-            {
-              "id": "NewNode",
-              "data": "새 객차",
-              "next": "Node2",
-              "new": true
-            },
-            {
-              "id": "Node2",
-              "data": "객차1",
-              "next": "Node3"
-            }
-          ]
+            "heap": [{"address": "train", "nodes": [{"data": "기관차"}, {"data": "새 객차", "new": true}, {"data": "객차1"}, {"data": "객차2"}]}]
         }
       }
     ]

@@ -1,10 +1,16 @@
 /**
- * Course Seed Script
+ * Course Seed Script (UPSERT 방식 - 사용자 데이터 보존!)
  *
- * 연구 기반 C언어 6개 챕터 × 30개 레슨 시드 데이터
- * JSON 콘텐츠 파일에서 로드
+ * JSON 콘텐츠 파일에서 커리큘럼을 로드하여 DB에 upsert합니다.
  *
- * 실행: npx prisma db seed
+ * ⚠️ 중요: 사용자 데이터(UserProgress, User 등)는 절대 삭제되지 않습니다!
+ *
+ * 📌 실행 방법:
+ *   npx prisma db seed
+ *
+ * 📌 백업/복원 스크립트:
+ *   - 백업: npx ts-node prisma/backup-user-data.ts
+ *   - 복원: npx ts-node prisma/restore-user-data.ts
  */
 
 import 'dotenv/config';
@@ -140,86 +146,53 @@ function loadLessonContent(langId: string, lessonId: string): LessonContentData 
 async function seed() {
   console.log('🌱 Seeding database...');
 
-  // 1. 기존 데이터 삭제 (개발용)
-  console.log('  🗑️  Cleaning existing data...');
-  // 자식 테이블부터 삭제 (FK 제약조건 방지)
-  await prisma.stepActivity.deleteMany();
-  await prisma.sessionContext.deleteMany();
-  await prisma.lessonActivity.deleteMany();
-  await prisma.chatHistory.deleteMany();
-  await prisma.quizAttempt.deleteMany();
-  await prisma.userNote.deleteMany();
-  await prisma.userStreak.deleteMany();
-  await prisma.userProfile.deleteMany();
+  // ========================================
+  // 🔒 사용자 데이터 절대 보존! (UPSERT 방식)
+  // ========================================
+  // ⚠️ 사용자 관련 테이블은 절대 삭제하지 않음:
+  // - User, UserProfile, UserStreak, UserNote
+  // - UserProgress (학습 진행상황) ← 가장 중요!
+  // - QuizAttempt, LessonActivity, StepActivity, SessionContext
+  // - ChatHistory
+  //
+  // 컨텐츠는 upsert로 업데이트 (있으면 수정, 없으면 생성)
+  console.log('  🔒 Using UPSERT mode (USER DATA PRESERVED)...');
 
-  await prisma.userProgress.deleteMany();
-  await prisma.quiz.deleteMany();
-  await prisma.lessonContent.deleteMany();
-  await prisma.lesson.deleteMany();
-  await prisma.chapter.deleteMany();
-  await prisma.language.deleteMany();
+  // 2. Languages upsert (있으면 업데이트, 없으면 생성)
+  console.log('  📝 Upserting Languages...');
 
-  // 2. Languages 생성
-  console.log('  📝 Creating Languages...');
-
-  await prisma.language.create({
-    data: {
-      id: 'c',
-      name: 'C',
-      description: '포인터와 메모리를 직접 다루는 시스템 프로그래밍 언어',
-      icon: 'C',
-      color: '#00599C',
-      order: 1,
-    },
+  await prisma.language.upsert({
+    where: { id: 'c' },
+    update: { name: 'C', description: '포인터와 메모리를 직접 다루는 시스템 프로그래밍 언어', icon: 'C', color: '#00599C', order: 1 },
+    create: { id: 'c', name: 'C', description: '포인터와 메모리를 직접 다루는 시스템 프로그래밍 언어', icon: 'C', color: '#00599C', order: 1 },
   });
   console.log('    ✅ C');
 
-  await prisma.language.create({
-    data: {
-      id: 'python',
-      name: 'Python',
-      description: '간결하고 읽기 쉬운 문법의 고급 프로그래밍 언어',
-      icon: '🐍',
-      color: '#3776AB',
-      order: 2,
-    },
+  await prisma.language.upsert({
+    where: { id: 'python' },
+    update: { name: 'Python', description: '간결하고 읽기 쉬운 문법의 고급 프로그래밍 언어', icon: '🐍', color: '#3776AB', order: 2 },
+    create: { id: 'python', name: 'Python', description: '간결하고 읽기 쉬운 문법의 고급 프로그래밍 언어', icon: '🐍', color: '#3776AB', order: 2 },
   });
   console.log('    ✅ Python');
 
-  await prisma.language.create({
-    data: {
-      id: 'java',
-      name: 'Java',
-      description: '객체지향 프로그래밍과 JVM 기반 언어',
-      icon: '☕',
-      color: '#007396',
-      order: 3,
-    },
+  await prisma.language.upsert({
+    where: { id: 'java' },
+    update: { name: 'Java', description: '객체지향 프로그래밍과 JVM 기반 언어', icon: '☕', color: '#007396', order: 3 },
+    create: { id: 'java', name: 'Java', description: '객체지향 프로그래밍과 JVM 기반 언어', icon: '☕', color: '#007396', order: 3 },
   });
   console.log('    ✅ Java');
 
-  await prisma.language.create({
-    data: {
-      id: 'javascript',
-      name: 'JavaScript',
-      description: '웹 개발의 핵심 언어, 비동기와 프로토타입',
-      icon: '⚡',
-      color: '#F7DF1E',
-      order: 4,
-    },
+  await prisma.language.upsert({
+    where: { id: 'javascript' },
+    update: { name: 'JavaScript', description: '웹 개발의 핵심 언어, 비동기와 프로토타입', icon: '⚡', color: '#F7DF1E', order: 4 },
+    create: { id: 'javascript', name: 'JavaScript', description: '웹 개발의 핵심 언어, 비동기와 프로토타입', icon: '⚡', color: '#F7DF1E', order: 4 },
   });
   console.log('    ✅ JavaScript');
 
-  await prisma.language.create({
-    data: {
-      id: 'python-practical',
-      name: 'Python (업무 자동화)',
-      description: '급하게 배우는 파이썬 - 엑셀/PDF/PPT 자동화 & 데이터 분석',
-      icon: '🚀',
-      color: '#FFA500',
-      isSequential: false, // 모든 챕터 즉시 열림
-      order: 5,
-    },
+  await prisma.language.upsert({
+    where: { id: 'python-practical' },
+    update: { name: 'Python (업무 자동화)', description: '급하게 배우는 파이썬 - 엑셀/PDF/PPT 자동화 & 데이터 분석', icon: '🚀', color: '#FFA500', isSequential: false, order: 5 },
+    create: { id: 'python-practical', name: 'Python (업무 자동화)', description: '급하게 배우는 파이썬 - 엑셀/PDF/PPT 자동화 & 데이터 분석', icon: '🚀', color: '#FFA500', isSequential: false, order: 5 },
   });
   console.log('    ✅ Python (업무 자동화)');
 
@@ -235,67 +208,74 @@ async function seed() {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
       const chapterId = getChapterId(chapterData);
-      const chapter = await prisma.chapter.create({
-        data: {
-          id: chapterId,
-          languageId: 'c',
-          title: chapterData.title,
-          description: chapterData.description,
-          keyQuestion: chapterData.keyQuestion,
-          part: chapterData.part,
-          partLabel: chapterData.partLabel,
-          order: chapterData.order,
-        },
+      const chapterPayload = {
+        languageId: 'c',
+        title: chapterData.title,
+        description: chapterData.description,
+        keyQuestion: chapterData.keyQuestion,
+        part: chapterData.part,
+        partLabel: chapterData.partLabel,
+        order: chapterData.order,
+      };
+      const chapter = await prisma.chapter.upsert({
+        where: { id: chapterId },
+        update: chapterPayload,
+        create: { id: chapterId, ...chapterPayload },
       });
 
-      // 각 챕터의 레슨 생성
+      // 각 챕터의 레슨 upsert
       for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
         const lessonItem = chapterData.lessons[lessonIdx];
-        // C 커리큘럼은 객체 배열 형식 사용
         const lessonData = typeof lessonItem === 'string' ? null : lessonItem;
         if (!lessonData) continue;
 
         console.log(`      ├─ Lesson ${lessonData.order}: ${lessonData.title}`);
 
-        const lesson = await prisma.lesson.create({
-          data: {
-            id: lessonData.id,
-            chapterId: chapter.id,
-            title: lessonData.title,
-            description: lessonData.description,
-            difficulty: lessonData.difficulty,
-            order: lessonData.order,
-            estimatedTime: lessonData.estimatedTime,
-          },
+        const lessonPayload = {
+          chapterId: chapter.id,
+          title: lessonData.title,
+          description: lessonData.description,
+          difficulty: lessonData.difficulty,
+          order: lessonData.order,
+          estimatedTime: lessonData.estimatedTime,
+        };
+        const lesson = await prisma.lesson.upsert({
+          where: { id: lessonData.id },
+          update: lessonPayload,
+          create: { id: lessonData.id, ...lessonPayload },
         });
 
-        // 레슨 콘텐츠 로드
+        // 레슨 콘텐츠 upsert
         const content = loadLessonContent('c', lessonData.id);
         if (content) {
-          await prisma.lessonContent.create({
-            data: {
-              id: `content-${lessonData.id}`,
-              lessonId: lesson.id,
-              code: content.content.code,
-              language: 'c',
-              steps: JSON.stringify(content.content.steps),
-            },
+          const contentPayload = {
+            lessonId: lesson.id,
+            code: content.content.code,
+            language: 'c',
+            steps: JSON.stringify(content.content.steps),
+          };
+          await prisma.lessonContent.upsert({
+            where: { id: `content-${lessonData.id}` },
+            update: contentPayload,
+            create: { id: `content-${lessonData.id}`, ...contentPayload },
           });
           contentCount++;
 
-          // 퀴즈 생성
+          // 퀴즈 upsert
           if (content.quiz) {
-            await prisma.quiz.create({
-              data: {
-                id: `quiz-${lessonData.id}`,
-                lessonId: lesson.id,
-                type: 'multiple_choice',
-                question: content.quiz.question,
-                options: content.quiz.options, // Prisma Json 타입은 배열을 직접 저장
-                answer: String(content.quiz.correctIndex),
-                explanation: content.quiz.explanation,
-                order: 1,
-              },
+            const quizPayload = {
+              lessonId: lesson.id,
+              type: 'multiple_choice',
+              question: content.quiz.question,
+              options: content.quiz.options,
+              answer: String(content.quiz.correctIndex),
+              explanation: content.quiz.explanation,
+              order: 1,
+            };
+            await prisma.quiz.upsert({
+              where: { id: `quiz-${lessonData.id}` },
+              update: quizPayload,
+              create: { id: `quiz-${lessonData.id}`, ...quizPayload },
             });
             quizCount++;
           }
@@ -307,170 +287,13 @@ async function seed() {
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
   }
 
-  // 4. JavaScript 커리큘럼 로드
-  console.log('  📚 Loading JavaScript curriculum from JSON...');
-  const jsCurriculum = loadCurriculum('javascript');
+  // 4. JavaScript 커리큘럼 (임시 비활성화)
+  console.log('  ⏭️  Skipping JavaScript curriculum...');
 
-  if (jsCurriculum) {
-    let contentCount = 0;
-    let quizCount = 0;
+  // 5. Java 커리큘럼 (임시 비활성화)
+  console.log('  ⏭️  Skipping Java curriculum...');
 
-    for (const chapterData of jsCurriculum.chapters) {
-      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
-
-      const chapterId = getChapterId(chapterData);
-      const chapter = await prisma.chapter.create({
-        data: {
-          id: chapterId,
-          languageId: 'javascript',
-          title: chapterData.title,
-          description: chapterData.description,
-          keyQuestion: chapterData.keyQuestion,
-          part: chapterData.part,
-          partLabel: chapterData.partLabel,
-          order: chapterData.order,
-        },
-      });
-
-      // 각 챕터의 레슨 생성
-      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
-        const lessonItem = chapterData.lessons[lessonIdx];
-        // JavaScript 커리큘럼은 객체 배열 형식 사용
-        const lessonData = typeof lessonItem === 'string' ? null : lessonItem;
-        if (!lessonData) continue;
-
-        console.log(`      ├─ Lesson ${lessonData.order}: ${lessonData.title}`);
-
-        const lesson = await prisma.lesson.create({
-          data: {
-            id: lessonData.id,
-            chapterId: chapter.id,
-            title: lessonData.title,
-            description: lessonData.description,
-            difficulty: lessonData.difficulty,
-            order: lessonData.order,
-            estimatedTime: lessonData.estimatedTime,
-          },
-        });
-
-        // 레슨 콘텐츠 로드
-        const content = loadLessonContent('javascript', lessonData.id);
-        if (content) {
-          await prisma.lessonContent.create({
-            data: {
-              id: `content-${lessonData.id}`,
-              lessonId: lesson.id,
-              code: content.content.code,
-              language: 'javascript',
-              steps: JSON.stringify(content.content.steps),
-            },
-          });
-          contentCount++;
-
-          // 퀴즈 생성
-          if (content.quiz) {
-            await prisma.quiz.create({
-              data: {
-                id: `quiz-${lessonData.id}`,
-                lessonId: lesson.id,
-                type: 'multiple_choice',
-                question: content.quiz.question,
-                options: content.quiz.options,
-                answer: String(content.quiz.correctIndex),
-                explanation: content.quiz.explanation,
-                order: 1,
-              },
-            });
-            quizCount++;
-          }
-        }
-      }
-    }
-
-    console.log(`    📄 Loaded ${contentCount} lesson contents`);
-    console.log(`    ❓ Loaded ${quizCount} quizzes`);
-  }
-
-  // 5. Java 커리큘럼 로드
-  console.log('  📚 Loading Java curriculum from JSON...');
-  const javaCurriculum = loadCurriculum('java');
-
-  if (javaCurriculum) {
-    let javaContentCount = 0;
-    let javaQuizCount = 0;
-
-    for (const chapterData of javaCurriculum.chapters) {
-      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
-
-      const chapterId = getChapterId(chapterData);
-      const chapter = await prisma.chapter.create({
-        data: {
-          id: chapterId,
-          languageId: 'java',
-          title: chapterData.title,
-          description: chapterData.description,
-          keyQuestion: chapterData.keyQuestion || '',
-          part: 'basics',
-          partLabel: '기초',
-          order: chapterData.order,
-        },
-      });
-
-      // 각 챕터의 레슨 생성
-      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
-        const lessonId = getLessonId(chapterData.lessons[lessonIdx]);
-        const content = loadLessonContent('java', lessonId);
-        if (content) {
-          console.log(`      ├─ Lesson: ${content.title}`);
-
-          const lesson = await prisma.lesson.create({
-            data: {
-              id: lessonId,
-              chapterId: chapter.id,
-              title: content.title,
-              description: content.concept,
-              difficulty: 'basic',
-              order: lessonIdx + 1,
-              estimatedTime: 10,
-            },
-          });
-
-          await prisma.lessonContent.create({
-            data: {
-              id: `content-${lessonId}`,
-              lessonId: lesson.id,
-              code: content.content.code,
-              language: 'java',
-              steps: JSON.stringify(content.content.steps),
-            },
-          });
-          javaContentCount++;
-
-          // 퀴즈 생성
-          if (content.quiz) {
-            await prisma.quiz.create({
-              data: {
-                id: `quiz-${lessonId}`,
-                lessonId: lesson.id,
-                type: 'multiple_choice',
-                question: content.quiz.question,
-                options: content.quiz.options,
-                answer: String(content.quiz.correctIndex),
-                explanation: content.quiz.explanation,
-                order: 1,
-              },
-            });
-            javaQuizCount++;
-          }
-        }
-      }
-    }
-
-    console.log(`    📄 Loaded ${javaContentCount} lesson contents`);
-    console.log(`    ❓ Loaded ${javaQuizCount} quizzes`);
-  }
-
-  // 6. Python (기초) 커리큘럼 로드
+  // 6. Python (기초) 커리큘럼 upsert
   console.log('  📚 Loading Python curriculum from JSON...');
   const pythonCurriculum = loadCurriculum('python');
 
@@ -482,62 +305,68 @@ async function seed() {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
       const chapterId = getChapterId(chapterData);
-      const chapter = await prisma.chapter.create({
-        data: {
-          id: chapterId,
-          languageId: 'python',
-          title: chapterData.title,
-          description: chapterData.description,
-          keyQuestion: chapterData.keyQuestion || '',
-          part: 'basics',
-          partLabel: '기초',
-          order: chapterData.order,
-        },
+      const chapterPayload = {
+        languageId: 'python',
+        title: chapterData.title,
+        description: chapterData.description,
+        keyQuestion: chapterData.keyQuestion || '',
+        part: 'basics',
+        partLabel: '기초',
+        order: chapterData.order,
+      };
+      const chapter = await prisma.chapter.upsert({
+        where: { id: chapterId },
+        update: chapterPayload,
+        create: { id: chapterId, ...chapterPayload },
       });
 
-      // 각 챕터의 레슨 생성
       for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
         const lessonId = getLessonId(chapterData.lessons[lessonIdx]);
         const content = loadLessonContent('python', lessonId);
         if (content) {
           console.log(`      ├─ Lesson: ${content.title}`);
 
-          const lesson = await prisma.lesson.create({
-            data: {
-              id: lessonId,
-              chapterId: chapter.id,
-              title: content.title,
-              description: content.concept,
-              difficulty: 'basic',
-              order: lessonIdx + 1,
-              estimatedTime: 10,
-            },
+          const lessonPayload = {
+            chapterId: chapter.id,
+            title: content.title,
+            description: content.concept,
+            difficulty: 'basic',
+            order: lessonIdx + 1,
+            estimatedTime: 10,
+          };
+          const lesson = await prisma.lesson.upsert({
+            where: { id: lessonId },
+            update: lessonPayload,
+            create: { id: lessonId, ...lessonPayload },
           });
 
-          await prisma.lessonContent.create({
-            data: {
-              id: `content-${lessonId}`,
-              lessonId: lesson.id,
-              code: content.content.code,
-              language: 'python',
-              steps: JSON.stringify(content.content.steps),
-            },
+          const contentPayload = {
+            lessonId: lesson.id,
+            code: content.content.code,
+            language: 'python',
+            steps: JSON.stringify(content.content.steps),
+          };
+          await prisma.lessonContent.upsert({
+            where: { id: `content-${lessonId}` },
+            update: contentPayload,
+            create: { id: `content-${lessonId}`, ...contentPayload },
           });
           pythonContentCount++;
 
-          // 퀴즈 생성
           if (content.quiz) {
-            await prisma.quiz.create({
-              data: {
-                id: `quiz-${lessonId}`,
-                lessonId: lesson.id,
-                type: 'multiple_choice',
-                question: content.quiz.question,
-                options: content.quiz.options,
-                answer: String(content.quiz.correctIndex),
-                explanation: content.quiz.explanation,
-                order: 1,
-              },
+            const quizPayload = {
+              lessonId: lesson.id,
+              type: 'multiple_choice',
+              question: content.quiz.question,
+              options: content.quiz.options,
+              answer: String(content.quiz.correctIndex),
+              explanation: content.quiz.explanation,
+              order: 1,
+            };
+            await prisma.quiz.upsert({
+              where: { id: `quiz-${lessonId}` },
+              update: quizPayload,
+              create: { id: `quiz-${lessonId}`, ...quizPayload },
             });
             pythonQuizCount++;
           }
@@ -549,7 +378,7 @@ async function seed() {
     console.log(`    ❓ Loaded ${pythonQuizCount} quizzes`);
   }
 
-  // 7. Python (업무 자동화) 커리큘럼 로드
+  // 7. Python (업무 자동화) 커리큘럼 upsert
   console.log('  📚 Loading Python (업무 자동화) curriculum from JSON...');
   const pythonPracticalCurriculum = loadCurriculum('python-practical');
 
@@ -561,22 +390,22 @@ async function seed() {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
       const chapterId = getChapterId(chapterData);
-      const chapter = await prisma.chapter.create({
-        data: {
-          id: chapterId,
-          languageId: 'python-practical',
-          title: chapterData.title,
-          description: chapterData.description,
-          keyQuestion: chapterData.keyQuestion || '',
-          part: 'automation',
-          partLabel: '업무 자동화',
-          order: chapterData.order,
-        },
+      const chapterPayload = {
+        languageId: 'python-practical',
+        title: chapterData.title,
+        description: chapterData.description,
+        keyQuestion: chapterData.keyQuestion || '',
+        part: 'automation',
+        partLabel: '업무 자동화',
+        order: chapterData.order,
+      };
+      const chapter = await prisma.chapter.upsert({
+        where: { id: chapterId },
+        update: chapterPayload,
+        create: { id: chapterId, ...chapterPayload },
       });
 
-      // 각 챕터의 레슨 생성
       for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
-        // 'python-practical' 커리큘럼은 객체 배열 형식 사용
         const lessonItem = chapterData.lessons[lessonIdx];
         const lessonData = typeof lessonItem === 'string' ? null : lessonItem;
         if (!lessonData) continue;
@@ -585,42 +414,47 @@ async function seed() {
         if (content) {
           console.log(`      ├─ Lesson: ${content.title}`);
 
-          const lesson = await prisma.lesson.create({
-            data: {
-              id: lessonData.id,
-              chapterId: chapter.id,
-              title: content.title,
-              description: content.concept,
-              difficulty: 'basic',
-              order: lessonIdx + 1,
-              estimatedTime: 10,
-            },
+          const lessonPayload = {
+            chapterId: chapter.id,
+            title: content.title,
+            description: content.concept,
+            difficulty: 'basic',
+            order: lessonIdx + 1,
+            estimatedTime: 10,
+          };
+          const lesson = await prisma.lesson.upsert({
+            where: { id: lessonData.id },
+            update: lessonPayload,
+            create: { id: lessonData.id, ...lessonPayload },
           });
 
-          await prisma.lessonContent.create({
-            data: {
-              id: `content-${lessonData.id}`,
-              lessonId: lesson.id,
-              code: content.content.code,
-              language: 'python-practical',
-              steps: JSON.stringify(content.content.steps),
-            },
+          const contentPayload = {
+            lessonId: lesson.id,
+            code: content.content.code,
+            language: 'python-practical',
+            steps: JSON.stringify(content.content.steps),
+          };
+          await prisma.lessonContent.upsert({
+            where: { id: `content-${lessonData.id}` },
+            update: contentPayload,
+            create: { id: `content-${lessonData.id}`, ...contentPayload },
           });
           contentCount++;
 
-          // 퀴즈 생성
           if (content.quiz) {
-            await prisma.quiz.create({
-              data: {
-                id: `quiz-${lessonData.id}`,
-                lessonId: lesson.id,
-                type: 'multiple_choice',
-                question: content.quiz.question,
-                options: content.quiz.options,
-                answer: String(content.quiz.correctIndex),
-                explanation: content.quiz.explanation,
-                order: 1,
-              },
+            const quizPayload = {
+              lessonId: lesson.id,
+              type: 'multiple_choice',
+              question: content.quiz.question,
+              options: content.quiz.options,
+              answer: String(content.quiz.correctIndex),
+              explanation: content.quiz.explanation,
+              order: 1,
+            };
+            await prisma.quiz.upsert({
+              where: { id: `quiz-${lessonData.id}` },
+              update: quizPayload,
+              create: { id: `quiz-${lessonData.id}`, ...quizPayload },
             });
             quizCount++;
           }

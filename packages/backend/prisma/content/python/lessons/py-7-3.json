@@ -6,86 +6,47 @@
     "code": "class Node:\n    def __init__(self, name):\n        self.name = name\n        self.next = None\n\na = Node(\"A\")\nb = Node(\"B\")\n\n# 순환 참조 만들기\na.next = b  # A → B\nb.next = a  # B → A (순환!)\n\ndel a  # a 삭제\ndel b  # b 삭제\n\n# 객체들은 아직 메모리에 있다!\n# 서로를 참조해서 refcount > 0",
     "steps": [
       {
+        "line": 1,
+        "title": "Node 클래스 정의",
+        "explanation": "`Node` 클래스를 정의합니다. 각 노드는 `name`과 다음 노드를 가리킬 `next` 속성을 가집니다.",
+        "highlight": [1, 2, 3, 4]
+    },
+    {
         "line": 6,
-        "title": "노드 생성",
-        "explanation": "`a = Node(\"A\")`, `b = Node(\"B\")`\n\n두 개의 노드 객체가 생성됩니다.\n\n**각 객체의 refcount:**\n- Node A: 1 (a가 참조)\n- Node B: 1 (b가 참조)",
-        "highlight": [6, 7],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "node_a" },
-            { "name": "b", "pointsTo": "node_b" }
-          ],
-          "objects": [
-            { "id": "node_a", "type": "Node", "value": "{name: A, next: None}", "pyId": "140100", "highlight": true },
-            { "id": "node_b", "type": "Node", "value": "{name: B, next: None}", "pyId": "140200", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "첫 번째 노드 생성",
+        "explanation": "`a = Node(\"A\")`\n'A'라는 이름을 가진 첫 번째 노드 객체를 생성합니다. 이 객체의 참조 횟수는 1입니다.",
+        "highlight": [6]
+    },
+    {
+        "line": 7,
+        "title": "두 번째 노드 생성",
+        "explanation": "`b = Node(\"B\")`\n'B'라는 이름을 가진 두 번째 노드 객체를 생성합니다. 이 객체의 참조 횟수도 1입니다.",
+        "highlight": [7]
+    },
+    {
         "line": 10,
-        "title": "A → B 연결",
-        "explanation": "`a.next = b`\n\nA의 next가 B를 가리킵니다.\n\n**refcount 변화:**\n- Node A: 1 (a)\n- Node B: 2 (b + a.next)",
-        "highlight": [10],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "node_a" },
-            { "name": "b", "pointsTo": "node_b" }
-          ],
-          "objects": [
-            { "id": "node_a", "type": "Node", "value": "{name: A, next: →B}", "pyId": "140100" },
-            { "id": "node_b", "type": "Node", "value": "{name: B, next: None}", "pyId": "140200", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "A에서 B로 참조 연결",
+        "explanation": "`a.next = b`\n`a`의 `next` 속성이 `b` 객체를 가리키도록 합니다. 이제 `b` 객체의 참조 횟수는 `b` 변수와 `a.next`, 총 2개가 됩니다.",
+        "highlight": [10]
+    },
+    {
         "line": 11,
-        "title": "순환 참조 완성!",
-        "explanation": "`b.next = a` - **문제의 시작!**\n\n이제 A → B → A → B → ...\n\n**refcount:**\n- Node A: 2 (a + b.next)\n- Node B: 2 (b + a.next)\n\n**서로가 서로를 참조!**",
-        "highlight": [11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "node_a" },
-            { "name": "b", "pointsTo": "node_b" }
-          ],
-          "objects": [
-            { "id": "node_a", "type": "Node", "value": "{name: A, next: →B}", "pyId": "140100", "highlight": true },
-            { "id": "node_b", "type": "Node", "value": "{name: B, next: →A}", "pyId": "140200", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "순환 참조 완성",
+        "explanation": "`b.next = a`\n`b`의 `next` 속성이 `a` 객체를 가리키도록 합니다. 이로써 `a`와 `b`가 서로를 참조하는 '순환 참조'가 만들어집니다. 이제 `a`와 `b` 객체 모두 참조 횟수가 2가 됩니다.",
+        "highlight": [11]
+    },
+    {
         "line": 13,
-        "title": "del a",
-        "explanation": "`del a` - a 변수 삭제\n\n**Node A의 refcount:**\n2 → 1 (b.next가 아직 참조)\n\n아직 0이 아니라서 삭제 안 됨!",
-        "highlight": [13],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "b", "pointsTo": "node_b" }
-          ],
-          "objects": [
-            { "id": "node_a", "type": "Node", "value": "{name: A, next: →B} (refcount: 1)", "pyId": "140100" },
-            { "id": "node_b", "type": "Node", "value": "{name: B, next: →A}", "pyId": "140200" }
-          ]
-        }
-      },
-      {
+        "title": "변수 'a' 삭제",
+        "explanation": "`del a`\n변수 `a`를 삭제합니다. `a` 객체의 참조 횟수가 2에서 1로 줄어들지만, 여전히 `b.next`가 참조하고 있으므로 객체는 삭제되지 않습니다.",
+        "highlight": [13]
+    },
+    {
         "line": 14,
-        "title": "del b - 문제 발생!",
-        "explanation": "`del b` - b 변수도 삭제\n\n**Node B의 refcount:**\n2 → 1 (a.next가 아직 참조)\n\n**참조 카운팅의 한계!**\n\n- Node A: refcount = 1 (B.next가 참조)\n- Node B: refcount = 1 (A.next가 참조)\n\n둘 다 0이 아니라서 삭제 안 됨!\n**하지만 접근할 방법도 없음!**\n\n→ 메모리 누수!",
-        "highlight": [14, 15, 16, 17],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [],
-          "objects": [
-            { "id": "node_a", "type": "Node", "value": "{name: A, next: →B} (refcount: 1)", "pyId": "140100", "highlight": true },
-            { "id": "node_b", "type": "Node", "value": "{name: B, next: →A} (refcount: 1)", "pyId": "140200", "highlight": true }
-          ]
-        }
-      }
+        "title": "변수 'b' 삭제와 메모리 누수",
+        "explanation": "`del b`\n변수 `b`도 삭제합니다. 이제 `a`와 `b` 두 객체에 접근할 방법이 없지만, 두 객체는 여전히 서로를 참조하여 참조 횟수가 1로 남아있습니다. 이 때문에 메모리에서 해제되지 않는 '메모리 누수'가 발생합니다. (파이썬의 가비지 컬렉터가 나중에 처리해줍니다.)",
+        "highlight": [14]
+    }
     ]
   },
   "quiz": {

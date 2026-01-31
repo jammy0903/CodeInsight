@@ -7,31 +7,32 @@
     "steps": [
       {
         "line": 6,
-        "title": "사무소(ThreadPool) 생성",
-        "explanation": "`Executors.newFixedThreadPool(3)`은 미리 3명의 정규직 일꾼을 고용해둡니다.\n쓰레드를 새로 만드는 것은 메모리나 CPU 입장에서 꽤나 무거운 작업인데, 이렇게 미리 만들어두면 훨씬 빠릅니다.",
-        "highlight": [
-          6
-        ],
+        "title": "쓰레드 풀 생성",
+        "explanation": "`Executors.newFixedThreadPool(3)`은 3개의 쓰레드(일꾼)를 미리 만들어두는 쓰레드 풀(인력 사무소)을 생성합니다. 쓰레드를 필요할 때마다 만드는 비용을 절약할 수 있습니다.",
+        "highlight": [6],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "name": "ThreadPool",
-              "size": 3,
-              "state": "Waiting for tasks"
-            }
-          ]
+          "heap": [{"name": "ThreadPool", "size": 3, "state": "Waiting"}]
         }
       },
       {
         "line": 9,
-        "title": "일감(Task) 제출",
-        "explanation": "`execute()` 메서드로 해야 할 일을 사무소에 전달합니다.\n비어있는 일꾼 중 한 명이 냉큼 달려와 작업을 처리하고, 일이 끝나면 다시 대기 장소로 복귀합니다.\n\n**장점:** 일꾼 열 명을 새로 뽑았다 해고했다 할 필요 없이, 세 명의 정규직으로 수백 개의 일을 처리할 수 있습니다.",
+        "title": "첫 번째 작업 제출",
+        "explanation": "`execute()`를 통해 첫 번째 작업(람다 함수)을 쓰레드 풀에 제출합니다. 대기 중인 쓰레드 중 하나가 이 작업을 맡아 실행합니다.",
         "keyInsight": "재사용성(Reusability) = 효율적인 자원 관리",
-        "highlight": [
-          9,
-          10
-        ],
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "worker1": "Executing task A",
+          "worker2": "IDLE",
+          "worker3": "IDLE"
+        }
+      },
+      {
+        "line": 10,
+        "title": "두 번째 작업 제출",
+        "explanation": "이어서 두 번째 작업을 제출합니다. 다른 대기 중인 쓰레드가 이 작업을 즉시 가져가 실행합니다. 만약 모든 쓰레드가 일하고 있다면, 이 작업은 큐에서 대기하게 됩니다.",
+        "highlight": [10],
         "visualizationType": "memory",
         "memoryState": {
           "worker1": "Executing task A",
@@ -41,11 +42,9 @@
       },
       {
         "line": 13,
-        "title": "사무소 폐쇄 (shutdown)",
-        "explanation": "작업이 다 끝났다면 사무소 문을 닫아야 합니다.\n이걸 잊으면 정규직 일꾼들이 퇴근도 못 하고 계속 대기하면서 메모리를 차지하게 됩니다.",
-        "highlight": [
-          13
-        ],
+        "title": "쓰레드 풀 종료",
+        "explanation": "`shutdown()`을 호출하여 쓰레드 풀을 종료합니다. 더 이상 새로운 작업을 받지 않으며, 현재 진행 중인 모든 작업이 완료되면 쓰레드들도 안전하게 종료됩니다. 이 호출을 잊으면 프로그램이 끝나지 않습니다.",
+        "highlight": [13],
         "visualizationType": "memory",
         "memoryState": {
           "threadPool": "SHUTTING_DOWN",
