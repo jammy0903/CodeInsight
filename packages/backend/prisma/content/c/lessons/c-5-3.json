@@ -9,47 +9,68 @@
         "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 표준 입출력 라이브러리를 포함합니다.",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
       },
       {
         "line": 2,
         "title": "stdlib.h 헤더 포함",
         "explanation": "**`#include <stdlib.h>`**\n\n`malloc`과 `free` 같은 메모리 관리 함수를 사용하기 위해 표준 라이브러리를 포함합니다.",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
       },
       {
         "line": 4,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램의 실행이 시작되는 지점입니다.",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
       },
       {
         "line": 5,
         "title": "힙 메모리 할당",
         "explanation": "**`int *p = (int*)malloc(sizeof(int));`**\n\n정수 하나를 저장할 공간(4 바이트)을 힙에 할당하고, 그 시작 주소를 포인터 `p`에 저장합니다.",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [{ "name": "p", "value": "0xHEAP", "type": "int*", "address": "0x1000" }],
-          "heap": [{ "address": "0xHEAP", "size": "4 bytes", "value": "???" }],
-          "output": []
-        }
-      },
-      {
-        "line": 6,
-        "title": "할당된 메모리에 값 저장",
-        "explanation": "**`*p = 100;`**\n\n포인터 `p`가 가리키는 힙 메모리 공간에 값 `100`을 저장합니다.",
-        "highlight": [6],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [{ "name": "p", "value": "0xHEAP", "type": "int*", "address": "0x1000" }],
-          "heap": [{ "address": "0xHEAP", "size": "4 bytes", "value": "100", "highlight": true }],
+          "stack": [
+            {
+              "name": "p",
+              "value": "0xHEAP",
+              "type": "int*",
+              "address": "0x1000"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xHEAP",
+              "size": "4 bytes",
+              "value": "???"
+            }
+          ],
           "output": []
         }
       },
@@ -57,24 +78,53 @@
         "line": 8,
         "title": "메모리 사용 중 출력",
         "explanation": "**`printf(\"Using memory...\\n\");`**\n\n메모리를 사용하고 있음을 나타내는 메시지를 출력합니다.",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [{ "name": "p", "value": "0xHEAP", "type": "int*", "address": "0x1000" }],
-          "heap": [{ "address": "0xHEAP", "size": "4 bytes", "value": "100" }],
-          "output": ["Using memory..."]
+          "stack": [
+            {
+              "name": "p",
+              "value": "0xHEAP",
+              "type": "int*",
+              "address": "0x1000"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xHEAP",
+              "size": "4 bytes",
+              "value": "100"
+            }
+          ],
+          "output": [
+            "Using memory..."
+          ]
         }
       },
       {
         "line": 10,
         "title": "힙 메모리 해제",
         "explanation": "**`free(p);`**\n\n`malloc`으로 할당받았던 힙 메모리 공간을 시스템에 반납합니다. 이 메모리는 이제 다른 용도로 재사용될 수 있습니다. `free` 후 포인터 `p`는 더 이상 유효하지 않은 주소를 가리키는 '댕글링 포인터'가 됩니다.",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [{ "name": "p", "value": "0xHEAP", "type": "int*", "address": "0x1000", "dangling": true }],
+          "stack": [
+            {
+              "name": "p",
+              "value": "0xHEAP",
+              "type": "int*",
+              "address": "0x1000",
+              "dangling": true
+            }
+          ],
           "heap": [],
-          "output": ["Using memory..."],
+          "output": [
+            "Using memory..."
+          ],
           "note": "p가 가리키던 힙 메모리가 해제되었습니다. p는 이제 댕글링 포인터입니다."
         }
       },
@@ -82,12 +132,16 @@
         "line": 12,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 운영체제에 알리고 프로그램을 종료합니다.",
-        "highlight": [12],
+        "highlight": [
+          12
+        ],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [],
           "heap": [],
-          "output": ["Using memory..."]
+          "output": [
+            "Using memory..."
+          ]
         }
       }
     ]

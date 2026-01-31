@@ -9,45 +9,82 @@
         "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
       },
       {
         "line": 3,
         "title": "콜백될 함수 정의",
         "explanation": "**`void greet() { ... }`**\n\n'Hello!'를 출력하는 간단한 `greet` 함수입니다. 이 함수가 나중에 다른 함수의 인자로 전달되어 '콜백(callback)'될 대상입니다.",
-        "highlight": [3, 4, 5],
+        "highlight": [
+          3,
+          4,
+          5
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "readOnlyData": [{ "label": "greet() code", "address": "0xCODE1" }] }
+        "cMemoryState": {
+          "readOnlyData": [
+            {
+              "label": "greet() code",
+              "address": "0xCODE1"
+            }
+          ]
+        }
       },
       {
         "line": 7,
         "title": "콜백을 받는 함수 정의",
         "explanation": "**`void execute(void (*func)()) { ... }`**\n\n`execute` 함수는 '인자가 없고 반환값도 없는 함수를 가리키는 포인터'(`void (*func)()`)를 매개변수로 받습니다. 즉, '실행할 함수' 자체를 인자로 받는 것입니다.",
-        "highlight": [7, 8, 9],
+        "highlight": [
+          7,
+          8,
+          9
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "readOnlyData": [{ "label": "greet() code", "address": "0xCODE1" }, { "label": "execute() code", "address": "0xCODE2" }] }
-      },
-      {
-        "line": 11,
-        "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
-        "highlight": [11],
-        "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [] }
+        "cMemoryState": {
+          "readOnlyData": [
+            {
+              "label": "greet() code",
+              "address": "0xCODE1"
+            },
+            {
+              "label": "execute() code",
+              "address": "0xCODE2"
+            }
+          ]
+        }
       },
       {
         "line": 12,
         "title": "execute 함수에 greet 함수를 전달하며 호출",
         "explanation": "**`execute(greet);`**\n\n`execute` 함수를 호출하면서, 인자로 `greet` 함수의 주소를 전달합니다. 이제 `execute` 함수 내부의 `func` 포인터는 `greet` 함수를 가리키게 됩니다.",
-        "highlight": [12],
+        "highlight": [
+          12
+        ],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            { "name": "func", "type": "void (*)()", "value": "0xCODE1", "frame": "execute" }
+            {
+              "name": "func",
+              "type": "void (*)()",
+              "value": "0xCODE1",
+              "frame": "execute"
+            }
           ],
-          "readOnlyData": [{ "label": "greet() code", "address": "0xCODE1", "highlight": true }],
+          "readOnlyData": [
+            {
+              "label": "greet() code",
+              "address": "0xCODE1",
+              "highlight": true
+            }
+          ],
           "note": "execute 함수의 func 포인터가 main에서 넘겨준 greet 함수의 주소를 가리킵니다."
         }
       },
@@ -55,36 +92,62 @@
         "line": 8,
         "title": "콜백 실행 준비",
         "explanation": "**`printf(\"Executing callback...\\n\");`**\n\n`execute` 함수 내부의 코드가 실행됩니다. 콜백을 실행하기 직전의 메시지를 출력합니다.",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            { "name": "func", "type": "void (*)()", "value": "0xCODE1", "frame": "execute" }
+            {
+              "name": "func",
+              "type": "void (*)()",
+              "value": "0xCODE1",
+              "frame": "execute"
+            }
           ],
-          "output": ["Executing callback..."]
+          "output": [
+            "Executing callback..."
+          ]
         }
       },
       {
         "line": 9,
         "title": "콜백 함수 호출!",
         "explanation": "**`func();`**\n\n`func` 포인터에 저장된 주소(`greet` 함수의 주소)로 점프하여 함수를 실행합니다. 이 순간 `greet` 함수 내부의 코드가 실행됩니다.",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "cMemory",
         "cMemoryState": {
           "stack": [
-            { "name": "func", "type": "void (*)()", "value": "0xCODE1", "frame": "execute" }
+            {
+              "name": "func",
+              "type": "void (*)()",
+              "value": "0xCODE1",
+              "frame": "execute"
+            }
           ],
-          "output": ["Executing callback...", "Hello!"]
+          "output": [
+            "Executing callback...",
+            "Hello!"
+          ]
         }
       },
       {
         "line": 13,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업이 성공적으로 완료되었음을 알리고 프로그램을 종료합니다.",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [], "heap": [], "output": ["Executing callback...", "Hello!"]
+          "stack": [],
+          "heap": [],
+          "output": [
+            "Executing callback...",
+            "Hello!"
+          ]
         }
       }
     ]

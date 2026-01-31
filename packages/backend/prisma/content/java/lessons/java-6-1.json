@@ -6,70 +6,17 @@
     "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. Error (Serious, usually fatal)\n        // StackOverflowError error = new StackOverflowError();\n        \n        // 2. RuntimeException (Unchecked - Logic bugs)\n        RuntimeException bug = new NullPointerException(\"oops\");\n        \n        // 3. Exception (Checked - External failure)\n        Exception failure = new java.io.IOException(\"File not found\");\n        \n        System.out.println(\"Hierarchy loaded\");\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "Throwable 계층 구조",
-        "explanation": "Java의 모든 예외와 에러는 `Throwable` 클래스를 상속받습니다. 크게 `Error`와 `Exception` 두 가지로 나뉩니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "id": 1,
-              "class": "NullPointerException",
-              "extends": "RuntimeException"
-            },
-            {
-              "id": 2,
-              "class": "IOException",
-              "extends": "Exception"
-            }
-          ]
-        }
-      },
-      {
-        "line": 6,
-        "title": "RuntimeException (Unchecked)",
-        "explanation": "프로그래머의 실수(버그)로 발생하는 예외들입니다. 컴파일러가 처리를 강제하지 않습니다 (Unchecked).\n예: `NullPointerException`, `IndexOutOfBoundsException`",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "bug",
-              "type": "RuntimeException",
-              "value": "ref: 1"
-            }
-          ]
-        }
-      },
-      {
-        "line": 9,
-        "title": "Exception (Checked)",
-        "explanation": "외부 시스템(파일, 네트워크 등) 문제로 발생할 수 있는 예외입니다. 반드시 `try-catch`로 처리하거나 `throws` 해야 합니다.",
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "bug",
-              "type": "RuntimeException",
-              "value": "ref: 1"
-            },
-            {
-              "name": "failure",
-              "type": "Exception",
-              "value": "ref: 2"
-            }
-          ]
-        }
-      },
-      {
         "line": 12,
         "title": "실행 완료",
         "explanation": "프로그램이 예외 없이 정상적으로 실행되어 메시지를 출력합니다. 이 레슨에서는 예외를 생성만 하고 '던지지는(throw)' 않았기 때문에 프로그램이 중단되지 않았습니다.",
         "highlight": [
-            12
+          12
         ],
         "visualizationType": "memory",
         "memoryState": {
-            "output": ["Hierarchy loaded"]
+          "output": [
+            "Hierarchy loaded"
+          ]
         }
       }
     ]

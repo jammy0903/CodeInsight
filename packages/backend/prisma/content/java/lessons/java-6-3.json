@@ -6,56 +6,33 @@
     "code": "import java.io.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // Unchecked: Compiler doesn't complain\n        int[] arr = {1, 2};\n        // System.out.println(arr[5]); // RuntimeException\n\n        // Checked: Compiler forces handling\n        // Thread.sleep(1000); // Compile Error!\n        \n        try {\n            dangerousOperation();\n        } catch (InterruptedException e) {\n            e.printStackTrace();\n        }\n    }\n\n    // 'throws' declares Checked Exception\n    public static void dangerousOperation() throws InterruptedException {\n        Thread.sleep(1000);\n    }\n}",
     "steps": [
       {
-        "line": 7,
-        "title": "Unchecked Exception",
-        "explanation": "배열의 범위를 벗어나는 것과 같은 `RuntimeException`은 컴파일러가 검사하지 않습니다(Unchecked). 이는 프로그래머의 논리적 오류로 간주되며, 예외 처리보다는 코드 수정으로 해결해야 합니다.",
-        "highlight": [7],
-        "visualizationType": "memory",
-        "memoryState": {
-            "note": "이 라인의 주석을 풀면 컴파일은 되지만 실행 시 에러 발생"
-        }
-      },
-      {
-        "line": 10,
-        "title": "Checked Exception",
-        "explanation": "`Thread.sleep`과 같이 외부 요인에 의해 실패할 수 있는 코드는 'Checked Exception'을 발생시킵니다. 컴파일러는 이런 예외가 `try-catch`나 `throws`로 처리되도록 강제합니다. 처리하지 않으면 컴파일 에러가 발생합니다.",
-        "keyInsight": "처리하지 않으면 컴파일조차 되지 않습니다 (빨간 줄).",
-        "highlight": [10],
-        "visualizationType": "memory",
-        "memoryState": {
-            "error": "Unhandled exception: java.lang.InterruptedException"
-        }
-      },
-      {
         "line": 13,
         "title": "메서드 호출",
         "explanation": "`dangerousOperation` 메서드를 호출합니다. 이 메서드는 `InterruptedException`이라는 Checked Exception을 던질(throw) 수 있다고 선언되어 있으므로, `try-catch` 블록 안에서 호출해야만 합니다.",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "memory",
         "memoryState": {
-            "note": "dangerousOperation() 실행 시작"
-        }
-      },
-      {
-        "line": 19,
-        "title": "예외 떠넘기기 (throws)",
-        "explanation": "`dangerousOperation` 메서드는 `Thread.sleep`이 던질 수 있는 `InterruptedException`을 직접 처리하지 않고, `throws` 키워드를 사용해 이 예외 처리의 책임을 자신을 호출한 `main` 메서드에게 떠넘깁니다.",
-        "keyInsight": "throws: 예외 처리 책임을 호출자에게 넘김",
-        "highlight": [19],
-        "visualizationType": "memory",
-        "memoryState": {
-            "note": "Thread.sleep(1000) 실행. InterruptedException 발생 가능"
+          "note": "dangerousOperation() 실행 시작"
         }
       },
       {
         "line": 14,
         "title": "예외 잡기 (catch)",
         "explanation": "만약 `dangerousOperation`에서 `InterruptedException`이 실제로 발생했다면, 이 `catch` 블록이 그 예외를 잡아서 처리합니다. `e.printStackTrace()`는 예외가 발생한 경로를 콘솔에 출력하여 디버깅을 돕습니다.",
-        "highlight": [14],
+        "highlight": [
+          14
+        ],
         "visualizationType": "memory",
         "memoryState": {
-            "stack": [{"name": "e", "value": "-> InterruptedException"}],
-            "note": "예외 발생 시 실행될 코드"
+          "stack": [
+            {
+              "name": "e",
+              "value": "-> InterruptedException"
+            }
+          ],
+          "note": "예외 발생 시 실행될 코드"
         }
       }
     ]

@@ -1,117 +1,69 @@
 {
-    "lessonId": "js-9-2",
-    "title": "제너레이터 (Generators)",
-    "concept": "제너레이터는 함수의 실행을 중간에 멈췄다(Yield)가 다시 재개(Resume)할 수 있는 특별한 함수입니다.",
-    "content": {
-        "code": "function* counter() {\n  console.log('시작!');\n  yield 1; // 실행 일시 정지 (값 1 반환)\n  console.log('재개!');\n  yield 2; // 실행 일시 정지 (값 2 반환)\n  console.log('끝!');\n}\n\n// 함수가 바로 실행되지 않고, Iterator(제어 객체)를 반환함\nconst gen = counter();\n\nconsole.log(gen.next()); // { value: 1, done: false }\nconsole.log(gen.next()); // { value: 2, done: false }\nconsole.log(gen.next()); // { value: undefined, done: true }",
-        "steps": [
-            {
-                "line": 1,
-                "title": "제너레이터 함수 정의",
-                "explanation": "`function*` 문법은 이 함수가 제너레이터임을 나타냅니다.\n\n**제너레이터란?**\n일반 함수는 한 번 실행되면 멈출 수 없지만(Run-to-completion), 제너레이터는 중간에 멈췄다가 나중에 이어서 실행할 수 있는 함수입니다.",
-                "highlight": [
-                    1
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "stack": [
-                        {
-                            "name": "counter",
-                            "value": "GeneratorFunction"
-                        }
-                    ]
-                }
-            },
-            {
-                "line": 8,
-                "title": "Iterator 객체 생성",
-                "explanation": "`counter()`를 호출하면 코드가 실행되는 대신 **Iterator(반복자)** 객체가 반환됩니다.\n\n**Iterator란?**\n제너레이터의 실행을 제어하는 객체입니다. `next()` 메서드를 통해 함수를 한 단계씩 실행시킬 수 있는 '리모컨' 같은 존재입니다.",
-                "highlight": [
-                    8
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "stack": [
-                        {
-                            "name": "gen",
-                            "value": "→ 0xGen"
-                        }
-                    ],
-                    "heap": [
-                        {
-                            "address": "0xGen",
-                            "content": "Generator { status: 'suspended' }"
-                        }
-                    ]
-                }
-            },
-            {
-                "line": 10,
-                "title": "next(): 첫 번째 실행",
-                "explanation": "`gen.next()`를 호출하면 함수가 처음으로 실행됩니다. 그러다 `yield 1`을 만나면 멈춥니다.\n\n**Yield(양보)란?**\n함수의 실행 컨텍스트(지역 변수 등)를 유지한 채, 제어권과 값을 호출자에게 넘겨주고 **일시 정지(Suspend)**하는 키워드입니다.",
-                "highlight": [
-                    2,
-                    3,
-                    10
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "output": [
-                        "시작!",
-                        "{ value: 1, done: false }"
-                    ],
-                    "heap": [
-                        {
-                            "address": "0xGen",
-                            "content": "Generator { status: 'suspended', line: 3 }"
-                        }
-                    ]
-                }
-            },
-            {
-                "line": 11,
-                "title": "next(): 재개 (Resume)",
-                "explanation": "다시 `next()`를 호출하면, 아까 멈췄던 줄(Line 3) 바로 다음부터 실행을 재개합니다. 지역 변수가 그대로 살아있습니다.\n\n**일반 함수와의 차이점:** 일반 함수는 끝나면 메모리에서 사라지지만, 제너레이터는 상태를 기억하고 대기합니다.",
-                "highlight": [
-                    4,
-                    5,
-                    11
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "output": [
-                        "시작!",
-                        "{ value: 1, done: false }",
-                        "재개!",
-                        "{ value: 2, done: false }"
-                    ],
-                    "heap": [
-                        {
-                            "address": "0xGen",
-                            "content": "Generator { status: 'suspended', line: 5 }"
-                        }
-                    ]
-                }
-            }
-        ]
-    },
-    "quiz": {
-        "question": "제너레이터 함수가 실행을 완전히 종료했음을 알리는 신호는?",
-        "options": [
-            "value: null",
-            "done: true",
-            "status: finished",
-            "yield: undefined"
+  "lessonId": "js-9-2",
+  "title": "제너레이터 (Generators)",
+  "concept": "제너레이터는 함수의 실행을 중간에 멈췄다(Yield)가 다시 재개(Resume)할 수 있는 특별한 함수입니다.",
+  "content": {
+    "code": "function* counter() {\n  console.log('시작!');\n  yield 1; // 실행 일시 정지 (값 1 반환)\n  console.log('재개!');\n  yield 2; // 실행 일시 정지 (값 2 반환)\n  console.log('끝!');\n}\n\n// 함수가 바로 실행되지 않고, Iterator(제어 객체)를 반환함\nconst gen = counter();\n\nconsole.log(gen.next()); // { value: 1, done: false }\nconsole.log(gen.next()); // { value: 2, done: false }\nconsole.log(gen.next()); // { value: undefined, done: true }",
+    "steps": [
+      {
+        "line": 1,
+        "title": "제너레이터 함수 정의",
+        "explanation": "`function*` 문법은 이 함수가 제너레이터임을 나타냅니다.\n\n**제너레이터란?**\n일반 함수는 한 번 실행되면 멈출 수 없지만(Run-to-completion), 제너레이터는 중간에 멈췄다가 나중에 이어서 실행할 수 있는 함수입니다.",
+        "highlight": [
+          1
         ],
-        "correctIndex": 1,
-        "explanation": "IteratorResult 객체 `{ value: ..., done: true }`가 반환되면, 더 이상 실행할 코드가 없다는 뜻입니다."
-    },
-    "misconceptions": [
-        {
-            "wrong": "제너레이터는 멀티 스레드처럼 동시에 실행된다",
-            "correct": "아닙니다. 여전히 싱글 스레드입니다.",
-            "why": "제너레이터는 실행 제어권을 주고받을 뿐(Cooperative Multitasking), 동시에 돌아가는 것은 아닙니다. 한 번에 하나만 실행됩니다."
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "counter",
+              "value": "GeneratorFunction"
+            }
+          ]
         }
+      },
+      {
+        "line": 10,
+        "title": "next(): 첫 번째 실행",
+        "explanation": "`gen.next()`를 호출하면 함수가 처음으로 실행됩니다. 그러다 `yield 1`을 만나면 멈춥니다.\n\n**Yield(양보)란?**\n함수의 실행 컨텍스트(지역 변수 등)를 유지한 채, 제어권과 값을 호출자에게 넘겨주고 **일시 정지(Suspend)**하는 키워드입니다.",
+        "highlight": [
+          2,
+          3,
+          10
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "시작!",
+            "{ value: 1, done: false }"
+          ],
+          "heap": [
+            {
+              "address": "0xGen",
+              "content": "Generator { status: 'suspended', line: 3 }"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "제너레이터 함수가 실행을 완전히 종료했음을 알리는 신호는?",
+    "options": [
+      "value: null",
+      "done: true",
+      "status: finished",
+      "yield: undefined"
     ],
-    "keyTakeaway": "함수의 실행 흐름을 끊었다가 이을 수 있어, 비동기 코드를 동기 코드처럼 작성(Redux-Saga 등)하는 데 유용합니다."
+    "correctIndex": 1,
+    "explanation": "IteratorResult 객체 `{ value: ..., done: true }`가 반환되면, 더 이상 실행할 코드가 없다는 뜻입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "제너레이터는 멀티 스레드처럼 동시에 실행된다",
+      "correct": "아닙니다. 여전히 싱글 스레드입니다.",
+      "why": "제너레이터는 실행 제어권을 주고받을 뿐(Cooperative Multitasking), 동시에 돌아가는 것은 아닙니다. 한 번에 하나만 실행됩니다."
+    }
+  ],
+  "keyTakeaway": "함수의 실행 흐름을 끊었다가 이을 수 있어, 비동기 코드를 동기 코드처럼 작성(Redux-Saga 등)하는 데 유용합니다."
 }
