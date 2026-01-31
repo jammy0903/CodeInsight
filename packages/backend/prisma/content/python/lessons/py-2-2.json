@@ -8,74 +8,165 @@
       {
         "line": 1,
         "title": "카운터 변수 초기화",
-        "explanation": "`count` 변수에 초기값 `3`을 할당합니다. 이 변수 값을 1씩 줄여나가며 0이 될 때까지 반복할 것입니다.",
-        "highlight": [1]
+        "explanation": "**`count = 3`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `count` 이름표를 정수 객체 `3`에 붙입니다.\n\n**왜 이 순서인가?** 반복문(line 3)에서 사용할 변수를 먼저 만들어야 합니다.",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "3", "type": "int"}
+          ],
+          "output": []
+        }
     },
     {
         "line": 3,
         "title": "반복문 조건 확인 (1번째)",
-        "explanation": "`while count > 0:`\n첫 번째 조건을 확인합니다. `count`(3)는 0보다 크므로, 조건은 `True`입니다. 들여쓰기 된 코드 블록을 실행합니다.",
-        "highlight": [3]
+        "explanation": "**`while count > 0:`**\n\n조건식 `count > 0`을 평가합니다. `3 > 0`은 **True**이므로, 들여쓰기된 블록(line 4-5)을 실행합니다.\n\n**실행 순서**: 조건 확인 → True → 블록 실행 → 다시 조건 확인 (반복)",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "3", "type": "int"}
+          ],
+          "output": [],
+          "note": "조건 True → line 4 실행 예정"
+        }
     },
     {
         "line": 4,
         "title": "현재 카운트 출력 (1번째)",
-        "explanation": "`print(f\"Count: {count}\")`\n현재 `count`의 값인 `3`을 화면에 출력합니다.",
-        "highlight": [4]
+        "explanation": "**`print(f\"Count: {count}\")`**\n\nf-string으로 현재 `count` 값(3)을 문자열에 삽입하여 \"Count: 3\"을 출력합니다.\n\n**왜 이 순서인가?** while 조건이 True였으므로 들여쓰기 블록의 첫 번째 줄부터 실행합니다.",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "3", "type": "int"}
+          ],
+          "output": ["Count: 3"]
+        }
     },
     {
         "line": 5,
         "title": "카운터 값 감소 (1번째)",
-        "explanation": "`count = count - 1`\n`count`의 값을 1 감소시킵니다. `count`는 이제 `2`가 됩니다. 이 라인이 `while` 문을 언젠가 멈추게 하는 핵심 부분입니다.",
-        "highlight": [5]
+        "explanation": "**`count = count - 1`**\n\n`count`의 현재 값(3)에서 1을 뺀 새로운 객체 `2`를 만들고, `count` 이름표를 그쪽으로 옮깁니다.\n\n**왜 이 라인이 필수인가?** 이 라인이 없으면 `count`는 영원히 3이고, 조건은 영원히 True가 되어 **무한 루프**에 빠집니다.\n\n**실행 순서**: count 감소 → 블록 끝 → line 3으로 다시 점프",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "2", "type": "int", "highlight": true}
+          ],
+          "output": ["Count: 3"],
+          "note": "count 변경됨 → line 3으로 돌아감"
+        }
     },
     {
         "line": 3,
         "title": "반복문 조건 확인 (2번째)",
-        "explanation": "`while count > 0:`\n루프의 시작으로 돌아와 다시 조건을 확인합니다. 현재 `count`(2)는 0보다 크므로, 조건은 여전히 `True`입니다.",
-        "highlight": [3]
+        "explanation": "**`while count > 0:`**\n\n**왜 다시 line 3으로 돌아왔는가?** while 루프는 블록이 끝나면 자동으로 **조건문으로 점프**합니다. `2 > 0`은 **True**이므로 블록을 다시 실행합니다.\n\n**실행 순서**: line 5 끝 → line 3 점프 → 조건 확인 → True → line 4",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "2", "type": "int"}
+          ],
+          "output": ["Count: 3"],
+          "note": "2번째 반복 시작"
+        }
     },
     {
         "line": 4,
         "title": "현재 카운트 출력 (2번째)",
-        "explanation": "`print(f\"Count: {count}\")`\n현재 `count`의 값인 `2`를 화면에 출력합니다.",
-        "highlight": [4]
+        "explanation": "**`print(f\"Count: {count}\")`**\n\n현재 `count` 값(2)을 포함한 \"Count: 2\"를 출력합니다.",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "2", "type": "int"}
+          ],
+          "output": ["Count: 3", "Count: 2"]
+        }
     },
     {
         "line": 5,
         "title": "카운터 값 감소 (2번째)",
-        "explanation": "`count = count - 1`\n`count`의 값을 다시 1 감소시킵니다. `count`는 이제 `1`이 됩니다.",
-        "highlight": [5]
+        "explanation": "**`count = count - 1`**\n\n`count`를 다시 1 감소시킵니다. `count`는 이제 `1`이 됩니다.\n\n**실행 순서**: count 감소 → 블록 끝 → line 3으로 다시 점프",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "1", "type": "int", "highlight": true}
+          ],
+          "output": ["Count: 3", "Count: 2"],
+          "note": "count 변경됨 → line 3으로 돌아감"
+        }
     },
     {
         "line": 3,
         "title": "반복문 조건 확인 (3번째)",
-        "explanation": "`while count > 0:`\n루프의 시작으로 돌아와 다시 조건을 확인합니다. 현재 `count`(1)는 0보다 크므로, 조건은 여전히 `True`입니다.",
-        "highlight": [3]
+        "explanation": "**`while count > 0:`**\n\n블록 끝에서 다시 조건문으로 점프했습니다. `1 > 0`은 **True**이므로 블록을 다시 실행합니다.\n\n**실행 순서**: line 5 끝 → line 3 점프 → 조건 확인 → True → line 4",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "1", "type": "int"}
+          ],
+          "output": ["Count: 3", "Count: 2"],
+          "note": "3번째 반복 시작"
+        }
     },
     {
         "line": 4,
         "title": "현재 카운트 출력 (3번째)",
-        "explanation": "`print(f\"Count: {count}\")`\n현재 `count`의 값인 `1`을 화면에 출력합니다.",
-        "highlight": [4]
+        "explanation": "**`print(f\"Count: {count}\")`**\n\n현재 `count` 값(1)을 포함한 \"Count: 1\"을 출력합니다.",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "1", "type": "int"}
+          ],
+          "output": ["Count: 3", "Count: 2", "Count: 1"]
+        }
     },
     {
         "line": 5,
         "title": "카운터 값 감소 (3번째)",
-        "explanation": "`count = count - 1`\n`count`의 값을 다시 1 감소시킵니다. `count`는 이제 `0`이 됩니다.",
-        "highlight": [5]
+        "explanation": "**`count = count - 1`**\n\n`count`를 다시 1 감소시킵니다. `count`는 이제 `0`이 됩니다.\n\n**중요**: 다음에 조건을 확인하면 `0 > 0`은 False가 되어 루프가 종료됩니다.\n\n**실행 순서**: count = 0 → 블록 끝 → line 3으로 점프",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "0", "type": "int", "highlight": true}
+          ],
+          "output": ["Count: 3", "Count: 2", "Count: 1"],
+          "note": "count가 0이 됨 → 다음 조건 확인에서 False"
+        }
     },
     {
         "line": 3,
         "title": "반복문 조건 확인 (종료)",
-        "explanation": "`while count > 0:`\n루프의 시작으로 돌아와 다시 조건을 확인합니다. 현재 `count`(0)는 0보다 크지 않으므로, 조건은 `False`입니다. 루프를 탈출합니다.",
-        "highlight": [3]
+        "explanation": "**`while count > 0:`**\n\n블록 끝에서 다시 조건문으로 점프했습니다. `0 > 0`은 **False**이므로 while 블록을 건너뛰고 루프 밖(line 7)으로 빠져나갑니다.\n\n**왜 종료되는가?** count가 0이 되어 조건이 False가 되었기 때문입니다.\n\n**실행 순서**: 조건 확인 → False → 루프 탈출 → line 7로 점프",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "0", "type": "int"}
+          ],
+          "output": ["Count: 3", "Count: 2", "Count: 1"],
+          "note": "조건 False → 루프 종료 → line 7로"
+        }
     },
     {
         "line": 7,
         "title": "반복문 종료 후 실행",
-        "explanation": "`print(\"Liftoff!\")`\n`while` 루프가 모두 종료된 후, 다음 라인인 이 코드가 실행되어 \"Liftoff!\"를 출력합니다.",
-        "highlight": [7]
+        "explanation": "**`print(\"Liftoff!\")`**\n\n**왜 이제 실행되는가?** while 루프가 종료되어 들여쓰기 밖의 코드로 왔기 때문입니다. \"Liftoff!\"를 출력하고 프로그램이 종료됩니다.\n\n**실행 순서**: 루프 탈출 → line 7 실행 → 출력 → 프로그램 종료",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "count", "value": "0", "type": "int"}
+          ],
+          "output": ["Count: 3", "Count: 2", "Count: 1", "Liftoff!"]
+        }
     }
     ]
   },
