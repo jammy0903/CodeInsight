@@ -9,52 +9,56 @@
         "line": 2,
         "title": "기본 예외 정의",
         "explanation": "`Exception`을 상속받아 `BankException`이라는 우리만의 예외 클래스를 만듭니다. 이 클래스는 은행 관련 에러의 부모 역할을 합니다.",
-        "highlight": [2, 3, 4, 5, 6],
+        "highlight": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
         "visualizationType": "memory",
         "memoryState": {
-            "note": "BankException 설계도 정의"
+          "note": "BankException 설계도 정의"
         }
       },
       {
         "line": 8,
         "title": "구체적인 예외 정의",
         "explanation": "더 구체적인 상황을 표현하기 위해 `BankException`을 상속받아 `InsufficientFundsException`(잔고 부족 예외)을 만듭니다. 이렇게 하면 에러의 원인을 이름만 보고도 명확히 알 수 있습니다.",
-        "highlight": [8, 9, 10, 11, 12],
+        "highlight": [
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
         "visualizationType": "memory",
         "memoryState": {
-            "note": "InsufficientFundsException 설계도 정의"
+          "note": "InsufficientFundsException 설계도 정의"
         }
       },
       {
         "line": 16,
         "title": "메서드 호출",
         "explanation": "`main` 메서드가 `try` 블록 안에서 `withdraw(1000)`를 호출합니다. 예외 발생에 대비합니다.",
-        "highlight": [16],
+        "highlight": [
+          16
+        ],
         "visualizationType": "memory",
         "memoryState": {
-            "note": "withdraw(1000) 실행 시작"
+          "note": "withdraw(1000) 실행 시작"
         }
       },
       {
         "line": 26,
         "title": "잔고 확인",
         "explanation": "`withdraw` 메서드 안에서 `amount(1000)`가 `balance(500)`보다 큰지 확인합니다. 조건이 `true`이므로 `if` 블록이 실행됩니다.",
-        "highlight": [26],
+        "highlight": [
+          26
+        ],
         "visualizationType": "memory",
         "memoryState": {
-            "evaluation": "1000 > 500  →  true"
-        }
-      },
-      {
-        "line": 28,
-        "title": "사용자 정의 예외 던지기",
-        "explanation": "잔고가 부족하므로, 직접 만든 `InsufficientFundsException` 객체를 생성하여 '던집니다(throw)'. 예외 메시지에는 부족한 금액(500.0) 정보가 담겨있습니다. 이 라인에서 `withdraw` 메서드의 실행은 즉시 중단됩니다.",
-        "keyInsight": "의미 있는 이름을 가진 예외는 코드 가독성을 높입니다.",
-        "highlight": [28],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [{"class": "InsufficientFundsException", "message": "Need 500.0 more"}],
-          "error": "InsufficientFundsException thrown"
+          "evaluation": "1000 > 500  →  true"
         }
       },
       {
@@ -62,20 +66,31 @@
         "title": "구체적인 예외 잡기",
         "explanation": "던져진 예외가 `InsufficientFundsException`이므로, 이 `catch` 블록이 선택됩니다. 더 일반적인 `BankException` 블록은 무시됩니다.",
         "keyInsight": "자식 예외(더 구체적인)를 부모 예외보다 먼저 catch 해야 합니다.",
-        "highlight": [17],
+        "highlight": [
+          17
+        ],
         "visualizationType": "memory",
         "memoryState": {
-            "stack": [{"name": "e", "value": "-> InsufficientFundsException"}]
+          "stack": [
+            {
+              "name": "e",
+              "value": "-> InsufficientFundsException"
+            }
+          ]
         }
       },
       {
         "line": 18,
         "title": "예외 정보 출력",
         "explanation": "잡은 예외 객체(`e`)의 `getMessage()` 메서드를 호출하여, 생성 시 담았던 \"Need 500.0 more\" 메시지를 가져와 출력합니다. 프로그램을 중단시키지 않고 우아하게 에러를 처리했습니다.",
-        "highlight": [18],
+        "highlight": [
+          18
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "output": ["Error: Need 500.0 more"]
+          "output": [
+            "Error: Need 500.0 more"
+          ]
         }
       }
     ]
