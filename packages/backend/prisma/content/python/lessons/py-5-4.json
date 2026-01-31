@@ -7,94 +7,203 @@
     "steps": [
       {
         "line": 1,
-        "title": "Animal 클래스 정의 시작",
-        "explanation": "**`class Animal:`**\n부모 클래스 `Animal`을 정의합니다.",
-        "highlight": [ 1 ]
-      },
-      {
-        "line": 1,
-        "title": "Animal 클래스 본문 진입",
-        "explanation": "클래스 본문으로 진입합니다.",
-        "highlight": [ 1, 2, 3 ]
+        "title": "부모 클래스 정의 (Animal)",
+        "explanation": "**`class Animal:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. **부모 클래스(Parent Class)** `Animal`을 정의합니다.\n\n**상속(Inheritance)**: 다른 클래스의 기능을 물려받아 재사용하는 것입니다. Animal은 부모 역할을 할 기본 클래스입니다.\n\n**왜 이 순서인가?** 부모 클래스를 먼저 정의해야 나중에 자식 클래스가 상속받을 수 있습니다.\n\n**실행 순서**: class Animal 실행 → Animal 클래스 등록 시작 → line 2",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"}
+          ],
+          "output": [],
+          "note": "부모 클래스 정의 시작"
+        }
       },
       {
         "line": 2,
-        "title": "speak 메서드 정의 (Animal)",
-        "explanation": "`def speak(self):`\n기본 speak 메서드를 정의합니다.",
-        "highlight": [ 2, 3 ]
+        "title": "부모 메서드 정의 (speak)",
+        "explanation": "**`def speak(self):`**\n\n부모 클래스 `Animal`에 `speak` 메서드를 정의합니다. 이 메서드는 자식 클래스들이 **상속받거나 재정의(오버라이딩)**할 수 있습니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def speak 실행 → speak 메서드 등록 → Animal 클래스 정의 완료 → line 5",
+        "highlight": [2, 3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class with speak>", "type": "class", "id": "0x1000"}
+          ],
+          "output": [],
+          "note": "Animal.speak 메서드 정의됨"
+        }
       },
       {
         "line": 5,
-        "title": "Dog 클래스 정의 시작",
-        "explanation": "**`class Dog(Animal):`**\n`Animal`을 상속받는 `Dog` 클래스를 정의합니다.",
-        "highlight": [ 5 ]
-      },
-      {
-        "line": 5,
-        "title": "Dog 클래스 본문 진입",
-        "explanation": "클래스 본문으로 진입합니다.",
-        "highlight": [ 5, 6, 7 ]
+        "title": "자식 클래스 정의 (Dog)",
+        "explanation": "**`class Dog(Animal):`**\n\n**상속 문법**: 괄호 `(Animal)` 안에 **부모 클래스 이름**을 씁니다. `Dog`는 `Animal`의 **자식 클래스(Child Class)**가 됩니다.\n\n**상속의 효과**:\n1. `Dog`는 `Animal`의 모든 메서드와 속성을 **자동으로 물려받습니다**\n2. `Dog`만의 새로운 메서드를 추가할 수 있습니다\n3. 부모의 메서드를 **재정의(Override)**할 수 있습니다\n\n**왜 상속을 사용하는가?**\n- **코드 재사용**: 공통 기능을 부모에 한 번만 작성\n- **확장성**: 부모 기능에 새 기능 추가 가능\n- **다형성(Polymorphism)**: 같은 메서드 이름으로 다른 동작 구현\n\n**왜 이 순서인가?** 부모 클래스 정의 완료 후, 순서대로 자식 클래스를 정의합니다.\n\n**실행 순서**: class Dog(Animal) 실행 → Dog 클래스 등록 시작 (Animal 상속) → line 6",
+        "highlight": [5],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class, parent: Animal>", "type": "class", "id": "0x2000", "highlight": true}
+          ],
+          "output": [],
+          "note": "Dog 클래스 정의 시작 (Animal 상속)"
+        }
       },
       {
         "line": 6,
-        "title": "speak 메서드 정의 (Dog - 오버라이딩)",
-        "explanation": "`def speak(self):`\n부모의 speak를 덮어쓰는 새로운 메서드를 정의합니다.",
-        "highlight": [ 6, 7 ]
+        "title": "메서드 오버라이딩 (Dog.speak)",
+        "explanation": "**`def speak(self):`**\n\n**메서드 오버라이딩(Method Overriding)**: 부모 클래스의 메서드를 **같은 이름으로 재정의**하는 것입니다.\n\n**동작 원리**:\n- `Animal`에도 `speak` 메서드가 있습니다\n- `Dog`에서 **같은 이름**으로 다시 정의하면, `Dog`의 버전이 **우선**됩니다\n- `d.speak()` 호출 시, **부모가 아닌 자식**의 speak이 실행됩니다\n\n**왜 오버라이딩을 하는가?**\n- 부모의 기본 동작을 **자식에 맞게 변경**하기 위해\n- 각 동물마다 다른 소리를 내도록 구현\n\n**왜 이 순서인가?** Dog 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def speak 실행 → Dog.speak 메서드 등록 (Animal.speak 덮어씀) → line 9",
+        "highlight": [6, 7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class with speak>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class with speak (overridden)>", "type": "class", "id": "0x2000", "highlight": true}
+          ],
+          "output": [],
+          "note": "Dog.speak 정의 (Animal.speak 오버라이딩)"
+        }
       },
       {
         "line": 9,
-        "title": "Cat 클래스 정의 시작",
-        "explanation": "**`class Cat(Animal):`**\n`Animal`을 상속받는 `Cat` 클래스를 정의합니다.",
-        "highlight": [ 9 ]
-      },
-      {
-        "line": 9,
-        "title": "Cat 클래스 본문 진입",
-        "explanation": "클래스 본문으로 진입합니다.",
-        "highlight": [ 9, 10 ]
+        "title": "자식 클래스 정의 (Cat)",
+        "explanation": "**`class Cat(Animal):`**\n\n또 다른 자식 클래스 `Cat`을 정의합니다. `Cat`도 `Animal`을 상속받습니다.\n\n**왜 이 순서인가?** Dog 클래스 정의 완료 후, 순서대로 다음 클래스를 정의합니다.\n\n**실행 순서**: class Cat(Animal) 실행 → Cat 클래스 등록 시작 (Animal 상속) → line 10",
+        "highlight": [9],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class, parent: Animal>", "type": "class", "id": "0x2000"},
+            {"name": "Cat", "value": "<class, parent: Animal>", "type": "class", "id": "0x3000", "highlight": true}
+          ],
+          "output": [],
+          "note": "Cat 클래스 정의 시작 (Animal 상속)"
+        }
       },
       {
         "line": 10,
-        "title": "pass 실행",
-        "explanation": "`pass`\n아무것도 추가하지 않고 부모 기능을 그대로 사용합니다.",
-        "highlight": [ 10 ]
+        "title": "pass (부모 메서드 그대로 사용)",
+        "explanation": "**`pass`**\n\n`Cat` 클래스는 **아무 메서드도 추가하지 않습니다**. `pass`만 있으면 부모(`Animal`)의 모든 메서드를 **그대로 상속**받아 사용합니다.\n\n**Dog vs Cat**:\n- `Dog`: `speak`을 **오버라이딩** → 자신만의 speak 사용\n- `Cat`: 아무것도 안 함 → **부모의 speak** 그대로 사용\n\n**왜 이렇게 하는가?** 기본 동작이 적합하면 굳이 재정의할 필요가 없습니다. 필요한 부분만 오버라이딩하면 됩니다.\n\n**실행 순서**: pass 실행 (아무 일 안 함) → Cat 클래스 정의 완료 → line 12",
+        "highlight": [10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class with speak>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class with speak (overridden)>", "type": "class", "id": "0x2000"},
+            {"name": "Cat", "value": "<class, inherits Animal.speak>", "type": "class", "id": "0x3000", "highlight": true}
+          ],
+          "output": [],
+          "note": "Cat은 Animal.speak 그대로 상속"
+        }
       },
       {
         "line": 12,
         "title": "Dog 객체 생성",
-        "explanation": "`d = Dog()`\n`Dog` 인스턴스를 생성합니다.",
-        "highlight": [12]
-    },
-    {
+        "explanation": "**`d = Dog()`**\n\n`Dog` 클래스의 인스턴스를 생성합니다.\n\n**상속받은 객체**: `d` 객체는:\n- `Dog` 클래스의 인스턴스\n- `Animal` 클래스의 기능도 가진 객체\n- `Dog.speak` 메서드를 가짐 (오버라이딩된 버전)\n\n**왜 이 순서인가?** 모든 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog() 호출 → 새 객체 0x4000 생성 → d = 0x4000 → line 13",
+        "highlight": [12],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x2000"},
+            {"name": "Cat", "value": "<class>", "type": "class", "id": "0x3000"},
+            {"name": "d", "value": "<Dog object>", "type": "instance", "id": "0x4000", "highlight": true}
+          ],
+          "output": [],
+          "note": "Dog 인스턴스 생성"
+        }
+      },
+      {
         "line": 13,
         "title": "Cat 객체 생성",
-        "explanation": "`c = Cat()`\n`Cat` 인스턴스를 생성합니다.",
-        "highlight": [13]
-    },
-    {
+        "explanation": "**`c = Cat()`**\n\n`Cat` 클래스의 인스턴스를 생성합니다.\n\n**상속받은 객체**: `c` 객체는:\n- `Cat` 클래스의 인스턴스\n- `Animal` 클래스의 기능도 가진 객체\n- `Animal.speak` 메서드를 가짐 (부모 버전)\n\n**왜 이 순서인가?** 첫 번째 객체 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Cat() 호출 → 새 객체 0x5000 생성 → c = 0x5000 → line 15",
+        "highlight": [13],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x2000"},
+            {"name": "Cat", "value": "<class>", "type": "class", "id": "0x3000"},
+            {"name": "d", "value": "<Dog object>", "type": "instance", "id": "0x4000"},
+            {"name": "c", "value": "<Cat object>", "type": "instance", "id": "0x5000", "highlight": true}
+          ],
+          "output": [],
+          "note": "Cat 인스턴스 생성"
+        }
+      },
+      {
         "line": 15,
         "title": "d.speak() 호출",
-        "explanation": "`d.speak()`\n`Dog`의 speak 메서드를 호출합니다.",
-        "highlight": [15]
-    },
-    {
+        "explanation": "**`d.speak()`**\n\n`Dog` 객체 `d`의 `speak` 메서드를 호출합니다.\n\n**메서드 탐색 순서(Method Resolution Order, MRO)**:\n1. `d` 객체의 클래스(`Dog`)에 `speak`이 있는가? → **있음!**\n2. `Dog.speak` 실행 (line 7로 점프)\n\n**왜 이 순서인가?** 두 번째 객체 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 15 → d.speak() 호출 → Dog.speak 찾음 → line 7로 점프",
+        "highlight": [15],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x2000"},
+            {"name": "Cat", "value": "<class>", "type": "class", "id": "0x3000"},
+            {"name": "d", "value": "<Dog object>", "type": "instance", "id": "0x4000"},
+            {"name": "c", "value": "<Cat object>", "type": "instance", "id": "0x5000"}
+          ],
+          "output": [],
+          "note": "d.speak() 호출 → Dog.speak으로 점프 예정"
+        }
+      },
+      {
         "line": 7,
-        "title": "Dog.speak 실행",
-        "explanation": "`print(\"Bark!\")`\n오버라이딩된 메서드가 실행되어 \"Bark!\"가 출력됩니다.",
-        "highlight": [7]
-    },
-    {
+        "title": "Dog.speak 실행 (오버라이딩된 버전)",
+        "explanation": "**`print(\"Bark!\")`**\n\n**오버라이딩된 메서드 실행**: `Dog`에서 재정의한 `speak` 메서드가 실행됩니다. \"Bark!\"가 출력됩니다.\n\n**왜 Animal.speak이 아닌가?** `Dog`에서 `speak`을 **오버라이딩**했기 때문에, `Dog`의 버전이 우선됩니다.\n\n**실행 순서**: print 실행 → \"Bark!\" 출력 → 함수 종료 → line 16으로 돌아감",
+        "highlight": [7],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x2000"},
+            {"name": "Cat", "value": "<class>", "type": "class", "id": "0x3000"},
+            {"name": "d", "value": "<Dog object>", "type": "instance", "id": "0x4000"},
+            {"name": "c", "value": "<Cat object>", "type": "instance", "id": "0x5000"},
+            {"name": "self", "value": "→ d (0x4000)", "type": "parameter", "highlight": true}
+          ],
+          "output": ["Bark!"],
+          "note": "Dog의 오버라이딩된 speak 실행"
+        }
+      },
+      {
         "line": 16,
         "title": "c.speak() 호출",
-        "explanation": "`c.speak()`\n`Cat`의 speak 메서드를 호출합니다. Cat은 오버라이딩하지 않았으므로 부모의 메서드가 호출됩니다.",
-        "highlight": [16]
-    },
-    {
+        "explanation": "**`c.speak()`**\n\n`Cat` 객체 `c`의 `speak` 메서드를 호출합니다.\n\n**메서드 탐색 순서(MRO)**:\n1. `c` 객체의 클래스(`Cat`)에 `speak`이 있는가? → **없음!**\n2. 부모 클래스(`Animal`)에 `speak`이 있는가? → **있음!**\n3. `Animal.speak` 실행 (line 3으로 점프)\n\n**왜 부모 메서드가 실행되는가?** `Cat`에서 `speak`을 오버라이딩하지 않았기 때문에, Python이 **상속 체인**을 따라 올라가서 부모의 메서드를 찾습니다.\n\n**왜 이 순서인가?** 이전 메서드 호출이 완료되고, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 16 → c.speak() 호출 → Cat.speak 없음 → Animal.speak 찾음 → line 3으로 점프",
+        "highlight": [16],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x2000"},
+            {"name": "Cat", "value": "<class>", "type": "class", "id": "0x3000"},
+            {"name": "d", "value": "<Dog object>", "type": "instance", "id": "0x4000"},
+            {"name": "c", "value": "<Cat object>", "type": "instance", "id": "0x5000"}
+          ],
+          "output": ["Bark!"],
+          "note": "c.speak() 호출 → Cat에 없음 → Animal.speak으로 점프 예정"
+        }
+      },
+      {
         "line": 3,
-        "title": "Animal.speak 실행",
-        "explanation": "`print(\"...\")`\n부모 클래스의 메서드가 실행되어 \"...\"가 출력됩니다.",
-        "highlight": [3]
-    }
+        "title": "Animal.speak 실행 (부모 버전)",
+        "explanation": "**`print(\"...\")`**\n\n**부모 메서드 실행**: `Animal`의 원래 `speak` 메서드가 실행됩니다. \"...\"가 출력됩니다.\n\n**상속의 핵심**:\n- `Dog` 객체: 자신의 `speak` 메서드 사용 (오버라이딩)\n- `Cat` 객체: 부모의 `speak` 메서드 사용 (상속)\n\n**다형성(Polymorphism)**: 같은 메서드 이름(`speak`)이지만, 객체 타입에 따라 다른 동작을 합니다!\n\n**실행 순서**: print 실행 → \"...\" 출력 → 함수 종료 → 프로그램 종료",
+        "highlight": [3],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {"name": "Animal", "value": "<class>", "type": "class", "id": "0x1000"},
+            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x2000"},
+            {"name": "Cat", "value": "<class>", "type": "class", "id": "0x3000"},
+            {"name": "d", "value": "<Dog object>", "type": "instance", "id": "0x4000"},
+            {"name": "c", "value": "<Cat object>", "type": "instance", "id": "0x5000"},
+            {"name": "self", "value": "→ c (0x5000)", "type": "parameter", "highlight": true}
+          ],
+          "output": ["Bark!", "..."],
+          "note": "Cat은 부모(Animal)의 speak 실행"
+        }
+      }
     ]
   },
   "quiz": {
