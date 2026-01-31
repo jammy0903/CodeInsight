@@ -154,24 +154,10 @@ export function useLessonNavigation(
   }, [currentStepIndex, steps, code, totalSteps, onStepChange]);
 
   const goToNextStep = useCallback(() => {
-    console.log('[goToNextStep] called:', {
-      currentStepIndex,
-      totalSteps,
-      stepsLength: steps?.length,
-      codeLength: code?.length,
-      canAdvance: currentStepIndex < totalSteps - 1
-    });
-
     if (currentStepIndex < totalSteps - 1) {
       // 빈 줄 스킵: 다음 유효한 스텝 찾기
       const candidateIndex = currentStepIndex + 1;
       const newIndex = findNextNonEmptyStep(candidateIndex, 1, steps, code, totalSteps);
-
-      console.log('[goToNextStep] findNextNonEmptyStep result:', {
-        candidateIndex,
-        newIndex,
-        willUpdate: newIndex !== currentStepIndex
-      });
 
       if (newIndex !== currentStepIndex) {
         setCurrentStepIndex(newIndex);
