@@ -88,6 +88,37 @@
         }
       },
       {
+        "line": 9,
+        "title": "역참조를 통한 값 변경",
+        "explanation": "**`*remote = 100;`**\n\n`*remote`는 '`remote`가 가리키는 주소의 값'을 의미합니다. `remote`는 `energy`의 주소를 담고 있으므로, 이 코드는 `energy`의 값을 `100`으로 바꿉니다. 마치 리모컨으로 TV 볼륨을 높이는 것처럼, 멀리서 원본 값을 제어합니다.",
+        "keyInsight": "`*p = 값`은 '그 주소에 값을 저장하라'는 뜻입니다.",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "energy",
+              "value": "100",
+              "type": "int",
+              "address": "0x3000",
+              "highlight": true
+            },
+            {
+              "name": "remote",
+              "value": "0x3000",
+              "type": "int*",
+              "address": "0x3004"
+            }
+          ],
+          "output": [
+            "Before: 50"
+          ],
+          "note": "*remote = 100 → energy가 100으로 변경됨"
+        }
+      },
+      {
         "line": 11,
         "title": "변경 후 값 확인",
         "explanation": "**`printf(\"After:  %d\\n\", energy);`**\n\n`energy` 변수의 값을 다시 출력하여, 포인터를 통한 원격 수정으로 값이 `100`으로 변경되었음을 확인합니다.",

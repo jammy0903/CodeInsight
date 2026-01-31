@@ -6,18 +6,51 @@
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int size;\n    printf(\"How many numbers? \");\n    size = 5;\n\n    int *arr = (int*)malloc(sizeof(int) * size);\n\n    for(int i=0; i<size; i++) {\n        arr[i] = i * 10;\n        printf(\"%d \", arr[i]);\n    }\n\n    free(arr);\n    return 0;\n}",
     "steps": [
       {
-        "line": 6,
-        "title": "출력 (Output)",
-        "explanation": "**`printf(\"How many numbers? \");`**\n\n표준 출력(stdout)으로 형식화된 데이터를 출력합니다.\n\nprintf 내부의 변수들은 메모리에 그대로 유지됩니다.",
-        "highlight": [
-          6
-        ],
+        "line": 1,
+        "title": "헤더 파일 포함",
+        "explanation": "**`#include <stdio.h>`** 와 **`#include <stdlib.h>`**\n\n`printf` 함수와 동적 메모리 함수(`malloc`, `free`)를 사용하기 위해 헤더 파일들을 포함합니다.",
+        "highlight": [1, 2],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 4,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
+        "highlight": [4],
+        "visualizationType": "cMemory",
+        "cMemoryState": {"stack": [], "heap": [], "output": []}
+      },
+      {
+        "line": 5,
+        "title": "크기 변수 선언",
+        "explanation": "**`int size;`**\n\n배열의 크기를 저장할 변수를 선언합니다. 아직 초기화되지 않아 쓰레기 값이 들어있습니다.",
+        "highlight": [5],
         "visualizationType": "cMemory",
         "cMemoryState": {
-          "stack": [],
-          "output": [
-            "[Output will be shown here]"
-          ]
+          "stack": [{"name": "size", "value": "???", "type": "int"}]
+        }
+      },
+      {
+        "line": 6,
+        "title": "입력 프롬프트 출력",
+        "explanation": "**`printf(\"How many numbers? \");`**\n\n사용자에게 배열 크기를 묻는 메시지를 출력합니다.",
+        "highlight": [6],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{"name": "size", "value": "???", "type": "int"}],
+          "output": ["How many numbers? "]
+        }
+      },
+      {
+        "line": 7,
+        "title": "크기 설정 (입력 시뮬레이션)",
+        "explanation": "**`size = 5;`**\n\n실제로는 `scanf`로 사용자 입력을 받지만, 여기서는 크기를 5로 가정합니다. 이제 `malloc`에서 사용할 크기가 결정되었습니다.",
+        "highlight": [7],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [{"name": "size", "value": "5", "type": "int", "highlight": true}],
+          "output": ["How many numbers? "]
         }
       },
       {

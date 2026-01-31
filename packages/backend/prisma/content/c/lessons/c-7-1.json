@@ -144,6 +144,43 @@
         }
       },
       {
+        "line": 10,
+        "title": "이중 역참조로 값 변경",
+        "explanation": "**`**pp = 20;`**\n\n이중 역참조(`**`)를 통해 `a`의 값을 변경합니다.\n- `*pp`는 `p`의 값, 즉 `a`의 주소(`0x100`)입니다.\n- `**pp`는 `a`의 주소에 있는 값, 즉 `a` 자체입니다.\n따라서 `**pp = 20`은 `*p = 20`과 같고, 이는 곧 `a = 20`과 같은 효과입니다.",
+        "keyInsight": "**pp → *p → a: 체인을 따라 원본 값 변경",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "type": "int",
+              "address": "0x100",
+              "value": "20",
+              "highlight": true
+            },
+            {
+              "name": "p",
+              "type": "int*",
+              "address": "0x108",
+              "value": "0x100"
+            },
+            {
+              "name": "pp",
+              "type": "int**",
+              "address": "0x110",
+              "value": "0x108"
+            }
+          ],
+          "output": [
+            "a = 10"
+          ],
+          "note": "**pp = 20 → a가 10에서 20으로 변경됨"
+        }
+      },
+      {
         "line": 12,
         "title": "변경된 값 확인",
         "explanation": "**`printf(\"a = %d\\n\", a);`**\n\n이중 포인터를 통해 값이 변경된 `a`를 출력하여 확인합니다.",
