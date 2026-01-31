@@ -6,80 +6,98 @@
     "code": "function delay(ms) {\n  return new Promise(resolve => setTimeout(resolve, ms));\n}\n\nasync function fetchUser() {\n  console.log('Fetching...');\n  await delay(1000);\n  console.log('User loaded');\n  return { name: 'Alice' };\n}\n\nasync function main() {\n  console.log('Start');\n  const user = await fetchUser();\n  console.log('Got:', user.name);\n  console.log('End');\n}\n\nmain();",
     "steps": [
       {
-        "line": 1,
-        "title": "main 호출",
-        "explanation": "async 함수 main() 호출",
-        "highlight": [
-          1
-        ]
+        "line": 19,
+        "title": "main() 호출",
+        "explanation": "`main()`을 호출합니다. async 함수이므로 즉시 Promise를 반환하고 내부 코드 실행을 시작합니다.",
+        "highlight": [19],
+        "visualizationType": "callStack"
       },
       {
-        "line": 2,
-        "title": "Start 출력",
-        "explanation": "동기 코드 실행",
-        "highlight": [
-          2
-        ]
+        "line": 13,
+        "title": "'Start' 출력",
+        "explanation": "`console.log('Start')`가 동기적으로 실행됩니다. 콘솔에 'Start'가 출력됩니다.",
+        "highlight": [13],
+        "visualizationType": "callStack"
       },
       {
-        "line": 3,
-        "title": "fetchUser 호출",
-        "explanation": "await로 일시 중지",
-        "highlight": [
-          3
-        ]
-      },
-      {
-        "line": 5,
-        "title": "delay 대기",
-        "explanation": "1초 대기",
-        "highlight": [
-          5
-        ]
+        "line": 14,
+        "title": "await fetchUser() 호출",
+        "explanation": "`fetchUser()`를 호출하고 `await`로 결과를 기다립니다. main 함수는 여기서 일시 중지됩니다.",
+        "keyInsight": "await = Promise가 resolve될 때까지 함수 실행을 일시 중지",
+        "highlight": [14],
+        "visualizationType": "callStack"
       },
       {
         "line": 6,
-        "title": "User loaded",
-        "explanation": "delay 완료",
-        "highlight": [
-          6
-        ]
+        "title": "'Fetching...' 출력",
+        "explanation": "`fetchUser` 함수 내부에서 `console.log('Fetching...')`이 실행됩니다.",
+        "highlight": [6],
+        "visualizationType": "callStack"
       },
       {
         "line": 7,
-        "title": "반환값",
-        "explanation": "객체 반환",
-        "highlight": [
-          7
-        ]
+        "title": "await delay(1000)",
+        "explanation": "`delay(1000)`을 호출하고 await합니다. 1초 타이머가 시작되고 fetchUser도 일시 중지됩니다.",
+        "highlight": [7],
+        "visualizationType": "promise",
+        "promiseState": {
+          "webApis": [{"name": "setTimeout(1000ms)", "status": "waiting"}]
+        }
+      },
+      {
+        "line": 2,
+        "title": "Promise 생성 (delay 내부)",
+        "explanation": "`delay` 함수 내부에서 `new Promise`가 생성되고, setTimeout이 Web API로 등록됩니다.",
+        "highlight": [2],
+        "visualizationType": "promise"
       },
       {
         "line": 8,
-        "title": "Got 출력",
-        "explanation": "main 재개",
-        "highlight": [
-          8
-        ]
+        "title": "'User loaded' 출력",
+        "explanation": "1초 후 delay Promise가 resolve되어 fetchUser가 재개됩니다. 'User loaded'가 출력됩니다.",
+        "highlight": [8],
+        "visualizationType": "callStack"
       },
       {
         "line": 9,
-        "title": "End",
-        "explanation": "완료",
-        "highlight": [
-          9
-        ]
+        "title": "객체 반환",
+        "explanation": "`return { name: 'Alice' }`로 객체를 반환합니다. fetchUser의 Promise가 이 값으로 resolve됩니다.",
+        "highlight": [9],
+        "visualizationType": "callStack"
+      },
+      {
+        "line": 15,
+        "title": "'Got: Alice' 출력",
+        "explanation": "main 함수가 재개되어 `user` 변수에 `{ name: 'Alice' }`가 할당되고, 'Got: Alice'가 출력됩니다.",
+        "highlight": [15],
+        "visualizationType": "callStack"
+      },
+      {
+        "line": 16,
+        "title": "'End' 출력",
+        "explanation": "`console.log('End')`가 실행되어 'End'가 출력됩니다. main 함수가 완료됩니다.",
+        "highlight": [16],
+        "visualizationType": "callStack"
       }
     ]
   },
   "quiz": {
     "question": "await의 역할은?",
     "options": [
-      "블로킹",
-      "일시중지",
-      "종료",
-      "없음"
+      "메인 스레드를 완전히 블로킹한다",
+      "async 함수를 일시 중지하고 Promise 완료를 기다린다",
+      "함수를 즉시 종료한다",
+      "아무 효과가 없다"
     ],
     "correctIndex": 1,
-    "explanation": "await는 async 함수를 일시 중지합니다"
-  }
+    "explanation": "await는 async 함수의 실행을 일시 중지하고, Promise가 resolve될 때까지 기다립니다. 메인 스레드는 블로킹되지 않고 다른 작업을 처리할 수 있습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "await는 메인 스레드를 블로킹한다",
+      "correct": "await는 해당 async 함수만 일시 중지합니다. 메인 스레드는 다른 작업을 처리할 수 있습니다.",
+      "why": "async/await는 Promise 기반이므로, 이벤트 루프가 계속 동작하며 다른 이벤트를 처리할 수 있습니다."
+    }
+  ],
+  "keyTakeaway": "async/await = Promise를 동기 코드처럼 작성하는 문법. await는 함수를 일시 중지하지만 메인 스레드는 블로킹하지 않습니다."
 }

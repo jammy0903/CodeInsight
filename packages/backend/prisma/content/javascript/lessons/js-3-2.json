@@ -123,22 +123,28 @@
         "explanation": "greetFn()은 일반 함수 호출입니다. 점(.) 앞에 객체가 없으므로 this는 전역(또는 undefined)입니다!",
         "keyInsight": "메서드를 변수에 저장하고 호출하면 this를 잃어버립니다!",
         "misconception": "greetFn이 원래 user.greet였으니 this도 user일 거라 착각하기 쉽습니다.",
-        "highlight": [
-          11
-        ],
+        "highlight": [11],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "function call (lost this)",
           "thisValue": "window (or undefined in strict)",
-          "callStack": [
-            "<global>",
-            "greetFn()"
-          ],
-          "output": [
-            "Hello, Alice",
-            "Hello, undefined"
-          ],
-          "warning": "this.name = undefined!"
+          "callStack": ["<global>", "greetFn()"]
+        }
+      },
+      {
+        "line": 4,
+        "title": "this.name 접근 (this 손실 상태)",
+        "explanation": "greetFn 내부에서 `this.name`에 접근합니다. 하지만 this가 window(또는 undefined)이므로, `this.name`은 **undefined**입니다!",
+        "keyInsight": "같은 코드(line 4)인데 this가 달라서 결과가 다릅니다.",
+        "highlight": [4],
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "function call (lost this)",
+          "thisValue": "window",
+          "callStack": ["<global>", "greetFn()"],
+          "output": ["Hello, Alice", "Hello, undefined"],
+          "thisAccess": "this.name → undefined",
+          "warning": "this가 window라서 name이 없음!"
         }
       }
     ]
