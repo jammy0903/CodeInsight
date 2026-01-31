@@ -6,45 +6,24 @@
         "code": "function add(a, b) {\n  return a + b;\n}\n\n// 1. 학습 및 최적화 (Optimizing)\nfor (let i = 0; i < 10000; i++) {\n  add(i, i);\n}\n// -> 엔진 판단: \"이 함수는 (Int, Int) 입력만 받는구나!\" -> 기계어 컴파일 완료\n\n// 2. 타입 변경 (Deoptimization 유발!)\nadd('Hello', 'World');\n// -> 엔진 당황: \"어? 문자열이네?\" \n// -> 기계어 폐기 및 인터프리터 모드로 복귀 (느려짐)",
         "steps": [
             {
-                "line": 1,
-                "title": "JIT 컴파일러의 관찰 (Profiling)",
-                "explanation": "처음 코드가 실행될 때, **TurboFan(최적화 컴파일러)**은 이 함수를 유심히 지켜봅니다.\n\"여기에 들어오는 `a`와 `b`는 무슨 타입일까?\" 하고 정보를 수집합니다(Profiling).",
-                "highlight": [
-                    1,
-                    2,
-                    3
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "note": "데이터 수집(Profiling) 중..."
-                }
-            },
-            {
                 "line": 6,
-                "title": "최적화 완료 (Optimization)",
-                "explanation": "반복문을 통해 정수(Integer)만 10,000번 들어오면, 엔진은 확신을 가집니다.\n\"좋아! 이 함수는 평생 정수만 받을 거야!\"\n\n그러면 정수 덧셈에 특화된 **최적화 기계어(Optimized Code)**를 생성합니다. 이 코드는 타입 검사 단계를 생략하기 때문에 엄청나게 빠릅니다.",
+                "title": "1. 학습 및 최적화 (Profiling & Optimizing)",
+                "explanation": "`for` 루프가 돌면서 `add` 함수가 숫자 인자만으로 반복 호출됩니다. V8의 JIT 컴파일러는 이 패턴을 '학습(Profiling)'하고, \"이 함수는 항상 숫자를 더하는군!\"이라고 확신하게 되면, 숫자 덧셈에만 특화된 매우 빠른 기계어 코드를 생성합니다(Optimization).",
                 "keyInsight": "자바스크립트 엔진은 '타입이 변하지 않는다'는 가정하에 공격적인 최적화를 수행합니다.",
-                "highlight": [
-                    6,
-                    7,
-                    8
-                ],
+                "highlight": [6, 7, 8],
                 "visualizationType": "memory",
-                "memoryState": {
-                    "note": "Optimized Code 생성됨 (Only for Integers)"
-                }
+                "memoryState": { "note": "Function is 'hot' -> Optimized Code generated for (Number, Number)" }
             },
             {
                 "line": 12,
-                "title": "최적화 해제 (Deoptimization)",
-                "explanation": "갑자기 문자열 'Hello'가 입력되었습니다. 엔진의 '정수만 들어온다'는 가정이 깨졌습니다!\n\n**Deoptimization(최적화 해제)이란?**\n틀린 가정으로 만든 기계어를 즉시 폐기하고, 느리지만 안전한 기본 모드(Interpreter)로 돌아가는 과정입니다. 이 과정 자체도 비용이 꽤 듭니다.",
-                "highlight": [
-                    12
-                ],
+                "title": "2. 예측 실패 및 최적화 해제 (Deoptimization)",
+                "explanation": "갑자기 `add` 함수가 문자열 인자와 함께 호출됩니다. 엔진의 \"항상 숫자가 들어올 거야\"라는 예측이 깨졌습니다! 이 순간, 엔진은 힘들게 만들었던 최적화된 기계어 코드를 버리고, 어떤 타입이든 처리할 수 있는 느린 인터프리터 모드로 되돌아갑니다. 이 과정을 '최적화 해제(Deoptimization)'라고 합니다.",
+                "keyInsight": "일관되지 않은 타입 사용은 최적화를 무효화시켜 성능을 저하시킵니다.",
+                "highlight": [12],
                 "visualizationType": "memory",
                 "memoryState": {
                     "note": "Deopt! -> Bailout to Interpreter",
-                    "warning": "성능 저하 발생"
+                    "warning": "Performance hit!"
                 }
             }
         ]
