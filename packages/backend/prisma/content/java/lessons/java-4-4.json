@@ -7,11 +7,56 @@
     "steps": [
       {
         "line": 1,
-        "title": "변수 준비",
-        "explanation": "**메모리 배치:**\n- `a`: Pool의 \"Hello\"\n- `b`: Heap의 \"Hello\" (모양만 같고 주소가 다른 녀석)\n- `c`: Pool의 \"hello\" (소문자)",
+        "title": "리터럴 a 생성",
+        "explanation": "`a`는 문자열 리터럴로 생성되어 String Pool에 있는 \"Hello\" 객체를 참조합니다.",
         "highlight": [
-          1,
-          2,
+          1
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool[0]"
+            }
+          ],
+          "stringPool": [
+            "\"Hello\""
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "title": "new String b 생성",
+        "explanation": "`b`는 `new` 키워드로 생성되어, 내용은 같지만 String Pool이 아닌 Heap 메모리에 별도의 \"Hello\" 객체를 만들고 참조합니다.",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool[0]"
+            },
+            {
+              "name": "b",
+              "value": "-> Heap[0]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello\""
+            }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "리터럴 c 생성",
+        "explanation": "`c`는 소문자 \"hello\" 리터럴로, String Pool에 새로운 \"hello\" 객체가 만들어지고 이를 참조합니다.",
+        "highlight": [
           3
         ],
         "visualizationType": "memory",
@@ -33,19 +78,13 @@
           "stringPool": [
             "\"Hello\"",
             "\"hello\""
-          ],
-          "heap": [
-            {
-              "address": "Heap[0]",
-              "content": "\"Hello\""
-            }
           ]
         }
       },
       {
         "line": 5,
         "title": "== 비교 (참조 비교)",
-        "explanation": "`a`는 Pool, `b`는 Heap.\n서로 사는 집(주소)이 다르므로 `false`입니다.\n(내용이 같은 건 상관 안 합니다. `==`는 오직 주소만 봅니다!)",
+        "explanation": "`a`는 Pool, `b`는 Heap. 서로 사는 집(주소)이 다르므로 `false`입니다. `==`는 내용이 아닌 주소만 비교합니다.",
         "keyInsight": "== 는 집 주소 비교",
         "highlight": [
           5
@@ -61,7 +100,7 @@
       {
         "line": 6,
         "title": "equals() 비교 (내용 비교)",
-        "explanation": "\"그 안에 살고 있는 사람(글자)이 똑같은가?\"를 확인합니다.\n둘 다 \"Hello\"이므로 `true`입니다.\n**Java에서 문자열 비교는 무조건 이거입니다.**",
+        "explanation": "두 객체 안의 실제 내용(\"Hello\")을 비교합니다. 내용이 같으므로 `true`입니다. Java에서 문자열 내용 비교의 표준입니다.",
         "keyInsight": "equals() = 내용 비교 (표준)",
         "highlight": [
           6
@@ -77,7 +116,7 @@
       {
         "line": 7,
         "title": "equalsIgnoreCase()",
-        "explanation": "대소문자 차이를 눈감아줍니다. (H vs h)\n\"Hello\"와 \"hello\"를 같은 단어로 취급합니다 -> `true`",
+        "explanation": "대소문자 차이를 무시하고 내용을 비교합니다. \"Hello\"와 \"hello\"를 같은 것으로 취급하여 `true`를 반환합니다.",
         "keyInsight": "ID/PW 비교 말고 검색 등에 유용",
         "highlight": [
           7
@@ -94,7 +133,7 @@
       {
         "line": 8,
         "title": "compareTo() (사전순)",
-        "explanation": "`dictionary`에서 누가 더 뒤에 나오나 봅니다.\n`H`(72) - `A`(65) = 7.\n양수가 나왔으므로 `a`(\"Hello\")가 `Apple`보다 뒤에 있다는 뜻입니다.",
+        "explanation": "문자열을 사전 순서로 비교합니다. `H`(72)는 `A`(65)보다 크므로 양수(7)를 반환합니다. 이는 `a`가 `\"Apple\"`보다 사전에 뒤에 나온다는 의미입니다.",
         "keyInsight": "0: 같음, 양수: 내가 더 큼, 음수: 내가 더 작음",
         "highlight": [
           8
@@ -113,7 +152,7 @@
       {
         "line": 9,
         "title": "안전한 비교 (Yoda Condition)",
-        "explanation": "**꿀팁:** `변수.equals(\"리터럴\")` 대신 **`\"리터럴\".equals(변수)`**를 쓰세요.\n\n왜냐하면 `a`가 혹시 `null`이어도, 살아있는 객체인 `\"Hello\"`가 비교를 주도하기 때문에 에러(NPE)가 안 나고 그냥 `false`가 나옵니다.",
+        "explanation": "추천 기법: `\"리터럴\".equals(변수)` 순서로 비교합니다. 이렇게 하면 변수 `a`가 `null`일 경우에도 NullPointerException 없이 안전하게 `false`를 반환합니다.",
         "keyInsight": "\"리터럴\".equals(변수) = null-safe",
         "highlight": [
           9

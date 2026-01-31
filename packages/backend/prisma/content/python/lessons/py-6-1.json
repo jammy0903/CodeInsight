@@ -7,82 +7,33 @@
     "steps": [
       {
         "line": 1,
-        "title": "클래스 정의",
-        "explanation": "`class Dog:`로 새로운 클래스를 정의합니다.\n\n**파이썬에서 클래스는:**\n- 객체를 만드는 '틀' (설계도)\n- 그 자체도 객체! (type 타입의 인스턴스)\n\n이게 파이썬이 \"모든 것이 객체\"인 이유입니다.",
-        "highlight": [1, 2, 3, 4, 5],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Dog", "pointsTo": "class_dog" }
-          ],
-          "objects": [
-            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100", "highlight": true }
-          ]
-        }
-      },
-      {
-        "line": 2,
-        "title": "클래스 변수",
-        "explanation": "`species = \"Canis familiaris\"`는 **클래스 변수**입니다.\n\n**특징:**\n- 클래스에 속함 (인스턴스가 아님)\n- 모든 인스턴스가 공유\n- `Dog.species`로 접근",
-        "highlight": [2],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Dog", "pointsTo": "class_dog" }
-          ],
-          "objects": [
-            { "id": "class_dog", "type": "class", "value": "Dog [species='Canis...']", "pyId": "140100" }
-          ]
-        }
-      },
-      {
-        "line": 4,
-        "title": "메서드 정의",
-        "explanation": "`def bark(self)`는 **인스턴스 메서드**입니다.\n\n**self가 뭐야?**\n- 이 메서드를 호출하는 인스턴스 자신\n- 첫 번째 인자로 자동 전달됨\n- 이름은 관례적으로 `self` (다른 이름도 가능하지만 쓰지 마세요!)",
-        "highlight": [4, 5],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Dog", "pointsTo": "class_dog" }
-          ],
-          "objects": [
-            { "id": "class_dog", "type": "class", "value": "Dog [species, bark()]", "pyId": "140100" }
-          ]
-        }
+        "title": "클래스 정의와 클래스 변수",
+        "explanation": "**`class Dog:`**\n`Dog`라는 새로운 타입을 정의합니다.\n\n**`species = ...`**\n`species`는 **클래스 변수**입니다. `Dog`라는 클래스 자체에 속하며, 이 클래스로부터 만들어지는 모든 객체(인스턴스)가 공유하는 데이터입니다.",
+        "highlight": [ 1, 2, 4, 5 ]
       },
       {
         "line": 7,
-        "title": "클래스도 객체!",
-        "explanation": "`type(Dog)` → `<class 'type'>`\n\n**놀라운 사실:** 클래스 Dog 자체도 객체입니다!\n\n- Dog는 `type` 클래스의 인스턴스\n- type도 객체 (자기 자신의 인스턴스)\n\n이게 파이썬의 \"메타클래스\" 개념입니다.",
-        "highlight": [7],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Dog", "pointsTo": "class_dog" }
-          ],
-          "objects": [
-            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100" }
-          ],
-          "output": ["<class 'type'>"]
-        }
+        "title": "클래스도 객체다",
+        "explanation": "**`print(type(Dog))`**\n놀랍게도, 클래스 `Dog` 자체도 파이썬에서는 하나의 객체입니다. 이 객체의 타입은 `<class 'type'>` 입니다. 즉, `Dog`는 `type`이라는 클래스의 '인스턴스'입니다.",
+        "highlight": [ 7 ]
+      },
+      {
+        "line": 8,
+        "title": "클래스 변수 접근",
+        "explanation": "**`print(Dog.species)`**\n클래스 변수는 `클래스이름.변수이름` 형식으로 직접 접근할 수 있습니다. `Dog` 클래스의 모든 객체가 이 값을 공유합니다.",
+        "highlight": [ 8 ]
       },
       {
         "line": 10,
-        "title": "인스턴스 생성",
-        "explanation": "`my_dog = Dog()` → 새로운 Dog 인스턴스 생성!\n\n**무슨 일이 일어나나?**\n1. 메모리에 새 객체 공간 할당\n2. `__init__` 호출 (있다면)\n3. 객체 반환\n\n`type(my_dog)` → `<class 'Dog'>`",
-        "highlight": [10, 11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Dog", "pointsTo": "class_dog" },
-            { "name": "my_dog", "pointsTo": "inst_dog" }
-          ],
-          "objects": [
-            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100" },
-            { "id": "inst_dog", "type": "Dog", "value": "Dog instance", "pyId": "140200", "highlight": true }
-          ],
-          "output": ["<class 'type'>", "Canis familiaris", "<class '__main__.Dog'>"]
-        }
+        "title": "인스턴스(객체) 생성",
+        "explanation": "**`my_dog = Dog()`**\n`Dog` 설계도를 바탕으로 실제 제품, 즉 인스턴스(객체)를 만듭니다. `my_dog`는 `Dog` 타입의 새로운 객체를 가리킵니다.",
+        "highlight": [ 10 ]
+      },
+      {
+        "line": 11,
+        "title": "인스턴스 타입 확인",
+        "explanation": "**`print(type(my_dog))`**\n`my_dog` 변수가 가리키는 객체의 타입을 출력합니다. 결과는 `<class '__main__.Dog'>` 이며, 우리가 방금 정의한 `Dog` 클래스의 인스턴스임을 의미합니다.",
+        "highlight": [ 11 ]
       }
     ]
   },

@@ -110,10 +110,40 @@
       },
       {
         "line": 8,
-        "title": "2차원 배열 생성",
+        "title": "첫 번째 2차원 배열 생성",
         "explanation": "2차원 배열은 **'배열을 가리키는 배열'**입니다.\n`deep1`은 `[주소1, 주소2]`를 담고 있습니다.\n\n**Deep Structure:**\n겉 껍데기(행) 안에, 각자의 알맹이 배열(열)들이 따로따로 들어있는 구조입니다.",
         "highlight": [
-          8,
+          8
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "deep1",
+              "value": "-> 0x010"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x010",
+              "content": "[-> 0x011, -> 0x012]"
+            },
+            {
+              "address": "0x011",
+              "content": "[1, 2]"
+            },
+            {
+              "address": "0x012",
+              "content": "[3, 4]"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "두 번째 2차원 배열 생성",
+        "explanation": "첫 번째 2차원 배열과 내용은 같지만, 완전히 새로운 객체로 생성됩니다. `deep2`는 `deep1`과 다른 주소를 참조하게 됩니다.",
+        "highlight": [
           9
         ],
         "visualizationType": "memory",
@@ -143,7 +173,8 @@
             },
             {
               "address": "0x020",
-              "content": "[-> 0x021, -> 0x022]"
+              "content": "[-> 0x021, -> 0x022]",
+              "new": true
             }
           ]
         }

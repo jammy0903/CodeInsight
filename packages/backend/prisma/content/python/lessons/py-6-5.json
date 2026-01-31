@@ -6,90 +6,47 @@
     "code": "class Dog:\n    def bark(self):\n        print(f\"멍멍! (id: {id(self)})\")\n\nmy_dog = Dog()\n\n# 방법 1: 바운드 메서드\nmy_dog.bark()\n\n# 방법 2: 언바운드 호출\nDog.bark(my_dog)\n\n# 메서드도 객체!\nmethod = my_dog.bark\nprint(type(method))\nmethod()  # self 없이 호출 가능!",
     "steps": [
       {
-        "line": 2,
-        "title": "메서드 정의",
-        "explanation": "`def bark(self)`\n\n메서드는 클래스에 저장된 함수입니다.\n\n**self는 누가 전달하나요?**\n→ 파이썬이 자동으로!",
-        "highlight": [2, 3],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Dog", "pointsTo": "class_dog" }
-          ],
-          "objects": [
-            { "id": "class_dog", "type": "class", "value": "Dog [bark()]", "pyId": "140100", "highlight": true }
-          ]
-        }
-      },
-      {
+        "line": 1,
+        "title": "클래스 정의",
+        "explanation": "`Dog` 클래스와 그 안의 `bark` 메서드를 정의합니다. `bark` 메서드는 호출한 객체(`self`)의 ID를 출력합니다.",
+        "highlight": [1, 2, 3]
+    },
+    {
+        "line": 5,
+        "title": "객체(인스턴스) 생성",
+        "explanation": "`my_dog = Dog()`\n`Dog` 클래스의 인스턴스인 `my_dog`를 생성합니다. 이 객체의 고유 ID를 기억해두세요.",
+        "highlight": [5]
+    },
+    {
         "line": 8,
-        "title": "바운드 메서드 호출",
-        "explanation": "`my_dog.bark()`\n\n**무슨 일이 일어나나?**\n1. `my_dog.bark` → 바운드 메서드 객체 생성\n2. 이 객체는 my_dog를 \"기억\"함\n3. `()` 호출 시 self=my_dog 자동 전달\n\n**바운드 메서드 = 인스턴스 + 함수**",
-        "highlight": [8],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Dog", "pointsTo": "class_dog" },
-            { "name": "my_dog", "pointsTo": "inst_dog" }
-          ],
-          "objects": [
-            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100" },
-            { "id": "inst_dog", "type": "Dog", "value": "Dog instance", "pyId": "140200", "highlight": true }
-          ],
-          "output": ["멍멍! (id: 140200)"]
-        }
-      },
-      {
+        "title": "방법 1: 바운드 메서드 호출",
+        "explanation": "`my_dog.bark()`\n가장 일반적인 호출 방식입니다. `my_dog` 객체에 '묶인(bound)' `bark` 메서드가 호출되며, `my_dog` 자신이 `self` 인자로 자동 전달됩니다.",
+        "highlight": [8]
+    },
+    {
         "line": 11,
-        "title": "언바운드 호출",
-        "explanation": "`Dog.bark(my_dog)`\n\n**클래스에서 직접 호출!**\n\n이 경우 self를 명시적으로 전달해야 합니다.\n\n결과는 `my_dog.bark()`와 동일!",
-        "highlight": [11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "Dog", "pointsTo": "class_dog" },
-            { "name": "my_dog", "pointsTo": "inst_dog" }
-          ],
-          "objects": [
-            { "id": "class_dog", "type": "class", "value": "Dog", "pyId": "140100" },
-            { "id": "inst_dog", "type": "Dog", "value": "Dog instance", "pyId": "140200" }
-          ],
-          "output": ["멍멍! (id: 140200)", "멍멍! (id: 140200)"]
-        }
-      },
-      {
+        "title": "방법 2: 언바운드 메서드 호출",
+        "explanation": "`Dog.bark(my_dog)`\n클래스에서 직접 메서드를 호출할 수도 있습니다. 이 경우, `self`에 해당하는 객체(`my_dog`)를 첫 번째 인자로 직접 전달해줘야 합니다. 결과는 바운드 메서드 호출과 동일합니다.",
+        "highlight": [11]
+    },
+    {
         "line": 14,
-        "title": "메서드도 객체!",
-        "explanation": "`method = my_dog.bark`\n\n**메서드를 변수에 저장!**\n\n`type(method)` → `<class 'method'>`\n\n이 method 객체는 my_dog를 기억하고 있어서\n나중에 `method()` 호출하면 self가 자동 전달!",
-        "highlight": [14, 15],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "my_dog", "pointsTo": "inst_dog" },
-            { "name": "method", "pointsTo": "bound_method" }
-          ],
-          "objects": [
-            { "id": "inst_dog", "type": "Dog", "value": "Dog instance", "pyId": "140200" },
-            { "id": "bound_method", "type": "method", "value": "bark [self=my_dog]", "pyId": "140300", "highlight": true }
-          ],
-          "output": ["멍멍! (id: 140200)", "멍멍! (id: 140200)", "<class 'method'>"]
-        }
-      },
-      {
+        "title": "메서드를 변수에 할당",
+        "explanation": "`method = my_dog.bark`\n메서드도 객체이므로, 호출하는 `()` 괄호 없이 이름만 쓰면 변수에 할당할 수 있습니다. `method` 변수는 `my_dog`에 묶인 `bark` 메서드 객체를 가리킵니다.",
+        "highlight": [14]
+    },
+    {
+        "line": 15,
+        "title": "메서드 타입 확인",
+        "explanation": "`print(type(method))`\n`method` 변수의 타입을 출력합니다. 일반적인 'function'이 아닌, 'method' 타입임을 확인할 수 있습니다.",
+        "highlight": [15]
+    },
+    {
         "line": 16,
-        "title": "저장한 메서드 호출",
-        "explanation": "`method()` - 인자 없이 호출!\n\n**왜 self 없이 되나요?**\n\n바운드 메서드가 이미 인스턴스를 기억하고 있어서\n호출 시 자동으로 self를 전달합니다.\n\n**콜백에 유용!** (버튼 클릭 핸들러 등)",
-        "highlight": [16],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "method", "pointsTo": "bound_method" }
-          ],
-          "objects": [
-            { "id": "bound_method", "type": "method", "value": "bark [self=my_dog]", "pyId": "140300" }
-          ],
-          "output": ["멍멍! (id: 140200)", "멍멍! (id: 140200)", "<class 'method'>", "멍멍! (id: 140200)"]
-        }
-      }
+        "title": "저장된 메서드 호출",
+        "explanation": "`method()`\n`method` 변수에 저장된 바운드 메서드를 호출합니다. 이 메서드는 이미 `my_dog` 객체를 기억하고 있으므로, `self` 인자 없이도 호출할 수 있습니다.",
+        "highlight": [16]
+    }
     ]
   },
   "quiz": {

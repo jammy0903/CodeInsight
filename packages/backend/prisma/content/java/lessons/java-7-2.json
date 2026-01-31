@@ -6,33 +6,92 @@
     "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<String> list = new ArrayList<>();\n        list.add(\"Hello\");\n        \n        // 1. Compile-time Check\n        // list.add(123); // Error\n        \n        // 2. Runtime Reality (Type Erasure)\n        // Inside JVM, it is just ArrayList (raw type)\n        String s = list.get(0); \n        // Compiler inserts: (String) list.get(0)\n        \n        System.out.println(s);\n        \n        // Proof: getClass() is same for all generic types\n        ArrayList<Integer> intList = new ArrayList<>();\n        boolean sameClass = list.getClass() == intList.getClass();\n        System.out.println(\"Same Class? \" + sameClass);\n    }\n}",
     "steps": [
       {
+        "line": 5,
+        "title": "제네릭 리스트 생성",
+        "explanation": "`String` 타입을 담을 `ArrayList`를 생성합니다. 컴파일러는 이제 이 `list`에 `String`만 추가될 수 있도록 감시합니다.",
+        "highlight": [5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "list", "value": "-> ArrayList<String>"}]
+        }
+      },
+      {
+        "line": 6,
+        "title": "요소 추가",
+        "explanation": "`list`에 \"Hello\" 문자열을 추가합니다. `String` 타입이므로 정상적으로 추가됩니다.",
+        "highlight": [6],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [{"address": "ArrayList", "content": "[\"Hello\"]"}]
+        }
+      },
+      {
+        "line": 9,
+        "title": "컴파일 타임 타입 체크",
+        "explanation": "만약 이 라인의 주석을 풀고 정수 `123`을 추가하려고 하면, 컴파일러가 `ArrayList<String>`에 맞지 않는 타입이라며 에러를 발생시킵니다. 런타임까지 가기 전에 버그를 잡는 것입니다.",
+        "highlight": [9],
+        "visualizationType": "memory",
+        "memoryState": {
+          "error": "Compile Error: Incompatible types"
+        }
+      },
+      {
         "line": 13,
-        "title": "Type Erasure (타입 소거)",
-        "explanation": "컴파일이 끝나면 제네릭 타입 정보(`<String>`)는 모두 지워집니다(Soggeo). JVM은 `list`가 String 전용인지 Integer 전용인지 모릅니다. 그냥 `Object`들의 리스트로 취급합니다.",
-        "keyInsight": "하위 호환성(Java 5 이전 코드와 호환)을 유지하기 위해 이렇게 설계되었습니다.",
+        "title": "타입 소거와 자동 캐스팅",
+        "explanation": "리스트에서 요소를 꺼냅니다. 이때 `Type Erasure`가 일어납니다. 컴파일러는 `<String>` 정보를 지우는 대신, `(String)` 형변환 코드를 자동으로 삽입해줍니다. 개발자는 보이지 않지만, 실제로는 `String s = (String) list.get(0);` 와 같이 동작합니다.",
+        "keyInsight": "제네릭 타입 정보는 컴파일 시에만 사용되고 런타임에는 사라집니다.",
+        "highlight": [13],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "s", "value": "\"Hello\""}],
+          "note": "컴파일러가 (String) 캐스팅을 자동으로 추가"
+        }
+      },
+      {
+        "line": 16,
+        "title": "결과 출력",
+        "explanation": "안전하게 형변환된 문자열 `s`를 출력합니다.",
+        "highlight": [16],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Hello"]
+        }
+      },
+      {
+        "line": 19,
+        "title": "다른 타입의 제네릭 리스트 생성",
+        "explanation": "이번에는 `Integer`를 담는 `ArrayList`를 생성합니다. 소스 코드 상에서는 두 리스트가 명백히 다른 타입입니다.",
+        "highlight": [19],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {
-              "name": "list",
-              "value": "ArrayList (Raw)"
-            }
-          ],
-          "output": [
-            "Hello"
+              {"name": "list", "value": "-> ArrayList<String>"},
+              {"name": "intList", "value": "-> ArrayList<Integer>"}
           ]
         }
       },
       {
         "line": 20,
-        "title": "런타임 클래스 정보",
-        "explanation": "`ArrayList<String>`이나 `ArrayList<Integer>`나 런타임에는 똑같은 `ArrayList.class`입니다. 그래서 `instanceof ArrayList<String>` 같은 코드는 불가능합니다.",
+        "title": "런타임 클래스 비교",
+        "explanation": "`getClass()`는 런타임의 실제 클래스 정보를 반환합니다. Type Erasure 때문에, `list`와 `intList` 모두 런타임에는 그냥 `ArrayList.class`일 뿐입니다. 따라서 두 클래스 정보는 동일합니다.",
+        "keyInsight": "런타임에는 제네릭 타입 정보를 알 수 없다.",
+        "highlight": [20],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "Hello",
-            "Same Class? true"
-          ]
+            "stack": [
+                {"name": "sameClass", "value": "true"}
+            ],
+            "note": "list.getClass()와 intList.getClass()는 같다"
+        }
+      },
+      {
+        "line": 21,
+        "title": "비교 결과 출력",
+        "explanation": "두 변수의 런타임 클래스가 같으므로 `true`가 출력됩니다. 이는 Java 제네릭이 타입 소거 방식으로 구현되었음를 증명합니다.",
+        "highlight": [21],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["Hello", "Same Class? true"]
         }
       }
     ]

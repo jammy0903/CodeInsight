@@ -8,7 +8,7 @@
       {
         "line": 6,
         "title": "변수 a 선언",
-        "explanation": "**메모리 상태:**\nStack 메모리의 `main` 방(Stack Frame)에 `a`라는 이름표가 붙은 상자가 생기고, 그 안에 숫자 `10`이 들어갑니다.",
+        "explanation": "Stack 메모리의 `main` 프레임에 `a`라는 변수를 만들고 값 `10`을 저장합니다.",
         "highlight": [
           6
         ],
@@ -24,13 +24,26 @@
         }
       },
       {
+        "line": 7,
+        "title": "메서드 호출 전 출력",
+        "explanation": "`a`의 현재 값인 10을 출력합니다.",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "before: 10"
+          ]
+        }
+      },
+      {
         "line": 8,
         "title": "increment(a) 호출",
-        "explanation": "**값의 복사 (Pass by Value):**\n1. `increment` 메서드를 위한 **새로운 방(Stack Frame)**이 만들어집니다.\n2. `main` 방에 있는 `a`의 값(10)을 **복사**해서 `x`에게 줍니다.\n\n**비유:** 숙제를 친구에게 보여줄 때, 내 공책을 통째로 주는 게 아니라 **복사본**만 주는 것과 같습니다. 친구가 복사본에 낙서해도 내 원본은 멀쩡하죠.",
+        "explanation": "**값의 복사 (Pass by Value):** `increment` 메서드를 위한 새 스택 프레임이 생깁니다. `a`의 값(10)이 '복사'되어 새 프레임의 `x`에게 전달됩니다. 이제 `a`와 `x`는 완전히 별개의 변수입니다.",
         "keyInsight": "기본 타입 = 값만 복사, 원본과 완전 남남",
         "highlight": [
-          8,
-          1
+          8
         ],
         "visualizationType": "memory",
         "memoryState": {
@@ -52,8 +65,8 @@
       },
       {
         "line": 2,
-        "title": "x 증가",
-        "explanation": "`increment` 방 안에 있는 `x`의 값이 11로 바뀝니다.\n하지만 `main` 방에 있는 `a`는 끄떡없습니다. 벽으로 막혀있는 다른 방이기 때문입니다.",
+        "title": "파라미터 x 값 변경",
+        "explanation": "`increment` 프레임 안에 있는 `x`의 값이 11로 바뀝니다. `main` 프레임의 `a`는 영향을 받지 않습니다.",
         "keyInsight": "파라미터 변경 -> 원본 영향 없음",
         "highlight": [
           2
@@ -72,14 +85,13 @@
               "frame": "increment",
               "changed": true
             }
-          ],
-          "note": "Stack 프레임이 다름"
+          ]
         }
       },
       {
         "line": 3,
         "title": "함수 내부 출력",
-        "explanation": "이 방(`increment`) 안에서는 `x`가 11로 보입니다.",
+        "explanation": "`increment` 프레임 안에서 `x`의 값인 11을 출력합니다.",
         "highlight": [
           3
         ],
@@ -94,7 +106,7 @@
       {
         "line": 9,
         "title": "함수 반환 후 출력",
-        "explanation": "`increment` 메서드가 끝나고 그 방(Stack Frame)은 사라집니다. `x`도 함께 사라졌습니다.\n`main`으로 돌아와서 `a`를 보니 여전히 깔끔한 10입니다.\n\n**스택 프레임(Stack Frame)이란?**\n메서드가 호출될 때마다 생기는 독립적인 메모리 공간입니다. 지역변수들은 모두 이 안에 삽니다.",
+        "explanation": "`increment` 메서드가 종료되면 해당 스택 프레임(x 포함)은 사라집니다. `main` 프레임으로 돌아와 `a`를 출력하면, 여전히 원래 값인 10이 출력됩니다.",
         "keyInsight": "메서드 종료 -> 복사본 x 소멸",
         "highlight": [
           9

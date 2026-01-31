@@ -1,56 +1,16 @@
 {
   "lessonId": "js-2-3",
   "title": "호이스팅 (Hoisting)",
-  "concept": "JavaScript는 선언을 스코프 최상단으로 끌어올린다. 단, 초기화는 끌어올리지 않는다",
+  "concept": "JavaScript는 변수와 함수 선언을 스코프 맨 위로 끌어올린다 (호이스팅)",
   "content": {
-    "code": "console.log(a);\nconsole.log(b);\nconsole.log(c);\n\nvar a = 1;\nlet b = 2;\nconst c = 3;\n\nconsole.log(a, b, c);",
+    "code": "var message = 'Hello';\n\nfunction greet() {\n  console.log(inner);\n  var inner = 'World';\n  console.log(inner);\n  return message + ' ' + inner;\n}\n\nvar result = greet();\nconsole.log(result);",
     "steps": [
       {
-        "line": 0,
-        "title": "실행 컨텍스트 생성 단계 (Creation Phase)",
-        "explanation": "코드를 실행하기 전, 자바스크립트 엔진은 **생성 단계(Creation Phase)**를 거칩니다.\n이때 모든 변수 선언(var, let, const)과 함수 선언을 찾아 메모리에 미리 자리를 잡습니다.",
-        "keyInsight": "호이스팅은 '마법'이 아니라, **메모리 할당 시점**의 차이입니다.",
-        "analogy": "요리를 시작하기(Execution) 전에, 필요한 재료를 모두 꺼내서 조리대(Memory)에 올려두는(Creation) 것과 같습니다.",
-        "highlight": [],
-        "visualizationType": "scope",
-        "scopeState": {
-          "scopes": [
-            {
-              "name": "Global",
-              "type": "global",
-              "variables": [
-                {
-                  "name": "a",
-                  "value": "undefined",
-                  "keyword": "var",
-                  "hoisted": true
-                },
-                {
-                  "name": "b",
-                  "value": "<uninitialized>",
-                  "keyword": "let",
-                  "hoisted": true
-                },
-                {
-                  "name": "c",
-                  "value": "<uninitialized>",
-                  "keyword": "const",
-                  "hoisted": true
-                }
-              ]
-            }
-          ],
-          "phase": "creation"
-        }
-      },
-      {
         "line": 1,
-        "title": "console.log(a) - var는 undefined",
-        "explanation": "var a의 선언은 호이스팅되어 이미 존재합니다. 하지만 값 할당은 아직 안 됐으므로 undefined입니다.",
-        "keyInsight": "var는 호이스팅 시 undefined로 초기화됩니다.",
-        "highlight": [
-          1
-        ],
+        "title": "전역 변수 선언",
+        "explanation": "`var message = 'Hello'`가 실행됩니다. var는 **함수 스코프**이며, 호이스팅 됩니다.",
+        "keyInsight": "실제로 JS 엔진은 코드 실행 전에 모든 var 선언을 스코프 맨 위로 끌어올립니다.",
+        "highlight": [1],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -58,39 +18,20 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                {
-                  "name": "a",
-                  "value": "undefined",
-                  "keyword": "var",
-                  "accessed": true
-                },
-                {
-                  "name": "b",
-                  "value": "TDZ",
-                  "keyword": "let"
-                },
-                {
-                  "name": "c",
-                  "value": "TDZ",
-                  "keyword": "const"
-                }
+                { "name": "message", "value": "'Hello'", "keyword": "var" }
               ]
             }
           ],
-          "output": [
-            "undefined"
-          ]
+          "highlightScope": "Global",
+          "highlightVariable": "message"
         }
       },
       {
-        "line": 2,
-        "title": "console.log(b) - let은 TDZ!",
-        "explanation": "let b도 호이스팅됩니다! 하지만 TDZ(Temporal Dead Zone)에 있어서 접근하면 에러가 발생합니다.",
-        "keyInsight": "TDZ = 선언은 됐지만 초기화 전까지 접근 불가 구간",
-        "tip": "TDZ는 선언 위치부터 초기화 위치 사이의 구간입니다.",
-        "highlight": [
-          2
-        ],
+        "line": 10,
+        "title": "greet() 함수 호출",
+        "explanation": "`greet()` 함수를 호출합니다. 함수 스코프가 생성되고, 함수 내부의 var 선언이 **호이스팅**됩니다.",
+        "keyInsight": "함수가 호출되면, 함수 내부의 모든 var 변수가 먼저 undefined로 초기화됩니다.",
+        "highlight": [10],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -98,39 +39,28 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                {
-                  "name": "a",
-                  "value": "undefined",
-                  "keyword": "var"
-                },
-                {
-                  "name": "b",
-                  "value": "TDZ",
-                  "keyword": "let",
-                  "accessed": true,
-                  "error": true
-                },
-                {
-                  "name": "c",
-                  "value": "TDZ",
-                  "keyword": "const"
-                }
+                { "name": "message", "value": "'Hello'", "keyword": "var" },
+                { "name": "result", "value": "undefined", "keyword": "var" }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                { "name": "inner", "value": "undefined", "keyword": "var", "hoisted": true }
               ]
             }
           ],
-          "output": [
-            "undefined",
-            "ReferenceError: Cannot access 'b' before initialization"
-          ]
+          "highlightScope": "greet()"
         }
       },
       {
-        "line": 3,
-        "title": "console.log(c) - const도 TDZ!",
-        "explanation": "const c도 마찬가지로 TDZ에 있어서 에러가 발생합니다.",
-        "highlight": [
-          3
-        ],
+        "line": 4,
+        "title": "호이스팅 확인 - undefined 출력",
+        "explanation": "`console.log(inner)`가 실행됩니다. inner는 아직 할당 전이지만, **호이스팅** 덕분에 에러 없이 `undefined`가 출력됩니다.",
+        "keyInsight": "var는 선언만 호이스팅되고, 할당은 원래 위치에서 실행됩니다. 그래서 undefined!",
+        "analogy": "책상에 'inner'라는 이름표를 먼저 붙이고(선언), 나중에 내용물을 넣는(할당) 것과 같습니다.",
+        "highlight": [4],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -138,40 +68,26 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                {
-                  "name": "a",
-                  "value": "undefined",
-                  "keyword": "var"
-                },
-                {
-                  "name": "b",
-                  "value": "TDZ",
-                  "keyword": "let"
-                },
-                {
-                  "name": "c",
-                  "value": "TDZ",
-                  "keyword": "const",
-                  "accessed": true,
-                  "error": true
-                }
+                { "name": "message", "value": "'Hello'", "keyword": "var" }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                { "name": "inner", "value": "undefined", "keyword": "var", "accessed": true }
               ]
             }
           ],
-          "output": [
-            "undefined",
-            "ReferenceError",
-            "ReferenceError"
-          ]
+          "output": ["undefined"]
         }
       },
       {
         "line": 5,
-        "title": "var a = 1 (초기화)",
-        "explanation": "이제 a에 값 1이 할당됩니다. 선언은 이미 호이스팅됐고, 여기서 값만 할당됩니다.",
-        "highlight": [
-          5
-        ],
+        "title": "실제 할당 실행",
+        "explanation": "`var inner = 'World'`의 할당 부분이 실행됩니다. 이제 inner = 'World'가 됩니다.",
+        "keyInsight": "호이스팅은 선언만 끌어올리고, 할당(= 'World')은 원래 위치에서 실행됩니다.",
+        "highlight": [5],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -179,22 +95,14 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                {
-                  "name": "a",
-                  "value": 1,
-                  "keyword": "var",
-                  "changed": true
-                },
-                {
-                  "name": "b",
-                  "value": "TDZ",
-                  "keyword": "let"
-                },
-                {
-                  "name": "c",
-                  "value": "TDZ",
-                  "keyword": "const"
-                }
+                { "name": "message", "value": "'Hello'", "keyword": "var" }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                { "name": "inner", "value": "'World'", "keyword": "var", "changed": true }
               ]
             }
           ]
@@ -202,12 +110,10 @@
       },
       {
         "line": 6,
-        "title": "let b = 2 (TDZ 종료)",
-        "explanation": "이 줄에서 b가 초기화됩니다. 이제 TDZ가 끝나고 b에 접근할 수 있습니다.",
-        "keyInsight": "let/const는 초기화 줄에서 TDZ가 끝납니다.",
-        "highlight": [
-          6
-        ],
+        "title": "할당 후 값 확인",
+        "explanation": "`console.log(inner)`가 실행됩니다. 이번에는 'World'가 출력됩니다.",
+        "keyInsight": "같은 변수가 코드 위치에 따라 다른 값을 가집니다. 호이스팅의 함정!",
+        "highlight": [6],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -215,34 +121,26 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                {
-                  "name": "a",
-                  "value": 1,
-                  "keyword": "var"
-                },
-                {
-                  "name": "b",
-                  "value": 2,
-                  "keyword": "let",
-                  "changed": true
-                },
-                {
-                  "name": "c",
-                  "value": "TDZ",
-                  "keyword": "const"
-                }
+                { "name": "message", "value": "'Hello'", "keyword": "var" }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                { "name": "inner", "value": "'World'", "keyword": "var", "accessed": true }
               ]
             }
-          ]
+          ],
+          "output": ["undefined", "'World'"]
         }
       },
       {
         "line": 7,
-        "title": "const c = 3 (TDZ 종료)",
-        "explanation": "c도 초기화되어 TDZ가 끝납니다.",
-        "highlight": [
-          7
-        ],
+        "title": "결과 반환",
+        "explanation": "`message + ' ' + inner`를 반환합니다. 'Hello World'가 됩니다.",
+        "keyInsight": "message는 전역 스코프에서, inner는 함수 스코프에서 가져옵니다 (스코프 체인).",
+        "highlight": [7],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -250,34 +148,24 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                {
-                  "name": "a",
-                  "value": 1,
-                  "keyword": "var"
-                },
-                {
-                  "name": "b",
-                  "value": 2,
-                  "keyword": "let"
-                },
-                {
-                  "name": "c",
-                  "value": 3,
-                  "keyword": "const",
-                  "changed": true
-                }
+                { "name": "message", "value": "'Hello'", "keyword": "var", "accessed": true }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                { "name": "inner", "value": "'World'", "keyword": "var", "accessed": true }
               ]
             }
           ]
         }
       },
       {
-        "line": 9,
-        "title": "정상 출력",
-        "explanation": "이제 모든 변수가 초기화되어 정상적으로 출력됩니다.",
-        "highlight": [
-          9
-        ],
+        "line": 10,
+        "title": "result에 할당",
+        "explanation": "greet() 함수가 반환한 'Hello World'가 result 변수에 저장됩니다.",
+        "highlight": [10],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -285,59 +173,58 @@
               "name": "Global",
               "type": "global",
               "variables": [
-                {
-                  "name": "a",
-                  "value": 1,
-                  "keyword": "var",
-                  "accessed": true
-                },
-                {
-                  "name": "b",
-                  "value": 2,
-                  "keyword": "let",
-                  "accessed": true
-                },
-                {
-                  "name": "c",
-                  "value": 3,
-                  "keyword": "const",
-                  "accessed": true
-                }
+                { "name": "message", "value": "'Hello'", "keyword": "var" },
+                { "name": "result", "value": "'Hello World'", "keyword": "var", "changed": true }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "최종 결과 출력",
+        "explanation": "result를 출력합니다. 'Hello World'가 출력됩니다.",
+        "keyInsight": "호이스팅 때문에 첫 번째 console.log는 undefined, 두 번째는 'World'가 출력되었습니다.",
+        "highlight": [11],
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                { "name": "message", "value": "'Hello'", "keyword": "var" },
+                { "name": "result", "value": "'Hello World'", "keyword": "var", "accessed": true }
               ]
             }
           ],
-          "output": [
-            "undefined",
-            "ReferenceError",
-            "ReferenceError",
-            "1 2 3"
-          ]
+          "output": ["undefined", "'World'", "'Hello World'"]
         }
       }
     ]
   },
   "quiz": {
-    "question": "다음 코드의 결과는?\n\nconsole.log(typeof x);\nlet x = 5;",
+    "question": "다음 코드의 첫 번째 console.log 출력은?\n\nfunction test() {\n  console.log(x);\n  var x = 10;\n}\ntest();",
     "options": [
+      "10",
       "undefined",
-      "number",
-      "ReferenceError",
+      "ReferenceError 발생",
       "null"
     ],
-    "correctIndex": 2,
-    "explanation": "let은 호이스팅되지만 TDZ에 있으므로 초기화 전에 접근하면 ReferenceError가 발생합니다. typeof도 예외가 아닙니다!"
+    "correctIndex": 1,
+    "explanation": "var x의 선언은 함수 맨 위로 호이스팅되어 undefined로 초기화됩니다. 할당(= 10)은 원래 위치에서 실행되므로, 첫 번째 console.log에서는 undefined가 출력됩니다."
   },
   "misconceptions": [
     {
-      "wrong": "let과 const는 호이스팅되지 않는다",
-      "correct": "호이스팅됩니다! 단, **초기화되지 않은 상태(Uninitialized)**로 메모리에 등록되므로 접근 시 에러가 납니다.",
-      "why": "var는 `undefined`로 자동 초기화해주지만, let/const는 안전을 위해 초기화를 미룹니다. 이 구간을 TDZ라고 부릅니다."
+      "wrong": "호이스팅은 변수를 물리적으로 코드 맨 위로 이동시킨다",
+      "correct": "실제로 코드가 이동하는 것이 아닙니다. JS 엔진이 실행 전에 선언을 먼저 처리할 뿐입니다.",
+      "why": "컴파일 단계에서 선언을 메모리에 등록하고, 실행 단계에서 할당을 수행합니다. 코드 자체는 변하지 않습니다."
     },
     {
-      "wrong": "호이스팅은 코드를 실제로 위로 옮기는 것이다",
-      "correct": "아닙니다. 코드는 그대로 있고, 엔진이 **메모리 할당**을 먼저 하는 것입니다.",
-      "why": "물리적인 코드 이동이 아니라, 실행 컨텍스트의 동작 방식입니다."
+      "wrong": "let과 const도 var처럼 호이스팅된다",
+      "correct": "let/const도 호이스팅되지만, TDZ(Temporal Dead Zone) 때문에 선언 전에 접근하면 에러가 발생합니다.",
+      "why": "let/const는 선언 전에 접근하면 ReferenceError가 발생합니다. 이것이 var와의 큰 차이점입니다."
     }
   ],
-  "keyTakeaway": "var = undefined로 호이스팅, let/const = TDZ로 호이스팅 (접근 불가)"
+  "keyTakeaway": "var는 선언만 호이스팅(undefined), 할당은 원래 위치. let/const는 TDZ로 선언 전 접근 시 에러 발생."
 }

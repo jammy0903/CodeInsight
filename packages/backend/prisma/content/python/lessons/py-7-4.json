@@ -7,77 +7,70 @@
     "steps": [
       {
         "line": 1,
-        "title": "gc 모듈",
-        "explanation": "`import gc` - 가비지 컬렉터 모듈\n\n**파이썬 메모리 관리의 두 축:**\n1. 참조 카운팅 (refcount=0 → 즉시 삭제)\n2. gc 모듈 (순환 참조 정리)\n\ngc는 주기적으로 또는 수동으로 실행!",
-        "highlight": [1],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "gc", "pointsTo": "gc_module" }
-          ],
-          "objects": [
-            { "id": "gc_module", "type": "module", "value": "gc (garbage collector)", "pyId": "140050", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "gc 모듈 임포트",
+        "explanation": "`import gc`\n파이썬의 가비지 컬렉터(Garbage Collector) 인터페이스인 `gc` 모듈을 가져옵니다.",
+        "highlight": [1]
+    },
+    {
+        "line": 3,
+        "title": "Node 클래스 정의",
+        "explanation": "순환 참조를 만들기 위한 `Node` 클래스를 정의합니다.",
+        "highlight": [3, 4, 5, 6]
+    },
+    {
+        "line": 8,
+        "title": "첫 번째 노드 생성",
+        "explanation": "`a = Node(\"A\")`\n'A' 노드를 생성합니다.",
+        "highlight": [8]
+    },
+    {
+        "line": 9,
+        "title": "두 번째 노드 생성",
+        "explanation": "`b = Node(\"B\")`\n'B' 노드를 생성합니다.",
+        "highlight": [9]
+    },
+    {
+        "line": 10,
+        "title": "참조 연결 (A -> B)",
+        "explanation": "`a.next = b`\n`a`가 `b`를 가리키게 합니다.",
+        "highlight": [10]
+    },
+    {
         "line": 11,
-        "title": "순환 참조 생성",
-        "explanation": "`a.next = b`, `b.next = a`\n\nA ↔ B 순환 참조 완성!\n\n**지난 레슨에서 배웠듯이:**\ndel a, del b 해도 refcount > 0이라 삭제 안 됨",
-        "highlight": [10, 11],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "node_a" },
-            { "name": "b", "pointsTo": "node_b" }
-          ],
-          "objects": [
-            { "id": "node_a", "type": "Node", "value": "{name: A, next: →B}", "pyId": "140100" },
-            { "id": "node_b", "type": "Node", "value": "{name: B, next: →A}", "pyId": "140200" }
-          ]
-        }
-      },
-      {
+        "title": "순환 참조 완성 (B -> A)",
+        "explanation": "`b.next = a`\n`b`가 `a`를 가리키게 하여, `a`와 `b`가 서로를 참조하는 순환 참조 구조를 만듭니다.",
+        "highlight": [11]
+    },
+    {
+        "line": 13,
+        "title": "변수 'a' 삭제",
+        "explanation": "`del a`\n변수 `a`를 삭제합니다. 하지만 `b.next`가 여전히 `a`가 가리키던 객체를 참조하므로 객체는 사라지지 않습니다.",
+        "highlight": [13]
+    },
+    {
         "line": 14,
-        "title": "변수 삭제 후",
-        "explanation": "`del a`, `del b`\n\n변수는 삭제됐지만 객체들은 살아있음!\n\n**고아 객체들:**\n- 접근 불가 (변수 없음)\n- 삭제도 안 됨 (서로 참조 중)\n\n이게 바로 gc가 처리해야 할 대상!",
-        "highlight": [13, 14],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [],
-          "objects": [
-            { "id": "node_a", "type": "Node", "value": "{A} ↔", "pyId": "140100", "highlight": true },
-            { "id": "node_b", "type": "Node", "value": "↔ {B}", "pyId": "140200", "highlight": true }
-          ]
-        }
-      },
-      {
+        "title": "변수 'b' 삭제",
+        "explanation": "`del b`\n변수 `b`도 삭제합니다. 이제 두 객체에 접근할 이름은 없지만, 객체끼리 서로를 참조하고 있어 참조 횟수가 0이 되지 않아 메모리에 계속 남아있게 됩니다.",
+        "highlight": [14]
+    },
+    {
         "line": 16,
-        "title": "gc.get_count()",
-        "explanation": "`gc.get_count()` → (개수, 개수, 개수)\n\n**세대별 관리 (Generational GC)**\n- 세대 0: 새로 생성된 객체\n- 세대 1: 1번 살아남은 객체\n- 세대 2: 오래된 객체\n\n젊은 객체일수록 자주 검사!\n(대부분의 객체는 금방 사라지니까)",
-        "highlight": [16],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [],
-          "objects": [
-            { "id": "node_a", "type": "Node", "value": "{A} ↔", "pyId": "140100" },
-            { "id": "node_b", "type": "Node", "value": "↔ {B}", "pyId": "140200" }
-          ],
-          "output": ["정리 전 쓰레기: (gen0, gen1, gen2)"]
-        }
-      },
-      {
+        "title": "가비지 컬렉션 상태 확인",
+        "explanation": "`print(f\"...{gc.get_count()}\")`\n현재 가비지 컬렉터의 각 세대별 객체 수를 출력합니다. 아직 정리되지 않은 순환 참조 객체가 여기에 포함됩니다.",
+        "highlight": [16]
+    },
+    {
         "line": 17,
-        "title": "gc.collect() - 강제 정리!",
-        "explanation": "`gc.collect()` - 가비지 컬렉션 수동 실행!\n\n**무슨 일이 일어나나:**\n1. 모든 객체 순회\n2. 도달 불가능한 객체 찾기\n3. 순환 참조 감지\n4. 객체들 삭제!\n\n**반환값:** 정리된 객체 수",
-        "highlight": [17, 18],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [],
-          "objects": [],
-          "output": ["정리 전 쓰레기: (gen0, gen1, gen2)", "정리된 객체 수: 2"]
-        }
-      }
+        "title": "수동 가비지 컬렉션 실행",
+        "explanation": "`num = gc.collect()`\n가비지 컬렉션을 수동으로 실행하여, 도달할 수 없는 순환 참조 객체들을 찾아 메모리에서 해제합니다. `collect` 함수는 해제된 객체의 수를 반환합니다.",
+        "highlight": [17]
+    },
+    {
+        "line": 18,
+        "title": "정리된 객체 수 확인",
+        "explanation": "`print(f\"...{num}\")`\n가비지 컬렉션으로 인해 정리된 객체의 수를 출력합니다. 순환 참조를 이루고 있던 `a`와 `b` 객체, 총 2개가 정리되었음을 알 수 있습니다.",
+        "highlight": [18]
+    }
     ]
   },
   "quiz": {

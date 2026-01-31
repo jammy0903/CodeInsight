@@ -84,22 +84,32 @@
       },
       {
         "line": 7,
-        "title": "isPresent() - 확인하고 꺼내기",
-        "explanation": "고전적인 방식입니다.\n\"상자에 값이 있나요?\"(`isPresent`) 확인하고, \"있으면 꺼냅니다\"(`get`).\n안전하지만, `if (x != null)`랑 다를 게 별로 없어서 코드가 길어집니다.",
+        "title": "isPresent() - 확인하기",
+        "explanation": "고전적인 방식입니다. \"상자에 값이 있나요?\"(`isPresent`) 라고 물어봅니다. `opt2`는 비어있으므로 `false`를 반환하고, `if` 블록은 실행되지 않습니다.",
         "highlight": [
-          7,
-          8,
-          9
+          7
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "opt2는 empty이므로 블록 실행 안 됨"
+          "note": "opt2는 empty이므로 false 반환, 블록 실행 안 됨"
+        }
+      },
+      {
+        "line": 8,
+        "title": "조건부 get()",
+        "explanation": "이 라인은 `isPresent()`가 `true`일 때만 실행됩니다. 값이 있음을 보장하고 안전하게 `get()`을 호출하는 패턴이지만, 코드가 길어지는 단점이 있습니다.",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+            "note": "앞의 if 조건이 false이므로 이 라인은 실행되지 않음"
         }
       },
       {
         "line": 11,
         "title": "orElse() - 안전한 기본값 제공",
-        "explanation": "**가장 권장하는 방식:**\n\"상자를 열어봐. 값이 있으면 그거 쓰고, **비어있으면 'default'를 대신 써.**\"\n\n한 줄로 깔끔하고 안전하게 처리됩니다. `if`문도 필요 없고, NPE 걱정도 없습니다.",
+        "explanation": "**가장 권장하는 방식:** \"상자를 열어봐. 값이 있으면 그거 쓰고, **비어있으면 'default'를 대신 써.**\" 한 줄로 깔끔하고 안전하게 값을 얻을 수 있습니다.",
         "keyInsight": "orElse() = 안전한 기본값 패턴",
         "highlight": [
           11
@@ -118,7 +128,7 @@
       {
         "line": 13,
         "title": "ifPresent() - 함수형 스타일",
-        "explanation": "\"값이 있으면 이 함수(람다)를 실행 해줘. 없으면 말고.\"\n값을 굳이 꺼내지 않고, 상자 안에서 작업을 처리하도록 시키는 세련된 방법입니다.",
+        "explanation": "\"값이 있으면 이 함수(람다)를 실행 해줘. 없으면 말고.\" 값을 꺼내지 않고, 상자 안에서 작업을 처리하도록 시키는 세련된 방법입니다. `opt1`은 값이 있으므로 내부 람다가 실행됩니다.",
         "keyInsight": "ifPresent() = 값 있을 때만 실행",
         "highlight": [
           13

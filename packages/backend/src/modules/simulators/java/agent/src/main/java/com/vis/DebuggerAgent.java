@@ -6,9 +6,9 @@ import com.sun.jdi.connect.LaunchingConnector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import com.sun.jdi.connect.VMStartException;
 import com.sun.jdi.event.*;
-import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequestManager;
+import com.sun.jdi.request.StepRequest;
 
 import java.io.IOException;
 import java.util.Map;
@@ -19,6 +19,8 @@ public class DebuggerAgent {
     private VirtualMachine vm;
     private final SnapshotMaker snapshotMaker;
     private final JsonWriter jsonWriter;
+    private int previousLine = -1;
+    private ThreadReference previousThread = null;
 
     public DebuggerAgent(String targetClassName) {
         this.targetClassName = targetClassName;
@@ -72,12 +74,21 @@ public class DebuggerAgent {
             EventSet eventSet = eventQueue.remove();
             for (Event event : eventSet) {
                 if (event instanceof VMDeathEvent || event instanceof VMDisconnectEvent) {
+                    // VM 종료 전 마지막 라인 출력
+                    if (previousLine != -1 && previousThread != null) {
+                        try {
+                            Map<String, Object> snapshot = snapshotMaker.capture(previousThread, previousLine);
+                            jsonWriter.print(snapshot);
+                        } catch (Exception e) {
+                            // VM이 이미 종료되었으면 무시
+                        }
+                    }
                     connected = false;
                     break;
                 } else if (event instanceof ClassPrepareEvent) {
-                    createBreakpointRequests(vm, (ClassPrepareEvent) event);
-                } else if (event instanceof BreakpointEvent) {
-                    processBreakpoint((BreakpointEvent) event);
+                    createStepRequest(vm, (ClassPrepareEvent) event);
+                } else if (event instanceof StepEvent) {
+                    processStep((StepEvent) event);
                 } else if (event instanceof ExceptionEvent) {
                     ExceptionEvent exceptionEvent = (ExceptionEvent) event;
                     // Print full stack trace for better diagnostics
@@ -105,44 +116,70 @@ public class DebuggerAgent {
         }
     }
 
-    private void createBreakpointRequests(VirtualMachine vm, ClassPrepareEvent event) throws AbsentInformationException {
+    private void createStepRequest(VirtualMachine vm, ClassPrepareEvent event) throws AbsentInformationException {
         EventRequestManager mgr = vm.eventRequestManager();
-        ReferenceType refType = event.referenceType();
+        ThreadReference thread = event.thread();
 
-        // Set a breakpoint at every executable line
-        for (Location loc : refType.allLineLocations()) {
-            if (loc.lineNumber() != -1) { // Only valid lines
-                BreakpointRequest req = mgr.createBreakpointRequest(loc);
-                req.enable();
-            }
-        }
+        // Create a step request to execute line-by-line
+        // STEP_LINE: step to the next line
+        // STEP_INTO: step into method calls (not over them)
+        StepRequest stepRequest = mgr.createStepRequest(
+            thread,
+            StepRequest.STEP_LINE,
+            StepRequest.STEP_INTO
+        );
 
-        vm.resume(); // Resume the VM after setting breakpoints
+        // Only step in the target class (not JDK classes)
+        stepRequest.addClassFilter(targetClassName);
+        stepRequest.enable();
+
+        vm.resume(); // Resume the VM to start stepping
     }
 
-    private void processBreakpoint(BreakpointEvent event) {
+    private void processStep(StepEvent event) {
         ThreadReference thread = event.thread();
+        int currentLine = event.location().lineNumber();
 
         try {
             // 스레드가 suspended 상태인지 확인 (defensive check)
             if (!thread.isSuspended()) {
-                System.err.println("Warning: Thread not suspended at breakpoint, suspending now...");
+                System.err.println("Warning: Thread not suspended at step, suspending now...");
                 thread.suspend();
             }
 
-            Map<String, Object> snapshot = snapshotMaker.capture(thread, event.location().lineNumber());
-            jsonWriter.print(snapshot);
+            // StepEvent는 "다음 라인 진입 시점"에 발생
+            // 따라서 이전 라인의 실행이 완료된 상태
+            if (previousLine != -1 && previousThread != null) {
+                // 이전 라인의 스냅샷 출력 (실제로 실행 완료된 라인)
+                Map<String, Object> snapshot = snapshotMaker.capture(thread, previousLine);
+                jsonWriter.print(snapshot);
+            }
+
+            // 현재 라인을 다음 스텝을 위해 저장
+            previousLine = currentLine;
+            previousThread = thread;
 
         } catch (VMDisconnectedException e) {
-            // VM이 이미 종료됨 - 정상적인 상황 (프로그램 종료 시 발생)
-            // 마지막 breakpoint 처리 중 VM이 종료될 수 있음
+            // VM 종료 시 마지막 라인 출력
+            if (previousLine != -1 && previousThread != null) {
+                try {
+                    Map<String, Object> snapshot = snapshotMaker.capture(previousThread, previousLine);
+                    jsonWriter.print(snapshot);
+                } catch (Exception ignored) {
+                    // 이미 종료된 상태에서는 무시
+                }
+            }
         } catch (IncompatibleThreadStateException e) {
             // Race condition 발생 시 재시도
             System.err.println("Thread state incompatible, retrying after explicit suspend...");
             try {
                 thread.suspend();
-                Map<String, Object> snapshot = snapshotMaker.capture(thread, event.location().lineNumber());
-                jsonWriter.print(snapshot);
+                if (previousLine != -1) {
+                    Map<String, Object> snapshot = snapshotMaker.capture(thread, previousLine);
+                    jsonWriter.print(snapshot);
+                }
+                previousLine = currentLine;
+                previousThread = thread;
             } catch (VMDisconnectedException vme) {
                 // VM이 이미 종료됨 - 정상적인 상황
             } catch (Exception retryException) {
@@ -150,7 +187,7 @@ public class DebuggerAgent {
                 retryException.printStackTrace(System.err);
             }
         } catch (Exception e) {
-            System.err.println("Error processing breakpoint: " + e.getMessage());
+            System.err.println("Error processing step: " + e.getMessage());
             e.printStackTrace(System.err);
         }
     }

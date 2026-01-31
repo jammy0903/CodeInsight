@@ -192,3 +192,13 @@ VITE_API_URL=http://localhost:3002
 - **GitHub**: https://github.com/jammy0903/CodeInsight
 - **로컬 경로**: `/home/jammy/projects/C-OSINE`
 - **데이터베이스**: Neon PostgreSQL
+
+---
+
+## 💡 개발 환경 노트
+
+### 브라우저 캐시
+- ⚠️ **사용자는 항상 Vite 캐시를 제거하고 하드 리프레시를 함**
+- ⚠️ **브라우저 캐시 문제로 가정하지 말 것**
+- 변경사항이 반영 안 되면 → 실제 코드 문제 확인
+- 캐시 클리어 제안 금지

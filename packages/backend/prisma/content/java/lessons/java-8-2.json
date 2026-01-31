@@ -6,34 +6,45 @@
     "code": "import java.util.HashMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        HashMap<String, Integer> scores = new HashMap<>();\n        \n        scores.put(\"Alice\", 90);\n        scores.put(\"Bob\", 85);\n        \n        System.out.println(scores.get(\"Alice\")); // 90\n    }\n}",
     "steps": [
       {
-        "line": 7,
-        "title": "데이터 저장 (put)",
-        "explanation": "Alice라는 이름을 구멍(Bucket)에 넣으려 합니다.\nHashMap은 내부적으로 '해시 함수'를 사용하여 \"Alice\"를 숫자 주소로 변환합니다. \n\n**비유:** 'Alice'라는 글자를 보고 '102번 서랍'이라는 숫자를 계산해내는 요리사와 같습니다.",
-        "highlight": [
-          7
-        ],
+        "line": 5,
+        "title": "HashMap 생성",
+        "explanation": "`String`을 키로, `Integer`를 값으로 사용하는 `HashMap`을 생성합니다. 내부적으로는 키-값 쌍을 저장할 수 있는 '버킷(bucket)'이라는 배열 구조를 가집니다.",
+        "highlight": [5],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "address": "Bucket[102]",
-              "key": "Alice",
-              "value": 90
-            }
-          ]
+            "heap": [{"address": "scores", "class": "HashMap", "buckets": "[]"}]
+        }
+      },
+      {
+        "line": 7,
+        "title": "첫 번째 데이터 저장 (put)",
+        "explanation": "`put` 메서드는 키(`\"Alice\"`)의 해시코드를 계산하여 저장할 버킷의 위치를 결정합니다. 그리고 해당 위치에 키와 값(`90`)을 저장합니다.",
+        "keyInsight": "Key -> Hash Function -> Index",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [{"address": "scores", "buckets": "[..., {\"Alice\": 90}, ...]" }]
+        }
+      },
+      {
+        "line": 8,
+        "title": "두 번째 데이터 저장 (put)",
+        "explanation": "새로운 키(`\"Bob\"`)에 대해서도 해시코드를 계산하여 다른 버킷 위치를 찾아 값(`85`)을 저장합니다.",
+        "highlight": [8],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [{"address": "scores", "buckets": "[..., {\"Bob\": 85}, ..., {\"Alice\": 90}, ...]"}]
         }
       },
       {
         "line": 10,
-        "title": "데이터 찾기 (get)",
-        "explanation": "이름으로 점수를 찾을 때도 다시 해시 함수를 씁니다.\n\"Alice\"를 요리사에게 보여주면 바로 \"102번 서랍에 있어요!\"라고 알려줍니다.\n\n**장점:** 데이터가 100만 개가 있어도, 서랍 번호만 계산하면 바로 찾을 수 있어 매우 빠릅니다.",
-        "keyInsight": "Key -> Hash Function -> Index",
-        "highlight": [
-          10
-        ],
+        "title": "데이터 조회 (get)",
+        "explanation": "`get` 메서드는 키(`\"Alice\"`)의 해시코드를 다시 계산하여 데이터가 저장된 버킷 위치로 즉시 이동합니다. 그리고 해당 키에 연결된 값(`90`)을 찾아 반환합니다. 이 과정은 데이터의 양과 상관없이 매우 빠릅니다.",
+        "keyInsight": "O(1) 시간 복잡도: 검색 속도가 데이터 양과 거의 무관.",
+        "highlight": [10],
         "visualizationType": "memory",
         "memoryState": {
-          "note": "시간 복잡도 O(1): 검색 속도가 데이터 양과 상관없이 일정함"
+            "output": ["90"]
         }
       }
     ]

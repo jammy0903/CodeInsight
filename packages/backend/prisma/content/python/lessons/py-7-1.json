@@ -6,88 +6,59 @@
     "code": "import sys\n\na = [1, 2, 3]\nprint(f\"a만 참조: {sys.getrefcount(a)}\")\n\nb = a  # 같은 객체 참조\nprint(f\"a, b 참조: {sys.getrefcount(a)}\")\n\nc = a  # 또 참조\nprint(f\"a, b, c 참조: {sys.getrefcount(a)}\")\n\ndel b  # 참조 제거\nprint(f\"del b 후: {sys.getrefcount(a)}\")",
     "steps": [
       {
+        "line": 1,
+        "title": "sys 모듈 임포트",
+        "explanation": "`import sys`\n참조 횟수를 확인하는 특별한 함수 `getrefcount`를 사용하기 위해 `sys` 모듈을 가져옵니다.",
+        "highlight": [1]
+    },
+    {
         "line": 3,
         "title": "객체 생성과 첫 참조",
-        "explanation": "`a = [1, 2, 3]`\n\n리스트 객체가 생성되고 `a`가 참조합니다.\n\n**참조 카운팅 (Reference Counting)**\n- 파이썬의 메모리 관리 핵심!\n- 각 객체는 \"몇 개의 이름이 나를 가리키나?\"를 기록\n- 이 숫자가 참조 횟수 (refcount)",
-        "highlight": [3],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_obj" }
-          ],
-          "objects": [
-            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 1)", "pyId": "140100", "highlight": true }
-          ]
-        }
-      },
-      {
+        "explanation": "`a = [1, 2, 3]`\n리스트 객체 `[1, 2, 3]`이 메모리에 생성되고, 변수 `a`가 이 객체를 가리킵니다. 현재 이 객체를 가리키는 이름은 `a` 하나뿐이므로, 객체의 '참조 횟수(reference count)'는 1입니다.",
+        "highlight": [3]
+    },
+    {
         "line": 4,
-        "title": "getrefcount 이해",
-        "explanation": "`sys.getrefcount(a)` → **2**가 나옴!\n\n**왜 1이 아니라 2?**\n- a가 가리키는 참조: 1\n- getrefcount 함수에 전달될 때 임시 참조: +1\n\n실제 refcount = 출력값 - 1",
-        "highlight": [4],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_obj" }
-          ],
-          "objects": [
-            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 1+1)", "pyId": "140100" }
-          ],
-          "output": ["a만 참조: 2"]
-        }
-      },
-      {
+        "title": "참조 횟수 확인 (getrefcount)",
+        "explanation": "`print(f\"...{sys.getrefcount(a)}\")`\n`a`가 가리키는 객체의 참조 횟수를 출력합니다. 결과가 2인 이유는, `a`의 참조 1개에 더해 `getrefcount` 함수에 인자로 전달되는 동안 임시 참조가 1개 더 생기기 때문입니다.",
+        "highlight": [4]
+    },
+    {
         "line": 6,
-        "title": "참조 추가 (b = a)",
-        "explanation": "`b = a` - 같은 객체를 b도 가리킴!\n\n**참조 횟수 증가!**\n- 실제 refcount: 2 (a, b)\n- getrefcount 출력: 3 (+1 임시)\n\n객체는 복사되지 않음, 화살표만 추가!",
-        "highlight": [6, 7],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_obj" },
-            { "name": "b", "pointsTo": "list_obj" }
-          ],
-          "objects": [
-            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 2)", "pyId": "140100", "highlight": true }
-          ],
-          "output": ["a만 참조: 2", "a, b 참조: 3"]
-        }
-      },
-      {
+        "title": "참조 추가",
+        "explanation": "`b = a`\n변수 `b`도 `a`와 똑같은 리스트 객체를 가리키게 됩니다. 이제 이 객체의 참조 횟수는 `a`와 `b`, 총 2개로 늘어납니다.",
+        "highlight": [6]
+    },
+    {
+        "line": 7,
+        "title": "늘어난 참조 횟수 확인",
+        "explanation": "`print(f\"...{sys.getrefcount(a)}\")`\n참조 횟수를 다시 확인합니다. 실제 참조 횟수가 2이므로, 임시 참조를 더해 `3`이 출력됩니다.",
+        "highlight": [7]
+    },
+    {
         "line": 9,
-        "title": "참조 또 추가 (c = a)",
-        "explanation": "`c = a` - 세 번째 참조!\n\n**refcount = 3** (a, b, c)\n\n같은 메모리의 객체를 세 이름이 공유!\n→ 메모리 효율적",
-        "highlight": [9, 10],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_obj" },
-            { "name": "b", "pointsTo": "list_obj" },
-            { "name": "c", "pointsTo": "list_obj" }
-          ],
-          "objects": [
-            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 3)", "pyId": "140100", "highlight": true }
-          ],
-          "output": ["a만 참조: 2", "a, b 참조: 3", "a, b, c 참조: 4"]
-        }
-      },
-      {
+        "title": "참조 또 추가",
+        "explanation": "`c = a`\n변수 `c`도 같은 객체를 가리킵니다. 이제 객체의 참조 횟수는 `a`, `b`, `c` 총 3개입니다.",
+        "highlight": [9]
+    },
+    {
+        "line": 10,
+        "title": "다시 늘어난 참조 횟수 확인",
+        "explanation": "`print(f\"...{sys.getrefcount(a)}\")`\n실제 참조 횟수 3에 임시 참조 1을 더해 `4`가 출력됩니다.",
+        "highlight": [10]
+    },
+    {
         "line": 12,
-        "title": "참조 제거 (del b)",
-        "explanation": "`del b` - b 변수 삭제!\n\n**중요:** 객체가 삭제되는 게 아님!\nb라는 이름(참조)만 제거됨\n\n**refcount 감소**: 3 → 2\n아직 a, c가 참조하므로 객체는 살아있음!",
-        "highlight": [12, 13],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            { "name": "a", "pointsTo": "list_obj" },
-            { "name": "c", "pointsTo": "list_obj" }
-          ],
-          "objects": [
-            { "id": "list_obj", "type": "list", "value": "[1, 2, 3] (refcount: 2)", "pyId": "140100", "highlight": true }
-          ],
-          "output": ["a만 참조: 2", "a, b 참조: 3", "a, b, c 참조: 4", "del b 후: 3"]
-        }
-      }
+        "title": "참조 제거 (del)",
+        "explanation": "`del b`\n변수 `b` 자체를 삭제합니다. `b`가 가리키던 객체와의 연결이 끊어지므로, 객체의 참조 횟수는 3에서 2로 줄어듭니다. 객체 자체는 아직 `a`와 `c`가 참조하므로 사라지지 않습니다.",
+        "highlight": [12]
+    },
+    {
+        "line": 13,
+        "title": "줄어든 참조 횟수 확인",
+        "explanation": "`print(f\"...{sys.getrefcount(a)}\")`\n최종 참조 횟수를 확인합니다. 실제 참조 횟수가 2이므로, 임시 참조를 더해 `3`이 출력됩니다.",
+        "highlight": [13]
+    }
     ]
   },
   "quiz": {

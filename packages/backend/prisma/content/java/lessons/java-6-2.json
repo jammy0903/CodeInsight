@@ -6,54 +6,65 @@
     "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            System.out.println(\"1. Start\");\n            String s = null;\n            System.out.println(s.length()); // NPE occurs here\n            System.out.println(\"2. This line is skipped\");\n            \n        } catch (NullPointerException e) {\n            System.out.println(\"3. Caught NPE!\");\n            // e.printStackTrace();\n            \n        } catch (Exception e) {\n            System.out.println(\"4. General Handler\");\n        }\n        \n        System.out.println(\"5. Program Continues\");\n    }\n}",
     "steps": [
       {
-        "line": 3,
-        "title": "try 블록의 실행",
-        "explanation": "`try` 블록 안의 코드는 순서대로 실행됩니다. 예외가 발생하기 전까지는 정상적인 흐름을 따릅니다.",
+        "line": 4,
+        "title": "try 블록 시작",
+        "explanation": "`try` 블록 안으로 진입하여 코드를 실행합니다. 첫 번째 라인이 실행되어 \"1. Start\"가 출력됩니다.",
+        "highlight": [4],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "1. Start"
-          ]
+          "output": ["1. Start"]
         }
       },
       {
         "line": 5,
+        "title": "null 변수 선언",
+        "explanation": "String 변수 `s`를 선언하고 `null` 값을 할당합니다. `s`는 현재 아무 객체도 가리키지 않습니다.",
+        "highlight": [5],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [{"name": "s", "value": "null"}]
+        }
+      },
+      {
+        "line": 6,
         "title": "예외 발생 (Throw)",
-        "explanation": "`s.length()`에서 `s`가 null이므로 `NullPointerException` 객체가 생성되어 던져집니다(Throw). 즉시 실행흐름이 중단됩니다.",
-        "keyInsight": "예외가 발생하자마자 현재 블록을 탈출하여 적절한 `catch` 블록을 찾습니다.",
+        "explanation": "`s`가 `null`이므로 `.length()` 메서드를 호출할 수 없습니다. 여기서 `NullPointerException`이 '던져지고(throw)', `try` 블록의 나머지 실행은 즉시 중단됩니다.",
+        "keyInsight": "예외가 발생하면 현재 블록을 탈출하여 적절한 `catch` 블록을 찾습니다.",
+        "highlight": [6],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "class": "NullPointerException",
-              "message": "Cannot invoke..."
-            }
-          ]
+          "heap": [{"class": "NullPointerException", "message": "Cannot invoke..."}],
+          "error": "NullPointerException"
         }
       },
       {
-        "line": 8,
-        "title": "catch 블록 포착",
-        "explanation": "`NullPointerException`과 일치하는 첫 번째 `catch` 블록이 실행됩니다. 그 뒤의 `Exception` 캐치 블록은 무시됩니다.",
+        "line": 9,
+        "title": "NPE catch 블록 진입",
+        "explanation": "던져진 `NullPointerException`과 일치하는 `catch` 블록을 찾았습니다. 프로그램의 제어가 이 블록으로 넘어옵니다. 라인 7은 건너뛰게 됩니다.",
+        "highlight": [9],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "1. Start",
-            "3. Caught NPE!"
-          ]
+            "stack": [{"name": "e", "value": "-> NPE"}]
         }
       },
       {
-        "line": 15,
+        "line": 10,
+        "title": "예외 처리",
+        "explanation": "`catch` 블록 내부의 코드가 실행되어 예외가 잡혔음을 알리는 메시지를 출력합니다. 더 구체적인 `catch` 블록이 먼저 실행되었으므로, 다음 `catch(Exception e)` 블록은 무시됩니다.",
+        "highlight": [10],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": ["1. Start", "3. Caught NPE!"]
+        }
+      },
+      {
+        "line": 17,
         "title": "정상 흐름 복귀",
-        "explanation": "`try-catch` 문을 빠져나와 프로그램이 죽지 않고 계속 실행됩니다. 이것이 예외 처리의 목적입니다.",
+        "explanation": "`try-catch` 구문이 모두 끝났습니다. 예외를 성공적으로 처리했기 때문에 프로그램이 중단되지 않고 다음 라인을 계속 실행합니다. 이것이 예외 처리의 핵심 목적입니다.",
+        "highlight": [17],
         "visualizationType": "memory",
         "memoryState": {
-          "output": [
-            "1. Start",
-            "3. Caught NPE!",
-            "5. Program Continues"
-          ]
+          "output": ["1. Start", "3. Caught NPE!", "5. Program Continues"]
         }
       }
     ]

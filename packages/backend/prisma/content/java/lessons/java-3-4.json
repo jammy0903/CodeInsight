@@ -7,10 +7,33 @@
     "steps": [
       {
         "line": 8,
-        "title": "Integer x, y 생성",
-        "explanation": "**메모리 상태:**\n`x`와 `y`는 각각 Heap의 `Integer(1)`과 `Integer(2)`를 가리킵니다.\n여기서 `Integer`는 **불변(Immutable) 객체**입니다. 값을 바꿀 수 없습니다.",
+        "title": "Integer x 생성",
+        "explanation": "`main` 프레임에 `x` 변수가 생성되고, Heap에 있는 `Integer(1)` 객체(주소: 0x001)를 가리킵니다.",
         "highlight": [
-          8,
+          8
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x001",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Integer(1)"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Integer y 생성",
+        "explanation": "`main` 프레임에 `y` 변수가 생성되고, Heap에 있는 `Integer(2)` 객체(주소: 0x002)를 가리킵니다.",
+        "highlight": [
           9
         ],
         "visualizationType": "memory",
@@ -18,11 +41,13 @@
           "stack": [
             {
               "name": "x",
-              "value": "-> 0x001"
+              "value": "-> 0x001",
+              "frame": "main"
             },
             {
               "name": "y",
-              "value": "-> 0x002"
+              "value": "-> 0x002",
+              "frame": "main"
             }
           ],
           "heap": [
@@ -38,13 +63,26 @@
         }
       },
       {
+        "line": 10,
+        "title": "호출 전 상태 출력",
+        "explanation": "`swap` 함수 호출 전 `x`와 `y`의 값을 출력합니다.",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "before: x=1, y=2"
+          ]
+        }
+      },
+      {
         "line": 11,
         "title": "swap(x, y) 호출",
-        "explanation": "**참조값 복사:**\n`x`의 주소(`0x001`)가 `a`에 복사되고,\n`y`의 주소(`0x002`)가 `b`에 복사됩니다.\n\n이제 `a`와 `b`는 `x`, `y`의 **복사본 리모컨**입니다.",
+        "explanation": "`x`의 주소(0x001)가 `a`에, `y`의 주소(0x002)가 `b`에 복사됩니다. `a`와 `b`는 `x`, `y`의 복사본 리모컨입니다.",
         "keyInsight": "파라미터 = 주소값의 복사본",
         "highlight": [
-          11,
-          1
+          11
         ],
         "visualizationType": "memory",
         "memoryState": {
@@ -76,41 +114,72 @@
       },
       {
         "line": 2,
-        "title": "지역 변수 교환 (Swap)",
-        "explanation": "`swap` 메서드 안에서 `a`와 `b`가 서로 주소를 교환합니다.\n- `a` → 0x002\n- `b` → 0x001\n\n하지만 이건 **`swap` 방 안에서 복사본들끼리 자리 바꾼 것**에 불과합니다.\n`main` 방에 있는 `x`, `y`는 이 사실을 전혀 모릅니다.",
+        "title": "temp 변수에 a 저장",
+        "explanation": "`swap` 메서드 내의 `temp` 변수가 `a`의 주소(0x001)를 가리킵니다.",
         "highlight": [
-          2,
-          3,
+          2
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            { "name": "a", "value": "-> 0x001", "frame": "swap" },
+            { "name": "b", "value": "-> 0x002", "frame": "swap" },
+            { "name": "temp", "value": "-> 0x001", "frame": "swap" }
+          ]
+        }
+      },
+      {
+        "line": 3,
+        "title": "a에 b 할당",
+        "explanation": "`a` 변수가 `b`의 주소(0x002)를 가리키도록 변경됩니다. 이제 `a`는 `Integer(2)` 객체를 참조합니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            { "name": "a", "value": "-> 0x002", "frame": "swap", "changed": true },
+            { "name": "b", "value": "-> 0x002", "frame": "swap" },
+            { "name": "temp", "value": "-> 0x001", "frame": "swap" }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "b에 temp 할당",
+        "explanation": "`b` 변수가 `temp`의 주소(0x001)를 가리키도록 변경됩니다. 이로써 `a`와 `b`의 참조가 서로 교환되었습니다. 하지만 이것은 `swap` 메서드 내부의 지역 변수들 사이에서만 일어난 일입니다.",
+        "highlight": [
           4
         ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {
-              "name": "x",
-              "value": "-> 0x001",
-              "frame": "main"
-            },
-            {
-              "name": "a",
-              "value": "-> 0x002",
-              "frame": "swap",
-              "changed": true
-            },
-            {
-              "name": "b",
-              "value": "-> 0x001",
-              "frame": "swap",
-              "changed": true
-            }
+            { "name": "a", "value": "-> 0x002", "frame": "swap" },
+            { "name": "b", "value": "-> 0x001", "frame": "swap", "changed": true },
+            { "name": "temp", "value": "-> 0x001", "frame": "swap" }
           ],
-          "note": "a, b만 바뀌고 x, y는 그대로 (영향력 0)"
+          "note": "a, b만 바뀌고 x, y는 그대로"
+        }
+      },
+      {
+        "line": 5,
+        "title": "함수 내부 상태 출력",
+        "explanation": "`swap` 메서드 내에서 교환된 `a`와 `b`의 값을 출력합니다.",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "before: x=1, y=2",
+            "inside: a=2, b=1"
+          ]
         }
       },
       {
         "line": 12,
-        "title": "함수 반환 후 (Swap 실패 확인)",
-        "explanation": "`swap` 메서드가 종료되고 `a`, `b`는 사라집니다.\n`main`에 돌아와 보니 `x`, `y`는 여전히 1, 2 그대로입니다.\n\n**해결책은?**\n만약 진짜 값을 바꾸고 싶다면, `int[]` 같은 그릇(Wrapper)을 만들어서 넘겨야 합니다. 그릇의 내용물은 바꿀 수 있으니까요!",
+        "title": "호출 후 상태 출력 (Swap 실패!)",
+        "explanation": "`swap` 메서드가 종료되고 `a`, `b`, `temp`는 사라집니다. `main`으로 돌아와 `x`와 `y`를 출력하면, 값이 전혀 바뀌지 않았음을 확인할 수 있습니다. Pass by Value의 특성 때문입니다.",
         "keyInsight": "Java에서 swap 함수 구현 불가",
         "highlight": [
           12
@@ -118,14 +187,8 @@
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            {
-              "name": "x",
-              "value": "-> 0x001"
-            },
-            {
-              "name": "y",
-              "value": "-> 0x002"
-            }
+            { "name": "x", "value": "-> 0x001", "frame": "main" },
+            { "name": "y", "value": "-> 0x002", "frame": "main" }
           ],
           "output": [
             "before: x=1, y=2",

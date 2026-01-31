@@ -6,39 +6,44 @@
     "code": "import java.util.HashSet;\n\npublic class Main {\n    public static void main(String[] args) {\n        HashSet<String> set = new HashSet<>();\n        \n        set.add(\"Java\");\n        set.add(\"Java\"); // 중복! \n        \n        System.out.println(\"크기: \" + set.size()); // 1\n    }\n}",
     "steps": [
       {
-        "line": 7,
-        "title": "첫 번째 데이터 추가",
-        "explanation": "\"Java\"를 주머니에 넣습니다. 처음 들어오는 데이터이므로 안전하게 저장됩니다.",
-        "highlight": [
-          7
-        ],
+        "line": 5,
+        "title": "HashSet 생성",
+        "explanation": "중복을 허용하지 않는 `HashSet`을 생성합니다. 내부적으로는 `HashMap`을 사용하여 데이터를 관리합니다.",
+        "highlight": [5],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "class": "HashSet",
-              "elements": "[\"Java\"]"
-            }
-          ]
+            "heap": [{"address": "set", "class": "HashSet", "elements": "[]"}]
+        }
+      },
+      {
+        "line": 7,
+        "title": "첫 번째 요소 추가",
+        "explanation": "`set`에 \"Java\" 문자열을 추가합니다. 처음 추가되는 요소이므로 성공적으로 저장됩니다.",
+        "highlight": [7],
+        "visualizationType": "memory",
+        "memoryState": {
+            "heap": [{"address": "set", "elements": "[\"Java\"]"}]
         }
       },
       {
         "line": 8,
-        "title": "중복 데이터 추가 시도",
-        "explanation": "이미 \"Java\"가 들어있는데 또 넣으려고 하면, HashSet은 내부적으로 `equals()`와 `hashCode()`를 체크하여 동일한 객체임을 인지하고 무시합니다.\n\n**비유:** 똑같은 회원카드를 두 번 발급해주지 않는 시스템과 같습니다.",
-        "keyInsight": "Set은 유일성(Uniqueness)을 보장함",
-        "highlight": [
-          8
-        ],
+        "title": "중복 요소 추가 시도",
+        "explanation": "다시 \"Java\"를 추가하려고 시도합니다. `HashSet`은 내부적으로 `hashCode()`와 `equals()`를 사용해 이미 존재하는 요소임을 확인하고, 이 추가 요청을 무시합니다. `add` 메서드는 `false`를 반환합니다.",
+        "keyInsight": "Set은 유일성(Uniqueness)을 보장합니다.",
+        "highlight": [8],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [
-            {
-              "class": "HashSet",
-              "elements": "[\"Java\"]",
-              "note": "Size remains 1"
-            }
-          ]
+            "heap": [{"address": "set", "elements": "[\"Java\"]", "note": "Size remains 1"}]
+        }
+      },
+      {
+        "line": 10,
+        "title": "크기 확인",
+        "explanation": "`set.size()`를 호출하여 `set`에 들어있는 요소의 개수를 확인합니다. 중복된 \"Java\"는 추가되지 않았으므로, 크기는 1이 출력됩니다.",
+        "highlight": [10],
+        "visualizationType": "memory",
+        "memoryState": {
+            "output": ["크기: 1"]
         }
       }
     ]

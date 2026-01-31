@@ -1,43 +1,71 @@
 {
   "lessonId": "py-9-3",
-  "title": "Decorators with Arguments",
-  "concept": "Core concept for Decorators with Arguments",
+  "title": "인자있는 데코레이터: 반복 실행하기",
+  "concept": "데코레이터에 인자를 전달하려면, 함수를 한 단계 더 감싸 3단 중첩 구조를 만듭니다.",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Decorators with Arguments\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "def repeat(n):\n    def decorator(func):\n        def wrapper(*args, **kwargs):\n            print(f\"{n}번 반복합니다:\")\n            for _ in range(n):\n                func(*args, **kwargs)\n        return wrapper\n    return decorator\n\n@repeat(3)\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"World\")",
     "steps": [
       {
         "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "python-visualizer",
-        "pythonState": {
-          "variables": {},
-          "stdout": ""
-        }
+        "title": "인자있는 데코레이터 정의",
+        "explanation": "`repeat(n)` 함수는 데코레이터 자체에 인자(`n`)를 받기 위해 3단 중첩 구조를 가집니다. 가장 바깥 함수(`repeat`)는 인자를 받고, 그 안의 `decorator` 함수가 꾸밀 함수를 받으며, 가장 안쪽의 `wrapper`가 실제 로직을 실행합니다.",
+        "highlight": [1, 2, 3, 4, 5, 6, 7, 8]
+      },
+      {
+        "line": 10,
+        "title": "데코레이터에 인자 전달",
+        "explanation": "`@repeat(3)`\n데코레이터에 숫자 `3`을 전달하며 적용합니다. 이 코드는 두 단계로 실행됩니다:\n1. `repeat(3)`이 먼저 호출되어, `n=3`을 기억하는 `decorator` 함수가 반환됩니다.\n2. 반환된 `decorator`가 `greet` 함수를 꾸밉니다. (`greet = decorator(greet)`)",
+        "highlight": [10]
+      },
+      {
+        "line": 11,
+        "title": "꾸밈을 받을 함수 정의",
+        "explanation": "`def greet(name):`\n핵심 로직을 담고 있는 원본 함수입니다.",
+        "highlight": [11, 12]
+      },
+      {
+        "line": 14,
+        "title": "꾸며진 함수 호출",
+        "explanation": "`greet(\"World\")`\n`greet`을 호출하면, `repeat(3)`이 만들었던 `wrapper` 함수가 실행됩니다. `\"World\"`는 `wrapper`를 통해 원본 `greet` 함수에 전달됩니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 4,
+        "title": "wrapper 함수 실행",
+        "explanation": "`print(f\"{n}번 반복합니다:\")`\n`wrapper` 함수가 실행됩니다. `repeat` 함수가 받았던 인자 `n` (값: 3)을 기억하고 있는 클로저이므로, `3번 반복합니다:`를 출력합니다.",
+        "highlight": [4]
+      },
+      {
+        "line": 5,
+        "title": "반복문 실행",
+        "explanation": "`for _ in range(n):`\n기억하고 있던 `n`(3)만큼 `for` 루프를 실행합니다.",
+        "highlight": [5]
+      },
+      {
+        "line": 6,
+        "title": "원본 함수 반복 호출",
+        "explanation": "`func(*args, **kwargs)`\n루프 안에서 원본 함수 `greet`를 반복해서 호출합니다. 그 결과 \"Hello, World!\"가 세 번 출력됩니다.",
+        "highlight": [6]
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Decorators with Arguments?",
+    "question": "인자있는 데코레이터 `@deco(arg)`는 내부적으로 어떻게 동작하나요?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "func = func(deco(arg))",
+      "deco = func(deco(arg))",
+      "func = deco(arg)(func)",
+      "deco(arg, func)"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "`deco(arg)`가 먼저 호출되어 데코레이터 함수를 반환하고, 그 반환된 함수가 `@`의 대상이 되어 `func`를 인자로 받습니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "데코레이터는 클래스에만 쓸 수 있다.",
+      "correct": "아닙니다. 데코레이터는 함수와 클래스 모두에 적용할 수 있습니다.",
+      "why": "클래스 데코레이터는 클래스 자체를 인자로 받아 수정하거나 다른 클래스로 교체하는 등의 작업을 합니다."
     }
   ],
-  "keyTakeaway": "Understanding Decorators with Arguments is crucial for advanced Python."
+  "keyTakeaway": "인자있는 데코레이터는 '데코레이터를 반환하는 함수'입니다. `@repeat(3)`은 `repeat(3)`을 먼저 호출하고, 그 결과(데코레이터)를 함수에 적용합니다."
 }

@@ -1,43 +1,77 @@
 {
   "lessonId": "py-8-1",
-  "title": "Iterator Protocol",
-  "concept": "Core concept for Iterator Protocol",
+  "title": "이터레이터 프로토콜: for문의 심장",
+  "concept": "`for`문이 동작하는 원리인 `__iter__`와 `__next__`를 이해합니다.",
   "content": {
-    "code": "def example():\n    # TODO: Add code for Iterator Protocol\n    pass\n\nif __name__ == '__main__':\n    example()",
+    "code": "# for loop의 동작 원리: Iterator Protocol\nclass Counter:\n    def __init__(self, start, end):\n        self.current = start\n        self.end = end\n\n    def __iter__(self):\n        return self\n\n    def __next__(self):\n        if self.current >= self.end:\n            raise StopIteration\n        value = self.current\n        self.current += 1\n        return value\n\ncounter = Counter(0, 3)\n\nfor num in counter:\n    print(num)",
     "steps": [
       {
-        "line": 1,
-        "title": "Placeholder Step",
-        "explanation": "Content coming soon.",
-        "keyInsight": "Pending Update",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "python-visualizer",
-        "pythonState": {
-          "variables": {},
-          "stdout": ""
-        }
+        "line": 2,
+        "title": "이터레이터 클래스 정의",
+        "explanation": "`Counter` 클래스를 정의합니다. `for` 문과 함께 동작하게 하려면, `__iter__`와 `__next__` 두 개의 '매직 메서드'를 구현해야 합니다.",
+        "highlight": [2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14]
+      },
+      {
+        "line": 16,
+        "title": "카운터 객체 생성",
+        "explanation": "`counter = Counter(0, 3)`\n`Counter` 클래스의 인스턴스를 생성합니다. `__init__` 메서드가 호출되어, `current`는 0, `end`는 3으로 초기화됩니다.",
+        "highlight": [16]
+      },
+      {
+        "line": 18,
+        "title": "for 루프 시작 (`__iter__` 호출)",
+        "explanation": "`for num in counter:`\n`for` 루프가 `counter` 객체를 처음 만났습니다. 루프를 시작하기 위해, `counter` 객체의 `__iter__` 메서드를 내부적으로 단 한 번 호출합니다. 이 메서드는 이터레이터 객체(`self`, 즉 `counter` 자신)를 반환합니다.",
+        "highlight": [18]
+      },
+      {
+        "line": 18,
+        "title": "첫 번째 값 요청 (`__next__` 호출)",
+        "explanation": "루프의 첫 바퀴가 시작됩니다. `for`문은 `__iter__`로부터 받은 이터레이터 객체의 `__next__` 메서드를 호출합니다. `current`(0)가 `end`(3)보다 작으므로 `value`는 0이 되고, 0이 반환되어 `num` 변수에 할당됩니다.",
+        "highlight": [18]
+      },
+      {
+        "line": 19,
+        "title": "첫 번째 값 출력",
+        "explanation": "`print(num)`\n`num`에 할당된 `0`을 화면에 출력합니다.",
+        "highlight": [19]
+      },
+      {
+        "line": 18,
+        "title": "두 번째 값 요청 (`__next__` 호출)",
+        "explanation": "루프의 두 번째 바퀴입니다. `for`문이 다시 `__next__`를 호출합니다. `current`는 1이 되어 `num`에 할당됩니다.",
+        "highlight": [18]
+      },
+      {
+        "line": 19,
+        "title": "두 번째 값 출력",
+        "explanation": "`print(num)`\n`num`에 할당된 `1`을 화면에 출력합니다.",
+        "highlight": [19]
+      },
+      {
+        "line": 18,
+        "title": "마지막 값 요청과 루프 종료",
+        "explanation": "이 과정이 반복되어 `2`가 출력된 후, `current`가 3이 됩니다. 다음 `__next__` 호출 시 `current >= end` 조건이 참이 되어 `StopIteration` 예외가 발생하고, `for` 루프는 이 예외를 감지하여 정상적으로 반복을 종료합니다.",
+        "highlight": [18]
       }
     ]
   },
   "quiz": {
-    "question": "What is a key feature of Iterator Protocol?",
+    "question": "`for` 루프가 객체로부터 다음 값을 얻기 위해 내부적으로 호출하는 메서드는 무엇인가요?",
     "options": [
-      "Feature A",
-      "Feature B",
-      "Feature C",
-      "Feature D"
+      "__init__",
+      "__iter__",
+      "__next__",
+      "__stop__"
     ],
-    "correctIndex": 0,
-    "explanation": "Correct answer reasoning placeholder."
+    "correctIndex": 2,
+    "explanation": "`for` 루프는 먼저 `__iter__`를 호출하여 이터레이터 객체를 얻고, 그 다음부터는 루프가 한 번 돌 때마다 `__next__`를 호출하여 다음 값을 가져옵니다."
   },
   "misconceptions": [
     {
-      "wrong": "Common wrong belief",
-      "correct": "Actual truth",
-      "why": "Reasoning"
+      "wrong": "리스트만 `for` 루프에 쓸 수 있다.",
+      "correct": "`__iter__`와 `__next__`가 구현된 어떤 객체든 `for` 루프에 사용할 수 있습니다.",
+      "why": "`for` 루프는 객체의 타입이 무엇인지 신경쓰지 않고, '이터레이터 프로토콜'을 따르는지만 확인하기 때문입니다. (덕 타이핑)"
     }
   ],
-  "keyTakeaway": "Understanding Iterator Protocol is crucial for advanced Python."
+  "keyTakeaway": "`for` 루프는 객체의 `__iter__`와 `__next__` 메소드를 호출하는 '문법 설탕(Syntax Sugar)'입니다."
 }

@@ -36,10 +36,11 @@ export function OnboardingModal() {
 
   // 제출 (handleNext보다 먼저 정의되어야 함)
   const handleSubmit = useCallback(async () => {
+    if (!appUser) return;
     setIsSubmitting(true);
     try {
-      const result = await updateProfile(answers);
-      console.log('Profile saved successfully:', result);
+      await updateProfile(answers);
+      console.log('Profile saved successfully');
       // 성공 시 모달과 사이드바 모두 닫기
       setNeedsOnboarding(false);
       setSidebarOpen(false);
@@ -51,7 +52,7 @@ export function OnboardingModal() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [answers]);
+  }, [answers, appUser, setNeedsOnboarding, setSidebarOpen]);
 
   // 다음 단계
   const handleNext = useCallback(() => {
@@ -71,7 +72,8 @@ export function OnboardingModal() {
 
   // 스킵 (나중에 하기)
   const handleSkip = async () => {
-    // 빈 프로필로 완료 처리
+    if (!appUser) return;
+    // 빈 프로필로 완료 처리 (백엔드에 저장)
     try {
       await updateProfile({});
       setNeedsOnboarding(false);
@@ -80,7 +82,7 @@ export function OnboardingModal() {
     }
   };
 
-  // 모달 표시 조건
+  // 모달 표시 조건 (백엔드에서 설정한 needsOnboarding 상태만 사용)
   if (!needsOnboarding || !appUser) return null;
 
   const selectedValue = answers[currentQuestion.key as ProfileQuestionKey];
