@@ -7,44 +7,92 @@
     "steps": [
       {
         "line": 1,
-        "title": "부모 클래스 정의",
-        "explanation": "`Animal` 클래스를 모든 동물의 '부모'가 될 기본 클래스로 정의합니다. 모든 동물은 `name`을 갖고 `speak` 할 수 있다고 가정합니다.",
+        "title": "Animal 클래스 정의 시작",
+        "explanation": "`Animal` 클래스를 정의합니다.",
+        "highlight": [1]
+    },
+    {
+        "line": 1,
+        "title": "Animal 클래스 본문 진입",
+        "explanation": "클래스 본문으로 진입합니다.",
         "highlight": [1, 2, 3, 5, 6]
     },
     {
+        "line": 2,
+        "title": "Animal.__init__ 정의",
+        "explanation": "`def __init__(self, name):`\nAnimal 초기화 메서드를 정의합니다.",
+        "highlight": [2, 3]
+    },
+    {
+        "line": 5,
+        "title": "Animal.speak 정의",
+        "explanation": "`def speak(self):`\nspeak 메서드를 정의합니다.",
+        "highlight": [5, 6]
+    },
+    {
         "line": 8,
-        "title": "자식 클래스 정의 (상속)",
-        "explanation": "`class Dog(Animal):`\n`Animal`의 모든 기능을 물려받는 '자식' 클래스 `Dog`를 정의합니다.",
+        "title": "Dog 클래스 정의 시작",
+        "explanation": "`class Dog(Animal):`\n`Animal`을 상속받는 `Dog` 클래스를 정의합니다.",
         "highlight": [8]
     },
     {
-        "line": 10,
-        "title": "부모 초기화 메서드 호출 (super)",
-        "explanation": "`super().__init__(name)`\n`Dog`의 `__init__`이 실행될 때, 부모인 `Animal`의 `__init__`도 호출하여 `name` 속성 초기화를 위임합니다. 상속에서 매우 중요한 부분입니다.",
-        "highlight": [10]
+        "line": 8,
+        "title": "Dog 클래스 본문 진입",
+        "explanation": "클래스 본문으로 진입합니다.",
+        "highlight": [8, 9, 10, 11, 13, 14]
+    },
+    {
+        "line": 9,
+        "title": "Dog.__init__ 정의",
+        "explanation": "`def __init__(self, name, breed):`\nDog 초기화 메서드를 정의합니다.",
+        "highlight": [9, 10, 11]
     },
     {
         "line": 13,
-        "title": "메서드 오버라이딩",
-        "explanation": "`def speak(self):`\n부모와 똑같은 이름의 `speak` 메서드를 자식 클래스에 새로 정의합니다. 이렇게 부모의 기능을 덮어쓰는 것을 '오버라이딩'이라고 합니다.",
+        "title": "Dog.speak 정의 (오버라이딩)",
+        "explanation": "`def speak(self):`\n부모의 speak를 덮어쓰는 새 메서드를 정의합니다.",
         "highlight": [13, 14]
     },
     {
         "line": 16,
-        "title": "자식 객체 생성",
-        "explanation": "`dog = Dog(\"바둑이\", \"진돗개\")`\n`Dog` 객체를 생성합니다. 이 과정에서 `Dog`의 `__init__`이 호출되고, 그 안에서 `Animal`의 `__init__`도 연쇄적으로 호출됩니다.",
+        "title": "Dog 객체 생성",
+        "explanation": "`dog = Dog(\"바둑이\", \"진돗개\")`\n`Dog` 객체를 생성합니다.",
         "highlight": [16]
     },
     {
+        "line": 10,
+        "title": "super().__init__(name) 호출",
+        "explanation": "`super().__init__(name)`\n부모 Animal의 __init__을 호출합니다.",
+        "highlight": [10]
+    },
+    {
+        "line": 3,
+        "title": "Animal.__init__ 실행",
+        "explanation": "`self.name = name`\n부모에서 `name` 속성을 설정합니다.",
+        "highlight": [3]
+    },
+    {
+        "line": 11,
+        "title": "breed 속성 설정",
+        "explanation": "`self.breed = breed`\n`breed` 속성을 설정합니다.",
+        "highlight": [11]
+    },
+    {
         "line": 17,
-        "title": "오버라이딩된 메서드 호출",
-        "explanation": "`dog.speak()`\n`Dog` 객체 `dog`의 `speak` 메서드를 호출합니다. 부모의 `speak`가 아닌, `Dog`에 재정의된 `speak`가 실행됩니다.",
+        "title": "dog.speak() 호출",
+        "explanation": "`dog.speak()`\n오버라이딩된 메서드를 호출합니다.",
         "highlight": [17]
+    },
+    {
+        "line": 14,
+        "title": "Dog.speak 실행",
+        "explanation": "`print(f\"{self.name}: 멍멍!\")`\n\"바둑이: 멍멍!\"이 출력됩니다.",
+        "highlight": [14]
     },
     {
         "line": 18,
         "title": "속성 확인",
-        "explanation": "`print(dog.name, dog.breed)`\n`dog` 객체의 속성들을 출력합니다. `name`은 부모로부터, `breed`는 자식에서 설정되었지만 모두 `dog` 객체에 잘 저장되어 있습니다.",
+        "explanation": "`print(dog.name, dog.breed)`\n\"바둑이 진돗개\"가 출력됩니다.",
         "highlight": [18]
     }
     ]
