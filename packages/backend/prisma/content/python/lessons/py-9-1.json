@@ -7,33 +7,69 @@
     "steps": [
       {
         "line": 1,
-        "title": "중첩 함수 정의",
-        "explanation": "`outer_func` 함수 안에 `inner_func`라는 또 다른 함수를 정의했습니다. `inner_func`는 자신의 바깥(enclosing) 스코프에 있는 변수 `x`를 참조합니다.",
+        "title": "outer_func 정의",
+        "explanation": "`def outer_func(x):`\n바깥 함수를 정의합니다. 안에 중첩 함수가 있습니다.",
         "highlight": [1, 3, 5, 6]
       },
       {
         "line": 9,
-        "title": "클로저 생성 1",
-        "explanation": "`times_2 = outer_func(2)`\n`outer_func`를 `x=2`로 호출합니다. `outer_func`는 `inner_func` 함수 객체를 반환합니다. 이때, 반환된 `inner_func`는 자신이 생성될 때의 환경(x=2)을 **기억**합니다. 이 '기억하는 함수'가 바로 클로저입니다.",
+        "title": "outer_func(2) 호출",
+        "explanation": "`times_2 = outer_func(2)`\nouter_func를 x=2로 호출합니다.",
         "highlight": [9]
       },
       {
+        "line": 3,
+        "title": "inner_func 정의 (x=2 환경)",
+        "explanation": "`def inner_func(y):`\ninner_func를 정의합니다. 이 함수는 x=2인 환경을 기억합니다.",
+        "highlight": [3, 5]
+      },
+      {
+        "line": 6,
+        "title": "클로저 반환 (1)",
+        "explanation": "`return inner_func`\ninner_func(x=2를 기억)를 반환합니다. times_2는 이제 클로저입니다.",
+        "highlight": [6]
+      },
+      {
         "line": 10,
-        "title": "클로저 생성 2",
-        "explanation": "`times_3 = outer_func(3)`\n`outer_func`를 `x=3`으로 다시 호출하여, `x=3` 환경을 기억하는 또 다른 클로저를 만듭니다. `times_2`와 `times_3`는 서로 다른 환경을 기억하는 별개의 함수입니다.",
+        "title": "outer_func(3) 호출",
+        "explanation": "`times_3 = outer_func(3)`\nouter_func를 x=3으로 다시 호출합니다.",
         "highlight": [10]
       },
       {
+        "line": 3,
+        "title": "inner_func 정의 (x=3 환경)",
+        "explanation": "`def inner_func(y):`\n이번에는 x=3인 환경을 기억하는 새로운 inner_func를 정의합니다.",
+        "highlight": [3, 5]
+      },
+      {
+        "line": 6,
+        "title": "클로저 반환 (2)",
+        "explanation": "`return inner_func`\ninner_func(x=3을 기억)를 반환합니다. times_3는 별개의 클로저입니다.",
+        "highlight": [6]
+      },
+      {
         "line": 13,
-        "title": "첫 번째 클로저 호출",
-        "explanation": "`print(f\"...{times_2(5)}\")`\n`times_2` 클로저를 `y=5`로 호출합니다. 이 클로저는 자신이 기억하고 있던 `x=2`와 방금 받은 `y=5`를 곱하여 `10`을 반환하고, 그 결과가 출력됩니다.",
+        "title": "times_2(5) 호출",
+        "explanation": "`print(f\"...{times_2(5)}\")`\ntimes_2 클로저를 y=5로 호출합니다.",
         "highlight": [13]
       },
       {
+        "line": 5,
+        "title": "times_2 실행 (2 * 5)",
+        "explanation": "`return x * y`\nx=2(기억된 값)와 y=5를 곱해 10을 반환합니다.",
+        "highlight": [5]
+      },
+      {
         "line": 14,
-        "title": "두 번째 클로저 호출",
-        "explanation": "`print(f\"...{times_3(5)}\")`\n`times_3` 클로저를 `y=5`로 호출합니다. 이 클로저는 `x=3`을 기억하고 있었으므로, `3 * 5`의 결과인 `15`를 반환하고 출력합니다.",
+        "title": "times_3(5) 호출",
+        "explanation": "`print(f\"...{times_3(5)}\")`\ntimes_3 클로저를 y=5로 호출합니다.",
         "highlight": [14]
+      },
+      {
+        "line": 5,
+        "title": "times_3 실행 (3 * 5)",
+        "explanation": "`return x * y`\nx=3(기억된 값)와 y=5를 곱해 15를 반환합니다.",
+        "highlight": [5]
       }
     ]
   },

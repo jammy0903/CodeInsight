@@ -14,7 +14,7 @@
       {
         "line": 4,
         "title": "리스트 컴프리헨션",
-        "explanation": "`list_comp = [i * i for i in range(5)]`\n대괄호`[]`를 사용한 리스트 컴프리헨션입니다. `0, 1, 2, 3, 4`의 제곱 값을 '모두' 계산하여 '미리' 리스트로 만들어 메모리에 올립니다.",
+        "explanation": "`list_comp = [i * i for i in range(5)]`\n대괄호`[]`를 사용한 리스트 컴프리헨션입니다. 모든 값을 미리 계산하여 메모리에 올립니다.",
         "highlight": [4]
       },
       {
@@ -26,37 +26,85 @@
       {
         "line": 6,
         "title": "리스트 메모리 크기",
-        "explanation": "`print(f\"Size: {sys.getsizeof(list_comp)}\")`\n리스트가 차지하는 메모리의 크기를 출력합니다. 리스트의 크기에 비례하여 메모리 사용량이 커집니다.",
+        "explanation": "`print(f\"Size: {sys.getsizeof(list_comp)}\")`\n리스트가 차지하는 메모리의 크기를 출력합니다.",
         "highlight": [6]
       },
       {
         "line": 9,
         "title": "제너레이터 표현식",
-        "explanation": "`gen_exp = (i * i for i in range(5))`\n리스트 컴프리헨션과 똑같이 생겼지만, 대괄호`[]` 대신 소괄호`()`를 사용했습니다. 이 코드는 리스트를 만들지 않고, 값을 어떻게 만들지에 대한 '레시피'만 담고 있는 작은 '제너레이터 객체'를 생성합니다.",
+        "explanation": "`gen_exp = (i * i for i in range(5))`\n소괄호`()`를 사용하여 제너레이터 객체를 생성합니다. 값을 미리 계산하지 않습니다.",
         "highlight": [9]
       },
       {
         "line": 10,
         "title": "제너레이터 객체 출력",
-        "explanation": "`print(f\"Generator: {gen_exp}\")`\n제너레이터 객체 자체를 출력합니다. 리스트 내용이 아닌, `<generator object ...>` 와 같은 정보가 표시됩니다.",
+        "explanation": "`print(f\"Generator: {gen_exp}\")`\n제너레이터 객체 자체를 출력합니다. 내용이 아닌 객체 정보가 표시됩니다.",
         "highlight": [10]
       },
       {
         "line": 11,
         "title": "제너레이터 메모리 크기",
-        "explanation": "`print(f\"Size: {sys.getsizeof(gen_exp)}\")`\n제너레이터 객체의 메모리 크기를 출력합니다. `range`의 크기와 상관없이 항상 작은 크기를 차지하는 것을 볼 수 있습니다.",
+        "explanation": "`print(f\"Size: {sys.getsizeof(gen_exp)}\")`\n제너레이터 객체의 메모리 크기를 출력합니다. 항상 작은 크기입니다.",
         "highlight": [11]
       },
       {
         "line": 14,
-        "title": "제너레이터 순회",
-        "explanation": "`for num in gen_exp:`\n`for` 루프가 제너레이터를 순회합니다. 루프는 `next()`를 호출할 때마다, 제너레이터에게 다음 값을 '요청'하고, 제너레이터는 그제서야 값을 하나씩 계산해서 `yield`합니다.",
+        "title": "for 루프 시작 - 첫 번째 값",
+        "explanation": "`for num in gen_exp:`\n제너레이터를 순회합니다. 첫 번째 값 0이 계산되어 num에 할당됩니다.",
         "highlight": [14]
       },
       {
         "line": 15,
-        "title": "값 순차적 출력",
-        "explanation": "`print(num, end=' ')`\n제너레이터로부터 하나씩 받은 값 `0, 1, 4, 9, 16`을 차례대로 출력합니다. 결과는 리스트와 같지만, 모든 값을 메모리에 미리 올려두지 않아 훨씬 효율적입니다.",
+        "title": "첫 번째 값 출력 (0)",
+        "explanation": "`print(num, end=' ')`\n0을 출력합니다.",
+        "highlight": [15]
+      },
+      {
+        "line": 14,
+        "title": "for 루프 - 두 번째 값",
+        "explanation": "다음 반복입니다. 두 번째 값 1이 계산되어 num에 할당됩니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 15,
+        "title": "두 번째 값 출력 (1)",
+        "explanation": "`print(num, end=' ')`\n1을 출력합니다.",
+        "highlight": [15]
+      },
+      {
+        "line": 14,
+        "title": "for 루프 - 세 번째 값",
+        "explanation": "다음 반복입니다. 세 번째 값 4가 계산되어 num에 할당됩니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 15,
+        "title": "세 번째 값 출력 (4)",
+        "explanation": "`print(num, end=' ')`\n4를 출력합니다.",
+        "highlight": [15]
+      },
+      {
+        "line": 14,
+        "title": "for 루프 - 네 번째 값",
+        "explanation": "다음 반복입니다. 네 번째 값 9가 계산되어 num에 할당됩니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 15,
+        "title": "네 번째 값 출력 (9)",
+        "explanation": "`print(num, end=' ')`\n9를 출력합니다.",
+        "highlight": [15]
+      },
+      {
+        "line": 14,
+        "title": "for 루프 - 다섯 번째 값",
+        "explanation": "다음 반복입니다. 다섯 번째 값 16이 계산되어 num에 할당됩니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 15,
+        "title": "다섯 번째 값 출력 (16)",
+        "explanation": "`print(num, end=' ')`\n16을 출력합니다. 제너레이터가 소진되어 루프가 종료됩니다.",
         "highlight": [15]
       }
     ]

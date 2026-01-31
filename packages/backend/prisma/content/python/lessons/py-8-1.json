@@ -7,51 +7,165 @@
     "steps": [
       {
         "line": 2,
-        "title": "이터레이터 클래스 정의",
-        "explanation": "`Counter` 클래스를 정의합니다. `for` 문과 함께 동작하게 하려면, `__iter__`와 `__next__` 두 개의 '매직 메서드'를 구현해야 합니다.",
-        "highlight": [2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14]
+        "title": "Counter 클래스 정의 시작",
+        "explanation": "`class Counter:`\n`Counter` 클래스를 정의합니다.",
+        "highlight": [2]
       },
       {
-        "line": 16,
+        "line": 2,
+        "title": "클래스 본문 진입",
+        "explanation": "클래스 본문으로 진입하여 메서드들을 정의합니다.",
+        "highlight": [2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15]
+      },
+      {
+        "line": 3,
+        "title": "__init__ 메서드 정의",
+        "explanation": "`def __init__(self, start, end):`\n초기화 메서드를 정의합니다.",
+        "highlight": [3, 4, 5]
+      },
+      {
+        "line": 7,
+        "title": "__iter__ 메서드 정의",
+        "explanation": "`def __iter__(self):`\n이터레이터 프로토콜의 일부입니다. 자기 자신을 반환합니다.",
+        "highlight": [7, 8]
+      },
+      {
+        "line": 10,
+        "title": "__next__ 메서드 정의",
+        "explanation": "`def __next__(self):`\n다음 값을 반환하거나 StopIteration을 발생시킵니다.",
+        "highlight": [10, 11, 12, 13, 14, 15]
+      },
+      {
+        "line": 17,
         "title": "카운터 객체 생성",
-        "explanation": "`counter = Counter(0, 3)`\n`Counter` 클래스의 인스턴스를 생성합니다. `__init__` 메서드가 호출되어, `current`는 0, `end`는 3으로 초기화됩니다.",
-        "highlight": [16]
+        "explanation": "`counter = Counter(0, 3)`\n`Counter` 인스턴스를 생성합니다. `__init__`이 호출됩니다.",
+        "highlight": [17]
       },
       {
-        "line": 18,
-        "title": "for 루프 시작 (`__iter__` 호출)",
-        "explanation": "`for num in counter:`\n`for` 루프가 `counter` 객체를 처음 만났습니다. 루프를 시작하기 위해, `counter` 객체의 `__iter__` 메서드를 내부적으로 단 한 번 호출합니다. 이 메서드는 이터레이터 객체(`self`, 즉 `counter` 자신)를 반환합니다.",
-        "highlight": [18]
+        "line": 4,
+        "title": "__init__ 실행 (1)",
+        "explanation": "`self.current = start`\n`current`를 0으로 설정합니다.",
+        "highlight": [4]
       },
       {
-        "line": 18,
-        "title": "첫 번째 값 요청 (`__next__` 호출)",
-        "explanation": "루프의 첫 바퀴가 시작됩니다. `for`문은 `__iter__`로부터 받은 이터레이터 객체의 `__next__` 메서드를 호출합니다. `current`(0)가 `end`(3)보다 작으므로 `value`는 0이 되고, 0이 반환되어 `num` 변수에 할당됩니다.",
-        "highlight": [18]
+        "line": 5,
+        "title": "__init__ 실행 (2)",
+        "explanation": "`self.end = end`\n`end`를 3으로 설정합니다.",
+        "highlight": [5]
       },
       {
         "line": 19,
+        "title": "for 루프 시작",
+        "explanation": "`for num in counter:`\n`for` 루프가 시작되며 내부적으로 `__iter__`를 호출합니다.",
+        "highlight": [19]
+      },
+      {
+        "line": 8,
+        "title": "__iter__ 실행",
+        "explanation": "`return self`\n이터레이터 객체(자기 자신)를 반환합니다.",
+        "highlight": [8]
+      },
+      {
+        "line": 11,
+        "title": "__next__ 실행 - 첫 번째 (조건 검사)",
+        "explanation": "`if self.current >= self.end:`\ncurrent(0) >= end(3)? False이므로 계속 진행합니다.",
+        "highlight": [11]
+      },
+      {
+        "line": 13,
+        "title": "__next__ 실행 - 첫 번째 (값 저장)",
+        "explanation": "`value = self.current`\n현재 값 0을 저장합니다.",
+        "highlight": [13]
+      },
+      {
+        "line": 14,
+        "title": "__next__ 실행 - 첫 번째 (증가)",
+        "explanation": "`self.current += 1`\ncurrent를 1로 증가시킵니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 15,
+        "title": "__next__ 실행 - 첫 번째 (반환)",
+        "explanation": "`return value`\n0을 반환합니다. `num`에 할당됩니다.",
+        "highlight": [15]
+      },
+      {
+        "line": 20,
         "title": "첫 번째 값 출력",
-        "explanation": "`print(num)`\n`num`에 할당된 `0`을 화면에 출력합니다.",
-        "highlight": [19]
+        "explanation": "`print(num)`\n0을 출력합니다.",
+        "highlight": [20]
       },
       {
-        "line": 18,
-        "title": "두 번째 값 요청 (`__next__` 호출)",
-        "explanation": "루프의 두 번째 바퀴입니다. `for`문이 다시 `__next__`를 호출합니다. `current`는 1이 되어 `num`에 할당됩니다.",
-        "highlight": [18]
+        "line": 11,
+        "title": "__next__ 실행 - 두 번째 (조건 검사)",
+        "explanation": "`if self.current >= self.end:`\ncurrent(1) >= end(3)? False이므로 계속 진행합니다.",
+        "highlight": [11]
       },
       {
-        "line": 19,
+        "line": 13,
+        "title": "__next__ 실행 - 두 번째 (값 저장)",
+        "explanation": "`value = self.current`\n현재 값 1을 저장합니다.",
+        "highlight": [13]
+      },
+      {
+        "line": 14,
+        "title": "__next__ 실행 - 두 번째 (증가)",
+        "explanation": "`self.current += 1`\ncurrent를 2로 증가시킵니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 15,
+        "title": "__next__ 실행 - 두 번째 (반환)",
+        "explanation": "`return value`\n1을 반환합니다. `num`에 할당됩니다.",
+        "highlight": [15]
+      },
+      {
+        "line": 20,
         "title": "두 번째 값 출력",
-        "explanation": "`print(num)`\n`num`에 할당된 `1`을 화면에 출력합니다.",
-        "highlight": [19]
+        "explanation": "`print(num)`\n1을 출력합니다.",
+        "highlight": [20]
       },
       {
-        "line": 18,
-        "title": "마지막 값 요청과 루프 종료",
-        "explanation": "이 과정이 반복되어 `2`가 출력된 후, `current`가 3이 됩니다. 다음 `__next__` 호출 시 `current >= end` 조건이 참이 되어 `StopIteration` 예외가 발생하고, `for` 루프는 이 예외를 감지하여 정상적으로 반복을 종료합니다.",
-        "highlight": [18]
+        "line": 11,
+        "title": "__next__ 실행 - 세 번째 (조건 검사)",
+        "explanation": "`if self.current >= self.end:`\ncurrent(2) >= end(3)? False이므로 계속 진행합니다.",
+        "highlight": [11]
+      },
+      {
+        "line": 13,
+        "title": "__next__ 실행 - 세 번째 (값 저장)",
+        "explanation": "`value = self.current`\n현재 값 2를 저장합니다.",
+        "highlight": [13]
+      },
+      {
+        "line": 14,
+        "title": "__next__ 실행 - 세 번째 (증가)",
+        "explanation": "`self.current += 1`\ncurrent를 3으로 증가시킵니다.",
+        "highlight": [14]
+      },
+      {
+        "line": 15,
+        "title": "__next__ 실행 - 세 번째 (반환)",
+        "explanation": "`return value`\n2를 반환합니다. `num`에 할당됩니다.",
+        "highlight": [15]
+      },
+      {
+        "line": 20,
+        "title": "세 번째 값 출력",
+        "explanation": "`print(num)`\n2를 출력합니다.",
+        "highlight": [20]
+      },
+      {
+        "line": 11,
+        "title": "__next__ 실행 - 네 번째 (StopIteration)",
+        "explanation": "`if self.current >= self.end:`\ncurrent(3) >= end(3)? True! 조건이 참이 됩니다.",
+        "highlight": [11]
+      },
+      {
+        "line": 12,
+        "title": "루프 종료",
+        "explanation": "`raise StopIteration`\nStopIteration 예외가 발생하여 for 루프가 정상 종료됩니다.",
+        "highlight": [12]
       }
     ]
   },
