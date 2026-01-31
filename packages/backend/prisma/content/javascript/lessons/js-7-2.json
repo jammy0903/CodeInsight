@@ -6,57 +6,49 @@
         "code": "// 1. Young Generation (단명 객체)\nfunction createTemp() {\n  const temp = { id: Math.random() };\n  // 함수 종료 시 참조가 끊기며 GC 대상이 됨\n}\n\n// 2. Old Generation (장수 객체)\nconst cache = [];\nfunction save(data) {\n  cache.push(data); // 전역 배열이 참조를 유지함\n}\n\ncreateTemp(); // Young 영역에 할당되었다가 금방 수거됨\ncreateTemp();\n\nsave({ type: 'important' }); // GC를 여러 번 버티면 Old 영역으로 승격됨",
         "steps": [
             {
-                "line": 2,
-                "title": "Young Generation: 신규 할당",
-                "explanation": "`temp` 객체처럼 새로 생성되는 대부분의 객체는 **Young Generation (New Space)** 영역에 할당됩니다.\n\n**Young Generation이란?**\n생성된 지 얼마 안 된 '신입' 객체들이 머무는 곳입니다. 용량이 작지만(보통 1~8MB), 할당과 해제가 매우 빠르다는 장점이 있습니다.",
-                "keyInsight": "Generational Hypothesis: '대부분의 객체는 금방 죽는다'는 가설에 기반한 설계입니다.",
-                "highlight": [
-                    2,
-                    3
-                ],
+                "line": 13,
+                "title": "객체 생성 (Young Generation)",
+                "explanation": "`createTemp()`가 호출되면, 내부의 `temp` 객체는 V8 힙의 **Young Generation** 영역에 할당됩니다. 대부분의 객체는 이곳에서 짧은 생을 삽니다.",
+                "keyInsight": "Young Generation은 '신입' 객체들이 머무는 곳으로, GC가 매우 빠릅니다.",
+                "highlight": [13, 2, 3],
                 "visualizationType": "memory",
-                "memoryState": {
-                    "heap": [
-                        {
-                            "address": "0xNew1",
-                            "content": "{ id: 0.1 }",
-                            "label": "Young Gen (Nursery)"
-                        }
-                    ]
-                }
-            },
-            {
-                "line": 10,
-                "title": "마이너 GC (Scavenge)",
-                "explanation": "`createTemp()`가 종료되면 `temp`는 도달 불가능한(Unreachable) 상태가 됩니다. 이때 **Scavenger**가 동작합니다.\n\n**Scavenger(청소부)란?**\nYoung Generation 전용 가비지 컬렉터입니다. 살아있는 객체만 재빠르게 골라내고, 나머지는 한꺼번에 비우는 방식(Copying GC)을 씁니다. 속도가 엄청 빠릅니다.",
-                "highlight": [
-                    9,
-                    10
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "heap": [],
-                    "note": "0xNew1 객체 수거됨 (Minor GC 완료)"
-                }
+                "memoryState": { "heap": [{"area": "Young", "content": "{id: ...}"}] }
             },
             {
                 "line": 13,
-                "title": "Old Generation으로 승격 (Promotion)",
-                "explanation": "`cache`에 저장된 객체처럼 GC를 2번 이상 버텨낸 객체는 **Old Generation** 영역으로 이동합니다.\n\n**Promotion(승격)이란?**\n\"너는 금방 죽을 녀석이 아니구나!\" 하고 판단해서, 더 크고 안정적인 메모리 공간(Old Generation)으로 이사를 시키는 과정입니다. 이곳은 GC가 자주 일어나지 않습니다.",
+                "title": "마이너 GC (Scavenge)",
+                "explanation": "`createTemp()` 함수 실행이 끝나면, `temp` 객체는 더 이상 참조되지 않는 '쓰레기'가 됩니다. Young Generation을 청소하는 **마이너 GC(Scavenge)**가 매우 빠르게 이 객체를 수거해갑니다.",
+                "highlight": [13, 4],
+                "visualizationType": "memory",
+                "memoryState": { "heap": [{"area": "Young", "content": "empty (collected)"}] }
+            },
+            {
+                "line": 14,
+                "title": "반복적인 생성과 소멸",
+                "explanation": "다시 `createTemp()`가 호출됩니다. 이전과 마찬가지로 `temp` 객체는 Young Generation에 생성되었다가 함수 종료와 함께 빠르게 사라집니다.",
+                "highlight": [14],
+                "visualizationType": "memory",
+                "memoryState": { "heap": [{"area": "Young", "note": "Object created and collected again"}]}
+            },
+            {
+                "line": 16,
+                "title": "장기 생존 객체 생성",
+                "explanation": "`save` 함수가 호출되면서 `{ type: 'important' }` 객체가 생성되어 `cache` 배열에 추가됩니다.",
+                "highlight": [16],
+                "visualizationType": "memory",
+                "memoryState": { "heap": [{"area": "Young", "content": "{type: 'important'}"}] }
+            },
+            {
+                "line": 10,
+                "title": "참조 유지 (Promotion 대상)",
+                "explanation": "`cache` 배열은 전역 변수이므로 프로그램이 끝날 때까지 사라지지 않습니다. 따라서 `cache`가 참조하는 객체는 마이너 GC에서 계속 살아남습니다. 몇 번의 GC에서 살아남은 '장수 객체'는 결국 **Old Generation** 영역으로 '승격(Promotion)'됩니다.",
                 "keyInsight": "오래 살아남은 객체는 '안전한 보관소(Old Space)'로 옮겨서 관리 효율을 높입니다.",
-                "highlight": [
-                    13,
-                    14,
-                    15
-                ],
+                "highlight": [10],
                 "visualizationType": "memory",
                 "memoryState": {
                     "heap": [
-                        {
-                            "address": "0xOld1",
-                            "content": "{ type: 'important' }",
-                            "label": "Old Gen (Promoted)"
-                        }
+                        {"area": "Young"},
+                        {"area": "Old", "content": "{type: 'important'}", "note": "Promoted"}
                     ]
                 }
             }
