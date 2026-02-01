@@ -9,10 +9,6 @@
 
 // 컴포넌트
 export { CMemoryView } from './CMemoryView';
-export { PointerArrow, PointerArrowOverlay } from './components/PointerArrow';
-
-// Hooks
-export { usePointerConnections } from './hooks/usePointerConnections';
 
 // 타입
 export type {
@@ -21,16 +17,6 @@ export type {
   CMemoryViewProps,
   SegmentType,
 } from './CMemoryView';
-
-export type {
-  PointerArrowProps,
-  PointerArrowOverlayProps,
-} from './components/PointerArrow';
-
-export type {
-  PointerConnection,
-  UsePointerConnectionsResult,
-} from './hooks/usePointerConnections';
 
 // 상수
 export { SEGMENT_COLORS, getPointerColor, POINTER_PALETTE } from './constants';
