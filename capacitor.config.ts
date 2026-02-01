@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.cosine.codeinsight',
-  appName: 'C-OSINE',
+  appName: 'CodeInsight',
   webDir: 'packages/frontend/dist',
 
   server: {
