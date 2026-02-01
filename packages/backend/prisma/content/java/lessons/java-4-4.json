@@ -1,128 +1,106 @@
 {
   "lessonId": "java-4-4",
   "title": "문자열 비교 총정리",
-  "concept": "String 비교는 상황에 따라 ==, equals(), equalsIgnoreCase(), compareTo()를 사용한다",
+  "concept": "문자열 내용 비교는 무조건 equals()를 써야 한다. ==는 수류탄이다.",
   "content": {
     "code": "String a = \"Hello\";\nString b = new String(\"Hello\");\nString c = \"hello\";\n\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));\nSystem.out.println(a.equalsIgnoreCase(c));\nSystem.out.println(a.compareTo(\"Apple\"));\nSystem.out.println(\"Hello\".equals(a));",
     "steps": [
       {
         "line": 1,
-        "title": "리터럴 a 생성",
-        "explanation": "`a`는 문자열 리터럴로 생성되어 String Pool에 있는 \"Hello\" 객체를 참조합니다.",
+        "title": "리터럴 변수 a",
+        "explanation": "**실행 순서:**\n1. String Pool에 `\"Hello\"` 등록.\n2. `a`가 이를 참조.\n\n`a`는 Pool에 있는 객체를 가리킵니다.",
         "highlight": [
           1
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
-              "value": "-> Pool[0]"
+              "value": "-> Pool[0]",
+              "frame": "main"
             }
           ],
           "stringPool": [
-            "\"Hello\""
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
           ]
         }
       },
       {
         "line": 2,
-        "title": "new String b 생성",
-        "explanation": "`b`는 `new` 키워드로 생성되어, 내용은 같지만 String Pool이 아닌 Heap 메모리에 별도의 \"Hello\" 객체를 만들고 참조합니다.",
+        "title": "new String 변수 b",
+        "explanation": "**실행 순서:**\n1. Heap에 새로운 `\"Hello\"` 객체 생성.\n2. `b`가 이를 참조.\n\n내용은 같지만, `a`와 `b`는 서로 다른 물리적 공간(주소)에 존재합니다.",
         "highlight": [
           2
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
-              "value": "-> Pool[0]"
+              "value": "-> Pool[0]",
+              "frame": "main"
             },
             {
               "name": "b",
-              "value": "-> Heap[0]"
+              "value": "-> Heap[0]",
+              "frame": "main"
             }
           ],
           "heap": [
             {
               "address": "Heap[0]",
-              "content": "\"Hello\""
+              "content": "\"Hello\"",
+              "type": "String"
             }
-          ]
-        }
-      },
-      {
-        "line": 3,
-        "title": "리터럴 c 생성",
-        "explanation": "`c`는 소문자 \"hello\" 리터럴로, String Pool에 새로운 \"hello\" 객체가 만들어지고 이를 참조합니다.",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "a",
-              "value": "-> Pool[0]"
-            },
-            {
-              "name": "b",
-              "value": "-> Heap[0]"
-            },
-            {
-              "name": "c",
-              "value": "-> Pool[1]"
-            }
-          ],
-          "stringPool": [
-            "\"Hello\"",
-            "\"hello\""
           ]
         }
       },
       {
         "line": 5,
-        "title": "== 비교 (참조 비교)",
-        "explanation": "`a`는 Pool, `b`는 Heap. 서로 사는 집(주소)이 다르므로 `false`입니다. `==`는 내용이 아닌 주소만 비교합니다.",
-        "keyInsight": "== 는 집 주소 비교",
+        "title": "== 비교 (위험!)",
+        "explanation": "**실행 순서:**\n1. `a`의 주소(Pool[0])와 `b`의 주소(Heap[0]) 비교.\n2. 다름 -> `false`.\n\n`==` 연산자는 '내용'을 보는 게 아니라, '메모리 주소'가 같은지만 봅니다. \"쌍둥이인데 왜 다른 사람 취급하냐\"고 따져도 소용없습니다. 주민등록번호(주소)가 다르니까요.",
+        "keyInsight": "== 는 주소값 비교 (절대 금지)",
         "highlight": [
           5
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "output": [
             "false"
           ],
-          "warning": "문자열 비교에 == 쓰지 마세요!"
+          "warning": "문자열 비교에 == 를 쓰면 버그 발생!"
         }
       },
       {
         "line": 6,
-        "title": "equals() 비교 (내용 비교)",
-        "explanation": "두 객체 안의 실제 내용(\"Hello\")을 비교합니다. 내용이 같으므로 `true`입니다. Java에서 문자열 내용 비교의 표준입니다.",
-        "keyInsight": "equals() = 내용 비교 (표준)",
+        "title": "equals() 비교 (표준)",
+        "explanation": "**실행 순서:**\n1. `a`가 가리키는 문자열 내용 확인.\n2. `b`가 가리키는 문자열 내용 확인.\n3. 한 글자씩 비교 -> 일치 -> `true`.\n\n`equals()`는 주소가 아니라 **실제 내용물**을 비교합니다. 우리가 일반적으로 원하는 '비교'입니다.",
+        "keyInsight": "equals() = 내용물 비교",
         "highlight": [
           6
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "output": [
             "false",
             "true"
-          ]
+          ],
+          "note": "내용물 비교 성공"
         }
       },
       {
         "line": 7,
         "title": "equalsIgnoreCase()",
-        "explanation": "대소문자 차이를 무시하고 내용을 비교합니다. \"Hello\"와 \"hello\"를 같은 것으로 취급하여 `true`를 반환합니다.",
-        "keyInsight": "ID/PW 비교 말고 검색 등에 유용",
+        "explanation": "**실행 순서:**\n1. `a`(\"Hello\")와 `c`(\"hello\") 비교.\n2. 대소문자 무시 옵션 켜짐.\n3. H == h, E == e... -> `true`.\n\n사용자 ID나 이메일 주소 비교할 때 매우 유용합니다.",
         "highlight": [
           7
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "output": [
             "false",
             "true",
@@ -132,33 +110,31 @@
       },
       {
         "line": 8,
-        "title": "compareTo() (사전순)",
-        "explanation": "문자열을 사전 순서로 비교합니다. `H`(72)는 `A`(65)보다 크므로 양수(7)를 반환합니다. 이는 `a`가 `\"Apple\"`보다 사전에 뒤에 나온다는 의미입니다.",
-        "keyInsight": "0: 같음, 양수: 내가 더 큼, 음수: 내가 더 작음",
+        "title": "compareTo() - 사전순 정렬",
+        "explanation": "**실행 순서:**\n1. \"Hello\"와 \"Apple\"을 앞에서부터 비교.\n2. 'H'(72) - 'A'(65) = 7.\n3. 양수이므로 \"Hello\"가 더 뒤에 옴.\n\n정렬(Sorting) 알고리즘에서 주로 사용됩니다.",
         "highlight": [
           8
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "output": [
             "false",
             "true",
             "true",
             "7"
-          ],
-          "note": "정렬(Sorting)할 때 쓰임"
+          ]
         }
       },
       {
         "line": 9,
-        "title": "안전한 비교 (Yoda Condition)",
-        "explanation": "추천 기법: `\"리터럴\".equals(변수)` 순서로 비교합니다. 이렇게 하면 변수 `a`가 `null`일 경우에도 NullPointerException 없이 안전하게 `false`를 반환합니다.",
-        "keyInsight": "\"리터럴\".equals(변수) = null-safe",
+        "title": "null-safe 비교 (요다 조건식)",
+        "explanation": "**비교 팁:**\n`변수.equals(\"상수\")` 대신 `\"상수\".equals(변수)`를 쓰세요.\n\n만약 `a`가 `null`이라면?\n- `a.equals(...)` -> **NullPointerException** (폭발)\n- `\"Hello\".equals(a)` -> `false` (안전)",
+        "keyInsight": "\"리터럴\".equals(변수) = 안전",
         "highlight": [
           9
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "output": [
             "false",
             "true",
@@ -166,33 +142,28 @@
             "7",
             "true"
           ],
-          "note": "a가 null이어도 안전함"
+          "note": "변수가 null이어도 에러 안 남"
         }
       }
     ]
   },
   "quiz": {
-    "question": "null-safe한 문자열 비교 방법은?",
+    "question": "다음 중 가장 안전한 문자열 비교 코드는?",
     "options": [
-      "str.equals(\"value\")",
-      "\"value\".equals(str)",
-      "str == \"value\"",
-      "str.compareTo(\"value\") == 0"
+      "if (input == \"EXIT\")",
+      "if (input.equals(\"EXIT\"))",
+      "if (\"EXIT\".equals(input))",
+      "if (input.compareTo(\"EXIT\") == 0)"
     ],
-    "correctIndex": 1,
-    "explanation": "리터럴.equals(변수) 패턴은 변수가 null이어도 `false`를 반환합니다. 반대로 변수.equals()는 변수가 null이면 `NullPointerException`이 터집니다."
+    "correctIndex": 2,
+    "explanation": "3번 `\"EXIT\".equals(input)`은 `input`이 `null`이어도 에러가 나지 않고 그냥 `false`를 반환하므로 가장 안전합니다(Null-safe)."
   },
   "misconceptions": [
     {
-      "wrong": "== 가 가끔 true니까 그냥 써도 된다",
-      "correct": "러시안 룰렛과 같습니다. 리터럴끼리는 `true`지만, 연산 결과나 DB에서 가져온 문자열은 `false`가 나옵니다.",
-      "why": "지금 당장 돌아간다고 해서 안전한 코드가 아닙니다. 언제든 터질 수 있는 시한폭탄입니다."
-    },
-    {
-      "wrong": "compareTo는 -1, 0, 1 중 하나만 반환한다",
-      "correct": "아닙니다! 두 문자의 차이값(ASCII 코드 차이)인 7, -32 같은 숫자가 나올 수 있습니다.",
-      "why": "부호(양수/음수)만 봐야지, 특정 숫자(`-1`)랑 같은지 비교하면 버그가 생깁니다."
+      "wrong": "== 써도 테스트 잘 통과하던데?",
+      "correct": "운이 좋았을 뿐입니다. 리터럴끼리 비교했거나 String Pool 덕을 본 것입니다.",
+      "why": "사용자 입력, 파일 읽기, DB 조회 등으로 만들어진 문자열은 Pool이 아닌 Heap에 생길 수 있어서, `==`로 비교하면 내용이 같아도 `false`가 나옵니다."
     }
   ],
-  "keyTakeaway": "String 비교는 equals(), 안전하려면 \"리터럴\".equals(변수) 순서로!"
+  "keyTakeaway": "String 내용 비교는 무조건 equals()! 주소 비교(==)는 절대 금지!"
 }

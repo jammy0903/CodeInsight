@@ -1,19 +1,19 @@
 {
   "lessonId": "java-3-1",
-  "title": "기본 타입 전달",
-  "concept": "기본 타입(primitive)은 값이 복사되어 전달된다",
+  "title": "기본 타입 전달 (Primitive Passing)",
+  "concept": "기본 타입(int, boolean 등)을 메서드에 넘길 땐 '값'만 복사된다.",
   "content": {
     "code": "void increment(int x) {\n    x = x + 1;\n    System.out.println(\"inside: \" + x);\n}\n\nint a = 10;\nSystem.out.println(\"before: \" + a);\nincrement(a);\nSystem.out.println(\"after: \" + a);",
     "steps": [
       {
         "line": 6,
         "title": "변수 a 선언",
-        "explanation": "Stack 메모리의 `main` 프레임에 `a`라는 변수를 만들고 값 `10`을 저장합니다.",
+        "explanation": "**실행 순서:**\n1. Stack 메모리의 `main` 프레임 생성.\n2. `int`형 변수 `a` 공간 확보.\n3. 값 `10` 저장.\n\n**메모리에서 일어나는 일:**\n`main`이라는 작업 공간(Stack Frame)에 `a`라는 이름표를 붙인 상자를 만들고, 숫자 `10`을 넣습니다.",
         "highlight": [
           6
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
@@ -26,12 +26,19 @@
       {
         "line": 7,
         "title": "메서드 호출 전 출력",
-        "explanation": "`a`의 현재 값인 10을 출력합니다.",
+        "explanation": "**실행 순서:**\n1. `a`의 현재 값 조회.\n2. `System.out.println` 호출.\n\n현재 `a` 상자에 들어있는 `10`을 화면에 출력합니다.",
         "highlight": [
           7
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main"
+            }
+          ],
           "output": [
             "before: 10"
           ]
@@ -39,14 +46,14 @@
       },
       {
         "line": 8,
-        "title": "increment(a) 호출",
-        "explanation": "**값의 복사 (Pass by Value):** `increment` 메서드를 위한 새 스택 프레임이 생깁니다. `a`의 값(10)이 '복사'되어 새 프레임의 `x`에게 전달됩니다. 이제 `a`와 `x`는 완전히 별개의 변수입니다.",
-        "keyInsight": "기본 타입 = 값만 복사, 원본과 완전 남남",
+        "title": "increment(a) 호출 - 값의 복사",
+        "explanation": "**실행 순서:**\n1. `increment` 메서드용 새 Stack Frame 생성.\n2. 파라미터 `x` 변수 공간 생성.\n3. `a`의 값 `10`을 읽어서 `x`에 **복사**.\n\n**핵심 (Call by Value):**\n`a` 그 자체가 넘어가는 게 아닙니다. `a`에 들어있는 값 `10`을 복사해서 `x`라는 새 상자에 넣어줍니다. 이제 `a`와 `x`는 완전히 남남입니다.",
+        "keyInsight": "변수 자체가 아닌 '값'만 복사됨",
         "highlight": [
           8
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
@@ -60,19 +67,22 @@
               "copied": true
             }
           ],
-          "note": "a의 값이 복사됨"
+          "output": [
+            "before: 10"
+          ],
+          "note": "a의 값(10)이 x로 복사됨"
         }
       },
       {
         "line": 2,
         "title": "파라미터 x 값 변경",
-        "explanation": "`increment` 프레임 안에 있는 `x`의 값이 11로 바뀝니다. `main` 프레임의 `a`는 영향을 받지 않습니다.",
-        "keyInsight": "파라미터 변경 -> 원본 영향 없음",
+        "explanation": "**실행 순서:**\n1. `x`의 값 `10`을 읽음.\n2. `1`을 더해 `11` 생성.\n3. `x` 상자에 `11`을 다시 저장.\n\n**원본은?**\n`x`는 `increment` 프레임에 있는 별도의 상자입니다. 여기서 무슨 짓을 해도 `main` 프레임에 있는 `a` 상자는 영향을 받지 않습니다.",
+        "keyInsight": "복사본(x)을 수정해도 원본(a)은 그대로",
         "highlight": [
           2
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
@@ -85,18 +95,33 @@
               "frame": "increment",
               "changed": true
             }
+          ],
+          "output": [
+            "before: 10"
           ]
         }
       },
       {
         "line": 3,
         "title": "함수 내부 출력",
-        "explanation": "`increment` 프레임 안에서 `x`의 값인 11을 출력합니다.",
+        "explanation": "**실행 순서:**\n1. `x`의 값 `11` 조회.\n2. 출력.\n\n함수 내부에서는 변경된 값 `11`이 보입니다.",
         "highlight": [
           3
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main"
+            },
+            {
+              "name": "x",
+              "value": "11",
+              "frame": "increment"
+            }
+          ],
           "output": [
             "before: 10",
             "inside: 11"
@@ -105,14 +130,14 @@
       },
       {
         "line": 9,
-        "title": "함수 반환 후 출력",
-        "explanation": "`increment` 메서드가 종료되면 해당 스택 프레임(x 포함)은 사라집니다. `main` 프레임으로 돌아와 `a`를 출력하면, 여전히 원래 값인 10이 출력됩니다.",
-        "keyInsight": "메서드 종료 -> 복사본 x 소멸",
+        "title": "함수 반환 및 결과 확인",
+        "explanation": "**실행 순서:**\n1. `increment` 메서드 종료.\n2. `increment` 스택 프레임(x 포함) 삭제.\n3. `main`으로 복귀.\n4. `a` 값 출력.\n\n**결과:**\n`a`는 여전히 `10`입니다. 복사본(`x`)이 사라졌을 뿐, 원본(`a`)은 건드린 적이 없기 때문입니다.",
+        "keyInsight": "메서드 종료 시 복사본은 소멸됨",
         "highlight": [
           9
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
@@ -130,22 +155,22 @@
     ]
   },
   "quiz": {
-    "question": "Java의 기본 타입 호출 방식은?",
+    "question": "Java에서 기본 타입(int)을 메서드에 전달할 때의 동작으로 올바른 것은?",
     "options": [
-      "Call by Reference",
-      "Call by Value",
-      "Call by Name",
-      "Call by Need"
+      "변수의 메모리 주소가 전달된다.",
+      "변수의 값이 복사되어 전달된다.",
+      "변수 자체가 이동한다.",
+      "아무 일도 일어나지 않는다."
     ],
     "correctIndex": 1,
-    "explanation": "Java는 오직 **Call by Value(값에 의한 호출)**만 존재합니다. 변수의 값을 복사해서 전달합니다."
+    "explanation": "Java는 기본 타입을 전달할 때 그 **값(Value)**만 복사해서 전달합니다(Call by Value). 따라서 메서드 안에서 값을 바꿔도 원본에는 영향이 없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "함수에서 파라미터를 수정하면 원본도 바뀐다",
-      "correct": "기본 타입(primitive)은 **값(Value)**만 복사되므로, 원본 변수는 절대 영향을 받지 않습니다.",
-      "why": "마치 엑셀 파일을 이메일로 보낸 것과 같습니다. 받은 사람이 엑셀을 수정해도 내 컴퓨터에 있는 파일은 그대로인 것과 같은 원리입니다."
+      "wrong": "함수로 변수를 보내면 연결되어 있다.",
+      "correct": "기본 타입은 복사본(Clone)을 보내는 것과 같습니다.",
+      "why": "엑셀 파일을 복사해서 친구에게 주면, 친구가 내용을 수정해도 내 원본 파일은 바뀌지 않는 것과 똑같은 원리입니다."
     }
   ],
-  "keyTakeaway": "기본 타입은 '복사본'이 전달된다. 원본은 안전하다."
+  "keyTakeaway": "기본 타입은 '값의 복사'다. 메서드 안에서 지지고 볶아도 원본은 안전하다."
 }

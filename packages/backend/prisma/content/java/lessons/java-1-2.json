@@ -8,13 +8,13 @@
       {
         "line": 1,
         "title": "리터럴로 String 생성",
-        "explanation": "**메모리에서 일어나는 일:**\n1. JVM이 **String Pool**을 뒤져봅니다.\n2. \"hello\"가 없으니 새로 만들어서 Pool에 넣습니다.\n3. 그 주소(Pool:0x100)를 `a`에게 줍니다.\n\n**String Pool이란?**\n자주 쓰는 문자열을 모아두는 '재활용 센터'입니다. Java는 메모리를 아끼기 위해 똑같은 문자열 리터럴은 하나만 만들어서 공유합니다.\n\n**리터럴(Literal)이란?**\n코드에 직접 타이핑한 값(`\"hello\"`)들을 말합니다.",
+        "explanation": "**실행 순서:**\n1. JVM이 **String Pool** 검색.\n2. \"hello\"가 없으므로 Pool에 생성.\n3. 주소(Pool:0x100)를 `a`에 할당.\n\n**String Pool이란?**\n자주 쓰는 문자열을 모아두는 '재활용 센터'입니다. Java는 메모리를 아끼기 위해 똑같은 문자열 리터럴은 하나만 만들어서 공유합니다.\n\n**리터럴(Literal)이란?**\n코드에 직접 타이핑한 값(`\"hello\"`)들을 말합니다.",
         "keyInsight": "따옴표(\"\")로 만들면 Pool에 저장됨",
         "highlight": [
           1
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
@@ -33,13 +33,13 @@
       {
         "line": 2,
         "title": "같은 리터럴 재사용",
-        "explanation": "또 \"hello\"를 만들려고 하네요?\nJVM은 Pool을 뒤져보고, \"어? 아까 만든 게 있네?\" 하고 **기존 주소**를 재사용합니다.\n\n그래서 `b`도 `a`와 똑같은 **Pool:0x100**을 가리키게 됩니다.\n\n**Flyweight 패턴:**\n똑같은 객체를 많이 만들지 않고 공유해서 메모리를 절약하는 디자인 패턴입니다. String Pool이 바로 이 패턴입니다.",
+        "explanation": "**실행 순서:**\n1. String Pool 검색.\n2. \"hello\" 발견 (재사용).\n3. 기존 주소(Pool:0x100)를 `b`에 할당.\n\n또 \"hello\"를 만들려고 하네요?\nJVM은 Pool을 뒤져보고, \"어? 아까 만든 게 있네?\" 하고 **기존 주소**를 재사용합니다.\n그래서 `b`도 `a`와 똑같은 **Pool:0x100**을 가리키게 됩니다.\n\n**Flyweight 패턴:**\n똑같은 객체를 많이 만들지 않고 공유해서 메모리를 절약하는 디자인 패턴입니다. String Pool이 바로 이 패턴입니다.",
         "keyInsight": "같은 리터럴 = 같은 주소 재사용",
         "highlight": [
           2
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
@@ -63,13 +63,13 @@
       {
         "line": 3,
         "title": "리터럴끼리 == 비교",
-        "explanation": "`a`와 `b`는 **같은 주소**를 가리키고 있으니 `==`(주소 비교) 결과는 **true**입니다.\n\n하지만 주의하세요! 이건 문자열이 같아서가 아니라, **우연히 같은 객체를 공유**했기 때문입니다.",
+        "explanation": "**실행 순서:**\n1. a(Pool:0x100) == b(Pool:0x100) 비교.\n2. 주소가 같으므로 **true**.\n\n`a`와 `b`는 **같은 주소**를 가리키고 있으니 `==`(주소 비교) 결과는 **true**입니다.\n하지만 주의하세요! 이건 문자열이 같아서가 아니라, **우연히 같은 객체를 공유**했기 때문입니다.",
         "keyInsight": "리터럴끼리는 == 가 true (하지만 .equals 권장)",
         "highlight": [
           3
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "comparison": "Pool:0x100 == Pool:0x100",
           "output": [
             "true"
@@ -80,13 +80,13 @@
       {
         "line": 5,
         "title": "new로 String 생성",
-        "explanation": "`new` 키워드는 **\"재활용하지 말고 무조건 새 거 내놔!\"** 라는 명령입니다.\nPool에 \"hello\"가 있든 말든 신경 쓰지 않고, 일반 **Heap** 영역에 새로운 객체를 만듭니다.\n\n**Heap String vs Pooled String:**\n- `new`: 나만의 전용 객체 (재사용 X)\n- `\"...\"`: 공용 객체 (재사용 O)",
+        "explanation": "**실행 순서:**\n1. `new` 키워드 발견 -> 무조건 새 객체 생성.\n2. Heap에 0x200 할당.\n\n`new` 키워드는 **\"재활용하지 말고 무조건 새 거 내놔!\"** 라는 명령입니다.\nPool에 \"hello\"가 있든 말든 신경 쓰지 않고, 일반 **Heap** 영역에 새로운 객체를 만듭니다.\n\n**Heap String vs Pooled String:**\n- `new`: 나만의 전용 객체 (재사용 X)\n- `\"...\"`: 공용 객체 (재사용 O)",
         "keyInsight": "new = 재활용 거부, 무조건 새 객체",
         "highlight": [
           5
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
@@ -115,12 +115,12 @@
       {
         "line": 6,
         "title": "리터럴 vs new 비교",
-        "explanation": "`a`는 재활용 센터(Pool) 출신이고,\n`c`는 공장(Heap)에서 갓 찍어낸 신상입니다.\n\n출신 성분이 다르니 주소도 다릅니다. `false`!",
+        "explanation": "**실행 순서:**\n1. a(Pool:0x100) == c(0x200) 비교.\n2. 주소가 다르므로 **false**.\n\n`a`는 재활용 센터(Pool) 출신이고,\n`c`는 공장(Heap)에서 갓 찍어낸 신상입니다.\n출신 성분이 다르니 주소도 다릅니다.",
         "highlight": [
           6
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "comparison": "Pool:0x100 != 0x200",
           "output": [
             "true",
@@ -131,13 +131,13 @@
       {
         "line": 8,
         "title": "intern()으로 Pool 등록",
-        "explanation": "`intern()` 메서드는 **\"나도 저 Pool 무리에 끼워줘\"** 라고 요청하는 것입니다.\n\n1. Pool에 \"hello\"가 있는지 확인합니다.\n2. 이미 있으니, 그 **Pool 객체의 주소**를 반환합니다.\n\n결국 `d`는 `a`와 같은 주소를 가지게 됩니다.",
+        "explanation": "**실행 순서:**\n1. `c.intern()` 호출.\n2. String Pool에서 같은 내용(\"hello\") 찾음.\n3. 찾은 Pool 객체의 주소(Pool:0x100) 반환.\n\n`intern()` 메서드는 **\"나도 저 Pool 무리에 끼워줘\"** 라고 요청하는 것입니다.\n결국 `d`는 `a`와 같은 주소를 가지게 됩니다.",
         "keyInsight": "intern() = Heap 문자열을 Pool 주소로 변환",
         "highlight": [
           8
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "a",
@@ -160,12 +160,12 @@
       {
         "line": 9,
         "title": "intern() 결과 비교",
-        "explanation": "`a`와 `d`는 이제 같은 Pool 객체를 가리킵니다. `true`!\n\n**실무 팁:**\n수백만 개의 중복된 문자열을 다뤄야 할 때 `intern()`을 쓰면 메모리를 획기적으로 줄일 수 있습니다.",
+        "explanation": "**실행 순서:**\n1. a(Pool:0x100) == d(Pool:0x100) 비교.\n2. 주소가 같으므로 **true**.\n\n`a`와 `d`는 이제 같은 Pool 객체를 가리킵니다. `true`!\n\n**실무 팁:**\n수백만 개의 중복된 문자열을 다뤄야 할 때 `intern()`을 쓰면 메모리를 획기적으로 줄일 수 있습니다.",
         "highlight": [
           9
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "output": [
             "true",
             "false",

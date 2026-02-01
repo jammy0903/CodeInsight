@@ -1,99 +1,139 @@
 {
   "lessonId": "java-4-1",
-  "title": "String 불변성",
-  "concept": "String 객체는 한 번 생성되면 내용을 변경할 수 없다. 모든 수정은 새 객체를 생성한다",
+  "title": "String 불변성 (Immutability)",
+  "concept": "String 객체는 한 번 생성되면 절대 변하지 않는다. 수정은 곧 '새 객체 생성'이다.",
   "content": {
     "code": "String s1 = \"Hello\";\nString s2 = s1;\n\ns1 = s1 + \" World\";\n\nSystem.out.println(s1);\nSystem.out.println(s2);\nSystem.out.println(s1 == s2);",
     "steps": [
       {
         "line": 1,
         "title": "String 리터럴 생성",
-        "explanation": "**String Pool:**\nJVM이 `\"Hello\"`라는 리터럴을 보고 String Pool에 저장합니다.\n`s1`은 이 Pool 상의 주소를 가리킵니다.",
+        "explanation": "**실행 순서:**\n1. JVM이 `\"Hello\"` 리터럴 발견.\n2. String Pool에 `\"Hello\"` 객체 등록/검색.\n3. `s1` 변수가 Pool의 주소(`Pool[0]`이라 가정)를 참조.\n\n**핵심:**\nString Pool은 메모리를 절약하기 위한 '재활용 센터'입니다. 같은 글자는 하나만 만들어 공유합니다.",
         "highlight": [
           1
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "s1",
-              "value": "-> Pool[0]"
+              "value": "-> Pool[0]",
+              "frame": "main"
             }
           ],
           "stringPool": [
-            "\"Hello\""
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
           ]
         }
       },
       {
         "line": 2,
         "title": "참조 복사 (Alias)",
-        "explanation": "`s2 = s1`:\n주소만 복사합니다. `s1`과 `s2`는 **같은 객체(Pool[0])**를 보고 있습니다.\n\n**비유:** 두 사람이 같은 책(`\"Hello\"`)을 보고 있는 상황입니다.",
-        "keyInsight": "String 할당 = 참조 복사",
+        "explanation": "**실행 순서:**\n1. `s1`의 주소(`Pool[0]`)를 읽음.\n2. `s2` 변수에 복사.\n\n**상태:**\n`s1`과 `s2`는 완전히 같은 객체(TV)를 가리키는 두 개의 리모컨이 되었습니다. 이를 '별칭(Aliasing)'이라고 합니다.",
+        "keyInsight": "단순 대입 = 주소 복사 (같은 곳 바라봄)",
         "highlight": [
           2
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "s1",
-              "value": "-> Pool[0]"
+              "value": "-> Pool[0]",
+              "frame": "main"
             },
             {
               "name": "s2",
               "value": "-> Pool[0]",
+              "frame": "main",
               "sameRef": true
             }
           ],
           "stringPool": [
-            "\"Hello\""
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
           ]
         }
       },
       {
         "line": 4,
-        "title": "문자열 연결 (불변성 발동!)",
-        "explanation": "**중요한 순간:**\n1. \"Hello\" 뒤에 \" World\"를 붙이려 합니다.\n2. 하지만 `String`은 **불변(Immutable)**이라, 책에 글씨를 덧쓸 수 없습니다.\n3. 대신 **새로운 책**(`\"Hello World\"`)을 만들어서 Heap에 저장합니다.\n4. `s1`은 이제 이 **새 책**을 가리키게 됩니다.\n\n**불변성(Immutability)이란?**\n생성 후 상태를 절대 바꿀 수 없는 성질입니다. 수정처럼 보이는 모든 작업은 사실 '새 객체 생성'입니다.",
-        "keyInsight": "수정 불가 -> 새 객체 생성",
+        "title": "문자열 연결 - 불변성 발동!",
+        "explanation": "**실행 순서:**\n1. `s1`(\"Hello\")과 \" World\"를 합침 -> \"Hello World\" 임시 생성.\n2. **새로운 객체** `\"Hello World\"`를 Heap에 할당 (Pool 아님).\n3. `s1`이 이 **새 주소**(`Heap[0]`)를 가리키도록 변경됨.\n\n**중요:**\n원래의 \"Hello\" 객체를 수정한 게 아닙니다! 새 종이에 글씨를 써서 `s1`에게 쥐어준 것입니다. `s2`는 여전히 옛날 \"Hello\"를 잡고 있습니다.",
+        "keyInsight": "String 수정 = New Object 생성 (Rebinding)",
         "highlight": [
           4
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "s1",
               "value": "-> Heap[0]",
+              "frame": "main",
               "changed": true
             },
             {
               "name": "s2",
-              "value": "-> Pool[0]"
+              "value": "-> Pool[0]",
+              "frame": "main"
             }
           ],
           "stringPool": [
-            "\"Hello\""
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
           ],
           "heap": [
             {
               "address": "Heap[0]",
               "content": "\"Hello World\"",
+              "type": "String",
               "new": true
             }
           ],
-          "note": "s1이 가리키는 곳이 바뀜! (Rebinding)"
+          "note": "s1의 화살표만 바뀜! (s2는 그대로)"
         }
       },
       {
         "line": 6,
         "title": "s1 출력 (새 값)",
-        "explanation": "`s1`은 새로 만든 `\"Hello World\"`를 출력합니다.",
+        "explanation": "**실행 순서:**\n1. `s1`이 가리키는 `\"Hello World\"` 출력.\n\n`s1`은 이제 새 객체를 보고 있으므로 바뀐 값이 나옵니다.",
         "highlight": [
           6
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Heap[0]",
+              "frame": "main"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello World\"",
+              "type": "String"
+            }
+          ],
           "output": [
             "Hello World"
           ]
@@ -102,13 +142,38 @@
       {
         "line": 7,
         "title": "s2 출력 (원본 유지)",
-        "explanation": "**불변성의 장점:**\n`s1`이 다른 책(`\"Hello World\"`)을 보러 떠났지만, `s2`가 보고 있던 원래 책(`\"Hello\"`)은 **아무런 손상 없이 그대로** 있습니다.\n\n만약 String이 가변이었다면, `s1`이 바뀔 때 `s2`도 덩달아 바뀌는 **부작용(Side Effect)**이 일어났을 것입니다.",
-        "keyInsight": "불변성 = 사이드 이펙트 방지",
+        "explanation": "**실행 순서:**\n1. `s2`가 가리키는 `\"Hello\"` 출력.\n\n**불변성의 힘:**\n`s1`이 배신(?)하고 떠났지만, `s2`가 잡고 있던 원본 `\"Hello\"`는 절대 변하지 않았습니다. 이것이 불변 객체(Immutable Object)가 주는 **안전함(Safety)**입니다.",
+        "keyInsight": "원본 훼손 없음 = 사이드 이펙트 방지",
         "highlight": [
           7
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Heap[0]",
+              "frame": "main"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello World\"",
+              "type": "String"
+            }
+          ],
           "output": [
             "Hello World",
             "Hello"
@@ -118,12 +183,37 @@
       {
         "line": 8,
         "title": "참조 비교",
-        "explanation": "`s1`(Heap의 새 객체)과 `s2`(Pool의 옛 객체)는 주소가 다릅니다.\n결과는 `false`입니다.",
+        "explanation": "**실행 순서:**\n1. `s1` 주소(Heap[0]) vs `s2` 주소(Pool[0]) 비교.\n2. 다름 -> `false` 출력.\n\n다른 객체이므로 주소도 당연히 다릅니다.",
         "highlight": [
           8
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Heap[0]",
+              "frame": "main"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello World\"",
+              "type": "String"
+            }
+          ],
           "output": [
             "Hello World",
             "Hello",
@@ -134,27 +224,27 @@
     ]
   },
   "quiz": {
-    "question": "String이 불변인 이유로 올바르지 않은 것은?",
+    "question": "Java에서 String이 불변(Immutable)이라서 생기는 현상 중 틀린 것은?",
     "options": [
-      "스레드 안전성(Thread Safety)",
-      "String Pool을 통한 메모리 절약",
-      "보안(Security)",
-      "수정(Update) 속도 향상"
+      "문자열을 수정하면 새로운 객체가 생긴다.",
+      "여러 변수가 같은 문자열을 공유해도 안전하다.",
+      "멀티스레드 환경에서 별도의 동기화가 필요 없다.",
+      "수정 작업이 많아도 메모리를 적게 쓴다."
     ],
     "correctIndex": 3,
-    "explanation": "불변성은 수정할 때마다 새 객체를 메모리에 할당해야 하므로 오히려 속도가 느립니다. 그래서 반복 수정 시에는 `StringBuilder`를 써야 합니다."
+    "explanation": "문자열 수정이 일어날 때마다 새로운 객체를 계속 만들어내므로, 수정이 잦은 경우 메모리 낭비가 심하고 성능이 떨어집니다. 이럴 땐 `StringBuilder`를 써야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "String에 += 쓰면 원본이 바뀐다",
-      "correct": "String은 절대 변하지 않습니다. 변수(`s1`)가 가리키는 **화살표**가 새 객체로 이동했을 뿐입니다.",
-      "why": "이를 **Rebinding(재연결)**이라고 합니다. 원본 객체는 메모리 어딘가에 그대로 남아있다가 나중에 GC(청소부)가 치워갑니다."
+      "wrong": "s1 = s1 + \"world\" 하면 s1의 내용이 바뀐다.",
+      "correct": "`s1`이라는 변수가 가리키는 **방향(참조)**이 바뀔 뿐, 원래 있던 \"Hello\" 객체는 그대로입니다.",
+      "why": "String 객체는 태어날 때 정해진 값을 죽을 때까지 바꿀 수 없습니다(Read-only)."
     },
     {
-      "wrong": "불변이면 메모리 낭비 아닌가요?",
-      "correct": "수정이 잦으면 낭비가 맞지만, **읽기**가 잦은 대부분의 경우엔 공유할 수 있어 오히려 이득입니다.",
-      "why": "공유해도 안전하다(Thread-safe)는 확신이 있기 때문에 `String Pool` 같은 최적화가 가능한 것입니다."
+      "wrong": "불변이면 메모리 낭비 아닌가?",
+      "correct": "수정할 땐 낭비지만, **읽기**에서는 엄청난 이득입니다.",
+      "why": "값이 안 변한다는 보장이 있으니, `\"Hello\"` 하나만 만들어놓고 수천 개의 변수가 돌려써도(Sharing) 안전하기 때문입니다. 이것이 **String Pool**의 원리입니다."
     }
   ],
-  "keyTakeaway": "String은 '돌판'과 같아서 고칠 수 없다. 수정하면 새 돌판을 파야 한다."
+  "keyTakeaway": "String은 '돌에 새긴 글자'와 같다. 내용을 고칠 순 없고 새 돌판을 파야 한다."
 }
