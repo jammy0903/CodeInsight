@@ -3,12 +3,12 @@
   "title": "제네릭 메서드와 타입 추론",
   "concept": "Core concept for Generic Methods",
   "content": {
-    "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \\\");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
+    "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
     "steps": [
       {
         "line": 3,
-        "title": "제네릭 메서드 선언",
-        "explanation": "메서드의 리턴 타입 앞에 <T>를 붙여, 이 메서드 안에서만 독립적으로 사용할 제네릭 타입 T를 선언합니다. 클래스 전체가 아닌 특정 메서드만 제네릭으로 만들 수 있습니다.",
+        "title": "제네릭 메서드 정의",
+        "explanation": "**실행 순서:**\n1. `printArray` 메서드가 정의됩니다.\n2. `<T>`는 이 메서드 호출 시점에 타입이 결정됨을 의미합니다.\n\n**독립적인 제네릭:**\n클래스 전체가 아니라, 이 메서드 하나만 제네릭하게 만들 수 있어요. 유틸리티 함수 만들 때 딱이죠!",
         "highlight": [
           3,
           4,
@@ -17,67 +17,187 @@
           7,
           8
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "printArray<T> 설계도 정의"
-        }
-      },
-      {
-        "line": 11,
-        "title": "Integer 배열 생성",
-        "explanation": "`printArray` 메서드에 전달할 `Integer` 타입의 배열을 생성합니다.",
-        "highlight": [
-          11
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [
             {
-              "name": "intArray",
-              "value": "-> [1, 2, 3]"
+              "name": "printArray<T>",
+              "value": "Method Definition"
             }
           ]
         }
       },
       {
-        "line": 14,
-        "title": "레이블 출력",
-        "explanation": "배열 내용을 출력하기 전에 설명 레이블을 먼저 출력합니다.",
+        "line": 11,
+        "title": "배열 생성 (Integer, String)",
+        "explanation": "**실행 순서:**\n1. `Integer` 배열과 `String` 배열을 힙에 생성합니다.\n2. 각각 `intArray`, `strArray` 변수가 참조합니다.\n\n**준비 완료:**\n테스트할 데이터들을 미리 만들어둡니다.",
         "highlight": [
-          14
+          11,
+          12
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "Integer Array: "
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "Integer[]",
+              "new": true
+            },
+            {
+              "address": "0x200",
+              "content": "[\"A\", \"B\", \"C\"]",
+              "type": "String[]",
+              "new": true
+            }
           ]
         }
       },
       {
-        "line": 17,
-        "title": "두 번째 레이블 출력",
-        "explanation": "다음 배열 내용을 출력하기 위해 설명 레이블을 출력합니다.",
+        "line": 15,
+        "title": "함수 호출 (T = Integer)",
+        "explanation": "**실행 순서:**\n1. `printArray(intArray)`를 호출합니다.\n2. 컴파일러가 `intArray`의 타입을 보고 `T`를 `Integer`로 추론(Type Inference)합니다.\n3. `printArray` 스택 프레임이 생성됩니다.\n\n**알아서 척척:**\n`<Integer>printArray(...)`라고 안 써도, 넣어주는 값을 보고 알아서 `Integer`인 줄 압니다.",
         "highlight": [
-          17
+          15,
+          3,
+          4,
+          5,
+          6,
+          7
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main"
+            },
+            {
+              "name": "array",
+              "value": "0x100",
+              "frame": "printArray",
+              "isFinal": true
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "Integer[]"
+            },
+            {
+              "address": "0x200",
+              "content": "[\"A\", \"B\", \"C\"]",
+              "type": "String[]"
+            }
+          ],
           "output": [
-            "Integer Array: 1 2 3 \n",
-            "String Array: "
+            "Integer Array: 1 2 3 "
+          ]
+        }
+      },
+      {
+        "line": 18,
+        "title": "함수 호출 (T = String)",
+        "explanation": "**실행 순서:**\n1. `printArray(strArray)`를 호출합니다.\n2. 이번엔 인자가 `String[]`이므로 `T`가 `String`으로 결정됩니다.\n3. 새로운 스택 프레임이 생성되어 실행됩니다.\n\n**재사용성:**\n코드 하나로 숫자 배열도 찍고, 문자열 배열도 찍고! 이게 바로 제네릭의 힘입니다.",
+        "highlight": [
+          18,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main"
+            },
+            {
+              "name": "array",
+              "value": "0x200",
+              "frame": "printArray",
+              "isFinal": true
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "Integer[]"
+            },
+            {
+              "address": "0x200",
+              "content": "[\"A\", \"B\", \"C\"]",
+              "type": "String[]"
+            }
+          ],
+          "output": [
+            "Integer Array: 1 2 3 ",
+            "String Array: A B C "
           ]
         }
       },
       {
         "line": 20,
-        "title": "원시 타입 에러",
-        "explanation": "제네릭 타입 파라미터 `T`에는 참조 타입(객체)만 올 수 있습니다. `int`와 같은 원시 타입(primitive type)은 올 수 없으므로, 이 라인의 주석을 풀면 컴파일 에러가 발생합니다. `Integer`와 같은 래퍼 클래스를 사용해야 합니다.",
+        "title": "원시 타입 제한",
+        "explanation": "**실행 순서:**\n1. 이 줄의 주석을 풀면 컴파일 에러가 발생합니다.\n\n**주의할 점:**\n`int[]`는 객체 배열이 아니라 원시 타입 배열이라 `T[]`에 대입될 수 없습니다. 제네릭은 오직 '참조 타입(Object)'만 다룬다는 점, 잊지 마세요!",
         "highlight": [
           20
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "error": "Compile Error: Generic type cannot be primitive"
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "error": "Compile Error: int[] cannot be converted to T[]",
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ]
         }
       }
     ]
@@ -97,8 +217,8 @@
     {
       "wrong": "static 메서드는 클래스의 제네릭 타입 T를 사용할 수 있다.",
       "correct": "불가능합니다. static 메서드는 객체 생성 전에 메모리에 올라가는데, 클래스의 T는 객체 생성 시(`new Box<Integer>`)에 정해지기 때문입니다. 그래서 제네릭 메서드로 따로 선언해야 합니다.",
-      "why": "static 문맥과 인스턴스 문맥의 차이입니다."
+      "why": "static 문맥(Class level)과 인스턴스 문맥(Object level)의 생명주기가 다르기 때문입니다."
     }
   ],
-  "keyTakeaway": "클래스에 제네릭을 붙이지 않아도, 특정 메서드만 독립적으로 제네릭하게 만들 수 있어 유틸리티 함수 제작에 매우 유용합니다."
+  "keyTakeaway": "클래스 전체를 제네릭으로 만들지 않아도, 특정 메서드만 `<T>`를 사용하여 유연하게 만들 수 있습니다. 이때 `static` 메서드도 문제없이 제네릭을 사용할 수 있죠!"
 }
