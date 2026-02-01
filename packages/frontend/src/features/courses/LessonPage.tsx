@@ -558,26 +558,37 @@ export function LessonPage() {
   const displayLine = currentStep?.line || 1;
 
   // 터미널 출력 라인 변환 (C/Java/Python 모두 지원)
+  // 현재 스텝에서 새로 추가된 출력만 표시 (누적 X)
   const terminalLines = useMemo((): TerminalLine[] => {
+    const prevStep = navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null;
+
     // 1. stdout 우선 (C, Java)
     if (currentStep?.stdout) {
-      return currentStep.stdout
-        .split('\n')
-        .filter(Boolean)
-        .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+      const currentLines = currentStep.stdout.split('\n').filter(Boolean);
+      const prevLines = prevStep?.stdout?.split('\n').filter(Boolean) || [];
+
+      // 이전 스텝 출력을 제외한 새로운 라인만 추출
+      const newLines = currentLines.slice(prevLines.length);
+
+      return newLines.map((line): TerminalLine => ({ content: line, type: 'stdout' }));
     }
 
     // 2. Python: pythonMemoryState.output
     const pythonOutput = (currentStep as any)?.pythonMemoryState?.output;
     if (Array.isArray(pythonOutput)) {
-      return pythonOutput.map((line): TerminalLine => ({
+      const prevPythonOutput = (prevStep as any)?.pythonMemoryState?.output || [];
+
+      // 이전 스텝 출력을 제외한 새로운 라인만 추출
+      const newLines = pythonOutput.slice(prevPythonOutput.length);
+
+      return newLines.map((line): TerminalLine => ({
         content: String(line),
         type: 'stdout'
       }));
     }
 
     return [];
-  }, [currentStep]);
+  }, [currentStep, navigation.currentStepIndex, steps]);
 
   useEffect(() => {
     const prevIndex = prevStepIndexRef.current;
