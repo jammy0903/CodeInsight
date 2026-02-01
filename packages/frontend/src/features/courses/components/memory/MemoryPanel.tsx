@@ -11,8 +11,6 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { MemoryBlock } from '@/types';
 import { useThemeStore } from '@/stores/themeStore';
-import { PointerArrow, PointerArrowOverlay } from '@/features/visualizers/c/components/PointerArrow';
-import { usePointerConnections } from '@/features/visualizers/c/hooks/usePointerConnections';
 
 // ============================================================
 // 타입 정의
@@ -185,8 +183,6 @@ function ArrayBlock({
   onToggle: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-  /** 블록 등록 함수 (포인터 화살표용) */
-  registerBlock?: (name: string, address: string, element: HTMLElement | null) => void;
 }) {
   const displayName = getDisplayName(arrayName);
   const elementCount = elements.length;
@@ -195,7 +191,6 @@ function ArrayBlock({
 
   // 테마 적용
   const currentTheme = useThemeStore((s) => s.theme);
-  
 
   if (!isExpanded) {
     // 접힌 상태: 요약 표시
@@ -269,7 +264,6 @@ function ArrayBlock({
             frameName={frameName}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            onRegister={registerBlock ? (el) => registerBlock(element.name, element.address, el) : undefined}
           />
         ))}
       </div>
@@ -287,7 +281,6 @@ function MemoryBlockCard({
   registerLabel,
   onMouseEnter,
   onMouseLeave,
-  onRegister,
 }: {
   block: MemoryBlock;
   isChanged: boolean;
@@ -297,32 +290,15 @@ function MemoryBlockCard({
   registerLabel?: 'rsp' | 'rbp';
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-  /** 블록 요소 등록 (포인터 화살표용) */
-  onRegister?: (element: HTMLElement | null) => void;
 }) {
   const valueDisplay = isGarbageValue(block.value) ? '?' : String(block.value);
   const displayName = getDisplayName(block.name);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   // 테마 적용
   const currentTheme = useThemeStore((s) => s.theme);
 
-  // 블록 요소 등록
-  useEffect(() => {
-    if (onRegister && cardRef.current) {
-      onRegister(cardRef.current);
-    }
-    return () => {
-      if (onRegister) {
-        onRegister(null);
-      }
-    };
-  }, [onRegister]);
-
-
   return (
     <motion.div
-      ref={cardRef}
       layout
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
@@ -460,14 +436,11 @@ function StackSection({
   changedBlocks,
   frames,
   showRegisters,
-  registerBlock,
 }: {
   blocks: MemoryBlock[];
   changedBlocks: ChangedBlocksType;
   frames: Array<{ name: string }>;
   showRegisters: boolean;
-  /** 블록 등록 함수 (포인터 화살표용) */
-  registerBlock?: (name: string, address: string, element: HTMLElement | null) => void;
 }) {
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [expandedArrays, setExpandedArrays] = useState<Set<string>>(new Set());
@@ -653,7 +626,6 @@ function StackSection({
                     onToggle={() => toggleArray(arrayName)}
                     onMouseEnter={() => setHoveredFrame(frameName)}
                     onMouseLeave={() => setHoveredFrame(null)}
-                    registerBlock={registerBlock}
                   />
                 );
               } else {
@@ -696,7 +668,6 @@ function StackSection({
                     registerLabel={registerLabel}
                     onMouseEnter={() => setHoveredFrame(frameName)}
                     onMouseLeave={() => setHoveredFrame(null)}
-                    onRegister={registerBlock ? (el) => registerBlock(block.name, block.address, el) : undefined}
                   />
                 );
               }
@@ -856,12 +827,9 @@ function LowerMemorySections({
 function HeapSection({
   blocks,
   changedBlocks,
-  registerBlock,
 }: {
   blocks: MemoryBlock[];
   changedBlocks: ChangedBlocksType;
-  /** 블록 등록 함수 (포인터 화살표용) */
-  registerBlock?: (name: string, address: string, element: HTMLElement | null) => void;
 }) {
   // 주소순 정렬 (낮은 주소 → 높은 주소)
   const sortedBlocks = useMemo(() => {
@@ -922,7 +890,6 @@ function HeapSection({
             frameName="heap"
             onMouseEnter={() => {}}
             onMouseLeave={() => {}}
-            onRegister={registerBlock ? (el) => registerBlock(block.name, block.address, el) : undefined}
           />
         ))}
       </div>
@@ -947,31 +914,8 @@ export function MemoryPanel({
 }: MemoryPanelProps) {
   const isEmpty = stack.length === 0 && heap.length === 0;
 
-  // 포인터 화살표 연결 관리
-  const { connections, containerRef, containerSize, registerBlock } =
-    usePointerConnections(stack, heap, [...changedBlocks.stack, ...changedBlocks.heap]);
-
   return (
-    <div className="p-2 space-y-2 relative" ref={containerRef}>
-      {/* 포인터 화살표 오버레이 */}
-      {connections.length > 0 && (
-        <PointerArrowOverlay
-          width={containerSize.width}
-          height={containerSize.height}
-        >
-          {connections.map((conn) => (
-            <PointerArrow
-              key={conn.id}
-              id={conn.id}
-              from={conn.from}
-              to={conn.to}
-              isActive={conn.isActive}
-              isCrossFrame={conn.isCrossFrame}
-            />
-          ))}
-        </PointerArrowOverlay>
-      )}
-
+    <div className="p-2 space-y-2 relative">
       {isEmpty ? (
         <div
           className="text-center py-8 text-sm italic"
@@ -987,12 +931,10 @@ export function MemoryPanel({
             changedBlocks={changedBlocks}
             frames={frames}
             showRegisters={showRegisters}
-            registerBlock={registerBlock}
           />
           <HeapSection
             blocks={heap}
             changedBlocks={changedBlocks}
-            registerBlock={registerBlock}
           />
           <LowerMemorySections
             dataSection={dataSection}
