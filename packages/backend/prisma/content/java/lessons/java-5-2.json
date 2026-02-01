@@ -1,106 +1,93 @@
 {
   "lessonId": "java-5-2",
   "title": "final 클래스와 메서드",
-  "concept": "final 클래스는 상속 불가, final 메서드는 오버라이드 불가",
+  "concept": "final 클래스는 상속을 금지하고, final 메서드는 오버라이딩을 금지한다.",
   "content": {
     "code": "final class ImmutablePoint {\n    private final int x, y;\n    \n    public ImmutablePoint(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n    \n    public final int getX() { return x; }\n}\n\n// class ExtendedPoint extends ImmutablePoint {}  // 에러!\n\nclass Parent {\n    public final void cannotOverride() {\n        System.out.println(\"Cannot override this!\");\n    }\n}\n\nclass Child extends Parent {\n    // public void cannotOverride() {}  // 에러!\n}",
     "steps": [
       {
         "line": 1,
         "title": "final 클래스 선언",
-        "explanation": "`final class`는 **\"나는 자식을 거부한다\"**는 선언입니다.\n이 클래스를 상속받아 기능을 제멋대로 바꾸거나 해킹하는 것을 원천 봉쇄합니다. 보안상 중요하거나 완벽하게 설계된 클래스(String 등)에 붙입니다.",
-        "keyInsight": "final class = 상속 금지 (가계도 끝)",
+        "explanation": "**의미:**\n\"내 대는 여기서 끝이다!\"\n`final class`는 다른 클래스가 나를 상속받지 못하게 막습니다. `String`, `Integer` 등의 핵심 클래스가 보안과 무결성을 위해 `final`로 선언되어 있습니다.",
+        "keyInsight": "final class = 상속 불가 (자식 없음)",
         "highlight": [
           1
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "String, Integer 등이 대표적인 final 클래스"
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "note": "상속 시도 시 컴파일 에러!"
         }
       },
       {
         "line": 2,
-        "title": "final 필드들",
-        "explanation": "필드까지 `final`이면 생성자에서 딱 한 번 값을 정하고, 이후 **절대 변경할 수 없습니다.**\n-> 이것이 바로 안전한 **불변 객체(Immutable Object)**를 만드는 비결입니다.",
+        "title": "final 필드 초기화",
+        "explanation": "**실행 순서:**\n1. 객체 생성(`new`).\n2. 생성자 호출.\n3. 생성자 안에서 `x`, `y` 값 할당.\n\n`final` 필드는 생성자에서 값이 정해지면 영원히 바뀌지 않습니다. 세터(Setter)를 만들 수 없습니다.",
         "highlight": [
-          2
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "Setter가 없어야 함"
-        }
-      },
-      {
-        "line": 4,
-        "title": "생성자에서 초기화",
-        "explanation": "`final` 필드는 **무조건** 생성자 안에서 초기화해야 합니다.\n\"태어날 때 값을 정하지 않으면 평생 빈 깡통\"이 되기 때문에 컴파일러가 강제합니다.",
-        "highlight": [
-          4,
+          2,
           5,
           6
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "heap": [
             {
               "address": "0x001",
-              "content": "ImmutablePoint{x: 10, y: 20}"
+              "content": "ImmutablePoint{x: 10, y: 20}",
+              "type": "ImmutablePoint"
             }
-          ]
+          ],
+          "note": "x, y는 절대 변경 불가"
         }
       },
       {
         "line": 9,
-        "title": "final 메서드",
-        "explanation": "`getX()`에 `final`이 붙으면, 자식 클래스에서 이 메서드의 로직을 **바꿀(Override) 수 없습니다.**\n\"내 동작 방식은 완벽하니 건드리지 마라\"는 일종의 **계약 확정**입니다.",
-        "keyInsight": "final method = 오버라이드 금지",
+        "title": "final 메서드 선언",
+        "explanation": "**의미:**\n\"내 메서드 로직을 바꾸지 마라!\"\n`final` 메서드는 상속은 되지만, 자식 클래스가 로직을 `Override`(재정의)하는 것을 금지합니다.",
+        "keyInsight": "final method = 오버라이딩 금지",
         "highlight": [
           9
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "중요한 로직 보안/무결성 유지"
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "note": "자식이 그대로 물려받아야 함"
         }
       },
       {
         "line": 14,
         "title": "일반 클래스의 final 메서드",
-        "explanation": "`Parent` 클래스 자체는 상속해줘도 되지만, `cannotOverride` 메서드만큼은 마음대로 바꾸지 못하게 막고 싶을 때 씁니다.",
+        "explanation": "`Parent` 클래스 자체는 상속이 가능하지만, `cannotOverride` 메서드는 자식이 수정할 수 없습니다. 중요한 핵심 로직을 자식이 망가뜨리는 것을 방지할 때 씁니다.",
         "highlight": [
-          14,
-          15,
-          16,
-          17
+          14
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "부분적인 상속 제한"
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "note": "클래스는 상속되지만 메서드는 잠김"
         }
       }
     ]
   },
   "quiz": {
-    "question": "final 메서드의 특징은?",
+    "question": "Java에서 상속을 막는 방법은?",
     "options": [
-      "절대 호출할 수 없다",
-      "자식 클래스에서 내용을 변경(Override)할 수 없다",
-      "오버로딩(Overloading)할 수 없다",
-      "반환값이 항상 일정하다"
+      "클래스를 private으로 선언한다.",
+      "클래스를 final로 선언한다.",
+      "클래스를 static으로 선언한다.",
+      "클래스를 abstract로 선언한다."
     ],
     "correctIndex": 1,
-    "explanation": "final 메서드는 상속은 되지만, 자식 클래스에서 내용을 덮어쓰기(Override)할 수 없습니다. 오버로딩(파라미터 다르게 정의)은 가능합니다."
+    "explanation": "클래스 앞에 `final`을 붙이면 '마지막 클래스'라는 의미가 되어 더 이상 자식을 낳을(상속할) 수 없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "final 메서드는 오버로딩도 안 된다",
-      "correct": "오버라이드(덮어쓰기)만 안 될 뿐, 오버로딩(새로 추가하기)은 가능합니다.",
-      "why": "이름만 같을 뿐 파라미터가 다르면 아예 다른 메서드로 취급하기 때문입니다."
+      "wrong": "final 메서드는 오버로딩(Overloading)도 못 한다.",
+      "correct": "오버로딩은 가능합니다!",
+      "why": "오버라이딩(덮어쓰기)이 금지된 것이지, 이름만 같고 파라미터가 다른 새로운 메서드(오버로딩)를 만드는 것은 상관없습니다."
     },
     {
-      "wrong": "모든 메서드는 기본적으로 final이다",
-      "correct": "Java는 기본적으로 `override` 허용(Open)입니다. `final`을 붙여야 금지(Closed)됩니다.",
-      "why": "반대로 Kotlin 같은 최신 언어는 기본이 금지이고 `open` 키워드를 써야 열리는 방식이라 헷갈릴 수 있습니다."
+      "wrong": "abstract 메서드에도 final을 붙일 수 있다.",
+      "correct": "절대 안 됩니다. 모순입니다.",
+      "why": "`abstract`는 \"자식이 구현해라(Override)\"이고, `final`은 \"Override 하지 마라\"이므로 서로 정반대 개념입니다."
     }
   ],
-  "keyTakeaway": "final class는 대를 끊고, final method는 수정을 막는다."
+  "keyTakeaway": "final 클래스는 가계도를 끊고, final 메서드는 로직 수정을 막는다."
 }

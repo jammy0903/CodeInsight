@@ -1,20 +1,20 @@
 {
   "lessonId": "java-5-3",
   "title": "static 필드",
-  "concept": "static 필드는 클래스에 속하며, 모든 인스턴스가 공유한다",
+  "concept": "static 필드는 모든 인스턴스가 공유하는 '공용 변수'다.",
   "content": {
-    "code": "class Counter {\n    static int count = 0;\n    int id;\n    \n    Counter() {\n        count++;\n        id = count;\n    }\n}\n\nCounter c1 = new Counter();\nCounter c2 = new Counter();\n\nSystem.out.println(c1.id);\nSystem.out.println(c2.id);\nSystem.out.println(Counter.count);\nSystem.out.println(c1.count == c2.count);",
+    "code": "class Counter {\n    static int count = 0;\n    int id;\n    \n    Counter() {\n        count++;\n        id = count;\n    }\n}\n\nCounter c1 = new Counter();\nCounter c2 = new Counter();\n\nSystem.out.println(c1.id);\nSystem.out.println(c2.id);\nSystem.out.println(Counter.count);",
     "steps": [
       {
         "line": 2,
-        "title": "static 필드 선언",
-        "explanation": "`static int count`는 모든 `Counter` 객체가 공유하는 단 하나뿐인 '공용 변수'입니다. 프로그램 시작 시 Metaspace 영역에 0으로 초기화됩니다.",
-        "keyInsight": "static = 클래스당 1개 (공유)",
+        "title": "static 필드 메모리 할당",
+        "explanation": "**실행 순서:**\n1. JVM이 `Counter` 클래스 정보를 읽음 (Class Loading).\n2. Metaspace(또는 Method Area)에 `count` 변수 공간 생성.\n3. `0`으로 초기화.\n\n**핵심:**\n`static` 변수는 객체(`new`) 생성과 상관없이 프로그램 시작 시점에 딱 하나만 만들어집니다.",
+        "keyInsight": "static = 클래스에 딱 1개 존재",
         "highlight": [
           2
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "metaspace": [
             {
               "name": "Counter.count",
@@ -26,12 +26,12 @@
       {
         "line": 11,
         "title": "첫 번째 인스턴스(c1) 생성",
-        "explanation": "`new Counter()`가 생성자를 호출합니다. 생성자 내부에서 공용 변수 `count`가 1로 증가하고, 그 값이 `c1`의 개인 변수 `id`에 할당됩니다.",
+        "explanation": "**실행 순서:**\n1. `new Counter()` 호출.\n2. **공용 자원** `Counter.count`를 1로 증가 (0 -> 1).\n3. `c1`의 **개인 수첩** `id`에 `1` 저장.\n4. Heap에 `c1` 객체 생성 완료.\n\n모든 `Counter` 객체들이 저 멀리 있는 `count`라는 화이트보드를 같이 쓰고 있습니다.",
         "highlight": [
           11
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "metaspace": [
             {
               "name": "Counter.count",
@@ -39,10 +39,18 @@
               "changed": true
             }
           ],
+          "stack": [
+            {
+              "name": "c1",
+              "value": "-> 0x001",
+              "frame": "main"
+            }
+          ],
           "heap": [
             {
-              "address": "c1",
-              "content": "Counter{id: 1}"
+              "address": "0x001",
+              "content": "Counter{id: 1}",
+              "type": "Counter"
             }
           ]
         }
@@ -50,12 +58,12 @@
       {
         "line": 12,
         "title": "두 번째 인스턴스(c2) 생성",
-        "explanation": "다시 생성자가 호출됩니다. 공용 변수 `count`가 2로 증가하고, 그 값이 **새로운** 인스턴스 `c2`의 개인 변수 `id`에 할당됩니다.",
+        "explanation": "**실행 순서:**\n1. `new Counter()` 호출.\n2. **공용 자원** `Counter.count`를 또 증가 (1 -> 2).\n3. `c2`의 **개인 수첩** `id`에 `2` 저장.\n4. Heap에 `c2` 객체 생성.\n\n`count`는 계속 누적되지만, `id`는 객체마다 따로 가집니다.",
         "highlight": [
           12
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "metaspace": [
             {
               "name": "Counter.count",
@@ -63,107 +71,71 @@
               "changed": true
             }
           ],
-          "heap": [
+          "stack": [
             {
-              "address": "c1",
-              "content": "Counter{id: 1}"
+              "name": "c1",
+              "value": "-> 0x001",
+              "frame": "main"
             },
             {
-              "address": "c2",
+              "name": "c2",
+              "value": "-> 0x002",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Counter{id: 1}",
+              "type": "Counter"
+            },
+            {
+              "address": "0x002",
               "content": "Counter{id: 2}",
+              "type": "Counter",
               "new": true
             }
           ]
         }
       },
       {
-        "line": 14,
-        "title": "c1.id 출력",
-        "explanation": "`c1` 객체의 개인 변수 `id`의 값인 1을 출력합니다.",
-        "highlight": [
-          14
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "1"
-          ]
-        }
-      },
-      {
-        "line": 15,
-        "title": "c2.id 출력",
-        "explanation": "`c2` 객체의 개인 변수 `id`의 값인 2를 출력합니다. 각 인스턴스는 `id`를 별도로 가집니다.",
-        "highlight": [
-          15
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "1",
-            "2"
-          ]
-        }
-      },
-      {
         "line": 16,
-        "title": "Counter.count 출력",
-        "explanation": "클래스 이름을 통해 공용 변수 `count`에 접근합니다. 최종값인 2가 출력됩니다. 이 방식이 정석입니다.",
-        "keyInsight": "Class.field 로 접근하세요",
+        "title": "결과 확인",
+        "explanation": "**실행 순서:**\n1. `c1.id` (1) 출력.\n2. `c2.id` (2) 출력.\n3. `Counter.count` (2) 출력.\n\n`count`는 클래스 이름(`Counter`)으로 접근하는 것이 정석입니다. `c1.count`처럼 접근하면 인스턴스 변수인지 헷갈리기 때문입니다.",
+        "keyInsight": "static 접근 = ClassName.variable",
         "highlight": [
+          14,
+          15,
           16
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "output": [
             "1",
             "2",
             "2"
           ]
-        }
-      },
-      {
-        "line": 17,
-        "title": "공유 변수 비교",
-        "explanation": "`c1.count`와 `c2.count` 모두 실제로는 동일한 `Counter.count`를 가리킵니다. 따라서 `2 == 2`가 되어 `true`가 출력됩니다. 하지만 이런 접근 방식은 코드를 헷갈리게 만드므로 피해야 합니다.",
-        "highlight": [
-          17
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "output": [
-            "1",
-            "2",
-            "2",
-            "true"
-          ],
-          "warning": "인스턴스 변수로 오해하기 딱 좋음!"
         }
       }
     ]
   },
   "quiz": {
-    "question": "static 필드를 쓰기에 가장 적합한 것은?",
+    "question": "static 필드의 특징으로 올바르지 않은 것은?",
     "options": [
-      "각 학생의 이름",
-      "각 학생의 성적",
-      "학교의 이름 (모든 학생이 공유)",
-      "학생 개인의 출석률"
+      "모든 인스턴스가 하나의 값을 공유한다.",
+      "객체 생성 없이도 사용할 수 있다.",
+      "각 인스턴스마다 메모리 공간이 별도로 할당된다.",
+      "클래스 로딩 시점에 메모리에 올라간다."
     ],
     "correctIndex": 2,
-    "explanation": "모든 인스턴스(학생)가 공통적으로 공유해야 하는 값(학교 이름) 같은 경우에 static을 씁니다."
+    "explanation": "각 인스턴스마다 별도로 할당되는 것은 **인스턴스 변수**입니다. static 필드는 클래스당 딱 하나만 존재합니다."
   },
   "misconceptions": [
     {
-      "wrong": "인스턴스 변수로 static 변수에 접근하면 안 된다",
-      "correct": "문법적으로 에러는 아니지만, **매우매우 비추천**합니다.",
-      "why": "코드를 읽을 때 \"이게 공유 변수인지 개인 변수인지\" 헷갈리게 만들기 때문입니다. `ClassName.variable` 형식을 쓰세요."
-    },
-    {
-      "wrong": "static은 메모리를 적게 먹는다",
-      "correct": "객체 생성을 안 하니 적을 수도 있지만, 프로그램 끝날 때까지 **절대 안 사라짐(GC 안 됨)**을 조심해야 합니다.",
-      "why": "너무 큰 데이터를 static으로 잡으면 메모리 누수(Memory Leak)처럼 동작할 수 있습니다."
+      "wrong": "static 변수도 GC(가비지 컬렉션) 대상이다.",
+      "correct": "보통 프로그램 종료 시까지 살아있습니다.",
+      "why": "클래스 자체가 메모리에서 내려가지 않는 한 static 변수도 계속 남아있습니다. 그래서 너무 큰 데이터를 static으로 잡으면 메모리 누수(Memory Leak)의 주범이 됩니다."
     }
   ],
-  "keyTakeaway": "static은 '공용 화이트보드', 인스턴스 변수는 '개인 수첩'."
+  "keyTakeaway": "static은 '공용 칠판'이다. 모두가 보고 쓰고 공유한다."
 }

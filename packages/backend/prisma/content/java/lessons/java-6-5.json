@@ -1,97 +1,127 @@
 {
   "lessonId": "java-6-5",
-  "title": "추상 클래스 vs 인터페이스",
-  "concept": "추상 클래스는 is-a 관계의 공통 기반, 인터페이스는 can-do 관계의 능력 정의",
+  "title": "Try-with-resources (자동 자원 정리)",
+  "concept": "자바 7부터 도입된 try-with-resources 구문을 사용하여, close() 호출 없이도 자원을 안전하게 해제하는 방법을 배웁니다.",
   "content": {
-    "code": "abstract class Animal {\n    String name;  // 상태 가능\n    \n    Animal(String name) {\n        this.name = name;\n    }\n    \n    void sleep() {  // 구현된 메서드\n        System.out.println(name + \" sleeps\");\n    }\n    \n    abstract void sound();  // 추상 메서드\n}\n\ninterface Swimmable {\n    void swim();  // 암묵적 public abstract\n    \n    default void float_() {  // Java 8+ 기본 구현\n        System.out.println(\"Floating...\");\n    }\n}\n\nclass Duck extends Animal implements Swimmable {\n    Duck(String name) { super(name); }\n    \n    void sound() { System.out.println(\"Quack!\"); }\n    public void swim() { System.out.println(\"Duck swims\"); }\n}",
+    "code": "import java.io.*;\n\n// AutoCloseable 인터페이스 구현\nclass Box implements AutoCloseable {\n    public void close() {\n        System.out.println(\"Box closed!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // try (...) 괄호 안에 자원 선언\n        try (Box box = new Box()) {\n            System.out.println(\"Using Box...\");\n            throw new RuntimeException(\"Boom!\");\n        } catch (Exception e) {\n            System.out.println(\"Caught: \" + e.getMessage());\n        }\n    }\n}",
     "steps": [
       {
-        "line": 1,
-        "title": "추상 클래스: 미완성 설계도",
-        "explanation": "`Animal`은 `name` 필드 같은 **데이터(상태)**를 가질 수 있습니다.\n\"동물이라면 이름이 있다\"는 본질적 속성을 정의합니다.",
-        "keyInsight": "is-a 관계: Duck is an Animal",
+        "line": 10,
+        "title": "자원 생성 (Open)",
+        "explanation": "**실행 순서:**\n1. `try` 옆의 괄호 `(...)` 안에서 `Box` 객체가 생성됩니다.\n2. `box` 변수가 힙 메모리의 객체를 참조합니다.\n\n**해설:**\n이 괄호 안에서 만들어진 객체는 \"나갈 때 자동으로 닫아줄게\"라고 JVM과 약속한 것입니다. 단, 해당 객체는 반드시 `AutoCloseable` 인터페이스를 구현하고 있어야 합니다.",
         "highlight": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
+          10
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "추상 클래스: 필드 O, 생성자 O"
-        }
-      },
-      {
-        "line": 15,
-        "title": "인터페이스: 기능 명세서",
-        "explanation": "`Swimmable`은 \"수영할 수 있음\"이라는 **능력(기능)**만 정의합니다.\n상태(필드)를 가질 수 없습니다.\n여기저기 붙일 수 있는 '자격증' 같은 개념입니다.",
-        "keyInsight": "can-do 관계: Duck can Swim",
-        "highlight": [
-          15,
-          16
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "인터페이스: 필드 X, 다중 구현 O"
-        }
-      },
-      {
-        "line": 23,
-        "title": "다중 상속의 대안",
-        "explanation": "`class Duck extends Animal implements Swimmable`\n1. `Animal`의 핏줄을 이어받고 (단일 상속)\n2. `Swimmable` 자격증을 취득했습니다 (인터페이스 구현)\n이런 식으로 Java의 단일 상속 한계를 극복합니다.",
-        "highlight": [
-          23
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "본질은 하나, 능력은 여러 개"
-        }
-      },
-      {
-        "line": 26,
-        "title": "구현 의무",
-        "explanation": "이제 `Duck`은 `Animal`이 남겨둔 숙제 `sound()`와, `Swimmable`이 요구하는 숙제 `swim()`을 모두 직접 코드로 짜야 합니다.",
-        "highlight": [
-          26,
-          27
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
             {
-              "address": "0x001",
-              "content": "Duck{name: \"Donald\"}"
+              "name": "box",
+              "value": "-> 0x888",
+              "frame": "try-resource",
+              "new": true
             }
           ],
-          "note": "모든 추상 메서드 구현 완료"
+          "heap": [
+            {
+              "address": "0x888",
+              "content": "Box Instance",
+              "type": "Box",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 11,
+        "title": "자원 사용 및 예외 발생",
+        "explanation": "**실행 순서:**\n1. \"Using Box...\"를 출력합니다.\n2. 갑자기 `RuntimeException`(\"Boom!\")이 발생합니다.\n\n**해설:**\n일을 하던 도중 사고가 났습니다! 보통의 `try-catch`였다면 `catch` 블록으로 바로 점프했겠지만, `try-with-resources`는 다릅니다. **도망가기 전에 뒷정리부터** 합니다.",
+        "highlight": [
+          11,
+          12
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "box",
+              "value": "-> 0x888",
+              "frame": "try-resource"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x999",
+              "content": "NumEx: Boom!",
+              "type": "RuntimeException",
+              "new": true
+            }
+          ],
+          "output": [
+            "Using Box..."
+          ],
+          "error": "Exception Occurred!"
+        }
+      },
+      {
+        "line": 6,
+        "title": "자동 close() 호출",
+        "explanation": "**실행 순서:**\n1. 예외가 발생해서 블록을 나가려는 순간, JVM이 몰래 `box.close()`를 호출합니다.\n2. \"Box closed!\"가 출력됩니다.\n\n**해설:**\n**핵심 포인트!** 개발자가 `finally` 블록에 지저분하게 `close()`를 적지 않아도, JVM이 알아서 닫아줍니다. 예외가 나든 안 나든 무조건 닫힙니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "output": [
+            "Using Box...",
+            "Box closed!"
+          ],
+          "note": "JVM이 자동으로 close() 호출"
+        }
+      },
+      {
+        "line": 13,
+        "title": "예외 처리 Catch",
+        "explanation": "**실행 순서:**\n1. 자원 정리가 끝난 후, 아까 발생했던 예외(\"Boom!\")가 `catch` 블록으로 전달됩니다.\n2. 예외 메시지를 출력합니다.\n\n**해설:**\n자원 정리가 예외 처리보다 **먼저** 일어난다는 점을 기억하세요. 안전하게 문을 닫고 나서야 119에 신고(Catch)하는 순서입니다.",
+        "highlight": [
+          13,
+          14
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "e",
+              "value": "-> 0x999",
+              "frame": "catch"
+            }
+          ],
+          "output": [
+            "Using Box...",
+            "Box closed!",
+            "Caught: Boom!"
+          ]
         }
       }
     ]
   },
   "quiz": {
-    "question": "인터페이스에 정의할 수 없는 것은?",
+    "question": "try-with-resources를 사용하기 위해 리소스 클래스가 반드시 구현해야 하는 인터페이스는?",
     "options": [
-      "상수 (public static final)",
-      "인스턴스 필드",
-      "default 메서드",
-      "static 메서드"
+      "Serializable",
+      "Cloneable",
+      "AutoCloseable",
+      "Runnable"
     ],
-    "correctIndex": 1,
-    "explanation": "인터페이스는 인스턴스 필드를 가질 수 없습니다. 상수(public static final)만 가능합니다."
+    "correctIndex": 2,
+    "explanation": "`java.lang.AutoCloseable` 인터페이스를 구현하고 `close()` 메서드를 정의해야, `try` 블록이 끝날 때 JVM이 자동으로 `close()`를 호출해 줄 수 있습니다."
   },
   "misconceptions": [
     {
-      "wrong": "인터페이스도 변수(상태)를 가질 수 있다",
-      "correct": "인터페이스의 모든 변수는 자동으로 `public static final`(상수)이 됩니다. 인스턴스별 상태는 못 가집니다.",
-      "why": "인터페이스는 '행동'을 정의하는 곳이지, '데이터'를 저장하는 곳이 아니기 때문입니다."
-    },
-    {
-      "wrong": "추상 클래스는 new로 생성할 수 있다",
-      "correct": "절대 불가합니다. `new Animal()`은 컴파일 에러입니다.",
-      "why": "미완성 설계도로는 집을 지을 수 없습니다. 반드시 완성된 자식 클래스(`Duck`)로 지어야 합니다."
+      "wrong": "try-with-resources는 예외가 발생하지 않을 때만 close()를 호출한다.",
+      "correct": "아닙니다. 예외 발생 여부와 상관없이 블록을 벗어나면 무조건 `close()`가 호출됩니다.",
+      "why": "기존의 `finally` 역할을 컴파일러가 대신 해주는 것입니다."
     }
   ],
-  "keyTakeaway": "추상 클래스 = is-a + 상태, 인터페이스 = can-do + 다중 구현"
+  "keyTakeaway": "`try-with-resources`를 사용하면 파일입출력(I/O), 소켓, DB 연결 같은 리소스 누수(Leak)를 문법적으로 안전하게 방지할 수 있습니다."
 }
