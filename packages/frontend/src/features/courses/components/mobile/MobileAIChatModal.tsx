@@ -9,6 +9,7 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bot } from 'lucide-react';
+import './MobileLessonView.css';
 import { ChatQA } from '@/features/chat';
 import type { ChatContext } from '@/services/ai';
 
@@ -55,11 +56,7 @@ export function MobileAIChatModal({
         <>
           {/* 배경 오버레이 (blur) */}
           <motion.div
-            className="fixed inset-0 z-40"
-            style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              backdropFilter: 'blur(4px)',
-            }}
+            className="fixed inset-0 z-40 modal-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -81,21 +78,11 @@ export function MobileAIChatModal({
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
             <div
-              className="w-full h-full rounded-2xl overflow-hidden flex flex-col"
-              style={{
-                backgroundColor: '#fffcf8',
-                border: '1px solid #e5d5c7',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                fontFamily: 'NationalPension, cursive',
-                fontWeight: 'normal',
-              }}
+              className="w-full h-full rounded-2xl overflow-hidden flex flex-col modal-content-wrapper"
             >
               {/* 헤더 */}
               <div
-                className="flex items-center justify-between px-4 py-3"
-                style={{
-                  background: 'linear-gradient(135deg, #6b5a4a 0%, #5a4a3a 100%)',
-                }}
+                className="flex items-center justify-between px-4 py-3 modal-header-gradient"
               >
                 <div className="flex items-center gap-2">
                   <Bot className="w-5 h-5 text-white" />

@@ -221,6 +221,35 @@ export const LessonStepSchema = z.object({
     comparison: z.string().optional(), // "0x001 != 0x002" 등
     output: z.array(z.string()).optional(), // ["false"] 등
   }).optional(),
+  // Java 메모리 시각화 (Standardized)
+  javaMemoryState: z.object({
+    stack: z.array(z.object({
+      name: z.string(),
+      value: z.union([z.string(), z.number()]),
+      type: z.string().optional(),
+      address: z.string().optional(),
+      sameRef: z.boolean().optional(),
+    })).optional(),
+    heap: z.array(z.object({
+      address: z.string(),
+      content: z.union([z.string(), z.number()]),
+      type: z.string().optional(),
+      new: z.boolean().optional(),
+      refCount: z.number().optional(),
+      hashCode: z.string().optional(),
+    })).optional(),
+    stringPool: z.array(z.object({
+      value: z.string(),
+      address: z.string(),
+      refCount: z.number().optional(),
+    })).optional(),
+    cache: z.any().optional(),
+    hashSet: z.any().optional(),
+    comparison: z.string().optional(),
+    output: z.array(z.string()).optional(),
+    note: z.string().optional(),
+    warning: z.string().optional(),
+  }).optional(),
   // Playground용 메모리 스냅샷 (직접 실행 결과)
   // WHY: Playground는 실시간 C 실행 결과를 받아 즉시 시각화
   // TRADEOFF: Lesson은 memoryChanges로 누적, Playground는 stack/heap으로 스냅샷

@@ -1,19 +1,22 @@
 /**
- * MobileLessonView - Swiper.js 스타일 커스터마이징
+ * MobileLessonView - Swiper.js & Mobile Component Styles
  *
- * 터치감 극대화:
- * - Momentum scroll (부드러운 감속)
- * - Snap to page (정확한 포지셔닝)
- * - 최소 터치 거리 설정
+ * Integrated styles for:
+ * - MobileLessonView (Layout, Swiper)
+ * - MobileAIChatFAB (Floating Action Button)
+ * - MobileAIChatModal (AI Chat Overlay)
  */
 
+/* ============================================
+   Swiper Customization
+   ============================================ */
 .swiper {
   width: 100%;
   height: 100%;
-  --swiper-theme-color: #1e40af; /* 파란색 테마 */
+  --swiper-theme-color: #1e40af;
+  /* Blue theme */
 }
 
-/* Pagination 도트 스타일 */
 .swiper-pagination {
   position: absolute;
   bottom: 8px;
@@ -48,33 +51,28 @@
   background: rgba(0, 0, 0, 0.5);
 }
 
-/* Swiper 터치 제스처 최적화 */
 .swiper-wrapper {
-  /* 부드러운 가속도 곡선 */
   transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
-/* 슬라이드 사이 간격 제거 (정확히 한 페이지씩) */
 .swiper-slide {
   width: 100%;
   height: 100%;
 }
 
-/* 터치 드래그 중 커서 변경 */
 .swiper-button-disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 
-/* 모바일 최적화: 터치 스크롤 부드럽게 */
 @supports (scroll-behavior: smooth) {
   .swiper-container {
     scroll-behavior: smooth;
   }
 }
 
-/* 고DPI 디스플레이에서 도트 선명하게 */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
   .swiper-pagination-bullet {
     width: 7px;
     height: 7px;
@@ -83,4 +81,105 @@
   .swiper-pagination-bullet-active {
     width: 28px;
   }
+}
+
+/* ============================================
+   Shared Utilities & Layouts
+   ============================================ */
+.mobile-handwriting {
+  font-family: var(--font-handwriting);
+  font-weight: normal;
+}
+
+.mobile-panel {
+  background-color: var(--theme-lesson-panel-bg);
+}
+
+/* ============================================
+   Explanation Section
+   ============================================ */
+.explanation-container {
+  font-family: var(--font-handwriting);
+  font-weight: normal;
+  background-color: var(--theme-lesson-panel-bg);
+}
+
+.explanation-header {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.keyword-highlight {
+  color: var(--theme-explanation-text);
+  background-color: var(--theme-memory-changed-bg);
+}
+
+.code-highlight {
+  color: var(--theme-memory-register-rbp-text);
+  background-color: var(--theme-memory-register-rbp-bg);
+}
+
+/* ============================================
+   Terminal Overlay
+   ============================================ */
+.terminal-overlay-container {
+  background-color: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  /* green-500/30 */
+  backdrop-filter: blur(4px);
+}
+
+/* ============================================
+   Visualization Tabs & Zoom
+   ============================================ */
+.viz-tab-active {
+  color: white;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  /* blue-500 to blue-600 */
+}
+
+.viz-tab-inactive {
+  color: var(--theme-lesson-tab-inactive-text);
+  background-color: var(--theme-lesson-tab-inactive-bg);
+}
+
+.viz-zoom-container {
+  width: 100%;
+  /* Zoom property is non-standard but widely supported in mobile WebKit */
+  zoom: 0.55;
+}
+
+/* ============================================
+   Mobile AI Chat FAB
+   ============================================ */
+.fab-container {
+  bottom: 24px;
+  right: 16px;
+}
+
+.fab-gradient-active {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.fab-gradient-inactive {
+  background: linear-gradient(135deg, #6b5a4a 0%, #5a4a3a 100%);
+}
+
+/* ============================================
+   Mobile AI Chat Modal
+   ============================================ */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content-wrapper {
+  background-color: #fffcf8;
+  border: 1px solid #e5d5c7;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  font-family: var(--font-handwriting);
+  font-weight: normal;
+}
+
+.modal-header-gradient {
+  background: linear-gradient(135deg, #6b5a4a 0%, #5a4a3a 100%);
 }

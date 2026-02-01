@@ -147,8 +147,8 @@ export function useLessonVisualization(
     }
 
     // Java (정적 JSON or 실시간 시뮬레이션)
-    if (vizType === 'java' || currentStep.memoryState) {
-      const javaMemoryState = currentStep.memoryState;
+    if (vizType === 'java' || vizType === 'javaMemory' || currentStep.javaMemoryState || currentStep.memoryState) {
+      const javaMemoryState = currentStep.javaMemoryState || currentStep.memoryState;
       const stack: MemoryBlock[] = [];
       const frames: { name: string }[] = [{ name: 'main' }];
 
