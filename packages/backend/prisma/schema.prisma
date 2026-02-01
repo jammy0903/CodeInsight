@@ -226,7 +226,7 @@ model LessonActivity {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson          Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson          Lesson           @relation(fields: [lessonId], references: [id], onDelete: Restrict)
   // 학습 분석 확장
   sessionContexts SessionContext[]
   stepActivities  StepActivity[]
@@ -268,7 +268,7 @@ model QuizAttempt {
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Restrict)
 
   @@index([userId, createdAt]) // 사용자별 시간순
   @@index([userId, isCorrect]) // 오답만 빠르게 조회
@@ -291,7 +291,7 @@ model UserNote {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   quiz   Quiz?  @relation(fields: [quizId], references: [id], onDelete: SetNull)
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Restrict)
 
   @@index([userId, concept]) // 개념별 노트 조회
   @@index([userId, lessonId]) // 레슨별 노트 조회
@@ -375,7 +375,7 @@ model StepActivity {
 
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   lessonActivity LessonActivity @relation(fields: [lessonActivityId], references: [id], onDelete: Cascade)
-  lesson         Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson         Lesson         @relation(fields: [lessonId], references: [id], onDelete: Restrict)
 
   @@unique([lessonActivityId, stepIndex]) // 한 활동 내 스텝은 유니크
   @@index([userId, lessonId])
