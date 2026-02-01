@@ -28,7 +28,7 @@ import { Capacitor } from '@capacitor/core';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { config } from '@/config';
 import { useStore } from '@/stores/store';
-import { getCurrentUser, registerUser, linkOAuthAccount } from './user';
+import { getCurrentUser, registerUser } from './user';
 import { getProfile } from './analytics';
 import { generateTempNickname } from '@/utils/nickname';
 import { logger } from '@/utils/logger';
@@ -84,28 +84,41 @@ export function initializeAuthListener(): () => void {
             setNeedsOnboarding(false);
           }
         } else {
-          // 미등록 사용자 → 자동 OAuth 연동 시도
-          logger.info('User not found, attempting to link OAuth...');
+          // 미등록 사용자 → 자동 등록 (닉네임: user_{uid 앞 8자리})
+          logger.info('User not found, auto-registering...');
           try {
-            const linkedUser = await linkOAuthAccount();
-            // OAuth 연동 성공 → 기존 계정에 연결됨
-            setAppUser(linkedUser);
-            setNeedsRegistration(false);
-            logger.info('OAuth account linked successfully');
+            // 자동 닉네임 생성: user_{Firebase UID 앞 8자리}
+            const autoNickname = `user_${firebaseUser.uid.slice(0, 8)}`;
+            const newUser = await registerUser(autoNickname);
 
-            // 온보딩 완료 여부 확인
-            const profileResult = await getProfile();
-            if (profileResult && !profileResult.onboardingCompleted) {
-              setNeedsOnboarding(true);
+            setAppUser(newUser);
+            setNeedsRegistration(false);
+            setNeedsOnboarding(true); // 새 사용자는 온보딩 필요
+            logger.info(`Auto-registered user with nickname: ${autoNickname}`);
+          } catch (registerError: any) {
+            // 닉네임 중복 시 랜덤 숫자 추가해서 재시도
+            if (registerError.message?.includes('이미 사용 중') || registerError.message?.includes('NICKNAME_TAKEN')) {
+              try {
+                const randomSuffix = Math.floor(Math.random() * 10000);
+                const fallbackNickname = `user_${firebaseUser.uid.slice(0, 6)}_${randomSuffix}`;
+                const newUser = await registerUser(fallbackNickname);
+
+                setAppUser(newUser);
+                setNeedsRegistration(false);
+                setNeedsOnboarding(true);
+                logger.info(`Auto-registered user with fallback nickname: ${fallbackNickname}`);
+              } catch (fallbackError) {
+                logger.error('Auto-registration failed:', fallbackError);
+                setAppUser(null);
+                setNeedsRegistration(true);
+                setNeedsOnboarding(false);
+              }
             } else {
+              logger.error('Auto-registration failed:', registerError);
+              setAppUser(null);
+              setNeedsRegistration(true);
               setNeedsOnboarding(false);
             }
-          } catch (linkError) {
-            // OAuth 연동 실패 → 새로운 사용자로 등록 필요
-            logger.info('OAuth link failed, needs new registration:', linkError);
-            setAppUser(null);
-            setNeedsRegistration(true); // 닉네임 등록이 필요
-            setNeedsOnboarding(false);
           }
         }
       } catch (error) {

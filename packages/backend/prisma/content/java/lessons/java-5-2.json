@@ -8,60 +8,92 @@
       {
         "line": 1,
         "title": "final 클래스 선언",
-        "explanation": "**의미:**\n\"내 대는 여기서 끝이다!\"\n`final class`는 다른 클래스가 나를 상속받지 못하게 막습니다. `String`, `Integer` 등의 핵심 클래스가 보안과 무결성을 위해 `final`로 선언되어 있습니다.",
-        "keyInsight": "final class = 상속 불가 (자식 없음)",
+        "explanation": "**실행 순서:**\n1. `ImmutablePoint` 클래스가 로드됩니다.\n2. 클래스 메타데이터에 '상속 금지(final)' 표시가 붙습니다.\n\n**내 대는 여기서 끝:**\n`final class`는 불임(?) 클래스입니다. 자식을 낳을(상속할) 수 없죠. `String`이나 `System` 클래스가 대표적인 예입니다.",
         "highlight": [
-          1
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "note": "상속 시도 시 컴파일 에러!"
+          "stack": [],
+          "heap": [],
+          "metaspace": [
+            {
+              "name": "ImmutablePoint",
+              "value": "Class (final)"
+            }
+          ]
         }
       },
       {
         "line": 2,
         "title": "final 필드 초기화",
-        "explanation": "**실행 순서:**\n1. 객체 생성(`new`).\n2. 생성자 호출.\n3. 생성자 안에서 `x`, `y` 값 할당.\n\n`final` 필드는 생성자에서 값이 정해지면 영원히 바뀌지 않습니다. 세터(Setter)를 만들 수 없습니다.",
+        "explanation": "**실행 순서:**\n1. 객체를 생성(`new`)하며 생성자를 호출합니다.\n2. 생성자 내부에서 `x`, `y` 필드에 값을 할당합니다.\n3. 생성자가 끝나는 순간, 이 필드들은 '동결'되어 절대 바꿀 수 없게 됩니다.\n\n**완벽한 불변:**\nSetter도 없고 필드도 `final`이니, 이 객체는 생성될 때의 상태를 평생 간직합니다.",
         "highlight": [
           2,
+          3,
+          4,
           5,
-          6
+          6,
+          7
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "heap": [
             {
               "address": "0x001",
-              "content": "ImmutablePoint{x: 10, y: 20}",
-              "type": "ImmutablePoint"
+              "content": "x: 10, y: 20",
+              "type": "ImmutablePoint",
+              "new": true
             }
-          ],
-          "note": "x, y는 절대 변경 불가"
+          ]
         }
       },
       {
         "line": 9,
         "title": "final 메서드 선언",
-        "explanation": "**의미:**\n\"내 메서드 로직을 바꾸지 마라!\"\n`final` 메서드는 상속은 되지만, 자식 클래스가 로직을 `Override`(재정의)하는 것을 금지합니다.",
-        "keyInsight": "final method = 오버라이딩 금지",
+        "explanation": "**실행 순서:**\n1. 메서드 정보가 로드될 때 'Override 금지(final)' 표시가 붙습니다.\n\n**고집불통 메서드:**\n\"내 로직은 완벽하니 건드리지 마라!\" 자식 클래스가 이 메서드를 물려받긴 하지만, 내용을 뜯어고칠(재정의할) 수는 없습니다.",
         "highlight": [
           9
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "note": "자식이 그대로 물려받아야 함"
+          "metaspace": [
+            {
+              "name": "ImmutablePoint.getX()",
+              "value": "Method (final)"
+            }
+          ]
         }
       },
       {
         "line": 14,
         "title": "일반 클래스의 final 메서드",
-        "explanation": "`Parent` 클래스 자체는 상속이 가능하지만, `cannotOverride` 메서드는 자식이 수정할 수 없습니다. 중요한 핵심 로직을 자식이 망가뜨리는 것을 방지할 때 씁니다.",
+        "explanation": "**실행 순서:**\n1. `Parent` 클래스는 일반 클래스라 상속이 가능합니다.\n2. 하지만 `cannotOverride` 메서드는 `final`이라 자식이 내용을 바꿀 수 없습니다.\n\n**부분적 통제:**\n클래스 전체를 막을 필요는 없고, 특정 핵심 기능만 보호하고 싶을 때 사용합니다.",
         "highlight": [
-          14
+          14,
+          15,
+          16
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "note": "클래스는 상속되지만 메서드는 잠김"
+          "metaspace": [
+            {
+              "name": "Parent",
+              "value": "Class"
+            },
+            {
+              "name": "Parent.cannotOverride()",
+              "value": "Method (final)"
+            }
+          ]
         }
       }
     ]
