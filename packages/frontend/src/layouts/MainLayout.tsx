@@ -68,8 +68,8 @@ export function MainLayout({ children }: MainLayoutProps) {
 
         {/* Footer - 스크롤 영역 안에 배치 */}
         {!isLessonPage && !isPlaygroundPage && (
-          <footer className="mt-16 py-4 border-t border-t-[var(--theme-layout-footer-border)]" style={{ backgroundColor: 'var(--theme-layout-footer-bg)' }}>
-            <div className="main-content-container my-4">
+          <footer className="mt-8 py-2 border-t border-t-[var(--theme-layout-footer-border)]" style={{ backgroundColor: 'var(--theme-layout-footer-bg)' }}>
+            <div className="main-content-container my-2">
               {/* 2열 레이아웃 */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 {/* 왼쪽: 브랜드 + 링크 */}
@@ -159,7 +159,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               </div>
 
               {/* 하단 저작권 */}
-              <div className="mt-4 pt-3 border-t border-t-[var(--theme-layout-footer-border)] text-center text-xs" style={{ color: 'var(--theme-layout-footer-text-muted)' }}>
+              <div className="mt-2 pt-2 border-t border-t-[var(--theme-layout-footer-border)] text-center text-xs" style={{ color: 'var(--theme-layout-footer-text-muted)' }}>
                 © 2026 CodeInsight. All Rights Reserved.
               </div>
             </div>
