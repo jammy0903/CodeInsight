@@ -8,68 +8,292 @@
       {
         "line": 1,
         "title": "outer_func 정의",
-        "explanation": "`def outer_func(x):`\n바깥 함수를 정의합니다. 안에 중첩 함수가 있습니다.",
-        "highlight": [1, 3, 5, 6]
+        "explanation": "`def outer_func(x):`\n바깥 함수를 정의합니다. 안에 중첩 함수가 있습니다.\n\n**왜 이 순서인가?**\n프로그램이 시작되면 함수 정의부터 읽습니다.\n\n**실행 순서:**\n1. `outer_func` 함수 객체(0x1100)를 생성합니다.\n2. 전역 네임스페이스에 등록합니다.",
+        "highlight": [
+          1,
+          3,
+          5,
+          6
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "outer_func",
+              "value": "function",
+              "type": "function",
+              "id": "0x1100",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "outer_func(0x1100)가 정의되었습니다."
+        }
       },
       {
         "line": 9,
         "title": "outer_func(2) 호출",
-        "explanation": "`times_2 = outer_func(2)`\nouter_func를 x=2로 호출합니다.",
-        "highlight": [9]
+        "explanation": "`times_2 = outer_func(2)`\nouter_func를 x=2로 호출합니다.\n\n**왜 이 순서인가?**\n클로저를 생성하기 위해 바깥 함수를 호출합니다.\n\n**실행 순서:**\n1. `outer_func(2)` 호출.\n2. 매개변수 `x`에 2 할당.",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "x",
+              "value": "2",
+              "type": "int",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "outer_func가 x=2를 가지고 실행됩니다."
+        }
       },
       {
         "line": 3,
         "title": "inner_func 정의 (x=2 환경)",
-        "explanation": "`def inner_func(y):`\ninner_func를 정의합니다. 이 함수는 x=2인 환경을 기억합니다.",
-        "highlight": [3, 5]
+        "explanation": "`def inner_func(y):`\ninner_func를 정의합니다. 이 함수는 x=2인 환경을 기억합니다.\n\n**왜 이 순서인가?**\n함수가 실행될 때마다 `def` 문을 만나면 새로운 함수 객체를 만듭니다.\n\n**실행 순서:**\n1. `inner_func` 객체(0x2000) 생성.\n2. `x`를 참조하는 클로저(Cell 0x3000) 생성.",
+        "highlight": [
+          3,
+          5
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "x",
+              "value": "2",
+              "type": "int"
+            },
+            {
+              "name": "inner_func",
+              "value": "function",
+              "type": "function",
+              "id": "0x2000",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "inner_func(0x2000)가 생성됩니다. x=2를 Cell(0x3000)에 저장합니다."
+        }
       },
       {
         "line": 6,
         "title": "클로저 반환 (1)",
-        "explanation": "`return inner_func`\ninner_func(x=2를 기억)를 반환합니다. times_2는 이제 클로저입니다.",
-        "highlight": [6]
+        "explanation": "`return inner_func`\ninner_func(x=2를 기억)를 반환합니다. times_2는 이제 클로저입니다.\n\n**왜 이 순서인가?**\n만들어진 클로저를 반환하여 나중에 쓸 수 있게 합니다.\n\n**실행 순서:**\n1. `inner_func` 반환.\n2. `times_2`에 할당.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "times_2",
+              "value": "closure",
+              "type": "function",
+              "id": "0x2000",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "times_2 변수가 클로저(0x2000)를 가리킵니다."
+        }
       },
       {
         "line": 10,
         "title": "outer_func(3) 호출",
-        "explanation": "`times_3 = outer_func(3)`\nouter_func를 x=3으로 다시 호출합니다.",
-        "highlight": [10]
+        "explanation": "`times_3 = outer_func(3)`\nouter_func를 x=3으로 다시 호출합니다.\n\n**왜 이 순서인가?**\n다른 환경을 가진 또 다른 클로저를 만듭니다.\n\n**실행 순서:**\n1. `outer_func(3)` 호출.\n2. `x`에 3 할당.",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "times_2",
+              "value": "closure",
+              "type": "function",
+              "id": "0x2000"
+            },
+            {
+              "name": "x",
+              "value": "3",
+              "type": "int",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "이번에는 x=3으로 outer_func가 실행됩니다."
+        }
       },
       {
         "line": 3,
         "title": "inner_func 정의 (x=3 환경)",
-        "explanation": "`def inner_func(y):`\n이번에는 x=3인 환경을 기억하는 새로운 inner_func를 정의합니다.",
-        "highlight": [3, 5]
+        "explanation": "`def inner_func(y):`\n이번에는 x=3인 환경을 기억하는 새로운 inner_func를 정의합니다.\n\n**왜 이 순서인가?**\n이전과 **다른** 새로운 함수 객체가 생성됩니다.\n\n**실행 순서:**\n1. 새로운 `inner_func` 객체(0x2100) 생성.\n2. `x`를 참조하는 새로운 Cell(0x3100) 생성.",
+        "highlight": [
+          3,
+          5
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "x",
+              "value": "3",
+              "type": "int"
+            },
+            {
+              "name": "inner_func",
+              "value": "function",
+              "type": "function",
+              "id": "0x2100",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "새로운 inner_func(0x2100)가 생성됩니다. x=3을 별도의 Cell(0x3100)에 저장합니다."
+        }
       },
       {
         "line": 6,
         "title": "클로저 반환 (2)",
-        "explanation": "`return inner_func`\ninner_func(x=3을 기억)를 반환합니다. times_3는 별개의 클로저입니다.",
-        "highlight": [6]
+        "explanation": "`return inner_func`\ninner_func(x=3을 기억)를 반환합니다. times_3는 별개의 클로저입니다.\n\n**왜 이 순서인가?**\n두 번째 클로저를 반환합니다.\n\n**실행 순서:**\n1. `inner_func` 반환.\n2. `times_3`에 할당.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "times_2",
+              "value": "closure(x=2)",
+              "type": "function",
+              "id": "0x2000"
+            },
+            {
+              "name": "times_3",
+              "value": "closure(x=3)",
+              "type": "function",
+              "id": "0x2100",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "times_3는 0x2100을 가리킵니다. times_2와 times_3는 서로 다른 객체입니다."
+        }
       },
       {
         "line": 13,
         "title": "times_2(5) 호출",
-        "explanation": "`print(f\"...{times_2(5)}\")`\ntimes_2 클로저를 y=5로 호출합니다.",
-        "highlight": [13]
+        "explanation": "`print(f\"...{times_2(5)}\")`\ntimes_2 클로저를 y=5로 호출합니다.\n\n**왜 이 순서인가?**\n첫 번째 클로저를 사용해봅니다.\n\n**실행 순서:**\n1. `times_2(5)` 호출.\n2. 저장된 환경(x=2)을 사용.",
+        "highlight": [
+          13
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "x",
+              "value": "2",
+              "type": "int",
+              "note": "Cell(0x3000)에서 가져옴"
+            },
+            {
+              "name": "y",
+              "value": "5",
+              "type": "int",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "times_2 실행: Cell에 저장된 x=2를 사용합니다."
+        }
       },
       {
         "line": 5,
         "title": "times_2 실행 (2 * 5)",
-        "explanation": "`return x * y`\nx=2(기억된 값)와 y=5를 곱해 10을 반환합니다.",
-        "highlight": [5]
+        "explanation": "`return x * y`\nx=2(기억된 값)와 y=5를 곱해 10을 반환합니다.\n\n**실행 순서:**\n1. `2 * 5` 계산.\n2. 10 반환.",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "x",
+              "value": "2",
+              "type": "int"
+            },
+            {
+              "name": "y",
+              "value": "5",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "times_2(5) = 10"
+          ],
+          "note": "결과 10이 출력되었습니다."
+        }
       },
       {
         "line": 14,
         "title": "times_3(5) 호출",
-        "explanation": "`print(f\"...{times_3(5)}\")`\ntimes_3 클로저를 y=5로 호출합니다.",
-        "highlight": [14]
+        "explanation": "`print(f\"...{times_3(5)}\")`\ntimes_3 클로저를 y=5로 호출합니다.\n\n**왜 이 순서인가?**\n두 번째 클로저를 사용해봅니다.\n\n**실행 순서:**\n1. `times_3(5)` 호출.\n2. 저장된 환경(x=3)을 사용.",
+        "highlight": [
+          14
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "x",
+              "value": "3",
+              "type": "int",
+              "note": "Cell(0x3100)에서 가져옴"
+            },
+            {
+              "name": "y",
+              "value": "5",
+              "type": "int",
+              "highlight": true
+            }
+          ],
+          "output": [
+            "times_2(5) = 10"
+          ],
+          "note": "times_3 실행: 0x3100 Cell에 저장된 x=3을 사용합니다."
+        }
       },
       {
         "line": 5,
         "title": "times_3 실행 (3 * 5)",
-        "explanation": "`return x * y`\nx=3(기억된 값)와 y=5를 곱해 15를 반환합니다.",
-        "highlight": [5]
+        "explanation": "`return x * y`\nx=3(기억된 값)와 y=5를 곱해 15를 반환합니다.\n\n**실행 순서:**\n1. `3 * 5` 계산.\n2. 15 반환.",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "x",
+              "value": "3",
+              "type": "int"
+            },
+            {
+              "name": "y",
+              "value": "5",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "times_2(5) = 10",
+            "times_3(5) = 15"
+          ],
+          "note": "결과 15가 출력되었습니다."
+        }
       }
     ]
   },
