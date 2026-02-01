@@ -8,50 +8,215 @@
       {
         "line": 1,
         "title": "모듈 임포트",
-        "explanation": "`asyncio`와 `time` 모듈을 가져옵니다.",
-        "highlight": [1, 2]
+        "explanation": "`asyncio`와 `time` 모듈을 가져옵니다.\n\n**왜 이 순서인가?**\n도구 로드.\n\n**실행 순서:**\n1. `asyncio`(0x1500), `time`(0x1600) 로드.",
+        "highlight": [
+          1,
+          2
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "asyncio",
+              "value": "module",
+              "type": "module",
+              "id": "0x1500",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "asyncio 준비 완료."
+        }
       },
       {
         "line": 4,
         "title": "비동기 작업 함수 정의",
-        "explanation": "`fetch_data`는 I/O 작업(예: 웹 요청)을 시뮬레이션하는 코루틴 함수입니다. `delay`초 만큼 기다린 후 데이터를 반환합니다.",
-        "highlight": [4, 5, 6, 7, 8]
+        "explanation": "`fetch_data`는 I/O 작업(예: 웹 요청)을 시뮬레이션하는 코루틴 함수입니다. `delay`초 만큼 기다린 후 데이터를 반환합니다.\n\n**실행 순서:**\n1. `fetch_data` 함수(0x1100) 정의.",
+        "highlight": [
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "fetch_data",
+              "value": "coroutine function",
+              "type": "function",
+              "id": "0x1100",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "코루틴 함수 fetch_data 정의."
+        }
       },
       {
         "line": 10,
         "title": "메인 코루틴 정의",
-        "explanation": "`async def main():`\n비동기 프로그램의 메인 진입점 역할을 할 `main` 코루틴을 정의합니다.",
-        "highlight": [10]
+        "explanation": "`async def main():`\n비동기 프로그램의 메인 진입점 역할을 할 `main` 코루틴을 정의합니다.\n\n**실행 순서:**\n1. `main` 함수(0x1200) 정의.",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "main",
+              "value": "coroutine function",
+              "type": "function",
+              "id": "0x1200",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "main 코루틴 정의."
+        }
       },
       {
         "line": 13,
         "title": "동시 실행 및 결과 수집 (gather)",
-        "explanation": "`results = await asyncio.gather(...)`\n`gather` 함수에 여러 코루틴(`fetch_data` 호출)을 전달합니다. `gather`는 이 코루틴들을 모두 동시에 실행하고, **전부 완료될 때까지 기다립니다.**",
-        "highlight": [13, 14, 15, 16, 17]
+        "explanation": "`results = await asyncio.gather(...)`\n`gather` 함수에 여러 코루틴(`fetch_data` 호출)을 전달합니다. `gather`는 이 코루틴들을 모두 동시에 실행하고, **전부 완료될 때까지 기다립니다.**\n\n**왜 이 순서인가?**\n3개의 작업을 동시에 스케줄링하고, 모두 끝날 때까지 기다립니다.\n\n**실행 순서:**\n1. `fetch_data(1, 2)` -> 코루틴 객체 생성.\n2. `fetch_data(2, 1)` -> 코루틴 객체 생성.\n3. `fetch_data(3, 3)` -> 코루틴 객체 생성.\n4. `gather` 실행.",
+        "highlight": [
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "task_1",
+              "value": "Task(2s)",
+              "type": "instance",
+              "id": "0x2001",
+              "highlight": true
+            },
+            {
+              "name": "task_2",
+              "value": "Task(1s)",
+              "type": "instance",
+              "id": "0x2002",
+              "highlight": true
+            },
+            {
+              "name": "task_3",
+              "value": "Task(3s)",
+              "type": "instance",
+              "id": "0x2003",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "3개의 태스크가 동시에 실행됩니다."
+        }
       },
       {
         "line": 13,
-        "title": "gather의 동작",
-        "explanation": "`gather`가 실행되면, 3개의 `fetch_data` 작업이 이벤트 루프에서 동시에 실행됩니다. 가장 오래 걸리는 작업은 3초이므로, `gather`는 약 3초 동안 기다리게 됩니다.",
-        "highlight": [13]
+        "title": "gather의 동작 (1초 후)",
+        "explanation": "`gather`가 실행되면, 3개의 `fetch_data` 작업이 이벤트 루프에서 동시에 실행됩니다. 가장 오래 걸리는 작업은 3초이므로, `gather`는 약 3초 동안 기다리게 됩니다.\n\n**실행 순서:**\n1. 모든 태스크 시작.\n2. 1초 후 task_2 완료.\n3. 나머지는 계속 실행 중.",
+        "highlight": [
+          13
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "task_1",
+              "value": "Task(pending)",
+              "type": "instance",
+              "id": "0x2001"
+            },
+            {
+              "name": "task_2",
+              "value": "Task(Finished!)",
+              "type": "instance",
+              "id": "0x2002",
+              "highlight": true
+            },
+            {
+              "name": "task_3",
+              "value": "Task(pending)",
+              "type": "instance",
+              "id": "0x2003"
+            }
+          ],
+          "output": [
+            "Fetching data 1...",
+            "Fetching data 2...",
+            "Fetching data 3...",
+            "Data 2 fetched!"
+          ],
+          "note": "1초 경과: Task 2 완료."
+        }
       },
       {
         "line": 19,
-        "title": "결과 확인",
-        "explanation": "`print(f\"\\nResults: {results}\")`\n모든 작업이 완료되면, `gather`는 각 작업의 반환값을 리스트에 모아서 반환합니다. `results` 변수에 이 리스트가 할당되고, 출력됩니다.",
-        "highlight": [19]
+        "title": "결과 확인 (3초 후)",
+        "explanation": "`print(f\"\\nResults: {results}\")`\n모든 작업이 완료되면, `gather`는 각 작업의 반환값을 리스트에 모아서 반환합니다. `results` 변수에 이 리스트가 할당되고, 출력됩니다.\n\n**실행 순서:**\n1. 2초 경과: Task 1 완료.\n2. 3초 경과: Task 3 완료.\n3. `gather` 반환.\n4. `results` 리스트 생성.",
+        "highlight": [
+          19
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "results",
+              "value": "[{id:1}, {id:2}, {id:3}]",
+              "type": "list",
+              "highlight": true
+            }
+          ],
+          "output": [
+            "...",
+            "Data 1 fetched!",
+            "Data 3 fetched!"
+          ],
+          "note": "모든 태스크 완료. 결과가 리스트로 모였습니다."
+        }
       },
       {
         "line": 20,
         "title": "총 소요 시간 확인",
-        "explanation": "`print(f\"Total time: ...\")`\n총 소요 시간은 약 3초가 출력됩니다. 각 작업을 순서대로 실행했다면 6초(2+1+3)가 걸렸겠지만, `gather`를 통해 동시에 처리했기 때문에 가장 오래 걸리는 작업 시간만큼만 소요되었습니다.",
-        "highlight": [20]
+        "explanation": "`print(f\"Total time: ...\")`\n총 소요 시간은 약 3초가 출력됩니다. 각 작업을 순서대로 실행했다면 6초(2+1+3)가 걸렸겠지만, `gather`를 통해 동시에 처리했기 때문에 가장 오래 걸리는 작업 시간만큼만 소요되었습니다.\n\n**실행 순서:**\n1. 시간 출력.",
+        "highlight": [
+          20
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "time",
+              "value": "3.0012s",
+              "type": "float"
+            }
+          ],
+          "output": [
+            "...",
+            "Results: ...",
+            "Total time: 3.0012s"
+          ],
+          "note": "총 3초 소요."
+        }
       },
       {
         "line": 22,
         "title": "이벤트 루프 실행",
-        "explanation": "`asyncio.run(main())`\n`asyncio` 이벤트 루프를 시작하고, `main` 코루틴을 실행하여 전체 비동기 프로그램을 시작합니다.",
-        "highlight": [22]
+        "explanation": "`asyncio.run(main())`\n`asyncio` 이벤트 루프를 시작하고, `main` 코루틴을 실행하여 전체 비동기 프로그램을 시작합니다.\n\n**실행 순서:**\n1. 프로그램 시작.",
+        "highlight": [
+          22
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "프로그램 진입."
+        }
       }
     ]
   },
