@@ -98,5 +98,14 @@ EXPOSE 3002
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3002/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# 실행
-CMD ["node", "dist/app.js"]
+# 시작 스크립트 생성 (migrate → seed → app 순서)
+RUN echo '#!/bin/sh\n\
+echo "🔄 Running Prisma migrate..."\n\
+npx prisma migrate deploy\n\
+echo "🌱 Running seed..."\n\
+npx prisma db seed || echo "⚠️ Seed failed (may already exist)"\n\
+echo "🚀 Starting app..."\n\
+node dist/app.js' > /app/start.sh && chmod +x /app/start.sh
+
+# 실행 (migrate → seed → app)
+CMD ["/bin/sh", "/app/start.sh"]
