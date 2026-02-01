@@ -7,89 +7,276 @@
     "steps": [
       {
         "line": 6,
-        "title": "제네릭 와일드카드 메서드",
-        "explanation": "`List<? extends Number>`는 'Number 클래스를 상속받는 어떤 타입이든 담고 있는 리스트'를 매개변수로 받겠다는 의미입니다. 이를 통해 `List<Integer>`와 `List<Double>`을 모두 처리할 수 있는 유연한 메서드를 만들 수 있습니다.",
-        "highlight": [6, 7, 8, 9, 10, 11, 12, 13],
-        "visualizationType": "memory",
-        "memoryState": {
-            "note": "sum(? extends Number) 설계도 정의"
+        "title": "와일드카드 메서드 정의",
+        "explanation": "**실행 순서:**\n1. `sum` 메서드가 메모리에 로드됩니다.\n2. `List<? extends Number>`는 `Number`와 그 자식들만 받겠다는 선언입니다.\n\n**문지기 역할:**\n\"Number 패밀리만 들어오세요!\"라고 문에 써붙인 것과 같아요. String 같은 건 절대 못 들어오죠.",
+        "highlight": [
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [
+            {
+              "name": "sum",
+              "value": "Method Definition"
+            }
+          ]
         }
       },
       {
         "line": 16,
         "title": "Integer 리스트 생성",
-        "explanation": "`Integer` 타입을 담을 `ArrayList`를 생성합니다.",
-        "highlight": [16],
-        "visualizationType": "memory",
-        "memoryState": {
-            "stack": [{"name": "ints", "value": "-> List<Integer>"}]
-        }
-      },
-      {
-        "line": 17,
-        "title": "요소 추가",
-        "explanation": "리스트에 정수 1을 추가합니다.",
-        "highlight": [17],
-        "visualizationType": "memory",
-        "memoryState": {
-            "heap": [{"address": "List<Integer>", "content": "[1]"}]
+        "explanation": "**실행 순서:**\n1. `ArrayList<Integer>` 객체를 힙에 생성합니다.\n2. `ints` 변수가 참조합니다.\n",
+        "highlight": [
+          16
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "size: 0",
+              "type": "ArrayList<Integer>",
+              "new": true
+            }
+          ]
         }
       },
       {
         "line": 18,
-        "title": "요소 추가",
-        "explanation": "리스트에 정수 2를 추가합니다.",
-        "highlight": [18],
-        "visualizationType": "memory",
-        "memoryState": {
-            "heap": [{"address": "List<Integer>", "content": "[1, 2]"}]
+        "title": "데이터 추가 (1, 2)",
+        "explanation": "**실행 순서:**\n1. `ints` 리스트에 1과 2를 추가합니다.\n\n**데이터 준비:**\n더하기 테스트를 위해 정수들을 채워넣습니다.",
+        "highlight": [
+          17,
+          18
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>",
+              "changed": true
+            }
+          ]
         }
       },
       {
         "line": 20,
         "title": "Double 리스트 생성",
-        "explanation": "`Double` 타입을 담을 `ArrayList`를 생성합니다.",
-        "highlight": [20],
-        "visualizationType": "memory",
-        "memoryState": {
-            "stack": [
-                {"name": "ints", "value": "-> List<Integer>"},
-                {"name": "doubles", "value": "-> List<Double>"}
-            ]
+        "explanation": "**실행 순서:**\n1. 이번엔 `ArrayList<Double>` 객체를 힙에 생성합니다.\n2. `doubles` 변수가 참조합니다.\n",
+        "highlight": [
+          20
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "doubles",
+              "value": "0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "size: 0",
+              "type": "ArrayList<Double>",
+              "new": true
+            }
+          ]
         }
       },
       {
         "line": 21,
-        "title": "요소 추가",
-        "explanation": "리스트에 실수 3.5를 추가합니다.",
-        "highlight": [21],
-        "visualizationType": "memory",
-        "memoryState": {
-            "heap": [
-                {"address": "List<Integer>", "content": "[1, 2]"},
-                {"address": "List<Double>", "content": "[3.5]"}
-            ]
+        "title": "데이터 추가 (3.5)",
+        "explanation": "**실행 순서:**\n1. `doubles` 리스트에 3.5를 추가합니다.\n",
+        "highlight": [
+          21
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "doubles",
+              "value": "0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "[3.5]",
+              "type": "ArrayList<Double>",
+              "changed": true
+            }
+          ]
         }
       },
       {
         "line": 24,
         "title": "sum(ints) 호출",
-        "explanation": "`sum` 메서드를 `List<Integer>` 타입의 `ints`와 함께 호출합니다. 와일드카드 `? extends Number` 덕분에 `Number`의 자식 클래스인 `Integer`의 리스트를 인자로 전달할 수 있습니다. 메서드는 리스트의 합계인 3.0을 계산하여 출력합니다.",
-        "keyInsight": "상한 경계 와일드카드(? extends)는 유연한 '읽기' API를 만듭니다.",
-        "highlight": [24],
-        "visualizationType": "memory",
-        "memoryState": {
-            "output": ["Sum Ints: 3.0"]
+        "explanation": "**실행 순서:**\n1. `sum(ints)`를 호출합니다.\n2. `ints`는 `Integer` 리스트지만, `Integer`는 `Number`의 자식이므로 와일드카드(`? extends Number`)에 통과합니다.\n3. 합계 3.0이 반환되어 출력됩니다.\n\n**유연함:**\n`List<Integer>`도 OK, `List<Double>`도 OK. 이것이 프로그래머들이 와일드카드를 사랑하는 이유입니다!",
+        "highlight": [
+          24,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "doubles",
+              "value": "0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "[3.5]",
+              "type": "ArrayList<Double>"
+            }
+          ],
+          "output": [
+            "Sum Ints: 3.0"
+          ]
         }
       },
       {
         "line": 25,
         "title": "sum(doubles) 호출",
-        "explanation": "동일한 `sum` 메서드를 이번에는 `List<Double>` 타입의 `doubles`와 함께 호출합니다. `Double` 역시 `Number`의 자식 클래스이므로 와일드카드 규칙에 의해 허용됩니다. 메서드는 합계 3.5를 계산하여 출력합니다.",
-        "highlight": [25],
-        "visualizationType": "memory",
-        "memoryState": {
-            "output": ["Sum Ints: 3.0", "Sum Doubles: 3.5"]
+        "explanation": "**실행 순서:**\n1. `sum(doubles)`를 호출합니다.\n2. `Double` 역시 `Number` 패밀리이므로 환영받습니다.\n3. 합계 3.5가 출력됩니다.\n\n**마무리:**\n상한 경계 와일드카드(`? extends`) 덕분에 '읽기 전용'의 유연한 메서드가 완성되었습니다.",
+        "highlight": [
+          25,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "doubles",
+              "value": "0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "[3.5]",
+              "type": "ArrayList<Double>"
+            }
+          ],
+          "output": [
+            "Sum Ints: 3.0",
+            "Sum Doubles: 3.5"
+          ]
         }
       }
     ]
@@ -112,5 +299,5 @@
       "why": "만약 대입이 되면, String 리스트에 Integer를 넣는 사고가 발생할 수 있기 때문입니다."
     }
   ],
-  "keyTakeaway": "유연한 API를 만들려면 와일드카드를 써야 합니다. 읽을 땐 `extends`, 쓸 땐 `super` 공식을 기억하세요."
+  "keyTakeaway": "유연한 API를 만들려면 와일드카드를 써야 합니다. 데이터를 읽을 땐 `extends`, 데이터를 쓸 땐 `super` 공식을 기억하세요."
 }

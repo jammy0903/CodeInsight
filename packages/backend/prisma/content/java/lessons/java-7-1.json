@@ -8,7 +8,7 @@
       {
         "line": 2,
         "title": "제네릭 클래스 선언",
-        "explanation": "클래스 이름 뒤에 <T>를 붙여 '타입 파라미터'를 선언합니다. T는 '어떤 타입이든 될 수 있다'는 의미의 임시 이름표입니다. 이 Box 클래스는 이제 어떤 타입의 객체든 담을 수 있는 범용 상자가 됩니다.",
+        "explanation": "**실행 순서:**\n1. `Box<T>` 클래스 정의가 로드됩니다.\n2. 제네릭 타입 `T`는 '나중에 정해질 타입'을 의미합니다.\n\n**만능 상자 만들기:**\n`Box<T>`는 무엇이든 담을 수 있는 마법 상자 설계도예요. `T`라는 이름표를 붙여놓고, 나중에 실제 상자를 만들 때 \"이건 사과 상자\", \"이건 배 상자\"라고 정하는 것과 같죠!",
         "highlight": [
           2,
           3,
@@ -21,58 +21,239 @@
           10,
           11
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "Box<T> 설계도 정의"
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [
+            {
+              "name": "Box<T>",
+              "value": "Class Definition"
+            }
+          ]
+        }
+      },
+      {
+        "line": 17,
+        "title": "String Box 생성",
+        "explanation": "**실행 순서:**\n1. `new Box<>()`가 실행되어 힙 메모리에 `Box` 객체가 생성됩니다.\n2. 이때 `T`가 `String`으로 결정됩니다.\n3. `stringBox` 변수가 스택에 생겨 이 객체를 가리킵니다.\n\n**타입 확정:**\n이제 이 상자는 오직 `String`만 담을 수 있어요. 컴파일러가 철저하게 감시해주니까 안심해도 됩니다!",
+        "highlight": [
+          17
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "stringBox",
+              "value": "0x100",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: null",
+              "type": "Box<String>",
+              "new": true
+            }
+          ]
         }
       },
       {
         "line": 18,
-        "title": "값 설정",
-        "explanation": "`set` 메서드를 통해 `stringBox`에 \"Hello Generics\" 문자열을 저장합니다. `T`가 `String`이므로 문자열만 허용됩니다.",
+        "title": "값 저장 (String)",
+        "explanation": "**실행 순서:**\n1. `stringBox.set(\"Hello Generics\")`가 호출됩니다.\n2. 힙 메모리의 `0x100` 객체 내부 `value` 필드에 문자열이 저장됩니다.\n\n**딱 맞는 타입:**\n`String` 타입의 값을 넣었으니 문제없이 쏙 들어갑니다.",
         "highlight": [
           18
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "stringBox",
+              "value": "0x100",
+              "frame": "main"
+            }
+          ],
           "heap": [
             {
-              "address": "Box<String>",
-              "content": "value: \"Hello Generics\""
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>",
+              "changed": true
             }
+          ]
+        }
+      },
+      {
+        "line": 23,
+        "title": "값 출력",
+        "explanation": "**실행 순서:**\n1. `stringBox.get()`으로 값을 꺼냅니다.\n2. `System.out.println`으로 화면에 출력합니다.\n\n**형변환 불필요:**\n`input`이 `String`인 걸 알기 때문에 `(String)`으로 강제 변환할 필요가 없어요. 코드가 훨씬 깔끔해졌죠?",
+        "highlight": [
+          23
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "stringBox",
+              "value": "0x100",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>"
+            }
+          ],
+          "output": [
+            "Hello Generics"
+          ]
+        }
+      },
+      {
+        "line": 25,
+        "title": "Integer Box 생성",
+        "explanation": "**실행 순서:**\n1. 이번엔 `Integer` 타입을 담을 `Box` 객체를 힙에 생성합니다(`0x200`).\n2. `intBox` 변수가 스택에서 이를 가리킵니다.\n\n**다른 용도의 상자:**\n같은 `Box` 클래스지만, 이번엔 숫자를 담기 위해 태어났어요. 재사용성이 정말 뛰어나죠?",
+        "highlight": [
+          25
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "stringBox",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "intBox",
+              "value": "0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>"
+            },
+            {
+              "address": "0x200",
+              "content": "value: null",
+              "type": "Box<Integer>",
+              "new": true
+            }
+          ],
+          "output": [
+            "Hello Generics"
           ]
         }
       },
       {
         "line": 26,
-        "title": "정수 값 설정",
-        "explanation": "`intBox`는 `Integer` 전용 상자이므로 정수 `42`를 저장할 수 있습니다.",
+        "title": "값 저장 (Integer)",
+        "explanation": "**실행 순서:**\n1. `intBox.set(42)`를 호출합니다.\n2. `0x200` 객체에 42가 저장됩니다.\n\n**오토 박싱(Auto-boxing):**\n`int` 42가 자동으로 `Integer` 객체로 포장되어 저장됩니다.",
         "highlight": [
           26
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
             {
-              "address": "Box<String>",
-              "content": "value: \"Hello Generics\""
+              "name": "main",
+              "value": "running",
+              "frame": "main"
             },
             {
-              "address": "Box<Integer>",
-              "content": "value: 42"
+              "name": "stringBox",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "intBox",
+              "value": "0x200",
+              "frame": "main"
             }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>"
+            },
+            {
+              "address": "0x200",
+              "content": "value: 42",
+              "type": "Box<Integer>",
+              "changed": true
+            }
+          ],
+          "output": [
+            "Hello Generics"
           ]
         }
       },
       {
         "line": 27,
-        "title": "정수 값 출력",
-        "explanation": "`intBox`에서 값을 꺼내 출력합니다. 이번에도 형변환 없이 안전하게 `Integer` 타입의 값을 얻을 수 있습니다.",
+        "title": "Integer 값 출력",
+        "explanation": "**실행 순서:**\n1. `intBox.get()`으로 42를 꺼내 출력합니다.\n\n**마무리:**\n제네릭 덕분에 타입 걱정 없이 안전하게 코딩할 수 있게 되었습니다.",
         "highlight": [
           27
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "stringBox",
+              "value": "0x100",
+              "frame": "main"
+            },
+            {
+              "name": "intBox",
+              "value": "0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>"
+            },
+            {
+              "address": "0x200",
+              "content": "value: 42",
+              "type": "Box<Integer>"
+            }
+          ],
           "output": [
             "Hello Generics",
             "42"
@@ -95,8 +276,8 @@
   "misconceptions": [
     {
       "wrong": "제네릭을 쓰면 실행 속도가 빨라진다.",
-      "correct": "실행 속도와는 관계없습니다. 오히려 컴파일러가 캐스팅 코드를 자동으로 넣어주는 방식이라 런타임 성능은 동일하거나 미세한 차이뿐입니다.",
-      "why": "제네릭은 성능 최적화 도구가 아니라 '타입 안정성' 도구입니다."
+      "correct": "실행 속도와는 관계없습니다. 컴파일러가 캐스팅 코드를 자동으로 넣어주는 방식이라 런타임 성능은 동일합니다.",
+      "why": "제네릭은 성능 최적화가 아닌 '타입 안정성'을 위한 도구입니다."
     }
   ],
   "keyTakeaway": "제네릭을 사용하면 캐스팅(형변환) 코드 없이도 강력한 타입 체크를 받을 수 있어, 런타임 에러(ClassCastException)를 방지할 수 있습니다."

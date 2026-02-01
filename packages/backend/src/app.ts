@@ -39,8 +39,22 @@ lessonContentLoader.scanFilePaths().catch((err) => {
 const app = express();
 
 // Middleware
+// Capacitor 앱 Origin 허용 (Android: capacitor://localhost, https://localhost)
+const capacitorOrigins = ['capacitor://localhost', 'https://localhost', 'http://localhost'];
+const allowedOrigins = [...config.server.corsOrigins, ...capacitorOrigins];
+
 app.use(cors({
-  origin: config.server.isDev ? true : config.server.corsOrigins,
+  origin: config.server.isDev ? true : (origin, callback) => {
+    // origin이 없으면 허용 (same-origin 요청)
+    if (!origin) return callback(null, true);
+
+    // 허용된 Origin 체크
+    if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+      return callback(null, true);
+    }
+
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(express.json({ limit: config.server.jsonBodyLimit }));
