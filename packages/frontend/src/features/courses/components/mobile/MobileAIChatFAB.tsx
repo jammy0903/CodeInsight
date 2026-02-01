@@ -7,6 +7,7 @@
 
 import { MessageCircle, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import './MobileLessonView.css';
 
 interface MobileAIChatFABProps {
   onClick: () => void;
@@ -17,14 +18,8 @@ export function MobileAIChatFAB({ onClick, isOpen }: MobileAIChatFABProps) {
   return (
     <motion.button
       onClick={onClick}
-      className="fixed z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center"
-      style={{
-        bottom: '24px',
-        right: '16px',
-        background: isOpen
-          ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
-          : 'linear-gradient(135deg, #6b5a4a 0%, #5a4a3a 100%)',
-      }}
+      className={`fixed z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center fab-container ${isOpen ? 'fab-gradient-active' : 'fab-gradient-inactive'
+        }`}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       initial={{ scale: 0, opacity: 0 }}
