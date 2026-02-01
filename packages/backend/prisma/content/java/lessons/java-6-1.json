@@ -1,19 +1,126 @@
 {
   "lessonId": "java-6-1",
-  "title": "스택 트레이스와 예외 처리 기초",
-  "concept": "Core concept for Stack Trace & Try-Catch",
+  "title": "스택 트레이스와 예외 계층",
+  "concept": "예외(Exception)와 에러(Error)의 차이, 그리고 예외 계층 구조(Hierarchy)를 이해합니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. Error (Serious, usually fatal)\n        // StackOverflowError error = new StackOverflowError();\n        \n        // 2. RuntimeException (Unchecked - Logic bugs)\n        RuntimeException bug = new NullPointerException(\"oops\");\n        \n        // 3. Exception (Checked - External failure)\n        Exception failure = new java.io.IOException(\"File not found\");\n        \n        System.out.println(\"Hierarchy loaded\");\n    }\n}",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. Error (시스템 레벨의 심각한 문제)\n        // Error error = new StackOverflowError();\n        \n        // 2. RuntimeException (Unchecked - 프로그래머의 실수)\n        RuntimeException bug = new NullPointerException(\"널(null) 참조!\");\n        \n        // 3. Exception (Checked - 외부 환경 문제)\n        Exception failure = new java.io.IOException(\"파일 없음\");\n        \n        System.out.println(\"Hierarchy loaded\");\n    }\n}",
     "steps": [
+      {
+        "line": 7,
+        "title": "RuntimeException 생성",
+        "explanation": "**실행 순서:**\n1. `main` 스택 프레임이 생성됩니다.\n2. `NullPointerException` 객체가 Heap 메모리의 `0x100` 번지에 생성됩니다.\n3. `bug` 변수가 이 객체를 참조합니다.\n\n**해설:**\n자바의 모든 예외도 결국 **객체(Object)**입니다. `RuntimeException`은 주로 프로그래머가 코드를 잘못 짰을 때(버그) 발생합니다. 예를 들어, `null`인 변수를 사용하려 할 때처럼요. 컴파일러가 잡아주지 않아서 'Unchecked'라고 부릅니다.",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main"
+            },
+            {
+              "name": "bug",
+              "value": "-> 0x100",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: 널(null) 참조!",
+              "type": "NullPointerException",
+              "new": true
+            }
+          ],
+          "metaspace": [
+            {
+              "name": "Main.class",
+              "value": "loaded"
+            }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "Checked Exception 생성",
+        "explanation": "**실행 순서:**\n1. `IOException` 객체가 Heap 메모리의 `0x200` 번지에 생성됩니다.\n2. `failure` 변수가 이 객체를 참조합니다.\n\n**해설:**\n`IOException` 같은 Checked Exception은 파일이 없거나 네트워크가 끊기는 등 **외부 환경** 문제로 발생합니다. 이건 꽤 흔한 일이라서, 자바는 \"너 이거 꼭 처리할 코드(try-catch)를 짜야 해!\"라고 **강제**합니다. 그래서 'Checked'입니다.",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main"
+            },
+            {
+              "name": "bug",
+              "value": "-> 0x100",
+              "frame": "main"
+            },
+            {
+              "name": "failure",
+              "value": "-> 0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: 널(null) 참조!",
+              "type": "NullPointerException"
+            },
+            {
+              "address": "0x200",
+              "content": "IOException: 파일 없음",
+              "type": "IOException",
+              "new": true
+            }
+          ]
+        }
+      },
       {
         "line": 12,
         "title": "실행 완료",
-        "explanation": "프로그램이 예외 없이 정상적으로 실행되어 메시지를 출력합니다. 이 레슨에서는 예외를 생성만 하고 '던지지는(throw)' 않았기 때문에 프로그램이 중단되지 않았습니다.",
+        "explanation": "**실행 순서:**\n1. `System.out.println`이 호출되어 콘솔에 메시지를 출력합니다.\n2. `main` 메서드가 정상 종료됩니다.\n\n**해설:**\n여기서는 예외 객체를 `new`로 만들기만 하고, `throw` 던지지 않았습니다. 그래서 프로그램이 폭발(?)하지 않고 끝까지 실행된 것입니다. 예외도 던져야 터집니다!",
         "highlight": [
           12
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main"
+            },
+            {
+              "name": "bug",
+              "value": "-> 0x100",
+              "frame": "main"
+            },
+            {
+              "name": "failure",
+              "value": "-> 0x200",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: 널(null) 참조!",
+              "type": "NullPointerException"
+            },
+            {
+              "address": "0x200",
+              "content": "IOException: 파일 없음",
+              "type": "IOException"
+            }
+          ],
           "output": [
             "Hierarchy loaded"
           ]
@@ -22,22 +129,22 @@
     ]
   },
   "quiz": {
-    "question": "다음 중 개발자가 'catch'를 통해 복구하려고 시도하면 안 되는 것은?",
+    "question": "다음 중 컴파일러가 예외 처리를 강제하는(Checked Exception) 것은 무엇인가요?",
     "options": [
-      "FileNotFoundException",
-      "OutOfMemoryError",
       "NullPointerException",
-      "SQLException"
+      "ArrayIndexOutOfBoundsException",
+      "IOException",
+      "ArithmeticException"
     ],
-    "correctIndex": 1,
-    "explanation": "`Error` 클래스(OutOfMemoryError 등)는 시스템 레벨의 심각한 문제이므로, 애플리케이션에서 복구하는 것이 불가능하거나 권장되지 않습니다."
+    "correctIndex": 2,
+    "explanation": "`IOException`은 외부 리소스(파일, 네트워크)와 관련되므로 예외 처리가 강제됩니다. 나머지는 `RuntimeException`의 자식들로, 프로그래머의 실수에 해당하여 처리가 강제되지 않습니다(Unchecked)."
   },
   "misconceptions": [
     {
-      "wrong": "모든 예외는 Exception 클래스를 상속받는다.",
-      "correct": "아닙니다. `Error`는 `Exception`이 아닌 `Throwable`을 상속받으며, 이는 일반적인 예외 처리 대상이 아닙니다.",
-      "why": "Throwable > Error, Exception 구조입니다."
+      "wrong": "Error와 Exception은 같은 것이다.",
+      "correct": "다릅니다. `Error`(예: StackOverflow)는 시스템 레벨의 심각한 문제로 애플리케이션이 복구할 수 없지만, `Exception`은 개발자가 코드로 수습할 수 있는 사고입니다.",
+      "why": "불이 나서 건물이 무너지는 것(Error)과, 요리하다 손을 데인 것(Exception)의 차이입니다."
     }
   ],
-  "keyTakeaway": "예외 계층(Hierarchy)을 이해해야 어떤 예외를 잡아야 하고(Checked), 어떤 예외는 코드를 고쳐야 하는지(Unchecked) 구분할 수 있습니다."
+  "keyTakeaway": "자바의 예외는 `Throwable` 아래 `Error`(심각)와 `Exception`(수습 가능)으로 나뉘며, `Exception`은 다시 `Checked`(필수 처리)와 `Unchecked`(선택 처리)로 나뉩니다."
 }

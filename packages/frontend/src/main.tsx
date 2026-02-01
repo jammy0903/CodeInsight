@@ -3,12 +3,14 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
+import { Capacitor } from '@capacitor/core'
 import { router } from './router'
 import { queryClient } from './config/queryClient'
 import './index.css'
 import './i18n' // i18n 설정 파일 임포트
 import { useStore } from './stores/store'
 import { auth } from './services/firebase'
+import { initializeAdMob } from './services/admob'
 
 // 개발 환경에서 디버깅용으로 window에 노출
 if (import.meta.env.DEV) {
@@ -40,6 +42,11 @@ const initTheme = () => {
 };
 
 initTheme();
+
+// Initialize AdMob on native platforms
+if (Capacitor.isNativePlatform()) {
+  initializeAdMob().catch(console.error);
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

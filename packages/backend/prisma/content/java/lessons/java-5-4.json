@@ -1,65 +1,27 @@
 {
   "lessonId": "java-5-4",
   "title": "static 메서드",
-  "concept": "static 메서드는 인스턴스 없이 호출 가능하지만, 인스턴스 멤버에 접근할 수 없다",
+  "concept": "static 메서드는 객체 없이 호출 가능한 '유틸리티 함수'다.",
   "content": {
-    "code": "class MathUtil {\n    static int add(int a, int b) {\n        return a + b;\n    }\n    \n    int instanceValue = 10;\n    \n    static void tryAccessInstance() {\n        // System.out.println(instanceValue);  // 에러!\n        // System.out.println(this.instanceValue);  // 에러!\n    }\n    \n    void instanceMethod() {\n        System.out.println(add(1, 2));  // OK!\n        System.out.println(instanceValue);  // OK!\n    }\n}\n\nint result = MathUtil.add(3, 5);\nSystem.out.println(result);",
+    "code": "class MathUtil {\n    static int add(int a, int b) {\n        return a + b;\n    }\n    \n    int instanceValue = 10;\n    \n    static void tryAccess() {\n        // System.out.println(instanceValue); // 에러!\n    }\n}\n\nint result = MathUtil.add(3, 5);\nSystem.out.println(result);",
     "steps": [
       {
         "line": 2,
-        "title": "static 메서드 선언",
-        "explanation": "**독립적인 도구:**\n`add()`는 `static`입니다. 객체(`new`)를 만들지 않아도 바로 쓸 수 있는 **자판기** 같은 녀석입니다.\n입력값(`a`, `b`)만 주면 결과가 튀어나옵니다.",
-        "keyInsight": "static method = 순수 함수 (Pure Function)",
+        "title": "static 메서드 사용",
+        "explanation": "**실행 순서:**\n1. `MathUtil` 클래스의 `add` 메서드 직접 호출.\n2. Stack에 `add` 프레임 생성.\n3. `a=3`, `b=5` 저장 및 연산.\n\n**핵심:**\n`new MathUtil()`로 객체를 만들 필요가 없습니다. 그냥 도구함(`MathUtil`)에서 도구(`add`)를 꺼내 쓰는 느낌입니다.",
+        "keyInsight": "객체 생성 불필요 (순수 기능)",
         "highlight": [
           2,
-          3,
-          4
+          13
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "metaspace": [
             {
               "name": "MathUtil.add()",
-              "value": "method"
+              "value": "Code"
             }
           ],
-          "note": "상태(필드)가 필요 없는 유틸리티"
-        }
-      },
-      {
-        "line": 6,
-        "title": "인스턴스 필드",
-        "explanation": "`instanceValue`는 `new MathUtil()`을 해서 힙에 객체를 만들어야만 비로소 생겨나는 값입니다.",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "아직 객체가 없으니 이 변수도 없음"
-        }
-      },
-      {
-        "line": 14,
-        "title": "인스턴스에서 static 접근 (OK)",
-        "explanation": "**반대는 가능:**\n`instanceMethod()`는 이미 객체가 생성된 후에 호출됩니다.\n객체가 있는 상태에서 \"공용 도구(`add`) 좀 빌려 쓸게\"라고 하는 건 전혀 문제되지 않습니다.",
-        "highlight": [
-          14
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "note": "개별 객체는 공용 도구 사용 가능"
-        }
-      },
-      {
-        "line": 19,
-        "title": "클래스명으로 호출",
-        "explanation": "`new MathUtil()` 따위는 필요 없습니다.\n바로 `MathUtil.add(3, 5)`를 호출합니다.\n무거운 객체를 안 만들어도 되니 **빠르고 효율적**입니다. `Math.max()`, `Arrays.sort()` 같은 유틸리티들이 다 이렇게 생겼습니다.",
-        "keyInsight": "유틸리티 함수는 static이 국룰",
-        "highlight": [
-          19
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
           "stack": [
             {
               "name": "a",
@@ -75,49 +37,58 @@
         }
       },
       {
-        "line": 20,
-        "title": "결과 출력",
-        "explanation": "결과 8이 반환됩니다. 메모리 낭비 없이 깔끔하게 계산만 수행했습니다.",
+        "line": 14,
+        "title": "결과 반환",
+        "explanation": "**실행 순서:**\n1. `3 + 5` 계산.\n2. `8` 반환.\n3. `add` 스택 프레임 삭제.\n\n상태(인스턴스 변수)를 건드리지 않고 오직 입력값만으로 결과를 내므로 깔끔하고 빠릅니다.",
         "highlight": [
-          20
+          14
         ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "stack": [
-            {
-              "name": "result",
-              "value": "8"
-            }
-          ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "note": "메서드 종료 후 스택 정리됨",
           "output": [
             "8"
           ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "접근 제한 (static -> instance)",
+        "explanation": "**왜 에러가 날까요?**\n`tryAccess()`는 객체가 없어도 실행될 수 있습니다. 그런데 `instanceValue`는 객체가 있어야만 존재합니다.\n\"아직 태어나지도 않은(또는 없을 수도 있는) 친구의 이름을 부르는 것\"과 같아서 불가능합니다.",
+        "keyInsight": "static에서는 this 사용 불가",
+        "highlight": [
+          8,
+          9
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "warning": "객체가 없는데 인스턴스 변수를 찾을 수 없음!"
         }
       }
     ]
   },
   "quiz": {
-    "question": "main 메서드가 static인 이유는?",
+    "question": "static 메서드를 사용하기 가장 적절한 경우는?",
     "options": [
-      "메모리를 아끼려고",
-      "인스턴스 생성 없이 JVM이 바로 실행하려고",
-      "보안 때문에",
-      "아무 이유 없다"
+      "각 객체의 상태(필드)를 수정해야 할 때",
+      "입력값만 가지고 계산하는 유틸리티 함수일 때",
+      "오버라이딩(Overriding)을 통해 다형성을 구현할 때",
+      "생성자 대신 객체를 초기화할 때"
     ],
     "correctIndex": 1,
-    "explanation": "프로그램이 시작될 때는 아직 아무런 객체도 없습니다. 그래서 JVM이 \"객체 없어도 실행 가능한\" `static` 메서드인 `main`을 찾아서 호출하는 것입니다."
+    "explanation": "`Math.max()`, `Arrays.sort()` 처럼 객체의 상태와 무관하게 입력값만으로 동작하는 함수는 `static`으로 만드는 것이 효율적입니다."
   },
   "misconceptions": [
     {
-      "wrong": "static 메서드 안에서 super를 쓸 수 있다",
-      "correct": "못 씁니다. `this`도 없고 `super`도 없습니다.",
-      "why": "`this`, `super` 모두 '인스턴스'가 있어야 성립하는 개념입니다."
+      "wrong": "static 메서드 안에서 this를 쓸 수 있다.",
+      "correct": "절대 못 씁니다.",
+      "why": "`this`는 '현재 객체'를 뜻하는데, `static` 메서드가 실행되는 시점에는 '현재 객체'라는 개념 자체가 없을 수도 있기 때문입니다."
     },
     {
-      "wrong": "static 메서드는 오버라이딩(Overriding) 된다",
-      "correct": "아닙니다. **하이딩(Hiding)**이라고 부르며, 다형성(Polymorphism)이 적용되지 않습니다.",
-      "why": "변수의 '타입'만 보고 호출되지, 실제 '객체'가 뭔지는 보지 않기 때문입니다."
+      "wrong": "static 메서드는 오버라이딩 된다.",
+      "correct": "안 됩니다. 'Hiding(가리기)'만 됩니다.",
+      "why": "오버라이딩은 런타임에 '객체 타입'을 보고 찾아가는 것인데, static은 컴파일 타임에 '변수 타입'만 보고 결정나기 때문입니다."
     }
   ],
-  "keyTakeaway": "static 메서드는 '도구 상자'다. 객체 없이 쓸 수 있지만, 객체 내부(this)는 못 건드린다."
+  "keyTakeaway": "static 메서드는 '독립적인 도구'다. this도 없고, 인스턴스 변수도 못 만진다."
 }
