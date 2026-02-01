@@ -8,56 +8,205 @@
       {
         "line": 1,
         "title": "객체 생성",
-        "explanation": "`a = [1, 2, 3]`\n리스트 객체를 생성하고, 변수 `a`가 이 객체를 참조합니다.",
-        "highlight": [1]
+        "explanation": "`a = [1, 2, 3]`\n리스트 객체를 생성하고, 변수 `a`가 이 객체를 참조합니다.\n\n**왜 이 순서인가?**\n가장 먼저 리스트 객체를 메모리에 생성하고, 변수 a가 이 객체를 가리키도록 합니다. 이때 객체 ID는 0x2000입니다.\n\n**실행 순서:**\n1. 메모리에 리스트 [1, 2, 3] 객체 생성 (ID: 0x2000)\n2. 변수 a가 0x2000을 참조\n3. 객체의 참조 카운트 = 1",
+        "highlight": [1],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "변수 a가 리스트 객체 0x2000을 참조 (refcount=1)"
+        }
     },
     {
         "line": 2,
         "title": "별칭(참조) 생성",
-        "explanation": "`b = a`\n변수 `b`도 `a`와 같은 객체를 참조하도록 합니다. 이제 하나의 객체를 `a`와 `b` 두 개의 이름으로 부를 수 있습니다.",
-        "highlight": [2]
+        "explanation": "`b = a`\n변수 `b`도 `a`와 같은 객체를 참조하도록 합니다. 이제 하나의 객체를 `a`와 `b` 두 개의 이름으로 부를 수 있습니다.\n\n**왜 이 순서인가?**\nb = a는 새로운 객체를 만드는 것이 아니라, 기존 객체 0x2000에 대한 또 다른 참조를 만듭니다. 이제 같은 객체를 두 개의 이름으로 접근할 수 있습니다.\n\n**실행 순서:**\n1. 변수 a가 가리키는 객체 0x2000을 확인\n2. 변수 b도 같은 객체 0x2000을 참조하도록 설정\n3. 객체의 참조 카운트가 1 → 2로 증가",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000"
+            },
+            {
+              "name": "b",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            }
+          ],
+          "output": [],
+          "note": "a와 b가 같은 객체 0x2000을 참조 (refcount=2)"
+        }
     },
     {
         "line": 4,
         "title": "삭제 전 상태 확인",
-        "explanation": "`print(f\"b 삭제 전: {a}\")`\n`b`를 삭제하기 전의 상태를 확인하기 위해 `a`를 출력합니다.",
-        "highlight": [4]
+        "explanation": "`print(f\"b 삭제 전: {a}\")`\n`b`를 삭제하기 전의 상태를 확인하기 위해 `a`를 출력합니다.\n\n**왜 이 순서인가?**\ndel 키워드의 효과를 명확히 보여주기 위해, 삭제하기 전의 상태를 먼저 출력합니다. a를 통해 객체에 접근할 수 있음을 확인합니다.\n\n**실행 순서:**\n1. f-string 내부의 {a} 평가 → a가 가리키는 0x2000의 값 [1, 2, 3] 가져오기\n2. \"b 삭제 전: [1, 2, 3]\" 문자열 생성\n3. 출력 버퍼에 추가",
+        "highlight": [4],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000"
+            }
+          ],
+          "output": ["b 삭제 전: [1, 2, 3]"],
+          "note": "a를 통해 객체 0x2000에 접근하여 출력"
+        }
     },
     {
         "line": 6,
         "title": "참조 삭제 (del)",
-        "explanation": "`del b`\n`del` 키워드는 객체가 아닌, 변수 `b`라는 '이름' 또는 '참조'를 삭제합니다. 리스트 객체의 참조 횟수가 하나 줄어들지만, 아직 `a`가 참조하고 있으므로 객체는 사라지지 않습니다.",
-        "highlight": [6]
+        "explanation": "`del b`\n`del` 키워드는 객체가 아닌, 변수 `b`라는 '이름' 또는 '참조'를 삭제합니다. 리스트 객체의 참조 횟수가 하나 줄어들지만, 아직 `a`가 참조하고 있으므로 객체는 사라지지 않습니다.\n\n**왜 이 순서인가?**\n이것이 del의 핵심입니다! del은 객체를 삭제하는 것이 아니라 '이름'을 삭제합니다. b라는 이름은 네임스페이스에서 제거되지만, 객체 0x2000은 여전히 메모리에 존재하고 a를 통해 접근 가능합니다.\n\n**실행 순서:**\n1. 네임스페이스에서 변수 b 제거\n2. 객체 0x2000의 참조 카운트 2 → 1로 감소\n3. refcount > 0이므로 객체는 삭제되지 않음\n4. a는 여전히 0x2000을 참조 중",
+        "highlight": [6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000"
+            }
+          ],
+          "output": ["b 삭제 전: [1, 2, 3]"],
+          "note": "변수 b는 삭제됨! 하지만 객체 0x2000은 a가 참조 중 (refcount=1)"
+        }
     },
     {
         "line": 8,
         "title": "객체 생존 확인",
-        "explanation": "`print(f\"a는 여전히: {a}\")`\n`b`가 삭제된 후에도, `a`는 여전히 원래의 리스트 객체에 접근할 수 있음을 보여줍니다.",
-        "highlight": [8]
+        "explanation": "`print(f\"a는 여전히: {a}\")`\n`b`가 삭제된 후에도, `a`는 여전히 원래의 리스트 객체에 접근할 수 있음을 보여줍니다.\n\n**왜 이 순서인가?**\ndel b로 이름만 삭제되었고 객체는 살아있음을 증명하기 위해, a를 통해 같은 객체에 접근합니다. 객체 0x2000은 여전히 메모리에 존재합니다.\n\n**실행 순서:**\n1. f-string 내부의 {a} 평가 → a가 가리키는 0x2000의 값 [1, 2, 3] 가져오기\n2. \"a는 여전히: [1, 2, 3]\" 문자열 생성\n3. 출력 버퍼에 추가\n4. del은 이름만 삭제했고, 객체는 온전함을 확인!",
+        "highlight": [8],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            }
+          ],
+          "output": [
+            "b 삭제 전: [1, 2, 3]",
+            "a는 여전히: [1, 2, 3]"
+          ],
+          "note": "객체 0x2000은 살아있고, a로 접근 가능!"
+        }
     },
     {
         "line": 10,
         "title": "에러 발생 시도 (try)",
-        "explanation": "`try:`\n`b`라는 이름은 `del`로 삭제되어 더 이상 존재하지 않습니다. 존재하지 않는 변수에 접근하면 에러가 발생하므로, `try...except` 구문으로 에러를 안전하게 처리하려고 시도합니다.",
-        "highlight": [10]
+        "explanation": "`try:`\n`b`라는 이름은 `del`로 삭제되어 더 이상 존재하지 않습니다. 존재하지 않는 변수에 접근하면 에러가 발생하므로, `try...except` 구문으로 에러를 안전하게 처리하려고 시도합니다.\n\n**왜 이 순서인가?**\ndel b로 이름이 삭제되었으므로, b에 접근하려고 하면 NameError가 발생할 것입니다. 프로그램이 중단되지 않도록 try 블록으로 감쌉니다.\n\n**실행 순서:**\n1. try 블록 진입\n2. try 블록 내부의 코드 실행 시작\n3. 에러가 발생하면 즉시 except 블록으로 점프 예정",
+        "highlight": [10],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000"
+            }
+          ],
+          "output": [
+            "b 삭제 전: [1, 2, 3]",
+            "a는 여전히: [1, 2, 3]"
+          ],
+          "note": "try 블록 진입 - b는 이미 삭제됨"
+        }
     },
     {
         "line": 11,
         "title": "NameError 발생",
-        "explanation": "`print(b)`\n삭제된 변수 `b`를 출력하려고 시도합니다. 이 시점에서 `NameError`가 발생하고, 프로그램은 즉시 `except` 블록으로 점프합니다.",
-        "highlight": [11]
+        "explanation": "`print(b)`\n삭제된 변수 `b`를 출력하려고 시도합니다. 이 시점에서 `NameError`가 발생하고, 프로그램은 즉시 `except` 블록으로 점프합니다.\n\n**왜 이 순서인가?**\nPython이 변수 b를 찾으려고 네임스페이스를 검색하지만, del b로 이미 제거되었으므로 찾을 수 없습니다. 이때 NameError 예외가 발생합니다.\n\n**실행 순서:**\n1. print() 함수가 인자 b를 평가하려고 시도\n2. 현재 네임스페이스에서 이름 'b' 검색\n3. 'b'를 찾을 수 없음 → NameError: name 'b' is not defined 발생\n4. 즉시 except 블록으로 제어 흐름 이동 (이 줄은 완료되지 않음!)",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000"
+            }
+          ],
+          "output": [
+            "b 삭제 전: [1, 2, 3]",
+            "a는 여전히: [1, 2, 3]"
+          ],
+          "note": "NameError 발생! 이름 'b'는 존재하지 않음"
+        }
     },
     {
         "line": 12,
         "title": "에러 잡기 (except)",
-        "explanation": "`except NameError:`\n`try` 블록에서 `NameError`가 발생했기 때문에, 프로그램의 흐름이 이 `except` 블록으로 넘어옵니다.",
-        "highlight": [12]
+        "explanation": "`except NameError:`\n`try` 블록에서 `NameError`가 발생했기 때문에, 프로그램의 흐름이 이 `except` 블록으로 넘어옵니다.\n\n**왜 이 순서인가?**\ntry 블록에서 NameError가 발생했으므로, Python은 매칭되는 except 블록을 찾습니다. except NameError가 정확히 매칭되므로 이 블록으로 제어 흐름이 이동합니다.\n\n**실행 순서:**\n1. 발생한 예외 타입(NameError) 확인\n2. except 절의 타입과 비교 → 일치!\n3. except 블록 내부로 진입\n4. try 블록의 나머지 코드는 실행되지 않음",
+        "highlight": [12],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000"
+            }
+          ],
+          "output": [
+            "b 삭제 전: [1, 2, 3]",
+            "a는 여전히: [1, 2, 3]"
+          ],
+          "note": "except 블록 진입 - NameError 처리 준비"
+        }
     },
     {
         "line": 13,
         "title": "에러 처리 메시지 출력",
-        "explanation": "`print(...)`\n`except` 블록 안의 코드가 실행되어, `b`가 더 이상 존재하지 않는다는 메시지를 출력합니다. `try...except` 덕분에 프로그램이 멈추지 않고 계속 실행됩니다.",
-        "highlight": [13]
+        "explanation": "`print(...)`\n`except` 블록 안의 코드가 실행되어, `b`가 더 이상 존재하지 않는다는 메시지를 출력합니다. `try...except` 덕분에 프로그램이 멈추지 않고 계속 실행됩니다.\n\n**왜 이 순서인가?**\nexcept 블록 내부의 코드를 실행하여, NameError가 발생했음을 사용자에게 알립니다. del로 이름이 삭제되었음을 명확히 보여줍니다.\n\n**실행 순서:**\n1. except 블록 내부의 print() 실행\n2. \"b는 더 이상 존재하지 않음\" 메시지 생성\n3. 출력 버퍼에 추가\n4. try-except 블록 종료\n5. 프로그램 정상 계속 실행 (에러로 중단되지 않음!)\n\n**핵심 교훈:** del b는 객체를 삭제하는 것이 아니라 '이름' b를 삭제합니다. 객체 0x2000은 a를 통해 여전히 접근 가능합니다!",
+        "highlight": [13],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "a",
+              "value": "[1, 2, 3]",
+              "type": "list",
+              "id": "0x2000"
+            }
+          ],
+          "output": [
+            "b 삭제 전: [1, 2, 3]",
+            "a는 여전히: [1, 2, 3]",
+            "b는 더 이상 존재하지 않음"
+          ],
+          "note": "에러 처리 완료! 객체 0x2000은 a로 접근 가능"
+        }
     }
     ]
   },
