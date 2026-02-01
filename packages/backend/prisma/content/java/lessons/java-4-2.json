@@ -1,110 +1,157 @@
 {
   "lessonId": "java-4-2",
   "title": "String vs StringBuilder",
-  "concept": "반복적인 문자열 연결에는 StringBuilder를 사용해야 한다",
+  "concept": "문자열 수정이 많을 땐 가변(Mutable) 객체인 StringBuilder를 써야 한다.",
   "content": {
     "code": "// 나쁜 예: String 연결 (쓰레기 생성)\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// 좋은 예: StringBuilder (재사용)\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
     "steps": [
       {
         "line": 2,
         "title": "빈 String 생성",
-        "explanation": "`bad` 변수는 빈 문자열 `\"\"`를 가리킵니다. 반복문 안에서 문자열을 더하는 비효율적인 로직의 시작입니다.",
+        "explanation": "**실행 순서:**\n1. String Pool에 `\"\"`(빈 문자열) 생성.\n2. `bad` 변수가 이를 참조.\n\n이제부터 `bad`에 계속 덧붙이기를 시도할 것입니다.",
         "highlight": [
           2
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "bad",
-              "value": "-> \"\""
+              "value": "-> Pool[0]",
+              "frame": "main"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"\"",
+              "address": "Pool[0]"
             }
           ]
         }
       },
       {
         "line": 3,
-        "title": "첫 번째 반복문 시작",
-        "explanation": "`i`가 0부터 2까지 총 3번 반복하는 루프를 시작합니다.",
+        "title": "반복문 시작 (String)",
+        "explanation": "**실행 순서:**\n1. `i = 0` 초기화.\n2. 반복 조건 확인.\n\n루프를 돌 준비를 합니다.",
         "highlight": [
           3
         ],
-        "visualizationType": "memory",
-        "memoryState": {}
-      },
-      {
-        "line": 4,
-        "title": "비효율적인 String 연결",
-        "explanation": "루프가 돌 때마다 `bad + i` 연산은 새로운 String 객체를 생성합니다. 기존 문자열은 버려져 쓰레기(Garbage)가 됩니다. 이 과정이 반복되면서 메모리 낭비와 성능 저하가 발생합니다.",
-        "keyInsight": "반복문 안의 '+' 연산은 쓰레기 객체를 대량 생성",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
-          "heap": [
-            {
-              "address": "...",
-              "content": "쓰레기들",
-              "garbage": true
-            },
-            {
-              "address": "0x00N",
-              "content": "\"012\"",
-              "new": true
-            }
-          ],
-          "warning": "메모리 낭비 심각 (O(n²))"
-        }
-      },
-      {
-        "line": 8,
-        "title": "StringBuilder 생성",
-        "explanation": "`StringBuilder`는 내부적으로 수정 가능한 문자 배열(버퍼)을 가집니다. 문자열을 추가해도 새 객체를 만들지 않고 내부 배열을 효율적으로 사용합니다.",
-        "keyInsight": "StringBuilder = 가변 버퍼 (미리 공간 확보)",
-        "highlight": [
-          8
-        ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
-              "name": "good",
-              "value": "-> 0x010"
+              "name": "bad",
+              "value": "-> Pool[0]",
+              "frame": "main"
+            },
+            {
+              "name": "i",
+              "value": "0",
+              "frame": "main"
             }
           ],
-          "heap": [
+          "stringPool": [
             {
-              "address": "0x010",
-              "content": "StringBuilder{buffer: []}"
+              "value": "\"\"",
+              "address": "Pool[0]"
             }
           ]
         }
       },
       {
-        "line": 9,
-        "title": "두 번째 반복문 시작",
-        "explanation": "효율적인 `StringBuilder`를 사용하는 두 번째 루프를 시작합니다.",
+        "line": 4,
+        "title": "비효율적인 연결 (쓰레기 투척)",
+        "explanation": "**실행 순서 (반복):**\n1. `bad` + `i` -> 새로운 객체 생성.\n2. `bad`가 새 객체를 가리킴.\n3. 이전 객체는 **버려짐(Garbage)**.\n\n**문제점:**\n루프가 돌 때마다 멀쩡한 String 객체들이 1회용으로 쓰고 버려집니다. 루프가 1만 번 돌면 쓰레기도 1만 개가 생깁니다.",
+        "keyInsight": "String Loop 연결 = 메모리 낭비(O(N²))",
         "highlight": [
-          9
+          4
         ],
-        "visualizationType": "memory",
-        "memoryState": {}
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "bad",
+              "value": "-> Obj_2",
+              "frame": "main",
+              "changed": true
+            },
+            {
+              "name": "i",
+              "value": "2",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Obj_0",
+              "content": "\"0\"",
+              "type": "String",
+              "garbage": true
+            },
+            {
+              "address": "Obj_1",
+              "content": "\"01\"",
+              "type": "String",
+              "garbage": true
+            },
+            {
+              "address": "Obj_2",
+              "content": "\"012\"",
+              "type": "String",
+              "new": true
+            }
+          ],
+          "warning": "중간 객체들이 계속 버려지고 있습니다!"
+        }
+      },
+      {
+        "line": 8,
+        "title": "StringBuilder 생성",
+        "explanation": "**실행 순서:**\n1. Heap에 `StringBuilder` 객체(0x100) 생성.\n2. 내부에 넉넉한 크기의 문자 배열(Buffer)을 가짐.\n\n`StringBuilder`는 **가변(Mutable)** 객체입니다. 즉, 내용물을 마음대로 고칠 수 있는 '화이트보드'와 같습니다.",
+        "keyInsight": "StringBuilder = 수정 가능한 화이트보드",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "good",
+              "value": "-> 0x100",
+              "frame": "main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "sb_buffer[]",
+              "type": "StringBuilder"
+            }
+          ]
+        }
       },
       {
         "line": 10,
-        "title": "효율적인 append",
-        "explanation": "`append` 메서드는 새 객체를 만들지 않고, 내부 버퍼에 문자를 추가합니다. 루프가 반복되어도 쓰레기가 발생하지 않아 매우 효율적입니다.",
-        "keyInsight": "객체 재사용 = 메모리 절약 + 속도 빠름",
+        "title": "효율적인 append()",
+        "explanation": "**실행 순서 (반복):**\n1. `good.append(i)` 호출.\n2. `0x100` 객체 내부의 배열 빈칸에 숫자를 채움.\n\n**장점:**\n새 객체를 만들지 않고, **하나의 객체** 안에서 내용을 계속 업데이트합니다. 쓰레기가 전혀 생기지 않습니다.",
+        "keyInsight": "객체 재사용 = 속도 빠름 + 메모리 절약",
         "highlight": [
           10
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "good",
+              "value": "-> 0x100",
+              "frame": "main"
+            }
+          ],
           "heap": [
             {
-              "address": "0x010",
-              "content": "StringBuilder{buffer: ['0','1','2']}",
+              "address": "0x100",
+              "content": "['0', '1', '2', ...]",
+              "type": "StringBuilder",
               "changed": true
             }
           ]
@@ -112,23 +159,31 @@
       },
       {
         "line": 12,
-        "title": "toString()으로 최종 변환",
-        "explanation": "반복문이 끝난 후, `StringBuilder`의 최종 결과를 `String` 객체로 변환합니다. 이 때 단 한 번만 새로운 String 객체가 생성됩니다.",
+        "title": "toString()으로 완성",
+        "explanation": "**실행 순서:**\n1. `good.toString()` 호출.\n2. 현재까지 완성된 내용을 바탕으로 **딱 한 번** String 객체 생성.\n3. `result`에 저장.\n\n요리(수정)는 화이트보드(StringBuilder)에서 실컷 하고, 마지막에 완성된 요리만 접시(String)에 담아 내는 방식입니다.",
         "highlight": [
           12
         ],
-        "visualizationType": "memory",
-        "memoryState": {
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
           "stack": [
             {
               "name": "result",
-              "value": "-> 0x011"
+              "value": "-> 0x200",
+              "frame": "main"
             }
           ],
           "heap": [
             {
-              "address": "0x011",
-              "content": "\"012\""
+              "address": "0x100",
+              "content": "['0', '1', '2']",
+              "type": "StringBuilder"
+            },
+            {
+              "address": "0x200",
+              "content": "\"012\"",
+              "type": "String",
+              "new": true
             }
           ]
         }
@@ -136,22 +191,22 @@
     ]
   },
   "quiz": {
-    "question": "StringBuilder 대신 StringBuffer를 써야 할 때는?",
+    "question": "반복문 안에서 문자열을 계속 더해야 할 때 가장 좋은 방법은?",
     "options": [
-      "문자열이 아주 길 때",
-      "반복 횟수가 많을 때",
-      "멀티스레드가 동시에 접근할 때",
-      "메모리가 부족할 때"
+      "그냥 + 연산자를 쓴다.",
+      "String.concat() 메서드를 쓴다.",
+      "StringBuilder나 StringBuffer를 쓴다.",
+      "new String()을 계속 호출한다."
     ],
     "correctIndex": 2,
-    "explanation": "StringBuffer는 동기화(Synchronized)되어 있어서 스레드 안전(Thread-safe)합니다. 혼자 쓸 때는 StringBuilder가 더 빠릅니다."
+    "explanation": "반복문 내에서의 `+` 연산은 수많은 임시 객체(쓰레기)를 만들기 때문에 성능 최악입니다. `StringBuilder`를 써서 하나의 객체 안에서 수정해야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "요즘 컴파일러는 + 연산도 알아서 최적화해준다",
-      "correct": "`a` + `b` 한 번 하는 건 최적화해주지만, **반복문(Loop)** 안에서는 최적화를 못 해줍니다.",
-      "why": "반복문 안에서는 매번 새로운 StringBuilder를 만들었다 버리는 비효율적인 코드로 변환되기 십상입니다. 루프 안에서는 무조건 명시적으로 `StringBuilder`를 쓰세요."
+      "wrong": "요즘 Java는 + 연산자 써도 컴파일러가 최적화해준다?",
+      "correct": "단순 한두 번 연결은 최적화해주지만, **반복문(Loop)** 안에서는 최적화에 한계가 있습니다.",
+      "why": "반복문마다 `new StringBuilder`를 만들었다 버리는 식으로 변환되기 십상이라 여전히 느립니다. 루프에선 명시적으로 `StringBuilder`를 쓰세요."
     }
   ],
-  "keyTakeaway": "루프 돌면서 문자열 합칠 땐 무조건 StringBuilder! 그냥 + 쓰면 메모리 테러."
+  "keyTakeaway": "루프 돌며 문자열 조립할 땐 무조건 `StringBuilder`! 성능 차이가 100배 이상 날 수 있다."
 }
