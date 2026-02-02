@@ -9,16 +9,18 @@ import { MainLayout } from './layouts';
 import { HomePage } from './features/home';
 import { AuthPage } from './features/auth';
 
-import { PlaygroundPage } from './features/playground';
-import { AdminPage, AdminRoute } from './features/admin';
-import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage } from './features/quiz';
-import { ProfilePage } from './features/profile';
-import { DashboardPage } from './features/dashboard';
-import { ReportPage } from './features/report';
+// 정적 import (필수 컴포넌트만)
+import { AdminRoute } from './features/admin';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { initializeAuthListener } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
 import { CoursesPage } from './features/courses/CoursesPage';
+
+// NOTE: 무거운 페이지들은 lazy 로딩으로 변경됨 (번들 크기 최적화)
+// - PlaygroundPage: Monaco 에디터 (~150KB)
+// - DashboardPage: recharts (~60KB)
+// - QuizPage: 퀴즈 관련 로직
+// - ReportPage, AdminPage, ProfilePage
 
 /**
  * 인증 상태 초기화 컴포넌트
@@ -91,15 +93,91 @@ export const router = createBrowserRouter([
           return { Component: LessonPage };
         }
       },
-      { path: 'playground', element: <PlaygroundPage /> },
-      { path: 'quiz', element: <ProtectedRoute><QuizPage /></ProtectedRoute> },
-      { path: 'quiz/ox/:lang', element: <ProtectedRoute><OXQuizPage /></ProtectedRoute> },
-      { path: 'quiz/multiple-choice/:lang', element: <ProtectedRoute><MultipleChoiceQuizPage /></ProtectedRoute> },
-      { path: 'quiz/fill-blank/:lang', element: <ProtectedRoute><FillBlankQuizPage /></ProtectedRoute> },
-      { path: 'profile', element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
-      { path: 'dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
-      { path: 'report', element: <ProtectedRoute><ReportPage /></ProtectedRoute> },
-      { path: 'admin', element: <AdminRoute><AdminPage /></AdminRoute> },
+      // Playground (Monaco 에디터 포함, ~150KB)
+      {
+        path: 'playground',
+        lazy: async () => {
+          const { PlaygroundPage } = await import('./features/playground');
+          return { Component: PlaygroundPage };
+        },
+      },
+      // Quiz 페이지들
+      {
+        path: 'quiz',
+        lazy: async () => {
+          const { QuizPage } = await import('./features/quiz');
+          return {
+            Component: () => <ProtectedRoute><QuizPage /></ProtectedRoute>,
+          };
+        },
+      },
+      {
+        path: 'quiz/ox/:lang',
+        lazy: async () => {
+          const { OXQuizPage } = await import('./features/quiz');
+          return {
+            Component: () => <ProtectedRoute><OXQuizPage /></ProtectedRoute>,
+          };
+        },
+      },
+      {
+        path: 'quiz/multiple-choice/:lang',
+        lazy: async () => {
+          const { MultipleChoiceQuizPage } = await import('./features/quiz');
+          return {
+            Component: () => <ProtectedRoute><MultipleChoiceQuizPage /></ProtectedRoute>,
+          };
+        },
+      },
+      {
+        path: 'quiz/fill-blank/:lang',
+        lazy: async () => {
+          const { FillBlankQuizPage } = await import('./features/quiz');
+          return {
+            Component: () => <ProtectedRoute><FillBlankQuizPage /></ProtectedRoute>,
+          };
+        },
+      },
+      // Profile
+      {
+        path: 'profile',
+        lazy: async () => {
+          const { ProfilePage } = await import('./features/profile');
+          return {
+            Component: () => <ProtectedRoute><ProfilePage /></ProtectedRoute>,
+          };
+        },
+      },
+      // Dashboard (recharts 포함, ~60KB)
+      {
+        path: 'dashboard',
+        lazy: async () => {
+          const { DashboardPage } = await import('./features/dashboard');
+          return {
+            Component: () => <ProtectedRoute><DashboardPage /></ProtectedRoute>,
+          };
+        },
+      },
+      // Report
+      {
+        path: 'report',
+        lazy: async () => {
+          const { ReportPage } = await import('./features/report');
+          return {
+            Component: () => <ProtectedRoute><ReportPage /></ProtectedRoute>,
+          };
+        },
+      },
+      // Admin
+      {
+        path: 'admin',
+        lazy: async () => {
+          const { AdminPage } = await import('./features/admin');
+          return {
+            Component: () => <AdminRoute><AdminPage /></AdminRoute>,
+          };
+        },
+      },
     ],
   },
 ]);
