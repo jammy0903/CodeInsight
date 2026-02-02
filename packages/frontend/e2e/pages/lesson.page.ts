@@ -46,10 +46,10 @@ export class LessonPage {
     this.lessonTitle = page.locator('h1, h2').first();
     this.backButton = page.getByRole('button', { name: /뒤로|back|←/i });
 
-    // Code Viewer
-    this.codeViewer = page.locator('pre, code, .code-viewer').first();
-    this.codeLines = page.locator('.code-line, [class*="line"]');
-    this.highlightedLine = page.locator('[class*="highlight"], [class*="active"]');
+    // Code Viewer (Monaco Editor)
+    this.codeViewer = page.locator('.monaco-editor, pre, code, .code-viewer').first();
+    this.codeLines = page.locator('.view-line, .code-line, [class*="line"]');
+    this.highlightedLine = page.locator('.current-line, [class*="highlight"], [class*="active"]');
 
     // Step Controls
     this.prevButton = page.getByRole('button', { name: /이전|prev|←/i });
@@ -106,7 +106,17 @@ export class LessonPage {
   }
 
   async isLoaded() {
-    await this.codeViewer.waitFor({ state: 'visible', timeout: 10000 });
+    // Monaco Editor는 로드에 시간이 걸림 - 최대 30초까지 기다림
+    try {
+      // 먼저 Monroe Editor 컨테이너를 기다림
+      await this.page.waitForSelector('.monaco-editor', { timeout: 15000 });
+    } catch {
+      // Monaco가 없으면 대체 코드 뷰어를 기다림
+      await this.codeViewer.waitFor({ state: 'visible', timeout: 15000 });
+    }
+
+    // 코드가 실제로 보이도록 추가 대기
+    await this.page.waitForTimeout(500);
   }
 
   async getStepCount(): Promise<{ current: number; total: number }> {

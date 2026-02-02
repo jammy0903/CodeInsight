@@ -7,6 +7,7 @@
  */
 
 import { test, expect } from '../../fixtures/test-base';
+import { mockCoursesAPIs } from '../../fixtures/courses-mock';
 import { LessonPage } from '../../pages';
 
 // 테스트용 레슨 경로 (실제 DB 데이터 형식에 맞춤)
@@ -20,6 +21,9 @@ test.describe('LessonPage - 학습 화면 (Public)', () => {
   let lessonPage: LessonPage;
 
   test.beforeEach(async ({ page }) => {
+    // Courses API 모킹 활성화
+    await mockCoursesAPIs(page);
+
     lessonPage = new LessonPage(page);
     await lessonPage.goto(TEST_LESSON.lang, TEST_LESSON.chapterId, TEST_LESSON.lessonId);
   });
@@ -81,6 +85,9 @@ test.describe('LessonPage - 메모리 시각화', () => {
   let lessonPage: LessonPage;
 
   test.beforeEach(async ({ page }) => {
+    // Courses API 모킹 활성화
+    await mockCoursesAPIs(page);
+
     lessonPage = new LessonPage(page);
     await lessonPage.goto(TEST_LESSON.lang, TEST_LESSON.chapterId, TEST_LESSON.lessonId);
     await lessonPage.isLoaded();
@@ -109,6 +116,9 @@ test.describe('LessonPage - 퀴즈', () => {
   let lessonPage: LessonPage;
 
   test.beforeEach(async ({ page }) => {
+    // Courses API 모킹 활성화
+    await mockCoursesAPIs(page);
+
     lessonPage = new LessonPage(page);
     await lessonPage.goto(TEST_LESSON.lang, TEST_LESSON.chapterId, TEST_LESSON.lessonId);
     await lessonPage.isLoaded();
@@ -179,6 +189,9 @@ test.describe('LessonPage - 퀴즈', () => {
 
 test.describe('LessonPage - 접근성', () => {
   test('키보드 네비게이션', async ({ page }) => {
+    // Courses API 모킹 활성화
+    await mockCoursesAPIs(page);
+
     const lessonPage = new LessonPage(page);
     await lessonPage.goto(TEST_LESSON.lang, TEST_LESSON.chapterId, TEST_LESSON.lessonId);
     await lessonPage.isLoaded();
@@ -192,6 +205,9 @@ test.describe('LessonPage - 접근성', () => {
   });
 
   test('ARIA 레이블 확인', async ({ page }) => {
+    // Courses API 모킹 활성화
+    await mockCoursesAPIs(page);
+
     const lessonPage = new LessonPage(page);
     await lessonPage.goto(TEST_LESSON.lang, TEST_LESSON.chapterId, TEST_LESSON.lessonId);
     await lessonPage.isLoaded();
