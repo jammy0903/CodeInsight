@@ -7,3 +7,4 @@ export { useTheme } from './useTheme';
 export { useIsMobile } from './useIsMobile';
 export { useSlidingPages } from './useSlidingPages';
 export { useLanguageCourse, useChapter, useUserProgress, useLesson } from './useCourses';
+export { useMonacoLineHighlight, injectMonacoHighlightStyles } from './useMonacoLineHighlight';
