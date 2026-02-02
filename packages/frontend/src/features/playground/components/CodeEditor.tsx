@@ -9,7 +9,7 @@ import Editor from '@monaco-editor/react';
 import type { Monaco } from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import { usePlaygroundStore, useCurrentCode } from '../stores/playgroundStore';
-import { useIsMobile } from '@/hooks';
+import { useIsMobile, useMonacoLineHighlight, injectMonacoHighlightStyles } from '@/hooks';
 import { useThemeStore } from '@/stores/themeStore';
 import { monacoThemes } from '@/config/themes';
 import type { SupportedLanguage } from '@/types/simulator';
@@ -38,44 +38,9 @@ export function CodeEditor() {
   const currentLine = steps[currentStepIndex]?.line;
   const editorRef = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
-  const decorationsRef = useRef<string[]>([]);
 
-  // 현재 라인 하이라이트 업데이트
-  useEffect(() => {
-    if (!editorRef.current || !currentLine) {
-      // 라인 없으면 데코레이션 제거
-      if (editorRef.current && decorationsRef.current.length > 0) {
-        decorationsRef.current = editorRef.current.deltaDecorations(
-          decorationsRef.current,
-          []
-        );
-      }
-      return;
-    }
-
-    // 현재 라인 하이라이트 추가
-    decorationsRef.current = editorRef.current.deltaDecorations(
-      decorationsRef.current,
-      [
-        {
-          range: {
-            startLineNumber: currentLine,
-            startColumn: 1,
-            endLineNumber: currentLine,
-            endColumn: 1,
-          },
-          options: {
-            isWholeLine: true,
-            className: 'current-line-highlight',
-            glyphMarginClassName: 'current-line-glyph',
-          },
-        },
-      ]
-    );
-
-    // 해당 라인으로 스크롤
-    editorRef.current.revealLineInCenter(currentLine);
-  }, [currentLine]);
+  // 라인 하이라이트 훅 사용 (중복 코드 제거)
+  useMonacoLineHighlight({ editorRef, lineNumber: currentLine });
 
   const handleEditorMount: OnMountHandler = (editor, monaco) => {
     editorRef.current = editor;
@@ -89,23 +54,8 @@ export function CodeEditor() {
     // 현재 테마 적용
     monaco.editor.setTheme(`codeinsight-${currentTheme}`);
 
-    // 현재 라인 하이라이트 CSS 주입 (한 번만)
-    if (!document.getElementById('monaco-highlight-style')) {
-      const style = document.createElement('style');
-      style.id = 'monaco-highlight-style';
-      style.textContent = `
-        .current-line-highlight {
-          background-color: rgba(34, 197, 94, 0.15) !important;
-          border-left: 3px solid #22c55e !important;
-        }
-        .current-line-glyph {
-          background-color: #22c55e;
-          border-radius: 2px;
-          margin-left: 3px;
-        }
-      `;
-      document.head.appendChild(style);
-    }
+    // 현재 라인 하이라이트 CSS 주입 (공용 유틸리티 사용)
+    injectMonacoHighlightStyles();
   };
 
   // 테마 변경 시 Monaco 테마 업데이트
