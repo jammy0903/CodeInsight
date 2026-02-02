@@ -132,35 +132,42 @@ router.post('/activity', requireDbUser, async (req, res) => {
 
       const { activityId } = parsed.data;
 
-      // 기존 활동 레코드 찾기
-      const existing = await prisma.lessonActivity.findFirst({
-        where: {
-          id: activityId,
-          userId, // 본인 레코드만
-          endedAt: null, // 아직 종료 안 된 것만
-        },
+      // 트랜잭션으로 Race Condition 방지
+      const result = await prisma.$transaction(async (tx) => {
+        // 기존 활동 레코드 찾기 (트랜잭션 내에서)
+        const existing = await tx.lessonActivity.findFirst({
+          where: {
+            id: activityId,
+            userId, // 본인 레코드만
+            endedAt: null, // 아직 종료 안 된 것만
+          },
+        });
+
+        if (!existing) {
+          return null; // 트랜잭션 내에서 early return
+        }
+
+        const endedAt = new Date();
+        const duration = Math.floor((endedAt.getTime() - existing.startedAt.getTime()) / 1000);
+
+        return tx.lessonActivity.update({
+          where: { id: activityId },
+          data: {
+            endedAt,
+            duration,
+          },
+        });
       });
 
-      if (!existing) {
+      if (!result) {
         return res.status(404).json({ error: 'Activity not found or already ended' });
       }
 
-      const endedAt = new Date();
-      const duration = Math.floor((endedAt.getTime() - existing.startedAt.getTime()) / 1000);
-
-      const activity = await prisma.lessonActivity.update({
-        where: { id: activityId },
-        data: {
-          endedAt,
-          duration,
-        },
-      });
-
       return res.json({
-        id: activity.id,
-        startedAt: activity.startedAt.toISOString(),
-        endedAt: activity.endedAt?.toISOString(),
-        duration: activity.duration,
+        id: result.id,
+        startedAt: result.startedAt.toISOString(),
+        endedAt: result.endedAt?.toISOString(),
+        duration: result.duration,
       });
     }
 
@@ -195,31 +202,36 @@ router.post('/activity/end', async (req, res) => {
 
     const { activityId } = parsed.data;
 
-    // 아직 종료 안 된 활동만 찾기
-    const existing = await prisma.lessonActivity.findFirst({
-      where: {
-        id: activityId,
-        endedAt: null,
-      },
+    // 트랜잭션으로 Race Condition 방지
+    const updated = await prisma.$transaction(async (tx) => {
+      // 아직 종료 안 된 활동만 찾기
+      const existing = await tx.lessonActivity.findFirst({
+        where: {
+          id: activityId,
+          endedAt: null,
+        },
+      });
+
+      if (!existing) {
+        // 이미 종료됐거나 없음
+        return false;
+      }
+
+      const endedAt = new Date();
+      const duration = Math.floor((endedAt.getTime() - existing.startedAt.getTime()) / 1000);
+
+      await tx.lessonActivity.update({
+        where: { id: activityId },
+        data: {
+          endedAt,
+          duration,
+        },
+      });
+
+      return true;
     });
 
-    if (!existing) {
-      // 이미 종료됐거나 없음 - 성공으로 처리 (sendBeacon은 재시도 가능)
-      return res.json({ ok: true, message: 'Already ended or not found' });
-    }
-
-    const endedAt = new Date();
-    const duration = Math.floor((endedAt.getTime() - existing.startedAt.getTime()) / 1000);
-
-    await prisma.lessonActivity.update({
-      where: { id: activityId },
-      data: {
-        endedAt,
-        duration,
-      },
-    });
-
-    res.json({ ok: true });
+    res.json({ ok: true, message: updated ? 'Ended' : 'Already ended or not found' });
   } catch (error) {
     logger.error('Activity end (beacon) error:', error);
     // sendBeacon은 실패해도 재시도하므로 200 반환
@@ -345,38 +357,38 @@ router.get('/summary', requireDbUser, async (req, res) => {
       }),
     ]);
 
-    // 통계 계산
-    const totalStudyTime = activities.reduce((sum, a: any) => sum + (a.duration || 0), 0);
-    const correctAttempts = quizAttempts.filter((a: any) => a.isCorrect).length;
-    const wrongAttempts = quizAttempts.filter((a: any) => !a.isCorrect);
+    // 통계 계산 (any 타입 제거 - Prisma 타입 추론 활용)
+    const totalStudyTime = activities.reduce((sum, a) => sum + (a.duration ?? 0), 0);
+    const correctAttempts = quizAttempts.filter((a) => a.isCorrect).length;
+    const wrongAttempts = quizAttempts.filter((a) => !a.isCorrect);
 
     // 일별 활동 (캘린더용)
     const dailyActivity: Record<string, number> = {};
-    activities.forEach((a: any) => {
+    for (const a of activities) {
       const date = a.startedAt.toISOString().split('T')[0];
-      dailyActivity[date] = (dailyActivity[date] || 0) + (a.duration || 0);
-    });
+      dailyActivity[date] = (dailyActivity[date] ?? 0) + (a.duration ?? 0);
+    }
 
     // 시간대별 활동
-    const hourlyActivity = Array(24).fill(0);
-    activities.forEach((a: any) => {
+    const hourlyActivity: number[] = Array(24).fill(0);
+    for (const a of activities) {
       const hour = a.startedAt.getHours();
-      hourlyActivity[hour] += a.duration || 0;
-    });
+      hourlyActivity[hour] += a.duration ?? 0;
+    }
 
     // 요일별 활동
-    const weekdayActivity = Array(7).fill(0);
-    activities.forEach((a: any) => {
+    const weekdayActivity: number[] = Array(7).fill(0);
+    for (const a of activities) {
       const day = a.startedAt.getDay();
-      weekdayActivity[day] += a.duration || 0;
-    });
+      weekdayActivity[day] += a.duration ?? 0;
+    }
 
     // 취약 개념 추출 (오답 기반)
     const weakConcepts: Record<string, number> = {};
-    wrongAttempts.forEach((a: any) => {
-      const concept = a.quiz?.lessonId || 'unknown';
-      weakConcepts[concept] = (weakConcepts[concept] || 0) + 1;
-    });
+    for (const a of wrongAttempts) {
+      const concept = a.quiz?.lessonId ?? 'unknown';
+      weakConcepts[concept] = (weakConcepts[concept] ?? 0) + 1;
+    }
 
     res.json({
       period,
@@ -396,9 +408,9 @@ router.get('/summary', requireDbUser, async (req, res) => {
       hourlyActivity,
       weekdayActivity,
       weakConcepts,
-      recentWrongAnswers: wrongAttempts.slice(0, 10).map((a: any) => ({
+      recentWrongAnswers: wrongAttempts.slice(0, 10).map((a) => ({
         quizId: a.quizId,
-        question: a.quiz?.question,
+        question: a.quiz?.question ?? null,
         userAnswer: a.userAnswer,
         createdAt: a.createdAt.toISOString(),
       })),
@@ -657,7 +669,7 @@ router.post('/step-activities', requireDbUser, async (req, res) => {
 
     res.json({
       count: results.length,
-      ids: results.map((r: any) => r.id),
+      ids: results.map((r) => r.id),
     });
   } catch (error) {
     logger.error('Batch step activities error:', error);
