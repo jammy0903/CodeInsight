@@ -621,6 +621,7 @@ class DebuggerAgent {
     if (trimmed === '};') return true;
     if (trimmed === '},') return true;
     if (trimmed.startsWith('function ')) return true;
+    if (trimmed.startsWith('class ')) return true;  // 클래스 선언 스킵
     return false;
   }
 
