@@ -1,4 +1,16 @@
-import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, AdmobConsentStatus, RewardAdOptions, AdLoadInfo, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
+import {
+  AdMob,
+  BannerAdSize,
+  BannerAdPosition,
+  AdmobConsentStatus,
+  RewardAdPluginEvents
+} from '@capacitor-community/admob';
+import type {
+  BannerAdOptions,
+  RewardAdOptions,
+  AdLoadInfo,
+  AdMobRewardItem
+} from '@capacitor-community/admob';
 
 // Ad Unit IDs
 const AD_UNITS = {
