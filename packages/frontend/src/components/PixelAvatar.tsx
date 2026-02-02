@@ -14,6 +14,7 @@
  * @see CustomPixelEditor - Phase 2에서 직접 그리기 기능 추가 예정
  */
 
+import { memo } from 'react';
 import Avatar from 'boring-avatars';
 
 // 사이버펑크 테마 색상 팔레트
@@ -36,7 +37,7 @@ interface PixelAvatarProps {
   className?: string;
 }
 
-export function PixelAvatar({
+export const PixelAvatar = memo(function PixelAvatar({
   seed,
   size = 24,
   variant = 'pixel',
@@ -55,4 +56,4 @@ export function PixelAvatar({
       />
     </div>
   );
-}
+});
