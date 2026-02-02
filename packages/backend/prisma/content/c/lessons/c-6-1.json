@@ -9,126 +9,189 @@
         "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n문자열을 출력하는 `printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 3,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램의 실행이 시작되는 지점입니다.",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 4,
         "title": "문자 배열로 문자열 선언",
         "explanation": "**`char str[] = \"Code\";`**\n\nC언어에서 문자열은 `char` 타입의 배열입니다. 큰따옴표로 문자열을 생성하면, 컴파일러는 문자들 끝에 자동으로 **'널(Null) 문자' (`\\0`)**를 추가하여 문자열의 끝을 표시합니다. 따라서 `\"Code\"`는 4글자지만, 실제로는 `{'C', 'o', 'd', 'e', '\\0'}` 5개의 문자를 담는 배열이 생성됩니다.",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {
-              "name": "str",
-              "type": "char[5]",
-              "address": "0x1000",
-              "value": [
-                { "value": "'C'", "highlight": false },
-                { "value": "'o'", "highlight": false },
-                { "value": "'d'", "highlight": false },
-                { "value": "'e'", "highlight": false },
-                { "value": "'\\0'", "highlight": true }
-              ]
-            }
-          ],
-          "heap": [],
-          "output": []
-        }
+        "stack": [
+          {
+            "name": "str",
+            "type": "char[5]",
+            "address": "0x1000",
+            "value": [
+              {
+                "value": "'C'",
+                "highlight": false
+              },
+              {
+                "value": "'o'",
+                "highlight": false
+              },
+              {
+                "value": "'d'",
+                "highlight": false
+              },
+              {
+                "value": "'e'",
+                "highlight": false
+              },
+              {
+                "value": "'\\0'",
+                "highlight": true
+              }
+            ]
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 6,
         "title": "문자열 출력 (%s)",
         "explanation": "**`printf(\"String: %s\\n\", str);`**\n\n`%s` 형식 지정자는 `printf`에게 \"이 주소(`str`)부터 시작해서 널 문자(`\\0`)가 나올 때까지 모든 문자를 출력해줘\" 라고 알려줍니다. 널 문자 자체는 화면에 출력되지 않습니다.",
-        "highlight": [6],
+        "highlight": [
+          6
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {
-              "name": "str",
-              "type": "char[5]",
-              "address": "0x1000",
-              "value": [
-                { "value": "'C'" },
-                { "value": "'o'" },
-                { "value": "'d'" },
-                { "value": "'e'" },
-                { "value": "'\\0'" }
-              ]
-            }
-          ],
-          "output": ["String: Code"]
-        }
+        "stack": [
+          {
+            "name": "str",
+            "type": "char[5]",
+            "address": "0x1000",
+            "value": [
+              {
+                "value": "'C'"
+              },
+              {
+                "value": "'o'"
+              },
+              {
+                "value": "'d'"
+              },
+              {
+                "value": "'e'"
+              },
+              {
+                "value": "'\\0'"
+              }
+            ]
+          }
+        ],
+        "stdout": "String: Code",
+        "heap": []
       },
       {
         "line": 7,
         "title": "배열의 전체 크기 확인 (sizeof)",
         "explanation": "**`printf(\"Size:   %lu\\n\", sizeof(str));`**\n\n`sizeof` 연산자는 변수나 타입의 전체 메모리 크기(바이트 단위)를 반환합니다. `str` 배열은 5개의 `char`(각 1바이트)로 이루어져 있으므로, 결과는 5가 됩니다. 이는 문자열의 길이(4)와 다른 값입니다.",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {
-              "name": "str",
-              "type": "char[5]",
-              "address": "0x1000",
-              "value": [
-                { "value": "'C'" },
-                { "value": "'o'" },
-                { "value": "'d'" },
-                { "value": "'e'" },
-                { "value": "'\\0'", "highlight": true }
-              ]
-            }
-          ],
-          "output": ["String: Code", "Size:   5"]
-        }
+        "stack": [
+          {
+            "name": "str",
+            "type": "char[5]",
+            "address": "0x1000",
+            "value": [
+              {
+                "value": "'C'"
+              },
+              {
+                "value": "'o'"
+              },
+              {
+                "value": "'d'"
+              },
+              {
+                "value": "'e'"
+              },
+              {
+                "value": "'\\0'",
+                "highlight": true
+              }
+            ]
+          }
+        ],
+        "stdout": "String: Code\nSize:   5",
+        "heap": []
       },
       {
         "line": 9,
         "title": "배열 내용 직접 확인",
         "explanation": "**`printf(\"[%c] [%c] [%c] [%c] [%d]\\n\", ...);`**\n\n배열의 각 요소를 직접 출력하여 내부 구조를 확인합니다. 마지막 다섯 번째 요소 `str[4]`를 정수(`%d`)로 출력하면, 그 값이 널 문자의 아스키 코드 값인 `0`임을 명확히 볼 수 있습니다.",
-        "highlight": [9, 10],
+        "highlight": [
+          9,
+          10
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {
-              "name": "str",
-              "type": "char[5]",
-              "address": "0x1000",
-              "value": [
-                { "value": "'C'", "highlight": true },
-                { "value": "'o'", "highlight": true },
-                { "value": "'d'", "highlight": true },
-                { "value": "'e'", "highlight": true },
-                { "value": "'\\0'", "highlight": true }
-              ]
-            }
-          ],
-          "output": ["String: Code", "Size:   5", "[C] [o] [d] [e] [0]"]
-        }
+        "stack": [
+          {
+            "name": "str",
+            "type": "char[5]",
+            "address": "0x1000",
+            "value": [
+              {
+                "value": "'C'",
+                "highlight": true
+              },
+              {
+                "value": "'o'",
+                "highlight": true
+              },
+              {
+                "value": "'d'",
+                "highlight": true
+              },
+              {
+                "value": "'e'",
+                "highlight": true
+              },
+              {
+                "value": "'\\0'",
+                "highlight": true
+              }
+            ]
+          }
+        ],
+        "stdout": "String: Code\nSize:   5\n[C] [o] [d] [e] [0]",
+        "heap": []
       },
       {
         "line": 12,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 운영체제에 알리고 프로그램을 종료합니다.",
-        "highlight": [12],
+        "highlight": [
+          12
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": ["String: Code", "Size:   5", "[C] [o] [d] [e] [0]"]
-        }
+        "stdout": "String: Code\nSize:   5\n[C] [o] [d] [e] [0]",
+        "stack": [],
+        "heap": []
       }
     ]
   },

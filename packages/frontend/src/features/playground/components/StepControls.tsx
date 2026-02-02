@@ -48,6 +48,7 @@ export function StepControls({
 
       // DEBUG: 시뮬레이션 결과 확인
       if (import.meta.env.DEV && result.steps?.length > 0) {
+        console.log('[StepControls] All steps:', result.steps.map(s => ({ line: s.line, code: s.code?.substring(0, 30) })));
         console.log('[StepControls] First step:', JSON.stringify(result.steps[0], null, 2));
       }
 

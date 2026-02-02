@@ -7,6 +7,7 @@
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Cpu, Bot, Code2, ChevronUp, ChevronDown, Play } from 'lucide-react';
 import {
   Dialog,
@@ -265,7 +266,8 @@ export function LessonPage() {
     lessonId: string;
   }>();
 
-  const { setPageTitle } = useStore();
+  const queryClient = useQueryClient();
+  const { setPageTitle, appUser } = useStore();
 
   // TanStack Query: 레슨 데이터 + 챕터 데이터
   const { data: lesson, isLoading, isError, error } = useLesson(lessonId);
@@ -519,6 +521,9 @@ export function LessonPage() {
       if (!lessonId) return;
       try {
         await updateProgress({ lessonId, status: 'completed' });
+        // 캐시 무효화로 UI 즉시 업데이트
+        queryClient.invalidateQueries({ queryKey: ['progress', appUser?.id] });
+        queryClient.invalidateQueries({ queryKey: ['language'] }); // 챕터 progress도 업데이트
       } catch (err) {
         console.error('[Progress] Failed to save:', err);
       }

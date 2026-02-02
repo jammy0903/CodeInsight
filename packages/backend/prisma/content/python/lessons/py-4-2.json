@@ -9,129 +9,282 @@
         "line": 1,
         "title": "매개변수와 디폴트 값",
         "explanation": "**`def add(a, b=10):`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `add` 함수를 정의합니다.\n\n**디폴트 매개변수(Default Parameter)**: `b=10`처럼 매개변수에 **기본값**을 설정할 수 있습니다. 호출 시 `b`를 생략하면 자동으로 `10`이 사용됩니다.\n\n**규칙**: 디폴트 매개변수는 **일반 매개변수 뒤**에 와야 합니다:\n```python\ndef func(a, b=10):  # ✅ OK\ndef func(a=5, b):   # ❌ SyntaxError\n```\n\n**왜 이 순서인가?** 함수를 먼저 정의해야 아래에서 호출할 수 있습니다.\n\n**실행 순서**: def 실행 → add 함수 등록 → line 5",
-        "highlight": [ 1, 2 ],
+        "highlight": [
+          1,
+          2
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "add", "value": "<function(a, b=10)>", "type": "function", "id": "0x1000"}
+            {
+              "name": "add",
+              "value": "<function(a, b=10)>",
+              "type": "function",
+              "id": "0x1000"
+            }
           ],
           "output": [],
-          "note": "함수 정의됨 (b의 기본값: 10)"
+          "note": "함수 정의됨 (b의 기본값: 10)",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 5,
         "title": "위치 인자로 함수 호출",
         "explanation": "**`res1 = add(5, 3)`**\n\n**위치 인자(Positional Argument)**: 값을 **순서대로** 전달합니다.\n- 첫 번째 값(`5`) → 첫 번째 매개변수(`a`)\n- 두 번째 값(`3`) → 두 번째 매개변수(`b`)\n\n실행 흐름이 **함수 내부(line 2)**로 이동합니다.\n\n**왜 이 순서인가?** 함수 정의 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 5 → add(5, 3) 호출 → line 2로 점프 → a=5, b=3",
-        "highlight": [ 5 ],
+        "highlight": [
+          5
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "add", "value": "<function(a, b=10)>", "type": "function", "id": "0x1000"}
+            {
+              "name": "add",
+              "value": "<function(a, b=10)>",
+              "type": "function",
+              "id": "0x1000"
+            }
           ],
           "output": [],
-          "note": "add(5, 3) 호출 → line 2로 점프 예정"
+          "note": "add(5, 3) 호출 → line 2로 점프 예정",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 2,
         "title": "add 함수 실행 (5+3)",
         "explanation": "**`return a + b`**\n\n매개변수에 인자가 바인딩됩니다: `a=5`, `b=3`. `5 + 3 = 8`을 계산하고 **반환**합니다.\n\n반환된 `8`이 `res1`에 저장됩니다.\n\n**실행 순서**: a=5, b=3 → 5+3 계산 → 8 반환 → line 5로 돌아감 → res1=8 → line 8",
-        "highlight": [ 2 ],
+        "highlight": [
+          2
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "add", "value": "<function(a, b=10)>", "type": "function", "id": "0x1000"},
-            {"name": "a", "value": "5", "type": "int (parameter)", "highlight": true},
-            {"name": "b", "value": "3", "type": "int (parameter)", "highlight": true},
-            {"name": "res1", "value": "8", "type": "int"}
+            {
+              "name": "add",
+              "value": "<function(a, b=10)>",
+              "type": "function",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "5",
+              "type": "int (parameter)",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "value": "3",
+              "type": "int (parameter)",
+              "highlight": true
+            },
+            {
+              "name": "res1",
+              "value": "8",
+              "type": "int"
+            }
           ],
           "output": [],
-          "note": "a=5, b=3 → return 8 → res1=8"
+          "note": "a=5, b=3 → return 8 → res1=8",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 8,
         "title": "키워드 인자로 함수 호출",
         "explanation": "**`res2 = add(b=5, a=3)`**\n\n**키워드 인자(Keyword Argument)**: 매개변수 **이름을 지정**하여 값을 전달합니다. **순서와 상관없이** 올바른 매개변수에 할당됩니다.\n- `b=5` → `b` 매개변수에 5\n- `a=3` → `a` 매개변수에 3\n\n**언제 사용하는가?**\n- 매개변수가 많을 때 명확성 향상\n- 일부 매개변수만 지정하고 싶을 때\n\n실행 흐름이 **함수 내부(line 2)**로 이동합니다.\n\n**실행 순서**: line 8 → add(b=5, a=3) 호출 → line 2로 점프 → a=3, b=5",
-        "highlight": [ 8 ],
+        "highlight": [
+          8
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "add", "value": "<function(a, b=10)>", "type": "function", "id": "0x1000"},
-            {"name": "res1", "value": "8", "type": "int"}
+            {
+              "name": "add",
+              "value": "<function(a, b=10)>",
+              "type": "function",
+              "id": "0x1000"
+            },
+            {
+              "name": "res1",
+              "value": "8",
+              "type": "int"
+            }
           ],
           "output": [],
-          "note": "키워드 인자 → 순서 무관 (b=5, a=3)"
+          "note": "키워드 인자 → 순서 무관 (b=5, a=3)",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 2,
         "title": "add 함수 실행 (3+5)",
         "explanation": "**`return a + b`**\n\n키워드 인자로 전달된 값이 바인딩됩니다: `a=3`, `b=5`. `3 + 5 = 8`을 계산하고 반환합니다.\n\n**주의**: 순서를 바꿔서 전달했지만(`b`, `a` 순서), 이름으로 매칭되므로 올바르게 할당됩니다.\n\n**실행 순서**: a=3, b=5 → 3+5 계산 → 8 반환 → line 8로 돌아감 → res2=8 → line 11",
-        "highlight": [ 2 ],
+        "highlight": [
+          2
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "add", "value": "<function(a, b=10)>", "type": "function", "id": "0x1000"},
-            {"name": "a", "value": "3", "type": "int (parameter)", "highlight": true},
-            {"name": "b", "value": "5", "type": "int (parameter)", "highlight": true},
-            {"name": "res1", "value": "8", "type": "int"},
-            {"name": "res2", "value": "8", "type": "int"}
+            {
+              "name": "add",
+              "value": "<function(a, b=10)>",
+              "type": "function",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "3",
+              "type": "int (parameter)",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "value": "5",
+              "type": "int (parameter)",
+              "highlight": true
+            },
+            {
+              "name": "res1",
+              "value": "8",
+              "type": "int"
+            },
+            {
+              "name": "res2",
+              "value": "8",
+              "type": "int"
+            }
           ],
           "output": [],
-          "note": "a=3, b=5 → return 8 → res2=8"
+          "note": "a=3, b=5 → return 8 → res2=8",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 11,
         "title": "디폴트 인자 사용",
         "explanation": "**`res3 = add(7)`**\n\n**디폴트 인자 사용**: `a`에만 `7`을 전달하고, `b`는 **생략**했습니다. 이 경우 `b`는 함수 정의 시 설정한 **기본값 `10`**을 자동으로 사용합니다.\n\n**왜 편리한가?** 자주 쓰는 값을 기본값으로 설정하면, 매번 전달하지 않아도 됩니다:\n```python\ndef connect(host, port=80):  # 대부분 80 포트\n    ...\n\nconnect(\"example.com\")  # port=80 자동\n```\n\n**실행 순서**: line 11 → add(7) 호출 → line 2로 점프 → a=7, b=10(기본값)",
-        "highlight": [ 11 ],
+        "highlight": [
+          11
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "add", "value": "<function(a, b=10)>", "type": "function", "id": "0x1000"},
-            {"name": "res1", "value": "8", "type": "int"},
-            {"name": "res2", "value": "8", "type": "int"}
+            {
+              "name": "add",
+              "value": "<function(a, b=10)>",
+              "type": "function",
+              "id": "0x1000"
+            },
+            {
+              "name": "res1",
+              "value": "8",
+              "type": "int"
+            },
+            {
+              "name": "res2",
+              "value": "8",
+              "type": "int"
+            }
           ],
           "output": [],
-          "note": "b 생략 → 기본값 10 사용"
+          "note": "b 생략 → 기본값 10 사용",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 2,
         "title": "add 함수 실행 (7+10)",
         "explanation": "**`return a + b`**\n\n`a=7`, `b=10`(기본값)이 바인딩됩니다. `7 + 10 = 17`을 계산하고 반환합니다.\n\n**실행 순서**: a=7, b=10(기본값) → 7+10 계산 → 17 반환 → line 11로 돌아감 → res3=17 → line 13",
-        "highlight": [ 2 ],
+        "highlight": [
+          2
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "add", "value": "<function(a, b=10)>", "type": "function", "id": "0x1000"},
-            {"name": "a", "value": "7", "type": "int (parameter)", "highlight": true},
-            {"name": "b", "value": "10", "type": "int (parameter, default)", "highlight": true},
-            {"name": "res1", "value": "8", "type": "int"},
-            {"name": "res2", "value": "8", "type": "int"},
-            {"name": "res3", "value": "17", "type": "int"}
+            {
+              "name": "add",
+              "value": "<function(a, b=10)>",
+              "type": "function",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "7",
+              "type": "int (parameter)",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "value": "10",
+              "type": "int (parameter, default)",
+              "highlight": true
+            },
+            {
+              "name": "res1",
+              "value": "8",
+              "type": "int"
+            },
+            {
+              "name": "res2",
+              "value": "8",
+              "type": "int"
+            },
+            {
+              "name": "res3",
+              "value": "17",
+              "type": "int"
+            }
           ],
           "output": [],
-          "note": "a=7, b=10(기본값) → return 17 → res3=17"
+          "note": "a=7, b=10(기본값) → return 17 → res3=17",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 13,
         "title": "최종 결과 출력",
         "explanation": "**`print(res1, res2, res3)`**\n\n세 변수의 값을 한 번에 출력합니다: `8 8 17`\n\n**정리**:\n- **위치 인자**: `add(5, 3)` → a=5, b=3 → 8\n- **키워드 인자**: `add(b=5, a=3)` → a=3, b=5 → 8\n- **디폴트 인자**: `add(7)` → a=7, b=10(기본값) → 17\n\n**실행 순서**: print 실행 → \"8 8 17\" 출력 → 프로그램 종료",
-        "highlight": [ 13 ],
+        "highlight": [
+          13
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "add", "value": "<function(a, b=10)>", "type": "function", "id": "0x1000"},
-            {"name": "res1", "value": "8", "type": "int"},
-            {"name": "res2", "value": "8", "type": "int"},
-            {"name": "res3", "value": "17", "type": "int"}
+            {
+              "name": "add",
+              "value": "<function(a, b=10)>",
+              "type": "function",
+              "id": "0x1000"
+            },
+            {
+              "name": "res1",
+              "value": "8",
+              "type": "int"
+            },
+            {
+              "name": "res2",
+              "value": "8",
+              "type": "int"
+            },
+            {
+              "name": "res3",
+              "value": "17",
+              "type": "int"
+            }
           ],
-          "output": ["8 8 17"]
+          "output": [
+            "8 8 17"
+          ],
+          "names": [],
+          "objects": []
         }
       }
     ]

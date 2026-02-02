@@ -379,9 +379,11 @@ ${func.params.length > 0 ? `📋 전달받은 파라미터:\n${paramDetails}` : 
     }
 
     // 함수 본문 실행
+    // func.bodyStart는 함수 선언 라인 (예: "int main() {")
+    // func.lines[0]은 본문 첫 줄이므로 실제 라인 번호는 bodyStart + 1 + i
     for (let i = 0; i < func.lines.length; i++) {
       const line = func.lines[i];
-      const lineNum = func.bodyStart + i + 1;
+      const lineNum = func.bodyStart + 1 + i;
 
       const stripped = line.trim();
       if (!stripped || stripped === '{' || stripped === '}') continue;
@@ -527,9 +529,10 @@ ${func.params.length > 0 ? `📋 전달받은 파라미터:\n${paramDetails}` : 
       setupEvents.forEach(e => this.addEvent(e));
     }
 
+    // func.bodyStart는 함수 선언 라인, 본문은 그 다음 줄부터
     for (let i = 0; i < func.lines.length; i++) {
       const line = func.lines[i];
-      const lineNum = func.bodyStart + i + 1;
+      const lineNum = func.bodyStart + 1 + i;
 
       const stripped = line.trim();
       if (!stripped || stripped === '{' || stripped === '}') continue;

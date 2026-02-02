@@ -6,6 +6,20 @@
     "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. Error (시스템 레벨의 심각한 문제)\n        // Error error = new StackOverflowError();\n        \n        // 2. RuntimeException (Unchecked - 프로그래머의 실수)\n        RuntimeException bug = new NullPointerException(\"널(null) 참조!\");\n        \n        // 3. Exception (Checked - 외부 환경 문제)\n        Exception failure = new java.io.IOException(\"파일 없음\");\n        \n        System.out.println(\"Hierarchy loaded\");\n    }\n}",
     "steps": [
       {
+        "line": 2,
+        "title": "main 메서드 실행",
+        "explanation": "**`public static void main(String[] args)`**\n\n자바 애플리케이션의 진입점(Entry Point)입니다. JVM이 이 메서드를 호출하면서 프로그램이 시작됩니다.",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
         "line": 7,
         "title": "RuntimeException 생성",
         "explanation": "**실행 순서:**\n1. `main` 스택 프레임이 생성됩니다.\n2. `NullPointerException` 객체가 Heap 메모리의 `0x100` 번지에 생성됩니다.\n3. `bug` 변수가 이 객체를 참조합니다.\n\n**해설:**\n자바의 모든 예외도 결국 **객체(Object)**입니다. `RuntimeException`은 주로 프로그래머가 코드를 잘못 짰을 때(버그) 발생합니다. 예를 들어, `null`인 변수를 사용하려 할 때처럼요. 컴파일러가 잡아주지 않아서 'Unchecked'라고 부릅니다.",
@@ -39,7 +53,8 @@
               "name": "Main.class",
               "value": "loaded"
             }
-          ]
+          ],
+          "output": []
         }
       },
       {
@@ -80,7 +95,8 @@
               "type": "IOException",
               "new": true
             }
-          ]
+          ],
+          "output": []
         }
       },
       {

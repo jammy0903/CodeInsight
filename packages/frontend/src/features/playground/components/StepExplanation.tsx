@@ -5,6 +5,7 @@
  * 반응형 지원 (모바일에서 더 컴팩트)
  */
 
+import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useExplanation } from '../stores/explanationStore';
 import type { SimulationStep } from '../stores/playgroundStore';
@@ -16,6 +17,17 @@ interface StepExplanationProps {
 
 export function StepExplanation({ step, isMobile = false }: StepExplanationProps) {
   const { explanation, isStreaming, streamingContent } = useExplanation(step.line, step.code);
+
+  // DEBUG: 실제 표시되는 설명 확인
+  useEffect(() => {
+    const displayContent = isStreaming ? streamingContent : explanation;
+    console.log('[StepExplanation DISPLAY]', {
+      line: step.line,
+      explanation_from_cache: explanation?.substring(0, 40),
+      streaming: isStreaming,
+      final_display: displayContent?.substring(0, 40),
+    });
+  }, [explanation, isStreaming, streamingContent, step.line]);
 
   // 표시할 내용 결정 (AI 설명만 사용)
   const displayContent = isStreaming

@@ -1,3 +1,5 @@
+console.log('🚀 main.tsx loading...');
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
@@ -8,6 +10,8 @@ import { App } from '@capacitor/app'
 import { router } from './router'
 import { queryClient } from './config/queryClient'
 import './index.css'
+
+console.log('🔗 API URL:', import.meta.env.VITE_API_URL);
 import './i18n' // i18n 설정 파일 임포트
 import { useStore } from './stores/store'
 import { auth } from './services/firebase'
@@ -17,6 +21,13 @@ import { initializeAdMob } from './services/admob'
 if (import.meta.env.DEV) {
   (window as any).useStore = useStore;
   (window as any).auth = auth;
+  // 환경변수 확인용 로그
+  console.log('🔧 Environment:', {
+    MODE: import.meta.env.MODE,
+    DEV: import.meta.env.DEV,
+    PROD: import.meta.env.PROD,
+    VITE_API_URL: import.meta.env.VITE_API_URL,
+  });
 }
 
 // 초기 테마 설정 (localStorage에서 읽어서 HTML에 적용)

@@ -1,20 +1,41 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { ChapterWithLessons } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
-import { ChevronLeft, Lock } from 'lucide-react';
+import { ChevronLeft, Lock, Crown } from 'lucide-react';
 import { useIsMobile, useLanguageCourse } from '@/hooks';
+import { getMySubscription } from '@/services/subscription';
 
 export function LanguageCoursePage() {
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
-  const { setPageTitle } = useStore();
+  const { setPageTitle, appUser } = useStore();
 
   // TanStack Query: loading, error, data 자동 관리
   const { data, isLoading, isError, error } = useLanguageCourse(lang);
+
+  // 구독으로 전체 챕터 접근 가능 여부
+  const [hasAllChapters, setHasAllChapters] = useState(false);
+
+  // 구독 상태 확인
+  useEffect(() => {
+    async function checkSubscription() {
+      if (!appUser) {
+        setHasAllChapters(false);
+        return;
+      }
+      try {
+        const subscription = await getMySubscription();
+        setHasAllChapters(subscription.features.includes('all_chapters'));
+      } catch {
+        setHasAllChapters(false);
+      }
+    }
+    checkSubscription();
+  }, [appUser]);
 
   // 언어 이름 & 아이콘 & 설명
   const getLanguageInfo = () => {
@@ -209,20 +230,27 @@ export function LanguageCoursePage() {
                     return prevTotal > 0 && prevCompleted === prevTotal;
                   });
 
-                  const isLocked = language?.isSequential
+                  const isSequentialLocked = language?.isSequential
                     ? index > 0 && !previousChaptersComplete && completed === 0
                     : false;
+
+                  // 비로그인: 챕터 2 이상 로그인 필요
+                  const needsLogin = !appUser && chapter.order >= 2;
+                  // 로그인했지만 구독 없음: 챕터 3 이상 구독 필요
+                  const needsSubscription = appUser && !hasAllChapters && chapter.order >= 3;
 
                   return (
                     <div key={chapter.id}>
                       <button
-                        onClick={() => !isLocked && navigate(`/courses/${lang}/${chapter.id}`)}
-                        disabled={isLocked}
+                        onClick={() => !isSequentialLocked && navigate(`/courses/${lang}/${chapter.id}`)}
+                        disabled={isSequentialLocked}
                         className="w-full p-4 text-left transition-colors hover:bg-[var(--theme-layout-top-bar-button-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="flex items-center justify-between gap-3">
                           <h3 className="text-base font-semibold text-[#333] flex items-center gap-2 flex-shrink-0">
-                            {isLocked && <Lock className="w-4 h-4 text-[var(--theme-dashboard-text-muted)]" />}
+                            {isSequentialLocked && <Lock className="w-4 h-4 text-[var(--theme-dashboard-text-muted)]" />}
+                            {needsLogin && !isSequentialLocked && <Lock className="w-4 h-4 text-gray-400" />}
+                            {needsSubscription && !isSequentialLocked && <Crown className="w-4 h-4 text-amber-500" />}
                             {chapter.title}
                           </h3>
                           <div className="flex items-center gap-2 flex-shrink-0">
@@ -276,6 +304,11 @@ export function LanguageCoursePage() {
                     : false;
                   const isActive = !isComplete && !isLocked && (index === 0 || previousChaptersComplete);
 
+                  // 비로그인: 챕터 2 이상 로그인 필요
+                  const needsLogin = !appUser && chapter.order >= 2;
+                  // 로그인했지만 구독 없음: 챕터 3 이상 구독 필요
+                  const needsSubscription = appUser && !hasAllChapters && chapter.order >= 3;
+
                   return (
                     <ChapterCard
                       key={chapter.id}
@@ -285,6 +318,8 @@ export function LanguageCoursePage() {
                       completedCount={completed}
                       isLocked={isLocked}
                       isActive={isActive}
+                      needsLogin={needsLogin}
+                      needsSubscription={needsSubscription}
                     />
                   );
                 })}

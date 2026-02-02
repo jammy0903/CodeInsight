@@ -17,7 +17,8 @@ import {
 import { getSettings } from './settings';
 import { logger } from '../../utils/logger';
 import { prisma } from '../../config/database';
-import { optionalDbUser } from '../../middleware/auth';
+import { optionalDbUser, requireDbUser } from '../../middleware/auth';
+import { checkAIUsage, recordAIUsage } from '../subscription';
 
 const router = Router();
 
@@ -682,8 +683,8 @@ ${objectsStr}
 });
 
 // === Q&A 채팅 엔드포인트 ===
-// optionalDbUser: 로그인 안 해도 사용 가능, 로그인 시 ChatHistory 저장
-router.post('/chat', optionalDbUser, async (req, res) => {
+// requireDbUser + checkAIUsage: 로그인 필수, 구독 한도 체크
+router.post('/chat', requireDbUser, checkAIUsage, async (req, res) => {
   try {
     const parsed = chatRequestSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -695,6 +696,7 @@ router.post('/chat', optionalDbUser, async (req, res) => {
 
     const { message, history, context, lessonId, contextType } = parsed.data;
     const provider = getCurrentProvider();
+    const userId = req.user?.dbUser?.id;
 
     const response = await provider.chat({
       message,
@@ -702,8 +704,7 @@ router.post('/chat', optionalDbUser, async (req, res) => {
       systemPrompt: buildChatPrompt(context, history),
     });
 
-    // 로그인 사용자인 경우 ChatHistory 저장 (비동기, 실패해도 응답에 영향 없음)
-    const userId = req.user?.dbUser?.id;
+    // ChatHistory 저장 (비동기, 실패해도 응답에 영향 없음)
     if (userId) {
       prisma.chatHistory.create({
         data: {
@@ -717,6 +718,18 @@ router.post('/chat', optionalDbUser, async (req, res) => {
       }).catch((err) => {
         logger.error('Failed to save chat history:', err);
       });
+
+      // AI 사용량 기록 (구독 시스템)
+      if (response.usage) {
+        recordAIUsage(
+          userId,
+          'chat',
+          response.usage.promptTokens || 0,
+          response.usage.completionTokens || 0
+        ).catch((err) => {
+          logger.error('Failed to record AI usage:', err);
+        });
+      }
     }
 
     res.json(response);
@@ -730,8 +743,8 @@ router.post('/chat', optionalDbUser, async (req, res) => {
 });
 
 // === 스트리밍 Q&A 채팅 엔드포인트 (SSE) ===
-// optionalDbUser: 로그인 안 해도 사용 가능, 로그인 시 ChatHistory 저장
-router.post('/chat/stream', optionalDbUser, async (req, res) => {
+// requireDbUser + checkAIUsage: 로그인 필수, 구독 한도 체크
+router.post('/chat/stream', requireDbUser, checkAIUsage, async (req, res) => {
   try {
     const parsed = chatRequestSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -748,9 +761,10 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
     // 스트리밍 응답 수집 (ChatHistory 저장용)
     let fullResponse = '';
 
-    // ChatHistory 저장 헬퍼 (스트리밍 완료 후 호출)
-    const saveChatHistory = () => {
+    // ChatHistory 저장 및 사용량 기록 헬퍼 (스트리밍 완료 후 호출)
+    const saveChatHistoryAndUsage = () => {
       if (userId && fullResponse) {
+        // ChatHistory 저장
         prisma.chatHistory.create({
           data: {
             userId,
@@ -762,6 +776,18 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
           },
         }).catch((err) => {
           logger.error('Failed to save chat history:', err);
+        });
+
+        // AI 사용량 기록 (토큰 추정: 한글 2글자/1토큰, 영문 4글자/1토큰)
+        const estimatedPromptTokens = Math.ceil(message.length / 2);
+        const estimatedCompletionTokens = Math.ceil(fullResponse.length / 2);
+        recordAIUsage(
+          userId,
+          'chat-stream',
+          estimatedPromptTokens,
+          estimatedCompletionTokens
+        ).catch((err) => {
+          logger.error('Failed to record AI usage:', err);
         });
       }
     };
@@ -776,7 +802,7 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
       });
 
       fullResponse = response.content;
-      saveChatHistory();
+      saveChatHistoryAndUsage();
 
       // SSE 형식으로 한 번에 전송
       res.setHeader('Content-Type', 'text/event-stream');
@@ -810,7 +836,7 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
     );
 
     // 스트리밍 완료 후 ChatHistory 저장
-    saveChatHistory();
+    saveChatHistoryAndUsage();
 
     res.end();
   } catch (error) {
@@ -830,8 +856,8 @@ router.post('/chat/stream', optionalDbUser, async (req, res) => {
 });
 
 // === 학습 리포트 AI 분석 엔드포인트 ===
-// optionalDbUser: 로그인 시 더 풍부한 데이터로 분석
-router.post('/analyze-report', optionalDbUser, async (req, res) => {
+// requireDbUser + checkAIUsage: 로그인 필수, 구독 한도 체크
+router.post('/analyze-report', requireDbUser, checkAIUsage, async (req, res) => {
   try {
     const parsed = analyzeReportSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -989,6 +1015,18 @@ ${enrichedContext ? '특히 저장한 노트, AI 질문, 최근 틀린 문제를
       history: [],
       systemPrompt: buildReportAnalysisPrompt(),
     });
+
+    // AI 사용량 기록
+    if (userId && response.usage) {
+      recordAIUsage(
+        userId,
+        'analyze-report',
+        response.usage.promptTokens || 0,
+        response.usage.completionTokens || 0
+      ).catch((err) => {
+        logger.error('Failed to record AI usage:', err);
+      });
+    }
 
     res.json({
       analysis: response.content,

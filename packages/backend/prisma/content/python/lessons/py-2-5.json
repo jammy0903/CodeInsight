@@ -9,148 +9,371 @@
         "line": 1,
         "title": "짧은 문자열 생성",
         "explanation": "**`a = \"hello\"`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 짧고 공백 없는 문자열 객체 `\"hello\"`를 만들고, `a` 이름표를 붙입니다.\n\n**왜 String Interning이 일어나는가?** Python은 성능 최적화를 위해 **짧고 자주 쓰이는 문자열**을 메모리에 한 번만 저장하고 재사용합니다. `\"hello\"`는 공백 없는 짧은 문자열이므로 interning 대상입니다.\n\n**실행 순서**: line 1 → 문자열 객체 생성 (id: 0x1000) → a = 0x1000 → line 2",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            }
           ],
-          "output": []
+          "output": [],
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 2,
         "title": "같은 문자열 재사용",
         "explanation": "**`b = \"hello\"`**\n\n**왜 새 객체를 만들지 않는가?** Python은 코드를 실행하기 전에, 같은 문자열 리터럴(`\"hello\"`)을 발견하면 **이미 만들어진 객체를 재사용**합니다. 따라서 `b`는 새 객체를 만들지 않고 `a`와 **완전히 같은 객체(0x1000)**를 가리킵니다.\n\n**이것이 String Interning입니다**: 메모리 절약을 위해 같은 문자열을 중복 생성하지 않습니다.\n\n**실행 순서**: line 2 → 이미 존재하는 \"hello\" (0x1000) 발견 → b = 0x1000 → line 3",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "b", "value": "\"hello\"", "type": "str", "id": "0x1000", "highlight": true}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "b",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000",
+              "highlight": true
+            }
           ],
           "output": [],
-          "note": "a와 b는 같은 객체(0x1000)를 가리킴"
+          "note": "a와 b는 같은 객체(0x1000)를 가리킴",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 3,
         "title": "동일성 검사 (is)",
         "explanation": "**`print(f\"a is b: {a is b}\")`**\n\n**`is` vs `==` 차이**:\n- **`==`**: 값이 같은가? (내용 비교)\n- **`is`**: 같은 객체인가? (메모리 주소 비교, `id(a) == id(b)`와 동일)\n\n`a`와 `b`는 둘 다 0x1000을 가리키므로 **같은 객체**입니다. 따라서 `a is b`는 `True`입니다.\n\n**실행 순서**: is 검사 (0x1000 == 0x1000) → True → f-string 평가 → 출력",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "b", "value": "\"hello\"", "type": "str", "id": "0x1000"}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "b",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            }
           ],
-          "output": ["a is b: True"]
+          "output": [
+            "a is b: True"
+          ],
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 5,
         "title": "공백 있는 문자열 생성",
         "explanation": "**`x = \"hello world\"`**\n\n공백이 포함된 더 긴 문자열 객체를 만듭니다. **이런 문자열은 항상 interning되는 것이 보장되지 않습니다**. Python 버전, 실행 환경에 따라 다를 수 있습니다.\n\n**왜 이 순서인가?** 이전 코드 실행이 끝나고, 순서대로 다음 줄(line 5)로 넘어왔습니다.\n\n**실행 순서**: line 5 → 문자열 객체 생성 (id: 0x2000) → x = 0x2000 → line 6",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "b", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "x", "value": "\"hello world\"", "type": "str", "id": "0x2000"}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "b",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2000"
+            }
           ],
-          "output": ["a is b: True"]
+          "output": [
+            "a is b: True"
+          ],
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 6,
         "title": "동일한 긴 문자열 다시 생성",
         "explanation": "**`y = \"hello world\"`**\n\n`x`와 똑같은 내용의 문자열을 다시 만듭니다. **중요**: `y`가 `x`와 같은 객체를 가리킬지는 **예측할 수 없습니다**.\n\n**왜 예측 불가능한가?**\n- CPython 구현에서는 공백 있는 문자열도 interning할 수 있지만, **보장되지 않습니다**\n- Python 버전, 실행 방식(스크립트 vs REPL)에 따라 다를 수 있습니다\n\n이 예제에서는 다른 객체(0x2001)로 가정합니다.\n\n**실행 순서**: line 6 → 새 문자열 객체 생성 (id: 0x2001) → y = 0x2001 → line 7",
-        "highlight": [6],
+        "highlight": [
+          6
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "b", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "x", "value": "\"hello world\"", "type": "str", "id": "0x2000"},
-            {"name": "y", "value": "\"hello world\"", "type": "str", "id": "0x2001", "highlight": true}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "b",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2000"
+            },
+            {
+              "name": "y",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2001",
+              "highlight": true
+            }
           ],
-          "output": ["a is b: True"],
-          "note": "x와 y는 다른 객체일 수 있음 (예측 불가)"
+          "output": [
+            "a is b: True"
+          ],
+          "note": "x와 y는 다른 객체일 수 있음 (예측 불가)",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 7,
         "title": "긴 문자열 동일성 검사",
         "explanation": "**`print(f\"x is y: {x is y}\")`**\n\n`x`(0x2000)와 `y`(0x2001)가 같은 객체인지 확인합니다. 이 예제에서는 다른 객체이므로 `False`입니다.\n\n**결론**: 문자열 **내용 비교**에는 **절대 `is`를 사용하지 마세요!** String interning은 **최적화일 뿐, 보장이 아닙니다**. 항상 `==`를 사용하세요.\n\n**실행 순서**: is 검사 (0x2000 == 0x2001) → False → f-string 평가 → 출력",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "b", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "x", "value": "\"hello world\"", "type": "str", "id": "0x2000"},
-            {"name": "y", "value": "\"hello world\"", "type": "str", "id": "0x2001"}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "b",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2000"
+            },
+            {
+              "name": "y",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2001"
+            }
           ],
-          "output": ["a is b: True", "x is y: False"]
+          "output": [
+            "a is b: True",
+            "x is y: False"
+          ],
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 9,
         "title": "문자열 연결로 생성",
         "explanation": "**`s1 = \"hello\" + \" \" + \"world\"`**\n\n`+` 연산자로 **런타임에 동적으로** 문자열을 조합하여 새 객체를 만듭니다. 이렇게 만들어진 문자열은 **절대 interning되지 않습니다**.\n\n**왜 interning 안 되는가?** String interning은 **컴파일 타임(코드 파싱 단계)**에만 일어납니다. 런타임에 `+`로 만든 문자열은 대상이 아닙니다.\n\n**실행 순서**: line 9 → + 연산 (새 객체 생성, id: 0x3000) → s1 = 0x3000 → line 10",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "b", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "x", "value": "\"hello world\"", "type": "str", "id": "0x2000"},
-            {"name": "y", "value": "\"hello world\"", "type": "str", "id": "0x2001"},
-            {"name": "s1", "value": "\"hello world\"", "type": "str", "id": "0x3000"}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "b",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2000"
+            },
+            {
+              "name": "y",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2001"
+            },
+            {
+              "name": "s1",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x3000"
+            }
           ],
-          "output": ["a is b: True", "x is y: False"],
-          "note": "s1은 동적 생성 (+ 연산) → interning 안 됨"
+          "output": [
+            "a is b: True",
+            "x is y: False"
+          ],
+          "note": "s1은 동적 생성 (+ 연산) → interning 안 됨",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 10,
         "title": "문자열 리터럴로 생성",
         "explanation": "**`s2 = \"hello world\"`**\n\n`s2`는 **문자열 리터럴**로 직접 생성합니다. `s1`과 **내용은 같지만 생성 방식이 다릅니다**.\n\n**왜 s1과 다른 객체인가?**\n- `s1`: 런타임에 `+` 연산으로 동적 생성 (0x3000)\n- `s2`: 컴파일 타임에 리터럴로 생성 (0x2001, y와 같을 수도 있음)\n\n**실행 순서**: line 10 → 문자열 객체 생성 또는 재사용 (id: 0x2001) → s2 = 0x2001 → line 11",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "b", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "x", "value": "\"hello world\"", "type": "str", "id": "0x2000"},
-            {"name": "y", "value": "\"hello world\"", "type": "str", "id": "0x2001"},
-            {"name": "s1", "value": "\"hello world\"", "type": "str", "id": "0x3000"},
-            {"name": "s2", "value": "\"hello world\"", "type": "str", "id": "0x2001", "highlight": true}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "b",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2000"
+            },
+            {
+              "name": "y",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2001"
+            },
+            {
+              "name": "s1",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x3000"
+            },
+            {
+              "name": "s2",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2001",
+              "highlight": true
+            }
           ],
-          "output": ["a is b: True", "x is y: False"],
-          "note": "s2는 y와 같은 객체일 수 있음 (리터럴)"
+          "output": [
+            "a is b: True",
+            "x is y: False"
+          ],
+          "note": "s2는 y와 같은 객체일 수 있음 (리터럴)",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 11,
         "title": "생성 방식이 다른 문자열 비교",
         "explanation": "**`print(f\"s1 is s2: {s1 is s2}\")`**\n\n생성 방식이 다른 `s1`(0x3000, 동적 생성)과 `s2`(0x2001, 리터럴)가 같은 객체인지 확인합니다. 다른 객체이므로 `False`입니다.\n\n**핵심 교훈**:\n1. **`is`**: 객체 동일성 검사 (메모리 주소 비교)\n2. **`==`**: 값 비교 (내용 비교)\n3. **String interning은 예측 불가능합니다** → 문자열 비교는 **항상 `==`를 사용하세요!**\n\n만약 `s1 == s2`를 사용했다면 `True`가 나왔을 것입니다 (내용이 같으므로).\n\n**실행 순서**: is 검사 (0x3000 == 0x2001) → False → f-string 평가 → 출력 → 프로그램 종료",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "a", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "b", "value": "\"hello\"", "type": "str", "id": "0x1000"},
-            {"name": "x", "value": "\"hello world\"", "type": "str", "id": "0x2000"},
-            {"name": "y", "value": "\"hello world\"", "type": "str", "id": "0x2001"},
-            {"name": "s1", "value": "\"hello world\"", "type": "str", "id": "0x3000"},
-            {"name": "s2", "value": "\"hello world\"", "type": "str", "id": "0x2001"}
+            {
+              "name": "a",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "b",
+              "value": "\"hello\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2000"
+            },
+            {
+              "name": "y",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2001"
+            },
+            {
+              "name": "s1",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x3000"
+            },
+            {
+              "name": "s2",
+              "value": "\"hello world\"",
+              "type": "str",
+              "id": "0x2001"
+            }
           ],
-          "output": ["a is b: True", "x is y: False", "s1 is s2: False"],
-          "note": "s1 == s2는 True지만, s1 is s2는 False!"
+          "output": [
+            "a is b: True",
+            "x is y: False",
+            "s1 is s2: False"
+          ],
+          "note": "s1 == s2는 True지만, s1 is s2는 False!",
+          "names": [],
+          "objects": []
         }
-    }
+      }
     ]
   },
   "quiz": {

@@ -6,6 +6,20 @@
     "code": "import java.io.*;\n\n// AutoCloseable 인터페이스 구현\nclass Box implements AutoCloseable {\n    public void close() {\n        System.out.println(\"Box closed!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // try (...) 괄호 안에 자원 선언\n        try (Box box = new Box()) {\n            System.out.println(\"Using Box...\");\n            throw new RuntimeException(\"Boom!\");\n        } catch (Exception e) {\n            System.out.println(\"Caught: \" + e.getMessage());\n        }\n    }\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "패키지 임포트",
+        "explanation": "**`import java.io.*;`**\n\n입출력(`Input/Output`) 관련 클래스들을 가져옵니다. `AutoCloseable`은 `java.lang`에 있어서 자동 임포트되지만, 보통 I/O 작업에서 많이 쓰이므로 이 패키지가 자주 등장합니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
         "line": 10,
         "title": "자원 생성 (Open)",
         "explanation": "**실행 순서:**\n1. `try` 옆의 괄호 `(...)` 안에서 `Box` 객체가 생성됩니다.\n2. `box` 변수가 힙 메모리의 객체를 참조합니다.\n\n**해설:**\n이 괄호 안에서 만들어진 객체는 \"나갈 때 자동으로 닫아줄게\"라고 JVM과 약속한 것입니다. 단, 해당 객체는 반드시 `AutoCloseable` 인터페이스를 구현하고 있어야 합니다.",
@@ -29,7 +43,8 @@
               "type": "Box",
               "new": true
             }
-          ]
+          ],
+          "output": []
         }
       },
       {
@@ -76,7 +91,9 @@
             "Using Box...",
             "Box closed!"
           ],
-          "note": "JVM이 자동으로 close() 호출"
+          "note": "JVM이 자동으로 close() 호출",
+          "stack": [],
+          "heap": []
         }
       },
       {
@@ -100,7 +117,8 @@
             "Using Box...",
             "Box closed!",
             "Caught: Boom!"
-          ]
+          ],
+          "heap": []
         }
       }
     ]

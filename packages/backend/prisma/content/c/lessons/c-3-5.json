@@ -6,43 +6,72 @@
     "code": "#include <stdio.h>\n\nint main() {\n    int arr[] = {10, 20, 30, -1};\n    int *p = arr;\n\n    while (*p != -1) {\n        printf(\"%d \", *p);\n        p++;\n    }\n\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n표준 입출력 라이브러리입니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "cMemory",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
         "line": 3,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다. 이 함수의 스택 프레임이 생성되고, 내부 코드가 순차적으로 실행됩니다.",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {"stack": [], "heap": [], "output": []}
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 4,
         "title": "배열 선언",
         "explanation": "**`int arr[] = {10, 20, 30, -1};`**\n\n크기를 명시하지 않고 초기값으로 배열을 선언합니다.\n컴파일러가 자동으로 4개 요소 배열로 결정합니다.\n\n-1은 **종료 표시(Sentinel)**로, 반복을 멈추는 신호입니다.",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {
-              "name": "arr",
-              "value": "{10, 20, 30, -1}",
-              "type": "int[4]",
-              "address": "0x1000"
-            }
-          ]
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 5,
         "title": "포인터 초기화",
         "explanation": "**`int *p = arr;`**\n\n포인터 `p`를 배열의 첫 번째 요소 주소로 초기화합니다. 배열 이름 `arr`은 표현식에서 사용될 때 자동으로 첫 번째 요소의 주소로 변환됩니다(Array Decay).\n\n이제 `p`를 통해 배열을 순회할 준비가 되었습니다.",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {"name": "arr", "value": "{10, 20, 30, -1}", "type": "int[4]", "address": "0x1000"},
-            {"name": "p", "value": "0x1000", "type": "int*", "address": "0x1010"}
-          ],
-          "note": "p는 arr[0]의 주소(0x1000)를 담고 있습니다."
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1010"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 7,
@@ -55,24 +84,21 @@
           8
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {
-              "name": "arr",
-              "value": "{10, 20, 30, -1}",
-              "type": "int[]"
-            },
-            {
-              "name": "p",
-              "value": "Address(20)",
-              "type": "int*",
-              "highlight": true
-            }
-          ],
-          "output": [
-            "10 20 "
-          ]
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[]"
+          },
+          {
+            "name": "p",
+            "value": "Address(20)",
+            "type": "int*",
+            "highlight": true
+          }
+        ],
+        "stdout": "10 20 ",
+        "heap": []
       },
       {
         "line": 9,
@@ -82,25 +108,32 @@
           7
         ],
         "visualizationType": "terminal",
-        "memoryState": {
-          "output": [
-            "10 20 30 "
-          ]
-        }
+        "stdout": "10 20 30 "
       },
       {
         "line": 8,
         "title": "역참조로 값 출력",
         "explanation": "**`printf(\"%d \", *p);`**\n\n`*p`는 '포인터 p가 가리키는 주소의 값'입니다. 루프가 돌 때마다 `p`는 배열의 다음 요소를 가리키고, `*p`는 해당 위치의 값(10, 20, 30)을 읽어옵니다.\n\n**실행 순서**: while 조건 검사 → printf 출력 → p++ 증가 → while 조건 검사 → ... 이 과정이 `*p`가 -1이 될 때까지 반복됩니다.",
-        "highlight": [7, 8, 9],
+        "highlight": [
+          7,
+          8,
+          9
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            {"name": "arr", "value": "{10, 20, 30, -1}", "type": "int[4]"},
-            {"name": "p", "value": "현재 요소 주소", "type": "int*"}
-          ],
-          "output": ["10 20 30 "]
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]"
+          },
+          {
+            "name": "p",
+            "value": "현재 요소 주소",
+            "type": "int*"
+          }
+        ],
+        "stdout": "10 20 30 ",
+        "heap": []
       }
     ]
   },

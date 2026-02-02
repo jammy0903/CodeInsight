@@ -126,6 +126,18 @@ export function PlaygroundPage() {
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
 
+  // DEBUG: 현재 step 확인
+  useEffect(() => {
+    if (currentStep) {
+      console.log('[PlaygroundPage] Current step:', {
+        index: currentStepIndex,
+        line: currentStep.line,
+        code: currentStep.code?.substring(0, 30),
+        explanation: currentStep.explanation?.substring(0, 40),
+      });
+    }
+  }, [currentStepIndex, currentStep]);
+
   // Flow/Memory 탭 상태
   const [activeTab, setActiveTab] = useState<'flow' | 'memory'>('flow');
 
@@ -144,7 +156,7 @@ export function PlaygroundPage() {
 
   // 페이지 제목 설정
   useEffect(() => {
-    setPageTitle('코드 실행 연습', '직접 코드를 작성하고 메모리 변화를 확인해보세요');
+    setPageTitle('코드실행연습', '직접 코드를 작성하고\n메모리 변화를 확인해보세요');
   }, [setPageTitle]);
 
   // 키보드 좌우 화살표 키로 스텝 이동

@@ -5,11 +5,16 @@
 
 import { z } from 'zod';
 import dotenv from 'dotenv';
+import path from 'path';
 
-// .env 파일 로드 (개발 환경에서만)
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
+// 환경별 .env 파일 로드
+const nodeEnv = process.env.NODE_ENV || 'development';
+const envFile = nodeEnv === 'production' ? '.env.production' : '.env.development';
+
+// .env.development 또는 .env.production 로드
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+// 기본 .env도 로드 (fallback)
+dotenv.config();
 
 const envSchema = z.object({
   // === Server ===

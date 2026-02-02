@@ -9,81 +9,126 @@
         "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 3,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 4,
         "title": "방법 1: 문자 배열 선언 (수정 가능)",
         "explanation": "**`char arr[] = \"Hello\";`**\n\n이 방식은 **수정 가능한 사본**을 만듭니다. \"Hello\"라는 문자열의 내용이 `main` 함수의 스택 메모리에 생성된 `arr` 배열로 그대로 복사됩니다. 이 배열은 우리가 자유롭게 내용을 변경할 수 있습니다.",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [{ "name": "arr", "type": "char[6]", "value": "Hello\\0" }],
-          "readOnlyData": [], "output": []
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Hello\\0"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 5,
         "title": "배열 내용 수정",
         "explanation": "**`arr[0] = 'B';`**\n\n`arr` 배열은 스택에 있는 우리 소유의 공간이므로, 첫 번째 요소 `arr[0]`의 값을 'H'에서 'B'로 성공적으로 변경할 수 있습니다.",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [{ "name": "arr", "type": "char[6]", "value": "Bello\\0", "highlightIndex": 0 }],
-          "readOnlyData": [], "output": []
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0",
+            "highlightIndex": 0
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 6,
         "title": "수정된 배열 출력",
         "explanation": "**`printf(\"%s\\n\", arr);`**\n\n변경된 내용이 반영된 \"Bello\"가 화면에 출력됩니다.",
-        "highlight": [6],
+        "highlight": [
+          6
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [{ "name": "arr", "type": "char[6]", "value": "Bello\\0" }],
-          "readOnlyData": [], "output": ["Bello"]
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0"
+          }
+        ],
+        "stdout": "Bello",
+        "heap": []
       },
       {
         "line": 8,
         "title": "방법 2: 문자 포인터 선언 (수정 불가)",
         "explanation": "**`char *ptr = \"World\";`**\n\n이 방식은 **수정이 불가능한 원본을 가리킵니다.** \"World\"라는 문자열은 프로그램의 **읽기 전용(Read-Only) 데이터 영역**에 저장됩니다. 그리고 스택에 생성된 포인터 `ptr`은 그 읽기 전용 데이터의 주소를 저장할 뿐입니다.",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "arr", "type": "char[6]", "value": "Bello\\0" },
-            { "name": "ptr", "type": "char*", "value": "0xRODATA" }
-          ],
-          "readOnlyData": [{ "address": "0xRODATA", "value": "\"World\"\\0" }],
-          "output": ["Bello"],
-          "note": "ptr은 읽기 전용 메모리를 가리킵니다."
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0"
+          },
+          {
+            "name": "ptr",
+            "type": "char*",
+            "value": "0xRODATA"
+          }
+        ],
+        "stdout": "Bello",
+        "heap": []
       },
       {
         "line": 9,
         "title": "포인터가 가리키는 문자열 출력",
         "explanation": "**`printf(\"%s\\n\", ptr);`**\n\n`ptr`이 가리키는 읽기 전용 메모리의 문자열 \"World\"가 정상적으로 출력됩니다. 읽는 것은 문제가 없습니다.",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "arr", "type": "char[6]", "value": "Bello\\0" },
-            { "name": "ptr", "type": "char*", "value": "0xRODATA" }
-          ],
-          "readOnlyData": [{ "address": "0xRODATA", "value": "\"World\"\\0" }],
-          "output": ["Bello", "World"]
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0"
+          },
+          {
+            "name": "ptr",
+            "type": "char*",
+            "value": "0xRODATA"
+          }
+        ],
+        "stdout": "Bello\nWorld",
+        "heap": []
       },
       {
         "line": 9,
@@ -91,28 +136,32 @@
         "explanation": "만약 `ptr[0] = 'B';` 와 같이 읽기 전용 데이터를 수정하려고 시도하면, 운영체제가 이를 허용하지 않기 때문에 프로그램이 강제 종료(Segmentation Fault)됩니다. 비석에 새겨진 글자를 바꾸려는 것과 같습니다.",
         "highlight": [],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "arr", "type": "char[6]", "value": "Bello\\0" },
-            { "name": "ptr", "type": "char*", "value": "0xRODATA" }
-          ],
-          "readOnlyData": [{ "address": "0xRODATA", "value": "\"World\"\\0" }],
-          "output": ["Bello", "World"],
-          "note": "ptr[0] = 'B'; 시도 시 CRASH!"
-        }
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0"
+          },
+          {
+            "name": "ptr",
+            "type": "char*",
+            "value": "0xRODATA"
+          }
+        ],
+        "stdout": "Bello\nWorld",
+        "heap": []
       },
       {
         "line": 11,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "readOnlyData": [],
-          "output": ["Bello", "World"]
-        }
+        "stdout": "Bello\nWorld",
+        "stack": [],
+        "heap": []
       }
     ]
   },

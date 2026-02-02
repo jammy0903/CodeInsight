@@ -9,93 +9,149 @@
         "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {"stack": [], "heap": [], "output": []}
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 3,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {"stack": [], "heap": [], "output": []}
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 4,
         "title": "변수 선언",
         "explanation": "**`int a = 10; char c = 'A';`**\n\n`int`형 변수 `a`와 `char`형 변수 `c`를 선언하고 초기화합니다.",
-        "highlight": [4, 5],
+        "highlight": [
+          4,
+          5
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "a", "value": "10", "type": "int", "address": "0x1000" },
-            { "name": "c", "value": "'A'", "type": "char", "address": "0x1004" }
-          ]
-        }
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "c",
+            "value": "'A'",
+            "type": "char",
+            "address": "0x1004"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 7,
         "title": "포인터 선언",
         "explanation": "**`int *pi = &a; char *pc = &c;`**\n\n`int`를 가리키는 포인터 `pi`와 `char`를 가리키는 포인터 `pc`를 각각 선언하고, `a`와 `c`의 주소로 초기화합니다.",
-        "highlight": [7, 8],
+        "highlight": [
+          7,
+          8
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "a", "value": "10", "type": "int", "address": "0x1000" },
-            { "name": "c", "value": "'A'", "type": "char", "address": "0x1004" },
-            { "name": "pi", "value": "0x1000", "type": "int*", "address": "0x1008" },
-            { "name": "pc", "value": "0x1004", "type": "char*", "address": "0x1010" }
-          ]
-        }
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "c",
+            "value": "'A'",
+            "type": "char",
+            "address": "0x1004"
+          },
+          {
+            "name": "pi",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1008"
+          },
+          {
+            "name": "pc",
+            "value": "0x1004",
+            "type": "char*",
+            "address": "0x1010"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 10,
         "title": "int 포인터의 크기",
         "explanation": "**`printf(\"Size of int*:  %lu\\n\", sizeof(pi));`**\n\n`sizeof(pi)`는 `pi`가 가리키는 대상(`int`)의 크기가 아니라, **포인터 변수 자체의 크기**를 반환합니다. 주소값을 저장하는 데 필요한 크기는 시스템 아키텍처에 따라 결정됩니다 (예: 64비트 시스템에서는 8바이트).",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "output": ["Size of int*:  8"]
-        }
+        "stdout": "Size of int*:  8",
+        "stack": [],
+        "heap": []
       },
       {
         "line": 11,
         "title": "char 포인터의 크기",
         "explanation": "**`printf(\"Size of char*: %lu\\n\", sizeof(pc));`**\n\n`char*` 타입인 `pc`의 크기 역시 `int*`와 동일한 8바이트임을 확인할 수 있습니다. 가리키는 대상이 무엇이든, **모든 포인터 변수의 크기는 같습니다**.",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "output": ["Size of int*:  8", "Size of char*: 8"]
-        }
+        "stdout": "Size of int*:  8\nSize of char*: 8",
+        "stack": [],
+        "heap": []
       },
       {
         "line": 13,
         "title": "int 포인터로 값 읽기",
         "explanation": "**`printf(\"Read int*:  %d\\n\", *pi);`**\n\n`*pi`를 실행하면, 컴파일러는 `pi`가 `int*` 타입임을 알고 `pi`가 가리키는 주소에서 `sizeof(int)` 즉 4바이트만큼을 읽어와 정수로 해석합니다.",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "output": ["Size of int*:  8", "Size of char*: 8", "Read int*:  10"]
-        }
+        "stdout": "Size of int*:  8\nSize of char*: 8\nRead int*:  10",
+        "stack": [],
+        "heap": []
       },
       {
         "line": 14,
         "title": "char 포인터로 값 읽기",
         "explanation": "**`printf(\"Read char*: %c\\n\", *pc);`**\n\n반면 `*pc`를 실행하면, 컴파일러는 `pc`가 `char*` 타입임을 알고 주소에서 `sizeof(char)` 즉 1바이트만 읽어와 문자로 해석합니다. 이처럼 포인터의 타입은 **역참조 시 몇 바이트를 읽을지 결정하는 중요한 정보**입니다.",
-        "highlight": [14],
+        "highlight": [
+          14
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "output": ["Size of int*:  8", "Size of char*: 8", "Read int*:  10", "Read char*: A"]
-        }
+        "stdout": "Size of int*:  8\nSize of char*: 8\nRead int*:  10\nRead char*: A",
+        "stack": [],
+        "heap": []
       },
       {
         "line": 15,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
-        "highlight": [15],
+        "highlight": [
+          15
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [] }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       }
     ]
   },

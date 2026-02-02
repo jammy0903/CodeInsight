@@ -6,6 +6,21 @@
     "code": "class BankException extends Exception {\n    public BankException(String msg) { super(msg); }\n}\n\n// 1. 커스텀 예외 정의\nclass NoMoneyException extends BankException {\n    public NoMoneyException(int lack) {\n        // 부모 생성자 호출\n        super(\"부족한 금액: \" + lack);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        try {\n            withdraw(1000);\n        } catch (NoMoneyException e) {\n            System.out.println(e.getMessage());\n        } catch (BankException e) {\n            System.out.println(\"은행 오류\");\n        }\n    }\n\n    static void withdraw(int money) throws BankException {\n        int balance = 500;\n        if (money > balance) {\n            // 2. 예외 던지기\n            throw new NoMoneyException(money - balance);\n        }\n    }\n}",
     "steps": [
       {
+        "line": 13,
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.\n\n**비유**: 은행 창구(main)에서 고객이 출금을 시도하는 상황을 시뮬레이션합니다.",
+        "highlight": [
+          13
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [],
+          "output": []
+        }
+      },
+      {
         "line": 6,
         "title": "커스텀 예외 클래스 정의",
         "explanation": "**실행 순서:**\n1. `BankException`을 상속받은 `NoMoneyException` 클래스가 로딩됩니다.\n\n**해설:**\n자바가 제공하는 기본 예외만으로는 \"잔고 부족\", \"아이디 중복\" 같은 구체적인 상황을 표현하기 어렵습니다. 이럴 때 우리만의 예외 클래스를 만들어 쓰면 코드 읽기가 훨씬 좋아집니다.",
@@ -27,7 +42,10 @@
               "name": "Main.class",
               "value": "loaded"
             }
-          ]
+          ],
+          "stack": [],
+          "heap": [],
+          "output": []
         }
       },
       {
@@ -52,7 +70,9 @@
               "value": "500",
               "frame": "withdraw"
             }
-          ]
+          ],
+          "heap": [],
+          "output": []
         }
       },
       {
@@ -79,7 +99,8 @@
               "new": true
             }
           ],
-          "error": "NoMoneyException 던짐!"
+          "error": "NoMoneyException 던짐!",
+          "output": []
         }
       },
       {
@@ -101,7 +122,8 @@
           ],
           "output": [
             "부족한 금액: 500"
-          ]
+          ],
+          "heap": []
         }
       }
     ]

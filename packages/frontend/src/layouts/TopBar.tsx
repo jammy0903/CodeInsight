@@ -107,13 +107,16 @@ export function TopBar() {
               // 데스크톱 또는 모바일인데 언어 정보가 없거나, 언어 정보가 필요 없는 페이지
               <>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
+                  <h2 className={`font-bold ${isMobile ? 'text-sm' : 'text-xl'}`} style={{ color: 'var(--theme-layout-top-bar-text)' }}>
                     {pageTitle}
                   </h2>
                   {pageLanguage && <LanguageBadge language={pageLanguage} />}
                 </div>
                 {pageSubtitle && (
-                  <p className="text-xs text-ellipsis whitespace-nowrap overflow-hidden" style={{ color: 'var(--theme-layout-top-bar-text-muted)' }}>
+                  <p
+                    className={`text-xs ${isMobile ? 'text-center whitespace-pre-line' : 'text-ellipsis whitespace-nowrap overflow-hidden'}`}
+                    style={{ color: 'var(--theme-layout-top-bar-text-muted)' }}
+                  >
                     {pageSubtitle}
                   </p>
                 )}

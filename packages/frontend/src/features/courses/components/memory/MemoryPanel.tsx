@@ -172,7 +172,7 @@ function ArrayBlock({
   onToggle,
   onMouseEnter,
   onMouseLeave,
-  registerBlock,
+  registerLabel,
 }: {
   arrayName: string;
   elements: MemoryBlock[];
@@ -183,6 +183,7 @@ function ArrayBlock({
   onToggle: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  registerLabel?: 'rsp' | 'rbp';
 }) {
   const displayName = getDisplayName(arrayName);
   const elementCount = elements.length;
@@ -231,6 +232,27 @@ function ArrayBlock({
             {firstElement.address} ~ {lastElement.address}
           </span>
         </div>
+
+        {/* RSP/RBP 레지스터 인디케이터 (접힌 상태에서도 표시) */}
+        {registerLabel && (
+          <div className="absolute -right-16 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {/* 화살표 */}
+            <svg width="32" height="12" viewBox="0 0 32 12" className="flex-shrink-0">
+              <line x1="8" y1="6" x2="32" y2="6" stroke={COLORS.register[registerLabel].border} strokeWidth="2" />
+            </svg>
+            {/* 레이블 */}
+            <div
+              className="px-2 py-0.5 rounded text-[10px] font-bold"
+              style={{
+                backgroundColor: COLORS.register[registerLabel].bg,
+                color: COLORS.register[registerLabel].text,
+                border: `1px solid ${COLORS.register[registerLabel].border}`,
+              }}
+            >
+              {registerLabel.toUpperCase()}
+            </div>
+          </div>
+        )}
       </motion.div>
     );
   }
@@ -271,7 +293,15 @@ function ArrayBlock({
   );
 }
 
-/** 메모리 블록 카드 - [주소 | 값] 형태 */
+/** 텍스트 트렁케이션 헬퍼 */
+function truncateText(text: string, maxLength: number): { text: string; isTruncated: boolean } {
+  if (text.length <= maxLength) {
+    return { text, isTruncated: false };
+  }
+  return { text: text.slice(0, maxLength) + '…', isTruncated: true };
+}
+
+/** 메모리 블록 카드 - [주소 | 값] 형태 (터치 확장 지원) */
 function MemoryBlockCard({
   block,
   isChanged,
@@ -291,11 +321,32 @@ function MemoryBlockCard({
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const valueDisplay = isGarbageValue(block.value) ? '?' : String(block.value);
   const displayName = getDisplayName(block.name);
 
   // 테마 적용
   const currentTheme = useThemeStore((s) => s.theme);
+
+  // 트렁케이션 적용 (확장되지 않은 상태에서만)
+  const MAX_VALUE_LENGTH = 8;
+  const MAX_NAME_LENGTH = 10;
+  const MAX_POINTER_LENGTH = 12;
+
+  const valueTrunc = truncateText(valueDisplay, MAX_VALUE_LENGTH);
+  const nameTrunc = truncateText(displayName, MAX_NAME_LENGTH);
+  const pointerTrunc = block.points_to ? truncateText(block.points_to, MAX_POINTER_LENGTH) : null;
+
+  // 확장이 필요한지 체크 (어느 하나라도 트렁케이트 되었으면)
+  const needsExpansion = valueTrunc.isTruncated || nameTrunc.isTruncated || (pointerTrunc?.isTruncated ?? false);
+
+  // 터치/클릭 핸들러
+  const handleToggleExpand = (e: React.MouseEvent | React.TouchEvent) => {
+    if (needsExpansion) {
+      e.stopPropagation();
+      setIsExpanded(!isExpanded);
+    }
+  };
 
   return (
     <motion.div
@@ -316,6 +367,7 @@ function MemoryBlockCard({
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onClick={handleToggleExpand}
     >
       {/* 블록별 프레임 오버레이 */}
       <AnimatePresence>
@@ -346,15 +398,29 @@ function MemoryBlockCard({
         )}
       </AnimatePresence>
 
-      <div className="flex items-center gap-3 relative">
+      {/* 확장 인디케이터 (트렁케이트된 경우에만 표시) */}
+      {needsExpansion && (
+        <div
+          className="absolute top-1 right-1 text-[8px] px-1 rounded"
+          style={{
+            backgroundColor: isExpanded ? '#3b82f6' : 'var(--theme-memory-card-muted)',
+            color: isExpanded ? '#fff' : 'var(--theme-memory-card-bg)',
+            opacity: 0.8
+          }}
+        >
+          {isExpanded ? '접기' : '더보기'}
+        </div>
+      )}
+
+      <div className={`flex items-center gap-2 relative ${isExpanded ? 'flex-wrap' : ''}`}>
         {/* [주소 | 값] 박스 */}
         <div
-          className="flex items-center rounded px-2 py-1"
-          style={{ backgroundColor: `${frameColor.border}15` }}
+          className={`flex items-center rounded px-2 py-1 ${isExpanded ? 'flex-wrap' : ''}`}
+          style={{ backgroundColor: `${frameColor.border}15`, maxWidth: isExpanded ? '100%' : undefined }}
         >
           {/* 주소 배지 */}
           <span
-            className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded flex-shrink-0 whitespace-nowrap"
+            className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded flex-shrink-0"
             style={{
               color: 'var(--theme-memory-card-muted)',
               backgroundColor: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
@@ -365,33 +431,45 @@ function MemoryBlockCard({
           <span className="mx-2 font-bold flex-shrink-0" style={{ color: 'var(--theme-memory-card-muted)' }}>|</span>
           {/* 값 */}
           <span
-            className="font-mono font-bold text-base flex-shrink-0 whitespace-nowrap"
-            style={{ color: isChanged ? 'var(--theme-memory-changed-border)' : 'var(--theme-memory-card-text)' }}
+            className={`font-mono font-bold text-base ${isExpanded ? 'break-all' : 'truncate'}`}
+            style={{
+              color: isChanged ? 'var(--theme-memory-changed-border)' : 'var(--theme-memory-card-text)',
+              maxWidth: isExpanded ? '100%' : '80px'
+            }}
+            title={valueDisplay}
           >
-            {valueDisplay}
+            {isExpanded ? valueDisplay : valueTrunc.text}
           </span>
         </div>
 
         {/* 타입 */}
-        <span className="text-[10px] font-mono" style={{ color: 'var(--theme-memory-card-muted)' }}>
+        <span className="text-[10px] font-mono flex-shrink-0" style={{ color: 'var(--theme-memory-card-muted)' }}>
           {block.type || 'var'}
         </span>
 
         {/* 변수명 */}
         <span
-          className="text-xs font-semibold"
-          style={{ color: frameColor.text }}
+          className={`text-xs font-semibold ${isExpanded ? 'break-all' : 'truncate'}`}
+          style={{
+            color: frameColor.text,
+            maxWidth: isExpanded ? '100%' : '80px'
+          }}
+          title={displayName}
         >
-          {displayName}
+          {isExpanded ? displayName : nameTrunc.text}
         </span>
 
         {/* 포인터 표시 */}
         {block.points_to && (
           <span
-            className="text-[10px] font-semibold ml-auto"
-            style={{ color: '#f97316' }}
+            className={`text-[10px] font-semibold ${isExpanded ? '' : 'ml-auto truncate'}`}
+            style={{
+              color: '#f97316',
+              maxWidth: isExpanded ? '100%' : '100px'
+            }}
+            title={`→ ${block.points_to}`}
           >
-            → {block.points_to}
+            → {isExpanded ? block.points_to : (pointerTrunc?.text ?? block.points_to)}
           </span>
         )}
 
@@ -400,7 +478,7 @@ function MemoryBlockCard({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="w-2.5 h-2.5 rounded-full ml-auto"
+            className="w-2.5 h-2.5 rounded-full ml-auto flex-shrink-0"
             style={{ backgroundColor: 'var(--theme-memory-changed-border)' }}
           />
         )}
@@ -608,11 +686,39 @@ function StackSection({
             });
 
             return items.map((item, index) => {
+              const isLast = index === items.length - 1;
+
               if (item.type === 'array') {
                 const [arrayName, elements] = item.data as [string, MemoryBlock[]];
                 const frameName = blockFrameMap.get(elements[0].name) || 'main';
                 const frameColor = frameColorMap.get(frameName) || COLORS.frame[0];
                 const isChanged = elements.some((el) => changedBlocks.stack.includes(el.name) || changedBlocks.heap.includes(el.name));
+
+                // 배열에 대한 RSP/RBP 계산
+                // RBP: 배열의 첫 번째 요소가 현재 프레임의 첫 번째인 경우
+                const isFirstOfCurrentFrame = (() => {
+                  for (let j = 0; j < items.length; j++) {
+                    const checkItem = items[j];
+                    let checkFrameName: string;
+                    if (checkItem.type === 'array') {
+                      const [, checkElements] = checkItem.data as [string, MemoryBlock[]];
+                      checkFrameName = blockFrameMap.get(checkElements[0].name) || 'main';
+                    } else {
+                      const checkBlock = checkItem.data as MemoryBlock;
+                      checkFrameName = blockFrameMap.get(checkBlock.name) || 'main';
+                    }
+                    if (checkFrameName === currentFrame) {
+                      return j === index;
+                    }
+                  }
+                  return false;
+                })();
+
+                let arrayRegisterLabel: 'rsp' | 'rbp' | undefined = undefined;
+                if (showRegisters) {
+                  if (isFirstOfCurrentFrame) arrayRegisterLabel = 'rbp';
+                  else if (isLast) arrayRegisterLabel = 'rsp';
+                }
 
                 return (
                   <ArrayBlock
@@ -626,6 +732,7 @@ function StackSection({
                     onToggle={() => toggleArray(arrayName)}
                     onMouseEnter={() => setHoveredFrame(frameName)}
                     onMouseLeave={() => setHoveredFrame(null)}
+                    registerLabel={arrayRegisterLabel}
                   />
                 );
               } else {
@@ -634,18 +741,21 @@ function StackSection({
                 const frameColor = frameColorMap.get(frameName) || COLORS.frame[0];
                 // 오직 호버했을 때만 오버레이 표시
                 const isHovered = hoveredFrame === frameName;
-                const isLast = index === items.length - 1;
 
                 // 현재 프레임의 첫 번째 블록인지 확인 (RBP 위치)
                 const isFirstOfCurrentFrame = (() => {
                   for (let j = 0; j < items.length; j++) {
                     const checkItem = items[j];
-                    if (checkItem.type === 'block') {
+                    let checkFrameName: string;
+                    if (checkItem.type === 'array') {
+                      const [, checkElements] = checkItem.data as [string, MemoryBlock[]];
+                      checkFrameName = blockFrameMap.get(checkElements[0].name) || 'main';
+                    } else {
                       const checkBlock = checkItem.data as MemoryBlock;
-                      const checkFrameName = blockFrameMap.get(checkBlock.name) || 'main';
-                      if (checkFrameName === currentFrame) {
-                        return j === index; // 현재 블록이 현재 프레임의 첫 번째인지
-                      }
+                      checkFrameName = blockFrameMap.get(checkBlock.name) || 'main';
+                    }
+                    if (checkFrameName === currentFrame) {
+                      return j === index;
                     }
                   }
                   return false;

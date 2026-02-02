@@ -10,12 +10,11 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, User, TrendingUp } from 'lucide-react';
+import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, Crown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle, loginWithKakao } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { logger } from '@/utils/logger';
 
 const SIDEBAR_WIDTH = 224; // 14rem
@@ -32,12 +31,10 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/playground', label: 'Playground', icon: Play },
 ];
 
-// 로그인 필수 탭들
+// 로그인 필수 탭들 (프로필은 프로필 카드 클릭으로 이동)
 const AUTH_NAV_ITEMS: NavItem[] = [
   { path: '/quiz', label: '퀴즈', icon: FileQuestion },
-  { path: '/dashboard', label: '나의 현황', icon: BarChart3 },
-  { path: '/report', label: '학습 리포트', icon: TrendingUp },
-  { path: '/profile', label: '프로필', icon: User },
+  { path: '/report', label: '나의 학습', icon: BarChart3 },
 ];
 
 export function Sidebar() {
@@ -266,10 +263,9 @@ export function Sidebar() {
                   </Link>
                 </motion.div>
               )}
-            </nav>
 
-            {/* 프로필 영역 */}
-            <div className="p-4 border-t border-t-[var(--theme-sidebar-profile-border)]">
+              {/* 프로필 영역 (스크롤 가능) */}
+              <div className="mt-4 pt-4 border-t border-t-[var(--theme-sidebar-profile-border)]">
               {firebaseUser ? (
                 <div className="space-y-3">
                   {/* 닉네임 등록 필요 시 */}
@@ -298,16 +294,24 @@ export function Sidebar() {
                     </motion.button>
                   ) : (
                     <>
-                      {/* 테마 변경 버튼 */}
-                      <div className="flex justify-center">
-                        <ThemeToggle />
-                      </div>
-
-                      {/* 등록 완료 상태 - 닉네임 기반 프로필 */}
-                      <div className="flex items-center gap-3 p-3 rounded-lg border" style={{
-                        backgroundColor: 'var(--theme-sidebar-profile-card-bg)',
-                        borderColor: 'var(--theme-sidebar-profile-card-border)'
-                      }}>
+                      {/* 등록 완료 상태 - 닉네임 기반 프로필 (클릭 시 프로필 페이지 이동) */}
+                      <Link
+                        to="/profile"
+                        onClick={toggleSidebar}
+                        className="flex items-center gap-3 p-3 rounded-lg border transition-colors"
+                        style={{
+                          backgroundColor: 'var(--theme-sidebar-profile-card-bg)',
+                          borderColor: 'var(--theme-sidebar-profile-card-border)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
+                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-profile-card-bg)';
+                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-profile-card-border)';
+                        }}
+                      >
                         <PixelAvatar seed={appUser.nickname} size={40} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold truncate" style={{ color: 'var(--theme-sidebar-nickname-text)' }}>
@@ -317,7 +321,30 @@ export function Sidebar() {
                             {firebaseUser.email}
                           </p>
                         </div>
-                      </div>
+                      </Link>
+
+                      {/* 구독 관리 링크 */}
+                      <Link
+                        to="/subscription"
+                        onClick={toggleSidebar}
+                        className="flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg transition-colors"
+                        style={{
+                          color: 'var(--theme-sidebar-nav-inactive-text)',
+                          borderColor: 'var(--theme-sidebar-nav-inactive-border)',
+                          backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
+                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
+                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
+                        }}
+                      >
+                        <Crown className="w-4 h-4" />
+                        구독 관리
+                      </Link>
                     </>
                   )}
 
@@ -420,7 +447,8 @@ export function Sidebar() {
                   </p>
                 </div>
               )}
-            </div>
+              </div>
+            </nav>
           </motion.aside>
         </>
       )}
