@@ -4,7 +4,7 @@
  * WHY: 사용자의 학습 진행 상황 시각화
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart3, BookOpen, CheckCircle, PlayCircle, Loader2 } from 'lucide-react';
 import { useStore } from '@/stores/store';
@@ -40,18 +40,23 @@ export function DashboardPage() {
     fetchProgress();
   }, [appUser]);
 
-  // 통계 계산
-  const completedLessons = progress.filter(p => p.status === 'completed').length;
-  const inProgressLessons = progress.filter(p => p.status === 'in_progress').length;
-  const completedQuizzes = progress.filter(p => p.quizScore !== null && p.quizScore !== undefined).length;
-  const totalQuizScore = progress.reduce((sum, p) => sum + (p.quizScore || 0), 0);
-  const totalQuizTotal = progress.reduce((sum, p) => sum + (p.quizTotal || 0), 0);
+  // 통계 계산 (useMemo로 불필요한 재계산 방지)
+  const { completedLessons, inProgressLessons, totalQuizScore, totalQuizTotal } = useMemo(() => ({
+    completedLessons: progress.filter(p => p.status === 'completed').length,
+    inProgressLessons: progress.filter(p => p.status === 'in_progress').length,
+    totalQuizScore: progress.reduce((sum, p) => sum + (p.quizScore ?? 0), 0),
+    totalQuizTotal: progress.reduce((sum, p) => sum + (p.quizTotal ?? 0), 0),
+  }), [progress]);
 
-  // 최근 활동 (최신순 정렬)
-  const recentActivity = [...progress]
-    .filter(p => p.updatedAt)
-    .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())
-    .slice(0, 5);
+  // 최근 활동 (최신순 정렬, useMemo로 최적화)
+  const recentActivity = useMemo(() => {
+    // 미리 timestamp 변환하여 정렬 시 Date 객체 생성 최소화
+    return progress
+      .filter(p => p.updatedAt)
+      .map(p => ({ ...p, _ts: new Date(p.updatedAt!).getTime() }))
+      .sort((a, b) => b._ts - a._ts)
+      .slice(0, 5);
+  }, [progress]);
 
   if (loading) {
     return (

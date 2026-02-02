@@ -90,68 +90,77 @@ export class DeepSeekProvider implements IAIProvider {
       { role: 'user', content: request.message },
     ];
 
-    const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages,
-        temperature: 0.7,
-        max_tokens: 1024,
-        stream: true,  // 스트리밍 활성화
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`DeepSeek API error (${response.status}): ${error}`);
-    }
-
-    if (!response.body) {
-      throw new Error('No response body for streaming');
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
+    // 타임아웃 설정 (90초)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
 
     try {
-      while (true) {
-        const { done, value } = await reader.read();
+      const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages,
+          temperature: 0.7,
+          max_tokens: 1024,
+          stream: true,  // 스트리밍 활성화
+        }),
+      });
 
-        if (done) {
-          onChunk({ content: '', done: true });
-          break;
-        }
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`DeepSeek API error (${response.status}): ${error}`);
+      }
 
-        buffer += decoder.decode(value, { stream: true });
+      if (!response.body) {
+        throw new Error('No response body for streaming');
+      }
 
-        // SSE 파싱: "data: {...}\n\n" 형식
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed || trimmed === 'data: [DONE]') continue;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
 
-          if (trimmed.startsWith('data: ')) {
-            try {
-              const json = JSON.parse(trimmed.slice(6));
-              const content = json.choices?.[0]?.delta?.content || '';
-              if (content) {
-                onChunk({ content, done: false });
+          if (done) {
+            onChunk({ content: '', done: true });
+            break;
+          }
+
+          buffer += decoder.decode(value, { stream: true });
+
+          // SSE 파싱: "data: {...}\n\n" 형식
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed === 'data: [DONE]') continue;
+
+            if (trimmed.startsWith('data: ')) {
+              try {
+                const json = JSON.parse(trimmed.slice(6));
+                const content = json.choices?.[0]?.delta?.content || '';
+                if (content) {
+                  onChunk({ content, done: false });
+                }
+              } catch {
+                // JSON 파싱 실패 무시
               }
-            } catch {
-              // JSON 파싱 실패 무시
             }
           }
         }
+      } finally {
+        reader.releaseLock();
       }
     } finally {
-      reader.releaseLock();
+      clearTimeout(timeoutId);
     }
   }
 }
