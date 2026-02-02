@@ -198,12 +198,17 @@ export async function askAIStream(
 ): Promise<string> {
   const url = `${config.api.baseUrl}${config.api.endpoints.aiChatStream}`;
 
+  // 타임아웃 설정 (90초)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 90000);
+
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      signal: controller.signal,
       body: JSON.stringify({
         message,
         history,
@@ -227,40 +232,49 @@ export async function askAIStream(
     let fullContent = '';
     let buffer = '';
 
-    while (true) {
-      const { done, value } = await reader.read();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
 
-      if (done) break;
+        if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
+        buffer += decoder.decode(value, { stream: true });
 
-      // SSE 파싱
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
+        // SSE 파싱
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
 
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed.startsWith('data: ')) continue;
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data: ')) continue;
 
-        try {
-          const chunk: StreamChunk = JSON.parse(trimmed.slice(6));
+          try {
+            const chunk: StreamChunk = JSON.parse(trimmed.slice(6));
 
-          if (chunk.error) {
-            throw new Error(chunk.error);
+            if (chunk.error) {
+              throw new Error(chunk.error);
+            }
+
+            if (chunk.content) {
+              fullContent += chunk.content;
+              onChunk?.(chunk.content);
+            }
+          } catch {
+            // JSON 파싱 실패 무시
           }
-
-          if (chunk.content) {
-            fullContent += chunk.content;
-            onChunk?.(chunk.content);
-          }
-        } catch {
-          // JSON 파싱 실패 무시
         }
       }
+    } finally {
+      reader.releaseLock();
     }
 
     return fullContent;
   } catch (err) {
+    // 타임아웃 에러 처리
+    if (err instanceof Error && err.name === 'AbortError') {
+      return '⏱️ AI 응답 시간이 초과되었습니다. 다시 시도해주세요.';
+    }
+
     // 네트워크 에러 처리
     if (err instanceof TypeError && err.message.includes('fetch')) {
       notifyAI.backendDisconnected();
@@ -270,6 +284,8 @@ cd backend && npm run dev 명령어로 서버를 실행해주세요.`;
     }
 
     return `스트리밍 오류: ${err instanceof Error ? err.message : 'Unknown error'}`;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -286,12 +302,17 @@ export async function getStepExplanationStream(
 ): Promise<string> {
   const url = `${config.api.baseUrl}${config.api.endpoints.aiExplainStep}`;
 
+  // 타임아웃 설정 (60초 - 스텝 설명은 짧으므로)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
+
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      signal: controller.signal,
       body: JSON.stringify(request),
     });
 
@@ -308,46 +329,57 @@ export async function getStepExplanationStream(
     let fullContent = '';
     let buffer = '';
 
-    while (true) {
-      const { done, value } = await reader.read();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
 
-      if (done) break;
+        if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
+        buffer += decoder.decode(value, { stream: true });
 
-      // SSE 파싱
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
+        // SSE 파싱
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
 
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed.startsWith('data: ')) continue;
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data: ')) continue;
 
-        try {
-          const chunk: StreamChunk = JSON.parse(trimmed.slice(6));
+          try {
+            const chunk: StreamChunk = JSON.parse(trimmed.slice(6));
 
-          if (chunk.error) {
-            throw new Error(chunk.error);
+            if (chunk.error) {
+              throw new Error(chunk.error);
+            }
+
+            if (chunk.content) {
+              fullContent += chunk.content;
+              onChunk?.(chunk.content);
+            }
+          } catch {
+            // JSON 파싱 실패 무시
           }
-
-          if (chunk.content) {
-            fullContent += chunk.content;
-            onChunk?.(chunk.content);
-          }
-        } catch {
-          // JSON 파싱 실패 무시
         }
       }
+    } finally {
+      reader.releaseLock();
     }
 
     return fullContent;
   } catch (err) {
+    // 타임아웃 에러 처리
+    if (err instanceof Error && err.name === 'AbortError') {
+      return '⏱️ AI 응답 시간이 초과되었습니다.';
+    }
+
     if (err instanceof TypeError && err.message.includes('fetch')) {
       notifyAI.backendDisconnected();
       return '🔌 AI 서버에 연결할 수 없습니다.';
     }
 
     return `⚠️ 스트리밍 오류: ${err instanceof Error ? err.message : 'Unknown error'}`;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
