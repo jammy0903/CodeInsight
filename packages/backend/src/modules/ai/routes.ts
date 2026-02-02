@@ -879,53 +879,56 @@ router.post('/analyze-report', optionalDbUser, async (req, res) => {
     let enrichedContext = '';
 
     if (userId) {
-      // 1. 최근 저장한 노트 (개념 메모)
-      const recentNotes = await prisma.userNote.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        include: {
-          lesson: { select: { title: true } },
-        },
-      });
+      // 병렬 쿼리 실행 (N+1 최적화)
+      const [recentNotes, recentChats, languageStats, recentWrongs] = await Promise.all([
+        // 1. 최근 저장한 노트 (개념 메모)
+        prisma.userNote.findMany({
+          where: { userId },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+          include: {
+            lesson: { select: { title: true } },
+          },
+        }),
 
-      // 2. 최근 AI 질문들
-      const recentChats = await prisma.chatHistory.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        select: { question: true, context: true },
-      });
+        // 2. 최근 AI 질문들
+        prisma.chatHistory.findMany({
+          where: { userId },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+          select: { question: true, context: true },
+        }),
 
-      // 3. 언어별 학습 시간 (LessonActivity + Lesson + Chapter + Language)
-      const languageStats = await prisma.$queryRaw<{ language: string; totalSeconds: bigint }[]>`
-        SELECT
-          l."language_id" as language,
-          SUM(la.duration) as "totalSeconds"
-        FROM lesson_activities la
-        JOIN lessons le ON la.lesson_id = le.id
-        JOIN chapters c ON le.chapter_id = c.id
-        JOIN languages l ON c.language_id = l.id
-        WHERE la.user_id = ${userId}::uuid
-          AND la.duration IS NOT NULL
-        GROUP BY l."language_id"
-        ORDER BY "totalSeconds" DESC
-      `;
+        // 3. 언어별 학습 시간 (LessonActivity + Lesson + Chapter + Language)
+        prisma.$queryRaw<{ language: string; totalSeconds: bigint }[]>`
+          SELECT
+            l."language_id" as language,
+            SUM(la.duration) as "totalSeconds"
+          FROM lesson_activities la
+          JOIN lessons le ON la.lesson_id = le.id
+          JOIN chapters c ON le.chapter_id = c.id
+          JOIN languages l ON c.language_id = l.id
+          WHERE la.user_id = ${userId}::uuid
+            AND la.duration IS NOT NULL
+          GROUP BY l."language_id"
+          ORDER BY "totalSeconds" DESC
+        `,
 
-      // 4. 최근 틀린 퀴즈 상세
-      const recentWrongs = await prisma.quizAttempt.findMany({
-        where: { userId, isCorrect: false },
-        orderBy: { createdAt: 'desc' },
-        take: 3,
-        include: {
-          quiz: {
-            select: {
-              question: true,
-              lesson: { select: { title: true } },
+        // 4. 최근 틀린 퀴즈 상세
+        prisma.quizAttempt.findMany({
+          where: { userId, isCorrect: false },
+          orderBy: { createdAt: 'desc' },
+          take: 3,
+          include: {
+            quiz: {
+              select: {
+                question: true,
+                lesson: { select: { title: true } },
+              },
             },
           },
-        },
-      });
+        }),
+      ]);
 
       // 컨텍스트 문자열 생성
       if (recentNotes.length > 0) {
