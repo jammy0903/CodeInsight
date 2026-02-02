@@ -17,6 +17,7 @@ import * as courseService from './service';
 import { requireDbUser, optionalDbUser } from '../../middleware/auth';
 import { lessonContentLoader } from '../../services/lessonContentLoader';
 import { logger } from '../../utils/logger';
+import { env } from '../../config/env';
 
 const router = Router();
 
@@ -146,12 +147,13 @@ router.get('/chapters/:id/progress', requireDbUser, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user!.dbUser!.id;
+    const isAdmin = req.user?.uid === env.ADMIN_FIREBASE_UID;
 
     const chapterId = Array.isArray(id) ? id[0] : id;
     if (!chapterId) {
       return res.status(400).json({ message: 'Chapter ID is required.' });
     }
-    const progress = await courseService.getChapterProgress(userId, chapterId);
+    const progress = await courseService.getChapterProgress(userId, chapterId, !!isAdmin);
 
     if (!progress) {
       return res.status(404).json({ error: 'Chapter not found' });
@@ -241,7 +243,8 @@ router.get('/:id', optionalDbUser, async (req, res, next) => {
     }
 
     const userId = req.user?.dbUser?.id;
-    const language = await courseService.getLanguageWithChapters(id, userId);
+    const isAdmin = req.user?.uid === env.ADMIN_FIREBASE_UID;
+    const language = await courseService.getLanguageWithChapters(id, userId, !!isAdmin);
 
     if (!language) {
       return res.status(404).json({ error: 'Language not found' });

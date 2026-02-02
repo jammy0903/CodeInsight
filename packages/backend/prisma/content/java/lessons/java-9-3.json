@@ -3,8 +3,101 @@
   "title": "Stop-the-World: 청소부의 방식",
   "concept": "GC가 작동하면 프로그램이 잠시 멈춥니다. 이를 'Stop-the-World'라고 하며, 이 시간을 줄이는 것이 GC 알고리즘의 핵심입니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        // 현대의 Java는 G1 GC를 기본적으로 사용합니다.\n        // 바닥 전체를 한 번에 쓰는 대신, 구역을 나눠서 효율적으로 청소하죠.\n    }\n}",
-    "steps": []
+    "code": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"열심히 일하는 중...\");\n        \n        // GC가 발동하면?\n        // 모든 스레드가 일시 정지(Stop)합니다.\n        \n        System.out.println(\"다시 일하는 중!\");\n    }\n}",
+    "steps": [
+      {
+        "line": 2,
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다. GC가 실행될 때 벌어지는 '멈춤 현상'을 관찰합니다.",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "line": 3,
+        "title": "정상 실행",
+        "explanation": "프로그램이 정상적으로 실행되고 있습니다. CPU가 바쁘게 일하는 중입니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "열심히 일하는 중..."
+          ],
+          "heap": []
+        }
+      },
+      {
+        "line": 6,
+        "title": "얼음! (Stop-the-World)",
+        "explanation": "메모리 청소(GC)를 위해 **모든 스레드가 '얼음' 하고 멈춥니다.**\n청소부 아저씨가 바닥 왁스 칠을 할 때는 아무도 지나다니면 안 되는 것과 같습니다.",
+        "highlight": [
+          6,
+          7
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "STOPPED",
+              "frame": "main"
+            },
+            {
+              "name": "GC",
+              "value": "Cleaning...",
+              "frame": "system"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap",
+              "content": "Cleaning Garbage...",
+              "note": "Reclaiming Memory"
+            }
+          ],
+          "warning": "모든 스레드 정지됨 (STW)",
+          "output": []
+        }
+      },
+      {
+        "line": 9,
+        "title": "땡! (실행 재개)",
+        "explanation": "청소가 끝나면 다시 '땡!' 하고 멈췄던 작업들이 이어서 실행됩니다.\n이 멈추는 시간이 너무 길어지면 사용자는 \"렉 걸렸다\"고 느끼게 됩니다.",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "열심히 일하는 중...",
+            "다시 일하는 중!"
+          ],
+          "heap": []
+        }
+      }
+    ]
   },
   "quiz": {
     "question": "GC 수행을 위해 JVM이 애플리케이션 실행을 멈추는 현상을 무엇이라 하나요?",

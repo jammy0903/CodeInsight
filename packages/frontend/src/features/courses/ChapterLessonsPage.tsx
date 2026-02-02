@@ -4,15 +4,16 @@
  * URL: /courses/:lang/:chapterId
  */
 
-import { useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import type { UserProgress } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
-import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle } from 'lucide-react';
+import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle, Lock, Crown } from 'lucide-react';
 import { useIsMobile, useChapter, useUserProgress } from '@/hooks';
+import { checkChapterAccess } from '@/services/subscription';
 
 // 언어별 색상 (챕터 페이지용)
 const getLanguageColor = (lang: string | undefined) => {
@@ -29,13 +30,46 @@ const getLanguageColor = (lang: string | undefined) => {
 export function ChapterLessonsPage() {
   const { lang, chapterId } = useParams<{ lang: string; chapterId: string }>();
   const navigate = useNavigate();
-  const { setPageTitle } = useStore();
+  const { setPageTitle, appUser } = useStore();
   const langColor = getLanguageColor(lang);
   const isMobile = useIsMobile();
 
   // TanStack Query: 챕터 데이터 + 진행 상태
   const { data: chapter, isLoading, isError, error } = useChapter(chapterId);
   const { data: progressList } = useUserProgress();
+
+  // 구독 접근 권한 체크
+  const [accessDenied, setAccessDenied] = useState(false);
+  const [accessReason, setAccessReason] = useState<string>('');
+
+  // 챕터 로드 후 접근 권한 체크
+  useEffect(() => {
+    async function checkAccess() {
+      if (!chapter) return;
+
+      // 비로그인: 챕터 2 이상 로그인 필요
+      if (!appUser && chapter.order >= 2) {
+        setAccessDenied(true);
+        setAccessReason('챕터 2 이상은 로그인이 필요합니다.');
+        return;
+      }
+
+      // 로그인 사용자: 챕터 3 이상은 구독 체크 필요
+      if (appUser && chapter.order >= 3) {
+        const result = await checkChapterAccess(chapter.order);
+        if (!result.allowed) {
+          setAccessDenied(true);
+          setAccessReason(result.reason || '유료 구독이 필요합니다.');
+        } else {
+          setAccessDenied(false);
+        }
+      } else {
+        setAccessDenied(false);
+      }
+    }
+
+    checkAccess();
+  }, [chapter, appUser]);
 
   // 진행 상태 Map 변환 (useMemo로 최적화)
   const progressMap = useMemo(() => {
@@ -67,6 +101,63 @@ export function ChapterLessonsPage() {
           >
             챕터 목록으로 돌아가기
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 구독 필요 (접근 거부)
+  if (accessDenied && chapter) {
+    return (
+      <div className="min-h-screen py-4 px-3 md:px-12 lg:px-16">
+        {/* 뒤로가기 버튼 */}
+        <button
+          onClick={() => navigate(`/courses/${lang}`)}
+          className="group flex items-center gap-2 text-[var(--theme-dashboard-text-muted)] hover:text-[#FFD700] transition-colors mb-6"
+        >
+          <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-2xl font-semibold tracking-wider uppercase">Back to Chapters</span>
+        </button>
+
+        {/* 잠금 안내 */}
+        <div className="flex flex-col items-center justify-center py-20">
+          <div
+            className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
+            style={{ backgroundColor: `${langColor}30` }}
+          >
+            <Lock className="w-12 h-12" style={{ color: langColor }} />
+          </div>
+          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-3">
+            {chapter.title}
+          </h2>
+          <p className="text-[var(--theme-dashboard-text-muted)] mb-6 text-center max-w-md">
+            {accessReason}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            {!appUser ? (
+              <Link
+                to="/"
+                className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow flex items-center gap-2"
+              >
+                로그인하기
+              </Link>
+            ) : (
+              <Link
+                to="/subscription"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow flex items-center gap-2"
+              >
+                <Crown className="w-5 h-5" />
+                구독하기
+              </Link>
+            )}
+            <button
+              onClick={() => navigate(`/courses/${lang}`)}
+              className="px-6 py-3 border border-[var(--theme-dashboard-card-border)] rounded-xl font-semibold hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
+              style={{ color: 'var(--theme-dashboard-text)' }}
+            >
+              다른 챕터 보기
+            </button>
+          </div>
         </div>
       </div>
     );

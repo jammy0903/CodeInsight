@@ -8,6 +8,7 @@ import { api } from './api/axios';
 import { handleError } from './api/errors';
 import { config } from '@/config';
 import { notifyAI, notifyNetwork } from '@/components/common/Toast';
+import { getAuthTokenAsync } from './api/tokenManager';
 
 // === 타입 정의 ===
 
@@ -199,11 +200,18 @@ export async function askAIStream(
   const url = `${config.api.baseUrl}${config.api.endpoints.aiChatStream}`;
 
   try {
+    // 인증 토큰 가져오기
+    const token = await getAuthTokenAsync();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         message,
         history,
@@ -287,11 +295,18 @@ export async function getStepExplanationStream(
   const url = `${config.api.baseUrl}${config.api.endpoints.aiExplainStep}`;
 
   try {
+    // 인증 토큰 가져오기
+    const token = await getAuthTokenAsync();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(request),
     });
 

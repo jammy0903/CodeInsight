@@ -13,6 +13,7 @@ import { Sidebar } from './Sidebar';
 import { NicknameModal } from '@/components/NicknameModal';
 import { OnboardingModal } from '@/components/OnboardingModal';
 import { Menu, Github, Mail } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useStore } from '@/stores/store';
 
 interface MainLayoutProps {
@@ -71,9 +72,9 @@ export function MainLayout({ children }: MainLayoutProps) {
           <footer className="mt-8 py-2 border-t border-t-[var(--theme-layout-footer-border)]" style={{ backgroundColor: 'var(--theme-layout-footer-bg)' }}>
             <div className="main-content-container my-2">
               {/* 2열 레이아웃 */}
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex flex-row items-center justify-between gap-4">
                 {/* 왼쪽: 브랜드 + 링크 */}
-                <div className="space-y-2">
+                <div className="flex items-center gap-4">
                   <Link
                     to="/"
                     className="text-lg font-bold transition-colors no-underline hover:no-underline"
@@ -83,43 +84,24 @@ export function MainLayout({ children }: MainLayoutProps) {
                   >
                     CodeInsight
                   </Link>
-                  <div className="flex flex-wrap gap-4 text-sm" style={{ color: 'var(--theme-layout-footer-text-muted)' }}>
-                    <a
-                      href="/courses"
-                      className="transition-colors"
-                      style={{ color: 'var(--theme-layout-footer-text-muted)' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text-muted)'; }}
-                    >
-                      Courses
-                    </a>
-                    <a
-                      href="/chat"
-                      className="transition-colors"
-                      style={{ color: 'var(--theme-layout-footer-text-muted)' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text-muted)'; }}
-                    >
-                      AI Chat
-                    </a>
-                    <a
-                      href={gmailLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition-colors"
-                      style={{ color: 'var(--theme-layout-footer-text-muted)' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text-muted)'; }}
-                    >
-                      Contact
-                    </a>
-                  </div>
+                  <a
+                    href={gmailLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--theme-layout-footer-text-muted)' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text-muted)'; }}
+                  >
+                    Contact
+                  </a>
                 </div>
 
-                {/* 오른쪽: Stay in touch + 소셜 */}
-                <div className="space-y-2 md:text-right">
-                  <p className="text-sm font-medium" style={{ color: 'var(--theme-layout-footer-text)' }}>Stay in touch</p>
-                  <div className="flex gap-3 md:justify-end">
+                {/* 오른쪽: 테마 토글 + Stay in touch + 소셜 */}
+                <div className="flex items-center gap-3">
+                  <ThemeToggle />
+                  <p className="text-sm font-medium whitespace-nowrap" style={{ color: 'var(--theme-layout-footer-text)' }}>Stay in touch</p>
+                  <div className="flex gap-3">
                     <a
                       href="https://github.com/jammy0903"
                       target="_blank"

@@ -9,144 +9,327 @@
         "line": 1,
         "title": "sys 모듈 임포트",
         "explanation": "**`import sys`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 참조 횟수를 확인하는 `getrefcount` 함수를 사용하기 위해 `sys` 모듈을 가져옵니다.\n\n**sys.getrefcount()**: 객체의 참조 횟수(Reference Count)를 반환하는 특별한 함수입니다.\n\n**왜 이 순서인가?** sys 모듈을 먼저 임포트해야 나중에 sys.getrefcount()를 사용할 수 있습니다.\n\n**실행 순서**: import sys → sys 모듈 로드 → line 3",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module 'sys'>", "type": "module", "id": "0x1000"}
+            {
+              "name": "sys",
+              "value": "<module 'sys'>",
+              "type": "module",
+              "id": "0x1000"
+            }
           ],
           "output": [],
-          "note": "sys 모듈 임포트 완료"
+          "note": "sys 모듈 임포트 완료",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 3,
         "title": "리스트 객체 생성과 첫 참조",
         "explanation": "**`a = [1, 2, 3]`**\n\n**객체 생성**: 리스트 객체 `[1, 2, 3]`이 메모리(0x2000)에 생성됩니다.\n\n**첫 번째 참조**: 변수 `a`가 이 객체를 가리킵니다.\n\n**참조 횟수(Reference Count)**: 현재 1\n- 이 객체를 가리키는 이름: `a` (1개)\n\n**참조 카운팅이란?**\n- Python은 각 객체가 몇 개의 변수에 의해 참조되는지 추적합니다\n- 참조 횟수가 0이 되면 → 즉시 메모리 해제!\n\n**왜 이 순서인가?** sys 모듈 임포트 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: [1, 2, 3] 리스트 생성 (0x2000) → a = 0x2000 (refcount=1) → line 4",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module>", "type": "module", "id": "0x1000"},
-            {"name": "a", "value": "[1, 2, 3] (refcount=1)", "type": "list", "id": "0x2000", "highlight": true}
+            {
+              "name": "sys",
+              "value": "<module>",
+              "type": "module",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "[1, 2, 3] (refcount=1)",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            }
           ],
           "output": [],
-          "note": "리스트 객체 생성, refcount=1"
+          "note": "리스트 객체 생성, refcount=1",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 4,
         "title": "참조 횟수 확인 (getrefcount)",
         "explanation": "**`print(f\"a만 참조: {sys.getrefcount(a)}\")`**\n\n**sys.getrefcount(a)**: `a`가 가리키는 객체(0x2000)의 참조 횟수를 반환합니다.\n\n**왜 2가 출력되는가?**\n1. 실제 참조: `a` (1개)\n2. **임시 참조**: `getrefcount(a)` 호출 시 함수 매개변수로 전달되는 동안 임시로 +1\n3. 결과: 1 + 1 = **2**\n\n**중요**: `getrefcount()`는 항상 실제 값보다 1 크게 나옵니다!\n- 실제 refcount = getrefcount() 결과 - 1\n\n**왜 이 순서인가?** 객체 생성 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: sys.getrefcount(a) 호출 → refcount 읽기 (2) → f-string 평가 → print 실행 → line 6",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module>", "type": "module", "id": "0x1000"},
-            {"name": "a", "value": "[1, 2, 3] (refcount=1)", "type": "list", "id": "0x2000", "highlight": true}
+            {
+              "name": "sys",
+              "value": "<module>",
+              "type": "module",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "[1, 2, 3] (refcount=1)",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            }
           ],
-          "output": ["a만 참조: 2"],
-          "note": "getrefcount() = 실제(1) + 임시(1) = 2"
+          "output": [
+            "a만 참조: 2"
+          ],
+          "note": "getrefcount() = 실제(1) + 임시(1) = 2",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 6,
         "title": "두 번째 참조 추가 (b = a)",
         "explanation": "**`b = a`**\n\n**참조 추가**: 변수 `b`도 `a`와 **똑같은 리스트 객체(0x2000)**를 가리키게 됩니다.\n\n**중요**: 새로운 리스트를 만드는 것이 아니라, **같은 객체를 가리킴**!\n\n**참조 횟수 변화**:\n- 이전: `a` (1개) → refcount = 1\n- 현재: `a`, `b` (2개) → refcount = 2\n\n**메모리 구조**:\n```\na → [1, 2, 3] (0x2000) ← b  (같은 객체!)\n```\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: b = a → b가 0x2000을 가리킴 → refcount 1→2 증가 → line 7",
-        "highlight": [6],
+        "highlight": [
+          6
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module>", "type": "module", "id": "0x1000"},
-            {"name": "a", "value": "[1, 2, 3] (refcount=2)", "type": "list", "id": "0x2000", "highlight": true},
-            {"name": "b", "value": "→ same as a (0x2000)", "type": "reference", "highlight": true}
+            {
+              "name": "sys",
+              "value": "<module>",
+              "type": "module",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "[1, 2, 3] (refcount=2)",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "value": "→ same as a (0x2000)",
+              "type": "reference",
+              "highlight": true
+            }
           ],
-          "output": ["a만 참조: 2"],
-          "note": "b = a 실행, refcount 1→2 증가"
+          "output": [
+            "a만 참조: 2"
+          ],
+          "note": "b = a 실행, refcount 1→2 증가",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 7,
         "title": "늘어난 참조 횟수 확인 (2개)",
         "explanation": "**`print(f\"a, b 참조: {sys.getrefcount(a)}\")`**\n\n참조 횟수를 다시 확인합니다.\n\n**계산**:\n1. 실제 참조: `a`, `b` (2개)\n2. 임시 참조: `getrefcount(a)` 호출 시 +1\n3. 결과: 2 + 1 = **3**\n\n**검증**:\n- `a`와 `b`는 같은 객체(0x2000)를 가리킴\n- `sys.getrefcount(a)` = `sys.getrefcount(b)` (같은 결과!)\n\n**왜 이 순서인가?** b = a 실행 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: sys.getrefcount(a) 호출 → refcount 읽기 (3) → f-string 평가 → print 실행 → line 9",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module>", "type": "module", "id": "0x1000"},
-            {"name": "a", "value": "[1, 2, 3] (refcount=2)", "type": "list", "id": "0x2000"},
-            {"name": "b", "value": "→ 0x2000", "type": "reference"}
+            {
+              "name": "sys",
+              "value": "<module>",
+              "type": "module",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "[1, 2, 3] (refcount=2)",
+              "type": "list",
+              "id": "0x2000"
+            },
+            {
+              "name": "b",
+              "value": "→ 0x2000",
+              "type": "reference"
+            }
           ],
-          "output": ["a만 참조: 2", "a, b 참조: 3"],
-          "note": "getrefcount() = 실제(2) + 임시(1) = 3"
+          "output": [
+            "a만 참조: 2",
+            "a, b 참조: 3"
+          ],
+          "note": "getrefcount() = 실제(2) + 임시(1) = 3",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 9,
         "title": "세 번째 참조 추가 (c = a)",
         "explanation": "**`c = a`**\n\n**참조 추가**: 변수 `c`도 같은 리스트 객체(0x2000)를 가리킵니다.\n\n**참조 횟수 변화**:\n- 이전: `a`, `b` (2개) → refcount = 2\n- 현재: `a`, `b`, `c` (3개) → refcount = 3\n\n**메모리 구조**:\n```\na → [1, 2, 3] (0x2000) ← b\n          ↑\n          c  (모두 같은 객체!)\n```\n\n**핵심**: 리스트는 여전히 **단 하나**만 존재합니다!\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: c = a → c가 0x2000을 가리킴 → refcount 2→3 증가 → line 10",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module>", "type": "module", "id": "0x1000"},
-            {"name": "a", "value": "[1, 2, 3] (refcount=3)", "type": "list", "id": "0x2000", "highlight": true},
-            {"name": "b", "value": "→ 0x2000", "type": "reference"},
-            {"name": "c", "value": "→ 0x2000", "type": "reference", "highlight": true}
+            {
+              "name": "sys",
+              "value": "<module>",
+              "type": "module",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "[1, 2, 3] (refcount=3)",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "value": "→ 0x2000",
+              "type": "reference"
+            },
+            {
+              "name": "c",
+              "value": "→ 0x2000",
+              "type": "reference",
+              "highlight": true
+            }
           ],
-          "output": ["a만 참조: 2", "a, b 참조: 3"],
-          "note": "c = a 실행, refcount 2→3 증가"
+          "output": [
+            "a만 참조: 2",
+            "a, b 참조: 3"
+          ],
+          "note": "c = a 실행, refcount 2→3 증가",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 10,
         "title": "다시 늘어난 참조 횟수 확인 (3개)",
         "explanation": "**`print(f\"a, b, c 참조: {sys.getrefcount(a)}\")`**\n\n참조 횟수를 다시 확인합니다.\n\n**계산**:\n1. 실제 참조: `a`, `b`, `c` (3개)\n2. 임시 참조: `getrefcount(a)` 호출 시 +1\n3. 결과: 3 + 1 = **4**\n\n**참조 횟수 증가 추이**:\n```\na = [1, 2, 3]  → refcount = 1 (출력: 2)\nb = a          → refcount = 2 (출력: 3)\nc = a          → refcount = 3 (출력: 4)\n```\n\n**왜 이 순서인가?** c = a 실행 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: sys.getrefcount(a) 호출 → refcount 읽기 (4) → f-string 평가 → print 실행 → line 12",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module>", "type": "module", "id": "0x1000"},
-            {"name": "a", "value": "[1, 2, 3] (refcount=3)", "type": "list", "id": "0x2000"},
-            {"name": "b", "value": "→ 0x2000", "type": "reference"},
-            {"name": "c", "value": "→ 0x2000", "type": "reference"}
+            {
+              "name": "sys",
+              "value": "<module>",
+              "type": "module",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "[1, 2, 3] (refcount=3)",
+              "type": "list",
+              "id": "0x2000"
+            },
+            {
+              "name": "b",
+              "value": "→ 0x2000",
+              "type": "reference"
+            },
+            {
+              "name": "c",
+              "value": "→ 0x2000",
+              "type": "reference"
+            }
           ],
-          "output": ["a만 참조: 2", "a, b 참조: 3", "a, b, c 참조: 4"],
-          "note": "getrefcount() = 실제(3) + 임시(1) = 4"
+          "output": [
+            "a만 참조: 2",
+            "a, b 참조: 3",
+            "a, b, c 참조: 4"
+          ],
+          "note": "getrefcount() = 실제(3) + 임시(1) = 4",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 12,
         "title": "참조 제거 (del b)",
         "explanation": "**`del b`**\n\n**del의 의미**: 변수 `b` **이름 자체**를 삭제합니다!\n\n**중요한 구분**:\n- ❌ **객체를 삭제하는 것이 아님!**\n- ✅ **변수(참조)만 삭제함!**\n\n**참조 횟수 변화**:\n1. `b`가 가리키던 객체(0x2000)와의 연결 끊김\n2. refcount 감소: 3 → 2\n3. 객체는 여전히 존재 (a와 c가 참조하므로)\n\n**만약 refcount가 0이 되면?**\n```python\ndel a\ndel b\ndel c  # 마지막 참조 삭제 → refcount = 0 → 객체 즉시 메모리 해제!\n```\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: del b → b 변수 삭제 → refcount 3→2 감소 → line 13",
-        "highlight": [12],
+        "highlight": [
+          12
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module>", "type": "module", "id": "0x1000"},
-            {"name": "a", "value": "[1, 2, 3] (refcount=2)", "type": "list", "id": "0x2000", "highlight": true},
-            {"name": "c", "value": "→ 0x2000", "type": "reference"}
+            {
+              "name": "sys",
+              "value": "<module>",
+              "type": "module",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "[1, 2, 3] (refcount=2)",
+              "type": "list",
+              "id": "0x2000",
+              "highlight": true
+            },
+            {
+              "name": "c",
+              "value": "→ 0x2000",
+              "type": "reference"
+            }
           ],
-          "output": ["a만 참조: 2", "a, b 참조: 3", "a, b, c 참조: 4"],
-          "note": "del b 실행, refcount 3→2 감소 (객체는 살아있음!)"
+          "output": [
+            "a만 참조: 2",
+            "a, b 참조: 3",
+            "a, b, c 참조: 4"
+          ],
+          "note": "del b 실행, refcount 3→2 감소 (객체는 살아있음!)",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 13,
         "title": "줄어든 참조 횟수 확인",
         "explanation": "**`print(f\"del b 후: {sys.getrefcount(a)}\")`**\n\n최종 참조 횟수를 확인합니다.\n\n**계산**:\n1. 실제 참조: `a`, `c` (2개) ← `b`는 삭제됨!\n2. 임시 참조: `getrefcount(a)` 호출 시 +1\n3. 결과: 2 + 1 = **3**\n\n**참조 카운팅 정리**:\n```python\na = [1, 2, 3]  # refcount = 1 (출력: 2)\nb = a          # refcount = 2 (출력: 3)\nc = a          # refcount = 3 (출력: 4)\ndel b          # refcount = 2 (출력: 3) ← 다시 감소!\n```\n\n**핵심 원리**:\n- Python은 각 객체의 참조 횟수를 실시간으로 추적\n- refcount = 0 → **즉시 메모리 해제** (CPython 특징)\n- 다른 언어(Java, C#)는 가비지 컬렉터가 나중에 처리\n\n**왜 이 순서인가?** del b 실행 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: sys.getrefcount(a) 호출 → refcount 읽기 (3) → f-string 평가 → print 실행 → 프로그램 종료",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "sys", "value": "<module>", "type": "module", "id": "0x1000"},
-            {"name": "a", "value": "[1, 2, 3] (refcount=2)", "type": "list", "id": "0x2000"},
-            {"name": "c", "value": "→ 0x2000", "type": "reference"}
+            {
+              "name": "sys",
+              "value": "<module>",
+              "type": "module",
+              "id": "0x1000"
+            },
+            {
+              "name": "a",
+              "value": "[1, 2, 3] (refcount=2)",
+              "type": "list",
+              "id": "0x2000"
+            },
+            {
+              "name": "c",
+              "value": "→ 0x2000",
+              "type": "reference"
+            }
           ],
-          "output": ["a만 참조: 2", "a, b 참조: 3", "a, b, c 참조: 4", "del b 후: 3"],
-          "note": "getrefcount() = 실제(2) + 임시(1) = 3"
+          "output": [
+            "a만 참조: 2",
+            "a, b 참조: 3",
+            "a, b, c 참조: 4",
+            "del b 후: 3"
+          ],
+          "note": "getrefcount() = 실제(2) + 임시(1) = 3",
+          "names": [],
+          "objects": []
         }
-    }
+      }
     ]
   },
   "quiz": {

@@ -19,6 +19,7 @@ import pythonSimulatorRoutes from './modules/simulators/python/routes';
 import { javaSimulatorRoutes } from './modules/simulators/java/routes';
 import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
 import { standaloneQuizzesRoutes } from './modules/standalone-quizzes/routes';
+import { subscriptionRoutes } from './modules/subscription';
 import { lessonContentLoader } from './services/lessonContentLoader';
 
 // Firebase Admin 초기화
@@ -85,6 +86,7 @@ app.use('/api/v1/gamification', rateLimit, gamificationRoutes);
 app.use('/api/v1/admin', rateLimit, adminRoutes);
 app.use('/api/v1/users', rateLimit, userRoutes);
 app.use('/api/v1/standalone-quizzes', rateLimit, standaloneQuizzesRoutes);
+app.use('/api/v1/subscription', rateLimit, subscriptionRoutes);
 
 // =============================================
 // Legacy Routes (버전 없는 요청 → v1로 리다이렉트)

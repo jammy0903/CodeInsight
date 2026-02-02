@@ -18,11 +18,11 @@ import {
 } from '@/services/analytics';
 import { AlertCircle, Calendar, TrendingUp, LogIn } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { StreakCard, useStreak } from '@/features/gamification';
 
 // 컴포넌트
 import { StatsCards } from './components/StatsCards';
 import { ActivityChart } from './components/ActivityChart';
-import { WeekdayChart } from './components/WeekdayChart';
 import { HourlyChart } from './components/HourlyChart';
 import { AIInsights } from './components/AIInsights';
 import { WeakConcepts } from './components/WeakConcepts';
@@ -39,6 +39,7 @@ const PERIOD_LABELS: Record<Period, string> = {
 
 export function ReportPage() {
   const { appUser, setPageTitle } = useStore();
+  const { streak, loading: streakLoading } = useStreak();
 
   const [period, setPeriod] = useState<Period>('30d');
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
@@ -49,7 +50,7 @@ export function ReportPage() {
 
   // 페이지 제목 설정
   useEffect(() => {
-    setPageTitle('학습 리포트', '나의 학습 패턴을 분석합니다');
+    setPageTitle('나의 학습', '학습 현황과 패턴을 분석합니다');
   }, [setPageTitle]);
 
   // 데이터 로드
@@ -188,7 +189,7 @@ export function ReportPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">
-            {appUser.nickname}님의 학습 리포트
+            {appUser.nickname}님의 학습 현황
           </h1>
           <p className="text-[var(--theme-dashboard-text-muted)] mt-1">
             <Calendar className="w-4 h-4 inline-block mr-1" />
@@ -214,6 +215,9 @@ export function ReportPage() {
         </div>
       </div>
 
+      {/* Streak Card */}
+      <StreakCard streak={streak} variant="full" loading={streakLoading} />
+
       {/* Stats Cards */}
       <StatsCards summary={summary} />
 
@@ -222,11 +226,8 @@ export function ReportPage() {
         {/* Daily Activity */}
         <ActivityChart dailyActivity={summary.dailyActivity} period={period} />
 
-        {/* Weekday & Hourly Charts */}
-        <div className="space-y-6">
-          <WeekdayChart weekdayActivity={summary.weekdayActivity} />
-          <HourlyChart hourlyActivity={summary.hourlyActivity} />
-        </div>
+        {/* Hourly Chart */}
+        <HourlyChart hourlyActivity={summary.hourlyActivity} />
       </div>
 
       {/* AI Insights */}

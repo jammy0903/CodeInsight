@@ -13,9 +13,9 @@ import { create } from 'zustand';
 import { getStepExplanationStream } from '@/services/ai';
 import type { LessonStep, SupportedLanguage } from '@/types';
 
-// 캐시 키 생성
-function getCacheKey(line: number, code: string): string {
-  return `${line}:${code}`;
+// 캐시 키 생성 (line 번호만 사용 - step.code는 일부일 수 있음)
+function getCacheKey(line: number): string {
+  return `${line}`;
 }
 
 // fullCode에서 특정 라인의 코드 추출
@@ -56,16 +56,25 @@ interface ExplanationState {
 export const useExplanationStore = create<ExplanationState>((set, get) => {
   // 내부 상태
   let abortController: AbortController | null = null;
+  let processQueueId = 0;  // 큐 처리 ID (race condition 방지)
 
   // 큐 처리 함수
-  const processQueue = async () => {
+  const processQueue = async (queueId: number) => {
     const state = get();
+
+    // race condition 확인: 현재 processQueue가 최신인지 확인
+    if (queueId !== processQueueId) {
+      console.log('[ExplanationStore] Skipping stale processQueue');
+      return;
+    }
+
     if (state.queue.length === 0 || !state.isProcessing) {
       set({ isProcessing: false, streamingKey: null, streamingContent: '' });
       return;
     }
 
     const [current, ...rest] = state.queue;
+    console.log('[processQueue] Processing:', { line: current.step.line, code: current.step.code?.substring(0, 20), cacheKey: current.cacheKey });
     set({ queue: rest, streamingKey: current.cacheKey, streamingContent: '' });
 
     try {
@@ -114,6 +123,12 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
         }
       );
 
+      // ⭐ 결과 받은 후 ID 재확인 (다른 startPrefetch가 호출되었을 수 있음)
+      if (queueId !== processQueueId) {
+        console.log('[ExplanationStore] Discarding result for stale queueId:', queueId);
+        return;
+      }
+
       // 완료된 설명 캐시에 저장 (SKIP이면 빈 문자열로)
       const finalResult = result.trim().toUpperCase() === 'SKIP' ? '' : result;
       set((s) => {
@@ -135,8 +150,10 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
     const nextState = get();
     if (nextState.isProcessing && nextState.queue.length > 0) {
       // 약간의 딜레이로 Ollama 과부하 방지
-      setTimeout(() => processQueue(), 100);
+      console.log('[ExplanationStore] Queue remaining:', nextState.queue.length);
+      setTimeout(() => processQueue(queueId), 200);
     } else {
+      console.log('[ExplanationStore] Prefetch complete');
       set({ isProcessing: false, streamingKey: null, streamingContent: '' });
     }
   };
@@ -155,13 +172,20 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
       }
       abortController = new AbortController();
 
+      // processQueue ID 증가 (이전 실행 취소)
+      processQueueId++;
+      const currentQueueId = processQueueId;
+
       // 캐시 초기화 및 큐 생성
       const newQueue: QueueItem[] = steps.map((step) => ({
         step,
         fullCode,
         language,
-        cacheKey: getCacheKey(step.line, getCodeAtLine(fullCode, step.line)),
+        cacheKey: getCacheKey(step.line),
       }));
+
+      console.log('[ExplanationStore] Starting prefetch for', newQueue.length, 'steps (queueId:', currentQueueId, ')');
+      console.log('[ExplanationStore] First 3 items:', newQueue.slice(0, 3).map(q => ({ line: q.step.line, code: q.step.code?.substring(0, 20), cacheKey: q.cacheKey })));
 
       set({
         cache: new Map(),
@@ -171,8 +195,8 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
         streamingContent: '',
       });
 
-      // 큐 처리 시작
-      processQueue();
+      // 큐 처리 시작 (다음 틱에서 실행하여 상태 업데이트 보장)
+      setTimeout(() => processQueue(currentQueueId), 0);
     },
 
     stopPrefetch: () => {
@@ -189,17 +213,17 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
     },
 
     getExplanation: (line, code) => {
-      const key = getCacheKey(line, code);
+      const key = getCacheKey(line);
       return get().cache.get(key) || null;
     },
 
     isStreaming: (line, code) => {
-      const key = getCacheKey(line, code);
+      const key = getCacheKey(line);
       return get().streamingKey === key;
     },
 
     getStreamingContent: (line, code) => {
-      const key = getCacheKey(line, code);
+      const key = getCacheKey(line);
       const state = get();
       if (state.streamingKey === key) {
         return state.streamingContent;
@@ -211,7 +235,7 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
 
 // 셀렉터 - 실제 상태 값을 직접 구독해야 리렌더 발생
 export const useExplanation = (line: number, code: string) => {
-  const key = getCacheKey(line, code);
+  const key = getCacheKey(line);
 
   // 각 상태를 개별적으로 구독 (값이 바뀌면 리렌더)
   const streamingKey = useExplanationStore((s) => s.streamingKey);

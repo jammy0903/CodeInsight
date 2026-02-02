@@ -3,18 +3,21 @@
 # ========================================
 # CodeInsight Development Server Starter
 # ========================================
-# ⚠️  개발(development) 환경 전용 스크립트입니다.
+# 개발(development) 환경 전용 스크립트
 #
-# 프로덕션(production) 배포는:
-#   docker compose up -d 명령어를 사용하세요!
+# 사용: ./start-dev.sh
 #
 # 이 스크립트는:
+#   - NODE_ENV=development 설정
+#   - .env.development 파일 사용
 #   - Backend (3002) -> Frontend (5174) 순차 실행
 #   - 포트 충돌 시 자동 kill
 #   - Ctrl+C로 종료
 # ========================================
 
 set -e
+
+export NODE_ENV=development
 
 BACKEND_PORT=3002
 FRONTEND_PORT=5174
@@ -29,7 +32,8 @@ NC='\033[0m'
 
 echo -e "${CYAN}"
 echo "╔═══════════════════════════════════════╗"
-echo "║        CodeInsight Dev Server         ║"
+echo "║   CodeInsight Dev Server (개발모드)    ║"
+echo "║   NODE_ENV=development                ║"
 echo "╚═══════════════════════════════════════╝"
 echo -e "${NC}"
 
@@ -71,12 +75,27 @@ if [ ! -d "node_modules" ]; then
     pnpm install
 fi
 
-# Backend 캐시 삭제 (TypeScript 빌드 캐시)
+# Backend 캐시 삭제
 echo -e "${YELLOW}[...] Backend 캐시 삭제 중...${NC}"
 rm -rf dist node_modules/.cache .tsbuildinfo 2>/dev/null || true
 echo -e "${GREEN}[✓] Backend 캐시 삭제 완료${NC}"
 
-pnpm run dev &
+# DB Seed 확인
+echo -e "${YELLOW}[...] DB Seed 상태 확인 중...${NC}"
+if npx tsx scripts/check-seed.ts 2>/dev/null; then
+    echo -e "${GREEN}[✓] DB Seed 확인 완료${NC}"
+else
+    EXIT_CODE=$?
+    if [ $EXIT_CODE -eq 1 ]; then
+        echo -e "${YELLOW}[!] Seed 데이터 없음 - 자동 실행${NC}"
+        npx prisma db seed
+        echo -e "${GREEN}[✓] Seed 완료${NC}"
+    else
+        echo -e "${YELLOW}[!] DB 연결 실패 - Seed 스킵 (서버 시작 후 수동 실행 필요)${NC}"
+    fi
+fi
+
+NODE_ENV=development pnpm run dev &
 BACKEND_PID=$!
 
 # Backend 준비 대기
@@ -101,7 +120,7 @@ if [ ! -d "node_modules" ]; then
     pnpm install
 fi
 
-# Vite 캐시 삭제 (shared 패키지 변경 반영)
+# Vite 캐시 삭제
 echo -e "${YELLOW}[...] Vite 캐시 삭제 중...${NC}"
 rm -rf node_modules/.vite .vite 2>/dev/null || true
 echo -e "${GREEN}[✓] 캐시 삭제 완료${NC}"
@@ -118,6 +137,7 @@ echo "║           서버 실행 완료!              ║"
 echo "╠═══════════════════════════════════════╣"
 echo "║  Frontend: http://localhost:$FRONTEND_PORT      ║"
 echo "║  Backend:  http://localhost:$BACKEND_PORT       ║"
+echo "║  Mode:     development                ║"
 echo "╠═══════════════════════════════════════╣"
 echo "║  종료: Ctrl+C                         ║"
 echo "╚═══════════════════════════════════════╝"

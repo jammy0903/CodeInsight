@@ -9,132 +9,306 @@
         "line": 1,
         "title": "필요한 헤더 포함",
         "explanation": "**`#include <stdio.h>`** 와 **`#include <stdlib.h>`**\n\n`printf` 함수와 동적 메모리 할당(`malloc`, `free`) 함수를 사용하기 위해 필요한 헤더 파일들을 포함합니다.",
-        "highlight": [1, 2],
+        "highlight": [
+          1,
+          2
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 4,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": [] }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 5,
         "title": "배열 크기 정의",
         "explanation": "**`int rows = 2, cols = 3;`**\n\n생성할 2차원 배열의 행(rows)과 열(cols) 크기를 변수에 저장합니다.",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "rows", "type": "int", "value": "2" },
-            { "name": "cols", "type": "int", "value": "3" }
-          ]
-        }
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 7,
         "title": "1단계: 행 포인터 배열 할당",
         "explanation": "**`int **matrix = (int **)malloc(rows * sizeof(int *));`**\n\n힙(Heap)에 2차원 배열의 **행들을 가리킬 포인터들을 담을 배열**을 먼저 할당합니다. `int*` 타입의 포인터를 `rows`개(2개) 저장할 공간을 만드는 것입니다. `matrix`는 이 포인터 배열의 시작 주소를 가리킵니다.",
-        "highlight": [7],
+        "highlight": [
+          7
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "rows", "type": "int", "value": "2" },
-            { "name": "cols", "type": "int", "value": "3" },
-            { "name": "matrix", "type": "int**", "value": "0xHEAP1" }
-          ],
-          "heap": [
-            { "address": "0xHEAP1", "label": "행 포인터 배열", "value": ["???", "???"] }
-          ]
-        }
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "행 포인터 배열",
+            "value": [
+              "???",
+              "???"
+            ]
+          }
+        ],
+        "stdout": ""
       },
       {
         "line": 9,
         "title": "2단계: 각 행의 데이터 공간 할당 (루프 시작)",
         "explanation": "**`for (int i = 0; i < rows; i++) { ... }`**\n\n반복문을 돌면서 각 행에 실제 데이터(`int`)가 저장될 공간을 할당합니다.",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "rows", "type": "int", "value": "2" },
-            { "name": "cols", "type": "int", "value": "3" },
-            { "name": "matrix", "type": "int**", "value": "0xHEAP1" },
-            { "name": "i", "type": "int", "value": "0" }
-          ],
-          "heap": [
-            { "address": "0xHEAP1", "label": "행 포인터 배열", "value": ["???", "???"] }
-          ]
-        }
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "0"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "행 포인터 배열",
+            "value": [
+              "???",
+              "???"
+            ]
+          }
+        ],
+        "stdout": ""
       },
       {
         "line": 10,
         "title": "첫 번째 행(row 0) 할당",
         "explanation": "**`matrix[0] = (int *)malloc(cols * sizeof(int));`**\n\n`i`가 0일 때, `cols`개(3개)의 `int`를 저장할 공간을 힙에 할당하고, 그 시작 주소를 `matrix[0]`에 저장합니다.",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "rows", "type": "int", "value": "2" },
-            { "name": "cols", "type": "int", "value": "3" },
-            { "name": "matrix", "type": "int**", "value": "0xHEAP1" },
-            { "name": "i", "type": "int", "value": "0" }
-          ],
-          "heap": [
-            { "address": "0xHEAP1", "label": "행 포인터 배열", "value": ["0xHEAP2", "???"] },
-            { "address": "0xHEAP2", "label": "Row 0 데이터", "value": ["?", "?", "?"] }
-          ]
-        }
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "0"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "행 포인터 배열",
+            "value": [
+              "0xHEAP2",
+              "???"
+            ]
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 데이터",
+            "value": [
+              "?",
+              "?",
+              "?"
+            ]
+          }
+        ],
+        "stdout": ""
       },
       {
         "line": 10,
         "title": "두 번째 행(row 1) 할당",
         "explanation": "**`matrix[1] = (int *)malloc(cols * sizeof(int));`**\n\n`i`가 1로 증가하여, 두 번째 행을 위한 공간을 힙에 할당하고, 그 시작 주소를 `matrix[1]`에 저장합니다. 이제 2x3 배열의 모든 공간이 힙에 마련되었습니다.",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "rows", "type": "int", "value": "2" },
-            { "name": "cols", "type": "int", "value": "3" },
-            { "name": "matrix", "type": "int**", "value": "0xHEAP1" },
-            { "name": "i", "type": "int", "value": "1" }
-          ],
-          "heap": [
-            { "address": "0xHEAP1", "label": "행 포인터 배열", "value": ["0xHEAP2", "0xHEAP3"] },
-            { "address": "0xHEAP2", "label": "Row 0 데이터", "value": ["?", "?", "?"] },
-            { "address": "0xHEAP3", "label": "Row 1 데이터", "value": ["?", "?", "?"] }
-          ],
-          "note": "각 행은 힙의 다른 위치에 있을 수 있습니다."
-        }
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "1"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "행 포인터 배열",
+            "value": [
+              "0xHEAP2",
+              "0xHEAP3"
+            ]
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 데이터",
+            "value": [
+              "?",
+              "?",
+              "?"
+            ]
+          },
+          {
+            "address": "0xHEAP3",
+            "label": "Row 1 데이터",
+            "value": [
+              "?",
+              "?",
+              "?"
+            ]
+          }
+        ],
+        "stdout": ""
       },
       {
         "line": 13,
         "title": "값 할당 및 접근",
         "explanation": "**`matrix[0][1] = 99;`**\n\n이제 `matrix`를 일반적인 2차원 배열처럼 자연스럽게 사용할 수 있습니다. `matrix[0]`가 첫 번째 행을 가리키고, `[1]`은 그 행의 두 번째 요소를 의미합니다.",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [
-            { "name": "rows", "type": "int", "value": "2" },
-            { "name": "cols", "type": "int", "value": "3" },
-            { "name": "matrix", "type": "int**", "value": "0xHEAP1" }
-          ],
-          "heap": [
-            { "address": "0xHEAP1", "label": "행 포인터 배열", "value": ["0xHEAP2", "0xHEAP3"] },
-            { "address": "0xHEAP2", "label": "Row 0 데이터", "value": ["?", "99", "?"] },
-            { "address": "0xHEAP3", "label": "Row 1 데이터", "value": ["?", "?", "?"] }
-          ]
-        }
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "행 포인터 배열",
+            "value": [
+              "0xHEAP2",
+              "0xHEAP3"
+            ]
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 데이터",
+            "value": [
+              "?",
+              "99",
+              "?"
+            ]
+          },
+          {
+            "address": "0xHEAP3",
+            "label": "Row 1 데이터",
+            "value": [
+              "?",
+              "?",
+              "?"
+            ]
+          }
+        ],
+        "stdout": ""
       },
       {
         "line": 14,
         "title": "값 출력",
         "explanation": "**`printf(\"matrix[0][1] = %d\\n\", matrix[0][1]);`**\n\n할당한 위치의 값을 읽어서 화면에 출력합니다.",
-        "highlight": [14],
+        "highlight": [
+          14
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "output": ["matrix[0][1] = 99"] }
+        "stdout": "matrix[0][1] = 99",
+        "stack": [],
+        "heap": []
       },
       {
         "line": 16,
@@ -142,15 +316,21 @@
         "explanation": "이 코드에는 없지만, 이렇게 할당된 메모리는 **할당의 역순**으로 해제해야 합니다. 먼저 반복문을 돌며 각 행(`matrix[i]`)을 `free`하고, 마지막으로 행 포인터 배열(`matrix`) 자체를 `free`해야 메모리 누수를 막을 수 있습니다.\n\n`for (i) { free(matrix[i]); }`\n`free(matrix);`",
         "highlight": [],
         "visualizationType": "cMemory",
-        "cMemoryState": { "note": "메모리 해제는 할당의 역순!" }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 16,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
-        "highlight": [16],
+        "highlight": [
+          16
+        ],
         "visualizationType": "cMemory",
-        "cMemoryState": { "stack": [], "heap": [], "output": ["matrix[0][1] = 99"] }
+        "stdout": "matrix[0][1] = 99",
+        "stack": [],
+        "heap": []
       }
     ]
   },

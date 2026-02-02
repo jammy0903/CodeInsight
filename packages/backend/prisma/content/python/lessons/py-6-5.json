@@ -9,183 +9,450 @@
         "line": 1,
         "title": "Dog 클래스 정의",
         "explanation": "**`class Dog:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Dog` 클래스를 정의합니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Dog 실행 → Dog 클래스 등록 시작 → line 2",
-        "highlight": [1],
+        "highlight": [
+          1
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            }
           ],
           "output": [],
-          "note": "클래스 정의 시작"
+          "note": "클래스 정의 시작",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 2,
         "title": "bark 메서드 정의",
         "explanation": "**`def bark(self):`**\n\nbark 메서드를 정의합니다.\n\n**메서드는 함수 객체**: `bark`는 함수 객체(0x1100)로 생성되어 Dog 클래스에 등록됩니다.\n\n**self의 의미**: 나중에 이 메서드를 호출할 때, **어떤 객체가 호출했는지**를 구분하는 매개변수입니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def bark 실행 → bark 함수 객체 0x1100 생성 → Dog.bark에 등록 → Dog 클래스 정의 완료 → line 5",
-        "highlight": [2, 3],
+        "highlight": [
+          2,
+          3
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100",
+              "highlight": true
+            }
           ],
           "output": [],
-          "note": "bark 메서드(함수 객체) 정의됨"
+          "note": "bark 메서드(함수 객체) 정의됨",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 5,
         "title": "Dog 인스턴스 생성",
         "explanation": "**`my_dog = Dog()`**\n\nDog 클래스의 인스턴스를 생성합니다.\n\n**생성된 객체**: my_dog (0x2000)\n\n**왜 이 순서인가?** 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog() 호출 → 객체 0x2000 생성 → my_dog = 0x2000 → line 8",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100"},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100"
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000",
+              "highlight": true
+            }
           ],
           "output": [],
-          "note": "my_dog 인스턴스 생성"
+          "note": "my_dog 인스턴스 생성",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 8,
         "title": "바운드 메서드 호출 (Bound Method)",
         "explanation": "**`my_dog.bark()`**\n\n**바운드 메서드(Bound Method)**: `my_dog.bark`는 **my_dog 객체에 바인딩된 메서드 객체**입니다.\n\n**Python 내부 변환**:\n```python\nmy_dog.bark()  # 사용자가 쓴 코드\n↓\nDog.bark(my_dog)  # Python이 내부적으로 변환\n```\n\n**자동 바인딩**:\n1. `my_dog.bark` 접근 시, Python은 **바운드 메서드 객체**(0x2100)를 생성\n2. 이 객체는 `Dog.bark` 함수(0x1100)와 `my_dog` 인스턴스(0x2000)를 묶음\n3. 호출 시 `my_dog`가 자동으로 `self`로 전달됨\n\n**왜 이 순서인가?** my_dog 생성 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: my_dog.bark 접근 → 바운드 메서드 0x2100 생성 → () 호출 → line 3으로 점프 → self=my_dog",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100"},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000", "highlight": true},
-            {"name": "my_dog.bark", "value": "<bound method (my_dog + bark)>", "type": "bound_method", "id": "0x2100", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100"
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000",
+              "highlight": true
+            },
+            {
+              "name": "my_dog.bark",
+              "value": "<bound method (my_dog + bark)>",
+              "type": "bound_method",
+              "id": "0x2100",
+              "highlight": true
+            }
           ],
           "output": [],
-          "note": "바운드 메서드 호출 → self 자동 전달"
+          "note": "바운드 메서드 호출 → self 자동 전달",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 3,
         "title": "bark 메서드 실행 (1번째)",
         "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\nbark 메서드가 실행됩니다.\n\n**self에 무엇이 들어왔는가?**\n- `self` = `my_dog` (0x2000) ← 자동 전달!\n\n**id(self) 함수**: 객체의 메모리 주소를 반환합니다.\n- `id(my_dog)` → 0x2000 (16진수를 10진수로 변환한 값)\n\n**출력**: \"멍멍! (id: 8192)\" (예시, 실제 값은 실행마다 다름)\n\n**왜 이 순서인가?** 메서드 호출(line 8)에서 점프해왔습니다.\n\n**실행 순서**: id(self) → id(my_dog) → 8192 → f-string 평가 → print 실행 → bark 종료 → line 8로 돌아감 → line 11",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100"},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000"},
-            {"name": "self", "value": "→ my_dog (0x2000)", "type": "parameter", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100"
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000"
+            },
+            {
+              "name": "self",
+              "value": "→ my_dog (0x2000)",
+              "type": "parameter",
+              "highlight": true
+            }
           ],
-          "output": ["멍멍! (id: 8192)"],
-          "note": "self = my_dog (바운드 메서드가 자동 전달)"
+          "output": [
+            "멍멍! (id: 8192)"
+          ],
+          "note": "self = my_dog (바운드 메서드가 자동 전달)",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 11,
         "title": "언바운드 호출 (Unbound Call)",
         "explanation": "**`Dog.bark(my_dog)`**\n\n**언바운드 호출(Unbound Call)**: 클래스에서 직접 메서드를 호출하고, **self를 명시적으로 전달**합니다.\n\n**바운드 vs 언바운드**:\n```python\n# 바운드 (일반적)\nmy_dog.bark()         # self 자동 전달\n\n# 언바운드 (드물게 사용)\nDog.bark(my_dog)      # self 명시적 전달\n```\n\n**같은 결과**: 두 방법 모두 결국 `Dog.bark` 함수에 `my_dog`를 전달하므로 결과는 동일합니다!\n\n**왜 이 순서인가?** 이전 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog.bark(my_dog) 호출 → line 3으로 점프 → self=my_dog",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100", "highlight": true},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100",
+              "highlight": true
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000",
+              "highlight": true
+            }
           ],
-          "output": ["멍멍! (id: 8192)"],
-          "note": "언바운드 호출 → self 명시적 전달"
+          "output": [
+            "멍멍! (id: 8192)"
+          ],
+          "note": "언바운드 호출 → self 명시적 전달",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 3,
         "title": "bark 메서드 실행 (2번째)",
         "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\n**같은 코드, 같은 결과**:\n- `self` = `my_dog` (0x2000) ← 명시적으로 전달받음!\n- `id(self)` → 8192 (동일!)\n\n**바운드 vs 언바운드 비교**:\n```python\n# 1번째 호출 (바운드)\nmy_dog.bark()         # self 자동 전달 → 8192 출력\n\n# 2번째 호출 (언바운드)\nDog.bark(my_dog)      # self 명시 전달 → 8192 출력 (동일!)\n```\n\n**결론**: 바운드 메서드는 **편의를 위한 문법 설탕(Syntactic Sugar)**입니다!\n\n**왜 이 순서인가?** 메서드 호출(line 11)에서 점프해왔습니다.\n\n**실행 순서**: id(self) → 8192 → f-string 평가 → print 실행 → bark 종료 → line 11로 돌아감 → line 14",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100"},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000"},
-            {"name": "self", "value": "→ my_dog (0x2000)", "type": "parameter", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100"
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000"
+            },
+            {
+              "name": "self",
+              "value": "→ my_dog (0x2000)",
+              "type": "parameter",
+              "highlight": true
+            }
           ],
-          "output": ["멍멍! (id: 8192)", "멍멍! (id: 8192)"],
-          "note": "self = my_dog (언바운드 호출도 같은 결과!)"
+          "output": [
+            "멍멍! (id: 8192)",
+            "멍멍! (id: 8192)"
+          ],
+          "note": "self = my_dog (언바운드 호출도 같은 결과!)",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 14,
         "title": "💡 바운드 메서드를 변수에 할당",
         "explanation": "**`method = my_dog.bark`**\n\n**메서드도 객체다!**\n\n**중요한 차이**:\n```python\nmy_dog.bark()   # () 있음 → 메서드 호출 (실행)\nmy_dog.bark     # () 없음 → 메서드 객체 자체 (참조)\n```\n\n**무엇이 할당되는가?**\n- `my_dog.bark` 접근 시, Python은 **바운드 메서드 객체**(0x2100)를 생성\n- 이 객체는 `Dog.bark` 함수(0x1100)와 `my_dog` 인스턴스(0x2000)를 **이미 묶어놓음**\n- `method` 변수는 이 바운드 메서드 객체(0x2100)를 가리킴\n\n**핵심**: `method`는 이미 `my_dog`에 바인딩되어 있으므로, 나중에 `method()` 호출 시 **self를 전달하지 않아도 됨**!\n\n**왜 이 순서인가?** 이전 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: my_dog.bark 접근 → 바운드 메서드 0x2100 생성 → method = 0x2100 → line 15",
-        "highlight": [14],
+        "highlight": [
+          14
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100"},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000"},
-            {"name": "method", "value": "<bound method (my_dog + bark)>", "type": "bound_method", "id": "0x2100", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100"
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000"
+            },
+            {
+              "name": "method",
+              "value": "<bound method (my_dog + bark)>",
+              "type": "bound_method",
+              "id": "0x2100",
+              "highlight": true
+            }
           ],
-          "output": ["멍멍! (id: 8192)", "멍멍! (id: 8192)"],
-          "note": "💡 바운드 메서드 객체를 변수에 저장!"
+          "output": [
+            "멍멍! (id: 8192)",
+            "멍멍! (id: 8192)"
+          ],
+          "note": "💡 바운드 메서드 객체를 변수에 저장!",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 15,
         "title": "메서드 타입 확인",
         "explanation": "**`print(type(method))`**\n\n`method` 변수의 타입을 확인합니다.\n\n**type() 함수**: 객체의 타입(클래스)을 반환합니다.\n\n**결과**: `<class 'method'>`\n- 일반적인 `<class 'function'>`이 아님!\n- `method`는 **바운드 메서드 객체**의 타입\n\n**타입 비교**:\n```python\ntype(Dog.bark)     # <class 'function'>  (언바운드 함수)\ntype(my_dog.bark)  # <class 'method'>    (바운드 메서드)\n```\n\n**왜 이 순서인가?** 바운드 메서드 할당 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: type(method) 호출 → <class 'method'> 반환 → print 실행 → line 16",
-        "highlight": [15],
+        "highlight": [
+          15
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100"},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000"},
-            {"name": "method", "value": "<bound method>", "type": "bound_method", "id": "0x2100", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100"
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000"
+            },
+            {
+              "name": "method",
+              "value": "<bound method>",
+              "type": "bound_method",
+              "id": "0x2100",
+              "highlight": true
+            }
           ],
-          "output": ["멍멍! (id: 8192)", "멍멍! (id: 8192)", "<class 'method'>"],
-          "note": "method는 'function'이 아닌 'method' 타입!"
+          "output": [
+            "멍멍! (id: 8192)",
+            "멍멍! (id: 8192)",
+            "<class 'method'>"
+          ],
+          "note": "method는 'function'이 아닌 'method' 타입!",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 16,
         "title": "💡 저장된 바운드 메서드 호출",
         "explanation": "**`method()`**\n\n**self 없이 호출 가능!**\n\n**왜 self 없이 호출되는가?**\n- `method` 변수는 **이미 my_dog에 바인딩된 메서드 객체**(0x2100)를 가리킴\n- 바운드 메서드 객체는 `Dog.bark` 함수(0x1100)와 `my_dog` 인스턴스(0x2000)를 **내부에 저장**하고 있음\n- `method()` 호출 시, **저장된 my_dog가 자동으로 self로 전달**됨!\n\n**비교**:\n```python\nmy_dog.bark()      # my_dog가 self로 전달\nmethod()           # method에 저장된 my_dog가 self로 전달 (동일!)\n```\n\n**왜 이 순서인가?** 타입 확인 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: method() 호출 → 바운드 메서드 0x2100 실행 → line 3으로 점프 → self=my_dog",
-        "highlight": [16],
+        "highlight": [
+          16
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100"},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000"},
-            {"name": "method", "value": "<bound method (my_dog + bark)>", "type": "bound_method", "id": "0x2100", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100"
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000"
+            },
+            {
+              "name": "method",
+              "value": "<bound method (my_dog + bark)>",
+              "type": "bound_method",
+              "id": "0x2100",
+              "highlight": true
+            }
           ],
-          "output": ["멍멍! (id: 8192)", "멍멍! (id: 8192)", "<class 'method'>"],
-          "note": "💡 method() 호출 → 저장된 my_dog가 self로 전달!"
+          "output": [
+            "멍멍! (id: 8192)",
+            "멍멍! (id: 8192)",
+            "<class 'method'>"
+          ],
+          "note": "💡 method() 호출 → 저장된 my_dog가 self로 전달!",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 3,
         "title": "bark 메서드 실행 (3번째)",
         "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\n**같은 결과!**\n- `self` = `my_dog` (0x2000) ← 바운드 메서드에 저장된 객체!\n- `id(self)` → 8192 (동일!)\n\n**3가지 호출 방법 비교**:\n```python\n# 1. 바운드 메서드 직접 호출\nmy_dog.bark()         # self 자동 전달 → 8192 출력\n\n# 2. 언바운드 호출\nDog.bark(my_dog)      # self 명시 전달 → 8192 출력\n\n# 3. 저장된 바운드 메서드 호출\nmethod = my_dog.bark\nmethod()              # 저장된 my_dog가 self로 전달 → 8192 출력\n```\n\n**결론**: 모든 방법의 결과는 동일! 바운드 메서드는 **편의성**을 위한 것입니다.\n\n**왜 이 순서인가?** 메서드 호출(line 16)에서 점프해왔습니다.\n\n**실행 순서**: id(self) → 8192 → f-string 평가 → print 실행 → bark 종료 → 프로그램 종료",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "Dog", "value": "<class>", "type": "class", "id": "0x1000"},
-            {"name": "Dog.bark", "value": "<function>", "type": "function", "id": "0x1100"},
-            {"name": "my_dog", "value": "<Dog object>", "type": "instance", "id": "0x2000"},
-            {"name": "method", "value": "<bound method>", "type": "bound_method", "id": "0x2100"},
-            {"name": "self", "value": "→ my_dog (0x2000)", "type": "parameter", "highlight": true}
+            {
+              "name": "Dog",
+              "value": "<class>",
+              "type": "class",
+              "id": "0x1000"
+            },
+            {
+              "name": "Dog.bark",
+              "value": "<function>",
+              "type": "function",
+              "id": "0x1100"
+            },
+            {
+              "name": "my_dog",
+              "value": "<Dog object>",
+              "type": "instance",
+              "id": "0x2000"
+            },
+            {
+              "name": "method",
+              "value": "<bound method>",
+              "type": "bound_method",
+              "id": "0x2100"
+            },
+            {
+              "name": "self",
+              "value": "→ my_dog (0x2000)",
+              "type": "parameter",
+              "highlight": true
+            }
           ],
-          "output": ["멍멍! (id: 8192)", "멍멍! (id: 8192)", "<class 'method'>", "멍멍! (id: 8192)"],
-          "note": "self = my_dog (바운드 메서드에 저장된 객체!)"
+          "output": [
+            "멍멍! (id: 8192)",
+            "멍멍! (id: 8192)",
+            "<class 'method'>",
+            "멍멍! (id: 8192)"
+          ],
+          "note": "self = my_dog (바운드 메서드에 저장된 객체!)",
+          "names": [],
+          "objects": []
         }
-    }
+      }
     ]
   },
   "quiz": {

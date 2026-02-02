@@ -6,6 +6,26 @@
     "code": "class BankAccount {\n    private int balance = 1000;\n\n    public synchronized void withdraw(int amount) {\n        balance -= amount;\n        System.out.println(\"출금 완료! 잔액: \" + balance);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        BankAccount account = new BankAccount();\n        // 두 일꾼이 동시에 돈을 뽑으려 한다고 가정합시다.\n    }\n}",
     "steps": [
       {
+        "line": 11,
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다. 은행 계좌를 만들고 임무를 시작합니다.",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running"
+            }
+          ],
+          "note": "메인 쓰레드 시작",
+          "heap": [],
+          "output": []
+        }
+      },
+      {
         "line": 12,
         "title": "계좌 객체 생성",
         "explanation": "공유 자원으로 사용될 `BankAccount` 객체를 생성합니다. 이 객체는 내부에 보이지 않는 '모니터 락(열쇠)'을 하나 가지고 있습니다.",
@@ -14,8 +34,20 @@
         ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{"name": "account", "value": "-> 0x001"}],
-          "heap": [{"address": "0x001", "content": "BankAccount{balance: 1000}", "hasLock": true}]
+          "stack": [
+            {
+              "name": "account",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "BankAccount{balance: 1000}",
+              "hasLock": true
+            }
+          ],
+          "output": []
         }
       },
       {
@@ -27,7 +59,14 @@
         ],
         "visualizationType": "memory",
         "memoryState": {
-            "heap": [{"address": "0x001", "lockedBy": "Thread-A"}]
+          "heap": [
+            {
+              "address": "0x001",
+              "lockedBy": "Thread-A"
+            }
+          ],
+          "stack": [],
+          "output": []
         }
       },
       {
@@ -51,7 +90,10 @@
               "action": "WAITING (Blocked)",
               "hasKey": false
             }
-          ]
+          ],
+          "stack": [],
+          "heap": [],
+          "output": []
         }
       }
     ]

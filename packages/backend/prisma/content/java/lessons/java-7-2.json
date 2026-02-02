@@ -6,6 +6,34 @@
     "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<String> list = new ArrayList<>();\n        list.add(\"Hello\");\n        \n        // 1. Compile-time Check\n        // list.add(123); // Error\n        \n        // 2. Runtime Reality (Type Erasure)\n        // Inside JVM, it is just ArrayList (raw type)\n        String s = list.get(0); \n        // Compiler inserts: (String) list.get(0)\n        \n        System.out.println(s);\n        \n        // Proof: getClass() is same for all generic types\n        ArrayList<Integer> intList = new ArrayList<>();\n        boolean sameClass = list.getClass() == intList.getClass();\n        System.out.println(\"Same Class? \" + sameClass);\n    }\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "패키지 임포트",
+        "explanation": "**`import java.util.ArrayList;`**\n\n가변 크기 배열인 `ArrayList`를 사용하기 위해 도구를 가져옵니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "line": 3,
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다. 여기서 제네릭의 '타입 소거' 현상을 목격하게 됩니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
         "line": 5,
         "title": "제네릭 리스트 생성",
         "explanation": "**실행 순서:**\n1. `ArrayList<String>` 객체를 힙에 생성합니다.\n2. `list` 변수가 이를 참조합니다.\n\n**컴파일 타임 vs 런타임:**\n코드에서는 `ArrayList<String>`이라고 명시했지만, 컴파일이 끝나면 JVM은 이걸 그냥 `ArrayList`로 취급합니다(Type Erasure). 하지만 컴파일러가 \"여긴 String만 넣어!\"라고 철저히 감시해주죠.",
@@ -33,7 +61,8 @@
               "type": "ArrayList<String>",
               "new": true
             }
-          ]
+          ],
+          "output": []
         }
       },
       {
@@ -64,7 +93,8 @@
               "type": "ArrayList<String>",
               "changed": true
             }
-          ]
+          ],
+          "output": []
         }
       },
       {
@@ -99,7 +129,8 @@
               "content": "[\"Hello\"]",
               "type": "ArrayList<String>"
             }
-          ]
+          ],
+          "output": []
         }
       },
       {

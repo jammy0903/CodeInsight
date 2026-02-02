@@ -16,5 +16,9 @@ export default defineConfig({
   server: {
     port: 5174,
     strictPort: true, // 포트가 사용 중이면 에러 발생 (다른 포트로 자동 변경 방지)
+    headers: {
+      // 개발 모드에서 CSP 완화 (로컬 백엔드 + 외부 API 허용)
+      'Content-Security-Policy': "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://apis.google.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' http://localhost:* https: wss: ws:",
+    },
   },
 });

@@ -35,7 +35,8 @@ export async function getLanguages() {
  * - lesson.id만 조회 (description, difficulty 등 제외)
  * - 진행률은 별도 쿼리로 completed만 집계
  */
-export async function getLanguageWithChapters(languageId: string, userId?: string) {
+// ... (previous code)
+export async function getLanguageWithChapters(languageId: string, userId?: string, isAdmin: boolean = false) {
   // 1. Structure (Lightweight - Lessons ID only)
   const language = await prisma.language.findUnique({
     where: { id: languageId },
@@ -89,7 +90,8 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
     ...language,
     chapters: language.chapters.map((chapter: any) => {
       const total = chapter.lessons.length;
-      const completed = chapter.lessons.filter((l: any) =>
+      // Admin은 모든 레슨을 완료한 것으로 간주 (무조건 접근 가능)
+      const completed = isAdmin ? total : chapter.lessons.filter((l: any) =>
         completedLessonIds.has(l.id)
       ).length;
 
@@ -230,7 +232,7 @@ export async function getUserProgress(userId: string, lessonId?: string) {
 /**
  * 챕터별 진행 상태 (레슨 포함)
  */
-export async function getChapterProgress(userId: string, chapterId: string) {
+export async function getChapterProgress(userId: string, chapterId: string, isAdmin: boolean = false) {
   const chapter = await prisma.chapter.findUnique({
     where: { id: chapterId },
     include: {
@@ -248,7 +250,8 @@ export async function getChapterProgress(userId: string, chapterId: string) {
 
   if (!chapter) return null;
 
-  const completedCount = chapter.lessons.filter(
+  // Admin은 모든 레슨을 완료한 것으로 처리
+  const completedCount = isAdmin ? chapter.lessons.length : chapter.lessons.filter(
     (l: any) => l.progress[0]?.status === 'completed'
   ).length;
 
@@ -258,7 +261,8 @@ export async function getChapterProgress(userId: string, chapterId: string) {
     totalCount: chapter.lessons.length,
     lessons: chapter.lessons.map((l: any) => ({
       ...l,
-      progress: l.progress[0] || null,
+      // Admin은 모든 레슨에 대해 가짜 완료 상태 반환 (접근 허용)
+      progress: isAdmin ? (l.progress[0] || { status: 'completed' }) : (l.progress[0] || null),
     })),
   };
 }

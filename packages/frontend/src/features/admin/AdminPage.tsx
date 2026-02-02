@@ -19,6 +19,9 @@ import {
   Database,
   Clock,
   HardDrive,
+  DollarSign,
+  Zap,
+  MessageSquare,
 } from 'lucide-react';
 import { AIProviderToggle } from './components/AIProviderToggle';
 import { api } from '@/services/api/axios';
@@ -69,12 +72,30 @@ interface SystemStatus {
   timestamp: string;
 }
 
+interface AIUsageStats {
+  today: { tokens: number; requests: number };
+  thisWeek: { tokens: number; requests: number };
+  thisMonth: { tokens: number; requests: number };
+  estimatedCost: {
+    today: number;
+    thisWeek: number;
+    thisMonth: number;
+  };
+  recentRequests: Array<{
+    createdAt: string;
+    context: string | null;
+    tokens: number | null;
+    questionPreview: string;
+  }>;
+}
+
 export function AdminPage() {
   const { appUser, authLoading, setPageTitle } = useStore();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<{ users: UserInfo[]; total: number; page: number; totalPages: number } | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionInfo[]>([]);
   const [system, setSystem] = useState<SystemStatus | null>(null);
+  const [aiUsage, setAIUsage] = useState<AIUsageStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [progressMode, setProgressMode] = useState<'all' | 'active'>('all');
@@ -97,17 +118,19 @@ export function AdminPage() {
       setError(null);
 
       // Fetch all admin data in parallel (axios interceptor handles auth automatically)
-      const [statsRes, usersRes, submissionsRes, systemRes] = await Promise.all([
+      const [statsRes, usersRes, submissionsRes, systemRes, aiUsageRes] = await Promise.all([
         api.get('/admin/stats'),
         api.get('/admin/users', { params: { page: 1, limit: 20 } }),
         api.get('/admin/submissions', { params: { limit: 50 } }),
         api.get('/admin/system'),
+        api.get('/admin/ai-usage'),
       ]);
 
       setStats(statsRes.data);
       setUsers(usersRes.data);
       setSubmissions(submissionsRes.data);
       setSystem(systemRes.data);
+      setAIUsage(aiUsageRes.data);
     } catch (err) {
       logger.error('Admin data fetch error:', err);
       const error = handleError(err);
@@ -252,6 +275,105 @@ export function AdminPage() {
 
         {/* AI Provider Toggle */}
         <AIProviderToggle />
+
+        {/* AI Usage & Cost */}
+        {aiUsage && (
+          <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
+            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4 flex items-center gap-3">
+              <DollarSign className="w-6 h-6 text-green-500" />
+              DeepSeek API 비용
+            </h2>
+
+            {/* 비용 카드 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-[var(--theme-dashboard-section-header-bg)] rounded-lg p-4 border border-[var(--theme-dashboard-card-border)]">
+                <div className="flex items-center gap-2 text-sm text-[var(--theme-dashboard-text-muted)] mb-1">
+                  <Zap className="w-4 h-4" />
+                  오늘
+                </div>
+                <div className="text-2xl font-bold text-[var(--theme-dashboard-title)]">
+                  ${aiUsage.estimatedCost.today.toFixed(4)}
+                </div>
+                <div className="text-xs text-[var(--theme-dashboard-text-muted)] mt-1">
+                  {aiUsage.today.tokens.toLocaleString()} tokens · {aiUsage.today.requests} 요청
+                </div>
+              </div>
+
+              <div className="bg-[var(--theme-dashboard-section-header-bg)] rounded-lg p-4 border border-[var(--theme-dashboard-card-border)]">
+                <div className="flex items-center gap-2 text-sm text-[var(--theme-dashboard-text-muted)] mb-1">
+                  <Zap className="w-4 h-4" />
+                  이번 주
+                </div>
+                <div className="text-2xl font-bold text-[var(--theme-dashboard-title)]">
+                  ${aiUsage.estimatedCost.thisWeek.toFixed(4)}
+                </div>
+                <div className="text-xs text-[var(--theme-dashboard-text-muted)] mt-1">
+                  {aiUsage.thisWeek.tokens.toLocaleString()} tokens · {aiUsage.thisWeek.requests} 요청
+                </div>
+              </div>
+
+              <div className="bg-[var(--theme-dashboard-section-header-bg)] rounded-lg p-4 border border-[var(--theme-dashboard-card-border)]">
+                <div className="flex items-center gap-2 text-sm text-[var(--theme-dashboard-text-muted)] mb-1">
+                  <Zap className="w-4 h-4" />
+                  이번 달
+                </div>
+                <div className="text-2xl font-bold text-green-500">
+                  ${aiUsage.estimatedCost.thisMonth.toFixed(4)}
+                </div>
+                <div className="text-xs text-[var(--theme-dashboard-text-muted)] mt-1">
+                  {aiUsage.thisMonth.tokens.toLocaleString()} tokens · {aiUsage.thisMonth.requests} 요청
+                </div>
+              </div>
+            </div>
+
+            {/* 최근 요청 내역 */}
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-[var(--theme-dashboard-text-muted)] mb-3 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                최근 AI 요청 (ChatHistory 기록)
+              </h3>
+              <div className="overflow-x-auto max-h-64 overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-[var(--theme-dashboard-card-bg)]">
+                    <tr className="border-b border-[var(--theme-dashboard-card-border)]">
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">시간</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">컨텍스트</th>
+                      <th className="text-right py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">토큰</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">질문</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {aiUsage.recentRequests.map((req, idx) => (
+                      <tr key={idx} className="border-b border-[var(--theme-dashboard-card-border)] hover:bg-[var(--theme-dashboard-section-header-bg)]">
+                        <td className="py-2 px-2 text-[var(--theme-dashboard-text-muted)] whitespace-nowrap">
+                          {new Date(req.createdAt).toLocaleString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                        </td>
+                        <td className="py-2 px-2">
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                            req.context === 'lesson' ? 'bg-blue-100 text-blue-700' :
+                            req.context === 'playground' ? 'bg-purple-100 text-purple-700' :
+                            'bg-gray-100 text-gray-600'
+                          }`}>
+                            {req.context || 'general'}
+                          </span>
+                        </td>
+                        <td className="py-2 px-2 text-right font-mono text-[var(--theme-dashboard-text-muted)]">
+                          {req.tokens?.toLocaleString() || '-'}
+                        </td>
+                        <td className="py-2 px-2 text-[var(--theme-dashboard-title)] truncate max-w-[200px]">
+                          {req.questionPreview}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-[var(--theme-dashboard-text-muted)] mt-3">
+                ⚠️ 참고: /explain-step (스트리밍)은 토큰 추적이 안 됨. 실제 비용은 더 높을 수 있음.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* System Status */}
         {system && (

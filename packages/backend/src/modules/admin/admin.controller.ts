@@ -72,3 +72,17 @@ export async function getSystemStatus(req: AdminRequest, res: Response): Promise
     res.status(500).json({ error: 'Failed to fetch system status' });
   }
 }
+
+/**
+ * GET /api/admin/ai-usage
+ * AI 사용량 통계 (DeepSeek 비용 추정)
+ */
+export async function getAIUsage(req: AdminRequest, res: Response): Promise<void> {
+  try {
+    const usage = await adminService.getAIUsageStats();
+    res.json(usage);
+  } catch (error) {
+    logger.error('Get AI usage error:', error);
+    res.status(500).json({ error: 'Failed to fetch AI usage statistics' });
+  }
+}

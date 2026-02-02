@@ -9,73 +9,145 @@
         "line": 2,
         "title": "튜플 생성",
         "explanation": "**`point = (10, 20)`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 소괄호 `()`로 튜플 객체를 만들고, `point` 이름표를 붙입니다.\n\n**튜플의 특징**:\n- **순서가 있음(Ordered)**: 인덱스로 접근 가능 (리스트와 같음)\n- **수정 불가능(Immutable)**: 한 번 만들면 내용 변경 불가 ⭐\n- **리스트와의 차이**:\n  * 리스트(Mutable): `fruits.append()`, `fruits[0] = x` 가능\n  * 튜플(Immutable): 수정 시도 시 TypeError\n\n**왜 이 순서인가?** 튜플을 먼저 만들어야 아래에서 읽을 수 있습니다.\n\n**실행 순서**: line 2 → 튜플 생성 (id: 0x1000) → point = 0x1000 → line 5",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "point", "value": "(10, 20)", "type": "tuple", "id": "0x1000"}
+            {
+              "name": "point",
+              "value": "(10, 20)",
+              "type": "tuple",
+              "id": "0x1000"
+            }
           ],
-          "output": []
+          "output": [],
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 5,
         "title": "항목 읽기 (인덱싱)",
         "explanation": "**`print(point[0])`**\n\n**읽기는 가능**: 튜플은 Immutable이지만, **인덱스로 값을 읽는 것은 허용**됩니다. 수정만 안 될 뿐입니다.\n\n인덱스 0(첫 번째 항목)의 값 `10`을 읽어서 출력합니다.\n\n**리스트와의 공통점**: 인덱싱 문법(`[0]`)은 리스트와 동일합니다.\n\n**왜 이 순서인가?** 튜플 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: point[0] 접근 → 10 읽기 → print 실행 → line 8 (주석)",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "point", "value": "(10, 20)", "type": "tuple", "id": "0x1000"}
+            {
+              "name": "point",
+              "value": "(10, 20)",
+              "type": "tuple",
+              "id": "0x1000"
+            }
           ],
-          "output": ["10"]
+          "output": [
+            "10"
+          ],
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 8,
         "title": "수정 시도 (에러 발생)",
         "explanation": "**`# point[0] = 99  # TypeError!`**\n\n**Immutable의 의미**: 튜플은 **생성 후 내용을 절대 바꿀 수 없습니다**. 만약 이 주석을 제거하고 실행하면:\n```\nTypeError: 'tuple' object does not support item assignment\n```\n에러가 발생합니다.\n\n**리스트와의 차이**:\n- 리스트: `fruits[0] = \"Grape\"` ✅ 가능 (Mutable)\n- 튜플: `point[0] = 99` ❌ 불가능 (Immutable)\n\n**왜 Immutable이 필요한가?**\n1. **성능**: 변경 불가 → 최적화 가능\n2. **안전성**: 실수로 데이터 변경 방지\n3. **딕셔너리 키**: 튜플은 키로 사용 가능 (리스트 불가)\n\n**실행 순서**: 주석이므로 실제 실행 안 됨 → line 11",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "point", "value": "(10, 20)", "type": "tuple", "id": "0x1000"}
+            {
+              "name": "point",
+              "value": "(10, 20)",
+              "type": "tuple",
+              "id": "0x1000"
+            }
           ],
-          "output": ["10"],
-          "note": "주석 처리되어 실제 실행 안 됨 (에러 발생 X)"
+          "output": [
+            "10"
+          ],
+          "note": "주석 처리되어 실제 실행 안 됨 (에러 발생 X)",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 11,
         "title": "튜플 언패킹(Unpacking)",
         "explanation": "**`x, y = point`**\n\n**Unpacking의 원리**: 튜플 `point`의 각 항목을 순서대로 **왼쪽 변수들에 할당**합니다.\n- `point[0]` (10) → `x`\n- `point[1]` (20) → `y`\n\n**왜 편리한가?** 함수에서 여러 값을 리턴할 때 유용합니다:\n```python\ndef get_position():\n    return (10, 20)  # 튜플 리턴\n\nx, y = get_position()  # 언패킹\n```\n\n**변수 개수가 안 맞으면?** `ValueError` 발생:\n```python\nx, y, z = point  # ValueError: not enough values to unpack\n```\n\n**왜 이 순서인가?** 주석 다음 줄을 순서대로 실행합니다.\n\n**실행 순서**: point 튜플 읽기 → x = 10, y = 20 할당 → line 12",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "point", "value": "(10, 20)", "type": "tuple", "id": "0x1000"},
-            {"name": "x", "value": "10", "type": "int", "highlight": true},
-            {"name": "y", "value": "20", "type": "int", "highlight": true}
+            {
+              "name": "point",
+              "value": "(10, 20)",
+              "type": "tuple",
+              "id": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "10",
+              "type": "int",
+              "highlight": true
+            },
+            {
+              "name": "y",
+              "value": "20",
+              "type": "int",
+              "highlight": true
+            }
           ],
-          "output": ["10"],
-          "note": "Unpacking: point[0]→x, point[1]→y"
+          "output": [
+            "10"
+          ],
+          "note": "Unpacking: point[0]→x, point[1]→y",
+          "names": [],
+          "objects": []
         }
-    },
-    {
+      },
+      {
         "line": 12,
         "title": "언패킹 결과 출력",
         "explanation": "**`print(f\"x={x}, y={y}\")`**\n\n언패킹으로 할당된 변수 `x`(10)와 `y`(20)의 값을 f-string으로 출력합니다.\n\n**왜 이 순서인가?** 언패킹 후, 순서대로 다음 줄을 실행합니다.\n\n**핵심 요약**:\n- 튜플은 **Immutable** (수정 불가)\n- 읽기는 가능 (`point[0]`)\n- Unpacking은 매우 편리한 기능 (`x, y = point`)\n- 리스트보다 빠르고 안전함\n\n**실행 순서**: f-string 평가 → print 실행 → 프로그램 종료",
-        "highlight": [12],
+        "highlight": [
+          12
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
-            {"name": "point", "value": "(10, 20)", "type": "tuple", "id": "0x1000"},
-            {"name": "x", "value": "10", "type": "int"},
-            {"name": "y", "value": "20", "type": "int"}
+            {
+              "name": "point",
+              "value": "(10, 20)",
+              "type": "tuple",
+              "id": "0x1000"
+            },
+            {
+              "name": "x",
+              "value": "10",
+              "type": "int"
+            },
+            {
+              "name": "y",
+              "value": "20",
+              "type": "int"
+            }
           ],
-          "output": ["10", "x=10, y=20"]
+          "output": [
+            "10",
+            "x=10, y=20"
+          ],
+          "names": [],
+          "objects": []
         }
-    }
+      }
     ]
   },
   "quiz": {

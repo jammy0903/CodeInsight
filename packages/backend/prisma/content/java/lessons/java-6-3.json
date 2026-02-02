@@ -6,6 +6,20 @@
     "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            dangerousTask();\n        } catch (InterruptedException e) {\n            System.out.println(\"Caught!\");\n        }\n    }\n\n    // throws: \"난 이거 처리 못해, 네가 해!\"\n    static void dangerousTask() throws InterruptedException {\n        System.out.println(\"Task Start\");\n        try {\n            Thread.sleep(1000);\n            throw new InterruptedException(); // Force Error\n        } finally {\n            System.out.println(\"Cleanup\");\n        }\n    }\n}",
     "steps": [
       {
+        "line": 2,
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램의 시작점입니다.\n\n**비유**: `main`은 사건 사고를 최종적으로 수습해야 하는 '현장 책임자'와 같습니다.",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
         "line": 4,
         "title": "위험한 메서드 호출",
         "explanation": "**실행 순서:**\n1. `main`에서 `dangerousTask()`를 호출합니다.\n2. 새로운 스택 프레임이 생성됩니다.\n\n**해설:**\n이 메서드는 `throws InterruptedException`이라고 선언되어 있습니다. 즉, \"나를 부르려면 반드시 그 예외를 처리할 준비를 해!\"라고 경고장을 날린 것입니다.",
@@ -26,7 +40,9 @@
               "frame": "dangerousTask",
               "new": true
             }
-          ]
+          ],
+          "heap": [],
+          "output": []
         }
       },
       {
@@ -88,7 +104,8 @@
           "output": [
             "Task Start",
             "Cleanup"
-          ]
+          ],
+          "heap": []
         }
       },
       {
@@ -148,7 +165,8 @@
             "Task Start",
             "Cleanup",
             "Caught!"
-          ]
+          ],
+          "heap": []
         }
       }
     ]

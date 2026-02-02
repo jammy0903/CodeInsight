@@ -3,7 +3,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { Clock, BookOpen, Target, HelpCircle, StickyNote } from 'lucide-react';
+import { Clock, BookOpen, Target, HelpCircle } from 'lucide-react';
 import type { AnalyticsSummary } from '@/services/analytics';
 
 interface StatsCardsProps {
@@ -45,17 +45,10 @@ export function StatsCards({ summary }: StatsCardsProps) {
       color: 'from-purple-400 to-purple-600',
       bgColor: 'bg-purple-50',
     },
-    {
-      label: '작성한 노트',
-      value: `${summary.notes}개`,
-      icon: StickyNote,
-      color: 'from-pink-400 to-pink-600',
-      bgColor: 'bg-pink-50',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {stats.map((stat, index) => (
         <motion.div
           key={stat.label}

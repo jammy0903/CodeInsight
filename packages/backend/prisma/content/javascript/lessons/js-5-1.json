@@ -10,25 +10,44 @@
         "title": "원시값 a = 10",
         "explanation": "숫자 10이 메모리에 저장되고, a가 그 값을 가리킵니다.",
         "keyInsight": "원시값: number, string, boolean, null, undefined, symbol, bigint",
-        "highlight": [2],
+        "highlight": [
+          2
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "stack": [{ "name": "a", "value": 10, "type": "primitive" }],
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            }
+          ],
           "heap": []
         }
       },
       {
         "line": 3,
         "title": "b = a (값 복사)",
-        "explanation": "a의 값 10이 복사되어 b에 저장됩니다. a와 b는 독립적인 값입니다.",
+        "explanation": "a의 값 10이 복사되어 b에 저장됩니다. a와 b는 독립적인 값입니다.\n\n**비유**: 종이에 적힌 숫자를 다른 종이에 베껴 쓰는 것과 같습니다. 원본 종이를 찢어도 베껴 쓴 종이는 멀쩡하죠.",
         "keyInsight": "원시값은 값 자체가 복사됩니다.",
         "analogy": "종이에 적힌 숫자를 다른 종이에 베껴 쓰는 것과 같습니다.",
-        "highlight": [3],
+        "highlight": [
+          3
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            { "name": "a", "value": 10, "type": "primitive" },
-            { "name": "b", "value": 10, "type": "primitive", "copied": true }
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 10,
+              "type": "primitive",
+              "copied": true
+            }
           ],
           "heap": []
         }
@@ -37,12 +56,23 @@
         "line": 4,
         "title": "b = 20 (독립적 변경)",
         "explanation": "b를 20으로 변경해도 a는 영향을 받지 않습니다. 서로 다른 메모리 공간입니다.",
-        "highlight": [4],
+        "highlight": [
+          4
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            { "name": "a", "value": 10, "type": "primitive" },
-            { "name": "b", "value": 20, "type": "primitive", "changed": true }
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 20,
+              "type": "primitive",
+              "changed": true
+            }
           ],
           "heap": []
         }
@@ -51,14 +81,26 @@
         "line": 5,
         "title": "원시값 출력",
         "explanation": "a는 10, b는 20입니다. 원시값은 독립적으로 존재합니다.",
-        "highlight": [5],
+        "highlight": [
+          5
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            { "name": "a", "value": 10, "type": "primitive" },
-            { "name": "b", "value": 20, "type": "primitive" }
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 20,
+              "type": "primitive"
+            }
           ],
-          "output": ["10 20"]
+          "output": [
+            "10 20"
+          ]
         }
       },
       {
@@ -66,32 +108,56 @@
         "title": "참조값 obj1 = { value: 10 }",
         "explanation": "객체는 Heap 메모리에 저장됩니다. obj1은 그 객체의 주소(참조)를 가집니다.",
         "keyInsight": "참조값: object, array, function",
-        "highlight": [8],
+        "highlight": [
+          8
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            { "name": "obj1", "value": "→ 0x001", "type": "reference" }
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            }
           ],
           "heap": [
-            { "address": "0x001", "content": "{ value: 10 }" }
+            {
+              "address": "0x001",
+              "content": "{ value: 10 }"
+            }
           ]
         }
       },
       {
         "line": 9,
         "title": "obj2 = obj1 (참조 복사)",
-        "explanation": "obj1의 참조(주소)가 복사됩니다. obj1과 obj2는 같은 객체를 가리킵니다!",
+        "explanation": "obj1의 참조(주소)가 복사됩니다. obj1과 obj2는 같은 객체를 가리킵니다!\n\n**비유**: 같은 집의 주소를 두 사람이 수첩에 적어둔 것과 같습니다. 한 사람이 집에 페인트칠을 하면, 다른 사람이 찾아갔을 때도 페인트칠 된 집을 보게 됩니다.",
         "keyInsight": "참조값은 주소가 복사됩니다. 객체 자체는 하나입니다!",
         "analogy": "같은 집의 주소를 두 사람이 적어둔 것과 같습니다.",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            { "name": "obj1", "value": "→ 0x001", "type": "reference" },
-            { "name": "obj2", "value": "→ 0x001", "type": "reference", "sameRef": true }
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001",
+              "type": "reference",
+              "sameRef": true
+            }
           ],
           "heap": [
-            { "address": "0x001", "content": "{ value: 10 }", "refCount": 2 }
+            {
+              "address": "0x001",
+              "content": "{ value: 10 }",
+              "refCount": 2
+            }
           ]
         }
       },
@@ -100,15 +166,29 @@
         "title": "obj2.value = 20 (같은 객체 수정)",
         "explanation": "obj2를 통해 객체를 수정하면, obj1으로 접근해도 변경된 값이 보입니다!",
         "keyInsight": "같은 참조 = 같은 객체 = 한쪽 수정 시 양쪽 영향",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            { "name": "obj1", "value": "→ 0x001", "type": "reference" },
-            { "name": "obj2", "value": "→ 0x001", "type": "reference" }
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001",
+              "type": "reference"
+            }
           ],
           "heap": [
-            { "address": "0x001", "content": "{ value: 20 }", "changed": true }
+            {
+              "address": "0x001",
+              "content": "{ value: 20 }",
+              "changed": true
+            }
           ]
         }
       },
@@ -116,24 +196,43 @@
         "line": 11,
         "title": "참조값 출력",
         "explanation": "obj1.value와 obj2.value 모두 20입니다. 같은 객체를 가리키기 때문입니다.",
-        "highlight": [11],
+        "highlight": [
+          11
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
-            { "name": "obj1", "value": "→ 0x001" },
-            { "name": "obj2", "value": "→ 0x001" }
+            {
+              "name": "obj1",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001"
+            }
           ],
           "heap": [
-            { "address": "0x001", "content": "{ value: 20 }" }
+            {
+              "address": "0x001",
+              "content": "{ value: 20 }"
+            }
           ],
-          "output": ["10 20", "20 20"]
+          "output": [
+            "10 20",
+            "20 20"
+          ]
         }
       }
     ]
   },
   "quiz": {
     "question": "다음 코드의 출력은?\n\nlet arr1 = [1, 2, 3];\nlet arr2 = arr1;\narr2.push(4);\nconsole.log(arr1.length);",
-    "options": ["3", "4", "undefined", "에러"],
+    "options": [
+      "3",
+      "4",
+      "undefined",
+      "에러"
+    ],
     "correctIndex": 1,
     "explanation": "배열도 참조값입니다. arr2 = arr1은 같은 배열을 가리키게 됩니다. arr2.push(4)는 원본 배열을 수정합니다."
   },

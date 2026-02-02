@@ -26,4 +26,7 @@ router.get('/submissions', adminController.getSubmissions);
 // 시스템 상태
 router.get('/system', adminController.getSystemStatus);
 
+// AI 사용량 통계 (DeepSeek 비용)
+router.get('/ai-usage', adminController.getAIUsage);
+
 export default router;

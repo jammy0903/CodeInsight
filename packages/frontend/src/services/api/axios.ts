@@ -3,12 +3,16 @@
  * - 인증 토큰 자동 추가
  * - 기본 URL/타임아웃 설정
  * - 에러 처리 interceptor
+ *
+ * ENHANCEMENT (2026-02-02):
+ * - 비동기 토큰 가져오기로 변경
+ * - 메모리 캐시가 없으면 Firebase에서 동적으로 가져옴
  */
 
 import axios from 'axios';
 import { config } from '../../config';
 import { logger } from '@/utils/logger';
-import { getAuthToken } from './tokenManager';
+import { getAuthTokenAsync } from './tokenManager';
 
 // API 기본 URL (버전 포함)
 const BASE_URL = config.api.baseUrl;
@@ -22,10 +26,11 @@ export const api = axios.create({
   timeout: 60000, // 60초
 });
 
-// Request Interceptor: 인증 토큰 자동 추가
+// Request Interceptor: 인증 토큰 자동 추가 (비동기)
 api.interceptors.request.use(
-  (config) => {
-    const token = getAuthToken();
+  async (config) => {
+    // 비동기로 토큰 가져오기 (캐시 또는 Firebase에서)
+    const token = await getAuthTokenAsync();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

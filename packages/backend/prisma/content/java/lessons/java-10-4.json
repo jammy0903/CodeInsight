@@ -6,13 +6,37 @@
     "code": "import java.util.concurrent.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // 1. 일꾼 3명이 대기하는 사무소 건설\n        ExecutorService office = Executors.newFixedThreadPool(3);\n\n        // 2. 사무소에 일감을 던짐\n        office.execute(() -> System.out.println(\"A 작업 처리 중...\"));\n        office.execute(() -> System.out.println(\"B 작업 처리 중...\"));\n\n        // 3. 사무소 문을 닫음\n        office.shutdown();\n    }\n}",
     "steps": [
       {
-        "line": 6,
-        "title": "쓰레드 풀 생성",
-        "explanation": "`Executors.newFixedThreadPool(3)`은 3개의 쓰레드(일꾼)를 미리 만들어두는 쓰레드 풀(인력 사무소)을 생성합니다. 쓰레드를 필요할 때마다 만드는 비용을 절약할 수 있습니다.",
-        "highlight": [6],
+        "line": 1,
+        "title": "필요한 클래스 가져오기",
+        "explanation": "**`import java.util.concurrent.*;`**\n\n쓰레드 풀을 관리하는 `ExecutorService`와 친구들을 사용하기 위해 미리 가져옵니다.",
+        "highlight": [
+          1
+        ],
         "visualizationType": "memory",
         "memoryState": {
-          "heap": [{"name": "ThreadPool", "size": 3, "state": "Waiting"}]
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "line": 4,
+        "title": "인력 사무소(ThreadPool) 개설",
+        "explanation": "**`Executors.newFixedThreadPool(3)`**\n\n3명의 일꾼이 상주하는 사무소를 차립니다. 이제 일감이 들어오면 이 3명이 번갈아가며 처리합니다. 매번 새로운 알바생을 구하는(쓰레드 생성) 비용이 들지 않습니다.\n\n**비유**: '배달 대행 사무소'에 기사님이 3명 대기하고 있는 것과 같습니다. 주문(Task)이 들어오면 대기 중인 기사님이 바로 출발합니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "name": "ThreadPool",
+              "size": 3,
+              "state": "Waiting"
+            }
+          ],
+          "stack": [],
+          "output": []
         }
       },
       {
@@ -20,35 +44,50 @@
         "title": "첫 번째 작업 제출",
         "explanation": "`execute()`를 통해 첫 번째 작업(람다 함수)을 쓰레드 풀에 제출합니다. 대기 중인 쓰레드 중 하나가 이 작업을 맡아 실행합니다.",
         "keyInsight": "재사용성(Reusability) = 효율적인 자원 관리",
-        "highlight": [9],
+        "highlight": [
+          9
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "worker1": "Executing task A",
           "worker2": "IDLE",
-          "worker3": "IDLE"
+          "worker3": "IDLE",
+          "stack": [],
+          "heap": [],
+          "output": []
         }
       },
       {
         "line": 10,
         "title": "두 번째 작업 제출",
         "explanation": "이어서 두 번째 작업을 제출합니다. 다른 대기 중인 쓰레드가 이 작업을 즉시 가져가 실행합니다. 만약 모든 쓰레드가 일하고 있다면, 이 작업은 큐에서 대기하게 됩니다.",
-        "highlight": [10],
+        "highlight": [
+          10
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "worker1": "Executing task A",
           "worker2": "Executing task B",
-          "worker3": "IDLE"
+          "worker3": "IDLE",
+          "stack": [],
+          "heap": [],
+          "output": []
         }
       },
       {
         "line": 13,
         "title": "쓰레드 풀 종료",
         "explanation": "`shutdown()`을 호출하여 쓰레드 풀을 종료합니다. 더 이상 새로운 작업을 받지 않으며, 현재 진행 중인 모든 작업이 완료되면 쓰레드들도 안전하게 종료됩니다. 이 호출을 잊으면 프로그램이 끝나지 않습니다.",
-        "highlight": [13],
+        "highlight": [
+          13
+        ],
         "visualizationType": "memory",
         "memoryState": {
           "threadPool": "SHUTTING_DOWN",
-          "note": "모든 작업이 끝나면 쓰레드들도 안전하게 소멸합니다."
+          "note": "모든 작업이 끝나면 쓰레드들도 안전하게 소멸합니다.",
+          "stack": [],
+          "heap": [],
+          "output": []
         }
       }
     ]
