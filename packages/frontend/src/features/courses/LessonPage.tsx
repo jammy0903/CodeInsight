@@ -732,6 +732,7 @@ export function LessonPage() {
           <div className="w-full md:w-1/2 flex flex-col rounded-xl"
             style={{
               border: '1px solid var(--theme-lesson-panel-border)',
+              height: 'calc(100vh - 120px)',
               minHeight: '500px',
               overflow: 'visible',
             }}
@@ -876,6 +877,7 @@ export function LessonPage() {
               className="flex-1 overflow-hidden"
               style={{
                 background: 'var(--theme-lesson-memory-bg)',
+                height: 'calc(100vh - 160px)',
                 minHeight: '500px',
               }}
             >
