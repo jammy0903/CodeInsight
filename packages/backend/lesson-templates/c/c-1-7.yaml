@@ -1,0 +1,110 @@
+lessonId: "c-1-7"
+title: "함수 정의"
+concept: "함수는 코드를 재사용 가능한 블록으로 분리합니다. 반환 타입, 이름, 매개변수를 명시해야 합니다."
+
+code: |
+  #include <stdio.h>
+
+  int add(int a, int b) {
+      int result = a + b;
+      return result;
+  }
+
+  int main() {
+      int x = 3;
+      int y = 7;
+      int sum = add(x, y);
+      printf("%d + %d = %d\n", x, y, sum);
+
+      return 0;
+  }
+
+annotations:
+  - line: 3
+    title: "함수 정의"
+    explanation: |
+      **`int add(int a, int b)`**
+
+      **함수 선언 구조**: `반환타입 함수이름(매개변수)`
+
+      - `int`: 반환 타입 (정수를 돌려줌)
+      - `add`: 함수 이름
+      - `int a, int b`: 매개변수 (각각 타입 명시 필수)
+
+      **Python과 비교**:
+      - Python: `def add(a, b):`
+      - C: `int add(int a, int b) {`
+
+  - line: 4
+    title: "함수 내부 연산"
+    explanation: |
+      **`int result = a + b;`**
+
+      매개변수 a와 b의 합을 지역 변수 result에 저장합니다.
+
+      **지역 변수**: 함수 안에서 선언된 변수는 함수 안에서만 유효합니다.
+      함수가 끝나면 result는 **메모리에서 사라집니다**.
+
+  - line: 5
+    title: "값 반환 (return)"
+    explanation: |
+      **`return result;`**
+
+      `result`의 값을 호출한 곳으로 **반환**합니다.
+
+      - 반환 타입이 `int`이므로 정수를 반환해야 합니다
+      - `return` 실행 시 함수가 즉시 종료됩니다
+
+  - line: 9
+    title: "main에서 변수 선언"
+    explanation: |
+      **`int x = 3;`**
+
+      main 함수에서 변수를 선언합니다.
+
+  - line: 11
+    title: "함수 호출"
+    explanation: |
+      **`int sum = add(x, y);`**
+
+      `add(3, 7)` 호출:
+      1. x(3)의 **값이 복사**되어 a에 전달
+      2. y(7)의 **값이 복사**되어 b에 전달
+      3. add 함수 실행 → result = 10
+      4. 10이 반환되어 sum에 저장
+
+      **값에 의한 전달(pass by value)**: C는 기본적으로 값을 복사합니다.
+
+  - line: 12
+    title: "결과 출력"
+    explanation: |
+      **`printf("%d + %d = %d\n", x, y, sum);`**
+
+      **출력 결과**: `3 + 7 = 10`
+
+quiz:
+  question: "void 반환 타입의 함수에서 return은?"
+  options:
+    - "return 값; 필수"
+    - "return; 또는 생략 가능"
+    - "컴파일 에러"
+    - "return 0; 필수"
+  correctIndex: 1
+  explanation: |
+    **void**: 반환값이 없는 함수입니다.
+
+    - `return;`으로 함수를 종료하거나
+    - return 없이 함수 끝에서 자동 종료
+
+    값을 반환하려고 하면 컴파일 경고가 발생합니다.
+
+misconceptions:
+  - wrong: "함수의 매개변수를 변경하면 원본도 바뀐다"
+    correct: "C는 기본적으로 값에 의한 전달(pass by value)입니다."
+    why: "매개변수는 원본의 복사본이므로, 함수 안에서 변경해도 원본에 영향 없습니다."
+
+  - wrong: "함수는 main 아래에만 정의할 수 있다"
+    correct: "함수는 main 위에 정의하거나, 함수 프로토타입을 선언해야 합니다."
+    why: "C 컴파일러는 위에서 아래로 읽으므로, 사용 전에 함수가 정의되어 있어야 합니다."
+
+keyTakeaway: "C 함수는 반환타입 함수명(매개변수) 형태. 값에 의한 전달. return으로 값 반환."

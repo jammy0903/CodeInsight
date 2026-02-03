@@ -1,0 +1,97 @@
+lessonId: "c-1-5"
+title: "반복문 (for)"
+concept: "for 문은 초기화, 조건, 증감을 한 줄에 표현하는 반복문입니다. 횟수가 정해진 반복에 적합합니다."
+
+code: |
+  #include <stdio.h>
+
+  int main() {
+      int sum = 0;
+
+      for (int i = 1; i <= 5; i++) {
+          sum = sum + i;
+          printf("i=%d, sum=%d\n", i, sum);
+      }
+
+      printf("최종 합: %d\n", sum);
+
+      return 0;
+  }
+
+annotations:
+  - line: 4
+    title: "합계 변수 초기화"
+    explanation: |
+      **`int sum = 0;`**
+
+      반복문에서 누적할 합계를 0으로 초기화합니다.
+
+  - line: 6
+    title: "for 문 구조"
+    explanation: |
+      **`for (int i = 1; i <= 5; i++)`**
+
+      **for 문의 3요소**:
+      1. **초기화**: `int i = 1` → 반복 변수 i를 1로 설정
+      2. **조건**: `i <= 5` → i가 5 이하면 반복 계속
+      3. **증감**: `i++` → 매 반복마다 i를 1 증가
+
+      **실행 순서**: 초기화 → [조건 검사 → 본문 실행 → 증감] × 반복
+
+  - line: 7
+    title: "합계 누적"
+    explanation: |
+      **`sum = sum + i;`**
+
+      현재 `i` 값을 `sum`에 더합니다.
+
+      **반복 과정**:
+      - i=1: sum = 0 + 1 = 1
+      - i=2: sum = 1 + 2 = 3
+      - i=3: sum = 3 + 3 = 6
+      - i=4: sum = 6 + 4 = 10
+      - i=5: sum = 10 + 5 = 15
+
+  - line: 8
+    title: "현재 상태 출력"
+    explanation: |
+      **`printf("i=%d, sum=%d\n", i, sum);`**
+
+      매 반복마다 현재 i와 sum을 출력합니다.
+
+      **출력 결과** (첫 반복): `i=1, sum=1`
+
+  - line: 11
+    title: "최종 결과 출력"
+    explanation: |
+      **`printf("최종 합: %d\n", sum);`**
+
+      for 문이 끝난 후 최종 합계를 출력합니다.
+
+      **출력 결과**: `최종 합: 15`
+
+      **수학 공식**: 1+2+3+4+5 = 15 = n(n+1)/2 = 5×6/2
+
+quiz:
+  question: "for (int i = 0; i < 3; i++) 에서 반복 횟수는?"
+  options:
+    - "2번"
+    - "3번"
+    - "4번"
+    - "무한 반복"
+  correctIndex: 1
+  explanation: |
+    i의 변화: 0 → 1 → 2 → (3이면 i < 3 거짓, 종료)
+
+    실행되는 i 값: **0, 1, 2** → 총 **3번** 반복
+
+misconceptions:
+  - wrong: "for 문의 i는 반복 후에도 사용할 수 있다"
+    correct: "for 문 안에서 선언한 변수는 for 블록 안에서만 유효합니다."
+    why: "int i를 for문 안에서 선언하면 블록 스코프가 적용되어 밖에서 접근 불가합니다."
+
+  - wrong: "i++와 ++i는 for 문에서 항상 같다"
+    correct: "for 문의 증감식에서는 결과가 같지만, 표현식에서는 다를 수 있습니다."
+    why: "i++는 현재 값을 반환 후 증가, ++i는 증가 후 값을 반환합니다."
+
+keyTakeaway: "for(초기화; 조건; 증감)으로 횟수 기반 반복. i는 0부터 시작하는 것이 관례."

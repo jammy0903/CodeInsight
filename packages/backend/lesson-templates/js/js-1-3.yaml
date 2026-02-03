@@ -1,0 +1,121 @@
+lessonId: "js-1-3"
+title: "배열 기초"
+concept: "배열은 여러 값을 순서대로 저장하는 자료구조입니다. 인덱스는 0부터 시작합니다."
+
+code: |
+  let fruits = ["apple", "banana", "cherry"];
+  console.log("전체:", fruits);
+  console.log("길이:", fruits.length);
+
+  console.log("첫번째:", fruits[0]);
+  console.log("마지막:", fruits[fruits.length - 1]);
+
+  fruits.push("mango");
+  console.log("추가 후:", fruits);
+
+annotations:
+  - line: 1
+    title: "배열 생성"
+    explanation: |
+      **`let fruits = ["apple", "banana", "cherry"];`**
+
+      **배열(Array)**: 대괄호 `[]`로 생성합니다.
+
+      - 인덱스 0: "apple"
+      - 인덱스 1: "banana"
+      - 인덱스 2: "cherry"
+
+      **JS 배열의 특징**:
+      - 크기가 **자동으로 조절**됨 (C와 다름!)
+      - **서로 다른 타입** 혼합 가능 (`[1, "hi", true]`)
+
+  - line: 2
+    title: "배열 전체 출력"
+    explanation: |
+      **`console.log("전체:", fruits);`**
+
+      **출력 결과**: `전체: [ 'apple', 'banana', 'cherry' ]`
+
+  - line: 3
+    title: "배열 길이"
+    explanation: |
+      **`console.log("길이:", fruits.length);`**
+
+      **length**: 배열의 요소 개수를 반환하는 속성입니다.
+
+      **출력 결과**: `길이: 3`
+
+  - line: 5
+    title: "첫 번째 요소"
+    explanation: |
+      **`console.log("첫번째:", fruits[0]);`**
+
+      인덱스는 **0부터 시작**합니다.
+
+      **출력 결과**: `첫번째: apple`
+
+  - line: 6
+    title: "마지막 요소"
+    explanation: |
+      **`console.log("마지막:", fruits[fruits.length - 1]);`**
+
+      마지막 요소 접근: `배열[배열.length - 1]`
+
+      - `fruits.length` = 3
+      - `fruits[3 - 1]` = `fruits[2]` = "cherry"
+
+      **출력 결과**: `마지막: cherry`
+
+      **Python과 비교**:
+      - Python: `fruits[-1]` (음수 인덱스 지원)
+      - JS: `fruits[fruits.length - 1]` (음수 인덱스 미지원)
+
+  - line: 8
+    title: "배열에 요소 추가"
+    explanation: |
+      **`fruits.push("mango");`**
+
+      **push()**: 배열 **끝에** 요소를 추가합니다.
+
+      **변경 후**: `["apple", "banana", "cherry", "mango"]`
+
+      **다른 메서드**:
+      - `pop()`: 마지막 요소 제거
+      - `unshift()`: 앞에 추가
+      - `shift()`: 첫 요소 제거
+
+  - line: 9
+    title: "추가 후 출력"
+    explanation: |
+      **`console.log("추가 후:", fruits);`**
+
+      **출력 결과**: `추가 후: [ 'apple', 'banana', 'cherry', 'mango' ]`
+
+      배열 크기가 3 → 4로 자동 증가했습니다.
+
+quiz:
+  question: "let arr = [1,2,3]; arr[5] = 10; 의 결과는?"
+  options:
+    - "에러 발생"
+    - "arr 길이가 6이 됨"
+    - "arr 길이가 4가 됨"
+    - "무시됨"
+  correctIndex: 1
+  explanation: |
+    JS 배열은 **희소 배열(sparse array)**을 허용합니다.
+
+    `arr[5] = 10` 실행 후:
+    - `arr` = `[1, 2, 3, empty, empty, 10]`
+    - `arr.length` = **6**
+    - `arr[3]`, `arr[4]`는 `undefined`
+
+misconceptions:
+  - wrong: "JS 배열은 같은 타입만 저장 가능하다"
+    correct: "JS 배열은 서로 다른 타입을 혼합할 수 있습니다."
+    why: "JS는 동적 타입 언어이므로 배열에 어떤 타입이든 넣을 수 있습니다."
+
+  - wrong: "배열 범위를 벗어나면 에러가 발생한다"
+    correct: "존재하지 않는 인덱스에 접근하면 undefined를 반환합니다."
+    why: "JS는 배열 범위를 엄격하게 검사하지 않습니다. C처럼 위험하진 않지만 버그 원인이 됩니다."
+
+keyTakeaway: "배열은 []로 생성, 인덱스 0부터 시작. push로 추가, length로 길이 확인. 크기 자동 조절."

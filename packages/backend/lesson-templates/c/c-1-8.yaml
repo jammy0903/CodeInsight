@@ -1,0 +1,117 @@
+lessonId: "c-1-8"
+title: "함수 호출과 스택 프레임"
+concept: "함수가 호출되면 스택에 새로운 프레임이 생성되고, 반환되면 프레임이 제거됩니다."
+
+code: |
+  #include <stdio.h>
+
+  int square(int n) {
+      int result = n * n;
+      return result;
+  }
+
+  int main() {
+      int a = 4;
+      int b = square(a);
+      printf("square(%d) = %d\n", a, b);
+
+      return 0;
+  }
+
+annotations:
+  - line: 9
+    title: "main 변수 선언"
+    explanation: |
+      **`int a = 4;`**
+
+      **스택 프레임**: main 함수의 스택 프레임에 변수 `a`가 생성됩니다.
+
+      ```
+      [스택]
+      main 프레임:
+        a = 4
+      ```
+
+  - line: 10
+    title: "함수 호출 - 새 스택 프레임"
+    explanation: |
+      **`int b = square(a);`**
+
+      `square(4)` 호출 시:
+      1. **새 스택 프레임** 생성 (square)
+      2. a의 값(4)이 매개변수 n에 **복사**됨
+      3. square 함수 실행
+
+      ```
+      [스택]
+      square 프레임:  ← 새로 생성!
+        n = 4
+      main 프레임:
+        a = 4
+      ```
+
+  - line: 4
+    title: "square 내부 연산"
+    explanation: |
+      **`int result = n * n;`**
+
+      n(4) × n(4) = 16을 result에 저장합니다.
+
+      ```
+      [스택]
+      square 프레임:
+        n = 4
+        result = 16
+      main 프레임:
+        a = 4
+      ```
+
+  - line: 5
+    title: "return으로 프레임 제거"
+    explanation: |
+      **`return result;`**
+
+      1. result(16)를 호출자에게 반환
+      2. square의 스택 프레임 **제거**
+      3. n과 result는 메모리에서 사라짐
+
+      ```
+      [스택]
+      main 프레임:  ← square 프레임 사라짐!
+        a = 4
+        b = 16
+      ```
+
+  - line: 11
+    title: "결과 출력"
+    explanation: |
+      **`printf("square(%d) = %d\n", a, b);`**
+
+      **출력 결과**: `square(4) = 16`
+
+      함수 호출의 결과값이 b에 저장되어 출력됩니다.
+
+quiz:
+  question: "함수가 return하면 그 함수의 지역 변수는?"
+  options:
+    - "그대로 남아있다"
+    - "자동으로 0이 된다"
+    - "메모리에서 제거된다"
+    - "전역 변수가 된다"
+  correctIndex: 2
+  explanation: |
+    함수가 return하면 해당 함수의 **스택 프레임이 제거**됩니다.
+
+    스택 프레임 안의 지역 변수(매개변수 포함)는 모두 **메모리에서 사라집니다**.
+    이것이 스택 기반 메모리 관리의 핵심입니다.
+
+misconceptions:
+  - wrong: "함수의 지역 변수는 함수 종료 후에도 접근 가능하다"
+    correct: "지역 변수는 함수 종료 시 스택 프레임과 함께 사라집니다."
+    why: "스택 기반 메모리 관리로 함수 호출/반환 시 자동으로 메모리가 할당/해제됩니다."
+
+  - wrong: "재귀 함수는 같은 변수를 공유한다"
+    correct: "재귀 호출마다 새로운 스택 프레임이 생성되어 독립적인 변수를 가집니다."
+    why: "각 호출은 별도의 스택 프레임을 가지므로 같은 이름의 변수도 독립적입니다."
+
+keyTakeaway: "함수 호출 시 스택 프레임 생성, return 시 제거. 지역 변수는 프레임과 함께 사라짐."

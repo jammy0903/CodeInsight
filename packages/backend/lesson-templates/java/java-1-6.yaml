@@ -1,0 +1,133 @@
+lessonId: "java-1-6"
+title: "메서드 정의"
+concept: "메서드는 재사용 가능한 코드 블록입니다. 반환 타입, 이름, 매개변수를 명시해야 합니다."
+
+code: |
+  public class Main {
+      public static int add(int a, int b) {
+          int sum = a + b;
+          return sum;
+      }
+
+      public static int square(int n) {
+          return n * n;
+      }
+
+      public static void main(String[] args) {
+          int result = add(3, 7);
+          System.out.println("3 + 7 = " + result);
+
+          int squared = square(5);
+          System.out.println("5^2 = " + squared);
+      }
+  }
+
+annotations:
+  - line: 1
+    title: "클래스 정의"
+    explanation: |
+      **`public class Main { ... }`**
+
+      Java에서 모든 메서드는 **클래스 안**에 정의해야 합니다.
+
+  - line: 2
+    title: "add 메서드 정의"
+    explanation: |
+      **`public static int add(int a, int b)`**
+
+      메서드 정의의 각 부분:
+      - `public`: 접근 제한자 (어디서든 접근 가능)
+      - `static`: 객체 없이 호출 가능
+      - `int`: **반환 타입** (정수를 반환)
+      - `add`: 메서드 이름
+      - `(int a, int b)`: **매개변수** (입력값)
+
+  - line: 3
+    title: "메서드 본문"
+    explanation: |
+      **`int sum = a + b;`**
+
+      매개변수 a와 b를 더해 sum에 저장합니다.
+      a=3, b=7이므로 sum=10
+
+  - line: 4
+    title: "return문"
+    explanation: |
+      **`return sum;`**
+
+      **return**: 메서드의 결과를 호출한 곳으로 **돌려보냅니다**.
+
+      sum(10)이 메서드를 호출한 곳으로 반환됩니다.
+
+  - line: 7
+    title: "square 메서드"
+    explanation: |
+      **`public static int square(int n)`**
+
+      매개변수가 하나인 메서드입니다.
+      `return n * n;` → 한 줄로 바로 반환 가능!
+
+  - line: 10
+    title: "main 메서드"
+    explanation: |
+      **`public static void main(String[] args)`**
+
+      **main**: 프로그램의 시작점(entry point)입니다.
+      - `void`: 반환값이 **없음**
+      - `String[] args`: 명령줄 인수
+
+  - line: 11
+    title: "메서드 호출"
+    explanation: |
+      **`int result = add(3, 7);`**
+
+      `add(3, 7)` 호출 → a=3, b=7 → return 10
+      result에 10이 저장됩니다.
+
+  - line: 12
+    title: "결과 출력"
+    explanation: |
+      **`System.out.println("3 + 7 = " + result);`**
+
+      **출력 결과**: `3 + 7 = 10`
+
+  - line: 14
+    title: "다른 메서드 호출"
+    explanation: |
+      **`int squared = square(5);`**
+
+      `square(5)` 호출 → n=5 → return 25
+
+      **메서드의 장점**: 같은 로직을 여러 번 작성하지 않고 재사용!
+
+  - line: 15
+    title: "제곱 결과 출력"
+    explanation: |
+      **`System.out.println("5^2 = " + squared);`**
+
+      **출력 결과**: `5^2 = 25`
+
+quiz:
+  question: "void 메서드에서 return 값을 주면?"
+  options:
+    - "정상 동작"
+    - "컴파일 에러"
+    - "런타임 에러"
+    - "값이 무시됨"
+  correctIndex: 1
+  explanation: |
+    **void**: 반환값이 없는 메서드입니다.
+
+    `return 5;` 같이 값을 반환하면 **컴파일 에러** 발생!
+    void 메서드에서는 `return;`만 사용하거나 생략 가능합니다.
+
+misconceptions:
+  - wrong: "메서드와 함수는 다르다"
+    correct: "Java에서 메서드는 클래스 안의 함수입니다. 개념적으로 같습니다."
+    why: "Java는 모든 코드가 클래스 안에 있으므로 함수를 메서드라고 부릅니다."
+
+  - wrong: "static 메서드와 인스턴스 메서드는 같다"
+    correct: "static은 클래스 레벨, 인스턴스 메서드는 객체 레벨입니다."
+    why: "static 메서드는 객체 없이 호출 가능하지만 인스턴스 변수에 접근할 수 없습니다."
+
+keyTakeaway: "Java 메서드: 반환타입 이름(매개변수). void는 반환값 없음. 클래스 안에 정의. static으로 객체 없이 호출."

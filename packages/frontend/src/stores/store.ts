@@ -51,6 +51,7 @@ interface Store {
   streak: StreakStatus | null;
   streakLoading: boolean;
   refreshStreak: () => Promise<void>;
+  optimisticallyIncrementStreak: () => void;
 
   // === 채팅 ===
   messages: Message[];
@@ -130,6 +131,21 @@ export const useStore = create<Store>((set, get) => ({
       logger.error('Failed to fetch streak:', error);
       set({ streak: null, streakLoading: false });
     }
+  },
+  optimisticallyIncrementStreak: () => {
+    const { streak } = get();
+    if (!streak) return;
+
+    // 즉시 UI 업데이트 (+1)
+    set({
+      streak: {
+        ...streak,
+        currentStreak: streak.currentStreak + 1,
+        longestStreak: Math.max(streak.longestStreak, streak.currentStreak + 1),
+        isActiveToday: true,
+        streakAtRisk: false,
+      },
+    });
   },
 
   // === 채팅 ===

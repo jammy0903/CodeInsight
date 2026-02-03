@@ -1,0 +1,126 @@
+lessonId: "java-2-2"
+title: "ArrayList 사용"
+concept: "ArrayList는 크기가 자동으로 조절되는 배열입니다. 제네릭으로 타입을 지정합니다."
+
+code: |
+  import java.util.ArrayList;
+
+  ArrayList<String> names = new ArrayList<>();
+  names.add("Alice");
+  names.add("Bob");
+  names.add("Charlie");
+
+  System.out.println("크기: " + names.size());
+  System.out.println("첫번째: " + names.get(0));
+
+  names.remove(1);
+  System.out.println("삭제 후: " + names);
+
+annotations:
+  - line: 3
+    title: "ArrayList 생성"
+    explanation: |
+      **`ArrayList<String> names = new ArrayList<>();`**
+
+      **ArrayList**: 크기가 **자동으로 조절**되는 배열입니다.
+
+      - `<String>`: **제네릭(Generic)** - 저장할 타입을 지정
+      - `new ArrayList<>()`: 새 ArrayList 생성
+
+      **배열 vs ArrayList**:
+      - 배열: `String[] arr = new String[3]` (크기 고정)
+      - ArrayList: `ArrayList<String>` (크기 자동 증가)
+
+  - line: 4
+    title: "요소 추가"
+    explanation: |
+      **`names.add("Alice");`**
+
+      **add()**: 배열 끝에 요소를 추가합니다.
+
+      현재: `["Alice"]`
+
+  - line: 5
+    title: "추가 요소"
+    explanation: |
+      **`names.add("Bob");`**
+
+      현재: `["Alice", "Bob"]`
+
+  - line: 6
+    title: "세 번째 요소 추가"
+    explanation: |
+      **`names.add("Charlie");`**
+
+      현재: `["Alice", "Bob", "Charlie"]`
+
+      크기가 자동으로 증가합니다!
+
+  - line: 8
+    title: "크기 확인"
+    explanation: |
+      **`System.out.println("크기: " + names.size());`**
+
+      **size()**: ArrayList의 요소 개수를 반환합니다.
+
+      **출력 결과**: `크기: 3`
+
+      **주의**: 배열은 `.length`, ArrayList는 `.size()`
+
+  - line: 9
+    title: "인덱스로 접근"
+    explanation: |
+      **`System.out.println("첫번째: " + names.get(0));`**
+
+      **get(index)**: 특정 인덱스의 요소를 반환합니다.
+
+      **출력 결과**: `첫번째: Alice`
+
+      **주의**: `names[0]` 불가! `names.get(0)` 사용!
+
+  - line: 11
+    title: "요소 삭제"
+    explanation: |
+      **`names.remove(1);`**
+
+      **remove(index)**: 해당 인덱스의 요소를 삭제합니다.
+
+      인덱스 1의 "Bob"이 삭제됩니다.
+
+  - line: 12
+    title: "삭제 결과 출력"
+    explanation: |
+      **`System.out.println("삭제 후: " + names);`**
+
+      **출력 결과**: `삭제 후: [Alice, Charlie]`
+
+      Bob이 삭제되고 Charlie가 앞으로 이동했습니다.
+
+quiz:
+  question: "ArrayList<int>로 정수 ArrayList를 만들 수 있나요?"
+  options:
+    - "가능하다"
+    - "불가, ArrayList<Integer>를 사용해야 한다"
+    - "불가, 배열만 사용 가능하다"
+    - "컴파일 경고만 발생"
+  correctIndex: 1
+  explanation: |
+    제네릭에는 **기본 타입을 사용할 수 없습니다**.
+
+    **래퍼 클래스**를 사용해야 합니다:
+    - `int` → `Integer`
+    - `double` → `Double`
+    - `boolean` → `Boolean`
+
+    `ArrayList<Integer> nums = new ArrayList<>();`
+
+misconceptions:
+  - wrong: "ArrayList도 []로 접근할 수 있다"
+    correct: "ArrayList는 get(), set() 메서드로 접근합니다."
+    why: "Java에서 []는 배열 전용입니다. ArrayList는 클래스이므로 메서드를 사용합니다."
+
+  - wrong: "ArrayList는 배열보다 항상 좋다"
+    correct: "성능이 중요하고 크기가 고정이면 배열이 더 효율적입니다."
+    why: "ArrayList는 내부적으로 배열을 사용하며, 크기 조절 시 복사 비용이 발생합니다."
+
+keyTakeaway: "ArrayList: 크기 자동 조절. add(), get(), remove(), size(). 제네릭으로 타입 지정. 기본 타입은 래퍼 클래스 사용."

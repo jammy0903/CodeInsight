@@ -1,0 +1,125 @@
+lessonId: "py-1-7"
+title: "while 반복문"
+concept: "while 문은 조건이 참인 동안 계속 반복합니다. 조건 검사 → 실행 → 조건 검사 반복."
+
+code: |
+  count = 0
+  print(f"시작: count = {count}")
+
+  while count < 3:
+      print(f"반복 중: count = {count}")
+      count = count + 1
+
+  print(f"종료: count = {count}")
+
+annotations:
+  - line: 1
+    title: "초기값 설정"
+    explanation: |
+      **`count = 0`**
+
+      **while 문 전 준비**: 반복 조건에 사용할 변수를 초기화합니다.
+
+      **중요**: while 문은 자동으로 변수를 증가시키지 않음!
+      - for 문: 자동으로 다음 요소로 이동
+      - while 문: 수동으로 변수 변경 필요
+
+  - line: 2
+    title: "초기값 출력"
+    explanation: |
+      **`print(f"시작: count = {count}")`**
+
+      **출력 결과**: `시작: count = 0`
+
+  - line: 4
+    title: "while 조건 검사"
+    explanation: |
+      **`while count < 3:`**
+
+      **while 문**: 조건이 참(True)인 동안 반복 실행합니다.
+
+      **구조**: `while 조건:` 다음에 들여쓰기된 코드 작성
+
+      **동작 흐름**:
+      1. 조건 검사 (`count < 3`?)
+      2. 참이면 → 들여쓰기 코드 실행
+      3. 다시 조건 검사 (1번으로)
+      4. 거짓이면 → while 문 종료
+
+      **첫 번째 검사**: `0 < 3` → True → 실행!
+
+  - line: 5
+    title: "반복 본문 (출력)"
+    explanation: |
+      **`print(f"반복 중: count = {count}")`**
+
+      **첫 번째 반복**: `반복 중: count = 0`
+      **두 번째 반복**: `반복 중: count = 1`
+      **세 번째 반복**: `반복 중: count = 2`
+
+      **총 3번 실행**됩니다.
+
+  - line: 6
+    title: "카운터 증가"
+    explanation: |
+      **`count = count + 1`**
+
+      **필수!**: 조건을 변경하지 않으면 무한 루프에 빠집니다.
+
+      **실행 과정**:
+      - 첫 번째: `count = 0 + 1` → `count = 1`
+      - 두 번째: `count = 1 + 1` → `count = 2`
+      - 세 번째: `count = 2 + 1` → `count = 3`
+
+      **단축 표현**: `count += 1` (같은 의미)
+
+      **무한 루프 주의**: 이 줄이 없으면 count가 계속 0이므로 영원히 반복!
+
+  - line: 8
+    title: "반복 종료 후"
+    explanation: |
+      **`print(f"종료: count = {count}")`**
+
+      **출력 결과**: `종료: count = 3`
+
+      **종료 이유**: `count = 3`일 때 조건 `count < 3` → False
+
+      **전체 흐름**:
+      1. count = 0 → 0 < 3? (True) → 반복 → count = 1
+      2. count = 1 → 1 < 3? (True) → 반복 → count = 2
+      3. count = 2 → 2 < 3? (True) → 반복 → count = 3
+      4. count = 3 → 3 < 3? (False) → 종료
+
+quiz:
+  question: "다음 코드는 몇 번 반복될까요?"
+  options:
+    - "0번"
+    - "1번"
+    - "2번"
+    - "무한 반복"
+  correctIndex: 1
+  explanation: |
+    코드: `x = 5` → `while x < 10:` → `print(x)` → `x = x + 10`
+
+    **실행 과정**:
+    1. x = 5 → 5 < 10? (True) → print(5) → x = 15
+    2. x = 15 → 15 < 10? (False) → 종료
+
+    **결과**: 1번만 반복됩니다.
+
+    따라서 답은 **1번**입니다!
+
+misconceptions:
+  - wrong: "while은 for처럼 자동으로 카운터를 증가시킨다"
+    correct: "while은 수동으로 조건을 변경해야 합니다."
+    why: "for는 자동으로 다음 요소로 이동하지만, while은 조건을 직접 변경해야 합니다."
+
+  - wrong: "조건이 거짓이어도 최소 1번은 실행된다"
+    correct: "처음부터 조건이 거짓이면 한 번도 실행되지 않습니다."
+    why: "while은 조건을 먼저 검사하고 실행합니다. do-while과 다릅니다."
+
+  - wrong: "while 문 안에서 변수를 변경하지 않아도 된다"
+    correct: "조건을 변경하지 않으면 무한 루프에 빠집니다."
+    why: "while은 조건이 False가 될 때까지 계속 반복합니다. 조건을 바꾸지 않으면 영원히 True입니다."
+
+keyTakeaway: "while은 조건이 참인 동안 반복. 조건 검사 먼저. 무한 루프 주의. 조건 변경 필수."

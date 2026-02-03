@@ -1,0 +1,133 @@
+lessonId: "c-1-1"
+title: "변수와 자료형"
+concept: "C는 정적 타입 언어입니다. 변수를 사용하려면 반드시 타입을 먼저 선언해야 합니다."
+
+code: |
+  #include <stdio.h>
+
+  int main() {
+      int x = 5;
+      printf("x = %d\n", x);
+
+      char ch = 'A';
+      printf("ch = %c\n", ch);
+
+      float pi = 3.14;
+      printf("pi = %.2f\n", pi);
+
+      return 0;
+  }
+
+annotations:
+  - line: 4
+    title: "정수 변수 선언"
+    explanation: |
+      **`int x = 5;`**
+
+      C에서 변수를 선언할 때는 **타입을 반드시 명시**해야 합니다.
+
+      - `int`: 정수 타입 (4바이트, 약 -21억 ~ 21억)
+      - `x`: 변수 이름
+      - `5`: 초기값
+
+      **메모리**: 스택에 4바이트 공간이 할당되고, 그 자리에 5가 저장됩니다.
+
+      **Python과 비교**:
+      - Python: `x = 5` (타입 자동 추론)
+      - C: `int x = 5;` (타입 명시 필수, 세미콜론 필수)
+
+  - line: 5
+    title: "정수 출력 (printf)"
+    explanation: |
+      **`printf("x = %d\n", x);`**
+
+      **printf**: C의 표준 출력 함수입니다.
+
+      **형식 지정자(format specifier)**:
+      - `%d`: 정수 (decimal)
+      - `%c`: 문자 (character)
+      - `%f`: 실수 (float)
+      - `%s`: 문자열 (string)
+      - `\n`: 줄바꿈
+
+      **출력 결과**: `x = 5`
+
+  - line: 7
+    title: "문자 변수 선언"
+    explanation: |
+      **`char ch = 'A';`**
+
+      **char**: 문자 하나를 저장하는 타입 (1바이트)
+
+      - 작은따옴표(`' '`)로 감싸야 합니다
+      - 실제로는 ASCII 코드 값(65)이 저장됩니다
+      - `'A'` = 65, `'a'` = 97, `'0'` = 48
+
+      **주의**: `"A"`는 문자열(string), `'A'`는 문자(char)
+
+  - line: 8
+    title: "문자 출력"
+    explanation: |
+      **`printf("ch = %c\n", ch);`**
+
+      `%c` 형식 지정자로 문자를 출력합니다.
+
+      **출력 결과**: `ch = A`
+
+      **팁**: `%d`로 출력하면 ASCII 코드 값이 나옵니다 → `ch = 65`
+
+  - line: 10
+    title: "실수 변수 선언"
+    explanation: |
+      **`float pi = 3.14;`**
+
+      **float**: 소수점이 있는 실수를 저장하는 타입 (4바이트)
+
+      **C의 실수 타입**:
+      - `float`: 4바이트 (소수점 이하 약 6자리)
+      - `double`: 8바이트 (소수점 이하 약 15자리, 더 정밀)
+
+      **메모리**: IEEE 754 부동소수점 표준으로 저장됩니다.
+
+  - line: 11
+    title: "실수 출력"
+    explanation: |
+      **`printf("pi = %.2f\n", pi);`**
+
+      `%.2f`: 소수점 이하 2자리까지 출력합니다.
+
+      **출력 결과**: `pi = 3.14`
+
+      **형식 예시**:
+      - `%f`: 기본 (소수점 6자리) → `3.140000`
+      - `%.2f`: 소수점 2자리 → `3.14`
+      - `%.0f`: 소수점 없음 → `3`
+
+quiz:
+  question: "C에서 변수를 선언할 때 반드시 해야 하는 것은?"
+  options:
+    - "초기값을 지정한다"
+    - "타입을 명시한다"
+    - "const를 붙인다"
+    - "아무것도 필요 없다"
+  correctIndex: 1
+  explanation: |
+    C는 **정적 타입 언어**입니다.
+    변수 선언 시 `int`, `char`, `float` 등 **타입을 반드시 명시**해야 합니다.
+
+    초기값은 선택사항이지만, 초기화하지 않으면 쓰레기 값이 들어갑니다.
+
+misconceptions:
+  - wrong: "C에서도 Python처럼 타입 없이 변수를 선언할 수 있다"
+    correct: "C는 정적 타입 언어로 변수 선언 시 타입 명시가 필수입니다."
+    why: "컴파일 시점에 메모리 크기를 결정해야 하므로 타입 정보가 필요합니다."
+
+  - wrong: "char는 문자열을 저장할 수 있다"
+    correct: "char는 문자 하나만 저장합니다. 문자열은 char 배열을 사용합니다."
+    why: "char는 1바이트 크기로, ASCII 문자 하나만 저장 가능합니다."
+
+  - wrong: "float와 double은 같다"
+    correct: "float는 4바이트, double은 8바이트로 정밀도가 다릅니다."
+    why: "정밀한 계산이 필요하면 double을 사용해야 합니다."
+
+keyTakeaway: "C는 정적 타입 언어. int(정수), char(문자), float(실수). 변수 선언 시 타입 명시 필수. printf로 출력 시 형식 지정자 사용."

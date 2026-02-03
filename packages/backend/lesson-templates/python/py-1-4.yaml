@@ -1,0 +1,192 @@
+lessonId: "py-1-4"
+title: "조건문 (if, elif, else)"
+concept: "조건문은 조건에 따라 다른 코드를 실행합니다. if, elif, else로 분기 처리를 합니다."
+
+code: |
+  age = 15
+  print(f"나이: {age}")
+
+  if age >= 18:
+      print("성인입니다")
+  else:
+      print("미성년자입니다")
+
+  score = 85
+  print(f"점수: {score}")
+
+  if score >= 90:
+      grade = "A"
+  elif score >= 80:
+      grade = "B"
+  elif score >= 70:
+      grade = "C"
+  else:
+      grade = "F"
+
+  print(f"학점: {grade}")
+
+annotations:
+  - line: 1
+    title: "변수 초기화"
+    explanation: |
+      **`age = 15`**
+
+      조건을 테스트할 변수를 준비합니다.
+
+      이 레슨에서는:
+      - `if` 문으로 조건을 검사합니다
+      - 조건에 따라 다른 코드를 실행합니다
+
+  - line: 2
+    title: "나이 출력"
+    explanation: |
+      **`print(f"나이: {age}")`**
+
+      **출력 결과**: `나이: 15`
+
+  - line: 4
+    title: "if 조건 검사"
+    explanation: |
+      **`if age >= 18:`**
+
+      **if 문**: 조건이 참(True)일 때만 코드를 실행합니다.
+
+      **구조**: `if 조건:` 다음에 들여쓰기된 코드 작성
+
+      **비교 연산자**:
+      - `==`: 같다
+      - `!=`: 다르다
+      - `>`: 크다
+      - `<`: 작다
+      - `>=`: 크거나 같다
+      - `<=`: 작거나 같다
+
+      **현재 조건**:
+      - `age >= 18` → `15 >= 18` → **False**
+      - 조건이 거짓이므로 **들여쓰기된 코드를 건너뜁니다**
+
+  - line: 6
+    title: "else 블록"
+    explanation: |
+      **`else:`**
+
+      **else**: if 조건이 거짓일 때 실행됩니다.
+
+      **구조**: `if 조건:` (참일 때) / `else:` (거짓일 때)
+
+      **현재 상황**:
+      - `age >= 18`이 False였으므로
+      - else 블록이 실행됩니다
+
+  - line: 7
+    title: "else 코드 실행"
+    explanation: |
+      **`print("미성년자입니다")`**
+
+      **출력 결과**: `미성년자입니다`
+
+      **요약**:
+      - age = 15
+      - 15 >= 18? → False
+      - else 블록 실행 → "미성년자입니다" 출력
+
+  - line: 9
+    title: "점수 변수"
+    explanation: |
+      **`score = 85`**
+
+      이제 더 복잡한 조건 분기를 테스트합니다.
+
+      **목표**: 점수에 따라 학점(A, B, C, F)을 부여
+
+  - line: 10
+    title: "점수 출력"
+    explanation: |
+      **`print(f"점수: {score}")`**
+
+      **출력 결과**: `점수: 85`
+
+  - line: 12
+    title: "첫 번째 조건 (A학점)"
+    explanation: |
+      **`if score >= 90:`**
+
+      **조건 검사**:
+      - `score >= 90` → `85 >= 90` → **False**
+      - 다음 조건(elif)으로 이동
+
+  - line: 14
+    title: "elif: 두 번째 조건 (B학점)"
+    explanation: |
+      **`elif score >= 80:`**
+
+      **elif** (else if): 이전 조건이 거짓일 때 새로운 조건을 검사합니다.
+
+      **구조**: `if 조건1:` → `elif 조건2:` → `elif 조건3:` → `else:`
+      - 위에서 아래로 순서대로 검사
+      - 첫 번째로 참인 조건만 실행
+      - 나머지는 건너뜀
+
+      **현재 조건**:
+      - 이전 조건 (`score >= 90`)은 False였음
+      - `score >= 80` → `85 >= 80` → **True**
+      - **이 블록이 실행됩니다!**
+
+  - line: 15
+    title: "B학점 부여"
+    explanation: |
+      **`grade = "B"`**
+
+      조건이 참이므로 `grade` 변수에 "B"를 할당합니다.
+
+      **중요**: elif 블록이 실행되면 나머지 elif, else는 **건너뜁니다**.
+
+      - Line 16-19의 elif, else는 실행 안 됨!
+
+  - line: 21
+    title: "학점 출력"
+    explanation: |
+      **`print(f"학점: {grade}")`**
+
+      **출력 결과**: `학점: B`
+
+      **전체 흐름 요약**:
+      1. score = 85
+      2. if score >= 90? → False
+      3. elif score >= 80? → **True** → grade = "B"
+      4. (나머지 elif, else 건너뜀)
+      5. print("학점: B")
+
+quiz:
+  question: "다음 코드에서 x = 7일 때 출력 결과는?"
+  options:
+    - "작음"
+    - "중간"
+    - "큼"
+    - "아무것도 출력 안 됨"
+  correctIndex: 1
+  explanation: |
+    코드: `x = 7` → `if x < 5:` → `elif x < 10:` → `else:`
+
+    **조건 검사 순서**:
+    1. `x < 5` → `7 < 5` → False
+    2. `elif x < 10` → `7 < 10` → **True**
+    3. "중간" 출력
+    4. else는 건너뜀
+
+    따라서 답은 **"중간"**입니다!
+
+misconceptions:
+  - wrong: "elif와 else는 필수다"
+    correct: "if만 단독으로 사용할 수 있습니다."
+    why: "elif와 else는 선택 사항입니다. 필요에 따라 생략 가능합니다."
+
+  - wrong: "if, elif가 모두 참이면 모두 실행된다"
+    correct: "첫 번째로 참인 블록만 실행되고 나머지는 건너뜁니다."
+    why: "조건문은 위에서 아래로 순서대로 검사하며, 하나라도 참이면 나머지는 무시합니다."
+
+  - wrong: "조건에 괄호를 꼭 써야 한다 (if (x > 5):)"
+    correct: "Python은 조건에 괄호가 필요 없습니다."
+    why: "Java, C와 달리 Python은 괄호 없이 조건을 씁니다. 단, 복잡한 조건은 가독성을 위해 괄호를 쓸 수 있습니다."
+
+keyTakeaway: "if는 조건이 참일 때, elif는 이전이 거짓이고 새 조건이 참일 때, else는 모든 조건이 거짓일 때 실행. 첫 번째 참인 블록만 실행됨."

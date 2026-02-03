@@ -1,122 +1,124 @@
 {
   "lessonId": "c-2-1",
-  "title": "주소 연산자 (&): 집 주소 찾기",
-  "concept": "메모리 주소는 '집 주소'와 같다. & 변수명으로 찾는다.",
+  "title": "포인터 변수",
+  "concept": "포인터로 다른 변수의 값을 간접적으로 읽고 변경할 수 있습니다.",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int a = 100;\n\n    printf(\"Value of a: %d\\n\", a);\n\n    printf(\"Address of a: %p\\n\", &a);\n\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int x = 10;\n    int *ptr = &x;\n\n    printf(\"변경 전: x = %d\\n\", x);\n\n    *ptr = 20;\n    printf(\"변경 후: x = %d\\n\", x);\n    printf(\"*ptr = %d\\n\", *ptr);\n\n    return 0;\n}\n",
     "steps": [
       {
-        "line": 1,
-        "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 표준 입출력 라이브러리 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "cMemory",
-        "stack": [],
-        "heap": [],
-        "stdout": ""
-      },
-      {
-        "line": 3,
-        "title": "main 함수 정의",
-        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "cMemory",
-        "stack": [],
-        "heap": [],
-        "stdout": ""
-      },
-      {
         "line": 4,
-        "title": "변수의 선언과 값",
-        "explanation": "**`int a = 100;`**\n\n정수형 변수 `a`를 선언하고 값 `100`을 할당합니다. 이 순간, 메모리의 특정 위치(주소)에 `a`를 위한 공간이 마련되고 그 안에 `100`이 저장됩니다.",
+        "title": "변수 선언",
+        "explanation": "**`int x = 10;`**\n\n정수 변수 x에 10을 저장합니다.\n",
         "highlight": [
           4
         ],
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "a",
-            "value": "100",
-            "type": "int",
-            "address": "0x1FF0"
-          }
-        ],
-        "heap": [],
-        "stdout": ""
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [],
+          "note": "Line 4 executed"
+        }
       },
       {
-        "line": 6,
-        "title": "변수의 값 출력",
-        "explanation": "**`printf(\"Value of a: %d\\n\", a);`**\n\n변수 `a`에 저장된 **값**을 `%d` 형식 지정자를 사용하여 화면에 출력합니다.",
+        "line": 5,
+        "title": "포인터로 주소 저장",
+        "explanation": "**`int *ptr = &x;`**\n\nptr이 x의 주소를 가리킵니다.\n\n```\nptr ──→ x (10)\n```\n",
         "highlight": [
-          6
+          5
         ],
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "a",
-            "value": "100",
-            "type": "int",
-            "address": "0x1FF0"
-          }
-        ],
-        "stdout": "Value of a: 100",
-        "heap": []
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [],
+          "note": "Line 5 executed"
+        }
       },
       {
-        "line": 8,
-        "title": "변수의 주소 확인 (& 연산자)",
-        "explanation": "**`printf(\"Address of a: %p\\n\", &a);`**\n\n`&` (Ampersand) 연산자는 '...의 주소(Address of)'를 의미합니다. 변수 `a` 앞에 붙여 `a`가 저장된 메모리의 시작 **주소**를 알아냅니다. 이 주소는 `%p` 형식 지정자를 사용하여 16진수로 출력합니다.\n\n**비유**: `a`라는 집의 '도로명 주소'를 알아내는 것과 같습니다.",
+        "line": 7,
+        "title": "변경 전 값 확인",
+        "explanation": "**`printf(\"변경 전: x = %d\\n\", x);`**\n\n**출력 결과**: `변경 전: x = 10`\n",
         "highlight": [
-          8
+          7
         ],
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "a",
-            "value": "100",
-            "type": "int",
-            "address": "0x1FF0"
-          }
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [
+            "변경 전: x = 10"
+          ],
+          "note": "Line 7 executed"
+        }
+      },
+      {
+        "line": 9,
+        "title": "역참조로 값 변경",
+        "explanation": "**`*ptr = 20;`**\n\n**역참조 대입**: 포인터가 가리키는 주소의 값을 변경합니다.\n\n- `*ptr = 20`: ptr이 가리키는 곳(= x)에 20을 저장\n- 결과: **x의 값이 10 → 20으로 변경됨**\n\n포인터를 통해 다른 변수의 값을 **간접적으로 수정**할 수 있습니다!\n",
+        "highlight": [
+          9
         ],
-        "stdout": "Value of a: 100\nAddress of a: 0x1FF0",
-        "heap": []
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [
+            "변경 전: x = 10",
+            "변경 전: x = 10",
+            "변경 후: x = 20",
+            "*ptr = *ptr"
+          ],
+          "note": "Line 9 executed"
+        }
       },
       {
         "line": 10,
-        "title": "프로그램 종료",
-        "explanation": "**`return 0;`**\n\n`main` 함수가 모든 작업을 성공적으로 마쳤음을 운영체제에 알리며 프로그램을 종료합니다.",
+        "title": "변경 확인",
+        "explanation": "**`printf(\"변경 후: x = %d\\n\", x);`**\n\n**출력 결과**: `변경 후: x = 20`\n\nx를 직접 수정하지 않았지만, `*ptr = 20`을 통해 x의 값이 바뀌었습니다.\n",
         "highlight": [
           10
         ],
         "visualizationType": "cMemory",
-        "stdout": "Value of a: 100\nAddress of a: 0x1FF0",
-        "stack": [],
-        "heap": []
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [
+            "변경 전: x = 10",
+            "변경 전: x = 10",
+            "변경 후: x = 20",
+            "*ptr = *ptr",
+            "변경 전: x = 10",
+            "변경 후: x = 20",
+            "*ptr = *ptr"
+          ],
+          "note": "Line 10 executed"
+        }
       }
     ]
   },
   "quiz": {
-    "question": "변수 `int money = 500;` 의 주소를 얻는 코드는?",
+    "question": "int a = 5; int *p = &a; *p = 10; 실행 후 a의 값은?",
     "options": [
-      "money",
-      "*money",
-      "&money",
-      "address(money)"
+      "5",
+      "10",
+      "0",
+      "컴파일 에러"
     ],
-    "correctIndex": 2,
-    "explanation": "`&` (Ampersand)는 'Address Of' 연산자입니다. 영어권에서는 'Ampersand = Address'로 외우기도 합니다."
+    "correctIndex": 1,
+    "explanation": "`*p = 10`은 p가 가리키는 곳(= a)에 10을 저장합니다.\n\n따라서 a의 값은 **10**으로 변경됩니다.\n"
   },
   "misconceptions": [
     {
-      "wrong": "주소값은 항상 같다",
-      "correct": "실행할 때마다 바뀝니다 (ASLR 보안 기법 등).",
-      "why": "운영체제가 그때그때 빈 메모리 공간을 할당해주기 때문입니다."
+      "wrong": "포인터로 값을 변경하면 원본은 그대로다",
+      "correct": "포인터 역참조로 값을 변경하면 원본 변수의 값이 직접 변경됩니다.",
+      "why": "포인터는 원본의 주소를 가리키므로 *ptr은 원본 자체입니다."
+    },
+    {
+      "wrong": "ptr = 20 으로 가리키는 값을 변경할 수 있다",
+      "correct": "ptr = 20은 포인터에 주소 20을 저장하는 것입니다. *ptr = 20이 올바른 방법입니다.",
+      "why": "ptr은 주소를 저장하고, *ptr은 그 주소의 값입니다."
     }
   ],
-  "keyTakeaway": "모든 변수는 주소가 있다. `&`로 확인할 수 있다."
+  "keyTakeaway": "*ptr로 포인터가 가리키는 값을 읽고 쓸 수 있다. *ptr = 값으로 간접 수정."
 }

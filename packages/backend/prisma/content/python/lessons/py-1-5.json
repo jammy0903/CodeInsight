@@ -1,235 +1,174 @@
 {
   "lessonId": "py-1-5",
-  "title": "재할당: 라벨 옮기기",
-  "concept": "변수를 재할당하면 라벨을 다른 객체로 옮기는 것이다",
+  "title": "함수 정의와 호출",
+  "concept": "함수는 재사용 가능한 코드 블록입니다. def 키워드로 정의하고, 이름으로 호출합니다.",
   "content": {
-    "code": "a = 10\nprint(f\"a = {a}, id = {id(a)}\")\n\na = 20\nprint(f\"a = {a}, id = {id(a)}\")\n\na = a + 1\nprint(f\"a = {a}, id = {id(a)}\")",
+    "code": "def greet(name):\n    message = f\"Hello, {name}!\"\n    return message\n\nresult = greet(\"Python\")\nprint(f\"결과: {result}\")\n",
     "steps": [
       {
         "line": 1,
-        "title": "첫 할당: a가 10을 가리킴",
-        "explanation": "**초기 상태**\n\n`a = 10`은 정수 객체 10을 만들고 이름 `a`를 바인딩합니다.\n\n**비유:** 객체 10에 'a' 라벨을 붙이는 것.",
+        "title": "함수 정의",
+        "explanation": "**`def greet(name):`**\n\n**함수 정의**: `def` 키워드로 재사용 가능한 코드 블록을 만듭니다.\n\n**구조**: `def 함수이름(매개변수):` 다음에 들여쓰기된 코드 작성\n\n**용어 정리**:\n- `def`: define(정의하다)의 약자\n- `greet`: 함수 이름\n- `name`: 매개변수(parameter) - 함수가 받을 값\n\n**이 시점**: 함수가 정의만 되고, 아직 실행되지 않음\n",
         "highlight": [
           1
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
+          "variables": [
             {
-              "name": "a",
-              "pointsTo": "obj_10"
+              "name": "greet",
+              "value": "greet",
+              "type": "function",
+              "id": "0x1000"
             }
           ],
-          "objects": [
-            {
-              "id": "obj_10",
-              "type": "int",
-              "value": "10",
-              "pyId": "9406400",
-              "highlight": true
-            }
-          ],
-          "output": []
+          "output": [],
+          "note": "Line 1 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 2,
-        "title": "id 확인",
-        "explanation": "`id(a)`는 `a`가 가리키는 객체의 고유 신원을 반환합니다.\n\n지문처럼 - 객체가 살아있는 동안 절대 변하지 않습니다.",
+        "title": "함수 본문",
+        "explanation": "**`message = f\"Hello, {name}!\"`**\n\n**함수 본문**: 들여쓰기된 코드는 함수가 호출될 때 실행됩니다.\n\n**지역 변수**: `message`는 함수 안에서만 사용 가능한 변수입니다.\n\n**중요**: 이 코드는 아직 실행되지 않음! (함수 정의 단계)\n",
         "highlight": [
           2
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
+          "variables": [
             {
-              "name": "a",
-              "pointsTo": "obj_10"
+              "name": "name",
+              "value": "\"Python\"",
+              "type": "str",
+              "id": "0x1000"
+            },
+            {
+              "name": "message",
+              "value": "\"Hello, Python!\"",
+              "type": "str",
+              "id": "0x2000"
             }
           ],
-          "objects": [
-            {
-              "id": "obj_10",
-              "type": "int",
-              "value": "10",
-              "pyId": "9406400"
-            }
-          ],
-          "output": [
-            "a = 10, id = 9406400"
-          ]
+          "output": [],
+          "note": "Line 2 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
-        "line": 4,
-        "title": "재할당: a가 새 객체로 이동!",
-        "explanation": "**핵심 통찰**\n\n`a = 20`은 10 객체를 20으로 바꾸지 않습니다!\n\n대신:\n1. 새 객체 20 생성\n2. 라벨 `a`를 20으로 **이동**\n3. 원래 10 객체는 고아가 됨\n\n**정수는 불변!** - 바꿀 수 없습니다. 재할당은 항상 새 바인딩을 만듭니다.",
+        "line": 3,
+        "title": "return 문",
+        "explanation": "**`return message`**\n\n**return**: 함수의 결과값을 반환합니다.\n\n**동작**:\n- 함수 실행을 종료\n- `message` 값을 호출한 곳으로 반환\n- return 이후 코드는 실행 안 됨\n\n**없으면?**: return이 없으면 `None` 반환\n",
         "highlight": [
-          4
+          3
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
+          "variables": [
             {
-              "name": "a",
-              "pointsTo": "obj_20"
-            }
-          ],
-          "objects": [
-            {
-              "id": "obj_10",
-              "type": "int",
-              "value": "10",
-              "pyId": "9406400",
-              "orphaned": true
+              "name": "greet",
+              "value": "greet",
+              "type": "function",
+              "id": "0x1000"
             },
             {
-              "id": "obj_20",
-              "type": "int",
-              "value": "20",
-              "pyId": "9406720",
-              "highlight": true
+              "name": "result",
+              "value": "\"Hello, Python!\"",
+              "type": "str",
+              "id": "0x2000"
             }
           ],
-          "output": []
+          "output": [],
+          "note": "Line 3 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 5,
-        "title": "다른 id = 다른 객체!",
-        "explanation": "id가 바뀌었습니다!\n\n이게 `a`가 이제 완전히 다른 객체를 가리킨다는 **증거**입니다.\n\n**10 객체는 아직 존재** (가비지 컬렉션 전까지), 다만 가리키는 이름이 없을 뿐.",
+        "title": "함수 호출",
+        "explanation": "**`result = greet(\"Python\")`**\n\n**함수 호출**: 함수 이름 뒤에 괄호를 붙여 실행합니다.\n\n**실행 흐름**:\n1. `greet(\"Python\")` 호출\n2. `name` 매개변수에 `\"Python\"` 할당\n3. 함수 본문 실행 (line 2-3)\n4. `return message`로 값 반환\n5. 반환값이 `result`에 할당\n\n**값 전달**: `\"Python\"` → `name` → `message` → `result`\n",
         "highlight": [
           5
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
+          "variables": [
             {
-              "name": "a",
-              "pointsTo": "obj_20"
+              "name": "name",
+              "value": "\"Python\"",
+              "type": "str",
+              "id": "0x1000"
             }
           ],
-          "objects": [
-            {
-              "id": "obj_10",
-              "type": "int",
-              "value": "10",
-              "pyId": "9406400",
-              "orphaned": true
-            },
-            {
-              "id": "obj_20",
-              "type": "int",
-              "value": "20",
-              "pyId": "9406720"
-            }
-          ],
-          "output": [
-            "a = 10, id = 9406400",
-            "a = 20, id = 9406720"
-          ]
+          "output": [],
+          "note": "Line 5 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
-        "line": 7,
-        "title": "a = a + 1: 또 다른 새 객체 생성!",
-        "explanation": "**실제로 일어나는 일:**\n\n1. `a + 1` 계산 → 새 정수 객체 21 생성\n2. `a`를 이 새 객체에 바인딩\n\n`a = a + 1`은 숫자를 제자리에서 증가시키는 게 아닙니다.\n\n21을 만들고 라벨을 옮기는 것입니다.\n\n**id가 바뀔 때마다 새 객체!**",
+        "line": 6,
+        "title": "결과 출력",
+        "explanation": "**`print(f\"결과: {result}\")`**\n\n**출력 결과**: `결과: Hello, Python!`\n\n**전체 흐름 요약**:\n1. 함수 정의 (line 1-3)\n2. 함수 호출 (line 5)\n3. 함수 실행 → 값 반환\n4. 결과 출력 (line 6)\n",
         "highlight": [
-          7
+          6
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [
+          "variables": [
             {
-              "name": "a",
-              "pointsTo": "obj_21"
-            }
-          ],
-          "objects": [
-            {
-              "id": "obj_10",
-              "type": "int",
-              "value": "10",
-              "pyId": "9406400",
-              "orphaned": true
+              "name": "greet",
+              "value": "greet",
+              "type": "function",
+              "id": "0x1000"
             },
             {
-              "id": "obj_20",
-              "type": "int",
-              "value": "20",
-              "pyId": "9406720",
-              "orphaned": true
-            },
-            {
-              "id": "obj_21",
-              "type": "int",
-              "value": "21",
-              "pyId": "9406752",
-              "highlight": true
-            }
-          ],
-          "output": []
-        }
-      },
-      {
-        "line": 8,
-        "title": "최종 상태: 세 개의 객체가 존재했음",
-        "explanation": "**요약:**\n\n세 개의 서로 다른 정수 객체를 만들었습니다:\n- 10 (고아)\n- 20 (고아)\n- 21 (현재)\n\n이름 `a`는 그냥 이리저리 옮겨 다닌 라벨입니다.\n\n**이게 정수가 '불변'인 이유** - 바꿀 수 없고, 새로 만들 수만 있습니다.",
-        "highlight": [
-          8
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [
-            {
-              "name": "a",
-              "pointsTo": "obj_21"
-            }
-          ],
-          "objects": [
-            {
-              "id": "obj_21",
-              "type": "int",
-              "value": "21",
-              "pyId": "9406752"
+              "name": "result",
+              "value": "\"Hello, Python!\"",
+              "type": "str",
+              "id": "0x2000"
             }
           ],
           "output": [
-            "a = 10, id = 9406400",
-            "a = 20, id = 9406720",
-            "a = 21, id = 9406752"
-          ]
+            "결과: Hello, Python!"
+          ],
+          "note": "Line 6 executed",
+          "names": [],
+          "objects": []
         }
       }
     ]
   },
   "quiz": {
-    "question": "이 코드 후 몇 개의 정수 객체가 생성됐나?\n\nx = 5\nx = 10\nx = x + 5",
+    "question": "다음 코드에서 출력 결과는?",
     "options": [
-      "1개 (x가 그냥 바뀜)",
-      "2개 (5와 15)",
-      "3개 (5, 10, 15)",
-      "0개 (정수는 객체를 만들지 않음)"
+      "5",
+      "10",
+      "15",
+      "에러 발생"
     ],
     "correctIndex": 2,
-    "explanation": "각 할당은 (잠재적으로 새로운) 객체에 바인딩을 만듭니다. 먼저 5, 그다음 10, 그다음 15. 정수는 불변이라 x = x + 5는 10을 수정하는 게 아니라 새 15 객체를 만듭니다."
+    "explanation": "코드: `def add(x, y): return x + y` → `print(add(5, 10))`\n\n**실행 과정**:\n1. `add(5, 10)` 호출\n2. `x = 5`, `y = 10` 할당\n3. `return 5 + 10` → 15 반환\n4. `print(15)` → 15 출력\n\n따라서 답은 **15**입니다!\n"
   },
   "misconceptions": [
     {
-      "wrong": "a = 20은 'a' 안의 값을 수정한다",
-      "correct": "a = 20은 'a'가 완전히 다른 객체를 가리키게 한다",
-      "why": "변수는 값을 '담지' 않습니다. 객체를 가리키는 라벨입니다. 재할당은 라벨을 옮깁니다."
+      "wrong": "함수를 정의하면 자동으로 실행된다",
+      "correct": "함수는 정의 후 반드시 호출해야 실행됩니다.",
+      "why": "def는 함수를 '정의'만 합니다. 호출(함수이름())을 해야 실행됩니다."
     },
     {
-      "wrong": "a = a + 1은 숫자를 제자리에서 증가시킨다",
-      "correct": "a = a + 1은 새 정수를 만들고 'a'를 재바인딩한다",
-      "why": "정수는 불변 - 바꿀 수 없습니다. 모든 산술 연산은 새 객체를 만듭니다."
+      "wrong": "return 없이도 값을 받을 수 있다",
+      "correct": "return이 없으면 None이 반환됩니다.",
+      "why": "명시적으로 return을 써야 원하는 값을 반환할 수 있습니다."
     },
     {
-      "wrong": "재할당하면 옛날 값이 즉시 삭제된다",
-      "correct": "옛날 객체는 가비지 컬렉션될 때까지 메모리에 남아있음",
-      "why": "파이썬의 가비지 컬렉터가 참조 없는 객체를 정리하지만, 즉시는 아닙니다."
+      "wrong": "함수 안의 변수는 밖에서도 사용 가능하다",
+      "correct": "함수 안의 지역 변수는 함수 밖에서 접근할 수 없습니다.",
+      "why": "지역 변수는 함수가 실행되는 동안만 존재합니다. 스코프(범위)가 다릅니다."
     }
   ],
-  "keyTakeaway": "재할당 = 라벨을 다른 객체로 옮기는 것, 객체 수정이 아님!"
+  "keyTakeaway": "함수는 def로 정의하고, 이름()으로 호출. return으로 값 반환. 함수 내부는 지역 스코프."
 }

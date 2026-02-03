@@ -1,0 +1,150 @@
+lessonId: "java-2-4"
+title: "예외 처리 (try-catch)"
+concept: "예외 처리는 프로그램 실행 중 발생하는 오류를 안전하게 처리하는 메커니즘입니다."
+
+code: |
+  String numStr = "123";
+  int num = Integer.parseInt(numStr);
+  System.out.println("변환 성공: " + num);
+
+  String text = "abc";
+  boolean valid = true;
+
+  for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      if (c < '0' || c > '9') {
+          valid = false;
+      }
+  }
+
+  if (valid) {
+      System.out.println("숫자 문자열");
+  } else {
+      System.out.println("숫자가 아님: " + text);
+  }
+
+annotations:
+  - line: 1
+    title: "문자열 숫자 변환"
+    explanation: |
+      **`String numStr = "123";`**
+
+      문자열 `"123"`을 정수로 변환하려고 합니다.
+
+      **예외가 발생할 수 있는 상황**:
+      - `"123"` → 123 (성공)
+      - `"abc"` → **NumberFormatException** 발생!
+
+  - line: 2
+    title: "parseInt 성공"
+    explanation: |
+      **`int num = Integer.parseInt(numStr);`**
+
+      `"123"`은 유효한 숫자이므로 변환 성공!
+
+      **실제 프로그램에서는 try-catch로 감싸야 합니다**:
+      ```
+      try {
+          int num = Integer.parseInt(input);
+      } catch (NumberFormatException e) {
+          System.out.println("잘못된 입력!");
+      }
+      ```
+
+  - line: 3
+    title: "성공 출력"
+    explanation: |
+      **`System.out.println("변환 성공: " + num);`**
+
+      **출력 결과**: `변환 성공: 123`
+
+  - line: 5
+    title: "숫자가 아닌 문자열"
+    explanation: |
+      **`String text = "abc";`**
+
+      이 문자열에 `parseInt()`를 쓰면 **예외 발생**!
+
+      **안전한 방법**: 먼저 검증한 후 변환합니다.
+      이것이 **방어적 프로그래밍**의 핵심입니다.
+
+  - line: 6
+    title: "유효성 플래그"
+    explanation: |
+      **`boolean valid = true;`**
+
+      숫자인지 확인하기 위한 플래그 변수입니다.
+      숫자가 아닌 문자가 하나라도 있으면 false로 바뀝니다.
+
+  - line: 8
+    title: "문자 검사 루프"
+    explanation: |
+      **`for (int i = 0; i < text.length(); i++)`**
+
+      문자열의 각 문자를 하나씩 검사합니다.
+
+      **try-catch vs 사전 검증**:
+      - try-catch: 예외 발생 후 처리 (사후 대응)
+      - 사전 검증: 예외 발생 전 방지 (사전 예방)
+
+  - line: 9
+    title: "문자 추출"
+    explanation: |
+      **`char c = text.charAt(i);`**
+
+      **charAt(i)**: i번째 문자를 가져옵니다.
+      - i=0: 'a', i=1: 'b', i=2: 'c'
+
+  - line: 10
+    title: "숫자 문자 확인"
+    explanation: |
+      **`if (c < '0' || c > '9')`**
+
+      문자가 '0'~'9' 범위 밖이면 숫자가 아닙니다.
+
+      - 'a'는 '0'~'9' 범위 밖 → **valid = false**
+
+  - line: 15
+    title: "조건 분기"
+    explanation: |
+      **`if (valid) { ... } else { ... }`**
+
+      valid가 false이므로 else 블록이 실행됩니다.
+
+      **출력 결과**: `숫자가 아님: abc`
+
+      **try-catch 구문 정리**:
+      ```
+      try {
+          // 예외 가능 코드
+      } catch (예외타입 e) {
+          // 에러 처리
+      } finally {
+          // 항상 실행 (선택)
+      }
+      ```
+
+quiz:
+  question: "try 블록에서 예외가 발생하지 않으면 catch는?"
+  options:
+    - "항상 실행"
+    - "실행되지 않음"
+    - "컴파일 에러"
+    - "경고 발생"
+  correctIndex: 1
+  explanation: |
+    catch 블록은 **예외가 발생했을 때만** 실행됩니다.
+
+    예외가 없으면 try 블록만 정상 실행되고
+    catch 블록은 **건너뜁니다**.
+
+misconceptions:
+  - wrong: "try-catch를 사용하면 에러가 발생하지 않는다"
+    correct: "try-catch는 에러 발생을 방지하는 것이 아니라, 발생한 에러를 처리합니다."
+    why: "예외는 여전히 발생하지만, catch에서 적절히 대응하여 프로그램이 계속 실행됩니다."
+
+  - wrong: "모든 코드를 try-catch로 감싸야 한다"
+    correct: "예외가 실제로 발생할 수 있는 코드만 try-catch로 감쌉니다."
+    why: "과도한 try-catch는 성능에 영향을 주고 코드 가독성을 떨어뜨립니다."
+
+keyTakeaway: "try: 예외 가능 코드. catch: 예외 처리. 사전 검증으로 예외 방지 가능. 방어적 프로그래밍이 중요."
