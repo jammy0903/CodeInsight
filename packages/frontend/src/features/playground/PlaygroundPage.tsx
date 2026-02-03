@@ -4,9 +4,9 @@
  * Right 50%: Memory Visualization
  */
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useIsMobile } from '@/hooks';
-import { Github, Mail, Play, Layers } from 'lucide-react';
+import { Play, Layers } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
 import { CodeEditor } from './components/CodeEditor';
 import { StepControls } from './components/StepControls';
@@ -22,92 +22,8 @@ import { StepNavigationArrows } from '@/features/courses/components/StepNavigati
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
 import type { LessonStep } from '@/types';
-
-// 테마별 Playground 색상
-const playgroundColors = {
-  dark: {
-    // 배경 (남색 기반)
-    pageBg: '#0a0f1a',           // deep navy
-    panelBg: '#0d1525',          // navy panel
-    headerBg: '#0d1525',
-    // 보더
-    border: '#1a2540',           // navy border
-    resizeHandle: '#1a2d4a',     // navy handle
-    resizeHover: '#2a3d5a',      // navy hover
-    // 텍스트
-    text: '#e8f0ff',             // bright white-blue
-    textMuted: '#b8c8e8',        // light blue-gray
-    textDim: '#8ba3cf',          // medium blue-gray
-    // 악센트 (네온 시안)
-    accent: '#00ffff',           // neon cyan
-    accentBg: '#0a2040',         // dark cyan bg
-    accentBorder: '#00aaff',     // bright cyan border
-    // 설명 패널 (네온 시안 계열)
-    explanationBg: '#081820',
-    explanationHeaderBg: '#0a2540',
-    explanationBorder: '#00aaff',
-    explanationText: '#00ffff',
-    explanationTextMuted: '#00ddff',
-    // 에러
-    errorBg: '#180810',
-    errorBorder: '#ff3366',
-    errorText: '#ff5577',
-    // 푸터
-    footerBg: '#080d18',
-    footerBorder: '#1a2540',
-    footerText: '#b8c8e8',
-  },
-  soft: {
-    pageBg: '#faf8fc',
-    panelBg: '#ffffff',
-    headerBg: '#ffffff',
-    border: '#ebe4ed',
-    resizeHandle: '#e9d5ff',
-    resizeHover: '#d8b4fe',
-    text: '#6b5a7a',
-    textMuted: '#a08eb0',
-    textDim: '#c4b5d0',
-    accent: '#a855f7',
-    accentBg: '#faf5ff',
-    accentBorder: '#e9d5ff',
-    explanationBg: '#f0fdf4',
-    explanationHeaderBg: '#dcfce7',
-    explanationBorder: '#bbf7d0',
-    explanationText: '#166534',
-    explanationTextMuted: '#16a34a',
-    errorBg: '#fef2f2',
-    errorBorder: '#fecaca',
-    errorText: '#dc2626',
-    footerBg: '#f3eef8',
-    footerBorder: '#ebe4ed',
-    footerText: '#a08eb0',
-  },
-  minimal: {
-    pageBg: '#faf9f7',
-    panelBg: '#fffffe',
-    headerBg: '#fffffe',
-    border: '#e5d5c7',
-    resizeHandle: '#d6cfc5',
-    resizeHover: '#c4b8a8',
-    text: '#5c4a3d',
-    textMuted: '#8a8279',
-    textDim: '#a39585',
-    accent: '#a08060',
-    accentBg: '#fef3c7',
-    accentBorder: '#fcd34d',
-    explanationBg: '#fefce8',
-    explanationHeaderBg: '#fef9c3',
-    explanationBorder: '#fde047',
-    explanationText: '#854d0e',
-    explanationTextMuted: '#a16207',
-    errorBg: '#fef2f2',
-    errorBorder: '#fecaca',
-    errorText: '#dc2626',
-    footerBg: '#f5f3f0',
-    footerBorder: '#e5d5c7',
-    footerText: '#8a8279',
-  },
-};
+import { playgroundColors } from './styles/playgroundTheme';
+import { PlaygroundFooter } from './components/PlaygroundFooter';
 
 const LINE_HEIGHT = 19;
 const MIN_EDITOR_HEIGHT = 150;
@@ -421,28 +337,7 @@ export function PlaygroundPage() {
         )}
 
         {/* Footer */}
-        <footer
-          style={{
-            padding: '6px 12px',
-            backgroundColor: colors.footerBg,
-            borderTop: `1px solid ${colors.footerBorder}`,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexShrink: 0,
-            paddingBottom: '20px', // 약간의 여유 공간
-          }}
-        >
-          <span style={{ fontSize: '10px', color: colors.footerText }}>CodeInsight 2026</span>
-          <div style={{ display: 'flex', gap: '6px' }}>
-            <a href="https://github.com/jammy0903" target="_blank" rel="noopener noreferrer" style={{ color: colors.footerText, display: 'flex' }}>
-              <Github size={12} />
-            </a>
-            <a href="mailto:l89192164@gmail.com" style={{ color: colors.footerText, display: 'flex' }}>
-              <Mail size={12} />
-            </a>
-          </div>
-        </footer>
+        <PlaygroundFooter colors={colors} isMobile />
       </div>
     );
   }
@@ -680,27 +575,7 @@ export function PlaygroundPage() {
       </div>
 
       {/* Footer */}
-      <footer
-        style={{
-          padding: '8px 24px',
-          backgroundColor: colors.footerBg,
-          borderTop: `1px solid ${colors.footerBorder}`,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <span style={{ fontSize: '11px', color: colors.footerText }}>CodeInsight 2026</span>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <a href="https://github.com/jammy0903" target="_blank" rel="noopener noreferrer" style={{ color: colors.footerText, display: 'flex' }}>
-            <Github size={14} />
-          </a>
-          <a href="mailto:l89192164@gmail.com" style={{ color: colors.footerText, display: 'flex' }}>
-            <Mail size={14} />
-          </a>
-        </div>
-      </footer>
+      <PlaygroundFooter colors={colors} />
     </div>
   );
 }
