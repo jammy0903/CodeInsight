@@ -7,10 +7,11 @@ import { motion } from 'framer-motion';
 import { Code2, Sparkles, Menu } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
-import { StreakCard, useStreak } from '@/features/gamification';
+import { StreakCard } from '@/features/gamification';
 import { LanguageBadge } from '@/components/ui/LanguageBadge';
 import { useIsMobile } from '@/hooks'; // useIsMobile import
 import type { SupportedLanguage } from '@/types/simulator'; // SupportedLanguage import
+import { useEffect } from 'react';
 
 // 언어 정보 (LanguageCoursePage.tsx에서 가져옴)
 const getLanguageInfo = (lang: SupportedLanguage | null) => {
@@ -25,11 +26,15 @@ const getLanguageInfo = (lang: SupportedLanguage | null) => {
 };
 
 export function TopBar() {
-  const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle, pageLanguage, appUser } = useStore();
-  const { streak, loading: streakLoading } = useStreak();
+  const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle, pageLanguage, appUser, streak, streakLoading, refreshStreak } = useStore();
   const isMobile = useIsMobile(); // isMobile 훅 사용
 
   const langInfo = pageLanguage ? getLanguageInfo(pageLanguage) : null;
+
+  // 초기 로드 및 appUser 변경 시 스트릭 로드
+  useEffect(() => {
+    refreshStreak();
+  }, [appUser, refreshStreak]);
 
   return (
     <header

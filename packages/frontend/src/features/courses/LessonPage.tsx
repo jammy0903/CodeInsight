@@ -267,7 +267,7 @@ export function LessonPage() {
   }>();
 
   const queryClient = useQueryClient();
-  const { setPageTitle, appUser } = useStore();
+  const { setPageTitle, appUser, refreshStreak } = useStore();
 
   // TanStack Query: 레슨 데이터 + 챕터 데이터
   const { data: lesson, isLoading, isError, error } = useLesson(lessonId);
@@ -524,6 +524,8 @@ export function LessonPage() {
         // 캐시 무효화로 UI 즉시 업데이트
         queryClient.invalidateQueries({ queryKey: ['progress', appUser?.id] });
         queryClient.invalidateQueries({ queryKey: ['language'] }); // 챕터 progress도 업데이트
+        // 스트릭 업데이트 (백엔드에서 이미 업데이트되었으므로 UI만 refresh)
+        await refreshStreak();
       } catch (err) {
         console.error('[Progress] Failed to save:', err);
       }

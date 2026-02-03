@@ -7,6 +7,9 @@ import { create } from 'zustand';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { Message, RunResult, Step } from '@/types/index';
 import type { SupportedLanguage } from '@/types/simulator';
+import type { StreakStatus } from '@/services/gamification';
+import { getStreak } from '@/services/gamification';
+import { logger } from '@/utils/logger';
 
 // App User 타입 (우리 DB의 User)
 export interface OAuthAccountInfo {
@@ -43,6 +46,11 @@ interface Store {
   setNeedsOnboarding: (needs: boolean) => void;
   authLoading: boolean;
   setAuthLoading: (loading: boolean) => void;
+
+  // === 스트릭 (Gamification) ===
+  streak: StreakStatus | null;
+  streakLoading: boolean;
+  refreshStreak: () => Promise<void>;
 
   // === 채팅 ===
   messages: Message[];
@@ -101,6 +109,28 @@ export const useStore = create<Store>((set, get) => ({
   setNeedsOnboarding: (needs) => set({ needsOnboarding: needs }),
   authLoading: true,
   setAuthLoading: (loading) => set({ authLoading: loading }),
+
+  // === 스트릭 (Gamification) ===
+  streak: null,
+  streakLoading: false,
+  refreshStreak: async () => {
+    const { appUser } = get();
+
+    // 로그인 안 된 상태
+    if (!appUser) {
+      set({ streak: null, streakLoading: false });
+      return;
+    }
+
+    try {
+      set({ streakLoading: true });
+      const data = await getStreak();
+      set({ streak: data, streakLoading: false });
+    } catch (error) {
+      logger.error('Failed to fetch streak:', error);
+      set({ streak: null, streakLoading: false });
+    }
+  },
 
   // === 채팅 ===
   messages: [],
