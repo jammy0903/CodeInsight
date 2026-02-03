@@ -98,23 +98,36 @@ export function MobileLessonView({
     currentStepIndex
   );
 
-  // 터미널 출력 라인 변환 (C/Java/Python 모두 지원)
+  // 터미널 출력 라인 변환 — languageId 기반 분기
   const terminalLines = useMemo((): TerminalLine[] => {
-    // 1. stdout 우선 (C, Java)
-    if (currentStep?.stdout) {
-      return currentStep.stdout
-        .split('\n')
-        .filter(Boolean)
+    if (!currentStep) return [];
+
+    // C: step.stdout (누적 문자열)
+    if (languageId === 'c') {
+      if (!currentStep.stdout) return [];
+      return currentStep.stdout.split('\n').filter(Boolean)
         .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
     }
 
-    // 2. Python: pythonMemoryState.output
-    const pythonOutput = (currentStep as any)?.pythonMemoryState?.output;
-    if (Array.isArray(pythonOutput)) {
-      return pythonOutput.map((line): TerminalLine => ({
-        content: String(line),
-        type: 'stdout'
-      }));
+    // Python: pythonMemoryState.output (배열)
+    if (languageId === 'python' || languageId === 'python-practical') {
+      const output = (currentStep as any)?.pythonMemoryState?.output;
+      if (!Array.isArray(output)) return [];
+      return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+    }
+
+    // Java: javaMemoryState.output (배열)
+    if (languageId === 'java') {
+      const output = (currentStep as any)?.javaMemoryState?.output;
+      if (!Array.isArray(output)) return [];
+      return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+    }
+
+    // JavaScript: eventLoopState.output (배열)
+    if (languageId === 'javascript' || languageId === 'js') {
+      const output = (currentStep as any)?.eventLoopState?.output;
+      if (!Array.isArray(output)) return [];
+      return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
     }
 
     return [];
