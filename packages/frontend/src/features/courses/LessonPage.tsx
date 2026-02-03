@@ -564,34 +564,46 @@ export function LessonPage() {
   // (이전 workaround 코드 제거됨 - 2026-01-27)
   const displayLine = currentStep?.line || 1;
 
-  // 터미널 출력 라인 변환 (C/Java/Python 모두 지원)
+  // 터미널 출력 라인 변환 — languageId 기반 분기
   // 현재 스텝에서 새로 추가된 출력만 표시 (누적 X)
   const terminalLines = useMemo((): TerminalLine[] => {
+    if (!currentStep) return [];
     const prevStep = navigation.currentStepIndex > 0 ? steps[navigation.currentStepIndex - 1] : null;
 
-    // 1. stdout 우선 (C, Java)
-    if (currentStep?.stdout) {
+    // C: step.stdout (누적 문자열)
+    if (lang === 'c') {
+      if (!currentStep.stdout) return [];
       const currentLines = currentStep.stdout.split('\n').filter(Boolean);
       const prevLines = prevStep?.stdout?.split('\n').filter(Boolean) || [];
-
-      // 이전 스텝 출력을 제외한 새로운 라인만 추출
-      const newLines = currentLines.slice(prevLines.length);
-
-      return newLines.map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+      return currentLines.slice(prevLines.length)
+        .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
     }
 
-    // 2. Python: pythonMemoryState.output
-    const pythonOutput = (currentStep as any)?.pythonMemoryState?.output;
-    if (Array.isArray(pythonOutput)) {
-      const prevPythonOutput = (prevStep as any)?.pythonMemoryState?.output || [];
+    // Python: pythonMemoryState.output (배열)
+    if (lang === 'python' || lang === 'python-practical') {
+      const output = (currentStep as any)?.pythonMemoryState?.output;
+      if (!Array.isArray(output)) return [];
+      const prevOutput = (prevStep as any)?.pythonMemoryState?.output || [];
+      return output.slice(prevOutput.length)
+        .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+    }
 
-      // 이전 스텝 출력을 제외한 새로운 라인만 추출
-      const newLines = pythonOutput.slice(prevPythonOutput.length);
+    // Java: javaMemoryState.output (배열)
+    if (lang === 'java') {
+      const output = (currentStep as any)?.javaMemoryState?.output;
+      if (!Array.isArray(output)) return [];
+      const prevOutput = (prevStep as any)?.javaMemoryState?.output || [];
+      return output.slice(prevOutput.length)
+        .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+    }
 
-      return newLines.map((line): TerminalLine => ({
-        content: String(line),
-        type: 'stdout'
-      }));
+    // JavaScript: eventLoopState.output (배열)
+    if (lang === 'javascript' || lang === 'js') {
+      const output = (currentStep as any)?.eventLoopState?.output;
+      if (!Array.isArray(output)) return [];
+      const prevOutput = (prevStep as any)?.eventLoopState?.output || [];
+      return output.slice(prevOutput.length)
+        .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
     }
 
     return [];
