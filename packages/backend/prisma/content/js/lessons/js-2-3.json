@@ -1,0 +1,121 @@
+{
+  "lessonId": "js-2-3",
+  "title": "콜백 함수",
+  "concept": "콜백 함수는 다른 함수에 인자로 전달되는 함수입니다. JavaScript의 핵심 패턴입니다.",
+  "content": {
+    "code": "function calculate(a, b, operation) {\n    let result = operation(a, b);\n    return result;\n}\n\nfunction multiply(x, y) {\n    return x * y;\n}\n\nlet answer = calculate(4, 5, multiply);\nconsole.log(\"4 * 5 =\", answer);\n\nlet sum = calculate(4, 5, (x, y) => x + y);\nconsole.log(\"4 + 5 =\", sum);\n",
+    "steps": [
+      {
+        "line": 2,
+        "title": "콜백 함수 실행",
+        "explanation": "**`let result = operation(a, b);`**\n\n전달받은 함수(`operation`)를 호출합니다.\n\n`operation`에 어떤 함수가 전달되느냐에 따라 동작이 달라집니다!\n",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "Line 2 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 10,
+        "title": "함수를 인자로 전달",
+        "explanation": "**`let answer = calculate(4, 5, multiply);`**\n\n`multiply` 함수 자체를 인자로 전달합니다.\n(괄호 없이! `multiply()`가 아님)\n\n실행: `operation(4, 5)` = `multiply(4, 5)` = 20\n",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "Line 10 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 11,
+        "title": "결과 출력",
+        "explanation": "**`console.log(\"4 * 5 =\", answer);`**\n\n**출력 결과**: `4 * 5 = 20`\n",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "4 * 5 = 20"
+          ],
+          "note": "Line 11 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 13,
+        "title": "화살표 함수를 콜백으로",
+        "explanation": "**`let sum = calculate(4, 5, (x, y) => x + y);`**\n\n화살표 함수를 **직접 인라인으로** 전달합니다.\n별도의 함수를 정의할 필요 없이 바로 사용!\n\n실행: `operation(4, 5)` = `((x, y) => x + y)(4, 5)` = 9\n",
+        "highlight": [
+          13
+        ],
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "4 * 5 = 20"
+          ],
+          "note": "Line 13 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 14,
+        "title": "덧셈 결과 출력",
+        "explanation": "**`console.log(\"4 + 5 =\", sum);`**\n\n**출력 결과**: `4 + 5 = 9`\n",
+        "highlight": [
+          14
+        ],
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "4 * 5 = 20",
+            "4 + 5 = 9"
+          ],
+          "note": "Line 14 executed",
+          "names": [],
+          "objects": []
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "함수를 인자로 전달할 때 올바른 방법은?",
+    "options": [
+      "calculate(4, 5, multiply())",
+      "calculate(4, 5, multiply)",
+      "calculate(4, 5, &multiply)",
+      "calculate(4, 5, \"multiply\")"
+    ],
+    "correctIndex": 1,
+    "explanation": "함수를 전달할 때는 **괄호 없이 함수 이름만** 전달합니다.\n\n- `multiply`: 함수 자체를 전달 (올바름!)\n- `multiply()`: 함수를 **실행한 결과값**을 전달 (의도와 다름!)\n"
+  },
+  "misconceptions": [
+    {
+      "wrong": "함수는 인자로 전달할 수 없다",
+      "correct": "JS에서 함수는 일급 객체이므로 인자로 전달, 변수에 할당, 반환값으로 사용 가능합니다.",
+      "why": "함수도 객체의 일종이므로 값처럼 다룰 수 있습니다."
+    },
+    {
+      "wrong": "콜백 함수는 비동기에서만 사용한다",
+      "correct": "콜백은 동기/비동기 모두에서 사용되는 일반적인 패턴입니다.",
+      "why": "배열 메서드(map, filter), 이벤트 리스너 등 동기적 콜백도 매우 흔합니다."
+    }
+  ],
+  "keyTakeaway": "콜백: 함수를 인자로 전달하는 패턴. 함수 이름만 전달(괄호 없이). 화살표 함수로 인라인 작성 가능."
+}

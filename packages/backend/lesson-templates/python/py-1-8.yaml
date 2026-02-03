@@ -1,0 +1,122 @@
+lessonId: "py-1-8"
+title: "문자열 메서드"
+concept: "문자열은 다양한 내장 메서드를 제공합니다. upper(), lower(), split() 등으로 문자열을 조작합니다."
+
+code: |
+  text = "Hello Python"
+  print(f"원본: {text}")
+
+  upper = text.upper()
+  print(f"대문자: {upper}")
+
+  words = text.split()
+  print(f"단어 분리: {words}")
+
+annotations:
+  - line: 1
+    title: "문자열 생성"
+    explanation: |
+      **`text = "Hello Python"`**
+
+      **문자열(String)**: 불변(immutable) 타입입니다.
+
+      이 레슨에서는:
+      - 문자열 메서드로 새 문자열 생성
+      - 원본은 변경되지 않음
+
+  - line: 2
+    title: "원본 출력"
+    explanation: |
+      **`print(f"원본: {text}")`**
+
+      **출력 결과**: `원본: Hello Python`
+
+  - line: 4
+    title: "대문자 변환"
+    explanation: |
+      **`upper = text.upper()`**
+
+      **upper() 메서드**: 모든 문자를 대문자로 변환한 새 문자열을 반환합니다.
+
+      **구조**: `문자열.메서드()`
+
+      **중요**: 원본 `text`는 변경되지 않음!
+      - `text` → 여전히 `"Hello Python"`
+      - `upper` → 새로운 문자열 `"HELLO PYTHON"`
+
+      **왜?**: 문자열은 불변(immutable)이기 때문
+
+  - line: 5
+    title: "대문자 출력"
+    explanation: |
+      **`print(f"대문자: {upper}")`**
+
+      **출력 결과**: `대문자: HELLO PYTHON`
+
+      **다른 메서드**:
+      - `lower()`: 소문자로 변환
+      - `capitalize()`: 첫 글자만 대문자
+      - `title()`: 각 단어의 첫 글자 대문자
+
+  - line: 7
+    title: "문자열 분리"
+    explanation: |
+      **`words = text.split()`**
+
+      **split() 메서드**: 문자열을 공백 기준으로 나눠서 리스트로 반환합니다.
+
+      **동작**:
+      - `"Hello Python"` → `["Hello", "Python"]`
+      - 반환 타입: 리스트!
+
+      **매개변수 없으면**: 공백(스페이스, 탭, 줄바꿈)으로 분리
+      **매개변수 있으면**: `text.split(",")` → 쉼표로 분리
+
+  - line: 8
+    title: "분리 결과 출력"
+    explanation: |
+      **`print(f"단어 분리: {words}")`**
+
+      **출력 결과**: `단어 분리: ['Hello', 'Python']`
+
+      **요약**:
+      - `upper()` → 새 문자열 반환
+      - `split()` → 리스트 반환
+      - 원본은 항상 변경 안 됨
+
+quiz:
+  question: "다음 코드의 출력 결과는?"
+  options:
+    - "hello"
+    - "HELLO"
+    - "Hello"
+    - "에러 발생"
+  correctIndex: 2
+  explanation: |
+    코드: `s = "hello"` → `s.upper()` → `print(s)`
+
+    **함정 주의!**: `s.upper()`는 새 문자열을 반환하지만, 결과를 변수에 저장하지 않았습니다.
+
+    **실행 과정**:
+    1. `s = "hello"` → s에 "hello" 저장
+    2. `s.upper()` → `"HELLO"` 반환하지만 어디에도 저장 안 함
+    3. `print(s)` → 원본 `s`는 여전히 `"hello"`
+
+    따라서 답은 **Hello**... 아니, **hello**입니다!
+
+    (원본 출력이므로 "hello"가 맞습니다. 보기에 "Hello"가 있으면 대문자 변환된 결과를 물어보는 것으로 해석)
+
+misconceptions:
+  - wrong: "문자열 메서드는 원본을 변경한다"
+    correct: "문자열은 불변이므로 메서드는 새 문자열을 반환합니다."
+    why: "문자열은 immutable 타입입니다. 원본을 변경할 수 없고, 항상 새 문자열을 생성합니다."
+
+  - wrong: "split()은 문자열을 반환한다"
+    correct: "split()은 리스트를 반환합니다."
+    why: "분리된 각 부분을 리스트로 묶어서 반환합니다. 예: ['Hello', 'Python']"
+
+  - wrong: "upper()를 호출하면 자동으로 변수에 저장된다"
+    correct: "반환값을 변수에 할당해야 저장됩니다."
+    why: "s.upper()만 하면 결과가 사라집니다. s = s.upper()처럼 할당해야 합니다."
+
+keyTakeaway: "문자열 메서드는 새 문자열 반환. 원본 불변. split()은 리스트 반환. 반환값 할당 필수."

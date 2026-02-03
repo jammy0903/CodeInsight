@@ -1,15 +1,14 @@
 {
   "lessonId": "java-1-2",
-  "title": "String Pool의 비밀",
-  "concept": "문자열 리터럴은 String Pool에 저장되어 재사용된다",
+  "title": "배열 기초",
+  "concept": "Java 배열은 같은 타입의 데이터를 고정된 크기로 저장합니다. 인덱스는 0부터 시작합니다.",
   "content": {
-    "code": "String a = \"hello\";\nString b = \"hello\";\nSystem.out.println(a == b);\n\nString c = new String(\"hello\");\nSystem.out.println(a == c);\n\nString d = c.intern();\nSystem.out.println(a == d);",
+    "code": "int[] nums = {10, 20, 30};\nSystem.out.println(\"길이: \" + nums.length);\nSystem.out.println(\"nums[0] = \" + nums[0]);\nSystem.out.println(\"nums[2] = \" + nums[2]);\n\nnums[1] = 99;\nSystem.out.println(\"변경 후 nums[1] = \" + nums[1]);\n",
     "steps": [
       {
         "line": 1,
-        "title": "리터럴로 String 생성",
-        "explanation": "**실행 순서:**\n1. JVM이 **String Pool** 검색.\n2. \"hello\"가 없으므로 Pool에 생성.\n3. 주소(Pool:0x100)를 `a`에 할당.\n\n**String Pool이란?**\n자주 쓰는 문자열을 모아두는 '재활용 센터'입니다. Java는 메모리를 아끼기 위해 똑같은 문자열 리터럴은 하나만 만들어서 공유합니다.\n\n**리터럴(Literal)이란?**\n코드에 직접 타이핑한 값(`\"hello\"`)들을 말합니다.",
-        "keyInsight": "따옴표(\"\")로 만들면 Pool에 저장됨",
+        "title": "배열 선언과 초기화",
+        "explanation": "**`int[] nums = {10, 20, 30};`**\n\n**배열 선언**: `타입[] 이름 = {초기값};`\n\n- `int[]`: int 타입 배열\n- `{10, 20, 30}`: 3개 요소로 초기화\n- 배열 크기는 **생성 시 고정** (변경 불가)\n\n**다른 선언 방법**:\n- `int[] arr = new int[5];` → 크기 5, 기본값 0\n- `int[] arr = new int[]{1, 2, 3};`\n",
         "highlight": [
           1
         ],
@@ -17,25 +16,46 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "-> Pool"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "nums": {
+                  "length": 3,
+                  "id": "0x037",
+                  "type": "Array",
+                  "class": "int[]"
+                }
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
-          "stringPool": [
+          "heap": [
             {
-              "value": "\"hello\"",
-              "address": "Pool:0x100"
+              "address": "0x037",
+              "length": 3,
+              "type": "int[]",
+              "content": "[10, 20, 30]"
+            },
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "heap": [],
-          "output": []
+          "output": [],
+          "note": "Line 1 executed"
         }
       },
       {
         "line": 2,
-        "title": "같은 리터럴 재사용",
-        "explanation": "**실행 순서:**\n1. String Pool 검색.\n2. \"hello\" 발견 (재사용).\n3. 기존 주소(Pool:0x100)를 `b`에 할당.\n\n또 \"hello\"를 만들려고 하네요?\nJVM은 Pool을 뒤져보고, \"어? 아까 만든 게 있네?\" 하고 **기존 주소**를 재사용합니다.\n그래서 `b`도 `a`와 똑같은 **Pool:0x100**을 가리키게 됩니다.\n\n**Flyweight 패턴:**\n똑같은 객체를 많이 만들지 않고 공유해서 메모리를 절약하는 디자인 패턴입니다. String Pool이 바로 이 패턴입니다.",
-        "keyInsight": "같은 리터럴 = 같은 주소 재사용",
+        "title": "배열 길이",
+        "explanation": "**`System.out.println(\"길이: \" + nums.length);`**\n\n**length**: 배열의 길이를 반환하는 **필드**입니다.\n\n**출력 결과**: `길이: 3`\n\n**주의**: `length`는 메서드가 아니라 필드! (`()` 없음)\n- 배열: `arr.length` (필드)\n- String: `str.length()` (메서드)\n",
         "highlight": [
           2
         ],
@@ -43,172 +63,254 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "-> Pool:0x100"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "nums": {
+                  "length": 3,
+                  "id": "0x037",
+                  "type": "Array",
+                  "class": "int[]"
+                }
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x037",
+              "length": 3,
+              "type": "int[]",
+              "content": "[10, 20, 30]"
             },
             {
-              "name": "b",
-              "value": "-> Pool:0x100",
-              "sameRef": true
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "stringPool": [
-            {
-              "value": "\"hello\"",
-              "address": "Pool:0x100",
-              "refCount": 2
-            }
-          ],
-          "heap": [],
-          "output": []
+          "output": [],
+          "note": "Line 2 executed"
         }
       },
       {
         "line": 3,
-        "title": "리터럴끼리 == 비교",
-        "explanation": "**실행 순서:**\n1. a(Pool:0x100) == b(Pool:0x100) 비교.\n2. 주소가 같으므로 **true**.\n\n`a`와 `b`는 **같은 주소**를 가리키고 있으니 `==`(주소 비교) 결과는 **true**입니다.\n하지만 주의하세요! 이건 문자열이 같아서가 아니라, **우연히 같은 객체를 공유**했기 때문입니다.",
-        "keyInsight": "리터럴끼리는 == 가 true (하지만 .equals 권장)",
+        "title": "인덱스 접근",
+        "explanation": "**`System.out.println(\"nums[0] = \" + nums[0]);`**\n\n인덱스는 **0부터 시작**합니다.\n\n**출력 결과**: `nums[0] = 10`\n",
         "highlight": [
           3
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "comparison": "Pool:0x100 == Pool:0x100",
-          "output": [
-            "true"
+          "stack": [
+            {
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "nums": {
+                  "length": 3,
+                  "id": "0x037",
+                  "type": "Array",
+                  "class": "int[]"
+                }
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
           ],
-          "warning": "리터럴끼리는 ==가 true! 하지만 이에 의존하면 안 됨",
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "address": "0x037",
+              "length": 3,
+              "type": "int[]",
+              "content": "[10, 20, 30]"
+            },
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 3 executed"
         }
       },
       {
-        "line": 5,
-        "title": "new로 String 생성",
-        "explanation": "**실행 순서:**\n1. `new` 키워드 발견 -> 무조건 새 객체 생성.\n2. Heap에 0x200 할당.\n\n`new` 키워드는 **\"재활용하지 말고 무조건 새 거 내놔!\"** 라는 명령입니다.\nPool에 \"hello\"가 있든 말든 신경 쓰지 않고, 일반 **Heap** 영역에 새로운 객체를 만듭니다.\n\n**Heap String vs Pooled String:**\n- `new`: 나만의 전용 객체 (재사용 X)\n- `\"...\"`: 공용 객체 (재사용 O)",
-        "keyInsight": "new = 재활용 거부, 무조건 새 객체",
+        "line": 4,
+        "title": "마지막 요소",
+        "explanation": "**`System.out.println(\"nums[2] = \" + nums[2]);`**\n\n**출력 결과**: `nums[2] = 30`\n\n**주의**: `nums[3]`에 접근하면 **ArrayIndexOutOfBoundsException** 발생!\n(C와 다르게 Java는 범위를 검사합니다)\n",
         "highlight": [
-          5
+          4
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "-> Pool:0x100"
-            },
-            {
-              "name": "c",
-              "value": "-> 0x200"
-            }
-          ],
-          "stringPool": [
-            {
-              "value": "\"hello\"",
-              "address": "Pool:0x100"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "nums": {
+                  "length": 3,
+                  "id": "0x037",
+                  "type": "Array",
+                  "class": "int[]"
+                }
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
           "heap": [
             {
-              "address": "0x200",
-              "content": "\"hello\"",
-              "new": true
+              "address": "0x037",
+              "length": 3,
+              "type": "int[]",
+              "content": "[10, 20, 30]"
+            },
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "output": []
+          "output": [],
+          "note": "Line 4 executed"
         }
       },
       {
         "line": 6,
-        "title": "리터럴 vs new 비교",
-        "explanation": "**실행 순서:**\n1. a(Pool:0x100) == c(0x200) 비교.\n2. 주소가 다르므로 **false**.\n\n`a`는 재활용 센터(Pool) 출신이고,\n`c`는 공장(Heap)에서 갓 찍어낸 신상입니다.\n출신 성분이 다르니 주소도 다릅니다.",
+        "title": "요소 변경",
+        "explanation": "**`nums[1] = 99;`**\n\n인덱스 1의 값을 20 → 99로 변경합니다.\n",
         "highlight": [
           6
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "comparison": "Pool:0x100 != 0x200",
-          "output": [
-            "true",
-            "false"
+          "stack": [
+            {
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "nums": {
+                  "length": 3,
+                  "id": "0x037",
+                  "type": "Array",
+                  "class": "int[]"
+                }
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
           ],
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "address": "0x037",
+              "length": 3,
+              "type": "int[]",
+              "content": "[10, 99, 30]"
+            },
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 6 executed"
         }
       },
       {
-        "line": 8,
-        "title": "intern()으로 Pool 등록",
-        "explanation": "**실행 순서:**\n1. `c.intern()` 호출.\n2. String Pool에서 같은 내용(\"hello\") 찾음.\n3. 찾은 Pool 객체의 주소(Pool:0x100) 반환.\n\n`intern()` 메서드는 **\"나도 저 Pool 무리에 끼워줘\"** 라고 요청하는 것입니다.\n결국 `d`는 `a`와 같은 주소를 가지게 됩니다.",
-        "keyInsight": "intern() = Heap 문자열을 Pool 주소로 변환",
+        "line": 7,
+        "title": "변경 확인",
+        "explanation": "**`System.out.println(\"변경 후 nums[1] = \" + nums[1]);`**\n\n**출력 결과**: `변경 후 nums[1] = 99`\n",
         "highlight": [
-          8
+          7
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "-> Pool:0x100"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "nums": {
+                  "length": 3,
+                  "id": "0x037",
+                  "type": "Array",
+                  "class": "int[]"
+                }
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x037",
+              "length": 3,
+              "type": "int[]",
+              "content": "[10, 99, 30]"
             },
             {
-              "name": "d",
-              "value": "-> Pool:0x100",
-              "sameRef": true
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "stringPool": [
-            {
-              "value": "\"hello\"",
-              "address": "Pool:0x100"
-            }
-          ],
-          "heap": [],
-          "output": []
-        }
-      },
-      {
-        "line": 9,
-        "title": "intern() 결과 비교",
-        "explanation": "**실행 순서:**\n1. a(Pool:0x100) == d(Pool:0x100) 비교.\n2. 주소가 같으므로 **true**.\n\n`a`와 `d`는 이제 같은 Pool 객체를 가리킵니다. `true`!\n\n**실무 팁:**\n수백만 개의 중복된 문자열을 다뤄야 할 때 `intern()`을 쓰면 메모리를 획기적으로 줄일 수 있습니다.",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "javaMemory",
-        "javaMemoryState": {
-          "output": [
-            "true",
-            "false",
-            "true"
-          ],
-          "stack": [],
-          "heap": []
+          "output": [],
+          "note": "Line 7 executed"
         }
       }
     ]
   },
   "quiz": {
-    "question": "String Pool의 목적은?",
+    "question": "new int[3]으로 생성한 배열의 초기값은?",
     "options": [
-      "보안 강화",
-      "메모리 절약",
-      "속도 향상",
-      "가비지 컬렉션 최적화"
+      "null",
+      "0",
+      "undefined",
+      "랜덤 값"
     ],
     "correctIndex": 1,
-    "explanation": "같은 문자열 리터럴을 여러 번 사용해도 하나의 객체만 생성하여 메모리를 절약합니다."
+    "explanation": "Java에서 `new int[3]`으로 생성한 배열은 **기본값 0**으로 초기화됩니다.\n\n**타입별 기본값**:\n- 정수(`int`, `long`): 0\n- 실수(`double`, `float`): 0.0\n- `boolean`: false\n- 참조 타입(`String` 등): null\n"
   },
   "misconceptions": [
     {
-      "wrong": "문자열은 항상 ==로 비교하면 된다",
-      "correct": "문자열 비교는 무조건 `.equals()`를 사용해야 합니다.",
-      "why": "리터럴은 Pool 때문에 운 좋게 `==`가 통할 수 있지만, 사용자 입력이나 파일에서 읽은 문자열은 `new` 객체처럼 취급되어 `==`가 실패합니다."
+      "wrong": "Java 배열 크기를 나중에 변경할 수 있다",
+      "correct": "Java 배열의 크기는 생성 시 고정됩니다.",
+      "why": "크기 변경이 필요하면 ArrayList를 사용해야 합니다."
     },
     {
-      "wrong": "String Pool은 메모리가 꽉 차도 안 비워진다",
-      "correct": "String Pool도 GC(가비지 컬렉션)의 대상입니다.",
-      "why": "Java 7 이전에는 PermGen 영역에 있어서 메모리 부족 문제가 있었지만, Java 7부터는 일반 Heap으로 옮겨져서 참조가 없으면 자동으로 청소됩니다."
+      "wrong": "배열 범위를 벗어나도 C처럼 접근 가능하다",
+      "correct": "Java는 배열 범위를 검사하여 ArrayIndexOutOfBoundsException을 발생시킵니다.",
+      "why": "Java는 안전한 메모리 접근을 보장합니다."
     }
   ],
-  "keyTakeaway": "리터럴은 Pool에서 재사용되고, new는 항상 새 객체를 만듭니다. 비교는 .equals()!"
+  "keyTakeaway": "Java 배열: 타입[] 이름. 크기 고정. 인덱스 0부터. 범위 초과 시 예외 발생."
 }

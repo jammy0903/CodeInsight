@@ -1,15 +1,14 @@
 {
   "lessonId": "java-1-3",
-  "title": "Integer 캐싱 함정",
-  "concept": "Integer는 -128~127 범위를 캐싱하여 같은 객체를 재사용한다",
+  "title": "조건문 (if, else)",
+  "concept": "Java의 조건문은 C와 유사합니다. boolean 타입만 조건으로 사용할 수 있습니다.",
   "content": {
-    "code": "Integer a = 127;\nInteger b = 127;\nSystem.out.println(a == b);\n\nInteger x = 128;\nInteger y = 128;\nSystem.out.println(x == y);\n\nSystem.out.println(x.equals(y));",
+    "code": "int score = 85;\n\nif (score >= 90) {\n    System.out.println(\"A등급\");\n} else if (score >= 80) {\n    System.out.println(\"B등급\");\n} else {\n    System.out.println(\"C등급\");\n}\n",
     "steps": [
       {
         "line": 1,
-        "title": "Integer 127 생성 (Auto-boxing)",
-        "explanation": "**실행 순서:**\n1. `Integer.valueOf(127)` 자동 호출.\n2. 127이 캐시 범위(-128~127)인지 확인.\n3. 캐시된 객체 반환.\n\n`Integer a = 127;`이라고 썼지만, 컴파일러가 몰래 `Integer.valueOf(127)`로 바꿉니다.\n\n**Auto-boxing이란?**\n원시 타입(int)을 객체(Wrapper Class)로 자동으로 포장해주는 기능입니다.",
-        "keyInsight": "작은 숫자(-128~127)는 미리 만들어둔 거 씀",
+        "title": "점수 변수",
+        "explanation": "**`int score = 85;`**\n\n정수 변수 score에 85를 저장합니다.\n",
         "highlight": [
           1
         ],
@@ -17,70 +16,71 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "a",
-              "value": "-> Cache[127]"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "score": 85
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
-          "cache": {
-            "name": "Integer Cache",
-            "range": "-128 ~ 127",
-            "highlight": 127
-          },
-          "heap": [],
-          "output": []
-        }
-      },
-      {
-        "line": 2,
-        "title": "같은 값 127 다시 생성",
-        "explanation": "**실행 순서:**\n1. `Integer.valueOf(127)` 호출.\n2. 캐시에서 동일한 객체 재사용.\n3. `b`도 같은 주소 가리킴.\n\n127은 캐시 범위 내의 숫자입니다.\nJVM은 아까 그 **캐시 상자**에서 똑같은 객체를 다시 꺼내줍니다.\n결국 `a`와 `b`는 **같은 객체**를 가리킵니다.",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "javaMemory",
-        "javaMemoryState": {
-          "stack": [
+          "heap": [
             {
-              "name": "a",
-              "value": "-> Cache[127]"
-            },
-            {
-              "name": "b",
-              "value": "-> Cache[127]",
-              "sameRef": true
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "cache": {
-            "highlight": 127,
-            "refCount": 2
-          },
-          "heap": [],
-          "output": []
+          "output": [],
+          "note": "Line 1 executed"
         }
       },
       {
         "line": 3,
-        "title": "캐시 범위 내 == 비교",
-        "explanation": "**실행 순서:**\n1. 주소 비교 (Cache[127] == Cache[127]).\n2. **true** 반환.\n\n**경고:**\n이게 문제입니다! 개발자들은 \"아, Integer끼리도 `==` 비교가 되는구나\"라고 착각하게 됩니다.",
-        "keyInsight": "캐시 범위 내에서는 ==가 true (위험!)",
+        "title": "첫 번째 조건",
+        "explanation": "**`if (score >= 90)`**\n\n**조건**: `85 >= 90` → **false**\n\n이 블록은 건너뜁니다.\n\n**Java vs C 차이점**:\n- C: `if (1)` 가능 (0이 아닌 값은 true)\n- Java: `if (1)` **불가!** (boolean만 허용)\n",
         "highlight": [
           3
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "output": [
-            "true"
+          "stack": [
+            {
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "score": 85
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
           ],
-          "warning": "캐시 범위 내라서 true, 하지만 이에 의존하면 안 됨!",
-          "stack": [],
-          "heap": []
+          "heap": [
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 3 executed"
         }
       },
       {
         "line": 5,
-        "title": "Integer 128 생성 (범위 초과)",
-        "explanation": "**실행 순서:**\n1. `Integer.valueOf(128)` 호출.\n2. 범위(127) 초과 확인.\n3. `new Integer(128)`로 **새 객체** 생성.\n\n이제 128입니다. 캐시 범위(127)를 넘었죠?\n오토박싱이라도 범위 밖이면 `new`를 호출해서 Heap에 **진짜 새 객체**를 만듭니다.",
-        "keyInsight": "128부터는 매번 새 객체 생성",
+        "title": "두 번째 조건 - 참!",
+        "explanation": "**`else if (score >= 80)`**\n\n**조건**: `85 >= 80` → **true!**\n\n이 블록이 실행됩니다.\n",
         "highlight": [
           5
         ],
@@ -88,27 +88,35 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "x",
-              "value": "-> 0x001"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "score": 85
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
           "heap": [
             {
-              "address": "0x001",
-              "content": "Integer(128)"
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "cache": {
-            "range": "-128 ~ 127",
-            "note": "128은 범위 밖!"
-          },
-          "output": []
+          "output": [],
+          "note": "Line 5 executed"
         }
       },
       {
         "line": 6,
-        "title": "같은 값 128 다시 생성",
-        "explanation": "**실행 순서:**\n1. `Integer.valueOf(128)` 호출.\n2. 범위 초과 -> 새 객체(0x002) 생성.\n3. `y`에 할당.\n\n128은 특별 대우가 없습니다.\n요청할 때마다 매번 **새로운 객체**가 힙에 만들어집니다.",
+        "title": "B등급 출력",
+        "explanation": "**`System.out.println(\"B등급\");`**\n\n**출력 결과**: `B등급`\n\n나머지 else 블록은 건너뜁니다.\n",
         "highlight": [
           6
         ],
@@ -116,85 +124,55 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "x",
-              "value": "-> 0x001"
-            },
-            {
-              "name": "y",
-              "value": "-> 0x002"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "score": 85
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
           "heap": [
             {
-              "address": "0x001",
-              "content": "Integer(128)"
-            },
-            {
-              "address": "0x002",
-              "content": "Integer(128)",
-              "new": true
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "output": []
-        }
-      },
-      {
-        "line": 7,
-        "title": "캐시 범위 밖 == 비교",
-        "explanation": "**실행 순서:**\n1. x(0x001) == y(0x002) 비교.\n2. 주소가 다르므로 **false**.\n\n**충격 실화:**\n똑같은 `Integer` 타입인데 127은 `true`고, 128은 `false`입니다.\n이런 **일관성 없는 동작** 때문에 Integer 비교에 `==`를 쓰면 절대 안 됩니다.",
-        "keyInsight": "캐시 범위 밖에서는 ==가 false",
-        "highlight": [
-          7
-        ],
-        "visualizationType": "javaMemory",
-        "javaMemoryState": {
-          "comparison": "0x001 != 0x002",
-          "output": [
-            "true",
-            "false"
-          ],
-          "stack": [],
-          "heap": []
-        }
-      },
-      {
-        "line": 9,
-        "title": "equals()로 안전한 비교",
-        "explanation": "**실행 순서:**\n1. x.equals(y) 호출.\n2. 내부 값(128) 비교.\n3. 일치 -> **true**.\n\n`.equals()`는 객체 안의 **실제 값(value)**을 꺼내서 비교합니다.\n**결론:** 객체 비교는 무조건 `.equals()`! 예외는 없습니다.",
-        "keyInsight": "항상 .equals() 사용이 안전",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "javaMemory",
-        "javaMemoryState": {
-          "output": [
-            "true",
-            "false",
-            "true"
-          ],
-          "stack": [],
-          "heap": []
+          "output": [],
+          "note": "Line 6 executed"
         }
       }
     ]
   },
   "quiz": {
-    "question": "다음 중 ==가 true인 경우는?",
+    "question": "Java에서 if (1) { ... }의 결과는?",
     "options": [
-      "Integer a = 200; Integer b = 200; a == b",
-      "Integer a = 100; Integer b = 100; a == b",
-      "Integer a = new Integer(100); Integer b = 100; a == b",
-      "Integer a = -200; Integer b = -200; a == b"
+      "항상 실행",
+      "실행 안 됨",
+      "컴파일 에러",
+      "런타임 에러"
     ],
-    "correctIndex": 1,
-    "explanation": "100은 캐시 범위(-128~127) 내이고 오토박싱이므로 같은 캐시 객체를 참조합니다. 200, -200은 범위 밖, new는 항상 새 객체입니다."
+    "correctIndex": 2,
+    "explanation": "Java는 if 조건에 **boolean 타입만** 허용합니다.\n\n`1`은 int이므로 **컴파일 에러** 발생!\n`if (true)` 또는 `if (score > 0)` 처럼 boolean 표현식이 필요합니다.\n\nC와 JavaScript는 숫자를 조건에 사용할 수 있지만, Java는 엄격합니다.\n"
   },
   "misconceptions": [
     {
-      "wrong": "Integer는 항상 ==로 비교해도 된다",
-      "correct": "절대 안 됩니다. 오직 .equals()만 사용하세요.",
-      "why": "캐시 범위(-128~127) 안에서는 `==`가 작동하지만, 그 외의 숫자에서는 실패합니다. 운에 맡기는 코드가 됩니다."
+      "wrong": "Java에서 0은 false, 1은 true이다",
+      "correct": "Java에서 boolean은 true/false만 가능하고, 숫자와 변환되지 않습니다.",
+      "why": "Java는 타입 안전성을 중시하여 int와 boolean 간 자동 변환을 허용하지 않습니다."
+    },
+    {
+      "wrong": "== 로 문자열을 비교할 수 있다",
+      "correct": "문자열 비교에는 .equals() 메서드를 사용해야 합니다.",
+      "why": "==는 참조(주소)를 비교하고, .equals()는 내용을 비교합니다."
     }
   ],
-  "keyTakeaway": "Integer 캐시: -128~127만 재사용, 항상 .equals() 사용"
+  "keyTakeaway": "Java if문은 boolean만 허용. 문자열 비교는 .equals() 사용. 타입 엄격."
 }

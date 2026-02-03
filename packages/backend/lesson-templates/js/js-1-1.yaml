@@ -1,0 +1,115 @@
+lessonId: "js-1-1"
+title: "변수 선언 (let, const)"
+concept: "JavaScript는 let과 const로 변수를 선언합니다. let은 재할당 가능, const는 재할당 불가입니다."
+
+code: |
+  let name = "Alice";
+  console.log("이름:", name);
+
+  const age = 25;
+  console.log("나이:", age);
+
+  name = "Bob";
+  console.log("변경된 이름:", name);
+
+annotations:
+  - line: 1
+    title: "let으로 변수 선언"
+    explanation: |
+      **`let name = "Alice";`**
+
+      **let**: 재할당 가능한 변수를 선언합니다.
+
+      **특징**:
+      - 블록 스코프 (block scope)
+      - 재할당 가능 (`name = "Bob"` OK)
+      - 같은 스코프에서 재선언 불가
+
+      **Python과 비교**:
+      - Python: `name = "Alice"` (키워드 없음)
+      - JS: `let name = "Alice"` (let 필수)
+
+  - line: 2
+    title: "console.log로 출력"
+    explanation: |
+      **`console.log("이름:", name);`**
+
+      **console.log**: 콘솔에 값을 출력하는 메서드입니다.
+
+      - 쉼표로 구분하면 자동으로 공백이 삽입됩니다
+      - 여러 값을 한 번에 출력 가능
+
+      **출력 결과**: `이름: Alice`
+
+  - line: 4
+    title: "const로 상수 선언"
+    explanation: |
+      **`const age = 25;`**
+
+      **const**: 재할당 불가능한 상수를 선언합니다.
+
+      **특징**:
+      - 블록 스코프
+      - 재할당 불가능 (`age = 30` → TypeError!)
+      - 선언 시 반드시 초기화 필요
+
+      **주의**: 객체/배열은 const여도 내부 값 변경 가능!
+      ```
+      const arr = [1, 2];
+      arr.push(3);   // OK (내부 변경)
+      arr = [4, 5];  // TypeError (재할당)
+      ```
+
+  - line: 5
+    title: "상수 출력"
+    explanation: |
+      **`console.log("나이:", age);`**
+
+      **출력 결과**: `나이: 25`
+
+  - line: 7
+    title: "let 변수 재할당"
+    explanation: |
+      **`name = "Bob";`**
+
+      **재할당**: let으로 선언된 변수는 값을 변경할 수 있습니다.
+
+      - `name`의 값이 `"Alice"` → `"Bob"`으로 변경
+      - const였다면 **TypeError 발생!**
+
+  - line: 8
+    title: "변경된 값 출력"
+    explanation: |
+      **`console.log("변경된 이름:", name);`**
+
+      **출력 결과**: `변경된 이름: Bob`
+
+      **요약**:
+      - `let`: 재할당 O
+      - `const`: 재할당 X
+      - `var`: 사용 지양 (구식, 함수 스코프)
+
+quiz:
+  question: "다음 코드의 결과는? const x = 10; x = 20;"
+  options:
+    - "정상 실행"
+    - "TypeError"
+    - "ReferenceError"
+    - "SyntaxError"
+  correctIndex: 1
+  explanation: |
+    **const로 선언된 변수는 재할당이 불가능**합니다.
+
+    `x = 20` 시도 시 **TypeError** 발생:
+    `TypeError: Assignment to constant variable.`
+
+misconceptions:
+  - wrong: "const는 값을 절대 변경할 수 없다"
+    correct: "const는 재할당만 불가능하고, 객체/배열의 내부 값은 변경 가능합니다."
+    why: "const는 변수 바인딩을 고정할 뿐, 객체 내부 속성은 변경 가능합니다."
+
+  - wrong: "let과 var는 같다"
+    correct: "let은 블록 스코프, var는 함수 스코프입니다."
+    why: "var는 블록을 무시하고 함수 단위로 스코프가 결정되어 예상치 못한 버그를 유발합니다."
+
+keyTakeaway: "let은 재할당 가능, const는 재할당 불가. 블록 스코프. var는 지양."

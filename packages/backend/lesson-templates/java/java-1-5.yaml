@@ -1,0 +1,83 @@
+lessonId: "java-1-5"
+title: "반복문 (while)"
+concept: "while 문은 조건이 참인 동안 반복합니다. do-while은 최소 한 번 실행을 보장합니다."
+
+code: |
+  int n = 1;
+  while (n <= 8) {
+      System.out.println("n = " + n);
+      n = n * 2;
+  }
+  System.out.println("최종 n = " + n);
+
+annotations:
+  - line: 1
+    title: "초기값 설정"
+    explanation: |
+      **`int n = 1;`**
+
+      반복 변수 n을 1로 초기화합니다.
+
+  - line: 2
+    title: "while 조건 검사"
+    explanation: |
+      **`while (n <= 8)`**
+
+      `n = 1`, `1 <= 8` → **true** → 블록 실행
+
+      매 반복 시작 전마다 조건을 검사합니다.
+
+  - line: 3
+    title: "현재 값 출력"
+    explanation: |
+      **`System.out.println("n = " + n);`**
+
+      **출력 결과** (첫 반복): `n = 1`
+
+  - line: 4
+    title: "값 2배 증가"
+    explanation: |
+      **`n = n * 2;`**
+
+      **반복 과정**:
+      - 1회: n=1 출력, n=2
+      - 2회: n=2 출력, n=4
+      - 3회: n=4 출력, n=8
+      - 4회: n=8 출력, n=16
+      - 검사: n=16, 16 <= 8 → **false** → 종료
+
+  - line: 6
+    title: "최종값 출력"
+    explanation: |
+      **`System.out.println("최종 n = " + n);`**
+
+      **출력 결과**: `최종 n = 16`
+
+quiz:
+  question: "do-while과 while의 차이점은?"
+  options:
+    - "동일하다"
+    - "do-while은 최소 한 번 실행된다"
+    - "do-while이 더 빠르다"
+    - "do-while은 Java에 없다"
+  correctIndex: 1
+  explanation: |
+    **while**: 조건을 **먼저** 검사 → 거짓이면 한 번도 실행 안 됨
+    **do-while**: 본문을 **먼저** 실행 → 조건 검사 → **최소 1회 실행 보장**
+
+    ```
+    do {
+        // 최소 한 번 실행
+    } while (조건);
+    ```
+
+misconceptions:
+  - wrong: "while(true)는 사용하면 안 된다"
+    correct: "while(true)는 break와 함께 사용하는 유효한 패턴입니다."
+    why: "서버 루프, 이벤트 루프 등에서 while(true)는 자주 사용됩니다."
+
+  - wrong: "while 문의 조건은 한 번만 검사된다"
+    correct: "while 문의 조건은 매 반복 시작 전마다 검사됩니다."
+    why: "조건이 거짓이 될 때까지 반복적으로 검사합니다."
+
+keyTakeaway: "while(조건): 조건 먼저 검사. do-while: 최소 1회 실행 보장. break로 탈출."

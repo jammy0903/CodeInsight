@@ -1,14 +1,14 @@
 {
   "lessonId": "py-2-4",
-  "title": "Break와 Continue: 반복문의 통제",
-  "concept": "반복문을 중간에 멈추거나 건너뛰기",
+  "title": "딕셔너리 메서드",
+  "concept": "딕셔너리는 keys(), values(), items() 등의 메서드로 키, 값, 키-값 쌍을 조회합니다.",
   "content": {
-    "code": "for i in range(10):\n    if i == 2:\n        print(\"Skip 2\")\n        continue  # 이번 턴은 여기서 끝! 위로 올라가\n    \n    if i == 5:\n        print(\"Stop!\")\n        break     # 반복문 전체 종료!\n        \n    print(i)",
+    "code": "scores = {\"Alice\": 90, \"Bob\": 85, \"Charlie\": 95}\nprint(f\"딕셔너리: {scores}\")\n\nkeys = list(scores.keys())\nprint(f\"키 목록: {keys}\")\n\nvalues = list(scores.values())\nprint(f\"값 목록: {values}\")\n\nitems = list(scores.items())\nprint(f\"키-값 쌍: {items}\")\n",
     "steps": [
       {
         "line": 1,
-        "title": "for 루프 시작 (i=0)",
-        "explanation": "**`for i in range(10):`**\n\n0부터 9까지 반복하는 루프를 시작합니다. `range(10)`에서 첫 번째 값 `0`을 가져와 `i`에 할당합니다.\n\n**왜 이 순서인가?** Python은 위에서 아래로 실행되며, for 루프가 시작되면 바로 첫 번째 항목부터 처리합니다.\n\n**실행 순서**: for 시작 → i = 0 → line 2",
+        "title": "딕셔너리 생성",
+        "explanation": "**`scores = {\"Alice\": 90, \"Bob\": 85, \"Charlie\": 95}`**\n\n학생 이름(키)과 점수(값)를 저장한 딕셔너리입니다.\n",
         "highlight": [
           1
         ],
@@ -16,21 +16,22 @@
         "pythonMemoryState": {
           "variables": [
             {
-              "name": "i",
-              "value": "0",
-              "type": "int"
+              "name": "scores",
+              "value": "<dict object>",
+              "type": "dict",
+              "id": "0x1000"
             }
           ],
           "output": [],
-          "note": "1번째 반복 시작",
+          "note": "Line 1 executed",
           "names": [],
           "objects": []
         }
       },
       {
         "line": 2,
-        "title": "첫 번째 조건문 검사 (i=0)",
-        "explanation": "**`if i == 2:`**\n\n`i`(0)가 2인지 확인합니다. `0 == 2`는 **False**이므로, 들여쓰기된 블록(line 3-4)을 건너뛰고 다음 코드(line 6)로 이동합니다.\n\n**실행 순서**: 조건 확인 → False → 블록 건너뜀 → line 6",
+        "title": "딕셔너리 출력",
+        "explanation": "**`print(f\"딕셔너리: {scores}\")`**\n\n**출력 결과**: `딕셔너리: {'Alice': 90, 'Bob': 85, 'Charlie': 95}`\n",
         "highlight": [
           2
         ],
@@ -38,237 +39,24 @@
         "pythonMemoryState": {
           "variables": [
             {
-              "name": "i",
-              "value": "0",
-              "type": "int"
-            }
-          ],
-          "output": [],
-          "note": "조건 False → line 3-4 건너뜀",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 6,
-        "title": "두 번째 조건문 검사 (i=0)",
-        "explanation": "**`if i == 5:`**\n\n`i`(0)가 5인지 확인합니다. `0 == 5`는 **False**이므로, 들여쓰기된 블록(line 7-8)을 건너뛰고 다음 코드(line 10)로 이동합니다.\n\n**실행 순서**: 조건 확인 → False → 블록 건너뜀 → line 10",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "0",
-              "type": "int"
-            }
-          ],
-          "output": [],
-          "note": "조건 False → line 7-8 건너뜀",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 10,
-        "title": "값 출력 (i=0)",
-        "explanation": "**`print(i)`**\n\n두 조건문을 모두 통과했으므로 현재 `i` 값(0)을 출력합니다.\n\n**왜 이 순서인가?** 조건문들이 False여서 continue나 break가 실행되지 않았기 때문에, 순서대로 마지막 print에 도달합니다.\n\n**실행 순서**: print 실행 → 블록 끝 → line 1로 점프",
-        "highlight": [
-          10
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "0",
-              "type": "int"
+              "name": "scores",
+              "value": "<dict object>",
+              "type": "dict",
+              "id": "0x1000"
             }
           ],
           "output": [
-            "0"
+            "딕셔너리: {'Alice': 90, 'Bob': 85, 'Charlie': 95}"
           ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 1,
-        "title": "다음 반복 (i=1)",
-        "explanation": "**`for i in range(10):`**\n\n**왜 다시 line 1로 돌아왔는가?** for 루프는 블록이 끝나면 자동으로 루프 시작점으로 점프합니다. `range(10)`에서 다음 값 `1`을 가져와 `i`에 재할당합니다.\n\n**실행 순서**: 블록 끝 → line 1 점프 → i = 1 → line 2",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "1",
-              "type": "int",
-              "highlight": true
-            }
-          ],
-          "output": [
-            "0"
-          ],
-          "note": "2번째 반복 시작",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 2,
-        "title": "첫 번째 조건문 검사 (i=1)",
-        "explanation": "**`if i == 2:`**\n\n`1 == 2`는 **False**이므로 블록을 건너뜁니다.\n\n**실행 순서**: 조건 확인 → False → line 6",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "1",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 6,
-        "title": "두 번째 조건문 검사 (i=1)",
-        "explanation": "**`if i == 5:`**\n\n`1 == 5`는 **False**이므로 블록을 건너뜁니다.\n\n**실행 순서**: 조건 확인 → False → line 10",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "1",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 10,
-        "title": "값 출력 (i=1)",
-        "explanation": "**`print(i)`**\n\n현재 `i` 값(1)을 출력합니다.\n\n**실행 순서**: print 실행 → 블록 끝 → line 1로 점프",
-        "highlight": [
-          10
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "1",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 1,
-        "title": "다음 반복 (i=2)",
-        "explanation": "**`for i in range(10):`**\n\n블록 끝에서 다시 line 1로 점프했습니다. `range(10)`에서 다음 값 `2`를 가져와 `i`에 재할당합니다.\n\n**실행 순서**: 블록 끝 → line 1 점프 → i = 2 → line 2",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "2",
-              "type": "int",
-              "highlight": true
-            }
-          ],
-          "output": [
-            "0",
-            "1"
-          ],
-          "note": "3번째 반복 시작 (continue 테스트)",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 2,
-        "title": "첫 번째 조건문 검사 (i=2)",
-        "explanation": "**`if i == 2:`**\n\n`2 == 2`는 **True**입니다! 들여쓰기된 블록(line 3-4) 안으로 들어갑니다.\n\n**실행 순서**: 조건 확인 → True → line 3",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "2",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1"
-          ],
-          "note": "조건 True → line 3 실행 예정",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 3,
-        "title": "메시지 출력",
-        "explanation": "**`print(\"Skip 2\")`**\n\n\"Skip 2\"를 출력합니다.\n\n**왜 이 순서인가?** 조건이 True였으므로 블록 안의 코드를 순서대로 실행합니다.\n\n**실행 순서**: print 실행 → line 4",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "2",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2"
-          ],
+          "note": "Line 2 executed",
           "names": [],
           "objects": []
         }
       },
       {
         "line": 4,
-        "title": "continue 실행",
-        "explanation": "**`continue`**\n\n**continue의 역할**: 현재 반복의 **나머지 코드를 모두 건너뛰고** 바로 다음 반복으로 점프합니다. 즉, line 6, 10을 실행하지 않고 바로 line 1로 돌아갑니다.\n\n**왜 print(i)가 실행 안 되는가?** continue가 실행되는 순간, 블록의 나머지(line 6-10)를 무시하고 for 루프의 시작점으로 점프하기 때문입니다.\n\n**break와의 차이**: break는 **루프 전체를 종료**하지만, continue는 **이번 턴만 건너뛰고 다음 턴 계속**합니다.\n\n**실행 순서**: continue 실행 → line 6-10 건너뜀 → line 1로 점프",
+        "title": "keys() 메서드",
+        "explanation": "**`keys = list(scores.keys())`**\n\n**keys() 메서드**: 딕셔너리의 모든 키를 반환합니다.\n\n**반환 타입**: `dict_keys` 객체 (뷰 객체)\n- 리스트처럼 보이지만 리스트는 아님\n- `list()`로 변환하면 진짜 리스트가 됨\n\n**결과**: `[\"Alice\", \"Bob\", \"Charlie\"]`\n\n**용도**: 모든 키를 순회하거나 검사할 때\n",
         "highlight": [
           4
         ],
@@ -276,319 +64,62 @@
         "pythonMemoryState": {
           "variables": [
             {
-              "name": "i",
-              "value": "2",
-              "type": "int"
+              "name": "scores",
+              "value": "<dict object>",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "keys",
+              "value": "{type: \"Array\", id: \"0x002\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x2000"
             }
           ],
           "output": [
-            "0",
-            "1",
-            "Skip 2"
+            "딕셔너리: {'Alice': 90, 'Bob': 85, 'Charlie': 95}"
           ],
-          "note": "continue → line 6-10 건너뜀 → line 1로 점프",
+          "note": "Line 4 executed",
           "names": [],
           "objects": []
         }
       },
       {
-        "line": 1,
-        "title": "다음 반복 (i=3)",
-        "explanation": "**`for i in range(10):`**\n\n**왜 여기로 왔는가?** `continue`가 실행되어 line 6-10을 건너뛰고 바로 for 루프 시작점으로 점프했습니다. `range(10)`에서 다음 값 `3`을 가져와 `i`에 재할당합니다.\n\n**실행 순서**: continue → line 1 점프 → i = 3 → line 2",
+        "line": 5,
+        "title": "키 목록 출력",
+        "explanation": "**`print(f\"키 목록: {keys}\")`**\n\n**출력 결과**: `키 목록: ['Alice', 'Bob', 'Charlie']`\n",
         "highlight": [
-          1
+          5
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "variables": [
             {
-              "name": "i",
-              "value": "3",
-              "type": "int",
-              "highlight": true
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2"
-          ],
-          "note": "4번째 반복 시작 (continue로 인해 2는 출력 안 됨)",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 2,
-        "title": "첫 번째 조건문 검사 (i=3)",
-        "explanation": "**`if i == 2:`**\n\n`3 == 2`는 **False**이므로 블록을 건너뜁니다.\n\n**실행 순서**: 조건 확인 → False → line 6",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
+              "name": "scores",
+              "value": "<dict object>",
+              "type": "dict",
+              "id": "0x1000"
+            },
             {
-              "name": "i",
-              "value": "3",
-              "type": "int"
+              "name": "keys",
+              "value": "{type: \"Array\", id: \"0x002\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x2000"
             }
           ],
           "output": [
-            "0",
-            "1",
-            "Skip 2"
+            "딕셔너리: {'Alice': 90, 'Bob': 85, 'Charlie': 95}",
+            "키 목록: ['Alice', 'Bob', 'Charlie']"
           ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 6,
-        "title": "두 번째 조건문 검사 (i=3)",
-        "explanation": "**`if i == 5:`**\n\n`3 == 5`는 **False**이므로 블록을 건너뜁니다.\n\n**실행 순서**: 조건 확인 → False → line 10",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "3",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 10,
-        "title": "값 출력 (i=3)",
-        "explanation": "**`print(i)`**\n\n현재 `i` 값(3)을 출력합니다.\n\n**실행 순서**: print 실행 → 블록 끝 → line 1로 점프",
-        "highlight": [
-          10
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "3",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 1,
-        "title": "다음 반복 (i=4)",
-        "explanation": "**`for i in range(10):`**\n\n블록 끝에서 다시 line 1로 점프했습니다. `range(10)`에서 다음 값 `4`를 가져와 `i`에 재할당합니다.\n\n**실행 순서**: 블록 끝 → line 1 점프 → i = 4 → line 2",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "4",
-              "type": "int",
-              "highlight": true
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3"
-          ],
-          "note": "5번째 반복 시작",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 2,
-        "title": "첫 번째 조건문 검사 (i=4)",
-        "explanation": "**`if i == 2:`**\n\n`4 == 2`는 **False**이므로 블록을 건너뜁니다.\n\n**실행 순서**: 조건 확인 → False → line 6",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "4",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 6,
-        "title": "두 번째 조건문 검사 (i=4)",
-        "explanation": "**`if i == 5:`**\n\n`4 == 5`는 **False**이므로 블록을 건너뜁니다.\n\n**실행 순서**: 조건 확인 → False → line 10",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "4",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 10,
-        "title": "값 출력 (i=4)",
-        "explanation": "**`print(i)`**\n\n현재 `i` 값(4)을 출력합니다.\n\n**실행 순서**: print 실행 → 블록 끝 → line 1로 점프",
-        "highlight": [
-          10
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "4",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3",
-            "4"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 1,
-        "title": "다음 반복 (i=5)",
-        "explanation": "**`for i in range(10):`**\n\n블록 끝에서 다시 line 1로 점프했습니다. `range(10)`에서 다음 값 `5`를 가져와 `i`에 재할당합니다.\n\n**실행 순서**: 블록 끝 → line 1 점프 → i = 5 → line 2",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "5",
-              "type": "int",
-              "highlight": true
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3",
-            "4"
-          ],
-          "note": "6번째 반복 시작 (break 테스트)",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 2,
-        "title": "첫 번째 조건문 검사 (i=5)",
-        "explanation": "**`if i == 2:`**\n\n`5 == 2`는 **False**이므로 블록을 건너뜁니다.\n\n**실행 순서**: 조건 확인 → False → line 6",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "5",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3",
-            "4"
-          ],
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 6,
-        "title": "두 번째 조건문 검사 (i=5)",
-        "explanation": "**`if i == 5:`**\n\n`5 == 5`는 **True**입니다! 들여쓰기된 블록(line 7-8) 안으로 들어갑니다.\n\n**실행 순서**: 조건 확인 → True → line 7",
-        "highlight": [
-          6
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "i",
-              "value": "5",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3",
-            "4"
-          ],
-          "note": "조건 True → line 7 실행 예정",
+          "note": "Line 5 executed",
           "names": [],
           "objects": []
         }
       },
       {
         "line": 7,
-        "title": "메시지 출력",
-        "explanation": "**`print(\"Stop!\")`**\n\n\"Stop!\"을 출력합니다.\n\n**왜 이 순서인가?** 조건이 True였으므로 블록 안의 코드를 순서대로 실행합니다.\n\n**실행 순서**: print 실행 → line 8",
+        "title": "values() 메서드",
+        "explanation": "**`values = list(scores.values())`**\n\n**values() 메서드**: 딕셔너리의 모든 값을 반환합니다.\n\n**반환 타입**: `dict_values` 객체\n\n**결과**: `[90, 85, 95]`\n\n**용도**: 평균 계산, 최대/최소값 찾기 등\n",
         "highlight": [
           7
         ],
@@ -596,27 +127,37 @@
         "pythonMemoryState": {
           "variables": [
             {
-              "name": "i",
-              "value": "5",
-              "type": "int"
+              "name": "scores",
+              "value": "<dict object>",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "keys",
+              "value": "{type: \"Array\", id: \"0x002\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x2000"
+            },
+            {
+              "name": "values",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x3000"
             }
           ],
           "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3",
-            "4",
-            "Stop!"
+            "딕셔너리: {'Alice': 90, 'Bob': 85, 'Charlie': 95}",
+            "키 목록: ['Alice', 'Bob', 'Charlie']"
           ],
+          "note": "Line 7 executed",
           "names": [],
           "objects": []
         }
       },
       {
         "line": 8,
-        "title": "break 실행",
-        "explanation": "**`break`**\n\n**break의 역할**: 반복문 **전체를 즉시 종료**합니다. `i`가 6, 7, 8, 9가 될 기회 없이 for 루프를 완전히 탈출합니다.\n\n**continue와의 차이**:\n- **continue**: 이번 턴만 건너뛰고 **다음 턴 계속** (line 1로 점프)\n- **break**: 루프 **전체를 종료** (루프 밖으로 탈출)\n\n**왜 i가 6~9는 처리 안 되는가?** break가 실행되는 순간, for 루프가 완전히 끝나버리기 때문입니다. `range(10)`에 아직 값이 남아있어도 더 이상 요청하지 않습니다.\n\n**실행 순서**: break 실행 → 루프 탈출 → 프로그램 종료",
+        "title": "값 목록 출력",
+        "explanation": "**`print(f\"값 목록: {values}\")`**\n\n**출력 결과**: `값 목록: [90, 85, 95]`\n\n**활용 예시**: `sum(scores.values()) / len(scores)` → 평균\n",
         "highlight": [
           8
         ],
@@ -624,20 +165,121 @@
         "pythonMemoryState": {
           "variables": [
             {
-              "name": "i",
-              "value": "5",
-              "type": "int"
+              "name": "scores",
+              "value": "<dict object>",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "keys",
+              "value": "{type: \"Array\", id: \"0x002\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x2000"
+            },
+            {
+              "name": "values",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x3000"
             }
           ],
           "output": [
-            "0",
-            "1",
-            "Skip 2",
-            "3",
-            "4",
-            "Stop!"
+            "딕셔너리: {'Alice': 90, 'Bob': 85, 'Charlie': 95}",
+            "키 목록: ['Alice', 'Bob', 'Charlie']",
+            "값 목록: [90, 85, 95]"
           ],
-          "note": "break → 루프 종료 (i=6~9는 실행 안 됨)",
+          "note": "Line 8 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 10,
+        "title": "items() 메서드",
+        "explanation": "**`items = list(scores.items())`**\n\n**items() 메서드**: 딕셔너리의 모든 키-값 쌍을 튜플로 반환합니다.\n\n**반환 타입**: `dict_items` 객체\n\n**결과**: `[(\"Alice\", 90), (\"Bob\", 85), (\"Charlie\", 95)]`\n\n**각 요소는 튜플**: `(키, 값)` 형태\n\n**용도**: for 문으로 키와 값을 동시에 순회\n",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "scores",
+              "value": "<dict object>",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "keys",
+              "value": "{type: \"Array\", id: \"0x002\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x2000"
+            },
+            {
+              "name": "values",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x3000"
+            },
+            {
+              "name": "items",
+              "value": "{type: \"Array\", id: \"0x004\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x4000"
+            }
+          ],
+          "output": [
+            "딕셔너리: {'Alice': 90, 'Bob': 85, 'Charlie': 95}",
+            "키 목록: ['Alice', 'Bob', 'Charlie']",
+            "값 목록: [90, 85, 95]"
+          ],
+          "note": "Line 10 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 11,
+        "title": "키-값 쌍 출력",
+        "explanation": "**`print(f\"키-값 쌍: {items}\")`**\n\n**출력 결과**: `키-값 쌍: [('Alice', 90), ('Bob', 85), ('Charlie', 95)]`\n\n**for 문 활용**:\n```\nfor name, score in scores.items():\n    print(f\"{name}: {score}\")\n```\n→ 언패킹으로 키와 값을 동시에 사용\n",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "scores",
+              "value": "<dict object>",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "keys",
+              "value": "{type: \"Array\", id: \"0x002\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x2000"
+            },
+            {
+              "name": "values",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x3000"
+            },
+            {
+              "name": "items",
+              "value": "{type: \"Array\", id: \"0x004\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x4000"
+            }
+          ],
+          "output": [
+            "딕셔너리: {'Alice': 90, 'Bob': 85, 'Charlie': 95}",
+            "키 목록: ['Alice', 'Bob', 'Charlie']",
+            "값 목록: [90, 85, 95]",
+            "키-값 쌍: [('Alice', 90), ('Bob', 85), ('Charlie', 95)]"
+          ],
+          "note": "Line 11 executed",
           "names": [],
           "objects": []
         }
@@ -645,22 +287,32 @@
     ]
   },
   "quiz": {
-    "question": "다음 중 break를 만났을 때의 동작은?",
+    "question": "다음 코드로 Alice의 점수를 출력하려면?",
     "options": [
-      "프로그램이 완전히 종료된다",
-      "현재 반복(Loop) 하나를 완전히 탈출한다",
-      "다음 줄로 넘어간다",
-      "반복문의 처음으로 돌아간다"
+      "scores.keys()[0]",
+      "scores.values()[0]",
+      "scores['Alice']",
+      "scores.items()[0]"
     ],
-    "correctIndex": 1,
-    "explanation": "break는 자신이 포함된 가장 가까운 반복문(for/while) 하나를 즉시 끝냅니다."
+    "correctIndex": 2,
+    "explanation": "딕셔너리에서 값을 가져오는 방법:\n- `scores['Alice']` → 90 (정답!)\n- `scores.keys()[0]` → 에러! (dict_keys는 인덱싱 불가)\n- `scores.values()[0]` → 에러! (dict_values는 인덱싱 불가)\n- `scores.items()[0]` → 에러! (dict_items는 인덱싱 불가)\n\n따라서 답은 **scores['Alice']**입니다!\n"
   },
   "misconceptions": [
     {
-      "wrong": "중첩 반복문에서 break하면 다 빠져나간다",
-      "correct": "아닙니다. 가장 안쪽의 반복문 하나만 탈출합니다.",
-      "why": "여러 개를 한 번에 나가려면 별도의 플래그(flag) 변수를 써야 합니다."
+      "wrong": "keys()는 리스트를 반환한다",
+      "correct": "dict_keys 뷰 객체를 반환합니다.",
+      "why": "뷰 객체는 딕셔너리와 연동되어 변화를 반영합니다. 리스트로 쓰려면 list()로 변환하세요."
+    },
+    {
+      "wrong": "values()로 얻은 값은 인덱스로 접근 가능하다",
+      "correct": "dict_values는 인덱싱을 지원하지 않습니다.",
+      "why": "뷰 객체는 순회(iteration)만 가능합니다. 인덱싱하려면 list()로 변환하세요."
+    },
+    {
+      "wrong": "items()는 리스트의 리스트를 반환한다",
+      "correct": "items()는 튜플의 리스트를 반환합니다.",
+      "why": "각 키-값 쌍은 `(키, 값)` 형태의 튜플입니다. `[(키1, 값1), (키2, 값2)]`"
     }
   ],
-  "keyTakeaway": "continue는 '다음 순서로', break는 '그만해'."
+  "keyTakeaway": "keys()는 키, values()는 값, items()는 (키,값) 튜플 반환. 뷰 객체이므로 list() 변환 가능."
 }

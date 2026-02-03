@@ -1,161 +1,163 @@
 {
   "lessonId": "c-1-2",
-  "title": "초기화와 쓰레기 값",
-  "concept": "변수를 안전하게 쓰려면 반드시 초기화(Initialization) 해야 한다",
+  "title": "배열 기초",
+  "concept": "배열은 같은 타입의 데이터를 연속된 메모리 공간에 저장하는 자료구조입니다.",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int score = 100;\n\n    int level;\n    level = 1;\n\n    printf(\"Score: %d, Level: %d\\n\", score, level);\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int nums[3] = {10, 20, 30};\n    printf(\"nums[0] = %d\\n\", nums[0]);\n    printf(\"nums[1] = %d\\n\", nums[1]);\n    printf(\"nums[2] = %d\\n\", nums[2]);\n\n    nums[1] = 99;\n    printf(\"변경 후 nums[1] = %d\\n\", nums[1]);\n\n    return 0;\n}\n",
     "steps": [
       {
-        "line": 1,
-        "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수와 같은 표준 입출력 함수를 사용하기 위해 `stdio.h` 헤더 파일을 코드에 포함시킵니다.",
-        "highlight": [
-          1
-        ],
-        "visualizationType": "cMemory",
-        "stack": [],
-        "heap": [],
-        "stdout": ""
-      },
-      {
-        "line": 3,
-        "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\n모든 C 프로그램의 실행 시작점입니다. 이 함수가 호출되면서 스택 메모리에 `main` 함수를 위한 공간(스택 프레임)이 할당됩니다.",
-        "highlight": [
-          3
-        ],
-        "visualizationType": "cMemory",
-        "stack": [],
-        "heap": [],
-        "stdout": ""
-      },
-      {
         "line": 4,
-        "title": "선언과 동시에 초기화",
-        "explanation": "**`int score = 100;`**\n\n정수형 변수 `score`를 선언하고, 그 즉시 값 `100`으로 초기화(Initialization)합니다. `score`를 위한 메모리 공간이 할당되고 바로 `100`이라는 값이 채워지므로 '쓰레기 값'이 들어갈 틈이 없습니다. 가장 안전하고 권장되는 방식입니다.",
+        "title": "배열 선언과 초기화",
+        "explanation": "**`int nums[3] = {10, 20, 30};`**\n\n**배열 선언**: `타입 이름[크기] = {초기값};`\n\n- `int`: 요소의 타입\n- `nums`: 배열 이름\n- `[3]`: 요소 3개짜리 배열\n- `{10, 20, 30}`: 초기값\n\n**메모리 배치** (연속 4바이트씩):\n```\n주소    값\n[0]  →  10\n[1]  →  20\n[2]  →  30\n```\n\n**Python과 비교**:\n- Python: `nums = [10, 20, 30]` (크기 자동, 타입 혼합 가능)\n- C: `int nums[3]` (크기 고정, 같은 타입만)\n",
         "highlight": [
           4
         ],
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "score",
-            "value": "100",
-            "type": "int",
-            "address": "0x1004"
-          }
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [],
+          "note": "Line 4 executed"
+        }
+      },
+      {
+        "line": 5,
+        "title": "배열 요소 접근: 인덱스 0",
+        "explanation": "**`printf(\"nums[0] = %d\\n\", nums[0]);`**\n\n배열 인덱스는 **0부터 시작**합니다.\n\n- `nums[0]` → 10 (첫 번째 요소)\n- `nums[1]` → 20 (두 번째 요소)\n- `nums[2]` → 30 (세 번째 요소)\n\n**출력 결과**: `nums[0] = 10`\n",
+        "highlight": [
+          5
         ],
-        "heap": [],
-        "stdout": ""
+        "visualizationType": "cMemory",
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [
+            "nums[0] = nums[0]"
+          ],
+          "note": "Line 5 executed"
+        }
       },
       {
         "line": 6,
-        "title": "선언만 한 경우 (쓰레기 값)",
-        "explanation": "**`int level;`**\n\n정수형 변수 `level`을 위한 메모리 공간만 확보합니다. 아직 값을 할당하지 않았기 때문에, 이 메모리 공간에는 이전에 다른 프로그램이 사용했던 의미 없는 데이터, 즉 **쓰레기 값(Garbage Value)**이 남아있게 됩니다.",
+        "title": "배열 요소 접근: 인덱스 1",
+        "explanation": "**`printf(\"nums[1] = %d\\n\", nums[1]);`**\n\n**출력 결과**: `nums[1] = 20`\n",
         "highlight": [
           6
         ],
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "score",
-            "value": "100",
-            "type": "int",
-            "address": "0x1004"
-          },
-          {
-            "name": "level",
-            "value": "???",
-            "type": "int",
-            "address": "0x1000",
-            "note": "쓰레기 값이 들어있습니다."
-          }
-        ],
-        "heap": [],
-        "stdout": ""
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [
+            "nums[0] = nums[0]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]"
+          ],
+          "note": "Line 6 executed"
+        }
       },
       {
         "line": 7,
-        "title": "값 할당 (Assignment)",
-        "explanation": "**`level = 1;`**\n\n이제 `level` 변수의 메모리 공간에 `1`이라는 새로운 값을 덮어씁니다. 이 시점부터 `level`은 유효한 값을 갖게 됩니다. 선언과 할당을 분리하면 이처럼 변수가 '쓰레기 값'을 가지는 위험한 구간이 생길 수 있습니다.",
+        "title": "배열 요소 접근: 인덱스 2",
+        "explanation": "**`printf(\"nums[2] = %d\\n\", nums[2]);`**\n\n**출력 결과**: `nums[2] = 30`\n\n**주의**: `nums[3]`에 접근하면 **배열 범위를 벗어남** (정의되지 않은 동작!)\nC는 인덱스 범위를 자동으로 검사하지 않습니다.\n",
         "highlight": [
           7
         ],
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "score",
-            "value": "100",
-            "type": "int",
-            "address": "0x1004"
-          },
-          {
-            "name": "level",
-            "value": "1",
-            "type": "int",
-            "address": "0x1000",
-            "highlight": true
-          }
-        ],
-        "heap": [],
-        "stdout": ""
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [
+            "nums[0] = nums[0]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[2] = nums[2]"
+          ],
+          "note": "Line 7 executed"
+        }
       },
       {
         "line": 9,
-        "title": "변수 값 출력",
-        "explanation": "**`printf(\"Score: %d, Level: %d\\n\", score, level);`**\n\n두 변수 `score`와 `level`에 저장된 현재 값을 화면에 출력합니다.",
+        "title": "배열 요소 변경",
+        "explanation": "**`nums[1] = 99;`**\n\n배열의 특정 위치에 새 값을 대입할 수 있습니다.\n\n**변경 전**: `nums = {10, 20, 30}`\n**변경 후**: `nums = {10, 99, 30}`\n\n**메모리**: nums[1]의 주소에 저장된 값이 20 → 99로 바뀝니다.\n",
         "highlight": [
           9
         ],
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "score",
-            "value": "100",
-            "type": "int",
-            "address": "0x1004"
-          },
-          {
-            "name": "level",
-            "value": "1",
-            "type": "int",
-            "address": "0x1000"
-          }
-        ],
-        "stdout": "Score: 100, Level: 1",
-        "heap": []
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [
+            "nums[0] = nums[0]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[2] = nums[2]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[2] = nums[2]",
+            "변경 후 nums[1] = nums[1]"
+          ],
+          "note": "Line 9 executed"
+        }
       },
       {
         "line": 10,
-        "title": "프로그램 종료",
-        "explanation": "**`return 0;`**\n\n`main` 함수가 모든 작업을 성공적으로 마쳤음을 운영체제에 알리는 값 `0`을 반환하고 프로그램을 종료합니다. `main` 함수의 스택 프레임이 해제되면서 지역 변수 `score`와 `level`도 사라집니다.",
+        "title": "변경된 값 출력",
+        "explanation": "**`printf(\"변경 후 nums[1] = %d\\n\", nums[1]);`**\n\n**출력 결과**: `변경 후 nums[1] = 99`\n",
         "highlight": [
           10
         ],
         "visualizationType": "cMemory",
-        "stdout": "Score: 100, Level: 1",
-        "stack": [],
-        "heap": []
+        "cMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": [
+            "nums[0] = nums[0]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[2] = nums[2]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[2] = nums[2]",
+            "변경 후 nums[1] = nums[1]",
+            "nums[0] = nums[0]",
+            "nums[1] = nums[1]",
+            "nums[2] = nums[2]",
+            "변경 후 nums[1] = nums[1]"
+          ],
+          "note": "Line 10 executed"
+        }
       }
     ]
   },
   "quiz": {
-    "question": "변수 초기화를 깜빡하면 발생하는 문제는?",
+    "question": "int arr[5];로 선언한 배열에서 유효한 인덱스 범위는?",
     "options": [
-      "컴파일 에러가 나서 실행이 안 된다",
-      "항상 0으로 계산된다",
-      "쓰레기 값 때문에 엉뚱한 결과가 나오거나 버그가 생긴다",
-      "컴퓨터가 재부팅된다"
+      "1부터 5까지",
+      "0부터 4까지",
+      "0부터 5까지",
+      "1부터 4까지"
     ],
-    "correctIndex": 2,
-    "explanation": "대부분의 최신 컴파일러는 경고(Warning)를 주지만, 실행은 됩니다. 그리고 예측 불가능한 동작(Undefined Behavior)을 유발합니다."
+    "correctIndex": 1,
+    "explanation": "배열 인덱스는 **0부터 시작**합니다.\n\n`int arr[5]`는 5개 요소를 가지므로:\n- 유효한 인덱스: `arr[0]`, `arr[1]`, `arr[2]`, `arr[3]`, `arr[4]`\n- 범위: **0부터 4까지**\n\n`arr[5]`에 접근하면 배열 범위 초과! (undefined behavior)\n"
   },
   "misconceptions": [
     {
-      "wrong": "나중에 값을 넣을 거니까 선언만 해둬도 된다",
-      "correct": "가능하다면 `int a = 0;` 처럼 기본값이라도 넣어두세요.",
-      "why": "코드가 길어지면 어디서 초기화했는지 잊어버리기 십상입니다."
+      "wrong": "배열 크기를 나중에 늘릴 수 있다",
+      "correct": "C 배열의 크기는 선언 시 고정됩니다.",
+      "why": "컴파일 시점에 메모리 크기가 결정되므로 런타임에 변경할 수 없습니다. 동적 크기가 필요하면 malloc을 사용합니다."
+    },
+    {
+      "wrong": "배열 범위를 벗어나면 에러가 발생한다",
+      "correct": "C는 배열 범위를 자동으로 검사하지 않습니다. 정의되지 않은 동작이 발생합니다.",
+      "why": "성능을 위해 범위 검사를 하지 않습니다. 버퍼 오버플로우 버그의 원인이 됩니다."
     }
   ],
-  "keyTakeaway": "선언과 동시에 값을 넣어라. 그게 제일 안전하다."
+  "keyTakeaway": "C 배열은 같은 타입, 고정 크기. 인덱스 0부터 시작. 범위 검사 없음 - 주의 필요."
 }

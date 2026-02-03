@@ -1,15 +1,14 @@
 {
   "lessonId": "java-2-3",
-  "title": "Optional 사용법",
-  "concept": "Optional은 null 대신 '값이 없을 수 있음'을 명시적으로 표현한다",
+  "title": "형변환과 캐스팅",
+  "concept": "Java에서 자동 형변환(widening)과 명시적 형변환(narrowing/casting)을 이해합니다.",
   "content": {
-    "code": "Optional<String> opt1 = Optional.of(\"hello\");\nOptional<String> opt2 = Optional.empty();\nOptional<String> opt3 = Optional.ofNullable(null);\n\nString value = opt1.get();\n\nif (opt2.isPresent()) {\n    System.out.println(opt2.get());\n}\n\nString result = opt3.orElse(\"default\");\n\nopt1.ifPresent(s -> System.out.println(s));",
+    "code": "int intVal = 42;\ndouble doubleVal = intVal;\nSystem.out.println(\"자동 변환: \" + doubleVal);\n\ndouble pi = 3.99;\nint truncated = (int) pi;\nSystem.out.println(\"강제 변환: \" + truncated);\n\nString numStr = \"123\";\nint parsed = Integer.parseInt(numStr);\nSystem.out.println(\"문자열→정수: \" + parsed);\n",
     "steps": [
       {
         "line": 1,
-        "title": "Optional.of() - 상자 만들기",
-        "explanation": "**실행 순서:**\n1. `Optional.of(\"hello\")` 호출.\n2. Heap에 `Optional` 객체(상자) 생성.\n3. 내부에 \"hello\" 값 저장.\n\n**메모리에서 일어나는 일:**\nHeap에 `Optional`이라는 **단단한 상자(Wrapper)**를 만들고, \"hello\" 문자열을 그 상자 안에 안전하게 넣습니다.\n\n**경고:** `of()`는 `null`을 절대 허용하지 않습니다. null을 넣으면 상자를 만들기도 전에 NPE가 터집니다.",
-        "keyInsight": "of() = null 절대 불가",
+        "title": "정수 변수",
+        "explanation": "**`int intVal = 42;`**\n\n4바이트 정수 변수를 선언합니다.\n",
         "highlight": [
           1
         ],
@@ -17,30 +16,35 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "opt1",
-              "value": "-> 0xOPT1"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
           "heap": [
             {
-              "address": "0xOPT1",
-              "content": "Optional[\"hello\"]",
-              "type": "Optional"
-            },
-            {
-              "address": "Pool:hello",
-              "content": "\"hello\"",
-              "type": "String"
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "output": []
+          "output": [],
+          "note": "Line 1 executed"
         }
       },
       {
         "line": 2,
-        "title": "Optional.empty() - 빈 상자",
-        "explanation": "**실행 순서:**\n1. `Optional.empty()` 호출.\n2. 비어있는 `Optional` 객체 반환.\n\n내용물이 없는 '빈 상자' 객체를 만듭니다.\n`null` 변수를 쓰는 대신 \"상자는 있는데 내용은 없어\"라고 명확하게 말하는 방식입니다.\n`Optional`을 리턴하면 \"아, 없을 수도 있구나\"라고 바로 알 수 있습니다.",
-        "keyInsight": "empty() = 값 없음을 명시적으로 표현",
+        "title": "자동 형변환 (widening)",
+        "explanation": "**`double doubleVal = intVal;`**\n\n**자동 형변환**: 작은 타입 → 큰 타입은 자동으로 변환됩니다.\n\n- `int` (4바이트) → `double` (8바이트): **안전**, 자동 변환\n- 42 → 42.0\n\n**자동 변환 방향**:\n`byte → short → int → long → float → double`\n",
         "highlight": [
           2
         ],
@@ -48,32 +52,36 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "opt1",
-              "value": "-> 0xOPT1"
-            },
-            {
-              "name": "opt2",
-              "value": "-> 0xEMPTY"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42,
+                "doubleVal": 42
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
           "heap": [
             {
-              "address": "0xOPT1",
-              "content": "Optional[\"hello\"]"
-            },
-            {
-              "address": "0xEMPTY",
-              "content": "Optional.empty",
-              "type": "Optional"
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "output": []
+          "output": [],
+          "note": "Line 2 executed"
         }
       },
       {
         "line": 3,
-        "title": "Optional.ofNullable() - 유연한 상자",
-        "explanation": "**실행 순서:**\n1. `Optional.ofNullable(null)` 호출.\n2. 인자가 `null`임 확인.\n3. 내부적으로 `Optional.empty()` 반환.\n\n값이 있으면 상자에 넣고(`of`), `null`이면 빈 상자(`empty`)를 만듭니다.\n현실적으로 가장 많이 쓰이는 생성 방식입니다.",
+        "title": "자동 변환 결과",
+        "explanation": "**`System.out.println(\"자동 변환: \" + doubleVal);`**\n\n**출력 결과**: `자동 변환: 42.0`\n",
         "highlight": [
           3
         ],
@@ -81,26 +89,36 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "opt3",
-              "value": "-> 0xEMPTY"
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42,
+                "doubleVal": 42
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
           "heap": [
             {
-              "address": "0xEMPTY",
-              "content": "Optional.empty",
-              "refCount": 2
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
             }
           ],
-          "note": "null을 넣으면 empty()가 됨",
-          "output": []
+          "output": [],
+          "note": "Line 3 executed"
         }
       },
       {
         "line": 5,
-        "title": "get() - 강제로 꺼내기 (위험!!)",
-        "explanation": "**실행 순서:**\n1. `opt1.get()` 호출.\n2. 값 존재 확인.\n3. \"hello\" 반환.\n\n상자를 무작정 엽니다.\n지금은 값이 있어서 다행이지만, 비어있을 때 `get()`을 호출하면 **`NoSuchElementException`** 예외가 폭발합니다.\n\n**경고:** `get()`은 최후의 수단입니다. 되도록 쓰지 마세요.",
-        "keyInsight": "get() 대신 orElse() 사용 권장",
+        "title": "실수 변수",
+        "explanation": "**`double pi = 3.99;`**\n\n실수 값 3.99를 저장합니다.\n",
         "highlight": [
           5
         ],
@@ -108,34 +126,216 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "value",
-              "value": "\"hello\""
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42,
+                "doubleVal": 42,
+                "pi": 3.99
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
-          "heap": [],
-          "output": []
+          "heap": [
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 5 executed"
+        }
+      },
+      {
+        "line": 6,
+        "title": "강제 형변환 (casting)",
+        "explanation": "**`int truncated = (int) pi;`**\n\n**강제 형변환**: 큰 타입 → 작은 타입은 **캐스팅** 필요!\n\n- `(int)`: 캐스트 연산자\n- 소수점 이하가 **잘림** (반올림 아님!)\n- 3.99 → 3\n\n**위험**: 데이터 손실 가능!\n",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42,
+                "doubleVal": 42,
+                "pi": 3.99,
+                "truncated": 3
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 6 executed"
         }
       },
       {
         "line": 7,
-        "title": "isPresent() - 확인하기",
-        "explanation": "**실행 순서:**\n1. `opt2.isPresent()` 호출.\n2. `opt2`는 empty이므로 **false** 반환.\n3. `if` 블록 건너뜀.\n\n\"상자에 값이 있나요?\"(`isPresent`) 라고 물어봅니다.\n`opt2`는 비어있으므로 `false`를 반환하고, `if` 블록은 실행되지 않습니다.",
+        "title": "강제 변환 결과",
+        "explanation": "**`System.out.println(\"강제 변환: \" + truncated);`**\n\n**출력 결과**: `강제 변환: 3`\n\n3.99에서 소수점이 **버려져서** 3이 됩니다.\n",
         "highlight": [
           7
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
+          "stack": [
+            {
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42,
+                "doubleVal": 42,
+                "pi": 3.99,
+                "truncated": 3
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            }
+          ],
           "output": [],
-          "note": "opt2는 empty이므로 false 반환, 블록 실행 안 됨",
-          "stack": [],
-          "heap": []
+          "note": "Line 7 executed"
+        }
+      },
+      {
+        "line": 9,
+        "title": "문자열을 정수로 변환",
+        "explanation": "**`String numStr = \"123\";`**\n\n문자열 \"123\"을 숫자 123으로 변환하려면 파싱이 필요합니다.\n",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42,
+                "doubleVal": 42,
+                "numStr": {
+                  "displayValue": "123",
+                  "id": "0x0A1",
+                  "type": "Reference",
+                  "class": "String"
+                },
+                "pi": 3.99,
+                "truncated": 3
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            },
+            {
+              "address": "0x0A1",
+              "type": "String",
+              "content": "\"123\""
+            }
+          ],
+          "output": [],
+          "note": "Line 9 executed"
+        }
+      },
+      {
+        "line": 10,
+        "title": "Integer.parseInt()",
+        "explanation": "**`int parsed = Integer.parseInt(numStr);`**\n\n**Integer.parseInt()**: 문자열을 int로 파싱합니다.\n\n- `\"123\"` → `123`\n- `\"abc\"` → **NumberFormatException** 발생!\n",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42,
+                "doubleVal": 42,
+                "numStr": {
+                  "displayValue": "123",
+                  "id": "0x0A1",
+                  "type": "Reference",
+                  "class": "String"
+                },
+                "pi": 3.99,
+                "truncated": 3,
+                "parsed": 123
+              },
+              "methodName": "main",
+              "className": "Main"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            },
+            {
+              "address": "0x0A1",
+              "type": "String",
+              "content": "\"123\""
+            }
+          ],
+          "output": [],
+          "note": "Line 10 executed"
         }
       },
       {
         "line": 11,
-        "title": "orElse() - 안전한 기본값 제공",
-        "explanation": "**실행 순서:**\n1. `opt3.orElse(\"default\")` 호출.\n2. `opt3`가 비어있음 확인.\n3. 인자로 넘긴 `\"default\"` 반환.\n\n**가장 권장하는 방식:** \"상자를 열어봐. 값이 있으면 그거 쓰고, **비어있으면 'default'를 대신 써.**\"\n한 줄로 깔끔하고 안전하게 값을 얻을 수 있습니다.",
-        "keyInsight": "orElse() = 안전한 기본값 패턴",
+        "title": "파싱 결과",
+        "explanation": "**`System.out.println(\"문자열→정수: \" + parsed);`**\n\n**출력 결과**: `문자열→정수: 123`\n",
         "highlight": [
           11
         ],
@@ -143,57 +343,70 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "result",
-              "value": "\"default\""
+              "variables": {
+                "args": {
+                  "length": 0,
+                  "id": "0x036",
+                  "type": "Array",
+                  "class": "java.lang.String[]"
+                },
+                "intVal": 42,
+                "doubleVal": 42,
+                "numStr": {
+                  "displayValue": "123",
+                  "id": "0x0A1",
+                  "type": "Reference",
+                  "class": "String"
+                },
+                "pi": 3.99,
+                "truncated": 3,
+                "parsed": 123
+              },
+              "methodName": "main",
+              "className": "Main"
             }
           ],
-          "note": "opt3가 empty이므로 \"default\" 반환",
-          "heap": [],
-          "output": []
-        }
-      },
-      {
-        "line": 13,
-        "title": "ifPresent() - 함수형 스타일",
-        "explanation": "**실행 순서:**\n1. `opt1.ifPresent(...)` 호출.\n2. `opt1`에 값이 있음 확인.\n3. 람다 함수 `s -> println(s)` 실행.\n4. \"hello\" 출력.\n\n\"값이 있으면 이 함수(람다)를 실행 해줘. 없으면 말고.\"\n값을 꺼내지 않고, 상자 안에서 작업을 처리하도록 시키는 세련된 방법입니다.",
-        "keyInsight": "ifPresent() = 값 있을 때만 실행",
-        "highlight": [
-          13
-        ],
-        "visualizationType": "javaMemory",
-        "javaMemoryState": {
-          "output": [
-            "hello"
+          "heap": [
+            {
+              "address": "0x036",
+              "length": 0,
+              "type": "java.lang.String[]",
+              "content": "[]"
+            },
+            {
+              "address": "0x0A1",
+              "type": "String",
+              "content": "\"123\""
+            }
           ],
-          "note": "opt1은 값이 있으므로 람다 실행됨",
-          "stack": [],
-          "heap": []
+          "output": [],
+          "note": "Line 11 executed"
         }
       }
     ]
   },
   "quiz": {
-    "question": "Optional을 사용하면 안 되는 위치는?",
+    "question": "(int) 3.7의 결과는?",
     "options": [
-      "메서드 반환 타입",
-      "클래스 필드(멤버 변수)",
-      "로컬 변수",
-      "스트림 파이프라인"
+      "4 (반올림)",
+      "3 (소수점 버림)",
+      "3.0",
+      "에러"
     ],
     "correctIndex": 1,
-    "explanation": "Optional은 오직 **메서드 반환용**으로 설계되었습니다. 필드로 쓰면 메모리 낭비가 심하고 직렬화(Serialization) 문제도 생깁니다."
+    "explanation": "`(int)` 캐스팅은 **소수점 이하를 버립니다** (절삭, truncation).\n\n- `(int) 3.7` → `3`\n- `(int) -3.7` → `-3`\n\n반올림이 아닙니다! 반올림은 `Math.round(3.7)` → 4\n"
   },
   "misconceptions": [
     {
-      "wrong": "Optional은 null 처리를 완전히 대체한다",
-      "correct": "아닙니다. Optional 변수 자체가 null일 수도 있습니다(최악의 상황).",
-      "why": "Optional을 쓰려면 `Optional<String> opt = null;` 절대 이러지 말고, 항상 `Optional.empty()`로 초기화해야 합니다."
+      "wrong": "(int) 캐스팅은 반올림이다",
+      "correct": "(int) 캐스팅은 소수점 이하를 버리는 절삭입니다.",
+      "why": "반올림이 필요하면 Math.round()를 사용해야 합니다."
     },
     {
-      "wrong": "isPresent() + get() 패턴이 정석이다",
-      "correct": "`orElse()`나 `ifPresent()` 같은 메서드를 쓰는 게 'Optional스러운' 사용법입니다.",
-      "why": "`if (opt.isPresent()) { ... get() }`은 `if (x != null)`과 다를 바가 없어서 코드가 장황해집니다. Optional의 진가는 함수형 스타일에 있습니다."
+      "wrong": "모든 형변환은 자동이다",
+      "correct": "작은→큰 타입만 자동, 큰→작은 타입은 명시적 캐스팅이 필요합니다.",
+      "why": "데이터 손실 가능성이 있으므로 개발자가 명시적으로 동의해야 합니다."
     }
   ],
-  "keyTakeaway": "리턴 타입에는 Optional, 꺼낼 때는 orElse()!"
+  "keyTakeaway": "자동 변환: 작은→큰 타입. 강제 캐스팅: (타입) 사용, 소수점 버림. 문자열 변환: parseInt()."
 }

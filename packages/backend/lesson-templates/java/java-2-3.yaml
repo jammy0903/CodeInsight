@@ -1,0 +1,124 @@
+lessonId: "java-2-3"
+title: "형변환과 캐스팅"
+concept: "Java에서 자동 형변환(widening)과 명시적 형변환(narrowing/casting)을 이해합니다."
+
+code: |
+  int intVal = 42;
+  double doubleVal = intVal;
+  System.out.println("자동 변환: " + doubleVal);
+
+  double pi = 3.99;
+  int truncated = (int) pi;
+  System.out.println("강제 변환: " + truncated);
+
+  String numStr = "123";
+  int parsed = Integer.parseInt(numStr);
+  System.out.println("문자열→정수: " + parsed);
+
+annotations:
+  - line: 1
+    title: "정수 변수"
+    explanation: |
+      **`int intVal = 42;`**
+
+      4바이트 정수 변수를 선언합니다.
+
+  - line: 2
+    title: "자동 형변환 (widening)"
+    explanation: |
+      **`double doubleVal = intVal;`**
+
+      **자동 형변환**: 작은 타입 → 큰 타입은 자동으로 변환됩니다.
+
+      - `int` (4바이트) → `double` (8바이트): **안전**, 자동 변환
+      - 42 → 42.0
+
+      **자동 변환 방향**:
+      `byte → short → int → long → float → double`
+
+  - line: 3
+    title: "자동 변환 결과"
+    explanation: |
+      **`System.out.println("자동 변환: " + doubleVal);`**
+
+      **출력 결과**: `자동 변환: 42.0`
+
+  - line: 5
+    title: "실수 변수"
+    explanation: |
+      **`double pi = 3.99;`**
+
+      실수 값 3.99를 저장합니다.
+
+  - line: 6
+    title: "강제 형변환 (casting)"
+    explanation: |
+      **`int truncated = (int) pi;`**
+
+      **강제 형변환**: 큰 타입 → 작은 타입은 **캐스팅** 필요!
+
+      - `(int)`: 캐스트 연산자
+      - 소수점 이하가 **잘림** (반올림 아님!)
+      - 3.99 → 3
+
+      **위험**: 데이터 손실 가능!
+
+  - line: 7
+    title: "강제 변환 결과"
+    explanation: |
+      **`System.out.println("강제 변환: " + truncated);`**
+
+      **출력 결과**: `강제 변환: 3`
+
+      3.99에서 소수점이 **버려져서** 3이 됩니다.
+
+  - line: 9
+    title: "문자열을 정수로 변환"
+    explanation: |
+      **`String numStr = "123";`**
+
+      문자열 "123"을 숫자 123으로 변환하려면 파싱이 필요합니다.
+
+  - line: 10
+    title: "Integer.parseInt()"
+    explanation: |
+      **`int parsed = Integer.parseInt(numStr);`**
+
+      **Integer.parseInt()**: 문자열을 int로 파싱합니다.
+
+      - `"123"` → `123`
+      - `"abc"` → **NumberFormatException** 발생!
+
+  - line: 11
+    title: "파싱 결과"
+    explanation: |
+      **`System.out.println("문자열→정수: " + parsed);`**
+
+      **출력 결과**: `문자열→정수: 123`
+
+quiz:
+  question: "(int) 3.7의 결과는?"
+  options:
+    - "4 (반올림)"
+    - "3 (소수점 버림)"
+    - "3.0"
+    - "에러"
+  correctIndex: 1
+  explanation: |
+    `(int)` 캐스팅은 **소수점 이하를 버립니다** (절삭, truncation).
+
+    - `(int) 3.7` → `3`
+    - `(int) -3.7` → `-3`
+
+    반올림이 아닙니다! 반올림은 `Math.round(3.7)` → 4
+
+misconceptions:
+  - wrong: "(int) 캐스팅은 반올림이다"
+    correct: "(int) 캐스팅은 소수점 이하를 버리는 절삭입니다."
+    why: "반올림이 필요하면 Math.round()를 사용해야 합니다."
+
+  - wrong: "모든 형변환은 자동이다"
+    correct: "작은→큰 타입만 자동, 큰→작은 타입은 명시적 캐스팅이 필요합니다."
+    why: "데이터 손실 가능성이 있으므로 개발자가 명시적으로 동의해야 합니다."
+
+keyTakeaway: "자동 변환: 작은→큰 타입. 강제 캐스팅: (타입) 사용, 소수점 버림. 문자열 변환: parseInt()."

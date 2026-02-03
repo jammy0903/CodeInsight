@@ -1,0 +1,113 @@
+lessonId: "java-1-4"
+title: "반복문 (for)"
+concept: "Java의 for 문은 C와 동일한 구조입니다. 향상된 for문(for-each)도 제공합니다."
+
+code: |
+  int sum = 0;
+  for (int i = 1; i <= 5; i++) {
+      sum = sum + i;
+  }
+  System.out.println("합계: " + sum);
+
+  String[] fruits = {"apple", "banana", "cherry"};
+  for (String fruit : fruits) {
+      System.out.println(fruit);
+  }
+
+annotations:
+  - line: 1
+    title: "합계 변수 초기화"
+    explanation: |
+      **`int sum = 0;`**
+
+      반복문에서 누적할 합계를 0으로 초기화합니다.
+
+  - line: 2
+    title: "기본 for 문"
+    explanation: |
+      **`for (int i = 1; i <= 5; i++)`**
+
+      **for 문 구조**: `for (초기화; 조건; 증감)`
+
+      1. `int i = 1`: 반복 변수 초기화
+      2. `i <= 5`: 조건 (true면 계속)
+      3. `i++`: 매 반복 후 i 증가
+
+      C의 for문과 **완전히 동일**한 문법입니다.
+
+  - line: 3
+    title: "합계 누적"
+    explanation: |
+      **`sum = sum + i;`**
+
+      **과정**: 0+1=1, 1+2=3, 3+3=6, 6+4=10, 10+5=15
+
+  - line: 5
+    title: "합계 출력"
+    explanation: |
+      **`System.out.println("합계: " + sum);`**
+
+      **출력 결과**: `합계: 15`
+
+  - line: 7
+    title: "배열 선언"
+    explanation: |
+      **`String[] fruits = {"apple", "banana", "cherry"};`**
+
+      String 배열을 선언합니다.
+
+  - line: 8
+    title: "향상된 for문 (for-each)"
+    explanation: |
+      **`for (String fruit : fruits)`**
+
+      **향상된 for문**: `for (타입 변수 : 배열/컬렉션)`
+
+      배열의 각 요소를 순서대로 `fruit`에 대입합니다.
+
+      - 1회: fruit = "apple"
+      - 2회: fruit = "banana"
+      - 3회: fruit = "cherry"
+
+      **Python과 비교**:
+      - Python: `for fruit in fruits:`
+      - Java: `for (String fruit : fruits)`
+
+  - line: 9
+    title: "요소 출력"
+    explanation: |
+      **`System.out.println(fruit);`**
+
+      **출력 결과**:
+      - `apple`
+      - `banana`
+      - `cherry`
+
+quiz:
+  question: "향상된 for문에서 인덱스를 사용할 수 있나요?"
+  options:
+    - "가능하다"
+    - "불가능하다, 기본 for문을 사용해야 한다"
+    - "index 변수가 자동 생성된다"
+    - "컴파일 에러가 발생한다"
+  correctIndex: 1
+  explanation: |
+    향상된 for문(`for-each`)은 **인덱스를 제공하지 않습니다**.
+
+    인덱스가 필요하면 기본 for문을 사용하세요:
+    ```
+    for (int i = 0; i < fruits.length; i++) {
+        System.out.println(i + ": " + fruits[i]);
+    }
+    ```
+
+misconceptions:
+  - wrong: "향상된 for문으로 배열 요소를 변경할 수 있다"
+    correct: "향상된 for문의 변수는 복사본이므로 원본 배열을 변경할 수 없습니다."
+    why: "fruit = 'grape'로 변경해도 원본 배열은 그대로입니다."
+
+  - wrong: "for-each가 항상 더 좋다"
+    correct: "인덱스가 필요하거나, 역순 순회가 필요하면 기본 for문이 적합합니다."
+    why: "for-each는 읽기 전용 순차 접근에 적합합니다."
+
+keyTakeaway: "기본 for: for(초기화;조건;증감). 향상된 for: for(타입 변수 : 배열). for-each는 읽기 전용."

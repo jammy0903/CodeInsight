@@ -1,131 +1,344 @@
 {
   "lessonId": "py-1-3",
-  "title": "문자열: 데이터의 나열",
-  "concept": "문자열은 문자의 나열이며, 인덱싱과 슬라이싱이 강력하다",
+  "title": "반복문 (for)",
+  "concept": "for 문은 리스트나 범위의 각 요소를 순회하며 코드를 반복 실행합니다.",
   "content": {
-    "code": "s = \"Python\"\n\n# 1. 인덱싱 (Indexing)\nprint(s[0])\nprint(s[-1])\n\n# 2. 슬라이싱 (Slicing)\nprint(s[0:2])\nprint(s[2:])\n\n# 3. 불변성 (Immutability)\n# s[0] = 'J'  # 에러 발생!\ns = \"J\" + s[1:]\nprint(s)",
+    "code": "numbers = [1, 2, 3]\nprint(f\"리스트: {numbers}\")\n\nfor num in numbers:\n    print(f\"현재 값: {num}\")\n\nprint(\"반복 종료\")\n\ntotal = 0\nfor i in [10, 20, 30]:\n    total = total + i\n    print(f\"누적 합: {total}\")\n",
     "steps": [
       {
         "line": 1,
-        "title": "문자열 변수 's' 생성",
-        "explanation": "메모리에 문자열 객체 `\"Python\"`을 만들고, `s`라는 이름표를 붙입니다.",
-        "highlight": [1],
+        "title": "리스트 준비",
+        "explanation": "**`numbers = [1, 2, 3]`**\n\n반복할 리스트를 준비합니다.\n\n이 레슨에서는:\n- `for` 문으로 리스트의 각 요소를 순회합니다\n- 각 요소에 대해 같은 작업을 반복합니다\n",
+        "highlight": [
+          1
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [{"name": "s", "pointsTo": "str1"}],
-          "objects": [{"id": "str1", "type": "str", "value": "\"Python\"", "pyId": "3001"}],
-          "output": []
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            }
+          ],
+          "output": [],
+          "note": "Line 1 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 2,
+        "title": "리스트 출력",
+        "explanation": "**`print(f\"리스트: {numbers}\")`**\n\n**출력 결과**: `리스트: [1, 2, 3]`\n",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            }
+          ],
+          "output": [
+            "리스트: [1, 2, 3]"
+          ],
+          "note": "Line 2 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 4,
-        "title": "인덱싱: 첫 번째 요소 접근",
-        "explanation": "`s[0]`는 문자열의 첫 번째 문자에 접근합니다. 파이썬의 인덱스는 0부터 시작합니다. 결과로 'P'가 출력됩니다.",
-        "highlight": [4],
+        "title": "for 문 시작",
+        "explanation": "**`for num in numbers:`**\n\n**for 문**: 리스트의 각 요소를 하나씩 가져와서 반복 실행합니다.\n\n**구조**: `for 변수 in 리스트:` 다음에 들여쓰기된 코드 작성\n\n**동작 방식**:\n1. `numbers`의 첫 번째 요소 (1)을 `num`에 할당\n2. 들여쓰기된 코드 실행\n3. 다음 요소 (2)를 `num`에 할당\n4. 다시 실행\n5. 모든 요소를 다 처리할 때까지 반복\n\n**들여쓰기 중요!**\n- Python은 들여쓰기로 블록을 구분합니다\n- 들여쓰기된 코드만 반복됩니다\n",
+        "highlight": [
+          4
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [{"name": "s", "pointsTo": "str1"}],
-          "objects": [{"id": "str1", "type": "str", "value": "\"Python\"", "pyId": "3001"}],
-          "output": ["P"]
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "num",
+              "value": "1",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "리스트: [1, 2, 3]"
+          ],
+          "note": "Line 4 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 5,
-        "title": "인덱싱: 마지막 요소 접근",
-        "explanation": "음수 인덱스는 뒤에서부터 셉니다. `s[-1]`은 마지막 문자를 의미하며, 'n'이 출력됩니다. 매우 편리한 파이썬 기능입니다.",
-        "highlight": [5],
+        "title": "반복 코드 실행 (1)",
+        "explanation": "**`print(f\"현재 값: {num}\")`**\n\n**첫 번째 반복** (num = 1):\n- **출력 결과**: `현재 값: 1`\n\n**두 번째 반복** (num = 2):\n- **출력 결과**: `현재 값: 2`\n\n**세 번째 반복** (num = 3):\n- **출력 결과**: `현재 값: 3`\n\n**총 3번 실행됩니다!**\n",
+        "highlight": [
+          5
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [{"name": "s", "pointsTo": "str1"}],
-          "objects": [{"id": "str1", "type": "str", "value": "\"Python\"", "pyId": "3001"}],
-          "output": ["P", "n"]
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "num",
+              "value": "1",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "리스트: [1, 2, 3]",
+            "현재 값: 1"
+          ],
+          "note": "Line 5 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
-        "line": 8,
-        "title": "슬라이싱: 부분 문자열 추출",
-        "explanation": "`s[0:2]`는 인덱스 0부터 2 '직전'까지의 부분 문자열을 추출합니다. 즉, 인덱스 0, 1에 해당하는 'Py'가 출력됩니다.",
-        "highlight": [8],
+        "line": 7,
+        "title": "반복 종료 후",
+        "explanation": "**`print(\"반복 종료\")`**\n\nfor 문이 끝나면 다음 줄로 이동합니다.\n\n**출력 결과**: `반복 종료`\n\n**들여쓰기 확인**:\n- 이 줄은 들여쓰기가 없음 → for 문 밖\n- for 문이 완전히 끝난 후 한 번만 실행\n",
+        "highlight": [
+          7
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [{"name": "s", "pointsTo": "str1"}],
-          "objects": [{"id": "str1", "type": "str", "value": "\"Python\"", "pyId": "3001"}],
-          "output": ["P", "n", "Py"]
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "num",
+              "value": "3",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "리스트: [1, 2, 3]",
+            "현재 값: 1",
+            "반복 종료"
+          ],
+          "note": "Line 7 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 9,
-        "title": "슬라이싱: 특정 지점부터 끝까지",
-        "explanation": "`s[2:]`처럼 끝나는 지점을 생략하면, 시작 지점부터 문자열의 끝까지 모두 추출합니다. 인덱스 2부터 끝까지인 'thon'이 출력됩니다.",
-        "highlight": [9],
+        "title": "누적 합 초기화",
+        "explanation": "**`total = 0`**\n\n누적 합을 계산하기 위해 `total` 변수를 0으로 초기화합니다.\n\n**패턴**: 반복문에서 값을 누적할 때는 항상 초기값 설정이 필요합니다.\n",
+        "highlight": [
+          9
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [{"name": "s", "pointsTo": "str1"}],
-          "objects": [{"id": "str1", "type": "str", "value": "\"Python\"", "pyId": "3001"}],
-          "output": ["P", "n", "Py", "thon"]
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "num",
+              "value": "3",
+              "type": "int"
+            },
+            {
+              "name": "total",
+              "value": "0",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "리스트: [1, 2, 3]",
+            "현재 값: 1",
+            "반복 종료"
+          ],
+          "note": "Line 9 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 10,
+        "title": "누적 합 계산 반복",
+        "explanation": "**`for i in [10, 20, 30]:`**\n\n리스트를 직접 쓸 수도 있습니다.\n\n**동작**:\n1. 첫 번째 반복: i = 10\n2. 두 번째 반복: i = 20\n3. 세 번째 반복: i = 30\n",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "num",
+              "value": "3",
+              "type": "int"
+            },
+            {
+              "name": "total",
+              "value": "0",
+              "type": "int"
+            },
+            {
+              "name": "i",
+              "value": "10",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "리스트: [1, 2, 3]",
+            "현재 값: 1",
+            "반복 종료"
+          ],
+          "note": "Line 10 executed",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 11,
+        "title": "누적 합 계산",
+        "explanation": "**`total = total + i`**\n\n**누적 패턴**: 기존 값에 새 값을 더해서 다시 저장합니다.\n\n**실행 과정**:\n- 첫 번째 반복 (i=10): `total = 0 + 10` → total = 10\n- 두 번째 반복 (i=20): `total = 10 + 20` → total = 30\n- 세 번째 반복 (i=30): `total = 30 + 30` → total = 60\n\n**단축 표현**: `total += i` (total = total + i와 동일)\n",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "num",
+              "value": "3",
+              "type": "int"
+            },
+            {
+              "name": "total",
+              "value": "10",
+              "type": "int"
+            },
+            {
+              "name": "i",
+              "value": "10",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "리스트: [1, 2, 3]",
+            "현재 값: 1",
+            "반복 종료"
+          ],
+          "note": "Line 11 executed",
+          "names": [],
+          "objects": []
         }
       },
       {
         "line": 12,
-        "title": "불변성(Immutability)으로 인한 에러",
-        "explanation": "문자열은 '불변' 객체이므로, `s[0] = 'J'`처럼 내부의 일부를 직접 수정하려고 하면 `TypeError`가 발생합니다. 이 라인은 주석 처리되어 있어 실제 에러는 나지 않지만, 주석을 풀면 프로그램이 멈춥니다.",
-        "highlight": [12],
+        "title": "누적 합 출력",
+        "explanation": "**`print(f\"누적 합: {total}\")`**\n\n매 반복마다 현재까지의 누적 합을 출력합니다.\n\n**출력 결과**: `누적 합: 10`, `누적 합: 30`, `누적 합: 60` (줄마다)\n",
+        "highlight": [
+          12
+        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "names": [{"name": "s", "pointsTo": "str1"}],
-          "objects": [{"id": "str1", "type": "str", "value": "\"Python\"", "pyId": "3001"}],
-          "output": ["P", "n", "Py", "thon"]
-        }
-      },
-      {
-        "line": 13,
-        "title": "새로운 문자열 생성 및 재할당",
-        "explanation": "문자열을 바꾸려면, 기존 문자열의 일부(`s[1:]` 즉, 'ython')와 새로운 문자열('J')을 조합하여 '새로운' 문자열 객체 `\"Jython\"`을 만들어야 합니다. 그리고 변수 `s`가 이 새로운 객체를 가리키도록 합니다.",
-        "highlight": [13],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [{"name": "s", "pointsTo": "str2"}],
-          "objects": [
-            {"id": "str1", "type": "str", "value": "\"Python\"", "pyId": "3001"},
-            {"id": "str2", "type": "str", "value": "\"Jython\"", "pyId": "3002", "new": true}
+          "variables": [
+            {
+              "name": "numbers",
+              "value": "{type: \"Array\", id: \"0x001\", class: \"list\", length: 3}",
+              "type": "dict",
+              "id": "0x1000"
+            },
+            {
+              "name": "num",
+              "value": "3",
+              "type": "int"
+            },
+            {
+              "name": "total",
+              "value": "10",
+              "type": "int"
+            },
+            {
+              "name": "i",
+              "value": "10",
+              "type": "int"
+            }
           ],
-          "output": ["P", "n", "Py", "thon"]
-        }
-      },
-      {
-        "line": 14,
-        "title": "결과 출력",
-        "explanation": "이제 `s`는 완전히 새로운 `\"Jython\"` 객체를 가리키고 있습니다. 이 값을 출력합니다.",
-        "highlight": [14],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "names": [{"name": "s", "pointsTo": "str2"}],
-          "objects": [
-            {"id": "str1", "type": "str", "value": "\"Python\"", "pyId": "3001"},
-            {"id": "str2", "type": "str", "value": "\"Jython\"", "pyId": "3002"}
+          "output": [
+            "리스트: [1, 2, 3]",
+            "현재 값: 1",
+            "반복 종료",
+            "누적 합: 10"
           ],
-          "output": ["P", "n", "Py", "thon", "Jython"]
+          "note": "Line 12 executed",
+          "names": [],
+          "objects": []
         }
       }
     ]
   },
   "quiz": {
-    "question": "s = \"Hello\" 일 때, \"ell\"을 뽑아내는 슬라이싱은?",
+    "question": "다음 코드의 출력 결과는?",
     "options": [
-      "s[1:3]",
-      "s[1:4]",
-      "s[2:4]",
-      "s[1:-1]"
+      "1",
+      "1\\n2\\n3",
+      "6",
+      "에러 발생"
     ],
     "correctIndex": 1,
-    "explanation": "'e'는 인덱스 1입니다. 'o' 직전까지 뽑아야 하므로 인덱스 4를 끝으로 잡아야 합니다 (0:H, 1:e, 2:l, 3:l, 4:o). 즉, 1부터 4 '직전'까지."
+    "explanation": "코드: `for x in [1, 2, 3]: print(x)`\n\n**for 문은 각 요소마다 print를 실행**합니다.\n\n- 첫 번째 반복: print(1) → 1 출력\n- 두 번째 반복: print(2) → 2 출력\n- 세 번째 반복: print(3) → 3 출력\n\n따라서 답은 **1\\\\n2\\\\n3** (줄바꿈으로 구분)입니다!\n"
   },
   "misconceptions": [
     {
-      "wrong": "문자열의 한 글자만 바꿀 수 있다",
-      "correct": "절대 안 됩니다. 문자열은 **불변(Immutable)**입니다.",
-      "why": "리스트(`list`)는 수정 가능하지만, 튜플(`tuple`)과 문자열(`str`)은 수정 불가능합니다."
+      "wrong": "for 문 다음 줄은 자동으로 반복된다",
+      "correct": "들여쓰기된 줄만 반복됩니다.",
+      "why": "Python은 들여쓰기로 코드 블록을 구분합니다. 들여쓰기가 끝나면 for 문도 끝납니다."
+    },
+    {
+      "wrong": "for num in numbers는 숫자만 가능하다",
+      "correct": "리스트의 모든 타입 요소를 순회할 수 있습니다.",
+      "why": "for 문은 숫자뿐 아니라 문자열, 딕셔너리 등 모든 iterable 객체를 순회할 수 있습니다."
+    },
+    {
+      "wrong": "total = total + i는 순환 참조 에러다",
+      "correct": "오른쪽을 먼저 계산한 후 왼쪽에 할당합니다.",
+      "why": "= 는 할당 연산자입니다. 오른쪽 식을 먼저 평가한 후 그 결과를 왼쪽 변수에 저장합니다."
     }
   ],
-  "keyTakeaway": "음수 인덱스(-1)와 슬라이싱(:)을 자유자재로 쓰자. 단, 수정은 안 된다."
+  "keyTakeaway": "for 문은 리스트 요소를 하나씩 가져와 반복. 들여쓰기로 반복 범위 결정. 누적 계산은 초기값 필수."
 }

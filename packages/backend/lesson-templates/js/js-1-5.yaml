@@ -1,0 +1,86 @@
+lessonId: "js-1-5"
+title: "조건문 (if, else)"
+concept: "조건문은 조건에 따라 다른 코드를 실행합니다. JavaScript는 truthy/falsy 개념이 있습니다."
+
+code: |
+  let score = 75;
+
+  if (score >= 90) {
+      console.log("A등급");
+  } else if (score >= 80) {
+      console.log("B등급");
+  } else if (score >= 70) {
+      console.log("C등급");
+  } else {
+      console.log("F등급");
+  }
+
+annotations:
+  - line: 1
+    title: "변수 선언"
+    explanation: |
+      **`let score = 75;`**
+
+      점수를 저장하는 변수를 선언합니다.
+
+  - line: 3
+    title: "첫 번째 조건"
+    explanation: |
+      **`if (score >= 90)`**
+
+      **조건**: `75 >= 90` → **false**
+
+      조건이 거짓이므로 이 블록은 건너뜁니다.
+
+  - line: 5
+    title: "두 번째 조건"
+    explanation: |
+      **`else if (score >= 80)`**
+
+      **조건**: `75 >= 80` → **false**
+
+      여전히 거짓이므로 다음으로 넘어갑니다.
+
+  - line: 7
+    title: "세 번째 조건 - 참!"
+    explanation: |
+      **`else if (score >= 70)`**
+
+      **조건**: `75 >= 70` → **true!**
+
+      조건이 참이므로 이 블록이 실행됩니다.
+
+  - line: 8
+    title: "C등급 출력"
+    explanation: |
+      **`console.log("C등급");`**
+
+      **출력 결과**: `C등급`
+
+      첫 번째로 참인 조건의 블록만 실행되고, 나머지는 건너뜁니다.
+
+quiz:
+  question: 'if ("") { console.log("실행"); }의 결과는?'
+  options:
+    - '"실행"이 출력됨'
+    - "아무것도 출력 안 됨"
+    - "에러 발생"
+    - '"undefined"가 출력됨'
+  correctIndex: 1
+  explanation: |
+    빈 문자열 `""`은 **falsy** 값입니다.
+
+    **JS의 falsy 값**: `false`, `0`, `""`, `null`, `undefined`, `NaN`
+
+    조건이 falsy이므로 블록이 **실행되지 않습니다**.
+
+misconceptions:
+  - wrong: "0도 true이다"
+    correct: "JavaScript에서 0은 falsy 값입니다."
+    why: "C와 마찬가지로 0은 false, 0이 아닌 값은 true로 취급됩니다."
+
+  - wrong: "=== 와 ==는 같다"
+    correct: "===는 타입까지 비교하는 엄격 비교, ==는 타입 변환 후 비교합니다."
+    why: "'1' == 1은 true이지만, '1' === 1은 false입니다. ===를 사용하는 것이 안전합니다."
+
+keyTakeaway: "if-else if-else로 조건 분기. falsy: false, 0, '', null, undefined, NaN. === 사용 권장."

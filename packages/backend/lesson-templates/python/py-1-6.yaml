@@ -1,0 +1,122 @@
+lessonId: "py-1-6"
+title: "딕셔너리 (dict)"
+concept: "딕셔너리는 키-값 쌍으로 데이터를 저장하는 자료구조입니다. 중괄호 {}로 만듭니다."
+
+code: |
+  person = {"name": "Alice", "age": 25}
+  print(f"딕셔너리: {person}")
+
+  name = person["name"]
+  print(f"이름: {name}")
+
+  person["city"] = "Seoul"
+  print(f"추가 후: {person}")
+
+annotations:
+  - line: 1
+    title: "딕셔너리 생성"
+    explanation: |
+      **`person = {"name": "Alice", "age": 25}`**
+
+      **딕셔너리(Dictionary)**: 키-값 쌍으로 데이터를 저장합니다.
+
+      **구조**:
+      - `{ }`: 중괄호로 생성
+      - `"키": 값`: 콜론으로 키와 값을 연결
+      - `,`: 쉼표로 여러 쌍 구분
+
+      **예시**:
+      - 키 `"name"` → 값 `"Alice"`
+      - 키 `"age"` → 값 `25`
+
+      **vs 리스트**: 리스트는 인덱스(0, 1, 2), 딕셔너리는 키("name", "age")
+
+  - line: 2
+    title: "딕셔너리 출력"
+    explanation: |
+      **`print(f"딕셔너리: {person}")`**
+
+      **출력 결과**: `딕셔너리: {'name': 'Alice', 'age': 25}`
+
+      **순서**: Python 3.7+ 에서는 삽입 순서가 유지됩니다.
+
+  - line: 4
+    title: "값 접근 (키로)"
+    explanation: |
+      **`name = person["name"]`**
+
+      **딕셔너리 접근**: 대괄호 안에 키를 넣어 값을 가져옵니다.
+
+      **구조**: `딕셔너리[키]` → 값 반환
+
+      **이 경우**:
+      - `person["name"]` → `"Alice"` 반환
+      - `name` 변수에 `"Alice"` 할당
+
+      **주의**: 존재하지 않는 키를 사용하면 KeyError 발생!
+
+  - line: 5
+    title: "값 출력"
+    explanation: |
+      **`print(f"이름: {name}")`**
+
+      **출력 결과**: `이름: Alice`
+
+  - line: 7
+    title: "키-값 추가"
+    explanation: |
+      **`person["city"] = "Seoul"`**
+
+      **딕셔너리 수정/추가**: 새 키에 값을 할당하면 자동으로 추가됩니다.
+
+      **동작**:
+      - `"city"` 키가 없으면 → 새로 추가
+      - `"city"` 키가 있으면 → 값 덮어쓰기
+
+      **변경 전**: `{"name": "Alice", "age": 25}`
+      **변경 후**: `{"name": "Alice", "age": 25, "city": "Seoul"}`
+
+  - line: 8
+    title: "추가 후 출력"
+    explanation: |
+      **`print(f"추가 후: {person}")`**
+
+      **출력 결과**: `추가 후: {'name': 'Alice', 'age': 25, 'city': 'Seoul'}`
+
+      **요약**:
+      - 딕셔너리는 가변(mutable)
+      - 키로 접근: `dict[키]`
+      - 추가/수정: `dict[새키] = 값`
+
+quiz:
+  question: "다음 코드에서 출력 결과는?"
+  options:
+    - "키 에러"
+    - "None"
+    - "30"
+    - "에러 없이 실행 안 됨"
+  correctIndex: 2
+  explanation: |
+    코드: `data = {"x": 10}` → `data["x"] = 30` → `print(data["x"])`
+
+    **실행 과정**:
+    1. `data = {"x": 10}` → 딕셔너리 생성
+    2. `data["x"] = 30` → 기존 키 `"x"`의 값을 30으로 덮어쓰기
+    3. `print(data["x"])` → 30 출력
+
+    따라서 답은 **30**입니다!
+
+misconceptions:
+  - wrong: "딕셔너리는 순서가 없다"
+    correct: "Python 3.7+에서는 삽입 순서가 유지됩니다."
+    why: "3.6 이하에서는 순서가 보장되지 않았지만, 3.7부터는 공식적으로 순서가 유지됩니다."
+
+  - wrong: "존재하지 않는 키를 쓰면 자동으로 None이 반환된다"
+    correct: "존재하지 않는 키를 사용하면 KeyError가 발생합니다."
+    why: "안전하게 접근하려면 `dict.get(키)` 또는 `키 in dict` 확인이 필요합니다."
+
+  - wrong: "딕셔너리 키는 무조건 문자열이어야 한다"
+    correct: "불변(immutable) 타입이면 키로 사용 가능합니다."
+    why: "문자열, 숫자, 튜플 등은 키로 사용 가능. 리스트, 딕셔너리는 불가."
+
+keyTakeaway: "딕셔너리는 중괄호로 생성. 키로 값 접근. dict[키] = 값으로 추가/수정. 가변 자료구조."
