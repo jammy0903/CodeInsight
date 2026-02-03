@@ -11,17 +11,8 @@ import type { StreakStatus } from '@/services/gamification';
 import { getStreak } from '@/services/gamification';
 import { logger } from '@/utils/logger';
 
-// App User 타입 (우리 DB의 User)
-export interface OAuthAccountInfo {
-  provider: string;
-}
-
-export interface AppUser {
-  id: string;          // User UUID (PK)
-  nickname: string;
-  role: 'user' | 'admin';
-  oauthAccounts: OAuthAccountInfo[];
-}
+// App User 타입 — authStore.ts에서 정의, 여기서 re-export
+export type { AppUser, OAuthAccountInfo } from './authStore';
 
 interface Store {
   // === UI 상태 ===
