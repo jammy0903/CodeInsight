@@ -2,7 +2,7 @@
 
 > **목적**: 가시성 향상, 로직 분리, 유지보수성 개선
 > **작성일**: 2026-02-03
-> **상태**: Phase 1~2 완료, Phase 3 진행중
+> **상태**: Phase 1~7 전체 완료
 
 ---
 
@@ -275,11 +275,11 @@ hooks/analytics/
 
 - [x] **Phase 1**: LessonPage.tsx 분리 (1042줄→276줄, 커밋 1b4eddc2)
 - [x] **Phase 2**: MemoryPanel.tsx 분리 (1057줄→57줄, 커밋 111dd58a)
-- [ ] **Phase 3**: AnalyticsSection.tsx 분리
-- [ ] **Phase 4**: PlaygroundPage.tsx 분리
-- [ ] **Phase 5**: simulator.ts 언어별 분리
-- [ ] **Phase 6**: store.ts 도메인별 분리
-- [ ] **Phase 7**: analytics 서비스/훅 분리
+- [x] **Phase 3**: AnalyticsSection.tsx 분리 (748줄→220줄, 커밋 8292d7da)
+- [x] **Phase 4**: PlaygroundPage.tsx 분리 (706줄→581줄, 커밋 219f52ac)
+- [x] **Phase 5**: simulator.ts 언어별 분리 (516줄→4줄 re-export, 커밋 f6f3b2ea)
+- [x] **Phase 6**: store.ts 도메인별 스토어 분리 (authStore, chatStore, simulatorStore, 커밋 1f543202)
+- [x] **Phase 7**: analytics 서비스/훅 분리 (analytics.ts 379줄→33줄, useLessonAnalytics 289줄→98줄, 커밋 64b40520)
 
 ### 각 Phase 완료 기준
 1. `pnpm --filter frontend build` 성공
