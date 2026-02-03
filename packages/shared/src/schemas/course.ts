@@ -123,7 +123,7 @@ export const HeapObjectSchema = z.object({
 // NOTE: Heap blocks may not have a name (anonymous malloc blocks)
 export const MemoryBlockSchema: z.ZodType<{
   name?: string;  // Optional for heap blocks
-  address: string;
+  address?: string;
   value: string;
   type?: string;
   size?: number;
@@ -137,7 +137,7 @@ export const MemoryBlockSchema: z.ZodType<{
   isExpanded?: boolean;
 }> = z.object({
   name: z.string().optional(),  // Heap blocks may be anonymous
-  address: z.string(),
+  address: z.string().optional(),  // Optional for lesson JSON (simple variables)
   value: z.string(),
   // Optional fields
   type: z.string().optional(),
