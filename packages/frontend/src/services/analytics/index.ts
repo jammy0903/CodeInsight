@@ -1,8 +1,8 @@
 /**
- * Re-export from analytics/ directory
+ * Analytics Service — 모든 분석 API re-export
  */
+
 export {
-  // Activity
   startLessonActivity,
   endLessonActivity,
   endLessonActivityBeacon,
@@ -14,19 +14,25 @@ export {
   type ActivityEndResponse,
   type SessionContextData,
   type StepActivityData,
-  // Quiz
+} from './activityService';
+
+export {
   recordQuizAttempt,
   type QuizAttemptRequest,
   type QuizAttemptResponse,
-  // Profile
+} from './quizService';
+
+export {
   getProfile,
   updateProfile,
   type UserProfile,
   type ProfileResponse,
-  // Report
+} from './profileService';
+
+export {
   getAnalyticsSummary,
   getReportAnalysis,
   type AnalyticsSummary,
   type ReportAnalysisRequest,
   type ReportAnalysisResponse,
-} from './analytics/index';
+} from './reportService';
