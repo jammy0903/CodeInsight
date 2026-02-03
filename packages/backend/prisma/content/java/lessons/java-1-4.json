@@ -1,14 +1,14 @@
 {
   "lessonId": "java-1-4",
-  "title": "반복문 (for)",
-  "concept": "Java의 for 문은 C와 동일한 구조입니다. 향상된 for문(for-each)도 제공합니다.",
+  "title": "배열 비교의 함정",
+  "concept": "배열의 .equals()는 Object.equals()를 사용하므로 Arrays.equals()를 써야 한다",
   "content": {
-    "code": "int sum = 0;\nfor (int i = 1; i <= 5; i++) {\n    sum = sum + i;\n}\nSystem.out.println(\"합계: \" + sum);\n\nString[] fruits = {\"apple\", \"banana\", \"cherry\"};\nfor (String fruit : fruits) {\n    System.out.println(fruit);\n}\n",
+    "code": "int[] arr1 = {1, 2, 3};\nint[] arr2 = {1, 2, 3};\n\nSystem.out.println(arr1 == arr2);\nSystem.out.println(arr1.equals(arr2));\nSystem.out.println(Arrays.equals(arr1, arr2));\n\nint[][] deep1 = {{1, 2}, {3, 4}};\nint[][] deep2 = {{1, 2}, {3, 4}};\nSystem.out.println(Arrays.equals(deep1, deep2));\nSystem.out.println(Arrays.deepEquals(deep1, deep2));",
     "steps": [
       {
         "line": 1,
-        "title": "합계 변수 초기화",
-        "explanation": "**`int sum = 0;`**\n\n반복문에서 누적할 합계를 0으로 초기화합니다.\n",
+        "title": "첫 번째 배열 생성",
+        "explanation": "**실행 순서:**\n1. Heap에 배열 `[1, 2, 3]` 생성.\n2. 주소(0x001)를 `arr1`에 저장.\n\n**배열도 객체인가요?**\n네, Java에서 배열은 **특수한 객체**입니다. 하지만 `equals` 같은 편의 기능이 제대로 구현되지 않은 '불친절한' 객체입니다.",
         "highlight": [
           1
         ],
@@ -16,35 +16,23 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "sum": 0
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "arr1",
+              "value": "-> 0x001"
             }
           ],
           "heap": [
             {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0x001",
+              "content": "[1, 2, 3]"
             }
           ],
-          "output": [],
-          "note": "Line 1 executed"
+          "output": []
         }
       },
       {
         "line": 2,
-        "title": "기본 for 문",
-        "explanation": "**`for (int i = 1; i <= 5; i++)`**\n\n**for 문 구조**: `for (초기화; 조건; 증감)`\n\n1. `int i = 1`: 반복 변수 초기화\n2. `i <= 5`: 조건 (true면 계속)\n3. `i++`: 매 반복 후 i 증가\n\nC의 for문과 **완전히 동일**한 문법입니다.\n",
+        "title": "두 번째 배열 생성",
+        "explanation": "**실행 순서:**\n1. Heap에 새 배열 `[1, 2, 3]` 생성.\n2. 주소(0x002)를 `arr2`에 저장.\n\n내용은 `[1, 2, 3]`으로 똑같지만, Heap의 **다른 공간**에 새로운 배열을 만듭니다.",
         "highlight": [
           2
         ],
@@ -52,157 +40,86 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "i": 1,
-                "sum": 0
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "arr1",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "arr2",
+              "value": "-> 0x002"
             }
           ],
           "heap": [
             {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0x001",
+              "content": "[1, 2, 3]"
+            },
+            {
+              "address": "0x002",
+              "content": "[1, 2, 3]",
+              "new": true
             }
           ],
-          "output": [],
-          "note": "Line 2 executed"
+          "output": []
         }
       },
       {
-        "line": 3,
-        "title": "합계 누적",
-        "explanation": "**`sum = sum + i;`**\n\n**과정**: 0+1=1, 1+2=3, 3+3=6, 6+4=10, 10+5=15\n",
+        "line": 4,
+        "title": "== 비교 (참조 비교)",
+        "explanation": "**실행 순서:**\n1. arr1(0x001) == arr2(0x002) 비교.\n2. 주소가 다르므로 **false**.",
         "highlight": [
-          3
+          4
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "i": 1,
-                "sum": 1
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
+          "output": [
+            "false"
           ],
-          "heap": [
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 3 executed"
+          "stack": [],
+          "heap": []
         }
       },
       {
         "line": 5,
-        "title": "합계 출력",
-        "explanation": "**`System.out.println(\"합계: \" + sum);`**\n\n**출력 결과**: `합계: 15`\n",
+        "title": ".equals() 비교 (배열의 함정!)",
+        "explanation": "**실행 순서:**\n1. `arr1.equals(arr2)` 호출.\n2. 내부적으로 `==` (주소 비교) 수행.\n3. **false** 반환.\n\n여기서 많이 속습니다!\n배열의 `.equals()`는 내용을 확인하지 않습니다. `Object.equals()`를 그대로 써서 **주소만 비교**합니다.",
+        "keyInsight": "배열.equals() = Object.equals() = 참조 비교!",
         "highlight": [
           5
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "sum": 15
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
+          "output": [
+            "false",
+            "false"
           ],
-          "heap": [
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 5 executed"
+          "warning": ".equals()도 false! 배열은 Object.equals()를 사용함",
+          "stack": [],
+          "heap": []
         }
       },
       {
-        "line": 7,
-        "title": "배열 선언",
-        "explanation": "**`String[] fruits = {\"apple\", \"banana\", \"cherry\"};`**\n\nString 배열을 선언합니다.\n",
+        "line": 6,
+        "title": "Arrays.equals() 사용",
+        "explanation": "**실행 순서:**\n1. `Arrays.equals(arr1, arr2)` 호출.\n2. 길이 비교 -> 통과.\n3. 내용 비교 (1==1, 2==2, 3==3).\n4. 모두 같으므로 **true**.",
+        "keyInsight": "배열 비교 = Arrays.equals() 사용",
         "highlight": [
-          7
+          6
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "fruits": {
-                  "length": 3,
-                  "id": "0x097",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "sum": 15
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
+          "output": [
+            "false",
+            "false",
+            "true"
           ],
-          "heap": [
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x097",
-              "length": 3,
-              "type": "java.lang.String[]",
-              "content": "[\"apple\", \"banana\", \"cherry\"]"
-            }
-          ],
-          "output": [],
-          "note": "Line 7 executed"
+          "stack": [],
+          "heap": []
         }
       },
       {
         "line": 8,
-        "title": "향상된 for문 (for-each)",
-        "explanation": "**`for (String fruit : fruits)`**\n\n**향상된 for문**: `for (타입 변수 : 배열/컬렉션)`\n\n배열의 각 요소를 순서대로 `fruit`에 대입합니다.\n\n- 1회: fruit = \"apple\"\n- 2회: fruit = \"banana\"\n- 3회: fruit = \"cherry\"\n\n**Python과 비교**:\n- Python: `for fruit in fruits:`\n- Java: `for (String fruit : fruits)`\n",
+        "title": "첫 번째 2차원 배열 생성",
+        "explanation": "**실행 순서:**\n1. 2차원 배열(껍데기) 생성 (0x010).\n2. 내부 배열(열)들 생성 (0x011, 0x012).\n3. 주소 연결 후 `deep1`에 할당.\n\n2차원 배열은 **'배열을 가리키는 배열'**입니다.",
         "highlight": [
           8
         ],
@@ -210,58 +127,31 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "fruits": {
-                  "length": 3,
-                  "id": "0x097",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "fruit": {
-                  "displayValue": "apple",
-                  "id": "0x098",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "sum": 15
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "deep1",
+              "value": "-> 0x010"
             }
           ],
           "heap": [
             {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0x010",
+              "content": "[-> 0x011, -> 0x012]"
             },
             {
-              "address": "0x097",
-              "length": 3,
-              "type": "java.lang.String[]",
-              "content": "[\"apple\", \"banana\", \"cherry\"]"
+              "address": "0x011",
+              "content": "[1, 2]"
             },
             {
-              "address": "0x098",
-              "type": "String",
-              "content": "\"apple\""
+              "address": "0x012",
+              "content": "[3, 4]"
             }
           ],
-          "output": [],
-          "note": "Line 8 executed"
+          "output": []
         }
       },
       {
         "line": 9,
-        "title": "요소 출력",
-        "explanation": "**`System.out.println(fruit);`**\n\n**출력 결과**:\n- `apple`\n- `banana`\n- `cherry`\n",
+        "title": "두 번째 2차원 배열 생성",
+        "explanation": "**실행 순서:**\n1. 새 2차원 배열 생성 (0x020).\n2. 새 내부 배열들 생성 (0x021, 0x022).\n3. `deep2`에 할당.\n\n첫 번째 2차원 배열과 내용은 같지만, 완전히 새로운 객체 구조입니다.",
         "highlight": [
           9
         ],
@@ -269,67 +159,97 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "fruits": {
-                  "length": 3,
-                  "id": "0x097",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "sum": 15
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "deep1",
+              "value": "-> 0x010"
+            },
+            {
+              "name": "deep2",
+              "value": "-> 0x020"
             }
           ],
           "heap": [
             {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0x010",
+              "content": "[-> 0x011, -> 0x012]"
             },
             {
-              "address": "0x097",
-              "length": 3,
-              "type": "java.lang.String[]",
-              "content": "[\"apple\", \"banana\", \"cherry\"]"
+              "address": "0x011",
+              "content": "[1, 2]"
+            },
+            {
+              "address": "0x012",
+              "content": "[3, 4]"
+            },
+            {
+              "address": "0x020",
+              "content": "[-> 0x021, -> 0x022]",
+              "new": true
             }
           ],
-          "output": [],
-          "note": "Line 9 executed"
+          "output": []
+        }
+      },
+      {
+        "line": 10,
+        "title": "Arrays.equals() - 2차원 (함정!)",
+        "explanation": "**실행 순서:**\n1. `Arrays.equals` 호출.\n2. 껍데기(1차원) 요소 비교.\n3. deep1[0](0x011) != deep2[0](0x021).\n4. 주소가 다르므로 **false**.\n\n`Arrays.equals`는 **1차원**만 비교합니다. 안쪽 내용(`[1, 2]`)이 같은지는 확인하지 않습니다.",
+        "keyInsight": "Arrays.equals()는 1차원만 비교",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "output": [
+            "false",
+            "false",
+            "true",
+            "false"
+          ],
+          "warning": "내부 배열 주소가 다르므로 false!",
+          "stack": [],
+          "heap": []
+        }
+      },
+      {
+        "line": 11,
+        "title": "Arrays.deepEquals() 사용",
+        "explanation": "**실행 순서:**\n1. `Arrays.deepEquals` 호출.\n2. 요소가 배열임을 감지 -> 재귀적 진입.\n3. 내부 배열 내용(`[1,2]`, `[3,4]`) 비교.\n4. 모두 일치 -> **true**.",
+        "keyInsight": "다차원 배열 = Arrays.deepEquals() 사용",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "output": [
+            "false",
+            "false",
+            "true",
+            "false",
+            "true"
+          ],
+          "stack": [],
+          "heap": []
         }
       }
     ]
   },
   "quiz": {
-    "question": "향상된 for문에서 인덱스를 사용할 수 있나요?",
+    "question": "String[] 배열을 비교하려면?",
     "options": [
-      "가능하다",
-      "불가능하다, 기본 for문을 사용해야 한다",
-      "index 변수가 자동 생성된다",
-      "컴파일 에러가 발생한다"
+      "arr1 == arr2",
+      "arr1.equals(arr2)",
+      "Arrays.equals(arr1, arr2)",
+      "arr1.toString().equals(arr2.toString())"
     ],
-    "correctIndex": 1,
-    "explanation": "향상된 for문(`for-each`)은 **인덱스를 제공하지 않습니다**.\n\n인덱스가 필요하면 기본 for문을 사용하세요:\n```\nfor (int i = 0; i < fruits.length; i++) {\n    System.out.println(i + \": \" + fruits[i]);\n}\n```\n"
+    "correctIndex": 2,
+    "explanation": "Arrays.equals()는 각 요소를 돌며 .equals()를 호출해줍니다. String은 equals()가 잘 구현되어 있으니 문제없습니다."
   },
   "misconceptions": [
     {
-      "wrong": "향상된 for문으로 배열 요소를 변경할 수 있다",
-      "correct": "향상된 for문의 변수는 복사본이므로 원본 배열을 변경할 수 없습니다.",
-      "why": "fruit = 'grape'로 변경해도 원본 배열은 그대로입니다."
-    },
-    {
-      "wrong": "for-each가 항상 더 좋다",
-      "correct": "인덱스가 필요하거나, 역순 순회가 필요하면 기본 for문이 적합합니다.",
-      "why": "for-each는 읽기 전용 순차 접근에 적합합니다."
+      "wrong": "배열도 .equals()로 비교하면 된다",
+      "correct": "배열은 `Arrays.equals()`로 비교해야 합니다.",
+      "why": "배열 자체의 `.equals()`는 주소 비교(==)와 똑같습니다. Java 설계상의 아쉬운 부분 중 하나입니다."
     }
   ],
-  "keyTakeaway": "기본 for: for(초기화;조건;증감). 향상된 for: for(타입 변수 : 배열). for-each는 읽기 전용."
+  "keyTakeaway": "1차원: Arrays.equals(), 다차원: Arrays.deepEquals()"
 }

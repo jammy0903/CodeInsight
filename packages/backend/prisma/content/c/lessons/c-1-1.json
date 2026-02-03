@@ -1,135 +1,82 @@
 {
   "lessonId": "c-1-1",
-  "title": "변수와 자료형",
-  "concept": "C는 정적 타입 언어입니다. 변수를 사용하려면 반드시 타입을 먼저 선언해야 합니다.",
+  "title": "선언과 메모리 할당",
+  "concept": "변수를 선언하는 순간, 메모리에 방을 잡는다 (초기화는 아님)",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int x = 5;\n    printf(\"x = %d\\n\", x);\n\n    char ch = 'A';\n    printf(\"ch = %c\\n\", ch);\n\n    float pi = 3.14;\n    printf(\"pi = %.2f\\n\", pi);\n\n    return 0;\n}\n",
+    "code": "#include <stdio.h>\n\nint main() {\n    int a;\n\n    printf(\"Value of a: %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "헤더 파일 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 같은 표준 입출력 함수를 쓰려면 이 도구 상자(헤더 파일)를 미리 준비해야 합니다.\n\n**비유**: 요리를 하기 전에 필요한 조리 도구를 식탁에 꺼내놓는 것과 같습니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "cMemory",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "line": 3,
+        "title": "main 함수 정의",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 시작점입니다.\n\n- `int`: 함수가 정수값을 반환함을 의미\n- `main`: 프로그램이 실행될 때 가장 먼저 호출되는 특별한 함수\n- `()`: 함수의 입력값(파라미터)이 없음을 의미\n- `{`: 함수 본문의 시작\n\n**스택에 main 함수의 스택 프레임이 생성됩니다.**",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "cMemory",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
         "line": 4,
-        "title": "정수 변수 선언",
-        "explanation": "**`int x = 5;`**\n\nC에서 변수를 선언할 때는 **타입을 반드시 명시**해야 합니다.\n\n- `int`: 정수 타입 (4바이트, 약 -21억 ~ 21억)\n- `x`: 변수 이름\n- `5`: 초기값\n\n**메모리**: 스택에 4바이트 공간이 할당되고, 그 자리에 5가 저장됩니다.\n\n**Python과 비교**:\n- Python: `x = 5` (타입 자동 추론)\n- C: `int x = 5;` (타입 명시 필수, 세미콜론 필수)\n",
+        "title": "변수 선언",
+        "explanation": "**`int a;`**\n이 한 줄이 실행되면 4바이트(32비트 시스템 기준)의 메모리 공간이 확보됩니다.\n\n중요한 점은 **'청소'를 하지 않는다**는 것입니다. 이전에 이 자리를 쓰던 데이터가 그대로 남아있습니다.\n\n**비유:** 호텔 방을 체크인만 하고, 청소가 안 된 상태로 들어간 것과 같습니다.",
         "highlight": [
           4
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [],
-          "note": "Line 4 executed"
-        }
+        "stack": [
+          {
+            "name": "a",
+            "value": "??? (Garbage)",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
-        "line": 5,
-        "title": "정수 출력 (printf)",
-        "explanation": "**`printf(\"x = %d\\n\", x);`**\n\n**printf**: C의 표준 출력 함수입니다.\n\n**형식 지정자(format specifier)**:\n- `%d`: 정수 (decimal)\n- `%c`: 문자 (character)\n- `%f`: 실수 (float)\n- `%s`: 문자열 (string)\n- `\\n`: 줄바꿈\n\n**출력 결과**: `x = 5`\n",
+        "line": 6,
+        "title": "쓰레기 값(Garbage Value)",
+        "explanation": "변수 `a`를 초기화하지 않고 읽으면, 예측할 수 없는 값(쓰레기 값)이 나옵니다.\n-12044332 같은 이상한 숫자가 나올 수 있습니다.\n\n**C언어의 철학:** \"프로그래머가 시키지 않은 일(초기화)은 하지 않는다.\"",
         "highlight": [
-          5
+          6
         ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "x = 5"
-          ],
-          "note": "Line 5 executed"
-        }
-      },
-      {
-        "line": 7,
-        "title": "문자 변수 선언",
-        "explanation": "**`char ch = 'A';`**\n\n**char**: 문자 하나를 저장하는 타입 (1바이트)\n\n- 작은따옴표(`' '`)로 감싸야 합니다\n- 실제로는 ASCII 코드 값(65)이 저장됩니다\n- `'A'` = 65, `'a'` = 97, `'0'` = 48\n\n**주의**: `\"A\"`는 문자열(string), `'A'`는 문자(char)\n",
-        "highlight": [
-          7
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "x = 5",
-            "x = 5",
-            "ch = 'A'"
-          ],
-          "note": "Line 7 executed"
-        }
-      },
-      {
-        "line": 8,
-        "title": "문자 출력",
-        "explanation": "**`printf(\"ch = %c\\n\", ch);`**\n\n`%c` 형식 지정자로 문자를 출력합니다.\n\n**출력 결과**: `ch = A`\n\n**팁**: `%d`로 출력하면 ASCII 코드 값이 나옵니다 → `ch = 65`\n",
-        "highlight": [
-          8
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "x = 5",
-            "x = 5",
-            "ch = 'A'",
-            "x = 5",
-            "ch = 'A'"
-          ],
-          "note": "Line 8 executed"
-        }
-      },
-      {
-        "line": 10,
-        "title": "실수 변수 선언",
-        "explanation": "**`float pi = 3.14;`**\n\n**float**: 소수점이 있는 실수를 저장하는 타입 (4바이트)\n\n**C의 실수 타입**:\n- `float`: 4바이트 (소수점 이하 약 6자리)\n- `double`: 8바이트 (소수점 이하 약 15자리, 더 정밀)\n\n**메모리**: IEEE 754 부동소수점 표준으로 저장됩니다.\n",
-        "highlight": [
-          10
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "x = 5",
-            "x = 5",
-            "ch = 'A'",
-            "x = 5",
-            "ch = 'A'",
-            "x = 5",
-            "ch = 'A'",
-            "pi = %.2f"
-          ],
-          "note": "Line 10 executed"
-        }
+        "visualizationType": "terminal",
+        "stdout": "Value of a: 21845 (Random!)"
       }
     ]
   },
   "quiz": {
-    "question": "C에서 변수를 선언할 때 반드시 해야 하는 것은?",
+    "question": "다음 중 C언어에서 변수를 선언만 했을 때, 변수에 들어있는 값은?",
     "options": [
-      "초기값을 지정한다",
-      "타입을 명시한다",
-      "const를 붙인다",
-      "아무것도 필요 없다"
+      "무조건 0",
+      "무조건 NULL",
+      "알 수 없음 (Garbage Value)",
+      "1"
     ],
-    "correctIndex": 1,
-    "explanation": "C는 **정적 타입 언어**입니다.\n변수 선언 시 `int`, `char`, `float` 등 **타입을 반드시 명시**해야 합니다.\n\n초기값은 선택사항이지만, 초기화하지 않으면 쓰레기 값이 들어갑니다.\n"
+    "correctIndex": 2,
+    "explanation": "자동 초기화는 전역(Global) 변수나 static 변수일 때만 일어납니다. 함수 안의 지역(Local) 변수는 초기화하지 않으면 쓰레기 값이 들어있습니다."
   },
   "misconceptions": [
     {
-      "wrong": "C에서도 Python처럼 타입 없이 변수를 선언할 수 있다",
-      "correct": "C는 정적 타입 언어로 변수 선언 시 타입 명시가 필수입니다.",
-      "why": "컴파일 시점에 메모리 크기를 결정해야 하므로 타입 정보가 필요합니다."
-    },
-    {
-      "wrong": "char는 문자열을 저장할 수 있다",
-      "correct": "char는 문자 하나만 저장합니다. 문자열은 char 배열을 사용합니다.",
-      "why": "char는 1바이트 크기로, ASCII 문자 하나만 저장 가능합니다."
-    },
-    {
-      "wrong": "float와 double은 같다",
-      "correct": "float는 4바이트, double은 8바이트로 정밀도가 다릅니다.",
-      "why": "정밀한 계산이 필요하면 double을 사용해야 합니다."
+      "wrong": "모든 변수는 0으로 시작한다",
+      "correct": "지역 변수는 절대 자동으로 0이 되지 않습니다.",
+      "why": "매번 0으로 초기화하는 것은 성능 낭비라고 판단하기 때문입니다(C언어는 성능 최우선)."
     }
   ],
-  "keyTakeaway": "C는 정적 타입 언어. int(정수), char(문자), float(실수). 변수 선언 시 타입 명시 필수. printf로 출력 시 형식 지정자 사용."
+  "keyTakeaway": "변수를 만들면 메모리 공간이 생긴다. 하지만 값은 내가 직접 넣어야 한다."
 }

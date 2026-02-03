@@ -1,112 +1,184 @@
 {
   "lessonId": "c-2-2",
-  "title": "포인터 연산",
-  "concept": "포인터에 정수를 더하면 타입 크기만큼 주소가 이동합니다. 배열 순회에 활용됩니다.",
+  "title": "포인터 선언 (*): 주소를 담는 변수",
+  "concept": "포인터는 '주소'를 저장하는 특별한 변수다",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n    int *ptr = arr;\n\n    printf(\"ptr: %d\\n\", *ptr);\n    printf(\"ptr+1: %d\\n\", *(ptr + 1));\n    printf(\"ptr+2: %d\\n\", *(ptr + 2));\n\n    return 0;\n}\n",
+    "code": "#include <stdio.h>\n\nint main() {\n    int num = 10;\n\n    int *ptr = &num;\n\n    printf(\"num value:   %d\\n\", num);\n    printf(\"num address: %p\\n\", &num);\n    printf(\"ptr value:   %p\\n\", ptr);\n\n    return 0;\n}",
     "steps": [
       {
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "cMemory",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "line": 3,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "cMemory",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
         "line": 4,
-        "title": "배열 선언",
-        "explanation": "**`int arr[3] = {10, 20, 30};`**\n\n3개의 int가 연속된 메모리에 저장됩니다.\n\n```\n주소     값\n0x100 → 10  (arr[0])\n0x104 → 20  (arr[1])\n0x108 → 30  (arr[2])\n```\n\n각 int는 4바이트이므로 주소가 4씩 증가합니다.\n",
+        "title": "정수 변수 선언",
+        "explanation": "**`int num = 10;`**\n\n정수형 변수 `num`을 선언하고 10으로 초기화합니다. 이 변수는 메모리 어딘가에 자리를 잡습니다(예: 주소 `0x1000`).",
         "highlight": [
           4
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [],
-          "note": "Line 4 executed"
-        }
+        "stack": [
+          {
+            "name": "num",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
-        "line": 7,
-        "title": "현재 위치의 값",
-        "explanation": "**`printf(\"ptr: %d\\n\", *ptr);`**\n\n`*ptr` = ptr이 가리키는 값 = arr[0] = 10\n\n**출력 결과**: `ptr: 10`\n",
+        "line": 6,
+        "title": "포인터 변수 선언 및 초기화",
+        "explanation": "**`int *ptr = &num;`**\n\n`int *ptr`은 '`int` 타입 변수의 주소를 저장하는 포인터 변수 `ptr`'을 선언하는 것입니다. 여기에 `&num` (num의 주소)을 대입하여, `ptr`이 `num`을 가리키도록 합니다. `ptr` 자체도 변수이므로 자신만의 주소(예: `0x1004`)를 가집니다.\n\n**비유**: `ptr`은 `num`네 집으로 바로 갈 수 있는 약도(Map)를 가지고 있는 것과 같습니다.",
         "highlight": [
-          7
+          6
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "ptr: *ptr",
-            "ptr+1: *(ptr + 1)"
-          ],
-          "note": "Line 7 executed"
-        }
+        "stack": [
+          {
+            "name": "num",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "ptr",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1004"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
         "line": 8,
-        "title": "포인터 + 1",
-        "explanation": "**`printf(\"ptr+1: %d\\n\", *(ptr + 1));`**\n\n**포인터 연산**: `ptr + 1`은 주소를 `sizeof(int)` (4바이트) 만큼 이동합니다.\n\n- `ptr`: arr[0]의 주소 (0x100)\n- `ptr + 1`: arr[1]의 주소 (0x104) ← 1이 아니라 4바이트 이동!\n- `*(ptr + 1)`: arr[1]의 값 = 20\n\n**출력 결과**: `ptr+1: 20`\n\n**핵심**: `*(ptr + i)` = `arr[i]`\n",
+        "title": "num의 값 출력",
+        "explanation": "**`printf(\"num value:   %d\\n\", num);`**\n\n변수 `num`에 저장된 값을 출력합니다.",
         "highlight": [
           8
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "ptr: *ptr",
-            "ptr+1: *(ptr + 1)",
-            "ptr: *ptr",
-            "ptr+1: *(ptr + 1)",
-            "ptr+2: *(ptr + 2)"
-          ],
-          "note": "Line 8 executed"
-        }
+        "stack": [
+          {
+            "name": "num",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "ptr",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1004"
+          }
+        ],
+        "stdout": "num value:   10",
+        "heap": []
       },
       {
         "line": 9,
-        "title": "포인터 + 2",
-        "explanation": "**`printf(\"ptr+2: %d\\n\", *(ptr + 2));`**\n\n`ptr + 2` → 8바이트 이동 → arr[2]의 주소\n\n`*(ptr + 2)` = arr[2] = 30\n\n**출력 결과**: `ptr+2: 30`\n",
+        "title": "num의 주소 출력",
+        "explanation": "**`printf(\"num address: %p\\n\", &num);`**\n\n`&` 연산자를 이용해 `num`의 실제 메모리 주소를 출력합니다.",
         "highlight": [
           9
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "ptr: *ptr",
-            "ptr+1: *(ptr + 1)",
-            "ptr: *ptr",
-            "ptr+1: *(ptr + 1)",
-            "ptr+2: *(ptr + 2)",
-            "ptr: *ptr",
-            "ptr+1: *(ptr + 1)",
-            "ptr+2: *(ptr + 2)"
-          ],
-          "note": "Line 9 executed"
-        }
+        "stack": [
+          {
+            "name": "num",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "ptr",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1004"
+          }
+        ],
+        "stdout": "num value:   10\nnum address: 0x1000",
+        "heap": []
+      },
+      {
+        "line": 10,
+        "title": "ptr의 값 출력",
+        "explanation": "**`printf(\"ptr value:   %p\\n\", ptr);`**\n\n포인터 변수 `ptr`에 저장된 **값**을 출력합니다. 이 값은 `num`의 주소와 정확히 일치함을 확인할 수 있습니다. 이것이 '포인터가 가리킨다'는 것의 실제 의미입니다.",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "cMemory",
+        "stack": [
+          {
+            "name": "num",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "ptr",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1004"
+          }
+        ],
+        "stdout": "num value:   10\nnum address: 0x1000\nptr value:   0x1000",
+        "heap": []
+      },
+      {
+        "line": 12,
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
+        "highlight": [
+          12
+        ],
+        "visualizationType": "cMemory",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       }
     ]
   },
   "quiz": {
-    "question": "double *p; 일 때 p+1은 주소가 몇 바이트 이동?",
+    "question": "다음 중 올바른 포인터 선언은? (타켓은 double형 변수)",
     "options": [
-      "1바이트",
-      "4바이트",
-      "8바이트",
-      "타입에 무관하게 1"
+      "pointer double p;",
+      "double p;",
+      "double &p;",
+      "double *p;"
     ],
-    "correctIndex": 2,
-    "explanation": "포인터 연산에서 +1은 **가리키는 타입의 크기**만큼 이동합니다.\n\n- `double`은 8바이트\n- `p + 1` = 주소 + 8바이트\n\n이것이 포인터 연산의 핵심입니다!\n"
+    "correctIndex": 3,
+    "explanation": "C언어에서 포인터 타입은 `타입 *이름` 형식으로 선언합니다."
   },
   "misconceptions": [
     {
-      "wrong": "ptr + 1은 주소에 1을 더한다",
-      "correct": "ptr + 1은 가리키는 타입의 크기(sizeof)만큼 주소를 이동합니다.",
-      "why": "int *ptr이면 +1은 4바이트, double *ptr이면 +1은 8바이트 이동합니다."
-    },
-    {
-      "wrong": "배열 이름과 포인터는 완전히 같다",
-      "correct": "배열 이름은 상수 포인터처럼 동작하지만, sizeof와 & 연산에서 차이가 있습니다.",
-      "why": "arr은 재할당 불가(arr = ptr 불가), sizeof(arr)은 전체 배열 크기를 반환합니다."
+      "wrong": "*의 의미는 항상 같다",
+      "correct": "선언할 때(`int *p`)와 사용할 때(`*p = 10`)의 의미가 **완전히 다릅니다**.",
+      "why": "선언부의 `*`는 '타입 표시'이고, 사용부의 `*`는 '역참조 연산자'입니다. 문맥을 잘 봐야 합니다."
     }
   ],
-  "keyTakeaway": "포인터 +1은 타입 크기만큼 이동. *(ptr+i) = arr[i]. 배열 이름은 첫 요소의 주소."
+  "keyTakeaway": "`int *p`는 정수 주소 담는 변수. `p = &a`로 연결한다."
 }

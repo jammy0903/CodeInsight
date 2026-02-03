@@ -1,214 +1,228 @@
 {
   "lessonId": "java-1-5",
-  "title": "반복문 (while)",
-  "concept": "while 문은 조건이 참인 동안 반복합니다. do-while은 최소 한 번 실행을 보장합니다.",
+  "title": "equals/hashCode 계약",
+  "concept": "equals()를 오버라이드하면 반드시 hashCode()도 오버라이드해야 한다",
   "content": {
-    "code": "int n = 1;\nwhile (n <= 8) {\n    System.out.println(\"n = \" + n);\n    n = n * 2;\n}\nSystem.out.println(\"최종 n = \" + n);\n",
+    "code": "class Person {\n    String name;\n    Person(String name) { this.name = name; }\n\n    @Override\n    public boolean equals(Object obj) {\n        if (!(obj instanceof Person)) return false;\n        return name.equals(((Person) obj).name);\n    }\n    // hashCode() 누락!\n}\n\nPerson p1 = new Person(\"Alice\");\nPerson p2 = new Person(\"Alice\");\n\nSystem.out.println(p1.equals(p2));\n\nSet<Person> set = new HashSet<>();\nset.add(p1);\nSystem.out.println(set.contains(p2));",
     "steps": [
       {
         "line": 1,
-        "title": "초기값 설정",
-        "explanation": "**`int n = 1;`**\n\n반복 변수 n을 1로 초기화합니다.\n",
+        "title": "Person 클래스 정의",
+        "explanation": "**실행 순서:**\n1. Person 클래스 로드.\n2. `equals` 오버라이드 확인.\n3. `hashCode` 누락 확인 (경고).\n\n`equals()`는 재정의했지만, `hashCode()`는 빠뜨린 '반쪽짜리' 클래스입니다.\n이 클래스를 `HashSet`이나 `HashMap` 같은 곳에 쓰면 **대형 사고**가 터집니다.",
         "highlight": [
-          1
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "n": 1
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 1 executed"
+          "note": "equals()는 오버라이드, hashCode()는 누락 (위험!)",
+          "stack": [],
+          "heap": [],
+          "output": []
         }
       },
       {
-        "line": 2,
-        "title": "while 조건 검사",
-        "explanation": "**`while (n <= 8)`**\n\n`n = 1`, `1 <= 8` → **true** → 블록 실행\n\n매 반복 시작 전마다 조건을 검사합니다.\n",
+        "line": 13,
+        "title": "첫 번째 Person 객체 생성",
+        "explanation": "**실행 순서:**\n1. `new Person(\"Alice\")` 호출.\n2. Heap 할당 (0x001).\n3. 기본 `hashCode`(예: 123) 생성.\n\n이 객체는 고유한 메모리 주소(0x001)와 그에 기반한 기본 해시코드(123)를 갖습니다.",
         "highlight": [
-          2
+          13
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "n": 1
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "p1",
+              "value": "-> 0x001"
             }
           ],
           "heap": [
             {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
             }
           ],
-          "output": [],
-          "note": "Line 2 executed"
+          "output": []
         }
       },
       {
-        "line": 3,
-        "title": "현재 값 출력",
-        "explanation": "**`System.out.println(\"n = \" + n);`**\n\n**출력 결과** (첫 반복): `n = 1`\n",
+        "line": 14,
+        "title": "두 번째 Person 객체 생성",
+        "explanation": "**실행 순서:**\n1. `new Person(\"Alice\")` 호출.\n2. 새 Heap 할당 (0x002).\n3. 새 기본 `hashCode`(예: 456) 생성.\n\n`p2`는 내용이 같더라도 `p1`과 다른 해시코드를 갖게 됩니다. `hashCode()`가 재정의되지 않았기 때문입니다.",
         "highlight": [
-          3
+          14
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "n": 1
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "p1",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "p2",
+              "value": "-> 0x002"
             }
           ],
           "heap": [
             {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            },
+            {
+              "address": "0x002",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 456",
+              "new": true
             }
           ],
-          "output": [],
-          "note": "Line 3 executed"
+          "output": []
         }
       },
       {
-        "line": 4,
-        "title": "값 2배 증가",
-        "explanation": "**`n = n * 2;`**\n\n**반복 과정**:\n- 1회: n=1 출력, n=2\n- 2회: n=2 출력, n=4\n- 3회: n=4 출력, n=8\n- 4회: n=8 출력, n=16\n- 검사: n=16, 16 <= 8 → **false** → 종료\n",
+        "line": 16,
+        "title": "equals() 비교",
+        "explanation": "**실행 순서:**\n1. `p1.equals(p2)` 호출.\n2. 이름(\"Alice\") 비교.\n3. 일치하므로 **true**.\n\n여기까지는 문제가 없어 보입니다.",
+        "keyInsight": "equals() 오버라이드 = 값 비교 가능",
         "highlight": [
-          4
+          16
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "n": 2
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
+          "output": [
+            "true"
           ],
-          "heap": [
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 4 executed"
+          "note": "equals()는 정상 작동",
+          "stack": [],
+          "heap": []
         }
       },
       {
-        "line": 6,
-        "title": "최종값 출력",
-        "explanation": "**`System.out.println(\"최종 n = \" + n);`**\n\n**출력 결과**: `최종 n = 16`\n",
+        "line": 18,
+        "title": "HashSet 생성",
+        "explanation": "**실행 순서:**\n1. `new HashSet<>()` 호출.\n2. 초기 버킷(배열) 생성.\n\n해시 기반 자료구조는 객체를 저장하고 검색할 때 `hashCode()`를 사용합니다.",
         "highlight": [
-          6
+          18
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "n": 16
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "p1",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "p2",
+              "value": "-> 0x002"
+            },
+            {
+              "name": "set",
+              "value": "-> 0x100"
             }
           ],
           "heap": [
             {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            },
+            {
+              "address": "0x002",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 456"
+            },
+            {
+              "address": "0x100",
+              "content": "HashSet"
             }
           ],
-          "output": [],
-          "note": "Line 6 executed"
+          "output": []
+        }
+      },
+      {
+        "line": 19,
+        "title": "HashSet에 p1 추가",
+        "explanation": "**실행 순서:**\n1. `set.add(p1)` 호출.\n2. `p1.hashCode()` 계산 -> **123**.\n3. 123번 버킷에 `p1` 저장.",
+        "keyInsight": "HashSet/HashMap = hashCode()로 방 배정",
+        "highlight": [
+          19
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "hash(123)",
+                "content": "p1"
+              }
+            ]
+          },
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "line": 20,
+        "title": "contains(p2) 호출 (검색 실패)",
+        "explanation": "**실행 순서:**\n1. `set.contains(p2)` 호출.\n2. `p2.hashCode()` 계산 -> **456**.\n3. 456번 버킷 확인.\n4. **비어있음** -> **false** 반환.\n\n`equals()`가 `true`여도, `hashCode()`가 달라서 아예 다른 방을 뒤졌습니다. 찾을 리가 없죠.",
+        "keyInsight": "hashCode 다름 = 다른 버킷 = 찾기 실패",
+        "highlight": [
+          20
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "hash(123)",
+                "content": "p1"
+              },
+              {
+                "index": "hash(456)",
+                "content": "검색 위치",
+                "searched": true
+              }
+            ]
+          },
+          "output": [
+            "true",
+            "false"
+          ],
+          "warning": "equals()는 true인데 contains()는 false!",
+          "stack": [],
+          "heap": []
         }
       }
     ]
   },
   "quiz": {
-    "question": "do-while과 while의 차이점은?",
+    "question": "equals/hashCode 계약이란?",
     "options": [
-      "동일하다",
-      "do-while은 최소 한 번 실행된다",
-      "do-while이 더 빠르다",
-      "do-while은 Java에 없다"
+      "equals()가 true면 hashCode()도 같아야 한다",
+      "hashCode()가 같으면 equals()도 true여야 한다",
+      "둘 다 항상 같은 값을 반환해야 한다",
+      "둘 중 하나만 오버라이드하면 된다"
     ],
-    "correctIndex": 1,
-    "explanation": "**while**: 조건을 **먼저** 검사 → 거짓이면 한 번도 실행 안 됨\n**do-while**: 본문을 **먼저** 실행 → 조건 검사 → **최소 1회 실행 보장**\n\n```\ndo {\n    // 최소 한 번 실행\n} while (조건);\n```\n"
+    "correctIndex": 0,
+    "explanation": "반드시 기억하세요: equals()가 같으면 hashCode()도 무조건 같아야 합니다! (역은 성립하지 않아도 됨)"
   },
   "misconceptions": [
     {
-      "wrong": "while(true)는 사용하면 안 된다",
-      "correct": "while(true)는 break와 함께 사용하는 유효한 패턴입니다.",
-      "why": "서버 루프, 이벤트 루프 등에서 while(true)는 자주 사용됩니다."
-    },
-    {
-      "wrong": "while 문의 조건은 한 번만 검사된다",
-      "correct": "while 문의 조건은 매 반복 시작 전마다 검사됩니다.",
-      "why": "조건이 거짓이 될 때까지 반복적으로 검사합니다."
+      "wrong": "equals()만 오버라이드하면 된다",
+      "correct": "반드시 `hashCode()`도 같이 오버라이드해야 합니다.",
+      "why": "HashMap, HashSet 같은 자료구조는 `hashCode`로 1차 분류(구 이름)를 하고, 그 안에서 `equals`로 2차 확인(번지수)을 합니다. 구 이름이 다르면 집을 절대 못 찾습니다."
     }
   ],
-  "keyTakeaway": "while(조건): 조건 먼저 검사. do-while: 최소 1회 실행 보장. break로 탈출."
+  "keyTakeaway": "equals() 오버라이드 시 hashCode()도 필수입니다. IDE의 자동 생성 기능을 활용하세요."
 }
