@@ -76,64 +76,15 @@ async function seedFromJson() {
 
     const lessonId = lesson.lessonId;
 
-    // py-1-* 레슨에 대해서만 자동 생성
-    if (lessonId.startsWith('py-1-')) {
-      // Python Language 확인/생성
-      let language = await prisma.language.findUnique({ where: { id: 'python' } });
-      if (!language) {
-        language = await prisma.language.create({
-          data: {
-            id: 'python',
-            name: 'Python',
-            description: 'Python 프로그래밍 기초부터 심화까지',
-            icon: '🐍',
-            order: 2,
-          },
-        });
-      }
+    // 레슨 존재 확인
+    const existingLesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+    });
 
-      // Chapter 1 확인/생성
-      let chapter1 = await prisma.chapter.findUnique({ where: { id: 'python-chapter-1' } });
-      if (!chapter1) {
-        chapter1 = await prisma.chapter.create({
-          data: {
-            id: 'python-chapter-1',
-            languageId: 'python',
-            title: 'Python 기초',
-            description: '변수, 리스트, 반복문, 조건문',
-            keyQuestion: 'Python의 기본 문법은?',
-            order: 1,
-          },
-        });
-      }
-
-      // Lesson 생성 (존재하지 않으면)
-      const existingLesson = await prisma.lesson.findUnique({ where: { id: lessonId } });
-      if (!existingLesson) {
-        await prisma.lesson.create({
-          data: {
-            id: lessonId,
-            chapterId: 'python-chapter-1',
-            title: lesson.title,
-            description: lesson.concept,
-            order: parseInt(lessonId.split('-')[2]) || 1,
-            difficulty: 'basic',
-            estimatedTime: 10,
-          },
-        });
-        console.log(`   📝 Created Lesson: ${lessonId}`);
-      }
-    } else {
-      // 기존 레슨들은 Lesson이 필수
-      const existingLesson = await prisma.lesson.findUnique({
-        where: { id: lessonId },
-      });
-
-      if (!existingLesson) {
-        console.log(`⚠️  Skipping ${lessonId}: Lesson not found in DB (run python-seed.ts first)`);
-        skipped++;
-        continue;
-      }
+    if (!existingLesson) {
+      console.log(`⚠️  Skipping ${lessonId}: Lesson not found in DB (run python-seed.ts first)`);
+      skipped++;
+      continue;
     }
 
     // 기존 콘텐츠 업데이트 또는 생성

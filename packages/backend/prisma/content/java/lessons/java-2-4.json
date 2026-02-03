@@ -1,14 +1,14 @@
 {
   "lessonId": "java-2-4",
-  "title": "예외 처리 (try-catch)",
-  "concept": "예외 처리는 프로그램 실행 중 발생하는 오류를 안전하게 처리하는 메커니즘입니다.",
+  "title": "null-safe 컬렉션",
+  "concept": "컬렉션마다 null 허용 정책이 다르다",
   "content": {
-    "code": "String numStr = \"123\";\nint num = Integer.parseInt(numStr);\nSystem.out.println(\"변환 성공: \" + num);\n\nString text = \"abc\";\nboolean valid = true;\n\nfor (int i = 0; i < text.length(); i++) {\n    char c = text.charAt(i);\n    if (c < '0' || c > '9') {\n        valid = false;\n    }\n}\n\nif (valid) {\n    System.out.println(\"숫자 문자열\");\n} else {\n    System.out.println(\"숫자가 아님: \" + text);\n}\n",
+    "code": "Map<String, Integer> hashMap = new HashMap<>();\nhashMap.put(\"key\", null);\nhashMap.put(null, 100);\n\nMap<String, Integer> concurrentMap = new ConcurrentHashMap<>();\nconcurrentMap.put(\"key\", null);\n\nList<String> list = List.of(\"a\", \"b\", \"c\");\nlist.contains(null);\n\nInteger value = hashMap.getOrDefault(\"missing\", 0);",
     "steps": [
       {
         "line": 1,
-        "title": "문자열 숫자 변환",
-        "explanation": "**`String numStr = \"123\";`**\n\n문자열 `\"123\"`을 정수로 변환하려고 합니다.\n\n**예외가 발생할 수 있는 상황**:\n- `\"123\"` → 123 (성공)\n- `\"abc\"` → **NumberFormatException** 발생!\n",
+        "title": "HashMap 생성",
+        "explanation": "**실행 순서:**\n1. `new HashMap<>()` 호출.\n2. Heap에 HashMap 객체 생성.\n\n**HashMap의 정책:** \"뭐든 다 받아줍니다.\"\n`null` 키도, `null` 값도 저장할 수 있는 관대한 친구입니다. 가장 흔하게 쓰이는 Map 구현체죠.",
         "highlight": [
           1
         ],
@@ -16,45 +16,24 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "hashMap",
+              "value": "-> 0xMap1"
             }
           ],
           "heap": [
             {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0xMap1",
+              "content": "HashMap{}",
+              "type": "HashMap"
             }
           ],
-          "output": [],
-          "note": "Line 1 executed"
+          "output": []
         }
       },
       {
         "line": 2,
-        "title": "parseInt 성공",
-        "explanation": "**`int num = Integer.parseInt(numStr);`**\n\n`\"123\"`은 유효한 숫자이므로 변환 성공!\n\n**실제 프로그램에서는 try-catch로 감싸야 합니다**:\n```\ntry {\n    int num = Integer.parseInt(input);\n} catch (NumberFormatException e) {\n    System.out.println(\"잘못된 입력!\");\n}\n```\n",
+        "title": "null value 저장",
+        "explanation": "**실행 순서:**\n1. `hashMap.put(\"key\", null)` 호출.\n2. \"key\"의 해시코드 계산.\n3. 버킷에 (key, null) 저장.\n\n값을 `null`로 저장했습니다.\n\"이 키에 대한 데이터는 없음\"을 표시하고 싶을 때 쓸 수 있지만, `get()` 했을 때 \"키가 없는 건지 값이 null인 건지\" 헷갈릴 수 있습니다.",
         "highlight": [
           2
         ],
@@ -62,46 +41,26 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "num": 123
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "hashMap",
+              "value": "-> 0xMap1"
             }
           ],
           "heap": [
             {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0xMap1",
+              "content": "{\"key\": null}",
+              "type": "HashMap"
             }
           ],
-          "output": [],
-          "note": "Line 2 executed"
+          "note": "HashMap: null value OK",
+          "output": []
         }
       },
       {
         "line": 3,
-        "title": "성공 출력",
-        "explanation": "**`System.out.println(\"변환 성공: \" + num);`**\n\n**출력 결과**: `변환 성공: 123`\n",
+        "title": "null key 저장",
+        "explanation": "**실행 순서:**\n1. `hashMap.put(null, 100)` 호출.\n2. Key가 `null`임을 감지.\n3. 0번 버킷(지정석)에 (null, 100) 저장.\n\n**특이점:** Key가 `null`인 것도 저장됩니다!\n내부적으로는 해시값을 계산할 수 없어서 0번 버킷에 따로 모셔둡니다.\n물론 Key는 유일해야 하므로 `null` Key는 딱 하나만 가질 수 있습니다.",
+        "keyInsight": "HashMap: null key 1개, null value 무제한 가능",
         "highlight": [
           3
         ],
@@ -109,46 +68,24 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "num": 123
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "hashMap",
+              "value": "-> 0xMap1"
             }
           ],
           "heap": [
             {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "address": "0xMap1",
+              "content": "{\"key\": null, null: 100}",
+              "type": "HashMap"
             }
           ],
-          "output": [],
-          "note": "Line 3 executed"
+          "output": []
         }
       },
       {
         "line": 5,
-        "title": "숫자가 아닌 문자열",
-        "explanation": "**`String text = \"abc\";`**\n\n이 문자열에 `parseInt()`를 쓰면 **예외 발생**!\n\n**안전한 방법**: 먼저 검증한 후 변환합니다.\n이것이 **방어적 프로그래밍**의 핵심입니다.\n",
+        "title": "ConcurrentHashMap 생성",
+        "explanation": "**실행 순서:**\n1. `new ConcurrentHashMap<>()` 호출.\n2. Heap에 객체 생성.\n\n**ConcurrentHashMap의 정책:** \"null은 절대 사절!\"\n멀티스레드 환경을 위해 설계된 이 맵은 아주 엄격합니다.\n여러 스레드가 동시에 접근해도 안전하도록 설계되었습니다.",
         "highlight": [
           5
         ],
@@ -156,116 +93,42 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "num": 123,
-                "text": {
-                  "displayValue": "abc",
-                  "id": "0x098",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "concurrentMap",
+              "value": "-> 0xCMap"
             }
           ],
           "heap": [
             {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x098",
-              "type": "String",
-              "content": "\"abc\""
+              "address": "0xCMap",
+              "content": "ConcurrentHashMap{}",
+              "type": "ConcurrentHashMap"
             }
           ],
-          "output": [],
-          "note": "Line 5 executed"
+          "output": []
         }
       },
       {
         "line": 6,
-        "title": "유효성 플래그",
-        "explanation": "**`boolean valid = true;`**\n\n숫자인지 확인하기 위한 플래그 변수입니다.\n숫자가 아닌 문자가 하나라도 있으면 false로 바뀝니다.\n",
+        "title": "ConcurrentHashMap에 null 넣기 (NPE!)",
+        "explanation": "**실행 순서:**\n1. `put` 메서드 진입.\n2. Key/Value null 체크.\n3. `null` 발견 -> **NPE 발생**.\n\n**왜 이렇게 깐깐할까?**\n멀티스레드 환경에서 `get(key)`가 `null`을 반환했을 때 모호하기 때문입니다. 누군가 방금 `remove`해서 없는 건지, 원래 `null`이었는지 확실하지 않으면 동시성 버그가 생기기 쉽습니다.",
+        "keyInsight": "ConcurrentHashMap: null 절대 불가!",
         "highlight": [
           6
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "valid": true,
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "num": 123,
-                "text": {
-                  "displayValue": "abc",
-                  "id": "0x098",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x098",
-              "type": "String",
-              "content": "\"abc\""
-            }
-          ],
-          "output": [],
-          "note": "Line 6 executed"
+          "error": "NullPointerException",
+          "warning": "ConcurrentHashMap은 null key/value 불가",
+          "stack": [],
+          "heap": [],
+          "output": []
         }
       },
       {
         "line": 8,
-        "title": "문자 검사 루프",
-        "explanation": "**`for (int i = 0; i < text.length(); i++)`**\n\n문자열의 각 문자를 하나씩 검사합니다.\n\n**try-catch vs 사전 검증**:\n- try-catch: 예외 발생 후 처리 (사후 대응)\n- 사전 검증: 예외 발생 전 방지 (사전 예방)\n",
+        "title": "List.of() 불변 리스트",
+        "explanation": "**실행 순서:**\n1. `List.of(...)` 팩토리 메서드 호출.\n2. 내부적으로 null 포함 여부 전수 검사.\n3. 불변 리스트 객체 생성.\n\nJava 9에 나온 `List.of()` 역시 `null`을 허용하지 않습니다.\n\"불변 객체(Immutable Object)는 깔끔하고 완전해야 한다\"는 최신 Java의 철학 때문입니다.",
+        "keyInsight": "List.of(): 불변 리스트, null 포함 불가",
         "highlight": [
           8
         ],
@@ -273,260 +136,81 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "valid": true,
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "num": 123,
-                "i": 0,
-                "text": {
-                  "displayValue": "abc",
-                  "id": "0x098",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "list",
+              "value": "-> 0xList"
             }
           ],
           "heap": [
             {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x098",
-              "type": "String",
-              "content": "\"abc\""
+              "address": "0xList",
+              "content": "[\"a\", \"b\", \"c\"]",
+              "type": "ImmutableList"
             }
           ],
-          "output": [],
-          "note": "Line 8 executed"
+          "note": "List.of(): 불변, null 불가",
+          "output": []
         }
       },
       {
         "line": 9,
-        "title": "문자 추출",
-        "explanation": "**`char c = text.charAt(i);`**\n\n**charAt(i)**: i번째 문자를 가져옵니다.\n- i=0: 'a', i=1: 'b', i=2: 'c'\n",
+        "title": "contains(null) 호출 (NPE!)",
+        "explanation": "**실행 순서:**\n1. `list.contains(null)` 호출.\n2. 인자가 `null`임 감지.\n3. **NPE 발생**.\n\n심지어 \"`null`이 들어있니?\"라고 물어보는 것(`contains`)조차 허용하지 않고 NPE를 던집니다.",
         "highlight": [
           9
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "valid": true,
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "c": "a",
-                "num": 123,
-                "i": 0,
-                "text": {
-                  "displayValue": "abc",
-                  "id": "0x098",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x098",
-              "type": "String",
-              "content": "\"abc\""
-            }
-          ],
-          "output": [],
-          "note": "Line 9 executed"
+          "error": "NullPointerException",
+          "stack": [],
+          "heap": [],
+          "output": []
         }
       },
       {
-        "line": 10,
-        "title": "숫자 문자 확인",
-        "explanation": "**`if (c < '0' || c > '9')`**\n\n문자가 '0'~'9' 범위 밖이면 숫자가 아닙니다.\n\n- 'a'는 '0'~'9' 범위 밖 → **valid = false**\n",
+        "line": 11,
+        "title": "getOrDefault() - null-safe 조회",
+        "explanation": "**실행 순서:**\n1. `hashMap.getOrDefault(\"missing\", 0)` 호출.\n2. \"missing\" 키 조회 시도.\n3. 없음(null) 확인.\n4. 기본값 `0` 반환.\n\n**추천 메서드:**\n\"키가 없으면 `null` 말고 0을 달라.\"\n`null` 처리를 매번 `if`문으로 하기 귀찮을 때 쓰는 '치트키'입니다.",
+        "keyInsight": "getOrDefault() = null 대신 기본값 받기",
         "highlight": [
-          10
+          11
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "valid": true,
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "c": "a",
-                "num": 123,
-                "i": 0,
-                "text": {
-                  "displayValue": "abc",
-                  "id": "0x098",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "value",
+              "value": "0"
             }
           ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x098",
-              "type": "String",
-              "content": "\"abc\""
-            }
-          ],
-          "output": [],
-          "note": "Line 10 executed"
-        }
-      },
-      {
-        "line": 15,
-        "title": "조건 분기",
-        "explanation": "**`if (valid) { ... } else { ... }`**\n\nvalid가 false이므로 else 블록이 실행됩니다.\n\n**출력 결과**: `숫자가 아님: abc`\n\n**try-catch 구문 정리**:\n```\ntry {\n    // 예외 가능 코드\n} catch (예외타입 e) {\n    // 에러 처리\n} finally {\n    // 항상 실행 (선택)\n}\n```\n",
-        "highlight": [
-          15
-        ],
-        "visualizationType": "javaMemory",
-        "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "valid": false,
-                "numStr": {
-                  "displayValue": "123",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "num": 123,
-                "text": {
-                  "displayValue": "abc",
-                  "id": "0x098",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"123\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x098",
-              "type": "String",
-              "content": "\"abc\""
-            }
-          ],
-          "output": [],
-          "note": "Line 15 executed"
+          "note": "\"missing\" 키가 없으므로 0 반환",
+          "heap": [],
+          "output": []
         }
       }
     ]
   },
   "quiz": {
-    "question": "try 블록에서 예외가 발생하지 않으면 catch는?",
+    "question": "null key를 허용하는 Map은?",
     "options": [
-      "항상 실행",
-      "실행되지 않음",
-      "컴파일 에러",
-      "경고 발생"
+      "HashMap",
+      "TreeMap",
+      "ConcurrentHashMap",
+      "Hashtable"
     ],
-    "correctIndex": 1,
-    "explanation": "catch 블록은 **예외가 발생했을 때만** 실행됩니다.\n\n예외가 없으면 try 블록만 정상 실행되고\ncatch 블록은 **건너뜁니다**.\n"
+    "correctIndex": 0,
+    "explanation": "HashMap만 null key를 허용합니다. TreeMap은 정렬해야 해서, ConcurrentHashMap과 Hashtable은 설계상 허용하지 않습니다."
   },
   "misconceptions": [
     {
-      "wrong": "try-catch를 사용하면 에러가 발생하지 않는다",
-      "correct": "try-catch는 에러 발생을 방지하는 것이 아니라, 발생한 에러를 처리합니다.",
-      "why": "예외는 여전히 발생하지만, catch에서 적절히 대응하여 프로그램이 계속 실행됩니다."
+      "wrong": "모든 Map은 null을 허용한다",
+      "correct": "구현체마다 다릅니다!",
+      "why": "`HashMap`, `LinkedHashMap`은 허용하지만, `TreeMap`, `Hashtable`, `ConcurrentHashMap`은 Key 또는 Value에 null을 허용하지 않습니다. API 문서를 꼭 확인해야 합니다."
     },
     {
-      "wrong": "모든 코드를 try-catch로 감싸야 한다",
-      "correct": "예외가 실제로 발생할 수 있는 코드만 try-catch로 감쌉니다.",
-      "why": "과도한 try-catch는 성능에 영향을 주고 코드 가독성을 떨어뜨립니다."
+      "wrong": "List.of(null)은 [null]이 된다",
+      "correct": "바로 `NullPointerException`이 발생합니다.",
+      "why": "Java 9+의 팩토리 메서드(`List.of`, `Set.of`, `Map.of`)는 null을 매우 싫어합니다."
     }
   ],
-  "keyTakeaway": "try: 예외 가능 코드. catch: 예외 처리. 사전 검증으로 예외 방지 가능. 방어적 프로그래밍이 중요."
+  "keyTakeaway": "HashMap은 관대하지만, 최신 컬렉션과 Concurrent 컬렉션은 null에 엄격합니다."
 }

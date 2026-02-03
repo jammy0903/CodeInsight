@@ -1,0 +1,48 @@
+# ==================================================
+# Fly.io Backend Configuration
+# ==================================================
+app = "codeinsight-backend"
+primary_region = "nrt" # Tokyo (가장 가까운 리전)
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "3002"
+  NODE_ENV = "production"
+  DOCKER_IMAGE = "gcc:latest"
+  DOCKER_MEMORY_LIMIT = "128m"
+  DOCKER_CPU_LIMIT = "0.5"
+  DOCKER_PID_LIMIT = "50"
+  DOCKER_TMPFS_SIZE = "10m"
+  C_RUN_DEFAULT_TIMEOUT = "10"
+  C_RUN_MAX_TIMEOUT = "30"
+  C_JUDGE_TIMEOUT = "5"
+  C_EXECUTOR_BUFFER_SIZE = "10485760"
+  CODE_MAX_LENGTH = "50000"
+  JSON_BODY_LIMIT = "1mb"
+  DAILY_PROBLEM_CRON = "0 9 * * *"
+  TIMEZONE = "Asia/Seoul"
+
+[http_service]
+  internal_port = 3002
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "15s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[mounts]
+  source = "data"
+  destination = "/app/data"

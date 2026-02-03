@@ -24,6 +24,7 @@ import type { LessonFull, LessonStep, Quiz, SupportedLanguage } from '@/types';
 
 // 기존 컴포넌트 재사용
 import { LessonCodeEditor } from './components/day/LessonCodeEditor';
+import { StepExplanation } from './components/day/StepExplanation';
 import { SelectedCodeBadge } from './components/day/SelectedCodeBadge';
 import { StepNavigationArrows } from './components/StepNavigationArrows';
 import { ReturnOverlay } from '@/features/visualizers/shared';
@@ -41,43 +42,12 @@ import { useIsMobile } from '@/hooks';
 // 언어별 시각화
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { LessonMemoryVisualizer } from '@/features/visualizers/memory';
-import type { TerminalLine } from '@/features/visualizers/shared';
+import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { Layers } from 'lucide-react';
-import { Panel, Group, Separator } from 'react-resizable-panels';
 
 
 // 모바일 컴포넌트
 import { MobileAIChatFAB, MobileAIChatModal, MobileLessonView } from './components/mobile';
-
-// 설명 텍스트 포맷팅 함수 (모바일과 동일)
-const formatExplanation = (text: string) => {
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      const keyword = part.slice(2, -2);
-      return (
-        <span key={i} className="font-bold px-1 rounded" style={{
-          color: 'var(--theme-explanation-text)',
-          backgroundColor: 'var(--theme-memory-changed-bg)'
-        }}>
-          {keyword}
-        </span>
-      );
-    }
-    if (part.startsWith('`') && part.endsWith('`')) {
-      const code = part.slice(1, -1);
-      return (
-        <code key={i} className="font-mono font-bold px-1 rounded text-sm" style={{
-          color: 'var(--theme-memory-register-rbp-text)',
-          backgroundColor: 'var(--theme-memory-register-rbp-bg)'
-        }}>
-          {code}
-        </code>
-      );
-    }
-    return part;
-  });
-};
 
 // Top-level Component Definitions
 
@@ -297,7 +267,7 @@ export function LessonPage() {
   }>();
 
   const queryClient = useQueryClient();
-  const { setPageTitle, appUser, refreshStreak, optimisticallyIncrementStreak } = useStore();
+  const { setPageTitle, appUser, refreshStreak } = useStore();
 
   // TanStack Query: 레슨 데이터 + 챕터 데이터
   const { data: lesson, isLoading, isError, error } = useLesson(lessonId);
@@ -324,6 +294,7 @@ export function LessonPage() {
   const [flashFlow, setFlashFlow] = useState(false);
   const [flashMemory, setFlashMemory] = useState(false);
   const prevStepIndexRef = useRef(0);
+  const [isExplanationCollapsed, setIsExplanationCollapsed] = useState(false);
 
   // 다음 레슨 ID 계산 (useMemo로 최적화)
   const nextLessonId = useMemo(() => {
@@ -549,22 +520,14 @@ export function LessonPage() {
     onComplete: async () => {
       if (!lessonId) return;
       try {
-        // 1. Optimistic Update: 즉시 UI에 스트릭 +1 표시
-        optimisticallyIncrementStreak();
-
-        // 2. 백엔드에 저장
         await updateProgress({ lessonId, status: 'completed' });
-
-        // 3. 캐시 무효화로 UI 즉시 업데이트
+        // 캐시 무효화로 UI 즉시 업데이트
         queryClient.invalidateQueries({ queryKey: ['progress', appUser?.id] });
         queryClient.invalidateQueries({ queryKey: ['language'] }); // 챕터 progress도 업데이트
-
-        // 4. 실제 스트릭 값으로 교체 (백그라운드)
-        refreshStreak();
+        // 스트릭 업데이트 (백엔드에서 이미 업데이트되었으므로 UI만 refresh)
+        await refreshStreak();
       } catch (err) {
         console.error('[Progress] Failed to save:', err);
-        // 실패 시 스트릭 재조회 (롤백)
-        refreshStreak();
       }
       analyticsRef.current.finishTracking();
     },
@@ -732,8 +695,7 @@ export function LessonPage() {
           <div className="w-full md:w-1/2 flex flex-col rounded-xl"
             style={{
               border: '1px solid var(--theme-lesson-panel-border)',
-              height: 'calc(100vh - 120px)',
-              minHeight: '500px',
+              minHeight: '400px',
               overflow: 'visible',
             }}
           >
@@ -748,78 +710,68 @@ export function LessonPage() {
               <Code2 className="w-3 h-3 mr-1.5" />
               에디터
             </div>
-            <Group direction="vertical">
-              <Panel defaultSize={50} minSize={20}>
-                <div className="h-full overflow-y-auto relative">
-                  <LessonCodeEditor
-                    code={code}
-                    highlightLine={displayLine}
-                    onSelectionChange={setSelection}
-                  />
-                  {/* 터미널 오버레이 (모바일 스타일) */}
-                  {terminalLines.length > 0 && (
-                    <div className="absolute bottom-0 left-0 right-0 z-10 max-h-[30%] flex flex-col-reverse">
-                      <div
-                        className="overflow-hidden shadow-lg border-t border-green-500/30"
-                        style={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                          backdropFilter: 'blur(4px)',
-                        }}
-                      >
-                        <div className="px-3 py-2 overflow-y-auto max-h-[100px]">
-                          {terminalLines.map((line, idx) => (
-                            <div key={idx} className="text-sm font-mono leading-relaxed text-green-500 break-words whitespace-pre-wrap">
-                              <span className="text-emerald-500 opacity-70 mr-1">{'>'}</span>
-                              {line.content}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Panel>
-              <Separator className="h-1.5 bg-[var(--theme-lesson-panel-border)] hover:bg-blue-500 transition-colors cursor-row-resize" />
-              <Panel defaultSize={50} minSize={20}>
-                {currentStep && (
-                  <div className="h-full overflow-hidden flex flex-col"
+            <div
+              className={(code.split('\n').length > 10 && !isExplanationCollapsed) ? 'overflow-y-auto' : ''}
+              style={{
+                height: `${(isExplanationCollapsed ? code.split('\n').length : Math.max(code.split('\n').length, 10)) * 20}px`,
+                borderBottom: '1px solid var(--theme-lesson-panel-border)',
+              }}
+            >
+              <LessonCodeEditor
+                code={code}
+                highlightLine={displayLine}
+                onSelectionChange={setSelection}
+              />
+            </div>
+            {currentStep && (
+              <div
+                className={`relative ${isExplanationCollapsed ? 'shrink-0' : 'overflow-y-auto'}`}
+                style={{
+                  background: 'var(--theme-lesson-explanation-bg)',
+                  borderTop: '1px solid var(--theme-lesson-panel-border)',
+                  height: isExplanationCollapsed ? 'auto' : `${Math.max(code.split('\n').length, 10) * 20}px`,
+                }}
+              >
+                <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+                  <span
+                    className="px-2 py-0.5 rounded-md text-xs font-bold"
                     style={{
-                      fontFamily: 'var(--font-handwriting)',
-                      fontWeight: 'normal',
-                      background: 'var(--theme-lesson-panel-bg)',
+                      background: 'var(--theme-lesson-explanation-line-badge-bg)',
+                      color: '#fff',
                     }}
                   >
-                    {/* 설명 헤더 (모바일 스타일) */}
-                    <div
-                      className="flex items-center gap-2 px-3 py-2 shrink-0"
-                      style={{
-                        background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                      }}
+                    L{displayLine}
+                  </span>
+                  {(code.split('\n').length > 6) && (
+                    <button
+                      onClick={() => setIsExplanationCollapsed(!isExplanationCollapsed)}
+                      className="p-1 rounded-md bg-transparent hover:bg-amber-200 bg-opacity-50 transition-colors"
+                      title={isExplanationCollapsed ? '설명 펼치기' : '설명 접기'}
                     >
-                      <span className="shrink-0 px-2 py-1 rounded text-white text-xs font-bold leading-none" style={{
-                        fontFamily: 'var(--font-sans)',
-                        backgroundColor: 'var(--theme-explanation-text)'
-                      }}>
-                        L{displayLine}
-                      </span>
-                      <span className="text-sm font-semibold text-amber-800">설명</span>
-                    </div>
-                    {/* 설명 내용 (모바일 스타일) */}
-                    <div className="flex-1 p-4 overflow-y-auto">
-                      <span className="text-base leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--theme-explanation-text)' }}>
-                        {currentStep?.explanation ? formatExplanation(currentStep.explanation) : '설명이 없습니다'}
-                      </span>
-                      {currentStep?.tip && (
-                        <div className="mt-3 pl-3 border-l-2 border-l-[var(--theme-memory-changed-border)]">
-                          <span className="text-sm" style={{ color: 'var(--theme-memory-changed-border)' }}>💡 </span>
-                          <span className="text-sm whitespace-pre-wrap" style={{ color: 'var(--theme-explanation-text)' }}>{currentStep.tip}</span>
-                        </div>
+                      {isExplanationCollapsed ? (
+                        <ChevronUp className="w-4 h-4 text-amber-700" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-amber-700" />
                       )}
-                    </div>
+                    </button>
+                  )}
+                </div>
+                {isExplanationCollapsed ? (
+                  <div className="p-2 text-xs text-amber-700 cursor-pointer" onClick={() => setIsExplanationCollapsed(false)}>
+                    클릭하여 설명 보기
+                  </div>
+                ) : (
+                  <div className="p-4 pr-20">
+                    <StepExplanation
+                      explanation={currentStep.explanation}
+                      stepIndex={navigation.currentStepIndex}
+                      line={displayLine}
+                      code={code}
+                    />
                   </div>
                 )}
-              </Panel>
-            </Group>
+              </div>
+            )}
           </div>
 
           {/* Right Panel */}
@@ -877,8 +829,7 @@ export function LessonPage() {
               className="flex-1 overflow-hidden"
               style={{
                 background: 'var(--theme-lesson-memory-bg)',
-                height: 'calc(100vh - 160px)',
-                minHeight: '500px',
+                minHeight: '400px',
               }}
             >
               {activeTab === 'flow' && (
@@ -897,6 +848,15 @@ export function LessonPage() {
                           } : undefined}
                           stdout={currentStep.stdout}
                         />
+                        {/* 터미널 출력 */}
+                        {terminalLines.length > 0 && (
+                          <TerminalOutput
+                            lines={terminalLines}
+                            title="출력"
+                            compact
+                            className="mt-6"
+                          />
+                        )}
                       </>
                     )}
                   </div>
@@ -914,6 +874,15 @@ export function LessonPage() {
                       memoryState={memoryState}
                       changedBlocks={changedBlocks}
                     />
+                    {/* 터미널 출력 */}
+                    {terminalLines.length > 0 && (
+                      <TerminalOutput
+                        lines={terminalLines}
+                        title="출력"
+                        compact
+                        className="mt-6"
+                      />
+                    )}
                   </>
                 </div>
               )}

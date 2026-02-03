@@ -1,173 +1,168 @@
 {
   "lessonId": "c-2-4",
-  "title": "포인터와 함수",
-  "concept": "포인터를 매개변수로 전달하면 함수에서 원본 변수를 직접 수정할 수 있습니다.",
+  "title": "Dereferencing (Writing)",
+  "concept": "주소를 알면 멀리서도 원본 값을 바꿀 수 있다 (원격 제어)",
   "content": {
-    "code": "#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n\nint main() {\n    int x = 10;\n    int y = 20;\n    printf(\"swap 전: x=%d, y=%d\\n\", x, y);\n\n    swap(&x, &y);\n    printf(\"swap 후: x=%d, y=%d\\n\", x, y);\n\n    return 0;\n}\n",
+    "code": "#include <stdio.h>\n\nint main() {\n    int energy = 50;\n    int *remote = &energy;\n\n    printf(\"Before: %d\\n\", energy);\n\n    *remote = 100;\n\n    printf(\"After:  %d\\n\", energy);\n    return 0;\n}",
     "steps": [
       {
-        "line": 4,
-        "title": "임시 변수에 저장",
-        "explanation": "**`int temp = *a;`**\n\n`*a`는 포인터 a가 가리키는 값 (= x = 10)\n\ntemp에 x의 값(10)을 임시 저장합니다.\n",
+        "line": 1,
+        "title": "stdio.h 헤더 포함",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
         "highlight": [
-          4
+          1
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "swap 전: x=10, y=20"
-          ],
-          "note": "Line 4 executed"
-        }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       },
       {
-        "line": 5,
-        "title": "a에 b의 값 대입",
-        "explanation": "**`*a = *b;`**\n\n`*b`(= y = 20)를 `*a`(= x)에 저장합니다.\n\n**결과**: x가 20으로 변경됨\n",
+        "line": 3,
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
         "highlight": [
+          3
+        ],
+        "visualizationType": "cMemory",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "line": 4,
+        "title": "변수 및 포인터 선언",
+        "explanation": "**`int energy = 50;`**\n**`int *remote = &energy;`**\n\n`energy` 변수를 선언하고, `remote` 포인터가 `energy`의 주소를 가리키도록 합니다. `remote`는 `energy`를 원격 제어할 수 있는 '리모컨' 역할을 합니다.",
+        "highlight": [
+          4,
           5
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20"
-          ],
-          "note": "Line 5 executed"
-        }
+        "stack": [
+          {
+            "name": "energy",
+            "value": "50",
+            "type": "int",
+            "address": "0x3000"
+          },
+          {
+            "name": "remote",
+            "value": "0x3000",
+            "type": "int*",
+            "address": "0x3004"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
       },
       {
-        "line": 6,
-        "title": "b에 임시 값 대입",
-        "explanation": "**`*b = temp;`**\n\ntemp(10)를 `*b`(= y)에 저장합니다.\n\n**결과**: y가 10으로 변경됨\n\n**교환 완료!** x=20, y=10\n",
+        "line": 7,
+        "title": "변경 전 값 확인",
+        "explanation": "**`printf(\"Before: %d\\n\", energy);`**\n\n`energy` 변수의 초기 값을 화면에 출력합니다.",
         "highlight": [
-          6
+          7
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20"
-          ],
-          "note": "Line 6 executed"
-        }
+        "stack": [
+          {
+            "name": "energy",
+            "value": "50",
+            "type": "int",
+            "address": "0x3000"
+          },
+          {
+            "name": "remote",
+            "value": "0x3000",
+            "type": "int*",
+            "address": "0x3004"
+          }
+        ],
+        "stdout": "Before: 50",
+        "heap": []
       },
       {
-        "line": 10,
-        "title": "main에서 변수 선언",
-        "explanation": "**`int x = 10;`** / **`int y = 20;`**\n\n교환할 두 변수를 선언합니다.\n",
+        "line": 9,
+        "title": "역참조를 통한 값 변경",
+        "explanation": "**`*remote = 100;`**\n\n`*remote`는 '`remote`가 가리키는 주소의 값'을 의미합니다. `remote`는 `energy`의 주소를 담고 있으므로, 이 코드는 `energy`의 값을 `100`으로 바꿉니다. 마치 리모컨으로 TV 볼륨을 높이는 것처럼, 멀리서 원본 값을 제어합니다.",
+        "keyInsight": "`*p = 값`은 '그 주소에 값을 저장하라'는 뜻입니다.",
         "highlight": [
-          10
+          9
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20"
-          ],
-          "note": "Line 10 executed"
-        }
+        "stack": [
+          {
+            "name": "energy",
+            "value": "100",
+            "type": "int",
+            "address": "0x3000",
+            "highlight": true
+          },
+          {
+            "name": "remote",
+            "value": "0x3000",
+            "type": "int*",
+            "address": "0x3004"
+          }
+        ],
+        "stdout": "Before: 50",
+        "heap": []
+      },
+      {
+        "line": 11,
+        "title": "변경 후 값 확인",
+        "explanation": "**`printf(\"After:  %d\\n\", energy);`**\n\n`energy` 변수의 값을 다시 출력하여, 포인터를 통한 원격 수정으로 값이 `100`으로 변경되었음을 확인합니다.",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "cMemory",
+        "stack": [
+          {
+            "name": "energy",
+            "value": "100",
+            "type": "int",
+            "address": "0x3000"
+          },
+          {
+            "name": "remote",
+            "value": "0x3000",
+            "type": "int*",
+            "address": "0x3004"
+          }
+        ],
+        "stdout": "Before: 50\nAfter:  100",
+        "heap": []
       },
       {
         "line": 12,
-        "title": "swap 전 출력",
-        "explanation": "**`printf(\"swap 전: x=%d, y=%d\\n\", x, y);`**\n\n**출력 결과**: `swap 전: x=10, y=20`\n",
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
         "highlight": [
           12
         ],
         "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20"
-          ],
-          "note": "Line 12 executed"
-        }
-      },
-      {
-        "line": 14,
-        "title": "주소를 전달하며 함수 호출",
-        "explanation": "**`swap(&x, &y);`**\n\n- `&x`: x의 주소를 전달 → 매개변수 a가 x를 가리킴\n- `&y`: y의 주소를 전달 → 매개변수 b가 y를 가리킴\n\n**값이 아니라 주소를 전달**하므로 함수 안에서 원본을 수정할 수 있습니다!\n",
-        "highlight": [
-          14
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 후: x=20, y=10"
-          ],
-          "note": "Line 14 executed"
-        }
-      },
-      {
-        "line": 15,
-        "title": "swap 후 출력",
-        "explanation": "**`printf(\"swap 후: x=%d, y=%d\\n\", x, y);`**\n\n**출력 결과**: `swap 후: x=20, y=10`\n\n포인터를 통해 x와 y의 값이 성공적으로 교환되었습니다!\n",
-        "highlight": [
-          15
-        ],
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 전: x=10, y=20",
-            "swap 후: x=20, y=10",
-            "swap 전: x=10, y=20",
-            "swap 후: x=20, y=10"
-          ],
-          "note": "Line 15 executed"
-        }
+        "stack": [],
+        "heap": [],
+        "stdout": ""
       }
     ]
   },
   "quiz": {
-    "question": "swap(x, y) 대신 swap(&x, &y)를 사용하는 이유는?",
+    "question": "다음 코드 실행 후 a의 값은?\nint a = 10;\nint *p = &a;\n*p = 20;\na = 30;",
     "options": [
-      "속도가 더 빠르다",
-      "원본 변수를 수정하려면 주소가 필요하다",
-      "포인터가 더 안전하다",
-      "C 문법 규칙이다"
+      "10",
+      "20",
+      "30",
+      "에러 발생"
     ],
-    "correctIndex": 1,
-    "explanation": "C는 **값에 의한 전달(pass by value)**이 기본입니다.\n\nswap(x, y)로 호출하면 x, y의 **복사본**이 전달되어 원본은 변하지 않습니다.\nswap(&x, &y)로 **주소를 전달**해야 함수 안에서 원본을 수정할 수 있습니다.\n"
+    "correctIndex": 2,
+    "explanation": "순서대로 실행됩니다. 10 -> (*p에 의해) 20 -> (직접 대입에 의해) 30. 최종값은 30입니다."
   },
   "misconceptions": [
     {
-      "wrong": "C에서도 참조(reference)로 전달할 수 있다",
-      "correct": "C에는 참조(reference) 전달이 없습니다. 포인터로 흉내냅니다.",
-      "why": "C++에는 참조(&)가 있지만, C는 포인터만으로 간접 접근을 구현합니다."
-    },
-    {
-      "wrong": "포인터 매개변수는 원본 변수의 이름을 알고 있다",
-      "correct": "포인터는 단지 메모리 주소만 알고 있습니다.",
-      "why": "포인터에는 주소만 저장되어 있으며, 어떤 변수의 주소인지 이름 정보는 없습니다."
+      "wrong": "포인터로 값을 바꾸면 복사본만 바뀐다",
+      "correct": "원본이 바뀝니다.",
+      "why": "포인터는 원본의 **주소**를 가지고 있기 때문에, 그 주소에 찾아가서 쓰면 당연히 원본 데이터가 변경됩니다."
     }
   ],
-  "keyTakeaway": "포인터 매개변수로 원본 수정 가능. 주소(&)를 전달하고, 역참조(*)로 값 접근. C의 핵심 패턴."
+  "keyTakeaway": "`*p` 왼쪽에 오면 '그 위치에 값을 저장하라'는 뜻. 원본 조작 가능!"
 }

@@ -1,14 +1,35 @@
 {
   "lessonId": "java-2-2",
-  "title": "ArrayList 사용",
-  "concept": "ArrayList는 크기가 자동으로 조절되는 배열입니다. 제네릭으로 타입을 지정합니다.",
+  "title": "null 체크 패턴",
+  "concept": "null을 안전하게 다루는 여러 가지 패턴이 있다",
   "content": {
-    "code": "import java.util.ArrayList;\n\nArrayList<String> names = new ArrayList<>();\nnames.add(\"Alice\");\nnames.add(\"Bob\");\nnames.add(\"Charlie\");\n\nSystem.out.println(\"크기: \" + names.size());\nSystem.out.println(\"첫번째: \" + names.get(0));\n\nnames.remove(1);\nSystem.out.println(\"삭제 후: \" + names);\n",
+    "code": "String str = getValueMaybeNull();\n\nif (str != null && str.length() > 0) {\n    System.out.println(str);\n}\n\nObjects.requireNonNull(str, \"str must not be null\");\n\nString result = (str != null) ? str : \"default\";\n\nString value = Objects.requireNonNullElse(str, \"default\");",
     "steps": [
       {
+        "line": 1,
+        "title": "null일 수 있는 값 받기",
+        "explanation": "**실행 순서:**\n1. `getValueMaybeNull()` 호출.\n2. 값(또는 `null`) 반환.\n3. `str` 변수에 저장.\n\n**상황:** 외부(DB, API, 사용자 입력)에서 값을 받아오면 항상 `null`일 수 있다고 의심해야 합니다.\n이 `str`은 언제 터질지 모르는 시한폭탄과 같습니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "str",
+              "value": "null"
+            }
+          ],
+          "note": "외부 입력은 항상 null 가능성 고려",
+          "heap": [],
+          "output": []
+        }
+      },
+      {
         "line": 3,
-        "title": "ArrayList 생성",
-        "explanation": "**`ArrayList<String> names = new ArrayList<>();`**\n\n**ArrayList**: 크기가 **자동으로 조절**되는 배열입니다.\n\n- `<String>`: **제네릭(Generic)** - 저장할 타입을 지정\n- `new ArrayList<>()`: 새 ArrayList 생성\n\n**배열 vs ArrayList**:\n- 배열: `String[] arr = new String[3]` (크기 고정)\n- ArrayList: `ArrayList<String>` (크기 자동 증가)\n",
+        "title": "단축 평가 (Short-circuit Evaluation)",
+        "explanation": "**실행 순서:**\n1. `str != null` 검사 -> **false** (만약 null이라면).\n2. **즉시 중단** (뒤의 `str.length()` 실행 안 함).\n\n**논리 연산의 마법:** `&&`(AND) 연산자는 왼쪽 조건이 `false`면 오른쪽은 확인조차 하지 않습니다. 먼저 `str != null`을 검사하여 `null`이면, 뒤의 `str.length()`는 실행되지 않아 `NullPointerException`을 안전하게 피합니다.",
+        "keyInsight": "&& 단축 평가: 앞이 false면 뒤는 실행 안 함",
         "highlight": [
           3
         ],
@@ -16,44 +37,20 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "names": {
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "java.util.ArrayList"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "str",
+              "value": "null"
             }
           ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "java.util.ArrayList",
-              "content": "java.util.ArrayList{elementData=@0x045, size=1, modCount=1}"
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 3 executed"
+          "evaluation": "str != null → false → && 뒤 실행 안 함",
+          "note": "순서가 중요! null 체크를 먼저",
+          "heap": [],
+          "output": []
         }
       },
       {
         "line": 4,
-        "title": "요소 추가",
-        "explanation": "**`names.add(\"Alice\");`**\n\n**add()**: 배열 끝에 요소를 추가합니다.\n\n현재: `[\"Alice\"]`\n",
+        "title": "조건부 실행",
+        "explanation": "**실행 순서:**\n1. 만약 앞의 `if` 조건이 `true`라면...\n2. `println(str)` 실행.\n\n앞선 `if`문의 조건(`str != null && str.length() > 0`)이 모두 `true`일 경우에만 이 라인이 실행됩니다. `str`이 유효한 문자열임이 보장된 상태에서 안전하게 출력합니다.",
         "highlight": [
           4
         ],
@@ -61,134 +58,66 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "names": {
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "java.util.ArrayList"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "str",
+              "value": "\"hello\""
             }
           ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "java.util.ArrayList",
-              "content": "java.util.ArrayList{elementData=@0x045, size=2, modCount=2}"
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 4 executed"
+          "note": "이 라인은 str이 안전할 때만 도달 가능",
+          "heap": [],
+          "output": []
         }
       },
       {
-        "line": 5,
-        "title": "추가 요소",
-        "explanation": "**`names.add(\"Bob\");`**\n\n현재: `[\"Alice\", \"Bob\"]`\n",
+        "line": 7,
+        "title": "Objects.requireNonNull (Fail-fast)",
+        "explanation": "**실행 순서:**\n1. `Objects.requireNonNull(str, ...)` 호출.\n2. `str`이 `null`인지 확인.\n3. `null`이면 즉시 예외 발생.\n\n**Fail-fast(빠른 실패) 전략:** \"문제가 있다면 나중에 이상하게 터지지 말고, 지금 당장 명확하게 터져라!\" `str`이 `null`이면 즉시 `NullPointerException`을 명확한 메시지와 함께 던져, 디버깅을 쉽게 만들어 줍니다.",
+        "keyInsight": "빠른 실패(Fail-fast) 패턴",
         "highlight": [
-          5
+          7
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "names": {
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "java.util.ArrayList"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "str",
+              "value": "null"
             }
           ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "java.util.ArrayList",
-              "content": "java.util.ArrayList{elementData=@0x045, size=3, modCount=3}"
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
+          "output": [
+            "Exception: str must not be null"
           ],
-          "output": [],
-          "note": "Line 5 executed"
+          "note": "null이면 명확한 에러 메시지와 함께 즉시 실패",
+          "heap": []
         }
       },
       {
-        "line": 8,
-        "title": "크기 확인",
-        "explanation": "**`System.out.println(\"크기: \" + names.size());`**\n\n**size()**: ArrayList의 요소 개수를 반환합니다.\n\n**출력 결과**: `크기: 3`\n\n**주의**: 배열은 `.length`, ArrayList는 `.size()`\n",
+        "line": 9,
+        "title": "삼항 연산자로 기본값 제공",
+        "explanation": "**실행 순서:**\n1. `str != null` 검사.\n2. 참이면 `str`, 거짓이면 `\"default\"` 선택.\n3. 결과를 `result`에 할당.\n\n`str`이 `null`이 아니면 `str` 자신을, `null`이면 기본값인 `\"default\"`를 `result` 변수에 할당합니다.",
         "highlight": [
-          8
+          9
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "names": {
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "java.util.ArrayList"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "java.util.ArrayList",
-              "content": "java.util.ArrayList{elementData=@0x045, size=3, modCount=3}"
+              "name": "str",
+              "value": "null"
             },
             {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
+              "name": "result",
+              "value": "\"default\""
             }
           ],
-          "output": [],
-          "note": "Line 8 executed"
+          "heap": [],
+          "output": []
         }
       },
       {
         "line": 11,
-        "title": "요소 삭제",
-        "explanation": "**`names.remove(1);`**\n\n**remove(index)**: 해당 인덱스의 요소를 삭제합니다.\n\n인덱스 1의 \"Bob\"이 삭제됩니다.\n",
+        "title": "Objects.requireNonNullElse",
+        "explanation": "**실행 순서:**\n1. `Objects.requireNonNullElse` 호출.\n2. 내부적으로 null 체크.\n3. `null`이면 `\"default\"` 반환.\n4. `value`에 할당.\n\nJava 9부터 제공되는 더 읽기 좋은 방식입니다. 삼항 연산자와 기능은 같지만, \"null이 아니면 이것, 아니면 저것\"이라는 의도가 명확히 드러납니다.",
+        "keyInsight": "Java 9+: requireNonNullElse 사용",
         "highlight": [
           11
         ],
@@ -196,64 +125,34 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "names": {
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "java.util.ArrayList"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "value",
+              "value": "\"default\""
             }
           ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "java.util.ArrayList",
-              "content": "java.util.ArrayList{elementData=@0x045, size=2, modCount=4}"
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 11 executed"
+          "note": "더 읽기 쉬운 코드 (Java 9+)",
+          "heap": [],
+          "output": []
         }
       }
     ]
   },
   "quiz": {
-    "question": "ArrayList<int>로 정수 ArrayList를 만들 수 있나요?",
+    "question": "if (str.length() > 0 && str != null)의 문제점은?",
     "options": [
-      "가능하다",
-      "불가, ArrayList<Integer>를 사용해야 한다",
-      "불가, 배열만 사용 가능하다",
-      "컴파일 경고만 발생"
+      "문법 오류",
+      "str이 null이면 NPE 발생",
+      "항상 false 반환",
+      "문제없음"
     ],
     "correctIndex": 1,
-    "explanation": "제네릭에는 **기본 타입을 사용할 수 없습니다**.\n\n**래퍼 클래스**를 사용해야 합니다:\n- `int` → `Integer`\n- `double` → `Double`\n- `boolean` → `Boolean`\n\n`ArrayList<Integer> nums = new ArrayList<>();`\n"
+    "explanation": "순서가 잘못되었습니다. str.length()가 먼저 실행되므로 str이 null이면 NPE가 발생합니다. null 체크를 무조건 맨 앞에 둬야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "ArrayList도 []로 접근할 수 있다",
-      "correct": "ArrayList는 get(), set() 메서드로 접근합니다.",
-      "why": "Java에서 []는 배열 전용입니다. ArrayList는 클래스이므로 메서드를 사용합니다."
-    },
-    {
-      "wrong": "ArrayList는 배열보다 항상 좋다",
-      "correct": "성능이 중요하고 크기가 고정이면 배열이 더 효율적입니다.",
-      "why": "ArrayList는 내부적으로 배열을 사용하며, 크기 조절 시 복사 비용이 발생합니다."
+      "wrong": "null 체크 순서는 상관없다",
+      "correct": "순서가 생명입니다. 무조건 `null` 체크가 가장 앞에(왼쪽) 와야 합니다.",
+      "why": "오른쪽부터 체크하면 이미 `null.메서드()`가 실행되어 NPE가 터져버립니다. `&&`는 왼쪽부터 읽다가 `false`가 나오면 즉시 멈춥니다(단축 평가)."
     }
   ],
-  "keyTakeaway": "ArrayList: 크기 자동 조절. add(), get(), remove(), size(). 제네릭으로 타입 지정. 기본 타입은 래퍼 클래스 사용."
+  "keyTakeaway": "null 체크는 항상 맨 앞에. Objects 유틸리티를 활용하면 코드가 깔끔해집니다."
 }

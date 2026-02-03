@@ -1,14 +1,15 @@
 {
   "lessonId": "java-2-1",
-  "title": "클래스와 객체",
-  "concept": "클래스는 객체의 설계도입니다. 필드(데이터)와 메서드(동작)를 하나로 묶습니다.",
+  "title": "NullPointerException 이해",
+  "concept": "null 참조에서 메서드를 호출하면 NullPointerException이 발생한다",
   "content": {
-    "code": "String dogName = \"Buddy\";\nint dogAge = 3;\nSystem.out.println(dogName + \"는 \" + dogAge + \"살\");\n\nString catName = \"Nabi\";\nint catAge = 2;\nSystem.out.println(catName + \"는 \" + catAge + \"살\");\n",
+    "code": "String str = null;\n\nint len = str.length();\n\nString text = null;\nboolean result = text.equals(\"hello\");\n\nboolean safe = \"hello\".equals(text);",
     "steps": [
       {
         "line": 1,
-        "title": "첫 번째 데이터 그룹",
-        "explanation": "**`String dogName = \"Buddy\";`**\n\n개의 이름을 저장합니다.\n\n**문제점**: 관련된 데이터(이름, 나이)가 **분리**되어 있습니다.\n데이터가 많아지면 관리가 어려워집니다!\n\n**클래스가 필요한 이유**:\n```\n// 클래스를 사용하면:\nclass Dog {\n    String name;\n    int age;\n}\nDog dog = new Dog();\ndog.name = \"Buddy\";\ndog.age = 3;\n```\n",
+        "title": "null 할당",
+        "explanation": "**실행 순서:**\n1. `str` 변수 공간 생성 (Stack).\n2. `null`(0x0) 값 할당.\n\n**메모리에서 일어나는 일:**\nStack에 `str`이라는 공간을 만들고, `null`이라는 특별한 값을 넣습니다.\n\n**null이란?**\n\"아무것도 가리키지 않는다\"는 뜻의 표식입니다. 주소지가 적혀있지 않은 '빈 봉투'와 같습니다. 내부적으로는 보통 0x0 같은 무효한 주소로 표현됩니다.",
+        "keyInsight": "null = 참조 없음 (주소 0x0)",
         "highlight": [
           1
         ],
@@ -16,92 +17,19 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "dogName": {
-                  "displayValue": "Buddy",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "str",
+              "value": "null"
             }
           ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"Buddy\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 1 executed"
-        }
-      },
-      {
-        "line": 2,
-        "title": "나이 데이터",
-        "explanation": "**`int dogAge = 3;`**\n\ndogName과 dogAge는 **논리적으로 같은 개**에 대한 데이터이지만,\n코드에서는 별개의 변수입니다.\n",
-        "highlight": [
-          2
-        ],
-        "visualizationType": "javaMemory",
-        "javaMemoryState": {
-          "stack": [
-            {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "dogAge": 3,
-                "dogName": {
-                  "displayValue": "Buddy",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"Buddy\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
-          ],
-          "output": [],
-          "note": "Line 2 executed"
+          "heap": [],
+          "output": []
         }
       },
       {
         "line": 3,
-        "title": "출력",
-        "explanation": "**`System.out.println(dogName + \"는 \" + dogAge + \"살\");`**\n\n**출력 결과**: `Buddy는 3살`\n",
+        "title": "null에서 메서드 호출 (NPE 발생)",
+        "explanation": "**실행 순서:**\n1. `str` 역참조 시도.\n2. 값이 `null`임을 확인.\n3. **`NullPointerException`** 발생.\n\n`str.length()`를 호출하려면 `str`이 가리키는 **주소로 이동(역참조)**해야 합니다.\n하지만 주소가 `null`(빈 봉투)이므로, \"갈 곳이 없는데?\"라며 즉시 에러를 던지고 프로그램을 멈춥니다.\n\n**역참조(Dereference)란?**\n주소를 따라가서 그곳에 있는 실제 객체에 접근하는 행위(`.` 연산자)를 말합니다.",
+        "keyInsight": "null.메서드() = NullPointerException",
         "highlight": [
           3
         ],
@@ -109,46 +37,21 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "dogAge": 3,
-                "dogName": {
-                  "displayValue": "Buddy",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "str",
+              "value": "null"
             }
           ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"Buddy\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            }
+          "output": [
+            "Exception in thread \"main\" java.lang.NullPointerException"
           ],
-          "output": [],
-          "note": "Line 3 executed"
+          "error": "NullPointerException: Cannot invoke \"String.length()\" because \"str\" is null",
+          "heap": []
         }
       },
       {
         "line": 5,
-        "title": "두 번째 데이터 그룹",
-        "explanation": "**`String catName = \"Nabi\";`**\n\n또 다른 동물의 데이터입니다.\n\n**변수가 계속 늘어남**: dog1Name, dog1Age, dog2Name, dog2Age...\n→ **클래스(class)**로 묶으면 해결!\n",
+        "title": "또 다른 null 변수",
+        "explanation": "**실행 순서:**\n1. `text` 변수 생성.\n2. `null` 값 할당.\n\n`text` 변수도 마찬가지로 아무런 객체도 가리키지 않는 상태(`null`)로 초기화됩니다.\nJava 개발자가 가장 많이 겪는 에러의 시작점입니다.",
         "highlight": [
           5
         ],
@@ -156,136 +59,88 @@
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "dogAge": 3,
-                "catName": {
-                  "displayValue": "Nabi",
-                  "id": "0x0A4",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "dogName": {
-                  "displayValue": "Buddy",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "text",
+              "value": "null"
             }
           ],
-          "heap": [
-            {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"Buddy\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x0A4",
-              "type": "String",
-              "content": "\"Nabi\""
-            }
-          ],
-          "output": [],
-          "note": "Line 5 executed"
+          "heap": [],
+          "output": []
         }
       },
       {
-        "line": 7,
-        "title": "두 번째 출력",
-        "explanation": "**`System.out.println(catName + \"는 \" + catAge + \"살\");`**\n\n**출력 결과**: `Nabi는 2살`\n\n**정리**: 관련된 데이터를 하나로 묶는 것이 **객체지향(OOP)**의 핵심입니다.\n",
+        "line": 6,
+        "title": "null.equals() 호출 (위험!)",
+        "explanation": "**실행 순서:**\n1. `text` 역참조 시도 (text.equals...).\n2. `text`가 `null`이므로 **NPE 발생**.\n\n`text`가 `null`이므로, `text`를 통해 무언가를 하려는 시도(`.equals`)는 무조건 실패합니다.\n\n**경고:**\n변수가 `null`일 가능성이 0.1%라도 있다면, 절대로 메서드를 먼저 호출하지 마세요.",
+        "keyInsight": "null.equals(x) = NPE!",
         "highlight": [
-          7
+          6
         ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
             {
-              "variables": {
-                "args": {
-                  "length": 0,
-                  "id": "0x036",
-                  "type": "Array",
-                  "class": "java.lang.String[]"
-                },
-                "dogAge": 3,
-                "catAge": 2,
-                "catName": {
-                  "displayValue": "Nabi",
-                  "id": "0x0A4",
-                  "type": "Reference",
-                  "class": "String"
-                },
-                "dogName": {
-                  "displayValue": "Buddy",
-                  "id": "0x037",
-                  "type": "Reference",
-                  "class": "String"
-                }
-              },
-              "methodName": "main",
-              "className": "Main"
+              "name": "text",
+              "value": "null"
             }
           ],
-          "heap": [
+          "output": [
+            "Exception in thread \"main\" java.lang.NullPointerException"
+          ],
+          "error": "NullPointerException",
+          "heap": []
+        }
+      },
+      {
+        "line": 8,
+        "title": "안전한 비교 방법 (Yoda Condition)",
+        "explanation": "**실행 순서:**\n1. `\"hello\"` 리터럴(String Pool) 참조.\n2. `\"hello\".equals(null)` 호출.\n3. `null` 인자를 받아 안전하게 **false** 반환.\n4. `safe` 변수에 false 저장.\n\n**순서만 바꿨을 뿐인데?**\n`\"hello\"`는 리터럴이므로 **String Pool에 존재하는 실제 객체**입니다. (절대 null이 아님)\n`equals` 메서드는 인자로 `null`이 들어오면 우아하게 `false`를 반환하도록 만들어져 있습니다.\n이런 패턴을 '요다 표기법(Yoda Conditions)'이라고도 부릅니다.",
+        "keyInsight": "\"리터럴\".equals(변수) = null-safe",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
             {
-              "address": "0x037",
-              "type": "String",
-              "content": "\"Buddy\""
-            },
-            {
-              "address": "0x036",
-              "length": 0,
-              "type": "java.lang.String[]",
-              "content": "[]"
-            },
-            {
-              "address": "0x0A4",
-              "type": "String",
-              "content": "\"Nabi\""
+              "name": "safe",
+              "value": "false"
             }
           ],
-          "output": [],
-          "note": "Line 7 executed"
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "note": "\"hello\"는 null이 아니므로 안전하게 메서드 호출 가능",
+          "heap": [],
+          "output": []
         }
       }
     ]
   },
   "quiz": {
-    "question": "클래스와 객체의 관계는?",
+    "question": "다음 중 NullPointerException이 발생하지 않는 것은?",
     "options": [
-      "같은 것이다",
-      "클래스는 설계도, 객체는 실체",
-      "객체는 설계도, 클래스는 실체",
-      "관련 없다"
+      "null.toString()",
+      "((String)null).length()",
+      "\"test\".equals(null)",
+      "null.equals(\"test\")"
     ],
-    "correctIndex": 1,
-    "explanation": "**클래스 = 설계도** (붕어빵 틀)\n**객체 = 실체** (붕어빵)\n\n- 클래스: `class Dog { String name; int age; }`\n- 객체: `Dog buddy = new Dog();`\n\n하나의 클래스에서 **여러 객체**를 만들 수 있습니다!\n"
+    "correctIndex": 2,
+    "explanation": "\"test\".equals(null)은 \"test\"라는 '살아있는 객체'에서 메서드를 호출하므로 안전합니다. 나머지는 모두 null인 상태에서 호출하므로 에러가 납니다."
   },
   "misconceptions": [
     {
-      "wrong": "클래스와 객체는 같다",
-      "correct": "클래스는 설계도이고, 객체는 그 설계도로 만든 실체(인스턴스)입니다.",
-      "why": "Dog 클래스 하나로 buddy, max 등 여러 Dog 객체를 만들 수 있습니다."
+      "wrong": "null 체크 없이 메서드를 호출해도 된다",
+      "correct": "외부 데이터나 리턴값은 **반드시** null 체크를 해야 합니다.",
+      "why": "NPE는 컴파일러가 잡아주지 않는 **런타임 에러(Runtime Error)**입니다. 즉, 사용자가 앱을 쓰다가 갑자기 '앱이 중지되었습니다' 뜨게 만드는 주범입니다."
     },
     {
-      "wrong": "객체는 하나만 만들 수 있다",
-      "correct": "하나의 클래스에서 원하는 만큼 객체를 생성할 수 있습니다.",
-      "why": "new 키워드로 매번 독립적인 새 객체를 생성합니다."
+      "wrong": "null은 '0'이나 '공백'과 같다",
+      "correct": "완전히 다릅니다. 0은 숫자이고 공백은 문자열이지만, null은 **'존재하지 않음'** 그 자체입니다.",
+      "why": "0으로 초기화된 int는 메모리에 0이라는 값이 있지만, null로 초기화된 참조 변수는 가리키는 대상 자체가 없습니다."
     }
   ],
-  "keyTakeaway": "클래스: 필드+메서드를 묶은 설계도. 객체: new로 생성한 실체. 관련 데이터를 하나로 관리."
+  "keyTakeaway": "null.메서드()는 폭탄입니다. 항상 \"리터럴\".equals(변수) 순서로 쓰세요."
 }

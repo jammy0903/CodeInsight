@@ -1,332 +1,211 @@
 {
   "lessonId": "py-1-4",
-  "title": "조건문 (if, elif, else)",
-  "concept": "조건문은 조건에 따라 다른 코드를 실행합니다. if, elif, else로 분기 처리를 합니다.",
+  "title": "불리언과 형변환",
+  "concept": "데이터의 타입을 명시적으로 바꿀 수 있다 (Casting)",
   "content": {
-    "code": "age = 15\nprint(f\"나이: {age}\")\n\nif age >= 18:\n    print(\"성인입니다\")\nelse:\n    print(\"미성년자입니다\")\n\nscore = 85\nprint(f\"점수: {score}\")\n\nif score >= 90:\n    grade = \"A\"\nelif score >= 80:\n    grade = \"B\"\nelif score >= 70:\n    grade = \"C\"\nelse:\n    grade = \"F\"\n\nprint(f\"학점: {grade}\")\n",
+    "code": "# 1. 숫자 변환\ns = \"100\"\nn = int(s)\nf = float(s)\n\nprint(n + 50)\nprint(f + 0.5)\n\n# 2. 문자 변환\nage = 20\n# msg = \"Age: \" + age # 에러 발생!\nmsg = \"Age: \" + str(age)\nprint(msg)",
     "steps": [
       {
-        "line": 1,
-        "title": "변수 초기화",
-        "explanation": "**`age = 15`**\n\n조건을 테스트할 변수를 준비합니다.\n\n이 레슨에서는:\n- `if` 문으로 조건을 검사합니다\n- 조건에 따라 다른 코드를 실행합니다\n",
-        "highlight": [
-          1
-        ],
+        "line": 2,
+        "title": "문자열 변수 's' 생성",
+        "explanation": "먼저, 숫자처럼 보이지만 따옴표로 감싸진 문자열 객체 `\"100\"`을 만들고 `s` 이름표를 붙입니다.",
+        "highlight": [2],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            }
-          ],
-          "output": [],
-          "note": "Line 1 executed",
-          "names": [],
-          "objects": []
+          "names": [{"name": "s", "pointsTo": "str1"}],
+          "objects": [{"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"}],
+          "output": []
         }
       },
       {
-        "line": 2,
-        "title": "나이 출력",
-        "explanation": "**`print(f\"나이: {age}\")`**\n\n**출력 결과**: `나이: 15`\n",
-        "highlight": [
-          2
-        ],
+        "line": 3,
+        "title": "문자열 -> 정수 형변환",
+        "explanation": "`int()` 함수를 사용해 문자열 `\"100\"`을 기반으로 새로운 정수 객체 `100`을 만듭니다. 이제 `n`은 숫자 연산이 가능합니다.",
+        "highlight": [3],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            }
+          "names": [
+            {"name": "s", "pointsTo": "str1"},
+            {"name": "n", "pointsTo": "int1"}
           ],
-          "output": [
-            "나이: 15"
+          "objects": [
+            {"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"},
+            {"id": "int1", "type": "int", "value": "100", "pyId": "4002", "new": true}
           ],
-          "note": "Line 2 executed",
-          "names": [],
-          "objects": []
+          "output": []
         }
       },
       {
         "line": 4,
-        "title": "if 조건 검사",
-        "explanation": "**`if age >= 18:`**\n\n**if 문**: 조건이 참(True)일 때만 코드를 실행합니다.\n\n**구조**: `if 조건:` 다음에 들여쓰기된 코드 작성\n\n**비교 연산자**:\n- `==`: 같다\n- `!=`: 다르다\n- `>`: 크다\n- `<`: 작다\n- `>=`: 크거나 같다\n- `<=`: 작거나 같다\n\n**현재 조건**:\n- `age >= 18` → `15 >= 18` → **False**\n- 조건이 거짓이므로 **들여쓰기된 코드를 건너뜁니다**\n",
-        "highlight": [
-          4
-        ],
+        "title": "문자열 -> 실수 형변환",
+        "explanation": "`float()` 함수는 문자열을 기반으로 새로운 실수(부동소수점) 객체를 만듭니다. `f`는 `100.0`을 가리킵니다.",
+        "highlight": [4],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            }
+          "names": [
+            {"name": "s", "pointsTo": "str1"},
+            {"name": "n", "pointsTo": "int1"},
+            {"name": "f", "pointsTo": "float1"}
           ],
-          "output": [
-            "나이: 15"
+          "objects": [
+            {"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"},
+            {"id": "int1", "type": "int", "value": "100", "pyId": "4002"},
+            {"id": "float1", "type": "float", "value": "100.0", "pyId": "4003", "new": true}
           ],
-          "note": "Line 4 executed",
-          "names": [],
-          "objects": []
+          "output": []
+        }
+      },
+      {
+        "line": 6,
+        "title": "정수 연산 결과 출력",
+        "explanation": "정수 `n` (100)과 `50`을 더한 결과인 `150`을 출력합니다.",
+        "highlight": [6],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            {"name": "s", "pointsTo": "str1"},
+            {"name": "n", "pointsTo": "int1"},
+            {"name": "f", "pointsTo": "float1"}
+          ],
+          "objects": [
+            {"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"},
+            {"id": "int1", "type": "int", "value": "100", "pyId": "4002"},
+            {"id": "float1", "type": "float", "value": "100.0", "pyId": "4003"}
+          ],
+          "output": ["150"]
         }
       },
       {
         "line": 7,
-        "title": "else 코드 실행",
-        "explanation": "**`print(\"미성년자입니다\")`**\n\n**출력 결과**: `미성년자입니다`\n\n**요약**:\n- age = 15\n- 15 >= 18? → False\n- else 블록 실행 → \"미성년자입니다\" 출력\n",
-        "highlight": [
-          7
-        ],
+        "title": "실수 연산 결과 출력",
+        "explanation": "실수 `f` (100.0)와 `0.5`를 더한 결과인 `100.5`를 출력합니다.",
+        "highlight": [7],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            }
+          "names": [
+            {"name": "s", "pointsTo": "str1"},
+            {"name": "n", "pointsTo": "int1"},
+            {"name": "f", "pointsTo": "float1"}
           ],
-          "output": [
-            "나이: 15",
-            "미성년자입니다"
+          "objects": [
+            {"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"},
+            {"id": "int1", "type": "int", "value": "100", "pyId": "4002"},
+            {"id": "float1", "type": "float", "value": "100.0", "pyId": "4003"}
           ],
-          "note": "Line 7 executed",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 9,
-        "title": "점수 변수",
-        "explanation": "**`score = 85`**\n\n이제 더 복잡한 조건 분기를 테스트합니다.\n\n**목표**: 점수에 따라 학점(A, B, C, F)을 부여\n",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            },
-            {
-              "name": "score",
-              "value": "85",
-              "type": "int"
-            }
-          ],
-          "output": [
-            "나이: 15",
-            "미성년자입니다"
-          ],
-          "note": "Line 9 executed",
-          "names": [],
-          "objects": []
+          "output": ["150", "100.5"]
         }
       },
       {
         "line": 10,
-        "title": "점수 출력",
-        "explanation": "**`print(f\"점수: {score}\")`**\n\n**출력 결과**: `점수: 85`\n",
-        "highlight": [
-          10
-        ],
+        "title": "정수 변수 'age' 생성",
+        "explanation": "다음 예제를 위해 정수 객체 `20`을 만들고 `age` 이름표를 붙입니다.",
+        "highlight": [10],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            },
-            {
-              "name": "score",
-              "value": "85",
-              "type": "int"
-            }
+          "names": [
+            {"name": "s", "pointsTo": "str1"},
+            {"name": "n", "pointsTo": "int1"},
+            {"name": "f", "pointsTo": "float1"},
+            {"name": "age", "pointsTo": "int2"}
           ],
-          "output": [
-            "나이: 15",
-            "미성년자입니다",
-            "점수: 85"
+          "objects": [
+            {"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"},
+            {"id": "int1", "type": "int", "value": "100", "pyId": "4002"},
+            {"id": "float1", "type": "float", "value": "100.0", "pyId": "4003"},
+            {"id": "int2", "type": "int", "value": "20", "pyId": "4004", "new": true}
           ],
-          "note": "Line 10 executed",
-          "names": [],
-          "objects": []
+          "output": ["150", "100.5"]
+        }
+      },
+      {
+        "line": 11,
+        "title": "TypeError 발생 상황",
+        "explanation": "파이썬은 타입에 엄격하여 문자열(`\"Age: \"`)과 숫자(`age`)를 `+`로 직접 더할 수 없습니다. 만약 이 코드의 주석을 풀면 `TypeError`가 발생하며 프로그램이 멈춥니다.",
+        "highlight": [11],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            {"name": "s", "pointsTo": "str1"},
+            {"name": "n", "pointsTo": "int1"},
+            {"name": "f", "pointsTo": "float1"},
+            {"name": "age", "pointsTo": "int2"}
+          ],
+          "objects": [
+            {"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"},
+            {"id": "int1", "type": "int", "value": "100", "pyId": "4002"},
+            {"id": "float1", "type": "float", "value": "100.0", "pyId": "4003"},
+            {"id": "int2", "type": "int", "value": "20", "pyId": "4004"}
+          ],
+          "output": ["150", "100.5"]
         }
       },
       {
         "line": 12,
-        "title": "첫 번째 조건 (A학점)",
-        "explanation": "**`if score >= 90:`**\n\n**조건 검사**:\n- `score >= 90` → `85 >= 90` → **False**\n- 다음 조건(elif)으로 이동\n",
-        "highlight": [
-          12
-        ],
+        "title": "정수 -> 문자열 형변환",
+        "explanation": "에러를 피하기 위해 `str(age)`를 사용해 정수 `20`을 문자열 `\"20\"`으로 변환합니다. 그 다음, 두 문자열을 연결하여 `\"Age: 20\"`이라는 새로운 문자열 객체를 만들고 `msg`가 가리키게 합니다.",
+        "highlight": [12],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            },
-            {
-              "name": "score",
-              "value": "85",
-              "type": "int"
-            }
+          "names": [
+            {"name": "s", "pointsTo": "str1"},
+            {"name": "n", "pointsTo": "int1"},
+            {"name": "f", "pointsTo": "float1"},
+            {"name": "age", "pointsTo": "int2"},
+            {"name": "msg", "pointsTo": "str2"}
           ],
-          "output": [
-            "나이: 15",
-            "미성년자입니다",
-            "점수: 85"
+          "objects": [
+            {"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"},
+            {"id": "int1", "type": "int", "value": "100", "pyId": "4002"},
+            {"id": "float1", "type": "float", "value": "100.0", "pyId": "4003"},
+            {"id": "int2", "type": "int", "value": "20", "pyId": "4004"},
+            {"id": "str2", "type": "str", "value": "\"Age: 20\"", "pyId": "4005", "new": true}
           ],
-          "note": "Line 12 executed",
-          "names": [],
-          "objects": []
+          "output": ["150", "100.5"]
         }
       },
       {
-        "line": 14,
-        "title": "elif: 두 번째 조건 (B학점)",
-        "explanation": "**`elif score >= 80:`**\n\n**elif** (else if): 이전 조건이 거짓일 때 새로운 조건을 검사합니다.\n\n**구조**: `if 조건1:` → `elif 조건2:` → `elif 조건3:` → `else:`\n- 위에서 아래로 순서대로 검사\n- 첫 번째로 참인 조건만 실행\n- 나머지는 건너뜀\n\n**현재 조건**:\n- 이전 조건 (`score >= 90`)은 False였음\n- `score >= 80` → `85 >= 80` → **True**\n- **이 블록이 실행됩니다!**\n",
-        "highlight": [
-          14
-        ],
+        "line": 13,
+        "title": "최종 결과 출력",
+        "explanation": "`msg` 변수가 가리키는 최종 문자열 `\"Age: 20\"`을 출력합니다.",
+        "highlight": [13],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            },
-            {
-              "name": "score",
-              "value": "85",
-              "type": "int"
-            }
+          "names": [
+            {"name": "s", "pointsTo": "str1"},
+            {"name": "n", "pointsTo": "int1"},
+            {"name": "f", "pointsTo": "float1"},
+            {"name": "age", "pointsTo": "int2"},
+            {"name": "msg", "pointsTo": "str2"}
           ],
-          "output": [
-            "나이: 15",
-            "미성년자입니다",
-            "점수: 85"
+          "objects": [
+            {"id": "str1", "type": "str", "value": "\"100\"", "pyId": "4001"},
+            {"id": "int1", "type": "int", "value": "100", "pyId": "4002"},
+            {"id": "float1", "type": "float", "value": "100.0", "pyId": "4003"},
+            {"id": "int2", "type": "int", "value": "20", "pyId": "4004"},
+            {"id": "str2", "type": "str", "value": "\"Age: 20\"", "pyId": "4005"}
           ],
-          "note": "Line 14 executed",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 15,
-        "title": "B학점 부여",
-        "explanation": "**`grade = \"B\"`**\n\n조건이 참이므로 `grade` 변수에 \"B\"를 할당합니다.\n\n**중요**: elif 블록이 실행되면 나머지 elif, else는 **건너뜁니다**.\n\n- Line 16-19의 elif, else는 실행 안 됨!\n",
-        "highlight": [
-          15
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            },
-            {
-              "name": "score",
-              "value": "85",
-              "type": "int"
-            },
-            {
-              "name": "grade",
-              "value": "\"B\"",
-              "type": "str",
-              "id": "0x3000"
-            }
-          ],
-          "output": [
-            "나이: 15",
-            "미성년자입니다",
-            "점수: 85"
-          ],
-          "note": "Line 15 executed",
-          "names": [],
-          "objects": []
-        }
-      },
-      {
-        "line": 21,
-        "title": "학점 출력",
-        "explanation": "**`print(f\"학점: {grade}\")`**\n\n**출력 결과**: `학점: B`\n\n**전체 흐름 요약**:\n1. score = 85\n2. if score >= 90? → False\n3. elif score >= 80? → **True** → grade = \"B\"\n4. (나머지 elif, else 건너뜀)\n5. print(\"학점: B\")\n",
-        "highlight": [
-          21
-        ],
-        "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "age",
-              "value": "15",
-              "type": "int"
-            },
-            {
-              "name": "score",
-              "value": "85",
-              "type": "int"
-            },
-            {
-              "name": "grade",
-              "value": "\"B\"",
-              "type": "str",
-              "id": "0x3000"
-            }
-          ],
-          "output": [
-            "나이: 15",
-            "미성년자입니다",
-            "점수: 85",
-            "학점: B"
-          ],
-          "note": "Line 21 executed",
-          "names": [],
-          "objects": []
+          "output": ["150", "100.5", "Age: 20"]
         }
       }
     ]
   },
   "quiz": {
-    "question": "다음 코드에서 x = 7일 때 출력 결과는?",
+    "question": "다음 중 에러가 발생하는 코드는?",
     "options": [
-      "작음",
-      "중간",
-      "큼",
-      "아무것도 출력 안 됨"
+      "int(\"123\")",
+      "str(123)",
+      "\"Number \" + 5",
+      "float(\"3.14\")"
     ],
-    "correctIndex": 1,
-    "explanation": "코드: `x = 7` → `if x < 5:` → `elif x < 10:` → `else:`\n\n**조건 검사 순서**:\n1. `x < 5` → `7 < 5` → False\n2. `elif x < 10` → `7 < 10` → **True**\n3. \"중간\" 출력\n4. else는 건너뜀\n\n따라서 답은 **\"중간\"**입니다!\n"
+    "correctIndex": 2,
+    "explanation": "파이썬은 자동 형변환(Implicit Casting)을 잘 안 해줍니다. 문자열과 숫자를 더하면 TypeError가 납니다. `\"Number \" + str(5)`로 써야 합니다."
   },
   "misconceptions": [
     {
-      "wrong": "elif와 else는 필수다",
-      "correct": "if만 단독으로 사용할 수 있습니다.",
-      "why": "elif와 else는 선택 사항입니다. 필요에 따라 생략 가능합니다."
-    },
-    {
-      "wrong": "if, elif가 모두 참이면 모두 실행된다",
-      "correct": "첫 번째로 참인 블록만 실행되고 나머지는 건너뜁니다.",
-      "why": "조건문은 위에서 아래로 순서대로 검사하며, 하나라도 참이면 나머지는 무시합니다."
-    },
-    {
-      "wrong": "조건에 괄호를 꼭 써야 한다 (if (x > 5):)",
-      "correct": "Python은 조건에 괄호가 필요 없습니다.",
-      "why": "Java, C와 달리 Python은 괄호 없이 조건을 씁니다. 단, 복잡한 조건은 가독성을 위해 괄호를 쓸 수 있습니다."
+      "wrong": "자바스크립트처럼 '1' + 1 하면 '11'이 된다",
+      "correct": "파이썬에서는 에러(TypeError)가 발생합니다.",
+      "why": "파이썬의 철학: \"암시적인 것보다 명시적인 것이 낫다(Explicit is better than implicit).\""
     }
   ],
-  "keyTakeaway": "if는 조건이 참일 때, elif는 이전이 거짓이고 새 조건이 참일 때, else는 모든 조건이 거짓일 때 실행. 첫 번째 참인 블록만 실행됨."
+  "keyTakeaway": "타입을 바꿀 땐 `int()`, `str()`, `float()`를 명확하게 쓰자."
 }
