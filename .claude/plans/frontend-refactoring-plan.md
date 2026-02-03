@@ -2,7 +2,7 @@
 
 > **목적**: 가시성 향상, 로직 분리, 유지보수성 개선
 > **작성일**: 2026-02-03
-> **상태**: Phase 1 완료, Phase 2 진행중
+> **상태**: Phase 1~2 완료, Phase 3 진행중
 
 ---
 
@@ -274,7 +274,7 @@ hooks/analytics/
 ## 전체 작업 체크리스트
 
 - [x] **Phase 1**: LessonPage.tsx 분리 (1042줄→276줄, 커밋 1b4eddc2)
-- [ ] **Phase 2**: MemoryPanel.tsx 분리
+- [x] **Phase 2**: MemoryPanel.tsx 분리 (1057줄→57줄, 커밋 111dd58a)
 - [ ] **Phase 3**: AnalyticsSection.tsx 분리
 - [ ] **Phase 4**: PlaygroundPage.tsx 분리
 - [ ] **Phase 5**: simulator.ts 언어별 분리
