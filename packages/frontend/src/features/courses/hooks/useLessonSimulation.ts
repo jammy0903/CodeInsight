@@ -99,6 +99,13 @@ function mergeSteps(
       title: jsonStep?.title || `Line ${simStep.line}`,
       highlight: jsonStep?.highlight || [simStep.line],
       pythonMemoryState,
+      // Java/JS: JSON 원본의 언어별 메모리 상태 보존 (시뮬레이터에 없으면)
+      ...(!simStep.javaMemoryState && jsonStep && (jsonStep as any).javaMemoryState
+        ? { javaMemoryState: (jsonStep as any).javaMemoryState }
+        : {}),
+      ...(!simStep.eventLoopState && jsonStep && (jsonStep as any).eventLoopState
+        ? { eventLoopState: (jsonStep as any).eventLoopState }
+        : {}),
     };
   });
 }
