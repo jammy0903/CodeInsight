@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Code2, ChevronUp, ChevronDown, Play } from 'lucide-react';
+import { Bot, Code2, BookOpen, ChevronUp, ChevronDown, Play } from 'lucide-react';
 import { Layers } from 'lucide-react';
 
 import { LessonCodeEditor } from './day/LessonCodeEditor';
@@ -14,7 +14,6 @@ import { StepExplanation } from './day/StepExplanation';
 import { ChatQA } from '@/features/chat';
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { LessonMemoryVisualizer } from '@/features/visualizers/memory';
-import { TerminalOutput } from '@/features/visualizers/shared';
 import type { TerminalLine } from '@/features/visualizers/shared';
 import type { LessonStep } from '@/types';
 
@@ -82,81 +81,103 @@ export function LessonDesktopLayout({
 
   return (
     <div className="flex flex-col md:flex-row gap-4 items-start pb-16">
-      {/* Left Panel: 코드 + 설명 */}
+      {/* Left Panel: 코드(위) + 설명(아래) — 고정 높이, 각각 독립 스크롤 */}
       <div
-        className="w-full md:w-1/2 flex flex-col rounded-xl"
+        className="w-full md:w-1/2 flex flex-col rounded-xl overflow-hidden"
         style={{
           border: '1px solid var(--theme-lesson-panel-border)',
-          minHeight: '400px',
-          overflow: 'visible',
+          height: 'calc(100vh - 120px)',
         }}
       >
-        <div
-          className="flex items-center px-3 py-1 text-xs font-medium shrink-0"
-          style={{
-            background: 'var(--theme-lesson-editor-header-bg)',
-            color: 'var(--theme-lesson-editor-header-text)',
-            borderBottom: '1px solid var(--theme-lesson-panel-border)',
-          }}
-        >
-          <Code2 className="w-3 h-3 mr-1.5" />
-          에디터
-        </div>
-        <div
-          className={code.split('\n').length > 10 && !isExplanationCollapsed ? 'overflow-y-auto' : ''}
-          style={{
-            height: `${(isExplanationCollapsed ? code.split('\n').length : Math.max(code.split('\n').length, 10)) * 20}px`,
-            borderBottom: '1px solid var(--theme-lesson-panel-border)',
-          }}
-        >
-          <LessonCodeEditor
-            code={code}
-            highlightLine={displayLine}
-            onSelectionChange={onSelectionChange}
-          />
-        </div>
-        {currentStep && (
+        {/* === 상단: 코드 에디터 + 터미널 오버레이 === */}
+        <div className="relative flex flex-col" style={{ flex: isExplanationCollapsed ? '1 1 auto' : '1 1 50%', minHeight: 0 }}>
           <div
-            className={`relative ${isExplanationCollapsed ? 'shrink-0' : 'overflow-y-auto'}`}
+            className="flex items-center px-3 py-1 text-xs font-medium shrink-0"
             style={{
-              background: 'var(--theme-lesson-explanation-bg)',
-              borderTop: '1px solid var(--theme-lesson-panel-border)',
-              height: isExplanationCollapsed ? 'auto' : `${Math.max(code.split('\n').length, 10) * 20}px`,
+              background: 'var(--theme-lesson-editor-header-bg)',
+              color: 'var(--theme-lesson-editor-header-text)',
+              borderBottom: '1px solid var(--theme-lesson-panel-border)',
             }}
           >
-            <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
-              <span
-                className="px-2 py-0.5 rounded-md text-xs font-bold"
+            <Code2 className="w-3 h-3 mr-1.5" />
+            에디터
+          </div>
+          <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
+            <LessonCodeEditor
+              code={code}
+              highlightLine={displayLine}
+              onSelectionChange={onSelectionChange}
+            />
+          </div>
+          {/* 터미널 오버레이 — 코드에디터 하단에 겹침 */}
+          {terminalLines.length > 0 && (
+            <div className="absolute bottom-0 left-0 right-0 z-10 max-h-[40%]">
+              <div
+                className="overflow-hidden shadow-lg border-t"
                 style={{
-                  background: 'var(--theme-lesson-explanation-line-badge-bg)',
-                  color: '#fff',
+                  background: 'rgba(0, 20, 10, 0.92)',
+                  borderColor: 'rgba(34, 197, 94, 0.3)',
+                  backdropFilter: 'blur(8px)',
                 }}
               >
-                L{displayLine}
-              </span>
-              {code.split('\n').length > 6 && (
-                <button
-                  onClick={() => setIsExplanationCollapsed(!isExplanationCollapsed)}
-                  className="p-1 rounded-md bg-transparent hover:bg-amber-200 bg-opacity-50 transition-colors"
-                  title={isExplanationCollapsed ? '설명 펼치기' : '설명 접기'}
-                >
-                  {isExplanationCollapsed ? (
-                    <ChevronUp className="w-4 h-4 text-amber-700" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-amber-700" />
-                  )}
-                </button>
-              )}
-            </div>
-            {isExplanationCollapsed ? (
-              <div
-                className="p-2 text-xs text-amber-700 cursor-pointer"
-                onClick={() => setIsExplanationCollapsed(false)}
-              >
-                클릭하여 설명 보기
+                <div className="px-3 py-1.5 overflow-y-auto max-h-[120px]">
+                  {terminalLines.map((line, idx) => (
+                    <div key={idx} className="text-xs font-mono leading-relaxed text-green-400 break-words whitespace-pre-wrap">
+                      <span className="text-emerald-500 opacity-70 mr-1.5">{'>'}</span>
+                      {line.content}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ) : (
-              <div className="p-4 pr-20">
+            </div>
+          )}
+        </div>
+
+        {/* === 하단: 설명 === */}
+        {currentStep && (
+          <div
+            className="flex flex-col shrink-0"
+            style={{
+              flex: isExplanationCollapsed ? '0 0 auto' : '1 1 50%',
+              minHeight: 0,
+              borderTop: '2px solid var(--theme-lesson-panel-border)',
+              background: 'var(--theme-lesson-explanation-bg)',
+            }}
+          >
+            {/* 설명 헤더 바 */}
+            <div
+              className="flex items-center justify-between px-3 py-1 text-xs font-medium shrink-0 cursor-pointer"
+              style={{
+                background: 'var(--theme-lesson-explanation-bg)',
+                color: 'var(--theme-lesson-editor-header-text)',
+                borderBottom: isExplanationCollapsed ? 'none' : '1px solid var(--theme-lesson-panel-border)',
+              }}
+              onClick={() => setIsExplanationCollapsed(!isExplanationCollapsed)}
+            >
+              <div className="flex items-center">
+                <BookOpen className="w-3 h-3 mr-1.5" />
+                설명
+              </div>
+              <div className="flex items-center gap-1">
+                <span
+                  className="px-2 py-0.5 rounded-md text-xs font-bold"
+                  style={{
+                    background: 'var(--theme-lesson-explanation-line-badge-bg)',
+                    color: '#fff',
+                  }}
+                >
+                  L{displayLine}
+                </span>
+                {isExplanationCollapsed ? (
+                  <ChevronUp className="w-3.5 h-3.5" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5" />
+                )}
+              </div>
+            </div>
+            {/* 설명 내용 */}
+            {!isExplanationCollapsed && (
+              <div className="flex-1 overflow-y-auto p-4" style={{ minHeight: 0 }}>
                 <StepExplanation
                   explanation={currentStep.explanation}
                   stepIndex={currentStepIndex}
@@ -171,8 +192,11 @@ export function LessonDesktopLayout({
 
       {/* Right Panel: Flow / Memory / AI */}
       <div
-        className="w-full md:w-1/2 flex flex-col rounded-xl md:sticky md:top-4 z-10"
-        style={{ border: '1px solid var(--theme-lesson-panel-border)' }}
+        className="w-full md:w-1/2 flex flex-col rounded-xl md:sticky md:top-4 z-10 overflow-hidden"
+        style={{
+          border: '1px solid var(--theme-lesson-panel-border)',
+          height: 'calc(100vh - 120px)',
+        }}
       >
         <div
           className="flex shrink-0"
@@ -218,7 +242,7 @@ export function LessonDesktopLayout({
         </div>
         <div
           className="flex-1 overflow-hidden"
-          style={{ background: 'var(--theme-lesson-memory-bg)', minHeight: '400px' }}
+          style={{ background: 'var(--theme-lesson-memory-bg)', minHeight: 0 }}
         >
           {activeTab === 'flow' && (
             <div className="w-full h-full overflow-y-auto">
@@ -240,9 +264,6 @@ export function LessonDesktopLayout({
                       }
                       stdout={currentStep.stdout}
                     />
-                    {terminalLines.length > 0 && (
-                      <TerminalOutput lines={terminalLines} title="출력" compact className="mt-6" />
-                    )}
                   </>
                 )}
               </div>
@@ -256,9 +277,6 @@ export function LessonDesktopLayout({
                 memoryState={memoryState}
                 changedBlocks={changedBlocks}
               />
-              {terminalLines.length > 0 && (
-                <TerminalOutput lines={terminalLines} title="출력" compact className="mt-6" />
-              )}
             </div>
           )}
           {activeTab === 'chat' && (

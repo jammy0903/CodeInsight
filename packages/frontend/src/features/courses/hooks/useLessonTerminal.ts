@@ -49,40 +49,76 @@ export function useLessonTerminal({
         .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
     }
 
-    // Python: pythonMemoryState.output (배열)
+    // Python: pythonMemoryState.output (JSON 레슨) 또는 stdout (시뮬레이터)
     if (languageId === 'python' || languageId === 'python-practical') {
-      const output = (currentStep as any)?.pythonMemoryState?.output;
-      if (!Array.isArray(output)) return [];
-      if (!diffMode) {
-        return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+      const pyOutput = (currentStep as any)?.pythonMemoryState?.output;
+      if (Array.isArray(pyOutput) && pyOutput.length > 0) {
+        if (!diffMode) {
+          return pyOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+        }
+        const prevOutput = (prevStep as any)?.pythonMemoryState?.output || [];
+        return pyOutput.slice(prevOutput.length)
+          .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
-      const prevOutput = (prevStep as any)?.pythonMemoryState?.output || [];
-      return output.slice(prevOutput.length)
-        .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+      // fallback: stdout (시뮬레이터 경로)
+      if (currentStep.stdout) {
+        const currentLines = currentStep.stdout.split('\n').filter(Boolean);
+        if (!diffMode) {
+          return currentLines.map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+        }
+        const prevLines = prevStep?.stdout?.split('\n').filter(Boolean) || [];
+        return currentLines.slice(prevLines.length)
+          .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+      }
+      return [];
     }
 
-    // Java: javaMemoryState.output (배열)
+    // Java: javaMemoryState.output (JSON 레슨) 또는 stdout (시뮬레이터)
     if (languageId === 'java') {
-      const output = (currentStep as any)?.javaMemoryState?.output;
-      if (!Array.isArray(output)) return [];
-      if (!diffMode) {
-        return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+      const jmsOutput = (currentStep as any)?.javaMemoryState?.output;
+      if (Array.isArray(jmsOutput) && jmsOutput.length > 0) {
+        if (!diffMode) {
+          return jmsOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+        }
+        const prevOutput = (prevStep as any)?.javaMemoryState?.output || [];
+        return jmsOutput.slice(prevOutput.length)
+          .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
-      const prevOutput = (prevStep as any)?.javaMemoryState?.output || [];
-      return output.slice(prevOutput.length)
-        .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+      // fallback: stdout (시뮬레이터 경로)
+      if (currentStep.stdout) {
+        const currentLines = currentStep.stdout.split('\n').filter(Boolean);
+        if (!diffMode) {
+          return currentLines.map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+        }
+        const prevLines = prevStep?.stdout?.split('\n').filter(Boolean) || [];
+        return currentLines.slice(prevLines.length)
+          .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+      }
+      return [];
     }
 
-    // JavaScript: eventLoopState.output (배열)
+    // JavaScript: eventLoopState.output (JSON 레슨) 또는 stdout (시뮬레이터)
     if (languageId === 'javascript' || languageId === 'js') {
-      const output = (currentStep as any)?.eventLoopState?.output;
-      if (!Array.isArray(output)) return [];
-      if (!diffMode) {
-        return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+      const jsOutput = (currentStep as any)?.eventLoopState?.output;
+      if (Array.isArray(jsOutput) && jsOutput.length > 0) {
+        if (!diffMode) {
+          return jsOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+        }
+        const prevOutput = (prevStep as any)?.eventLoopState?.output || [];
+        return jsOutput.slice(prevOutput.length)
+          .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
-      const prevOutput = (prevStep as any)?.eventLoopState?.output || [];
-      return output.slice(prevOutput.length)
-        .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+      // fallback: stdout (시뮬레이터 경로)
+      if (currentStep.stdout) {
+        const currentLines = currentStep.stdout.split('\n').filter(Boolean);
+        if (!diffMode) {
+          return currentLines.map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+        }
+        const prevLines = prevStep?.stdout?.split('\n').filter(Boolean) || [];
+        return currentLines.slice(prevLines.length)
+          .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
+      }
+      return [];
     }
 
     return [];
