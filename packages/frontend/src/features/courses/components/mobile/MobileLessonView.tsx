@@ -7,7 +7,7 @@
  * - 페이지 2: 설명 + 시각화 (메모리 or 플로우)
  */
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Code2, Play, ChevronUp, ChevronDown, Layers } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -17,13 +17,13 @@ import 'swiper/css/pagination';
 import './MobileLessonView.css';
 
 import { useLessonVisualization } from '../../hooks/useLessonVisualization';
+import { useLessonTerminal } from '../../hooks/useLessonTerminal';
 import { LessonCodeEditor } from '../day/LessonCodeEditor';
 
 import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { LessonMemoryVisualizer } from '@/features/visualizers/memory';
 import { MobileAIChatFAB } from './MobileAIChatFAB';
 import { MobileAIChatModal } from './MobileAIChatModal';
-import type { TerminalLine } from '@/features/visualizers/shared';
 import type { LessonStep } from '@/types';
 
 interface MobileLessonViewProps {
@@ -98,40 +98,13 @@ export function MobileLessonView({
     currentStepIndex
   );
 
-  // 터미널 출력 라인 변환 — languageId 기반 분기
-  const terminalLines = useMemo((): TerminalLine[] => {
-    if (!currentStep) return [];
-
-    // C: step.stdout (누적 문자열)
-    if (languageId === 'c') {
-      if (!currentStep.stdout) return [];
-      return currentStep.stdout.split('\n').filter(Boolean)
-        .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
-    }
-
-    // Python: pythonMemoryState.output (배열)
-    if (languageId === 'python' || languageId === 'python-practical') {
-      const output = (currentStep as any)?.pythonMemoryState?.output;
-      if (!Array.isArray(output)) return [];
-      return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
-    }
-
-    // Java: javaMemoryState.output (배열)
-    if (languageId === 'java') {
-      const output = (currentStep as any)?.javaMemoryState?.output;
-      if (!Array.isArray(output)) return [];
-      return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
-    }
-
-    // JavaScript: eventLoopState.output (배열)
-    if (languageId === 'javascript' || languageId === 'js') {
-      const output = (currentStep as any)?.eventLoopState?.output;
-      if (!Array.isArray(output)) return [];
-      return output.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
-    }
-
-    return [];
-  }, [currentStep]);
+  // 터미널 출력 (모바일은 누적 전체 표시 = diffMode: false)
+  const terminalLines = useLessonTerminal({
+    steps,
+    currentStepIndex,
+    languageId,
+    diffMode: false,
+  });
 
   // Memory 탭 표시 여부 (Java, C만)
   const showMemoryTab = languageId === 'java' || languageId === 'c';
