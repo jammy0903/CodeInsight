@@ -13,13 +13,14 @@
 
 ---
 
-## 📍 서버 주소 정리 (예시)
+## 📍 서버 주소 정리
 
 | 서버 | 주소 | 용도 |
 |------|------|------|
-| **원격 프로덕션** | `[프로덕션 서버 IP/도메인]` | 실제 서비스 배포 |
-| **원격 스테이징** | `[스테이징 서버 IP/도메인]` | 테스트/검증 환경 |
-| **Git Remote** | `[Git 원격 저장소 주소]` | 코드 저장소 (예: GitHub, GitLab) |
+| **프론트엔드 배포** | https://codeinsight-frontend.onrender.com | Render |
+| **백엔드 배포** | https://codeinsight-backend.onrender.com | Render (Docker) |
+| **데이터베이스** | Neon PostgreSQL (ep-**.us-east-1.aws.neon.tech) | 프로덕션 DB |
+| **Git Remote** | https://github.com/jammy0903/CodeInsight | GitHub |
 | **로컬 작업 디렉토리** | `/home/jammy/projects/C-OSINE` | 개발 환경 |
 
 ---
@@ -54,37 +55,71 @@ git pull origin [브랜치명]
 
 ---
 
-## 2️⃣ 원격 서버 배포 (수동)
+## 2️⃣ 자동 배포 (Render)
 
-현재 프로젝트에는 자동화된 배포 스크립트가 없으므로, 수동으로 배포해야 합니다.
+### 🚀 배포 방식: Git Push → 자동 배포
 
-### 일반적인 수동 배포 절차
-1.  **원격 서버 SSH 접속**
-    ```bash
-    ssh [사용자명]@[원격 서버 IP]
-    ```
-2.  **프로젝트 디렉토리로 이동**
-    ```bash
-    cd [원격 작업 경로]
-    ```
-3.  **최신 코드 가져오기**
-    ```bash
-    git pull origin main
-    ```
-4.  **의존성 설치**
-    ```bash
-    pnpm install
-    ```
-5.  **프로젝트 빌드**
-    ```bash
-    pnpm build
-    ```
-6.  **애플리케이션 재시작**
-    - `pm2`, `systemd` 등 사용 중인 프로세스 매니저에 맞춰 재시작 명령을 실행합니다.
-    ```bash
-    # 예시: pm2 사용 시
-    pm2 restart all 
-    ```
+우리는 **Render만 사용**합니다. 다른 배포 플랫폼은 사용하지 않습니다.
+
+### 배포 프로세스
+
+```bash
+# 1️⃣ 로컬에서 코드 수정
+vi packages/backend/prisma/content/javascript/lessons/js-4-2.json
+
+# 2️⃣ 커밋
+git add .
+git commit -m "docs: js-4-2 레슨 개선"
+
+# 3️⃣ Push (배포 자동 시작!)
+git push origin main
+```
+
+### 배포 흐름
+
+| 단계 | 소요 시간 | 자동 실행 내용 |
+|------|---------|--------------|
+| 1 | 1초 | GitHub Webhook → Render 감지 |
+| 2 | 2-3분 | 프론트엔드 빌드 및 배포 |
+| 3 | 5-10분 | 백엔드 Docker 이미지 빌드 |
+| 4 | 2-3분 | `prisma migrate` + `prisma db seed` + 앱 시작 |
+| **전체** | **10-20분** | **완료!** ✅ |
+
+### 배포 상태 확인
+
+```
+1. Render Dashboard: https://dashboard.render.com
+2. Services 클릭
+3. codeinsight-backend (또는 frontend) 선택
+4. Deployments 탭에서 상태 확인 (Building → Deploying → Live)
+```
+
+### 시드 데이터 자동 동기화
+
+배포 시 자동으로 실행됨 (`packages/backend/Dockerfile`):
+
+```bash
+# 1. 스키마 변경 적용
+npx prisma migrate deploy
+
+# 2. JSON 파일 → DB에 데이터 삽입
+npx prisma db seed
+
+# 3. 앱 시작
+node dist/app.js
+```
+
+**= 레슨 JSON 파일만 수정 후 push하면, 자동으로 DB에 반영됨!**
+
+### 🔙 롤백 (필요 시)
+
+```
+Render Dashboard
+  → Services → codeinsight-backend
+  → Deployments 탭
+  → 이전 배포 선택
+  → Redeploy 버튼 클릭
+```
 
 ---
 

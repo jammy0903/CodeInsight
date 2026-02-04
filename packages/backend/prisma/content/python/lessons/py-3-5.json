@@ -1,7 +1,7 @@
 {
   "lessonId": "py-3-5",
   "title": "Dictionary Mutability",
-  "concept": "Dictionaries are mutable - adding, modifying, and removing keys changes the same object!",
+  "concept": "딕셔너리는 수정 가능(Mutable) — 추가, 수정, 삭제 모두 같은 객체를 변경한다!",
   "content": {
     "code": "person = {\"name\": \"Alice\", \"age\": 25}\nprint(f\"id = {id(person)}\")\n\nperson[\"age\"] = 26\nperson[\"city\"] = \"Seoul\"\nprint(f\"After changes: {person}\")\nprint(f\"id = {id(person)}\")\n\nref = person\nref[\"name\"] = \"Bob\"\nprint(f\"person: {person}\")",
     "steps": [
@@ -89,27 +89,27 @@
     ]
   },
   "quiz": {
-    "question": "What creates an independent copy of dict d?",
+    "question": "딕셔너리 d의 독립적인 복사본을 만드는 방법은?",
     "options": [
       "e = d",
       "e = d.copy()",
       "e = dict(d)",
-      "Both B and C"
+      "B와 C 모두"
     ],
     "correctIndex": 3,
-    "explanation": "Both d.copy() and dict(d) create shallow copies. e = d just creates an alias. For nested dicts, use copy.deepcopy()."
+    "explanation": "`d.copy()`와 `dict(d)` 모두 얕은 복사(Shallow Copy)를 만듭니다. `e = d`는 그냥 별명(Alias)을 만드는 것입니다. 중첩된 딕셔너리는 `copy.deepcopy()`를 사용하세요."
   },
   "misconceptions": [
     {
-      "wrong": "d2 = d1 creates a copy of the dictionary",
-      "correct": "d2 = d1 creates an alias - both point to same dict",
-      "why": "Assignment binds names to objects. It never copies objects."
+      "wrong": "`d2 = d1`은 딕셔너리를 복사한다",
+      "correct": "`d2 = d1`은 별명(Alias)을 만들 뿐입니다 — 둘 다 같은 객체를 가리킵니다.",
+      "why": "대입(=)은 이름표를 객체에 붙이는 것이지, 객체를 복사하지 않습니다."
     },
     {
-      "wrong": "Dictionary keys can be lists",
-      "correct": "Dictionary keys must be immutable (strings, numbers, tuples)",
-      "why": "Mutable objects can't be hashed consistently, so they can't be keys."
+      "wrong": "리스트를 딕셔너리 키로 쓸 수 있다",
+      "correct": "딕셔너리 키는 불변(Immutable) 타입이어야 합니다 (문자열, 숫자, 튜플).",
+      "why": "가변 객체는 해시값이 일정하지 않으므로 키로 사용할 수 없습니다."
     }
   ],
-  "keyTakeaway": "Dictionaries are MUTABLE like lists. d[key] = value modifies in place. Watch out for aliasing!"
+  "keyTakeaway": "딕셔너리는 리스트처럼 Mutable! `d[key] = value`는 제자리에서 수정합니다. 별명(Aliasing)에 주의하세요!"
 }

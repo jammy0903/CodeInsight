@@ -4,18 +4,40 @@
 
 ## 🎯 프로젝트 개요
 
-**CodeInsight** - 코드 실행 학습 플랫폼
+**CodeInsight** - 코드 실행 시각화 학습 플랫폼
 
 ### 핵심 목표
-- C 언어 메모리 시각화 학습
-- 코드 실행 단계별 추적
+- 코드 실행 과정을 단계별로 시각화 (메모리, 변수, 콜스택)
+- C, Python, JavaScript, Java 다국어 지원
 - 인터랙티브한 교육 경험 제공
+
+### 🏗️ 핵심 아키텍처: 이중 실행 구조
+
+이 앱은 **두 가지 실행 경로**를 가진다:
+
+| 모드 | 데이터 출처 | 시뮬레이터 사용 | 설명 |
+|------|------------|---------------|------|
+| **Lesson** | 사전 제작 JSON | ❌ 불필요 | 단계별 시각화 데이터가 JSON에 미리 스크립팅됨 |
+| **Playground** | 동적 실행 | ✅ 사용 | 사용자 코드를 시뮬레이터가 실행하여 동적으로 시각화 생성 |
+
+```
+[ Lesson 모드 ]
+  DB(JSON) → 프론트엔드 로드 → 사전 스크립팅된 단계별 시각화 표시
+  - 시뮬레이터 미지원 개념(yield, decorator, async 등)도 교육 가능
+  - 교육 품질을 직접 통제 가능
+
+[ Playground 모드 ]
+  사용자 코드 → 백엔드 → 시뮬레이터 실행 → JSON 변환 → 동적 시각화
+  - 자유 코드 입력 가능
+  - 시뮬레이터가 지원하는 범위 내에서 동작
+```
 
 ### 기술 스택
 - **Frontend**: React 18, Vite, TypeScript, Framer Motion
 - **Backend**: Node.js, Express, Prisma ORM
 - **Database**: PostgreSQL (Neon)
-- **Simulators**: JDI (Java), Python `sys.settrace()`, Node.js VM, C (GCC)
+- **Simulators**: Python `sys.settrace()`, Node.js VM, C (Emscripten 검증 + 인터프리터)
+- **Lesson Data**: JSON 파일 (`packages/backend/prisma/content/`) → DB seed로 자동 동기화
 
 ---
 
