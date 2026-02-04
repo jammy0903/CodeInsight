@@ -4,18 +4,24 @@ import * as path from 'path';
 export interface PythonSnapshot {
   line: number;
   event: 'STEP' | 'ERROR';
-  stack: Array<{
-    methodName: string;
-    className: string;
-    variables: Record<string, any>;
+  names: Array<{
+    name: string;
+    scope: string;   // "global" | function name
+    pointsTo: string; // hex address (e.g., "0x001")
   }>;
-  heap: Array<{
-    address: string;
-    type: string;
-    content: string;
-    length?: number;
+  objects: Array<{
+    id: string;       // hex address
+    type: string;     // "int", "str", "list", "dict", etc.
+    value: unknown;   // typed value or structured {objectId} refs
+    mutable: boolean;
   }>;
-  stdout?: string;  // 누적 print 출력
+  callStack: Array<{
+    functionName: string;
+    depth: number;
+    localNames: Array<{ name: string; pointsTo: string }>;
+  }>;
+  stdout?: string;
+  code?: string;  // Added by processSnapshots
   error?: {
     type: string;
     message: string;

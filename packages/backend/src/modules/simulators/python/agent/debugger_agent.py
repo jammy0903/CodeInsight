@@ -2,28 +2,23 @@
 """
 Python Debugger Agent using sys.settrace()
 
-This agent captures execution snapshots at each line of Python code execution,
-producing JSON output compatible with the Java JDI-based simulator format.
+Captures execution snapshots at each line, producing JSON output in
+names/objects/callStack format (matching Lesson JSON structure).
 
 Output format (one JSON per line):
 {
     "line": int,
     "event": "STEP",
-    "stack": [
-        {
-            "methodName": str,
-            "className": str,
-            "variables": { name: value }
-        }
+    "names": [
+        {"name": str, "scope": str, "pointsTo": str}
     ],
-    "heap": [
-        {
-            "address": str ("0xNNN"),
-            "type": str,
-            "content": str,
-            "length": int (for lists/tuples)
-        }
-    ]
+    "objects": [
+        {"id": str, "type": str, "value": any, "mutable": bool}
+    ],
+    "callStack": [
+        {"functionName": str, "depth": int, "localNames": [...]}
+    ],
+    "stdout": str (optional)
 }
 """
 
@@ -31,10 +26,17 @@ import sys
 import json
 import os
 import io
+import inspect
 
 
 # 원본 stdout 저장 (JSON 스냅샷 출력용)
 _original_stdout = sys.stdout
+
+# 불변 타입 집합
+_IMMUTABLE_TYPES = frozenset({"int", "float", "str", "bool", "NoneType", "tuple", "frozenset"})
+
+# 컬렉션 원소 제한
+_MAX_COLLECTION_ITEMS = 50
 
 
 class StdoutCapture:
@@ -46,7 +48,7 @@ class StdoutCapture:
         self.buffer.write(text)
 
     def flush(self):
-        pass  # StringIO는 flush 불필요
+        pass
 
     def getvalue(self):
         return self.buffer.getvalue()
@@ -58,17 +60,18 @@ class StdoutCapture:
 class DebuggerAgent:
     def __init__(self, target_file: str, stdout_capture: StdoutCapture):
         self.target_file = target_file
-        self.stdout_capture = stdout_capture  # 사용자 print 출력 캡처
-        self.collected_ids = set()
-        self.heap_objects = []
+        self.stdout_capture = stdout_capture
         self.object_id_counter = 1
-        self.id_map = {}  # Maps Python id() to our hex address
-        self.last_line = -1  # Track last line to avoid duplicate snapshots
-        self.pending_frame = None  # Frame from previous line (to capture AFTER execution)
+        self.id_map = {}  # Python id() → hex address
+        # Per-snapshot state (reset each capture)
+        self.collected_ids = set()
+        self.objects_list = []
+        # Pending line state
+        self.pending_frame = None
         self.pending_line = -1
 
     def get_hex_address(self, obj) -> str:
-        """Get or create a hex address for an object."""
+        """Get or create a stable hex address for an object."""
         obj_id = id(obj)
         if obj_id not in self.id_map:
             self.id_map[obj_id] = f"0x{self.object_id_counter:03X}"
@@ -76,465 +79,343 @@ class DebuggerAgent:
         return self.id_map[obj_id]
 
     def trace_func(self, frame, event, arg):
-        """Trace function called by sys.settrace() for each execution event."""
-        # Only trace 'line' events (before each line executes)
+        """sys.settrace() callback."""
+        # On 'call': decide whether to trace this frame
+        if event == 'call':
+            filename = frame.f_code.co_filename
+            if filename != self.target_file and filename != '<string>':
+                return None  # Don't trace non-user frames
+            co = frame.f_code
+            # Skip class body frames: 0 args, not module, name matches first const
+            if (co.co_name != '<module>' and co.co_argcount == 0
+                    and len(co.co_consts) > 0 and co.co_consts[0] == co.co_name):
+                return None  # Don't trace class body execution
+            return self.trace_func
+
         if event != 'line':
             return self.trace_func
 
-        # Only trace the target file
         filename = frame.f_code.co_filename
         if filename != self.target_file and filename != '<string>':
             return self.trace_func
 
-        line_number = frame.f_lineno
-
-        # Output the PREVIOUS line's state (after it executed)
-        # This way we capture the state AFTER the line ran
+        # Output PREVIOUS line's state (captured AFTER execution)
         if self.pending_line > 0:
-            snapshot = self.capture(frame, self.pending_line)
-            # JSON 스냅샷은 원본 stdout으로 출력 (사용자 print와 분리)
+            snapshot = self._capture(frame, self.pending_line)
             _original_stdout.write(json.dumps(snapshot, ensure_ascii=False) + '\n')
             _original_stdout.flush()
 
-        # Store current line as pending (will output on next line event)
         self.pending_frame = frame
-        self.pending_line = line_number
+        self.pending_line = frame.f_lineno
 
         return self.trace_func
 
     def flush_pending(self, frame):
         """Output the last pending line's state."""
         if self.pending_line > 0 and frame:
-            snapshot = self.capture(frame, self.pending_line)
-            # JSON 스냅샷은 원본 stdout으로 출력 (사용자 print와 분리)
+            snapshot = self._capture(frame, self.pending_line)
             _original_stdout.write(json.dumps(snapshot, ensure_ascii=False) + '\n')
             _original_stdout.flush()
             self.pending_line = -1
 
-    def capture(self, frame, line_number: int) -> dict:
-        """Capture the current execution state."""
-        # Reset heap collection for this snapshot
-        self.collected_ids = set()
-        self.heap_objects = []
+    # ─── Snapshot Capture ────────────────────────────────────────
 
-        # 현재 스텝에서 발생한 stdout만 캡처 (이전 스텝 출력은 제외)
+    def _capture(self, frame, line_number: int) -> dict:
+        """Capture current execution state as names/objects/callStack."""
+        # Reset per-snapshot state
+        self.collected_ids = set()
+        self.objects_list = []
+
+        # Capture stdout for this step
         stdout_value = self.stdout_capture.getvalue()
-        self.stdout_capture.clear()  # 버퍼 비우기 - 다음 스텝은 새로운 출력만 포함
+        self.stdout_capture.clear()
+
+        # Walk the call stack (innermost → outermost)
+        raw_frames = self._collect_frames(frame)
+
+        # Build names, objects, callStack from frames
+        all_names = []
+        call_stack = []
+
+        for i, frame_info in enumerate(raw_frames):
+            func_name = frame_info["functionName"]
+            is_global = (func_name == "__main__")
+            scope = "global" if is_global else func_name
+            local_names_for_callstack = []
+
+            for var_name, var_value in frame_info["variables"].items():
+                obj_id = self._ensure_object(var_value)
+                name_entry = {
+                    "name": var_name,
+                    "scope": scope,
+                    "pointsTo": obj_id,
+                }
+                all_names.append(name_entry)
+                if not is_global:
+                    local_names_for_callstack.append({
+                        "name": var_name,
+                        "pointsTo": obj_id,
+                    })
+
+            if not is_global:
+                call_stack.append({
+                    "functionName": func_name,
+                    "depth": frame_info["depth"],
+                    "localNames": local_names_for_callstack,
+                })
 
         snapshot = {
             "line": line_number,
             "event": "STEP",
-            "stack": self._build_stack(frame),
-            "heap": self.heap_objects
+            "names": all_names,
+            "objects": self.objects_list,
+            "callStack": call_stack,
         }
 
-        # stdout이 있으면 포함
         if stdout_value:
             snapshot["stdout"] = stdout_value
 
         return snapshot
 
-    def _build_stack(self, frame) -> list:
-        """Build the call stack from the current frame."""
+    def _collect_frames(self, frame) -> list:
+        """Walk call stack and collect frame info (outermost first)."""
         frames = []
-        current_frame = frame
+        current = frame
+        depth = 0
 
-        while current_frame is not None:
-            code = current_frame.f_code
-            filename = code.co_filename
-
-            # Only include frames from our target file
+        while current is not None:
+            filename = current.f_code.co_filename
             if filename == self.target_file or filename == '<string>':
-                # Python 글로벌 스코프는 __main__으로 표시 (main이 아님!)
-                method_name = code.co_name
-                if code.co_name == '<module>':
-                    method_name = "__main__"
+                func_name = current.f_code.co_name
 
-                frame_data = {
-                    "methodName": method_name,
-                    "className": "Main",
-                    "variables": self._extract_variables(current_frame.f_locals)
-                }
-                frames.append(frame_data)
+                if func_name == '<module>':
+                    func_name = "__main__"
 
-            current_frame = current_frame.f_back
+                frames.append({
+                    "functionName": func_name,
+                    "depth": depth,
+                    "variables": self._extract_variables(current.f_locals),
+                })
+                depth += 1
+
+            current = current.f_back
+
+        # Reverse: outermost (global) first, innermost (current function) last
+        frames.reverse()
+        # Re-assign depths: 0 = global, 1 = first call, etc.
+        for i, f in enumerate(frames):
+            f["depth"] = i
 
         return frames
 
     def _extract_variables(self, locals_dict: dict) -> dict:
-        """Extract variables from a local namespace."""
+        """Extract user variables from a frame's locals."""
         variables = {}
 
         for name, value in locals_dict.items():
-            # Skip internal variables and modules
             if name.startswith('_'):
                 continue
             if isinstance(value, type(sys)):  # Skip modules
                 continue
-            if callable(value) and not isinstance(value, type):  # Skip functions but keep classes
-                # Check if it's a user-defined function (not built-in)
+            if callable(value) and not isinstance(value, type):
+                # Keep user-defined functions
                 if hasattr(value, '__module__') and value.__module__ == '__main__':
-                    variables[name] = self._parse_value(value)
+                    variables[name] = value
                 continue
 
-            variables[name] = self._parse_value(value)
+            variables[name] = value
 
         return variables
 
-    def _parse_value(self, value):
-        """Parse a Python value into the snapshot format."""
-        # None
+    # ─── Object Tracking ─────────────────────────────────────────
+
+    def _ensure_object(self, value) -> str:
+        """
+        Ensure a Python value is tracked in objects_list.
+        Returns the hex address (object ID).
+        Shared references: same id(value) → same hex → one object entry.
+        """
+        address = self.get_hex_address(value)
+        obj_id = id(value)
+
+        if obj_id in self.collected_ids:
+            return address  # Already tracked this snapshot
+
+        self.collected_ids.add(obj_id)
+
+        # ── Primitives ──
         if value is None:
-            return None
-
-        # Booleans (must check before int since bool is subclass of int)
-        if isinstance(value, bool):
-            return value
-
-        # Numbers (int, float)
-        if isinstance(value, (int, float)):
-            return value
-
-        # Strings -> heap reference
-        if isinstance(value, str):
-            return self._add_string_to_heap(value)
-
-        # Lists -> heap reference
-        if isinstance(value, list):
-            return self._add_list_to_heap(value)
-
-        # Tuples -> heap reference
-        if isinstance(value, tuple):
-            return self._add_tuple_to_heap(value)
-
-        # Dicts -> heap reference
-        if isinstance(value, dict):
-            return self._add_dict_to_heap(value)
-
-        # Sets -> heap reference
-        if isinstance(value, (set, frozenset)):
-            return self._add_set_to_heap(value)
-
-        # Classes (type objects)
-        if isinstance(value, type):
-            return self._add_class_to_heap(value)
-
-        # Functions
-        if callable(value) and hasattr(value, '__name__'):
-            return self._add_function_to_heap(value)
-
-        # Custom objects -> heap reference
-        if hasattr(value, '__dict__'):
-            return self._add_object_to_heap(value)
-
-        # Fallback: convert to string
-        return str(value)
-
-    def _add_string_to_heap(self, value: str) -> dict:
-        """Add a string to the heap and return a reference."""
-        address = self.get_hex_address(value)
-        obj_id = id(value)
-
-        if obj_id not in self.collected_ids:
-            self.collected_ids.add(obj_id)
-            self.heap_objects.append({
-                "address": address,
-                "type": "str",
-                "content": f'"{value}"'
+            self.objects_list.append({
+                "id": address, "type": "NoneType",
+                "value": None, "mutable": False,
+            })
+        elif isinstance(value, bool):
+            self.objects_list.append({
+                "id": address, "type": "bool",
+                "value": value, "mutable": False,
+            })
+        elif isinstance(value, int):
+            self.objects_list.append({
+                "id": address, "type": "int",
+                "value": value, "mutable": False,
+            })
+        elif isinstance(value, float):
+            self.objects_list.append({
+                "id": address, "type": "float",
+                "value": value, "mutable": False,
+            })
+        elif isinstance(value, str):
+            self.objects_list.append({
+                "id": address, "type": "str",
+                "value": value, "mutable": False,
             })
 
-        return {
-            "type": "Reference",
-            "id": address,
-            "class": "str",
-            "displayValue": value
-        }
-
-    def _add_list_to_heap(self, value: list) -> dict:
-        """Add a list to the heap and return a reference."""
-        address = self.get_hex_address(value)
-        obj_id = id(value)
-
-        if obj_id not in self.collected_ids:
-            self.collected_ids.add(obj_id)
-            self.heap_objects.append({
-                "address": address,
-                "type": "list",
-                "content": self._format_sequence_content(value),
-                "length": len(value)
+        # ── Sequences ──
+        elif isinstance(value, list):
+            # Recurse into elements first, then build objectId refs
+            elements = []
+            for item in value[:_MAX_COLLECTION_ITEMS]:
+                elements.append({"objectId": self._ensure_object(item)})
+            self.objects_list.append({
+                "id": address, "type": "list",
+                "value": elements, "mutable": True,
+            })
+        elif isinstance(value, tuple):
+            elements = []
+            for item in value[:_MAX_COLLECTION_ITEMS]:
+                elements.append({"objectId": self._ensure_object(item)})
+            self.objects_list.append({
+                "id": address, "type": "tuple",
+                "value": elements, "mutable": False,
             })
 
-        return {
-            "type": "Array",
-            "id": address,
-            "class": "list",
-            "length": len(value)
-        }
-
-    def _add_tuple_to_heap(self, value: tuple) -> dict:
-        """Add a tuple to the heap and return a reference."""
-        address = self.get_hex_address(value)
-        obj_id = id(value)
-
-        if obj_id not in self.collected_ids:
-            self.collected_ids.add(obj_id)
-            self.heap_objects.append({
-                "address": address,
-                "type": "tuple",
-                "content": self._format_sequence_content(value),
-                "length": len(value)
-            })
-
-        return {
-            "type": "Array",
-            "id": address,
-            "class": "tuple",
-            "length": len(value)
-        }
-
-    def _add_dict_to_heap(self, value: dict) -> dict:
-        """Add a dict to the heap and return a reference."""
-        address = self.get_hex_address(value)
-        obj_id = id(value)
-
-        if obj_id not in self.collected_ids:
-            self.collected_ids.add(obj_id)
-            self.heap_objects.append({
-                "address": address,
-                "type": "dict",
-                "content": self._format_dict_content(value),
-                "length": len(value)
-            })
-
-        return {
-            "type": "Reference",
-            "id": address,
-            "class": "dict",
-            "length": len(value)
-        }
-
-    def _add_set_to_heap(self, value) -> dict:
-        """Add a set to the heap and return a reference."""
-        address = self.get_hex_address(value)
-        obj_id = id(value)
-        type_name = "set" if isinstance(value, set) else "frozenset"
-
-        if obj_id not in self.collected_ids:
-            self.collected_ids.add(obj_id)
-            self.heap_objects.append({
-                "address": address,
-                "type": type_name,
-                "content": self._format_set_content(value),
-                "length": len(value)
-            })
-
-        return {
-            "type": "Reference",
-            "id": address,
-            "class": type_name,
-            "length": len(value)
-        }
-
-    def _add_class_to_heap(self, value: type) -> dict:
-        """Add a class to the heap and return a reference."""
-        address = self.get_hex_address(value)
-        obj_id = id(value)
-
-        if obj_id not in self.collected_ids:
-            self.collected_ids.add(obj_id)
-            self.heap_objects.append({
-                "address": address,
-                "type": "class",
-                "content": f"<class '{value.__name__}'>"
-            })
-
-        return {
-            "type": "Reference",
-            "id": address,
-            "class": "type",
-            "displayValue": value.__name__
-        }
-
-    def _add_function_to_heap(self, value) -> dict:
-        """Add a function to the heap and return a reference."""
-        address = self.get_hex_address(value)
-        obj_id = id(value)
-
-        if obj_id not in self.collected_ids:
-            self.collected_ids.add(obj_id)
-            self.heap_objects.append({
-                "address": address,
-                "type": "function",
-                "content": f"<function {value.__name__}>"
-            })
-
-        return {
-            "type": "Reference",
-            "id": address,
-            "class": "function",
-            "displayValue": value.__name__
-        }
-
-    def _add_object_to_heap(self, value) -> dict:
-        """Add a custom object to the heap and return a reference."""
-        address = self.get_hex_address(value)
-        obj_id = id(value)
-        class_name = type(value).__name__
-
-        if obj_id not in self.collected_ids:
-            self.collected_ids.add(obj_id)
-            self.heap_objects.append({
-                "address": address,
-                "type": class_name,
-                "content": self._format_object_content(value)
-            })
-
-        return {
-            "type": "Reference",
-            "id": address,
-            "class": class_name
-        }
-
-    def _format_sequence_content(self, seq) -> str:
-        """Format a sequence (list/tuple) for display."""
-        if not seq:
-            return "[]" if isinstance(seq, list) else "()"
-
-        items = []
-        limit = min(len(seq), 5)
-
-        for i in range(limit):
-            items.append(self._format_value_short(seq[i]))
-
-        if len(seq) > limit:
-            items.append("...")
-
-        brackets = "[]" if isinstance(seq, list) else "()"
-        return f"{brackets[0]}{', '.join(items)}{brackets[1]}"
-
-    def _format_dict_content(self, d: dict) -> str:
-        """Format a dict for display."""
-        if not d:
-            return "{}"
-
-        items = []
-        limit = 3
-
-        for i, (k, v) in enumerate(d.items()):
-            if i >= limit:
-                items.append("...")
-                break
-            items.append(f"{self._format_value_short(k)}: {self._format_value_short(v)}")
-
-        return "{" + ", ".join(items) + "}"
-
-    def _format_set_content(self, s) -> str:
-        """Format a set for display."""
-        if not s:
-            return "set()"
-
-        items = []
-        limit = 3
-
-        for i, v in enumerate(s):
-            if i >= limit:
-                items.append("...")
-                break
-            items.append(self._format_value_short(v))
-
-        return "{" + ", ".join(items) + "}"
-
-    def _format_object_content(self, obj) -> str:
-        """Format a custom object for display."""
-        class_name = type(obj).__name__
-
-        try:
-            attrs = vars(obj)
-            if not attrs:
-                return f"{class_name}{{}}"
-
-            items = []
-            limit = 3
-
-            for i, (k, v) in enumerate(attrs.items()):
-                if i >= limit:
-                    items.append("...")
+        # ── Dict ──
+        elif isinstance(value, dict):
+            entries = []
+            for i, (k, v) in enumerate(value.items()):
+                if i >= _MAX_COLLECTION_ITEMS:
                     break
-                if not k.startswith('_'):
-                    items.append(f"{k}={self._format_value_short(v)}")
+                entries.append({
+                    "key": {"objectId": self._ensure_object(k)},
+                    "value": {"objectId": self._ensure_object(v)},
+                })
+            self.objects_list.append({
+                "id": address, "type": "dict",
+                "value": entries, "mutable": True,
+            })
 
-            return f"{class_name}{{{', '.join(items)}}}"
-        except:
-            return f"{class_name}{{...}}"
+        # ── Set / Frozenset ──
+        elif isinstance(value, (set, frozenset)):
+            type_name = "set" if isinstance(value, set) else "frozenset"
+            elements = []
+            for i, item in enumerate(value):
+                if i >= _MAX_COLLECTION_ITEMS:
+                    break
+                elements.append({"objectId": self._ensure_object(item)})
+            self.objects_list.append({
+                "id": address, "type": type_name,
+                "value": elements,
+                "mutable": isinstance(value, set),
+            })
 
-    def _format_value_short(self, value) -> str:
-        """Format a value for short display (in content strings)."""
-        if value is None:
-            return "None"
-        if isinstance(value, bool):
-            return str(value)
-        if isinstance(value, (int, float)):
-            return str(value)
-        if isinstance(value, str):
-            if len(value) > 10:
-                return f'"{value[:10]}..."'
-            return f'"{value}"'
-        if isinstance(value, (list, tuple)):
-            return f"[...{len(value)}]" if isinstance(value, list) else f"(...{len(value)})"
-        if isinstance(value, dict):
-            return f"{{...{len(value)}}}"
-        if isinstance(value, (set, frozenset)):
-            return f"{{...{len(value)}}}"
-        if hasattr(value, '__dict__'):
-            return f"@{self.get_hex_address(value)}"
-        return str(value)[:20]
+        # ── Class (type object) — must come before callable check ──
+        elif isinstance(value, type):
+            methods = {}
+            for attr_name in dir(value):
+                if not attr_name.startswith('_'):
+                    attr = getattr(value, attr_name, None)
+                    if callable(attr):
+                        methods[attr_name] = self.get_hex_address(attr) if hasattr(attr, '__func__') else attr_name
+            self.objects_list.append({
+                "id": address, "type": "class",
+                "value": {"name": value.__name__, "methods": methods},
+                "mutable": False,
+            })
+
+        # ── Function ──
+        elif callable(value) and hasattr(value, '__name__'):
+            params = []
+            try:
+                sig = inspect.signature(value)
+                params = [{"name": p} for p in sig.parameters]
+            except (ValueError, TypeError):
+                pass
+            self.objects_list.append({
+                "id": address, "type": "function",
+                "value": {"name": value.__name__, "params": params},
+                "mutable": False,
+            })
+
+        # ── Instance (custom object) ──
+        elif hasattr(value, '__dict__'):
+            class_name = type(value).__name__
+            attributes = {}
+            try:
+                for k, v in vars(value).items():
+                    if not k.startswith('_'):
+                        attributes[k] = self._ensure_object(v)
+            except Exception:
+                pass
+            self.objects_list.append({
+                "id": address, "type": "instance",
+                "value": {
+                    "className": class_name,
+                    "attributes": attributes,
+                },
+                "mutable": True,
+            })
+
+        # ── Fallback ──
+        else:
+            self.objects_list.append({
+                "id": address, "type": type(value).__name__,
+                "value": str(value), "mutable": False,
+            })
+
+        return address
 
 
 def run_with_trace(code: str, target_file: str):
     """Run the code with tracing enabled."""
-    # stdout 캡처 설정 (사용자 print 출력 분리)
     stdout_capture = StdoutCapture()
-    sys.stdout = stdout_capture  # 사용자 print → 캡처 버퍼로
+    sys.stdout = stdout_capture
 
     agent = DebuggerAgent(target_file, stdout_capture)
-
-    # Set the trace function
     sys.settrace(agent.trace_func)
 
     try:
-        # Create a clean namespace for execution
         namespace = {
             '__name__': '__main__',
             '__file__': target_file,
             '__builtins__': __builtins__,
         }
 
-        # Execute the code
         exec(compile(code, target_file, 'exec'), namespace)
 
-        # Flush the last pending line after successful execution
-        # Create a dummy frame-like object with the final namespace
+        # Flush the last pending line
         class FinalFrame:
             def __init__(self, ns):
                 self.f_locals = ns
                 self.f_back = None
-                self.f_code = type('code', (), {'co_name': '<module>', 'co_filename': target_file})()
+                self.f_code = type('code', (), {
+                    'co_name': '<module>',
+                    'co_filename': target_file,
+                })()
 
         agent.flush_pending(FinalFrame(namespace))
 
     except Exception as e:
-        # Output error as a special snapshot
-        # 에러 시에도 현재까지의 stdout 포함
         stdout_value = stdout_capture.getvalue()
         error_snapshot = {
             "line": agent.pending_line if agent.pending_line > 0 else 1,
             "event": "ERROR",
             "error": {
                 "type": type(e).__name__,
-                "message": str(e)
+                "message": str(e),
             },
-            "stack": [],
-            "heap": []
+            "names": [],
+            "objects": [],
+            "callStack": [],
         }
         if stdout_value:
             error_snapshot["stdout"] = stdout_value
@@ -544,7 +425,7 @@ def run_with_trace(code: str, target_file: str):
 
     finally:
         sys.settrace(None)
-        sys.stdout = _original_stdout  # stdout 복원
+        sys.stdout = _original_stdout
 
 
 if __name__ == '__main__':

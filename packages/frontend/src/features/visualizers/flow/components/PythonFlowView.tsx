@@ -21,9 +21,6 @@ interface PythonFlowViewProps {
   step: FlowStep;
   prevStep?: FlowStep | null;
   className?: string;
-  /** 원본 LessonStep (callStack 등 접근용) */
-  rawStep?: unknown;
-  rawPrevStep?: unknown;
 }
 
 interface ObjectWithNames {
@@ -303,8 +300,6 @@ export const PythonFlowView = memo(function PythonFlowView({
   step,
   prevStep,
   className = '',
-  rawStep,
-  rawPrevStep,
 }: PythonFlowViewProps) {
   // 변수 ID → 변수 맵
   const variableMap = useMemo(() => {
@@ -331,14 +326,7 @@ export const PythonFlowView = memo(function PythonFlowView({
     return { objectMap: objMap, namesByObject: namesMap };
   }, [step.variables]);
 
-  // 콜스택 데이터 (시뮬레이터에서 직접 제공 - rawStep에서 가져옴)
-  const callStack = (rawStep as any)?.callStack as Array<{
-    functionName: string;
-    depth: number;
-    localNames: Array<{ name: string; scope?: string; pointsTo: string }>;
-  }> | undefined;
-
-  // 프레임별 객체 그룹화
+  // step.frames 기반 프레임 데이터 구성 (PyTransformer가 callStack→frames 변환 완료)
   const frameData = useMemo(() => {
     const result: Array<{
       name: string;
@@ -347,71 +335,49 @@ export const PythonFlowView = memo(function PythonFlowView({
       isActive: boolean;
     }> = [];
 
-    // 1. Global/Main 프레임 - global 스코프의 변수들
-    const globalObjects: ObjectWithNames[] = [];
-    objectMap.forEach((object, objectId) => {
-      const names = namesByObject.get(objectId) || [];
-      const globalNames = names.filter((n) => n.scope === 'global' || !n.scope);
+    // step.frames에서 각 프레임의 객체 + 이름 조합
+    step.frames.forEach((frame, index) => {
+      const frameObjects: ObjectWithNames[] = [];
+      const addedObjectIds = new Set<string>();
 
-      if (globalNames.length > 0) {
-        globalObjects.push({ object, names: globalNames });
-      }
-    });
-
-    // global 프레임은 항상 표시
-    result.push({
-      name: 'global',
-      objects: globalObjects,
-      isNew: false,
-      isActive: !callStack?.length, // 콜스택 없으면 global이 활성
-    });
-
-    // 2. 콜스택이 있으면 함수 프레임들 추가
-    if (callStack && callStack.length > 0) {
-      // depth 순서로 정렬 (낮은 것이 먼저 = 먼저 호출된 함수)
-      const sortedStack = [...callStack].sort((a, b) => a.depth - b.depth);
-
-      sortedStack.forEach((frame, index) => {
-        const frameObjects: ObjectWithNames[] = [];
-
-        // 프레임의 로컬 변수들
-        frame.localNames.forEach((localName) => {
-          // 해당 로컬 변수가 가리키는 객체 찾기
-          const targetObjVar = variableMap.get(`obj-${localName.pointsTo}`);
-          if (targetObjVar) {
-            const allNames = namesByObject.get(targetObjVar.id) || [];
-            const localNames = allNames.filter((n) =>
-              n.scope === frame.functionName || n.name === localName.name
+      // 프레임의 변수(이름)들이 가리키는 객체 수집
+      frame.variableIds.forEach((varId) => {
+        const nameVar = variableMap.get(varId);
+        if (nameVar?.pointsTo) {
+          const objVar = objectMap.get(nameVar.pointsTo);
+          if (objVar && !addedObjectIds.has(objVar.id)) {
+            addedObjectIds.add(objVar.id);
+            const allNames = namesByObject.get(objVar.id) || [];
+            // 이 프레임에 속한 이름만 필터
+            const frameNames = allNames.filter((n) =>
+              frame.variableIds.includes(n.id)
             );
-            if (!frameObjects.some(fo => fo.object.id === targetObjVar.id)) {
-              frameObjects.push({ object: targetObjVar, names: localNames });
-            }
+            frameObjects.push({ object: objVar, names: frameNames });
           }
-        });
-
-        // 이전 스텝에 없던 프레임이면 새로 생성
-        const prevCallStack = (rawPrevStep as any)?.callStack as typeof callStack;
-        const isNew = !prevCallStack?.some((f) => f.functionName === frame.functionName);
-
-        // 마지막 프레임(가장 최근 호출)이 활성
-        const isActive = index === sortedStack.length - 1;
-
-        result.push({
-          name: frame.functionName,
-          objects: frameObjects,
-          isNew,
-          isActive,
-        });
+        }
       });
-    }
 
-    // Objects (Heap) 프레임 제거 - global + 함수 프레임만 표시
+      // 이전 스텝에 없던 프레임이면 새로 생성
+      const isNew = prevStep
+        ? !prevStep.frames?.some((f) => f.name === frame.name)
+        : false;
+
+      // 마지막 프레임이 활성 (가장 최근 호출)
+      const isActive = index === step.frames.length - 1;
+
+      result.push({
+        name: frame.name,
+        objects: frameObjects,
+        isNew,
+        isActive,
+      });
+    });
 
     return result;
-  }, [step, callStack, variableMap, objectMap, namesByObject, prevStep]);
+  }, [step.frames, variableMap, objectMap, namesByObject, prevStep]);
 
-  // 콜스택에 함수 호출이 있는 경우
-  const hasFrames = callStack && callStack.length > 0;
+  // 함수 프레임이 있는 경우 (global 외에 추가 프레임 존재)
+  const hasFrames = step.frames.length > 1;
 
   return (
     <div className={`python-flow-view p-4 ${className}`}>
