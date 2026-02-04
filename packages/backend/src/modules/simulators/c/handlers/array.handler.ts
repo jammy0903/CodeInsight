@@ -6,6 +6,8 @@
  * - int arr[5] = {1, 2, 3, 4, 5};
  * - float arr[3] = {1.5, 2.5, 3.5};
  * - char arr[4] = {'a', 'b', 'c', 'd'};
+ * - char str[] = "Hello";
+ * - char str[20] = "Hello";
  * - double arr[2];
  * - arr[0] = 10;
  */
@@ -15,6 +17,10 @@ import { cTypeRegistry, type TypeInfo } from '../types';
 
 // 패턴 정의 (모든 타입 지원)
 const PATTERNS = {
+  // char str[20] = "Hello";  (크기 명시, 더 구체적이므로 먼저)
+  STRING_INIT_SIZED: /^char\s+(\w+)\s*\[\s*(\d+)\s*\]\s*=\s*"([^"]*)"/,
+  // char str[] = "Hello";  (크기 자동 계산)
+  STRING_INIT_AUTO: /^char\s+(\w+)\s*\[\s*\]\s*=\s*"([^"]*)"/,
   // type arr[5] = {values};
   ARRAY_INIT: /^(unsigned\s+)?(\w+(?:\s+\w+)?)\s+(\w+)\s*\[\s*(\d+)\s*\]\s*=\s*\{([^}]+)\}/,
   // type arr[5];
@@ -29,6 +35,8 @@ export const ArrayHandler: CodeHandler = {
 
   canHandle(code: string): boolean {
     return (
+      PATTERNS.STRING_INIT_SIZED.test(code) ||
+      PATTERNS.STRING_INIT_AUTO.test(code) ||
       PATTERNS.ARRAY_INIT.test(code) ||
       PATTERNS.ARRAY_DECL.test(code) ||
       PATTERNS.ARRAY_ASSIGN.test(code)
@@ -36,6 +44,18 @@ export const ArrayHandler: CodeHandler = {
   },
 
   handle(ctx: SimContext, lineNum: number, code: string): Step | null {
+    // char str[20] = "Hello";  (크기 명시 — 더 구체적이므로 먼저 체크)
+    const strSized = code.match(PATTERNS.STRING_INIT_SIZED);
+    if (strSized) {
+      return handleStringLiteral(ctx, lineNum, code, strSized[1], strSized[3], parseInt(strSized[2]));
+    }
+
+    // char str[] = "Hello";  (크기 자동)
+    const strAuto = code.match(PATTERNS.STRING_INIT_AUTO);
+    if (strAuto) {
+      return handleStringLiteral(ctx, lineNum, code, strAuto[1], strAuto[2]);
+    }
+
     // type arr[5] = {values};
     const arrInit = code.match(PATTERNS.ARRAY_INIT);
     if (arrInit) {
@@ -300,6 +320,69 @@ function handleArrayAssign(
 • 항상 배열 크기 확인: if (index < ${arrSize})
 • 안전한 함수 사용: strncpy() 대신 strcpy()`;
   }
+
+  return ctx.createStep(lineNum, code, explanation);
+}
+
+/**
+ * 문자열 리터럴로 char 배열 선언
+ * char str[] = "Hello";  또는  char str[20] = "Hello";
+ */
+function handleStringLiteral(
+  ctx: SimContext,
+  lineNum: number,
+  code: string,
+  name: string,
+  literal: string,
+  explicitSize?: number
+): Step {
+  const chars = literal.split('');
+  const size = explicitSize || chars.length + 1; // +1 for null terminator
+  const addr = ctx.allocateStack(size);
+
+  // 바이트 배열: 각 문자 ASCII + null terminator + 패딩
+  const bytes = chars.map((c) => c.charCodeAt(0));
+  bytes.push(0); // null terminator '\0'
+  while (bytes.length < size) bytes.push(0); // 나머지 패딩
+
+  // 표시용 문자 목록
+  const displayChars = [...chars.map((c) => `'${c}'`), "'\\0'"];
+
+  ctx.variables.set(name, {
+    address: ctx.toHex(addr),
+    type: `char[${size}]`,
+    size,
+    bytes,
+    value: `"${literal}"`,
+    is_array: true,
+    array_size: size,
+    element_type: 'char',
+    element_size: 1,
+  });
+
+  // Phase 4: 배열 선언 이벤트
+  if (ctx.addEvent && ctx.getCurrentFrame) {
+    ctx.addEvent({
+      type: 'variable',
+      action: 'declare',
+      frame: ctx.getCurrentFrame(),
+      name,
+      varType: `char[${size}]`,
+      value: `"${literal}"`,
+      address: ctx.toHex(addr),
+      size,
+    });
+  }
+
+  const explanation = `📚 문자열 '${name}' 선언: "${literal}"
+
+• 타입: char[${size}] (${size}바이트)
+• 스택 주소: ${ctx.toHex(addr)}
+• 문자 구성: {${displayChars.join(', ')}}
+• 바이트: [${bytes.slice(0, chars.length + 1).join(', ')}]
+
+💡 C 문자열은 char 배열 + null terminator('\\0')
+   "${literal}" → ${chars.length}글자 + '\\0' = ${chars.length + 1}바이트 필요${explicitSize && explicitSize > chars.length + 1 ? `\n   선언 크기 ${explicitSize} > 필요 크기 ${chars.length + 1} → 나머지는 0으로 채워짐` : ''}`;
 
   return ctx.createStep(lineNum, code, explanation);
 }
