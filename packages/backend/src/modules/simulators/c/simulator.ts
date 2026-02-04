@@ -11,6 +11,7 @@ import { CallStack, ScopeManager, type Step, type MemoryBlock, type Variable, ty
 import { registry, type SimContext } from './handlers';
 import { ExpressionEvaluator, type EvalContext } from './evaluator';
 import { FrameManager, ParameterSetup } from './execution';
+import { clearStructDefs } from './handlers/struct.handler';
 import type { VisualizationEvent } from '@codeinsight/shared';
 
 /**
@@ -91,6 +92,12 @@ class CSimulator implements SimContext, EvalContext {
     // 코드 파싱
     this.parseResult = parseCode(code);
     const { functions, sourceLines } = this.parseResult;
+
+    // 이전 실행 잔여 struct 정의 정리
+    clearStructDefs();
+
+    // 전역 struct 정의 사전 처리 (함수 바깥의 struct 정의를 스캔)
+    this.preprocessGlobalStructs(sourceLines);
 
     // main 함수 찾기
     const mainFunc = functions.get('main');
@@ -190,6 +197,68 @@ ${headerExplanations}
     }
 
     return steps;
+  }
+
+  /**
+   * 전역 struct 정의 사전 처리
+   * 함수 바깥의 struct 정의를 찾아 StructHandler에 위임
+   * 멀티라인 struct도 한 줄로 병합하여 처리
+   */
+  private preprocessGlobalStructs(sourceLines: string[]): void {
+    // 함수 영역을 파악 (함수 본문 내부인지 판별용)
+    const functionRanges: Array<{ start: number; end: number }> = [];
+    if (this.parseResult) {
+      for (const [, func] of this.parseResult.functions) {
+        // bodyStart/bodyEnd는 1-indexed
+        functionRanges.push({ start: func.bodyStart, end: func.bodyEnd });
+      }
+    }
+
+    const isInsideFunction = (lineIdx: number): boolean => {
+      const lineNum = lineIdx + 1; // 1-indexed
+      return functionRanges.some((r) => lineNum >= r.start && lineNum <= r.end);
+    };
+
+    let i = 0;
+    while (i < sourceLines.length) {
+      if (isInsideFunction(i)) {
+        i++;
+        continue;
+      }
+
+      const line = sourceLines[i].trim();
+
+      // struct 키워드로 시작하고 멤버 정의를 포함하는 패턴 감지
+      if (/^struct\s+\w+\s*\{/.test(line)) {
+        // 한 줄에 완결되는 경우: struct Point { int x; int y; };
+        if (/\}/.test(line)) {
+          const cleanCode = line.replace(/;$/, '').trim();
+          this.analyzeLine(i + 1, cleanCode);
+          i++;
+          continue;
+        }
+
+        // 멀티라인 struct: 닫는 }까지 병합
+        let merged = line;
+        let j = i + 1;
+        while (j < sourceLines.length) {
+          const nextLine = sourceLines[j].trim();
+          merged += ' ' + nextLine;
+          if (nextLine.includes('}')) {
+            break;
+          }
+          j++;
+        }
+
+        // 병합된 한 줄을 정리하고 analyzeLine에 전달
+        const cleanMerged = merged.replace(/\s+/g, ' ').replace(/;$/, '').trim();
+        this.analyzeLine(i + 1, cleanMerged);
+        i = j + 1;
+        continue;
+      }
+
+      i++;
+    }
   }
 
   /**
