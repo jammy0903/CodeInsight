@@ -3,26 +3,26 @@
  *
  * LessonStep (C) → FlowStep 변환
  * - stack/heap MemoryBlock[] → FlowVariable[]
- * - 포인터 관계 유지
- * - 함수 프레임 파싱
+ * - 포인터 관계 유지 (pointsTo → 변수 ID 해석)
+ * - 함수 프레임 파싱 (dot-format + frame 필드 모두 지원)
+ * - 배열/구조체 복합 타입 값 처리
  */
 
 import type { LessonStep, FlowStep, FlowVariable, FlowFrame } from '@codeinsight/shared';
 import type { IFlowTransformer } from '../base/types';
 
 /**
- * 값을 FlowValue로 파싱
+ * 문자열 값을 FlowValue로 파싱
  *
  * 주의: hex 주소(0x...)는 문자열로 유지해야 함
  * 그렇지 않으면 0x7fffffffde00 → 140737488346624로 변환됨
  */
 function parseValue(value: string | undefined | null): string | number | boolean | null {
-  // 방어적 코드: undefined, null, 빈 문자열 처리
   if (value === undefined || value === null) {
-    return 0; // 기본값
+    return 0;
   }
 
-  const strValue = String(value); // 타입 안전성 보장
+  const strValue = String(value);
 
   if (strValue === '' || strValue === 'null' || strValue === 'NULL') return null;
   if (strValue === 'true') return true;
@@ -49,25 +49,52 @@ function parseValue(value: string | undefined | null): string | number | boolean
 }
 
 /**
- * 변수명에서 함수 프레임 추출
- * 예: "main.x" → { frame: "main", name: "x" }
- * 예: "foo.local" → { frame: "foo", name: "local" }
+ * 복합 타입 값 처리 (배열, 구조체 포함)
+ *
+ * - string → parseValue() 위임
+ * - string[] (배열) → "[10, 20, 30]" 문자열
+ * - {key, value}[] (구조체) → "{x: 10, y: 20}" 문자열
  */
+function parseComplexValue(value: unknown): string | number | boolean | null {
+  if (value === undefined || value === null) return 0;
+  if (typeof value === 'string') return parseValue(value);
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) return '[]';
+
+    // 구조체 형식: [{key: "x", value: "10"}, ...]
+    if (typeof value[0] === 'object' && value[0] !== null && 'key' in value[0]) {
+      const members = value.map(
+        (m: { key: string; value: string }) => `${m.key}: ${m.value}`
+      );
+      return `{${members.join(', ')}}`;
+    }
+
+    // 배열 형식: ["10", "20", "30"] 또는 [{value: "10", address?: "0x100"}, ...]
+    const elements = value.map((el: unknown) => {
+      if (typeof el === 'object' && el !== null && 'value' in el) {
+        return String((el as { value: string }).value);
+      }
+      return String(el);
+    });
+    return `[${elements.join(', ')}]`;
+  }
+
+  return String(value);
+}
+
 /**
- * 변수명에서 함수 프레임 추출
+ * 변수명에서 함수 프레임 추출 (Simulator dot-format)
  * 예: "main.x" → { frame: "main", name: "x" }
  * 예: "x" → { frame: "main", name: "x" } (기본값)
  */
 function parseVariableName(fullName: string): { frame: string; name: string } {
-  // 방어적 코드: 빈 문자열 처리
   if (!fullName) {
     return { frame: 'main', name: 'unknown' };
   }
 
   const dotIndex = fullName.indexOf('.');
 
-  // 점(.)이 없는 경우: 기본적으로 'main' 프레임으로 간주
-  // 단, 'global'이나 'heap' 등 특수 키워드가 이름에 포함된 경우(예비)는 고려하지 않음 (이름 자체로 식별)
   if (dotIndex === -1) {
     return { frame: 'main', name: fullName };
   }
@@ -93,11 +120,25 @@ export class CTransformer implements IFlowTransformer {
   transform(step: LessonStep, prevStep?: LessonStep, fullCode?: string): FlowStep {
     const variables: FlowVariable[] = [];
     const framesMap = new Map<string, string[]>(); // frame name → variable IDs
+    let varIdx = 0; // ID 충돌 방지용 카운터
 
     // 1. Stack 변수 처리
     if (step.stack) {
-      step.stack.forEach((block) => {
-        const { frame, name } = parseVariableName(block.name);
+      step.stack.forEach((block: any) => {
+        // type: "frame" 마커는 변수가 아닌 프레임 구분자
+        if (block.type === 'frame') {
+          const frameName = block.func || block.name;
+          if (frameName && !framesMap.has(frameName)) {
+            framesMap.set(frameName, []);
+          }
+          return;
+        }
+
+        // 프레임 결정: Lesson JSON의 frame 필드 우선, 없으면 dot-format 파싱
+        const dotParsed = parseVariableName(block.name);
+        const frame = block.frame || dotParsed.frame;
+        const name = dotParsed.name;
+
         const variable = this.toVariable(
           {
             name,
@@ -105,9 +146,11 @@ export class CTransformer implements IFlowTransformer {
             type: block.type,
             address: block.address,
             points_to: block.points_to,
+            highlight: block.highlight,
             segment: 'stack',
           },
-          frame
+          frame,
+          varIdx++,
         );
         variables.push(variable);
 
@@ -120,7 +163,9 @@ export class CTransformer implements IFlowTransformer {
 
     // 2. Heap 변수 처리
     if (step.heap) {
-      step.heap.forEach((block) => {
+      step.heap.forEach((block: any) => {
+        if (block.type === 'frame') return;
+
         const variable = this.toVariable(
           {
             name: block.name || `[${block.address}]`,
@@ -128,13 +173,14 @@ export class CTransformer implements IFlowTransformer {
             type: block.type,
             address: block.address,
             points_to: block.points_to,
+            highlight: block.highlight,
             segment: 'heap',
           },
-          'heap'
+          'heap',
+          varIdx++,
         );
         variables.push(variable);
 
-        // heap 프레임에 추가
         const heapVars = framesMap.get('heap') || [];
         heapVars.push(variable.id);
         framesMap.set('heap', heapVars);
@@ -143,16 +189,20 @@ export class CTransformer implements IFlowTransformer {
 
     // 3. Data 섹션 처리 (전역 변수)
     if (step.data) {
-      step.data.forEach((block) => {
+      step.data.forEach((block: any) => {
+        if (block.type === 'frame') return;
+
         const variable = this.toVariable(
           {
             name: block.name,
             value: block.value,
             type: block.type,
             address: block.address,
+            highlight: block.highlight,
             segment: 'data',
           },
-          'global'
+          'global',
+          varIdx++,
         );
         variables.push(variable);
 
@@ -162,7 +212,10 @@ export class CTransformer implements IFlowTransformer {
       });
     }
 
-    // 4. 프레임 배열 생성 (main이 없으면 추가)
+    // 4. pointsTo 해석: raw 값(hex 주소 또는 변수 이름)을 변수 ID로 매핑
+    this.resolvePointsTo(variables);
+
+    // 5. 프레임 배열 생성 (main이 없으면 추가)
     if (!framesMap.has('main')) {
       framesMap.set('main', []);
     }
@@ -185,10 +238,10 @@ export class CTransformer implements IFlowTransformer {
       frames.push({ name: 'heap', variableIds: framesMap.get('heap')! });
     }
 
-    // 5. 코드 추출
+    // 6. 코드 추출
     const code = step.code || (fullCode ? getCodeAtLine(fullCode, step.line) : '');
 
-    // 6. 터미널 출력
+    // 7. 터미널 출력
     const terminalOutput = step.stdout || step.output
       ? { text: step.stdout || step.output || '' }
       : undefined;
@@ -205,28 +258,67 @@ export class CTransformer implements IFlowTransformer {
   }
 
   /**
+   * pointsTo 값을 변수 ID로 해석
+   *
+   * 세 가지 경우 처리:
+   * 1. hex 주소 (Simulator): "0x7fff..." → address 매칭 → 변수 ID
+   * 2. 변수 이름 (Lesson JSON points_to): "a" → name 매칭 → 변수 ID
+   * 3. 이미 변수 ID 형태면 그대로 유지
+   */
+  private resolvePointsTo(variables: FlowVariable[]): void {
+    variables.forEach((v) => {
+      if (!v.pointsTo) return;
+
+      // 이미 변수 ID 형태 ("main-a-0x1000")면 스킵
+      if (v.pointsTo.includes('-') && !v.pointsTo.startsWith('0x')) return;
+
+      // hex 주소 → address로 매칭 (Simulator 경로)
+      if (v.pointsTo.startsWith('0x')) {
+        const target = variables.find((t) => t.address === v.pointsTo && t.id !== v.id);
+        if (target) {
+          v.pointsTo = target.id;
+          return;
+        }
+      }
+
+      // 변수 이름으로 매칭 (Lesson JSON points_to: "a")
+      const target = variables.find((t) => t.name === v.pointsTo && t.id !== v.id);
+      if (target) {
+        v.pointsTo = target.id;
+        return;
+      }
+
+      // 매칭 실패 시 pointsTo 제거 (깨진 화살표 방지)
+      v.pointsTo = undefined;
+    });
+  }
+
+  /**
    * MemoryBlock 유사 객체 → FlowVariable 변환
    */
   toVariable(
     block: {
       name: string;
-      value: string;
+      value: unknown;
       type?: string;
       address?: string;
       points_to?: string | null;
+      highlight?: boolean;
       segment?: string;
     },
-    scope: string
+    scope: string,
+    idx: number = 0,
   ): FlowVariable {
     const isPointer = block.type?.includes('*') || false;
-    const parsedValue = parseValue(block.value);
+    const parsedValue = parseComplexValue(block.value);
+    const addr = block.address || `auto-${idx}`;
 
     return {
-      id: `${scope}-${block.name}-${block.address || 'no-addr'}`,
+      id: `${scope}-${block.name}-${addr}`,
       name: block.name,
-      value: parsedValue ?? block.value,
+      value: parsedValue ?? 0,
       type: block.type || 'unknown',
-      state: 'idle',
+      state: block.highlight ? 'updating' : 'idle',
       scope,
       isPointer,
       pointsTo: block.points_to || undefined,
