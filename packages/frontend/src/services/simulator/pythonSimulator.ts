@@ -38,8 +38,6 @@ interface PyStep {
   objects: PyObject[];
   stdout?: string;
   callStack?: PyCallFrameSnapshot[];
-  stack?: any;
-  heap?: any;
 }
 
 interface PySimulateResult {
@@ -52,10 +50,8 @@ function toSteps(pySteps: PyStep[]): LessonStep[] {
   return pySteps.map((step) => ({
     line: step.line,
     code: step.code,
-    explanation: step.explanation,
+    explanation: step.explanation || '',
     stdout: step.stdout,
-    stack: step.stack,
-    heap: step.heap,
     pyNames: step.names,
     pyObjects: step.objects,
     callStack: step.callStack,
