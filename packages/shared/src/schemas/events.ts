@@ -143,7 +143,7 @@ export const HighlightEventSchema = z.object({
 export type HighlightEvent = z.infer<typeof HighlightEventSchema>;
 
 // ============================================
-// 통합 Visualization Event
+// 통합 Visualization Event (legacy 7종)
 // ============================================
 
 export const VisualizationEventSchema = z.discriminatedUnion('type', [
@@ -157,6 +157,74 @@ export const VisualizationEventSchema = z.discriminatedUnion('type', [
 ]);
 
 export type VisualizationEvent = z.infer<typeof VisualizationEventSchema>;
+
+// ============================================
+// Scope Event (JS, Python 스코프 시각화)
+// ============================================
+
+export const ScopeEventSchema = z.object({
+  type: z.literal('scope'),
+  action: z.enum(['enter', 'exit']),
+  scopeType: z.enum(['global', 'function', 'block', 'module', 'class']),
+  name: z.string(),
+  parentScope: z.string().optional(),
+});
+
+export type ScopeEvent = z.infer<typeof ScopeEventSchema>;
+
+// ============================================
+// Object Event (Java, JS, Python 힙 객체)
+// ============================================
+
+export const ObjectEventSchema = z.object({
+  type: z.literal('object'),
+  action: z.enum(['create', 'update', 'access', 'destroy']),
+  objectId: z.string(),
+  className: z.string().optional(),
+  properties: z.record(z.string(), z.unknown()).optional(),
+  location: z.enum(['heap', 'string-pool', 'intern']).optional(),
+});
+
+export type ObjectEvent = z.infer<typeof ObjectEventSchema>;
+
+// ============================================
+// Binding Event (Python 이름 → 객체 바인딩)
+// ============================================
+
+export const BindingEventSchema = z.object({
+  type: z.literal('binding'),
+  action: z.enum(['bind', 'rebind', 'unbind']),
+  name: z.string(),
+  scope: z.string(),
+  objectId: z.string(),
+  objectType: z.string(),
+  objectValue: z.unknown().optional(),
+  isNewObject: z.boolean().optional(),
+  refCount: z.number().optional(),
+});
+
+export type BindingEvent = z.infer<typeof BindingEventSchema>;
+
+// ============================================
+// 확장 통합 SimulatorEvent (legacy 7 + new 3)
+// ============================================
+
+export const SimulatorEventSchema = z.discriminatedUnion('type', [
+  // legacy 7
+  FrameEventSchema,
+  VariableEventSchema,
+  PointerEventSchema,
+  HeapEventSchema,
+  OutputEventSchema,
+  WarningEventSchema,
+  HighlightEventSchema,
+  // new 3
+  ScopeEventSchema,
+  ObjectEventSchema,
+  BindingEventSchema,
+]);
+
+export type SimulatorEvent = z.infer<typeof SimulatorEventSchema>;
 
 // ============================================
 // Step with Events (확장된 Step 타입)

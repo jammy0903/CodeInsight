@@ -26,6 +26,7 @@
 import { FileManager } from './engine/file-manager';
 import { JavaCompiler } from './engine/compiler';
 import { DebuggerClient } from './engine/debugger-client';
+import { normalizeJavaEvents } from './normalizer';
 
 /**
  * Java 시뮬레이션 서비스 메인 클래스
@@ -153,10 +154,18 @@ export class JavaSimulationService {
                     lineNumber: snapshot.lineNumber ? snapshot.lineNumber - LINE_OFFSET : snapshot.lineNumber,
                 }));
 
+            // ═══════════════════════════════════════════════════════
+            // 5️⃣ Normalize: SimulatorEvent[] 추가 (dual path)
+            // ═══════════════════════════════════════════════════════
+            const normalizedSteps = adjustedSnapshots.map((step: any) => ({
+                ...step,
+                normalizedEvents: normalizeJavaEvents(step),
+            }));
+
             // 🎉 성공 반환
             return {
                 success: true,
-                steps: adjustedSnapshots,
+                steps: normalizedSteps,
             };
 
         } catch (error: any) {
