@@ -59,11 +59,20 @@ DB(JSON 파일) → API → 프론트엔드 → 사전 제작된 단계별 시�
 - **Python**: sys.settrace() 기반
 - **JavaScript**: Node.js VM 기반
 
-### 3. 시각화 엔진
-- 메모리 레이아웃 (스택, 힙 - C언어)
-- 변수 값 단계별 추적 (Python, JS)
-- 콜 스택 표시
-- 실행 흐름 하이라이트
+### 3. 시각화 엔진 (언어별 어댑터 패턴)
+- **C**: 메모리 레이아웃 (스택, 힙) — `CMemoryView`
+- **Python**: 이름표(names) + 객체(objects) 포스트잇 모델 — `PythonFlowView`
+- **JavaScript**: 이벤트 루프, 클로저, 프로토타입 체인 — `JSFlowView`
+- **Java**: 참조 기반 메모리 시각화 — `JavaFlowView`
+- **공통**: 콜 스택, 스코프 체인, 터미널 출력 — `shared/`
+
+**Python 시각화 파이프라인:**
+```
+Lesson JSON (names[]/objects[])
+  → PyTransformer.transform()
+  → FlowStep (공통 포맷)
+  → PythonFlowView.tsx (포스트잇 렌더링)
+```
 
 ### 4. 학습 콘텐츠 (Lesson용)
 - **사전 제작된 JSON 레슨** — 시뮬레이터 없이 동작
@@ -156,24 +165,31 @@ DB (JSON seed 데이터)
 ```
 packages/frontend/src/
 ├── components/
-│   ├── common/           # 공통 UI (Button, Input, etc)
+│   ├── common/           # 공통 UI (Button, Input, Toast 등)
 │   ├── editor/          # 코드 에디터
-│   ├── visualizer/      # 시각화 컴포넌트
-│   │   ├── MemoryView.tsx
-│   │   ├── StackView.tsx
-│   │   └── CallStackView.tsx
-│   └── Toast.tsx        # 알림 시스템
+│   └── lesson/          # 레슨 관련 컴포넌트
 ├── features/
+│   ├── courses/         # 코스/레슨 페이지 (LessonPage.tsx 포함)
 │   ├── playground/      # 플레이그라운드 페이지
-│   ├── lessons/         # 레슨 페이지
-│   └── courses/         # 과정 페이지
+│   └── visualizers/     # 언어별 시각화 (핵심!)
+│       ├── flow/        # 범용 플로우 시각화
+│       │   ├── adapters/       # 언어별 어댑터
+│       │   │   ├── python/     # PyTransformer, PyStyler, PyAnimator
+│       │   │   ├── javascript/ # JSTransformer, JSStyler, JSAnimator
+│       │   │   ├── java/       # JavaTransformer, JavaStyler, JavaAnimator
+│       │   │   └── c/          # CTransformer, CStyler, CAnimator
+│       │   └── components/     # PythonFlowView, JSFlowView 등
+│       ├── memory/      # C/Java 메모리 시각화 (스택/힙)
+│       ├── shared/      # 공통 (CallStack, ScopeChain, TerminalOutput)
+│       └── c/, java/    # 언어별 특화 시각화
 ├── services/
-│   ├── api.ts          # API 호출
-│   └── simulator.ts    # 시뮬레이터 호출
-├── stores/
-│   └── usePlaygroundStore.ts  # Zustand
-└── utils/
-    └── parser.ts       # 데이터 파싱
+│   ├── api/             # API 클라이언트
+│   ├── simulator/       # 시뮬레이터 서비스
+│   ├── courses.ts       # 코스/레슨 API
+│   └── ai.ts            # AI 서비스
+├── stores/              # Zustand (authStore, simulatorStore, themeStore 등)
+├── hooks/               # 커스텀 훅 (useCourses, useAuth 등)
+└── lib/                 # 외부 라이브러리 설정 (firebase.ts)
 ```
 
 ---
@@ -212,41 +228,82 @@ packages/backend/prisma/content/
 ```
 
 ### Lesson JSON 구조 예시
+
+**Python 레슨** (`names[]`/`objects[]` 기반 — 참조 모델):
 ```json
 {
-  "lessonId": "py-3-1",
-  "title": "리스트 기초",
-  "concept": "리스트의 생성과 기본 조작",
+  "id": "py-3-1",
+  "chapterId": "python-ch3",
+  "title": "Lists (Mutable)",
   "content": {
-    "code": "fruits = ['apple', 'banana']\nfruits.append('cherry')",
+    "code": "fruits = [\"Apple\", \"Banana\"]\nfruits.append(\"Orange\")",
+    "language": "python",
     "steps": [
       {
-        "step": 1,
-        "line": 1,
+        "line": 2,
         "title": "리스트 생성",
-        "explanation": "리스트를 생성하고 변수에 할당합니다.",
-        "highlight": [1],
+        "explanation": "대괄호 []로 리스트 객체를 만들고 fruits 이름표를 붙입니다.",
+        "highlight": [2],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            { "name": "fruits", "value": "['apple', 'banana']", "type": "list" }
+          "names": [
+            { "name": "fruits", "pointsTo": "list1" }
+          ],
+          "objects": [
+            { "id": "list1", "type": "list", "value": "[\"Apple\", \"Banana\"]", "pyId": "1001" }
           ],
           "output": []
         }
       }
     ]
   },
-  "quiz": { "question": "...", "options": [...], "answer": 1 },
-  "misconceptions": ["..."],
-  "keyTakeaway": "..."
+  "quizzes": [{ "type": "multiple_choice", "question": "...", "options": [...], "answer": "2" }]
 }
 ```
+
+**C 레슨** (메모리 스택/힙 기반):
+```json
+{
+  "id": "c-1-1",
+  "title": "변수와 메모리",
+  "content": {
+    "code": "int x = 5;\nint y = x + 10;",
+    "steps": [
+      {
+        "line": 1,
+        "title": "변수 선언",
+        "explanation": "int x = 5;는 정수형 변수 x를 선언하고...",
+        "highlight": [1]
+      }
+    ]
+  },
+  "quizzes": [{ "type": "ox", "question": "...", "answer": "true" }]
+}
+```
+
+#### Python `pythonMemoryState` 구조 (names/objects 모델)
+
+Python은 **모든 변수가 참조(이름표)**인 언어이므로, `variables[]` 박스 모델이 아닌 `names[]`/`objects[]` 참조 모델을 사용한다:
+
+| 필드 | 설명 | 예시 |
+|------|------|------|
+| `names[]` | 변수 이름표 (참조) | `{ "name": "x", "pointsTo": "int1" }` |
+| `objects[]` | 실제 객체 (값) | `{ "id": "int1", "type": "int", "value": 42, "pyId": "1001" }` |
+| `output[]` | 터미널 출력 | `["Hello World"]` |
+| `note` | 시각화 하단 설명 | `"새 객체가 생성되었습니다"` |
+
+**핵심 규칙:**
+- **공유 참조**: 같은 `pointsTo` → 같은 객체를 가리킴 (예: `a = b = [1,2]`)
+- **highlight**: `true`이면 현재 스텝에서 변경된 항목
+- **Object ID 형식**: `{type}{counter}` (예: `int1`, `str2`, `list1`)
+- **pyId**: 고유 식별자, `1001`부터 증가
 
 ### 핵심 포인트
 - **시뮬레이터 없이 동작**: JSON에 모든 시각화 데이터가 사전 정의됨
 - **교육 품질 통제**: 변수 상태, explanation, 퀴즈를 직접 스크립팅
 - **시뮬레이터 미지원 개념도 교육 가능**: yield, decorator, async/await 등
 - **자동 배포**: JSON 수정 → git push → prisma db seed → DB 반영
+- **Python은 참조 모델**: `names[]`/`objects[]`로 포스트잇(이름표)+객체 시각화
 
 ---
 

@@ -81,6 +81,7 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
     const elements = refs.map((ref) => {
       const obj = objects.get(ref.objectId);
       if (!obj) return '?';
+      else if (obj.type == 'NoneType') return '텅빔';
       return formatValue(obj.value, obj.type);
     });
     if (type === 'list') return `[${elements.join(', ')}]`;
@@ -212,8 +213,8 @@ export class PyTransformer implements IFlowTransformer {
       };
 
       console.log('[PyTransformer] Converted:', {
-        names: names.map(n => ({name: n.name, scope: n.scope})),
-        objects: objects.map(o => ({id: o.id, type: o.type, value: o.value}))
+        names: names.map(n => ({ name: n.name, scope: n.scope })),
+        objects: objects.map(o => ({ id: o.id, type: o.type, value: o.value }))
       });
 
       return converted;
@@ -258,6 +259,15 @@ export class PyTransformer implements IFlowTransformer {
     // Python step 데이터 추출
     // 우선순위: pythonMemoryState > pyNames/pyObjects > names/objects
     const pyState = (convertedStep as any).pythonMemoryState;
+
+    // 감지: variables[]가 있는데 names[]가 비어있으면 변환 누락
+    if (pyState?.variables?.length > 0 && (!pyState?.names || pyState.names.length === 0)) {
+      console.error('[PyTransformer] ❌ variables[]는 있는데 names[]가 비어있음! 변환 누락:', {
+        step: (step as any).title || (step as any).line,
+        variablesCount: pyState.variables.length,
+      });
+    }
+
     const names: PyName[] = pyState?.names || (convertedStep as any).pyNames || (convertedStep as any).names || [];
     const objectsArray: PyObject[] = pyState?.objects || (convertedStep as any).pyObjects || (convertedStep as any).objects || [];
     const callStack: PyCallFrameSnapshot[] = (convertedStep as any).callStack || [];

@@ -19,10 +19,12 @@
 | | Python | 3.10+ | Python 인터프리터 |
 | | Node.js VM | - | JavaScript VM |
 | | JDI | - | Java 디버거 |
+| **Auth** | Firebase Auth | - | 인증 (Google/GitHub OAuth) |
+| **API 상태** | TanStack Query | 5+ | 서버 데이터 캐싱/페칭 |
 | **Testing** | Vitest | 4+ | 단위 테스트 |
 | | Playwright | - | E2E 테스트 |
-| **DevOps** | Docker | - | 컨테이너화 |
-| | Railway | - | 호스팅 |
+| **DevOps** | Docker | - | 컨테이너화 (백엔드) |
+| | Render | - | 호스팅 (프론트엔드 Static + 백엔드 Docker) |
 
 ---
 
@@ -35,9 +37,12 @@
   "react-dom": "^18.3.1",
   "framer-motion": "^11.x",
   "zustand": "^4.x",
+  "@tanstack/react-query": "^5.x",
   "tailwindcss": "^3.4.0",
   "lucide-react": "^0.x",
-  "@monaco-editor/react": "^4.x"
+  "@monaco-editor/react": "^4.x",
+  "sonner": "^1.x",
+  "firebase": "^10.x"
 }
 ```
 
@@ -47,6 +52,7 @@
   "express": "^4.18.0",
   "@prisma/client": "^5.x",
   "zod": "^3.x",
+  "firebase-admin": "^12.x",
   "dotenv": "^16.0.0"
 }
 ```
@@ -134,8 +140,7 @@ packages/backend/dist/         # Node.js 실행 가능
 ### 환경별 설정
 ```
 .env              # 로컬 개발 (git ignored)
-.env.production   # 프로덕션 (Railway env vars)
-.env.staging      # 스테이징 (테스트)
+.env.production   # 프로덕션 (Render env vars)
 ```
 
 ---
@@ -228,12 +233,13 @@ try {
 ## 🔒 보안 기술
 
 ### 인증
-- JWT 토큰 (Bearer)
-- HttpOnly 쿠키 (향후)
+- Firebase Authentication (Google/GitHub OAuth)
+- Firebase ID 토큰 (Bearer) → 백엔드 firebase-admin으로 검증
+- 미들웨어: `requireAuth`, `requireDbUser`, `optionalAuth`, `optionalDbUser`
 
 ### 인가
-- Role-based Access Control (RBAC)
-- User → Lesson → Submission 소유권 검증
+- Role-based Access Control (RBAC) — User.role: "user", "admin"
+- 인증 선택적 API (비로그인도 코스 조회 가능, 진행률은 로그인 필요)
 
 ### 데이터 보호
 - HTTPS (프로덕션)
@@ -266,10 +272,11 @@ pnpm --filter backend test
 
 ## 🔄 CI/CD 파이프라인
 
-### GitHub Actions
-- 푸시 시 테스트 자동 실행
-- PR 병합 전 빌드 검증
-- Railway 자동 배포
+### Render 자동 배포
+- Git push (main) → Render Webhook → 자동 빌드/배포
+- 프론트엔드: Render Static Site (빌드 + 정적 파일 서빙)
+- 백엔드: Render Docker (`prisma migrate deploy` → `prisma db seed` → `node dist/app.js`)
+- 레슨 JSON 수정 → push → 자동으로 DB 반영
 
 ---
 

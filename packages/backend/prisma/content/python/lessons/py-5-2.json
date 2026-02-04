@@ -14,18 +14,22 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
-            }
-          ],
           "output": [],
           "note": "클래스 정의 시작",
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
         }
       },
       {
@@ -38,18 +42,22 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "Cat",
-              "value": "<class with set_name>",
-              "type": "class",
-              "id": "0x1000"
-            }
-          ],
           "output": [],
           "note": "set_name 메서드 정의됨 (실행 안 됨)",
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with set_name>",
+              "pyId": "1001"
+            }
+          ]
         }
       },
       {
@@ -62,18 +70,22 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "Cat",
-              "value": "<class with set_name, meow>",
-              "type": "class",
-              "id": "0x1000"
-            }
-          ],
           "output": [],
           "note": "meow 메서드 정의됨 (실행 안 됨)",
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with set_name, meow>",
+              "pyId": "1001"
+            }
+          ]
         }
       },
       {
@@ -85,25 +97,34 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "첫 번째 Cat 객체 생성 (0x2000)",
+          "names": [
             {
               "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
+              "pointsTo": "class1"
             },
             {
               "name": "cat1",
-              "value": "<Cat object>",
-              "type": "instance",
-              "id": "0x2000",
+              "pointsTo": "instance1",
               "highlight": true
             }
           ],
-          "output": [],
-          "note": "첫 번째 Cat 객체 생성 (0x2000)",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
         }
       },
       {
@@ -115,24 +136,32 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "set_name 호출 → line 3으로 점프 예정",
+          "names": [
             {
               "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
+              "pointsTo": "class1"
             },
             {
               "name": "cat1",
-              "value": "<Cat object>",
-              "type": "instance",
-              "id": "0x2000"
+              "pointsTo": "instance1"
             }
           ],
-          "output": [],
-          "note": "set_name 호출 → line 3으로 점프 예정",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1002"
+            }
+          ]
         }
       },
       {
@@ -144,36 +173,56 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "cat1 객체에만 name 속성 추가",
+          "names": [
             {
               "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
+              "pointsTo": "class1"
             },
             {
               "name": "cat1",
-              "value": "<Cat object, name='Kitty'>",
-              "type": "instance",
-              "id": "0x2000",
+              "pointsTo": "instance1",
               "highlight": true
             },
             {
               "name": "self",
-              "value": "→ cat1 (0x2000)",
-              "type": "parameter",
+              "pointsTo": "parameter1",
               "highlight": true
             },
             {
               "name": "n",
-              "value": "\"Kitty\"",
-              "type": "parameter"
+              "pointsTo": "parameter2"
             }
           ],
-          "output": [],
-          "note": "cat1 객체에만 name 속성 추가",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ cat1 (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Kitty\"",
+              "pyId": "1004"
+            }
+          ]
         }
       },
       {
@@ -185,31 +234,44 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "두 번째 Cat 객체 생성 (cat2에는 name 없음)",
+          "names": [
             {
               "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
+              "pointsTo": "class1"
             },
             {
               "name": "cat1",
-              "value": "<Cat object, name='Kitty'>",
-              "type": "instance",
-              "id": "0x2000"
+              "pointsTo": "instance1"
             },
             {
               "name": "cat2",
-              "value": "<Cat object>",
-              "type": "instance",
-              "id": "0x3000",
+              "pointsTo": "instance2",
               "highlight": true
             }
           ],
-          "output": [],
-          "note": "두 번째 Cat 객체 생성 (cat2에는 name 없음)",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
         }
       },
       {
@@ -221,30 +283,42 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "set_name 호출 → line 3으로 점프 예정",
+          "names": [
             {
               "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
+              "pointsTo": "class1"
             },
             {
               "name": "cat1",
-              "value": "<Cat object, name='Kitty'>",
-              "type": "instance",
-              "id": "0x2000"
+              "pointsTo": "instance1"
             },
             {
               "name": "cat2",
-              "value": "<Cat object>",
-              "type": "instance",
-              "id": "0x3000"
+              "pointsTo": "instance2"
             }
           ],
-          "output": [],
-          "note": "set_name 호출 → line 3으로 점프 예정",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005"
+            }
+          ]
         }
       },
       {
@@ -256,42 +330,66 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "cat2 객체에만 name 속성 추가 (cat1과 독립적)",
+          "names": [
             {
               "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
+              "pointsTo": "class1"
             },
             {
               "name": "cat1",
-              "value": "<Cat object, name='Kitty'>",
-              "type": "instance",
-              "id": "0x2000"
+              "pointsTo": "instance1"
             },
             {
               "name": "cat2",
-              "value": "<Cat object, name='Nabi'>",
-              "type": "instance",
-              "id": "0x3000",
+              "pointsTo": "instance2",
               "highlight": true
             },
             {
               "name": "self",
-              "value": "→ cat2 (0x3000)",
-              "type": "parameter",
+              "pointsTo": "parameter3",
               "highlight": true
             },
             {
               "name": "n",
-              "value": "\"Nabi\"",
-              "type": "parameter"
+              "pointsTo": "parameter4"
             }
           ],
-          "output": [],
-          "note": "cat2 객체에만 name 속성 추가 (cat1과 독립적)",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "→ cat2 (0x3000)",
+              "pyId": "1006",
+              "highlight": true
+            },
+            {
+              "id": "parameter4",
+              "type": "parameter",
+              "value": "\"Nabi\"",
+              "pyId": "1007"
+            }
+          ]
         }
       },
       {
@@ -303,30 +401,42 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "meow 호출 → line 6으로 점프 예정",
+          "names": [
             {
               "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
+              "pointsTo": "class1"
             },
             {
               "name": "cat1",
-              "value": "<Cat object, name='Kitty'>",
-              "type": "instance",
-              "id": "0x2000"
+              "pointsTo": "instance1"
             },
             {
               "name": "cat2",
-              "value": "<Cat object, name='Nabi'>",
-              "type": "instance",
-              "id": "0x3000"
+              "pointsTo": "instance2"
             }
           ],
-          "output": [],
-          "note": "meow 호출 → line 6으로 점프 예정",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005"
+            }
+          ]
         }
       },
       {
@@ -338,37 +448,55 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
-            },
-            {
-              "name": "cat1",
-              "value": "<Cat object, name='Kitty'>",
-              "type": "instance",
-              "id": "0x2000"
-            },
-            {
-              "name": "cat2",
-              "value": "<Cat object, name='Nabi'>",
-              "type": "instance",
-              "id": "0x3000"
-            },
-            {
-              "name": "self",
-              "value": "→ cat1 (0x2000)",
-              "type": "parameter",
-              "highlight": true
-            }
-          ],
           "output": [
             "Kitty says Meow!"
           ],
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ cat1 (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
         }
       },
       {
@@ -380,32 +508,44 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
-            },
-            {
-              "name": "cat1",
-              "value": "<Cat object, name='Kitty'>",
-              "type": "instance",
-              "id": "0x2000"
-            },
-            {
-              "name": "cat2",
-              "value": "<Cat object, name='Nabi'>",
-              "type": "instance",
-              "id": "0x3000"
-            }
-          ],
           "output": [
             "Kitty says Meow!"
           ],
           "note": "meow 호출 → line 6으로 점프 예정",
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005"
+            }
+          ]
         }
       },
       {
@@ -417,39 +557,57 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "Cat",
-              "value": "<class>",
-              "type": "class",
-              "id": "0x1000"
-            },
-            {
-              "name": "cat1",
-              "value": "<Cat object, name='Kitty'>",
-              "type": "instance",
-              "id": "0x2000"
-            },
-            {
-              "name": "cat2",
-              "value": "<Cat object, name='Nabi'>",
-              "type": "instance",
-              "id": "0x3000"
-            },
-            {
-              "name": "self",
-              "value": "→ cat2 (0x3000)",
-              "type": "parameter",
-              "highlight": true
-            }
-          ],
           "output": [
             "Kitty says Meow!",
             "Nabi says Meow!"
           ],
           "note": "각 객체가 자신만의 name을 출력",
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "→ cat2 (0x3000)",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
         }
       }
     ]

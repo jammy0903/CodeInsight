@@ -15,18 +15,22 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "add",
-              "value": "<function(a, b=10)>",
-              "type": "function",
-              "id": "0x1000"
-            }
-          ],
           "output": [],
           "note": "함수 정의됨 (b의 기본값: 10)",
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            }
+          ]
         }
       },
       {
@@ -38,18 +42,22 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "add",
-              "value": "<function(a, b=10)>",
-              "type": "function",
-              "id": "0x1000"
-            }
-          ],
           "output": [],
           "note": "add(5, 3) 호출 → line 2로 점프 예정",
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            }
+          ]
         }
       },
       {
@@ -61,35 +69,56 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "a=5, b=3 → return 8 → res1=8",
+          "names": [
             {
               "name": "add",
-              "value": "<function(a, b=10)>",
-              "type": "function",
-              "id": "0x1000"
+              "pointsTo": "function1"
             },
             {
               "name": "a",
-              "value": "5",
-              "type": "int (parameter)",
+              "pointsTo": "int1",
               "highlight": true
             },
             {
               "name": "b",
-              "value": "3",
-              "type": "int (parameter)",
+              "pointsTo": "int2",
               "highlight": true
             },
             {
               "name": "res1",
-              "value": "8",
-              "type": "int"
+              "pointsTo": "int3"
             }
           ],
-          "output": [],
-          "note": "a=5, b=3 → return 8 → res1=8",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 5,
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            }
+          ]
         }
       },
       {
@@ -101,23 +130,32 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "키워드 인자 → 순서 무관 (b=5, a=3)",
+          "names": [
             {
               "name": "add",
-              "value": "<function(a, b=10)>",
-              "type": "function",
-              "id": "0x1000"
+              "pointsTo": "function1"
             },
             {
               "name": "res1",
-              "value": "8",
-              "type": "int"
+              "pointsTo": "int3"
             }
           ],
-          "output": [],
-          "note": "키워드 인자 → 순서 무관 (b=5, a=3)",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            }
+          ]
         }
       },
       {
@@ -129,40 +167,66 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "a=3, b=5 → return 8 → res2=8",
+          "names": [
             {
               "name": "add",
-              "value": "<function(a, b=10)>",
-              "type": "function",
-              "id": "0x1000"
+              "pointsTo": "function1"
             },
             {
               "name": "a",
-              "value": "3",
-              "type": "int (parameter)",
+              "pointsTo": "int4",
               "highlight": true
             },
             {
               "name": "b",
-              "value": "5",
-              "type": "int (parameter)",
+              "pointsTo": "int5",
               "highlight": true
             },
             {
               "name": "res1",
-              "value": "8",
-              "type": "int"
+              "pointsTo": "int3"
             },
             {
               "name": "res2",
-              "value": "8",
-              "type": "int"
+              "pointsTo": "int6"
             }
           ],
-          "output": [],
-          "note": "a=3, b=5 → return 8 → res2=8",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006",
+              "highlight": true
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 8,
+              "pyId": "1007"
+            }
+          ]
         }
       },
       {
@@ -174,28 +238,42 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "b 생략 → 기본값 10 사용",
+          "names": [
             {
               "name": "add",
-              "value": "<function(a, b=10)>",
-              "type": "function",
-              "id": "0x1000"
+              "pointsTo": "function1"
             },
             {
               "name": "res1",
-              "value": "8",
-              "type": "int"
+              "pointsTo": "int3"
             },
             {
               "name": "res2",
-              "value": "8",
-              "type": "int"
+              "pointsTo": "int6"
             }
           ],
-          "output": [],
-          "note": "b 생략 → 기본값 10 사용",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 8,
+              "pyId": "1007"
+            }
+          ]
         }
       },
       {
@@ -207,45 +285,76 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
+          "output": [],
+          "note": "a=7, b=10(기본값) → return 17 → res3=17",
+          "names": [
             {
               "name": "add",
-              "value": "<function(a, b=10)>",
-              "type": "function",
-              "id": "0x1000"
+              "pointsTo": "function1"
             },
             {
               "name": "a",
-              "value": "7",
-              "type": "int (parameter)",
+              "pointsTo": "int7",
               "highlight": true
             },
             {
               "name": "b",
-              "value": "10",
-              "type": "int (parameter, default)",
+              "pointsTo": "int8",
               "highlight": true
             },
             {
               "name": "res1",
-              "value": "8",
-              "type": "int"
+              "pointsTo": "int3"
             },
             {
               "name": "res2",
-              "value": "8",
-              "type": "int"
+              "pointsTo": "int6"
             },
             {
               "name": "res3",
-              "value": "17",
-              "type": "int"
+              "pointsTo": "int9"
             }
           ],
-          "output": [],
-          "note": "a=7, b=10(기본값) → return 17 → res3=17",
-          "names": [],
-          "objects": []
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 7,
+              "pyId": "1008",
+              "highlight": true
+            },
+            {
+              "id": "int8",
+              "type": "int",
+              "value": 10,
+              "pyId": "1009",
+              "highlight": true
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 8,
+              "pyId": "1007"
+            },
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 17,
+              "pyId": "1010"
+            }
+          ]
         }
       },
       {
@@ -257,34 +366,53 @@
         ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "add",
-              "value": "<function(a, b=10)>",
-              "type": "function",
-              "id": "0x1000"
-            },
-            {
-              "name": "res1",
-              "value": "8",
-              "type": "int"
-            },
-            {
-              "name": "res2",
-              "value": "8",
-              "type": "int"
-            },
-            {
-              "name": "res3",
-              "value": "17",
-              "type": "int"
-            }
-          ],
           "output": [
             "8 8 17"
           ],
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "res1",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "res2",
+              "pointsTo": "int6"
+            },
+            {
+              "name": "res3",
+              "pointsTo": "int9"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 8,
+              "pyId": "1007"
+            },
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 17,
+              "pyId": "1010"
+            }
+          ]
         }
       }
     ]

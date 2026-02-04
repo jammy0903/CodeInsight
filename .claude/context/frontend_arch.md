@@ -147,18 +147,24 @@ export function useUserProgress(lessonId: string | undefined) {
   - 로컬 상태로 충분한 경우
 
 ### 주요 디렉토리 구조 (`src/`)
-- **`components/`**: 버튼, 입력창, 모달 등 재사용 가능한 공통 UI 컴포넌트.
-- **`features/`**: 특정 기능(도메인)과 관련된 컴포넌트와 로직. 페이지 레벨의 컴포넌트(`courses`, `playground`)나, 특정 기능에 대한 집합(`visualizers`)이 여기에 위치합니다. (예: `auth`, `courses`, `visualizers`)
-  - **`features/visualizers/`**: 언어별 코드 시각화 컴포넌트 모음
-    - `js/` - JavaScript 전용 (EventLoop, Closure, Prototype 등)
-    - `python/` - Python 시각화
-    - `java/` - Java 메모리 시각화
-    - `flow/` - 범용 플로우차트 시각화
-    - `shared/` - 여러 언어에서 공통으로 사용하는 시각화 (CallStack, ScopeChain 등)
-- **`hooks/`**: 여러 컴포넌트에서 재사용되는 커스텀 훅. (예: `useAuth`, `useDebounce`)
+- **`components/`**: 버튼, 입력창, 모달, Toast 등 재사용 가능한 공통 UI 컴포넌트.
+- **`features/`**: 특정 기능(도메인)과 관련된 컴포넌트와 로직. 페이지 레벨의 컴포넌트(`courses`, `playground`)나, 특정 기능에 대한 집합(`visualizers`)이 여기에 위치합니다.
+  - **`features/courses/`**: 코스/레슨 페이지 (CoursesPage, LessonPage 등)
+  - **`features/playground/`**: 플레이그라운드 페이지
+  - **`features/visualizers/`**: 언어별 코드 시각화 컴포넌트 모음 (핵심!)
+    - `flow/` - 범용 플로우 시각화 (어댑터 패턴 기반)
+      - `flow/adapters/python/` - Python 어댑터 (PyTransformer, PyStyler, PyAnimator)
+      - `flow/adapters/javascript/` - JS 어댑터
+      - `flow/adapters/java/` - Java 어댑터
+      - `flow/adapters/c/` - C 어댑터
+      - `flow/components/` - PythonFlowView, JSFlowView 등 렌더링 컴포넌트
+    - `memory/` - C/Java 메모리 시각화 (스택/힙)
+    - `shared/` - 여러 언어에서 공통으로 사용하는 시각화 (CallStack, ScopeChain, TerminalOutput)
+    - `c/`, `java/` - 언어별 특화 시각화
+- **`hooks/`**: 여러 컴포넌트에서 재사용되는 커스텀 훅. (예: `useAuth`, `useCourses`, `useDebounce`)
 - **`layouts/`**: 페이지의 전체적인 레이아웃(예: 헤더, 사이드바 포함)을 정의하는 컴포넌트.
-- **`services/`**: 백엔드 API 호출을 담당하는 함수들.
-- **`stores/`**: Zustand를 사용한 전역 상태 관리 로직.
+- **`services/`**: 백엔드 API 호출을 담당하는 함수들. (api/, simulator/, courses.ts, ai.ts 등)
+- **`stores/`**: Zustand를 사용한 전역 상태 관리 로직. (authStore, simulatorStore, themeStore 등)
 - **`utils/`**: 날짜 포맷팅, 문자열 처리 등 범용 헬퍼 함수.
 - **`lib/`**: 외부 라이브러리 설정이나 인스턴스를 관리. (예: `firebase.ts`)
 
@@ -166,32 +172,147 @@ export function useUserProgress(lessonId: string | undefined) {
 
 ```
 features/visualizers/
-├── js/                    # JavaScript 전용 시각화
-│   ├── index.ts          # JSVisualizerView, EventLoopView export
-│   ├── types.ts          # JS 시각화 타입 정의
-│   ├── JSVisualizerView.tsx  # 타입별 라우팅 컴포넌트
+├── flow/                           # ⭐ 범용 플로우 시각화 (핵심!)
+│   ├── FlowVisualizer.tsx         # Playground 모드 진입점
+│   ├── LessonFlowVisualizer.tsx   # Lesson 모드 진입점
+│   ├── index.ts
+│   ├── styles.ts
+│   ├── adapters/                  # 언어별 어댑터 (Transformer + Styler + Animator)
+│   │   ├── base/
+│   │   │   ├── types.ts           # IFlowAdapter, IFlowTransformer 인터페이스
+│   │   │   └── index.ts
+│   │   ├── python/                # Python 어댑터
+│   │   │   ├── PyTransformer.ts   # names/objects → FlowStep 변환
+│   │   │   ├── PyStyler.ts        # 테마별 스타일링
+│   │   │   ├── PyAnimator.ts      # 애니메이션 정의
+│   │   │   └── index.ts           # pythonAdapter 팩토리
+│   │   ├── javascript/            # JS 어댑터
+│   │   │   ├── JSTransformer.ts
+│   │   │   ├── JSStyler.ts
+│   │   │   ├── JSAnimator.ts
+│   │   │   └── index.ts
+│   │   ├── java/                  # Java 어댑터
+│   │   │   ├── JavaTransformer.ts
+│   │   │   ├── JavaStyler.ts
+│   │   │   ├── JavaAnimator.ts
+│   │   │   └── index.ts
+│   │   ├── c/                     # C 어댑터
+│   │   │   ├── CTransformer.ts
+│   │   │   ├── CStyler.ts
+│   │   │   ├── CAnimator.ts
+│   │   │   └── index.ts
+│   │   └── index.ts               # getAdapter() 레지스트리 + 팩토리
+│   ├── components/                # 언어별 렌더링 컴포넌트
+│   │   ├── PythonFlowView.tsx     # Python 포스트잇(이름표+객체) 시각화
+│   │   ├── JSFlowView.tsx         # JS 시각화
+│   │   ├── JavaFlowView.tsx       # Java 시각화
+│   │   ├── VariableBox.tsx        # 변수 박스 (C 등)
+│   │   ├── FunctionFrame.tsx      # 함수 프레임
+│   │   ├── ArrowLayer.tsx         # 참조 화살표
+│   │   ├── LoopTrack.tsx          # 루프 시각화
+│   │   └── ControlFlowOverlay.tsx # 제어 흐름 오버레이
+│   └── hooks/
+│       ├── useFlowDiff.ts         # 스텝 간 diff 계산
+│       └── useAnimationQueue.ts   # 애니메이션 큐
+├── memory/                         # C/Java 메모리 시각화
+│   ├── LessonMemoryVisualizer.tsx
+│   └── adapters/
+│       ├── CMemoryAdapter.ts
+│       └── JavaMemoryAdapter.ts
+├── c/                              # C 특화 시각화
+│   ├── CMemoryView.tsx
+│   └── constants.ts
+├── java/                           # Java 특화 시각화
+│   ├── JavaMemoryView.tsx
+│   └── adapters/
+│       └── toJavaMemoryView.ts
+├── shared/                         # 공통 시각화 컴포넌트
 │   ├── components/
-│   │   ├── EventLoopView.tsx
-│   │   ├── ClosureView.tsx
-│   │   ├── PrototypeChainView.tsx
-│   │   └── ...
-│   ├── hooks/
-│   │   └── useJsToFlow.ts
-│   └── services/
-│       └── jsVisualizerService.ts
-├── python/               # Python 시각화
-├── java/                 # Java 시각화
-├── flow/                 # 범용 플로우차트
-└── shared/               # 공통 시각화 컴포넌트
-    ├── components/
-    │   └── CallStackView.tsx
-    └── types.ts
+│   │   ├── CallStackView.tsx
+│   │   ├── ReturnOverlay.tsx
+│   │   ├── ScopeChainView.tsx
+│   │   └── TerminalOutput.tsx
+│   ├── constants.ts
+│   └── types.ts
+└── core/
+    └── event-processor.ts
 ```
 
 **⚠️ 주의사항**:
-- `js-visualizer/` 경로는 **폐기됨** → `visualizers/js/` 사용
-- 새로운 시각화 추가 시 해당 언어 폴더 아래에 배치
+- `js-visualizer/` 경로는 **폐기됨** → `visualizers/flow/` 사용
+- 새로운 언어 시각화 추가 시 `flow/adapters/{lang}/`에 어댑터 생성
+- 언어별 렌더링 컴포넌트는 `flow/components/`에 배치
 - 여러 언어에서 공통으로 사용하는 컴포넌트는 `shared/`에 배치
+
+### Python 시각화 파이프라인 (names/objects → 포스트잇)
+
+Python은 모든 변수가 **참조(이름표)**인 언어이므로, 전용 시각화 모델을 사용한다:
+
+```
+┌─────────────────────────────────────────────────────┐
+│ Lesson JSON (pythonMemoryState)                     │
+│  names: [{ name: "x", pointsTo: "int1" }]          │
+│  objects: [{ id: "int1", type: "int", value: 42 }]  │
+└───────────────────┬─────────────────────────────────┘
+                    │ PyTransformer.transform(step)
+                    ▼
+┌─────────────────────────────────────────────────────┐
+│ FlowStep (공통 포맷)                                 │
+│  - objectMap: id → PyObject 매핑                     │
+│  - namesByObject: objectId → PyName[] 그루핑         │
+│  - output[], note                                    │
+└───────────────────┬─────────────────────────────────┘
+                    │ PythonFlowView
+                    ▼
+┌─────────────────────────────────────────────────────┐
+│ 렌더링 (포스트잇 메타포)                              │
+│  - 이름표(name) → 객체(object) 화살표 연결            │
+│  - 타입별 색상: mutable(초록) / immutable(보라)       │
+│  - 타입별 이모지: 🔢 int, 📝 str, 📋 list 등        │
+│  - 콜 스택 프레임 내 로컬 변수 렌더링                 │
+│  - highlight: 현재 스텝에서 변경된 항목 강조           │
+└─────────────────────────────────────────────────────┘
+```
+
+**어댑터 인터페이스:**
+```typescript
+interface IFlowAdapter {
+  language: string;
+  transformer: IFlowTransformer;  // PyTransformer (데이터 변환)
+  styler: IFlowStyler;            // PyStyler (테마별 스타일)
+  animator: IFlowAnimator;        // PyAnimator (Framer Motion 정의)
+}
+
+// 레지스트리 사용법:
+const adapter = getAdapter('python');       // 싱글톤 반환
+const adapter = createAdapter('python', 'dark'); // 테마별 생성
+```
+
+**PyTransformer 핵심 타입:**
+```typescript
+interface PyName {
+  name: string;           // 변수 이름
+  pointsTo: string;       // 참조하는 object.id ("int1", "list1" 등)
+  highlight?: boolean;    // 현재 스텝에서 변경됨
+}
+
+interface PyObject {
+  id: string;             // "{type}{counter}" (int1, str2, list1)
+  type: string;           // "int", "str", "list", "function", "class", "instance"
+  value: unknown;         // 42, "\"hello\"", "[1, 2, 3]"
+  pyId?: string;          // 고유 ID "1001"부터 증가
+  highlight?: boolean;
+}
+```
+
+**공유 참조 시각화** (Ch7 핵심):
+```
+a ─────→ ┌──────────┐ ←───── b
+          │ list1    │
+          │ [1, 2, 3]│
+          └──────────┘
+// 같은 pointsTo → 같은 객체를 가리킴
+```
 
 ---
 
