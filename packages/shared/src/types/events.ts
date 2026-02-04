@@ -14,7 +14,7 @@ export type {
   // 값 타입
   VisualizationValue,
 
-  // 이벤트 타입
+  // 이벤트 타입 (legacy 7)
   FrameEvent,
   VariableEvent,
   PointerEvent,
@@ -23,8 +23,14 @@ export type {
   WarningEvent,
   HighlightEvent,
 
+  // 이벤트 타입 (new 3)
+  ScopeEvent,
+  ObjectEvent,
+  BindingEvent,
+
   // 통합 이벤트
   VisualizationEvent,
+  SimulatorEvent,
   StepEvents,
 
   // 프론트엔드 상태

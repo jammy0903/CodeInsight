@@ -33,6 +33,7 @@ import {
   JavaScriptDebuggerClient,
   JavaScriptSnapshot,
 } from './engine/debugger-client';
+import { normalizeJsSnapshots } from './normalizer';
 
 // ═══════════════════════════════════════════════════════
 // 에러 코드 정의
@@ -78,6 +79,7 @@ export class SimulationError extends Error {
 export interface JavaScriptSimulationResult {
   success: boolean;
   steps?: JavaScriptSnapshot[];
+  normalizedSteps?: import('./normalizer').NormalizedJsStep[];
   error?: {
     code: SimulationErrorCode;
     message: string;
@@ -266,10 +268,16 @@ export class JavaScriptSimulationService {
       //    - 소스 코드 라인 추가 (code 필드)
       const processedSnapshots = this.processSnapshots(snapshots, sourceCode);
 
-      // 🎉 성공 반환
+      // ═══════════════════════════════════════════════════════
+      // 5️⃣ Normalize: SimulatorEvent[] 추가 (dual path)
+      // ═══════════════════════════════════════════════════════
+      const normalizedSteps = normalizeJsSnapshots(processedSnapshots);
+
+      // 🎉 성공 반환 (기존 snapshot 보존 + normalizedEvents 추가)
       return {
         success: true,
         steps: processedSnapshots,
+        normalizedSteps,
       };
 
     } catch (error: unknown) {
