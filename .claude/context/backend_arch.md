@@ -973,7 +973,13 @@ content/
 │   └── lessons/
 ├── python/
 │   ├── curriculum.json
-│   └── lessons/
+│   ├── lessons/
+│   │   ├── py-1-1.json ~ py-1-5.json   # Ch1 변수와 타입
+│   │   ├── py-2-1.json ~ py-2-5.json   # Ch2 조건문/반복문
+│   │   ├── ...
+│   │   └── py-10-1.json ~ py-10-4.json # Ch10 GIL/async
+│   └── scripts/
+│       └── convert-to-names-objects.mjs # names/objects 변환 스크립트
 └── quizzes/                 # 독립 퀴즈 (2026-01-27 추가)
     ├── c/
     │   └── ox/
@@ -985,34 +991,112 @@ content/
     └── python/
 ```
 
-### 레슨 JSON 형식
+### lessonContentLoader — 하이브리드 콘텐츠 로딩
 
+**파일**: `src/services/lessonContentLoader.ts`
+
+레슨 콘텐츠는 **DB 메타데이터 + JSON 파일 콘텐츠**를 하이브리드로 로딩한다:
+
+```
+┌─────────────────────────────────────────────────────┐
+│ 서버 시작 시: scanFilePaths()                        │
+│  content/ 디렉토리 스캔 → fileMap (lessonId → path)  │
+│  ※ 파일 내용은 읽지 않음 (경로만 매핑)               │
+└───────────────────┬─────────────────────────────────┘
+                    │
+                    ▼ 요청 시
+┌─────────────────────────────────────────────────────┐
+│ getContent(lessonId)                                 │
+│  1. 메모리 캐시 확인 → 히트 시 즉시 반환 (~0.1ms)    │
+│  2. 캐시 미스 → JSON 파일 읽기 (~5ms)               │
+│  3. 파싱 + 캐시 저장 + 반환                          │
+└─────────────────────────────────────────────────────┘
+```
+
+**특징:**
+- 지연 로딩: 요청이 올 때만 파일 읽기
+- 메모리 캐시: 반복 요청 시 ~0.1ms 응답
+- Dev 모드: 파일 변경 감시 (HMR 지원), 변경 시 캐시 무효화
+- 에러 복원력: 콘텐츠 디렉토리 없어도 앱 정상 동작
+
+**API에서의 병합 (courses/routes.ts):**
+```typescript
+// GET /api/courses/lessons/:id
+const dbLesson = await courseService.getLessonFull(id);      // DB 메타
+const jsonContent = await lessonContentLoader.getContent(id); // JSON 콘텐츠
+// 두 소스를 병합하여 응답
+```
+
+### 레슨 JSON 형식 (언어별)
+
+**C 레슨:**
 ```json
 {
   "id": "c-1-1",
   "title": "변수와 메모리",
-  "description": "...",
-  "difficulty": "basic",
-  "estimatedTime": 15,
-  "language": "c",
-  "code": "int x = 5;\nint y = x + 10;",
-  "steps": [
-    {
-      "line": 1,
-      "title": "변수 선언",
-      "description": "int x = 5;는 정수형 변수 x를 선언하고..."
-    }
-  ],
-  "quizzes": [
-    {
-      "type": "ox",
-      "question": "변수는 메모리에 저장되는가?",
-      "answer": "true",
-      "explanation": "..."
-    }
-  ]
+  "content": {
+    "code": "int x = 5;\nint y = x + 10;",
+    "steps": [
+      {
+        "line": 1,
+        "title": "변수 선언",
+        "explanation": "int x = 5;는 정수형 변수 x를 선언하고...",
+        "highlight": [1]
+      }
+    ]
+  },
+  "quizzes": [{ "type": "ox", "question": "...", "answer": "true" }]
 }
 ```
+
+**Python 레슨** (names/objects 참조 모델):
+```json
+{
+  "id": "py-3-1",
+  "chapterId": "python-ch3",
+  "title": "Lists (Mutable)",
+  "content": {
+    "code": "fruits = [\"Apple\", \"Banana\"]\nfruits.append(\"Orange\")",
+    "language": "python",
+    "steps": [
+      {
+        "line": 2,
+        "title": "리스트 생성",
+        "explanation": "대괄호 []로 리스트 객체를 만들고...",
+        "highlight": [2],
+        "visualizationType": "pythonMemory",
+        "pythonMemoryState": {
+          "names": [
+            { "name": "fruits", "pointsTo": "list1" }
+          ],
+          "objects": [
+            { "id": "list1", "type": "list", "value": "[\"Apple\", \"Banana\"]", "pyId": "1001" }
+          ],
+          "output": [],
+          "note": "리스트 객체가 생성되었습니다"
+        }
+      }
+    ]
+  },
+  "quizzes": [{ "type": "multiple_choice", "question": "...", "options": [...], "answer": "2" }]
+}
+```
+
+#### Python pythonMemoryState 구조
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `names[]` | PyName[] | 변수 이름표 — `{ name, pointsTo, highlight? }` |
+| `objects[]` | PyObject[] | 객체 — `{ id, type, value, pyId?, highlight? }` |
+| `output[]` | string[] | 터미널 출력 |
+| `note` | string | 시각화 하단 설명 메모 |
+
+**Object ID 규칙:** `{type}{counter}` (예: `int1`, `str2`, `list1`, `function3`)
+**pyId 규칙:** `"1001"`부터 순차 증가
+**공유 참조:** 같은 `pointsTo` → 같은 객체 (예: `a = b = [1,2]`)
+**highlight:** `true`이면 현재 스텝에서 변경된 항목
+
+**⚠️ 참고:** Python 레슨에서 `variables[]`는 더 이상 사용하지 않음 — 모든 Python 레슨은 `names[]/objects[]` 전용
 
 ### 퀴즈 JSON 형식
 
