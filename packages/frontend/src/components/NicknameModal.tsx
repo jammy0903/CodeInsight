@@ -57,7 +57,7 @@ export function NicknameModal() {
         setMessage('사용 가능한 닉네임입니다');
       } else {
         setStatus('invalid');
-        setMessage(result.message || '이미 사용 중인 닉네임입니다');
+        setMessage(result.error || '이미 사용 중인 닉네임입니다');
       }
     } catch (error) {
       setStatus('invalid');

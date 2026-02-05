@@ -13,7 +13,7 @@ import type { AppUser } from '@/stores/store';
  */
 interface CheckNicknameResponse {
   available: boolean;
-  message?: string;
+  error?: string;  // 오류 원인 (백엔드에서 error 필드로 반환)
 }
 
 /**
