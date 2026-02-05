@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useStore } from '@/stores/store';
 import {
@@ -30,14 +31,15 @@ import { StandaloneQuizSection } from './components/StandaloneQuizSection';
 
 type Period = '7d' | '30d' | '90d' | '1y';
 
-const PERIOD_LABELS: Record<Period, string> = {
-  '7d': '최근 7일',
-  '30d': '최근 30일',
-  '90d': '최근 90일',
-  '1y': '최근 1년',
+const PERIOD_KEYS: Record<Period, string> = {
+  '7d': 'report.period_7d',
+  '30d': 'report.period_30d',
+  '90d': 'report.period_90d',
+  '1y': 'report.period_1y',
 };
 
 export function ReportPage() {
+  const { t } = useTranslation();
   const { appUser, setPageTitle } = useStore();
   const { streak, loading: streakLoading } = useStreak();
 
@@ -50,8 +52,8 @@ export function ReportPage() {
 
   // 페이지 제목 설정
   useEffect(() => {
-    setPageTitle('나의 학습', '학습 현황과 패턴을 분석합니다');
-  }, [setPageTitle]);
+    setPageTitle(t('report.title'), t('report.subtitle'));
+  }, [setPageTitle, t]);
 
   // 데이터 로드
   useEffect(() => {
@@ -68,7 +70,7 @@ export function ReportPage() {
         const data = await getAnalyticsSummary(period);
         setSummary(data);
       } catch (err) {
-        setError('데이터를 불러오는 중 오류가 발생했습니다.');
+        setError(t('report.data_load_error'));
       } finally {
         setLoading(false);
       }
@@ -117,14 +119,14 @@ export function ReportPage() {
           <LogIn className="w-10 h-10 text-amber-600" />
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)] mb-2">로그인이 필요합니다</h2>
-          <p className="text-[var(--theme-dashboard-text-muted)]">학습 리포트를 보려면 먼저 로그인해주세요.</p>
+          <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)] mb-2">{t('errors.auth_required')}</h2>
+          <p className="text-[var(--theme-dashboard-text-muted)]">{t('report.login_required_desc')}</p>
         </div>
         <Link
           to="/"
           className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
         >
-          홈으로 이동
+          {t('report.go_home')}
         </Link>
       </div>
     );
@@ -140,7 +142,7 @@ export function ReportPage() {
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             className="w-10 h-10 border-3 border-amber-200 border-t-amber-500 rounded-full"
           />
-          <p className="text-[var(--theme-dashboard-text-muted)]">데이터를 불러오는 중...</p>
+          <p className="text-[var(--theme-dashboard-text-muted)]">{t('report.loading_data')}</p>
         </div>
       </div>
     );
@@ -156,7 +158,7 @@ export function ReportPage() {
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-[var(--theme-dashboard-section-header-bg)] hover:bg-[var(--theme-dashboard-progress-bg)] rounded-lg transition-colors"
         >
-          다시 시도
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -170,14 +172,14 @@ export function ReportPage() {
           <TrendingUp className="w-10 h-10 text-[var(--theme-dashboard-text-muted)]" />
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)] mb-2">아직 학습 데이터가 없어요</h2>
-          <p className="text-[var(--theme-dashboard-text-muted)]">레슨을 학습하면 여기에 분석 결과가 표시됩니다.</p>
+          <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)] mb-2">{t('report.no_data')}</h2>
+          <p className="text-[var(--theme-dashboard-text-muted)]">{t('report.no_data_desc')}</p>
         </div>
         <Link
           to="/courses"
           className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
         >
-          학습 시작하기
+          {t('report.start_learning')}
         </Link>
       </div>
     );
@@ -189,17 +191,17 @@ export function ReportPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">
-            {appUser.nickname}님의 학습 현황
+            {t('report.user_status', { name: appUser.nickname })}
           </h1>
           <p className="text-[var(--theme-dashboard-text-muted)] mt-1">
             <Calendar className="w-4 h-4 inline-block mr-1" />
-            {PERIOD_LABELS[period]} 기준
+            {t('report.period_based', { period: t(PERIOD_KEYS[period]) })}
           </p>
         </div>
 
         {/* Period Selector */}
         <div className="flex gap-2">
-          {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+          {(Object.keys(PERIOD_KEYS) as Period[]).map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
@@ -209,7 +211,7 @@ export function ReportPage() {
                   : 'bg-[var(--theme-dashboard-section-header-bg)] text-[var(--theme-dashboard-text-muted)] hover:bg-[var(--theme-dashboard-progress-bg)]'
               }`}
             >
-              {PERIOD_LABELS[p]}
+              {t(PERIOD_KEYS[p])}
             </button>
           ))}
         </div>
