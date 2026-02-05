@@ -12,6 +12,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, Crown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle, loginWithKakao } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
@@ -21,24 +22,25 @@ const SIDEBAR_WIDTH = 224; // 14rem
 
 interface NavItem {
   path: string;
-  label: string;
+  labelKey: string; // i18n translation key
   icon: React.ComponentType<{ className?: string }>;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { path: '/', label: '홈', icon: Home },
-  { path: '/courses', label: 'Courses', icon: BookOpen },
-  { path: '/playground', label: 'Playground', icon: Play },
+  { path: '/', labelKey: 'nav.home', icon: Home },
+  { path: '/courses', labelKey: 'nav.courses', icon: BookOpen },
+  { path: '/playground', labelKey: 'nav.playground', icon: Play },
 ];
 
 // 로그인 필수 탭들 (프로필은 프로필 카드 클릭으로 이동)
 const AUTH_NAV_ITEMS: NavItem[] = [
-  { path: '/quiz', label: '퀴즈', icon: FileQuestion },
-  { path: '/report', label: '나의 학습', icon: BarChart3 },
+  { path: '/quiz', labelKey: 'nav.quiz', icon: FileQuestion },
+  { path: '/report', labelKey: 'nav.report', icon: BarChart3 },
 ];
 
 export function Sidebar() {
   const location = useLocation();
+  const { t } = useTranslation();
   const { sidebarOpen, toggleSidebar, firebaseUser, appUser, needsRegistration } = useStore();
   const isAdmin = appUser?.role === 'admin';
 
@@ -74,7 +76,7 @@ export function Sidebar() {
             transition={{ duration: 0.2 }}
             onClick={toggleSidebar}
             className="fixed inset-0 bg-black/50 z-40"
-            aria-label="사이드바 닫기"
+            aria-label={t('nav.close_sidebar')}
           />
 
           {/* 사이드바 */}
@@ -114,7 +116,7 @@ export function Sidebar() {
                   e.currentTarget.style.backgroundColor = 'transparent';
                   e.currentTarget.style.borderColor = 'var(--theme-sidebar-close-btn-border)';
                 }}
-                aria-label="사이드바 닫기"
+                aria-label={t('nav.close_sidebar')}
               >
                 <X className="w-5 h-5" style={{ color: 'var(--theme-sidebar-close-icon)' }} />
               </motion.button>
@@ -165,7 +167,7 @@ export function Sidebar() {
                       }}
                     >
                       <Icon className="w-5 h-5 shrink-0" />
-                      <span className="text-sm">{item.label}</span>
+                      <span className="text-sm">{t(item.labelKey)}</span>
                     </Link>
                   </motion.div>
                 );
@@ -215,7 +217,7 @@ export function Sidebar() {
                       }}
                     >
                       <Icon className="w-5 h-5 shrink-0" />
-                      <span className="text-sm">{item.label}</span>
+                      <span className="text-sm">{t(item.labelKey)}</span>
                     </Link>
                   </motion.div>
                 );
@@ -290,7 +292,7 @@ export function Sidebar() {
                       }}
                     >
                       <UserPlus className="w-5 h-5" />
-                      닉네임 설정하기
+                      {t('auth.set_nickname')}
                     </motion.button>
                   ) : (
                     <>
@@ -343,7 +345,7 @@ export function Sidebar() {
                         }}
                       >
                         <Crown className="w-4 h-4" />
-                        구독 관리
+                        {t('nav.subscription')}
                       </Link>
                     </>
                   )}
@@ -367,7 +369,7 @@ export function Sidebar() {
                     }}
                   >
                     <LogOut className="w-4 h-4" />
-                    로그아웃
+                    {t('auth.logout')}
                   </motion.button>
                 </div>
               ) : (
@@ -411,7 +413,7 @@ export function Sidebar() {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                       />
                     </svg>
-                    Google 로그인
+                    {t('auth.login_google')}
                   </motion.button>
 
                   {/* 카카오 로그인 */}
@@ -439,7 +441,7 @@ export function Sidebar() {
                         d="M12 3C6.477 3 2 6.463 2 10.691c0 2.693 1.775 5.063 4.445 6.412-.144.523-.926 3.369-.963 3.592 0 0-.02.166.088.229.108.063.235.015.235.015.31-.043 3.593-2.363 4.159-2.771.339.047.686.071 1.036.071 5.523 0 10-3.463 10-7.548C22 6.463 17.523 3 12 3z"
                       />
                     </svg>
-                    카카오 로그인
+                    {t('auth.login_kakao')}
                   </motion.button>
 
                   <p className="text-xs text-center pt-1" style={{ color: 'var(--theme-sidebar-copyright-text)' }}>

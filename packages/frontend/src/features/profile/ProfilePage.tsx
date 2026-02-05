@@ -9,8 +9,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ChevronRight, Check, Loader2, Edit2, X, LogOut, AlertTriangle } from 'lucide-react';
+import { User, ChevronRight, Check, Loader2, Edit2, X, LogOut, AlertTriangle, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '@/stores/store';
 import { PixelAvatar } from '@/components/PixelAvatar';
 import { getProfile, updateProfile, type UserProfile } from '@/services/analytics';
@@ -29,9 +30,11 @@ import {
   getProfileEmoji,
   type ProfileQuestionKey,
 } from '@/constants/profileQuestions';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 export function ProfilePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { appUser, firebaseUser, setAppUser, setFirebaseUser } = useStore();
 
   // 프로필 데이터 상태
@@ -425,13 +428,34 @@ export function ProfilePage() {
           )}
         </div>
 
+        {/* 앱 설정 카드 */}
+        <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-6 mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Globe className="w-5 h-5 text-[var(--theme-dashboard-accent)]" />
+            <h3 className="text-lg font-bold text-[var(--theme-dashboard-title)]">
+              {t('settings.title')}
+            </h3>
+          </div>
+
+          {/* 언어 설정 */}
+          <div>
+            <p className="text-sm font-medium text-[var(--theme-dashboard-title)] mb-1">
+              {t('settings.language')}
+            </p>
+            <p className="text-xs text-[var(--theme-dashboard-text-muted)] mb-3">
+              {t('settings.language_desc')}
+            </p>
+            <LanguageSelector />
+          </div>
+        </div>
+
         {/* 계정 탈퇴 링크 (작게, 맨 밑으로 이동, 가운데 정렬) */}
-        <div className="text-center mt-8 mb-6"> {/* 상하 마진 추가 */}
+        <div className="text-center mt-8 mb-6">
           <button
             onClick={handleOpenDeleteDialog}
             className="text-sm text-red-500 hover:underline transition-colors"
           >
-            계정 탈퇴
+            {t('account.delete')}
           </button>
         </div>
 

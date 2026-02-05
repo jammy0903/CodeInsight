@@ -12,6 +12,7 @@
 
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown, LogIn } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
 import { motion } from 'framer-motion';
@@ -400,6 +401,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 StoryPanel.displayName = 'StoryPanel';
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const currentTheme = useThemeStore((s) => s.theme);
   const { firebaseUser, setPageTitle } = useStore();
   const isLoggedIn = !!firebaseUser;
@@ -433,14 +435,14 @@ export default function HomePage() {
 
             {/* 부제 */}
             <p className="text-lg md:text-xl home-subtitle" style={{ marginTop: '12px' }}>
-              코드의 원리를 눈으로 이해하다
+              {t('home.hero_subtitle')}
             </p>
 
             {/* CTA 버튼 */}
             <div className="flex items-center justify-center gap-4" style={{ marginTop: '32px' }}>
               <Link to="/courses">
                 <button className="btn-primary px-8 py-4 rounded-lg inline-flex items-center gap-2 text-base">
-                  코스 둘러보기
+                  {t('home.browse_courses')}
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </Link>
@@ -448,7 +450,7 @@ export default function HomePage() {
                 <Link to="/login">
                   <button className="btn-secondary px-8 py-4 rounded-lg inline-flex items-center gap-2 text-base">
                     <LogIn className="w-5 h-5" />
-                    로그인
+                    {t('auth.login')}
                   </button>
                 </Link>
               )}
@@ -491,7 +493,7 @@ export default function HomePage() {
         <div className="text-center">
           <Link to="/courses">
             <button className="btn-primary px-8 py-4 rounded-lg inline-flex items-center gap-2 text-base">
-              시작하기
+              {t('home.start_learning')}
               <ArrowRight className="w-5 h-5" />
             </button>
           </Link>
