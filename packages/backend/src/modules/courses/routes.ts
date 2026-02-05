@@ -1,5 +1,5 @@
 /**
- * Courses Routes
+ * Courses Routes (Fastify Plugin)
  * Language → Chapter → Lesson 계층 구조 API
  *
  * GET  /api/courses/languages          - 언어 목록
@@ -11,15 +11,12 @@
  * POST /api/courses/progress           - 진행 상태 업데이트
  */
 
-import { Router } from 'express';
+import { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import * as courseService from './service';
-import { requireDbUser, optionalDbUser } from '../../middleware/auth';
 import { lessonContentLoader } from '../../services/lessonContentLoader';
 import { logger } from '../../utils/logger';
 import { env } from '../../config/env';
-
-const router = Router();
 
 // =============================================
 // 스키마 정의
@@ -34,247 +31,269 @@ const progressUpdateSchema = z.object({
 });
 
 // =============================================
-// Lesson Endpoints
+// Fastify Plugin
 // =============================================
 
-/**
- * 레슨 상세 (콘텐츠 + 퀴즈 포함)
- *
- * WHY: DB(메타데이터) + JSON(콘텐츠) 하이브리드
- * - DB: title, description, difficulty 등 구조
- * - JSON: code, steps, quizzes 등 콘텐츠 (10-200배 빠름)
- */
-router.get('/lessons/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const lesson = await courseService.getLessonFull(id);
+const courseRoutes: FastifyPluginAsync = async (fastify) => {
+  // =============================================
+  // Lesson Endpoints
+  // =============================================
 
-    if (!lesson) {
-      return res.status(404).json({ error: 'Lesson not found' });
-    }
+  /**
+   * 레슨 상세 (콘텐츠 + 퀴즈 포함)
+   *
+   * WHY: DB(메타데이터) + JSON(콘텐츠) 하이브리드
+   * - DB: title, description, difficulty 등 구조
+   * - JSON: code, steps, quizzes 등 콘텐츠 (10-200배 빠름)
+   */
+  fastify.get('/lessons/:id', async (request, reply) => {
+    try {
+      const { id } = request.params as { id: string };
+      const lesson = await courseService.getLessonFull(id);
 
-    // JSON 파일에서 콘텐츠 로드 (없으면 null)
-    // Lazy Loading: await 필수
-    const jsonContent = await lessonContentLoader.getContent(id);
-
-    // 하이브리드 응답: DB 메타데이터 + JSON 콘텐츠
-    // JSON 구조가 Flat한 경우(code, steps가 최상위)와 Nested된 경우(content 내부) 모두 지원
-    let mergedContent = lesson.content;
-
-    if (jsonContent) {
-      // 1. Nested Structure check
-      if ('content' in jsonContent && (jsonContent as any).content) {
-        mergedContent = {
-          ...lesson.content,
-          code: (jsonContent as any).content.code,
-          steps: (jsonContent as any).content.steps,
-        } as any;
+      if (!lesson) {
+        return reply.status(404).send({ error: 'Lesson not found' });
       }
-      // 2. Flat Structure check (User's current format)
-      else if ('code' in jsonContent || 'steps' in jsonContent) {
-        mergedContent = {
-          ...lesson.content,
-          code: (jsonContent as any).code,
-          steps: (jsonContent as any).steps,
-        } as any;
+
+      // JSON 파일에서 콘텐츠 로드 (없으면 null)
+      // Lazy Loading: await 필수
+      const jsonContent = await lessonContentLoader.getContent(id);
+
+      // 하이브리드 응답: DB 메타데이터 + JSON 콘텐츠
+      // JSON 구조가 Flat한 경우(code, steps가 최상위)와 Nested된 경우(content 내부) 모두 지원
+      let mergedContent = lesson.content;
+
+      if (jsonContent) {
+        // 1. Nested Structure check
+        if ('content' in jsonContent && (jsonContent as any).content) {
+          mergedContent = {
+            ...lesson.content,
+            code: (jsonContent as any).content.code,
+            steps: (jsonContent as any).content.steps,
+          } as any;
+        }
+        // 2. Flat Structure check (User's current format)
+        else if ('code' in jsonContent || 'steps' in jsonContent) {
+          mergedContent = {
+            ...lesson.content,
+            code: (jsonContent as any).code,
+            steps: (jsonContent as any).steps,
+          } as any;
+        }
       }
-    }
 
-    res.json({
-      ...lesson,
-      content: mergedContent,
-      quizzes: lesson.quizzes, // 항상 DB 데이터 사용
-    });
-  } catch (error) {
-    logger.error('Get lesson error:', error);
-    res.status(500).json({
-      error: 'Failed to get lesson',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// =============================================
-// Language Endpoints
-// =============================================
-
-/**
- * 언어 목록
- */
-router.get('/languages', async (req, res) => {
-  try {
-    const languages = await courseService.getLanguages();
-    res.json(languages);
-  } catch (error) {
-    logger.error('Get languages error:', error);
-    res.status(500).json({
-      error: 'Failed to get languages',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// =============================================
-// Chapter Endpoints
-// =============================================
-
-/**
- * 챕터 상세 (레슨 목록 포함)
- */
-router.get('/chapters/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const chapter = await courseService.getChapterWithLessons(id);
-
-    if (!chapter) {
-      return res.status(404).json({ error: 'Chapter not found' });
-    }
-
-    res.json(chapter);
-  } catch (error) {
-    logger.error('Get chapter error:', error);
-    res.status(500).json({
-      error: 'Failed to get chapter',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-/**
- * 챕터 진행 상태 (인증 필요)
- */
-router.get('/chapters/:id/progress', requireDbUser, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user!.dbUser!.id;
-    const isAdmin = req.user?.uid === env.ADMIN_FIREBASE_UID;
-
-    const chapterId = Array.isArray(id) ? id[0] : id;
-    if (!chapterId) {
-      return res.status(400).json({ message: 'Chapter ID is required.' });
-    }
-    const progress = await courseService.getChapterProgress(userId, chapterId, !!isAdmin);
-
-    if (!progress) {
-      return res.status(404).json({ error: 'Chapter not found' });
-    }
-
-    res.json(progress);
-  } catch (error) {
-    logger.error('Get chapter progress error:', error);
-    res.status(500).json({
-      error: 'Failed to get chapter progress',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// =============================================
-// Progress Endpoints
-// =============================================
-
-/**
- * 사용자 전체 진행 상태
- */
-router.get('/progress', requireDbUser, async (req, res) => {
-  try {
-    const userId = req.user!.dbUser!.id;
-
-    const progress = await courseService.getUserProgress(userId);
-    res.json(progress);
-  } catch (error) {
-    logger.error('Get progress error:', error);
-    res.status(500).json({
-      error: 'Failed to get progress',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-/**
- * 진행 상태 업데이트
- */
-router.post('/progress', requireDbUser, async (req, res) => {
-  try {
-    const userId = req.user!.dbUser!.id;
-
-    const parsed = progressUpdateSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({
-        error: 'Invalid request',
-        details: parsed.error.issues,
+      return {
+        ...lesson,
+        content: mergedContent,
+        quizzes: lesson.quizzes, // 항상 DB 데이터 사용
+      };
+    } catch (error) {
+      logger.error('Get lesson error:', error);
+      return reply.status(500).send({
+        error: 'Failed to get lesson',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
+  });
 
-    const { lessonId, ...data } = parsed.data;
-    const progress = await courseService.updateProgress(userId, lessonId, data);
+  // =============================================
+  // Language Endpoints
+  // =============================================
 
-    res.json(progress);
-  } catch (error) {
-    logger.error('Update progress error:', error);
-    res.status(500).json({
-      error: 'Failed to update progress',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// =============================================
-// Generic Language/Chapter Endpoints (MUST BE LAST)
-// =============================================
-
-/**
- * 언어 상세 (챕터 + 레슨 구조 포함)
- *
- * WHY: optionalDbUser로 인증 선택적 처리
- * - 로그인 시: 챕터별 진행률 포함
- * - 비로그인 시: 코스 구조만 반환
- */
-router.get('/:id', optionalDbUser, async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    // 'chapter'나 'lesson' 등의 키워드가 id로 오면 패스 (안전장치)
-    if (id === 'chapters' || id === 'lessons' || id === 'progress' || id === 'languages') {
-      return next();
+  /**
+   * 언어 목록
+   */
+  fastify.get('/languages', async (request, reply) => {
+    try {
+      const languages = await courseService.getLanguages();
+      return languages;
+    } catch (error) {
+      logger.error('Get languages error:', error);
+      return reply.status(500).send({
+        error: 'Failed to get languages',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
+  });
 
-    if (typeof id !== 'string') {
-      return res.status(400).json({ error: 'Invalid ID' });
+  // =============================================
+  // Chapter Endpoints
+  // =============================================
+
+  /**
+   * 챕터 상세 (레슨 목록 포함)
+   */
+  fastify.get('/chapters/:id', async (request, reply) => {
+    try {
+      const { id } = request.params as { id: string };
+      const chapter = await courseService.getChapterWithLessons(id);
+
+      if (!chapter) {
+        return reply.status(404).send({ error: 'Chapter not found' });
+      }
+
+      return chapter;
+    } catch (error) {
+      logger.error('Get chapter error:', error);
+      return reply.status(500).send({
+        error: 'Failed to get chapter',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
+  });
 
-    const userId = req.user?.dbUser?.id;
-    const isAdmin = req.user?.uid === env.ADMIN_FIREBASE_UID;
-    const language = await courseService.getLanguageWithChapters(id, userId, !!isAdmin);
+  /**
+   * 챕터 진행 상태 (인증 필요)
+   */
+  fastify.get(
+    '/chapters/:id/progress',
+    { preHandler: [fastify.requireDbUser] },
+    async (request, reply) => {
+      try {
+        const { id } = request.params as { id: string };
+        const userId = request.user!.dbUser!.id;
+        const isAdmin = request.user?.uid === env.ADMIN_FIREBASE_UID;
 
-    if (!language) {
-      return res.status(404).json({ error: 'Language not found' });
+        const chapterId = Array.isArray(id) ? id[0] : id;
+        if (!chapterId) {
+          return reply.status(400).send({ message: 'Chapter ID is required.' });
+        }
+        const progress = await courseService.getChapterProgress(userId, chapterId, !!isAdmin);
+
+        if (!progress) {
+          return reply.status(404).send({ error: 'Chapter not found' });
+        }
+
+        return progress;
+      } catch (error) {
+        logger.error('Get chapter progress error:', error);
+        return reply.status(500).send({
+          error: 'Failed to get chapter progress',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
     }
+  );
 
-    res.json(language);
-  } catch (error) {
-    logger.error('Get language error:', error);
-    res.status(500).json({
-      error: 'Failed to get language',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
+  // =============================================
+  // Progress Endpoints
+  // =============================================
 
-/**
- * 언어별 챕터 목록
- */
-router.get('/:lang/chapters', async (req, res) => {
-  try {
-    const { lang } = req.params;
-    const chapters = await courseService.getChapters(lang);
-    res.json(chapters);
-  } catch (error) {
-    logger.error('Get chapters error:', error);
-    res.status(500).json({
-      error: 'Failed to get chapters',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
+  /**
+   * 사용자 전체 진행 상태
+   */
+  fastify.get(
+    '/progress',
+    { preHandler: [fastify.requireDbUser] },
+    async (request, reply) => {
+      try {
+        const userId = request.user!.dbUser!.id;
 
-export const courseRoutes = router;
+        const progress = await courseService.getUserProgress(userId);
+        return progress;
+      } catch (error) {
+        logger.error('Get progress error:', error);
+        return reply.status(500).send({
+          error: 'Failed to get progress',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+  );
+
+  /**
+   * 진행 상태 업데이트
+   */
+  fastify.post(
+    '/progress',
+    { preHandler: [fastify.requireDbUser] },
+    async (request, reply) => {
+      try {
+        const userId = request.user!.dbUser!.id;
+
+        const parsed = progressUpdateSchema.safeParse(request.body);
+        if (!parsed.success) {
+          return reply.status(400).send({
+            error: 'Invalid request',
+            details: parsed.error.issues,
+          });
+        }
+
+        const { lessonId, ...data } = parsed.data;
+        const progress = await courseService.updateProgress(userId, lessonId, data);
+
+        return progress;
+      } catch (error) {
+        logger.error('Update progress error:', error);
+        return reply.status(500).send({
+          error: 'Failed to update progress',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+  );
+
+  // =============================================
+  // Generic Language/Chapter Endpoints (MUST BE LAST)
+  // =============================================
+
+  /**
+   * 언어 상세 (챕터 + 레슨 구조 포함)
+   *
+   * WHY: optionalDbUser로 인증 선택적 처리
+   * - 로그인 시: 챕터별 진행률 포함
+   * - 비로그인 시: 코스 구조만 반환
+   */
+  fastify.get(
+    '/:id',
+    { preHandler: [fastify.optionalDbUser] },
+    async (request, reply) => {
+      try {
+        const { id } = request.params as { id: string };
+        // 'chapter'나 'lesson' 등의 키워드가 id로 오면 404 (안전장치)
+        if (id === 'chapters' || id === 'lessons' || id === 'progress' || id === 'languages') {
+          return reply.status(404).send({ error: 'Not found' });
+        }
+
+        if (typeof id !== 'string') {
+          return reply.status(400).send({ error: 'Invalid ID' });
+        }
+
+        const userId = request.user?.dbUser?.id;
+        const isAdmin = request.user?.uid === env.ADMIN_FIREBASE_UID;
+        const language = await courseService.getLanguageWithChapters(id, userId, !!isAdmin);
+
+        if (!language) {
+          return reply.status(404).send({ error: 'Language not found' });
+        }
+
+        return language;
+      } catch (error) {
+        logger.error('Get language error:', error);
+        return reply.status(500).send({
+          error: 'Failed to get language',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+  );
+
+  /**
+   * 언어별 챕터 목록
+   */
+  fastify.get('/:lang/chapters', async (request, reply) => {
+    try {
+      const { lang } = request.params as { lang: string };
+      const chapters = await courseService.getChapters(lang);
+      return chapters;
+    } catch (error) {
+      logger.error('Get chapters error:', error);
+      return reply.status(500).send({
+        error: 'Failed to get chapters',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+};
+
+export { courseRoutes };

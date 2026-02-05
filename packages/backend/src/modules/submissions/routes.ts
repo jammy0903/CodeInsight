@@ -1,140 +1,133 @@
-import { Router } from 'express';
+/**
+ * Submission Routes (Fastify)
+ */
+
+import { FastifyPluginAsync } from 'fastify';
 import { prisma } from '../../config/database';
-import { requireDbUser } from '../../middleware';
 import { logger } from '../../utils/logger';
 
-export const submissionRoutes = Router();
-
-/**
- * @swagger
- * /api/submissions:
- *   post:
- *     tags: [Submissions]
- *     summary: 제출 기록 생성
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [problemId, code]
- *             properties:
- *               problemId:
- *                 type: string
- *               code:
- *                 type: string
- *               verdict:
- *                 type: string
- *                 enum: [accepted, wrong_answer, compile_error, runtime_error]
- *               executionTime:
- *                 type: integer
- *     responses:
- *       201:
- *         description: 제출 생성 성공
- *       401:
- *         description: 인증 필요
- */
-submissionRoutes.post('/', requireDbUser, async (req, res) => {
-  try {
-    const { problemId, code, verdict, executionTime } = req.body;
-    const userId = req.user!.dbUser!.id;
-
-    if (!problemId || !code) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const submission = await prisma.submission.create({
-      data: {
-        userId,
-        problemId,
-        code,
-        verdict: verdict || 'judging',
-        executionTime,
-      },
-    });
-
-    res.status(201).json(submission);
-  } catch (error) {
-    logger.error('Submission error:', error);
-    res.status(500).json({ error: 'Failed to create submission' });
-  }
-});
-
-/**
- * @swagger
- * /api/submissions/me:
- *   get:
- *     tags: [Submissions]
- *     summary: 내 제출 기록 조회
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: 제출 기록 목록
- */
-submissionRoutes.get('/me', requireDbUser, async (req, res) => {
-  try {
-    const userId = req.user!.dbUser!.id;
-
-    const submissions = await prisma.submission.findMany({
-      where: { userId },
-      include: {
-        problem: {
-          select: { number: true, title: true },
+export const submissionRoutes: FastifyPluginAsync = async (fastify) => {
+  /**
+   * POST /
+   * 제출 기록 생성
+   */
+  fastify.post('/', {
+    preHandler: [fastify.requireDbUser],
+    schema: {
+      tags: ['Submissions'],
+      summary: '제출 기록 생성',
+      body: {
+        type: 'object',
+        required: ['problemId', 'code'],
+        properties: {
+          problemId: { type: 'string' },
+          code: { type: 'string' },
+          verdict: { type: 'string', enum: ['accepted', 'wrong_answer', 'compile_error', 'runtime_error'] },
+          executionTime: { type: 'integer' },
         },
       },
-      orderBy: { createdAt: 'desc' },
-    });
+    },
+  }, async (request, reply) => {
+    try {
+      const { problemId, code, verdict, executionTime } = request.body as {
+        problemId: string;
+        code: string;
+        verdict?: string;
+        executionTime?: number;
+      };
+      const userId = request.user!.dbUser!.id;
 
-    res.json(submissions);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch submissions' });
-  }
-});
+      if (!problemId || !code) {
+        return reply.status(400).send({ error: 'Missing required fields' });
+      }
 
-/**
- * @swagger
- * /api/submissions/me/solved:
- *   get:
- *     tags: [Submissions]
- *     summary: 내가 푼 문제 ID 목록
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: 문제 ID 목록 (solved, attempted 분리)
- */
-submissionRoutes.get('/me/solved', requireDbUser, async (req, res) => {
-  try {
-    const userId = req.user!.dbUser!.id;
+      const submission = await prisma.submission.create({
+        data: {
+          userId,
+          problemId,
+          code,
+          verdict: verdict || 'judging',
+          executionTime,
+        },
+      });
 
-    const solvedSubmissions = await prisma.submission.findMany({
-      where: {
-        userId,
-        verdict: 'accepted',
-      },
-      select: { problemId: true },
-      distinct: ['problemId'],
-    });
+      return reply.status(201).send(submission);
+    } catch (error) {
+      logger.error('Submission error:', error);
+      return reply.status(500).send({ error: 'Failed to create submission' });
+    }
+  });
 
-    const allSubmissions = await prisma.submission.findMany({
-      where: { userId },
-      select: { problemId: true },
-      distinct: ['problemId'],
-    });
+  /**
+   * GET /me
+   * 내 제출 기록 조회
+   */
+  fastify.get('/me', {
+    preHandler: [fastify.requireDbUser],
+    schema: {
+      tags: ['Submissions'],
+      summary: '내 제출 기록 조회',
+    },
+  }, async (request, reply) => {
+    try {
+      const userId = request.user!.dbUser!.id;
 
-    const solvedIds = solvedSubmissions.map((s: any) => s.problemId);
-    const attemptedIds = allSubmissions
-      .map((s: any) => s.problemId)
-      .filter((id: any) => !solvedIds.includes(id));
+      const submissions = await prisma.submission.findMany({
+        where: { userId },
+        include: {
+          problem: {
+            select: { number: true, title: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
 
-    res.json({
-      solved: solvedIds,
-      attempted: attemptedIds,
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch solved problems' });
-  }
-});
+      return submissions;
+    } catch (error) {
+      return reply.status(500).send({ error: 'Failed to fetch submissions' });
+    }
+  });
+
+  /**
+   * GET /me/solved
+   * 내가 푼 문제 ID 목록
+   */
+  fastify.get('/me/solved', {
+    preHandler: [fastify.requireDbUser],
+    schema: {
+      tags: ['Submissions'],
+      summary: '내가 푼 문제 ID 목록',
+    },
+  }, async (request, reply) => {
+    try {
+      const userId = request.user!.dbUser!.id;
+
+      const solvedSubmissions = await prisma.submission.findMany({
+        where: {
+          userId,
+          verdict: 'accepted',
+        },
+        select: { problemId: true },
+        distinct: ['problemId'],
+      });
+
+      const allSubmissions = await prisma.submission.findMany({
+        where: { userId },
+        select: { problemId: true },
+        distinct: ['problemId'],
+      });
+
+      const solvedIds = solvedSubmissions.map((s: { problemId: string }) => s.problemId);
+      const attemptedIds = allSubmissions
+        .map((s: { problemId: string }) => s.problemId)
+        .filter((id: string) => !solvedIds.includes(id));
+
+      return {
+        solved: solvedIds,
+        attempted: attemptedIds,
+      };
+    } catch (error) {
+      return reply.status(500).send({ error: 'Failed to fetch solved problems' });
+    }
+  });
+};

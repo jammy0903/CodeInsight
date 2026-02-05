@@ -1,32 +1,94 @@
 /**
- * Admin Routes
+ * Admin Routes (Fastify)
  *
  * WHY: Admin API 라우트 정의
- * SECURITY: requireAdmin 미들웨어로 모든 라우트 보호
+ * SECURITY: requireAdmin preHandler로 모든 라우트 보호
  */
 
-import { Router } from 'express';
-import { requireAdmin } from '../../middleware/adminAuth';
-import * as adminController from './admin.controller';
+import { FastifyPluginAsync } from 'fastify';
+import { AdminService } from './admin.service';
+import { logger } from '../../utils/logger';
 
-const router = Router();
+const adminService = new AdminService();
 
-// 모든 admin 라우트는 requireAdmin 미들웨어 필요
-router.use(requireAdmin);
+export const adminRoutes: FastifyPluginAsync = async (fastify) => {
+  // 모든 admin 라우트에 requireAdmin preHandler 적용
+  fastify.addHook('preHandler', fastify.requireAdmin);
 
-// 통계
-router.get('/stats', adminController.getStats);
+  /**
+   * GET /api/admin/stats
+   * 전체 통계 조회
+   */
+  fastify.get('/stats', async (_request, reply) => {
+    try {
+      const stats = await adminService.getStats();
+      return stats;
+    } catch (error) {
+      logger.error('Get stats error:', error);
+      return reply.status(500).send({ error: 'Failed to fetch statistics' });
+    }
+  });
 
-// 사용자 관리
-router.get('/users', adminController.getUsers);
+  /**
+   * GET /api/admin/users?page=1&limit=20
+   * 사용자 목록 조회
+   */
+  fastify.get('/users', async (request, reply) => {
+    try {
+      const query = request.query as { page?: string; limit?: string };
+      const page = parseInt(query.page || '1', 10);
+      const limit = parseInt(query.limit || '20', 10);
 
-// 제출 내역
-router.get('/submissions', adminController.getSubmissions);
+      const result = await adminService.getUsers(page, limit);
+      return result;
+    } catch (error) {
+      logger.error('Get users error:', error);
+      return reply.status(500).send({ error: 'Failed to fetch users' });
+    }
+  });
 
-// 시스템 상태
-router.get('/system', adminController.getSystemStatus);
+  /**
+   * GET /api/admin/submissions?limit=50
+   * 최근 제출 내역 조회
+   */
+  fastify.get('/submissions', async (request, reply) => {
+    try {
+      const query = request.query as { limit?: string };
+      const limit = parseInt(query.limit || '50', 10);
 
-// AI 사용량 통계 (DeepSeek 비용)
-router.get('/ai-usage', adminController.getAIUsage);
+      const submissions = await adminService.getRecentSubmissions(limit);
+      return submissions;
+    } catch (error) {
+      logger.error('Get submissions error:', error);
+      return reply.status(500).send({ error: 'Failed to fetch submissions' });
+    }
+  });
 
-export default router;
+  /**
+   * GET /api/admin/system
+   * 시스템 상태 조회
+   */
+  fastify.get('/system', async (_request, reply) => {
+    try {
+      const status = await adminService.getSystemStatus();
+      return status;
+    } catch (error) {
+      logger.error('Get system status error:', error);
+      return reply.status(500).send({ error: 'Failed to fetch system status' });
+    }
+  });
+
+  /**
+   * GET /api/admin/ai-usage
+   * AI 사용량 통계 (DeepSeek 비용 추정)
+   */
+  fastify.get('/ai-usage', async (_request, reply) => {
+    try {
+      const usage = await adminService.getAIUsageStats();
+      return usage;
+    } catch (error) {
+      logger.error('Get AI usage error:', error);
+      return reply.status(500).send({ error: 'Failed to fetch AI usage statistics' });
+    }
+  });
+};

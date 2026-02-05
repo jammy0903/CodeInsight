@@ -1,12 +1,17 @@
 /**
- * AI 해설자 Routes
- * GET  /api/ai/explain - 자동 해설 (줄 변경 시)
- * POST /api/ai/chat - Q&A 대화
- * GET  /api/ai/providers - 사용 가능한 Provider 목록
+ * AI Routes (Fastify Plugin)
+ *
+ * GET  /api/ai/explain        - 자동 해설 (줄 변경 시)
+ * POST /api/ai/explain-step   - 시뮬레이션 스텝 설명 (SSE 스트리밍)
+ * POST /api/ai/chat           - Q&A 대화
+ * POST /api/ai/chat/stream    - Q&A 대화 스트리밍 (SSE)
+ * POST /api/ai/analyze-report - 학습 리포트 AI 분석
+ * GET  /api/ai/health         - Health 체크
+ * GET  /api/ai/providers      - 사용 가능한 Provider 목록
  * POST /api/ai/providers/switch - Provider 변경
  */
 
-import { Router } from 'express';
+import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import {
   getCurrentProvider,
@@ -17,10 +22,7 @@ import {
 import { getSettings } from './settings';
 import { logger } from '../../utils/logger';
 import { prisma } from '../../config/database';
-import { optionalDbUser, requireDbUser } from '../../middleware/auth';
-import { checkAIUsage, recordAIUsage } from '../subscription';
-
-const router = Router();
+import { subscriptionService, recordAIUsage } from '../subscription';
 
 // === 스키마 정의 ===
 
@@ -473,77 +475,162 @@ function buildReportAnalysisPrompt(): string {
 "이번 달 27분이라는 학습 시간이 짧아 보일 수 있지만, 9번의 세션으로 꾸준히 접속하신 점이 인상적이에요! 특히 월요일과 저녁 시간대에 집중해서 학습하시는 패턴이 보이는데, 이 시간대를 '나만의 코딩 타임'으로 굳히시면 좋겠어요."`;
 }
 
-// === 자동 해설 엔드포인트 ===
-router.get('/explain', async (req, res) => {
+// === AI 사용량 체크 preHandler ===
+
+/**
+ * AI 사용량 체크 (Fastify preHandler)
+ * - requireDbUser 이후 사용 (DB 사용자 ID 필요)
+ * - 구독 상태 및 토큰 한도 체크
+ */
+async function checkAIUsage(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   try {
-    const parsed = explainRequestSchema.safeParse(req.query);
-    if (!parsed.success) {
-      return res.status(400).json({
-        error: 'Invalid request',
-        details: parsed.error.issues,
+    // DB 사용자 체크 (requireDbUser가 먼저 실행되어야 함)
+    const userId = request.user?.dbUser?.id;
+    if (!userId) {
+      return reply.status(401).send({
+        error: 'Unauthorized',
+        message: 'AI 기능을 사용하려면 로그인이 필요합니다.'
       });
     }
 
-    const { line, code, topic } = parsed.data;
-    const provider = getCurrentProvider();
+    // 사용량 체크 (예상 토큰 1000개 기준)
+    const usageCheck = await subscriptionService.checkUsageAllowed(userId, 1000);
 
-    // 코드에서 해당 줄 추출
-    const lines = code.split('\n');
-    const targetLine = lines[line - 1] || '';
+    if (!usageCheck.allowed) {
+      return reply.status(429).send({
+        error: 'Usage Limit Exceeded',
+        message: usageCheck.reason,
+        details: {
+          remainingTokens: usageCheck.remainingTokens,
+          currentUsage: usageCheck.currentUsage,
+          limit: usageCheck.limit
+        }
+      });
+    }
 
-    const response = await provider.chat({
-      message: `다음 C 코드의 ${line}번째 줄을 설명해주세요:\n\n전체 코드:\n\`\`\`c\n${code}\n\`\`\`\n\n설명할 줄: \`${targetLine.trim()}\``,
-      history: [],
-      systemPrompt: buildExplainPrompt(topic),
-    });
-
-    res.json({
-      line,
-      explanation: response.content,
-    });
+    // 구독 정보를 request에 첨부 (나중에 사용량 기록 시 활용)
+    (request as any).subscriptionInfo = await subscriptionService.getUserSubscription(userId);
   } catch (error) {
-    logger.error('AI explain error:', error);
-    res.status(500).json({
-      error: 'AI service error',
-      message: error instanceof Error ? error.message : 'Unknown error',
+    logger.error('AI usage check error:', error);
+    return reply.status(500).send({
+      error: 'Internal Server Error',
+      message: 'AI 사용량 체크 중 오류가 발생했습니다.'
     });
   }
-});
+}
 
-// === 시뮬레이션 스텝 설명 스트리밍 엔드포인트 (SSE) ===
-router.post('/explain-step', async (req, res) => {
-  try {
-    const parsed = explainStepSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({
-        error: 'Invalid request',
-        details: parsed.error.issues,
+// === Fastify Plugin ===
+
+const aiRoutes: FastifyPluginAsync = async (fastify) => {
+  /**
+   * @swagger
+   * /api/ai/explain:
+   *   get:
+   *     tags: [AI]
+   *     summary: 자동 해설 (줄 변경 시)
+   *     parameters:
+   *       - in: query
+   *         name: line
+   *         required: true
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: code
+   *         required: true
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: topic
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: 해설 결과
+   */
+  fastify.get('/explain', async (request, reply) => {
+    try {
+      const parsed = explainRequestSchema.safeParse(request.query);
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: 'Invalid request',
+          details: parsed.error.issues,
+        });
+      }
+
+      const { line, code, topic } = parsed.data;
+      const provider = getCurrentProvider();
+
+      // 코드에서 해당 줄 추출
+      const lines = code.split('\n');
+      const targetLine = lines[line - 1] || '';
+
+      const response = await provider.chat({
+        message: `다음 C 코드의 ${line}번째 줄을 설명해주세요:\n\n전체 코드:\n\`\`\`c\n${code}\n\`\`\`\n\n설명할 줄: \`${targetLine.trim()}\``,
+        history: [],
+        systemPrompt: buildExplainPrompt(topic),
+      });
+
+      return {
+        line,
+        explanation: response.content,
+      };
+    } catch (error) {
+      logger.error('AI explain error:', error);
+      return reply.status(500).send({
+        error: 'AI service error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
+  });
 
-    const provider = getCurrentProvider();
-    const data = parsed.data;
-    let userMessage = '';
-    let systemPrompt = '';
+  /**
+   * @swagger
+   * /api/ai/explain-step:
+   *   post:
+   *     tags: [AI]
+   *     summary: 시뮬레이션 스텝 설명 (SSE 스트리밍)
+   *     requestBody:
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *     responses:
+   *       200:
+   *         description: SSE 스트리밍 응답
+   */
+  fastify.post('/explain-step', async (request, reply) => {
+    try {
+      const parsed = explainStepSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: 'Invalid request',
+          details: parsed.error.issues,
+        });
+      }
 
-    // 언어별 메시지 및 프롬프트 생성
-    if (data.language === 'c') {
-      // C 언어
-      const { line, code, fullCode, stack, heap, changes } = data;
+      const provider = getCurrentProvider();
+      const data = parsed.data;
+      let userMessage = '';
+      let systemPrompt = '';
 
-      const stackStr = stack.length > 0
-        ? stack.map(v => `  ${v.name}: ${v.value} (${v.type}, ${v.address})`).join('\n')
-        : '  (비어있음)';
+      // 언어별 메시지 및 프롬프트 생성
+      if (data.language === 'c') {
+        // C 언어
+        const { line, code, fullCode, stack, heap, changes } = data;
 
-      const heapStr = heap.length > 0
-        ? heap.map(v => `  ${v.name}: ${v.value} (${v.type}, ${v.address})`).join('\n')
-        : '  (비어있음)';
+        const stackStr = stack.length > 0
+          ? stack.map(v => `  ${v.name}: ${v.value} (${v.type}, ${v.address})`).join('\n')
+          : '  (비어있음)';
 
-      const changesStr = changes.length > 0
-        ? changes.map(c => c.from ? `  ${c.target}: ${c.from} → ${c.to}` : `  ${c.target}: ${c.to} (새로 생성)`).join('\n')
-        : '  (변경 없음)';
+        const heapStr = heap.length > 0
+          ? heap.map(v => `  ${v.name}: ${v.value} (${v.type}, ${v.address})`).join('\n')
+          : '  (비어있음)';
 
-      userMessage = `## 현재 실행 중인 코드
+        const changesStr = changes.length > 0
+          ? changes.map(c => c.from ? `  ${c.target}: ${c.from} → ${c.to}` : `  ${c.target}: ${c.to} (새로 생성)`).join('\n')
+          : '  (변경 없음)';
+
+        userMessage = `## 현재 실행 중인 코드
 \`${code.trim()}\` (${line}번째 줄)
 
 ## 전체 코드
@@ -562,21 +649,21 @@ ${changesStr}
 
 위 상황을 바탕으로 이 줄이 무엇을 하는지 설명해줘!`;
 
-      systemPrompt = buildStepExplainPrompt();
+        systemPrompt = buildStepExplainPrompt();
 
-    } else if (data.language === 'javascript') {
-      // JavaScript
-      const { line, code, fullCode, stack, heap } = data;
+      } else if (data.language === 'javascript') {
+        // JavaScript
+        const { line, code, fullCode, stack, heap } = data;
 
-      const stackStr = stack.length > 0
-        ? stack.map(f => `  함수: ${f.functionName}\n${Object.entries(f.variables).map(([k, v]) => `    ${k}: ${JSON.stringify(v)}`).join('\n')}`).join('\n\n')
-        : '  (비어있음)';
+        const stackStr = stack.length > 0
+          ? stack.map(f => `  함수: ${f.functionName}\n${Object.entries(f.variables).map(([k, v]) => `    ${k}: ${JSON.stringify(v)}`).join('\n')}`).join('\n\n')
+          : '  (비어있음)';
 
-      const heapStr = heap.length > 0
-        ? heap.map(h => `  [${h.id}] ${h.type}: ${JSON.stringify(h.value)}`).join('\n')
-        : '  (비어있음)';
+        const heapStr = heap.length > 0
+          ? heap.map(h => `  [${h.id}] ${h.type}: ${JSON.stringify(h.value)}`).join('\n')
+          : '  (비어있음)';
 
-      userMessage = `## 현재 실행 중인 코드
+        userMessage = `## 현재 실행 중인 코드
 \`${code.trim()}\` (${line}번째 줄)
 
 ## 전체 코드
@@ -592,21 +679,21 @@ ${heapStr}
 
 위 상황을 바탕으로 이 줄이 무엇을 하는지 설명해줘!`;
 
-      systemPrompt = buildJsStepExplainPrompt();
+        systemPrompt = buildJsStepExplainPrompt();
 
-    } else if (data.language === 'python') {
-      // Python
-      const { line, code, fullCode, names, objects } = data;
+      } else if (data.language === 'python') {
+        // Python
+        const { line, code, fullCode, names, objects } = data;
 
-      const namesStr = names.length > 0
-        ? names.map(n => `  ${n.name} → ${n.pointsTo}`).join('\n')
-        : '  (비어있음)';
+        const namesStr = names.length > 0
+          ? names.map(n => `  ${n.name} → ${n.pointsTo}`).join('\n')
+          : '  (비어있음)';
 
-      const objectsStr = objects.length > 0
-        ? objects.map(o => `  [${o.id}] ${o.type}: ${JSON.stringify(o.value)}`).join('\n')
-        : '  (비어있음)';
+        const objectsStr = objects.length > 0
+          ? objects.map(o => `  [${o.id}] ${o.type}: ${JSON.stringify(o.value)}`).join('\n')
+          : '  (비어있음)';
 
-      userMessage = `## 현재 실행 중인 코드
+        userMessage = `## 현재 실행 중인 코드
 \`${code.trim()}\` (${line}번째 줄)
 
 ## 전체 코드
@@ -622,374 +709,458 @@ ${objectsStr}
 
 위 상황을 바탕으로 이 줄이 무엇을 하는지 설명해줘!`;
 
-      systemPrompt = buildPyStepExplainPrompt();
+        systemPrompt = buildPyStepExplainPrompt();
 
-    } else {
-      // Fallback (should not happen due to Zod validation)
-      throw new Error(`Unsupported language: ${(data as any).language}`);
-    }
-
-    // 스트리밍 지원 확인
-    if (!provider.streamChat) {
-      // 스트리밍 미지원 시 일반 응답으로 fallback
-      const response = await provider.chat({
-        message: userMessage,
-        history: [],
-        systemPrompt,
-      });
-
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.write(`data: ${JSON.stringify({ content: response.content, done: false })}\n\n`);
-      res.write(`data: ${JSON.stringify({ content: '', done: true })}\n\n`);
-      return res.end();
-    }
-
-    // SSE 헤더 설정
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('X-Accel-Buffering', 'no');
-    res.flushHeaders();  // 헤더 즉시 전송
-
-    // 스트리밍 시작
-    await provider.streamChat(
-      {
-        message: userMessage,
-        history: [],
-        systemPrompt,
-      },
-      (chunk) => {
-        res.write(`data: ${JSON.stringify(chunk)}\n\n`);
-        // Node.js 스트림은 write 후 자동 flush (compression 미들웨어 없으면)
+      } else {
+        // Fallback (should not happen due to Zod validation)
+        throw new Error(`Unsupported language: ${(data as any).language}`);
       }
-    );
 
-    res.end();
-  } catch (error) {
-    logger.error('AI explain-step stream error:', error);
+      // 스트리밍 지원 확인
+      if (!provider.streamChat) {
+        // 스트리밍 미지원 시 일반 응답으로 fallback
+        const response = await provider.chat({
+          message: userMessage,
+          history: [],
+          systemPrompt,
+        });
 
-    if (res.headersSent) {
-      res.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error', done: true })}\n\n`);
-      return res.end();
-    }
+        reply.raw.writeHead(200, {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        });
+        reply.raw.write(`data: ${JSON.stringify({ content: response.content, done: false })}\n\n`);
+        reply.raw.write(`data: ${JSON.stringify({ content: '', done: true })}\n\n`);
+        reply.raw.end();
+        return;
+      }
 
-    res.status(500).json({
-      error: 'AI service error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// === Q&A 채팅 엔드포인트 ===
-// requireDbUser + checkAIUsage: 로그인 필수, 구독 한도 체크
-router.post('/chat', requireDbUser, checkAIUsage, async (req, res) => {
-  try {
-    const parsed = chatRequestSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({
-        error: 'Invalid request',
-        details: parsed.error.issues,
+      // SSE 헤더 설정
+      reply.raw.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no',
       });
-    }
 
-    const { message, history, context, lessonId, contextType } = parsed.data;
-    const provider = getCurrentProvider();
-    const userId = req.user?.dbUser?.id;
-
-    const response = await provider.chat({
-      message,
-      history,
-      systemPrompt: buildChatPrompt(context, history),
-    });
-
-    // ChatHistory 저장 (비동기, 실패해도 응답에 영향 없음)
-    if (userId) {
-      prisma.chatHistory.create({
-        data: {
-          userId,
-          lessonId: lessonId || null,
-          context: contextType || null,
-          question: message,
-          answer: response.content,
-          tokens: response.usage?.totalTokens || null,
+      // 스트리밍 시작
+      await provider.streamChat(
+        {
+          message: userMessage,
+          history: [],
+          systemPrompt,
         },
-      }).catch((err) => {
-        logger.error('Failed to save chat history:', err);
-      });
-
-      // AI 사용량 기록 (구독 시스템)
-      if (response.usage) {
-        recordAIUsage(
-          userId,
-          'chat',
-          response.usage.promptTokens || 0,
-          response.usage.completionTokens || 0
-        ).catch((err) => {
-          logger.error('Failed to record AI usage:', err);
-        });
-      }
-    }
-
-    res.json(response);
-  } catch (error) {
-    logger.error('AI chat error:', error);
-    res.status(500).json({
-      error: 'AI service error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// === 스트리밍 Q&A 채팅 엔드포인트 (SSE) ===
-// requireDbUser + checkAIUsage: 로그인 필수, 구독 한도 체크
-router.post('/chat/stream', requireDbUser, checkAIUsage, async (req, res) => {
-  try {
-    const parsed = chatRequestSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({
-        error: 'Invalid request',
-        details: parsed.error.issues,
-      });
-    }
-
-    const { message, history, context, lessonId, contextType } = parsed.data;
-    const provider = getCurrentProvider();
-    const userId = req.user?.dbUser?.id;
-
-    // 스트리밍 응답 수집 (ChatHistory 저장용)
-    let fullResponse = '';
-
-    // ChatHistory 저장 및 사용량 기록 헬퍼 (스트리밍 완료 후 호출)
-    const saveChatHistoryAndUsage = () => {
-      if (userId && fullResponse) {
-        // ChatHistory 저장
-        prisma.chatHistory.create({
-          data: {
-            userId,
-            lessonId: lessonId || null,
-            context: contextType || null,
-            question: message,
-            answer: fullResponse,
-            tokens: null, // 스트리밍에서는 토큰 수 알 수 없음
-          },
-        }).catch((err) => {
-          logger.error('Failed to save chat history:', err);
-        });
-
-        // AI 사용량 기록 (토큰 추정: 한글 2글자/1토큰, 영문 4글자/1토큰)
-        const estimatedPromptTokens = Math.ceil(message.length / 2);
-        const estimatedCompletionTokens = Math.ceil(fullResponse.length / 2);
-        recordAIUsage(
-          userId,
-          'chat-stream',
-          estimatedPromptTokens,
-          estimatedCompletionTokens
-        ).catch((err) => {
-          logger.error('Failed to record AI usage:', err);
-        });
-      }
-    };
-
-    // 스트리밍 지원 확인
-    if (!provider.streamChat) {
-      // 스트리밍 미지원 시 일반 응답으로 fallback
-      const response = await provider.chat({
-        message,
-        history,
-        systemPrompt: buildChatPrompt(context, history),
-      });
-
-      fullResponse = response.content;
-      saveChatHistoryAndUsage();
-
-      // SSE 형식으로 한 번에 전송
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.write(`data: ${JSON.stringify({ content: response.content, done: false })}\n\n`);
-      res.write(`data: ${JSON.stringify({ content: '', done: true })}\n\n`);
-      return res.end();
-    }
-
-    // SSE 헤더 설정
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('X-Accel-Buffering', 'no');  // nginx 버퍼링 비활성화
-
-    // 스트리밍 시작
-    await provider.streamChat(
-      {
-        message,
-        history,
-        systemPrompt: buildChatPrompt(context, history),
-      },
-      (chunk) => {
-        // 청크 내용 수집
-        if (chunk.content) {
-          fullResponse += chunk.content;
+        (chunk) => {
+          reply.raw.write(`data: ${JSON.stringify(chunk)}\n\n`);
         }
-        res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+      );
+
+      reply.raw.end();
+    } catch (error) {
+      logger.error('AI explain-step stream error:', error);
+
+      if (reply.raw.headersSent) {
+        reply.raw.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error', done: true })}\n\n`);
+        reply.raw.end();
+        return;
       }
-    );
 
-    // 스트리밍 완료 후 ChatHistory 저장
-    saveChatHistoryAndUsage();
-
-    res.end();
-  } catch (error) {
-    logger.error('AI stream error:', error);
-
-    // 이미 스트리밍 시작된 경우 에러 이벤트 전송
-    if (res.headersSent) {
-      res.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error', done: true })}\n\n`);
-      return res.end();
-    }
-
-    res.status(500).json({
-      error: 'AI service error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// === 학습 리포트 AI 분석 엔드포인트 ===
-// requireDbUser + checkAIUsage: 로그인 필수, 구독 한도 체크
-router.post('/analyze-report', requireDbUser, checkAIUsage, async (req, res) => {
-  try {
-    const parsed = analyzeReportSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({
-        error: 'Invalid request',
-        details: parsed.error.issues,
+      return reply.status(500).send({
+        error: 'AI service error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
+  });
 
-    const data = parsed.data;
-    const userId = req.user?.dbUser?.id;
-    const provider = getCurrentProvider();
+  /**
+   * @swagger
+   * /api/ai/chat:
+   *   post:
+   *     tags: [AI]
+   *     summary: Q&A 대화
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - message
+   *             properties:
+   *               message:
+   *                 type: string
+   *               history:
+   *                 type: array
+   *               context:
+   *                 type: object
+   *     responses:
+   *       200:
+   *         description: AI 응답
+   */
+  fastify.post(
+    '/chat',
+    { preHandler: [fastify.requireDbUser, checkAIUsage] },
+    async (request, reply) => {
+      try {
+        const parsed = chatRequestSchema.safeParse(request.body);
+        if (!parsed.success) {
+          return reply.status(400).send({
+            error: 'Invalid request',
+            details: parsed.error.issues,
+          });
+        }
 
-    // 데이터를 자연어로 변환
-    const studyHours = Math.floor(data.totalStudyTime / 3600);
-    const studyMinutes = Math.floor((data.totalStudyTime % 3600) / 60);
-    const studyTimeStr = studyHours > 0
-      ? `${studyHours}시간 ${studyMinutes}분`
-      : `${studyMinutes}분`;
+        const { message, history, context, lessonId, contextType } = parsed.data;
+        const provider = getCurrentProvider();
+        const userId = request.user?.dbUser?.id;
 
-    // 요일별 활동 분석
-    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-    const maxWeekdayIdx = data.weekdayActivity.indexOf(Math.max(...data.weekdayActivity));
-    const mostActiveDay = weekdays[maxWeekdayIdx];
+        const response = await provider.chat({
+          message,
+          history,
+          systemPrompt: buildChatPrompt(context, history),
+        });
 
-    // 시간대별 활동 분석
-    const timeSlots = ['새벽(0-6시)', '오전(6-12시)', '오후(12-18시)', '저녁(18-24시)'];
-    const slotTotals = [
-      data.hourlyActivity.slice(0, 6).reduce((a, b) => a + b, 0),
-      data.hourlyActivity.slice(6, 12).reduce((a, b) => a + b, 0),
-      data.hourlyActivity.slice(12, 18).reduce((a, b) => a + b, 0),
-      data.hourlyActivity.slice(18, 24).reduce((a, b) => a + b, 0),
-    ];
-    const maxSlotIdx = slotTotals.indexOf(Math.max(...slotTotals));
-    const mostActiveSlot = timeSlots[maxSlotIdx];
+        // ChatHistory 저장 (비동기, 실패해도 응답에 영향 없음)
+        if (userId) {
+          prisma.chatHistory.create({
+            data: {
+              userId,
+              lessonId: lessonId || null,
+              context: contextType || null,
+              question: message,
+              answer: response.content,
+              tokens: response.usage?.totalTokens || null,
+            },
+          }).catch((err) => {
+            logger.error('Failed to save chat history:', err);
+          });
 
-    // 취약 개념 정리
-    const weakConceptList = Object.entries(data.weakConcepts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([concept, count]) => `${concept}(${count}회 오답)`)
-      .join(', ');
+          // AI 사용량 기록 (구독 시스템)
+          if (response.usage) {
+            recordAIUsage(
+              userId,
+              'chat',
+              response.usage.promptTokens || 0,
+              response.usage.completionTokens || 0
+            ).catch((err) => {
+              logger.error('Failed to record AI usage:', err);
+            });
+          }
+        }
 
-    // === 로그인 사용자용 추가 데이터 수집 ===
-    let enrichedContext = '';
+        return response;
+      } catch (error) {
+        logger.error('AI chat error:', error);
+        return reply.status(500).send({
+          error: 'AI service error',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+  );
 
-    if (userId) {
-      // 병렬 쿼리 실행 (N+1 최적화)
-      const [recentNotes, recentChats, languageStats, recentWrongs] = await Promise.all([
-        // 1. 최근 저장한 노트 (개념 메모)
-        prisma.userNote.findMany({
-          where: { userId },
-          orderBy: { createdAt: 'desc' },
-          take: 5,
-          include: {
-            lesson: { select: { title: true } },
+  /**
+   * @swagger
+   * /api/ai/chat/stream:
+   *   post:
+   *     tags: [AI]
+   *     summary: Q&A 대화 스트리밍 (SSE)
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - message
+   *             properties:
+   *               message:
+   *                 type: string
+   *               history:
+   *                 type: array
+   *               context:
+   *                 type: object
+   *     responses:
+   *       200:
+   *         description: SSE 스트리밍 응답
+   */
+  fastify.post(
+    '/chat/stream',
+    { preHandler: [fastify.requireDbUser, checkAIUsage] },
+    async (request, reply) => {
+      try {
+        const parsed = chatRequestSchema.safeParse(request.body);
+        if (!parsed.success) {
+          return reply.status(400).send({
+            error: 'Invalid request',
+            details: parsed.error.issues,
+          });
+        }
+
+        const { message, history, context, lessonId, contextType } = parsed.data;
+        const provider = getCurrentProvider();
+        const userId = request.user?.dbUser?.id;
+
+        // 스트리밍 응답 수집 (ChatHistory 저장용)
+        let fullResponse = '';
+
+        // ChatHistory 저장 및 사용량 기록 헬퍼 (스트리밍 완료 후 호출)
+        const saveChatHistoryAndUsage = () => {
+          if (userId && fullResponse) {
+            // ChatHistory 저장
+            prisma.chatHistory.create({
+              data: {
+                userId,
+                lessonId: lessonId || null,
+                context: contextType || null,
+                question: message,
+                answer: fullResponse,
+                tokens: null, // 스트리밍에서는 토큰 수 알 수 없음
+              },
+            }).catch((err) => {
+              logger.error('Failed to save chat history:', err);
+            });
+
+            // AI 사용량 기록 (토큰 추정: 한글 2글자/1토큰, 영문 4글자/1토큰)
+            const estimatedPromptTokens = Math.ceil(message.length / 2);
+            const estimatedCompletionTokens = Math.ceil(fullResponse.length / 2);
+            recordAIUsage(
+              userId,
+              'chat-stream',
+              estimatedPromptTokens,
+              estimatedCompletionTokens
+            ).catch((err) => {
+              logger.error('Failed to record AI usage:', err);
+            });
+          }
+        };
+
+        // 스트리밍 지원 확인
+        if (!provider.streamChat) {
+          // 스트리밍 미지원 시 일반 응답으로 fallback
+          const response = await provider.chat({
+            message,
+            history,
+            systemPrompt: buildChatPrompt(context, history),
+          });
+
+          fullResponse = response.content;
+          saveChatHistoryAndUsage();
+
+          // SSE 형식으로 한 번에 전송
+          reply.raw.writeHead(200, {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+          });
+          reply.raw.write(`data: ${JSON.stringify({ content: response.content, done: false })}\n\n`);
+          reply.raw.write(`data: ${JSON.stringify({ content: '', done: true })}\n\n`);
+          reply.raw.end();
+          return;
+        }
+
+        // SSE 헤더 설정
+        reply.raw.writeHead(200, {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'X-Accel-Buffering': 'no',  // nginx 버퍼링 비활성화
+        });
+
+        // 스트리밍 시작
+        await provider.streamChat(
+          {
+            message,
+            history,
+            systemPrompt: buildChatPrompt(context, history),
           },
-        }),
+          (chunk) => {
+            // 청크 내용 수집
+            if (chunk.content) {
+              fullResponse += chunk.content;
+            }
+            reply.raw.write(`data: ${JSON.stringify(chunk)}\n\n`);
+          }
+        );
 
-        // 2. 최근 AI 질문들
-        prisma.chatHistory.findMany({
-          where: { userId },
-          orderBy: { createdAt: 'desc' },
-          take: 5,
-          select: { question: true, context: true },
-        }),
+        // 스트리밍 완료 후 ChatHistory 저장
+        saveChatHistoryAndUsage();
 
-        // 3. 언어별 학습 시간 (LessonActivity + Lesson + Chapter + Language)
-        prisma.$queryRaw<{ language: string; totalSeconds: bigint }[]>`
-          SELECT
-            l."language_id" as language,
-            SUM(la.duration) as "totalSeconds"
-          FROM lesson_activities la
-          JOIN lessons le ON la.lesson_id = le.id
-          JOIN chapters c ON le.chapter_id = c.id
-          JOIN languages l ON c.language_id = l.id
-          WHERE la.user_id = ${userId}::uuid
-            AND la.duration IS NOT NULL
-          GROUP BY l."language_id"
-          ORDER BY "totalSeconds" DESC
-        `,
+        reply.raw.end();
+      } catch (error) {
+        logger.error('AI stream error:', error);
 
-        // 4. 최근 틀린 퀴즈 상세
-        prisma.quizAttempt.findMany({
-          where: { userId, isCorrect: false },
-          orderBy: { createdAt: 'desc' },
-          take: 3,
-          include: {
-            quiz: {
-              select: {
-                question: true,
+        // 이미 스트리밍 시작된 경우 에러 이벤트 전송
+        if (reply.raw.headersSent) {
+          reply.raw.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error', done: true })}\n\n`);
+          reply.raw.end();
+          return;
+        }
+
+        return reply.status(500).send({
+          error: 'AI service error',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+  );
+
+  /**
+   * @swagger
+   * /api/ai/analyze-report:
+   *   post:
+   *     tags: [AI]
+   *     summary: 학습 리포트 AI 분석
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *     responses:
+   *       200:
+   *         description: AI 분석 결과
+   */
+  fastify.post(
+    '/analyze-report',
+    { preHandler: [fastify.requireDbUser, checkAIUsage] },
+    async (request, reply) => {
+      try {
+        const parsed = analyzeReportSchema.safeParse(request.body);
+        if (!parsed.success) {
+          return reply.status(400).send({
+            error: 'Invalid request',
+            details: parsed.error.issues,
+          });
+        }
+
+        const data = parsed.data;
+        const userId = request.user?.dbUser?.id;
+        const provider = getCurrentProvider();
+
+        // 데이터를 자연어로 변환
+        const studyHours = Math.floor(data.totalStudyTime / 3600);
+        const studyMinutes = Math.floor((data.totalStudyTime % 3600) / 60);
+        const studyTimeStr = studyHours > 0
+          ? `${studyHours}시간 ${studyMinutes}분`
+          : `${studyMinutes}분`;
+
+        // 요일별 활동 분석
+        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+        const maxWeekdayIdx = data.weekdayActivity.indexOf(Math.max(...data.weekdayActivity));
+        const mostActiveDay = weekdays[maxWeekdayIdx];
+
+        // 시간대별 활동 분석
+        const timeSlots = ['새벽(0-6시)', '오전(6-12시)', '오후(12-18시)', '저녁(18-24시)'];
+        const slotTotals = [
+          data.hourlyActivity.slice(0, 6).reduce((a, b) => a + b, 0),
+          data.hourlyActivity.slice(6, 12).reduce((a, b) => a + b, 0),
+          data.hourlyActivity.slice(12, 18).reduce((a, b) => a + b, 0),
+          data.hourlyActivity.slice(18, 24).reduce((a, b) => a + b, 0),
+        ];
+        const maxSlotIdx = slotTotals.indexOf(Math.max(...slotTotals));
+        const mostActiveSlot = timeSlots[maxSlotIdx];
+
+        // 취약 개념 정리
+        const weakConceptList = Object.entries(data.weakConcepts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([concept, count]) => `${concept}(${count}회 오답)`)
+          .join(', ');
+
+        // === 로그인 사용자용 추가 데이터 수집 ===
+        let enrichedContext = '';
+
+        if (userId) {
+          // 병렬 쿼리 실행 (N+1 최적화)
+          const [recentNotes, recentChats, languageStats, recentWrongs] = await Promise.all([
+            // 1. 최근 저장한 노트 (개념 메모)
+            prisma.userNote.findMany({
+              where: { userId },
+              orderBy: { createdAt: 'desc' },
+              take: 5,
+              include: {
                 lesson: { select: { title: true } },
               },
-            },
-          },
-        }),
-      ]);
+            }),
 
-      // 컨텍스트 문자열 생성
-      if (recentNotes.length > 0) {
-        const notesList = recentNotes
-          .map((n) => `- "${n.concept}" (${n.lesson.title}${n.isFromWrong ? ', 오답 후 저장' : ''})`)
-          .join('\n');
-        enrichedContext += `\n### 최근 저장한 개념 노트\n${notesList}\n`;
-      }
+            // 2. 최근 AI 질문들
+            prisma.chatHistory.findMany({
+              where: { userId },
+              orderBy: { createdAt: 'desc' },
+              take: 5,
+              select: { question: true, context: true },
+            }),
 
-      if (recentChats.length > 0) {
-        const chatsList = recentChats
-          .map((c) => `- "${c.question.slice(0, 50)}${c.question.length > 50 ? '...' : ''}"`)
-          .join('\n');
-        enrichedContext += `\n### 최근 AI에게 한 질문\n${chatsList}\n`;
-      }
+            // 3. 언어별 학습 시간 (LessonActivity + Lesson + Chapter + Language)
+            prisma.$queryRaw<{ language: string; totalSeconds: bigint }[]>`
+              SELECT
+                l."language_id" as language,
+                SUM(la.duration) as "totalSeconds"
+              FROM lesson_activities la
+              JOIN lessons le ON la.lesson_id = le.id
+              JOIN chapters c ON le.chapter_id = c.id
+              JOIN languages l ON c.language_id = l.id
+              WHERE la.user_id = ${userId}::uuid
+                AND la.duration IS NOT NULL
+              GROUP BY l."language_id"
+              ORDER BY "totalSeconds" DESC
+            `,
 
-      if (languageStats.length > 0) {
-        const langList = languageStats
-          .map((l) => {
-            const mins = Math.round(Number(l.totalSeconds) / 60);
-            return `- ${l.language.toUpperCase()}: ${mins}분`;
-          })
-          .join('\n');
-        enrichedContext += `\n### 언어별 학습 시간\n${langList}\n`;
-      }
+            // 4. 최근 틀린 퀴즈 상세
+            prisma.quizAttempt.findMany({
+              where: { userId, isCorrect: false },
+              orderBy: { createdAt: 'desc' },
+              take: 3,
+              include: {
+                quiz: {
+                  select: {
+                    question: true,
+                    lesson: { select: { title: true } },
+                  },
+                },
+              },
+            }),
+          ]);
 
-      if (recentWrongs.length > 0) {
-        const wrongList = recentWrongs
-          .map((w) => `- "${w.quiz.question.slice(0, 40)}..." (${w.quiz.lesson.title})`)
-          .join('\n');
-        enrichedContext += `\n### 최근 틀린 문제\n${wrongList}\n`;
-      }
-    }
+          // 컨텍스트 문자열 생성
+          if (recentNotes.length > 0) {
+            const notesList = recentNotes
+              .map((n) => `- "${n.concept}" (${n.lesson.title}${n.isFromWrong ? ', 오답 후 저장' : ''})`)
+              .join('\n');
+            enrichedContext += `\n### 최근 저장한 개념 노트\n${notesList}\n`;
+          }
 
-    const userMessage = `## 학생 학습 데이터
+          if (recentChats.length > 0) {
+            const chatsList = recentChats
+              .map((c) => `- "${c.question.slice(0, 50)}${c.question.length > 50 ? '...' : ''}"`)
+              .join('\n');
+            enrichedContext += `\n### 최근 AI에게 한 질문\n${chatsList}\n`;
+          }
+
+          if (languageStats.length > 0) {
+            const langList = languageStats
+              .map((l) => {
+                const mins = Math.round(Number(l.totalSeconds) / 60);
+                return `- ${l.language.toUpperCase()}: ${mins}분`;
+              })
+              .join('\n');
+            enrichedContext += `\n### 언어별 학습 시간\n${langList}\n`;
+          }
+
+          if (recentWrongs.length > 0) {
+            const wrongList = recentWrongs
+              .map((w) => `- "${w.quiz.question.slice(0, 40)}..." (${w.quiz.lesson.title})`)
+              .join('\n');
+            enrichedContext += `\n### 최근 틀린 문제\n${wrongList}\n`;
+          }
+        }
+
+        const userMessage = `## 학생 학습 데이터
 
 ### 기본 통계
 - 총 학습 시간: ${studyTimeStr}
@@ -1013,94 +1184,134 @@ ${enrichedContext}
 위 데이터를 바탕으로 이 학생에게 맞춤형 학습 피드백을 4-8문장의 줄글로 작성해주세요.
 ${enrichedContext ? '특히 저장한 노트, AI 질문, 최근 틀린 문제를 참고하여 구체적인 조언을 해주세요.' : ''}`;
 
-    const response = await provider.chat({
-      message: userMessage,
-      history: [],
-      systemPrompt: buildReportAnalysisPrompt(),
-    });
+        const response = await provider.chat({
+          message: userMessage,
+          history: [],
+          systemPrompt: buildReportAnalysisPrompt(),
+        });
 
-    // AI 사용량 기록
-    if (userId && response.usage) {
-      recordAIUsage(
-        userId,
-        'analyze-report',
-        response.usage.promptTokens || 0,
-        response.usage.completionTokens || 0
-      ).catch((err) => {
-        logger.error('Failed to record AI usage:', err);
-      });
+        // AI 사용량 기록
+        if (userId && response.usage) {
+          recordAIUsage(
+            userId,
+            'analyze-report',
+            response.usage.promptTokens || 0,
+            response.usage.completionTokens || 0
+          ).catch((err) => {
+            logger.error('Failed to record AI usage:', err);
+          });
+        }
+
+        return {
+          analysis: response.content,
+          provider: response.provider,
+        };
+      } catch (error) {
+        logger.error('AI analyze-report error:', error);
+        return reply.status(500).send({
+          error: 'AI service error',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
     }
+  );
 
-    res.json({
-      analysis: response.content,
-      provider: response.provider,
-    });
-  } catch (error) {
-    logger.error('AI analyze-report error:', error);
-    res.status(500).json({
-      error: 'AI service error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
+  /**
+   * @swagger
+   * /api/ai/health:
+   *   get:
+   *     tags: [AI]
+   *     summary: AI 서비스 상태 체크
+   *     responses:
+   *       200:
+   *         description: 서비스 상태
+   */
+  fastify.get('/health', async (request, reply) => {
+    const provider = getCurrentProvider();
+    const available = await provider.isAvailable();
 
-// === Health 엔드포인트 ===
-router.get('/health', async (req, res) => {
-  const provider = getCurrentProvider();
-  const available = await provider.isAvailable();
-
-  res.json({
-    status: available ? 'ok' : 'degraded',
-    provider: provider.type,
-    providerName: provider.name,
-    available,
+    return {
+      status: available ? 'ok' : 'degraded',
+      provider: provider.type,
+      providerName: provider.name,
+      available,
+    };
   });
-});
 
-// === Provider 목록 ===
-router.get('/providers', async (req, res) => {
-  try {
-    const providers = await getAllProviders();
-    const settings = getSettings();
+  /**
+   * @swagger
+   * /api/ai/providers:
+   *   get:
+   *     tags: [AI]
+   *     summary: 사용 가능한 Provider 목록
+   *     responses:
+   *       200:
+   *         description: Provider 목록
+   */
+  fastify.get('/providers', async (request, reply) => {
+    try {
+      const providers = await getAllProviders();
+      const settings = getSettings();
 
-    res.json({
-      current: settings.currentProvider,
-      providers,
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: 'Failed to get providers',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-// === Provider 변경 ===
-router.post('/providers/switch', async (req, res) => {
-  try {
-    const parsed = switchProviderSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({
-        error: 'Invalid request',
-        details: parsed.error.issues,
+      return {
+        current: settings.currentProvider,
+        providers,
+      };
+    } catch (error) {
+      return reply.status(500).send({
+        error: 'Failed to get providers',
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
+  });
 
-    const { provider } = parsed.data;
-    await setCurrentProvider(provider as ProviderType);
+  /**
+   * @swagger
+   * /api/ai/providers/switch:
+   *   post:
+   *     tags: [AI]
+   *     summary: Provider 변경
+   *     requestBody:
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - provider
+   *             properties:
+   *               provider:
+   *                 type: string
+   *                 enum: [deepseek, ollama]
+   *     responses:
+   *       200:
+   *         description: Provider 변경 성공
+   */
+  fastify.post('/providers/switch', async (request, reply) => {
+    try {
+      const parsed = switchProviderSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: 'Invalid request',
+          details: parsed.error.issues,
+        });
+      }
 
-    const currentProvider = getCurrentProvider();
-    res.json({
-      success: true,
-      current: currentProvider.type,
-      name: currentProvider.name,
-    });
-  } catch (error) {
-    res.status(400).json({
-      error: 'Failed to switch provider',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
+      const { provider } = parsed.data;
+      await setCurrentProvider(provider as ProviderType);
 
-export const aiRoutes = router;
+      const currentProvider = getCurrentProvider();
+      return {
+        success: true,
+        current: currentProvider.type,
+        name: currentProvider.name,
+      };
+    } catch (error) {
+      return reply.status(400).send({
+        error: 'Failed to switch provider',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+};
+
+export { aiRoutes };
