@@ -6,6 +6,10 @@
  */
 
 import { toast } from 'sonner';
+import i18n from 'i18next';
+
+// Helper to get translated string
+const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, options) as string;
 
 // ============================================
 // 타입 정의
@@ -59,54 +63,54 @@ export const notify = {
 export const notifyAI = {
   /** Ollama 연결 끊김 */
   ollamaDisconnected: () => {
-    notify.error('Ollama 연결 끊김', {
-      description: '로컬 Ollama 서버에 연결할 수 없습니다. 서버가 실행 중인지 확인하세요.',
+    notify.error(t('toast.ollama_disconnected'), {
+      description: t('toast.ollama_disconnected_desc'),
       duration: 6000,
     });
   },
 
   /** DeepSeek 연결 실패 */
   deepseekDisconnected: () => {
-    notify.error('DeepSeek 연결 실패', {
-      description: 'DeepSeek API에 연결할 수 없습니다. 네트워크 상태를 확인하세요.',
+    notify.error(t('toast.deepseek_disconnected'), {
+      description: t('toast.deepseek_disconnected_desc'),
       duration: 6000,
     });
   },
 
   /** Gemini 연결 실패 */
   geminiDisconnected: () => {
-    notify.error('Gemini 연결 실패', {
-      description: 'Google Gemini API에 연결할 수 없습니다.',
+    notify.error(t('toast.gemini_disconnected'), {
+      description: t('toast.gemini_disconnected_desc'),
       duration: 6000,
     });
   },
 
   /** AI Provider 전환 성공 */
   providerSwitched: (providerName: string) => {
-    notify.success(`${providerName}로 전환됨`, {
+    notify.success(t('toast.provider_switched', { provider: providerName }), {
       duration: 2000,
     });
   },
 
   /** AI Provider 전환 실패 */
   providerSwitchFailed: (providerName: string) => {
-    notify.error(`${providerName} 전환 실패`, {
-      description: '잠시 후 다시 시도해주세요.',
+    notify.error(t('toast.provider_switch_failed', { provider: providerName }), {
+      description: t('toast.try_again_later'),
     });
   },
 
   /** API 크레딧 부족 */
   creditExhausted: () => {
-    notify.warning('API 크레딧 부족', {
-      description: 'AI 기능 사용을 위해 크레딧을 충전해주세요.',
+    notify.warning(t('toast.credit_exhausted'), {
+      description: t('toast.credit_exhausted_desc'),
       duration: 6000,
     });
   },
 
   /** 백엔드 서버 연결 실패 */
   backendDisconnected: () => {
-    notify.error('서버 연결 실패', {
-      description: '백엔드 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.',
+    notify.error(t('toast.server_connection_failed'), {
+      description: t('toast.server_connection_failed_desc'),
       duration: 6000,
     });
   },
@@ -119,16 +123,16 @@ export const notifyAI = {
 export const notifySimulator = {
   /** 시뮬레이션 타임아웃 */
   timeout: (language: string) => {
-    notify.error(`${language} 시뮬레이션 타임아웃`, {
-      description: '코드 실행 시간이 10초를 초과했습니다. 무한 루프가 있는지 확인하세요.',
+    notify.error(t('toast.simulation_timeout', { lang: language }), {
+      description: t('toast.simulation_timeout_desc'),
       duration: 6000,
     });
   },
 
   /** 컴파일 에러 */
   compileError: (language: string, errorMessage?: string) => {
-    notify.error(`${language} 컴파일 에러`, {
-      description: errorMessage || '코드에 문법 오류가 있습니다.',
+    notify.error(t('toast.compile_error', { lang: language }), {
+      description: errorMessage || t('toast.syntax_error'),
       duration: 6000,
     });
   },
@@ -136,9 +140,9 @@ export const notifySimulator = {
   /** Emscripten 컴파일 에러 (상세 - 여러 에러 표시) */
   compilationErrors: (language: string, errors: string[]) => {
     const errorList = errors.slice(0, 3).map((err) => `• ${err}`).join('\n');
-    const moreCount = errors.length > 3 ? `\n\n+${errors.length - 3}개 더` : '';
+    const moreCount = errors.length > 3 ? `\n\n+${t('toast.more_errors', { count: errors.length - 3 })}` : '';
 
-    toast.error(`${language} 컴파일 에러`, {
+    toast.error(t('toast.compile_error', { lang: language }), {
       description: errorList + moreCount,
       duration: 8000,
     });
@@ -146,31 +150,31 @@ export const notifySimulator = {
 
   /** 런타임 에러 */
   runtimeError: (language: string, errorMessage?: string) => {
-    notify.error(`${language} 런타임 에러`, {
-      description: errorMessage || '코드 실행 중 오류가 발생했습니다.',
+    notify.error(t('toast.runtime_error', { lang: language }), {
+      description: errorMessage || t('toast.runtime_error_desc'),
       duration: 6000,
     });
   },
 
   /** 시뮬레이션 실패 (일반) */
   simulationFailed: (language: string, errorMessage?: string) => {
-    notify.error(`${language} 시뮬레이션 실패`, {
-      description: errorMessage || '알 수 없는 오류가 발생했습니다.',
+    notify.error(t('toast.simulation_failed', { lang: language }), {
+      description: errorMessage || t('errors.unknown'),
       duration: 5000,
     });
   },
 
   /** 위험한 코드 감지 */
   dangerousCode: () => {
-    notify.warning('위험한 코드 감지', {
-      description: '보안상 실행할 수 없는 코드가 포함되어 있습니다.',
+    notify.warning(t('toast.dangerous_code'), {
+      description: t('toast.dangerous_code_desc'),
       duration: 5000,
     });
   },
 
   /** 시뮬레이션 성공 */
   simulationSuccess: (language: string) => {
-    notify.success(`${language} 시뮬레이션 완료`, {
+    notify.success(t('toast.simulation_complete', { lang: language }), {
       duration: 2000,
     });
   },
@@ -183,56 +187,56 @@ export const notifySimulator = {
 export const notifyNetwork = {
   /** 네트워크 연결 끊김 */
   disconnected: () => {
-    notify.error('네트워크 연결 끊김', {
-      description: '인터넷 연결을 확인해주세요.',
+    notify.error(t('toast.network_disconnected'), {
+      description: t('toast.check_internet'),
       duration: 6000,
     });
   },
 
   /** 요청 타임아웃 */
   requestTimeout: () => {
-    notify.error('요청 시간 초과', {
-      description: '서버 응답이 너무 오래 걸립니다. 잠시 후 다시 시도해주세요.',
+    notify.error(t('toast.request_timeout'), {
+      description: t('toast.request_timeout_desc'),
       duration: 5000,
     });
   },
 
   /** 서버 에러 (500) */
   serverError: () => {
-    notify.error('서버 오류', {
-      description: '서버에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+    notify.error(t('toast.server_error'), {
+      description: t('toast.server_error_desc'),
       duration: 5000,
     });
   },
 
   /** 서비스 이용 불가 (503) */
   serviceUnavailable: () => {
-    notify.error('서비스 일시 중단', {
-      description: '서비스가 일시적으로 이용 불가합니다. 잠시 후 다시 시도해주세요.',
+    notify.error(t('toast.service_unavailable'), {
+      description: t('toast.service_unavailable_desc'),
       duration: 5000,
     });
   },
 
   /** 인증 실패 (401) */
   unauthorized: () => {
-    notify.warning('인증 만료', {
-      description: '다시 로그인해주세요.',
+    notify.warning(t('toast.auth_expired'), {
+      description: t('toast.please_login_again'),
       duration: 4000,
     });
   },
 
   /** 권한 없음 (403) */
   forbidden: () => {
-    notify.warning('접근 권한 없음', {
-      description: '이 기능에 대한 접근 권한이 없습니다.',
+    notify.warning(t('toast.no_permission'), {
+      description: t('toast.no_permission_desc'),
       duration: 4000,
     });
   },
 
   /** 요청 제한 (429) */
   rateLimited: () => {
-    notify.warning('요청 제한', {
-      description: '너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.',
+    notify.warning(t('toast.rate_limited'), {
+      description: t('toast.rate_limited_desc'),
       duration: 5000,
     });
   },
@@ -245,23 +249,23 @@ export const notifyNetwork = {
 export const notifyAdmin = {
   /** 설정 저장 성공 */
   settingsSaved: () => {
-    notify.success('설정이 저장되었습니다', {
+    notify.success(t('toast.settings_saved'), {
       duration: 2000,
     });
   },
 
   /** 설정 저장 실패 */
   settingsFailed: (errorMessage?: string) => {
-    notify.error('설정 저장 실패', {
-      description: errorMessage || '설정을 저장하는 중 오류가 발생했습니다.',
+    notify.error(t('toast.settings_failed'), {
+      description: errorMessage || t('toast.settings_failed_desc'),
       duration: 5000,
     });
   },
 
   /** 레슨 로드 실패 */
   lessonLoadFailed: (lessonId: string) => {
-    notify.error('레슨 로드 실패', {
-      description: `레슨 "${lessonId}"를 불러올 수 없습니다.`,
+    notify.error(t('toast.lesson_load_failed'), {
+      description: t('toast.lesson_load_failed_desc', { lessonId }),
       duration: 5000,
     });
   },
@@ -331,9 +335,9 @@ export function handleAPIError(status: number, message?: string) {
       break;
     default:
       if (message) {
-        notify.error('오류 발생', { description: message });
+        notify.error(t('toast.error_occurred'), { description: message });
       } else {
-        notify.error('알 수 없는 오류가 발생했습니다');
+        notify.error(t('errors.unknown'));
       }
   }
 }
