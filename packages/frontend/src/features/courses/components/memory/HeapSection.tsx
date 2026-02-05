@@ -21,11 +21,14 @@ export function HeapSection({
   blocks,
   changedBlocks,
 }: HeapSectionProps) {
-  // 주소순 정렬 (낮은 주소 → 높은 주소)
+  // 주소순 정렬 (낮은 주소 → 높은 주소), NaN 방어
   const sortedBlocks = useMemo(() => {
     return [...blocks].sort((a, b) => {
       const addrA = parseInt(a.address, 16);
       const addrB = parseInt(b.address, 16);
+      if (isNaN(addrA) && isNaN(addrB)) return 0;
+      if (isNaN(addrA)) return 1;
+      if (isNaN(addrB)) return -1;
       return addrA - addrB;
     });
   }, [blocks]);
@@ -68,16 +71,25 @@ export function HeapSection({
 
       <div className="space-y-1.5">
         {sortedBlocks.map((block) => (
-          <MemoryBlockCard
-            key={`heap-${block.name}-${block.address}`}
-            block={block}
-            isChanged={changedBlocks.stack.includes(block.name) || changedBlocks.heap.includes(block.name)}
-            isHovered={false}
-            frameColor={COLORS.frame[2]}
-            frameName="heap"
-            onMouseEnter={() => {}}
-            onMouseLeave={() => {}}
-          />
+          <div key={`heap-${block.name}-${block.address}`}>
+            {block.label && (
+              <div
+                className="text-[9px] font-semibold mb-0.5 px-1"
+                style={{ color: 'var(--theme-memory-heap-label)' }}
+              >
+                {block.label}
+              </div>
+            )}
+            <MemoryBlockCard
+              block={block}
+              isChanged={changedBlocks.stack.includes(block.name) || changedBlocks.heap.includes(block.name)}
+              isHovered={false}
+              frameColor={COLORS.frame[2]}
+              frameName="heap"
+              onMouseEnter={() => {}}
+              onMouseLeave={() => {}}
+            />
+          </div>
         ))}
       </div>
     </div>

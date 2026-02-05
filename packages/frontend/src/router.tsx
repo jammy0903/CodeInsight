@@ -15,7 +15,6 @@ import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage } from 
 import { ProfilePage } from './features/profile';
 import { DashboardPage } from './features/dashboard';
 import { ReportPage } from './features/report';
-import { SubscriptionPage } from './features/subscription';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { initializeAuthListener } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
@@ -100,7 +99,6 @@ export const router = createBrowserRouter([
       { path: 'profile', element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
       { path: 'dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
       { path: 'report', element: <ProtectedRoute><ReportPage /></ProtectedRoute> },
-      { path: 'subscription', element: <SubscriptionPage /> },
       { path: 'admin', element: <AdminRoute><AdminPage /></AdminRoute> },
     ],
   },

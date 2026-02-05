@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { ChapterWithLessons } from '@/types';
@@ -6,38 +6,18 @@ import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
-import { ChevronLeft, Lock, Crown } from 'lucide-react';
+import { ChevronLeft, Lock } from 'lucide-react';
 import { useIsMobile, useLanguageCourse } from '@/hooks';
-import { getMySubscription } from '@/services/subscription';
 
 export function LanguageCoursePage() {
   const { t } = useTranslation();
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
-  const { setPageTitle, appUser } = useStore();
+  const setPageTitle = useStore((s) => s.setPageTitle);
+  const appUser = useStore((s) => s.appUser);
 
   // TanStack Query: loading, error, data 자동 관리
   const { data, isLoading, isError, error } = useLanguageCourse(lang);
-
-  // 구독으로 전체 챕터 접근 가능 여부
-  const [hasAllChapters, setHasAllChapters] = useState(false);
-
-  // 구독 상태 확인
-  useEffect(() => {
-    async function checkSubscription() {
-      if (!appUser) {
-        setHasAllChapters(false);
-        return;
-      }
-      try {
-        const subscription = await getMySubscription();
-        setHasAllChapters(subscription.features.includes('all_chapters'));
-      } catch {
-        setHasAllChapters(false);
-      }
-    }
-    checkSubscription();
-  }, [appUser]);
 
   // 언어 이름 & 아이콘 & 설명
   const getLanguageInfo = () => {
@@ -236,8 +216,6 @@ export function LanguageCoursePage() {
 
                   // 비로그인: 챕터 2 이상 로그인 필요
                   const needsLogin = !appUser && chapter.order >= 2;
-                  // 로그인했지만 구독 없음: 챕터 3 이상 구독 필요
-                  const needsSubscription = appUser && !hasAllChapters && chapter.order >= 3;
 
                   return (
                     <div key={chapter.id}>
@@ -250,7 +228,6 @@ export function LanguageCoursePage() {
                           <h3 className="text-base font-semibold text-[#333] flex items-center gap-2 flex-shrink-0">
                             {isSequentialLocked && <Lock className="w-4 h-4 text-[var(--theme-dashboard-text-muted)]" />}
                             {needsLogin && !isSequentialLocked && <Lock className="w-4 h-4 text-gray-400" />}
-                            {needsSubscription && !isSequentialLocked && <Crown className="w-4 h-4 text-amber-500" />}
                             {chapter.title}
                           </h3>
                           <div className="flex items-center gap-2 flex-shrink-0">
@@ -306,8 +283,6 @@ export function LanguageCoursePage() {
 
                   // 비로그인: 챕터 2 이상 로그인 필요
                   const needsLogin = !appUser && chapter.order >= 2;
-                  // 로그인했지만 구독 없음: 챕터 3 이상 구독 필요
-                  const needsSubscription = appUser && !hasAllChapters && chapter.order >= 3;
 
                   return (
                     <ChapterCard
@@ -319,7 +294,6 @@ export function LanguageCoursePage() {
                       isLocked={isLocked}
                       isActive={isActive}
                       needsLogin={needsLogin}
-                      needsSubscription={needsSubscription}
                     />
                   );
                 })}

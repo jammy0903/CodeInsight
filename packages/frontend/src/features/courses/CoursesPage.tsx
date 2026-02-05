@@ -18,7 +18,7 @@ import { useStore } from '@/stores/store';
 export function CoursesPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setPageTitle } = useStore();
+  const setPageTitle = useStore((s) => s.setPageTitle);
   const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

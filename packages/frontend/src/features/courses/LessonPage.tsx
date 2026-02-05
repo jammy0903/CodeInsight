@@ -67,7 +67,8 @@ export function LessonPage() {
   }>();
 
   const queryClient = useQueryClient();
-  const { appUser, refreshStreak } = useStore();
+  const appUser = useStore((s) => s.appUser);
+  const refreshStreak = useStore((s) => s.refreshStreak);
   const isMobile = useIsMobile();
 
   // 1. 데이터 패칭

@@ -90,7 +90,9 @@ interface AIUsageStats {
 }
 
 export function AdminPage() {
-  const { appUser, authLoading, setPageTitle } = useStore();
+  const appUser = useStore((s) => s.appUser);
+  const authLoading = useStore((s) => s.authLoading);
+  const setPageTitle = useStore((s) => s.setPageTitle);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<{ users: UserInfo[]; total: number; page: number; totalPages: number } | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionInfo[]>([]);

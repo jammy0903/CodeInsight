@@ -6,7 +6,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import type { Chapter, UserProgress } from '@/types';
-import { Star, Target, Lock, ChevronRight, BookOpen, Crown } from 'lucide-react';
+import { Star, Target, Lock, ChevronRight, BookOpen } from 'lucide-react';
 
 // 언어별 색상 테마 (밝은 파스텔 톤)
 const LANGUAGE_THEMES: Record<string, {
@@ -68,7 +68,6 @@ interface ChapterCardProps {
   completedCount: number;
   isLocked?: boolean;
   isActive?: boolean;
-  needsSubscription?: boolean; // 구독 필요 여부
   needsLogin?: boolean; // 로그인 필요 여부
 }
 
@@ -79,7 +78,6 @@ export function ChapterCard({
   completedCount,
   isLocked = false,
   isActive = false,
-  needsSubscription = false,
   needsLogin = false,
 }: ChapterCardProps) {
   const navigate = useNavigate();
@@ -192,12 +190,6 @@ export function ChapterCard({
           <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 border border-gray-200">
             <Lock className="w-2.5 h-2.5 md:w-3 md:h-3" />
             Login
-          </span>
-        )}
-        {needsSubscription && !isLocked && !needsLogin && (
-          <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200">
-            <Crown className="w-2.5 h-2.5 md:w-3 md:h-3" />
-            Premium
           </span>
         )}
       </div>

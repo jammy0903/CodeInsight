@@ -403,7 +403,8 @@ StoryPanel.displayName = 'StoryPanel';
 export default function HomePage() {
   const { t } = useTranslation();
   const currentTheme = useThemeStore((s) => s.theme);
-  const { firebaseUser, setPageTitle } = useStore();
+  const firebaseUser = useStore((s) => s.firebaseUser);
+  const setPageTitle = useStore((s) => s.setPageTitle);
   const isLoggedIn = !!firebaseUser;
 
   // 페이지 제목 초기화 (홈페이지는 빈 문자열 = 로고만 표시)

@@ -16,7 +16,10 @@ import { ChevronLeft, ChevronRight, Sparkles, X } from 'lucide-react';
 import { PROFILE_QUESTIONS, type ProfileQuestionKey } from '@/constants/profileQuestions';
 
 export function OnboardingModal() {
-  const { needsOnboarding, setNeedsOnboarding, appUser, setSidebarOpen } = useStore();
+  const needsOnboarding = useStore((s) => s.needsOnboarding);
+  const setNeedsOnboarding = useStore((s) => s.setNeedsOnboarding);
+  const appUser = useStore((s) => s.appUser);
+  const setSidebarOpen = useStore((s) => s.setSidebarOpen);
 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<UserProfile>>({});

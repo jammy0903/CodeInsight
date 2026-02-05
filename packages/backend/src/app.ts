@@ -1,18 +1,11 @@
-/**
- * Fastify 애플리케이션 진입점
- *
- * Express에서 Fastify로 마이그레이션됨 (2026-02)
- */
-
-import Fastify, { FastifyInstance } from 'fastify';
-import cors from '@fastify/cors';
+import express from 'express';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
 import { logger } from './config/logger';
 import { initializeFirebase } from './config/firebase';
-import { authPlugin, rateLimitPlugin, swaggerPlugin } from './plugins';
-import { lessonContentLoader } from './services/lessonContentLoader';
-
-// Route imports
+import { swaggerSpec } from './config/swagger';
+import { rateLimit, authRateLimit, aiRateLimit, executeRateLimit, requestLogger } from './middleware';
 import { problemRoutes } from './modules/problems/routes';
 import { cSimulatorRoutes } from './modules/simulators/c/routes';
 import { aiRoutes } from './modules/ai/routes';
@@ -20,13 +13,13 @@ import { courseRoutes } from './modules/courses/routes';
 import { analyticsRoutes } from './modules/analytics/routes';
 import { notesRoutes } from './modules/notes/routes';
 import { gamificationRoutes } from './modules/gamification';
-import { adminRoutes } from './modules/admin/admin.routes';
+import adminRoutes from './modules/admin/admin.routes';
 import { userRoutes } from './modules/users/routes';
 import pythonSimulatorRoutes from './modules/simulators/python/routes';
 import { javaSimulatorRoutes } from './modules/simulators/java/routes';
 import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
 import { standaloneQuizzesRoutes } from './modules/standalone-quizzes/routes';
-import { subscriptionRoutes } from './modules/subscription';
+import { lessonContentLoader } from './services/lessonContentLoader';
 
 // Firebase Admin 초기화
 try {
@@ -43,141 +36,130 @@ lessonContentLoader.scanFilePaths().catch((err) => {
   logger.warn('App will continue without pre-loaded lesson contents');
 });
 
-// Fastify 인스턴스 생성
-const app: FastifyInstance = Fastify({
-  logger: false, // 커스텀 로거 사용
-  bodyLimit: 10 * 1024 * 1024, // 10MB (config.server.jsonBodyLimit)
-  trustProxy: true,
-});
+const app = express();
 
-// CORS 설정
+// Middleware
+// Capacitor 앱 Origin 허용 (Android: capacitor://localhost, https://localhost)
 const capacitorOrigins = ['capacitor://localhost', 'https://localhost', 'http://localhost'];
 const allowedOrigins = [...config.server.corsOrigins, ...capacitorOrigins];
 
-app.register(cors, {
+app.use(cors({
   origin: config.server.isDev ? true : (origin, callback) => {
+    // origin이 없으면 허용 (same-origin 요청)
     if (!origin) return callback(null, true);
+
+    // 허용된 Origin 체크
     if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
       return callback(null, true);
     }
-    callback(new Error('Not allowed by CORS'), false);
+
+    callback(new Error('Not allowed by CORS'));
   },
-  credentials: true,
+  credentials: true
+}));
+app.use(express.json({ limit: config.server.jsonBodyLimit }));
+app.use(requestLogger);
+
+// Routes
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', service: 'CodeInsight Backend API' });
 });
 
-// 플러그인 등록
-app.register(authPlugin);
-app.register(rateLimitPlugin);
-app.register(swaggerPlugin);
-
-// Request 로깅 훅
-app.addHook('onResponse', (request, reply, done) => {
-  logger.info('HTTP Request', {
-    method: request.method,
-    url: request.url,
-    statusCode: reply.statusCode,
-    duration: `${Math.round(reply.elapsedTime)}ms`,
-    ip: request.ip,
-  });
-  done();
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy' });
 });
 
 // =============================================
-// 기본 라우트
+// API v1 Routes (현재 버전)
 // =============================================
-app.get('/', async () => {
-  return { status: 'ok', service: 'CodeInsight Backend API' };
-});
-
-app.get('/health', async () => {
-  return { status: 'healthy' };
-});
-
-// =============================================
-// API v1 Routes
-// =============================================
-app.register(problemRoutes, { prefix: '/api/v1/problems' });
-app.register(cSimulatorRoutes, { prefix: '/api/v1/simulators/c' });
-app.register(pythonSimulatorRoutes, { prefix: '/api/v1/simulators/python' });
-app.register(javaSimulatorRoutes, { prefix: '/api/v1/simulators/java' });
-app.register(javascriptSimulatorRoutes, { prefix: '/api/v1/simulators/javascript' });
-app.register(aiRoutes, { prefix: '/api/v1/ai' });
-app.register(courseRoutes, { prefix: '/api/v1/courses' });
-app.register(analyticsRoutes, { prefix: '/api/v1/analytics' });
-app.register(notesRoutes, { prefix: '/api/v1/notes' });
-app.register(gamificationRoutes, { prefix: '/api/v1/gamification' });
-app.register(adminRoutes, { prefix: '/api/v1/admin' });
-app.register(userRoutes, { prefix: '/api/v1/users' });
-app.register(standaloneQuizzesRoutes, { prefix: '/api/v1/standalone-quizzes' });
-app.register(subscriptionRoutes, { prefix: '/api/v1/subscription' });
+app.use('/api/v1/problems', rateLimit, problemRoutes);
+app.use('/api/v1/simulators/c', executeRateLimit, cSimulatorRoutes);
+app.use('/api/v1/simulators/python', executeRateLimit, pythonSimulatorRoutes);
+app.use('/api/v1/simulators/java', executeRateLimit, javaSimulatorRoutes);
+app.use('/api/v1/simulators/javascript', executeRateLimit, javascriptSimulatorRoutes);
+app.use('/api/v1/ai', aiRateLimit, aiRoutes);
+app.use('/api/v1/courses', rateLimit, courseRoutes);
+app.use('/api/v1/analytics', rateLimit, analyticsRoutes);
+app.use('/api/v1/notes', rateLimit, notesRoutes);
+app.use('/api/v1/gamification', rateLimit, gamificationRoutes);
+app.use('/api/v1/admin', rateLimit, adminRoutes);
+app.use('/api/v1/users', rateLimit, userRoutes);
+app.use('/api/v1/standalone-quizzes', rateLimit, standaloneQuizzesRoutes);
 
 // =============================================
 // Legacy Routes (버전 없는 요청 → v1로 리다이렉트)
 // =============================================
-const legacyRedirects: Record<string, string> = {
-  '/api/problems': '/api/v1/problems',
-  '/api/memory': '/api/v1/simulators/c/trace',
-  '/api/submissions': '/api/v1/submissions',
-  '/api/users': '/api/v1/users',
-  '/api/c': '/api/v1/c',
-  '/api/ai': '/api/v1/ai',
-  '/api/courses': '/api/v1/courses',
-  '/api/analytics': '/api/v1/analytics',
-  '/api/notes': '/api/v1/notes',
-  '/api/admin': '/api/v1/admin',
-  '/api/gamification': '/api/v1/gamification',
-  '/api/standalone-quizzes': '/api/v1/standalone-quizzes',
-};
-
-Object.entries(legacyRedirects).forEach(([oldPath, newPath]) => {
-  app.all(`${oldPath}/*`, async (request, reply) => {
-    const subPath = request.url.replace(oldPath, '');
-    return reply.redirect(`${newPath}${subPath}`);
-  });
-  app.all(oldPath, async (_request, reply) => {
-    return reply.redirect(newPath);
-  });
+app.use('/api/problems', (req, res) => {
+  res.redirect(301, `/api/v1/problems${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/memory', (req, res) => {
+  res.redirect(301, `/api/v1/simulators/c/trace${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/submissions', (req, res) => {
+  res.redirect(301, `/api/v1/submissions${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/users', (req, res) => {
+  res.redirect(301, `/api/v1/users${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/c', (req, res) => {
+  res.redirect(301, `/api/v1/c${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/ai', (req, res) => {
+  res.redirect(301, `/api/v1/ai${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/courses', (req, res) => {
+  res.redirect(301, `/api/v1/courses${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/analytics', (req, res) => {
+  res.redirect(301, `/api/v1/analytics${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/notes', (req, res) => {
+  res.redirect(301, `/api/v1/notes${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/admin', (req, res) => {
+  res.redirect(301, `/api/v1/admin${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/gamification', (req, res) => {
+  res.redirect(301, `/api/v1/gamification${req.path === '/' ? '' : req.path}`);
+});
+app.use('/api/standalone-quizzes', (req, res) => {
+  res.redirect(301, `/api/v1/standalone-quizzes${req.path === '/' ? '' : req.path}`);
 });
 
-// =============================================
-// Error Handlers
-// =============================================
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'C-OSINE API Docs'
+}));
+
+// OpenAPI JSON endpoint
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // 404 handler
-app.setNotFoundHandler(async (request, reply) => {
-  return reply.status(404).send({ error: 'Not found', path: request.url });
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found', path: req.path });
 });
 
 // Global error handler
-app.setErrorHandler(async (error, request, reply) => {
-  const err = error as Error & { statusCode?: number };
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error('Unhandled error', {
     message: err.message,
     stack: err.stack,
-    url: request.url,
-    method: request.method,
+    url: req.url,
+    method: req.method,
   });
-
-  const statusCode = err.statusCode || 500;
-  return reply.status(statusCode).send({
-    error: statusCode === 500 ? 'Internal server error' : err.message,
-    message: config.server.isDev ? err.message : undefined,
+  res.status(500).json({
+    error: 'Internal server error',
+    message: config.server.isDev ? err.message : undefined
   });
 });
 
-// =============================================
-// Server Start
-// =============================================
-const start = async () => {
-  try {
-    await app.listen({ port: config.server.port, host: '0.0.0.0' });
-    logger.info(`Server running on http://localhost:${config.server.port}`);
-  } catch (err) {
-    logger.error('Failed to start server:', err);
-    process.exit(1);
-  }
-};
-
-start();
+// Start server
+app.listen(config.server.port, () => {
+  logger.info(`Server running on http://localhost:${config.server.port}`);
+});
 
 export default app;

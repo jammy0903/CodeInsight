@@ -27,7 +27,8 @@ export function useLessonAnalytics({
   currentStepIndex,
   enabled = true,
 }: UseLessonAnalyticsOptions) {
-  const { appUser } = useStore();
+  // 선택적 구독: appUser만 구독하여 불필요한 리렌더링 방지
+  const appUser = useStore((state) => state.appUser);
   const isLoggedIn = !!appUser;
   const shouldTrack = enabled && isLoggedIn && !!lessonId;
 

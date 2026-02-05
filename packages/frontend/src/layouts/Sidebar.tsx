@@ -41,7 +41,11 @@ const AUTH_NAV_ITEMS: NavItem[] = [
 export function Sidebar() {
   const location = useLocation();
   const { t } = useTranslation();
-  const { sidebarOpen, toggleSidebar, firebaseUser, appUser, needsRegistration } = useStore();
+  const sidebarOpen = useStore((s) => s.sidebarOpen);
+  const toggleSidebar = useStore((s) => s.toggleSidebar);
+  const firebaseUser = useStore((s) => s.firebaseUser);
+  const appUser = useStore((s) => s.appUser);
+  const needsRegistration = useStore((s) => s.needsRegistration);
   const isAdmin = appUser?.role === 'admin';
 
   const handleSignOut = async () => {

@@ -59,22 +59,28 @@ export function MemoryBlockCard({
     }
   };
 
+  const isDangling = !!block.dangling;
+
   return (
     <motion.div
       layout
       initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
+      animate={{ opacity: isDangling ? 0.6 : 1, x: 0 }}
       className="rounded-lg px-3 py-2 transition-all duration-200 cursor-pointer relative"
       data-block-name={block.name}
       data-block-address={block.address}
       style={{
         backgroundColor: isHovered ? frameColor.hover : 'var(--theme-memory-card-bg)',
-        border: `2px solid ${isChanged ? COLORS.changed.border : frameColor.border}`,
-        boxShadow: isChanged
-          ? `0 0 8px ${COLORS.changed.border}40`
-          : isHovered
-            ? `0 0 6px ${frameColor.border}30`
-            : '0 1px 3px rgba(0,0,0,0.08)',
+        border: isDangling
+          ? '2px dashed #ef4444'
+          : `2px solid ${isChanged ? COLORS.changed.border : frameColor.border}`,
+        boxShadow: isDangling
+          ? '0 0 8px rgba(239,68,68,0.3)'
+          : isChanged
+            ? `0 0 8px ${COLORS.changed.border}40`
+            : isHovered
+              ? `0 0 6px ${frameColor.border}30`
+              : '0 1px 3px rgba(0,0,0,0.08)',
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -215,6 +221,53 @@ export function MemoryBlockCard({
           </div>
         )}
       </div>
+
+      {/* Dangling 뱃지 */}
+      {isDangling && (
+        <div
+          className="mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded inline-block"
+          style={{ backgroundColor: '#fecaca', color: '#991b1b' }}
+        >
+          dangling
+        </div>
+      )}
+
+      {/* Struct 멤버 표시 */}
+      {block.structMembers && block.structMembers.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          {block.structMembers.map((member) => (
+            <span
+              key={member.key}
+              className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+              style={{
+                backgroundColor: `${frameColor.border}15`,
+                color: 'var(--theme-memory-card-text)',
+              }}
+            >
+              .{member.key}={member.value}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Char 배열 표시 */}
+      {block.charElements && block.charElements.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap gap-0.5">
+          {block.charElements.map((el, i) => (
+            <span
+              key={i}
+              className="text-[11px] font-mono font-bold px-1 py-0.5 rounded border"
+              style={{
+                backgroundColor: el.highlight ? '#fef08a' : `${frameColor.border}10`,
+                borderColor: el.highlight ? '#eab308' : `${frameColor.border}30`,
+                color: 'var(--theme-memory-card-text)',
+              }}
+            >
+              {el.value}
+            </span>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }

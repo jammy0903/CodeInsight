@@ -40,7 +40,8 @@ const PERIOD_KEYS: Record<Period, string> = {
 
 export function ReportPage() {
   const { t } = useTranslation();
-  const { appUser, setPageTitle } = useStore();
+  const appUser = useStore((s) => s.appUser);
+  const setPageTitle = useStore((s) => s.setPageTitle);
   const { streak, loading: streakLoading } = useStreak();
 
   const [period, setPeriod] = useState<Period>('30d');

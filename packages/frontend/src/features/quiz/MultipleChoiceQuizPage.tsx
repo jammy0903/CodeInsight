@@ -191,7 +191,7 @@ export function MultipleChoiceQuizPage() {
   const [score, setScore] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
 
-  const { setPageTitle } = useStore(); // useStore 훅 사용
+  const setPageTitle = useStore((s) => s.setPageTitle);
 
   useEffect(() => {
     setPageTitle(

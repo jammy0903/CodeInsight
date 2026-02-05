@@ -630,64 +630,13 @@ async function seed() {
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
   }
 
-  // 8. 구독 플랜 시드
-  console.log('\n💳 Seeding subscription plans...');
-  const subscriptionPlans = [
-    {
-      id: 'free',
-      name: '무료',
-      description: '챕터 1-2 학습 + AI 체험',
-      price: 0,
-      currency: 'KRW',
-      billingPeriod: 'monthly',
-      monthlyTokenLimit: 50000, // 월 50,000 토큰
-      dailyTokenLimit: 5000, // 일 5,000 토큰
-      features: ['basic_learning', 'ai_chat_limited', 'chapters_1_2'],
-      order: 0,
-    },
-    {
-      id: 'basic',
-      name: '베이직',
-      description: '전체 챕터 + AI 확장',
-      price: 2000,
-      currency: 'KRW',
-      billingPeriod: 'monthly',
-      monthlyTokenLimit: 500000, // 월 500,000 토큰
-      dailyTokenLimit: 50000, // 일 50,000 토큰
-      features: ['basic_learning', 'ai_chat', 'ai_explain', 'all_chapters'],
-      order: 1,
-    },
-    {
-      id: 'premium',
-      name: '프리미엄',
-      description: '전체 챕터 + AI 무제한',
-      price: 5000,
-      currency: 'KRW',
-      billingPeriod: 'monthly',
-      monthlyTokenLimit: 2000000, // 월 2,000,000 토큰
-      dailyTokenLimit: null, // 일일 제한 없음
-      features: ['basic_learning', 'ai_chat', 'ai_explain', 'all_chapters', 'priority_support'],
-      order: 2,
-    },
-  ];
-
-  for (const plan of subscriptionPlans) {
-    await prisma.subscriptionPlan.upsert({
-      where: { id: plan.id },
-      update: plan,
-      create: plan,
-    });
-    console.log(`  ✓ Plan: ${plan.name} (${plan.price}원/월)`);
-  }
-
-  // 9. 결과 확인
+  // 8. 결과 확인
   const stats = {
     languages: await prisma.language.count(),
     chapters: await prisma.chapter.count(),
     lessons: await prisma.lesson.count(),
     contents: await prisma.lessonContent.count(),
     quizzes: await prisma.quiz.count(),
-    subscriptionPlans: await prisma.subscriptionPlan.count(),
   };
 
   console.log('\n✅ Seeding complete!');
@@ -697,7 +646,6 @@ async function seed() {
   console.log(`     - Lessons: ${stats.lessons}`);
   console.log(`     - Contents: ${stats.contents}`);
   console.log(`     - Quizzes: ${stats.quizzes}`);
-  console.log(`     - Subscription Plans: ${stats.subscriptionPlans}`);
 }
 
 // 실행

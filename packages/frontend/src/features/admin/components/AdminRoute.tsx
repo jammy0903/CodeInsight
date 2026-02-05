@@ -14,7 +14,9 @@ interface AdminRouteProps {
 }
 
 export function AdminRoute({ children }: AdminRouteProps) {
-  const { firebaseUser, appUser, authLoading } = useStore();
+  const firebaseUser = useStore((s) => s.firebaseUser);
+  const appUser = useStore((s) => s.appUser);
+  const authLoading = useStore((s) => s.authLoading);
 
   // 인증 상태 로딩 중이면 대기
   if (authLoading) {
