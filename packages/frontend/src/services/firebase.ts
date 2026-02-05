@@ -22,6 +22,8 @@ import {
   OAuthProvider,
   signOut,
   onAuthStateChanged,
+  browserSessionPersistence,
+  setPersistence,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { Capacitor } from '@capacitor/core';
@@ -37,6 +39,11 @@ import { setAuthToken } from './api/tokenManager';
 // Firebase 초기화
 const app = initializeApp(config.firebase);
 export const auth = getAuth(app);
+
+// 브라우저 닫으면 자동 로그아웃 (sessionStorage 사용)
+setPersistence(auth, browserSessionPersistence).catch((error) => {
+  console.error('Failed to set auth persistence:', error);
+});
 
 // OAuth Providers
 const googleProvider = new GoogleAuthProvider();

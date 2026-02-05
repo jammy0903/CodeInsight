@@ -10,7 +10,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, Crown } from 'lucide-react';
+import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '@/stores/store';
@@ -327,29 +327,6 @@ export function Sidebar() {
                             {firebaseUser.email}
                           </p>
                         </div>
-                      </Link>
-
-                      {/* 구독 관리 링크 */}
-                      <Link
-                        to="/subscription"
-                        onClick={toggleSidebar}
-                        className="flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded-lg transition-colors"
-                        style={{
-                          color: 'var(--theme-sidebar-nav-inactive-text)',
-                          borderColor: 'var(--theme-sidebar-nav-inactive-border)',
-                          backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
-                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
-                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
-                        }}
-                      >
-                        <Crown className="w-4 h-4" />
-                        {t('nav.subscription')}
                       </Link>
                     </>
                   )}
