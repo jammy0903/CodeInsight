@@ -7,29 +7,31 @@ import { motion } from 'framer-motion';
 import { Code2, Sparkles, Menu } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { StreakCard } from '@/features/gamification';
 import { LanguageBadge } from '@/components/ui/LanguageBadge';
-import { useIsMobile } from '@/hooks'; // useIsMobile import
-import type { SupportedLanguage } from '@/types/simulator'; // SupportedLanguage import
+import { useIsMobile } from '@/hooks';
+import type { SupportedLanguage } from '@/types/simulator';
 import { useEffect } from 'react';
 
 // 언어 정보 (LanguageCoursePage.tsx에서 가져옴)
-const getLanguageInfo = (lang: SupportedLanguage | null) => {
+const getLanguageInfo = (lang: SupportedLanguage | null, t: (key: string) => string) => {
   if (!lang) return null;
   switch (lang) {
-    case 'c': return { name: 'C언어', icon: 'C', color: '#0077B6' };
+    case 'c': return { name: t('languages.c'), icon: 'C', color: '#0077B6' };
     case 'python': return { name: 'Python', icon: '🐍', color: '#FFD54F' };
     case 'java': return { name: 'Java', icon: '☕', color: '#EC4899' };
     case 'javascript': return { name: 'JavaScript', icon: '⚡', color: '#81C784' };
-    case 'python-practical': return { name: 'Python실용', icon: '🤖', color: '#9E9E9E' };
+    case 'python-practical': return { name: t('languages.python_practical'), icon: '🤖', color: '#9E9E9E' };
   }
 };
 
 export function TopBar() {
+  const { t } = useTranslation();
   const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle, pageLanguage, appUser, streak, streakLoading, refreshStreak } = useStore();
-  const isMobile = useIsMobile(); // isMobile 훅 사용
+  const isMobile = useIsMobile();
 
-  const langInfo = pageLanguage ? getLanguageInfo(pageLanguage) : null;
+  const langInfo = pageLanguage ? getLanguageInfo(pageLanguage, t) : null;
 
   // 초기 로드 및 appUser 변경 시 스트릭 로드
   useEffect(() => {
@@ -52,7 +54,7 @@ export function TopBar() {
           <button
             onClick={toggleSidebar}
             className="p-1.5 rounded-md transition-colors shrink-0 hover:bg-[var(--theme-layout-top-bar-button-hover)]"
-            aria-label="메뉴 열기"
+            aria-label={t('nav.open_menu')}
           >
             <Menu className="w-6 h-6" style={{ color: 'var(--theme-layout-top-bar-text-muted)' }} />
           </button>
@@ -134,7 +136,7 @@ export function TopBar() {
         <div className="flex items-center gap-3 shrink-0">
           {/* 로그인 상태일 때 스트릭 표시 */}
           {appUser && (
-            <Link to="/dashboard" title="나의 현황 보기">
+            <Link to="/dashboard" title={t('nav.view_status')}>
               <StreakCard streak={streak} variant="compact" loading={streakLoading} />
             </Link>
           )}

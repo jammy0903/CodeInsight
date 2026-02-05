@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Loader2, AlertCircle, ChevronRight, BookOpen, RefreshCw } from 'lucide-react';
 import { getLanguages } from '@/services/courses';
@@ -16,6 +17,7 @@ import { useStore } from '@/stores/store';
 
 export function CoursesPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { setPageTitle } = useStore();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,8 +25,8 @@ export function CoursesPage() {
 
   // 페이지 제목 설정
   useEffect(() => {
-    setPageTitle('코스 목록', '학습할 언어를 선택하세요');
-  }, [setPageTitle]);
+    setPageTitle(t('courses.title'), t('courses.select_language'));
+  }, [setPageTitle, t]);
 
   // API에서 언어 목록 로드
   useEffect(() => {
@@ -34,7 +36,7 @@ export function CoursesPage() {
         const data = await getLanguages();
         setLanguages(data);
       } catch (err) {
-        setError('언어 목록을 불러오지 못했습니다.');
+        setError(t('courses.load_error'));
         logger.error('Failed to load languages:', err);
       } finally {
         setLoading(false);
@@ -65,7 +67,7 @@ export function CoursesPage() {
         <p className="text-muted-foreground">{error}</p>
         <button onClick={() => window.location.reload()} className="btn-secondary px-4 py-2 flex items-center gap-2">
           <RefreshCw className="w-4 h-4" />
-          다시 시도
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -80,10 +82,10 @@ export function CoursesPage() {
         className="text-center space-y-3"
       >
         <h1 className="text-3xl md:text-4xl font-display font-bold text-text">
-          🎓 코스 선택
+          🎓 {t('courses.select_title')}
         </h1>
         <p className="text-text-secondary">
-          학습하고 싶은 프로그래밍 언어를 선택하세요
+          {t('courses.select_desc')}
         </p>
       </motion.div>
 
@@ -108,7 +110,7 @@ export function CoursesPage() {
       {languages.length === 0 && (
         <div className="text-center py-12">
           <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground">아직 등록된 코스가 없습니다.</p>
+          <p className="text-muted-foreground">{t('courses.empty')}</p>
         </div>
       )}
     </div>
@@ -166,6 +168,7 @@ const DEFAULT_COLOR = {
 };
 
 function LanguageCard({ language, index, onClick }: LanguageCardProps) {
+  const { t } = useTranslation();
   const colors = LANGUAGE_COLORS[language.id] || DEFAULT_COLOR;
 
   return (
@@ -213,7 +216,7 @@ function LanguageCard({ language, index, onClick }: LanguageCardProps) {
         className="mt-3 flex items-center gap-1 text-sm font-semibold opacity-60 group-hover:opacity-100 transition-opacity"
         style={{ color: colors.text }}
       >
-        <span>시작하기</span>
+        <span>{t('courses.start')}</span>
         <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
       </div>
     </motion.button>

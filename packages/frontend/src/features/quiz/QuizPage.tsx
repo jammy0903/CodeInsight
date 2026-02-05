@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FileQuestion, CircleDot, ListChecks, Code2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/stores/store';
@@ -14,8 +15,8 @@ import { useStore } from '@/stores/store';
 interface QuizType {
   id: string;
   path: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descKey: string;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
@@ -32,24 +33,24 @@ const QUIZ_TYPES: QuizType[] = [
   {
     id: 'ox',
     path: '/quiz/ox',
-    label: 'OX 퀴즈',
-    description: '참/거짓을 판단하세요',
+    labelKey: 'quiz.ox_quiz',
+    descKey: 'quiz.ox_desc',
     icon: CircleDot,
     color: 'bg-blue-500',
   },
   {
     id: 'multiple-choice',
     path: '/quiz/multiple-choice',
-    label: '객관식',
-    description: '4개 중 정답을 선택하세요',
+    labelKey: 'quiz.multiple_choice',
+    descKey: 'quiz.multiple_desc',
     icon: ListChecks,
     color: 'bg-green-500',
   },
   {
     id: 'fill-blank',
     path: '/quiz/fill-blank',
-    label: '빈칸 코드 입력',
-    description: '코드 빈칸을 채우세요',
+    labelKey: 'quiz.fill_blank',
+    descKey: 'quiz.fill_desc',
     icon: Code2,
     color: 'bg-purple-500',
   },
@@ -88,13 +89,14 @@ const LANGUAGES: LanguageOption[] = [
 
 export function QuizPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { setPageTitle } = useStore();
   const [selectedQuizType, setSelectedQuizType] = useState<string | null>(null);
 
   // 페이지 제목 설정
   useEffect(() => {
-    setPageTitle('퀴즈', '학습한 내용을 확인해보세요');
-  }, [setPageTitle]);
+    setPageTitle(t('quiz.title'), t('quiz.subtitle'));
+  }, [setPageTitle, t]);
 
   const handleQuizTypeClick = (quizId: string) => {
     setSelectedQuizType(quizId);
@@ -112,7 +114,7 @@ export function QuizPage() {
         {/* 헤더 */}
         <div className="flex items-center gap-3 mb-8">
           <FileQuestion className="w-8 h-8" style={{ color: 'var(--theme-quiz-header-icon)' }} />
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-quiz-title)' }}>퀴즈</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-quiz-title)' }}>{t('quiz.title')}</h1>
         </div>
 
         {/* 퀴즈 유형 버튼들 - 모바일: 세로, 데스크톱: 가로 */}
@@ -152,10 +154,10 @@ export function QuizPage() {
                         color: isSelected ? 'var(--theme-quiz-text-hover)' : 'var(--theme-quiz-text)',
                       }}
                     >
-                      {quiz.label}
+                      {t(quiz.labelKey)}
                     </h2>
                     <p className="text-sm" style={{ color: 'var(--theme-quiz-text-muted)' }}>
-                      {quiz.description}
+                      {t(quiz.descKey)}
                     </p>
                   </div>
                 </div>
@@ -174,7 +176,7 @@ export function QuizPage() {
               transition={{ duration: 0.3 }}
               className="mt-8"
             >
-              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--theme-quiz-title)' }}>언어 선택</h3>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--theme-quiz-title)' }}>{t('quiz.select_language')}</h3>
               <div className="flex flex-col md:flex-row gap-4">
                 {LANGUAGES.map((lang) => (
                   <motion.button
