@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { loginWithGoogle, loginWithGithub, loginWithKakao } from '@/services/firebase';
 import { Github } from 'lucide-react';
@@ -15,6 +16,7 @@ import { logger } from '@/utils/logger';
 import { useStore } from '@/stores/store';
 
 export default function AuthPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { setSidebarOpen } = useStore();
@@ -23,11 +25,11 @@ export default function AuthPage() {
 
   // URL 경로로 로그인/회원가입 구분
   const isSignup = location.pathname === '/signup';
-  const pageTitle = isSignup ? '회원가입' : '로그인';
-  const errorPrefix = isSignup ? '회원가입' : '로그인';
+  const pageTitle = isSignup ? t('auth.signup') : t('auth.login');
+  const errorPrefix = isSignup ? t('auth.signup') : t('auth.login');
   const linkPath = isSignup ? '/login' : '/signup';
-  const linkText = isSignup ? '로그인하기' : '회원가입하기';
-  const linkPrompt = isSignup ? '이미 계정이 있으신가요?' : '계정이 없으신가요?';
+  const linkText = isSignup ? t('auth.go_login') : t('auth.go_signup');
+  const linkPrompt = isSignup ? t('auth.have_account') : t('auth.no_account');
 
   const handleGoogleLogin = async () => {
     try {
@@ -37,7 +39,7 @@ export default function AuthPage() {
       setSidebarOpen(false); // 로그인 성공 시 사이드바 닫기
       navigate('/courses');
     } catch (err) {
-      setError(`Google ${errorPrefix} 실패`);
+      setError(t('auth.google_failed', { action: errorPrefix }));
       logger.error('Google login failed:', err);
     } finally {
       setLoading(false);
@@ -52,7 +54,7 @@ export default function AuthPage() {
       setSidebarOpen(false); // 로그인 성공 시 사이드바 닫기
       navigate('/courses');
     } catch (err) {
-      setError(`GitHub ${errorPrefix} 실패`);
+      setError(t('auth.github_failed', { action: errorPrefix }));
       logger.error('GitHub login failed:', err);
     } finally {
       setLoading(false);
@@ -67,7 +69,7 @@ export default function AuthPage() {
       setSidebarOpen(false); // 로그인 성공 시 사이드바 닫기
       navigate('/courses');
     } catch (err) {
-      setError(`Kakao ${errorPrefix} 실패`);
+      setError(t('auth.kakao_failed', { action: errorPrefix }));
       logger.error('Kakao login failed:', err);
     } finally {
       setLoading(false);
@@ -88,7 +90,7 @@ export default function AuthPage() {
             {pageTitle}
           </h1>
           <p className="text-text-secondary">
-            소셜 계정으로 간편하게 시작하세요
+            {t('auth.social_subtitle')}
           </p>
         </div>
 
@@ -101,7 +103,7 @@ export default function AuthPage() {
             onClick={handleGoogleLogin}
             disabled={loading}
             className="w-16 h-16 flex items-center justify-center bg-white border-2 border-border rounded-full shadow-md hover:shadow-lg hover:border-primary transition-all disabled:opacity-50"
-            aria-label={`Google로 ${pageTitle}`}
+            aria-label={t('auth.google_auth', { action: pageTitle })}
           >
             <svg className="w-7 h-7" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -118,7 +120,7 @@ export default function AuthPage() {
             onClick={handleGithubLogin}
             disabled={loading}
             className="w-16 h-16 flex items-center justify-center bg-[#24292e] border-2 border-[#24292e] rounded-full shadow-md hover:shadow-lg hover:bg-[#1a1e22] transition-all disabled:opacity-50"
-            aria-label={`GitHub로 ${pageTitle}`}
+            aria-label={t('auth.github_auth', { action: pageTitle })}
           >
             <Github className="w-7 h-7 text-white" />
           </motion.button>
@@ -130,7 +132,7 @@ export default function AuthPage() {
             onClick={handleKakaoLogin}
             disabled={loading}
             className="w-16 h-16 flex items-center justify-center bg-[#FEE500] border-2 border-[#FEE500] rounded-full shadow-md hover:shadow-lg hover:bg-[#FFEB3B] transition-all disabled:opacity-50"
-            aria-label={`Kakao로 ${pageTitle}`}
+            aria-label={t('auth.kakao_auth', { action: pageTitle })}
           >
             <svg className="w-7 h-7 text-[#3C1E1E]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 3C6.477 3 2 6.477 2 10.75c0 2.745 1.79 5.155 4.5 6.645l-1.125 4.125c-.075.27.21.495.45.345l5.25-3.495c.315.03.63.045.945.045 5.523 0 9.98-3.477 9.98-7.75S17.523 3 12 3z"/>
