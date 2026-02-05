@@ -138,7 +138,7 @@ export function ProfilePage() {
     try {
       const result = await checkNickname(value);
       if (!result.available) {
-        setNicknameError(result.message || '이미 사용 중인 닉네임입니다');
+        setNicknameError(result.error || '이미 사용 중인 닉네임입니다');
       }
     } catch (error) {
       setNicknameError('닉네임 확인 중 오류가 발생했습니다');

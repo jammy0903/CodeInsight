@@ -12,9 +12,8 @@ import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
-import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle, Lock, Crown } from 'lucide-react';
+import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle, Lock } from 'lucide-react';
 import { useIsMobile, useChapter, useUserProgress } from '@/hooks';
-import { checkChapterAccess } from '@/services/subscription';
 
 // 언어별 색상 (챕터 페이지용)
 const getLanguageColor = (lang: string | undefined) => {
@@ -46,33 +45,18 @@ export function ChapterLessonsPage() {
   const [accessReason, setAccessReason] = useState<string>('');
 
   // 챕터 로드 후 접근 권한 체크
+  // 구독 시스템 제거됨 - 챕터 2 이상은 로그인만 필요
   useEffect(() => {
-    async function checkAccess() {
-      if (!chapter) return;
+    if (!chapter) return;
 
-      // 비로그인: 챕터 2 이상 로그인 필요
-      if (!appUser && chapter.order >= 2) {
-        setAccessDenied(true);
-        setAccessReason(t('chapter.login_required_for_chapter'));
-        return;
-      }
-
-      // 로그인 사용자: 챕터 3 이상은 구독 체크 필요
-      if (appUser && chapter.order >= 3) {
-        const result = await checkChapterAccess(chapter.order);
-        if (!result.allowed) {
-          setAccessDenied(true);
-          setAccessReason(result.reason || t('chapter.subscription_required'));
-        } else {
-          setAccessDenied(false);
-        }
-      } else {
-        setAccessDenied(false);
-      }
+    // 비로그인: 챕터 2 이상 로그인 필요
+    if (!appUser && chapter.order >= 2) {
+      setAccessDenied(true);
+      setAccessReason(t('chapter.login_required_for_chapter'));
+    } else {
+      setAccessDenied(false);
     }
-
-    checkAccess();
-  }, [chapter, appUser]);
+  }, [chapter, appUser, t]);
 
   // 진행 상태 Map 변환 (useMemo로 최적화)
   const progressMap = useMemo(() => {
@@ -137,22 +121,12 @@ export function ChapterLessonsPage() {
             {accessReason}
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            {!appUser ? (
-              <Link
-                to="/"
-                className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow flex items-center gap-2"
-              >
-                {t('auth.login')}
-              </Link>
-            ) : (
-              <Link
-                to="/subscription"
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow flex items-center gap-2"
-              >
-                <Crown className="w-5 h-5" />
-                {t('chapter.subscribe')}
-              </Link>
-            )}
+            <Link
+              to="/"
+              className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow flex items-center gap-2"
+            >
+              {t('auth.login')}
+            </Link>
             <button
               onClick={() => navigate(`/courses/${lang}`)}
               className="px-6 py-3 border border-[var(--theme-dashboard-card-border)] rounded-xl font-semibold hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
