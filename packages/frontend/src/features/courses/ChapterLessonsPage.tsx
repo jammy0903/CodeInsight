@@ -6,6 +6,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { UserProgress } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
@@ -28,6 +29,7 @@ const getLanguageColor = (lang: string | undefined) => {
 };
 
 export function ChapterLessonsPage() {
+  const { t } = useTranslation();
   const { lang, chapterId } = useParams<{ lang: string; chapterId: string }>();
   const navigate = useNavigate();
   const { setPageTitle, appUser } = useStore();
@@ -50,7 +52,7 @@ export function ChapterLessonsPage() {
       // 비로그인: 챕터 2 이상 로그인 필요
       if (!appUser && chapter.order >= 2) {
         setAccessDenied(true);
-        setAccessReason('챕터 2 이상은 로그인이 필요합니다.');
+        setAccessReason(t('chapter.login_required_for_chapter'));
         return;
       }
 
@@ -59,7 +61,7 @@ export function ChapterLessonsPage() {
         const result = await checkChapterAccess(chapter.order);
         if (!result.allowed) {
           setAccessDenied(true);
-          setAccessReason(result.reason || '유료 구독이 필요합니다.');
+          setAccessReason(result.reason || t('chapter.subscription_required'));
         } else {
           setAccessDenied(false);
         }
@@ -91,15 +93,15 @@ export function ChapterLessonsPage() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="text-6xl mb-4">😢</div>
-          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">챕터를 불러올 수 없습니다</h2>
+          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">{t('chapter.load_error')}</h2>
           <p className="text-[var(--theme-dashboard-text-muted)] mb-6">
-            {error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다'}
+            {error instanceof Error ? error.message : t('errors.unknown')}
           </p>
           <button
             onClick={() => navigate(`/courses/${lang}`)}
             className="btn-primary"
           >
-            챕터 목록으로 돌아가기
+            {t('chapter.back_to_chapters')}
           </button>
         </div>
       </div>
@@ -139,7 +141,7 @@ export function ChapterLessonsPage() {
                 to="/"
                 className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow flex items-center gap-2"
               >
-                로그인하기
+                {t('auth.login')}
               </Link>
             ) : (
               <Link
@@ -147,7 +149,7 @@ export function ChapterLessonsPage() {
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow flex items-center gap-2"
               >
                 <Crown className="w-5 h-5" />
-                구독하기
+                {t('chapter.subscribe')}
               </Link>
             )}
             <button
@@ -155,7 +157,7 @@ export function ChapterLessonsPage() {
               className="px-6 py-3 border border-[var(--theme-dashboard-card-border)] rounded-xl font-semibold hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
               style={{ color: 'var(--theme-dashboard-text)' }}
             >
-              다른 챕터 보기
+              {t('chapter.view_other_chapters')}
             </button>
           </div>
         </div>
@@ -213,7 +215,7 @@ export function ChapterLessonsPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-[var(--theme-dashboard-title)] tracking-tight mb-2">
-                {chapter?.title || '로딩 중...'}
+                {chapter?.title || t('common.loading')}
               </h1>
               {chapter?.description && (
                 <p className="text-[var(--theme-dashboard-text-muted)] text-sm">
@@ -231,7 +233,7 @@ export function ChapterLessonsPage() {
                 <span className="text-xs text-emerald-600 font-mono uppercase">Progress</span>
               </div>
               <span className="text-xs text-[var(--theme-dashboard-text-muted)] font-mono">
-                {isLoading ? '계산 중...' : `${completedLessons} / ${totalLessons} 레슨 완료`}
+                {isLoading ? t('chapter.calculating') : t('chapter.lessons_completed', { completed: completedLessons, total: totalLessons })}
               </span>
             </div>
             <div className="h-3 bg-white rounded-full overflow-hidden border border-[var(--theme-dashboard-card-border)]">
@@ -242,7 +244,7 @@ export function ChapterLessonsPage() {
             </div>
             <div className="flex justify-between mt-1">
               <span className="text-[10px] text-[var(--theme-dashboard-text-muted)] font-mono">
-                {totalLessons - completedLessons} 레슨 남음
+                {t('chapter.lessons_remaining', { count: totalLessons - completedLessons })}
               </span>
               <span className="text-[10px] text-emerald-500 font-mono font-bold">
                 {progressPercent}%
@@ -258,7 +260,7 @@ export function ChapterLessonsPage() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--theme-dashboard-accent)] mx-auto mb-4"></div>
-            <p className="text-[var(--theme-dashboard-text-muted)]">레슨 로딩 중...</p>
+            <p className="text-[var(--theme-dashboard-text-muted)]">{t('chapter.loading_lessons')}</p>
           </div>
         </div>
       ) : !chapter ? (
@@ -266,10 +268,10 @@ export function ChapterLessonsPage() {
           <div className="text-center">
             <div className="text-6xl mb-4">📚</div>
             <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">
-              챕터 정보 없음
+              {t('chapter.no_chapter_info')}
             </h2>
             <p className="text-[var(--theme-dashboard-text-muted)]">
-              챕터 데이터를 불러올 수 없습니다.
+              {t('chapter.cannot_load_chapter')}
             </p>
           </div>
         </div>
@@ -278,10 +280,10 @@ export function ChapterLessonsPage() {
           <div className="text-center">
             <div className="text-6xl mb-4">📝</div>
             <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">
-              레슨 준비 중
+              {t('chapter.lessons_preparing')}
             </h2>
             <p className="text-[var(--theme-dashboard-text-muted)]">
-              아직 학습 콘텐츠가 준비되지 않았습니다.
+              {t('courses.no_content_yet')}
             </p>
           </div>
         </div>

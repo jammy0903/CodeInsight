@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { MemoryBlock } from '@/types';
 import { useThemeStore } from '@/stores/themeStore';
@@ -34,6 +35,7 @@ export function MemoryBlockCard({
   onMouseEnter,
   onMouseLeave,
 }: MemoryBlockCardProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const valueDisplay = isGarbageValue(block.value) ? '?' : String(block.value);
   const displayName = getDisplayName(block.name);
@@ -117,7 +119,7 @@ export function MemoryBlockCard({
             opacity: 0.8,
           }}
         >
-          {isExpanded ? '접기' : '더보기'}
+          {isExpanded ? t('lesson.collapse') : t('lesson.expand')}
         </div>
       )}
 

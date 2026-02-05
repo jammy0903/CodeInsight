@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ function QuizCardAdapter({
   quiz: Quiz;
   onComplete: (isCorrect: boolean) => void;
 }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const quizContainerRef = useRef<HTMLDivElement>(null);
@@ -110,11 +112,11 @@ function QuizCardAdapter({
             disabled={selected === null}
             className={`btn-primary px-4 py-2 ${selected === null ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            제출
+            {t('common.submit')}
           </button>
         ) : (
           <button onClick={handleContinue} className="btn-success px-4 py-2">
-            {isCorrect ? '완료' : '다시 학습하기'}
+            {isCorrect ? t('lesson.completed') : t('lesson.study_again')}
           </button>
         )}
       </div>
@@ -130,6 +132,7 @@ export function LessonQuizModal({
   onPrevStep,
   canGoPrev,
 }: LessonQuizModalProps) {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -142,9 +145,9 @@ export function LessonQuizModal({
         }}
       >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">🧠 퀴즈</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">🧠 {t('lesson.quiz')}</DialogTitle>
           <DialogDescription className="sr-only">
-            레슨 내용을 확인하는 퀴즈 세션입니다.
+            {t('lesson.quiz_session_desc')}
           </DialogDescription>
         </DialogHeader>
         <QuizCardAdapter quiz={quiz} onComplete={onComplete} />

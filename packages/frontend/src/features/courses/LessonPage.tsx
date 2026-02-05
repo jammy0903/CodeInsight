@@ -7,6 +7,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { updateProgress } from '@/services/courses';
@@ -41,6 +42,7 @@ function LoadingView() {
 }
 
 function NotFoundView({ message, backPath }: { message: string; backPath: string }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4">
@@ -48,7 +50,7 @@ function NotFoundView({ message, backPath }: { message: string; backPath: string
       <h2 className="text-xl font-semibold">{message}</h2>
       <button onClick={() => navigate(backPath)} className="btn-secondary px-4 py-2 flex items-center gap-1">
         <ArrowLeft className="w-4 h-4" />
-        뒤로 가기
+        {t('common.back')}
       </button>
     </div>
   );
@@ -57,6 +59,7 @@ function NotFoundView({ message, backPath }: { message: string; backPath: string
 // --- 메인 컴포넌트 ---
 
 export function LessonPage() {
+  const { t } = useTranslation();
   const { lang, chapterId, lessonId } = useParams<{
     lang: string;
     chapterId: string;
@@ -153,12 +156,12 @@ export function LessonPage() {
   if (isError || !lesson)
     return (
       <NotFoundView
-        message={error instanceof Error ? error.message : '레슨을 찾을 수 없습니다'}
+        message={error instanceof Error ? error.message : t('lesson.not_found')}
         backPath={languageCoursePath}
       />
     );
   if (steps.length === 0)
-    return <NotFoundView message="레슨 콘텐츠가 없습니다" backPath={languageCoursePath} />;
+    return <NotFoundView message={t('lesson.no_content')} backPath={languageCoursePath} />;
 
   // --- 렌더 ---
   return (
@@ -210,7 +213,7 @@ export function LessonPage() {
           onPrev={navigation.goToPrevStep}
           onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
           canGoPrev={navigation.canGoPrev}
-          nextLabel={navigation.isLastStep ? '퀴즈' : '다음'}
+          nextLabel={navigation.isLastStep ? t('lesson.quiz') : t('common.next')}
         />
       )}
 
