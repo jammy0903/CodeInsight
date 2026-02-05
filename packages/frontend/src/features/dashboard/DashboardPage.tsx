@@ -6,6 +6,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { BarChart3, BookOpen, CheckCircle, PlayCircle, Loader2 } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { getUserProgress } from '@/services/courses';
@@ -14,6 +15,7 @@ import { StreakCard, useStreak } from '@/features/gamification';
 import type { UserProgress } from '@/types';
 
 export function DashboardPage() {
+  const { t, i18n } = useTranslation();
   const { appUser } = useStore();
   const navigate = useNavigate();
   const [progress, setProgress] = useState<UserProgress[]>([]);
@@ -71,8 +73,8 @@ export function DashboardPage() {
       <div className="min-h-screen bg-[var(--theme-dashboard-page-bg)] p-6">
         <div className="max-w-4xl mx-auto text-center py-20">
           <BarChart3 className="w-16 h-16 text-[var(--theme-dashboard-accent)] mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">로그인이 필요합니다</h1>
-          <p className="text-[var(--theme-dashboard-text-muted)]">학습 현황을 보려면 먼저 로그인해주세요.</p>
+          <h1 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">{t('errors.auth_required')}</h1>
+          <p className="text-[var(--theme-dashboard-text-muted)]">{t('dashboard.login_required_desc')}</p>
         </div>
       </div>
     );
@@ -84,7 +86,7 @@ export function DashboardPage() {
         {/* 헤더 - 반응형 */}
         <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
           <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-[var(--theme-dashboard-accent)]" />
-          <h1 className="text-xl sm:text-2xl font-bold text-[var(--theme-dashboard-title)]">나의 현황</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--theme-dashboard-title)]">{t('dashboard.my_status')}</h1>
         </div>
 
         {/* 스트릭 카드 */}
@@ -97,7 +99,7 @@ export function DashboardPage() {
           <div className="bg-[var(--theme-dashboard-card-bg)] rounded-lg sm:rounded-xl border border-[var(--theme-dashboard-card-border)] p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1 sm:mb-2">
               <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-              <span className="text-[10px] sm:text-sm text-[var(--theme-dashboard-text-muted)]">완료 레슨</span>
+              <span className="text-[10px] sm:text-sm text-[var(--theme-dashboard-text-muted)]">{t('dashboard.completed_lessons')}</span>
             </div>
             <p className="text-lg sm:text-2xl font-bold text-[var(--theme-dashboard-title)]">{completedLessons}</p>
           </div>
@@ -105,7 +107,7 @@ export function DashboardPage() {
           <div className="bg-[var(--theme-dashboard-card-bg)] rounded-lg sm:rounded-xl border border-[var(--theme-dashboard-card-border)] p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1 sm:mb-2">
               <PlayCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-              <span className="text-[10px] sm:text-sm text-[var(--theme-dashboard-text-muted)]">진행 중</span>
+              <span className="text-[10px] sm:text-sm text-[var(--theme-dashboard-text-muted)]">{t('dashboard.in_progress')}</span>
             </div>
             <p className="text-lg sm:text-2xl font-bold text-[var(--theme-dashboard-title)]">{inProgressLessons}</p>
           </div>
@@ -113,7 +115,7 @@ export function DashboardPage() {
           <div className="bg-[var(--theme-dashboard-card-bg)] rounded-lg sm:rounded-xl border border-[var(--theme-dashboard-card-border)] p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1 sm:mb-2">
               <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--theme-dashboard-accent)]" />
-              <span className="text-[10px] sm:text-sm text-[var(--theme-dashboard-text-muted)]">퀴즈</span>
+              <span className="text-[10px] sm:text-sm text-[var(--theme-dashboard-text-muted)]">{t('quiz.title')}</span>
             </div>
             <p className="text-lg sm:text-2xl font-bold text-[var(--theme-dashboard-title)]">
               {totalQuizTotal > 0 ? `${totalQuizScore}/${totalQuizTotal}` : '-'}
@@ -124,17 +126,17 @@ export function DashboardPage() {
         {/* 최근 활동 - 반응형 */}
         <div className="bg-[var(--theme-dashboard-card-bg)] rounded-lg sm:rounded-xl border border-[var(--theme-dashboard-card-border)] p-3 sm:p-6">
           <h2 className="text-base sm:text-lg font-semibold text-[var(--theme-dashboard-title)] mb-3 sm:mb-4">
-            최근 활동
+            {t('dashboard.recent_activity')}
           </h2>
           {recentActivity.length === 0 ? (
             <div className="text-center py-6 sm:py-8 text-[var(--theme-dashboard-text-muted)]">
-              <p className="text-sm sm:text-base">아직 학습 기록이 없습니다.</p>
-              <p className="text-xs sm:text-sm mt-2">코스를 시작해보세요!</p>
+              <p className="text-sm sm:text-base">{t('dashboard.no_activity')}</p>
+              <p className="text-xs sm:text-sm mt-2">{t('dashboard.start_course')}</p>
               <button
                 onClick={() => navigate('/courses')}
                 className="mt-3 sm:mt-4 px-3 sm:px-4 py-2 text-sm bg-[var(--theme-dashboard-accent)] text-white rounded-lg hover:bg-[var(--theme-dashboard-accent-hover)] transition-colors"
               >
-                코스 둘러보기
+                {t('home.browse_courses')}
               </button>
             </div>
           ) : (
@@ -155,17 +157,17 @@ export function DashboardPage() {
                         {item.lessonId}
                       </p>
                       <p className="text-[10px] sm:text-xs text-[var(--theme-dashboard-text-muted)]">
-                        {item.status === 'completed' ? '완료' : '진행 중'}
+                        {item.status === 'completed' ? t('courses.completed') : t('dashboard.in_progress')}
                         {item.quizScore !== null && item.quizTotal !== null && (
                           <span className="ml-1 sm:ml-2">
-                            퀴즈: {item.quizScore}/{item.quizTotal}
+                            {t('quiz.title')}: {item.quizScore}/{item.quizTotal}
                           </span>
                         )}
                       </p>
                     </div>
                   </div>
                   <span className="text-[10px] sm:text-xs text-[var(--theme-dashboard-text-muted)] shrink-0 ml-2">
-                    {item.updatedAt && new Date(item.updatedAt).toLocaleDateString('ko-KR')}
+                    {item.updatedAt && new Date(item.updatedAt).toLocaleDateString(i18n.language === 'ko' ? 'ko-KR' : 'en-US')}
                   </span>
                 </div>
               ))}

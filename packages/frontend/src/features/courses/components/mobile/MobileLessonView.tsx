@@ -8,6 +8,7 @@
  */
 
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Code2, Play, ChevronUp, ChevronDown, Layers } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -41,11 +42,11 @@ interface MobileLessonViewProps {
 }
 
 // 언어별 코드 이름 반환
-function getCodeName(languageId: string): string {
-  if (languageId.includes('python')) return 'Python 코드';
-  if (languageId.includes('java')) return 'Java 코드';
-  if (languageId.includes('javascript') || languageId.includes('js')) return 'JavaScript 코드';
-  return 'C 코드';
+function getCodeName(languageId: string, t: (key: string) => string): string {
+  if (languageId.includes('python')) return t('lesson.python_code');
+  if (languageId.includes('java')) return t('lesson.java_code');
+  if (languageId.includes('javascript') || languageId.includes('js')) return t('lesson.javascript_code');
+  return t('lesson.c_code');
 }
 
 export function MobileLessonView({
@@ -60,6 +61,7 @@ export function MobileLessonView({
   onNextStep,
   onQuiz,
 }: MobileLessonViewProps) {
+  const { t } = useTranslation();
   // Swiper 상태
   const [currentPage, setCurrentPage] = useState(0);
   const swiperRef = useRef(null);
@@ -89,7 +91,7 @@ export function MobileLessonView({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[currentStepIndex];
-  const codeName = getCodeName(languageId);
+  const codeName = getCodeName(languageId, t);
   const isLastStep = currentStepIndex >= steps.length - 1;
 
   // 데스크톱과 동일한 시각화 훅 사용
@@ -148,7 +150,7 @@ export function MobileLessonView({
         <span className="shrink-0 px-1 py-0.5 rounded text-white text-[9px] font-bold leading-none" style={{ fontFamily: 'var(--font-sans)', backgroundColor: 'var(--theme-explanation-text)' }}>
           L{currentStep?.line || 1}
         </span>
-        <span className="text-[10px] font-semibold text-amber-800">설명</span>
+        <span className="text-[10px] font-semibold text-amber-800">{t('quiz.explanation')}</span>
         {canCollapse && (
           <button
             onClick={(e) => {
@@ -169,7 +171,7 @@ export function MobileLessonView({
       {!isExplanationCollapsed && (
         <div className="flex-1 p-1.5 overflow-y-auto">
           <span className="text-xs leading-snug whitespace-pre-wrap" style={{ color: 'var(--theme-explanation-text)' }}>
-            {currentStep?.explanation ? formatExplanation(currentStep.explanation) : '설명이 없습니다'}
+            {currentStep?.explanation ? formatExplanation(currentStep.explanation) : t('lesson.no_explanation')}
           </span>
           {currentStep?.tip && (
             <div className="mt-1 pl-1 border-l-2 border-l-[var(--theme-memory-changed-border)]">

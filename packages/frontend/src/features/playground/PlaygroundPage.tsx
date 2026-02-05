@@ -5,6 +5,7 @@
  */
 
 import { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks';
 import { Play, Layers } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
@@ -30,6 +31,7 @@ const MIN_EDITOR_HEIGHT = 150;
 const MAX_EDITOR_HEIGHT = 500;
 
 export function PlaygroundPage() {
+  const { t } = useTranslation();
   const { steps, currentStepIndex, error, registers, language } = usePlaygroundStore();
   const code = useCurrentCode();
   const { startPrefetch, stopPrefetch } = useExplanationStore();
@@ -72,8 +74,8 @@ export function PlaygroundPage() {
 
   // 페이지 제목 설정
   useEffect(() => {
-    setPageTitle('코드실행연습', '직접 코드를 작성하고\n메모리 변화를 확인해보세요');
-  }, [setPageTitle]);
+    setPageTitle(t('playground.title'), t('playground.subtitle'));
+  }, [setPageTitle, t]);
 
   // 키보드 좌우 화살표 키로 스텝 이동
   useStepGestures({
@@ -281,7 +283,7 @@ export function PlaygroundPage() {
                     {terminalLines.length > 0 && (
                       <TerminalOutput
                         lines={terminalLines}
-                        title="출력"
+                        title={t('playground.output')}
                         compact
                         className="mt-4"
                       />
@@ -291,7 +293,7 @@ export function PlaygroundPage() {
               </>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
-                Run 버튼을 눌러 실행
+                {t('playground.click_run')}
               </div>
             )}
           </div>
@@ -328,7 +330,7 @@ export function PlaygroundPage() {
                 onNext={nextStep}
                 canGoPrev={canGoPrev}
                 canGoNext={canGoNext}
-                nextLabel="다음"
+                nextLabel={t('common.next')}
                 size="sm"
                 variant="inline"
               />
@@ -557,7 +559,7 @@ export function PlaygroundPage() {
                     {terminalLines.length > 0 && (
                       <TerminalOutput
                         lines={terminalLines}
-                        title="출력"
+                        title={t('playground.output')}
                         compact
                         className="mt-6"
                       />
@@ -567,7 +569,7 @@ export function PlaygroundPage() {
               </>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
-                Click Run button to execute code
+                {t('playground.click_run')}
               </div>
             )}
           </div>

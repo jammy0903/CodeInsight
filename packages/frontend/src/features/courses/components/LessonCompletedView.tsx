@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useEnterKey } from '@/hooks';
 import { useFocusCycle } from '@/hooks/useFocusCycle';
@@ -22,6 +23,7 @@ export function LessonCompletedView({
   nextLessonPath,
   chapterPath,
 }: LessonCompletedViewProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const hasNext = nextLessonPath !== null;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,10 +73,10 @@ export function LessonCompletedView({
         <CheckCircle2 className="w-10 h-10 text-white" />
       </div>
       <h2 className="text-2xl font-bold mb-2 text-[var(--theme-dashboard-title)]">
-        레슨 {lessonOrder} 완료!
+        {t('lesson.completed_title', { order: lessonOrder })}
       </h2>
       <p className="mb-6 text-[var(--theme-dashboard-text)]">
-        {hasNext ? '다음 레슨으로 계속 학습하세요.' : '이 챕터의 모든 레슨을 완료했습니다!'}
+        {hasNext ? t('lesson.continue_next') : t('lesson.chapter_completed')}
       </p>
       <div className="flex gap-3 justify-center">
         <button
@@ -82,7 +84,7 @@ export function LessonCompletedView({
           className="px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all bg-[var(--theme-lesson-button-secondary-bg)] border border-[var(--theme-lesson-button-secondary-border)] text-[var(--theme-lesson-button-secondary-text)]"
         >
           <ArrowLeft className="w-4 h-4" />
-          레슨 목록
+          {t('lesson.lesson_list')}
         </button>
         {hasNext && (
           <button
@@ -95,7 +97,7 @@ export function LessonCompletedView({
               boxShadow: '0 2px 8px rgba(122, 154, 122, 0.3)',
             }}
           >
-            다음 레슨
+            {t('lesson.next_lesson')}
             <ArrowRight className="w-4 h-4" />
           </button>
         )}

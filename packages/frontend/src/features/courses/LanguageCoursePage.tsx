@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { ChapterWithLessons } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
@@ -10,6 +11,7 @@ import { useIsMobile, useLanguageCourse } from '@/hooks';
 import { getMySubscription } from '@/services/subscription';
 
 export function LanguageCoursePage() {
+  const { t } = useTranslation();
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
   const { setPageTitle, appUser } = useStore();
@@ -42,45 +44,45 @@ export function LanguageCoursePage() {
     switch (lang) {
       case 'c':
         return {
-          name: 'C언어',
+          name: t('languages.c'),
           icon: 'C',
           color: '#87CEEB',
-          description: '메모리와 포인터의 원리를 이해하는 시스템 프로그래밍'
+          description: t('language_desc.c')
         };
       case 'python':
         return {
           name: 'Python',
           icon: '🐍',
           color: '#FFD54F',
-          description: '파이썬으로 배우는 프로그래밍 기초와 데이터 처리'
+          description: t('language_desc.python')
         };
       case 'java':
         return {
           name: 'Java',
           icon: '☕',
           color: '#EC4899',
-          description: '객체지향 프로그래밍과 JVM의 동작 원리'
+          description: t('language_desc.java')
         };
       case 'javascript':
         return {
           name: 'JavaScript',
           icon: '⚡',
           color: '#81C784',
-          description: '웹 개발을 위한 자바스크립트 핵심 개념'
+          description: t('language_desc.javascript')
         };
       case 'python-practical':
         return {
-          name: 'Python실용',
+          name: t('languages.python_practical'),
           icon: '🤖',
           color: '#9E9E9E',
-          description: '실무에서 바로 쓰는 파이썬 자동화 스크립트'
+          description: t('language_desc.python_practical')
         };
       default:
         return {
           name: lang?.toUpperCase() || '',
           icon: '📚',
           color: '#FFD700',
-          description: '프로그래밍의 기초부터 심화까지'
+          description: t('language_desc.default')
         };
     }
   };
@@ -103,15 +105,15 @@ export function LanguageCoursePage() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="text-6xl mb-4">😢</div>
-          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">코스를 불러올 수 없습니다</h2>
+          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">{t('courses.load_error')}</h2>
           <p className="text-[var(--theme-dashboard-text-muted)] mb-6">
-            {error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다'}
+            {error instanceof Error ? error.message : t('errors.unknown')}
           </p>
           <button
             onClick={() => navigate('/courses')}
             className="btn-primary"
           >
-            코스 목록으로 돌아가기
+            {t('courses.back_to_list')}
           </button>
         </div>
       </div>
@@ -170,7 +172,7 @@ export function LanguageCoursePage() {
                   {langInfo.name}
                 </h1>
                 <p className="text-[var(--theme-dashboard-text-muted)] text-sm">
-                  {isLoading ? '로딩 중...' : `${chapters.length} 챕터 · ${totalLessons} 레슨`}
+                  {isLoading ? t('common.loading') : `${chapters.length} ${t('courses.chapters')} · ${totalLessons} ${t('courses.lessons')}`}
                 </p>
                 <p className="text-[var(--theme-dashboard-text-muted)] text-xs mt-1">
                   {langInfo.description}
@@ -187,7 +189,7 @@ export function LanguageCoursePage() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--theme-dashboard-accent)] mx-auto mb-4"></div>
-              <p className="text-[var(--theme-dashboard-text-muted)]">챕터 로딩 중...</p>
+              <p className="text-[var(--theme-dashboard-text-muted)]">{t('courses.loading_chapters')}</p>
             </div>
           </div>
         ) : chapters.length === 0 ? (
@@ -195,18 +197,16 @@ export function LanguageCoursePage() {
             <div className="text-center">
               <div className="text-6xl mb-4">📚</div>
               <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-2">
-                {langInfo.name} 코스 준비 중
+                {t('courses.preparing', { name: langInfo.name })}
               </h2>
               <p className="text-[var(--theme-dashboard-text-muted)] mb-6">
-                아직 학습 콘텐츠가 준비되지 않았습니다.
-                <br />
-                곧 추가될 예정입니다!
+                {t('courses.no_content_yet')}
               </p>
               <button
                 onClick={() => navigate('/courses')}
                 className="btn-primary"
               >
-                다른 코스 보기
+                {t('courses.back_to_list')}
               </button>
             </div>
           </div>

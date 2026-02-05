@@ -4,6 +4,7 @@
  * 레슨페이지에서 이전/다음 스텝으로 이동할 때 사용하는 공통 컴포넌트
  */
 
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface StepNavigationArrowsProps {
@@ -34,13 +35,16 @@ export function StepNavigationArrows({
   onNext,
   canGoPrev,
   canGoNext,
-  nextLabel = '다음',
-  prevLabel = '이전',
+  nextLabel,
+  prevLabel,
   className = '',
   size = 'md',
   showLabels = true,
   variant = 'inline',
 }: StepNavigationArrowsProps) {
+  const { t } = useTranslation();
+  const resolvedNextLabel = nextLabel || t('common.next');
+  const resolvedPrevLabel = prevLabel || t('common.previous');
 
   const sizeClasses = {
     sm: 'px-2 py-1 text-xs gap-1',
@@ -87,10 +91,10 @@ export function StepNavigationArrows({
           className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-base transition-all ${
             canGoPrev ? enabledClass : disabledClass
           }`}
-          aria-label={prevLabel}
+          aria-label={resolvedPrevLabel}
         >
           <ChevronLeft className="w-5 h-5" />
-          {showLabels && <span>{prevLabel}</span>}
+          {showLabels && <span>{resolvedPrevLabel}</span>}
         </button>
         <button
           onClick={onNext}
@@ -98,9 +102,9 @@ export function StepNavigationArrows({
           className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-base transition-all ${
             canGoNext ? enabledClass : disabledClass
           }`}
-          aria-label={nextLabel}
+          aria-label={resolvedNextLabel}
         >
-          {showLabels && <span>{nextLabel}</span>}
+          {showLabels && <span>{resolvedNextLabel}</span>}
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
@@ -123,18 +127,18 @@ export function StepNavigationArrows({
             onClick={onPrev}
             disabled={!canGoPrev}
             className={`${baseButtonClass} ${canGoPrev ? enabledClass : disabledClass}`}
-            aria-label={prevLabel}
+            aria-label={resolvedPrevLabel}
           >
             <ChevronLeft className={iconSizes[size]} />
-            {showLabels && <span>{prevLabel}</span>}
+            {showLabels && <span>{resolvedPrevLabel}</span>}
           </button>
           <button
             onClick={onNext}
             disabled={!canGoNext}
             className={`${baseButtonClass} ${canGoNext ? enabledClass : disabledClass}`}
-            aria-label={nextLabel}
+            aria-label={resolvedNextLabel}
           >
-            {showLabels && <span>{nextLabel}</span>}
+            {showLabels && <span>{resolvedNextLabel}</span>}
             <ChevronRight className={iconSizes[size]} />
           </button>
         </div>
@@ -149,18 +153,18 @@ export function StepNavigationArrows({
         onClick={onPrev}
         disabled={!canGoPrev}
         className={`${baseButtonClass} ${canGoPrev ? enabledClass : disabledClass}`}
-        aria-label={prevLabel}
+        aria-label={resolvedPrevLabel}
       >
         <ChevronLeft className={iconSizes[size]} />
-        {showLabels && <span>{prevLabel}</span>}
+        {showLabels && <span>{resolvedPrevLabel}</span>}
       </button>
       <button
         onClick={onNext}
         disabled={!canGoNext}
         className={`${baseButtonClass} ${canGoNext ? enabledClass : disabledClass}`}
-        aria-label={nextLabel}
+        aria-label={resolvedNextLabel}
       >
-        {showLabels && <span>{nextLabel}</span>}
+        {showLabels && <span>{resolvedNextLabel}</span>}
         <ChevronRight className={iconSizes[size]} />
       </button>
     </div>
