@@ -16,6 +16,7 @@ import { LessonFlowVisualizer } from '@/features/visualizers/flow';
 import { LessonMemoryVisualizer } from '@/features/visualizers/memory';
 import type { TerminalLine } from '@/features/visualizers/shared';
 import type { LessonStep } from '@/types';
+import type { CodeSelection } from '../types';
 
 interface LessonDesktopLayoutProps {
   code: string;
@@ -29,7 +30,7 @@ interface LessonDesktopLayoutProps {
   terminalLines: TerminalLine[];
   memoryState: any;
   changedBlocks: Set<string>;
-  onSelectionChange: (selection: string | null) => void;
+  onSelectionChange: (selection: CodeSelection) => void;
 }
 
 export function LessonDesktopLayout({
