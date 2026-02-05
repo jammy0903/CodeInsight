@@ -29,6 +29,11 @@ export interface MemoryBlock {
   isArray?: boolean;
   arrayElements?: MemoryBlock[];
   isExpanded?: boolean;
+  // C 언어 전용
+  dangling?: boolean;
+  label?: string;
+  structMembers?: Array<{ key: string; value: string }>;
+  charElements?: Array<{ value: string; highlight?: boolean }>;
 }
 
 // 메모리 상태 (레슨/Playground 공용)

@@ -90,7 +90,7 @@ const LANGUAGES: LanguageOption[] = [
 export function QuizPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setPageTitle } = useStore();
+  const setPageTitle = useStore((s) => s.setPageTitle);
   const [selectedQuizType, setSelectedQuizType] = useState<string | null>(null);
 
   // 페이지 제목 설정

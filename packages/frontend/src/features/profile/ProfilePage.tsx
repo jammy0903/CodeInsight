@@ -35,7 +35,10 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 export function ProfilePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { appUser, firebaseUser, setAppUser, setFirebaseUser } = useStore();
+  const appUser = useStore((s) => s.appUser);
+  const firebaseUser = useStore((s) => s.firebaseUser);
+  const setAppUser = useStore((s) => s.setAppUser);
+  const setFirebaseUser = useStore((s) => s.setFirebaseUser);
 
   // 프로필 데이터 상태
   const [profile, setProfile] = useState<UserProfile | null>(null);

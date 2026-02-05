@@ -20,7 +20,8 @@ export function useStreak(): UseStreakResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { appUser } = useStore();
+  // 선택적 구독: appUser만 구독하여 불필요한 리렌더링 방지
+  const appUser = useStore((state) => state.appUser);
 
   const fetchStreak = useCallback(async () => {
     // 로그인 안 된 상태

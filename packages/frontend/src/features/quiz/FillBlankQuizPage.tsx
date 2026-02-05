@@ -210,7 +210,7 @@ export function FillBlankQuizPage() {
   const [score, setScore] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
 
-  const { setPageTitle } = useStore(); // useStore 훅 사용
+  const setPageTitle = useStore((s) => s.setPageTitle);
   const theme = LANGUAGE_THEMES[lang || 'c'] || LANGUAGE_THEMES.c;
 
   useEffect(() => {

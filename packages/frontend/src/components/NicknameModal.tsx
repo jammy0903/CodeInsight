@@ -21,7 +21,10 @@ const NICKNAME_REGEX = /^[a-zA-Z0-9가-힣_]{2,20}$/;
 type ValidationStatus = 'idle' | 'checking' | 'valid' | 'invalid';
 
 export function NicknameModal() {
-  const { needsRegistration, firebaseUser, setAppUser, setNeedsRegistration } = useStore();
+  const needsRegistration = useStore((s) => s.needsRegistration);
+  const firebaseUser = useStore((s) => s.firebaseUser);
+  const setAppUser = useStore((s) => s.setAppUser);
+  const setNeedsRegistration = useStore((s) => s.setNeedsRegistration);
 
   const [nickname, setNickname] = useState('');
   const [status, setStatus] = useState<ValidationStatus>('idle');

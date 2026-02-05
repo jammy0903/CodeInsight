@@ -19,7 +19,8 @@ interface UseLessonDataOptions {
 }
 
 export function useLessonData({ lessonId, chapterId, lang }: UseLessonDataOptions) {
-  const { setPageTitle } = useStore();
+  // 선택적 구독: setPageTitle만 구독하여 불필요한 리렌더링 방지
+  const setPageTitle = useStore((state) => state.setPageTitle);
   const { data: lesson, isLoading, isError, error } = useLesson(lessonId);
   const { data: chapterData } = useChapter(chapterId);
 

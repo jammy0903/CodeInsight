@@ -35,7 +35,7 @@ export function PlaygroundPage() {
   const { steps, currentStepIndex, error, registers, language } = usePlaygroundStore();
   const code = useCurrentCode();
   const { startPrefetch, stopPrefetch } = useExplanationStore();
-  const { setPageTitle } = useStore();
+  const setPageTitle = useStore((s) => s.setPageTitle);
   const currentTheme = useThemeStore((s) => s.theme);
   const colors = playgroundColors[currentTheme];
   const isMobile = useIsMobile();

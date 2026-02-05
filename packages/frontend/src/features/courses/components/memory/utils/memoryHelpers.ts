@@ -44,6 +44,71 @@ export function getArrayIndex(name: string | undefined): number {
   return match ? parseInt(match[1], 10) : -1;
 }
 
+// ── C 언어 정규화 헬퍼 ──
+
+/** struct 배열 값인지 확인 (예: [{key:"x", value:"10"}, ...]) */
+export function isStructValue(rawValue: unknown): rawValue is Array<{ key: string; value: string }> {
+  return (
+    Array.isArray(rawValue) &&
+    rawValue.length > 0 &&
+    typeof rawValue[0] === 'object' &&
+    rawValue[0] !== null &&
+    'key' in rawValue[0]
+  );
+}
+
+/** char[] 배열 값인지 확인 (예: [{value:"'C'"}, ...]) */
+export function isCharArrayValue(rawValue: unknown): rawValue is Array<{ value: string; highlight?: boolean }> {
+  return (
+    Array.isArray(rawValue) &&
+    rawValue.length > 0 &&
+    typeof rawValue[0] === 'object' &&
+    rawValue[0] !== null &&
+    'value' in rawValue[0] &&
+    !('key' in rawValue[0])
+  );
+}
+
+/** 복합 C value를 표시용 문자열로 변환 */
+export function normalizeCValue(rawValue: unknown): string {
+  if (rawValue === null || rawValue === undefined) return '???';
+  if (typeof rawValue === 'string' || typeof rawValue === 'number') return String(rawValue);
+  if (isStructValue(rawValue)) {
+    return `{${rawValue.map((m) => `${m.key}=${m.value}`).join(', ')}}`;
+  }
+  if (isCharArrayValue(rawValue)) {
+    return rawValue.map((e) => e.value).join('');
+  }
+  if (Array.isArray(rawValue)) {
+    return `[${rawValue.map(String).join(', ')}]`;
+  }
+  return JSON.stringify(rawValue);
+}
+
+/** C stack 배열에서 frame 마커를 분리하고 변수를 추출 */
+export function extractCFrames(rawStack: any[]): {
+  frames: { name: string }[];
+  variables: any[];
+} {
+  const frames: { name: string }[] = [];
+  const variables: any[] = [];
+
+  for (const item of rawStack) {
+    if (item.type === 'frame' && item.func) {
+      frames.push({ name: item.func });
+    } else {
+      variables.push(item);
+    }
+  }
+
+  // frame이 하나도 없으면 기본 main 추가
+  if (frames.length === 0) {
+    frames.push({ name: 'main' });
+  }
+
+  return { frames, variables };
+}
+
 /** 텍스트 트렁케이션 */
 export function truncateText(text: string, maxLength: number): { text: string; isTruncated: boolean } {
   if (text.length <= maxLength) {

@@ -28,7 +28,15 @@ const getLanguageInfo = (lang: SupportedLanguage | null, t: (key: string) => str
 
 export function TopBar() {
   const { t } = useTranslation();
-  const { sidebarOpen, toggleSidebar, pageTitle, pageSubtitle, pageLanguage, appUser, streak, streakLoading, refreshStreak } = useStore();
+  const sidebarOpen = useStore((s) => s.sidebarOpen);
+  const toggleSidebar = useStore((s) => s.toggleSidebar);
+  const pageTitle = useStore((s) => s.pageTitle);
+  const pageSubtitle = useStore((s) => s.pageSubtitle);
+  const pageLanguage = useStore((s) => s.pageLanguage);
+  const appUser = useStore((s) => s.appUser);
+  const streak = useStore((s) => s.streak);
+  const streakLoading = useStore((s) => s.streakLoading);
+  const refreshStreak = useStore((s) => s.refreshStreak);
   const isMobile = useIsMobile();
 
   const langInfo = pageLanguage ? getLanguageInfo(pageLanguage, t) : null;

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { LessonStep, StepMemoryState, StackFrame, Variable, HeapObject } from '@/types';
 import { processMemoryChanges } from '../utils/memoryUtils';
 import type { MemoryBlock } from '@/types/memory';
+import { extractCFrames, normalizeCValue, isStructValue, isCharArrayValue } from '../components/memory/utils/memoryHelpers';
 
 // JavaScript visualization types (inlined from legacy - kept for backwards compatibility)
 type JSVisualizationType = 'memory' | 'callStack' | 'scopeChain' | 'eventLoop' | 'closure' | 'prototype' | 'thisBind' | 'hoisting' | 'promise';
@@ -230,11 +231,59 @@ export function useLessonVisualization(
     }
 
     if (currentStep.stack && currentStep.heap) {
-      const memoryState = {
-        stack: currentStep.stack,
-        heap: currentStep.heap,
-        frames: [{ name: 'main' }]
-      };
+      const rawStack = currentStep.stack as any[];
+      const rawHeap = (currentStep.heap || []) as any[];
+
+      const { frames, variables } = extractCFrames(rawStack);
+
+      const stack: MemoryBlock[] = variables.map((item: any) => {
+        const frameName = item.frame || frames[0]?.name || 'main';
+        const rawValue = item.value;
+
+        const block: MemoryBlock = {
+          name: frames.length > 1 ? `${frameName}.${item.name}` : item.name,
+          address: item.address || '???',
+          value: normalizeCValue(rawValue),
+          type: item.type,
+          points_to: item.points_to ?? undefined,
+          highlight: item.highlight,
+          dangling: item.dangling,
+        };
+
+        if (isStructValue(rawValue)) {
+          block.structMembers = rawValue;
+        }
+        if (isCharArrayValue(rawValue)) {
+          block.charElements = rawValue;
+        }
+
+        return block;
+      });
+
+      const heap: MemoryBlock[] = rawHeap.map((item: any) => {
+        const rawValue = item.value;
+        const block: MemoryBlock = {
+          name: item.name || item.label || '',
+          address: item.address || '???',
+          value: normalizeCValue(rawValue),
+          type: item.type,
+          size: item.size ? parseInt(String(item.size), 10) || undefined : undefined,
+          highlight: item.highlight,
+          label: item.label,
+          dangling: item.dangling,
+        };
+
+        if (isCharArrayValue(rawValue)) {
+          block.charElements = rawValue;
+        }
+
+        return block;
+      });
+
+      const memoryState = (stack.length > 0 || heap.length > 0)
+        ? { stack, heap, frames }
+        : null;
+
       return {
         memoryState,
         changedBlocks: INITIAL_CHANGED_BLOCKS,

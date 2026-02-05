@@ -16,7 +16,7 @@ import type { UserProgress } from '@/types';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
-  const { appUser } = useStore();
+  const appUser = useStore((s) => s.appUser);
   const navigate = useNavigate();
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);

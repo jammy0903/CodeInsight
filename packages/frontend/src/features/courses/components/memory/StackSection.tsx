@@ -37,11 +37,14 @@ export function StackSection({
   // 현재 실행 중인 프레임 (frames 배열의 마지막)
   const currentFrame = frames[frames.length - 1]?.name || 'main';
 
-  // 주소순 정렬 (높은 주소 → 낮은 주소)
+  // 주소순 정렬 (높은 주소 → 낮은 주소), NaN 방어
   const sortedBlocks = useMemo(() => {
     return [...blocks].sort((a, b) => {
       const addrA = parseInt(a.address, 16);
       const addrB = parseInt(b.address, 16);
+      if (isNaN(addrA) && isNaN(addrB)) return 0;
+      if (isNaN(addrA)) return 1;
+      if (isNaN(addrB)) return -1;
       return addrB - addrA;
     });
   }, [blocks]);
@@ -173,7 +176,7 @@ export function StackSection({
               items.push({ type: 'block', data: block });
             });
 
-            // 주소순 정렬 (첫 번째 요소 주소 기준)
+            // 주소순 정렬 (첫 번째 요소 주소 기준), NaN 방어
             items.sort((a, b) => {
               const addrA = a.type === 'array'
                 ? parseInt((a.data as [string, MemoryBlock[]])[1][0].address, 16)
@@ -181,6 +184,9 @@ export function StackSection({
               const addrB = b.type === 'array'
                 ? parseInt((b.data as [string, MemoryBlock[]])[1][0].address, 16)
                 : parseInt((b.data as MemoryBlock).address, 16);
+              if (isNaN(addrA) && isNaN(addrB)) return 0;
+              if (isNaN(addrA)) return 1;
+              if (isNaN(addrB)) return -1;
               return addrB - addrA;
             });
 

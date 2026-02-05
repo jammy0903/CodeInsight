@@ -32,7 +32,8 @@ export function ChapterLessonsPage() {
   const { t } = useTranslation();
   const { lang, chapterId } = useParams<{ lang: string; chapterId: string }>();
   const navigate = useNavigate();
-  const { setPageTitle, appUser } = useStore();
+  const setPageTitle = useStore((s) => s.setPageTitle);
+  const appUser = useStore((s) => s.appUser);
   const langColor = getLanguageColor(lang);
   const isMobile = useIsMobile();
 

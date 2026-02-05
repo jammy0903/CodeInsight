@@ -19,7 +19,7 @@ export default function AuthPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { setSidebarOpen } = useStore();
+  const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 

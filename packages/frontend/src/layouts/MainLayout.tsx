@@ -21,7 +21,9 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const { sidebarOpen, toggleSidebar, appUser } = useStore();
+  const sidebarOpen = useStore((s) => s.sidebarOpen);
+  const toggleSidebar = useStore((s) => s.toggleSidebar);
+  const appUser = useStore((s) => s.appUser);
   const location = useLocation();
 
   // 페이지 타입 확인

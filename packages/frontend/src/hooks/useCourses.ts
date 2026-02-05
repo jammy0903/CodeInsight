@@ -25,7 +25,8 @@ import type { ChapterWithLessons, Language, UserProgress, LessonFull } from '@/t
  * return <ChapterList chapters={data.chapters} />;
  */
 export function useLanguageCourse(languageId: string | undefined) {
-  const { appUser } = useStore();
+  // 선택적 구독: appUser만 구독하여 불필요한 리렌더링 방지
+  const appUser = useStore((state) => state.appUser);
 
   return useQuery<Language & { chapters: ChapterWithLessons[] }>({
     // queryKey: 캐시 키 (languageId, userId 변경 시 자동 refetch)
@@ -67,7 +68,8 @@ export function useChapter(chapterId: string | undefined) {
  * const { data: progressList } = useUserProgress();
  */
 export function useUserProgress() {
-  const { appUser } = useStore();
+  // 선택적 구독: appUser만 구독하여 불필요한 리렌더링 방지
+  const appUser = useStore((state) => state.appUser);
 
   return useQuery<UserProgress[]>({
     queryKey: ['progress', appUser?.id],
