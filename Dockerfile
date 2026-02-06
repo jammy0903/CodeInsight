@@ -10,9 +10,10 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     # Java Development Kit 17
     openjdk-17-jdk \
-    # C compiler
+    # C compiler & debugger
     gcc \
     g++ \
+    gdb \
     make \
     # Docker CLI (for C simulator)
     ca-certificates \
