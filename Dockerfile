@@ -135,7 +135,8 @@ RUN mkdir -p /app/packages/backend/tmp /app/packages/backend/logs /app/packages/
 # Set working directory to backend
 WORKDIR /app/packages/backend
 
-# Expose backend port
+# Set and expose backend port
+ENV PORT=3002
 EXPOSE 3002
 
 # Health check
