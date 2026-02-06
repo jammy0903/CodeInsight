@@ -1,11 +1,14 @@
 /**
- * StepExplanation - AI 기반 스텝 설명 표시
- * explanationStore의 prefetch 큐에서 설명을 가져와 표시
- * 스트리밍 중인 경우 실시간으로 텍스트가 타이핑되는 효과
+ * StepExplanation - 스텝 설명 표시
+ *
+ * 우선순위:
+ * 1. 레슨 JSON의 사전 작성된 설명 (step.explanation)
+ * 2. AI 생성 설명 (explanationStore)
+ *
+ * AI 설명 사용 시 스트리밍 효과 표시
  * 반응형 지원 (모바일에서 더 컴팩트)
  */
 
-import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useExplanation } from '../stores/explanationStore';
 import type { SimulationStep } from '../stores/playgroundStore';
@@ -16,26 +19,21 @@ interface StepExplanationProps {
 }
 
 export function StepExplanation({ step, isMobile = false }: StepExplanationProps) {
-  const { explanation, isStreaming, streamingContent } = useExplanation(step.line, step.code);
+  // 1순위: 레슨 JSON의 사전 작성된 설명
+  // 2순위: AI 생성 설명
+  const hasPrewrittenExplanation = !!step.explanation;
+  const { explanation: aiExplanation, isStreaming, streamingContent } = useExplanation(step.line, step.code);
 
-  // DEBUG: 실제 표시되는 설명 확인
-  useEffect(() => {
-    const displayContent = isStreaming ? streamingContent : explanation;
-    console.log('[StepExplanation DISPLAY]', {
-      line: step.line,
-      explanation_from_cache: explanation?.substring(0, 40),
-      streaming: isStreaming,
-      final_display: displayContent?.substring(0, 40),
-    });
-  }, [explanation, isStreaming, streamingContent, step.line]);
+  // 사전 작성된 설명이 있으면 그것을 사용, 없으면 AI 설명 사용
+  const displayContent = hasPrewrittenExplanation
+    ? step.explanation
+    : (isStreaming ? streamingContent : aiExplanation);
 
-  // 표시할 내용 결정 (AI 설명만 사용)
-  const displayContent = isStreaming
-    ? streamingContent
-    : explanation;
+  // AI 설명 사용 중일 때만 스트리밍 상태 표시
+  const showStreaming = !hasPrewrittenExplanation && isStreaming;
 
-  // 아직 설명이 없고 스트리밍도 아닌 경우 = 대기 중
-  const isWaiting = !displayContent && !isStreaming;
+  // 아직 설명이 없고 스트리밍도 아닌 경우 = 대기 중 (사전 작성 설명이 있으면 대기 안 함)
+  const isWaiting = !hasPrewrittenExplanation && !displayContent && !isStreaming;
 
   return (
     <div
@@ -89,7 +87,7 @@ export function StepExplanation({ step, isMobile = false }: StepExplanationProps
             }}
           >
             {displayContent}
-            {isStreaming && (
+            {showStreaming && (
               <span
                 style={{
                   display: 'inline-block',

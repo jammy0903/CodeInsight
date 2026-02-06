@@ -167,7 +167,7 @@ export function LessonDesktopLayout({
                     color: '#fff',
                   }}
                 >
-                  L{displayLine}
+                  Step {currentStepIndex + 1}/{steps.length} · L{displayLine}
                 </span>
                 {isExplanationCollapsed ? (
                   <ChevronUp className="w-3.5 h-3.5" />

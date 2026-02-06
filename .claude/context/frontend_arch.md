@@ -164,6 +164,7 @@ export function useUserProgress(lessonId: string | undefined) {
 - **`hooks/`**: 여러 컴포넌트에서 재사용되는 커스텀 훅. (예: `useAuth`, `useCourses`, `useDebounce`)
 - **`layouts/`**: 페이지의 전체적인 레이아웃(예: 헤더, 사이드바 포함)을 정의하는 컴포넌트.
 - **`services/`**: 백엔드 API 호출을 담당하는 함수들. (api/, simulator/, courses.ts, ai.ts 등)
+  - `courses.ts`의 `getLessonFull()`에서 `resolveStepLines()`를 호출하여 step.code → step.line 런타임 변환 수행
 - **`stores/`**: Zustand를 사용한 전역 상태 관리 로직. (authStore, simulatorStore, themeStore 등)
 - **`utils/`**: 날짜 포맷팅, 문자열 처리 등 범용 헬퍼 함수.
 - **`lib/`**: 외부 라이브러리 설정이나 인스턴스를 관리. (예: `firebase.ts`)
@@ -417,3 +418,36 @@ import { Toaster } from 'sonner';
 - ✅ **유지보수**: 메시지 수정 시 한 곳만 변경
 - ✅ **타입 안전**: TypeScript로 알림 함수 자동완성
 - ✅ **테스트 용이**: 알림 로직 단위 테스트 가능
+
+---
+
+### step.code → step.line 런타임 계산 (resolveStepLines)
+
+**핵심 원칙: JSON에는 라인 번호를 저장하지 않고, 코드 문자열로 매칭**
+
+Lesson JSON의 각 step에는 `step.code` (코드 매칭 키)만 저장되어 있고, `step.line`은 프론트엔드에서 런타임에 계산됩니다.
+
+#### 파일 위치
+- **`features/courses/utils/resolveStepLines.ts`** — 변환 함수
+- **`services/courses.ts`** — getLessonFull()에서 Zod 검증 전에 호출
+
+#### 데이터 흐름
+```
+JSON (step.code만 저장)
+  → DB seed → API 응답
+  → courses.ts: resolveStepLines(steps, fullCode) → step.line 주입
+  → Zod safeParse (line: required number ✅)
+  → 기존 프론트엔드 코드 변경 없이 동작
+```
+
+#### step 필드 매핑
+| JSON 저장 필드 | 런타임 계산 필드 | 설명 |
+|----------------|------------------|------|
+| `step.code` | `step.line` | 코드 문자열 → content.code에서 매칭 → 1-indexed 라인번호 |
+| `step.highlightOffset` | `step.highlight` | 상대 오프셋 [0, 1] → 절대 라인번호 [resolvedLine, resolvedLine+1] |
+| `step.occurrence` | (매칭 로직 내) | 동일 코드가 여러 줄에 있을 때 N번째 출현 지정 (기본: 1) |
+
+#### Why?
+- **빈줄 추가/삭제 문제 원천 차단**: 라인 번호가 JSON에 없으므로 코드 수정 시 밀리지 않음
+- **검증 가능**: step.code가 content.code에 없으면 스크립트로 100% 감지
+- **기존 코드 변경 없음**: resolveStepLines() 이후 step.line이 주입되므로 기존 프론트엔드 코드 그대로 동작

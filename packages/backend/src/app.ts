@@ -26,6 +26,7 @@ import pythonSimulatorRoutes from './modules/simulators/python/routes';
 import { javaSimulatorRoutes } from './modules/simulators/java/routes';
 import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
 import { standaloneQuizzesRoutes } from './modules/standalone-quizzes/routes';
+import { submissionRoutes } from './modules/submissions/routes';
 
 // Firebase Admin 초기화
 try {
@@ -108,6 +109,7 @@ app.register(gamificationRoutes, { prefix: '/api/v1/gamification' });
 app.register(adminRoutes, { prefix: '/api/v1/admin' });
 app.register(userRoutes, { prefix: '/api/v1/users' });
 app.register(standaloneQuizzesRoutes, { prefix: '/api/v1/standalone-quizzes' });
+app.register(submissionRoutes, { prefix: '/api/v1/submissions' });
 
 // =============================================
 // Legacy Routes (버전 없는 요청 → v1로 리다이렉트)
@@ -117,7 +119,7 @@ const legacyRedirects: Record<string, string> = {
   '/api/memory': '/api/v1/simulators/c/trace',
   '/api/submissions': '/api/v1/submissions',
   '/api/users': '/api/v1/users',
-  '/api/c': '/api/v1/c',
+  '/api/c': '/api/v1/simulators/c',
   '/api/ai': '/api/v1/ai',
   '/api/courses': '/api/v1/courses',
   '/api/analytics': '/api/v1/analytics',

@@ -4,7 +4,7 @@
 
 ## 주요 기술 스택
 
-- **API 서버**: Express.js
+- **API 서버**: Fastify
 - **ORM**: Prisma
 - **데이터베이스**: PostgreSQL (NeonDB)
 - **언어**: TypeScript
@@ -13,7 +13,7 @@
 ## 아키텍처 개요
 
 - **모듈 시스템**: `src/modules` 아래에 각 기능 모듈이 위치합니다. 각 모듈은 특정 도메인(예: `courses`, `users`, `simulators`)과 관련된 라우트, 서비스, 타입 정의 등을 포함합니다.
-- **메인 진입점**: `src/app.ts` 파일이 Express 앱의 메인 진입점 역할을 하며, 모든 모듈의 라우터를 등록하고 CORS, JSON 파서 등의 공통 미들웨어를 설정합니다.
+- **메인 진입점**: `src/app.ts` 파일이 Fastify 앱의 메인 진입점 역할을 하며, 모든 모듈의 라우터를 등록하고 CORS, JSON 파서 등의 공통 미들웨어를 설정합니다.
 - **설정 관리**: `src/config` 디렉토리에서 환경 변수를 `zod`로 검증하고, 애플리케이션 전반에 사용될 설정 객체를 생성하여 제공합니다.
 
 ## 디렉토리 구조
@@ -21,7 +21,7 @@
 ```
 packages/backend/
 ├── src/
-│   ├── app.ts                    # Express 앱 진입점
+│   ├── app.ts                    # Fastify 앱 진입점
 │   ├── config/                   # 환경 변수 및 설정
 │   │   ├── database.ts          # Prisma 클라이언트
 │   │   └── index.ts             # 앱 전역 설정
@@ -71,7 +71,7 @@ packages/backend/
   - `services/`: 여러 도메인에서 공통으로 사용되는 비즈니스 로직
   - `utils/`: 특정 도메인에 종속되지 않는 순수 유틸리티 함수
   - `types/`: 여러 모듈에서 공통으로 사용되는 전역 타입 정의
-  - `middleware/`: 여러 라우트 또는 모듈에서 공통으로 사용되는 Express 미들웨어
+  - `middleware/`: 여러 라우트 또는 모듈에서 공통으로 사용되는 Fastify 미들웨어
 
 > **⚠️ 언제 공용 디렉토리를 사용해야 하나요?**
 >
@@ -1038,10 +1038,9 @@ const jsonContent = await lessonContentLoader.getContent(id); // JSON 콘텐츠
     "code": "int x = 5;\nint y = x + 10;",
     "steps": [
       {
-        "line": 1,
+        "code": "int x = 5;",
         "title": "변수 선언",
-        "explanation": "int x = 5;는 정수형 변수 x를 선언하고...",
-        "highlight": [1]
+        "explanation": "int x = 5;는 정수형 변수 x를 선언하고..."
       }
     ]
   },
@@ -1060,10 +1059,9 @@ const jsonContent = await lessonContentLoader.getContent(id); // JSON 콘텐츠
     "language": "python",
     "steps": [
       {
-        "line": 2,
+        "code": "fruits = [\"Apple\", \"Banana\"]",
         "title": "리스트 생성",
         "explanation": "대괄호 []로 리스트 객체를 만들고...",
-        "highlight": [2],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
@@ -1081,6 +1079,10 @@ const jsonContent = await lessonContentLoader.getContent(id); // JSON 콘텐츠
   "quizzes": [{ "type": "multiple_choice", "question": "...", "options": [...], "answer": "2" }]
 }
 ```
+
+> **참고**: JSON에 `step.line`이 없고 `step.code`만 저장됩니다.
+> 프론트엔드의 `resolveStepLines()`가 런타임에 step.code → step.line을 계산합니다.
+> `highlightOffset`으로 상대 오프셋을 저장하면 step.highlight도 자동 계산됩니다.
 
 #### Python pythonMemoryState 구조
 

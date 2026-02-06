@@ -28,10 +28,13 @@ export interface MemoryChange {
 }
 
 export interface LessonStep {
-  line: number;
+  line?: number;              // step.code로부터 런타임 계산 후 주입
+  code?: string;              // 코드 매칭 키 (trimmed)
+  occurrence?: number;        // 동일 코드 라인 구분 (기본값: 1)
   title?: string;
   explanation: string;
   highlight?: number[];
+  highlightOffset?: number[]; // step.line 기준 상대 오프셋
   misconception?: string;
   memoryChanges?: MemoryChange[];
 }

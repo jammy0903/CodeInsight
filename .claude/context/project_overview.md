@@ -111,7 +111,7 @@ Lesson JSON (names[]/objects[])
 └──────────────┬──────────────────┘
                │ REST API
 ┌──────────────▼──────────────────┐
-│    Backend (Node.js/Express)    │
+│    Backend (Node.js/Fastify)    │
 │  - API 라우팅                   │
 │  - 인증/권한                    │
 │  - 데이터 관리                  │
@@ -229,6 +229,10 @@ packages/backend/prisma/content/
 
 ### Lesson JSON 구조 예시
 
+> **핵심 변경 (2026-02)**: `step.line` → `step.code`, `highlight` → `highlightOffset`
+> JSON에는 라인 번호가 없고, 코드 문자열(`step.code`)로 매칭합니다.
+> 프론트엔드의 `resolveStepLines()`가 런타임에 `step.code` → `step.line`을 계산합니다.
+
 **Python 레슨** (`names[]`/`objects[]` 기반 — 참조 모델):
 ```json
 {
@@ -240,10 +244,9 @@ packages/backend/prisma/content/
     "language": "python",
     "steps": [
       {
-        "line": 2,
+        "code": "fruits = [\"Apple\", \"Banana\"]",
         "title": "리스트 생성",
         "explanation": "대괄호 []로 리스트 객체를 만들고 fruits 이름표를 붙입니다.",
-        "highlight": [2],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [
@@ -270,16 +273,25 @@ packages/backend/prisma/content/
     "code": "int x = 5;\nint y = x + 10;",
     "steps": [
       {
-        "line": 1,
+        "code": "int x = 5;",
         "title": "변수 선언",
-        "explanation": "int x = 5;는 정수형 변수 x를 선언하고...",
-        "highlight": [1]
+        "explanation": "int x = 5;는 정수형 변수 x를 선언하고..."
       }
     ]
   },
   "quizzes": [{ "type": "ox", "question": "...", "answer": "true" }]
 }
 ```
+
+#### step 필드 설명 (새 스키마)
+
+| 필드 | 필수 | 설명 |
+|------|------|------|
+| `code` | ✅ | 해당 스텝의 코드 문자열 (content.code에서 매칭) |
+| `occurrence` | ❌ | 동일 코드 라인이 여러 번 나올 때 N번째 지정 (기본: 1) |
+| `highlightOffset` | ❌ | 매칭된 라인 기준 상대 오프셋 (예: [0, 1] = 현재 줄 + 다음 줄) |
+| `line` | ❌ | JSON에 저장하지 않음, 프론트엔드에서 런타임 계산 |
+| `highlight` | ❌ | JSON에 저장하지 않음, highlightOffset에서 런타임 계산 |
 
 #### Python `pythonMemoryState` 구조 (names/objects 모델)
 
@@ -304,6 +316,7 @@ Python은 **모든 변수가 참조(이름표)**인 언어이므로, `variables[
 - **시뮬레이터 미지원 개념도 교육 가능**: yield, decorator, async/await 등
 - **자동 배포**: JSON 수정 → git push → prisma db seed → DB 반영
 - **Python은 참조 모델**: `names[]`/`objects[]`로 포스트잇(이름표)+객체 시각화
+- **step.code 기반 매칭**: JSON에 라인 번호 없음 → 코드 문자열로 매칭 → 빈줄 추가/삭제 시에도 안전
 
 ---
 

@@ -117,7 +117,7 @@ const executeCode = (req) => {
 };
 ```
 
-### Express 라우터
+### Fastify 라우터
 ```typescript
 // ✅ Good
 router.post(

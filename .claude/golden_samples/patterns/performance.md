@@ -97,7 +97,7 @@ const MemoizedComponent = memo(({ props }) => { /* ... */ });
 
 ---
 
-## ⚡ 백엔드 최적화 (Node.js/Express.js 예시)
+## ⚡ 백엔드 최적화 (Node.js/Fastify 예시)
 
 ### 1. N+1 문제 방지 (ORM 활용)
 
@@ -143,7 +143,7 @@ async function fetchData() {
 - `compression` 미들웨어를 사용하여 HTTP 응답 데이터 압축 (gzip, Brotli).
 
 ```javascript
-// 예시: Express.js compression 미들웨어
+// 예시: compression 미들웨어
 const compression = require('compression');
 app.use(compression());
 ```

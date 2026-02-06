@@ -26,6 +26,7 @@ import {
   ChapterWithProgressSchema,
 } from '@codeinsight/shared';
 import { logger } from '@/utils/logger';
+import { resolveStepLines } from '@/features/courses/utils/resolveStepLines';
 
 // =============================================
 // API Endpoints
@@ -163,8 +164,14 @@ export async function getLessonFull(lessonId: string): Promise<LessonFull> {
   try {
     const response = await api.get<LessonFull>(ENDPOINTS.lesson(lessonId));
 
+    // step.code → step.line 런타임 계산 (Zod 검증 전에 수행)
+    const data = response.data;
+    if (data.content?.steps && data.content?.code) {
+      data.content.steps = resolveStepLines(data.content.steps, data.content.code);
+    }
+
     // 런타임 검증
-    const parsed = LessonFullSchema.safeParse(response.data);
+    const parsed = LessonFullSchema.safeParse(data);
     if (!parsed.success) {
       logger.error('Invalid API response:', parsed.error);
       throw new Error('Invalid lesson data from server');

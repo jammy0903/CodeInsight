@@ -41,7 +41,7 @@
 | 순서 | 파일 | 읽는 이유 |
 |------|------|-----------|
 | 11 | `packages/backend/tsconfig.json` | 백엔드 TS 설정 |
-| 12 | `packages/backend/src/app.ts` | Express 서버 진입점 (미들웨어, 라우트 등록, Firebase, 레슨 로더) |
+| 12 | `packages/backend/src/app.ts` | Fastify 서버 진입점 (플러그인, 라우트 등록, Firebase, 레슨 로더) |
 | 13 | `packages/backend/src/config/index.ts` | 환경 변수 & 전역 설정 |
 | 14 | `packages/backend/src/config/logger.ts` | Winston 로거 설정 |
 | 15 | `packages/backend/src/middleware/auth.ts` | Firebase 인증 미들웨어 |

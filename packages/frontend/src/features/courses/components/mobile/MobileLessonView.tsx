@@ -148,7 +148,7 @@ export function MobileLessonView({
         className="flex items-center gap-1 px-1.5 py-1 explanation-header"
       >
         <span className="shrink-0 px-1 py-0.5 rounded text-white text-[9px] font-bold leading-none" style={{ fontFamily: 'var(--font-sans)', backgroundColor: 'var(--theme-explanation-text)' }}>
-          L{currentStep?.line || 1}
+          Step {currentStepIndex + 1}/{steps.length} · L{currentStep?.line || 1}
         </span>
         <span className="text-[10px] font-semibold text-amber-800">{t('quiz.explanation')}</span>
         {canCollapse && (

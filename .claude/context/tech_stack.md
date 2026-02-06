@@ -11,7 +11,7 @@
 | | TailwindCSS | 3+ | 스타일링 |
 | | Zustand | - | 상태 관리 |
 | **Backend** | Node.js | 18+ | 런타임 |
-| | Express | 4+ | 웹 프레임워크 |
+| | Fastify | 4+ | 웹 프레임워크 |
 | | TypeScript | 5.9+ | 타입 안정성 |
 | | Prisma | 5+ | ORM |
 | **Database** | PostgreSQL | 15+ | 주 DB (Neon) |
@@ -49,7 +49,7 @@
 ### Backend Dependencies
 ```json
 {
-  "express": "^4.18.0",
+  "fastify": "^4.x",
   "@prisma/client": "^5.x",
   "zod": "^3.x",
   "firebase-admin": "^12.x",
@@ -190,12 +190,12 @@ interface PlaygroundStore {
 
 ## 🔧 백엔드 기술 상세
 
-### Express 미들웨어
+### Fastify 플러그인
 ```typescript
-// 인증, 에러 처리, CORS, 로깅
-app.use(cors());
-app.use(express.json());
-app.use(errorHandler);
+// 인증, 에러 처리, CORS
+app.register(cors);
+app.register(routes);
+app.setErrorHandler(errorHandler);
 ```
 
 ### Prisma ORM
@@ -286,7 +286,7 @@ pnpm --filter backend test
 - [React 18](https://react.dev)
 - [Vite](https://vitejs.dev)
 - [Prisma](https://www.prisma.io)
-- [Express](https://expressjs.com)
+- [Fastify](https://fastify.dev)
 
 ### 커뮤니티
 - [React Korea](https://github.com/reactjs)

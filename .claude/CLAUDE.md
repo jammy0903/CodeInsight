@@ -34,7 +34,7 @@
 
 ### 기술 스택
 - **Frontend**: React 18, Vite, TypeScript, Framer Motion
-- **Backend**: Node.js, Express, Prisma ORM
+- **Backend**: Node.js, Fastify, Prisma ORM
 - **Database**: PostgreSQL (Neon)
 - **Simulators**: Python `sys.settrace()`, Node.js VM, C (Emscripten 검증 + 인터프리터)
 - **Lesson Data**: JSON 파일 (`packages/backend/prisma/content/`) → DB seed로 자동 동기화

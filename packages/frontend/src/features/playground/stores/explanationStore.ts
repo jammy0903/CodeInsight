@@ -176,16 +176,28 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
       processQueueId++;
       const currentQueueId = processQueueId;
 
-      // 캐시 초기화 및 큐 생성
-      const newQueue: QueueItem[] = steps.map((step) => ({
+      // 사전 작성된 explanation이 없는 스텝만 큐에 추가
+      // (Lesson JSON에 explanation이 있으면 AI 호출 불필요)
+      const stepsNeedingAI = steps.filter((step) => !step.explanation);
+
+      const newQueue: QueueItem[] = stepsNeedingAI.map((step) => ({
         step,
         fullCode,
         language,
         cacheKey: getCacheKey(step.line),
       }));
 
-      console.log('[ExplanationStore] Starting prefetch for', newQueue.length, 'steps (queueId:', currentQueueId, ')');
-      console.log('[ExplanationStore] First 3 items:', newQueue.slice(0, 3).map(q => ({ line: q.step.line, code: q.step.code?.substring(0, 20), cacheKey: q.cacheKey })));
+      // AI 호출이 필요한 스텝이 없으면 바로 완료
+      if (newQueue.length === 0) {
+        set({
+          cache: new Map(),
+          queue: [],
+          isProcessing: false,
+          streamingKey: null,
+          streamingContent: '',
+        });
+        return;
+      }
 
       set({
         cache: new Map(),

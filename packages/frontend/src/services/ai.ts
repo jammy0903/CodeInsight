@@ -161,6 +161,16 @@ export async function askAI(
 cd backend && npm run dev 명령어로 서버를 실행해주세요.`;
     }
 
+    // 401: 인증 실패
+    if (error.status === 401) {
+      return '🔐 로그인이 필요합니다.\n\n다시 로그인해주세요.';
+    }
+
+    // 404: 사용자 미등록
+    if (error.status === 404) {
+      return '👤 사용자 등록이 필요합니다.\n\n회원가입을 완료해주세요.';
+    }
+
     // API 크레딧 부족
     if (error.status === 402) {
       notifyAI.creditExhausted();
@@ -202,12 +212,16 @@ export async function askAIStream(
   try {
     // 인증 토큰 가져오기
     const token = await getAuthTokenAsync();
+
+    // 토큰이 없으면 로그인 필요 안내
+    if (!token) {
+      return '🔐 AI 튜터를 사용하려면 로그인이 필요합니다.\n\n페이지를 새로고침하거나 다시 로그인해주세요.';
+    }
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
 
     const response = await fetch(url, {
       method: 'POST',
@@ -223,6 +237,18 @@ export async function askAIStream(
     });
 
     if (!response.ok) {
+      // 401: 인증 실패
+      if (response.status === 401) {
+        const errorData = await response.json().catch(() => ({}));
+        if (errorData.code === 'TOKEN_EXPIRED') {
+          return '⏰ 세션이 만료되었습니다.\n\n페이지를 새로고침해주세요.';
+        }
+        return '🔐 로그인이 필요합니다.\n\n다시 로그인해주세요.';
+      }
+      // 404: 사용자 미등록
+      if (response.status === 404) {
+        return '👤 사용자 등록이 필요합니다.\n\n회원가입을 완료해주세요.';
+      }
       throw new Error(`API error: ${response.status}`);
     }
 
@@ -304,14 +330,21 @@ export async function getStepExplanationStream(
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    // 30초 타임아웃 설정
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(request),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`API error: ${response.status} - ${errorText}`);
     }
 
     if (!response.body) {
@@ -357,12 +390,18 @@ export async function getStepExplanationStream(
 
     return fullContent;
   } catch (err) {
-    if (err instanceof TypeError && err.message.includes('fetch')) {
+    // 네트워크 에러 (fetch 실패)
+    if (err instanceof TypeError) {
       notifyAI.backendDisconnected();
-      return '🔌 AI 서버에 연결할 수 없습니다.';
+      return '🔌 AI 서버에 연결할 수 없습니다.\n\n백엔드 서버가 실행 중인지 확인해주세요.';
     }
 
-    return `⚠️ 스트리밍 오류: ${err instanceof Error ? err.message : 'Unknown error'}`;
+    // AbortError (타임아웃)
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      return '⏱️ AI 응답 시간이 초과되었습니다.\n\n다시 시도해주세요.';
+    }
+
+    return `⚠️ AI 오류: ${err instanceof Error ? err.message : 'Unknown error'}`;
   }
 }
 

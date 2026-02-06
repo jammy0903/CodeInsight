@@ -9,7 +9,6 @@ import { create } from 'zustand';
 import type { LessonStep } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import type { StackRegisters } from '@/features/visualizers/c';
-
 // ============================================================
 // 타입 정의
 // ============================================================

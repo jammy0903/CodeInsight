@@ -180,8 +180,9 @@ export const MemoryChangeSchema = z.object({
 import { VisualizationEventSchema } from './events';
 
 export const LessonStepSchema = z.object({
-  line: z.number(),
-  highlight: z.array(z.number()).optional(), // API는 highlight 사용
+  line: z.number(), // step.code로부터 런타임 계산 후 주입됨
+  highlight: z.array(z.number()).optional(), // 런타임 계산 또는 직접 지정
+  highlightOffset: z.array(z.number()).optional(), // step.line 기준 상대 오프셋
   highlightLines: z.array(z.number()).optional(), // 레거시
   title: z.string().optional(),
   explanation: z.string(),
@@ -275,8 +276,9 @@ export const LessonStepSchema = z.object({
   hoistingState: z.unknown().optional(),
   scopeChainState: z.unknown().optional(),
   prototypeState: z.unknown().optional(),
-  // Playground에서 필요한 코드 필드
+  // 코드 매칭 키 (Lesson JSON: step.line 대체, Playground: 실행 코드)
   code: z.string().optional(),
+  occurrence: z.number().optional(), // 동일 코드 라인 구분 (기본값: 1)
   // C 시뮬레이터 return 정보
   isReturn: z.boolean().optional(),
   returnInfo: z.unknown().optional(),

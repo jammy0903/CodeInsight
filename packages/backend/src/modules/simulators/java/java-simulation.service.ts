@@ -140,6 +140,9 @@ export class JavaSimulationService {
             //    - class 있음 → 래핑 안 함 (LINE_OFFSET=0)
             const LINE_OFFSET = !hasClassDefinition ? 7 : 0;
 
+            // 📝 소스 코드를 라인별로 분리 (빈 줄 필터링용)
+            const sourceLines = sourceCode.split('\n');
+
             // 🔄 스냅샷 변환: 디버거 라인 → 사용자 코드 라인
             const adjustedSnapshots = snapshots
                 // ❌ 실행 전 스냅샷 제거 (line <= 0 또는 래핑 영역)
@@ -152,7 +155,14 @@ export class JavaSimulationService {
                     ...snapshot,
                     line: snapshot.line ? snapshot.line - LINE_OFFSET : snapshot.line,
                     lineNumber: snapshot.lineNumber ? snapshot.lineNumber - LINE_OFFSET : snapshot.lineNumber,
-                }));
+                }))
+                // 빈 줄 스텝 제거 (공백만 있는 라인)
+                // 빈 줄 스텝이 끼어들면 프론트엔드와 인덱스가 밀림
+                .filter((snapshot: any) => {
+                    const line = snapshot.line || snapshot.lineNumber;
+                    const lineContent = sourceLines[line - 1] || '';
+                    return lineContent.trim() !== '';
+                });
 
             // ═══════════════════════════════════════════════════════
             // 5️⃣ Normalize: SimulatorEvent[] 추가 (dual path)

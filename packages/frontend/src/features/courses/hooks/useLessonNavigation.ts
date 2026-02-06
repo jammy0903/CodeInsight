@@ -38,29 +38,17 @@ export interface UseLessonNavigationReturn {
 
 /**
  * 특정 스텝이 빈 줄인지 확인
- * @param stepIndex 확인할 스텝 인덱스
- * @param steps 스텝 배열
- * @param code 원본 코드
- * @returns 빈 줄 여부
+ *
+ * NOTE: 이 기능은 레슨 JSON에서 모든 스텝이 유효한 코드 라인을 가리키므로
+ * 비활성화됨. 빈 줄 스킵이 필요하면 JSON 작성 시 해당 스텝을 제외해야 함.
  */
 function isEmptyLineStep(
-  stepIndex: number,
-  steps: LessonStep[] | undefined,
-  code: string | undefined
+  _stepIndex: number,
+  _steps: LessonStep[] | undefined,
+  _code: string | undefined
 ): boolean {
-  if (!steps || !code || stepIndex < 0 || stepIndex >= steps.length) {
-    return false;
-  }
-
-  const step = steps[stepIndex];
-  const lineNumber = step?.line || 0;
-
-  if (lineNumber <= 0) return false;
-
-  const codeLines = code.split('\n');
-  const lineContent = codeLines[lineNumber - 1] || '';
-
-  return lineContent.trim() === '';
+  // 빈 줄 스킵 기능 비활성화 - 모든 스텝 실행
+  return false;
 }
 
 /**

@@ -63,18 +63,22 @@ export function CodeMirrorReadOnly({
     return codemirrorThemes[currentTheme] || codemirrorThemes.soft;
   }, [currentTheme]);
 
-  // 폰트 크기 extension
+  // 폰트 크기 extension - 화면 크기에 따라 유연하게 조절
+  // clamp(최소, 선호, 최대): 뷰포트 너비에 비례하되 범위 내로 제한
   const fontSizeExtension = useMemo(() => {
     return EditorView.theme({
       '.cm-content': {
-        fontSize: isMobile ? '12px' : '14px',
+        // 모바일: 10px~12px, 데스크탑: 11px~14px 범위로 뷰포트에 따라 조절
+        fontSize: isMobile ? 'clamp(10px, 2.5vw, 12px)' : 'clamp(11px, 1.2vw, 14px)',
         padding: isMobile ? '8px 0' : '16px 0',
       },
       '.cm-scroller': {
-        overflow: 'auto',
+        overflowX: 'hidden', // 가로 스크롤 숨김
+        overflowY: 'auto',   // 세로 스크롤만 허용
       },
       '.cm-gutters': {
         minWidth: isMobile ? '24px' : '36px',
+        fontSize: isMobile ? 'clamp(9px, 2vw, 11px)' : 'clamp(10px, 1vw, 12px)',
       },
     });
   }, [isMobile]);
@@ -95,6 +99,7 @@ export function CodeMirrorReadOnly({
       extensions: [
         EditorState.readOnly.of(true),
         lineNumbers(),
+        EditorView.lineWrapping, // 긴 줄 자동 줄바꿈 (가로 스크롤 방지)
         langExtension(),
         ...themeExtension,
         fontSizeExtension,

@@ -36,7 +36,7 @@
 ### 1. 미들웨어 기반 처리
 
 ```javascript
-// 예시: Express.js 에러 처리 미들웨어
+// 예시: Fastify 에러 처리 미들웨어
 app.use((err, req, res, next) => {
   console.error(err.stack); // 서버 로그
   if (err.isOperational) {

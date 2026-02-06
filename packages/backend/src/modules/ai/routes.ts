@@ -22,6 +22,7 @@ import {
 import { getSettings } from './settings';
 import { logger } from '../../utils/logger';
 import { prisma } from '../../config/database';
+import { startSSE, sendSSE, endSSE, sendSSEError } from '../../utils/sse';
 // subscription 시스템 제거됨 - AI 사용량 제한 없음
 
 // === 스키마 정의 ===
@@ -700,26 +701,17 @@ ${objectsStr}
           systemPrompt,
         });
 
-        reply.raw.writeHead(200, {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-        });
-        reply.raw.write(`data: ${JSON.stringify({ content: response.content, done: false })}\n\n`);
-        reply.raw.write(`data: ${JSON.stringify({ content: '', done: true })}\n\n`);
-        reply.raw.end();
+        startSSE(request, reply);
+        sendSSE(reply, { content: response.content, done: false });
+        sendSSE(reply, { content: '', done: true });
+        endSSE(reply);
         return;
       }
 
-      // SSE 헤더 설정
-      reply.raw.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'X-Accel-Buffering': 'no',
-      });
+      // SSE 스트리밍 시작
+      startSSE(request, reply);
 
-      // 스트리밍 시작
+      // 스트리밍
       await provider.streamChat(
         {
           message: userMessage,
@@ -727,17 +719,16 @@ ${objectsStr}
           systemPrompt,
         },
         (chunk) => {
-          reply.raw.write(`data: ${JSON.stringify(chunk)}\n\n`);
+          sendSSE(reply, chunk);
         }
       );
 
-      reply.raw.end();
+      endSSE(reply);
     } catch (error) {
       logger.error('AI explain-step stream error:', error);
 
       if (reply.raw.headersSent) {
-        reply.raw.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error', done: true })}\n\n`);
-        reply.raw.end();
+        sendSSEError(reply, error instanceof Error ? error : 'Unknown error');
         return;
       }
 
@@ -906,26 +897,17 @@ ${objectsStr}
           saveChatHistoryAndUsage();
 
           // SSE 형식으로 한 번에 전송
-          reply.raw.writeHead(200, {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-          });
-          reply.raw.write(`data: ${JSON.stringify({ content: response.content, done: false })}\n\n`);
-          reply.raw.write(`data: ${JSON.stringify({ content: '', done: true })}\n\n`);
-          reply.raw.end();
+          startSSE(request, reply);
+          sendSSE(reply, { content: response.content, done: false });
+          sendSSE(reply, { content: '', done: true });
+          endSSE(reply);
           return;
         }
 
-        // SSE 헤더 설정
-        reply.raw.writeHead(200, {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-          'X-Accel-Buffering': 'no',  // nginx 버퍼링 비활성화
-        });
+        // SSE 스트리밍 시작
+        startSSE(request, reply);
 
-        // 스트리밍 시작
+        // 스트리밍
         await provider.streamChat(
           {
             message,
@@ -937,21 +919,20 @@ ${objectsStr}
             if (chunk.content) {
               fullResponse += chunk.content;
             }
-            reply.raw.write(`data: ${JSON.stringify(chunk)}\n\n`);
+            sendSSE(reply, chunk);
           }
         );
 
         // 스트리밍 완료 후 ChatHistory 저장
         saveChatHistoryAndUsage();
 
-        reply.raw.end();
+        endSSE(reply);
       } catch (error) {
         logger.error('AI stream error:', error);
 
         // 이미 스트리밍 시작된 경우 에러 이벤트 전송
         if (reply.raw.headersSent) {
-          reply.raw.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error', done: true })}\n\n`);
-          reply.raw.end();
+          sendSSEError(reply, error instanceof Error ? error : 'Unknown error');
           return;
         }
 

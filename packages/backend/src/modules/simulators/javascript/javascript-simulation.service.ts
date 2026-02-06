@@ -466,6 +466,13 @@ export class JavaScriptSimulationService {
           return false;
         }
 
+        // 빈 줄 스텝 제거 (공백만 있는 라인)
+        // 빈 줄 스텝이 끼어들면 프론트엔드와 인덱스가 밀림
+        const lineContent = lines[snapshot.line - 1] || '';
+        if (lineContent.trim() === '') {
+          return false;
+        }
+
         return true;
       })
       // ✅ 스냅샷 정규화 및 코드 추가

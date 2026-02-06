@@ -319,6 +319,11 @@ export class GdbTracer {
     const line = currentFrame?.line ?? 0;
     const code = sourceLines[line - 1] ?? '';
 
+    // 빈 줄 스텝 스킵 (공백만 있는 라인)
+    if (code.trim() === '') {
+      return;
+    }
+
     // 변수 enrichment (주소, 바이트 데이터)
     const enrichedLocals = await this.enrichVariables(session, locals);
     const enrichedArgs = await this.enrichVariables(session, args);

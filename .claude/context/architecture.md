@@ -16,7 +16,7 @@
         └────────────────┼──────────────┘
                          │
           ┌──────────────▼──────────────┐
-          │  API Gateway (Express)      │
+          │  API Gateway (Fastify)      │
           │  - 라우팅                   │
           │  - 인증/인가               │
           │  - 에러 처리               │
@@ -288,7 +288,7 @@ src/
 ├── config/
 │   └── index.ts                # 환경 변수 (zod 검증)
 │
-└── app.ts                      # Express 앱 진입점
+└── app.ts                      # Fastify 앱 진입점
 ```
 
 ---
@@ -454,10 +454,9 @@ interface PlaygroundStore {
     "language": "python",
     "steps": [
       {
-        "line": 2,
+        "code": "fruits = [\"Apple\", \"Banana\"]",
         "title": "리스트 생성",
         "explanation": "...",
-        "highlight": [2],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "names": [{ "name": "fruits", "pointsTo": "list1" }],
@@ -471,6 +470,7 @@ interface PlaygroundStore {
     { "type": "multiple_choice", "question": "...", "options": [...], "answer": "2" }
   ]
 }
+※ JSON에는 step.code만 저장, step.line은 프론트엔드에서 resolveStepLines()로 런타임 계산
 ```
 
 #### GET /api/courses/:languageId

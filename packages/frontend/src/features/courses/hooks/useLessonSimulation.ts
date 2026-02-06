@@ -125,6 +125,19 @@ function filterConsecutiveDuplicateLines(steps: LessonStep[]): LessonStep[] {
   }, []);
 }
 
+/**
+ * 빈 줄 스텝 필터링 — 코드에서 해당 라인이 빈 줄이면 제거
+ * (시뮬레이터가 빈 줄도 스텝으로 생성하는 문제 방지)
+ */
+function filterEmptyLineSteps(steps: LessonStep[], code: string): LessonStep[] {
+  const codeLines = code.split('\n');
+  return steps.filter(step => {
+    if (step.line === undefined) return true;
+    const lineContent = codeLines[step.line - 1] || '';
+    return lineContent.trim() !== '';
+  });
+}
+
 export function useLessonSimulation({
   lesson,
   lang,
@@ -148,7 +161,7 @@ export function useLessonSimulation({
   useEffect(() => {
     if (!lesson || !lang) return;
 
-    // 1. 코드 없이 steps만 있으면 그대로 사용
+    // 1. 코드 없이 steps만 있으면 그대로 사용 (courses.ts에서 이미 resolve됨)
     if (!lesson.content?.code && lesson.content?.steps) {
       setLiveSteps(lesson.content.steps);
       return;
@@ -194,14 +207,17 @@ export function useLessonSimulation({
         if (cancelled) return;
 
         if (result.success) {
+          // lesson.content.steps는 courses.ts에서 이미 resolve됨
           const jsonSteps = lesson.content?.steps || [];
           const merged = mergeSteps(result.steps, jsonSteps, lang);
           const filtered = filterConsecutiveDuplicateLines(merged);
+          // 빈 줄 스텝 제거 (시뮬레이터가 빈 줄도 스텝으로 생성하는 문제 방지)
+          const withoutEmptyLines = filterEmptyLineSteps(filtered, codeToRun);
 
-          simulationCache.current[memoizedCode] = filtered;
+          simulationCache.current[memoizedCode] = withoutEmptyLines;
           lastSimulatedCodeRef.current = memoizedCode;
           setSimulationError(null);
-          setLiveSteps(filtered);
+          setLiveSteps(withoutEmptyLines);
         } else {
           console.error('Simulation failed:', result.error);
           setSimulationError(result.error || 'Failed to simulate code.');

@@ -135,14 +135,14 @@ pnpm dev
 
 ---
 
-# ⚙️ Part 2: Backend (Node.js/Express.js 예시)
+# ⚙️ Part 2: Backend (Node.js/Fastify 예시)
 
 ## 1. 폴더 구조
 ```
 packages/
 └── backend/
     └── src/
-        ├── app.ts          # Express 앱 진입점
+        ├── app.ts          # Fastify 앱 진입점
         ├── modules/        # 도메인별 모듈 디렉토리
         │   ├── users/      # 예시: 사용자 모듈
         │   │   ├── routes.ts
