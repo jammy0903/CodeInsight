@@ -91,7 +91,8 @@ WORKDIR /app/packages/backend
 # Prisma 클라이언트 생성
 RUN pnpm prisma generate
 
-# 포트 노출
+# 포트 설정 및 노출
+ENV PORT=3002
 EXPOSE 3002
 
 # 헬스체크
