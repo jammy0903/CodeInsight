@@ -6,19 +6,8 @@
     "code": "def repeat(n):\n    def decorator(func):\n        def wrapper(*args, **kwargs):\n            print(f\"{n}번 반복합니다:\")\n            for _ in range(n):\n                func(*args, **kwargs)\n        return wrapper\n    return decorator\n\n@repeat(3)\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"World\")",
     "steps": [
       {
-        "line": 1,
         "title": "repeat 함수 정의",
         "explanation": "`def repeat(n):`\n3단 중첩 구조의 가장 바깥 함수입니다. 데코레이터 인자 n을 받습니다.\n\n**왜 이 순서인가?**\n데코레이터에 인자를 넘기려면, 그 인자를 받아서 진짜 데코레이터를 반환하는 '팩토리' 함수가 필요합니다.\n\n**실행 순서:**\n1. `repeat` 함수(0x1100) 정의.",
-        "highlight": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -39,15 +28,22 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def repeat(n):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
       },
       {
-        "line": 10,
         "title": "@repeat(3) 적용",
         "explanation": "`@repeat(3)`\nrepeat(3)이 먼저 호출됩니다. n=3을 기억하는 decorator 함수가 반환됩니다.\n\n**왜 이 순서인가?**\n`@` 뒤의 코드가 먼저 실행되어야 합니다. `repeat(3)`의 결과가 데코레이터로 쓰입니다.\n\n**실행 순서:**\n1. `repeat(3)` 호출.\n2. `n=3`을 저장하는 클로저(Cell) 생성.\n3. `decorator` 함수(0x2000) 반환.",
-        "highlight": [
-          10
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -80,20 +76,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "@repeat(3)"
       },
       {
-        "line": 2,
         "title": "decorator 함수 정의",
         "explanation": "`def decorator(func):`\nn=3을 기억하는 decorator 함수가 정의됩니다.\n\n**왜 이 순서인가?**\n`repeat` 함수 실행 중에 내부 함수가 정의됩니다.\n\n**실행 순서:**\n1. `decorator` 함수 객체 생성.",
-        "highlight": [
-          2,
-          3,
-          4,
-          5,
-          6,
-          7
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -112,15 +100,20 @@
               "pyId": "1003"
             }
           ]
-        }
+        },
+        "code": "def decorator(func):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       },
       {
-        "line": 8,
         "title": "decorator 반환",
         "explanation": "`return decorator`\ndecorator 함수를 반환합니다. 이것이 실제 데코레이터가 됩니다.\n\n**실행 순서:**\n1. `decorator`(0x2000) 리턴.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -139,16 +132,12 @@
               "pyId": "1002"
             }
           ]
-        }
+        },
+        "code": "return decorator"
       },
       {
-        "line": 11,
         "title": "greet 함수 정의 및 꾸미기",
         "explanation": "`def greet(name):`\ngreet 함수가 정의되고, decorator(greet)가 호출됩니다.\n\n**왜 이 순서인가?**\n`decorator` 함수가 원본 `greet`를 받아 처리합니다.\n\n**실행 순서:**\n1. 원본 `greet` 함수 객체(0x1200) 생성.\n2. `decorator(0x1200)` 호출.\n3. `func` 매개변수에 원본 함수 전달.",
-        "highlight": [
-          11,
-          12
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -169,18 +158,16 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def greet(name):",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 3,
         "title": "wrapper 함수 정의",
         "explanation": "`def wrapper(*args, **kwargs):`\ndecorator 안에서 wrapper 함수가 정의됩니다.\n\n**왜 이 순서인가?**\n`n=3`과 `func=greet` 둘 다 기억하는 최종 래퍼 함수를 만듭니다.\n\n**실행 순서:**\n1. `wrapper` 함수 객체(0x3000) 생성.\n2. `n`과 `func`를 클로저로 참조.",
-        "highlight": [
-          3,
-          4,
-          5,
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -221,15 +208,18 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def wrapper(*args, **kwargs):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
       },
       {
-        "line": 7,
         "title": "wrapper 반환",
         "explanation": "`return wrapper`\nwrapper를 반환합니다. greet은 이제 wrapper를 가리킵니다.\n\n**실행 순서:**\n1. `wrapper` 반환.\n2. `greet` 이름이 `wrapper`를 가리키게 됨.",
-        "highlight": [
-          7
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -250,15 +240,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "return wrapper"
       },
       {
-        "line": 14,
         "title": "greet 호출 (wrapper 호출)",
         "explanation": "`greet(\"World\")`\ngreet을 호출하면 wrapper가 실행됩니다.\n\n**왜 이 순서인가?**\n꾸며진 함수를 사용합니다.\n\n**실행 순서:**\n1. `wrapper(\"World\")` 호출.",
-        "highlight": [
-          14
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -287,15 +274,12 @@
               "pyId": "1004"
             }
           ]
-        }
+        },
+        "code": "greet(\"World\")"
       },
       {
-        "line": 4,
         "title": "wrapper 실행 - 메시지 출력",
         "explanation": "`print(f\"{n}번 반복합니다:\")`\n\"3번 반복합니다:\"를 출력합니다.\n\n**실행 순서:**\n1. `n`(3)을 사용해 메시지 출력.",
-        "highlight": [
-          4
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -316,15 +300,12 @@
               "pyId": "1002"
             }
           ]
-        }
+        },
+        "code": "print(f\"{n}번 반복합니다:\")"
       },
       {
-        "line": 5,
         "title": "for 루프 시작 - 첫 번째",
         "explanation": "`for _ in range(n):`\n3번 반복할 for 루프가 시작됩니다.\n\n**왜 이 순서인가?**\n`n`번 만큼 반복합니다.\n\n**실행 순서:**\n1. Loop 1/3 시작.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -345,15 +326,12 @@
               "pyId": "1002"
             }
           ]
-        }
+        },
+        "code": "for _ in range(n):"
       },
       {
-        "line": 6,
         "title": "원본 함수 호출 (1)",
         "explanation": "`func(*args, **kwargs)`\n원본 greet 함수를 호출합니다.\n\n**실행 순서:**\n1. `func(\"World\")` 호출.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -374,15 +352,12 @@
               "pyId": "1004"
             }
           ]
-        }
+        },
+        "code": "func(*args, **kwargs)"
       },
       {
-        "line": 12,
         "title": "greet 본문 실행 (1)",
         "explanation": "`print(f\"Hello, {name}!\")`\n\"Hello, World!\"를 출력합니다.\n\n**실행 순서:**\n1. 출력 실행.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -392,15 +367,12 @@
           "note": "첫 번째 출력 완료.",
           "names": [],
           "objects": []
-        }
+        },
+        "code": "print(f\"Hello, {name}!\")"
       },
       {
-        "line": 5,
         "title": "for 루프 - 두 번째",
         "explanation": "두 번째 반복입니다.\n\n**실행 순서:**\n1. Loop 2/3 시작.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -410,15 +382,12 @@
           "note": "반복 2회차.",
           "names": [],
           "objects": []
-        }
+        },
+        "code": "for _ in range(n):"
       },
       {
-        "line": 6,
         "title": "원본 함수 호출 (2)",
         "explanation": "`func(*args, **kwargs)`\ngreet 함수를 두 번째로 호출합니다.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -428,15 +397,12 @@
           "note": "원본 함수 재호출.",
           "names": [],
           "objects": []
-        }
+        },
+        "code": "func(*args, **kwargs)"
       },
       {
-        "line": 12,
         "title": "greet 본문 실행 (2)",
         "explanation": "`print(f\"Hello, {name}!\")`\n\"Hello, World!\"를 두 번째로 출력합니다.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -447,15 +413,12 @@
           "note": "두 번째 출력 완료.",
           "names": [],
           "objects": []
-        }
+        },
+        "code": "print(f\"Hello, {name}!\")"
       },
       {
-        "line": 5,
         "title": "for 루프 - 세 번째",
         "explanation": "세 번째 반복입니다.\n\n**실행 순서:**\n1. Loop 3/3 시작.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -464,15 +427,12 @@
           "note": "반복 3회차.",
           "names": [],
           "objects": []
-        }
+        },
+        "code": "for _ in range(n):"
       },
       {
-        "line": 6,
         "title": "원본 함수 호출 (3)",
         "explanation": "`func(*args, **kwargs)`\ngreet 함수를 세 번째로 호출합니다.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -481,15 +441,12 @@
           "note": "원본 함수 재호출.",
           "names": [],
           "objects": []
-        }
+        },
+        "code": "func(*args, **kwargs)"
       },
       {
-        "line": 12,
         "title": "greet 본문 실행 (3)",
         "explanation": "`print(f\"Hello, {name}!\")`\n\"Hello, World!\"를 세 번째로 출력합니다. for 루프가 종료됩니다.\n\n**실행 순서:**\n1. 출력 실행.\n2. `wrapper` 함수 종료.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -501,7 +458,8 @@
           "note": "세 번째 출력 완료. 모든 작업이 끝났습니다.",
           "names": [],
           "objects": []
-        }
+        },
+        "code": "print(f\"Hello, {name}!\")"
       }
     ]
   },

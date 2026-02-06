@@ -6,275 +6,158 @@
     "code": "#include <stdio.h>\n\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    struct Point p1 = {10, 20};\n\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n\n    struct Point p2 = p1;\n    p2.x = 99;\n\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "구조체 '틀' 정의",
         "explanation": "**`struct Point { ... };`**\n\n`int` 타입의 `x`와 `y`를 멤버로 갖는 `Point`라는 이름의 새로운 구조체 '틀(blueprint)'을 정의합니다. 이 자체만으로는 메모리를 차지하지 않고, 이런 모양의 변수를 만들 수 있다는 약속입니다.",
-        "highlight": [
-          3,
-          4,
-          5,
-          6
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "struct Point {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
       },
       {
-        "line": 8,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램 실행이 시작되는 지점입니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 9,
         "title": "구조체 변수 선언 및 초기화",
         "explanation": "**`struct Point p1 = {10, 20};`**\n\n앞서 정의한 `Point`라는 틀을 사용하여 `p1`이라는 변수를 스택에 생성합니다. `int` 두 개를 담을 수 있는 공간(8바이트)이 할당되고, 멤버 `x`에는 10, `y`에는 20이 저장됩니다.",
-        "highlight": [
-          9
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "p1",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "10"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 10, y: 20}"
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "struct Point p1 = {10, 20};"
       },
       {
-        "line": 11,
         "title": "구조체 멤버 접근 및 출력",
         "explanation": "**`printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);`**\n\n점(`.`) 연산자를 사용하여 구조체 변수 `p1`의 멤버 `x`와 `y`에 접근하여 그 값을 화면에 출력합니다.",
-        "highlight": [
-          11
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "p1",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "10"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 10, y: 20}"
           }
         ],
         "stdout": "p1: (10, 20)",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);"
       },
       {
-        "line": 13,
         "title": "구조체 복사 (값 복사)",
         "explanation": "**`struct Point p2 = p1;`**\n\n새로운 구조체 변수 `p2`를 선언하면서 `p1`을 대입합니다. C에서 구조체 대입은 **값의 복사**가 일어납니다. `p1`의 모든 멤버 값이 `p2`로 그대로 복사되어, 완전히 독립적인 새로운 `p2` 변수가 스택에 생성됩니다.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "p1",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "10"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 10, y: 20}"
           },
           {
             "name": "p2",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "10"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ],
+            "value": "{x: 10, y: 20}",
             "highlight": true
           }
         ],
         "stdout": "p1: (10, 20)",
-        "heap": []
+        "heap": [],
+        "code": "struct Point p2 = p1;"
       },
       {
-        "line": 14,
         "title": "복사된 구조체 멤버 수정",
         "explanation": "**`p2.x = 99;`**\n\n복사본인 `p2`의 `x` 멤버 값을 `99`로 변경합니다. 이 작업은 원본인 `p1`에 아무런 영향을 주지 않습니다.",
-        "highlight": [
-          14
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "p1",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "10"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 10, y: 20}"
           },
           {
             "name": "p2",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "99",
-                "highlight": true
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 99, y: 20}"
           }
         ],
         "stdout": "p1: (10, 20)",
-        "heap": []
+        "heap": [],
+        "code": "p2.x = 99;"
       },
       {
-        "line": 16,
         "title": "원본(p1) 값 확인",
         "explanation": "**`printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);`**\n\n`p1`의 값을 출력합니다. `p2`의 값을 변경했지만, `p1`의 값은 (10, 20)으로 그대로 유지되었음을 확인할 수 있습니다.",
-        "highlight": [
-          16
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "p1",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "10"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 10, y: 20}"
           },
           {
             "name": "p2",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "99"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 99, y: 20}"
           }
         ],
         "stdout": "p1: (10, 20)\np1: (10, 20)",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);",
+        "occurrence": 2
       },
       {
-        "line": 17,
         "title": "사본(p2) 값 확인",
         "explanation": "**`printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);`**\n\n`p2`의 값을 출력합니다. 변경된 값 (99, 20)이 올바르게 출력됩니다.",
-        "highlight": [
-          17
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "p1",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "10"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 10, y: 20}"
           },
           {
             "name": "p2",
             "type": "struct Point",
-            "value": [
-              {
-                "key": "x",
-                "value": "99"
-              },
-              {
-                "key": "y",
-                "value": "20"
-              }
-            ]
+            "value": "{x: 99, y: 20}"
           }
         ],
         "stdout": "p1: (10, 20)\np1: (10, 20)\np2: (99, 20)",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);"
       },
       {
-        "line": 19,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
-        "highlight": [
-          19
-        ],
         "visualizationType": "cMemory",
         "stdout": "p1: (10, 20)\np1: (10, 20)\np2: (99, 20)",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "return 0;"
       }
     ]
   },

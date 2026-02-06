@@ -6,12 +6,8 @@
     "code": "String a = \"Hello\";\nString b = new String(\"Hello\");\nString c = \"hello\";\n\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));\nSystem.out.println(a.equalsIgnoreCase(c));\nSystem.out.println(a.compareTo(\"Apple\"));\nSystem.out.println(\"Hello\".equals(a));",
     "steps": [
       {
-        "line": 1,
         "title": "리터럴 변수 a",
         "explanation": "**실행 순서:**\n1. String Pool에 `\"Hello\"` 등록.\n2. `a`가 이를 참조.\n\n`a`는 Pool에 있는 객체를 가리킵니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -29,15 +25,12 @@
           ],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "String a = \"Hello\";"
       },
       {
-        "line": 2,
         "title": "new String 변수 b",
         "explanation": "**실행 순서:**\n1. Heap에 새로운 `\"Hello\"` 객체 생성.\n2. `b`가 이를 참조.\n\n내용은 같지만, `a`와 `b`는 서로 다른 물리적 공간(주소)에 존재합니다.",
-        "highlight": [
-          2
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -60,16 +53,13 @@
             }
           ],
           "output": []
-        }
+        },
+        "code": "String b = new String(\"Hello\");"
       },
       {
-        "line": 5,
         "title": "== 비교 (위험!)",
         "explanation": "**실행 순서:**\n1. `a`의 주소(Pool[0])와 `b`의 주소(Heap[0]) 비교.\n2. 다름 -> `false`.\n\n`==` 연산자는 '내용'을 보는 게 아니라, '메모리 주소'가 같은지만 봅니다. \"쌍둥이인데 왜 다른 사람 취급하냐\"고 따져도 소용없습니다. 주민등록번호(주소)가 다르니까요.",
         "keyInsight": "== 는 주소값 비교 (절대 금지)",
-        "highlight": [
-          5
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "output": [
@@ -78,16 +68,13 @@
           "warning": "문자열 비교에 == 를 쓰면 버그 발생!",
           "stack": [],
           "heap": []
-        }
+        },
+        "code": "System.out.println(a == b);"
       },
       {
-        "line": 6,
         "title": "equals() 비교 (표준)",
         "explanation": "**실행 순서:**\n1. `a`가 가리키는 문자열 내용 확인.\n2. `b`가 가리키는 문자열 내용 확인.\n3. 한 글자씩 비교 -> 일치 -> `true`.\n\n`equals()`는 주소가 아니라 **실제 내용물**을 비교합니다. 우리가 일반적으로 원하는 '비교'입니다.",
         "keyInsight": "equals() = 내용물 비교",
-        "highlight": [
-          6
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "output": [
@@ -97,15 +84,12 @@
           "note": "내용물 비교 성공",
           "stack": [],
           "heap": []
-        }
+        },
+        "code": "System.out.println(a.equals(b));"
       },
       {
-        "line": 7,
         "title": "equalsIgnoreCase()",
         "explanation": "**실행 순서:**\n1. `a`(\"Hello\")와 `c`(\"hello\") 비교.\n2. 대소문자 무시 옵션 켜짐.\n3. H == h, E == e... -> `true`.\n\n사용자 ID나 이메일 주소 비교할 때 매우 유용합니다.",
-        "highlight": [
-          7
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "output": [
@@ -115,15 +99,12 @@
           ],
           "stack": [],
           "heap": []
-        }
+        },
+        "code": "System.out.println(a.equalsIgnoreCase(c));"
       },
       {
-        "line": 8,
         "title": "compareTo() - 사전순 정렬",
         "explanation": "**실행 순서:**\n1. \"Hello\"와 \"Apple\"을 앞에서부터 비교.\n2. 'H'(72) - 'A'(65) = 7.\n3. 양수이므로 \"Hello\"가 더 뒤에 옴.\n\n정렬(Sorting) 알고리즘에서 주로 사용됩니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "output": [
@@ -134,16 +115,13 @@
           ],
           "stack": [],
           "heap": []
-        }
+        },
+        "code": "System.out.println(a.compareTo(\"Apple\"));"
       },
       {
-        "line": 9,
         "title": "null-safe 비교 (요다 조건식)",
         "explanation": "**비교 팁:**\n`변수.equals(\"상수\")` 대신 `\"상수\".equals(변수)`를 쓰세요.\n\n만약 `a`가 `null`이라면?\n- `a.equals(...)` -> **NullPointerException** (폭발)\n- `\"Hello\".equals(a)` -> `false` (안전)",
         "keyInsight": "\"리터럴\".equals(변수) = 안전",
-        "highlight": [
-          9
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "output": [
@@ -156,7 +134,8 @@
           "note": "변수가 null이어도 에러 안 남",
           "stack": [],
           "heap": []
-        }
+        },
+        "code": "System.out.println(\"Hello\".equals(a));"
       }
     ]
   },

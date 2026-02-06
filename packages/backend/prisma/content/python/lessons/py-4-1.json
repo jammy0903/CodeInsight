@@ -6,13 +6,8 @@
     "code": "# 1. 함수 정의\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\n# 2. 함수 호출\ngreet(\"Alice\")\ngreet(\"Bob\")\n\n# 3. Docstring (문서화)\ndef square(n):\n    \"\"\"숫자를 받아서 제곱을 반환합니다\"\"\"\n    return n * n\n\nprint(square(5))",
     "steps": [
       {
-        "line": 2,
         "title": "함수 정의 (greet)",
         "explanation": "**`def greet(name):`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `def` 키워드로 `greet` 함수를 **정의**합니다.\n\n**왜 함수 내부 코드가 실행 안 되는가?** `def`는 **'이런 기능이 있다'고 등록만** 하는 것입니다. 실제로 실행하려면 `greet()`처럼 **괄호를 써서 호출**해야 합니다.\n\n**함수 정의 vs 호출**:\n- **정의(Definition)**: `def greet(name):` → 등록만 (실행 X)\n- **호출(Call)**: `greet(\"Alice\")` → 실제 실행\n\n**매개변수(Parameter)**: `name`은 함수가 호출될 때 받을 값의 자리 표시자입니다.\n\n**왜 이 순서인가?** 함수를 먼저 정의해야 아래에서 호출할 수 있습니다.\n\n**실행 순서**: def 실행 → greet 함수 등록 → line 6",
-        "highlight": [
-          2,
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -31,15 +26,16 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "def greet(name):",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 6,
         "title": "첫 번째 함수 호출",
         "explanation": "**`greet(\"Alice\")`**\n\n**함수 호출**: 정의된 `greet` 함수를 `\"Alice\"`라는 **인자(Argument)**와 함께 호출합니다.\n\n**실행 흐름 점프**: 호출 순간, 프로그램의 실행 흐름이 **함수 내부(line 3)**로 이동합니다. 인자 `\"Alice\"`는 매개변수 `name`에 할당됩니다.\n\n**왜 이 순서인가?** 함수 정의 후, 순서대로 다음 줄을 실행하다가 함수 호출을 만나면 함수 내부로 점프합니다.\n\n**실행 순서**: line 6 → greet 호출 → line 3으로 점프 → name = \"Alice\"",
-        "highlight": [
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -58,15 +54,12 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "greet(\"Alice\")"
       },
       {
-        "line": 3,
         "title": "greet 함수 실행 (Alice)",
         "explanation": "**`print(f\"Hello, {name}!\")`**\n\n함수 내부의 코드가 실행됩니다. 매개변수 `name`에 인자 `\"Alice\"`가 바인딩되어, f-string이 \"Hello, Alice!\"로 평가되고 출력됩니다.\n\n**함수 스코프**: `name`은 함수 내부에서만 존재하는 **지역 변수**입니다. 함수가 끝나면 사라집니다.\n\n**왜 이 순서인가?** 함수 호출(line 6)에서 점프해왔습니다.\n\n**실행 순서**: name = \"Alice\" → f-string 평가 → print 실행 → 함수 종료 → line 7로 돌아감",
-        "highlight": [
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -99,15 +92,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "print(f\"Hello, {name}!\")"
       },
       {
-        "line": 7,
         "title": "두 번째 함수 호출",
         "explanation": "**`greet(\"Bob\")`**\n\n같은 함수를 `\"Bob\"`이라는 **다른 인자**와 함께 다시 호출합니다.\n\n**왜 이전 name은 없는가?** 이전 호출에서 사용한 `name = \"Alice\"`는 함수가 끝나면서 **사라졌습니다** (지역 변수). 새 호출은 완전히 새로운 실행입니다.\n\n**실행 순서**: line 7 → greet 호출 → line 3으로 점프 → name = \"Bob\"",
-        "highlight": [
-          7
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -128,15 +118,12 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "greet(\"Bob\")"
       },
       {
-        "line": 3,
         "title": "greet 함수 실행 (Bob)",
         "explanation": "**`print(f\"Hello, {name}!\")`**\n\n이번에는 매개변수 `name`에 인자 `\"Bob\"`이 바인딩되어, \"Hello, Bob!\"이 출력됩니다.\n\n**실행 순서**: name = \"Bob\" → f-string 평가 → print 실행 → 함수 종료 → line 10으로 (다음 코드)",
-        "highlight": [
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -169,17 +156,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "print(f\"Hello, {name}!\")"
       },
       {
-        "line": 10,
         "title": "함수 정의 (square)",
         "explanation": "**`def square(n):`**\n\n숫자를 받아 그 제곱을 반환하는 `square` 함수를 정의합니다.\n\n**Docstring**: `\"\"\"...\"\"\"` 부분은 함수의 **설명 문서**입니다. 코드에는 영향 없지만, `help(square)`를 실행하면 이 설명이 나타납니다. 함수가 무엇을 하는지 설명하는 좋은 습관입니다.\n\n**왜 이 순서인가?** 이전 함수 호출들이 끝나고, 순서대로 다음 코드를 실행합니다.\n\n**실행 순서**: def 실행 → square 함수 등록 → line 14",
-        "highlight": [
-          10,
-          11,
-          12
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -211,15 +193,17 @@
               "pyId": "1004"
             }
           ]
-        }
+        },
+        "code": "def square(n):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 14,
         "title": "square 함수 호출",
         "explanation": "**`print(square(5))`**\n\n`square(5)`를 호출합니다. 실행 흐름이 **함수 내부(line 12)**로 이동합니다.\n\n**중첩된 호출**: `print(square(5))`는 다음 순서로 실행됩니다:\n1. `square(5)` 호출 → line 12로 점프\n2. `square`가 25 반환\n3. `print(25)` 실행\n\n**실행 순서**: line 14 → square(5) 호출 → line 12로 점프 → n = 5",
-        "highlight": [
-          14
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -251,15 +235,12 @@
               "pyId": "1004"
             }
           ]
-        }
+        },
+        "code": "print(square(5))"
       },
       {
-        "line": 12,
         "title": "square 함수 실행",
         "explanation": "**`return n * n`**\n\n매개변수 `n`에 인자 `5`가 바인딩되어, `5 * 5 = 25`를 계산하고 **반환(return)**합니다.\n\n**return의 역할**:\n1. **값 반환**: 계산된 값(25)을 **호출한 곳(line 14)**으로 돌려줍니다\n2. **함수 종료**: return을 만나면 함수가 **즉시 종료**됩니다\n\n반환된 `25`가 `print`로 전달되어 출력됩니다.\n\n**return 없으면?** `None`이 반환됩니다 (Python 함수의 기본 동작).\n\n**실행 순서**: n = 5 → 5 * 5 계산 → 25 반환 → line 14로 돌아감 → print(25) → 프로그램 종료",
-        "highlight": [
-          12
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -304,7 +285,8 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "return n * n"
       }
     ]
   },

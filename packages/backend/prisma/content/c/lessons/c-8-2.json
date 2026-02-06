@@ -6,52 +6,45 @@
     "code": "#include <stdio.h>\n\nvoid greet() {\n    printf(\"Hello!\\n\");\n}\n\nvoid execute(void (*func)()) {\n    printf(\"Executing callback...\\n\");\n    func();\n}\n\nint main() {\n    execute(greet);\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "콜백될 함수 정의",
         "explanation": "**`void greet() { ... }`**\n\n'Hello!'를 출력하는 간단한 `greet` 함수입니다. 이 함수가 나중에 다른 함수의 인자로 전달되어 '콜백(callback)'될 대상입니다.",
-        "highlight": [
-          3,
-          4,
-          5
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "void greet() {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 7,
         "title": "콜백을 받는 함수 정의",
         "explanation": "**`void execute(void (*func)()) { ... }`**\n\n`execute` 함수는 '인자가 없고 반환값도 없는 함수를 가리키는 포인터'(`void (*func)()`)를 매개변수로 받습니다. 즉, '실행할 함수' 자체를 인자로 받는 것입니다.",
-        "highlight": [
-          7,
-          8,
-          9
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "void execute(void (*func)()) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 12,
         "title": "main에서 execute 호출 - 함수를 인자로 전달",
         "explanation": "**`execute(greet);`**\n\nC 프로그램은 `main`에서 시작합니다. `execute` 함수를 호출하면서, 인자로 `greet` **함수 자체**(정확히는 함수의 주소 0xCODE1)를 전달합니다.\n\n**왜 이 순서인가?** 함수 이름은 함수 포인터로 자동 변환됩니다. `execute`는 이제 `greet`을 받아 실행할 수 있습니다.\n\n**비유**: 친구에게 \"나중에 밥 먹을 때(execute) 나도 불러줘(greet 연락처 전달)\"라고 부탁하는 상황입니다.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -62,15 +55,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 8,
         "title": "콜백 실행 준비",
         "explanation": "**`printf(\"Executing callback...\\n\");`**\n\n`execute` 함수 내부의 코드가 실행됩니다. 콜백을 실행하기 직전의 메시지를 출력합니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -81,15 +71,12 @@
           }
         ],
         "stdout": "Executing callback...",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"Executing callback...\\n\");"
       },
       {
-        "line": 9,
         "title": "콜백 함수 호출!",
         "explanation": "**`func();`**\n\n`func` 포인터에 저장된 주소(`greet` 함수의 주소)로 점프하여 함수를 실행합니다. 이 순간 `greet` 함수 내부의 코드가 실행됩니다.",
-        "highlight": [
-          9
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -100,19 +87,17 @@
           }
         ],
         "stdout": "Executing callback...\nHello!",
-        "heap": []
+        "heap": [],
+        "code": "func();"
       },
       {
-        "line": 13,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업이 성공적으로 완료되었음을 알리고 프로그램을 종료합니다.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "cMemory",
         "stdout": "Executing callback...\nHello!",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "execute(greet);"
       }
     ]
   },

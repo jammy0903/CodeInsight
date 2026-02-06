@@ -1,0 +1,240 @@
+{
+  "lessonId": "java-1-7",
+  "title": "메서드와 매개변수",
+  "concept": "Java는 값에 의한 전달(pass by value)입니다. 기본 타입은 복사, 참조 타입은 참조 복사됩니다.",
+  "content": {
+    "code": "int a = 10;\nint b = 20;\nSystem.out.println(\"swap 전: a=\" + a + \", b=\" + b);\n\nint temp = a;\na = b;\nb = temp;\nSystem.out.println(\"swap 후: a=\" + a + \", b=\" + b);\n",
+    "steps": [
+      {
+        "title": "변수 선언",
+        "explanation": "**`int a = 10;`** / **`int b = 20;`**\n\n교환할 두 변수를 선언합니다.\n\n**Java의 메모리**:\n- 기본 타입은 **스택**에 직접 값을 저장\n- `a = 10`, `b = 20`이 스택에 저장됨\n",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "10",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 1 executed"
+        },
+        "code": "int a = 10;"
+      },
+      {
+        "title": "교환 전 출력",
+        "explanation": "**`System.out.println(\"swap 전: a=\" + a + \", b=\" + b);`**\n\n**출력 결과**: `swap 전: a=10, b=20`\n",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "20",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 3 executed"
+        },
+        "code": "System.out.println(\"swap 전: a=\" + a + \", b=\" + b);"
+      },
+      {
+        "title": "임시 변수에 저장",
+        "explanation": "**`int temp = a;`**\n\na의 값(10)을 임시 변수 temp에 저장합니다.\n\n**왜 temp가 필요한가?**\n`a = b`를 먼저 실행하면 a의 원래 값(10)이 사라집니다!\n",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:temp",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "20",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 5 executed"
+        },
+        "code": "int temp = a;"
+      },
+      {
+        "title": "a에 b 대입",
+        "explanation": "**`a = b;`**\n\na = 20 (b의 값)\n\n**현재 상태**: a=20, b=20, temp=10\n",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "20",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:temp",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "20",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 6 executed"
+        },
+        "code": "a = b;"
+      },
+      {
+        "title": "b에 temp 대입",
+        "explanation": "**`b = temp;`**\n\nb = 10 (temp에 저장해둔 원래 a의 값)\n\n**교환 완료!** a=20, b=10\n",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "20",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:temp",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "10",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 7 executed"
+        },
+        "code": "b = temp;"
+      },
+      {
+        "title": "교환 후 출력",
+        "explanation": "**`System.out.println(\"swap 후: a=\" + a + \", b=\" + b);`**\n\n**출력 결과**: `swap 후: a=20, b=10`\n\n**참고**: C에서는 포인터로 swap 함수를 만들 수 있지만,\nJava는 기본 타입을 참조로 전달할 수 없어서 메서드로 swap이 어렵습니다.\n",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "20",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:temp",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "10",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 8 executed"
+        },
+        "code": "System.out.println(\"swap 후: a=\" + a + \", b=\" + b);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Java에서 기본 타입(int)을 메서드에 전달하면?",
+    "options": [
+      "참조가 전달된다",
+      "값이 복사되어 전달된다",
+      "주소가 전달된다",
+      "전달할 수 없다"
+    ],
+    "correctIndex": 1,
+    "explanation": "Java는 **항상 값에 의한 전달(pass by value)**입니다.\n\n- **기본 타입**: 값 자체가 복사됨 (메서드에서 변경해도 원본 불변)\n- **참조 타입**: 참조(주소)가 복사됨 (같은 객체를 가리킴)\n"
+  }
+}

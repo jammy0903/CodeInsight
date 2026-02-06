@@ -6,12 +6,8 @@
     "code": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n        print(f\"{name} 객체 초기화!\")\n\nalice = Person(\"Alice\", 25)\nprint(f\"이름: {alice.name}\")\nprint(f\"나이: {alice.age}\")",
     "steps": [
       {
-        "line": 1,
         "title": "클래스 정의 (Person)",
         "explanation": "**`class Person:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Person` 클래스를 정의합니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Person 실행 → Person 클래스 등록 시작 → line 2",
-        "highlight": [
-          1
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -30,18 +26,12 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "class Person:"
       },
       {
-        "line": 2,
         "title": "__init__ 초기화자 정의",
         "explanation": "**`def __init__(self, name, age):`**\n\n**초기화자(Initializer)**: `__init__`는 **생성자(Constructor)가 아니라 초기화자**입니다!\n\n**생성자 vs 초기화자**:\n- **생성자** (`__new__`): 객체를 **생성**하는 메서드 (Python이 자동 호출)\n- **초기화자** (`__init__`): 이미 생성된 객체를 **초기화**하는 메서드\n\n**실행 순서**:\n1. `Person(\"Alice\", 25)` 호출\n2. Python이 `__new__`로 **빈 객체** 생성\n3. Python이 `__init__`로 객체 **초기화**\n4. 초기화된 객체 반환\n\n**self의 의미**: \"나 자신\"을 가리키는 참조. `__init__` 호출 시, Python이 **자동으로** 생성된 객체를 `self`에 전달합니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def __init__ 실행 → __init__ 메서드 등록 → Person 클래스 정의 완료 → line 7",
-        "highlight": [
-          2,
-          3,
-          4,
-          5
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -60,15 +50,18 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "def __init__(self, name, age):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
       },
       {
-        "line": 7,
         "title": "객체 생성 및 __init__ 자동 호출",
         "explanation": "**`alice = Person(\"Alice\", 25)`**\n\n**객체 생성과 초기화**:\n\n**Python 내부 동작**:\n```python\n# 1. __new__로 빈 객체 생성\nalice = object.__new__(Person)  # 메모리 0x2000\n\n# 2. __init__으로 객체 초기화 (자동 호출!)\nalice.__init__(\"Alice\", 25)\n\n# 3. 초기화된 객체 반환\n```\n\n**매개변수 전달**:\n- `self` = `alice` (0x2000 객체, **자동 전달**)\n- `name` = `\"Alice\"`\n- `age` = `25`\n\n**왜 이 순서인가?** 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Person(\"Alice\", 25) 호출 → 빈 객체 0x2000 생성 → __init__ 자동 호출 → line 3으로 점프",
-        "highlight": [
-          7
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -99,15 +92,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "alice = Person(\"Alice\", 25)"
       },
       {
-        "line": 3,
         "title": "인스턴스 변수 생성 (name)",
         "explanation": "**`self.name = name`**\n\n**인스턴스 변수 생성**: `self` (alice 객체, 0x2000)에 `name` 속성을 추가하고 `\"Alice\"`를 할당합니다.\n\n**self.name의 의미**:\n- `self` → alice 객체 (0x2000)\n- `.name` → 이 객체의 name 속성 (아직 없음, 지금 만듦!)\n- `= name` → 매개변수 name(\"Alice\")을 할당\n\n**중요한 규칙**: `self.`를 붙여야만 **인스턴스 변수**가 됩니다!\n\n**잘못된 예**:\n```python\nname = name  # ❌ 로컬 변수! 함수 끝나면 사라짐\nself.name = name  # ✅ 인스턴스 변수! 객체에 영구 저장\n```\n\n**왜 이 순서인가?** 객체 생성(line 7)에서 __init__이 자동 호출되어 점프해왔습니다.\n\n**실행 순서**: self.name = name → alice 객체에 name=\"Alice\" 추가 → line 4",
-        "highlight": [
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -170,15 +160,12 @@
               "pyId": "1005"
             }
           ]
-        }
+        },
+        "code": "self.name = name"
       },
       {
-        "line": 4,
         "title": "인스턴스 변수 생성 (age)",
         "explanation": "**`self.age = age`**\n\n**인스턴스 변수 생성**: `self` (alice 객체, 0x2000)에 `age` 속성을 추가하고 `25`를 할당합니다.\n\n**실행 순서**: self.age = age → alice 객체에 age=25 추가 → line 5",
-        "highlight": [
-          4
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -241,15 +228,12 @@
               "pyId": "1005"
             }
           ]
-        }
+        },
+        "code": "self.age = age"
       },
       {
-        "line": 5,
         "title": "초기화 중 출력",
         "explanation": "**`print(f\"{name} 객체 초기화!\")`**\n\n__init__ 메서드 내부에서 추가 작업을 할 수 있습니다. 여기서는 초기화 메시지를 출력합니다.\n\n**왜 name이 사용 가능한가?** `name`은 매개변수이므로 `__init__` 내부 어디서든 사용 가능합니다.\n\n**실행 순서**: name=\"Alice\" 읽기 → f-string 평가 → print 실행 → __init__ 종료 → line 7로 돌아감 → line 8",
-        "highlight": [
-          5
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -310,15 +294,12 @@
               "pyId": "1005"
             }
           ]
-        }
+        },
+        "code": "print(f\"{name} 객체 초기화!\")"
       },
       {
-        "line": 8,
         "title": "인스턴스 변수 접근 (name)",
         "explanation": "**`print(f\"이름: {alice.name}\")`**\n\n초기화가 완료된 `alice` 객체의 `name` 속성에 접근합니다.\n\n**왜 접근 가능한가?** line 3에서 `self.name = name`으로 인스턴스 변수를 만들었기 때문입니다!\n\n**만약 `self.`를 빠뜨렸다면?**\n```python\ndef __init__(self, name, age):\n    name = name  # ❌ 로컬 변수\n    age = age    # ❌ 로컬 변수\n\nalice = Person(\"Alice\", 25)\nprint(alice.name)  # AttributeError!\n```\n\n**왜 이 순서인가?** 객체 생성 및 초기화 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: alice.name 읽기 (\"Alice\") → f-string 평가 → print 실행 → line 9",
-        "highlight": [
-          8
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -350,15 +331,12 @@
               "pyId": "1002"
             }
           ]
-        }
+        },
+        "code": "print(f\"이름: {alice.name}\")"
       },
       {
-        "line": 9,
         "title": "인스턴스 변수 접근 (age)",
         "explanation": "**`print(f\"나이: {alice.age}\")`**\n\n`alice` 객체의 `age` 속성에 접근하여 출력합니다.\n\n**__init__의 핵심**:\n1. 객체 생성 시 **자동 호출**\n2. **self.변수명**으로 인스턴스 변수 생성\n3. 생성 후 다른 곳에서 **obj.변수명**으로 접근 가능\n\n**정리**:\n- `self.name = name` (__init__ 내부): 인스턴스 변수 **생성**\n- `alice.name` (외부): 인스턴스 변수 **접근**\n\n**실행 순서**: alice.age 읽기 (25) → f-string 평가 → print 실행 → 프로그램 종료",
-        "highlight": [
-          9
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -391,7 +369,8 @@
               "pyId": "1002"
             }
           ]
-        }
+        },
+        "code": "print(f\"나이: {alice.age}\")"
       }
     ]
   },

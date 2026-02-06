@@ -6,74 +6,116 @@
     "code": "console.log('start');\n\nsetTimeout(() => {\n  console.log('timeout');\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log('promise');\n});\n\nconsole.log('end');",
     "steps": [
       {
-        "line": 1,
         "title": "console.log('start')",
         "explanation": "가장 먼저 동기 코드인 `console.log('start')`가 콜 스택에 추가되고 실행됩니다.",
-        "highlight": [1],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["console.log('start')"],
-          "output": ["start"]
-        }
+          "callStack": [
+            "console.log('start')"
+          ],
+          "output": [
+            "start"
+          ]
+        },
+        "code": "console.log('start');"
       },
       {
-        "line": 3,
         "title": "setTimeout 등록",
         "explanation": "`setTimeout`의 콜백 함수는 Web API로 위임된 후, 타이머(0ms)가 완료되면 **Task Queue**로 이동하여 대기합니다.",
-        "highlight": [3, 4, 5],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "webApis": [{"name": "setTimeout callback"}],
-          "output": ["start"]
-        }
+          "webApis": [
+            {
+              "name": "setTimeout callback"
+            }
+          ],
+          "output": [
+            "start"
+          ]
+        },
+        "code": "setTimeout(() => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 7,
         "title": "Promise.then 등록",
         "explanation": "`.then()`의 콜백 함수는 **Microtask Queue**로 이동하여 대기합니다. Task Queue와는 다른, 더 높은 우선순위의 큐입니다.",
-        "highlight": [7, 8, 9],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "microtaskQueue": ["promise then"],
-          "output": ["start"]
-        }
+          "microtaskQueue": [
+            "promise then"
+          ],
+          "output": [
+            "start"
+          ]
+        },
+        "code": "Promise.resolve().then(() => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 11,
         "title": "console.log('end')",
         "explanation": "마지막 동기 코드인 `console.log('end')`가 실행됩니다. 이제 콜 스택이 비워질 차례입니다.",
-        "highlight": [11],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["console.log('end')"],
-          "taskQueue": ["setTimeout callback"],
-          "microtaskQueue": ["promise then"],
-          "output": ["start", "end"]
-        }
+          "callStack": [
+            "console.log('end')"
+          ],
+          "taskQueue": [
+            "setTimeout callback"
+          ],
+          "microtaskQueue": [
+            "promise then"
+          ],
+          "output": [
+            "start",
+            "end"
+          ]
+        },
+        "code": "console.log('end');"
       },
       {
-        "line": 8,
         "title": "Microtask 처리 (Promise)",
         "explanation": "콜 스택이 비워지면, 이벤트 루프는 Task Queue보다 먼저 Microtask Queue를 확인합니다. 여기에 있던 Promise 콜백이 콜 스택으로 이동하여 실행됩니다.",
         "keyInsight": "Microtask Queue는 항상 Task Queue보다 우선순위가 높습니다.",
-        "highlight": [8],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["() => { ... }", "console.log('promise')"],
+          "callStack": [
+            "() => { ... }",
+            "console.log('promise')"
+          ],
           "microtaskQueue": [],
-          "output": ["start", "end", "promise"]
-        }
+          "output": [
+            "start",
+            "end",
+            "promise"
+          ]
+        },
+        "code": "console.log('promise');"
       },
       {
-        "line": 4,
         "title": "Task 처리 (setTimeout)",
         "explanation": "Microtask Queue가 완전히 비워진 후에야 이벤트 루프는 Task Queue를 확인합니다. 여기에 있던 `setTimeout` 콜백이 콜 스택으로 이동하여 마지막으로 실행됩니다.",
-        "highlight": [4],
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "callStack": ["() => { ... }", "console.log('timeout')"],
-          "output": ["start", "end", "promise", "timeout"]
-        }
+          "callStack": [
+            "() => { ... }",
+            "console.log('timeout')"
+          ],
+          "output": [
+            "start",
+            "end",
+            "promise",
+            "timeout"
+          ]
+        },
+        "code": "console.log('timeout');"
       }
     ]
   },

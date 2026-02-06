@@ -6,12 +6,8 @@
     "code": "# 1. 딕셔너리 생성\nuser = {\n    \"name\": \"Alice\",\n    \"age\": 25\n}\n\n# 2. 접근 및 수정\nprint(user[\"name\"])\nuser[\"age\"] = 26      # 수정\nuser[\"city\"] = \"Seoul\" # 추가\n\n# 3. 키 확인\nif \"job\" in user:\n    print(user[\"job\"])",
     "steps": [
       {
-        "line": 3,
         "title": "딕셔너리 첫 번째 항목",
         "explanation": "**`\"name\": \"Alice\"`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 딕셔너리 리터럴 `{}`를 만들 때, 각 키-값 쌍을 **순서대로 평가**합니다.\n\n첫 번째 키-값 쌍 `\"name\": \"Alice\"`를 평가하여 딕셔너리에 추가합니다.\n\n**왜 이 순서인가?** 딕셔너리 리터럴은 위에서 아래로 각 항목을 순서대로 처리합니다.\n\n**실행 순서**: line 2 시작 → line 3 평가 → \"name\": \"Alice\" 추가 → line 4",
-        "highlight": [
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -30,15 +26,12 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "\"name\": \"Alice\","
       },
       {
-        "line": 4,
         "title": "딕셔너리 두 번째 항목",
         "explanation": "**`\"age\": 25`**\n\n두 번째 키-값 쌍 `\"age\": 25`를 평가하여 딕셔너리에 추가합니다.\n\n**실행 순서**: line 4 평가 → \"age\": 25 추가 → line 5 (닫는 괄호)",
-        "highlight": [
-          4
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -57,18 +50,12 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "\"age\": 25"
       },
       {
-        "line": 2,
         "title": "딕셔너리 생성 완료",
         "explanation": "**`user = {...}`**\n\n모든 키-값 쌍이 평가된 후, 딕셔너리 객체가 완성되어 `user` 변수에 할당됩니다.\n\n**딕셔너리의 특징**:\n- **Key-Value 쌍**: 이름(Key)으로 값(Value)을 찾음\n- **Mutable**: 내용 수정 가능 (리스트처럼)\n- **해시 테이블**: O(1) 평균 조회 시간 (매우 빠름)\n- **순서 보장**: Python 3.7+부터 삽입 순서 유지\n- **키는 Immutable**: 문자열, 숫자, 튜플만 가능 (리스트 불가)\n\n**왜 이 순서인가?** 모든 항목 평가 후, 딕셔너리 객체 생성이 완료됩니다.\n\n**실행 순서**: line 5 닫기 → 딕셔너리 완성 → user = 0x1000 → line 8",
-        "highlight": [
-          2,
-          3,
-          4,
-          5
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -86,15 +73,18 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "user = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
       },
       {
-        "line": 8,
         "title": "값 접근",
         "explanation": "**`print(user[\"name\"])`**\n\n**딕셔너리 조회**: 대괄호 `[]` 안에 **키**를 넣어 값에 접근합니다. `user` 딕셔너리에서 `\"name\"` 키에 해당하는 값 `\"Alice\"`를 찾아 출력합니다.\n\n**리스트와의 차이**:\n- 리스트: 인덱스(숫자)로 접근 → `fruits[0]`\n- 딕셔너리: 키(문자열 등)로 접근 → `user[\"name\"]`\n\n**없는 키를 조회하면?** `KeyError` 발생. 안전하게 조회하려면 `user.get(\"name\")`을 사용하세요.\n\n**왜 이 순서인가?** 딕셔너리 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: user[\"name\"] 조회 → \"Alice\" 반환 → print 실행 → line 9",
-        "highlight": [
-          8
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -114,15 +104,12 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "print(user[\"name\"])"
       },
       {
-        "line": 9,
         "title": "값 수정",
         "explanation": "**`user[\"age\"] = 26`**\n\n**기존 키에 할당 = 수정**: 이미 존재하는 키(`\"age\"`)에 새로운 값을 할당하면, 기존 값(25)이 새 값(26)으로 **덮어써집니다**.\n\n**Mutable의 의미**: 딕셔너리는 **새 객체를 만들지 않고**, 기존 객체(0x1000)의 **내용을 직접 수정**합니다. `user`는 여전히 같은 객체(0x1000)를 가리킵니다.\n\n**실행 순서**: user[\"age\"] 접근 → 25 → 26으로 교체 → line 10",
-        "highlight": [
-          9
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -145,15 +132,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "user[\"age\"] = 26      # 수정"
       },
       {
-        "line": 10,
         "title": "새 항목 추가",
         "explanation": "**`user[\"city\"] = \"Seoul\"`**\n\n**새 키에 할당 = 추가**: 존재하지 않는 키(`\"city\"`)에 값을 할당하면, **새로운 키-값 쌍이 딕셔너리에 추가**됩니다.\n\n**수정 vs 추가**:\n- 기존 키(`\"age\"`) → 값 수정\n- 새 키(`\"city\"`) → 키-값 추가\n\n딕셔너리는 같은 문법(`dict[key] = value`)으로 수정과 추가를 모두 처리합니다.\n\n**왜 이 순서인가?** 이전 수정 작업 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: user[\"city\"] 확인 (없음) → 새 키-값 추가 → line 13",
-        "highlight": [
-          10
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -176,15 +160,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "user[\"city\"] = \"Seoul\" # 추가"
       },
       {
-        "line": 13,
         "title": "키 존재 여부 확인",
         "explanation": "**`if \"job\" in user:`**\n\n**`in` 키워드**: 딕셔너리에 특정 **키**가 있는지 확인합니다 (값이 아님!). `user` 딕셔너리에는 `\"job\"` 키가 없으므로, `\"job\" in user`는 **False**입니다.\n\n**왜 in을 사용하는가?** `user[\"job\"]`을 바로 조회하면 `KeyError`가 발생하지만, `in`으로 먼저 확인하면 안전합니다:\n```python\nif \"job\" in user:\n    print(user[\"job\"])  # 안전\nelse:\n    print(\"No job\")  # 키 없을 때\n```\n\n**또 다른 방법**: `user.get(\"job\")` → 키 없으면 `None` 반환 (에러 없음)\n\n**실행 순서**: \"job\" in user → False → if 블록 건너뜀 → 프로그램 종료",
-        "highlight": [
-          13
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -205,7 +186,8 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "if \"job\" in user:"
       }
     ]
   },

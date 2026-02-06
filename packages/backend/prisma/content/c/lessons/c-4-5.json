@@ -6,37 +6,26 @@
     "code": "#include <stdio.h>\n\nint* dangerousFunc() {\n    int x = 100;\n    return &x;\n}\n\nint main() {\n    int *p = dangerousFunc();\n\n    printf(\"%d\\n\", *p);\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n표준 입출력 라이브러리입니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 8,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다. 이 예제는 **절대 해서는 안 되는 위험한 패턴**을 보여줍니다: 지역 변수의 주소를 함수 밖으로 반환하는 것입니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 9,
         "title": "dangerousFunc 호출",
         "explanation": "**`int *p = dangerousFunc();`**\n\n`dangerousFunc` 함수를 호출합니다. 이 함수는 내부에서 지역 변수 `x`를 생성하고 그 주소를 반환할 것입니다.",
-        "highlight": [
-          9,
-          3
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -54,15 +43,16 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int *p = dangerousFunc();",
+        "highlightOffset": [
+          0,
+          -6
+        ]
       },
       {
-        "line": 5,
         "title": "위험한 반환 - 지역 변수의 주소",
         "explanation": "**`return &x;`**\n\n`x`는 `dangerousFunc`의 지역 변수입니다. 이 함수가 return하는 순간, **스택 프레임이 파괴**되면서 `x`도 사라집니다.\n\n하지만 그 주소(0x2000)는 반환됩니다. 즉, **철거될 집의 열쇠를 주는 꼴**입니다. 컴파일러는 경고를 주지만 막지는 않습니다.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -74,15 +64,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "return &x;"
       },
       {
-        "line": 11,
         "title": "Dangling Pointer 역참조 - Undefined Behavior",
         "explanation": "**`printf(\"%d\\n\", *p);`**\n\n`p`가 가리키는 주소(0x2000)는 이미 해제된 스택 영역입니다. 이 메모리를 읽는 것은 **Undefined Behavior(정의되지 않은 동작)**입니다.\n\n- **운이 좋으면**: 메모리가 아직 덮어써지지 않아 100이 나옴\n- **운이 나쁘면**: 쓰레기 값이나 Segmentation Fault\n\n이것이 **Dangling Pointer (댕글링 포인터)**의 위험성입니다.",
-        "highlight": [
-          11
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -93,7 +80,8 @@
           }
         ],
         "stdout": "??? (100일수도, 쓰레기값일수도, Crash일수도)",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"%d\\n\", *p);"
       }
     ]
   },

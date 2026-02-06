@@ -6,48 +6,35 @@
     "code": "#include <stdio.h>\n\nvoid printArr(int arr[], int len) {\n    for (int i = 0; i < len; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    int data[3] = {10, 20, 30};\n\n    printArr(data, 3);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 사용을 위한 표준 라이브러리입니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "printArr 함수 정의",
         "explanation": "**`void printArr(int arr[], int len)`**\n\n배열을 출력하는 함수를 정의합니다. 매개변수 `int arr[]`는 사실 `int *arr`와 동일합니다. 배열은 함수로 전달될 때 '포인터로 붕괴(decay)'됩니다.\n\n**비유**: 무거운 여행 가방(배열) 자체를 택배로 보내는 게 아니라, 가방이 있는 '수하물 보관소 키(포인터)'만 봉투에 담아 보내는 것과 같습니다.",
-        "highlight": [
-          3
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "void printArr(int arr[], int len) {"
       },
       {
-        "line": 10,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main`에서 시작합니다. 위에 정의된 `printArr` 함수는 아직 호출되지 않았으므로 실행되지 않습니다. **함수 정의는 '도구를 만들어두는 것'이고, 함수 호출은 '도구를 실제로 사용하는 것'입니다.**",
-        "highlight": [
-          10
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 11,
         "title": "배열 선언 및 초기화",
         "explanation": "**`int data[3] = {10, 20, 30};`**\n\n`main` 스택 프레임에 3개의 정수를 담는 배열 `data`를 생성하고 초기화합니다. 이 배열은 연속된 12바이트(4×3) 메모리를 차지합니다.",
-        "highlight": [
-          11
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -59,16 +46,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int data[3] = {10, 20, 30};"
       },
       {
-        "line": 13,
         "title": "배열 전달 (Array Decay)",
         "explanation": "**`printArr(data, 3);`**\n\n`printArr` 함수가 호출됩니다. `data`는 배열이지만, 함수에 전달될 때 **자동으로 첫 번째 요소의 주소(포인터)로 변환**됩니다. 이것을 'Array Decay(배열 붕괴)'라고 합니다.\n\n**왜 배열 전체가 복사되지 않을까요?** 배열은 덩치가 클 수 있기 때문에, 매번 복사하면 느리고 메모리를 낭비합니다. 그래서 C는 주소만 넘기는 효율적인 방식을 선택했습니다.",
-        "highlight": [
-          13,
-          3
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -91,17 +74,16 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "printArr(data, 3);",
+        "highlightOffset": [
+          0,
+          -10
+        ]
       },
       {
-        "line": 4,
         "title": "for 루프 순회",
         "explanation": "**`for (int i = 0; i < len; i++) { printf(\"%d \", arr[i]); }`**\n\n`arr`은 포인터이지만, `arr[i]` 문법으로 마치 배열처럼 접근할 수 있습니다. 컴파일러가 `arr[i]`를 `*(arr + i)`로 변환하기 때문입니다.\n\n포인터에 정수를 더하면 '해당 타입 크기 × 정수'만큼 주소가 이동합니다. 그래서 `arr[0]`, `arr[1]`, `arr[2]`가 각각 10, 20, 30을 출력합니다.",
-        "highlight": [
-          4,
-          5,
-          6
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -130,19 +112,22 @@
           }
         ],
         "stdout": "10 20 30 ",
-        "heap": []
+        "heap": [],
+        "code": "for (int i = 0; i < len; i++) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 15,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n포인터만 넘어가면 배열이 총 몇 개인지 알 수 없습니다. 반드시 `len` 같은 길이 정보를 같이 줘야 `for`문을 돌릴 수 있습니다. (Python의 `len(list)` 같은 마법은 없습니다)",
-        "highlight": [
-          15
-        ],
         "visualizationType": "cMemory",
         "stdout": "10 20 30 ",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "return 0;"
       }
     ]
   },

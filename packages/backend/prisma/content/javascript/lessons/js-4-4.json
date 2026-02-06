@@ -6,57 +6,69 @@
     "code": "async function riskyOperation() {\n  throw new Error('Something went wrong!');\n}\n\n// try/catch 방식\nasync function handleWithTryCatch() {\n  try {\n    const result = await riskyOperation();\n    console.log(result);\n  } catch (error) {\n    console.log('Caught:', error.message);\n  }\n}\n\n// .catch() 방식\nriskyOperation()\n  .then(result => console.log(result))\n  .catch(error => console.log('Caught:', error.message));\n\nhandleWithTryCatch();",
     "steps": [
       {
-        "line": 20,
         "title": "handleWithTryCatch() 호출",
         "explanation": "프로그램의 실행은 `handleWithTryCatch()`를 호출하면서 시작됩니다.",
-        "highlight": [20],
         "visualizationType": "promise",
         "promiseState": {
-            "callStack": ["handleWithTryCatch()"]
-        }
+          "callStack": [
+            "handleWithTryCatch()"
+          ]
+        },
+        "code": "handleWithTryCatch();"
       },
       {
-        "line": 8,
         "title": "await에서 Promise 거부(rejection) 발생",
         "explanation": "`await`가 `riskyOperation()`을 호출합니다. 이 함수는 에러를 `throw`하므로, 반환된 Promise는 'rejected'(거부) 상태가 됩니다. `await`는 이 거부된 Promise를 일반적인 `throw` 문처럼 처리합니다.",
         "keyInsight": "await에서 rejected Promise = throw와 같음",
-        "highlight": [8],
         "visualizationType": "promise",
         "promiseState": {
-            "promises": [{"id": "riskyOp", "state": "rejected", "error": "Error"}]
-        }
+          "promises": [
+            {
+              "id": "riskyOp",
+              "state": "rejected",
+              "error": "Error"
+            }
+          ]
+        },
+        "code": "const result = await riskyOperation();"
       },
       {
-        "line": 10,
         "title": "catch 블록 실행",
         "explanation": "`await`에 의해 던져진 에러는 가장 가까운 `catch` 블록에 의해 잡힙니다. `try` 블록의 나머지 부분(9행)은 건너뜁니다.",
-        "highlight": [10],
         "visualizationType": "promise",
         "promiseState": {
-            "callStack": ["handleWithTryCatch() - catch"],
-            "note": "Error caught!"
-        }
+          "callStack": [
+            "handleWithTryCatch() - catch"
+          ],
+          "note": "Error caught!"
+        },
+        "code": "} catch (error) {"
       },
       {
-        "line": 11,
         "title": "에러 메시지 출력",
         "explanation": "`catch` 블록이 실행되어 에러 객체의 메시지를 콘솔에 출력합니다. 프로그램은 비정상 종료되지 않고 계속됩니다.",
-        "highlight": [11],
         "visualizationType": "promise",
         "promiseState": {
-            "output": ["Caught: Something went wrong!"]
-        }
+          "output": [
+            "Caught: Something went wrong!"
+          ]
+        },
+        "code": "console.log('Caught:', error.message);"
       },
       {
-        "line": 16,
         "title": "대안: .catch() 체이닝",
         "explanation": "이 코드는 실행되지는 않지만, `async/await`를 사용하지 않고 Promise의 에러를 처리하는 또 다른 방법입니다. `.catch()` 메서드를 체인 끝에 붙이면, 체인 중간 어디에서든 발생한 거부(rejection)를 잡을 수 있습니다.",
         "keyInsight": "async/await와 try/catch는 Promise와 .catch()의 문법적 설탕(syntactic sugar)입니다.",
-        "highlight": [16, 17, 18],
         "visualizationType": "promise",
         "promiseState": {
-            "note": "This part of code is not executed in this run."
-        }
+          "note": "This part of code is not executed in this run."
+        },
+        "code": "riskyOperation()",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       }
     ]
   },

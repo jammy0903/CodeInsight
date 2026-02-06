@@ -6,18 +6,8 @@
     "code": "def logger(func):\n    def wrapper(*args, **kwargs):\n        print(f\"--- {func.__name__} 시작 ---\")\n        result = func(*args, **kwargs)\n        print(f\"--- {func.__name__} 종료 ---\")\n        return result\n    return wrapper\n\n@logger\ndef say_hello(name):\n    print(f\"안녕하세요, {name}님!\")\n\nsay_hello(\"앨리스\")",
     "steps": [
       {
-        "line": 1,
         "title": "logger 함수 정의",
         "explanation": "`def logger(func):`\n데코레이터 함수를 정의합니다. 다른 함수를 인자로 받습니다.\n\n**왜 이 순서인가?**\n데코레이터를 사용하려면 먼저 정의해야 합니다.\n\n**실행 순서:**\n1. `logger` 함수 객체(0x1100) 생성.\n2. 전역 네임스페이스에 등록.",
-        "highlight": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -38,17 +28,21 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def logger(func):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
       },
       {
-        "line": 10,
         "title": "@logger 데코레이터 적용 및 say_hello 정의",
         "explanation": "`@logger` + `def say_hello(name):`\n@logger는 `say_hello = logger(say_hello)`와 동일합니다. logger가 호출됩니다.\n\n**왜 이 순서인가?**\n함수 정의 직후에 바로 데코레이터를 적용합니다.\n\n**실행 순서:**\n1. 원본 `say_hello` 함수 객체(0x1200) 임시 생성.\n2. `logger(0x1200)` 호출.\n3. `func` 매개변수에 원본 함수 전달.",
-        "highlight": [
-          9,
-          10,
-          11
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -69,19 +63,17 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def say_hello(name):",
+        "highlightOffset": [
+          -1,
+          0,
+          1
+        ]
       },
       {
-        "line": 2,
         "title": "wrapper 함수 정의",
         "explanation": "`def wrapper(*args, **kwargs):`\nlogger 함수 안에서 wrapper 함수를 정의합니다. say_hello(func)를 감싸는 클로저입니다.\n\n**왜 이 순서인가?**\n기능을 추가한 새로운 함수를 만듭니다.\n\n**실행 순서:**\n1. `wrapper` 함수 객체(0x2000) 생성.\n2. `func`(0x1200)를 참조하는 클로저 생성.",
-        "highlight": [
-          2,
-          3,
-          4,
-          5,
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -112,15 +104,19 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def wrapper(*args, **kwargs):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
       },
       {
-        "line": 7,
         "title": "wrapper 반환",
         "explanation": "`return wrapper`\nwrapper 함수를 반환합니다. say_hello는 이제 wrapper를 가리킵니다.\n\n**왜 이 순서인가?**\n`say_hello`라는 이름이 이제 `wrapper` 함수를 가리키게 됩니다.\n\n**실행 순서:**\n1. `wrapper` 반환.\n2. 전역 변수 `say_hello`에 할당.\n3. 원본 함수 이름이 덮어씌워짐.",
-        "highlight": [
-          7
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -141,15 +137,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "return wrapper"
       },
       {
-        "line": 13,
         "title": "say_hello 호출 (wrapper 호출)",
         "explanation": "`say_hello(\"앨리스\")`\nsay_hello를 호출하지만 실제로는 wrapper가 호출됩니다.\n\n**왜 이 순서인가?**\n데코레이터가 적용된 함수를 사용합니다.\n\n**실행 순서:**\n1. `say_hello`(=wrapper) 호출.\n2. 인자 \"앨리스\" 전달.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -168,15 +161,12 @@
               "pyId": "1003"
             }
           ]
-        }
+        },
+        "code": "say_hello(\"앨리스\")"
       },
       {
-        "line": 3,
         "title": "wrapper 실행 - 시작 로그",
         "explanation": "`print(f\"--- {func.__name__} 시작 ---\")`\n\"--- say_hello 시작 ---\"을 출력합니다.\n\n**왜 이 순서인가?**\n원본 함수 실행 전에 로그를 남깁니다.\n\n**실행 순서:**\n1. `func`(0x1200)의 이름 확인.\n2. 출력.",
-        "highlight": [
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -197,15 +187,12 @@
               "pyId": "1002"
             }
           ]
-        }
+        },
+        "code": "print(f\"--- {func.__name__} 시작 ---\")"
       },
       {
-        "line": 4,
         "title": "원본 함수 호출",
         "explanation": "`result = func(*args, **kwargs)`\n원본 say_hello 함수를 호출합니다.\n\n**왜 이 순서인가?**\n저장해둔 원본 함수를 실제로 실행할 차례입니다.\n\n**실행 순서:**\n1. `func`(0x1200) 호출.\n2. 인자 \"앨리스\" 전달.",
-        "highlight": [
-          4
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -238,15 +225,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "result = func(*args, **kwargs)"
       },
       {
-        "line": 11,
         "title": "say_hello 본문 실행",
         "explanation": "`print(f\"안녕하세요, {name}님!\")`\n\"안녕하세요, 앨리스님!\"을 출력합니다.\n\n**실행 순서:**\n1. 메시지 출력.",
-        "highlight": [
-          11
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -268,15 +252,12 @@
               "pyId": "1004"
             }
           ]
-        }
+        },
+        "code": "print(f\"안녕하세요, {name}님!\")"
       },
       {
-        "line": 5,
         "title": "wrapper 실행 - 종료 로그",
         "explanation": "`print(f\"--- {func.__name__} 종료 ---\")`\n\"--- say_hello 종료 ---\"를 출력합니다.\n\n**왜 이 순서인가?**\n원본 함수 실행이 끝난 후, 마무리 로그를 남깁니다.\n\n**실행 순서:**\n1. 원본 함수 복귀(Return).\n2. 종료 로그 출력.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -301,15 +282,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "print(f\"--- {func.__name__} 종료 ---\")"
       },
       {
-        "line": 6,
         "title": "결과 반환",
         "explanation": "`return result`\n원본 함수의 결과(None)를 반환합니다.\n\n**왜 이 순서인가?**\n래퍼 함수도 원본 함수와 똑같은 값을 반환해야, 사용자가 눈치채지 못합니다.\n\n**실행 순서:**\n1. `result`(None) 반환.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -332,7 +310,8 @@
               "pyId": "1005"
             }
           ]
-        }
+        },
+        "code": "return result"
       }
     ]
   },

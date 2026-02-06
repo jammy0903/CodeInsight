@@ -6,43 +6,33 @@
     "code": "import java.util.*;\n\npublic class MemoryLeak {\n    static List<Object> list = new ArrayList<>(); // static 변수는 위험해요!\n\n    public static void main(String[] args) {\n        while(true) {\n            list.add(new byte[1024 * 1024]); // 1MB씩 무한 추가\n        }\n    }\n}",
     "steps": [
       {
-        "line": 1,
         "title": "패키지 임포트",
         "explanation": "**`import java.util.*;`**\n\n`List`와 `ArrayList`를 사용하기 위해 패키지를 가져옵니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [],
           "heap": [],
           "metaspace": [],
           "output": []
-        }
+        },
+        "code": "import java.util.*;"
       },
       {
-        "line": 6,
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다. 메모리 누수를 발생시키는 위험한 코드를 실행합니다.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [],
           "heap": [],
           "metaspace": [],
           "output": []
-        }
+        },
+        "code": "public static void main(String[] args) {"
       },
       {
-        "line": 4,
         "title": "static 리스트 생성",
         "explanation": "`static` 키워드 때문에 이 `list`는 프로그램 시작 시 생성되어 프로그램이 끝날 때까지 메모리에 계속 남아있습니다. 여기에 담긴 객체들은 GC의 대상이 되기 매우 어렵습니다.",
         "keyInsight": "static 변수는 GC의 주시 대상에서 벗어나기 쉽습니다.",
-        "highlight": [
-          4
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "metaspace": [
@@ -60,15 +50,12 @@
           ],
           "stack": [],
           "output": []
-        }
+        },
+        "code": "static List<Object> list = new ArrayList<>(); // static 변수는 위험해요!"
       },
       {
-        "line": 7,
         "title": "무한 루프 시작",
         "explanation": "`while(true)`를 통해 멈추지 않는 무한 루프에 진입합니다.",
-        "highlight": [
-          7
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -82,16 +69,13 @@
             "Loop start..."
           ],
           "heap": []
-        }
+        },
+        "code": "while(true) {"
       },
       {
-        "line": 8,
         "title": "좀비 객체 양산 (메모리 누수)",
         "explanation": "루프가 돌 때마다 1MB 크기의 `byte` 배열이 계속 `list`에 추가됩니다.\n리스트가 `static`이라서 이 객체들을 꽉 잡고 놓아주지 않으니, GC 입장에서는 \"아직 쓰는 거구나\" 하고 버리지 못합니다.\n결국 Heap이 가득 차서 터집니다 (OutOfMemoryError).",
         "keyInsight": "누수 = 사용하지 않는데 참조가 끊기지 않음",
-        "highlight": [
-          8
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "metaspace": [
@@ -111,7 +95,8 @@
           "error": "java.lang.OutOfMemoryError: Java heap space",
           "stack": [],
           "output": []
-        }
+        },
+        "code": "list.add(new byte[1024 * 1024]); // 1MB씩 무한 추가"
       }
     ]
   },

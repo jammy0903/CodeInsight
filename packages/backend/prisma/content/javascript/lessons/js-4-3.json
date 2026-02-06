@@ -6,78 +6,73 @@
     "code": "function delay(ms) {\n  return new Promise(resolve => setTimeout(resolve, ms));\n}\n\nasync function fetchUser() {\n  console.log('Fetching...');\n  await delay(1000);\n  console.log('User loaded');\n  return { name: 'Alice' };\n}\n\nasync function main() {\n  console.log('Start');\n  const user = await fetchUser();\n  console.log('Got:', user.name);\n  console.log('End');\n}\n\nmain();",
     "steps": [
       {
-        "line": 19,
         "title": "main() 호출",
         "explanation": "`main()`을 호출합니다. async 함수이므로 즉시 Promise를 반환하고 내부 코드 실행을 시작합니다.",
-        "highlight": [19],
-        "visualizationType": "callStack"
+        "visualizationType": "callStack",
+        "code": "main();"
       },
       {
-        "line": 13,
         "title": "'Start' 출력",
         "explanation": "`console.log('Start')`가 동기적으로 실행됩니다. 콘솔에 'Start'가 출력됩니다.",
-        "highlight": [13],
-        "visualizationType": "callStack"
+        "visualizationType": "callStack",
+        "code": "console.log('Start');"
       },
       {
-        "line": 14,
         "title": "await fetchUser() 호출",
         "explanation": "`fetchUser()`를 호출하고 `await`로 결과를 기다립니다. main 함수는 여기서 일시 중지됩니다.",
         "keyInsight": "await = Promise가 resolve될 때까지 함수 실행을 일시 중지",
-        "highlight": [14],
-        "visualizationType": "callStack"
+        "visualizationType": "callStack",
+        "code": "const user = await fetchUser();"
       },
       {
-        "line": 6,
         "title": "'Fetching...' 출력",
         "explanation": "`fetchUser` 함수 내부에서 `console.log('Fetching...')`이 실행됩니다.",
-        "highlight": [6],
-        "visualizationType": "callStack"
+        "visualizationType": "callStack",
+        "code": "console.log('Fetching...');"
       },
       {
-        "line": 7,
         "title": "await delay(1000)",
         "explanation": "`delay(1000)`을 호출하고 await합니다. 1초 타이머가 시작되고 fetchUser도 일시 중지됩니다.",
-        "highlight": [7],
         "visualizationType": "promise",
         "promiseState": {
-          "webApis": [{"name": "setTimeout(1000ms)", "status": "waiting"}]
-        }
+          "webApis": [
+            {
+              "name": "setTimeout(1000ms)",
+              "status": "waiting"
+            }
+          ]
+        },
+        "code": "await delay(1000);"
       },
       {
-        "line": 2,
         "title": "Promise 생성 (delay 내부)",
         "explanation": "`delay` 함수 내부에서 `new Promise`가 생성되고, setTimeout이 Web API로 등록됩니다.",
-        "highlight": [2],
-        "visualizationType": "promise"
+        "visualizationType": "promise",
+        "code": "return new Promise(resolve => setTimeout(resolve, ms));"
       },
       {
-        "line": 8,
         "title": "'User loaded' 출력",
         "explanation": "1초 후 delay Promise가 resolve되어 fetchUser가 재개됩니다. 'User loaded'가 출력됩니다.",
-        "highlight": [8],
-        "visualizationType": "callStack"
+        "visualizationType": "callStack",
+        "code": "console.log('User loaded');"
       },
       {
-        "line": 9,
         "title": "객체 반환",
         "explanation": "`return { name: 'Alice' }`로 객체를 반환합니다. fetchUser의 Promise가 이 값으로 resolve됩니다.",
-        "highlight": [9],
-        "visualizationType": "callStack"
+        "visualizationType": "callStack",
+        "code": "return { name: 'Alice' };"
       },
       {
-        "line": 15,
         "title": "'Got: Alice' 출력",
         "explanation": "main 함수가 재개되어 `user` 변수에 `{ name: 'Alice' }`가 할당되고, 'Got: Alice'가 출력됩니다.",
-        "highlight": [15],
-        "visualizationType": "callStack"
+        "visualizationType": "callStack",
+        "code": "console.log('Got:', user.name);"
       },
       {
-        "line": 16,
         "title": "'End' 출력",
         "explanation": "`console.log('End')`가 실행되어 'End'가 출력됩니다. main 함수가 완료됩니다.",
-        "highlight": [16],
-        "visualizationType": "callStack"
+        "visualizationType": "callStack",
+        "code": "console.log('End');"
       }
     ]
   },

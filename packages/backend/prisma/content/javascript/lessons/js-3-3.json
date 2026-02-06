@@ -6,54 +6,76 @@
     "code": "const user = {\n  name: 'Alice',\n  greetRegular() {\n    setTimeout(function() {\n      console.log(`Regular: ${this.name}`);\n    }, 100);\n  },\n  greetArrow() {\n    setTimeout(() => {\n      console.log(`Arrow: ${this.name}`);\n    }, 100);\n  }\n};\n\nuser.greetRegular();\nuser.greetArrow();",
     "steps": [
       {
-        "line": 15,
         "title": "user.greetRegular() 호출",
         "explanation": "`greetRegular` 메서드를 `user` 객체의 메서드로 호출합니다. 이 때 `greetRegular` 내부의 `this`는 `user`가 됩니다. 하지만 그 안의 `setTimeout` 콜백(일반 함수)은 100ms 후 Web API에 의해 실행될 때 `this`를 잃어버립니다.",
-        "highlight": [15],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "method call",
           "thisValue": "user",
-          "webApis": [{"name": "regular callback", "delay": 100}]
-        }
+          "webApis": [
+            {
+              "name": "regular callback",
+              "delay": 100
+            }
+          ]
+        },
+        "code": "user.greetRegular();"
       },
       {
-        "line": 16,
         "title": "user.greetArrow() 호출",
         "explanation": "`greetArrow` 메서드를 호출합니다. 이 때 `greetArrow` 내부의 `this`도 `user`가 됩니다. 그 안의 `setTimeout` 콜백(화살표 함수)은 100ms 후 실행될 때 이 `this` 값을 '기억'합니다.",
-        "highlight": [16],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "method call",
           "thisValue": "user",
-          "webApis": [{"name": "regular callback"}, {"name": "arrow callback", "delay": 100}]
-        }
+          "webApis": [
+            {
+              "name": "regular callback"
+            },
+            {
+              "name": "arrow callback",
+              "delay": 100
+            }
+          ]
+        },
+        "code": "user.greetArrow();"
       },
       {
-        "line": 4,
         "title": "콜백 실행 (일반 함수)",
         "explanation": "100ms 후, `greetRegular`의 콜백이 실행됩니다. 이 콜백은 '일반 함수'이므로, 호출될 때 자신만의 `this`를 갖습니다. `setTimeout`에 의해 호출된 콜백의 `this`는 전역 객체(`window`)를 가리키므로, `this.name`은 `undefined`가 됩니다.",
         "keyInsight": "일반 함수 콜백의 this는 전역 객체입니다.",
-        "highlight": [4, 5],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "callback (regular function)",
           "thisValue": "window",
-          "output": ["Regular: undefined"]
-        }
+          "output": [
+            "Regular: undefined"
+          ]
+        },
+        "code": "setTimeout(function() {",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 9,
         "title": "콜백 실행 (화살표 함수)",
         "explanation": "이어서 `greetArrow`의 콜백이 실행됩니다. '화살표 함수'는 자신만의 `this`를 만들지 않고, 자신이 정의된 위치(lexical scope)의 `this`를 그대로 사용합니다. 여기서는 `greetArrow` 메서드의 `this`인 `user` 객체를 가리킵니다.",
         "keyInsight": "화살표 함수 this = 내 부모의 this (상속)",
-        "highlight": [9, 10],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "callback (arrow function)",
           "thisValue": "user",
-          "output": ["Regular: undefined", "Arrow: Alice"]
-        }
+          "output": [
+            "Regular: undefined",
+            "Arrow: Alice"
+          ]
+        },
+        "code": "setTimeout(() => {",
+        "highlightOffset": [
+          0,
+          1
+        ]
       }
     ]
   },

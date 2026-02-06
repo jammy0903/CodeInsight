@@ -6,37 +6,26 @@
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 65;\n    float b = 3.14;\n\n    void *ptr;\n\n    ptr = &a;\n    printf(\"int: %d\\n\", *(int *)ptr);\n\n    ptr = &b;\n    printf(\"float: %.2f\\n\", *(float *)ptr);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
-        "highlight": [
-          3
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 4,
         "title": "변수 선언",
         "explanation": "**`int a = 65;`** 와 **`float b = 3.14;`**\n\n서로 다른 타입의 변수 `a`와 `b`를 스택에 생성합니다.",
-        "highlight": [
-          4,
-          5
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -53,15 +42,16 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int a = 65;",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 7,
         "title": "void 포인터 선언",
         "explanation": "**`void *ptr;`**\n\n`void` 포인터 `ptr`을 선언합니다. `void*`는 '타입을 가리지 않는 포인터'로, 어떤 변수의 주소든 저장할 수 있는 만능 주소 보관함입니다. 하지만 `ptr` 자체는 그 주소에 어떤 타입의 데이터가 있는지 전혀 알지 못합니다.",
-        "highlight": [
-          7
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -84,15 +74,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "void *ptr;"
       },
       {
-        "line": 9,
         "title": "int 변수의 주소 저장",
         "explanation": "**`ptr = &a;`**\n\n`void` 포인터 `ptr`에 `int` 변수 `a`의 주소(`0x100`)를 저장합니다. `void*`는 모든 타입의 주소를 담을 수 있으므로 이 작업은 완벽하게 안전합니다.",
-        "highlight": [
-          9
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -116,15 +103,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "ptr = &a;"
       },
       {
-        "line": 10,
         "title": "형변환(Casting) 후 역참조 (int)",
         "explanation": "**`printf(\"int: %d\\n\", *(int *)ptr);`**\n\n`void` 포인터는 타입 정보를 모르기 때문에 `*ptr`과 같이 직접 역참조할 수 없습니다. 따라서 `(int *)ptr`와 같이 `ptr`을 '`int`를 가리키는 포인터'라고 컴파일러에게 알려준(형변환) 뒤에, 바깥의 `*`로 역참조하여 값을 읽어야 합니다.",
-        "highlight": [
-          10
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -148,15 +132,12 @@
           }
         ],
         "stdout": "int: 65",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"int: %d\\n\", *(int *)ptr);"
       },
       {
-        "line": 12,
         "title": "float 변수의 주소 저장",
         "explanation": "**`ptr = &b;`**\n\n이제 `void` 포인터 `ptr`에 `float` 변수 `b`의 주소(`0x104`)를 저장합니다. `ptr`은 이전에 무엇을 가리켰는지 잊고 새로운 주소를 담습니다.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -180,15 +161,12 @@
           }
         ],
         "stdout": "int: 65",
-        "heap": []
+        "heap": [],
+        "code": "ptr = &b;"
       },
       {
-        "line": 13,
         "title": "형변환(Casting) 후 역참조 (float)",
         "explanation": "**`printf(\"float: %.2f\\n\", *(float *)ptr);`**\n\n이번에는 `ptr`이 `float` 변수를 가리키고 있으므로, `(float *)`로 올바르게 형변환한 뒤 역참조하여 값을 읽습니다. 잘못된 타입으로 형변환하면 쓰레기 값이 나오거나 프로그램이 비정상 종료될 수 있습니다.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -212,19 +190,17 @@
           }
         ],
         "stdout": "int: 65\nfloat: 3.14",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"float: %.2f\\n\", *(float *)ptr);"
       },
       {
-        "line": 15,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
-        "highlight": [
-          15
-        ],
         "visualizationType": "cMemory",
         "stdout": "int: 65\nfloat: 3.14",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "return 0;"
       }
     ]
   },

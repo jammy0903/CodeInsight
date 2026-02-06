@@ -1,99 +1,93 @@
 {
-    "lessonId": "js-9-3",
-    "title": "WeakMap과 메모리 누수 방지",
-    "concept": "WeakMap은 객체에 대한 '약한 참조(Weak Reference)'를 사용하여 메모리 누수를 방지합니다.",
-    "content": {
-        "code": "let user = { name: 'Alice' };\n\n// 1. 일반 Map (강한 참조)\nconst strongMap = new Map();\nstrongMap.set(user, 'Data');\n\n// 2. WeakMap (약한 참조)\nconst weakMap = new WeakMap();\nweakMap.set(user, 'Secret');\n\n// user 객체 삭제 (참조 끊기)\nuser = null;\n\n// 결과:\n// strongMap은 여전히 Alice를 잡고 있음 (메모리 해제 안 됨)\n// weakMap은 Alice를 놓아줌 (GC 수거됨)",
-        "steps": [
+  "lessonId": "js-9-3",
+  "title": "WeakMap과 메모리 누수 방지",
+  "concept": "WeakMap은 객체에 대한 '약한 참조(Weak Reference)'를 사용하여 메모리 누수를 방지합니다.",
+  "content": {
+    "code": "let user = { name: 'Alice' };\n\n// 1. 일반 Map (강한 참조)\nconst strongMap = new Map();\nstrongMap.set(user, 'Data');\n\n// 2. WeakMap (약한 참조)\nconst weakMap = new WeakMap();\nweakMap.set(user, 'Secret');\n\n// user 객체 삭제 (참조 끊기)\nuser = null;\n\n// 결과:\n// strongMap은 여전히 Alice를 잡고 있음 (메모리 해제 안 됨)\n// weakMap은 Alice를 놓아줌 (GC 수거됨)",
+    "steps": [
+      {
+        "title": "객체 생성",
+        "explanation": "Heap 메모리에 `{ name: 'Alice' }` 객체가 생성되고, `user` 변수가 이를 가리킵니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
             {
-                "line": 1,
-                "title": "객체 생성",
-                "explanation": "Heap 메모리에 `{ name: 'Alice' }` 객체가 생성되고, `user` 변수가 이를 가리킵니다.",
-                "highlight": [
-                    1
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "heap": [
-                        {
-                            "address": "0xAlice",
-                            "content": "{ name: 'Alice' }",
-                            "refCount": 1
-                        }
-                    ]
-                }
-            },
-            {
-                "line": 5,
-                "title": "Strong Map: 강한 참조",
-                "explanation": "일반 `Map`에 Alice를 키로 등록했습니다. 이 방식은 **강한 참조(Strong Reference)**입니다.\n\n**강한 참조란?**\n\"내가 보고 있으니까 절대 없애지 마!\"라고 GC에게 말하는 것입니다. 그래서 `user` 변수가 사라져도 Map이 살아있는 한 Alice도 메모리에서 사라지지 않습니다.",
-                "highlight": [
-                    4,
-                    5
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "heap": [
-                        {
-                            "address": "0xAlice",
-                            "content": "{ name: 'Alice' }",
-                            "refCount": 2,
-                            "note": "Ref by user & strongMap"
-                        }
-                    ]
-                }
-            },
-            {
-                "line": 9,
-                "title": "WeakMap: 약한 참조",
-                "explanation": "`WeakMap`에도 Alice를 등록했습니다. 하지만 얘는 **약한 참조(Weak Reference)**를 합니다.\n\n**약한 참조란?**\n\"나는 얘를 보고는 있지만, 굳이 나 때문에 살려둘 필요는 없어\"라고 말하는 것입니다. 다른 누군가(변수)가 Alice를 찾지 않으면, WeakMap의 참조는 무시되고 GC가 일어납니다.",
-                "highlight": [
-                    8,
-                    9
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "note": "weakMap added ref, but it doesn't count for GC"
-                }
-            },
-            {
-                "line": 12,
-                "title": "참조 해제 (user = null)",
-                "explanation": "`user = null`을 실행해 변수와의 연결을 끊었습니다. 이제 Alice를 찾는 건 Map들뿐입니다.\n\n*   **StrongMap**: 꽉 잡고 있어서 Alice가 메모리에 남습니다. (누수)\n*   **WeakMap**: 약한 참조이므로 GC가 Alice를 수거해갑니다.",
-                "highlight": [
-                    12
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "heap": [
-                        {
-                            "address": "0xAlice",
-                            "content": "{ name: 'Alice' }",
-                            "refCount": 1,
-                            "note": "Only strongMap holds it. If strongMap dies, Alice dies."
-                        }
-                    ]
-                }
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 1
             }
+          ]
+        },
+        "code": "let user = { name: 'Alice' };"
+      },
+      {
+        "title": "Strong Map: 강한 참조",
+        "explanation": "일반 `Map`에 Alice를 키로 등록했습니다. 이 방식은 **강한 참조(Strong Reference)**입니다.\n\n**강한 참조란?**\n\"내가 보고 있으니까 절대 없애지 마!\"라고 GC에게 말하는 것입니다. 그래서 `user` 변수가 사라져도 Map이 살아있는 한 Alice도 메모리에서 사라지지 않습니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 2,
+              "note": "Ref by user & strongMap"
+            }
+          ]
+        },
+        "code": "strongMap.set(user, 'Data');",
+        "highlightOffset": [
+          -1,
+          0
         ]
-    },
-    "quiz": {
-        "question": "WeakMap의 키(Key)로 사용할 수 없는 것은?",
-        "options": [
-            "DOM 엘리먼트 (document.body)",
-            "빈 객체 ({})",
-            "문자열 (\"hello\")",
-            "함수 (function() {})"
-        ],
-        "correctIndex": 2,
-        "explanation": "WeakMap의 키는 반드시 **참조 타입(객체)**이어야 합니다. 문자열이나 숫자 같은 원시 타입은 GC의 관리(Reference Counting) 대상이 아니기 때문입니다."
-    },
-    "misconceptions": [
-        {
-            "wrong": "WeakMap.size로 크기를 알 수 있다",
-            "correct": "알 수 없습니다. (size 프로퍼티 없음)",
-            "why": "GC가 언제 돌아서 객체를 지울지 예측할 수 없기 때문에(비결정적), 현재 몇 개가 남아있는지 세는 것이 불가능합니다."
-        }
+      },
+      {
+        "title": "WeakMap: 약한 참조",
+        "explanation": "`WeakMap`에도 Alice를 등록했습니다. 하지만 얘는 **약한 참조(Weak Reference)**를 합니다.\n\n**약한 참조란?**\n\"나는 얘를 보고는 있지만, 굳이 나 때문에 살려둘 필요는 없어\"라고 말하는 것입니다. 다른 누군가(변수)가 Alice를 찾지 않으면, WeakMap의 참조는 무시되고 GC가 일어납니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "weakMap added ref, but it doesn't count for GC"
+        },
+        "code": "weakMap.set(user, 'Secret');",
+        "highlightOffset": [
+          -1,
+          0
+        ]
+      },
+      {
+        "title": "참조 해제 (user = null)",
+        "explanation": "`user = null`을 실행해 변수와의 연결을 끊었습니다. 이제 Alice를 찾는 건 Map들뿐입니다.\n\n*   **StrongMap**: 꽉 잡고 있어서 Alice가 메모리에 남습니다. (누수)\n*   **WeakMap**: 약한 참조이므로 GC가 Alice를 수거해갑니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 1,
+              "note": "Only strongMap holds it. If strongMap dies, Alice dies."
+            }
+          ]
+        },
+        "code": "user = null;"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "WeakMap의 키(Key)로 사용할 수 없는 것은?",
+    "options": [
+      "DOM 엘리먼트 (document.body)",
+      "빈 객체 ({})",
+      "문자열 (\"hello\")",
+      "함수 (function() {})"
     ],
-    "keyTakeaway": "캐시(Cache)나 임시 데이터를 저장할 때는 WeakMap을 사용해야 메모리 누수 없이 안전합니다."
+    "correctIndex": 2,
+    "explanation": "WeakMap의 키는 반드시 **참조 타입(객체)**이어야 합니다. 문자열이나 숫자 같은 원시 타입은 GC의 관리(Reference Counting) 대상이 아니기 때문입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "WeakMap.size로 크기를 알 수 있다",
+      "correct": "알 수 없습니다. (size 프로퍼티 없음)",
+      "why": "GC가 언제 돌아서 객체를 지울지 예측할 수 없기 때문에(비결정적), 현재 몇 개가 남아있는지 세는 것이 불가능합니다."
+    }
+  ],
+  "keyTakeaway": "캐시(Cache)나 임시 데이터를 저장할 때는 WeakMap을 사용해야 메모리 누수 없이 안전합니다."
 }

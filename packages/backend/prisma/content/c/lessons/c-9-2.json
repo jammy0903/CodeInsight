@@ -6,49 +6,35 @@
     "code": "#include <stdio.h>\n\n#define SQUARE_BAD(x) x * x\n\n#define SQUARE_SAFE(x) ((x) * (x))\n\nint main() {\n    int a = 5;\n\n    printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));\n\n    printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));\n\n    int n = 3;\n    printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "잘못된 매크로 정의",
         "explanation": "**`#define SQUARE_BAD(x) x * x`**\n\n제곱을 계산하는 것처럼 보이는 매크로입니다. 하지만 매개변수 `x`에 괄호를 씌우지 않아 심각한 버그를 유발할 수 있습니다.",
-        "highlight": [
-          3
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#define SQUARE_BAD(x) x * x"
       },
       {
-        "line": 5,
         "title": "안전한 매크로 정의",
         "explanation": "**`#define SQUARE_SAFE(x) ((x) * (x))`**\n\n매개변수 `x`와 전체 표현식을 괄호로 감싸서, 연산자 우선순위 문제를 방지한 더 안전한 버전의 매크로입니다.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#define SQUARE_SAFE(x) ((x) * (x))"
       },
       {
-        "line": 7,
         "title": "main 함수 및 변수 선언",
         "explanation": "**`int main() { ... }`**\n\n`main` 함수를 시작하고, 테스트에 사용할 변수 `a`를 선언합니다.",
-        "highlight": [
-          7,
-          8
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -58,15 +44,16 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 10,
         "title": "함정 1: 연산자 우선순위",
         "explanation": "**`printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));`**\n\n전처리기는 이 코드를 **`printf(\"Bad: %d\\n\", a + 1 * a + 1);`** 로 치환합니다. 곱셈이 덧셈보다 우선순위가 높으므로, `1 * a`가 먼저 계산됩니다. 즉, `5 + (1 * 5) + 1` 이 되어 결과는 `11`이 됩니다. (기대값: 36)",
-        "highlight": [
-          10
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -76,15 +63,12 @@
           }
         ],
         "stdout": "Bad: 11",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));"
       },
       {
-        "line": 12,
         "title": "올바른 괄호 사용",
         "explanation": "**`printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));`**\n\n안전한 매크로는 이 코드를 **`printf(\"Safe: %d\\n\", ((a + 1) * (a + 1)));`** 로 치환합니다. 괄호 덕분에 `a + 1`이 먼저 계산되어, `(6 * 6)` 즉, 기대했던 `36`이 올바르게 출력됩니다.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -94,15 +78,12 @@
           }
         ],
         "stdout": "Bad: 11\nSafe: 36",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));"
       },
       {
-        "line": 14,
         "title": "함정 2: 부작용(Side Effect) 이중 발생",
         "explanation": "**`int n = 3;`**\n\n두 번째 함정을 테스트하기 위한 변수 `n`을 선언합니다.",
-        "highlight": [
-          14
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -117,15 +98,12 @@
           }
         ],
         "heap": [],
-        "stdout": "Bad: 11\nSafe: 36"
+        "stdout": "Bad: 11\nSafe: 36",
+        "code": "int n = 3;"
       },
       {
-        "line": 15,
         "title": "증감 연산자의 이중 호출",
         "explanation": "**`printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));`**\n\n이 코드는 **`printf(\"Side Effect: %d\\n\", ((n++) * (n++)));`** 로 치환됩니다. `n++`이 두 번 호출되는 심각한 문제가 발생합니다.\n- 첫 번째 `n++` 에서 `n`의 값 `3`이 사용되고, `n`은 `4`가 됩니다.\n- 두 번째 `n++` 에서 `n`의 값 `4`가 사용되고, `n`은 `5`가 됩니다.\n- 결국 `3 * 4` 가 계산되어 `12`가 출력되고, `n`의 최종값은 `5`가 됩니다. (기대값: 9, 최종 n: 4)",
-        "highlight": [
-          15
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -141,19 +119,17 @@
           }
         ],
         "stdout": "Bad: 11\nSafe: 36\nSide Effect: 12",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));"
       },
       {
-        "line": 17,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
-        "highlight": [
-          17
-        ],
         "visualizationType": "cMemory",
         "stdout": "Bad: 11\nSafe: 36\nSide Effect: 12",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "return 0;"
       }
     ]
   },

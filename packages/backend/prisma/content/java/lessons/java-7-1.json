@@ -6,21 +6,8 @@
     "code": "// 1. Generic Class Definition\nclass Box<T> {\n    private T value;\n\n    public void set(T value) {\n        this.value = value;\n    }\n\n    public T get() {\n        return value;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // 2. Type Inference (Diamond Operator)\n        Box<String> stringBox = new Box<>();\n        stringBox.set(\"Hello Generics\");\n\n        // 3. Compile-time Type Safety\n        // stringBox.set(123); // Compile Error!\n\n        System.out.println(stringBox.get());\n        \n        Box<Integer> intBox = new Box<>();\n        intBox.set(42);\n        System.out.println(intBox.get());\n    }\n}",
     "steps": [
       {
-        "line": 2,
         "title": "제네릭 클래스 선언",
         "explanation": "**실행 순서:**\n1. `Box<T>` 클래스 정의가 로드됩니다.\n2. 제네릭 타입 `T`는 '나중에 정해질 타입'을 의미합니다.\n\n**만능 상자 만들기:**\n`Box<T>`는 무엇이든 담을 수 있는 마법 상자 설계도예요. `T`라는 이름표를 붙여놓고, 나중에 실제 상자를 만들 때 \"이건 사과 상자\", \"이건 배 상자\"라고 정하는 것과 같죠!",
-        "highlight": [
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [],
@@ -32,30 +19,36 @@
             }
           ],
           "output": []
-        }
+        },
+        "code": "class Box<T> {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
       },
       {
-        "line": 13,
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램의 진입점(Entry Point)입니다. 제네릭 실험실의 문을 여는 곳이죠.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [],
           "heap": [],
           "metaspace": [],
           "output": []
-        }
+        },
+        "code": "public static void main(String[] args) {"
       },
       {
-        "line": 17,
         "title": "String Box 생성",
         "explanation": "**실행 순서:**\n1. `new Box<>()`가 실행되어 힙 메모리에 `Box` 객체가 생성됩니다.\n2. 이때 `T`가 `String`으로 결정됩니다.\n3. `stringBox` 변수가 스택에 생겨 이 객체를 가리킵니다.\n\n**타입 확정:**\n이제 이 상자는 오직 `String`만 담을 수 있어요. 컴파일러가 철저하게 감시해주니까 안심해도 됩니다!",
-        "highlight": [
-          17
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -79,15 +72,12 @@
             }
           ],
           "output": []
-        }
+        },
+        "code": "Box<String> stringBox = new Box<>();"
       },
       {
-        "line": 18,
         "title": "값 저장 (String)",
         "explanation": "**실행 순서:**\n1. `stringBox.set(\"Hello Generics\")`가 호출됩니다.\n2. 힙 메모리의 `0x100` 객체 내부 `value` 필드에 문자열이 저장됩니다.\n\n**딱 맞는 타입:**\n`String` 타입의 값을 넣었으니 문제없이 쏙 들어갑니다.",
-        "highlight": [
-          18
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -111,15 +101,12 @@
             }
           ],
           "output": []
-        }
+        },
+        "code": "stringBox.set(\"Hello Generics\");"
       },
       {
-        "line": 23,
         "title": "값 출력",
         "explanation": "**실행 순서:**\n1. `stringBox.get()`으로 값을 꺼냅니다.\n2. `System.out.println`으로 화면에 출력합니다.\n\n**형변환 불필요:**\n`input`이 `String`인 걸 알기 때문에 `(String)`으로 강제 변환할 필요가 없어요. 코드가 훨씬 깔끔해졌죠?",
-        "highlight": [
-          23
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -144,15 +131,12 @@
           "output": [
             "Hello Generics"
           ]
-        }
+        },
+        "code": "System.out.println(stringBox.get());"
       },
       {
-        "line": 25,
         "title": "Integer Box 생성",
         "explanation": "**실행 순서:**\n1. 이번엔 `Integer` 타입을 담을 `Box` 객체를 힙에 생성합니다(`0x200`).\n2. `intBox` 변수가 스택에서 이를 가리킵니다.\n\n**다른 용도의 상자:**\n같은 `Box` 클래스지만, 이번엔 숫자를 담기 위해 태어났어요. 재사용성이 정말 뛰어나죠?",
-        "highlight": [
-          25
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -188,15 +172,12 @@
           "output": [
             "Hello Generics"
           ]
-        }
+        },
+        "code": "Box<Integer> intBox = new Box<>();"
       },
       {
-        "line": 26,
         "title": "값 저장 (Integer)",
         "explanation": "**실행 순서:**\n1. `intBox.set(42)`를 호출합니다.\n2. `0x200` 객체에 42가 저장됩니다.\n\n**오토 박싱(Auto-boxing):**\n`int` 42가 자동으로 `Integer` 객체로 포장되어 저장됩니다.",
-        "highlight": [
-          26
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -232,15 +213,12 @@
           "output": [
             "Hello Generics"
           ]
-        }
+        },
+        "code": "intBox.set(42);"
       },
       {
-        "line": 27,
         "title": "Integer 값 출력",
         "explanation": "**실행 순서:**\n1. `intBox.get()`으로 42를 꺼내 출력합니다.\n\n**마무리:**\n제네릭 덕분에 타입 걱정 없이 안전하게 코딩할 수 있게 되었습니다.",
-        "highlight": [
-          27
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -276,7 +254,8 @@
             "Hello Generics",
             "42"
           ]
-        }
+        },
+        "code": "System.out.println(intBox.get());"
       }
     ]
   },

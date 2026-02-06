@@ -6,12 +6,8 @@
     "code": "String str = getValueMaybeNull();\n\nif (str != null && str.length() > 0) {\n    System.out.println(str);\n}\n\nObjects.requireNonNull(str, \"str must not be null\");\n\nString result = (str != null) ? str : \"default\";\n\nString value = Objects.requireNonNullElse(str, \"default\");",
     "steps": [
       {
-        "line": 1,
         "title": "null일 수 있는 값 받기",
         "explanation": "**실행 순서:**\n1. `getValueMaybeNull()` 호출.\n2. 값(또는 `null`) 반환.\n3. `str` 변수에 저장.\n\n**상황:** 외부(DB, API, 사용자 입력)에서 값을 받아오면 항상 `null`일 수 있다고 의심해야 합니다.\n이 `str`은 언제 터질지 모르는 시한폭탄과 같습니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -23,16 +19,13 @@
           "note": "외부 입력은 항상 null 가능성 고려",
           "heap": [],
           "output": []
-        }
+        },
+        "code": "String str = getValueMaybeNull();"
       },
       {
-        "line": 3,
         "title": "단축 평가 (Short-circuit Evaluation)",
         "explanation": "**실행 순서:**\n1. `str != null` 검사 -> **false** (만약 null이라면).\n2. **즉시 중단** (뒤의 `str.length()` 실행 안 함).\n\n**논리 연산의 마법:** `&&`(AND) 연산자는 왼쪽 조건이 `false`면 오른쪽은 확인조차 하지 않습니다. 먼저 `str != null`을 검사하여 `null`이면, 뒤의 `str.length()`는 실행되지 않아 `NullPointerException`을 안전하게 피합니다.",
         "keyInsight": "&& 단축 평가: 앞이 false면 뒤는 실행 안 함",
-        "highlight": [
-          3
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -45,15 +38,12 @@
           "note": "순서가 중요! null 체크를 먼저",
           "heap": [],
           "output": []
-        }
+        },
+        "code": "if (str != null && str.length() > 0) {"
       },
       {
-        "line": 4,
         "title": "조건부 실행",
         "explanation": "**실행 순서:**\n1. 만약 앞의 `if` 조건이 `true`라면...\n2. `println(str)` 실행.\n\n앞선 `if`문의 조건(`str != null && str.length() > 0`)이 모두 `true`일 경우에만 이 라인이 실행됩니다. `str`이 유효한 문자열임이 보장된 상태에서 안전하게 출력합니다.",
-        "highlight": [
-          4
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -65,16 +55,13 @@
           "note": "이 라인은 str이 안전할 때만 도달 가능",
           "heap": [],
           "output": []
-        }
+        },
+        "code": "System.out.println(str);"
       },
       {
-        "line": 7,
         "title": "Objects.requireNonNull (Fail-fast)",
         "explanation": "**실행 순서:**\n1. `Objects.requireNonNull(str, ...)` 호출.\n2. `str`이 `null`인지 확인.\n3. `null`이면 즉시 예외 발생.\n\n**Fail-fast(빠른 실패) 전략:** \"문제가 있다면 나중에 이상하게 터지지 말고, 지금 당장 명확하게 터져라!\" `str`이 `null`이면 즉시 `NullPointerException`을 명확한 메시지와 함께 던져, 디버깅을 쉽게 만들어 줍니다.",
         "keyInsight": "빠른 실패(Fail-fast) 패턴",
-        "highlight": [
-          7
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -88,15 +75,12 @@
           ],
           "note": "null이면 명확한 에러 메시지와 함께 즉시 실패",
           "heap": []
-        }
+        },
+        "code": "Objects.requireNonNull(str, \"str must not be null\");"
       },
       {
-        "line": 9,
         "title": "삼항 연산자로 기본값 제공",
         "explanation": "**실행 순서:**\n1. `str != null` 검사.\n2. 참이면 `str`, 거짓이면 `\"default\"` 선택.\n3. 결과를 `result`에 할당.\n\n`str`이 `null`이 아니면 `str` 자신을, `null`이면 기본값인 `\"default\"`를 `result` 변수에 할당합니다.",
-        "highlight": [
-          9
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -111,16 +95,13 @@
           ],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "String result = (str != null) ? str : \"default\";"
       },
       {
-        "line": 11,
         "title": "Objects.requireNonNullElse",
         "explanation": "**실행 순서:**\n1. `Objects.requireNonNullElse` 호출.\n2. 내부적으로 null 체크.\n3. `null`이면 `\"default\"` 반환.\n4. `value`에 할당.\n\nJava 9부터 제공되는 더 읽기 좋은 방식입니다. 삼항 연산자와 기능은 같지만, \"null이 아니면 이것, 아니면 저것\"이라는 의도가 명확히 드러납니다.",
         "keyInsight": "Java 9+: requireNonNullElse 사용",
-        "highlight": [
-          11
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -132,7 +113,8 @@
           "note": "더 읽기 쉬운 코드 (Java 9+)",
           "heap": [],
           "output": []
-        }
+        },
+        "code": "String value = Objects.requireNonNullElse(str, \"default\");"
       }
     ]
   },

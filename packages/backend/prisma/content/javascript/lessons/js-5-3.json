@@ -6,12 +6,8 @@
     "code": "// 가변 (Mutable) - 직접 수정\nconst user = { name: 'Alice', age: 25 };\nuser.age = 26;\n\n// 불변 (Immutable) - 새 객체 생성\nconst user2 = { name: 'Alice', age: 25 };\nconst updated = { ...user2, age: 26 };\n\nconsole.log(user2.age);\nconsole.log(updated.age);\n\n// 배열 불변 패턴\nconst nums = [1, 2, 3];\nconst added = [...nums, 4];\nconst removed = nums.filter(n => n !== 2);\nconst mapped = nums.map(n => n * 2);",
     "steps": [
       {
-        "line": 2,
         "title": "가변 방식: 객체 생성",
         "explanation": "user 객체를 생성합니다.",
-        "highlight": [
-          2
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
@@ -26,16 +22,13 @@
               "content": "{ name: 'Alice', age: 25 }"
             }
           ]
-        }
+        },
+        "code": "const user = { name: 'Alice', age: 25 };"
       },
       {
-        "line": 3,
         "title": "가변 방식: 직접 수정",
         "explanation": "user.age를 직접 수정합니다. 원본 객체가 변경됩니다.",
         "keyInsight": "가변(Mutable) = 원본을 직접 수정",
-        "highlight": [
-          3
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
@@ -52,15 +45,12 @@
             }
           ],
           "warning": "원본이 변경됨!"
-        }
+        },
+        "code": "user.age = 26;"
       },
       {
-        "line": 6,
         "title": "불변 방식: 원본 유지",
         "explanation": "user2 객체를 생성합니다. 이 객체는 변경하지 않을 것입니다.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
@@ -75,17 +65,14 @@
               "content": "{ name: 'Alice', age: 25 }"
             }
           ]
-        }
+        },
+        "code": "const user2 = { name: 'Alice', age: 25 };"
       },
       {
-        "line": 7,
         "title": "불변 방식: 새 객체 생성",
         "explanation": "spread로 복사하고 age만 덮어씁니다. 원본 `user2`는 건드리지 않고 **새로운 객체(New Identity)**를 Heap에 만듭니다.",
         "keyInsight": "불변성 = 수정(Mutation) 금지, 교체(Replacement) 권장",
         "analogy": "문서에 수정테이프를 칠하는 게 아니라, 새 종이에 내용을 옮겨 적고 고친 버전을 제출하는 것입니다.",
-        "highlight": [
-          7
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
@@ -110,31 +97,28 @@
               "new": true
             }
           ]
-        }
+        },
+        "code": "const updated = { ...user2, age: 26 };"
       },
       {
-        "line": 9,
         "title": "원본 확인",
         "explanation": "user2.age는 여전히 25입니다. 원본이 보존되었습니다!",
-        "highlight": [
-          9,
-          10
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "output": [
             "25",
             "26"
           ]
-        }
+        },
+        "code": "console.log(user2.age);",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 13,
         "title": "배열 불변 패턴: 원본",
         "explanation": "nums 배열을 생성합니다.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
@@ -143,16 +127,13 @@
               "value": "[1, 2, 3]"
             }
           ]
-        }
+        },
+        "code": "const nums = [1, 2, 3];"
       },
       {
-        "line": 14,
         "title": "추가: spread + 새 요소",
         "explanation": "[...nums, 4]는 원본을 복사하고 4를 추가한 새 배열을 만듭니다.",
         "keyInsight": "push() 대신 [...arr, item] 사용",
-        "highlight": [
-          14
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
@@ -167,16 +148,13 @@
               "new": true
             }
           ]
-        }
+        },
+        "code": "const added = [...nums, 4];"
       },
       {
-        "line": 15,
         "title": "삭제: filter()",
         "explanation": "filter()는 조건에 맞는 요소만 포함한 새 배열을 반환합니다.",
         "keyInsight": "splice() 대신 filter() 사용",
-        "highlight": [
-          15
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
@@ -191,16 +169,13 @@
               "new": true
             }
           ]
-        }
+        },
+        "code": "const removed = nums.filter(n => n !== 2);"
       },
       {
-        "line": 16,
         "title": "변환: map()",
         "explanation": "map()은 각 요소를 변환한 새 배열을 반환합니다.",
         "keyInsight": "for 루프로 수정 대신 map() 사용",
-        "highlight": [
-          16
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
@@ -215,7 +190,8 @@
               "new": true
             }
           ]
-        }
+        },
+        "code": "const mapped = nums.map(n => n * 2);"
       }
     ]
   },

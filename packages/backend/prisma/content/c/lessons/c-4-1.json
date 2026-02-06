@@ -6,77 +6,72 @@
     "code": "#include <stdio.h>\n\nvoid funcB(int x) {\n    int b = x + 1;\n    printf(\"Inside funcB: b=%d\\n\", b);\n}\n\nvoid funcA() {\n    int a = 10;\n    funcB(a);\n}\n\nint main() {\n    funcA();\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 사용을 위한 표준 라이브러리입니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 13,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main`에서 시작합니다. 위에 정의된 `funcA`, `funcB` 함수들은 아직 호출되지 않았으므로 실행되지 않습니다.\n\n프로그램이 시작되면 `main` 함수의 스택 프레임이 가장 먼저 생깁니다. **왜 스택인가?** 함수 호출은 '가장 나중에 호출된 것이 가장 먼저 끝나는(LIFO)' 구조이기 때문입니다.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "main",
             "type": "frame",
-            "func": "main"
+            "func": "main",
+            "value": "frame"
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 14,
         "title": "funcA 호출 (스택 Push)",
         "explanation": "**`funcA();`**\n\n`funcA()`를 호출하면, `main` 프레임 위에 `funcA`의 프레임이 쌓입니다(Push). 스택이 한 층 더 높아집니다.\n\n**실행 순서**: main의 line 14 실행 → funcA의 line 8로 점프 → funcA 내부 코드 실행.",
-        "highlight": [
-          14,
-          8
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "main",
             "type": "frame",
-            "func": "main"
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "funcA",
             "type": "frame",
-            "func": "funcA"
+            "func": "funcA",
+            "value": "frame"
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "funcA();",
+        "highlightOffset": [
+          0,
+          -6
+        ]
       },
       {
-        "line": 9,
         "title": "funcA 내부: 변수 a 생성",
         "explanation": "**`int a = 10;`**\n\n`funcA`의 스택 프레임 안에 지역 변수 `a`가 생성됩니다. 이 변수는 `funcA`만의 공간에 있으므로 다른 함수에서 직접 접근할 수 없습니다.",
-        "highlight": [
-          9
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "main",
             "type": "frame",
-            "func": "main"
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "funcA",
             "type": "frame",
-            "func": "funcA"
+            "func": "funcA",
+            "value": "frame"
           },
           {
             "name": "a",
@@ -86,27 +81,25 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int a = 10;"
       },
       {
-        "line": 10,
         "title": "funcB 호출 (스택 Push)",
         "explanation": "**`funcB(a);`**\n\n`funcB(a)`를 호출하면, 또다시 `funcA` 위에 `funcB` 층이 쌓입니다. `a`의 값(10)이 `x`로 복사되어 전달됩니다.\n\n이렇게 층층이 쌓이기 때문에 **스택(Stack, 무더기)**이라고 부릅니다.",
-        "highlight": [
-          10,
-          3
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "main",
             "type": "frame",
-            "func": "main"
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "funcA",
             "type": "frame",
-            "func": "funcA"
+            "func": "funcA",
+            "value": "frame"
           },
           {
             "name": "a",
@@ -117,7 +110,8 @@
           {
             "name": "funcB",
             "type": "frame",
-            "func": "funcB"
+            "func": "funcB",
+            "value": "frame"
           },
           {
             "name": "x",
@@ -127,26 +121,29 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "funcB(a);",
+        "highlightOffset": [
+          0,
+          -7
+        ]
       },
       {
-        "line": 4,
         "title": "funcB 내부: 변수 b 생성",
         "explanation": "**`int b = x + 1;`**\n\n`funcB`의 스택 프레임 안에 지역 변수 `b`가 생성되고, `x + 1` (= 11)로 초기화됩니다.",
-        "highlight": [
-          4
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "main",
             "type": "frame",
-            "func": "main"
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "funcA",
             "type": "frame",
-            "func": "funcA"
+            "func": "funcA",
+            "value": "frame"
           },
           {
             "name": "a",
@@ -157,7 +154,8 @@
           {
             "name": "funcB",
             "type": "frame",
-            "func": "funcB"
+            "func": "funcB",
+            "value": "frame"
           },
           {
             "name": "x",
@@ -173,26 +171,25 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int b = x + 1;"
       },
       {
-        "line": 5,
         "title": "funcB: 결과 출력",
         "explanation": "**`printf(\"Inside funcB: b=%d\\n\", b);`**\n\n`funcB` 안에서 계산된 `b`의 값을 출력합니다.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "main",
             "type": "frame",
-            "func": "main"
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "funcA",
             "type": "frame",
-            "func": "funcA"
+            "func": "funcA",
+            "value": "frame"
           },
           {
             "name": "a",
@@ -203,7 +200,8 @@
           {
             "name": "funcB",
             "type": "frame",
-            "func": "funcB"
+            "func": "funcB",
+            "value": "frame"
           },
           {
             "name": "x",
@@ -219,26 +217,25 @@
           }
         ],
         "stdout": "Inside funcB: b=11",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"Inside funcB: b=%d\\n\", b);"
       },
       {
-        "line": 6,
         "title": "funcB 종료 (스택 Pop)",
         "explanation": "**`}`**\n\n`funcB`가 종료되면, `funcB`의 스택 프레임이 통째로 사라집니다(Pop). 지역 변수 `x`, `b`도 함께 파괴됩니다. 제어권은 `funcA`로 돌아갑니다.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "main",
             "type": "frame",
-            "func": "main"
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "funcA",
             "type": "frame",
-            "func": "funcA"
+            "func": "funcA",
+            "value": "frame"
           },
           {
             "name": "a",
@@ -248,37 +245,34 @@
           }
         ],
         "stdout": "Inside funcB: b=11",
-        "heap": []
+        "heap": [],
+        "code": "}"
       },
       {
-        "line": 11,
         "title": "funcA 종료 (스택 Pop)",
         "explanation": "**`}`**\n\n`funcA`도 종료되어 프레임이 사라집니다. 변수 `a`도 파괴됩니다. 제어권은 `main`으로 돌아갑니다.",
-        "highlight": [
-          11
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "main",
             "type": "frame",
-            "func": "main"
+            "func": "main",
+            "value": "frame"
           }
         ],
         "stdout": "Inside funcB: b=11",
-        "heap": []
+        "heap": [],
+        "code": "}",
+        "occurrence": 2
       },
       {
-        "line": 15,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n`main`이 종료되면 프로그램이 끝납니다. 함수 호출은 스택에 쌓고(Push), 리턴하면 빼는(Pop) 구조입니다.",
-        "highlight": [
-          15
-        ],
         "visualizationType": "cMemory",
         "stdout": "Inside funcB: b=11",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "return 0;"
       }
     ]
   },

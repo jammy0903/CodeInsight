@@ -6,17 +6,8 @@
     "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
     "steps": [
       {
-        "line": 3,
         "title": "제네릭 메서드 정의",
         "explanation": "**실행 순서:**\n1. `printArray` 메서드가 정의됩니다.\n2. `<T>`는 이 메서드 호출 시점에 타입이 결정됨을 의미합니다.\n\n**독립적인 제네릭:**\n클래스 전체가 아니라, 이 메서드 하나만 제네릭하게 만들 수 있어요. 유틸리티 함수 만들 때 딱이죠!",
-        "highlight": [
-          3,
-          4,
-          5,
-          6,
-          7,
-          8
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [],
@@ -28,30 +19,31 @@
             }
           ],
           "output": []
-        }
+        },
+        "code": "public static <T> void printArray(T[] array) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       },
       {
-        "line": 10,
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.",
-        "highlight": [
-          10
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "public static void main(String[] args) {"
       },
       {
-        "line": 11,
         "title": "배열 생성 (Integer, String)",
         "explanation": "**`Integer[] intArray = {1, 2, 3};`**\n\n`Integer` 배열과 `String` 배열을 힙에 생성합니다. 각각 `intArray`, `strArray` 변수가 참조합니다.\n\n**비유**: `intArray`는 '숫자 블록 박스', `strArray`는 '글자 블록 박스'를 준비하는 것과 같습니다.",
-        "highlight": [
-          11,
-          12
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -86,20 +78,16 @@
             }
           ],
           "output": []
-        }
+        },
+        "code": "Integer[] intArray = {1, 2, 3};",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 15,
         "title": "함수 호출 (T = Integer)",
         "explanation": "**`printArray(intArray);`**\n\n`printArray`를 호출합니다. 컴파일러가 `intArray`의 타입을 보고 `T`를 `Integer`로 추론(Type Inference)합니다.\n\n**비유**: '만능 프린터'(`printArray`)에 '숫자 종이'를 넣으면, 프린터가 알아서 \"아, 이건 숫자구나\" 하고 숫자 모드로 작동하는 것과 같습니다.",
-        "highlight": [
-          15,
-          3,
-          4,
-          5,
-          6,
-          7
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -140,20 +128,20 @@
           "output": [
             "Integer Array: 1 2 3 "
           ]
-        }
+        },
+        "code": "printArray(intArray); // T inferred as Integer",
+        "highlightOffset": [
+          0,
+          -12,
+          -11,
+          -10,
+          -9,
+          -8
+        ]
       },
       {
-        "line": 18,
         "title": "함수 호출 (T = String)",
         "explanation": "**실행 순서:**\n1. `printArray(strArray)`를 호출합니다.\n2. 이번엔 인자가 `String[]`이므로 `T`가 `String`으로 결정됩니다.\n3. 새로운 스택 프레임이 생성되어 실행됩니다.\n\n**재사용성:**\n코드 하나로 숫자 배열도 찍고, 문자열 배열도 찍고! 이게 바로 제네릭의 힘입니다.",
-        "highlight": [
-          18,
-          3,
-          4,
-          5,
-          6,
-          7
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -195,15 +183,20 @@
             "Integer Array: 1 2 3 ",
             "String Array: A B C "
           ]
-        }
+        },
+        "code": "printArray(strArray); // T inferred as String",
+        "highlightOffset": [
+          0,
+          -15,
+          -14,
+          -13,
+          -12,
+          -11
+        ]
       },
       {
-        "line": 20,
         "title": "원시 타입 제한",
         "explanation": "**실행 순서:**\n1. 이 줄의 주석을 풀면 컴파일 에러가 발생합니다.\n\n**주의할 점:**\n`int[]`는 객체 배열이 아니라 원시 타입 배열이라 `T[]`에 대입될 수 없습니다. 제네릭은 오직 '참조 타입(Object)'만 다룬다는 점, 잊지 마세요!",
-        "highlight": [
-          20
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "error": "Compile Error: int[] cannot be converted to T[]",
@@ -216,7 +209,8 @@
           ],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "// printArray(new int[]{1, 2}); // Error! int is not T"
       }
     ]
   },

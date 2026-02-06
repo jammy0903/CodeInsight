@@ -6,12 +6,8 @@
     "code": "function createCounter() {\n  let count = 0;\n\n  return function increment() {\n    count++;\n    return count;\n  };\n}\n\nconst counter = createCounter();\nconsole.log(counter());\nconsole.log(counter());\nconsole.log(counter());",
     "steps": [
       {
-        "line": 10,
         "title": "createCounter() 호출",
         "explanation": "createCounter 함수가 호출됩니다. 새로운 함수 스코프가 생성됩니다.",
-        "highlight": [
-          10
-        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -27,15 +23,12 @@
             }
           ],
           "highlightScope": "createCounter()"
-        }
+        },
+        "code": "const counter = createCounter();"
       },
       {
-        "line": 2,
         "title": "let count = 0",
         "explanation": "createCounter 함수 내부에 count 변수가 생성됩니다.",
-        "highlight": [
-          2
-        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -57,20 +50,14 @@
             }
           ],
           "highlightVariable": "count"
-        }
+        },
+        "code": "let count = 0;"
       },
       {
-        "line": 4,
         "title": "내부 함수 반환",
         "explanation": "increment 함수가 반환됩니다. 이 함수는 외부의 count 변수를 참조합니다.",
         "keyInsight": "내부 함수가 외부 변수를 참조하면 클로저가 형성됩니다!",
         "analogy": "increment 함수가 count를 '기억'하는 배낭을 메고 나갑니다.",
-        "highlight": [
-          4,
-          5,
-          6,
-          7
-        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -98,16 +85,19 @@
             }
           ],
           "highlightScope": "increment() [closure]"
-        }
+        },
+        "code": "return function increment() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
       },
       {
-        "line": 10,
         "title": "createCounter() 종료 - 스코프 보존",
         "explanation": "createCounter() 함수의 실행은 끝났고 스택에서 제거됩니다.\n하지만! 반환된 `increment` 함수가 내부의 `count` 변수를 붙잡고 있습니다(Reference).\n따라서 **가비지 컬렉터(GC)**가 `count`를 청소하지 못하고 **Heap 메모리**에 살려둡니다.",
         "keyInsight": "참조가 남아있으면 메모리에서 지워지지 않습니다 (Closure Preservation).",
-        "highlight": [
-          10
-        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -136,15 +126,12 @@
             }
           ],
           "highlightScope": "Closure (createCounter)"
-        }
+        },
+        "code": "const counter = createCounter();"
       },
       {
-        "line": 11,
         "title": "counter() 첫 번째 호출",
         "explanation": "counter()(=increment)가 호출됩니다. 클로저에 저장된 count에 접근하여 1 증가시킵니다.",
-        "highlight": [
-          11
-        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -175,16 +162,13 @@
           "output": [
             "1"
           ]
-        }
+        },
+        "code": "console.log(counter());"
       },
       {
-        "line": 12,
         "title": "counter() 두 번째 호출",
         "explanation": "같은 클로저의 count를 다시 증가시킵니다. count는 계속 유지됩니다!",
         "keyInsight": "클로저는 상태를 기억합니다. 마치 private 변수처럼!",
-        "highlight": [
-          12
-        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -216,16 +200,14 @@
             "1",
             "2"
           ]
-        }
+        },
+        "code": "console.log(counter());",
+        "occurrence": 2
       },
       {
-        "line": 13,
         "title": "counter() 세 번째 호출",
         "explanation": "count가 3이 됩니다. 외부에서는 count에 직접 접근할 수 없고, counter()를 통해서만 조작 가능합니다.",
         "keyInsight": "클로저로 private 변수를 구현할 수 있습니다!",
-        "highlight": [
-          13
-        ],
         "visualizationType": "scope",
         "scopeState": {
           "scopes": [
@@ -258,7 +240,9 @@
             "2",
             "3"
           ]
-        }
+        },
+        "code": "console.log(counter());",
+        "occurrence": 3
       }
     ]
   },

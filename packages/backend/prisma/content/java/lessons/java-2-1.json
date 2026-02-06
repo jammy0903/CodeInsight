@@ -6,13 +6,9 @@
     "code": "String str = null;\n\nint len = str.length();\n\nString text = null;\nboolean result = text.equals(\"hello\");\n\nboolean safe = \"hello\".equals(text);",
     "steps": [
       {
-        "line": 1,
         "title": "null 할당",
         "explanation": "**실행 순서:**\n1. `str` 변수 공간 생성 (Stack).\n2. `null`(0x0) 값 할당.\n\n**메모리에서 일어나는 일:**\nStack에 `str`이라는 공간을 만들고, `null`이라는 특별한 값을 넣습니다.\n\n**null이란?**\n\"아무것도 가리키지 않는다\"는 뜻의 표식입니다. 주소지가 적혀있지 않은 '빈 봉투'와 같습니다. 내부적으로는 보통 0x0 같은 무효한 주소로 표현됩니다.",
         "keyInsight": "null = 참조 없음 (주소 0x0)",
-        "highlight": [
-          1
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -23,16 +19,13 @@
           ],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "String str = null;"
       },
       {
-        "line": 3,
         "title": "null에서 메서드 호출 (NPE 발생)",
         "explanation": "**실행 순서:**\n1. `str` 역참조 시도.\n2. 값이 `null`임을 확인.\n3. **`NullPointerException`** 발생.\n\n`str.length()`를 호출하려면 `str`이 가리키는 **주소로 이동(역참조)**해야 합니다.\n하지만 주소가 `null`(빈 봉투)이므로, \"갈 곳이 없는데?\"라며 즉시 에러를 던지고 프로그램을 멈춥니다.\n\n**역참조(Dereference)란?**\n주소를 따라가서 그곳에 있는 실제 객체에 접근하는 행위(`.` 연산자)를 말합니다.",
         "keyInsight": "null.메서드() = NullPointerException",
-        "highlight": [
-          3
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -46,15 +39,12 @@
           ],
           "error": "NullPointerException: Cannot invoke \"String.length()\" because \"str\" is null",
           "heap": []
-        }
+        },
+        "code": "int len = str.length();"
       },
       {
-        "line": 5,
         "title": "또 다른 null 변수",
         "explanation": "**실행 순서:**\n1. `text` 변수 생성.\n2. `null` 값 할당.\n\n`text` 변수도 마찬가지로 아무런 객체도 가리키지 않는 상태(`null`)로 초기화됩니다.\nJava 개발자가 가장 많이 겪는 에러의 시작점입니다.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -65,16 +55,13 @@
           ],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "String text = null;"
       },
       {
-        "line": 6,
         "title": "null.equals() 호출 (위험!)",
         "explanation": "**실행 순서:**\n1. `text` 역참조 시도 (text.equals...).\n2. `text`가 `null`이므로 **NPE 발생**.\n\n`text`가 `null`이므로, `text`를 통해 무언가를 하려는 시도(`.equals`)는 무조건 실패합니다.\n\n**경고:**\n변수가 `null`일 가능성이 0.1%라도 있다면, 절대로 메서드를 먼저 호출하지 마세요.",
         "keyInsight": "null.equals(x) = NPE!",
-        "highlight": [
-          6
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -88,16 +75,13 @@
           ],
           "error": "NullPointerException",
           "heap": []
-        }
+        },
+        "code": "boolean result = text.equals(\"hello\");"
       },
       {
-        "line": 8,
         "title": "안전한 비교 방법 (Yoda Condition)",
         "explanation": "**실행 순서:**\n1. `\"hello\"` 리터럴(String Pool) 참조.\n2. `\"hello\".equals(null)` 호출.\n3. `null` 인자를 받아 안전하게 **false** 반환.\n4. `safe` 변수에 false 저장.\n\n**순서만 바꿨을 뿐인데?**\n`\"hello\"`는 리터럴이므로 **String Pool에 존재하는 실제 객체**입니다. (절대 null이 아님)\n`equals` 메서드는 인자로 `null`이 들어오면 우아하게 `false`를 반환하도록 만들어져 있습니다.\n이런 패턴을 '요다 표기법(Yoda Conditions)'이라고도 부릅니다.",
         "keyInsight": "\"리터럴\".equals(변수) = null-safe",
-        "highlight": [
-          8
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -115,7 +99,8 @@
           "note": "\"hello\"는 null이 아니므로 안전하게 메서드 호출 가능",
           "heap": [],
           "output": []
-        }
+        },
+        "code": "boolean safe = \"hello\".equals(text);"
       }
     ]
   },

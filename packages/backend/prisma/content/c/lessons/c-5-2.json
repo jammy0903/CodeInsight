@@ -6,48 +6,35 @@
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n\n    if (p == NULL) {\n        printf(\"Memory full!\\n\");\n        return 1;\n    }\n\n    *p = 100;\n    printf(\"Stored in heap: %d\\n\", *p);\n\n    free(p);\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n표준 입출력 함수 `printf`를 사용하기 위해 `stdio.h` 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 2,
         "title": "stdlib.h 헤더 포함",
         "explanation": "**`#include <stdlib.h>`**\n\n동적 메모리 할당 함수 `malloc`과 `free`를 사용하기 위해 `stdlib.h` 헤더 파일을 포함합니다.",
-        "highlight": [
-          2
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdlib.h>"
       },
       {
-        "line": 4,
         "title": "main 함수 정의",
         "explanation": "**`int main() {`**\n\nC 프로그램의 실행이 시작되는 `main` 함수입니다.",
-        "highlight": [
-          4
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 5,
         "title": "힙 메모리 할당 요청",
         "explanation": "**`int *p = (int*)malloc(sizeof(int));`**\n\n`sizeof(int)` (보통 4바이트) 크기의 메모리 공간을 힙(Heap)에 할당해달라고 요청합니다. \n`malloc`은 할당된 메모리의 시작 주소를 반환하며, 이 주소는 `int` 타입의 포인터 변수 `p`에 저장됩니다. `(int*)`는 `malloc`이 반환하는 `void*` 타입을 `int*` 타입으로 변환하는 형변환(casting)입니다.\n\n**비유**: 호텔 프런트(OS)에 가서 \"4바이트 방 하나 주세요\"라고 요청하고, 방 키(주소)를 받아오는 과정입니다.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -64,15 +51,12 @@
             "value": "???"
           }
         ],
-        "stdout": ""
+        "stdout": "",
+        "code": "int *p = (int*)malloc(sizeof(int));"
       },
       {
-        "line": 7,
         "title": "메모리 할당 실패 검사",
         "explanation": "**`if (p == NULL)`**\n\n운영체제가 더 이상 할당해줄 메모리가 없는 경우 `malloc`은 `NULL`을 반환합니다. `p`가 `NULL`인지 검사하여 메모리 할당이 실패했는지 확인하는 것은 매우 중요한 안정성 코드입니다.",
-        "highlight": [
-          7
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -89,39 +73,30 @@
             "value": "???"
           }
         ],
-        "stdout": ""
+        "stdout": "",
+        "code": "if (p == NULL) {"
       },
       {
-        "line": 8,
         "title": "실패 메시지 출력",
         "explanation": "**`printf(\"Memory full!\\n\");`**\n\n메모리 할당이 실패했음을 사용자에게 알립니다. 이 코드는 `if (p == NULL)` 조건이 참일 때만 실행됩니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "cMemory",
         "stdout": "Memory full!",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "printf(\"Memory full!\\n\");"
       },
       {
-        "line": 9,
         "title": "오류 코드 반환",
         "explanation": "**`return 1;`**\n\n프로그램을 즉시 종료하며, 운영체제에 오류가 발생했음을 알립니다. 일반적으로 `0`이 아닌 값(주로 `1`)은 오류를 의미하는 종료 코드로 사용됩니다.",
-        "highlight": [
-          9
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "return 1;"
       },
       {
-        "line": 12,
         "title": "힙 메모리에 값 저장",
         "explanation": "**`*p = 100;`**\n\n역참조 연산자 `*`를 사용하여 포인터 `p`가 가리키는 힙 메모리 위치에 값 `100`을 저장합니다. `malloc`으로 할당받은 메모리에 실제 데이터를 쓰는 중요한 단계입니다.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -139,15 +114,12 @@
             "highlight": true
           }
         ],
-        "stdout": ""
+        "stdout": "",
+        "code": "*p = 100;"
       },
       {
-        "line": 13,
         "title": "힙 메모리 값 출력",
         "explanation": "**`printf(\"Stored in heap: %d\\n\", *p);`**\n\n`*p`를 통해 힙 메모리에 저장된 값(`100`)을 읽어서 화면에 출력합니다.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -164,15 +136,12 @@
             "value": "100"
           }
         ],
-        "stdout": "Stored in heap: 100"
+        "stdout": "Stored in heap: 100",
+        "code": "printf(\"Stored in heap: %d\\n\", *p);"
       },
       {
-        "line": 15,
         "title": "힙 메모리 해제",
         "explanation": "**`free(p);`**\n\n`malloc`으로 할당받았던 힙 메모리를 시스템에 반환합니다. `free`를 하지 않으면 메모리 누수가 발생합니다. `free` 호출 후, 포인터 `p`는 더 이상 유효하지 않은 메모리를 가리키게 되므로(댕글링 포인터) 다시 사용해서는 안됩니다.\n\n**비유**: 호텔 체크아웃입니다. 이제 방 키(p)를 가지고 있어도 문은 열리지 않으며, 무단으로 들어가면 쫓겨납니다(에러).",
-        "highlight": [
-          15
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -184,19 +153,17 @@
           }
         ],
         "stdout": "Stored in heap: 100",
-        "heap": []
+        "heap": [],
+        "code": "free(p);"
       },
       {
-        "line": 16,
         "title": "프로그램 성공 종료",
         "explanation": "**`return 0;`**\n\n`main` 함수가 모든 작업을 성공적으로 완료했음을 나타내는 `0`을 반환하고 프로그램을 종료합니다.",
-        "highlight": [
-          16
-        ],
         "visualizationType": "cMemory",
         "stdout": "Stored in heap: 100",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "return 0;"
       }
     ]
   },

@@ -6,15 +6,8 @@
     "code": "class MathUtil {\n    static int add(int a, int b) {\n        return a + b;\n    }\n    \n    int instanceValue = 10;\n    \n    static void tryAccess() {\n        // System.out.println(instanceValue); // 에러!\n    }\n}\n\nint result = MathUtil.add(3, 5);\nSystem.out.println(result);",
     "steps": [
       {
-        "line": 2,
         "title": "static 메서드 사용",
         "explanation": "**실행 순서:**\n1. `MathUtil.add(3, 5)`를 호출합니다.\n2. Stack에 `add` 메서드를 위한 프레임이 새로 생깁니다.\n3. `a=3`, `b=5`가 그 안에 저장됩니다.\n\n**도구 상자:**\n`MathUtil` 객체를 만들(`new`) 필요가 없습니다. 그냥 도구함(`MathUtil`)에서 도구(`add`)를 꺼내 쓰는 느낌입니다.",
-        "highlight": [
-          2,
-          3,
-          4,
-          13
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "metaspace": [
@@ -42,15 +35,18 @@
           ],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "static int add(int a, int b) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          11
+        ]
       },
       {
-        "line": 14,
         "title": "결과 반환 및 출력",
         "explanation": "**실행 순서:**\n1. `8`을 반환하며 `add` 스택 프레임이 사라집니다.\n2. `main` 스택 프레임의 `result` 변수에 `8`이 저장됩니다.\n3. 화면에 출력합니다.\n\n**깔끔한 뒷정리:**\n객체 상태를 건드리지 않으니, 쓰고 나면 흔적도 없이 사라집니다.",
-        "highlight": [
-          14
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [
@@ -69,23 +65,24 @@
           "output": [
             "8"
           ]
-        }
+        },
+        "code": "System.out.println(result);"
       },
       {
-        "line": 8,
         "title": "접근 제한 (static -> instance)",
         "explanation": "**실행 순서:**\n1. 이 줄의 주석을 풀면 컴파일 에러가 납니다.\n\n**존재의 모순:**\n`tryAccess()`는 `new` 없이도 실행되는데, `instanceValue`는 `new`를 해야만 태어나는 변수입니다. \"태어나지 않은 친구 이름을 부르는 격\"이라 불가능합니다.",
-        "highlight": [
-          8,
-          9
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "error": "Cannot access instance member from static context",
           "stack": [],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "static void tryAccess() {",
+        "highlightOffset": [
+          0,
+          1
+        ]
       }
     ]
   },

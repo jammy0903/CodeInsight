@@ -6,75 +6,124 @@
     "code": "class Animal {\n  constructor(name) {\n    this.name = name;\n  }\n  eat() {\n    return this.name + ' eats';\n  }\n}\n\nclass Dog extends Animal {\n  constructor(name, breed) {\n    super(name);\n    this.breed = breed;\n  }\n  bark() {\n    return 'Woof!';\n  }\n}\n\nconst buddy = new Dog('Buddy', 'Golden');\nconsole.log(buddy.name);\nconsole.log(buddy.eat());\nconsole.log(buddy.bark());",
     "steps": [
       {
-        "line": 1,
         "title": "Animal 클래스 정의",
         "explanation": "`class` 키워드는 생성자 함수와 프로토타입 설정을 한번에 할 수 있는 문법적 설탕입니다. `constructor`는 생성자 함수가 되고, `eat` 같은 메서드는 `Animal.prototype`에 추가됩니다.",
         "keyInsight": "class = 생성자 함수 + prototype의 문법 설탕",
-        "highlight": [1, 2, 3, 4, 5, 6, 7, 8],
         "visualizationType": "prototype",
         "prototypeState": {
-          "classes": [{"name": "Animal", "methods": ["constructor", "eat()"]}]
-        }
+          "classes": [
+            {
+              "name": "Animal",
+              "methods": [
+                "constructor",
+                "eat()"
+              ]
+            }
+          ]
+        },
+        "code": "class Animal {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
       },
       {
-        "line": 10,
         "title": "Dog 클래스 상속",
         "explanation": "`extends` 키워드는 `Dog.prototype`의 프로토타입을 `Animal.prototype`으로 설정하여 상속 체인을 자동으로 만들어줍니다.",
         "keyInsight": "extends = 프로토타입 체인 자동 설정",
-        "highlight": [10],
         "visualizationType": "prototype",
         "prototypeState": {
-          "classes": [{"name": "Dog", "extends": "Animal", "methods": ["constructor", "bark()"] }],
-          "chain": ["Dog.prototype", "Animal.prototype"]
-        }
+          "classes": [
+            {
+              "name": "Dog",
+              "extends": "Animal",
+              "methods": [
+                "constructor",
+                "bark()"
+              ]
+            }
+          ],
+          "chain": [
+            "Dog.prototype",
+            "Animal.prototype"
+          ]
+        },
+        "code": "class Dog extends Animal {"
       },
       {
-        "line": 12,
         "title": "super() 호출",
         "explanation": "자식 클래스의 `constructor`에서는 반드시 `super()`를 호출하여 부모 클래스의 `constructor`를 실행해야 합니다. 이를 통해 `this.name`이 초기화됩니다. `super()` 호출 전에는 `this` 키워드를 사용할 수 없습니다.",
         "keyInsight": "super() = 부모 생성자 호출 (this 초기화)",
-        "highlight": [12],
         "visualizationType": "prototype",
         "prototypeState": {
           "note": "super()는 Animal.call(this, name)과 유사"
-        }
+        },
+        "code": "super(name);"
       },
       {
-        "line": 20,
         "title": "인스턴스 생성",
         "explanation": "`new Dog()`로 `buddy` 인스턴스를 생성합니다. `super('Buddy')`가 호출되어 `name`이 설정되고, `this.breed`가 'Golden'으로 설정됩니다. `buddy`의 프로토타입은 `Dog.prototype`을 가리킵니다.",
-        "highlight": [20],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
-            {"name": "buddy", "props": ["name: 'Buddy'", "breed: 'Golden'"], "proto": "Dog.prototype"}
+            {
+              "name": "buddy",
+              "props": [
+                "name: 'Buddy'",
+                "breed: 'Golden'"
+              ],
+              "proto": "Dog.prototype"
+            }
           ],
-          "chain": ["buddy", "Dog.prototype", "Animal.prototype"]
-        }
+          "chain": [
+            "buddy",
+            "Dog.prototype",
+            "Animal.prototype"
+          ]
+        },
+        "code": "const buddy = new Dog('Buddy', 'Golden');"
       },
       {
-        "line": 21,
         "title": "자신의 속성 접근",
         "explanation": "`buddy.name`을 찾습니다. `buddy` 객체 자신에게 `name` 속성이 있으므로 즉시 'Buddy'를 반환합니다.",
-        "highlight": [21],
         "visualizationType": "prototype",
-        "prototypeState": { "output": ["Buddy"] }
+        "prototypeState": {
+          "output": [
+            "Buddy"
+          ]
+        },
+        "code": "console.log(buddy.name);"
       },
       {
-        "line": 22,
         "title": "부모 프로토타입 메서드 호출",
         "explanation": "`buddy.eat()`을 찾습니다. `buddy` 자신과 `Dog.prototype`에는 없으므로, 프로토타입 체인을 따라 올라가 `Animal.prototype`에서 `eat` 메서드를 찾아 실행합니다.",
-        "highlight": [22],
         "visualizationType": "prototype",
-        "prototypeState": { "output": ["Buddy", "Buddy eats"] }
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats"
+          ]
+        },
+        "code": "console.log(buddy.eat());"
       },
       {
-        "line": 23,
         "title": "자식 프로토타입 메서드 호출",
         "explanation": "`buddy.bark()`를 찾습니다. `buddy` 자신에게는 없지만, 프로토타입인 `Dog.prototype`에서 `bark` 메서드를 찾아 실행합니다.",
-        "highlight": [23],
         "visualizationType": "prototype",
-        "prototypeState": { "output": ["Buddy", "Buddy eats", "Woof!"] }
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats",
+            "Woof!"
+          ]
+        },
+        "code": "console.log(buddy.bark());"
       }
     ]
   },

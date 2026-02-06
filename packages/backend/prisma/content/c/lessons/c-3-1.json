@@ -6,68 +6,42 @@
     "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n\n    printf(\"arr[0] Address: %p\\n\", &arr[0]);\n    printf(\"arr[1] Address: %p\\n\", &arr[1]);\n    printf(\"arr[2] Address: %p\\n\", &arr[2]);\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
-        "highlight": [
-          3
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 4,
         "title": "배열 선언과 메모리 할당",
         "explanation": "**`int arr[3] = {10, 20, 30};`**\n\n`int` 타입 요소 3개를 담는 배열 `arr`을 선언합니다. 이 순간 스택 메모리에 `sizeof(int) * 3` 크기(보통 12바이트)의 **연속된 공간**이 할당되고, 각 요소가 초기화됩니다.",
-        "highlight": [
-          4
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "name": "arr",
             "type": "int[3]",
             "address": "0x1000",
-            "value": [
-              {
-                "value": "10",
-                "address": "0x1000"
-              },
-              {
-                "value": "20",
-                "address": "0x1004"
-              },
-              {
-                "value": "30",
-                "address": "0x1008"
-              }
-            ]
+            "value": "{10, 20, 30}"
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int arr[3] = {10, 20, 30};"
       },
       {
-        "line": 6,
         "title": "첫 번째 요소의 주소",
         "explanation": "**`printf(\"arr[0] Address: %p\\n\", &arr[0]);`**\n\n배열의 첫 번째 요소(`arr[0]`)의 메모리 주소를 출력합니다. 이 주소가 배열의 시작 주소입니다.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "cMemory",
         "stdout": "arr[0] Address: 0x1000",
         "stack": [
@@ -75,22 +49,15 @@
             "name": "arr",
             "type": "int[3]",
             "address": "0x1000",
-            "value": [
-              { "value": "10", "address": "0x1000" },
-              { "value": "20", "address": "0x1004" },
-              { "value": "30", "address": "0x1008" }
-            ]
+            "value": "{10, 20, 30}"
           }
         ],
-        "heap": []
+        "heap": [],
+        "code": "printf(\"arr[0] Address: %p\\n\", &arr[0]);"
       },
       {
-        "line": 7,
         "title": "두 번째 요소의 주소",
         "explanation": "**`printf(\"arr[1] Address: %p\\n\", &arr[1]);`**\n\n두 번째 요소(`arr[1]`)의 주소를 출력합니다. `int` 타입의 크기가 4바이트이므로, 첫 번째 요소의 주소보다 정확히 4만큼 큰 값을 가집니다. 이것이 배열이 '연속된 메모리'에 있다는 증거입니다.",
-        "highlight": [
-          7
-        ],
         "visualizationType": "cMemory",
         "stdout": "arr[0] Address: 0x1000\narr[1] Address: 0x1004",
         "stack": [
@@ -98,22 +65,15 @@
             "name": "arr",
             "type": "int[3]",
             "address": "0x1000",
-            "value": [
-              { "value": "10", "address": "0x1000" },
-              { "value": "20", "address": "0x1004" },
-              { "value": "30", "address": "0x1008" }
-            ]
+            "value": "{10, 20, 30}"
           }
         ],
-        "heap": []
+        "heap": [],
+        "code": "printf(\"arr[1] Address: %p\\n\", &arr[1]);"
       },
       {
-        "line": 8,
         "title": "세 번째 요소의 주소",
         "explanation": "**`printf(\"arr[2] Address: %p\\n\", &arr[2]);`**\n\n세 번째 요소(`arr[2]`)의 주소를 출력합니다. 역시 이전 요소의 주소보다 4만큼 큰 값을 보여줍니다. 이처럼 배열의 모든 요소는 메모리 상에 빈틈없이 나란히 배치됩니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "cMemory",
         "stdout": "arr[0] Address: 0x1000\narr[1] Address: 0x1004\narr[2] Address: 0x1008",
         "stack": [
@@ -121,26 +81,20 @@
             "name": "arr",
             "type": "int[3]",
             "address": "0x1000",
-            "value": [
-              { "value": "10", "address": "0x1000" },
-              { "value": "20", "address": "0x1004" },
-              { "value": "30", "address": "0x1008" }
-            ]
+            "value": "{10, 20, 30}"
           }
         ],
-        "heap": []
+        "heap": [],
+        "code": "printf(\"arr[2] Address: %p\\n\", &arr[2]);"
       },
       {
-        "line": 10,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
-        "highlight": [
-          10
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "return 0;"
       }
     ]
   },

@@ -6,20 +6,8 @@
     "code": "final class ImmutablePoint {\n    private final int x, y;\n    \n    public ImmutablePoint(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n    \n    public final int getX() { return x; }\n}\n\n// class ExtendedPoint extends ImmutablePoint {}  // 에러!\n\nclass Parent {\n    public final void cannotOverride() {\n        System.out.println(\"Cannot override this!\");\n    }\n}\n\nclass Child extends Parent {\n    // public void cannotOverride() {}  // 에러!\n}",
     "steps": [
       {
-        "line": 1,
         "title": "final 클래스 선언",
         "explanation": "**실행 순서:**\n1. `ImmutablePoint` 클래스가 로드됩니다.\n2. 클래스 메타데이터에 '상속 금지(final)' 표시가 붙습니다.\n\n**내 대는 여기서 끝:**\n`final class`는 불임(?) 클래스입니다. 자식을 낳을(상속할) 수 없죠. `String`이나 `System` 클래스가 대표적인 예입니다.",
-        "highlight": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "stack": [],
@@ -31,20 +19,23 @@
             }
           ],
           "output": []
-        }
-      },
-      {
-        "line": 2,
-        "title": "final 필드 초기화",
-        "explanation": "**실행 순서:**\n1. 객체를 생성(`new`)하며 생성자를 호출합니다.\n2. 생성자 내부에서 `x`, `y` 필드에 값을 할당합니다.\n3. 생성자가 끝나는 순간, 이 필드들은 '동결'되어 절대 바꿀 수 없게 됩니다.\n\n**비유**: 종이에 연필로 쓴 것(일반 변수)은 지우개로 지울 수 있지만, 돌에 새긴 것(final)은 고칠 수 없습니다.\n\n**완벽한 불변:**\nSetter도 없고 필드도 `final`이니, 이 객체는 생성될 때의 상태를 평생 간직합니다.",
-        "highlight": [
+        },
+        "code": "final class ImmutablePoint {",
+        "highlightOffset": [
+          0,
+          1,
           2,
           3,
           4,
           5,
           6,
-          7
-        ],
+          7,
+          8
+        ]
+      },
+      {
+        "title": "final 필드 초기화",
+        "explanation": "**실행 순서:**\n1. 객체를 생성(`new`)하며 생성자를 호출합니다.\n2. 생성자 내부에서 `x`, `y` 필드에 값을 할당합니다.\n3. 생성자가 끝나는 순간, 이 필드들은 '동결'되어 절대 바꿀 수 없게 됩니다.\n\n**비유**: 종이에 연필로 쓴 것(일반 변수)은 지우개로 지울 수 있지만, 돌에 새긴 것(final)은 고칠 수 없습니다.\n\n**완벽한 불변:**\nSetter도 없고 필드도 `final`이니, 이 객체는 생성될 때의 상태를 평생 간직합니다.",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "heap": [
@@ -57,15 +48,20 @@
           ],
           "stack": [],
           "output": []
-        }
+        },
+        "code": "private final int x, y;",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       },
       {
-        "line": 9,
         "title": "final 메서드 선언",
         "explanation": "**실행 순서:**\n1. 메서드 정보가 로드될 때 'Override 금지(final)' 표시가 붙습니다.\n\n**고집불통 메서드:**\n\"내 로직은 완벽하니 건드리지 마라!\" 자식 클래스가 이 메서드를 물려받긴 하지만, 내용을 뜯어고칠(재정의할) 수는 없습니다.",
-        "highlight": [
-          9
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "metaspace": [
@@ -77,17 +73,12 @@
           "stack": [],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "public final int getX() { return x; }"
       },
       {
-        "line": 14,
         "title": "일반 클래스의 final 메서드",
         "explanation": "**실행 순서:**\n1. `Parent` 클래스는 일반 클래스라 상속이 가능합니다.\n2. 하지만 `cannotOverride` 메서드는 `final`이라 자식이 내용을 바꿀 수 없습니다.\n\n**부분적 통제:**\n클래스 전체를 막을 필요는 없고, 특정 핵심 기능만 보호하고 싶을 때 사용합니다.",
-        "highlight": [
-          14,
-          15,
-          16
-        ],
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "metaspace": [
@@ -103,7 +94,13 @@
           "stack": [],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "class Parent {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       }
     ]
   },

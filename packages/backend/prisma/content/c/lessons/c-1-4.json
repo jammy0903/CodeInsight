@@ -6,164 +6,158 @@
     "code": "#include <stdio.h>\n\nvoid func() {\n    int a = 10;\n    printf(\"Inside func: %d, Addr: %p\\n\", a, &a);\n}\n\nint main() {\n    func();\n\n\n    printf(\"Back in main\\n\");\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "func 함수 설계도",
         "explanation": "**`void func() { ... }`**\n\n`func`라는 이름의 함수를 정의합니다. 이 코드는 프로그램의 코드(Code/Text) 영역에 저장되며, `main` 함수에서 호출하기 전까지는 실행되지 않습니다.",
-        "highlight": [
-          3,
-          4,
-          5,
-          6
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "void func() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
       },
       {
-        "line": 8,
         "title": "프로그램 실행 시작",
         "explanation": "**`int main() {`**\n\n프로그램이 시작되면, 운영체제는 `main` 함수를 호출합니다. 이 때 `main` 함수를 위한 첫 번째 스택 프레임이 스택 메모리에 생성됩니다.",
-        "highlight": [
-          8
-        ],
-        "visualizationType": "cMemory",
-        "stack": [
-          {
-            "frame": "main"
-          }
-        ],
-        "heap": [],
-        "stdout": ""
-      },
-      {
-        "line": 9,
-        "title": "func() 함수 호출 (Push)",
-        "explanation": "**`func();`**\n\n`main` 함수가 `func` 함수를 호출합니다. 이 순간, `main`의 실행은 잠시 멈추고, `func`를 위한 새로운 스택 프레임이 `main`의 스택 프레임 **위**에 쌓입니다(Push). 프로그램의 제어권이 `func`로 넘어갑니다.\n\n**비유**: `main`이라는 책상 위에 `func`라는 새 작업 서류를 덮어서 올린 것과 같습니다.",
-        "highlight": [
-          9
-        ],
-        "visualizationType": "cMemory",
-        "stack": [
-          {
-            "frame": "main"
-          },
-          {
-            "frame": "func",
-            "highlight": true
-          }
-        ],
-        "heap": [],
-        "stdout": ""
-      },
-      {
-        "line": 4,
-        "title": "func의 지역 변수 생성",
-        "explanation": "**`int a = 10;`**\n\n`func`의 스택 프레임 안에 `a`라는 지역 변수가 생성되고 `10`으로 초기화됩니다. 이 변수 `a`는 오직 `func` 함수 안에서만 접근할 수 있습니다.\n\n**비유**: `func` 서류에만 붙여둔 포스트잇 메모입니다. `main` 서류에서는 이 메모가 보이지 않습니다.",
-        "highlight": [
-          4
-        ],
-        "visualizationType": "cMemory",
-        "stack": [
-          {
-            "frame": "main"
-          },
-          {
-            "frame": "func",
-            "variables": [
-              {
-                "name": "a",
-                "type": "int",
-                "value": "10"
-              }
-            ]
-          }
-        ],
-        "heap": [],
-        "stdout": ""
-      },
-      {
-        "line": 5,
-        "title": "func 내부에서 출력",
-        "explanation": "**`printf(\"Inside func: %d, Addr: %p\\n\", a, &a);`**\n\n`func`의 지역 변수 `a`의 값과 주소를 출력합니다.",
-        "highlight": [
-          5
-        ],
-        "visualizationType": "cMemory",
-        "stack": [
-          {
-            "frame": "main"
-          },
-          {
-            "frame": "func",
-            "variables": [
-              {
-                "name": "a",
-                "type": "int",
-                "value": "10"
-              }
-            ]
-          }
-        ],
-        "stdout": "Inside func: 10, Addr: 0x...",
-        "heap": []
-      },
-      {
-        "line": 6,
-        "title": "func() 함수 종료 (Pop)",
-        "explanation": "**`}`**\n\n`func` 함수가 끝나는 닫는 중괄호를 만나면, `func`의 스택 프레임 전체가 스택에서 제거됩니다(Pop). 프레임 안에 있던 지역 변수 `a`도 함께 **완전히 사라집니다**.\n\n**비유**: `func` 작업이 끝나서 해당 서류 뭉치를 책상에서 치워버린 상황입니다. 포스트잇(`a`)도 같이 쓰레기통으로 갔습니다.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
             "frame": "main",
-            "highlight": true
+            "value": "main",
+            "name": "main"
           }
         ],
-        "stdout": "Inside func: 10, Addr: 0x...",
-        "heap": []
+        "heap": [],
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 12,
-        "title": "main으로 복귀",
-        "explanation": "**`printf(\"Back in main\\n\");`**\n\n`func` 함수가 종료되었으므로, 프로그램의 제어권은 다시 `main` 함수로 돌아와 다음 코드를 실행합니다.",
-        "highlight": [
-          12
-        ],
+        "title": "func() 함수 호출 (Push)",
+        "explanation": "**`func();`**\n\n`main` 함수가 `func` 함수를 호출합니다. 이 순간, `main`의 실행은 잠시 멈추고, `func`를 위한 새로운 스택 프레임이 `main`의 스택 프레임 **위**에 쌓입니다(Push). 프로그램의 제어권이 `func`로 넘어갑니다.\n\n**비유**: `main`이라는 책상 위에 `func`라는 새 작업 서류를 덮어서 올린 것과 같습니다.",
         "visualizationType": "cMemory",
         "stack": [
           {
-            "frame": "main"
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          },
+          {
+            "frame": "func",
+            "highlight": true,
+            "value": "func",
+            "name": "func"
+          }
+        ],
+        "heap": [],
+        "stdout": "",
+        "code": "func();"
+      },
+      {
+        "title": "func의 지역 변수 생성",
+        "explanation": "**`int a = 10;`**\n\n`func`의 스택 프레임 안에 `a`라는 지역 변수가 생성되고 `10`으로 초기화됩니다. 이 변수 `a`는 오직 `func` 함수 안에서만 접근할 수 있습니다.\n\n**비유**: `func` 서류에만 붙여둔 포스트잇 메모입니다. `main` 서류에서는 이 메모가 보이지 않습니다.",
+        "visualizationType": "cMemory",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          },
+          {
+            "frame": "func",
+            "variables": [
+              {
+                "name": "a",
+                "type": "int",
+                "value": "10"
+              }
+            ],
+            "value": "func",
+            "name": "func"
+          }
+        ],
+        "heap": [],
+        "stdout": "",
+        "code": "int a = 10;"
+      },
+      {
+        "title": "func 내부에서 출력",
+        "explanation": "**`printf(\"Inside func: %d, Addr: %p\\n\", a, &a);`**\n\n`func`의 지역 변수 `a`의 값과 주소를 출력합니다.",
+        "visualizationType": "cMemory",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          },
+          {
+            "frame": "func",
+            "variables": [
+              {
+                "name": "a",
+                "type": "int",
+                "value": "10"
+              }
+            ],
+            "value": "func",
+            "name": "func"
+          }
+        ],
+        "stdout": "Inside func: 10, Addr: 0x...",
+        "heap": [],
+        "code": "printf(\"Inside func: %d, Addr: %p\\n\", a, &a);"
+      },
+      {
+        "title": "func() 함수 종료 (Pop)",
+        "explanation": "**`}`**\n\n`func` 함수가 끝나는 닫는 중괄호를 만나면, `func`의 스택 프레임 전체가 스택에서 제거됩니다(Pop). 프레임 안에 있던 지역 변수 `a`도 함께 **완전히 사라집니다**.\n\n**비유**: `func` 작업이 끝나서 해당 서류 뭉치를 책상에서 치워버린 상황입니다. 포스트잇(`a`)도 같이 쓰레기통으로 갔습니다.",
+        "visualizationType": "cMemory",
+        "stack": [
+          {
+            "frame": "main",
+            "highlight": true,
+            "value": "main",
+            "name": "main"
+          }
+        ],
+        "stdout": "Inside func: 10, Addr: 0x...",
+        "heap": [],
+        "code": "}"
+      },
+      {
+        "title": "main으로 복귀",
+        "explanation": "**`printf(\"Back in main\\n\");`**\n\n`func` 함수가 종료되었으므로, 프로그램의 제어권은 다시 `main` 함수로 돌아와 다음 코드를 실행합니다.",
+        "visualizationType": "cMemory",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
           }
         ],
         "stdout": "Inside func: 10, Addr: 0x...\nBack in main",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"Back in main\\n\");"
       },
       {
-        "line": 13,
         "title": "main 함수 종료",
         "explanation": "**`return 0;`**\n\n`main` 함수가 종료되고, `main`의 스택 프레임도 스택에서 제거됩니다. 스택이 비워지고 프로그램이 최종적으로 끝납니다.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "cMemory",
         "stdout": "Inside func: 10, Addr: 0x...\nBack in main",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "return 0;"
       }
     ]
   },

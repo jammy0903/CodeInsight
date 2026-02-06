@@ -6,14 +6,8 @@
     "code": "function greet(greeting, punctuation) {\n  console.log(`${greeting}, ${this.name}${punctuation}`);\n}\n\nconst user = { name: 'Alice' };\nconst admin = { name: 'Bob' };\n\ngreet.call(user, 'Hello', '!');\ngreet.apply(admin, ['Hi', '?']);\n\nconst boundGreet = greet.bind(user, 'Hey');\nboundGreet('~');",
     "steps": [
       {
-        "line": 1,
         "title": "greet 함수 정의",
         "explanation": "this.name을 사용하는 greet 함수를 정의합니다. 이 함수는 두 개의 인자를 받습니다.",
-        "highlight": [
-          1,
-          2,
-          3
-        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "function definition",
@@ -27,16 +21,17 @@
               "usesThis": true
             }
           ]
-        }
+        },
+        "code": "function greet(greeting, punctuation) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 5,
         "title": "객체 생성",
         "explanation": "user와 admin 두 객체를 생성합니다. 이 객체들을 this로 사용할 예정입니다.",
-        "highlight": [
-          5,
-          6
-        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "object creation",
@@ -60,16 +55,17 @@
               ]
             }
           ]
-        }
+        },
+        "code": "const user = { name: 'Alice' };",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 8,
         "title": "call() - this와 인자를 개별 전달",
         "explanation": "call() 메서드는 **함수를 즉시 실행**하면서, 첫 번째 인자로 **this로 쓸 객체**를 강제로 지정합니다.",
         "keyInsight": "call(this, args) = \"이 객체를 this로 삼아서 지금 실행해!\"",
-        "highlight": [
-          8
-        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "call()",
@@ -89,17 +85,14 @@
           "output": [
             "Hello, Alice!"
           ]
-        }
+        },
+        "code": "greet.call(user, 'Hello', '!');"
       },
       {
-        "line": 9,
         "title": "apply() - this와 인자를 배열로 전달",
         "explanation": "apply()는 첫 번째 인자로 this를, 두 번째 인자로 인자들의 배열을 전달합니다.",
         "keyInsight": "apply(thisArg, [arg1, arg2, ...]) - 인자를 배열로 전달",
         "analogy": "call과 apply의 차이: call = 쉼표(Comma), apply = 배열(Array)",
-        "highlight": [
-          9
-        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "apply()",
@@ -117,16 +110,13 @@
             "Hello, Alice!",
             "Hi, Bob?"
           ]
-        }
+        },
+        "code": "greet.apply(admin, ['Hi', '?']);"
       },
       {
-        "line": 11,
         "title": "bind() - 새 함수 반환",
         "explanation": "bind()는 this가 고정된 새로운 함수를 반환합니다. 즉시 실행하지 않습니다!",
         "keyInsight": "bind(thisArg, arg1, ...) - 새 함수 반환 (즉시 실행 X)",
-        "highlight": [
-          11
-        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "bind()",
@@ -145,16 +135,13 @@
               "value": "function (this=user, greeting='Hey')"
             }
           ]
-        }
+        },
+        "code": "const boundGreet = greet.bind(user, 'Hey');"
       },
       {
-        "line": 12,
         "title": "bind된 함수 호출",
         "explanation": "boundGreet를 호출합니다. this는 이미 user로 고정되어 있고, greeting도 'Hey'로 고정되어 있습니다.",
         "keyInsight": "bind는 부분 적용(partial application)도 가능합니다!",
-        "highlight": [
-          12
-        ],
         "visualizationType": "thisBinding",
         "thisState": {
           "context": "bound function call",
@@ -177,7 +164,8 @@
             "Hi, Bob?",
             "Hey, Alice~"
           ]
-        }
+        },
+        "code": "boundGreet('~');"
       }
     ]
   },

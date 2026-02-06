@@ -6,12 +6,8 @@
     "code": "class Counter:\n    def __init__(self):\n        self.count = 0\n    \n    def increment(self):\n        self.count += 1\n\nc1 = Counter()\nc2 = Counter()\n\nc1.increment()\nc1.increment()\nc2.increment()\n\nprint(f\"c1: {c1.count}\")  # 2\nprint(f\"c2: {c2.count}\")  # 1",
     "steps": [
       {
-        "line": 1,
         "title": "Counter 클래스 정의",
         "explanation": "**`class Counter:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Counter` 클래스(카운터 설계도)를 정의합니다.\n\n**클래스의 역할**: 여러 개의 독립적인 카운터 객체를 만들 수 있는 설계도입니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가하고 객체를 만들 수 있습니다.\n\n**실행 순서**: class Counter 실행 → Counter 클래스 등록 시작 → line 2",
-        "highlight": [
-          1
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -30,16 +26,12 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "class Counter:"
       },
       {
-        "line": 2,
         "title": "__init__ 메서드 정의",
         "explanation": "**`def __init__(self):`**\n\n**초기화 메서드**: 객체 생성 시 자동으로 호출되는 메서드를 정의합니다.\n\n**self.count = 0의 의미**: 생성되는 **각 객체마다** count 속성을 0으로 초기화합니다.\n\n**중요한 개념**: 이 코드는 **정의만** 하는 것이고, 실제 실행은 나중에 `Counter()` 호출 시 자동으로 일어납니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def __init__ 실행 → __init__ 메서드 등록 → line 5",
-        "highlight": [
-          2,
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -58,16 +50,16 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "def __init__(self):",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 5,
         "title": "increment 메서드 정의",
         "explanation": "**`def increment(self):`**\n\n**카운트 증가 메서드**: `self.count += 1`로 호출한 객체의 count를 1 증가시킵니다.\n\n**self의 역할**: 어떤 객체의 count를 증가시킬지 구분합니다.\n- `c1.increment()` 호출 시: self = c1\n- `c2.increment()` 호출 시: self = c2\n\n**왜 이 순서인가?** __init__ 정의 후, 순서대로 다음 메서드를 정의합니다.\n\n**실행 순서**: def increment 실행 → increment 메서드 등록 → Counter 클래스 정의 완료 → line 8",
-        "highlight": [
-          5,
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -86,15 +78,16 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "def increment(self):",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 8,
         "title": "첫 번째 카운터 생성 (__init__ 자동 호출)",
         "explanation": "**`c1 = Counter()`**\n\n**객체 생성과 동시에 __init__ 자동 호출!**\n\n**Python 내부 동작**:\n1. 새 객체 공간 할당 (0x2000)\n2. `__init__(c1)` **자동 호출** → line 3으로 점프\n3. 초기화 완료 후 객체 참조를 `c1`에 할당\n\n**왜 이 순서인가?** 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Counter() 호출 → 객체 0x2000 생성 → __init__ 자동 호출 → line 3으로 점프",
-        "highlight": [
-          8
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -125,15 +118,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "c1 = Counter()"
       },
       {
-        "line": 3,
         "title": "c1 인스턴스 변수 초기화",
         "explanation": "**`self.count = 0`**\n\n**인스턴스 변수 생성**: `self` (c1 객체, 0x2000)에 `count` 속성을 추가하고 `0`을 할당합니다.\n\n**self.count의 의미**:\n- `self` → c1 객체 (0x2000)\n- `.count` → 이 객체의 count 속성 (지금 만듦!)\n- `= 0` → 0으로 초기화\n\n**왜 이 순서인가?** 객체 생성(line 8)에서 __init__이 자동 호출되어 점프해왔습니다.\n\n**실행 순서**: self.count = 0 → c1 객체에 count=0 추가 → __init__ 종료 → line 8로 돌아감 → line 9",
-        "highlight": [
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -176,15 +166,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "self.count = 0"
       },
       {
-        "line": 9,
         "title": "두 번째 카운터 생성 (__init__ 자동 호출)",
         "explanation": "**`c2 = Counter()`**\n\n**새로운 독립적 객체 생성!**\n\n**Python 내부 동작**:\n1. **새로운** 객체 공간 할당 (0x3000) ← c1(0x2000)과 다름!\n2. `__init__(c2)` **자동 호출** → line 3으로 점프\n3. 초기화 완료 후 객체 참조를 `c2`에 할당\n\n**중요**: c1과 c2는 **완전히 별개의 객체**입니다!\n\n**왜 이 순서인가?** c1 초기화 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Counter() 호출 → 객체 0x3000 생성 → __init__ 자동 호출 → line 3으로 점프",
-        "highlight": [
-          9
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -225,15 +212,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "c2 = Counter()"
       },
       {
-        "line": 3,
         "title": "c2 인스턴스 변수 초기화",
         "explanation": "**`self.count = 0`**\n\n**인스턴스 변수 생성**: `self` (c2 객체, 0x3000)에 `count` 속성을 추가하고 `0`을 할당합니다.\n\n**핵심 개념**: c1.count와 c2.count는 **완전히 다른 변수**입니다!\n- c1.count → 0x2000 객체의 count\n- c2.count → 0x3000 객체의 count\n- 같은 이름이지만 **서로 다른 메모리 공간**!\n\n**왜 이 순서인가?** 객체 생성(line 9)에서 __init__이 자동 호출되어 점프해왔습니다.\n\n**실행 순서**: self.count = 0 → c2 객체에 count=0 추가 → __init__ 종료 → line 9로 돌아감 → line 11",
-        "highlight": [
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -286,15 +270,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "self.count = 0"
       },
       {
-        "line": 11,
         "title": "c1.increment() 호출 (1번째)",
         "explanation": "**`c1.increment()`**\n\nc1 객체의 increment 메서드를 호출합니다.\n\n**Python 내부 변환**:\n```python\nc1.increment()  # 사용자가 쓴 코드\n↓\nCounter.increment(c1)  # Python이 내부적으로 변환\n```\n\n**self에 무엇이 들어가는가?**\n- `self` = `c1` (0x2000 객체)\n\n**왜 이 순서인가?** c2 초기화 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: c1.increment() 호출 → line 6으로 점프 → self=c1",
-        "highlight": [
-          11
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -335,15 +316,12 @@
               "pyId": "1004"
             }
           ]
-        }
+        },
+        "code": "c1.increment()"
       },
       {
-        "line": 6,
         "title": "c1.count 증가 (1번째)",
         "explanation": "**`self.count += 1`**\n\n`self` (c1 객체, 0x2000)의 `count`를 1 증가시킵니다.\n\n**실행 흐름**:\n1. `self.count` 읽기 → c1.count → 0\n2. `0 + 1` 계산 → 1\n3. `self.count = 1` 할당 → c1.count = 1\n\n**중요**: c2.count는 여전히 0입니다! 각 객체의 인스턴스 변수는 **완전히 독립적**입니다.\n\n**왜 이 순서인가?** 메서드 호출(line 11)에서 점프해왔습니다.\n\n**실행 순서**: self.count += 1 → c1.count가 0→1 → increment 종료 → line 11로 돌아감 → line 12",
-        "highlight": [
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -396,15 +374,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "self.count += 1"
       },
       {
-        "line": 12,
         "title": "c1.increment() 호출 (2번째)",
         "explanation": "**`c1.increment()`**\n\n**같은 객체의 메서드를 다시 호출**합니다.\n\n**self에 무엇이 들어가는가?**\n- `self` = `c1` (0x2000 객체) ← 1번째와 동일한 객체!\n\n**왜 이 순서인가?** 이전 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: c1.increment() 호출 → line 6으로 점프 → self=c1",
-        "highlight": [
-          12
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -445,15 +420,13 @@
               "pyId": "1004"
             }
           ]
-        }
+        },
+        "code": "c1.increment()",
+        "occurrence": 2
       },
       {
-        "line": 6,
         "title": "c1.count 증가 (2번째)",
         "explanation": "**`self.count += 1`**\n\n`self` (c1 객체, 0x2000)의 `count`를 **다시** 1 증가시킵니다.\n\n**실행 흐름**:\n1. `self.count` 읽기 → c1.count → 1 (이전 호출에서 증가한 값!)\n2. `1 + 1` 계산 → 2\n3. `self.count = 2` 할당 → c1.count = 2\n\n**인스턴스 변수의 지속성**: 이전 메서드 호출의 결과가 **객체에 저장**되어 있기 때문에, 다시 호출해도 **누적**됩니다!\n\n**왜 이 순서인가?** 메서드 호출(line 12)에서 점프해왔습니다.\n\n**실행 순서**: self.count += 1 → c1.count가 1→2 → increment 종료 → line 12로 돌아감 → line 13",
-        "highlight": [
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -506,15 +479,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "self.count += 1"
       },
       {
-        "line": 13,
         "title": "c2.increment() 호출",
         "explanation": "**`c2.increment()`**\n\n**다른 객체의 메서드 호출!**\n\n**Python 내부 변환**:\n```python\nc2.increment()  # 사용자가 쓴 코드\n↓\nCounter.increment(c2)  # Python이 내부적으로 변환\n```\n\n**self에 무엇이 들어가는가?**\n- `self` = `c2` (0x3000 객체) ← c1(0x2000)이 아님!\n\n**중요**: 같은 메서드 코드(`line 6`)를 실행하지만, **self가 다르므로** 다른 객체의 count가 변경됩니다!\n\n**왜 이 순서인가?** 이전 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: c2.increment() 호출 → line 6으로 점프 → self=c2",
-        "highlight": [
-          13
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -555,15 +525,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "c2.increment()"
       },
       {
-        "line": 6,
         "title": "c2.count 증가",
         "explanation": "**`self.count += 1`**\n\n`self` (c2 객체, 0x3000)의 `count`를 1 증가시킵니다.\n\n**실행 흐름**:\n1. `self.count` 읽기 → c2.count → 0\n2. `0 + 1` 계산 → 1\n3. `self.count = 1` 할당 → c2.count = 1\n\n**핵심 개념 - 인스턴스 변수의 독립성**:\n- c1.count = 2 (c1 객체, 0x2000)\n- c2.count = 1 (c2 객체, 0x3000)\n- **같은 코드, 다른 self, 다른 결과!**\n\n**왜 이 순서인가?** 메서드 호출(line 13)에서 점프해왔습니다.\n\n**실행 순서**: self.count += 1 → c2.count가 0→1 → increment 종료 → line 13로 돌아감 → line 15",
-        "highlight": [
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -616,15 +583,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "self.count += 1"
       },
       {
-        "line": 15,
         "title": "c1의 최종값 출력",
         "explanation": "**`print(f\"c1: {c1.count}\")`**\n\nc1 객체의 count 속성에 접근하여 출력합니다.\n\n**실행 흐름**:\n1. `c1.count` 읽기 → 2 (두 번 증가했음)\n2. f-string 평가 → \"c1: 2\"\n3. print 실행 → \"c1: 2\" 출력\n\n**왜 2인가?** c1.increment()를 **두 번** 호출했기 때문입니다 (line 11, line 12).\n\n**왜 이 순서인가?** 모든 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: c1.count 읽기 (2) → f-string 평가 → print 실행 → line 16",
-        "highlight": [
-          15
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -667,15 +631,12 @@
               "pyId": "1004"
             }
           ]
-        }
+        },
+        "code": "print(f\"c1: {c1.count}\")  # 2"
       },
       {
-        "line": 16,
         "title": "c2의 최종값 출력",
         "explanation": "**`print(f\"c2: {c2.count}\")`**\n\nc2 객체의 count 속성에 접근하여 출력합니다.\n\n**실행 흐름**:\n1. `c2.count` 읽기 → 1 (한 번 증가했음)\n2. f-string 평가 → \"c2: 1\"\n3. print 실행 → \"c2: 1\" 출력\n\n**왜 1인가?** c2.increment()를 **한 번만** 호출했기 때문입니다 (line 13).\n\n**핵심 정리 - 인스턴스 변수의 독립성**:\n- 같은 클래스 (Counter)\n- 같은 메서드 (increment)\n- 하지만 **각 객체는 독립적인 count를 소유**\n- c1과 c2는 **서로 영향 없음**!\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: c2.count 읽기 (1) → f-string 평가 → print 실행 → 프로그램 종료",
-        "highlight": [
-          16
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -719,7 +680,8 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "print(f\"c2: {c2.count}\")  # 1"
       }
     ]
   },

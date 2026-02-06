@@ -6,12 +6,8 @@
     "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n    \n    def speak(self):\n        print(\"...\")\n\nclass Dog(Animal):\n    def __init__(self, name, breed):\n        super().__init__(name)  # 부모 초기화!\n        self.breed = breed\n    \n    def speak(self):\n        print(f\"{self.name}: 멍멍!\")\n\ndog = Dog(\"바둑이\", \"진돗개\")\ndog.speak()\nprint(dog.name, dog.breed)",
     "steps": [
       {
-        "line": 1,
         "title": "Animal 클래스 정의 (부모 클래스)",
         "explanation": "**`class Animal:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Animal` 클래스(부모 클래스)를 정의합니다.\n\n**부모 클래스의 역할**: 다른 클래스들이 상속받을 수 있는 **기본 설계도**입니다.\n\n**왜 이 순서인가?** 부모 클래스를 먼저 정의해야 나중에 자식 클래스가 상속받을 수 있습니다.\n\n**실행 순서**: class Animal 실행 → Animal 클래스 등록 시작 → line 2",
-        "highlight": [
-          1
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -30,16 +26,12 @@
               "pyId": "1001"
             }
           ]
-        }
+        },
+        "code": "class Animal:"
       },
       {
-        "line": 2,
         "title": "Animal.__init__ 메서드 정의",
         "explanation": "**`def __init__(self, name):`**\n\nAnimal 클래스의 초기화 메서드를 정의합니다.\n\n**매개변수**:\n- `self`: 생성될 객체 자신\n- `name`: 동물의 이름\n\n**역할**: Animal 객체 생성 시 name 속성을 초기화합니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def __init__ 실행 → __init__ 함수 객체 0x1100 생성 → Animal.__init__에 등록 → line 5",
-        "highlight": [
-          2,
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -70,16 +62,16 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def __init__(self, name):",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 5,
         "title": "Animal.speak 메서드 정의",
         "explanation": "**`def speak(self):`**\n\nAnimal 클래스의 speak 메서드를 정의합니다.\n\n**기본 구현**: \"...\"을 출력합니다 (동물의 기본 소리).\n\n**나중에 오버라이딩 가능**: 자식 클래스에서 이 메서드를 **재정의**하여 다른 동작을 구현할 수 있습니다.\n\n**왜 이 순서인가?** __init__ 정의 후, 순서대로 다음 메서드를 정의합니다.\n\n**실행 순서**: def speak 실행 → speak 함수 객체 0x1200 생성 → Animal.speak에 등록 → Animal 클래스 정의 완료 → line 8",
-        "highlight": [
-          5,
-          6
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -120,15 +112,16 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def speak(self):",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 8,
         "title": "Dog 클래스 정의 (자식 클래스)",
         "explanation": "**`class Dog(Animal):`**\n\n**상속(Inheritance)**: Dog 클래스가 Animal 클래스를 **상속**받습니다!\n\n**`(Animal)`의 의미**:\n- Dog는 Animal의 **자식 클래스(Child Class)**\n- Animal은 Dog의 **부모 클래스(Parent Class)**\n- Dog는 Animal의 모든 속성과 메서드를 **자동으로 물려받음**\n\n**상속의 장점**:\n- 코드 재사용 (Animal의 코드를 다시 쓸 필요 없음)\n- 확장 가능 (Dog만의 고유 기능 추가 가능)\n- 다형성 (Animal 타입으로 Dog를 다룰 수 있음)\n\n**왜 이 순서인가?** Animal 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: class Dog(Animal) 실행 → Dog 클래스 등록 시작 (Animal 상속) → line 9",
-        "highlight": [
-          8
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -159,17 +152,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "class Dog(Animal):"
       },
       {
-        "line": 9,
         "title": "Dog.__init__ 메서드 정의",
         "explanation": "**`def __init__(self, name, breed):`**\n\nDog 클래스의 초기화 메서드를 정의합니다.\n\n**매개변수**:\n- `self`: 생성될 Dog 객체 자신\n- `name`: 상속받은 Animal의 속성 (부모가 필요로 함)\n- `breed`: Dog만의 고유 속성 (품종)\n\n**중요**: 자식 클래스에서 `__init__`을 정의하면, **부모의 __init__이 자동으로 호출되지 않습니다!**\n- 따라서 `super().__init__(name)`을 **명시적으로 호출**해야 합니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def __init__ 실행 → __init__ 함수 객체 0x2100 생성 → Dog.__init__에 등록 → line 13",
-        "highlight": [
-          9,
-          10,
-          11
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -210,16 +198,17 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def __init__(self, name, breed):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 13,
         "title": "Dog.speak 메서드 정의 (오버라이딩)",
         "explanation": "**`def speak(self):`**\n\n**메서드 오버라이딩(Method Overriding)**: 부모 Animal의 speak 메서드를 **재정의**합니다!\n\n**오버라이딩의 의미**:\n- Animal.speak: \"...\" 출력 (부모의 기본 구현)\n- Dog.speak: \"{name}: 멍멍!\" 출력 (자식의 새로운 구현)\n- dog.speak() 호출 시 → **Dog.speak가 실행됨** (부모 것은 무시)\n\n**MRO (Method Resolution Order)**:\n1. 메서드 찾기 시작\n2. 먼저 Dog 클래스에서 speak 검색 → **발견!** (0x2200)\n3. Animal에서는 검색하지 않음 (이미 찾았으므로)\n\n**왜 이 순서인가?** __init__ 정의 후, 순서대로 다음 메서드를 정의합니다.\n\n**실행 순서**: def speak 실행 → speak 함수 객체 0x2200 생성 → Dog.speak에 등록 → Dog 클래스 정의 완료 → line 16",
-        "highlight": [
-          13,
-          14
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -280,15 +269,17 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "def speak(self):",
+        "occurrence": 2,
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 16,
         "title": "Dog 객체 생성 (__init__ 자동 호출)",
         "explanation": "**`dog = Dog(\"바둑이\", \"진돗개\")`**\n\n**객체 생성과 동시에 Dog.__init__ 자동 호출!**\n\n**Python 내부 동작**:\n1. 새 객체 공간 할당 (0x3000)\n2. `Dog.__init__(dog, \"바둑이\", \"진돗개\")` **자동 호출** → line 10으로 점프\n3. 초기화 완료 후 객체 참조를 `dog`에 할당\n\n**중요**: Dog.__init__이 호출되며, **Animal.__init__은 자동으로 호출되지 않습니다!**\n- super()를 사용하여 명시적으로 호출해야 합니다.\n\n**왜 이 순서인가?** Dog 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog(\"바둑이\", \"진돗개\") 호출 → 객체 0x3000 생성 → Dog.__init__ 자동 호출 → line 10으로 점프",
-        "highlight": [
-          16
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -329,15 +320,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "dog = Dog(\"바둑이\", \"진돗개\")"
       },
       {
-        "line": 10,
         "title": "💡 super().__init__(name) 호출",
         "explanation": "**`super().__init__(name)`**\n\n**super() 함수**: 부모 클래스를 참조하는 특별한 함수입니다.\n\n**동작 원리**:\n1. `super()` → Animal 클래스를 반환\n2. `super().__init__(name)` → `Animal.__init__(self, name)` 호출\n3. 부모의 초기화 메서드로 **점프**\n\n**왜 필요한가?**\n- Dog.__init__만 실행되면 `self.name`이 설정되지 않음!\n- 부모 Animal.__init__을 호출해야 name 속성이 추가됨\n\n**매개변수**:\n- `self`는 자동 전달 (생략)\n- `name` = \"바둑이\" (명시적 전달)\n\n**왜 이 순서인가?** 객체 생성(line 16)에서 Dog.__init__이 자동 호출되어 점프해왔습니다.\n\n**실행 순서**: super().__init__(name) → Animal.__init__(dog, \"바둑이\") 호출 → line 3으로 점프",
-        "highlight": [
-          10
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -408,15 +396,12 @@
               "pyId": "1010"
             }
           ]
-        }
+        },
+        "code": "super().__init__(name)  # 부모 초기화!"
       },
       {
-        "line": 3,
         "title": "Animal.__init__ 실행 (부모 초기화)",
         "explanation": "**`self.name = name`**\n\n**부모 클래스의 초기화**: Animal.__init__ 메서드가 실행됩니다.\n\n**인스턴스 변수 생성**:\n- `self` (dog 객체, 0x3000)에 `name` 속성을 추가\n- `name` = \"바둑이\"\n\n**상속의 핵심**:\n- dog 객체는 Dog의 인스턴스이지만\n- Animal.__init__도 실행할 수 있음 (상속 덕분!)\n- 부모의 코드를 재사용!\n\n**왜 이 순서인가?** super().__init__(name) 호출(line 10)에서 점프해왔습니다.\n\n**실행 순서**: self.name = name → dog 객체에 name=\"바둑이\" 추가 → Animal.__init__ 종료 → line 10으로 돌아감 → line 11",
-        "highlight": [
-          3
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -479,15 +464,12 @@
               "pyId": "1009"
             }
           ]
-        }
+        },
+        "code": "self.name = name"
       },
       {
-        "line": 11,
         "title": "Dog 고유 속성 추가 (breed)",
         "explanation": "**`self.breed = breed`**\n\n**자식 클래스의 고유 속성**: Dog만의 속성 `breed`를 추가합니다.\n\n**상속 + 확장**:\n- `name` 속성: Animal에서 상속받아 초기화 (부모의 기능)\n- `breed` 속성: Dog에서 새로 추가 (자식의 확장)\n\n**초기화 완료**:\n- dog.name = \"바둑이\" (부모에서 설정)\n- dog.breed = \"진돗개\" (자식에서 설정)\n- 두 속성 모두 dog 객체(0x3000)에 저장됨\n\n**왜 이 순서인가?** 부모 초기화 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: self.breed = breed → dog 객체에 breed=\"진돗개\" 추가 → Dog.__init__ 종료 → line 16로 돌아감 → line 17",
-        "highlight": [
-          11
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -560,15 +542,12 @@
               "pyId": "1010"
             }
           ]
-        }
+        },
+        "code": "self.breed = breed"
       },
       {
-        "line": 17,
         "title": "dog.speak() 호출 (오버라이딩된 메서드)",
         "explanation": "**`dog.speak()`**\n\n**메서드 검색 (MRO - Method Resolution Order)**:\n1. dog.speak() 호출\n2. dog 객체(0x3000)에서 speak 찾기 → **없음!**\n3. **Dog 클래스에서 speak 찾기** → Dog.speak (0x2200) **발견!**\n4. Animal 클래스는 확인하지 않음 (이미 찾았으므로)\n\n**오버라이딩 효과**:\n- Animal.speak (0x1200): \"...\" 출력 (부모의 기본 구현)\n- Dog.speak (0x2200): \"{name}: 멍멍!\" 출력 (**자식의 재정의**)\n- dog.speak() → **Dog.speak 실행** (부모 것은 무시됨!)\n\n**self에 무엇이 들어가는가?**\n- `self` = `dog` (0x3000 객체)\n\n**왜 이 순서인가?** 객체 생성 및 초기화 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: dog.speak() 호출 → Dog.speak (0x2200) 실행 → line 14로 점프 → self=dog",
-        "highlight": [
-          17
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [],
@@ -631,15 +610,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "dog.speak()"
       },
       {
-        "line": 14,
         "title": "Dog.speak 메서드 실행",
         "explanation": "**`print(f\"{self.name}: 멍멍!\")`**\n\n**오버라이딩된 메서드 실행**: Dog.speak가 실행됩니다.\n\n**실행 흐름**:\n1. `self` → dog (0x3000)\n2. `self.name` → dog.name → \"바둑이\" (부모에서 설정한 속성!)\n3. f-string 평가 → \"바둑이: 멍멍!\"\n4. print 실행\n\n**상속의 장점**:\n- Dog.speak에서 `self.name`을 사용할 수 있음\n- name은 부모 Animal.__init__에서 설정했지만\n- 자식 Dog에서도 **자유롭게 접근 가능**!\n\n**왜 이 순서인가?** 메서드 호출(line 17)에서 점프해왔습니다.\n\n**실행 순서**: self.name 읽기 (\"바둑이\") → f-string 평가 → print 실행 → Dog.speak 종료 → line 17로 돌아감 → line 18",
-        "highlight": [
-          14
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -692,15 +668,12 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "print(f\"{self.name}: 멍멍!\")"
       },
       {
-        "line": 18,
         "title": "상속받은 속성과 고유 속성 확인",
         "explanation": "**`print(dog.name, dog.breed)`**\n\n두 속성에 접근하여 출력합니다.\n\n**속성 출처**:\n- `dog.name` = \"바둑이\" (Animal.__init__에서 설정 - **상속받은 속성**)\n- `dog.breed` = \"진돗개\" (Dog.__init__에서 설정 - **고유 속성**)\n\n**상속 정리**:\n```python\nclass Animal:              # 부모 클래스\n    def __init__(self, name):\n        self.name = name   # 부모 속성\n\nclass Dog(Animal):         # 자식 클래스\n    def __init__(self, name, breed):\n        super().__init__(name)  # 부모 초기화 (name 설정)\n        self.breed = breed      # 자식 속성 추가\n    \n    def speak(self):       # 메서드 오버라이딩\n        # 부모 Animal.speak를 덮어씀\n```\n\n**왜 이 순서인가?** 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: dog.name 읽기 (\"바둑이\") → dog.breed 읽기 (\"진돗개\") → print 실행 → 프로그램 종료",
-        "highlight": [
-          18
-        ],
         "visualizationType": "pythonMemory",
         "pythonMemoryState": {
           "output": [
@@ -744,7 +717,8 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "code": "print(dog.name, dog.breed)"
       }
     ]
   },

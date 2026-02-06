@@ -1,111 +1,109 @@
 {
-    "lessonId": "js-9-1",
-    "title": "Proxy & Reflect (메타프로그래밍)",
-    "concept": "Proxy는 대상 객체(Target) 앞에서 동작을 가로채고 재정의하는 '중개자(Interceptor)' 역할을 합니다.",
-    "content": {
-        "code": "const target = { \n  secret: 'shhh',\n  public: 'hello'\n};\n\nconst handler = {\n  // 1. 읽기(Get) 동작을 가로채는 Trap\n  get(obj, prop) {\n    if (prop === 'secret') {\n      return 'Access Denied!';\n    }\n    // 2. 나머지는 원본 객체에게 전달 (Forwarding)\n    return Reflect.get(obj, prop);\n  }\n};\n\n// 원본(Target)을 감싸는 Proxy 생성\nconst proxy = new Proxy(target, handler);\n\nconsole.log(proxy.public); // hello\nconsole.log(proxy.secret); // Access Denied!",
-        "steps": [
+  "lessonId": "js-9-1",
+  "title": "Proxy & Reflect (메타프로그래밍)",
+  "concept": "Proxy는 대상 객체(Target) 앞에서 동작을 가로채고 재정의하는 '중개자(Interceptor)' 역할을 합니다.",
+  "content": {
+    "code": "const target = { \n  secret: 'shhh',\n  public: 'hello'\n};\n\nconst handler = {\n  // 1. 읽기(Get) 동작을 가로채는 Trap\n  get(obj, prop) {\n    if (prop === 'secret') {\n      return 'Access Denied!';\n    }\n    // 2. 나머지는 원본 객체에게 전달 (Forwarding)\n    return Reflect.get(obj, prop);\n  }\n};\n\n// 원본(Target)을 감싸는 Proxy 생성\nconst proxy = new Proxy(target, handler);\n\nconsole.log(proxy.public); // hello\nconsole.log(proxy.secret); // Access Denied!",
+    "steps": [
+      {
+        "title": "Target(원본) 객체 생성",
+        "explanation": "대상이 되는 원본 객체 `target`입니다. Proxy가 감싸게 될 실제 데이터(Real Subject)입니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
             {
-                "line": 1,
-                "title": "Target(원본) 객체 생성",
-                "explanation": "대상이 되는 원본 객체 `target`입니다. Proxy가 감싸게 될 실제 데이터(Real Subject)입니다.",
-                "highlight": [
-                    1,
-                    2,
-                    3,
-                    4
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "heap": [
-                        {
-                            "address": "0xTarget",
-                            "content": "{ secret: '...', public: '...' }"
-                        }
-                    ]
-                }
-            },
-            {
-                "line": 6,
-                "title": "Handler 및 Trap 정의",
-                "explanation": "`handler` 객체는 Proxy의 행동 수칙을 정의합니다. 여기서 `get` 메서드는 **Trap(함정)**입니다.\n\n**Trap이란?**\n객체의 기본 동작(읽기, 쓰기, 호출 등)이 발생했을 때 이를 가로채서 대신 실행되는 메서드를 말합니다. 여기서는 '속성 읽기'를 가로챕니다.",
-                "highlight": [
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "note": "Handler prepared with 'get' trap"
-                }
-            },
-            {
-                "line": 18,
-                "title": "Proxy 인스턴스 생성",
-                "explanation": "`new Proxy(target, handler)`를 통해 원본을 감싸는 대리자(Proxy)를 생성했습니다.\n이제 모든 접근은 이 `proxy` 객체를 통해 이루어지며, 핸들러의 규칙을 따릅니다.",
-                "highlight": [
-                    18
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "stack": [
-                        {
-                            "name": "proxy",
-                            "value": "→ 0xProxy"
-                        }
-                    ],
-                    "heap": [
-                        {
-                            "address": "0xTarget",
-                            "content": "{ ... }"
-                        },
-                        {
-                            "address": "0xProxy",
-                            "content": "Proxy(Target, Handler)",
-                            "label": "Interceptor"
-                        }
-                    ]
-                }
-            },
-            {
-                "line": 20,
-                "title": "프록시를 통한 접근",
-                "explanation": "`proxy.public`과 `proxy.secret`에 접근합니다. `get` 트랩이 이를 가로챕니다.\n'public' 속성은 Reflect.get으로 원본에서 가져오고(hello), 'secret' 속성은 'Access Denied!'를 반환합니다.\n\n**Forwarding(전달)이란?**\n가로챈 작업을 `Reflect` API를 통해 다시 원본 객체로 넘겨주는 것을 말합니다.",
-                "highlight": [
-                    20, 21
-                ],
-                "visualizationType": "memory",
-                "memoryState": {
-                    "output": [
-                        "hello",
-                        "Access Denied!"
-                    ]
-                }
+              "address": "0xTarget",
+              "content": "{ secret: '...', public: '...' }"
             }
+          ]
+        },
+        "code": "const target = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
         ]
-    },
-    "quiz": {
-        "question": "Proxy의 Handler에서 정의할 수 있는 'Trap'에 해당하지 않는 것은?",
-        "options": [
-            "get (속성 읽기)",
-            "set (속성 쓰기)",
-            "construct (new 호출)",
-            "private (#) 필드 직접 접근"
-        ],
-        "correctIndex": 3,
-        "explanation": "Proxy는 객체의 공개적인 동작(Public Interception)만 가로챌 수 있습니다. 객체 내부 깊숙한 Private(#) 필드나 슬롯에는 직접 개입할 수 없습니다."
-    },
-    "misconceptions": [
-        {
-            "wrong": "Proxy는 원본 객체를 복사해서 사용한다",
-            "correct": "아닙니다. 원본 객체에 대한 '참조'를 가지고 중개할 뿐입니다.",
-            "why": "Proxy 자신은 데이터를 저장하지 않습니다. 모든 요청을 핸들러를 거쳐 원본(Target)에게 전달하거나 차단하는 껍데기(Wrapper)입니다."
-        }
+      },
+      {
+        "title": "Handler 및 Trap 정의",
+        "explanation": "`handler` 객체는 Proxy의 행동 수칙을 정의합니다. 여기서 `get` 메서드는 **Trap(함정)**입니다.\n\n**Trap이란?**\n객체의 기본 동작(읽기, 쓰기, 호출 등)이 발생했을 때 이를 가로채서 대신 실행되는 메서드를 말합니다. 여기서는 '속성 읽기'를 가로챕니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "Handler prepared with 'get' trap"
+        },
+        "code": "const handler = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "title": "Proxy 인스턴스 생성",
+        "explanation": "`new Proxy(target, handler)`를 통해 원본을 감싸는 대리자(Proxy)를 생성했습니다.\n이제 모든 접근은 이 `proxy` 객체를 통해 이루어지며, 핸들러의 규칙을 따릅니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "proxy",
+              "value": "→ 0xProxy"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xTarget",
+              "content": "{ ... }"
+            },
+            {
+              "address": "0xProxy",
+              "content": "Proxy(Target, Handler)",
+              "label": "Interceptor"
+            }
+          ]
+        },
+        "code": "const proxy = new Proxy(target, handler);"
+      },
+      {
+        "title": "프록시를 통한 접근",
+        "explanation": "`proxy.public`과 `proxy.secret`에 접근합니다. `get` 트랩이 이를 가로챕니다.\n'public' 속성은 Reflect.get으로 원본에서 가져오고(hello), 'secret' 속성은 'Access Denied!'를 반환합니다.\n\n**Forwarding(전달)이란?**\n가로챈 작업을 `Reflect` API를 통해 다시 원본 객체로 넘겨주는 것을 말합니다.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "hello",
+            "Access Denied!"
+          ]
+        },
+        "code": "console.log(proxy.public); // hello",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Proxy의 Handler에서 정의할 수 있는 'Trap'에 해당하지 않는 것은?",
+    "options": [
+      "get (속성 읽기)",
+      "set (속성 쓰기)",
+      "construct (new 호출)",
+      "private (#) 필드 직접 접근"
     ],
-    "keyTakeaway": "Vue 3의 반응성 시스템 등 최신 라이브러리의 마법은 Proxy를 통해 구현됩니다."
+    "correctIndex": 3,
+    "explanation": "Proxy는 객체의 공개적인 동작(Public Interception)만 가로챌 수 있습니다. 객체 내부 깊숙한 Private(#) 필드나 슬롯에는 직접 개입할 수 없습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Proxy는 원본 객체를 복사해서 사용한다",
+      "correct": "아닙니다. 원본 객체에 대한 '참조'를 가지고 중개할 뿐입니다.",
+      "why": "Proxy 자신은 데이터를 저장하지 않습니다. 모든 요청을 핸들러를 거쳐 원본(Target)에게 전달하거나 차단하는 껍데기(Wrapper)입니다."
+    }
+  ],
+  "keyTakeaway": "Vue 3의 반응성 시스템 등 최신 라이브러리의 마법은 Proxy를 통해 구현됩니다."
 }

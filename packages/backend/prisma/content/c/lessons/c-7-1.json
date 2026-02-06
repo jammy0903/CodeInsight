@@ -6,36 +6,26 @@
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p = &a;\n    int **pp = &p;\n\n    printf(\"a = %d\\n\", a);\n\n    **pp = 20;\n\n    printf(\"a = %d\\n\", a);\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
-        "highlight": [
-          3
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {"
       },
       {
-        "line": 4,
         "title": "1. 정수 변수 선언",
         "explanation": "**`int a = 10;`**\n\n정수 변수 `a`를 선언하고 값 `10`으로 초기화합니다. 스택 메모리에 `a`를 위한 공간이 할당됩니다 (예: 주소 `0x100`).",
-        "highlight": [
-          4
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -46,15 +36,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int a = 10;"
       },
       {
-        "line": 5,
         "title": "2. 싱글 포인터 선언",
         "explanation": "**`int *p = &a;`**\n\n`int`형 변수를 가리키는 포인터 `p`를 선언합니다. `&a`는 변수 `a`의 메모리 주소(`0x100`)를 의미하며, 이 주소값이 포인터 `p`에 저장됩니다. `p` 자체도 스택에 자신만의 주소(예: `0x108`)를 가집니다.",
-        "highlight": [
-          5
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -72,15 +59,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int *p = &a;"
       },
       {
-        "line": 6,
         "title": "3. 더블 포인터 선언",
         "explanation": "**`int **pp = &p;`**\n\n`int*`형 변수를 가리키는 이중 포인터 `pp`를 선언합니다. `&p`는 포인터 변수 `p`의 메모리 주소(`0x108`)이며, 이 주소값이 `pp`에 저장됩니다. `pp`는 '포인터의 주소를 담는 포인터'입니다.\n\n**비유**: `pp`는 '보물 지도(`p`)가 숨겨진 금고의 위치'를 가리키는 지도입니다. 지도를 두 번 따라가야 진짜 보물(`a`)을 찾을 수 있습니다.",
-        "highlight": [
-          6
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -105,15 +89,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int **pp = &p;"
       },
       {
-        "line": 8,
         "title": "초기값 출력",
         "explanation": "**`printf(\"a = %d\\n\", a);`**\n\n현재 변수 `a`의 값을 출력합니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -138,16 +119,13 @@
           }
         ],
         "stdout": "a = 10",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"a = %d\\n\", a);"
       },
       {
-        "line": 10,
         "title": "이중 역참조로 값 변경",
         "explanation": "**`**pp = 20;`**\n\n이중 역참조(`**`)를 통해 `a`의 값을 변경합니다.\n- `*pp`는 `p`의 값, 즉 `a`의 주소(`0x100`)입니다.\n- `**pp`는 `a`의 주소에 있는 값, 즉 `a` 자체입니다.\n따라서 `**pp = 20`은 `*p = 20`과 같고, 이는 곧 `a = 20`과 같은 효과입니다.",
         "keyInsight": "**pp → *p → a: 체인을 따라 원본 값 변경",
-        "highlight": [
-          10
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -173,15 +151,12 @@
           }
         ],
         "stdout": "a = 10",
-        "heap": []
+        "heap": [],
+        "code": "**pp = 20;"
       },
       {
-        "line": 12,
         "title": "변경된 값 확인",
         "explanation": "**`printf(\"a = %d\\n\", a);`**\n\n이중 포인터를 통해 값이 변경된 `a`를 출력하여 확인합니다.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -206,19 +181,18 @@
           }
         ],
         "stdout": "a = 10\na = 20",
-        "heap": []
+        "heap": [],
+        "code": "printf(\"a = %d\\n\", a);",
+        "occurrence": 2
       },
       {
-        "line": 13,
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
-        "highlight": [
-          13
-        ],
         "visualizationType": "cMemory",
         "stdout": "a = 10\na = 20",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "return 0;"
       }
     ]
   },

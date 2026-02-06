@@ -6,32 +6,26 @@
     "code": "public class Counter {\n    int count = 0;\n    public void increment() {\n        count = count + 1;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Counter c = new Counter();\n        // 두 쓰레드가 동시에 c.increment()를 호출한다면?\n        // 예상치 못한 결과가 발생합니다.\n    }\n}",
     "steps": [
       {
-        "line": 8,
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다. 공유될 카운터 객체를 생성합니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "stack": [
             {
               "name": "main",
-              "frame": "main"
+              "frame": "main",
+              "value": "main"
             }
           ],
           "note": "Main 시작",
           "heap": [],
           "output": []
-        }
+        },
+        "code": "public class Main {"
       },
       {
-        "line": 4,
         "title": "count + 1의 정체",
         "explanation": "**`count = count + 1;`**\n\nCPU는 이 한 줄을 3단계로 나눠서 처리합니다:\n1. 읽기 (Read): 현재 값 가져오기\n2. 수정 (Modify): 1 더하기\n3. 쓰기 (Write): 결과 저장하기\n\n이 틈새가 바로 사고가 발생하는 지점입니다.",
-        "highlight": [
-          4
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "cpu": [
@@ -51,16 +45,13 @@
           "stack": [],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "count = count + 1;"
       },
       {
-        "line": 5,
         "title": "사고 발생 시나리오",
         "explanation": "**일꾼 A**가 1번(읽기)을 하고 있는 도중, 갑자기 **일꾼 B**가 끼어들어 똑같이 1번(읽기)을 했다고 생각해봅시다.\n\n둘 다 '지금은 0이구나!'라고 생각하고 똑같이 1을 더해서 저장합니다.\n결과는 원래 2가 되어야 하지만, 실제로는 1이 되어버립니다. 데이터가 증발한 것이죠!",
         "keyInsight": "동시에 같은 데이터에 접근하면 업데이트가 누락됨",
-        "highlight": [
-          5
-        ],
         "visualizationType": "memory",
         "memoryState": {
           "threadA": {
@@ -75,7 +66,8 @@
           "stack": [],
           "heap": [],
           "output": []
-        }
+        },
+        "code": "}"
       }
     ]
   },

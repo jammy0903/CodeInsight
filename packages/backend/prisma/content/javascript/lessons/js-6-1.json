@@ -6,14 +6,8 @@
     "code": "const animal = {\n  eat() { return 'eating'; }\n};\n\nconst dog = {\n  bark() { return 'woof!'; }\n};\n\nObject.setPrototypeOf(dog, animal);\n\nconsole.log(dog.bark());\nconsole.log(dog.eat());\nconsole.log(dog.toString());",
     "steps": [
       {
-        "line": 1,
         "title": "animal 객체 (공유 메서드)",
         "explanation": "animal 객체를 만듭니다. 여기에 있는 `eat` 메서드는 나중에 `rabbit`이 빌려 쓸 것입니다.\n각 객체가 메서드를 복사해 갖는 게 아니라, 하나를 **공유(Share)**해서 메모리를 아낍니다.",
-        "highlight": [
-          1,
-          2,
-          3
-        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
@@ -25,17 +19,17 @@
               "proto": "Object.prototype"
             }
           ]
-        }
+        },
+        "code": "const animal = {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 5,
         "title": "dog 객체 생성",
         "explanation": "bark 메서드를 가진 dog 객체를 생성합니다. 아직 animal과 연결되지 않았습니다.",
-        "highlight": [
-          5,
-          6,
-          7
-        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
@@ -54,16 +48,18 @@
               "proto": "Object.prototype"
             }
           ]
-        }
+        },
+        "code": "const dog = {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "line": 9,
         "title": "프로토타입 연결",
         "explanation": "dog의 [[Prototype]]을 animal로 설정합니다. 이제 dog → animal → Object.prototype 체인이 형성됩니다.",
         "keyInsight": "[[Prototype]] = 객체 간 상속 링크",
-        "highlight": [
-          9
-        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
@@ -95,15 +91,12 @@
             "Object.prototype",
             "null"
           ]
-        }
+        },
+        "code": "Object.setPrototypeOf(dog, animal);"
       },
       {
-        "line": 11,
         "title": "자신의 메서드 호출",
         "explanation": "dog.bark()는 dog 자신에게 있으므로 바로 찾습니다.",
-        "highlight": [
-          11
-        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "lookup": {
@@ -114,16 +107,13 @@
           "output": [
             "woof!"
           ]
-        }
+        },
+        "code": "console.log(dog.bark());"
       },
       {
-        "line": 12,
         "title": "프로토타입 체인 탐색",
         "explanation": "dog.eat()는 dog에 없어서 animal에서 찾습니다.",
         "keyInsight": "속성이 없으면 [[Prototype]] 체인을 따라 올라감",
-        "highlight": [
-          12
-        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "lookup": {
@@ -135,16 +125,13 @@
             "woof!",
             "eating"
           ]
-        }
+        },
+        "code": "console.log(dog.eat());"
       },
       {
-        "line": 13,
         "title": "Object.prototype까지 탐색",
         "explanation": "toString()은 dog, animal에 없어서 Object.prototype에서 찾습니다.",
         "keyInsight": "모든 객체는 Object.prototype을 상속",
-        "highlight": [
-          13
-        ],
         "visualizationType": "prototype",
         "prototypeState": {
           "lookup": {
@@ -157,7 +144,8 @@
             "eating",
             "[object Object]"
           ]
-        }
+        },
+        "code": "console.log(dog.toString());"
       }
     ]
   },

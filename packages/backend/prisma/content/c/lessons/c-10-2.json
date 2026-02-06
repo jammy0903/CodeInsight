@@ -6,25 +6,17 @@
     "code": "#include <stdio.h>\n\nint main() {\n    FILE *fp;\n\n    fp = fopen(\"data.txt\", \"w\");\n    if (fp) {\n        fprintf(fp, \"Hello File!\");\n        fclose(fp);\n    }\n\n    fp = fopen(\"data.txt\", \"a\");\n    if (fp) {\n        fprintf(fp, \" Append me.\");\n        fclose(fp);\n    }\n\n    fp = fopen(\"data.txt\", \"r\");\n    char buffer[50];\n    if (fp) {\n        fgets(buffer, 50, fp);\n        printf(\"Read: %s\\n\", buffer);\n        fclose(fp);\n    }\n\n    return 0;\n}",
     "steps": [
       {
-        "line": 1,
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n파일 입출력에 필요한 모든 함수(`fopen`, `fclose`, `fprintf`, `fgets`)와 `FILE` 타입이 정의된 헤더입니다.",
-        "highlight": [
-          1
-        ],
         "visualizationType": "cMemory",
         "stack": [],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "#include <stdio.h>"
       },
       {
-        "line": 3,
         "title": "main 함수와 FILE 포인터",
         "explanation": "**`int main() { ... }`**\n\n`FILE *fp;`는 파일에 대한 정보를 담는 `FILE` 구조체를 가리킬 포인터 변수입니다. 파일과 소통하기 위한 일종의 '리모컨' 역할을 합니다.",
-        "highlight": [
-          3,
-          4
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -34,15 +26,16 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "int main() {",
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "line": 6,
         "title": "1. 쓰기 모드(\"w\")로 파일 열기",
         "explanation": "**`fp = fopen(\"data.txt\", \"w\");`**\n\n`fopen`을 쓰기 모드(`\"w\"`)로 호출합니다. \n- `data.txt` 파일이 없으면 새로 생성합니다.\n- `data.txt` 파일이 이미 있으면, **내용을 모두 지우고** 엽니다. (매우 중요!)",
-        "highlight": [
-          6
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -52,15 +45,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "fp = fopen(\"data.txt\", \"w\");"
       },
       {
-        "line": 8,
         "title": "파일에 쓰기",
         "explanation": "**`fprintf(fp, \"Hello File!\");`**\n\n`fprintf`를 사용하여 `fp`가 가리키는 파일에 문자열을 씁니다.",
-        "highlight": [
-          8
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -70,15 +60,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "fprintf(fp, \"Hello File!\");"
       },
       {
-        "line": 9,
         "title": "파일 닫기",
         "explanation": "**`fclose(fp);`**\n\n파일 작업을 마친 후 반드시 `fclose`를 호출하여 변경사항을 디스크에 완전히 저장하고, 파일 핸들 리소스를 운영체제에 반납해야 합니다.",
-        "highlight": [
-          9
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -88,15 +75,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "fclose(fp);"
       },
       {
-        "line": 12,
         "title": "2. 추가 모드(\"a\")로 파일 열기",
         "explanation": "**`fp = fopen(\"data.txt\", \"a\");`**\n\n이번에는 추가 모드(`\"a\"`)로 같은 파일을 엽니다. 이 모드는 기존 파일 내용을 그대로 두고, 파일의 **맨 끝**에서부터 쓰기를 시작합니다.",
-        "highlight": [
-          12
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -106,15 +90,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "fp = fopen(\"data.txt\", \"a\");"
       },
       {
-        "line": 14,
         "title": "파일에 내용 추가",
         "explanation": "**`fprintf(fp, \" Append me.\");`**\n\n새로운 문자열이 기존 내용 뒤에 추가됩니다.",
-        "highlight": [
-          14
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -124,15 +105,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "fprintf(fp, \" Append me.\");"
       },
       {
-        "line": 15,
         "title": "파일 닫기",
         "explanation": "**`fclose(fp);`**\n\n추가된 내용을 디스크에 저장하고 파일을 닫습니다.",
-        "highlight": [
-          15
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -142,15 +120,13 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "fclose(fp);",
+        "occurrence": 2
       },
       {
-        "line": 18,
         "title": "3. 읽기 모드(\"r\")로 파일 열기",
         "explanation": "**`fp = fopen(\"data.txt\", \"r\");`**\n\n읽기 모드(`\"r\"`)로 파일을 엽니다. 이 모드에서는 파일에 쓰는 것이 불가능합니다.",
-        "highlight": [
-          18
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -160,16 +136,12 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "fp = fopen(\"data.txt\", \"r\");"
       },
       {
-        "line": 19,
         "title": "버퍼 준비 및 파일 읽기",
         "explanation": "**`char buffer[50]; fgets(buffer, 50, fp);`**\n\n파일 내용을 담을 `buffer` 배열을 선언하고, `fgets` 함수를 사용해 파일에서 한 줄(최대 49자)을 읽어와 `buffer`에 저장합니다.",
-        "highlight": [
-          19,
-          21
-        ],
         "visualizationType": "cMemory",
         "stack": [
           {
@@ -184,15 +156,16 @@
           }
         ],
         "heap": [],
-        "stdout": ""
+        "stdout": "",
+        "code": "char buffer[50];",
+        "highlightOffset": [
+          0,
+          2
+        ]
       },
       {
-        "line": 22,
         "title": "읽은 내용 출력",
         "explanation": "**`printf(\"Read: %s\\n\", buffer);`**\n\n파일에서 성공적으로 읽어온 내용을 화면에 출력하여 확인합니다.",
-        "highlight": [
-          22
-        ],
         "visualizationType": "cMemory",
         "stdout": "Read: Hello File! Append me.",
         "stack": [
@@ -207,20 +180,22 @@
             "value": "\"Hello File! Append me.\""
           }
         ],
-        "heap": []
+        "heap": [],
+        "code": "printf(\"Read: %s\\n\", buffer);"
       },
       {
-        "line": 23,
         "title": "마지막 파일 닫기 및 종료",
         "explanation": "**`fclose(fp); return 0;`**\n\n모든 파일 작업을 마치고 프로그램을 성공적으로 종료합니다.",
-        "highlight": [
-          23,
-          26
-        ],
         "visualizationType": "cMemory",
         "stdout": "Read: Hello File! Append me.",
         "stack": [],
-        "heap": []
+        "heap": [],
+        "code": "fclose(fp);",
+        "occurrence": 3,
+        "highlightOffset": [
+          0,
+          3
+        ]
       }
     ]
   },
