@@ -6,6 +6,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { ProviderType } from './providers/types';
+import { env } from '../../config/env';
 
 interface AISettings {
   currentProvider: ProviderType;
@@ -14,7 +15,7 @@ interface AISettings {
 
 const SETTINGS_FILE = join(__dirname, '../../../data/ai-settings.json');
 const DEFAULT_SETTINGS: AISettings = {
-  currentProvider: 'ollama', // 기본값: 로컬 Ollama
+  currentProvider: env.AI_DEFAULT_PROVIDER,
   updatedAt: new Date().toISOString(),
 };
 

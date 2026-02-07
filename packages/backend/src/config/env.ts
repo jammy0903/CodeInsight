@@ -46,6 +46,9 @@ const envSchema = z.object({
   OLLAMA_URL: z.string().default('http://localhost:5044'),
   OLLAMA_MODEL: z.string().default('qwen2.5-coder:7b'),
 
+  // === AI Provider Default ===
+  AI_DEFAULT_PROVIDER: z.enum(['deepseek', 'ollama']).default('ollama'),
+
   // === Firebase Admin ===
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().optional(),

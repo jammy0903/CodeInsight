@@ -534,7 +534,7 @@ const aiRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       const { line, code, topic } = parsed.data;
-      const provider = getCurrentProvider();
+      const provider = await getCurrentProvider();
 
       // 코드에서 해당 줄 추출
       const lines = code.split('\n');
@@ -584,7 +584,7 @@ const aiRoutes: FastifyPluginAsync = async (fastify) => {
         });
       }
 
-      const provider = getCurrentProvider();
+      const provider = await getCurrentProvider();
       const data = parsed.data;
       let userMessage = '';
       let systemPrompt = '';
@@ -779,7 +779,7 @@ ${objectsStr}
         }
 
         const { message, history, context, lessonId, contextType } = parsed.data;
-        const provider = getCurrentProvider();
+        const provider = await getCurrentProvider();
         const userId = request.user?.dbUser?.id;
 
         const response = await provider.chat({
@@ -857,7 +857,7 @@ ${objectsStr}
         }
 
         const { message, history, context, lessonId, contextType } = parsed.data;
-        const provider = getCurrentProvider();
+        const provider = await getCurrentProvider();
         const userId = request.user?.dbUser?.id;
 
         // 스트리밍 응답 수집 (ChatHistory 저장용)
@@ -976,7 +976,7 @@ ${objectsStr}
 
         const data = parsed.data;
         const userId = request.user?.dbUser?.id;
-        const provider = getCurrentProvider();
+        const provider = await getCurrentProvider();
 
         // 데이터를 자연어로 변환
         const studyHours = Math.floor(data.totalStudyTime / 3600);
@@ -1153,7 +1153,7 @@ ${enrichedContext ? '특히 저장한 노트, AI 질문, 최근 틀린 문제를
    *         description: 서비스 상태
    */
   fastify.get('/health', async (request, reply) => {
-    const provider = getCurrentProvider();
+    const provider = await getCurrentProvider();
     const available = await provider.isAvailable();
 
     return {
@@ -1225,7 +1225,7 @@ ${enrichedContext ? '특히 저장한 노트, AI 질문, 최근 틀린 문제를
       const { provider } = parsed.data;
       await setCurrentProvider(provider as ProviderType);
 
-      const currentProvider = getCurrentProvider();
+      const currentProvider = await getCurrentProvider();
       return {
         success: true,
         current: currentProvider.type,

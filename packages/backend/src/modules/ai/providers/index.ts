@@ -20,10 +20,25 @@ const providers: Record<ProviderType, IAIProvider> = {
 
 /**
  * 현재 활성화된 provider 가져오기
+ * 현재 provider가 불가능하면 사용 가능한 다른 provider로 자동 폴백
  */
-export function getCurrentProvider(): IAIProvider {
+export async function getCurrentProvider(): Promise<IAIProvider> {
   const settings = getSettings();
-  return providers[settings.currentProvider];
+  const current = providers[settings.currentProvider];
+
+  if (await current.isAvailable()) {
+    return current;
+  }
+
+  // 폴백: 다른 사용 가능한 provider 탐색
+  for (const [type, provider] of Object.entries(providers)) {
+    if (type !== settings.currentProvider && await provider.isAvailable()) {
+      return provider;
+    }
+  }
+
+  // 모든 provider 불가 시 설정된 provider 반환 (에러는 호출 시 발생)
+  return current;
 }
 
 /**
