@@ -40,6 +40,24 @@ import { setAuthToken } from './api/tokenManager';
 const app = initializeApp(config.firebase);
 export const auth = getAuth(app);
 
+// 세션 관리: 2시간 미활동 시 자동 로그아웃
+const SESSION_KEY = 'codeinsight_session_active';
+const SESSION_MAX_AGE_MS = 2 * 60 * 60 * 1000; // 2시간
+
+function isSessionExpired(): boolean {
+  const lastActive = localStorage.getItem(SESSION_KEY);
+  if (!lastActive) return false; // 세션 기록 없으면 만료 아님 (새 로그인)
+  return Date.now() - Number(lastActive) > SESSION_MAX_AGE_MS;
+}
+
+function updateSessionActivity(): void {
+  localStorage.setItem(SESSION_KEY, String(Date.now()));
+}
+
+function clearSession(): void {
+  localStorage.removeItem(SESSION_KEY);
+}
+
 // 브라우저 닫으면 자동 로그아웃 (sessionStorage 사용)
 setPersistence(auth, browserSessionPersistence).catch((error) => {
   console.error('Failed to set auth persistence:', error);
@@ -67,9 +85,18 @@ export function initializeAuthListener(): () => void {
       setAuthLoading,
     } = useStore.getState();
 
+    // 세션 만료 체크: 웹에서만 2시간 초과 시 강제 로그아웃 (앱은 영구 유지)
+    if (firebaseUser && !Capacitor.isNativePlatform() && isSessionExpired()) {
+      logger.info('Session expired (2h), forcing logout');
+      clearSession();
+      await signOut(auth);
+      return; // onAuthStateChanged가 다시 호출됨 (firebaseUser=null)
+    }
+
     setFirebaseUser(firebaseUser);
 
     if (firebaseUser) {
+      updateSessionActivity(); // 세션 활동 시간 갱신
       const token = await firebaseUser.getIdToken();
       setAuthToken(token); // PUSH TOKEN
 
@@ -136,6 +163,7 @@ export function initializeAuthListener(): () => void {
       }
     } else {
       // 로그아웃 상태
+      clearSession();
       setAuthToken(null); // CLEAR TOKEN
       setAppUser(null);
       setNeedsRegistration(false);
@@ -208,6 +236,7 @@ export async function loginWithKakao(): Promise<User> {
  * - Web: Firebase JS SDK만 로그아웃
  */
 export async function logout(): Promise<void> {
+  clearSession(); // 세션 타임스탬프 제거
   if (Capacitor.isNativePlatform()) {
     // 네이티브: Capacitor 플러그인 로그아웃
     await FirebaseAuthentication.signOut();
