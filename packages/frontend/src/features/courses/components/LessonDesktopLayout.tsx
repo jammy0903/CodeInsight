@@ -81,13 +81,13 @@ export function LessonDesktopLayout({
   }, [activeTab, currentStepIndex]);
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 items-start pb-16">
+    <div className="flex flex-col md:flex-row gap-4 items-start pb-12">
       {/* Left Panel: 코드(위) + 설명(아래) — 고정 높이, 각각 독립 스크롤 */}
       <div
         className="w-full md:w-1/2 flex flex-col rounded-xl overflow-hidden"
         style={{
           border: '1px solid var(--theme-lesson-panel-border)',
-          height: 'calc(100vh - 120px)',
+          height: 'calc(100vh - 80px)',
         }}
       >
         {/* === 상단: 코드 에디터 + 터미널 오버레이 === */}
@@ -196,7 +196,7 @@ export function LessonDesktopLayout({
         className="w-full md:w-1/2 flex flex-col rounded-xl md:sticky md:top-4 z-10 overflow-hidden"
         style={{
           border: '1px solid var(--theme-lesson-panel-border)',
-          height: 'calc(100vh - 120px)',
+          height: 'calc(100vh - 80px)',
         }}
       >
         <div
