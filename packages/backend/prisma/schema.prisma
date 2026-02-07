@@ -30,6 +30,8 @@ model User {
   streak                 UserStreak?
   // 독립 퀴즈 (퀴즈 페이지용)
   standaloneQuizAttempts StandaloneQuizAttempt[]
+  // 신고/문의
+  reports                Report[]
 
   @@map("users")
 }
@@ -154,6 +156,8 @@ model Lesson {
   chatHistories  ChatHistory[]
   notes          UserNote[]
   stepActivities StepActivity[]
+  // 신고/문의
+  reports        Report[]
 
   @@index([chapterId, order])
   @@map("lessons")
@@ -467,5 +471,30 @@ model StandaloneQuizAttempt {
   @@index([quizId]) // 퀴즈별 정답률 통계
   @@index([userId, quizId]) // 재시도 횟수 계산용
   @@map("standalone_quiz_attempts")
+}
+
+// ============================================
+// 신고/문의 시스템 (2026-02-07 추가)
+// ============================================
+
+model Report {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String   @db.VarChar(20) // "lesson" | "general"
+  category  String   @db.VarChar(200)
+  message   String?  @db.Text
+  lessonId  String?  @map("lesson_id") // Lesson FK (nullable)
+  language  String?  @db.VarChar(20) // "c","python","javascript","java" (lessonId에서 추출)
+  status    String   @default("open") @db.VarChar(20) // "open" | "resolved"
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([lessonId])
+  @@index([type, createdAt])
+  @@index([status])
+  @@map("reports")
 }
 

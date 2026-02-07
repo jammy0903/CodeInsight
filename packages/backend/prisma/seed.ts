@@ -140,6 +140,61 @@ function loadLessonContent(langId: string, lessonId: string): LessonContentData 
 }
 
 // =============================================
+// 유령 레슨 정리 (Soft-delete)
+// =============================================
+
+/**
+ * curriculum에 없는 유령 레슨을 비활성화 (isActive: false)
+ *
+ * WHY: seed가 UPSERT만 사용하기 때문에, curriculum에서 제거된 레슨이
+ * DB에 유령 데이터로 남아 사용자에게 노출됨.
+ * Hard delete 불가: LessonActivity, StepActivity, UserNote가 onDelete: Restrict
+ */
+async function deactivateStaleLessons(languageId: string, validLessonIds: string[]) {
+  // 해당 언어의 모든 챕터 ID 조회
+  const chapters = await prisma.chapter.findMany({
+    where: { languageId },
+    select: { id: true },
+  });
+  const chapterIds = chapters.map(c => c.id);
+
+  if (chapterIds.length === 0) return;
+
+  // 현재 active인데 curriculum에 없는 레슨 찾기
+  const staleLessons = await prisma.lesson.findMany({
+    where: {
+      chapterId: { in: chapterIds },
+      isActive: true,
+      id: { notIn: validLessonIds },
+    },
+    select: { id: true, title: true },
+  });
+
+  if (staleLessons.length > 0) {
+    await prisma.lesson.updateMany({
+      where: {
+        id: { in: staleLessons.map(l => l.id) },
+      },
+      data: { isActive: false },
+    });
+    console.log(`    🧹 Deactivated ${staleLessons.length} stale lesson(s): ${staleLessons.map(l => l.id).join(', ')}`);
+  }
+
+  // curriculum에 복귀한 레슨 재활성화
+  const reactivated = await prisma.lesson.updateMany({
+    where: {
+      id: { in: validLessonIds },
+      isActive: false,
+    },
+    data: { isActive: true },
+  });
+
+  if (reactivated.count > 0) {
+    console.log(`    ♻️  Reactivated ${reactivated.count} lesson(s)`);
+  }
+}
+
+// =============================================
 // Seed 함수
 // =============================================
 
@@ -203,6 +258,7 @@ async function seed() {
   if (cCurriculum) {
     let contentCount = 0;
     let quizCount = 0;
+    const cValidLessonIds: string[] = [];
 
     for (const chapterData of cCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
@@ -244,6 +300,7 @@ async function seed() {
           update: lessonPayload,
           create: { id: lessonData.id, ...lessonPayload },
         });
+        cValidLessonIds.push(lessonData.id);
 
         // 레슨 콘텐츠 upsert
         const content = loadLessonContent('c', lessonData.id);
@@ -285,6 +342,7 @@ async function seed() {
 
     console.log(`    📄 Loaded ${contentCount} lesson contents`);
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
+    await deactivateStaleLessons('c', cValidLessonIds);
   }
 
   // 4. JavaScript 커리큘럼 upsert
@@ -294,6 +352,7 @@ async function seed() {
   if (jsCurriculum) {
     let jsContentCount = 0;
     let jsQuizCount = 0;
+    const jsValidLessonIds: string[] = [];
 
     for (const chapterData of jsCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
@@ -333,6 +392,7 @@ async function seed() {
             update: lessonPayload,
             create: { id: lessonId, ...lessonPayload },
           });
+          jsValidLessonIds.push(lessonId);
 
           const contentPayload = {
             lessonId: lesson.id,
@@ -370,6 +430,7 @@ async function seed() {
 
     console.log(`    📄 Loaded ${jsContentCount} lesson contents`);
     console.log(`    ❓ Loaded ${jsQuizCount} quizzes`);
+    await deactivateStaleLessons('javascript', jsValidLessonIds);
   }
 
   // 5. Java 커리큘럼 upsert
@@ -379,6 +440,7 @@ async function seed() {
   if (javaCurriculum) {
     let javaContentCount = 0;
     let javaQuizCount = 0;
+    const javaValidLessonIds: string[] = [];
 
     for (const chapterData of javaCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
@@ -418,6 +480,7 @@ async function seed() {
             update: lessonPayload,
             create: { id: lessonId, ...lessonPayload },
           });
+          javaValidLessonIds.push(lessonId);
 
           const contentPayload = {
             lessonId: lesson.id,
@@ -455,6 +518,7 @@ async function seed() {
 
     console.log(`    📄 Loaded ${javaContentCount} lesson contents`);
     console.log(`    ❓ Loaded ${javaQuizCount} quizzes`);
+    await deactivateStaleLessons('java', javaValidLessonIds);
   }
 
   // 6. Python (기초) 커리큘럼 upsert
@@ -464,6 +528,7 @@ async function seed() {
   if (pythonCurriculum) {
     let pythonContentCount = 0;
     let pythonQuizCount = 0;
+    const pythonValidLessonIds: string[] = [];
 
     for (const chapterData of pythonCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
@@ -503,6 +568,7 @@ async function seed() {
             update: lessonPayload,
             create: { id: lessonId, ...lessonPayload },
           });
+          pythonValidLessonIds.push(lessonId);
 
           const contentPayload = {
             lessonId: lesson.id,
@@ -540,6 +606,7 @@ async function seed() {
 
     console.log(`    📄 Loaded ${pythonContentCount} lesson contents`);
     console.log(`    ❓ Loaded ${pythonQuizCount} quizzes`);
+    await deactivateStaleLessons('python', pythonValidLessonIds);
   }
 
   // 7. Python (업무 자동화) 커리큘럼 upsert
@@ -549,6 +616,7 @@ async function seed() {
   if (pythonPracticalCurriculum) {
     let contentCount = 0;
     let quizCount = 0;
+    const ppValidLessonIds: string[] = [];
 
     for (const chapterData of pythonPracticalCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
@@ -591,6 +659,7 @@ async function seed() {
             update: lessonPayload,
             create: { id: lessonData.id, ...lessonPayload },
           });
+          ppValidLessonIds.push(lessonData.id);
 
           const contentPayload = {
             lessonId: lesson.id,
@@ -628,13 +697,15 @@ async function seed() {
 
     console.log(`    📄 Loaded ${contentCount} lesson contents`);
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
+    await deactivateStaleLessons('python-practical', ppValidLessonIds);
   }
 
   // 8. 결과 확인
   const stats = {
     languages: await prisma.language.count(),
     chapters: await prisma.chapter.count(),
-    lessons: await prisma.lesson.count(),
+    activeLessons: await prisma.lesson.count({ where: { isActive: true } }),
+    inactiveLessons: await prisma.lesson.count({ where: { isActive: false } }),
     contents: await prisma.lessonContent.count(),
     quizzes: await prisma.quiz.count(),
   };
@@ -643,7 +714,7 @@ async function seed() {
   console.log('  📊 Stats:');
   console.log(`     - Languages: ${stats.languages}`);
   console.log(`     - Chapters: ${stats.chapters}`);
-  console.log(`     - Lessons: ${stats.lessons}`);
+  console.log(`     - Lessons: ${stats.activeLessons} active, ${stats.inactiveLessons} inactive`);
   console.log(`     - Contents: ${stats.contents}`);
   console.log(`     - Quizzes: ${stats.quizzes}`);
 }

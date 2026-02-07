@@ -175,8 +175,8 @@ export async function getLessons(chapterId: string) {
  * 레슨 상세 (콘텐츠 + 퀴즈 포함)
  */
 export async function getLessonFull(lessonId: string) {
-  const lesson = await prisma.lesson.findUnique({
-    where: { id: lessonId },
+  const lesson = await prisma.lesson.findFirst({
+    where: { id: lessonId, isActive: true },
     include: {
       content: true,
       quizzes: {

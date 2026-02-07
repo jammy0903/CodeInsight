@@ -114,34 +114,6 @@ app.register(submissionRoutes, { prefix: '/api/v1/submissions' });
 app.register(reportRoutes, { prefix: '/api/v1/reports' });
 
 // =============================================
-// Legacy Routes (버전 없는 요청 → v1로 리다이렉트)
-// =============================================
-const legacyRedirects: Record<string, string> = {
-  '/api/problems': '/api/v1/problems',
-  '/api/memory': '/api/v1/simulators/c/trace',
-  '/api/submissions': '/api/v1/submissions',
-  '/api/users': '/api/v1/users',
-  '/api/c': '/api/v1/simulators/c',
-  '/api/ai': '/api/v1/ai',
-  '/api/courses': '/api/v1/courses',
-  '/api/analytics': '/api/v1/analytics',
-  '/api/notes': '/api/v1/notes',
-  '/api/admin': '/api/v1/admin',
-  '/api/gamification': '/api/v1/gamification',
-  '/api/standalone-quizzes': '/api/v1/standalone-quizzes',
-};
-
-Object.entries(legacyRedirects).forEach(([oldPath, newPath]) => {
-  app.all(`${oldPath}/*`, async (request, reply) => {
-    const subPath = request.url.replace(oldPath, '');
-    return reply.redirect(`${newPath}${subPath}`);
-  });
-  app.all(oldPath, async (_request, reply) => {
-    return reply.redirect(newPath);
-  });
-});
-
-// =============================================
 // Error Handlers
 // =============================================
 

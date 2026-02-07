@@ -22,6 +22,8 @@ import {
   DollarSign,
   Zap,
   MessageSquare,
+  AlertTriangle,
+  CheckCircle,
 } from 'lucide-react';
 import { AIProviderToggle } from './components/AIProviderToggle';
 import { api } from '@/services/api/axios';
@@ -89,6 +91,27 @@ interface AIUsageStats {
   }>;
 }
 
+interface ReportStats {
+  summary: {
+    total: number;
+    todayCount: number;
+    openCount: number;
+    byType: Record<string, number>;
+    byLanguage: Record<string, number>;
+  };
+  recent: Array<{
+    id: string;
+    userNickname: string;
+    type: string;
+    category: string;
+    message: string | null;
+    lessonId: string | null;
+    language: string | null;
+    status: string;
+    createdAt: string;
+  }>;
+}
+
 export function AdminPage() {
   const appUser = useStore((s) => s.appUser);
   const authLoading = useStore((s) => s.authLoading);
@@ -98,6 +121,7 @@ export function AdminPage() {
   const [submissions, setSubmissions] = useState<SubmissionInfo[]>([]);
   const [system, setSystem] = useState<SystemStatus | null>(null);
   const [aiUsage, setAIUsage] = useState<AIUsageStats | null>(null);
+  const [reportStats, setReportStats] = useState<ReportStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [progressMode, setProgressMode] = useState<'all' | 'active'>('all');
@@ -133,12 +157,42 @@ export function AdminPage() {
       setSubmissions(submissionsRes.data);
       setSystem(systemRes.data);
       setAIUsage(aiUsageRes.data);
+
+      // 신고 통계는 별도 처리 (실패해도 기존 admin 페이지는 정상 표시)
+      try {
+        const reportStatsRes = await api.get('/admin/reports');
+        setReportStats(reportStatsRes.data);
+      } catch (reportErr) {
+        logger.error('Report stats fetch failed (non-critical):', reportErr);
+      }
     } catch (err) {
       logger.error('Admin data fetch error:', err);
       const error = handleError(err);
       setError(error.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleResolveReport(reportId: string) {
+    try {
+      await api.patch(`/admin/reports/${reportId}/resolve`);
+      // 해당 report의 status를 로컬에서 업데이트
+      setReportStats((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          summary: {
+            ...prev.summary,
+            openCount: Math.max(0, prev.summary.openCount - 1),
+          },
+          recent: prev.recent.map((r) =>
+            r.id === reportId ? { ...r, status: 'resolved' } : r
+          ),
+        };
+      });
+    } catch (err) {
+      logger.error('Failed to resolve report:', err);
     }
   }
 
@@ -373,6 +427,143 @@ export function AdminPage() {
               <p className="text-xs text-[var(--theme-dashboard-text-muted)] mt-3">
                 ⚠️ 참고: /explain-step (스트리밍)은 토큰 추적이 안 됨. 실제 비용은 더 높을 수 있음.
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Report Stats */}
+        {reportStats && (
+          <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
+            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4 flex items-center gap-3">
+              <AlertTriangle className="w-6 h-6 text-red-500" />
+              신고/문의 현황
+            </h2>
+
+            {/* 요약 카드 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <StatCard
+                icon={<AlertTriangle className="w-8 h-8" />}
+                label="전체 신고"
+                value={reportStats.summary.total}
+                color="bg-red-500"
+              />
+              <StatCard
+                icon={<Zap className="w-8 h-8" />}
+                label="오늘 신고"
+                value={reportStats.summary.todayCount}
+                color="bg-yellow-500"
+              />
+              <StatCard
+                icon={<Clock className="w-8 h-8" />}
+                label="미처리"
+                value={reportStats.summary.openCount}
+                color="bg-orange-500"
+              />
+            </div>
+
+            {/* 언어별 신고 바 */}
+            {Object.keys(reportStats.summary.byLanguage).length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-[var(--theme-dashboard-text-muted)] mb-3">
+                  언어별 신고 분포
+                </h3>
+                <div className="space-y-2">
+                  {Object.entries(reportStats.summary.byLanguage)
+                    .sort(([, a], [, b]) => b - a)
+                    .map(([lang, count]) => {
+                      const maxCount = Math.max(...Object.values(reportStats.summary.byLanguage));
+                      const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                      return (
+                        <div key={lang} className="flex items-center gap-3">
+                          <div className="w-20 text-sm font-bold text-[var(--theme-dashboard-title)] font-mono capitalize">
+                            {lang}
+                          </div>
+                          <div className="flex-1 bg-[var(--theme-dashboard-progress-bg)] border-2 border-[var(--theme-dashboard-card-border)] h-6 overflow-hidden">
+                            <motion.div
+                              className="h-full bg-red-400 flex items-center justify-end px-2"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${pct}%` }}
+                              transition={{ duration: 0.8, ease: 'easeOut' }}
+                            >
+                              {pct > 15 && (
+                                <span className="text-xs font-bold text-white font-mono">{count}</span>
+                              )}
+                            </motion.div>
+                          </div>
+                          {pct <= 15 && (
+                            <span className="text-xs font-bold text-[var(--theme-dashboard-title)] font-mono w-8">{count}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
+            {/* 최근 신고 테이블 */}
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--theme-dashboard-text-muted)] mb-3">
+                최근 신고 목록
+              </h3>
+              <div className="overflow-x-auto max-h-72 overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-[var(--theme-dashboard-card-bg)]">
+                    <tr className="border-b border-[var(--theme-dashboard-card-border)]">
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">닉네임</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">유형</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">카테고리</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">레슨</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">상태</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">시각</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">작업</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reportStats.recent.map((report) => (
+                      <tr key={report.id} className="border-b border-[var(--theme-dashboard-card-border)] hover:bg-[var(--theme-dashboard-section-header-bg)]">
+                        <td className="py-2 px-2">
+                          <div className="flex items-center gap-1">
+                            <PixelAvatar seed={report.userNickname} size={18} />
+                            <span>{report.userNickname}</span>
+                          </div>
+                        </td>
+                        <td className="py-2 px-2">
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                            report.type === 'lesson' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {report.type === 'lesson' ? '레슨' : '일반'}
+                          </span>
+                        </td>
+                        <td className="py-2 px-2 truncate max-w-[150px]">{report.category}</td>
+                        <td className="py-2 px-2 font-mono text-xs">{report.lessonId || '-'}</td>
+                        <td className="py-2 px-2">
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                            report.status === 'open'
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-green-100 text-green-700'
+                          }`}>
+                            {report.status === 'open' ? '미처리' : '해결'}
+                          </span>
+                        </td>
+                        <td className="py-2 px-2 text-[var(--theme-dashboard-text-muted)] whitespace-nowrap">
+                          {new Date(report.createdAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        </td>
+                        <td className="py-2 px-2">
+                          {report.status === 'open' && (
+                            <button
+                              onClick={() => handleResolveReport(report.id)}
+                              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded hover:bg-green-200 transition-colors"
+                            >
+                              <CheckCircle className="w-3 h-3" />
+                              해결
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

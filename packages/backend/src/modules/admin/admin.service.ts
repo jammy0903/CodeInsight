@@ -72,6 +72,27 @@ export interface AIUsageStats {
   }>;
 }
 
+export interface ReportStats {
+  summary: {
+    total: number;
+    todayCount: number;
+    openCount: number;
+    byType: Record<string, number>;
+    byLanguage: Record<string, number>;
+  };
+  recent: Array<{
+    id: string;
+    userNickname: string;
+    type: string;
+    category: string;
+    message: string | null;
+    lessonId: string | null;
+    language: string | null;
+    status: string;
+    createdAt: string;
+  }>;
+}
+
 export class AdminService {
   /**
    * 전체 통계 조회
@@ -373,5 +394,64 @@ export class AdminService {
       },
       timestamp: new Date().toISOString(),
     };
+  }
+
+  /**
+   * 신고 통계 + 최근 목록 조회
+   */
+  async getReportStats(): Promise<ReportStats> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 병렬로 집계 쿼리 실행
+    const [total, todayCount, openCount, byTypeRaw, byLanguageRaw, recent] = await Promise.all([
+      prisma.report.count(),
+      prisma.report.count({ where: { createdAt: { gte: today } } }),
+      prisma.report.count({ where: { status: 'open' } }),
+      prisma.report.groupBy({ by: ['type'], _count: { id: true } }),
+      prisma.report.groupBy({ by: ['language'], where: { language: { not: null } }, _count: { id: true } }),
+      prisma.report.findMany({
+        take: 30,
+        orderBy: { createdAt: 'desc' },
+        include: { user: { select: { nickname: true } } },
+      }),
+    ]);
+
+    const byType: Record<string, number> = {};
+    for (const row of byTypeRaw) {
+      byType[row.type] = row._count.id;
+    }
+
+    const byLanguage: Record<string, number> = {};
+    for (const row of byLanguageRaw) {
+      if (row.language) {
+        byLanguage[row.language] = row._count.id;
+      }
+    }
+
+    return {
+      summary: { total, todayCount, openCount, byType, byLanguage },
+      recent: recent.map((r) => ({
+        id: r.id,
+        userNickname: r.user.nickname,
+        type: r.type,
+        category: r.category,
+        message: r.message,
+        lessonId: r.lessonId,
+        language: r.language,
+        status: r.status,
+        createdAt: r.createdAt.toISOString(),
+      })),
+    };
+  }
+
+  /**
+   * 신고 상태 변경 (open → resolved)
+   */
+  async resolveReport(reportId: string): Promise<void> {
+    await prisma.report.update({
+      where: { id: reportId },
+      data: { status: 'resolved' },
+    });
   }
 }

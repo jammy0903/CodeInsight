@@ -91,4 +91,33 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(500).send({ error: 'Failed to fetch AI usage statistics' });
     }
   });
+
+  /**
+   * GET /api/admin/reports
+   * 신고 통계 + 최근 목록
+   */
+  fastify.get('/reports', async (_request, reply) => {
+    try {
+      const reportStats = await adminService.getReportStats();
+      return reportStats;
+    } catch (error) {
+      logger.error('Get report stats error:', error);
+      return reply.status(500).send({ error: 'Failed to fetch report statistics' });
+    }
+  });
+
+  /**
+   * PATCH /api/admin/reports/:id/resolve
+   * 신고 상태 변경 (open → resolved)
+   */
+  fastify.patch('/reports/:id/resolve', async (request, reply) => {
+    try {
+      const { id } = request.params as { id: string };
+      await adminService.resolveReport(id);
+      return { success: true };
+    } catch (error) {
+      logger.error('Resolve report error:', error);
+      return reply.status(500).send({ error: 'Failed to resolve report' });
+    }
+  });
 };

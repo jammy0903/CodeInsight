@@ -100,14 +100,19 @@ EXPOSE 3002
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3002/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# 시작 스크립트 생성 (migrate → seed → app 순서)
+# 시작 스크립트 생성 (migrate → 조건부 seed → app)
+# SEED_ON_DEPLOY=true 일 때만 seed 실행 (기본: 실행 안 함)
 RUN echo '#!/bin/sh\n\
 echo "🔄 Running Prisma migrate..."\n\
 npx prisma migrate deploy\n\
-echo "🌱 Running seed..."\n\
-npx prisma db seed || echo "⚠️ Seed failed (may already exist)"\n\
+if [ "$SEED_ON_DEPLOY" = "true" ]; then\n\
+  echo "🌱 SEED_ON_DEPLOY=true → Running seed..."\n\
+  npx prisma db seed || echo "⚠️ Seed failed"\n\
+else\n\
+  echo "⏭️  Skipping seed (SEED_ON_DEPLOY != true)"\n\
+fi\n\
 echo "🚀 Starting app..."\n\
 node dist/app.js' > /app/start.sh && chmod +x /app/start.sh
 
-# 실행 (migrate → seed → app)
+# 실행 (migrate → 조건부 seed → app)
 CMD ["/bin/sh", "/app/start.sh"]

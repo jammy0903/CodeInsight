@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { notify } from '@/components/common/Toast/notifications';
 import { sendReport } from '@/services/reports';
+import { useStore } from '@/stores/store';
 
 interface ReportModalProps {
   open: boolean;
@@ -26,6 +27,7 @@ interface ReportModalProps {
 
 export function ReportModal({ open, onOpenChange, type, lessonId }: ReportModalProps) {
   const { t } = useTranslation();
+  const appUser = useStore((s) => s.appUser);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -90,7 +92,16 @@ export function ReportModal({ open, onOpenChange, type, lessonId }: ReportModalP
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 mt-2">
+        {/* 비로그인 안내 */}
+        {!appUser && (
+          <div className="mt-4 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              {t('report.login_required', '로그인 후 신고/문의를 보낼 수 있습니다.')}
+            </p>
+          </div>
+        )}
+
+        {appUser && <div className="space-y-4 mt-2">
           {/* 카테고리 선택 */}
           <div className="space-y-2">
             <p className="text-sm font-medium">{t('report.category')}</p>
@@ -146,7 +157,7 @@ export function ReportModal({ open, onOpenChange, type, lessonId }: ReportModalP
               {sending ? t('report.sending') : t('report.send')}
             </button>
           </div>
-        </div>
+        </div>}
       </DialogContent>
     </Dialog>
   );
