@@ -150,12 +150,15 @@ export function useLessonSimulation({
   const memoizedCode = useMemo(() => lesson?.content?.code || '', [lesson?.content?.code]);
   const simulationCache = useRef<Record<string, LessonStep[]>>({});
   const lastSimulatedCodeRef = useRef<string>('');
+  const prevLessonIdRef = useRef(lessonId);
 
-  // 레슨 변경 시 상태 리셋
-  useEffect(() => {
+  // 레슨 변경 시 상태 리셋 — 렌더 중 동기 리셋 (useEffect 대신)
+  // useEffect는 paint 후 실행되어 이전 레슨 데이터가 한 프레임 보이는 문제 방지
+  if (prevLessonIdRef.current !== lessonId) {
+    prevLessonIdRef.current = lessonId;
     setLiveSteps(null);
     setSimulationError(null);
-  }, [lessonId]);
+  }
 
   // 시뮬레이션 실행
   useEffect(() => {
