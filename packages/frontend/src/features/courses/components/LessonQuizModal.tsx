@@ -18,6 +18,41 @@ import { useEnterKey } from '@/hooks';
 import { useFocusCycle } from '@/hooks/useFocusCycle';
 import type { Quiz } from '@/types';
 
+/**
+ * 퀴즈 질문에서 텍스트와 코드를 분리
+ * "질문?\ncode line 1\ncode line 2" → { text: "질문?", code: "code line 1\ncode line 2" }
+ */
+function splitQuestionAndCode(question: string): { text: string; code: string | null } {
+  const lines = question.split('\n');
+
+  // 마지막 '?' 포함 줄 찾기
+  let lastQuestionLineIdx = -1;
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].trimEnd().endsWith('?') || lines[i].trimEnd().endsWith('?)')) {
+      lastQuestionLineIdx = i;
+      break;
+    }
+  }
+
+  // '?'가 마지막 줄이거나 없으면 코드 없음
+  if (lastQuestionLineIdx === -1 || lastQuestionLineIdx === lines.length - 1) {
+    return { text: question, code: null };
+  }
+
+  const textPart = lines.slice(0, lastQuestionLineIdx + 1).join('\n');
+  // 코드 앞 빈줄 제거
+  const codeLines = lines.slice(lastQuestionLineIdx + 1);
+  while (codeLines.length > 0 && codeLines[0].trim() === '') {
+    codeLines.shift();
+  }
+
+  if (codeLines.length === 0) {
+    return { text: question, code: null };
+  }
+
+  return { text: textPart, code: codeLines.join('\n') };
+}
+
 interface LessonQuizModalProps {
   quiz: Quiz;
   open: boolean;
@@ -26,6 +61,27 @@ interface LessonQuizModalProps {
   /** Dialog 내부에서 ← 키로 이전 스텝 이동 */
   onPrevStep?: () => void;
   canGoPrev?: boolean;
+}
+
+function QuizQuestion({ question }: { question: string }) {
+  const { text, code } = splitQuestionAndCode(question);
+  return (
+    <div>
+      <p className="text-base font-medium">{text}</p>
+      {code && (
+        <pre
+          className="mt-3 px-4 py-3 rounded-lg text-sm font-mono leading-relaxed overflow-x-auto"
+          style={{
+            backgroundColor: 'var(--theme-lesson-editor-bg, #1e1e2e)',
+            color: 'var(--theme-lesson-editor-text, #cdd6f4)',
+            border: '1px solid var(--theme-lesson-panel-border, #313244)',
+          }}
+        >
+          {code}
+        </pre>
+      )}
+    </div>
+  );
 }
 
 function QuizCardAdapter({
@@ -74,11 +130,18 @@ function QuizCardAdapter({
     return () => clearTimeout(timer);
   }, []);
 
+  // 제출 후 포커스 복원 (버튼 교체로 포커스 유실 방지)
+  useEffect(() => {
+    if (submitted) {
+      requestAnimationFrame(() => {
+        quizContainerRef.current?.focus({ preventScroll: true });
+      });
+    }
+  }, [submitted]);
+
   return (
     <div className="space-y-4 outline-none" ref={quizContainerRef} tabIndex={-1}>
-      <pre className="text-lg font-medium whitespace-pre-wrap font-sans">
-        {quiz.question}
-      </pre>
+      <QuizQuestion question={quiz.question} />
       <div className="space-y-2">
         {options.map((option, idx) => (
           <button

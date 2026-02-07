@@ -36,9 +36,10 @@ export function LessonCompletedView({
 
   useEnterKey({
     onEnter: () => {
-      const focusedElement = document.activeElement as HTMLElement;
-      if (focusedElement && focusedElement.matches('button')) {
-        focusedElement.click();
+      if (hasNext) {
+        navigate(nextLessonPath!);
+      } else {
+        navigate(chapterPath);
       }
     },
     enabled: true,

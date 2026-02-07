@@ -371,8 +371,8 @@ class DebuggerAgent {
     if (typeof value === 'number') return String(value);
 
     if (typeof value === 'string') {
-      if (value.length > 10) {
-        return `"${value.substring(0, 10)}..."`;
+      if (value.length > 25) {
+        return `"${value.substring(0, 25)}..."`;
       }
       return `"${value}"`;
     }

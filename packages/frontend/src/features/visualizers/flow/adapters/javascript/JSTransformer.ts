@@ -103,6 +103,16 @@ export class JSTransformer implements IFlowTransformer {
       }
     }
 
+    // 0. 힙 타입 맵 구축 (참조 값의 실제 타입 조회용)
+    const heapTypeMap = new Map<string, string>();
+    const rawHeapData = step.memoryState?.heap || (step.heap as any);
+    if (rawHeapData && Array.isArray(rawHeapData)) {
+      rawHeapData.forEach((item: any) => {
+        const addr = item.address || item.id;
+        if (addr) heapTypeMap.set(addr, item.type || 'Object');
+      });
+    }
+
     // 1. Stack 변수 처리 (여러 프레임 지원)
     const stackData = step.memoryState?.stack || (step.stack as any);
     if (stackData && Array.isArray(stackData)) {
@@ -140,7 +150,14 @@ export class JSTransformer implements IFlowTransformer {
                 }
               } else {
                 value = parseValue(val);
-                type = this.inferType(val);
+                const strVal = String(val);
+                if (strVal.startsWith('@')) {
+                  // "@N" 형태의 힙 참조 — 실제 타입을 힙에서 조회
+                  pointsToAddr = strVal.trim();
+                  type = heapTypeMap.get(pointsToAddr) || 'Reference';
+                } else {
+                  type = this.inferType(val);
+                }
               }
 
               const variable: FlowVariable = {

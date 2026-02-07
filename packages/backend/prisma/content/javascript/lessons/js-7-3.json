@@ -15,13 +15,34 @@
           0,
           1,
           2
-        ]
+        ],
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          }
+        ],
+        "heap": []
       },
       {
         "title": "결과 배열 생성",
         "explanation": "`results` 배열을 생성합니다. 함수 호출 결과를 저장할 것입니다.",
         "visualizationType": "memory",
-        "code": "const results = [];"
+        "code": "const results = [];",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
       },
       {
         "title": "첫 번째 숫자 덧셈",
@@ -71,7 +92,25 @@
         "title": "최적화된 상태 저장",
         "explanation": "현재까지의 결과 [3, 7, 11]을 `optimized`에 복사합니다. 이 시점에서 함수는 최적화 상태입니다.",
         "visualizationType": "memory",
-        "code": "const optimized = results.slice();"
+        "code": "const optimized = results.slice();",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
       },
       {
         "title": "타입 변경 - Deoptimization!",
@@ -97,7 +136,30 @@
         "explanation": "최적화 해제 후의 결과를 `afterDeopt`에 저장합니다. 결과는 정확하지만 성능이 저하되었습니다.",
         "keyInsight": "기능적으로는 문제없지만, 같은 함수가 이제 더 느려졌습니다.",
         "visualizationType": "memory",
-        "code": "const afterDeopt = results.slice();"
+        "code": "const afterDeopt = results.slice();",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          },
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "afterDeopt",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
       },
       {
         "title": "결과 비교",
@@ -108,7 +170,21 @@
         "highlightOffset": [
           0,
           1
-        ]
+        ],
+        "stack": [
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "afterDeopt",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          }
+        ],
+        "heap": [],
+        "stdout": "[3, 7, 11, ...]\n[3, 7, 11, ..., NaN]"
       }
     ]
   },

@@ -12,6 +12,7 @@ import { FlowVisualizer } from './FlowVisualizer';
 import { PythonFlowView } from './components/PythonFlowView';
 import { JavaFlowView } from './components/JavaFlowView';
 import { JSFlowView } from './components/JSFlowView';
+import { EventLoopView } from './components/EventLoopView';
 import { ArrowLayer } from './components/ArrowLayer';
 import { getAdapter, createAdapter } from './adapters';
 import type { FlowTheme } from './styles';
@@ -187,6 +188,20 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
         <JavaFlowView
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
+        />
+      </div>
+    );
+  }
+
+  // JavaScript: eventLoopState가 있고 표준 필드(callStack/webApis/taskQueue)가 존재하면 EventLoop 전용 시각화
+  const els = (step as any).eventLoopState;
+  const hasStandardEventLoop = els && (els.callStack || els.webApis || els.taskQueue || els.microtaskQueue);
+  if ((language === 'javascript' || language === 'js') && hasStandardEventLoop) {
+    return (
+      <div className={className}>
+        <EventLoopView
+          eventLoopState={(step as any).eventLoopState}
+          prevEventLoopState={(prevStep as any)?.eventLoopState}
         />
       </div>
     );

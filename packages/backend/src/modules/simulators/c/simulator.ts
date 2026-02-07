@@ -300,7 +300,16 @@ ${func.returnType} ${func.name}(${paramsDesc})
     return {
       line: func.bodyStart,
       code: `${func.returnType} ${func.name}(${paramsDesc}) {`,
-      stack: [],
+      stack: [{
+        name: func.name,
+        address: this.frameManager.getRbp(),
+        type: 'frame',
+        size: 0,
+        bytes: [],
+        value: 'frame',
+        points_to: null,
+        explanation: `${func.name}() 스택 프레임`,
+      }],
       heap: [],
       explanation,
       rsp: this.frameManager.getRsp(),

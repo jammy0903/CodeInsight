@@ -49,13 +49,45 @@ function adaptMemoryState(memoryState: StepMemoryState): { stack: MemoryBlock[],
   return { stack: newStack, heap: newHeap, frames };
 }
 
-// Memoize helper function to avoid recreating it
-const getInitialState = () => ({
-  memoryState: INITIAL_MEMORY_STATE,
-  changedBlocks: INITIAL_CHANGED_BLOCKS,
-  visualizationType: 'memory',
-  visualizationState: null,
-});
+// 시각화 데이터 존재 여부 확인
+const VIZ_DATA_FIELDS = [
+  'stack', 'memoryState', 'scopeState', 'eventLoopState',
+  'promiseState', 'thisState', 'prototypeState', 'callStackState',
+  'pythonMemoryState', 'pyNames', 'javaMemoryState', 'memoryChanges',
+] as const;
+
+function hasVisualizationData(step: LessonStep): boolean {
+  return VIZ_DATA_FIELDS.some(field => (step as any)[field] != null);
+}
+
+// 이전 스텝에서 시각화 데이터 상속 (캐리포워드)
+function resolveStepWithInheritance(steps: LessonStep[], currentIndex: number): LessonStep {
+  const currentStep = steps[currentIndex];
+  if (!currentStep || hasVisualizationData(currentStep)) return currentStep;
+
+  const currentVizType = currentStep.visualizationType || 'memory';
+
+  // 같은 vizType을 가진 가장 가까운 이전 스텝에서 상속
+  for (let i = currentIndex - 1; i >= 0; i--) {
+    const prevStep = steps[i];
+    const prevVizType = prevStep.visualizationType || 'memory';
+    if (prevVizType === currentVizType && hasVisualizationData(prevStep)) {
+      const vizFields: Record<string, unknown> = {};
+      for (const field of VIZ_DATA_FIELDS) {
+        if ((prevStep as any)[field] != null) {
+          vizFields[field] = (prevStep as any)[field];
+        }
+      }
+      // heap도 함께 상속 (stack과 쌍)
+      if ((prevStep as any).heap != null) {
+        vizFields.heap = (prevStep as any).heap;
+      }
+      return { ...currentStep, ...vizFields };
+    }
+  }
+
+  return currentStep;
+}
 
 export function useLessonVisualization(
   steps: LessonStep[],
@@ -73,14 +105,16 @@ export function useLessonVisualization(
       };
     }
 
-    const vizType = currentStep.visualizationType || 'memory';
+    // 캐리포워드: 시각화 데이터 없으면 이전 스텝에서 상속
+    const resolvedStep = resolveStepWithInheritance(steps, currentStepIndex);
+    const vizType = resolvedStep.visualizationType || 'memory';
 
     if (vizType === 'javascript') {
       const stack: MemoryBlock[] = [];
       const frames: { name: string }[] = [];
 
-      if (currentStep.stack && Array.isArray(currentStep.stack)) {
-        currentStep.stack.forEach((frame: any) => {
+      if (resolvedStep.stack && Array.isArray(resolvedStep.stack)) {
+        resolvedStep.stack.forEach((frame: any) => {
           // 백엔드는 methodName을 사용함 (functionName이 아님!)
           const frameName = frame.methodName || frame.functionName || '__main__';
           frames.push({ name: frameName });
@@ -98,7 +132,7 @@ export function useLessonVisualization(
         });
       }
 
-      const heap: MemoryBlock[] = (currentStep.heap || []).map((item: any) => ({
+      const heap: MemoryBlock[] = (resolvedStep.heap || []).map((item: any) => ({
         name: item.id || '?',
         address: item.address || '',
         value: typeof item.value === 'object' ? JSON.stringify(item.value) : String(item.value ?? ''),
@@ -111,15 +145,15 @@ export function useLessonVisualization(
         memoryState,
         changedBlocks: INITIAL_CHANGED_BLOCKS,
         visualizationType: 'javascript',
-        visualizationState: (currentStep as any).visualizationState as JSVisualizationState,
+        visualizationState: (resolvedStep as any).visualizationState as JSVisualizationState,
       };
     }
 
     // Python (정적 JSON or 실시간 시뮬레이션)
-    if (vizType === 'python' || currentStep.pythonMemoryState || currentStep.pyNames) {
-      const pyState = currentStep.pythonMemoryState || {
-        names: currentStep.pyNames,
-        objects: currentStep.pyObjects
+    if (vizType === 'python' || resolvedStep.pythonMemoryState || resolvedStep.pyNames) {
+      const pyState = resolvedStep.pythonMemoryState || {
+        names: resolvedStep.pyNames,
+        objects: resolvedStep.pyObjects
       };
 
       // Memory 탭에서도 표시되도록 memoryState 구조 제공
@@ -148,14 +182,14 @@ export function useLessonVisualization(
     }
 
     // Java (정적 JSON or 실시간 시뮬레이션)
-    if (vizType === 'java' || vizType === 'javaMemory' || currentStep.javaMemoryState || currentStep.memoryState) {
-      const javaMemoryState = currentStep.javaMemoryState || currentStep.memoryState;
+    if (vizType === 'java' || vizType === 'javaMemory' || resolvedStep.javaMemoryState || resolvedStep.memoryState) {
+      const javaMemoryState = resolvedStep.javaMemoryState || resolvedStep.memoryState;
       const stack: MemoryBlock[] = [];
       const frames: { name: string }[] = [{ name: 'main' }];
 
       // Java 레슨 JSON 형태: stack: [{name, value, type?}]
       // Java 시뮬레이터 형태: stack: [{methodName, variables: {...}}]
-      const stackData = javaMemoryState?.stack || (currentStep.stack as any[]) || [];
+      const stackData = javaMemoryState?.stack || (resolvedStep.stack as any[]) || [];
 
       stackData.forEach((item: any) => {
         // 단순 형태: {name, value, type?} - 레슨 JSON
@@ -211,14 +245,14 @@ export function useLessonVisualization(
         }
       });
 
-      const heap: MemoryBlock[] = (javaMemoryState?.heap || currentStep.heap || []).map((item: any) => ({
+      const heap: MemoryBlock[] = (javaMemoryState?.heap || resolvedStep.heap || []).map((item: any) => ({
         name: item.id || item.name || item.address || '?',
         address: item.address || '',
         value: String(item.content ?? item.value ?? ''),
         type: item.type || 'Object',
       }));
 
-      const memoryState = (stack.length > 0 || heap.length > 0)
+      const memoryState = (stack.length > 0 || heap.length > 0 || frames.length > 0)
         ? { stack, heap, frames }
         : null;
 
@@ -230,9 +264,9 @@ export function useLessonVisualization(
       };
     }
 
-    if (currentStep.stack && currentStep.heap) {
-      const rawStack = currentStep.stack as any[];
-      const rawHeap = (currentStep.heap || []) as any[];
+    if (resolvedStep.stack && resolvedStep.heap) {
+      const rawStack = resolvedStep.stack as any[];
+      const rawHeap = (resolvedStep.heap || []) as any[];
 
       const { frames, variables } = extractCFrames(rawStack);
 
@@ -280,7 +314,7 @@ export function useLessonVisualization(
         return block;
       });
 
-      const memoryState = (stack.length > 0 || heap.length > 0)
+      const memoryState = (stack.length > 0 || heap.length > 0 || frames.length > 0)
         ? { stack, heap, frames }
         : null;
 
@@ -293,7 +327,7 @@ export function useLessonVisualization(
     }
 
     // 🚨 복구: memoryChanges가 있는 경우 (Diff 방식 지원)
-    if (currentStep.memoryChanges) {
+    if (resolvedStep.memoryChanges) {
       const { memoryState, changedBlocks } = processMemoryChanges(steps, currentStepIndex);
       const adaptedState = adaptMemoryState(memoryState);
       return {
@@ -304,11 +338,21 @@ export function useLessonVisualization(
       };
     }
 
+    // JS 레슨의 비-메모리 타입 (scope, eventLoop, promise 등) 패스스루
+    const resolvedVizState = (resolvedStep as any).scopeState
+      || (resolvedStep as any).eventLoopState
+      || (resolvedStep as any).promiseState
+      || (resolvedStep as any).thisState
+      || (resolvedStep as any).prototypeState
+      || (resolvedStep as any).callStackState
+      || (resolvedStep as any).memoryState
+      || null;
+
     return {
       memoryState: INITIAL_MEMORY_STATE,
       changedBlocks: INITIAL_CHANGED_BLOCKS,
-      visualizationType: 'memory',
-      visualizationState: null,
+      visualizationType: vizType,
+      visualizationState: resolvedVizState,
     };
   }, [steps, currentStepIndex, currentStep]);
 

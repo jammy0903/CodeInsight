@@ -167,7 +167,21 @@ export function useLessonSimulation({
       return;
     }
 
-    // 2. 지원되지 않는 언어이거나 코드가 없으면 JSON steps fallback
+    // 2. JSON 스텝에 시각화 데이터가 이미 있으면 시뮬레이션 스킵
+    //    (eventLoopState, scopeState 등 — 시뮬레이터보다 정확한 사전 제작 데이터)
+    if (lesson.content?.steps && lesson.content.steps.length > 0) {
+      const VIZ_FIELDS = ['stack', 'memoryState', 'scopeState', 'eventLoopState',
+        'promiseState', 'thisState', 'prototypeState', 'callStackState'];
+      const allStepsHaveViz = lesson.content.steps.every((s: any) =>
+        VIZ_FIELDS.some(f => s[f] != null)
+      );
+      if (allStepsHaveViz) {
+        setLiveSteps(lesson.content.steps);
+        return;
+      }
+    }
+
+    // 3. 지원되지 않는 언어이거나 코드가 없으면 JSON steps fallback
     if (!isLanguageSupported(lang) || !memoizedCode) {
       if (lesson.content?.steps) {
         setLiveSteps(lesson.content.steps);
