@@ -9,7 +9,7 @@ import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Flag } from 'lucide-react';
 import { updateProgress } from '@/services/courses';
 import { useStore } from '@/stores/store';
 
@@ -30,6 +30,7 @@ import { LessonCompletedView } from './components/LessonCompletedView';
 import { LessonQuizModal } from './components/LessonQuizModal';
 import { LessonBottomNav } from './components/LessonBottomNav';
 import { MobileAIChatFAB, MobileAIChatModal, MobileLessonView } from './components/mobile';
+import { ReportModal } from '@/components/ReportModal';
 
 // --- 간단한 상태 뷰 ---
 
@@ -70,6 +71,7 @@ export function LessonPage() {
   const appUser = useStore((s) => s.appUser);
   const refreshStreak = useStore((s) => s.refreshStreak);
   const isMobile = useIsMobile();
+  const [reportOpen, setReportOpen] = React.useState(false);
 
   // 1. 데이터 패칭
   const { lesson, isLoading, isError, error, nextLessonId, quiz } = useLessonData({
@@ -210,13 +212,35 @@ export function LessonPage() {
 
       {/* 하단 네비게이션 */}
       {navigation.phase !== 'completed' && (
-        <LessonBottomNav
-          onPrev={navigation.goToPrevStep}
-          onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
-          canGoPrev={navigation.canGoPrev}
-          nextLabel={navigation.isLastStep ? t('lesson.quiz') : t('common.next')}
-        />
+        <>
+          <LessonBottomNav
+            onPrev={navigation.goToPrevStep}
+            onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
+            canGoPrev={navigation.canGoPrev}
+            nextLabel={navigation.isLastStep ? t('lesson.quiz') : t('common.next')}
+          />
+          {/* 레슨 신고 버튼 */}
+          <button
+            onClick={() => setReportOpen(true)}
+            className="fixed bottom-3 right-4 z-50 p-2 rounded-full opacity-40 hover:opacity-100 transition-opacity"
+            style={{
+              backgroundColor: 'var(--theme-layout-footer-social-bg)',
+              color: 'var(--theme-layout-footer-text-muted)',
+            }}
+            title={t('report.lesson_title')}
+          >
+            <Flag className="w-4 h-4" />
+          </button>
+        </>
       )}
+
+      {/* 레슨 신고 모달 */}
+      <ReportModal
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        type="lesson"
+        lessonId={lessonId}
+      />
 
       {/* 퀴즈 모달 */}
       {quiz && (

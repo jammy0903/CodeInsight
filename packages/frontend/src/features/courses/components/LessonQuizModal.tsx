@@ -20,7 +20,12 @@ import type { Quiz } from '@/types';
 
 /**
  * 퀴즈 질문에서 텍스트와 코드를 분리
- * "질문?\ncode line 1\ncode line 2" → { text: "질문?", code: "code line 1\ncode line 2" }
+ *
+ * 패턴 1 (멀티라인): "질문?\ncode line 1\ncode line 2"
+ *   → { text: "질문?", code: "code line 1\ncode line 2" }
+ *
+ * 패턴 2 (인라인): 'if ("") { console.log("실행"); }의 결과는?'
+ *   → { text: "의 결과는?", code: 'if ("") { console.log("실행"); }' }
  */
 function splitQuestionAndCode(question: string): { text: string; code: string | null } {
   const lines = question.split('\n');
@@ -34,23 +39,27 @@ function splitQuestionAndCode(question: string): { text: string; code: string | 
     }
   }
 
-  // '?'가 마지막 줄이거나 없으면 코드 없음
-  if (lastQuestionLineIdx === -1 || lastQuestionLineIdx === lines.length - 1) {
-    return { text: question, code: null };
+  // 패턴 1: 코드가 '?' 줄 뒤에 오는 경우
+  if (lastQuestionLineIdx !== -1 && lastQuestionLineIdx < lines.length - 1) {
+    const textPart = lines.slice(0, lastQuestionLineIdx + 1).join('\n');
+    const codeLines = lines.slice(lastQuestionLineIdx + 1);
+    while (codeLines.length > 0 && codeLines[0].trim() === '') {
+      codeLines.shift();
+    }
+    if (codeLines.length > 0) {
+      return { text: textPart, code: codeLines.join('\n') };
+    }
   }
 
-  const textPart = lines.slice(0, lastQuestionLineIdx + 1).join('\n');
-  // 코드 앞 빈줄 제거
-  const codeLines = lines.slice(lastQuestionLineIdx + 1);
-  while (codeLines.length > 0 && codeLines[0].trim() === '') {
-    codeLines.shift();
+  // 패턴 2: 한 줄에서 코드가 앞에, 한국어 질문이 뒤에 오는 경우
+  // 예: 'if ("") { console.log("실행"); }의 결과는?'
+  // )};] 같은 코드 종료 문자 바로 뒤에 한국어가 시작되는 경계를 찾음
+  const inlineMatch = question.match(/^(.+[)}\];])\s*([\uAC00-\uD7AF].+)$/);
+  if (inlineMatch) {
+    return { code: inlineMatch[1], text: inlineMatch[2] };
   }
 
-  if (codeLines.length === 0) {
-    return { text: question, code: null };
-  }
-
-  return { text: textPart, code: codeLines.join('\n') };
+  return { text: question, code: null };
 }
 
 interface LessonQuizModalProps {
@@ -65,12 +74,12 @@ interface LessonQuizModalProps {
 
 function QuizQuestion({ question }: { question: string }) {
   const { text, code } = splitQuestionAndCode(question);
+  // 코드가 있으면: 코드 블록 먼저, 질문 텍스트 뒤에
   return (
     <div>
-      <p className="text-base font-medium">{text}</p>
       {code && (
         <pre
-          className="mt-3 px-4 py-3 rounded-lg text-sm font-mono leading-relaxed overflow-x-auto"
+          className="mb-3 px-4 py-3 rounded-lg text-sm font-mono leading-relaxed overflow-x-auto"
           style={{
             backgroundColor: 'var(--theme-lesson-editor-bg, #1e1e2e)',
             color: 'var(--theme-lesson-editor-text, #cdd6f4)',
@@ -80,6 +89,7 @@ function QuizQuestion({ question }: { question: string }) {
           {code}
         </pre>
       )}
+      <p className="text-base font-medium">{text}</p>
     </div>
   );
 }

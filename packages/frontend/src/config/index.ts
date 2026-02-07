@@ -33,6 +33,8 @@ export const config = {
       standaloneQuizzes: '/standalone-quizzes',
       standaloneQuizAttempt: '/standalone-quizzes/attempt',
       standaloneQuizWeakConcepts: '/standalone-quizzes/weak-concepts',
+      // Reports
+      reports: '/reports',
     },
     timeout: {
       run: env.VITE_C_RUN_TIMEOUT,

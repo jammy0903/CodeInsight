@@ -27,6 +27,7 @@ import { javaSimulatorRoutes } from './modules/simulators/java/routes';
 import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
 import { standaloneQuizzesRoutes } from './modules/standalone-quizzes/routes';
 import { submissionRoutes } from './modules/submissions/routes';
+import { reportRoutes } from './modules/reports/routes';
 
 // Firebase Admin 초기화
 try {
@@ -110,6 +111,7 @@ app.register(adminRoutes, { prefix: '/api/v1/admin' });
 app.register(userRoutes, { prefix: '/api/v1/users' });
 app.register(standaloneQuizzesRoutes, { prefix: '/api/v1/standalone-quizzes' });
 app.register(submissionRoutes, { prefix: '/api/v1/submissions' });
+app.register(reportRoutes, { prefix: '/api/v1/reports' });
 
 // =============================================
 // Legacy Routes (버전 없는 요청 → v1로 리다이렉트)

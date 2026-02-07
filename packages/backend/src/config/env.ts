@@ -50,6 +50,9 @@ const envSchema = z.object({
 
   // === Admin User ===
   ADMIN_FIREBASE_UID: z.string().optional(),
+
+  // === Brevo Email ===
+  BREVO_API_KEY: z.string().optional(),
 });
 
 // 환경변수 파싱 및 검증
