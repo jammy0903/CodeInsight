@@ -149,7 +149,7 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
     // 다음 아이템 처리
     const nextState = get();
     if (nextState.isProcessing && nextState.queue.length > 0) {
-      // 약간의 딜레이로 Ollama 과부하 방지
+      // 약간의 딜레이로 AI API 과부하 방지
       console.log('[ExplanationStore] Queue remaining:', nextState.queue.length);
       setTimeout(() => processQueue(queueId), 200);
     } else {

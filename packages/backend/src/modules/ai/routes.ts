@@ -54,7 +54,7 @@ const chatRequestSchema = z.object({
 });
 
 const switchProviderSchema = z.object({
-  provider: z.enum(['deepseek', 'ollama']),
+  provider: z.enum(['deepseek']),
 });
 
 // 리포트 분석 요청 스키마
@@ -1207,7 +1207,7 @@ ${enrichedContext ? '특히 저장한 노트, AI 질문, 최근 틀린 문제를
    *             properties:
    *               provider:
    *                 type: string
-   *                 enum: [deepseek, ollama]
+   *                 enum: [deepseek]
    *     responses:
    *       200:
    *         description: Provider 변경 성공

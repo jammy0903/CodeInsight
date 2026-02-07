@@ -1,6 +1,6 @@
 /**
  * AI Provider 토글 컴포넌트
- * DeepSeek ↔ Ollama ↔ Gemini 전환
+ * 현재 DeepSeek 전용
  */
 
 import { useState, useEffect } from 'react';
@@ -37,7 +37,7 @@ export function AIProviderToggle() {
   }
 
   // Provider 전환
-  async function handleSwitch(providerType: 'deepseek' | 'ollama' | 'gemini') {
+  async function handleSwitch(providerType: 'deepseek') {
     try {
       setSwitching(true);
       const result = await switchAIProvider(providerType);
@@ -61,8 +61,6 @@ export function AIProviderToggle() {
   function getProviderDisplayName(type: string): string {
     const names: Record<string, string> = {
       deepseek: 'DeepSeek',
-      ollama: 'Ollama (Local)',
-      gemini: 'Gemini',
     };
     return names[type] || type;
   }

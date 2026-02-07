@@ -42,12 +42,6 @@ const envSchema = z.object({
   DEEPSEEK_API_KEY: z.string().optional(),
   DEEPSEEK_BASE_URL: z.string().default('https://api.deepseek.com'),
 
-  // === Ollama (Local LLM) ===
-  OLLAMA_URL: z.string().default('http://localhost:5044'),
-  OLLAMA_MODEL: z.string().default('qwen2.5-coder:7b'),
-
-  // === AI Provider Default ===
-  AI_DEFAULT_PROVIDER: z.enum(['deepseek', 'ollama']).default('ollama'),
 
   // === Firebase Admin ===
   FIREBASE_PROJECT_ID: z.string().optional(),

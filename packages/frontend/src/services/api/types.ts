@@ -26,7 +26,7 @@ export interface PaginatedResponse<T> {
  * AI Provider 정보
  */
 export interface AIProvider {
-  type: 'deepseek' | 'ollama' | 'gemini';
+  type: 'deepseek';
   name: string;
   available: boolean;
   current: boolean;
@@ -44,7 +44,7 @@ export interface AIProvidersResponse {
  * AI Provider 전환 요청
  */
 export interface SwitchProviderRequest {
-  provider: 'deepseek' | 'ollama' | 'gemini';
+  provider: 'deepseek';
 }
 
 /**

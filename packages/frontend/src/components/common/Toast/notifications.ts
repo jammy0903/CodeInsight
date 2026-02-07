@@ -61,14 +61,6 @@ export const notify = {
 // ============================================
 
 export const notifyAI = {
-  /** Ollama 연결 끊김 */
-  ollamaDisconnected: () => {
-    notify.error(t('toast.ollama_disconnected'), {
-      description: t('toast.ollama_disconnected_desc'),
-      duration: 6000,
-    });
-  },
-
   /** DeepSeek 연결 실패 */
   deepseekDisconnected: () => {
     notify.error(t('toast.deepseek_disconnected'), {

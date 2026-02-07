@@ -2,7 +2,7 @@
  * AI Provider Interface & Types
  */
 
-export type ProviderType = 'deepseek' | 'ollama';
+export type ProviderType = 'deepseek';
 
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -57,11 +57,6 @@ export interface ProviderConfig {
     deepseek: {
       enabled: boolean;
       apiKey?: string;
-    };
-    ollama: {
-      enabled: boolean;
-      url: string;
-      model: string;
     };
   };
 }
