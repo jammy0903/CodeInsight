@@ -10,11 +10,13 @@
         "explanation": "**실행 순서:**\n1. `Optional.of(\"hello\")` 호출.\n2. Heap에 `Optional` 객체(상자) 생성.\n3. 내부에 \"hello\" 값 저장.\n\n**메모리에서 일어나는 일:**\nHeap에 `Optional`이라는 **단단한 상자(Wrapper)**를 만들고, \"hello\" 문자열을 그 상자 안에 안전하게 넣습니다.\n\n**경고:** `of()`는 `null`을 절대 허용하지 않습니다. null을 넣으면 상자를 만들기도 전에 NPE가 터집니다.",
         "keyInsight": "of() = null 절대 불가",
         "visualizationType": "javaMemory",
+        "code": "Optional<String> opt1 = Optional.of(\"hello\");",
         "javaMemoryState": {
           "stack": [
             {
               "name": "opt1",
-              "value": "-> 0xOPT1"
+              "value": "-> 0xOPT1",
+              "type": "Optional<String>"
             }
           ],
           "heap": [
@@ -30,23 +32,25 @@
             }
           ],
           "output": []
-        },
-        "code": "Optional<String> opt1 = Optional.of(\"hello\");"
+        }
       },
       {
         "title": "Optional.empty() - 빈 상자",
         "explanation": "**실행 순서:**\n1. `Optional.empty()` 호출.\n2. 비어있는 `Optional` 객체 반환.\n\n내용물이 없는 '빈 상자' 객체를 만듭니다.\n`null` 변수를 쓰는 대신 \"상자는 있는데 내용은 없어\"라고 명확하게 말하는 방식입니다.\n`Optional`을 리턴하면 \"아, 없을 수도 있구나\"라고 바로 알 수 있습니다.",
         "keyInsight": "empty() = 값 없음을 명시적으로 표현",
         "visualizationType": "javaMemory",
+        "code": "Optional<String> opt2 = Optional.empty();",
         "javaMemoryState": {
           "stack": [
             {
               "name": "opt1",
-              "value": "-> 0xOPT1"
+              "value": "-> 0xOPT1",
+              "type": "Optional<String>"
             },
             {
               "name": "opt2",
-              "value": "-> 0xEMPTY"
+              "value": "-> 0xEMPTY",
+              "type": "Optional<String>"
             }
           ],
           "heap": [
@@ -59,20 +63,20 @@
               "content": "Optional.empty",
               "type": "Optional"
             }
-          ],
-          "output": []
-        },
-        "code": "Optional<String> opt2 = Optional.empty();"
+          ]
+        }
       },
       {
         "title": "Optional.ofNullable() - 유연한 상자",
         "explanation": "**실행 순서:**\n1. `Optional.ofNullable(null)` 호출.\n2. 인자가 `null`임 확인.\n3. 내부적으로 `Optional.empty()` 반환.\n\n값이 있으면 상자에 넣고(`of`), `null`이면 빈 상자(`empty`)를 만듭니다.\n현실적으로 가장 많이 쓰이는 생성 방식입니다.",
         "visualizationType": "javaMemory",
+        "code": "Optional<String> opt3 = Optional.ofNullable(null);",
         "javaMemoryState": {
           "stack": [
             {
               "name": "opt3",
-              "value": "-> 0xEMPTY"
+              "value": "-> 0xEMPTY",
+              "type": "Optional<String>"
             }
           ],
           "heap": [
@@ -82,74 +86,68 @@
               "refCount": 2
             }
           ],
-          "note": "null을 넣으면 empty()가 됨",
-          "output": []
-        },
-        "code": "Optional<String> opt3 = Optional.ofNullable(null);"
+          "note": "null을 넣으면 empty()가 됨"
+        }
       },
       {
         "title": "get() - 강제로 꺼내기 (위험!!)",
         "explanation": "**실행 순서:**\n1. `opt1.get()` 호출.\n2. 값 존재 확인.\n3. \"hello\" 반환.\n\n상자를 무작정 엽니다.\n지금은 값이 있어서 다행이지만, 비어있을 때 `get()`을 호출하면 **`NoSuchElementException`** 예외가 폭발합니다.\n\n**경고:** `get()`은 최후의 수단입니다. 되도록 쓰지 마세요.",
         "keyInsight": "get() 대신 orElse() 사용 권장",
         "visualizationType": "javaMemory",
+        "code": "String value = opt1.get();",
         "javaMemoryState": {
           "stack": [
             {
               "name": "value",
-              "value": "\"hello\""
+              "value": "\"hello\"",
+              "type": "String"
             }
           ],
           "heap": [],
-          "output": []
-        },
-        "code": "String value = opt1.get();"
+          "note": null
+        }
       },
       {
         "title": "isPresent() - 확인하기",
         "explanation": "**실행 순서:**\n1. `opt2.isPresent()` 호출.\n2. `opt2`는 empty이므로 **false** 반환.\n3. `if` 블록 건너뜀.\n\n\"상자에 값이 있나요?\"(`isPresent`) 라고 물어봅니다.\n`opt2`는 비어있으므로 `false`를 반환하고, `if` 블록은 실행되지 않습니다.",
         "visualizationType": "javaMemory",
+        "code": "if (opt2.isPresent()) {",
         "javaMemoryState": {
-          "output": [],
-          "note": "opt2는 empty이므로 false 반환, 블록 실행 안 됨",
-          "stack": [],
-          "heap": []
-        },
-        "code": "if (opt2.isPresent()) {"
+          "note": "opt2는 empty이므로 false 반환, 블록 실행 안 됨"
+        }
       },
       {
         "title": "orElse() - 안전한 기본값 제공",
         "explanation": "**실행 순서:**\n1. `opt3.orElse(\"default\")` 호출.\n2. `opt3`가 비어있음 확인.\n3. 인자로 넘긴 `\"default\"` 반환.\n\n**가장 권장하는 방식:** \"상자를 열어봐. 값이 있으면 그거 쓰고, **비어있으면 'default'를 대신 써.**\"\n한 줄로 깔끔하고 안전하게 값을 얻을 수 있습니다.",
         "keyInsight": "orElse() = 안전한 기본값 패턴",
         "visualizationType": "javaMemory",
+        "code": "String result = opt3.orElse(\"default\");",
         "javaMemoryState": {
           "stack": [
             {
               "name": "result",
-              "value": "\"default\""
+              "value": "\"default\"",
+              "type": "String"
             }
           ],
-          "note": "opt3가 empty이므로 \"default\" 반환",
-          "heap": [],
-          "output": []
-        },
-        "code": "String result = opt3.orElse(\"default\");"
+          "note": "opt3가 empty이므로 \"default\" 반환"
+        }
       },
       {
         "title": "ifPresent() - 함수형 스타일",
         "explanation": "**실행 순서:**\n1. `opt1.ifPresent(...)` 호출.\n2. `opt1`에 값이 있음 확인.\n3. 람다 함수 `s -> println(s)` 실행.\n4. \"hello\" 출력.\n\n\"값이 있으면 이 함수(람다)를 실행 해줘. 없으면 말고.\"\n값을 꺼내지 않고, 상자 안에서 작업을 처리하도록 시키는 세련된 방법입니다.",
         "keyInsight": "ifPresent() = 값 있을 때만 실행",
         "visualizationType": "javaMemory",
+        "code": "opt1.ifPresent(s -> System.out.println(s));",
         "javaMemoryState": {
           "output": [
             "hello"
           ],
-          "note": "opt1은 값이 있으므로 람다 실행됨",
-          "stack": [],
-          "heap": []
-        },
-        "code": "opt1.ifPresent(s -> System.out.println(s));"
+          "note": "opt1은 값이 있으므로 람다 실행됨"
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "Optional을 사용하면 안 되는 위치는?",

@@ -1,20 +1,28 @@
 /**
  * LessonFlowVisualizer Component
  *
- * LessonStep을 받아서 FlowVisualizer에 전달
- * - 언어별 어댑터로 LessonStep → FlowStep 변환
- * - 포인터 화살표 렌더링
+ * LessonStep을 받아서 vizType에 따라 적절한 시각화 컴포넌트로 라우팅.
+ *
+ * 라우팅 우선순위:
+ * 1. Non-memory viz types (scope, thisBinding, prototype, promise, terminal, eventLoop)
+ *    → 각 전용 뷰어로 직접 전달 (Transformer 불필요)
+ * 2. Memory viz types (memory, jsMemory, pythonMemory, python, javaMemory, javascript)
+ *    → 언어별 어댑터 → FlowStep → ReferenceGraphView (Python/Java/JS)
+ *    → 기존 FlowVisualizer + ArrowLayer (C)
  */
 
 import { memo, useMemo, useRef } from 'react';
 import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared';
 import { FlowVisualizer } from './FlowVisualizer';
-import { PythonFlowView } from './components/PythonFlowView';
-import { JavaFlowView } from './components/JavaFlowView';
-import { JSFlowView } from './components/JSFlowView';
+import { ReferenceGraphView } from './components/ReferenceGraphView';
 import { EventLoopView } from './components/EventLoopView';
+import { ScopeView } from './components/ScopeView';
+import { ThisBindingView } from './components/ThisBindingView';
+import { PrototypeChainView } from './components/PrototypeChainView';
+import { PromiseView } from './components/PromiseView';
+import { TerminalStepView } from './components/TerminalStepView';
 import { ArrowLayer } from './components/ArrowLayer';
-import { getAdapter, createAdapter } from './adapters';
+import { createAdapter } from './adapters';
 import type { FlowTheme } from './styles';
 
 // ============================================
@@ -28,27 +36,16 @@ interface MemoryState {
 }
 
 interface LessonFlowVisualizerProps {
-  /** 현재 LessonStep */
   step: LessonStep;
-  /** 이전 LessonStep (변경 감지용) */
   prevStep?: LessonStep | null;
-  /** 언어 */
   language?: FlowLanguage | string;
-  /** 전체 코드 (step.code가 없을 때 line에서 추출) */
   fullCode?: string;
-  /** 테마 */
   theme?: FlowTheme;
-  /** 변수 클릭 핸들러 */
   onVariableClick?: (variable: FlowVariable) => void;
-  /** 클래스명 */
   className?: string;
-  /** 화살표 표시 여부 */
   showArrows?: boolean;
-  /** 계산된 메모리 상태 (useLessonVisualization에서 전달) */
   memoryState?: MemoryState;
-  /** 이전 메모리 상태 */
   prevMemoryState?: MemoryState;
-  /** 터미널 출력 (현재 스텝의 stdout) */
   stdout?: string;
 }
 
@@ -70,80 +67,74 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   stdout,
 }: LessonFlowVisualizerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const vizType = (step as any).visualizationType as string | undefined;
+  const isJavaScript = language === 'javascript' || language === 'js';
 
-  // DEBUG: 입력 데이터 확인
-  if (process.env.NODE_ENV === 'development') {
-    const swapVars = step.stack?.filter(b =>
-      b?.name && (b.name.includes('swap.') || b.name.includes('.temp') || b.name === 'temp')
-    );
-    if (swapVars && swapVars.length > 0) {
-      console.log('[LessonFlowVisualizer] 📥 swap variables in step:', JSON.stringify(swapVars, null, 2));
-      console.log('[LessonFlowVisualizer] 📥 memoryState provided:', !!memoryState);
-    }
-  }
+  // Detect non-memory viz types that bypass the transformer pipeline
+  const els = (step as any).eventLoopState;
+  const hasStandardEventLoop = els && (els.callStack || els.webApis || els.taskQueue || els.microtaskQueue);
+  const isNonMemoryType =
+    hasStandardEventLoop ||
+    (vizType === 'scope' && (step as any).scopeState) ||
+    (vizType === 'thisBinding' && (step as any).thisState) ||
+    (vizType === 'prototype' && (step as any).prototypeState) ||
+    (vizType === 'promise' && (step as any).promiseState) ||
+    vizType === 'terminal';
 
-  // 1. 어댑터 가져오기 (테마 적용)
+  // ========================================================
+  // All hooks called unconditionally (React rules of hooks)
+  // ========================================================
+
   const adapter = useMemo(
     () => createAdapter(language, theme),
     [language, theme]
   );
 
-  // 2. memoryState와 stdout을 step에 병합
-  // JavaScript는 원본 step.stack/heap 형식을 사용 (JSTransformer가 {methodName, variables} 형식 기대)
   const enrichedStep = useMemo(() => {
+    if (isNonMemoryType) return step;
     const enriched = { ...step };
-
-    // JavaScript는 memoryState 덮어쓰기 안 함 - 원본 형식 유지
-    const isJavaScript = language === 'javascript' || language === 'js';
     if (memoryState && !isJavaScript) {
       enriched.stack = memoryState.stack as LessonStep['stack'];
       enriched.heap = memoryState.heap as LessonStep['heap'];
     }
-
-    // stdout이 제공되면 추가
     if (stdout) {
       enriched.stdout = stdout;
     }
-
     return enriched;
-  }, [step, memoryState, stdout, language]);
+  }, [step, memoryState, stdout, isJavaScript, isNonMemoryType]);
 
   const enrichedPrevStep = useMemo(() => {
+    if (isNonMemoryType) return prevStep;
     if (!prevStep) return null;
     if (!prevMemoryState) return prevStep;
-    // JavaScript는 memoryState 덮어쓰기 안 함 - 원본 형식 유지
-    const isJavaScript = language === 'javascript' || language === 'js';
     if (isJavaScript) return prevStep;
     return {
       ...prevStep,
       stack: prevMemoryState.stack as LessonStep['stack'],
       heap: prevMemoryState.heap as LessonStep['heap'],
     };
-  }, [prevStep, prevMemoryState, language]);
+  }, [prevStep, prevMemoryState, isJavaScript, isNonMemoryType]);
 
-  // 3. LessonStep → FlowStep 변환
-  const flowStep = useMemo(
-    () => adapter.transformer.transform(enrichedStep, enrichedPrevStep ?? undefined, fullCode),
-    [adapter, enrichedStep, enrichedPrevStep, fullCode]
-  );
+  const flowStep = useMemo(() => {
+    if (isNonMemoryType) return null;
+    return adapter.transformer.transform(enrichedStep, enrichedPrevStep ?? undefined, fullCode);
+  }, [adapter, enrichedStep, enrichedPrevStep, fullCode, isNonMemoryType]);
 
-  // 4. 이전 FlowStep 변환 (diff 계산용)
-  const prevFlowStep = useMemo(
-    () => (enrichedPrevStep ? adapter.transformer.transform(enrichedPrevStep, undefined, fullCode) : null),
-    [adapter, enrichedPrevStep, fullCode]
-  );
+  const prevFlowStep = useMemo(() => {
+    if (isNonMemoryType) return null;
+    return enrichedPrevStep ? adapter.transformer.transform(enrichedPrevStep, undefined, fullCode) : null;
+  }, [adapter, enrichedPrevStep, fullCode, isNonMemoryType]);
 
-  // 5. 애니메이션 생성 (diff 기반)
   const flowStepWithAnimations = useMemo(() => {
+    if (isNonMemoryType || !flowStep) return null;
+
     if (!prevFlowStep) {
-      // 첫 스텝: 모든 변수 생성 애니메이션
       const animations = flowStep.variables.flatMap((v) =>
         adapter.animator.createVariableAnimations(v)
       );
       return { ...flowStep, animations };
     }
 
-    // diff 기반 애니메이션
     const diff = {
       created: flowStep.variables
         .filter((v) => !prevFlowStep.variables.find((pv) => pv.id === v.id))
@@ -167,36 +158,13 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
 
     const animations = adapter.animator.createAnimationsFromDiff(diff, flowStep, prevFlowStep);
     return { ...flowStep, animations };
-  }, [flowStep, prevFlowStep, adapter]);
+  }, [flowStep, prevFlowStep, adapter, isNonMemoryType]);
 
-  // Python은 전용 뷰 사용 (포스트잇 비유)
-  if (language === 'python') {
-    return (
-      <div className={className}>
-        <PythonFlowView
-          step={flowStepWithAnimations}
-          prevStep={prevFlowStep}
-        />
-      </div>
-    );
-  }
+  // ========================================================
+  // Route 1: Non-memory visualization types
+  // ========================================================
 
-  // Java는 전용 뷰 사용 (호버 하이라이트, 화살표 없음)
-  if (language === 'java') {
-    return (
-      <div className={className}>
-        <JavaFlowView
-          step={flowStepWithAnimations}
-          prevStep={prevFlowStep}
-        />
-      </div>
-    );
-  }
-
-  // JavaScript: eventLoopState가 있고 표준 필드(callStack/webApis/taskQueue)가 존재하면 EventLoop 전용 시각화
-  const els = (step as any).eventLoopState;
-  const hasStandardEventLoop = els && (els.callStack || els.webApis || els.taskQueue || els.microtaskQueue);
-  if ((language === 'javascript' || language === 'js') && hasStandardEventLoop) {
+  if (hasStandardEventLoop) {
     return (
       <div className={className}>
         <EventLoopView
@@ -207,13 +175,207 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     );
   }
 
-  // JavaScript는 전용 뷰 사용 (호버 하이라이트, 화살표 없음, 초급자 친화적)
-  if (language === 'javascript' || language === 'js') {
+  if (vizType === 'scope' && (step as any).scopeState) {
     return (
       <div className={className}>
-        <JSFlowView
+        <ScopeView
+          scopeState={(step as any).scopeState}
+          prevScopeState={(prevStep as any)?.scopeState}
+        />
+      </div>
+    );
+  }
+
+  if (vizType === 'thisBinding' && (step as any).thisState) {
+    return (
+      <div className={className}>
+        <ThisBindingView
+          thisState={(step as any).thisState}
+          prevThisState={(prevStep as any)?.thisState}
+        />
+      </div>
+    );
+  }
+
+  if (vizType === 'prototype' && (step as any).prototypeState) {
+    return (
+      <div className={className}>
+        <PrototypeChainView
+          prototypeState={(step as any).prototypeState}
+          prevPrototypeState={(prevStep as any)?.prototypeState}
+        />
+      </div>
+    );
+  }
+
+  if (vizType === 'promise' && (step as any).promiseState) {
+    return (
+      <div className={className}>
+        <PromiseView
+          promiseState={(step as any).promiseState}
+          prevPromiseState={(prevStep as any)?.promiseState}
+        />
+      </div>
+    );
+  }
+
+  if (vizType === 'terminal') {
+    return (
+      <div className={className}>
+        <TerminalStepView
+          explanation={(step as any).explanation}
+          stdout={stdout || (step as any).stdout}
+        />
+      </div>
+    );
+  }
+
+  // ========================================================
+  // Route 2: Memory visualization types
+  // ========================================================
+
+  if (!flowStepWithAnimations) {
+    return <div className={className} />;
+  }
+
+  // Python → ReferenceGraphView
+  if (language === 'python') {
+    return (
+      <div className={className}>
+        <ReferenceGraphView
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
+          language="python"
+        />
+      </div>
+    );
+  }
+
+  // Java → ReferenceGraphView + comparison/warning/note/error 배너 + cache/hashSet
+  if (language === 'java') {
+    const jms = (step as any).javaMemoryState;
+    const comparison = jms?.comparison;
+    const warning = jms?.warning;
+    const note = jms?.note;
+    const error = jms?.error;
+    const cache = jms?.cache;
+    const hashSet = jms?.hashSet;
+
+    return (
+      <div className={className}>
+        {comparison && (
+          <div
+            className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg text-sm font-mono"
+            style={{ background: '#eff6ff', border: '1px solid #93c5fd', color: '#1e40af' }}
+          >
+            <span style={{ fontSize: '1.1em' }}>&#x2194;</span>
+            <span className="font-semibold">{comparison}</span>
+          </div>
+        )}
+        {warning && (
+          <div
+            className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg text-sm"
+            style={{ background: '#fefce8', border: '1px solid #fde047', color: '#854d0e' }}
+          >
+            <span>&#x26A0;</span>
+            <span>{warning}</span>
+          </div>
+        )}
+        {note && (
+          <div
+            className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg text-sm"
+            style={{ background: '#f0f9ff', border: '1px solid #bae6fd', color: '#0369a1' }}
+          >
+            <span style={{ fontSize: '1.1em' }}>&#x1F4DD;</span>
+            <span>{note}</span>
+          </div>
+        )}
+        {error && (
+          <div
+            className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg text-sm font-mono"
+            style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#991b1b' }}
+          >
+            <span style={{ fontSize: '1.1em' }}>&#x274C;</span>
+            <span>{error}</span>
+          </div>
+        )}
+        <ReferenceGraphView
+          step={flowStepWithAnimations}
+          prevStep={prevFlowStep}
+          language="java"
+        />
+        {/* Integer Cache visualization */}
+        {cache && (
+          <div className="mt-3 p-3 rounded-lg border" style={{ background: '#fefce8', borderColor: '#fde047' }}>
+            <div className="text-xs font-semibold text-amber-800 mb-2">
+              {cache.name || 'Integer Cache'} {cache.range ? `(${cache.range})` : ''}
+            </div>
+            <div className="flex items-center gap-1">
+              {[-128, -1, 0, 1, 127].map((n) => (
+                <div
+                  key={n}
+                  className="flex-1 text-center py-1 rounded text-xs font-mono border"
+                  style={{
+                    background: cache.highlight === n ? '#fbbf24' : '#fffbeb',
+                    borderColor: cache.highlight === n ? '#f59e0b' : '#fde68a',
+                    fontWeight: cache.highlight === n ? 700 : 400,
+                    color: cache.highlight === n ? '#78350f' : '#92400e',
+                  }}
+                >
+                  {n}
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between text-[10px] text-amber-700 mt-1 px-1">
+              <span>-128</span>
+              <span>127</span>
+            </div>
+            {cache.refCount != null && (
+              <div className="text-xs text-amber-700 mt-1">
+                refs: {cache.refCount}
+              </div>
+            )}
+            {cache.note && (
+              <div className="text-xs text-amber-800 mt-1 font-medium">
+                {cache.note}
+              </div>
+            )}
+          </div>
+        )}
+        {/* HashSet bucket visualization */}
+        {hashSet?.buckets && (
+          <div className="mt-3 p-3 rounded-lg border" style={{ background: '#f0fdf4', borderColor: '#86efac' }}>
+            <div className="text-xs font-semibold text-green-800 mb-2">HashSet Buckets</div>
+            <div className="flex flex-wrap gap-2">
+              {hashSet.buckets.map((bucket: { index: string; content: string; searched?: boolean }, i: number) => (
+                <div
+                  key={i}
+                  className="px-3 py-2 rounded-lg border text-xs font-mono"
+                  style={{
+                    background: bucket.searched ? '#bbf7d0' : '#f0fdf4',
+                    borderColor: bucket.searched ? '#22c55e' : '#86efac',
+                    boxShadow: bucket.searched ? '0 0 0 2px #4ade80' : 'none',
+                  }}
+                >
+                  <div className="text-[10px] text-green-600 mb-0.5">{bucket.index}</div>
+                  <div className="font-semibold text-green-900">{bucket.content}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // JavaScript → ReferenceGraphView
+  if (isJavaScript) {
+    return (
+      <div className={className}>
+        <ReferenceGraphView
+          step={flowStepWithAnimations}
+          prevStep={prevFlowStep}
+          language="javascript"
         />
       </div>
     );

@@ -82,23 +82,22 @@ export class JavaTransformer implements IFlowTransformer {
     const variables: FlowVariable[] = [];
     const mainFrameVars: string[] = [];
     const heapFrameVars: string[] = [];
+    const stringPoolVars: string[] = [];
 
-    // DEBUG
-    if (import.meta.env.DEV) {
-      console.log('[JavaTransformer] step.line:', step.line);
-      console.log('[JavaTransformer] step.memoryState:', step.memoryState);
-      console.log('[JavaTransformer] step.stack:', step.stack);
-    }
+    // javaMemoryState (레슨 JSON 우선) → memoryState (ch10 등) → enriched stack/heap
+    const jms = (step as any).javaMemoryState;
 
     // 1. Stack 변수 처리 (main 프레임)
-    // step.memoryState?.stack (원본) 또는 step.stack (enriched) 둘 다 체크
-    const stackData = step.memoryState?.stack || (step.stack as any);
+    const stackData = jms?.stack || step.memoryState?.stack || (step.stack as any);
     if (stackData && Array.isArray(stackData)) {
       stackData.forEach((item: any) => {
         // 형태 1: 단순 형태 {name, value, type?} - 레슨 JSON
         if (item.name && (item.value !== undefined || item.value === null)) {
           const pointsTo = extractPointsTo(item.value);
           const isReference = !!pointsTo;
+
+          const meta: Record<string, unknown> = {};
+          if (item.sameRef) meta.sameRef = true;
 
           const variable: FlowVariable = {
             id: `main-${item.name}`,
@@ -110,14 +109,11 @@ export class JavaTransformer implements IFlowTransformer {
             isPointer: isReference,
             // ArrowLayer는 variable.id로 매칭하므로 heap-${address} 형식 필요
             pointsTo: pointsTo ? `heap-${pointsTo}` : undefined,
+            metadata: Object.keys(meta).length > 0 ? meta : undefined,
           };
 
           variables.push(variable);
           mainFrameVars.push(variable.id);
-
-          if (import.meta.env.DEV) {
-            console.log('[JavaTransformer] stack variable (simple):', variable);
-          }
         }
         // 형태 2: 복잡한 형태 {methodName, variables: {...}} - 시뮬레이터
         else if (item.methodName || item.variables) {
@@ -164,10 +160,6 @@ export class JavaTransformer implements IFlowTransformer {
 
               variables.push(variable);
               mainFrameVars.push(variable.id);
-
-              if (import.meta.env.DEV) {
-                console.log('[JavaTransformer] stack variable (complex):', variable);
-              }
             });
           }
         }
@@ -175,11 +167,16 @@ export class JavaTransformer implements IFlowTransformer {
     }
 
     // 2. Heap 변수 처리
-    // step.memoryState?.heap (원본) 또는 step.heap (enriched) 둘 다 체크
-    const heapData = step.memoryState?.heap || (step.heap as any);
+    const heapData = jms?.heap || step.memoryState?.heap || (step.heap as any);
     if (heapData && Array.isArray(heapData)) {
       heapData.forEach((item: any) => {
         const address = item.address || item.id || 'unknown';
+
+        const meta: Record<string, unknown> = {};
+        if (item.new) meta.isNew = true;
+        if (item.hashCode) meta.hashCode = item.hashCode;
+        if (item.refCount != null) meta.refCount = item.refCount;
+
         const variable: FlowVariable = {
           id: `heap-${address}`,
           name: address,
@@ -189,15 +186,36 @@ export class JavaTransformer implements IFlowTransformer {
           scope: 'heap',
           address: address,
           isPointer: false,
+          metadata: Object.keys(meta).length > 0 ? meta : undefined,
         };
 
         variables.push(variable);
         heapFrameVars.push(variable.id);
+      });
+    }
 
-        // DEBUG
-        if (import.meta.env.DEV) {
-          console.log('[JavaTransformer] heap variable:', variable);
-        }
+    // 2.5. String Pool 처리 (java-1-2 등 String Pool 레슨)
+    const stringPoolData = jms?.stringPool;
+    if (stringPoolData && Array.isArray(stringPoolData)) {
+      stringPoolData.forEach((item: any) => {
+        const address = item.address || 'unknown';
+
+        const meta: Record<string, unknown> = {};
+        if (item.refCount != null) meta.refCount = item.refCount;
+
+        const variable: FlowVariable = {
+          id: `heap-${address}`,
+          name: address,
+          value: parseValue(item.value),
+          type: 'String (Pool)',
+          state: 'idle',
+          scope: 'stringPool',
+          address: address,
+          isPointer: false,
+          metadata: Object.keys(meta).length > 0 ? meta : undefined,
+        };
+        variables.push(variable);
+        stringPoolVars.push(variable.id);
       });
     }
 
@@ -206,6 +224,10 @@ export class JavaTransformer implements IFlowTransformer {
       { name: 'main', variableIds: mainFrameVars },
     ];
 
+    if (stringPoolVars.length > 0) {
+      frames.push({ name: 'String Pool', variableIds: stringPoolVars });
+    }
+
     if (heapFrameVars.length > 0) {
       frames.push({ name: 'heap', variableIds: heapFrameVars });
     }
@@ -213,19 +235,17 @@ export class JavaTransformer implements IFlowTransformer {
     // 4. 코드 추출
     const code = step.code || (fullCode ? getCodeAtLine(fullCode, step.line) : '');
 
-    // 5. 터미널 출력 (stdout 또는 memoryState.output)
+    // 5. 터미널 출력 (javaMemoryState.output → memoryState.output → stdout)
     let terminalOutput: { text: string } | undefined = undefined;
+    const outputData = jms?.output || step.memoryState?.output;
 
-    // 시뮬레이터: step.stdout 직접 전달
     if ((step as any).stdout) {
       terminalOutput = { text: String((step as any).stdout) };
-    }
-    // 레슨 JSON: step.memoryState.output
-    else if (step.memoryState?.output) {
+    } else if (outputData) {
       terminalOutput = {
-        text: Array.isArray(step.memoryState.output)
-          ? step.memoryState.output.join('\n')
-          : String(step.memoryState.output),
+        text: Array.isArray(outputData)
+          ? outputData.join('\n')
+          : String(outputData),
       };
     }
 

@@ -9,12 +9,14 @@
         "title": "변수 생성 (Boxing)",
         "explanation": "**실행 순서:**\n1. `Integer(1)` 객체 생성 (0x100, Auto-boxing).\n2. `Integer(2)` 객체 생성 (0x200).\n3. `x`에 `0x100`, `y`에 `0x200` 저장.\n\n**메모리 상태:**\n`Stack`에 `x`, `y` 변수가 있고, 각각 `Heap`의 Integer 객체를 가리킵니다.",
         "visualizationType": "javaMemory",
+        "code": "Integer x = 1;",
         "javaMemoryState": {
           "stack": [
             {
               "name": "x",
               "value": "-> 0x100",
-              "frame": "main"
+              "frame": "main",
+              "type": "Integer"
             }
           ],
           "heap": [
@@ -25,24 +27,26 @@
             }
           ],
           "output": []
-        },
-        "code": "Integer x = 1;"
+        }
       },
       {
         "title": "변수 y 생성",
         "explanation": "**실행 순서:**\n1. `y` 변수 생성 및 초기화.\n\n이제 두 개의 객체가 준비되었습니다.",
         "visualizationType": "javaMemory",
+        "code": "Integer y = 2;",
         "javaMemoryState": {
           "stack": [
             {
               "name": "x",
               "value": "-> 0x100",
-              "frame": "main"
+              "frame": "main",
+              "type": "Integer"
             },
             {
               "name": "y",
               "value": "-> 0x200",
-              "frame": "main"
+              "frame": "main",
+              "type": "Integer"
             }
           ],
           "heap": [
@@ -56,247 +60,196 @@
               "content": "Integer(2)",
               "type": "Integer"
             }
-          ],
-          "output": []
-        },
-        "code": "Integer y = 2;"
+          ]
+        }
       },
       {
         "title": "초기 상태 출력",
         "explanation": "**실행 순서:**\n1. `x`, `y` 값 출력.\n\n\"before: x=1, y=2\"가 출력됩니다.",
         "visualizationType": "javaMemory",
+        "code": "System.out.println(\"before: x=\" + x + \", y=\" + y);",
         "javaMemoryState": {
-          "stack": [
-            {
-              "name": "x",
-              "value": "-> 0x100",
-              "frame": "main"
-            },
-            {
-              "name": "y",
-              "value": "-> 0x200",
-              "frame": "main"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "Integer(1)",
-              "type": "Integer"
-            },
-            {
-              "address": "0x200",
-              "content": "Integer(2)",
-              "type": "Integer"
-            }
-          ],
           "output": [
             "before: x=1, y=2"
           ]
-        },
-        "code": "System.out.println(\"before: x=\" + x + \", y=\" + y);"
+        }
       },
       {
         "title": "swap(x, y) 호출 - 주소 복사",
         "explanation": "**실행 순서:**\n1. `x`의 주소(`0x100`) -> `a`에 복사.\n2. `y`의 주소(`0x200`) -> `b`에 복사.\n\n**핵심:**\n`a`와 `b`는 `x`, `y`의 **복사본 리모컨**입니다.",
         "keyInsight": "파라미터 전달 = 리모컨 복사",
         "visualizationType": "javaMemory",
+        "code": "swap(x, y);",
         "javaMemoryState": {
           "stack": [
             {
               "name": "x",
               "value": "-> 0x100",
-              "frame": "main"
+              "frame": "main",
+              "type": "Integer"
             },
             {
               "name": "y",
               "value": "-> 0x200",
-              "frame": "main"
+              "frame": "main",
+              "type": "Integer"
             },
             {
               "name": "a",
               "value": "-> 0x100",
               "frame": "swap",
-              "copied": true
+              "copied": true,
+              "type": "Integer"
             },
             {
               "name": "b",
               "value": "-> 0x200",
               "frame": "swap",
-              "copied": true
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "Integer(1)",
-              "type": "Integer"
-            },
-            {
-              "address": "0x200",
-              "content": "Integer(2)",
+              "copied": true,
               "type": "Integer"
             }
-          ],
-          "output": [
-            "before: x=1, y=2"
           ]
-        },
-        "code": "swap(x, y);"
+        }
       },
       {
         "title": "temp = a",
         "explanation": "**실행 순서:**\n1. `a`가 가리키는 주소 `0x100`을 `temp`에 저장.\n\n`swap` 메서드 내부에서 교환 작업을 시작합니다.",
         "visualizationType": "javaMemory",
+        "code": "Integer temp = a;",
         "javaMemoryState": {
           "stack": [
             {
               "name": "a",
               "value": "-> 0x100",
-              "frame": "swap"
+              "frame": "swap",
+              "type": "Integer"
             },
             {
               "name": "b",
               "value": "-> 0x200",
-              "frame": "swap"
+              "frame": "swap",
+              "type": "Integer"
             },
             {
               "name": "temp",
               "value": "-> 0x100",
-              "frame": "swap"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0x100",
-              "content": "Integer(1)",
-              "type": "Integer"
-            },
-            {
-              "address": "0x200",
-              "content": "Integer(2)",
+              "frame": "swap",
               "type": "Integer"
             }
-          ],
-          "output": [
-            "before: x=1, y=2"
           ]
-        },
-        "code": "Integer temp = a;"
+        }
       },
       {
         "title": "a = b",
         "explanation": "**실행 순서:**\n1. `b`의 주소 `0x200`을 `a`에 대입.\n\n이제 `a`는 `0x200`번 TV를 가리킵니다. (원래 `main`의 `x`는 여전히 `0x100`입니다!)",
         "visualizationType": "javaMemory",
+        "code": "a = b;",
         "javaMemoryState": {
           "stack": [
             {
               "name": "a",
               "value": "-> 0x200",
               "frame": "swap",
-              "changed": true
+              "changed": true,
+              "type": "Integer"
             },
             {
               "name": "b",
               "value": "-> 0x200",
-              "frame": "swap"
+              "frame": "swap",
+              "type": "Integer"
             },
             {
               "name": "temp",
               "value": "-> 0x100",
-              "frame": "swap"
+              "frame": "swap",
+              "type": "Integer"
             }
-          ],
-          "output": [
-            "before: x=1, y=2"
-          ],
-          "heap": []
-        },
-        "code": "a = b;"
+          ]
+        }
       },
       {
         "title": "b = temp",
         "explanation": "**실행 순서:**\n1. `temp`의 주소 `0x100`을 `b`에 대입.\n\n**상태:**\n`swap` 함수 내부에서는 `a`와 `b`가 서로 주소를 맞바꾸었습니다. 교환 성공!",
         "visualizationType": "javaMemory",
+        "code": "b = temp;",
         "javaMemoryState": {
           "stack": [
             {
               "name": "a",
               "value": "-> 0x200",
-              "frame": "swap"
+              "frame": "swap",
+              "type": "Integer"
             },
             {
               "name": "b",
               "value": "-> 0x100",
               "frame": "swap",
-              "changed": true
+              "changed": true,
+              "type": "Integer"
             },
             {
               "name": "temp",
               "value": "-> 0x100",
-              "frame": "swap"
+              "frame": "swap",
+              "type": "Integer"
             }
-          ],
-          "output": [
-            "before: x=1, y=2"
-          ],
-          "heap": []
-        },
-        "code": "b = temp;"
+          ]
+        }
       },
       {
         "title": "내부 확인",
         "explanation": "**실행 순서:**\n1. `a`, `b` 출력.\n\n함수 내부에서는 \"a=2, b=1\"로 잘 교환된 것처럼 보입니다.",
         "visualizationType": "javaMemory",
+        "code": "System.out.println(\"inside: a=\" + a + \", b=\" + b);",
         "javaMemoryState": {
           "stack": [
             {
               "name": "a",
               "value": "-> 0x200",
-              "frame": "swap"
+              "frame": "swap",
+              "type": "Integer"
             },
             {
               "name": "b",
               "value": "-> 0x100",
-              "frame": "swap"
+              "frame": "swap",
+              "type": "Integer"
             }
           ],
           "output": [
-            "before: x=1, y=2",
             "inside: a=2, b=1"
-          ],
-          "heap": []
-        },
-        "code": "System.out.println(\"inside: a=\" + a + \", b=\" + b);"
+          ]
+        }
       },
       {
         "title": "메서드 종료 및 최종 확인",
         "explanation": "**실행 순서:**\n1. `swap` 종료 -> `a`, `b`, `temp` 모두 삭제.\n2. `main` 복귀.\n3. `x`, `y` 출력.\n\n**충격적인 결과:**\n`x`, `y`는 자신들의 복사본(`a`, `b`)이 무슨 짓을 했는지 전혀 모릅니다. 여전히 원래 주소(`0x100`, `0x200`)를 꽉 잡고 있습니다.",
         "keyInsight": "Swap 실패! 리모컨만 바꿨을 뿐.",
         "visualizationType": "javaMemory",
+        "code": "System.out.println(\"after: x=\" + x + \", y=\" + y);",
         "javaMemoryState": {
           "stack": [
             {
               "name": "x",
               "value": "-> 0x100",
-              "frame": "main"
+              "frame": "main",
+              "type": "Integer"
             },
             {
               "name": "y",
               "value": "-> 0x200",
-              "frame": "main"
+              "frame": "main",
+              "type": "Integer"
             }
           ],
           "output": [
-            "before: x=1, y=2",
-            "inside: a=2, b=1",
             "after: x=1, y=2"
-          ],
-          "heap": []
-        },
-        "code": "System.out.println(\"after: x=\" + x + \", y=\" + y);"
+          ]
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "Java에서 두 변수의 값을 교환(Swap)하는 올바른 방법은?",

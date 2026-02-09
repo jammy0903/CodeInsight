@@ -9,12 +9,14 @@
         "title": "빈 String 생성",
         "explanation": "**실행 순서:**\n1. String Pool에 `\"\"`(빈 문자열) 생성.\n2. `bad` 변수가 이를 참조.\n\n이제부터 `bad`에 계속 덧붙이기를 시도할 것입니다.",
         "visualizationType": "javaMemory",
+        "code": "String bad = \"\";",
         "javaMemoryState": {
           "stack": [
             {
               "name": "bad",
               "value": "-> Pool[0]",
-              "frame": "main"
+              "frame": "main",
+              "type": "String"
             }
           ],
           "stringPool": [
@@ -25,54 +27,50 @@
           ],
           "heap": [],
           "output": []
-        },
-        "code": "String bad = \"\";"
+        }
       },
       {
         "title": "반복문 시작 (String)",
         "explanation": "**실행 순서:**\n1. `i = 0` 초기화.\n2. 반복 조건 확인.\n\n루프를 돌 준비를 합니다.",
         "visualizationType": "javaMemory",
+        "code": "for (int i = 0; i < 3; i++) {",
         "javaMemoryState": {
           "stack": [
             {
               "name": "bad",
               "value": "-> Pool[0]",
-              "frame": "main"
+              "frame": "main",
+              "type": "String"
             },
             {
               "name": "i",
               "value": "0",
-              "frame": "main"
+              "frame": "main",
+              "type": "int"
             }
-          ],
-          "stringPool": [
-            {
-              "value": "\"\"",
-              "address": "Pool[0]"
-            }
-          ],
-          "heap": [],
-          "output": []
-        },
-        "code": "for (int i = 0; i < 3; i++) {"
+          ]
+        }
       },
       {
         "title": "비효율적인 연결 (쓰레기 투척)",
         "explanation": "**실행 순서 (반복):**\n1. `bad` + `i` -> 새로운 객체 생성.\n2. `bad`가 새 객체를 가리킴.\n3. 이전 객체는 **버려짐(Garbage)**.\n\n**문제점:**\n루프가 돌 때마다 멀쩡한 String 객체들이 1회용으로 쓰고 버려집니다. 루프가 1만 번 돌면 쓰레기도 1만 개가 생깁니다.",
         "keyInsight": "String Loop 연결 = 메모리 낭비(O(N²))",
         "visualizationType": "javaMemory",
+        "code": "bad = bad + i;",
         "javaMemoryState": {
           "stack": [
             {
               "name": "bad",
               "value": "-> Obj_2",
               "frame": "main",
-              "changed": true
+              "changed": true,
+              "type": "String"
             },
             {
               "name": "i",
               "value": "2",
-              "frame": "main"
+              "frame": "main",
+              "type": "int"
             }
           ],
           "heap": [
@@ -96,21 +94,22 @@
             }
           ],
           "warning": "중간 객체들이 계속 버려지고 있습니다!",
-          "output": []
-        },
-        "code": "bad = bad + i;"
+          "stringPool": null
+        }
       },
       {
         "title": "StringBuilder 생성",
         "explanation": "**실행 순서:**\n1. Heap에 `StringBuilder` 객체(0x100) 생성.\n2. 내부에 넉넉한 크기의 문자 배열(Buffer)을 가짐.\n\n`StringBuilder`는 **가변(Mutable)** 객체입니다. 즉, 내용물을 마음대로 고칠 수 있는 '화이트보드'와 같습니다.",
         "keyInsight": "StringBuilder = 수정 가능한 화이트보드",
         "visualizationType": "javaMemory",
+        "code": "StringBuilder good = new StringBuilder();",
         "javaMemoryState": {
           "stack": [
             {
               "name": "good",
               "value": "-> 0x100",
-              "frame": "main"
+              "frame": "main",
+              "type": "StringBuilder"
             }
           ],
           "heap": [
@@ -120,23 +119,16 @@
               "type": "StringBuilder"
             }
           ],
-          "output": []
-        },
-        "code": "StringBuilder good = new StringBuilder();"
+          "warning": null
+        }
       },
       {
         "title": "효율적인 append()",
         "explanation": "**실행 순서 (반복):**\n1. `good.append(i)` 호출.\n2. `0x100` 객체 내부의 배열 빈칸에 숫자를 채움.\n\n**장점:**\n새 객체를 만들지 않고, **하나의 객체** 안에서 내용을 계속 업데이트합니다. 쓰레기가 전혀 생기지 않습니다.",
         "keyInsight": "객체 재사용 = 속도 빠름 + 메모리 절약",
         "visualizationType": "javaMemory",
+        "code": "good.append(i);",
         "javaMemoryState": {
-          "stack": [
-            {
-              "name": "good",
-              "value": "-> 0x100",
-              "frame": "main"
-            }
-          ],
           "heap": [
             {
               "address": "0x100",
@@ -144,21 +136,21 @@
               "type": "StringBuilder",
               "changed": true
             }
-          ],
-          "output": []
-        },
-        "code": "good.append(i);"
+          ]
+        }
       },
       {
         "title": "toString()으로 완성",
         "explanation": "**실행 순서:**\n1. `good.toString()` 호출.\n2. 현재까지 완성된 내용을 바탕으로 **딱 한 번** String 객체 생성.\n3. `result`에 저장.\n\n요리(수정)는 화이트보드(StringBuilder)에서 실컷 하고, 마지막에 완성된 요리만 접시(String)에 담아 내는 방식입니다.",
         "visualizationType": "javaMemory",
+        "code": "String result = good.toString();",
         "javaMemoryState": {
           "stack": [
             {
               "name": "result",
               "value": "-> 0x200",
-              "frame": "main"
+              "frame": "main",
+              "type": "String"
             }
           ],
           "heap": [
@@ -173,12 +165,11 @@
               "type": "String",
               "new": true
             }
-          ],
-          "output": []
-        },
-        "code": "String result = good.toString();"
+          ]
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "반복문 안에서 문자열을 계속 더해야 할 때 가장 좋은 방법은?",

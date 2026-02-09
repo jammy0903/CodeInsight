@@ -72,6 +72,9 @@ export const FlowVariableSchema = z.object({
   // 배열 정보 (선택적)
   isArray: z.boolean().optional(),
   arrayIndex: z.number().optional(),
+
+  // 언어별 추가 메타데이터 (Java: isNew, sameRef, hashCode, refCount 등)
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type FlowVariable = z.infer<typeof FlowVariableSchema>;
