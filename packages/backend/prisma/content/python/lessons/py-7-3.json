@@ -9,38 +9,40 @@
         "title": "Node 클래스 정의 시작",
         "explanation": "`Node` 클래스를 정의합니다.\n\n**왜 이 순서인가?**\n순환 참조를 만들기 위해서는 먼저 서로를 참조할 수 있는 클래스가 필요합니다. Node 클래스는 next 속성을 통해 다른 Node를 가리킬 수 있습니다.\n\n**실행 순서:**\n1. class 키워드로 새로운 클래스 정의 시작\n2. Node라는 이름의 클래스 객체 생성 준비\n3. 클래스 본문 실행 대기",
         "visualizationType": "pythonMemory",
+        "code": "class Node:",
         "pythonMemoryState": {
           "output": [],
           "note": "Node 클래스 정의 시작",
           "names": [],
           "objects": []
-        },
-        "code": "class Node:"
+        }
       },
       {
         "title": "클래스 본문 진입",
         "explanation": "클래스 본문으로 진입합니다.\n\n**왜 이 순서인가?**\n클래스 내부의 메서드와 속성을 정의하기 위해 클래스 본문을 실행합니다. 이 단계에서 __init__ 메서드가 정의됩니다.\n\n**실행 순서:**\n1. 클래스 본문 실행 시작\n2. __init__ 메서드 정의 준비\n3. 클래스 객체 생성 완료 후 변수에 바인딩",
         "visualizationType": "pythonMemory",
-        "pythonMemoryState": {
-          "output": [],
-          "note": "클래스 본문 실행 중",
-          "names": [],
-          "objects": []
-        },
         "code": "class Node:",
         "highlightOffset": [
           0,
           1,
           2,
           3
-        ]
+        ],
+        "pythonMemoryState": {
+          "note": "클래스 본문 실행 중"
+        }
       },
       {
         "title": "__init__ 메서드 정의",
         "explanation": "`def __init__(self, name):`\n초기화 메서드를 정의합니다.\n\n**왜 이 순서인가?**\n__init__ 메서드는 새 인스턴스가 생성될 때 자동으로 호출되어 초기 상태를 설정합니다. name과 next 속성을 초기화하는 코드를 포함합니다.\n\n**실행 순서:**\n1. __init__ 함수 객체 생성\n2. 클래스의 메서드로 등록\n3. Node 클래스 객체 완성 (ID: 0x1000)",
         "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
         "pythonMemoryState": {
-          "output": [],
           "note": "Node 클래스 정의 완료 (ID: 0x1000)",
           "names": [
             {
@@ -58,20 +60,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "def __init__(self, name):",
-        "highlightOffset": [
-          0,
-          1,
-          2
-        ]
+        }
       },
       {
         "title": "첫 번째 노드 생성",
         "explanation": "`a = Node(\"A\")`\n'A' 노드를 생성합니다.\n\n**왜 이 순서인가?**\nNode 클래스를 호출하여 새 인스턴스를 생성합니다. 이때 __init__ 메서드가 자동으로 호출되어 초기화가 진행됩니다.\n\n**실행 순서:**\n1. Node 클래스 호출 → 새 인스턴스 생성 (ID: 0x2000)\n2. __init__(self, \"A\") 자동 호출\n3. 초기화 진행...",
         "visualizationType": "pythonMemory",
+        "code": "a = Node(\"A\")",
         "pythonMemoryState": {
-          "output": [],
           "note": "Node(\"A\") 호출 → 인스턴스 0x2000 생성, __init__ 호출 준비",
           "names": [
             {
@@ -87,15 +83,14 @@
               "pyId": "1001"
             }
           ]
-        },
-        "code": "a = Node(\"A\")"
+        }
       },
       {
         "title": "Node A 초기화 (1)",
         "explanation": "`self.name = name`\n`name`을 'A'로 설정합니다.\n\n**왜 이 순서인가?**\n__init__ 메서드 내부에서 인스턴스 속성을 설정합니다. self는 0x2000 인스턴스를 가리키고, name 매개변수는 \"A\"입니다.\n\n**실행 순서:**\n1. self (0x2000) 객체에 name 속성 추가\n2. name 속성에 \"A\" 문자열 할당\n3. 0x2000.name = \"A\" 완료",
         "visualizationType": "pythonMemory",
+        "code": "self.name = name",
         "pythonMemoryState": {
-          "output": [],
           "note": "Node A의 name 속성 = 'A' 설정",
           "names": [
             {
@@ -123,15 +118,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "self.name = name"
+        }
       },
       {
         "title": "Node A 초기화 (2)",
         "explanation": "`self.next = None`\n`next`를 None으로 설정합니다.\n\n**왜 이 순서인가?**\nname 속성 설정 후 next 속성을 초기화합니다. 처음에는 다른 노드를 가리키지 않으므로 None으로 설정합니다.\n\n**실행 순서:**\n1. self (0x2000) 객체에 next 속성 추가\n2. next 속성에 None 할당\n3. __init__ 완료, 변수 a가 0x2000 참조 (refcount=1)",
         "visualizationType": "pythonMemory",
+        "code": "self.next = None",
         "pythonMemoryState": {
-          "output": [],
           "note": "Node A 완성! a → 0x2000 (refcount=1)",
           "names": [
             {
@@ -159,15 +153,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "self.next = None"
+        }
       },
       {
         "title": "두 번째 노드 생성",
         "explanation": "`b = Node(\"B\")`\n'B' 노드를 생성합니다.\n\n**왜 이 순서인가?**\n순환 참조를 만들기 위해서는 두 개의 노드가 필요합니다. 첫 번째 노드 A에 이어 두 번째 노드 B를 생성합니다.\n\n**실행 순서:**\n1. Node 클래스 호출 → 새 인스턴스 생성 (ID: 0x3000)\n2. __init__(self, \"B\") 자동 호출\n3. 초기화 진행...",
         "visualizationType": "pythonMemory",
+        "code": "b = Node(\"B\")",
         "pythonMemoryState": {
-          "output": [],
           "note": "Node(\"B\") 호출 → 인스턴스 0x3000 생성, __init__ 호출 준비",
           "names": [
             {
@@ -193,15 +186,14 @@
               "pyId": "1002"
             }
           ]
-        },
-        "code": "b = Node(\"B\")"
+        }
       },
       {
         "title": "Node B 초기화 (1)",
         "explanation": "`self.name = name`\n`name`을 'B'로 설정합니다.\n\n**왜 이 순서인가?**\nNode A와 동일한 과정으로, 새 인스턴스 0x3000의 name 속성을 초기화합니다. self는 이번에는 0x3000을 가리킵니다.\n\n**실행 순서:**\n1. self (0x3000) 객체에 name 속성 추가\n2. name 속성에 \"B\" 문자열 할당\n3. 0x3000.name = \"B\" 완료",
         "visualizationType": "pythonMemory",
+        "code": "self.name = name",
         "pythonMemoryState": {
-          "output": [],
           "note": "Node B의 name 속성 = 'B' 설정",
           "names": [
             {
@@ -239,15 +231,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "self.name = name"
+        }
       },
       {
         "title": "Node B 초기화 (2)",
         "explanation": "`self.next = None`\n`next`를 None으로 설정합니다.\n\n**왜 이 순서인가?**\nNode A와 마찬가지로 next 속성을 None으로 초기화합니다. 이제 두 개의 독립적인 노드가 준비되었습니다.\n\n**실행 순서:**\n1. self (0x3000) 객체에 next 속성 추가\n2. next 속성에 None 할당\n3. __init__ 완료, 변수 b가 0x3000 참조 (refcount=1)\n4. 두 노드 모두 준비됨 (a: 0x2000, b: 0x3000)",
         "visualizationType": "pythonMemory",
+        "code": "self.next = None",
         "pythonMemoryState": {
-          "output": [],
           "note": "Node B 완성! a → 0x2000, b → 0x3000 (각 refcount=1)",
           "names": [
             {
@@ -285,15 +276,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "self.next = None"
+        }
       },
       {
         "title": "A에서 B로 참조 연결",
         "explanation": "`a.next = b`\n`a`의 `next` 속성이 `b` 객체를 가리키도록 합니다. 이제 `b` 객체의 참조 횟수는 `b` 변수와 `a.next`, 총 2개가 됩니다.\n\n**왜 이 순서인가?**\n노드 A가 노드 B를 가리키도록 연결합니다. 이제 0x2000.next가 0x3000을 참조하므로, 0x3000의 참조 카운트가 1 → 2로 증가합니다.\n\n**실행 순서:**\n1. a (0x2000)의 next 속성에 접근\n2. b (0x3000) 객체를 next에 할당\n3. 0x3000의 참조 카운트 1 → 2 (변수 b + a.next)\n4. A → B 연결 완성",
         "visualizationType": "pythonMemory",
+        "code": "a.next = b  # A → B",
         "pythonMemoryState": {
-          "output": [],
           "note": "A → B 연결! 0x3000 refcount=2 (변수 b + a.next)",
           "names": [
             {
@@ -331,15 +321,14 @@
               "pyId": "1003"
             }
           ]
-        },
-        "code": "a.next = b  # A → B"
+        }
       },
       {
         "title": "순환 참조 완성",
         "explanation": "`b.next = a`\n`b`의 `next` 속성이 `a` 객체를 가리키도록 합니다. 이로써 `a`와 `b`가 서로를 참조하는 '순환 참조'가 만들어집니다. 이제 `a`와 `b` 객체 모두 참조 횟수가 2가 됩니다.\n\n**왜 이 순서인가?**\n이제 노드 B도 노드 A를 가리키도록 합니다. A → B, B → A로 순환 고리가 완성됩니다! 이것이 순환 참조의 핵심입니다.\n\n**실행 순서:**\n1. b (0x3000)의 next 속성에 접근\n2. a (0x2000) 객체를 next에 할당\n3. 0x2000의 참조 카운트 1 → 2 (변수 a + b.next)\n4. 순환 참조 완성: A ⇄ B (서로를 가리킴!)\n5. 두 객체 모두 refcount=2",
         "visualizationType": "pythonMemory",
+        "code": "b.next = a  # B → A (순환!)",
         "pythonMemoryState": {
-          "output": [],
           "note": "순환 참조 완성! A ⇄ B (각 refcount=2)",
           "names": [
             {
@@ -377,15 +366,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "b.next = a  # B → A (순환!)"
+        }
       },
       {
         "title": "변수 'a' 삭제",
         "explanation": "`del a`\n변수 `a`를 삭제합니다. `a` 객체의 참조 횟수가 2에서 1로 줄어들지만, 여전히 `b.next`가 참조하고 있으므로 객체는 삭제되지 않습니다.\n\n**왜 이 순서인가?**\n변수 a를 삭제하여 0x2000에 대한 직접 접근을 제거합니다. 하지만 b.next가 여전히 0x2000을 가리키고 있으므로 객체는 메모리에 남아있습니다.\n\n**실행 순서:**\n1. 네임스페이스에서 변수 a 제거\n2. 0x2000의 참조 카운트 2 → 1 (b.next만 남음)\n3. refcount > 0이므로 객체는 삭제되지 않음\n4. 하지만 이제 a로는 접근 불가능!",
         "visualizationType": "pythonMemory",
+        "code": "del a  # a 삭제",
         "pythonMemoryState": {
-          "output": [],
           "note": "변수 a 삭제! 하지만 0x2000은 b.next가 참조 중 (refcount=1)",
           "names": [
             {
@@ -411,15 +399,14 @@
               "pyId": "1003"
             }
           ]
-        },
-        "code": "del a  # a 삭제"
+        }
       },
       {
         "title": "변수 'b' 삭제와 메모리 누수",
         "explanation": "`del b`\n변수 `b`도 삭제합니다. 이제 `a`와 `b` 두 객체에 접근할 방법이 없지만, 두 객체는 여전히 서로를 참조하여 참조 횟수가 1로 남아있습니다. 이 때문에 메모리에서 해제되지 않는 '메모리 누수'가 발생합니다. (파이썬의 가비지 컬렉터가 나중에 처리해줍니다.)\n\n**왜 이 순서인가?**\n이것이 순환 참조의 문제점입니다! 변수 b도 삭제하면 두 객체 모두 외부에서 접근할 수 없지만, 서로를 참조하고 있어서 refcount가 0이 되지 않습니다.\n\n**실행 순서:**\n1. 네임스페이스에서 변수 b 제거\n2. 0x3000의 참조 카운트 2 → 1 (a.next만 남음)\n3. 하지만 a도 이미 삭제된 상태!\n4. 결과: 0x2000과 0x3000 모두 접근 불가능하지만 메모리에 남아있음\n5. 0x2000.next → 0x3000 (refcount=1)\n6. 0x3000.next → 0x2000 (refcount=1)\n7. 참조 카운팅만으로는 이 고리를 끊을 수 없음!\n\n**핵심 교훈:** 순환 참조는 참조 카운팅의 한계입니다. Python의 가비지 컬렉터(gc 모듈)가 주기적으로 이런 순환 참조를 탐지하여 메모리를 정리합니다.",
         "visualizationType": "pythonMemory",
+        "code": "del b  # b 삭제",
         "pythonMemoryState": {
-          "output": [],
           "note": "메모리 누수! 0x2000 ⇄ 0x3000 서로 참조 (각 refcount=1), 접근 불가능하지만 삭제 안됨!",
           "names": [
             {
@@ -435,10 +422,10 @@
               "pyId": "1001"
             }
           ]
-        },
-        "code": "del b  # b 삭제"
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "순환 참조의 문제는?",

@@ -9,6 +9,11 @@
         "title": "일반 함수 정의",
         "explanation": "**`def add(x, y):`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 두 수를 더하는 간단한 함수 `add`를 정의합니다.\n\n**왜 이 순서인가?** 람다와 비교하기 위해 일반 함수를 먼저 정의합니다.\n\n**실행 순서**: def 실행 → add 함수 등록 → line 6",
         "visualizationType": "pythonMemory",
+        "code": "def add(x, y):",
+        "highlightOffset": [
+          0,
+          1
+        ],
         "pythonMemoryState": {
           "output": [],
           "names": [
@@ -25,19 +30,14 @@
               "pyId": "1001"
             }
           ]
-        },
-        "code": "def add(x, y):",
-        "highlightOffset": [
-          0,
-          1
-        ]
+        }
       },
       {
         "title": "람다(Lambda) 함수",
         "explanation": "**`add_lambda = lambda x, y: x + y`**\n\n**Lambda 함수**: `lambda` 키워드로 **이름 없는 익명 함수**를 만듭니다. 람다 함수는 **한 줄 표현식**만 가능합니다.\n\n**문법**: `lambda 매개변수: 표현식`\n- 매개변수: `x, y`\n- 표현식: `x + y` (자동으로 반환됨, return 불필요)\n\n**일반 함수와의 차이**:\n- 일반: `def add(x, y): return x + y` (3줄)\n- 람다: `lambda x, y: x + y` (1줄)\n\n생성된 람다 함수 객체를 `add_lambda` 변수에 할당합니다.\n\n**왜 이 순서인가?** 일반 함수 정의 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: lambda 생성 → 함수 객체 (0x2000) → add_lambda = 0x2000 → line 8",
         "visualizationType": "pythonMemory",
+        "code": "add_lambda = lambda x, y: x + y",
         "pythonMemoryState": {
-          "output": [],
           "note": "람다 함수 객체 생성됨",
           "names": [
             {
@@ -63,46 +63,22 @@
               "pyId": "1002"
             }
           ]
-        },
-        "code": "add_lambda = lambda x, y: x + y"
+        }
       },
       {
         "title": "일반 함수 호출",
         "explanation": "**`print(add(2, 3))`**\n\n`add` 함수를 호출합니다. 실행 흐름이 **함수 내부(line 3)**로 이동합니다.\n\n**실행 순서**: line 8 → add(2, 3) 호출 → line 3으로 점프 → x=2, y=3",
         "visualizationType": "pythonMemory",
+        "code": "print(add(2, 3))",
         "pythonMemoryState": {
-          "output": [],
-          "names": [
-            {
-              "name": "add",
-              "pointsTo": "function1"
-            },
-            {
-              "name": "add_lambda",
-              "pointsTo": "function2"
-            }
-          ],
-          "objects": [
-            {
-              "id": "function1",
-              "type": "function",
-              "value": "<function>",
-              "pyId": "1001"
-            },
-            {
-              "id": "function2",
-              "type": "function",
-              "value": "<lambda>",
-              "pyId": "1002"
-            }
-          ]
-        },
-        "code": "print(add(2, 3))"
+          "note": null
+        }
       },
       {
         "title": "add 함수 실행",
         "explanation": "**`return x + y`**\n\n`x=2`, `y=3`이므로 `5`를 반환합니다. `print`가 `5`를 출력합니다.\n\n**실행 순서**: x=2, y=3 → 2+3 계산 → 5 반환 → line 8로 → print(5) → line 9",
         "visualizationType": "pythonMemory",
+        "code": "return x + y",
         "pythonMemoryState": {
           "output": [
             "5"
@@ -155,17 +131,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "return x + y"
+        }
       },
       {
         "title": "람다 함수 호출",
         "explanation": "**`print(add_lambda(2, 3))`**\n\n람다 함수를 호출합니다. **람다도 일반 함수처럼 호출**할 수 있습니다.\n\n**실행 순서**: line 9 → add_lambda(2, 3) 호출 → line 6으로 점프 → x=2, y=3",
         "visualizationType": "pythonMemory",
+        "code": "print(add_lambda(2, 3))",
         "pythonMemoryState": {
-          "output": [
-            "5"
-          ],
           "names": [
             {
               "name": "add",
@@ -190,16 +163,15 @@
               "pyId": "1002"
             }
           ]
-        },
-        "code": "print(add_lambda(2, 3))"
+        }
       },
       {
         "title": "람다 함수 실행",
         "explanation": "**`lambda x, y: x + y`**\n\n람다 함수의 **표현식 `x + y`**가 실행됩니다. `x=2`, `y=3`이므로 `5`를 반환합니다.\n\n**자동 return**: 람다는 표현식의 결과를 **자동으로 반환**합니다. `return` 키워드가 필요 없습니다.\n\n**실행 순서**: x=2, y=3 → 2+3 계산 → 5 반환 → line 9로 → print(5) → line 12",
         "visualizationType": "pythonMemory",
+        "code": "add_lambda = lambda x, y: x + y",
         "pythonMemoryState": {
           "output": [
-            "5",
             "5"
           ],
           "names": [
@@ -250,18 +222,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "add_lambda = lambda x, y: x + y"
+        }
       },
       {
         "title": "정렬할 리스트 준비",
         "explanation": "**`pairs = [(1, 'one'), (3, 'three'), (2, 'two')]`**\n\n(숫자, 문자열) 형태의 튜플을 담은 리스트를 생성합니다.\n\n**왜 이 순서인가?** 람다의 실용적인 활용 예시를 보여주기 위해 정렬할 데이터를 준비합니다.\n\n**실행 순서**: 리스트 생성 → pairs = 리스트 → line 13",
         "visualizationType": "pythonMemory",
+        "code": "pairs = [(1, 'one'), (3, 'three'), (2, 'two')]",
         "pythonMemoryState": {
-          "output": [
-            "5",
-            "5"
-          ],
           "names": [
             {
               "name": "add",
@@ -296,18 +264,14 @@
               "pyId": "1005"
             }
           ]
-        },
-        "code": "pairs = [(1, 'one'), (3, 'three'), (2, 'two')]"
+        }
       },
       {
         "title": "람다를 활용한 정렬",
         "explanation": "**`pairs.sort(key=lambda p: p[1])`**\n\n**람다의 실용적 활용**: `sort()`의 `key` 매개변수에 람다 함수를 전달합니다.\n\n**동작 원리**:\n1. 정렬 과정에서 각 요소마다 **람다가 호출**됩니다\n2. 람다는 각 튜플 `p`의 **두 번째 요소 `p[1]`** (문자열)을 반환합니다\n3. Python은 이 반환값을 기준으로 정렬합니다\n\n**람다 호출 예시**:\n- `(1, 'one')` → `'one'`\n- `(3, 'three')` → `'three'`\n- `(2, 'two')` → `'two'`\n\n알파벳 순으로 정렬: `'one'` < `'three'` < `'two'`\n\n**왜 람다를 사용하는가?** 한 줄짜리 간단한 함수를 `def`로 정의하는 것보다 훨씬 간결합니다.\n\n**실행 순서**: sort 실행 (내부에서 람다 여러 번 호출) → pairs 내용 변경 → line 14",
         "visualizationType": "pythonMemory",
+        "code": "pairs.sort(key=lambda p: p[1]) # 두 번째 요소(글자)로 정렬",
         "pythonMemoryState": {
-          "output": [
-            "5",
-            "5"
-          ],
           "note": "정렬 완료 (알파벳 순: one < three < two)",
           "names": [
             {
@@ -345,17 +309,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "pairs.sort(key=lambda p: p[1]) # 두 번째 요소(글자)로 정렬"
+        }
       },
       {
         "title": "정렬 결과 출력",
         "explanation": "**`print(pairs)`**\n\n정렬된 리스트를 출력합니다. 문자열 기준으로 정렬되어 순서가 바뀌었습니다.\n\n**결과 분석**: 숫자 순서(1, 3, 2)가 아니라 문자열 알파벳 순서(one, three, two)로 정렬되었습니다.\n\n**람다의 장점 정리**:\n- ✅ 간결함: 한 줄로 표현\n- ✅ 일회성: 이름 지을 필요 없음\n- ✅ 고차 함수: `sort()`, `filter()`, `map()` 등에 활용\n\n**실행 순서**: print 실행 → 리스트 출력 → 프로그램 종료",
         "visualizationType": "pythonMemory",
+        "code": "print(pairs)",
         "pythonMemoryState": {
           "output": [
-            "5",
-            "5",
             "[(1, 'one'), (3, 'three'), (2, 'two')]"
           ],
           "names": [
@@ -391,11 +353,12 @@
               "value": "[(1, 'one'), (3, 'three'), (2, 'two')]",
               "pyId": "1005"
             }
-          ]
-        },
-        "code": "print(pairs)"
+          ],
+          "note": null
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "람다 함수에 대한 설명으로 틀린 것은?",

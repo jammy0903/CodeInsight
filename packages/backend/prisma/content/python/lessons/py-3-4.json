@@ -9,6 +9,7 @@
         "title": "세트 생성",
         "explanation": "**`nums = {1, 2, 2, 3, 3, 3}`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 중괄호 `{}`로 세트(Set) 객체를 만듭니다.\n\n**왜 중복이 제거되는가?** 세트의 핵심 특징은 **중복된 요소를 허용하지 않는다**는 것입니다. Python은 세트를 만들 때 **자동으로 중복을 제거**합니다:\n- 입력: `{1, 2, 2, 3, 3, 3}`\n- 결과: `{1, 2, 3}`\n\n**세트의 특징**:\n- **중복 불가(Unique)**: 같은 값 1개만 유지\n- **순서 없음(Unordered)**: `s[0]` 같은 인덱싱 불가\n- **Mutable**: 내용 수정 가능 (add, remove)\n- **해시 테이블**: O(1) 평균 조회 시간\n\n**빈 세트**: `set()` (주의: `{}`는 빈 딕셔너리!)\n\n**왜 이 순서인가?** Python은 코드를 위에서부터 실행합니다.\n\n**실행 순서**: line 2 → 세트 생성 (중복 제거) → nums = 0x1000 → line 3",
         "visualizationType": "pythonMemory",
+        "code": "nums = {1, 2, 2, 3, 3, 3}",
         "pythonMemoryState": {
           "output": [],
           "note": "중복 자동 제거 (2, 3의 중복 삭제됨)",
@@ -26,42 +27,26 @@
               "pyId": "1001"
             }
           ]
-        },
-        "code": "nums = {1, 2, 2, 3, 3, 3}"
+        }
       },
       {
         "title": "중복 제거 확인",
         "explanation": "**`print(nums)`**\n\n중복이 제거된 `nums` 세트를 출력합니다. 결과는 `{1, 2, 3}`입니다.\n\n**왜 순서가 보장 안 되는가?** 세트는 내부적으로 **해시 테이블**을 사용하기 때문에, 값들이 해시값에 따라 무작위 순서로 저장됩니다. 출력 순서는 Python 버전이나 실행 환경에 따라 달라질 수 있습니다 (예: `{2, 1, 3}` 가능).\n\n**리스트와의 차이**:\n- 리스트: 순서 보장 O, 인덱싱 O, 중복 O\n- 세트: 순서 보장 X, 인덱싱 X, 중복 X\n\n**실행 순서**: nums 읽기 → print 실행 → line 6",
         "visualizationType": "pythonMemory",
+        "code": "print(nums)  # {1, 2, 3} (중복 제거됨)",
         "pythonMemoryState": {
           "output": [
             "{1, 2, 3}"
           ],
-          "names": [
-            {
-              "name": "nums",
-              "pointsTo": "set1"
-            }
-          ],
-          "objects": [
-            {
-              "id": "set1",
-              "type": "set",
-              "value": "{1, 2, 3}",
-              "pyId": "1001"
-            }
-          ]
-        },
-        "code": "print(nums)  # {1, 2, 3} (중복 제거됨)"
+          "note": null
+        }
       },
       {
         "title": "항목 추가 (add)",
         "explanation": "**`nums.add(4)`**\n\n**add 메서드**: 세트에 새로운 항목을 추가합니다. `nums` 세트에 `4`가 추가되어 `{1, 2, 3, 4}`가 됩니다.\n\n**Mutable의 의미**: 세트는 **새 객체를 만들지 않고**, 기존 객체(0x1000)의 **내용을 직접 수정**합니다.\n\n**이미 있는 값을 추가하면?** 아무 일도 일어나지 않습니다 (중복 불가):\n```python\nnums.add(2)  # 이미 2가 있으므로 변화 없음\n```\n\n**리스트와의 차이**:\n- 리스트: `append(4)` → 맨 끝에 추가\n- 세트: `add(4)` → 순서 없이 추가\n\n**실행 순서**: add 실행 → 0x1000 객체 내용 변경 → line 7",
         "visualizationType": "pythonMemory",
+        "code": "nums.add(4)",
         "pythonMemoryState": {
-          "output": [
-            "{1, 2, 3}"
-          ],
           "note": "4 추가 (같은 객체 0x1000 수정)",
           "names": [
             {
@@ -79,25 +64,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "nums.add(4)"
+        }
       },
       {
         "title": "항목 삭제 (remove)",
         "explanation": "**`nums.remove(1)`**\n\n**remove 메서드**: 특정 항목을 삭제합니다. `nums` 세트에서 `1`이 제거되어 `{2, 3, 4}`가 됩니다.\n\n**없는 값을 삭제하면?** `KeyError` 발생:\n```python\nnums.remove(999)  # KeyError: 999\n```\n\n**안전한 삭제**: `discard()`를 사용하면 에러 없이 무시됩니다:\n```python\nnums.discard(999)  # 에러 없음\n```\n\n**실행 순서**: remove 실행 → 1 삭제 → 0x1000 객체 내용 변경 → line 10",
         "visualizationType": "pythonMemory",
+        "code": "nums.remove(1)",
         "pythonMemoryState": {
-          "output": [
-            "{1, 2, 3}"
-          ],
           "note": "1 제거",
-          "names": [
-            {
-              "name": "nums",
-              "pointsTo": "set1",
-              "highlight": true
-            }
-          ],
           "objects": [
             {
               "id": "set1",
@@ -107,17 +82,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "nums.remove(1)"
+        }
       },
       {
         "title": "집합 연산을 위한 세트 'a' 생성",
         "explanation": "**`a = {1, 2, 3}`**\n\n집합 연산(교집합, 합집합 등)을 시연하기 위한 첫 번째 세트 `a`를 생성합니다.\n\n**왜 이 순서인가?** 이전 작업 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 10 → 세트 생성 (id: 0x2000) → a = 0x2000 → line 11",
         "visualizationType": "pythonMemory",
+        "code": "a = {1, 2, 3}",
         "pythonMemoryState": {
-          "output": [
-            "{1, 2, 3}"
-          ],
           "names": [
             {
               "name": "nums",
@@ -141,18 +113,16 @@
               "value": "{1, 2, 3}",
               "pyId": "1002"
             }
-          ]
-        },
-        "code": "a = {1, 2, 3}"
+          ],
+          "note": null
+        }
       },
       {
         "title": "집합 연산을 위한 세트 'b' 생성",
         "explanation": "**`b = {3, 4, 5}`**\n\n집합 연산을 시연하기 위한 두 번째 세트 `b`를 생성합니다.\n\n**실행 순서**: line 11 → 세트 생성 (id: 0x3000) → b = 0x3000 → line 13",
         "visualizationType": "pythonMemory",
+        "code": "b = {3, 4, 5}",
         "pythonMemoryState": {
-          "output": [
-            "{1, 2, 3}"
-          ],
           "names": [
             {
               "name": "nums",
@@ -187,105 +157,34 @@
               "pyId": "1003"
             }
           ]
-        },
-        "code": "b = {3, 4, 5}"
+        }
       },
       {
         "title": "교집합 연산 (&)",
         "explanation": "**`print(a & b)`**\n\n**교집합(Intersection)**: `&` 연산자는 두 세트에 **모두 포함된** 항목들의 집합을 구합니다.\n\n- `a = {1, 2, 3}`\n- `b = {3, 4, 5}`\n- `a & b = {3}` (공통 원소)\n\n**다른 집합 연산**:\n- `a | b`: 합집합 (모든 원소)\n- `a - b`: 차집합 (a에만 있는 것)\n- `a ^ b`: 대칭차집합 (둘 중 하나에만 있는 것)\n\n**메서드 버전**: `a.intersection(b)`와 동일\n\n**실행 순서**: a & b 계산 → 새 세트 생성 → print 실행 → line 14",
         "visualizationType": "pythonMemory",
+        "code": "print(a & b) # 교집합 {3}",
         "pythonMemoryState": {
           "output": [
-            "{1, 2, 3}",
             "{3}"
           ],
-          "note": "a & b = {3} (교집합, 새 세트)",
-          "names": [
-            {
-              "name": "nums",
-              "pointsTo": "set1"
-            },
-            {
-              "name": "a",
-              "pointsTo": "set2"
-            },
-            {
-              "name": "b",
-              "pointsTo": "set3"
-            }
-          ],
-          "objects": [
-            {
-              "id": "set1",
-              "type": "set",
-              "value": "{2, 3, 4}",
-              "pyId": "1001"
-            },
-            {
-              "id": "set2",
-              "type": "set",
-              "value": "{1, 2, 3}",
-              "pyId": "1002"
-            },
-            {
-              "id": "set3",
-              "type": "set",
-              "value": "{3, 4, 5}",
-              "pyId": "1003"
-            }
-          ]
-        },
-        "code": "print(a & b) # 교집합 {3}"
+          "note": "a & b = {3} (교집합, 새 세트)"
+        }
       },
       {
         "title": "합집합 연산 (|)",
         "explanation": "**`print(a | b)`**\n\n**합집합(Union)**: `|` 연산자는 두 세트의 **모든 항목을 합친** 집합을 구합니다. 중복은 자동으로 제거됩니다.\n\n- `a = {1, 2, 3}`\n- `b = {3, 4, 5}`\n- `a | b = {1, 2, 3, 4, 5}` (중복 3은 1개만)\n\n**메서드 버전**: `a.union(b)`와 동일\n\n**왜 3이 두 개 안 되는가?** 세트는 중복을 허용하지 않으므로, `3`은 한 번만 포함됩니다.\n\n**실행 순서**: a | b 계산 → 새 세트 생성 → print 실행 → 프로그램 종료",
         "visualizationType": "pythonMemory",
+        "code": "print(a | b) # 합집합 {1, 2, 3, 4, 5}",
         "pythonMemoryState": {
           "output": [
-            "{1, 2, 3}",
-            "{3}",
             "{1, 2, 3, 4, 5}"
           ],
-          "note": "a | b = {1, 2, 3, 4, 5} (합집합, 중복 제거)",
-          "names": [
-            {
-              "name": "nums",
-              "pointsTo": "set1"
-            },
-            {
-              "name": "a",
-              "pointsTo": "set2"
-            },
-            {
-              "name": "b",
-              "pointsTo": "set3"
-            }
-          ],
-          "objects": [
-            {
-              "id": "set1",
-              "type": "set",
-              "value": "{2, 3, 4}",
-              "pyId": "1001"
-            },
-            {
-              "id": "set2",
-              "type": "set",
-              "value": "{1, 2, 3}",
-              "pyId": "1002"
-            },
-            {
-              "id": "set3",
-              "type": "set",
-              "value": "{3, 4, 5}",
-              "pyId": "1003"
-            }
-          ]
-        },
-        "code": "print(a | b) # 합집합 {1, 2, 3, 4, 5}"
+          "note": "a | b = {1, 2, 3, 4, 5} (합집합, 중복 제거)"
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "빈 세트를 만들 때 올바른 방법은?",

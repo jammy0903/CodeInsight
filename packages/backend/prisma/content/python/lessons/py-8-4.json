@@ -9,6 +9,7 @@
         "title": "itertools 모듈 임포트",
         "explanation": "`import itertools`\n효율적인 반복을 위한 강력한 도구들이 모여있는 `itertools` 모듈을 가져옵니다.\n\n**왜 이 순서인가?**\n도구를 사용하기 위해 상자를 먼저 엽니다.\n\n**실행 순서:**\n1. `itertools` 모듈(0x1500)을 로드합니다.\n2. 네임스페이스에 등록합니다.",
         "visualizationType": "pythonMemory",
+        "code": "import itertools",
         "pythonMemoryState": {
           "output": [],
           "note": "itertools 모듈(0x1500) 로드 완료.",
@@ -28,15 +29,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "import itertools"
+        }
       },
       {
         "title": "무한 카운터 생성 (count)",
         "explanation": "`counter = itertools.count(start=10, step=2)`\n10에서 시작하여 2씩 무한히 증가하는 카운터 이터레이터를 생성합니다.\n\n**왜 이 순서인가?**\n시작값과 증가폭을 설정하여 카운터를 준비합니다.\n\n**실행 순서:**\n1. `count` 객체(0x2000) 생성.\n2. 내부 상태: start=10, step=2.",
         "visualizationType": "pythonMemory",
+        "code": "counter = itertools.count(start=10, step=2)",
         "pythonMemoryState": {
-          "output": [],
           "note": "count 이터레이터(0x2000)가 생성되었습니다. (10부터 2씩 증가)",
           "names": [
             {
@@ -54,25 +54,18 @@
               "highlight": true
             }
           ]
-        },
-        "code": "counter = itertools.count(start=10, step=2)"
+        }
       },
       {
         "title": "count 첫 번째 값 (10)",
         "explanation": "`print(next(counter))`\n시작값인 10이 출력됩니다.\n\n**왜 이 순서인가?**\n첫 번째 값을 요청하면 시작값을 줍니다.\n\n**실행 순서:**\n1. `next()` 호출.\n2. 10 반환.\n3. 내부 값 10 -> 12 업데이트.",
         "visualizationType": "pythonMemory",
+        "code": "print(next(counter))",
         "pythonMemoryState": {
           "output": [
             "10"
           ],
           "note": "10 출력 후, 다음 값은 12가 됩니다.",
-          "names": [
-            {
-              "name": "counter",
-              "pointsTo": "iterator1",
-              "highlight": true
-            }
-          ],
           "objects": [
             {
               "id": "iterator1",
@@ -82,26 +75,19 @@
               "highlight": true
             }
           ]
-        },
-        "code": "print(next(counter))"
+        }
       },
       {
         "title": "count 두 번째 값 (12)",
         "explanation": "`print(next(counter))`\nstep인 2만큼 증가한 12가 출력됩니다.\n\n**왜 이 순서인가?**\n두 번째 값은 step만큼 더해진 값입니다.\n\n**실행 순서:**\n1. `next()` 호출.\n2. 12 반환.\n3. 내부 값 12 -> 14 업데이트.",
         "visualizationType": "pythonMemory",
+        "code": "print(next(counter))",
+        "occurrence": 2,
         "pythonMemoryState": {
           "output": [
-            "10",
             "12"
           ],
           "note": "12 출력 후, 다음 값은 14가 됩니다.",
-          "names": [
-            {
-              "name": "counter",
-              "pointsTo": "iterator1",
-              "highlight": true
-            }
-          ],
           "objects": [
             {
               "id": "iterator1",
@@ -111,19 +97,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "print(next(counter))",
-        "occurrence": 2
+        }
       },
       {
         "title": "무한 순환 이터레이터 생성 (cycle)",
         "explanation": "`cycler = itertools.cycle(['A', 'B', 'C'])`\n리스트의 항목을 무한히 순환하는 이터레이터를 생성합니다.\n\n**왜 이 순서인가?**\n반복할 대상을 지정하여 순환자를 준비합니다.\n\n**실행 순서:**\n1. `cycle` 객체(0x3000) 생성.\n2. ['A', 'B', 'C'] 리스트 저장.",
         "visualizationType": "pythonMemory",
+        "code": "cycler = itertools.cycle(['A', 'B', 'C'])",
         "pythonMemoryState": {
-          "output": [
-            "10",
-            "12"
-          ],
           "note": "cycle 이터레이터(0x3000)가 생성되었습니다.",
           "names": [
             {
@@ -141,17 +122,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "cycler = itertools.cycle(['A', 'B', 'C'])"
+        }
       },
       {
         "title": "cycle 첫 번째 값 (A)",
         "explanation": "`print(next(cycler))`\n첫 번째 값 'A'가 출력됩니다.\n\n**왜 이 순서인가?**\n리스트의 첫 요소를 반환합니다.\n\n**실행 순서:**\n1. `next()` 호출.\n2. 'A' 반환.",
         "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
         "pythonMemoryState": {
           "output": [
-            "10",
-            "12",
             "A"
           ],
           "note": "첫 번째 원소 'A'가 반환되었습니다.",
@@ -169,106 +148,52 @@
               "pyId": "1003"
             }
           ]
-        },
-        "code": "print(next(cycler))"
+        }
       },
       {
         "title": "cycle 두 번째 값 (B)",
         "explanation": "`print(next(cycler))`\n두 번째 값 'B'가 출력됩니다.\n\n**실행 순서:**\n1. `next()` 호출.\n2. 'B' 반환.",
         "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 2,
         "pythonMemoryState": {
           "output": [
-            "10",
-            "12",
-            "A",
             "B"
           ],
-          "note": "'B' 출력.",
-          "names": [
-            {
-              "name": "cycler",
-              "pointsTo": "iterator2"
-            }
-          ],
-          "objects": [
-            {
-              "id": "iterator2",
-              "type": "iterator",
-              "value": "cycle object",
-              "pyId": "1003"
-            }
-          ]
-        },
-        "code": "print(next(cycler))",
-        "occurrence": 2
+          "note": "'B' 출력."
+        }
       },
       {
         "title": "cycle 세 번째 값 (C)",
         "explanation": "`print(next(cycler))`\n세 번째 값 'C'가 출력됩니다.\n\n**실행 순서:**\n1. 'C' 반환.",
         "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 3,
         "pythonMemoryState": {
           "output": [
-            "10",
-            "12",
-            "A",
-            "B",
             "C"
           ],
-          "note": "'C' 출력. 리스트 끝에 도달했습니다.",
-          "names": [
-            {
-              "name": "cycler",
-              "pointsTo": "iterator2"
-            }
-          ],
-          "objects": [
-            {
-              "id": "iterator2",
-              "type": "iterator",
-              "value": "cycle object",
-              "pyId": "1003"
-            }
-          ]
-        },
-        "code": "print(next(cycler))",
-        "occurrence": 3
+          "note": "'C' 출력. 리스트 끝에 도달했습니다."
+        }
       },
       {
         "title": "cycle 네 번째 값 - 순환 (A)",
         "explanation": "`print(next(cycler))`\n마지막 항목 후 다시 처음으로 돌아와 'A'가 출력됩니다.\n\n**왜 이 순서인가?**\n끝에 도달했으므로 다시 처음으로 돌아갑니다(Cycle).\n\n**실행 순서:**\n1. 인덱스 0으로 리셋.\n2. 'A' 반환.",
         "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 4,
         "pythonMemoryState": {
           "output": [
-            "10",
-            "12",
-            "A",
-            "B",
-            "C",
             "A"
           ],
-          "note": "다시 처음으로 돌아와 'A'가 출력되었습니다.",
-          "names": [
-            {
-              "name": "cycler",
-              "pointsTo": "iterator2"
-            }
-          ],
-          "objects": [
-            {
-              "id": "iterator2",
-              "type": "iterator",
-              "value": "cycle object",
-              "pyId": "1003"
-            }
-          ]
-        },
-        "code": "print(next(cycler))",
-        "occurrence": 4
+          "note": "다시 처음으로 돌아와 'A'가 출력되었습니다."
+        }
       },
       {
         "title": "이터러블 연결 (chain)",
         "explanation": "`chained = itertools.chain([1, 2], ['a', 'b'])`\n여러 이터러블을 하나로 연결하는 이터레이터를 생성합니다.\n\n**왜 이 순서인가?**\n두 리스트를 논리적으로만 연결하여 메모리 낭비를 줄입니다.\n\n**실행 순서:**\n1. `chain` 객체(0x4000) 생성.\n2. 이터러블 참조 저장.",
         "visualizationType": "pythonMemory",
+        "code": "chained = itertools.chain([1, 2], ['a', 'b'])",
         "pythonMemoryState": {
           "output": [
             "..."
@@ -290,17 +215,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "chained = itertools.chain([1, 2], ['a', 'b'])"
+        }
       },
       {
         "title": "for 루프 - 첫 번째 값 (1)",
         "explanation": "`for item in chained:`\n첫 번째 리스트의 첫 번째 값 1이 item에 할당됩니다.\n\n**왜 이 순서인가?**\n첫 번째 이터러블부터 순회를 시작합니다.\n\n**실행 순서:**\n1. `chain` 시작.\n2. 첫 번째 리스트 [1, 2] 순회.",
         "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
         "pythonMemoryState": {
-          "output": [
-            "..."
-          ],
           "note": "첫 번째 리스트의 1을 가져왔습니다.",
           "names": [
             {
@@ -328,16 +250,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for item in chained:"
+        }
       },
       {
         "title": "출력 (1)",
         "explanation": "`print(item, end=' ')`\n1을 출력합니다.\n\n**실행 순서:**\n1. 1 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
         "pythonMemoryState": {
           "output": [
-            "...",
             "1"
           ],
           "note": "1 출력.",
@@ -355,18 +276,14 @@
               "pyId": "1005"
             }
           ]
-        },
-        "code": "print(item, end=' ')"
+        }
       },
       {
         "title": "for 루프 - 두 번째 값 (2)",
         "explanation": "첫 번째 리스트의 두 번째 값 2가 item에 할당됩니다.\n\n**실행 순서:**\n1. 첫 번째 리스트 다음 값.\n2. `item` = 2.",
         "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
         "pythonMemoryState": {
-          "output": [
-            "...",
-            "1"
-          ],
           "note": "첫 번째 리스트의 2를 가져왔습니다.",
           "names": [
             {
@@ -384,17 +301,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for item in chained:"
+        }
       },
       {
         "title": "출력 (2)",
         "explanation": "`print(item, end=' ')`\n2를 출력합니다.\n\n**실행 순서:**\n1. 2 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
         "pythonMemoryState": {
           "output": [
-            "...",
-            "1",
             "2"
           ],
           "note": "2 출력. 첫 번째 리스트 종료.",
@@ -412,19 +327,14 @@
               "pyId": "1006"
             }
           ]
-        },
-        "code": "print(item, end=' ')"
+        }
       },
       {
         "title": "for 루프 - 세 번째 값 (a)",
         "explanation": "첫 번째 리스트가 소진되어 두 번째 리스트의 'a'가 item에 할당됩니다.\n\n**왜 이 순서인가?**\nchain은 앞의 것이 끝나면 자동으로 다음 이터러블로 넘어갑니다.\n\n**실행 순서:**\n1. 첫 번째 리스트 끝남.\n2. 두 번째 리스트 전환.\n3. `item` = 'a'.",
         "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
         "pythonMemoryState": {
-          "output": [
-            "...",
-            "1",
-            "2"
-          ],
           "note": "두 번째 리스트로 넘어가 'a'를 가져왔습니다.",
           "names": [
             {
@@ -442,18 +352,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for item in chained:"
+        }
       },
       {
         "title": "출력 (a)",
         "explanation": "`print(item, end=' ')`\n'a'를 출력합니다.\n\n**실행 순서:**\n1. 'a' 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
         "pythonMemoryState": {
           "output": [
-            "...",
-            "1",
-            "2",
             "a"
           ],
           "note": "'a' 출력.",
@@ -471,20 +378,14 @@
               "pyId": "1007"
             }
           ]
-        },
-        "code": "print(item, end=' ')"
+        }
       },
       {
         "title": "for 루프 - 네 번째 값 (b)",
         "explanation": "두 번째 리스트의 'b'가 item에 할당됩니다.\n\n**실행 순서:**\n1. 두 번째 리스트 다음 값.\n2. `item` = 'b'.",
         "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
         "pythonMemoryState": {
-          "output": [
-            "...",
-            "1",
-            "2",
-            "a"
-          ],
           "note": "'b' 할당.",
           "names": [
             {
@@ -502,19 +403,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for item in chained:"
+        }
       },
       {
         "title": "출력 (b) - 루프 종료",
         "explanation": "`print(item, end=' ')`\n'b'를 출력합니다. 모든 이터러블이 소진되어 루프가 종료됩니다.\n\n**왜 이 순서인가?**\n더 이상 연결된 이터러블이 없으므로 종료합니다.\n\n**실행 순서:**\n1. 'b' 출력.\n2. 모든 리스트 소진 확인.\n3. 루프 종료.",
         "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
         "pythonMemoryState": {
           "output": [
-            "...",
-            "1",
-            "2",
-            "a",
             "b"
           ],
           "note": "모든 연결된 데이터를 순회하고 루프가 종료되었습니다.",
@@ -532,10 +429,10 @@
               "pyId": "1004"
             }
           ]
-        },
-        "code": "print(item, end=' ')"
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "`itertools.cycle('XYZ')` 이터레이터에서 4번째로 나오는 값은?",

@@ -9,6 +9,7 @@
         "title": "sys 모듈 임포트",
         "explanation": "`import sys`\n메모리 크기를 확인하는 `sys.getsizeof()` 함수를 사용하기 위해 `sys` 모듈을 가져옵니다.\n\n**왜 이 순서인가?**\n외부 라이브러리를 사용하려면 먼저 임포트해야 합니다.\n\n**실행 순서:**\n1. `sys` 모듈(0x1500)을 로드합니다.\n2. 현재 네임스페이스에 `sys` 이름을 등록합니다.",
         "visualizationType": "pythonMemory",
+        "code": "import sys",
         "pythonMemoryState": {
           "output": [],
           "note": "sys 모듈(0x1500)이 로드되었습니다.",
@@ -28,15 +29,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "import sys"
+        }
       },
       {
         "title": "리스트 컴프리헨션",
         "explanation": "`list_comp = [i * i for i in range(5)]`\n대괄호`[]`를 사용한 리스트 컴프리헨션입니다. 모든 값을 미리 계산하여 메모리에 올립니다.\n\n**왜 이 순서인가?**\n리스트 컴프리헨션은 정의되는 즉시 모든 계산을 수행합니다(Eager Evaluation).\n\n**실행 순서:**\n1. 리스트 객체(0x2000) 생성.\n2. 0부터 4까지 반복하며 제곱값 계산.\n3. 리스트에 [0, 1, 4, 9, 16] 저장.",
         "visualizationType": "pythonMemory",
+        "code": "list_comp = [i * i for i in range(5)]",
         "pythonMemoryState": {
-          "output": [],
           "note": "리스트(0x2000)가 생성되고 모든 값이 즉시 메모리에 저장됩니다.",
           "names": [
             {
@@ -54,13 +54,13 @@
               "highlight": true
             }
           ]
-        },
-        "code": "list_comp = [i * i for i in range(5)]"
+        }
       },
       {
         "title": "리스트 내용 출력",
         "explanation": "`print(f\"List: {list_comp}\")`\n생성된 리스트 `[0, 1, 4, 9, 16]` 전체를 출력합니다.\n\n**왜 이 순서인가?**\n값이 잘 들어갔는지 확인합니다.\n\n**실행 순서:**\n1. 리스트 내용을 문자열로 변환하여 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(f\"List: {list_comp}\")",
         "pythonMemoryState": {
           "output": [
             "List: [0, 1, 4, 9, 16]"
@@ -80,45 +80,26 @@
               "pyId": "1002"
             }
           ]
-        },
-        "code": "print(f\"List: {list_comp}\")"
+        }
       },
       {
         "title": "리스트 메모리 크기",
         "explanation": "`print(f\"Size: {sys.getsizeof(list_comp)}\")`\n리스트가 차지하는 메모리의 크기를 출력합니다.\n\n**왜 이 순서인가?**\n메모리를 얼마나 쓰는지 확인해봅니다.\n\n**실행 순서:**\n1. `sys.getsizeof` 호출.",
         "visualizationType": "pythonMemory",
+        "code": "print(f\"Size: {sys.getsizeof(list_comp)}\")",
         "pythonMemoryState": {
           "output": [
-            "List: [0, 1, 4, 9, 16]",
             "Size: 120"
           ],
-          "note": "리스트의 크기가 출력됩니다. (값은 시스템마다 다를 수 있음)",
-          "names": [
-            {
-              "name": "list_comp",
-              "pointsTo": "list1"
-            }
-          ],
-          "objects": [
-            {
-              "id": "list1",
-              "type": "list",
-              "value": "[0, 1, 4, 9, 16]",
-              "pyId": "1002"
-            }
-          ]
-        },
-        "code": "print(f\"Size: {sys.getsizeof(list_comp)}\")"
+          "note": "리스트의 크기가 출력됩니다. (값은 시스템마다 다를 수 있음)"
+        }
       },
       {
         "title": "제너레이터 표현식",
         "explanation": "`gen_exp = (i * i for i in range(5))`\n소괄호`()`를 사용하여 제너레이터 객체를 생성합니다. 값을 미리 계산하지 않습니다.\n\n**왜 이 순서인가?**\n제너레이터 표현식은 평가를 지연(Lazy Evaluation)시킵니다.\n\n**실행 순서:**\n1. 제너레이터 객체(0x3000) 생성.\n2. 계산 식만 저장하고 값은 아직 만듭니다.",
         "visualizationType": "pythonMemory",
+        "code": "gen_exp = (i * i for i in range(5))",
         "pythonMemoryState": {
-          "output": [
-            "List: [0, 1, 4, 9, 16]",
-            "Size: 120"
-          ],
           "note": "제너레이터 객체(0x3000)가 생성되었지만, 내부 값은 하나도 계산되지 않았습니다.",
           "names": [
             {
@@ -136,17 +117,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "gen_exp = (i * i for i in range(5))"
+        }
       },
       {
         "title": "제너레이터 객체 출력",
         "explanation": "`print(f\"Generator: {gen_exp}\")`\n제너레이터 객체 자체를 출력합니다. 내용이 아닌 객체 정보가 표시됩니다.\n\n**왜 이 순서인가?**\n객체의 내용을 보려고 해도, 아직 계산되지 않아서 볼 수 없습니다.\n\n**실행 순서:**\n1. 객체 `repr` 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(f\"Generator: {gen_exp}\")",
         "pythonMemoryState": {
           "output": [
-            "List: [0, 1, 4, 9, 16]",
-            "Size: 120",
             "Generator: <generator object ...>"
           ],
           "note": "제너레이터는 내용을 보여주는 대신 객체 정보만 출력합니다.",
@@ -164,49 +143,26 @@
               "pyId": "1003"
             }
           ]
-        },
-        "code": "print(f\"Generator: {gen_exp}\")"
+        }
       },
       {
         "title": "제너레이터 메모리 크기",
         "explanation": "`print(f\"Size: {sys.getsizeof(gen_exp)}\")`\n제너레이터 객체의 메모리 크기를 출력합니다. 항상 작은 크기입니다.\n\n**왜 이 순서인가?**\n리스트와 비교하여 얼마나 가벼운지 확인합니다.\n\n**실행 순서:**\n1. 메모리 크기 측정.",
         "visualizationType": "pythonMemory",
+        "code": "print(f\"Size: {sys.getsizeof(gen_exp)}\")",
         "pythonMemoryState": {
           "output": [
-            "List: [0, 1, 4, 9, 16]",
-            "Size: 120",
-            "Generator: <generator object ...>",
             "Size: 112"
           ],
-          "note": "데이터 개수와 상관없이 일정한(작은) 메모리만 사용합니다.",
-          "names": [
-            {
-              "name": "gen_exp",
-              "pointsTo": "generator1"
-            }
-          ],
-          "objects": [
-            {
-              "id": "generator1",
-              "type": "generator",
-              "value": "generator object",
-              "pyId": "1003"
-            }
-          ]
-        },
-        "code": "print(f\"Size: {sys.getsizeof(gen_exp)}\")"
+          "note": "데이터 개수와 상관없이 일정한(작은) 메모리만 사용합니다."
+        }
       },
       {
         "title": "for 루프 시작 - 첫 번째 값",
         "explanation": "`for num in gen_exp:`\n제너레이터를 순회합니다. 첫 번째 값 0이 계산되어 num에 할당됩니다.\n\n**왜 이 순서인가?**\n값이 필요해진 시점(루프)에 계산을 시작합니다.\n\n**실행 순서:**\n1. `gen_exp` 실행 시작.\n2. `i=0` -> `0*0` 계산.\n3. `num`에 0 할당.",
         "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
         "pythonMemoryState": {
-          "output": [
-            "List: [0, 1, 4, 9, 16]",
-            "Size: 120",
-            "Generator: <generator object ...>",
-            "Size: 112"
-          ],
           "note": "첫 번째 값이 계산되어 num에 할당되었습니다.",
           "names": [
             {
@@ -234,19 +190,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for num in gen_exp:"
+        }
       },
       {
         "title": "첫 번째 값 출력 (0)",
         "explanation": "`print(num, end=' ')`\n0을 출력합니다.\n\n**왜 이 순서인가?**\n계산된 값을 사용합니다.\n\n**실행 순서:**\n1. 0 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
         "pythonMemoryState": {
           "output": [
-            "List: [0, 1, 4, 9, 16]",
-            "Size: 120",
-            "Generator: <generator object ...>",
-            "Size: 112",
             "0"
           ],
           "note": "0 출력.",
@@ -264,13 +216,13 @@
               "pyId": "1004"
             }
           ]
-        },
-        "code": "print(num, end=' ')"
+        }
       },
       {
         "title": "for 루프 - 두 번째 값",
         "explanation": "다음 반복입니다. 두 번째 값 1이 계산되어 num에 할당됩니다.\n\n**왜 이 순서인가?**\n그 다음 값이 필요하므로 제너레이터를 재개합니다.\n\n**실행 순서:**\n1. `i=1` -> `1*1` 계산.\n2. `num`에 1 할당.",
         "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
         "pythonMemoryState": {
           "output": [
             "..."
@@ -302,13 +254,13 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for num in gen_exp:"
+        }
       },
       {
         "title": "두 번째 값 출력 (1)",
         "explanation": "`print(num, end=' ')`\n1을 출력합니다.\n\n**실행 순서:**\n1. 1 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
         "pythonMemoryState": {
           "output": [
             "0",
@@ -329,18 +281,14 @@
               "pyId": "1005"
             }
           ]
-        },
-        "code": "print(num, end=' ')"
+        }
       },
       {
         "title": "for 루프 - 세 번째 값",
         "explanation": "다음 반복입니다. 세 번째 값 4가 계산되어 num에 할당됩니다.\n\n**실행 순서:**\n1. `i=2` -> `2*2` 계산.\n2. `num`에 4 할당.",
         "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
         "pythonMemoryState": {
-          "output": [
-            "0",
-            "1"
-          ],
           "note": "세 번째 값 4가 생성되었습니다.",
           "names": [
             {
@@ -358,17 +306,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for num in gen_exp:"
+        }
       },
       {
         "title": "세 번째 값 출력 (4)",
         "explanation": "`print(num, end=' ')`\n4를 출력합니다.\n\n**실행 순서:**\n1. 4 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
         "pythonMemoryState": {
           "output": [
-            "0",
-            "1",
             "4"
           ],
           "note": "4 출력.",
@@ -386,19 +332,14 @@
               "pyId": "1006"
             }
           ]
-        },
-        "code": "print(num, end=' ')"
+        }
       },
       {
         "title": "for 루프 - 네 번째 값",
         "explanation": "다음 반복입니다. 네 번째 값 9가 계산되어 num에 할당됩니다.\n\n**실행 순서:**\n1. `i=3` -> `3*3` 계산.\n2. `num`에 9 할당.",
         "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
         "pythonMemoryState": {
-          "output": [
-            "0",
-            "1",
-            "4"
-          ],
           "note": "네 번째 값 9가 생성되었습니다.",
           "names": [
             {
@@ -416,18 +357,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for num in gen_exp:"
+        }
       },
       {
         "title": "네 번째 값 출력 (9)",
         "explanation": "`print(num, end=' ')`\n9를 출력합니다.\n\n**실행 순서:**\n1. 9 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
         "pythonMemoryState": {
           "output": [
-            "0",
-            "1",
-            "4",
             "9"
           ],
           "note": "9 출력.",
@@ -445,20 +383,14 @@
               "pyId": "1007"
             }
           ]
-        },
-        "code": "print(num, end=' ')"
+        }
       },
       {
         "title": "for 루프 - 다섯 번째 값",
         "explanation": "다음 반복입니다. 다섯 번째 값 16이 계산되어 num에 할당됩니다.\n\n**실행 순서:**\n1. `i=4` -> `4*4` 계산.\n2. `num`에 16 할당.",
         "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
         "pythonMemoryState": {
-          "output": [
-            "0",
-            "1",
-            "4",
-            "9"
-          ],
           "note": "다섯 번째 값 16이 생성되었습니다.",
           "names": [
             {
@@ -476,19 +408,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "for num in gen_exp:"
+        }
       },
       {
         "title": "다섯 번째 값 출력 (16)",
         "explanation": "`print(num, end=' ')`\n16을 출력합니다. 제너레이터가 소진되어 루프가 종료됩니다.\n\n**왜 이 순서인가?**\n더 이상 생성할 값이 없으면 루프를 멈춥니다.\n\n**실행 순서:**\n1. 16 출력.\n2. `next()` 호출 시 `StopIteration` 발생.\n3. 루프 종료.",
         "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
         "pythonMemoryState": {
           "output": [
-            "0",
-            "1",
-            "4",
-            "9",
             "16"
           ],
           "note": "16을 출력하고 루프가 종료됩니다. 제너레이터(0x3000)는 이제 비었습니다.",
@@ -506,10 +434,10 @@
               "pyId": "1003"
             }
           ]
-        },
-        "code": "print(num, end=' ')"
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "리스트 컴프리헨션 대신 제너레이터 표현식을 쓰는 가장 큰 이유는?",

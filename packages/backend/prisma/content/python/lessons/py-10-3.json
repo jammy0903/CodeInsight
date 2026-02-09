@@ -9,6 +9,11 @@
         "title": "모듈 임포트",
         "explanation": "비동기 I/O를 위한 `asyncio`와 시간 측정을 위한 `time` 모듈을 가져옵니다.\n\n**왜 이 순서인가?**\n라이브러리 로드.\n\n**실행 순서:**\n1. `asyncio`(0x1500), `time`(0x1600) 로드.\n\n**비유**: `asyncio`는 '멀티태스킹의 달인' 주방장 한 명을 고용하는 것과 같습니다. 혼자서 파스타 물 끓이는 동안 샐러드도 썰 수 있는 분이죠.",
         "visualizationType": "pythonMemory",
+        "code": "import asyncio",
+        "highlightOffset": [
+          0,
+          1
+        ],
         "pythonMemoryState": {
           "output": [],
           "note": "asyncio 모듈 준비 완료.",
@@ -28,19 +33,20 @@
               "highlight": true
             }
           ]
-        },
-        "code": "import asyncio",
-        "highlightOffset": [
-          0,
-          1
-        ]
+        }
       },
       {
         "title": "코루틴 함수 정의",
         "explanation": "`async def`로 정의된 함수는 '코루틴'이라고 부릅니다. `await` 키워드를 만나면, 해당 작업이 끝날 때까지 기다리지 않고 다른 작업을 할 수 있도록 제어권을 이벤트 루프에 넘깁니다.\n\n**실행 순서:**\n1. `say_after` 함수(0x1100) 정의.",
         "visualizationType": "pythonMemory",
+        "code": "async def say_after(delay, what):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
         "pythonMemoryState": {
-          "output": [],
           "note": "코루틴 함수가 정의되었습니다.",
           "names": [
             {
@@ -58,21 +64,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "async def say_after(delay, what):",
-        "highlightOffset": [
-          0,
-          1,
-          2,
-          3
-        ]
+        }
       },
       {
         "title": "메인 코루틴 정의",
         "explanation": "`async def main():`\n비동기 프로그램의 메인 진입점 역할을 할 `main` 코루틴을 정의합니다.\n\n**실행 순서:**\n1. `main` 함수(0x1200) 정의.",
         "visualizationType": "pythonMemory",
+        "code": "async def main():",
         "pythonMemoryState": {
-          "output": [],
           "note": "메인 코루틴 정의.",
           "names": [
             {
@@ -90,27 +89,25 @@
               "highlight": true
             }
           ]
-        },
-        "code": "async def main():"
+        }
       },
       {
         "title": "이벤트 루프 실행",
         "explanation": "`asyncio.run(main())`\n`asyncio` 이벤트 루프를 시작하고, `main` 코루틴을 실행하도록 지시합니다. 이 라인에서 비동기 프로그램 전체가 시작됩니다.\n\n**왜 이 순서인가?**\n프로그램 진입점입니다.\n\n**실행 순서:**\n1. 이벤트 루프 생성.\n2. `main()` 코루틴 객체 생성.\n3. 실행.",
         "visualizationType": "pythonMemory",
+        "code": "asyncio.run(main())",
         "pythonMemoryState": {
-          "output": [],
           "note": "이벤트 루프가 시작되었습니다.",
           "names": [],
           "objects": []
-        },
-        "code": "asyncio.run(main())"
+        }
       },
       {
         "title": "동시 실행 작업 생성 (task)",
         "explanation": "`asyncio.create_task(...)`\n`say_after` 코루틴을 '태스크'로 만들어, 이벤트 루프에서 즉시 실행되도록 예약합니다. 코드는 여기서 멈추지 않고 바로 다음 라인으로 넘어갑니다.\n\n**왜 이 순서인가?**\n작업을 '예약'만 하고 넘어갑니다. (Non-blocking)\n\n**실행 순서:**\n1. `say_after` 코루틴 생성.\n2. `Task` 객체 task1(0x2000) 생성 및 스케줄링.",
         "visualizationType": "pythonMemory",
+        "code": "task1 = asyncio.create_task(say_after(1, 'hello'))",
         "pythonMemoryState": {
-          "output": [],
           "note": "task1이 예약되었습니다 (아직 실행 안 됨).",
           "names": [
             {
@@ -128,15 +125,14 @@
               "highlight": true
             }
           ]
-        },
-        "code": "task1 = asyncio.create_task(say_after(1, 'hello'))"
+        }
       },
       {
         "title": "두 번째 작업 생성",
         "explanation": "`task2`도 마찬가지로 즉시 실행되도록 예약합니다. 이제 `task1`과 `task2`는 이벤트 루프 내에서 '동시에' 실행 대기 상태가 됩니다.\n\n**실행 순서:**\n1. `Task` 객체 task2(0x2100) 생성 및 스케줄링.",
         "visualizationType": "pythonMemory",
+        "code": "task2 = asyncio.create_task(say_after(2, 'world'))",
         "pythonMemoryState": {
-          "output": [],
           "note": "task2가 예약되었습니다.",
           "names": [
             {
@@ -164,13 +160,13 @@
               "highlight": true
             }
           ]
-        },
-        "code": "task2 = asyncio.create_task(say_after(2, 'world'))"
+        }
       },
       {
         "title": "작업 기다리기 (await)",
         "explanation": "`await task1`\n`task1`이 완료될 때까지 `main` 함수의 실행을 멈추고 기다립니다. `task1`은 `asyncio.sleep(1)`을 실행하며 1초간 '대기' 상태에 들어가고, 이 동안 이벤트 루프는 다른 작업(`task2`)을 실행할 수 있습니다.\n\n**왜 이 순서인가?**\n`await`를 만나는 순간 제어권이 이벤트 루프로 넘어갑니다!\n\n**실행 순서:**\n1. Main 멈춤.\n2. task1 실행 -> 출력 -> Sleep(1s) 만남 -> **제어권 양보**.\n3. 이벤트 루프가 task2 실행 -> 출력 -> Sleep(2s) 만남 -> **제어권 양보**.",
         "visualizationType": "pythonMemory",
+        "code": "await task1",
         "pythonMemoryState": {
           "output": [
             "--- 작업 예약 완료 ---",
@@ -194,18 +190,15 @@
               "highlight": true
             }
           ]
-        },
-        "code": "await task1"
+        }
       },
       {
         "title": "두 번째 작업 기다리기",
         "explanation": "`await task2`\n`task1`이 완료된 후, `task2`가 완료되기를 기다립니다. `task2`는 총 2초가 걸리므로, 프로그램은 여기서 약 1초를 더 기다리게 됩니다.\n\n**실행 순서:**\n1. 1초 후 task1 완료 (`print(hello)`).\n2. task2는 아직 1초 더 남음.\n3. 1초 더 대기.",
         "visualizationType": "pythonMemory",
+        "code": "await task2",
         "pythonMemoryState": {
           "output": [
-            "--- 작업 예약 완료 ---",
-            "'hello' 작업 시작",
-            "'world' 작업 시작",
             "hello"
           ],
           "note": "task1 완료. task2 기다리는 중...",
@@ -235,13 +228,13 @@
               "highlight": true
             }
           ]
-        },
-        "code": "await task2"
+        }
       },
       {
         "title": "총 소요 시간 확인",
         "explanation": "`print(...)`\n총 소요 시간은 약 2초가 출력됩니다. 1초와 2초짜리 작업을 순서대로 실행했다면 3초가 걸렸겠지만, `asyncio`는 `sleep`으로 대기하는 동안 다른 작업을 동시에 처리했기 때문에 가장 오래 걸리는 작업 시간(2초)만큼만 소요되었습니다.\n\n**실행 순서:**\n1. task2 완료 (`print(world)`).\n2. Main 재개.\n3. 시간 출력.",
         "visualizationType": "pythonMemory",
+        "code": "print(f\"총 소요 시간: {time.time() - start:.4f}s\")",
         "pythonMemoryState": {
           "output": [
             "...",
@@ -266,10 +259,10 @@
               "highlight": true
             }
           ]
-        },
-        "code": "print(f\"총 소요 시간: {time.time() - start:.4f}s\")"
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "`await` 키워드의 역할은 무엇인가요?",
