@@ -9,15 +9,16 @@
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수와 같은 표준 입출력 함수를 사용하기 위해 `stdio.h` 헤더 파일을 코드에 포함시킵니다.",
         "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
         "stack": [],
         "heap": [],
-        "stdout": "",
-        "code": "#include <stdio.h>"
+        "stdout": ""
       },
       {
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n모든 C 프로그램의 실행 시작점입니다. 이 함수가 호출되면서 스택 메모리에 `main` 함수를 위한 공간(스택 프레임)이 할당됩니다.",
         "visualizationType": "cMemory",
+        "code": "int main() {",
         "stack": [
           {
             "name": "main",
@@ -25,15 +26,13 @@
             "func": "main",
             "value": "frame"
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "int main() {"
+        ]
       },
       {
         "title": "선언과 동시에 초기화",
         "explanation": "**`int score = 100;`**\n\n정수형 변수 `score`를 선언하고, 그 즉시 값 `100`으로 초기화(Initialization)합니다. `score`를 위한 메모리 공간이 할당되고 바로 `100`이라는 값이 채워지므로 '쓰레기 값'이 들어갈 틈이 없습니다. 가장 안전하고 권장되는 방식입니다.",
         "visualizationType": "cMemory",
+        "code": "int score = 100;",
         "stack": [
           {
             "name": "score",
@@ -41,15 +40,13 @@
             "type": "int",
             "address": "0x1004"
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "int score = 100;"
+        ]
       },
       {
         "title": "선언만 한 경우 (쓰레기 값)",
         "explanation": "**`int level;`**\n\n정수형 변수 `level`을 위한 메모리 공간만 확보합니다. 아직 값을 할당하지 않았기 때문에, 이 메모리 공간에는 이전에 다른 프로그램이 사용했던 의미 없는 데이터, 즉 **쓰레기 값(Garbage Value)**이 남아있게 됩니다.",
         "visualizationType": "cMemory",
+        "code": "int level;",
         "stack": [
           {
             "name": "score",
@@ -64,15 +61,13 @@
             "address": "0x1000",
             "note": "쓰레기 값이 들어있습니다."
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "int level;"
+        ]
       },
       {
         "title": "값 할당 (Assignment)",
         "explanation": "**`level = 1;`**\n\n이제 `level` 변수의 메모리 공간에 `1`이라는 새로운 값을 덮어씁니다. 이 시점부터 `level`은 유효한 값을 갖게 됩니다. 선언과 할당을 분리하면 이처럼 변수가 '쓰레기 값'을 가지는 위험한 구간이 생길 수 있습니다.",
         "visualizationType": "cMemory",
+        "code": "level = 1;",
         "stack": [
           {
             "name": "score",
@@ -87,15 +82,13 @@
             "address": "0x1000",
             "highlight": true
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "level = 1;"
+        ]
       },
       {
         "title": "변수 값 출력",
         "explanation": "**`printf(\"Score: %d, Level: %d\\n\", score, level);`**\n\n두 변수 `score`와 `level`에 저장된 현재 값을 화면에 출력합니다.",
         "visualizationType": "cMemory",
+        "code": "printf(\"Score: %d, Level: %d\\n\", score, level);",
         "stack": [
           {
             "name": "score",
@@ -110,20 +103,17 @@
             "address": "0x1000"
           }
         ],
-        "stdout": "Score: 100, Level: 1",
-        "heap": [],
-        "code": "printf(\"Score: %d, Level: %d\\n\", score, level);"
+        "stdout": "Score: 100, Level: 1"
       },
       {
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n`main` 함수가 모든 작업을 성공적으로 마쳤음을 운영체제에 알리는 값 `0`을 반환하고 프로그램을 종료합니다. `main` 함수의 스택 프레임이 해제되면서 지역 변수 `score`와 `level`도 사라집니다.",
         "visualizationType": "cMemory",
-        "stdout": "Score: 100, Level: 1",
-        "stack": [],
-        "heap": [],
-        "code": "return 0;"
+        "code": "return 0;",
+        "stack": []
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "변수 초기화를 깜빡하면 발생하는 문제는?",

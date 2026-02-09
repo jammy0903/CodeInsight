@@ -82,16 +82,16 @@ export function LessonDesktopLayout({
 
   return (
     <div className="flex flex-col md:flex-row gap-4 items-start pb-12">
-      {/* Left Panel: 코드(위) + 설명(아래) — 고정 높이, 각각 독립 스크롤 */}
+      {/* Left Panel: 코드(위) + 설명(아래) — 설명은 콘텐츠에 맞춰 유동 확장 */}
       <div
-        className="w-full md:w-1/2 flex flex-col rounded-xl overflow-hidden"
+        className="w-full md:w-1/2 flex flex-col rounded-xl overflow-y-auto overflow-x-hidden"
         style={{
           border: '1px solid var(--theme-lesson-panel-border)',
           height: 'calc(100vh - 80px)',
         }}
       >
         {/* === 상단: 코드 에디터 + 터미널 오버레이 === */}
-        <div className="relative flex flex-col" style={{ flex: isExplanationCollapsed ? '1 1 auto' : '1 1 50%', minHeight: 0 }}>
+        <div className="relative flex flex-col shrink-0" style={{ height: isExplanationCollapsed ? '100%' : '55vh' }}>
           <div
             className="flex items-center px-3 py-1 text-xs font-medium shrink-0"
             style={{
@@ -108,6 +108,7 @@ export function LessonDesktopLayout({
               code={code}
               highlightLine={displayLine}
               onSelectionChange={onSelectionChange}
+              bottomPadding={terminalLines.length > 0 ? 140 : 0}
             />
           </div>
           {/* 터미널 오버레이 — 코드에디터 하단에 겹침 */}
@@ -139,8 +140,6 @@ export function LessonDesktopLayout({
           <div
             className="flex flex-col shrink-0"
             style={{
-              flex: isExplanationCollapsed ? '0 0 auto' : '1 1 50%',
-              minHeight: 0,
               borderTop: '2px solid var(--theme-lesson-panel-border)',
               background: 'var(--theme-lesson-explanation-bg)',
             }}
@@ -178,7 +177,7 @@ export function LessonDesktopLayout({
             </div>
             {/* 설명 내용 */}
             {!isExplanationCollapsed && (
-              <div className="flex-1 overflow-y-auto p-4" style={{ minHeight: 0 }}>
+              <div className="p-4">
                 <StepExplanation
                   explanation={currentStep.explanation}
                   stepIndex={currentStepIndex}

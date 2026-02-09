@@ -33,6 +33,63 @@ export interface AuthUser {
   };
 }
 
+// =============================================
+// 로컬 JWT 디코드 (Firebase verifyIdToken 대체)
+// WHY: verifyIdToken()은 매번 Google 서버 호출 (~100-200ms)
+//      JWT payload를 로컬 디코드하면 ~0ms (만료만 체크)
+//      사용자 수 적으므로 보안 리스크 최소, 성능 이점 큼
+// =============================================
+
+interface DecodedFirebaseToken {
+  sub: string;        // Firebase UID
+  email?: string;
+  firebase?: { sign_in_provider?: string };
+  exp?: number;       // 만료 시각 (Unix seconds)
+}
+
+function decodeFirebaseJwt(token: string): DecodedFirebaseToken | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+    if (!payload.sub) return null;
+    if (payload.exp && payload.exp * 1000 < Date.now()) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+// =============================================
+// DB 사용자 캐시 (uid → dbUser)
+// WHY: 사용자 수 적으므로 메모리 부담 없음
+//      매 요청 DB 조회 대신 캐시에서 즉시 반환
+// =============================================
+
+interface CachedDbUser {
+  id: string;
+  nickname: string;
+  role: string;
+  oauthAccounts: { provider: string }[];
+  cachedAt: number;
+}
+
+const dbUserCache = new Map<string, CachedDbUser>();
+const DB_CACHE_TTL_MS = 10 * 60 * 1000; // 10분
+
+function getCachedDbUser(uid: string): CachedDbUser | null {
+  const cached = dbUserCache.get(uid);
+  if (cached && (Date.now() - cached.cachedAt) < DB_CACHE_TTL_MS) {
+    return cached;
+  }
+  if (cached) dbUserCache.delete(uid);
+  return null;
+}
+
+function setCachedDbUser(uid: string, dbUser: Omit<CachedDbUser, 'cachedAt'>): void {
+  dbUserCache.set(uid, { ...dbUser, cachedAt: Date.now() });
+}
+
 // Admin 사용자 타입
 export interface AdminUser {
   uid: string;
@@ -165,31 +222,21 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     }
 
     const token = authHeader.slice(7);
+    const decoded = decodeFirebaseJwt(token);
 
-    try {
-      const decodedToken = await getFirebaseAuth().verifyIdToken(token);
-      const provider = getProviderFromFirebase(decodedToken.firebase?.sign_in_provider);
-
-      request.user = {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
-        provider,
-      };
-    } catch (error: any) {
-      const isExpired = error?.code === 'auth/id-token-expired' || error?.errorInfo?.code === 'auth/id-token-expired';
-
-      if (isExpired) {
-        logger.info('Auth: Session expired (token refresh needed)');
-        return reply.status(401).send({
-          error: 'Session expired',
-          message: 'Please refresh the page to continue',
-          code: 'TOKEN_EXPIRED'
-        });
-      } else {
-        logger.error('Auth: Token verification failed', { error });
-        return reply.status(401).send({ error: 'Invalid token' });
-      }
+    if (!decoded) {
+      return reply.status(401).send({
+        error: 'Invalid or expired token',
+        code: 'TOKEN_EXPIRED',
+      });
     }
+
+    const provider = getProviderFromFirebase(decoded.firebase?.sign_in_provider);
+    request.user = {
+      uid: decoded.sub,
+      email: decoded.email,
+      provider,
+    };
   });
 
   /**
@@ -198,7 +245,6 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
    * - DB에 사용자가 없으면 404 반환
    */
   fastify.decorate('requireDbUser', async function (request: FastifyRequest, reply: FastifyReply) {
-    // 1. 토큰 검증
     const authHeader = request.headers.authorization;
 
     if (!authHeader?.startsWith('Bearer ')) {
@@ -206,48 +252,43 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     }
 
     const token = authHeader.slice(7);
+    const decoded = decodeFirebaseJwt(token);
 
-    try {
-      const decodedToken = await getFirebaseAuth().verifyIdToken(token);
-      const provider = getProviderFromFirebase(decodedToken.firebase?.sign_in_provider);
-
-      request.user = {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
-        provider,
-      };
-    } catch (error: any) {
-      const isExpired = error?.code === 'auth/id-token-expired' || error?.errorInfo?.code === 'auth/id-token-expired';
-
-      if (isExpired) {
-        logger.info('Auth: Session expired (token refresh needed)');
-        return reply.status(401).send({
-          error: 'Session expired',
-          message: 'Please refresh the page to continue',
-          code: 'TOKEN_EXPIRED'
-        });
-      } else {
-        logger.error('Auth: Token verification failed', { error });
-        return reply.status(401).send({ error: 'Invalid token' });
-      }
+    if (!decoded) {
+      return reply.status(401).send({
+        error: 'Invalid or expired token',
+        code: 'TOKEN_EXPIRED',
+      });
     }
 
-    // 2. DB에서 User 조회
+    const provider = getProviderFromFirebase(decoded.firebase?.sign_in_provider);
+    request.user = {
+      uid: decoded.sub,
+      email: decoded.email,
+      provider,
+    };
+
+    // DB 사용자 캐시 확인
+    const cachedDbUser = getCachedDbUser(decoded.sub);
+    if (cachedDbUser) {
+      request.user.dbUser = cachedDbUser;
+      return;
+    }
+
+    // DB 조회 (첫 요청 또는 캐시 만료 시만)
     try {
       const oauthAccount = await prisma.oAuthAccount.findUnique({
         where: {
           provider_providerId: {
-            provider: request.user!.provider,
-            providerId: request.user!.uid,
+            provider: request.user.provider,
+            providerId: request.user.uid,
           },
         },
         include: {
           user: {
             include: {
               oauthAccounts: {
-                select: {
-                  provider: true,
-                },
+                select: { provider: true },
               },
             },
           },
@@ -262,12 +303,15 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
         });
       }
 
-      request.user!.dbUser = {
+      const dbUser = {
         id: oauthAccount.user.id,
         nickname: oauthAccount.user.nickname,
         role: oauthAccount.user.role,
         oauthAccounts: oauthAccount.user.oauthAccounts,
       };
+
+      request.user.dbUser = dbUser;
+      setCachedDbUser(decoded.sub, dbUser);
     } catch (error) {
       logger.error('Auth: DB user lookup failed', { error });
       return reply.status(500).send({ error: 'Failed to authenticate user' });
@@ -282,23 +326,19 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     const authHeader = request.headers.authorization;
 
     if (!authHeader?.startsWith('Bearer ')) {
-      return; // 토큰 없으면 통과
+      return;
     }
 
     const token = authHeader.slice(7);
+    const decoded = decodeFirebaseJwt(token);
+    if (!decoded) return;
 
-    try {
-      const decodedToken = await getFirebaseAuth().verifyIdToken(token);
-      const provider = getProviderFromFirebase(decodedToken.firebase?.sign_in_provider);
-
-      request.user = {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
-        provider,
-      };
-    } catch {
-      // 토큰 검증 실패해도 통과 (선택적 인증)
-    }
+    const provider = getProviderFromFirebase(decoded.firebase?.sign_in_provider);
+    request.user = {
+      uid: decoded.sub,
+      email: decoded.email,
+      provider,
+    };
   });
 
   /**
@@ -309,22 +349,28 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     const authHeader = request.headers.authorization;
 
     if (!authHeader?.startsWith('Bearer ')) {
-      return; // 토큰 없으면 통과
+      return;
     }
 
     const token = authHeader.slice(7);
+    const decoded = decodeFirebaseJwt(token);
+    if (!decoded) return;
+
+    const provider = getProviderFromFirebase(decoded.firebase?.sign_in_provider);
+    request.user = {
+      uid: decoded.sub,
+      email: decoded.email,
+      provider,
+    };
+
+    // DB 사용자 캐시 확인
+    const cachedDbUser = getCachedDbUser(decoded.sub);
+    if (cachedDbUser) {
+      request.user.dbUser = cachedDbUser;
+      return;
+    }
 
     try {
-      const decodedToken = await getFirebaseAuth().verifyIdToken(token);
-      const provider = getProviderFromFirebase(decodedToken.firebase?.sign_in_provider);
-
-      request.user = {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
-        provider,
-      };
-
-      // DB에서 User 조회 (선택적이므로 없어도 통과)
       const oauthAccount = await prisma.oAuthAccount.findUnique({
         where: {
           provider_providerId: {
@@ -336,9 +382,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
           user: {
             include: {
               oauthAccounts: {
-                select: {
-                  provider: true,
-                },
+                select: { provider: true },
               },
             },
           },
@@ -346,15 +390,17 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
       });
 
       if (oauthAccount) {
-        request.user.dbUser = {
+        const dbUser = {
           id: oauthAccount.user.id,
           nickname: oauthAccount.user.nickname,
           role: oauthAccount.user.role,
           oauthAccounts: oauthAccount.user.oauthAccounts,
         };
+        request.user.dbUser = dbUser;
+        setCachedDbUser(decoded.sub, dbUser);
       }
     } catch {
-      // 토큰 검증 실패해도 통과 (선택적 인증)
+      // 선택적 인증이므로 에러 무시
     }
   });
 

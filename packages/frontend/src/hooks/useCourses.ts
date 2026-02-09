@@ -25,20 +25,13 @@ import type { ChapterWithLessons, Language, UserProgress, LessonFull } from '@/t
  * return <ChapterList chapters={data.chapters} />;
  */
 export function useLanguageCourse(languageId: string | undefined) {
-  // 선택적 구독: appUser만 구독하여 불필요한 리렌더링 방지
-  const appUser = useStore((state) => state.appUser);
-
   return useQuery<Language & { chapters: ChapterWithLessons[] }>({
-    // queryKey: 캐시 키 (languageId, userId 변경 시 자동 refetch)
-    queryKey: ['language', languageId, appUser?.id],
+    // queryKey: 언어 구조는 공개 데이터 (인증 무관)
+    queryKey: ['language', languageId],
 
-    // queryFn: 실제 API 호출
     queryFn: () => getLanguageWithChapters(languageId!),
 
-    // enabled: languageId가 있을 때만 쿼리 실행
     enabled: !!languageId,
-
-    // staleTime: 5분간 캐시 유지 (config/queryClient.ts 기본값 사용)
   });
 }
 
@@ -56,6 +49,7 @@ export function useChapter(chapterId: string | undefined) {
     queryKey: ['chapter', chapterId],
     queryFn: () => getChapterWithLessons(chapterId!),
     enabled: !!chapterId,
+    staleTime: 5 * 60 * 1000, // 5분: 챕터 구조는 세션 중 변경 안 됨
   });
 }
 
@@ -93,5 +87,6 @@ export function useLesson(lessonId: string | undefined) {
     queryKey: ['lesson', lessonId],
     queryFn: () => getLessonFull(lessonId!),
     enabled: !!lessonId,
+    staleTime: 5 * 60 * 1000, // 5분: 레슨 콘텐츠는 세션 중 변경 안 됨
   });
 }

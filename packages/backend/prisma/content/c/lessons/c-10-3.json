@@ -9,15 +9,16 @@
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf`, `fflush` 등 표준 입출력 함수를 사용하기 위해 헤더 파일을 포함합니다.",
         "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
         "stack": [],
         "heap": [],
-        "stdout": "",
-        "code": "#include <stdio.h>"
+        "stdout": ""
       },
       {
         "title": "main 함수 시작",
         "explanation": "**`int main() { ... }`**\n\n프로그램의 실행 시작점입니다.",
         "visualizationType": "cMemory",
+        "code": "int main() {",
         "stack": [
           {
             "name": "main",
@@ -25,57 +26,44 @@
             "func": "main",
             "value": "frame"
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "int main() {"
+        ]
       },
       {
         "title": "데이터를 버퍼에 저장",
         "explanation": "**`printf(\"Example 1... \");`**\n\n`printf`를 호출했지만, 문자열 끝에 개행 문자(`\\n`)가 없습니다. 대부분의 시스템에서 `stdout`은 '줄 단위 버퍼링'으로 동작하므로, 이 텍스트는 즉시 화면에 출력되지 않고 메모리 상의 '출력 버퍼'에 임시로 저장됩니다.",
         "visualizationType": "cMemory",
-        "stack": [],
-        "heap": [],
-        "stdout": "",
-        "code": "printf(\"Example 1... \");"
+        "code": "printf(\"Example 1... \");",
+        "stack": []
       },
       {
         "title": "버퍼 강제 비우기 (Flush)",
         "explanation": "**`fflush(stdout);`**\n\n`fflush` 함수는 지정된 스트림의 버퍼를 강제로 비워, 내용물을 목적지(여기서는 터미널 화면)로 보냅니다. 이 시점에 'Example 1... '이 화면에 출력됩니다.",
         "visualizationType": "cMemory",
-        "stdout": "Example 1... ",
-        "stack": [],
-        "heap": [],
-        "code": "fflush(stdout);"
+        "code": "fflush(stdout);",
+        "stdout": "Example 1... "
       },
       {
         "title": "개행 문자가 있는 출력",
         "explanation": "**`printf(\"Printed immediately!\\n\");`**\n\n이 `printf`는 문자열 끝에 개행 문자(`\\n`)를 포함하고 있습니다. 줄 단위 버퍼링 환경에서는 개행 문자를 만나면 버퍼가 자동으로 비워지므로 `fflush` 없이도 이 텍스트는 거의 즉시 화면에 출력됩니다.",
         "visualizationType": "cMemory",
-        "stdout": "Example 1... Printed immediately!",
-        "stack": [],
-        "heap": [],
-        "code": "printf(\"Printed immediately!\\n\");"
+        "code": "printf(\"Printed immediately!\\n\");",
+        "stdout": "Example 1... Printed immediately!"
       },
       {
         "title": "자동 플러시 재확인",
         "explanation": "**`printf(\"Example 2 with newline\\n\");`**\n\n이전과 마찬가지로, 개행 문자(`\\n`)가 포함되어 있으므로 버퍼에 쌓이지 않고 바로 화면으로 출력됩니다.",
         "visualizationType": "cMemory",
-        "stdout": "Example 1... Printed immediately!\nExample 2 with newline",
-        "stack": [],
-        "heap": [],
-        "code": "printf(\"Example 2 with newline\\n\");"
+        "code": "printf(\"Example 2 with newline\\n\");",
+        "stdout": "Example 1... Printed immediately!\nExample 2 with newline"
       },
       {
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n프로그램이 정상적으로 종료될 때, 열려있는 모든 스트림의 버퍼는 자동으로 비워집니다. 하지만 프로그램이 비정상적으로 종료(충돌)되면 버퍼의 내용은 유실될 수 있습니다.",
         "visualizationType": "cMemory",
-        "stdout": "Example 1... Printed immediately!\nExample 2 with newline",
-        "stack": [],
-        "heap": [],
         "code": "return 0;"
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "프로그램이 충돌(Crash)하여 종료되었을 때, printf 내용이 화면에 안 나올 수 있는 이유는?",

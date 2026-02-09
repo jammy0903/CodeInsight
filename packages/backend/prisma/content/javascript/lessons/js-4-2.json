@@ -10,16 +10,6 @@
         "explanation": "new Promise()로 Promise 객체를 생성합니다. executor 함수가 즉시 실행됩니다.",
         "keyInsight": "Promise = 미래의 값을 나타내는 객체",
         "visualizationType": "promise",
-        "promiseState": {
-          "promises": [
-            {
-              "id": "promise",
-              "state": "pending",
-              "value": null
-            }
-          ],
-          "phase": "executor running"
-        },
         "code": "const promise = new Promise((resolve, reject) => {",
         "highlightOffset": [
           0,
@@ -32,12 +22,7 @@
           7,
           8,
           9
-        ]
-      },
-      {
-        "title": "setTimeout 등록",
-        "explanation": "비동기 작업(setTimeout)이 시작됩니다. Promise는 아직 pending 상태입니다.",
-        "visualizationType": "promise",
+        ],
         "promiseState": {
           "promises": [
             {
@@ -46,18 +31,35 @@
               "value": null
             }
           ],
+          "phase": "executor running"
+        }
+      },
+      {
+        "title": "setTimeout 등록",
+        "explanation": "비동기 작업(setTimeout)이 시작됩니다. Promise는 아직 pending 상태입니다.",
+        "visualizationType": "promise",
+        "code": "setTimeout(() => {",
+        "promiseState": {
           "timer": {
             "delay": 0,
             "status": "waiting"
-          }
-        },
-        "code": "setTimeout(() => {"
+          },
+          "phase": null
+        }
       },
       {
         "title": ".then() 등록",
         "explanation": ".then()으로 성공 핸들러를 등록합니다. 이 핸들러는 **Microtask Queue**에 예약됩니다.",
         "keyInsight": "Promise는 이벤트 루프의 VIP입니다 (Microtask Priority).",
         "visualizationType": "promise",
+        "code": "promise",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
         "promiseState": {
           "promises": [
             {
@@ -69,22 +71,16 @@
                 ".catch(error => ...)"
               ]
             }
-          ]
-        },
-        "code": "promise",
-        "highlightOffset": [
-          0,
-          1,
-          2,
-          3,
-          4
-        ]
+          ],
+          "timer": null
+        }
       },
       {
         "title": "resolve() 호출",
         "explanation": "1초 후 resolve('Data loaded!')가 호출됩니다. Promise가 fulfilled 상태가 됩니다.",
         "keyInsight": "resolve() = Promise를 성공 상태로 변경",
         "visualizationType": "promise",
+        "code": "resolve('Data loaded!');",
         "promiseState": {
           "promises": [
             {
@@ -93,38 +89,36 @@
               "value": "'Data loaded!'"
             }
           ]
-        },
-        "code": "resolve('Data loaded!');"
+        }
       },
       {
         "title": "첫 번째 then 실행",
         "explanation": "Promise가 fulfilled되어 첫 번째 .then()의 콜백이 실행됩니다.",
         "visualizationType": "promise",
-        "promiseState": {
-          "promises": [
-            {
-              "id": "promise",
-              "state": "fulfilled",
-              "value": "'Data loaded!'"
-            }
-          ],
-          "output": [
-            "Data loaded!"
-          ],
-          "returnValue": "'Processed: Data loaded!'"
-        },
         "code": ".then(result => {",
         "highlightOffset": [
           0,
           1,
           2
-        ]
+        ],
+        "promiseState": {
+          "output": [
+            "Data loaded!"
+          ],
+          "returnValue": "'Processed: Data loaded!'"
+        }
       },
       {
         "title": "두 번째 then 실행 (체이닝)",
         "explanation": "첫 번째 then의 return 값이 다음 then으로 전달됩니다. 이것이 Promise 체이닝입니다!",
         "keyInsight": ".then()의 return 값 = 다음 .then()의 인자",
         "visualizationType": "promise",
+        "code": ".then(processed => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
         "promiseState": {
           "promises": [
             {
@@ -136,16 +130,12 @@
             "Data loaded!",
             "Processed: Data loaded!"
           ],
-          "chaining": true
-        },
-        "code": ".then(processed => {",
-        "highlightOffset": [
-          0,
-          1,
-          2
-        ]
+          "chaining": true,
+          "returnValue": null
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "다음 코드의 출력은?\n\nPromise.resolve(1)\n  .then(x => x + 1)\n  .then(x => x * 2)\n  .then(x => console.log(x));",

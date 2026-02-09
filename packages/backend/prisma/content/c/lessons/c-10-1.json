@@ -9,15 +9,16 @@
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n표준 입출력(Standard I/O) 함수들을 사용하기 위해 헤더 파일을 포함합니다. `fprintf`, `printf`, `stdout`, `stderr` 등이 모두 여기에 정의되어 있습니다.",
         "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
         "stack": [],
         "heap": [],
-        "stdout": "",
-        "code": "#include <stdio.h>"
+        "stdout": ""
       },
       {
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램이 시작되면, 운영체제는 3개의 기본 통로(스트림)를 열어줍니다: `stdin`(표준 입력), `stdout`(표준 출력), `stderr`(표준 에러).",
         "visualizationType": "cMemory",
+        "code": "int main() {",
         "stack": [
           {
             "name": "main",
@@ -25,97 +26,80 @@
             "func": "main",
             "value": "frame"
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "int main() {"
+        ]
       },
       {
         "title": "표준 출력(stdout)에 쓰기",
         "explanation": "**`fprintf(stdout, \"This uses stdout\\n\");`**\n\n`fprintf` 함수는 지정된 스트림에 형식화된 문자열을 씁니다. `stdout`은 '표준 출력 스트림'을 가리키는 포인터로, 기본적으로 터미널 화면에 연결됩니다.",
         "visualizationType": "cMemory",
-        "stdout": "This uses stdout",
+        "code": "fprintf(stdout, \"This uses stdout\\n\");",
         "stack": [],
-        "heap": [],
-        "code": "fprintf(stdout, \"This uses stdout\\n\");"
+        "stdout": "This uses stdout"
       },
       {
         "title": "printf는 stdout의 단축키",
         "explanation": "**`printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");`**\n\n우리가 흔히 사용하는 `printf(...)`는 사실 내부적으로 `fprintf(stdout, ...)`를 호출하는 편리한 단축 함수입니다. 둘의 목적지는 동일합니다.",
         "visualizationType": "cMemory",
-        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)",
-        "stack": [],
-        "heap": [],
-        "code": "printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");"
+        "code": "printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");",
+        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)"
       },
       {
         "title": "표준 에러(stderr)에 쓰기",
         "explanation": "**`fprintf(stderr, \"Error: Something went wrong!\\n\");`**\n\n`stderr`는 '표준 에러 스트림'으로, 에러 메시지를 보내기 위한 별도의 통로입니다. 기본적으로 `stdout`처럼 터미널 화면에 연결되지만, 중요한 차이점이 있습니다.",
         "visualizationType": "cMemory",
-        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!",
-        "stack": [],
-        "heap": [],
-        "code": "fprintf(stderr, \"Error: Something went wrong!\\n\");"
+        "code": "fprintf(stderr, \"Error: Something went wrong!\\n\");",
+        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!"
       },
       {
         "title": "변수 선언 및 입력 프롬프트",
         "explanation": "**`int n; fprintf(stdout, \"Enter a number: \");`**\n\n사용자 입력을 받기 위한 변수 `n`을 선언하고, 화면에 안내 메시지를 출력합니다.",
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "n",
-            "type": "int",
-            "value": "???"
-          }
-        ],
-        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: ",
-        "heap": [],
         "code": "int n;",
         "highlightOffset": [
           0,
           1
-        ]
+        ],
+        "stack": [
+          {
+            "name": "n",
+            "type": "int",
+            "value": "???",
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: "
       },
       {
         "title": "입력 시뮬레이션",
         "explanation": "**`n = 5;`**\n\n실제로는 `scanf` 등을 사용해 `stdin`(표준 입력 스트림, 기본적으로 키보드에 연결됨)으로부터 입력을 받지만, 여기서는 사용자가 `5`를 입력했다고 가정합니다.",
         "visualizationType": "cMemory",
+        "code": "n = 5;",
         "stack": [
           {
             "name": "n",
             "type": "int",
-            "value": "5"
+            "value": "5",
+            "address": "0x1000"
           }
-        ],
-        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: ",
-        "heap": [],
-        "code": "n = 5;"
+        ]
       },
       {
         "title": "입력값 확인 출력",
         "explanation": "**`fprintf(stdout, \"You entered: %d\\n\", n);`**\n\n입력받은 값을 다시 표준 출력(stdout)으로 보여줍니다.",
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "n",
-            "type": "int",
-            "value": "5"
-          }
-        ],
-        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: \nYou entered: 5",
-        "heap": [],
-        "code": "fprintf(stdout, \"You entered: %d\\n\", n);"
+        "code": "fprintf(stdout, \"You entered: %d\\n\", n);",
+        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: \nYou entered: 5"
       },
       {
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
         "visualizationType": "cMemory",
+        "code": "return 0;",
         "stack": [],
-        "heap": [],
-        "stdout": "",
-        "code": "return 0;"
+        "stdout": ""
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "터미널에서 ./app > log.txt 로 실행했을 때, 화면에 출력되는 것은?",

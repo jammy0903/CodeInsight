@@ -9,15 +9,16 @@
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
         "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
         "stack": [],
         "heap": [],
-        "stdout": "",
-        "code": "#include <stdio.h>"
+        "stdout": ""
       },
       {
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
         "visualizationType": "cMemory",
+        "code": "int main() {",
         "stack": [
           {
             "name": "main",
@@ -25,15 +26,17 @@
             "func": "main",
             "value": "frame"
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "int main() {"
+        ]
       },
       {
         "title": "변수 및 포인터 선언",
         "explanation": "**`int energy = 50;`**\n**`int *remote = &energy;`**\n\n`energy` 변수를 선언하고, `remote` 포인터가 `energy`의 주소를 가리키도록 합니다. `remote`는 `energy`를 원격 제어할 수 있는 '리모컨' 역할을 합니다.",
         "visualizationType": "cMemory",
+        "code": "int energy = 50;",
+        "highlightOffset": [
+          0,
+          1
+        ],
         "stack": [
           {
             "name": "energy",
@@ -48,43 +51,21 @@
             "address": "0x3004",
             "points_to": "energy"
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "int energy = 50;",
-        "highlightOffset": [
-          0,
-          1
         ]
       },
       {
         "title": "변경 전 값 확인",
         "explanation": "**`printf(\"Before: %d\\n\", energy);`**\n\n`energy` 변수의 초기 값을 화면에 출력합니다.",
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "energy",
-            "value": "50",
-            "type": "int",
-            "address": "0x3000"
-          },
-          {
-            "name": "remote",
-            "value": "0x3000",
-            "type": "int*",
-            "address": "0x3004",
-            "points_to": "energy"
-          }
-        ],
-        "stdout": "Before: 50",
-        "heap": [],
-        "code": "printf(\"Before: %d\\n\", energy);"
+        "code": "printf(\"Before: %d\\n\", energy);",
+        "stdout": "Before: 50"
       },
       {
         "title": "역참조를 통한 값 변경",
         "explanation": "**`*remote = 100;`**\n\n`*remote`는 '`remote`가 가리키는 주소의 값'을 의미합니다. `remote`는 `energy`의 주소를 담고 있으므로, 이 코드는 `energy`의 값을 `100`으로 바꿉니다. 마치 리모컨으로 TV 볼륨을 높이는 것처럼, 멀리서 원본 값을 제어합니다.",
         "keyInsight": "`*p = 값`은 '그 주소에 값을 저장하라'는 뜻입니다.",
         "visualizationType": "cMemory",
+        "code": "*remote = 100;",
         "stack": [
           {
             "name": "energy",
@@ -100,15 +81,13 @@
             "address": "0x3004",
             "points_to": "energy"
           }
-        ],
-        "stdout": "Before: 50",
-        "heap": [],
-        "code": "*remote = 100;"
+        ]
       },
       {
         "title": "변경 후 값 확인",
         "explanation": "**`printf(\"After:  %d\\n\", energy);`**\n\n`energy` 변수의 값을 다시 출력하여, 포인터를 통한 원격 수정으로 값이 `100`으로 변경되었음을 확인합니다.",
         "visualizationType": "cMemory",
+        "code": "printf(\"After:  %d\\n\", energy);",
         "stack": [
           {
             "name": "energy",
@@ -124,20 +103,18 @@
             "points_to": "energy"
           }
         ],
-        "stdout": "Before: 50\nAfter:  100",
-        "heap": [],
-        "code": "printf(\"After:  %d\\n\", energy);"
+        "stdout": "Before: 50\nAfter:  100"
       },
       {
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
         "visualizationType": "cMemory",
+        "code": "return 0;",
         "stack": [],
-        "heap": [],
-        "stdout": "",
-        "code": "return 0;"
+        "stdout": ""
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "다음 코드 실행 후 a의 값은?\nint a = 10;\nint *p = &a;\n*p = 20;\na = 30;",

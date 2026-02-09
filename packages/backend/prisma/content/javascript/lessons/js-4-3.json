@@ -9,6 +9,7 @@
         "title": "main() 호출",
         "explanation": "`main()`을 호출합니다. async 함수이므로 즉시 Promise를 반환하고 내부 코드 실행을 시작합니다.",
         "visualizationType": "eventLoop",
+        "code": "main();",
         "eventLoopState": {
           "callStack": [
             "main()"
@@ -17,74 +18,63 @@
           "taskQueue": [],
           "microtaskQueue": [],
           "output": []
-        },
-        "code": "main();"
+        }
       },
       {
         "title": "'Start' 출력",
         "explanation": "`console.log('Start')`가 동기적으로 실행됩니다. 콘솔에 'Start'가 출력됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('Start');",
         "eventLoopState": {
           "callStack": [
             "main()",
             "console.log('Start')"
           ],
-          "webApis": [],
-          "taskQueue": [],
-          "microtaskQueue": [],
           "output": [
             "Start"
           ]
-        },
-        "code": "console.log('Start');"
+        }
       },
       {
         "title": "await fetchUser() 호출",
         "explanation": "`fetchUser()`를 호출하고 `await`로 결과를 기다립니다. main 함수는 여기서 일시 중지됩니다.",
         "keyInsight": "await = Promise가 resolve될 때까지 함수 실행을 일시 중지",
         "visualizationType": "eventLoop",
+        "code": "const user = await fetchUser();",
         "eventLoopState": {
           "callStack": [
             "fetchUser()"
           ],
-          "webApis": [],
-          "taskQueue": [],
           "microtaskQueue": [
             "main() (suspended)"
           ],
-          "output": [
-            "Start"
-          ],
           "currentPhase": "executing",
           "highlightArea": "callStack"
-        },
-        "code": "const user = await fetchUser();"
+        }
       },
       {
         "title": "'Fetching...' 출력",
         "explanation": "`fetchUser` 함수 내부에서 `console.log('Fetching...')`이 실행됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('Fetching...');",
         "eventLoopState": {
           "callStack": [
             "fetchUser()",
             "console.log('Fetching...')"
           ],
-          "webApis": [],
-          "taskQueue": [],
-          "microtaskQueue": [
-            "main() (suspended)"
-          ],
           "output": [
             "Start",
             "Fetching..."
-          ]
-        },
-        "code": "console.log('Fetching...');"
+          ],
+          "currentPhase": null,
+          "highlightArea": null
+        }
       },
       {
         "title": "await delay(1000)",
         "explanation": "`delay(1000)`을 호출하고 await합니다. 1초 타이머가 시작되고 fetchUser도 일시 중지됩니다.",
         "visualizationType": "eventLoop",
+        "code": "await delay(1000);",
         "eventLoopState": {
           "callStack": [],
           "webApis": [
@@ -93,26 +83,20 @@
               "delay": 1000
             }
           ],
-          "taskQueue": [],
           "microtaskQueue": [
             "main() (suspended)",
             "fetchUser() (suspended)"
           ],
-          "output": [
-            "Start",
-            "Fetching..."
-          ],
           "currentPhase": "waiting",
           "highlightArea": "webApis"
-        },
-        "code": "await delay(1000);"
+        }
       },
       {
         "title": "Promise 생성 (delay 내부)",
         "explanation": "`delay` 함수 내부에서 `new Promise`가 생성되고, setTimeout이 Web API로 등록됩니다.",
         "visualizationType": "eventLoop",
+        "code": "return new Promise(resolve => setTimeout(resolve, ms));",
         "eventLoopState": {
-          "callStack": [],
           "webApis": [
             {
               "name": "setTimeout(1000ms)",
@@ -120,30 +104,22 @@
               "status": "resolving"
             }
           ],
-          "taskQueue": [],
           "microtaskQueue": [
             "fetchUser() (suspended)"
-          ],
-          "output": [
-            "Start",
-            "Fetching..."
-          ],
-          "currentPhase": "waiting",
-          "highlightArea": "webApis"
-        },
-        "code": "return new Promise(resolve => setTimeout(resolve, ms));"
+          ]
+        }
       },
       {
         "title": "'User loaded' 출력",
         "explanation": "1초 후 delay Promise가 resolve되어 fetchUser가 재개됩니다. 'User loaded'가 출력됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('User loaded');",
         "eventLoopState": {
           "callStack": [
             "fetchUser()",
             "console.log('User loaded')"
           ],
           "webApis": [],
-          "taskQueue": [],
           "microtaskQueue": [
             "main() (suspended)"
           ],
@@ -154,43 +130,33 @@
           ],
           "currentPhase": "executing",
           "highlightArea": "callStack"
-        },
-        "code": "console.log('User loaded');"
+        }
       },
       {
         "title": "객체 반환",
         "explanation": "`return { name: 'Alice' }`로 객체를 반환합니다. fetchUser의 Promise가 이 값으로 resolve됩니다.",
         "visualizationType": "eventLoop",
+        "code": "return { name: 'Alice' };",
         "eventLoopState": {
           "callStack": [
             "fetchUser()"
           ],
-          "webApis": [],
-          "taskQueue": [],
           "microtaskQueue": [
             "main() → user = { name: 'Alice' }"
           ],
-          "output": [
-            "Start",
-            "Fetching...",
-            "User loaded"
-          ],
-          "currentPhase": "executing",
           "highlightArea": "microtaskQueue"
-        },
-        "code": "return { name: 'Alice' };"
+        }
       },
       {
         "title": "'Got: Alice' 출력",
         "explanation": "main 함수가 재개되어 `user` 변수에 `{ name: 'Alice' }`가 할당되고, 'Got: Alice'가 출력됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('Got:', user.name);",
         "eventLoopState": {
           "callStack": [
             "main()",
             "console.log('Got:', user.name)"
           ],
-          "webApis": [],
-          "taskQueue": [],
           "microtaskQueue": [],
           "output": [
             "Start",
@@ -198,36 +164,30 @@
             "User loaded",
             "Got: Alice"
           ],
-          "currentPhase": "executing",
           "highlightArea": "callStack"
-        },
-        "code": "console.log('Got:', user.name);"
+        }
       },
       {
         "title": "'End' 출력",
         "explanation": "`console.log('End')`가 실행되어 'End'가 출력됩니다. main 함수가 완료됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('End');",
         "eventLoopState": {
           "callStack": [
             "main()",
             "console.log('End')"
           ],
-          "webApis": [],
-          "taskQueue": [],
-          "microtaskQueue": [],
           "output": [
             "Start",
             "Fetching...",
             "User loaded",
             "Got: Alice",
             "End"
-          ],
-          "currentPhase": "executing",
-          "highlightArea": "callStack"
-        },
-        "code": "console.log('End');"
+          ]
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "await의 역할은?",

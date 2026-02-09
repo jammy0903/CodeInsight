@@ -10,25 +10,25 @@
         "explanation": "`var globalValue = 100`이 전역에서 선언됩니다. var로 선언된 전역 변수는 **전역 객체(window)의 속성**이 됩니다.",
         "keyInsight": "var globalValue = 100은 window.globalValue = 100과 같습니다.",
         "visualizationType": "thisBinding",
+        "code": "var globalValue = 100;",
         "thisState": {
           "context": "global",
           "thisValue": "window",
           "globalProperties": {
             "globalValue": 100
           }
-        },
-        "code": "var globalValue = 100;"
+        }
       },
       {
         "title": "getGlobalValue() 호출",
         "explanation": "`getGlobalValue()` 함수를 호출합니다. 일반 함수 호출이므로 this는 전역 객체(window)입니다.",
         "keyInsight": "일반 함수 호출에서 this = 전역 객체 (window)",
         "visualizationType": "thisBinding",
+        "code": "var result1 = getGlobalValue();",
         "thisState": {
           "context": "function call",
-          "thisValue": "window"
-        },
-        "code": "var result1 = getGlobalValue();"
+          "globalProperties": null
+        }
       },
       {
         "title": "this.globalValue 반환",
@@ -36,24 +36,23 @@
         "keyInsight": "this.globalValue = window.globalValue = 100",
         "analogy": "회사(window)에서 직원(함수)이 '이 회사(this)의 자산(globalValue)'을 조회하는 것과 같습니다.",
         "visualizationType": "thisBinding",
+        "code": "return this.globalValue;",
         "thisState": {
-          "context": "function call",
-          "thisValue": "window",
           "accessing": "this.globalValue → 100"
-        },
-        "code": "return this.globalValue;"
+        }
       },
       {
         "title": "strictGetValue() 호출",
         "explanation": "`strictGetValue()` 함수를 호출합니다. 이 함수 내부에 `'use strict';`가 선언되어 있습니다.",
         "keyInsight": "strict mode에서 일반 함수 호출 시 this = undefined",
         "visualizationType": "thisBinding",
+        "code": "var result2 = strictGetValue();",
         "thisState": {
           "context": "strict function call",
           "thisValue": "undefined",
-          "isStrict": true
-        },
-        "code": "var result2 = strictGetValue();"
+          "isStrict": true,
+          "accessing": null
+        }
       },
       {
         "title": "Strict Mode에서 this 반환",
@@ -61,11 +60,6 @@
         "keyInsight": "strict mode는 실수로 전역 객체를 수정하는 것을 방지합니다.",
         "tip": "ES6 모듈과 클래스는 기본적으로 strict mode입니다.",
         "visualizationType": "thisBinding",
-        "thisState": {
-          "context": "strict function call",
-          "thisValue": "undefined",
-          "isStrict": true
-        },
         "code": "return this;"
       },
       {
@@ -73,24 +67,29 @@
         "explanation": "`result2 === undefined`를 확인합니다. strict mode 함수에서 반환된 this가 undefined이므로 `isUndefined = true`입니다.",
         "keyInsight": "strict mode가 전역 객체 오염을 방지하는 방법",
         "visualizationType": "thisBinding",
+        "code": "var isUndefined = result2 === undefined;",
         "thisState": {
           "context": "comparison",
-          "result": "result2 === undefined → true"
-        },
-        "code": "var isUndefined = result2 === undefined;"
+          "result": "result2 === undefined → true",
+          "thisValue": null,
+          "isStrict": null
+        }
       },
       {
         "title": "결과 출력",
         "explanation": "`console.log(result1, isUndefined)`를 실행합니다. result1은 100, isUndefined는 true입니다.",
         "visualizationType": "thisBinding",
+        "code": "console.log(result1, isUndefined);",
         "thisState": {
           "output": [
             "100 true"
-          ]
-        },
-        "code": "console.log(result1, isUndefined);"
+          ],
+          "context": null,
+          "result": null
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "strict mode에서 다음 코드의 this는?\n\n'use strict';\nfunction test() {\n  return this;\n}\ntest();",

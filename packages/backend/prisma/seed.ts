@@ -19,6 +19,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+import { expandDeltaSteps } from './utils/expandDeltaSteps';
 
 // PostgreSQL connection
 const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
@@ -78,6 +79,7 @@ interface Curriculum {
 }
 
 interface LessonContentStep {
+  [key: string]: unknown;
   line: number;
   title: string;
   explanation: string;
@@ -99,6 +101,7 @@ interface LessonContentData {
   content: {
     code: string;
     steps: LessonContentStep[];
+    deltaFormat?: boolean;
   };
   quiz: LessonQuiz;
   misconceptions?: object[];
@@ -309,7 +312,7 @@ async function seed() {
             lessonId: lesson.id,
             code: content.content.code,
             language: 'c',
-            steps: JSON.stringify(content.content.steps),
+            steps: JSON.stringify(expandDeltaSteps(content.content.steps, content.content.deltaFormat === true)),
           };
           await prisma.lessonContent.upsert({
             where: { id: `content-${lessonData.id}` },
@@ -398,7 +401,7 @@ async function seed() {
             lessonId: lesson.id,
             code: content.content.code,
             language: 'javascript',
-            steps: JSON.stringify(content.content.steps),
+            steps: JSON.stringify(expandDeltaSteps(content.content.steps, content.content.deltaFormat === true)),
           };
           await prisma.lessonContent.upsert({
             where: { id: `content-${lessonId}` },
@@ -486,7 +489,7 @@ async function seed() {
             lessonId: lesson.id,
             code: content.content.code,
             language: 'java',
-            steps: JSON.stringify(content.content.steps),
+            steps: JSON.stringify(expandDeltaSteps(content.content.steps, content.content.deltaFormat === true)),
           };
           await prisma.lessonContent.upsert({
             where: { id: `content-${lessonId}` },
@@ -574,7 +577,7 @@ async function seed() {
             lessonId: lesson.id,
             code: content.content.code,
             language: 'python',
-            steps: JSON.stringify(content.content.steps),
+            steps: JSON.stringify(expandDeltaSteps(content.content.steps, content.content.deltaFormat === true)),
           };
           await prisma.lessonContent.upsert({
             where: { id: `content-${lessonId}` },
@@ -665,7 +668,7 @@ async function seed() {
             lessonId: lesson.id,
             code: content.content.code,
             language: 'python-practical',
-            steps: JSON.stringify(content.content.steps),
+            steps: JSON.stringify(expandDeltaSteps(content.content.steps, content.content.deltaFormat === true)),
           };
           await prisma.lessonContent.upsert({
             where: { id: `content-${lessonData.id}` },

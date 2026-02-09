@@ -6,44 +6,264 @@
     "code": "#include <stdio.h>\n\nint main() {\n    int sum = 0;\n\n    for (int i = 1; i <= 5; i++) {\n        sum = sum + i;\n        printf(\"i=%d, sum=%d\\n\", i, sum);\n    }\n\n    printf(\"최종 합: %d\\n\", sum);\n\n    return 0;\n}\n",
     "steps": [
       {
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\n프로그램 실행이 시작됩니다. main의 스택 프레임이 생성됩니다.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
         "title": "합계 변수 초기화",
-        "explanation": "**`int sum = 0;`**\n\n반복문에서 누적할 합계를 0으로 초기화합니다.\n",
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [],
-          "note": "Line 4 executed"
-        },
-        "code": "int sum = 0;"
+        "explanation": "**`int sum = 0;`**\n\n반복문에서 누적할 합계 변수를 **0**으로 초기화합니다.\n\n이 변수에 1부터 5까지의 값을 차례로 더해나갈 것입니다.",
+        "code": "int sum = 0;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "0",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ]
       },
       {
-        "title": "for 문 구조",
-        "explanation": "**`for (int i = 1; i <= 5; i++)`**\n\n**for 문의 3요소**:\n1. **초기화**: `int i = 1` → 반복 변수 i를 1로 설정\n2. **조건**: `i <= 5` → i가 5 이하면 반복 계속\n3. **증감**: `i++` → 매 반복마다 i를 1 증가\n\n**실행 순서**: 초기화 → [조건 검사 → 본문 실행 → 증감] × 반복\n",
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [],
-          "note": "Line 6 executed"
-        },
-        "code": "for (int i = 1; i <= 5; i++) {"
+        "title": "for 문 진입 (i = 1)",
+        "explanation": "**`for (int i = 1; i <= 5; i++)`**\n\nfor 문의 **3요소**:\n1. **초기화**: `int i = 1` → 반복 변수 i를 1로 설정\n2. **조건**: `i <= 5` → i가 5 이하면 반복\n3. **증감**: `i++` → 매 반복 후 i를 1 증가\n\n**실행 순서**: 초기화 → [조건 검사 → 본문 → 증감] × 반복\n\n먼저 `i = 1`로 초기화됩니다. 조건 `1 <= 5` → **참** → 본문 실행!",
+        "code": "for (int i = 1; i <= 5; i++) {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "0",
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "1",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ]
       },
       {
-        "title": "합계 누적",
-        "explanation": "**`sum = sum + i;`**\n\n현재 `i` 값을 `sum`에 더합니다.\n\n**반복 과정**:\n- i=1: sum = 0 + 1 = 1\n- i=2: sum = 1 + 2 = 3\n- i=3: sum = 3 + 3 = 6\n- i=4: sum = 6 + 4 = 10\n- i=5: sum = 10 + 5 = 15\n",
-        "visualizationType": "cMemory",
-        "cMemoryState": {
-          "stack": [],
-          "heap": [],
-          "output": [
-            "i=i, sum=0"
-          ],
-          "note": "Line 7 executed"
-        },
-        "code": "sum = sum + i;"
+        "title": "1회차: sum에 i 더하기",
+        "explanation": "**`sum = sum + i;`**\n\n현재 `sum = 0`, `i = 1`\n→ `sum = 0 + 1 = **1**`\n\nsum이 0에서 **1**로 변합니다.",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "1",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "1",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "1회차: 현재 값 출력",
+        "explanation": "**`printf(\"i=%d, sum=%d\\n\", i, sum);`**\n\n`%d`에 변수 값이 대입되어 `i=1, sum=1`이 출력됩니다.",
+        "code": "printf(\"i=%d, sum=%d\\n\", i, sum);",
+        "stdout": "i=1, sum=1"
+      },
+      {
+        "title": "2회차: i 증가 (i = 2)",
+        "explanation": "**증감**: `i++` → i가 1에서 **2**로 증가\n\n**조건 검사**: `2 <= 5` → **참** → 계속 반복!",
+        "code": "for (int i = 1; i <= 5; i++) {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "1",
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "2",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "2회차: sum += i",
+        "explanation": "**`sum = sum + i;`**\n\n`sum = 1 + 2 = **3**`",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "3",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "2",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "2회차: 출력",
+        "explanation": "**`printf(\"i=%d, sum=%d\\n\", i, sum);`**\n\n`i=2, sum=3`이 출력됩니다.",
+        "code": "printf(\"i=%d, sum=%d\\n\", i, sum);",
+        "stdout": "i=1, sum=1\ni=2, sum=3"
+      },
+      {
+        "title": "3회차: i = 3, sum = 6",
+        "explanation": "`i++` → `i = 3`, 조건 `3 <= 5` → **참**\n\n**`sum = 3 + 3 = 6`**\n\n출력: `i=3, sum=6`\n\n패턴이 보이나요? 매 반복마다 `i`가 1씩 늘고, `sum`에 현재 `i`가 누적됩니다.",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "6",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "3",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "i=1, sum=1\ni=2, sum=3\ni=3, sum=6"
+      },
+      {
+        "title": "4회차: i = 4, sum = 10",
+        "explanation": "`i++` → `i = 4`, 조건 `4 <= 5` → **참**\n\n**`sum = 6 + 4 = 10`**\n\n출력: `i=4, sum=10`",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "10",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "4",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "i=1, sum=1\ni=2, sum=3\ni=3, sum=6\ni=4, sum=10"
+      },
+      {
+        "title": "5회차 (마지막): i = 5, sum = 15",
+        "explanation": "`i++` → `i = 5`, 조건 `5 <= 5` → **참** (마지막!)\n\n**`sum = 10 + 5 = 15`**\n\n출력: `i=5, sum=15`\n\n**누적 과정**: 0 → 1 → 3 → 6 → 10 → **15**",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "15",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "5",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "i=1, sum=1\ni=2, sum=3\ni=3, sum=6\ni=4, sum=10\ni=5, sum=15"
+      },
+      {
+        "title": "반복 종료 (조건 거짓)",
+        "explanation": "`i++` → `i = 6`\n\n**조건 검사**: `6 <= 5` → **거짓!** → 반복문 종료\n\n`i`는 for 블록 안에서 선언되었으므로 루프가 끝나면 **소멸**합니다.\n스택에서 `i`가 사라지고, `sum = 15`만 남습니다.",
+        "code": "for (int i = 1; i <= 5; i++) {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "15",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "최종 합 출력",
+        "explanation": "**`printf(\"최종 합: %d\\n\", sum);`**\n\n`sum = 15` (1+2+3+4+5 = 15)\n\n**검증**: 공식 `N*(N+1)/2 = 5*6/2 = 15` ✓",
+        "code": "printf(\"최종 합: %d\\n\", sum);",
+        "stdout": "i=1, sum=1\ni=2, sum=3\ni=3, sum=6\ni=4, sum=10\ni=5, sum=15\n최종 합: 15"
+      },
+      {
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n프로그램이 정상 종료됩니다. main의 스택 프레임이 제거됩니다.",
+        "code": "return 0;",
+        "stack": []
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "for (int i = 0; i < 3; i++) 에서 반복 횟수는?",
@@ -54,7 +274,14 @@
       "무한 반복"
     ],
     "correctIndex": 1,
-    "explanation": "i의 변화: 0 → 1 → 2 → (3이면 i < 3 거짓, 종료)\n\n실행되는 i 값: **0, 1, 2** → 총 **3번** 반복\n"
+    "explanation": "i의 변화: 0 → 1 → 2 → (3이면 i < 3 거짓, 종료)\n\n실행되는 i 값: **0, 1, 2** → 총 **3번** 반복"
   },
-  "keyTakeaway": ""
+  "misconceptions": [
+    {
+      "wrong": "for 문의 i는 루프가 끝나도 사용할 수 있다",
+      "correct": "for (int i = ...) 로 선언하면 i의 스코프는 for 블록 내부로 한정됩니다.",
+      "why": "루프가 끝나면 i는 스택에서 제거됩니다. 루프 밖에서 i를 쓰려면 for 문 바깥에서 선언해야 합니다."
+    }
+  ],
+  "keyTakeaway": "for 문은 '초기화; 조건; 증감'을 한 줄에 — 반복 횟수가 명확할 때 최적의 선택!"
 }

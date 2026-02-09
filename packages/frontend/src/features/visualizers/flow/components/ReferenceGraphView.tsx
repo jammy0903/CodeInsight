@@ -228,7 +228,6 @@ const ValueCard = memo(function ValueCard({
                   border: `1px solid ${nameMeta?.sameRef ? '#818cf8' : theme.nameTagColor.border}`,
                 }}
               >
-                {nameMeta?.sameRef && <span style={{ fontSize: '0.85em' }}>=</span>}
                 {n.name}
               </span>
             );

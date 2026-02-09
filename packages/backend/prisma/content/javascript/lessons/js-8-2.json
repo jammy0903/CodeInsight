@@ -10,6 +10,8 @@
         "explanation": "`requestAnimationFrame(goodAni)`를 호출하여 애니메이션 루프를 시작합니다. 이는 브라우저에게 \"다음 화면을 그릴 준비가 되면 `goodAni` 함수를 실행해줘\"라고 예약하는 것과 같습니다.",
         "keyInsight": "rAF는 특정 시간이 아닌, 브라우저의 렌더링 사이클에 작업을 맞춥니다.",
         "visualizationType": "eventLoop",
+        "code": "requestAnimationFrame(goodAni);",
+        "occurrence": 2,
         "eventLoopState": {
           "webApis": [
             {
@@ -17,36 +19,31 @@
               "status": "scheduled"
             }
           ]
-        },
-        "code": "requestAnimationFrame(goodAni);",
-        "occurrence": 2
+        }
       },
       {
         "title": "다음 프레임 예약",
         "explanation": "`goodAni` 함수 내부에서 다시 `requestAnimationFrame(goodAni)`를 호출하여 다음 프레임에 대한 애니메이션을 예약합니다. 이것이 바로 'rAF 루프'이며, 부드러운 애니메이션의 핵심입니다.",
         "visualizationType": "eventLoop",
+        "code": "requestAnimationFrame(goodAni);",
         "eventLoopState": {
-          "webApis": [
-            {
-              "name": "rAF(goodAni)",
-              "status": "scheduled"
-            }
-          ],
           "note": "Looping animation scheduled"
-        },
-        "code": "requestAnimationFrame(goodAni);"
+        }
       },
       {
         "title": "참고: 잘못된 setTimeout 방식",
         "explanation": "`badAni` 함수처럼 `setTimeout`을 사용하면, JS 실행 타이밍이 브라우저의 렌더링 주기와 어긋날 수 있습니다. 예를 들어, 렌더링이 막 끝난 시점에 `moveBox`가 실행되면 다음 렌더링까지 16ms를 기다려야 하므로, 화면이 뚝뚝 끊겨 보이는 'Jank' 현상이 발생할 수 있습니다.",
         "keyInsight": "JS 애니메이션에는 `setTimeout` 대신 `requestAnimationFrame`을 사용해야 합니다.",
         "visualizationType": "eventLoop",
+        "code": "setTimeout(badAni, 10);",
         "eventLoopState": {
-          "warning": "setTimeout timing is not synced with rendering."
-        },
-        "code": "setTimeout(badAni, 10);"
+          "warning": "setTimeout timing is not synced with rendering.",
+          "webApis": null,
+          "note": null
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "requestAnimationFrame의 주요 특징이 아닌 것은?",

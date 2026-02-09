@@ -9,75 +9,58 @@
         "title": "동기 코드 #1",
         "explanation": "첫 번째 동기 코드 `console.log('1')`이 실행됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('1');",
         "eventLoopState": {
           "output": [
             "1"
           ]
-        },
-        "code": "console.log('1');"
+        }
       },
       {
         "title": "setTimeout 등록",
         "explanation": "`setTimeout` 콜백이 Web API로 위임된 후 **Task Queue**로 이동하여 대기합니다.",
         "visualizationType": "eventLoop",
+        "code": "setTimeout(() => console.log('2'), 0);",
         "eventLoopState": {
           "taskQueue": [
             "() => log('2')"
-          ],
-          "output": [
-            "1"
           ]
-        },
-        "code": "setTimeout(() => console.log('2'), 0);"
+        }
       },
       {
         "title": "첫 번째 .then 등록",
         "explanation": "첫 번째 `.then()`의 콜백 함수가 **Microtask Queue**에 추가됩니다.",
         "visualizationType": "eventLoop",
-        "eventLoopState": {
-          "taskQueue": [
-            "() => log('2')"
-          ],
-          "microtaskQueue": [
-            "() => log('3')"
-          ],
-          "output": [
-            "1"
-          ]
-        },
         "code": "Promise.resolve()",
         "highlightOffset": [
           0,
           1
-        ]
+        ],
+        "eventLoopState": {
+          "microtaskQueue": [
+            "() => log('3')"
+          ]
+        }
       },
       {
         "title": "동기 코드 #2",
         "explanation": "마지막 동기 코드 `console.log('5')`가 실행됩니다. 이제 모든 동기 코드가 완료되고 콜 스택이 비워집니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('5');",
         "eventLoopState": {
-          "taskQueue": [
-            "() => log('2')"
-          ],
-          "microtaskQueue": [
-            "() => log('3')"
-          ],
           "output": [
             "1",
             "5"
           ]
-        },
-        "code": "console.log('5');"
+        }
       },
       {
         "title": "Microtask #1 실행",
         "explanation": "콜 스택이 비었으므로 이벤트 루프는 Microtask Queue를 먼저 확인합니다. 첫 번째 콜백이 실행되어 '3'을 출력하고, 이 콜백이 반환한 Promise로 인해 다음 `.then`의 콜백이 Microtask Queue에 **새로 추가**됩니다.",
         "keyInsight": "Promise 체이닝은 새로운 Microtask를 큐에 추가합니다.",
         "visualizationType": "eventLoop",
+        "code": ".then(() => console.log('3'))",
         "eventLoopState": {
-          "taskQueue": [
-            "() => log('2')"
-          ],
           "microtaskQueue": [
             "() => log('4')"
           ],
@@ -86,17 +69,14 @@
             "5",
             "3"
           ]
-        },
-        "code": ".then(() => console.log('3'))"
+        }
       },
       {
         "title": "Microtask #2 실행",
         "explanation": "이벤트 루프는 Microtask Queue가 완전히 빌 때까지 계속 확인합니다. 새로 추가된 두 번째 콜백이 실행되어 '4'를 출력합니다.",
         "visualizationType": "eventLoop",
+        "code": ".then(() => console.log('4'));",
         "eventLoopState": {
-          "taskQueue": [
-            "() => log('2')"
-          ],
           "microtaskQueue": [],
           "output": [
             "1",
@@ -104,13 +84,13 @@
             "3",
             "4"
           ]
-        },
-        "code": ".then(() => console.log('4'));"
+        }
       },
       {
         "title": "Task 실행",
         "explanation": "Microtask Queue가 비로소 비워진 후에야, 이벤트 루프는 Task Queue를 확인합니다. `setTimeout`의 콜백이 실행되어 '2'를 마지막으로 출력합니다.",
         "visualizationType": "eventLoop",
+        "code": "setTimeout(() => console.log('2'), 0);",
         "eventLoopState": {
           "taskQueue": [],
           "output": [
@@ -119,11 +99,12 @@
             "3",
             "4",
             "2"
-          ]
-        },
-        "code": "setTimeout(() => console.log('2'), 0);"
+          ],
+          "microtaskQueue": null
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "다음 코드의 출력 순서는?\n\nsetTimeout(() => console.log('A'), 0);\nPromise.resolve().then(() => {\n  console.log('B');\n  Promise.resolve().then(() => console.log('C'));\n});\nconsole.log('D');",

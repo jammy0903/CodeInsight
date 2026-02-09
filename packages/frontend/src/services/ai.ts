@@ -8,7 +8,7 @@ import { api } from './api/axios';
 import { handleError } from './api/errors';
 import { config } from '@/config';
 import { notifyAI, notifyNetwork } from '@/components/common/Toast';
-import { getAuthTokenAsync } from './api/tokenManager';
+import { getAuthToken } from './api/tokenManager';
 
 // === 타입 정의 ===
 
@@ -211,7 +211,7 @@ export async function askAIStream(
 
   try {
     // 인증 토큰 가져오기
-    const token = await getAuthTokenAsync();
+    const token = getAuthToken();
 
     // 토큰이 없으면 로그인 필요 안내
     if (!token) {
@@ -322,7 +322,7 @@ export async function getStepExplanationStream(
 
   try {
     // 인증 토큰 가져오기
-    const token = await getAuthTokenAsync();
+    const token = getAuthToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };

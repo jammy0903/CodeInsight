@@ -9,24 +9,22 @@
         "title": "stdio.h 헤더 포함",
         "explanation": "**`#include <stdio.h>`**\n\n표준 입출력 함수를 사용하기 위해 헤더 파일을 포함합니다.",
         "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
         "stack": [],
         "heap": [],
-        "stdout": "",
-        "code": "#include <stdio.h>"
+        "stdout": ""
       },
       {
         "title": "stdlib.h 헤더 포함",
         "explanation": "**`#include <stdlib.h>`**\n\n`malloc`, `free`와 같은 메모리 관리 함수를 사용하기 위해 헤더 파일을 포함합니다.",
         "visualizationType": "cMemory",
-        "stack": [],
-        "heap": [],
-        "stdout": "",
         "code": "#include <stdlib.h>"
       },
       {
         "title": "main 함수 시작",
         "explanation": "**`int main() {`**\n\n프로그램 실행의 시작점입니다.",
         "visualizationType": "cMemory",
+        "code": "int main() {",
         "stack": [
           {
             "name": "main",
@@ -34,15 +32,13 @@
             "func": "main",
             "value": "frame"
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "int main() {"
+        ]
       },
       {
         "title": "힙 메모리 할당",
         "explanation": "**`int *p = (int*)malloc(sizeof(int));`**\n\n힙 영역에 정수 하나를 저장할 메모리(4바이트)를 할당하고, 그 주소를 포인터 변수 `p`에 저장합니다.",
         "visualizationType": "cMemory",
+        "code": "int *p = (int*)malloc(sizeof(int));",
         "stack": [
           {
             "name": "p",
@@ -57,22 +53,13 @@
             "size": "4 bytes",
             "value": "???"
           }
-        ],
-        "stdout": "",
-        "code": "int *p = (int*)malloc(sizeof(int));"
+        ]
       },
       {
         "title": "힙 메모리에 값 저장",
         "explanation": "**`*p = 10;`**\n\n역참조 연산자 `*`를 사용하여 포인터 `p`가 가리키는 힙 메모리 위치에 값 `10`을 저장합니다.",
         "visualizationType": "cMemory",
-        "stack": [
-          {
-            "name": "p",
-            "value": "0xHEAP",
-            "type": "int*",
-            "address": "0x1000"
-          }
-        ],
+        "code": "*p = 10;",
         "heap": [
           {
             "address": "0xHEAP",
@@ -80,14 +67,13 @@
             "value": "10",
             "highlight": true
           }
-        ],
-        "stdout": "",
-        "code": "*p = 10;"
+        ]
       },
       {
         "title": "메모리 해제와 댕글링 포인터 발생",
         "explanation": "**`free(p);`**\n\n`p`가 가리키던 힙 메모리를 시스템에 반납합니다. **하지만 포인터 변수 `p` 자체는 변하지 않고, 여전히 해제된 메모리의 주소 '0xHEAP'을 가지고 있습니다.** 이처럼 유효하지 않은 메모리를 가리키는 포인터를 '댕글링 포인터(Dangling Pointer)'라고 합니다.",
         "visualizationType": "cMemory",
+        "code": "free(p);",
         "stack": [
           {
             "name": "p",
@@ -97,14 +83,13 @@
             "dangling": true
           }
         ],
-        "heap": [],
-        "stdout": "",
-        "code": "free(p);"
+        "heap": []
       },
       {
         "title": "댕글링 포인터 방지 (해결책)",
         "explanation": "**`p = NULL;`**\n\n댕글링 포인터로 인한 위험을 방지하는 가장 좋은 습관은 메모리를 `free`한 직후, 해당 포인터에 `NULL`을 대입하는 것입니다. 이렇게 하면 `p`는 더 이상 유효하지 않은 메모리를 가리키지 않게 되어, 실수로 사용하는 것을 막을 수 있습니다. (`NULL` 포인터에 접근하면 대부분 프로그램이 즉시 종료되어 버그를 빨리 찾을 수 있습니다.)",
         "visualizationType": "cMemory",
+        "code": "p = NULL;",
         "stack": [
           {
             "name": "p",
@@ -112,21 +97,17 @@
             "type": "int*",
             "address": "0x1000"
           }
-        ],
-        "heap": [],
-        "stdout": "",
-        "code": "p = NULL;"
+        ]
       },
       {
         "title": "프로그램 종료",
         "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 운영체제에 알리고 프로그램을 종료합니다.",
         "visualizationType": "cMemory",
-        "stack": [],
-        "heap": [],
-        "stdout": "",
-        "code": "return 0;"
+        "code": "return 0;",
+        "stack": []
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "Dangling Pointer(댕글링 포인터)란?",

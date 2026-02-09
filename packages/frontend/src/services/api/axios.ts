@@ -1,18 +1,18 @@
 /**
  * Axios 인스턴스 설정
- * - 인증 토큰 자동 추가
+ * - 인증 토큰 자동 추가 (동기적 캐시 읽기)
  * - 기본 URL/타임아웃 설정
  * - 에러 처리 interceptor
  *
- * ENHANCEMENT (2026-02-02):
- * - 비동기 토큰 가져오기로 변경
- * - 메모리 캐시가 없으면 Firebase에서 동적으로 가져옴
+ * WHY 동기적 토큰 읽기:
+ * - AuthProvider(상위 컨텍스트)가 onAuthStateChanged → setAuthToken()으로 토큰 관리
+ * - 인터셉터는 캐시만 읽으면 됨 → 공개 API 즉시 발송, Firebase 중복 호출 제거
  */
 
 import axios from 'axios';
 import { config } from '../../config';
 import { logger } from '@/utils/logger';
-import { getAuthTokenAsync } from './tokenManager';
+import { getAuthToken } from './tokenManager';
 
 // API 기본 URL (버전 포함)
 const BASE_URL = config.api.baseUrl;
@@ -26,18 +26,17 @@ export const api = axios.create({
   timeout: 60000, // 60초
 });
 
-// Request Interceptor: 인증 토큰 자동 추가 (비동기)
+// Request Interceptor: 인증 토큰 자동 추가 (동기적 캐시 읽기)
 api.interceptors.request.use(
-  async (config) => {
-    // 비동기로 토큰 가져오기 (캐시 또는 Firebase에서)
-    const token = await getAuthTokenAsync();
+  (config) => {
+    // AuthProvider가 관리하는 캐시에서 동기적으로 토큰 읽기
+    const token = getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
-    // 이 에러는 요청을 보내기 전에 발생하는 에러 (네트워크 문제 등)
     logger.error('Request interceptor error:', error);
     return Promise.reject(error);
   }

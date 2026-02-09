@@ -8,7 +8,9 @@
  */
 
 import { useEffect, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLesson, useChapter } from '@/hooks';
+import { getLessonFull } from '@/services/courses';
 import { useStore } from '@/stores/store';
 import type { SupportedLanguage } from '@/types';
 
@@ -21,6 +23,7 @@ interface UseLessonDataOptions {
 export function useLessonData({ lessonId, chapterId, lang }: UseLessonDataOptions) {
   // 선택적 구독: setPageTitle만 구독하여 불필요한 리렌더링 방지
   const setPageTitle = useStore((state) => state.setPageTitle);
+  const queryClient = useQueryClient();
   const { data: lesson, isLoading, isError, error } = useLesson(lessonId);
   const { data: chapterData } = useChapter(chapterId);
 
@@ -33,6 +36,17 @@ export function useLessonData({ lessonId, chapterId, lang }: UseLessonDataOption
     }
     return null;
   }, [chapterData, lessonId]);
+
+  // 다음 레슨 프리페치: 현재 레슨 로드 완료 시 다음 레슨을 백그라운드에서 미리 로드
+  useEffect(() => {
+    if (nextLessonId) {
+      queryClient.prefetchQuery({
+        queryKey: ['lesson', nextLessonId],
+        queryFn: () => getLessonFull(nextLessonId),
+        staleTime: 5 * 60 * 1000,
+      });
+    }
+  }, [nextLessonId, queryClient]);
 
   // 페이지 타이틀 관리
   useEffect(() => {

@@ -9,6 +9,7 @@
         "title": "console.log('start') 실행",
         "explanation": "프로그램이 시작되어 첫 번째 동기 코드인 `console.log('start')`가 콜 스택에 추가되고 즉시 실행됩니다. 'start'가 출력됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('start');",
         "eventLoopState": {
           "callStack": [
             "console.log('start')"
@@ -16,14 +17,19 @@
           "output": [
             "start"
           ]
-        },
-        "code": "console.log('start');"
+        }
       },
       {
         "title": "setTimeout 위임",
         "explanation": "JS 엔진이 `setTimeout`을 만나면, 타이머 설정과 콜백 함수를 브라우저의 Web API에 위임합니다. JS 엔진은 타이머를 기다리지 않고 바로 다음 코드로 넘어갑니다.\n\n**비유**: 식당에서 주문(setTimeout)을 넣고 진동벨(Callback)을 받은 뒤, 자리에 앉아 다른 일(다음 코드 실행)을 하는 것과 같습니다. 주방(Web API)에서 요리가 다 되면 진동벨이 울리겠죠.",
         "keyInsight": "JavaScript 엔진은 타이머를 직접 세지 않고 브라우저에 떠넘깁니다.",
         "visualizationType": "eventLoop",
+        "code": "setTimeout(() => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
         "eventLoopState": {
           "callStack": [],
           "webApis": [
@@ -31,22 +37,14 @@
               "name": "setTimeout callback",
               "delay": 0
             }
-          ],
-          "output": [
-            "start"
           ]
-        },
-        "code": "setTimeout(() => {",
-        "highlightOffset": [
-          0,
-          1,
-          2
-        ]
+        }
       },
       {
         "title": "console.log('end') 실행",
         "explanation": "`setTimeout`이 Web API로 넘어갔기 때문에, 메인 스레드는 멈추지 않고 다음 동기 코드인 `console.log('end')`를 실행합니다. 'end'가 출력됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('end');",
         "eventLoopState": {
           "callStack": [
             "console.log('end')"
@@ -59,14 +57,14 @@
             "start",
             "end"
           ]
-        },
-        "code": "console.log('end');"
+        }
       },
       {
         "title": "콜백 실행",
         "explanation": "모든 동기 코드가 실행되어 콜 스택이 비워지면, 이벤트 루프가 Task Queue에 대기 중이던 `setTimeout`의 콜백 함수를 가져와 콜 스택에 올립니다. 이제서야 콜백 안의 `console.log('timeout')`이 실행됩니다.",
         "keyInsight": "비동기 콜백은 항상 모든 동기 코드가 끝난 후에 실행됩니다.",
         "visualizationType": "eventLoop",
+        "code": "console.log('timeout');",
         "eventLoopState": {
           "callStack": [
             "() => { ... }",
@@ -77,11 +75,12 @@
             "start",
             "end",
             "timeout"
-          ]
-        },
-        "code": "console.log('timeout');"
+          ],
+          "webApis": null
+        }
       }
-    ]
+    ],
+    "deltaFormat": true
   },
   "quiz": {
     "question": "setTimeout(() => console.log('A'), 0)과 console.log('B')의 출력 순서는?",

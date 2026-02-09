@@ -173,8 +173,8 @@ export function useLessonSimulation({
     // 2. JSON 스텝에 시각화 데이터가 이미 있으면 시뮬레이션 스킵
     //    (eventLoopState, scopeState 등 — 시뮬레이터보다 정확한 사전 제작 데이터)
     if (lesson.content?.steps && lesson.content.steps.length > 0) {
-      const VIZ_FIELDS = ['stack', 'memoryState', 'scopeState', 'eventLoopState',
-        'promiseState', 'thisState', 'prototypeState', 'callStackState'];
+      const VIZ_FIELDS = ['stack', 'memoryState', 'pythonMemoryState', 'javaMemoryState',
+        'scopeState', 'eventLoopState', 'promiseState', 'thisState', 'prototypeState', 'callStackState'];
       const allStepsHaveViz = lesson.content.steps.every((s: any) =>
         VIZ_FIELDS.some(f => s[f] != null)
       );

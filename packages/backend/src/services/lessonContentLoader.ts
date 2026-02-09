@@ -16,6 +16,7 @@ import * as fs from 'fs/promises';
 import { watch, FSWatcher } from 'fs';
 import * as path from 'path';
 import { LessonContentData } from '../types/lesson-content';
+import { expandDeltaSteps } from '../utils/expandDeltaSteps';
 import { logger } from '../utils/logger';
 import { config } from '../config';
 
@@ -139,16 +140,23 @@ class LessonContentLoader {
 
     try {
       const content = await fs.readFile(filePath, 'utf-8');
-      const data: LessonContentData = JSON.parse(content);
+      const data = JSON.parse(content);
+
+      // Delta format 확장: delta 형식의 steps를 full state로 확장
+      if (data.content?.deltaFormat === true && Array.isArray(data.content.steps)) {
+        data.content.steps = expandDeltaSteps(data.content.steps, true);
+      }
+
+      const typedData: LessonContentData = data;
 
       // Validate: JSON 내부 ID와 파일명 ID가 일치하는지 (선택사항)
-      if (data.lessonId !== lessonId) {
-        logger.warn(`Lesson ID mismatch in file ${filePath}: expected ${lessonId}, found ${data.lessonId}`);
+      if (typedData.lessonId !== lessonId) {
+        logger.warn(`Lesson ID mismatch in file ${filePath}: expected ${lessonId}, found ${typedData.lessonId}`);
       }
 
       // Store in Cache
-      this.cache.set(lessonId, data);
-      return data;
+      this.cache.set(lessonId, typedData);
+      return typedData;
     } catch (err) {
       logger.error(`Failed to load lesson file: ${filePath}`, err);
       return null;

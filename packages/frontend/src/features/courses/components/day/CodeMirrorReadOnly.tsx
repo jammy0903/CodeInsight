@@ -33,6 +33,7 @@ interface CodeMirrorReadOnlyProps {
   onSelectionChange?: (selection: CodeSelection) => void;
   language?: 'c' | 'python' | 'java' | 'javascript';
   className?: string;
+  bottomPadding?: number;
 }
 
 const languageExtensions = {
@@ -49,6 +50,7 @@ export function CodeMirrorReadOnly({
   onSelectionChange,
   language = 'c',
   className = '',
+  bottomPadding = 0,
 }: CodeMirrorReadOnlyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -83,6 +85,15 @@ export function CodeMirrorReadOnly({
     });
   }, [isMobile]);
 
+  // 하단 여백 extension — 터미널 오버레이에 가려지지 않도록 스크롤 여유 확보
+  const bottomPaddingExtension = useMemo(() => {
+    return EditorView.theme({
+      '.cm-content': {
+        paddingBottom: bottomPadding > 0 ? `${bottomPadding}px` : '0',
+      },
+    });
+  }, [bottomPadding]);
+
   // 에디터 생성 (code, language, theme 변경 시 재생성)
   useEffect(() => {
     if (!containerRef.current) return;
@@ -103,6 +114,7 @@ export function CodeMirrorReadOnly({
         langExtension(),
         ...themeExtension,
         fontSizeExtension,
+        bottomPaddingExtension,
         lineHighlightExtension,
         lineHighlightTheme,
         // 선택 이벤트 리스너
@@ -146,7 +158,7 @@ export function CodeMirrorReadOnly({
       view.destroy();
       viewRef.current = null;
     };
-  }, [code, language, themeExtension, fontSizeExtension, onSelectionChange]);
+  }, [code, language, themeExtension, fontSizeExtension, bottomPaddingExtension, onSelectionChange]);
 
   // 하이라이트 라인 변경 시 업데이트
   useEffect(() => {
