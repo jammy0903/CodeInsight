@@ -9,148 +9,53 @@
         "title": "HashMap 생성",
         "explanation": "**실행 순서:**\n1. `new HashMap<>()` 호출.\n2. Heap에 HashMap 객체 생성.\n\n**HashMap의 정책:** \"뭐든 다 받아줍니다.\"\n`null` 키도, `null` 값도 저장할 수 있는 관대한 친구입니다. 가장 흔하게 쓰이는 Map 구현체죠.",
         "visualizationType": "javaMemory",
-        "code": "Map<String, Integer> hashMap = new HashMap<>();",
-        "javaMemoryState": {
-          "stack": [
-            {
-              "name": "hashMap",
-              "value": "-> 0xMap1",
-              "type": "Map<String, Integer>"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0xMap1",
-              "content": "HashMap{}",
-              "type": "HashMap"
-            }
-          ],
-          "output": []
-        }
+        "code": "Map<String, Integer> hashMap = new HashMap<>();"
       },
       {
         "title": "null value 저장",
         "explanation": "**실행 순서:**\n1. `hashMap.put(\"key\", null)` 호출.\n2. \"key\"의 해시코드 계산.\n3. 버킷에 (key, null) 저장.\n\n값을 `null`로 저장했습니다.\n\"이 키에 대한 데이터는 없음\"을 표시하고 싶을 때 쓸 수 있지만, `get()` 했을 때 \"키가 없는 건지 값이 null인 건지\" 헷갈릴 수 있습니다.",
         "visualizationType": "javaMemory",
-        "code": "hashMap.put(\"key\", null);",
-        "javaMemoryState": {
-          "heap": [
-            {
-              "address": "0xMap1",
-              "content": "{\"key\": null}",
-              "type": "HashMap"
-            }
-          ],
-          "note": "HashMap: null value OK"
-        }
+        "code": "hashMap.put(\"key\", null);"
       },
       {
         "title": "null key 저장",
         "explanation": "**실행 순서:**\n1. `hashMap.put(null, 100)` 호출.\n2. Key가 `null`임을 감지.\n3. 0번 버킷(지정석)에 (null, 100) 저장.\n\n**특이점:** Key가 `null`인 것도 저장됩니다!\n내부적으로는 해시값을 계산할 수 없어서 0번 버킷에 따로 모셔둡니다.\n물론 Key는 유일해야 하므로 `null` Key는 딱 하나만 가질 수 있습니다.",
         "keyInsight": "HashMap: null key 1개, null value 무제한 가능",
         "visualizationType": "javaMemory",
-        "code": "hashMap.put(null, 100);",
-        "javaMemoryState": {
-          "heap": [
-            {
-              "address": "0xMap1",
-              "content": "{\"key\": null, null: 100}",
-              "type": "HashMap"
-            }
-          ],
-          "note": null
-        }
+        "code": "hashMap.put(null, 100);"
       },
       {
         "title": "ConcurrentHashMap 생성",
         "explanation": "**실행 순서:**\n1. `new ConcurrentHashMap<>()` 호출.\n2. Heap에 객체 생성.\n\n**ConcurrentHashMap의 정책:** \"null은 절대 사절!\"\n멀티스레드 환경을 위해 설계된 이 맵은 아주 엄격합니다.\n여러 스레드가 동시에 접근해도 안전하도록 설계되었습니다.",
         "visualizationType": "javaMemory",
-        "code": "Map<String, Integer> concurrentMap = new ConcurrentHashMap<>();",
-        "javaMemoryState": {
-          "stack": [
-            {
-              "name": "concurrentMap",
-              "value": "-> 0xCMap",
-              "type": "Map<String, Integer>"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0xCMap",
-              "content": "ConcurrentHashMap{}",
-              "type": "ConcurrentHashMap"
-            }
-          ]
-        }
+        "code": "Map<String, Integer> concurrentMap = new ConcurrentHashMap<>();"
       },
       {
         "title": "ConcurrentHashMap에 null 넣기 (NPE!)",
         "explanation": "**실행 순서:**\n1. `put` 메서드 진입.\n2. Key/Value null 체크.\n3. `null` 발견 -> **NPE 발생**.\n\n**왜 이렇게 깐깐할까?**\n멀티스레드 환경에서 `get(key)`가 `null`을 반환했을 때 모호하기 때문입니다. 누군가 방금 `remove`해서 없는 건지, 원래 `null`이었는지 확실하지 않으면 동시성 버그가 생기기 쉽습니다.",
         "keyInsight": "ConcurrentHashMap: null 절대 불가!",
         "visualizationType": "javaMemory",
-        "code": "concurrentMap.put(\"key\", null);",
-        "javaMemoryState": {
-          "error": "NullPointerException",
-          "warning": "ConcurrentHashMap은 null key/value 불가",
-          "stack": [],
-          "heap": []
-        }
+        "code": "concurrentMap.put(\"key\", null);"
       },
       {
         "title": "List.of() 불변 리스트",
         "explanation": "**실행 순서:**\n1. `List.of(...)` 팩토리 메서드 호출.\n2. 내부적으로 null 포함 여부 전수 검사.\n3. 불변 리스트 객체 생성.\n\nJava 9에 나온 `List.of()` 역시 `null`을 허용하지 않습니다.\n\"불변 객체(Immutable Object)는 깔끔하고 완전해야 한다\"는 최신 Java의 철학 때문입니다.",
         "keyInsight": "List.of(): 불변 리스트, null 포함 불가",
         "visualizationType": "javaMemory",
-        "code": "List<String> list = List.of(\"a\", \"b\", \"c\");",
-        "javaMemoryState": {
-          "stack": [
-            {
-              "name": "list",
-              "value": "-> 0xList",
-              "type": "List<String>"
-            }
-          ],
-          "heap": [
-            {
-              "address": "0xList",
-              "content": "[\"a\", \"b\", \"c\"]",
-              "type": "ImmutableList"
-            }
-          ],
-          "note": "List.of(): 불변, null 불가",
-          "error": null,
-          "warning": null
-        }
+        "code": "List<String> list = List.of(\"a\", \"b\", \"c\");"
       },
       {
         "title": "contains(null) 호출 (NPE!)",
         "explanation": "**실행 순서:**\n1. `list.contains(null)` 호출.\n2. 인자가 `null`임 감지.\n3. **NPE 발생**.\n\n심지어 \"`null`이 들어있니?\"라고 물어보는 것(`contains`)조차 허용하지 않고 NPE를 던집니다.",
         "visualizationType": "javaMemory",
-        "code": "list.contains(null);",
-        "javaMemoryState": {
-          "error": "NullPointerException",
-          "stack": [],
-          "heap": [],
-          "note": null
-        }
+        "code": "list.contains(null);"
       },
       {
         "title": "getOrDefault() - null-safe 조회",
         "explanation": "**실행 순서:**\n1. `hashMap.getOrDefault(\"missing\", 0)` 호출.\n2. \"missing\" 키 조회 시도.\n3. 없음(null) 확인.\n4. 기본값 `0` 반환.\n\n**추천 메서드:**\n\"키가 없으면 `null` 말고 0을 달라.\"\n`null` 처리를 매번 `if`문으로 하기 귀찮을 때 쓰는 '치트키'입니다.",
         "keyInsight": "getOrDefault() = null 대신 기본값 받기",
         "visualizationType": "javaMemory",
-        "code": "Integer value = hashMap.getOrDefault(\"missing\", 0);",
-        "javaMemoryState": {
-          "stack": [
-            {
-              "name": "value",
-              "value": "0",
-              "type": "Integer"
-            }
-          ],
-          "note": "\"missing\" 키가 없으므로 0 반환",
-          "error": null
-        }
+        "code": "Integer value = hashMap.getOrDefault(\"missing\", 0);"
       }
     ],
     "deltaFormat": true

@@ -108,8 +108,8 @@ export function MobileLessonView({
     diffMode: false,
   });
 
-  // Memory 탭 표시 여부 (Java, C만)
-  const showMemoryTab = languageId === 'java' || languageId === 'c';
+  // Memory 탭 표시 여부 (C만)
+  const showMemoryTab = languageId === 'c';
 
 
 

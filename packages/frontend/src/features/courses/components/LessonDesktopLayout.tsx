@@ -275,7 +275,7 @@ export function LessonDesktopLayout({
             <Play className="w-3.5 h-3.5" />
             <span>Flow</span>
           </button>
-          {(lang === 'java' || lang === 'c') && (
+          {lang === 'c' && (
             <button
               onClick={() => setActiveTab('memory')}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold transition-all"
