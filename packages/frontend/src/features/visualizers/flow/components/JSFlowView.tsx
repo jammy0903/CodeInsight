@@ -161,6 +161,7 @@ const ObjectCard = memo(function ObjectCard({
   isNew,
   isUpdated,
 }: ObjectCardProps) {
+  const [showType, setShowType] = useState(false);
   const colors = getTypeColor(object.type);
   const emoji = getTypeEmoji(object.type);
 
@@ -184,10 +185,11 @@ const ObjectCard = memo(function ObjectCard({
         borderColor: isHighlighted ? '#f59e0b' : colors.border,
         boxShadow: isHighlighted ? '0 0 12px rgba(245, 158, 11, 0.5)' : undefined,
       }}
-      onMouseEnter={() => onHover(object.id)}
-      onMouseLeave={() => onHover(null)}
+      onMouseEnter={() => { onHover(object.id); setShowType(true); }}
+      onMouseLeave={() => { onHover(null); setShowType(false); }}
+      onClick={() => setShowType((prev) => !prev)}
     >
-      {/* 이름표들 (포스트잇) - 상단에 나란히 */}
+      {/* 이름표들 - 상단에 나란히 */}
       {names.length > 0 && (
         <div className="absolute -top-3 left-2 flex gap-1">
           {names.map((nameVar) => (
@@ -217,17 +219,15 @@ const ObjectCard = memo(function ObjectCard({
         </span>
       </div>
 
-      {/* 타입 - 우하단 */}
-      <span
-        className="absolute -bottom-2 right-2 px-1.5 py-0.5 rounded text-[10px]"
-        style={{
-          backgroundColor: colors.bg,
-          color: colors.text,
-          border: `1px solid ${colors.border}`,
-        }}
-      >
-        {object.type}
-      </span>
+      {/* 타입 오버레이 — 호버(데스크톱) / 탭(모바일) 시 표시 */}
+      {showType && (
+        <div
+          className="absolute inset-0 flex items-center justify-center rounded-xl z-10"
+          style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+        >
+          <span className="text-white font-bold text-sm">{object.type}</span>
+        </div>
+      )}
     </div>
   );
 });

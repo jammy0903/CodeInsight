@@ -3,11 +3,11 @@
  *
  * Duolingo/Codecademy 스타일: 화면 하단에 전체 너비로 고정.
  * 이전/다음 버튼이 넓은 터치 영역을 가짐.
+ * 색상은 테마 CSS 변수 사용 (theme.css --theme-lesson-nav-*)
  */
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '@/hooks';
 
 interface LessonBottomNavProps {
   onPrev: () => void;
@@ -23,8 +23,6 @@ export function LessonBottomNav({
   nextLabel,
 }: LessonBottomNavProps) {
   const { t } = useTranslation();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
 
   return (
     <div
@@ -36,10 +34,10 @@ export function LessonBottomNav({
         zIndex: 50,
         padding: '12px 16px',
         paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-        backgroundColor: isDark ? 'rgba(13, 21, 37, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: 'var(--theme-lesson-nav-bg)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        borderTop: '1px solid var(--theme-lesson-nav-border)',
       }}
     >
       <div style={{ display: 'flex', gap: '10px' }}>
@@ -57,15 +55,15 @@ export function LessonBottomNav({
             borderRadius: '14px',
             fontSize: '16px',
             fontWeight: 600,
-            border: `1.5px solid ${!canGoPrev
-              ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)')
-              : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)')}`,
-            backgroundColor: !canGoPrev
-              ? (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)')
-              : (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)'),
-            color: !canGoPrev
-              ? (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)')
-              : (isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)'),
+            border: `1.5px solid var(${canGoPrev
+              ? '--theme-lesson-nav-prev-border'
+              : '--theme-lesson-nav-prev-disabled-border'})`,
+            backgroundColor: `var(${canGoPrev
+              ? '--theme-lesson-nav-prev-bg'
+              : '--theme-lesson-nav-prev-disabled-bg'})`,
+            color: `var(${canGoPrev
+              ? '--theme-lesson-nav-prev-text'
+              : '--theme-lesson-nav-prev-disabled-text'})`,
             cursor: canGoPrev ? 'pointer' : 'not-allowed',
             transition: 'all 0.15s ease',
           }}
@@ -79,7 +77,7 @@ export function LessonBottomNav({
         <button
           onClick={onNext}
           style={{
-            flex: 1.4,
+            flex: 1,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -89,11 +87,11 @@ export function LessonBottomNav({
             fontSize: '16px',
             fontWeight: 700,
             border: 'none',
-            backgroundColor: isDark ? '#7c5ce0' : '#7c3aed',
-            color: '#ffffff',
+            backgroundColor: 'var(--theme-lesson-nav-next-bg)',
+            color: 'var(--theme-lesson-nav-next-text)',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
-            boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)',
+            boxShadow: 'var(--theme-lesson-nav-next-shadow)',
           }}
           aria-label={nextLabel}
         >

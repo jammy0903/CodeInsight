@@ -107,73 +107,69 @@ interface ObjectCardProps {
 }
 
 const ObjectCard = memo(function ObjectCard({ object, names, isNew, isUpdated }: ObjectCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  const [showType, setShowType] = useState(false);
   const mutable = isMutable(object.type);
   const colorSet = mutable ? COLORS.mutable : COLORS.immutable;
   const emoji = getTypeEmoji(object.type);
   const displayValue = formatValue(object.value, object.type);
-
-  // 단순 타입만 이모지 표시
-  const isSimpleType = ['int', 'float', 'str', 'bool', 'NoneType'].includes(object.type);
 
   return (
     <motion.div
       initial={isNew ? { opacity: 0, y: 20 } : false}
       animate={{ opacity: 1, y: 0 }}
       className={`
-        relative px-3 py-2 rounded-lg border-2 cursor-pointer
+        relative px-4 py-3 rounded-lg border-2 cursor-pointer select-none
         ${colorSet.bg} ${colorSet.border}
         ${isUpdated ? COLORS.highlight.ring : ''}
         shadow-sm
       `}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => setShowType(true)}
+      onMouseLeave={() => setShowType(false)}
+      onClick={() => setShowType((prev) => !prev)}
     >
-      {/* 호버 시 클래스명 오버레이 (단순 타입 제외) */}
-      {isHovered && !isSimpleType && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 rounded-lg z-10"
-        >
-          <span className="text-white font-bold text-sm">
-            {object.type}
-          </span>
-        </motion.div>
+      {/* 이름표들 - 상단에 나란히 (JS와 동일 스타일) */}
+      {names.length > 0 && (
+        <div className="absolute -top-3 left-2 flex gap-1">
+          {names.map((nameVar) => (
+            <span
+              key={nameVar.id}
+              className={`
+                px-2 py-0.5 rounded text-xs font-mono font-bold shadow-sm
+                ${COLORS.stickyNote.bg} ${COLORS.stickyNote.text}
+                border ${COLORS.stickyNote.border}
+                ${nameVar.state === 'updating' ? COLORS.highlight.ring : ''}
+              `}
+            >
+              {nameVar.name}
+            </span>
+          ))}
+        </div>
       )}
 
-      {/* 컴팩트 레이아웃: 값 + 포스트잇 한 줄 */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {/* 값 */}
+      {/* 값 (이모지 + 내용) */}
+      <div className="flex items-center gap-2 mt-1">
+        <span className="text-lg">{emoji}</span>
         <motion.span
           key={displayValue}
           initial={isUpdated ? { scale: 1.1, color: '#3b82f6' } : false}
           animate={{ scale: 1, color: 'inherit' }}
-          className={`font-mono font-semibold ${isSimpleType ? 'text-lg' : 'text-xs'}`}
+          className="font-mono font-semibold text-sm"
         >
-          {isSimpleType && <span className="mr-1">{emoji}</span>}
           {displayValue}
         </motion.span>
-
-        {/* 포스트잇들 (변수 이름) - 인라인 */}
-        {names.length > 0 && (
-          <div className="flex gap-1">
-            {names.map((nameVar) => (
-              <span
-                key={nameVar.id}
-                className={`
-                  px-2 py-0.5 rounded text-xs font-mono font-bold
-                  ${COLORS.stickyNote.bg} ${COLORS.stickyNote.text}
-                  border-b-2 ${COLORS.stickyNote.border}
-                  ${nameVar.state === 'updating' ? COLORS.highlight.ring : ''}
-                `}
-              >
-                {nameVar.name}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* 타입 오버레이 — 호버(데스크톱) / 탭(모바일) 시 표시 */}
+      {showType && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="absolute inset-0 flex items-center justify-center rounded-lg z-10"
+          style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+        >
+          <span className="text-white font-bold text-sm">{object.type}</span>
+        </motion.div>
+      )}
     </motion.div>
   );
 });
@@ -261,9 +257,9 @@ const FrameCard = memo(function FrameCard({
       </div>
 
       {/* 프레임 내용 */}
-      <div className="p-3">
+      <div className="p-4 pt-5">
         {objects.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-6">
             <AnimatePresence mode="popLayout">
               {objects.map(({ object, names }) => {
                 const isObjNew = prevStep
