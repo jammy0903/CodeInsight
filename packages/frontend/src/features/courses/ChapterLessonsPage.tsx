@@ -75,6 +75,17 @@ export function ChapterLessonsPage() {
     }
   }, [chapter, setPageTitle, lang]);
 
+  // 진행률: hooks 규칙상 early return 전에 선언
+  const chapterProgress = useMemo(() => {
+    if (!languageData || !chapterId) return { total: 0, completed: 0, percentage: 0 };
+    const ch = (languageData as any).chapters?.find((c: any) => c.id === chapterId);
+    return ch?.progress || { total: 0, completed: 0, percentage: 0 };
+  }, [languageData, chapterId]);
+
+  const totalLessons = chapterProgress.total;
+  const completedLessons = chapterProgress.completed;
+  const progressPercent = chapterProgress.percentage;
+
   // 에러 상태만 early return
   if (isError) {
     return (
@@ -142,17 +153,6 @@ export function ChapterLessonsPage() {
       </div>
     );
   }
-
-  // 진행률: LanguageCoursePage와 동일한 소스 (백엔드 계산값) 사용
-  const chapterProgress = useMemo(() => {
-    if (!languageData || !chapterId) return { total: 0, completed: 0, percentage: 0 };
-    const ch = (languageData as any).chapters?.find((c: any) => c.id === chapterId);
-    return ch?.progress || { total: 0, completed: 0, percentage: 0 };
-  }, [languageData, chapterId]);
-
-  const totalLessons = chapterProgress.total;
-  const completedLessons = chapterProgress.completed;
-  const progressPercent = chapterProgress.percentage;
 
   return (
     <div className="min-h-screen py-4 px-3 md:px-12 lg:px-16">
