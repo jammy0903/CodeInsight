@@ -222,7 +222,7 @@ export function LessonPage() {
           {/* 레슨 신고 버튼 */}
           <button
             onClick={() => setReportOpen(true)}
-            className="fixed bottom-[76px] right-4 z-50 p-2 rounded-full opacity-40 hover:opacity-100 transition-opacity"
+            className="fixed bottom-[76px] right-4 z-40 p-2 rounded-full opacity-40 hover:opacity-100 transition-opacity"
             style={{
               backgroundColor: 'var(--theme-layout-footer-social-bg)',
               color: 'var(--theme-layout-footer-text-muted)',

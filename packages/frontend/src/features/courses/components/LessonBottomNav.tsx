@@ -31,7 +31,7 @@ export function LessonBottomNav({
         bottom: 0,
         left: 0,
         right: 0,
-        zIndex: 50,
+        zIndex: 40,
         padding: '12px 16px',
         paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
         backgroundColor: 'var(--theme-lesson-nav-bg)',
