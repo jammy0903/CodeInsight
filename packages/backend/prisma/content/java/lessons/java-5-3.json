@@ -8,7 +8,6 @@
       {
         "title": "static 필드 메모리 할당",
         "explanation": "**실행 순서:**\n1. JVM이 `Counter` 클래스 정보를 Metaspace에 로드(Load)합니다.\n2. 이때 `static int count`를 위한 공간도 함께 생성하고 `0`으로 초기화합니다.\n\n**탄생의 비밀:**\n객체(`new`)를 하나도 안 만들어도, `static` 멤버는 프로그램 시작과 동시에 이미 존재합니다. 공용 게시판처럼요!",
-        "visualizationType": "javaMemory",
         "code": "static int count = 0;",
         "highlightOffset": [
           0,
@@ -24,7 +23,6 @@
       {
         "title": "첫 번째 인스턴스(c1) 생성",
         "explanation": "**실행 순서:**\n1. `new Counter()`를 호출합니다.\n2. 생성자가 실행되면서 공동 자산인 `Counter.count`를 `1` 올립니다 (0 -> 1).\n3. 이 `1` 값을 내 `id` 수첩에 적습니다.\n\n**따로 또 같이:**\n`count`는 모두가 공유하는 전광판이고, `id`는 내 주머니 속 번호표입니다.",
-        "visualizationType": "javaMemory",
         "code": "Counter c1 = new Counter();",
         "highlightOffset": [
           0,
@@ -37,7 +35,6 @@
       {
         "title": "두 번째 인스턴스(c2) 생성",
         "explanation": "**실행 순서:**\n1. 또 `new Counter()`를 호출합니다.\n2. `Counter.count`는 아까 1이었으니까, 이제 `2`가 됩니다.\n3. 새 친구 `c2`는 `id`로 `2`를 가져갑니다.\n\n**이어달리기:**\n`c1`이 올려둔 값을 `c2`가 이어서 올립니다. 그게 `static`이니까요!",
-        "visualizationType": "javaMemory",
         "code": "Counter c2 = new Counter();",
         "highlightOffset": [
           0,
@@ -50,7 +47,6 @@
       {
         "title": "결과 출력",
         "explanation": "**실행 순서:**\n1. `c1`의 번호 `1` 확인.\n2. `c2`의 번호 `2` 확인.\n3. 공용 카운터 `2` 확인.\n\n**권장 표기법:**\n`c1.count`라고 써도 작동은 하지만, 노란 줄(Warning)이 뜹니다. \"이건 공용이니까 `Counter.count`라고 불러줘!\"라는 뜻입니다.",
-        "visualizationType": "javaMemory",
         "code": "System.out.println(Counter.count);",
         "highlightOffset": [
           -2,

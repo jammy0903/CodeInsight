@@ -8,46 +8,39 @@
       {
         "title": "첫 번째 리터럴 (\"Hello\")",
         "explanation": "**실행 순서:**\n1. JVM이 `\"Hello\"` 리터럴을 만남.\n2. String Pool에 \"Hello\"가 있는지 확인 (없음).\n3. Pool에 \"Hello\" 객체 생성 및 등록.\n4. `s1`이 그 주소(`Pool[0]`이라 가정)를 가리킴.\n\n**Pool의 역할:**\n자주 쓰이는 문자열을 모아두는 '공용 창고'입니다.",
-        "visualizationType": "javaMemory",
         "code": "String s1 = \"Hello\";"
       },
       {
         "title": "리터럴 재사용",
         "explanation": "**실행 순서:**\n1. JVM이 또 `\"Hello\"` 리터럴을 만남.\n2. Pool 확인 -> \"어! 아까 만든 거 있네!\"\n3. 새로 만들지 않고 기존 `Pool[0]` 주소를 `s2`에게 줌.\n\n**핵심:**\n리터럴(`\"...\"`)로 쓰면 무조건 Pool을 먼저 뒤져보고 재사용합니다. 메모리 절약의 일등공신입니다.",
         "keyInsight": "같은 리터럴 = 같은 주소 (재사용)",
-        "visualizationType": "javaMemory",
         "code": "String s2 = \"Hello\";"
       },
       {
         "title": "new String() - 강제 생성",
         "explanation": "**실행 순서:**\n1. `new String(...)` 실행.\n2. Pool을 거치지 않고 **Heap 메모리에 무조건 새 객체**(`Heap[0]`) 생성.\n3. `s3`는 이 새 객체를 가리킴.\n\n**비유:**\nPool이 '공용 정수기'라면, `new String`은 '비싼 생수 사다 마시기'입니다. 물 맛(내용)은 같아도 완전히 다른 물병입니다.",
         "keyInsight": "new String() = 재사용 안 함 (Heap 할당)",
-        "visualizationType": "javaMemory",
         "code": "String s3 = new String(\"Hello\");"
       },
       {
         "title": "intern() - 족보 찾기",
         "explanation": "**실행 순서:**\n1. `s3`의 내용(\"Hello\")을 들고 Pool에 감.\n2. \"영주님, 저랑 같은 이름 가진 애가 Pool에 있습니까?\"\n3. \"ㅇㅇ, `Pool[0]`에 있음.\"\n4. 그 주소(`Pool[0]`)를 받아와서 `s4`에 저장.\n\n`intern()`은 Heap에 있는 문자열과 똑같은 게 Pool에 있으면 그 주소를 반환합니다 (없으면 Pool에 등록 후 반환).",
         "keyInsight": "intern() = Pool 주소로 변환",
-        "visualizationType": "javaMemory",
         "code": "String s4 = s3.intern();"
       },
       {
         "title": "s1 == s2 비교",
         "explanation": "둘 다 Pool 출신입니다. 주소가 같습니다. -> `true`",
-        "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s2);"
       },
       {
         "title": "s1 == s3 비교",
         "explanation": "`s1`(Pool)과 `s3`(Heap)는 사는 동네가 다릅니다. 주소 불일치. -> `false`",
-        "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s3);"
       },
       {
         "title": "s1 == s4 비교",
         "explanation": "`intern()` 덕분에 `s4`도 Pool 주소를 얻었습니다. `s1`과 주소가 같습니다. -> `true`",
-        "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s4);"
       }
     ],

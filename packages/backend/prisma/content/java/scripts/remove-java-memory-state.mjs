@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Java lesson JSON에서 javaMemoryState 필드를 모든 step에서 제거하는 스크립트.
+ * Java lesson JSON에서 메모리 관련 필드를 모든 step에서 제거하는 스크립트.
+ * 제거 대상: javaMemoryState, memoryState, visualizationType (javaMemory/memory)
  *
  * Usage:
  *   node remove-java-memory-state.mjs              # 실행 (모든 파일)
@@ -16,7 +17,9 @@ const LESSONS_DIR = path.join(__dirname, '..', 'lessons');
 const dryRun = process.argv.includes('--dry-run');
 const targetFile = process.argv.find(a => a.startsWith('java-'));
 
-function removeJavaMemoryState(filePath) {
+const MEMORY_VIS_TYPES = new Set(['javaMemory', 'memory']);
+
+function removeMemoryFields(filePath) {
   const raw = fs.readFileSync(filePath, 'utf-8');
   const json = JSON.parse(raw);
   const fileName = path.basename(filePath);
@@ -29,11 +32,19 @@ function removeJavaMemoryState(filePath) {
         delete step.javaMemoryState;
         removedCount++;
       }
+      if ('memoryState' in step) {
+        delete step.memoryState;
+        removedCount++;
+      }
+      if (MEMORY_VIS_TYPES.has(step.visualizationType)) {
+        delete step.visualizationType;
+        removedCount++;
+      }
     }
   }
 
   if (removedCount === 0) {
-    console.log(`  ${fileName}: no javaMemoryState found, skipping`);
+    console.log(`  ${fileName}: no memory fields found, skipping`);
     return { file: fileName, removed: 0 };
   }
 
@@ -41,7 +52,7 @@ function removeJavaMemoryState(filePath) {
     fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n', 'utf-8');
   }
 
-  console.log(`  ${fileName}: removed ${removedCount} javaMemoryState entries${dryRun ? ' (dry-run)' : ''}`);
+  console.log(`  ${fileName}: removed ${removedCount} memory-related fields${dryRun ? ' (dry-run)' : ''}`);
   return { file: fileName, removed: removedCount };
 }
 
@@ -57,9 +68,9 @@ let totalRemoved = 0;
 let filesModified = 0;
 
 for (const file of files) {
-  const result = removeJavaMemoryState(path.join(LESSONS_DIR, file));
+  const result = removeMemoryFields(path.join(LESSONS_DIR, file));
   totalRemoved += result.removed;
   if (result.removed > 0) filesModified++;
 }
 
-console.log(`\nDone! ${filesModified} files modified, ${totalRemoved} javaMemoryState entries removed.${dryRun ? ' (dry-run, no files changed)' : ''}\n`);
+console.log(`\nDone! ${filesModified} files modified, ${totalRemoved} memory-related fields removed.${dryRun ? ' (dry-run, no files changed)' : ''}\n`);

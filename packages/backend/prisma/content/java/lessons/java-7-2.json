@@ -8,55 +8,46 @@
       {
         "title": "패키지 임포트",
         "explanation": "**`import java.util.ArrayList;`**\n\n가변 크기 배열인 `ArrayList`를 사용하기 위해 도구를 가져옵니다.",
-        "visualizationType": "javaMemory",
         "code": "import java.util.ArrayList;"
       },
       {
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다. 여기서 제네릭의 '타입 소거' 현상을 목격하게 됩니다.",
-        "visualizationType": "javaMemory",
         "code": "public class Main {"
       },
       {
         "title": "제네릭 리스트 생성",
         "explanation": "**실행 순서:**\n1. `ArrayList<String>` 객체를 힙에 생성합니다.\n2. `list` 변수가 이를 참조합니다.\n\n**컴파일 타임 vs 런타임:**\n코드에서는 `ArrayList<String>`이라고 명시했지만, 컴파일이 끝나면 JVM은 이걸 그냥 `ArrayList`로 취급합니다(Type Erasure). 하지만 컴파일러가 \"여긴 String만 넣어!\"라고 철저히 감시해주죠.",
-        "visualizationType": "javaMemory",
         "code": "ArrayList<String> list = new ArrayList<>();"
       },
       {
         "title": "요소 추가",
         "explanation": "**실행 순서:**\n1. `list.add(\"Hello\")`를 호출합니다.\n2. 리스트 내부에 \"Hello\"가 저장됩니다.\n\n**보이지 않는 형변환:**\n실제로는 `Object` 타입으로 저장되지만, 우리가 `String`이라고 선언했으니 안전하게 들어갑니다.",
-        "visualizationType": "javaMemory",
         "code": "list.add(\"Hello\");"
       },
       {
         "title": "값 꺼내기 (Type Erasure)",
         "explanation": "**실행 순서:**\n1. `list.get(0)`으로 값을 꺼냅니다.\n2. 컴파일러가 몰래 넣어준 `(String)` 캐스팅 코드가 실행됩니다.\n3. `s` 변수에 \"Hello\"가 저장됩니다.\n\n**마법의 순간:**\n소스 코드엔 없지만 컴파일러가 `String s = (String) list.get(0);` 처럼 바꿔줍니다. 이게 바로 제네릭의 비밀입니다!",
-        "visualizationType": "javaMemory",
         "code": "String s = list.get(0);"
       },
       {
         "title": "출력",
         "explanation": "**실행 순서:**\n1. `s`의 값을 출력합니다.\n\n**결과:**\n\"Hello\"가 출력됩니다.",
-        "visualizationType": "javaMemory",
         "code": "System.out.println(s);"
       },
       {
         "title": "Integer 리스트 생성",
         "explanation": "**실행 순서:**\n1. 이번엔 `ArrayList<Integer>`를 힙에 생성합니다(`0x200`).\n2. `intList` 변수가 이를 참조합니다.\n\n**겉보기엔 다르지만:**\n`String` 리스트와 `Integer` 리스트, 코드에선 완전 다른 타입 같죠?",
-        "visualizationType": "javaMemory",
         "code": "ArrayList<Integer> intList = new ArrayList<>();"
       },
       {
         "title": "클래스 정보 비교",
         "explanation": "**실행 순서:**\n1. `list.getClass()`를 호출합니다 -> `ArrayList.class` 반환.\n2. `intList.getClass()`를 호출합니다 -> `ArrayList.class` 반환.\n3. 두 클래스 객체가 같은지 비교합니다 (`==`).\n\n**충격적인 진실:**\n제네릭 타입 정보(`String`, `Integer`)는 런타임에 **완전히 지워집니다(Erased)**. 그래서 둘 다 그냥 `ArrayList` 클래스일 뿐이며, 결과는 `true`가 됩니다!",
-        "visualizationType": "javaMemory",
         "code": "boolean sameClass = list.getClass() == intList.getClass();"
       },
       {
         "title": "비교 결과 출력",
         "explanation": "**실행 순서:**\n1. 결과를 출력합니다.\n\n**기억하세요:**\n제네릭은 컴파일러와의 약속일 뿐, 런타임까지 가져가는 짐이 아닙니다.",
-        "visualizationType": "javaMemory",
         "code": "System.out.println(\"Same Class? \" + sameClass);"
       }
     ],
