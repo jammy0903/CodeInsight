@@ -5,7 +5,7 @@
  * 우: Flow/Memory/AI 탭 시각화
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bot, Code2, BookOpen, ChevronUp, ChevronDown, Play } from 'lucide-react';
 import { Layers } from 'lucide-react';
 
@@ -52,6 +52,39 @@ export function LessonDesktopLayout({
   );
   const [isExplanationCollapsed, setIsExplanationCollapsed] = useState(false);
   const memoryScrollRef = useRef<HTMLDivElement>(null);
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const [codeHeightRatio, setCodeHeightRatio] = useState(0.55); // 55% default
+  const isDragging = useRef(false);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+
+    const handleMove = (ev: MouseEvent | TouchEvent) => {
+      if (!isDragging.current || !leftPanelRef.current) return;
+      const rect = leftPanelRef.current.getBoundingClientRect();
+      const clientY = 'touches' in ev ? ev.touches[0].clientY : ev.clientY;
+      const ratio = Math.min(0.85, Math.max(0.15, (clientY - rect.top) / rect.height));
+      setCodeHeightRatio(ratio);
+    };
+
+    const handleEnd = () => {
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleEnd);
+      window.removeEventListener('touchmove', handleMove);
+      window.removeEventListener('touchend', handleEnd);
+    };
+
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
+    window.addEventListener('touchmove', handleMove);
+    window.addEventListener('touchend', handleEnd);
+  }, []);
 
   const currentStep = steps[currentStepIndex];
 
@@ -84,14 +117,15 @@ export function LessonDesktopLayout({
     <div className="flex flex-col md:flex-row gap-4 items-start pb-12">
       {/* Left Panel: 코드(위) + 설명(아래) — 설명은 콘텐츠에 맞춰 유동 확장 */}
       <div
-        className="w-full md:w-1/2 flex flex-col rounded-xl overflow-y-auto overflow-x-hidden"
+        ref={leftPanelRef}
+        className="w-full md:w-1/2 flex flex-col rounded-xl overflow-hidden"
         style={{
           border: '1px solid var(--theme-lesson-panel-border)',
           height: 'calc(100vh - 80px)',
         }}
       >
         {/* === 상단: 코드 에디터 + 터미널 오버레이 === */}
-        <div className="relative flex flex-col shrink-0" style={{ height: isExplanationCollapsed ? '100%' : '55vh' }}>
+        <div className="relative flex flex-col shrink-0" style={{ height: isExplanationCollapsed ? '100%' : `${codeHeightRatio * 100}%` }}>
           <div
             className="flex items-center px-3 py-1 text-xs font-medium shrink-0"
             style={{
@@ -135,13 +169,40 @@ export function LessonDesktopLayout({
           )}
         </div>
 
+        {/* === 리사이저 핸들 === */}
+        {!isExplanationCollapsed && (
+          <div
+            onMouseDown={handleResizeStart}
+            onTouchStart={handleResizeStart}
+            style={{
+              height: '6px',
+              cursor: 'row-resize',
+              background: 'var(--theme-lesson-panel-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              touchAction: 'none',
+            }}
+          >
+            <div style={{
+              width: '32px',
+              height: '3px',
+              borderRadius: '2px',
+              background: 'var(--theme-lesson-editor-header-text)',
+              opacity: 0.4,
+            }} />
+          </div>
+        )}
+
         {/* === 하단: 설명 === */}
         {currentStep && (
           <div
-            className="flex flex-col shrink-0"
+            className="flex flex-col min-h-0"
             style={{
-              borderTop: '2px solid var(--theme-lesson-panel-border)',
+              flex: isExplanationCollapsed ? '0 0 auto' : '1 1 0',
               background: 'var(--theme-lesson-explanation-bg)',
+              overflow: 'hidden',
             }}
           >
             {/* 설명 헤더 바 */}
@@ -177,7 +238,7 @@ export function LessonDesktopLayout({
             </div>
             {/* 설명 내용 */}
             {!isExplanationCollapsed && (
-              <div className="p-4">
+              <div className="p-4 overflow-y-auto flex-1 min-h-0">
                 <StepExplanation
                   explanation={currentStep.explanation}
                   stepIndex={currentStepIndex}
