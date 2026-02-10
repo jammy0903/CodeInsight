@@ -180,6 +180,7 @@ const ValueCard = memo(function ValueCard({
   isNew,
   isUpdated,
 }: ValueCardProps) {
+  const [showType, setShowType] = useState(false);
   const colors = getTypeColor(object.type, theme);
   const emoji = getTypeEmoji(object.type, language);
   const displayValue = String(object.value ?? 'null');
@@ -200,8 +201,9 @@ const ValueCard = memo(function ValueCard({
         backgroundColor: isHighlighted ? '#fefce8' : colors.bg,
         borderColor: isHighlighted ? '#fbbf24' : meta?.isNew ? '#22c55e' : colors.border,
       }}
-      onMouseEnter={() => onHover(object.id)}
-      onMouseLeave={() => onHover(null)}
+      onMouseEnter={() => { onHover(object.id); setShowType(true); }}
+      onMouseLeave={() => { onHover(null); setShowType(false); }}
+      onClick={() => setShowType((prev) => !prev)}
     >
       {/* NEW badge - top left corner */}
       {meta?.isNew && (
@@ -256,17 +258,17 @@ const ValueCard = memo(function ValueCard({
         </div>
       )}
 
-      {/* Type badge - bottom right */}
-      <span
-        className="absolute -bottom-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-mono"
-        style={{
-          backgroundColor: colors.bg,
-          color: colors.text,
-          border: `1px solid ${colors.border}`,
-        }}
-      >
-        {object.type}
-      </span>
+      {/* Type overlay — hover(desktop) / tap(mobile) */}
+      {showType && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="absolute inset-0 flex items-center justify-center rounded-xl z-10"
+          style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+        >
+          <span className="text-white font-bold text-sm">{object.type}</span>
+        </motion.div>
+      )}
 
       {/* refCount badge - bottom left */}
       {meta?.refCount != null && (
