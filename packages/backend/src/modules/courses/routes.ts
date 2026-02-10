@@ -238,12 +238,13 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
   // =============================================
 
   /**
-   * 언어 상세 (챕터 + 레슨 구조 포함)
+   * 언어 상세 (챕터 + 진행률 포함)
    *
-   * 공개 엔드포인트 — 인증 없이 코스 구조만 반환 (빠름)
-   * 진행률은 챕터 진도 페이지에서 별도 조회
+   * WHY: optionalAuth로 인증 선택적 처리
+   * - 로그인 시: 챕터별 진행률 포함
+   * - 비로그인 시: 코스 구조만 반환
    */
-  fastify.get('/:id', async (request, reply) => {
+  fastify.get('/:id', { preHandler: [fastify.optionalAuth] }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
       // 'chapter'나 'lesson' 등의 키워드가 id로 오면 404 (안전장치)
@@ -255,7 +256,9 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(400).send({ error: 'Invalid ID' });
       }
 
-      const language = await courseService.getLanguageWithChapters(id);
+      const userId = request.user?.dbUser?.id;
+      const isAdmin = request.user?.uid === env.ADMIN_FIREBASE_UID;
+      const language = await courseService.getLanguageWithChapters(id, userId, !!isAdmin);
 
       if (!language) {
         return reply.status(404).send({ error: 'Language not found' });

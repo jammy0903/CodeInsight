@@ -13,7 +13,7 @@ import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
 import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle, Lock } from 'lucide-react';
-import { useIsMobile, useChapter, useUserProgress } from '@/hooks';
+import { useIsMobile, useChapter, useUserProgress, useLanguageCourse } from '@/hooks';
 
 // 언어별 색상 (챕터 페이지용)
 const getLanguageColor = (lang: string | undefined) => {
@@ -39,6 +39,9 @@ export function ChapterLessonsPage() {
   // TanStack Query: 챕터 데이터 + 진행 상태
   const { data: chapter, isLoading, isError, error } = useChapter(chapterId);
   const { data: progressList } = useUserProgress();
+
+  // 챕터 progress는 LanguageCoursePage와 동일한 소스에서 가져옴 (캐시 재사용)
+  const { data: languageData } = useLanguageCourse(lang);
 
   // 구독 접근 권한 체크
   const [accessDenied, setAccessDenied] = useState(false);
@@ -140,12 +143,16 @@ export function ChapterLessonsPage() {
     );
   }
 
-  // 진행률 계산 (로딩 중에는 0으로 표시)
-  const totalLessons = chapter?.lessons.length || 0;
-  const completedLessons = chapter?.lessons.filter(
-    (lesson) => progressMap.get(lesson.id)?.status === 'completed'
-  ).length || 0;
-  const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+  // 진행률: LanguageCoursePage와 동일한 소스 (백엔드 계산값) 사용
+  const chapterProgress = useMemo(() => {
+    if (!languageData || !chapterId) return { total: 0, completed: 0, percentage: 0 };
+    const ch = (languageData as any).chapters?.find((c: any) => c.id === chapterId);
+    return ch?.progress || { total: 0, completed: 0, percentage: 0 };
+  }, [languageData, chapterId]);
+
+  const totalLessons = chapterProgress.total;
+  const completedLessons = chapterProgress.completed;
+  const progressPercent = chapterProgress.percentage;
 
   return (
     <div className="min-h-screen py-4 px-3 md:px-12 lg:px-16">

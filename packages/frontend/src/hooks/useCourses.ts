@@ -25,13 +25,17 @@ import type { ChapterWithLessons, Language, UserProgress, LessonFull } from '@/t
  * return <ChapterList chapters={data.chapters} />;
  */
 export function useLanguageCourse(languageId: string | undefined) {
+  const appUser = useStore((state) => state.appUser);
+  const authLoading = useStore((state) => state.authLoading);
+
   return useQuery<Language & { chapters: ChapterWithLessons[] }>({
-    // queryKey: 언어 구조는 공개 데이터 (인증 무관)
-    queryKey: ['language', languageId],
+    // queryKey에 appUser.id 포함 → 로그인/로그아웃 시 자동 재요청
+    queryKey: ['language', languageId, appUser?.id],
 
     queryFn: () => getLanguageWithChapters(languageId!),
 
-    enabled: !!languageId,
+    // authLoading 완료까지 대기 → 토큰 없이 보내는 레이스 컨디션 방지
+    enabled: !!languageId && !authLoading,
   });
 }
 

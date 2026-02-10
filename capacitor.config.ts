@@ -12,10 +12,10 @@ const config: CapacitorConfig = {
 
   android: {
     buildOptions: {
-      keystorePath: './my-release-key.keystore',
-      keystorePassword: process.env.KEYSTORE_PASSWORD,
-      keyAlias: 'my-key-alias',
-      keyPassword: process.env.KEY_PASSWORD,
+      keystorePath: './android/app/codeinsight-release.keystore',
+      keystorePassword: 'codeinsight2026',
+      keyAlias: 'codeinsight',
+      keyPassword: 'codeinsight2026',
     },
   },
 

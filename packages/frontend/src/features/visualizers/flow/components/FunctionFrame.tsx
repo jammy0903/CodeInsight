@@ -11,7 +11,7 @@ import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FlowVariable, FlowDiff } from '@codeinsight/shared';
 import { VariableBox } from './VariableBox';
-import { FLOW_THEMES, FLOW_SIZES, FLOW_ANIMATION, type FlowTheme } from '../styles';
+import { FLOW_THEMES, FLOW_ANIMATION, type FlowTheme } from '../styles';
 
 // ============================================
 // 타입 정의
@@ -157,7 +157,7 @@ export const FunctionFrame = memo(function FunctionFrame({
       {/* 변수들 */}
       <div
         className="p-4 flex flex-wrap min-h-[80px]"
-        style={{ gap: FLOW_SIZES.spacing.boxGap }}
+        style={{ gap: 'var(--flow-spacing-box-gap)' }}
       >
         <AnimatePresence mode="popLayout">
           {variables.length > 0 ? (

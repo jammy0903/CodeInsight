@@ -120,7 +120,7 @@ export function PlaygroundPage() {
   // 모바일 레이아웃: PanelGroup 없이 단순 스택
   if (isMobile) {
     return (
-      <div style={{ backgroundColor: colors.pageBg, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ backgroundColor: colors.pageBg, minHeight: '100vh', display: 'flex', flexDirection: 'column', padding: '16px' }}>
         {/* Code Section */}
         <div style={{ backgroundColor: colors.panelBg, flexShrink: 0 }}>
           {/* Header */}

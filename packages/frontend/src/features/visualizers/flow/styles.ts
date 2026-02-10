@@ -158,37 +158,18 @@ export type FlowTheme = keyof typeof FLOW_THEMES;
 // ============================================
 
 export const FLOW_SIZES = {
-  // 변수 박스
+  // 변수 박스 — CSS 변수로 반응형 처리 (var(--flow-box-*))
   box: {
     width: 80,
-    minWidth: 60,
-    height: 60,
-    minHeight: 50,
-    padding: 8,
     borderRadius: 8,
     borderWidth: 2,
   },
 
-  // 화살표
+  // 화살표 — SVG 계산용 (JS에서만 사용)
   arrow: {
     strokeWidth: 2,
     headSize: 8,
     curveOffset: 20,
-  },
-
-  // 폰트
-  font: {
-    label: 12,
-    value: 18,
-    type: 10,
-    address: 9,
-  },
-
-  // 간격
-  spacing: {
-    boxGap: 16,
-    frameGap: 24,
-    framePadding: 16,
   },
 
   // 터미널

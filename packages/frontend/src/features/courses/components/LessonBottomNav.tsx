@@ -1,11 +1,13 @@
 /**
- * LessonBottomNav - 하단 플로팅 스텝 네비게이션 바
+ * LessonBottomNav - 하단 고정 스텝 네비게이션 바
  *
- * 데스크톱/모바일 공용. 화면 하단에 고정되어 이전/다음 스텝 이동.
+ * Duolingo/Codecademy 스타일: 화면 하단에 전체 너비로 고정.
+ * 이전/다음 버튼이 넓은 터치 영역을 가짐.
  */
 
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/hooks';
-import { StepNavigationArrows } from './StepNavigationArrows';
 
 interface LessonBottomNavProps {
   onPrev: () => void;
@@ -20,42 +22,84 @@ export function LessonBottomNav({
   canGoPrev,
   nextLabel,
 }: LessonBottomNavProps) {
+  const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <div
       style={{
         position: 'fixed',
-        bottom: '8px',
-        left: '50%',
-        transform: 'translateX(-50%)',
+        bottom: 0,
+        left: 0,
+        right: 0,
         zIndex: 50,
-        padding: '6px 12px',
-        backgroundColor: resolvedTheme === 'dark'
-          ? 'rgba(13, 21, 37, 0.85)'
-          : 'rgba(255, 255, 255, 0.85)',
+        padding: '12px 16px',
+        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+        backgroundColor: isDark ? 'rgba(13, 21, 37, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        borderRadius: '20px',
-        border: `1px solid ${resolvedTheme === 'dark'
-          ? 'rgba(26, 37, 64, 0.6)'
-          : 'rgba(229, 229, 229, 0.6)'}`,
-        boxShadow: resolvedTheme === 'dark'
-          ? '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)'
-          : '0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-        maxWidth: '320px',
+        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
       }}
     >
-      <div style={{ transform: 'scale(0.85)' }}>
-        <StepNavigationArrows
-          onPrev={onPrev}
-          onNext={onNext}
-          canGoPrev={canGoPrev}
-          canGoNext={true}
-          nextLabel={nextLabel}
-          size="sm"
-          variant="inline"
-        />
+      <div style={{ display: 'flex', gap: '10px' }}>
+        {/* 이전 버튼 */}
+        <button
+          onClick={onPrev}
+          disabled={!canGoPrev}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            padding: '14px 0',
+            borderRadius: '14px',
+            fontSize: '16px',
+            fontWeight: 600,
+            border: `1.5px solid ${!canGoPrev
+              ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)')
+              : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)')}`,
+            backgroundColor: !canGoPrev
+              ? (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)')
+              : (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)'),
+            color: !canGoPrev
+              ? (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)')
+              : (isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)'),
+            cursor: canGoPrev ? 'pointer' : 'not-allowed',
+            transition: 'all 0.15s ease',
+          }}
+          aria-label={t('common.previous')}
+        >
+          <ChevronLeft style={{ width: 20, height: 20 }} />
+          <span>{t('common.previous')}</span>
+        </button>
+
+        {/* 다음 버튼 — 강조 */}
+        <button
+          onClick={onNext}
+          style={{
+            flex: 1.4,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            padding: '14px 0',
+            borderRadius: '14px',
+            fontSize: '16px',
+            fontWeight: 700,
+            border: 'none',
+            backgroundColor: isDark ? '#7c5ce0' : '#7c3aed',
+            color: '#ffffff',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)',
+          }}
+          aria-label={nextLabel}
+        >
+          <span>{nextLabel}</span>
+          <ChevronRight style={{ width: 20, height: 20 }} />
+        </button>
       </div>
     </div>
   );

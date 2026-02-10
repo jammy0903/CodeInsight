@@ -21,7 +21,6 @@ import { ControlFlowOverlay } from './components/ControlFlowOverlay';
 import { LoopTrack } from './components/LoopTrack';
 import {
   FLOW_THEMES,
-  FLOW_SIZES,
   type FlowTheme,
 } from './styles';
 
@@ -111,7 +110,7 @@ export const FlowVisualizer = memo(function FlowVisualizer({
       {/* 프레임들 (콜스택 역순 - 최근 호출이 위) */}
       <div
         className="flex flex-col-reverse gap-6"
-        style={{ gap: FLOW_SIZES.spacing.frameGap }}
+        style={{ gap: 'var(--flow-spacing-frame-gap)' }}
       >
         <AnimatePresence mode="popLayout">
           {step.frames.map((frame, index) => {

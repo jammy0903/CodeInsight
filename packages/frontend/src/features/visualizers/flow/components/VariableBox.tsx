@@ -13,6 +13,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { FlowVariable, FlowVariableState } from '@codeinsight/shared';
 import { FLOW_SIZES, FLOW_ANIMATION, getBoxStyle, type FlowTheme } from '../styles';
 
+// CSS 변수 기반 반응형 사이징 (index.css :root + @media 참조)
+const cssVar = {
+  fontLabel: 'var(--flow-font-label)',
+  fontValue: 'var(--flow-font-value)',
+  fontType: 'var(--flow-font-type)',
+  fontAddress: 'var(--flow-font-address)',
+  boxMinWidth: 'var(--flow-box-min-width)',
+  boxHeight: 'var(--flow-box-height)',
+  boxMinHeight: 'var(--flow-box-min-height)',
+  boxPaddingV: 'var(--flow-box-padding-v)',
+  boxPaddingH: 'var(--flow-box-padding-h)',
+};
+
 // ============================================
 // 타입 정의
 // ============================================
@@ -149,10 +162,10 @@ export const VariableBox = memo(function VariableBox({
       data-variable-id={variable.id}
       style={{
         width: 'auto', // 내용에 맞게 자동 조절
-        minWidth: FLOW_SIZES.box.minWidth,
-        height: FLOW_SIZES.box.height,
-        minHeight: FLOW_SIZES.box.minHeight,
-        padding: `${FLOW_SIZES.box.padding}px ${FLOW_SIZES.box.padding + 8}px`, // 좌우 패딩 추가
+        minWidth: cssVar.boxMinWidth,
+        height: cssVar.boxHeight,
+        minHeight: cssVar.boxMinHeight,
+        padding: `${cssVar.boxPaddingV} ${cssVar.boxPaddingH}`,
         borderRadius: FLOW_SIZES.box.borderRadius,
         borderWidth: FLOW_SIZES.box.borderWidth,
         borderStyle: 'solid',
@@ -173,7 +186,7 @@ export const VariableBox = memo(function VariableBox({
       <span
         className="absolute -top-2 left-1/2 -translate-x-1/2 px-1 rounded text-xs font-medium whitespace-nowrap"
         style={{
-          fontSize: FLOW_SIZES.font.label,
+          fontSize: cssVar.fontLabel,
           color: style.label,
           backgroundColor: style.background,
         }}
@@ -187,7 +200,7 @@ export const VariableBox = memo(function VariableBox({
           key={String(variable.value)}
           className="font-mono font-bold text-center whitespace-nowrap"
           style={{
-            fontSize: FLOW_SIZES.font.value,
+            fontSize: cssVar.fontValue,
             color: style.value,
           }}
           variants={valueVariants}
@@ -203,7 +216,7 @@ export const VariableBox = memo(function VariableBox({
       <span
         className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-1 rounded text-xs whitespace-nowrap"
         style={{
-          fontSize: FLOW_SIZES.font.type,
+          fontSize: cssVar.fontType,
           color: style.type,
           backgroundColor: style.background,
         }}
@@ -216,7 +229,7 @@ export const VariableBox = memo(function VariableBox({
         <span
           className="absolute -bottom-5 left-1/2 -translate-x-1/2 font-mono opacity-50"
           style={{
-            fontSize: FLOW_SIZES.font.address,
+            fontSize: cssVar.fontAddress,
             color: style.type,
           }}
         >
