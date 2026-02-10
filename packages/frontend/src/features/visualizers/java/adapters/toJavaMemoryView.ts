@@ -128,9 +128,10 @@ export function toJavaMemoryViewProps(step: LessonStep): {
   const frames: JavaStackFrame[] = [];
   const heap: JavaHeapObject[] = [];
 
-  // `step.stack` (C-style MemoryBlock[]) is structurally different and will be ignored by the logic below.
-  const stackData = step.memoryState?.stack || (step as any).stack;
-  const heapData = step.memoryState?.heap || (step as any).heap;
+  // javaMemoryState (lesson JSON) → memoryState (legacy) → direct stack/heap fallback
+  const jms = (step as any).javaMemoryState;
+  const stackData = jms?.stack || step.memoryState?.stack || (step as any).stack;
+  const heapData = jms?.heap || step.memoryState?.heap || (step as any).heap;
 
   // Stack 처리
   if (stackData && Array.isArray(stackData) && stackData.length > 0) {
