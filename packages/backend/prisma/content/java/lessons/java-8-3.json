@@ -8,32 +8,90 @@
       {
         "title": "패키지 임포트",
         "explanation": "**`import java.util.HashSet;`**\n\n중복을 허용하지 않는 집합 `HashSet`을 사용하기 위해 가져옵니다.",
-        "code": "import java.util.HashSet;"
+        "visualizationType": "javaMemory",
+        "code": "import java.util.HashSet;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
       },
       {
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.",
+        "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {"
       },
       {
         "title": "HashSet 생성",
         "explanation": "**실행 순서:**\n1. `HashSet` 객체를 생성합니다.\n2. 실제로는 내부에 `HashMap`을 하나 몰래 만들어서 씁니다.\n\n**중복 금지:**\n`Set`은 똑같은 물건을 두 개 가질 수 없는 주머니입니다.",
-        "code": "HashSet<String> set = new HashSet<>();"
+        "visualizationType": "javaMemory",
+        "code": "HashSet<String> set = new HashSet<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "set",
+              "value": "0x001",
+              "frame": "main",
+              "type": "HashSet<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 0",
+              "type": "HashSet",
+              "new": true
+            }
+          ]
+        }
       },
       {
         "title": "첫 번째 요소 추가",
         "explanation": "**실행 순서:**\n1. `Java`가 `set`에 있는지 확인합니다.\n2. 없으면 저장합니다.\n\n**첫 등장:**\n문제없이 쏙 들어갑니다.",
-        "code": "set.add(\"Java\");"
+        "visualizationType": "javaMemory",
+        "code": "set.add(\"Java\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[\"Java\"]",
+              "type": "HashSet",
+              "changed": true
+            }
+          ]
+        }
       },
       {
         "title": "중복 요소 추가 시도",
         "explanation": "**실행 순서:**\n1. `Java`를 넣으려고 보니, 이미 있습니다!\n2. `hashCode()`와 `equals()`로 꼼꼼히 검사 후, \"어, 이미 있네?\" 하고 저장을 거부합니다.\n3. `false`가 반환됩니다.\n\n**철통 방어:**\n`Set`은 절대 중복을 허용하지 않습니다.",
-        "code": "set.add(\"Java\"); // 중복!"
+        "visualizationType": "javaMemory",
+        "code": "set.add(\"Java\"); // 중복!",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[\"Java\"]",
+              "type": "HashSet"
+            }
+          ]
+        }
       },
       {
         "title": "크기 확인",
         "explanation": "**실행 순서:**\n1. 현재 들어있는 데이터 개수를 셉니다.\n2. 방금 시도는 실패했으니 여전히 `1`개입니다.",
-        "code": "System.out.println(\"크기: \" + set.size()); // 1"
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"크기: \" + set.size()); // 1",
+        "javaMemoryState": {
+          "output": [
+            "크기: 1"
+          ]
+        }
       }
     ],
     "deltaFormat": true

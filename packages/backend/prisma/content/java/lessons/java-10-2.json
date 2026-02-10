@@ -8,23 +8,78 @@
       {
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다. 은행 계좌를 만들고 임무를 시작합니다.",
-        "code": "public static void main(String[] args) {"
+        "visualizationType": "memory",
+        "code": "public static void main(String[] args) {",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running"
+            }
+          ],
+          "note": "메인 쓰레드 시작",
+          "heap": [],
+          "output": []
+        }
       },
       {
         "title": "계좌 객체 생성",
         "explanation": "공유 자원으로 사용될 `BankAccount` 객체를 생성합니다. 이 객체는 내부에 보이지 않는 '모니터 락(열쇠)'을 하나 가지고 있습니다.",
-        "code": "BankAccount account = new BankAccount();"
+        "visualizationType": "memory",
+        "code": "BankAccount account = new BankAccount();",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "account",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "BankAccount{balance: 1000}",
+              "hasLock": true
+            }
+          ],
+          "note": null
+        }
       },
       {
         "title": "동기화된 메서드",
         "explanation": "메서드 앞에 `synchronized`가 붙으면, 이 메서드를 실행하려는 쓰레드는 반드시 해당 객체(`account`)의 열쇠를 얻어야만 진입할 수 있습니다. 한 번에 오직 한 쓰레드만 이 메서드를 실행할 수 있습니다.",
-        "code": "public synchronized void withdraw(int amount) {"
+        "visualizationType": "memory",
+        "code": "public synchronized void withdraw(int amount) {",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "locked by Thread-A"
+            }
+          ],
+          "stack": []
+        }
       },
       {
         "title": "임계 영역 (Critical Section)",
         "explanation": "열쇠를 가진 쓰레드만 `balance`를 안전하게 변경할 수 있습니다. 다른 쓰레드는 이 작업이 끝날 때까지 밖에서 대기해야 합니다. 이처럼 한 번에 하나의 쓰레드만 실행해야 하는 코드 영역을 '임계 영역'이라고 부릅니다.",
         "keyInsight": "동기화 = 데이터 무결성 보호",
-        "code": "balance -= amount;"
+        "visualizationType": "memory",
+        "code": "balance -= amount;",
+        "memoryState": {
+          "threadPool": [
+            {
+              "name": "Thread-A",
+              "action": "Working in method",
+              "hasKey": true
+            },
+            {
+              "name": "Thread-B",
+              "action": "WAITING (Blocked)",
+              "hasKey": false
+            }
+          ],
+          "heap": []
+        }
       }
     ],
     "deltaFormat": true

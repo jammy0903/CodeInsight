@@ -8,6 +8,7 @@
       {
         "title": "Person 클래스 정의",
         "explanation": "**실행 순서:**\n1. Person 클래스 로드.\n2. `equals` 오버라이드 확인.\n3. `hashCode` 누락 확인 (경고).\n\n`equals()`는 재정의했지만, `hashCode()`는 빠뜨린 '반쪽짜리' 클래스입니다.\n이 클래스를 `HashSet`이나 `HashMap` 같은 곳에 쓰면 **대형 사고**가 터집니다.",
+        "visualizationType": "javaMemory",
         "code": "class Person {",
         "highlightOffset": [
           0,
@@ -20,40 +21,168 @@
           7,
           8,
           9
-        ]
+        ],
+        "javaMemoryState": {
+          "note": "equals()는 오버라이드, hashCode()는 누락 (위험!)",
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
       },
       {
         "title": "첫 번째 Person 객체 생성",
         "explanation": "**실행 순서:**\n1. `new Person(\"Alice\")` 호출.\n2. Heap 할당 (0x001).\n3. 기본 `hashCode`(예: 123) 생성.\n\n이 객체는 고유한 메모리 주소(0x001)와 그에 기반한 기본 해시코드(123)를 갖습니다.",
-        "code": "Person p1 = new Person(\"Alice\");"
+        "visualizationType": "javaMemory",
+        "code": "Person p1 = new Person(\"Alice\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "-> 0x001",
+              "type": "Person"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            }
+          ],
+          "note": null
+        }
       },
       {
         "title": "두 번째 Person 객체 생성",
         "explanation": "**실행 순서:**\n1. `new Person(\"Alice\")` 호출.\n2. 새 Heap 할당 (0x002).\n3. 새 기본 `hashCode`(예: 456) 생성.\n\n`p2`는 내용이 같더라도 `p1`과 다른 해시코드를 갖게 됩니다. `hashCode()`가 재정의되지 않았기 때문입니다.",
-        "code": "Person p2 = new Person(\"Alice\");"
+        "visualizationType": "javaMemory",
+        "code": "Person p2 = new Person(\"Alice\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "-> 0x001",
+              "type": "Person"
+            },
+            {
+              "name": "p2",
+              "value": "-> 0x002",
+              "type": "Person"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            },
+            {
+              "address": "0x002",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 456",
+              "new": true
+            }
+          ]
+        }
       },
       {
         "title": "equals() 비교",
         "explanation": "**실행 순서:**\n1. `p1.equals(p2)` 호출.\n2. 이름(\"Alice\") 비교.\n3. 일치하므로 **true**.\n\n여기까지는 문제가 없어 보입니다.",
         "keyInsight": "equals() 오버라이드 = 값 비교 가능",
-        "code": "System.out.println(p1.equals(p2));"
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(p1.equals(p2));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "note": "equals()는 정상 작동"
+        }
       },
       {
         "title": "HashSet 생성",
         "explanation": "**실행 순서:**\n1. `new HashSet<>()` 호출.\n2. 초기 버킷(배열) 생성.\n\n해시 기반 자료구조는 객체를 저장하고 검색할 때 `hashCode()`를 사용합니다.",
-        "code": "Set<Person> set = new HashSet<>();"
+        "visualizationType": "javaMemory",
+        "code": "Set<Person> set = new HashSet<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "-> 0x001",
+              "type": "Person"
+            },
+            {
+              "name": "p2",
+              "value": "-> 0x002",
+              "type": "Person"
+            },
+            {
+              "name": "set",
+              "value": "-> 0x100",
+              "type": "Set<Person>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            },
+            {
+              "address": "0x002",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 456"
+            },
+            {
+              "address": "0x100",
+              "content": "HashSet"
+            }
+          ],
+          "output": [],
+          "note": null
+        }
       },
       {
         "title": "HashSet에 p1 추가",
         "explanation": "**실행 순서:**\n1. `set.add(p1)` 호출.\n2. `p1.hashCode()` 계산 -> **123**.\n3. 123번 버킷에 `p1` 저장.",
         "keyInsight": "HashSet/HashMap = hashCode()로 방 배정",
-        "code": "set.add(p1);"
+        "visualizationType": "javaMemory",
+        "code": "set.add(p1);",
+        "javaMemoryState": {
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "hash(123)",
+                "content": "p1"
+              }
+            ]
+          }
+        }
       },
       {
         "title": "contains(p2) 호출 (검색 실패)",
         "explanation": "**실행 순서:**\n1. `set.contains(p2)` 호출.\n2. `p2.hashCode()` 계산 -> **456**.\n3. 456번 버킷 확인.\n4. **비어있음** -> **false** 반환.\n\n`equals()`가 `true`여도, `hashCode()`가 달라서 아예 다른 방을 뒤졌습니다. 찾을 리가 없죠.",
         "keyInsight": "hashCode 다름 = 다른 버킷 = 찾기 실패",
-        "code": "System.out.println(set.contains(p2));"
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(set.contains(p2));",
+        "javaMemoryState": {
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "hash(123)",
+                "content": "p1"
+              },
+              {
+                "index": "hash(456)",
+                "content": "검색 위치",
+                "searched": true
+              }
+            ]
+          },
+          "output": [
+            "false"
+          ],
+          "warning": "equals()는 true인데 contains()는 false!"
+        }
       }
     ],
     "deltaFormat": true

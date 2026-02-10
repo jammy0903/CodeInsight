@@ -8,41 +8,194 @@
       {
         "title": "Dog 객체 생성",
         "explanation": "**실행 순서:**\n1. Heap 메모리에 `Dog` 객체 생성 (\"Buddy\").\n2. 주소값(`0x100`이라 가정) 생성.\n3. Stack의 `myDog` 변수에 이 주소 `0x100` 저장.\n\n**메모리 상태:**\n`myDog`는 리모컨입니다. 0x100번지에 있는 TV(객체)를 가리키고 있습니다.",
-        "code": "Dog myDog = new Dog(\"Buddy\");"
+        "visualizationType": "javaMemory",
+        "code": "Dog myDog = new Dog(\"Buddy\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Buddy\"}",
+              "type": "Dog"
+            }
+          ],
+          "output": []
+        }
       },
       {
         "title": "changeName(myDog) 호출 - 리모컨 복사",
         "explanation": "**실행 순서:**\n1. `myDog`의 값(주소 `0x100`)을 읽음.\n2. `changeName`의 파라미터 `d`에 복사.\n\n**핵심:**\n객체가 복사된 게 아니라, **객체를 가리키는 주소**가 복사되었습니다. 이제 `myDog`와 `d`는 같은 TV를 조작할 수 있는 **두 개의 리모컨**입니다.",
         "keyInsight": "주소 복사 = 리모컨이 하나 더 생김",
-        "code": "changeName(myDog);"
+        "visualizationType": "javaMemory",
+        "code": "changeName(myDog);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x100",
+              "frame": "changeName",
+              "copied": true,
+              "type": "Dog"
+            }
+          ]
+        }
       },
       {
         "title": "객체 내부 변경 (Side Effect)",
         "explanation": "**실행 순서:**\n1. `d` 리모컨으로 `0x100`번 객체에 접속 (역참조).\n2. `name` 필드를 \"Max\"로 수정.\n\n**메모리 변화:**\n두 리모컨이 같은 TV를 보고 있으므로, `d`로 채널을 바꾸면 `myDog`가 보는 화면도 바뀝니다.",
         "keyInsight": "공유된 객체 수정 = 원본 영향 받음",
-        "code": "d.name = \"Max\";"
+        "visualizationType": "javaMemory",
+        "code": "d.name = \"Max\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x100",
+              "frame": "changeName",
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "type": "Dog",
+              "changed": true
+            }
+          ]
+        }
       },
       {
         "title": "첫 번째 결과 확인",
         "explanation": "**실행 순서:**\n1. `changeName` 종료 (d 소멸).\n2. `myDog.name` 출력.\n\nTV 채널이 바뀌었으므로 \"Max\"가 나옵니다.",
-        "code": "System.out.println(myDog.name);"
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(myDog.name);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "type": "Dog"
+            }
+          ],
+          "output": [
+            "Max"
+          ]
+        }
       },
       {
         "title": "reassign(myDog) 호출",
         "explanation": "**실행 순서:**\n1. 다시 `myDog`의 주소 `0x100`을 읽음.\n2. `reassign` 메서드의 `d`에 복사.\n\n또다시 같은 TV를 가리키는 복사본 리모컨 `d`가 생성되었습니다.",
-        "code": "reassign(myDog);"
+        "visualizationType": "javaMemory",
+        "code": "reassign(myDog);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x100",
+              "frame": "reassign",
+              "copied": true,
+              "type": "Dog"
+            }
+          ]
+        }
       },
       {
         "title": "변수 재할당 (New Object)",
         "explanation": "**실행 순서:**\n1. `new Dog(\"Rex\")` 실행 -> 새 객체 생성 (0x200).\n2. 새 주소 `0x200`을 `d` 변수에 대입.\n\n**중요:**\n`d`라는 리모컨이 **새 TV**(`0x200`)를 가리키게 된 것뿐입니다. 집에 있는 원래 리모컨(`myDog`)은 여전히 옛날 TV(`0x100`)를 가리키고 있습니다.",
         "keyInsight": "변수 재할당 = 내 연결만 바뀜 (원본 무관)",
-        "code": "d = new Dog(\"Rex\");"
+        "visualizationType": "javaMemory",
+        "code": "d = new Dog(\"Rex\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x200",
+              "frame": "reassign",
+              "changed": true,
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "type": "Dog"
+            },
+            {
+              "address": "0x200",
+              "content": "Dog{name: \"Rex\"}",
+              "type": "Dog",
+              "new": true
+            }
+          ]
+        }
       },
       {
         "title": "최종 결과 확인",
         "explanation": "**실행 순서:**\n1. `reassign` 종료 (d 소멸).\n2. `myDog.name` 출력.\n\n`myDog`는 여전히 `0x100`번 TV를 보고 있습니다. 따라서 \"Max\"가 출력됩니다.",
+        "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
-        "occurrence": 2
+        "occurrence": 2,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "type": "Dog"
+            }
+          ],
+          "output": [
+            "Max"
+          ]
+        }
       }
     ],
     "deltaFormat": true

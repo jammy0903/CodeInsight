@@ -8,11 +8,24 @@
       {
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다. 여기서 새로운 일꾼(쓰레드)을 고용하고 일을 시킵니다.",
-        "code": "public static void main(String[] args) {"
+        "visualizationType": "memory",
+        "code": "public static void main(String[] args) {",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running"
+            }
+          ],
+          "note": "메인 쓰레드 시작",
+          "heap": [],
+          "output": []
+        }
       },
       {
         "title": "Thread 클래스 상속",
         "explanation": "Java에서 새로운 일꾼(쓰레드)을 만드는 가장 쉬운 방법은 `Thread` 클래스를 상속받아, `run` 메서드 안에 실제 할 일을 정의하는 것입니다.",
+        "visualizationType": "memory",
         "code": "class MyWorker extends Thread {",
         "highlightOffset": [
           0,
@@ -20,25 +33,69 @@
           2,
           3,
           4
-        ]
+        ],
+        "memoryState": {
+          "note": "MyWorker 설계도 정의",
+          "stack": []
+        }
       },
       {
         "title": "일꾼 객체 생성",
         "explanation": "설계도를 바탕으로 실제 `MyWorker` 일꾼 객체를 생성합니다. 아직 일을 시작한 것은 아니고, '준비' 상태(NEW)입니다.",
         "keyInsight": "new Thread() = 일꾼 준비 완료 (Ready)",
-        "code": "MyWorker worker = new MyWorker();"
+        "visualizationType": "memory",
+        "code": "MyWorker worker = new MyWorker();",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "worker",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "MyWorker",
+              "state": "NEW"
+            }
+          ],
+          "note": null
+        }
       },
       {
         "title": "작업 시작 (start)",
         "explanation": "`start()`를 호출하면 JVM에게 새로운 실행 흐름을 만들어달라고 요청합니다. JVM은 새 쓰레드를 생성하고 독립적인 스택을 할당한 뒤, 그 위에서 `run()` 메서드를 실행시킵니다.",
         "keyInsight": "start()는 새로운 스택 프레임을 생성함",
-        "code": "worker.start(); // 일꾼에게 일을 시작하라고 지시합니다."
+        "visualizationType": "memory",
+        "code": "worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main thread stack",
+              "value": "main()"
+            },
+            {
+              "name": "MyWorker stack",
+              "new": true,
+              "value": "run()"
+            }
+          ],
+          "note": "두 개의 일이 동시에 실행되기 시작!",
+          "heap": []
+        }
       },
       {
         "title": "메인 쓰레드 계속 실행",
         "explanation": "`start()`는 작업을 '요청'만 하고 바로 리턴됩니다. 따라서 `main` 쓰레드는 멈추지 않고 자기 할 일을 계속합니다. 어떤 메시지가 먼저 출력될지는 OS의 스케줄링에 따라 달라지며, 실행할 때마다 결과가 다를 수 있습니다.",
         "keyInsight": "두 쓰레드는 서로를 기다려주지 않고 각자 실행됩니다.",
-        "code": "System.out.println(\"메인 일꾼도 자기 일을 합니다.\");"
+        "visualizationType": "memory",
+        "code": "System.out.println(\"메인 일꾼도 자기 일을 합니다.\");",
+        "memoryState": {
+          "output": [
+            "(출력 순서는 매번 다를 수 있음)"
+          ],
+          "note": null
+        }
       }
     ],
     "deltaFormat": true

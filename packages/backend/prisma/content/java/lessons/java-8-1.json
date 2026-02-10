@@ -8,32 +8,96 @@
       {
         "title": "패키지 임포트",
         "explanation": "**`import java.util.ArrayList;`**\n\n크기가 조절되는 배열인 `ArrayList`를 사용하기 위해 가져옵니다.",
-        "code": "import java.util.ArrayList;"
+        "visualizationType": "javaMemory",
+        "code": "import java.util.ArrayList;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
       },
       {
         "title": "main 메서드 시작",
         "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.",
+        "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {"
       },
       {
         "title": "초기 용량 설정",
         "explanation": "**실행 순서:**\n1. `new ArrayList<>(2)`를 실행합니다.\n2. 내부적으로 크기가 2인 배열(`Object[2]`)을 만듭니다.\n\n**이사 갈 준비:**\n처음엔 방 2개짜리 작은 집으로 시작합니다.",
-        "code": "ArrayList<Integer> list = new ArrayList<>(2); // 초기 용량 2"
+        "visualizationType": "javaMemory",
+        "code": "ArrayList<Integer> list = new ArrayList<>(2); // 초기 용량 2",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "list",
+              "value": "0x001",
+              "frame": "main",
+              "type": "ArrayList<Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 0, elementData: [null, null]",
+              "type": "ArrayList",
+              "new": true
+            }
+          ]
+        }
       },
       {
         "title": "첫 번째 요소 추가",
         "explanation": "**실행 순서:**\n1. 0번 인덱스에 `10`을 저장합니다.\n2. `size`가 1로 증가합니다.\n\n**입주 환영:**\n첫 번째 손님이 0번 방에 들어왔습니다.",
-        "code": "list.add(10);"
+        "visualizationType": "javaMemory",
+        "code": "list.add(10);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 1, elementData: [10, null]",
+              "type": "ArrayList",
+              "changed": true
+            }
+          ]
+        }
       },
       {
         "title": "두 번째 요소 추가",
         "explanation": "**실행 순서:**\n1. 1번 인덱스에 `20`을 저장합니다.\n2. `size`가 2로 증가합니다.\n\n**만원:**\n이제 방이 꽉 찼습니다.",
-        "code": "list.add(20);"
+        "visualizationType": "javaMemory",
+        "code": "list.add(20);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 2, elementData: [10, 20]",
+              "type": "ArrayList",
+              "changed": true
+            }
+          ]
+        }
       },
       {
         "title": "용량 초과 및 이사(Resizing)",
         "explanation": "**실행 순서:**\n1. 공간이 꽉 차서 더 큰 배열(보통 1.5배)을 새로 만듭니다.\n2. 기존 데이터를 모두 새 배열로 복사(이사)합니다.\n3. 새 배열에 `30`을 추가합니다.\n\n**자동 확장:**\n`ArrayList`가 '알아서 늘어나는' 비결은 바로 이 '이사 다니기(Resizing)' 덕분입니다. 다만 이사비용(성능 저하)이 드니까, 처음에 적절한 크기를 잡는 게 중요해요!",
-        "code": "list.add(30); // 앗! 공간이 부족해요. 무슨 일이 일어날까요?"
+        "visualizationType": "javaMemory",
+        "code": "list.add(30); // 앗! 공간이 부족해요. 무슨 일이 일어날까요?",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 3, elementData: [10, 20, 30, null]",
+              "type": "ArrayList",
+              "changed": true
+            }
+          ]
+        }
       }
     ],
     "deltaFormat": true
