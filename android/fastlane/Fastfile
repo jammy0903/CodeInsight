@@ -1,0 +1,52 @@
+default_platform(:android)
+
+platform :android do
+
+  desc "Build release AAB"
+  lane :build do
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "./"
+    )
+  end
+
+  desc "Deploy to Google Play internal testing track"
+  lane :deploy_internal do
+    build
+    upload_to_play_store(
+      track: "internal",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_changelogs: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Promote internal to production"
+  lane :promote_to_production do
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "production",
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Full deploy: build frontend + sync capacitor + build AAB + upload"
+  lane :full_deploy do |options|
+    # 1. Build frontend
+    sh("cd ../.. && pnpm --filter @codeinsight/frontend build")
+
+    # 2. Capacitor sync
+    sh("cd ../.. && npx cap sync android")
+
+    # 3. Build + Upload
+    deploy_internal
+  end
+
+end
