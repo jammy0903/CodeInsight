@@ -155,7 +155,8 @@ export function LessonPage() {
   };
 
   // --- Early Returns ---
-  if (isLoading || simulating) return <LoadingView />;
+  // API 로딩만 블로킹 — 시뮬레이션 중에는 코드+설명을 먼저 표시
+  if (isLoading) return <LoadingView />;
   if (isError || !lesson)
     return (
       <NotFoundView
@@ -163,8 +164,10 @@ export function LessonPage() {
         backPath={languageCoursePath}
       />
     );
-  if (steps.length === 0)
+  // 시뮬레이션 진행 중이면 NotFound 대신 로딩 표시
+  if (steps.length === 0 && !simulating)
     return <NotFoundView message={t('lesson.no_content')} backPath={languageCoursePath} />;
+  if (steps.length === 0 && simulating) return <LoadingView />;
 
   // --- 렌더 ---
   return (

@@ -164,6 +164,18 @@ class LessonContentLoader {
   }
 
   /**
+   * 서버 시작 시 모든 레슨 JSON을 메모리에 프리로드
+   * 첫 요청의 디스크 I/O (~5-20ms) 제거
+   */
+  async preloadAll(): Promise<void> {
+    const entries = Array.from(this.fileMap.entries());
+    await Promise.all(
+      entries.map(([lessonId]) => this.getContent(lessonId))
+    );
+    logger.info(`${this.cache.size} lessons preloaded into memory`);
+  }
+
+  /**
    * 현재 메모리에 캐시된 레슨 개수
    */
   getCachedCount(): number {

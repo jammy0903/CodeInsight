@@ -4,9 +4,10 @@
  * URL: /courses/:lang/:chapterId
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import type { UserProgress } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
@@ -14,6 +15,7 @@ import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
 import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle, Lock } from 'lucide-react';
 import { useIsMobile, useChapter, useUserProgress, useLanguageCourse } from '@/hooks';
+import { getLessonFull } from '@/services/courses';
 
 // 언어별 색상 (챕터 페이지용)
 const getLanguageColor = (lang: string | undefined) => {
@@ -31,6 +33,7 @@ export function ChapterLessonsPage() {
   const { t } = useTranslation();
   const { lang, chapterId } = useParams<{ lang: string; chapterId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const setPageTitle = useStore((s) => s.setPageTitle);
   const appUser = useStore((s) => s.appUser);
   const langColor = getLanguageColor(lang);
@@ -67,6 +70,30 @@ export function ChapterLessonsPage() {
     progressList?.forEach((p) => map.set(p.lessonId, p));
     return map;
   }, [progressList]);
+
+  // 첫 번째 미완료 레슨 프리페치 — 챕터 진입 시 가장 클릭 가능성 높은 레슨을 미리 로드
+  useEffect(() => {
+    if (!chapter?.lessons) return;
+    const firstIncomplete = chapter.lessons.find(
+      (l) => progressMap.get(l.id)?.status !== 'completed'
+    );
+    if (firstIncomplete) {
+      queryClient.prefetchQuery({
+        queryKey: ['lesson', firstIncomplete.id],
+        queryFn: () => getLessonFull(firstIncomplete.id),
+        staleTime: 5 * 60 * 1000,
+      });
+    }
+  }, [chapter, progressMap, queryClient]);
+
+  // hover 시 해당 레슨 프리페치
+  const handlePrefetch = useCallback((lessonId: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ['lesson', lessonId],
+      queryFn: () => getLessonFull(lessonId),
+      staleTime: 5 * 60 * 1000,
+    });
+  }, [queryClient]);
 
   // 페이지 제목 설정
   useEffect(() => {
@@ -280,6 +307,7 @@ export function ChapterLessonsPage() {
               <div key={lesson.id}>
                 <button
                   onClick={() => navigate(`/courses/${lang}/${chapterId}/${lesson.id}`)}
+                  onTouchStart={() => handlePrefetch(lesson.id)}
                   className="w-full p-4 text-left transition-colors hover:bg-[var(--theme-layout-top-bar-button-hover)]"
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -312,6 +340,7 @@ export function ChapterLessonsPage() {
               progress={progressMap.get(lesson.id)}
               languageId={lang || 'c'}
               chapterId={chapter.id}
+              onPrefetch={handlePrefetch}
             />
           ))}
         </CourseGrid>

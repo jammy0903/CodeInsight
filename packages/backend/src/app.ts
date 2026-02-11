@@ -38,11 +38,13 @@ try {
   logger.warn('App will continue without Firebase authentication');
 }
 
-// Lesson Content 초기화 (서버 시작 시 파일 경로 스캔)
-lessonContentLoader.scanFilePaths().catch((err) => {
-  logger.error('Failed to load lesson contents:', err);
-  logger.warn('App will continue without pre-loaded lesson contents');
-});
+// Lesson Content 초기화 (서버 시작 시 파일 경로 스캔 + 메모리 프리로드)
+lessonContentLoader.scanFilePaths()
+  .then(() => lessonContentLoader.preloadAll())
+  .catch((err) => {
+    logger.error('Failed to load lesson contents:', err);
+    logger.warn('App will continue without pre-loaded lesson contents');
+  });
 
 // Fastify 인스턴스 생성
 const app: FastifyInstance = Fastify({

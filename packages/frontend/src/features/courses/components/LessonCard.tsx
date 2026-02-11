@@ -74,9 +74,10 @@ interface LessonCardProps {
   progress?: UserProgress;
   languageId: string;
   chapterId: string;
+  onPrefetch?: (lessonId: string) => void;
 }
 
-export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCardProps) {
+export function LessonCard({ lesson, progress, languageId, chapterId, onPrefetch }: LessonCardProps) {
   const navigate = useNavigate();
   const theme = LANGUAGE_THEMES[languageId] || DEFAULT_THEME;
 
@@ -112,6 +113,7 @@ export function LessonCard({ lesson, progress, languageId, chapterId }: LessonCa
   return (
     <button
       onClick={handleClick}
+      onMouseEnter={() => onPrefetch?.(lesson.id)}
       className="group relative rounded-xl text-left transition-all duration-300 hover:scale-[1.02]"
       style={{
         padding: '32px',
