@@ -10,7 +10,10 @@
         "explanation": "`heavy()` 함수는 메인 스레드를 완전히 차단하는 긴 작업을 정의합니다. 이 함수가 실행되면 10억 번의 루프가 끝날 때까지 브라우저의 UI가 멈춥니다. 이를 'UI 프리징(Freezing)'이라고 합니다.",
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "warning": "This function would block the UI."
+          "callStack": ["heavy()  ⚠️ 10억 루프 블로킹"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": []
         },
         "code": "function heavy() {",
         "highlightOffset": [
@@ -26,7 +29,10 @@
         "keyInsight": "거대한 작업을 작게 쪼개서, 한 번 실행할 때 걸리는 시간을 줄이는 기법입니다.",
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "note": "Function defines a chunk of work."
+          "callStack": ["heavyChunk()  (100만 번만)"],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": []
         },
         "code": "function heavyChunk() {",
         "highlightOffset": [
@@ -42,7 +48,10 @@
         "explanation": "`heavyChunk()`는 작업 조각이 끝난 후 `setTimeout(heavyChunk, 0)`을 호출하여, 다음 작업 조각을 Task Queue로 보냅니다. 이는 의도적으로 Call Stack을 비워 브라우저가 렌더링이나 사용자 입력을 처리할 기회(Yield)를 제공하는 것입니다.",
         "visualizationType": "eventLoop",
         "eventLoopState": {
-          "note": "Provides opportunity for UI to respond."
+          "callStack": [],
+          "webApis": [],
+          "taskQueue": ["heavyChunk()"],
+          "microtaskQueue": []
         },
         "code": "if (i < 1000000000) {",
         "highlightOffset": [

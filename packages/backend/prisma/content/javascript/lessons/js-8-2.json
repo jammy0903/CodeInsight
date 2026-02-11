@@ -13,12 +13,14 @@
         "code": "requestAnimationFrame(goodAni);",
         "occurrence": 2,
         "eventLoopState": {
+          "callStack": [],
           "webApis": [
             {
-              "name": "rAF(goodAni)",
-              "status": "scheduled"
+              "name": "rAF(goodAni)"
             }
-          ]
+          ],
+          "taskQueue": [],
+          "microtaskQueue": []
         }
       },
       {
@@ -27,7 +29,14 @@
         "visualizationType": "eventLoop",
         "code": "requestAnimationFrame(goodAni);",
         "eventLoopState": {
-          "note": "Looping animation scheduled"
+          "callStack": ["goodAni()", "moveBox()"],
+          "webApis": [
+            {
+              "name": "rAF(goodAni)"
+            }
+          ],
+          "taskQueue": [],
+          "microtaskQueue": []
         }
       },
       {
@@ -37,9 +46,10 @@
         "visualizationType": "eventLoop",
         "code": "setTimeout(badAni, 10);",
         "eventLoopState": {
-          "warning": "setTimeout timing is not synced with rendering.",
-          "webApis": null,
-          "note": null
+          "callStack": ["badAni()", "moveBox()"],
+          "webApis": [],
+          "taskQueue": ["setTimeout(badAni, 10)"],
+          "microtaskQueue": []
         }
       }
     ],

@@ -176,7 +176,7 @@ export function useLessonSimulation({
       const VIZ_FIELDS = ['stack', 'memoryState', 'pythonMemoryState', 'javaMemoryState',
         'scopeState', 'eventLoopState', 'promiseState', 'thisState', 'prototypeState', 'callStackState'];
       const allStepsHaveViz = lesson.content.steps.every((s: any) =>
-        VIZ_FIELDS.some(f => s[f] != null)
+        s.visualizationType === 'terminal' || VIZ_FIELDS.some(f => s[f] != null)
       );
       if (allStepsHaveViz) {
         setLiveSteps(lesson.content.steps);

@@ -73,8 +73,10 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   // Detect non-memory viz types that bypass the transformer pipeline
   const els = (step as any).eventLoopState;
   const hasStandardEventLoop = els && (els.callStack || els.webApis || els.taskQueue || els.microtaskQueue);
+  const hasEventLoopNoteOnly = els && !hasStandardEventLoop && (els.note || els.warning);
   const isNonMemoryType =
     hasStandardEventLoop ||
+    hasEventLoopNoteOnly ||
     (vizType === 'scope' && (step as any).scopeState) ||
     (vizType === 'thisBinding' && (step as any).thisState) ||
     (vizType === 'prototype' && (step as any).prototypeState) ||
@@ -171,6 +173,23 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
           eventLoopState={(step as any).eventLoopState}
           prevEventLoopState={(prevStep as any)?.eventLoopState}
         />
+      </div>
+    );
+  }
+
+  if (hasEventLoopNoteOnly) {
+    return (
+      <div className={className}>
+        <div className="flex items-center justify-center h-full p-6">
+          <div className="text-center max-w-md">
+            {els.warning && (
+              <p className="text-amber-600 text-sm font-medium mb-2">{els.warning}</p>
+            )}
+            {els.note && (
+              <p className="text-[var(--theme-dashboard-text-muted)] text-sm">{els.note}</p>
+            )}
+          </div>
+        </div>
       </div>
     );
   }

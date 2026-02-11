@@ -126,7 +126,7 @@ export const MemoryBlockSchema: z.ZodType<{
   address?: string;
   value: string;
   type?: string;
-  size?: number;
+  size?: number | string;
   bytes?: number[];
   segment?: 'stack' | 'heap' | 'data' | 'text';
   points_to?: string | null;
@@ -141,7 +141,7 @@ export const MemoryBlockSchema: z.ZodType<{
   value: z.string(),
   // Optional fields
   type: z.string().optional(),
-  size: z.number().optional(),
+  size: z.union([z.number(), z.string()]).optional(),
   bytes: z.array(z.number()).optional(),
   segment: z.enum(['stack', 'heap', 'data', 'text']).optional(),
   points_to: z.string().nullable().optional(),

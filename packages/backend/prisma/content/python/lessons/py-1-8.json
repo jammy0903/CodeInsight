@@ -11,18 +11,22 @@
         "visualizationType": "pythonMemory",
         "code": "text = \"Hello Python\"",
         "pythonMemoryState": {
-          "variables": [
-            {
-              "name": "text",
-              "value": "\"Hello Python\"",
-              "type": "str",
-              "id": "0x1000"
-            }
-          ],
           "output": [],
           "note": "Line 1 executed",
-          "names": [],
-          "objects": []
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            }
+          ]
         }
       },
       {
@@ -34,7 +38,21 @@
           "output": [
             "원본: Hello Python"
           ],
-          "note": "Line 2 executed"
+          "note": "Line 2 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            }
+          ]
         }
       },
       {
@@ -43,21 +61,31 @@
         "visualizationType": "pythonMemory",
         "code": "upper = text.upper()",
         "pythonMemoryState": {
-          "variables": [
+          "note": "Line 4 executed",
+          "names": [
             {
               "name": "text",
-              "value": "\"Hello Python\"",
-              "type": "str",
-              "id": "0x1000"
+              "pointsTo": "str1"
             },
             {
               "name": "upper",
-              "value": "\"HELLO PYTHON\"",
-              "type": "str",
-              "id": "0x2000"
+              "pointsTo": "str2"
             }
           ],
-          "note": "Line 4 executed"
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            }
+          ]
         }
       },
       {
@@ -69,7 +97,31 @@
           "output": [
             "대문자: HELLO PYTHON"
           ],
-          "note": "Line 5 executed"
+          "note": "Line 5 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            }
+          ]
         }
       },
       {
@@ -78,27 +130,41 @@
         "visualizationType": "pythonMemory",
         "code": "words = text.split()",
         "pythonMemoryState": {
-          "variables": [
+          "note": "Line 7 executed",
+          "names": [
             {
               "name": "text",
-              "value": "\"Hello Python\"",
-              "type": "str",
-              "id": "0x1000"
+              "pointsTo": "str1"
             },
             {
               "name": "upper",
-              "value": "\"HELLO PYTHON\"",
-              "type": "str",
-              "id": "0x2000"
+              "pointsTo": "str2"
             },
             {
               "name": "words",
-              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 2}",
-              "type": "dict",
-              "id": "0x3000"
+              "pointsTo": "list1"
             }
           ],
-          "note": "Line 7 executed"
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 2}",
+              "pyId": "1003"
+            }
+          ]
         }
       },
       {
@@ -110,7 +176,41 @@
           "output": [
             "단어 분리: ['Hello', 'Python']"
           ],
-          "note": "Line 8 executed"
+          "note": "Line 8 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 2}",
+              "pyId": "1003"
+            }
+          ]
         }
       }
     ],

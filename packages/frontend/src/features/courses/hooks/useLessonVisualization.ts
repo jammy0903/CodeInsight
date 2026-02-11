@@ -182,7 +182,7 @@ export function useLessonVisualization(
     }
 
     // Java (정적 JSON or 실시간 시뮬레이션)
-    if (vizType === 'java' || vizType === 'javaMemory' || resolvedStep.javaMemoryState || resolvedStep.memoryState) {
+    if (vizType === 'java' || vizType === 'javaMemory' || resolvedStep.javaMemoryState) {
       const javaMemoryState = resolvedStep.javaMemoryState || resolvedStep.memoryState;
       const stack: MemoryBlock[] = [];
       const frames: { name: string }[] = [{ name: 'main' }];
@@ -261,6 +261,32 @@ export function useLessonVisualization(
         changedBlocks: INITIAL_CHANGED_BLOCKS,
         visualizationType: 'java',
         visualizationState: javaMemoryState,
+      };
+    }
+
+    // 일반 memoryState 처리 (JS memory 레슨 등 — Java가 아닌 경우)
+    if (resolvedStep.memoryState) {
+      const ms = resolvedStep.memoryState as any;
+      const stack: MemoryBlock[] = (ms.stack || []).map((item: any) => ({
+        name: item.name || '?',
+        address: item.address || '',
+        value: String(item.value ?? item.content ?? ''),
+        type: item.type || 'unknown',
+      }));
+      const heap: MemoryBlock[] = (ms.heap || []).map((item: any) => ({
+        name: item.address || item.name || '?',
+        address: item.address || '',
+        value: String(item.content ?? item.value ?? ''),
+        type: item.type || 'Object',
+      }));
+      const memoryState = (stack.length > 0 || heap.length > 0)
+        ? { stack, heap, frames: [{ name: 'main' }] }
+        : null;
+      return {
+        memoryState,
+        changedBlocks: INITIAL_CHANGED_BLOCKS,
+        visualizationType: vizType,
+        visualizationState: ms,
       };
     }
 
