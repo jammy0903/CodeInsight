@@ -21,35 +21,41 @@ export interface StreakStatus {
 }
 
 // =============================================
-// Date Utilities
+// Date Utilities (KST 기준)
 // =============================================
 
 /**
- * UTC 기준 오늘 날짜 (시간 제외)
+ * KST (UTC+9) 기준 날짜 (시간 제외)
+ *
+ * WHY: UTC 기준이면 한국 사용자의 "하루" 경계가 오전 9시가 됨.
+ * 자정 기준으로 스트릭을 계산하려면 KST 기준이어야 함.
  */
-function getUtcDateOnly(date: Date = new Date()): Date {
-  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+function getKstDateOnly(date: Date = new Date()): Date {
+  const kstTime = new Date(date.getTime() + KST_OFFSET_MS);
+  return new Date(Date.UTC(kstTime.getUTCFullYear(), kstTime.getUTCMonth(), kstTime.getUTCDate()));
 }
 
 /**
- * 두 날짜 간 일수 차이 (UTC 기준)
+ * 두 날짜 간 일수 차이 (KST 기준)
  */
 function getDaysDifference(date1: Date, date2: Date): number {
-  const utc1 = getUtcDateOnly(date1);
-  const utc2 = getUtcDateOnly(date2);
-  const diffTime = Math.abs(utc2.getTime() - utc1.getTime());
+  const kst1 = getKstDateOnly(date1);
+  const kst2 = getKstDateOnly(date2);
+  const diffTime = Math.abs(kst2.getTime() - kst1.getTime());
   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
 
 /**
- * 날짜가 어제인지 확인
+ * 날짜가 어제인지 확인 (KST 기준)
  */
 function isYesterday(date: Date): boolean {
   return getDaysDifference(date, new Date()) === 1;
 }
 
 /**
- * 날짜가 오늘인지 확인
+ * 날짜가 오늘인지 확인 (KST 기준)
  */
 function isToday(date: Date): boolean {
   return getDaysDifference(date, new Date()) === 0;
@@ -116,7 +122,7 @@ export async function checkStreakStatus(userId: string): Promise<StreakStatus> {
  * - Serializable isolation으로 일관성 보장
  */
 export async function updateStreak(userId: string) {
-  const today = getUtcDateOnly();
+  const today = getKstDateOnly();
 
   // Transaction으로 원자적 처리
   return prisma.$transaction(async (tx: any) => {
