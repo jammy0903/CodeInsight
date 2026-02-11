@@ -197,6 +197,47 @@ async function deactivateStaleLessons(languageId: string, validLessonIds: string
   }
 }
 
+/**
+ * curriculum에 없는 유령 챕터를 비활성화 (isActive: false)
+ *
+ * WHY: seed가 UPSERT만 사용하기 때문에, curriculum에서 제거된 챕터가
+ * DB에 유령 데이터로 남아 빈 챕터가 사용자에게 노출됨.
+ * (예: python-chapter-1 vs python-ch1)
+ */
+async function deactivateStaleChapters(languageId: string, validChapterIds: string[]) {
+  const staleChapters = await prisma.chapter.findMany({
+    where: {
+      languageId,
+      isActive: true,
+      id: { notIn: validChapterIds },
+    },
+    select: { id: true, title: true },
+  });
+
+  if (staleChapters.length > 0) {
+    await prisma.chapter.updateMany({
+      where: {
+        id: { in: staleChapters.map(c => c.id) },
+      },
+      data: { isActive: false },
+    });
+    console.log(`    🧹 Deactivated ${staleChapters.length} stale chapter(s): ${staleChapters.map(c => c.id).join(', ')}`);
+  }
+
+  // curriculum에 복귀한 챕터 재활성화
+  const reactivated = await prisma.chapter.updateMany({
+    where: {
+      id: { in: validChapterIds },
+      isActive: false,
+    },
+    data: { isActive: true },
+  });
+
+  if (reactivated.count > 0) {
+    console.log(`    ♻️  Reactivated ${reactivated.count} chapter(s)`);
+  }
+}
+
 // =============================================
 // Seed 함수
 // =============================================
@@ -262,11 +303,13 @@ async function seed() {
     let contentCount = 0;
     let quizCount = 0;
     const cValidLessonIds: string[] = [];
+    const cValidChapterIds: string[] = [];
 
     for (const chapterData of cCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
       const chapterId = getChapterId(chapterData);
+      cValidChapterIds.push(chapterId);
       const chapterPayload = {
         languageId: 'c',
         title: chapterData.title,
@@ -346,6 +389,7 @@ async function seed() {
     console.log(`    📄 Loaded ${contentCount} lesson contents`);
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
     await deactivateStaleLessons('c', cValidLessonIds);
+    await deactivateStaleChapters('c', cValidChapterIds);
   }
 
   // 4. JavaScript 커리큘럼 upsert
@@ -356,11 +400,13 @@ async function seed() {
     let jsContentCount = 0;
     let jsQuizCount = 0;
     const jsValidLessonIds: string[] = [];
+    const jsValidChapterIds: string[] = [];
 
     for (const chapterData of jsCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
       const chapterId = getChapterId(chapterData);
+      jsValidChapterIds.push(chapterId);
       const chapterPayload = {
         languageId: 'javascript',
         title: chapterData.title,
@@ -434,6 +480,7 @@ async function seed() {
     console.log(`    📄 Loaded ${jsContentCount} lesson contents`);
     console.log(`    ❓ Loaded ${jsQuizCount} quizzes`);
     await deactivateStaleLessons('javascript', jsValidLessonIds);
+    await deactivateStaleChapters('javascript', jsValidChapterIds);
   }
 
   // 5. Java 커리큘럼 upsert
@@ -444,11 +491,13 @@ async function seed() {
     let javaContentCount = 0;
     let javaQuizCount = 0;
     const javaValidLessonIds: string[] = [];
+    const javaValidChapterIds: string[] = [];
 
     for (const chapterData of javaCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
       const chapterId = getChapterId(chapterData);
+      javaValidChapterIds.push(chapterId);
       const chapterPayload = {
         languageId: 'java',
         title: chapterData.title,
@@ -522,6 +571,7 @@ async function seed() {
     console.log(`    📄 Loaded ${javaContentCount} lesson contents`);
     console.log(`    ❓ Loaded ${javaQuizCount} quizzes`);
     await deactivateStaleLessons('java', javaValidLessonIds);
+    await deactivateStaleChapters('java', javaValidChapterIds);
   }
 
   // 6. Python (기초) 커리큘럼 upsert
@@ -532,11 +582,13 @@ async function seed() {
     let pythonContentCount = 0;
     let pythonQuizCount = 0;
     const pythonValidLessonIds: string[] = [];
+    const pythonValidChapterIds: string[] = [];
 
     for (const chapterData of pythonCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
       const chapterId = getChapterId(chapterData);
+      pythonValidChapterIds.push(chapterId);
       const chapterPayload = {
         languageId: 'python',
         title: chapterData.title,
@@ -610,6 +662,7 @@ async function seed() {
     console.log(`    📄 Loaded ${pythonContentCount} lesson contents`);
     console.log(`    ❓ Loaded ${pythonQuizCount} quizzes`);
     await deactivateStaleLessons('python', pythonValidLessonIds);
+    await deactivateStaleChapters('python', pythonValidChapterIds);
   }
 
   // 7. Python (업무 자동화) 커리큘럼 upsert
@@ -620,11 +673,13 @@ async function seed() {
     let contentCount = 0;
     let quizCount = 0;
     const ppValidLessonIds: string[] = [];
+    const ppValidChapterIds: string[] = [];
 
     for (const chapterData of pythonPracticalCurriculum.chapters) {
       console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
 
       const chapterId = getChapterId(chapterData);
+      ppValidChapterIds.push(chapterId);
       const chapterPayload = {
         languageId: 'python-practical',
         title: chapterData.title,
@@ -701,6 +756,7 @@ async function seed() {
     console.log(`    📄 Loaded ${contentCount} lesson contents`);
     console.log(`    ❓ Loaded ${quizCount} quizzes`);
     await deactivateStaleLessons('python-practical', ppValidLessonIds);
+    await deactivateStaleChapters('python-practical', ppValidChapterIds);
   }
 
   // 8. 결과 확인
