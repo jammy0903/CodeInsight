@@ -89,7 +89,8 @@ export function StepExplanation({ explanation, stepIndex }: StepExplanationProps
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="text-sm leading-relaxed text-stack-text"
+        className="text-base leading-relaxed text-stack-text"
+        style={{ fontFamily: 'var(--font-handwriting)' }}
       >
         {formatExplanation(explanation || '')}
       </motion.div>

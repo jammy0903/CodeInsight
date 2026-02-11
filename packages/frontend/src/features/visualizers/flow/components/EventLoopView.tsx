@@ -175,7 +175,7 @@ function QueueItem({
         color: colors.itemText,
       }}
     >
-      <span className="truncate">{text}</span>
+      <span className="break-words whitespace-normal">{text}</span>
       {delay !== undefined && (
         <span
           className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap"

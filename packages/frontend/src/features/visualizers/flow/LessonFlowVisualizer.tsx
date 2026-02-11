@@ -72,7 +72,7 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
 
   // Detect non-memory viz types that bypass the transformer pipeline
   const els = (step as any).eventLoopState;
-  const hasStandardEventLoop = els && (els.callStack || els.webApis || els.taskQueue || els.microtaskQueue);
+  const hasStandardEventLoop = els && (vizType === 'eventLoop' || els.callStack || els.webApis || els.taskQueue || els.microtaskQueue);
   const hasEventLoopNoteOnly = els && !hasStandardEventLoop && (els.note || els.warning);
   const isNonMemoryType =
     hasStandardEventLoop ||
