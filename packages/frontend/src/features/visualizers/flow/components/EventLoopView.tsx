@@ -26,7 +26,6 @@ interface EventLoopState {
   webApis?: WebApiItem[];
   taskQueue?: string[];
   microtaskQueue?: string[];
-  output?: string[];
 }
 
 interface EventLoopViewProps {
@@ -75,12 +74,6 @@ const COLORS = {
     itemBorder: '#c084fc',
     itemText: '#581c87',
   },
-  output: {
-    bg: '#0a1a0f',
-    border: '#22c55e33',
-    text: '#4ade80',
-    dimText: '#166534',
-  },
 };
 
 // ============================================
@@ -91,11 +84,6 @@ const itemVariants = {
   initial: { opacity: 0, scale: 0.8, y: -8 },
   animate: { opacity: 1, scale: 1, y: 0 },
   exit: { opacity: 0, scale: 0.8, y: 8 },
-};
-
-const outputLineVariants = {
-  initial: { opacity: 0, x: -12 },
-  animate: { opacity: 1, x: 0 },
 };
 
 // ============================================
@@ -227,16 +215,10 @@ export const EventLoopView = memo(function EventLoopView({
   const webApis = eventLoopState.webApis || [];
   const taskQueue = eventLoopState.taskQueue || [];
   const microtaskQueue = eventLoopState.microtaskQueue || [];
-  const output = eventLoopState.output || [];
-
   // 이전 상태와 비교하여 새로 추가된 항목 감지
   const prevCallStack = new Set(prevEventLoopState?.callStack || []);
   const prevWebApis = new Set((prevEventLoopState?.webApis || []).map(w => w.name));
   const prevTaskQueue = new Set(prevEventLoopState?.taskQueue || []);
-  const prevOutput = prevEventLoopState?.output || [];
-
-  // 새 출력 라인 감지 (이전보다 많아진 부분)
-  const newOutputStartIndex = prevOutput.length;
 
   return (
     <div className="event-loop-view p-4 space-y-3">
@@ -345,57 +327,6 @@ export const EventLoopView = memo(function EventLoopView({
           </div>
         </Section>
       </div>
-
-      {/* Console Output */}
-      {output.length > 0 && (
-        <div
-          className="rounded-xl border overflow-hidden"
-          style={{
-            backgroundColor: COLORS.output.bg,
-            borderColor: COLORS.output.border,
-          }}
-        >
-          <div
-            className="px-3 py-1.5 text-xs font-bold flex items-center gap-1.5"
-            style={{
-              backgroundColor: 'rgba(34, 197, 94, 0.1)',
-              color: COLORS.output.text,
-            }}
-          >
-            <span>🖥️</span>
-            Console Output
-          </div>
-          <div className="px-3 py-2 font-mono text-xs space-y-0.5">
-            {output.map((line, idx) => (
-              <motion.div
-                key={`out-${idx}-${line}`}
-                variants={outputLineVariants}
-                initial={idx >= newOutputStartIndex ? 'initial' : false}
-                animate="animate"
-                transition={{ duration: 0.2, delay: idx >= newOutputStartIndex ? 0.1 : 0 }}
-                className="flex items-center gap-1.5"
-              >
-                <span style={{ color: COLORS.output.dimText }}>{'>'}</span>
-                <span
-                  style={{
-                    color: idx >= newOutputStartIndex
-                      ? '#4ade80'   /* 새 출력: 밝은 초록 */
-                      : '#166534',  /* 기존 출력: 어두운 초록 */
-                    fontWeight: idx >= newOutputStartIndex ? 600 : 400,
-                  }}
-                >
-                  {line}
-                </span>
-                {idx >= newOutputStartIndex && (
-                  <span className="text-[10px] px-1 py-0.5 rounded bg-green-900 text-green-300 ml-1">
-                    new
-                  </span>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* 범례 */}
       <div className="pt-3 border-t border-gray-200">
