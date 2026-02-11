@@ -244,7 +244,7 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
    * - 로그인 시: 챕터별 진행률 포함
    * - 비로그인 시: 코스 구조만 반환
    */
-  fastify.get('/:id', { preHandler: [fastify.optionalAuth] }, async (request, reply) => {
+  fastify.get('/:id', { preHandler: [fastify.optionalDbUser] }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
       // 'chapter'나 'lesson' 등의 키워드가 id로 오면 404 (안전장치)
