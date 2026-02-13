@@ -107,7 +107,7 @@ fs.readFileSync('/etc/passwd');`;
     const result = await service.simulate(code);
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain('dangerous');
+    expect(result.error?.code).toBe('DANGEROUS_CODE');
   }, 15000);
 
   it('should handle const and let declarations', async () => {
@@ -129,7 +129,7 @@ let area = PI * radius * radius;`;
     const result = await service.simulate(code);
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain('Time Limit Exceeded');
+    expect(result.error?.code).toBe('MAX_STEPS_EXCEEDED');
   }, 15000);
 
   it('should handle boolean values', async () => {

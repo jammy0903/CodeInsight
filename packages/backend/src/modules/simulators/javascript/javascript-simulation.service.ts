@@ -287,13 +287,13 @@ export class JavaScriptSimulationService {
       // 🚨 에러 분류 및 처리
       // ═══════════════════════════════════════════════════════
 
-      // ⏱️ 타임아웃 에러 (무한 루프)
-      if (err.message?.includes('Time Limit') || err.message?.includes('timeout')) {
+      // ⏱️ 타임아웃 에러 (무한 루프) 또는 최대 실행 단계 초과
+      if (err.message?.includes('Time Limit') || err.message?.includes('timeout') || err.message?.includes('최대 실행 단계')) {
         return {
           success: false,
           error: {
-            code: SimulationErrorCode.TIMEOUT,
-            message: '실행 시간이 초과되었습니다. 무한 루프가 있는지 확인해주세요.',
+            code: SimulationErrorCode.MAX_STEPS_EXCEEDED,
+            message: '실행 단계가 너무 많습니다. 무한 루프가 있는지 확인해주세요.',
           },
         };
       }
