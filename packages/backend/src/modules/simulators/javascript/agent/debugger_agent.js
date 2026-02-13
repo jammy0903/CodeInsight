@@ -58,6 +58,21 @@ function isForLoopInit(node, ancestors) {
   return false;
 }
 
+function isAtFunctionScope(ancestors) {
+  const parent = ancestors[ancestors.length - 2];
+  if (parent.type === 'Program') return true;
+  if (parent.type === 'BlockStatement') {
+    const grandparent = ancestors[ancestors.length - 3];
+    if (!grandparent) return false;
+    return (
+      grandparent.type === 'FunctionDeclaration' ||
+      grandparent.type === 'FunctionExpression' ||
+      grandparent.type === 'ArrowFunctionExpression'
+    );
+  }
+  return false;
+}
+
 function getFunctionName(node) {
   if (node.id && node.id.name) return node.id.name;
   return 'anonymous';
@@ -445,22 +460,26 @@ class DebuggerAgent {
         if (isForLoopInit(node, ancestors)) return;
 
         const line = node.loc.start.line;
-        // let/const → var
-        if (node.kind === 'let' || node.kind === 'const') {
+        const atFuncScope = isAtFunctionScope(ancestors);
+
+        // let/const → var (함수/프로그램 스코프에서만, 블록 스코프 유지)
+        if (atFuncScope && (node.kind === 'let' || node.kind === 'const')) {
           insertions.push({
             start: node.start,
             end: node.start + node.kind.length,
             replacement: 'var',
           });
         }
-        // 초기화 없는 선언에 = undefined 추가
-        for (const decl of node.declarations) {
-          if (!decl.init) {
-            insertions.push({
-              start: decl.end,
-              end: decl.end,
-              replacement: ' = undefined',
-            });
+        // 초기화 없는 선언에 = undefined 추가 (var 변환 시에만)
+        if (atFuncScope) {
+          for (const decl of node.declarations) {
+            if (!decl.init) {
+              insertions.push({
+                start: decl.end,
+                end: decl.end,
+                replacement: ' = undefined',
+              });
+            }
           }
         }
         // __capture__ 삽입

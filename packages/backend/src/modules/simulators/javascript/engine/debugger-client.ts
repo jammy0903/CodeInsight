@@ -97,14 +97,17 @@ export class JavaScriptDebuggerClient {
 
     for (const line of lines) {
       try {
-        // Custom reviver to restore special values (undefined, NaN, Infinity)
+        // Custom reviver to restore special values (NaN, Infinity)
+        // NOTE: @@UNDEFINED@@ is NOT handled here because JSON.parse
+        // deletes keys when reviver returns undefined. Handled in post-processing.
         const snapshot = JSON.parse(line, (key, value) => {
-          if (value === '@@UNDEFINED@@') return undefined;
           if (value === '@@NaN@@') return NaN;
           if (value === '@@INFINITY@@') return Infinity;
           if (value === '@@-INFINITY@@') return -Infinity;
           return value;
         });
+        // Post-process: restore @@UNDEFINED@@ → actual undefined
+        restoreUndefined(snapshot);
         snapshots.push(snapshot);
       } catch (e) {
         // Skip non-JSON output
@@ -134,5 +137,21 @@ export class JavaScriptDebuggerClient {
     }
 
     return snapshots.filter((s) => s.event === 'STEP');
+  }
+}
+
+/**
+ * Recursively walk an object and replace "@@UNDEFINED@@" strings with undefined.
+ * JSON.parse reviver can't do this because returning undefined deletes the key.
+ */
+function restoreUndefined(obj: unknown): void {
+  if (obj === null || typeof obj !== 'object') return;
+  for (const key of Object.keys(obj as Record<string, unknown>)) {
+    const rec = obj as Record<string, unknown>;
+    if (rec[key] === '@@UNDEFINED@@') {
+      rec[key] = undefined;
+    } else if (typeof rec[key] === 'object' && rec[key] !== null) {
+      restoreUndefined(rec[key]);
+    }
   }
 }
