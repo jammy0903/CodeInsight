@@ -217,22 +217,27 @@ class DebuggerAgent {
       if (value.length < 50) {
         return value;
       }
-      return this.addStringToHeap(value, collected);
+      const addr = this.addStringToHeap(value, collected);
+      return { id: addr, class: 'String' };
     }
 
     // Array -> 힙 참조
     if (Array.isArray(value)) {
-      return this.addArrayToHeap(value, collected, depth);
+      const addr = this.addArrayToHeap(value, collected, depth);
+      return { id: addr, class: 'Array' };
     }
 
     // Function -> 힙 참조
     if (typeof value === 'function') {
-      return this.addFunctionToHeap(value, collected);
+      const addr = this.addFunctionToHeap(value, collected);
+      return { id: addr, class: 'Function' };
     }
 
     // Object -> 힙 참조
     if (typeof value === 'object') {
-      return this.addObjectToHeap(value, collected, depth);
+      const className = value.constructor?.name || 'Object';
+      const addr = this.addObjectToHeap(value, collected, depth);
+      return { id: addr, class: className };
     }
 
     return String(value);
