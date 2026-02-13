@@ -9,6 +9,27 @@ export * from './types';
 // 상수
 export * from './constants';
 
+// 스타일
+export {
+  FLOW_THEMES,
+  FLOW_SIZES,
+  FLOW_ANIMATION,
+  getBoxStyle,
+  getFrameStyle,
+  getArrowStyle,
+  type FlowTheme,
+} from './styles';
+
+// 어댑터 타입
+export type {
+  BoxStyle,
+  ArrowStyle,
+  IFlowTransformer,
+  IFlowStyler,
+  IFlowAnimator,
+  IFlowAdapter,
+} from './adapters/types';
+
 // 컴포넌트
 export { CallStackView } from './components/CallStackView';
 export { ReturnOverlay } from './components/ReturnOverlay';
@@ -17,4 +38,6 @@ export {
   type TerminalLine,
   type TerminalLineType,
 } from './components/TerminalOutput';
+export { ReferenceGraphView } from './components/ReferenceGraphView';
+export { TerminalStepView } from './components/TerminalStepView';
 

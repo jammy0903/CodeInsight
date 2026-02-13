@@ -1,13 +1,22 @@
 /**
- * C Memory Visualization Module
- * C 메모리 시각화 컴포넌트 및 상수
+ * C Language Visualization Module
  *
- * 사용처:
- * - Playground: CMemoryView theme="dark"
- * - Lessons: CMemoryView theme="light"
+ * Flow (변수/프레임/제어흐름) + Memory (Stack/Heap) 시각화
  */
 
-// 컴포넌트
+// Flow Visualizer
+export { FlowVisualizer } from './CFlowVisualizer';
+
+// Flow Components
+export { VariableBox, ArrowLayer, FunctionFrame, ControlFlowOverlay, LoopTrack } from './components';
+
+// Flow Hooks
+export { useAnimationQueue, useFlowDiff, calculateFlowDiff, useFlowDiffStatus } from './hooks';
+
+// C Adapters
+export { cAdapter, createCAdapter, CTransformer, CStyler, CAnimator, CMemoryAdapter } from './adapters';
+
+// Memory View
 export { CMemoryView } from './CMemoryView';
 
 // 타입

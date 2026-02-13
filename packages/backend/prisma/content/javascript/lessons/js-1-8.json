@@ -6,8 +6,21 @@
     "code": "function add(a, b) {\n    let result = a + b;\n    return result;\n}\n\nlet sum = add(3, 7);\nconsole.log(\"3 + 7 =\", sum);\n\nlet double = add(sum, sum);\nconsole.log(\"sum * 2 =\", double);\n",
     "steps": [
       {
-        "title": "지역 변수",
-        "explanation": "**`let result = a + b;`**\n\n함수 내부에서 선언된 **지역 변수**입니다.\n함수 밖에서는 접근할 수 없습니다.\n",
+        "title": "함수 선언",
+        "explanation": "**`function add(a, b) {`**\n\n`function` 키워드로 함수를 **선언**합니다.\n아직 실행되지 않고, 메모리에 **등록만** 됩니다.\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "Line 1 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "function add(a, b) {"
+      },
+      {
+        "title": "함수 내부 진입",
+        "explanation": "**`let result = a + b;`**\n\n`add(3, 7)` 호출로 실행 흐름이 **함수 내부로 점프**했습니다.\n`a = 3`, `b = 7` → `result = 10`\n\n`result`는 함수 안에서만 존재하는 **지역 변수**입니다.\n",
         "visualizationType": "jsMemory",
         "jsMemoryState": {
           "variables": [],
@@ -19,8 +32,21 @@
         "code": "let result = a + b;"
       },
       {
-        "title": "함수 호출",
-        "explanation": "**`let sum = add(3, 7);`**\n\n- `add(3, 7)` 호출: a=3, b=7\n- result = 3 + 7 = 10\n- 10이 반환되어 sum에 저장\n\n**출력**: `3 + 7 = 10`\n",
+        "title": "값 반환",
+        "explanation": "**`return result;`**\n\n`result`의 값 `10`을 **호출한 곳으로 반환**합니다.\n함수 실행이 끝나고, 실행 흐름이 라인 6으로 돌아갑니다.\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "Line 3 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "return result;"
+      },
+      {
+        "title": "반환값 저장",
+        "explanation": "**`let sum = add(3, 7);`**\n\n함수가 반환한 `10`이 `sum`에 저장됩니다.\n\n함수 호출 → 내부 실행 → return → 값 저장, 이 흐름을 기억하세요!\n",
         "visualizationType": "jsMemory",
         "jsMemoryState": {
           "variables": [],
@@ -47,8 +73,38 @@
         "code": "console.log(\"3 + 7 =\", sum);"
       },
       {
-        "title": "함수 재사용",
-        "explanation": "**`let double = add(sum, sum);`**\n\n같은 함수를 다른 인자로 다시 호출합니다.\n\n- `add(10, 10)` → 20\n- `double = 20`\n",
+        "title": "함수 재호출 — 내부 진입",
+        "explanation": "**`let result = a + b;`**\n\n`add(sum, sum)` 즉 `add(10, 10)` 호출!\n다시 함수 내부로 점프합니다.\n\n`a = 10`, `b = 10` → `result = 20`\n이전 호출의 `result`는 이미 사라졌습니다.\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "3 + 7 = 10"
+          ],
+          "note": "Line 2 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "let result = a + b;"
+      },
+      {
+        "title": "값 반환 (2회차)",
+        "explanation": "**`return result;`**\n\n`result`의 값 `20`을 반환합니다.\n라인 9로 돌아갑니다.\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "3 + 7 = 10"
+          ],
+          "note": "Line 3 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "return result;"
+      },
+      {
+        "title": "반환값 저장 (2회차)",
+        "explanation": "**`let double = add(sum, sum);`**\n\n함수가 반환한 `20`이 `double`에 저장됩니다.\n",
         "visualizationType": "jsMemory",
         "jsMemoryState": {
           "variables": [],
@@ -62,7 +118,7 @@
         "code": "let double = add(sum, sum);"
       },
       {
-        "title": "재사용 결과 출력",
+        "title": "최종 출력",
         "explanation": "**`console.log(\"sum * 2 =\", double);`**\n\n**출력 결과**: `sum * 2 = 20`\n\n함수의 핵심 가치: **한 번 작성, 여러 번 사용!**\n",
         "visualizationType": "jsMemory",
         "jsMemoryState": {

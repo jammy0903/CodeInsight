@@ -36,6 +36,34 @@ const MAX_OBJECT_PROPS = 5;
 const MAX_STRING_LENGTH = 50;
 
 // ============================================
+// AST 헬퍼 함수
+// ============================================
+
+function isInsideClassBody(ancestors) {
+  for (let i = ancestors.length - 2; i >= 0; i--) {
+    const a = ancestors[i];
+    if (a.type === 'ClassBody') return true;
+    if (a.type === 'FunctionExpression' || a.type === 'FunctionDeclaration' ||
+        a.type === 'ArrowFunctionExpression') return false;
+  }
+  return false;
+}
+
+function isForLoopInit(node, ancestors) {
+  const parent = ancestors[ancestors.length - 2];
+  if (!parent) return false;
+  if (parent.type === 'ForStatement' && parent.init === node) return true;
+  if (parent.type === 'ForInStatement' && parent.left === node) return true;
+  if (parent.type === 'ForOfStatement' && parent.left === node) return true;
+  return false;
+}
+
+function getFunctionName(node) {
+  if (node.id && node.id.name) return node.id.name;
+  return 'anonymous';
+}
+
+// ============================================
 // DebuggerAgent 클래스
 // ============================================
 
@@ -394,234 +422,338 @@ class DebuggerAgent {
     return String(value).substring(0, 20);
   }
 
+
   /**
-   * Promise/setTimeout 콜백 계측 (AST 기반)
+   * AST 기반 코드 계측 (instrumentCode + instrumentAsyncCallbacks 통합)
    */
-  instrumentAsyncCallbacks(code) {
-    try {
-      const ast = acorn.parse(code, {
-        ecmaVersion: 2020,
-        locations: true,
-      });
+  instrument(code) {
+    const insertions = [];
 
-      const insertions = [];
+    const ast = acorn.parse(code, {
+      ecmaVersion: 2020,
+      locations: true,
+    });
 
-      walk.simple(ast, {
-        CallExpression(node) {
-          // Promise.then() 계측
-          if (
-            node.callee?.type === 'MemberExpression' &&
-            node.callee.property?.name === 'then'
-          ) {
-            const callback = node.arguments[0];
-            if (callback && callback.type === 'ArrowFunctionExpression') {
-              const callbackLine = callback.loc.start.line;
+    walk.ancestor(ast, {
+      VariableDeclaration(node, ancestors) {
+        if (isInsideClassBody(ancestors)) return;
+        if (isForLoopInit(node, ancestors)) return;
 
-              if (callback.body.type === 'BlockStatement') {
-                // { } 블록: 끝나기 직전에 삽입
-                const insertPos = callback.body.end - 1;
-                insertions.push({
-                  start: insertPos,
-                  end: insertPos,
-                  replacement: ` __captureMicrotask__(${callbackLine}); `
-                });
-              } else {
-                // 한 줄 표현식: 실행 후 캡처
-                const arrowPos = code.indexOf('=>', callback.start);
-                const exprStart = callback.body.start;
-                const exprEnd = callback.body.end;
-
-                insertions.push({
-                  start: arrowPos + 2,
-                  end: exprEnd,
-                  replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMicrotask__(${callbackLine}); return __result__; }`
-                });
-              }
-            }
-          }
-
-          // setTimeout() 계측
-          if (
-            node.callee?.type === 'Identifier' &&
-            node.callee.name === 'setTimeout'
-          ) {
-            const callback = node.arguments[0];
-            const delay = node.arguments[1];
-
-            let delayValue = 0;
-            if (delay && delay.type === 'Literal') {
-              delayValue = delay.value;
-            }
-
-            if (callback && callback.type === 'ArrowFunctionExpression') {
-              const callbackLine = callback.loc.start.line;
-
-              if (callback.body.type === 'BlockStatement') {
-                // { } 블록: 끝나기 직전에 삽입
-                const insertPos = callback.body.end - 1;
-                insertions.push({
-                  start: insertPos,
-                  end: insertPos,
-                  replacement: ` __captureMacrotask__(${callbackLine}, ${delayValue}); `
-                });
-              } else {
-                // 한 줄 표현식: 실행 후 캡처
-                const arrowPos = code.indexOf('=>', callback.start);
-                const exprStart = callback.body.start;
-                const exprEnd = callback.body.end;
-
-                insertions.push({
-                  start: arrowPos + 2,
-                  end: exprEnd,
-                  replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMacrotask__(${callbackLine}, ${delayValue}); return __result__; }`
-                });
-              }
-            }
+        const line = node.loc.start.line;
+        // let/const → var
+        if (node.kind === 'let' || node.kind === 'const') {
+          insertions.push({
+            start: node.start,
+            end: node.start + node.kind.length,
+            replacement: 'var',
+          });
+        }
+        // 초기화 없는 선언에 = undefined 추가
+        for (const decl of node.declarations) {
+          if (!decl.init) {
+            insertions.push({
+              start: decl.end,
+              end: decl.end,
+              replacement: ' = undefined',
+            });
           }
         }
-      });
+        // __capture__ 삽입
+        insertions.push({
+          start: node.end,
+          end: node.end,
+          replacement: ` __capture__(${line});`,
+        });
+      },
 
-      // 역순 정렬
-      insertions.sort((a, b) => b.start - a.start);
+      FunctionDeclaration(node, ancestors) {
+        if (isInsideClassBody(ancestors)) return;
+        const line = node.loc.start.line;
+        const name = getFunctionName(node);
+        // 선언 전 캡처
+        insertions.push({
+          start: node.start,
+          end: node.start,
+          replacement: `__capture__(${line}); `,
+        });
+        // body 시작에 enterFunction
+        const bodyStart = node.body.start + 1; // { 다음
+        insertions.push({
+          start: bodyStart,
+          end: bodyStart,
+          replacement: ` __enterFunction__('${name}');`,
+        });
+        // body 끝에 exitFunction (return 없이 끝나는 경우)
+        const bodyEnd = node.body.end - 1; // } 앞
+        insertions.push({
+          start: bodyEnd,
+          end: bodyEnd,
+          replacement: ` __exitFunction__();`,
+        });
+      },
 
-      let instrumented = code;
-      for (const { start, end, replacement } of insertions) {
-        instrumented = instrumented.substring(0, start) + replacement + instrumented.substring(end);
-      }
-
-      return instrumented;
-    } catch (e) {
-      // AST 파싱 실패 시 원본 반환
-      console.error('[instrumentAsyncCallbacks] Parse error:', e.message);
-      return code;
-    }
-  }
-
-  /**
-   * 코드 계측 (라인 기반)
-   */
-  instrumentCode(code) {
-    const lines = code.split('\n');
-    const instrumentedLines = [];
-    let inMultilineComment = false;
-    let braceDepth = 0;        // { } 깊이
-    let bracketDepth = 0;      // [ ] 깊이
-    let inObjectLiteral = false;
-    let objectStartDepth = 0;
-
-    for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
-      const trimmed = line.trim();
-      const lineNum = i + 1;
-
-      // 멀티라인 주석 처리
-      if (inMultilineComment) {
-        if (trimmed.includes('*/')) {
-          inMultilineComment = false;
+      ReturnStatement(node, ancestors) {
+        const line = node.loc.start.line;
+        if (node.argument) {
+          // Split into prefix + suffix to avoid overlapping with inner insertions
+          insertions.push({
+            start: node.start,
+            end: node.argument.start,
+            replacement: '{ var __retval__ = (',
+          });
+          insertions.push({
+            start: node.argument.end,
+            end: node.end,
+            replacement: `); __capture__(${line}); __exitFunction__(); return __retval__; }`,
+          });
+        } else {
+          insertions.push({
+            start: node.start,
+            end: node.end,
+            replacement: `{ __capture__(${line}); __exitFunction__(); return; }`,
+          });
         }
-        instrumentedLines.push(line);
-        continue;
-      }
-      if (trimmed.startsWith('/*')) {
-        inMultilineComment = true;
-        instrumentedLines.push(line);
-        continue;
-      }
+      },
 
-      // 중괄호/대괄호 깊이 계산
-      const lineWithoutStrings = trimmed
-        .replace(/'[^']*'/g, '')
-        .replace(/"[^"]*"/g, '')
-        .replace(/`[^`]*`/g, '');
+      ExpressionStatement(node, ancestors) {
+        if (isInsideClassBody(ancestors)) return;
+        const line = node.loc.start.line;
+        insertions.push({
+          start: node.end,
+          end: node.end,
+          replacement: ` __capture__(${line});`,
+        });
+      },
 
-      const openBraces = (lineWithoutStrings.match(/{/g) || []).length;
-      const closeBraces = (lineWithoutStrings.match(/}/g) || []).length;
-      const openBrackets = (lineWithoutStrings.match(/\[/g) || []).length;
-      const closeBrackets = (lineWithoutStrings.match(/\]/g) || []).length;
+      ClassDeclaration(node, ancestors) {
+        const line = node.loc.start.line;
+        const name = node.id ? node.id.name : 'AnonymousClass';
+        // class Foo {} → var Foo = (class Foo {}); __capture__()
+        insertions.push({
+          start: node.start,
+          end: node.start,
+          replacement: `var ${name} = (`,
+        });
+        insertions.push({
+          start: node.end,
+          end: node.end,
+          replacement: `); __capture__(${line});`,
+        });
+      },
 
-      // 객체 리터럴 시작 감지
-      if (!inObjectLiteral && (
-        /=\s*\{/.test(lineWithoutStrings) ||
-        /:\s*\{/.test(lineWithoutStrings) ||
-        /\(\s*\{/.test(lineWithoutStrings) ||
-        /,\s*\{/.test(lineWithoutStrings)
-      )) {
-        inObjectLiteral = true;
-        objectStartDepth = braceDepth;
-      }
-
-      braceDepth += openBraces - closeBraces;
-      bracketDepth += openBrackets - closeBrackets;
-
-      // 객체 리터럴 종료 감지
-      if (inObjectLiteral && braceDepth <= objectStartDepth) {
-        inObjectLiteral = false;
-      }
-
-      // 스킵할 라인
-      if (this.shouldSkipLine(trimmed)) {
-        instrumentedLines.push(line);
-        continue;
-      }
-
-      // let/const를 var로 변환
-      if (/^(let|const)\s+/.test(trimmed)) {
-        line = line.replace(/^(\s*)(let|const)\s+/, '$1var ');
-
-        // 초기화 없는 선언은 undefined로 명시
-        if (/^var\s+\w+\s*;/.test(line.trim())) {
-          line = line.replace(/^(\s*var\s+\w+)\s*;/, '$1 = undefined;');
+      MethodDefinition(node, ancestors) {
+        if (node.kind === 'constructor' || node.kind === 'method') {
+          const funcName = node.key && node.key.name ? node.key.name : 'method';
+          const body = node.value.body; // BlockStatement
+          if (body) {
+            const bodyStart = body.start + 1;
+            insertions.push({
+              start: bodyStart,
+              end: bodyStart,
+              replacement: ` __enterFunction__('${funcName}');`,
+            });
+            const bodyEnd = body.end - 1;
+            insertions.push({
+              start: bodyEnd,
+              end: bodyEnd,
+              replacement: ` __exitFunction__();`,
+            });
+          }
         }
-      }
+      },
 
-      // 객체/배열 리터럴 내부에서는 캡처 삽입 안 함
-      if (inObjectLiteral || bracketDepth > 0) {
-        instrumentedLines.push(line);
-        continue;
-      }
+      IfStatement(node, ancestors) {
+        const line = node.loc.start.line;
+        // consequent block
+        if (node.consequent && node.consequent.type === 'BlockStatement') {
+          insertions.push({
+            start: node.consequent.start + 1,
+            end: node.consequent.start + 1,
+            replacement: ` __capture__(${line});`,
+          });
+        }
+        // alternate block (else)
+        if (node.alternate && node.alternate.type === 'BlockStatement') {
+          const altLine = node.alternate.loc.start.line;
+          insertions.push({
+            start: node.alternate.start + 1,
+            end: node.alternate.start + 1,
+            replacement: ` __capture__(${altLine});`,
+          });
+        }
+      },
 
-      // 속성 정의 라인 스킵
-      if (/^\w+\s*:/.test(trimmed) && !trimmed.includes('?') && !trimmed.includes('=>')) {
-        instrumentedLines.push(line);
-        continue;
-      }
+      ForStatement(node, ancestors) {
+        const line = node.loc.start.line;
+        if (node.body && node.body.type === 'BlockStatement') {
+          insertions.push({
+            start: node.body.start + 1,
+            end: node.body.start + 1,
+            replacement: ` __capture__(${line});`,
+          });
+        }
+      },
 
-      // 원본 라인 추가
-      instrumentedLines.push(line);
+      WhileStatement(node, ancestors) {
+        const line = node.loc.start.line;
+        if (node.body && node.body.type === 'BlockStatement') {
+          insertions.push({
+            start: node.body.start + 1,
+            end: node.body.start + 1,
+            replacement: ` __capture__(${line});`,
+          });
+        }
+      },
 
-      // 다음 라인이 .으로 시작하면 캡처 스킵 (메소드 체이닝)
-      // 주석이나 공백 라인은 건너뛰고 확인
-      let nextLineIndex = i + 1;
-      let nextLine = lines[nextLineIndex];
-      while (nextLineIndex < lines.length && (!nextLine || !nextLine.trim() || nextLine.trim().startsWith('//'))) {
-        nextLineIndex++;
-        nextLine = lines[nextLineIndex];
-      }
+      DoWhileStatement(node, ancestors) {
+        const line = node.loc.start.line;
+        if (node.body && node.body.type === 'BlockStatement') {
+          insertions.push({
+            start: node.body.start + 1,
+            end: node.body.start + 1,
+            replacement: ` __capture__(${line});`,
+          });
+        }
+      },
 
-      if (nextLine && nextLine.trim().startsWith('.')) {
-        continue;
-      }
+      ForInStatement(node, ancestors) {
+        const line = node.loc.start.line;
+        if (node.body && node.body.type === 'BlockStatement') {
+          insertions.push({
+            start: node.body.start + 1,
+            end: node.body.start + 1,
+            replacement: ` __capture__(${line});`,
+          });
+        }
+      },
 
-      // 캡처 호출 추가
-      instrumentedLines.push(`__capture__(${lineNum});`);
+      ForOfStatement(node, ancestors) {
+        const line = node.loc.start.line;
+        if (node.body && node.body.type === 'BlockStatement') {
+          insertions.push({
+            start: node.body.start + 1,
+            end: node.body.start + 1,
+            replacement: ` __capture__(${line});`,
+          });
+        }
+      },
+
+      SwitchStatement(node, ancestors) {
+        for (const switchCase of node.cases) {
+          if (switchCase.consequent.length > 0) {
+            const caseLine = switchCase.loc.start.line;
+            const firstStmt = switchCase.consequent[0];
+            insertions.push({
+              start: firstStmt.start,
+              end: firstStmt.start,
+              replacement: `__capture__(${caseLine}); `,
+            });
+          }
+        }
+      },
+
+      TryStatement(node, ancestors) {
+        // try block
+        if (node.block) {
+          const tryLine = node.loc.start.line;
+          insertions.push({
+            start: node.block.start + 1,
+            end: node.block.start + 1,
+            replacement: ` __capture__(${tryLine});`,
+          });
+        }
+        // catch block
+        if (node.handler && node.handler.body) {
+          const catchLine = node.handler.loc.start.line;
+          insertions.push({
+            start: node.handler.body.start + 1,
+            end: node.handler.body.start + 1,
+            replacement: ` __capture__(${catchLine});`,
+          });
+        }
+        // finally block
+        if (node.finalizer) {
+          const finallyLine = node.finalizer.loc.start.line;
+          insertions.push({
+            start: node.finalizer.start + 1,
+            end: node.finalizer.start + 1,
+            replacement: ` __capture__(${finallyLine});`,
+          });
+        }
+      },
+
+      CallExpression(node, ancestors) {
+        // Promise.then() 계측
+        if (
+          node.callee?.type === 'MemberExpression' &&
+          node.callee.property?.name === 'then'
+        ) {
+          const callback = node.arguments[0];
+          if (callback && callback.type === 'ArrowFunctionExpression') {
+            const callbackLine = callback.loc.start.line;
+            if (callback.body.type === 'BlockStatement') {
+              const insertPos = callback.body.end - 1;
+              insertions.push({
+                start: insertPos,
+                end: insertPos,
+                replacement: ` __captureMicrotask__(${callbackLine}); `,
+              });
+            } else {
+              const arrowPos = code.indexOf('=>', callback.start);
+              const exprStart = callback.body.start;
+              const exprEnd = callback.body.end;
+              insertions.push({
+                start: arrowPos + 2,
+                end: exprEnd,
+                replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMicrotask__(${callbackLine}); return __result__; }`,
+              });
+            }
+          }
+        }
+
+        // setTimeout() 계측
+        if (
+          node.callee?.type === 'Identifier' &&
+          node.callee.name === 'setTimeout'
+        ) {
+          const callback = node.arguments[0];
+          const delay = node.arguments[1];
+          let delayValue = 0;
+          if (delay && delay.type === 'Literal') {
+            delayValue = delay.value;
+          }
+          if (callback && callback.type === 'ArrowFunctionExpression') {
+            const callbackLine = callback.loc.start.line;
+            if (callback.body.type === 'BlockStatement') {
+              const insertPos = callback.body.end - 1;
+              insertions.push({
+                start: insertPos,
+                end: insertPos,
+                replacement: ` __captureMacrotask__(${callbackLine}, ${delayValue}); `,
+              });
+            } else {
+              const arrowPos = code.indexOf('=>', callback.start);
+              const exprStart = callback.body.start;
+              const exprEnd = callback.body.end;
+              insertions.push({
+                start: arrowPos + 2,
+                end: exprEnd,
+                replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMacrotask__(${callbackLine}, ${delayValue}); return __result__; }`,
+              });
+            }
+          }
+        }
+      },
+    });
+
+    // 역순 정렬 후 적용
+    insertions.sort((a, b) => b.start - a.start);
+
+    let result = code;
+    for (const { start, end, replacement } of insertions) {
+      result = result.substring(0, start) + replacement + result.substring(end);
     }
-
-    return instrumentedLines.join('\n');
-  }
-
-  /**
-   * 스킵할 라인 확인
-   */
-  shouldSkipLine(trimmed) {
-    if (!trimmed) return true;
-    if (trimmed.startsWith('//')) return true;
-    if (trimmed.startsWith('.')) return true;
-    if (trimmed === '{') return true;
-    if (trimmed === '}') return true;
-    if (trimmed === '};') return true;
-    if (trimmed === '},') return true;
-    if (trimmed.startsWith('function ')) return true;
-    return false;
+    return result;
   }
 
   /**
@@ -661,9 +793,8 @@ class DebuggerAgent {
   async run(code) {
     const agent = this;
 
-    // 코드 계측: Promise/setTimeout 콜백 먼저, 그 다음 라인 기반
-    let instrumentedCode = this.instrumentAsyncCallbacks(code);
-    instrumentedCode = this.instrumentCode(instrumentedCode);
+    // AST 기반 통합 계측
+    let instrumentedCode = this.instrument(code);
 
     // ========================================
     // 비동기 시뮬레이션을 위한 Queue 분리

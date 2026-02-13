@@ -21,8 +21,7 @@ import { useLessonVisualization } from '../../hooks/useLessonVisualization';
 import { useLessonTerminal } from '../../hooks/useLessonTerminal';
 import { LessonCodeEditor } from '../day/LessonCodeEditor';
 
-import { LessonFlowVisualizer } from '@/features/visualizers/flow';
-import { LessonMemoryVisualizer } from '@/features/visualizers/memory';
+import { LessonFlowVisualizer, LessonMemoryVisualizer } from '@/features/visualizers';
 import { MobileAIChatFAB } from './MobileAIChatFAB';
 import { MobileAIChatModal } from './MobileAIChatModal';
 import type { LessonStep } from '@/types';

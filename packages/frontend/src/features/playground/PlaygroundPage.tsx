@@ -16,8 +16,7 @@ import { useLessonVisualization } from '@/features/courses/hooks/useLessonVisual
 import { useStepGestures } from '@/features/courses/hooks/useStepGestures';
 import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/playgroundStore';
 import { useExplanationStore } from './stores/explanationStore';
-import { LessonFlowVisualizer } from '@/features/visualizers/flow';
-import { LessonMemoryVisualizer } from '@/features/visualizers/memory';
+import { LessonFlowVisualizer, LessonMemoryVisualizer } from '@/features/visualizers';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { StepNavigationArrows } from '@/features/courses/components/StepNavigationArrows';
 import { useThemeStore } from '@/stores/themeStore';
