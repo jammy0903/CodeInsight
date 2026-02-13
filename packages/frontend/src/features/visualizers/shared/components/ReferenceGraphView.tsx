@@ -316,8 +316,9 @@ const FrameSection = memo(function FrameSection({
 }: FrameSectionProps) {
   const isGlobal = name === theme.globalFrameName || name === 'global' || name === '__main__' || name === 'main';
   const isStringPool = name === 'String Pool';
+  const isHeapSection = name === 'Heap';
   const colors = isGlobal ? theme.frameColors.global : theme.frameColors.function;
-  const displayName = isGlobal ? (language === 'python' ? 'global' : name) : isStringPool ? name : `${name}()`;
+  const displayName = isGlobal ? (language === 'python' ? 'global' : name) : (isStringPool || isHeapSection) ? name : `${name}()`;
 
   return (
     <motion.div
@@ -337,14 +338,14 @@ const FrameSection = memo(function FrameSection({
         className="flex items-center gap-2 px-3 py-2"
         style={{ backgroundColor: colors.header }}
       >
-        <span className="text-sm">{isGlobal ? theme.icon : '→'}</span>
+        <span className="text-sm">{isGlobal ? theme.icon : isHeapSection ? '📦' : '→'}</span>
         <span
           className="font-mono text-sm font-semibold"
           style={{ color: colors.headerText }}
         >
           {displayName}
         </span>
-        {isActive && (
+        {isActive && !isHeapSection && (
           <span className="ml-auto text-[11px] px-1.5 py-0.5 rounded-md bg-blue-500 text-white font-medium">
             실행 중
           </span>
@@ -476,6 +477,18 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
           frames.push({ name: frame.name, objects: frameObjects });
         }
       });
+
+      // Show orphaned heap objects not referenced by any stack variable
+      const orphanedHeapObjects: ObjectWithNames[] = [];
+      heapObjects.forEach((obj, objId) => {
+        if (!processedObjectIds.has(objId)) {
+          orphanedHeapObjects.push({ object: obj, names: namesByObject.get(objId) || [] });
+          processedObjectIds.add(objId);
+        }
+      });
+      if (orphanedHeapObjects.length > 0) {
+        frames.push({ name: 'Heap', objects: orphanedHeapObjects });
+      }
     } else {
       // No frames — put everything in a default frame
       const mainObjects: ObjectWithNames[] = [];
@@ -523,8 +536,13 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
     [prevStep]
   );
 
-  // Last frame is active
-  const activeFrameName = frameData.length > 0 ? frameData[frameData.length - 1].name : null;
+  // Last non-Heap frame is active
+  const activeFrameName = useMemo(() => {
+    for (let i = frameData.length - 1; i >= 0; i--) {
+      if (frameData[i].name !== 'Heap') return frameData[i].name;
+    }
+    return null;
+  }, [frameData]);
 
   return (
     <div className={`reference-graph-view p-4 ${className}`}>
@@ -534,10 +552,10 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
         <span>{theme.label}: {theme.description}</span>
       </div>
 
-      {/* Frames (reversed — latest call on top) */}
+      {/* Frames (reversed — latest call on top, Heap always at bottom) */}
       <div className="flex flex-col gap-4">
         <AnimatePresence mode="popLayout">
-          {frameData.slice().reverse().map(({ name, objects }) => (
+          {frameData.filter(f => f.name !== 'Heap').slice().reverse().map(({ name, objects }) => (
             <FrameSection
               key={name}
               name={name}
@@ -548,6 +566,22 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
               connectedIds={connectedIds}
               onHover={handleHover}
               isActive={name === activeFrameName}
+              isNew={!prevFrameNames.has(name)}
+              prevVariableIds={prevVariableIds}
+              prevVariableValues={prevVariableValues}
+            />
+          ))}
+          {frameData.filter(f => f.name === 'Heap').map(({ name, objects }) => (
+            <FrameSection
+              key={name}
+              name={name}
+              objects={objects}
+              theme={theme}
+              language={language}
+              hoveredId={hoveredId}
+              connectedIds={connectedIds}
+              onHover={handleHover}
+              isActive={false}
               isNew={!prevFrameNames.has(name)}
               prevVariableIds={prevVariableIds}
               prevVariableValues={prevVariableValues}

@@ -97,7 +97,7 @@ export function useLessonTerminal({
       return [];
     }
 
-    // JavaScript: eventLoopState.output (JSON 레슨) 또는 stdout (시뮬레이터)
+    // JavaScript: eventLoopState.output 또는 memoryState.output (JSON 레슨) 또는 stdout (시뮬레이터)
     if (languageId === 'javascript' || languageId === 'js') {
       const jsOutput = (currentStep as any)?.eventLoopState?.output;
       if (Array.isArray(jsOutput) && jsOutput.length > 0) {
@@ -106,6 +106,16 @@ export function useLessonTerminal({
         }
         const prevOutput = (prevStep as any)?.eventLoopState?.output || [];
         return jsOutput.slice(prevOutput.length)
+          .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+      }
+      // fallback: memoryState.output (memory vizType 레슨)
+      const msOutput = (currentStep as any)?.memoryState?.output;
+      if (Array.isArray(msOutput) && msOutput.length > 0) {
+        if (!diffMode) {
+          return msOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+        }
+        const prevMsOutput = (prevStep as any)?.memoryState?.output || [];
+        return msOutput.slice(prevMsOutput.length)
           .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
       // fallback: stdout (시뮬레이터 경로)

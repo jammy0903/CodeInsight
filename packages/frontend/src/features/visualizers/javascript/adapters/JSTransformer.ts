@@ -63,12 +63,18 @@ function parseValue(value: string | undefined | null): string | number | boolean
 /**
  * 참조에서 주소 추출
  * "@1" → "@1"
+ * "→ 0x001" → "0x001"  (레슨 JSON 형식)
  */
 function extractPointsTo(value: string | undefined | null): string | undefined {
   if (!value) return undefined;
   const strValue = String(value);
   if (strValue.startsWith('@')) {
     return strValue.trim();
+  }
+  // 레슨 JSON에서 사용하는 "→ 0xNNN" 형식
+  const arrowMatch = strValue.match(/^→\s*(0x[\da-fA-F]+)/);
+  if (arrowMatch) {
+    return arrowMatch[1];
   }
   return undefined;
 }
@@ -189,12 +195,16 @@ export class JSTransformer implements IFlowTransformer {
 
           const pointsTo = extractPointsTo(item.value);
           const isReference = !!pointsTo;
+          // 참조이면 heapTypeMap에서 실제 타입 조회
+          const type = isReference
+            ? (heapTypeMap.get(pointsTo!) || item.type || 'Reference')
+            : (item.type || 'unknown');
 
           const variable: FlowVariable = {
             id: `${frameName}-${item.name}`,
             name: item.name,
             value: parseValue(item.value),
-            type: item.type || 'unknown',
+            type,
             state: 'idle',
             scope: frameName,
             isPointer: isReference,
@@ -218,6 +228,11 @@ export class JSTransformer implements IFlowTransformer {
     if (heapData && Array.isArray(heapData)) {
       heapData.forEach((item: any) => {
         const address = item.address || item.id || 'unknown';
+        const metadata: Record<string, unknown> = {};
+        if (item.new) metadata.isNew = true;
+        if (item.changed) metadata.isChanged = true;
+        if (item.shared) metadata.isShared = true;
+        if (item.warning) metadata.isWarning = true;
         const variable: FlowVariable = {
           id: `heap-${address}`,
           name: address,
@@ -227,6 +242,7 @@ export class JSTransformer implements IFlowTransformer {
           scope: 'heap',
           address: address,
           isPointer: false,
+          ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
         };
 
         variables.push(variable);

@@ -10,28 +10,14 @@
         "explanation": "`original` 객체는 `address`라는 또 다른 객체를 속성으로 가집니다. `original` 변수는 힙에 있는 객체의 주소를 참조합니다.",
         "visualizationType": "memory",
         "code": "const original = {",
-        "highlightOffset": [
-          0,
-          1,
-          2,
-          3
-        ],
+        "highlightOffset": [0, 1, 2, 3],
         "memoryState": {
           "stack": [
-            {
-              "name": "original",
-              "value": "→ 0x001"
-            }
+            { "name": "original", "value": "→ 0x001" }
           ],
           "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Seoul' }"
-            }
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Seoul' }" }
           ]
         }
       },
@@ -43,22 +29,13 @@
         "code": "const shallow = { ...original };",
         "memoryState": {
           "stack": [
-            {
-              "name": "shallow",
-              "value": "→ 0x003"
-            }
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" }
           ],
           "heap": [
-            {
-              "address": "0x002",
-              "content": "{ city: 'Seoul' }",
-              "shared": true
-            },
-            {
-              "address": "0x003",
-              "content": "{ name: 'Alice', address: → 0x002 }",
-              "new": true
-            }
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Seoul' }", "shared": true },
+            { "address": "0x003", "content": "{ name: 'Alice', address: → 0x002 }", "new": true }
           ]
         }
       },
@@ -68,26 +45,14 @@
         "visualizationType": "memory",
         "code": "shallow.name = 'Bob';",
         "memoryState": {
-          "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x003",
-              "content": "{ name: 'Bob', address: → 0x002 }",
-              "changed": true
-            }
-          ],
           "stack": [
-            {
-              "name": "original",
-              "value": "→ 0x001"
-            },
-            {
-              "name": "shallow",
-              "value": "→ 0x003"
-            }
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" }
+          ],
+          "heap": [
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Seoul' }" },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }", "changed": true }
           ]
         }
       },
@@ -98,21 +63,14 @@
         "visualizationType": "memory",
         "code": "shallow.address.city = 'Busan';",
         "memoryState": {
+          "stack": [
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" }
+          ],
           "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Busan' }",
-              "changed": true,
-              "warning": true
-            },
-            {
-              "address": "0x003",
-              "content": "{ name: 'Bob', address: → 0x002 }"
-            }
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Busan' }", "changed": true, "warning": true },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }" }
           ]
         }
       },
@@ -122,24 +80,16 @@
         "visualizationType": "memory",
         "code": "console.log(original.name);",
         "memoryState": {
-          "output": [
-            "Alice"
+          "stack": [
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" }
           ],
           "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Busan' }",
-              "warning": true
-            },
-            {
-              "address": "0x003",
-              "content": "{ name: 'Bob', address: → 0x002 }"
-            }
-          ]
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Busan' }", "warning": true },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }" }
+          ],
+          "output": ["Alice"]
         }
       },
       {
@@ -148,10 +98,16 @@
         "visualizationType": "memory",
         "code": "console.log(original.address.city);",
         "memoryState": {
-          "output": [
-            "Alice",
-            "Busan"
-          ]
+          "stack": [
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" }
+          ],
+          "heap": [
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Busan' }" },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }" }
+          ],
+          "output": ["Alice", "Busan"]
         }
       },
       {
@@ -162,22 +118,16 @@
         "code": "const deep = JSON.parse(JSON.stringify(original));",
         "memoryState": {
           "stack": [
-            {
-              "name": "deep",
-              "value": "→ 0x004"
-            }
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" },
+            { "name": "deep", "value": "→ 0x004" }
           ],
           "heap": [
-            {
-              "address": "0x004",
-              "content": "{ name: 'Alice', address: → 0x005 }",
-              "new": true
-            },
-            {
-              "address": "0x005",
-              "content": "{ city: 'Busan' }",
-              "new": true
-            }
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Busan' }" },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }" },
+            { "address": "0x004", "content": "{ name: 'Alice', address: → 0x005 }", "new": true },
+            { "address": "0x005", "content": "{ city: 'Busan' }", "new": true }
           ],
           "output": null
         }
@@ -188,30 +138,17 @@
         "visualizationType": "memory",
         "code": "deep.address.city = 'Incheon';",
         "memoryState": {
-          "heap": [
-            {
-              "address": "0x004",
-              "content": "{ name: 'Alice', address: → 0x005 }"
-            },
-            {
-              "address": "0x005",
-              "content": "{ city: 'Incheon' }",
-              "changed": true
-            }
-          ],
           "stack": [
-            {
-              "name": "original",
-              "value": "→ 0x001"
-            },
-            {
-              "name": "shallow",
-              "value": "→ 0x003"
-            },
-            {
-              "name": "deep",
-              "value": "→ 0x004"
-            }
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" },
+            { "name": "deep", "value": "→ 0x004" }
+          ],
+          "heap": [
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Busan' }" },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }" },
+            { "address": "0x004", "content": "{ name: 'Alice', address: → 0x005 }" },
+            { "address": "0x005", "content": "{ city: 'Incheon' }", "changed": true }
           ]
         }
       },
@@ -222,34 +159,19 @@
         "code": "console.log(original.address.city);",
         "occurrence": 2,
         "memoryState": {
-          "output": [
-            "Alice",
-            "Busan",
-            "Busan"
+          "stack": [
+            { "name": "original", "value": "→ 0x001" },
+            { "name": "shallow", "value": "→ 0x003" },
+            { "name": "deep", "value": "→ 0x004" }
           ],
           "heap": [
-            {
-              "address": "0x001",
-              "content": "{ name: 'Alice', address: → 0x002 }"
-            },
-            {
-              "address": "0x002",
-              "content": "{ city: 'Busan' }"
-            },
-            {
-              "address": "0x003",
-              "content": "{ name: 'Bob', address: → 0x002 }"
-            },
-            {
-              "address": "0x004",
-              "content": "{ name: 'Alice', address: → 0x005 }"
-            },
-            {
-              "address": "0x005",
-              "content": "{ city: 'Incheon' }",
-              "changed": true
-            }
-          ]
+            { "address": "0x001", "content": "{ name: 'Alice', address: → 0x002 }" },
+            { "address": "0x002", "content": "{ city: 'Busan' }" },
+            { "address": "0x003", "content": "{ name: 'Bob', address: → 0x002 }" },
+            { "address": "0x004", "content": "{ name: 'Alice', address: → 0x005 }" },
+            { "address": "0x005", "content": "{ city: 'Incheon' }", "changed": true }
+          ],
+          "output": ["Alice", "Busan", "Busan"]
         }
       }
     ],
