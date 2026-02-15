@@ -12,6 +12,7 @@ const LANGUAGES: { id: SupportedLanguage; label: string; shortLabel: string; col
   { id: 'c', label: 'C', shortLabel: 'C', color: '#3b82f6' },
   { id: 'python', label: 'Py', shortLabel: 'Py', color: '#22c55e' },
   { id: 'java', label: 'Java', shortLabel: 'Ja', color: '#EC4899' },
+  { id: 'javascript', label: 'JS', shortLabel: 'JS', color: '#f59e0b' },
 ];
 
 interface LanguageTabsProps {
