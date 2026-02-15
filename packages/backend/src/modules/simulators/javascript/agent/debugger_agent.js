@@ -588,12 +588,15 @@ class DebuggerAgent {
         const line = node.loc.start.line;
         const name = getFunctionName(node);
 
-        // 선언 전 캡처
-        const captureExpr = scopeTracker.generateCaptureExpression(node.start);
+        // 함수명을 현재 스코프에 등록 (호이스팅)
+        scopeTracker.declareVariable(name, 'var', node.start);
+
+        // 선언 후 캡처 (함수가 이미 등록되어 있음)
+        const captureExpr = scopeTracker.generateCaptureExpression(node.end);
         insertions.push({
-          start: node.start,
-          end: node.start,
-          replacement: `__capture__(${line}, ${captureExpr}); `,
+          start: node.end,
+          end: node.end,
+          replacement: ` __capture__(${line}, ${captureExpr});`,
         });
 
         // 함수 스코프 진입
@@ -699,10 +702,16 @@ class DebuggerAgent {
         const line = node.loc.start.line;
 
         // 선언된 변수 등록
+        // var는 호이스팅되어 함수 처음부터 접근 가능 (undefined)
+        // let/const는 선언 라인부터만 접근 가능
+        // 초기값이 있는 경우, 초기화 완료 후에만 실제 값 접근 가능
         for (const decl of node.declarations) {
           const names = extractDeclaredNames(decl.id);
           for (const name of names) {
-            scopeTracker.declareVariable(name, node.kind, node.start);
+            // let/const with initializer: use node.end (after entire statement)
+            // var or no initializer: use node.start
+            const declOffset = (node.kind !== 'var' && decl.init) ? node.end : node.start;
+            scopeTracker.declareVariable(name, node.kind, declOffset);
           }
         }
 
