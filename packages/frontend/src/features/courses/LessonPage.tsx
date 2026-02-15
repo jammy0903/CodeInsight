@@ -72,6 +72,7 @@ export function LessonPage() {
   const refreshStreak = useStore((s) => s.refreshStreak);
   const isMobile = useIsMobile();
   const [reportOpen, setReportOpen] = React.useState(false);
+  const [mobileResetCount, setMobileResetCount] = React.useState(0);
 
   // 1. 데이터 패칭
   const { lesson, isLoading, isError, error, nextLessonId, quiz } = useLessonData({
@@ -151,6 +152,7 @@ export function LessonPage() {
       navigation.completeLesson();
     } else {
       navigation.reset();
+      if (isMobile) setMobileResetCount((c) => c + 1);
     }
   };
 
@@ -180,22 +182,17 @@ export function LessonPage() {
           chapterPath={languageCoursePath}
         />
       ) : isMobile ? (
-        <div className="flex flex-col h-[calc(100vh-120px)]">
-          <div className="flex-1 min-h-0">
-            <MobileLessonView
-              code={code}
-              steps={steps}
-              currentStepIndex={navigation.currentStepIndex}
-              languageId={lang || 'c'}
-              lessonId={lessonId || ''}
-              lessonTitle={lesson.title}
-              lessonOrder={lesson.order}
-              onPrevStep={navigation.goToPrevStep}
-              onNextStep={navigation.goToNextStep}
-              onQuiz={navigation.goToQuiz}
-            />
-          </div>
-        </div>
+        <MobileLessonView
+          key={`${lessonId}-${mobileResetCount}`}
+          code={code}
+          steps={steps}
+          languageId={lang || 'c'}
+          lessonId={lessonId || ''}
+          lessonTitle={lesson.title}
+          lessonOrder={lesson.order}
+          onQuiz={navigation.goToQuiz}
+          onStepChange={() => {}}
+        />
       ) : (
         <LessonDesktopLayout
           code={code}
@@ -213,8 +210,8 @@ export function LessonPage() {
         />
       )}
 
-      {/* 하단 네비게이션 */}
-      {navigation.phase !== 'completed' && (
+      {/* 하단 네비게이션 (데스크톱 only — 모바일은 MobileLessonView 내장) */}
+      {navigation.phase !== 'completed' && !isMobile && (
         <>
           <LessonBottomNav
             onPrev={navigation.goToPrevStep}

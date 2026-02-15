@@ -1,341 +1,207 @@
 /**
- * MobileLessonView - 모바일 레슨 통합 레이아웃
+ * MobileLessonView - Two-round mobile lesson layout
  *
- * 모든 언어(C, Python, Java, JS, ML 등)에서 동일한 구조 사용
- * 슬라이딩 2페이지:
- * - 페이지 1: 설명 + 코드 + 출력
- * - 페이지 2: 설명 + 시각화 (메모리 or 플로우)
+ * Round 1 (설명): Code + explanation (resizable)
+ * Round 2 (시각화): Code + visualization (resizable)
+ *
+ * Uses shared LessonCodePanel for code editor + resizer.
  */
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Code2, Play, ChevronUp, ChevronDown, Layers } from 'lucide-react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
+import { Play, Layers } from 'lucide-react';
 import './MobileLessonView.css';
 
 import { useLessonVisualization } from '../../hooks/useLessonVisualization';
 import { useLessonTerminal } from '../../hooks/useLessonTerminal';
-import { LessonCodeEditor } from '../day/LessonCodeEditor';
+import { useMobileRoundNavigation } from '../../hooks/useMobileRoundNavigation';
+import { LessonCodePanel } from '../LessonCodePanel';
+import { StepExplanation } from '../day/StepExplanation';
+import { LessonBottomNav } from '../LessonBottomNav';
 
 import { LessonFlowVisualizer, LessonMemoryVisualizer } from '@/features/visualizers';
-import { MobileAIChatFAB } from './MobileAIChatFAB';
-import { MobileAIChatModal } from './MobileAIChatModal';
 import type { LessonStep } from '@/types';
 
 interface MobileLessonViewProps {
   code: string;
   steps: LessonStep[];
-  currentStepIndex: number;
   languageId: string;
   lessonId: string;
   lessonTitle?: string;
   lessonOrder?: number;
-  // 스텝 네비게이션
-  onPrevStep: () => void;
-  onNextStep: () => void;
   onQuiz?: () => void;
+  onStepChange?: (idx: number) => void;
 }
 
-// 언어별 코드 이름 반환
-function getCodeName(languageId: string, t: (key: string) => string): string {
-  if (languageId.includes('python')) return t('lesson.python_code');
-  if (languageId.includes('java')) return t('lesson.java_code');
-  if (languageId.includes('javascript') || languageId.includes('js')) return t('lesson.javascript_code');
-  return t('lesson.c_code');
-}
+const contentVariants = {
+  enter: { opacity: 0, y: 12 },
+  center: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
+  exit: { opacity: 0, y: -12, transition: { duration: 0.15 } },
+} as const;
 
 export function MobileLessonView({
   code,
   steps,
-  currentStepIndex,
   languageId,
   lessonId,
-  lessonTitle,
-  lessonOrder,
-  onPrevStep,
-  onNextStep,
   onQuiz,
+  onStepChange,
 }: MobileLessonViewProps) {
   const { t } = useTranslation();
-  // Swiper 상태
-  const [currentPage, setCurrentPage] = useState(0);
-  const swiperRef = useRef(null);
+  const [activeVizTab, setActiveVizTab] = useState<'flow' | 'memory'>('flow');
 
-  // 시각화 탭 전환 Variants (Flow ↔ Memory)
-  const visualizationVariants = {
-    hidden: { opacity: 0, scale: 0.95, y: 10 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { duration: 0.3, ease: 'easeOut' },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.95,
-      y: -10,
-      transition: { duration: 0.2 },
-    },
-  } as const;
-
-  const isAIChatOpenState = useState(false);
-  const [isAIChatOpen, setIsAIChatOpen] = isAIChatOpenState;
-
-  const [isExplanationCollapsed, setIsExplanationCollapsed] = useState(false);
-  const [activeVisualizationTab, setActiveVisualizationTab] = useState<'flow' | 'memory'>('flow');
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const currentStep = steps[currentStepIndex];
-  const codeName = getCodeName(languageId, t);
-  const isLastStep = currentStepIndex >= steps.length - 1;
-
-  // 데스크톱과 동일한 시각화 훅 사용
-  const { memoryState, changedBlocks } = useLessonVisualization(
+  // Two-round navigation
+  const nav = useMobileRoundNavigation({
     steps,
-    currentStepIndex
-  );
+    lessonId,
+    onStepChange,
+    onQuiz,
+  });
 
-  // 터미널 출력 (모바일은 누적 전체 표시 = diffMode: false)
+  const currentStep = steps[nav.actualStepIndex];
+
+  // Visualization data (with carry-forward)
+  const { memoryState, changedBlocks } = useLessonVisualization(steps, nav.actualStepIndex);
+
+  // Terminal output
   const terminalLines = useLessonTerminal({
     steps,
-    currentStepIndex,
+    currentStepIndex: nav.actualStepIndex,
     languageId,
     diffMode: false,
   });
 
-  // Memory 탭 표시 여부 (C만)
   const showMemoryTab = languageId === 'c';
+  const isExplanationRound = nav.round === 'explanation';
 
-
-
-  // 설명 텍스트에서 **굵게** 와 `코드`를 강조 처리
-  const formatExplanation = (text: string) => {
-    // **bold** 와 `code` 패턴 모두 처리
-    const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
-    return parts.map((part, i) => {
-      // **굵게** 처리 - 배경 + 진한 색상으로 확실히 구분
-      if (part.startsWith('**') && part.endsWith('**')) {
-        const keyword = part.slice(2, -2);
-        return (
-          <span key={i} className="font-bold px-1 rounded keyword-highlight">
-            {keyword}
-          </span>
-        );
+  // Bottom nav labels
+  const nextLabel = (() => {
+    if (isExplanationRound) {
+      if (nav.stepIndex >= steps.length - 1) {
+        return nav.hasVizRound ? t('lesson.visualization', '시각화') : t('lesson.quiz');
       }
-      // `코드` 처리
-      if (part.startsWith('`') && part.endsWith('`')) {
-        const code = part.slice(1, -1);
-        return (
-          <code key={i} className="font-mono font-bold px-1 rounded text-sm code-highlight">
-            {code}
-          </code>
-        );
-      }
-      return part;
-    });
-  };
-
-  // 설명 컴포넌트 (접기/펼치기 기능 포함)
-  const ExplanationSection = ({ canCollapse }: { canCollapse: boolean }) => (
-    <div className="h-full overflow-hidden flex flex-col explanation-container">
-      {/* 설명 헤더 (접기/펼치기 버튼 포함) */}
-      <div
-        className="flex items-center gap-1 px-1.5 py-1 explanation-header"
-      >
-        <span className="shrink-0 px-1 py-0.5 rounded text-white text-[9px] font-bold leading-none" style={{ fontFamily: 'var(--font-sans)', backgroundColor: 'var(--theme-explanation-text)' }}>
-          Step {currentStepIndex + 1}/{steps.length} · L{currentStep?.line || 1}
-        </span>
-        <span className="text-[10px] font-semibold text-amber-800">{t('quiz.explanation')}</span>
-        {canCollapse && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsExplanationCollapsed(!isExplanationCollapsed);
-            }}
-            className="ml-auto p-0.5 rounded hover:bg-amber-200 bg-opacity-50 transition-colors"
-          >
-            {isExplanationCollapsed ? (
-              <ChevronUp className="w-3 h-3 text-amber-700" />
-            ) : (
-              <ChevronDown className="w-3 h-3 text-amber-700" />
-            )}
-          </button>
-        )}
-      </div>
-      {/* 설명 내용 (접혔을 때 숨김) */}
-      {!isExplanationCollapsed && (
-        <div className="flex-1 p-1.5 overflow-y-auto">
-          <span className="text-xs leading-snug whitespace-pre-wrap" style={{ color: 'var(--theme-explanation-text)' }}>
-            {currentStep?.explanation ? formatExplanation(currentStep.explanation) : t('lesson.no_explanation')}
-          </span>
-          {currentStep?.tip && (
-            <div className="mt-1 pl-1 border-l-2 border-l-[var(--theme-memory-changed-border)]">
-              <span className="text-[10px]" style={{ color: 'var(--theme-memory-changed-border)' }}>💡 </span>
-              <span className="text-[10px] whitespace-pre-wrap" style={{ color: 'var(--theme-explanation-text)' }}>{currentStep.tip}</span>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+      return t('common.next');
+    }
+    // visualization round
+    if (nav.stepIndex >= nav.vizStepIndices.length - 1) {
+      return t('lesson.quiz');
+    }
+    return t('common.next');
+  })();
 
   return (
-    <div className="flex flex-col h-full relative">
-      {/* Swiper 컨테이너 */}
-      <Swiper
-        ref={swiperRef}
-        modules={[]}
-        slidesPerView={1}
-        onSlideChange={(swiper) => setCurrentPage(swiper.activeIndex)}
-        className="flex-1 w-full"
+    <div className="flex flex-col h-full">
+      <LessonCodePanel
+        code={code}
+        highlightLine={currentStep?.line || 1}
+        terminalLines={terminalLines}
+        defaultRatio={0.4}
+        style={{ flex: 1, minHeight: 0 }}
       >
-        {/* 페이지 1: 모든 정보 통합 (코드+출력+설명+시각화) */}
-        <SwiperSlide className="!flex !flex-col">
-          {(() => {
-            const lineCount = code.split('\n').length;
+        {/* Round indicator bar */}
+        <div className="flex items-center gap-2 px-3 py-1.5 shrink-0 bg-[var(--theme-lesson-panel-bg)] border-b border-[var(--theme-lesson-panel-border)]">
+          <div className="flex gap-1">
+            <span className={`round-tab px-2 py-0.5 text-[10px] font-bold rounded-full ${isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
+              {t('quiz.explanation', '설명')}
+            </span>
+            {nav.hasVizRound && (
+              <span className={`round-tab px-2 py-0.5 text-[10px] font-bold rounded-full ${!isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
+                {t('lesson.visualization', '시각화')}
+              </span>
+            )}
+          </div>
+          <span className="ml-auto text-[10px] font-semibold opacity-60">
+            {nav.stepIndex + 1}/{nav.totalInRound} · L{currentStep?.line || 1}
+          </span>
+        </div>
 
-            return (
-              <div className="h-auto min-h-full flex flex-col w-full overflow-y-auto">
-                {/* ========== 위쪽 영역 (고정 높이 45vh): 코드 + 설명 ========== */}
-                <div className="h-[45vh] shrink-0 flex flex-row min-h-[250px] w-full border-b border-[var(--theme-lesson-panel-border)]">
-                  {/* 왼쪽 (50%): 코드 + 터미널 오버레이 */}
-                  <div className="w-1/2 min-w-0 relative flex flex-col border-r border-[var(--theme-lesson-panel-border)]">
-                    <div
-                      className="flex-1 overflow-hidden flex flex-col bg-[var(--theme-lesson-panel-bg)]"
-                    >
-                      <div className="px-2 py-1 bg-gradient-to-r from-[#2d2d2d] to-[#1a1a1a] text-white text-[11px] font-semibold flex items-center gap-1.5 shrink-0">
-                        <Code2 className="w-3 h-3" />
-                        <span className="truncate">{codeName}</span>
-                        <span className="ml-auto opacity-60 text-[10px] whitespace-nowrap">{lineCount}줄</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto min-h-0">
-                        <LessonCodeEditor
-                          code={code}
-                          highlightLine={currentStep?.line || 1}
-                        />
-                      </div>
-                    </div>
-
-                    {/* 터미널 오버레이 */}
-                    {terminalLines.length > 0 && (
-                      <div className="absolute bottom-0 left-0 right-0 z-10 max-h-[30%] flex flex-col-reverse">
-                        <div
-                          className="overflow-hidden shadow-lg terminal-overlay-container border-t border-green-500/30"
-                        >
-                          <div className="px-2 py-1 overflow-y-auto max-h-[80px]">
-                            {terminalLines.map((line, idx) => (
-                              <div key={idx} className="text-xs font-mono leading-relaxed text-green-500 break-words whitespace-pre-wrap">
-                                <span className="text-emerald-500 opacity-70 mr-1">{'>'}</span>
-                                {line.content}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 오른쪽 (50%): 설명 */}
-                  <div className="w-1/2 min-w-0 h-full">
-                    <ExplanationSection canCollapse={false} />
-                  </div>
-                </div>
-
-                {/* ========== 아래쪽 영역 (Auto Height): 시각화 (Flow/Memory) ========== */}
-                <div className="w-full min-w-0 overflow-visible flex flex-col bg-[var(--theme-lesson-panel-bg)]">
-                  {/* 탭 헤더 */}
+        {/* Content area — scrollable */}
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <AnimatePresence mode="wait">
+            {isExplanationRound ? (
+              /* Round 1: Explanation */
+              <motion.div
+                key={`explanation-${nav.stepIndex}`}
+                variants={contentVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="p-3 explanation-container"
+              >
+                <StepExplanation
+                  explanation={currentStep?.explanation || ''}
+                  stepIndex={nav.stepIndex}
+                />
+              </motion.div>
+            ) : (
+              /* Round 2: Visualization */
+              <motion.div
+                key={`viz-${nav.stepIndex}`}
+                variants={contentVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="w-full"
+              >
+                {/* Flow/Memory tab switcher (C only) */}
+                {showMemoryTab && (
                   <div className="flex shrink-0 border-b border-[var(--theme-lesson-panel-border)]">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveVisualizationTab('flow');
-                      }}
-                      className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-all ${activeVisualizationTab === 'flow'
-                        ? 'viz-tab-active'
-                        : 'viz-tab-inactive'
-                        }`}
+                      onClick={() => setActiveVizTab('flow')}
+                      className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-all ${activeVizTab === 'flow' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
                     >
                       <Play className="w-3 h-3" />
                       Flow
                     </button>
-                    {showMemoryTab && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveVisualizationTab('memory');
-                        }}
-                        className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVisualizationTab === 'memory'
-                          ? 'viz-tab-active'
-                          : 'viz-tab-inactive'
-                          }`}
-                      >
-                        <Layers className="w-3 h-3" />
-                        Memory
-                      </button>
+                    <button
+                      onClick={() => setActiveVizTab('memory')}
+                      className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+                    >
+                      <Layers className="w-3 h-3" />
+                      Memory
+                    </button>
+                  </div>
+                )}
+
+                {/* Visualization content */}
+                <div className="w-full min-h-[200px] px-0 py-2">
+                  <div className="w-full viz-zoom-container">
+                    {activeVizTab === 'flow' || !showMemoryTab ? (
+                      <LessonFlowVisualizer
+                        step={currentStep}
+                        prevStep={nav.actualStepIndex > 0 ? steps[nav.actualStepIndex - 1] : null}
+                        language={languageId === 'python-practical' ? 'python' : (languageId as 'c' | 'python' | 'java')}
+                        fullCode={code}
+                        theme="light"
+                        memoryState={memoryState ? {
+                          stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
+                          heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' })),
+                          frames: memoryState.frames.map(f => ({ ...f, name: f.name || '?' })),
+                        } : undefined}
+                      />
+                    ) : (
+                      <LessonMemoryVisualizer
+                        step={currentStep}
+                        language={languageId}
+                        memoryState={memoryState}
+                        changedBlocks={changedBlocks}
+                      />
                     )}
                   </div>
-
-                  {/* 시각화 콘텐츠 (zoom 0.55배 축소, 스크롤 없이 내용물 크기에 따라 높이 자동 조절) */}
-                  <div className="w-full min-h-[300px] px-0 py-2">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={activeVisualizationTab}
-                        variants={visualizationVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        className="w-full viz-zoom-container"
-                      >
-                        {activeVisualizationTab === 'flow' ? (
-                          <LessonFlowVisualizer
-                            step={currentStep}
-                            prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] : null}
-                            language={languageId === 'python-practical' ? 'python' : (languageId as 'c' | 'python' | 'java')}
-                            fullCode={code}
-                            theme="light"
-                            memoryState={memoryState ? {
-                              stack: memoryState.stack.map(s => ({ ...s, name: s.name || '?' })),
-                              heap: memoryState.heap.map(h => ({ ...h, name: h.name || '?' })),
-                              frames: memoryState.frames.map(f => ({ ...f, name: f.name || '?' }))
-                            } : undefined}
-                          />
-                        ) : (
-                          <LessonMemoryVisualizer
-                            step={currentStep}
-                            language={languageId}
-                            memoryState={memoryState}
-                            changedBlocks={changedBlocks}
-                          />
-                        )}
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
                 </div>
-              </div>
-            );
-          })()}
-        </SwiperSlide>
-      </Swiper>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </LessonCodePanel>
 
-      {/* AI Chat FAB + Modal */}
-      <MobileAIChatFAB
-        isOpen={isAIChatOpen}
-        onClick={() => setIsAIChatOpen(!isAIChatOpen)}
-      />
-      <MobileAIChatModal
-        isOpen={isAIChatOpen}
-        onClose={() => setIsAIChatOpen(false)}
-        context={{
-          courseDay: lessonOrder,
-          topic: lessonTitle,
-          code: code,
-          currentLine: currentStep?.line,
-        }}
-        lessonId={lessonId}
+      {/* Bottom navigation — fixed at bottom */}
+      <LessonBottomNav
+        onPrev={nav.goPrev}
+        onNext={nav.goNext}
+        canGoPrev={nav.canGoPrev}
+        nextLabel={nextLabel}
       />
     </div>
   );

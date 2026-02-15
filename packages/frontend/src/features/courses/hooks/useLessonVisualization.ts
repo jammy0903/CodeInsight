@@ -50,13 +50,13 @@ function adaptMemoryState(memoryState: StepMemoryState): { stack: MemoryBlock[],
 }
 
 // 시각화 데이터 존재 여부 확인
-const VIZ_DATA_FIELDS = [
+export const VIZ_DATA_FIELDS = [
   'stack', 'memoryState', 'scopeState', 'eventLoopState',
   'promiseState', 'thisState', 'prototypeState', 'callStackState',
   'pythonMemoryState', 'pyNames', 'javaMemoryState', 'memoryChanges',
 ] as const;
 
-function hasVisualizationData(step: LessonStep): boolean {
+export function hasVisualizationData(step: LessonStep): boolean {
   return VIZ_DATA_FIELDS.some(field => (step as any)[field] != null);
 }
 
