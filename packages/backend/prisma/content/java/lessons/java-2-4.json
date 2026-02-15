@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "HashMap 생성",
-        "explanation": "**실행 순서:**\n1. `new HashMap<>()` 호출.\n2. Heap에 HashMap 객체 생성.\n\n**HashMap의 정책:** \"뭐든 다 받아줍니다.\"\n`null` 키도, `null` 값도 저장할 수 있는 관대한 친구입니다. 가장 흔하게 쓰이는 Map 구현체죠.",
+        "explanation": "**실행 순서:**\n1. `new HashMap<>()` 호출.\n2. Heap에 HashMap 객체 생성.\n\n**HashMap의 정책:** \"뭐든 다 받아줍니다.\"\n`null` 키도, `null` 값도 저장할 수 있는 관대한 친구입니다.\n가장 흔하게 쓰이는 Map 구현체죠.",
         "visualizationType": "javaMemory",
         "code": "Map<String, Integer> hashMap = new HashMap<>();",
         "javaMemoryState": {
@@ -85,7 +85,7 @@
       },
       {
         "title": "ConcurrentHashMap에 null 넣기 (NPE!)",
-        "explanation": "**실행 순서:**\n1. `put` 메서드 진입.\n2. Key/Value null 체크.\n3. `null` 발견 -> **NPE 발생**.\n\n**왜 이렇게 깐깐할까?**\n멀티스레드 환경에서 `get(key)`가 `null`을 반환했을 때 모호하기 때문입니다. 누군가 방금 `remove`해서 없는 건지, 원래 `null`이었는지 확실하지 않으면 동시성 버그가 생기기 쉽습니다.",
+        "explanation": "**실행 순서:**\n1. `put` 메서드 진입.\n2. Key/Value null 체크.\n3. `null` 발견 -> **NPE 발생**.\n\n**왜 이렇게 깐깐할까?**\n멀티스레드 환경에서 `get(key)`가 `null`을 반환했을 때 모호하기 때문입니다.\n누군가 방금 `remove`해서 없는 건지, 원래 `null`이었는지 확실하지 않으면 동시성 버그가 생기기 쉽습니다.",
         "keyInsight": "ConcurrentHashMap: null 절대 불가!",
         "visualizationType": "javaMemory",
         "code": "concurrentMap.put(\"key\", null);",
@@ -164,13 +164,13 @@
       "Hashtable"
     ],
     "correctIndex": 0,
-    "explanation": "HashMap만 null key를 허용합니다. TreeMap은 정렬해야 해서, ConcurrentHashMap과 Hashtable은 설계상 허용하지 않습니다."
+    "explanation": "HashMap만 null key를 허용합니다.\nTreeMap은 정렬해야 해서, ConcurrentHashMap과 Hashtable은 설계상 허용하지 않습니다."
   },
   "misconceptions": [
     {
       "wrong": "모든 Map은 null을 허용한다",
       "correct": "구현체마다 다릅니다!",
-      "why": "`HashMap`, `LinkedHashMap`은 허용하지만, `TreeMap`, `Hashtable`, `ConcurrentHashMap`은 Key 또는 Value에 null을 허용하지 않습니다. API 문서를 꼭 확인해야 합니다."
+      "why": "`HashMap`, `LinkedHashMap`은 허용하지만, `TreeMap`, `Hashtable`, `ConcurrentHashMap`은 Key 또는 Value에 null을 허용하지 않습니다.\nAPI 문서를 꼭 확인해야 합니다."
     },
     {
       "wrong": "List.of(null)은 [null]이 된다",

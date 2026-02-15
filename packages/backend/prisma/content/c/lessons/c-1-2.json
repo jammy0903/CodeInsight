@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 표준 입출력 도구 상자(`stdio.h`)를 가져옵니다. C에서는 이 한 줄이 없으면 `printf`를 쓸 수 없습니다.",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 표준 입출력 도구 상자(`stdio.h`)를 가져옵니다.\nC에서는 이 한 줄이 없으면 `printf`를 쓸 수 없습니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\n모든 C 프로그램의 실행 시작점입니다. `main`이 호출되면 메모리의 스택 영역에 **main의 스택 프레임**(전용 작업 공간)이 만들어집니다. 앞 레슨에서 배웠듯이, 이 공간 안에 `main` 함수에서 사용할 변수들이 차곡차곡 저장됩니다.",
+        "explanation": "**`int main() {`**\n\n모든 C 프로그램의 실행 시작점입니다.\n`main`이 호출되면 메모리의 스택 영역에 **main의 스택 프레임**(전용 작업 공간)이 만들어집니다.\n앞 레슨에서 배웠듯이, 이 공간 안에 `main` 함수에서 사용할 변수들이 차곡차곡 저장됩니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -44,7 +44,7 @@
       },
       {
         "title": "선언만 한 경우 (쓰레기 값)",
-        "explanation": "**`int level;`**\n\n정수형 변수 `level`을 위한 메모리 공간(4바이트)만 확보합니다. **값은 넣지 않았습니다.**\n\n이 상태에서 `level`을 읽으면 어떻게 될까요? 앞 레슨에서 배웠던 **쓰레기 값(Garbage Value)**이 나옵니다! 이전에 다른 프로그램이 이 메모리 자리에 남긴 의미 없는 데이터가 그대로 있기 때문입니다.\n\n오른쪽 메모리 시각화에서 `level`의 값이 `???`로 표시된 것을 확인하세요.",
+        "explanation": "**`int level;`**\n\n정수형 변수 `level`을 위한 메모리 공간(4바이트)만 확보합니다.\n**값은 넣지 않았습니다.**\n\n이 상태에서 `level`을 읽으면 어떻게 될까요? 앞 레슨에서 배웠던 **쓰레기 값(Garbage Value)**이 나옵니다! 이전에 다른 프로그램이 이 메모리 자리에 남긴 의미 없는 데이터가 그대로 있기 때문입니다.\n\n오른쪽 메모리 시각화에서 `level`의 값이 `???`로 표시된 것을 확인하세요.",
         "visualizationType": "cMemory",
         "code": "int level;",
         "stack": [
@@ -65,7 +65,7 @@
       },
       {
         "title": "값 할당 (Assignment)",
-        "explanation": "**`level = 1;`**\n\n드디어 `level` 변수에 `1`이라는 값을 넣습니다. 쓰레기 값이 `1`로 **덮어씌워집니다**.\n\n여기서 `=`는 수학의 '같다'가 아니라 **대입 연산자**입니다. \"오른쪽 값을 왼쪽 변수에 넣어라\"라는 뜻입니다.\n\n**문제점**: `int level;` 선언부터 `level = 1;` 할당까지의 사이 구간에서 `level`은 쓰레기 값을 가지고 있었습니다. 만약 이 사이에 실수로 `level`을 읽었다면 버그가 발생했을 것입니다. 그래서 `int level = 1;`처럼 **선언과 동시에 초기화**하는 것이 더 안전합니다.",
+        "explanation": "**`level = 1;`**\n\n드디어 `level` 변수에 `1`이라는 값을 넣습니다.\n쓰레기 값이 `1`로 **덮어씌워집니다**.\n\n여기서 `=`는 수학의 '같다'가 아니라 **대입 연산자**입니다.\n\"오른쪽 값을 왼쪽 변수에 넣어라\"라는 뜻입니다.\n\n**문제점**: `int level;` 선언부터 `level = 1;` 할당까지의 사이 구간에서 `level`은 쓰레기 값을 가지고 있었습니다.\n만약 이 사이에 실수로 `level`을 읽었다면 버그가 발생했을 것입니다.\n그래서 `int level = 1;`처럼 **선언과 동시에 초기화**하는 것이 더 안전합니다.",
         "visualizationType": "cMemory",
         "code": "level = 1;",
         "stack": [
@@ -86,7 +86,7 @@
       },
       {
         "title": "변수 값 출력",
-        "explanation": "**`printf(\"Score: %d, Level: %d\\n\", score, level);`**\n\n`printf`의 작동 원리를 자세히 봅시다:\n- `%d`는 **자리 표시자(placeholder)**입니다. \"여기에 정수를 넣어줘\"라는 뜻입니다\n- 첫 번째 `%d` → `score`의 값(100)이 들어감\n- 두 번째 `%d` → `level`의 값(1)이 들어감\n- `\\n`은 **줄바꿈** 문자입니다\n\n결과: `Score: 100, Level: 1`이 화면에 출력됩니다.",
+        "explanation": "**`printf(\"Score: %d, Level: %d\\n\", score, level);`**\n\n`printf`의 작동 원리를 자세히 봅시다:\n- `%d`는 **자리 표시자(placeholder)**입니다.\n\"여기에 정수를 넣어줘\"라는 뜻입니다\n- 첫 번째 `%d` → `score`의 값(100)이 들어감\n- 두 번째 `%d` → `level`의 값(1)이 들어감\n- `\\n`은 **줄바꿈** 문자입니다\n\n결과: `Score: 100, Level: 1`이 화면에 출력됩니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Score: %d, Level: %d\\n\", score, level);",
         "stack": [
@@ -107,7 +107,7 @@
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`**\n\n`main` 함수가 끝나면서 두 가지 일이 벌어집니다:\n\n1. **값 반환**: 운영체제에 `0`을 돌려줍니다. `0`은 관례적으로 **\"프로그램이 정상적으로 끝났다\"**는 신호입니다. (0이 아닌 값은 에러를 의미합니다)\n\n2. **스택 프레임 해제**: main의 스택 프레임(작업 공간)이 통째로 사라집니다. 그 안에 있던 `score`, `level` 변수도 **함께 소멸**합니다.\n\n이처럼 함수 안에서 만든 변수(지역 변수)는 함수가 끝나면 자동으로 사라집니다. 이것이 **스택 메모리의 핵심 특성**입니다.",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 끝나면서 두 가지 일이 벌어집니다:\n\n1. **값 반환**: 운영체제에 `0`을 돌려줍니다.\n`0`은 관례적으로 **\"프로그램이 정상적으로 끝났다\"**는 신호입니다.\n(0이 아닌 값은 에러를 의미합니다)\n\n2. **스택 프레임 해제**: main의 스택 프레임(작업 공간)이 통째로 사라집니다.\n그 안에 있던 `score`, `level` 변수도 **함께 소멸**합니다.\n\n이처럼 함수 안에서 만든 변수(지역 변수)는 함수가 끝나면 자동으로 사라집니다.\n이것이 **스택 메모리의 핵심 특성**입니다.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -124,7 +124,7 @@
       "컴퓨터가 재부팅된다"
     ],
     "correctIndex": 2,
-    "explanation": "대부분의 최신 컴파일러는 경고(Warning)를 주지만, 실행은 됩니다. 그리고 예측 불가능한 동작(Undefined Behavior)을 유발합니다."
+    "explanation": "대부분의 최신 컴파일러는 경고(Warning)를 주지만, 실행은 됩니다.\n그리고 예측 불가능한 동작(Undefined Behavior)을 유발합니다."
   },
   "misconceptions": [
     {

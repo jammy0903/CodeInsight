@@ -16,7 +16,7 @@
       },
       {
         "title": "콜백될 함수 정의",
-        "explanation": "**`void greet() { ... }`**\n\n'Hello!'를 출력하는 간단한 `greet` 함수입니다. 이 함수가 나중에 다른 함수의 인자로 전달되어 '콜백(callback)'될 대상입니다.",
+        "explanation": "**`void greet() { ... }`**\n\n'Hello!'를 출력하는 간단한 `greet` 함수입니다.\n이 함수가 나중에 다른 함수의 인자로 전달되어 '콜백(callback)'될 대상입니다.",
         "visualizationType": "cMemory",
         "code": "void greet() {",
         "highlightOffset": [
@@ -27,7 +27,7 @@
       },
       {
         "title": "콜백을 받는 함수 정의",
-        "explanation": "**`void execute(void (*func)()) { ... }`**\n\n`execute` 함수는 '인자가 없고 반환값도 없는 함수를 가리키는 포인터'(`void (*func)()`)를 매개변수로 받습니다. 즉, '실행할 함수' 자체를 인자로 받는 것입니다.",
+        "explanation": "**`void execute(void (*func)()) { ... }`**\n\n`execute` 함수는 '인자가 없고 반환값도 없는 함수를 가리키는 포인터'(`void (*func)()`)를 매개변수로 받습니다.\n즉, '실행할 함수' 자체를 인자로 받는 것입니다.",
         "visualizationType": "cMemory",
         "code": "void execute(void (*func)()) {",
         "highlightOffset": [
@@ -38,7 +38,7 @@
       },
       {
         "title": "main에서 execute 호출 - 함수를 인자로 전달",
-        "explanation": "**`execute(greet);`**\n\nC 프로그램은 `main`에서 시작합니다. `execute` 함수를 호출하면서, 인자로 `greet` **함수 자체**(정확히는 함수의 주소 0xCODE1)를 전달합니다.\n\n**왜 이 순서인가?** 함수 이름은 함수 포인터로 자동 변환됩니다. `execute`는 이제 `greet`을 받아 실행할 수 있습니다.\n\n**비유**: 친구에게 \"나중에 밥 먹을 때(execute) 나도 불러줘(greet 연락처 전달)\"라고 부탁하는 상황입니다.",
+        "explanation": "**`execute(greet);`**\n\nC 프로그램은 `main`에서 시작합니다.\n`execute` 함수를 호출하면서, 인자로 `greet` **함수 자체**(정확히는 함수의 주소 0xCODE1)를 전달합니다.\n\n**왜 이 순서인가?** 함수 이름은 함수 포인터로 자동 변환됩니다.\n`execute`는 이제 `greet`을 받아 실행할 수 있습니다.\n\n**비유**: 친구에게 \"나중에 밥 먹을 때(execute) 나도 불러줘(greet 연락처 전달)\"라고 부탁하는 상황입니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -52,14 +52,14 @@
       },
       {
         "title": "콜백 실행 준비",
-        "explanation": "**`printf(\"Executing callback...\\n\");`**\n\n`execute` 함수 내부의 코드가 실행됩니다. 콜백을 실행하기 직전의 메시지를 출력합니다.",
+        "explanation": "**`printf(\"Executing callback...\\n\");`**\n\n`execute` 함수 내부의 코드가 실행됩니다.\n콜백을 실행하기 직전의 메시지를 출력합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Executing callback...\\n\");",
         "stdout": "Executing callback..."
       },
       {
         "title": "콜백 함수 호출!",
-        "explanation": "**`func();`**\n\n`func` 포인터에 저장된 주소(`greet` 함수의 주소)로 점프하여 함수를 실행합니다. 이 순간 `greet` 함수 내부의 코드가 실행됩니다.",
+        "explanation": "**`func();`**\n\n`func` 포인터에 저장된 주소(`greet` 함수의 주소)로 점프하여 함수를 실행합니다.\n이 순간 `greet` 함수 내부의 코드가 실행됩니다.",
         "visualizationType": "cMemory",
         "code": "func();",
         "stdout": "Executing callback...\nHello!"
@@ -83,12 +83,12 @@
       "모든 변수가 전역 변수가 된다."
     ],
     "correctIndex": 1,
-    "explanation": "이를 '의존성 주입(Dependency Injection)'과 비슷한 효과로 볼 수 있습니다. 함수 내부 로직을 변경하지 않고도 동작을 바꿀 수 있습니다."
+    "explanation": "이를 '의존성 주입(Dependency Injection)'과 비슷한 효과로 볼 수 있습니다.\n함수 내부 로직을 변경하지 않고도 동작을 바꿀 수 있습니다."
   },
   "misconceptions": [
     {
       "wrong": "콜백은 이벤트 리스너(클릭 등)에서만 쓴다.",
-      "correct": "모든 '동작의 매개변수화'가 콜백입니다. 정렬, 필터링, 트리 순회 등 범용 알고리즘에 필수적입니다.",
+      "correct": "모든 '동작의 매개변수화'가 콜백입니다.\n정렬, 필터링, 트리 순회 등 범용 알고리즘에 필수적입니다.",
       "why": "Web 개발의 영향으로 비동기 이벤트 핸들러만 콜백이라고 생각하기 쉽습니다."
     }
   ],

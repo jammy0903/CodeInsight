@@ -25,7 +25,7 @@
       },
       {
         "title": "단축 평가 (Short-circuit Evaluation)",
-        "explanation": "**실행 순서:**\n1. `str != null` 검사 -> **false** (만약 null이라면).\n2. **즉시 중단** (뒤의 `str.length()` 실행 안 함).\n\n**논리 연산의 마법:** `&&`(AND) 연산자는 왼쪽 조건이 `false`면 오른쪽은 확인조차 하지 않습니다. 먼저 `str != null`을 검사하여 `null`이면, 뒤의 `str.length()`는 실행되지 않아 `NullPointerException`을 안전하게 피합니다.",
+        "explanation": "**실행 순서:**\n1. `str != null` 검사 -> **false** (만약 null이라면).\n2. **즉시 중단** (뒤의 `str.length()` 실행 안 함).\n\n**논리 연산의 마법:** `&&`(AND) 연산자는 왼쪽 조건이 `false`면 오른쪽은 확인조차 하지 않습니다.\n먼저 `str != null`을 검사하여 `null`이면, 뒤의 `str.length()`는 실행되지 않아 `NullPointerException`을 안전하게 피합니다.",
         "keyInsight": "&& 단축 평가: 앞이 false면 뒤는 실행 안 함",
         "visualizationType": "javaMemory",
         "code": "if (str != null && str.length() > 0) {",
@@ -36,7 +36,7 @@
       },
       {
         "title": "조건부 실행",
-        "explanation": "**실행 순서:**\n1. 만약 앞의 `if` 조건이 `true`라면...\n2. `println(str)` 실행.\n\n앞선 `if`문의 조건(`str != null && str.length() > 0`)이 모두 `true`일 경우에만 이 라인이 실행됩니다. `str`이 유효한 문자열임이 보장된 상태에서 안전하게 출력합니다.",
+        "explanation": "**실행 순서:**\n1. 만약 앞의 `if` 조건이 `true`라면...\n2. `println(str)` 실행.\n\n앞선 `if`문의 조건(`str != null && str.length() > 0`)이 모두 `true`일 경우에만 이 라인이 실행됩니다.\n`str`이 유효한 문자열임이 보장된 상태에서 안전하게 출력합니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(str);",
         "javaMemoryState": {
@@ -95,7 +95,7 @@
       },
       {
         "title": "Objects.requireNonNullElse",
-        "explanation": "**실행 순서:**\n1. `Objects.requireNonNullElse` 호출.\n2. 내부적으로 null 체크.\n3. `null`이면 `\"default\"` 반환.\n4. `value`에 할당.\n\nJava 9부터 제공되는 더 읽기 좋은 방식입니다. 삼항 연산자와 기능은 같지만, \"null이 아니면 이것, 아니면 저것\"이라는 의도가 명확히 드러납니다.",
+        "explanation": "**실행 순서:**\n1. `Objects.requireNonNullElse` 호출.\n2. 내부적으로 null 체크.\n3. `null`이면 `\"default\"` 반환.\n4. `value`에 할당.\n\nJava 9부터 제공되는 더 읽기 좋은 방식입니다.\n삼항 연산자와 기능은 같지만, \"null이 아니면 이것, 아니면 저것\"이라는 의도가 명확히 드러납니다.",
         "keyInsight": "Java 9+: requireNonNullElse 사용",
         "visualizationType": "javaMemory",
         "code": "String value = Objects.requireNonNullElse(str, \"default\");",
@@ -122,13 +122,13 @@
       "문제없음"
     ],
     "correctIndex": 1,
-    "explanation": "순서가 잘못되었습니다. str.length()가 먼저 실행되므로 str이 null이면 NPE가 발생합니다. null 체크를 무조건 맨 앞에 둬야 합니다."
+    "explanation": "순서가 잘못되었습니다.\nstr.length()가 먼저 실행되므로 str이 null이면 NPE가 발생합니다.\nnull 체크를 무조건 맨 앞에 둬야 합니다."
   },
   "misconceptions": [
     {
       "wrong": "null 체크 순서는 상관없다",
-      "correct": "순서가 생명입니다. 무조건 `null` 체크가 가장 앞에(왼쪽) 와야 합니다.",
-      "why": "오른쪽부터 체크하면 이미 `null.메서드()`가 실행되어 NPE가 터져버립니다. `&&`는 왼쪽부터 읽다가 `false`가 나오면 즉시 멈춥니다(단축 평가)."
+      "correct": "순서가 생명입니다.\n무조건 `null` 체크가 가장 앞에(왼쪽) 와야 합니다.",
+      "why": "오른쪽부터 체크하면 이미 `null.메서드()`가 실행되어 NPE가 터져버립니다.\n`&&`는 왼쪽부터 읽다가 `false`가 나오면 즉시 멈춥니다(단축 평가)."
     }
   ],
   "keyTakeaway": "null 체크는 항상 맨 앞에. Objects 유틸리티를 활용하면 코드가 깔끔해집니다."

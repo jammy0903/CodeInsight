@@ -28,7 +28,7 @@
       },
       {
         "title": "와일드카드 메서드 정의",
-        "explanation": "**실행 순서:**\n1. `sum` 메서드가 메모리에 로드됩니다.\n2. `List<? extends Number>`는 `Number`와 그 자식들만 받겠다는 선언입니다.\n\n**문지기 역할:**\n\"Number 패밀리만 들어오세요!\"라고 문에 써붙인 것과 같아요. String 같은 건 절대 못 들어오죠.",
+        "explanation": "**실행 순서:**\n1. `sum` 메서드가 메모리에 로드됩니다.\n2. `List<? extends Number>`는 `Number`와 그 자식들만 받겠다는 선언입니다.\n\n**문지기 역할:**\n\"Number 패밀리만 들어오세요!\"라고 문에 써붙인 것과 같아요.\nString 같은 건 절대 못 들어오죠.",
         "visualizationType": "javaMemory",
         "code": "public static double sum(List<? extends Number> list) {",
         "highlightOffset": [
@@ -163,7 +163,7 @@
       },
       {
         "title": "sum(ints) 호출",
-        "explanation": "**실행 순서:**\n1. `sum(ints)`를 호출합니다.\n2. `ints`는 `Integer` 리스트지만, `Integer`는 `Number`의 자식이므로 와일드카드(`? extends Number`)에 통과합니다.\n3. 합계 3.0이 반환되어 출력됩니다.\n\n**유연함:**\n`List<Integer>`도 OK, `List<Double>`도 OK. 이것이 프로그래머들이 와일드카드를 사랑하는 이유입니다!",
+        "explanation": "**실행 순서:**\n1. `sum(ints)`를 호출합니다.\n2. `ints`는 `Integer` 리스트지만, `Integer`는 `Number`의 자식이므로 와일드카드(`? extends Number`)에 통과합니다.\n3. 합계 3.0이 반환되어 출력됩니다.\n\n**유연함:**\n`List<Integer>`도 OK, `List<Double>`도 OK.\n이것이 프로그래머들이 와일드카드를 사랑하는 이유입니다!",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"Sum Ints: \" + sum(ints));",
         "highlightOffset": [
@@ -229,12 +229,12 @@
       "Integer만 가능"
     ],
     "correctIndex": 1,
-    "explanation": "`super`는 하한 경계(Lower Bound)를 설정합니다. Integer 본인이나 그 상위 부모(Number, Object 등) 타입의 리스트를 의미하며, 주로 데이터를 저장(Write/Consume)할 때 사용됩니다."
+    "explanation": "`super`는 하한 경계(Lower Bound)를 설정합니다.\nInteger 본인이나 그 상위 부모(Number, Object 등) 타입의 리스트를 의미하며, 주로 데이터를 저장(Write/Consume)할 때 사용됩니다."
   },
   "misconceptions": [
     {
       "wrong": "List<Object>는 List<String>의 부모다.",
-      "correct": "아닙니다! 제네릭은 불공변(Invariant)입니다. `List<Object>` 변수에 `List<String>`을 대입할 수 없습니다. 그래서 와일드카드(`? extends Object`)가 필요한 것입니다.",
+      "correct": "아닙니다! 제네릭은 불공변(Invariant)입니다.\n`List<Object>` 변수에 `List<String>`을 대입할 수 없습니다.\n그래서 와일드카드(`? extends Object`)가 필요한 것입니다.",
       "why": "만약 대입이 되면, String 리스트에 Integer를 넣는 사고가 발생할 수 있기 때문입니다."
     }
   ],

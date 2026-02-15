@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "main 메서드 시작",
-        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다. 여기서 새로운 일꾼(쓰레드)을 고용하고 일을 시킵니다.",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다.\n여기서 새로운 일꾼(쓰레드)을 고용하고 일을 시킵니다.",
         "visualizationType": "memory",
         "code": "public static void main(String[] args) {",
         "memoryState": {
@@ -41,7 +41,7 @@
       },
       {
         "title": "일꾼 객체 생성",
-        "explanation": "설계도를 바탕으로 실제 `MyWorker` 일꾼 객체를 생성합니다. 아직 일을 시작한 것은 아니고, '준비' 상태(NEW)입니다.",
+        "explanation": "설계도를 바탕으로 실제 `MyWorker` 일꾼 객체를 생성합니다.\n아직 일을 시작한 것은 아니고, '준비' 상태(NEW)입니다.",
         "keyInsight": "new Thread() = 일꾼 준비 완료 (Ready)",
         "visualizationType": "memory",
         "code": "MyWorker worker = new MyWorker();",
@@ -64,7 +64,7 @@
       },
       {
         "title": "작업 시작 (start)",
-        "explanation": "`start()`를 호출하면 JVM에게 새로운 실행 흐름을 만들어달라고 요청합니다. JVM은 새 쓰레드를 생성하고 독립적인 스택을 할당한 뒤, 그 위에서 `run()` 메서드를 실행시킵니다.",
+        "explanation": "`start()`를 호출하면 JVM에게 새로운 실행 흐름을 만들어달라고 요청합니다.\nJVM은 새 쓰레드를 생성하고 독립적인 스택을 할당한 뒤, 그 위에서 `run()` 메서드를 실행시킵니다.",
         "keyInsight": "start()는 새로운 스택 프레임을 생성함",
         "visualizationType": "memory",
         "code": "worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.",
@@ -86,7 +86,7 @@
       },
       {
         "title": "메인 쓰레드 계속 실행",
-        "explanation": "`start()`는 작업을 '요청'만 하고 바로 리턴됩니다. 따라서 `main` 쓰레드는 멈추지 않고 자기 할 일을 계속합니다. 어떤 메시지가 먼저 출력될지는 OS의 스케줄링에 따라 달라지며, 실행할 때마다 결과가 다를 수 있습니다.",
+        "explanation": "`start()`는 작업을 '요청'만 하고 바로 리턴됩니다.\n따라서 `main` 쓰레드는 멈추지 않고 자기 할 일을 계속합니다.\n어떤 메시지가 먼저 출력될지는 OS의 스케줄링에 따라 달라지며, 실행할 때마다 결과가 다를 수 있습니다.",
         "keyInsight": "두 쓰레드는 서로를 기다려주지 않고 각자 실행됩니다.",
         "visualizationType": "memory",
         "code": "System.out.println(\"메인 일꾼도 자기 일을 합니다.\");",
@@ -109,12 +109,12 @@
       "begin()"
     ],
     "correctIndex": 1,
-    "explanation": "run()을 직접 호출하면 그냥 현재 쓰레드에서 메서드를 실행할 뿐입니다. 새로운 실행 흐름을 만들려면 반드시 start()를 써야 합니다."
+    "explanation": "run()을 직접 호출하면 그냥 현재 쓰레드에서 메서드를 실행할 뿐입니다.\n새로운 실행 흐름을 만들려면 반드시 start()를 써야 합니다."
   },
   "misconceptions": [
     {
       "wrong": "run()을 호출하면 멀티쓰레드로 동작한다.",
-      "correct": "아니요! run()은 그냥 일반 메서드 호출입니다. start()만이 새로운 쓰레드를 탄생시킵니다.",
+      "correct": "아니요! run()은 그냥 일반 메서드 호출입니다.\nstart()만이 새로운 쓰레드를 탄생시킵니다.",
       "why": "start() 메서드 내부에서 네이티브 코드를 호출해 OS 수준의 쓰레드를 생성하기 때문입니다."
     }
   ],

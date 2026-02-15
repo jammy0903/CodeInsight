@@ -42,7 +42,7 @@
       },
       {
         "title": "제너레이터 객체 생성",
-        "explanation": "`counter = counter_generator(0, 3)`\n제너레이터 함수를 호출하면, 코드가 바로 실행되는 대신 '제너레이터 객체'가 생성되어 반환됩니다. 아직 함수 안의 코드는 실행되지 않았습니다.\n\n**왜 이 순서인가?**\n제너레이터는 호출 시 실행되지 않고, 실행을 예약한 객체를 반환합니다.\n\n**실행 순서:**\n1. `counter_generator(0, 3)` 호출.\n2. 제너레이터 객체(0x2000) 생성.\n3. `counter` 변수에 할당.",
+        "explanation": "`counter = counter_generator(0, 3)`\n제너레이터 함수를 호출하면, 코드가 바로 실행되는 대신 '제너레이터 객체'가 생성되어 반환됩니다.\n아직 함수 안의 코드는 실행되지 않았습니다.\n\n**왜 이 순서인가?**\n제너레이터는 호출 시 실행되지 않고, 실행을 예약한 객체를 반환합니다.\n\n**실행 순서:**\n1. `counter_generator(0, 3)` 호출.\n2. 제너레이터 객체(0x2000) 생성.\n3. `counter` 변수에 할당.",
         "visualizationType": "pythonMemory",
         "code": "counter = counter_generator(0, 3)",
         "pythonMemoryState": {
@@ -93,7 +93,7 @@
       },
       {
         "title": "for 루프 시작",
-        "explanation": "`for num in counter:`\n`for` 루프가 시작됩니다. 내부적으로 제너레이터의 `__next__`를 호출합니다.\n\n**왜 이 순서인가?**\n제너레이터로부터 값을 하나씩 꺼내기 시작합니다.\n\n**실행 순서:**\n1. `counter`의 반복자(자기 자신)를 얻습니다.\n2. 첫 번째 `__next__()`를 호출합니다.",
+        "explanation": "`for num in counter:`\n`for` 루프가 시작됩니다.\n내부적으로 제너레이터의 `__next__`를 호출합니다.\n\n**왜 이 순서인가?**\n제너레이터로부터 값을 하나씩 꺼내기 시작합니다.\n\n**실행 순서:**\n1. `counter`의 반복자(자기 자신)를 얻습니다.\n2. 첫 번째 `__next__()`를 호출합니다.",
         "visualizationType": "pythonMemory",
         "code": "for num in counter:",
         "pythonMemoryState": {
@@ -277,7 +277,7 @@
       },
       {
         "title": "current 증가 (1)",
-        "explanation": "`current += 1`\n제너레이터가 재개되어 yield 다음 라인부터 실행합니다. current가 1이 됩니다.\n\n**왜 이 순서인가?**\n`for` 루프가 다음 값을 요청(`__next__`)하면 멈췄던 곳 바로 다음부터 실행을 재개합니다.\n\n**실행 순서:**\n1. 제너레이터 실행 재개(Resume).\n2. `current` 1 증가.",
+        "explanation": "`current += 1`\n제너레이터가 재개되어 yield 다음 라인부터 실행합니다.\ncurrent가 1이 됩니다.\n\n**왜 이 순서인가?**\n`for` 루프가 다음 값을 요청(`__next__`)하면 멈췄던 곳 바로 다음부터 실행을 재개합니다.\n\n**실행 순서:**\n1. 제너레이터 실행 재개(Resume).\n2. `current` 1 증가.",
         "visualizationType": "pythonMemory",
         "code": "current += 1",
         "pythonMemoryState": {
@@ -605,7 +605,7 @@
     {
       "wrong": "제너레이터 함수를 호출하면 바로 코드가 실행된다.",
       "correct": "호출 시점에는 제너레이터 객체만 생성되고, `next()`가 호출될 때 비로소 코드가 실행됩니다.",
-      "why": "제너레이터는 '게으른(lazy)' 실행을 하도록 설계되었기 때문입니다. 필요할 때만 값을 계산하여 메모리를 절약합니다."
+      "why": "제너레이터는 '게으른(lazy)' 실행을 하도록 설계되었기 때문입니다.\n필요할 때만 값을 계산하여 메모리를 절약합니다."
     }
   ],
   "keyTakeaway": "`yield`는 값을 반환하고 그 자리에서 실행을 '일시정지'합니다. 다음 호출 시 멈췄던 곳부터 다시 시작합니다."

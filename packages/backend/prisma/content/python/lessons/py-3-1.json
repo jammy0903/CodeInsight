@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "리스트 생성",
-        "explanation": "**`fruits = [\"Apple\", \"Banana\"]`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 대괄호 `[]`로 리스트 객체를 만들고, `fruits` 이름표를 붙입니다.\n\n**리스트의 특징**:\n- **순서가 있음(Ordered)**: 인덱스로 접근 가능 (fruits[0], fruits[1])\n- **수정 가능(Mutable)**: 내용을 바꿀 수 있음 (문자열은 Immutable)\n- **중복 허용**: [1, 1, 1] 가능\n\n**왜 이 순서인가?** 리스트를 먼저 만들어야 아래에서 수정할 수 있습니다.\n\n**실행 순서**: line 2 → 리스트 생성 (id: 0x1000) → fruits = 0x1000 → line 5",
+        "explanation": "**`fruits = [\"Apple\", \"Banana\"]`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n대괄호 `[]`로 리스트 객체를 만들고, `fruits` 이름표를 붙입니다.\n\n**리스트의 특징**:\n- **순서가 있음(Ordered)**: 인덱스로 접근 가능 (fruits[0], fruits[1])\n- **수정 가능(Mutable)**: 내용을 바꿀 수 있음 (문자열은 Immutable)\n- **중복 허용**: [1, 1, 1] 가능\n\n**왜 이 순서인가?** 리스트를 먼저 만들어야 아래에서 수정할 수 있습니다.\n\n**실행 순서**: line 2 → 리스트 생성 (id: 0x1000) → fruits = 0x1000 → line 5",
         "visualizationType": "pythonMemory",
         "code": "fruits = [\"Apple\", \"Banana\"]",
         "pythonMemoryState": {
@@ -30,7 +30,7 @@
       },
       {
         "title": "항목 추가 (append)",
-        "explanation": "**`fruits.append(\"Orange\")`**\n\n**Mutable의 의미**: 리스트는 **새 객체를 만들지 않고**, 기존 객체(0x1000)의 **내용을 직접 수정**합니다. `fruits`는 여전히 같은 객체(0x1000)를 가리키지만, 그 안의 내용이 바뀝니다.\n\n**append의 역할**: 리스트의 **맨 끝**에 새 항목을 추가합니다.\n\n**문자열과의 차이**: 문자열(Immutable)은 수정하면 새 객체를 만들지만, 리스트(Mutable)는 같은 객체를 수정합니다.\n\n**왜 이 순서인가?** 리스트 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: append 실행 → 0x1000 객체 내용 변경 → line 6",
+        "explanation": "**`fruits.append(\"Orange\")`**\n\n**Mutable의 의미**: 리스트는 **새 객체를 만들지 않고**, 기존 객체(0x1000)의 **내용을 직접 수정**합니다.\n`fruits`는 여전히 같은 객체(0x1000)를 가리키지만, 그 안의 내용이 바뀝니다.\n\n**append의 역할**: 리스트의 **맨 끝**에 새 항목을 추가합니다.\n\n**문자열과의 차이**: 문자열(Immutable)은 수정하면 새 객체를 만들지만, 리스트(Mutable)는 같은 객체를 수정합니다.\n\n**왜 이 순서인가?** 리스트 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: append 실행 → 0x1000 객체 내용 변경 → line 6",
         "visualizationType": "pythonMemory",
         "code": "fruits.append(\"Orange\")",
         "pythonMemoryState": {
@@ -55,7 +55,7 @@
       },
       {
         "title": "항목 수정 (인덱스)",
-        "explanation": "**`fruits[0] = \"Grape\"`**\n\n**인덱스 할당**: 특정 위치의 항목을 **새로운 값으로 덮어씁니다**. 인덱스 0(첫 번째 항목)의 `\"Apple\"`이 `\"Grape\"`로 교체됩니다.\n\n**append와의 차이**:\n- **append**: 리스트 **끝에 추가** (길이 증가)\n- **인덱스 할당**: 기존 항목 **교체** (길이 동일)\n\n**왜 새 리스트를 만들지 않는가?** 리스트는 Mutable이므로, 같은 객체(0x1000)를 계속 수정합니다.\n\n**실행 순서**: 인덱스 0 접근 → \"Apple\" → \"Grape\"로 교체 → line 9",
+        "explanation": "**`fruits[0] = \"Grape\"`**\n\n**인덱스 할당**: 특정 위치의 항목을 **새로운 값으로 덮어씁니다**.\n인덱스 0(첫 번째 항목)의 `\"Apple\"`이 `\"Grape\"`로 교체됩니다.\n\n**append와의 차이**:\n- **append**: 리스트 **끝에 추가** (길이 증가)\n- **인덱스 할당**: 기존 항목 **교체** (길이 동일)\n\n**왜 새 리스트를 만들지 않는가?** 리스트는 Mutable이므로, 같은 객체(0x1000)를 계속 수정합니다.\n\n**실행 순서**: 인덱스 0 접근 → \"Apple\" → \"Grape\"로 교체 → line 9",
         "visualizationType": "pythonMemory",
         "code": "fruits[0] = \"Grape\"",
         "pythonMemoryState": {
@@ -73,7 +73,7 @@
       },
       {
         "title": "항목 삭제 (del)",
-        "explanation": "**`del fruits[1]`**\n\n**del의 역할**: 특정 인덱스의 항목을 **리스트에서 제거**합니다. 현재 리스트는 `[\"Grape\", \"Banana\", \"Orange\"]`이므로, 인덱스 1의 `\"Banana\"`가 삭제됩니다.\n\n**인덱스 재정렬**: 삭제 후, 뒤의 항목들이 앞으로 당겨집니다:\n- 삭제 전: [\"Grape\"(0), \"Banana\"(1), \"Orange\"(2)]\n- 삭제 후: [\"Grape\"(0), \"Orange\"(1)]\n\n**왜 이 순서인가?** 이전 수정 작업들이 끝나고, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: del 실행 → 인덱스 1 삭제 → 뒤 항목들 앞으로 → line 11",
+        "explanation": "**`del fruits[1]`**\n\n**del의 역할**: 특정 인덱스의 항목을 **리스트에서 제거**합니다.\n현재 리스트는 `[\"Grape\", \"Banana\", \"Orange\"]`이므로, 인덱스 1의 `\"Banana\"`가 삭제됩니다.\n\n**인덱스 재정렬**: 삭제 후, 뒤의 항목들이 앞으로 당겨집니다:\n- 삭제 전: [\"Grape\"(0), \"Banana\"(1), \"Orange\"(2)]\n- 삭제 후: [\"Grape\"(0), \"Orange\"(1)]\n\n**왜 이 순서인가?** 이전 수정 작업들이 끝나고, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: del 실행 → 인덱스 1 삭제 → 뒤 항목들 앞으로 → line 11",
         "visualizationType": "pythonMemory",
         "code": "del fruits[1] # Banana 삭제",
         "pythonMemoryState": {
@@ -91,7 +91,7 @@
       },
       {
         "title": "최종 리스트 출력",
-        "explanation": "**`print(fruits)`**\n\n모든 추가, 수정, 삭제 작업을 거친 후의 최종 리스트를 출력합니다.\n\n**중요한 점**: `fruits`는 **처음부터 끝까지 같은 객체(0x1000)**를 가리킵니다. 새 리스트를 만든 적이 없고, **계속 같은 리스트를 수정**한 것입니다. 이것이 **Mutable의 핵심**입니다.\n\n**만약 Immutable이었다면?**: 각 수정마다 새 객체를 만들어야 했을 것입니다 (문자열처럼).\n\n**실행 순서**: print 실행 → fruits(0x1000) 내용 출력 → 프로그램 종료",
+        "explanation": "**`print(fruits)`**\n\n모든 추가, 수정, 삭제 작업을 거친 후의 최종 리스트를 출력합니다.\n\n**중요한 점**: `fruits`는 **처음부터 끝까지 같은 객체(0x1000)**를 가리킵니다.\n새 리스트를 만든 적이 없고, **계속 같은 리스트를 수정**한 것입니다.\n이것이 **Mutable의 핵심**입니다.\n\n**만약 Immutable이었다면?**: 각 수정마다 새 객체를 만들어야 했을 것입니다 (문자열처럼).\n\n**실행 순서**: print 실행 → fruits(0x1000) 내용 출력 → 프로그램 종료",
         "visualizationType": "pythonMemory",
         "code": "print(fruits)",
         "pythonMemoryState": {
@@ -127,7 +127,7 @@
       "어떤 타입이든 섞어서 담을 수 있다"
     ],
     "correctIndex": 2,
-    "explanation": "리스트는 중복을 허용합니다(`[1, 1, 1]` 가능). 중복을 허용하지 않는 것은 **세트(Set)**입니다."
+    "explanation": "리스트는 중복을 허용합니다(`[1, 1, 1]` 가능).\n중복을 허용하지 않는 것은 세트(Set)입니다."
   },
   "misconceptions": [
     {

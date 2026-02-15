@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "모듈 임포트",
-        "explanation": "멀티프로세싱을 위해 `multiprocessing`과 시간 측정을 위한 `time` 모듈을 가져옵니다.\n\n**왜 이 순서인가?**\n필요한 도구(모듈)를 먼저 가져옵니다.\n\n**실행 순서:**\n1. `multiprocessing` 모듈(0x1500) 로드.\n2. `time` 모듈(0x1600) 로드.\n\n**비유**: 요리(작업)를 하기 위해 주방 도구(모듈)를 꺼내는 과정입니다. `multiprocessing`은 '여러 명의 요리사'를 고용하는 계약서와 같습니다.",
+        "explanation": "멀티프로세싱을 위해 `multiprocessing`과 시간 측정을 위한 `time` 모듈을 가져옵니다.\n\n**왜 이 순서인가?**\n필요한 도구(모듈)를 먼저 가져옵니다.\n\n**실행 순서:**\n1. `multiprocessing` 모듈(0x1500) 로드.\n2. `time` 모듈(0x1600) 로드.\n\n**비유**: 요리(작업)를 하기 위해 주방 도구(모듈)를 꺼내는 과정입니다.\n`multiprocessing`은 '여러 명의 요리사'를 고용하는 계약서와 같습니다.",
         "visualizationType": "pythonMemory",
         "code": "import multiprocessing",
         "highlightOffset": [
@@ -68,7 +68,7 @@
       },
       {
         "title": "`if __name__ == '__main__'`",
-        "explanation": "멀티프로세싱 코드는 반드시 이 블록 안에서 실행해야 합니다. 그렇지 않으면 자식 프로세스가 코드를 다시 임포트하면서 무한으로 프로세스가 생성될 수 있습니다.\n\n**왜 이 순서인가?**\n메인 모듈로 실행될 때만 프로세스를 생성하도록 보호합니다.",
+        "explanation": "멀티프로세싱 코드는 반드시 이 블록 안에서 실행해야 합니다.\n그렇지 않으면 자식 프로세스가 코드를 다시 임포트하면서 무한으로 프로세스가 생성될 수 있습니다.\n\n**왜 이 순서인가?**\n메인 모듈로 실행될 때만 프로세스를 생성하도록 보호합니다.",
         "visualizationType": "pythonMemory",
         "code": "if __name__ == '__main__':",
         "pythonMemoryState": {
@@ -79,7 +79,7 @@
       },
       {
         "title": "싱글 프로세스 실행",
-        "explanation": "먼저, `countdown` 함수를 하나의 프로세스에서 실행하고 시간을 측정합니다. 이전 스레딩 예제와 거의 동일한 시간이 소요됩니다.\n\n**실행 순서:**\n1. `start` 시간 기록.\n2. `countdown()` 실행.\n3. `duration` 계산.",
+        "explanation": "먼저, `countdown` 함수를 하나의 프로세스에서 실행하고 시간을 측정합니다.\n이전 스레딩 예제와 거의 동일한 시간이 소요됩니다.\n\n**실행 순서:**\n1. `start` 시간 기록.\n2. `countdown()` 실행.\n3. `duration` 계산.",
         "visualizationType": "pythonMemory",
         "code": "start = time.time()",
         "highlightOffset": [
@@ -113,7 +113,7 @@
       },
       {
         "title": "멀티프로세스 준비",
-        "explanation": "`p1`과 `p2`라는 두 개의 `Process` 객체를 생성합니다. 스레드와 문법이 매우 비슷합니다.\n\n**왜 이 순서인가?**\n새로운 프로세스를 생성할 준비를 합니다.\n\n**실행 순서:**\n1. `Process` 객체 p1(0x2000) 생성.\n2. `Process` 객체 p2(0x2100) 생성.",
+        "explanation": "`p1`과 `p2`라는 두 개의 `Process` 객체를 생성합니다.\n스레드와 문법이 매우 비슷합니다.\n\n**왜 이 순서인가?**\n새로운 프로세스를 생성할 준비를 합니다.\n\n**실행 순서:**\n1. `Process` 객체 p1(0x2000) 생성.\n2. `Process` 객체 p2(0x2100) 생성.",
         "visualizationType": "pythonMemory",
         "code": "p1 = multiprocessing.Process(target=countdown)",
         "highlightOffset": [
@@ -154,7 +154,7 @@
       },
       {
         "title": "두 프로세스 동시 시작",
-        "explanation": "`p1.start()`와 `p2.start()`로 두 프로세스의 실행을 시작합니다. 각 프로세스는 별도의 메모리와 파이썬 인터프리터를 가지므로, GIL의 제약을 받지 않고 동시에 실행될 수 있습니다.\n\n**왜 이 순서인가?**\nOS에게 새 프로세스를 fork/spawn 하라고 요청합니다.\n\n**실행 순서:**\n1. p1 시작 (새 PID 할당).\n2. p2 시작 (새 PID 할당).",
+        "explanation": "`p1.start()`와 `p2.start()`로 두 프로세스의 실행을 시작합니다.\n각 프로세스는 별도의 메모리와 파이썬 인터프리터를 가지므로, GIL의 제약을 받지 않고 동시에 실행될 수 있습니다.\n\n**왜 이 순서인가?**\nOS에게 새 프로세스를 fork/spawn 하라고 요청합니다.\n\n**실행 순서:**\n1. p1 시작 (새 PID 할당).\n2. p2 시작 (새 PID 할당).",
         "visualizationType": "pythonMemory",
         "code": "start = time.time()",
         "occurrence": 2,
@@ -213,7 +213,7 @@
       },
       {
         "title": "결과 확인: 진정한 병렬 처리",
-        "explanation": "`print(...)`\n두 개의 프로세스로 실행했을 때, 시간이 싱글 프로세스일 때의 절반 가까이로 줄어든 것을 볼 수 있습니다. 이것이 GIL을 우회한 진정한 병렬 처리의 효과입니다.\n\n**실행 순서:**\n1. 최종 시간 계산.\n2. 출력.",
+        "explanation": "`print(...)`\n두 개의 프로세스로 실행했을 때, 시간이 싱글 프로세스일 때의 절반 가까이로 줄어든 것을 볼 수 있습니다.\n이것이 GIL을 우회한 진정한 병렬 처리의 효과입니다.\n\n**실행 순서:**\n1. 최종 시간 계산.\n2. 출력.",
         "visualizationType": "pythonMemory",
         "code": "duration = time.time() - start",
         "occurrence": 2,
@@ -257,8 +257,8 @@
   "misconceptions": [
     {
       "wrong": "멀티프로세싱은 스레딩보다 항상 좋다.",
-      "correct": "아닙니다. 프로세스는 스레드보다 생성 비용이 비싸고 메모리를 더 많이 사용합니다.",
-      "why": "프로세스 간 통신(IPC)은 스레드 간 메모리 공유보다 복잡하고 느립니다. 따라서 I/O 작업에는 스레딩이 더 적합할 수 있습니다."
+      "correct": "아닙니다.\n프로세스는 스레드보다 생성 비용이 비싸고 메모리를 더 많이 사용합니다.",
+      "why": "프로세스 간 통신(IPC)은 스레드 간 메모리 공유보다 복잡하고 느립니다.\n따라서 I/O 작업에는 스레딩이 더 적합할 수 있습니다."
     }
   ],
   "keyTakeaway": "I/O 작업(대기)에는 스레딩, CPU 작업(계산)에는 멀티프로세싱을 사용하세요."

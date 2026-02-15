@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "로그 배열 초기화",
-        "explanation": "`log` 배열을 생성합니다. 함수 실행 순서를 이 배열에 기록할 것입니다.",
+        "explanation": "`log` 배열을 생성합니다.\n함수 실행 순서를 이 배열에 기록할 것입니다.",
         "keyInsight": "배열은 힙(Heap)에 저장되고, 변수는 이 배열의 주소를 참조합니다.",
         "visualizationType": "eventLoop",
         "code": "const log = [];",
@@ -23,7 +23,7 @@
       },
       {
         "title": "first() 호출 - 스택 프레임 생성",
-        "explanation": "first() 함수가 호출되면 **스택 프레임(Stack Frame)**이 만들어져 콜 스택에 푸시(Push)됩니다. 이 프레임에는 함수의 매개변수, 지역 변수, 그리고 **복귀 주소(Return Address)**가 담깁니다.\n\n**비유**: 책상 위에 'first 프로젝트' 서류철을 펼치는 것과 같습니다. 다른 작업은 잠시 중단됩니다.",
+        "explanation": "first() 함수가 호출되면 **스택 프레임(Stack Frame)**이 만들어져 콜 스택에 푸시(Push)됩니다.\n이 프레임에는 함수의 매개변수, 지역 변수, 그리고 **복귀 주소(Return Address)**가 담깁니다.\n\n**비유**: 책상 위에 'first 프로젝트' 서류철을 펼치는 것과 같습니다.\n다른 작업은 잠시 중단됩니다.",
         "keyInsight": "함수 호출 = 스택 프레임 생성 (메모리 할당)",
         "analogy": "책상 위에 'first 프로젝트' 서류철을 펼치는 것과 같습니다. 다른 작업은 잠시 중단됩니다.",
         "tip": "프레임이 너무 많이 쌓이면 **Stack Overflow** 에러가 발생합니다.",
@@ -38,7 +38,7 @@
       },
       {
         "title": "log.push('first start') 실행",
-        "explanation": "first() 함수 내부로 진입합니다. `log` 배열에 'first start'를 추가합니다. 이제 log = ['first start']입니다.",
+        "explanation": "first() 함수 내부로 진입합니다.\n`log` 배열에 'first start'를 추가합니다.\n이제 log = ['first start']입니다.",
         "keyInsight": "배열의 push()는 원본 배열을 변경합니다 (Mutate).",
         "visualizationType": "eventLoop",
         "code": "log.push('first start');",
@@ -51,7 +51,7 @@
       },
       {
         "title": "second() 호출 - 콜 스택 위에 쌓임",
-        "explanation": "first() 실행 중에 second()가 호출됩니다. second()가 콜 스택 맨 위에 쌓입니다.",
+        "explanation": "first() 실행 중에 second()가 호출됩니다.\nsecond()가 콜 스택 맨 위에 쌓입니다.",
         "keyInsight": "함수 안에서 다른 함수를 호출하면, 새 함수가 콜 스택 위에 쌓입니다. **나중에 호출된 함수가 먼저 끝납니다.**",
         "analogy": "first() 접시 위에 second() 접시를 올린 상태. second() 접시를 먼저 치워야 first() 접시에 접근할 수 있습니다.",
         "tip": "**LIFO (Last In First Out)**: 마지막에 들어온 것이 먼저 나갑니다. 스택의 기본 원리입니다.",
@@ -67,7 +67,7 @@
       },
       {
         "title": "log.push('second') 실행",
-        "explanation": "second() 함수 내부에서 log.push('second')가 실행됩니다. 이제 log = ['first start', 'second']입니다.",
+        "explanation": "second() 함수 내부에서 log.push('second')가 실행됩니다.\n이제 log = ['first start', 'second']입니다.",
         "keyInsight": "콜 스택의 맨 위에 있는 함수만 실행됩니다. 아래에 있는 first()는 '대기' 상태입니다.",
         "visualizationType": "eventLoop",
         "code": "log.push('second');",
@@ -81,7 +81,7 @@
       },
       {
         "title": "second() 종료 - 콜 스택에서 제거",
-        "explanation": "second()가 끝나서 콜 스택에서 제거(pop)됩니다. first()가 다시 맨 위가 됩니다.",
+        "explanation": "second()가 끝나서 콜 스택에서 제거(pop)됩니다.\nfirst()가 다시 맨 위가 됩니다.",
         "keyInsight": "함수가 끝나면 콜 스택에서 제거됩니다. 그러면 그 아래에 있던 함수가 이어서 실행됩니다.",
         "analogy": "second() 접시를 치웠으니, 이제 first() 접시에 접근할 수 있습니다.",
         "tip": "**pop**: 스택에서 맨 위 항목을 제거하는 것. 반대로 추가하는 것은 **push**입니다.",
@@ -96,7 +96,7 @@
       },
       {
         "title": "first()로 복귀 - log.push('first end')",
-        "explanation": "second()가 끝났으니, first() 함수의 **중단된 지점**부터 이어서 실행됩니다. log = ['first start', 'second', 'first end']가 됩니다.",
+        "explanation": "second()가 끝났으니, first() 함수의 **중단된 지점**부터 이어서 실행됩니다.\nlog = ['first start', 'second', 'first end']가 됩니다.",
         "keyInsight": "함수 호출 후 돌아올 위치를 콜 스택이 기억합니다. 이것이 '콜 스택'이라 불리는 이유입니다.",
         "tip": "**복귀 주소**: 콜 스택은 '어디로 돌아가야 하는지'도 함께 저장합니다.",
         "visualizationType": "eventLoop",
@@ -110,7 +110,7 @@
       },
       {
         "title": "first() 종료",
-        "explanation": "first() 함수도 끝에 도달했습니다. first()가 콜 스택에서 제거됩니다. 이제 콜 스택이 비었습니다.",
+        "explanation": "first() 함수도 끝에 도달했습니다.\nfirst()가 콜 스택에서 제거됩니다.\n이제 콜 스택이 비었습니다.",
         "keyInsight": "콜 스택이 비면 = 실행할 함수가 없음 = 프로그램이 다음 코드로 넘어감",
         "visualizationType": "eventLoop",
         "code": "}",
@@ -121,7 +121,7 @@
       },
       {
         "title": "log.push('done') - 전역 코드 실행",
-        "explanation": "first() 호출이 끝났으니 다음 줄이 실행됩니다. log = ['first start', 'second', 'first end', 'done']",
+        "explanation": "first() 호출이 끝났으니 다음 줄이 실행됩니다.\nlog = ['first start', 'second', 'first end', 'done']",
         "keyInsight": "동기 코드는 위에서 아래로 순차 실행됩니다. 함수 호출이 있으면 그 함수가 완전히 끝날 때까지 기다립니다.",
         "analogy": "요리 레시피처럼 한 단계가 끝나야 다음 단계로 넘어갑니다. 동시에 여러 단계를 할 수 없습니다.",
         "visualizationType": "eventLoop",
@@ -135,7 +135,7 @@
       },
       {
         "title": "최종 결과 확인",
-        "explanation": "log 배열을 출력합니다. ['first start', 'second', 'first end', 'done'] 순서로 기록되어 있습니다. 이 순서가 콜 스택의 LIFO 동작을 증명합니다.",
+        "explanation": "log 배열을 출력합니다.\n['first start', 'second', 'first end', 'done'] 순서로 기록되어 있습니다.\n이 순서가 콜 스택의 LIFO 동작을 증명합니다.",
         "keyInsight": "second가 first end보다 먼저 기록된 이유: second()가 완전히 끝난 후에야 first()가 이어졌기 때문입니다.",
         "visualizationType": "eventLoop",
         "code": "console.log(log);",
@@ -160,18 +160,18 @@
       "[1, 2, 3]이 동시에 추가"
     ],
     "correctIndex": 1,
-    "explanation": "a()가 실행되어 1 추가 → b() 호출로 콜 스택에 b() 추가 → 2 추가 → b() 종료 후 a()로 복귀 → 3 추가. JavaScript는 싱글 스레드이므로 '동시에'는 불가능합니다."
+    "explanation": "a()가 실행되어 1 추가 → b() 호출로 콜 스택에 b() 추가 → 2 추가 → b() 종료 후 a()로 복귀 → 3 추가.\nJavaScript는 싱글 스레드이므로 '동시에'는 불가능합니다."
   },
   "misconceptions": [
     {
       "wrong": "JavaScript는 여러 함수를 동시에 실행할 수 있다",
-      "correct": "JavaScript는 **싱글 스레드**입니다. 콜 스택의 맨 위에 있는 함수만 실행됩니다.",
-      "why": "브라우저의 메인 스레드는 하나뿐입니다. 동시 실행처럼 보이는 것은 '이벤트 루프' 덕분이며, 다음 레슨에서 배웁니다."
+      "correct": "JavaScript는 **싱글 스레드**입니다.\n콜 스택의 맨 위에 있는 함수만 실행됩니다.",
+      "why": "브라우저의 메인 스레드는 하나뿐입니다.\n동시 실행처럼 보이는 것은 '이벤트 루프' 덕분이며, 다음 레슨에서 배웁니다."
     },
     {
       "wrong": "함수 안에서 다른 함수를 호출하면 병렬로 실행된다",
-      "correct": "아닙니다. '중첩 호출(Nested Call)'일 뿐, 하나씩 순서대로 실행됩니다.",
-      "why": "콜 스택은 **LIFO(Last In First Out)** 구조입니다. 위에 쌓인(나중에 호출된) 함수가 끝나서 스택에서 사라져야, 아래 함수가 다시 움직일 수 있습니다."
+      "correct": "아닙니다.\n'중첩 호출(Nested Call)'일 뿐, 하나씩 순서대로 실행됩니다.",
+      "why": "콜 스택은 **LIFO(Last In First Out)** 구조입니다.\n위에 쌓인(나중에 호출된) 함수가 끝나서 스택에서 사라져야, 아래 함수가 다시 움직일 수 있습니다."
     }
   ],
   "keyTakeaway": "콜 스택 = 현재 실행 중인 함수 추적, 싱글 스레드 = 한 번에 하나만, LIFO = 나중에 온 게 먼저 끝남"

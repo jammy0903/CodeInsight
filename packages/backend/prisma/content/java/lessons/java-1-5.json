@@ -54,7 +54,7 @@
       },
       {
         "title": "두 번째 Person 객체 생성",
-        "explanation": "**실행 순서:**\n1. `new Person(\"Alice\")` 호출.\n2. 새 Heap 할당 (0x002).\n3. 새 기본 `hashCode`(예: 456) 생성.\n\n`p2`는 내용이 같더라도 `p1`과 다른 해시코드를 갖게 됩니다. `hashCode()`가 재정의되지 않았기 때문입니다.",
+        "explanation": "**실행 순서:**\n1. `new Person(\"Alice\")` 호출.\n2. 새 Heap 할당 (0x002).\n3. 새 기본 `hashCode`(예: 456) 생성.\n\n`p2`는 내용이 같더라도 `p1`과 다른 해시코드를 갖게 됩니다.\n`hashCode()`가 재정의되지 않았기 때문입니다.",
         "visualizationType": "javaMemory",
         "code": "Person p2 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -160,7 +160,7 @@
       },
       {
         "title": "contains(p2) 호출 (검색 실패)",
-        "explanation": "**실행 순서:**\n1. `set.contains(p2)` 호출.\n2. `p2.hashCode()` 계산 -> **456**.\n3. 456번 버킷 확인.\n4. **비어있음** -> **false** 반환.\n\n`equals()`가 `true`여도, `hashCode()`가 달라서 아예 다른 방을 뒤졌습니다. 찾을 리가 없죠.",
+        "explanation": "**실행 순서:**\n1. `set.contains(p2)` 호출.\n2. `p2.hashCode()` 계산 -> **456**.\n3. 456번 버킷 확인.\n4. **비어있음** -> **false** 반환.\n\n`equals()`가 `true`여도, `hashCode()`가 달라서 아예 다른 방을 뒤졌습니다.\n찾을 리가 없죠.",
         "keyInsight": "hashCode 다름 = 다른 버킷 = 찾기 실패",
         "visualizationType": "javaMemory",
         "code": "System.out.println(set.contains(p2));",
@@ -202,7 +202,7 @@
     {
       "wrong": "equals()만 오버라이드하면 된다",
       "correct": "반드시 `hashCode()`도 같이 오버라이드해야 합니다.",
-      "why": "HashMap, HashSet 같은 자료구조는 `hashCode`로 1차 분류(구 이름)를 하고, 그 안에서 `equals`로 2차 확인(번지수)을 합니다. 구 이름이 다르면 집을 절대 못 찾습니다."
+      "why": "HashMap, HashSet 같은 자료구조는 `hashCode`로 1차 분류(구 이름)를 하고, 그 안에서 `equals`로 2차 확인(번지수)을 합니다.\n구 이름이 다르면 집을 절대 못 찾습니다."
     }
   ],
   "keyTakeaway": "equals() 오버라이드 시 hashCode()도 필수입니다. IDE의 자동 생성 기능을 활용하세요."

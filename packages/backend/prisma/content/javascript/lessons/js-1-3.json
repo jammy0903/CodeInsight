@@ -40,7 +40,7 @@
       },
       {
         "title": "Promise.then 등록",
-        "explanation": "`.then()`의 콜백 함수는 **Microtask Queue**로 이동하여 대기합니다. Task Queue와는 다른, 더 높은 우선순위의 큐입니다.",
+        "explanation": "`.then()`의 콜백 함수는 **Microtask Queue**로 이동하여 대기합니다.\nTask Queue와는 다른, 더 높은 우선순위의 큐입니다.",
         "visualizationType": "eventLoop",
         "code": "Promise.resolve().then(() => {",
         "highlightOffset": [
@@ -57,7 +57,7 @@
       },
       {
         "title": "console.log('end')",
-        "explanation": "마지막 동기 코드인 `console.log('end')`가 실행됩니다. 이제 콜 스택이 비워질 차례입니다.",
+        "explanation": "마지막 동기 코드인 `console.log('end')`가 실행됩니다.\n이제 콜 스택이 비워질 차례입니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('end');",
         "eventLoopState": {
@@ -75,7 +75,7 @@
       },
       {
         "title": "Microtask 처리 (Promise)",
-        "explanation": "콜 스택이 비워지면, 이벤트 루프는 Task Queue보다 먼저 Microtask Queue를 확인합니다. 여기에 있던 Promise 콜백이 콜 스택으로 이동하여 실행됩니다.",
+        "explanation": "콜 스택이 비워지면, 이벤트 루프는 Task Queue보다 먼저 Microtask Queue를 확인합니다.\n여기에 있던 Promise 콜백이 콜 스택으로 이동하여 실행됩니다.",
         "keyInsight": "Microtask Queue는 항상 Task Queue보다 우선순위가 높습니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('promise');",
@@ -95,7 +95,7 @@
       },
       {
         "title": "Task 처리 (setTimeout)",
-        "explanation": "Microtask Queue가 완전히 비워진 후에야 이벤트 루프는 Task Queue를 확인합니다. 여기에 있던 `setTimeout` 콜백이 콜 스택으로 이동하여 마지막으로 실행됩니다.",
+        "explanation": "Microtask Queue가 완전히 비워진 후에야 이벤트 루프는 Task Queue를 확인합니다.\n여기에 있던 `setTimeout` 콜백이 콜 스택으로 이동하여 마지막으로 실행됩니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('timeout');",
         "eventLoopState": {
@@ -124,7 +124,7 @@
       "B → C → A"
     ],
     "correctIndex": 2,
-    "explanation": "동기 코드(C) → Microtask(B) → Task(A) 순서로 실행됩니다. Promise의 then 콜백은 Microtask Queue에, setTimeout은 Task Queue에 들어가며, Microtask가 우선순위가 높습니다."
+    "explanation": "동기 코드(C) → Microtask(B) → Task(A) 순서로 실행됩니다.\nPromise의 then 콜백은 Microtask Queue에, setTimeout은 Task Queue에 들어가며, Microtask가 우선순위가 높습니다."
   },
   "misconceptions": [
     {
@@ -134,8 +134,8 @@
     },
     {
       "wrong": "0ms가 더 짧으니까 setTimeout이 먼저 실행된다",
-      "correct": "시간은 상관없습니다. **어느 큐(Queue)에 줄을 섰는지**가 중요합니다.",
-      "why": "이벤트 루프 스펙상 Microtask Queue가 100% 비워지기 전에는 Task Queue를 절대 실행하지 않습니다. 무한 루프에 빠진 Microtask가 있다면 Task는 영원히 실행되지 못할 수도 있습니다(Starvation)."
+      "correct": "시간은 상관없습니다.\n**어느 큐(Queue)에 줄을 섰는지**가 중요합니다.",
+      "why": "이벤트 루프 스펙상 Microtask Queue가 100% 비워지기 전에는 Task Queue를 절대 실행하지 않습니다.\n무한 루프에 빠진 Microtask가 있다면 Task는 영원히 실행되지 못할 수도 있습니다(Starvation)."
     }
   ],
   "keyTakeaway": "실행 우선순위: 동기 코드 > Microtask (Promise) > Task (setTimeout)"

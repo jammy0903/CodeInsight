@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "main() 호출",
-        "explanation": "`main()`을 호출합니다. async 함수이므로 즉시 Promise를 반환하고 내부 코드 실행을 시작합니다.",
+        "explanation": "`main()`을 호출합니다.\nasync 함수이므로 즉시 Promise를 반환하고 내부 코드 실행을 시작합니다.",
         "visualizationType": "eventLoop",
         "code": "main();",
         "eventLoopState": {
@@ -22,7 +22,7 @@
       },
       {
         "title": "'Start' 출력",
-        "explanation": "`console.log('Start')`가 동기적으로 실행됩니다. 콘솔에 'Start'가 출력됩니다.",
+        "explanation": "`console.log('Start')`가 동기적으로 실행됩니다.\n콘솔에 'Start'가 출력됩니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('Start');",
         "eventLoopState": {
@@ -37,7 +37,7 @@
       },
       {
         "title": "await fetchUser() 호출",
-        "explanation": "`fetchUser()`를 호출하고 `await`로 결과를 기다립니다. main 함수는 여기서 일시 중지됩니다.",
+        "explanation": "`fetchUser()`를 호출하고 `await`로 결과를 기다립니다.\nmain 함수는 여기서 일시 중지됩니다.",
         "keyInsight": "await = Promise가 resolve될 때까지 함수 실행을 일시 중지",
         "visualizationType": "eventLoop",
         "code": "const user = await fetchUser();",
@@ -72,7 +72,7 @@
       },
       {
         "title": "await delay(1000)",
-        "explanation": "`delay(1000)`을 호출하고 await합니다. 1초 타이머가 시작되고 fetchUser도 일시 중지됩니다.",
+        "explanation": "`delay(1000)`을 호출하고 await합니다.\n1초 타이머가 시작되고 fetchUser도 일시 중지됩니다.",
         "visualizationType": "eventLoop",
         "code": "await delay(1000);",
         "eventLoopState": {
@@ -111,7 +111,7 @@
       },
       {
         "title": "'User loaded' 출력",
-        "explanation": "1초 후 delay Promise가 resolve되어 fetchUser가 재개됩니다. 'User loaded'가 출력됩니다.",
+        "explanation": "1초 후 delay Promise가 resolve되어 fetchUser가 재개됩니다.\n'User loaded'가 출력됩니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('User loaded');",
         "eventLoopState": {
@@ -134,7 +134,7 @@
       },
       {
         "title": "객체 반환",
-        "explanation": "`return { name: 'Alice' }`로 객체를 반환합니다. fetchUser의 Promise가 이 값으로 resolve됩니다.",
+        "explanation": "`return { name: 'Alice' }`로 객체를 반환합니다.\nfetchUser의 Promise가 이 값으로 resolve됩니다.",
         "visualizationType": "eventLoop",
         "code": "return { name: 'Alice' };",
         "eventLoopState": {
@@ -169,7 +169,7 @@
       },
       {
         "title": "'End' 출력",
-        "explanation": "`console.log('End')`가 실행되어 'End'가 출력됩니다. main 함수가 완료됩니다.",
+        "explanation": "`console.log('End')`가 실행되어 'End'가 출력됩니다.\nmain 함수가 완료됩니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('End');",
         "eventLoopState": {
@@ -198,12 +198,12 @@
       "아무 효과가 없다"
     ],
     "correctIndex": 1,
-    "explanation": "await는 async 함수의 실행을 일시 중지하고, Promise가 resolve될 때까지 기다립니다. 메인 스레드는 블로킹되지 않고 다른 작업을 처리할 수 있습니다."
+    "explanation": "await는 async 함수의 실행을 일시 중지하고, Promise가 resolve될 때까지 기다립니다.\n메인 스레드는 블로킹되지 않고 다른 작업을 처리할 수 있습니다."
   },
   "misconceptions": [
     {
       "wrong": "await는 메인 스레드를 블로킹한다",
-      "correct": "await는 해당 async 함수만 일시 중지합니다. 메인 스레드는 다른 작업을 처리할 수 있습니다.",
+      "correct": "await는 해당 async 함수만 일시 중지합니다.\n메인 스레드는 다른 작업을 처리할 수 있습니다.",
       "why": "async/await는 Promise 기반이므로, 이벤트 루프가 계속 동작하며 다른 이벤트를 처리할 수 있습니다."
     }
   ],

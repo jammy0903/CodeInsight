@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "클래스 정의 (Person)",
-        "explanation": "**`class Person:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Person` 클래스를 정의합니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Person 실행 → Person 클래스 등록 시작 → line 2",
+        "explanation": "**`class Person:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n`Person` 클래스를 정의합니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Person 실행 → Person 클래스 등록 시작 → line 2",
         "visualizationType": "pythonMemory",
         "code": "class Person:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "__init__ 초기화자 정의",
-        "explanation": "**`def __init__(self, name, age):`**\n\n**초기화자(Initializer)**: `__init__`는 **생성자(Constructor)가 아니라 초기화자**입니다!\n\n**생성자 vs 초기화자**:\n- **생성자** (`__new__`): 객체를 **생성**하는 메서드 (Python이 자동 호출)\n- **초기화자** (`__init__`): 이미 생성된 객체를 **초기화**하는 메서드\n\n**실행 순서**:\n1. `Person(\"Alice\", 25)` 호출\n2. Python이 `__new__`로 **빈 객체** 생성\n3. Python이 `__init__`로 객체 **초기화**\n4. 초기화된 객체 반환\n\n**self의 의미**: \"나 자신\"을 가리키는 참조. `__init__` 호출 시, Python이 **자동으로** 생성된 객체를 `self`에 전달합니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def __init__ 실행 → __init__ 메서드 등록 → Person 클래스 정의 완료 → line 7",
+        "explanation": "**`def __init__(self, name, age):`**\n\n**초기화자(Initializer)**: `__init__`는 **생성자(Constructor)가 아니라 초기화자**입니다!\n\n**생성자 vs 초기화자**:\n- **생성자** (`__new__`): 객체를 **생성**하는 메서드 (Python이 자동 호출)\n- **초기화자** (`__init__`): 이미 생성된 객체를 **초기화**하는 메서드\n\n**실행 순서**:\n1. `Person(\"Alice\", 25)` 호출\n2. Python이 `__new__`로 **빈 객체** 생성\n3. Python이 `__init__`로 객체 **초기화**\n4. 초기화된 객체 반환\n\n**self의 의미**: \"나 자신\"을 가리키는 참조.\n`__init__` 호출 시, Python이 **자동으로** 생성된 객체를 `self`에 전달합니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def __init__ 실행 → __init__ 메서드 등록 → Person 클래스 정의 완료 → line 7",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, name, age):",
         "highlightOffset": [
@@ -199,7 +199,7 @@
       },
       {
         "title": "초기화 중 출력",
-        "explanation": "**`print(f\"{name} 객체 초기화!\")`**\n\n__init__ 메서드 내부에서 추가 작업을 할 수 있습니다. 여기서는 초기화 메시지를 출력합니다.\n\n**왜 name이 사용 가능한가?** `name`은 매개변수이므로 `__init__` 내부 어디서든 사용 가능합니다.\n\n**실행 순서**: name=\"Alice\" 읽기 → f-string 평가 → print 실행 → __init__ 종료 → line 7로 돌아감 → line 8",
+        "explanation": "**`print(f\"{name} 객체 초기화!\")`**\n\n__init__ 메서드 내부에서 추가 작업을 할 수 있습니다.\n여기서는 초기화 메시지를 출력합니다.\n\n**왜 name이 사용 가능한가?** `name`은 매개변수이므로 `__init__` 내부 어디서든 사용 가능합니다.\n\n**실행 순서**: name=\"Alice\" 읽기 → f-string 평가 → print 실행 → __init__ 종료 → line 7로 돌아감 → line 8",
         "visualizationType": "pythonMemory",
         "code": "print(f\"{name} 객체 초기화!\")",
         "pythonMemoryState": {
@@ -323,18 +323,18 @@
       "SyntaxError"
     ],
     "correctIndex": 1,
-    "explanation": "name = name은 그냥 로컬 변수 할당입니다! self.name = name이어야 인스턴스 변수가 됩니다. self.를 빠뜨리면 c.name이 존재하지 않아요."
+    "explanation": "name = name은 그냥 로컬 변수 할당입니다! self.name = name이어야 인스턴스 변수가 됩니다.\nself.를 빠뜨리면 c.name이 존재하지 않아요."
   },
   "misconceptions": [
     {
       "wrong": "__init__이 객체를 생성한다",
       "correct": "__init__은 이미 생성된 객체를 초기화한다",
-      "why": "객체 생성은 __new__가 담당. __init__은 초기값 설정만 합니다."
+      "why": "객체 생성은 __new__가 담당.\n__init__은 초기값 설정만 합니다."
     },
     {
       "wrong": "self.x = x 없이도 x가 인스턴스 변수가 된다",
       "correct": "self.를 붙여야만 인스턴스 변수",
-      "why": "self 없이 x = 값은 그냥 로컬 변수. 함수 끝나면 사라집니다."
+      "why": "self 없이 x = 값은 그냥 로컬 변수.\n함수 끝나면 사라집니다."
     }
   ],
   "keyTakeaway": "__init__은 초기화 메서드! self.변수명으로 인스턴스 변수를 만들어야 한다!"

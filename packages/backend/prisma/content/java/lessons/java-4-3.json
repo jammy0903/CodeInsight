@@ -31,7 +31,7 @@
       },
       {
         "title": "리터럴 재사용",
-        "explanation": "**실행 순서:**\n1. JVM이 또 `\"Hello\"` 리터럴을 만남.\n2. Pool 확인 -> \"어! 아까 만든 거 있네!\"\n3. 새로 만들지 않고 기존 `Pool[0]` 주소를 `s2`에게 줌.\n\n**핵심:**\n리터럴(`\"...\"`)로 쓰면 무조건 Pool을 먼저 뒤져보고 재사용합니다. 메모리 절약의 일등공신입니다.",
+        "explanation": "**실행 순서:**\n1. JVM이 또 `\"Hello\"` 리터럴을 만남.\n2. Pool 확인 -> \"어! 아까 만든 거 있네!\"\n3. 새로 만들지 않고 기존 `Pool[0]` 주소를 `s2`에게 줌.\n\n**핵심:**\n리터럴(`\"...\"`)로 쓰면 무조건 Pool을 먼저 뒤져보고 재사용합니다.\n메모리 절약의 일등공신입니다.",
         "keyInsight": "같은 리터럴 = 같은 주소 (재사용)",
         "visualizationType": "javaMemory",
         "code": "String s2 = \"Hello\";",
@@ -56,7 +56,7 @@
       },
       {
         "title": "new String() - 강제 생성",
-        "explanation": "**실행 순서:**\n1. `new String(...)` 실행.\n2. Pool을 거치지 않고 **Heap 메모리에 무조건 새 객체**(`Heap[0]`) 생성.\n3. `s3`는 이 새 객체를 가리킴.\n\n**비유:**\nPool이 '공용 정수기'라면, `new String`은 '비싼 생수 사다 마시기'입니다. 물 맛(내용)은 같아도 완전히 다른 물병입니다.",
+        "explanation": "**실행 순서:**\n1. `new String(...)` 실행.\n2. Pool을 거치지 않고 **Heap 메모리에 무조건 새 객체**(`Heap[0]`) 생성.\n3. `s3`는 이 새 객체를 가리킴.\n\n**비유:**\nPool이 '공용 정수기'라면, `new String`은 '비싼 생수 사다 마시기'입니다.\n물 맛(내용)은 같아도 완전히 다른 물병입니다.",
         "keyInsight": "new String() = 재사용 안 함 (Heap 할당)",
         "visualizationType": "javaMemory",
         "code": "String s3 = new String(\"Hello\");",
@@ -115,7 +115,7 @@
       },
       {
         "title": "s1 == s2 비교",
-        "explanation": "둘 다 Pool 출신입니다. 주소가 같습니다. -> `true`",
+        "explanation": "둘 다 Pool 출신입니다.\n주소가 같습니다.\n-> `true`",
         "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s2);",
         "javaMemoryState": {
@@ -128,7 +128,7 @@
       },
       {
         "title": "s1 == s3 비교",
-        "explanation": "`s1`(Pool)과 `s3`(Heap)는 사는 동네가 다릅니다. 주소 불일치. -> `false`",
+        "explanation": "`s1`(Pool)과 `s3`(Heap)는 사는 동네가 다릅니다.\n주소 불일치.\n-> `false`",
         "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s3);",
         "javaMemoryState": {
@@ -139,7 +139,7 @@
       },
       {
         "title": "s1 == s4 비교",
-        "explanation": "`intern()` 덕분에 `s4`도 Pool 주소를 얻었습니다. `s1`과 주소가 같습니다. -> `true`",
+        "explanation": "`intern()` 덕분에 `s4`도 Pool 주소를 얻었습니다.\n`s1`과 주소가 같습니다.\n-> `true`",
         "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s4);",
         "javaMemoryState": {
@@ -160,13 +160,13 @@
       "String s = s1;"
     ],
     "correctIndex": 2,
-    "explanation": "`new String(\"A\")`는 1) 리터럴 \"A\"가 Pool에 없으면 Pool에 하나 만들고, 2) 그 값을 복사해서 Heap에 또 하나 만듭니다. 그래서 최대 2개가 생길 수 있는 비효율적인 코드입니다."
+    "explanation": "`new String(\"A\")`는 1) 리터럴 \"A\"가 Pool에 없으면 Pool에 하나 만들고, 2) 그 값을 복사해서 Heap에 또 하나 만듭니다.\n그래서 최대 2개가 생길 수 있는 비효율적인 코드입니다."
   },
   "misconceptions": [
     {
       "wrong": "String Pool도 Heap 메모리인가?",
-      "correct": "네, 맞습니다. (Java 7 이후)",
-      "why": "예전(Java 6 이하)엔 PermGen이라는 특수 영역에 있었는데, 꽉 차면 에러가 자주 나서 일반 Heap 영역으로 이사 왔습니다. 그래서 이제는 안 쓰는 문자열은 GC(청소부)가 수거해갑니다."
+      "correct": "네, 맞습니다.\n(Java 7 이후)",
+      "why": "예전(Java 6 이하)엔 PermGen이라는 특수 영역에 있었는데, 꽉 차면 에러가 자주 나서 일반 Heap 영역으로 이사 왔습니다.\n그래서 이제는 안 쓰는 문자열은 GC(청소부)가 수거해갑니다."
     }
   ],
   "keyTakeaway": "리터럴 방식(\"...\")을 써야 Pool 혜택을 받는다. new String()은 쓰지 말자."

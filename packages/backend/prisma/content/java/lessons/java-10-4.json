@@ -18,7 +18,7 @@
       },
       {
         "title": "인력 사무소(ThreadPool) 개설",
-        "explanation": "**`Executors.newFixedThreadPool(3)`**\n\n3명의 일꾼이 상주하는 사무소를 차립니다. 이제 일감이 들어오면 이 3명이 번갈아가며 처리합니다. 매번 새로운 알바생을 구하는(쓰레드 생성) 비용이 들지 않습니다.\n\n**비유**: '배달 대행 사무소'에 기사님이 3명 대기하고 있는 것과 같습니다. 주문(Task)이 들어오면 대기 중인 기사님이 바로 출발합니다.",
+        "explanation": "**`Executors.newFixedThreadPool(3)`**\n\n3명의 일꾼이 상주하는 사무소를 차립니다.\n이제 일감이 들어오면 이 3명이 번갈아가며 처리합니다.\n매번 새로운 알바생을 구하는(쓰레드 생성) 비용이 들지 않습니다.\n\n**비유**: '배달 대행 사무소'에 기사님이 3명 대기하고 있는 것과 같습니다.\n주문(Task)이 들어오면 대기 중인 기사님이 바로 출발합니다.",
         "visualizationType": "memory",
         "code": "ExecutorService office = Executors.newFixedThreadPool(3);",
         "memoryState": {
@@ -33,7 +33,7 @@
       },
       {
         "title": "첫 번째 작업 제출",
-        "explanation": "`execute()`를 통해 첫 번째 작업(람다 함수)을 쓰레드 풀에 제출합니다. 대기 중인 쓰레드 중 하나가 이 작업을 맡아 실행합니다.",
+        "explanation": "`execute()`를 통해 첫 번째 작업(람다 함수)을 쓰레드 풀에 제출합니다.\n대기 중인 쓰레드 중 하나가 이 작업을 맡아 실행합니다.",
         "keyInsight": "재사용성(Reusability) = 효율적인 자원 관리",
         "visualizationType": "memory",
         "code": "office.execute(() -> System.out.println(\"A 작업 처리 중...\"));",
@@ -46,7 +46,7 @@
       },
       {
         "title": "두 번째 작업 제출",
-        "explanation": "이어서 두 번째 작업을 제출합니다. 다른 대기 중인 쓰레드가 이 작업을 즉시 가져가 실행합니다. 만약 모든 쓰레드가 일하고 있다면, 이 작업은 큐에서 대기하게 됩니다.",
+        "explanation": "이어서 두 번째 작업을 제출합니다.\n다른 대기 중인 쓰레드가 이 작업을 즉시 가져가 실행합니다.\n만약 모든 쓰레드가 일하고 있다면, 이 작업은 큐에서 대기하게 됩니다.",
         "visualizationType": "memory",
         "code": "office.execute(() -> System.out.println(\"B 작업 처리 중...\"));",
         "memoryState": {
@@ -55,7 +55,7 @@
       },
       {
         "title": "쓰레드 풀 종료",
-        "explanation": "`shutdown()`을 호출하여 쓰레드 풀을 종료합니다. 더 이상 새로운 작업을 받지 않으며, 현재 진행 중인 모든 작업이 완료되면 쓰레드들도 안전하게 종료됩니다. 이 호출을 잊으면 프로그램이 끝나지 않습니다.",
+        "explanation": "`shutdown()`을 호출하여 쓰레드 풀을 종료합니다.\n더 이상 새로운 작업을 받지 않으며, 현재 진행 중인 모든 작업이 완료되면 쓰레드들도 안전하게 종료됩니다.\n이 호출을 잊으면 프로그램이 끝나지 않습니다.",
         "visualizationType": "memory",
         "code": "office.shutdown();",
         "memoryState": {
@@ -78,7 +78,7 @@
       "자원(메모리 및 CPU)의 효율적 사용"
     ],
     "correctIndex": 2,
-    "explanation": "오히려 쓰레드 풀을 제대로 닫지 않으면 프로세스가 종료되지 않고 계속 살아있을 수 있습니다. 종료 속도와는 직접적인 상관이 없습니다."
+    "explanation": "오히려 쓰레드 풀을 제대로 닫지 않으면 프로세스가 종료되지 않고 계속 살아있을 수 있습니다.\n종료 속도와는 직접적인 상관이 없습니다."
   },
   "misconceptions": [
     {

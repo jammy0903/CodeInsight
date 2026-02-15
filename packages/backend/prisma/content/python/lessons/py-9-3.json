@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "repeat 함수 정의",
-        "explanation": "`def repeat(n):`\n3단 중첩 구조의 가장 바깥 함수입니다. 데코레이터 인자 n을 받습니다.\n\n**왜 이 순서인가?**\n데코레이터에 인자를 넘기려면, 그 인자를 받아서 진짜 데코레이터를 반환하는 '팩토리' 함수가 필요합니다.\n\n**실행 순서:**\n1. `repeat` 함수(0x1100) 정의.",
+        "explanation": "`def repeat(n):`\n3단 중첩 구조의 가장 바깥 함수입니다.\n데코레이터 인자 n을 받습니다.\n\n**왜 이 순서인가?**\n데코레이터에 인자를 넘기려면, 그 인자를 받아서 진짜 데코레이터를 반환하는 '팩토리' 함수가 필요합니다.\n\n**실행 순서:**\n1. `repeat` 함수(0x1100) 정의.",
         "visualizationType": "pythonMemory",
         "code": "def repeat(n):",
         "highlightOffset": [
@@ -43,7 +43,7 @@
       },
       {
         "title": "@repeat(3) 적용",
-        "explanation": "`@repeat(3)`\nrepeat(3)이 먼저 호출됩니다. n=3을 기억하는 decorator 함수가 반환됩니다.\n\n**왜 이 순서인가?**\n`@` 뒤의 코드가 먼저 실행되어야 합니다. `repeat(3)`의 결과가 데코레이터로 쓰입니다.\n\n**실행 순서:**\n1. `repeat(3)` 호출.\n2. `n=3`을 저장하는 클로저(Cell) 생성.\n3. `decorator` 함수(0x2000) 반환.",
+        "explanation": "`@repeat(3)`\nrepeat(3)이 먼저 호출됩니다.\nn=3을 기억하는 decorator 함수가 반환됩니다.\n\n**왜 이 순서인가?**\n`@` 뒤의 코드가 먼저 실행되어야 합니다.\n`repeat(3)`의 결과가 데코레이터로 쓰입니다.\n\n**실행 순서:**\n1. `repeat(3)` 호출.\n2. `n=3`을 저장하는 클로저(Cell) 생성.\n3. `decorator` 함수(0x2000) 반환.",
         "visualizationType": "pythonMemory",
         "code": "@repeat(3)",
         "pythonMemoryState": {
@@ -111,7 +111,7 @@
       },
       {
         "title": "decorator 반환",
-        "explanation": "`return decorator`\ndecorator 함수를 반환합니다. 이것이 실제 데코레이터가 됩니다.\n\n**실행 순서:**\n1. `decorator`(0x2000) 리턴.",
+        "explanation": "`return decorator`\ndecorator 함수를 반환합니다.\n이것이 실제 데코레이터가 됩니다.\n\n**실행 순서:**\n1. `decorator`(0x2000) 리턴.",
         "visualizationType": "pythonMemory",
         "code": "return decorator",
         "pythonMemoryState": {
@@ -214,7 +214,7 @@
       },
       {
         "title": "wrapper 반환",
-        "explanation": "`return wrapper`\nwrapper를 반환합니다. greet은 이제 wrapper를 가리킵니다.\n\n**실행 순서:**\n1. `wrapper` 반환.\n2. `greet` 이름이 `wrapper`를 가리키게 됨.",
+        "explanation": "`return wrapper`\nwrapper를 반환합니다.\ngreet은 이제 wrapper를 가리킵니다.\n\n**실행 순서:**\n1. `wrapper` 반환.\n2. `greet` 이름이 `wrapper`를 가리키게 됨.",
         "visualizationType": "pythonMemory",
         "code": "return wrapper",
         "pythonMemoryState": {
@@ -491,7 +491,7 @@
       },
       {
         "title": "greet 본문 실행 (3)",
-        "explanation": "`print(f\"Hello, {name}!\")`\n\"Hello, World!\"를 세 번째로 출력합니다. for 루프가 종료됩니다.\n\n**실행 순서:**\n1. 출력 실행.\n2. `wrapper` 함수 종료.",
+        "explanation": "`print(f\"Hello, {name}!\")`\n\"Hello, World!\"를 세 번째로 출력합니다.\nfor 루프가 종료됩니다.\n\n**실행 순서:**\n1. 출력 실행.\n2. `wrapper` 함수 종료.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Hello, {name}!\")",
         "pythonMemoryState": {
@@ -535,7 +535,7 @@
   "misconceptions": [
     {
       "wrong": "데코레이터는 클래스에만 쓸 수 있다.",
-      "correct": "아닙니다. 데코레이터는 함수와 클래스 모두에 적용할 수 있습니다.",
+      "correct": "아닙니다.\n데코레이터는 함수와 클래스 모두에 적용할 수 있습니다.",
       "why": "클래스 데코레이터는 클래스 자체를 인자로 받아 수정하거나 다른 클래스로 교체하는 등의 작업을 합니다."
     }
   ],

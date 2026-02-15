@@ -183,7 +183,7 @@ export function CodeMirrorReadOnly({
   return (
     <div
       ref={containerRef}
-      className={`h-full w-full ${className}`}
+      className={`w-full ${className}`}
       style={{ minHeight: '100px' }}
     />
   );

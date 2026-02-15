@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "null 할당",
-        "explanation": "**실행 순서:**\n1. `str` 변수 공간 생성 (Stack).\n2. `null`(0x0) 값 할당.\n\n**메모리에서 일어나는 일:**\nStack에 `str`이라는 공간을 만들고, `null`이라는 특별한 값을 넣습니다.\n\n**null이란?**\n\"아무것도 가리키지 않는다\"는 뜻의 표식입니다. 주소지가 적혀있지 않은 '빈 봉투'와 같습니다. 내부적으로는 보통 0x0 같은 무효한 주소로 표현됩니다.",
+        "explanation": "**실행 순서:**\n1. `str` 변수 공간 생성 (Stack).\n2. `null`(0x0) 값 할당.\n\n**메모리에서 일어나는 일:**\nStack에 `str`이라는 공간을 만들고, `null`이라는 특별한 값을 넣습니다.\n\n**null이란?**\n\"아무것도 가리키지 않는다\"는 뜻의 표식입니다.\n주소지가 적혀있지 않은 '빈 봉투'와 같습니다.\n내부적으로는 보통 0x0 같은 무효한 주소로 표현됩니다.",
         "keyInsight": "null = 참조 없음 (주소 0x0)",
         "visualizationType": "javaMemory",
         "code": "String str = null;",
@@ -68,7 +68,7 @@
       },
       {
         "title": "안전한 비교 방법 (Yoda Condition)",
-        "explanation": "**실행 순서:**\n1. `\"hello\"` 리터럴(String Pool) 참조.\n2. `\"hello\".equals(null)` 호출.\n3. `null` 인자를 받아 안전하게 **false** 반환.\n4. `safe` 변수에 false 저장.\n\n**순서만 바꿨을 뿐인데?**\n`\"hello\"`는 리터럴이므로 **String Pool에 존재하는 실제 객체**입니다. (절대 null이 아님)\n`equals` 메서드는 인자로 `null`이 들어오면 우아하게 `false`를 반환하도록 만들어져 있습니다.\n이런 패턴을 '요다 표기법(Yoda Conditions)'이라고도 부릅니다.",
+        "explanation": "**실행 순서:**\n1. `\"hello\"` 리터럴(String Pool) 참조.\n2. `\"hello\".equals(null)` 호출.\n3. `null` 인자를 받아 안전하게 **false** 반환.\n4. `safe` 변수에 false 저장.\n\n**순서만 바꿨을 뿐인데?**\n`\"hello\"`는 리터럴이므로 **String Pool에 존재하는 실제 객체**입니다.\n(절대 null이 아님)\n`equals` 메서드는 인자로 `null`이 들어오면 우아하게 `false`를 반환하도록 만들어져 있습니다.\n이런 패턴을 '요다 표기법(Yoda Conditions)'이라고도 부릅니다.",
         "keyInsight": "\"리터럴\".equals(변수) = null-safe",
         "visualizationType": "javaMemory",
         "code": "boolean safe = \"hello\".equals(text);",
@@ -103,17 +103,17 @@
       "null.equals(\"test\")"
     ],
     "correctIndex": 2,
-    "explanation": "\"test\".equals(null)은 \"test\"라는 '살아있는 객체'에서 메서드를 호출하므로 안전합니다. 나머지는 모두 null인 상태에서 호출하므로 에러가 납니다."
+    "explanation": "\"test\".equals(null)은 \"test\"라는 '살아있는 객체'에서 메서드를 호출하므로 안전합니다.\n나머지는 모두 null인 상태에서 호출하므로 에러가 납니다."
   },
   "misconceptions": [
     {
       "wrong": "null 체크 없이 메서드를 호출해도 된다",
       "correct": "외부 데이터나 리턴값은 **반드시** null 체크를 해야 합니다.",
-      "why": "NPE는 컴파일러가 잡아주지 않는 **런타임 에러(Runtime Error)**입니다. 즉, 사용자가 앱을 쓰다가 갑자기 '앱이 중지되었습니다' 뜨게 만드는 주범입니다."
+      "why": "NPE는 컴파일러가 잡아주지 않는 **런타임 에러(Runtime Error)**입니다.\n즉, 사용자가 앱을 쓰다가 갑자기 '앱이 중지되었습니다' 뜨게 만드는 주범입니다."
     },
     {
       "wrong": "null은 '0'이나 '공백'과 같다",
-      "correct": "완전히 다릅니다. 0은 숫자이고 공백은 문자열이지만, null은 **'존재하지 않음'** 그 자체입니다.",
+      "correct": "완전히 다릅니다.\n0은 숫자이고 공백은 문자열이지만, null은 **'존재하지 않음'** 그 자체입니다.",
       "why": "0으로 초기화된 int는 메모리에 0이라는 값이 있지만, null로 초기화된 참조 변수는 가리키는 대상 자체가 없습니다."
     }
   ],

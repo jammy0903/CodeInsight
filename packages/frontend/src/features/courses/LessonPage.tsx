@@ -1,7 +1,9 @@
 /**
  * LessonPage - 레슨 학습 페이지 (오케스트레이터)
  *
- * 역할: 훅 조합 + 레이아웃 선택 (데스크톱/모바일/완료/퀴즈)
+ * 역할: 데이터 패칭 + 시뮬레이션 + 위상 관리 (학습/퀴즈/완료)
+ * 레이아웃은 LessonUnifiedView에 위임 (데스크톱/모바일 자동 전환)
+ *
  * Route: /courses/:lang/:chapterId/:lessonId
  */
 
@@ -16,20 +18,15 @@ import { useStore } from '@/stores/store';
 // Hooks
 import { useLessonData } from './hooks/useLessonData';
 import { useLessonNavigation } from './hooks/useLessonNavigation';
-import { useLessonVisualization } from './hooks/useLessonVisualization';
-import { useCodeSelection } from './hooks/useCodeSelection';
 import { useLessonAnalytics } from './hooks/useLessonAnalytics';
 import { useLessonSimulation } from './hooks/useLessonSimulation';
-import { useLessonTerminal } from './hooks/useLessonTerminal';
-import { useStepGestures } from './hooks/useStepGestures';
-import { useIsMobile } from '@/hooks';
+import { useCodeSelection } from './hooks/useCodeSelection';
 
 // Layout Components
-import { LessonDesktopLayout } from './components/LessonDesktopLayout';
+import { LessonUnifiedView } from './components/LessonUnifiedView';
 import { LessonCompletedView } from './components/LessonCompletedView';
 import { LessonQuizModal } from './components/LessonQuizModal';
-import { LessonBottomNav } from './components/LessonBottomNav';
-import { MobileAIChatFAB, MobileAIChatModal, MobileLessonView } from './components/mobile';
+import { MobileAIChatFAB, MobileAIChatModal } from './components/mobile';
 import { ReportModal } from '@/components/ReportModal';
 
 // --- 간단한 상태 뷰 ---
@@ -70,9 +67,8 @@ export function LessonPage() {
   const queryClient = useQueryClient();
   const appUser = useStore((s) => s.appUser);
   const refreshStreak = useStore((s) => s.refreshStreak);
-  const isMobile = useIsMobile();
   const [reportOpen, setReportOpen] = React.useState(false);
-  const [mobileResetCount, setMobileResetCount] = React.useState(0);
+  const [resetCount, setResetCount] = React.useState(0);
 
   // 1. 데이터 패칭
   const { lesson, isLoading, isError, error, nextLessonId, quiz } = useLessonData({
@@ -84,7 +80,7 @@ export function LessonPage() {
   // 2. 시뮬레이션
   const { steps, code, simulating } = useLessonSimulation({ lesson, lang, lessonId });
 
-  // 3. 네비게이션
+  // 3. 위상 관리 (학습/퀴즈/완료)
   const analyticsRef = useRef<{ finishTracking: () => void }>({ finishTracking: () => {} });
 
   const navigation = useLessonNavigation({
@@ -117,30 +113,8 @@ export function LessonPage() {
     analyticsRef.current = { finishTracking: analytics.finishTracking };
   }, [analytics.finishTracking]);
 
-  // 5. 시각화
-  const { memoryState, changedBlocks } = useLessonVisualization(steps, navigation.currentStepIndex);
+  // 5. 코드 선택
   const { setSelection } = useCodeSelection();
-
-  // 6. 키보드 제스처 (데스크톱)
-  useStepGestures({
-    onPrev: navigation.goToPrevStep,
-    onNext: navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep,
-    enabled: navigation.phase === 'learning' && !isMobile,
-    isModalOpen: navigation.phase === 'quiz',
-    canGoPrev: navigation.canGoPrev,
-    canGoNext: true,
-  });
-
-  // 7. 터미널 출력
-  const currentStep = steps[navigation.currentStepIndex];
-  const displayLine = currentStep?.line || 1;
-
-  const terminalLines = useLessonTerminal({
-    steps,
-    currentStepIndex: navigation.currentStepIndex,
-    languageId: lang || 'c',
-    diffMode: true,
-  });
 
   // --- 파생 데이터 ---
   const languageCoursePath = `/courses/${lang}`;
@@ -152,12 +126,11 @@ export function LessonPage() {
       navigation.completeLesson();
     } else {
       navigation.reset();
-      if (isMobile) setMobileResetCount((c) => c + 1);
+      setResetCount((c) => c + 1);
     }
   };
 
   // --- Early Returns ---
-  // API 로딩만 블로킹 — 시뮬레이션 중에는 코드+설명을 먼저 표시
   if (isLoading) return <LoadingView />;
   if (isError || !lesson)
     return (
@@ -166,7 +139,6 @@ export function LessonPage() {
         backPath={languageCoursePath}
       />
     );
-  // 시뮬레이션 진행 중이면 NotFound 대신 로딩 표시
   if (steps.length === 0 && !simulating)
     return <NotFoundView message={t('lesson.no_content')} backPath={languageCoursePath} />;
   if (steps.length === 0 && simulating) return <LoadingView />;
@@ -174,64 +146,37 @@ export function LessonPage() {
   // --- 렌더 ---
   return (
     <div className="lesson-page-container">
-      {/* 메인 콘텐츠 */}
       {navigation.phase === 'completed' ? (
         <LessonCompletedView
           lessonOrder={lesson.order}
           nextLessonPath={nextLessonPath}
           chapterPath={languageCoursePath}
         />
-      ) : isMobile ? (
-        <MobileLessonView
-          key={`${lessonId}-${mobileResetCount}`}
+      ) : (
+        <LessonUnifiedView
+          key={`${lessonId}-${resetCount}`}
           code={code}
           steps={steps}
           languageId={lang || 'c'}
           lessonId={lessonId || ''}
-          lessonTitle={lesson.title}
-          lessonOrder={lesson.order}
           onQuiz={navigation.goToQuiz}
-          onStepChange={() => {}}
-        />
-      ) : (
-        <LessonDesktopLayout
-          code={code}
-          steps={steps}
-          currentStepIndex={navigation.currentStepIndex}
-          displayLine={displayLine}
-          lang={lang || 'c'}
-          lessonId={lessonId}
-          lessonOrder={lesson.order}
-          lessonTitle={lesson.title}
-          terminalLines={terminalLines}
-          memoryState={memoryState}
-          changedBlocks={changedBlocks}
           onSelectionChange={setSelection}
         />
       )}
 
-      {/* 하단 네비게이션 (데스크톱 only — 모바일은 MobileLessonView 내장) */}
-      {navigation.phase !== 'completed' && !isMobile && (
-        <>
-          <LessonBottomNav
-            onPrev={navigation.goToPrevStep}
-            onNext={navigation.isLastStep ? navigation.goToQuiz : navigation.goToNextStep}
-            canGoPrev={navigation.canGoPrev}
-            nextLabel={navigation.isLastStep ? t('lesson.quiz') : t('common.next')}
-          />
-          {/* 레슨 신고 버튼 */}
-          <button
-            onClick={() => setReportOpen(true)}
-            className="fixed bottom-[76px] right-4 z-40 p-2 rounded-full opacity-40 hover:opacity-100 transition-opacity"
-            style={{
-              backgroundColor: 'var(--theme-layout-footer-social-bg)',
-              color: 'var(--theme-layout-footer-text-muted)',
-            }}
-            title={t('report.lesson_title')}
-          >
-            <Flag className="w-4 h-4" />
-          </button>
-        </>
+      {/* 레슨 신고 버튼 */}
+      {navigation.phase !== 'completed' && (
+        <button
+          onClick={() => setReportOpen(true)}
+          className="fixed bottom-4 right-4 z-40 p-2 rounded-full opacity-40 hover:opacity-100 transition-opacity"
+          style={{
+            backgroundColor: 'var(--theme-layout-footer-social-bg)',
+            color: 'var(--theme-layout-footer-text-muted)',
+          }}
+          title={t('report.lesson_title')}
+        >
+          <Flag className="w-4 h-4" />
+        </button>
       )}
 
       {/* 레슨 신고 모달 */}
@@ -254,34 +199,31 @@ export function LessonPage() {
         />
       )}
 
-      {/* 모바일 AI 채팅 */}
-      {isMobile && navigation.phase !== 'completed' && (
-        <MobileAIChatOverlay
+      {/* AI 채팅 (FAB + Modal, 모바일/데스크톱 공통) */}
+      {navigation.phase !== 'completed' && (
+        <AIChatOverlay
           lessonId={lessonId}
           lessonOrder={lesson.order}
           lessonTitle={lesson.title}
           code={code}
-          currentLine={currentStep?.line}
         />
       )}
     </div>
   );
 }
 
-// --- 모바일 AI 채팅 오버레이 (FAB + Modal) ---
+// --- AI 채팅 오버레이 (FAB + Modal) ---
 
-function MobileAIChatOverlay({
+function AIChatOverlay({
   lessonId,
   lessonOrder,
   lessonTitle,
   code,
-  currentLine,
 }: {
   lessonId: string | undefined;
   lessonOrder: number;
   lessonTitle: string;
   code: string;
-  currentLine: number | undefined;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -295,7 +237,6 @@ function MobileAIChatOverlay({
           courseDay: lessonOrder,
           topic: lessonTitle,
           code,
-          currentLine,
         }}
         lessonId={lessonId}
       />

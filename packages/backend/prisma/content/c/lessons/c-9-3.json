@@ -16,7 +16,7 @@
       },
       {
         "title": "컴파일 조건 스위치 정의",
-        "explanation": "**`#define DEBUG_MODE 1`**\n\n`DEBUG_MODE` 라는 매크로를 `1`로 정의합니다. 이 정의는 아래의 `#ifdef`와 `#if` 지시문이 어떤 코드를 컴파일에 포함할지 결정하는 '스위치' 역할을 합니다.",
+        "explanation": "**`#define DEBUG_MODE 1`**\n\n`DEBUG_MODE` 라는 매크로를 `1`로 정의합니다.\n이 정의는 아래의 `#ifdef`와 `#if` 지시문이 어떤 코드를 컴파일에 포함할지 결정하는 '스위치' 역할을 합니다.",
         "visualizationType": "cMemory",
         "code": "#define DEBUG_MODE 1"
       },
@@ -44,7 +44,7 @@
       },
       {
         "title": "조건부 컴파일 1: #ifdef",
-        "explanation": "**`#ifdef DEBUG_MODE`**\n\n전처리기가 `DEBUG_MODE`라는 매크로가 **정의되었는지** 확인합니다. 현재 파일 위쪽에서 정의했으므로, 조건은 참(true)이 됩니다. 따라서 `#ifdef`와 `#endif` 사이의 코드가 컴파일에 포함됩니다.",
+        "explanation": "**`#ifdef DEBUG_MODE`**\n\n전처리기가 `DEBUG_MODE`라는 매크로가 **정의되었는지** 확인합니다.\n현재 파일 위쪽에서 정의했으므로, 조건은 참(true)이 됩니다.\n따라서 `#ifdef`와 `#endif` 사이의 코드가 컴파일에 포함됩니다.",
         "visualizationType": "cMemory",
         "code": "#ifdef DEBUG_MODE",
         "highlightOffset": [
@@ -54,14 +54,14 @@
       },
       {
         "title": "디버그 코드 실행",
-        "explanation": "**`printf(\"[DEBUG] Variable x checking...\\n\");`**\n\n`#ifdef` 조건이 참이었기 때문에 이 줄은 컴파일러에게 전달되어 실행됩니다. 디버깅 목적으로만 필요한 코드를 넣기에 유용합니다.",
+        "explanation": "**`printf(\"[DEBUG] Variable x checking...\\n\");`**\n\n`#ifdef` 조건이 참이었기 때문에 이 줄은 컴파일러에게 전달되어 실행됩니다.\n디버깅 목적으로만 필요한 코드를 넣기에 유용합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"[DEBUG] Variable x checking...\\n\");",
         "stdout": "Program Start\n[DEBUG] Variable x checking..."
       },
       {
         "title": "조건부 컴파일 2: #if",
-        "explanation": "**`#if DEBUG_MODE == 0`**\n\n전처리기가 `DEBUG_MODE`의 **값**을 직접 비교합니다. `1 == 0` 은 거짓(false)이므로, 이 `#if`와 `#endif` 사이의 코드는 전처리기 단계에서 **완전히 삭제**됩니다. 컴파일러는 이 코드를 아예 보지도 못합니다.",
+        "explanation": "**`#if DEBUG_MODE == 0`**\n\n전처리기가 `DEBUG_MODE`의 **값**을 직접 비교합니다.\n`1 == 0` 은 거짓(false)이므로, 이 `#if`와 `#endif` 사이의 코드는 전처리기 단계에서 **완전히 삭제**됩니다.\n컴파일러는 이 코드를 아예 보지도 못합니다.",
         "visualizationType": "cMemory",
         "code": "#if DEBUG_MODE == 0",
         "highlightOffset": [
@@ -94,12 +94,12 @@
       "메모리 사용량 감소"
     ],
     "correctIndex": 1,
-    "explanation": "한 소스 파일에서 같은 헤더를 여러 번 include하게 되면(직/간접적으로), 구조체나 함수가 중복 정의되어 컴파일 에러가 발생합니다. 헤더 가드는 이를 막아줍니다."
+    "explanation": "한 소스 파일에서 같은 헤더를 여러 번 include하게 되면(직/간접적으로), 구조체나 함수가 중복 정의되어 컴파일 에러가 발생합니다.\n헤더 가드는 이를 막아줍니다."
   },
   "misconceptions": [
     {
       "wrong": "#ifdef로 뺀 코드는 런타임에 if문처럼 검사된다.",
-      "correct": "런타임에는 조건 검사조차 하지 않습니다. 전처리 단계에서 코드 자체가 사라지거나 남거나 둘 중 하나입니다.",
+      "correct": "런타임에는 조건 검사조차 하지 않습니다.\n전처리 단계에서 코드 자체가 사라지거나 남거나 둘 중 하나입니다.",
       "why": "실행 파일 크기 자체에 영향을 줍니다."
     }
   ],

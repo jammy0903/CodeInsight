@@ -90,9 +90,12 @@ export function MobileAIChatModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-white bg-opacity-20 hover:bg-white bg-opacity-30 transition-colors"
+                  className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                  style={{
+                    backgroundColor: 'rgba(239,68,68,0.2)',
+                  }}
                 >
-                  <X className="w-5 h-5 text-white" />
+                  <X className="w-5 h-5" style={{ color: '#ef4444' }} />
                 </button>
               </div>
 

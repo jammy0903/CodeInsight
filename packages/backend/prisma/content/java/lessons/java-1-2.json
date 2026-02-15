@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "리터럴로 String 생성",
-        "explanation": "**실행 순서:**\n1. JVM이 **String Pool** 검색.\n2. \"hello\"가 없으므로 Pool에 생성.\n3. 주소(Pool:0x100)를 `a`에 할당.\n\n**String Pool이란?**\n자주 쓰는 문자열을 모아두는 '재활용 센터'입니다. Java는 메모리를 아끼기 위해 똑같은 문자열 리터럴은 하나만 만들어서 공유합니다.\n\n**리터럴(Literal)이란?**\n코드에 직접 타이핑한 값(`\"hello\"`)들을 말합니다.",
+        "explanation": "**실행 순서:**\n1. JVM이 **String Pool** 검색.\n2. \"hello\"가 없으므로 Pool에 생성.\n3. 주소(Pool:0x100)를 `a`에 할당.\n\n**String Pool이란?**\n자주 쓰는 문자열을 모아두는 '재활용 센터'입니다.\nJava는 메모리를 아끼기 위해 똑같은 문자열 리터럴은 하나만 만들어서 공유합니다.\n\n**리터럴(Literal)이란?**\n코드에 직접 타이핑한 값(`\"hello\"`)들을 말합니다.",
         "keyInsight": "따옴표(\"\")로 만들면 Pool에 저장됨",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "같은 리터럴 재사용",
-        "explanation": "**실행 순서:**\n1. String Pool 검색.\n2. \"hello\" 발견 (재사용).\n3. 기존 주소(Pool:0x100)를 `b`에 할당.\n\n또 \"hello\"를 만들려고 하네요?\nJVM은 Pool을 뒤져보고, \"어? 아까 만든 게 있네?\" 하고 **기존 주소**를 재사용합니다.\n그래서 `b`도 `a`와 똑같은 **Pool:0x100**을 가리키게 됩니다.\n\n**Flyweight 패턴:**\n똑같은 객체를 많이 만들지 않고 공유해서 메모리를 절약하는 디자인 패턴입니다. String Pool이 바로 이 패턴입니다.",
+        "explanation": "**실행 순서:**\n1. String Pool 검색.\n2. \"hello\" 발견 (재사용).\n3. 기존 주소(Pool:0x100)를 `b`에 할당.\n\n또 \"hello\"를 만들려고 하네요?\nJVM은 Pool을 뒤져보고, \"어? 아까 만든 게 있네?\" 하고 **기존 주소**를 재사용합니다.\n그래서 `b`도 `a`와 똑같은 **Pool:0x100**을 가리키게 됩니다.\n\n**Flyweight 패턴:**\n똑같은 객체를 많이 만들지 않고 공유해서 메모리를 절약하는 디자인 패턴입니다.\nString Pool이 바로 이 패턴입니다.",
         "keyInsight": "같은 리터럴 = 같은 주소 재사용",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
@@ -153,7 +153,7 @@
       },
       {
         "title": "intern() 결과 비교",
-        "explanation": "**실행 순서:**\n1. a(Pool:0x100) == d(Pool:0x100) 비교.\n2. 주소가 같으므로 **true**.\n\n`a`와 `d`는 이제 같은 Pool 객체를 가리킵니다. `true`!\n\n**실무 팁:**\n수백만 개의 중복된 문자열을 다뤄야 할 때 `intern()`을 쓰면 메모리를 획기적으로 줄일 수 있습니다.",
+        "explanation": "**실행 순서:**\n1. a(Pool:0x100) == d(Pool:0x100) 비교.\n2. 주소가 같으므로 **true**.\n\n`a`와 `d`는 이제 같은 Pool 객체를 가리킵니다.\n`true`!\n\n**실무 팁:**\n수백만 개의 중복된 문자열을 다뤄야 할 때 `intern()`을 쓰면 메모리를 획기적으로 줄일 수 있습니다.",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "output": [

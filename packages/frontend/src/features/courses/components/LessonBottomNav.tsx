@@ -1,12 +1,11 @@
 /**
- * LessonBottomNav - 하단 고정 스텝 네비게이션 바
+ * LessonBottomNav - 하단 고정 스텝 네비게이션 바 (compact, 반투명)
  *
- * Duolingo/Codecademy 스타일: 화면 하단에 전체 너비로 고정.
- * 이전/다음 버튼이 넓은 터치 영역을 가짐.
+ * 화면 하단에 항상 고정. 반투명 배경 + blur.
  * 색상은 테마 CSS 변수 사용 (theme.css --theme-lesson-nav-*)
  */
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface LessonBottomNavProps {
@@ -14,6 +13,7 @@ interface LessonBottomNavProps {
   onNext: () => void;
   canGoPrev: boolean;
   nextLabel: string;
+  onQuiz?: () => void;
 }
 
 export function LessonBottomNav({
@@ -21,6 +21,7 @@ export function LessonBottomNav({
   onNext,
   canGoPrev,
   nextLabel,
+  onQuiz,
 }: LessonBottomNavProps) {
   const { t } = useTranslation();
 
@@ -32,15 +33,15 @@ export function LessonBottomNav({
         left: 0,
         right: 0,
         zIndex: 40,
-        padding: '12px 16px',
-        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-        backgroundColor: 'var(--theme-lesson-nav-bg)',
+        padding: '6px 12px',
+        paddingBottom: 'max(6px, env(safe-area-inset-bottom))',
+        backgroundColor: 'color-mix(in srgb, var(--theme-lesson-nav-bg) 75%, transparent)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         borderTop: '1px solid var(--theme-lesson-nav-border)',
       }}
     >
-      <div style={{ display: 'flex', gap: '10px' }}>
+      <div style={{ display: 'flex', gap: '8px', maxWidth: '600px', margin: '0 auto' }}>
         {/* 이전 버튼 */}
         <button
           onClick={onPrev}
@@ -50,10 +51,10 @@ export function LessonBottomNav({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '6px',
-            padding: '14px 0',
-            borderRadius: '14px',
-            fontSize: '16px',
+            gap: '4px',
+            padding: '8px 0',
+            borderRadius: '10px',
+            fontSize: '13px',
             fontWeight: 600,
             border: `1.5px solid var(${canGoPrev
               ? '--theme-lesson-nav-prev-border'
@@ -69,7 +70,7 @@ export function LessonBottomNav({
           }}
           aria-label={t('common.previous')}
         >
-          <ChevronLeft style={{ width: 20, height: 20 }} />
+          <ChevronLeft style={{ width: 16, height: 16 }} />
           <span>{t('common.previous')}</span>
         </button>
 
@@ -81,10 +82,10 @@ export function LessonBottomNav({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '6px',
-            padding: '14px 0',
-            borderRadius: '14px',
-            fontSize: '16px',
+            gap: '4px',
+            padding: '8px 0',
+            borderRadius: '10px',
+            fontSize: '13px',
             fontWeight: 700,
             border: 'none',
             backgroundColor: 'var(--theme-lesson-nav-next-bg)',
@@ -96,8 +97,36 @@ export function LessonBottomNav({
           aria-label={nextLabel}
         >
           <span>{nextLabel}</span>
-          <ChevronRight style={{ width: 20, height: 20 }} />
+          <ChevronRight style={{ width: 16, height: 16 }} />
         </button>
+
+        {/* 바로 퀴즈풀기 버튼 — 반투명 */}
+        {onQuiz && (
+          <button
+            onClick={onQuiz}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '3px',
+              padding: '8px 10px',
+              borderRadius: '10px',
+              fontSize: '11px',
+              fontWeight: 600,
+              border: '1px solid var(--theme-lesson-nav-next-bg)',
+              backgroundColor: 'color-mix(in srgb, var(--theme-lesson-nav-next-bg) 15%, transparent)',
+              color: 'var(--theme-lesson-nav-next-bg)',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+              opacity: 0.75,
+            }}
+            aria-label={t('lesson.quiz')}
+          >
+            <Zap style={{ width: 12, height: 12 }} />
+            <span>{t('lesson.quiz')}</span>
+          </button>
+        )}
       </div>
     </div>
   );

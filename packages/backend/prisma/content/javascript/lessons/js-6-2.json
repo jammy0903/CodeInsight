@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Animal.prototype에 메서드 추가",
-        "explanation": "`eat` 메서드를 `Animal.prototype`에 추가합니다. `Animal`의 모든 인스턴스는 이 `eat` 메서드를 프로토타입 체인을 통해 공유하게 됩니다.",
+        "explanation": "`eat` 메서드를 `Animal.prototype`에 추가합니다.\n`Animal`의 모든 인스턴스는 이 `eat` 메서드를 프로토타입 체인을 통해 공유하게 됩니다.",
         "keyInsight": "prototype에 메서드 추가 = 모든 인스턴스가 공유",
         "visualizationType": "prototype",
         "prototypeState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "Dog 생성자 + 부모 생성자 호출",
-        "explanation": "`Dog` 생성자 내에서 `Animal.call(this, name)`을 호출합니다. 이는 `new Dog()`로 생성될 객체(`this`)를 `Animal` 생성자에 넘겨 `name` 속성을 초기화하도록 하는, 클래스의 `super()`와 유사한 역할을 합니다.",
+        "explanation": "`Dog` 생성자 내에서 `Animal.call(this, name)`을 호출합니다.\n이는 `new Dog()`로 생성될 객체(`this`)를 `Animal` 생성자에 넘겨 `name` 속성을 초기화하도록 하는, 클래스의 `super()`와 유사한 역할을 합니다.",
         "keyInsight": "Animal.call(this) = 부모 생성자 실행 (super() 역할)",
         "visualizationType": "prototype",
         "prototypeState": {
@@ -55,7 +55,7 @@
       },
       {
         "title": "프로토타입 체인 연결",
-        "explanation": "`Object.create(Animal.prototype)`을 통해 `Animal.prototype`을 자신의 프로토타입으로 갖는 새로운 빈 객체를 생성하고, 이를 `Dog.prototype`에 할당합니다. 이로써 `Dog`과 `Animal` 사이의 상속 관계가 형성됩니다.",
+        "explanation": "`Object.create(Animal.prototype)`을 통해 `Animal.prototype`을 자신의 프로토타입으로 갖는 새로운 빈 객체를 생성하고, 이를 `Dog.prototype`에 할당합니다.\n이로써 `Dog`과 `Animal` 사이의 상속 관계가 형성됩니다.",
         "keyInsight": "Object.create(Parent.prototype) = 상속 체인 연결",
         "visualizationType": "prototype",
         "prototypeState": {
@@ -87,7 +87,7 @@
       },
       {
         "title": "Dog.prototype에 메서드 추가",
-        "explanation": "`bark` 메서드를 `Dog.prototype`에 추가합니다. 이제 `Dog`의 인스턴스들은 `bark`와 `eat` 메서드를 모두 사용할 수 있습니다.",
+        "explanation": "`bark` 메서드를 `Dog.prototype`에 추가합니다.\n이제 `Dog`의 인스턴스들은 `bark`와 `eat` 메서드를 모두 사용할 수 있습니다.",
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
@@ -110,7 +110,7 @@
       },
       {
         "title": "인스턴스 생성",
-        "explanation": "`new Dog('Buddy')`로 `buddy` 인스턴스를 생성합니다. 생성 과정에서 `Animal.call`이 실행되어 `buddy.name`이 'Buddy'로 설정되고, `buddy`의 `[[Prototype]]`은 `Dog.prototype`을 가리키게 됩니다.",
+        "explanation": "`new Dog('Buddy')`로 `buddy` 인스턴스를 생성합니다.\n생성 과정에서 `Animal.call`이 실행되어 `buddy.name`이 'Buddy'로 설정되고, `buddy`의 `[[Prototype]]`은 `Dog.prototype`을 가리키게 됩니다.",
         "visualizationType": "prototype",
         "prototypeState": {
           "objects": [
@@ -148,7 +148,7 @@
       },
       {
         "title": "자신의 속성 접근",
-        "explanation": "`buddy.name`을 찾습니다. `buddy` 객체 자신에게 `name` 속성이 있으므로 즉시 'Buddy'를 반환합니다.",
+        "explanation": "`buddy.name`을 찾습니다.\n`buddy` 객체 자신에게 `name` 속성이 있으므로 즉시 'Buddy'를 반환합니다.",
         "visualizationType": "prototype",
         "prototypeState": {
           "output": [
@@ -159,7 +159,7 @@
       },
       {
         "title": "부모 프로토타입 메서드 호출",
-        "explanation": "`buddy.eat()`을 찾습니다. `buddy` 자신에게는 없으므로 프로토타입 체인을 따라 올라가 `Animal.prototype`에서 `eat` 메서드를 찾아 실행합니다.",
+        "explanation": "`buddy.eat()`을 찾습니다.\n`buddy` 자신에게는 없으므로 프로토타입 체인을 따라 올라가 `Animal.prototype`에서 `eat` 메서드를 찾아 실행합니다.",
         "visualizationType": "prototype",
         "prototypeState": {
           "output": [
@@ -171,7 +171,7 @@
       },
       {
         "title": "자식 프로토타입 메서드 호출",
-        "explanation": "`buddy.bark()`를 찾습니다. `buddy` 자신에게는 없지만, 바로 위 프로토타입인 `Dog.prototype`에서 `bark` 메서드를 찾아 실행합니다.",
+        "explanation": "`buddy.bark()`를 찾습니다.\n`buddy` 자신에게는 없지만, 바로 위 프로토타입인 `Dog.prototype`에서 `bark` 메서드를 찾아 실행합니다.",
         "visualizationType": "prototype",
         "prototypeState": {
           "output": [
@@ -193,12 +193,12 @@
       "아무 영향 없음"
     ],
     "correctIndex": 1,
-    "explanation": "Object.create()로 새 객체를 만들면 constructor가 없습니다. 체인을 따라 Animal.prototype.constructor(= Animal)를 찾게 됩니다."
+    "explanation": "Object.create()로 새 객체를 만들면 constructor가 없습니다.\n체인을 따라 Animal.prototype.constructor(= Animal)를 찾게 됩니다."
   },
   "misconceptions": [
     {
       "wrong": "Dog.prototype = Animal.prototype 하면 상속된다",
-      "correct": "이러면 Dog.prototype과 Animal.prototype이 같은 객체가 됩니다. Dog에 추가한 메서드가 Animal에도 추가됩니다.",
+      "correct": "이러면 Dog.prototype과 Animal.prototype이 같은 객체가 됩니다.\nDog에 추가한 메서드가 Animal에도 추가됩니다.",
       "why": "Object.create()로 새 객체를 만들어 연결해야 합니다."
     }
   ],

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "딕셔너리 첫 번째 항목",
-        "explanation": "**`\"name\": \"Alice\"`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 딕셔너리 리터럴 `{}`를 만들 때, 각 키-값 쌍을 **순서대로 평가**합니다.\n\n첫 번째 키-값 쌍 `\"name\": \"Alice\"`를 평가하여 딕셔너리에 추가합니다.\n\n**왜 이 순서인가?** 딕셔너리 리터럴은 위에서 아래로 각 항목을 순서대로 처리합니다.\n\n**실행 순서**: line 2 시작 → line 3 평가 → \"name\": \"Alice\" 추가 → line 4",
+        "explanation": "**`\"name\": \"Alice\"`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n딕셔너리 리터럴 `{}`를 만들 때, 각 키-값 쌍을 **순서대로 평가**합니다.\n\n첫 번째 키-값 쌍 `\"name\": \"Alice\"`를 평가하여 딕셔너리에 추가합니다.\n\n**왜 이 순서인가?** 딕셔너리 리터럴은 위에서 아래로 각 항목을 순서대로 처리합니다.\n\n**실행 순서**: line 2 시작 → line 3 평가 → \"name\": \"Alice\" 추가 → line 4",
         "visualizationType": "pythonMemory",
         "code": "\"name\": \"Alice\",",
         "pythonMemoryState": {
@@ -63,7 +63,7 @@
       },
       {
         "title": "값 접근",
-        "explanation": "**`print(user[\"name\"])`**\n\n**딕셔너리 조회**: 대괄호 `[]` 안에 **키**를 넣어 값에 접근합니다. `user` 딕셔너리에서 `\"name\"` 키에 해당하는 값 `\"Alice\"`를 찾아 출력합니다.\n\n**리스트와의 차이**:\n- 리스트: 인덱스(숫자)로 접근 → `fruits[0]`\n- 딕셔너리: 키(문자열 등)로 접근 → `user[\"name\"]`\n\n**없는 키를 조회하면?** `KeyError` 발생. 안전하게 조회하려면 `user.get(\"name\")`을 사용하세요.\n\n**왜 이 순서인가?** 딕셔너리 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: user[\"name\"] 조회 → \"Alice\" 반환 → print 실행 → line 9",
+        "explanation": "**`print(user[\"name\"])`**\n\n**딕셔너리 조회**: 대괄호 `[]` 안에 **키**를 넣어 값에 접근합니다.\n`user` 딕셔너리에서 `\"name\"` 키에 해당하는 값 `\"Alice\"`를 찾아 출력합니다.\n\n**리스트와의 차이**:\n- 리스트: 인덱스(숫자)로 접근 → `fruits[0]`\n- 딕셔너리: 키(문자열 등)로 접근 → `user[\"name\"]`\n\n**없는 키를 조회하면?** `KeyError` 발생.\n안전하게 조회하려면 `user.get(\"name\")`을 사용하세요.\n\n**왜 이 순서인가?** 딕셔너리 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: user[\"name\"] 조회 → \"Alice\" 반환 → print 실행 → line 9",
         "visualizationType": "pythonMemory",
         "code": "print(user[\"name\"])",
         "pythonMemoryState": {
@@ -74,7 +74,7 @@
       },
       {
         "title": "값 수정",
-        "explanation": "**`user[\"age\"] = 26`**\n\n**기존 키에 할당 = 수정**: 이미 존재하는 키(`\"age\"`)에 새로운 값을 할당하면, 기존 값(25)이 새 값(26)으로 **덮어써집니다**.\n\n**Mutable의 의미**: 딕셔너리는 **새 객체를 만들지 않고**, 기존 객체(0x1000)의 **내용을 직접 수정**합니다. `user`는 여전히 같은 객체(0x1000)를 가리킵니다.\n\n**실행 순서**: user[\"age\"] 접근 → 25 → 26으로 교체 → line 10",
+        "explanation": "**`user[\"age\"] = 26`**\n\n**기존 키에 할당 = 수정**: 이미 존재하는 키(`\"age\"`)에 새로운 값을 할당하면, 기존 값(25)이 새 값(26)으로 **덮어써집니다**.\n\n**Mutable의 의미**: 딕셔너리는 **새 객체를 만들지 않고**, 기존 객체(0x1000)의 **내용을 직접 수정**합니다.\n`user`는 여전히 같은 객체(0x1000)를 가리킵니다.\n\n**실행 순서**: user[\"age\"] 접근 → 25 → 26으로 교체 → line 10",
         "visualizationType": "pythonMemory",
         "code": "user[\"age\"] = 26      # 수정",
         "pythonMemoryState": {
@@ -117,7 +117,7 @@
       },
       {
         "title": "키 존재 여부 확인",
-        "explanation": "**`if \"job\" in user:`**\n\n**`in` 키워드**: 딕셔너리에 특정 **키**가 있는지 확인합니다 (값이 아님!). `user` 딕셔너리에는 `\"job\"` 키가 없으므로, `\"job\" in user`는 **False**입니다.\n\n**왜 in을 사용하는가?** `user[\"job\"]`을 바로 조회하면 `KeyError`가 발생하지만, `in`으로 먼저 확인하면 안전합니다:\n```python\nif \"job\" in user:\n    print(user[\"job\"])  # 안전\nelse:\n    print(\"No job\")  # 키 없을 때\n```\n\n**또 다른 방법**: `user.get(\"job\")` → 키 없으면 `None` 반환 (에러 없음)\n\n**실행 순서**: \"job\" in user → False → if 블록 건너뜀 → 프로그램 종료",
+        "explanation": "**`if \"job\" in user:`**\n\n**`in` 키워드**: 딕셔너리에 특정 **키**가 있는지 확인합니다 (값이 아님!).\n`user` 딕셔너리에는 `\"job\"` 키가 없으므로, `\"job\" in user`는 **False**입니다.\n\n**왜 in을 사용하는가?** `user[\"job\"]`을 바로 조회하면 `KeyError`가 발생하지만, `in`으로 먼저 확인하면 안전합니다:\n```python\nif \"job\" in user:\n    print(user[\"job\"])  # 안전\nelse:\n    print(\"No job\")  # 키 없을 때\n```\n\n**또 다른 방법**: `user.get(\"job\")` → 키 없으면 `None` 반환 (에러 없음)\n\n**실행 순서**: \"job\" in user → False → if 블록 건너뜀 → 프로그램 종료",
         "visualizationType": "pythonMemory",
         "code": "if \"job\" in user:",
         "pythonMemoryState": {
@@ -150,13 +150,13 @@
       "user.search(key)"
     ],
     "correctIndex": 1,
-    "explanation": "`user.get(\"job\")`을 쓰면 키가 없을 때 에러 대신 `None`을 반환합니다. `user.get(\"job\", \"Unknown\")` 처럼 기본값도 줄 수 있습니다."
+    "explanation": "`user.get(\"job\")`을 쓰면 키가 없을 때 에러 대신 `None`을 반환합니다.\n`user.get(\"job\", \"Unknown\")` 처럼 기본값도 줄 수 있습니다."
   },
   "misconceptions": [
     {
       "wrong": "리스트를 딕셔너리 키로 쓸 수 있다",
-      "correct": "불가능합니다. 키는 **불변(Immutable)** 타입이어야 합니다.",
-      "why": "리스트 같은 가변 객체는 값이 바뀌면 해시값도 바뀌어야 해서, 키로 쓰면 딕셔너리가 망가집니다. 튜플은 가능합니다."
+      "correct": "불가능합니다.\n키는 **불변(Immutable)** 타입이어야 합니다.",
+      "why": "리스트 같은 가변 객체는 값이 바뀌면 해시값도 바뀌어야 해서, 키로 쓰면 딕셔너리가 망가집니다.\n튜플은 가능합니다."
     }
   ],
   "keyTakeaway": "이름으로 데이터를 찾을 땐 딕셔너리. `get()`으로 안전하게 조회하자."

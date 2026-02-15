@@ -16,7 +16,7 @@
       },
       {
         "title": "액션 함수들 정의",
-        "explanation": "**`void item()`, `void map()`, `void save()`**\n\n같은 형태(시그니처)를 가진 세 개의 함수를 정의합니다. 각 함수는 매개변수 없이(`void`) 호출되며 아무것도 반환하지 않습니다(`void`). 이 함수들은 나중에 배열에 담길 것입니다.\n\n**비유**: 자판기의 음료수 버튼 1, 2, 3번에 연결될 실제 동작들입니다.",
+        "explanation": "**`void item()`, `void map()`, `void save()`**\n\n같은 형태(시그니처)를 가진 세 개의 함수를 정의합니다.\n각 함수는 매개변수 없이(`void`) 호출되며 아무것도 반환하지 않습니다(`void`).\n이 함수들은 나중에 배열에 담길 것입니다.\n\n**비유**: 자판기의 음료수 버튼 1, 2, 3번에 연결될 실제 동작들입니다.",
         "visualizationType": "cMemory",
         "code": "void item() { printf(\"Item Used\\n\"); }",
         "highlightOffset": [
@@ -41,7 +41,7 @@
       },
       {
         "title": "선택 변수 선언",
-        "explanation": "**`int choice = 1;`**\n\n어떤 함수를 호출할지 결정하는 인덱스 변수입니다. 1은 배열의 두 번째 요소, 즉 `map` 함수를 가리킵니다.",
+        "explanation": "**`int choice = 1;`**\n\n어떤 함수를 호출할지 결정하는 인덱스 변수입니다.\n1은 배열의 두 번째 요소, 즉 `map` 함수를 가리킵니다.",
         "visualizationType": "cMemory",
         "code": "int choice = 1;",
         "stack": [
@@ -55,7 +55,7 @@
       },
       {
         "title": "함수 포인터 배열 (점프 테이블)",
-        "explanation": "**`void (*actions[3])() = {item, map, save};`**\n\n함수 포인터 배열을 선언합니다. 이 배열은 '함수의 주소'를 담고 있습니다.\n- `actions[0]` → `item` 함수의 주소\n- `actions[1]` → `map` 함수의 주소\n- `actions[2]` → `save` 함수의 주소\n\n이것이 바로 **점프 테이블(Jump Table)**입니다. 인덱스로 함수를 선택할 수 있습니다.\n\n**비유**: `actions`는 '단축키 목록'입니다. 0번을 누르면 `item`, 1번을 누르면 `map`이 실행되도록 등록해둔 것입니다.",
+        "explanation": "**`void (*actions[3])() = {item, map, save};`**\n\n함수 포인터 배열을 선언합니다.\n이 배열은 '함수의 주소'를 담고 있습니다.\n- `actions[0]` → `item` 함수의 주소\n- `actions[1]` → `map` 함수의 주소\n- `actions[2]` → `save` 함수의 주소\n\n이것이 바로 **점프 테이블(Jump Table)**입니다.\n인덱스로 함수를 선택할 수 있습니다.\n\n**비유**: `actions`는 '단축키 목록'입니다.\n0번을 누르면 `item`, 1번을 누르면 `map`이 실행되도록 등록해둔 것입니다.",
         "keyInsight": "함수 이름 자체가 함수의 주소입니다.",
         "visualizationType": "cMemory",
         "code": "void (*actions[3])() = {item, map, save};",
@@ -76,13 +76,13 @@
       },
       {
         "title": "범위 검사",
-        "explanation": "**`if (choice >= 0 && choice < 3)`**\n\n`choice` 값이 배열 범위 내(0~2)인지 확인합니다. 이 검사 없이 `actions[-1]()` 같은 코드가 실행되면 심각한 버그가 발생합니다.",
+        "explanation": "**`if (choice >= 0 && choice < 3)`**\n\n`choice` 값이 배열 범위 내(0~2)인지 확인합니다.\n이 검사 없이 `actions[-1]()` 같은 코드가 실행되면 심각한 버그가 발생합니다.",
         "visualizationType": "cMemory",
         "code": "if (choice >= 0 && choice < 3) {"
       },
       {
         "title": "점프 테이블로 함수 호출",
-        "explanation": "**`actions[choice]();`**\n\n`choice`가 1이므로, `actions[1]`을 참조합니다. 이는 `map` 함수의 주소입니다. 그 뒤에 `()`를 붙이면 해당 주소의 함수를 호출합니다.\n\n마치 `map();`을 직접 호출한 것과 같은 효과입니다. if-else 없이 O(1)로 분기가 처리됩니다!",
+        "explanation": "**`actions[choice]();`**\n\n`choice`가 1이므로, `actions[1]`을 참조합니다.\n이는 `map` 함수의 주소입니다.\n그 뒤에 `()`를 붙이면 해당 주소의 함수를 호출합니다.\n\n마치 `map();`을 직접 호출한 것과 같은 효과입니다.\nif-else 없이 O(1)로 분기가 처리됩니다!",
         "keyInsight": "actions[1]()은 곧 map()과 동일",
         "visualizationType": "cMemory",
         "code": "actions[choice]();",
@@ -112,7 +112,7 @@
   "misconceptions": [
     {
       "wrong": "함수 포인터 배열은 서로 다른 형태(매개변수/반환값)의 함수도 담을 수 있다.",
-      "correct": "아닙니다. 배열은 동일한 타입만 담을 수 있으므로, 모든 함수의 시그니처(Signature)가 같아야 합니다.",
+      "correct": "아닙니다.\n배열은 동일한 타입만 담을 수 있으므로, 모든 함수의 시그니처(Signature)가 같아야 합니다.",
       "why": "int 배열에 float를 못 넣는 것과 같은 이치입니다."
     }
   ],

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Optional.of() - 상자 만들기",
-        "explanation": "**실행 순서:**\n1. `Optional.of(\"hello\")` 호출.\n2. Heap에 `Optional` 객체(상자) 생성.\n3. 내부에 \"hello\" 값 저장.\n\n**메모리에서 일어나는 일:**\nHeap에 `Optional`이라는 **단단한 상자(Wrapper)**를 만들고, \"hello\" 문자열을 그 상자 안에 안전하게 넣습니다.\n\n**경고:** `of()`는 `null`을 절대 허용하지 않습니다. null을 넣으면 상자를 만들기도 전에 NPE가 터집니다.",
+        "explanation": "**실행 순서:**\n1. `Optional.of(\"hello\")` 호출.\n2. Heap에 `Optional` 객체(상자) 생성.\n3. 내부에 \"hello\" 값 저장.\n\n**메모리에서 일어나는 일:**\nHeap에 `Optional`이라는 **단단한 상자(Wrapper)**를 만들고, \"hello\" 문자열을 그 상자 안에 안전하게 넣습니다.\n\n**경고:** `of()`는 `null`을 절대 허용하지 않습니다.\nnull을 넣으면 상자를 만들기도 전에 NPE가 터집니다.",
         "keyInsight": "of() = null 절대 불가",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt1 = Optional.of(\"hello\");",
@@ -91,7 +91,7 @@
       },
       {
         "title": "get() - 강제로 꺼내기 (위험!!)",
-        "explanation": "**실행 순서:**\n1. `opt1.get()` 호출.\n2. 값 존재 확인.\n3. \"hello\" 반환.\n\n상자를 무작정 엽니다.\n지금은 값이 있어서 다행이지만, 비어있을 때 `get()`을 호출하면 **`NoSuchElementException`** 예외가 폭발합니다.\n\n**경고:** `get()`은 최후의 수단입니다. 되도록 쓰지 마세요.",
+        "explanation": "**실행 순서:**\n1. `opt1.get()` 호출.\n2. 값 존재 확인.\n3. \"hello\" 반환.\n\n상자를 무작정 엽니다.\n지금은 값이 있어서 다행이지만, 비어있을 때 `get()`을 호출하면 **`NoSuchElementException`** 예외가 폭발합니다.\n\n**경고:** `get()`은 최후의 수단입니다.\n되도록 쓰지 마세요.",
         "keyInsight": "get() 대신 orElse() 사용 권장",
         "visualizationType": "javaMemory",
         "code": "String value = opt1.get();",
@@ -118,7 +118,7 @@
       },
       {
         "title": "orElse() - 안전한 기본값 제공",
-        "explanation": "**실행 순서:**\n1. `opt3.orElse(\"default\")` 호출.\n2. `opt3`가 비어있음 확인.\n3. 인자로 넘긴 `\"default\"` 반환.\n\n**가장 권장하는 방식:** \"상자를 열어봐. 값이 있으면 그거 쓰고, **비어있으면 'default'를 대신 써.**\"\n한 줄로 깔끔하고 안전하게 값을 얻을 수 있습니다.",
+        "explanation": "**실행 순서:**\n1. `opt3.orElse(\"default\")` 호출.\n2. `opt3`가 비어있음 확인.\n3. 인자로 넘긴 `\"default\"` 반환.\n\n**가장 권장하는 방식:** \"상자를 열어봐.\n값이 있으면 그거 쓰고, **비어있으면 'default'를 대신 써.**\"\n한 줄로 깔끔하고 안전하게 값을 얻을 수 있습니다.",
         "keyInsight": "orElse() = 안전한 기본값 패턴",
         "visualizationType": "javaMemory",
         "code": "String result = opt3.orElse(\"default\");",
@@ -135,7 +135,7 @@
       },
       {
         "title": "ifPresent() - 함수형 스타일",
-        "explanation": "**실행 순서:**\n1. `opt1.ifPresent(...)` 호출.\n2. `opt1`에 값이 있음 확인.\n3. 람다 함수 `s -> println(s)` 실행.\n4. \"hello\" 출력.\n\n\"값이 있으면 이 함수(람다)를 실행 해줘. 없으면 말고.\"\n값을 꺼내지 않고, 상자 안에서 작업을 처리하도록 시키는 세련된 방법입니다.",
+        "explanation": "**실행 순서:**\n1. `opt1.ifPresent(...)` 호출.\n2. `opt1`에 값이 있음 확인.\n3. 람다 함수 `s -> println(s)` 실행.\n4. \"hello\" 출력.\n\n\"값이 있으면 이 함수(람다)를 실행 해줘.\n없으면 말고.\"\n값을 꺼내지 않고, 상자 안에서 작업을 처리하도록 시키는 세련된 방법입니다.",
         "keyInsight": "ifPresent() = 값 있을 때만 실행",
         "visualizationType": "javaMemory",
         "code": "opt1.ifPresent(s -> System.out.println(s));",
@@ -158,18 +158,18 @@
       "스트림 파이프라인"
     ],
     "correctIndex": 1,
-    "explanation": "Optional은 오직 **메서드 반환용**으로 설계되었습니다. 필드로 쓰면 메모리 낭비가 심하고 직렬화(Serialization) 문제도 생깁니다."
+    "explanation": "Optional은 오직 메서드 반환용으로 설계되었습니다.\n필드로 쓰면 메모리 낭비가 심하고 직렬화(Serialization) 문제도 생깁니다."
   },
   "misconceptions": [
     {
       "wrong": "Optional은 null 처리를 완전히 대체한다",
-      "correct": "아닙니다. Optional 변수 자체가 null일 수도 있습니다(최악의 상황).",
+      "correct": "아닙니다.\nOptional 변수 자체가 null일 수도 있습니다(최악의 상황).",
       "why": "Optional을 쓰려면 `Optional<String> opt = null;` 절대 이러지 말고, 항상 `Optional.empty()`로 초기화해야 합니다."
     },
     {
       "wrong": "isPresent() + get() 패턴이 정석이다",
       "correct": "`orElse()`나 `ifPresent()` 같은 메서드를 쓰는 게 'Optional스러운' 사용법입니다.",
-      "why": "`if (opt.isPresent()) { ... get() }`은 `if (x != null)`과 다를 바가 없어서 코드가 장황해집니다. Optional의 진가는 함수형 스타일에 있습니다."
+      "why": "`if (opt.isPresent()) { ... get() }`은 `if (x != null)`과 다를 바가 없어서 코드가 장황해집니다.\nOptional의 진가는 함수형 스타일에 있습니다."
     }
   ],
   "keyTakeaway": "리턴 타입에는 Optional, 꺼낼 때는 orElse()!"

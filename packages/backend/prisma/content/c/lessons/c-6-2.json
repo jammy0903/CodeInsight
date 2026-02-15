@@ -30,7 +30,7 @@
       },
       {
         "title": "방법 1: 문자 배열 선언 (수정 가능)",
-        "explanation": "**`char arr[] = \"Hello\";`**\n\n이 방식은 **수정 가능한 사본**을 만듭니다. \"Hello\"라는 문자열의 내용이 `main` 함수의 스택 메모리에 생성된 `arr` 배열로 그대로 복사됩니다. 이 배열은 우리가 자유롭게 내용을 변경할 수 있습니다.",
+        "explanation": "**`char arr[] = \"Hello\";`**\n\n이 방식은 **수정 가능한 사본**을 만듭니다.\n\"Hello\"라는 문자열의 내용이 `main` 함수의 스택 메모리에 생성된 `arr` 배열로 그대로 복사됩니다.\n이 배열은 우리가 자유롭게 내용을 변경할 수 있습니다.",
         "visualizationType": "cMemory",
         "code": "char arr[] = \"Hello\";",
         "stack": [
@@ -74,7 +74,7 @@
       },
       {
         "title": "방법 2: 문자 포인터 선언 (수정 불가)",
-        "explanation": "**`char *ptr = \"World\";`**\n\n이 방식은 **수정이 불가능한 원본을 가리킵니다.** \"World\"라는 문자열은 프로그램의 **읽기 전용(Read-Only) 데이터 영역**에 저장됩니다. 그리고 스택에 생성된 포인터 `ptr`은 그 읽기 전용 데이터의 주소를 저장할 뿐입니다.",
+        "explanation": "**`char *ptr = \"World\";`**\n\n이 방식은 **수정이 불가능한 원본을 가리킵니다.** \"World\"라는 문자열은 프로그램의 **읽기 전용(Read-Only) 데이터 영역**에 저장됩니다.\n그리고 스택에 생성된 포인터 `ptr`은 그 읽기 전용 데이터의 주소를 저장할 뿐입니다.",
         "visualizationType": "cMemory",
         "code": "char *ptr = \"World\";",
         "stack": [
@@ -94,14 +94,14 @@
       },
       {
         "title": "포인터가 가리키는 문자열 출력",
-        "explanation": "**`printf(\"%s\\n\", ptr);`**\n\n`ptr`이 가리키는 읽기 전용 메모리의 문자열 \"World\"가 정상적으로 출력됩니다. 읽는 것은 문제가 없습니다.",
+        "explanation": "**`printf(\"%s\\n\", ptr);`**\n\n`ptr`이 가리키는 읽기 전용 메모리의 문자열 \"World\"가 정상적으로 출력됩니다.\n읽는 것은 문제가 없습니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"%s\\n\", ptr);",
         "stdout": "Bello\nWorld"
       },
       {
         "title": "만약 수정하려고 한다면? (Crash!)",
-        "explanation": "만약 `ptr[0] = 'B';` 와 같이 읽기 전용 데이터를 수정하려고 시도하면, 운영체제가 이를 허용하지 않기 때문에 프로그램이 강제 종료(Segmentation Fault)됩니다. 비석에 새겨진 글자를 바꾸려는 것과 같습니다.",
+        "explanation": "만약 `ptr[0] = 'B';` 와 같이 읽기 전용 데이터를 수정하려고 시도하면, 운영체제가 이를 허용하지 않기 때문에 프로그램이 강제 종료(Segmentation Fault)됩니다.\n비석에 새겨진 글자를 바꾸려는 것과 같습니다.",
         "highlight": [],
         "visualizationType": "cMemory",
         "code": "printf(\"%s\\n\", ptr);"
@@ -125,13 +125,13 @@
       "#define STR \"...\""
     ],
     "correctIndex": 2,
-    "explanation": "배열(`[]`)로 선언해야 스택(또는 데이터 영역)에 수정 가능한 사본이 만들어집니다. 포인터(`*`)로 문자열 상수를 가리키면 수정할 수 없습니다."
+    "explanation": "배열(`[]`)로 선언해야 스택(또는 데이터 영역)에 수정 가능한 사본이 만들어집니다.\n포인터(`*`)로 문자열 상수를 가리키면 수정할 수 없습니다."
   },
   "misconceptions": [
     {
       "wrong": "char *s = \"A\"; 는 힙에 저장된다",
       "correct": "힙이 아니라 코드(텍스트) 영역에 저장됩니다.",
-      "why": "`malloc`을 쓰지 않는 한 힙은 아닙니다. 프로그램 코드와 함께 저장되는 상수(Constant)입니다."
+      "why": "`malloc`을 쓰지 않는 한 힙은 아닙니다.\n프로그램 코드와 함께 저장되는 상수(Constant)입니다."
     }
   ],
   "keyTakeaway": "고쳐야 하면 `[]`(배열), 읽기만 하면 `*`(포인터). 구분해서 쓰자."

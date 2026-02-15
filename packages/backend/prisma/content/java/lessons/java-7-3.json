@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "제네릭 메서드 정의",
-        "explanation": "**실행 순서:**\n1. `printArray` 메서드가 정의됩니다.\n2. `<T>`는 이 메서드 호출 시점에 타입이 결정됨을 의미합니다.\n\n**독립적인 제네릭:**\n클래스 전체가 아니라, 이 메서드 하나만 제네릭하게 만들 수 있어요. 유틸리티 함수 만들 때 딱이죠!",
+        "explanation": "**실행 순서:**\n1. `printArray` 메서드가 정의됩니다.\n2. `<T>`는 이 메서드 호출 시점에 타입이 결정됨을 의미합니다.\n\n**독립적인 제네릭:**\n클래스 전체가 아니라, 이 메서드 하나만 제네릭하게 만들 수 있어요.\n유틸리티 함수 만들 때 딱이죠!",
         "visualizationType": "javaMemory",
         "code": "public static <T> void printArray(T[] array) {",
         "highlightOffset": [
@@ -41,7 +41,7 @@
       },
       {
         "title": "배열 생성 (Integer, String)",
-        "explanation": "**`Integer[] intArray = {1, 2, 3};`**\n\n`Integer` 배열과 `String` 배열을 힙에 생성합니다. 각각 `intArray`, `strArray` 변수가 참조합니다.\n\n**비유**: `intArray`는 '숫자 블록 박스', `strArray`는 '글자 블록 박스'를 준비하는 것과 같습니다.",
+        "explanation": "**`Integer[] intArray = {1, 2, 3};`**\n\n`Integer` 배열과 `String` 배열을 힙에 생성합니다.\n각각 `intArray`, `strArray` 변수가 참조합니다.\n\n**비유**: `intArray`는 '숫자 블록 박스', `strArray`는 '글자 블록 박스'를 준비하는 것과 같습니다.",
         "visualizationType": "javaMemory",
         "code": "Integer[] intArray = {1, 2, 3};",
         "highlightOffset": [
@@ -86,7 +86,7 @@
       },
       {
         "title": "함수 호출 (T = Integer)",
-        "explanation": "**`printArray(intArray);`**\n\n`printArray`를 호출합니다. 컴파일러가 `intArray`의 타입을 보고 `T`를 `Integer`로 추론(Type Inference)합니다.\n\n**비유**: '만능 프린터'(`printArray`)에 '숫자 종이'를 넣으면, 프린터가 알아서 \"아, 이건 숫자구나\" 하고 숫자 모드로 작동하는 것과 같습니다.",
+        "explanation": "**`printArray(intArray);`**\n\n`printArray`를 호출합니다.\n컴파일러가 `intArray`의 타입을 보고 `T`를 `Integer`로 추론(Type Inference)합니다.\n\n**비유**: '만능 프린터'(`printArray`)에 '숫자 종이'를 넣으면, 프린터가 알아서 \"아, 이건 숫자구나\" 하고 숫자 모드로 작동하는 것과 같습니다.",
         "visualizationType": "javaMemory",
         "code": "printArray(intArray); // T inferred as Integer",
         "highlightOffset": [
@@ -188,7 +188,7 @@
       },
       {
         "title": "원시 타입 제한",
-        "explanation": "**실행 순서:**\n1. 이 줄의 주석을 풀면 컴파일 에러가 발생합니다.\n\n**주의할 점:**\n`int[]`는 객체 배열이 아니라 원시 타입 배열이라 `T[]`에 대입될 수 없습니다. 제네릭은 오직 '참조 타입(Object)'만 다룬다는 점, 잊지 마세요!",
+        "explanation": "**실행 순서:**\n1. 이 줄의 주석을 풀면 컴파일 에러가 발생합니다.\n\n**주의할 점:**\n`int[]`는 객체 배열이 아니라 원시 타입 배열이라 `T[]`에 대입될 수 없습니다.\n제네릭은 오직 '참조 타입(Object)'만 다룬다는 점, 잊지 마세요!",
         "visualizationType": "javaMemory",
         "code": "// printArray(new int[]{1, 2}); // Error! int is not T",
         "javaMemoryState": {
@@ -221,7 +221,7 @@
   "misconceptions": [
     {
       "wrong": "static 메서드는 클래스의 제네릭 타입 T를 사용할 수 있다.",
-      "correct": "불가능합니다. static 메서드는 객체 생성 전에 메모리에 올라가는데, 클래스의 T는 객체 생성 시(`new Box<Integer>`)에 정해지기 때문입니다. 그래서 제네릭 메서드로 따로 선언해야 합니다.",
+      "correct": "불가능합니다.\nstatic 메서드는 객체 생성 전에 메모리에 올라가는데, 클래스의 T는 객체 생성 시(`new Box<Integer>`)에 정해지기 때문입니다.\n그래서 제네릭 메서드로 따로 선언해야 합니다.",
       "why": "static 문맥(Class level)과 인스턴스 문맥(Object level)의 생명주기가 다르기 때문입니다."
     }
   ],

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "logger 함수 정의",
-        "explanation": "`def logger(func):`\n데코레이터 함수를 정의합니다. 다른 함수를 인자로 받습니다.\n\n**왜 이 순서인가?**\n데코레이터를 사용하려면 먼저 정의해야 합니다.\n\n**실행 순서:**\n1. `logger` 함수 객체(0x1100) 생성.\n2. 전역 네임스페이스에 등록.",
+        "explanation": "`def logger(func):`\n데코레이터 함수를 정의합니다.\n다른 함수를 인자로 받습니다.\n\n**왜 이 순서인가?**\n데코레이터를 사용하려면 먼저 정의해야 합니다.\n\n**실행 순서:**\n1. `logger` 함수 객체(0x1100) 생성.\n2. 전역 네임스페이스에 등록.",
         "visualizationType": "pythonMemory",
         "code": "def logger(func):",
         "highlightOffset": [
@@ -42,7 +42,7 @@
       },
       {
         "title": "@logger 데코레이터 적용 및 say_hello 정의",
-        "explanation": "`@logger` + `def say_hello(name):`\n@logger는 `say_hello = logger(say_hello)`와 동일합니다. logger가 호출됩니다.\n\n**왜 이 순서인가?**\n함수 정의 직후에 바로 데코레이터를 적용합니다.\n\n**실행 순서:**\n1. 원본 `say_hello` 함수 객체(0x1200) 임시 생성.\n2. `logger(0x1200)` 호출.\n3. `func` 매개변수에 원본 함수 전달.",
+        "explanation": "`@logger` + `def say_hello(name):`\n@logger는 `say_hello = logger(say_hello)`와 동일합니다.\nlogger가 호출됩니다.\n\n**왜 이 순서인가?**\n함수 정의 직후에 바로 데코레이터를 적용합니다.\n\n**실행 순서:**\n1. 원본 `say_hello` 함수 객체(0x1200) 임시 생성.\n2. `logger(0x1200)` 호출.\n3. `func` 매개변수에 원본 함수 전달.",
         "visualizationType": "pythonMemory",
         "code": "def say_hello(name):",
         "highlightOffset": [
@@ -72,7 +72,7 @@
       },
       {
         "title": "wrapper 함수 정의",
-        "explanation": "`def wrapper(*args, **kwargs):`\nlogger 함수 안에서 wrapper 함수를 정의합니다. say_hello(func)를 감싸는 클로저입니다.\n\n**왜 이 순서인가?**\n기능을 추가한 새로운 함수를 만듭니다.\n\n**실행 순서:**\n1. `wrapper` 함수 객체(0x2000) 생성.\n2. `func`(0x1200)를 참조하는 클로저 생성.",
+        "explanation": "`def wrapper(*args, **kwargs):`\nlogger 함수 안에서 wrapper 함수를 정의합니다.\nsay_hello(func)를 감싸는 클로저입니다.\n\n**왜 이 순서인가?**\n기능을 추가한 새로운 함수를 만듭니다.\n\n**실행 순서:**\n1. `wrapper` 함수 객체(0x2000) 생성.\n2. `func`(0x1200)를 참조하는 클로저 생성.",
         "visualizationType": "pythonMemory",
         "code": "def wrapper(*args, **kwargs):",
         "highlightOffset": [
@@ -114,7 +114,7 @@
       },
       {
         "title": "wrapper 반환",
-        "explanation": "`return wrapper`\nwrapper 함수를 반환합니다. say_hello는 이제 wrapper를 가리킵니다.\n\n**왜 이 순서인가?**\n`say_hello`라는 이름이 이제 `wrapper` 함수를 가리키게 됩니다.\n\n**실행 순서:**\n1. `wrapper` 반환.\n2. 전역 변수 `say_hello`에 할당.\n3. 원본 함수 이름이 덮어씌워짐.",
+        "explanation": "`return wrapper`\nwrapper 함수를 반환합니다.\nsay_hello는 이제 wrapper를 가리킵니다.\n\n**왜 이 순서인가?**\n`say_hello`라는 이름이 이제 `wrapper` 함수를 가리키게 됩니다.\n\n**실행 순서:**\n1. `wrapper` 반환.\n2. 전역 변수 `say_hello`에 할당.\n3. 원본 함수 이름이 덮어씌워짐.",
         "visualizationType": "pythonMemory",
         "code": "return wrapper",
         "pythonMemoryState": {
@@ -315,7 +315,7 @@
   "misconceptions": [
     {
       "wrong": "데코레이터는 함수의 내용을 바꾼다.",
-      "correct": "아닙니다. 함수를 그대로 둔 채, 감싸는(wrapping) 새로운 함수를 만들어 기능을 추가합니다.",
+      "correct": "아닙니다.\n함수를 그대로 둔 채, 감싸는(wrapping) 새로운 함수를 만들어 기능을 추가합니다.",
       "why": "원본 함수를 수정하지 않고 기능을 추가/변경할 수 있다는 점이 데코레이터의 가장 큰 장점입니다."
     }
   ],

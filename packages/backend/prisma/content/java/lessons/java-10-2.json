@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "main 메서드 시작",
-        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다. 은행 계좌를 만들고 임무를 시작합니다.",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다.\n은행 계좌를 만들고 임무를 시작합니다.",
         "visualizationType": "memory",
         "code": "public static void main(String[] args) {",
         "memoryState": {
@@ -24,7 +24,7 @@
       },
       {
         "title": "계좌 객체 생성",
-        "explanation": "공유 자원으로 사용될 `BankAccount` 객체를 생성합니다. 이 객체는 내부에 보이지 않는 '모니터 락(열쇠)'을 하나 가지고 있습니다.",
+        "explanation": "공유 자원으로 사용될 `BankAccount` 객체를 생성합니다.\n이 객체는 내부에 보이지 않는 '모니터 락(열쇠)'을 하나 가지고 있습니다.",
         "visualizationType": "memory",
         "code": "BankAccount account = new BankAccount();",
         "memoryState": {
@@ -46,7 +46,7 @@
       },
       {
         "title": "동기화된 메서드",
-        "explanation": "메서드 앞에 `synchronized`가 붙으면, 이 메서드를 실행하려는 쓰레드는 반드시 해당 객체(`account`)의 열쇠를 얻어야만 진입할 수 있습니다. 한 번에 오직 한 쓰레드만 이 메서드를 실행할 수 있습니다.",
+        "explanation": "메서드 앞에 `synchronized`가 붙으면, 이 메서드를 실행하려는 쓰레드는 반드시 해당 객체(`account`)의 열쇠를 얻어야만 진입할 수 있습니다.\n한 번에 오직 한 쓰레드만 이 메서드를 실행할 수 있습니다.",
         "visualizationType": "memory",
         "code": "public synchronized void withdraw(int amount) {",
         "memoryState": {
@@ -61,7 +61,7 @@
       },
       {
         "title": "임계 영역 (Critical Section)",
-        "explanation": "열쇠를 가진 쓰레드만 `balance`를 안전하게 변경할 수 있습니다. 다른 쓰레드는 이 작업이 끝날 때까지 밖에서 대기해야 합니다. 이처럼 한 번에 하나의 쓰레드만 실행해야 하는 코드 영역을 '임계 영역'이라고 부릅니다.",
+        "explanation": "열쇠를 가진 쓰레드만 `balance`를 안전하게 변경할 수 있습니다.\n다른 쓰레드는 이 작업이 끝날 때까지 밖에서 대기해야 합니다.\n이처럼 한 번에 하나의 쓰레드만 실행해야 하는 코드 영역을 '임계 영역'이라고 부릅니다.",
         "keyInsight": "동기화 = 데이터 무결성 보호",
         "visualizationType": "memory",
         "code": "balance -= amount;",
@@ -93,13 +93,13 @@
       "제한 없음"
     ],
     "correctIndex": 0,
-    "explanation": "Java의 모든 객체는 단 하나의 '모니터 락'을 가집니다. 그래서 한 번에 오직 하나의 쓰레드만 synchronized 영역에 진입할 수 있습니다."
+    "explanation": "Java의 모든 객체는 단 하나의 '모니터 락'을 가집니다.\n그래서 한 번에 오직 하나의 쓰레드만 synchronized 영역에 진입할 수 있습니다."
   },
   "misconceptions": [
     {
       "wrong": "synchronized를 많이 쓸수록 프로그램이 빨라진다.",
       "correct": "아니요! 동기화는 쓰레드를 줄 세우기 때문에 오히려 성능이 떨어집니다.",
-      "why": "기다리는 시간(Waiting Time)이 발생하기 때문입니다. 꼭 필요한 공유 자원에만 최소한으로 써야 합니다."
+      "why": "기다리는 시간(Waiting Time)이 발생하기 때문입니다.\n꼭 필요한 공유 자원에만 최소한으로 써야 합니다."
     }
   ],
   "keyTakeaway": "synchronized는 '데이터가 꼬이지 않게 보호하는 방어막'입니다. 열쇠는 객체당 하나뿐임을 기억하세요!"

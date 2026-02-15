@@ -36,7 +36,7 @@
       },
       {
         "title": "힙 메모리 할당 요청",
-        "explanation": "**`int *p = (int*)malloc(sizeof(int));`**\n\n`sizeof(int)` (보통 4바이트) 크기의 메모리 공간을 힙(Heap)에 할당해달라고 요청합니다. \n`malloc`은 할당된 메모리의 시작 주소를 반환하며, 이 주소는 `int` 타입의 포인터 변수 `p`에 저장됩니다. `(int*)`는 `malloc`이 반환하는 `void*` 타입을 `int*` 타입으로 변환하는 형변환(casting)입니다.\n\n**비유**: 호텔 프런트(OS)에 가서 \"4바이트 방 하나 주세요\"라고 요청하고, 방 키(주소)를 받아오는 과정입니다.",
+        "explanation": "**`int *p = (int*)malloc(sizeof(int));`**\n\n`sizeof(int)` (보통 4바이트) 크기의 메모리 공간을 힙(Heap)에 할당해달라고 요청합니다.\n\n`malloc`은 할당된 메모리의 시작 주소를 반환하며, 이 주소는 `int` 타입의 포인터 변수 `p`에 저장됩니다.\n`(int*)`는 `malloc`이 반환하는 `void*` 타입을 `int*` 타입으로 변환하는 형변환(casting)입니다.\n\n**비유**: 호텔 프런트(OS)에 가서 \"4바이트 방 하나 주세요\"라고 요청하고, 방 키(주소)를 받아오는 과정입니다.",
         "visualizationType": "cMemory",
         "code": "int *p = (int*)malloc(sizeof(int));",
         "stack": [
@@ -57,13 +57,13 @@
       },
       {
         "title": "메모리 할당 실패 검사",
-        "explanation": "**`if (p == NULL)`**\n\n운영체제가 더 이상 할당해줄 메모리가 없는 경우 `malloc`은 `NULL`을 반환합니다. `p`가 `NULL`인지 검사하여 메모리 할당이 실패했는지 확인하는 것은 매우 중요한 안정성 코드입니다.",
+        "explanation": "**`if (p == NULL)`**\n\n운영체제가 더 이상 할당해줄 메모리가 없는 경우 `malloc`은 `NULL`을 반환합니다.\n`p`가 `NULL`인지 검사하여 메모리 할당이 실패했는지 확인하는 것은 매우 중요한 안정성 코드입니다.",
         "visualizationType": "cMemory",
         "code": "if (p == NULL) {"
       },
       {
         "title": "실패 메시지 출력",
-        "explanation": "**`printf(\"Memory full!\\n\");`**\n\n메모리 할당이 실패했음을 사용자에게 알립니다. 이 코드는 `if (p == NULL)` 조건이 참일 때만 실행됩니다.",
+        "explanation": "**`printf(\"Memory full!\\n\");`**\n\n메모리 할당이 실패했음을 사용자에게 알립니다.\n이 코드는 `if (p == NULL)` 조건이 참일 때만 실행됩니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Memory full!\\n\");",
         "stack": [],
@@ -72,14 +72,14 @@
       },
       {
         "title": "오류 코드 반환",
-        "explanation": "**`return 1;`**\n\n프로그램을 즉시 종료하며, 운영체제에 오류가 발생했음을 알립니다. 일반적으로 `0`이 아닌 값(주로 `1`)은 오류를 의미하는 종료 코드로 사용됩니다.",
+        "explanation": "**`return 1;`**\n\n프로그램을 즉시 종료하며, 운영체제에 오류가 발생했음을 알립니다.\n일반적으로 `0`이 아닌 값(주로 `1`)은 오류를 의미하는 종료 코드로 사용됩니다.",
         "visualizationType": "cMemory",
         "code": "return 1;",
         "stdout": ""
       },
       {
         "title": "힙 메모리에 값 저장",
-        "explanation": "**`*p = 100;`**\n\n역참조 연산자 `*`를 사용하여 포인터 `p`가 가리키는 힙 메모리 위치에 값 `100`을 저장합니다. `malloc`으로 할당받은 메모리에 실제 데이터를 쓰는 중요한 단계입니다.",
+        "explanation": "**`*p = 100;`**\n\n역참조 연산자 `*`를 사용하여 포인터 `p`가 가리키는 힙 메모리 위치에 값 `100`을 저장합니다.\n`malloc`으로 할당받은 메모리에 실제 데이터를 쓰는 중요한 단계입니다.",
         "visualizationType": "cMemory",
         "code": "*p = 100;",
         "stack": [
@@ -115,7 +115,7 @@
       },
       {
         "title": "힙 메모리 해제",
-        "explanation": "**`free(p);`**\n\n`malloc`으로 할당받았던 힙 메모리를 시스템에 반환합니다. `free`를 하지 않으면 메모리 누수가 발생합니다. `free` 호출 후, 포인터 `p`는 더 이상 유효하지 않은 메모리를 가리키게 되므로(댕글링 포인터) 다시 사용해서는 안됩니다.\n\n**비유**: 호텔 체크아웃입니다. 이제 방 키(p)를 가지고 있어도 문은 열리지 않으며, 무단으로 들어가면 쫓겨납니다(에러).",
+        "explanation": "**`free(p);`**\n\n`malloc`으로 할당받았던 힙 메모리를 시스템에 반환합니다.\n`free`를 하지 않으면 메모리 누수가 발생합니다.\n`free` 호출 후, 포인터 `p`는 더 이상 유효하지 않은 메모리를 가리키게 되므로(댕글링 포인터) 다시 사용해서는 안됩니다.\n\n**비유**: 호텔 체크아웃입니다.\n이제 방 키(p)를 가지고 있어도 문은 열리지 않으며, 무단으로 들어가면 쫓겨납니다(에러).",
         "visualizationType": "cMemory",
         "code": "free(p);",
         "stack": [
@@ -140,7 +140,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "malloc의 리턴 타입은 `void*`입니다. 무슨 뜻일까요?",
+    "question": "malloc의 리턴 타입은 `void*`입니다.\n무슨 뜻일까요?",
     "options": [
       "아무것도 리턴하지 않는다",
       "에러를 리턴한다",
@@ -148,13 +148,13 @@
       "0을 리턴한다"
     ],
     "correctIndex": 2,
-    "explanation": "`void*`는 '무슨 타입인지 모르는 주소'입니다. 그래서 `(int*)` 처럼 캐스팅해서 사용하는 것이 정석입니다."
+    "explanation": "`void*`는 '무슨 타입인지 모르는 주소'입니다.\n그래서 `(int*)` 처럼 캐스팅해서 사용하는 것이 정석입니다."
   },
   "misconceptions": [
     {
       "wrong": "malloc으로 잡은 메모리는 0으로 초기화된다",
       "correct": "쓰레기 값이 들어있습니다.",
-      "why": "0으로 초기화된 메모리가 필요하면 `calloc`을 써야 합니다. `malloc`은 속도를 위해 초기화를 안 합니다."
+      "why": "0으로 초기화된 메모리가 필요하면 `calloc`을 써야 합니다.\n`malloc`은 속도를 위해 초기화를 안 합니다."
     }
   ],
   "keyTakeaway": "`malloc(sizeof(type))`으로 빌리고, `NULL` 체크하고, 포인터로 쓴다."

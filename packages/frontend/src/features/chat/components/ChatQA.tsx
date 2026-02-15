@@ -16,6 +16,13 @@ import { useThemeStore } from '@/stores/themeStore';
 import { themes } from '@/config/themes';
 import { useStore } from '@/stores/store'; // useStore import 추가
 
+// 테마별 Q&A 타이틀 색상
+const titleColors: Record<string, string> = {
+  soft: '#8b5cf6',    // 바이올렛
+  dark: '#22d3ee',    // 시안
+  minimal: '#f97316', // 오렌지
+};
+
 // 테마별 채팅 색상 (zinc + cyan 팔레트)
 const chatColors = {
   light: {
@@ -95,8 +102,8 @@ export function ChatQA({
         style={{ borderBottom: `1px solid ${colors.headerBorder}` }}
       >
         <div className="flex items-center gap-2">
-          <MessageCircle className="h-4 w-4 text-primary" />
-          <span className="text-sm font-medium" style={{ color: colors.headerText }}>
+          <MessageCircle className="h-4 w-4" style={{ color: titleColors[currentTheme] || titleColors.dark }} />
+          <span className="text-sm font-bold" style={{ color: titleColors[currentTheme] || titleColors.dark }}>
             Q&A 대화
           </span>
           {expiresAt && messages.length > 0 && (

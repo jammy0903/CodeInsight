@@ -53,7 +53,7 @@
       },
       {
         "title": "비효율적인 연결 (쓰레기 투척)",
-        "explanation": "**실행 순서 (반복):**\n1. `bad` + `i` -> 새로운 객체 생성.\n2. `bad`가 새 객체를 가리킴.\n3. 이전 객체는 **버려짐(Garbage)**.\n\n**문제점:**\n루프가 돌 때마다 멀쩡한 String 객체들이 1회용으로 쓰고 버려집니다. 루프가 1만 번 돌면 쓰레기도 1만 개가 생깁니다.",
+        "explanation": "**실행 순서 (반복):**\n1. `bad` + `i` -> 새로운 객체 생성.\n2. `bad`가 새 객체를 가리킴.\n3. 이전 객체는 **버려짐(Garbage)**.\n\n**문제점:**\n루프가 돌 때마다 멀쩡한 String 객체들이 1회용으로 쓰고 버려집니다.\n루프가 1만 번 돌면 쓰레기도 1만 개가 생깁니다.",
         "keyInsight": "String Loop 연결 = 메모리 낭비(O(N²))",
         "visualizationType": "javaMemory",
         "code": "bad = bad + i;",
@@ -99,7 +99,7 @@
       },
       {
         "title": "StringBuilder 생성",
-        "explanation": "**실행 순서:**\n1. Heap에 `StringBuilder` 객체(0x100) 생성.\n2. 내부에 넉넉한 크기의 문자 배열(Buffer)을 가짐.\n\n`StringBuilder`는 **가변(Mutable)** 객체입니다. 즉, 내용물을 마음대로 고칠 수 있는 '화이트보드'와 같습니다.",
+        "explanation": "**실행 순서:**\n1. Heap에 `StringBuilder` 객체(0x100) 생성.\n2. 내부에 넉넉한 크기의 문자 배열(Buffer)을 가짐.\n\n`StringBuilder`는 **가변(Mutable)** 객체입니다.\n즉, 내용물을 마음대로 고칠 수 있는 '화이트보드'와 같습니다.",
         "keyInsight": "StringBuilder = 수정 가능한 화이트보드",
         "visualizationType": "javaMemory",
         "code": "StringBuilder good = new StringBuilder();",
@@ -124,7 +124,7 @@
       },
       {
         "title": "효율적인 append()",
-        "explanation": "**실행 순서 (반복):**\n1. `good.append(i)` 호출.\n2. `0x100` 객체 내부의 배열 빈칸에 숫자를 채움.\n\n**장점:**\n새 객체를 만들지 않고, **하나의 객체** 안에서 내용을 계속 업데이트합니다. 쓰레기가 전혀 생기지 않습니다.",
+        "explanation": "**실행 순서 (반복):**\n1. `good.append(i)` 호출.\n2. `0x100` 객체 내부의 배열 빈칸에 숫자를 채움.\n\n**장점:**\n새 객체를 만들지 않고, **하나의 객체** 안에서 내용을 계속 업데이트합니다.\n쓰레기가 전혀 생기지 않습니다.",
         "keyInsight": "객체 재사용 = 속도 빠름 + 메모리 절약",
         "visualizationType": "javaMemory",
         "code": "good.append(i);",
@@ -180,13 +180,13 @@
       "new String()을 계속 호출한다."
     ],
     "correctIndex": 2,
-    "explanation": "반복문 내에서의 `+` 연산은 수많은 임시 객체(쓰레기)를 만들기 때문에 성능 최악입니다. `StringBuilder`를 써서 하나의 객체 안에서 수정해야 합니다."
+    "explanation": "반복문 내에서의 `+` 연산은 수많은 임시 객체(쓰레기)를 만들기 때문에 성능 최악입니다.\n`StringBuilder`를 써서 하나의 객체 안에서 수정해야 합니다."
   },
   "misconceptions": [
     {
       "wrong": "요즘 Java는 + 연산자 써도 컴파일러가 최적화해준다?",
       "correct": "단순 한두 번 연결은 최적화해주지만, **반복문(Loop)** 안에서는 최적화에 한계가 있습니다.",
-      "why": "반복문마다 `new StringBuilder`를 만들었다 버리는 식으로 변환되기 십상이라 여전히 느립니다. 루프에선 명시적으로 `StringBuilder`를 쓰세요."
+      "why": "반복문마다 `new StringBuilder`를 만들었다 버리는 식으로 변환되기 십상이라 여전히 느립니다.\n루프에선 명시적으로 `StringBuilder`를 쓰세요."
     }
   ],
   "keyTakeaway": "루프 돌며 문자열 조립할 땐 무조건 `StringBuilder`! 성능 차이가 100배 이상 날 수 있다."

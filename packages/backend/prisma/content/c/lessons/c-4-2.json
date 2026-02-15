@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main`에서 시작합니다. 위에 정의된 `tryToChange` 함수는 아직 호출되지 않았으므로 실행되지 않습니다.",
+        "explanation": "**`int main() {`**\n\nC 프로그램은 항상 `main`에서 시작합니다.\n위에 정의된 `tryToChange` 함수는 아직 호출되지 않았으므로 실행되지 않습니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "변수 a 선언 및 초기화",
-        "explanation": "**`int a = 10;`**\n\n`main` 스택 프레임에 변수 `a`를 생성하고 10으로 초기화합니다. 이 변수가 함수에 전달될 때 어떻게 복사되는지 관찰해봅시다.",
+        "explanation": "**`int a = 10;`**\n\n`main` 스택 프레임에 변수 `a`를 생성하고 10으로 초기화합니다.\n이 변수가 함수에 전달될 때 어떻게 복사되는지 관찰해봅시다.",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
@@ -44,14 +44,14 @@
       },
       {
         "title": "Before 값 출력",
-        "explanation": "**`printf(\"Before: %d\\n\", a);`**\n\n함수 호출 전에 `a`의 현재 값(10)을 출력합니다. 이 값을 기억해두면 나중에 Call by Value의 효과를 확인할 수 있습니다.",
+        "explanation": "**`printf(\"Before: %d\\n\", a);`**\n\n함수 호출 전에 `a`의 현재 값(10)을 출력합니다.\n이 값을 기억해두면 나중에 Call by Value의 효과를 확인할 수 있습니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Before: %d\\n\", a);",
         "stdout": "Before: 10"
       },
       {
         "title": "함수 호출과 값 복사",
-        "explanation": "**`tryToChange(a);`**\n\n`tryToChange` 함수가 호출됩니다. 이때 `a`의 **값(10)만 복사**되어 매개변수 `x`로 전달됩니다. `a`와 `x`는 서로 다른 메모리 주소(0x1000 vs 0x2000)를 가진 **완전히 별개의 변수**입니다.\n\n**왜 이 순서인가?** Before를 출력한 후 함수를 호출해야 변경 전후를 비교할 수 있습니다.",
+        "explanation": "**`tryToChange(a);`**\n\n`tryToChange` 함수가 호출됩니다.\n이때 `a`의 **값(10)만 복사**되어 매개변수 `x`로 전달됩니다.\n`a`와 `x`는 서로 다른 메모리 주소(0x1000 vs 0x2000)를 가진 **완전히 별개의 변수**입니다.\n\n**왜 이 순서인가?** Before를 출력한 후 함수를 호출해야 변경 전후를 비교할 수 있습니다.",
         "visualizationType": "cMemory",
         "code": "tryToChange(a);",
         "highlightOffset": [
@@ -77,7 +77,7 @@
       },
       {
         "title": "복사본 x 변경",
-        "explanation": "**`x = 999;`**\n\n함수 내부에서 `x`를 999로 변경합니다. 하지만 `x`는 `a`의 복사본일 뿐이므로, **원본 `a`는 여전히 10**입니다. 마치 복사본 문서를 수정해도 원본 문서는 변하지 않는 것과 같습니다.",
+        "explanation": "**`x = 999;`**\n\n함수 내부에서 `x`를 999로 변경합니다.\n하지만 `x`는 `a`의 복사본일 뿐이므로, **원본 `a`는 여전히 10**입니다.\n마치 복사본 문서를 수정해도 원본 문서는 변하지 않는 것과 같습니다.",
         "visualizationType": "cMemory",
         "code": "x = 999;",
         "stack": [
@@ -123,7 +123,7 @@
       },
       {
         "title": "After 출력 - 원본은 그대로",
-        "explanation": "**`printf(\"After:  %d\\n\", a);`**\n\n`tryToChange` 함수가 종료되고 `main`으로 돌아왔습니다. 함수 안에서 `x`를 999로 바꿨지만, 이것은 **복사본을 찢어버린 것**과 같습니다. 원본인 `a`는 여전히 **10**입니다.\n\n이를 **Call by Value(값에 의한 호출)**라고 합니다. C언어의 기본 동작이며, 데이터 보호를 위한 안전장치입니다.",
+        "explanation": "**`printf(\"After:  %d\\n\", a);`**\n\n`tryToChange` 함수가 종료되고 `main`으로 돌아왔습니다.\n함수 안에서 `x`를 999로 바꿨지만, 이것은 **복사본을 찢어버린 것**과 같습니다.\n원본인 `a`는 여전히 **10**입니다.\n\n이를 **Call by Value(값에 의한 호출)**라고 합니다.\nC언어의 기본 동작이며, 데이터 보호를 위한 안전장치입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", a);",
         "stack": [
@@ -149,13 +149,13 @@
       "에러"
     ],
     "correctIndex": 0,
-    "explanation": "증가된 것은 복사본 `n`뿐입니다. 원본 `a`는 변하지 않고 5 그대로입니다."
+    "explanation": "증가된 것은 복사본 `n`뿐입니다.\n원본 `a`는 변하지 않고 5 그대로입니다."
   },
   "misconceptions": [
     {
       "wrong": "함수에 변수를 넣으면 연결된다",
       "correct": "연결되는 게 아니라 'Ctrl+C, Ctrl+V' 복사되는 것입니다.",
-      "why": "데이터 보호를 위한 기본 동작입니다. 바꾸고 싶다면 포인터를 써야 합니다."
+      "why": "데이터 보호를 위한 기본 동작입니다.\n바꾸고 싶다면 포인터를 써야 합니다."
     }
   ],
   "keyTakeaway": "함수에 변수를 던지면 값만 복사된다. 원본을 바꾸고 싶다면?"

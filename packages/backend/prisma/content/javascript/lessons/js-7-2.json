@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "객체 생성 (Young Generation)",
-        "explanation": "`createTemp()`가 호출되면, 내부의 `temp` 객체는 V8 힙의 **Young Generation** 영역에 할당됩니다. 대부분의 객체는 이곳에서 짧은 생을 삽니다.",
+        "explanation": "`createTemp()`가 호출되면, 내부의 `temp` 객체는 V8 힙의 **Young Generation** 영역에 할당됩니다.\n대부분의 객체는 이곳에서 짧은 생을 삽니다.",
         "keyInsight": "Young Generation은 '신입' 객체들이 머무는 곳으로, GC가 매우 빠릅니다.",
         "visualizationType": "memory",
         "memoryState": {
@@ -27,7 +27,7 @@
       },
       {
         "title": "마이너 GC (Scavenge)",
-        "explanation": "`createTemp()` 함수 실행이 끝나면, `temp` 객체는 더 이상 참조되지 않는 '쓰레기'가 됩니다. Young Generation을 청소하는 **마이너 GC(Scavenge)**가 매우 빠르게 이 객체를 수거해갑니다.",
+        "explanation": "`createTemp()` 함수 실행이 끝나면, `temp` 객체는 더 이상 참조되지 않는 '쓰레기'가 됩니다.\nYoung Generation을 청소하는 **마이너 GC(Scavenge)**가 매우 빠르게 이 객체를 수거해갑니다.",
         "visualizationType": "memory",
         "memoryState": {
           "heap": [
@@ -45,7 +45,7 @@
       },
       {
         "title": "반복적인 생성과 소멸",
-        "explanation": "다시 `createTemp()`가 호출됩니다. 이전과 마찬가지로 `temp` 객체는 Young Generation에 생성되었다가 함수 종료와 함께 빠르게 사라집니다.",
+        "explanation": "다시 `createTemp()`가 호출됩니다.\n이전과 마찬가지로 `temp` 객체는 Young Generation에 생성되었다가 함수 종료와 함께 빠르게 사라집니다.",
         "visualizationType": "memory",
         "memoryState": {
           "heap": [
@@ -74,7 +74,7 @@
       },
       {
         "title": "참조 유지 (Promotion 대상)",
-        "explanation": "`cache` 배열은 전역 변수이므로 프로그램이 끝날 때까지 사라지지 않습니다. 따라서 `cache`가 참조하는 객체는 마이너 GC에서 계속 살아남습니다. 몇 번의 GC에서 살아남은 '장수 객체'는 결국 **Old Generation** 영역으로 '승격(Promotion)'됩니다.",
+        "explanation": "`cache` 배열은 전역 변수이므로 프로그램이 끝날 때까지 사라지지 않습니다.\n따라서 `cache`가 참조하는 객체는 마이너 GC에서 계속 살아남습니다.\n몇 번의 GC에서 살아남은 '장수 객체'는 결국 **Old Generation** 영역으로 '승격(Promotion)'됩니다.",
         "keyInsight": "오래 살아남은 객체는 '안전한 보관소(Old Space)'로 옮겨서 관리 효율을 높입니다.",
         "visualizationType": "memory",
         "memoryState": {
@@ -108,8 +108,8 @@
   "misconceptions": [
     {
       "wrong": "GC가 실행되는 동안 프로그램은 멈추지 않는다",
-      "correct": "멈춥니다(Stop-the-world). 하지만 사용자가 모를 정도로 짧습니다.",
-      "why": "메모리를 정리하는 동안 프로그램이 메모리를 건드리면 안 되기 때문에 잠깐 멈춰야 합니다. V8은 이 시간을 1ms 단위로 쪼개서 실행(Incremental Marking)하므로 끊김이 거의 없습니다."
+      "correct": "멈춥니다(Stop-the-world).\n하지만 사용자가 모를 정도로 짧습니다.",
+      "why": "메모리를 정리하는 동안 프로그램이 메모리를 건드리면 안 되기 때문에 잠깐 멈춰야 합니다.\nV8은 이 시간을 1ms 단위로 쪼개서 실행(Incremental Marking)하므로 끊김이 거의 없습니다."
     }
   ],
   "keyTakeaway": "객체 수명에 따라 메모리 영역이 나뉩니다. 불필요한 전역 변수를 줄여 메모리 누수를 방지하세요."

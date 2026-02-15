@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Target(원본) 객체 생성",
-        "explanation": "대상이 되는 원본 객체 `target`입니다. Proxy가 감싸게 될 실제 데이터(Real Subject)입니다.",
+        "explanation": "대상이 되는 원본 객체 `target`입니다.\nProxy가 감싸게 될 실제 데이터(Real Subject)입니다.",
         "visualizationType": "memory",
         "memoryState": {
           "heap": [
@@ -27,7 +27,7 @@
       },
       {
         "title": "Handler 및 Trap 정의",
-        "explanation": "`handler` 객체는 Proxy의 행동 수칙을 정의합니다. 여기서 `get` 메서드는 **Trap(함정)**입니다.\n\n**Trap이란?**\n객체의 기본 동작(읽기, 쓰기, 호출 등)이 발생했을 때 이를 가로채서 대신 실행되는 메서드를 말합니다. 여기서는 '속성 읽기'를 가로챕니다.",
+        "explanation": "`handler` 객체는 Proxy의 행동 수칙을 정의합니다.\n여기서 `get` 메서드는 **Trap(함정)**입니다.\n\n**Trap이란?**\n객체의 기본 동작(읽기, 쓰기, 호출 등)이 발생했을 때 이를 가로채서 대신 실행되는 메서드를 말합니다.\n여기서는 '속성 읽기'를 가로챕니다.",
         "visualizationType": "memory",
         "memoryState": {
           "note": "Handler prepared with 'get' trap"
@@ -71,7 +71,7 @@
       },
       {
         "title": "프록시를 통한 접근",
-        "explanation": "`proxy.public`과 `proxy.secret`에 접근합니다. `get` 트랩이 이를 가로챕니다.\n'public' 속성은 Reflect.get으로 원본에서 가져오고(hello), 'secret' 속성은 'Access Denied!'를 반환합니다.\n\n**Forwarding(전달)이란?**\n가로챈 작업을 `Reflect` API를 통해 다시 원본 객체로 넘겨주는 것을 말합니다.",
+        "explanation": "`proxy.public`과 `proxy.secret`에 접근합니다.\n`get` 트랩이 이를 가로챕니다.\n'public' 속성은 Reflect.get으로 원본에서 가져오고(hello), 'secret' 속성은 'Access Denied!'를 반환합니다.\n\n**Forwarding(전달)이란?**\n가로챈 작업을 `Reflect` API를 통해 다시 원본 객체로 넘겨주는 것을 말합니다.",
         "visualizationType": "memory",
         "memoryState": {
           "output": [
@@ -96,13 +96,13 @@
       "private (#) 필드 직접 접근"
     ],
     "correctIndex": 3,
-    "explanation": "Proxy는 객체의 공개적인 동작(Public Interception)만 가로챌 수 있습니다. 객체 내부 깊숙한 Private(#) 필드나 슬롯에는 직접 개입할 수 없습니다."
+    "explanation": "Proxy는 객체의 공개적인 동작(Public Interception)만 가로챌 수 있습니다.\n객체 내부 깊숙한 Private(#) 필드나 슬롯에는 직접 개입할 수 없습니다."
   },
   "misconceptions": [
     {
       "wrong": "Proxy는 원본 객체를 복사해서 사용한다",
-      "correct": "아닙니다. 원본 객체에 대한 '참조'를 가지고 중개할 뿐입니다.",
-      "why": "Proxy 자신은 데이터를 저장하지 않습니다. 모든 요청을 핸들러를 거쳐 원본(Target)에게 전달하거나 차단하는 껍데기(Wrapper)입니다."
+      "correct": "아닙니다.\n원본 객체에 대한 '참조'를 가지고 중개할 뿐입니다.",
+      "why": "Proxy 자신은 데이터를 저장하지 않습니다.\n모든 요청을 핸들러를 거쳐 원본(Target)에게 전달하거나 차단하는 껍데기(Wrapper)입니다."
     }
   ],
   "keyTakeaway": "Vue 3의 반응성 시스템 등 최신 라이브러리의 마법은 Proxy를 통해 구현됩니다."

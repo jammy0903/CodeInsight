@@ -16,7 +16,7 @@
       },
       {
         "title": "매크로 정의 1: 변수 생성기",
-        "explanation": "**`#define MAKE_VAR(type, name) type var_##name`**\n\n`##` 연산자(토큰 붙이기)를 사용하는 매크로입니다. `##`는 `var_`라는 텍스트와 `name`으로 전달된 텍스트를 합쳐서 하나의 새로운 단어(토큰)로 만듭니다. 예를 들어 `MAKE_VAR(int, apple)`은 `int var_apple` 코드로 변환됩니다.",
+        "explanation": "**`#define MAKE_VAR(type, name) type var_##name`**\n\n`##` 연산자(토큰 붙이기)를 사용하는 매크로입니다.\n`##`는 `var_`라는 텍스트와 `name`으로 전달된 텍스트를 합쳐서 하나의 새로운 단어(토큰)로 만듭니다.\n예를 들어 `MAKE_VAR(int, apple)`은 `int var_apple` 코드로 변환됩니다.",
         "visualizationType": "cMemory",
         "code": "#define MAKE_VAR(type, name) type var_##name"
       },
@@ -28,7 +28,7 @@
       },
       {
         "title": "전처리기 실행: 변수 생성",
-        "explanation": "**`MAKE_VAR(int, apple);`** 와 **`MAKE_VAR(int, banana);`**\n\n전처리기가 이 두 줄을 만나면, 아래와 같은 실제 C 코드로 치환합니다:\n```c\nint var_apple;\nint var_banana;\n```\n컴파일러는 이 생성된 코드를 보게 됩니다. 이 변수들은 전역 변수입니다.",
+        "explanation": "**`MAKE_VAR(int, apple);`** 와 **`MAKE_VAR(int, banana);`**\n\n전처리기가 이 두 줄을 만나면, 아래와 같은 실제 C 코드로 치환합니다:\n```c\nint var_apple;\nint var_banana;\n```\n컴파일러는 이 생성된 코드를 보게 됩니다.\n이 변수들은 전역 변수입니다.",
         "visualizationType": "cMemory",
         "code": "MAKE_VAR(int, apple);",
         "highlightOffset": [
@@ -69,7 +69,7 @@
       },
       {
         "title": "생성된 함수 호출",
-        "explanation": "**`printf(\"Apple: %d\\n\", get_apple());`**\n\n매크로를 통해 자동으로 생성된 `get_apple()` 함수를 호출합니다. 이 함수는 `var_apple`의 값을 반환하므로, `100`이 출력됩니다.",
+        "explanation": "**`printf(\"Apple: %d\\n\", get_apple());`**\n\n매크로를 통해 자동으로 생성된 `get_apple()` 함수를 호출합니다.\n이 함수는 `var_apple`의 값을 반환하므로, `100`이 출력됩니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Apple: %d\\n\", get_apple());",
         "stdout": "Apple: 100"

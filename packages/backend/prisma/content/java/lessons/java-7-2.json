@@ -18,13 +18,13 @@
       },
       {
         "title": "main 메서드 시작",
-        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다. 여기서 제네릭의 '타입 소거' 현상을 목격하게 됩니다.",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.\n여기서 제네릭의 '타입 소거' 현상을 목격하게 됩니다.",
         "visualizationType": "javaMemory",
         "code": "public class Main {"
       },
       {
         "title": "제네릭 리스트 생성",
-        "explanation": "**실행 순서:**\n1. `ArrayList<String>` 객체를 힙에 생성합니다.\n2. `list` 변수가 이를 참조합니다.\n\n**컴파일 타임 vs 런타임:**\n코드에서는 `ArrayList<String>`이라고 명시했지만, 컴파일이 끝나면 JVM은 이걸 그냥 `ArrayList`로 취급합니다(Type Erasure). 하지만 컴파일러가 \"여긴 String만 넣어!\"라고 철저히 감시해주죠.",
+        "explanation": "**실행 순서:**\n1. `ArrayList<String>` 객체를 힙에 생성합니다.\n2. `list` 변수가 이를 참조합니다.\n\n**컴파일 타임 vs 런타임:**\n코드에서는 `ArrayList<String>`이라고 명시했지만, 컴파일이 끝나면 JVM은 이걸 그냥 `ArrayList`로 취급합니다(Type Erasure).\n하지만 컴파일러가 \"여긴 String만 넣어!\"라고 철저히 감시해주죠.",
         "visualizationType": "javaMemory",
         "code": "ArrayList<String> list = new ArrayList<>();",
         "javaMemoryState": {
@@ -69,7 +69,7 @@
       },
       {
         "title": "값 꺼내기 (Type Erasure)",
-        "explanation": "**실행 순서:**\n1. `list.get(0)`으로 값을 꺼냅니다.\n2. 컴파일러가 몰래 넣어준 `(String)` 캐스팅 코드가 실행됩니다.\n3. `s` 변수에 \"Hello\"가 저장됩니다.\n\n**마법의 순간:**\n소스 코드엔 없지만 컴파일러가 `String s = (String) list.get(0);` 처럼 바꿔줍니다. 이게 바로 제네릭의 비밀입니다!",
+        "explanation": "**실행 순서:**\n1. `list.get(0)`으로 값을 꺼냅니다.\n2. 컴파일러가 몰래 넣어준 `(String)` 캐스팅 코드가 실행됩니다.\n3. `s` 변수에 \"Hello\"가 저장됩니다.\n\n**마법의 순간:**\n소스 코드엔 없지만 컴파일러가 `String s = (String) list.get(0);` 처럼 바꿔줍니다.\n이게 바로 제네릭의 비밀입니다!",
         "visualizationType": "javaMemory",
         "code": "String s = list.get(0);",
         "javaMemoryState": {
@@ -160,7 +160,7 @@
       },
       {
         "title": "클래스 정보 비교",
-        "explanation": "**실행 순서:**\n1. `list.getClass()`를 호출합니다 -> `ArrayList.class` 반환.\n2. `intList.getClass()`를 호출합니다 -> `ArrayList.class` 반환.\n3. 두 클래스 객체가 같은지 비교합니다 (`==`).\n\n**충격적인 진실:**\n제네릭 타입 정보(`String`, `Integer`)는 런타임에 **완전히 지워집니다(Erased)**. 그래서 둘 다 그냥 `ArrayList` 클래스일 뿐이며, 결과는 `true`가 됩니다!",
+        "explanation": "**실행 순서:**\n1. `list.getClass()`를 호출합니다 -> `ArrayList.class` 반환.\n2. `intList.getClass()`를 호출합니다 -> `ArrayList.class` 반환.\n3. 두 클래스 객체가 같은지 비교합니다 (`==`).\n\n**충격적인 진실:**\n제네릭 타입 정보(`String`, `Integer`)는 런타임에 **완전히 지워집니다(Erased)**.\n그래서 둘 다 그냥 `ArrayList` 클래스일 뿐이며, 결과는 `true`가 됩니다!",
         "visualizationType": "javaMemory",
         "code": "boolean sameClass = list.getClass() == intList.getClass();",
         "javaMemoryState": {
@@ -244,7 +244,7 @@
   "misconceptions": [
     {
       "wrong": "제네릭을 쓰면 클래스가 여러 개 생성된다.",
-      "correct": "아닙니다. C++ 템플릿과 달리 Java 제네릭은 단 하나의 클래스 파일만 생성되며, 내부적으로 타입 정보를 지우고 캐스팅을 추가하는 방식입니다.",
+      "correct": "아닙니다.\nC++ 템플릿과 달리 Java 제네릭은 단 하나의 클래스 파일만 생성되며, 내부적으로 타입 정보를 지우고 캐스팅을 추가하는 방식입니다.",
       "why": "코드 팽창(Code Bloat)을 방지하기 위함입니다."
     }
   ],
