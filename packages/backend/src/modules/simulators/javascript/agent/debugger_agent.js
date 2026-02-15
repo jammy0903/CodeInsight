@@ -58,24 +58,139 @@ function isForLoopInit(node, ancestors) {
   return false;
 }
 
-function isAtFunctionScope(ancestors) {
-  const parent = ancestors[ancestors.length - 2];
-  if (parent.type === 'Program') return true;
-  if (parent.type === 'BlockStatement') {
-    const grandparent = ancestors[ancestors.length - 3];
-    if (!grandparent) return false;
-    return (
-      grandparent.type === 'FunctionDeclaration' ||
-      grandparent.type === 'FunctionExpression' ||
-      grandparent.type === 'ArrowFunctionExpression'
-    );
-  }
-  return false;
-}
-
 function getFunctionName(node) {
   if (node.id && node.id.name) return node.id.name;
   return 'anonymous';
+}
+
+/**
+ * 바인딩 패턴에서 선언된 변수명 추출
+ * Identifier → ['x']
+ * ArrayPattern → ['a', 'b']
+ * ObjectPattern → ['x', 'y']
+ * RestElement → ['rest']
+ * AssignmentPattern → ['a']
+ */
+function extractDeclaredNames(pattern) {
+  if (!pattern) return [];
+
+  if (pattern.type === 'Identifier') {
+    return [pattern.name];
+  }
+
+  if (pattern.type === 'ArrayPattern') {
+    const names = [];
+    for (const element of pattern.elements) {
+      if (element) {
+        names.push(...extractDeclaredNames(element));
+      }
+    }
+    return names;
+  }
+
+  if (pattern.type === 'ObjectPattern') {
+    const names = [];
+    for (const prop of pattern.properties) {
+      if (prop.type === 'RestElement') {
+        names.push(...extractDeclaredNames(prop));
+      } else if (prop.type === 'Property') {
+        names.push(...extractDeclaredNames(prop.value));
+      }
+    }
+    return names;
+  }
+
+  if (pattern.type === 'RestElement') {
+    return extractDeclaredNames(pattern.argument);
+  }
+
+  if (pattern.type === 'AssignmentPattern') {
+    return extractDeclaredNames(pattern.left);
+  }
+
+  return [];
+}
+
+/**
+ * ScopeTracker: 프로그램 스코프를 추적하고 각 오프셋에서 가시적인 변수 생성
+ */
+class ScopeTracker {
+  constructor() {
+    this.scopeStack = [];
+  }
+
+  /**
+   * 스코프 진입
+   * type: 'program' | 'function' | 'block' | 'for' | 'catch'
+   */
+  pushScope(type) {
+    this.scopeStack.push({
+      type,
+      variables: new Map(), // name → { kind, declaredAtOffset }
+    });
+  }
+
+  /**
+   * 스코프 종료
+   */
+  popScope() {
+    if (this.scopeStack.length > 1) {
+      this.scopeStack.pop();
+    }
+  }
+
+  /**
+   * 변수 선언 등록
+   * kind: 'var' | 'let' | 'const'
+   * declaredAtOffset: 선언문이 있는 위치 (var=0 호이스팅, let/const=현재위치)
+   */
+  declareVariable(name, kind, declaredAtOffset) {
+    // var는 function/program 스코프에만 등록
+    if (kind === 'var') {
+      for (let i = this.scopeStack.length - 1; i >= 0; i--) {
+        const scope = this.scopeStack[i];
+        if (scope.type === 'function' || scope.type === 'program') {
+          scope.variables.set(name, { kind, declaredAtOffset: 0 }); // 호이스팅
+          return;
+        }
+      }
+    } else {
+      // let/const는 현재 스코프에 등록
+      const currentScope = this.scopeStack[this.scopeStack.length - 1];
+      if (currentScope) {
+        currentScope.variables.set(name, { kind, declaredAtOffset });
+      }
+    }
+  }
+
+  /**
+   * 주어진 오프셋에서 가시적인 변수 목록 생성
+   * { varName: true, ... } 형태로 반환 (JS 런타임이 스코프 규칙 적용)
+   */
+  generateCaptureExpression(captureOffset) {
+    const visibleVars = new Set();
+
+    // 모든 스코프를 역순으로 순회 (현재 스코프부터 전역까지)
+    for (let i = this.scopeStack.length - 1; i >= 0; i--) {
+      const scope = this.scopeStack[i];
+      for (const [name, info] of scope.variables) {
+        // TDZ (Temporal Dead Zone) 체크
+        // let/const는 선언 전에는 캡처하지 않음
+        if (info.kind !== 'var' && captureOffset < info.declaredAtOffset) {
+          continue; // 아직 선언되지 않음
+        }
+        // 이미 섀도우된 변수가 없으면 추가
+        if (!visibleVars.has(name)) {
+          visibleVars.add(name);
+        }
+      }
+    }
+
+    if (visibleVars.size === 0) {
+      return '{}';
+    }
+    return '{' + Array.from(visibleVars).join(', ') + '}';
+  }
 }
 
 // ============================================
@@ -444,82 +559,179 @@ class DebuggerAgent {
 
 
   /**
-   * AST 기반 코드 계측 (instrumentCode + instrumentAsyncCallbacks 통합)
+   * AST 기반 코드 계측 (Scope-Aware 버전)
    */
   instrument(code) {
     const insertions = [];
+    const offsetMap = new Map(); // line → offset (오프셋 추적용)
 
     const ast = acorn.parse(code, {
       ecmaVersion: 2020,
       locations: true,
     });
 
-    walk.ancestor(ast, {
-      VariableDeclaration(node, ancestors) {
-        if (isInsideClassBody(ancestors)) return;
-        if (isForLoopInit(node, ancestors)) return;
+    const scopeTracker = new ScopeTracker();
 
-        const line = node.loc.start.line;
-        const atFuncScope = isAtFunctionScope(ancestors);
-
-        // let/const → var (함수/프로그램 스코프에서만, 블록 스코프 유지)
-        if (atFuncScope && (node.kind === 'let' || node.kind === 'const')) {
-          insertions.push({
-            start: node.start,
-            end: node.start + node.kind.length,
-            replacement: 'var',
-          });
+    // walk.recursive로 스코프 enter/exit 제어
+    walk.recursive(ast, null, {
+      Program(node, state, c) {
+        scopeTracker.pushScope('program');
+        for (const child of node.body) {
+          c(child, state);
         }
-        // 초기화 없는 선언에 = undefined 추가 (var 변환 시에만)
-        if (atFuncScope) {
-          for (const decl of node.declarations) {
-            if (!decl.init) {
-              insertions.push({
-                start: decl.end,
-                end: decl.end,
-                replacement: ' = undefined',
-              });
-            }
-          }
-        }
-        // __capture__ 삽입
-        insertions.push({
-          start: node.end,
-          end: node.end,
-          replacement: ` __capture__(${line});`,
-        });
+        scopeTracker.popScope();
       },
 
-      FunctionDeclaration(node, ancestors) {
-        if (isInsideClassBody(ancestors)) return;
+      FunctionDeclaration(node, state, c) {
+        if (isInsideClassBody([node])) return;
+
         const line = node.loc.start.line;
         const name = getFunctionName(node);
+
         // 선언 전 캡처
+        const captureExpr = scopeTracker.generateCaptureExpression(node.start);
         insertions.push({
           start: node.start,
           end: node.start,
-          replacement: `__capture__(${line}); `,
+          replacement: `__capture__(${line}, ${captureExpr}); `,
         });
-        // body 시작에 enterFunction
-        const bodyStart = node.body.start + 1; // { 다음
+
+        // 함수 스코프 진입
+        scopeTracker.pushScope('function');
+
+        // 매개변수 등록
+        for (const param of node.params) {
+          const names = extractDeclaredNames(param);
+          for (const name of names) {
+            scopeTracker.declareVariable(name, 'param', node.start);
+          }
+        }
+
+        // 본문 시작에 enterFunction
+        const bodyStart = node.body.start + 1;
         insertions.push({
           start: bodyStart,
           end: bodyStart,
           replacement: ` __enterFunction__('${name}');`,
         });
-        // body 끝에 exitFunction (return 없이 끝나는 경우)
-        const bodyEnd = node.body.end - 1; // } 앞
+
+        // 본문 순회
+        c(node.body, state);
+
+        // 본문 끝에 exitFunction
+        const bodyEnd = node.body.end - 1;
         insertions.push({
           start: bodyEnd,
           end: bodyEnd,
           replacement: ` __exitFunction__();`,
         });
+
+        scopeTracker.popScope();
       },
 
-      ReturnStatement(node, ancestors) {
+      FunctionExpression(node, state, c) {
+        const name = getFunctionName(node);
+        scopeTracker.pushScope('function');
+
+        for (const param of node.params) {
+          const names = extractDeclaredNames(param);
+          for (const n of names) {
+            scopeTracker.declareVariable(n, 'param', node.start);
+          }
+        }
+
+        const bodyStart = node.body.start + 1;
+        insertions.push({
+          start: bodyStart,
+          end: bodyStart,
+          replacement: ` __enterFunction__('${name}');`,
+        });
+
+        c(node.body, state);
+
+        const bodyEnd = node.body.end - 1;
+        insertions.push({
+          start: bodyEnd,
+          end: bodyEnd,
+          replacement: ` __exitFunction__();`,
+        });
+
+        scopeTracker.popScope();
+      },
+
+      ArrowFunctionExpression(node, state, c) {
+        const name = node.id?.name || 'arrow';
+        scopeTracker.pushScope('function');
+
+        for (const param of node.params) {
+          const names = extractDeclaredNames(param);
+          for (const n of names) {
+            scopeTracker.declareVariable(n, 'param', node.start);
+          }
+        }
+
+        if (node.body.type === 'BlockStatement') {
+          const bodyStart = node.body.start + 1;
+          insertions.push({
+            start: bodyStart,
+            end: bodyStart,
+            replacement: ` __enterFunction__('${name}');`,
+          });
+
+          c(node.body, state);
+
+          const bodyEnd = node.body.end - 1;
+          insertions.push({
+            start: bodyEnd,
+            end: bodyEnd,
+            replacement: ` __exitFunction__();`,
+          });
+        } else {
+          c(node.body, state);
+        }
+
+        scopeTracker.popScope();
+      },
+
+      VariableDeclaration(node, state, c) {
+        if (isInsideClassBody([node])) return;
+
+        const line = node.loc.start.line;
+
+        // 선언된 변수 등록
+        for (const decl of node.declarations) {
+          const names = extractDeclaredNames(decl.id);
+          for (const name of names) {
+            scopeTracker.declareVariable(name, node.kind, node.start);
+          }
+        }
+
+        // __capture__ 삽입 (명시적 변수 전달)
+        const captureExpr = scopeTracker.generateCaptureExpression(node.end);
+        insertions.push({
+          start: node.end,
+          end: node.end,
+          replacement: ` __capture__(${line}, ${captureExpr});`,
+        });
+
+        for (const decl of node.declarations) {
+          c(decl, state);
+        }
+      },
+
+      BlockStatement(node, state, c) {
+        // 함수 직속 블록이 아니면 블록 스코프 push
+        scopeTracker.pushScope('block');
+        for (const stmt of node.body) {
+          c(stmt, state);
+        }
+        scopeTracker.popScope();
+      },
+
+      ReturnStatement(node, state, c) {
         const line = node.loc.start.line;
         if (node.argument) {
-          // Split into prefix + suffix to avoid overlapping with inner insertions
+          const captureExpr = scopeTracker.generateCaptureExpression(node.end);
           insertions.push({
             start: node.start,
             end: node.argument.start,
@@ -528,185 +740,345 @@ class DebuggerAgent {
           insertions.push({
             start: node.argument.end,
             end: node.end,
-            replacement: `); __capture__(${line}); __exitFunction__(); return __retval__; }`,
+            replacement: `); __capture__(${line}, ${captureExpr}); __exitFunction__(); return __retval__; }`,
           });
+          c(node.argument, state);
         } else {
+          const captureExpr = scopeTracker.generateCaptureExpression(node.end);
           insertions.push({
             start: node.start,
             end: node.end,
-            replacement: `{ __capture__(${line}); __exitFunction__(); return; }`,
+            replacement: `{ __capture__(${line}, ${captureExpr}); __exitFunction__(); return; }`,
           });
         }
       },
 
-      ExpressionStatement(node, ancestors) {
-        if (isInsideClassBody(ancestors)) return;
+      ExpressionStatement(node, state, c) {
+        if (isInsideClassBody([node])) return;
         const line = node.loc.start.line;
+        const captureExpr = scopeTracker.generateCaptureExpression(node.end);
         insertions.push({
           start: node.end,
           end: node.end,
-          replacement: ` __capture__(${line});`,
+          replacement: ` __capture__(${line}, ${captureExpr});`,
         });
+        c(node.expression, state);
       },
 
-      ClassDeclaration(node, ancestors) {
+      ClassDeclaration(node, state, c) {
         const line = node.loc.start.line;
         const name = node.id ? node.id.name : 'AnonymousClass';
-        // class Foo {} → var Foo = (class Foo {}); __capture__()
+        const captureExpr = scopeTracker.generateCaptureExpression(node.end);
+        scopeTracker.declareVariable(name, 'let', node.start);
         insertions.push({
           start: node.start,
           end: node.start,
-          replacement: `var ${name} = (`,
+          replacement: `let ${name} = (`,
         });
         insertions.push({
           start: node.end,
           end: node.end,
-          replacement: `); __capture__(${line});`,
+          replacement: `); __capture__(${line}, ${captureExpr});`,
         });
+        c(node.body, state);
       },
 
-      MethodDefinition(node, ancestors) {
+      MethodDefinition(node, state, c) {
         if (node.kind === 'constructor' || node.kind === 'method') {
           const funcName = node.key && node.key.name ? node.key.name : 'method';
-          const body = node.value.body; // BlockStatement
+          const body = node.value.body;
           if (body) {
+            scopeTracker.pushScope('function');
             const bodyStart = body.start + 1;
             insertions.push({
               start: bodyStart,
               end: bodyStart,
               replacement: ` __enterFunction__('${funcName}');`,
             });
+            c(body, state);
             const bodyEnd = body.end - 1;
             insertions.push({
               start: bodyEnd,
               end: bodyEnd,
               replacement: ` __exitFunction__();`,
             });
+            scopeTracker.popScope();
           }
         }
       },
 
-      IfStatement(node, ancestors) {
+      IfStatement(node, state, c) {
         const line = node.loc.start.line;
-        // consequent block
+        const captureExpr = scopeTracker.generateCaptureExpression(node.test.end);
+
         if (node.consequent && node.consequent.type === 'BlockStatement') {
+          scopeTracker.pushScope('block');
           insertions.push({
             start: node.consequent.start + 1,
             end: node.consequent.start + 1,
-            replacement: ` __capture__(${line});`,
+            replacement: ` __capture__(${line}, ${captureExpr});`,
           });
+          c(node.consequent, state);
+          scopeTracker.popScope();
+        } else {
+          c(node.consequent, state);
         }
-        // alternate block (else)
-        if (node.alternate && node.alternate.type === 'BlockStatement') {
+
+        if (node.alternate) {
           const altLine = node.alternate.loc.start.line;
-          insertions.push({
-            start: node.alternate.start + 1,
-            end: node.alternate.start + 1,
-            replacement: ` __capture__(${altLine});`,
-          });
+          if (node.alternate.type === 'BlockStatement') {
+            scopeTracker.pushScope('block');
+            insertions.push({
+              start: node.alternate.start + 1,
+              end: node.alternate.start + 1,
+              replacement: ` __capture__(${altLine}, ${captureExpr});`,
+            });
+            c(node.alternate, state);
+            scopeTracker.popScope();
+          } else {
+            c(node.alternate, state);
+          }
         }
+
+        c(node.test, state);
       },
 
-      ForStatement(node, ancestors) {
+      ForStatement(node, state, c) {
         const line = node.loc.start.line;
+
+        // for (let i = ...) 형태면 블록 스코프 생성
+        let forScopeCreated = false;
+        if (node.init && node.init.type === 'VariableDeclaration' &&
+            (node.init.kind === 'let' || node.init.kind === 'const')) {
+          scopeTracker.pushScope('for');
+          forScopeCreated = true;
+
+          // init에서 변수 등록 (VariableDeclaration 핸들러를 우회)
+          for (const decl of node.init.declarations) {
+            const names = extractDeclaredNames(decl.id);
+            for (const name of names) {
+              scopeTracker.declareVariable(name, node.init.kind, node.init.start);
+            }
+            // 초기값만 처리
+            if (decl.init) c(decl.init, state);
+          }
+        } else {
+          // var 또는 expression init인 경우 일반적으로 처리
+          if (node.init) c(node.init, state);
+        }
+
+        if (node.test) c(node.test, state);
+        if (node.update) c(node.update, state);
+
+        // 변수 등록 후 captureExpr 생성
+        const captureExpr = scopeTracker.generateCaptureExpression(node.start);
+
         if (node.body && node.body.type === 'BlockStatement') {
+          scopeTracker.pushScope('block');
           insertions.push({
             start: node.body.start + 1,
             end: node.body.start + 1,
-            replacement: ` __capture__(${line});`,
+            replacement: ` __capture__(${line}, ${captureExpr});`,
           });
+          c(node.body, state);
+          scopeTracker.popScope();
+        } else {
+          c(node.body, state);
+        }
+
+        if (forScopeCreated) {
+          scopeTracker.popScope();
         }
       },
 
-      WhileStatement(node, ancestors) {
+      WhileStatement(node, state, c) {
         const line = node.loc.start.line;
+        const captureExpr = scopeTracker.generateCaptureExpression(node.test.end);
+        c(node.test, state);
         if (node.body && node.body.type === 'BlockStatement') {
+          scopeTracker.pushScope('block');
           insertions.push({
             start: node.body.start + 1,
             end: node.body.start + 1,
-            replacement: ` __capture__(${line});`,
+            replacement: ` __capture__(${line}, ${captureExpr});`,
           });
+          c(node.body, state);
+          scopeTracker.popScope();
+        } else {
+          c(node.body, state);
         }
       },
 
-      DoWhileStatement(node, ancestors) {
+      DoWhileStatement(node, state, c) {
         const line = node.loc.start.line;
+        const captureExpr = scopeTracker.generateCaptureExpression(node.test.end);
         if (node.body && node.body.type === 'BlockStatement') {
+          scopeTracker.pushScope('block');
           insertions.push({
             start: node.body.start + 1,
             end: node.body.start + 1,
-            replacement: ` __capture__(${line});`,
+            replacement: ` __capture__(${line}, ${captureExpr});`,
           });
+          c(node.body, state);
+          scopeTracker.popScope();
+        } else {
+          c(node.body, state);
         }
+        c(node.test, state);
       },
 
-      ForInStatement(node, ancestors) {
+      ForInStatement(node, state, c) {
         const line = node.loc.start.line;
+
+        // for...in (let x in obj) 형태면 블록 스코프 생성
+        let forScopeCreated = false;
+        if (node.left && node.left.type === 'VariableDeclaration' &&
+            (node.left.kind === 'let' || node.left.kind === 'const')) {
+          scopeTracker.pushScope('for');
+          forScopeCreated = true;
+
+          for (const decl of node.left.declarations) {
+            const names = extractDeclaredNames(decl.id);
+            for (const name of names) {
+              scopeTracker.declareVariable(name, node.left.kind, node.left.start);
+            }
+          }
+        } else if (node.left) {
+          c(node.left, state);
+        }
+
+        c(node.right, state);
+
+        const captureExpr = scopeTracker.generateCaptureExpression(node.start);
+
         if (node.body && node.body.type === 'BlockStatement') {
+          scopeTracker.pushScope('block');
           insertions.push({
             start: node.body.start + 1,
             end: node.body.start + 1,
-            replacement: ` __capture__(${line});`,
+            replacement: ` __capture__(${line}, ${captureExpr});`,
           });
+          c(node.body, state);
+          scopeTracker.popScope();
+        } else {
+          c(node.body, state);
+        }
+
+        if (forScopeCreated) {
+          scopeTracker.popScope();
         }
       },
 
-      ForOfStatement(node, ancestors) {
+      ForOfStatement(node, state, c) {
         const line = node.loc.start.line;
+
+        // for...of (let x of arr) 형태면 블록 스코프 생성
+        let forScopeCreated = false;
+        if (node.left && node.left.type === 'VariableDeclaration' &&
+            (node.left.kind === 'let' || node.left.kind === 'const')) {
+          scopeTracker.pushScope('for');
+          forScopeCreated = true;
+
+          for (const decl of node.left.declarations) {
+            const names = extractDeclaredNames(decl.id);
+            for (const name of names) {
+              scopeTracker.declareVariable(name, node.left.kind, node.left.start);
+            }
+          }
+        } else if (node.left) {
+          c(node.left, state);
+        }
+
+        c(node.right, state);
+
+        const captureExpr = scopeTracker.generateCaptureExpression(node.start);
+
         if (node.body && node.body.type === 'BlockStatement') {
+          scopeTracker.pushScope('block');
           insertions.push({
             start: node.body.start + 1,
             end: node.body.start + 1,
-            replacement: ` __capture__(${line});`,
+            replacement: ` __capture__(${line}, ${captureExpr});`,
           });
+          c(node.body, state);
+          scopeTracker.popScope();
+        } else {
+          c(node.body, state);
+        }
+
+        if (forScopeCreated) {
+          scopeTracker.popScope();
         }
       },
 
-      SwitchStatement(node, ancestors) {
+      SwitchStatement(node, state, c) {
+        c(node.discriminant, state);
         for (const switchCase of node.cases) {
           if (switchCase.consequent.length > 0) {
             const caseLine = switchCase.loc.start.line;
+            const captureExpr = scopeTracker.generateCaptureExpression(switchCase.start);
             const firstStmt = switchCase.consequent[0];
             insertions.push({
               start: firstStmt.start,
               end: firstStmt.start,
-              replacement: `__capture__(${caseLine}); `,
+              replacement: `__capture__(${caseLine}, ${captureExpr}); `,
             });
+          }
+          for (const stmt of switchCase.consequent) {
+            c(stmt, state);
           }
         }
       },
 
-      TryStatement(node, ancestors) {
+      TryStatement(node, state, c) {
         // try block
         if (node.block) {
           const tryLine = node.loc.start.line;
+          const captureExpr = scopeTracker.generateCaptureExpression(node.block.start);
+          scopeTracker.pushScope('block');
           insertions.push({
             start: node.block.start + 1,
             end: node.block.start + 1,
-            replacement: ` __capture__(${tryLine});`,
+            replacement: ` __capture__(${tryLine}, ${captureExpr});`,
           });
+          c(node.block, state);
+          scopeTracker.popScope();
         }
         // catch block
         if (node.handler && node.handler.body) {
           const catchLine = node.handler.loc.start.line;
+          const captureExpr = scopeTracker.generateCaptureExpression(node.handler.body.start);
+          scopeTracker.pushScope('catch');
+          if (node.handler.param) {
+            const names = extractDeclaredNames(node.handler.param);
+            for (const name of names) {
+              scopeTracker.declareVariable(name, 'let', node.handler.start);
+            }
+          }
           insertions.push({
             start: node.handler.body.start + 1,
             end: node.handler.body.start + 1,
-            replacement: ` __capture__(${catchLine});`,
+            replacement: ` __capture__(${catchLine}, ${captureExpr});`,
           });
+          c(node.handler.body, state);
+          scopeTracker.popScope();
         }
         // finally block
         if (node.finalizer) {
           const finallyLine = node.finalizer.loc.start.line;
+          const captureExpr = scopeTracker.generateCaptureExpression(node.finalizer.start);
+          scopeTracker.pushScope('block');
           insertions.push({
             start: node.finalizer.start + 1,
             end: node.finalizer.start + 1,
-            replacement: ` __capture__(${finallyLine});`,
+            replacement: ` __capture__(${finallyLine}, ${captureExpr});`,
           });
+          c(node.finalizer, state);
+          scopeTracker.popScope();
         }
       },
 
-      CallExpression(node, ancestors) {
+      CallExpression(node, state, c) {
         // Promise.then() 계측
         if (
           node.callee?.type === 'MemberExpression' &&
@@ -715,13 +1087,24 @@ class DebuggerAgent {
           const callback = node.arguments[0];
           if (callback && callback.type === 'ArrowFunctionExpression') {
             const callbackLine = callback.loc.start.line;
+            const captureExpr = scopeTracker.generateCaptureExpression(callback.body.end);
+
+            scopeTracker.pushScope('function');
+            for (const param of callback.params) {
+              const names = extractDeclaredNames(param);
+              for (const name of names) {
+                scopeTracker.declareVariable(name, 'param', callback.start);
+              }
+            }
+
             if (callback.body.type === 'BlockStatement') {
               const insertPos = callback.body.end - 1;
               insertions.push({
                 start: insertPos,
                 end: insertPos,
-                replacement: ` __captureMicrotask__(${callbackLine}); `,
+                replacement: ` __captureMicrotask__(${callbackLine}, ${captureExpr}); `,
               });
+              c(callback.body, state);
             } else {
               const arrowPos = code.indexOf('=>', callback.start);
               const exprStart = callback.body.start;
@@ -729,9 +1112,12 @@ class DebuggerAgent {
               insertions.push({
                 start: arrowPos + 2,
                 end: exprEnd,
-                replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMicrotask__(${callbackLine}); return __result__; }`,
+                replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMicrotask__(${callbackLine}, ${captureExpr}); return __result__; }`,
               });
+              c(callback.body, state);
             }
+
+            scopeTracker.popScope();
           }
         }
 
@@ -748,13 +1134,24 @@ class DebuggerAgent {
           }
           if (callback && callback.type === 'ArrowFunctionExpression') {
             const callbackLine = callback.loc.start.line;
+            const captureExpr = scopeTracker.generateCaptureExpression(callback.body.end);
+
+            scopeTracker.pushScope('function');
+            for (const param of callback.params) {
+              const names = extractDeclaredNames(param);
+              for (const name of names) {
+                scopeTracker.declareVariable(name, 'param', callback.start);
+              }
+            }
+
             if (callback.body.type === 'BlockStatement') {
               const insertPos = callback.body.end - 1;
               insertions.push({
                 start: insertPos,
                 end: insertPos,
-                replacement: ` __captureMacrotask__(${callbackLine}, ${delayValue}); `,
+                replacement: ` __captureMacrotask__(${callbackLine}, ${delayValue}, ${captureExpr}); `,
               });
+              c(callback.body, state);
             } else {
               const arrowPos = code.indexOf('=>', callback.start);
               const exprStart = callback.body.start;
@@ -762,11 +1159,143 @@ class DebuggerAgent {
               insertions.push({
                 start: arrowPos + 2,
                 end: exprEnd,
-                replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMacrotask__(${callbackLine}, ${delayValue}); return __result__; }`,
+                replacement: ` { const __result__ = ${code.substring(exprStart, exprEnd)}; __captureMacrotask__(${callbackLine}, ${delayValue}, ${captureExpr}); return __result__; }`,
               });
+              c(callback.body, state);
             }
+
+            scopeTracker.popScope();
           }
         }
+
+        c(node.callee, state);
+        for (const arg of node.arguments) {
+          c(arg, state);
+        }
+      },
+
+      // Default handler for unspecified nodes - recursively traverse
+      Identifier() {}, // Leaf nodes don't need traversal
+      Literal() {},
+      ThisExpression() {},
+      Super() {},
+      TemplateLiteral(node, state, c) {
+        for (const expr of node.expressions) {
+          c(expr, state);
+        }
+      },
+      TaggedTemplateExpression(node, state, c) {
+        c(node.tag, state);
+        c(node.quasi, state);
+      },
+      UnaryExpression(node, state, c) {
+        c(node.argument, state);
+      },
+      BinaryExpression(node, state, c) {
+        c(node.left, state);
+        c(node.right, state);
+      },
+      LogicalExpression(node, state, c) {
+        c(node.left, state);
+        c(node.right, state);
+      },
+      AssignmentExpression(node, state, c) {
+        c(node.left, state);
+        c(node.right, state);
+      },
+      ConditionalExpression(node, state, c) {
+        c(node.test, state);
+        c(node.consequent, state);
+        c(node.alternate, state);
+      },
+      MemberExpression(node, state, c) {
+        c(node.object, state);
+        if (node.computed) c(node.property, state);
+      },
+      ArrayExpression(node, state, c) {
+        for (const elem of node.elements) {
+          if (elem) c(elem, state);
+        }
+      },
+      ObjectExpression(node, state, c) {
+        for (const prop of node.properties) {
+          c(prop, state);
+        }
+      },
+      Property(node, state, c) {
+        if (node.computed) c(node.key, state);
+        c(node.value, state);
+      },
+      SpreadElement(node, state, c) {
+        c(node.argument, state);
+      },
+      UpdateExpression(node, state, c) {
+        c(node.argument, state);
+      },
+      SequenceExpression(node, state, c) {
+        for (const expr of node.expressions) {
+          c(expr, state);
+        }
+      },
+      NewExpression(node, state, c) {
+        c(node.callee, state);
+        for (const arg of node.arguments) {
+          c(arg, state);
+        }
+      },
+      YieldExpression(node, state, c) {
+        if (node.argument) c(node.argument, state);
+      },
+      AwaitExpression(node, state, c) {
+        c(node.argument, state);
+      },
+      EmptyStatement() {},
+      DebuggerStatement() {},
+      BreakStatement() {},
+      ContinueStatement() {},
+      ThrowStatement(node, state, c) {
+        c(node.argument, state);
+      },
+      LabeledStatement(node, state, c) {
+        c(node.body, state);
+      },
+      WithStatement(node, state, c) {
+        c(node.object, state);
+        c(node.body, state);
+      },
+      VariableDeclarator(node, state, c) {
+        if (node.init) c(node.init, state);
+      },
+      ObjectPattern(node, state, c) {
+        for (const prop of node.properties) {
+          if (prop.type === 'Property') {
+            c(prop.value, state);
+          } else if (prop.type === 'RestElement') {
+            c(prop.argument, state);
+          }
+        }
+      },
+      ArrayPattern(node, state, c) {
+        for (const elem of node.elements) {
+          if (elem) c(elem, state);
+        }
+      },
+      RestElement(node, state, c) {
+        c(node.argument, state);
+      },
+      AssignmentPattern(node, state, c) {
+        c(node.left, state);
+        if (node.right) c(node.right, state);
+      },
+      CatchClause(node, state, c) {
+        if (node.param) {
+          const names = extractDeclaredNames(node.param);
+          for (const name of names) {
+            scopeTracker.declareVariable(name, 'let', node.start);
+          }
+          c(node.param, state);
+        }
+        c(node.body, state);
       },
     });
 
@@ -830,15 +1359,9 @@ class DebuggerAgent {
 
     // 샌드박스 생성
     const sandbox = {
-      // 캡처 함수
-      __capture__: (lineNumber) => {
-        const vars = {};
-        for (const key of Object.keys(sandbox)) {
-          if (!agent.shouldSkipVariable(key)) {
-            vars[key] = sandbox[key];
-          }
-        }
-        agent.capture(lineNumber, vars);
+      // 캡처 함수 (명시적 변수 전달)
+      __capture__: (lineNumber, contextVariables) => {
+        agent.capture(lineNumber, contextVariables || {});
       },
 
       // 함수 진입/종료 추적 (로컬 버전의 기능)
@@ -873,25 +1396,13 @@ class DebuggerAgent {
       },
 
       // Microtask 캡처 (Promise.then() 콜백 내부에서 호출됨)
-      __captureMicrotask__: (lineNumber) => {
-        const vars = {};
-        for (const key of Object.keys(sandbox)) {
-          if (!agent.shouldSkipVariable(key)) {
-            vars[key] = sandbox[key];
-          }
-        }
-        agent.capture(lineNumber, vars);
+      __captureMicrotask__: (lineNumber, contextVariables) => {
+        agent.capture(lineNumber, contextVariables || {});
       },
 
       // Macrotask 캡처 (setTimeout() 콜백 내부에서 호출됨)
-      __captureMacrotask__: (lineNumber, delay) => {
-        const vars = {};
-        for (const key of Object.keys(sandbox)) {
-          if (!agent.shouldSkipVariable(key)) {
-            vars[key] = sandbox[key];
-          }
-        }
-        agent.capture(lineNumber, vars);
+      __captureMacrotask__: (lineNumber, delay, contextVariables) => {
+        agent.capture(lineNumber, contextVariables || {});
       },
 
       // ========================================
