@@ -34,6 +34,10 @@ export async function getLanguages() {
  * OPTIMIZATION (2025-01-25): Payload ~50KB → ~3KB
  * - lesson.id만 조회 (description, difficulty 등 제외)
  * - 진행률은 별도 쿼리로 completed만 집계
+ *
+ * FIX (2026-02-15): Accurate progress per chapter
+ * - 각 chapter마다 정확한 progress 계산
+ * - chapter 범위로 completed lessons 필터링 (language 범위 X)
  */
 // ... (previous code)
 export async function getLanguageWithChapters(languageId: string, userId?: string, isAdmin: boolean = false) {
@@ -72,39 +76,41 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
     };
   }
 
-  // 3. Progress (Batch Query)
-  // 해당 언어의 모든 완료된 레슨 ID를 한번에 가져옴
-  const completedLessonIds = new Set(
-    (await prisma.userProgress.findMany({
-      where: {
-        userId,
-        status: 'completed',
-        lesson: { chapter: { languageId } },
-      },
-      select: { lessonId: true },
-    })).map((p: any) => p.lessonId)
-  );
-
-  // 4. Transform & Combine
+  // 3. Progress (Per-Chapter Calculation)
+  // 각 chapter마다 정확한 진행률 계산
   return {
     ...language,
-    chapters: language.chapters.map((chapter: any) => {
-      const total = chapter.lessons.length;
-      // Admin은 모든 레슨을 완료한 것으로 간주 (무조건 접근 가능)
-      const completed = isAdmin ? total : chapter.lessons.filter((l: any) =>
-        completedLessonIds.has(l.id)
-      ).length;
+    chapters: await Promise.all(
+      language.chapters.map(async (chapter: any) => {
+        const total = chapter.lessons.length;
 
-      return {
-        ...chapter,
-        lessons: undefined, // Remove lessons from payload to save bandwidth
-        progress: {
-          total,
-          completed,
-          percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
-        },
-      };
-    }),
+        // Chapter의 모든 lesson id 배열
+        const chapterLessonIds = chapter.lessons.map((l: any) => l.id) as string[];
+
+        // 이 chapter에서 사용자가 완료한 lesson count
+        const completed = isAdmin
+          ? total
+          : (await prisma.userProgress.count({
+              where: {
+                userId,
+                status: 'completed',
+                lessonId: {
+                  in: chapterLessonIds,
+                },
+              },
+            }));
+
+        return {
+          ...chapter,
+          lessons: undefined, // Remove lessons from payload to save bandwidth
+          progress: {
+            total,
+            completed,
+            percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+          },
+        };
+      })
+    ),
   };
 }
 
