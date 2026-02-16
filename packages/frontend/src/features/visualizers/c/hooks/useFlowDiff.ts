@@ -112,18 +112,3 @@ export function useFlowDiff(
     [prevStep, currentStep]
   );
 }
-
-/**
- * 변수 ID가 특정 상태인지 확인하는 유틸리티
- */
-export function useFlowDiffStatus(diff: FlowDiff, variableId: string) {
-  return useMemo(
-    () => ({
-      isCreated: diff.created.includes(variableId),
-      isUpdated: diff.updated.includes(variableId),
-      isDeleted: diff.deleted.includes(variableId),
-      isUnchanged: diff.unchanged.includes(variableId),
-    }),
-    [diff, variableId]
-  );
-}

@@ -1,0 +1,158 @@
+{
+  "lessonId": "py-15-2",
+  "title": "with문과 파일 쓰기",
+  "concept": "with문은 파일을 자동으로 닫아주는 안전한 방법입니다. write()로 파일에 내용을 쓰고, 'a' 모드로 기존 내용 뒤에 추가할 수 있습니다.",
+  "content": {
+    "code": "with open(\"output.txt\", \"w\") as f:\n    f.write(\"Hello, File!\\n\")\n    f.write(\"Second line\\n\")\n\nwith open(\"output.txt\", \"r\") as f:\n    content = f.read()\n    print(content)\n\nwith open(\"output.txt\", \"a\") as f:\n    f.write(\"Appended line\\n\")",
+    "steps": [
+      {
+        "title": "with문으로 파일 열기 (쓰기 모드)",
+        "explanation": "**`with open(\"output.txt\", \"w\") as f:`** -- `with`문을 사용하여 파일을 쓰기 모드로 엽니다. 블록이 끝나면 **자동으로 파일을 닫아줍니다**.\n\n`with`문은 Python의 **컨텍스트 매니저(Context Manager)**입니다. 이전 레슨에서 `open()-작업-close()` 패턴의 문제점(에러 시 close 누락)을 배웠는데, `with`문이 이 문제를 완벽하게 해결합니다.\n\n**비유:** 호텔에 체크인하는 것과 같습니다. 호텔(with문)에 들어가면 방 키(파일 객체)를 받고, 체크아웃(블록 종료) 시 방 키를 자동으로 반납합니다. 화재(에러)가 발생해도 소방관(예외 처리기)이 방 키를 회수합니다. 절대로 방 키가 분실되지 않습니다.\n\n**with문의 동작 3단계:**\n1. `open()`으로 파일을 열고 파일 객체를 `f`에 할당\n2. `with` 블록 안의 코드를 실행\n3. 블록이 끝나면 **자동으로 `f.close()` 호출** (에러가 발생해도!)\n\n**왜 with문을 써야 하는가?**\n- `close()`를 **잊어버릴 걱정이 없습니다**\n- 에러가 발생해도 **항상 파일을 닫아줍니다** (try-finally와 동일)\n- 코드가 더 **깔끔하고 안전합니다**\n- Python 공식 문서에서도 **with문 사용을 강력히 권장**합니다\n\n**\"w\" 모드의 중요한 경고:**\n- 파일이 없으면 **새로 생성**합니다 (편리함)\n- 파일이 이미 있으면 **기존 내용을 모두 삭제**하고 빈 파일로 시작합니다! (위험!)\n- 중요한 데이터가 있는 파일에 `\"w\"` 모드를 쓰면 데이터가 사라집니다\n\n**Python 내부 동작:** `with`문은 내부적으로 컨텍스트 매니저 프로토콜을 사용합니다. `open()`이 반환하는 파일 객체는 `__enter__()` 메서드(파일 객체 반환)와 `__exit__()` 메서드(close 호출)를 구현하고 있습니다. `with` 블록 진입 시 `__enter__()`가 호출되고, 블록 종료 시(정상이든 예외든) `__exit__()`가 호출됩니다.\n\n**실행 순서:**\n1. `open(\"output.txt\", \"w\")` → 파일 객체 생성.\n2. `__enter__()` 호출 → 파일 객체를 `f`에 바인딩.\n3. with 블록 진입.",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"w\") as f:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "with문이 파일을 열고 f에 할당했습니다. 블록 종료 시 자동으로 닫힙니다.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='w')",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "파일에 내용 쓰기 (write)",
+        "explanation": "**`f.write(\"Hello, File!\\n\")`**\n**`f.write(\"Second line\\n\")`** -- `write()` 메서드로 파일에 두 줄의 텍스트를 기록합니다.\n\n`write()` 메서드는 전달받은 문자열을 **파일에 그대로 기록**합니다. `print()`와 달리 자동 줄바꿈을 추가하지 않습니다.\n\n**비유:** `print()`가 게시판에 글을 쓰고 자동으로 줄을 바꿔주는 것이라면, `write()`는 타자기로 직접 치는 것과 같습니다. 줄을 바꾸고 싶으면 직접 엔터(\\n)를 쳐야 합니다.\n\n**write() vs print()의 핵심 차이:**\n- `print(\"hello\")` → 자동으로 `\\n` 추가하여 화면에 출력\n- `f.write(\"hello\")` → `\\n` 없이 파일에 그대로 기록\n- `f.write(\"hello\\n\")` → `\\n`을 직접 넣어야 줄바꿈 발생\n\n**write()의 반환값:** 쓴 문자의 수(int)를 반환합니다. `f.write(\"Hello, File!\\n\")`은 `14`를 반환합니다 (13글자 + \\n 1글자).\n\n**Python 내부 동작:** `write()`는 문자열을 즉시 디스크에 쓰는 것이 아니라 **내부 버퍼**에 먼저 저장합니다. 버퍼가 가득 차거나 `flush()`가 호출되거나 `close()`가 호출될 때 실제 디스크에 기록됩니다. 이것을 **버퍼링(buffering)**이라고 하며, 디스크 접근을 줄여 성능을 향상시킵니다. `with`문이 끝나면 자동으로 flush + close가 실행됩니다.\n\n**주의:** `write()` 대신 `print()` 함수로도 파일에 쓸 수 있습니다. `print(\"hello\", file=f)`는 `f.write(\"hello\\n\")`과 동일합니다. `print()`의 `file` 매개변수를 사용하면 자동 줄바꿈의 편리함을 누릴 수 있습니다.\n\n**실행 순서:**\n1. 첫 번째 `write()` → `\"Hello, File!\\n\"`을 버퍼에 기록.\n2. 두 번째 `write()` → `\"Second line\\n\"`을 버퍼에 이어서 기록.\n3. with 블록 종료 → `__exit__()` 호출 → flush + close → 디스크에 실제 기록.",
+        "visualizationType": "pythonMemory",
+        "code": "    f.write(\"Hello, File!\\n\")",
+        "highlightOffset": [0, 1],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "파일에 두 줄이 기록되었습니다. with 블록이 끝나면 자동으로 close()됩니다.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='w') [written: 2 lines]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "파일 내용 다시 읽기",
+        "explanation": "**`with open(\"output.txt\", \"r\") as f:`**\n**`    content = f.read()`**\n**`    print(content)`** -- 이전 `with` 블록이 끝나면서 파일이 자동으로 닫혔습니다. 이제 같은 파일을 **읽기 모드(\"r\")**로 다시 열어 내용을 확인합니다.\n\n방금 쓴 내용이 정말로 파일에 저장되었는지 확인하는 패턴입니다. 새로운 `with` 블록으로 파일을 읽기 모드로 열고, `read()`로 전체 내용을 가져옵니다.\n\n**비유:** 편지를 쓴 후(write) 봉투를 봉인하고(close), 봉투를 다시 열어서(open \"r\") 내용이 제대로 적혔는지 확인하는(read) 것과 같습니다.\n\n**파일 쓰기 후 읽기의 필수 패턴:**\n1. `\"w\"` 모드로 열어서 내용 쓰기\n2. `with` 블록 종료 → 자동으로 close (디스크에 기록 보장)\n3. `\"r\"` 모드로 다시 열어서 읽기\n\n**왜 닫았다 다시 여는가?**\n- `\"w\"` 모드의 파일 객체로는 **읽을 수 없습니다** (쓰기 전용)\n- 모드를 바꾸려면 파일을 닫고 새 모드로 다시 열어야 합니다\n- `\"r+\"` 모드(읽기+쓰기)를 쓸 수도 있지만, 초보자에게는 권장하지 않습니다\n\n**Python 내부 동작:** 이전 `with` 블록의 `__exit__()`에서 버퍼가 flush되고 파일이 닫혔으므로, 새 `with` 블록에서 파일을 열면 디스크에 기록된 최신 내용을 읽을 수 있습니다. `f`라는 변수명은 재사용되지만, 가리키는 파일 객체는 이전 것(CLOSED)과 다른 새로운 객체입니다.\n\n**주의:** `\"r\"` 모드에서 파일이 존재하지 않으면 `FileNotFoundError`가 발생합니다. 하지만 직전에 `\"w\"` 모드로 생성했으므로 여기서는 안전합니다.\n\n**실행 순서:**\n1. 새 `with` 블록 → `\"r\"` 모드로 파일 열기.\n2. `f.read()` → 전체 내용을 `content`에 저장.\n3. `print(content)` → `\"Hello, File!\\nSecond line\\n\"` 출력.\n4. `with` 블록 종료 → 자동 close.",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"r\") as f:",
+        "highlightOffset": [0, 1, 2],
+        "pythonMemoryState": {
+          "output": [
+            "Hello, File!",
+            "Second line",
+            ""
+          ],
+          "note": "쓰기 모드에서 기록한 내용이 정상적으로 읽혔습니다.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file2",
+              "highlight": true
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='r')",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello, File!\nSecond line\n",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "추가 모드로 파일 열기 (append)",
+        "explanation": "**`with open(\"output.txt\", \"a\") as f:`**\n**`    f.write(\"Appended line\\n\")`** -- `\"a\"` 모드(append)로 파일을 열어 기존 내용 **뒤에 새 내용을 추가**합니다.\n\n이것이 `\"w\"` 모드와의 결정적인 차이입니다. `\"w\"`는 기존 내용을 삭제하지만, `\"a\"`는 기존 내용을 **그대로 보존**하면서 파일 끝에 추가합니다.\n\n**비유:** `\"w\"` 모드는 칠판을 깨끗이 지우고 처음부터 새로 쓰는 것이고, `\"a\"` 모드는 칠판에 이미 적힌 내용 아래에 한 줄을 더 추가하는 것입니다. 로그 파일처럼 계속 누적되는 데이터를 기록할 때 `\"a\"` 모드가 필수입니다.\n\n**\"w\" vs \"a\" 모드 비교:**\n- `\"w\"` (write): 기존 내용 **전부 삭제** 후 새로 씀 -- 덮어쓰기\n- `\"a\"` (append): 기존 내용 **유지** + 끝에 추가 -- 이어쓰기\n\n**\"w\" 모드의 실수 사례:**\n```python\n# 위험! 기존 데이터 전부 사라짐!\nwith open(\"중요데이터.txt\", \"w\") as f:\n    f.write(\"새 내용\")  # 기존 100줄의 데이터가 모두 삭제됨!\n```\n기존 데이터를 보존하고 싶다면 반드시 `\"a\"` 모드를 사용하세요.\n\n**추가 후 파일 내용:**\n```\nHello, File!\nSecond line\nAppended line    -- 새로 추가됨\n```\n\n**Python 내부 동작:** `\"a\"` 모드로 파일을 열면 파일 커서가 자동으로 **파일 끝**에 위치합니다. `write()`를 호출하면 커서 위치에서부터 기록하므로, 기존 내용 뒤에 새 내용이 추가됩니다. 또한 `\"a\"` 모드에서는 `seek()`으로 커서를 앞으로 옮겨도, `write()` 시점에 다시 파일 끝으로 이동합니다 (OS 레벨에서 보장).\n\n**주의:** `\"a\"` 모드는 파일이 없으면 `\"w\"`와 마찬가지로 새로 생성합니다. 파일이 없을 때 `\"r\"` 모드만 에러(`FileNotFoundError`)가 발생합니다.\n\n**실행 순서:**\n1. `open(\"output.txt\", \"a\")` → 추가 모드로 열기, 커서를 파일 끝에 배치.\n2. `write(\"Appended line\\n\")` → 파일 끝에 한 줄 추가.\n3. `with` 블록 종료 → `__exit__()` → flush + close → 디스크에 기록 완료.",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"a\") as f:",
+        "highlightOffset": [0, 1],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "'a' 모드는 기존 내용을 유지하면서 끝에 추가합니다.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file3",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='a') [appended: 1 line]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "with문을 사용하는 가장 중요한 이유는?",
+    "options": [
+      "파일을 더 빠르게 읽을 수 있다",
+      "블록이 끝나면 자동으로 파일을 닫아주어 안전하다",
+      "여러 파일을 동시에 열 수 있다",
+      "바이너리 파일도 읽을 수 있다"
+    ],
+    "correctIndex": 1,
+    "explanation": "with문의 핵심 장점은 블록이 끝나거나 에러가 발생해도 자동으로 close()를 호출한다는 것입니다.\nclose()를 잊어버리거나 예외 때문에 실행되지 않는 문제를 방지합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "\"w\" 모드는 기존 내용 뒤에 추가한다",
+      "correct": "\"w\" 모드는 기존 내용을 모두 삭제하고 새로 씁니다. 추가하려면 \"a\" 모드를 사용하세요",
+      "why": "\"w\"는 write(덮어쓰기), \"a\"는 append(이어쓰기)입니다. 실수로 \"w\"를 쓰면 데이터가 사라질 수 있습니다."
+    },
+    {
+      "wrong": "write()는 print()처럼 자동으로 줄바꿈을 추가한다",
+      "correct": "write()는 전달한 문자열을 그대로 쓰며, 줄바꿈이 필요하면 직접 \\n을 넣어야 합니다",
+      "why": "print()는 기본적으로 end='\\n'을 추가하지만, write()는 raw 문자열을 그대로 파일에 기록합니다."
+    }
+  ],
+  "keyTakeaway": "with문은 파일을 자동으로 닫아주는 안전한 방법입니다. \"w\"는 덮어쓰기, \"a\"는 이어쓰기이며, write()는 줄바꿈을 자동 추가하지 않습니다."
+}

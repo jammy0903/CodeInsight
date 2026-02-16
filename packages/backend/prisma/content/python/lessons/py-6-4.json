@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Student 클래스 정의",
-        "explanation": "**`class Student:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n`Student` 클래스(학생 설계도)를 정의합니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 클래스 변수와 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Student 실행 → Student 클래스 등록 시작 → line 2",
+        "explanation": "**`class Student:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Student` 클래스(학생 설계도)를 정의합니다.\n\n**이 레슨의 목표 -- 클래스 변수의 위험한 함정 발견!** 이전 레슨에서 인스턴스 변수(`self.count`)는 각 객체마다 독립적이라고 배웠습니다. 하지만 **클래스 변수**를 잘못 사용하면 모든 인스턴스가 같은 데이터를 공유하는 심각한 버그가 발생합니다! 특히 **가변 객체(리스트, 딕셔너리)**를 클래스 변수로 사용하면 대참사가 일어납니다.\n\n**비유**: 이 레슨은 \"함께 쓰는 화이트보드에 각자 성적을 쓰면 어떻게 되는가?\"를 보여줍니다. 각자의 노트(인스턴스 변수)가 아닌 공용 화이트보드(클래스 변수)에 쓰면, 모든 사람의 성적이 섞이는 참사가 벌어집니다!\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 클래스 변수와 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Student 실행 --> Student 클래스 객체 생성 시작 --> line 2",
         "visualizationType": "pythonMemory",
         "code": "class Student:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "클래스 변수 정의 (⚠️ 함정!)",
-        "explanation": "**`grades = []`**\n\n**클래스 변수**: 클래스 수준에서 정의된 변수로, **모든 인스턴스가 공유**합니다!\n\n**핵심 문제**:\n- `grades` 리스트는 **단 하나만** 생성됩니다 (0x1500)\n- 모든 Student 인스턴스가 **같은 0x1500 리스트를 참조**\n- 한 학생이 성적을 추가하면 **다른 학생에게도 보임**!\n\n**올바른 방법** (인스턴스 변수):\n```python\ndef __init__(self):\n    self.grades = []  # 각 인스턴스마다 독립적인 리스트\n```\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 실행됩니다.\n\n**실행 순서**: grades = [] 실행 → 리스트 0x1500 생성 → Student.grades에 할당 → line 4",
+        "explanation": "**`grades = []`**\n\n이것이 바로 **함정**입니다! 클래스 본문에서 `self` 없이 정의한 `grades = []`는 **클래스 변수**입니다. 모든 Student 인스턴스가 **이 하나의 리스트를 공유**합니다!\n\n**문제의 핵심:**\n- 이 줄이 실행될 때, 빈 리스트 객체가 **딱 하나만** 생성됩니다 (메모리 주소 0x1500)\n- 이 리스트는 `Student.__dict__['grades']`에 저장됩니다\n- 나중에 s1.grades든 s2.grades든, **모두 같은 0x1500 리스트를 가리킵니다**\n- 한 학생이 성적을 추가하면 **다른 모든 학생에게도 보입니다!**\n\n**왜 이게 위험한가?** `species = \"Canis familiaris\"` 같은 **불변(immutable) 문자열**은 클래스 변수로 사용해도 안전합니다. 값을 변경하면 새 객체가 만들어지니까요. 하지만 **리스트, 딕셔너리** 같은 **가변(mutable) 객체**는 `.append()`, `[key] = val` 등으로 **원래 객체를 직접 수정**할 수 있어서, 공유된 모든 곳에 영향을 미칩니다!\n\n**올바른 방법 (미리 보기):**\n```python\ndef __init__(self):\n    self.grades = []  # 각 인스턴스마다 독립적인 리스트!\n```\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 실행됩니다.\n\n**실행 순서**: grades = [] 실행 --> 빈 리스트 객체 0x1500 생성 --> Student.__dict__['grades'] = 0x1500 --> line 4",
         "visualizationType": "pythonMemory",
         "code": "grades = []  # 클래스 변수 - 함정!",
         "pythonMemoryState": {
@@ -585,7 +585,7 @@
       },
       {
         "title": "💡 객체 동일성 확인 (증명!)",
-        "explanation": "**`print(f\"같은 객체? {s1.grades is s2.grades}\")`**\n\n**`is` 연산자**: 두 변수가 **완전히 같은 객체**를 가리키는지 확인합니다 (메모리 주소 비교).\n\n**실행 흐름**:\n1. `s1.grades` → Student.grades → 0x1500\n2. `s2.grades` → Student.grades → 0x1500\n3. `0x1500 is 0x1500` → **True**\n\n**결과**: `True`가 출력됩니다!\n\n**증명 완료**: s1.grades와 s2.grades는 **완전히 같은 리스트 객체(0x1500)**를 가리킵니다!\n\n**해결 방법**:\n```python\nclass Student:\n    def __init__(self):\n        self.grades = []  # ✅ 인스턴스 변수로!\n```\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: s1.grades, s2.grades 읽기 → is 비교 → True → f-string 평가 → print 실행 → 프로그램 종료",
+        "explanation": "**`print(f\"같은 객체? {s1.grades is s2.grades}\")`**\n\n`is` 연산자로 최종 증거를 확보합니다! `is`는 두 변수가 **메모리에서 완전히 같은 객체**를 가리키는지 확인합니다 (`==`는 값이 같은지, `is`는 **동일한 객체인지**!).\n\n**실행 흐름:**\n1. `s1.grades` --> s1.__dict__에 없음 --> Student.__dict__['grades'] --> 0x1500\n2. `s2.grades` --> s2.__dict__에 없음 --> Student.__dict__['grades'] --> 0x1500\n3. `0x1500 is 0x1500` --> **True!** (완전히 같은 객체!)\n\n**결과: \"같은 객체? True\"** -- 증명 완료! s1.grades와 s2.grades는 **메모리에서 동일한 리스트 객체(0x1500)**를 가리키고 있었습니다!\n\n**이 레슨의 최종 정리 -- 올바른 해결 방법:**\n```python\nclass Student:\n    def __init__(self):\n        self.grades = []  # 각 인스턴스마다 새 리스트 생성!\n    \n    def add_grade(self, grade):\n        self.grades.append(grade)  # 자기만의 리스트에 추가\n\ns1 = Student()  # s1.grades = 새 리스트 1\ns2 = Student()  # s2.grades = 새 리스트 2 (별개!)\ns1.add_grade(90)  # s1.grades = [90]\ns2.add_grade(80)  # s2.grades = [80] (독립!)\n```\n\n**외울 규칙:**\n- **불변 객체**(str, int, tuple): 클래스 변수로 써도 안전 (공유해도 됨)\n- **가변 객체**(list, dict, set): **반드시 __init__에서 self.x = []로!** (공유하면 안 됨)\n\n**실행 순서**: s1.grades, s2.grades 읽기 --> is 비교 --> True --> f-string 평가 --> print 실행 --> 프로그램 종료",
         "visualizationType": "pythonMemory",
         "code": "print(f\"같은 객체? {s1.grades is s2.grades}\")",
         "pythonMemoryState": {

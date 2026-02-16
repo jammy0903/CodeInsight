@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수와 `NULL` 매크로를 사용하기 위해 헤더 파일을 포함합니다.",
+        "explanation": "**`#include <stdio.h>`**\n\n표준 입출력 라이브러리 헤더 파일을 포함합니다.\n이 헤더에는 `printf` 함수의 선언뿐만 아니라, `NULL` 매크로의 정의도 포함되어 있습니다.\n\n`NULL`은 보통 `(void *)0` 또는 `0`으로 정의되어 있으며, '아무것도 가리키지 않는 포인터 값'을 의미합니다.\n실제로 `stddef.h`에 정의되어 있지만, `stdio.h`가 이를 내부적으로 포함하므로 별도로 include할 필요가 없습니다.\n\n**비유**: 이번에는 공구 상자에서 도구(printf)뿐만 아니라 안전장치(NULL)까지 꺼내는 것과 같습니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
+        "explanation": "**`int main() {`**\n\n프로그램의 실행 시작점입니다. 운영체제가 `main`을 호출하면서 프로그램이 시작됩니다.\n\n스택 메모리에 `main`의 스택 프레임이 생성됩니다.\n이 프레임 안에 포인터 변수 `ptr`이 자리를 잡게 됩니다.\n\n이번 레슨에서는 포인터가 아무것도 가리키지 않을 때 어떻게 안전하게 처리하는지 배웁니다.\n이전 레슨에서 포인터로 값을 읽고 쓰는 법을 배웠지만, 포인터가 유효한 주소를 가지고 있지 않을 때 역참조하면 프로그램이 **충돌(crash)**합니다.\n\n**비유**: 네비게이션에 목적지 주소가 설정되지 않은 상태에서 '안내 시작' 버튼을 누르면 오류가 나는 것과 같습니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "포인터를 NULL로 초기화",
-        "explanation": "**`int *ptr = NULL;`**\n\n포인터 변수 `ptr`을 선언하고 `NULL`로 초기화합니다.\n`NULL`은 '이 포인터는 현재 아무것도 가리키고 있지 않다'는 것을 명시적으로 나타내는 특별한 값입니다.\n초기화하지 않은 포인터(쓰레기 주소)보다 훨씬 안전합니다.\n\n**비유**: 총에 '안전장치'를 걸어두는 것과 같습니다.\n쓰레기 주소를 가진 포인터는 언제 발사될지 모르는 위험한 총이지만, NULL 포인터는 사용하려고 하면 바로 알 수 있습니다.",
+        "explanation": "**`int *ptr = NULL;`**\n\n이번 레슨의 **핵심 코드**입니다!\n\n포인터 변수 `ptr`을 선언하고 `NULL`로 초기화합니다.\n`NULL`은 '이 포인터는 현재 아무 곳도 가리키고 있지 않습니다'라는 것을 **명시적으로** 나타내는 특별한 값입니다.\n\n**왜 NULL이 중요할까요?**\n\n초기화하지 않은 포인터는 **쓰레기 값(Garbage Value)**을 가집니다.\n이전에 그 메모리 공간을 사용했던 프로그램이 남긴 잔여 데이터가 마치 유효한 주소처럼 보일 수 있습니다.\n이런 포인터를 역참조하면, 엉뚱한 메모리를 읽거나 써서 프로그램이 예측 불가능하게 동작합니다.\n\n반면 `NULL`로 초기화하면:\n- 포인터가 아직 유효한 대상을 가리키지 않음을 **명확히** 표시합니다.\n- `if (ptr != NULL)` 같은 검사로 안전하게 확인할 수 있습니다.\n- 실수로 역참조해도 운영체제가 즉시 에러를 알려줍니다.\n\n**비유**: 총에 비유하면, 초기화 안 된 포인터는 **장전된 채로 안전장치가 풀린 총**입니다. 언제 발사될지 모릅니다.\n`NULL` 포인터는 **안전장치가 걸린 총**입니다. 방아쇠(역참조)를 당기면 바로 '안전장치 걸려있다!'는 경고(Segmentation Fault)가 뜹니다.\n\n**주의**: 쓰레기 주소를 가진 포인터를 '댕글링 포인터(Dangling Pointer)' 또는 '와일드 포인터(Wild Pointer)'라고 부르며, C 프로그램의 가장 흔한 버그 원인 중 하나입니다.",
         "visualizationType": "cMemory",
         "code": "int *ptr = NULL;",
         "stack": [
@@ -44,32 +44,32 @@
       },
       {
         "title": "NULL 포인터 검사",
-        "explanation": "**`if (ptr != NULL)`**\n\n포인터의 값을 사용(역참조)하기 전에, `NULL`이 아닌지 반드시 검사하는 것은 매우 중요한 코딩 습관입니다.\n현재 `ptr`은 `NULL`이므로, 이 `if`문의 조건은 거짓(false)이 됩니다.",
+        "explanation": "**`if (ptr != NULL)`**\n\n포인터를 역참조하기 **전에** 반드시 `NULL`인지 검사하는 **방어적 프로그래밍(Defensive Programming)** 패턴입니다.\n\n이 검사가 왜 필수적인지 이해해봅시다:\n- `ptr`이 `NULL`인데 `*ptr`을 실행하면 → **Segmentation Fault** → 프로그램 강제 종료!\n- `ptr`이 `NULL`이 아닌지 먼저 확인하면 → 안전하게 역참조 가능\n\n현재 `ptr`은 `NULL`이므로, `ptr != NULL`은 `0 != 0`과 같으며, 결과는 **거짓(false)**입니다.\n따라서 `if` 블록 안의 코드는 건너뛰고, `else` 블록으로 이동합니다.\n\n**실무에서의 패턴**: 프로 개발자들은 포인터를 역참조하기 전에 거의 항상 NULL 검사를 합니다.\n이것은 좋은 코딩 습관을 넘어서, **안전한 소프트웨어의 필수 요건**입니다.\n\n```\nif (ptr != NULL) {\n    // 안전하게 *ptr 사용\n}\n```\n\n이 패턴을 '널 가드(Null Guard)'라고 부르기도 합니다.",
         "visualizationType": "cMemory",
         "code": "if (ptr != NULL) {"
       },
       {
         "title": "실행되지 않는 코드",
-        "explanation": "**`printf(\"Value: %d\\n\", *ptr);`**\n\n`if` 조건이 거짓이므로 이 코드는 실행되지 않습니다.\n만약 `NULL` 검사 없이 이 코드를 실행하려고 했다면, `NULL` 포인터를 역참조하게 되어 프로그램이 'Segmentation Fault' 오류를 내며 강제 종료되었을 것입니다.",
+        "explanation": "**`printf(\"Value: %d\\n\", *ptr);`**\n\n이 코드는 `if` 조건이 거짓이므로 **실행되지 않습니다**. 하지만 만약 실행되었다면 무슨 일이 벌어졌을까요?\n\n`*ptr`은 'ptr이 가리키는 주소로 가서 값을 읽어라'는 뜻입니다.\n그런데 `ptr`은 `NULL`(= 주소 0)입니다.\n메모리 0번지 근처는 운영체제가 **접근 금지 구역**으로 보호하고 있습니다.\n\n이 금지 구역에 접근하려 하면:\n1. CPU가 '잘못된 메모리 접근'을 감지합니다.\n2. 운영체제에 **시그널(SIGSEGV)**을 보냅니다.\n3. 프로그램이 **Segmentation Fault** 에러와 함께 강제 종료됩니다.\n\n**비유**: 군사 기지(0번지)에 무단 침입하려 하면 즉시 체포(프로그램 종료)되는 것과 같습니다.\nNULL 검사는 '이 문이 군사 기지로 통하는 문인지 미리 확인하는 것'입니다.\n\n**주의**: Segmentation Fault(줄여서 'Segfault')는 C 프로그래밍에서 가장 흔하게 마주치는 런타임 에러입니다.\n대부분 NULL 포인터 역참조 또는 해제된 메모리 접근이 원인입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Value: %d\\n\", *ptr);"
       },
       {
         "title": "else 블록 실행",
-        "explanation": "**`else { ... }`**\n\n`if` 조건이 거짓이었기 때문에, 프로그램의 실행 흐름은 `else` 블록으로 들어옵니다.",
+        "explanation": "**`else { ... }`**\n\n`if (ptr != NULL)` 조건이 거짓이었으므로, 프로그램의 실행 흐름은 `else` 블록으로 들어옵니다.\n\n이것이 NULL 검사의 의미입니다:\n- `if` 분기: 포인터가 유효할 때 → 안전하게 역참조\n- `else` 분기: 포인터가 NULL일 때 → 대체 동작 수행 (에러 메시지 출력, 기본값 반환 등)\n\n이 패턴을 통해 프로그램은 **어떤 상황에서도 비정상 종료 없이** 동작할 수 있습니다.\n\n**실무 활용 예시**:\n```c\nint *data = find_data(key);\nif (data != NULL) {\n    process(*data);\n} else {\n    printf(\"데이터를 찾을 수 없습니다.\\n\");\n}\n```\n\n이처럼 NULL은 '데이터 없음', '찾지 못함', '아직 준비 안 됨' 등의 상태를 표현하는 데 널리 사용됩니다.",
         "visualizationType": "cMemory",
         "code": "} else {"
       },
       {
         "title": "안전한 경로로 출력",
-        "explanation": "**`printf(\"Pointer is NULL! Safe.\\n\");`**\n\n`ptr`이 `NULL`임을 확인하고, 안전하게 처리했음을 알리는 메시지를 화면에 출력합니다.",
+        "explanation": "**`printf(\"Pointer is NULL! Safe.\\n\");`**\n\n`ptr`이 `NULL`임을 확인한 후, 안전하게 메시지를 출력합니다.\n\n이 메시지가 화면에 출력되었다는 것은, 우리의 NULL 검사가 제대로 작동하여 **위험한 역참조를 성공적으로 방지**했다는 증거입니다.\n\n만약 NULL 검사 없이 바로 `*ptr`을 사용했다면, 이 메시지 대신 `Segmentation Fault`라는 에러 메시지가 나왔을 것입니다.\n\n**정리 - 포인터 사용의 3단계 안전 수칙**:\n1. **선언과 동시에 NULL 초기화**: `int *ptr = NULL;`\n2. **사용 전 NULL 검사**: `if (ptr != NULL)`\n3. **사용 끝나면 다시 NULL 설정**: `ptr = NULL;`\n\n이 세 가지를 습관화하면 포인터 관련 버그의 대부분을 예방할 수 있습니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Pointer is NULL! Safe.\\n\");",
         "stdout": "Pointer is NULL! Safe."
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알리고 프로그램을 종료합니다.\n\n이 프로그램은 NULL 검사 덕분에 어떤 에러도 없이 안전하게 종료됩니다.\n\n**이 레슨의 핵심 요약**:\n1. `NULL`은 '아무것도 가리키지 않음'을 명시하는 특별한 값입니다.\n2. 초기화하지 않은 포인터(쓰레기 주소)보다 `NULL`이 **훨씬 안전**합니다.\n3. 포인터를 역참조하기 전에 **반드시** `NULL` 검사를 해야 합니다.\n4. NULL 포인터를 역참조하면 **Segmentation Fault**가 발생합니다.\n\n**기억하세요**: 빈 총(초기화 안 된 포인터)보다 안전장치 걸린 총(NULL 포인터)이 낫습니다!",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],

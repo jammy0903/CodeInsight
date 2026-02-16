@@ -241,13 +241,6 @@ export function getBoxStyle(
 }
 
 /**
- * 테마에서 프레임 스타일 가져오기
- */
-export function getFrameStyle(theme: FlowTheme) {
-  return FLOW_THEMES[theme].frame;
-}
-
-/**
  * 테마에서 화살표 스타일 가져오기
  */
 export function getArrowStyle(theme: FlowTheme) {

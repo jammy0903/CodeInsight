@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 헤더 파일을 포함합니다.",
+        "explanation": "**`#include <stdio.h>`**\n\n표준 입출력 라이브러리 헤더 파일을 포함합니다.\n`printf` 함수의 선언이 이 헤더 안에 있으므로, 컴파일러가 `printf`를 인식할 수 있게 됩니다.\n\n**비유**: 게임을 시작하기 전에 필요한 도구(printf 등)를 불러오는 로딩 화면과 같습니다.\n모든 도구가 준비되어야 게임(프로그램)을 진행할 수 있습니다.\n\n**참고**: C 프로그램의 거의 모든 파일에서 볼 수 있는 필수 헤더입니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다.",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 실행 시작점입니다. 운영체제가 `main`을 호출하면서 프로그램이 시작됩니다.\n\n스택 메모리에 `main`의 스택 프레임이 생성됩니다.\n이 프레임 안에 앞으로 `energy`와 `remote` 변수가 자리를 잡게 됩니다.\n\n**비유**: 게임 캐릭터(energy)와 리모컨(remote)을 놓을 게임판(스택 프레임)이 준비된 것입니다.\n리모컨으로 캐릭터의 에너지를 원격 조종하는 게임이 시작됩니다!",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "변수 및 포인터 선언",
-        "explanation": "**`int energy = 50;`**\n**`int *remote = &energy;`**\n\n`energy` 변수를 선언하고, `remote` 포인터가 `energy`의 주소를 가리키도록 합니다.\n`remote`는 `energy`를 원격 제어할 수 있는 '리모컨' 역할을 합니다.",
+        "explanation": "**`int energy = 50;`**\n**`int *remote = &energy;`**\n\n두 줄이 연달아 실행됩니다:\n\n1단계 - `int energy = 50;`:\n- 스택 프레임에 4바이트 공간(주소: `0x3000`)이 확보됩니다.\n- 이 공간에 정수 `50`이 저장됩니다.\n- `energy`는 게임 캐릭터의 에너지 잔량을 나타냅니다.\n\n2단계 - `int *remote = &energy;`:\n- 포인터 변수 `remote`를 선언합니다(주소: `0x3004`).\n- `&energy`(= `0x3000`)를 `remote`에 저장합니다.\n- 이제 `remote`는 `energy`를 **가리킵니다**.\n\n**비유**: `energy`는 TV(원본 데이터)이고, `remote`는 리모컨(포인터)입니다.\n리모컨에는 TV의 '채널(주소)'이 저장되어 있어서, 버튼을 누르면(역참조하면) TV를 제어할 수 있습니다.\n리모컨으로 TV 채널을 바꾸면, TV의 화면(원본 값)이 실제로 바뀌는 것처럼요.\n\n**핵심**: 이전 레슨에서는 `*p`로 값을 **읽기만** 했지만, 이번에는 `*remote`로 값을 **바꿀** 것입니다!",
         "visualizationType": "cMemory",
         "code": "int energy = 50;",
         "highlightOffset": [
@@ -55,14 +55,14 @@
       },
       {
         "title": "변경 전 값 확인",
-        "explanation": "**`printf(\"Before: %d\\n\", energy);`**\n\n`energy` 변수의 초기 값을 화면에 출력합니다.",
+        "explanation": "**`printf(\"Before: %d\\n\", energy);`**\n\n`energy` 변수의 현재 값(`50`)을 화면에 출력합니다.\n이것은 포인터를 통해 값을 변경하기 **전**의 상태를 기록해두는 것입니다.\n\n출력 결과: `Before: 50`\n\n이 값을 기억해두세요.\n다음 단계에서 포인터를 통해 값을 바꾼 후, `energy`를 다시 출력하면 값이 달라져 있을 것입니다.\n변수 이름(`energy`)으로 직접 대입하지 않았는데도 값이 바뀌는 모습을 확인하게 됩니다.\n\n**핵심 관찰 포인트**: '`energy = 100;`이라고 쓴 적이 없는데, 어떻게 energy의 값이 바뀔 수 있을까?'\n그 비밀이 다음 단계에 있습니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Before: %d\\n\", energy);",
         "stdout": "Before: 50"
       },
       {
         "title": "역참조를 통한 값 변경",
-        "explanation": "**`*remote = 100;`**\n\n`*remote`는 '`remote`가 가리키는 주소의 값'을 의미합니다.\n`remote`는 `energy`의 주소를 담고 있으므로, 이 코드는 `energy`의 값을 `100`으로 바꿉니다.\n마치 리모컨으로 TV 볼륨을 높이는 것처럼, 멀리서 원본 값을 제어합니다.",
+        "explanation": "**`*remote = 100;`**\n\n이번 레슨의 **가장 핵심적인 코드**입니다!\n\n이전 레슨에서 `*p`는 '주소로 찾아가서 값을 **읽어오라**'는 뜻이었습니다.\n하지만 `*p`가 대입 연산자(`=`)의 **왼쪽**에 오면 의미가 달라집니다:\n'주소로 찾아가서 그곳에 값을 **저장하라**!'\n\n실행 과정:\n1. `remote`의 값을 확인합니다 → `0x3000` (energy의 주소)\n2. 메모리 주소 `0x3000`으로 이동합니다\n3. 그곳에 저장된 기존 값 `50`을 `100`으로 **덮어씁니다**\n4. 결과: `energy`의 값이 `50` → `100`으로 변경!\n\n주목하세요: 코드에서 `energy = 100;`이라고 쓰지 않았습니다.\n`*remote = 100;`이라고 썼을 뿐인데, **원본 변수 `energy`의 값이 실제로 바뀌었습니다.**\n이것이 포인터의 강력한 능력 - **간접 수정(indirect modification)**입니다.\n\n**비유**: 리모컨(remote)으로 TV(energy)의 볼륨을 50에서 100으로 올린 것과 같습니다.\n리모컨 버튼만 눌렀는데(포인터로 대입), TV의 실제 볼륨(원본 값)이 바뀝니다.\n\n**주의**: 포인터로 값을 바꾸면 **복사본이 아니라 원본**이 바뀝니다!\n이 점이 C 언어가 강력하면서도 위험한 이유입니다.",
         "keyInsight": "`*p = 값`은 '그 주소에 값을 저장하라'는 뜻입니다.",
         "visualizationType": "cMemory",
         "code": "*remote = 100;",
@@ -85,7 +85,7 @@
       },
       {
         "title": "변경 후 값 확인",
-        "explanation": "**`printf(\"After:  %d\\n\", energy);`**\n\n`energy` 변수의 값을 다시 출력하여, 포인터를 통한 원격 수정으로 값이 `100`으로 변경되었음을 확인합니다.",
+        "explanation": "**`printf(\"After:  %d\\n\", energy);`**\n\n`energy` 변수의 값을 다시 출력합니다. 결과는 `100`입니다!\n\n코드 어디에도 `energy = 100;`이라는 직접 대입문이 없었는데, 포인터 `remote`를 통한 역참조 대입(`*remote = 100`)이 원본 `energy`의 값을 바꿔놓았습니다.\n\n이것이 가능한 이유:\n- `remote`는 `energy`의 **주소(0x3000)**를 저장하고 있습니다.\n- `*remote = 100`은 주소 `0x3000`으로 가서 `100`을 쓰라는 명령입니다.\n- `energy`도 주소 `0x3000`에 있으므로, 결국 같은 메모리 위치의 값이 바뀐 것입니다.\n\n**핵심 정리**:\n- `*p` 읽기(오른쪽): '가리키는 곳의 값을 **가져와라**' → `printf(\"%d\", *p);`\n- `*p` 쓰기(왼쪽): '가리키는 곳에 값을 **저장하라**' → `*p = 100;`\n\n이 개념은 나중에 **함수에 포인터를 넘겨서 원본을 수정하는 패턴**(Call by Reference)의 기초가 됩니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", energy);",
         "stack": [
@@ -107,7 +107,7 @@
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알립니다.",
+        "explanation": "**`return 0;`**\n\n`main` 함수가 성공적으로 실행을 마쳤음을 운영체제에 알리고 프로그램을 종료합니다.\n\n스택 프레임이 제거되면서 `energy`와 `remote` 모두 메모리에서 사라집니다.\n\n**이 레슨의 핵심 요약**:\n1. `*p`가 `=` **오른쪽**에 오면 → 값을 **읽는다** (이전 레슨)\n2. `*p`가 `=` **왼쪽**에 오면 → 값을 **쓴다** (이번 레슨)\n3. 포인터를 통한 수정은 **원본 데이터**를 직접 바꿉니다.\n4. 이것이 C 언어에서 '원격 수정'이 가능한 이유입니다.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],

@@ -354,6 +354,7 @@ export const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
         prisma.userNote.findMany({
           where: {
             userId,
+            createdAt: { gte: since },
           },
           orderBy: { createdAt: 'desc' },
         }),

@@ -1,3 +1,3 @@
 // C Language Flow Hooks
 export { useAnimationQueue } from './useAnimationQueue';
-export { useFlowDiff, calculateFlowDiff, useFlowDiffStatus } from './useFlowDiff';
+export { useFlowDiff, calculateFlowDiff } from './useFlowDiff';

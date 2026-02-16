@@ -3,19 +3,12 @@ import { z } from 'zod';
 import { simulateCode } from './simulator';
 import { cExecutor } from './executor';
 import { EmscriptenValidatorService } from './services/emscripten-validator.service';
-import { GdbTracer } from './gdb';
 import { prisma } from '../../../config/database';
 import { config } from '../../../config';
 import { logger } from '../../../utils/logger';
 
-// Feature flag: GDB 기반 트레이서 사용 여부
-const USE_GDB_TRACER = process.env.USE_GDB_TRACER === 'true';
-
 // Emscripten 검증 서비스 인스턴스
 const emscriptenValidator = new EmscriptenValidatorService();
-
-// GDB 트레이서 인스턴스 (feature flag가 켜진 경우에만)
-const gdbTracer = USE_GDB_TRACER ? new GdbTracer() : null;
 
 // =============================================
 // Zod 스키마 정의 (From original c executor routes)
@@ -104,14 +97,6 @@ export const cSimulatorRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     try {
-      // ── GDB 기반 트레이서 (feature flag) ──
-      if (gdbTracer) {
-        logger.info('Using GDB-based tracer');
-        const result = await gdbTracer.trace(code, stdin);
-        return result;
-      }
-
-      // ── 기존 regex 기반 시뮬레이터 (fallback) ──
       // 1️⃣ Emscripten 검증 단계
       const validation = await emscriptenValidator.validate(code);
 

@@ -144,7 +144,6 @@ function evaluateArg(arg: string, ctx: SimContext): { value: string; isAddress: 
     if (v) {
       return { value: String(v.size || 4), isAddress: false, size: v.size };
     }
-    // 타입 기본 크기
     return { value: '4', isAddress: false, size: 4 };
   }
 

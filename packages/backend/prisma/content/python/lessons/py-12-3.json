@@ -1,0 +1,123 @@
+{
+  "lessonId": "py-12-3",
+  "title": "finally와 else",
+  "concept": "에러가 나든 안 나든 반드시 실행되는 finally, 에러가 없을 때만 실행되는 else!",
+  "content": {
+    "code": "def safe_divide(a, b):\n    try:\n        result = a / b\n    except ZeroDivisionError:\n        print(\"Error: division by zero\")\n        return None\n    else:\n        print(f\"Success: {a}/{b} = {result}\")\n        return result\n    finally:\n        print(\"Calculation attempt finished\")\n\nanswer = safe_divide(10, 3)\nprint(f\"Answer: {answer}\")",
+    "steps": [
+      {
+        "title": "함수 정의",
+        "explanation": "**`def safe_divide(a, b):`** -- `function` 객체를 생성하고 `safe_divide`라는 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `def` 키워드로 함수를 정의하면, Python은 함수 본문의 코드를 **코드 객체(code object)**로 컴파일하여 메모리에 저장하고, 그 코드 객체를 감싼 `function` 객체를 만듭니다.\n\n이 함수는 try-except-else-finally의 **완전한 4단 구조**를 보여줍니다:\n```\ntry:      에러가 날 수 있는 코드 (위험 구간)\nexcept:   에러가 났을 때 실행 (응급 처치)\nelse:     에러가 안 났을 때 실행 (성공 축하)\nfinally:  무조건 실행 (뒷정리)\n```\n\n**비유:** 수술실의 프로토콜과 같습니다. 수술(try)을 시도하고, 문제가 생기면 응급 처치(except), 성공하면 축하(else), 그리고 **성공이든 실패든 반드시** 수술실을 정리(finally)합니다.\n\n**Python 내부 동작:** `def` 문이 실행되면 `function` 객체가 힙에 생성되고, 전역 네임스페이스에 `{\"safe_divide\": <function 객체 주소>}`가 등록됩니다. 함수 본문은 아직 실행되지 않습니다. 실제 실행은 `safe_divide(10, 3)` 호출 시 시작됩니다.\n\n**주의:** `def`는 **정의만** 할 뿐, 함수 안의 코드는 **호출될 때까지 실행되지 않습니다**. 함수 안에 문법 에러가 아닌 런타임 에러가 있어도 이 시점에서는 발견되지 않습니다.\n\n**실행 순서:** `def safe_divide(a, b):` → 함수 객체 생성 → 다음 줄(함수 호출)로 이동",
+        "visualizationType": "pythonMemory",
+        "code": "def safe_divide(a, b):",
+        "highlightOffset": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "함수 정의됨 (아직 실행 안 됨)",
+          "names": [
+            { "name": "safe_divide", "pointsTo": "func1" }
+          ],
+          "objects": [
+            { "id": "func1", "type": "function", "value": "<function safe_divide>", "pyId": "3001" }
+          ]
+        }
+      },
+      {
+        "title": "함수 호출 - try 블록 진입",
+        "explanation": "**`answer = safe_divide(10, 3)`** -- 함수를 호출하면 새로운 **로컬 네임스페이스**가 생성되고, 인자가 매개변수에 바인딩됩니다.\n\n`safe_divide`를 `a=10`, `b=3`으로 호출합니다. 함수 내부로 점프하여 `try` 블록에 진입합니다.\n\n**`result = a / b`** -- `10 / 3` = **3.3333333333333335** (Python의 `/` 연산자는 항상 `float`를 반환합니다)\n\n**비유:** 주방장(함수)에게 \"10인분의 파스타를 3명이 나눠 먹을 수 있게 해주세요\"라고 주문(호출)한 것입니다. 주방장은 먼저 나눗셈을 시도(try)하고, 0명이 아니므로 성공적으로 결과를 만들어냅니다.\n\n**Python 내부 동작:** 함수 호출 시 새로운 스택 프레임이 생성됩니다. 이 프레임에는 로컬 변수(`a`, `b`, `result`)를 위한 네임스페이스가 포함됩니다. `10 / 3`은 `int.__truediv__(10, 3)`을 호출하여 `float` 객체 `3.3333333333333335`를 반환합니다.\n\n0으로 나누는 게 아니므로 **에러가 발생하지 않습니다!** 에러가 없으면 except 블록은 건너뛰고, **else 블록**이 실행됩니다. 이것이 핵심입니다!\n\n**실행 순서:** 함수 호출 → 스택 프레임 생성 → `a=10, b=3` 바인딩 → `try:` 진입 → `result = 10 / 3` 성공! → except 건너뜀 → else로 이동",
+        "visualizationType": "pythonMemory",
+        "code": "        result = a / b",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "10 / 3 = 3.333... 에러 없음!",
+          "names": [
+            { "name": "safe_divide", "pointsTo": "func1" },
+            { "name": "a", "pointsTo": "int1", "highlight": true },
+            { "name": "b", "pointsTo": "int2", "highlight": true },
+            { "name": "result", "pointsTo": "float1", "highlight": true }
+          ],
+          "objects": [
+            { "id": "func1", "type": "function", "value": "<function safe_divide>", "pyId": "3001" },
+            { "id": "int1", "type": "int", "value": 10, "pyId": "3002" },
+            { "id": "int2", "type": "int", "value": 3, "pyId": "3003" },
+            { "id": "float1", "type": "float", "value": 3.3333333333333335, "pyId": "3004", "highlight": true }
+          ]
+        }
+      },
+      {
+        "title": "else 블록 실행 (에러 없을 때만!)",
+        "explanation": "**`else:`** 블록이 실행됩니다! try 블록에서 **에러가 하나도 발생하지 않았을 때**만 실행되는 특별한 블록입니다.\n\n**`print(f\"Success: {a}/{b} = {result}\")`** -- 성공 메시지를 출력합니다: `Success: 10/3 = 3.3333333333333335`\n\n**else를 왜 쓸까?** \"try 블록에 성공 코드를 넣어도 되지 않나?\"라고 생각할 수 있습니다. 이론적으로는 가능하지만, **else를 쓰면 코드의 의도가 훨씬 명확**해집니다.\n\n**비유:** 시험(try)을 봤을 때, 시험 중 문제가 생기면(에러) 감독관(except)이 처리하고, 시험을 무사히 마치면(에러 없음) 합격 축하 파티(else)를 합니다. 시험 도중에 축하 파티를 하면 이상하잖아요!\n\n**Python 내부 동작:** try 블록의 모든 코드가 예외 없이 실행 완료되면, 인터프리터는 except 블록들을 모두 건너뛰고 else 블록으로 제어 흐름을 이동시킵니다. else 블록에서 발생하는 에러는 이 try-except에 의해 **잡히지 않습니다!** 이것이 try 안에 성공 코드를 넣는 것과의 핵심 차이입니다.\n\n**else를 사용하는 이유 (설계 원칙):**\n- **try**: 에러가 발생할 수 있는 **최소한의 위험 코드**만 넣기\n- **else**: 에러 없이 성공했을 때의 **후속 처리** (이 코드의 에러는 잡지 않음)\n- 이렇게 분리하면 \"어디서 에러가 날 수 있는지\" 한눈에 파악할 수 있습니다!\n\n**주의:** else 블록은 선택사항입니다. 꼭 필요하지 않다면 생략해도 됩니다. 하지만 있으면 코드 가독성이 크게 향상됩니다.\n\n**실행 순서:** try 성공 → except 건너뜀 → `else:` 진입 → 성공 메시지 출력 → `return result` 예약 → finally로 이동",
+        "visualizationType": "pythonMemory",
+        "code": "        print(f\"Success: {a}/{b} = {result}\")",
+        "pythonMemoryState": {
+          "output": ["Success: 10/3 = 3.3333333333333335"],
+          "note": "else 블록: 에러가 없었으므로 실행!",
+          "names": [
+            { "name": "safe_divide", "pointsTo": "func1" },
+            { "name": "a", "pointsTo": "int1" },
+            { "name": "b", "pointsTo": "int2" },
+            { "name": "result", "pointsTo": "float1" }
+          ],
+          "objects": [
+            { "id": "func1", "type": "function", "value": "<function safe_divide>", "pyId": "3001" },
+            { "id": "int1", "type": "int", "value": 10, "pyId": "3002" },
+            { "id": "int2", "type": "int", "value": 3, "pyId": "3003" },
+            { "id": "float1", "type": "float", "value": 3.3333333333333335, "pyId": "3004" }
+          ]
+        }
+      },
+      {
+        "title": "finally 블록 실행 (무조건!)",
+        "explanation": "**`finally:`** 블록이 실행됩니다! finally는 에러가 발생하든, 안 하든, return을 하든, **무조건 실행**됩니다!\n\n**`print(\"Calculation attempt finished\")`** -- 계산 시도가 끝났음을 알립니다.\n\n**비유:** 호텔 체크아웃과 같습니다. 투숙(try) 중에 문제가 있었든(에러), 즐거운 여행이었든(성공), 체크아웃(finally)은 **반드시** 해야 합니다. 호텔 방(자원)을 반납하지 않으면 다음 손님이 사용할 수 없으니까요!\n\n**Python 내부 동작:** CPython 바이트코드에서 finally 블록은 `SETUP_FINALLY` 명령어로 설정됩니다. try/except/else 어떤 경로로든 블록을 빠져나가기 전에 반드시 finally 코드가 실행됩니다. 심지어 `return` 문이 실행되어도, return 값을 임시 저장한 후 finally를 먼저 실행하고, 그 후에 실제 반환이 이루어집니다.\n\n**finally가 실행되는 모든 경우:**\n1. try 성공 → else 실행 → **finally 실행** (지금 이 경우!)\n2. try 에러 → except 실행 → **finally 실행**\n3. try에서 return → **finally 먼저 실행** → 그 다음 return 완료\n4. except에서 return → **finally 먼저 실행** → 그 다음 return 완료\n5. 잡히지 않는 에러 발생 → **finally 실행** → 에러 전파 계속\n\n**중요:** else에서 `return result`를 했지만, 반환이 **보류**되고 **finally가 먼저 실행**됩니다! finally 끝난 후에 비로소 return이 완료됩니다.\n\n**실전 활용 (반드시 정리해야 하는 작업):**\n- 파일 닫기: `file.close()`\n- 데이터베이스 연결 해제: `conn.close()`\n- 네트워크 소켓 해제: `socket.close()`\n- 임시 파일 삭제: `os.remove(temp_file)`\n\n**주의:** finally 블록 안에서 `return`을 쓰면, else/except의 return을 **덮어씌웁니다!** 이것은 매우 위험한 패턴이므로 절대 하지 마세요.\n\n**실행 순서:** else의 return 보류 → `finally:` 진입 → `print(\"Calculation attempt finished\")` 실행 → finally 완료 → 보류된 return 실행",
+        "visualizationType": "pythonMemory",
+        "code": "        print(\"Calculation attempt finished\")",
+        "pythonMemoryState": {
+          "output": ["Calculation attempt finished"],
+          "note": "finally 블록: 무조건 실행! (return보다 먼저)",
+          "names": [
+            { "name": "safe_divide", "pointsTo": "func1" },
+            { "name": "a", "pointsTo": "int1" },
+            { "name": "b", "pointsTo": "int2" },
+            { "name": "result", "pointsTo": "float1" }
+          ],
+          "objects": [
+            { "id": "func1", "type": "function", "value": "<function safe_divide>", "pyId": "3001" },
+            { "id": "int1", "type": "int", "value": 10, "pyId": "3002" },
+            { "id": "int2", "type": "int", "value": 3, "pyId": "3003" },
+            { "id": "float1", "type": "float", "value": 3.3333333333333335, "pyId": "3004" }
+          ]
+        }
+      },
+      {
+        "title": "함수 반환값 확인",
+        "explanation": "**`print(f\"Answer: {answer}\")`** -- finally 실행이 끝나고, else 블록에서 보류되었던 `return result`가 완료됩니다.\n\n`result`는 **3.3333333333333335**이므로, 호출 측의 `answer`에 이 `float` 객체가 바인딩됩니다. `answer`라는 이름표가 `float` 객체 `3.3333333333333335`를 가리키게 됩니다.\n\n**비유:** 레스토랑에서 요리(계산)를 주문(함수 호출)했더니, 주방에서 요리 완성(try 성공) → 서빙 준비(else에서 return) → 테이블 정리(finally) → 마지막으로 요리 서빙(return 완료)이 이루어진 것입니다.\n\n**Python 내부 동작:** 함수가 반환되면 스택 프레임이 소멸됩니다. 로컬 변수 `a`, `b`, `result`는 더 이상 접근할 수 없습니다. 하지만 반환된 `float` 객체는 `answer`가 참조하고 있으므로 살아남습니다. 참조 카운트가 0이 아닌 객체는 가비지 컬렉터에 의해 회수되지 않습니다.\n\n**실행 순서 (전체 정리 -- 성공 경로):**\n```\n1. try: result = 10/3     → 성공! (에러 없음)\n2. except: (건너뜀)        → 에러 없으니까\n3. else: print(\"Success\")  → 에러 없을 때 실행\n4. else: return result     → 반환 보류\n5. finally: print(\"...finished\") → 무조건 실행\n6. return result 완료      → finally 끝난 후 반환\n```\n\n**만약 b가 0이었다면? (실패 경로):**\n```\n1. try: result = 10/0      → ZeroDivisionError!\n2. except: print(\"Error\")  → 에러 처리\n3. except: return None     → 반환 보류\n4. else: (건너뜀)           → 에러 났으니까\n5. finally: print(\"...finished\") → 무조건 실행\n6. return None 완료        → finally 끝난 후 반환\n```",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Answer: {answer}\")",
+        "pythonMemoryState": {
+          "output": ["Answer: 3.3333333333333335"],
+          "note": "함수 반환 완료!",
+          "names": [
+            { "name": "safe_divide", "pointsTo": "func1" },
+            { "name": "answer", "pointsTo": "float1", "highlight": true }
+          ],
+          "objects": [
+            { "id": "func1", "type": "function", "value": "<function safe_divide>", "pyId": "3001" },
+            { "id": "float1", "type": "float", "value": 3.3333333333333335, "pyId": "3004", "highlight": true }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "finally 블록은 언제 실행되나요?",
+    "options": [
+      "에러가 발생했을 때만 실행된다",
+      "에러가 발생하지 않았을 때만 실행된다",
+      "에러 발생 여부와 관계없이 항상 실행된다",
+      "return 문이 있으면 실행되지 않는다"
+    ],
+    "correctIndex": 2,
+    "explanation": "finally 블록은 에러가 발생하든, 안 하든, return이 있든 무조건 실행됩니다. 심지어 return 문보다도 먼저 실행됩니다! 파일 닫기, DB 연결 해제 등 정리 작업에 사용합니다."
+  },
+  "keyTakeaway": "else는 에러 없을 때만, finally는 무조건 실행된다. finally는 return보다도 먼저 실행되므로, 반드시 해야 할 정리 작업에 사용하자!"
+}

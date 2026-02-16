@@ -12,6 +12,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+import { expandDeltaSteps } from '../src/utils/expandDeltaSteps';
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
 console.log('📁 Database:', connectionString.replace(/:[^:@]+@/, ':***@'));
@@ -27,6 +28,7 @@ interface LessonContentData {
   content: {
     code: string;
     steps: object[];
+    deltaFormat?: boolean;
   };
   quiz: {
     question: string;
@@ -69,12 +71,17 @@ async function updateContent() {
       const contentId = `content-${lessonId}`;
       const existing = await prisma.lessonContent.findUnique({ where: { id: contentId } });
 
+      const expandedSteps = expandDeltaSteps(
+        content.content.steps,
+        content.content.deltaFormat === true,
+      );
+
       if (existing) {
         await prisma.lessonContent.update({
           where: { id: contentId },
           data: {
             code: content.content.code,
-            steps: JSON.stringify(content.content.steps),
+            steps: JSON.stringify(expandedSteps),
           },
         });
         updatedCount++;
@@ -88,7 +95,7 @@ async function updateContent() {
               lessonId: lessonId,
               code: content.content.code,
               language: langId,
-              steps: JSON.stringify(content.content.steps),
+              steps: JSON.stringify(expandedSteps),
             },
           });
           createdCount++;

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "logger 함수 정의",
-        "explanation": "`def logger(func):`\n데코레이터 함수를 정의합니다.\n다른 함수를 인자로 받습니다.\n\n**왜 이 순서인가?**\n데코레이터를 사용하려면 먼저 정의해야 합니다.\n\n**실행 순서:**\n1. `logger` 함수 객체(0x1100) 생성.\n2. 전역 네임스페이스에 등록.",
+        "explanation": "**`def logger(func):`**\n\n**데코레이터 함수를 정의합니다.** 이 함수는 다른 함수를 매개변수 `func`으로 받아들입니다.\n\n**비유**: 선물 포장 서비스를 생각해보세요.\n- `logger`는 '포장 서비스' 자체입니다\n- `func`은 포장할 '원본 선물'입니다\n- 포장 서비스는 선물을 받아서, 예쁜 포장지(시작/종료 로그)를 씌운 뒤 돌려줍니다\n- 원본 선물 자체는 전혀 바뀌지 않습니다\n\n**내부 동작**: Python은 `def logger(func):`를 만나면 함수 객체(0x1100)를 생성합니다. 이 함수는 아직 호출되지 않았으므로, 내부의 `wrapper` 함수도 아직 만들어지지 않았습니다.\n\n**왜 이 순서인가?** 데코레이터를 `@logger`로 사용하려면, `logger`가 먼저 정의되어 있어야 합니다. Python은 위에서 아래로 코드를 읽으므로, 데코레이터 함수가 사용되기 전에 반드시 먼저 나와야 합니다.\n\n**주의**: 데코레이터 함수의 매개변수 이름은 관례적으로 `func`을 사용하지만, 어떤 이름이든 상관없습니다. 중요한 것은 '꾸며줄 함수'를 받는다는 점입니다.",
         "visualizationType": "pythonMemory",
         "code": "def logger(func):",
         "highlightOffset": [
@@ -42,7 +42,7 @@
       },
       {
         "title": "@logger 데코레이터 적용 및 say_hello 정의",
-        "explanation": "`@logger` + `def say_hello(name):`\n@logger는 `say_hello = logger(say_hello)`와 동일합니다.\nlogger가 호출됩니다.\n\n**왜 이 순서인가?**\n함수 정의 직후에 바로 데코레이터를 적용합니다.\n\n**실행 순서:**\n1. 원본 `say_hello` 함수 객체(0x1200) 임시 생성.\n2. `logger(0x1200)` 호출.\n3. `func` 매개변수에 원본 함수 전달.",
+        "explanation": "**`@logger` + `def say_hello(name):`**\n\n**`@logger`는 Python의 데코레이터 문법입니다.** 이 한 줄은 내부적으로 `say_hello = logger(say_hello)`와 완전히 동일한 동작을 합니다.\n\n작동 순서를 자세히 보면:\n1. 먼저 `def say_hello(name):`로 원본 `say_hello` 함수 객체(0x1200)가 만들어집니다\n2. 즉시 `logger(say_hello)`가 호출됩니다 -- `func` 매개변수에 원본 함수가 전달됩니다\n3. `logger`의 반환값이 다시 `say_hello`라는 이름에 할당됩니다\n\n**비유**: 택배 접수 과정을 상상해보세요.\n- 원본 상품(say_hello)을 만들고\n- 바로 포장 서비스(logger)에 넘깁니다\n- 포장된 상품이 다시 같은 이름표(say_hello)를 달고 돌아옵니다\n\n**내부 동작**: `logger`가 호출되면 새로운 실행 프레임이 생성되고, `func`이라는 지역 변수에 원본 `say_hello` 함수가 바인딩됩니다.\n\n**왜 이 순서인가?** `@` 구문은 함수 정의 직후에 자동으로 적용됩니다. 프로그래머가 `say_hello = logger(say_hello)`를 직접 쓰지 않아도 Python이 대신 해줍니다.\n\n**주의**: `@logger` 이후의 `say_hello`는 더 이상 원본 함수가 아닙니다! 이름은 같지만 실체가 바뀌었습니다.",
         "visualizationType": "pythonMemory",
         "code": "def say_hello(name):",
         "highlightOffset": [
@@ -72,7 +72,7 @@
       },
       {
         "title": "wrapper 함수 정의",
-        "explanation": "`def wrapper(*args, **kwargs):`\nlogger 함수 안에서 wrapper 함수를 정의합니다.\nsay_hello(func)를 감싸는 클로저입니다.\n\n**왜 이 순서인가?**\n기능을 추가한 새로운 함수를 만듭니다.\n\n**실행 순서:**\n1. `wrapper` 함수 객체(0x2000) 생성.\n2. `func`(0x1200)를 참조하는 클로저 생성.",
+        "explanation": "**`def wrapper(*args, **kwargs):`**\n\n**`logger` 함수 안에서 `wrapper`(래퍼) 함수를 정의합니다.** 이 함수가 원본 `say_hello`를 감싸는 '포장지' 역할을 합니다.\n\n**`*args, **kwargs`의 의미:**\n- `*args`: 위치 인자를 몇 개든 받을 수 있습니다 (예: `(\"앨리스\")`, `(1, 2, 3)`)\n- `**kwargs`: 키워드 인자를 몇 개든 받을 수 있습니다 (예: `(name=\"앨리스\")`)\n- 이렇게 하면 어떤 함수에든 데코레이터를 적용할 수 있습니다\n\n**비유**: 포장지는 어떤 크기의 상품이든 감쌀 수 있어야 합니다.\n`*args, **kwargs`는 '만능 사이즈 포장지'입니다.\n\n**내부 동작**: `wrapper`는 클로저입니다. `func` 변수(원본 `say_hello`)를 Cell을 통해 참조하므로, `logger`의 실행이 끝난 후에도 원본 함수에 접근할 수 있습니다.\n\n**왜 이 순서인가?** `logger(func)` 호출 시 `wrapper`가 정의되어야 합니다. 이 `wrapper`가 앞으로 `say_hello`라는 이름으로 불릴 '새로운 함수'이기 때문입니다.\n\n**주의**: `wrapper`라는 이름은 관례입니다. 어떤 이름이든 쓸 수 있지만, '감싸는 함수'라는 의미의 `wrapper`가 가장 널리 사용됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def wrapper(*args, **kwargs):",
         "highlightOffset": [
@@ -114,7 +114,7 @@
       },
       {
         "title": "wrapper 반환",
-        "explanation": "`return wrapper`\nwrapper 함수를 반환합니다.\nsay_hello는 이제 wrapper를 가리킵니다.\n\n**왜 이 순서인가?**\n`say_hello`라는 이름이 이제 `wrapper` 함수를 가리키게 됩니다.\n\n**실행 순서:**\n1. `wrapper` 반환.\n2. 전역 변수 `say_hello`에 할당.\n3. 원본 함수 이름이 덮어씌워짐.",
+        "explanation": "**`return wrapper`**\n\n**`logger` 함수가 `wrapper` 함수를 반환합니다.** 이 반환값이 전역 변수 `say_hello`에 할당됩니다.\n\n이 순간 일어나는 가장 중요한 변화:\n- **변경 전**: `say_hello` -> 원본 함수(0x1200)\n- **변경 후**: `say_hello` -> `wrapper` 함수(0x2000)\n\n즉, `say_hello`라는 이름은 그대로인데, 가리키는 대상이 바뀐 것입니다!\n\n**비유**: 같은 이름의 택배 상자인데, 안에 포장지가 한 겹 더 씌워진 것입니다.\n받는 사람은 상자 이름만 보고 \"아, say_hello구나\"라고 생각하지만, 실제로 열어보면 포장(wrapper)이 있고, 그 안에 원본(func)이 있습니다.\n\n**내부 동작**: `logger`의 실행 프레임이 종료됩니다. 하지만 `wrapper`의 `__closure__`가 `func`(원본 say_hello)에 대한 참조를 유지하므로, 원본 함수는 메모리에서 사라지지 않습니다.\n\n**왜 이 순서인가?** `logger`의 역할은 `wrapper`를 만들어 반환하는 것입니다. 이제 `say_hello`를 호출하면 `wrapper`가 대신 실행됩니다.\n\n**주의**: 원본 함수의 `__name__` 등 메타정보가 사라집니다. 이를 방지하려면 `functools.wraps` 데코레이터를 `wrapper`에 적용해야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "return wrapper",
         "pythonMemoryState": {
@@ -139,7 +139,7 @@
       },
       {
         "title": "say_hello 호출 (wrapper 호출)",
-        "explanation": "`say_hello(\"앨리스\")`\nsay_hello를 호출하지만 실제로는 wrapper가 호출됩니다.\n\n**왜 이 순서인가?**\n데코레이터가 적용된 함수를 사용합니다.\n\n**실행 순서:**\n1. `say_hello`(=wrapper) 호출.\n2. 인자 \"앨리스\" 전달.",
+        "explanation": "**`say_hello(\"앨리스\")`**\n\n**`say_hello`를 호출하지만, 실제로 실행되는 것은 `wrapper` 함수입니다.**\n\n왜냐하면 이전 단계에서 `say_hello`가 `wrapper`로 교체되었기 때문입니다.\n`say_hello(\"앨리스\")`는 곧 `wrapper(\"앨리스\")`입니다.\n\n`wrapper`는 `*args`로 인자를 받으므로, `args = (\"앨리스\",)` 튜플이 됩니다.\n\n**비유**: 택배 상자(say_hello)를 열면, 가장 먼저 포장지(wrapper)가 나옵니다.\n포장지를 펼치는 과정이 바로 wrapper의 실행입니다.\n\n**내부 동작**: Python은 `say_hello`가 가리키는 객체의 `__call__` 메서드를 호출합니다. `say_hello`는 이제 `wrapper` 함수 객체이므로, `wrapper.__call__(\"앨리스\")`가 실행됩니다.\n\n**왜 이 순서인가?** 데코레이터의 핵심은 '투명성'입니다. 사용자는 `say_hello`를 평소처럼 호출하기만 하면 됩니다. 데코레이터가 뒤에서 알아서 추가 기능을 수행합니다.\n\n**주의**: 호출하는 코드(`say_hello(\"앨리스\")`)는 데코레이터 적용 전후로 전혀 바뀌지 않습니다. 이것이 데코레이터의 우아함입니다.",
         "visualizationType": "pythonMemory",
         "code": "say_hello(\"앨리스\")",
         "pythonMemoryState": {
@@ -162,7 +162,7 @@
       },
       {
         "title": "wrapper 실행 - 시작 로그",
-        "explanation": "`print(f\"--- {func.__name__} 시작 ---\")`\n\"--- say_hello 시작 ---\"을 출력합니다.\n\n**왜 이 순서인가?**\n원본 함수 실행 전에 로그를 남깁니다.\n\n**실행 순서:**\n1. `func`(0x1200)의 이름 확인.\n2. 출력.",
+        "explanation": "**`print(f\"--- {func.__name__} 시작 ---\")`**\n\n**원본 함수 이름으로 \"시작\" 로그를 출력합니다.**\n\n`func`은 클로저를 통해 참조하는 원본 `say_hello` 함수입니다.\n`func.__name__`은 함수 객체의 이름 속성으로, `\"say_hello\"`라는 문자열을 반환합니다.\n따라서 `\"--- say_hello 시작 ---\"`이 출력됩니다.\n\n**비유**: 포장을 뜯기 시작하면서 \"이제 say_hello 선물을 열겠습니다!\"라고 알려주는 것입니다.\n\n**이것이 데코레이터의 핵심 가치입니다:**\n- 원본 함수(`say_hello`)의 코드를 한 글자도 바꾸지 않았습니다\n- 하지만 함수가 실행되기 '전'에 추가 동작(로깅)이 자동으로 수행됩니다\n\n**왜 이 순서인가?** `wrapper`는 '원본 함수 실행 전 -> 원본 함수 실행 -> 원본 함수 실행 후' 순서로 동작합니다. 지금은 '실행 전' 단계입니다.\n\n**실전 활용**: 실제 프로젝트에서 이런 로깅 데코레이터는 디버깅이나 성능 모니터링에 매우 유용합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"--- {func.__name__} 시작 ---\")",
         "pythonMemoryState": {
@@ -188,7 +188,7 @@
       },
       {
         "title": "원본 함수 호출",
-        "explanation": "`result = func(*args, **kwargs)`\n원본 say_hello 함수를 호출합니다.\n\n**왜 이 순서인가?**\n저장해둔 원본 함수를 실제로 실행할 차례입니다.\n\n**실행 순서:**\n1. `func`(0x1200) 호출.\n2. 인자 \"앨리스\" 전달.",
+        "explanation": "**`result = func(*args, **kwargs)`**\n\n**클로저에 저장된 원본 `say_hello` 함수를 호출합니다.** `*args`를 통해 전달받았던 인자 `\"앨리스\"`가 그대로 원본 함수에 전달됩니다.\n\n풀어서 쓰면 `result = func(\"앨리스\")`이며, 이것은 원본 `say_hello(\"앨리스\")`와 동일합니다.\n\n**비유**: 포장지를 열고 드디어 원본 선물(func)을 꺼내는 순간입니다.\n선물은 원래 기능을 온전히 수행합니다.\n\n**내부 동작**:\n1. `func`은 Cell에서 원본 `say_hello`(0x1200)를 가져옵니다\n2. `*args`는 `(\"앨리스\",)` 튜플을 언패킹하여 위치 인자로 전달합니다\n3. 원본 `say_hello`의 `name` 매개변수에 `\"앨리스\"`가 바인딩됩니다\n\n**왜 이 순서인가?** 시작 로그를 출력한 후, 원본 함수의 실제 작업을 수행할 차례입니다. `result`에 반환값을 저장하는 이유는, 나중에 `wrapper`도 이 값을 반환해야 하기 때문입니다.\n\n**주의**: `func(*args, **kwargs)` 형태는 원본 함수가 어떤 인자를 받든 그대로 전달하는 패턴입니다. 데코레이터의 범용성을 보장합니다.",
         "visualizationType": "pythonMemory",
         "code": "result = func(*args, **kwargs)",
         "pythonMemoryState": {
@@ -223,7 +223,7 @@
       },
       {
         "title": "say_hello 본문 실행",
-        "explanation": "`print(f\"안녕하세요, {name}님!\")`\n\"안녕하세요, 앨리스님!\"을 출력합니다.\n\n**실행 순서:**\n1. 메시지 출력.",
+        "explanation": "**`print(f\"안녕하세요, {name}님!\")`**\n\n**원본 `say_hello` 함수의 본문이 실행되어 인사 메시지를 출력합니다.**\n\n`name`은 `\"앨리스\"`이므로, `\"안녕하세요, 앨리스님!\"`이 출력됩니다.\n\n이 시점에서 콘솔에는 두 줄이 출력되어 있습니다:\n1. `--- say_hello 시작 ---` (wrapper가 출력)\n2. `안녕하세요, 앨리스님!` (원본 함수가 출력)\n\n**핵심 포인트**: 원본 함수는 자기가 데코레이터에 의해 감싸져 있다는 것을 전혀 모릅니다.\n평소처럼 자기 할 일만 합니다. 이것이 바로 '관심사의 분리(Separation of Concerns)'입니다.\n\n**비유**: 선물(원본 함수)은 포장되어 있든 안 되어 있든 똑같이 작동합니다.\n포장이 선물의 기능에 영향을 주지 않습니다.\n\n**왜 이 순서인가?** `wrapper` 안에서 `func(*args, **kwargs)`를 호출한 결과, 원본 함수의 본문이 실행되는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"안녕하세요, {name}님!\")",
         "pythonMemoryState": {
@@ -249,7 +249,7 @@
       },
       {
         "title": "wrapper 실행 - 종료 로그",
-        "explanation": "`print(f\"--- {func.__name__} 종료 ---\")`\n\"--- say_hello 종료 ---\"를 출력합니다.\n\n**왜 이 순서인가?**\n원본 함수 실행이 끝난 후, 마무리 로그를 남깁니다.\n\n**실행 순서:**\n1. 원본 함수 복귀(Return).\n2. 종료 로그 출력.",
+        "explanation": "**`print(f\"--- {func.__name__} 종료 ---\")`**\n\n**원본 함수 실행이 끝난 후, \"종료\" 로그를 출력합니다.**\n\n`\"--- say_hello 종료 ---\"`가 출력됩니다.\n\n이로써 `wrapper`의 3단계 실행 흐름이 완성되었습니다:\n1. **전처리**: `\"--- say_hello 시작 ---\"` 출력\n2. **본처리**: 원본 `func` 실행 -> `\"안녕하세요, 앨리스님!\"` 출력\n3. **후처리**: `\"--- say_hello 종료 ---\"` 출력\n\n**비유**: 선물을 다 열고 나서 \"say_hello 선물 열기 완료!\"라고 알려주는 것입니다.\n\n**내부 동작**: 원본 함수 `say_hello`는 명시적 `return`이 없으므로, `None`을 반환합니다. 이 값은 `result` 변수에 저장되어 있습니다.\n\n**왜 이 순서인가?** 이것이 데코레이터 패턴의 핵심 구조입니다: 원본 함수의 '앞뒤'에 원하는 코드를 추가할 수 있습니다.\n\n**실전 활용**: 이런 전후처리 패턴은 실행 시간 측정, 권한 검사, 캐싱, 트랜잭션 관리 등 다양한 곳에서 활용됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"--- {func.__name__} 종료 ---\")",
         "pythonMemoryState": {
@@ -277,7 +277,7 @@
       },
       {
         "title": "결과 반환",
-        "explanation": "`return result`\n원본 함수의 결과(None)를 반환합니다.\n\n**왜 이 순서인가?**\n래퍼 함수도 원본 함수와 똑같은 값을 반환해야, 사용자가 눈치채지 못합니다.\n\n**실행 순서:**\n1. `result`(None) 반환.",
+        "explanation": "**`return result`**\n\n**원본 함수의 반환값(`None`)을 그대로 반환합니다.**\n\n이 단계가 왜 중요한지 생각해보면:\n- 만약 원본 함수가 `return 42`처럼 값을 반환하는 함수였다면?\n- `wrapper`도 반드시 그 `42`를 반환해야 합니다\n- 그래야 데코레이터를 적용하기 전과 후의 동작이 동일합니다\n\n지금은 `say_hello`가 아무것도 반환하지 않으므로(`None`), `result`도 `None`입니다.\n\n**비유**: 포장 서비스가 끝나면, 원본 선물이 제공하는 것(반환값)을 고객에게 그대로 전달해야 합니다. 포장 서비스가 반환값을 가로채면 안 됩니다!\n\n**왜 이 순서인가?** `wrapper`의 마지막 역할은 원본 함수의 반환값을 호출자에게 투명하게 전달하는 것입니다. 이렇게 해야 데코레이터가 '투명'하게 동작합니다.\n\n**주의**: `return result`를 빠뜨리면, `wrapper`는 항상 `None`을 반환하게 됩니다. 이는 원본 함수가 의미 있는 값을 반환하는 경우에 버그를 일으킵니다. 데코레이터 작성 시 반드시 반환값 전달을 잊지 마세요!",
         "visualizationType": "pythonMemory",
         "code": "return result",
         "pythonMemoryState": {

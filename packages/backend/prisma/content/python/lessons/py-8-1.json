@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Counter 클래스 정의 시작",
-        "explanation": "`class Counter:`\n`Counter` 클래스를 정의합니다.\n\n**왜 이 순서인가?**\n프로그램이 시작되면 가장 먼저 클래스 정의를 읽어 메모리에 로드해야 합니다.\n\n**실행 순서:**\n1. `Counter`라는 이름의 새로운 클래스 객체를 생성합니다.\n2. 전역 네임스페이스에 `Counter`를 등록합니다.",
+        "explanation": "**`class Counter:`**\n\n**이터레이터 프로토콜(Iterator Protocol)**을 직접 구현하는 `Counter` 클래스를 정의합니다.\n\n**이터레이터 프로토콜이란?**\nPython의 `for` 루프가 객체를 순회할 때 사용하는 **약속된 규칙**입니다.\n이 규칙을 따르는 객체는 어떤 것이든 `for` 루프에서 사용할 수 있습니다!\n규칙은 딱 두 가지 메서드를 구현하는 것입니다:\n- `__iter__()`: 이터레이터 객체를 반환 (\"순회를 시작하겠다\")\n- `__next__()`: 다음 값을 반환 (\"다음 값을 줘\")\n\n**비유: 자동판매기 만들기**\nCounter 클래스는 버튼을 누를 때마다(__next__) 숫자를 하나씩 내놓는 자동판매기의 설계도입니다.\n0부터 시작해서 하나씩 증가하다가, 끝 숫자에 도달하면 \"더 이상 없어요!\"(StopIteration)라고 알려줍니다.\n\n**왜 이것을 배우는가?** Python의 `for`문이 내부적으로 어떻게 동작하는지 이해하면, `for`를 더 깊이 이해하고 커스텀 반복 객체를 만들 수 있습니다.\n\n**왜 이 순서인가?** 프로그램이 시작되면 먼저 클래스 정의를 읽어 메모리에 로드해야 합니다.\n\n**실행 순서**: Counter 클래스 객체(0x1000) 생성 → 전역 네임스페이스에 등록",
         "visualizationType": "pythonMemory",
         "code": "class Counter:",
         "pythonMemoryState": {
@@ -33,7 +33,7 @@
       },
       {
         "title": "클래스 본문 진입",
-        "explanation": "클래스 본문으로 진입하여 메서드들을 정의합니다.\n\n**왜 이 순서인가?**\n클래스 정의 내부의 코드를 실행하여 메서드들을 클래스 속성으로 등록해야 합니다.\n\n**실행 순서:**\n1. 클래스 내부 스코프로 진입합니다.\n2. 아직 실행되지 않은 메서드 정의들을 확인합니다.",
+        "explanation": "**`class Counter:` (본문 전체)**\n\nPython이 클래스 본문을 읽어 **세 개의 메서드**를 등록합니다:\n- `__init__`: 객체 초기화 (start, end 값 설정)\n- `__iter__`: for 루프가 호출 (이터레이터 반환)\n- `__next__`: for 루프가 반복마다 호출 (다음 값 반환)\n\n**이 세 메서드가 for 루프의 심장입니다!**\n`for num in counter:` 실행 시 Python은 내부적으로:\n1. `counter.__iter__()` 호출 → 이터레이터 얻음\n2. `counter.__next__()` 반복 호출 → 값 하나씩 얻음\n3. `StopIteration` 예외 발생 → 루프 종료\n\n**비유**: 자동판매기의 내부 회로를 설계하는 과정입니다.\n\n**왜 이 순서인가?** class 키워드를 만났으므로, 본문의 모든 메서드를 등록합니다.\n\n**실행 순서**: 클래스 내부 스코프 진입 → 세 개의 메서드 정의 확인",
         "visualizationType": "pythonMemory",
         "code": "class Counter:",
         "highlightOffset": [
@@ -70,7 +70,7 @@
       },
       {
         "title": "__init__ 메서드 정의",
-        "explanation": "`def __init__(self, start, end):`\n초기화 메서드를 정의합니다.\n\n**왜 이 순서인가?**\n객체를 생성할 때 호출될 생성자를 가장 먼저 정의하는 것이 관례입니다.\n\n**실행 순서:**\n1. `__init__` 함수 객체를 생성합니다.\n2. `Counter` 클래스의 메서드로 등록합니다.",
+        "explanation": "**`def __init__(self, start, end):`**\n\nCounter 객체의 **초기화 메서드**를 정의합니다.\n`Counter(0, 3)`처럼 호출하면 start=0, end=3이 전달되어 카운터의 범위를 설정합니다.\n\n**이 메서드가 설정하는 것들**:\n- `self.current = start`: 현재 값 (처음에는 시작값)\n- `self.end = end`: 끝 값 (이 값에 도달하면 반복 종료)\n\n**비유**: 자동판매기에 \"0번부터 시작해서 3번 전까지 나오게\" 설정하는 것입니다.\n\n**왜 이 순서인가?** 객체 생성 시 호출될 생성자를 가장 먼저 정의하는 것이 Python의 관례입니다.\n\n**실행 순서**: __init__ 함수 객체 생성 → Counter 클래스에 메서드로 등록",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, start, end):",
         "highlightOffset": [
@@ -110,7 +110,7 @@
       },
       {
         "title": "__iter__ 메서드 정의",
-        "explanation": "`def __iter__(self):`\n이터레이터 프로토콜의 일부입니다.\n자기 자신을 반환합니다.\n\n**왜 이 순서인가?**\n`for` 루프에서 사용할 수 있도록 `__iter__`를 정의합니다.\n\n**실행 순서:**\n1. `__iter__` 함수 객체를 생성합니다.\n2. `Counter` 클래스의 메서드로 등록합니다.",
+        "explanation": "**`def __iter__(self):`**\n\n이터레이터 프로토콜의 **첫 번째 약속**: `__iter__` 메서드를 정의합니다.\n이 메서드는 `return self`로 자기 자신을 반환합니다.\n\n**왜 자기 자신을 반환하는가?**\nPython의 이터레이터에는 두 가지 역할이 있습니다:\n1. **이터러블(Iterable)**: `__iter__`가 있어서 \"순회 가능\"하다고 알림\n2. **이터레이터(Iterator)**: `__next__`가 있어서 실제로 값을 하나씩 줌\n\nCounter 클래스는 두 역할을 **한 객체가 모두** 담당하므로, `__iter__`에서 자기 자신을 반환합니다.\n\n**비유**: \"이 자동판매기는 버튼(next)도 자기한테 있어요\"라고 알려주는 것입니다.\n\n**for 루프가 내부적으로 하는 일**:\n```python\n# for num in counter: 는 사실 이것과 같습니다!\nit = counter.__iter__()  # 이터레이터 얻기\nwhile True:\n    try:\n        num = it.__next__()  # 다음 값 얻기\n    except StopIteration:\n        break  # 종료!\n```\n\n**왜 이 순서인가?** __init__ 다음으로 이터레이터 프로토콜의 핵심 메서드를 정의합니다.\n\n**실행 순서**: __iter__ 함수 객체 생성 → Counter 클래스에 등록",
         "visualizationType": "pythonMemory",
         "code": "def __iter__(self):",
         "highlightOffset": [
@@ -149,7 +149,7 @@
       },
       {
         "title": "__next__ 메서드 정의",
-        "explanation": "`def __next__(self):`\n다음 값을 반환하거나 StopIteration을 발생시킵니다.\n\n**왜 이 순서인가?**\n이터레이터의 핵심 동작인 '다음 값 가져오기'를 구현할 차례입니다.\n\n**실행 순서:**\n1. `__next__` 함수 객체를 생성합니다.\n2. `Counter` 클래스의 메서드로 등록합니다.",
+        "explanation": "**`def __next__(self):`**\n\n이터레이터 프로토콜의 **두 번째 약속**: `__next__` 메서드를 정의합니다.\nfor 루프가 **반복할 때마다** 이 메서드를 호출하여 다음 값을 받아갑니다.\n\n**이 메서드의 핵심 로직**:\n1. `current >= end`이면 → `StopIteration` 예외 발생 (\"더 이상 값 없어요!\")\n2. 아니면 → 현재 값을 저장하고, current를 1 증가시킨 후, 저장한 값을 반환\n\n**StopIteration이란?**\n특별한 예외로, for 루프에게 \"반복 끝!\"이라고 알려주는 신호입니다.\nfor 루프는 이 예외를 자동으로 잡아서 조용히 루프를 종료합니다.\n일반적인 에러가 아니라, 정상적인 종료 신호입니다!\n\n**비유**: 자동판매기에서 버튼을 누르면(next) 숫자가 하나 나오고, 재고가 없으면 \"품절\"(StopIteration) 표시가 나타납니다.\n\n**왜 이 순서인가?** 이터레이터의 핵심 동작인 '다음 값 가져오기'를 구현합니다.\n\n**실행 순서**: __next__ 함수 객체 생성 → Counter 클래스에 등록",
         "visualizationType": "pythonMemory",
         "code": "def __next__(self):",
         "highlightOffset": [
@@ -192,7 +192,7 @@
       },
       {
         "title": "카운터 객체 생성",
-        "explanation": "`counter = Counter(0, 3)`\n`Counter` 인스턴스를 생성합니다.\n`__init__`이 호출됩니다.\n\n**왜 이 순서인가?**\n클래스 정의가 끝났으므로, 이제 실제로 사용할 인스턴스를 만듭니다.\n\n**실행 순서:**\n1. `Counter` 클래스를 호출합니다.\n2. 새로운 인스턴스(0x2000)가 메모리에 할당됩니다.\n3. `__init__` 메서드가 자동으로 호출됩니다.",
+        "explanation": "**`counter = Counter(0, 3)`**\n\nCounter 클래스를 호출하여 **0부터 3 미만까지 세는 카운터 객체**를 생성합니다.\n`__init__(self, 0, 3)`이 자동 호출되어 current=0, end=3으로 초기화됩니다.\n\n**이 객체가 생성하는 값의 순서**: 0, 1, 2 (3은 포함하지 않음 - range(3)과 동일)\n\n**비유**: \"0번부터 시작해서 2번까지 줄 수 있는 자동판매기\"를 만든 것입니다.\n버튼을 누를 때마다 0 → 1 → 2 → \"품절!\" 순서로 나옵니다.\n\n**왜 이 순서인가?** 클래스 정의가 끝났으니, 실제 인스턴스를 만들어 for 루프에서 사용합니다.\n\n**실행 순서**: Counter(0, 3) 호출 → 인스턴스(0x2000) 메모리 할당 → __init__ 자동 호출",
         "visualizationType": "pythonMemory",
         "code": "counter = Counter(0, 3)",
         "pythonMemoryState": {
@@ -217,7 +217,7 @@
       },
       {
         "title": "__init__ 실행 (1)",
-        "explanation": "`self.current = start`\n`current`를 0으로 설정합니다.\n\n**왜 이 순서인가?**\n객체가 생성된 직후, 초기 상태(시작값)를 설정해야 합니다.\n\n**실행 순서:**\n1. 인자로 받은 `start`(0)를 `self.current`에 저장합니다.\n2. 인스턴스 네임스페이스에 `current`가 생깁니다.",
+        "explanation": "**`self.current = start`**\n\n카운터의 **현재 위치**를 시작값(0)으로 설정합니다.\n`self.current`는 \"지금 몇 번째 값을 줄 차례인가\"를 추적하는 **상태 변수**입니다.\n\n**이터레이터의 핵심 특징: 상태를 기억한다!**\n일반 함수는 호출이 끝나면 내부 변수가 사라지지만, 이터레이터 객체는 `self.current`에 현재 위치를 저장해두므로 다음 호출 시 이어서 작동합니다.\n\n**비유**: 자동판매기의 \"현재 재고 번호\" 표시기를 0으로 맞추는 것입니다.\n\n**왜 이 순서인가?** 객체 생성 직후, 카운터의 시작 위치를 설정해야 합니다.\n\n**실행 순서**: start(0)를 self.current에 저장 → 인스턴스에 current 속성 생성",
         "visualizationType": "pythonMemory",
         "code": "self.current = start",
         "pythonMemoryState": {
@@ -262,7 +262,7 @@
       },
       {
         "title": "__init__ 실행 (2)",
-        "explanation": "`self.end = end`\n`end`를 3으로 설정합니다.\n\n**왜 이 순서인가?**\n반복을 언제 멈출지 알기 위해 끝(end) 값을 저장해야 합니다.\n\n**실행 순서:**\n1. 인자로 받은 `end`(3)를 `self.end`에 저장합니다.\n2. 초기화가 완료되고 인스턴스가 반환됩니다.",
+        "explanation": "**`self.end = end`**\n\n카운터의 **종료 지점**을 end(3)로 설정합니다.\n`self.current`가 이 값에 도달하면 StopIteration을 발생시켜 반복을 멈춥니다.\n\n**초기화 완료 후 Counter 인스턴스의 상태**:\n- `self.current = 0` (현재 위치: 시작)\n- `self.end = 3` (종료 지점: 여기서 멈춤)\n- 줄 값: 0, 1, 2 (총 3개)\n\n**왜 end를 별도로 저장하는가?** __next__가 호출될 때마다 \"지금 current가 end에 도달했는가?\"를 확인해야 하므로, end 값을 객체에 저장해둡니다.\n\n**비유**: 자동판매기에 \"3번 이상은 나오지 않도록\" 제한을 설정하는 것입니다.\n\n**왜 이 순서인가?** start 설정 후 end도 설정하여 초기화를 완료합니다.\n\n**실행 순서**: end(3)를 self.end에 저장 → 초기화 완료 → 인스턴스 반환",
         "visualizationType": "pythonMemory",
         "code": "self.end = end",
         "pythonMemoryState": {
@@ -307,7 +307,7 @@
       },
       {
         "title": "for 루프 시작",
-        "explanation": "`for num in counter:`\n`for` 루프가 시작되며 내부적으로 `__iter__`를 호출합니다.\n\n**왜 이 순서인가?**\n`for`문은 순회를 시작하기 위해 객체에게 '이터레이터'를 달라고 요청해야 합니다.\n\n**실행 순서:**\n1. `counter` 객체의 `__iter__` 메서드를 찾아서 호출합니다.",
+        "explanation": "**`for num in counter:`**\n\nfor 루프가 시작됩니다! Python은 내부적으로 `counter.__iter__()`를 호출하여 이터레이터를 요청합니다.\n\n**for 루프의 숨겨진 메커니즘 (이것이 핵심!)**:\nPython의 `for num in counter:`는 사실 다음과 동일합니다:\n```python\n_iterator = counter.__iter__()  # Step 1: 이터레이터 얻기\nwhile True:\n    try:\n        num = _iterator.__next__()  # Step 2: 다음 값 얻기\n    except StopIteration:           # Step 3: 종료 신호 잡기\n        break\n    print(num)  # 루프 본문 실행\n```\nfor 루프는 이 복잡한 과정을 **한 줄로** 간결하게 쓸 수 있게 해주는 **문법 설탕(Syntax Sugar)**입니다!\n\n**비유**: 자동판매기 앞에서 \"품절될 때까지 계속 버튼을 눌러줘\"라고 말한 것입니다.\n\n**왜 이 순서인가?** Counter 인스턴스가 준비되었으니, for 루프로 순회를 시작합니다.\n\n**실행 순서**: counter.__iter__() 호출 → 이터레이터(자기 자신) 반환 → __next__() 첫 호출 준비",
         "visualizationType": "pythonMemory",
         "code": "for num in counter:",
         "pythonMemoryState": {
@@ -330,7 +330,7 @@
       },
       {
         "title": "__iter__ 실행",
-        "explanation": "`return self`\n이터레이터 객체(자기 자신)를 반환합니다.\n\n**왜 이 순서인가?**\n이 클래스는 자기 자신이 이터레이터이므로, `self`를 그대로 반환합니다.\n\n**실행 순서:**\n1. `self`(0x2000)를 반환합니다.\n2. `for` 루프는 이 객체를 사용하여 `__next__` 호출을 준비합니다.",
+        "explanation": "**`return self`**\n\n`__iter__` 메서드가 **자기 자신(self)**을 반환합니다.\nCounter 객체가 이터러블인 동시에 이터레이터이므로, 자기 자신을 돌려주면 됩니다.\n\n**이게 왜 중요한가?**\nfor 루프는 이 반환값을 받아서, 이후 `__next__()`를 반복 호출할 대상으로 사용합니다.\n자기 자신을 반환했으므로, `counter.__next__()`가 반복 호출됩니다.\n\n**참고**: 리스트 같은 경우는 자기 자신이 아닌 별도의 이터레이터 객체를 반환합니다.\n`list.__iter__()`는 `list_iterator`라는 다른 객체를 만들어 반환하지요.\n\n**비유**: \"이 판매기의 버튼은 바로 여기에 있어요(자기 자신)\"라고 알려주는 것입니다.\n\n**왜 이 순서인가?** for 루프가 __iter__를 호출했으므로, 이터레이터를 반환합니다.\n\n**실행 순서**: self(0x2000) 반환 → for 루프가 이 객체로 __next__ 호출 준비",
         "visualizationType": "pythonMemory",
         "code": "return self",
         "pythonMemoryState": {
@@ -345,7 +345,7 @@
       },
       {
         "title": "__next__ 실행 - 첫 번째 (조건 검사)",
-        "explanation": "`if self.current >= self.end:`\ncurrent(0) >= end(3)? False이므로 계속 진행합니다.\n\n**왜 이 순서인가?**\n값을 반환하기 전에, 반복을 끝내야 하는 지점인지 먼저 확인해야 합니다.\n\n**실행 순서:**\n1. `self.current`(0)와 `self.end`(3)를 비교합니다.\n2. 0 < 3 이므로 if 블록을 건너뜁니다.",
+        "explanation": "**`if self.current >= self.end:`**\n\n`__next__`의 **첫 번째 호출**입니다! for 루프가 \"다음 값 줘!\"라고 요청한 것입니다.\n먼저 **종료 조건**을 확인합니다: current(0) >= end(3)? **False!** 아직 줄 값이 남아있습니다.\n\n**왜 종료 조건을 먼저 확인하는가?**\n값을 반환하기 전에 \"아직 줄 게 남아있나?\"를 먼저 확인하는 것이 안전합니다.\n만약 이미 끝에 도달했으면 값 대신 StopIteration을 발생시켜야 하기 때문입니다.\n\n**비유**: 자동판매기에서 버튼을 눌렀을 때, 먼저 \"재고가 있나?\"를 확인합니다. 있으면 상품을 내놓고, 없으면 \"품절\" 표시를 합니다.\n\n**왜 이 순서인가?** __next__가 호출되면 항상 종료 조건부터 확인합니다.\n\n**실행 순서**: self.current(0)와 self.end(3) 비교 → 0 < 3이므로 if 건너뜀 → 값 반환 로직으로 진행",
         "visualizationType": "pythonMemory",
         "code": "if self.current >= self.end:",
         "pythonMemoryState": {
@@ -378,7 +378,7 @@
       },
       {
         "title": "__next__ 실행 - 첫 번째 (값 저장)",
-        "explanation": "`value = self.current`\n현재 값 0을 저장합니다.\n\n**왜 이 순서인가?**\n`current`를 증가시키기 전에, 반환할 현재 값을 임시 변수에 저장해둬야 합니다.\n\n**실행 순서:**\n1. `self.current` 값 0을 지역 변수 `value`에 복사합니다.",
+        "explanation": "**`value = self.current`**\n\n현재 값(0)을 **임시 변수 `value`에 저장**해둡니다.\n왜 바로 반환하지 않고 임시 저장하는가?\n\n**순서가 중요한 이유**:\n1. 먼저 현재 값을 value에 저장 (value = 0)\n2. 그 다음 current를 1 증가 (current: 0 → 1)\n3. 마지막으로 value(0)를 반환\n\n만약 순서가 바뀌면? current를 먼저 증가시키면 0 대신 1이 반환되는 버그가 생깁니다!\n\n**비유**: 자동판매기에서 상품을 꺼내놓고(value 저장), 재고 카운터를 줄인 다음(current 증가), 상품을 내보내는(return) 것입니다.\n\n**왜 이 순서인가?** 증가 전에 반환할 값을 미리 확보해둡니다.\n\n**실행 순서**: self.current(0)를 value에 복사 → value = 0",
         "visualizationType": "pythonMemory",
         "code": "value = self.current",
         "pythonMemoryState": {
@@ -413,7 +413,7 @@
       },
       {
         "title": "__next__ 실행 - 첫 번째 (증가)",
-        "explanation": "`self.current += 1`\ncurrent를 1로 증가시킵니다.\n\n**왜 이 순서인가?**\n다음 호출 때 그 다음 값을 주기 위해 `current` 상태를 업데이트합니다.\n\n**실행 순서:**\n1. `self.current`를 1 증가시킵니다 (0 -> 1).",
+        "explanation": "**`self.current += 1`**\n\ncurrent를 0에서 **1로 증가**시킵니다.\n이것이 이터레이터의 **상태 업데이트**입니다. 다음에 __next__가 호출되면 current=1부터 시작하게 됩니다.\n\n**이터레이터가 일반 함수와 다른 핵심 포인트**:\n일반 함수는 호출이 끝나면 모든 지역 변수가 사라집니다.\n하지만 이터레이터 객체는 `self.current`에 상태를 저장하므로, 다음 호출에서도 \"어디까지 했는지\" 기억합니다!\n\n**비유**: 자동판매기의 재고 카운터를 한 칸 올리는 것입니다. 다음에 버튼을 누르면 다음 번호가 나옵니다.\n\n**왜 이 순서인가?** value에 현재 값을 저장한 후, 다음 호출을 위해 current를 증가시킵니다.\n\n**실행 순서**: self.current 1 증가 (0 → 1)",
         "visualizationType": "pythonMemory",
         "code": "self.current += 1",
         "pythonMemoryState": {
@@ -448,7 +448,7 @@
       },
       {
         "title": "__next__ 실행 - 첫 번째 (반환)",
-        "explanation": "`return value`\n0을 반환합니다.\n`num`에 할당됩니다.\n\n**왜 이 순서인가?**\n아까 저장해둔 값(0)을 `for` 루프에 전달합니다.\n\n**실행 순서:**\n1. `value`(0)를 반환하고 `__next__` 메서드를 종료합니다.\n2. 반환된 값은 `for` 문의 변수 `num`에 들어갑니다.",
+        "explanation": "**`return value`**\n\n미리 저장해둔 값 **0**을 for 루프에 반환합니다.\n이 값이 `for num in counter:`의 변수 `num`에 들어갑니다!\n\n**__next__의 한 사이클이 완료되었습니다:**\n1. 종료 확인: 0 >= 3? No → 계속\n2. 값 저장: value = 0\n3. 상태 업데이트: current 0 → 1\n4. 값 반환: return 0 → num = 0\n\n**이 과정이 for 루프의 한 바퀴입니다!** 이제 루프 본문(print(num))이 실행되고, 다시 __next__가 호출되어 같은 과정이 반복됩니다.\n\n**비유**: 자동판매기가 0번 상품을 내보낸 것입니다. 다음에 버튼을 누르면 1번이 나옵니다.\n\n**왜 이 순서인가?** __next__의 마지막 단계로, 계산된 값을 호출자(for 루프)에게 돌려줍니다.\n\n**실행 순서**: value(0) 반환 → num = 0 → 루프 본문 실행으로 이동",
         "visualizationType": "pythonMemory",
         "code": "return value",
         "pythonMemoryState": {
@@ -483,7 +483,7 @@
       },
       {
         "title": "첫 번째 값 출력",
-        "explanation": "`print(num)`\n0을 출력합니다.\n\n**왜 이 순서인가?**\n`num`에 값이 할당되었으므로, 루프 내부의 코드를 실행합니다.\n\n**실행 순서:**\n1. `print(0)`이 실행되어 화면에 출력됩니다.",
+        "explanation": "**`print(num)`**\n\n__next__가 반환한 값 **0**이 `num`에 들어있으므로, 이것을 화면에 출력합니다.\n\n**for 루프 첫 번째 반복 요약**:\n- __iter__() 호출 → self 반환\n- __next__() 호출 → 0 반환\n- num = 0\n- print(0) 실행\n- 다시 루프 맨 위로 돌아가 __next__() 호출...\n\n**이 출력이 의미하는 것**: 우리가 직접 만든 Counter 클래스가 for 루프에서 정상적으로 동작하고 있습니다!\n이터레이터 프로토콜(__iter__ + __next__)을 올바르게 구현했기 때문입니다.\n\n**왜 이 순서인가?** num에 값이 할당된 후, 루프 본문을 실행합니다.\n\n**실행 순서**: print(0) 실행 → 화면에 0 출력 → 루프 맨 위로 돌아가 __next__ 재호출",
         "visualizationType": "pythonMemory",
         "code": "print(num)",
         "pythonMemoryState": {
@@ -509,7 +509,7 @@
       },
       {
         "title": "__next__ 실행 - 두 번째 (조건 검사)",
-        "explanation": "`if self.current >= self.end:`\ncurrent(1) >= end(3)? False이므로 계속 진행합니다.\n\n**왜 이 순서인가?**\n`for` 루프는 끝날 때까지 계속 `__next__`를 호출합니다.\n\n**실행 순서:**\n1. `self.current`(1)와 `self.end`(3)를 비교합니다.\n2. 1 < 3 이므로 계속합니다.",
+        "explanation": "**`if self.current >= self.end:`**\n\n**두 번째 __next__ 호출!** for 루프가 print(0) 실행 후 다시 \"다음 값 줘!\"라고 요청했습니다.\n종료 조건을 확인합니다: current(1) >= end(3)? **False!** 아직 값이 남아있습니다.\n\n**반복 패턴 확인**: 첫 번째 호출 때와 똑같은 과정이 반복됩니다.\n__next__가 호출될 때마다: (1) 종료 확인 → (2) 값 저장 → (3) current 증가 → (4) 값 반환\n이 4단계가 StopIteration이 발생할 때까지 계속됩니다.\n\n**이터레이터의 상태 추적**: 첫 번째 호출에서 current가 0 → 1로 증가했으므로, 이번에는 1부터 시작합니다.\n이것이 이터레이터의 핵심 -- 객체가 \"어디까지 했는지\" 기억하고 있습니다!\n\n**실행 순서**: self.current(1)와 self.end(3) 비교 → 1 < 3이므로 if 건너뜀 → 값 반환 로직으로 진행",
         "visualizationType": "pythonMemory",
         "code": "if self.current >= self.end:",
         "pythonMemoryState": {
@@ -542,7 +542,7 @@
       },
       {
         "title": "__next__ 실행 - 두 번째 (값 저장)",
-        "explanation": "`value = self.current`\n현재 값 1을 저장합니다.\n\n**왜 이 순서인가?**\n반환할 값을 미리 확보해둡니다.\n\n**실행 순서:**\n1. `self.current` 값 1을 `value`에 저장합니다.",
+        "explanation": "**`value = self.current`**\n\n현재 값 **1**을 임시 변수 `value`에 저장합니다.\n첫 번째 호출 때와 동일한 패턴입니다 -- current를 증가시키기 전에 반환할 값을 미리 확보합니다.\n\n**왜 매번 임시 저장이 필요한가?** 다음 줄에서 current가 2로 바뀌므로, 지금 반환할 값 1을 미리 빼놓아야 합니다.\n만약 `value = self.current` 없이 바로 current를 증가시키면, 1 대신 2가 반환되는 버그가 생깁니다!\n\n**실행 순서**: self.current(1)를 value에 복사 → value = 1",
         "visualizationType": "pythonMemory",
         "code": "value = self.current",
         "pythonMemoryState": {
@@ -577,7 +577,7 @@
       },
       {
         "title": "__next__ 실행 - 두 번째 (증가)",
-        "explanation": "`self.current += 1`\ncurrent를 2로 증가시킵니다.\n\n**왜 이 순서인가?**\n다음 값을 위해 상태를 업데이트합니다.\n\n**실행 순서:**\n1. `self.current`를 1에서 2로 증가시킵니다.",
+        "explanation": "**`self.current += 1`**\n\ncurrent를 1에서 **2로 증가**시킵니다. 이터레이터의 내부 상태가 업데이트됩니다.\n\n**상태 변화 추적**:\n- 1회차 후: current = 1 (0에서 증가)\n- 2회차 후: current = 2 (1에서 증가) ← 지금!\n- 3회차 후: current = 3 (end와 같아짐 → 종료)\n\ncurrent가 end(3)에 가까워지고 있습니다. 다음 호출에서도 아직 2 < 3이므로 한 번 더 값을 줄 수 있습니다.\n\n**실행 순서**: self.current 1 증가 (1 → 2)",
         "visualizationType": "pythonMemory",
         "code": "self.current += 1",
         "pythonMemoryState": {
@@ -612,7 +612,7 @@
       },
       {
         "title": "__next__ 실행 - 두 번째 (반환)",
-        "explanation": "`return value`\n1을 반환합니다.\n`num`에 할당됩니다.\n\n**왜 이 순서인가?**\n저장해둔 값 1을 `for` 루프에 넘겨줍니다.\n\n**실행 순서:**\n1. `value`(1)를 반환합니다.\n2. `num` 변수에 1이 할당됩니다.",
+        "explanation": "**`return value`**\n\n미리 저장해둔 값 **1**을 for 루프에 반환합니다. `num = 1`이 됩니다.\n\n**두 번째 __next__ 사이클 완료**:\n1. 종료 확인: 1 >= 3? No → 계속\n2. 값 저장: value = 1\n3. 상태 업데이트: current 1 → 2\n4. 값 반환: return 1 → num = 1\n\n첫 번째 사이클과 완전히 동일한 4단계를 밟았습니다. 이 패턴이 StopIteration까지 반복됩니다.\n\n**실행 순서**: value(1) 반환 → num = 1 → 루프 본문(print) 실행으로 이동",
         "visualizationType": "pythonMemory",
         "code": "return value",
         "pythonMemoryState": {
@@ -647,7 +647,7 @@
       },
       {
         "title": "두 번째 값 출력",
-        "explanation": "`print(num)`\n1을 출력합니다.\n\n**왜 이 순서인가?**\n루프 본문을 실행합니다.\n\n**실행 순서:**\n1. `print(1)`이 실행됩니다.",
+        "explanation": "**`print(num)`**\n\n__next__가 반환한 값 **1**을 화면에 출력합니다.\n\n**지금까지의 출력**: 0, 1\n**남은 값**: 2 (current=2, end=3이므로 한 번 더 가능)\n\nfor 루프는 print 실행 후 다시 루프 맨 위로 돌아가 __next__를 호출합니다.\n이 과정이 자동으로 반복되는 것이 for 루프의 편리함입니다!\n\n**실행 순서**: print(1) 실행 → 화면에 1 출력 → 루프 맨 위로 돌아가 __next__ 재호출",
         "visualizationType": "pythonMemory",
         "code": "print(num)",
         "pythonMemoryState": {
@@ -673,7 +673,7 @@
       },
       {
         "title": "__next__ 실행 - 세 번째 (조건 검사)",
-        "explanation": "`if self.current >= self.end:`\ncurrent(2) >= end(3)? False이므로 계속 진행합니다.\n\n**왜 이 순서인가?**\n아직 종료 조건(3)에 도달하지 않았는지 확인합니다.\n\n**실행 순서:**\n1. `self.current`(2)와 `self.end`(3) 비교.\n2. 2 < 3 이므로 통과.",
+        "explanation": "**`if self.current >= self.end:`**\n\n**세 번째(마지막) __next__ 호출!** current(2) >= end(3)? **False!** 아직 마지막 값이 남아있습니다.\n\n**이번이 값을 반환하는 마지막 기회입니다!**\n현재 current=2이고, 이번 사이클에서 current가 3으로 증가하면 다음 호출에서는 3 >= 3이 True가 되어 StopIteration이 발생합니다.\n즉, 2가 이 이터레이터가 반환하는 **마지막 값**입니다.\n\n**전체 흐름 미리보기**: 0 → 1 → **2**(지금) → StopIteration(다음)\n\n**실행 순서**: self.current(2)와 self.end(3) 비교 → 2 < 3이므로 if 건너뜀 → 마지막 값 반환 준비",
         "visualizationType": "pythonMemory",
         "code": "if self.current >= self.end:",
         "pythonMemoryState": {
@@ -706,7 +706,7 @@
       },
       {
         "title": "__next__ 실행 - 세 번째 (값 저장)",
-        "explanation": "`value = self.current`\n현재 값 2를 저장합니다.\n\n**왜 이 순서인가?**\n반환할 값을 저장합니다.\n\n**실행 순서:**\n1. `self.current` 값 2를 `value`에 저장합니다.",
+        "explanation": "**`value = self.current`**\n\n이터레이터의 **마지막 값** 2를 임시 변수 `value`에 저장합니다.\n다음 줄에서 current가 3으로 증가하면 end와 같아지므로, 이것이 마지막으로 반환되는 값입니다.\n\n**세 번의 value 저장 비교**:\n- 1회차: value = 0 (current 0 → 1)\n- 2회차: value = 1 (current 1 → 2)\n- 3회차: value = 2 (current 2 → 3) ← 지금! 마지막!\n\n**실행 순서**: self.current(2)를 value에 복사 → value = 2",
         "visualizationType": "pythonMemory",
         "code": "value = self.current",
         "pythonMemoryState": {
@@ -741,7 +741,7 @@
       },
       {
         "title": "__next__ 실행 - 세 번째 (증가)",
-        "explanation": "`self.current += 1`\ncurrent를 3으로 증가시킵니다.\n\n**왜 이 순서인가?**\n상태를 업데이트합니다.\n이제 current는 종료 값인 3이 됩니다.\n\n**실행 순서:**\n1. `self.current`가 2에서 3으로 증가합니다.",
+        "explanation": "**`self.current += 1`**\n\ncurrent를 2에서 **3으로 증가**시킵니다. **이제 current(3) == end(3)입니다!**\n\n**이 순간이 중요합니다!** current가 end와 같아졌으므로, 다음에 __next__가 호출되면:\n`if self.current >= self.end:` → `3 >= 3` → **True** → StopIteration 발생!\n즉, 이 증가로 인해 이터레이터는 \"소진(exhausted)\" 상태가 됩니다.\n\n**전체 상태 변화 요약**:\n- 초기: current=0, end=3 → 값 3개(0, 1, 2) 제공 가능\n- 1회차 후: current=1\n- 2회차 후: current=2\n- 3회차 후: current=3 ← 지금! (end와 같음 = 종료 준비)\n\n**실행 순서**: self.current 1 증가 (2 → 3) → 이제 end와 같으므로 다음 호출에서 종료",
         "visualizationType": "pythonMemory",
         "code": "self.current += 1",
         "pythonMemoryState": {
@@ -776,7 +776,7 @@
       },
       {
         "title": "__next__ 실행 - 세 번째 (반환)",
-        "explanation": "`return value`\n2를 반환합니다.\n`num`에 할당됩니다.\n\n**왜 이 순서인가?**\n값 2를 반환합니다.\n\n**실행 순서:**\n1. `value`(2)를 반환합니다.\n2. `num`에 2가 할당됩니다.",
+        "explanation": "**`return value`**\n\n이터레이터의 **마지막 값 2**를 for 루프에 반환합니다. `num = 2`가 됩니다.\n\n**세 번째(마지막) __next__ 사이클 완료**:\n1. 종료 확인: 2 >= 3? No → 계속\n2. 값 저장: value = 2\n3. 상태 업데이트: current 2 → 3 (end와 같아짐!)\n4. 값 반환: return 2 → num = 2\n\n이제 print(2) 실행 후 for 루프가 다시 __next__를 호출하면, 3 >= 3이 True가 되어 StopIteration이 발생합니다.\n\n**실행 순서**: value(2) 반환 → num = 2 → 루프 본문(print) 실행으로 이동",
         "visualizationType": "pythonMemory",
         "code": "return value",
         "pythonMemoryState": {
@@ -811,7 +811,7 @@
       },
       {
         "title": "세 번째 값 출력",
-        "explanation": "`print(num)`\n2를 출력합니다.\n\n**왜 이 순서인가?**\n루프 본문을 실행합니다.\n\n**실행 순서:**\n1. `print(2)`가 실행됩니다.",
+        "explanation": "**`print(num)`**\n\n이터레이터의 마지막 값 **2**를 화면에 출력합니다.\n\n**전체 출력**: 0, 1, 2 -- Counter(0, 3)이 생성하는 모든 값을 출력했습니다!\nrange(3)과 동일한 결과입니다. 실제로 range()도 내부적으로 이터레이터 프로토콜을 구현하고 있습니다.\n\nprint 실행 후 for 루프가 다시 __next__를 호출하지만, 이번에는 StopIteration이 발생하여 루프가 종료됩니다.\n\n**실행 순서**: print(2) 실행 → 화면에 2 출력 → 루프 맨 위로 돌아감 → __next__ 호출 → StopIteration!",
         "visualizationType": "pythonMemory",
         "code": "print(num)",
         "pythonMemoryState": {
@@ -837,7 +837,7 @@
       },
       {
         "title": "__next__ 실행 - 네 번째 (StopIteration)",
-        "explanation": "`if self.current >= self.end:`\ncurrent(3) >= end(3)? True! 조건이 참이 됩니다.\n\n**왜 이 순서인가?**\n`current`가 3이 되었으므로, 종료 조건(3이상)에 해당합니다.\n\n**실행 순서:**\n1. `self.current`(3)와 `self.end`(3) 비교.\n2. 3 >= 3 은 참이므로 if 블록 안으로 들어갑니다.",
+        "explanation": "**`if self.current >= self.end:`**\n\n**네 번째 __next__ 호출!** current(3) >= end(3)? **True!** 드디어 종료 조건에 도달했습니다!\n\n**왜 3 >= 3이 True인가?**\n우리는 0, 1, 2 세 개의 값을 모두 내보냈습니다. current가 3이 되었으므로 end(3)와 같아졌습니다.\n더 이상 줄 값이 없으므로, if 블록 안으로 들어가 StopIteration을 발생시킬 준비를 합니다.\n\n**비유**: 자동판매기의 재고가 바닥났습니다. \"품절\" 표시를 해야 합니다.\n\n**왜 이 순서인가?** __next__의 첫 단계로 종료 조건을 확인한 결과, 이번에는 True입니다.\n\n**실행 순서**: self.current(3)와 self.end(3) 비교 → 3 >= 3은 True → if 블록 안으로 진입",
         "visualizationType": "pythonMemory",
         "code": "if self.current >= self.end:",
         "pythonMemoryState": {
@@ -870,7 +870,7 @@
       },
       {
         "title": "루프 종료",
-        "explanation": "`raise StopIteration`\nStopIteration 예외가 발생하여 for 루프가 정상 종료됩니다.\n\n**왜 이 순서인가?**\n더 이상 줄 값이 없음을 알리기 위해 예외를 발생시킵니다.\n`for` 루프는 이 예외를 잡아서 우아하게 종료합니다.\n\n**실행 순서:**\n1. `StopIteration` 예외 발생.\n2. `for` 루프가 예외를 감지하고 반복을 멈춥니다.",
+        "explanation": "**`raise StopIteration`**\n\n**\"더 이상 값이 없습니다!\"** 라는 의미의 `StopIteration` 예외를 발생시킵니다.\nfor 루프는 이 예외를 **자동으로 잡아서 조용히** 루프를 종료합니다.\n\n**StopIteration은 에러가 아닙니다!**\n일반적인 에러(TypeError, ValueError 등)와 달리, StopIteration은 **정상적인 종료 신호**입니다.\nfor 루프는 이 예외를 기대하고 있으며, 받으면 \"아, 끝났구나\" 하고 깔끔하게 종료합니다.\n프로그램이 중단되거나 에러 메시지가 표시되지 않습니다!\n\n**전체 for 루프 동작 요약**:\n```\n1회차: __next__() → 0 반환 → print(0)\n2회차: __next__() → 1 반환 → print(1)\n3회차: __next__() → 2 반환 → print(2)\n4회차: __next__() → StopIteration 발생 → 루프 종료!\n```\n\n**비유**: 자동판매기가 \"품절\" 표시를 올린 것입니다. for 루프는 이 표시를 보고 버튼 누르기를 멈춥니다.\n\n**핵심 교훈**: for 루프는 `__iter__`와 `__next__`를 호출하는 \"문법 설탕\"입니다!\n리스트, 튜플, 문자열 등 모든 iterable 객체가 이 프로토콜을 따릅니다.\n\n**실행 순서**: StopIteration 예외 발생 → for 루프가 예외를 감지 → 루프 정상 종료 → 프로그램 계속",
         "visualizationType": "pythonMemory",
         "code": "raise StopIteration",
         "pythonMemoryState": {

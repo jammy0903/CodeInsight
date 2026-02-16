@@ -31,7 +31,7 @@ const MAX_EDITOR_HEIGHT = 500;
 
 export function PlaygroundPage() {
   const { t } = useTranslation();
-  const { steps, currentStepIndex, error, registers, language } = usePlaygroundStore();
+  const { steps, currentStepIndex, error, language } = usePlaygroundStore();
   const code = useCurrentCode();
   const { startPrefetch, stopPrefetch } = useExplanationStore();
   const setPageTitle = useStore((s) => s.setPageTitle);
@@ -42,18 +42,6 @@ export function PlaygroundPage() {
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
-
-  // DEBUG: 현재 step 확인
-  useEffect(() => {
-    if (currentStep) {
-      console.log('[PlaygroundPage] Current step:', {
-        index: currentStepIndex,
-        line: currentStep.line,
-        code: currentStep.code?.substring(0, 30),
-        explanation: currentStep.explanation?.substring(0, 40),
-      });
-    }
-  }, [currentStepIndex, currentStep]);
 
   // Flow/Memory 탭 상태
   const [activeTab, setActiveTab] = useState<'flow' | 'memory'>('flow');
@@ -84,14 +72,6 @@ export function PlaygroundPage() {
     canGoPrev,
     canGoNext,
   });
-
-  // Enter 키로 Run 버튼 실행 - DISABLED (코드 에디터에서 Enter는 줄바꿈용)
-  // useEnterKey({
-  //   onEnter: () => {
-  //     (document.getElementById('playground-run-button') as HTMLButtonElement)?.click();
-  //   },
-  //   enabled: true, // 항상 활성화 (훅 내부에서 입력창 포커스 시 자동 비활성화)
-  // });
 
   // Calculate editor height based on code lines
   const editorHeight = useMemo(() => {

@@ -7,50 +7,50 @@
     "steps": [
       {
         "title": "세트 생성",
-        "explanation": "`fruits = {\"apple\", \"banana\"}`\n세트 객체를 생성합니다.\n세트는 리스트나 딕셔너리처럼 '수정 가능(Mutable)'하며, 중복된 요소를 허용하지 않습니다.",
+        "explanation": "**`fruits = {\"apple\", \"banana\"}`** -- 중괄호 `{}`로 세트 객체를 만들고, `fruits` 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 중괄호 `{}` 안에 값만 나열하면(키:값 쌍이 아닌) **세트(set)**가 됩니다. 2개의 문자열 항목(\"apple\", \"banana\")을 가진 세트 객체가 힙 메모리에 생성되고, `fruits`라는 이름표가 이 객체를 가리킵니다.\n\n**세트의 3가지 핵심 특징:**\n| 특징 | 설명 | 예시 |\n|---|---|---|\n| **중복 불허** | 같은 값을 두 번 넣어도 하나만 유지 | `{1, 1, 2}` → `{1, 2}` |\n| **순서 없음** | 인덱싱(`fruits[0]`) 불가능 | `{\"a\", \"b\"}`의 출력 순서 매번 다를 수 있음 |\n| **Mutable** | `add()`, `discard()` 등으로 내용 변경 가능 | 이번 레슨의 주제! |\n\n**비유:** 세트는 '주머니에 든 구슬'입니다. 구슬을 넣고(`add`) 빼는(`discard`) 것은 가능하지만, \"세 번째 구슬\"이라고 지목할 수 없습니다(순서 없음). 그리고 같은 색 구슬은 하나만 남습니다(중복 불허).\n\n**주의 -- `{}` vs `set()`:** 빈 세트를 만들 때 `{}`를 쓰면 **빈 딕셔너리**가 됩니다! 빈 세트는 반드시 `set()`으로 만들어야 합니다.\n```python\nempty_dict = {}      # type: dict (딕셔너리!)\nempty_set = set()    # type: set (세트)\n```\n\n**Python 내부 동작:** 세트는 딕셔너리와 동일한 **해시 테이블** 구조를 사용합니다. 차이점은 딕셔너리가 키-값 쌍을 저장하는 반면, 세트는 키만 저장합니다. 각 요소의 `hash()` 값으로 저장 위치를 결정하므로, `in` 연산(포함 여부 확인)이 **O(1)**로 매우 빠릅니다. 리스트의 `in`은 O(n)이므로, 대량 데이터에서 포함 여부를 자주 확인한다면 세트가 훨씬 유리합니다.\n\n**실행 순서**: line 1 → set 객체 생성(해시 테이블, id: 0x7000) → fruits = 0x7000 → line 2",
         "visualizationType": "terminal",
         "code": "fruits = {\"apple\", \"banana\"}"
       },
       {
         "title": "객체 ID 확인",
-        "explanation": "`print(f\"id = {id(fruits)}\")`\n생성된 `fruits` 객체의 고유 ID를 출력합니다.\n수정 후에도 이 ID가 바뀌지 않는지 확인할 것입니다.",
+        "explanation": "**`print(f\"id = {id(fruits)}\")`** -- `fruits` 세트 객체의 고유 ID(메모리 주소)를 출력합니다.\n\n`id()` 함수는 객체의 **고유 식별 번호**를 반환합니다. CPython에서 이 값은 객체가 저장된 메모리 주소와 같습니다. 이 ID를 지금 기록해 두면, 나중에 세트를 수정한 후에도 **같은 객체인지 다른 객체인지** 확인할 수 있습니다.\n\n**왜 ID를 확인하나?** Mutable과 Immutable의 차이를 눈으로 증명하기 위해서입니다:\n- **Mutable 객체** (리스트, 딕셔너리, 세트): 내용을 바꿔도 **id가 동일** → 같은 객체를 수정한 것\n- **Immutable 객체** (int, str, tuple): 값을 바꾸면 **id가 변경** → 새 객체를 만든 것\n\n**비유:** id는 집의 '주소'입니다. 집 안의 가구(내용)를 바꿔도 집 주소(id)는 변하지 않습니다. 하지만 새 집으로 이사하면(새 객체 생성) 주소가 바뀝니다. 세트는 가구를 바꿀 수 있는 집(Mutable)이므로, 내용을 수정해도 주소가 유지될 것입니다.\n\n**Python 내부 동작:** `id(fruits)`는 CPython에서 `fruits` 객체의 C 구조체 포인터 값을 정수로 반환합니다. 객체가 살아 있는 동안 이 값은 절대 변하지 않으며, 동시에 존재하는 두 객체가 같은 id를 가질 수 없습니다. 단, 객체가 소멸된 후 같은 메모리에 새 객체가 생성되면 동일한 id가 재사용될 수 있습니다.\n\n**실행 순서**: id(fruits) 호출 → 메모리 주소(예: 140234567890) 반환 → f-string 조립 → print 출력 → line 4",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(fruits)}\")"
       },
       {
         "title": "요소 추가 (add)",
-        "explanation": "`.add(\"cherry\")` 메서드로 세트에 새로운 요소를 추가합니다.\n이 작업은 기존 세트 객체를 직접 변경합니다.",
+        "explanation": "**`fruits.add(\"cherry\")`** -- 세트에 `\"cherry\"`를 추가합니다. 기존 세트 객체 **자체를 직접 변경**합니다.\n\n`.add()` 메서드는 세트에 새로운 요소를 하나 추가합니다. 이 메서드는 **기존 세트 객체를 제자리에서(in-place) 수정**하며, **새로운 세트를 만들지 않습니다**. 따라서 `fruits`의 id는 변하지 않습니다.\n\n**add() vs append():**\n- **리스트**: `fruits.append(\"cherry\")` -- 끝에 추가 (순서가 있으므로 '끝'이 존재)\n- **세트**: `fruits.add(\"cherry\")` -- 그냥 추가 (순서가 없으므로 '어디에'라는 개념 없음)\n\n**이미 있는 요소를 add하면?** 아무 일도 일어나지 않습니다! 에러도 발생하지 않습니다.\n```python\nfruits.add(\"apple\")  # \"apple\"은 이미 있음 → 무시됨 (에러 X)\n```\n세트는 중복을 허용하지 않으므로, 이미 존재하는 요소를 다시 추가하려고 하면 조용히 무시합니다.\n\n**비유:** 주머니에 빨간 구슬(apple)이 이미 있는데, 또 빨간 구슬을 넣으려고 하면 주머니가 \"이미 있어\"라고 거부합니다. 하지만 보라색 구슬(cherry)은 새로운 색이므로 들어갑니다.\n\n**주의 -- add()의 리턴값:** `add()`는 **`None`을 반환**합니다. `result = fruits.add(\"cherry\")`라고 쓰면 `result`는 `None`이 됩니다. 이것은 리스트의 `append()`와 같은 패턴으로, '이 메서드는 객체를 직접 수정합니다'라는 Python의 관례입니다.\n\n**Python 내부 동작:** `add(\"cherry\")`는 먼저 `hash(\"cherry\")`로 해시값을 계산한 뒤, 해시 테이블에서 해당 슬롯을 찾아 저장합니다. 이미 같은 해시값과 같은 값의 요소가 있으면(중복) 아무 작업도 하지 않습니다. 해시 테이블의 적재율(load factor)이 2/3를 초과하면 테이블 크기를 자동으로 늘립니다(리사이징).\n\n**실행 순서**: hash(\"cherry\") 계산 → 해시 테이블에 삽입 → fruits = {\"apple\", \"banana\", \"cherry\"} → line 5",
         "visualizationType": "terminal",
         "code": "fruits.add(\"cherry\")"
       },
       {
         "title": "요소 삭제 (discard)",
-        "explanation": "`.discard(\"banana\")` 메서드로 세트에서 \"banana\"를 삭제합니다.\n이 작업 역시 기존 객체를 직접 변경합니다.",
+        "explanation": "**`fruits.discard(\"banana\")`** -- 세트에서 `\"banana\"`를 삭제합니다. 기존 세트 객체를 **직접 수정**합니다.\n\n`.discard()` 메서드는 지정한 요소를 세트에서 제거합니다. `.add()`와 마찬가지로 기존 객체를 제자리에서 수정하며, 새 객체를 만들지 않습니다.\n\n**discard() vs remove() -- 핵심 차이:**\n| 메서드 | 요소가 없을 때 | 안전성 |\n|---|---|---|\n| `discard(\"grape\")` | **아무 일 없음** (에러 X) | 안전 |\n| `remove(\"grape\")` | **`KeyError` 발생!** | 위험 |\n\n```python\nfruits.discard(\"grape\")  # 없어도 OK → 에러 없음\nfruits.remove(\"grape\")   # 없으면 → KeyError: 'grape'\n```\n\n따라서 **요소가 있는지 확실하지 않을 때**는 `discard()`가 더 안전합니다. `remove()`는 \"반드시 있어야 하는\" 요소를 삭제할 때 사용합니다(없으면 버그이므로 에러가 나는 것이 오히려 좋음).\n\n**비유:** `discard()`는 '있으면 치워줘'라고 부탁하는 것이고, `remove()`는 '반드시 치워! 없으면 화낼 거야!'라고 명령하는 것입니다.\n\n**다른 삭제 메서드들:**\n- `fruits.pop()` -- 임의의 요소 하나를 제거하고 **반환** (세트가 비어있으면 KeyError)\n- `fruits.clear()` -- 모든 요소 제거 (빈 세트로 만듦)\n\n**Python 내부 동작:** `discard(\"banana\")`는 먼저 `hash(\"banana\")`로 해시값을 계산하고, 해시 테이블에서 해당 슬롯을 찾습니다. 요소가 존재하면 해당 슬롯을 'dummy' 마커로 표시합니다(실제로 삭제하면 해시 체인이 끊어질 수 있으므로). 요소가 없으면 아무 작업도 하지 않고 조용히 반환합니다.\n\n**실행 순서**: hash(\"banana\") 계산 → 해시 테이블에서 찾기 → 삭제(dummy 표시) → fruits = {\"apple\", \"cherry\"} → line 6",
         "visualizationType": "terminal",
         "code": "fruits.discard(\"banana\")"
       },
       {
         "title": "변경 후 내용 확인",
-        "explanation": "`print(f\"After changes: {fruits}\")`\n추가와 삭제가 모두 반영된 세트의 현재 내용을 출력합니다.\n세트는 순서가 없으므로 출력 순서는 실행할 때마다 다를 수 있습니다.",
+        "explanation": "**`print(f\"After changes: {fruits}\")`** -- `add(\"cherry\")`와 `discard(\"banana\")` 이후 변경된 세트의 현재 내용을 출력합니다.\n\n출력 예시: `After changes: {'cherry', 'apple'}` (순서는 다를 수 있음)\n\n원래 `{\"apple\", \"banana\"}`였던 세트가 `add(\"cherry\")`로 cherry가 추가되고, `discard(\"banana\")`로 banana가 제거되어 `{\"apple\", \"cherry\"}`가 되었습니다. 이 모든 변경은 **같은 객체**에서 이루어졌습니다.\n\n**세트의 출력 순서 -- 왜 매번 다를 수 있나?**\n세트는 **해시 테이블** 기반이므로, 요소의 저장 위치가 해시값에 의해 결정됩니다. 출력할 때는 해시 테이블의 슬롯 순서대로 나오므로, `{\"apple\", \"cherry\"}`가 될 수도 있고 `{\"cherry\", \"apple\"}`가 될 수도 있습니다. 이것은 버그가 아니라 **세트의 정상적인 동작**입니다.\n\n**주의 -- 순서가 보장되는 자료구조:**\n| 자료구조 | 순서 보장 | 인덱싱 가능 |\n|---|---|---|\n| 리스트 `[]` | O (삽입 순서) | O (`list[0]`) |\n| 튜플 `()` | O (삽입 순서) | O (`tuple[0]`) |\n| 딕셔너리 `{}` | O (Python 3.7+) | X (키로 접근) |\n| **세트 `{}`** | **X** | **X** |\n\n세트만 유일하게 순서가 보장되지 않습니다. 순서가 필요하다면 리스트를 사용하세요.\n\n**비유:** 세트의 출력 순서는 주머니에서 구슬을 꺼내는 순서와 같습니다. 어떤 구슬이 먼저 나올지는 매번 달라질 수 있습니다.\n\n**실행 순서**: f-string 조립(fruits 내용 삽입) → print 출력 → line 7",
         "visualizationType": "terminal",
         "code": "print(f\"After changes: {fruits}\")"
       },
       {
         "title": "ID 불변 확인",
-        "explanation": "`print(f\"id = {id(fruits)}\")`\n세트를 직접 수정했지만, 객체의 ID는 처음과 동일합니다.\n이것이 세트가 '수정 가능(Mutable)' 객체라는 증거입니다.",
+        "explanation": "**`print(f\"id = {id(fruits)}\")`** -- 수정 후 `fruits`의 id를 다시 출력합니다. **처음과 동일한 값**이 나옵니다!\n\nline 2에서 출력한 id와 **완전히 같은 숫자**가 출력됩니다. 세트의 내용은 `{\"apple\", \"banana\"}` → `{\"apple\", \"cherry\"}`로 바뀌었지만, **객체 자체는 그대로**입니다. 이것이 바로 **Mutable(수정 가능)**의 의미입니다.\n\n**Mutable vs Immutable -- id로 증명하기:**\n```python\n# Mutable (세트) -- id 동일\ns = {1, 2}\nprint(id(s))    # 예: 140234567890\ns.add(3)\nprint(id(s))    # 예: 140234567890 ← 같음!\n\n# Immutable (문자열) -- id 변경\nt = \"hello\"\nprint(id(t))    # 예: 140234500000\nt = t + \" world\"\nprint(id(t))    # 예: 140234511111 ← 다름!\n```\n\nMutable 객체는 내용을 바꿔도 **같은 메모리 위치에 존재**합니다. 반면 Immutable 객체는 값을 변경할 수 없으므로, 변경된 것처럼 보이는 것은 사실 **새 객체를 만들어서 이름표를 옮긴 것**입니다.\n\n**비유:** Mutable 객체는 '같은 집에서 가구만 바꾸는 것'(주소 동일)이고, Immutable 객체는 '새 집을 짓고 이사하는 것'(주소 변경)입니다.\n\n**왜 이것이 중요한가?** 같은 세트를 여러 변수가 가리키고 있을 때(앨리어싱), 한 변수를 통해 수정하면 **다른 변수에서도 변경된 내용이 보입니다**. 이것은 Mutable 객체의 가장 흔한 버그 원인입니다:\n```python\na = {1, 2}\nb = a       # 같은 객체를 가리킴 (복사 아님!)\na.add(3)\nprint(b)    # {1, 2, 3} ← b도 변경됨!\n```\n\n**Python 내부 동작:** `id(fruits)`가 동일하다는 것은 C 레벨에서 `PyObject*` 포인터가 같은 메모리 주소를 가리키고 있다는 뜻입니다. `add()`와 `discard()`는 해당 객체의 내부 해시 테이블만 수정할 뿐, 객체를 새로 할당하지 않습니다.\n\n**실행 순서**: id(fruits) 호출 → 동일한 메모리 주소 반환 → print 출력 → line 10",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(fruits)}\")",
         "occurrence": 2
       },
       {
         "title": "frozenset: 수정 불가능한 세트",
-        "explanation": "`frozenset`은 내용을 변경할 수 없는 '불변(Immutable)' 버전의 세트입니다.\n불변이기 때문에 딕셔너리의 키로 사용될 수 있습니다.",
+        "explanation": "**`frozen = frozenset([1, 2, 3])`** -- `frozenset()`으로 **수정 불가능한(Immutable) 세트**를 만듭니다.\n\n`frozenset`은 세트의 **Immutable 버전**입니다. 일반 세트(`set`)의 모든 읽기 기능(포함 여부 확인, 교집합, 합집합 등)은 그대로 사용할 수 있지만, 내용을 변경하는 메서드(`add`, `remove`, `discard`, `clear` 등)는 **존재하지 않습니다**.\n\n**set vs frozenset:**\n| | `set` | `frozenset` |\n|---|---|---|\n| 수정 | **가능** (Mutable) | **불가능** (Immutable) |\n| `add()` | O | **AttributeError** |\n| `in` 연산 | O | O |\n| `&` (교집합) | O | O |\n| 딕셔너리 키 | **불가능** (unhashable) | **가능** (hashable) |\n| 세트 안에 넣기 | **불가능** | **가능** |\n\n**왜 frozenset이 필요한가?**\n1. **딕셔너리 키로 사용:** 딕셔너리의 키는 반드시 Immutable(hashable)이어야 합니다. 일반 세트는 Mutable이라 키로 사용 불가하지만, frozenset은 가능합니다.\n2. **세트 안에 세트 넣기:** 세트의 요소도 hashable이어야 합니다. `{frozenset([1,2]), frozenset([3,4])}` -- 가능!\n3. **안전한 공유:** 여러 곳에서 참조해도 변경 위험이 없습니다.\n\n**비유:** tuple이 리스트의 Immutable 버전인 것처럼, frozenset은 세트의 Immutable 버전입니다.\n| Mutable | Immutable 버전 |\n|---|---|\n| `list` | `tuple` |\n| `set` | `frozenset` |\n| `dict` | (없음 -- `types.MappingProxyType`이 비슷) |\n\n**Python 내부 동작:** `frozenset([1, 2, 3])`은 리스트 `[1, 2, 3]`을 이터레이션하여 frozenset 객체를 생성합니다. frozenset은 생성 시점에 **자신의 해시값을 계산하여 캐시**합니다. 이 해시값은 모든 요소의 해시를 XOR 연산으로 결합한 것입니다. 한 번 계산하면 이후 `hash(frozen)`은 캐시된 값을 즉시 반환하므로, 딕셔너리 키로 사용할 때 매우 빠릅니다.\n\n**실행 순서**: frozenset() 생성자 호출 → [1, 2, 3] 이터레이션 → frozenset 객체 생성 → frozen 이름표 부착 → line 11",
         "visualizationType": "terminal",
         "code": "frozen = frozenset([1, 2, 3])"
       },
       {
         "title": "frozenset 수정 시도 (에러)",
-        "explanation": "`# frozen.add(4)`\n수정 불가능한 `frozenset`에 `.add()` 같은 수정 메서드를 사용하려고 하면 `AttributeError`가 발생합니다.",
+        "explanation": "**`# frozen.add(4)  # AttributeError!`** -- 주석 처리된 코드입니다. 이 주석을 제거하고 실행하면 `AttributeError`가 발생합니다.\n\n**Immutable의 의미 실감하기:** 이 줄의 주석(`#`)을 제거하고 실행하면:\n```\nAttributeError: 'frozenset' object has no attribute 'add'\n```\n에러가 발생합니다. frozenset에는 `add` 메서드 자체가 **존재하지 않습니다**.\n\n**TypeError vs AttributeError:**\n- **튜플** `(1, 2, 3)[0] = 99` → `TypeError` (메서드는 있지만 **수정이 금지**됨)\n- **frozenset** `.add(4)` → `AttributeError` (메서드 **자체가 없음**)\n\n튜플은 `__getitem__`은 있지만 `__setitem__`이 수정을 거부하는 반면, frozenset은 아예 `add` 메서드를 정의하지 않습니다. 접근 방식은 다르지만 결과는 같습니다: **내용을 변경할 수 없습니다**.\n\n**frozenset에 없는 메서드들:**\n`add`, `remove`, `discard`, `pop`, `clear`, `update`, `intersection_update`, `difference_update`, `symmetric_difference_update`\n\n**frozenset에 있는 메서드들 (읽기 전용):**\n`union` (`|`), `intersection` (`&`), `difference` (`-`), `symmetric_difference` (`^`), `issubset`, `issuperset`, `isdisjoint`, `copy`\n\n**이 레슨의 핵심 요약:**\n1. **세트는 Mutable** -- `add()`, `discard()`, `remove()`로 내용 수정 가능\n2. **수정해도 id 동일** -- 같은 객체를 제자리에서 수정 (Mutable의 증거)\n3. **discard vs remove** -- 없는 요소 삭제 시 discard는 안전, remove는 KeyError\n4. **frozenset** -- 세트의 Immutable 버전, 딕셔너리 키로 사용 가능\n5. **앨리어싱 주의** -- `b = a` 후 `a.add(x)` 하면 b도 변경됨\n\n**비유:** frozenset은 이름 그대로 '얼린 세트'입니다. 냉동된 음식처럼 현재 상태가 그대로 보존되며, 녹이지 않는 한(= 새 객체를 만들지 않는 한) 바꿀 수 없습니다.\n\n**실행 순서**: 주석이므로 실제 실행 안 됨 → 프로그램 종료",
         "visualizationType": "terminal",
         "code": "# frozen.add(4)  # AttributeError!"
       }

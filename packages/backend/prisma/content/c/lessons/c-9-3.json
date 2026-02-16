@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 전처리기에게 `stdio.h` 파일 내용을 여기에 포함하라고 지시합니다.",
+        "explanation": "**`#include <stdio.h>`**\n\n`printf` 함수를 사용하기 위해 전처리기에게 `stdio.h` 파일 내용을 여기에 포함하라고 지시합니다.\n\n이 레슨에서는 **조건부 컴파일(Conditional Compilation)**을 배웁니다.\n일반적인 `if`문은 **실행 시간(runtime)**에 조건을 판단하지만, `#ifdef`와 `#if`는 **컴파일 전(compile-time)**에 전처리기가 코드를 포함하거나 제외합니다.\n\n**핵심 차이**:\n- `if (condition)`: 조건과 관계없이 **모든 코드가 실행 파일에 포함**됨. 실행할 때 조건 판단.\n- `#ifdef MACRO`: 조건이 거짓이면 **코드 자체가 사라짐**. 실행 파일에 아예 존재하지 않음.\n\n**비유**: `if`문은 집 안에 방이 있지만 문을 잠근 것이고, `#ifdef`는 아예 그 방을 짓지 않는 것입니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,13 +16,13 @@
       },
       {
         "title": "컴파일 조건 스위치 정의",
-        "explanation": "**`#define DEBUG_MODE 1`**\n\n`DEBUG_MODE` 라는 매크로를 `1`로 정의합니다.\n이 정의는 아래의 `#ifdef`와 `#if` 지시문이 어떤 코드를 컴파일에 포함할지 결정하는 '스위치' 역할을 합니다.",
+        "explanation": "**`#define DEBUG_MODE 1`**\n\n`DEBUG_MODE`라는 매크로를 `1`로 정의합니다.\n이 매크로는 아래의 `#ifdef`와 `#if` 지시문이 어떤 코드를 컴파일에 포함할지 결정하는 **'스위치'** 역할을 합니다.\n\n**조건부 컴파일이 필요한 이유**:\n실제 소프트웨어 개발에서는 하나의 소스 코드로 여러 버전을 만들어야 합니다:\n- **디버그 빌드**: 로그 출력, 변수 검사, 느리지만 안전한 검증 코드 포함\n- **릴리즈 빌드**: 성능 최적화, 디버그 코드 제거, 최종 사용자에게 배포\n\n이 값을 `0`으로 바꾸거나 `#define DEBUG_MODE` 줄을 삭제하면, 아래의 디버그 코드가 **컴파일 자체에서 제외**됩니다.\n코드를 일일이 주석 처리할 필요 없이, 매크로 한 줄로 동작 모드를 전환할 수 있습니다.\n\n**실무 팁**: 실무에서는 소스 코드를 수정하지 않고 컴파일 명령어에서 `-DDEBUG_MODE=1` 옵션으로 매크로를 정의하는 경우가 더 많습니다.",
         "visualizationType": "cMemory",
         "code": "#define DEBUG_MODE 1"
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() { ... }`**\n\n프로그램의 실행 시작점입니다.",
+        "explanation": "**`int main() {`**\n\n프로그램의 실행 시작점입니다.\n\n이 시점에서 전처리기는 이미 다음 작업을 완료했습니다:\n1. `stdio.h` 헤더 내용 삽입\n2. `DEBUG_MODE`를 `1`로 정의\n3. `#ifdef` / `#if` 조건에 따라 코드를 포함하거나 제거\n\n**중요한 점**: 컴파일러가 `main` 함수를 볼 때는, 전처리기가 이미 조건부 코드를 정리한 **최종 버전**의 코드를 받습니다.\n컴파일러는 `#ifdef`라는 지시문을 이해하지 못합니다. 그것은 전처리기의 영역이기 때문입니다.\n\n**비유**: 편집장(전처리기)이 원고를 검토하여 불필요한 부분을 삭제한 후, 최종 원고만 인쇄소(컴파일러)에 보내는 것과 같습니다.\n인쇄소는 삭제된 부분이 원래 있었는지조차 모릅니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -36,7 +36,7 @@
       },
       {
         "title": "첫 번째 출력",
-        "explanation": "**`printf(\"Program Start\\n\");`**\n\n이 코드는 조건과 상관없이 항상 컴파일되고 실행됩니다.",
+        "explanation": "**`printf(\"Program Start\\n\");`**\n\n이 코드는 어떤 `#ifdef`나 `#if` 블록에도 속하지 않으므로, 조건과 **상관없이 항상** 컴파일되고 실행됩니다.\n\n화면에 `\"Program Start\"`가 출력됩니다.\n\n**조건부 코드 vs 무조건 코드**:\n- 조건부 코드: `#ifdef ... #endif` 사이에 있는 코드. 매크로 정의에 따라 포함되거나 제외됨.\n- 무조건 코드: 이 줄처럼 어떤 전처리 조건에도 감싸여 있지 않은 코드. 항상 컴파일됨.\n\n프로그램의 **핵심 로직**은 무조건 코드에 넣고, **디버깅이나 플랫폼별 코드**만 조건부로 감싸는 것이 올바른 사용법입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Program Start\\n\");",
         "stack": [],
@@ -44,7 +44,7 @@
       },
       {
         "title": "조건부 컴파일 1: #ifdef",
-        "explanation": "**`#ifdef DEBUG_MODE`**\n\n전처리기가 `DEBUG_MODE`라는 매크로가 **정의되었는지** 확인합니다.\n현재 파일 위쪽에서 정의했으므로, 조건은 참(true)이 됩니다.\n따라서 `#ifdef`와 `#endif` 사이의 코드가 컴파일에 포함됩니다.",
+        "explanation": "**`#ifdef DEBUG_MODE`**\n\n전처리기가 `DEBUG_MODE`라는 매크로가 **정의되었는지(defined)** 확인합니다.\n\n**`#ifdef`의 동작 원리**:\n- `DEBUG_MODE`가 어떤 값으로든 `#define`되어 있으면 → **참(true)** → 아래 코드를 유지\n- `DEBUG_MODE`가 정의되지 않았으면 → **거짓(false)** → 아래 코드를 삭제\n\n**주의: 값이 아닌 '존재 여부'만 확인합니다!**\n`#define DEBUG_MODE 0`으로 정의해도, `#ifdef DEBUG_MODE`는 **참**입니다.\n`0`이라는 값이 있든 없든, `DEBUG_MODE`가 **정의되었다**는 사실만 확인하기 때문입니다.\n\n현재 파일 위쪽에서 `#define DEBUG_MODE 1`로 정의했으므로 조건은 참입니다.\n따라서 `#ifdef`와 `#endif` 사이의 디버그 코드가 컴파일에 **포함**됩니다.\n\n**반대 명령어**: `#ifndef`(if not defined)는 매크로가 정의되지 **않았을** 때 참이 됩니다.\n이것은 **헤더 가드(Header Guard)**에서 주로 사용됩니다.",
         "visualizationType": "cMemory",
         "code": "#ifdef DEBUG_MODE",
         "highlightOffset": [
@@ -54,14 +54,14 @@
       },
       {
         "title": "디버그 코드 실행",
-        "explanation": "**`printf(\"[DEBUG] Variable x checking...\\n\");`**\n\n`#ifdef` 조건이 참이었기 때문에 이 줄은 컴파일러에게 전달되어 실행됩니다.\n디버깅 목적으로만 필요한 코드를 넣기에 유용합니다.",
+        "explanation": "**`printf(\"[DEBUG] Variable x checking...\\n\");`**\n\n`#ifdef DEBUG_MODE` 조건이 **참**이었기 때문에, 전처리기가 이 줄을 **유지**했고 컴파일러에게 전달되어 실행됩니다.\n화면에 `\"[DEBUG] Variable x checking...\"`이 출력됩니다.\n\n**만약 `DEBUG_MODE`를 정의하지 않았다면?**\n이 줄은 전처리 단계에서 **완전히 삭제**되어, 컴파일러가 이 코드를 보지도 못합니다.\n실행 파일에도 포함되지 않으므로, **프로그램 크기도 줄어들고 실행 속도에도 영향이 없습니다**.\n\n**`if`문과의 차이 (다시 한번 강조)**:\n```c\nif (DEBUG_MODE) { printf(\"[DEBUG]...\"); }  // 코드는 항상 존재, 실행만 건너뜀\n#ifdef DEBUG_MODE                          // 코드 자체가 사라짐\n```\n`if`문은 조건이 거짓이어도 코드가 실행 파일 안에 남아 있지만, `#ifdef`로 제외된 코드는 **흔적도 없이** 사라집니다.\n\n**실무 활용**: 디버그 로그, 성능 측정 코드, 단위 테스트 헬퍼 등을 넣기에 유용합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"[DEBUG] Variable x checking...\\n\");",
         "stdout": "Program Start\n[DEBUG] Variable x checking..."
       },
       {
         "title": "조건부 컴파일 2: #if",
-        "explanation": "**`#if DEBUG_MODE == 0`**\n\n전처리기가 `DEBUG_MODE`의 **값**을 직접 비교합니다.\n`1 == 0` 은 거짓(false)이므로, 이 `#if`와 `#endif` 사이의 코드는 전처리기 단계에서 **완전히 삭제**됩니다.\n컴파일러는 이 코드를 아예 보지도 못합니다.",
+        "explanation": "**`#if DEBUG_MODE == 0`**\n\n이번에는 `#ifdef`가 아니라 **`#if`**를 사용합니다.\n`#if`는 매크로의 **값(value)**을 직접 비교할 수 있는 더 강력한 조건 지시문입니다.\n\n**`#ifdef` vs `#if`의 차이**:\n- `#ifdef MACRO`: MACRO가 **정의되었는지** 여부만 확인 (참/거짓)\n- `#if 표현식`: 전처리기가 표현식의 **값을 계산**하여 참/거짓 판단\n\n**현재 조건 평가**:\n`DEBUG_MODE`는 `1`로 정의되었으므로, `#if 1 == 0`이 됩니다.\n`1 == 0`은 **거짓(false)**이므로, 이 `#if`와 `#endif` 사이의 코드는 전처리 단계에서 **완전히 삭제**됩니다.\n`printf(\"Release Mode\\n\");`는 컴파일러가 **아예 보지 못합니다**.\n\n**비유**: 건물 설계 도면에서 '예산이 0이면 수영장을 짓는다'라고 적혀 있는데, 예산이 1이므로 수영장 부분이 도면에서 지워지는 것과 같습니다.\n건설팀(컴파일러)은 수영장 계획이 있었다는 것조차 모릅니다.\n\n**`#if`로 가능한 다양한 비교**: `#if VERSION > 2`, `#if defined(A) && !defined(B)` 등 복잡한 조건도 사용할 수 있습니다.",
         "visualizationType": "cMemory",
         "code": "#if DEBUG_MODE == 0",
         "highlightOffset": [
@@ -71,14 +71,14 @@
       },
       {
         "title": "마지막 출력",
-        "explanation": "**`printf(\"Program End\\n\");`**\n\n조건과 상관없이 항상 실행되는 마지막 코드입니다.",
+        "explanation": "**`printf(\"Program End\\n\");`**\n\n이 코드는 어떤 조건부 블록에도 속하지 않으므로, **항상** 컴파일되고 실행됩니다.\n화면에 `\"Program End\"`가 출력됩니다.\n\n**최종 출력 결과 분석**:\n1. `\"Program Start\"` — 무조건 코드, 항상 실행\n2. `\"[DEBUG] Variable x checking...\"` — `#ifdef DEBUG_MODE` 조건 참, 포함됨\n3. ~~`\"Release Mode\"`~~ — `#if DEBUG_MODE == 0` 조건 거짓, **삭제됨**\n4. `\"Program End\"` — 무조건 코드, 항상 실행\n\n만약 `#define DEBUG_MODE 1`을 `#define DEBUG_MODE 0`으로 바꾸면:\n- `#ifdef DEBUG_MODE`: 여전히 **참** (값이 0이어도 '정의됨'이므로)\n- `#if DEBUG_MODE == 0`: **참**으로 바뀜 (0 == 0)\n- 출력: `Program Start` → `[DEBUG]...` → `Release Mode` → `Program End`\n\n**완전한 릴리즈 빌드를 원한다면** `#define DEBUG_MODE` 줄 자체를 삭제하거나 `#undef DEBUG_MODE`로 정의를 해제해야 합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Program End\\n\");",
         "stdout": "Program Start\n[DEBUG] Variable x checking...\nProgram End"
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`**\n\n모든 작업을 성공적으로 마쳤음을 알리고 프로그램을 종료합니다.",
+        "explanation": "**`return 0;`**\n\n프로그램이 정상적으로 종료됩니다.\n\n**조건부 컴파일의 실무 활용 정리**:\n\n1. **디버그/릴리즈 빌드 분리**: 디버그 로그, 성능 측정, 메모리 검사 코드를 `#ifdef DEBUG`로 감싸기\n2. **플랫폼별 코드**: `#ifdef _WIN32` (Windows), `#ifdef __linux__` (Linux), `#ifdef __APPLE__` (macOS)\n3. **헤더 가드**: `#ifndef HEADER_H` / `#define HEADER_H` / `#endif` — 헤더 중복 포함 방지\n4. **기능 토글**: 특정 기능을 매크로로 켜고 끄기 (`#ifdef FEATURE_ENCRYPTION`)\n\n**런타임 `if`문과의 최종 비교**:\n- `if`문: 실행 시간에 조건 판단, 코드는 항상 실행 파일에 존재, 약간의 실행 비용\n- `#ifdef`: 컴파일 전에 코드를 포함/제외, 제외된 코드는 실행 파일에 **아예 없음**, 실행 비용 **제로**\n\n하나의 소스 코드로 디버그용, 릴리즈용, OS별 실행 파일을 따로 만들 수 있는 것이 조건부 컴파일의 진정한 힘입니다.",
         "visualizationType": "cMemory",
         "code": "return 0;"
       }

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "모듈 가져오기 (import)",
-        "explanation": "**`import math`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n`import` 키워드로 **수학 관련 함수와 상수**가 들어있는 `math` 모듈을 통째로 가져옵니다.\n\n**모듈이란?** 다른 Python 파일 (`.py`)에 정의된 함수, 클래스, 변수 등을 재사용할 수 있게 해주는 **코드 라이브러리**입니다.\n\n**사용 방법**: `math.함수명` 또는 `math.변수명` 형식으로 모듈의 기능에 접근합니다.\n\n**왜 이 순서인가?** 모듈을 먼저 import해야 아래에서 사용할 수 있습니다.\n\n**실행 순서**: import math → math 모듈 로드 → line 4",
+        "explanation": "**`import math`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n`import` 키워드로 **수학 관련 함수와 상수**가 들어있는 `math` 모듈을 **통째로** 가져옵니다.\n\n**모듈(Module)이란?** 다른 Python 파일(`.py`)에 정의된 함수, 클래스, 변수 등을 재사용할 수 있게 해주는 **코드 라이브러리**입니다. 비유하자면, 다른 사람이 만들어둔 **도구 상자**를 빌려 쓰는 것입니다. `math`는 수학 도구 상자, `random`은 랜덤 도구 상자입니다.\n\n**사용 방법**: `math.함수명` 또는 `math.변수명` 형식으로 접근합니다. `math.`이라는 접두사가 **반드시** 필요합니다! 이 접두사가 \"이 함수는 math 모듈에서 가져온 것\"이라는 출처를 명확하게 해줍니다.\n\n**Python 내부 동작**: `import math`가 실행되면:\n1. Python이 `sys.path`에 등록된 경로들에서 `math` 모듈을 검색합니다\n2. 모듈 파일을 찾으면 **한 번만** 로드하고 실행합니다 (두 번째 import부터는 캐시 사용)\n3. 모듈 객체를 생성하고, 현재 네임스페이스에 `math`라는 이름으로 바인딩합니다\n4. `sys.modules['math']`에 캐싱됩니다\n\n**주의**: `import`는 보통 파일의 **맨 위**에 모아서 작성하는 것이 관례입니다(PEP 8). 코드 중간에 넣어도 동작하지만 가독성이 떨어집니다.\n\n**실행 순서**: import math → math 모듈 검색 + 로드 → 네임스페이스에 등록 → line 4",
         "visualizationType": "pythonMemory",
         "code": "import math",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "모듈의 상수 사용",
-        "explanation": "**`print(math.pi)`**\n\n`math` 모듈 안에 정의된 상수 `pi`(원주율 ≈ 3.14159...)에 접근하여 출력합니다.\n\n**왜 math.pi인가?** `math` 모듈의 **네임스페이스** 안에 `pi`가 정의되어 있기 때문에, `math.` 접두사를 붙여야 합니다.\n\n**실행 순서**: math.pi 접근 → 3.141592... 읽기 → print 실행 → line 5",
+        "explanation": "**`print(math.pi)`**\n\n`math` 모듈 안에 정의된 상수 `pi`(원주율, 약 3.141592653589793)에 접근하여 출력합니다.\n\n**왜 `math.pi`인가?** `pi`는 `math` 모듈의 **네임스페이스(namespace)** 안에 존재하기 때문에, `math.` 접두사를 반드시 붙여야 합니다.\n\n비유: 도구 상자(math 모듈) 안에 있는 특정 도구(pi)를 꺼내려면, \"math 상자에서 pi를 꺼내\"라고 명확히 지정해야 합니다. 그냥 `pi`라고만 하면 Python은 현재 스코프에서 `pi`를 찾고, 없으면 `NameError`가 발생합니다.\n\n**네임스페이스의 장점**: 만약 내 코드에도 `pi = 3.14`라는 변수가 있다면? `math.pi`와 `pi`는 **서로 다른 네임스페이스**에 있으므로 충돌하지 않습니다! 이것이 `import math` 방식의 큰 장점입니다.\n\n**Python 내부 동작**: `math.pi`에 접근하면 Python은 `math` 모듈 객체의 `__dict__` 딕셔너리에서 `'pi'` 키를 조회하여 값을 반환합니다. `math.pi`는 C 확장 모듈에서 정의된 `float` 상수입니다.\n\n**실행 순서**: math.pi 접근 → 3.141592653589793 읽기 → print 실행 → line 5",
         "visualizationType": "pythonMemory",
         "code": "print(math.pi)",
         "pythonMemoryState": {
@@ -57,7 +57,7 @@
       },
       {
         "title": "모듈의 함수 사용",
-        "explanation": "**`print(math.sqrt(16))`**\n\n`math` 모듈의 `sqrt`(제곱근) 함수를 호출하여 16의 제곱근인 `4.0`을 계산하고 출력합니다.\n\n**실행 순서**: math.sqrt(16) 호출 → 4.0 반환 → print(4.0) → line 8",
+        "explanation": "**`print(math.sqrt(16))`**\n\n`math` 모듈의 `sqrt` 함수(Square Root, 제곱근)를 호출하여 16의 제곱근인 `4.0`을 계산하고 출력합니다.\n\n**왜 결과가 `4`가 아니라 `4.0`인가?** `math.sqrt()`는 항상 **float(실수)** 타입을 반환합니다. 정수 결과가 나오더라도 `4.0`처럼 소수점이 붙습니다.\n\n**`math` 모듈의 유용한 함수들:**\n- `math.sqrt(x)` → x의 제곱근\n- `math.ceil(x)` → 올림 (예: `math.ceil(3.1)` → `4`)\n- `math.floor(x)` → 내림 (예: `math.floor(3.9)` → `3`)\n- `math.pow(x, y)` → x의 y제곱\n- `math.log(x)` → 자연로그\n\n**Python 내부 동작**: `math.sqrt`는 실제로 C 언어로 구현된 함수입니다. Python의 `math` 모듈은 C 표준 라이브러리의 수학 함수들을 감싼(wrapping) 것이므로, 순수 Python보다 **매우 빠릅니다**.\n\n**주의**: `math.sqrt(-1)`은 `ValueError`가 발생합니다! 음수의 제곱근이 필요하면 `cmath` (complex math) 모듈을 사용하세요.\n\n**실행 순서**: math.sqrt(16) 호출 → C 라이브러리에서 계산 → 4.0 반환 → print(4.0) → line 8",
         "visualizationType": "pythonMemory",
         "code": "print(math.sqrt(16))",
         "pythonMemoryState": {
@@ -82,7 +82,7 @@
       },
       {
         "title": "특정 함수만 가져오기 (from)",
-        "explanation": "**`from random import randint`**\n\n**from import**: `random` 모듈에서 `randint` 함수**만** 직접 가져옵니다.\n이렇게 가져온 함수는 **모듈 이름 없이 바로** 사용할 수 있습니다.\n\n**import vs from import**:\n- `import math` → `math.sqrt()` (모듈명 필요)\n- `from math import sqrt` → `sqrt()` (바로 사용)\n\n**언제 사용하는가?** 특정 함수 몇 개만 자주 쓸 때 편리합니다.\n\n**실행 순서**: from random import randint → randint 함수 로드 → line 9",
+        "explanation": "**`from random import randint`**\n\n**from ... import ... 문법**: `random` 모듈에서 `randint` 함수**만** 골라서 현재 네임스페이스로 직접 가져옵니다.\n\n**핵심 차이 -- `import` vs `from import`:**\n- `import math` → `math.sqrt()` (모듈명 접두사 **필요**)\n- `from math import sqrt` → `sqrt()` (접두사 **불필요**, 바로 사용)\n\n비유: `import math`는 도구 상자(math)를 통째로 가져와서, 쓸 때마다 \"math 상자에서 꺼내\"라고 하는 것입니다. `from random import randint`는 상자에서 **특정 도구(randint)만 꺼내** 내 작업대에 올려놓는 것입니다. 이제 바로 손에 잡히니까 접두사 없이 사용할 수 있습니다.\n\n**언제 사용하는가?**\n- 특정 함수 1~2개만 자주 사용할 때 (타이핑 절약)\n- `from math import sqrt, pi` 처럼 여러 개를 한 번에 가져올 수도 있음\n\n**Python 내부 동작**: `from random import randint`가 실행되면:\n1. `random` 모듈 전체를 먼저 로드합니다 (내부적으로)\n2. 그 중 `randint` 함수 객체만 현재 네임스페이스에 바인딩합니다\n3. `random` 모듈 자체는 네임스페이스에 추가되지 않습니다\n- 따라서 `random.choice()`처럼 다른 함수는 접근할 수 없습니다!\n\n**주의**: `from random import *`처럼 별표(`*`)를 쓰면 모듈의 **모든 것**을 가져옵니다. 편리해 보이지만, 이름 충돌 위험이 있어서 **절대 권장하지 않습니다**!\n\n**실행 순서**: from random import randint → random 모듈 로드 → randint만 현재 네임스페이스에 등록 → line 9",
         "visualizationType": "pythonMemory",
         "code": "from random import randint",
         "pythonMemoryState": {
@@ -115,7 +115,7 @@
       },
       {
         "title": "가져온 함수 바로 사용",
-        "explanation": "**`print(randint(1, 10))`**\n\n**from import의 장점**: `random.` 접두사 없이 `randint` 함수를 바로 호출할 수 있습니다.\n1과 10 사이의 임의의 정수를 뽑아 출력합니다.\n\n**실행 순서**: randint(1, 10) 호출 → 랜덤 정수 반환 (예: 7) → print 실행 → line 12",
+        "explanation": "**`print(randint(1, 10))`**\n\n**from import의 장점 확인**: `random.randint(1, 10)`이 아닌, 접두사 없이 바로 `randint(1, 10)`으로 호출할 수 있습니다! `from random import randint`로 직접 가져왔기 때문입니다.\n\n**`randint(1, 10)`의 의미**: 1 이상 10 **이하**의 임의의 정수를 하나 반환합니다. 실행할 때마다 결과가 달라집니다! (여기서는 예시로 7이 나왔다고 가정합니다.)\n\n**주의 -- `randint`의 범위**: `randint(a, b)`는 `a`와 `b`를 **모두 포함**합니다. 즉 `randint(1, 10)`은 1, 2, 3, ..., 10 중 하나입니다. Python의 `range(1, 10)`이 10을 포함하지 않는 것과 다르니 주의하세요!\n\n**Python 내부 동작**: `randint()`는 내부적으로 의사 난수 생성기(Mersenne Twister 알고리즘)를 사용합니다. 완전한 무작위가 아니라 시드(seed) 값에 따라 결정되는 수열이지만, 일반적인 용도에는 충분합니다. 암호학적 보안이 필요하면 `secrets` 모듈을 사용하세요.\n\n**실행 순서**: randint(1, 10) 호출 → 랜덤 정수 반환(예: 7) → print(7) 실행 → line 12",
         "visualizationType": "pythonMemory",
         "code": "print(randint(1, 10))",
         "pythonMemoryState": {
@@ -151,7 +151,7 @@
       },
       {
         "title": "별명 붙여 가져오기 (as)",
-        "explanation": "**`import datetime as dt`**\n\n**별명(Alias)**: `as` 키워드로 모듈에 **짧은 별명**을 붙일 수 있습니다.\n\n**언제 사용하는가?**\n- 모듈 이름이 길 때 (예: `datetime` → `dt`)\n- 자주 쓰는 라이브러리 관례 (예: `numpy as np`, `pandas as pd`)\n- 이름 충돌 방지\n\n이제 `datetime` 대신 `dt`라는 이름으로 모듈을 사용합니다.\n\n**실행 순서**: import datetime as dt → datetime 모듈 로드 → dt로 별명 설정 → line 13",
+        "explanation": "**`import datetime as dt`**\n\n`as` 키워드를 사용하여 `datetime` 모듈에 **짧은 별명(Alias) `dt`**를 붙여서 가져옵니다.\n\n**별명(Alias)이란?** 원래 이름 대신 사용할 수 있는 **대체 이름**입니다. 비유하자면, 친구 이름이 \"김동현\"인데 매번 부르기 귀찮으니까 \"동동이\"라고 부르는 것과 같습니다. `datetime`이 너무 길어서 `dt`라는 짧은 이름으로 부르겠다는 뜻입니다.\n\n**언제 사용하는가?**\n- 모듈 이름이 **길 때**: `datetime` → `dt` (8글자 → 2글자!)\n- **업계 관례**를 따를 때: `import numpy as np`, `import pandas as pd`, `import matplotlib.pyplot as plt`\n- **이름 충돌을 방지**할 때: 내 코드에 이미 같은 이름의 변수가 있는 경우\n\n**Python 내부 동작**: `import datetime as dt`가 실행되면:\n1. Python이 `datetime` 모듈을 `sys.path`에서 검색하고 로드합니다\n2. 모듈 객체를 생성합니다\n3. 하지만 현재 네임스페이스에는 `datetime`이 아닌 **`dt`라는 이름**으로 바인딩합니다\n4. 따라서 `datetime.xxx`는 사용 불가능하고, `dt.xxx`로만 접근해야 합니다!\n\n**주의**: 별명을 붙이면 **원래 이름은 사용할 수 없습니다!** `dt.datetime`은 되지만, `datetime.datetime`은 `NameError`가 발생합니다. 별명은 원래 이름을 **완전히 대체**합니다.\n\n**실행 순서**: import datetime as dt → datetime 모듈 검색 + 로드 → 네임스페이스에 `dt`로 등록 (datetime 이름은 등록 안 됨) → line 13",
         "visualizationType": "pythonMemory",
         "code": "import datetime as dt",
         "pythonMemoryState": {
@@ -194,7 +194,7 @@
       },
       {
         "title": "별명으로 모듈 사용",
-        "explanation": "**`now = dt.datetime.now()`**\n\n별명 `dt`를 사용하여 `datetime` 모듈 안의 `datetime` 클래스의 `now()` 메서드를 호출합니다.\n현재 날짜와 시간이 `now` 변수에 할당됩니다.\n\n**왜 dt.datetime인가?** `datetime` **모듈** 안에 `datetime` **클래스**가 있기 때문입니다.\n\n**실행 순서**: dt.datetime.now() 호출 → 현재 시각 객체 생성 → now 변수에 할당 → line 14",
+        "explanation": "**`now = dt.datetime.now()`**\n\n별명 `dt`를 사용하여 `datetime` 모듈 안의 `datetime` 클래스의 `now()` 메서드를 호출합니다. 현재 컴퓨터의 **날짜와 시간 정보**가 담긴 `datetime` 객체가 생성되어 `now` 변수에 할당됩니다.\n\n**왜 `dt.datetime`인가?** Python에서 혼동하기 쉬운 부분입니다! 여기서 **두 개의 `datetime`**이 등장합니다:\n- `dt` = `datetime` **모듈** (파일/패키지)\n- `dt.datetime` = 모듈 안에 정의된 `datetime` **클래스**\n- 즉, `datetime` 모듈 안에 이름이 같은 `datetime` 클래스가 있는 것입니다!\n\n비유: \"서울시 서울역\"처럼, 시(모듈) 이름과 역(클래스) 이름이 같은 상황입니다. 그래서 `from datetime import datetime`처럼 클래스만 직접 가져오는 경우도 많습니다.\n\n**`now()` 클래스 메서드**: `datetime.now()`는 현재 시스템 시각을 읽어 `datetime` 객체를 생성하는 **클래스 메서드**입니다. 인스턴스 없이 클래스에서 직접 호출합니다.\n\n**Python 내부 동작**: `now()` 호출 시 운영체제의 시스템 시각 API를 호출하여 현재 시각 정보(년, 월, 일, 시, 분, 초, 마이크로초)를 가져온 뒤 `datetime` 객체에 담아 반환합니다.\n\n**주의**: `dt.datetime.now()`는 **로컬 시간**을 반환합니다. UTC 시간이 필요하면 `dt.datetime.utcnow()` 또는 `dt.datetime.now(dt.timezone.utc)`를 사용하세요.\n\n**실행 순서**: dt.datetime 접근 (datetime 클래스) → .now() 호출 → 시스템 시각 읽기 → datetime 객체 생성 → now 변수에 할당 → line 14",
         "visualizationType": "pythonMemory",
         "code": "now = dt.datetime.now()",
         "pythonMemoryState": {
@@ -247,7 +247,7 @@
       },
       {
         "title": "결과 출력",
-        "explanation": "**`print(now)`**\n\n`now` 변수에 저장된 현재 시각을 출력합니다.\n\n**import 정리**:\n- `import math` → `math.pi`, `math.sqrt()`\n- `from random import randint` → `randint()` (바로 사용)\n- `import datetime as dt` → `dt.datetime.now()`\n\n**실행 순서**: print(now) 실행 → 시각 출력 → 프로그램 종료",
+        "explanation": "**`print(now)`**\n\n`now` 변수에 저장된 현재 시각 객체를 출력합니다. `2024-01-15 10:30:00`과 같은 형식으로 표시됩니다.\n\n**왜 이렇게 예쁘게 출력되는가?** `datetime` 객체는 **`__str__` 매직 메서드**가 정의되어 있어서, `print()`로 출력할 때 `YYYY-MM-DD HH:MM:SS` 형식의 문자열로 자동 변환됩니다. 이것이 Python 객체의 강력한 기능입니다.\n\n**다른 형식으로 출력하고 싶다면?** `strftime()` 메서드를 사용합니다:\n- `now.strftime(\"%Y년 %m월 %d일\")` → \"2024년 01월 15일\"\n- `now.strftime(\"%H시 %M분\")` → \"10시 30분\"\n\n**이 레슨의 핵심 정리 -- 3가지 import 방식**:\n- `import math` → `math.pi`, `math.sqrt()` (모듈명 접두사 필요)\n- `from random import randint` → `randint()` (바로 사용, 접두사 불필요)\n- `import datetime as dt` → `dt.datetime.now()` (짧은 별명 사용)\n\n**어떤 방식을 쓸까?**\n- 모듈의 여러 기능을 쓸 때 → `import 모듈` 또는 `import 모듈 as 별명`\n- 특정 기능 1~2개만 쓸 때 → `from 모듈 import 기능`\n- `from 모듈 import *`는 **절대 쓰지 마세요!** (이름 충돌 위험)\n\n**실행 순서**: now 읽기 → now.__str__() 자동 호출 → \"2024-01-15 10:30:00\" 문자열 생성 → print 실행 → 프로그램 종료",
         "visualizationType": "pythonMemory",
         "code": "print(now)",
         "pythonMemoryState": {

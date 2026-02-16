@@ -21,6 +21,7 @@ import { ThisBindingView } from './javascript/components/ThisBindingView';
 import { PrototypeChainView } from './javascript/components/PrototypeChainView';
 import { PromiseView } from './javascript/components/PromiseView';
 import { TerminalStepView } from './shared/components/TerminalStepView';
+import { AlgorithmView } from './algorithm/AlgorithmView';
 import { ArrowLayer } from './c/components/ArrowLayer';
 import { createAdapter } from './shared/adapters/registry';
 import type { FlowTheme } from './shared/styles';
@@ -81,6 +82,7 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     (vizType === 'thisBinding' && (step as any).thisState) ||
     (vizType === 'prototype' && (step as any).prototypeState) ||
     (vizType === 'promise' && (step as any).promiseState) ||
+    (vizType === 'algorithm' && (step as any).algorithmState) ||
     vizType === 'terminal';
 
   // ========================================================
@@ -233,6 +235,17 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
         <PromiseView
           promiseState={(step as any).promiseState}
           prevPromiseState={(prevStep as any)?.promiseState}
+        />
+      </div>
+    );
+  }
+
+  if (vizType === 'algorithm' && (step as any).algorithmState) {
+    return (
+      <div className={className}>
+        <AlgorithmView
+          algorithmState={(step as any).algorithmState}
+          prevAlgorithmState={(prevStep as any)?.algorithmState}
         />
       </div>
     );

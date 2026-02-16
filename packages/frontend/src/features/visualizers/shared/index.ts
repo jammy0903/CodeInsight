@@ -15,7 +15,6 @@ export {
   FLOW_SIZES,
   FLOW_ANIMATION,
   getBoxStyle,
-  getFrameStyle,
   getArrowStyle,
   type FlowTheme,
 } from './styles';

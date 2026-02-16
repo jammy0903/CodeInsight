@@ -1,0 +1,230 @@
+{
+  "lessonId": "py-14-1",
+  "title": "리스트 컴프리헨션",
+  "concept": "리스트 컴프리헨션은 for문을 한 줄로 압축한 파이썬의 핵심 문법이다",
+  "content": {
+    "code": "numbers = [1, 2, 3, 4, 5]\n\nsquares = [x**2 for x in numbers]\nprint(squares)\n\nevens = [x for x in numbers if x % 2 == 0]\nprint(evens)\n\nwords = [\"hello\", \"world\"]\nupper = [w.upper() for w in words]\nprint(upper)",
+    "steps": [
+      {
+        "title": "원본 리스트 생성",
+        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- 정수 5개를 담은 리스트 객체를 생성하고 `numbers`라는 이름표를 붙입니다.\n\n이 리스트는 앞으로 배울 **리스트 컴프리헨션**의 원본 데이터가 됩니다. 리스트 컴프리헨션이란, 기존 리스트를 **변환하거나 필터링**하여 **새 리스트**를 만드는 파이썬 고유의 간결한 문법입니다.\n\n**비유:** 마치 공장의 원재료 창고와 같습니다. 원재료(numbers)를 넣으면, 컨베이어 벨트(컴프리헨션)가 각 재료를 하나씩 꺼내 가공해서 새로운 제품(새 리스트)을 만들어 냅니다.\n\n**왜 컴프리헨션을 배우는가?** 일반 for문으로 새 리스트를 만들려면 4줄이 필요합니다:\n```python\nresult = []\nfor x in numbers:\n    result.append(x**2)\n```\n컴프리헨션은 이 패턴을 **단 1줄**로 줄여줍니다: `[x**2 for x in numbers]`\n\n**Python 내부 동작:** `[1, 2, 3, 4, 5]` 리터럴이 평가되면, 힙(heap) 메모리에 `list` 객체가 할당됩니다. 내부적으로 리스트는 각 정수 객체의 메모리 주소를 담는 배열입니다. `numbers`라는 이름이 전역 네임스페이스 딕셔너리에 등록되어 이 리스트 객체를 가리킵니다.\n\n**실행 순서:**\n1. 정수 객체 `1`, `2`, `3`, `4`, `5`가 메모리에 존재 (작은 정수는 캐싱됨).\n2. `list` 객체가 힙에 할당되고, 각 정수의 참조를 저장.\n3. 전역 네임스페이스에 `numbers → list 객체` 바인딩 생성.",
+        "visualizationType": "pythonMemory",
+        "code": "numbers = [1, 2, 3, 4, 5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "컴프리헨션의 원본이 될 리스트",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "기본 컴프리헨션 — 제곱 리스트",
+        "explanation": "**`squares = [x**2 for x in numbers]`** -- `numbers`의 각 요소를 제곱하여 새 리스트를 생성합니다.\n\n**리스트 컴프리헨션 문법:** `[표현식 for 변수 in 이터러블]`\n\n이 문법을 읽는 방법은 \"numbers의 각 x에 대해, x**2를 계산하여 모아라\"입니다. 영어로 읽으면 \"x squared, for x in numbers\"로, 수학의 집합 표기법 `{x² | x ∈ numbers}`과 매우 유사합니다.\n\n**비유:** 컨베이어 벨트 위에 숫자가 하나씩 올라오고, 각 숫자가 **제곱 기계**를 통과하면 변환된 값이 새 상자에 담기는 것과 같습니다. 원래 벨트(numbers)는 그대로이고, 새 상자(squares)만 만들어집니다.\n\n**동작 과정** (내부적으로 for문처럼 순차 실행):\n1. `x = 1` → `1**2` = `1`\n2. `x = 2` → `2**2` = `4`\n3. `x = 3` → `3**2` = `9`\n4. `x = 4` → `4**2` = `16`\n5. `x = 5` → `5**2` = `25`\n6. 결과: `[1, 4, 9, 16, 25]`\n\n**Python 내부 동작:** 컴프리헨션은 내부적으로 새 `list` 객체를 먼저 생성하고, 이터레이터 프로토콜(`__iter__`, `__next__`)을 사용해 `numbers`를 순회합니다. 각 반복에서 표현식 `x**2`를 평가하고 결과를 새 리스트에 `append`합니다. 일반 for문 + append보다 약 10-30% 빠른데, 바이트코드 레벨에서 `LIST_APPEND` 명령어를 직접 사용하기 때문입니다.\n\n**주의:** `x`는 컴프리헨션 내부의 임시 변수입니다. Python 3에서 리스트 컴프리헨션은 **자체 스코프**를 가지므로, 외부에 같은 이름의 변수가 있어도 영향을 주지 않습니다.\n\n**실행 순서:**\n1. 빈 리스트 객체 생성.\n2. `numbers`에서 이터레이터 획득.\n3. 각 요소에 대해 `x**2` 계산 후 새 리스트에 추가.\n4. 완성된 리스트를 `squares` 이름에 바인딩.",
+        "visualizationType": "pythonMemory",
+        "code": "squares = [x**2 for x in numbers]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "[x**2 for x in numbers] → 각 요소를 제곱",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "제곱 리스트 출력",
+        "explanation": "**`print(squares)`** -- `squares`가 가리키는 리스트 객체 `[1, 4, 9, 16, 25]`를 화면에 출력합니다.\n\n여기서 핵심적으로 이해해야 할 점은 **원본 리스트가 전혀 변경되지 않았다**는 것입니다.\n- `numbers`: `[1, 2, 3, 4, 5]` -- 원본 그대로\n- `squares`: `[1, 4, 9, 16, 25]` -- 완전히 새로운 리스트 객체\n\n**비유:** 복사기로 문서를 복사한 뒤 복사본에만 수정을 가한 것과 같습니다. 원본 문서는 건드리지 않았습니다.\n\n**Python 내부 동작:** `print()`는 `squares` 리스트의 `__repr__()` 메서드를 호출합니다. `list.__repr__()`은 각 요소의 `repr()`을 호출하고, 콤마로 구분하여 대괄호로 감싼 문자열을 생성합니다. 이 문자열이 `sys.stdout`에 출력됩니다.\n\n**컴프리헨션의 4가지 장점:**\n1. **간결함** -- 4줄짜리 for문을 1줄로 압축\n2. **가독성** -- \"무엇을 만들지\"가 명확하게 드러남\n3. **성능** -- 일반 for문 + `append`보다 약간 빠름\n4. **함수형 스타일** -- 선언적으로 결과를 기술\n\n**주의:** 컴프리헨션이 항상 좋은 것은 아닙니다. 로직이 복잡해지면 오히려 일반 for문이 더 읽기 쉽습니다. \"한 눈에 이해되는가?\"를 기준으로 판단하세요.\n\n**실행 순서:**\n1. `squares` 이름 → 리스트 객체 참조 해석.\n2. `print()` 호출 → `__repr__()` → 문자열 생성.\n3. `sys.stdout`에 출력.",
+        "visualizationType": "pythonMemory",
+        "code": "print(squares)",
+        "pythonMemoryState": {
+          "output": [
+            "[1, 4, 9, 16, 25]"
+          ],
+          "note": "원본 numbers는 변경 없음"
+        }
+      },
+      {
+        "title": "조건부 컴프리헨션 — 짝수 필터링",
+        "explanation": "**`evens = [x for x in numbers if x % 2 == 0]`** -- `numbers`에서 짝수인 요소만 골라 새 리스트를 만듭니다.\n\n**조건부 컴프리헨션 문법:** `[표현식 for 변수 in 이터러블 if 조건]`\n\n뒤에 `if` 조건을 붙이면 **조건을 만족하는 요소만** 새 리스트에 포함됩니다. 이것을 **필터링(filtering)**이라고 합니다.\n\n**비유:** 마치 체(sieve)로 쌀을 거르는 것과 같습니다. 쌀(모든 요소)을 체에 붓고, 구멍(조건)을 통과하는 것만 아래로 떨어져 모입니다. `x % 2 == 0`이라는 체를 통과한 짝수만 새 리스트에 담기는 것입니다.\n\n**동작 과정:**\n1. `x = 1` → `1 % 2 == 0`? `False` → 제외\n2. `x = 2` → `2 % 2 == 0`? `True` → **포함**\n3. `x = 3` → `3 % 2 == 0`? `False` → 제외\n4. `x = 4` → `4 % 2 == 0`? `True` → **포함**\n5. `x = 5` → `5 % 2 == 0`? `False` → 제외\n6. 결과: `[2, 4]`\n\n**Python 내부 동작:** 이전 컴프리헨션(변환)은 모든 요소에 표현식을 적용했지만, 조건부 컴프리헨션은 `if` 조건이 `True`인 요소에 대해서만 표현식을 평가하고 리스트에 추가합니다. `%` 연산자는 `int.__mod__()` 메서드를 호출하여 나머지를 계산합니다.\n\n**주의:** 조건부 컴프리헨션의 `if`는 for문 **뒤**에 위치합니다. 다음 레슨에서 배울 `if-else`는 for문 **앞**에 위치하는데, 이 두 가지를 혼동하면 `SyntaxError`가 발생합니다.\n\n**실행 순서:**\n1. 빈 리스트 객체 생성.\n2. `numbers`를 순회하면서 각 요소에 `x % 2 == 0` 조건 평가.\n3. 조건이 `True`인 요소만 새 리스트에 추가.\n4. 완성된 리스트 `[2, 4]`를 `evens`에 바인딩.",
+        "visualizationType": "pythonMemory",
+        "code": "evens = [x for x in numbers if x % 2 == 0]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "if 조건으로 짝수만 필터링",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "문자열 리스트에 메서드 적용",
+        "explanation": "**`words = [\"hello\", \"world\"]`**\n**`upper = [w.upper() for w in words]`** -- 문자열 리스트의 각 요소에 `.upper()` 메서드를 적용하여 대문자로 변환된 새 리스트를 만듭니다.\n\n컴프리헨션의 **표현식** 부분에는 단순한 산술 연산뿐만 아니라 **메서드 호출**도 사용할 수 있습니다. 이것이 컴프리헨션이 강력한 이유입니다.\n\n**비유:** 세탁소의 컨베이어 벨트를 상상해 보세요. 더러운 옷(소문자 문자열)이 하나씩 벨트 위에 올라오고, 세탁기(`.upper()` 메서드)를 통과하면 깨끗한 옷(대문자 문자열)이 되어 새 바구니(upper 리스트)에 담깁니다.\n\n**동작 과정:**\n1. `w = \"hello\"` → `\"hello\".upper()` = `\"HELLO\"`\n2. `w = \"world\"` → `\"world\".upper()` = `\"WORLD\"`\n3. 결과: `[\"HELLO\", \"WORLD\"]`\n\n**표현식에 쓸 수 있는 것들:**\n- 산술 연산: `x * 2`, `x + 1`\n- 메서드 호출: `s.upper()`, `s.strip()`, `s.replace(\"a\", \"b\")`\n- 함수 호출: `len(s)`, `int(s)`, `abs(x)`\n- 삼항 조건식: `x if x > 0 else 0`\n\n**Python 내부 동작:** `str.upper()`는 원본 문자열을 변경하지 않고 **새로운 문자열 객체**를 반환합니다. 파이썬의 문자열은 **불변(immutable)**이기 때문입니다. 따라서 `\"hello\"` 객체와 `\"HELLO\"` 객체는 메모리에서 완전히 별개의 객체입니다.\n\n**주의:** 컴프리헨션 표현식이 부수효과(side effect)를 일으키는 것은 권장되지 않습니다. 예를 들어 `[print(x) for x in numbers]`는 작동하지만, 이런 용도로는 일반 for문을 사용하는 것이 올바른 스타일입니다.\n\n**실행 순서:**\n1. `words` 리스트 생성 및 바인딩.\n2. 컴프리헨션 시작 → 빈 리스트 생성.\n3. 각 문자열에 `.upper()` 호출 → 새 문자열 객체 생성.\n4. 완성된 리스트를 `upper`에 바인딩.",
+        "visualizationType": "pythonMemory",
+        "code": "upper = [w.upper() for w in words]",
+        "pythonMemoryState": {
+          "output": [
+            "[2, 4]"
+          ],
+          "note": "메서드 호출도 표현식으로 사용 가능",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list4"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "list5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[\"hello\", \"world\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "list5",
+              "type": "list",
+              "value": "[\"HELLO\", \"WORLD\"]",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "최종 결과 출력",
+        "explanation": "**`print(upper)`** -- `upper`가 가리키는 리스트 `[\"HELLO\", \"WORLD\"]`를 출력합니다.\n\n이 레슨에서 우리는 리스트 컴프리헨션의 **세 가지 핵심 패턴**을 모두 배웠습니다.\n\n**리스트 컴프리헨션 패턴 정리:**\n\n| 패턴 | 문법 | 예시 |\n|------|------|------|\n| 변환 | `[표현식 for x in 리스트]` | `[x**2 for x in nums]` |\n| 필터 | `[x for x in 리스트 if 조건]` | `[x for x in nums if x > 0]` |\n| 변환+필터 | `[표현식 for x in 리스트 if 조건]` | `[x**2 for x in nums if x > 0]` |\n\n**비유:** 컴프리헨션은 SQL의 `SELECT`문과 비슷합니다. `SELECT x**2 FROM numbers WHERE x > 0` — 변환(SELECT), 원본(FROM), 필터(WHERE)가 모두 한 문장에 담깁니다.\n\n**Python 내부 동작:** 컴프리헨션은 내부적으로 바이트코드 레벨에서 특별히 최적화되어 있습니다. `dis` 모듈로 바이트코드를 확인하면 `LIST_APPEND` 명령이 직접 사용되어, `list.append()` 메서드 조회 오버헤드가 없습니다.\n\n**주의:** 컴프리헨션은 강력하지만 남용하면 안 됩니다.\n- 1줄에 80자를 넘기면 가독성이 떨어집니다\n- 2줄 이상이 필요할 정도로 복잡하면 일반 for문을 사용하세요\n- \"읽기 쉬운 코드\"가 \"짧은 코드\"보다 항상 더 중요합니다!\n\n**실행 순서:**\n1. `upper` 이름으로 리스트 객체 참조 획득.\n2. `print()` → `list.__repr__()` → 문자열 변환.\n3. `sys.stdout`에 출력하고 줄바꿈 추가.",
+        "visualizationType": "pythonMemory",
+        "code": "print(upper)",
+        "pythonMemoryState": {
+          "output": [
+            "[\"HELLO\", \"WORLD\"]"
+          ],
+          "note": "컴프리헨션 3가지 패턴: 변환, 필터, 변환+필터"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "[x*2 for x in [1,2,3] if x > 1]의 결과는?",
+    "options": [
+      "[2, 4, 6]",
+      "[4, 6]",
+      "[2, 4]",
+      "[1, 4, 6]"
+    ],
+    "correctIndex": 1,
+    "explanation": "if x > 1 조건으로 먼저 필터링하면 [2, 3]이 남고,\n각각 x*2를 적용하면 [4, 6]이 됩니다.\nx=1은 조건(x > 1)을 만족하지 않으므로 제외됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "리스트 컴프리헨션이 항상 for문보다 좋다",
+      "correct": "간단한 변환/필터링에는 컴프리헨션이 좋지만, 복잡한 로직에는 for문이 더 가독성이 좋습니다.",
+      "why": "중첩 for문 + 조건 + 복잡한 표현식이 합쳐지면\n한 줄이 너무 길어져서 오히려 읽기 어렵습니다."
+    }
+  ],
+  "keyTakeaway": "[표현식 for x in 리스트 if 조건] — 변환과 필터를 한 줄로! 파이썬의 핵심 문법!"
+}

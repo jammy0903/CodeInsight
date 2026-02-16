@@ -16,7 +16,5 @@ export { useLessonVisualization } from './hooks/useLessonVisualization';
 export { useCodeSelection } from './hooks/useCodeSelection';
 
 // Components
-export { CodeViewer } from './components/day/CodeViewer'; // 레거시 (deprecated)
 export { LessonCodeEditor } from './components/day/LessonCodeEditor'; // Monaco 기반 읽기 전용 에디터
 export { StepExplanation } from './components/day/StepExplanation';
-export { SelectedCodeBadge } from './components/day/SelectedCodeBadge';

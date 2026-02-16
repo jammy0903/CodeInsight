@@ -1,0 +1,263 @@
+{
+  "lessonId": "py-15-1",
+  "title": "파일 읽기 (open, read, readlines)",
+  "concept": "open() 함수로 파일을 열고, read()나 readlines()로 내용을 읽은 뒤, 반드시 close()로 닫아야 합니다.",
+  "content": {
+    "code": "f = open(\"data.txt\", \"r\")\ncontent = f.read()\nprint(content)\nf.close()\n\nf2 = open(\"data.txt\", \"r\")\nlines = f2.readlines()\nprint(f\"Total lines: {len(lines)}\")\nfor line in lines:\n    print(line.strip())\nf2.close()",
+    "steps": [
+      {
+        "title": "파일 열기 (open)",
+        "explanation": "**`f = open(\"data.txt\", \"r\")`** -- `open()` 함수로 파일을 열고, 반환된 **파일 객체**를 `f`라는 이름표에 연결합니다.\n\n지금까지 우리는 프로그램 내부의 변수에만 데이터를 저장했습니다. 하지만 프로그램이 종료되면 변수는 모두 사라집니다. **파일**은 데이터를 디스크에 영구적으로 저장하여 프로그램이 꺼져도 유지되는 방법입니다.\n\n**비유:** 파일을 여는 것은 도서관에서 책을 대출하는 것과 같습니다. `open()`은 도서관 사서에게 \"이 책(data.txt)을 읽기(r) 목적으로 빌려주세요\"라고 요청하는 것입니다. 사서가 건네주는 것은 책 자체가 아니라 **대출 카드**(파일 객체)입니다. 이 카드를 통해서만 책의 내용에 접근할 수 있습니다.\n\n**인자 설명:**\n- 첫 번째 인자 `\"data.txt\"`: 열려는 파일의 경로(이름)\n- 두 번째 인자 `\"r\"`: 읽기 모드(read) -- 파일을 읽기만 하겠다는 의미\n\n**파일 모드 종류:**\n- `\"r\"` -- 읽기 전용 (기본값, 파일이 없으면 `FileNotFoundError`)\n- `\"w\"` -- 쓰기 (기존 내용 삭제 후 새로 씀)\n- `\"a\"` -- 추가 (기존 내용 뒤에 이어쓰기)\n- `\"rb\"` / `\"wb\"` -- 바이너리 모드 (이미지, 영상 등)\n\n**Python 내부 동작:** `open()`은 운영체제(OS)에 **시스템 콜(system call)**을 보내 파일을 엽니다. OS는 파일 디스크립터(file descriptor)라는 정수 번호를 할당하고, Python은 이것을 감싸는 `TextIOWrapper` 객체를 반환합니다. 이 객체가 파일 읽기/쓰기의 모든 작업을 중개합니다.\n\n**주의:** `\"r\"` 모드에서 파일이 존재하지 않으면 `FileNotFoundError`가 발생합니다. 파일의 존재 여부가 불확실하면 `try-except`로 감싸거나, 먼저 `os.path.exists()`로 확인하세요.\n\n**실행 순서:**\n1. `open(\"data.txt\", \"r\")` → OS에 파일 열기 요청.\n2. OS가 파일 디스크립터 할당 → `TextIOWrapper` 객체 생성.\n3. 전역 네임스페이스에 `f → TextIOWrapper` 바인딩.",
+        "visualizationType": "pythonMemory",
+        "code": "f = open(\"data.txt\", \"r\")",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "파일 객체가 생성되어 f에 할당되었습니다.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "파일 전체 읽기 (read)",
+        "explanation": "**`content = f.read()`** -- 파일의 **전체 내용**을 하나의 문자열로 읽어서 `content` 변수에 저장합니다.\n\n`read()` 메서드는 파일의 처음부터 끝까지 모든 문자를 읽어 하나의 `str` 객체로 반환합니다. 줄바꿈 문자(`\\n`)도 문자열에 그대로 포함됩니다.\n\n**비유:** 책의 첫 페이지부터 마지막 페이지까지 **전체를 한꺼번에 복사기로 복사**하는 것과 같습니다. 결과물은 모든 페이지가 이어진 하나의 긴 두루마리(문자열)입니다.\n\n**read() vs readline() vs readlines():**\n- `read()` -- 파일 전체를 **하나의 문자열**로 반환\n- `readline()` -- **한 줄**만 읽어서 문자열로 반환\n- `readlines()` -- 모든 줄을 **리스트**로 반환 (각 줄이 하나의 원소)\n\n**Python 내부 동작:** `read()`가 호출되면 파일의 **커서(file pointer)**가 처음(위치 0)에서 끝으로 이동합니다. 이 커서는 \"지금 어디까지 읽었는지\"를 기억하는 북마크와 같습니다. `read()` 후 커서는 파일 끝에 있으므로, 다시 `read()`를 호출하면 **빈 문자열**이 반환됩니다. 처음부터 다시 읽으려면 `f.seek(0)`으로 커서를 되돌려야 합니다.\n\n**주의:** 매우 큰 파일(수 GB)에 `read()`를 사용하면 파일 전체가 메모리에 올라가서 `MemoryError`가 발생할 수 있습니다. 큰 파일은 `readline()`이나 `for line in f:`로 한 줄씩 처리하는 것이 안전합니다.\n\n**실행 순서:**\n1. `f.read()` 호출 → 파일 커서가 처음에서 끝으로 이동하며 전체 내용 읽기.\n2. 읽어온 문자열 객체를 힙에 생성.\n3. `content` 변수에 문자열 객체 바인딩.",
+        "visualizationType": "pythonMemory",
+        "code": "content = f.read()",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "파일 전체 내용이 하나의 문자열로 읽혔습니다.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1"
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1001"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello World\nPython File I/O\nThird Line",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "내용 출력 및 파일 닫기",
+        "explanation": "**`print(content)`** -- `read()`로 읽어온 문자열 전체를 출력합니다.\n**`f.close()`** -- 파일 사용이 끝났으므로 파일을 닫습니다.\n\n`content`에는 줄바꿈 문자(`\\n`)가 포함되어 있어 `print()`가 호출되면 여러 줄로 출력됩니다.\n\n**비유:** 도서관에서 빌린 책(파일 객체)을 다 읽었으면 반납(close)해야 합니다. 반납하지 않으면 다른 사람(다른 프로그램)이 그 책을 빌릴 수 없고, 도서관(OS)의 대출 한도에 걸릴 수 있습니다.\n\n**왜 close()가 반드시 필요한가?**\n- 운영체제는 동시에 열 수 있는 파일 수에 **제한**이 있습니다 (보통 1024개)\n- `close()`를 안 하면 **파일 디스크립터 누수(file descriptor leak)**가 발생합니다\n- 쓰기 모드에서는 `close()` 전까지 데이터가 버퍼에만 있고 실제 디스크에 기록되지 않을 수 있습니다\n- 다른 프로세스가 해당 파일에 접근하지 못하는 **파일 잠금(file lock)** 문제가 생길 수 있습니다\n\n**Python 내부 동작:** `close()`를 호출하면 내부 버퍼가 디스크에 flush(기록)되고, OS에 파일 디스크립터를 반납합니다. 이후 이 파일 객체로 `read()`나 `write()`를 호출하면 `ValueError: I/O operation on closed file`이 발생합니다.\n\n**주의:** `close()`를 잊어버리는 것이 너무 흔한 실수라서, Python은 이 문제를 해결하기 위해 `with`문을 제공합니다 (다음 레슨에서 배웁니다).\n\n**실행 순서:**\n1. `print(content)` → 파일 내용 전체를 `sys.stdout`에 출력.\n2. `f.close()` → 파일 디스크립터 반납, 버퍼 flush, 파일 객체 상태를 CLOSED로 변경.",
+        "visualizationType": "pythonMemory",
+        "code": "print(content)",
+        "highlightOffset": [0, 1],
+        "pythonMemoryState": {
+          "output": [
+            "Hello World",
+            "Python File I/O",
+            "Third Line"
+          ],
+          "note": "파일 내용을 출력하고 close()로 파일을 닫았습니다.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1"
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', CLOSED)",
+              "pyId": "1001",
+              "highlight": true
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello World\nPython File I/O\nThird Line",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "readlines()로 줄 단위 읽기",
+        "explanation": "**`f2 = open(\"data.txt\", \"r\")`**\n**`lines = f2.readlines()`** -- 같은 파일을 다시 열고, 이번에는 `readlines()`로 **줄 단위 리스트**를 얻습니다.\n\n이전 파일 객체 `f`는 이미 닫혔으므로 재사용할 수 없습니다. 같은 파일이라도 새로운 파일 객체 `f2`를 생성해야 합니다.\n\n**비유:** `read()`가 책 전체를 하나의 두루마리로 복사하는 것이라면, `readlines()`는 책의 각 페이지를 **개별 카드**에 하나씩 복사하여 **카드 뭉치(리스트)**로 만드는 것입니다. 특정 페이지(줄)에 바로 접근하고 싶을 때 유용합니다.\n\n**readlines()의 특징:**\n- 파일의 각 줄을 **리스트의 원소**로 반환합니다\n- 각 원소 끝에 줄바꿈 문자(`\\n`)가 포함됩니다\n- 예: `[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]`\n- 마지막 줄은 `\\n`이 없을 수 있습니다 (파일 끝에 줄바꿈이 없는 경우)\n\n**read()와의 핵심 차이:**\n- `read()` → 하나의 큰 문자열: `\"Hello World\\nPython File I/O\\nThird Line\"`\n- `readlines()` → 줄별 리스트: `[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]`\n\n**Python 내부 동작:** `readlines()`는 내부적으로 파일 전체를 읽은 뒤 `\\n`을 기준으로 분리하여 리스트를 만듭니다. 큰 파일에서는 `readlines()` 대신 `for line in f:`로 한 줄씩 처리하는 것이 메모리 효율적입니다. `for line in f:`는 이터레이터를 사용하므로 한 번에 한 줄만 메모리에 올립니다.\n\n**주의:** `readlines()`의 결과에서 각 줄 끝의 `\\n`을 제거하지 않으면 출력 시 의도치 않은 빈 줄이 생깁니다. `strip()`으로 제거하는 패턴을 기억하세요.\n\n**실행 순서:**\n1. `open()` → 새 파일 객체 `f2` 생성 (커서 위치 0).\n2. `readlines()` → 파일 전체를 읽어 줄 단위로 분리한 리스트 반환.\n3. `lines` 변수에 리스트 바인딩.",
+        "visualizationType": "pythonMemory",
+        "code": "f2 = open(\"data.txt\", \"r\")",
+        "highlightOffset": [0, 1],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "readlines()는 파일의 각 줄을 리스트 원소로 반환합니다.",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2",
+              "highlight": true
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "줄 수 출력 및 반복문으로 출력",
+        "explanation": "**`print(f\"Total lines: {len(lines)}\")`** -- `len(lines)`로 리스트의 길이(파일의 총 줄 수)를 구하고 f-string으로 출력합니다.\n**`for line in lines:`**\n**`    print(line.strip())`** -- 각 줄을 순회하며 `strip()` 후 출력합니다.\n\n**strip()의 역할이 중요합니다!** `readlines()`로 읽은 각 줄 끝에는 `\\n`이 포함되어 있습니다. 그런데 `print()` 함수도 기본적으로 출력 끝에 `\\n`을 추가합니다. 만약 `strip()` 없이 `print(line)`을 하면 줄바꿈이 **두 번** 발생하여 줄 사이에 빈 줄이 생깁니다.\n\n**비유:** 편지(줄)를 봉투에서 꺼내면 편지 끝에 빈 줄(\\n)이 있습니다. `strip()`은 편지 양쪽 끝의 빈 부분을 깔끔하게 잘라내는 가위와 같습니다.\n\n**strip()의 3가지 변형:**\n- `strip()` -- 양쪽 끝의 공백과 줄바꿈 제거\n- `lstrip()` -- 왼쪽(시작)만 제거\n- `rstrip()` -- 오른쪽(끝)만 제거\n- `strip(\"x\")` -- 지정한 문자 제거 (기본은 공백류)\n\n**Python 내부 동작:** `strip()`은 원본 문자열을 변경하지 않고 **새 문자열 객체**를 반환합니다. 문자열은 불변(immutable)이기 때문입니다. 따라서 `line` 변수가 가리키는 원본 `\"Hello World\\n\"`은 그대로이고, `print()`에는 새로 만든 `\"Hello World\"`가 전달됩니다.\n\n**주의:** `strip()`은 줄 **양쪽** 끝의 공백을 모두 제거합니다. 만약 줄 시작의 들여쓰기(indentation)를 보존해야 한다면 `rstrip()`(오른쪽만)을 사용하세요.\n\n**실행 순서:**\n1. `len(lines)` → 3 반환.\n2. f-string 포맷 → `\"Total lines: 3\"` 출력.\n3. for문 순회 → 각 `line`에 `strip()` 적용 후 출력.\n4. 3번 반복 → `\"Hello World\"`, `\"Python File I/O\"`, `\"Third Line\"` 출력.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Total lines: {len(lines)}\")",
+        "highlightOffset": [0, 1, 2],
+        "pythonMemoryState": {
+          "output": [
+            "Total lines: 3",
+            "Hello World",
+            "Python File I/O",
+            "Third Line"
+          ],
+          "note": "strip()으로 줄바꿈을 제거하고 깔끔하게 출력합니다.",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2"
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "line",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "Third Line",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "파일 닫기 (close)",
+        "explanation": "**`f2.close()`** -- 두 번째 파일 객체 `f2`도 사용이 끝났으므로 닫아줍니다.\n\n**비유:** 도서관에 빌린 두 번째 책도 다 읽었으니 반납하는 것입니다. 도서관(OS)의 대출 한도를 지키기 위해 빌린 책은 반드시 돌려주어야 합니다.\n\n**정리: 파일 처리의 기본 패턴 (open-작업-close)**\n```\nf = open(\"파일\", \"모드\")   # 1단계: 열기\n# ... 읽기/쓰기 작업 ...     # 2단계: 작업\nf.close()                    # 3단계: 닫기\n```\n\n**이 패턴의 치명적인 문제점:**\n- 2단계(작업) 중 **에러가 발생하면** `close()`가 실행되지 않습니다!\n- 예: `content = f.read()` 에서 `UnicodeDecodeError`가 나면 `f.close()` 줄까지 도달하지 못합니다\n- 파일을 열 때마다 `close()`를 잊지 않아야 하는 부담\n- 코드가 길어지면 `close()`를 빼먹기 쉬움\n\n**Python 내부 동작:** CPython의 참조 카운트 기반 가비지 컬렉터는 파일 객체의 참조가 0이 되면 자동으로 `close()`를 호출합니다. 하지만 이것에 의존하는 것은 **나쁜 습관**입니다. 다른 Python 구현(PyPy, Jython)에서는 가비지 컬렉션 타이밍이 다르기 때문입니다.\n\n**해결책:** 다음 레슨에서 배울 **`with`문**이 이 모든 문제를 우아하게 해결합니다! `with`문은 에러가 발생해도 자동으로 `close()`를 보장합니다.\n\n**실행 순서:**\n1. `f2.close()` → 파일 디스크립터 OS에 반납.\n2. `f2` 객체 상태가 CLOSED로 변경.\n3. 프로그램 종료.",
+        "visualizationType": "pythonMemory",
+        "code": "f2.close()",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "모든 파일 객체가 닫혔습니다. 다음 레슨에서 with문을 배웁니다!",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2"
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', CLOSED)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "read()와 readlines()의 차이점으로 올바른 것은?",
+    "options": [
+      "read()는 리스트를, readlines()는 문자열을 반환한다",
+      "read()는 파일 전체를 하나의 문자열로, readlines()는 각 줄을 리스트로 반환한다",
+      "read()는 첫 번째 줄만, readlines()는 모든 줄을 읽는다",
+      "read()는 바이너리 모드, readlines()는 텍스트 모드에서만 사용 가능하다"
+    ],
+    "correctIndex": 1,
+    "explanation": "read()는 파일 전체 내용을 하나의 문자열(str)로 반환합니다.\nreadlines()는 파일의 각 줄을 원소로 하는 리스트(list)를 반환합니다.\n각 원소 끝에는 줄바꿈 문자(\\n)가 포함됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "파일을 열면 자동으로 닫힌다",
+      "correct": "open()으로 열면 반드시 close()를 호출하거나 with문을 사용해야 합니다",
+      "why": "파일을 닫지 않으면 메모리 누수, 데이터 손실, 파일 잠금 등의 문제가 발생할 수 있습니다."
+    },
+    {
+      "wrong": "read()를 두 번 호출하면 같은 내용이 다시 나온다",
+      "correct": "read() 후 커서가 파일 끝으로 이동하므로 두 번째 read()는 빈 문자열을 반환합니다",
+      "why": "다시 읽으려면 f.seek(0)으로 커서를 처음으로 되돌려야 합니다."
+    }
+  ],
+  "keyTakeaway": "open()으로 파일을 열고, read()는 전체 문자열을, readlines()는 줄 단위 리스트를 반환합니다. 파일 사용 후 반드시 close()로 닫아야 합니다."
+}

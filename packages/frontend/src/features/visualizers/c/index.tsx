@@ -11,7 +11,7 @@ export { FlowVisualizer } from './CFlowVisualizer';
 export { VariableBox, ArrowLayer, FunctionFrame, ControlFlowOverlay, LoopTrack } from './components';
 
 // Flow Hooks
-export { useAnimationQueue, useFlowDiff, calculateFlowDiff, useFlowDiffStatus } from './hooks';
+export { useAnimationQueue, useFlowDiff, calculateFlowDiff } from './hooks';
 
 // C Adapters
 export { cAdapter, createCAdapter, CTransformer, CStyler, CAnimator, CMemoryAdapter } from './adapters';

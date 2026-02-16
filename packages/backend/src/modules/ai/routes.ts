@@ -523,7 +523,7 @@ const aiRoutes: FastifyPluginAsync = async (fastify) => {
    *       200:
    *         description: 해설 결과
    */
-  fastify.get('/explain', async (request, reply) => {
+  fastify.get('/explain', { preHandler: [fastify.requireDbUser, checkAIUsage] }, async (request, reply) => {
     try {
       const parsed = explainRequestSchema.safeParse(request.query);
       if (!parsed.success) {
@@ -574,7 +574,7 @@ const aiRoutes: FastifyPluginAsync = async (fastify) => {
    *       200:
    *         description: SSE 스트리밍 응답
    */
-  fastify.post('/explain-step', async (request, reply) => {
+  fastify.post('/explain-step', { preHandler: [fastify.requireDbUser, checkAIUsage] }, async (request, reply) => {
     try {
       const parsed = explainStepSchema.safeParse(request.body);
       if (!parsed.success) {

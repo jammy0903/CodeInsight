@@ -7,56 +7,56 @@
     "steps": [
       {
         "title": "딕셔너리 생성",
-        "explanation": "`person` 변수에 딕셔너리 객체를 생성하고 할당합니다.\n딕셔너리는 리스트처럼 '수정 가능(Mutable)'합니다.",
+        "explanation": "**`person = {\"name\": \"Alice\", \"age\": 25}`** -- 두 개의 키-값 쌍을 가진 딕셔너리 객체를 생성하고 `person` 변수에 할당합니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 중괄호 `{}`로 딕셔너리 리터럴을 만듭니다.\n\n**이 레슨의 핵심 주제:** 딕셔너리가 **Mutable(수정 가능)**하다는 것을 증명합니다. 수정 후에도 객체의 `id()`가 변하지 않는다는 것을 확인하고, **참조(Aliasing)**의 위험성도 배웁니다.\n\n**비유:** 이름표가 붙은 서랍장(0x1000)을 새로 만들었습니다. \"name\" 서랍에 \"Alice\", \"age\" 서랍에 25가 들어있습니다. 이 서랍장의 일련번호(id)를 기억해두고, 수정 후에도 같은 서랍장인지 확인할 것입니다.\n\n**Python 내부 동작:** 딕셔너리 객체가 힙 메모리에 할당되고, 해시 테이블 구조로 키-값 쌍이 저장됩니다. `person` 이름표가 이 객체의 메모리 주소를 가리킵니다.\n\n**실행 순서**: line 1 → 딕셔너리 생성(id: 0x1000) → person = 0x1000 → line 2",
         "visualizationType": "terminal",
         "code": "person = {\"name\": \"Alice\", \"age\": 25}"
       },
       {
         "title": "객체 ID 확인",
-        "explanation": "`print(f\"id = {id(person)}\")`\n생성된 `person` 객체의 고유 ID를 출력합니다.\n수정 후에도 이 ID가 바뀌지 않는지 확인할 것입니다.",
+        "explanation": "**`print(f\"id = {id(person)}\")`** -- `id()` 함수로 `person` 객체의 **고유 ID(메모리 주소)**를 출력합니다.\n\n`id()` 함수는 파이썬 객체의 **고유 식별자**를 반환합니다. CPython에서 이 값은 객체의 메모리 주소입니다. 이 ID를 기억해두고, 딕셔너리를 수정한 후에도 **같은 ID인지 확인**할 것입니다.\n\n**왜 id를 확인하는가?** Mutable 객체는 수정해도 **같은 객체를 유지**합니다(id 불변). 반면 Immutable 객체(문자열, 정수)는 수정하면 **새 객체가 생성**됩니다(id 변경). 이 차이를 실제로 확인하기 위해 id를 출력합니다.\n\n**비유:** 서랍장의 일련번호를 메모하는 것입니다. 내용물을 바꾼 후에도 같은 일련번호인지 확인할 예정입니다.\n\n**Python 내부 동작:** `id(person)`은 `person` 객체의 C 레벨 포인터 값을 정수로 반환합니다. CPython에서 이 값은 객체가 메모리에 존재하는 한 변하지 않습니다.\n\n**실행 순서**: id(person) 계산 → f-string 평가 → print 실행 → line 4",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(person)}\")"
       },
       {
         "title": "기존 키 값 수정",
-        "explanation": "`person[\"age\"] = 26`\n딕셔너리는 '수정 가능'하므로, 새로운 객체를 만들지 않고 기존 객체 내부의 값을 직접 변경합니다.",
+        "explanation": "**`person[\"age\"] = 26`** -- 기존 키 `\"age\"`의 값을 25에서 26으로 **수정**합니다. 같은 객체를 직접 변경합니다.\n\n딕셔너리는 Mutable이므로, **새로운 객체를 만들지 않고** 기존 객체(0x1000) 내부의 값을 직접 변경합니다.\n\n수정 전: `{\"name\": \"Alice\", \"age\": 25}`\n수정 후: `{\"name\": \"Alice\", \"age\": 26}`\n\n**문자열(Immutable)과의 차이:**\n```python\n# 문자열: 새 객체 생성 (id 변경)\ns = \"hello\"\ns = s + \"!\"  # 새 객체 \"hello!\" 생성, s의 id 변경됨\n\n# 딕셔너리: 같은 객체 수정 (id 불변)\nperson[\"age\"] = 26  # 같은 객체 내부만 변경, id 그대로\n```\n\n**Python 내부 동작:** 해시 테이블에서 `\"age\"` 키의 위치를 찾아, 값 참조를 `25` 객체에서 `26` 객체로 교체합니다. 딕셔너리 객체 자체의 메모리 주소(id)는 변하지 않습니다.\n\n**실행 순서**: person[\"age\"] 위치 찾기 → 값 참조 변경(25→26) → line 5",
         "visualizationType": "terminal",
         "code": "person[\"age\"] = 26"
       },
       {
         "title": "새로운 키-값 추가",
-        "explanation": "`person[\"city\"] = \"Seoul\"`\n존재하지 않는 키에 값을 할당하여 새로운 항목을 추가합니다.\n이 작업 역시 기존 객체를 직접 변경합니다.",
+        "explanation": "**`person[\"city\"] = \"Seoul\"`** -- 존재하지 않는 새 키 `\"city\"`에 값을 할당하여 **새로운 항목을 추가**합니다.\n\n딕셔너리에 `\"city\"` 키가 없으므로, 새 키-값 쌍 `\"city\": \"Seoul\"`이 자동으로 추가됩니다. 이 작업 역시 **기존 객체(0x1000)를 직접 변경**합니다.\n\n추가 후: `{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}`\n\n**딕셔너리의 편리한 점:** 같은 `dict[key] = value` 문법으로:\n- 키가 **있으면** → 값 수정 (이전 단계)\n- 키가 **없으면** → 새 항목 추가 (이번 단계)\n\n**비유:** 서랍장(0x1000)에 \"city\"라는 새 서랍을 추가하고 \"Seoul\"을 넣었습니다. 서랍장 자체는 그대로입니다.\n\n**Python 내부 동작:** `\"city\"` 키의 해시값을 계산하여 해시 테이블에 새 엔트리를 추가합니다. 테이블 사용률이 높으면 자동으로 리사이즈됩니다. 객체의 id는 변하지 않습니다.\n\n**실행 순서**: person[\"city\"] 해시 검색 → 없음 → 새 엔트리 추가 → line 6",
         "visualizationType": "terminal",
         "code": "person[\"city\"] = \"Seoul\""
       },
       {
         "title": "변경 후 내용 확인",
-        "explanation": "`print(f\"After changes: {person}\")`\n수정과 추가가 모두 반영된 딕셔너리의 현재 내용을 출력합니다.",
+        "explanation": "**`print(f\"After changes: {person}\")`** -- 수정과 추가가 모두 반영된 딕셔너리의 현재 내용을 출력합니다.\n\n출력 결과: `After changes: {'name': 'Alice', 'age': 26, 'city': 'Seoul'}`\n\n**변경 과정 요약:**\n1. 생성: `{\"name\": \"Alice\", \"age\": 25}` (2개)\n2. 수정: `\"age\"` 값 25 → 26\n3. 추가: `\"city\": \"Seoul\"` 새 항목\n\n이 모든 변경이 **같은 객체(0x1000)**에서 이루어졌습니다. 다음 줄에서 id를 다시 확인하여 증명할 것입니다.\n\n**실행 순서**: f-string 평가(person 내용 삽입) → print 실행 → line 7",
         "visualizationType": "terminal",
         "code": "print(f\"After changes: {person}\")"
       },
       {
         "title": "ID 불변 확인",
-        "explanation": "`print(f\"id = {id(person)}\")`\n딕셔너리를 직접 수정했지만, 객체의 ID는 처음과 동일합니다.\n이것이 '수정 가능(Mutable)' 객체의 특징입니다.",
+        "explanation": "**`print(f\"id = {id(person)}\")`** -- 딕셔너리를 수정한 후 다시 id를 확인합니다. **처음과 동일한 id**가 출력됩니다!\n\n이것이 **Mutable(수정 가능) 객체의 핵심 증거**입니다. 값을 수정하고 새 항목을 추가했지만, `person`은 여전히 **같은 객체(0x1000)**입니다. id가 변하지 않았습니다.\n\n**Mutable vs Immutable -- id로 비교:**\n- **Mutable** (리스트, 딕셔너리, 세트): 수정 후 id **불변** → 같은 객체를 수정\n- **Immutable** (정수, 문자열, 튜플): \"수정\" 시 id **변경** → 새 객체 생성\n\n**비유:** 서랍장(0x1000)의 내용물을 바꾸고 서랍을 추가했지만, 서랍장의 일련번호를 다시 확인하면 **처음 메모한 것과 동일**합니다. 같은 서랍장이 맞습니다!\n\n**Python 내부 동작:** 딕셔너리 객체의 C 구조체 포인터는 수정 작업에 의해 변하지 않습니다. 내부 해시 테이블이 리사이즈되더라도 딕셔너리 객체 자체의 주소는 유지됩니다.\n\n**실행 순서**: id(person) 계산(0x1000) → f-string 평가 → print 실행 → line 9",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(person)}\")",
         "occurrence": 2
       },
       {
         "title": "참조(별명) 생성",
-        "explanation": "`ref = person`\n새로운 변수 `ref`가 `person`과 똑같은 딕셔너리 객체를 가리키도록 합니다.\n객체가 복사된 것이 아니라, 같은 객체에 이름표가 하나 더 생긴 것입니다.",
+        "explanation": "**`ref = person`** -- `ref`라는 새 이름표를 `person`이 가리키는 **같은 객체(0x1000)**에 붙입니다. **복사가 아닙니다!**\n\n이것은 파이썬의 **Aliasing(별명 만들기)**입니다. 객체가 복사된 것이 아니라, 같은 딕셔너리 객체에 이름표가 하나 더 생긴 것입니다.\n\n`person` ──→ {name: Alice, age: 26, city: Seoul} (0x1000)\n`ref` ────→ (같은 객체)\n\n`id(person) == id(ref)` → **True** (완전히 같은 객체)\n\n**이것이 왜 위험한가?** `ref`를 통해 딕셔너리를 수정하면, `person`으로 접근해도 수정된 내용이 보입니다. 둘이 **같은 객체**를 공유하기 때문입니다. 다음 단계에서 이를 확인합니다.\n\n**비유:** 한 집(0x1000)에 두 개의 열쇠(person, ref)가 있는 것입니다. 어느 열쇠로 들어가서 가구를 옮기든, 다른 열쇠로 들어가면 옮겨진 가구가 보입니다.\n\n**Python 내부 동작:** `ref = person`은 `ref` 변수에 `person`이 가리키는 객체의 **참조(메모리 주소)**만 복사합니다. 객체 자체의 내용은 복사되지 않습니다. 딕셔너리 객체의 참조 카운트가 1에서 2로 증가합니다.\n\n**실행 순서**: person의 참조(0x1000) 읽기 → ref에 같은 참조 할당 → line 10",
         "visualizationType": "terminal",
         "code": "ref = person"
       },
       {
         "title": "참조를 통해 수정",
-        "explanation": "`ref[\"name\"] = \"Bob\"`\n`ref`를 통해 `name` 키의 값을 수정합니다.\n`ref`와 `person`은 같은 객체를 가리키고 있으므로, 이 변경은 `person`에도 똑같이 반영됩니다.",
+        "explanation": "**`ref[\"name\"] = \"Bob\"`** -- `ref`를 통해 `\"name\"` 키의 값을 `\"Alice\"`에서 `\"Bob\"`으로 수정합니다.\n\n`ref`와 `person`은 **같은 객체(0x1000)**를 가리키고 있으므로, `ref`를 통한 수정은 `person`에도 **즉시 반영**됩니다.\n\n수정 전: `{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}`\n수정 후: `{\"name\": \"Bob\", \"age\": 26, \"city\": \"Seoul\"}`\n\n**핵심:** `ref`로 수정했지만, `person`으로 접근해도 `\"name\"`이 `\"Bob\"`으로 바뀌어 있습니다! 두 변수가 **같은 객체를 공유**하기 때문입니다.\n\n**이것이 Aliasing의 위험성입니다.** 한쪽(ref)을 수정하면 다른 쪽(person)에도 영향을 미칩니다. 의도하지 않은 데이터 변경의 원인이 될 수 있습니다.\n\n**비유:** ref 열쇠로 집에 들어가서 벽지를 바꿨습니다. person 열쇠로 들어가도 바뀐 벽지가 보입니다. 같은 집이니까요!\n\n**독립적인 복사본을 만들려면:**\n```python\nref = person.copy()     # 얕은 복사 (1단계만)\nref = copy.deepcopy(person)  # 깊은 복사 (중첩 객체까지)\n```\n\n**Python 내부 동작:** `ref[\"name\"]`은 `ref`가 가리키는 객체(0x1000)의 해시 테이블에서 `\"name\"` 키를 찾아 값 참조를 변경합니다. `person`도 같은 객체(0x1000)를 가리키므로, 변경된 내용이 그대로 보입니다.\n\n**실행 순서**: ref[\"name\"] 위치 찾기(0x1000) → 값 참조 변경(\"Alice\"→\"Bob\") → line 11",
         "visualizationType": "terminal",
         "code": "ref[\"name\"] = \"Bob\""
       },
       {
         "title": "원본도 변경되었는지 확인",
-        "explanation": "`print(f\"person: {person}\")`\n`ref`를 수정했지만, `person`을 출력해도 변경된 내용(`'name': 'Bob'`)이 보입니다.\n두 변수가 같은 객체를 공유하기 때문입니다.",
+        "explanation": "**`print(f\"person: {person}\")`** -- `ref`를 수정했지만, `person`을 출력해도 변경된 내용(`'name': 'Bob'`)이 보입니다!\n\n출력 결과: `person: {'name': 'Bob', 'age': 26, 'city': 'Seoul'}`\n\n`ref[\"name\"] = \"Bob\"`으로 수정했는데, `person`에서도 `\"name\"`이 `\"Bob\"`으로 바뀌어 있습니다. 이것이 **Aliasing(별명)**의 직접적인 증거입니다.\n\n**이 레슨의 핵심 교훈 3가지:**\n1. **딕셔너리는 Mutable** -- 수정 후에도 `id()`가 변하지 않음 (같은 객체를 수정)\n2. **`=` 할당은 복사가 아니라 별명** -- `ref = person`은 같은 객체에 이름표를 하나 더 붙이는 것\n3. **별명으로 수정하면 원본에도 반영** -- `ref`와 `person`이 같은 객체를 공유하므로\n\n**비유:** 두 개의 열쇠(person, ref)로 같은 집(0x1000)에 접근합니다. 한쪽 열쇠로 들어가서 가구를 바꾸면, 다른 열쇠로 들어가도 바뀐 가구가 보입니다.\n\n**안전하게 독립적인 복사본을 만드는 방법:**\n- `ref = person.copy()` -- 얕은 복사 (1단계만 독립, 중첩 객체는 여전히 공유)\n- `ref = dict(person)` -- 얕은 복사 (위와 동일)\n- `ref = copy.deepcopy(person)` -- 깊은 복사 (모든 중첩 객체까지 완전 독립)\n\n**Python 내부 동작:** `person`과 `ref`는 같은 메모리 주소(0x1000)를 가리키고 있으므로, 어느 변수를 통해 접근하든 동일한 해시 테이블 데이터를 읽습니다.\n\n**실행 순서**: f-string 평가(person 내용 삽입) → print 실행 → 프로그램 종료",
         "visualizationType": "terminal",
         "code": "print(f\"person: {person}\")"
       }

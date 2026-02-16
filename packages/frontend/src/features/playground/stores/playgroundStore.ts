@@ -49,9 +49,6 @@ interface PlaygroundState {
   prevStep: () => void;
   goToStep: (index: number) => void;
   reset: () => void;
-
-  // === 현재 스텝 접근 ===
-  getCurrentStep: () => SimulationStep | null;
 }
 
 // ============================================================
@@ -236,19 +233,11 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     });
   },
 
-  // === 현재 스텝 접근 ===
-  getCurrentStep: () => {
-    const { steps, currentStepIndex } = get();
-    return steps[currentStepIndex] || null;
-  },
 }));
 
 // ============================================================
 // 셀렉터 (성능 최적화용)
 // ============================================================
-
-/** 현재 언어 선택 */
-export const useLanguage = () => usePlaygroundStore((s) => s.language);
 
 /** 현재 코드 */
 export const useCurrentCode = () => {
@@ -256,15 +245,6 @@ export const useCurrentCode = () => {
   const codes = usePlaygroundStore((s) => s.codes);
   return codes[language];
 };
-
-/** 시뮬레이션 상태 - 개별 값으로 반환 */
-export function useSimulationState() {
-  const steps = usePlaygroundStore((s) => s.steps);
-  const currentStepIndex = usePlaygroundStore((s) => s.currentStepIndex);
-  const isSimulating = usePlaygroundStore((s) => s.isSimulating);
-  const error = usePlaygroundStore((s) => s.error);
-  return { steps, currentStepIndex, isSimulating, error };
-}
 
 /** 스텝 컨트롤 액션 (안정적 참조) */
 export function useStepControls() {

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "outer_func 정의",
-        "explanation": "`def outer_func(x):`\n바깥 함수를 정의합니다.\n안에 중첩 함수가 있습니다.\n\n**왜 이 순서인가?**\n프로그램이 시작되면 함수 정의부터 읽습니다.\n\n**실행 순서:**\n1. `outer_func` 함수 객체(0x1100)를 생성합니다.\n2. 전역 네임스페이스에 등록합니다.",
+        "explanation": "**`def outer_func(x):`**\n\n**바깥 함수(외부 함수)를 정의합니다.**\n이 함수는 안에 또 다른 함수(`inner_func`)를 품고 있는 '중첩 함수' 구조의 바깥쪽입니다.\n\n**비유**: 러시아 인형(마트료시카)을 생각해보세요.\n- 바깥 인형이 `outer_func`이고, 그 안에 작은 인형 `inner_func`이 들어 있습니다\n- 바깥 인형을 열어야(호출해야) 안의 인형을 꺼낼 수 있습니다\n\n**내부 동작**: Python은 이 `def` 문을 만나면 함수 객체(0x1100)를 메모리에 생성하고, `outer_func`이라는 이름표를 전역 네임스페이스에 등록합니다.\n아직 함수 본문은 실행되지 않습니다 -- 단지 '이런 함수가 있다'고 등록만 한 것입니다.\n\n**왜 이 순서인가?** 프로그램이 위에서 아래로 실행되므로, 함수를 사용하기 전에 반드시 먼저 정의해야 합니다.\n\n**주의**: `def`는 함수를 '실행'하는 게 아니라 '정의'하는 것입니다. 함수 안의 코드는 나중에 `outer_func(2)`처럼 호출할 때 비로소 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def outer_func(x):",
         "highlightOffset": [
@@ -39,7 +39,7 @@
       },
       {
         "title": "outer_func(2) 호출",
-        "explanation": "`times_2 = outer_func(2)`\nouter_func를 x=2로 호출합니다.\n\n**왜 이 순서인가?**\n클로저를 생성하기 위해 바깥 함수를 호출합니다.\n\n**실행 순서:**\n1. `outer_func(2)` 호출.\n2. 매개변수 `x`에 2 할당.",
+        "explanation": "**`times_2 = outer_func(2)`**\n\n**`outer_func`을 호출하면서 매개변수 `x`에 값 `2`를 전달합니다.**\n\n이 한 줄에서 두 가지 일이 일어납니다:\n1. **오른쪽**: `outer_func(2)`가 호출되어 함수 본문이 실행됩니다\n2. **왼쪽**: 그 결과(반환값)가 `times_2`에 저장됩니다\n\n**비유**: 공장에 주문서(x=2)를 넣는 것과 같습니다.\n- 공장(`outer_func`)이 가동되면서, 주문서에 적힌 숫자 2를 기억하는 전용 기계(`inner_func`)를 만들어 반환합니다\n\n**내부 동작**: Python이 `outer_func(2)`를 만나면 새로운 **로컬 스코프(지역 영역)**가 생성됩니다. 이 스코프 안에서 `x`라는 변수에 정수 `2`가 바인딩됩니다.\n\n**왜 이 순서인가?** 클로저를 만들려면 바깥 함수를 '호출'해야 합니다. 호출해야 내부의 `inner_func`이 정의되고, 그때의 `x` 값을 기억하게 됩니다.\n\n**주의**: 아직 `times_2`에 할당은 안 됐습니다. `outer_func(2)`의 실행이 끝나고 `return`될 때 비로소 할당됩니다.",
         "visualizationType": "pythonMemory",
         "code": "times_2 = outer_func(2)",
         "pythonMemoryState": {
@@ -64,7 +64,7 @@
       },
       {
         "title": "inner_func 정의 (x=2 환경)",
-        "explanation": "`def inner_func(y):`\ninner_func를 정의합니다.\n이 함수는 x=2인 환경을 기억합니다.\n\n**왜 이 순서인가?**\n함수가 실행될 때마다 `def` 문을 만나면 새로운 함수 객체를 만듭니다.\n\n**실행 순서:**\n1. `inner_func` 객체(0x2000) 생성.\n2. `x`를 참조하는 클로저(Cell 0x3000) 생성.",
+        "explanation": "**`def inner_func(y):`**\n\n**`outer_func(2)` 실행 중에, 안쪽 함수 `inner_func`이 정의됩니다.**\n\n여기서 클로저의 핵심이 일어납니다:\n- `inner_func`의 본문에는 `return x * y`가 있는데, `x`는 자기 자신의 변수가 아닙니다\n- `x`는 바깥 함수 `outer_func`의 매개변수입니다\n- Python은 이런 상황을 감지하고, `x`를 **Cell 객체(0x3000)**라는 특별한 상자에 저장합니다\n\n**비유**: 포스트잇에 \"x=2\"라고 적어서 `inner_func`의 가방에 넣어주는 것과 같습니다.\n`inner_func`이 나중에 어디서 실행되든, 가방 속 포스트잇을 꺼내보면 `x`가 2라는 걸 알 수 있습니다.\n\n**내부 동작**: Python은 `inner_func`이 외부 변수 `x`를 참조한다는 것을 컴파일 시점에 이미 파악합니다. 그래서 `x`를 Cell 객체로 감싸고, `inner_func.__closure__`에 이 Cell의 참조를 저장합니다.\n\n**왜 이 순서인가?** `def` 문은 함수가 실행될 때마다 새로운 함수 객체를 만듭니다. `outer_func(2)` 호출 시 만들어진 `inner_func`은 `x=2` 환경 전용입니다.\n\n**주의**: 같은 `def inner_func(y):` 코드지만, `outer_func`을 호출할 때마다 **서로 다른** 함수 객체가 만들어집니다. 이 점이 일반 함수와 다릅니다.",
         "visualizationType": "pythonMemory",
         "code": "def inner_func(y):",
         "highlightOffset": [
@@ -103,7 +103,7 @@
       },
       {
         "title": "클로저 반환 (1)",
-        "explanation": "`return inner_func`\ninner_func(x=2를 기억)를 반환합니다.\ntimes_2는 이제 클로저입니다.\n\n**왜 이 순서인가?**\n만들어진 클로저를 반환하여 나중에 쓸 수 있게 합니다.\n\n**실행 순서:**\n1. `inner_func` 반환.\n2. `times_2`에 할당.",
+        "explanation": "**`return inner_func`**\n\n**`inner_func` 함수 객체 자체를 반환합니다.** 호출(`inner_func()`)이 아니라, 함수 그 자체를 돌려주는 것입니다.\n\n이 순간이 클로저가 완성되는 순간입니다:\n- `outer_func(2)`의 실행이 끝나면, 그 로컬 스코프는 사라집니다\n- 하지만 `inner_func`은 Cell 객체를 통해 `x=2`를 여전히 참조하고 있습니다\n- 이렇게 **자신의 스코프 밖에 있는 변수를 기억하는 함수**를 '클로저(closure)'라고 합니다\n\n**비유**: 공장(`outer_func`)이 문을 닫아도, 공장에서 만든 기계(`inner_func`)는 공장의 설계도(x=2)를 가지고 밖에서 동작할 수 있습니다.\n\n**내부 동작**: `return inner_func`이 실행되면, 이 함수 객체가 호출부 `times_2 = outer_func(2)`의 `times_2`에 할당됩니다. 이제 `times_2`는 `x=2`를 기억하는 클로저입니다.\n\n**왜 이 순서인가?** 바깥 함수의 목적은 클로저를 '만들어서 내보내는 것'입니다. `return`으로 내부 함수를 반환해야 외부에서 사용할 수 있습니다.\n\n**주의**: `return inner_func`과 `return inner_func()`는 완전히 다릅니다! 괄호 없이 반환하면 함수 자체를, 괄호를 붙이면 함수의 실행 결과를 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "return inner_func",
         "pythonMemoryState": {
@@ -128,7 +128,7 @@
       },
       {
         "title": "outer_func(3) 호출",
-        "explanation": "`times_3 = outer_func(3)`\nouter_func를 x=3으로 다시 호출합니다.\n\n**왜 이 순서인가?**\n다른 환경을 가진 또 다른 클로저를 만듭니다.\n\n**실행 순서:**\n1. `outer_func(3)` 호출.\n2. `x`에 3 할당.",
+        "explanation": "**`times_3 = outer_func(3)`**\n\n**같은 `outer_func`을 이번에는 `x=3`으로 호출합니다.**\n\n앞에서 `outer_func(2)`를 호출했던 것과 완전히 독립적인 새로운 호출입니다.\n새로운 로컬 스코프가 생성되고, 이 스코프에서 `x`는 `3`입니다.\n\n**비유**: 같은 공장에 이번엔 \"x=3\"이라는 새 주문서를 넣는 것과 같습니다.\n- 이전 주문(x=2)으로 만든 기계(`times_2`)와는 완전히 별개의 새 기계가 만들어집니다\n\n**내부 동작**: Python은 이전 `outer_func(2)` 호출과 완전히 독립적인 새로운 실행 프레임을 만듭니다. `times_2`의 Cell과 이번에 만들어질 Cell은 서로 다른 메모리 주소를 가집니다.\n\n**왜 이 순서인가?** 클로저의 강력함을 보여주기 위해서입니다. 같은 함수를 다른 인자로 호출하면, 각각 다른 값을 기억하는 별개의 클로저가 만들어집니다.\n\n**주의**: `times_2`와 `times_3`는 같은 코드(`inner_func`)를 기반으로 하지만, 기억하는 `x` 값이 다른 완전히 별개의 함수 객체입니다.",
         "visualizationType": "pythonMemory",
         "code": "times_3 = outer_func(3)",
         "pythonMemoryState": {
@@ -163,7 +163,7 @@
       },
       {
         "title": "inner_func 정의 (x=3 환경)",
-        "explanation": "`def inner_func(y):`\n이번에는 x=3인 환경을 기억하는 새로운 inner_func를 정의합니다.\n\n**왜 이 순서인가?**\n이전과 **다른** 새로운 함수 객체가 생성됩니다.\n\n**실행 순서:**\n1. 새로운 `inner_func` 객체(0x2100) 생성.\n2. `x`를 참조하는 새로운 Cell(0x3100) 생성.",
+        "explanation": "**`def inner_func(y):`**\n\n**이번에는 `x=3`인 환경을 기억하는 완전히 새로운 `inner_func`이 정의됩니다.**\n\n이것이 클로저의 핵심 메커니즘입니다:\n- 첫 번째 호출(`outer_func(2)`)에서 만들어진 `inner_func`은 Cell(0x3000)에 `x=2`를 저장\n- 이번 호출(`outer_func(3)`)에서 만들어진 `inner_func`은 **별도의** Cell(0x3100)에 `x=3`을 저장\n- 두 Cell은 완전히 다른 메모리 영역에 존재합니다\n\n**비유**: 같은 설계도로 만든 두 대의 자동차지만, 각각 다른 색(x=2는 파란색, x=3은 빨간색)으로 도색된 것과 같습니다.\n\n**내부 동작**: 새로운 함수 객체(0x2100)가 생성되고, 새로운 `__closure__` 튜플이 할당됩니다. 이 튜플 안의 Cell은 `x=3`을 참조합니다.\n\n**왜 이 순서인가?** `def` 문은 실행될 때마다 새 함수 객체를 만듭니다. 이전 `inner_func`(0x2000)과 이번 `inner_func`(0x2100)은 서로 다른 객체입니다.",
         "visualizationType": "pythonMemory",
         "code": "def inner_func(y):",
         "highlightOffset": [
@@ -202,7 +202,7 @@
       },
       {
         "title": "클로저 반환 (2)",
-        "explanation": "`return inner_func`\ninner_func(x=3을 기억)를 반환합니다.\ntimes_3는 별개의 클로저입니다.\n\n**왜 이 순서인가?**\n두 번째 클로저를 반환합니다.\n\n**실행 순서:**\n1. `inner_func` 반환.\n2. `times_3`에 할당.",
+        "explanation": "**`return inner_func`**\n\n**두 번째 클로저(`x=3`을 기억하는 `inner_func`)를 반환합니다.**\n이 반환값이 `times_3`에 저장됩니다.\n\n이제 메모리에는 두 개의 독립적인 클로저가 존재합니다:\n- `times_2` -> `inner_func`(0x2000), Cell에 `x=2` 저장\n- `times_3` -> `inner_func`(0x2100), Cell에 `x=3` 저장\n\n**비유**: 같은 공장에서 나왔지만 설정이 다른 두 대의 기계입니다.\n- 기계 A(`times_2`)에 재료를 넣으면 항상 2배로 만들어줍니다\n- 기계 B(`times_3`)에 재료를 넣으면 항상 3배로 만들어줍니다\n\n**내부 동작**: `outer_func(3)`의 실행 프레임이 종료되지만, Cell(0x3100)은 `times_3`의 `__closure__`를 통해 여전히 참조되므로 가비지 컬렉션 대상이 되지 않습니다.\n\n**왜 이 순서인가?** 두 번째 클로저를 반환함으로써, 이제 `times_2`와 `times_3` 모두 사용 준비가 완료되었습니다.",
         "visualizationType": "pythonMemory",
         "code": "return inner_func",
         "pythonMemoryState": {
@@ -237,7 +237,7 @@
       },
       {
         "title": "times_2(5) 호출",
-        "explanation": "`print(f\"...{times_2(5)}\")`\ntimes_2 클로저를 y=5로 호출합니다.\n\n**왜 이 순서인가?**\n첫 번째 클로저를 사용해봅니다.\n\n**실행 순서:**\n1. `times_2(5)` 호출.\n2. 저장된 환경(x=2)을 사용.",
+        "explanation": "**`print(f\"times_2(5) = {times_2(5)}\")`**\n\n**클로저 `times_2`를 `y=5`로 호출합니다.**\n\n`times_2`는 사실 `inner_func`이므로, `inner_func(5)`가 호출되는 것과 같습니다.\n이때 `inner_func`의 매개변수 `y`에 `5`가 전달됩니다.\n\n**기억해야 할 핵심**: `inner_func`의 본문은 `return x * y`인데, 여기서 `x`는 Cell에 저장된 `2`를 가져옵니다.\n- `x` = Cell에서 꺼낸 값 = **2** (클로저가 기억한 값)\n- `y` = 방금 전달한 값 = **5** (호출 시 넘긴 인자)\n\n**비유**: 2배 기계(`times_2`)에 재료 5를 넣는 순간입니다.\n기계는 내부에 저장된 설정값(x=2)을 사용해 계산을 수행합니다.\n\n**왜 이 순서인가?** 클로저를 만든 목적은 결국 '사용하기 위해서'입니다. 이제 실제로 클로저가 올바르게 동작하는지 확인합니다.\n\n**주의**: `outer_func(2)` 호출은 이미 끝났는데도, `x=2`라는 값이 살아있습니다. 이것이 바로 클로저의 마법입니다!",
         "visualizationType": "pythonMemory",
         "code": "print(f\"times_2(5) = {times_2(5)}\")",
         "pythonMemoryState": {
@@ -272,7 +272,7 @@
       },
       {
         "title": "times_2 실행 (2 * 5)",
-        "explanation": "`return x * y`\nx=2(기억된 값)와 y=5를 곱해 10을 반환합니다.\n\n**실행 순서:**\n1. `2 * 5` 계산.\n2. 10 반환.",
+        "explanation": "**`return x * y`**\n\n**Cell에서 꺼낸 `x=2`와 매개변수 `y=5`를 곱하여 `10`을 반환합니다.**\n\n계산 과정을 단계별로 보면:\n1. `x`를 참조합니다 -> Cell(0x3000)에서 값 `2`를 가져옵니다\n2. `y`를 참조합니다 -> 로컬 변수에서 값 `5`를 가져옵니다\n3. `2 * 5 = 10`을 계산합니다\n4. `10`을 반환합니다\n\n반환된 `10`은 `print`의 f-string 안에서 문자열로 변환되어, `\"times_2(5) = 10\"`이 출력됩니다.\n\n**비유**: 2배 기계가 재료 5를 받아서 10을 뱉어낸 것입니다. 기계의 내부 설정(x=2)은 변하지 않았습니다.\n\n**내부 동작**: Python은 `LOAD_DEREF` 바이트코드를 사용하여 Cell 객체에서 `x`의 값을 가져옵니다. 일반적인 지역 변수 접근(`LOAD_FAST`)과는 다른 메커니즘입니다.\n\n**주의**: 클로저가 기억하는 것은 '값'이 아니라 '변수에 대한 참조'입니다. 만약 `x`가 mutable 객체를 가리키고 있다면, 클로저 안에서 변경이 가능합니다.",
         "visualizationType": "pythonMemory",
         "code": "return x * y",
         "pythonMemoryState": {
@@ -308,7 +308,7 @@
       },
       {
         "title": "times_3(5) 호출",
-        "explanation": "`print(f\"...{times_3(5)}\")`\ntimes_3 클로저를 y=5로 호출합니다.\n\n**왜 이 순서인가?**\n두 번째 클로저를 사용해봅니다.\n\n**실행 순서:**\n1. `times_3(5)` 호출.\n2. 저장된 환경(x=3)을 사용.",
+        "explanation": "**`print(f\"times_3(5) = {times_3(5)}\")`**\n\n**이번에는 클로저 `times_3`를 `y=5`로 호출합니다.**\n\n`times_3`는 `outer_func(3)`에서 만들어진 클로저이므로, Cell(0x3100)에 `x=3`이 저장되어 있습니다.\n같은 `y=5`를 넘겼지만, 기억하고 있는 `x` 값이 다르기 때문에 결과도 달라집니다.\n\n**비유**: 이번에는 3배 기계(`times_3`)에 같은 재료 5를 넣는 것입니다.\n같은 재료를 넣었지만, 기계의 설정이 다르므로 다른 결과가 나옵니다.\n\n**핵심 포인트**: `times_2`와 `times_3`는 각자 독립된 Cell을 가지고 있으므로, 하나를 호출한다고 해서 다른 하나의 `x` 값이 바뀌지 않습니다.\n\n**왜 이 순서인가?** `times_2(5)`로 클로저의 동작을 확인했으니, `times_3(5)`로 서로 다른 클로저가 독립적으로 동작한다는 것을 증명합니다.\n\n**주의**: `times_2`의 `x`는 2이고 `times_3`의 `x`는 3입니다. 서로 간섭하지 않습니다. 이것이 클로저의 '상태 격리(state isolation)'입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"times_3(5) = {times_3(5)}\")",
         "pythonMemoryState": {
@@ -343,7 +343,7 @@
       },
       {
         "title": "times_3 실행 (3 * 5)",
-        "explanation": "`return x * y`\nx=3(기억된 값)와 y=5를 곱해 15를 반환합니다.\n\n**실행 순서:**\n1. `3 * 5` 계산.\n2. 15 반환.",
+        "explanation": "**`return x * y`**\n\n**Cell에서 꺼낸 `x=3`과 매개변수 `y=5`를 곱하여 `15`를 반환합니다.**\n\n계산 과정:\n1. `x`를 참조합니다 -> Cell(0x3100)에서 값 `3`을 가져옵니다\n2. `y`를 참조합니다 -> 로컬 변수에서 값 `5`를 가져옵니다\n3. `3 * 5 = 15`를 계산합니다\n4. `15`를 반환합니다\n\n최종 출력: `\"times_3(5) = 15\"`\n\n**정리하면**: 같은 `outer_func`에서 태어난 두 클로저가 서로 다른 결과를 냈습니다.\n- `times_2(5)` = 2 * 5 = **10** (x=2를 기억)\n- `times_3(5)` = 3 * 5 = **15** (x=3을 기억)\n\n이것이 클로저의 핵심 가치입니다. **함수가 '상태'를 가질 수 있게 해줍니다.**\n\n**실전 활용**: 클로저는 데코레이터, 콜백 함수, 이벤트 핸들러 등에서 널리 쓰이며, 다음 레슨에서 배울 데코레이터 패턴의 기반 기술입니다.\n\n**주의**: 클로저를 남용하면 메모리 누수의 원인이 될 수 있습니다. Cell 객체가 참조를 유지하므로, 클로저가 살아있는 한 참조된 변수도 가비지 컬렉션되지 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "return x * y",
         "pythonMemoryState": {

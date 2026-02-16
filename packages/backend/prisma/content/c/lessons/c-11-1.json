@@ -1,0 +1,119 @@
+{
+  "lessonId": "c-11-1",
+  "title": "if-else 조건문",
+  "concept": "조건에 따라 다른 코드를 실행하는 기본 분기문",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int temperature = 35;\n\n    if (temperature >= 30) {\n        printf(\"It's hot!\\n\");\n    } else if (temperature >= 20) {\n        printf(\"Nice weather!\\n\");\n    } else {\n        printf(\"It's cold!\\n\");\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "main 함수 시작",
+        "explanation": "**`int main() {`**\n\nC 프로그램의 **시작점(Entry Point)**입니다.\n프로그램을 실행하면, 운영체제(OS)가 가장 먼저 찾아서 호출하는 함수가 바로 `main`입니다.\n\n`main` 함수가 호출되면, 컴퓨터는 메모리의 **스택(Stack)** 영역에 main 전용 작업 공간인 **스택 프레임(Stack Frame)**을 생성합니다.\n이번 레슨에서는 `temperature` 변수 하나만 사용하여 **조건에 따라 프로그램의 흐름을 분기**하는 방법을 배웁니다.\n\n**비유**: 마치 출근할 때 날씨에 따라 옷을 고르는 것처럼, 프로그램도 조건에 따라 \"어떤 코드를 실행할지\" 선택할 수 있습니다.\n오늘의 핵심 질문: \"temperature 값에 따라 어떤 메시지를 출력할 것인가?\"\n\n**메모리 관점**: 오른쪽 시각화에서 **main** 스택 프레임이 생성된 것을 확인하세요. 아직 변수를 선언하지 않았으므로 프레임은 비어있습니다.\n\n**실행 순서**: 프로그램 시작 -> `main()` 호출 -> 스택 프레임 생성 -> 함수 본문 실행 시작",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "온도 변수 초기화",
+        "explanation": "**`int temperature = 35;`**\n\n정수형(`int`) 변수 `temperature`를 선언하고, 값 **35**로 초기화합니다.\n이 한 줄에서 두 가지 일이 동시에 일어납니다:\n1. **메모리 공간 확보**: main의 스택 프레임 안에 4바이트(int 크기) 공간이 잡힙니다\n2. **값 저장**: 그 공간에 `35`라는 숫자가 저장됩니다\n\n이 값을 기준으로 \"덥다\", \"좋다\", \"춥다\" 중 하나를 출력할 것입니다.\n\n**비유**: 온도계를 읽어서 숫자를 메모장에 적어두는 것과 같습니다.\n메모장에 적힌 숫자(35)를 보고, \"30도 이상인가?\", \"20도 이상인가?\"를 판단하게 됩니다.\n\n**메모리 관점**: 오른쪽 시각화에서 `temperature`가 main의 스택 프레임 안에 생성된 것을 확인하세요.\n주소 `0x1004`에 값 `35`가 저장되어 있고, 노란색 하이라이트는 이번 스텝에서 변경된 부분입니다.\n\n**주의**: 변수를 선언할 때 반드시 초기화하는 습관을 들이세요.\n`int temperature;`처럼 초기화 없이 선언하면 **쓰레기 값(Garbage Value)**이 들어가 예측 불가능한 결과가 나옵니다.\n\n**실행 순서**: `int temperature` (선언, 4바이트 할당) -> `= 35` (초기화, 값 저장) -> 다음 줄로 이동",
+        "code": "int temperature = 35;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "if 조건 평가 (참)",
+        "explanation": "**`if (temperature >= 30) {`**\n\n드디어 이번 레슨의 핵심인 **if 문(조건문)**이 등장합니다!\n\n`if`문은 프로그램에게 \"이 조건이 맞으면 이것을 해라\"라고 지시하는 명령입니다.\n괄호 `()` 안의 조건이 **참(true, 0이 아닌 값)**이면 중괄호 `{}` 안의 코드를 실행하고,\n**거짓(false, 0)**이면 해당 블록을 건너뜁니다.\n\n현재 `temperature`는 **35**이고, 조건은 `35 >= 30`입니다.\n35는 30 이상이므로 결과는 **참(1)**입니다!\n따라서 이 if 블록 안의 코드가 실행됩니다.\n\n**비유**: 놀이공원 입구에서 키 체크를 하는 것과 같습니다.\n\"키가 130cm 이상이면 탑승 가능\" --- 조건을 통과하면 안으로 들어가고, 통과하지 못하면 다른 안내로 넘어갑니다.\n여기서는 \"온도가 30도 이상이면 '덥다' 구역으로\" 안내하는 것이죠.\n\n**C에서 '참'과 '거짓'**: C에는 별도의 `boolean` 타입이 없습니다. 대신 **0은 거짓, 0이 아닌 모든 정수는 참**으로 취급합니다.\n`>=` 비교 연산자는 참이면 `1`, 거짓이면 `0`을 반환합니다.\n\n**주의**: `if (temperature = 30)`처럼 `=`를 하나만 쓰면 **대입 연산**이 되어 버립니다.\n비교는 반드시 `==`(같다), `>=`(이상), `<=`(이하), `>`(초과), `<`(미만), `!=`(같지 않다)를 사용하세요.\n\n**실행 순서**: `temperature >= 30` 평가 -> `35 >= 30` -> 참(1) -> if 블록 진입",
+        "code": "if (temperature >= 30) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "참인 분기 실행 (출력)",
+        "explanation": "**`printf(\"It's hot!\\n\");`**\n\n조건 `temperature >= 30`이 참이었으므로, if 블록 안의 이 줄이 실행됩니다.\n`printf` 함수가 화면에 `It's hot!`을 출력하고 줄바꿈(`\\n`)합니다.\n\n**if-else if-else 체인의 가장 중요한 규칙**:\nif 문의 조건이 참이면, 해당 블록만 실행하고 나머지 `else if`와 `else`는 **전부 건너뜁니다**.\n이미 맞는 조건을 찾았으니 더 볼 필요가 없는 것입니다.\n\n**비유**: 마치 시험 문제에서 5지선다 중 정답을 찾으면 나머지 보기를 굳이 확인하지 않는 것과 같습니다.\n또는 엘리베이터 버튼을 눌러서 원하는 층에 도착하면, 나머지 층 버튼은 무시하는 것과 비슷합니다.\n\n**흔한 오해**: \"모든 조건을 다 검사한 뒤 참인 것을 고른다\"고 생각하기 쉽지만, 실제로는 **위에서 아래로 순서대로 하나씩 검사**하다가 처음 참인 것을 만나면 즉시 실행하고 나머지를 무시합니다.\n\n**실행 순서**: if 블록 진입 -> `printf(\"It's hot!\\n\")` 실행 -> 화면 출력 -> if-else 체인 전체 종료 (else if, else 건너뜀)",
+        "visualizationType": "terminal",
+        "code": "printf(\"It's hot!\\n\");",
+        "stdout": "It's hot!"
+      },
+      {
+        "title": "else if / else 건너뛰기",
+        "explanation": "**`} else if (temperature >= 20) {`**\n\n앞의 `if (temperature >= 30)` 조건이 이미 **참**이었으므로, 이 `else if`와 아래의 `else` 블록은 **평가조차 하지 않고** 통째로 건너뜁니다.\n\n즉, `temperature >= 20`이라는 조건식은 **실행되지 않습니다**.\n`else` 블록의 `\"It's cold!\\n\"`도 절대 출력되지 않습니다.\n\n**if - else if - else 체인의 규칙**:\n1. 위에서부터 **순서대로** 조건을 검사합니다\n2. **처음으로 참인 조건**의 블록만 실행합니다\n3. 나머지는 모두 무시합니다 (조건 평가조차 하지 않음!)\n4. 모든 조건이 거짓이면 `else` 블록을 실행합니다 (else가 있는 경우)\n\n**비유**: 마치 병원 진료 순서표와 같습니다.\n1번 진료실(if): \"열이 38도 이상이면 여기로\" -> 해당 안 됨\n2번 진료실(else if): \"열이 37도 이상이면 여기로\" -> 해당 안 됨\n3번 진료실(else): \"나머지는 여기로\"\n한 진료실에 배정되면 다른 진료실에는 가지 않습니다.\n\n**만약 `temperature`가 25였다면?**\n첫 번째 조건(`>= 30`)은 거짓이므로 건너뛰고, 두 번째(`>= 20`)가 참이 되어 `\"Nice weather!\"`가 출력되었을 것입니다.\n세 번째(`else`)는 역시 건너뜁니다.\n\n**만약 `temperature`가 10이었다면?**\n첫 번째(`>= 30`) 거짓, 두 번째(`>= 20`) 거짓, 모든 조건이 거짓이므로 `else` 블록의 `\"It's cold!\"`가 출력됩니다.\n\n**실행 순서**: if 블록 실행 완료 -> else if 블록 건너뜀 -> else 블록 건너뜀 -> if-else 체인 완전히 빠져나감",
+        "visualizationType": "cMemory",
+        "code": "} else if (temperature >= 20) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "stdout": "It's hot!"
+      },
+      {
+        "title": "프로그램 종료",
+        "explanation": "**`return 0;`**\n\n조건 분기가 끝나고 프로그램이 정상 종료됩니다.\n`return 0`은 운영체제에게 \"프로그램이 문제 없이 끝났다\"고 알려주는 신호입니다.\nmain의 스택 프레임이 해제되면서 그 안의 `temperature` 변수도 메모리에서 사라집니다.\n\n**이 프로그램의 전체 실행 흐름 정리**:\n- `temperature = 35`이므로 첫 번째 조건(`>= 30`)이 **참** -> `\"It's hot!\"` 출력\n- 나머지 else if, else는 건너뜀\n\n**다른 값이었다면?**\n- `temperature = 25` -> 첫 번째 거짓, 두 번째(`>= 20`) **참** -> `\"Nice weather!\"`\n- `temperature = 10` -> 첫 번째 거짓, 두 번째 거짓, `else` 실행 -> `\"It's cold!\"`\n- `temperature = 30` -> 첫 번째(`>= 30`) **참** -> `\"It's hot!\"` (30은 \"30 이상\"에 포함!)\n\n이처럼 **if-else 체인**을 사용하면 하나의 변수 값에 따라 프로그램의 흐름을 여러 갈래로 나눌 수 있습니다.\n\n**주의**: `else if`와 `else`는 반드시 `if` 뒤에 와야 합니다. 단독으로 사용할 수 없습니다.\n또한 `else if`는 원하는 만큼 여러 개 사용할 수 있지만, `else`는 체인의 맨 마지막에 **최대 1개**만 올 수 있습니다.\n\n**실행 순서**: if-else 체인 종료 -> `return 0` -> main 스택 프레임 해제 -> 프로그램 종료",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "temperature가 20일 때, 다음 코드의 출력 결과는?\n\nif (temperature >= 30) printf(\"A\");\nelse if (temperature >= 20) printf(\"B\");\nelse if (temperature >= 10) printf(\"C\");",
+    "options": [
+      "A",
+      "B",
+      "BC",
+      "ABC"
+    ],
+    "correctIndex": 1,
+    "explanation": "if-else if 체인은 위에서부터 순서대로 검사하고, 처음으로 참인 조건의 블록만 실행합니다.\ntemperature = 20이면 첫 번째(>= 30)는 거짓, 두 번째(>= 20)가 참이므로 B만 출력됩니다.\n세 번째(>= 10)도 참이지만, 이미 두 번째에서 걸렸으므로 실행되지 않습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "else if 조건도 항상 검사된다",
+      "correct": "앞의 if 또는 else if 중 하나가 참이면, 그 뒤의 모든 else if / else는 건너뜁니다.",
+      "why": "if-else if-else는 '체인'으로 연결되어 있어서, 처음 참인 블록을 찾으면 나머지는 무시합니다."
+    }
+  ],
+  "keyTakeaway": "if-else if-else 체인은 위에서부터 조건을 검사하여, 처음 참인 블록 하나만 실행한다."
+}

@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileQuestion, CircleDot, ListChecks, Code2 } from 'lucide-react';
+import { FileQuestion, CircleDot, ListChecks, Code2, Brain } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/stores/store';
 
@@ -53,6 +53,14 @@ const QUIZ_TYPES: QuizType[] = [
     descKey: 'quiz.fill_desc',
     icon: Code2,
     color: 'bg-purple-500',
+  },
+  {
+    id: 'algorithm',
+    path: '/quiz/algorithm',
+    labelKey: 'quiz.algorithm',
+    descKey: 'quiz.algorithm_desc',
+    icon: Brain,
+    color: 'bg-orange-500',
   },
 ];
 
@@ -99,6 +107,10 @@ export function QuizPage() {
   }, [setPageTitle, t]);
 
   const handleQuizTypeClick = (quizId: string) => {
+    if (quizId === 'algorithm') {
+      navigate('/quiz/algorithm/python');
+      return;
+    }
     setSelectedQuizType(quizId);
   };
 

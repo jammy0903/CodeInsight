@@ -21,6 +21,7 @@ const VIZ_FIELDS = [
   'eventLoopState', 'scopeState', 'promiseState',
   'thisState', 'prototypeState',
   'memoryChanges', 'callStackState',
+  'algorithmState',
 ];
 
 /** deep merge 대상 */
@@ -28,6 +29,7 @@ const DEEP_MERGE_FIELDS = new Set([
   'pythonMemoryState', 'javaMemoryState', 'memoryState',
   'eventLoopState', 'scopeState', 'promiseState',
   'thisState', 'prototypeState',
+  'algorithmState',
 ]);
 
 /** Deep equality check */

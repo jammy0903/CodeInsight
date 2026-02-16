@@ -26,7 +26,6 @@ import { useCodeSelection } from './hooks/useCodeSelection';
 import { LessonUnifiedView } from './components/LessonUnifiedView';
 import { LessonCompletedView } from './components/LessonCompletedView';
 import { LessonQuizModal } from './components/LessonQuizModal';
-import { MobileAIChatFAB, MobileAIChatModal } from './components/mobile';
 import { ReportModal } from '@/components/ReportModal';
 
 // --- 간단한 상태 뷰 ---
@@ -199,47 +198,6 @@ export function LessonPage() {
         />
       )}
 
-      {/* AI 채팅 (FAB + Modal, 모바일/데스크톱 공통) */}
-      {navigation.phase !== 'completed' && (
-        <AIChatOverlay
-          lessonId={lessonId}
-          lessonOrder={lesson.order}
-          lessonTitle={lesson.title}
-          code={code}
-        />
-      )}
     </div>
-  );
-}
-
-// --- AI 채팅 오버레이 (FAB + Modal) ---
-
-function AIChatOverlay({
-  lessonId,
-  lessonOrder,
-  lessonTitle,
-  code,
-}: {
-  lessonId: string | undefined;
-  lessonOrder: number;
-  lessonTitle: string;
-  code: string;
-}) {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  return (
-    <>
-      <MobileAIChatFAB isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
-      <MobileAIChatModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        context={{
-          courseDay: lessonOrder,
-          topic: lessonTitle,
-          code,
-        }}
-        lessonId={lessonId}
-      />
-    </>
   );
 }

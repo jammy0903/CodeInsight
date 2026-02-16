@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Dog 클래스 정의",
-        "explanation": "**`class Dog:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n`Dog` 클래스를 정의합니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Dog 실행 → Dog 클래스 등록 시작 → line 2",
+        "explanation": "**`class Dog:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Dog` 클래스를 정의합니다.\n\n**이 레슨의 목표**: `my_dog.bark()`를 호출할 때 Python 내부에서 실제로 무슨 일이 벌어지는지를 깊이 이해합니다. `obj.method()`는 단순한 \"함수 호출\"이 아니라, Python이 **바운드 메서드(Bound Method)** 객체를 만들어서 self를 자동 전달하는 정교한 메커니즘입니다! 3가지 호출 방법(바운드, 언바운드, 저장된 바운드 메서드)을 비교해 봅니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Dog 실행 --> Dog 클래스 객체 생성 시작 --> line 2",
         "visualizationType": "pythonMemory",
         "code": "class Dog:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "bark 메서드 정의",
-        "explanation": "**`def bark(self):`**\n\nbark 메서드를 정의합니다.\n\n**메서드는 함수 객체**: `bark`는 함수 객체(0x1100)로 생성되어 Dog 클래스에 등록됩니다.\n\n**self의 의미**: 나중에 이 메서드를 호출할 때, **어떤 객체가 호출했는지**를 구분하는 매개변수입니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def bark 실행 → bark 함수 객체 0x1100 생성 → Dog.bark에 등록 → Dog 클래스 정의 완료 → line 5",
+        "explanation": "**`def bark(self):`**\n\nbark 메서드를 정의합니다. 본문은 `print(f\"멍멍! (id: {id(self)})\")`로, `id(self)`를 출력하여 **어떤 객체가 self인지** 확인할 수 있게 합니다.\n\n**핵심 개념 -- 메서드는 함수 객체**: `def bark(self):`을 실행하면 bark이라는 **함수 객체**(0x1100)가 메모리에 생성됩니다. 이 함수 객체가 Dog 클래스의 `__dict__`에 저장됩니다. 즉, `Dog.__dict__['bark']`는 **일반 함수 객체**입니다!\n\n**여기서 중요한 질문**: 그런데 `my_dog.bark()`를 호출하면, Python은 어떻게 `self`에 `my_dog`를 자동으로 전달하는 걸까요? 이 마법의 비밀이 바로 **바운드 메서드(Bound Method)**이며, 이번 레슨에서 그 메커니즘을 파헤칩니다.\n\n**id() 함수**: 객체의 고유 식별자(보통 메모리 주소)를 정수로 반환합니다. 같은 객체면 항상 같은 id를 반환하므로, self가 정말 같은 객체인지 확인하는 데 유용합니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def bark 실행 --> bark 함수 객체 0x1100 생성 --> Dog.__dict__['bark'] = 0x1100 --> Dog 클래스 정의 완료 --> line 5",
         "visualizationType": "pythonMemory",
         "code": "def bark(self):",
         "highlightOffset": [
@@ -70,7 +70,7 @@
       },
       {
         "title": "Dog 인스턴스 생성",
-        "explanation": "**`my_dog = Dog()`**\n\nDog 클래스의 인스턴스를 생성합니다.\n\n**생성된 객체**: my_dog (0x2000)\n\n**왜 이 순서인가?** 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog() 호출 → 객체 0x2000 생성 → my_dog = 0x2000 → line 8",
+        "explanation": "**`my_dog = Dog()`**\n\nDog 클래스를 호출하여 새로운 인스턴스(객체)를 생성합니다.\n\n**Python 내부에서 벌어지는 3단계 과정**:\n1. `Dog.__new__(Dog)` -- 빈 객체 0x2000을 메모리에 할당합니다\n2. `Dog.__init__(0x2000)` -- 초기화 메서드를 호출합니다 (이 클래스에는 `__init__`이 없으므로 생략)\n3. `my_dog = 0x2000` -- 생성된 객체의 참조를 변수에 저장합니다\n\n**비유**: `Dog()`은 \"Dog 설계도로 실제 강아지 한 마리를 만들어라\"라는 명령입니다. 설계도(클래스)는 하나지만, 강아지(인스턴스)는 여러 마리 만들 수 있습니다.\n\n**핵심 포인트 -- 왜 인스턴스가 필요한가?** `Dog.bark`는 클래스에 저장된 **일반 함수 객체**일 뿐입니다. 이 함수에 `self`를 전달하려면 인스턴스가 있어야 합니다. 인스턴스가 없으면 바운드 메서드도 만들 수 없습니다!\n\n**왜 이 순서인가?** 클래스 정의가 완료되어야 인스턴스를 만들 수 있습니다. `Dog`이라는 이름이 네임스페이스에 등록된 후에야 `Dog()`을 호출할 수 있습니다.\n\n**실행 순서**: Dog() 호출 --> 객체 0x2000 생성 --> my_dog = 0x2000 --> line 8",
         "visualizationType": "pythonMemory",
         "code": "my_dog = Dog()",
         "pythonMemoryState": {
@@ -115,7 +115,7 @@
       },
       {
         "title": "바운드 메서드 호출 (Bound Method)",
-        "explanation": "**`my_dog.bark()`**\n\n**바운드 메서드(Bound Method)**: `my_dog.bark`는 **my_dog 객체에 바인딩된 메서드 객체**입니다.\n\n**Python 내부 변환**:\n```python\nmy_dog.bark()  # 사용자가 쓴 코드\n↓\nDog.bark(my_dog)  # Python이 내부적으로 변환\n```\n\n**자동 바인딩**:\n1. `my_dog.bark` 접근 시, Python은 **바운드 메서드 객체**(0x2100)를 생성\n2. 이 객체는 `Dog.bark` 함수(0x1100)와 `my_dog` 인스턴스(0x2000)를 묶음\n3. 호출 시 `my_dog`가 자동으로 `self`로 전달됨\n\n**왜 이 순서인가?** my_dog 생성 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: my_dog.bark 접근 → 바운드 메서드 0x2100 생성 → () 호출 → line 3으로 점프 → self=my_dog",
+        "explanation": "**`my_dog.bark()`**\n\n이것이 이번 레슨의 **핵심 장면**입니다! `my_dog.bark()`라고 쓰면, Python 내부에서는 놀라운 변환이 일어납니다.\n\n**Python이 실제로 하는 일 (디스크립터 프로토콜)**:\n1. `my_dog.bark`에 접근하는 순간, Python은 먼저 `my_dog.__dict__`에서 `bark`를 찾습니다 --> 없음!\n2. 그다음 `Dog.__dict__`에서 찾습니다 --> `bark` 함수 객체(0x1100) 발견!\n3. 이 함수 객체가 `__get__` 메서드를 가지고 있으므로 (함수는 디스크립터), Python은 `bark.__get__(my_dog, Dog)`를 호출합니다\n4. 이 호출이 **바운드 메서드 객체**(0x2100)를 반환합니다 -- 함수(0x1100)와 인스턴스(0x2000)가 묶인 새 객체!\n5. `()`로 호출하면, 바운드 메서드가 저장된 `my_dog`를 `self`로 자동 전달합니다\n\n**비유**: 레스토랑에서 \"김철수 셰프의 파스타\"를 주문하면, 주방장이 자동으로 김철수 셰프에게 연결해주는 것과 같습니다. `my_dog.bark()`는 \"my_dog의 bark\"를 요청하면 Python이 자동으로 `self=my_dog`를 연결해줍니다.\n\n**결국 이것과 동일합니다**:\n`my_dog.bark()` == `Dog.bark(my_dog)` -- 하지만 전자가 훨씬 편리합니다!\n\n**왜 이 순서인가?** my_dog 생성 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: my_dog.bark 접근 --> 디스크립터 프로토콜 --> 바운드 메서드 0x2100 생성 --> () 호출 --> line 3으로 점프 --> self=my_dog",
         "visualizationType": "pythonMemory",
         "code": "my_dog.bark()",
         "pythonMemoryState": {
@@ -172,7 +172,7 @@
       },
       {
         "title": "bark 메서드 실행 (1번째)",
-        "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\nbark 메서드가 실행됩니다.\n\n**self에 무엇이 들어왔는가?**\n- `self` = `my_dog` (0x2000) ← 자동 전달!\n\n**id(self) 함수**: 객체의 메모리 주소를 반환합니다.\n- `id(my_dog)` → 0x2000 (16진수를 10진수로 변환한 값)\n\n**출력**: \"멍멍! (id: 8192)\" (예시, 실제 값은 실행마다 다름)\n\n**왜 이 순서인가?** 메서드 호출(line 8)에서 점프해왔습니다.\n\n**실행 순서**: id(self) → id(my_dog) → 8192 → f-string 평가 → print 실행 → bark 종료 → line 8로 돌아감 → line 11",
+        "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\nbark 메서드 본문이 실행됩니다. 바운드 메서드가 `self`에 `my_dog`를 자동으로 전달했으므로, 이제 `self`는 곧 `my_dog`(0x2000)입니다.\n\n**f-string 내부 실행 과정**:\n1. `self` --> `my_dog` 객체 (0x2000)\n2. `id(self)` --> `id(my_dog)` --> 8192 (CPython에서는 메모리 주소를 정수로 반환)\n3. f-string이 `{id(self)}`를 `8192`로 치환합니다\n4. 최종 문자열: `\"멍멍! (id: 8192)\"`\n\n**id() 함수의 의미**: `id()`는 객체의 **고유 식별자**를 반환합니다. CPython 구현에서는 메모리 주소를 사용합니다. 같은 객체를 가리키면 항상 같은 id를 반환하므로, 나중에 2번째, 3번째 호출에서도 같은 숫자가 나오는지 확인해볼 수 있습니다. 이것이 \"self가 정말 같은 객체인가?\"를 증명하는 방법입니다!\n\n**주의 -- id 값은 실행마다 달라집니다**: 8192는 예시이며, 프로그램을 다시 실행하면 다른 숫자가 나올 수 있습니다. 중요한 건 값 자체가 아니라 3번의 호출에서 **같은 값**이 나온다는 사실입니다.\n\n**왜 이 순서인가?** 메서드 호출(line 8)에서 bark 함수 본문(line 3)으로 점프해왔습니다.\n\n**실행 순서**: id(self) --> id(my_dog) --> 8192 --> f-string 평가 --> print 실행 --> bark 종료 --> line 8로 돌아감 --> line 11",
         "visualizationType": "pythonMemory",
         "code": "print(f\"멍멍! (id: {id(self)})\")",
         "pythonMemoryState": {
@@ -230,7 +230,7 @@
       },
       {
         "title": "언바운드 호출 (Unbound Call)",
-        "explanation": "**`Dog.bark(my_dog)`**\n\n**언바운드 호출(Unbound Call)**: 클래스에서 직접 메서드를 호출하고, **self를 명시적으로 전달**합니다.\n\n**바운드 vs 언바운드**:\n```python\n# 바운드 (일반적)\nmy_dog.bark()         # self 자동 전달\n\n# 언바운드 (드물게 사용)\nDog.bark(my_dog)      # self 명시적 전달\n```\n\n**같은 결과**: 두 방법 모두 결국 `Dog.bark` 함수에 `my_dog`를 전달하므로 결과는 동일합니다!\n\n**왜 이 순서인가?** 이전 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog.bark(my_dog) 호출 → line 3으로 점프 → self=my_dog",
+        "explanation": "**`Dog.bark(my_dog)`**\n\n이것이 **언바운드 호출(Unbound Call)**입니다. 바운드 메서드를 거치지 않고, 클래스의 함수 객체를 직접 호출하면서 `self`를 명시적으로 넘기는 방식입니다.\n\n**바운드 호출과의 차이점**:\n- `my_dog.bark()` -- 인스턴스를 통해 접근 --> 디스크립터 프로토콜 발동 --> 바운드 메서드 객체 생성 --> self 자동 전달\n- `Dog.bark(my_dog)` -- 클래스를 통해 접근 --> `Dog.__dict__['bark']`에서 **일반 함수 객체**를 직접 가져옴 --> self를 직접 넘김\n\n**왜 이 방식이 존재하는가?** 사실 `my_dog.bark()`의 내부 동작이 결국 `Dog.bark(my_dog)`와 같으므로, 언바운드 호출은 Python의 **메서드 바인딩 메커니즘을 투명하게 보여주는** 방법입니다. 또한 super() 없이 부모 클래스 메서드를 직접 호출할 때나, 메타프로그래밍에서 사용됩니다.\n\n**비유**: 바운드 호출은 \"바둑이야, 짖어!\"라고 하면 바둑이가 알아서 실행하는 것이고, 언바운드 호출은 \"Dog 설계도에 있는 bark 함수를 가져와서 바둑이를 넣어 실행해!\"라고 수동으로 지정하는 것입니다. 결과는 동일합니다!\n\n**실무에서의 사용**: 대부분 `obj.method()` 형태를 사용합니다. 하지만 상속 구조에서 특정 부모 클래스의 메서드를 명시적으로 호출하고 싶을 때 `ParentClass.method(self)`를 쓰기도 합니다.\n\n**왜 이 순서인가?** 이전 메서드 호출이 완료되어 line 8로 돌아온 후, 순서대로 line 11을 실행합니다.\n\n**실행 순서**: Dog.bark(my_dog) 호출 --> line 3으로 점프 --> self=my_dog",
         "visualizationType": "pythonMemory",
         "code": "Dog.bark(my_dog)",
         "pythonMemoryState": {
@@ -277,7 +277,7 @@
       },
       {
         "title": "bark 메서드 실행 (2번째)",
-        "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\n**같은 코드, 같은 결과**:\n- `self` = `my_dog` (0x2000) ← 명시적으로 전달받음!\n- `id(self)` → 8192 (동일!)\n\n**바운드 vs 언바운드 비교**:\n```python\n# 1번째 호출 (바운드)\nmy_dog.bark()         # self 자동 전달 → 8192 출력\n\n# 2번째 호출 (언바운드)\nDog.bark(my_dog)      # self 명시 전달 → 8192 출력 (동일!)\n```\n\n**결론**: 바운드 메서드는 **편의를 위한 문법 설탕(Syntactic Sugar)**입니다!\n\n**왜 이 순서인가?** 메서드 호출(line 11)에서 점프해왔습니다.\n\n**실행 순서**: id(self) → 8192 → f-string 평가 → print 실행 → bark 종료 → line 11로 돌아감 → line 14",
+        "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\n같은 bark 함수가 다시 실행됩니다. 이번에는 언바운드 호출 `Dog.bark(my_dog)`에서 점프해왔습니다.\n\n**핵심 확인 -- self는 동일한 객체인가?**\n- `self` = `my_dog` (0x2000) -- 이번에는 **명시적으로 전달**받았습니다!\n- `id(self)` --> 8192 -- 1번째 호출과 **완전히 동일한 숫자**!\n\n이것이 증명하는 사실: 바운드 호출(`my_dog.bark()`)이든 언바운드 호출(`Dog.bark(my_dog)`)이든, 결국 bark 함수에 전달되는 `self`는 **동일한 my_dog 객체**입니다. 전달 방식만 다를 뿐, 함수 입장에서는 구분할 수 없습니다.\n\n**문법 설탕(Syntactic Sugar)**: 바운드 메서드는 프로그래머의 편의를 위한 \"달콤한 포장\"입니다. `my_dog.bark()`라고 쓰면 Python이 자동으로 `Dog.bark(my_dog)`으로 변환해주니까, 매번 클래스 이름을 반복하지 않아도 됩니다. 이것을 \"문법 설탕\"이라고 부릅니다.\n\n**왜 이 순서인가?** 언바운드 호출(line 11)에서 bark 함수 본문(line 3)으로 점프해왔습니다.\n\n**실행 순서**: id(self) --> 8192 --> f-string 평가 --> print 실행 --> bark 종료 --> line 11로 돌아감 --> line 14",
         "visualizationType": "pythonMemory",
         "code": "print(f\"멍멍! (id: {id(self)})\")",
         "pythonMemoryState": {
@@ -335,7 +335,7 @@
       },
       {
         "title": "💡 바운드 메서드를 변수에 할당",
-        "explanation": "**`method = my_dog.bark`**\n\n**메서드도 객체다!**\n\n**중요한 차이**:\n```python\nmy_dog.bark()   # () 있음 → 메서드 호출 (실행)\nmy_dog.bark     # () 없음 → 메서드 객체 자체 (참조)\n```\n\n**무엇이 할당되는가?**\n- `my_dog.bark` 접근 시, Python은 **바운드 메서드 객체**(0x2100)를 생성\n- 이 객체는 `Dog.bark` 함수(0x1100)와 `my_dog` 인스턴스(0x2000)를 **이미 묶어놓음**\n- `method` 변수는 이 바운드 메서드 객체(0x2100)를 가리킴\n\n**핵심**: `method`는 이미 `my_dog`에 바인딩되어 있으므로, 나중에 `method()` 호출 시 **self를 전달하지 않아도 됨**!\n\n**왜 이 순서인가?** 이전 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: my_dog.bark 접근 → 바운드 메서드 0x2100 생성 → method = 0x2100 → line 15",
+        "explanation": "**`method = my_dog.bark`**\n\nPython에서는 **모든 것이 객체**입니다 -- 함수도, 메서드도 예외가 아닙니다! 괄호 `()`를 붙이지 않으면 메서드를 **호출하지 않고 참조만** 합니다.\n\n**괄호의 차이 -- 반드시 이해해야 할 구분**:\n- `my_dog.bark()` -- 괄호 있음 --> 메서드를 **실행**합니다 (\"멍멍!\" 출력)\n- `my_dog.bark` -- 괄호 없음 --> 메서드 객체 자체를 **참조**합니다 (실행하지 않음!)\n\n**변수에 저장되는 것의 정체**:\n1. `my_dog.bark`에 접근하면, 디스크립터 프로토콜이 다시 발동합니다\n2. 바운드 메서드 객체(0x2100)가 생성됩니다 -- `Dog.bark` 함수(0x1100) + `my_dog` 인스턴스(0x2000)의 결합체\n3. `method` 변수가 이 바운드 메서드 객체를 가리킵니다\n\n**비유**: 전화번호를 저장하는 것과 같습니다. `my_dog.bark()`는 \"지금 바로 전화하기\"이고, `method = my_dog.bark`는 \"이 전화번호를 즐겨찾기에 저장하기\"입니다. 저장해두면 나중에 `method()`로 언제든 전화할 수 있습니다!\n\n**핵심**: `method`에는 이미 `my_dog`가 바인딩되어 있으므로, 나중에 `method()`를 호출할 때 self를 전달할 필요가 없습니다. 이것이 바운드 메서드의 강력한 점입니다 -- 객체와 함수가 이미 묶여있으니까요!\n\n**왜 이 순서인가?** 이전 메서드 호출이 완료된 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: my_dog.bark 접근 --> 디스크립터 프로토콜 --> 바운드 메서드 0x2100 생성 --> method = 0x2100 --> line 15",
         "visualizationType": "pythonMemory",
         "code": "method = my_dog.bark",
         "pythonMemoryState": {
@@ -390,7 +390,7 @@
       },
       {
         "title": "메서드 타입 확인",
-        "explanation": "**`print(type(method))`**\n\n`method` 변수의 타입을 확인합니다.\n\n**type() 함수**: 객체의 타입(클래스)을 반환합니다.\n\n**결과**: `<class 'method'>`\n- 일반적인 `<class 'function'>`이 아님!\n- `method`는 **바운드 메서드 객체**의 타입\n\n**타입 비교**:\n```python\ntype(Dog.bark)     # <class 'function'>  (언바운드 함수)\ntype(my_dog.bark)  # <class 'method'>    (바운드 메서드)\n```\n\n**왜 이 순서인가?** 바운드 메서드 할당 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: type(method) 호출 → <class 'method'> 반환 → print 실행 → line 16",
+        "explanation": "**`print(type(method))`**\n\n`method` 변수에 저장된 객체의 타입을 확인합니다. 결과는 `<class 'method'>`입니다.\n\n**function과 method의 차이 -- Python이 구분하는 두 가지 타입**:\n- `type(Dog.bark)` --> `<class 'function'>` -- 클래스에서 직접 접근하면 **일반 함수 객체**\n- `type(my_dog.bark)` --> `<class 'method'>` -- 인스턴스를 통해 접근하면 **바운드 메서드 객체**\n\n같은 bark인데 어디서 접근하느냐에 따라 타입이 달라집니다! 이것이 디스크립터 프로토콜의 마법입니다. 인스턴스를 통해 접근하면 `__get__`이 발동하여 함수를 바운드 메서드로 포장하고, 클래스를 통해 접근하면 포장 없이 함수 그대로 반환합니다.\n\n**바운드 메서드 객체의 내부 속성**:\n- `method.__func__` --> `Dog.bark` (원본 함수 객체에 대한 참조)\n- `method.__self__` --> `my_dog` (바인딩된 인스턴스에 대한 참조)\n- 즉, `method()`를 호출하면 내부적으로 `method.__func__(method.__self__)`가 실행됩니다!\n\n**비유**: 일반 함수는 \"누구한테든 시킬 수 있는 일반 명령서\"이고, 바운드 메서드는 \"바둑이 전용 명령서\"입니다. 전용 명령서에는 이미 \"대상: 바둑이\"가 적혀 있어서, 실행할 때 대상을 따로 지정하지 않아도 됩니다.\n\n**왜 이 순서인가?** 바운드 메서드 할당 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: type(method) 호출 --> <class 'method'> 반환 --> print 실행 --> line 16",
         "visualizationType": "pythonMemory",
         "code": "print(type(method))",
         "pythonMemoryState": {
@@ -429,7 +429,7 @@
       },
       {
         "title": "💡 저장된 바운드 메서드 호출",
-        "explanation": "**`method()`**\n\n**self 없이 호출 가능!**\n\n**왜 self 없이 호출되는가?**\n- `method` 변수는 **이미 my_dog에 바인딩된 메서드 객체**(0x2100)를 가리킴\n- 바운드 메서드 객체는 `Dog.bark` 함수(0x1100)와 `my_dog` 인스턴스(0x2000)를 **내부에 저장**하고 있음\n- `method()` 호출 시, **저장된 my_dog가 자동으로 self로 전달**됨!\n\n**비교**:\n```python\nmy_dog.bark()      # my_dog가 self로 전달\nmethod()           # method에 저장된 my_dog가 self로 전달 (동일!)\n```\n\n**왜 이 순서인가?** 타입 확인 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: method() 호출 → 바운드 메서드 0x2100 실행 → line 3으로 점프 → self=my_dog",
+        "explanation": "**`method()`**\n\n놀랍게도, `self`를 전달하지 않고 `method()`만 호출해도 잘 동작합니다! 마치 일반 함수를 호출하는 것처럼 보이지만, 내부에서는 `my_dog`가 `self`로 자동 전달됩니다.\n\n**왜 self 없이 동작하는가?**\n- `method`는 바운드 메서드 객체(0x2100)입니다\n- 이 객체 내부에는 `__func__` = `Dog.bark`(원본 함수)와 `__self__` = `my_dog`(바인딩된 인스턴스)가 저장되어 있습니다\n- `method()`를 호출하면, Python이 내부적으로 `method.__func__(method.__self__)`를 실행합니다\n- 즉, `Dog.bark(my_dog)`와 완전히 동일합니다!\n\n**실무 활용 -- 콜백(callback) 패턴**: 이 기능은 GUI 프로그래밍이나 이벤트 핸들러에서 자주 사용됩니다. 예를 들어 `button.on_click = my_dog.bark`처럼 바운드 메서드를 저장해두면, 버튼이 클릭될 때 자동으로 `my_dog.bark()`가 실행됩니다. self를 따로 관리할 필요가 없으니 매우 편리합니다!\n\n**흔한 실수 -- 괄호 실수**: `method = my_dog.bark()`라고 괄호를 붙여버리면, bark가 즉시 실행되고 `method`에는 bark의 **반환값**(None)이 저장됩니다. 그러면 나중에 `method()`를 호출할 때 `TypeError: 'NoneType' is not callable` 에러가 발생합니다!\n\n**왜 이 순서인가?** 타입 확인 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: method() 호출 --> 바운드 메서드 0x2100 내부의 __func__(__self__) 실행 --> line 3으로 점프 --> self=my_dog",
         "visualizationType": "pythonMemory",
         "code": "method()  # self 없이 호출 가능!",
         "pythonMemoryState": {
@@ -465,7 +465,7 @@
       },
       {
         "title": "bark 메서드 실행 (3번째)",
-        "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\n**같은 결과!**\n- `self` = `my_dog` (0x2000) ← 바운드 메서드에 저장된 객체!\n- `id(self)` → 8192 (동일!)\n\n**3가지 호출 방법 비교**:\n```python\n# 1. 바운드 메서드 직접 호출\nmy_dog.bark()         # self 자동 전달 → 8192 출력\n\n# 2. 언바운드 호출\nDog.bark(my_dog)      # self 명시 전달 → 8192 출력\n\n# 3. 저장된 바운드 메서드 호출\nmethod = my_dog.bark\nmethod()              # 저장된 my_dog가 self로 전달 → 8192 출력\n```\n\n**결론**: 모든 방법의 결과는 동일! 바운드 메서드는 **편의성**을 위한 것입니다.\n\n**왜 이 순서인가?** 메서드 호출(line 16)에서 점프해왔습니다.\n\n**실행 순서**: id(self) → 8192 → f-string 평가 → print 실행 → bark 종료 → 프로그램 종료",
+        "explanation": "**`print(f\"멍멍! (id: {id(self)})\")`**\n\n3번째이자 마지막 bark 실행입니다. 이번에도 `id(self)` --> 8192로, 3번 모두 **완전히 동일한 결과**가 나왔습니다!\n\n**3가지 호출 방법 최종 비교**:\n- 방법 1 -- `my_dog.bark()` (바운드 메서드): 인스턴스를 통해 접근하면 디스크립터 프로토콜이 발동하여 self를 자동 전달합니다. 가장 일반적이고 권장되는 방법입니다.\n- 방법 2 -- `Dog.bark(my_dog)` (언바운드 호출): 클래스의 함수를 직접 호출하고 self를 명시적으로 넘깁니다. 내부 동작 이해나 상속 구조에서 특정 부모 메서드 호출에 사용합니다.\n- 방법 3 -- `method()` (저장된 바운드 메서드): 바운드 메서드를 변수에 저장하면, 나중에 self 없이 호출할 수 있습니다. 콜백, 이벤트 핸들러, 데코레이터 패턴에서 유용합니다.\n\n**세 방법이 동일한 이유**: 결국 모두 `Dog.__dict__['bark']`라는 **같은 함수 객체**(0x1100)에 **같은 인스턴스**(0x2000)를 `self`로 전달하기 때문입니다. 전달 경로만 다를 뿐, 도착지는 같습니다.\n\n**이번 레슨의 핵심 정리**:\n1. 클래스에 정의된 메서드는 본질적으로 **함수 객체**입니다\n2. 인스턴스를 통해 접근하면 **바운드 메서드**로 변환되어 self가 자동 전달됩니다\n3. 바운드 메서드는 `__func__`(원본 함수)와 `__self__`(바인딩된 인스턴스)를 내부에 저장합니다\n4. function과 method는 Python에서 **서로 다른 타입**의 객체입니다\n\n**실행 순서**: id(self) --> 8192 --> f-string 평가 --> print 실행 --> bark 종료 --> 프로그램 종료",
         "visualizationType": "pythonMemory",
         "code": "print(f\"멍멍! (id: {id(self)})\")",
         "pythonMemoryState": {

@@ -1,0 +1,218 @@
+{
+  "lessonId": "py-14-2",
+  "title": "조건부 컴프리헨션과 중첩",
+  "concept": "if-else 표현식은 for 앞에, 필터 if는 for 뒤에 — 위치가 다르다!",
+  "content": {
+    "code": "numbers = [1, 2, 3, 4, 5]\n\nlabels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]\nprint(labels)\n\nmatrix = [[1, 2], [3, 4], [5, 6]]\nflat = [num for row in matrix for num in row]\nprint(flat)",
+    "steps": [
+      {
+        "title": "원본 리스트 생성",
+        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- 정수 5개를 담은 리스트를 생성하고 `numbers`라는 이름표를 붙입니다.\n\n이번 레슨에서는 컴프리헨션의 **두 가지 고급 패턴**을 배웁니다:\n1. **조건 표현식(if-else)** 컴프리헨션 -- 값을 변환할 때 조건에 따라 다른 값을 선택\n2. **중첩 컴프리헨션** -- 2차원 리스트를 1차원으로 평탄화(flatten)\n\n**비유:** 이전 레슨의 컴프리헨션이 \"단순한 공장 라인\"이었다면, 이번에는 **분류 장치**와 **다단계 컨베이어 벨트**를 추가하는 것입니다. 물건이 들어오면 조건에 따라 다른 라벨을 붙이고, 여러 상자 안의 물건을 한 줄로 펼칠 수 있습니다.\n\n**핵심 주의사항:** 이전 레슨에서 배운 `if` 필터와 이번에 배울 `if-else` 조건 표현식은 **위치가 다릅니다!**\n- 필터: `[x for x in nums **if 조건**]` -- for **뒤**에 위치\n- 조건식: `[**값A if 조건 else 값B** for x in nums]` -- for **앞**에 위치\n이 두 가지를 혼동하는 것이 초보자가 가장 많이 하는 실수입니다.\n\n**Python 내부 동작:** 리스트 `[1, 2, 3, 4, 5]`가 힙 메모리에 할당되고, CPython에서 -5부터 256 사이의 작은 정수는 미리 캐싱되어 있어 새로 생성되지 않고 기존 정수 객체를 재활용합니다.\n\n**실행 순서:**\n1. 리스트 리터럴 평가 → `list` 객체 힙에 할당.\n2. 전역 네임스페이스에 `numbers → list` 바인딩 생성.",
+        "visualizationType": "pythonMemory",
+        "code": "numbers = [1, 2, 3, 4, 5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "조건 표현식과 중첩 컴프리헨션을 배울 준비",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "if-else 조건 표현식 컴프리헨션",
+        "explanation": "**`labels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]`** -- 각 숫자가 짝수면 `\"even\"`, 홀수면 `\"odd\"`를 부여하여 새 리스트를 만듭니다.\n\n**조건 표현식(Ternary Expression) + 컴프리헨션:** `[값A if 조건 else 값B for x in 리스트]`\n\n이 문법은 파이썬의 **삼항 연산자**를 컴프리헨션의 표현식 위치에 사용한 것입니다. 다른 언어의 `조건 ? 값A : 값B`와 동일한 역할이지만, 파이썬은 더 영어 문장에 가까운 문법을 사용합니다.\n\n**비유:** 과일 분류 기계를 상상하세요. 사과가 들어오면 두 개의 출구가 있습니다 -- 빨간 사과(조건 True)는 \"등급A\" 라벨이 붙고, 초록 사과(조건 False)는 \"등급B\" 라벨이 붙습니다. 어떤 사과도 버려지지 않고, **모든 사과에 반드시 라벨이 하나** 붙습니다.\n\n**동작 과정:**\n1. `x = 1` → `1 % 2 == 0`? `False` → `\"odd\"`\n2. `x = 2` → `2 % 2 == 0`? `True` → `\"even\"`\n3. `x = 3` → `3 % 2 == 0`? `False` → `\"odd\"`\n4. `x = 4` → `4 % 2 == 0`? `True` → `\"even\"`\n5. `x = 5` → `5 % 2 == 0`? `False` → `\"odd\"`\n6. 결과: `[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]`\n\n**핵심 구분 (가장 중요!):**\n- `if-else`는 **for 앞**: 모든 요소에 대해 **둘 중 하나를 선택** (요소 수 유지)\n- `if`만 **for 뒤**: 조건 만족하는 요소만 **포함/제외** (요소 수 감소)\n\n**Python 내부 동작:** 삼항 표현식 `\"even\" if x % 2 == 0 else \"odd\"`는 바이트코드에서 `POP_JUMP_IF_FALSE` 명령으로 컴파일됩니다. 조건이 True이면 `\"even\"` 문자열 객체를, False이면 `\"odd\"` 문자열 객체를 스택에 올립니다.\n\n**주의:** `[x for x in nums if x > 0 else -x]`는 `SyntaxError`입니다! `if-else`를 쓰려면 반드시 for **앞**에 `[x if x > 0 else -x for x in nums]`처럼 작성해야 합니다.\n\n**실행 순서:**\n1. 빈 리스트 생성.\n2. `numbers` 순회 시작.\n3. 각 `x`에 대해 조건 `x % 2 == 0` 평가.\n4. True → `\"even\"`, False → `\"odd\"` 선택 후 리스트에 추가.\n5. 완성된 리스트를 `labels`에 바인딩.",
+        "visualizationType": "pythonMemory",
+        "code": "labels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "if-else는 for 앞에 위치 (값 선택용)",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "labels 결과 출력",
+        "explanation": "**`print(labels)`** -- `labels`가 가리키는 `[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]`를 출력합니다.\n\n결과를 보면 원래 5개의 숫자가 5개의 문자열로 **1:1 변환**되었습니다. 하나도 빠지지 않았죠! 이것이 for 앞의 `if-else`(값 선택)와 for 뒤의 `if`(필터링)의 결정적 차이입니다.\n\n**비유:** 학교 시험에서 60점 이상이면 \"합격\", 미만이면 \"불합격\" 도장을 찍는 것과 같습니다. 모든 학생이 반드시 도장 하나를 받습니다. 반면, for 뒤의 `if`는 \"60점 이상인 학생만 명단에 올리기\"와 같아서 일부 학생이 제외됩니다.\n\n**일반 for문으로 쓰면:**\n```python\nlabels = []\nfor x in numbers:\n    if x % 2 == 0:\n        labels.append(\"even\")\n    else:\n        labels.append(\"odd\")\n```\n**6줄 → 1줄**로 압축되었습니다!\n\n**Python 내부 동작:** 삼항 표현식 `값A if 조건 else 값B`는 컴프리헨션 밖에서도 독립적으로 사용 가능합니다. `result = \"pass\" if score >= 60 else \"fail\"` 처럼 변수 할당에도 자주 쓰입니다. 내부적으로 이것은 파이썬 문법(grammar)에서 `conditional_expression`이라는 규칙으로 정의됩니다.\n\n**주의:** 삼항 표현식을 중첩하면 가독성이 급격히 떨어집니다. `\"A\" if x > 90 else \"B\" if x > 80 else \"C\"`는 작동하지만 읽기 어렵습니다. 이런 경우에는 `if-elif-else`문이나 딕셔너리 매핑을 사용하세요.\n\n**실행 순서:**\n1. `labels` 이름 → 리스트 객체 참조 해석.\n2. `print()` 호출 → 리스트의 `__repr__()` → 문자열 변환.\n3. `sys.stdout`에 출력.",
+        "visualizationType": "pythonMemory",
+        "code": "print(labels)",
+        "pythonMemoryState": {
+          "output": [
+            "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]"
+          ],
+          "note": "모든 요소에 대해 even 또는 odd 레이블 부여"
+        }
+      },
+      {
+        "title": "2차원 리스트(행렬) 생성",
+        "explanation": "**`matrix = [[1, 2], [3, 4], [5, 6]]`** -- 리스트 안에 리스트가 들어있는 **2차원 리스트**를 생성합니다. 이런 구조를 행렬(matrix)이라고도 부릅니다.\n\n**비유:** 아파트 건물을 상상하세요. 건물(matrix) 안에 여러 층(row)이 있고, 각 층에 여러 호실(원소)이 있습니다. `matrix[0]`은 1층 전체([1, 2])이고, `matrix[0][1]`은 1층 2호(2)입니다.\n\n**구조:**\n```\nmatrix = [\n    [1, 2],    -- row 0 (첫 번째 행)\n    [3, 4],    -- row 1 (두 번째 행)\n    [5, 6]     -- row 2 (세 번째 행)\n]\n```\n\n**접근 방법:**\n- `matrix[0]` → `[1, 2]` (첫 번째 행 전체)\n- `matrix[0][1]` → `2` (첫 번째 행의 두 번째 요소)\n- `matrix[2][0]` → `5` (세 번째 행의 첫 번째 요소)\n\n**Python 내부 동작:** 2차원 리스트는 사실 \"리스트들의 리스트\"입니다. 바깥 리스트는 안쪽 리스트 3개의 **참조(메모리 주소)**를 저장하고, 안쪽 각 리스트는 정수 객체 2개의 참조를 저장합니다. 총 4개의 리스트 객체와 6개의 정수 객체가 힙에 존재합니다.\n\n다음 단계에서 이 2차원 리스트를 **1차원으로 평탄화(flatten)**합니다.\n\n**실행 순서:**\n1. 내부 리스트 `[1, 2]`, `[3, 4]`, `[5, 6]` 3개 생성.\n2. 바깥 리스트 생성 → 내부 리스트들의 참조 저장.\n3. 전역 네임스페이스에 `matrix` 바인딩 생성.",
+        "visualizationType": "pythonMemory",
+        "code": "matrix = [[1, 2], [3, 4], [5, 6]]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "2차원 리스트 (3행 2열 행렬)",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "matrix",
+              "pointsTo": "list3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[[1, 2], [3, 4], [5, 6]]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "중첩 컴프리헨션으로 평탄화(flatten)",
+        "explanation": "**`flat = [num for row in matrix for num in row]`** -- 2차원 리스트의 모든 요소를 꺼내 1차원 리스트로 만듭니다.\n\n**중첩 컴프리헨션:** `for`가 두 번 연속으로 나옵니다! 읽는 순서는 **왼쪽에서 오른쪽**으로, 일반 중첩 for문과 동일합니다.\n\n**비유:** 사과 상자가 3개 있고, 각 상자에 사과가 2개씩 들어있다고 상상하세요. 상자(row)를 하나씩 열고, 그 안의 사과(num)를 하나씩 꺼내 큰 바구니(flat)에 담는 과정입니다. 상자 1번 열기 → 사과 꺼내기 → 상자 2번 열기 → 사과 꺼내기 → ... 이 순서로 진행됩니다.\n\n**일반 for문 동치:**\n```python\nflat = []\nfor row in matrix:       # 바깥 for (왼쪽에 먼저 쓰임)\n    for num in row:      # 안쪽 for (오른쪽에 나중에 쓰임)\n        flat.append(num)\n```\n\n**동작 과정:**\n1. `row = [1, 2]` → `num = 1`, `num = 2` → flat에 1, 2 추가\n2. `row = [3, 4]` → `num = 3`, `num = 4` → flat에 3, 4 추가\n3. `row = [5, 6]` → `num = 5`, `num = 6` → flat에 5, 6 추가\n4. 결과: `[1, 2, 3, 4, 5, 6]`\n\n**Python 내부 동작:** 중첩 컴프리헨션에서 바깥 for가 먼저 실행되고, 각 반복마다 안쪽 for가 완전히 실행됩니다. 바이트코드를 보면 두 개의 `FOR_ITER` 루프가 중첩되어 있습니다. 시간 복잡도는 전체 요소 수 N에 대해 O(N)입니다.\n\n**주의:** 중첩 컴프리헨션에서 가장 흔한 실수는 for의 **순서를 뒤집는 것**입니다. `[num for num in row for row in matrix]`라고 쓰면 `row`가 아직 정의되지 않아 `NameError`가 발생합니다. 바깥 반복 변수(row)를 먼저 선언해야 안쪽에서 사용할 수 있습니다.\n\n**실행 순서:**\n1. 빈 리스트 생성.\n2. 바깥 for: `matrix`에서 `row` 순회 시작.\n3. 안쪽 for: 현재 `row`에서 `num` 순회.\n4. 각 `num`을 새 리스트에 추가.\n5. 모든 행 처리 후 완성된 리스트를 `flat`에 바인딩.",
+        "visualizationType": "pythonMemory",
+        "code": "flat = [num for row in matrix for num in row]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "중첩 for: 바깥(row) → 안쪽(num) 순서",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "matrix",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "flat",
+              "pointsTo": "list4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[[1, 2], [3, 4], [5, 6]]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5, 6]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "평탄화 결과 출력",
+        "explanation": "**`print(flat)`** -- `flat`이 가리키는 `[1, 2, 3, 4, 5, 6]`을 출력합니다. 2차원 행렬이 성공적으로 1차원 리스트로 변환되었습니다.\n\n**평탄화(Flatten)**는 다차원 데이터를 1차원으로 펼치는 연산으로, 코딩 테스트와 데이터 처리에서 매우 자주 등장하는 패턴입니다.\n\n**비유:** 3층짜리 책장의 모든 책을 바닥에 한 줄로 늘어놓는 것과 같습니다. 1층 책부터 차례로, 그 다음 2층, 3층 순으로 나열합니다.\n\n**이번 레슨 핵심 정리:**\n\n| 패턴 | 위치 | 용도 | 요소 수 |\n|------|------|------|--------|\n| `if` 필터 | for **뒤** | 요소 선택/제외 | 감소 |\n| `if-else` | for **앞** | 값 변환 분기 | 유지 |\n| 중첩 for | for 연속 | 다차원 → 1차원 | 증가 |\n\n**Python 내부 동작:** 평탄화를 하는 다른 방법으로는 `itertools.chain.from_iterable(matrix)`가 있습니다. 이것은 이터레이터를 반환하므로 메모리 효율이 더 좋습니다. 하지만 간단한 경우에는 컴프리헨션이 가장 읽기 쉽습니다.\n\n**주의:** 중첩 컴프리헨션이 **3단계 이상**이면 가독성이 급격히 떨어집니다. `[x for a in A for b in a for x in b]` 같은 코드는 이해하기 매우 어렵습니다. 2단계까지만 컴프리헨션을 사용하고, 그 이상은 일반 for문이나 `itertools`를 권장합니다.\n\n**실행 순서:**\n1. `flat` 이름 → 리스트 객체 참조 해석.\n2. `print()` → `list.__repr__()` 호출.\n3. `sys.stdout`에 `[1, 2, 3, 4, 5, 6]` 출력.",
+        "visualizationType": "pythonMemory",
+        "code": "print(flat)",
+        "pythonMemoryState": {
+          "output": [
+            "[1, 2, 3, 4, 5, 6]"
+          ],
+          "note": "2차원 → 1차원 평탄화 완료"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "[\"even\" if x % 2 == 0 else \"odd\" for x in [1, 2, 3]]에서 if-else는 어디에 위치하는가?",
+    "options": [
+      "for 뒤에 위치 (필터링)",
+      "for 앞에 위치 (값 선택)",
+      "리스트 바깥에 위치",
+      "위치는 상관없다"
+    ],
+    "correctIndex": 1,
+    "explanation": "if-else 조건 표현식은 for **앞**에 위치하여 각 요소의 값을 선택합니다.\nfor **뒤**의 if는 요소를 필터링(포함/제외)하는 역할입니다.\n이 두 가지 if의 위치와 용도를 구분하는 것이 중요합니다!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "중첩 컴프리헨션에서 안쪽 for가 먼저 실행된다",
+      "correct": "중첩 컴프리헨션은 왼쪽 for부터 실행됩니다 (일반 중첩 for문과 같은 순서).",
+      "why": "[num for row in matrix for num in row]에서\n먼저 row를 순회하고, 각 row에 대해 num을 순회합니다."
+    }
+  ],
+  "keyTakeaway": "if-else는 for 앞(값 선택), if만은 for 뒤(필터)! 위치로 용도가 달라진다!"
+}

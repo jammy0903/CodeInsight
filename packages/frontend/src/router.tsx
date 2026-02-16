@@ -11,7 +11,7 @@ import { AuthPage } from './features/auth';
 
 import { PlaygroundPage } from './features/playground';
 import { AdminPage, AdminRoute } from './features/admin';
-import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage } from './features/quiz';
+import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage, AlgorithmQuizPage } from './features/quiz';
 import { ProfilePage } from './features/profile';
 import { DashboardPage } from './features/dashboard';
 import { ReportPage } from './features/report';
@@ -96,6 +96,7 @@ export const router = createBrowserRouter([
       { path: 'quiz/ox/:lang', element: <ProtectedRoute><OXQuizPage /></ProtectedRoute> },
       { path: 'quiz/multiple-choice/:lang', element: <ProtectedRoute><MultipleChoiceQuizPage /></ProtectedRoute> },
       { path: 'quiz/fill-blank/:lang', element: <ProtectedRoute><FillBlankQuizPage /></ProtectedRoute> },
+      { path: 'quiz/algorithm/:lang', element: <ProtectedRoute><AlgorithmQuizPage /></ProtectedRoute> },
       { path: 'profile', element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
       { path: 'dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
       { path: 'report', element: <ProtectedRoute><ReportPage /></ProtectedRoute> },

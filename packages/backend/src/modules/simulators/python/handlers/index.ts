@@ -133,16 +133,3 @@ export class PyHandlerRegistry {
 
 // 싱글톤 인스턴스
 export const pyHandlerRegistry = new PyHandlerRegistry();
-
-// Re-exports
-export { AssignHandler } from './assign.handler';
-export { PrintHandler } from './print.handler';
-export { ReturnHandler } from './return.handler';
-export { FunctionCallHandler, AssignFunctionCallHandler } from './function-call.handler';
-export { MethodCallHandler, AssignMethodCallHandler } from './method-call.handler';
-export { InstanceCreateHandler } from './instance-create.handler';
-export { AttributeAssignHandler } from './attribute.handler';
-export { FunctionDefHandler } from './function-def.handler';
-export { ClassDefHandler } from './class-def.handler';
-export { GlobalNonlocalHandler } from './global.handler';
-export { BuiltinFunctionHandler, AssignBuiltinHandler, evaluateBuiltinExpression } from './builtin.handler';

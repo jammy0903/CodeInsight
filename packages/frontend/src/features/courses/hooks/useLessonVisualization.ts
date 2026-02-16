@@ -54,6 +54,7 @@ export const VIZ_DATA_FIELDS = [
   'stack', 'memoryState', 'scopeState', 'eventLoopState',
   'promiseState', 'thisState', 'prototypeState', 'callStackState',
   'pythonMemoryState', 'pyNames', 'javaMemoryState', 'memoryChanges',
+  'algorithmState',
 ] as const;
 
 export function hasVisualizationData(step: LessonStep): boolean {
@@ -371,6 +372,7 @@ export function useLessonVisualization(
       || (resolvedStep as any).thisState
       || (resolvedStep as any).prototypeState
       || (resolvedStep as any).callStackState
+      || (resolvedStep as any).algorithmState
       || (resolvedStep as any).memoryState
       || null;
 

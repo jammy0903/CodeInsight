@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "문자열 생성",
-        "explanation": "**`text = \"Hello Python\"`**\n\n**문자열(String)**: 불변(immutable) 타입입니다.\n\n이 레슨에서는:\n- 문자열 메서드로 새 문자열 생성\n- 원본은 변경되지 않음\n",
+        "explanation": "**`text = \"Hello Python\"`** -- 메모리에 문자열 객체 `\"Hello Python\"`을 만들고, `text`라는 이름표를 붙입니다.\n\n문자열(str)은 **불변(Immutable)** 타입입니다. 이번 레슨에서 배울 `upper()`, `split()` 등의 메서드는 원본 문자열을 수정하지 않고, 항상 **새로운 객체를 만들어 반환**합니다.\n\n**비유:** `text`는 원본 문서입니다. 이 문서를 복사기에 넣고 대문자 버전, 단어별 분리 버전 등을 만들어내는 것입니다. 원본 문서 자체는 절대 바뀌지 않습니다.\n\n**왜 메서드인가?** 파이썬의 모든 것은 객체이고, 객체에는 **메서드(method)**라는 내장 기능이 있습니다. `text.upper()`에서 `.`(점)은 '이 객체의 기능을 사용하겠다'는 의미입니다.\n\n**Python 내부 동작:** `\"Hello Python\"` 문자열 객체가 힙 메모리에 생성됩니다. 이 객체는 `str` 클래스의 인스턴스이며, `str` 클래스에 정의된 수십 가지 메서드(`upper`, `lower`, `split`, `replace`, `strip`, `find` 등)를 모두 사용할 수 있습니다.\n\n**실용 팁:** `dir(text)`를 실행하면 문자열 객체가 가진 모든 메서드 목록을 볼 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "text = \"Hello Python\"",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "원본 출력",
-        "explanation": "**`print(f\"원본: {text}\")`**\n\n**출력 결과**: `원본: Hello Python`\n",
+        "explanation": "**`print(f\"원본: {text}\")`** -- f-string을 사용하여 원본 문자열의 내용을 확인합니다.\n\n출력 결과: `원본: Hello Python`\n\n**왜 먼저 출력하는가?** 이후에 `upper()`와 `split()` 메서드를 사용한 뒤, 원본이 변하지 않았음을 증명하기 위한 기준점입니다. '변경 전'의 상태를 기록해두는 것입니다.\n\n**f-string 복습:** `f\"...\"`에서 중괄호 `{text}` 안의 변수가 실제 값으로 치환됩니다. `f\"원본: {text}\"` -> `\"원본: Hello Python\"`\n\n**Python 내부 동작:** f-string은 내부적으로 `text.__format__('')`을 호출하여 문자열 표현을 얻고, 나머지 리터럴 부분과 합쳐 새로운 문자열을 생성합니다. 이 과정에서 `text` 객체 자체는 전혀 변하지 않습니다.\n\n**비유:** 원본 문서를 복사기에 넣기 전에 사진을 찍어두는 것과 같습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"원본: {text}\")",
         "pythonMemoryState": {
@@ -57,7 +57,7 @@
       },
       {
         "title": "대문자 변환",
-        "explanation": "**`upper = text.upper()`**\n\n**upper() 메서드**: 모든 문자를 대문자로 변환한 새 문자열을 반환합니다.\n\n**구조**: `문자열.메서드()`\n\n**중요**: 원본 `text`는 변경되지 않음!\n- `text` → 여전히 `\"Hello Python\"`\n- `upper` → 새로운 문자열 `\"HELLO PYTHON\"`\n\n**왜?**: 문자열은 불변(immutable)이기 때문\n",
+        "explanation": "**`upper = text.upper()`** -- `upper()` 메서드로 모든 문자를 대문자로 변환한 **새 문자열**을 반환합니다.\n\n`text.upper()`를 호출하면:\n1. `text`가 가리키는 `\"Hello Python\"` 객체의 각 문자를 대문자로 변환합니다\n2. 결과인 `\"HELLO PYTHON\"`이라는 **완전히 새로운 문자열 객체**가 생성됩니다\n3. `upper` 이름표가 이 새 객체를 가리킵니다\n\n**핵심:** 원본 `text`는 **전혀 변하지 않습니다!** `text`는 여전히 `\"Hello Python\"`을 가리키고 있습니다. 왜냐하면 문자열은 불변(Immutable)이기 때문입니다.\n\n**비유:** 원본 문서(text)를 복사기에 넣고 '대문자 변환' 버튼을 누르면, 새로운 복사본(upper)이 나옵니다. 원본은 그대로입니다.\n\n**관련 메서드:**\n- `lower()`: 모든 문자를 소문자로 변환\n- `capitalize()`: 첫 글자만 대문자, 나머지 소문자\n- `title()`: 각 단어의 첫 글자를 대문자로\n- `swapcase()`: 대소문자를 서로 뒤바꿈\n\n**Python 내부 동작:** `str.upper()`는 C 레벨에서 유니코드 문자 매핑 테이블을 사용하여 각 문자의 대문자 버전을 찾습니다. 새 `str` 객체를 힙에 할당하고, 변환된 문자들을 복사합니다.\n\n**주의:** `text.upper()`만 쓰고 결과를 변수에 저장하지 않으면 반환값이 사라집니다! 반드시 `upper = text.upper()`처럼 저장해야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "upper = text.upper()",
         "pythonMemoryState": {
@@ -90,7 +90,7 @@
       },
       {
         "title": "대문자 출력",
-        "explanation": "**`print(f\"대문자: {upper}\")`**\n\n**출력 결과**: `대문자: HELLO PYTHON`\n\n**다른 메서드**:\n- `lower()`: 소문자로 변환\n- `capitalize()`: 첫 글자만 대문자\n- `title()`: 각 단어의 첫 글자 대문자\n",
+        "explanation": "**`print(f\"대문자: {upper}\")`** -- 대문자로 변환된 새 문자열을 출력합니다.\n\n출력 결과: `대문자: HELLO PYTHON`\n\n`upper` 변수가 가리키는 `\"HELLO PYTHON\"` 객체의 내용이 출력됩니다. `text`(원본)와 `upper`(변환 결과)는 서로 다른 객체이며, 각각 독립적으로 존재합니다.\n\n**불변성 확인:** `text`는 여전히 `\"Hello Python\"`입니다. `upper()` 호출이 원본을 바꾸지 않았음을 알 수 있습니다.\n\n**자주 묻는 질문:** \"왜 `text = text.upper()`로 안 쓰나요?\" -- 물론 그렇게 쓸 수도 있습니다. 그러면 `text` 이름표가 새 객체(`\"HELLO PYTHON\"`)를 가리키게 되고, 원본 `\"Hello Python\"` 객체는 참조 카운트가 0이 되어 가비지 컬렉터가 회수합니다.\n\n**Python 내부 동작:** 메모리에 `str1`(\"Hello Python\")과 `str2`(\"HELLO PYTHON\") 두 개의 독립된 문자열 객체가 존재합니다. 각각의 참조 카운트는 1입니다.\n\n**실용 팁:** 대소문자를 무시한 문자열 비교에 유용합니다: `\"Hello\" .lower() == \"hello\".lower()` -> `True`",
         "visualizationType": "pythonMemory",
         "code": "print(f\"대문자: {upper}\")",
         "pythonMemoryState": {
@@ -126,7 +126,7 @@
       },
       {
         "title": "문자열 분리",
-        "explanation": "**`words = text.split()`**\n\n**split() 메서드**: 문자열을 공백 기준으로 나눠서 리스트로 반환합니다.\n\n**동작**:\n- `\"Hello Python\"` → `[\"Hello\", \"Python\"]`\n- 반환 타입: 리스트!\n\n**매개변수 없으면**: 공백(스페이스, 탭, 줄바꿈)으로 분리\n**매개변수 있으면**: `text.split(\",\")` → 쉼표로 분리\n",
+        "explanation": "**`words = text.split()`** -- `split()` 메서드로 문자열을 공백 기준으로 나눠 **리스트**로 반환합니다.\n\n`text.split()`을 호출하면:\n1. `\"Hello Python\"` 문자열에서 공백을 기준으로 분리합니다\n2. 분리된 각 조각을 원소로 가진 **리스트 객체** `[\"Hello\", \"Python\"]`이 생성됩니다\n3. `words` 이름표가 이 리스트를 가리킵니다\n\n**반환 타입에 주목!** `upper()`는 문자열을 반환했지만, `split()`은 **리스트(list)**를 반환합니다. 메서드마다 반환 타입이 다를 수 있으니 주의하세요.\n\n**매개변수에 따른 동작:**\n- `text.split()` -- 공백(스페이스, 탭, 줄바꿈)으로 분리, 연속 공백도 하나로 처리\n- `text.split(\",\")` -- 쉼표로 분리\n- `text.split(\" \", 1)` -- 공백으로 분리하되 최대 1번만 (결과 2개)\n\n**비유:** 긴 빵(문자열)을 칼(구분자)로 잘라서 접시(리스트)에 담는 것과 같습니다. 칼로 자르는 위치(공백)마다 조각이 만들어집니다.\n\n**Python 내부 동작:** `split()` 메서드는 문자열을 순회하면서 공백 위치를 찾고, 각 구간을 새로운 `str` 객체로 만들어 리스트에 추가합니다. 반환되는 리스트 객체와 그 안의 문자열 객체들 모두 새로 생성된 것입니다.\n\n**역방향:** `\" \".join([\"Hello\", \"Python\"])` = `\"Hello Python\"` -- `split()`의 반대 연산입니다.",
         "visualizationType": "pythonMemory",
         "code": "words = text.split()",
         "pythonMemoryState": {
@@ -169,7 +169,7 @@
       },
       {
         "title": "분리 결과 출력",
-        "explanation": "**`print(f\"단어 분리: {words}\")`**\n\n**출력 결과**: `단어 분리: ['Hello', 'Python']`\n\n**요약**:\n- `upper()` → 새 문자열 반환\n- `split()` → 리스트 반환\n- 원본은 항상 변경 안 됨\n",
+        "explanation": "**`print(f\"단어 분리: {words}\")`** -- 분리된 결과 리스트를 출력합니다.\n\n출력 결과: `단어 분리: ['Hello', 'Python']`\n\n`words`는 2개의 문자열을 담은 리스트입니다. `words[0]`은 `\"Hello\"`, `words[1]`은 `\"Python\"`입니다.\n\n**핵심 요약 -- 문자열 메서드의 규칙:**\n- 문자열은 **불변(Immutable)** -> 메서드는 항상 새 객체를 반환\n- `upper()`, `lower()` 등 -> **새 문자열** 반환\n- `split()` -> **리스트** 반환\n- 원본은 **항상 변경 안 됨!**\n\n**비유:** 문자열 메서드는 '원본을 건드리지 않는 복사기'와 같습니다. 어떤 변환을 하든 원본은 그대로이고, 변환 결과만 새로 나옵니다.\n\n**Python 내부 동작:** f-string 안에서 `{words}`를 평가할 때, `words.__repr__()`이 호출됩니다. 리스트의 `__repr__`은 각 원소의 `__repr__`을 호출하여 `['Hello', 'Python']` 형태의 문자열을 만듭니다.\n\n**실용 팁:** CSV 데이터를 파싱할 때 `line.split(\",\")`를 자주 사용합니다. 더 복잡한 파싱에는 `csv` 모듈을 사용하세요.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"단어 분리: {words}\")",
         "pythonMemoryState": {

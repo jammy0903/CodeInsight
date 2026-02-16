@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "부모 클래스 정의 (Animal)",
-        "explanation": "**`class Animal:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n**부모 클래스(Parent Class)** `Animal`을 정의합니다.\n\n**상속(Inheritance)**: 다른 클래스의 기능을 물려받아 재사용하는 것입니다.\nAnimal은 부모 역할을 할 기본 클래스입니다.\n\n**왜 이 순서인가?** 부모 클래스를 먼저 정의해야 나중에 자식 클래스가 상속받을 수 있습니다.\n\n**실행 순서**: class Animal 실행 → Animal 클래스 등록 시작 → line 2",
+        "explanation": "**`class Animal:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Animal`이라는 **부모 클래스(Parent Class, 기반 클래스, Base Class)**를 정의합니다.\n\n**이 레슨의 목표 -- 상속(Inheritance)**: 이미 만들어진 클래스의 기능을 **물려받아 재사용**하고, 필요한 부분만 **추가하거나 변경**하는 것입니다. 프로그래밍에서 가장 강력한 코드 재사용 기법 중 하나입니다.\n\n**비유**: 부모님에게 유전자를 물려받는 것과 비슷합니다. 기본적인 특성(Animal의 speak)을 물려받으면서, 각자의 개성(Dog는 \"Bark!\", Cat은 부모 그대로)을 가질 수 있습니다.\n\n**Python 내부 동작**: `class Animal:` 문을 만나면 Python은 Animal 클래스 객체를 생성합니다. 이 클래스는 나중에 Dog와 Cat의 **부모** 역할을 합니다. 부모 클래스를 지정하지 않은 경우 Python 3에서는 자동으로 `object` 클래스를 상속받습니다 (즉, `class Animal:` = `class Animal(object):`).\n\n**왜 이 순서인가?** 부모 클래스를 먼저 정의해야 나중에 자식 클래스가 상속받을 수 있습니다. 아직 존재하지 않는 클래스를 상속하려 하면 `NameError`가 발생합니다.\n\n**실행 순서**: class Animal 실행 --> Animal 클래스 객체 생성 시작 --> line 2",
         "visualizationType": "pythonMemory",
         "code": "class Animal:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "부모 메서드 정의 (speak)",
-        "explanation": "**`def speak(self):`**\n\n부모 클래스 `Animal`에 `speak` 메서드를 정의합니다.\n이 메서드는 자식 클래스들이 **상속받거나 재정의(오버라이딩)**할 수 있습니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def speak 실행 → speak 메서드 등록 → Animal 클래스 정의 완료 → line 5",
+        "explanation": "**`def speak(self):`**\n\n부모 클래스 `Animal`에 `speak` 메서드를 정의합니다. 이 메서드는 `print(\"...\")`로 기본적인 소리(\"...\")를 출력합니다.\n\n**부모 메서드의 두 가지 운명**: 자식 클래스에서 이 메서드를:\n1. **그대로 상속** -- 재정의하지 않으면 부모의 speak이 그대로 사용됩니다 (Cat이 이 경우)\n2. **오버라이딩(재정의)** -- 같은 이름으로 다시 정의하면 자식의 버전이 우선됩니다 (Dog가 이 경우)\n\n**비유**: Animal.speak은 \"동물은 소리를 낸다\"라는 **기본 설계**입니다. 구체적인 동물마다 소리가 다르므로, 필요한 경우 자식 클래스에서 재정의할 수 있습니다. 재정의하지 않은 동물은 기본 소리인 \"...\"를 냅니다.\n\n**Python 내부 동작**: `def speak(self):` 문은 speak이라는 함수 객체를 생성하고, Animal 클래스의 `__dict__`에 등록합니다. 즉, `Animal.__dict__['speak'] = <function>`이 됩니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def speak 실행 --> speak 함수 객체 생성 --> Animal.speak에 등록 --> Animal 클래스 정의 완료 --> line 5",
         "visualizationType": "pythonMemory",
         "code": "def speak(self):",
         "highlightOffset": [
@@ -52,7 +52,7 @@
       },
       {
         "title": "자식 클래스 정의 (Dog)",
-        "explanation": "**`class Dog(Animal):`**\n\n**상속 문법**: 괄호 `(Animal)` 안에 **부모 클래스 이름**을 씁니다.\n`Dog`는 `Animal`의 **자식 클래스(Child Class)**가 됩니다.\n\n**상속의 효과**:\n1. `Dog`는 `Animal`의 모든 메서드와 속성을 **자동으로 물려받습니다**\n2. `Dog`만의 새로운 메서드를 추가할 수 있습니다\n3. 부모의 메서드를 **재정의(Override)**할 수 있습니다\n\n**왜 상속을 사용하는가?**\n- **코드 재사용**: 공통 기능을 부모에 한 번만 작성\n- **확장성**: 부모 기능에 새 기능 추가 가능\n- **다형성(Polymorphism)**: 같은 메서드 이름으로 다른 동작 구현\n\n**왜 이 순서인가?** 부모 클래스 정의 완료 후, 순서대로 자식 클래스를 정의합니다.\n\n**실행 순서**: class Dog(Animal) 실행 → Dog 클래스 등록 시작 (Animal 상속) → line 6",
+        "explanation": "**`class Dog(Animal):`**\n\n이것이 **상속 문법**입니다! 괄호 `(Animal)` 안에 **부모 클래스 이름**을 써서, Dog가 Animal을 상속받도록 선언합니다.\n\n**이 한 줄로 Dog는:**\n- Animal의 **자식 클래스(Child Class, 파생 클래스, Derived Class)**가 됩니다\n- Animal의 모든 메서드와 속성을 **자동으로 물려받습니다** (코드를 한 줄도 쓰지 않아도!)\n- 필요하면 새로운 메서드를 **추가**할 수 있습니다\n- 부모의 메서드를 같은 이름으로 **재정의(Override)**할 수 있습니다\n\n**Python 내부 동작**: `class Dog(Animal):`을 실행하면 Python은 Dog 클래스 객체를 생성하고, Dog의 `__bases__` 속성에 `(Animal,)` 튜플을 저장합니다. 이 정보를 통해 나중에 메서드 탐색 시 \"Dog에 없으면 Animal에서 찾기\"를 수행할 수 있습니다.\n\n**왜 상속을 사용하는가?**\n- **코드 재사용**: 공통 기능(speak)을 Animal에 한 번만 작성하고, 여러 자식이 물려받음\n- **확장성**: 부모 기능에 새 기능 추가 가능\n- **다형성(Polymorphism)**: d.speak()과 c.speak() 모두 같은 이름이지만 다른 동작 가능\n\n**비유**: 동물이라는 큰 카테고리(Animal) 아래에 개(Dog)라는 구체적인 종류를 만드는 것입니다. 동물의 기본 특성은 자동으로 물려받으면서, 개만의 특성을 추가합니다.\n\n**왜 이 순서인가?** 부모 클래스가 먼저 존재해야 상속받을 수 있습니다.\n\n**실행 순서**: class Dog(Animal) 실행 --> Dog 클래스 객체 생성 (Animal 상속) --> line 6",
         "visualizationType": "pythonMemory",
         "code": "class Dog(Animal):",
         "pythonMemoryState": {
@@ -87,7 +87,7 @@
       },
       {
         "title": "메서드 오버라이딩 (Dog.speak)",
-        "explanation": "**`def speak(self):`**\n\n**메서드 오버라이딩(Method Overriding)**: 부모 클래스의 메서드를 **같은 이름으로 재정의**하는 것입니다.\n\n**동작 원리**:\n- `Animal`에도 `speak` 메서드가 있습니다\n- `Dog`에서 **같은 이름**으로 다시 정의하면, `Dog`의 버전이 **우선**됩니다\n- `d.speak()` 호출 시, **부모가 아닌 자식**의 speak이 실행됩니다\n\n**왜 오버라이딩을 하는가?**\n- 부모의 기본 동작을 **자식에 맞게 변경**하기 위해\n- 각 동물마다 다른 소리를 내도록 구현\n\n**왜 이 순서인가?** Dog 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def speak 실행 → Dog.speak 메서드 등록 (Animal.speak 덮어씀) → line 9",
+        "explanation": "**`def speak(self):`** (Dog 클래스 내부)\n\n이것이 **메서드 오버라이딩(Method Overriding)**입니다! 부모 클래스 Animal에도 `speak` 메서드가 있는데, 자식 클래스 Dog에서 **같은 이름으로 다시 정의**하여 기존 동작을 **덮어씁니다**.\n\n**오버라이딩의 동작 원리:**\n- Animal.speak: `print(\"...\")` -- 기본 소리\n- Dog.speak: `print(\"Bark!\")` -- 개만의 소리로 재정의!\n- `d.speak()` 호출 시 --> Python은 **Dog에서 먼저** speak을 찾음 --> **발견!** --> Dog.speak 실행 (부모 것은 무시)\n\n**Python의 메서드 탐색 순서(MRO - Method Resolution Order):**\n1. 인스턴스 자체 --> 없음 (메서드는 클래스에 있음)\n2. 인스턴스의 클래스(Dog) --> **speak 발견! 여기서 중단**\n3. 부모 클래스(Animal) --> Dog에서 이미 찾았으므로 확인하지 않음\n\n**왜 오버라이딩을 하는가?** 부모의 기본 동작(\"...\")은 너무 일반적입니다. 개는 \"Bark!\"라고 짖어야 하므로, Dog 클래스에서 speak을 자기에게 맞게 재정의합니다. 부모의 코드를 수정하지 않고도 동작을 바꿀 수 있다는 점이 핵심입니다!\n\n**비유**: 부모님이 \"인사할 때 고개를 숙여라\"고 가르쳤는데, 미국에서 자란 자녀가 \"인사할 때 악수를 한다\"로 방식을 바꾸는 것과 같습니다. 기본 교육은 받았지만 자기만의 방식을 선택한 것입니다.\n\n**주의**: 오버라이딩해도 Animal.speak은 여전히 존재합니다. 삭제되는 것이 아니라, Dog 인스턴스에서 호출할 때 **우선순위에서 밀릴 뿐**입니다.\n\n**왜 이 순서인가?** Dog 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def speak 실행 --> Dog.speak 함수 객체 생성 --> Dog 클래스에 등록 --> line 9",
         "visualizationType": "pythonMemory",
         "code": "def speak(self):",
         "occurrence": 2,
@@ -116,7 +116,7 @@
       },
       {
         "title": "자식 클래스 정의 (Cat)",
-        "explanation": "**`class Cat(Animal):`**\n\n또 다른 자식 클래스 `Cat`을 정의합니다.\n`Cat`도 `Animal`을 상속받습니다.\n\n**왜 이 순서인가?** Dog 클래스 정의 완료 후, 순서대로 다음 클래스를 정의합니다.\n\n**실행 순서**: class Cat(Animal) 실행 → Cat 클래스 등록 시작 (Animal 상속) → line 10",
+        "explanation": "**`class Cat(Animal):`**\n\n또 다른 자식 클래스 `Cat`을 정의합니다. Dog와 마찬가지로, 괄호 안에 `Animal`을 써서 상속을 선언합니다.\n\n**Cat vs Dog -- 같은 부모, 다른 전략:**\n- Dog: speak 메서드를 **오버라이딩**하여 자기만의 동작 구현\n- Cat: speak 메서드를 오버라이딩하지 **않음** -- 부모의 동작을 그대로 사용!\n\n**Python 내부 동작**: Cat 클래스 객체가 생성되고, `Cat.__bases__` = `(Animal,)` 이 설정됩니다. Cat에서 speak을 찾을 때, Cat 자체에 없으면 이 `__bases__` 정보를 따라 Animal에서 찾게 됩니다.\n\n**비유**: Dog는 부모님의 방식을 바꾼 자녀, Cat은 부모님의 방식을 그대로 따르는 자녀입니다. 두 방식 모두 유효하며, 상황에 따라 선택할 수 있습니다.\n\n**왜 이 순서인가?** Dog 클래스 정의 완료 후, 순서대로 다음 클래스를 정의합니다.\n\n**실행 순서**: class Cat(Animal) 실행 --> Cat 클래스 객체 생성 (Animal 상속) --> line 10",
         "visualizationType": "pythonMemory",
         "code": "class Cat(Animal):",
         "pythonMemoryState": {
@@ -161,7 +161,7 @@
       },
       {
         "title": "pass (부모 메서드 그대로 사용)",
-        "explanation": "**`pass`**\n\n`Cat` 클래스는 **아무 메서드도 추가하지 않습니다**.\n`pass`만 있으면 부모(`Animal`)의 모든 메서드를 **그대로 상속**받아 사용합니다.\n\n**Dog vs Cat**:\n- `Dog`: `speak`을 **오버라이딩** → 자신만의 speak 사용\n- `Cat`: 아무것도 안 함 → **부모의 speak** 그대로 사용\n\n**왜 이렇게 하는가?** 기본 동작이 적합하면 굳이 재정의할 필요가 없습니다.\n필요한 부분만 오버라이딩하면 됩니다.\n\n**실행 순서**: pass 실행 (아무 일 안 함) → Cat 클래스 정의 완료 → line 12",
+        "explanation": "**`pass`**\n\n`pass`는 Python의 **빈 문장(no-op)**입니다. 아무 동작도 하지 않습니다. Cat 클래스의 본문이 비어있을 때 문법적으로 한 줄이 필요해서 `pass`를 씁니다.\n\n**Cat 클래스가 pass만 있으면?** 자체적으로 정의한 메서드가 **하나도 없지만**, Animal로부터 **모든 것을 물려받습니다!** 즉, Cat 인스턴스도 `speak()` 메서드를 사용할 수 있습니다 -- Animal의 speak 그대로입니다.\n\n**Dog vs Cat 비교:**\n- `Dog`: speak을 **오버라이딩** --> `d.speak()` = \"Bark!\" (Dog의 새 버전)\n- `Cat`: speak을 오버라이딩하지 **않음** --> `c.speak()` = \"...\" (Animal의 원래 버전)\n\n**이것이 상속의 유연성입니다:** 필요한 부분만 재정의하고, 나머지는 부모 것을 그대로 쓸 수 있습니다. Cat에게 Animal.speak의 기본 동작(\"...\")이 적합하다면, 굳이 코드를 다시 쓸 필요가 없습니다.\n\n**비유**: 레시피(부모 클래스)를 물려받은 자녀 두 명이 있습니다. 한 명(Dog)은 레시피를 자기 입맛에 맞게 수정했고, 다른 한 명(Cat)은 원래 레시피 그대로 요리합니다.\n\n**주의**: `pass` 대신 `...`(Ellipsis)도 같은 용도로 사용할 수 있습니다: `class Cat(Animal): ...`\n\n**실행 순서**: pass 실행 (아무 일 안 함) --> Cat 클래스 정의 완료 --> line 12",
         "visualizationType": "pythonMemory",
         "code": "pass",
         "pythonMemoryState": {
@@ -191,7 +191,7 @@
       },
       {
         "title": "Dog 객체 생성",
-        "explanation": "**`d = Dog()`**\n\n`Dog` 클래스의 인스턴스를 생성합니다.\n\n**상속받은 객체**: `d` 객체는:\n- `Dog` 클래스의 인스턴스\n- `Animal` 클래스의 기능도 가진 객체\n- `Dog.speak` 메서드를 가짐 (오버라이딩된 버전)\n\n**왜 이 순서인가?** 모든 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog() 호출 → 새 객체 0x4000 생성 → d = 0x4000 → line 13",
+        "explanation": "**`d = Dog()`**\n\n`Dog` 클래스의 인스턴스를 생성합니다. `Dog()`을 호출하면 새로운 Dog 객체가 메모리에 만들어집니다.\n\n**이 객체의 정체**: `d` 객체(0x4000)는 Dog 클래스의 인스턴스이면서, 동시에 Animal의 기능도 가진 객체입니다. `isinstance(d, Dog)` = True, `isinstance(d, Animal)` = True 모두 성립합니다!\n\n**d 객체가 사용할 수 있는 메서드:**\n- `d.speak()` --> Dog.speak 실행 (오버라이딩된 버전, \"Bark!\" 출력)\n- Animal의 다른 메서드가 있었다면 그것도 사용 가능\n\n**Python 내부 동작**: Dog 클래스에 `__init__`이 정의되지 않았으므로, Python은 부모 클래스(Animal)에서 `__init__`을 탐색합니다. Animal에도 없으므로, 최종적으로 `object.__init__`이 호출되어 기본 초기화만 수행합니다.\n\n**왜 이 순서인가?** 모든 클래스 정의가 완료된 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog() 호출 --> __new__로 새 객체 0x4000 생성 --> d = 0x4000 참조 할당 --> line 13",
         "visualizationType": "pythonMemory",
         "code": "d = Dog()",
         "pythonMemoryState": {
@@ -246,7 +246,7 @@
       },
       {
         "title": "Cat 객체 생성",
-        "explanation": "**`c = Cat()`**\n\n`Cat` 클래스의 인스턴스를 생성합니다.\n\n**상속받은 객체**: `c` 객체는:\n- `Cat` 클래스의 인스턴스\n- `Animal` 클래스의 기능도 가진 객체\n- `Animal.speak` 메서드를 가짐 (부모 버전)\n\n**왜 이 순서인가?** 첫 번째 객체 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Cat() 호출 → 새 객체 0x5000 생성 → c = 0x5000 → line 15",
+        "explanation": "**`c = Cat()`**\n\n`Cat` 클래스의 인스턴스를 생성합니다.\n\n**d와 c의 차이점:**\n- `d` = Dog 인스턴스 (0x4000) --> d.speak() 시 **Dog.speak** 실행 (오버라이딩)\n- `c` = Cat 인스턴스 (0x5000) --> c.speak() 시 **Animal.speak** 실행 (상속)\n\n**왜 c.speak()이 Animal.speak을 실행하는가?** Cat 클래스에는 speak 메서드가 정의되지 않았습니다(`pass`만 있음). Python은 메서드 탐색 시 Cat에서 찾지 못하면, 부모인 Animal에서 찾습니다. Animal에 speak이 있으므로, 그것을 사용합니다.\n\n**isinstance 확인:**\n```python\nisinstance(c, Cat)     # True - Cat의 인스턴스\nisinstance(c, Animal)  # True - Animal의 자손이므로 Animal이기도 함!\nisinstance(c, Dog)     # False - Dog와는 관계없음\n```\n\n**왜 이 순서인가?** d 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Cat() 호출 --> __new__로 새 객체 0x5000 생성 --> c = 0x5000 참조 할당 --> line 15",
         "visualizationType": "pythonMemory",
         "code": "c = Cat()",
         "pythonMemoryState": {
@@ -311,7 +311,7 @@
       },
       {
         "title": "d.speak() 호출",
-        "explanation": "**`d.speak()`**\n\n`Dog` 객체 `d`의 `speak` 메서드를 호출합니다.\n\n**메서드 탐색 순서(Method Resolution Order, MRO)**:\n1. `d` 객체의 클래스(`Dog`)에 `speak`이 있는가? → **있음!**\n2. `Dog.speak` 실행 (line 7로 점프)\n\n**왜 이 순서인가?** 두 번째 객체 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 15 → d.speak() 호출 → Dog.speak 찾음 → line 7로 점프",
+        "explanation": "**`d.speak()`**\n\nDog 객체 `d`의 `speak` 메서드를 호출합니다. 여기서 Python의 **메서드 탐색 순서(MRO - Method Resolution Order)**가 작동합니다.\n\n**Python이 메서드를 찾는 순서:**\n1. d 객체 자체에 speak이 있는가? --> 없음 (메서드는 클래스에 있음)\n2. d의 클래스 **Dog**에 speak이 있는가? --> **있음! (오버라이딩된 버전)** --> 여기서 탐색 중단!\n3. 부모 클래스 **Animal**에서는 찾지 않음 (이미 찾았으므로)\n\n**결과**: Dog.speak이 실행됩니다. `print(\"Bark!\")`가 실행될 것입니다.\n\n**MRO 확인 방법**: `Dog.__mro__`를 출력하면 `(<class 'Dog'>, <class 'Animal'>, <class 'object'>)` 순서를 확인할 수 있습니다. Python은 이 순서대로 메서드를 탐색합니다.\n\n**비유**: 학교에서 질문이 있을 때, 먼저 담임선생님(Dog)에게 물어봅니다. 담임이 답을 알면(speak이 있으면) 거기서 끝! 모르면 교감선생님(Animal), 교장선생님(object) 순으로 올라갑니다.\n\n**왜 이 순서인가?** c 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 15 --> d.speak() 호출 --> Dog에서 speak 발견 --> Dog.speak 실행 --> line 7로 점프",
         "visualizationType": "pythonMemory",
         "code": "d.speak() # Bark! (오버라이딩)",
         "pythonMemoryState": {
@@ -374,7 +374,7 @@
       },
       {
         "title": "Dog.speak 실행 (오버라이딩된 버전)",
-        "explanation": "**`print(\"Bark!\")`**\n\n**오버라이딩된 메서드 실행**: `Dog`에서 재정의한 `speak` 메서드가 실행됩니다.\n\"Bark!\"가 출력됩니다.\n\n**왜 Animal.speak이 아닌가?** `Dog`에서 `speak`을 **오버라이딩**했기 때문에, `Dog`의 버전이 우선됩니다.\n\n**실행 순서**: print 실행 → \"Bark!\" 출력 → 함수 종료 → line 16으로 돌아감",
+        "explanation": "**`print(\"Bark!\")`**\n\n**오버라이딩된 Dog.speak 메서드가 실행됩니다!** \"Bark!\"가 화면에 출력됩니다.\n\n**왜 Animal.speak의 \"...\"가 아닌가?** Dog 클래스에서 speak을 **재정의(오버라이딩)**했기 때문입니다. Python의 MRO에 따라 Dog.speak이 Animal.speak보다 **우선순위가 높습니다**. Dog에서 speak을 찾은 순간 탐색이 중단되므로, Animal.speak은 실행되지 않습니다.\n\n**오버라이딩의 본질**: 부모의 코드를 **수정하지 않고도** 자식에서 동작을 바꿀 수 있습니다. Animal 클래스는 전혀 변하지 않았습니다. Dog가 자기만의 speak을 정의했을 뿐입니다. 이것이 **개방-폐쇄 원칙(Open-Closed Principle)** -- 확장에는 열려 있고, 수정에는 닫혀 있다 -- 의 기초입니다.\n\n**참고**: Dog에서도 부모의 speak을 호출하고 싶다면 `super().speak()`을 사용할 수 있습니다. 하지만 이 예제에서는 완전히 다른 동작으로 대체했습니다.\n\n**실행 순서**: print(\"Bark!\") 실행 --> 화면에 \"Bark!\" 출력 --> Dog.speak 종료 --> line 16으로 돌아감",
         "visualizationType": "pythonMemory",
         "code": "print(\"Bark!\")",
         "pythonMemoryState": {
@@ -452,7 +452,7 @@
       },
       {
         "title": "c.speak() 호출",
-        "explanation": "**`c.speak()`**\n\n`Cat` 객체 `c`의 `speak` 메서드를 호출합니다.\n\n**메서드 탐색 순서(MRO)**:\n1. `c` 객체의 클래스(`Cat`)에 `speak`이 있는가? → **없음!**\n2. 부모 클래스(`Animal`)에 `speak`이 있는가? → **있음!**\n3. `Animal.speak` 실행 (line 3으로 점프)\n\n**왜 부모 메서드가 실행되는가?** `Cat`에서 `speak`을 오버라이딩하지 않았기 때문에, Python이 **상속 체인**을 따라 올라가서 부모의 메서드를 찾습니다.\n\n**왜 이 순서인가?** 이전 메서드 호출이 완료되고, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 16 → c.speak() 호출 → Cat.speak 없음 → Animal.speak 찾음 → line 3으로 점프",
+        "explanation": "**`c.speak()`**\n\nCat 객체 `c`의 `speak` 메서드를 호출합니다. 이번에는 MRO가 다른 결과를 만듭니다!\n\n**Python이 메서드를 찾는 순서:**\n1. c 객체 자체에 speak이 있는가? --> 없음\n2. c의 클래스 **Cat**에 speak이 있는가? --> **없음!** (pass만 있었으므로)\n3. 부모 클래스 **Animal**에 speak이 있는가? --> **있음!** --> Animal.speak 실행!\n\n**d.speak() vs c.speak() 결과 비교:**\n- `d.speak()`: Dog에서 speak 발견 --> Dog.speak 실행 --> \"Bark!\" 출력\n- `c.speak()`: Cat에서 speak 미발견 --> Animal에서 speak 발견 --> Animal.speak 실행 --> \"...\" 출력\n\n**이것이 다형성(Polymorphism)!** 같은 이름의 메서드(`speak`)를 호출하지만, **객체의 타입에 따라 다른 동작**이 실행됩니다. Dog는 \"Bark!\", Cat은 \"...\". 외부에서 보면 둘 다 `.speak()`을 호출할 뿐인데, 내부적으로 다른 코드가 실행되는 것입니다.\n\n**비유**: TV 리모컨의 \"전원\" 버튼은 어떤 TV든 동일하지만, 삼성 TV와 LG TV는 각자 다른 방식으로 켜집니다. 사용자는 그 차이를 몰라도 됩니다.\n\n**왜 이 순서인가?** d.speak() 호출이 완료되고, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 16 --> c.speak() 호출 --> Cat에서 speak 미발견 --> Animal에서 speak 발견 --> Animal.speak 실행 --> line 3으로 점프",
         "visualizationType": "pythonMemory",
         "code": "c.speak() # ... (부모 꺼 그대로)",
         "pythonMemoryState": {
@@ -515,7 +515,7 @@
       },
       {
         "title": "Animal.speak 실행 (부모 버전)",
-        "explanation": "**`print(\"...\")`**\n\n**부모 메서드 실행**: `Animal`의 원래 `speak` 메서드가 실행됩니다.\n\"...\"가 출력됩니다.\n\n**상속의 핵심**:\n- `Dog` 객체: 자신의 `speak` 메서드 사용 (오버라이딩)\n- `Cat` 객체: 부모의 `speak` 메서드 사용 (상속)\n\n**다형성(Polymorphism)**: 같은 메서드 이름(`speak`)이지만, 객체 타입에 따라 다른 동작을 합니다!\n\n**실행 순서**: print 실행 → \"...\" 출력 → 함수 종료 → 프로그램 종료",
+        "explanation": "**`print(\"...\")`**\n\n**부모 클래스 Animal의 원래 speak 메서드**가 실행됩니다. \"...\"가 화면에 출력됩니다.\n\n**이 레슨의 최종 정리 -- 상속의 핵심:**\n- `d.speak()` --> Dog.speak 실행 --> \"Bark!\" 출력 (**오버라이딩**: 자식이 재정의)\n- `c.speak()` --> Animal.speak 실행 --> \"...\" 출력 (**상속**: 부모 것 그대로 사용)\n\n**상속의 3대 핵심 개념:**\n1. **코드 재사용**: Cat은 코드를 한 줄도 안 썼지만 speak 메서드를 사용 가능\n2. **메서드 오버라이딩**: Dog는 부모의 speak을 자기에게 맞게 재정의\n3. **다형성(Polymorphism)**: 같은 이름 `.speak()`으로 호출하지만, 객체 타입에 따라 다른 결과\n\n**왜 다형성이 중요한가?** 나중에 Bird, Fish 등 새로운 동물을 추가하더라도, Animal을 상속받아 speak만 오버라이딩하면 됩니다. 기존 코드(Animal, Dog, Cat)를 수정할 필요가 없습니다!\n\n**다음 단계 미리보기**: 이 레슨에서는 간단한 상속만 배웠습니다. 실무에서는 `super()` 함수를 사용하여 부모의 메서드를 호출하거나, `__init__`에서 부모의 초기화를 호출하는 패턴이 매우 중요합니다. 챕터 6에서 더 깊이 배울 예정입니다.\n\n**실행 순서**: print(\"...\") 실행 --> 화면에 \"...\" 출력 --> Animal.speak 종료 --> 프로그램 종료",
         "visualizationType": "pythonMemory",
         "code": "print(\"...\")",
         "pythonMemoryState": {

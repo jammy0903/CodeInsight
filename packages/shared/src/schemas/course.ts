@@ -276,6 +276,8 @@ export const LessonStepSchema = z.object({
   hoistingState: z.unknown().optional(),
   scopeChainState: z.unknown().optional(),
   prototypeState: z.unknown().optional(),
+  // 알고리즘 시각화 (그리디, 정렬, DP, 그래프 등)
+  algorithmState: z.unknown().optional(),
   // 코드 매칭 키 (Lesson JSON: step.line 대체, Playground: 실행 코드)
   code: z.string().optional(),
   occurrence: z.number().optional(), // 동일 코드 라인 구분 (기본값: 1)
