@@ -90,27 +90,54 @@ export const useExplanationStore = create<ExplanationState>((set, get) => {
 
       if (current.language === 'c') {
         // C 언어
-        requestData.stack = current.step.stack?.map(v => ({
+        requestData.stack = current.step.stack?.map((v: any) => ({
           name: v.name,
           type: v.type || '',
-          value: v.value,
-          address: v.address,
+          value: String(v.value ?? ''),
+          address: v.address || '',
         })) || [];
-        requestData.heap = current.step.heap?.map(v => ({
+        requestData.heap = current.step.heap?.map((v: any) => ({
           name: v.name,
           type: v.type || '',
-          value: v.value,
-          address: v.address,
+          value: String(v.value ?? ''),
+          address: v.address || '',
         })) || [];
         requestData.changes = [];
       } else if (current.language === 'javascript') {
-        // JavaScript
-        requestData.stack = current.step.stack || [];
-        requestData.heap = current.step.heap || [];
+        // JavaScript — 시뮬레이터는 methodName/content 필드를 사용하므로 변환 필요
+        requestData.stack = (current.step.stack || []).map((f: any) => ({
+          functionName: f.methodName || f.functionName || f.name || 'anonymous',
+          variables: f.variables || {},
+        }));
+        requestData.heap = (current.step.heap || []).map((h: any) => ({
+          id: h.id || h.address || '',
+          type: h.type || 'Object',
+          value: h.content || h.value || '',
+        }));
       } else if (current.language === 'python') {
         // Python
-        requestData.names = current.step.pyNames || [];
-        requestData.objects = current.step.pyObjects || [];
+        requestData.names = (current.step.pyNames || []).map((n: any) => ({
+          name: n.name,
+          pointsTo: n.pointsTo || '',
+        }));
+        requestData.objects = (current.step.pyObjects || []).map((o: any) => ({
+          id: o.id || '',
+          type: o.type || '',
+          value: o.value,
+        }));
+      } else if (current.language === 'java') {
+        // Java — memoryState에서 stack/heap 추출
+        const ms = current.step.memoryState as any;
+        requestData.stack = (ms?.stack || []).map((v: any) => ({
+          name: v.name || v.variable || '',
+          type: v.type || '',
+          value: v.value ?? '',
+        }));
+        requestData.heap = (ms?.heap || []).map((v: any) => ({
+          name: v.name || v.variable || '',
+          type: v.type || '',
+          value: v.value ?? '',
+        }));
       }
 
       const result = await getStepExplanationStream(

@@ -108,11 +108,11 @@ const explainStepSchema = z.discriminatedUnion('language', [
     fullCode: z.string(),
     stack: z.array(z.object({
       functionName: z.string(),
-      variables: z.record(z.string(), z.unknown()),
+      variables: z.record(z.string(), z.unknown()).optional().default({}),
     })).optional().default([]),
     heap: z.array(z.object({
       id: z.string(),
-      type: z.enum(['Object', 'Array', 'Function']),
+      type: z.string(),
       value: z.unknown(),
     })).optional().default([]),
   }),
@@ -128,6 +128,23 @@ const explainStepSchema = z.discriminatedUnion('language', [
     })).optional().default([]),
     objects: z.array(z.object({
       id: z.string(),
+      type: z.string(),
+      value: z.unknown(),
+    })).optional().default([]),
+  }),
+  // Java
+  z.object({
+    language: z.literal('java'),
+    line: z.number(),
+    code: z.string(),
+    fullCode: z.string(),
+    stack: z.array(z.object({
+      name: z.string(),
+      type: z.string(),
+      value: z.unknown(),
+    })).optional().default([]),
+    heap: z.array(z.object({
+      name: z.string(),
       type: z.string(),
       value: z.unknown(),
     })).optional().default([]),
@@ -319,6 +336,67 @@ Mutable 수정 시:
 
 Immutable 재할당 시:
 "💡 문자열은 **수정 불가**야! \`s = s + 'a'\`는 새 문자열을 만들어서 s에 다시 할당하는 거야."
+
+## 절대 하지 말 것
+- 모든 줄에 설명 달기 ❌
+- 당연한 것 설명하기 ❌
+- 길게 설명하기 ❌`;
+}
+
+/**
+ * Java 스텝 설명용 프롬프트
+ * 참조 타입, String Pool, 오토박싱 등 Java 초보자가 헷갈리는 개념 집중 설명
+ */
+function buildJavaStepExplainPrompt(): string {
+  return `당신은 Java 초보자가 **헷갈려하는 개념만** 콕 짚어주는 선생님입니다.
+
+## 핵심 규칙
+
+### 1. 단순한 코드는 "SKIP" 응답
+다음은 설명할 필요 없어요. 정확히 "SKIP"이라고만 답해주세요:
+- 변수 선언: \`int x = 10;\`, \`String name = "hello";\`
+- 단순 산술: \`x = a + b;\`
+- System.out.println 호출
+- return 문
+- 중괄호 \`{\` \`}\`
+- 메인 메서드 시그니처: \`public static void main(String[] args)\`
+
+### 2. 헷갈리는 개념만 설명
+다음 상황에서만 설명해주세요:
+
+**참조 타입 vs 기본 타입:**
+- \`int[] arr = new int[5];\` → 힙에 배열 객체 생성
+- \`String s1 = s2;\` → 두 변수가 **같은 객체**를 참조!
+- \`==\` vs \`.equals()\` 차이
+
+**String Pool:**
+- \`String s1 = "hello";\` → String Pool에서 재사용
+- \`String s2 = new String("hello");\` → 새 객체 생성 (Pool 무시)
+- \`s1 == s2\` vs \`s1.equals(s2)\` 결과 차이
+
+**오토박싱/언박싱:**
+- \`Integer x = 10;\` → int → Integer 오토박싱
+- \`int y = x;\` → Integer → int 언박싱
+- \`Integer.valueOf(127) == Integer.valueOf(127)\` → 캐시 범위!
+
+**객체와 메모리:**
+- \`new\` 키워드 → 힙에 새 객체 생성
+- 배열은 항상 참조 타입
+- 메서드 호출 시 참조 전달 (pass by value of reference)
+
+## 스타일
+- 한국어, 친근한 반말
+- **1-2문장**으로 핵심만!
+- "💡 ~라고 착각하기 쉬운데..." 형식 선호
+- 비유는 한 줄로 직관적으로
+
+## 응답 예시
+
+참조 비교 시:
+"💡 ==는 주소를 비교하고, .equals()는 내용을 비교해! String은 꼭 .equals()를 써야 해."
+
+배열 전달 시:
+"🔗 배열은 참조 타입이라 메서드에 넘기면 **원본이 바뀔 수 있어**!"
 
 ## 절대 하지 말 것
 - 모든 줄에 설명 달기 ❌
@@ -632,7 +710,7 @@ ${changesStr}
         const { line, code, fullCode, stack, heap } = data;
 
         const stackStr = stack.length > 0
-          ? stack.map(f => `  함수: ${f.functionName}\n${Object.entries(f.variables).map(([k, v]) => `    ${k}: ${JSON.stringify(v)}`).join('\n')}`).join('\n\n')
+          ? stack.map(f => `  함수: ${f.functionName}\n${Object.entries(f.variables || {}).map(([k, v]) => `    ${k}: ${JSON.stringify(v)}`).join('\n')}`).join('\n\n')
           : '  (비어있음)';
 
         const heapStr = heap.length > 0
@@ -686,6 +764,36 @@ ${objectsStr}
 위 상황을 바탕으로 이 줄이 무엇을 하는지 설명해줘!`;
 
         systemPrompt = buildPyStepExplainPrompt();
+
+      } else if (data.language === 'java') {
+        // Java
+        const { line, code, fullCode, stack, heap } = data;
+
+        const stackStr = stack.length > 0
+          ? stack.map(v => `  ${v.name}: ${JSON.stringify(v.value)} (${v.type})`).join('\n')
+          : '  (비어있음)';
+
+        const heapStr = heap.length > 0
+          ? heap.map(v => `  ${v.name}: ${JSON.stringify(v.value)} (${v.type})`).join('\n')
+          : '  (비어있음)';
+
+        userMessage = `## 현재 실행 중인 코드
+\`${code.trim()}\` (${line}번째 줄)
+
+## 전체 코드
+\`\`\`java
+${fullCode}
+\`\`\`
+
+## 현재 Stack (지역 변수)
+${stackStr}
+
+## 현재 Heap (객체)
+${heapStr}
+
+위 상황을 바탕으로 이 줄이 무엇을 하는지 설명해줘!`;
+
+        systemPrompt = buildJavaStepExplainPrompt();
 
       } else {
         // Fallback (should not happen due to Zod validation)

@@ -60,19 +60,16 @@ interface MemoryChange {
 }
 
 interface ExplainStepRequest {
-  language: 'c' | 'javascript' | 'python';
+  language: 'c' | 'javascript' | 'python' | 'java';
   line: number;
   code: string;
   fullCode: string;
-  stack?: MemoryBlock[];
-  heap?: MemoryBlock[];
+  stack?: MemoryBlock[] | Array<{ functionName: string; variables: Record<string, any> }> | Array<{ name: string; type: string; value: unknown }>;
+  heap?: MemoryBlock[] | Array<{ id: string; type: string; value: unknown }> | Array<{ name: string; type: string; value: unknown }>;
   changes?: MemoryChange[];
-  // JavaScript용 필드
-  jsStack?: Array<{ functionName: string; variables: Record<string, any> }>;
-  jsHeap?: Array<{ id: string; type: 'Object' | 'Array' | 'Function'; value: any }>;
   // Python용 필드
-  pyNames?: Array<{ name: string; pointsTo: string }>;
-  pyObjects?: Array<{ id: string; type: string; value: any }>;
+  names?: Array<{ name: string; pointsTo: string }>;
+  objects?: Array<{ id: string; type: string; value: any }>;
 }
 
 interface ExplainStepResponse {

@@ -20,7 +20,7 @@ function toSteps(javaSteps: any[]): LessonStep[] {
   return javaSteps.map((snapshot) => ({
     line: snapshot.line || snapshot.lineNumber || 0,
     code: snapshot.code || '',
-    explanation: snapshot.explanation || `Java 한 줄 실행 (Line ${snapshot.line || snapshot.lineNumber})`,
+    explanation: snapshot.explanation || '',
     memoryState: {
       stack: snapshot.stack || [],
       heap: snapshot.heap || [],
