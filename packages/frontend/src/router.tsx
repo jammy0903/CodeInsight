@@ -101,6 +101,20 @@ export const router = createBrowserRouter([
       { path: 'dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
       { path: 'report', element: <ProtectedRoute><ReportPage /></ProtectedRoute> },
       { path: 'admin', element: <AdminRoute><AdminPage /></AdminRoute> },
+      {
+        path: 'privacy',
+        lazy: async () => {
+          const { PrivacyPolicyPage } = await import('./features/legal');
+          return { Component: PrivacyPolicyPage };
+        }
+      },
+      {
+        path: 'terms',
+        lazy: async () => {
+          const { TermsPage } = await import('./features/legal');
+          return { Component: TermsPage };
+        }
+      },
     ],
   },
 ]);
