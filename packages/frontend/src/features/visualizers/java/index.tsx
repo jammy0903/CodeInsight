@@ -14,6 +14,3 @@ export type {
   JavaHeapObject,
   JavaMemoryViewProps,
 } from './JavaMemoryView';
-
-// 어댑터 (시뮬레이터 데이터 → 뷰 props 변환)
-export { toJavaMemoryViewProps } from './adapters';

@@ -3,9 +3,8 @@
  * CodeInsight - 코드 원리 학습 앱
  */
 
-import { createBrowserRouter, Outlet } from 'react-router-dom';
-import { useEffect } from 'react';
-import { MainLayout } from './layouts';
+import { createBrowserRouter } from 'react-router-dom';
+import { RootLayout } from './layouts/RootLayout';
 import { HomePage } from './features/home';
 import { AuthPage } from './features/auth';
 
@@ -16,44 +15,7 @@ import { ProfilePage } from './features/profile';
 import { DashboardPage } from './features/dashboard';
 import { ReportPage } from './features/report';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { initializeAuthListener } from './services/firebase';
-import { useTheme } from './hooks/useTheme';
 import { CoursesPage } from './features/courses/CoursesPage';
-
-/**
- * 인증 상태 초기화 컴포넌트
- *
- * WHY: Firebase Auth 상태 변경 → 백엔드 조회 → store 업데이트 연결
- * FLOW:
- *   1. Firebase 인증 상태 변경 감지
- *   2. 백엔드에서 사용자 정보 조회 (/users/me)
- *   3. 등록 여부에 따라 appUser 또는 needsRegistration 설정
- */
-function AuthProvider({ children }: { children: React.ReactNode }) {
-  // 테마 초기화
-  useTheme();
-
-  // 인증 상태 감시 (Firebase + 백엔드 연동)
-  useEffect(() => {
-    const unsubscribe = initializeAuthListener();
-    return () => unsubscribe();
-  }, []);
-
-  return <>{children}</>;
-}
-
-/**
- * 메인 레이아웃 래퍼
- */
-function RootLayout() {
-  return (
-    <AuthProvider>
-      <MainLayout>
-        <Outlet />
-      </MainLayout>
-    </AuthProvider>
-  );
-}
 
 /**
  * 라우터 설정

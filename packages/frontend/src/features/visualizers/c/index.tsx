@@ -10,12 +10,6 @@ export { FlowVisualizer } from './CFlowVisualizer';
 // Flow Components
 export { VariableBox, ArrowLayer, FunctionFrame, ControlFlowOverlay, LoopTrack } from './components';
 
-// Flow Hooks
-export { useAnimationQueue, useFlowDiff, calculateFlowDiff } from './hooks';
-
-// C Adapters
-export { cAdapter, createCAdapter, CTransformer, CStyler, CAnimator, CMemoryAdapter } from './adapters';
-
 // 타입
 export interface StackRegisters {
   /** Stack Pointer - 스택 최상단 */
