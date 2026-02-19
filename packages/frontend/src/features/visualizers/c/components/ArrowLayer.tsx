@@ -191,10 +191,13 @@ export const ArrowLayer = memo(function ArrowLayer({
   }, [containerRef]);
 
   // variables 변경 시 위치 재계산
+  // Double rAF: 첫 rAF는 DOM 커밋 직후, 두 번째 rAF는 페인트 후 → 레이아웃 확정된 좌표 측정
   useEffect(() => {
     if (updatePositionsRef.current) {
       requestAnimationFrame(() => {
-        updatePositionsRef.current?.();
+        requestAnimationFrame(() => {
+          updatePositionsRef.current?.();
+        });
       });
     }
   }, [variables]);
