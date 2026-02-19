@@ -28,7 +28,7 @@ export function resolveStepLines(steps: LessonStep[], fullCode: string): LessonS
     if (!stepCode) return step;
 
     // N번째 출현 찾기
-    const occurrence = (step as any).occurrence ?? 1;
+    const occurrence = step.occurrence ?? 1;
     let count = 0;
     let resolvedLine = -1;
 
@@ -46,7 +46,7 @@ export function resolveStepLines(steps: LessonStep[], fullCode: string): LessonS
 
     // highlight 계산
     let highlight: number[] | undefined;
-    const highlightOffset = (step as any).highlightOffset as number[] | undefined;
+    const highlightOffset = step.highlightOffset;
 
     if (highlightOffset && Array.isArray(highlightOffset)) {
       // 상대 오프셋 → 절대 라인번호

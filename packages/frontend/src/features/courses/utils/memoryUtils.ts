@@ -154,7 +154,7 @@ function diffStates(prevState: StepMemoryState, currentState: StepMemoryState): 
     };
 
     // Diff stack
-    const prevStackVars = new Map<string, any>();
+    const prevStackVars = new Map<string, string | number>();
     prevState.stack.forEach(frame => frame.variables.forEach(v => prevStackVars.set(`${frame.name}-${v.name}`, v.value)));
 
     currentState.stack.forEach(frame => {
@@ -167,7 +167,7 @@ function diffStates(prevState: StepMemoryState, currentState: StepMemoryState): 
     });
 
     // Diff heap
-    const prevHeapVars = new Map<string, any>();
+    const prevHeapVars = new Map<string, string | number | undefined>();
     prevState.heap.forEach(h => h.address && prevHeapVars.set(h.address, h.value));
 
     currentState.heap.forEach(h => {

@@ -129,7 +129,7 @@ function isArrayType(type: string): boolean {
 }
 
 /** 타입별 색상 가져오기 */
-function getTypeColor(type: string, value: any): { color: string; bg: string } {
+function getTypeColor(type: string, value: unknown): { color: string; bg: string } {
   if (value === null || value === 'null') return COLORS.types.null;
   if (isPrimitiveType(type)) return COLORS.types.primitive;
   if (isStringType(type)) return COLORS.types.string;

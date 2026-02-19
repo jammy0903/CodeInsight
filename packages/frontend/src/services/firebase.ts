@@ -128,9 +128,10 @@ export function initializeAuthListener(): () => void {
             setNeedsRegistration(false);
             setNeedsOnboarding(true); // 새 사용자는 온보딩 필요
             logger.info(`Auto-registered user with nickname: ${autoNickname}`);
-          } catch (registerError: any) {
+          } catch (registerError: unknown) {
             // 닉네임 중복 시 랜덤 숫자 추가해서 재시도
-            if (registerError.message?.includes('이미 사용 중') || registerError.message?.includes('NICKNAME_TAKEN')) {
+            const errorMessage = registerError instanceof Error ? registerError.message : String(registerError);
+            if (errorMessage.includes('이미 사용 중') || errorMessage.includes('NICKNAME_TAKEN')) {
               try {
                 const randomSuffix = Math.floor(Math.random() * 10000);
                 const fallbackNickname = `user_${firebaseUser.uid.slice(0, 6)}_${randomSuffix}`;
