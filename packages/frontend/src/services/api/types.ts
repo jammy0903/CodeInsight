@@ -21,37 +21,3 @@ export interface PaginatedResponse<T> {
   perPage: number;
   hasMore: boolean;
 }
-
-/**
- * AI Provider 정보
- */
-export interface AIProvider {
-  type: 'deepseek';
-  name: string;
-  available: boolean;
-  current: boolean;
-}
-
-/**
- * AI Provider 목록 응답
- */
-export interface AIProvidersResponse {
-  current: string;
-  providers: AIProvider[];
-}
-
-/**
- * AI Provider 전환 요청
- */
-export interface SwitchProviderRequest {
-  provider: 'deepseek';
-}
-
-/**
- * AI Provider 전환 응답
- */
-export interface SwitchProviderResponse {
-  success: boolean;
-  current: string;
-  name: string;
-}

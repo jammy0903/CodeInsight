@@ -2,12 +2,11 @@
  * Toast Notification Module
  *
  * Usage:
- * import { notify, notifySimulator, notifyAI, notifyNetwork } from '@/components/common/Toast';
+ * import { notify, notifySimulator, notifyNetwork } from '@/components/common/Toast';
  */
 
 export {
   notify,
-  notifyAI,
   notifySimulator,
   notifyNetwork,
   notifyAdmin,

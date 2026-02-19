@@ -31,8 +31,5 @@ export {
 
 export {
   getAnalyticsSummary,
-  getReportAnalysis,
   type AnalyticsSummary,
-  type ReportAnalysisRequest,
-  type ReportAnalysisResponse,
 } from './reportService';

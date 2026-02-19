@@ -6,5 +6,4 @@ export { ReportWeakConcepts } from './ReportWeakConcepts';
 export { ReportWrongAnswers } from './ReportWrongAnswers';
 export { ReportTrend } from './ReportTrend';
 export { ReportRecommendations } from './ReportRecommendations';
-export { ReportAIAnalysis } from './ReportAIAnalysis';
 export { DetailedReportModal } from './DetailedReportModal';

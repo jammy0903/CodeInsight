@@ -52,26 +52,6 @@ export interface SystemStatus {
   timestamp: string;
 }
 
-export interface AIUsageStats {
-  // 기간별 토큰 사용량
-  today: { tokens: number; requests: number };
-  thisWeek: { tokens: number; requests: number };
-  thisMonth: { tokens: number; requests: number };
-  // 비용 추정 (USD)
-  estimatedCost: {
-    today: number;
-    thisWeek: number;
-    thisMonth: number;
-  };
-  // 상세 내역
-  recentRequests: Array<{
-    createdAt: string;
-    context: string | null;
-    tokens: number | null;
-    questionPreview: string;
-  }>;
-}
-
 export interface ReportStats {
   summary: {
     total: number;
@@ -273,94 +253,6 @@ export class AdminService {
       verdict: s.verdict,
       createdAt: s.createdAt.toISOString(),
     }));
-  }
-
-  /**
-   * AI 사용량 통계 (DeepSeek 비용 계산)
-   *
-   * DeepSeek 가격 (2024):
-   * - Input: $0.14 / 1M tokens
-   * - Output: $0.28 / 1M tokens
-   * - 평균 가정: input:output = 3:1 → 평균 $0.175 / 1M tokens
-   */
-  async getAIUsageStats(): Promise<AIUsageStats> {
-    const now = new Date();
-
-    // 오늘 시작
-    const todayStart = new Date(now);
-    todayStart.setHours(0, 0, 0, 0);
-
-    // 이번 주 시작 (월요일)
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
-    weekStart.setHours(0, 0, 0, 0);
-
-    // 이번 달 시작
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    // 오늘 통계
-    const todayStats = await prisma.chatHistory.aggregate({
-      where: { createdAt: { gte: todayStart } },
-      _sum: { tokens: true },
-      _count: { id: true },
-    });
-
-    // 이번 주 통계
-    const weekStats = await prisma.chatHistory.aggregate({
-      where: { createdAt: { gte: weekStart } },
-      _sum: { tokens: true },
-      _count: { id: true },
-    });
-
-    // 이번 달 통계
-    const monthStats = await prisma.chatHistory.aggregate({
-      where: { createdAt: { gte: monthStart } },
-      _sum: { tokens: true },
-      _count: { id: true },
-    });
-
-    // 최근 요청 내역
-    const recentRequests = await prisma.chatHistory.findMany({
-      take: 20,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        createdAt: true,
-        context: true,
-        tokens: true,
-        question: true,
-      },
-    });
-
-    // DeepSeek 비용 계산 (평균 $0.175 / 1M tokens)
-    const COST_PER_MILLION = 0.175;
-    const calcCost = (tokens: number | null) =>
-      tokens ? (tokens / 1_000_000) * COST_PER_MILLION : 0;
-
-    return {
-      today: {
-        tokens: todayStats._sum.tokens || 0,
-        requests: todayStats._count.id,
-      },
-      thisWeek: {
-        tokens: weekStats._sum.tokens || 0,
-        requests: weekStats._count.id,
-      },
-      thisMonth: {
-        tokens: monthStats._sum.tokens || 0,
-        requests: monthStats._count.id,
-      },
-      estimatedCost: {
-        today: calcCost(todayStats._sum.tokens),
-        thisWeek: calcCost(weekStats._sum.tokens),
-        thisMonth: calcCost(monthStats._sum.tokens),
-      },
-      recentRequests: recentRequests.map(r => ({
-        createdAt: r.createdAt.toISOString(),
-        context: r.context,
-        tokens: r.tokens,
-        questionPreview: r.question.slice(0, 50) + (r.question.length > 50 ? '...' : ''),
-      })),
-    };
   }
 
   /**

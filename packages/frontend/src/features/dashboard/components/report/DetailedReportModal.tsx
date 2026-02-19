@@ -16,7 +16,6 @@ import { ReportWeakConcepts } from './ReportWeakConcepts';
 import { ReportWrongAnswers } from './ReportWrongAnswers';
 import { ReportTrend } from './ReportTrend';
 import { ReportRecommendations } from './ReportRecommendations';
-import { ReportAIAnalysis } from './ReportAIAnalysis';
 
 interface DetailedReportModalProps {
   isOpen: boolean;
@@ -208,9 +207,6 @@ export function DetailedReportModal({
           >
             <ReportHeader period={period} />
             <ReportSummaryCards data={analyticsData} />
-
-            {/* AI Analysis - personalized feedback */}
-            {analyticsData && <ReportAIAnalysis data={analyticsData} />}
 
             <ReportCalendar data={calendarData} />
             <ReportCharts weeklyData={weeklyData} timeSlotData={timeSlotData} />

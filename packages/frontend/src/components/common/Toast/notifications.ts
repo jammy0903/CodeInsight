@@ -57,58 +57,6 @@ export const notify = {
 };
 
 // ============================================
-// AI Provider 관련 알림
-// ============================================
-
-export const notifyAI = {
-  /** DeepSeek 연결 실패 */
-  deepseekDisconnected: () => {
-    notify.error(t('toast.deepseek_disconnected'), {
-      description: t('toast.deepseek_disconnected_desc'),
-      duration: 6000,
-    });
-  },
-
-  /** Gemini 연결 실패 */
-  geminiDisconnected: () => {
-    notify.error(t('toast.gemini_disconnected'), {
-      description: t('toast.gemini_disconnected_desc'),
-      duration: 6000,
-    });
-  },
-
-  /** AI Provider 전환 성공 */
-  providerSwitched: (providerName: string) => {
-    notify.success(t('toast.provider_switched', { provider: providerName }), {
-      duration: 2000,
-    });
-  },
-
-  /** AI Provider 전환 실패 */
-  providerSwitchFailed: (providerName: string) => {
-    notify.error(t('toast.provider_switch_failed', { provider: providerName }), {
-      description: t('toast.try_again_later'),
-    });
-  },
-
-  /** API 크레딧 부족 */
-  creditExhausted: () => {
-    notify.warning(t('toast.credit_exhausted'), {
-      description: t('toast.credit_exhausted_desc'),
-      duration: 6000,
-    });
-  },
-
-  /** 백엔드 서버 연결 실패 */
-  backendDisconnected: () => {
-    notify.error(t('toast.server_connection_failed'), {
-      description: t('toast.server_connection_failed_desc'),
-      duration: 6000,
-    });
-  },
-};
-
-// ============================================
 // 시뮬레이터 관련 알림
 // ============================================
 
@@ -309,9 +257,6 @@ export function handleAPIError(status: number, message?: string) {
       break;
     case 401:
       notifyNetwork.unauthorized();
-      break;
-    case 402:
-      notifyAI.creditExhausted();
       break;
     case 403:
       notifyNetwork.forbidden();

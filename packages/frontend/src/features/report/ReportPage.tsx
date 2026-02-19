@@ -13,9 +13,7 @@ import { motion } from 'framer-motion';
 import { useStore } from '@/stores/store';
 import {
   getAnalyticsSummary,
-  getReportAnalysis,
   type AnalyticsSummary,
-  type ReportAnalysisResponse,
 } from '@/services/analytics';
 import { AlertCircle, Calendar, TrendingUp, LogIn } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -25,7 +23,6 @@ import { StreakCard, useStreak } from '@/features/gamification';
 import { StatsCards } from './components/StatsCards';
 import { ActivityChart } from './components/ActivityChart';
 import { HourlyChart } from './components/HourlyChart';
-import { AIInsights } from './components/AIInsights';
 import { WeakConcepts } from './components/WeakConcepts';
 import { StandaloneQuizSection } from './components/StandaloneQuizSection';
 
@@ -46,9 +43,7 @@ export function ReportPage() {
 
   const [period, setPeriod] = useState<Period>('30d');
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
-  const [aiAnalysis, setAiAnalysis] = useState<ReportAnalysisResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [aiLoading, setAiLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // 페이지 제목 설정
@@ -79,38 +74,6 @@ export function ReportPage() {
 
     fetchData();
   }, [period, appUser]);
-
-  // AI 분석 요청
-  const handleRequestAIAnalysis = async () => {
-    if (!summary) return;
-
-    setAiLoading(true);
-    try {
-      // 연속 학습일 계산
-      const streakDays = calculateStreakDays(summary.dailyActivity);
-
-      const analysis = await getReportAnalysis({
-        totalStudyTime: summary.totalStudyTime,
-        totalSessions: summary.totalSessions,
-        quizStats: {
-          total: summary.quizStats.total,
-          correct: summary.quizStats.correct,
-          accuracy: summary.quizStats.accuracy,
-        },
-        aiQuestions: summary.aiQuestions,
-        weakConcepts: summary.weakConcepts,
-        weekdayActivity: summary.weekdayActivity,
-        hourlyActivity: summary.hourlyActivity,
-        recentWrongCount: summary.recentWrongAnswers.length,
-        streakDays,
-      });
-      setAiAnalysis(analysis);
-    } catch (err) {
-      console.error('AI analysis failed:', err);
-    } finally {
-      setAiLoading(false);
-    }
-  };
 
   // 로그인 안 된 경우
   if (!appUser) {
@@ -233,13 +196,6 @@ export function ReportPage() {
         <HourlyChart hourlyActivity={summary.hourlyActivity} />
       </div>
 
-      {/* AI Insights */}
-      <AIInsights
-        analysis={aiAnalysis}
-        loading={aiLoading}
-        onRequestAnalysis={handleRequestAIAnalysis}
-      />
-
       {/* Weak Concepts (Lesson-based) */}
       {Object.keys(summary.weakConcepts).length > 0 && (
         <WeakConcepts weakConcepts={summary.weakConcepts} />
@@ -249,32 +205,4 @@ export function ReportPage() {
       <StandaloneQuizSection />
     </div>
   );
-}
-
-/**
- * 연속 학습일 계산
- */
-function calculateStreakDays(dailyActivity: Record<string, number>): number {
-  const dates = Object.keys(dailyActivity).sort().reverse();
-  if (dates.length === 0) return 0;
-
-  let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  for (let i = 0; i < dates.length; i++) {
-    const date = new Date(dates[i]);
-    date.setHours(0, 0, 0, 0);
-
-    const expectedDate = new Date(today);
-    expectedDate.setDate(expectedDate.getDate() - i);
-
-    if (date.getTime() === expectedDate.getTime() && dailyActivity[dates[i]] > 0) {
-      streak++;
-    } else {
-      break;
-    }
-  }
-
-  return streak;
 }

@@ -10,12 +10,6 @@ export const config = {
     baseUrl: `${env.VITE_API_URL}/api/${env.VITE_API_VERSION}`,
     endpoints: {
       users: '/users',
-      aiChat: '/ai/chat',
-      aiChatStream: '/ai/chat/stream',
-      aiExplain: '/ai/explain',
-      aiExplainStep: '/ai/explain-step',
-      aiProviders: '/ai/providers',
-      aiAnalyzeReport: '/ai/analyze-report',
       // 분석 리포트
       analyticsActivity: '/analytics/activity',
       analyticsActivityEnd: '/analytics/activity/end',

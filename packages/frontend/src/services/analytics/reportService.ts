@@ -1,5 +1,5 @@
 /**
- * Report Service — 분석 요약 + AI 리포트
+ * Report Service — 분석 요약
  */
 
 import { api } from '../api/axios';
@@ -48,42 +48,3 @@ export async function getAnalyticsSummary(
   }
 }
 
-export interface ReportAnalysisRequest {
-  totalStudyTime: number;
-  totalSessions: number;
-  quizStats: {
-    total: number;
-    correct: number;
-    accuracy: number;
-  };
-  aiQuestions: number;
-  weakConcepts: Record<string, number>;
-  weekdayActivity: number[];
-  hourlyActivity: number[];
-  recentWrongCount: number;
-  streakDays?: number;
-}
-
-export interface ReportAnalysisResponse {
-  analysis: string;
-  provider: string;
-}
-
-/**
- * AI 기반 학습 리포트 분석 (LLM 호출 — 최대 3분 타임아웃)
- */
-export async function getReportAnalysis(
-  data: ReportAnalysisRequest
-): Promise<ReportAnalysisResponse | null> {
-  try {
-    const response = await api.post<ReportAnalysisResponse>(
-      config.api.endpoints.aiAnalyzeReport,
-      data,
-      { timeout: 180000 }
-    );
-    return response.data;
-  } catch (err) {
-    logger.error('Failed to get report analysis:', err);
-    return null;
-  }
-}

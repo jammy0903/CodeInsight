@@ -79,20 +79,6 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   /**
-   * GET /api/admin/ai-usage
-   * AI 사용량 통계 (DeepSeek 비용 추정)
-   */
-  fastify.get('/ai-usage', async (_request, reply) => {
-    try {
-      const usage = await adminService.getAIUsageStats();
-      return usage;
-    } catch (error) {
-      logger.error('Get AI usage error:', error);
-      return reply.status(500).send({ error: 'Failed to fetch AI usage statistics' });
-    }
-  });
-
-  /**
    * GET /api/admin/reports
    * 신고 통계 + 최근 목록
    */

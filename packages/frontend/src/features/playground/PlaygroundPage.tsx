@@ -11,11 +11,9 @@ import { Play, Layers } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
 import { CodeEditor } from './components/CodeEditor';
 import { StepControls } from './components/StepControls';
-import { StepExplanation } from './components/StepExplanation';
 import { useLessonVisualization } from '@/features/courses/hooks/useLessonVisualization';
 import { useStepGestures } from '@/features/courses/hooks/useStepGestures';
 import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/playgroundStore';
-import { useExplanationStore } from './stores/explanationStore';
 import { LessonFlowVisualizer, LessonMemoryVisualizer } from '@/features/visualizers';
 import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
 import { StepNavigationArrows } from '@/features/courses/components/StepNavigationArrows';
@@ -33,7 +31,6 @@ export function PlaygroundPage() {
   const { t } = useTranslation();
   const { steps, currentStepIndex, error, language } = usePlaygroundStore();
   const code = useCurrentCode();
-  const { startPrefetch, stopPrefetch } = useExplanationStore();
   const setPageTitle = useStore((s) => s.setPageTitle);
   const currentTheme = useThemeStore((s) => s.theme);
   const colors = playgroundColors[currentTheme];
@@ -80,16 +77,6 @@ export function PlaygroundPage() {
     return Math.max(MIN_EDITOR_HEIGHT, Math.min(calculated, MAX_EDITOR_HEIGHT));
   }, [code]);
 
-  // Start AI explanation prefetch when simulation steps change
-  useEffect(() => {
-    if (steps.length > 0 && code) {
-      startPrefetch(steps as LessonStep[], code, language);
-    }
-    return () => {
-      stopPrefetch();
-    };
-  }, [steps, code, language, startPrefetch, stopPrefetch]);
-
   // Use useLessonVisualization hook (unified Lesson and Playground)
   const { memoryState, changedBlocks, visualizationType, visualizationState } = useLessonVisualization(
     steps as LessonStep[],
@@ -124,40 +111,6 @@ export function PlaygroundPage() {
           <div style={{ height: `${Math.min(editorHeight, 180)}px` }}>
             <CodeEditor />
           </div>
-
-          {/* Explanation */}
-          {currentStep && (
-            <div style={{ padding: '6px 8px 8px' }}>
-              <div
-                style={{
-                  backgroundColor: colors.explanationBg,
-                  borderRadius: '6px',
-                  border: `1px solid ${colors.explanationBorder}`,
-                  overflow: 'hidden',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '4px 8px',
-                    backgroundColor: colors.explanationHeaderBg,
-                    borderBottom: `1px solid ${colors.explanationBorder}`,
-                    gap: '4px',
-                  }}
-                >
-                  <span style={{ fontSize: '12px' }}>💡</span>
-                  <span style={{ fontSize: '10px', color: colors.explanationText, fontWeight: 600 }}>Explanation</span>
-                  <span style={{ fontSize: '9px', color: colors.explanationTextMuted, marginLeft: 'auto', fontFamily: 'monospace' }}>
-                    Line {currentStep.line}
-                  </span>
-                </div>
-                <div style={{ padding: '8px 10px' }}>
-                  <StepExplanation step={currentStep} isMobile={true} />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Visualization Section - Flow Only */}
@@ -377,50 +330,6 @@ export function PlaygroundPage() {
             <CodeEditor />
           </div>
 
-          {/* Explanation Panel */}
-          {currentStep && (
-            <div
-              style={{
-                flexShrink: 0,
-                padding: '8px 12px 12px',
-                backgroundColor: colors.panelBg,
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: colors.explanationBg,
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  boxShadow: currentTheme === 'dark'
-                    ? '0 2px 8px rgba(0, 0, 0, 0.3)'
-                    : '0 2px 8px rgba(34, 197, 94, 0.12)',
-                  border: `1px solid ${colors.explanationBorder}`,
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '6px 12px',
-                    backgroundColor: colors.explanationHeaderBg,
-                    borderBottom: `1px solid ${colors.explanationBorder}`,
-                    gap: '8px',
-                  }}
-                >
-                  <span style={{ fontSize: '14px' }}>💡</span>
-                  <span style={{ fontSize: '11px', color: colors.explanationText, fontWeight: 600, fontFamily: 'system-ui, sans-serif' }}>
-                    Explanation
-                  </span>
-                  <span style={{ fontSize: '10px', color: colors.explanationTextMuted, marginLeft: 'auto', fontFamily: 'monospace' }}>
-                    Line {currentStep.line}
-                  </span>
-                </div>
-                <div style={{ padding: '10px 14px' }}>
-                  <StepExplanation step={currentStep} />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* ===== Right Panel: Flow + Memory Tabs - 컨텐츠에 따라 늘어남 ===== */}

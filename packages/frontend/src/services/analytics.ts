@@ -25,8 +25,5 @@ export {
   type ProfileResponse,
   // Report
   getAnalyticsSummary,
-  getReportAnalysis,
   type AnalyticsSummary,
-  type ReportAnalysisRequest,
-  type ReportAnalysisResponse,
 } from './analytics/index';

@@ -15,7 +15,6 @@ import { lessonContentLoader } from './services/lessonContentLoader';
 // Route imports
 import { problemRoutes } from './modules/problems/routes';
 import { cSimulatorRoutes } from './modules/simulators/c/routes';
-import { aiRoutes } from './modules/ai/routes';
 import { courseRoutes } from './modules/courses/routes';
 import { analyticsRoutes } from './modules/analytics/routes';
 import { notesRoutes } from './modules/notes/routes';
@@ -104,7 +103,6 @@ app.register(cSimulatorRoutes, { prefix: '/api/v1/simulators/c' });
 app.register(pythonSimulatorRoutes, { prefix: '/api/v1/simulators/python' });
 app.register(javaSimulatorRoutes, { prefix: '/api/v1/simulators/java' });
 app.register(javascriptSimulatorRoutes, { prefix: '/api/v1/simulators/javascript' });
-app.register(aiRoutes, { prefix: '/api/v1/ai' });
 app.register(courseRoutes, { prefix: '/api/v1/courses' });
 app.register(analyticsRoutes, { prefix: '/api/v1/analytics' });
 app.register(notesRoutes, { prefix: '/api/v1/notes' });
