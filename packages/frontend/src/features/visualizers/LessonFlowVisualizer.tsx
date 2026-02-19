@@ -20,7 +20,6 @@ import { ScopeView } from './javascript/components/ScopeView';
 import { ThisBindingView } from './javascript/components/ThisBindingView';
 import { PrototypeChainView } from './javascript/components/PrototypeChainView';
 import { PromiseView } from './javascript/components/PromiseView';
-import { TerminalStepView } from './shared/components/TerminalStepView';
 import { AlgorithmView } from './algorithm/AlgorithmView';
 import { ArrowLayer } from './c/components/ArrowLayer';
 import { createAdapter } from './shared/adapters/registry';
@@ -130,8 +129,6 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   const prevPromiseState = getField<PromiseStateProp>(prevStepRecord, 'promiseState');
   const algorithmState = (isRecord(step.algorithmState) ? step.algorithmState : undefined) as unknown as AlgorithmStateProp | undefined;
   const prevAlgorithmState = (prevStep && isRecord(prevStep.algorithmState) ? prevStep.algorithmState : undefined) as unknown as AlgorithmStateProp | undefined;
-  const terminalStdout = stdout || step.stdout;
-  const terminalExplanation = step.explanation;
 
   // Detect non-memory viz types that bypass the transformer pipeline
   const els = eventLoopState;
@@ -144,8 +141,7 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     (vizType === 'thisBinding' && thisState) ||
     (vizType === 'prototype' && prototypeState) ||
     (vizType === 'promise' && promiseState) ||
-    (vizType === 'algorithm' && algorithmState) ||
-    vizType === 'terminal';
+    (vizType === 'algorithm' && algorithmState);
 
   // ========================================================
   // All hooks called unconditionally (React rules of hooks)
@@ -308,17 +304,6 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
         <AlgorithmView
           algorithmState={algorithmState}
           prevAlgorithmState={prevAlgorithmState}
-        />
-      </div>
-    );
-  }
-
-  if (vizType === 'terminal') {
-    return (
-      <div className={className}>
-        <TerminalStepView
-          explanation={terminalExplanation}
-          stdout={terminalStdout}
         />
       </div>
     );
