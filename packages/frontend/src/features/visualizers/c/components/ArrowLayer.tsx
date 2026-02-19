@@ -182,17 +182,22 @@ export const ArrowLayer = memo(function ArrowLayer({
 
           // Framer Motion layout 애니메이션이 CSS transform을 적용하므로
           // getBoundingClientRect()는 애니메이션 중간 위치를 반환함.
-          // transform을 보정하여 최종 레이아웃 위치를 계산.
+          // 요소부터 컨테이너까지 모든 조상의 transform을 누적 보정하여
+          // 최종 레이아웃 위치를 계산. (VariableBox + FunctionFrame 등)
           let tx = 0, ty = 0;
-          const style = getComputedStyle(element);
-          if (style.transform && style.transform !== 'none') {
-            const match = style.transform.match(
-              /matrix\([^,]+,\s*[^,]+,\s*[^,]+,\s*[^,]+,\s*([^,]+),\s*([^)]+)\)/
-            );
-            if (match) {
-              tx = parseFloat(match[1]);
-              ty = parseFloat(match[2]);
+          let cur: HTMLElement | null = element;
+          while (cur && cur !== container) {
+            const style = getComputedStyle(cur);
+            if (style.transform && style.transform !== 'none') {
+              const match = style.transform.match(
+                /matrix\([^,]+,\s*[^,]+,\s*[^,]+,\s*[^,]+,\s*([^,]+),\s*([^)]+)\)/
+              );
+              if (match) {
+                tx += parseFloat(match[1]);
+                ty += parseFloat(match[2]);
+              }
             }
+            cur = cur.parentElement;
           }
 
           newPositions.set(variable.id, {
