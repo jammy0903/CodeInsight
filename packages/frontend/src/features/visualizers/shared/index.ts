@@ -3,12 +3,6 @@
  * 공통 시각화 컴포넌트 및 타입 export
  */
 
-// 타입
-export * from './types';
-
-// 상수
-export * from './constants';
-
 // 스타일
 export {
   FLOW_THEMES,
@@ -36,9 +30,6 @@ export { useLessonTerminal } from './hooks/useLessonTerminal';
 // 컴포넌트
 export { StepNavigationArrows } from './components/StepNavigationArrows';
 export { CodeMirrorEditor, type CodeSelection } from './components/CodeMirrorEditor';
-export { CodePanel } from './components/CodePanel';
-export { CallStackView } from './components/CallStackView';
-export { ReturnOverlay } from './components/ReturnOverlay';
 export {
   TerminalOutput,
   type TerminalLine,

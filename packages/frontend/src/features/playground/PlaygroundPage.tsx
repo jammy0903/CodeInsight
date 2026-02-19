@@ -77,7 +77,7 @@ export function PlaygroundPage() {
   }, [code]);
 
   // Use useLessonVisualization hook (unified Lesson and Playground)
-  const { memoryState, changedBlocks, visualizationType, visualizationState } = useLessonVisualization(
+  const { memoryState, changedBlocks } = useLessonVisualization(
     steps as LessonStep[],
     currentStepIndex
   );

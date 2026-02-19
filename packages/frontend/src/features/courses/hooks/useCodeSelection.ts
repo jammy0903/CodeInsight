@@ -1,35 +1,18 @@
 /**
  * useCodeSelection Hook
- * 코드 텍스트 선택 상태 관리
+ * 코드 텍스트 선택 핸들러
  */
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import type { CodeSelection } from '../types';
 
 export function useCodeSelection() {
-  const [selection, setSelection] = useState<CodeSelection | null>(null);
-
-  /**
-   * 선택 변경 핸들러 (빈 텍스트 필터링)
-   */
   const handleSelectionChange = useCallback((newSelection: CodeSelection) => {
-    if (!newSelection.text.trim()) {
-      setSelection(null);
-      return;
-    }
-    setSelection(newSelection);
-  }, []);
-
-  /**
-   * 선택 초기화
-   */
-  const clearSelection = useCallback(() => {
-    setSelection(null);
+    if (!newSelection.text.trim()) return;
+    // selection 데이터 수집 포인트 (현재 소비자 없음)
   }, []);
 
   return {
-    selection,
     setSelection: handleSelectionChange,
-    clearSelection,
   };
 }

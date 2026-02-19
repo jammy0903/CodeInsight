@@ -5,7 +5,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import type { Chapter, UserProgress } from '@/types';
+import type { Chapter } from '@/types';
 import { Star, Target, Lock, ChevronRight, BookOpen } from 'lucide-react';
 
 // 언어별 색상 테마 (밝은 파스텔 톤)

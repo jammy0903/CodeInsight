@@ -16,16 +16,10 @@ export { useAnimationQueue, useFlowDiff, calculateFlowDiff } from './hooks';
 // C Adapters
 export { cAdapter, createCAdapter, CTransformer, CStyler, CAnimator, CMemoryAdapter } from './adapters';
 
-// Memory View
-export { CMemoryView } from './CMemoryView';
-
 // 타입
-export type {
-  MemoryBlock,
-  StackRegisters,
-  CMemoryViewProps,
-  SegmentType,
-} from './CMemoryView';
-
-// 상수
-export { SEGMENT_COLORS, getPointerColor, POINTER_PALETTE } from './constants';
+export interface StackRegisters {
+  /** Stack Pointer - 스택 최상단 */
+  rsp?: string;
+  /** Base Pointer - 현재 함수 프레임 시작 */
+  rbp?: string;
+}

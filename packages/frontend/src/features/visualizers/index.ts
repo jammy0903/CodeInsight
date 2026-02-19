@@ -10,12 +10,7 @@ export { LessonMemoryVisualizer } from './LessonMemoryVisualizer';
 export type { LessonMemoryVisualizerProps } from './LessonMemoryVisualizer';
 
 // Adapter registry
-export {
-  getAdapter,
-  createAdapter,
-  getSupportedLanguages,
-  isLanguageSupported,
-} from './shared/adapters/registry';
+export { createAdapter } from './shared/adapters/registry';
 
 // Re-export types
 export type { FlowTheme } from './shared/styles';

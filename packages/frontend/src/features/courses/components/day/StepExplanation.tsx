@@ -10,8 +10,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface StepExplanationProps {
   explanation: string;
   stepIndex: number;
-  line?: number;
-  code?: string;
 }
 
 /**

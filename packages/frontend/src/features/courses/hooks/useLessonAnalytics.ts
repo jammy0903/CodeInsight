@@ -39,11 +39,6 @@ export function useLessonAnalytics({
     updateCurrentStepDuration,
     handleStepChange,
     clearStepData,
-    recordVisHover,
-    recordVisClick,
-    recordAIQuestion,
-    recordCodeSelection,
-    recordScroll,
   } = useStepTracking(currentStepIndex);
 
   // 활동 시작/종료
@@ -89,11 +84,5 @@ export function useLessonAnalytics({
 
   return {
     finishTracking: () => stopTracking(false),
-    recordVisHover,
-    recordVisClick,
-    recordAIQuestion,
-    recordCodeSelection,
-    recordScroll,
-    isTracking: !!activityIdRef.current,
   };
 }

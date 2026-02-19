@@ -13,9 +13,6 @@ import type { StackRegisters } from '@/features/visualizers/c';
 // 타입 정의
 // ============================================================
 
-/** 시뮬레이션 스텝 (LessonStep 통합 형식) */
-export type SimulationStep = LessonStep;
-
 /** Playground 상태 */
 interface PlaygroundState {
   // === 언어 선택 ===
@@ -25,18 +22,14 @@ interface PlaygroundState {
   // === 코드 (언어별 분리) ===
   codes: Record<SupportedLanguage, string>;
   setCode: (code: string) => void;
-  getCode: () => string;
 
   // === 시뮬레이션 상태 ===
-  steps: SimulationStep[];
-  setSteps: (steps: SimulationStep[], stepRegisters?: StackRegisters[]) => void;
+  steps: LessonStep[];
+  setSteps: (steps: LessonStep[], stepRegisters?: StackRegisters[]) => void;
   currentStepIndex: number;
-  setCurrentStepIndex: (index: number) => void;
 
   // === 레지스터 (RSP/RBP) ===
   stepRegisters: StackRegisters[];
-  registers: StackRegisters;
-  setRegisters: (registers: StackRegisters) => void;
 
   // === 실행 상태 ===
   isSimulating: boolean;
@@ -47,7 +40,6 @@ interface PlaygroundState {
   // === 액션 ===
   nextStep: () => void;
   prevStep: () => void;
-  goToStep: (index: number) => void;
   reset: () => void;
 }
 
@@ -120,14 +112,6 @@ let isAwesome = true;
 name = "CodeInsight Rocks!";
 `;
 
-const DEFAULT_PYTHON_PRACTICAL_CODE = `# 실용 파이썬 예제
-import os
-
-# 현재 디렉토리의 파일 목록 가져오기
-files = os.listdir('.')
-print(f"Files in current directory: {files}")
-`;
-
 // ============================================================
 // 스토어 생성
 // ============================================================
@@ -145,7 +129,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     python: DEFAULT_PYTHON_CODE,
     java: DEFAULT_JAVA_CODE,
     javascript: DEFAULT_JAVASCRIPT_CODE,
-    'python-practical': DEFAULT_PYTHON_PRACTICAL_CODE,
+    'python-practical': DEFAULT_PYTHON_CODE,
   },
   setCode: (code) => {
     const { language, codes } = get();
@@ -157,10 +141,6 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
       error: null,
     });
   },
-  getCode: () => {
-    const { language, codes } = get();
-    return codes[language];
-  },
 
   // === 시뮬레이션 상태 ===
   steps: [],
@@ -169,22 +149,12 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
       steps,
       stepRegisters,
       currentStepIndex: 0,
-      registers: stepRegisters[0] ?? {},
       error: null,
     }),
   currentStepIndex: 0,
-  setCurrentStepIndex: (index) => {
-    const { stepRegisters } = get();
-    set({
-      currentStepIndex: index,
-      registers: stepRegisters[index] ?? {},
-    });
-  },
 
   // === 레지스터 (RSP/RBP) ===
   stepRegisters: [],
-  registers: {},
-  setRegisters: (registers) => set({ registers }),
 
   // === 실행 상태 ===
   isSimulating: false,
@@ -194,32 +164,15 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
 
   // === 액션 ===
   nextStep: () => {
-    const { steps, currentStepIndex, stepRegisters } = get();
+    const { steps, currentStepIndex } = get();
     if (currentStepIndex < steps.length - 1) {
-      const newIndex = currentStepIndex + 1;
-      set({
-        currentStepIndex: newIndex,
-        registers: stepRegisters[newIndex] ?? {},
-      });
+      set({ currentStepIndex: currentStepIndex + 1 });
     }
   },
   prevStep: () => {
-    const { currentStepIndex, stepRegisters } = get();
+    const { currentStepIndex } = get();
     if (currentStepIndex > 0) {
-      const newIndex = currentStepIndex - 1;
-      set({
-        currentStepIndex: newIndex,
-        registers: stepRegisters[newIndex] ?? {},
-      });
-    }
-  },
-  goToStep: (index) => {
-    const { steps, stepRegisters } = get();
-    if (index >= 0 && index < steps.length) {
-      set({
-        currentStepIndex: index,
-        registers: stepRegisters[index] ?? {},
-      });
+      set({ currentStepIndex: currentStepIndex - 1 });
     }
   },
   reset: () => {
@@ -227,7 +180,6 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
       steps: [],
       stepRegisters: [],
       currentStepIndex: 0,
-      registers: {},
       isSimulating: false,
       error: null,
     });
@@ -250,9 +202,8 @@ export const useCurrentCode = () => {
 export function useStepControls() {
   const nextStep = usePlaygroundStore((s) => s.nextStep);
   const prevStep = usePlaygroundStore((s) => s.prevStep);
-  const goToStep = usePlaygroundStore((s) => s.goToStep);
   const reset = usePlaygroundStore((s) => s.reset);
   const canGoNext = usePlaygroundStore((s) => s.currentStepIndex < s.steps.length - 1);
   const canGoPrev = usePlaygroundStore((s) => s.currentStepIndex > 0);
-  return { nextStep, prevStep, goToStep, reset, canGoNext, canGoPrev };
+  return { nextStep, prevStep, reset, canGoNext, canGoPrev };
 }
