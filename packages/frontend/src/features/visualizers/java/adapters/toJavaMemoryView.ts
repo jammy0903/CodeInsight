@@ -5,10 +5,47 @@ import type {
   JavaHeapObject,
 } from '../JavaMemoryView';
 
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function toArray(value: unknown): unknown[] | undefined {
+  return Array.isArray(value) ? value : undefined;
+}
+
+function hasVariables(item: unknown): item is { variables: UnknownRecord } {
+  if (!isRecord(item)) return false;
+  return isRecord(item.variables);
+}
+
+function hasNameAndValue(item: unknown): item is { name: string; value: unknown } {
+  if (!isRecord(item)) return false;
+  return typeof item.name === 'string' && 'value' in item;
+}
+
+function getClassName(item: unknown): string | undefined {
+  if (!isRecord(item)) return undefined;
+  return asString(item.className);
+}
+
+function stringifyUnknown(value: unknown): string {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
 /**
  * 시뮬레이터 변수 값을 JavaVariable로 변환
  */
-function parseVariable(name: string, value: any): JavaVariable {
+function parseVariable(name: string, value: unknown): JavaVariable {
   // null
   if (value === null || value === undefined) {
     return {
@@ -45,24 +82,26 @@ function parseVariable(name: string, value: any): JavaVariable {
   }
 
   // Reference 객체 (배열, 객체, String 포함)
-  if (typeof value === 'object') {
+  if (isRecord(value)) {
     // { type: "Reference" | "Array", id: "0x001", class: "String", displayValue?: "hello" }
-    if (value.type === 'Reference' || value.type === 'Array' || value.id) {
-      const type = value.class || value.type || 'Object';
+    const refType = asString(value.type);
+    const refId = asString(value.id);
+    if (refType === 'Reference' || refType === 'Array' || refId) {
+      const type = asString(value.class) || refType || 'Object';
 
       // 모든 참조 타입은 동일하게 처리 (String 포함)
       return {
         name,
-        value: `→ ${value.id}`,
+        value: `→ ${refId || 'unknown'}`,
         type: type,
-        refAddress: value.id,
+        refAddress: refId,
       };
     }
 
     // 기타 객체
     return {
       name,
-      value: JSON.stringify(value),
+      value: stringifyUnknown(value),
       type: 'Object',
     };
   }
@@ -78,12 +117,14 @@ function parseVariable(name: string, value: any): JavaVariable {
 /**
  * 시뮬레이터 스택 프레임을 JavaStackFrame으로 변환
  */
-function parseStackFrame(frame: any): JavaStackFrame {
-  const frameName = frame.methodName || frame.name || 'unknown';
+function parseStackFrame(frame: unknown): JavaStackFrame {
+  const frameRecord = isRecord(frame) ? frame : {};
+  const frameName = asString(frameRecord.methodName) || asString(frameRecord.name) || 'unknown';
   const variables: JavaVariable[] = [];
+  const frameVariables = isRecord(frameRecord.variables) ? frameRecord.variables : undefined;
 
-  if (frame.variables && typeof frame.variables === 'object') {
-    for (const [varName, value] of Object.entries(frame.variables)) {
+  if (frameVariables) {
+    for (const [varName, value] of Object.entries(frameVariables)) {
       // args 배열은 스킵 (너무 복잡함)
       if (varName === 'args') continue;
 
@@ -101,20 +142,22 @@ function parseStackFrame(frame: any): JavaStackFrame {
  * 시뮬레이터 힙 객체를 JavaHeapObject로 변환
  * args 배열은 제외 (main 메서드 파라미터)
  */
-function parseHeapObjects(heap: any[]): JavaHeapObject[] {
+function parseHeapObjects(heap: unknown[]): JavaHeapObject[] {
   return heap
-    .filter(obj => {
-      if (typeof obj !== 'object' || obj === null) return false;
+    .filter((obj): obj is UnknownRecord => {
+      if (!isRecord(obj)) return false;
+      const rawContent = obj.content ?? obj.value;
+      const objType = asString(obj.type);
       // args 배열 스킵 (java.lang.String[] with empty content)
-      if (obj.type === 'java.lang.String[]' && obj.content === '[]') {
+      if (objType === 'java.lang.String[]' && String(rawContent) === '[]') {
         return false;
       }
       return true;
     })
     .map(obj => ({
-      address: obj.address,
-      type: obj.type,
-      content: String(obj.content),
+      address: asString(obj.address) || 'unknown',
+      type: asString(obj.type) || 'Object',
+      content: String(obj.content ?? obj.value ?? ''),
     }));
 }
 
@@ -127,22 +170,23 @@ export function toJavaMemoryViewProps(step: LessonStep): {
 } {
   const frames: JavaStackFrame[] = [];
   const heap: JavaHeapObject[] = [];
+  const stepRecord = step as UnknownRecord;
 
   // javaMemoryState (lesson JSON) → memoryState (legacy) → direct stack/heap fallback
-  const jms = (step as any).javaMemoryState;
-  const stackData = jms?.stack || step.memoryState?.stack || (step as any).stack;
-  const heapData = jms?.heap || step.memoryState?.heap || (step as any).heap;
+  const stackData = step.javaMemoryState?.stack || step.memoryState?.stack || toArray(stepRecord.stack);
+  const heapData = step.javaMemoryState?.heap || step.memoryState?.heap || toArray(stepRecord.heap);
 
   // Stack 처리
   if (stackData && Array.isArray(stackData) && stackData.length > 0) {
     const firstEl = stackData[0];
     // Case 1: Array of Frames (from live simulator)
-    if (typeof firstEl === 'object' && firstEl !== null && 'variables' in firstEl) {
+    if (hasVariables(firstEl)) {
       for (const frame of stackData) {
         // Main 클래스 프레임만 처리 (JDK 내부 프레임 제외)
-        if ((frame as any).className?.startsWith('java.') ||
-            (frame as any).className?.startsWith('sun.') ||
-            (frame as any).className?.startsWith('jdk.')) {
+        const className = getClassName(frame);
+        if (className?.startsWith('java.') ||
+            className?.startsWith('sun.') ||
+            className?.startsWith('jdk.')) {
           continue;
         }
 
@@ -153,10 +197,16 @@ export function toJavaMemoryViewProps(step: LessonStep): {
       }
     }
     // Case 2: Flat array of variables (from lesson JSON)
-    else if (typeof firstEl === 'object' && firstEl !== null && 'name' in firstEl && 'value' in firstEl) {
+    else if (hasNameAndValue(firstEl)) {
+      const mainVariables: JavaVariable[] = [];
+      for (const variableEntry of stackData) {
+        if (!hasNameAndValue(variableEntry)) continue;
+        mainVariables.push(parseVariable(variableEntry.name, variableEntry.value));
+      }
+
       const mainFrame: JavaStackFrame = {
         name: 'main',
-        variables: stackData.map(v => parseVariable(v.name, v.value)),
+        variables: mainVariables,
       };
       frames.push(mainFrame);
     }
