@@ -11,8 +11,5 @@ export { LessonCard } from './LessonCard';
 export { LessonCodeEditor } from './day/LessonCodeEditor'; // Monaco 기반 읽기 전용 에디터
 export { StepExplanation } from './day/StepExplanation';
 
-// Navigation Components
-export { StepNavigationArrows } from './StepNavigationArrows';
-
 // Memory Components
 export { MemoryPanel } from './memory/MemoryPanel';

@@ -15,7 +15,7 @@ import { Play, Layers } from 'lucide-react';
 import { useRoundNavigation } from '../hooks/useRoundNavigation';
 import { useLessonVisualization } from '../hooks/useLessonVisualization';
 import { useLessonTerminal } from '../hooks/useLessonTerminal';
-import { useStepGestures } from '../hooks/useStepGestures';
+import { useStepGestures } from '@/features/visualizers/shared/hooks/useStepGestures';
 import { LessonCodePanel } from './LessonCodePanel';
 import { StepExplanation } from './day/StepExplanation';
 import { LessonBottomNav } from './LessonBottomNav';
