@@ -9,8 +9,6 @@ interface HourlyChartProps {
 }
 
 export function HourlyChart({ hourlyActivity }: HourlyChartProps) {
-  const maxValue = Math.max(...hourlyActivity, 1);
-
   // 시간대를 4시간 단위로 그룹화 (6개 구간)
   const groupedActivity = [];
   for (let i = 0; i < 24; i += 4) {

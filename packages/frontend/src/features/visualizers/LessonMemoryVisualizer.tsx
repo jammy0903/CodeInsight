@@ -13,6 +13,7 @@
  */
 
 import { memo, useMemo } from 'react';
+import type { ComponentProps } from 'react';
 import type { LessonStep } from '@codeinsight/shared';
 import { JavaMemoryView } from '@/features/visualizers/java';
 import { MemoryPanel } from '@/features/courses/components/memory/MemoryPanel';
@@ -79,7 +80,7 @@ export const LessonMemoryVisualizer = memo(function LessonMemoryVisualizer({
   if (language.toLowerCase() === 'java') {
     return (
       <div className={className}>
-        <JavaMemoryView {...props} />
+        <JavaMemoryView {...(props as unknown as ComponentProps<typeof JavaMemoryView>)} />
       </div>
     );
   }
@@ -88,7 +89,7 @@ export const LessonMemoryVisualizer = memo(function LessonMemoryVisualizer({
   if (language.toLowerCase() === 'c' || language.toLowerCase() === 'c++') {
     return (
       <div className={className}>
-        <MemoryPanel {...props} />
+        <MemoryPanel {...(props as unknown as ComponentProps<typeof MemoryPanel>)} />
       </div>
     );
   }

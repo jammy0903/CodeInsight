@@ -29,7 +29,9 @@ export interface UseStepGesturesReturn {
 
 export function useStepGestures(options: UseStepGesturesOptions): UseStepGesturesReturn {
   const optionsRef = useRef(options);
-  optionsRef.current = options; // 렌더링될 때마다 항상 최신 props를 ref에 저장
+  useEffect(() => {
+    optionsRef.current = options; // 렌더링 이후 최신 props를 ref에 반영
+  }, [options]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -91,7 +91,13 @@ export async function saveSessionContext(data: SessionContextData): Promise<stri
 
 export function collectSessionContext(lessonActivityId?: string): SessionContextData {
   const now = new Date();
-  const connection = (navigator as any).connection;
+  const navWithConnection = navigator as Navigator & {
+    connection?: {
+      type?: string;
+      effectiveType?: 'slow-2g' | '2g' | '3g' | '4g';
+    };
+  };
+  const connection = navWithConnection.connection;
 
   return {
     lessonActivityId,

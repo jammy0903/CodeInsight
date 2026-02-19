@@ -5,7 +5,7 @@
 /**
  * 표준 API 응답
  */
-export interface APIResponse<T = any> {
+export interface APIResponse<T = unknown> {
   data?: T;
   error?: string;
   message?: string;

@@ -10,7 +10,7 @@
  * - 시도 기록 저장
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, CircleDot, Check, X, RotateCcw, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -56,14 +56,7 @@ export function OXQuizPage() {
   const totalQuizzes = quizzes.length;
   const progress = totalQuizzes > 0 ? ((currentIndex + 1) / totalQuizzes) * 100 : 0;
 
-  // 챕터 목록 로드
-  useEffect(() => {
-    if (viewState === 'chapters') {
-      loadChapters();
-    }
-  }, [lang, viewState]);
-
-  const loadChapters = async () => {
+  const loadChapters = useCallback(async () => {
     try {
       setIsLoadingChapters(true);
       const stats = await getChapterStatistics(lang || 'c', 'ox');
@@ -73,7 +66,14 @@ export function OXQuizPage() {
     } finally {
       setIsLoadingChapters(false);
     }
-  };
+  }, [lang]);
+
+  // 챕터 목록 로드
+  useEffect(() => {
+    if (viewState === 'chapters') {
+      void loadChapters();
+    }
+  }, [viewState, loadChapters]);
 
   const handleChapterSelect = async (chapter: ChapterStatistics) => {
     try {

@@ -56,8 +56,17 @@ export function ProfilePage() {
   const [isSavingNickname, setIsSavingNickname] = useState(false);
 
   // 회원탈퇴 상태
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) return error.message;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === 'string' && message.length > 0) return message;
+  }
+  return fallback;
+}
 
   // 프로필 불러오기
   useEffect(() => {
@@ -140,7 +149,7 @@ export function ProfilePage() {
       if (!result.available) {
         setNicknameError(result.error || '이미 사용 중인 닉네임입니다');
       }
-    } catch (error) {
+    } catch (_error) {
       setNicknameError('닉네임 확인 중 오류가 발생했습니다');
     } finally {
       setIsCheckingNickname(false);
@@ -164,8 +173,8 @@ export function ProfilePage() {
       const updatedUser = await updateNickname(newNickname);
       setAppUser(updatedUser); // Zustand store 업데이트
       handleCancelEditNickname();
-    } catch (error: any) {
-      setNicknameError(error.message || '닉네임 변경에 실패했습니다');
+    } catch (error: unknown) {
+      setNicknameError(getErrorMessage(error, '닉네임 변경에 실패했습니다'));
     } finally {
       setIsSavingNickname(false);
     }
@@ -193,9 +202,9 @@ export function ProfilePage() {
 
       // 로그인 페이지로 이동
       navigate('/auth', { replace: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Account deletion error:', error);
-      alert(error.message || '계정 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      alert(getErrorMessage(error, '계정 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.'));
     } finally {
       setIsDeletingAccount(false);
       handleCloseDeleteDialog();

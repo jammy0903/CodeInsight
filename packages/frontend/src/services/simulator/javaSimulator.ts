@@ -10,23 +10,23 @@ import type { SimulateRequest, SimulateResult } from './types';
 
 interface JavaSimulateResponse {
   success: boolean;
-  steps?: any[];
-  snapshots?: any[];
+  steps?: Array<Record<string, unknown>>;
+  snapshots?: Array<Record<string, unknown>>;
   error?: string;
   message?: string;
 }
 
-function toSteps(javaSteps: any[]): LessonStep[] {
+function toSteps(javaSteps: Array<Record<string, unknown>>): LessonStep[] {
   return javaSteps.map((snapshot) => ({
-    line: snapshot.line || snapshot.lineNumber || 0,
-    code: snapshot.code || '',
-    explanation: snapshot.explanation || '',
+    line: Number(snapshot.line ?? snapshot.lineNumber ?? 0),
+    code: String(snapshot.code ?? ''),
+    explanation: String(snapshot.explanation ?? ''),
     memoryState: {
-      stack: snapshot.stack || [],
-      heap: snapshot.heap || [],
+      stack: Array.isArray(snapshot.stack) ? snapshot.stack : [],
+      heap: Array.isArray(snapshot.heap) ? snapshot.heap : [],
     },
     visualizationType: 'java',
-    stdout: snapshot.stdout,
+    stdout: typeof snapshot.stdout === 'string' ? snapshot.stdout : undefined,
   }));
 }
 

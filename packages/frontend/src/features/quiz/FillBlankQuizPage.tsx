@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Code2, Check, X, RotateCcw, BookOpen } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useThemeStore } from '@/stores/themeStore';

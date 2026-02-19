@@ -7,7 +7,6 @@
 
 import { motion } from 'framer-motion';
 import type { MemoryBlock } from '@/types';
-import { useThemeStore } from '@/stores/themeStore';
 
 import { COLORS } from './utils/frameColors';
 import type { FrameColor } from './utils/frameColors';
@@ -43,8 +42,6 @@ export function ArrayBlock({
   const elementCount = elements.length;
   const firstElement = elements[0];
   const lastElement = elements[elements.length - 1];
-
-  const currentTheme = useThemeStore((s) => s.theme);
 
   if (!isExpanded) {
     // 접힌 상태: 요약 표시

@@ -2,7 +2,7 @@
  * useStepTracking — 스텝별 체류 시간 + 뒤로가기 감지
  */
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 
 export interface StepData {
   startTime: number;
@@ -30,8 +30,14 @@ function createEmptyStepData(): StepData {
 
 export function useStepTracking(currentStepIndex: number) {
   const stepDataRef = useRef<Map<number, StepData>>(new Map());
-  const stepStartTimeRef = useRef<number>(Date.now());
+  const stepStartTimeRef = useRef<number>(0);
   const prevStepIndexRef = useRef<number>(currentStepIndex);
+
+  useEffect(() => {
+    if (stepStartTimeRef.current === 0) {
+      stepStartTimeRef.current = Date.now();
+    }
+  }, []);
 
   /** 현재 스텝 duration 업데이트 */
   const updateCurrentStepDuration = useCallback(() => {

@@ -65,7 +65,7 @@ export function ReportPage() {
       try {
         const data = await getAnalyticsSummary(period);
         setSummary(data);
-      } catch (err) {
+      } catch (_err) {
         setError(t('report.data_load_error'));
       } finally {
         setLoading(false);
@@ -73,7 +73,7 @@ export function ReportPage() {
     }
 
     fetchData();
-  }, [period, appUser]);
+  }, [period, appUser, t]);
 
   // 로그인 안 된 경우
   if (!appUser) {

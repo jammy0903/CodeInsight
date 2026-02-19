@@ -32,7 +32,6 @@ import { config } from '@/config';
 import { useStore } from '@/stores/store';
 import { getCurrentUser, registerUser } from './user';
 import { getProfile } from './analytics';
-import { generateTempNickname } from '@/utils/nickname';
 import { logger } from '@/utils/logger';
 import { setAuthToken } from './api/tokenManager';
 
@@ -102,7 +101,7 @@ export function initializeAuthListener(): () => void {
 
       try {
         // 백엔드에서 등록된 사용자인지 확인
-        let appUser = await getCurrentUser();
+        const appUser = await getCurrentUser();
 
         if (appUser) {
           // 이미 등록된 사용자

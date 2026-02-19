@@ -62,7 +62,7 @@ export async function checkNickname(nickname: string): Promise<CheckNicknameResp
 
     // 400: 닉네임 형식 오류
     if (error.status === 400) {
-      return { available: false, message: error.message };
+      return { available: false, error: error.message };
     }
 
     throw new Error(`닉네임 확인 실패: ${error.message}`);

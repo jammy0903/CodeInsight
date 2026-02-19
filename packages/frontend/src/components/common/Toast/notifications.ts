@@ -227,7 +227,8 @@ export function handleSimulatorError(language: string, errorMessage: unknown) {
     messageStr = errorMessage;
   } else if (errorMessage && typeof errorMessage === 'object') {
     // 객체인 경우 message 속성 확인 또는 JSON 문자열화
-    messageStr = (errorMessage as any).message || JSON.stringify(errorMessage);
+    const errorWithMessage = errorMessage as { message?: string };
+    messageStr = errorWithMessage.message || JSON.stringify(errorMessage);
   } else {
     messageStr = String(errorMessage || 'Unknown error');
   }

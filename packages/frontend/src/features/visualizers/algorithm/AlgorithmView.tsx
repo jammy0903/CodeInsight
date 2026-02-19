@@ -169,7 +169,7 @@ export const AlgorithmView = memo(function AlgorithmView({
     default:
       return (
         <div className="p-4 text-center text-gray-400">
-          <p>알 수 없는 알고리즘 서브타입: {(algorithmState as any).subType}</p>
+          <p>알 수 없는 알고리즘 서브타입: {algorithmState.subType}</p>
         </div>
       );
   }

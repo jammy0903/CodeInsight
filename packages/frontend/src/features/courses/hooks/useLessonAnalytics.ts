@@ -23,7 +23,7 @@ interface UseLessonAnalyticsOptions {
 
 export function useLessonAnalytics({
   lessonId,
-  totalSteps,
+  totalSteps: _totalSteps,
   currentStepIndex,
   enabled = true,
 }: UseLessonAnalyticsOptions) {
@@ -70,11 +70,9 @@ export function useLessonAnalytics({
     startTracking();
 
     return () => {
-      if (activityIdRef.current) {
-        stopTracking(true);
-      }
+      stopTracking(true);
     };
-  }, [lessonId, shouldTrack, startTracking]);
+  }, [shouldTrack, startTracking, stopTracking]);
 
   // 스텝 변경 시 duration 업데이트 + 뒤로가기 감지
   useEffect(() => {

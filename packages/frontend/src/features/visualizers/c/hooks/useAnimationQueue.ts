@@ -14,7 +14,7 @@
  * → play()는 안정적인 참조 유지, 무한 루프 방지
  */
 
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import type { FlowAnimation } from '@codeinsight/shared';
 
 interface QueuedAnimation {
@@ -76,7 +76,9 @@ export function useAnimationQueue(): UseAnimationQueueReturn {
   const queueRef = useRef<QueuedAnimation[]>([]);
 
   // Keep queueRef in sync with queue state
-  queueRef.current = queue;
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
 
   /**
    * 단일 애니메이션 추가

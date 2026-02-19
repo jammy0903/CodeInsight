@@ -2,61 +2,67 @@ import { useState, useEffect, useCallback } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
 
+function resolveThemeMode(theme: Theme): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'dark';
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (theme === 'system') {
+    return systemDark ? 'dark' : 'light';
+  }
+  return theme === 'dark' ? 'dark' : 'light';
+}
+
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === 'undefined') return 'system';
     return (localStorage.getItem('coslab-theme') as Theme) || 'system';
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => resolveThemeMode(theme));
 
   // 실제 테마 적용
   const applyTheme = useCallback((newTheme: Theme) => {
     const root = document.documentElement;
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     // 부드러운 전환을 위해 클래스 추가
     root.classList.add('theme-transition');
 
-    let isDark: boolean;
-    if (newTheme === 'system') {
-      isDark = systemDark;
-    } else {
-      isDark = newTheme === 'dark';
-    }
+    const resolved = resolveThemeMode(newTheme);
 
-    if (isDark) {
+    if (resolved === 'dark') {
       root.classList.add('dark');
-      setResolvedTheme('dark');
     } else {
       root.classList.remove('dark');
-      setResolvedTheme('light');
     }
 
     // 전환 애니메이션 후 클래스 제거
     setTimeout(() => {
       root.classList.remove('theme-transition');
     }, 200);
+    return resolved;
   }, []);
 
   // 테마 변경 함수
   const setTheme = useCallback((newTheme: Theme) => {
+    const resolved = applyTheme(newTheme);
     setThemeState(newTheme);
+    setResolvedTheme(resolved);
     localStorage.setItem('coslab-theme', newTheme);
-    applyTheme(newTheme);
   }, [applyTheme]);
 
   // 초기 로드 시 테마 적용
   useEffect(() => {
-    applyTheme(theme);
-  }, []);
+    void applyTheme(theme);
+  }, [applyTheme, theme]);
 
   // 시스템 테마 변경 감지
   useEffect(() => {
     if (theme !== 'system') return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => applyTheme('system');
+    const handleChange = () => {
+      const resolved = applyTheme('system');
+      setResolvedTheme(resolved);
+    };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);

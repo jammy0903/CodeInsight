@@ -4,7 +4,7 @@
  * URL: /courses/:lang/:chapterId
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -43,23 +43,9 @@ export function ChapterLessonsPage() {
   const { data: chapter, isLoading, isError, error } = useChapter(chapterId);
   const { data: progressList } = useUserProgress();
 
-  // 구독 접근 권한 체크
-  const [accessDenied, setAccessDenied] = useState(false);
-  const [accessReason, setAccessReason] = useState<string>('');
-
-  // 챕터 로드 후 접근 권한 체크
   // 구독 시스템 제거됨 - 챕터 2 이상은 로그인만 필요
-  useEffect(() => {
-    if (!chapter) return;
-
-    // 비로그인: 챕터 2 이상 로그인 필요
-    if (!appUser && chapter.order >= 2) {
-      setAccessDenied(true);
-      setAccessReason(t('chapter.login_required_for_chapter'));
-    } else {
-      setAccessDenied(false);
-    }
-  }, [chapter, appUser, t]);
+  const accessDenied = !!chapter && !appUser && chapter.order >= 2;
+  const accessReason = accessDenied ? t('chapter.login_required_for_chapter') : '';
 
   // 진행 상태 Map 변환 (useMemo로 최적화)
   const progressMap = useMemo(() => {

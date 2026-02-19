@@ -8,6 +8,7 @@ import type { User as FirebaseUser } from 'firebase/auth';
 import type { Message, RunResult, Step } from '@/types/index';
 import type { SupportedLanguage } from '@/types/simulator';
 import type { StreakStatus } from '@/services/gamification';
+import type { AppUser } from './authStore';
 import { getStreak } from '@/services/gamification';
 import { logger } from '@/utils/logger';
 

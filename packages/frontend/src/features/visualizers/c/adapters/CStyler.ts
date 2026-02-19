@@ -76,7 +76,7 @@ export class CStyler implements IFlowStyler {
   /**
    * 화살표 스타일 (포인터용)
    */
-  getArrowStyle(from: FlowVariable, to: FlowVariable): ArrowStyle {
+  getArrowStyle(_from: FlowVariable, _to: FlowVariable): ArrowStyle {
     return {
       stroke: C_COLORS.pointer.stroke,
       strokeWidth: C_COLORS.pointer.strokeWidth,

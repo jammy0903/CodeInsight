@@ -7,7 +7,6 @@
 
 import { useState, useMemo } from 'react';
 import type { MemoryBlock } from '@/types';
-import { useThemeStore } from '@/stores/themeStore';
 
 import { COLORS } from './utils/frameColors';
 import type { FrameColor } from './utils/frameColors';
@@ -31,8 +30,6 @@ export function StackSection({
 }: StackSectionProps) {
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [expandedArrays, setExpandedArrays] = useState<Set<string>>(new Set());
-
-  const currentTheme = useThemeStore((s) => s.theme);
 
   // 현재 실행 중인 프레임 (frames 배열의 마지막)
   const currentFrame = frames[frames.length - 1]?.name || 'main';

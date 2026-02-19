@@ -8,9 +8,71 @@ import type { LessonStep } from '@/types';
 import { handleSimulatorError } from '@/components/common/Toast';
 import type { SimulateRequest, SimulateResult } from './types';
 
+interface JSStepResponse {
+  line?: number;
+  code?: string;
+  explanation?: string;
+  stack?: unknown[];
+  heap?: unknown[];
+  stdout?: string;
+  visualizationState?: unknown;
+}
+
+interface JSSimulateResponse {
+  success: boolean;
+  steps?: JSStepResponse[];
+  error?: string;
+}
+
+type LessonMemoryBlock = NonNullable<LessonStep['stack']>[number];
+
+function toMemoryBlock(raw: unknown): LessonMemoryBlock {
+  if (!raw || typeof raw !== 'object') {
+    return { value: String(raw ?? '') };
+  }
+
+  const block = raw as Record<string, unknown>;
+  const rawValue = block.value ?? block.content ?? block.data ?? '';
+
+  const result: LessonMemoryBlock = {
+    value: typeof rawValue === 'string' ? rawValue : String(rawValue),
+  };
+
+  if (typeof block.name === 'string') result.name = block.name;
+  if (typeof block.address === 'string') result.address = block.address;
+  if (typeof block.type === 'string') result.type = block.type;
+  if (typeof block.size === 'number' || typeof block.size === 'string') result.size = block.size;
+  const pointsTo = block.points_to;
+  if (typeof pointsTo === 'string') result.points_to = pointsTo;
+  if (typeof block.explanation === 'string') result.explanation = block.explanation;
+  if (typeof block.highlight === 'boolean') result.highlight = block.highlight;
+  if (typeof block.isArray === 'boolean') result.isArray = block.isArray;
+  if (typeof block.isExpanded === 'boolean') result.isExpanded = block.isExpanded;
+  if (Array.isArray(block.bytes)) {
+    result.bytes = block.bytes.filter((byte): byte is number => typeof byte === 'number');
+  }
+  if (
+    block.segment === 'stack' ||
+    block.segment === 'heap' ||
+    block.segment === 'data' ||
+    block.segment === 'text'
+  ) {
+    result.segment = block.segment;
+  }
+  if (Array.isArray(block.arrayElements)) {
+    result.arrayElements = block.arrayElements.map(toMemoryBlock);
+  }
+
+  return result;
+}
+
+function toMemoryBlocks(raw: unknown): LessonMemoryBlock[] {
+  return Array.isArray(raw) ? raw.map(toMemoryBlock) : [];
+}
+
 export async function simulateJavaScript(request: SimulateRequest): Promise<SimulateResult> {
   try {
-    const response = await api.post<any>('/simulators/javascript/simulate', {
+    const response = await api.post<JSSimulateResponse>('/simulators/javascript/simulate', {
       code: request.code,
     });
 
@@ -21,12 +83,12 @@ export async function simulateJavaScript(request: SimulateRequest): Promise<Simu
     }
 
     if (data.success && data.steps) {
-      const lessonSteps: LessonStep[] = data.steps.map((step: any) => ({
-        line: step.line,
-        code: step.code,
-        explanation: step.explanation,
-        stack: step.stack,
-        heap: step.heap,
+      const lessonSteps: LessonStep[] = data.steps.map((step) => ({
+        line: step.line ?? 0,
+        code: step.code ?? '',
+        explanation: step.explanation ?? '',
+        stack: toMemoryBlocks(step.stack),
+        heap: toMemoryBlocks(step.heap),
         stdout: step.stdout,
         visualizationType: 'javascript',
         visualizationState: step.visualizationState,

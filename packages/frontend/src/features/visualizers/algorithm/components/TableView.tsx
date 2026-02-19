@@ -58,24 +58,26 @@ const HIGHLIGHT_COLORS: Record<string, { bg: string; border: string; text: strin
 export const TableView = memo(function TableView({
   data,
 }: TableViewProps) {
-  if (!data || !data.data) {
+  const tableRows = data?.data ?? [];
+  const highlights = data?.highlights;
+
+  const highlightMap = useMemo(() => {
+    const map = new Map<string, TableHighlight>();
+    highlights?.forEach(h => {
+      map.set(`${h.row}-${h.col}`, h);
+    });
+    return map;
+  }, [highlights]);
+
+  if (!data || tableRows.length === 0) {
     return (
       <div className="p-4 text-center text-gray-400">
         <p>테이블 데이터가 없습니다</p>
       </div>
     );
   }
-
-  const highlightMap = useMemo(() => {
-    const map = new Map<string, TableHighlight>();
-    data.highlights?.forEach(h => {
-      map.set(`${h.row}-${h.col}`, h);
-    });
-    return map;
-  }, [data.highlights]);
-
-  const is1D = data.dimensions === 1 || data.data.length === 1;
-  const rows = data.data;
+  const is1D = data.dimensions === 1 || tableRows.length === 1;
+  const rows = tableRows;
   const colHeaders = data.headers?.cols;
   const rowHeaders = data.headers?.rows;
 

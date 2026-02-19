@@ -78,7 +78,7 @@ export class JavaStyler implements IFlowStyler {
   /**
    * 화살표 스타일 (참조용)
    */
-  getArrowStyle(from: FlowVariable, to: FlowVariable): ArrowStyle {
+  getArrowStyle(_from: FlowVariable, _to: FlowVariable): ArrowStyle {
     return {
       stroke: JAVA_COLORS.reference.stroke,
       strokeWidth: JAVA_COLORS.reference.strokeWidth,

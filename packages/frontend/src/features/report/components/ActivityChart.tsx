@@ -12,7 +12,7 @@ interface ActivityChartProps {
 
 export function ActivityChart({ dailyActivity, period }: ActivityChartProps) {
   // 기간에 따른 날짜 배열 생성
-  const { dates, maxValue } = useMemo(() => {
+  const { dates } = useMemo(() => {
     const days = period === '7d' ? 7 : period === '30d' ? 30 : period === '90d' ? 90 : 365;
     const result: { date: string; value: number; label: string }[] = [];
 
@@ -30,8 +30,7 @@ export function ActivityChart({ dailyActivity, period }: ActivityChartProps) {
       });
     }
 
-    const max = Math.max(...result.map((d) => d.value), 1);
-    return { dates: result, maxValue: max };
+    return { dates: result };
   }, [dailyActivity, period]);
 
   // 기간이 길면 그룹화

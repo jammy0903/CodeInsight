@@ -89,7 +89,7 @@ export async function getChapterStatistics(
   quizType?: string
 ): Promise<ChapterStatistics[]> {
   try {
-    const params: any = { language };
+    const params: Record<string, string> = { language };
     if (quizType) params.quizType = quizType;
 
     const response = await api.get<{ chapters: ChapterStatistics[] }>(

@@ -95,7 +95,7 @@ const ProtoObjectCard = memo(function ProtoObjectCard({
         {obj.props.length > 0 ? (
           obj.props.map((prop) => {
             const isHighlightedProp = obj.highlightProp === prop
-              || (isFoundTarget && prop === (obj as any).highlightProp);
+              || (isFoundTarget && prop === obj.highlightProp);
 
             return (
               <div
@@ -144,33 +144,15 @@ const ChainArrow = memo(function ChainArrow({ isActive }: { isActive: boolean })
 export const PrototypeChainView = memo(function PrototypeChainView({
   prototypeState,
 }: PrototypeChainViewProps) {
-  if (!prototypeState) {
-    return (
-      <div className="p-4 text-center text-gray-400">
-        <span className="text-4xl mb-2 block">🔗</span>
-        <p>프로토타입 데이터가 없습니다</p>
-      </div>
-    );
-  }
+  const objects = prototypeState?.objects;
 
   // Build ordered chain: object → proto → proto → ... → null
   const chains = useMemo(() => {
-    const objects = prototypeState.objects;
-    if (!objects || objects.length === 0) return [];
-
-    // Build name→object map
-    const objMap = new Map<string, ProtoObject>();
-    objects.forEach((o) => objMap.set(o.name, o));
-
-    // Find roots (objects not referenced as proto by another in the list)
-    const referencedAsProto = new Set(objects.map((o) => o.proto).filter(Boolean));
-    const roots = objects.filter(
-      (o) => !referencedAsProto.has(o.name) || o.name === objects[0].name
-    );
+    const objectList = objects ?? [];
+    if (objectList.length === 0) return [];
 
     // For each root, build chain
     const result: ProtoObject[][] = [];
-    const startObj = roots[0] || objects[0];
 
     // Walk from first object following proto links
     const chain: ProtoObject[] = [];
@@ -179,7 +161,7 @@ export const PrototypeChainView = memo(function PrototypeChainView({
     // First, add all objects not in proto chain (they appear before any chain)
     // Actually, just build one flat chain from the objects array in order
     // since the JSON is already ordered as chain
-    objects.forEach((obj) => {
+    objectList.forEach((obj) => {
       if (!visited.has(obj.name)) {
         chain.push(obj);
         visited.add(obj.name);
@@ -194,12 +176,21 @@ export const PrototypeChainView = memo(function PrototypeChainView({
 
     result.push(chain);
     return result;
-  }, [prototypeState.objects]);
+  }, [objects]);
 
   const lookupPathSet = useMemo(
-    () => new Set(prototypeState.lookupPath || []),
-    [prototypeState.lookupPath]
+    () => new Set(prototypeState?.lookupPath ?? []),
+    [prototypeState?.lookupPath]
   );
+
+  if (!prototypeState) {
+    return (
+      <div className="p-4 text-center text-gray-400">
+        <span className="text-4xl mb-2 block">🔗</span>
+        <p>프로토타입 데이터가 없습니다</p>
+      </div>
+    );
+  }
 
   return (
     <div className="prototype-chain-view p-4">

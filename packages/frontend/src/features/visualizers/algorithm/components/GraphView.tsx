@@ -112,15 +112,10 @@ function computeLayout(nodes: GraphNode[]): Map<string, { x: number; y: number }
 export const GraphView = memo(function GraphView({
   data,
 }: GraphViewProps) {
-  if (!data || !data.nodes) {
-    return (
-      <div className="p-4 text-center text-gray-400">
-        <p>그래프 데이터가 없습니다</p>
-      </div>
-    );
-  }
+  const nodes = data?.nodes;
+  const edges = data?.edges ?? [];
 
-  const positions = useMemo(() => computeLayout(data.nodes), [data.nodes]);
+  const positions = useMemo(() => computeLayout(nodes ?? []), [nodes]);
 
   // Compute SVG viewBox
   const viewBox = useMemo(() => {
@@ -135,6 +130,14 @@ export const GraphView = memo(function GraphView({
     const pad = SVG_PADDING + NODE_RADIUS;
     return `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`;
   }, [positions]);
+
+  if (!data || !nodes || nodes.length === 0) {
+    return (
+      <div className="p-4 text-center text-gray-400">
+        <p>그래프 데이터가 없습니다</p>
+      </div>
+    );
+  }
 
   return (
     <div className="graph-view p-4">
@@ -169,7 +172,7 @@ export const GraphView = memo(function GraphView({
           </defs>
 
           {/* Edges */}
-          {data.edges.map((edge, i) => {
+          {edges.map((edge, i) => {
             const fromPos = positions.get(edge.from);
             const toPos = positions.get(edge.to);
             if (!fromPos || !toPos) return null;
@@ -222,7 +225,7 @@ export const GraphView = memo(function GraphView({
           })}
 
           {/* Nodes */}
-          {data.nodes.map((node) => {
+          {nodes.map((node) => {
             const pos = positions.get(node.id);
             if (!pos) return null;
 

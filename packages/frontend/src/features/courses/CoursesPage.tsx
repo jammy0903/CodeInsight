@@ -43,7 +43,7 @@ export function CoursesPage() {
       }
     }
     loadLanguages();
-  }, []);
+  }, [t]);
 
   // 언어 카드 클릭 → 챕터 페이지로 이동
   const handleLanguageClick = (langId: string) => {

@@ -1,7 +1,6 @@
 import type {
   LessonStep,
   MemoryChangeAction,
-  StackFrame,
   Variable,
   HeapObject,
   StepMemoryState,

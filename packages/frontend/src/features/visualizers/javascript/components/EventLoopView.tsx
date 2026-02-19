@@ -9,7 +9,7 @@
  * - Output: 콘솔 출력 (누적)
  */
 
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ============================================

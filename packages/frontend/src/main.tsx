@@ -17,10 +17,16 @@ import { useStore } from './stores/store'
 import { auth } from './services/firebase'
 import { initializeAdMob } from './services/admob'
 
+type DebugWindow = Window & {
+  useStore?: typeof useStore;
+  auth?: typeof auth;
+};
+
 // 개발 환경에서 디버깅용으로 window에 노출
 if (import.meta.env.DEV) {
-  (window as any).useStore = useStore;
-  (window as any).auth = auth;
+  const debugWindow = window as DebugWindow;
+  debugWindow.useStore = useStore;
+  debugWindow.auth = auth;
   // 환경변수 확인용 로그
   console.log('🔧 Environment:', {
     MODE: import.meta.env.MODE,

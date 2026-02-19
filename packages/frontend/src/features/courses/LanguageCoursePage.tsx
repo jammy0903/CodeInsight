@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { ChapterWithLessons } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';

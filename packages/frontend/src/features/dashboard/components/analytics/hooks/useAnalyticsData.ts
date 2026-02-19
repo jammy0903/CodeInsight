@@ -119,7 +119,7 @@ export function useAnalyticsData(progress: UserProgress[]) {
     const oneYearAgo = new Date(today);
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    let countByDate: Record<string, number> = {};
+    const countByDate: Record<string, number> = {};
 
     if (analyticsData?.dailyActivity) {
       Object.entries(analyticsData.dailyActivity).forEach(([date, seconds]) => {

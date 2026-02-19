@@ -7,7 +7,7 @@
  * - 해당 퀴즈로 바로 이동 링크
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, ArrowRight, TrendingDown, Loader2, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -28,11 +28,7 @@ export function StandaloneQuizSection() {
 
   const langInfo = LANGUAGE_INFO[selectedLanguage];
 
-  useEffect(() => {
-    loadWeakConcepts();
-  }, [selectedLanguage]);
-
-  const loadWeakConcepts = async () => {
+  const loadWeakConcepts = useCallback(async () => {
     try {
       setLoading(true);
       const concepts = await getWeakConcepts(selectedLanguage, 5);
@@ -42,7 +38,11 @@ export function StandaloneQuizSection() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedLanguage]);
+
+  useEffect(() => {
+    void loadWeakConcepts();
+  }, [loadWeakConcepts]);
 
   return (
     <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6">

@@ -138,7 +138,7 @@ export interface IFlowAdapter {
 // ============================================
 
 export interface MemoryState {
-  stack: Array<{ name: string; type?: string; value: string; address?: string; points_to?: string | null }>;
+  stack: Array<{ name?: string; type?: string; value: string; address?: string; points_to?: string | null }>;
   heap: Array<{ name?: string; type?: string; value: string; address?: string; points_to?: string | null }>;
   frames?: Array<{ name: string }>;
 }
@@ -156,5 +156,5 @@ export interface MemoryAdapter {
     step: LessonStep,
     memoryState?: MemoryState,
     changedBlocks?: ChangedBlocksType
-  ): any;
+  ): Record<string, unknown> | null;
 }

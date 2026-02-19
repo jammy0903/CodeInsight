@@ -28,7 +28,6 @@ const getLanguageInfo = (lang: SupportedLanguage | null, t: (key: string) => str
 
 export function TopBar() {
   const { t } = useTranslation();
-  const sidebarOpen = useStore((s) => s.sidebarOpen);
   const toggleSidebar = useStore((s) => s.toggleSidebar);
   const pageTitle = useStore((s) => s.pageTitle);
   const pageSubtitle = useStore((s) => s.pageSubtitle);

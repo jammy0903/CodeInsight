@@ -9,7 +9,7 @@
  *             R2 last → quiz
  */
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type { LessonStep } from '@/types';
 import { hasVisualizationData } from './useLessonVisualization';
 
@@ -41,14 +41,40 @@ interface UseRoundNavigationReturn {
   reset: () => void;
 }
 
+interface RoundState {
+  lessonKey: string;
+  round: LessonRound;
+  stepIndex: number;
+}
+
 export function useRoundNavigation({
   steps,
   lessonId,
   onStepChange,
   onQuiz,
 }: UseRoundNavigationOptions): UseRoundNavigationReturn {
-  const [round, setRound] = useState<LessonRound>('explanation');
-  const [stepIndex, setStepIndex] = useState(0);
+  const lessonKey = lessonId || '__default_lesson__';
+  const [roundState, setRoundState] = useState<RoundState>(() => ({
+    lessonKey,
+    round: 'explanation',
+    stepIndex: 0,
+  }));
+
+  const round = roundState.lessonKey === lessonKey ? roundState.round : 'explanation';
+  const stepIndex = roundState.lessonKey === lessonKey ? roundState.stepIndex : 0;
+
+  const updateRoundState = useCallback(
+    (updater: (prev: Omit<RoundState, 'lessonKey'>) => Omit<RoundState, 'lessonKey'>) => {
+      setRoundState((prev) => {
+        const base = prev.lessonKey === lessonKey
+          ? { round: prev.round, stepIndex: prev.stepIndex }
+          : { round: 'explanation' as LessonRound, stepIndex: 0 };
+        const next = updater(base);
+        return { lessonKey, ...next };
+      });
+    },
+    [lessonKey]
+  );
 
   // Memoize which steps have visualization data
   const vizStepIndices = useMemo(
@@ -60,12 +86,6 @@ export function useRoundNavigation({
   );
 
   const hasVizRound = vizStepIndices.length > 0;
-
-  // Reset when lesson changes
-  useEffect(() => {
-    setRound('explanation');
-    setStepIndex(0);
-  }, [lessonId]);
 
   // Map (round, stepIndex) → actual index in steps[]
   const actualStepIndex = useMemo(() => {
@@ -90,12 +110,11 @@ export function useRoundNavigation({
     if (round === 'explanation') {
       if (stepIndex < steps.length - 1) {
         const next = stepIndex + 1;
-        setStepIndex(next);
+        updateRoundState((prev) => ({ ...prev, stepIndex: next }));
         onStepChange?.(next);
       } else {
         if (hasVizRound) {
-          setRound('visualization');
-          setStepIndex(0);
+          updateRoundState(() => ({ round: 'visualization', stepIndex: 0 }));
           onStepChange?.(vizStepIndices[0]);
         } else {
           onQuiz?.();
@@ -104,39 +123,37 @@ export function useRoundNavigation({
     } else {
       if (stepIndex < vizStepIndices.length - 1) {
         const next = stepIndex + 1;
-        setStepIndex(next);
+        updateRoundState((prev) => ({ ...prev, stepIndex: next }));
         onStepChange?.(vizStepIndices[next]);
       } else {
         onQuiz?.();
       }
     }
-  }, [round, stepIndex, steps.length, hasVizRound, vizStepIndices, onStepChange, onQuiz]);
+  }, [round, stepIndex, steps.length, hasVizRound, vizStepIndices, onStepChange, onQuiz, updateRoundState]);
 
   const goPrev = useCallback(() => {
     if (round === 'explanation') {
       if (stepIndex > 0) {
         const prev = stepIndex - 1;
-        setStepIndex(prev);
+        updateRoundState((current) => ({ ...current, stepIndex: prev }));
         onStepChange?.(prev);
       }
     } else {
       if (stepIndex > 0) {
         const prev = stepIndex - 1;
-        setStepIndex(prev);
+        updateRoundState((current) => ({ ...current, stepIndex: prev }));
         onStepChange?.(vizStepIndices[prev]);
       } else {
         const lastR1 = steps.length - 1;
-        setRound('explanation');
-        setStepIndex(lastR1);
+        updateRoundState(() => ({ round: 'explanation', stepIndex: lastR1 }));
         onStepChange?.(lastR1);
       }
     }
-  }, [round, stepIndex, steps.length, vizStepIndices, onStepChange]);
+  }, [round, stepIndex, steps.length, vizStepIndices, onStepChange, updateRoundState]);
 
   const reset = useCallback(() => {
-    setRound('explanation');
-    setStepIndex(0);
-  }, []);
+    updateRoundState(() => ({ round: 'explanation', stepIndex: 0 }));
+  }, [updateRoundState]);
 
   return {
     round,

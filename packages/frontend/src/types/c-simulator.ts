@@ -5,7 +5,7 @@
  * 설계 문서: docs/logic/SIMULATOR_EXTENSION.md (Part 1, Section 3)
  */
 
-import type { BaseStep, BaseChange, HexAddress } from './simulator';
+import type { BaseChange, HexAddress } from './simulator';
 import type { MemoryBlock } from '@codeinsight/shared';
 
 // ============================================================
