@@ -179,8 +179,8 @@ export function LessonUnifiedView({
                   language={languageId === 'python-practical' ? 'python' : (languageId || 'c')}
                   fullCode={code}
                   memoryState={memoryState ? {
-                    stack: memoryState.stack.map((s: any) => ({ ...s, name: s.name || '?' })),
-                    heap: memoryState.heap.map((h: any) => ({ ...h, name: h.name || '?' })),
+                    stack: memoryState.stack.map((s) => ({ ...s, name: s.name || '?' })),
+                    heap: memoryState.heap.map((h) => ({ ...h, name: h.name || '?' })),
                   } : undefined}
                   stdout={currentStep?.stdout}
                 />

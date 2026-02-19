@@ -86,12 +86,18 @@ export function normalizeCValue(rawValue: unknown): string {
 }
 
 /** C stack 배열에서 frame 마커를 분리하고 변수를 추출 */
-export function extractCFrames(rawStack: any[]): {
+export interface CStackItem {
+  type?: string;
+  func?: string;
+  [key: string]: unknown;
+}
+
+export function extractCFrames(rawStack: CStackItem[]): {
   frames: { name: string }[];
-  variables: any[];
+  variables: CStackItem[];
 } {
   const frames: { name: string }[] = [];
-  const variables: any[] = [];
+  const variables: CStackItem[] = [];
 
   for (const item of rawStack) {
     if (item.type === 'frame' && item.func) {
