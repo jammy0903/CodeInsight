@@ -19,6 +19,71 @@
 import type { LessonStep, FlowStep, FlowVariable, FlowFrame } from '@codeinsight/shared';
 import type { IFlowTransformer } from '../../shared/adapters/types';
 
+type UnknownRecord = Record<string, unknown>;
+
+type StackFrameItem = {
+  methodName?: string;
+  variables?: UnknownRecord;
+};
+
+type StackVariableItem = {
+  name: string;
+  value: unknown;
+  type?: string;
+};
+
+type HeapItem = {
+  address?: string;
+  id?: string;
+  type?: string;
+  content?: unknown;
+  value?: unknown;
+  new?: boolean;
+  changed?: boolean;
+  shared?: boolean;
+  warning?: boolean;
+};
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function toArray(value: unknown): unknown[] | undefined {
+  return Array.isArray(value) ? value : undefined;
+}
+
+function stringifyUnknown(value: unknown): string {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function isStackFrameItem(item: unknown): item is StackFrameItem {
+  if (!isRecord(item)) return false;
+  return typeof item.methodName === 'string' || isRecord(item.variables);
+}
+
+function isStackVariableItem(item: unknown): item is StackVariableItem {
+  if (!isRecord(item)) return false;
+  return typeof item.name === 'string' && 'value' in item;
+}
+
+function isHeapItem(item: unknown): item is HeapItem {
+  if (!isRecord(item)) return false;
+  return (
+    typeof item.address === 'string' ||
+    typeof item.id === 'string' ||
+    'content' in item ||
+    'value' in item
+  );
+}
+
 /**
  * 값을 FlowValue로 파싱
  *
@@ -27,7 +92,7 @@ import type { IFlowTransformer } from '../../shared/adapters/types';
  * - "hello" 형태의 문자열
  * - undefined, null, NaN 등 JS 고유 값
  */
-function parseValue(value: string | undefined | null): string | number | boolean | null {
+function parseValue(value: unknown): string | number | boolean | null {
   if (value === undefined || value === null) {
     return null;
   }
@@ -65,8 +130,8 @@ function parseValue(value: string | undefined | null): string | number | boolean
  * "@1" → "@1"
  * "→ 0x001" → "0x001"  (레슨 JSON 형식)
  */
-function extractPointsTo(value: string | undefined | null): string | undefined {
-  if (!value) return undefined;
+function extractPointsTo(value: unknown): string | undefined {
+  if (value === undefined || value === null) return undefined;
   const strValue = String(value);
   if (strValue.startsWith('@')) {
     return strValue.trim();
@@ -94,64 +159,77 @@ export class JSTransformer implements IFlowTransformer {
   transform(step: LessonStep, prevStep?: LessonStep, fullCode?: string): FlowStep {
     const variables: FlowVariable[] = [];
     const frameVarMap = new Map<string, string[]>(); // frameName -> variableIds
+    const stepRecord = step as UnknownRecord;
+    const getFrameVarIds = (frameName: string): string[] => {
+      let ids = frameVarMap.get(frameName);
+      if (!ids) {
+        ids = [];
+        frameVarMap.set(frameName, ids);
+      }
+      return ids;
+    };
 
     // DEBUG
     if (import.meta.env.DEV) {
       console.log('[JSTransformer] step.line:', step.line);
       console.log('[JSTransformer] step.memoryState:', step.memoryState);
       console.log('[JSTransformer] step.stack:', step.stack);
-      console.log('[JSTransformer] step.heap:', (step as any).heap);
+      console.log('[JSTransformer] step.heap:', stepRecord.heap);
       // 상세 변수 로그
       if (step.stack && Array.isArray(step.stack)) {
-        step.stack.forEach((frame: any, i: number) => {
-          console.log(`[JSTransformer] stack[${i}].variables:`, JSON.stringify(frame.variables || frame));
+        step.stack.forEach((frame, i: number) => {
+          const debugFrame: unknown = frame;
+          const frameRecord = isRecord(debugFrame) ? debugFrame : undefined;
+          console.log(`[JSTransformer] stack[${i}].variables:`, JSON.stringify(frameRecord?.variables || frame));
         });
       }
     }
 
     // 0. 힙 타입 맵 구축 (참조 값의 실제 타입 조회용)
     const heapTypeMap = new Map<string, string>();
-    const rawHeapData = step.memoryState?.heap || (step.heap as any);
-    if (rawHeapData && Array.isArray(rawHeapData)) {
-      rawHeapData.forEach((item: any) => {
+    const rawHeapData = step.memoryState?.heap || toArray(stepRecord.heap) || [];
+    rawHeapData.forEach(item => {
+      if (!isHeapItem(item)) return;
         const addr = item.address || item.id;
         if (addr) heapTypeMap.set(addr, item.type || 'Object');
-      });
-    }
+    });
 
     // 1. Stack 변수 처리 (여러 프레임 지원)
-    const stackData = step.memoryState?.stack || (step.stack as any);
-    if (stackData && Array.isArray(stackData)) {
-      stackData.forEach((item: any) => {
+    const stackData = step.memoryState?.stack || toArray(stepRecord.stack) || [];
+    stackData.forEach(item => {
         // 형태: {methodName, className, variables: {...}} - 시뮬레이터 출력
-        if (item.methodName || item.variables) {
+        if (isStackFrameItem(item)) {
           const frameName = item.methodName || '__main__';
+          const frameVarIds = getFrameVarIds(frameName);
+          const frameVariables = item.variables;
 
-          if (!frameVarMap.has(frameName)) {
-            frameVarMap.set(frameName, []);
-          }
-
-          if (item.variables && typeof item.variables === 'object') {
-            Object.entries(item.variables).forEach(([varName, val]: [string, any]) => {
+          if (frameVariables && typeof frameVariables === 'object') {
+            Object.entries(frameVariables).forEach(([varName, val]) => {
               let value: string | number | boolean | null = null;
               let type = 'unknown';
               let pointsToAddr: string | undefined = undefined;
 
-              if (val && typeof val === 'object') {
-                if ('value' in val) {
-                  value = parseValue(val.value);
-                  type = val.type || typeof val.value;
-                } else if (val.type === 'Reference' || val.type === 'Array' || val.id) {
+              if (isRecord(val)) {
+                const rawValue = val.value;
+                const refType = asString(val.type);
+                const refId = asString(val.id);
+                const className = asString(val.class);
+                const displayValue = val.displayValue;
+
+                if (rawValue !== undefined) {
+                  value = parseValue(rawValue);
+                  type = refType || typeof rawValue;
+                } else if (refType === 'Reference' || refType === 'Array' || refId) {
                   // 참조 타입: displayValue가 있으면 표시, 없으면 주소
-                  if (val.displayValue !== undefined) {
-                    value = val.displayValue;
+                  if (displayValue !== undefined) {
+                    value = parseValue(displayValue);
                   } else {
-                    value = val.id ? val.id : null;
+                    value = refId || null;
                   }
-                  type = val.class || val.type || 'Reference';
-                  pointsToAddr = val.id;
+                  type = className || refType || 'Reference';
+                  pointsToAddr = refId;
                 } else {
-                  value = JSON.stringify(val);
+                  value = stringifyUnknown(val);
                   type = 'object';
                 }
               } else {
@@ -178,7 +256,7 @@ export class JSTransformer implements IFlowTransformer {
               };
 
               variables.push(variable);
-              frameVarMap.get(frameName)!.push(variable.id);
+              frameVarIds.push(variable.id);
 
               if (import.meta.env.DEV) {
                 console.log('[JSTransformer] stack variable:', variable);
@@ -187,17 +265,15 @@ export class JSTransformer implements IFlowTransformer {
           }
         }
         // 형태 2: 단순 형태 {name, value, type?} - 레슨 JSON
-        else if (item.name && (item.value !== undefined || item.value === null)) {
+        else if (isStackVariableItem(item)) {
           const frameName = '__main__';
-          if (!frameVarMap.has(frameName)) {
-            frameVarMap.set(frameName, []);
-          }
+          const frameVarIds = getFrameVarIds(frameName);
 
           const pointsTo = extractPointsTo(item.value);
           const isReference = !!pointsTo;
           // 참조이면 heapTypeMap에서 실제 타입 조회
           const type = isReference
-            ? (heapTypeMap.get(pointsTo!) || item.type || 'Reference')
+            ? (heapTypeMap.get(pointsTo) || item.type || 'Reference')
             : (item.type || 'unknown');
 
           const variable: FlowVariable = {
@@ -212,21 +288,21 @@ export class JSTransformer implements IFlowTransformer {
           };
 
           variables.push(variable);
-          frameVarMap.get(frameName)!.push(variable.id);
+          frameVarIds.push(variable.id);
 
           if (import.meta.env.DEV) {
             console.log('[JSTransformer] stack variable (simple):', variable);
           }
         }
-      });
-    }
+    });
 
     // 2. Heap 변수 처리
-    const heapData = step.memoryState?.heap || (step.heap as any);
+    const heapData = step.memoryState?.heap || toArray(stepRecord.heap);
     const heapVarIds: string[] = [];
 
     if (heapData && Array.isArray(heapData)) {
-      heapData.forEach((item: any) => {
+      heapData.forEach(item => {
+        if (!isHeapItem(item)) return;
         const address = item.address || item.id || 'unknown';
         const metadata: Record<string, unknown> = {};
         if (item.new) metadata.isNew = true;
@@ -240,7 +316,7 @@ export class JSTransformer implements IFlowTransformer {
           type: item.type || 'Object',
           state: 'idle',
           scope: 'heap',
-          address: address,
+          address,
           isPointer: false,
           ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
         };
@@ -284,10 +360,11 @@ export class JSTransformer implements IFlowTransformer {
 
     // 5. 터미널 출력 (stdout 또는 memoryState.output)
     let terminalOutput: { text: string } | undefined = undefined;
+    const stdout = asString(stepRecord.stdout) || step.stdout;
 
     // 시뮬레이터: step.stdout 직접 전달
-    if ((step as any).stdout) {
-      terminalOutput = { text: String((step as any).stdout) };
+    if (stdout) {
+      terminalOutput = { text: stdout };
     }
     // 레슨 JSON: step.memoryState.output
     else if (step.memoryState?.output) {
