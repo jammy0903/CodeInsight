@@ -84,6 +84,9 @@ export const VIZ_DATA_FIELDS = [
 
 export function hasVisualizationData(step: LessonStep): boolean {
   const stepRecord = step as UnknownRecord;
+  if (step.visualizationType === 'terminal') {
+    return true;
+  }
   return VIZ_DATA_FIELDS.some(field => stepRecord[field] != null);
 }
 
