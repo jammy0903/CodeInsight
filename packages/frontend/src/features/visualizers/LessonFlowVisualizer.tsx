@@ -11,7 +11,7 @@
  *    → 기존 FlowVisualizer + ArrowLayer (C)
  */
 
-import { memo, useMemo, useRef } from 'react';
+import { memo, useMemo, useRef, type ComponentProps } from 'react';
 import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared';
 import { FlowVisualizer } from './c/CFlowVisualizer';
 import { ReferenceGraphView } from './shared/components/ReferenceGraphView';
@@ -50,6 +50,37 @@ interface LessonFlowVisualizerProps {
   stdout?: string;
 }
 
+type StepRecord = Record<string, unknown>;
+type EventLoopStateProp = ComponentProps<typeof EventLoopView>['eventLoopState'];
+type ScopeStateProp = ComponentProps<typeof ScopeView>['scopeState'];
+type ThisStateProp = ComponentProps<typeof ThisBindingView>['thisState'];
+type PrototypeStateProp = ComponentProps<typeof PrototypeChainView>['prototypeState'];
+type PromiseStateProp = ComponentProps<typeof PromiseView>['promiseState'];
+type AlgorithmStateProp = ComponentProps<typeof AlgorithmView>['algorithmState'];
+
+type JavaCacheInfo = {
+  name?: string;
+  range?: string;
+  highlight?: number;
+  refCount?: number;
+  note?: string;
+};
+
+type HashSetBucket = { index: string; content: string; searched?: boolean };
+type JavaHashSetInfo = { buckets?: HashSetBucket[] };
+
+function isRecord(value: unknown): value is StepRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function getField<T>(record: StepRecord | undefined, key: string): T | undefined {
+  return record?.[key] as T | undefined;
+}
+
 // ============================================
 // 컴포넌트
 // ============================================
@@ -68,21 +99,52 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   stdout,
 }: LessonFlowVisualizerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const vizType = (step as any).visualizationType as string | undefined;
+  const stepRecord = step as StepRecord;
+  const prevStepRecord = prevStep ? (prevStep as StepRecord) : undefined;
+  const vizType = asString(stepRecord.visualizationType);
   const isJavaScript = language === 'javascript' || language === 'js';
+  const eventLoopState = (isRecord(step.eventLoopState) ? step.eventLoopState : undefined) as EventLoopStateProp | undefined;
+  const prevEventLoopState = (prevStep && isRecord(prevStep.eventLoopState) ? prevStep.eventLoopState : undefined) as EventLoopStateProp | undefined;
+  const eventLoopRecord = isRecord(eventLoopState) ? eventLoopState : undefined;
+  const eventLoopWarning = asString(eventLoopRecord?.warning);
+  const eventLoopNote = asString(eventLoopRecord?.note);
+  const scopeState =
+    getField<ScopeStateProp>(stepRecord, 'scopeState') ||
+    ((isRecord(step.scopeChainState) ? step.scopeChainState : undefined) as unknown as ScopeStateProp | undefined);
+  const prevScopeState =
+    getField<ScopeStateProp>(prevStepRecord, 'scopeState') ||
+    ((prevStep && isRecord(prevStep.scopeChainState) ? prevStep.scopeChainState : undefined) as unknown as ScopeStateProp | undefined);
+  const thisState =
+    getField<ThisStateProp>(stepRecord, 'thisState') ||
+    ((isRecord(step.thisBindState) ? step.thisBindState : undefined) as unknown as ThisStateProp | undefined);
+  const prevThisState =
+    getField<ThisStateProp>(prevStepRecord, 'thisState') ||
+    ((prevStep && isRecord(prevStep.thisBindState) ? prevStep.thisBindState : undefined) as unknown as ThisStateProp | undefined);
+  const prototypeState =
+    getField<PrototypeStateProp>(stepRecord, 'prototypeState') ||
+    ((isRecord(step.prototypeState) ? step.prototypeState : undefined) as unknown as PrototypeStateProp | undefined);
+  const prevPrototypeState =
+    getField<PrototypeStateProp>(prevStepRecord, 'prototypeState') ||
+    ((prevStep && isRecord(prevStep.prototypeState) ? prevStep.prototypeState : undefined) as unknown as PrototypeStateProp | undefined);
+  const promiseState = getField<PromiseStateProp>(stepRecord, 'promiseState');
+  const prevPromiseState = getField<PromiseStateProp>(prevStepRecord, 'promiseState');
+  const algorithmState = (isRecord(step.algorithmState) ? step.algorithmState : undefined) as unknown as AlgorithmStateProp | undefined;
+  const prevAlgorithmState = (prevStep && isRecord(prevStep.algorithmState) ? prevStep.algorithmState : undefined) as unknown as AlgorithmStateProp | undefined;
+  const terminalStdout = stdout || step.stdout;
+  const terminalExplanation = step.explanation;
 
   // Detect non-memory viz types that bypass the transformer pipeline
-  const els = (step as any).eventLoopState;
-  const hasStandardEventLoop = els && (vizType === 'eventLoop' || els.callStack || els.webApis || els.taskQueue || els.microtaskQueue);
-  const hasEventLoopNoteOnly = els && !hasStandardEventLoop && (els.note || els.warning);
+  const els = eventLoopState;
+  const hasStandardEventLoop = !!(els && (vizType === 'eventLoop' || els.callStack || els.webApis || els.taskQueue || els.microtaskQueue));
+  const hasEventLoopNoteOnly = !!(els && !hasStandardEventLoop && (eventLoopNote || eventLoopWarning));
   const isNonMemoryType =
     hasStandardEventLoop ||
     hasEventLoopNoteOnly ||
-    (vizType === 'scope' && (step as any).scopeState) ||
-    (vizType === 'thisBinding' && (step as any).thisState) ||
-    (vizType === 'prototype' && (step as any).prototypeState) ||
-    (vizType === 'promise' && (step as any).promiseState) ||
-    (vizType === 'algorithm' && (step as any).algorithmState) ||
+    (vizType === 'scope' && scopeState) ||
+    (vizType === 'thisBinding' && thisState) ||
+    (vizType === 'prototype' && prototypeState) ||
+    (vizType === 'promise' && promiseState) ||
+    (vizType === 'algorithm' && algorithmState) ||
     vizType === 'terminal';
 
   // ========================================================
@@ -172,8 +234,8 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     return (
       <div className={className}>
         <EventLoopView
-          eventLoopState={(step as any).eventLoopState}
-          prevEventLoopState={(prevStep as any)?.eventLoopState}
+          eventLoopState={eventLoopState || {}}
+          prevEventLoopState={prevEventLoopState}
         />
       </div>
     );
@@ -184,11 +246,11 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
       <div className={className}>
         <div className="flex items-center justify-center h-full p-6">
           <div className="text-center max-w-md">
-            {els.warning && (
-              <p className="text-amber-600 text-sm font-medium mb-2">{els.warning}</p>
+            {eventLoopWarning && (
+              <p className="text-amber-600 text-sm font-medium mb-2">{eventLoopWarning}</p>
             )}
-            {els.note && (
-              <p className="text-[var(--theme-dashboard-text-muted)] text-sm">{els.note}</p>
+            {eventLoopNote && (
+              <p className="text-[var(--theme-dashboard-text-muted)] text-sm">{eventLoopNote}</p>
             )}
           </div>
         </div>
@@ -196,56 +258,56 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     );
   }
 
-  if (vizType === 'scope' && (step as any).scopeState) {
+  if (vizType === 'scope' && scopeState) {
     return (
       <div className={className}>
         <ScopeView
-          scopeState={(step as any).scopeState}
-          prevScopeState={(prevStep as any)?.scopeState}
+          scopeState={scopeState}
+          prevScopeState={prevScopeState}
         />
       </div>
     );
   }
 
-  if (vizType === 'thisBinding' && (step as any).thisState) {
+  if (vizType === 'thisBinding' && thisState) {
     return (
       <div className={className}>
         <ThisBindingView
-          thisState={(step as any).thisState}
-          prevThisState={(prevStep as any)?.thisState}
+          thisState={thisState}
+          prevThisState={prevThisState}
         />
       </div>
     );
   }
 
-  if (vizType === 'prototype' && (step as any).prototypeState) {
+  if (vizType === 'prototype' && prototypeState) {
     return (
       <div className={className}>
         <PrototypeChainView
-          prototypeState={(step as any).prototypeState}
-          prevPrototypeState={(prevStep as any)?.prototypeState}
+          prototypeState={prototypeState}
+          prevPrototypeState={prevPrototypeState}
         />
       </div>
     );
   }
 
-  if (vizType === 'promise' && (step as any).promiseState) {
+  if (vizType === 'promise' && promiseState) {
     return (
       <div className={className}>
         <PromiseView
-          promiseState={(step as any).promiseState}
-          prevPromiseState={(prevStep as any)?.promiseState}
+          promiseState={promiseState}
+          prevPromiseState={prevPromiseState}
         />
       </div>
     );
   }
 
-  if (vizType === 'algorithm' && (step as any).algorithmState) {
+  if (vizType === 'algorithm' && algorithmState) {
     return (
       <div className={className}>
         <AlgorithmView
-          algorithmState={(step as any).algorithmState}
-          prevAlgorithmState={(prevStep as any)?.algorithmState}
+          algorithmState={algorithmState}
+          prevAlgorithmState={prevAlgorithmState}
         />
       </div>
     );
@@ -255,8 +317,8 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     return (
       <div className={className}>
         <TerminalStepView
-          explanation={(step as any).explanation}
-          stdout={stdout || (step as any).stdout}
+          explanation={terminalExplanation}
+          stdout={terminalStdout}
         />
       </div>
     );
@@ -285,13 +347,14 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
 
   // Java → ReferenceGraphView + comparison/warning/note/error 배너 + cache/hashSet
   if (language === 'java') {
-    const jms = (step as any).javaMemoryState;
+    const jms = step.javaMemoryState;
+    const jmsRecord = isRecord(step.javaMemoryState) ? (step.javaMemoryState as unknown as StepRecord) : undefined;
     const comparison = jms?.comparison;
     const warning = jms?.warning;
     const note = jms?.note;
-    const error = jms?.error;
-    const cache = jms?.cache;
-    const hashSet = jms?.hashSet;
+    const error = asString(jmsRecord?.error);
+    const cache = (isRecord(jmsRecord?.cache) ? jmsRecord.cache : undefined) as JavaCacheInfo | undefined;
+    const hashSet = (isRecord(jmsRecord?.hashSet) ? jmsRecord.hashSet : undefined) as JavaHashSetInfo | undefined;
 
     return (
       <div className={className}>
