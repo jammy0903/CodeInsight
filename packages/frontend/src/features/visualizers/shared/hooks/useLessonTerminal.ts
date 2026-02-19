@@ -23,6 +23,13 @@ interface UseLessonTerminalOptions {
   diffMode?: boolean;
 }
 
+type OutputField = 'pythonMemoryState' | 'javaMemoryState' | 'eventLoopState' | 'memoryState';
+
+function getOutputList(step: LessonStep | null | undefined, field: OutputField): unknown[] {
+  const container = step?.[field] as { output?: unknown } | undefined;
+  return Array.isArray(container?.output) ? container.output : [];
+}
+
 export function useLessonTerminal({
   steps,
   currentStepIndex,
@@ -51,12 +58,12 @@ export function useLessonTerminal({
 
     // Python: pythonMemoryState.output (JSON 레슨) 또는 stdout (시뮬레이터)
     if (languageId === 'python' || languageId === 'python-practical') {
-      const pyOutput = (currentStep as any)?.pythonMemoryState?.output;
-      if (Array.isArray(pyOutput) && pyOutput.length > 0) {
+      const pyOutput = getOutputList(currentStep, 'pythonMemoryState');
+      if (pyOutput.length > 0) {
         if (!diffMode) {
           return pyOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
         }
-        const prevOutput = (prevStep as any)?.pythonMemoryState?.output || [];
+        const prevOutput = getOutputList(prevStep, 'pythonMemoryState');
         return pyOutput.slice(prevOutput.length)
           .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
@@ -75,12 +82,12 @@ export function useLessonTerminal({
 
     // Java: javaMemoryState.output (JSON 레슨) 또는 stdout (시뮬레이터)
     if (languageId === 'java') {
-      const jmsOutput = (currentStep as any)?.javaMemoryState?.output;
-      if (Array.isArray(jmsOutput) && jmsOutput.length > 0) {
+      const jmsOutput = getOutputList(currentStep, 'javaMemoryState');
+      if (jmsOutput.length > 0) {
         if (!diffMode) {
           return jmsOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
         }
-        const prevOutput = (prevStep as any)?.javaMemoryState?.output || [];
+        const prevOutput = getOutputList(prevStep, 'javaMemoryState');
         return jmsOutput.slice(prevOutput.length)
           .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
@@ -99,22 +106,22 @@ export function useLessonTerminal({
 
     // JavaScript: eventLoopState.output 또는 memoryState.output (JSON 레슨) 또는 stdout (시뮬레이터)
     if (languageId === 'javascript' || languageId === 'js') {
-      const jsOutput = (currentStep as any)?.eventLoopState?.output;
-      if (Array.isArray(jsOutput) && jsOutput.length > 0) {
+      const jsOutput = getOutputList(currentStep, 'eventLoopState');
+      if (jsOutput.length > 0) {
         if (!diffMode) {
           return jsOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
         }
-        const prevOutput = (prevStep as any)?.eventLoopState?.output || [];
+        const prevOutput = getOutputList(prevStep, 'eventLoopState');
         return jsOutput.slice(prevOutput.length)
           .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
       // fallback: memoryState.output (memory vizType 레슨)
-      const msOutput = (currentStep as any)?.memoryState?.output;
-      if (Array.isArray(msOutput) && msOutput.length > 0) {
+      const msOutput = getOutputList(currentStep, 'memoryState');
+      if (msOutput.length > 0) {
         if (!diffMode) {
           return msOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
         }
-        const prevMsOutput = (prevStep as any)?.memoryState?.output || [];
+        const prevMsOutput = getOutputList(prevStep, 'memoryState');
         return msOutput.slice(prevMsOutput.length)
           .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
