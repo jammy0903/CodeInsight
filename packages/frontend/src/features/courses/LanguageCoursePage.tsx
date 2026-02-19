@@ -2,11 +2,34 @@ import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { SupportedLanguage } from '@/types/simulator';
+import type { ChapterWithLessons } from '@/types';
 import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
 import { ChevronLeft, Lock } from 'lucide-react';
 import { useIsMobile, useLanguageCourse } from '@/hooks';
+
+interface ChapterProgressSnapshot {
+  total: number;
+  completed: number;
+  percentage: number;
+}
+
+type ChapterWithProgress = ChapterWithLessons & {
+  progress?: {
+    total?: number;
+    completed?: number;
+    percentage?: number;
+  };
+};
+
+function getChapterProgress(chapter: ChapterWithLessons): ChapterProgressSnapshot {
+  const chapterWithProgress = chapter as ChapterWithProgress;
+  const total = chapterWithProgress.progress?.total ?? chapter.lessons?.length ?? 0;
+  const completed = chapterWithProgress.progress?.completed ?? 0;
+  const percentage = chapterWithProgress.progress?.percentage ?? 0;
+  return { total, completed, percentage };
+}
 
 export function LanguageCoursePage() {
   const { t } = useTranslation();
@@ -195,17 +218,12 @@ export function LanguageCoursePage() {
               // 모바일: 리스트 형식
               <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] overflow-hidden">
                 {chapters.map((chapter, index) => {
-                  const chapterLessons = chapter.lessons || [];
-
                   // 백엔드에서 계산된 진행률 사용 (DRY 원칙)
-                  const total = (chapter as any).progress?.total || chapterLessons.length;
-                  const completed = (chapter as any).progress?.completed || 0;
-                  const progress = (chapter as any).progress?.percentage || 0;
+                  const { total, completed, percentage: progress } = getChapterProgress(chapter);
 
                   // 이전 챕터들이 모두 완료되었는지 확인
                   const previousChaptersComplete = chapters.slice(0, index).every(ch => {
-                    const prevTotal = (ch as any).progress?.total || ch.lessons?.length || 0;
-                    const prevCompleted = (ch as any).progress?.completed || 0;
+                    const { total: prevTotal, completed: prevCompleted } = getChapterProgress(ch);
                     return prevTotal > 0 && prevCompleted === prevTotal;
                   });
 
@@ -260,16 +278,12 @@ export function LanguageCoursePage() {
               // 데스크톱: 그리드 형식
               <CourseGrid>
                 {chapters.map((chapter, index) => {
-                  const chapterLessons = chapter.lessons || [];
-
                   // 백엔드에서 계산된 진행률 사용 (DRY 원칙)
-                  const total = (chapter as any).progress?.total || chapterLessons.length;
-                  const completed = (chapter as any).progress?.completed || 0;
+                  const { total, completed } = getChapterProgress(chapter);
 
                   // 이전 챕터들이 모두 완료되었는지 확인
                   const previousChaptersComplete = chapters.slice(0, index).every(ch => {
-                    const prevTotal = (ch as any).progress?.total || ch.lessons?.length || 0;
-                    const prevCompleted = (ch as any).progress?.completed || 0;
+                    const { total: prevTotal, completed: prevCompleted } = getChapterProgress(ch);
                     return prevTotal > 0 && prevCompleted === prevTotal;
                   });
 
