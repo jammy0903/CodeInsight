@@ -27,19 +27,71 @@ interface UseLessonSimulationResult {
   simulationError: string | null;
 }
 
+type SimStep = {
+  line?: number;
+  explanation?: string;
+  title?: string;
+  highlight?: number[];
+  javaMemoryState?: LessonStep['javaMemoryState'];
+  eventLoopState?: LessonStep['eventLoopState'];
+  stack?: unknown[];
+  heap?: unknown[];
+  stdout?: string;
+  [key: string]: unknown;
+};
+
+type LegacyVisualizationStep = LessonStep & Record<string, unknown>;
+
+interface PythonName {
+  name: string;
+  pointsTo: string;
+}
+
+interface PythonObject {
+  id: string;
+  type: string;
+  value: string;
+  pyId: string;
+}
+
+function hasStringId(value: unknown): value is { id: string } {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as { id?: unknown };
+  return typeof candidate.id === 'string';
+}
+
+function getFrameVariables(frame: unknown): Record<string, unknown> {
+  if (!frame || typeof frame !== 'object') return {};
+  const variables = (frame as { variables?: unknown }).variables;
+  if (variables && typeof variables === 'object' && !Array.isArray(variables)) {
+    return variables as Record<string, unknown>;
+  }
+  return {};
+}
+
+function parseHeapObject(heapObj: unknown): { address?: string; type?: string; content?: unknown } {
+  if (!heapObj || typeof heapObj !== 'object') return {};
+  const candidate = heapObj as Record<string, unknown>;
+  return {
+    address: typeof candidate.address === 'string' ? candidate.address : undefined,
+    type: typeof candidate.type === 'string' ? candidate.type : undefined,
+    content: candidate.content,
+  };
+}
+
 /**
  * Python 시뮬레이터 결과의 stack/heap을 pythonMemoryState로 변환
  */
-function convertToPythonMemoryState(simStep: any) {
-  if (!simStep.stack || !simStep.heap) return undefined;
+function convertToPythonMemoryState(simStep: SimStep) {
+  if (!Array.isArray(simStep.stack) || !Array.isArray(simStep.heap)) return undefined;
 
-  const names: any[] = [];
-  const objects: any[] = [];
+  const names: PythonName[] = [];
+  const objects: PythonObject[] = [];
 
   // stack에서 variables 추출
-  simStep.stack.forEach((frame: any) => {
-    Object.entries(frame.variables || {}).forEach(([varName, varData]: [string, any]) => {
-      if (typeof varData === 'object' && varData !== null && varData.id) {
+  simStep.stack.forEach((frame) => {
+    Object.entries(getFrameVariables(frame)).forEach(([varName, varData]) => {
+      if (hasStringId(varData)) {
         // Reference 타입 (str, list, dict 등)
         names.push({
           name: varName,
@@ -60,12 +112,14 @@ function convertToPythonMemoryState(simStep: any) {
   });
 
   // heap에서 objects 추출
-  simStep.heap.forEach((heapObj: any) => {
+  simStep.heap.forEach((heapObj, idx) => {
+    const parsed = parseHeapObject(heapObj);
+    const address = parsed.address || `obj-${simStep.line ?? 0}-${idx}`;
     objects.push({
-      id: heapObj.address.replace('0x', 'obj-'),
-      type: heapObj.type,
-      value: heapObj.content,
-      pyId: heapObj.address,
+      id: address.replace('0x', 'obj-'),
+      type: parsed.type || 'unknown',
+      value: String(parsed.content ?? ''),
+      pyId: address,
     });
   });
 
@@ -81,31 +135,38 @@ function convertToPythonMemoryState(simStep: any) {
  * - Python은 pythonMemoryState 변환
  */
 function mergeSteps(
-  simSteps: any[],
+  simSteps: SimStep[],
   jsonSteps: LessonStep[],
   lang: string,
 ): LessonStep[] {
   return simSteps.map((simStep) => {
-    const jsonStep = jsonSteps.find((js) => js.line === simStep.line);
+    const simLine = typeof simStep.line === 'number' ? simStep.line : 0;
+    const jsonStep = jsonSteps.find((js) => js.line === simLine);
 
     const pythonMemoryState =
       (lang === 'python' || lang === 'python-practical')
         ? convertToPythonMemoryState(simStep)
         : undefined;
 
+    const javaMemoryState =
+      !simStep.javaMemoryState && jsonStep?.javaMemoryState
+        ? jsonStep.javaMemoryState
+        : simStep.javaMemoryState;
+
+    const eventLoopState =
+      !simStep.eventLoopState && jsonStep?.eventLoopState
+        ? jsonStep.eventLoopState
+        : simStep.eventLoopState;
+
     return {
-      ...simStep,
-      explanation: jsonStep?.explanation || simStep.explanation,
-      title: jsonStep?.title || `Line ${simStep.line}`,
-      highlight: jsonStep?.highlight || [simStep.line],
+      ...(simStep as LessonStep),
+      line: simLine,
+      explanation: jsonStep?.explanation || simStep.explanation || '',
+      title: jsonStep?.title || `Line ${simLine}`,
+      highlight: jsonStep?.highlight || [simLine],
       pythonMemoryState,
-      // Java/JS: JSON 원본의 언어별 메모리 상태 보존 (시뮬레이터에 없으면)
-      ...(!simStep.javaMemoryState && jsonStep && (jsonStep as any).javaMemoryState
-        ? { javaMemoryState: (jsonStep as any).javaMemoryState }
-        : {}),
-      ...(!simStep.eventLoopState && jsonStep && (jsonStep as any).eventLoopState
-        ? { eventLoopState: (jsonStep as any).eventLoopState }
-        : {}),
+      javaMemoryState,
+      eventLoopState,
     };
   });
 }
@@ -175,9 +236,10 @@ export function useLessonSimulation({
     if (lesson.content?.steps && lesson.content.steps.length > 0) {
       const VIZ_FIELDS = ['stack', 'memoryState', 'pythonMemoryState', 'javaMemoryState',
         'scopeState', 'eventLoopState', 'promiseState', 'thisState', 'prototypeState', 'callStackState'];
-      const allStepsHaveViz = lesson.content.steps.every((s: any) =>
-        s.visualizationType === 'terminal' || VIZ_FIELDS.some(f => s[f] != null)
-      );
+      const allStepsHaveViz = lesson.content.steps.every((s) => {
+        const step = s as LegacyVisualizationStep;
+        return step.visualizationType === 'terminal' || VIZ_FIELDS.some((f) => step[f] != null);
+      });
       if (allStepsHaveViz) {
         setLiveSteps(lesson.content.steps);
         return;
