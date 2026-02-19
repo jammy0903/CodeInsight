@@ -176,12 +176,28 @@ export const ArrowLayer = memo(function ArrowLayer({
       const newPositions = new Map<string, Position>();
 
       variablesRef.current.forEach((variable) => {
-        const element = container.querySelector(`[data-variable-id="${variable.id}"]`);
+        const element = container.querySelector(`[data-variable-id="${variable.id}"]`) as HTMLElement | null;
         if (element) {
           const rect = element.getBoundingClientRect();
+
+          // Framer Motion layout 애니메이션이 CSS transform을 적용하므로
+          // getBoundingClientRect()는 애니메이션 중간 위치를 반환함.
+          // transform을 보정하여 최종 레이아웃 위치를 계산.
+          let tx = 0, ty = 0;
+          const style = getComputedStyle(element);
+          if (style.transform && style.transform !== 'none') {
+            const match = style.transform.match(
+              /matrix\([^,]+,\s*[^,]+,\s*[^,]+,\s*[^,]+,\s*([^,]+),\s*([^)]+)\)/
+            );
+            if (match) {
+              tx = parseFloat(match[1]);
+              ty = parseFloat(match[2]);
+            }
+          }
+
           newPositions.set(variable.id, {
-            x: rect.left - containerRect.left + rect.width / 2,
-            y: rect.top - containerRect.top + rect.height / 2,
+            x: rect.left - containerRect.left + rect.width / 2 - tx,
+            y: rect.top - containerRect.top + rect.height / 2 - ty,
           });
         }
       });
@@ -191,15 +207,23 @@ export const ArrowLayer = memo(function ArrowLayer({
   }, [containerRef]);
 
   // variables 변경 시 위치 재계산
-  // Double rAF: 첫 rAF는 DOM 커밋 직후, 두 번째 rAF는 페인트 후 → 레이아웃 확정된 좌표 측정
+  // 즉시(double rAF) + 지연(150ms) 두 번 측정:
+  // - double rAF: DOM 커밋 직후 빠른 측정
+  // - 150ms 지연: Framer Motion 애니메이션으로 레이아웃이 밀린 후 정확한 좌표 재측정
   useEffect(() => {
-    if (updatePositionsRef.current) {
+    if (!updatePositionsRef.current) return;
+
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          updatePositionsRef.current?.();
-        });
+        updatePositionsRef.current?.();
       });
-    }
+    });
+
+    const timer = setTimeout(() => {
+      updatePositionsRef.current?.();
+    }, 150);
+
+    return () => clearTimeout(timer);
   }, [variables]);
 
   // ResizeObserver는 mount 시 1회만 생성 (성능 최적화)
