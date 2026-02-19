@@ -9,10 +9,8 @@
 import { useState, useRef, useCallback } from 'react';
 import { Code2 } from 'lucide-react';
 
-import { LessonCodeEditor } from './day/LessonCodeEditor';
-import { CodePanelTerminal } from './CodePanelTerminal';
-import type { TerminalLine } from '@/features/visualizers/shared';
-import type { CodeSelection } from '../types';
+import { CodeMirrorEditor, type CodeSelection } from '@/features/visualizers/shared/components/CodeMirrorEditor';
+import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared/components/TerminalOutput';
 
 interface LessonCodePanelProps {
   code: string;
@@ -103,13 +101,13 @@ export function LessonCodePanel({
           </div>
         )}
         <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
-          <LessonCodeEditor
+          <CodeMirrorEditor
             code={code}
             highlightLine={highlightLine}
             onSelectionChange={onSelectionChange}
             bottomPadding={0}
           />
-          <CodePanelTerminal lines={terminalLines} />
+          <TerminalOutput lines={terminalLines} variant="inline" />
         </div>
       </div>
 

@@ -16,5 +16,4 @@ export { useLessonVisualization } from './hooks/useLessonVisualization';
 export { useCodeSelection } from './hooks/useCodeSelection';
 
 // Components
-export { LessonCodeEditor } from './components/day/LessonCodeEditor'; // Monaco 기반 읽기 전용 에디터
 export { StepExplanation } from './components/day/StepExplanation';

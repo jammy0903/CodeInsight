@@ -1,17 +1,8 @@
 /**
- * TerminalOutput - 통합 터미널 출력 컴포넌트
+ * TerminalOutput - Unified terminal output component
  *
- * 사용처:
- * - LessonPage (레슨 학습 페이지)
- * - MobileLessonView (모바일 레슨)
- * - FlowVisualizer (플로우 시각화)
- * - PlaygroundPage (연습장)
- *
- * 기능:
- * - 멀티라인 출력 지원
- * - framer-motion 애니메이션
- * - CSS 변수 기반 테마 시스템
- * - stdout/stderr/return 타입 지원
+ * variant='terminal' (Playground): Hacker dark style with Framer Motion animations
+ * variant='inline'   (Lesson):     Minimal inline style using CSS theme vars, no animation
  */
 
 import { memo } from 'react';
@@ -29,95 +20,132 @@ export interface TerminalLine {
 }
 
 interface TerminalOutputProps {
-  /** 출력 라인 배열 */
   lines: TerminalLine[];
-  /** 터미널 제목 */
+  variant?: 'terminal' | 'inline';
   title?: string;
-  /** 빈 상태 메시지 */
   emptyMessage?: string;
-  /** 컴팩트 모드 (패딩 축소) */
   compact?: boolean;
-  /** 헤더 우측에 표시할 커스텀 콘텐츠 */
   rightContent?: React.ReactNode;
-  /** 클래스명 */
   className?: string;
 }
 
 // ============================================
-// 애니메이션 설정
+// 고정 터미널 색상 (테마 무관 - terminal variant)
+// ============================================
+
+const TERMINAL = {
+  bg: '#0a0e17',
+  headerBg: '#111827',
+  border: '#1e293b',
+  text: '#e2e8f0',
+  textMuted: '#94a3b8',
+  stdout: '#4ade80',
+  stderr: '#ef4444',
+  return: '#60a5fa',
+  prompt: '#6366f1',
+  dot: { red: '#ef4444', yellow: '#eab308', green: '#22c55e' },
+} as const;
+
+// ============================================
+// 애니메이션 (terminal variant only)
 // ============================================
 
 const containerVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.3, ease: 'easeOut' },
-  },
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
 } as const;
 
 const lineVariants = {
-  hidden: { opacity: 0, x: -10 },
+  hidden: { opacity: 0, x: -8 },
   visible: (i: number) => ({
     opacity: 1,
     x: 0,
-    transition: { duration: 0.2, delay: i * 0.05 },
+    transition: { duration: 0.15, delay: i * 0.03 },
   }),
 };
 
 // ============================================
-// 헬퍼 함수
+// 헬퍼
 // ============================================
 
 function getPromptSymbol(type: TerminalLineType): string {
   switch (type) {
-    case 'stdout':
-      return '>';
-    case 'stderr':
-      return '!';
-    case 'return':
-      return '←';
-    default:
-      return '>';
+    case 'stdout': return '$';
+    case 'stderr': return '!';
+    case 'return': return '←';
+    default: return '$';
   }
 }
 
 function getTextColor(type: TerminalLineType): string {
   switch (type) {
-    case 'stdout':
-      return 'var(--theme-lesson-terminal-text)';
-    case 'stderr':
-      return '#ef4444';
-    case 'return':
-      return '#22c55e';
-    default:
-      return 'var(--theme-lesson-terminal-text)';
+    case 'stdout': return TERMINAL.stdout;
+    case 'stderr': return TERMINAL.stderr;
+    case 'return': return TERMINAL.return;
+    default: return TERMINAL.text;
   }
 }
 
 // ============================================
-// 메인 컴포넌트
+// Inline variant (Lesson) — CSS theme vars, no animation
 // ============================================
 
-export const TerminalOutput = memo(function TerminalOutput({
+const InlineTerminal = memo(function InlineTerminal({
   lines,
-  title = '출력',
-  emptyMessage = '출력이 없습니다',
+  className,
+}: Pick<TerminalOutputProps, 'lines' | 'className'>) {
+  if (lines.length === 0) return null;
+
+  return (
+    <div
+      className={`border-t ${className || ''}`}
+      style={{
+        background: 'var(--theme-lesson-terminal-bg)',
+        borderColor: 'var(--theme-lesson-panel-border)',
+      }}
+    >
+      <div className="px-3 py-1.5">
+        {lines.map((line, idx) => (
+          <div
+            key={`${idx}-${line.content}`}
+            className="text-xs font-mono leading-relaxed break-words whitespace-pre-wrap"
+            style={{ color: 'var(--theme-lesson-terminal-text)' }}
+          >
+            <span className="opacity-50 mr-1.5" style={{ userSelect: 'none' }}>
+              {line.type === 'stderr' ? '!' : '>'}
+            </span>
+            {line.content}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+// ============================================
+// Terminal variant (Playground) — hacker dark, Framer Motion
+// ============================================
+
+const HackerTerminal = memo(function HackerTerminal({
+  lines,
+  title = 'Terminal',
+  emptyMessage = 'No output',
   compact = false,
   rightContent,
   className = '',
-}: TerminalOutputProps) {
-  const padding = compact ? '8px' : '12px';
-  const headerPadding = compact ? '6px 10px' : '8px 12px';
+}: Omit<TerminalOutputProps, 'variant'>) {
+  const padding = compact ? '8px 10px' : '10px 14px';
+  const headerPadding = compact ? '5px 10px' : '7px 12px';
 
   return (
     <motion.div
       className={`terminal-output overflow-hidden rounded-lg ${className}`}
       style={{
-        background: 'var(--theme-lesson-terminal-bg)',
-        fontFamily: 'monospace',
+        background: TERMINAL.bg,
+        fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace",
         fontSize: '12px',
-        border: '1px solid var(--theme-lesson-panel-border)',
+        border: `1px solid ${TERMINAL.border}`,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
       }}
       variants={containerVariants}
       initial="hidden"
@@ -126,49 +154,37 @@ export const TerminalOutput = memo(function TerminalOutput({
       {/* 터미널 헤더 */}
       <div
         style={{
-          background: 'var(--theme-lesson-terminal-header-bg)',
+          background: TERMINAL.headerBg,
           padding: headerPadding,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '8px',
-          borderBottom: '1px solid var(--theme-lesson-panel-border)',
+          borderBottom: `1px solid ${TERMINAL.border}`,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* 터미널 버튼들 (장식용) */}
-          <div style={{ display: 'flex', gap: '6px' }}>
-            <div
-              style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: 'rgba(239, 68, 68, 0.6)',
-              }}
-            />
-            <div
-              style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: 'rgba(234, 179, 8, 0.6)',
-              }}
-            />
-            <div
-              style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: 'rgba(34, 197, 94, 0.6)',
-              }}
-            />
+          <div style={{ display: 'flex', gap: '5px' }}>
+            {[TERMINAL.dot.red, TERMINAL.dot.yellow, TERMINAL.dot.green].map((color, i) => (
+              <div
+                key={i}
+                style={{
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '50%',
+                  background: color,
+                  opacity: 0.8,
+                }}
+              />
+            ))}
           </div>
           <span
             style={{
-              color: 'var(--theme-lesson-terminal-text)',
-              fontSize: '11px',
+              color: TERMINAL.textMuted,
+              fontSize: '10px',
               fontWeight: 600,
-              opacity: 0.5,
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
             }}
           >
             {title}
@@ -178,14 +194,11 @@ export const TerminalOutput = memo(function TerminalOutput({
       </div>
 
       {/* 터미널 내용 */}
-      <div
-        style={{
-          padding,
-          color: 'var(--theme-lesson-terminal-text)',
-        }}
-      >
+      <div style={{ padding, color: TERMINAL.text }}>
         {lines.length === 0 ? (
-          <div style={{ opacity: 0.5, fontStyle: 'italic' }}>{emptyMessage}</div>
+          <div style={{ opacity: 0.4, fontStyle: 'italic', fontSize: '11px' }}>
+            {emptyMessage}
+          </div>
         ) : (
           <AnimatePresence mode="popLayout">
             {lines.map((line, i) => (
@@ -195,19 +208,18 @@ export const TerminalOutput = memo(function TerminalOutput({
                 variants={lineVariants}
                 initial="hidden"
                 animate="visible"
-                exit={{ opacity: 0, x: -10 }}
+                exit={{ opacity: 0, x: -8 }}
                 style={{
                   display: 'flex',
-                  alignItems: 'start',
+                  alignItems: 'baseline',
                   gap: '8px',
-                  marginBottom: i < lines.length - 1 ? '4px' : '0',
+                  marginBottom: i < lines.length - 1 ? '3px' : '0',
+                  lineHeight: '1.5',
                 }}
               >
-                {/* 프롬프트 기호 */}
-                <span style={{ opacity: 0.5, userSelect: 'none' }}>
+                <span style={{ color: TERMINAL.prompt, opacity: 0.6, userSelect: 'none', flexShrink: 0 }}>
                   {getPromptSymbol(line.type)}
                 </span>
-                {/* 출력 내용 */}
                 <span
                   style={{
                     color: getTextColor(line.type),
@@ -225,4 +237,18 @@ export const TerminalOutput = memo(function TerminalOutput({
       </div>
     </motion.div>
   );
+});
+
+// ============================================
+// 메인 컴포넌트 (variant dispatch)
+// ============================================
+
+export const TerminalOutput = memo(function TerminalOutput({
+  variant = 'terminal',
+  ...props
+}: TerminalOutputProps) {
+  if (variant === 'inline') {
+    return <InlineTerminal lines={props.lines} className={props.className} />;
+  }
+  return <HackerTerminal {...props} />;
 });

@@ -14,7 +14,7 @@ import { Play, Layers } from 'lucide-react';
 
 import { useRoundNavigation } from '../hooks/useRoundNavigation';
 import { useLessonVisualization } from '../hooks/useLessonVisualization';
-import { useLessonTerminal } from '../hooks/useLessonTerminal';
+import { useLessonTerminal } from '@/features/visualizers/shared/hooks/useLessonTerminal';
 import { useStepGestures } from '@/features/visualizers/shared/hooks/useStepGestures';
 import { LessonCodePanel } from './LessonCodePanel';
 import { StepExplanation } from './day/StepExplanation';
@@ -23,7 +23,7 @@ import { LessonBottomNav } from './LessonBottomNav';
 import { LessonFlowVisualizer, LessonMemoryVisualizer } from '@/features/visualizers';
 import { useIsMobile } from '@/hooks';
 import type { LessonStep } from '@/types';
-import type { CodeSelection } from '../types';
+import type { CodeSelection } from '@/features/visualizers/shared/components/CodeMirrorEditor';
 
 interface LessonUnifiedViewProps {
   code: string;
@@ -171,7 +171,7 @@ export function LessonUnifiedView({
             )}
 
             {/* Visualization content */}
-            <div className={`w-full min-h-[200px] px-0 py-2 ${isMobile ? 'viz-zoom-container' : ''}`}>
+            <div className={`w-full min-h-[67px] px-0 py-2 ${isMobile ? 'viz-zoom-container' : ''}`}>
               {activeVizTab === 'flow' || !showMemoryTab ? (
                 <LessonFlowVisualizer
                   step={currentStep}
@@ -211,10 +211,8 @@ export function LessonUnifiedView({
         showCodeHeader={!isMobile}
         className={isMobile ? '' : 'rounded-xl overflow-hidden'}
         style={{
-          height: 'calc(200svh - 64px)',
-          minHeight: '800px',
           ...(isMobile
-            ? { margin: '5px' }
+            ? { height: 'calc(100svh - 64px)', minHeight: '400px', margin: '5px' }
             : { border: '1px solid var(--theme-lesson-panel-border)', marginTop: '1rem' }),
         }}
       >

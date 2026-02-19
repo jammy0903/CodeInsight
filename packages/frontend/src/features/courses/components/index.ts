@@ -8,7 +8,6 @@ export { ChapterCard } from './ChapterCard';
 export { LessonCard } from './LessonCard';
 
 // Day Components
-export { LessonCodeEditor } from './day/LessonCodeEditor'; // Monaco 기반 읽기 전용 에디터
 export { StepExplanation } from './day/StepExplanation';
 
 // Memory Components

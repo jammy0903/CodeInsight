@@ -9,13 +9,13 @@ import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks';
 import { Play, Layers } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
-import { CodeEditor } from './components/CodeEditor';
+import { CodeMirrorEditor } from '@/features/visualizers/shared/components/CodeMirrorEditor';
 import { StepControls } from './components/StepControls';
 import { useLessonVisualization } from '@/features/courses';
 import { useStepGestures } from '@/features/visualizers/shared/hooks/useStepGestures';
 import { usePlaygroundStore, useCurrentCode, useStepControls } from './stores/playgroundStore';
 import { LessonFlowVisualizer, LessonMemoryVisualizer } from '@/features/visualizers';
-import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared';
+import { useLessonTerminal, TerminalOutput } from '@/features/visualizers/shared';
 import { StepNavigationArrows } from '@/features/visualizers/shared/components/StepNavigationArrows';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
@@ -29,7 +29,7 @@ const MAX_EDITOR_HEIGHT = 500;
 
 export function PlaygroundPage() {
   const { t } = useTranslation();
-  const { steps, currentStepIndex, error, language } = usePlaygroundStore();
+  const { steps, currentStepIndex, error, language, setCode } = usePlaygroundStore();
   const code = useCurrentCode();
   const setPageTitle = useStore((s) => s.setPageTitle);
   const currentTheme = useThemeStore((s) => s.theme);
@@ -43,14 +43,13 @@ export function PlaygroundPage() {
   // Flow/Memory 탭 상태
   const [activeTab, setActiveTab] = useState<'flow' | 'memory'>('flow');
 
-  // 터미널 출력 라인 변환
-  const terminalLines = useMemo((): TerminalLine[] => {
-    if (!currentStep?.stdout) return [];
-    return currentStep.stdout
-      .split('\n')
-      .filter(Boolean)
-      .map((line): TerminalLine => ({ content: line, type: 'stdout' }));
-  }, [currentStep?.stdout]);
+  // 터미널 출력 (모든 언어 통합 - useLessonTerminal 훅)
+  const terminalLines = useLessonTerminal({
+    steps: steps as LessonStep[],
+    currentStepIndex,
+    languageId: language,
+    diffMode: false,
+  });
 
   // Memory 탭 표시 여부 (Java, C만)
   const showMemoryTab = language === 'java' || language === 'c';
@@ -107,14 +106,29 @@ export function PlaygroundPage() {
             <StepControls isMobile={true} showRun={true} showReset={true} showNavigation={true} />
           </div>
 
-          {/* Editor */}
-          <div style={{ height: `${Math.min(editorHeight, 180)}px` }}>
-            <CodeEditor />
+          {/* Editor + Terminal (scrollable) */}
+          <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+            <div style={{ minHeight: `${Math.min(editorHeight, 180)}px` }}>
+              <CodeMirrorEditor
+                code={code}
+                language={language}
+                highlightLine={currentStep?.line}
+                editable
+                onChange={setCode}
+              />
+            </div>
+            {terminalLines.length > 0 && (
+              <TerminalOutput
+                lines={terminalLines}
+                title={t('playground.output')}
+                compact
+              />
+            )}
           </div>
         </div>
 
         {/* Visualization Section - Flow Only */}
-        <div style={{ backgroundColor: colors.panelBg, borderTop: `1px solid ${colors.border}`, display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
+        <div style={{ backgroundColor: colors.panelBg, borderTop: `1px solid ${colors.border}`, display: 'flex', flexDirection: 'column', minHeight: '100px' }}>
           {/* Header: Flow/Memory 탭 */}
           <div
             style={{
@@ -188,7 +202,7 @@ export function PlaygroundPage() {
           </div>
 
           {/* Content */}
-          <div style={{ padding: '8px', minHeight: '200px' }}>
+          <div style={{ padding: '3px', minHeight: '67px' }}>
             {error ? (
               <div style={{ padding: '10px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '6px' }}>
                 <p style={{ fontSize: '12px', color: colors.errorText }}>{error}</p>
@@ -205,26 +219,16 @@ export function PlaygroundPage() {
                     stdout={currentStep?.stdout}
                   />
                 ) : (
-                  <>
-                    <LessonMemoryVisualizer
-                      step={currentStep as LessonStep}
-                      language={language}
-                      memoryState={memoryState}
-                      changedBlocks={changedBlocks}
-                    />
-                    {terminalLines.length > 0 && (
-                      <TerminalOutput
-                        lines={terminalLines}
-                        title={t('playground.output')}
-                        compact
-                        className="mt-4"
-                      />
-                    )}
-                  </>
+                  <LessonMemoryVisualizer
+                    step={currentStep as LessonStep}
+                    language={language}
+                    memoryState={memoryState}
+                    changedBlocks={changedBlocks}
+                  />
                 )}
               </>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', fontSize: '12px', color: colors.textMuted }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '50px', fontSize: '12px', color: colors.textMuted }}>
                 {t('playground.click_run')}
               </div>
             )}
@@ -282,11 +286,15 @@ export function PlaygroundPage() {
       style={{
         backgroundColor: colors.pageBg,
         padding: '8px 16px 16px',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {/* Main area: Flex 2-column layout */}
       <div
         style={{
+          flex: 1,
           display: 'flex',
           flexDirection: 'row',
           gap: '16px',
@@ -302,8 +310,8 @@ export function PlaygroundPage() {
             backgroundColor: colors.panelBg,
             borderRadius: '12px',
             border: `1px solid ${colors.border}`,
-            overflow: 'visible', // sticky 동작을 위해
-            minHeight: '400px',
+            overflow: 'hidden',
+            minHeight: '133px',
           }}
         >
           {/* Code Header */}
@@ -325,9 +333,24 @@ export function PlaygroundPage() {
             <StepControls showRun={true} showReset={true} showNavigation={true} />
           </div>
 
-          {/* Editor */}
-          <div style={{ height: `${editorHeight}px`, flexShrink: 0 }}>
-            <CodeEditor />
+          {/* Editor + Terminal (scrollable) */}
+          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+            <div style={{ minHeight: `${editorHeight}px` }}>
+              <CodeMirrorEditor
+                code={code}
+                language={language}
+                highlightLine={currentStep?.line}
+                editable
+                onChange={setCode}
+              />
+            </div>
+            {terminalLines.length > 0 && (
+              <TerminalOutput
+                lines={terminalLines}
+                title={t('playground.output')}
+                compact
+              />
+            )}
           </div>
 
         </div>
@@ -420,9 +443,9 @@ export function PlaygroundPage() {
           </div>
 
           {/* Content */}
-          <div style={{ padding: '16px' }}>
+          <div style={{ padding: '5px' }}>
             {error ? (
-              <div style={{ padding: '16px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
+              <div style={{ padding: '5px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
                 <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
               </div>
             ) : (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
@@ -437,26 +460,16 @@ export function PlaygroundPage() {
                     stdout={currentStep?.stdout}
                   />
                 ) : (
-                  <>
-                    <LessonMemoryVisualizer
-                      step={currentStep as LessonStep}
-                      language={language}
-                      memoryState={memoryState}
-                      changedBlocks={changedBlocks}
-                    />
-                    {terminalLines.length > 0 && (
-                      <TerminalOutput
-                        lines={terminalLines}
-                        title={t('playground.output')}
-                        compact
-                        className="mt-6"
-                      />
-                    )}
-                  </>
+                  <LessonMemoryVisualizer
+                    step={currentStep as LessonStep}
+                    language={language}
+                    memoryState={memoryState}
+                    changedBlocks={changedBlocks}
+                  />
                 )}
               </>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', fontSize: '14px', color: colors.textMuted }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', fontSize: '14px', color: colors.textMuted }}>
                 {t('playground.click_run')}
               </div>
             )}
