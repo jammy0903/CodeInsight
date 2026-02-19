@@ -15,8 +15,9 @@ interface StepExplanationProps {
 function forceLineBreaks(text: string): string {
   return text
     .replace(/\r\n/g, '\n')
-    .replace(/([.!?])\s+(?=[^\n])/g, '$1\n')
-    .replace(/(다\.)\s+(?=[^\n])/g, '$1\n');
+    .replace(/(니다\.)[ \t]*(?!\n)/g, '$1\n')
+    .replace(/(다\.)[ \t]*(?!\n)/g, '$1\n')
+    .replace(/\n{3,}/g, '\n\n');
 }
 
 /**
