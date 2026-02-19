@@ -107,7 +107,9 @@ export function LessonCodePanel({
             onSelectionChange={onSelectionChange}
             bottomPadding={0}
           />
-          <TerminalOutput lines={terminalLines} variant="inline" />
+          {terminalLines.length > 0 && (
+            <TerminalOutput lines={terminalLines} compact />
+          )}
         </div>
       </div>
 
