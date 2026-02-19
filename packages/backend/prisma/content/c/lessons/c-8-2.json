@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`**\n\nC 표준 입출력 라이브러리의 **헤더 파일**을 포함합니다.\n\n`#include`는 전처리기 지시문으로, 컴파일 전에 `stdio.h`의 내용을 이 자리에 복사합니다. 이 파일에는 `printf` 등 화면 출력 함수의 선언이 들어 있습니다.\n\n**왜 필요한가?** `greet` 함수와 `execute` 함수 모두 내부에서 `printf`를 호출합니다. `stdio.h`가 없으면 컴파일러가 `printf`의 존재를 알 수 없어 오류가 발생합니다.\n\n**비유**: 우체국에서 편지를 보내려면 먼저 우표(헤더)를 사야 하는 것처럼, C에서 출력 기능을 쓰려면 먼저 해당 헤더를 포함해야 합니다.",
+        "explanation": "**`#include <stdio.h>`** — `printf` 등 입출력 함수 선언을 가져옵니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "콜백될 함수 정의",
-        "explanation": "**`void greet() { printf(\"Hello!\\n\"); }`**\n\n'Hello!'를 출력하는 간단한 `greet` 함수를 정의합니다.\n\n**함수의 구성 요소**:\n- `void`: 아무것도 반환하지 않습니다.\n- `greet`: 함수 이름 -- 이 이름이 나중에 함수의 주소로 사용됩니다.\n- `()`: 매개변수가 없습니다.\n\n**왜 이 함수가 중요한가?** 이 함수는 나중에 다른 함수(`execute`)의 **인자로 전달**됩니다. 직접 `greet()`을 호출하는 것이 아니라, `greet`의 주소를 다른 함수에게 넘겨서 \"나중에 네가 적절한 시점에 호출해줘\"라고 위임하는 것입니다. 이것이 **콜백(callback)**의 핵심입니다.\n\n**메모리 관점**: `greet`의 코드는 프로그램의 **코드(Text) 영역**에 저장됩니다(예: 주소 `0xCODE1`). 함수 이름 `greet`은 이 주소를 나타냅니다.\n\n**비유**: `greet`은 \"인사하기\" 능력을 가진 배달원입니다. 나중에 다른 사람(execute)에게 이 배달원의 전화번호(주소)를 알려주면, 그 사람이 필요할 때 배달원을 불러 일을 시킵니다.",
+        "explanation": "**`void greet() { printf(\"Hello!\\n\"); }`** — 'Hello!'를 출력하는 간단한 함수입니다. 이 함수는 나중에 직접 호출되는 것이 아니라, 다른 함수(`execute`)에게 **주소를 넘겨** \"네가 적절한 시점에 호출해줘\"라고 위임됩니다. 이것이 **콜백(callback)**의 핵심입니다.\n\n`greet`의 코드는 **코드(Text) 영역**(예: `0xCODE1`)에 저장되며, 함수 이름 `greet`이 이 주소를 나타냅니다.\n\n\"인사하기\" 능력을 가진 배달원의 전화번호를 다른 사람에게 알려주면, 그 사람이 필요할 때 배달원을 불러 일을 시키는 구조입니다.",
         "visualizationType": "cMemory",
         "code": "void greet() {",
         "highlightOffset": [
@@ -27,7 +27,7 @@
       },
       {
         "title": "콜백을 받는 함수 정의",
-        "explanation": "**`void execute(void (*func)()) { ... }`**\n\n**함수 포인터를 매개변수로 받는** `execute` 함수를 정의합니다. 이것이 콜백 패턴의 핵심 구조입니다.\n\n**매개변수 분석**:\n- `void (*func)()`: \"인자가 없고 반환값도 없는 함수를 가리키는 포인터\"입니다.\n- `func`은 일반 변수처럼 사용되지만, 실제로는 **함수의 주소**를 담고 있습니다.\n\n**함수 내부 동작**:\n1. `printf(\"Executing callback...\\n\");` -- 자체 로직을 먼저 실행합니다.\n2. `func();` -- 전달받은 함수 포인터를 **호출**합니다.\n\n**왜 이 패턴이 강력한가?** `execute`는 `func()`이 **무엇인지 모릅니다**. `greet`일 수도 있고, 완전히 다른 함수일 수도 있습니다. `execute`의 코드를 수정하지 않고도, 전달하는 함수만 바꾸면 동작이 달라집니다. 이것이 **개방-폐쇄 원칙(Open-Closed Principle)**의 C 언어 구현입니다.\n\n**실무 활용**: 이 패턴은 이벤트 처리, 정렬 알고리즘의 비교 함수, 타이머 콜백, 네트워크 응답 핸들러 등에서 광범위하게 사용됩니다.\n\n**비유**: `execute`는 \"작업 관리자\"입니다. 자기 할 일(\"Executing callback...\" 출력)을 하고, 그 다음 전달받은 명함(func)에 적힌 번호로 전화를 걸어 실제 작업을 위임합니다.",
+        "explanation": "**`void execute(void (*func)()) { ... }`** — **함수 포인터를 매개변수로 받는** 함수입니다. `void (*func)()`는 \"인자 없고 반환값 없는 함수를 가리키는 포인터\"입니다. 내부에서 자체 로직(`printf`)을 먼저 실행한 뒤, 전달받은 `func()`를 호출합니다.\n\n`execute`는 `func()`이 무엇인지 모릅니다. `greet`일 수도 있고 완전히 다른 함수일 수도 있습니다. `execute`의 코드를 수정하지 않고 전달하는 함수만 바꾸면 동작이 달라지는 — **개방-폐쇄 원칙(Open-Closed Principle)**의 C 구현입니다.\n\n작업 관리자가 자기 할 일을 먼저 하고, 전달받은 명함의 번호로 전화를 걸어 실제 작업을 위임하는 구조라고 생각하면 됩니다.\n\n이 패턴은 이벤트 처리, 정렬 비교 함수, 타이머 콜백, 네트워크 응답 핸들러 등에서 광범위하게 사용됩니다.",
         "visualizationType": "cMemory",
         "code": "void execute(void (*func)()) {",
         "highlightOffset": [
@@ -38,7 +38,7 @@
       },
       {
         "title": "main에서 execute 호출 - 함수를 인자로 전달",
-        "explanation": "**`execute(greet);`**\n\n프로그램의 실행이 `main`에서 시작됩니다. `execute` 함수를 호출하면서 `greet` **함수 자체**(정확히는 함수의 주소 `0xCODE1`)를 인자로 전달합니다.\n\n**내부 동작**:\n1. `greet`이라는 함수 이름은 **자동으로 함수 포인터로 변환**됩니다. 즉 `greet`의 코드 영역 주소 `0xCODE1`이 전달됩니다.\n2. `execute` 함수가 호출되면, 매개변수 `func`에 이 주소가 복사됩니다.\n3. `execute` 내부에서 `func()`을 호출하면, `0xCODE1`(greet)로 점프하여 실행합니다.\n\n**콜백 흐름 정리**:\n- `main` → `execute(greet)` → `execute` 내부에서 `func()` → `greet` 실행 → `main`으로 복귀\n\n**왜 '콜백'이라고 하는가?** `greet`이 직접 호출되는 것이 아니라, `execute`에게 전달된 후 `execute`가 **\"다시 호출(call back)\"**하기 때문입니다. 호출의 주도권이 `execute`에게 있습니다.\n\n**비유**: 친구에게 \"밥 먹을 때(execute) 나한테도 연락해줘(greet의 전화번호 전달)\"라고 부탁하는 것입니다. 내가 직접 밥을 먹으러 가는 것이 아니라, 친구가 적절한 시점에 나를 불러주는(콜백) 구조입니다.",
+        "explanation": "**`execute(greet);`** — `greet`이라는 함수 이름이 자동으로 함수 포인터(주소 `0xCODE1`)로 변환되어 `execute`에 전달됩니다. `execute` 내부에서 매개변수 `func`에 이 주소가 복사되고, `func()`을 호출하면 `greet`이 실행됩니다.\n\n호출 흐름은 `main` → `execute(greet)` → `execute` 내부의 `func()` → `greet` 실행 → `main` 복귀입니다. `greet`이 직접 호출되지 않고 `execute`에게 전달된 후 \"다시 호출(call back)\"되기 때문에 콜백이라 부릅니다.\n\n친구에게 \"밥 먹을 때 나한테도 연락해줘\"라고 전화번호를 건네는 것과 같습니다. 내가 직접 가는 게 아니라, 친구가 적절한 시점에 나를 불러주는 구조입니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -52,21 +52,21 @@
       },
       {
         "title": "콜백 실행 준비",
-        "explanation": "**`printf(\"Executing callback...\\n\");`**\n\n`execute` 함수 내부의 첫 번째 줄이 실행됩니다. 콜백 함수를 호출하기 직전에 \"Executing callback...\"이라는 메시지를 출력합니다.\n\n**이 줄의 의미**: `execute` 함수가 자체적으로 수행하는 **전처리(preprocessing)** 작업입니다. 실제 시스템에서는 여기에 로깅, 유효성 검사, 타이머 시작, 리소스 준비 등의 코드가 들어갈 수 있습니다.\n\n**콜백 패턴의 구조**:\n1. 전처리 (예: 이 printf)\n2. 콜백 호출 (다음 스텝의 `func()`)\n3. 후처리 (이 예제에서는 없지만, 결과 로깅, 정리 등)\n\n**결과**: 화면에 `Executing callback...`이 출력됩니다. 아직 `greet`(콜백)은 실행되지 않았습니다.\n\n**비유**: 요리사(execute)가 재료를 준비(전처리)하고 있는 단계입니다. 실제 요리(콜백 실행)는 다음 스텝에서 시작됩니다.",
+        "explanation": "**`printf(\"Executing callback...\\n\");`** — `execute` 함수가 콜백 호출 전에 수행하는 **전처리** 단계입니다. 화면에 `Executing callback...`이 출력됩니다.\n\n실제 시스템에서는 여기에 로깅, 유효성 검사, 타이머 시작, 리소스 준비 등의 코드가 들어갈 수 있습니다. 콜백 패턴은 보통 전처리 → 콜백 호출 → 후처리라는 구조를 따릅니다.\n\n요리사가 재료를 준비하는 단계이고, 실제 요리(콜백 실행)는 다음 스텝에서 시작됩니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Executing callback...\\n\");",
         "stdout": "Executing callback..."
       },
       {
         "title": "콜백 함수 호출!",
-        "explanation": "**`func();`**\n\n`execute` 함수 내부에서 **콜백이 실제로 실행되는 순간**입니다.\n\n**단계별 동작**:\n1. `func`에 저장된 주소는 `0xCODE1` (= `greet` 함수의 주소)입니다.\n2. `func()` 호출 → CPU가 `0xCODE1`로 점프합니다.\n3. `greet` 함수의 코드 `printf(\"Hello!\\n\")`이 실행됩니다.\n4. `greet`이 끝나면 `execute`의 `func()` 다음 줄로 복귀합니다.\n\n**결과**: 화면에 `Hello!`가 출력됩니다.\n\n**핵심 통찰**: `execute` 함수의 소스 코드 어디에도 `greet`이라는 이름이 등장하지 않습니다. `execute`는 오직 `func`이라는 포인터를 통해 간접적으로 호출할 뿐입니다. 이것이 **느슨한 결합(Loose Coupling)**의 핵심입니다.\n\n**확장성**: 만약 `void farewell() { printf(\"Bye!\\n\"); }`라는 함수가 있다면, `execute(farewell);`로 호출하면 `execute`의 코드를 전혀 수정하지 않고도 \"Bye!\"를 출력할 수 있습니다.\n\n**비유**: 작업 관리자(execute)가 명함(func)에 적힌 번호로 전화를 걸어, 배달원(greet)에게 \"이제 일해!\"라고 지시하는 순간입니다.",
+        "explanation": "**`func();`** — 콜백이 **실제로 실행되는 순간**입니다. `func`에 저장된 `0xCODE1`로 CPU가 점프하여 `greet`의 `printf(\"Hello!\\n\")`이 실행되고, 끝나면 `execute`로 돌아옵니다.\n\n`execute` 소스 코드 어디에도 `greet`이라는 이름이 없습니다. 오직 `func`라는 포인터를 통해 간접 호출할 뿐이며, 이것이 **느슨한 결합(Loose Coupling)**의 핵심입니다.\n\n만약 `void farewell() { printf(\"Bye!\\n\"); }`가 있다면 `execute(farewell)`로 호출하면 `execute` 코드를 전혀 수정하지 않고도 다른 동작을 실행할 수 있습니다.",
         "visualizationType": "cMemory",
         "code": "func();",
         "stdout": "Executing callback...\nHello!"
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`**\n\n`execute` 함수가 끝나면 `main`으로 복귀하고, `main`이 `0`을 반환하며 프로그램이 종료됩니다.\n\n**전체 실행 흐름 복기**:\n1. `main` 시작 → `execute(greet)` 호출\n2. `execute` 진입 → `func = greet(0xCODE1)` 매개변수 수신\n3. `printf(\"Executing callback...\")` 실행\n4. `func()` → `greet()` 콜백 실행 → `\"Hello!\"` 출력\n5. `greet` 반환 → `execute` 반환 → `main` 반환 → 프로그램 종료\n\n**이 레슨의 핵심 정리**:\n1. **콜백(callback)** = 함수를 다른 함수에게 인자로 전달하여, 나중에 호출되게 하는 패턴\n2. 함수 포인터를 매개변수로 선언: `void execute(void (*func)())`\n3. 함수 이름을 인자로 전달: `execute(greet);`\n4. 콜백을 받는 함수는 전달된 함수가 무엇인지 몰라도 호출할 수 있다 (느슨한 결합)\n5. 실무에서는 정렬, 이벤트 처리, 비동기 작업 완료 알림 등에 광범위하게 사용됩니다",
+        "explanation": "**`return 0;`** — `execute` → `main` → 프로그램 종료 순으로 복귀합니다.\n\n정리하면: **콜백**이란 함수를 다른 함수에게 인자로 전달하여 나중에 호출되게 하는 패턴입니다. 함수 포인터를 매개변수로 선언(`void execute(void (*func)())`)하고, 함수 이름을 인자로 전달(`execute(greet)`)하면, 받는 쪽은 전달된 함수가 무엇인지 몰라도 호출할 수 있습니다.\n\n실무에서는 정렬, 이벤트 처리, 비동기 작업 완료 알림 등에 광범위하게 사용됩니다.",
         "visualizationType": "cMemory",
         "code": "execute(greet);",
         "stack": []

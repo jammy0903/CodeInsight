@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`**\n\n표준 입출력(Standard I/O) 함수들을 사용하기 위해 헤더 파일을 포함합니다.\n`fprintf`, `printf`, `stdout`, `stderr` 등이 모두 이 헤더에 정의되어 있습니다.\n\n이 레슨에서는 **표준 스트림(Standard Streams)**이라는 개념을 배웁니다.\n모든 C 프로그램은 시작될 때 운영체제로부터 **3개의 기본 데이터 통로(스트림)**를 자동으로 받습니다:\n\n1. **`stdin`** (Standard Input): 키보드로부터 데이터를 읽는 통로 (파일 디스크립터 0)\n2. **`stdout`** (Standard Output): 화면에 일반 출력을 보내는 통로 (파일 디스크립터 1)\n3. **`stderr`** (Standard Error): 화면에 에러 메시지를 보내는 통로 (파일 디스크립터 2)\n\n**비유**: 사무실에 비유하면, `stdin`은 우편함(들어오는 편지), `stdout`은 게시판(일반 공지), `stderr`은 비상 알림 스피커(긴급 메시지)입니다.\n세 통로가 분리되어 있어서 각각 독립적으로 방향을 바꿀 수 있습니다(리다이렉션).",
+        "explanation": "**`#include <stdio.h>`** — 표준 입출력 함수들을 사용하기 위한 헤더입니다.\n\n모든 C 프로그램은 시작될 때 운영체제로부터 **3개의 데이터 통로(스트림)**를 자동으로 받습니다. **`stdin`**(키보드 입력), **`stdout`**(일반 출력), **`stderr`**(에러 출력)이 그것이며, 각각 파일 디스크립터 0, 1, 2에 대응합니다.\n\n사무실로 비유하면 `stdin`은 우편함, `stdout`은 게시판, `stderr`은 비상 알림 스피커입니다. 세 통로가 분리되어 있어 각각 독립적으로 방향을 바꿀 수 있습니다(리다이렉션).\n\n이 레슨에서는 `fprintf`, `printf`, `stdout`, `stderr` 등을 통해 이 세 스트림을 실제로 다루는 법을 배웁니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`**\n\n프로그램이 시작되면, 운영체제는 프로세스를 생성하면서 자동으로 3개의 기본 스트림을 열어줍니다:\n- `stdin` — 표준 입력 (기본: 키보드)\n- `stdout` — 표준 출력 (기본: 터미널 화면)\n- `stderr` — 표준 에러 (기본: 터미널 화면)\n\n**이 3개의 스트림은 모두 `FILE *` 타입의 포인터**입니다.\n즉, C에서 파일과 스트림은 본질적으로 같은 방식으로 다루어집니다.\n키보드 입력, 화면 출력, 파일 읽기/쓰기 모두 `FILE *`라는 동일한 인터페이스를 사용합니다.\n\n**이것이 Unix의 핵심 철학입니다**: \"모든 것은 파일이다(Everything is a file).\"\n키보드도 파일, 모니터도 파일, 네트워크 소켓도 파일처럼 취급됩니다.\n이 통일된 인터페이스 덕분에 `fprintf`라는 하나의 함수로 화면에도 쓰고, 파일에도 쓰고, 네트워크에도 보낼 수 있습니다.\n\n프로그래머가 별도로 이 스트림들을 열거나 닫을 필요가 없습니다. 프로그램 시작 시 자동으로 열리고, 종료 시 자동으로 닫힙니다.",
+        "explanation": "**`int main() {`** — 프로그램이 시작되면 OS가 자동으로 `stdin`, `stdout`, `stderr` 세 스트림을 열어줍니다.\n\n이 3개는 모두 **`FILE *` 타입 포인터**입니다. C에서 파일과 스트림은 본질적으로 같은 인터페이스(`FILE *`)로 다루어지며, 이것이 Unix의 핵심 철학 **\"모든 것은 파일이다\"**의 실현입니다. 키보드도, 모니터도, 네트워크 소켓도 파일처럼 취급됩니다.\n\n덕분에 `fprintf`라는 하나의 함수로 화면에도 쓰고, 파일에도 쓰고, 네트워크에도 보낼 수 있습니다.\n\n프로그래머가 이 스트림들을 별도로 열거나 닫을 필요는 없습니다 — 프로그램 시작 시 자동으로 열리고, 종료 시 자동으로 닫힙니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "표준 출력(stdout)에 쓰기",
-        "explanation": "**`fprintf(stdout, \"This uses stdout\\n\");`**\n\n`fprintf` 함수는 **지정된 스트림**에 형식화된 문자열을 씁니다.\n첫 번째 인자로 출력할 **대상 스트림**을 지정할 수 있습니다.\n\n**`fprintf`의 구조**: `fprintf(스트림, 서식문자열, 값들...)`\n- `스트림`: 어디에 쓸 것인가? (`stdout`, `stderr`, 또는 `fopen`으로 연 파일)\n- `서식문자열`: 어떤 형식으로 쓸 것인가?\n- `값들`: 서식에 들어갈 데이터\n\n여기서 `stdout`은 **표준 출력 스트림**을 가리키는 `FILE *` 포인터입니다.\n기본적으로 터미널 화면에 연결되어 있으므로, 이 문자열은 화면에 출력됩니다.\n\n**비유**: `fprintf`는 편지를 보내는 것과 같습니다.\n첫 번째 인자(스트림)가 **수신인 주소**이고, 두 번째 인자가 **편지 내용**입니다.\n`stdout`으로 보내면 화면에, 파일 포인터로 보내면 파일에 도착합니다.\n\n**중요**: `stdout`은 변수가 아니라 **매크로**로 정의된 전역 상수입니다. 값을 바꿀 수 없습니다.",
+        "explanation": "**`fprintf(stdout, \"This uses stdout\\n\");`** — `fprintf`는 **지정된 스트림**에 형식화된 문자열을 쓰는 함수입니다. 구조는 `fprintf(스트림, 서식문자열, 값들...)`이며, 첫 번째 인자로 출력 대상을 지정합니다.\n\n여기서 `stdout`은 **표준 출력 스트림**을 가리키는 `FILE *` 포인터로, 기본적으로 터미널 화면에 연결되어 있습니다.\n\n편지를 보내는 것과 같습니다 — 첫 번째 인자(스트림)가 **수신인 주소**, 두 번째 인자가 **편지 내용**이죠. `stdout`으로 보내면 화면에, 파일 포인터로 보내면 파일에 도착합니다.\n\n참고로 `stdout`은 매크로로 정의된 전역 상수이므로 값을 바꿀 수 없습니다.",
         "visualizationType": "cMemory",
         "code": "fprintf(stdout, \"This uses stdout\\n\");",
         "stack": [],
@@ -38,21 +38,21 @@
       },
       {
         "title": "printf는 stdout의 단축키",
-        "explanation": "**`printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");`**\n\n우리가 지금까지 사용해 온 `printf(...)`는 사실 **내부적으로 `fprintf(stdout, ...)`를 호출하는 편리한 단축 함수**입니다.\n\n**즉, 다음 두 줄은 완전히 동일합니다**:\n```c\nprintf(\"Hello\\n\");                    // 단축 버전\nfprintf(stdout, \"Hello\\n\");           // 명시적 버전\n```\n\n`printf`는 항상 `stdout`에만 출력하지만, `fprintf`는 **출력 대상을 자유롭게 선택**할 수 있습니다.\n이것이 `fprintf`가 더 범용적인 함수인 이유입니다.\n\n**비유**: `printf`는 '우리 집 앞 우체통에 넣기'(항상 같은 목적지)이고, `fprintf`는 '원하는 주소로 택배 보내기'(목적지 선택 가능)입니다.\n편의성을 위해 `printf`를 쓰지만, 목적지를 바꿔야 할 때는 `fprintf`가 필요합니다.\n\n**실무에서**: 대부분의 일반 출력에는 짧은 `printf`를 사용하고, 에러 출력이나 파일 출력처럼 대상을 지정해야 할 때 `fprintf`를 사용합니다.",
+        "explanation": "**`printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");`** — 우리가 사용해 온 `printf(...)`는 사실 내부적으로 `fprintf(stdout, ...)`를 호출하는 **단축 함수**입니다. 즉 `printf(\"Hello\\n\")`과 `fprintf(stdout, \"Hello\\n\")`은 완전히 동일합니다.\n\n`printf`는 항상 `stdout`에만 출력하지만, `fprintf`는 출력 대상을 자유롭게 선택할 수 있어 더 범용적입니다.\n\n`printf`가 '우리 집 앞 우체통에 넣기'(항상 같은 목적지)라면, `fprintf`는 '원하는 주소로 택배 보내기'(목적지 선택 가능)인 셈입니다.\n\n실무에서는 일반 출력에 짧은 `printf`를 쓰고, 에러 출력이나 파일 출력처럼 대상을 지정해야 할 때 `fprintf`를 사용합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");",
         "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)"
       },
       {
         "title": "표준 에러(stderr)에 쓰기",
-        "explanation": "**`fprintf(stderr, \"Error: Something went wrong!\\n\");`**\n\n이번에는 `stdout` 대신 **`stderr`(표준 에러 스트림)**에 메시지를 보냅니다.\n기본적으로 `stderr`도 터미널 화면에 연결되어 있어서, 눈으로 보기에는 `stdout` 출력과 구분이 안 됩니다.\n\n**그런데 왜 에러 전용 통로가 따로 필요한가?**\n\n핵심은 **리다이렉션(Redirection)**에 있습니다:\n```bash\n./program > output.txt    # stdout만 파일로 보냄, stderr는 여전히 화면에 출력\n./program 2> error.txt    # stderr만 파일로 보냄\n./program > out.txt 2> err.txt  # 각각 다른 파일로 보냄\n```\n\n`stdout`과 `stderr`가 분리되어 있기 때문에, **정상 출력은 파일에 저장하면서 에러 메시지는 화면에서 즉시 확인**할 수 있습니다.\n만약 둘이 섞여 있다면, 에러가 발생해도 파일에 묻혀서 보이지 않을 것입니다.\n\n**또 다른 차이점**: `stderr`는 기본적으로 **버퍼링되지 않습니다(unbuffered)**.\n에러 메시지는 즉시 화면에 나타나야 하므로, 버퍼에 쌓아두지 않고 바로 출력합니다.\n반면 `stdout`은 성능을 위해 버퍼링이 적용됩니다.",
+        "explanation": "**`fprintf(stderr, \"Error: Something went wrong!\\n\");`** — 이번에는 `stdout` 대신 **`stderr`(표준 에러 스트림)**에 메시지를 보냅니다. 기본적으로 `stderr`도 터미널에 연결되어 있어 눈으로 보기에는 `stdout`과 구분이 안 됩니다.\n\n분리된 이유는 **리다이렉션**에 있습니다. `./program > output.txt`를 실행하면 `stdout`만 파일로 보내고, `stderr`는 여전히 화면에 출력됩니다. 정상 출력은 파일에 저장하면서 에러 메시지는 즉시 확인할 수 있는 것이죠.\n\n집의 일반 우편함과 긴급 전화 회선이 따로 있는 것과 같습니다. 우편을 다른 주소로 전달(리다이렉트)해도, 긴급 전화는 여전히 내 전화기에서 울립니다.\n\n또 하나 중요한 차이로, `stderr`는 기본적으로 **버퍼링되지 않습니다(unbuffered)** — 에러 메시지는 버퍼에 쌓이지 않고 즉시 출력됩니다.",
         "visualizationType": "cMemory",
         "code": "fprintf(stderr, \"Error: Something went wrong!\\n\");",
         "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!"
       },
       {
         "title": "변수 선언 및 입력 프롬프트",
-        "explanation": "**`int n;`** 와 **`fprintf(stdout, \"Enter a number: \");`**\n\n사용자 입력을 받기 위한 정수 변수 `n`을 선언하고, 안내 메시지를 화면에 출력합니다.\n\n**`int n;`의 상태**: 선언만 하고 초기화하지 않았으므로 `n`에는 **쓰레기값(garbage value)**이 들어 있습니다.\n스택 메모리에서 해당 위치에 이전에 남아있던 아무 값이나 들어 있는 상태입니다.\n시각화에서 `???`로 표시된 것이 바로 이 쓰레기값을 의미합니다.\n\n**`Enter a number: `에 개행(`\\n`)이 없는 이유**:\n프롬프트 메시지 뒤에 사용자가 같은 줄에서 입력하도록 하기 위해서입니다.\n예: `Enter a number: 5` ← 같은 줄에 메시지와 입력이 나란히 표시됨\n\n**주의**: `\\n`이 없으면 줄 단위 버퍼링 환경에서 이 메시지가 즉시 화면에 나타나지 않을 수 있습니다.\n확실하게 표시하려면 `fflush(stdout);`를 호출해야 합니다. (다음 레슨에서 자세히 배웁니다.)\n\n실제 프로그램에서는 `scanf(\"%d\", &n);`으로 `stdin`에서 입력을 읽지만, 여기서는 다음 줄에서 직접 값을 대입합니다.",
+        "explanation": "**`int n;`**과 **`fprintf(stdout, \"Enter a number: \");`** — 사용자 입력을 받기 위한 정수 변수 `n`을 선언하고, 안내 메시지를 출력합니다. 선언만 하고 초기화하지 않았으므로 `n`에는 **쓰레기값**이 들어 있으며, 시각화의 `???`가 이를 나타냅니다.\n\n프롬프트 끝에 `\\n`이 없는 이유는 사용자가 같은 줄에서 입력하도록(`Enter a number: 5`) 하기 위해서입니다.\n\n다만 `\\n`이 없으면 줄 단위 버퍼링 환경에서 이 메시지가 즉시 화면에 나타나지 않을 수 있습니다. 확실하게 표시하려면 `fflush(stdout);`를 호출해야 하며, 이 내용은 다음 레슨에서 자세히 다룹니다.\n\n실제 프로그램에서는 `scanf(\"%d\", &n);`으로 `stdin`에서 입력을 읽지만, 여기서는 시각화를 위해 다음 줄에서 직접 값을 대입합니다.",
         "visualizationType": "cMemory",
         "code": "int n;",
         "highlightOffset": [
@@ -71,7 +71,7 @@
       },
       {
         "title": "입력 시뮬레이션",
-        "explanation": "**`n = 5;`**\n\n실제 프로그램에서는 **`scanf(\"%d\", &n);`**을 사용하여 `stdin`(표준 입력 스트림, 기본적으로 키보드에 연결됨)으로부터 사용자 입력을 받습니다.\n여기서는 시각화의 편의를 위해, 사용자가 키보드로 `5`를 입력했다고 가정하고 직접 값을 대입합니다.\n\n**`stdin`(표준 입력)의 작동 방식**:\n- `scanf`, `fgets`, `getchar` 등의 함수가 `stdin`에서 데이터를 읽습니다.\n- 기본적으로 **키보드**에 연결되어 있지만, 리다이렉션으로 바꿀 수 있습니다:\n  ```bash\n  ./program < input.txt    # 키보드 대신 파일에서 입력을 읽음\n  echo \"5\" | ./program     # 파이프를 통해 다른 프로그램의 출력을 입력으로 받음\n  ```\n\n**3개 스트림의 리다이렉션 요약**:\n| 스트림 | 기본 연결 | 리다이렉션 | 용도 |\n|--------|-----------|------------|------|\n| `stdin` | 키보드 | `< file` | 입력 받기 |\n| `stdout` | 화면 | `> file` | 일반 출력 |\n| `stderr` | 화면 | `2> file` | 에러 출력 |\n\n이것이 스트림이 분리된 이유입니다 — 각각 독립적으로 방향을 바꿀 수 있기 때문입니다.",
+        "explanation": "**`n = 5;`** — 실제로는 `scanf(\"%d\", &n);`으로 **`stdin`**(키보드에 연결된 표준 입력)에서 값을 읽지만, 여기서는 사용자가 `5`를 입력했다고 가정합니다.\n\n`stdin`도 리다이렉션이 가능합니다. `./program < input.txt`로 실행하면 키보드 대신 파일에서 입력을 읽고, `echo \"5\" | ./program`으로 파이프를 통해 다른 프로그램의 출력을 입력으로 받을 수도 있습니다.\n\n세 스트림이 각각 독립적으로 방향을 바꿀 수 있다는 것이 핵심입니다. `stdin`은 `< file`, `stdout`은 `> file`, `stderr`는 `2> file`로 리다이렉트하며, 이 분리 덕분에 Unix 파이프라인(`prog1 | prog2`)이 가능해집니다.\n\n이것이 바로 운영체제가 스트림을 3개로 나눠둔 이유입니다 — 입력, 일반 출력, 에러 출력을 각각 독립적으로 제어하기 위해서입니다.",
         "visualizationType": "cMemory",
         "code": "n = 5;",
         "stack": [
@@ -85,14 +85,14 @@
       },
       {
         "title": "입력값 확인 출력",
-        "explanation": "**`fprintf(stdout, \"You entered: %d\\n\", n);`**\n\n입력받은(여기서는 대입한) 값을 `stdout`(표준 출력)을 통해 화면에 표시합니다.\n`%d` 서식 지정자가 `n`의 정수값 `5`로 대체되어 `\"You entered: 5\"`가 출력됩니다.\n\n**여기서 `fprintf(stdout, ...)`를 사용한 이유**:\n이 레슨에서는 스트림 개념을 명확히 보여주기 위해 `stdout`을 명시적으로 지정했습니다.\n실무에서는 일반 출력에 간단히 `printf(\"You entered: %d\\n\", n);`을 쓰는 것이 더 자연스럽습니다.\n\n**데이터 흐름 전체 그림**:\n```\n키보드 → stdin → 프로그램 → stdout → 화면 (일반 출력)\n                           → stderr → 화면 (에러 출력)\n```\n\n프로그램은 이 3개의 통로를 통해 외부 세계와 소통합니다.\n이 패턴은 C뿐만 아니라 Python, Java, JavaScript 등 **거의 모든 프로그래밍 언어**에서 동일합니다.\n운영체제가 제공하는 기본 인프라이기 때문입니다.",
+        "explanation": "**`fprintf(stdout, \"You entered: %d\\n\", n);`** — 대입한 값을 `stdout`을 통해 화면에 표시합니다. `%d`가 `n`의 정수값 `5`로 대체되어 `\"You entered: 5\"`가 출력됩니다.\n\n이 레슨에서 `fprintf(stdout, ...)`를 명시적으로 사용한 이유는 스트림 개념을 명확히 보여주기 위해서입니다. 실무에서는 간단히 `printf`를 쓰는 것이 자연스럽습니다.\n\n전체 데이터 흐름을 정리하면: **키보드 → stdin → 프로그램 → stdout → 화면(일반 출력)** 그리고 **프로그램 → stderr → 화면(에러 출력)**입니다. 프로그램은 이 3개의 통로를 통해 외부 세계와 소통합니다.\n\n이 패턴은 C뿐만 아니라 Python, Java, JavaScript 등 거의 모든 프로그래밍 언어에서 동일합니다 — 운영체제가 제공하는 기본 인프라이기 때문입니다.",
         "visualizationType": "cMemory",
         "code": "fprintf(stdout, \"You entered: %d\\n\", n);",
         "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: \nYou entered: 5"
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`**\n\n프로그램이 정상적으로 종료됩니다.\n\n프로그램 종료 시 운영체제는 3개의 표준 스트림(`stdin`, `stdout`, `stderr`)을 자동으로 닫고,\n`stdout` 버퍼에 남아있는 데이터를 모두 출력(flush)합니다.\n\n**이 레슨의 핵심 정리**:\n\n1. **`stdin`** (파일 디스크립터 0): 프로그램으로 데이터가 **들어오는** 통로. 기본: 키보드\n2. **`stdout`** (파일 디스크립터 1): 프로그램에서 일반 데이터가 **나가는** 통로. 기본: 화면\n3. **`stderr`** (파일 디스크립터 2): 프로그램에서 에러 메시지가 **나가는** 통로. 기본: 화면\n\n**왜 3개가 분리되어 있는가?**\n- 정상 출력과 에러를 **다른 곳으로 보낼 수 있게** 하기 위해서 (리다이렉션)\n- `stderr`는 **버퍼링 없이 즉시 출력**하여 에러를 놓치지 않게 하기 위해서\n- Unix 파이프라인에서 프로그램들을 **연결**할 수 있게 하기 위해서 (`prog1 | prog2`)\n\n이 세 가지 스트림을 이해하는 것이 시스템 프로그래밍과 Unix 철학의 기초입니다.",
+        "explanation": "**`return 0;`** — 프로그램이 정상 종료되면서 3개의 표준 스트림이 자동으로 닫히고, `stdout` 버퍼에 남아있는 데이터도 모두 출력(flush)됩니다.\n\n정리하면, **`stdin`**(fd 0)은 데이터가 들어오는 통로, **`stdout`**(fd 1)은 일반 데이터가 나가는 통로, **`stderr`**(fd 2)는 에러 메시지가 나가는 통로입니다.\n\n왜 분리되어 있는가? 정상 출력과 에러를 다른 곳으로 보낼 수 있게(리다이렉션), `stderr`는 버퍼링 없이 즉시 출력하여 에러를 놓치지 않게, 그리고 Unix 파이프라인에서 프로그램들을 연결(`prog1 | prog2`)할 수 있게 하기 위해서입니다.\n\n이 세 가지 스트림을 이해하는 것이 시스템 프로그래밍과 Unix 철학의 기초입니다.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
