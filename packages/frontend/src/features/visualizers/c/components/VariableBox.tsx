@@ -57,10 +57,6 @@ function formatValue(value: unknown): string {
   if (value === undefined) return 'undefined';
 
   if (typeof value === 'string') {
-    // 문자열은 따옴표로 감싸기 (너무 길면 축약)
-    if (value.length > 8) {
-      return `"${value.slice(0, 6)}..."`;
-    }
     return `"${value}"`;
   }
 
@@ -70,14 +66,15 @@ function formatValue(value: unknown): string {
 
   if (Array.isArray(value)) {
     if (value.length === 0) return '[]';
-    if (value.length <= 3) {
-      return `[${value.join(', ')}]`;
-    }
-    return `[${value.slice(0, 2).join(', ')}, ...]`;
+    return `[${value.map((v) => String(v)).join(', ')}]`;
   }
 
   if (typeof value === 'object') {
-    return '{...}';
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
   }
 
   return String(value);
@@ -162,8 +159,9 @@ export const VariableBox = memo(function VariableBox({
       data-variable-id={variable.id}
       style={{
         width: 'auto', // 내용에 맞게 자동 조절
+        maxWidth: '260px',
         minWidth: cssVar.boxMinWidth,
-        height: cssVar.boxHeight,
+        height: 'auto',
         minHeight: cssVar.boxMinHeight,
         padding: `${cssVar.boxPaddingV} ${cssVar.boxPaddingH}`,
         borderRadius: FLOW_SIZES.box.borderRadius,
@@ -202,6 +200,9 @@ export const VariableBox = memo(function VariableBox({
           style={{
             fontSize: cssVar.fontValue,
             color: style.value,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-all',
+            lineHeight: 1.15,
           }}
           variants={valueVariants}
           initial="initial"

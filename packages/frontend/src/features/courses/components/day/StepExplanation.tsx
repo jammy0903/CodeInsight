@@ -12,6 +12,13 @@ interface StepExplanationProps {
   stepIndex: number;
 }
 
+function forceLineBreaks(text: string): string {
+  return text
+    .replace(/\r\n/g, '\n')
+    .replace(/([.!?])\s+(?=[^\n])/g, '$1\n')
+    .replace(/(다\.)\s+(?=[^\n])/g, '$1\n');
+}
+
 /**
  * 간단한 텍스트 포맷팅
  * - **bold** → <strong>bold</strong>
@@ -20,8 +27,9 @@ interface StepExplanationProps {
  * - \n → <br/>
  */
 function formatExplanation(text: string): React.ReactNode[] {
+  const normalized = forceLineBreaks(text);
   // 단락별로 분리
-  const paragraphs = text.split('\n\n');
+  const paragraphs = normalized.split('\n\n');
 
   return paragraphs.map((paragraph, pIdx) => {
     // 줄바꿈 처리
@@ -87,7 +95,7 @@ export function StepExplanation({ explanation, stepIndex }: StepExplanationProps
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="text-base leading-relaxed text-stack-text"
+        className="text-lg leading-relaxed text-stack-text"
         style={{ fontFamily: 'var(--font-handwriting)' }}
       >
         {formatExplanation(explanation || '')}

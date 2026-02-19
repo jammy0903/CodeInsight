@@ -4,15 +4,14 @@
  * 터치 확장 지원: 트렁케이트된 값/이름/포인터를 탭하면 전체 표시
  */
 
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { MemoryBlock } from '@/types';
 import { useThemeStore } from '@/stores/themeStore';
 
 import { COLORS } from './utils/frameColors';
 import type { FrameColor } from './utils/frameColors';
-import { isGarbageValue, getDisplayName, truncateText } from './utils/memoryHelpers';
+import { isGarbageValue, getDisplayName } from './utils/memoryHelpers';
 
 export interface MemoryBlockCardProps {
   block: MemoryBlock;
@@ -35,29 +34,10 @@ export function MemoryBlockCard({
   onMouseEnter,
   onMouseLeave,
 }: MemoryBlockCardProps) {
-  const { t } = useTranslation();
-  const [isExpanded, setIsExpanded] = useState(false);
   const valueDisplay = isGarbageValue(block.value) ? '?' : String(block.value);
   const displayName = getDisplayName(block.name);
 
   const currentTheme = useThemeStore((s) => s.theme);
-
-  const MAX_VALUE_LENGTH = 8;
-  const MAX_NAME_LENGTH = 10;
-  const MAX_POINTER_LENGTH = 12;
-
-  const valueTrunc = truncateText(valueDisplay, MAX_VALUE_LENGTH);
-  const nameTrunc = truncateText(displayName, MAX_NAME_LENGTH);
-  const pointerTrunc = block.points_to ? truncateText(block.points_to, MAX_POINTER_LENGTH) : null;
-
-  const needsExpansion = valueTrunc.isTruncated || nameTrunc.isTruncated || (pointerTrunc?.isTruncated ?? false);
-
-  const handleToggleExpand = (e: React.MouseEvent | React.TouchEvent) => {
-    if (needsExpansion) {
-      e.stopPropagation();
-      setIsExpanded(!isExpanded);
-    }
-  };
 
   const isDangling = !!block.dangling;
 
@@ -66,7 +46,7 @@ export function MemoryBlockCard({
       layout
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: isDangling ? 0.6 : 1, x: 0 }}
-      className="rounded-lg px-3 py-2 transition-all duration-200 cursor-pointer relative"
+      className="rounded-lg px-3 py-2 transition-all duration-200 relative"
       data-block-name={block.name}
       data-block-address={block.address}
       style={{
@@ -84,7 +64,6 @@ export function MemoryBlockCard({
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      onClick={handleToggleExpand}
     >
       {/* 블록별 프레임 오버레이 */}
       <AnimatePresence>
@@ -115,25 +94,11 @@ export function MemoryBlockCard({
         )}
       </AnimatePresence>
 
-      {/* 확장 인디케이터 (트렁케이트된 경우에만 표시) */}
-      {needsExpansion && (
-        <div
-          className="absolute top-1 right-1 text-[8px] px-1 rounded"
-          style={{
-            backgroundColor: isExpanded ? '#3b82f6' : 'var(--theme-memory-card-muted)',
-            color: isExpanded ? '#fff' : 'var(--theme-memory-card-bg)',
-            opacity: 0.8,
-          }}
-        >
-          {isExpanded ? t('lesson.collapse') : t('lesson.expand')}
-        </div>
-      )}
-
-      <div className={`flex items-center gap-2 relative ${isExpanded ? 'flex-wrap' : ''}`}>
+      <div className="flex items-center gap-2 relative flex-wrap">
         {/* [주소 | 값] 박스 */}
         <div
-          className={`flex items-center rounded px-2 py-1 ${isExpanded ? 'flex-wrap' : ''}`}
-          style={{ backgroundColor: `${frameColor.border}15`, maxWidth: isExpanded ? '100%' : undefined }}
+          className="flex items-center rounded px-2 py-1 flex-wrap"
+          style={{ backgroundColor: `${frameColor.border}15`, maxWidth: '100%' }}
         >
           {/* 주소 배지 */}
           <span
@@ -150,45 +115,45 @@ export function MemoryBlockCard({
           </span>
           {/* 값 */}
           <span
-            className={`font-mono font-bold text-base ${isExpanded ? 'break-all' : 'truncate'}`}
+            className="font-mono font-bold text-lg break-all"
             style={{
               color: isChanged ? 'var(--theme-memory-changed-border)' : 'var(--theme-memory-card-text)',
-              maxWidth: isExpanded ? '100%' : '80px',
+              maxWidth: '100%',
             }}
             title={valueDisplay}
           >
-            {isExpanded ? valueDisplay : valueTrunc.text}
+            {valueDisplay}
           </span>
         </div>
 
         {/* 타입 */}
-        <span className="text-[10px] font-mono flex-shrink-0" style={{ color: 'var(--theme-memory-card-muted)' }}>
+        <span className="text-xs font-mono flex-shrink-0" style={{ color: 'var(--theme-memory-card-muted)' }}>
           {block.type || 'var'}
         </span>
 
         {/* 변수명 */}
         <span
-          className={`text-xs font-semibold ${isExpanded ? 'break-all' : 'truncate'}`}
+          className="text-sm font-semibold break-all"
           style={{
             color: frameColor.text,
-            maxWidth: isExpanded ? '100%' : '80px',
+            maxWidth: '100%',
           }}
           title={displayName}
         >
-          {isExpanded ? displayName : nameTrunc.text}
+          {displayName}
         </span>
 
         {/* 포인터 표시 */}
         {block.points_to && (
           <span
-            className={`text-[10px] font-semibold ${isExpanded ? '' : 'ml-auto truncate'}`}
+            className="text-xs font-semibold ml-auto break-all"
             style={{
               color: '#f97316',
-              maxWidth: isExpanded ? '100%' : '100px',
+              maxWidth: '100%',
             }}
             title={`\u2192 ${block.points_to}`}
           >
-            &rarr; {isExpanded ? block.points_to : (pointerTrunc?.text ?? block.points_to)}
+            &rarr; {block.points_to}
           </span>
         )}
 

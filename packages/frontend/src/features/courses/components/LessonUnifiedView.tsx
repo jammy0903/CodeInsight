@@ -108,16 +108,16 @@ export function LessonUnifiedView({
       }}
     >
       <div className="flex gap-1">
-        <span className={`round-tab px-2 py-0.5 text-[10px] font-bold rounded-full ${isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
+        <span className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full ${isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
           {t('quiz.explanation', '설명')}
         </span>
         {nav.hasVizRound && (
-          <span className={`round-tab px-2 py-0.5 text-[10px] font-bold rounded-full ${!isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
+          <span className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full ${!isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
             {t('lesson.visualization', '시각화')}
           </span>
         )}
       </div>
-      <span className="ml-auto text-[10px] font-semibold opacity-60">
+      <span className="ml-auto text-xs md:text-sm font-semibold opacity-60">
         {nav.stepIndex + 1}/{nav.totalInRound} · L{currentStep?.line || 1}
       </span>
     </div>
@@ -134,7 +134,7 @@ export function LessonUnifiedView({
             initial="enter"
             animate="center"
             exit="exit"
-            className="p-3 explanation-container"
+            className="p-4 explanation-container"
           >
             <StepExplanation
               explanation={currentStep?.explanation || ''}
@@ -155,16 +155,16 @@ export function LessonUnifiedView({
               <div className="flex shrink-0 border-b border-[var(--theme-lesson-panel-border)]">
                 <button
                   onClick={() => setActiveVizTab('flow')}
-                  className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-all ${activeVizTab === 'flow' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all ${activeVizTab === 'flow' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
                 >
-                  <Play className="w-3 h-3" />
+                  <Play className="w-4 h-4" />
                   Flow
                 </button>
                 <button
                   onClick={() => setActiveVizTab('memory')}
-                  className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
                 >
-                  <Layers className="w-3 h-3" />
+                  <Layers className="w-4 h-4" />
                   Memory
                 </button>
               </div>
