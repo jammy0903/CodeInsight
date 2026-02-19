@@ -17,11 +17,36 @@ interface UseLessonVisualizationResult {
   } | null;
   changedBlocks: { stack: string[]; heap: string[] };
   visualizationType: JSVisualizationType | 'python' | 'java' | 'memory' | string;
-  visualizationState: any; // More specific types can be used here
+  visualizationState: unknown;
 }
 
 const INITIAL_MEMORY_STATE = { stack: [], heap: [], frames: [] };
 const INITIAL_CHANGED_BLOCKS = { stack: [], heap: [] };
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function asArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function stringifyValue(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+  return String(value);
+}
 
 function adaptMemoryState(memoryState: StepMemoryState): { stack: MemoryBlock[], heap: MemoryBlock[], frames: { name: string }[] } {
   const newStack: MemoryBlock[] = [];
@@ -58,7 +83,8 @@ export const VIZ_DATA_FIELDS = [
 ] as const;
 
 export function hasVisualizationData(step: LessonStep): boolean {
-  return VIZ_DATA_FIELDS.some(field => (step as any)[field] != null);
+  const stepRecord = step as UnknownRecord;
+  return VIZ_DATA_FIELDS.some(field => stepRecord[field] != null);
 }
 
 // 이전 스텝에서 시각화 데이터 상속 (캐리포워드)
@@ -73,15 +99,16 @@ function resolveStepWithInheritance(steps: LessonStep[], currentIndex: number): 
     const prevStep = steps[i];
     const prevVizType = prevStep.visualizationType || 'memory';
     if (prevVizType === currentVizType && hasVisualizationData(prevStep)) {
+      const prevStepRecord = prevStep as UnknownRecord;
       const vizFields: Record<string, unknown> = {};
       for (const field of VIZ_DATA_FIELDS) {
-        if ((prevStep as any)[field] != null) {
-          vizFields[field] = (prevStep as any)[field];
+        if (prevStepRecord[field] != null) {
+          vizFields[field] = prevStepRecord[field];
         }
       }
       // heap도 함께 상속 (stack과 쌍)
-      if ((prevStep as any).heap != null) {
-        vizFields.heap = (prevStep as any).heap;
+      if (prevStepRecord.heap != null) {
+        vizFields.heap = prevStepRecord.heap;
       }
       return { ...currentStep, ...vizFields };
     }
@@ -113,19 +140,23 @@ export function useLessonVisualization(
     if (vizType === 'javascript') {
       const stack: MemoryBlock[] = [];
       const frames: { name: string }[] = [];
+      const resolvedStepRecord = resolvedStep as UnknownRecord;
+      const rawStack = asArray(resolvedStepRecord.stack);
 
-      if (resolvedStep.stack && Array.isArray(resolvedStep.stack)) {
-        resolvedStep.stack.forEach((frame: any) => {
+      if (rawStack.length > 0) {
+        rawStack.forEach(frame => {
+          const frameRecord = isRecord(frame) ? frame : undefined;
+          const variablesRecord = isRecord(frameRecord?.variables) ? frameRecord.variables : undefined;
           // 백엔드는 methodName을 사용함 (functionName이 아님!)
-          const frameName = frame.methodName || frame.functionName || '__main__';
+          const frameName = asString(frameRecord?.methodName) || asString(frameRecord?.functionName) || '__main__';
           frames.push({ name: frameName });
 
-          if (frame.variables) {
-            Object.entries(frame.variables).forEach(([name, value]: [string, any]) => {
+          if (variablesRecord) {
+            Object.entries(variablesRecord).forEach(([name, value]) => {
               stack.push({
                 name: `${frameName}.${name}`,
                 address: '',
-                value: typeof value === 'object' ? JSON.stringify(value) : String(value),
+                value: stringifyValue(value),
                 type: typeof value,
               });
             });
@@ -133,12 +164,15 @@ export function useLessonVisualization(
         });
       }
 
-      const heap: MemoryBlock[] = (resolvedStep.heap || []).map((item: any) => ({
-        name: item.id || '?',
-        address: item.address || '',
-        value: typeof item.value === 'object' ? JSON.stringify(item.value) : String(item.value ?? ''),
-        type: item.type || 'object',
-      }));
+      const heap: MemoryBlock[] = asArray(resolvedStepRecord.heap).map(item => {
+        const itemRecord = isRecord(item) ? item : {};
+        return {
+          name: asString(itemRecord.id) || '?',
+          address: asString(itemRecord.address) || '',
+          value: stringifyValue(itemRecord.value),
+          type: asString(itemRecord.type) || 'object',
+        };
+      });
 
       const memoryState = (stack.length > 0 || heap.length > 0) ? { stack, heap, frames } : null;
 
@@ -146,7 +180,7 @@ export function useLessonVisualization(
         memoryState,
         changedBlocks: INITIAL_CHANGED_BLOCKS,
         visualizationType: 'javascript',
-        visualizationState: (resolvedStep as any).visualizationState as JSVisualizationState,
+        visualizationState: (resolvedStepRecord.visualizationState as JSVisualizationState | undefined) || null,
       };
     }
 
@@ -156,21 +190,32 @@ export function useLessonVisualization(
         names: resolvedStep.pyNames,
         objects: resolvedStep.pyObjects
       };
+      const pyStateRecord = isRecord(pyState) ? pyState : undefined;
+      const pyNames = asArray(pyStateRecord?.names);
+      const pyObjects = asArray(pyStateRecord?.objects);
 
       // Memory 탭에서도 표시되도록 memoryState 구조 제공
       const memoryState = pyState ? {
-        stack: (pyState.names || []).map((item: any) => ({
-          name: item.name || '?',
-          address: item.pointsTo || 'ref',
-          value: item.pointsTo || 'None',
-          type: item.scope || 'local',
-        })),
-        heap: (pyState.objects || []).map((item: any) => ({
-          name: item.id || '?',
-          address: item.id || '???',
-          value: String(item.value ?? ''),
-          type: item.type || 'unknown',
-        })),
+        stack: pyNames.map(item => {
+          const itemRecord = isRecord(item) ? item : {};
+          const pointsTo = asString(itemRecord.pointsTo);
+          return {
+            name: asString(itemRecord.name) || '?',
+            address: pointsTo || 'ref',
+            value: pointsTo || 'None',
+            type: asString(itemRecord.scope) || 'local',
+          };
+        }),
+        heap: pyObjects.map(item => {
+          const itemRecord = isRecord(item) ? item : {};
+          const objectId = asString(itemRecord.id);
+          return {
+            name: objectId || '?',
+            address: objectId || '???',
+            value: stringifyValue(itemRecord.value),
+            type: asString(itemRecord.type) || 'unknown',
+          };
+        }),
         frames: [{ name: 'global' }],
       } : null;
 
@@ -185,48 +230,52 @@ export function useLessonVisualization(
     // Java (정적 JSON or 실시간 시뮬레이션)
     if (vizType === 'java' || vizType === 'javaMemory' || resolvedStep.javaMemoryState) {
       const javaMemoryState = resolvedStep.javaMemoryState || resolvedStep.memoryState;
+      const javaStateRecord = isRecord(javaMemoryState) ? javaMemoryState : undefined;
+      const resolvedStepRecord = resolvedStep as UnknownRecord;
       const stack: MemoryBlock[] = [];
       const frames: { name: string }[] = [{ name: 'main' }];
 
       // Java 레슨 JSON 형태: stack: [{name, value, type?}]
       // Java 시뮬레이터 형태: stack: [{methodName, variables: {...}}]
-      const stackData = javaMemoryState?.stack || (resolvedStep.stack as any[]) || [];
+      const stackData = asArray(javaStateRecord?.stack ?? resolvedStepRecord.stack);
 
-      stackData.forEach((item: any) => {
+      stackData.forEach(item => {
+        const itemRecord = isRecord(item) ? item : undefined;
         // 단순 형태: {name, value, type?} - 레슨 JSON
-        if (item.name && (item.value !== undefined || item.value === null)) {
+        if (itemRecord && typeof itemRecord.name === 'string' && ('value' in itemRecord)) {
           stack.push({
-            name: item.name,
-            value: String(item.value ?? ''),
-            type: item.type || 'unknown',
+            name: itemRecord.name,
+            value: stringifyValue(itemRecord.value),
+            type: asString(itemRecord.type) || 'unknown',
             address: '',
             points_to: undefined,
           });
         }
         // 복잡한 형태: {methodName, variables: {...}} - 시뮬레이터
-        else if (item.methodName || item.variables) {
-          const frameName = item.methodName || item.name || 'main';
+        else if (itemRecord && (typeof itemRecord.methodName === 'string' || isRecord(itemRecord.variables))) {
+          const frameName = asString(itemRecord.methodName) || asString(itemRecord.name) || 'main';
           if (!frames.find(f => f.name === frameName)) {
             frames.push({ name: frameName });
           }
 
-          if (item.variables) {
-            Object.entries(item.variables).forEach(([name, val]: [string, any]) => {
+          if (isRecord(itemRecord.variables)) {
+            Object.entries(itemRecord.variables).forEach(([name, val]) => {
               let value = '';
               let type = 'unknown';
               let address = '';
 
-              if (val && typeof val === 'object') {
+              if (isRecord(val)) {
                 if ('value' in val) {
-                  value = String(val.value);
-                  type = val.type || typeof val.value;
-                  address = val.id || '';
-                } else if (val.type === 'Reference' || val.id) {
-                  value = val.id ? `@${val.id}` : 'null';
-                  type = val.class || val.type || 'Reference';
-                  address = val.id || '';
+                  value = stringifyValue(val.value);
+                  type = asString(val.type) || typeof val.value;
+                  address = asString(val.id) || '';
+                } else if (asString(val.type) === 'Reference' || val.id) {
+                  const refId = asString(val.id);
+                  value = refId ? `@${refId}` : 'null';
+                  type = asString(val.class) || asString(val.type) || 'Reference';
+                  address = refId || '';
                 } else {
-                  value = JSON.stringify(val);
+                  value = stringifyValue(val);
                   type = 'object';
                 }
               } else {
@@ -246,12 +295,15 @@ export function useLessonVisualization(
         }
       });
 
-      const heap: MemoryBlock[] = (javaMemoryState?.heap || resolvedStep.heap || []).map((item: any) => ({
-        name: item.id || item.name || item.address || '?',
-        address: item.address || '',
-        value: String(item.content ?? item.value ?? ''),
-        type: item.type || 'Object',
-      }));
+      const heap: MemoryBlock[] = asArray(javaStateRecord?.heap ?? resolvedStepRecord.heap).map(item => {
+        const itemRecord = isRecord(item) ? item : {};
+        return {
+          name: asString(itemRecord.id) || asString(itemRecord.name) || asString(itemRecord.address) || '?',
+          address: asString(itemRecord.address) || '',
+          value: stringifyValue(itemRecord.content ?? itemRecord.value),
+          type: asString(itemRecord.type) || 'Object',
+        };
+      });
 
       const memoryState = (stack.length > 0 || heap.length > 0 || frames.length > 0)
         ? { stack, heap, frames }
@@ -267,19 +319,25 @@ export function useLessonVisualization(
 
     // 일반 memoryState 처리 (JS memory 레슨 등 — Java가 아닌 경우)
     if (resolvedStep.memoryState) {
-      const ms = resolvedStep.memoryState as any;
-      const stack: MemoryBlock[] = (ms.stack || []).map((item: any) => ({
-        name: item.name || '?',
-        address: item.address || '',
-        value: String(item.value ?? item.content ?? ''),
-        type: item.type || 'unknown',
-      }));
-      const heap: MemoryBlock[] = (ms.heap || []).map((item: any) => ({
-        name: item.address || item.name || '?',
-        address: item.address || '',
-        value: String(item.content ?? item.value ?? ''),
-        type: item.type || 'Object',
-      }));
+      const ms = isRecord(resolvedStep.memoryState) ? resolvedStep.memoryState : undefined;
+      const stack: MemoryBlock[] = asArray(ms?.stack).map(item => {
+        const itemRecord = isRecord(item) ? item : {};
+        return {
+          name: asString(itemRecord.name) || '?',
+          address: asString(itemRecord.address) || '',
+          value: stringifyValue(itemRecord.value ?? itemRecord.content),
+          type: asString(itemRecord.type) || 'unknown',
+        };
+      });
+      const heap: MemoryBlock[] = asArray(ms?.heap).map(item => {
+        const itemRecord = isRecord(item) ? item : {};
+        return {
+          name: asString(itemRecord.address) || asString(itemRecord.name) || '?',
+          address: asString(itemRecord.address) || '',
+          value: stringifyValue(itemRecord.content ?? itemRecord.value),
+          type: asString(itemRecord.type) || 'Object',
+        };
+      });
       const memoryState = (stack.length > 0 || heap.length > 0)
         ? { stack, heap, frames: [{ name: 'main' }] }
         : null;
@@ -292,23 +350,26 @@ export function useLessonVisualization(
     }
 
     if (resolvedStep.stack && resolvedStep.heap) {
-      const rawStack = resolvedStep.stack as any[];
-      const rawHeap = (resolvedStep.heap || []) as any[];
+      const resolvedStepRecord = resolvedStep as UnknownRecord;
+      const rawStack = asArray(resolvedStepRecord.stack);
+      const rawHeap = asArray(resolvedStepRecord.heap);
 
-      const { frames, variables } = extractCFrames(rawStack);
+      const { frames, variables } = extractCFrames(rawStack as Parameters<typeof extractCFrames>[0]);
 
-      const stack: MemoryBlock[] = variables.map((item: any) => {
-        const frameName = item.frame || frames[0]?.name || 'main';
-        const rawValue = item.value;
+      const stack: MemoryBlock[] = variables.map(item => {
+        const itemRecord = item as UnknownRecord;
+        const frameName = asString(itemRecord.frame) || frames[0]?.name || 'main';
+        const rawValue = itemRecord.value;
+        const itemName = asString(itemRecord.name) || '';
 
         const block: MemoryBlock = {
-          name: frames.length > 1 ? `${frameName}.${item.name}` : item.name,
-          address: item.address || '???',
+          name: frames.length > 1 ? `${frameName}.${itemName}` : itemName,
+          address: asString(itemRecord.address) || '???',
           value: normalizeCValue(rawValue),
-          type: item.type,
-          points_to: item.points_to ?? undefined,
-          highlight: item.highlight,
-          dangling: item.dangling,
+          type: asString(itemRecord.type),
+          points_to: asString(itemRecord.points_to) ?? undefined,
+          highlight: itemRecord.highlight as boolean | undefined,
+          dangling: itemRecord.dangling as boolean | undefined,
         };
 
         if (isStructValue(rawValue)) {
@@ -321,17 +382,18 @@ export function useLessonVisualization(
         return block;
       });
 
-      const heap: MemoryBlock[] = rawHeap.map((item: any) => {
-        const rawValue = item.value;
+      const heap: MemoryBlock[] = rawHeap.map(item => {
+        const itemRecord = isRecord(item) ? item : {};
+        const rawValue = itemRecord.value;
         const block: MemoryBlock = {
-          name: item.name || item.label || '',
-          address: item.address || '???',
+          name: asString(itemRecord.name) || asString(itemRecord.label) || '',
+          address: asString(itemRecord.address) || '???',
           value: normalizeCValue(rawValue),
-          type: item.type,
-          size: item.size ? parseInt(String(item.size), 10) || undefined : undefined,
-          highlight: item.highlight,
-          label: item.label,
-          dangling: item.dangling,
+          type: asString(itemRecord.type),
+          size: itemRecord.size ? parseInt(String(itemRecord.size), 10) || undefined : undefined,
+          highlight: itemRecord.highlight as boolean | undefined,
+          label: asString(itemRecord.label),
+          dangling: itemRecord.dangling as boolean | undefined,
         };
 
         if (isCharArrayValue(rawValue)) {
@@ -366,14 +428,15 @@ export function useLessonVisualization(
     }
 
     // JS 레슨의 비-메모리 타입 (scope, eventLoop, promise 등) 패스스루
-    const resolvedVizState = (resolvedStep as any).scopeState
-      || (resolvedStep as any).eventLoopState
-      || (resolvedStep as any).promiseState
-      || (resolvedStep as any).thisState
-      || (resolvedStep as any).prototypeState
-      || (resolvedStep as any).callStackState
-      || (resolvedStep as any).algorithmState
-      || (resolvedStep as any).memoryState
+    const resolvedStepRecord = resolvedStep as UnknownRecord;
+    const resolvedVizState = resolvedStepRecord.scopeState
+      || resolvedStepRecord.eventLoopState
+      || resolvedStepRecord.promiseState
+      || resolvedStepRecord.thisState
+      || resolvedStepRecord.prototypeState
+      || resolvedStepRecord.callStackState
+      || resolvedStepRecord.algorithmState
+      || resolvedStepRecord.memoryState
       || null;
 
     return {
