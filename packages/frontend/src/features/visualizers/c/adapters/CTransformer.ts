@@ -145,7 +145,7 @@ export class CTransformer implements IFlowTransformer {
             value: block.value,
             type: block.type,
             address: block.address,
-            points_to: block.points_to,
+            points_to: block.points_to || block.pointsTo,
             highlight: block.highlight,
             segment: 'stack',
           },
@@ -172,7 +172,7 @@ export class CTransformer implements IFlowTransformer {
             value: block.value,
             type: block.type,
             address: block.address,
-            points_to: block.points_to,
+            points_to: block.points_to || block.pointsTo,
             highlight: block.highlight,
             segment: 'heap',
           },
@@ -282,9 +282,11 @@ export class CTransformer implements IFlowTransformer {
       }
 
       // 변수 이름으로 매칭 (Lesson JSON points_to: "a")
-      const target = variables.find((t) => t.name === v.pointsTo && t.id !== v.id);
-      if (target) {
-        v.pointsTo = target.id;
+      // 다른 스코프(프레임) 우선: 포인터는 보통 다른 프레임의 변수를 가리킴
+      const candidates = variables.filter((t) => t.name === v.pointsTo && t.id !== v.id);
+      if (candidates.length > 0) {
+        const crossFrame = candidates.find((t) => t.scope !== v.scope);
+        v.pointsTo = (crossFrame || candidates[0]).id;
         return;
       }
 
