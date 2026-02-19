@@ -59,7 +59,7 @@ const allowedOrigins = [...config.server.corsOrigins, ...capacitorOrigins];
 app.register(cors, {
   origin: config.server.isDev ? true : (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     callback(new Error('Not allowed by CORS'), false);
