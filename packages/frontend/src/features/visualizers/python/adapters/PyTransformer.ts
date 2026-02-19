@@ -10,6 +10,12 @@
 import type { LessonStep, FlowStep, FlowVariable, FlowFrame, FlowValue } from '@codeinsight/shared';
 import type { IFlowTransformer } from '../../shared/adapters/types';
 
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
 // Python names/objects 타입
 interface PyName {
   name: string;
@@ -63,6 +69,35 @@ interface PyCallFrameSnapshot {
   functionName: string;
   depth: number;
   localNames: PyName[];
+}
+
+function isPyName(value: unknown): value is PyName {
+  if (!isRecord(value)) return false;
+  return typeof value.name === 'string' && typeof value.pointsTo === 'string';
+}
+
+function isPyObject(value: unknown): value is PyObject {
+  if (!isRecord(value)) return false;
+  return typeof value.id === 'string' && typeof value.type === 'string' && 'value' in value;
+}
+
+function isPyCallFrameSnapshot(value: unknown): value is PyCallFrameSnapshot {
+  if (!isRecord(value)) return false;
+  if (typeof value.functionName !== 'string' || typeof value.depth !== 'number') return false;
+  if (!Array.isArray(value.localNames)) return false;
+  return value.localNames.every(isPyName);
+}
+
+function toPyNames(value: unknown): PyName[] {
+  return Array.isArray(value) ? value.filter(isPyName) : [];
+}
+
+function toPyObjects(value: unknown): PyObject[] {
+  return Array.isArray(value) ? value.filter(isPyObject) : [];
+}
+
+function toPyCallStack(value: unknown): PyCallFrameSnapshot[] {
+  return Array.isArray(value) ? value.filter(isPyCallFrameSnapshot) : [];
 }
 
 /**
@@ -161,13 +196,26 @@ export class PyTransformer implements IFlowTransformer {
    */
   transform(step: LessonStep, prevStep?: LessonStep, fullCode?: string): FlowStep {
     const variables: FlowVariable[] = [];
+    const stepRecord = step as UnknownRecord;
 
     // 데이터 추출 (Lesson/Playground 동일 경로)
     // 우선순위: pythonMemoryState > pyNames/pyObjects > names/objects
-    const pyState = (step as any).pythonMemoryState;
-    const names: PyName[] = pyState?.names || (step as any).pyNames || (step as any).names || [];
-    const objectsArray: PyObject[] = pyState?.objects || (step as any).pyObjects || (step as any).objects || [];
-    const callStack: PyCallFrameSnapshot[] = pyState?.callStack || (step as any).callStack || [];
+    const pyState = step.pythonMemoryState;
+    const pyStateRecord = isRecord(stepRecord.pythonMemoryState) ? stepRecord.pythonMemoryState : undefined;
+    const names: PyName[] = pyState?.names
+      ? toPyNames(pyState.names)
+      : step.pyNames
+        ? toPyNames(step.pyNames)
+        : toPyNames(stepRecord.names);
+    const objectsArray: PyObject[] = pyState?.objects
+      ? toPyObjects(pyState.objects)
+      : step.pyObjects
+        ? toPyObjects(step.pyObjects)
+        : toPyObjects(stepRecord.objects);
+    const pyStateCallStack = toPyCallStack(pyStateRecord?.callStack);
+    const callStack: PyCallFrameSnapshot[] = pyStateCallStack.length > 0
+      ? pyStateCallStack
+      : (step.callStack ? toPyCallStack(step.callStack) : toPyCallStack(stepRecord.callStack));
 
     // 객체를 Map으로 변환 (빠른 조회용)
     const objectsMap = new Map<string, PyObject>();
@@ -283,7 +331,7 @@ export class PyTransformer implements IFlowTransformer {
     const pyOutput = pyState?.output;
     const stdout = pyOutput
       ? (Array.isArray(pyOutput) ? pyOutput.join('\n') : pyOutput)
-      : ((step as any).stdout || step.output);
+      : (step.stdout || step.output);
     const terminalOutput = stdout ? { text: stdout } : undefined;
 
     return {
