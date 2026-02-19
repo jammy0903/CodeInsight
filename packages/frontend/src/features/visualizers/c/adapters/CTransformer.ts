@@ -11,6 +11,18 @@
 import type { LessonStep, FlowStep, FlowVariable, FlowFrame } from '@codeinsight/shared';
 import type { IFlowTransformer } from '../../shared/adapters/types';
 
+interface CStepBlock {
+  type?: string;
+  func?: string;
+  frame?: string;
+  name?: string;
+  value?: unknown;
+  address?: string;
+  points_to?: string | null;
+  pointsTo?: string | null;
+  highlight?: boolean;
+}
+
 /**
  * 문자열 값을 FlowValue로 파싱
  *
@@ -124,7 +136,7 @@ export class CTransformer implements IFlowTransformer {
 
     // 1. Stack 변수 처리
     if (step.stack) {
-      step.stack.forEach((block: any) => {
+      (step.stack as CStepBlock[]).forEach((block) => {
         // type: "frame" 마커는 변수가 아닌 프레임 구분자
         if (block.type === 'frame') {
           const frameName = block.func || block.name;
@@ -135,7 +147,7 @@ export class CTransformer implements IFlowTransformer {
         }
 
         // 프레임 결정: Lesson JSON의 frame 필드 우선, 없으면 dot-format 파싱
-        const dotParsed = parseVariableName(block.name);
+        const dotParsed = parseVariableName(block.name ?? '');
         const frame = block.frame || dotParsed.frame;
         const name = dotParsed.name;
 
@@ -163,12 +175,12 @@ export class CTransformer implements IFlowTransformer {
 
     // 2. Heap 변수 처리
     if (step.heap) {
-      step.heap.forEach((block: any) => {
+      (step.heap as CStepBlock[]).forEach((block) => {
         if (block.type === 'frame') return;
 
         const variable = this.toVariable(
           {
-            name: block.name || `[${block.address}]`,
+            name: block.name || `[${block.address ?? '?'}]`,
             value: block.value,
             type: block.type,
             address: block.address,
@@ -189,12 +201,12 @@ export class CTransformer implements IFlowTransformer {
 
     // 3. Data 섹션 처리 (전역 변수)
     if (step.data) {
-      step.data.forEach((block: any) => {
+      (step.data as CStepBlock[]).forEach((block) => {
         if (block.type === 'frame') return;
 
         const variable = this.toVariable(
           {
-            name: block.name,
+            name: block.name || '?',
             value: block.value,
             type: block.type,
             address: block.address,
