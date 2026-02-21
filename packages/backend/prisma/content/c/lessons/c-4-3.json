@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "헤더 포함",
-        "explanation": "`printf`를 쓰기 위해 **`#include <stdio.h>`**로 표준 입출력 헤더를 포함합니다. 이전 레슨에서 값을 복사해 넘겨도 원본이 안 바뀌는 걸 확인했으니, 이번엔 **원본을 직접 바꾸는 방법** — 포인터를 배웁니다.",
+        "explanation": "`#include <stdio.h>`로 출력 함수를 사용합니다.\n\n이번 레슨은 주소(포인터) 전달로 원본을 수정하는 흐름을 다룹니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main()`** — 프로그램 시작점입니다. 위에 정의된 `reallyChange`의 매개변수를 주목하세요: `int *p`(정수형 포인터). 이전 레슨의 `tryToChange(int x)`와 비교하면, `int` 대신 `int *` — 이 별표(`*`) 하나가 Call by Value와 Call by Reference의 차이를 만듭니다.\n\n`main` 스택 프레임이 생성되었고, 곧 이 안에 변수 `a`가 만들어집니다.",
+        "explanation": "main 프레임이 생성되고, 포인터 매개변수 함수 `reallyChange(int *p)`를 호출할 준비를 합니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "변수 a 선언 및 초기화",
-        "explanation": "**`int a = 10;`** — `main` 프레임에 변수 `a`를 생성하고 값 10을 저장합니다. 메모리 주소는 `0x1000`입니다. 이번에는 이 **주소**가 매우 중요합니다!\n\n이전 레슨에서는 `a`의 값(10)만 복사해 넘겼기에 원본이 안 바뀌었습니다. 이번에는 `a`의 **주소(0x1000)**를 넘겨서, 함수가 그 주소를 따라가 원본을 직접 수정하도록 할 겁니다. 시험지 '내용'을 복사하는 대신 시험지가 있는 **사물함 번호**를 알려주는 셈이죠.\n\n변수의 실제 주소는 실행마다 다르지만, 이해를 위해 0x1000으로 고정합니다.",
+        "explanation": "`int a = 10;`으로 원본 변수를 만듭니다.\n\n이번에는 값이 아니라 `a`의 주소를 함수에 전달합니다.",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
@@ -44,14 +44,14 @@
       },
       {
         "title": "Before 값 출력",
-        "explanation": "**`printf(\"Before: %d\\n\", a);`** — 함수 호출 전 `a`의 값(10)을 출력하여 기록합니다.\n\n이전 레슨에서는 Before=10, After=10으로 변하지 않았습니다. 이번에는 포인터를 사용하므로 After에서 다른 값이 나올 겁니다!",
+        "explanation": "호출 전 `a=10`을 출력합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Before: %d\\n\", a);",
         "stdout": "Before: 10"
       },
       {
         "title": "함수 호출과 주소 전달",
-        "explanation": "**`reallyChange(&a);`** — `&`는 **주소 연산자**로, `&a`는 변수 `a`의 메모리 주소(0x1000)를 반환합니다. 이전 레슨은 `tryToChange(a)` → 값 10 복사, 이번은 `reallyChange(&a)` → 주소 0x1000 복사입니다.\n\n새 스택 프레임의 매개변수 `p`에 주소값 `0x1000`이 저장됩니다. `p`는 `int *` 타입, 즉 **포인터**이고 이제 `a`를 **가리키는** 상태입니다. 이전엔 시험지를 복사해 줬지만, 이번엔 \"시험지가 사물함 1000번에 있어\"라고 위치 정보를 알려준 것이죠.\n\n기술적으로 C는 여전히 '값 복사'를 하고 있습니다. 다만 복사하는 대상이 '정수 값'이 아니라 **'주소 값'**인 것입니다!",
+        "explanation": "`reallyChange(&a);`에서 `&a` 주소가 전달되어 `p`가 `a`를 가리키게 됩니다.\n\nC는 여전히 값 복사이지만, 복사 대상이 주소값이어서 원본 수정이 가능해집니다.",
         "visualizationType": "cMemory",
         "code": "reallyChange(&a);",
         "highlightOffset": [
@@ -77,8 +77,8 @@
       },
       {
         "title": "역참조로 원본 변경",
-        "keyInsight": "포인터를 통해 다른 스택 프레임의 변수를 수정할 수 있습니다.",
-        "explanation": "**`*p = 999;`** — `*`는 **역참조 연산자**로, 포인터가 가리키는 메모리의 값에 접근합니다. `p`에는 0x1000이 저장되어 있고 그곳이 바로 `a`이므로, `*p = 999`는 곧 `a = 999`와 동일한 효과입니다!\n\n메모리를 확인하세요: `a`의 값이 10에서 **999**로 바뀌었습니다. 사물함 번호(0x1000)를 알고 있으니 직접 사물함을 열어(역참조) 안의 시험지(a)를 수정한 거죠.\n\nCall by Value와의 결정적 차이 — 이전에는 복사본만 바꿔서 원본에 영향이 없었지만, 이번에는 주소를 통해 원본 메모리에 직접 접근하여 수정했습니다. `*p`(그 주소의 데이터)와 `p`(주소 자체)를 혼동하지 마세요.",
+        "keyInsight": "포인터 역참조(`*p`)는 가리키는 실제 메모리를 수정합니다.",
+        "explanation": "`*p = 999;`는 `p`가 가리키는 실제 위치(`a`)에 999를 저장합니다.\n\n즉 함수 내부에서 main의 원본 변수를 직접 바꿉니다.",
         "visualizationType": "cMemory",
         "code": "*p = 999;",
         "stack": [
@@ -101,7 +101,7 @@
       },
       {
         "title": "함수 내부 출력",
-        "explanation": "**`printf(\"Inside func: Changed!\\n\");`** — 변경 완료 메시지를 출력합니다. 이 시점에서 `a`는 이미 999로 바뀌어 있습니다 — `*p = 999;`가 실행된 순간 즉시 수정되었으니까요.\n\n포인터(주소)를 알면 스택 프레임이 다르더라도 다른 프레임의 변수를 수정할 수 있습니다. 프레임의 '방 잠금'을 뚫는 유일한 합법적 방법이죠.\n\n이 능력은 강력하지만 위험하기도 합니다. 잘못된 포인터로 엉뚱한 메모리를 수정하면 프로그램이 죽을 수 있습니다.",
+        "explanation": "변경 메시지를 출력합니다.\n\n이미 이 시점에서 원본 `a` 값은 999로 바뀐 상태입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Inside func: Changed!\\n\");",
         "stack": [
@@ -124,7 +124,7 @@
       },
       {
         "title": "변경 확인 (After 출력)",
-        "explanation": "**`printf(\"After:  %d\\n\", a);`** — 함수가 끝나고 `main`으로 돌아와 `a`를 확인하면 **999**로 바뀌어 있습니다! `reallyChange`의 프레임(포인터 `p` 포함)은 사라졌지만, 포인터를 통해 수정한 `a`의 값은 영구적입니다.\n\n이전 레슨과 비교: Call by Value → Before=10, After=**10**. Call by Reference → Before=10, After=**999**. 사물함 번호를 알려줘서 직접 시험지를 고치게 했으니, 친구가 돌아간 후에도 시험지는 고쳐진 상태 그대로입니다.\n\n엄밀히 C에는 진정한 'Call by Reference'가 없습니다. '주소라는 값'을 복사해 넘기는 것(Call by Value of a pointer)이지만, 결과적으로 참조 전달과 같은 효과를 냅니다.",
+        "explanation": "호출 후 `a`를 출력하면 999가 나옵니다.\n\n주소 전달 + 역참조가 원본 변경을 만든 핵심 메커니즘입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", a);",
         "stack": [

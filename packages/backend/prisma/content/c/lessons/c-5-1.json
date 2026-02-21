@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`** — `printf` 함수를 쓰기 위한 준비입니다.\n\n이번 레슨에서는 C언어 메모리의 두 핵심 영역, **스택(Stack)**과 **힙(Heap)**의 차이를 배웁니다. 둘 다 데이터를 저장하지만 특성이 정반대입니다.\n\n스택은 내 책상, 힙은 대형 창고라고 생각하면 됩니다. 책상은 가깝고 빠르지만 좁고, 창고는 멀고 느리지만 넓습니다.\n\n이 구분을 이해하면 \"왜 `malloc`을 써야 하는지\"가 명확해집니다.",
+        "explanation": "`printf` 사용을 위해 `#include <stdio.h>`를 포함합니다.\n\n이번 레슨은 스택과 힙의 역할 차이를 비교합니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,13 +16,13 @@
       },
       {
         "title": "stdlib.h 헤더 포함",
-        "explanation": "**`#include <stdlib.h>`** — 동적 메모리 관리 함수들을 사용하기 위한 헤더입니다.\n\n이 안에 `malloc()`(메모리를 빌리는 함수), `free()`(반납하는 함수), `calloc()`, `realloc()` 등이 선언되어 있습니다. 힙 메모리를 다루려면 반드시 포함해야 합니다.\n\n빠뜨리면 컴파일 경고가 발생하고, 64비트 시스템에서는 주소가 잘려 심각한 버그로 이어질 수 있습니다.",
+        "explanation": "`malloc`/`free` 사용을 위해 `#include <stdlib.h>`를 포함합니다.\n\n힙 메모리는 이 헤더의 함수로 직접 관리합니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
         "title": "main 함수 정의",
-        "explanation": "**`int main() {`** — 프로그램 시작점입니다.\n\n`main`이 시작되면 운영체제가 **스택 메모리**(보통 1~8MB)를 할당합니다. 스택은 크기 제한이 있지만 자동 관리되고 매우 빠릅니다. 반면 **힙**은 RAM 크기만큼 쓸 수 있지만, `malloc`/`free`로 직접 관리해야 하고 상대적으로 느립니다.\n\n이 레슨에서 두 영역의 차이를 코드로 직접 확인해봅시다.",
+        "explanation": "main 프레임이 생성됩니다.\n\n이제 스택 배열과 힙 할당을 같은 코드에서 비교합니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -36,7 +36,7 @@
       },
       {
         "title": "스택에 배열 선언",
-        "explanation": "**`int stackArr[1000];`** — 스택에 정수 1,000개짜리 배열(약 **4KB**)을 선언합니다.\n\n스택 할당은 CPU가 스택 포인터(SP)를 이동하기만 하면 되므로 **매우 빠르고**, 함수가 끝나면 **자동으로 해제**됩니다. `free` 같은 건 필요 없습니다. 책상 위 포스트잇처럼 빨리 붙이고 뗄 수 있지만, 공간이 좁아서 큰 데이터는 담을 수 없습니다.\n\n만약 `int stackArr[10000000]`(1천만 개, 약 40MB)을 선언하면 스택 크기를 초과하여 **Stack Overflow**가 발생합니다.",
+        "explanation": "스택에 정수 배열이 생성됩니다.\n\n스택 메모리는 빠르고 자동 해제되지만 크기 제한이 작습니다.",
         "visualizationType": "cMemory",
         "code": "int stackErr[1000];",
         "stack": [
@@ -50,7 +50,7 @@
       },
       {
         "title": "힙에 메모리 할당 (malloc)",
-        "explanation": "**`int *heapArr = (int*)malloc(sizeof(int) * 10000000);`** — 힙에서 정수 **1천만 개**(약 40MB)를 저장할 공간을 빌려옵니다.\n\n분해하면 `sizeof(int) * 10000000` = 약 40MB를 `malloc`에 요청하고, 성공하면 시작 주소를, 실패하면 `NULL`을 반환합니다. `malloc`은 `void*`를 돌려주므로 `(int*)`로 형변환한 뒤 포인터 변수 `heapArr`에 저장합니다.\n\n스택이 내 책상 위의 좁은 공간이라면, 힙은 대형 물류 창고입니다. 40MB는 책상에서는 불가능하지만 창고에서는 문제없습니다. 다만 직접 가서 빌리고(`malloc`), 다 쓰면 직접 반납(`free`)해야 합니다.\n\n스택에는 포인터 변수 `heapArr`(8바이트, 주소값만 저장)이 있고, 실제 40MB 데이터는 힙에 있습니다.",
+        "explanation": "`malloc`으로 큰 연속 메모리를 힙에 요청하고 시작 주소를 포인터에 저장합니다.\n\n실데이터는 힙에 있고, 스택에는 주소를 담은 포인터만 남습니다.",
         "visualizationType": "cMemory",
         "code": "int *heapArr = (int*)malloc(sizeof(int) * 10000000);",
         "stack": [
@@ -77,20 +77,20 @@
       },
       {
         "title": "힙 할당 성공 확인",
-        "explanation": "**`if (heapArr != NULL)`** — `malloc`이 성공했는지 확인합니다.\n\n시스템에 남은 메모리가 부족하거나, 요청이 너무 크거나, 메모리 파편화로 연속 공간을 확보할 수 없으면 `malloc`은 `NULL`을 반환합니다. `NULL` 포인터를 역참조하면 프로그램이 즉시 죽으므로(Segmentation Fault), 반드시 확인해야 합니다.\n\n창고에 빈 공간이 있는지 먼저 확인하는 것과 같습니다. \"빈 방이 없습니다\"(NULL)라는 답을 무시하고 억지로 짐을 넣으면 사고가 나겠죠?\n\nNULL 체크를 빼먹는 것은 초보자의 가장 흔한 실수입니다. 프로 코드에서는 반드시 포함합니다.",
+        "explanation": "`heapArr != NULL`로 할당 성공 여부를 검사합니다.\n\n실패 시 역참조하면 위험하므로 사용 전 확인이 필수입니다.",
         "visualizationType": "cMemory",
         "code": "if (heapArr != NULL) {"
       },
       {
         "title": "성공 메시지 출력",
-        "explanation": "**`printf(\"Heap allocation success!\\n\");`** — 힙 할당이 성공했음을 화면에 알립니다.\n\n40MB라는 큰 메모리를 힙에서 성공적으로 빌려왔습니다. 같은 크기를 스택에서 확보하려 했다면 Stack Overflow가 발생했을 것입니다.\n\n스택 할당은 나노초 단위(포인터 이동 한 번)이고, `malloc`은 빈 공간을 찾는 알고리즘을 실행하므로 마이크로초 단위입니다. 하지만 대부분의 프로그램에서 이 차이는 문제가 되지 않습니다.",
+        "explanation": "힙 할당 성공 상태를 출력합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Heap allocation success!\\n\");",
         "stdout": "Heap allocation success!"
       },
       {
         "title": "힙 메모리 해제 (free)",
-        "explanation": "**`free(heapArr);`** — `malloc`으로 빌렸던 40MB를 운영체제에 반환합니다.\n\n스택 메모리는 함수가 끝나면 자동 해제되지만, **힙 메모리는 프로그래머가 직접 `free`를 호출해야** 합니다. 호출하지 않으면 프로그램이 끝날 때까지 메모리가 점유되는 **메모리 누수(Memory Leak)**가 발생하고, 장시간 실행되는 서버나 게임에서는 치명적입니다.\n\n창고 임대 계약을 해지하는 것과 같습니다. 해지(`free`) 후에도 열쇠(`heapArr`)는 내 손에 있지만, 이 열쇠로 다시 들어가면 불법 침입(Undefined Behavior)입니다. 안전을 위해 `heapArr = NULL;`을 추가하는 것이 좋습니다.\n\n`malloc`과 `free`는 반드시 **짝(pair)**으로 사용해야 합니다.",
+        "explanation": "`free(heapArr)`로 힙 메모리를 반납합니다.\n\n동적 할당은 반드시 해제까지 짝으로 관리해야 합니다.",
         "visualizationType": "cMemory",
         "code": "free(heapArr);",
         "stack": [
@@ -112,7 +112,7 @@
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`** — 프로그램이 정상 종료됩니다.\n\n`main`이 끝나면서 스택의 `stackArr`도 자동 해제되고, 힙 메모리는 이미 `free`로 반환했으므로 모든 메모리가 깔끔하게 정리되었습니다.\n\n**언제 힙을 써야 할까요?** 배열 크기가 매우 클 때(스택 오버플로우 방지), 크기가 실행 시 결정될 때(사용자 입력 등), 데이터를 함수 종료 후에도 유지해야 할 때 — 이 세 가지 상황이라면 힙을 선택합니다.\n\n한 줄 정리: 작고 빠른 건 스택, 크고 오래가는 건 힙.",
+        "explanation": "`return 0;`으로 종료합니다.\n\n핵심: 스택은 자동, 힙은 수동 관리입니다.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []

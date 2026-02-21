@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "헤더 포함",
-        "explanation": "`printf`를 쓰기 위해 **`#include <stdio.h>`**로 표준 입출력 헤더를 포함합니다. 이번 레슨은 C에서 가장 위험하고 흔한 버그 — **함수에서 지역 변수의 주소를 반환하는 실수**를 다룹니다. 이 코드는 **절대 따라 하면 안 되는 나쁜 예시**입니다!",
+        "explanation": "`#include <stdio.h>`로 출력 함수를 사용합니다.\n\n이번 예제는 지역 변수 주소 반환이 왜 위험한지 보여주는 반례입니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main()`** — 프로그램 시작점입니다. `dangerousFunc`의 반환 타입을 주목하세요: `int*` — 정수형 **포인터**를 반환한다는 뜻입니다.\n\n핵심 질문: 그 주소가 가리키는 변수가 함수 종료 후에도 살아있을까요? 친구가 \"우리 집 열쇠 줄게!\"라고 하는데, 그 집이 곧 철거될 예정이라면 열쇠를 받아도 소용이 없겠죠.\n\n`main` 스택 프레임이 생성되었고, 곧 `dangerousFunc`을 호출하여 그 위에 새 프레임이 쌓일 것입니다.",
+        "explanation": "main 프레임이 생성되고 `dangerousFunc`를 호출할 준비를 합니다.\n\n핵심 질문은 \"함수 종료 후 지역 변수 주소가 유효한가\"입니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "dangerousFunc 호출",
-        "explanation": "**`int *p = dangerousFunc();`** — 함수를 호출하면 새 스택 프레임이 생기고, 안에 지역 변수 `x = 100`(주소 0x2000)이 만들어집니다. `main`의 `p`는 아직 반환값을 기다리는 중(???)입니다.\n\n곧 문제가 발생합니다: `dangerousFunc`은 `return &x;`로 `x`의 주소(0x2000)를 반환할 건데, 함수가 끝나면 `x`가 사라질 주소를 돌려주는 셈입니다. 호텔에 체크인해서 301호(x)에 짐(100)을 풀었다가, 체크아웃(함수 종료) 후 301호 열쇠를 친구에게 건네는 것과 같죠.",
+        "explanation": "호출로 새 프레임이 생기고 내부 지역 변수 `x=100`이 생성됩니다.\n\nmain의 `p`는 함수가 돌려줄 포인터 값을 받게 됩니다.",
         "visualizationType": "cMemory",
         "code": "int *p = dangerousFunc();",
         "highlightOffset": [
@@ -55,7 +55,7 @@
       },
       {
         "title": "위험한 반환 - 지역 변수의 주소",
-        "explanation": "**`return &x;`** — `x`의 주소(0x2000)가 `main`의 `p`에 저장됩니다. 하지만 이 순간 `dangerousFunc`의 스택 프레임이 **통째로 파괴**되면서 `x`도 함께 사라집니다!\n\n`p`는 여전히 0x2000을 들고 있지만, 이미 철거된 건물의 주소를 쥐고 있는 셈입니다. 이런 포인터를 **Dangling Pointer(댕글링 포인터)**라고 합니다 — 가리키는 대상이 사라졌는데 여전히 그 주소를 가리키고 있기 때문입니다.\n\n컴파일러가 `\"warning: address of stack memory associated with local variable 'x' returned\"` 경고를 주지만 컴파일을 막지는 않습니다. 이 경고를 절대 무시하지 마세요!",
+        "explanation": "`return &x;`는 곧 소멸될 지역 변수 주소를 반환합니다.\n\n함수 종료 후 그 주소는 유효 대상이 사라진 dangling pointer가 됩니다.",
         "visualizationType": "cMemory",
         "code": "return &x;",
         "stack": [
@@ -70,7 +70,7 @@
       },
       {
         "title": "Dangling Pointer 역참조 - Undefined Behavior",
-        "explanation": "**`printf(\"%d\\n\", *p);`** — 이미 해제된 주소(0x2000)의 값을 읽으려 합니다. 이것은 **Undefined Behavior(정의되지 않은 동작)**으로, 운 좋으면 아직 덮어써지지 않아 100이 출력되고, 운 나쁘면 쓰레기 값이 나오며, 최악엔 Segmentation Fault로 프로그램이 죽습니다.\n\n'운 좋은 경우'가 가장 위험합니다 — 테스트할 때 잘 되다가 실서비스에서 갑자기 죽을 수 있기 때문이죠. 철거된 건물 자리에 아직 잔해가 남아있을 수도, 이미 새 공사가 시작되었을 수도 있는 것과 같습니다.\n\n안전한 대안: `static int x`(함수 종료 후에도 유지), `malloc`(힙에 할당), 또는 포인터 대신 값 자체를 `return x;`로 반환하는 방법이 있습니다.",
+        "explanation": "`*p`를 읽는 순간 동작은 Undefined Behavior입니다.\n\n값이 우연히 맞아 보일 수도, 쓰레기값이 나오거나 크래시가 날 수도 있어 신뢰할 수 없습니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"%d\\n\", *p);",
         "stack": [

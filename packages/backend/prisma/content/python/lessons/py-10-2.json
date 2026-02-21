@@ -113,7 +113,7 @@
       },
       {
         "title": "멀티프로세스 준비",
-        "explanation": "**`p1 = multiprocessing.Process(target=countdown)`**\n**`p2 = multiprocessing.Process(target=countdown)`**\n\n**두 개의 `Process` 객체를 생성합니다.** 문법이 `threading.Thread`와 거의 동일합니다!\n\n**`Thread`와 `Process`의 차이:**\n| 항목 | Thread | Process |\n|------|--------|----------|\n| 메모리 | 공유 | 독립 |\n| GIL | 영향 받음 | 각자 독립된 GIL |\n| 생성 비용 | 가벼움 | 무거움 |\n| 통신 | 직접 변수 접근 | IPC (Queue, Pipe 등) |\n\n**비유**: 스레딩이 같은 사무실의 직원이라면, 멀티프로세싱은 각각 독립된 사무실을 운영하는 것입니다. 각 사무실에는 자체 컴퓨터(GIL)가 있으므로 동시에 일할 수 있습니다!\n\n**내부 동작**: `Process` 인스턴스가 생성되지만, 아직 실제 OS 프로세스는 만들어지지 않습니다. `start()`를 호출해야 fork/spawn됩니다.\n\n**왜 이 순서인가?** 프로세스를 먼저 생성(준비)하고, 시간 측정 시작 후 동시에 실행합니다.\n\n**주의**: `multiprocessing`에서는 `target` 함수와 인자가 **직렬화(pickle)**될 수 있어야 합니다. 람다 함수나 로컬 함수는 직렬화가 안 될 수 있습니다.",
+        "explanation": "**`p1 = multiprocessing.Process(target=countdown)`**\n**`p2 = multiprocessing.Process(target=countdown)`**\n\n**두 개의 `Process` 객체를 생성합니다.** 문법이 `threading.Thread`와 거의 동일합니다!\n\n**`Thread`와 `Process`의 차이:**\n\n**비유**: 스레딩이 같은 사무실의 직원이라면, 멀티프로세싱은 각각 독립된 사무실을 운영하는 것입니다. 각 사무실에는 자체 컴퓨터(GIL)가 있으므로 동시에 일할 수 있습니다!\n\n**내부 동작**: `Process` 인스턴스가 생성되지만, 아직 실제 OS 프로세스는 만들어지지 않습니다. `start()`를 호출해야 fork/spawn됩니다.\n\n**왜 이 순서인가?** 프로세스를 먼저 생성(준비)하고, 시간 측정 시작 후 동시에 실행합니다.\n\n**주의**: `multiprocessing`에서는 `target` 함수와 인자가 **직렬화(pickle)**될 수 있어야 합니다. 람다 함수나 로컬 함수는 직렬화가 안 될 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "p1 = multiprocessing.Process(target=countdown)",
         "highlightOffset": [
@@ -213,7 +213,7 @@
       },
       {
         "title": "결과 확인: 진정한 병렬 처리",
-        "explanation": "**`print(f\"Two processes: {duration:.4f}s\")`**\n\n**결과를 확인합니다.** 멀티프로세싱으로 실행한 시간은 약 **1.3초**로, 싱글 프로세스(2.5초)의 **절반 수준**입니다!\n\n**성능 비교 정리:**\n| 방식 | 시간 | 이유 |\n|------|------|------|\n| 싱글 프로세스 | ~2.5초 | 기준선 |\n| 멀티스레딩 (2개) | ~5.0초 | GIL 때문에 오히려 느림! |\n| 멀티프로세싱 (2개) | ~1.3초 | 진정한 병렬 -> 절반으로 단축! |\n\n**왜 정확히 절반이 아닌가?**\n- 프로세스 생성/종료에 오버헤드가 있습니다\n- OS의 프로세스 스케줄링에도 시간이 소요됩니다\n- 그래서 이론적 절반(1.25초)보다 약간 더 걸립니다\n\n**비유**: 두 개의 독립된 사무실에서 동시에 돌을 세니, 시간이 거의 절반으로 줄었습니다. 약간의 추가 시간은 사무실을 세팅하는 데 든 비용입니다.\n\n**핵심 결론:**\n- **I/O 작업** (파일, 네트워크, DB) -> `threading` 사용 (GIL 해제되므로 효과적)\n- **CPU 작업** (계산, 데이터 처리) -> `multiprocessing` 사용 (GIL 우회)\n\n**왜 이 순서인가?** 실험의 마지막 단계로, 결과를 확인하고 의미를 해석합니다.",
+        "explanation": "**`print(f\"Two processes: {duration:.4f}s\")`**\n\n**결과를 확인합니다.** 멀티프로세싱으로 실행한 시간은 약 **1.3초**로, 싱글 프로세스(2.5초)의 **절반 수준**입니다!\n\n**성능 비교 정리:**\n\n**왜 정확히 절반이 아닌가?**\n- 프로세스 생성/종료에 오버헤드가 있습니다\n- OS의 프로세스 스케줄링에도 시간이 소요됩니다\n- 그래서 이론적 절반(1.25초)보다 약간 더 걸립니다\n\n**비유**: 두 개의 독립된 사무실에서 동시에 돌을 세니, 시간이 거의 절반으로 줄었습니다. 약간의 추가 시간은 사무실을 세팅하는 데 든 비용입니다.\n\n**핵심 결론:**\n- **I/O 작업** (파일, 네트워크, DB) -> `threading` 사용 (GIL 해제되므로 효과적)\n- **CPU 작업** (계산, 데이터 처리) -> `multiprocessing` 사용 (GIL 우회)\n\n**왜 이 순서인가?** 실험의 마지막 단계로, 결과를 확인하고 의미를 해석합니다.",
         "visualizationType": "pythonMemory",
         "code": "duration = time.time() - start",
         "occurrence": 2,

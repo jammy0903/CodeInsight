@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`** — 표준 입출력 헤더입니다.\n\n이번 레슨에서는 **Dangling Pointer(댕글링 포인터)**를 배웁니다. 'Dangling'은 '매달려 있는', '덜렁거리는'이라는 뜻으로, 해제된 메모리를 여전히 가리키고 있는 포인터를 말합니다. 끊어진 밧줄에 매달려 있는 것처럼, 언제 떨어질지(에러가 발생할지) 모르는 위험한 상태입니다.\n\n이전 레슨(Memory Leak)에서는 `free`를 안 해서 생기는 문제를 배웠고, 이번에는 반대로 `free`를 **한 후에** 포인터를 계속 사용하면 생기는 문제를 다룹니다.\n\nDangling Pointer는 메모리 누수보다 더 위험할 수 있습니다. 프로그램이 즉시 죽거나, 더 나쁘게는 잘못된 데이터로 조용히 동작할 수 있기 때문입니다.",
+        "explanation": "표준 입출력 헤더입니다.\n\n이번 레슨은 해제된 메모리를 계속 가리키는 dangling pointer 문제를 다룹니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,13 +16,13 @@
       },
       {
         "title": "stdlib.h 헤더 포함",
-        "explanation": "**`#include <stdlib.h>`** — `malloc`과 `free`를 사용하기 위한 표준 라이브러리 헤더입니다.\n\nDangling Pointer가 발생하는 대표적인 3가지 상황이 있습니다: `free` 후에 포인터를 계속 사용(이번 레슨의 주제), 함수의 지역 변수 주소를 반환(c-4-5에서 다룸), 변수의 유효 범위(scope) 밖에서 접근. 셋 다 '이미 사라진 메모리를 가리키는 포인터' 문제입니다.",
+        "explanation": "`malloc`/`free` 사용을 위한 헤더입니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`** — 프로그램 시작점입니다. `main`의 스택 프레임이 생성됩니다.\n\n이번 레슨의 흐름: `malloc`으로 할당 → 값 저장 → `free`로 해제(**Dangling Pointer 발생!**) → `p = NULL`로 해결.\n\n`free(p)` 후에 `p`는 어떤 상태일까요? `p` 변수 자체는 스택에 그대로 남아있고, `p`의 값(주소)도 그대로 유지되지만, 그 주소가 가리키는 힙 메모리는 이미 해제되었습니다. 이것이 Dangling Pointer의 본질입니다.",
+        "explanation": "main 프레임이 생성되고, 할당 -> 해제 -> 안전 처리 흐름을 확인합니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -36,7 +36,7 @@
       },
       {
         "title": "힙 메모리 할당",
-        "explanation": "**`int *p = (int*)malloc(sizeof(int));`** — 힙에 4바이트를 할당하고, 그 주소를 포인터 `p`에 저장합니다.\n\n스택에 `p`(주소 0x1000)가 있고, 값으로 `0xHEAP`(힙 주소)을 가지고 있습니다. 힙에는 4바이트 공간이 `???`(초기화 안 됨) 상태로 존재합니다.\n\n호텔에서 방을 배정받고 방 키(포인터 `p`)를 받은 상태입니다. 방(힙 메모리)은 존재하고, 키(`p`)도 유효합니다. 이 시점에서 `*p`로 안전하게 데이터를 읽고 쓸 수 있습니다.",
+        "explanation": "힙에서 정수 1개 공간을 할당하고 포인터 `p`에 주소를 저장합니다.",
         "visualizationType": "cMemory",
         "code": "int *p = (int*)malloc(sizeof(int));",
         "stack": [
@@ -57,7 +57,7 @@
       },
       {
         "title": "힙 메모리에 값 저장",
-        "explanation": "**`*p = 10;`** — 포인터 `p`가 가리키는 힙 메모리에 정수 10을 저장합니다.\n\n`???`이었던 공간에 깔끔하게 10이 들어갑니다. 지금은 `p`가 유효한 힙 주소를 가리키고, 힙에 값 10이 안전하게 저장된 정상 상태입니다.\n\n호텔 방에 짐(10)을 풀어놓은 상태입니다. 아직 체크아웃 전이라 방을 자유롭게 사용할 수 있습니다.\n\n하지만 곧 `free`가 호출되면서 상황이 완전히 달라집니다...",
+        "explanation": "`*p = 10;`으로 힙 값 초기화를 완료합니다.",
         "visualizationType": "cMemory",
         "code": "*p = 10;",
         "heap": [
@@ -71,7 +71,7 @@
       },
       {
         "title": "메모리 해제와 댕글링 포인터 발생",
-        "explanation": "**`free(p);`** — `p`가 가리키던 힙 메모리를 반납합니다. **이 순간 `p`는 Dangling Pointer가 됩니다!**\n\n힙의 0xHEAP 공간이 시스템에 반환되어 다른 `malloc`에 재사용될 수 있습니다. 하지만 `free`는 포인터 변수 `p`를 삭제하지도, 값을 바꾸지도, `NULL`로 초기화하지도 않습니다. **`p`는 여전히 `0xHEAP`이라는 주소를 가지고 있지만, 그 주소의 메모리는 이미 없습니다.**\n\n호텔 체크아웃(`free`) 후에도 방 키(`p`)를 돌려주지 않은 상태입니다. 키는 내 주머니에 있지만, 그 방은 청소되어 다른 손님에게 배정될 수 있습니다. 이 키로 문을 열려 하면 문제가 생깁니다.\n\n이 상태에서 `*p`를 쓰면 **Undefined Behavior**: 운이 좋으면 10이 아직 남아있을 수도 있지만(신뢰 불가), 운이 나쁘면 엉뚱한 값이 나오거나 프로그램이 죽고, 최악의 경우 다른 변수의 메모리를 덮어씁니다.",
+        "explanation": "`free(p)` 후 힙 블록은 해제되지만 `p` 값은 그대로 남아 dangling 상태가 됩니다.\n\n이 포인터를 역참조하면 Undefined Behavior가 발생합니다.",
         "visualizationType": "cMemory",
         "code": "free(p);",
         "stack": [
@@ -87,7 +87,7 @@
       },
       {
         "title": "댕글링 포인터 방지 (해결책)",
-        "explanation": "**`p = NULL;`** — Dangling Pointer를 방지하는 가장 간단하고 효과적인 해결책입니다.\n\n`NULL`은 **'아무것도 가리키지 않음'**을 나타내는 특별한 값(0)입니다. 이렇게 하면 `p`가 더 이상 해제된 메모리를 가리키지 않게 됩니다. 만약 실수로 `*p`를 사용해도, Dangling Pointer일 때는 조용히 잘못된 동작(찾기 매우 어려운 버그)이 일어나지만, NULL일 때는 즉시 Segmentation Fault가 발생하여 **버그를 빨리 발견**할 수 있습니다.\n\n호텔 방 키를 반납(NULL 설정)한 것과 같습니다. 키가 없으니 실수로 다시 방에 들어가려 해도 \"키가 없습니다\"라는 명확한 에러가 나옵니다.\n\nC 프로그래머의 생존 습관: `free(p);` 다음 줄에 `p = NULL;`을 절대 빼먹지 마세요. `if (p != NULL)` 검사로 포인터 유효성을 확인한 후 사용하는 패턴도 함께 쓰면 더 안전합니다.",
+        "explanation": "`p = NULL;`로 포인터를 무효화해 재사용 위험을 줄입니다.\n\n해제 직후 NULL 대입은 가장 기본적인 방어 습관입니다.",
         "visualizationType": "cMemory",
         "code": "p = NULL;",
         "stack": [
@@ -101,7 +101,7 @@
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`** — 프로그램이 정상 종료됩니다.\n\nDangling Pointer가 위험한 이유는 해제된 메모리를 읽으면 쓰레기 값이, 쓰면 다른 데이터를 덮어쓰고, 이미 다른 `malloc`에 재할당된 메모리를 오염시킬 수 있기 때문입니다.\n\n예방법은 단순합니다: `free(p);` 직후 `p = NULL;`, 사용 전 `if (p != NULL)` 검사. C++에서는 스마트 포인터(unique_ptr, shared_ptr)가 이를 자동으로 처리해줍니다.\n\nC언어는 프로그래머에게 많은 자유를 주지만, 그만큼 **책임**도 큽니다. `free` 후 `NULL` 설정은 C 프로그래머의 필수 매너입니다.",
+        "explanation": "`return 0;`으로 종료합니다.\n\n핵심: free 후 포인터는 즉시 NULL로 정리합니다.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []

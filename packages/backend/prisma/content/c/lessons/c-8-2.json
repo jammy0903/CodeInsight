@@ -1,7 +1,7 @@
 {
   "lessonId": "c-8-2",
   "title": "Implementing Callbacks",
-  "concept": "Core concept for Implementing Callbacks",
+  "concept": "함수 포인터를 인자로 넘겨 실행 시점을 위임하는 콜백 패턴",
   "content": {
     "code": "#include <stdio.h>\n\nvoid greet() {\n    printf(\"Hello!\\n\");\n}\n\nvoid execute(void (*func)()) {\n    printf(\"Executing callback...\\n\");\n    func();\n}\n\nint main() {\n    execute(greet);\n    return 0;\n}",
     "steps": [
@@ -40,7 +40,7 @@
         "title": "main에서 execute 호출 - 함수를 인자로 전달",
         "explanation": "**`execute(greet);`** — `greet`이라는 함수 이름이 자동으로 함수 포인터(주소 `0xCODE1`)로 변환되어 `execute`에 전달됩니다. `execute` 내부에서 매개변수 `func`에 이 주소가 복사되고, `func()`을 호출하면 `greet`이 실행됩니다.\n\n호출 흐름은 `main` → `execute(greet)` → `execute` 내부의 `func()` → `greet` 실행 → `main` 복귀입니다. `greet`이 직접 호출되지 않고 `execute`에게 전달된 후 \"다시 호출(call back)\"되기 때문에 콜백이라 부릅니다.\n\n친구에게 \"밥 먹을 때 나한테도 연락해줘\"라고 전화번호를 건네는 것과 같습니다. 내가 직접 가는 게 아니라, 친구가 적절한 시점에 나를 불러주는 구조입니다.",
         "visualizationType": "cMemory",
-        "code": "int main() {",
+        "code": "execute(greet);",
         "stack": [
           {
             "name": "func",
@@ -68,7 +68,7 @@
         "title": "프로그램 종료",
         "explanation": "**`return 0;`** — `execute` → `main` → 프로그램 종료 순으로 복귀합니다.\n\n정리하면: **콜백**이란 함수를 다른 함수에게 인자로 전달하여 나중에 호출되게 하는 패턴입니다. 함수 포인터를 매개변수로 선언(`void execute(void (*func)())`)하고, 함수 이름을 인자로 전달(`execute(greet)`)하면, 받는 쪽은 전달된 함수가 무엇인지 몰라도 호출할 수 있습니다.\n\n실무에서는 정렬, 이벤트 처리, 비동기 작업 완료 알림 등에 광범위하게 사용됩니다.",
         "visualizationType": "cMemory",
-        "code": "execute(greet);",
+        "code": "return 0;",
         "stack": []
       }
     ],

@@ -10,15 +10,28 @@
         "explanation": "**`class AgeError(Exception):`** -- `Exception`을 상속받아 **나만의 에러 클래스** `AgeError`를 정의합니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `class` 문이 실행되면, Python은 새로운 **타입(type) 객체**를 메모리에 생성합니다.\n\n**왜 커스텀 예외를 만들까?** `ValueError`같은 내장 예외는 너무 일반적입니다. \"값이 잘못됐다\"는 정보만으로는 **어떤** 값이 **왜** 잘못됐는지 알기 어렵습니다. 커스텀 예외를 만들면:\n- \"나이가 잘못됐다\"는 **구체적인 의미**를 담을 수 있습니다\n- 에러에 **추가 정보**(잘못된 나이값)를 속성으로 저장할 수 있습니다\n- `except AgeError:`로 **정확히 이 에러만** 잡을 수 있습니다\n\n**비유:** 병원에서 \"아프다\"(Exception)보다 \"팔이 부러졌다\"(AgeError)라고 말하는 게 훨씬 정확합니다. 게다가 \"왼팔이 3군데 부러졌다\"(self.age=200)처럼 구체적인 정보까지 전달할 수 있습니다.\n\n**클래스 내부 구조:**\n- **`def __init__(self, age):`** -- 에러 생성 시 호출되는 초기화 메서드\n- **`self.age = age`** -- 잘못된 나이값을 인스턴스 속성으로 저장 (나중에 `e.age`로 접근 가능)\n- **`super().__init__(f\"Invalid age: {age}\")`** -- 부모 클래스(Exception)의 `__init__`을 호출하여 에러 메시지를 설정\n\n**Python 내부 동작:** `class` 문이 실행되면 메타클래스 `type`이 호출되어 새로운 클래스 객체를 생성합니다. `AgeError`의 MRO(Method Resolution Order)는 `AgeError → Exception → BaseException → object`입니다. 전역 네임스페이스에 `{\"AgeError\": <AgeError 클래스 객체>}`가 등록됩니다.\n\n**주의:** 커스텀 예외는 반드시 `Exception` 또는 그 하위 클래스를 상속받아야 합니다. `BaseException`을 직접 상속받으면 `except Exception:`으로 잡히지 않으므로 권장하지 않습니다.\n\n**실행 순서:** `class AgeError(Exception):` 실행 → `type` 객체 생성 → `__init__`, `super().__init__` 메서드 정의 → 전역 네임스페이스에 등록",
         "visualizationType": "pythonMemory",
         "code": "class AgeError(Exception):",
-        "highlightOffset": [0, 1, 2, 3],
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
         "pythonMemoryState": {
           "output": [],
           "note": "커스텀 예외 클래스 정의됨",
           "names": [
-            { "name": "AgeError", "pointsTo": "class1" }
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            }
           ],
           "objects": [
-            { "id": "class1", "type": "type", "value": "<class AgeError(Exception)>", "pyId": "4001" }
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            }
           ]
         }
       },
@@ -27,17 +40,39 @@
         "explanation": "**`def check_age(age):`** -- 나이를 검증하는 함수를 정의합니다. `function` 객체가 생성되고 `check_age`라는 이름표가 붙습니다.\n\n이 함수의 핵심 로직은 **입력값 검증(validation)**입니다:\n- `age < 0` 또는 `age > 150`이면 → **AgeError를 raise**합니다\n- 유효한 나이이면 → 성공 메시지를 return합니다\n\n**`raise`란?** except가 에러를 **잡는(catch)** 것이라면, raise는 에러를 **일부러 발생시키는(throw)** 것입니다.\n```python\nraise 에러클래스(인자)  # 에러를 직접 발생시킴\n```\n\n**비유:** raise는 축구 심판의 **레드카드**와 같습니다. 선수(코드)가 반칙(잘못된 입력)을 하면, 심판(raise)이 경기를 즉시 중단시키고 퇴장(에러 발생)시킵니다. 심판이 없으면 반칙이 그냥 넘어가서 경기(프로그램)가 엉망이 될 수 있습니다.\n\n**Python 내부 동작:** `def` 문이 실행되면 함수의 바이트코드가 코드 객체로 컴파일됩니다. `raise` 문은 `RAISE_VARARGS` 바이트코드 명령어로 컴파일됩니다. 이 시점에서는 함수가 정의만 되고, 내부 코드는 실행되지 않습니다.\n\n**왜 raise를 쓸까?** 잘못된 입력이 들어왔을 때 그냥 넘어가면, 나중에 예상치 못한 곳에서 더 큰 문제가 발생할 수 있습니다. \"이 값은 안 돼!\"라고 **즉시, 명확하게 알려주는 것**이 프로그램의 안정성을 높입니다. 이것을 **\"빠르게 실패하기(Fail Fast)\"** 원칙이라고 합니다.\n\n**실행 순서:** `def check_age(age):` → 함수 객체 생성 → 다음 줄(try 블록)으로 이동",
         "visualizationType": "pythonMemory",
         "code": "def check_age(age):",
-        "highlightOffset": [0, 1, 2],
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
         "pythonMemoryState": {
           "output": [],
           "note": "check_age 함수 정의됨",
           "names": [
-            { "name": "AgeError", "pointsTo": "class1" },
-            { "name": "check_age", "pointsTo": "func1", "highlight": true }
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1",
+              "highlight": true
+            }
           ],
           "objects": [
-            { "id": "class1", "type": "type", "value": "<class AgeError(Exception)>", "pyId": "4001" },
-            { "id": "func1", "type": "function", "value": "<function check_age>", "pyId": "4002", "highlight": true }
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002",
+              "highlight": true
+            }
           ]
         }
       },
@@ -50,14 +85,40 @@
           "output": [],
           "note": "age=200, 200 > 150 → 조건 True!",
           "names": [
-            { "name": "AgeError", "pointsTo": "class1" },
-            { "name": "check_age", "pointsTo": "func1" },
-            { "name": "age", "pointsTo": "int1", "highlight": true }
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1",
+              "highlight": true
+            }
           ],
           "objects": [
-            { "id": "class1", "type": "type", "value": "<class AgeError(Exception)>", "pyId": "4001" },
-            { "id": "func1", "type": "function", "value": "<function check_age>", "pyId": "4002" },
-            { "id": "int1", "type": "int", "value": 200, "pyId": "4003", "highlight": true }
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 200,
+              "pyId": "4003",
+              "highlight": true
+            }
           ]
         }
       },
@@ -70,15 +131,45 @@
           "output": [],
           "note": "raise AgeError(200) - 에러 발생!",
           "names": [
-            { "name": "AgeError", "pointsTo": "class1" },
-            { "name": "check_age", "pointsTo": "func1" },
-            { "name": "age", "pointsTo": "int1" }
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            }
           ],
           "objects": [
-            { "id": "class1", "type": "type", "value": "<class AgeError(Exception)>", "pyId": "4001" },
-            { "id": "func1", "type": "function", "value": "<function check_age>", "pyId": "4002" },
-            { "id": "int1", "type": "int", "value": 200, "pyId": "4003" },
-            { "id": "err1", "type": "AgeError", "value": "\"Invalid age: 200\"", "pyId": "4004", "highlight": true }
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 200,
+              "pyId": "4003"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\"",
+              "pyId": "4004",
+              "highlight": true
+            }
           ]
         }
       },
@@ -88,37 +179,91 @@
         "visualizationType": "pythonMemory",
         "code": "    print(f\"Caught: {e}\")",
         "pythonMemoryState": {
-          "output": ["Caught: Invalid age: 200"],
+          "output": [
+            "Caught: Invalid age: 200"
+          ],
           "note": "AgeError 잡힘! e로 에러 정보 접근 가능",
           "names": [
-            { "name": "AgeError", "pointsTo": "class1" },
-            { "name": "check_age", "pointsTo": "func1" },
-            { "name": "e", "pointsTo": "err1", "highlight": true }
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "e",
+              "pointsTo": "err1",
+              "highlight": true
+            }
           ],
           "objects": [
-            { "id": "class1", "type": "type", "value": "<class AgeError(Exception)>", "pyId": "4001" },
-            { "id": "func1", "type": "function", "value": "<function check_age>", "pyId": "4002" },
-            { "id": "err1", "type": "AgeError", "value": "\"Invalid age: 200\"", "pyId": "4004", "highlight": true }
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\"",
+              "pyId": "4004",
+              "highlight": true
+            }
           ]
         }
       },
       {
         "title": "에러 객체의 속성 접근",
-        "explanation": "**`print(f\"Invalid value was: {e.age}\")`** -- 커스텀 예외 클래스에 저장해둔 **`age` 속성**에 점(`.`) 연산자로 접근합니다.\n\n`e.age`는 **200**입니다. `__init__`에서 `self.age = age`로 저장했기 때문입니다. 이것이 커스텀 예외의 핵심 가치입니다!\n\n**비유:** 교통사고 보고서(에러 객체)를 작성할 때, 단순히 \"사고 발생\"(일반 Exception)이라고만 쓰는 것보다 \"과속(200km/h)으로 인한 사고\"(AgeError with age=200)라고 쓰는 것이 훨씬 유용합니다. 보고서의 세부 항목(e.age)을 통해 정확한 상황을 파악할 수 있습니다.\n\n**Python 내부 동작:** `e.age` 접근은 Python의 **속성 조회(attribute lookup)** 메커니즘을 사용합니다. 먼저 `e.__dict__`에서 `\"age\"` 키를 찾고, 있으면 해당 값(200)을 반환합니다. 이 값은 `__init__`에서 `self.age = age`로 설정된 인스턴스 속성입니다.\n\n**커스텀 예외 vs 내장 예외 비교:**\n| 항목 | 내장 예외 (ValueError) | 커스텀 예외 (AgeError) |\n|---|---|---|\n| 의미 | 일반적인 \"값 에러\" | \"나이값이 잘못됨\" (구체적) |\n| 추가 정보 | 에러 메시지 문자열뿐 | `age` 속성으로 직접 접근 가능 |\n| 분류 | 다른 ValueError와 구분 어려움 | `except AgeError:`로 정확히 잡기 가능 |\n| 활용 | 메시지 파싱 필요 | `e.age`로 바로 값 사용 가능 |\n\n**주의:** 커스텀 예외에 너무 많은 로직을 넣지 마세요. 예외 클래스는 **에러 정보를 담는 데이터 컨테이너** 역할에 집중해야 합니다. 복잡한 처리 로직은 except 블록에서 수행하세요.\n\n**실행 순서 (전체 정리):**\n1. `class AgeError` → 커스텀 예외 클래스 정의\n2. `def check_age` → 검증 함수 정의\n3. `try:` → 예외 감시 시작\n4. `check_age(200)` → 함수 호출, `age=200`\n5. `if 200 > 150:` → 조건 True!\n6. `raise AgeError(200)` → **에러 직접 발생!**\n7. `except AgeError as e:` → 매칭 성공, `e`에 바인딩\n8. `print(f\"Caught: {e}\")` → 에러 메시지 출력\n9. `print(f\"Invalid value was: {e.age}\")` → 커스텀 속성 접근",
+        "explanation": "**`print(f\"Invalid value was: {e.age}\")`** -- 커스텀 예외 클래스에 저장해둔 **`age` 속성**에 점(`.`) 연산자로 접근합니다.\n\n`e.age`는 **200**입니다. `__init__`에서 `self.age = age`로 저장했기 때문입니다. 이것이 커스텀 예외의 핵심 가치입니다!\n\n**비유:** 교통사고 보고서(에러 객체)를 작성할 때, 단순히 \"사고 발생\"(일반 Exception)이라고만 쓰는 것보다 \"과속(200km/h)으로 인한 사고\"(AgeError with age=200)라고 쓰는 것이 훨씬 유용합니다. 보고서의 세부 항목(e.age)을 통해 정확한 상황을 파악할 수 있습니다.\n\n**Python 내부 동작:** `e.age` 접근은 Python의 **속성 조회(attribute lookup)** 메커니즘을 사용합니다. 먼저 `e.__dict__`에서 `\"age\"` 키를 찾고, 있으면 해당 값(200)을 반환합니다. 이 값은 `__init__`에서 `self.age = age`로 설정된 인스턴스 속성입니다.\n\n**커스텀 예외 vs 내장 예외 비교:**\n\n**주의:** 커스텀 예외에 너무 많은 로직을 넣지 마세요. 예외 클래스는 **에러 정보를 담는 데이터 컨테이너** 역할에 집중해야 합니다. 복잡한 처리 로직은 except 블록에서 수행하세요.\n\n**실행 순서 (전체 정리):**\n1. `class AgeError` → 커스텀 예외 클래스 정의\n2. `def check_age` → 검증 함수 정의\n3. `try:` → 예외 감시 시작\n4. `check_age(200)` → 함수 호출, `age=200`\n5. `if 200 > 150:` → 조건 True!\n6. `raise AgeError(200)` → **에러 직접 발생!**\n7. `except AgeError as e:` → 매칭 성공, `e`에 바인딩\n8. `print(f\"Caught: {e}\")` → 에러 메시지 출력\n9. `print(f\"Invalid value was: {e.age}\")` → 커스텀 속성 접근",
         "visualizationType": "pythonMemory",
         "code": "    print(f\"Invalid value was: {e.age}\")",
         "pythonMemoryState": {
-          "output": ["Invalid value was: 200"],
+          "output": [
+            "Invalid value was: 200"
+          ],
           "note": "e.age = 200 (커스텀 속성 접근)",
           "names": [
-            { "name": "AgeError", "pointsTo": "class1" },
-            { "name": "check_age", "pointsTo": "func1" },
-            { "name": "e", "pointsTo": "err1" }
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "e",
+              "pointsTo": "err1"
+            }
           ],
           "objects": [
-            { "id": "class1", "type": "type", "value": "<class AgeError(Exception)>", "pyId": "4001" },
-            { "id": "func1", "type": "function", "value": "<function check_age>", "pyId": "4002" },
-            { "id": "err1", "type": "AgeError", "value": "\"Invalid age: 200\" (age=200)", "pyId": "4004" }
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\" (age=200)",
+              "pyId": "4004"
+            }
           ]
         }
       }

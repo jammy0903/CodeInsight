@@ -3,7 +3,7 @@
   "title": "주소 연산자(&)와 sizeof",
   "concept": "모든 변수는 메모리 어딘가에 살고, 자기만의 크기가 있다",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int num = 42;\n    char ch = 'A';\n\n    printf(\"Address of num: %p\\n\", &num);\n    printf(\"Address of ch:  %p\\n\", &ch);\n\n    printf(\"Size of num: %lu bytes\\n\", sizeof(num));\n    printf(\"Size of ch:  %lu bytes\\n\", sizeof(ch));\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int num = 42;\n    char ch = 'A';\n\n    printf(\"Address of num: %p\\n\", &num);\n    printf(\"Address of ch:  %p\\n\", &ch);\n\n    printf(\"Size of num: %zu bytes\\n\", sizeof(num));\n    printf(\"Size of ch:  %zu bytes\\n\", sizeof(ch));\n    return 0;\n}",
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
@@ -30,7 +30,7 @@
       },
       {
         "title": "정수 변수 선언",
-        "explanation": "```int```는 **4바이트**(= 32비트)짜리 정수 타입으로, 약 **-21억 ~ +21억** 범위를 표현한다. 1바이트 = 8비트이고, ```int```는 1바이트짜리 칸 4개를 묶어 쓴다.\n\n오른쪽 시각화에서 ```num```이 주소 ```0x1004```에 위치한 것을 확인하자. 이 주소가 변수의 **메모리 상 '집 주소'**다.\n\n아파트 101호(주소 0x1004)에 입주한 4인 가족(4바이트)이 42라는 이름표를 달고 있는 셈이다.\n\n이 '주소' 개념이 이번 레슨의 핵심이다 — 곧 ```&``` 연산자로 이 주소를 직접 꺼내볼 것이다.",
+        "explanation": "`int num = 42;`는 정수 변수 num을 만들고 값을 저장합니다.\n\n핵심은 변수마다 메모리 주소가 있다는 점이며, 다음 단계에서 `&num`으로 그 주소를 확인합니다.",
         "visualizationType": "cMemory",
         "code": "int num = 42;",
         "stack": [
@@ -44,7 +44,7 @@
       },
       {
         "title": "문자 변수 선언",
-        "explanation": "```char```는 **1바이트**짜리 문자 타입 — ```int```(4바이트)의 1/4 크기다. 컴퓨터는 숫자만 이해하므로, ```'A'```는 **ASCII 코드표**에 따라 실제로 숫자 ```65```로 저장된다.\n\n사물함에 이름표 대신 번호표를 붙이는 것과 같다. ```'A'``` 대신 65가 저장되고, 출력할 때 65를 다시 'A'로 해석한다. ```'B'```=66, ```'a'```=97, ```'0'```=48이다.\n\n작은따옴표 ```'A'```는 **문자 하나**, 큰따옴표 ```\"A\"```는 **문자열**이다. ```char``` 변수에는 작은따옴표만 담을 수 있다.\n\n```int```와 ```char```의 크기 차이(4바이트 vs 1바이트)를 기억하자 — 곧 ```sizeof```로 이 차이를 직접 측정해볼 것이다.",
+        "explanation": "`char ch = 'A';`는 1바이트 문자 변수를 생성합니다.\n\n문자는 내부적으로 숫자 코드로 저장되며, `'A'`(문자)와 `\"A\"`(문자열)는 타입이 다릅니다.",
         "visualizationType": "cMemory",
         "code": "char ch = 'A';",
         "stack": [
@@ -64,7 +64,7 @@
       },
       {
         "title": "num의 주소 출력",
-        "explanation": "이 줄의 핵심은 **```&```(주소 연산자)**다. ```num``` → 값(42), ```&num``` → 주소(0x1004). 같은 변수인데 ```&```를 붙이느냐에 따라 완전히 다른 정보를 얻는다.\n\n```%p```는 **주소 서식 지정자**로, 주소를 16진수(0~9, a~f) 형태로 출력한다.\n\n\"철수가 누구야?\" → 특징(값), \"철수네 집 어디야?\" → 주소. ```num```은 전자, ```&num```은 후자다.\n\n이 주소 개념이 나중에 **포인터**의 기초가 된다. 포인터는 다른 변수의 주소를 저장하는 변수인데, 그 출발점이 바로 ```&```다.",
+        "explanation": "`&num`은 num의 값이 아니라 메모리 주소를 뜻합니다.\n\n주소 출력에는 `%p`를 사용하며, 이 개념이 포인터 학습의 출발점입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Address of num: %p\\n\", &num);",
         "stdout": "Address of num: 0x1004"
@@ -78,16 +78,16 @@
       },
       {
         "title": "num의 크기 출력 (sizeof)",
-        "explanation": "**```sizeof```**는 변수가 메모리에서 **몇 바이트를 차지하는지** 알려주는 연산자다. 함수처럼 생겼지만 실제로는 **컴파일 시점**에 계산된다. ```num```은 ```int```이므로 → **4바이트**.\n\n부동산에서 방의 **평수**를 재는 줄자와 같다. ```&```가 \"어디 사니?\"라면, ```sizeof```는 \"몇 평이야?\"다.\n\n```%lu```는 ```sizeof```가 반환하는 타입(```unsigned long```)에 맞는 서식 지정자다.\n\n출력: ```Size of num: 4 bytes```",
+        "explanation": "`sizeof`는 대상 타입/변수의 바이트 크기를 반환합니다. `num`은 `int`이므로 보통 4바이트가 출력됩니다.\n\n`sizeof`의 반환 타입은 `size_t`이므로 출력 포맷은 `%zu`를 쓰는 것이 맞습니다.",
         "visualizationType": "cMemory",
-        "code": "printf(\"Size of num: %lu bytes\\n\", sizeof(num));",
+        "code": "printf(\"Size of num: %zu bytes\\n\", sizeof(num));",
         "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000\nSize of num: 4 bytes"
       },
       {
         "title": "ch의 크기 출력 (sizeof)",
-        "explanation": "```char```는 C 표준에 의해 **모든 시스템에서 무조건 1바이트**다. 사실 C에서 '1바이트'의 정의 자체가 ```sizeof(char)```다. 반면 ```int```는 시스템에 따라 2 또는 4바이트로 달라질 수 있다.\n\n64비트 시스템 기준 크기 비교: ```char``` 1, ```short``` 2, ```int``` 4, ```long``` 8, ```float``` 4, ```double``` 8바이트.\n\n정리하면 ```&변수```는 **주소**(\"어디 사니?\", ```%p```로 출력), ```sizeof(변수)```는 **크기**(\"몇 바이트?\", ```%lu```로 출력)다.\n\n나중에 배열을 ```sizeof```에 넣으면 배열 **전체** 크기가 나온다는 점도 기억해두자.",
+        "explanation": "`sizeof(ch)`는 1입니다. C에서 `char`는 바이트의 기준 타입이라 항상 크기 1을 가집니다.\n\n정리하면 `&변수`는 주소, `sizeof(변수)`는 크기입니다. 포인터 학습 전 꼭 구분해두세요.",
         "visualizationType": "cMemory",
-        "code": "printf(\"Size of ch:  %lu bytes\\n\", sizeof(ch));",
+        "code": "printf(\"Size of ch:  %zu bytes\\n\", sizeof(ch));",
         "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000\nSize of num: 4 bytes\nSize of ch:  1 bytes"
       },
       {

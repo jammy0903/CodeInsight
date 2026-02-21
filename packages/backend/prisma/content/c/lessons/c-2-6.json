@@ -3,7 +3,7 @@
   "title": "포인터 타입과 크기",
   "concept": "포인터는 가리키는 대상의 타입에 따라 해석 방법이 달라진다",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    char c = 'A';\n\n    int *pi = &a;\n    char *pc = &c;\n\n    printf(\"Size of int*:  %lu\\n\", sizeof(pi));\n    printf(\"Size of char*: %lu\\n\", sizeof(pc));\n\n    printf(\"Read int*:  %d\\n\", *pi);\n    printf(\"Read char*: %c\\n\", *pc);\n    return 0;\n}",
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    char c = 'A';\n\n    int *pi = &a;\n    char *pc = &c;\n\n    printf(\"Size of int*:  %zu\\n\", sizeof(pi));\n    printf(\"Size of char*: %zu\\n\", sizeof(pc));\n\n    printf(\"Read int*:  %d\\n\", *pi);\n    printf(\"Read char*: %c\\n\", *pc);\n    return 0;\n}",
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
@@ -30,7 +30,7 @@
       },
       {
         "title": "변수 선언",
-        "explanation": "```int a = 10``` — **4바이트**(```0x1000``` ~ ```0x1003```)에 정수 10 저장. ```char c = 'A'``` — **1바이트**(```0x1004```)에 문자 'A'(ASCII 65) 저장.\n\n```int```는 큰 금고(4바이트)에 숫자를 보관하는 것이고, ```char```는 작은 서랍(1바이트)에 글자 하나를 보관하는 것이다. 크기는 다르지만 둘 다 '방 번호(주소)'가 있다는 점은 같다.\n\n이 **크기 차이**를 기억하자 — 나중에 포인터가 역참조할 때, 이 차이가 '몇 바이트를 읽을지' 결정한다.",
+        "explanation": "`int a = 10`, `char c = 'A'`로 서로 다른 타입 값을 준비합니다.\n\n이 둘은 크기와 해석 방식이 다르며, 포인터 타입 차이를 설명하는 기준 데이터가 됩니다.",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "highlightOffset": [
@@ -54,7 +54,7 @@
       },
       {
         "title": "포인터 선언",
-        "explanation": "```int *pi = &a``` — '```int```형 주소를 담는 포인터'에 ```a```의 주소(```0x1000```) 저장. ```char *pc = &c``` — '```char```형 주소를 담는 포인터'에 ```c```의 주소(```0x1004```) 저장.\n\n둘 다 메모리 주소(숫자)를 저장한다는 점은 같다. 차이는 역참조 시의 **해석 방법**: ```*pi``` = '이 주소부터 **4바이트** 읽어서 **정수**로 해석', ```*pc``` = '이 주소에서 **1바이트**만 읽어서 **문자**로 해석'.\n\n같은 지도(주소)라도 '큰 금고 지도(```int*```)'와 '작은 서랍 지도(```char*```)'에 따라 도착해서 여는 크기가 다르다.",
+        "explanation": "`pi`는 `a`의 주소를, `pc`는 `c`의 주소를 저장합니다.\n\n두 변수 모두 주소를 담는 포인터지만, 역참조 시 읽는 크기와 해석 방식은 타입(`int*`/`char*`)에 따라 달라집니다.",
         "visualizationType": "cMemory",
         "code": "int *pi = &a;",
         "highlightOffset": [
@@ -92,35 +92,35 @@
       },
       {
         "title": "int 포인터의 크기",
-        "explanation": "```sizeof(pi)```는 포인터 변수 ```pi``` **자체**의 크기다 — 가리키는 대상(```int```, 4바이트)의 크기가 아니다!\n\n64비트 시스템에서 메모리 주소는 64비트(= **8바이트**) 숫자이므로, 주소를 저장하는 포인터도 8바이트가 필요하다. 결과: ```8```.\n\n편지 봉투(포인터)의 크기는 안에 든 내용물(가리키는 대상)과 관계없이 항상 같다. 두꺼운 책이든 얇은 엽서든 봉투 크기는 동일하다.",
+        "explanation": "`sizeof(pi)`는 `pi`가 가리키는 대상이 아니라 포인터 변수 자체의 크기입니다.\n\n포인터 크기는 시스템 아키텍처에 따라 달라지며, 64비트에선 보통 8바이트입니다.",
         "visualizationType": "cMemory",
-        "code": "printf(\"Size of int*:  %lu\\n\", sizeof(pi));",
+        "code": "printf(\"Size of int*:  %zu\\n\", sizeof(pi));",
         "stdout": "Size of int*:  8"
       },
       {
         "title": "char 포인터의 크기",
-        "explanation": "```char*```인 ```pc```도 결과는 **8바이트** — ```int*```와 같다!\n\n이것이 첫 번째 핵심 발견: **모든 포인터 변수의 크기는 동일**하다. ```int*```, ```char*```, ```double*```, ```void*``` 전부. 포인터에 저장되는 건 **메모리 주소(숫자)**이고, 주소 길이는 시스템 아키텍처가 결정하기 때문이다 (64비트 → 8바이트, 32비트 → 4바이트).\n\n그러면 크기가 같은데 굳이 ```int*```, ```char*```를 구분하는 이유는? 다음 단계에서 확인한다.",
+        "explanation": "`sizeof(pc)`도 같은 환경에서는 `sizeof(pi)`와 동일합니다.\n\n즉 포인터 크기는 대상 타입보다 아키텍처의 주소 크기에 의해 결정됩니다.",
         "visualizationType": "cMemory",
-        "code": "printf(\"Size of char*: %lu\\n\", sizeof(pc));",
+        "code": "printf(\"Size of char*: %zu\\n\", sizeof(pc));",
         "stdout": "Size of int*:  8\nSize of char*: 8"
       },
       {
         "title": "int 포인터로 값 읽기",
-        "explanation": "```*pi``` 실행 시: ```pi```의 타입이 ```int*```이므로 주소 ```0x1000```에서 **4바이트**를 읽어 **정수**로 해석 → 결과 ```10```.\n\n타입 정보가 없다면 주소에 도착해도 '몇 바이트를 읽어야 하지? 1? 4? 8?'를 알 수 없다. 포인터의 타입은 역참조 시 **읽는 범위**와 **해석 방법** 두 가지를 결정한다.\n\n같은 창고에 도착해도 ```int*``` 지도에는 '큰 상자 1개(4바이트) 꺼내기'라고 적혀있고, ```char*``` 지도에는 '작은 봉투 1개(1바이트) 꺼내기'라고 적혀있는 셈이다.",
+        "explanation": "`*pi`는 `int*` 규칙대로 해당 주소를 정수로 읽어 값 10을 얻습니다.\n\n포인터 타입은 역참조 시 데이터를 어떤 형태로 해석할지 결정합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Read int*:  %d\\n\", *pi);",
         "stdout": "Size of int*:  8\nSize of char*: 8\nRead int*:  10"
       },
       {
         "title": "char 포인터로 값 읽기",
-        "explanation": "```*pc``` 실행 시: ```pc```의 타입이 ```char*```이므로 주소 ```0x1004```에서 **1바이트**만 읽어 **문자(ASCII)**로 해석 → 결과 ```'A'```.\n\n같은 ```*``` 연산인데 타입에 따라 읽는 바이트 수가 다르다: ```*pi```(```int*```) → 4바이트/정수, ```*pc```(```char*```) → 1바이트/문자. **이것이 포인터 타입이 존재하는 진짜 이유다.**\n\n모든 택배 트럭(포인터)의 크기는 같지만, 트럭에 붙은 **라벨(타입)**에 따라 배달지에서 꺼내는 물건의 크기가 다르다.\n\n타입이 잘못되면 엉뚱한 크기만큼 읽어서 쓰레기 값이 나올 수 있다. 예를 들어 ```char``` 변수의 주소를 ```int*```에 넣고 역참조하면 의도치 않은 데이터가 읽힌다.",
+        "explanation": "`*pc`는 `char*` 규칙대로 문자를 읽어 `A`를 얻습니다.\n\n같은 주소 연산이라도 포인터 타입이 다르면 읽기 단위와 해석 결과가 달라집니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Read char*: %c\\n\", *pc);",
         "stdout": "Size of int*:  8\nSize of char*: 8\nRead int*:  10\nRead char*: A"
       },
       {
         "title": "프로그램 종료",
-        "explanation": "```return 0``` — 스택 프레임이 제거되면서 모든 변수가 사라진다.\n\n핵심 정리: 포인터 크기는 모두 **동일**(64비트 → 8바이트)하지만, 타입은 역참조 시 **몇 바이트를 어떻게 읽을지** 결정하는 지도의 범례 역할을 한다. 다음 챕터에서는 이 개념이 **배열과 포인터 연산**에서 어떻게 활용되는지 배운다!",
+        "explanation": "`return 0;`으로 종료되며 스택 변수들이 정리됩니다.\n\n정리하면 포인터 크기는 환경 의존적이지만, 타입은 역참조 해석 규칙을 결정합니다.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
