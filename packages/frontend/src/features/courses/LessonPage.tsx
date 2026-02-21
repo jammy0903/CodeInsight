@@ -11,7 +11,7 @@ import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, ArrowLeft, Flag } from 'lucide-react';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { updateProgress } from '@/services/courses';
 import { useStore } from '@/stores/store';
 
@@ -26,7 +26,6 @@ import { useCodeSelection } from './hooks/useCodeSelection';
 import { LessonUnifiedView } from './components/LessonUnifiedView';
 import { LessonCompletedView } from './components/LessonCompletedView';
 import { LessonQuizModal } from './components/LessonQuizModal';
-import { ReportModal } from '@/components/ReportModal';
 
 // --- 간단한 상태 뷰 ---
 
@@ -66,7 +65,6 @@ export function LessonPage() {
   const queryClient = useQueryClient();
   const appUser = useStore((s) => s.appUser);
   const refreshStreak = useStore((s) => s.refreshStreak);
-  const [reportOpen, setReportOpen] = React.useState(false);
   const [resetCount, setResetCount] = React.useState(0);
 
   // 1. 데이터 패칭
@@ -145,6 +143,9 @@ export function LessonPage() {
   // --- 렌더 ---
   return (
     <div className="lesson-page-container">
+      {/* 신고 UI는 의도적으로 LessonPage에 두지 않는다.
+          플로팅 버튼은 하단 내비(Prev/Next)와 충돌 가능성이 있어 제거했고,
+          신고 진입은 Sidebar에서만 제공한다. */}
       {navigation.phase === 'completed' ? (
         <LessonCompletedView
           lessonOrder={lesson.order}
@@ -162,29 +163,6 @@ export function LessonPage() {
           onSelectionChange={setSelection}
         />
       )}
-
-      {/* 레슨 신고 버튼 */}
-      {navigation.phase !== 'completed' && (
-        <button
-          onClick={() => setReportOpen(true)}
-          className="fixed bottom-4 right-4 z-40 p-2 rounded-full opacity-40 hover:opacity-100 transition-opacity"
-          style={{
-            backgroundColor: 'var(--theme-layout-footer-social-bg)',
-            color: 'var(--theme-layout-footer-text-muted)',
-          }}
-          title={t('report.lesson_title')}
-        >
-          <Flag className="w-4 h-4" />
-        </button>
-      )}
-
-      {/* 레슨 신고 모달 */}
-      <ReportModal
-        open={reportOpen}
-        onOpenChange={setReportOpen}
-        type="lesson"
-        lessonId={lessonId}
-      />
 
       {/* 퀴즈 모달 */}
       {quiz && (

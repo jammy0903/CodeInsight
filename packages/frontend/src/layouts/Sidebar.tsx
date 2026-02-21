@@ -10,12 +10,14 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3 } from 'lucide-react';
+import { useState } from 'react';
+import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, Flag } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle, loginWithKakao } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
+import { ReportModal } from '@/components/ReportModal';
 import { logger } from '@/utils/logger';
 
 const SIDEBAR_WIDTH = 224; // 14rem
@@ -41,12 +43,15 @@ const AUTH_NAV_ITEMS: NavItem[] = [
 export function Sidebar() {
   const location = useLocation();
   const { t } = useTranslation();
+  const [reportOpen, setReportOpen] = useState(false);
   const sidebarOpen = useStore((s) => s.sidebarOpen);
   const toggleSidebar = useStore((s) => s.toggleSidebar);
   const firebaseUser = useStore((s) => s.firebaseUser);
   const appUser = useStore((s) => s.appUser);
   const needsRegistration = useStore((s) => s.needsRegistration);
   const isAdmin = appUser?.role === 'admin';
+  const lessonRouteMatch = location.pathname.match(/^\/courses\/[^/]+\/[^/]+\/([^/]+)$/);
+  const lessonId = lessonRouteMatch?.[1];
 
   const handleSignOut = async () => {
     await logout();
@@ -431,10 +436,49 @@ export function Sidebar() {
                 </div>
               )}
               </div>
+              {/* Design decision:
+                  신고 진입은 디바이스(모바일/데스크톱)와 페이지(레슨/일반) 관계없이
+                  항상 사이드바 한 곳에서만 노출한다.
+                  이유: 하단 고정 Next/Previous 네비와의 충돌/겹침을 방지하고
+                  신고 액션 위치를 일관되게 유지하기 위함. */}
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                onClick={() => {
+                  setReportOpen(true);
+                  toggleSidebar();
+                }}
+                className="w-full mt-3 flex items-center gap-3 px-4 h-12 rounded-lg border transition-all duration-150"
+                style={{
+                  backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)',
+                  borderColor: 'var(--theme-sidebar-nav-inactive-border)',
+                  color: 'var(--theme-sidebar-nav-inactive-text)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
+                  e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
+                  e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
+                }}
+              >
+                <Flag className="w-5 h-5 shrink-0" />
+                <span className="text-sm">{t('report.lesson_title')}</span>
+              </motion.button>
             </nav>
           </motion.aside>
         </>
       )}
+      <ReportModal
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        // 레슨 상세 경로에서는 lesson 신고, 그 외 경로에서는 general 문의로 라우팅
+        type={lessonId ? 'lesson' : 'general'}
+        lessonId={lessonId}
+      />
     </AnimatePresence>
   );
 }
