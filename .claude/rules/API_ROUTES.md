@@ -9,7 +9,11 @@
 | Courses | /courses | modules/courses/routes.ts |
 | Users | /users | modules/users/routes.ts |
 | Analytics | /analytics | modules/analytics/routes.ts |
-| AI | /ai | modules/ai/routes.ts |
 | Admin | /admin | modules/admin/admin.routes.ts |
+| Gamification | /gamification | modules/gamification/routes.ts |
+| Notes | /notes | modules/notes/routes.ts |
+| Reports | /reports | modules/reports/routes.ts |
+| Submissions | /submissions | modules/submissions/routes.ts |
+| Standalone Quizzes | /standalone-quizzes | modules/standalone-quizzes/routes.ts |
 
 See full endpoint list in this file.

@@ -33,6 +33,13 @@ pnpm test         # Run tests
 pnpm --filter @codeinsight/frontend dev
 ```
 
+## 🚫 Do Not Delete
+Root-level AI agent config files must NOT be deleted or moved:
+- `AGENTS.md`, `SOUL.md`, `IDENTITY.md`, `HEARTBEAT.md`, `BOOTSTRAP.md`, `USER.md`, `TOOLS.md`
+- `.ralphrc`, `.ralph/`
+
+These belong to another AI agent (Ralph) and are required to stay in the project root.
+
 ## 📚 Reference
 - `context/project_overview.md` - Project details
 - `context/tech_stack.md` - Technology

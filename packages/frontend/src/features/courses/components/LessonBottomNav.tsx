@@ -24,6 +24,8 @@ export function LessonBottomNav({
   onQuiz,
 }: LessonBottomNavProps) {
   const { t } = useTranslation();
+  const prevText = t('common.previous');
+  const quizText = t('lesson.quiz');
 
   return (
     <div
@@ -34,15 +36,15 @@ export function LessonBottomNav({
         right: 0,
         zIndex: 40,
         padding: '6px 12px',
-        paddingBottom: 'max(6px, env(safe-area-inset-bottom))',
-        backgroundColor: 'color-mix(in srgb, var(--theme-lesson-nav-bg) 75%, transparent)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        paddingBottom: 'max(10px, env(safe-area-inset-bottom))',
+        backgroundColor: 'color-mix(in srgb, var(--theme-lesson-nav-bg) 68%, transparent)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         borderTop: '1px solid var(--theme-lesson-nav-border)',
       }}
     >
-      <div style={{ display: 'flex', gap: '8px', maxWidth: '600px', margin: '0 auto' }}>
-        {/* 이전 버튼 */}
+      <div style={{ display: 'flex', alignItems: 'center', maxWidth: '720px', margin: '0 auto' }}>
+        {/* 이전 버튼 - 왼쪽 정렬, 터치 영역은 넓게 */}
         <button
           onClick={onPrev}
           disabled={!canGoPrev}
@@ -50,83 +52,86 @@ export function LessonBottomNav({
             flex: 1,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '4px',
-            padding: '8px 0',
-            borderRadius: '10px',
-            fontSize: '13px',
+            justifyContent: 'flex-start',
+            gap: '6px',
+            minHeight: '48px',
+            padding: '0 10px',
+            borderRadius: '12px',
+            fontSize: '12px',
             fontWeight: 600,
-            border: `1.5px solid var(${canGoPrev
-              ? '--theme-lesson-nav-prev-border'
-              : '--theme-lesson-nav-prev-disabled-border'})`,
-            backgroundColor: `var(${canGoPrev
-              ? '--theme-lesson-nav-prev-bg'
-              : '--theme-lesson-nav-prev-disabled-bg'})`,
+            border: 'none',
+            backgroundColor: 'transparent',
             color: `var(${canGoPrev
               ? '--theme-lesson-nav-prev-text'
               : '--theme-lesson-nav-prev-disabled-text'})`,
             cursor: canGoPrev ? 'pointer' : 'not-allowed',
-            transition: 'all 0.15s ease',
+            transition: 'color 0.15s ease, opacity 0.15s ease',
+            opacity: canGoPrev ? 0.95 : 0.45,
+            WebkitTapHighlightColor: 'transparent',
           }}
-          aria-label={t('common.previous')}
+          aria-label={prevText}
         >
           <ChevronLeft style={{ width: 16, height: 16 }} />
-          <span>{t('common.previous')}</span>
+          <span>{prevText}</span>
         </button>
 
-        {/* 다음 버튼 — 강조 */}
+        {/* 퀴즈 버튼 - 중앙 미니멀 pill */}
+        {onQuiz && (
+          <button
+            onClick={onQuiz}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              minHeight: '40px',
+              padding: '0 12px',
+              borderRadius: '999px',
+              fontSize: '11px',
+              fontWeight: 700,
+              border: '1px solid color-mix(in srgb, var(--theme-lesson-nav-next-bg) 36%, transparent)',
+              backgroundColor: 'color-mix(in srgb, var(--theme-lesson-nav-next-bg) 8%, transparent)',
+              color: 'var(--theme-lesson-nav-next-bg)',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+              opacity: 0.88,
+              WebkitTapHighlightColor: 'transparent',
+            }}
+            aria-label={quizText}
+          >
+            <Zap style={{ width: 12, height: 12 }} />
+            <span>{quizText}</span>
+          </button>
+        )}
+
+        {/* 다음 버튼 - 오른쪽 정렬, 터치 영역은 넓게 */}
         <button
           onClick={onNext}
           style={{
             flex: 1,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '4px',
-            padding: '8px 0',
-            borderRadius: '10px',
-            fontSize: '13px',
+            justifyContent: 'flex-end',
+            gap: '6px',
+            minHeight: '48px',
+            padding: '0 10px',
+            borderRadius: '12px',
+            fontSize: '12px',
             fontWeight: 700,
             border: 'none',
-            backgroundColor: 'var(--theme-lesson-nav-next-bg)',
-            color: 'var(--theme-lesson-nav-next-text)',
+            backgroundColor: 'transparent',
+            color: 'var(--theme-lesson-nav-prev-text)',
             cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            boxShadow: 'var(--theme-lesson-nav-next-shadow)',
+            transition: 'color 0.15s ease, opacity 0.15s ease',
+            opacity: 0.96,
+            WebkitTapHighlightColor: 'transparent',
           }}
           aria-label={nextLabel}
         >
           <span>{nextLabel}</span>
           <ChevronRight style={{ width: 16, height: 16 }} />
         </button>
-
-        {/* 바로 퀴즈풀기 버튼 — 반투명 */}
-        {onQuiz && (
-          <button
-            onClick={onQuiz}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '3px',
-              padding: '8px 10px',
-              borderRadius: '10px',
-              fontSize: '11px',
-              fontWeight: 600,
-              border: '1px solid var(--theme-lesson-nav-next-bg)',
-              backgroundColor: 'color-mix(in srgb, var(--theme-lesson-nav-next-bg) 15%, transparent)',
-              color: 'var(--theme-lesson-nav-next-bg)',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-              opacity: 0.75,
-            }}
-            aria-label={t('lesson.quiz')}
-          >
-            <Zap style={{ width: 12, height: 12 }} />
-            <span>{t('lesson.quiz')}</span>
-          </button>
-        )}
       </div>
     </div>
   );

@@ -3,8 +3,8 @@
  *
  * 백업 파일에서 사용자 데이터를 복원합니다.
  *
- * 실행: npx ts-node prisma/restore-user-data.ts [backup-file.json]
- * 예시: npx ts-node prisma/restore-user-data.ts backups/backup-2024-01-15-12-30-00.json
+ * 실행: npx ts-node prisma/restore-user-data.ts [backup-file.json]        ← dry-run (미리보기)
+ *       npx ts-node prisma/restore-user-data.ts [backup-file.json] --apply ← 실제 실행
  */
 
 import 'dotenv/config';
@@ -13,6 +13,10 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+
+const args = process.argv.slice(2);
+const applyFlag = args.includes('--apply');
+const fileArg = args.find(a => a !== '--apply');
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
 console.log('📁 Database:', connectionString.replace(/:[^:@]+@/, ':***@'));
@@ -23,7 +27,7 @@ const prisma = new PrismaClient({ adapter });
 
 async function restore() {
   // 백업 파일 경로 가져오기
-  let backupFile = process.argv[2];
+  let backupFile = fileArg;
 
   if (!backupFile) {
     // 최신 백업 파일 자동 선택
@@ -61,9 +65,35 @@ async function restore() {
   const data = JSON.parse(fs.readFileSync(backupFile, 'utf-8'));
 
   console.log(`  📅 Backup time: ${data.backupTime}`);
-  console.log('  🔄 Restoring user data...\n');
 
-  let restored = {
+  // Dry-run: 요약만 보여주고 종료
+  const summary = {
+    users: (data.users || []).length,
+    userProfiles: (data.userProfiles || []).length,
+    userProgress: (data.userProgress || []).length,
+    userStreaks: (data.userStreaks || []).length,
+    userNotes: (data.userNotes || []).length,
+    quizAttempts: (data.quizAttempts || []).length,
+    lessonActivities: (data.lessonActivities || []).length,
+    stepActivities: (data.stepActivities || []).length,
+    sessionContexts: (data.sessionContexts || []).length,
+    chatHistories: (data.chatHistories || []).length,
+  };
+
+  console.log('\n  📊 Backup contains:');
+  for (const [key, count] of Object.entries(summary)) {
+    console.log(`     - ${key}: ${count}`);
+  }
+
+  if (!applyFlag) {
+    console.log('\n⚠️  DRY-RUN: 실제 복원하려면 --apply 플래그를 추가하세요.');
+    console.log('   예: npx ts-node prisma/restore-user-data.ts --apply');
+    return;
+  }
+
+  console.log('\n  🔄 Restoring user data (--apply)...\n');
+
+  const restored = {
     users: 0,
     userProfiles: 0,
     userProgress: 0,
@@ -220,16 +250,9 @@ async function restore() {
   }
 
   console.log('  ✅ Restore stats:');
-  console.log(`     - Users: ${restored.users}`);
-  console.log(`     - UserProfiles: ${restored.userProfiles}`);
-  console.log(`     - UserProgress: ${restored.userProgress}`);
-  console.log(`     - UserStreaks: ${restored.userStreaks}`);
-  console.log(`     - UserNotes: ${restored.userNotes}`);
-  console.log(`     - QuizAttempts: ${restored.quizAttempts}`);
-  console.log(`     - LessonActivities: ${restored.lessonActivities}`);
-  console.log(`     - StepActivities: ${restored.stepActivities}`);
-  console.log(`     - SessionContexts: ${restored.sessionContexts}`);
-  console.log(`     - ChatHistories: ${restored.chatHistories}`);
+  for (const [key, count] of Object.entries(restored)) {
+    console.log(`     - ${key}: ${count}`);
+  }
 
   console.log('\n✅ Restore complete!');
 }

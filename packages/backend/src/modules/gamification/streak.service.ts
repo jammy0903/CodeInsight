@@ -177,25 +177,3 @@ export async function updateStreak(userId: string) {
   });
 }
 
-/**
- * 스트릭 리셋 (관리자용)
- */
-export async function resetStreak(userId: string) {
-  return prisma.$transaction(async (tx: any) => {
-    const streak = await tx.userStreak.findUnique({
-      where: { userId },
-    });
-
-    if (!streak) {
-      return null;
-    }
-
-    return tx.userStreak.update({
-      where: { userId },
-      data: {
-        currentStreak: 0,
-        lastActiveAt: null,
-      },
-    });
-  });
-}

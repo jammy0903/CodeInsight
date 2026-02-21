@@ -120,15 +120,14 @@ export function LessonCodePanel({
         className="flex items-center justify-center shrink-0"
         style={{
           ...(isHorizontal
-            ? { width: '6px', cursor: 'col-resize' }
-            : { height: '6px', cursor: 'row-resize' }),
-          background: 'var(--theme-lesson-panel-border)',
+            ? { width: '6px', cursor: 'col-resize', background: 'var(--theme-lesson-panel-border)' }
+            : { height: '24px', cursor: 'row-resize', background: 'transparent' }),
           touchAction: 'none',
         }}
       >
         <div style={isHorizontal
           ? { width: '3px', height: '32px', borderRadius: '2px', background: 'var(--theme-lesson-editor-header-text)', opacity: 0.4 }
-          : { width: '32px', height: '3px', borderRadius: '2px', background: 'var(--theme-lesson-editor-header-text)', opacity: 0.4 }
+          : { width: '48px', height: '4px', borderRadius: '3px', background: 'var(--theme-lesson-editor-header-text)', opacity: 0.35 }
         } />
       </div>
 

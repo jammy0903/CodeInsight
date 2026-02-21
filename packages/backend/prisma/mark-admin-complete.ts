@@ -4,13 +4,16 @@
  * 어드민 사용자의 모든 레슨을 완료 상태로 업데이트합니다.
  * 테스트/데모 용도로 빠르게 진행상황을 채우기 위해 사용합니다.
  *
- * 실행: npx ts-node prisma/mark-admin-complete.ts
+ * 실행: npx ts-node prisma/mark-admin-complete.ts          ← dry-run (미리보기)
+ *       npx ts-node prisma/mark-admin-complete.ts --apply  ← 실제 실행
  */
 
 import 'dotenv/config';
 import { PrismaClient } from '.prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
+
+const applyFlag = process.argv.includes('--apply');
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://codeinsight:codeinsight123@localhost:5432/codeinsight';
 console.log('📁 Database:', connectionString.replace(/:[^:@]+@/, ':***@'));
@@ -43,7 +46,23 @@ async function markAdminComplete() {
     select: { id: true, title: true },
   });
 
-  console.log(`\n  📚 Found ${lessons.length} lessons\n`);
+  console.log(`\n  📚 Found ${lessons.length} lessons`);
+
+  if (!applyFlag) {
+    // Dry-run: 영향 범위만 보여줌
+    for (const admin of admins) {
+      const existing = await prisma.userProgress.count({
+        where: { userId: admin.id, status: 'completed' },
+      });
+      console.log(`\n  📊 ${admin.nickname}: 현재 ${existing}/${lessons.length} 완료`);
+      console.log(`     → ${lessons.length - existing}개 레슨이 새로 완료 처리됩니다.`);
+    }
+    console.log('\n⚠️  DRY-RUN: 실제 실행하려면 --apply 플래그를 추가하세요.');
+    console.log('   예: npx ts-node prisma/mark-admin-complete.ts --apply');
+    return;
+  }
+
+  console.log('\n  ⚙️  Applying changes (--apply)...\n');
 
   // 3. 각 어드민 사용자에 대해 모든 레슨을 완료로 마크
   for (const admin of admins) {
@@ -79,10 +98,11 @@ async function markAdminComplete() {
           },
         });
 
-        if (progress.completedAt?.toString() !== new Date().toString()) {
-          updated++;
-        } else {
+        // createdAt === updatedAt → 새로 생성, 다르면 기존 레코드 업데이트
+        if (progress.createdAt.getTime() === progress.updatedAt.getTime()) {
           completed++;
+        } else {
+          updated++;
         }
       } catch (e) {
         console.log(`     ⚠️  Skipped ${lesson.id}: ${(e as Error).message}`);

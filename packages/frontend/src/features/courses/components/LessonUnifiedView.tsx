@@ -212,7 +212,7 @@ export function LessonUnifiedView({
         className={isMobile ? '' : 'rounded-xl overflow-hidden'}
         style={{
           ...(isMobile
-            ? { height: 'calc(100svh - 64px)', minHeight: '400px', margin: '5px' }
+            ? { height: 'calc(100svh - 64px)', minHeight: '400px', margin: '4px 0' }
             : { border: '1px solid var(--theme-lesson-panel-border)', marginTop: '1rem' }),
         }}
       >

@@ -68,7 +68,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
         {/* Footer - 스크롤 영역 안에 배치 */}
         {!isPlaygroundPage && (
-          <footer className="mt-8 py-2 border-t border-t-[var(--theme-layout-footer-border)]" style={{ backgroundColor: 'var(--theme-layout-footer-bg)' }}>
+          <footer className="mt-8 py-2 border-t border-t-[var(--theme-layout-footer-border)]" style={{ backgroundColor: 'var(--theme-layout-footer-bg)', paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
             <div className="main-content-container my-2">
               {/* 2열 레이아웃 */}
               <div className="flex flex-row items-center justify-between gap-4">

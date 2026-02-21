@@ -51,6 +51,7 @@ export function TopBar() {
       style={{
         background: 'var(--theme-layout-top-bar-bg)',
         borderBottom: '1px solid var(--theme-layout-top-bar-border)',
+        paddingTop: 'env(safe-area-inset-top)',
       }}
     >
       {/* Row 1: 3분할 레이아웃 (왼쪽: 로고, 중앙: 제목, 오른쪽: 액션) */}

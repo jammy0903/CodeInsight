@@ -64,32 +64,7 @@ export const gamificationRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
 
-  /**
-   * @swagger
-   * /api/gamification/streak/update:
-   *   post:
-   *     tags: [Gamification]
-   *     summary: 스트릭 업데이트 (수동, 테스트용)
-   *     security:
-   *       - bearerAuth: []
-   *     description: 일반적으로 레슨 완료 시 자동 호출됨
-   *     responses:
-   *       200:
-   *         description: 업데이트된 스트릭
-   */
-  fastify.post('/streak/update', { preHandler: [fastify.requireDbUser] }, async (request, reply) => {
-    try {
-      const userId = request.user!.dbUser!.id;
-      const streak = await streakService.updateStreak(userId);
-
-      return {
-        currentStreak: streak.currentStreak,
-        longestStreak: streak.longestStreak,
-        lastActiveAt: streak.lastActiveAt,
-      };
-    } catch (error) {
-      logger.error('Failed to update streak:', error);
-      return reply.status(500).send({ error: 'Failed to update streak' });
-    }
-  });
+  // NOTE: POST /streak/update 제거됨 (2026-02)
+  // 스트릭은 레슨 완료 시 courses/service.ts에서 자동 호출됨.
+  // 수동 트리거는 보안 위험 (아무 유저나 streak 조작 가능).
 };
