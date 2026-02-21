@@ -3,7 +3,19 @@
  * 연속 학습일(스트릭) 추적 및 관리
  *
  * WHY: Duolingo 연구 - 7일 스트릭 도달 시 유지율 2.4배 증가
- * TRADEOFF: UTC 기준 날짜 계산 (시간대 무관 일관성)
+ *
+ * ## API 응답 계약 (계산값 vs 저장값)
+ *
+ * DB `user_streaks.current_streak`는 마지막 updateStreak() 호출 시점의 값을 유지한다.
+ * 스트릭이 끊겨도 DB 값은 즉시 0으로 바뀌지 않는다.
+ *
+ * API 응답(`checkStreakStatus`)은 현재 시점 기준으로 계산한 "유효 스트릭"을 반환한다:
+ * - lastActiveAt이 오늘 → DB 값 그대로
+ * - lastActiveAt이 어제 → DB 값 그대로 (streakAtRisk: true)
+ * - lastActiveAt이 그 이전 → currentStreak: 0 (DB에는 아직 이전 값 유지)
+ *
+ * DB 값이 실제로 리셋되는 시점: 다음 레슨 완료 시 updateStreak()에서 1로 초기화.
+ * 이 지연은 의도적 설계 — 불필요한 DB write를 방지하고, 유저가 돌아오면 자연스럽게 리셋된다.
  */
 
 import { prisma } from '../../config/database';
@@ -76,6 +88,9 @@ export async function getStreak(userId: string) {
 
 /**
  * 스트릭 상태 확인 (UI 표시용)
+ *
+ * 반환하는 currentStreak는 DB 저장값이 아닌 현재 시점 기준 계산값이다.
+ * 스트릭이 끊긴 경우 0을 반환하지만, DB의 current_streak 컬럼은 변경하지 않는다.
  */
 export async function checkStreakStatus(userId: string): Promise<StreakStatus> {
   const streak = await getStreak(userId);
