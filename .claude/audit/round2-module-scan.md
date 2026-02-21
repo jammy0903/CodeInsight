@@ -75,35 +75,35 @@
 
 ---
 
-## REMAINING (미처리 — 향후 작업)
+## REMAINING (미처리 — 코드 대조 검증 완료 2026-02-16)
 
-### 🔵 DESIGN ISSUES (리팩토링 — 코드 변경 없이 메모만)
+### 🔵 DESIGN ISSUES (10건 — 전부 검증 완료)
 
-| # | Issue | Files | Impact |
-|---|-------|-------|--------|
-| D1 | `as any` 107회 | 31개 파일 | LessonStep discriminated union 필요 |
-| D2 | MemoryBlock 타입 4곳 중복 | types/memory.ts 외 3곳 | 단일 소스 통합 필요 |
-| D3 | parseValue() 3개 어댑터 중복 | JS/Java/C Transformer | 공통 유틸 추출 |
-| D4 | Transformer 패턴 중복 ~1,300 LOC | 4개 Transformer | BaseTransformer 추출 |
-| D5 | Store 중복 (authStore ↔ store.ts) | 3개 store 파일 | 마이그레이션 미완성 |
-| D6 | Quiz 데이터 하드코딩 ~1,890 LOC | 3개 QuizPage | JSON/API 분리 권장 |
-| D7 | PlaygroundPage 인라인 스타일 43개 | PlaygroundPage.tsx | TailwindCSS 규칙 위반 |
-| D8 | 시뮬레이터 모듈 진입점 불일치 | py/java/js index.ts | 표준화 필요 |
-| D9 | Users 중복 admin 인증 | users/routes.ts | fastify.requireAdmin 통합 |
-| D10 | mark-admin-complete.ts 타임스탬프 결함 | prisma script | toString 비교 로직 |
+| # | 심각도 | Issue | 검증 결과 | 권장 조치 |
+|---|--------|-------|-----------|-----------|
+| D1 | 중상 | `as any` **130회** (24개 파일) | Top: LessonFlowVisualizer(27), useLessonVisualization(18), LanguageCoursePage(9) | LessonStep discriminated union 타입 도입 |
+| D2 | 높음 | MemoryBlock 타입 **6곳** 중복 | types/memory.ts, shared/types.ts, CMemoryView.tsx, runtime/types.ts, schemas/course.ts, ai.ts — 필드 불일치 | shared MemoryBlock 단일 소스 통합 |
+| D3 | 중간 | parseValue() 3개 Transformer 중복 | JS(@N refs), Java(-> refs), C(hex) — ~70% 로직 동일 | 공통 유틸 + 언어별 모드 파라미터 |
+| D4 | 높음 | Transformer **1,343 LOC** 중복 | JS(360), Py(358), C(331), Java(294) — ~85% 구조 동일 | BaseTransformer 추상 클래스 추출 |
+| D5 | 중간 | authStore ↔ store.ts 중복 | authStore: 1개 파일만 import (store.ts 자체). store.ts: 30개 파일 import. 5개 필드 중복 | authStore 삭제, store.ts로 통합 |
+| D6 | 높음 | Quiz 하드코딩 **1,890+ LOC** | MultipleChoice(138 LOC), FillBlank(~133 LOC), Algorithm(대량) — OXQuiz만 API 사용 | JSON/API 분리 |
+| D7 | 중간 | PlaygroundPage 인라인 스타일 **43개** | `style={{` 43회 확인 — TailwindCSS 규칙 위반 | Tailwind 클래스로 전환 |
+| D8 | 낮음 | 시뮬레이터 진입점 불일치 | C: simulator.ts, Java/JS: *-simulation.service.ts, Python: index.ts(barrel) | 표준화 (낮은 우선순위) |
+| D9 | 낮음 | Admin 인증 인라인 | users/routes.ts에 requireAdmin() 인라인 정의, Fastify decorator 미등록 | fastify.requireAdmin 플러그인화 |
+| D10 | **버그** | mark-admin-complete.ts 타임스탬프 | `completedAt?.toString() !== new Date().toString()` — 항상 true, 카운터 완전히 깨짐 | **즉시 수정** 필요 |
 
-### 🟣 INCOMPLETE (미완성 기능 — 결정 필요)
+### 🟣 INCOMPLETE (8건 중 3건 해소, 5건 잔존)
 
-| # | File | What |
-|---|------|------|
-| I1 | `stores/lessonHistoryStore.ts` | STUB 구현 |
-| I2 | `executors/index.ts` | Python/Java/JS executor Phase 2 |
-| I3 | `ai/routes.ts` checkAIUsage | stub preHandler |
-| I4 | `Sidebar.tsx:281` | 닉네임 등록 모달 |
-| I5 | `variable.handler.ts:496` | 함수 호출 표현식 TODO |
-| I6 | `shared/types/course.ts` | Python 메모리 타입 Zod 스키마 없음 |
-| I7 | `shared/schemas/course.ts:247-248` | Java cache/hashSet `z.any()` |
-| I8 | `schema.prisma:90-101` | Draft 모델 미사용 |
+| # | 상태 | File | What | 권장 |
+|---|------|------|------|------|
+| ~~I3~~ | ✅ 해소 | `ai/routes.ts` | checkAIUsage 완전 구현됨 (구독 제거, 로그인 유저 무제한) | — |
+| ~~I6~~ | ✅ 해소 | `schemas/course.ts` | PyNameSchema, PyObjectSchema 이미 존재 | — |
+| ~~I8~~ | ✅ 해소 | `schema.prisma` | Draft 모델 users/routes.ts에서 활발히 사용 중 | — |
+| **I1** | 잔존 | `stores/lessonHistoryStore.ts` | addEntry/clear가 console.warn만 출력하는 STUB | 구현 또는 삭제 결정 |
+| **I2** | 잔존 | `executors/index.ts` | Python/Java/JS executor TODO만 존재, 구현 없음 | KEEP — Phase 2 블로커 |
+| **I4** | 잔존 | `Sidebar.tsx:281` | 닉네임 등록 버튼 onClick 빈 핸들러 + TODO 주석 | 모달 구현 또는 /profile 라우팅 |
+| **I5** | 잔존 | `variable.handler.ts:496` | callFunction() → null 반환, 시뮬레이터 연동 필요 | KEEP — 시뮬레이터 성숙 후 |
+| **I7** | 잔존 | `schemas/course.ts:247-248` | Java cache/hashSet `z.any().optional()` — 타입 안전성 없음 | 실제 Java JSON 분석 후 스키마 정의 |
 
 ---
 
@@ -114,7 +114,14 @@
 | 🔴 CRITICAL | 3 | ✅ 전부 완료 |
 | 🟠 HIGH | 5 | ✅ 전부 완료 |
 | 🟡 MEDIUM | 28 | ✅ 전부 완료 (1건 복구) |
-| 🔵 DESIGN | 10 | 📋 메모 (향후) |
-| 🟣 INCOMPLETE | 8 | 📋 결정 필요 |
+| 🔵 DESIGN | 10 | ✅ 검증 완료 — D10은 버그(즉시 수정 권장), 나머지 리팩토링 |
+| 🟣 INCOMPLETE | 8 → 5 | ✅ 3건 해소 (I3, I6, I8), 5건 잔존 |
 
 **총 제거: ~4,100+ LOC** (프론트 simulator 621 + GDB 2,114 + stale tests ~1,100 + 기타 ~300)
+
+### 우선순위 권장
+
+1. **즉시**: D10 타임스탬프 버그 수정
+2. **단기**: D5 authStore 삭제 (미사용), I1 lessonHistoryStore 결정 (구현/삭제)
+3. **중기**: D1 `as any` 정리 (LessonStep union 타입), D2 MemoryBlock 통합, D4 BaseTransformer
+4. **장기**: D6 Quiz API 분리, D7 Tailwind 전환, D3 parseValue 통합
