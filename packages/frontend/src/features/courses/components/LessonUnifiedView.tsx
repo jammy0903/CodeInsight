@@ -213,7 +213,7 @@ export function LessonUnifiedView({
         style={{
           ...(isMobile
             ? { height: 'calc(100svh - 64px)', minHeight: '400px', margin: '4px 0' }
-            : { height: 'calc(100vh - 80px)', border: '1px solid var(--theme-lesson-panel-border)', marginTop: '1rem' }),
+            : { height: 'calc(100vh - 80px)', position: 'sticky' as const, top: 0, border: '1px solid var(--theme-lesson-panel-border)', marginTop: '1rem' }),
         }}
       >
         {roundIndicator}
