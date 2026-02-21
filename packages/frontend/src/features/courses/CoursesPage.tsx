@@ -44,12 +44,12 @@ export function CoursesPage() {
         </p>
       </motion.div>
 
-      {/* 언어 카드 그리드 (5열) */}
+      {/* 언어 카드 그리드: 모바일 2열 / 데스크톱 3열 고정 */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="grid grid-cols-2 sm:grid-cols-3 gap-6 max-w-4xl mx-auto px-4 lg:px-16 xl:px-24"
+        className="grid grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto px-6 lg:px-20"
       >
         {STATIC_LANGUAGES.map((lang, index) => (
           <LanguageCard
