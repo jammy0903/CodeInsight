@@ -104,7 +104,7 @@
       },
       {
         "title": "동시 실행 작업 생성 (task)",
-        "explanation": "**`task1 = asyncio.create_task(say_after(1, 'hello'))`** — 코루틴을 **Task 객체**로 감싸서 이벤트 루프에 즉시 스케줄링합니다.\n\n이 한 줄에서 두 가지가 동시에 일어납니다:\n1. `say_after(1, 'hello')`가 호출되어 코루틴 객체가 생성됩니다\n2. `create_task()`가 이 코루틴을 Task로 감싸고 이벤트 루프에 등록합니다\n\n핵심은 **create_task()가 비차단(non-blocking)**이라는 점입니다. 이 줄을 실행하면 \"이 작업을 나중에 실행해줘\"라고 이벤트 루프에 예약만 해놓고, 코드는 멈추지 않고 바로 다음 줄로 넘어갑니다.\n\n비유하면, 식당에서 **주문서를 주방에 걸어두는 것**과 같습니다. 주문서를 걸었다고 음식이 바로 나오는 것이 아닙니다. 주방에서 시간이 되면 조리를 시작합니다. 그 동안 서버(우리 코드)는 다른 테이블의 주문을 계속 받을 수 있습니다.\n\n**create_task() vs await**: `await say_after(1, 'hello')`를 직접 쓰면 해당 코루틴이 완료될 때까지 기다립니다(순차 실행). 반면 `create_task()`는 예약만 하고 넘어가므로 여러 작업을 동시에 실행할 수 있게 됩니다.\n\n**내부 동작**: `create_task()`는 코루틴을 `asyncio.Task` 객체로 감싸고, 이벤트 루프의 ready 큐에 추가합니다. Task는 `asyncio.Future`의 서브클래스로, 완료 시 결과값이나 예외를 저장할 수 있습니다.\n\n**흔한 실수**: `create_task(say_after)` 처럼 코루틴 함수 자체를 전달하면 TypeError가 발생합니다. 반드시 `say_after(1, 'hello')`처럼 호출해서 코루틴 객체를 만든 후 전달해야 합니다.",
+        "explanation": "**`task1 = asyncio.create_task(say_after(1, 'hello'))`** — 코루틴을 **Task 객체**로 감싸서 이벤트 루프에 즉시 스케줄링합니다.\n\n이 한 줄에서 두 가지가 동시에 일어납니다:\n1. `say_after(1, 'hello')`가 호출되어 코루틴 객체가 생성됩니다\n2. `create_task()`가 이 코루틴을 Task로 감싸고 이벤트 루프에 등록합니다\n\n핵심은 **create_task()가 비차단(non-blocking)**이라는 점입니다. 이 줄을 실행하면 \"이 작업을 나중에 실행해줘\"라고 이벤트 루프에 예약만 해놓고, 코드는 멈추지 않고 바로 다음 줄로 넘어갑니다.\n\n비유하면, 식당에서 **주문서를 주방에 걸어두는 것**과 같습니다. 주문서를 걸었다고 음식이 바로 나오는 것이 아닙니다. 주방에서 시간이 되면 조리를 시작합니다. 그 동안 서버(우리 코드)는 다른 테이블의 주문을 계속 받을 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "task1 = asyncio.create_task(say_after(1, 'hello'))",
         "pythonMemoryState": {

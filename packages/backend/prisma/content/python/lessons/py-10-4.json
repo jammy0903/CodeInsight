@@ -94,7 +94,7 @@
       },
       {
         "title": "동시 실행 및 결과 수집 (gather)",
-        "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** — 3개의 코루틴을 **동시에 실행**하고, 모든 결과를 **리스트로 수집**합니다.\n\n`gather()`의 동작 과정을 단계별로 살펴봅시다:\n1. `fetch_data(1, 2)` 호출 → 코루틴 객체 생성 (아직 실행 안 됨)\n2. `fetch_data(2, 1)` 호출 → 코루틴 객체 생성\n3. `fetch_data(3, 3)` 호출 → 코루틴 객체 생성\n4. `gather()`가 세 코루틴을 각각 Task로 감싸서 이벤트 루프에 등록\n5. `await`를 만나 main()이 일시정지 → 세 Task가 동시에 실행 시작\n\n**gather()의 핵심 특징 두 가지**:\n- **동시 실행**: 전달된 모든 코루틴을 한꺼번에 스케줄링합니다\n- **결과 순서 보장**: 코루틴을 전달한 순서대로 결과 리스트를 반환합니다. task_2가 가장 먼저 끝나더라도, results[0]은 fetch_data(1,2)의 결과입니다\n\n비유하면, 레스토랑에서 3개 테이블의 주문을 동시에 조리하되, 완성된 요리를 **테이블 번호 순서대로** 트레이에 올려놓는 것입니다. 2번 테이블 요리가 먼저 나와도, 1번 위치에 1번 테이블 요리가 올라갑니다.\n\n**create_task와의 비교**: gather는 내부적으로 각 코루틴에 대해 `create_task()`를 호출합니다. 차이점은 gather가 모든 결과를 리스트로 모아 반환하고, 에러 처리 옵션(`return_exceptions=True`)도 제공한다는 것입니다.\n\n**주의**: gather에 코루틴이 아닌 일반 값을 전달하면 그 값이 그대로 결과에 포함됩니다. 하지만 이렇게 사용하는 것은 혼란을 줄 수 있으므로 권장하지 않습니다.",
+        "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** — 3개의 코루틴을 **동시에 실행**하고, 모든 결과를 **리스트로 수집**합니다.\n\n`gather()`의 동작 과정을 단계별로 살펴봅시다:\n1. `fetch_data(1, 2)` 호출 → 코루틴 객체 생성 (아직 실행 안 됨)\n2. `fetch_data(2, 1)` 호출 → 코루틴 객체 생성\n3. `fetch_data(3, 3)` 호출 → 코루틴 객체 생성\n4. `gather()`가 세 코루틴을 각각 Task로 감싸서 이벤트 루프에 등록\n5. `await`를 만나 main()이 일시정지 → 세 Task가 동시에 실행 시작\n\n**gather()의 핵심 특징 두 가지**:\n- **동시 실행**: 전달된 모든 코루틴을 한꺼번에 스케줄링합니다\n- **결과 순서 보장**: 코루틴을 전달한 순서대로 결과 리스트를 반환합니다. task_2가 가장 먼저 끝나더라도, results[0]은 fetch_data(1,2)의 결과입니다\n\n비유하면, 레스토랑에서 3개 테이블의 주문을 동시에 조리하되, 완성된 요리를 **테이블 번호 순서대로** 트레이에 올려놓는 것입니다. 2번 테이블 요리가 먼저 나와도, 1번 위치에 1번 테이블 요리가 올라갑니다.\n\n**주의**: gather에 코루틴이 아닌 일반 값을 전달하면 그 값이 그대로 결과에 포함됩니다.",
         "visualizationType": "pythonMemory",
         "code": "results = await asyncio.gather(",
         "highlightOffset": [
@@ -201,7 +201,7 @@
       },
       {
         "title": "결과 확인 (3초 후)",
-        "explanation": "**`print(f\"\\nResults: {results}\")`** — gather가 반환한 결과 리스트를 출력합니다.\n\n나머지 시간 흐름:\n- **2초**: task_1(2초 대기) 완료 → \"Data 1 fetched!\" 출력\n- **3초**: task_3(3초 대기) 완료 → \"Data 3 fetched!\" 출력\n- **3초**: 모든 Task 완료 → gather가 결과 리스트를 반환!\n\n결과 리스트는 **전달한 순서**와 동일합니다:\n```python\n[\n  {\"id\": 1, \"data\": \"Sample data 1\"},  # fetch_data(1, 2) - 첫 번째로 전달\n  {\"id\": 2, \"data\": \"Sample data 2\"},  # fetch_data(2, 1) - 두 번째로 전달\n  {\"id\": 3, \"data\": \"Sample data 3\"}   # fetch_data(3, 3) - 세 번째로 전달\n]\n```\n\ntask_2가 가장 먼저 완료되었지만, results[0]은 task_1의 결과입니다. **완료 순서가 아니라 전달 순서를 따른다**는 것이 gather의 중요한 특징입니다.\n\n비유하면, 주방에서 샐러드가 먼저 나오고, 그 다음 스테이크, 마지막으로 디저트가 완성됩니다. 하지만 트레이에는 주문서에 적힌 순서대로 — 스테이크, 샐러드, 디저트 — 놓입니다.\n\n**왜 순서를 보장할까?** 코드에서 `results[0]`이 항상 첫 번째 코루틴의 결과라는 것을 보장해야, 결과를 안정적으로 사용할 수 있기 때문입니다. 만약 완료 순서에 따라 결과가 바뀌면 버그가 발생하기 쉽습니다.\n\n**실무 팁**: 결과를 딕셔너리로 관리하고 싶다면 `results = dict(zip(ids, await asyncio.gather(*tasks)))` 패턴을 사용할 수 있습니다.",
+        "explanation": "**`print(f\"\\nResults: {results}\")`** — gather가 반환한 결과 리스트를 출력합니다.\n\n나머지 시간 흐름:\n- **2초**: task_1(2초 대기) 완료 → \"Data 1 fetched!\" 출력\n- **3초**: task_3(3초 대기) 완료 → \"Data 3 fetched!\" 출력\n- **3초**: 모든 Task 완료 → gather가 결과 리스트를 반환!\n\n비유하면, 주방에서 샐러드가 먼저 나오고, 그 다음 스테이크, 마지막으로 디저트가 완성됩니다. 하지만 트레이에는 주문서에 적힌 순서대로 — 스테이크, 샐러드, 디저트 — 놓입니다.\n\n**실무 팁**: 결과를 딕셔너리로 관리하고 싶다면 `results = dict(zip(ids, await asyncio.gather(*tasks)))` 패턴을 사용할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"\\nResults: {results}\")",
         "pythonMemoryState": {

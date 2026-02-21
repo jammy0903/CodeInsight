@@ -13,10 +13,18 @@
         "pythonMemoryState": {
           "output": [],
           "names": [
-            { "name": "data", "pointsTo": "list1" }
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "list1", "type": "list", "value": "[1, 2, 3]", "pyId": "2001" }
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
           ]
         }
       },
@@ -29,43 +37,75 @@
           "output": [],
           "note": "try 블록 진입 - 여러 에러 감시 시작",
           "names": [
-            { "name": "data", "pointsTo": "list1" }
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "list1", "type": "list", "value": "[1, 2, 3]", "pyId": "2001" }
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
           ]
         }
       },
       {
         "title": "ValueError 발생!",
-        "explanation": "**`index = int(\"abc\")`** -- `int()` 함수는 문자열을 정수로 변환합니다. 하지만 `\"abc\"`는 숫자가 아닌 문자이므로 **변환이 불가능**합니다!\n\n`int(\"123\")`은 정수 `123`이 되지만, `int(\"abc\")`는 어떤 정수로도 변환할 수 없습니다. Python이 **ValueError** 예외를 발생시킵니다.\n\n**비유:** 자동판매기(int() 함수)에 동전(숫자 문자열)을 넣어야 하는데, 종이(문자 문자열)를 넣은 것과 같습니다. 기계는 \"이건 동전이 아닙니다!\"라고 종이를 뱉어냅니다(ValueError 발생).\n\n**Python 내부 동작:** `int()` 내장 함수는 C 레벨에서 문자열의 각 문자를 순회하며 숫자인지 확인합니다. `'a'`를 만나는 순간, `PyErr_Format(PyExc_ValueError, \"invalid literal for int() with base 10: %R\", \"abc\")`를 호출하여 ValueError 객체를 생성합니다.\n\n**중요한 3가지 포인트:**\n1. `index` 변수는 **생성되지 않습니다** -- 에러가 `int()` 호출 중에 발생하므로, 할당(`=`)까지 도달하지 못합니다\n2. 다음 줄 `value = data[index]`는 **절대 실행되지 않습니다** -- try 블록에서 에러가 나면 나머지는 모두 건너뜁니다\n3. Python은 이 에러를 처리할 except 블록을 **위에서 아래로** 순서대로 찾습니다\n\n**주의:** `int()`에 넣을 수 있는 문자열은 `\"123\"`, `\"-45\"`, `\"0\"` 등 **정수를 표현하는 문자열**뿐입니다. `\"3.14\"`도 실패합니다 (float 형태이므로). `float(\"3.14\")`를 사용해야 합니다.\n\n**실행 순서:** `int(\"abc\")` 시도 → ValueError 발생 → `value = data[index]` 건너뜀 → except 블록 탐색 시작",
+        "explanation": "**`index = int(\"abc\")`** -- `int()` 함수는 문자열을 정수로 변환합니다. 하지만 `\"abc\"`는 숫자가 아닌 문자이므로 **변환이 불가능**합니다!\n\n`int(\"123\")`은 정수 `123`이 되지만, `int(\"abc\")`는 어떤 정수로도 변환할 수 없습니다. Python이 **ValueError** 예외를 발생시킵니다.\n\n**비유:** 자동판매기(int() 함수)에 동전(숫자 문자열)을 넣어야 하는데, 종이(문자 문자열)를 넣은 것과 같습니다. 기계는 \"이건 동전이 아닙니다!\"라고 종이를 뱉어냅니다(ValueError 발생).\n\n**주의:** `int()`에 넣을 수 있는 문자열은 `\"123\"`, `\"-45\"`, `\"0\"` 등 **정수를 표현하는 문자열**뿐입니다. `\"3.14\"`도 실패합니다 (float 형태이므로). `float(\"3.14\")`를 사용해야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "    index = int(\"abc\")",
         "pythonMemoryState": {
           "output": [],
           "note": "ValueError 발생! 맞는 except 블록 탐색 중...",
           "names": [
-            { "name": "data", "pointsTo": "list1" }
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "list1", "type": "list", "value": "[1, 2, 3]", "pyId": "2001" },
-            { "id": "err1", "type": "ValueError", "value": "\"invalid literal for int()\"", "pyId": "2002", "highlight": true }
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            },
+            {
+              "id": "err1",
+              "type": "ValueError",
+              "value": "\"invalid literal for int()\"",
+              "pyId": "2002",
+              "highlight": true
+            }
           ]
         }
       },
       {
         "title": "첫 번째 except가 잡았다!",
-        "explanation": "**`except ValueError:`** -- Python이 except 블록을 **위에서 아래로** 순서대로 확인하여, 발생한 에러와 일치하는 첫 번째 블록을 실행합니다.\n\n매칭 과정을 따라가 봅시다:\n1. `except ValueError:` -- 발생한 에러가 ValueError인가? **YES!** 이 블록 실행!\n2. `except IndexError:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)\n3. `except Exception as e:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)\n\n**`print(\"Invalid number format!\")`** -- ValueError에 맞는 에러 메시지를 출력합니다.\n\n**비유:** 우체국의 편지 분류 시스템과 같습니다. 편지(에러)가 들어오면 첫 번째 분류함(except ValueError)부터 확인합니다. \"서울행?\" → Yes! → 서울 분류함에 넣음. 나머지 분류함(부산행, 기타)은 확인할 필요 없이 건너뜁니다.\n\n**Python 내부 동작:** 인터프리터는 각 except 절에 대해 `isinstance(발생한_에러, except에_지정된_타입)` 검사를 수행합니다. `isinstance(ValueError_객체, ValueError)`가 `True`이므로 첫 번째 except 블록이 선택됩니다. 이후의 except 블록은 완전히 무시됩니다.\n\n**주의 (except 매칭 규칙):**\n- 위에서 아래로 **순서대로** 확인합니다\n- **첫 번째로** 일치하는 except 블록**만** 실행합니다\n- 나머지 except 블록은 전부 건너뜁니다\n- 하나의 에러에 대해 여러 except가 실행되는 일은 **절대 없습니다**\n\n**실행 순서:** except ValueError 매칭 → 일치! → `print(\"Invalid number format!\")` 실행 → 나머지 except 블록 건너뜀",
+        "explanation": "**`except ValueError:`** -- Python이 except 블록을 **위에서 아래로** 순서대로 확인하여, 발생한 에러와 일치하는 첫 번째 블록을 실행합니다.\n\n매칭 과정을 따라가 봅시다:\n1. `except ValueError:` -- 발생한 에러가 ValueError인가? **YES!** 이 블록 실행!\n2. `except IndexError:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)\n3. `except Exception as e:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)\n\n**비유:** 우체국의 편지 분류 시스템과 같습니다. 편지(에러)가 들어오면 첫 번째 분류함(except ValueError)부터 확인합니다. \"서울행?\" → Yes! → 서울 분류함에 넣음. 나머지 분류함(부산행, 기타)은 확인할 필요 없이 건너뜁니다.\n\n**주의 (except 매칭 규칙):**\n- 위에서 아래로 **순서대로** 확인합니다\n- **첫 번째로** 일치하는 except 블록**만** 실행합니다\n- 나머지 except 블록은 전부 건너뜁니다\n- 하나의 에러에 대해 여러 except가 실행되는 일은 **절대 없습니다**",
         "visualizationType": "pythonMemory",
         "code": "    print(\"Invalid number format!\")",
         "pythonMemoryState": {
-          "output": ["Invalid number format!"],
+          "output": [
+            "Invalid number format!"
+          ],
           "note": "ValueError를 첫 번째 except가 처리!",
           "names": [
-            { "name": "data", "pointsTo": "list1" }
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "list1", "type": "list", "value": "[1, 2, 3]", "pyId": "2001" }
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
           ]
         }
       },
@@ -78,26 +118,42 @@
           "output": [],
           "note": "이번에는 실행되지 않음 (ValueError가 먼저 잡힘)",
           "names": [
-            { "name": "data", "pointsTo": "list1" }
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "list1", "type": "list", "value": "[1, 2, 3]", "pyId": "2001" }
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
           ]
         }
       },
       {
         "title": "Exception: 만능 안전망",
-        "explanation": "**`except Exception as e:`** -- 이 블록도 이번 실행에서는 실행되지 않습니다. 하지만 매우 중요한 **마지막 안전망** 역할을 합니다!\n\n**Exception은 거의 모든 에러의 부모 클래스**입니다. Python의 예외 계층 구조를 보면:\n```\nBaseException\n  ├── SystemExit, KeyboardInterrupt (Exception이 아님!)\n  └── Exception\n        ├── ValueError\n        ├── IndexError\n        ├── TypeError\n        ├── KeyError\n        └── ... (대부분의 에러)\n```\n\n**`as e`**: 발생한 에러 객체를 변수 `e`에 저장합니다. `e`를 통해 에러 메시지(`str(e)`)나 에러 정보에 접근할 수 있습니다. 로깅(logging)이나 디버깅에 매우 유용합니다.\n\n**비유:** 공항의 수하물 분류 시스템입니다. 서울행 벨트(ValueError), 부산행 벨트(IndexError)로 먼저 분류하고, 어디에도 해당하지 않는 수하물은 \"기타\" 벨트(Exception)로 보냅니다. 이 기타 벨트가 없으면 분류 불가 수하물이 바닥에 쌓여버리죠(프로그램 종료)!\n\n**Python 내부 동작:** `except Exception as e:`는 `isinstance(에러, Exception)`으로 매칭합니다. ValueError, IndexError 등은 모두 Exception의 자식 클래스이므로, `isinstance(ValueError_객체, Exception)`도 `True`입니다. 그래서 이 except가 위에 있으면 모든 에러를 가로채버립니다!\n\n**주의 (except 배치 순서가 중요합니다!):**\n```python\nexcept ValueError:     # 1. 구체적인 에러 먼저\nexcept IndexError:     # 2. 구체적인 에러\nexcept Exception as e: # 3. 일반적인 에러 마지막!\n```\nException을 **맨 위에** 놓으면 모든 에러를 다 잡아버려서, 아래의 except ValueError, except IndexError가 **절대 실행되지 않습니다!** Python은 이 경우 경고를 주지 않으므로 주의해야 합니다.\n\n**실행 순서 (전체 정리):**\n1. `data = [1, 2, 3]` → 리스트 생성\n2. `try:` → 예외 감시 시작\n3. `int(\"abc\")` → **ValueError 발생!**\n4. `data[index]` → **건너뜀**\n5. `except ValueError:` → 매칭 성공! → 에러 메시지 출력\n6. `except IndexError:` → 건너뜀\n7. `except Exception as e:` → 건너뜀",
+        "explanation": "**`except Exception as e:`**는 \"마지막 안전망\"입니다.\n\n왜 마지막이냐면, `Exception`은 대부분의 일반 예외를 포괄하기 때문입니다.\n그래서 위에서 더 구체적인 예외(예: `ValueError`, `IndexError`)를 먼저 처리하고,\n맨 마지막에 이 블록을 둬야 의도대로 동작합니다.\n\n**비유**: 출입구별 안내 데스크(구체 except) 다음에,\n마지막 종합안내 데스크(Exception)를 두는 구조입니다.\n\n`as e`를 쓰면 에러 객체를 잡아 메시지 출력이나 로깅이 가능합니다.\n\n주의할 점:\n- `except Exception`을 맨 위에 두면 아래 구체 except가 사실상 무력화됩니다",
         "visualizationType": "pythonMemory",
         "code": "except Exception as e:",
         "pythonMemoryState": {
           "output": [],
           "note": "Exception은 모든 에러의 부모 클래스 (마지막 안전망)",
           "names": [
-            { "name": "data", "pointsTo": "list1" }
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
           ],
           "objects": [
-            { "id": "list1", "type": "list", "value": "[1, 2, 3]", "pyId": "2001" }
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
           ]
         }
       }

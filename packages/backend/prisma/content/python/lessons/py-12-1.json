@@ -13,10 +13,18 @@
         "pythonMemoryState": {
           "output": [],
           "names": [
-            { "name": "num", "pointsTo": "int1" }
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            }
           ],
           "objects": [
-            { "id": "int1", "type": "int", "value": 10, "pyId": "1001" }
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            }
           ]
         }
       },
@@ -28,12 +36,30 @@
         "pythonMemoryState": {
           "output": [],
           "names": [
-            { "name": "num", "pointsTo": "int1" },
-            { "name": "divisor", "pointsTo": "int2", "highlight": true }
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2",
+              "highlight": true
+            }
           ],
           "objects": [
-            { "id": "int1", "type": "int", "value": 10, "pyId": "1001" },
-            { "id": "int2", "type": "int", "value": 0, "pyId": "1002", "highlight": true }
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002",
+              "highlight": true
+            }
           ]
         }
       },
@@ -46,31 +72,69 @@
           "output": [],
           "note": "try 블록 진입 - 에러 감시 시작",
           "names": [
-            { "name": "num", "pointsTo": "int1" },
-            { "name": "divisor", "pointsTo": "int2" }
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
           ],
           "objects": [
-            { "id": "int1", "type": "int", "value": 10, "pyId": "1001" },
-            { "id": "int2", "type": "int", "value": 0, "pyId": "1002" }
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
           ]
         }
       },
       {
         "title": "ZeroDivisionError 발생!",
-        "explanation": "**`result = num / divisor`** -- `10 / 0`을 계산하려고 시도합니다. 하지만 **0으로 나누기는 수학적으로 불가능**합니다!\n\nPython이 `/` 연산자를 실행하는 순간, 나누는 수가 `0`임을 감지하고 **ZeroDivisionError** 예외 객체를 생성하여 발생(raise)시킵니다.\n\n**비유:** 마치 요리사가 레시피(코드)를 따라가다가 \"물 0리터로 나누시오\"라는 불가능한 지시를 만난 것과 같습니다. 요리사는 즉시 멈추고 \"이건 불가능합니다!\"라고 외칩니다(예외 발생).\n\n**Python 내부 동작:** CPython에서 `/` 연산자는 내부적으로 `__truediv__` 메서드를 호출합니다. `int.__truediv__(10, 0)`이 실행되면, C 레벨에서 divisor가 0인지 검사하고, 0이면 `PyErr_SetString(PyExc_ZeroDivisionError, \"division by zero\")`를 호출합니다. 이때 `ZeroDivisionError` 예외 객체가 힙에 생성되고, 인터프리터의 에러 플래그가 설정됩니다.\n\n**중요한 3가지 포인트:**\n1. `result` 변수는 **생성되지 않습니다** -- 에러가 할당 연산(`=`) 전에 발생하므로, 네임스페이스에 `result`가 추가되지 않습니다\n2. 다음 줄 `print(f\"Result: {result}\")`도 **실행되지 않습니다** -- try 블록 안에서 에러가 나면 나머지 코드는 모두 건너뜁니다\n3. try 블록에서 에러가 나면 **즉시** 해당 에러를 처리할 수 있는 except 블록으로 점프합니다\n\n**주의:** 만약 `try-except`가 없었다면? 프로그램이 에러 메시지를 출력하고 **즉시 종료**됩니다! `try-except`가 이 비극을 막아줍니다.\n\n**실행 순서:** `num / divisor` 시도 → ZeroDivisionError 발생 → try 블록 나머지 건너뜀 → except 블록으로 점프",
+        "explanation": "**`result = num / divisor`** -- `10 / 0`을 계산하려고 시도합니다. 하지만 **0으로 나누기는 수학적으로 불가능**합니다!\n\nPython이 `/` 연산자를 실행하는 순간, 나누는 수가 `0`임을 감지하고 **ZeroDivisionError** 예외 객체를 생성하여 발생(raise)시킵니다.\n\n**비유:** 마치 요리사가 레시피(코드)를 따라가다가 \"물 0리터로 나누시오\"라는 불가능한 지시를 만난 것과 같습니다. 요리사는 즉시 멈추고 \"이건 불가능합니다!\"라고 외칩니다(예외 발생).\n\n**주의:** 만약 `try-except`가 없었다면? 프로그램이 에러 메시지를 출력하고 **즉시 종료**됩니다! `try-except`가 이 비극을 막아줍니다.\n\n**Python 내부 동작:** CPython에서 `/` 연산자는 내부적으로 `__truediv__` 메서드를 호출합니다. `int.__truediv__(10, 0)`이 실행되면, C 레벨에서 divisor가 0인지 검사하고, 0이면 `PyErr_SetString(PyExc_ZeroDivisionError, \"division by zero\")`를 호출합니다. 이때 `ZeroDivisionError` 예외 객체가 힙에 생성되고, 인터프리터의 에러 플래그가 설정됩니다.",
         "visualizationType": "pythonMemory",
         "code": "    result = num / divisor",
         "pythonMemoryState": {
           "output": [],
           "note": "ZeroDivisionError 발생! except 블록으로 점프",
           "names": [
-            { "name": "num", "pointsTo": "int1" },
-            { "name": "divisor", "pointsTo": "int2" }
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
           ],
           "objects": [
-            { "id": "int1", "type": "int", "value": 10, "pyId": "1001" },
-            { "id": "int2", "type": "int", "value": 0, "pyId": "1002" },
-            { "id": "err1", "type": "ZeroDivisionError", "value": "\"division by zero\"", "pyId": "1003", "highlight": true }
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            },
+            {
+              "id": "err1",
+              "type": "ZeroDivisionError",
+              "value": "\"division by zero\"",
+              "pyId": "1003",
+              "highlight": true
+            }
           ]
         }
       },
@@ -80,33 +144,69 @@
         "visualizationType": "pythonMemory",
         "code": "    print(\"Cannot divide by zero!\")",
         "pythonMemoryState": {
-          "output": ["Cannot divide by zero!"],
+          "output": [
+            "Cannot divide by zero!"
+          ],
           "note": "ZeroDivisionError 처리 완료!",
           "names": [
-            { "name": "num", "pointsTo": "int1" },
-            { "name": "divisor", "pointsTo": "int2" }
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
           ],
           "objects": [
-            { "id": "int1", "type": "int", "value": 10, "pyId": "1001" },
-            { "id": "int2", "type": "int", "value": 0, "pyId": "1002" }
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
           ]
         }
       },
       {
         "title": "프로그램이 계속 실행된다!",
-        "explanation": "**`print(\"Program continues!\")`** -- except 블록에서 에러를 성공적으로 처리한 후, 프로그램은 try-except 블록 **바깥**의 코드를 **정상적으로 계속 실행**합니다.\n\n이것이 바로 try-except의 **핵심 가치**입니다! 에러가 발생해도 프로그램이 죽지 않고 살아남습니다.\n\n**비유:** 자동차를 운전하다가 타이어가 펑크(에러)났을 때, 스페어 타이어(except)로 교체하고 다시 달릴 수 있는 것과 같습니다. 스페어 타이어가 없으면(try-except 없음) 도로 한가운데서 멈춰야 합니다(프로그램 종료).\n\n**try-except가 없을 때:**\n```\nTraceback (most recent call last):\n  File \"...\", line 5, in <module>\n    result = num / divisor\nZeroDivisionError: division by zero\n(프로그램 강제 종료 - 이 줄은 절대 실행되지 않음)\n```\n\n**try-except가 있을 때:**\n```\nCannot divide by zero!\nProgram continues!  <-- 프로그램이 살아있다!\n```\n\n**Python 내부 동작:** except 블록이 정상적으로 완료되면, 인터프리터는 에러 플래그를 초기화(clear)하고, try-except 블록 다음 문장으로 제어 흐름을 이동시킵니다. 이 시점에서 `ZeroDivisionError` 객체는 더 이상 참조되지 않으므로, 가비지 컬렉터에 의해 나중에 회수됩니다.\n\n**실전에서 try-except가 필수인 상황:**\n- 파일을 열 때 파일이 없을 수 있음 → `FileNotFoundError`\n- 사용자 입력을 숫자로 변환할 때 → `ValueError`\n- 네트워크 요청이 실패할 때 → `ConnectionError`\n- 딕셔너리에서 없는 키를 조회할 때 → `KeyError`\n\n**실행 순서 (전체 정리):**\n1. `num = 10` → 변수 할당\n2. `divisor = 0` → 변수 할당\n3. `try:` → 예외 감시 시작\n4. `result = num / divisor` → **ZeroDivisionError 발생!**\n5. `print(f\"Result: {result}\")` → **건너뜀** (실행 안 됨)\n6. `except ZeroDivisionError:` → 에러 타입 매칭 성공!\n7. `print(\"Cannot divide by zero!\")` → 에러 메시지 출력\n8. `print(\"Program continues!\")` → 정상 실행 계속!",
+        "explanation": "**`print(\"Program continues!\")`**가 실행된다는 점이 핵심입니다.\n\n즉, 에러가 발생했어도 `except`에서 처리하면 프로그램 흐름이 끊기지 않습니다.\n\n**비유**: 길이 막혀도 우회로를 타면 목적지까지 갈 수 있는 것과 같습니다.\n\n이 패턴이 중요한 이유:\n- 사용자 입력 오류\n- 파일 없음\n- 일시적 네트워크 실패\n같은 상황에서 앱 전체가 종료되지 않게 만들 수 있습니다.\n\n정리하면, try-except는 \"에러를 없애는 기술\"이 아니라\n\"에러를 통제해서 프로그램을 계속 움직이게 하는 기술\"입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"Program continues!\")",
         "pythonMemoryState": {
-          "output": ["Program continues!"],
+          "output": [
+            "Program continues!"
+          ],
           "note": "에러 처리 후 정상 실행 계속!",
           "names": [
-            { "name": "num", "pointsTo": "int1" },
-            { "name": "divisor", "pointsTo": "int2" }
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
           ],
           "objects": [
-            { "id": "int1", "type": "int", "value": 10, "pyId": "1001" },
-            { "id": "int2", "type": "int", "value": 0, "pyId": "1002" }
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
           ]
         }
       }

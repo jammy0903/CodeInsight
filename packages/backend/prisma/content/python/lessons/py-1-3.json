@@ -76,7 +76,24 @@
         "title": "불변성(Immutability)으로 인한 에러",
         "explanation": "**`# s[0] = 'J'  # 에러 발생!`** -- 주석 처리된 코드: 문자열의 일부를 직접 수정하려는 시도입니다.\n\n문자열은 **불변(Immutable)** 객체이므로, 한 번 만들어진 문자열의 내부 문자를 바꿀 수 없습니다. 만약 이 주석을 풀면:\n```\nTypeError: 'str' object does not support item assignment\n```\n에러가 발생합니다.\n\n**왜 불변인가?** 불변성은 여러 이점이 있습니다:\n1. **안전성:** 여러 변수가 같은 문자열을 공유해도 예기치 않은 변경이 없음\n2. **해시 가능:** 딕셔너리의 키나 세트의 원소로 사용 가능\n3. **String Interning:** 같은 내용의 문자열을 메모리에서 공유 가능\n\n**비유:** 문자열은 '돌에 새긴 글씨'와 같습니다. 한 번 새기면 지우개로 지울 수 없습니다. 다른 내용을 원하면 새 돌에 다시 새겨야 합니다.\n\n**Python 내부 동작:** `str` 타입은 `__setitem__` 메서드를 구현하지 않습니다. 따라서 `s[0] = 'J'`가 호출하려는 `s.__setitem__(0, 'J')`가 존재하지 않아 `TypeError`가 발생합니다.\n\n**주의:** 리스트(list)는 수정 가능(Mutable)하므로 `lst[0] = 'J'`가 가능합니다. 하지만 문자열과 튜플은 불변입니다!",
         "visualizationType": "pythonMemory",
-        "code": "# s[0] = 'J'  # 에러 발생!"
+        "code": "# s[0] = 'J'  # 에러 발생!",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            }
+          ],
+          "note": "주석 코드라 실행 상태 변화 없음"
+        }
       },
       {
         "title": "새로운 문자열 생성 및 재할당",

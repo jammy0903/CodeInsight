@@ -585,7 +585,7 @@
       },
       {
         "title": "💡 객체 동일성 확인 (증명!)",
-        "explanation": "**`print(f\"같은 객체? {s1.grades is s2.grades}\")`**\n\n`is` 연산자로 최종 증거를 확보합니다! `is`는 두 변수가 **메모리에서 완전히 같은 객체**를 가리키는지 확인합니다 (`==`는 값이 같은지, `is`는 **동일한 객체인지**!).\n\n**실행 흐름:**\n1. `s1.grades` --> s1.__dict__에 없음 --> Student.__dict__['grades'] --> 0x1500\n2. `s2.grades` --> s2.__dict__에 없음 --> Student.__dict__['grades'] --> 0x1500\n3. `0x1500 is 0x1500` --> **True!** (완전히 같은 객체!)\n\n**결과: \"같은 객체? True\"** -- 증명 완료! s1.grades와 s2.grades는 **메모리에서 동일한 리스트 객체(0x1500)**를 가리키고 있었습니다!\n\n**이 레슨의 최종 정리 -- 올바른 해결 방법:**\n```python\nclass Student:\n    def __init__(self):\n        self.grades = []  # 각 인스턴스마다 새 리스트 생성!\n    \n    def add_grade(self, grade):\n        self.grades.append(grade)  # 자기만의 리스트에 추가\n\ns1 = Student()  # s1.grades = 새 리스트 1\ns2 = Student()  # s2.grades = 새 리스트 2 (별개!)\ns1.add_grade(90)  # s1.grades = [90]\ns2.add_grade(80)  # s2.grades = [80] (독립!)\n```\n\n**외울 규칙:**\n- **불변 객체**(str, int, tuple): 클래스 변수로 써도 안전 (공유해도 됨)\n- **가변 객체**(list, dict, set): **반드시 __init__에서 self.x = []로!** (공유하면 안 됨)\n\n**실행 순서**: s1.grades, s2.grades 읽기 --> is 비교 --> True --> f-string 평가 --> print 실행 --> 프로그램 종료",
+        "explanation": "객체 동일성 확인은 `==`와 `is`를 구분해서 보는 게 핵심입니다.\n\n- `==`: 값이 같은가\n- `is`: 같은 객체(같은 참조)인가\n\n**비유**: 같은 디자인의 의자 두 개(== True, is False)와, 같은 의자를 두 이름으로 부르는 경우(is True)를 구분하는 느낌입니다.\n\n디버깅에서 aliasing(같은 객체 공유) 문제를 찾을 때 `is`가 특히 강력합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"같은 객체? {s1.grades is s2.grades}\")",
         "pythonMemoryState": {

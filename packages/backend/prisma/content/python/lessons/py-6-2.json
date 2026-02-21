@@ -31,7 +31,7 @@
       },
       {
         "title": "__init__ 초기화자 정의",
-        "explanation": "**`def __init__(self, name, age):`**\n\n**핵심 개념 -- 초기화자(Initializer)**: `__init__`는 흔히 \"생성자\"라고 불리지만, 정확하게는 **초기화자**입니다!\n\n**생성자 vs 초기화자 -- 정확한 구분:**\n- **`__new__`** (진짜 생성자): 빈 객체를 **메모리에 생성**하는 메서드\n- **`__init__`** (초기화자): 이미 생성된 빈 객체에 **속성을 채워넣는** 메서드\n\n**Person(\"Alice\", 25) 호출 시 Python 내부의 실제 동작:**\n```\n1. Person.__new__(Person)  --> 빈 Person 객체 생성 (메모리 할당)\n2. Person.__init__(빈_객체, \"Alice\", 25)  --> 빈 객체에 데이터 채우기\n3. 완성된 객체 반환  --> alice 변수에 바인딩\n```\n\n**self의 정체**: `self`는 \"나 자신\"을 가리키는 **참조(reference)**입니다. `__init__` 호출 시 Python이 **자동으로** 1단계에서 생성된 빈 객체를 `self` 자리에 넣어줍니다. 우리가 `Person(\"Alice\", 25)`라고 쓸 때 인자는 2개(\"Alice\", 25)이지만, __init__의 매개변수는 3개(self, name, age)입니다. self는 Python이 자동으로 채워주는 것입니다!\n\n**비유**: 공장에서 빈 인형을 만드는 것이 `__new__`이고, 그 인형에 눈, 코, 입을 붙이는 것이 `__init__`입니다. 우리는 보통 `__init__`만 정의하면 되고, `__new__`는 Python이 알아서 처리합니다.\n\n**주의**: 이 시점에서는 메서드를 **정의만** 합니다. 실제 실행은 나중에 `Person(\"Alice\", 25)` 호출 시 자동으로 일어납니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def __init__ 실행 --> __init__ 함수 객체 생성 --> Person 클래스에 등록 --> Person 클래스 정의 완료 --> line 7",
+        "explanation": "**`__init__`**은 객체 생성 직후 자동 실행되는 초기화 메서드입니다.\n\n역할은 명확합니다:\n- 객체가 시작할 필수 상태를 한 곳에서 세팅\n- \"생성 후 미완성 상태\"를 줄여 안정성 확보\n\n**비유**: 새 계정을 만들 때 기본 프로필을 자동 등록하는 온보딩 단계입니다.\n\n실무 포인트:\n- 필수 속성은 `__init__`에서 보장\n- 선택 속성은 기본값으로 처리하면 사용성이 좋아집니다",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, name, age):",
         "highlightOffset": [
@@ -301,7 +301,7 @@
       },
       {
         "title": "인스턴스 변수 접근 (age)",
-        "explanation": "**`print(f\"나이: {alice.age}\")`**\n\n`alice` 객체의 `age` 속성에 접근하여 출력합니다. \"나이: 25\"가 화면에 출력됩니다.\n\n**이 레슨의 최종 정리 -- __init__과 self의 핵심:**\n\n**__init__의 동작 원리:**\n1. 객체 생성 시 Python이 **자동 호출** (우리가 호출하지 않아도!)\n2. **self.변수명 = 값**으로 인스턴스 변수 **생성** (영구 저장)\n3. 생성 후 다른 곳에서 **obj.변수명**으로 **접근** 가능\n\n**self의 정체:**\n- __init__ 내부에서: `self` = 방금 생성된 빈 객체\n- 다른 메서드에서: `self` = 메서드를 호출한 객체\n- Python이 **자동으로 전달** -- 우리가 명시적으로 넘기지 않아도 됨\n\n**__init__과 self의 관계 정리:**\n```python\n# __init__ 내부 (생성 시점)\nself.name = name    # self는 alice 객체 --> alice.name = \"Alice\"\nself.age = age      # self는 alice 객체 --> alice.age = 25\n\n# 외부 (사용 시점)\nalice.name          # --> \"Alice\" (__init__에서 설정한 값!)\nalice.age           # --> 25 (__init__에서 설정한 값!)\n```\n\n**주의 -- 가장 흔한 실수 (다시 한번!):**\n```python\ndef __init__(self, name):\n    name = name      # self. 빠뜨림! 로컬 변수일 뿐, 객체에 저장 안 됨!\n```\n**반드시 `self.`를 붙여야** 인스턴스 변수가 됩니다!\n\n**실행 순서**: alice.age 읽기 (25) --> f-string 평가 --> print 실행 --> 프로그램 종료",
+        "explanation": "**`print(f\"나이: {alice.age}\")`**\n\n`alice` 객체의 `age` 속성에 접근하여 출력합니다. \"나이: 25\"가 화면에 출력됩니다.\n\n**이 레슨의 최종 정리 -- __init__과 self의 핵심:**\n\n**주의 -- 가장 흔한 실수 (다시 한번!):**\n```python\ndef __init__(self, name):\n    name = name      # self. 빠뜨림! 로컬 변수일 뿐, 객체에 저장 안 됨!\n```\n**반드시 `self.`를 붙여야** 인스턴스 변수가 됩니다!\n\n**__init__의 동작 원리:**\n1. 객체 생성 시 Python이 **자동 호출** (우리가 호출하지 않아도!)\n2. **self.변수명 = 값**으로 인스턴스 변수 **생성** (영구 저장)\n3. 생성 후 다른 곳에서 **obj.변수명**으로 **접근** 가능",
         "visualizationType": "pythonMemory",
         "code": "print(f\"나이: {alice.age}\")",
         "pythonMemoryState": {

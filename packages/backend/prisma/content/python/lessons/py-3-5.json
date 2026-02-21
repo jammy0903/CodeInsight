@@ -56,7 +56,7 @@
       },
       {
         "title": "원본도 변경되었는지 확인",
-        "explanation": "**`print(f\"person: {person}\")`** -- `ref`를 수정했지만, `person`을 출력해도 변경된 내용(`'name': 'Bob'`)이 보입니다!\n\n출력 결과: `person: {'name': 'Bob', 'age': 26, 'city': 'Seoul'}`\n\n`ref[\"name\"] = \"Bob\"`으로 수정했는데, `person`에서도 `\"name\"`이 `\"Bob\"`으로 바뀌어 있습니다. 이것이 **Aliasing(별명)**의 직접적인 증거입니다.\n\n**이 레슨의 핵심 교훈 3가지:**\n1. **딕셔너리는 Mutable** -- 수정 후에도 `id()`가 변하지 않음 (같은 객체를 수정)\n2. **`=` 할당은 복사가 아니라 별명** -- `ref = person`은 같은 객체에 이름표를 하나 더 붙이는 것\n3. **별명으로 수정하면 원본에도 반영** -- `ref`와 `person`이 같은 객체를 공유하므로\n\n**비유:** 두 개의 열쇠(person, ref)로 같은 집(0x1000)에 접근합니다. 한쪽 열쇠로 들어가서 가구를 바꾸면, 다른 열쇠로 들어가도 바뀐 가구가 보입니다.\n\n**안전하게 독립적인 복사본을 만드는 방법:**\n- `ref = person.copy()` -- 얕은 복사 (1단계만 독립, 중첩 객체는 여전히 공유)\n- `ref = dict(person)` -- 얕은 복사 (위와 동일)\n- `ref = copy.deepcopy(person)` -- 깊은 복사 (모든 중첩 객체까지 완전 독립)\n\n**Python 내부 동작:** `person`과 `ref`는 같은 메모리 주소(0x1000)를 가리키고 있으므로, 어느 변수를 통해 접근하든 동일한 해시 테이블 데이터를 읽습니다.\n\n**실행 순서**: f-string 평가(person 내용 삽입) → print 실행 → 프로그램 종료",
+        "explanation": "**`print(f\"person: {person}\")`** -- `ref`를 수정했지만, `person`을 출력해도 변경된 내용(`'name': 'Bob'`)이 보입니다!\n\n출력 결과: `person: {'name': 'Bob', 'age': 26, 'city': 'Seoul'}`\n\n**이 레슨의 핵심 교훈 3가지:**\n1. **딕셔너리는 Mutable** -- 수정 후에도 `id()`가 변하지 않음 (같은 객체를 수정)\n2. **`=` 할당은 복사가 아니라 별명** -- `ref = person`은 같은 객체에 이름표를 하나 더 붙이는 것\n3. **별명으로 수정하면 원본에도 반영** -- `ref`와 `person`이 같은 객체를 공유하므로\n\n**비유:** 두 개의 열쇠(person, ref)로 같은 집(0x1000)에 접근합니다. 한쪽 열쇠로 들어가서 가구를 바꾸면, 다른 열쇠로 들어가도 바뀐 가구가 보입니다.",
         "visualizationType": "terminal",
         "code": "print(f\"person: {person}\")"
       }

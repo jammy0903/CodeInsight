@@ -141,7 +141,7 @@
       },
       {
         "title": "set_name 실행 (cat1)",
-        "explanation": "**`self.name = n`**\n\n이 줄이 바로 **인스턴스 속성(Instance Attribute)**을 만드는 핵심 코드입니다! `self`(지금은 cat1 객체, 0x2000)에 `name`이라는 속성을 새로 추가하고, 매개변수 `n`의 값인 `\"Kitty\"`를 할당합니다.\n\n**self.name = n을 한 글자씩 해석하면:**\n- `self` --> 메서드를 호출한 객체 = cat1 (0x2000)\n- `.name` --> 이 객체에 name이라는 **새 속성을 생성** (아직 없었으니까!)\n- `= n` --> 매개변수 n이 가리키는 값 \"Kitty\"를 할당\n\n**Python 내부 동작**: `self.name = n`은 내부적으로 `cat1.__dict__['name'] = \"Kitty\"`와 동일합니다. 이 시점에서 cat1의 `__dict__`는 `{}`에서 `{'name': 'Kitty'}`로 변합니다. 이 딕셔너리는 **cat1 객체만의** 개인 저장소입니다.\n\n**인스턴스 속성 vs 클래스 속성**: 인스턴스 속성은 각 객체가 **개별적으로** 소유합니다. cat1의 name과 나중에 만들 cat2의 name은 완전히 다른 변수입니다. 비유하자면, 같은 양식의 학생증이라도 각 학생이 자기 이름을 쓰는 것과 같습니다.\n\n**주의**: `self.name`과 `name`은 다릅니다! `name`만 쓰면 로컬 변수이고, `self.name`이라고 써야 객체에 영구적으로 저장됩니다. `self.`를 빠뜨리면 함수가 끝날 때 값이 사라집니다!\n\n**왜 이 순서인가?** 메서드 호출(line 9)에서 점프해왔습니다. set_name 메서드 본문이 실행 중입니다.\n\n**실행 순서**: self.name = n --> cat1.__dict__에 name=\"Kitty\" 추가 --> 함수 종료 --> line 11로 돌아감",
+        "explanation": "**`self.name = n`**\n\n이 줄이 바로 **인스턴스 속성(Instance Attribute)**을 만드는 핵심 코드입니다! `self`(지금은 cat1 객체, 0x2000)에 `name`이라는 속성을 새로 추가하고, 매개변수 `n`의 값인 `\"Kitty\"`를 할당합니다.\n\n**인스턴스 속성 vs 클래스 속성**: 인스턴스 속성은 각 객체가 **개별적으로** 소유합니다. cat1의 name과 나중에 만들 cat2의 name은 완전히 다른 변수입니다. 비유하자면, 같은 양식의 학생증이라도 각 학생이 자기 이름을 쓰는 것과 같습니다.\n\n**주의**: `self.name`과 `name`은 다릅니다! `name`만 쓰면 로컬 변수이고, `self.name`이라고 써야 객체에 영구적으로 저장됩니다. `self.`를 빠뜨리면 함수가 끝날 때 값이 사라집니다!",
         "visualizationType": "pythonMemory",
         "code": "self.name = n",
         "pythonMemoryState": {
@@ -497,7 +497,7 @@
       },
       {
         "title": "meow 실행 (cat2)",
-        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n이번에는 `self`(cat2, 0x3000)의 `name` 속성에 접근합니다.\n\n**실행 흐름을 한 단계씩 따라가 봅시다:**\n1. `self` --> cat2 객체 (0x3000)\n2. `self.name` --> cat2.__dict__['name'] --> \"Nabi\"\n3. f-string 평가: `f\"{self.name} says Meow!\"` --> `\"Nabi says Meow!\"`\n4. `print(\"Nabi says Meow!\")` 실행 --> 화면에 출력!\n\n**왜 \"Nabi\"가 나오는가?** 이번에는 self가 cat2(0x3000)를 가리키고, cat2의 `__dict__`에 `'name': 'Nabi'`가 저장되어 있기 때문입니다.\n\n**이 레슨의 최종 정리 -- self와 인스턴스 속성:**\n- `self.name = n` (set_name 내부): 호출한 객체에 name 속성을 **생성/수정**\n- `self.name` (meow 내부): 호출한 객체의 name 속성을 **읽기**\n- cat1.set_name(\"Kitty\") --> cat1.__dict__ = {'name': 'Kitty'}\n- cat2.set_name(\"Nabi\") --> cat2.__dict__ = {'name': 'Nabi'}\n- cat1.meow() --> \"Kitty says Meow!\" (self = cat1)\n- cat2.meow() --> \"Nabi says Meow!\" (self = cat2)\n\n**핵심 원리**: 메서드 코드(set_name, meow)는 Cat 클래스에 **한 벌만** 존재합니다. 하지만 `self` 매개변수 덕분에, 같은 코드가 호출한 객체에 따라 **다른 데이터**를 읽고 쓸 수 있습니다. 이것이 \"인스턴스 속성\"의 핵심이자, 이전 레슨에서 배운 `my_dog.name = \"Buddy\"` 방식보다 **메서드 내부에서 self.속성으로 관리하는 것**이 더 체계적인 이유입니다.\n\n**주의**: 이 코드의 약점은 `set_name()`을 호출하지 않으면 `meow()`에서 `AttributeError`가 발생한다는 점입니다. 다음 레슨에서 배울 `__init__` 생성자를 사용하면 이 문제를 해결할 수 있습니다!\n\n**실행 순서**: self.name 읽기 (\"Nabi\") --> f-string 평가 --> print 실행 --> meow 함수 종료 --> 프로그램 종료",
+        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n여기서 중요한 건 `self`가 누구냐입니다.\n이번 호출에서는 `self = cat2`이므로 `self.name`은 `\"Nabi\"`가 됩니다.\n그래서 출력은 `Nabi says Meow!`입니다.\n\n핵심 정리:\n- 메서드 코드는 클래스에 1개\n- 데이터는 인스턴스마다 다름\n- `self`가 현재 호출 대상을 가리켜서 같은 코드가 다르게 동작\n\n**비유**: 같은 대본을 읽어도 배우(인스턴스)가 다르면 대사가 달라지는 구조입니다.\n\n주의:\n- `name`을 미리 세팅하지 않으면 `AttributeError`가 날 수 있습니다",
         "visualizationType": "pythonMemory",
         "code": "print(f\"{self.name} says Meow!\")",
         "pythonMemoryState": {

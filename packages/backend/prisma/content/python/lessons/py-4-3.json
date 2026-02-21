@@ -34,7 +34,7 @@
       },
       {
         "title": "람다(Lambda) 함수",
-        "explanation": "**`add_lambda = lambda x, y: x + y`**\n\n**Lambda(람다) 함수**: `lambda` 키워드로 **이름 없는 익명 함수(anonymous function)**를 만듭니다.\n\n**람다 문법**: `lambda 매개변수들: 표현식`\n- `lambda` 키워드: \"지금부터 익명 함수를 만든다\"\n- 매개변수: `x, y` (콜론 왼쪽)\n- 표현식: `x + y` (콜론 오른쪽, **자동으로 반환됨** -- `return` 키워드 불필요!)\n\n비유: `def`로 만든 일반 함수가 '이름표가 붙은 정식 요리'라면, 람다는 '이름 없는 한입 간식'입니다. 간단한 것만 담을 수 있지만 그만큼 빠르고 간결합니다.\n\n**일반 함수와 람다의 비교:**\n- 일반: `def add(x, y): return x + y` → 3줄, 이름 있음\n- 람다: `lambda x, y: x + y` → 1줄, 이름 없음\n- 기능은 **완전히 동일**합니다!\n\n**`add_lambda = ...`의 의미**: 람다 표현식은 함수 **객체를 생성**하고, 그 객체를 `add_lambda` 변수에 할당합니다. 람다 자체에는 이름이 없지만, 변수에 저장하면 이름으로 호출할 수 있게 됩니다.\n\n**Python 내부 동작**: 람다도 `function` 타입 객체입니다. 다만 `add_lambda.__name__`을 확인하면 `'<lambda>'`로 나옵니다 (이름이 없으므로). 에러가 나면 디버깅이 어려울 수 있으므로, 복잡한 로직은 `def`를 사용하는 것이 좋습니다.\n\n**주의**: 람다에는 **표현식(expression) 하나만** 올 수 있습니다! `if-else`, `for`, `while` 같은 **문장(statement)**은 쓸 수 없습니다. (단, 삼항 표현식 `a if cond else b`는 가능)\n\n**실행 순서**: lambda 표현식 평가 → 함수 객체 생성 → add_lambda 변수에 할당 → line 8",
+        "explanation": "**`add_lambda = lambda x, y: x + y`**\n\n**Lambda(람다) 함수**: `lambda` 키워드로 **이름 없는 익명 함수(anonymous function)**를 만듭니다.\n\n비유: `def`로 만든 일반 함수가 '이름표가 붙은 정식 요리'라면, 람다는 '이름 없는 한입 간식'입니다. 간단한 것만 담을 수 있지만 그만큼 빠르고 간결합니다.\n\n**주의**: 람다에는 **표현식(expression) 하나만** 올 수 있습니다! `if-else`, `for`, `while` 같은 **문장(statement)**은 쓸 수 없습니다. (단, 삼항 표현식 `a if cond else b`는 가능)\n\n**람다 문법**: `lambda 매개변수들: 표현식`\n- `lambda` 키워드: \"지금부터 익명 함수를 만든다\"\n- 매개변수: `x, y` (콜론 왼쪽)\n- 표현식: `x + y` (콜론 오른쪽, **자동으로 반환됨** -- `return` 키워드 불필요!)",
         "visualizationType": "pythonMemory",
         "code": "add_lambda = lambda x, y: x + y",
         "pythonMemoryState": {
@@ -268,7 +268,7 @@
       },
       {
         "title": "람다를 활용한 정렬",
-        "explanation": "**`pairs.sort(key=lambda p: p[1])`**\n\n**이것이 람다의 진정한 활용처입니다!** `sort()`의 `key` 매개변수에 람다 함수를 전달하여 **정렬 기준**을 지정합니다.\n\n**동작 원리 (하나씩 따라가 봅시다):**\n1. `sort()`가 정렬을 시작하면, **각 요소마다 `key` 함수(람다)를 호출**합니다\n2. 람다 `lambda p: p[1]`는 각 튜플 `p`에서 **두 번째 요소(인덱스 1)**를 꺼내 반환합니다\n3. Python은 이 반환값들을 기준으로 크기를 비교하여 정렬합니다\n\n**람다가 각 요소에 대해 호출되는 과정:**\n- `(1, 'one')` → `lambda p: p[1]` → `'one'` 반환\n- `(3, 'three')` → `lambda p: p[1]` → `'three'` 반환\n- `(2, 'two')` → `lambda p: p[1]` → `'two'` 반환\n\n**알파벳 순 정렬**: `'one'` < `'three'` < `'two'` (문자열 비교는 첫 글자부터 알파벳 순서로)\n\n비유: 반장 선거에서 투표 용지를 정렬할 때, \"이름 기준으로 정렬해주세요\"라고 기준을 알려주는 것이 `key=lambda p: p[1]`입니다. 람다는 \"각 용지에서 이름 부분만 뽑아주는 도우미\"입니다.\n\n**만약 람다 없이 def로 쓴다면?**\n```python\ndef get_second(p):\n    return p[1]\npairs.sort(key=get_second)\n```\n3줄이나 필요합니다! 한 번만 쓸 간단한 함수를 위해 `def`로 정의하는 것은 낭비입니다. 이럴 때 람다가 빛을 발합니다.\n\n**Python 내부 동작**: `list.sort()`는 **Timsort** 알고리즘을 사용합니다. `key` 함수가 전달되면, 먼저 모든 요소에 대해 key 함수를 호출하여 비교 키를 캐싱한 뒤 정렬합니다. `.sort()`는 리스트를 **제자리(in-place)**에서 변경합니다(새 리스트를 만들지 않음).\n\n**주의**: `.sort()`는 원본 리스트를 직접 수정하고 `None`을 반환합니다! `pairs = pairs.sort(...)` 하면 `pairs`가 `None`이 되는 실수를 조심하세요.\n\n**실행 순서**: sort 실행 → 내부에서 람다 3번 호출 → 비교 후 재배열 → pairs 내용 변경 → line 14",
+        "explanation": "**람다를 정렬 키로 쓰면** \"정렬 기준 함수\"를 짧게 바로 전달할 수 있습니다.\n\n핵심 구조:\n- `key=lambda x: ...`\n- 각 요소에서 비교값만 뽑아 정렬\n\n이 방식이 좋은 이유:\n- 별도 `def` 없이 한눈에 기준이 보임\n- 한 번만 쓰는 간단 규칙에 특히 적합\n\n**비유**: 정리 담당자에게 \"이 값 기준으로 줄 세워\"라고 메모 한 줄로 건네는 느낌입니다.\n\n주의:\n- 기준 로직이 길어지면 람다보다 명명된 함수(`def`)가 가독성에 유리합니다",
         "visualizationType": "pythonMemory",
         "code": "pairs.sort(key=lambda p: p[1]) # 두 번째 요소(글자)로 정렬",
         "pythonMemoryState": {
