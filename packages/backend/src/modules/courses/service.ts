@@ -72,6 +72,10 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
       ...language,
       chapters: language.chapters.map((chapter: any) => ({
         ...chapter,
+        lessons: chapter.lessons.map((lesson: any) => ({
+          ...lesson,
+          progress: null,
+        })),
         progress: {
           total: chapter.lessons.length,
           completed: 0,
@@ -81,40 +85,69 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
     };
   }
 
-  // 3. Progress (Per-Chapter Calculation)
-  // 각 chapter마다 정확한 진행률 계산
+  // 3. Progress (Single Source of Truth)
+  // 백엔드에서만 lesson/chapter 진행률 계산 후 반환
+  const allLessonIds = language.chapters.flatMap((chapter: any) =>
+    chapter.lessons.map((lesson: any) => lesson.id)
+  ) as string[];
+
+  const progressRows = isAdmin
+    ? []
+    : await prisma.userProgress.findMany({
+        where: {
+          userId,
+          lessonId: {
+            in: allLessonIds,
+          },
+        },
+        select: {
+          id: true,
+          userId: true,
+          lessonId: true,
+          status: true,
+          currentStep: true,
+          quizScore: true,
+          quizTotal: true,
+          startedAt: true,
+          completedAt: true,
+          updatedAt: true,
+        },
+      });
+
+  const progressMap = new Map(progressRows.map((row) => [row.lessonId, row]));
+
   return {
     ...language,
-    chapters: await Promise.all(
-      language.chapters.map(async (chapter: any) => {
-        const total = chapter.lessons.length;
-
-        // Chapter의 모든 lesson id 배열
-        const chapterLessonIds = chapter.lessons.map((l: any) => l.id) as string[];
-
-        // 이 chapter에서 사용자가 완료한 lesson count
-        const completed = isAdmin
-          ? total
-          : (await prisma.userProgress.count({
-              where: {
-                userId,
-                status: 'completed',
-                lessonId: {
-                  in: chapterLessonIds,
-                },
-              },
-            }));
+    chapters: language.chapters.map((chapter: any) => {
+      const lessons = chapter.lessons.map((lesson: any) => {
+        if (isAdmin) {
+          return {
+            ...lesson,
+            progress: {
+              status: 'completed',
+            },
+          };
+        }
 
         return {
-          ...chapter,
-          progress: {
-            total,
-            completed,
-            percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
-          },
+          ...lesson,
+          progress: progressMap.get(lesson.id) || null,
         };
-      })
-    ),
+      });
+
+      const total = lessons.length;
+      const completed = lessons.filter((lesson: any) => lesson.progress?.status === 'completed').length;
+
+      return {
+        ...chapter,
+        lessons,
+        progress: {
+          total,
+          completed,
+          percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+        },
+      };
+    }),
   };
 }
 

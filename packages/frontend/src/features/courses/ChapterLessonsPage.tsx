@@ -8,14 +8,31 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import type { UserProgress } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
 import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle, Lock } from 'lucide-react';
-import { useIsMobile, useLanguageCourse, useUserProgress } from '@/hooks';
+import { useIsMobile, useLanguageCourse } from '@/hooks';
 import { getLessonFull } from '@/services/courses';
+
+type LessonProgressSnapshot = {
+  status?: 'not_started' | 'in_progress' | 'completed';
+};
+
+type LessonWithProgress = {
+  id: string;
+  order: number;
+  progress?: LessonProgressSnapshot | null;
+};
+
+type ChapterWithAggregatedProgress = {
+  progress?: {
+    total?: number;
+    completed?: number;
+    percentage?: number;
+  };
+};
 
 // 언어별 색상 (챕터 페이지용)
 const getLanguageColor = (lang: string | undefined) => {
@@ -42,7 +59,6 @@ export function ChapterLessonsPage() {
 
   // TanStack Query: 언어 코스 데이터 + 진행 상태
   const { data: languageData, isLoading, isError, error } = useLanguageCourse(lang);
-  const { data: progressList } = useUserProgress();
   const chapter = useMemo(
     () => languageData?.chapters?.find((ch) => ch.id === chapterId),
     [languageData, chapterId]
@@ -52,12 +68,9 @@ export function ChapterLessonsPage() {
   const accessDenied = !!chapter && !appUser && chapter.order >= 2;
   const accessReason = accessDenied ? t('chapter.login_required_for_chapter') : '';
 
-  // 진행 상태 Map 변환 (useMemo로 최적화)
-  const progressMap = useMemo(() => {
-    const map = new Map<string, UserProgress>();
-    progressList?.forEach((p) => map.set(p.lessonId, p));
-    return map;
-  }, [progressList]);
+  const getLessonProgress = useCallback((lesson: LessonWithProgress): LessonProgressSnapshot | null => {
+    return lesson.progress ?? null;
+  }, []);
 
   // 챕터 레슨 프리페치
   // - 1순위: 첫 미완료 레슨
@@ -68,7 +81,7 @@ export function ChapterLessonsPage() {
     if (!chapter?.lessons || chapter.lessons.length === 0 || accessDenied) return;
 
     const lessons = [...chapter.lessons].sort((a, b) => a.order - b.order);
-    const firstIncomplete = lessons.find((l) => progressMap.get(l.id)?.status !== 'completed');
+    const firstIncomplete = lessons.find((l) => getLessonProgress(l as LessonWithProgress)?.status !== 'completed');
 
     const orderedIds: string[] = [];
     if (firstIncomplete) orderedIds.push(firstIncomplete.id);
@@ -126,7 +139,7 @@ export function ChapterLessonsPage() {
     return () => {
       cancelled = true;
     };
-  }, [chapter, progressMap, queryClient, accessDenied, languageData]);
+  }, [chapter, queryClient, accessDenied, languageData, getLessonProgress]);
 
   // hover 시 해당 레슨 프리페치
   const handlePrefetch = useCallback((lessonId: string) => {
@@ -144,14 +157,15 @@ export function ChapterLessonsPage() {
     }
   }, [chapter, setPageTitle, lang]);
 
-  // 진행률: progressMap (단일 소스) 에서 직접 계산
+  // 진행률: 백엔드에서 계산된 chapter.progress 단일 소스 사용
   const chapterProgress = useMemo(() => {
-    if (!chapter?.lessons) return { total: 0, completed: 0, percentage: 0 };
-    const total = chapter.lessons.length;
-    const completed = chapter.lessons.filter(l => progressMap.get(l.id)?.status === 'completed').length;
-    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    if (!chapter) return { total: 0, completed: 0, percentage: 0 };
+    const chapterWithProgress = chapter as typeof chapter & ChapterWithAggregatedProgress;
+    const total = chapterWithProgress.progress?.total ?? chapter.lessons?.length ?? 0;
+    const completed = chapterWithProgress.progress?.completed ?? 0;
+    const percentage = chapterWithProgress.progress?.percentage ?? (total > 0 ? Math.round((completed / total) * 100) : 0);
     return { total, completed, percentage };
-  }, [chapter, progressMap]);
+  }, [chapter]);
 
   const totalLessons = chapterProgress.total;
   const completedLessons = chapterProgress.completed;
@@ -344,7 +358,7 @@ export function ChapterLessonsPage() {
         // 모바일: 리스트 형식
         <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] overflow-hidden">
           {chapter.lessons.map((lesson, index) => {
-            const progress = progressMap.get(lesson.id);
+            const progress = getLessonProgress(lesson as LessonWithProgress);
             const isCompleted = progress?.status === 'completed';
 
             return (
@@ -381,7 +395,7 @@ export function ChapterLessonsPage() {
             <LessonCard
               key={lesson.id}
               lesson={lesson}
-              progress={progressMap.get(lesson.id)}
+              progress={getLessonProgress(lesson as LessonWithProgress)}
               languageId={lang || 'c'}
               chapterId={chapter.id}
               onPrefetch={handlePrefetch}

@@ -79,7 +79,7 @@ const DEFAULT_THEME = {
 
 interface LessonCardProps {
   lesson: Lesson;
-  progress?: UserProgress;
+  progress?: Pick<UserProgress, 'status'> | null;
   languageId: string;
   chapterId: string;
   onPrefetch?: (lessonId: string) => void;
