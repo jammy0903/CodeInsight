@@ -1,0 +1,108 @@
+{
+  "language": "python",
+  "quizType": "multiple-choice",
+  "chapterId": "py-algo-modules",
+  "chapterTitle": "알고리즘 모듈",
+  "quizzes": [
+    {
+      "id": "mc-py-algo-q1",
+      "question": "heapq.heappush(h, 3) 후 heapq.heappop(h)가 반환하는 것은?",
+      "options": ["가장 큰 값", "가장 작은 값", "마지막에 넣은 값", "랜덤 값"],
+      "answer": "1",
+      "explanation": "heapq는 최소 힙(min-heap)입니다.\nheappop()은 항상 가장 작은 값을 꺼냅니다.\n최대 힙이 필요하면 -값을 넣어 사용합니다.",
+      "concepts": ["heapq", "heappop", "최소힙"],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "mc-py-algo-q2",
+      "question": "heapq.heapify(arr)의 시간 복잡도는?",
+      "options": ["O(1)", "O(n)", "O(n log n)", "O(log n)"],
+      "answer": "1",
+      "explanation": "heapify()는 리스트를 제자리에서 O(n)으로 힙으로 변환합니다.\n하나씩 heappush하면 O(n log n)이므로 heapify가 더 효율적입니다.",
+      "concepts": ["heapify", "시간복잡도", "힙변환"],
+      "difficulty": "medium",
+      "orderNum": 2
+    },
+    {
+      "id": "mc-py-algo-q3",
+      "question": "heapq.nlargest(2, [3, 1, 4, 1, 5])의 결과는?",
+      "options": ["[5, 4]", "[4, 5]", "[1, 1]", "5"],
+      "answer": "0",
+      "explanation": "nlargest(n, iterable)는 가장 큰 n개 요소를 내림차순으로 반환합니다.\n[5, 4]가 됩니다. 반대로 nsmallest()는 가장 작은 n개를 반환합니다.",
+      "concepts": ["nlargest", "nsmallest", "상위N개"],
+      "difficulty": "easy",
+      "orderNum": 3
+    },
+    {
+      "id": "mc-py-algo-q4",
+      "question": "bisect.bisect_left([1, 3, 5, 7], 5)의 결과는?",
+      "options": ["1", "2", "3", "4"],
+      "answer": "1",
+      "explanation": "bisect_left()는 정렬 유지하며 삽입할 가장 왼쪽 위치를 반환합니다.\n5는 인덱스 2에 이미 있으므로 2를 반환합니다(기존 값의 왼쪽).",
+      "concepts": ["bisect_left", "이진탐색", "삽입위치"],
+      "difficulty": "medium",
+      "orderNum": 4
+    },
+    {
+      "id": "mc-py-algo-q5",
+      "question": "bisect.bisect_right([1, 3, 5, 7], 5)의 결과는?",
+      "options": ["1", "2", "3", "4"],
+      "answer": "2",
+      "explanation": "bisect_right()는 기존 같은 값의 오른쪽 위치를 반환합니다.\n5는 인덱스 2에 있으므로 그 다음인 3을 반환합니다.",
+      "concepts": ["bisect_right", "bisect_left", "위치차이"],
+      "difficulty": "medium",
+      "orderNum": 5
+    },
+    {
+      "id": "mc-py-algo-q6",
+      "question": "list(itertools.combinations('ABC', 2))의 결과는?",
+      "options": ["[('A','B'), ('A','C'), ('B','C')]", "[('A','B'), ('B','A'), ('A','C'), ('C','A'), ('B','C'), ('C','B')]", "[('A','A'), ('B','B'), ('C','C')]", "에러 발생"],
+      "answer": "0",
+      "explanation": "combinations()는 순서 없이 중복 없는 조합을 생성합니다.\n3C2 = 3가지: AB, AC, BC입니다.\n순서가 중요하면 permutations()를 사용합니다.",
+      "concepts": ["combinations", "조합", "순서없음"],
+      "difficulty": "easy",
+      "orderNum": 6
+    },
+    {
+      "id": "mc-py-algo-q7",
+      "question": "len(list(itertools.permutations('ABC', 2)))의 결과는?",
+      "options": ["3", "6", "9", "8"],
+      "answer": "1",
+      "explanation": "permutations()는 순서가 있는 순열을 생성합니다.\n3P2 = 3 x 2 = 6가지입니다. AB, AC, BA, BC, CA, CB가 생성됩니다.",
+      "concepts": ["permutations", "순열", "경우의수"],
+      "difficulty": "easy",
+      "orderNum": 7
+    },
+    {
+      "id": "mc-py-algo-q8",
+      "question": "list(itertools.product('AB', repeat=2))의 결과는?",
+      "options": ["[('A','B'), ('B','A')]", "[('A','A'), ('A','B'), ('B','A'), ('B','B')]", "[('A','A'), ('B','B')]", "에러 발생"],
+      "answer": "1",
+      "explanation": "product()는 데카르트 곱(중복 허용 모든 조합)을 생성합니다.\nrepeat=2이면 2자리 조합: AA, AB, BA, BB 4가지입니다.\n중복 순열과 같습니다.",
+      "concepts": ["product", "데카르트곱", "중복순열"],
+      "difficulty": "medium",
+      "orderNum": 8
+    },
+    {
+      "id": "mc-py-algo-q9",
+      "question": "functools.reduce(lambda a, b: a + b, [1, 2, 3, 4])의 결과는?",
+      "options": ["[1, 2, 3, 4]", "10", "24", "4"],
+      "answer": "1",
+      "explanation": "reduce()는 누적 연산을 수행합니다.\n((1+2)+3)+4 = 10입니다.\nPython 3에서는 functools에서 import해야 합니다.",
+      "concepts": ["reduce", "누적연산", "functools"],
+      "difficulty": "medium",
+      "orderNum": 9
+    },
+    {
+      "id": "mc-py-algo-q10",
+      "question": "@functools.lru_cache의 기본 maxsize는?",
+      "options": ["64", "128", "256", "제한 없음"],
+      "answer": "1",
+      "explanation": "lru_cache의 기본 maxsize는 128입니다.\nmaxsize=None으로 설정하면 크기 제한 없이 모든 결과를 캐싱합니다.\n재귀 DP 문제에서 메모이제이션 용도로 자주 사용됩니다.",
+      "concepts": ["lru_cache", "메모이제이션", "DP"],
+      "difficulty": "hard",
+      "orderNum": 10
+    }
+  ]
+}

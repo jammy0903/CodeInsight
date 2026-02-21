@@ -1,0 +1,108 @@
+{
+  "language": "python",
+  "quizType": "multiple-choice",
+  "chapterId": "py-collections-mod",
+  "chapterTitle": "collections 모듈",
+  "quizzes": [
+    {
+      "id": "mc-py-collections-q1",
+      "question": "Counter('banana')에서 가장 흔한 문자를 구하는 방법은?",
+      "options": ["Counter('banana').max()", "Counter('banana').most_common(1)", "Counter('banana').top(1)", "max(Counter('banana'))"],
+      "answer": "1",
+      "explanation": "most_common(n)은 가장 많이 등장한 n개 요소를 [(요소, 횟수)] 형태로 반환합니다.\nCounter('banana').most_common(1) = [('a', 3)]입니다.",
+      "concepts": ["Counter", "most_common", "빈도수"],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "mc-py-collections-q2",
+      "question": "Counter([1, 1, 2, 3, 3, 3])에서 3의 개수를 구하는 방법은?",
+      "options": ["Counter([1,1,2,3,3,3]).count(3)", "Counter([1,1,2,3,3,3])[3]", "Counter([1,1,2,3,3,3]).get_count(3)", "Counter([1,1,2,3,3,3]).freq(3)"],
+      "answer": "1",
+      "explanation": "Counter는 딕셔너리의 서브클래스이므로 [key]로 접근합니다.\n존재하지 않는 키는 KeyError 대신 0을 반환합니다.",
+      "concepts": ["Counter", "딕셔너리", "인덱싱"],
+      "difficulty": "easy",
+      "orderNum": 2
+    },
+    {
+      "id": "mc-py-collections-q3",
+      "question": "defaultdict(list)에서 존재하지 않는 키에 접근하면?",
+      "options": ["KeyError 발생", "None 반환", "빈 리스트 [] 반환", "0 반환"],
+      "answer": "2",
+      "explanation": "defaultdict는 없는 키에 접근 시 팩토리 함수를 호출하여 기본값을 생성합니다.\ndefaultdict(list)는 빈 리스트, defaultdict(int)는 0을 생성합니다.",
+      "concepts": ["defaultdict", "팩토리함수", "기본값"],
+      "difficulty": "easy",
+      "orderNum": 3
+    },
+    {
+      "id": "mc-py-collections-q4",
+      "question": "defaultdict(int)를 사용하면 어떤 코드를 간결하게 만들 수 있는가?",
+      "options": ["리스트 정렬", "if key not in d: d[key] = 0 패턴", "딕셔너리 병합", "문자열 변환"],
+      "answer": "1",
+      "explanation": "defaultdict(int)는 없는 키의 기본값을 0으로 설정합니다.\n빈도수 카운팅 시 키 존재 여부를 확인할 필요가 없어집니다.",
+      "concepts": ["defaultdict", "int", "카운팅패턴"],
+      "difficulty": "medium",
+      "orderNum": 4
+    },
+    {
+      "id": "mc-py-collections-q5",
+      "question": "deque의 appendleft()와 list의 insert(0, x)의 차이는?",
+      "options": ["동일한 성능", "deque가 O(1), list가 O(n)", "list가 O(1), deque가 O(n)", "둘 다 O(n)"],
+      "answer": "1",
+      "explanation": "deque는 양쪽 끝에서 O(1)으로 삽입/삭제가 가능합니다.\nlist.insert(0, x)는 모든 요소를 한 칸씩 밀어야 하므로 O(n)입니다.",
+      "concepts": ["deque", "appendleft", "시간복잡도"],
+      "difficulty": "medium",
+      "orderNum": 5
+    },
+    {
+      "id": "mc-py-collections-q6",
+      "question": "deque([1, 2, 3], maxlen=3)에 4를 append하면?",
+      "options": ["에러 발생", "[1, 2, 3, 4]", "[2, 3, 4]", "[1, 2, 3]"],
+      "answer": "2",
+      "explanation": "maxlen이 설정된 deque는 새 요소 추가 시 반대쪽 요소를 자동 제거합니다.\n오른쪽에 4를 추가하면 왼쪽의 1이 제거되어 [2, 3, 4]가 됩니다.",
+      "concepts": ["deque", "maxlen", "순환버퍼"],
+      "difficulty": "medium",
+      "orderNum": 6
+    },
+    {
+      "id": "mc-py-collections-q7",
+      "question": "deque에서 왼쪽 요소를 제거하는 메서드는?",
+      "options": ["pop()", "popleft()", "remove(0)", "shift()"],
+      "answer": "1",
+      "explanation": "popleft()는 왼쪽 끝 요소를 O(1)으로 제거하고 반환합니다.\npop()은 오른쪽 끝 요소를 제거합니다. BFS 구현에 자주 사용됩니다.",
+      "concepts": ["deque", "popleft", "BFS"],
+      "difficulty": "easy",
+      "orderNum": 7
+    },
+    {
+      "id": "mc-py-collections-q8",
+      "question": "Point = namedtuple('Point', ['x', 'y']); p = Point(1, 2)에서 p.x의 결과는?",
+      "options": ["에러 발생", "1", "(1, 2)", "'x'"],
+      "answer": "1",
+      "explanation": "namedtuple은 이름으로 필드에 접근할 수 있는 튜플입니다.\np[0]과 p.x 모두 같은 값 1을 반환합니다.",
+      "concepts": ["namedtuple", "필드접근", "불변"],
+      "difficulty": "easy",
+      "orderNum": 8
+    },
+    {
+      "id": "mc-py-collections-q9",
+      "question": "Counter('aabbc') - Counter('abc')의 결과는?",
+      "options": ["Counter({'a': 1, 'b': 1})", "Counter({'a': 1, 'b': 1, 'c': -1})", "에러 발생", "Counter({'a': 2, 'b': 2, 'c': 1})"],
+      "answer": "0",
+      "explanation": "Counter끼리 뺄셈하면 각 요소의 카운트를 빼고, 음수는 제거됩니다.\na: 2-1=1, b: 2-1=1, c: 1-1=0(제거)이므로 Counter({'a': 1, 'b': 1})입니다.",
+      "concepts": ["Counter", "뺄셈", "연산"],
+      "difficulty": "hard",
+      "orderNum": 9
+    },
+    {
+      "id": "mc-py-collections-q10",
+      "question": "OrderedDict가 Python 3.7+에서도 유용한 이유는?",
+      "options": ["일반 dict보다 빠르다", "move_to_end(), == 연산에서 순서 비교를 지원한다", "메모리를 덜 사용한다", "Python 3.7+에서는 필요 없다"],
+      "answer": "1",
+      "explanation": "Python 3.7+에서 dict도 삽입 순서를 보장하지만, OrderedDict는 move_to_end()와\n순서를 고려한 == 비교 등 추가 기능이 있어 LRU 캐시 등에 유용합니다.",
+      "concepts": ["OrderedDict", "move_to_end", "순서비교"],
+      "difficulty": "hard",
+      "orderNum": 10
+    }
+  ]
+}
