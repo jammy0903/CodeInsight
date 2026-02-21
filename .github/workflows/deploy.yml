@@ -13,6 +13,9 @@ jobs:
   health-check:
     name: Backend Health Check
     runs-on: ubuntu-latest
+    env:
+      BACKEND_HEALTH_URL: https://c-osine-backend-5z56.onrender.com/health
+      FRONTEND_URL: https://c-osine-frontend-5z56.onrender.com
 
     steps:
       - name: Wait for deployment
@@ -22,17 +25,23 @@ jobs:
 
       - name: Check backend health
         run: |
-          echo "🏥 Checking backend health..."
-          for i in {1..20}; do
-            if curl -f -s https://codeinsight-backend.onrender.com/health > /dev/null 2>&1; then
+          echo "🏥 Checking backend health at $BACKEND_HEALTH_URL ..."
+          for i in {1..30}; do
+            if curl -f -s "$BACKEND_HEALTH_URL" > /dev/null 2>&1; then
               echo "✅ Backend is healthy!"
               exit 0
             fi
-            echo "Attempt $i/20 failed, retrying in 15s..."
-            sleep 15
+            echo "Attempt $i/30 failed, retrying in 10s..."
+            sleep 10
           done
           echo "❌ Backend health check failed after 5 minutes"
           exit 1
+
+      - name: Check frontend availability
+        run: |
+          echo "🌐 Checking frontend at $FRONTEND_URL ..."
+          curl -f -s "$FRONTEND_URL" > /dev/null
+          echo "✅ Frontend is reachable"
 
       - name: Deployment status
         if: success()
