@@ -14,8 +14,15 @@ Before doing anything else:
 2. Read `USER.md` — this is who you're helping
 3. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
 4. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
+5. Read `.claude/CLAUDE.md` and align your behavior with `.claude/` rules/context for project work
 
 Don't ask permission. Just do it.
+
+## Claude Alignment
+
+- Treat `.claude/CLAUDE.md` as a project-level operating guide
+- When `AGENTS.md` and `.claude` docs both apply, follow the stricter/more specific instruction
+- Use `.claude/context/*` and `.claude/rules/*` as the default project references before guessing
 
 ## Memory
 
