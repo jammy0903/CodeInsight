@@ -1,13 +1,13 @@
 {
   "lessonId": "c-10-2",
   "title": "File Modes",
-  "concept": "Core concept for File Modes",
+  "concept": "파일 모드는 읽기, 쓰기, 추가 동작을 결정하며 파일 처리 결과를 좌우한다",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    FILE *fp;\n\n    fp = fopen(\"data.txt\", \"w\");\n    if (fp) {\n        fprintf(fp, \"Hello File!\");\n        fclose(fp);\n    }\n\n    fp = fopen(\"data.txt\", \"a\");\n    if (fp) {\n        fprintf(fp, \" Append me.\");\n        fclose(fp);\n    }\n\n    fp = fopen(\"data.txt\", \"r\");\n    char buffer[50];\n    if (fp) {\n        fgets(buffer, 50, fp);\n        printf(\"Read: %s\\n\", buffer);\n        fclose(fp);\n    }\n\n    return 0;\n}",
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`** — 파일 입출력에 필요한 `FILE`, `fopen`, `fclose`, `fprintf`, `fgets` 등이 정의된 헤더입니다.\n\n이 레슨에서는 파일을 여는 **3가지 기본 모드**를 배웁니다. **`\"w\"`**(Write)는 기존 내용을 모두 지우고 새로 쓰고, **`\"a\"`**(Append)는 기존 내용을 유지한 채 맨 뒤에 추가하고, **`\"r\"`**(Read)는 읽기만 합니다.\n\n`\"w\"`는 빈 노트에 새로 쓰는 것, `\"a\"`는 기존 노트 맨 뒤에 이어 쓰는 것, `\"r\"`은 노트를 펼쳐서 읽기만 하는 것이라고 생각하면 직관적입니다.\n\n모드 선택을 잘못하면 데이터가 유실될 수 있으므로, 각 모드의 차이를 정확히 이해하는 것이 중요합니다.",
+        "explanation": "**`#include <stdio.h>`** — 파일 입출력에 필요한 `FILE`, `fopen`, `fclose`, `fprintf`, `fgets` 등이 정의된 헤더입니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수와 FILE 포인터",
-        "explanation": "**`FILE *fp;`** — 파일 정보를 담는 **`FILE` 구조체**를 가리킬 포인터 변수입니다. `FILE` 구조체에는 현재 읽기/쓰기 위치, 열린 모드, 내부 버퍼, 에러 상태 등 운영체제가 파일을 관리하기 위한 정보가 들어 있습니다.\n\n`FILE *fp`는 TV 리모컨과 같습니다. 리모컨(포인터)은 TV(파일) 자체가 아니지만, 리모컨을 통해 채널(읽기 위치)을 바꾸고, 볼륨(데이터)을 조절하고, 전원(열기/닫기)을 제어합니다.\n\n현재 `fp`는 선언만 되고 어떤 파일도 가리키지 않으므로 **쓰레기값(`???`)**이 들어 있습니다. `fopen()`을 호출해야 실제 파일과 연결됩니다.\n\n이 상태에서 `fprintf(fp, ...)`를 호출하면 **정의되지 않은 동작(Undefined Behavior)**이 발생하여 프로그램이 충돌할 수 있습니다.",
+        "explanation": "**`FILE *fp;`** — 파일 정보를 담는 **`FILE` 구조체**를 가리킬 포인터 변수입니다. `FILE` 구조체에는 현재 읽기/쓰기 위치, 열린 모드, 내부 버퍼, 에러 상태 등 운영체제가 파일을 관리하기 위한 정보가 들어 있습니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "highlightOffset": [
@@ -34,7 +34,7 @@
       },
       {
         "title": "1. 쓰기 모드(\"w\")로 파일 열기",
-        "explanation": "**`fp = fopen(\"data.txt\", \"w\");`** — **쓰기 모드(`\"w\"`)**로 파일을 엽니다. 파일이 없으면 새로 생성하고, 이미 있으면 기존 내용을 **모두 삭제(truncate)**한 뒤 빈 상태로 엽니다.\n\n`\"w\"` 모드는 **파괴적**입니다 — 기존 파일의 내용이 아무런 경고 없이 사라지며, 복구할 수 없습니다. 칠판을 완전히 지우고 새로 쓰기 시작하는 것과 같습니다.\n\n`fopen`은 성공하면 `FILE *` 포인터를 반환하고, 실패하면(권한 없음, 디스크 가득 참 등) `NULL`을 반환합니다.\n\n다음 줄의 `if (fp)`는 `fopen`이 성공했는지 확인하는 안전 점검으로, 파일 작업 전 **반드시** 해야 합니다.",
+        "explanation": "**`fp = fopen(\"data.txt\", \"w\");`** — **쓰기 모드(`\"w\"`)**로 파일을 엽니다. 파일이 없으면 새로 생성하고, 이미 있으면 기존 내용을 **모두 삭제(truncate)**한 뒤 빈 상태로 엽니다.",
         "visualizationType": "cMemory",
         "code": "fp = fopen(\"data.txt\", \"w\");",
         "stack": [
@@ -48,13 +48,13 @@
       },
       {
         "title": "파일에 쓰기",
-        "explanation": "**`fprintf(fp, \"Hello File!\");`** — `fp`가 가리키는 파일(`data.txt`)에 문자열을 씁니다. 이전 레슨에서 `fprintf(stdout, ...)`로 화면에 출력했던 것과 동일한 함수인데, `stdout` 대신 파일 포인터 `fp`를 넣었을 뿐입니다.\n\n이것이 **스트림 기반 I/O의 핵심 장점**입니다. `fprintf(stdout, \"Hello\")`는 화면에, `fprintf(fp, \"Hello\")`는 파일에 출력하며, 대상 스트림만 교체하면 됩니다.\n\n이 시점에서 데이터는 아직 디스크에 완전히 기록되지 않았을 수 있습니다. 성능을 위해 **내부 버퍼**에 임시 저장되어 있으며, `fclose`를 호출해야 확실하게 디스크에 기록됩니다.\n\n현재 `data.txt`의 내용은 `\"Hello File!\"`입니다.",
+        "explanation": "**`fprintf(fp, \"Hello File!\");`** — `fp`가 가리키는 파일(`data.txt`)에 문자열을 씁니다. 이전 레슨에서 `fprintf(stdout, ...)`로 화면에 출력했던 것과 동일한 함수인데, `stdout` 대신 파일 포인터 `fp`를 넣었을 뿐입니다.",
         "visualizationType": "cMemory",
         "code": "fprintf(fp, \"Hello File!\");"
       },
       {
         "title": "파일 닫기",
-        "explanation": "**`fclose(fp);`** — 파일 작업을 마친 후 **반드시** 호출해야 합니다. `fclose`는 세 가지 일을 합니다: 버퍼에 남은 데이터를 디스크에 기록하고(flush), 운영체제에 파일 핸들을 반납하고, `FILE` 구조체 메모리를 해제합니다.\n\n도서관에서 책을 빌려 읽은 후 반납하는 것과 같습니다. 반납하지 않으면 다른 사람이 그 책을 사용할 수 없고, 대출 한도(프로세스당 파일 핸들 수, 보통 1024개)도 줄어듭니다.\n\n`fclose` 후에 `fp`를 다시 사용하면 **정의되지 않은 동작**이 발생합니다 — `fp`가 가리키던 `FILE` 구조체는 이미 해제되었기 때문입니다.\n\n시각화에서 `fp`의 값이 `\"closed\"`로 바뀐 것을 확인하세요.",
+        "explanation": "**`fclose(fp);`** — 파일 작업을 마친 후 **반드시** 호출해야 합니다. `fclose`는 세 가지 일을 합니다: 버퍼에 남은 데이터를 디스크에 기록하고(flush), 운영체제에 파일 핸들을 반납하고, `FILE` 구조체 메모리를 해제합니다.",
         "visualizationType": "cMemory",
         "code": "fclose(fp);",
         "stack": [
@@ -68,7 +68,7 @@
       },
       {
         "title": "2. 추가 모드(\"a\")로 파일 열기",
-        "explanation": "**`fp = fopen(\"data.txt\", \"a\");`** — 이번에는 **추가 모드(`\"a\"`)**로 같은 파일을 엽니다. 파일이 없으면 새로 생성하고(`\"w\"`와 동일), 이미 있으면 기존 내용을 **그대로 유지**한 채 파일 맨 끝에서부터 쓰기를 시작합니다.\n\n`\"w\"`가 칠판을 지우고 새로 쓰는 것이라면, `\"a\"`는 칠판에 이미 적힌 내용 **아래에 이어서 쓰는 것**입니다.\n\n로그 파일에 데이터를 쌓을 때 `\"a\"` 모드가 필수적입니다. 웹 서버의 접속 로그나 에러 로그는 항상 기존 기록 뒤에 새 기록을 추가해야 하므로 `\"a\"` 모드를 사용합니다.\n\n만약 `\"w\"` 모드를 쓰면 서버를 재시작할 때마다 이전 로그가 전부 사라집니다!",
+        "explanation": "**`fp = fopen(\"data.txt\", \"a\");`** — 이번에는 **추가 모드(`\"a\"`)**로 같은 파일을 엽니다. 파일이 없으면 새로 생성하고(`\"w\"`와 동일), 이미 있으면 기존 내용을 **그대로 유지**한 채 파일 맨 끝에서부터 쓰기를 시작합니다.",
         "visualizationType": "cMemory",
         "code": "fp = fopen(\"data.txt\", \"a\");",
         "stack": [
@@ -82,13 +82,13 @@
       },
       {
         "title": "파일에 내용 추가",
-        "explanation": "**`fprintf(fp, \" Append me.\");`** — `\"a\"` 모드로 열었으므로 새 문자열이 기존 내용 **뒤에 이어서** 기록됩니다. `\"w\"` 모드 후에는 `\"Hello File!\"`이었고, `\"a\"` 모드로 추가하면 `\"Hello File! Append me.\"`가 됩니다.\n\n문자열 앞의 공백은 기존 내용과 새 내용 사이에 자연스러운 구분을 주기 위해 일부러 넣은 것입니다.\n\n`\"a\"` 모드에서는 `fseek()`으로 파일 커서를 옮겨도 실제 쓰기 시 항상 **파일 끝에서** 기록됩니다. 운영체제가 이를 보장하므로, 여러 프로세스가 동시에 같은 로그 파일에 써도 기존 데이터를 덮어쓸 위험이 없습니다.\n\n쓰기(`\"w\"`)와 추가(`\"a\"`)의 코드는 `fopen`의 두 번째 인자(모드 문자열)만 다릅니다 — 나머지 `fprintf`와 `fclose`는 완전히 동일합니다.",
+        "explanation": "**`fprintf(fp, \" Append me.\");`** — `\"a\"` 모드로 열었으므로 새 문자열이 기존 내용 **뒤에 이어서** 기록됩니다. `\"w\"` 모드 후에는 `\"Hello File!\"`이었고, `\"a\"` 모드로 추가하면 `\"Hello File!",
         "visualizationType": "cMemory",
         "code": "fprintf(fp, \" Append me.\");"
       },
       {
         "title": "파일 닫기",
-        "explanation": "**`fclose(fp);`** — 추가된 내용을 디스크에 확실히 저장하고 파일을 닫습니다. 이 시점의 `data.txt` 최종 내용은 `\"Hello File! Append me.\"`입니다.\n\n`fclose`를 빼먹으면 어떻게 될까요? 정상 종료 시 C 런타임이 자동으로 닫아주긴 하지만, **비정상 종료(크래시)** 시에는 버퍼 데이터가 유실됩니다. 또한 파일 핸들이 해제되지 않으면 같은 파일을 다시 여는 코드에서 접근 충돌이 발생할 수 있습니다.\n\n파일을 열었으면(`fopen`) 가능한 **빨리** 닫는 것(`fclose`)이 좋은 습관입니다.\n\n시각화에서 `fp`가 다시 `\"closed\"` 상태로 바뀐 것을 확인하세요.",
+        "explanation": "**`fclose(fp);`** — 추가된 내용을 디스크에 확실히 저장하고 파일을 닫습니다. 이 시점의 `data.txt` 최종 내용은 `\"Hello File!",
         "visualizationType": "cMemory",
         "code": "fclose(fp);",
         "occurrence": 2,
@@ -103,7 +103,7 @@
       },
       {
         "title": "3. 읽기 모드(\"r\")로 파일 열기",
-        "explanation": "**`fp = fopen(\"data.txt\", \"r\");`** — **읽기 모드(`\"r\"`)**로 파일을 엽니다. 파일이 있으면 읽기 전용으로 열고 커서를 맨 처음에 놓지만, 파일이 없으면 `NULL`을 반환합니다. `\"w\"`나 `\"a\"`와 달리 **파일을 생성하지 않습니다**.\n\n이 모드에서는 **쓰기가 불가능**합니다. `fprintf(fp, ...)`를 호출하면 에러가 발생하며, 덕분에 실수로 원본 데이터를 덮어쓸 위험이 없습니다.\n\n3가지 모드를 비교하면: `\"r\"`은 읽기만 가능하고 파일이 없으면 에러, `\"w\"`는 쓰기만 가능하고 기존 내용을 삭제, `\"a\"`는 쓰기만 가능하고 기존 내용을 보존합니다.\n\n나중에 `\"r+\"`(읽기+쓰기, 보존), `\"w+\"`(읽기+쓰기, 삭제), `\"a+\"`(읽기+추가쓰기, 보존) 같은 복합 모드도 배우게 됩니다.",
+        "explanation": "**`fp = fopen(\"data.txt\", \"r\");`** — **읽기 모드(`\"r\"`)**로 파일을 엽니다. 파일이 있으면 읽기 전용으로 열고 커서를 맨 처음에 놓지만, 파일이 없으면 `NULL`을 반환합니다.",
         "visualizationType": "cMemory",
         "code": "fp = fopen(\"data.txt\", \"r\");",
         "stack": [
@@ -117,7 +117,7 @@
       },
       {
         "title": "버퍼 준비 및 파일 읽기",
-        "explanation": "**`char buffer[50];`**과 **`fgets(buffer, 50, fp);`** — 파일에서 읽어올 데이터를 저장할 문자 배열을 선언하고, `fgets`로 파일 내용을 읽어옵니다. `fgets(저장할곳, 최대크기, 읽을스트림)` 형식이며, 최대 **49**글자까지 읽습니다 — 마지막 1바이트는 문자열 종료 문자 `\\0`용입니다.\n\n왜 50이 아니라 49글자일까요? C의 문자열은 반드시 `\\0`으로 끝나야 하고, `fgets`가 자동으로 이를 추가하므로 **버퍼 오버플로우**를 방지하기 위해 1바이트를 남기는 것입니다.\n\n읽은 결과로 `buffer`에 `\"Hello File! Append me.\"`가 저장됩니다 — 앞서 `\"w\"` 모드로 쓴 내용과 `\"a\"` 모드로 추가한 내용이 합쳐진 것입니다.\n\n`fgets`는 **한 줄 전체**를 읽고, `fscanf`는 **공백 단위로** 읽습니다. 공백이 포함된 문자열을 읽으려면 `fgets`를 사용해야 합니다.",
+        "explanation": "**`char buffer[50];`**과 **`fgets(buffer, 50, fp);`** — 파일에서 읽어올 데이터를 저장할 문자 배열을 선언하고, `fgets`로 파일 내용을 읽어옵니다. `fgets(저장할곳, 최대크기, 읽을스트림)` 형식이며, 최대 **49**글자까지 읽습니다 — 마지",
         "visualizationType": "cMemory",
         "code": "char buffer[50];",
         "highlightOffset": [
@@ -141,14 +141,14 @@
       },
       {
         "title": "읽은 내용 출력",
-        "explanation": "**`printf(\"Read: %s\\n\", buffer);`** — 파일에서 읽어온 문자열을 화면에 출력합니다. 결과는 `\"Read: Hello File! Append me.\"`입니다.\n\n전체 흐름을 돌아보면: `\"w\"` 모드로 `\"Hello File!\"`을 쓰고, `\"a\"` 모드로 `\" Append me.\"`를 추가한 뒤, `\"r\"` 모드로 합쳐진 내용을 읽어왔습니다.\n\n이 흐름에서 **모드 선택이 얼마나 중요한지** 느낄 수 있습니다. 4단계(추가 모드)에서 `\"a\"` 대신 `\"w\"`를 사용했다면, `\"Hello File!\"`이 삭제되고 `\" Append me.\"`만 남았을 것입니다.\n\n파일 모드를 잘못 선택하면 데이터가 영구적으로 사라질 수 있으니, 항상 의도에 맞는 모드를 선택하세요.",
+        "explanation": "**`printf(\"Read: %s\\n\", buffer);`** — 파일에서 읽어온 문자열을 화면에 출력합니다. 결과는 `\"Read: Hello File!",
         "visualizationType": "cMemory",
         "code": "printf(\"Read: %s\\n\", buffer);",
         "stdout": "Read: Hello File! Append me."
       },
       {
         "title": "마지막 파일 닫기 및 종료",
-        "explanation": "**`fclose(fp);`**과 **`return 0;`** — 모든 파일 작업을 마치고 프로그램을 종료합니다.\n\n파일 입출력의 기본 패턴은 항상 동일합니다: `fopen`으로 열고 → `NULL` 체크로 에러 확인 → 읽기/쓰기 작업 → `fclose`로 닫기. 이 순서를 벗어나면 크래시나 데이터 유실이 발생합니다.\n\n흔한 실수로는 `fopen` 후 `NULL` 체크를 빼먹거나(파일 없으면 크래시), `fclose`를 빼먹거나(데이터 유실), `\"w\"` 모드로 중요한 파일을 열어 기존 데이터를 삭제하는 것이 있습니다.\n\n이 레슨의 핵심은 파일 모드(`\"r\"`, `\"w\"`, `\"a\"`)의 차이를 정확히 이해하고, 용도에 맞는 모드를 선택해야 데이터 유실을 방지할 수 있다는 것입니다.",
+        "explanation": "**`fclose(fp);`**과 **`return 0;`** — 모든 파일 작업을 마치고 프로그램을 종료합니다.\n\n파일 입출력의 기본 패턴은 항상 동일합니다: `fopen`으로 열고 → `NULL` 체크로 에러 확인 → 읽기/쓰기 작업 → `fclose`로 닫기.",
         "visualizationType": "cMemory",
         "code": "fclose(fp);",
         "occurrence": 3,

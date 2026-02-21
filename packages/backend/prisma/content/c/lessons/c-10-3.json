@@ -1,13 +1,13 @@
 {
   "lessonId": "c-10-3",
   "title": "Buffered I/O",
-  "concept": "Core concept for Buffered I/O",
+  "concept": "버퍼링된 I/O는 시스템 호출 수를 줄여 성능을 높이지만 flush 시점을 이해해야 한다",
   "content": {
     "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    printf(\"Example 1... \");\n\n    fflush(stdout);\n    printf(\"Printed immediately!\\n\");\n\n    printf(\"Example 2 with newline\\n\");\n\n    return 0;\n}",
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`** — `printf`, `fflush` 등 표준 입출력 함수를 사용하기 위한 헤더입니다.\n\n이 레슨에서는 **버퍼링(Buffering)**을 배웁니다. `printf`로 출력한 텍스트가 **즉시** 화면에 나타나지 않을 수 있다는 사실, 알고 계셨나요? 데이터를 하나씩 보내는 대신 **임시 저장소(버퍼)**에 모아두었다가 한꺼번에 보내는 기법입니다.\n\n우체국에서 편지를 한 통씩 바로 배달하는 것(버퍼링 없음) vs 트럭이 가득 찰 때까지 모았다가 한 번에 배달하는 것(버퍼링)으로 생각하면 됩니다. 한 번에 배달하는 것이 훨씬 효율적이죠.\n\n화면에 한 글자를 출력할 때마다 **시스템 콜**이라는 비싼 연산이 필요합니다. 100글자를 1글자씩 100번 보내는 것보다, 모아서 1번 보내는 것이 **100배** 효율적입니다.",
+        "explanation": "**`#include <stdio.h>`** — `printf`, `fflush` 등 표준 입출력 함수를 사용하기 위한 헤더입니다.\n\n이 레슨에서는 **버퍼링(Buffering)**을 배웁니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`** — 프로그램이 시작되면 운영체제는 표준 스트림을 열면서 각각에 **버퍼링 모드**를 설정합니다.\n\nC에는 3가지 버퍼링 모드가 있습니다. **Full Buffering**(전체 버퍼링)은 버퍼가 가득 찰 때만 보내며, 파일 I/O에 기본 적용됩니다. **Line Buffering**(줄 단위 버퍼링)은 `\\n`을 만나거나 버퍼가 찰 때 보내며, 터미널에 연결된 `stdout`에 기본 적용됩니다. **No Buffering**(버퍼링 없음)은 즉시 보내며, `stderr`에 기본 적용됩니다.\n\n`stdout`은 터미널에 연결되면 줄 단위 버퍼링, 파일로 리다이렉트되면 전체 버퍼링으로 바뀝니다. 같은 프로그램이 `./program`과 `./program > out.txt`에서 다르게 동작할 수 있는 이유입니다.\n\n`stderr`에 버퍼링이 없는 이유는 에러 메시지가 지연 없이 즉시 보여야 하기 때문입니다.",
+        "explanation": "**`int main() {`** — 프로그램이 시작되면 운영체제는 표준 스트림을 열면서 각각에 **버퍼링 모드**를 설정합니다.\n\nC에는 3가지 버퍼링 모드가 있습니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,35 +30,35 @@
       },
       {
         "title": "데이터를 버퍼에 저장",
-        "explanation": "**`printf(\"Example 1... \");`** — `printf`를 호출했지만 문자열 끝에 **`\\n`이 없습니다**. 터미널에 연결된 `stdout`은 줄 단위 버퍼링이므로, `\\n`을 만나야 버퍼를 비웁니다. 따라서 **이 텍스트는 아직 화면에 나타나지 않습니다**.\n\n데이터의 현재 위치는 메모리 상의 `stdout` 내부 버퍼입니다. 화면에는 아직 아무것도 보이지 않습니다.\n\n레스토랑에서 주문을 메모지에 적어둔 것과 같습니다. 아직 주방(화면)에 전달한 게 아니라, 웨이터(버퍼)의 메모지에만 적혀 있는 상태이죠. 메모지가 가득 차거나, 줄을 긋거나(`\\n`), '지금 당장 전달해!'(`fflush`) 요청이 있어야 주방에 전달됩니다.\n\n디버깅 시 이 동작이 매우 혼란스러울 수 있습니다 — 크래시 직전에 `printf`로 출력한 메시지가 버퍼에만 남아있다가 사라져버릴 수 있기 때문입니다.",
+        "explanation": "**`printf(\"Example 1... \");`** — `printf`를 호출했지만 문자열 끝에 **`\\n`이 없습니다**.\n\n데이터의 현재 위치는 메모리 상의 `stdout` 내부 버퍼입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Example 1... \");",
         "stack": []
       },
       {
         "title": "버퍼 강제 비우기 (Flush)",
-        "explanation": "**`fflush(stdout);`** — 지정된 스트림의 버퍼를 **강제로 비워서**, 쌓여있던 모든 데이터를 목적지로 즉시 전송합니다. 이 시점에 버퍼의 `\"Example 1... \"`이 드디어 화면에 출력됩니다. `fflush(NULL)`을 쓰면 열려있는 모든 스트림의 버퍼를 비울 수 있습니다.\n\n`fflush`가 필요한 대표적인 상황은 `\\n` 없이 즉시 출력이 필요할 때(프로그레스 바, 프롬프트), 디버깅 출력을 확실히 보고 싶을 때, 그리고 `fork()` 전에 자식 프로세스의 중복 출력을 방지할 때입니다.\n\n화장실 변기의 '물 내리기(flush)' 버튼과 같은 개념입니다. 자동으로 내려가기를 기다리지 않고, 직접 버튼을 눌러 즉시 비웁니다.\n\n`fflush(stdin)`은 **정의되지 않은 동작**이므로 입력 스트림에는 사용하면 안 됩니다.",
+        "explanation": "**`fflush(stdout);`** — 지정된 스트림의 버퍼를 **강제로 비워서**, 쌓여있던 모든 데이터를 목적지로 즉시 전송합니다. 이 시점에 버퍼의 `\"Example 1...",
         "visualizationType": "cMemory",
         "code": "fflush(stdout);",
         "stdout": "Example 1... "
       },
       {
         "title": "개행 문자가 있는 출력",
-        "explanation": "**`printf(\"Printed immediately!\\n\");`** — 이 `printf`는 문자열 끝에 **`\\n`**을 포함하고 있습니다. 줄 단위 버퍼링에서 `\\n`을 만나면 버퍼가 **자동으로 비워지므로**, `fflush` 없이도 즉시 화면에 출력됩니다.\n\n`fflush(stdout)`는 버퍼를 강제로 비우지만 줄 바꿈이 없고, `\\n`은 버퍼를 자동으로 비우면서 줄 바꿈도 합니다. 이전 `fflush`로 출력된 `\"Example 1... \"` 뒤에 이어서 출력되어, 최종 결과는 `\"Example 1... Printed immediately!\"`입니다.\n\n대부분의 경우 문자열 끝에 `\\n`을 넣으면 자동으로 플러시되므로 `fflush`가 따로 필요 없습니다.\n\n`fflush`는 `\\n` 없이 즉시 출력이 필요한 특수한 경우에만 사용하세요.",
+        "explanation": "**`printf(\"Printed immediately!\\n\");`** — 이 `printf`는 문자열 끝에 **`\\n`**을 포함하고 있습니다. 줄 단위 버퍼링에서 `\\n`을 만나면 버퍼가 **자동으로 비워지므로**, `fflush` 없이도 즉시 화면에 출력됩니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Printed immediately!\\n\");",
         "stdout": "Example 1... Printed immediately!"
       },
       {
         "title": "자동 플러시 재확인",
-        "explanation": "**`printf(\"Example 2 with newline\\n\");`** — `\\n`이 포함되어 있으므로 줄 단위 버퍼링이 자동으로 비워져 즉시 화면에 출력됩니다.\n\n버퍼가 자동으로 비워지는 조건을 정리하면: `\\n`을 만났을 때(줄 단위 버퍼링), 버퍼가 가득 찼을 때(모든 모드), `fflush()`를 호출했을 때, `fclose()`를 호출했을 때, 프로그램이 정상 종료될 때입니다. 반면 **비정상 종료(크래시)에서는 버퍼가 비워지지 않습니다**.\n\n같은 프로그램이라도 출력 대상에 따라 버퍼링 모드가 달라집니다. `./program`은 줄 단위 버퍼링(터미널)이고, `./program > out.txt`는 전체 버퍼링(파일)입니다.\n\n이 차이 때문에 터미널에서는 잘 보이던 출력이, 파일 리다이렉트 시에는 버퍼가 가득 차거나 프로그램이 종료될 때까지 기록되지 않을 수 있습니다.",
+        "explanation": "**`printf(\"Example 2 with newline\\n\");`** — `\\n`이 포함되어 있으므로 줄 단위 버퍼링이 자동으로 비워져 즉시 화면에 출력됩니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Example 2 with newline\\n\");",
         "stdout": "Example 1... Printed immediately!\nExample 2 with newline"
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`** — 정상 종료 시 C 런타임은 열려있는 모든 스트림의 버퍼를 자동으로 비웁니다. 마지막에 `\\n` 없이 `printf`한 데이터도 이 시점에 출력됩니다.\n\n하지만 `abort()`, 세그폴트(`SIGSEGV`), `SIGKILL` 등으로 **비정상 종료**되면 버퍼 내용이 유실됩니다. 디버깅 시 `printf` 출력이 안 보인다면 크래시 전에 버퍼가 날아간 것일 수 있습니다.\n\n핵심 정리: **버퍼링은 시스템 콜 횟수를 줄이는 성능 최적화**입니다. `stdout`은 줄 단위 버퍼링(`\\n`에 플러시), `stderr`는 버퍼링 없음(즉시 출력), `fflush(stdout)`는 `\\n` 없이 즉시 출력이 필요할 때 사용합니다.\n\n`setvbuf(stdout, NULL, _IONBF, 0);`으로 버퍼링 모드를 직접 변경할 수도 있습니다.",
+        "explanation": "**`return 0;`** — 정상 종료 시 C 런타임은 열려있는 모든 스트림의 버퍼를 자동으로 비웁니다. 마지막에 `\\n` 없이 `printf`한 데이터도 이 시점에 출력됩니다.",
         "visualizationType": "cMemory",
         "code": "return 0;"
       }

@@ -106,6 +106,7 @@ export function LessonCodePanel({
             highlightLine={highlightLine}
             onSelectionChange={onSelectionChange}
             bottomPadding={0}
+            mobileFontSizeOffset={2}
           />
           {terminalLines.length > 0 && (
             <TerminalOutput lines={terminalLines} compact />

@@ -10,6 +10,7 @@ import type { SupportedLanguage } from '@/types';
 
 const LANGUAGES: { id: SupportedLanguage; label: string; shortLabel: string; color: string }[] = [
   { id: 'c', label: 'C', shortLabel: 'C', color: '#3b82f6' },
+  { id: 'cpp', label: 'C++', shortLabel: 'C++', color: '#6366f1' },
   { id: 'python', label: 'Py', shortLabel: 'Py', color: '#22c55e' },
   { id: 'java', label: 'Java', shortLabel: 'Ja', color: '#EC4899' },
   { id: 'javascript', label: 'JS', shortLabel: 'JS', color: '#f59e0b' },

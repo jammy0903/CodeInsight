@@ -52,7 +52,7 @@ export function PlaygroundPage() {
   });
 
   // Memory 탭 표시 여부 (Java, C만)
-  const showMemoryTab = language === 'java' || language === 'c';
+  const showMemoryTab = language === 'java' || language === 'c' || language === 'cpp';
 
 
   // 페이지 제목 설정
@@ -207,7 +207,7 @@ export function PlaygroundPage() {
               <div style={{ padding: '10px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '6px' }}>
                 <p style={{ fontSize: '12px', color: colors.errorText }}>{error}</p>
               </div>
-            ) : (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
+            ) : (language === 'c' || language === 'cpp' || language === 'python' || language === 'java') && hasSteps ? (
               <>
                 {activeTab === 'flow' ? (
                   <LessonFlowVisualizer
@@ -448,7 +448,7 @@ export function PlaygroundPage() {
               <div style={{ padding: '5px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
                 <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
               </div>
-            ) : (language === 'c' || language === 'python' || language === 'java') && hasSteps ? (
+            ) : (language === 'c' || language === 'cpp' || language === 'python' || language === 'java') && hasSteps ? (
               <>
                 {activeTab === 'flow' ? (
                   <LessonFlowVisualizer

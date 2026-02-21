@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "헤더 파일 포함",
-        "explanation": "`printf` 사용을 위해 **`#include <stdio.h>`**로 표준 입출력 라이브러리를 포함합니다.\n\n이번 레슨은 중요한 질문에 답합니다: **\"같은 문제를 재귀와 반복문으로 풀면 뭐가 다를까?\"** 1부터 n까지의 합을 두 가지 방법으로 구현하고, **메모리 사용량**의 극적인 차이를 확인합니다.\n\n서울에서 부산까지 KTX와 비행기 모두 도착하지만 비용이 다르듯, 같은 결과를 내는 두 방법의 \"연비\"를 비교해봅시다.",
+        "explanation": "`printf` 사용을 위해 **`#include <stdio.h>`**로 표준 입출력 라이브러리를 포함합니다.\n\n이번 레슨은 중요한 질문에 답합니다: **\"같은 문제를 재귀와 반복문으로 풀면 뭐가 다를까?\"** 1부터 n까지의 합을 두 가지 방법으로 구현하고, **",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,80 +16,237 @@
       },
       {
         "title": "main에서 sum_recursive(5) 호출",
-        "explanation": "**`printf(\"Recursive: %d\\n\", sum_recursive(5));`** --- 1+2+3+4+5를 **재귀적**으로 계산합니다. `sum_recursive(5) = 5 + sum_recursive(4)`, 즉 \"5까지의 합 = 5 + 4까지의 합\"으로 문제를 쪼개는 방식입니다.\n\n\"1부터 5까지 더해줘\"라고 했더니 \"나는 5만 담당할게, 1~4는 후배한테 물어봐\"라고 하고, 후배도 \"나는 4만, 1~3은 내 후배한테...\" 이렇게 연쇄적으로 위임하는 구조입니다.\n\n첫 번째 sum_recursive 프레임이 생성되었고 n=5가 전달되었습니다. 이제부터 프레임이 계속 쌓일 예정입니다.",
+        "explanation": "**`printf(\"Recursive: %d\\n\", sum_recursive(5));`** --- 1+2+3+4+5를 **재귀적**으로 계산합니다. `sum_recursive(5) = 5 + sum_recursive(4)`, 즉 \"5까지의 합 = 5 + 4까지의 합\"으로 문제를 쪼개는 방식입니다",
         "visualizationType": "cMemory",
         "code": "printf(\"Recursive: %d\\n\", sum_recursive(5));",
-        "highlightOffset": [0, -14],
+        "highlightOffset": [
+          0,
+          -14
+        ],
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" },
-          { "name": "sum_recursive", "type": "frame", "func": "sum_recursive", "value": "frame" },
-          { "name": "n", "value": "5", "type": "int", "address": "0x1004", "frame": "sum_recursive" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "5",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "sum_recursive"
+          }
         ]
       },
       {
         "title": "재귀: 스택 프레임이 6층까지 쌓임",
-        "explanation": "**`return n + sum_recursive(n - 1);`** --- sum_recursive(5)부터 sum_recursive(0)까지 총 6번 호출되어, main 포함 **7개의 프레임**이 동시에 존재합니다. 각 프레임은 약 16~32바이트의 메모리를 사용합니다.\n\nn=5 정도면 문제없지만, n이 10,000이면 프레임이 10,001개, 100,000이면 약 1.6~3.2MB --- 스택 메모리(보통 1~8MB)가 부족하면 **Stack Overflow**입니다. 사람을 한 줄로 세워서 앞사람이 뒷사람의 답을 기다리는 구조에서, n=100,000이면 10만 명이 줄 서야 하는데 교실(메모리)에 다 들어가지 못하는 것과 같습니다.\n\n오른쪽 시각화에서 스택 프레임이 탑처럼 높이 쌓인 것을 확인하세요. 이것이 재귀의 메모리 비용입니다.",
+        "explanation": "**`return n + sum_recursive(n - 1);`** --- sum_recursive(5)부터 sum_recursive(0)까지 총 6번 호출되어, main 포함 **7개의 프레임**이 동시에 존재합니다. 각 프레임은 약 16~32바이트의 메모리를 사용합니다.",
         "visualizationType": "cMemory",
         "code": "return n + sum_recursive(n - 1);",
-        "highlightOffset": [0, -2],
+        "highlightOffset": [
+          0,
+          -2
+        ],
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" },
-          { "name": "sum_recursive", "type": "frame", "func": "sum_recursive", "value": "frame" },
-          { "name": "n", "value": "5", "type": "int", "address": "0x1004", "frame": "sum_recursive" },
-          { "name": "sum_recursive", "type": "frame", "func": "sum_recursive", "value": "frame" },
-          { "name": "n", "value": "4", "type": "int", "address": "0x1008", "frame": "sum_recursive" },
-          { "name": "sum_recursive", "type": "frame", "func": "sum_recursive", "value": "frame" },
-          { "name": "n", "value": "3", "type": "int", "address": "0x100c", "frame": "sum_recursive" },
-          { "name": "sum_recursive", "type": "frame", "func": "sum_recursive", "value": "frame" },
-          { "name": "n", "value": "2", "type": "int", "address": "0x1010", "frame": "sum_recursive" },
-          { "name": "sum_recursive", "type": "frame", "func": "sum_recursive", "value": "frame" },
-          { "name": "n", "value": "1", "type": "int", "address": "0x1014", "frame": "sum_recursive" },
-          { "name": "sum_recursive", "type": "frame", "func": "sum_recursive", "value": "frame" },
-          { "name": "n", "value": "0", "type": "int", "address": "0x1018", "frame": "sum_recursive" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "5",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x1010",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "1",
+            "type": "int",
+            "address": "0x1014",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "0",
+            "type": "int",
+            "address": "0x1018",
+            "frame": "sum_recursive"
+          }
         ]
       },
       {
         "title": "재귀 결과: 15",
-        "explanation": "종료 조건에서 시작하여 반환값이 역순으로 전파됩니다: sum_recursive(0)=**0** -> (1)=1+0=**1** -> (2)=2+1=**3** -> (3)=3+3=**6** -> (4)=4+6=**10** -> (5)=5+10=**15**. 모든 프레임이 Pop 되고 최종 결과 `15`가 출력됩니다.\n\n재귀 방식의 메모리 비용: 스택 프레임 **n+1개**, 메모리 복잡도 **O(n)**. 도미노를 세우고(Winding) 맨 끝에서 밀어서(종료 조건) 연쇄적으로 쓰러뜨리는(Unwinding) 것처럼, 도미노 수가 n에 비례합니다.\n\n이제 같은 문제를 반복문으로 풀어보고, 메모리 사용량의 극적인 차이를 확인해봅시다!",
+        "explanation": "종료 조건에서 시작하여 반환값이 역순으로 전파됩니다: sum_recursive(0)=**0** -> (1)=1+0=**1** -> (2)=2+1=**3** -> (3)=3+3=**6** -> (4)=4+6=**10** -> (5)=5+10=**15**. 모든 프레임이 Pop 되고 최종 결과 `1",
         "visualizationType": "cMemory",
         "code": "printf(\"Recursive: %d\\n\", sum_recursive(5));",
         "occurrence": 2,
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
         ],
         "stdout": "Recursive: 15"
       },
       {
         "title": "반복문: sum_loop(5) 호출",
-        "explanation": "**`printf(\"Loop: %d\\n\", sum_loop(5));`** --- 이번에는 **반복문(for 루프)**으로 같은 문제를 풀어봅니다. sum_loop 프레임이 **딱 하나** 생기고, 자기 자신을 호출하지 않으므로 프레임이 추가로 쌓이지 않습니다.\n\n재귀가 \"사람 여러 명이 줄 서서 연쇄적으로 답을 전달\"하는 방식이었다면, 반복문은 **한 사람이 메모장 하나(total)를 들고 1부터 5까지 직접 더해나가는** 방식입니다. 사람을 여러 명 고용할(프레임을 여러 개 만들) 필요가 없습니다.\n\nsum_loop 프레임 **하나** 안에 n, total, i 세 변수만 있습니다. 재귀는 6개의 프레임이 필요했지만, 반복문은 단 1개입니다!",
+        "explanation": "**`printf(\"Loop: %d\\n\", sum_loop(5));`** --- 이번에는 **반복문(for 루프)**으로 같은 문제를 풀어봅니다. sum_loop 프레임이 **딱 하나** 생기고, 자기 자신을 호출하지 않으므로 프레임이 추가로 쌓이지 않습니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Loop: %d\\n\", sum_loop(5));",
-        "highlightOffset": [0, -10],
+        "highlightOffset": [
+          0,
+          -10
+        ],
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" },
-          { "name": "sum_loop", "type": "frame", "func": "sum_loop", "value": "frame" },
-          { "name": "n", "value": "5", "type": "int", "address": "0x1004", "frame": "sum_loop" },
-          { "name": "total", "value": "0", "type": "int", "address": "0x1008", "frame": "sum_loop" },
-          { "name": "i", "value": "1", "type": "int", "address": "0x100c", "frame": "sum_loop" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "sum_loop",
+            "type": "frame",
+            "func": "sum_loop",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "5",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "sum_loop"
+          },
+          {
+            "name": "total",
+            "value": "0",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "sum_loop"
+          },
+          {
+            "name": "i",
+            "value": "1",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "sum_loop"
+          }
         ],
         "stdout": "Recursive: 15"
       },
       {
         "title": "반복문: 변수 값이 변하며 누적",
-        "explanation": "**`total += i;`** --- 새 프레임 없이 **같은 프레임 안에서 변수 값만 바꾸며** 계산합니다: i=1이면 total=1, i=2이면 total=3, i=3이면 total=6, i=4이면 total=10, i=5이면 total=15. `i`가 6이 되면 `i <= n`(6 <= 5)이 거짓이 되어 루프가 종료됩니다.\n\n재귀가 \"5명의 직원이 각자 사무실(프레임)을 갖고 업무를 나누는 것\"이었다면, 반복문은 **\"1명이 한 사무실에서 메모장을 넘기며 혼자 계산하는 것\"**입니다. 프레임은 여전히 **하나뿐**이고, total과 i의 값만 변할 뿐 새로운 메모리가 추가로 필요하지 않습니다.\n\n재귀는 프레임 **6개**, 반복문은 프레임 **1개**로 같은 결과(15)를 얻었습니다. n이 100,000이어도 반복문은 여전히 프레임 1개입니다.",
+        "explanation": "**`total += i;`** --- 새 프레임 없이 **같은 프레임 안에서 변수 값만 바꾸며** 계산합니다: i=1이면 total=1, i=2이면 total=3, i=3이면 total=6, i=4이면 total=10, i=5이면 total=15. `i`가 6이 되면 `i <= n`(6 <=",
         "visualizationType": "cMemory",
         "code": "total += i;",
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" },
-          { "name": "sum_loop", "type": "frame", "func": "sum_loop", "value": "frame" },
-          { "name": "n", "value": "5", "type": "int", "address": "0x1004", "frame": "sum_loop" },
-          { "name": "total", "value": "15", "type": "int", "address": "0x1008", "frame": "sum_loop" },
-          { "name": "i", "value": "5", "type": "int", "address": "0x100c", "frame": "sum_loop" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "sum_loop",
+            "type": "frame",
+            "func": "sum_loop",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "5",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "sum_loop"
+          },
+          {
+            "name": "total",
+            "value": "15",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "sum_loop"
+          },
+          {
+            "name": "i",
+            "value": "5",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "sum_loop"
+          }
         ]
       },
       {
         "title": "최종 비교: 재귀 vs 반복문",
-        "explanation": "두 방법 모두 결과는 `15`로 동일하지만, 메모리 사용은 **하늘과 땅** 차이입니다. 재귀는 프레임 **n+1개**(O(n)), 반복문은 **1개**(O(1)). 재귀는 편지를 100명에게 릴레이로 전달하는 것(100명 필요), 반복문은 한 사람이 100번 걸어가서 전달하는 것(1명 필요)입니다.\n\n그렇다면 재귀는 언제 쓸까요? **트리 탐색**(폴더 구조, DOM 순회), **분할 정복**(퀵소트, 병합정렬), **하노이의 탑**, **미로 탐색** 등 구조 자체가 재귀적인 문제에서는 반복문으로 풀면 코드가 매우 복잡해지지만 재귀를 쓰면 수학 공식처럼 간결해집니다.\n\n\"항상 반복문이 좋다\"가 아니라 **\"문제의 성격에 맞는 방법을 선택하자\"**가 올바른 결론입니다. 단순한 합산은 반복문, 트리/그래프 탐색은 재귀가 자연스럽습니다.",
+        "explanation": "두 방법 모두 결과는 `15`로 동일하지만, 메모리 사용은 **하늘과 땅** 차이입니다. 재귀는 프레임 **n+1개**(O(n)), 반복문은 **1개**(O(1)).",
         "visualizationType": "terminal",
         "code": "printf(\"Loop: %d\\n\", sum_loop(5));",
         "stdout": "Recursive: 15\nLoop: 15"

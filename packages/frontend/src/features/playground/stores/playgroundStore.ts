@@ -102,6 +102,27 @@ const DEFAULT_JAVA_CODE = `public class Main {
     }
 }`;
 
+const DEFAULT_CPP_CODE = `#include <iostream>
+#include <vector>
+#include <string>
+#include <memory>
+
+int main() {
+    int x = 42;
+    double pi = 3.14;
+    std::string name = "CodeInsight";
+
+    std::vector<int> nums = {1, 2, 3};
+    nums.push_back(4);
+
+    std::cout << name << ": " << x << std::endl;
+
+    auto ptr = std::make_unique<int>(100);
+    std::cout << "ptr: " << *ptr << std::endl;
+
+    return 0;
+}`;
+
 const DEFAULT_JAVASCRIPT_CODE = `// Welcome to the JavaScript Visualizer!
 // Click 'Run' to see the visualization.
 
@@ -126,6 +147,7 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
   // === 코드 (언어별 분리) ===
   codes: {
     c: DEFAULT_C_CODE,
+    cpp: DEFAULT_CPP_CODE,
     python: DEFAULT_PYTHON_CODE,
     java: DEFAULT_JAVA_CODE,
     javascript: DEFAULT_JAVASCRIPT_CODE,

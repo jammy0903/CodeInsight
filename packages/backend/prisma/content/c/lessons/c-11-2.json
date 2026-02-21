@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main() {`** — 프로그램의 시작점이며, 스택에 main 스택 프레임이 생성됩니다.\n\n이번 레슨에서는 **switch-case 문**을 배웁니다. if-else가 \"범위 조건\"을 검사하는 데 적합했다면, switch는 **하나의 값이 정확히 무엇인지** 비교하는 데 특화된 분기문입니다.\n\nif-else가 \"키가 130cm 이상이면...\"처럼 범위를 검사하는 것이라면, switch는 \"번호표가 3번이면...\"처럼 정확한 값을 매칭하는 것입니다. 자동 분류기에 물건을 넣으면 라벨에 따라 정확한 칸으로 보내는 것과 같습니다.\n\n시각화에서 main 스택 프레임이 비어있는 상태로 생성된 것을 확인하세요.",
+        "explanation": "**`int main() {`** — 프로그램의 시작점이며, 스택에 main 스택 프레임이 생성됩니다.\n\n이번 레슨에서는 **switch-case 문**을 배웁니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -23,7 +23,7 @@
       },
       {
         "title": "요일 변수 초기화",
-        "explanation": "**`int day = 3;`** — 정수형 변수 `day`를 선언하고 **3**으로 초기화합니다. 1은 월요일, 2는 화요일, 3은 수요일을 의미하는 약속입니다. 이 값을 switch 문에서 여러 case와 하나씩 비교하여, 일치하는 곳으로 점프합니다.\n\n식당에서 번호표를 받은 것과 같습니다. 번호가 3이면 3번 테이블(case 3)로, 해당하는 번호가 없으면 대기석(default)으로 안내됩니다.\n\n시각화에서 `day`가 주소 `0x1004`에 값 `3`으로 생성된 것을 확인하세요.\n\nswitch에서 비교할 변수는 반드시 **정수 타입**(int, char, short, long 등)이어야 합니다. `float`, `double`, 문자열(`char*`)은 switch에 사용할 수 없으며, 이런 경우에는 if-else를 써야 합니다.",
+        "explanation": "**`int day = 3;`** — 정수형 변수 `day`를 선언하고 **3**으로 초기화합니다. 1은 월요일, 2는 화요일, 3은 수요일을 의미하는 약속입니다.",
         "code": "int day = 3;",
         "stack": [
           {
@@ -43,7 +43,7 @@
       },
       {
         "title": "switch 문 진입",
-        "explanation": "**`switch (day) {`** — 괄호 안의 값(`day = 3`)을 각 case의 값과 위에서 아래로 비교합니다. 일치하는 case를 찾으면 그 지점부터 코드를 실행합니다. if-else는 범위 조건(`>=`, `<`)이 가능하지만, switch는 **정확히 같은 값**(`==`)만 비교합니다.\n\nswitch는 내부적으로 **점프 테이블(Jump Table)**을 사용할 수 있어, case가 많을 때 if-else보다 빠릅니다. if-else가 아파트 문을 1층부터 하나씩 열어보는 것이라면, switch는 엘리베이터 번호판을 보고 바로 해당 층으로 직행하는 것과 같습니다.\n\n현재 `day = 3`이므로: `case 1`(불일치) → `case 2`(불일치) → `case 3`(**일치!**) → 여기서부터 실행합니다.\n\ncase 뒤의 값은 반드시 **상수(Constant)**여야 합니다. `case x:`(변수)나 `case a+b:`(연산식)은 사용할 수 없고, `case 3:`, `case 'A':` 같은 리터럴만 가능합니다.",
+        "explanation": "**`switch (day) {`** — 괄호 안의 값(`day = 3`)을 각 case의 값과 위에서 아래로 비교합니다. 일치하는 case를 찾으면 그 지점부터 코드를 실행합니다.",
         "code": "switch (day) {",
         "stack": [
           {
@@ -62,14 +62,14 @@
       },
       {
         "title": "case 3 일치 - 출력",
-        "explanation": "**`printf(\"Wednesday\\n\");`** — `day`의 값 **3**이 `case 3:`과 일치했으므로, switch가 이 지점으로 점프하여 코드를 실행합니다. 화면에 `Wednesday`가 출력됩니다.\n\n`case 1:`과 `case 2:`는 값이 일치하지 않아 완전히 건너뛰었습니다. 도서관에서 분류 번호를 보고 바로 해당 서가로 가는 것처럼, 1번과 2번 서가를 지나쳐서 3번 서가에서 멈춘 것입니다.\n\n지금은 `printf` 실행 후 다음 줄의 `break;`가 기다리고 있습니다.\n\n만약 `break;`가 없으면 어떻게 되는지는 다음 스텝에서 확인합니다.",
+        "explanation": "**`printf(\"Wednesday\\n\");`** — `day`의 값 **3**이 `case 3:`과 일치했으므로, switch가 이 지점으로 점프하여 코드를 실행합니다. 화면에 `Wednesday`가 출력됩니다.",
         "visualizationType": "terminal",
         "code": "printf(\"Wednesday\\n\");",
         "stdout": "Wednesday"
       },
       {
         "title": "break로 switch 탈출",
-        "explanation": "**`break;`** — switch 문을 **즉시 빠져나가는** 탈출 명령입니다. break를 만나면 switch의 닫는 `}` 다음 줄로 바로 이동합니다.\n\n만약 `break`가 없다면? switch에는 **fall-through(관통)** 동작이 있습니다. 일치하는 case를 찾으면 그 아래의 모든 코드를 case 구분 없이 연속 실행합니다. `case 3:` 뒤에 `break`가 없으면 `\"Wednesday\"` 출력 후 `default:`의 `\"Other day\"`까지 연속으로 출력됩니다.\n\n엘리베이터에서 내 층(3층)에 도착했을 때 내리는 것이 break입니다. break가 없으면 3층을 지나서 끝까지 내려갑니다. 의도적인 fall-through를 쓸 때는 `case 6: case 7: printf(\"Weekend!\\n\"); break;`처럼 여러 case가 같은 코드를 공유하는 경우입니다.\n\nbreak를 빠뜨리는 것은 C에서 **가장 흔한 버그** 중 하나이므로, 항상 각 case 끝에 break를 넣고, 의도적 fall-through라면 주석 `/* fall through */`를 달아두세요.",
+        "explanation": "**`break;`** — switch 문을 **즉시 빠져나가는** 탈출 명령입니다. break를 만나면 switch의 닫는 `}` 다음 줄로 바로 이동합니다.",
         "visualizationType": "cMemory",
         "code": "break;",
         "occurrence": 3,
@@ -91,7 +91,7 @@
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`** — switch를 빠져나온 후 프로그램이 정상 종료됩니다. main의 스택 프레임이 해제되면서 `day`도 메모리에서 사라집니다.\n\nswitch 문 핵심 문법을 정리하면: `switch(값)`으로 비교할 값을 지정하고(정수만 가능), `case N:`으로 일치 지점을 표시하고, `break;`로 탈출하고(없으면 fall-through), `default:`로 아무 case도 안 맞을 때를 처리합니다.\n\nif-else vs switch 선택 기준은 간단합니다. 범위 조건(`>=`, `<`)이나 float/문자열 비교에는 if-else, 정확한 값 비교(`==`)이고 case가 여러 개이면 switch가 더 깔끔합니다.\n\n만약 `day = 5`였다면 어떤 case도 일치하지 않으므로 `default:`의 `\"Other day\"`가 출력됩니다. `default`가 없었다면 아무것도 실행하지 않고 switch를 그냥 빠져나갑니다.",
+        "explanation": "**`return 0;`** — switch를 빠져나온 후 프로그램이 정상 종료됩니다. main의 스택 프레임이 해제되면서 `day`도 메모리에서 사라집니다.",
         "code": "return 0;",
         "stack": []
       }

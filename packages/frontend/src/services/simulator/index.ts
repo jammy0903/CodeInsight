@@ -9,6 +9,7 @@ import { simulateC, runC } from './cSimulator';
 import { simulatePython } from './pythonSimulator';
 import { simulateJava } from './javaSimulator';
 import { simulateJavaScript } from './jsSimulator';
+import { simulateCpp } from './cppSimulator';
 import type { SimulateRequest, SimulateResult } from './types';
 import { errorResult } from './types';
 
@@ -18,6 +19,7 @@ import { errorResult } from './types';
 export function isLanguageSupported(language: string): boolean {
   const lang = language.toLowerCase();
   return lang === 'c'
+    || lang === 'cpp' || lang === 'c++'
     || lang === 'python' || lang === 'py'
     || lang === 'javascript' || lang === 'js'
     || lang === 'java';
@@ -38,6 +40,7 @@ export const simulatorService = {
     if (lang === 'javascript' || lang === 'js') return simulateJavaScript(request);
     if (lang === 'java') return simulateJava(request);
     if (lang === 'c') return simulateC(request);
+    if (lang === 'cpp' || lang === 'c++') return simulateCpp(request);
 
     return errorResult('Unsupported language for simulation');
   },

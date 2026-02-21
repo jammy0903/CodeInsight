@@ -40,11 +40,13 @@ interface CodeMirrorEditorProps {
   onChange?: (code: string) => void;
   onSelectionChange?: (sel: CodeSelection) => void;
   bottomPadding?: number;
+  mobileFontSizeOffset?: number;
   className?: string;
 }
 
 const languageExtensions: Record<string, () => ReturnType<typeof cpp>> = {
   c: cpp,
+  cpp: cpp,
   python: python,
   java: java,
   javascript: javascript,
@@ -59,6 +61,7 @@ export function CodeMirrorEditor({
   onChange,
   onSelectionChange,
   bottomPadding = 0,
+  mobileFontSizeOffset = 0,
   className = '',
 }: CodeMirrorEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,9 +76,13 @@ export function CodeMirrorEditor({
 
   // Font size & style extension (shared across editable / read-only)
   const styleExtension = useMemo(() => {
+    const mobileContentMin = 10 + mobileFontSizeOffset;
+    const mobileContentMax = 12 + mobileFontSizeOffset;
     return EditorView.theme({
       '.cm-content': {
-        fontSize: isMobile ? 'clamp(10px, 2.5vw, 12px)' : 'clamp(11px, 1.2vw, 14px)',
+        fontSize: isMobile
+          ? `clamp(${mobileContentMin}px, 2.5vw, ${mobileContentMax}px)`
+          : 'clamp(11px, 1.2vw, 14px)',
         padding: isMobile ? '3px 0' : '5px 0',
       },
       '.cm-scroller': { overflowX: 'hidden', overflowY: 'auto' },
@@ -84,7 +91,7 @@ export function CodeMirrorEditor({
         fontSize: isMobile ? 'clamp(9px, 2vw, 11px)' : 'clamp(10px, 1vw, 12px)',
       },
     });
-  }, [isMobile]);
+  }, [isMobile, mobileFontSizeOffset]);
 
   // Bottom padding extension (for terminal overlay clearance)
   const bottomPaddingExtension = useMemo(() => {

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "`printf`와 `sizeof` 결과 출력을 위해 **`#include <stdio.h>`**로 표준 입출력 헤더를 포함합니다.\n\n이번 레슨에서는 C의 **정수 자료형(Integer Types)**을 비교합니다. C는 같은 정수라도 크기(바이트 수)가 다른 여러 타입을 제공하는데, 마트에서 물건 크기에 맞는 가방을 고르듯 **메모리 효율**을 위해 프로그래머가 직접 적절한 크기를 선택합니다.\n\n작은 숫자에 큰 타입을 쓰면 공간 낭비이고, 큰 숫자에 작은 타입을 쓰면 넘칩니다.",
+        "explanation": "`printf`와 `sizeof` 결과 출력을 위해 **`#include <stdio.h>`**로 표준 입출력 헤더를 포함합니다.\n\n이번 레슨에서는 C의 **정수 자료형(Integer Types)**을 비교합니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main()`** --- 프로그램의 시작점입니다.\n\n이 레슨에서는 `char`, `short`, `int`, `long long`을 선언하고 크기와 범위를 비교합니다. 포인트는 단순합니다: 타입마다 담을 수 있는 범위가 다르며, 기본 선택은 보통 `int`입니다.",
+        "explanation": "**`int main()`** --- 프로그램의 시작점입니다.\n\n이 레슨에서는 `char`, `short`, `int`, `long long`을 선언하고 크기와 범위를 비교합니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "char 변수 선언 - 가장 작은 정수형",
-        "explanation": "**`char c = 'A';`** --- `char`는 **1바이트(8비트)**, C에서 가장 작은 정수 타입입니다. 이름은 \"character\"에서 왔지만 메모리에 저장되는 것은 **숫자**입니다. `'A'`는 **ASCII 코드표**에서 **65**에 대응되므로, 1바이트 공간에 숫자 65가 저장됩니다.\n\n`char`의 표현 범위는 **-128~127**(signed) 또는 **0~255**(unsigned)로, 8비트가 표현할 수 있는 256가지 값입니다. 우편함 한 칸(1바이트)에 편지 번호(0~255)를 넣고, 그 번호로 실제 문자를 찾아보는 것이 ASCII 코드의 원리입니다.\n\n`char`는 문자 전용이 아닙니다. `char x = 100;`처럼 숫자를 넣을 수도 있고, 작은 범위의 정수가 필요할 때 메모리 절약 용도로 쓰기도 합니다.",
+        "explanation": "**`char c = 'A';`** --- `char`는 **1바이트(8비트)**, C에서 가장 작은 정수 타입입니다. 이름은 \"character\"에서 왔지만 메모리에 저장되는 것은 **숫자**입니다.",
         "visualizationType": "cMemory",
         "code": "char c = 'A';",
         "stack": [
@@ -44,7 +44,7 @@
       },
       {
         "title": "short 변수 선언 - 2바이트 정수",
-        "explanation": "**`short s = 32000;`** --- `short`는 **2바이트(16비트)**, 표현 범위 **-32,768~32,767**입니다. `32000`은 이 범위 안이므로 안전하게 저장되지만, `32768` 이상을 넣으면 **오버플로우**가 발생하여 예상치 못한 음수가 될 수 있습니다.\n\n오버플로우란 자동차 계기판이 99999에서 00000으로 되돌아가는 것과 같습니다. short의 경우 32767 + 1 = -32768로 최대값 다음이 최소값이 됩니다.\n\n현대 프로그래밍에서 `short`는 거의 사용되지 않습니다. 임베디드 시스템이나 네트워크 프로토콜, 오디오 샘플(16비트 PCM) 등 메모리가 극도로 제한된 환경에서만 주로 쓰이며, 일반적으로는 `int`를 사용합니다.",
+        "explanation": "**`short s = 32000;`** --- `short`는 **2바이트(16비트)**, 표현 범위 **-32,768~32,767**입니다. `32000`은 이 범위 안이므로 안전하게 저장되지만, `32768` 이상을 넣으면 **오버플로우**가 발생하여 예상치 못한 음수가 될 수 있습니다.",
         "visualizationType": "cMemory",
         "code": "short s = 32000;",
         "stack": [
@@ -64,7 +64,7 @@
       },
       {
         "title": "int 변수 선언 - 가장 자주 쓰는 정수형",
-        "explanation": "**`int i = 2000000000;`** --- `int`는 **4바이트(32비트)**, 약 **-21억~+21억** 범위로 C에서 **가장 많이 사용**되는 정수 타입입니다. CPU가 한 번에 처리하기에 가장 효율적인 크기이며, 대부분의 계산에 충분한 범위를 제공합니다.\n\n`int`는 표준 사이즈 노트(A4)와 같습니다. 대부분의 작업에 A4가 적합하듯, 대부분의 정수 계산에 `int`가 적합합니다. 메모지(char)는 너무 작고, 전지(long)는 불필요하게 큽니다. 특별한 이유가 없으면 정수는 항상 `int`를 사용하세요.\n\nC 표준은 `int`의 크기를 \"최소 16비트\"만 보장하지만, 현대 대부분의 시스템에서는 4바이트입니다. 크기를 확실히 보장하려면 `#include <stdint.h>`의 `int32_t`를 사용할 수 있습니다.",
+        "explanation": "**`int i = 2000000000;`** --- `int`는 **4바이트(32비트)**, 약 **-21억~+21억** 범위로 C에서 **가장 많이 사용**되는 정수 타입입니다. CPU가 한 번에 처리하기에 가장 효율적인 크기이며, 대부분의 계산에 충분한 범위를 제공합니다.",
         "visualizationType": "cMemory",
         "code": "int i = 2000000000;",
         "stack": [
@@ -90,7 +90,7 @@
       },
       {
         "title": "long long 변수 선언 - 큰 정수",
-        "explanation": "**`long long l = 9000000000LL;`** --- 90억은 `int` 범위를 넘으므로 큰 정수 타입이 필요합니다. `LL` 접미사는 long long 리터럴임을 명시합니다.\n\n`long`은 플랫폼별로 4/8바이트가 갈릴 수 있지만, `long long`은 현대 환경에서 64비트로 다루는 것이 일반적이라 이 예제에 더 안전합니다.\n\n정리하면: 일반 계산은 `int`, 큰 정수는 `long long`을 쓰는 쪽이 실무에서 덜 헷갈립니다.",
+        "explanation": "**`long long l = 9000000000LL;`** --- 90억은 `int` 범위를 넘으므로 큰 정수 타입이 필요합니다. `LL` 접미사는 long long 리터럴임을 명시합니다.",
         "visualizationType": "cMemory",
         "code": "long long l = 9000000000LL;",
         "stack": [
@@ -122,35 +122,35 @@
       },
       {
         "title": "char 출력 - 문자와 정수의 이중성",
-        "explanation": "**`printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));`** --- 같은 변수 `c`를 `%c`로 출력하면 문자 `A`, `%d`로 출력하면 숫자 `65`, `sizeof(c)`는 `1`이 됩니다. 메모리에 저장된 것은 항상 숫자 65이고, **해석 방식(`%c` vs `%d`)에 따라** 문자 또는 정수로 보이는 것입니다.\n\n모스 부호와 같은 원리입니다. 같은 신호(점과 선)를 해독 규칙(ASCII 표)에 따라 문자로 변환하는 것이고, 컴퓨터의 모든 데이터는 결국 숫자(0과 1의 조합)입니다.\n\n`sizeof` 연산자는 변수가 차지하는 **바이트 수**를 반환하며, 실행 시가 아닌 **컴파일 시**에 결정되는 상수값입니다.",
+        "explanation": "**`printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));`** --- 같은 변수 `c`를 `%c`로 출력하면 문자 `A`, `%d`로 출력하면 숫자 `65`, `sizeof(c)`는 `1`이 됩니다. 메모리에 저장된 것은 항상 숫자 65이고, **해",
         "visualizationType": "cMemory",
         "code": "printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));",
         "stdout": "char: A (65), size: 1"
       },
       {
         "title": "short 출력",
-        "explanation": "**`printf(\"short: %d, size: %zu\\n\", s, sizeof(s));`** --- `short` 변수 `s`의 값 `32000`과 크기 `2`(바이트)를 출력합니다. char(1바이트, -128~127)보다 2배 큰 공간을 사용하여 표현 범위가 **-32,768~32,767**로 확장됩니다.\n\nchar가 동전 지갑이라면 short는 지폐 지갑입니다. 동전 지갑에는 127원까지만 넣을 수 있지만, 지폐 지갑에는 32,767원까지 넣을 수 있습니다.\n\n현대 프로그래밍에서 `short`는 잘 쓰이지 않으며, 일반적으로는 `int`를 사용하세요.",
+        "explanation": "**`printf(\"short: %d, size: %zu\\n\", s, sizeof(s));`** --- `short` 변수 `s`의 값 `32000`과 크기 `2`(바이트)를 출력합니다. char(1바이트, -128~127)보다 2배 큰 공간을 사용하여 표현 범위가 **-32,768~32,767",
         "visualizationType": "cMemory",
         "code": "printf(\"short: %d, size: %zu\\n\", s, sizeof(s));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2"
       },
       {
         "title": "int 출력",
-        "explanation": "**`printf(\"int: %d, size: %zu\\n\", i, sizeof(i));`** --- `int` 변수 `i`의 값 `2000000000`과 크기 `4`를 출력합니다. 4바이트(32비트)로 약 42억 개의 서로 다른 값을 표현할 수 있고, signed의 경우 절반씩 음수/양수에 배정되어 약 -21억~+21억 범위입니다.\n\n비트와 범위의 관계는 자릿수와 비슷합니다. 2자리 십진수(00~99)로 100가지, 3자리(000~999)로 1000가지를 표현하듯, 비트 수가 늘어날수록 표현 가능한 값이 기하급수적으로 증가합니다: 8비트=256개, 16비트=65,536개, 32비트=약 42억 개, 64비트=약 1,844경 개.",
+        "explanation": "**`printf(\"int: %d, size: %zu\\n\", i, sizeof(i));`** --- `int` 변수 `i`의 값 `2000000000`과 크기 `4`를 출력합니다. 4바이트(32비트)로 약 42억 개의 서로 다른 값을 표현할 수 있고, signed의 경우 절반씩 음수/양수에 배정",
         "visualizationType": "cMemory",
         "code": "printf(\"int: %d, size: %zu\\n\", i, sizeof(i));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2\nint: 2000000000, size: 4"
       },
       {
         "title": "long long 출력 및 프로그램 종료",
-        "explanation": "**`printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));`** --- `l` 값과 크기를 출력합니다. `%lld`는 long long, `%zu`는 `sizeof`가 반환하는 `size_t` 전용 포맷입니다.\n\n핵심만 정리하면: char(작은 정수/문자), short(특수한 메모리 절약 상황), int(기본), long long(큰 정수).\n\n출력 포맷은 타입과 맞춰 쓰는 습관이 중요합니다.",
+        "explanation": "**`printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));`** --- `l` 값과 크기를 출력합니다. `%lld`는 long long, `%zu`는 `sizeof`가 반환하는 `size_t` 전용 포맷입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2\nint: 2000000000, size: 4\nlong long: 9000000000, size: 8"
       },
       {
         "title": "프로그램 종료",
-        "explanation": "**`return 0;`** --- 프로그램이 정상 종료되며, main 스택 프레임 해제와 함께 c, s, i, l 모든 변수가 메모리에서 사라집니다.\n\n이번 레슨의 핵심: C의 정수 타입은 크기가 다르며 클수록 더 넓은 범위를 저장합니다. `char`는 1바이트 정수로 ASCII 코드를 통해 문자를 표현하고, 기본은 항상 `int`를 사용하되 범위가 부족할 때는 `long long`을 고려하세요. 타입의 범위를 초과하면 **오버플로우**가 발생하여 예측 불가능한 값이 됩니다.",
+        "explanation": "**`return 0;`** --- 프로그램이 정상 종료되며, main 스택 프레임 해제와 함께 c, s, i, l 모든 변수가 메모리에서 사라집니다.\n\n이번 레슨의 핵심: C의 정수 타입은 크기가 다르며 클수록 더 넓은 범위를 저장합니다.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []

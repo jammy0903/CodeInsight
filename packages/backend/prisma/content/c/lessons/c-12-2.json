@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "헤더 파일 포함",
-        "explanation": "`printf` 사용을 위해 **`#include <stdio.h>`**로 표준 입출력 라이브러리를 포함합니다.\n\n이번 레슨에서는 재귀의 두 번째 핵심 --- **반환값의 전파**를 배웁니다. 이전 레슨(countdown)은 값을 반환하지 않는 `void` 재귀였지만, 이번에는 **값을 계산해서 돌려주는** 재귀입니다. 팩토리얼(`4! = 4 x 3 x 2 x 1 = 24`)이 대표적인 예제입니다.\n\n이전 재귀가 \"내려가면서 메시지를 전달하는 사다리\"였다면, 이번 재귀는 \"내려갔다가 결과를 들고 올라오는 사다리\"입니다.",
+        "explanation": "`printf` 사용을 위해 **`#include <stdio.h>`**로 표준 입출력 라이브러리를 포함합니다.\n\n이번 레슨에서는 재귀의 두 번째 핵심 --- **반환값의 전파**를 배웁니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "main 함수 시작 - factorial(4) 호출",
-        "explanation": "**`int result = factorial(4);`** --- `result` 선언, `factorial(4)` 호출, 반환값 저장이 한 줄에 있지만 실제로는 `factorial(4)`가 끝나야 `result`가 채워집니다.\n\n핵심 식은 `n! = n * (n-1)!`, 종료 조건은 `1! = 1`입니다. 즉 큰 문제는 더 작은 문제의 답이 먼저 필요합니다.\n\n그래서 이 시점의 `result`는 대기 상태이고, main은 factorial 호출이 끝날 때까지 기다립니다.",
+        "explanation": "**`int result = factorial(4);`** --- `result` 선언, `factorial(4)` 호출, 반환값 저장이 한 줄에 있지만 실제로는 `factorial(4)`가 끝나야 `result`가 채워집니다.",
         "visualizationType": "cMemory",
         "code": "int result = factorial(4);",
         "highlightOffset": [
@@ -54,7 +54,7 @@
       },
       {
         "title": "factorial(4) -> factorial(3) -> factorial(2) 호출",
-        "explanation": "**`return n * factorial(n - 1);`** --- factorial(4)에서 `return 4 * factorial(3)`을 계산하려 하지만 factorial(3)의 결과를 아직 모릅니다. factorial(3)도 `return 3 * factorial(2)`를 계산하려 하지만 역시 모릅니다. 이렇게 **\"답을 알려면 더 작은 질문의 답이 먼저 필요한\"** 구조가 재귀의 본질입니다.\n\n고객센터에 전화했더니 \"잠시만요, 담당자에게 확인할게요\"라며 다른 담당자에게 또 전화하고, 그 담당자도 또 다른 사람에게 전화하는 상황과 같습니다. 최종 답을 아는 사람(종료 조건)에 도달해야 연쇄적으로 답이 돌아옵니다.\n\n스택에 4개의 프레임이 쌓였습니다: main(`result = ?`) -> factorial(4, `return 4 * ?`) -> factorial(3, `return 3 * ?`) -> factorial(2, 방금 호출됨).",
+        "explanation": "**`return n * factorial(n - 1);`** --- factorial(4)에서 `return 4 * factorial(3)`을 계산하려 하지만 factorial(3)의 결과를 아직 모릅니다. factorial(3)도 `return 3 * factorial(2)`를 계산하려 하지",
         "visualizationType": "cMemory",
         "code": "return n * factorial(n - 1);",
         "highlightOffset": [
@@ -118,7 +118,7 @@
       },
       {
         "title": "factorial(1) - 종료 조건(Base Case) 도달!",
-        "explanation": "factorial(2)에서 factorial(1)을 호출하면 `n <= 1`이 **참** --- 드디어 **종료 조건**에 도달했습니다! 더 이상 자기 자신을 호출하지 않고 값 `1`을 바로 반환합니다. 여기가 재귀의 **전환점**으로, 지금까지 \"아래로 파고들기(Winding)\"만 했다면 이제부터 **\"결과를 들고 올라오기(Unwinding)\"**가 시작됩니다.\n\n산 정상에 도달한 등산가와 같습니다. 올라가는 동안(Winding) 점점 높이 갔지만, 정상에 도착하면 이제 내려가기(Unwinding)를 시작하며 각 중간 캠프(프레임)에 정보를 전달합니다.\n\n스택이 최대 높이(5층)에 도달한 순간이며, `return 1`로 factorial(1) 프레임이 제거되면서 반환값 `1`이 factorial(2)에게 전달됩니다. 종료 조건이 `n <= 1`인 이유는 `factorial(0)`이나 음수 입력에도 안전하게 멈추기 위해서입니다.",
+        "explanation": "factorial(2)에서 factorial(1)을 호출하면 `n <= 1`이 **참** --- 드디어 **종료 조건**에 도달했습니다! 더 이상 자기 자신을 호출하지 않고 값 `1`을 바로 반환합니다.",
         "visualizationType": "cMemory",
         "code": "return 1;",
         "stack": [
@@ -191,7 +191,7 @@
       },
       {
         "title": "반환값 전파: 1 -> 2 -> 6",
-        "explanation": "반환값이 역순으로 전파됩니다 --- 재귀의 가장 아름다운 부분입니다. factorial(1)이 **1**을 반환하면 factorial(2)가 `2 * 1 = 2`를, factorial(3)가 `3 * 2 = 6`을 반환하며, 프레임이 하나씩 Pop 됩니다.\n\n릴레이 경주에서 바통(반환값)을 전달하는 것과 같습니다. 마지막 주자(factorial(1))가 바통 `1`을 들고 결승, 이전 주자(factorial(2))에게 전달하면 `2*1=2`, 다시 factorial(3)에게 전달하면 `3*2=6`.\n\n프레임이 3개 제거되어 이제 main과 factorial(4)만 남았습니다. factorial(4)는 factorial(3)에서 받은 값 6을 가지고 최종 계산을 준비합니다.",
+        "explanation": "반환값이 역순으로 전파됩니다 --- 재귀의 가장 아름다운 부분입니다. factorial(1)이 **1**을 반환하면 factorial(2)가 `2 * 1 = 2`를, factorial(3)가 `3 * 2 = 6`을 반환하며, 프레임이 하나씩 Pop 됩니다.",
         "visualizationType": "cMemory",
         "code": "return n * factorial(n - 1);",
         "occurrence": 2,
@@ -226,7 +226,7 @@
       },
       {
         "title": "최종 반환: factorial(4) = 24",
-        "explanation": "factorial(4)는 `return 4 * 6`으로 **24**를 반환하고, 값이 main의 `result`에 저장됩니다.\n\n재귀는 보통 두 단계로 이해하면 됩니다: 내려가며 문제를 쪼개는 단계(Winding)와, 종료 조건에서 얻은 값을 들고 올라오며 합성하는 단계(Unwinding).\n\n이 코드는 `return n * factorial(n-1)` 형태라 꼬리 재귀가 아니므로, 프레임 최적화를 기대하기 어렵습니다.",
+        "explanation": "factorial(4)는 `return 4 * 6`으로 **24**를 반환하고, 값이 main의 `result`에 저장됩니다.\n\n재귀는 보통 두 단계로 이해하면 됩니다: 내려가며 문제를 쪼개는 단계(Winding)와, 종료 조건에서 얻은 값을 들고 올라오며 합성하는 단계(Unwin",
         "visualizationType": "cMemory",
         "code": "return n * factorial(n - 1);",
         "occurrence": 3,
@@ -248,7 +248,7 @@
       },
       {
         "title": "결과 출력",
-        "explanation": "**`printf(\"4! = %d\\n\", result);`** --- `result`의 `24`를 `%d`로 출력하여 화면에 `4! = 24`가 표시됩니다.\n\n재귀가 반환값을 전달하는 과정을 정리하면: 들어갈 때 큰 문제를 점점 작게 쪼개고(4!->3!->2!->1!), 나올 때 작은 답을 합쳐서 큰 답을 만듭니다(1->2->6->24). 이것이 **분할 정복(Divide and Conquer)**의 기본 원리입니다. 거대한 레고 성을 한 번에 완성하지 않고 각 부분을 따로 만든 뒤 조립하는 것과 같습니다.\n\n`factorial(20)`만 해도 결과가 `int` 범위를 넘어 오버플로우가 발생하므로, 큰 팩토리얼을 계산하려면 `long long` 타입이 필요합니다.",
+        "explanation": "**`printf(\"4! = %d\\n\", result);`** --- `result`의 `24`를 `%d`로 출력하여 화면에 `4!\n\n재귀가 반환값을 전달하는 과정을 정리하면: 들어갈 때 큰 문제를 점점 작게 쪼개고(4!->3!->2!->1!), 나올 때 작은 답을 합쳐서 큰 답을 만듭",
         "visualizationType": "terminal",
         "code": "printf(\"4! = %d\\n\", result);",
         "stdout": "4! = 24"

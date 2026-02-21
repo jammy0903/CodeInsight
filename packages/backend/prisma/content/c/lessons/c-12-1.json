@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "헤더 파일 포함",
-        "explanation": "`printf` 사용을 위해 **`#include <stdio.h>`**로 표준 입출력 라이브러리를 포함합니다.\n\n이번 레슨의 주제는 **재귀 함수(Recursive Function)** --- 함수가 자기 자신을 호출하는 구조입니다. 거울 두 개를 마주 보게 놓으면 거울 속에 거울이 무한 반복되는 모습처럼, 함수 안에서 같은 함수를 다시 부릅니다.\n\n단, 프로그래밍에서는 무한 반복을 허용하지 않으므로 반드시 **\"멈추는 조건\"**이 필요합니다. 이것이 재귀의 핵심 규칙입니다.",
+        "explanation": "`printf` 사용을 위해 **`#include <stdio.h>`**로 표준 입출력 라이브러리를 포함합니다.\n\n이번 레슨의 주제는 **재귀 함수(Recursive Function)** --- 함수가 자기 자신을 호출하는 구조입니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,90 +16,239 @@
       },
       {
         "title": "main 함수 시작",
-        "explanation": "**`int main()`** --- 프로그램의 시작점입니다. main 전용 **스택 프레임**이 생성됩니다.\n\n위쪽에 정의된 `countdown` 함수는 아직 호출되지 않아 실행되지 않습니다. 함수 정의는 설계도일 뿐, 누군가 `countdown(3)`처럼 명시적으로 호출해야 비로소 동작합니다. 요리책에 레시피가 있다고 요리가 저절로 만들어지지 않는 것과 같습니다.\n\n오른쪽 시각화에서 main 스택 프레임이 하나 생성된 것을 확인하세요. 아직 변수가 없어 비어 있습니다.",
+        "explanation": "**`int main()`** --- 프로그램의 시작점입니다. main 전용 **스택 프레임**이 생성됩니다.\n\n위쪽에 정의된 `countdown` 함수는 아직 호출되지 않아 실행되지 않습니다.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
         ]
       },
       {
         "title": "countdown(3) 호출 - 첫 번째 재귀 프레임",
-        "explanation": "**`countdown(3);`** --- `countdown`을 위한 **새로운 스택 프레임**이 main 위에 쌓이고, 매개변수 `n`에 `3`이 복사됩니다. main은 여기서 일시 정지되어 countdown(3)이 끝날 때까지 기다립니다.\n\n이 `countdown`은 곧 자기 자신을 다시 호출할 예정입니다. 호출할 때마다 **완전히 새로운 스택 프레임**이 위에 쌓이고, 각 프레임은 자기만의 독립적인 `n`을 갖습니다. 인셉션에서 꿈속의 꿈처럼, 각 층(프레임)은 독립적인 세계입니다.\n\n오른쪽 시각화에서 main 위에 countdown 프레임이 새로 생긴 것과 `n = 3`을 확인하세요. main의 다음 줄(`return 0;`)은 countdown(3)이 완전히 끝난 후에야 실행됩니다.",
+        "explanation": "**`countdown(3);`** --- `countdown`을 위한 **새로운 스택 프레임**이 main 위에 쌓이고, 매개변수 `n`에 `3`이 복사됩니다. main은 여기서 일시 정지되어 countdown(3)이 끝날 때까지 기다립니다.",
         "visualizationType": "cMemory",
         "code": "countdown(3);",
-        "highlightOffset": [0, -10],
+        "highlightOffset": [
+          0,
+          -10
+        ],
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "3", "type": "int", "address": "0x1004", "frame": "countdown" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "countdown"
+          }
         ]
       },
       {
         "title": "n=3: 종료 조건 확인 후 출력",
-        "explanation": "countdown에 진입하면 먼저 `if (n <= 0)`을 검사합니다. `3 <= 0`은 거짓이므로 if 블록을 건너뛰고, **`printf(\"%d...\\n\", n)`**으로 `\"3...\"`을 출력합니다.\n\n`n <= 0`은 이 함수의 **종료 조건(Base Case)** --- \"더 이상 자기 자신을 호출하지 않는 조건\"입니다. 종료 조건이 없으면 스택 프레임이 끝없이 쌓여 메모리가 고갈되고, **Stack Overflow**로 프로그램이 강제 종료됩니다. 계단을 내려가는데 \"지하 1층에서 멈춰라\"는 규칙이 없으면 바닥에 부딪히는 것과 같습니다.\n\n현재 스택에는 main과 countdown(n=3) 두 개의 프레임이 있고, 다음 줄 `countdown(n-1)`로 이동합니다.",
+        "explanation": "countdown에 진입하면 먼저 `if (n <= 0)`을 검사합니다. `3 <= 0`은 거짓이므로 if 블록을 건너뛰고, **`printf(\"%d...\\n\", n)`**으로 `\"3...\"`을 출력합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"%d...\\n\", n);",
         "stdout": "3..."
       },
       {
         "title": "countdown(2) 호출 - 두 번째 재귀 프레임",
-        "explanation": "**`countdown(n - 1);`** --- `countdown(3)` 안에서 `countdown(2)`를 호출합니다. 또 하나의 새로운 스택 프레임이 위에 쌓여 이제 총 **3개의 프레임**이 존재합니다: main(대기) -> countdown(n=3, 대기) -> countdown(n=2, 실행 중).\n\ncountdown(2) 안에서도 같은 과정이 반복됩니다: `n <= 0` 확인(거짓) -> `\"2...\"` 출력 -> `countdown(1)` 호출. 마트료시카 인형처럼 열 때마다 더 작은 인형이 나오고, 가장 안쪽 인형(countdown(0))에 도달해야 다시 닫기 시작합니다.\n\n같은 `countdown` 함수지만 각 프레임의 `n`은 완전히 별개의 메모리 공간입니다. n=3인 프레임의 `n`과 n=2인 프레임의 `n`은 서로 영향을 주지 않습니다.",
+        "explanation": "**`countdown(n - 1);`** --- `countdown(3)` 안에서 `countdown(2)`를 호출합니다. 또 하나의 새로운 스택 프레임이 위에 쌓여 이제 총 **3개의 프레임**이 존재합니다: main(대기) -> countdown(n=3, 대기) -> countdown(n=",
         "visualizationType": "cMemory",
         "code": "countdown(n - 1);",
-        "highlightOffset": [0, -6],
+        "highlightOffset": [
+          0,
+          -6
+        ],
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "3", "type": "int", "address": "0x1004", "frame": "countdown" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "2", "type": "int", "address": "0x1008", "frame": "countdown" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "countdown"
+          }
         ],
         "stdout": "3..."
       },
       {
         "title": "countdown(1) 호출 - 세 번째 재귀 프레임",
-        "explanation": "countdown(2)에서도 `n <= 0` 거짓 -> `\"2...\"` 출력 -> **`countdown(1)`** 호출로 같은 과정이 반복되어, 스택이 **4층**으로 높아졌습니다. 각 프레임의 `n`을 보면: 2층 `n=3`(0x1004), 3층 `n=2`(0x1008), 4층 `n=1`(0x100c) --- 이름은 같지만 **완전히 다른 메모리 주소**에 있는 별개의 변수입니다.\n\n같은 이름의 사원이 3명 있는 회사를 상상해보세요. 이름은 같지만 각자 다른 사무실(스택 프레임)에서 다른 업무(n 값)를 하고 있고, 한 사무실의 업무가 끝나야(return) 아래 사무실의 업무가 재개됩니다.\n\n현재 countdown(1)이 실행 중이며, 아래의 세 프레임은 모두 대기 상태입니다.",
+        "explanation": "countdown(2)에서도 `n <= 0` 거짓 -> `\"2...\"` 출력 -> **`countdown(1)`** 호출로 같은 과정이 반복되어, 스택이 **4층**으로 높아졌습니다. 각 프레임의 `n`을 보면: 2층 `n=3`(0x1004), 3층 `n=2`(0x1008), 4층 `n=1`(0",
         "visualizationType": "cMemory",
         "code": "countdown(n - 1);",
         "occurrence": 2,
-        "highlightOffset": [0, -6],
+        "highlightOffset": [
+          0,
+          -6
+        ],
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "3", "type": "int", "address": "0x1004", "frame": "countdown" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "2", "type": "int", "address": "0x1008", "frame": "countdown" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "1", "type": "int", "address": "0x100c", "frame": "countdown" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "1",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "countdown"
+          }
         ],
         "stdout": "3...\n2..."
       },
       {
         "title": "countdown(0) - 종료 조건 도달!",
-        "explanation": "countdown(1)에서 `\"1...\"` 출력 후 `countdown(0)`을 호출합니다. 이번에는 `0 <= 0`이 **참** --- 드디어 **종료 조건(Base Case)**에 도달했습니다! `\"Launch!\"`를 출력하고 `return`으로 함수를 종료하며, 더 이상 countdown을 호출하지 않으므로 쌓였던 프레임들이 하나씩 **풀려나갑니다(Unwind)**.\n\n마트료시카의 가장 안쪽 인형에 도달한 순간입니다. 더 이상 열 인형이 없으니 이제 하나씩 다시 닫아가는 과정이 시작됩니다.\n\n스택이 최대 높이(main + countdown 4개 = 5층)에 도달한 순간이며, 만약 종료 조건을 `n == 0` 대신 `n <= 0`으로 쓰지 않았다면 음수 호출이 계속되어 Stack Overflow가 발생했을 것입니다.",
+        "explanation": "countdown(1)에서 `\"1...\"` 출력 후 `countdown(0)`을 호출합니다. 이번에는 `0 <= 0`이 **참** --- 드디어 **종료 조건(Base Case)**에 도달했습니다!",
         "visualizationType": "cMemory",
         "code": "printf(\"Launch!\\n\");",
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "3", "type": "int", "address": "0x1004", "frame": "countdown" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "2", "type": "int", "address": "0x1008", "frame": "countdown" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "1", "type": "int", "address": "0x100c", "frame": "countdown" },
-          { "name": "countdown", "type": "frame", "func": "countdown", "value": "frame" },
-          { "name": "n", "value": "0", "type": "int", "address": "0x1010", "frame": "countdown" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "1",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "0",
+            "type": "int",
+            "address": "0x1010",
+            "frame": "countdown"
+          }
         ],
         "stdout": "3...\n2...\n1...\nLaunch!"
       },
       {
         "title": "스택 프레임 해제 (Unwinding)",
-        "explanation": "countdown(0)이 return하면서 프레임이 **Pop**되고, 대기하던 countdown(1)이 재개됩니다. 남은 코드가 없으므로 countdown(1)도 return, 같은 방식으로 countdown(2) -> countdown(3) -> main 순서로 돌아옵니다. 접시를 1,2,3,4번 순서로 쌓으면 치울 때는 4,3,2,1 순서로 위에서부터 빼야 하는 **LIFO(Last In, First Out)** 원리입니다.\n\n재귀의 전체 흐름은 두 단계로 나뉩니다: **Winding(감기)** --- main -> countdown(3) -> (2) -> (1) -> (0)으로 스택이 높아지며 출력하고, **Unwinding(풀기)** --- countdown(0)부터 역순으로 프레임이 제거됩니다.\n\n모든 countdown 프레임이 제거되고 main만 남았습니다. `return 0;`으로 프로그램이 종료됩니다.",
+        "explanation": "countdown(0)이 return하면서 프레임이 **Pop**되고, 대기하던 countdown(1)이 재개됩니다. 남은 코드가 없으므로 countdown(1)도 return, 같은 방식으로 countdown(2) -> countdown(3) -> main 순서로 돌아옵니다.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [
-          { "name": "main", "type": "frame", "func": "main", "value": "frame" }
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
         ],
         "stdout": "3...\n2...\n1...\nLaunch!"
       }

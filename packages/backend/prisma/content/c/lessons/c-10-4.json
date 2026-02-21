@@ -1,13 +1,13 @@
 {
   "lessonId": "c-10-4",
   "title": "Binary Input/Output",
-  "concept": "Core concept for Binary Input/Output",
+  "concept": "이진 입출력은 메모리 표현 그대로 저장하고 읽어 구조적 데이터를 빠르게 다룬다",
   "content": {
     "code": "#include <stdio.h>\n\nstruct Player {\n    int id;\n    double hp;\n};\n\nint main() {\n    struct Player saved = {1, 99.5};\n    struct Player loaded;\n\n    FILE *fp = fopen(\"save.bin\", \"wb\");\n    if (fp) {\n        fwrite(&saved, sizeof(struct Player), 1, fp);\n        fclose(fp);\n    }\n\n    fp = fopen(\"save.bin\", \"rb\");\n    if (fp) {\n        fread(&loaded, sizeof(struct Player), 1, fp);\n        printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);\n        fclose(fp);\n    }\n\n    return 0;\n}",
     "steps": [
       {
         "title": "stdio.h 헤더 포함",
-        "explanation": "**`#include <stdio.h>`** — 바이너리 파일 입출력 함수(`fwrite`, `fread`, `fopen`, `fclose`)를 사용하기 위한 헤더입니다.\n\n지금까지 배운 `fprintf`/`fgets`는 **텍스트 모드**로, 데이터를 사람이 읽을 수 있는 문자열로 변환하여 저장합니다. 반면 `fwrite`/`fread`는 **바이너리 모드**로, 메모리의 비트 패턴을 **있는 그대로** 파일에 저장합니다.\n\n숫자 `12345`를 예로 들면, 텍스트 모드(`fprintf`)는 `'1','2','3','4','5'`로 5바이트를 쓰지만, 바이너리 모드(`fwrite`)는 `0x00003039`로 4바이트만 씁니다. 바이너리가 더 적은 용량에 더 빠르지만, 텍스트 에디터로 열어봐도 내용을 이해할 수 없습니다.\n\n텍스트 모드가 외국인에게 번역해서 보내는 편지라면, 바이너리 모드는 원본 메모를 사진 찍어 보내는 것입니다 — 빠르지만, 같은 언어를 아는 사람만 읽을 수 있습니다.",
+        "explanation": "**`#include <stdio.h>`** — 바이너리 파일 입출력 함수(`fwrite`, `fread`, `fopen`, `fclose`)를 사용하기 위한 헤더입니다.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,7 +16,7 @@
       },
       {
         "title": "저장할 데이터 구조 정의",
-        "explanation": "**`struct Player { int id; double hp; };`** — 파일에 저장하고 불러올 데이터의 틀인 `Player` 구조체를 정의합니다. `int id`(4바이트)와 `double hp`(8바이트)로 구성되며, 컴파일러가 메모리 정렬을 위해 사이에 **패딩(Padding)** 4바이트를 넣을 수 있어 총 크기가 16바이트가 될 수 있습니다.\n\n바이너리 I/O에서 구조체가 유용한 이유는 `fwrite`/`fread`가 메모리 블록을 **통째로** 읽고 쓸 수 있기 때문입니다. 모든 멤버를 한 번의 함수 호출로 저장하거나 복원할 수 있습니다.\n\n택배를 보낼 때 물건을 하나씩 따로 포장하는 것(텍스트 모드로 멤버 하나씩 저장)이 아니라, 상자 통째로 배송하는 것(바이너리 모드로 구조체 한 번에 저장)과 같습니다.\n\n이 예제는 게임 세이브 파일의 전형적인 패턴입니다 — 플레이어 상태를 구조체에 담고, 바이너리로 저장/로드합니다.",
+        "explanation": "**`struct Player { int id; double hp; };`** — 파일에 저장하고 불러올 데이터의 틀인 `Player` 구조체를 정의합니다. `int id`(4바이트)와 `double hp`(8바이트)로 구성되며, 컴파일러가 메모리 정렬을 위해 사이에 **패딩(Padding)**",
         "visualizationType": "cMemory",
         "code": "struct Player {",
         "highlightOffset": [
@@ -28,7 +28,7 @@
       },
       {
         "title": "main 함수와 변수 준비",
-        "explanation": "**`struct Player saved = {1, 99.5};`**과 **`struct Player loaded;`** — 두 개의 `Player` 구조체를 스택에 준비합니다. `saved`는 파일에 저장할 원본 데이터(`id: 1, hp: 99.5`)이고, `loaded`는 파일에서 복원할 빈 그릇으로 아직 쓰레기값(`???`)입니다.\n\n프로그램의 전체 흐름은: `saved`의 메모리 내용을 `save.bin`에 바이너리로 **저장** → `save.bin`의 내용을 `loaded`에 **복원** → 값이 동일한지 확인하는 것입니다.\n\nUSB에 사진을 복사한 후, USB에서 다른 컴퓨터로 다시 복사하면 원본과 동일한 사진을 얻는 것과 같습니다. 메모리 → 파일 → 메모리, 변환 없이 데이터가 그대로 복사됩니다.\n\n`loaded`의 쓰레기값은 아직 파일에서 데이터를 읽어오지 않았다는 의미입니다.",
+        "explanation": "**`struct Player saved = {1, 99.5};`**과 **`struct Player loaded;`** — 두 개의 `Player` 구조체를 스택에 준비합니다. `saved`는 파일에 저장할 원본 데이터(`id: 1, hp: 99.5`)이고, `loaded`는 파일에서 복원할",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "highlightOffset": [
@@ -52,19 +52,19 @@
       },
       {
         "title": "메모리 내용을 파일에 쓰기 (fwrite)",
-        "explanation": "**`fwrite(&saved, sizeof(struct Player), 1, fp);`** — `saved` 구조체의 메모리 바이트들을 파일에 그대로 '덤프'합니다. 4개의 인자는 각각: `&saved`(데이터 시작 주소), `sizeof(struct Player)`(한 덩어리 크기), `1`(덩어리 개수), `fp`(대상 파일)입니다.\n\n`fprintf`와 비교하면 차이가 명확합니다. `fprintf(fp, \"%.1f\", 99.5)`는 파일에 `'9','9','.','5'`를 저장(텍스트 변환)하지만, `fwrite`는 `double`의 8바이트 비트 패턴을 변환 없이 그대로 저장합니다.\n\n변환 과정이 없으므로 속도가 빠르고, 부동소수점의 정밀도도 완벽히 보존됩니다. 대신 텍스트 에디터로 열면 의미 없는 깨진 문자만 보입니다.\n\n`\"wb\"` 모드에서 `\"b\"`는 바이너리를 뜻하며, 특히 Windows에서 줄바꿈 문자 변환을 방지합니다.",
+        "explanation": "**`fwrite(&saved, sizeof(struct Player), 1, fp);`** — `saved` 구조체의 메모리 바이트들을 파일에 그대로 '덤프'합니다. 4개의 인자는 각각: `&saved`(데이터 시작 주소), `sizeof(struct Player)`(한 덩어리 크기), `1`",
         "visualizationType": "cMemory",
         "code": "fwrite(&saved, sizeof(struct Player), 1, fp);"
       },
       {
         "title": "쓰기 후 파일 닫기",
-        "explanation": "**`fclose(fp);`** — 바이너리 데이터의 기록을 마치고 파일을 닫습니다. `save.bin`에는 `struct Player`의 메모리 내용이 바이트 단위로 저장되어 있습니다.\n\n헥스 에디터로 보면 `01 00 00 00`(int 1, 리틀 엔디안), `00 00 00 00`(패딩), 그리고 `E0 DF 58 E1 C0 E4 58 40`(double 99.5, IEEE 754)처럼 보입니다. 사람을 위한 텍스트가 아니라 **컴퓨터의 메모리 스냅샷**입니다.\n\n바이너리 파일을 사용하는 이유는 텍스트 변환 없이 메모리를 직접 저장하므로 대용량 데이터를 빠르게 처리할 수 있기 때문입니다.\n\n게임 세이브 파일, 이미지 파일(.png, .jpg), 데이터베이스 파일 등이 모두 바이너리 형식을 사용합니다.",
+        "explanation": "**`fclose(fp);`** — 바이너리 데이터의 기록을 마치고 파일을 닫습니다. `save.bin`에는 `struct Player`의 메모리 내용이 바이트 단위로 저장되어 있습니다.",
         "visualizationType": "cMemory",
         "code": "fwrite(&saved, sizeof(struct Player), 1, fp);"
       },
       {
         "title": "파일 내용을 메모리에 읽기 (fread)",
-        "explanation": "**`fread(&loaded, sizeof(struct Player), 1, fp);`** — 파일의 바이트들을 읽어서 `loaded` 구조체의 메모리 공간에 그대로 덮어씌웁니다. `fwrite`의 역순 작업입니다. 인자 구조는 동일합니다: 저장할 주소, 덩어리 크기, 개수, 소스 파일.\n\n실행 결과 `loaded`가 `{id: ???, hp: ???}`에서 **`{id: 1, hp: 99.5}`**로 바뀝니다. 파일에 저장했던 `saved`의 메모리 패턴이 그대로 복사된 것입니다.\n\n도장을 먹물에 찍어 종이에 누르면(`fwrite`) 도장의 모양이 종이에 복사되고, 그 종이를 스캔하면(`fread`) 원래 도장의 모양을 복원할 수 있는 것과 같습니다. 구조체의 의미를 이해하는 것이 아니라 순수하게 **바이트 블록을 복사**하는 것입니다.\n\n`fread`는 실제로 읽은 덩어리 개수를 반환합니다. `1`이면 성공, `0`이면 파일 끝(EOF)이나 에러이므로, 실무에서는 반드시 확인해야 합니다.",
+        "explanation": "**`fread(&loaded, sizeof(struct Player), 1, fp);`** — 파일의 바이트들을 읽어서 `loaded` 구조체의 메모리 공간에 그대로 덮어씌웁니다. `fwrite`의 역순 작업입니다.",
         "visualizationType": "cMemory",
         "code": "fread(&loaded, sizeof(struct Player), 1, fp);",
         "stack": [
@@ -85,7 +85,7 @@
       },
       {
         "title": "복원된 데이터 확인",
-        "explanation": "**`printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);`** — 출력 결과는 `\"Loaded ID: 1, HP: 99.5\"`입니다. `saved`에 넣었던 값이 파일을 거쳐 `loaded`에 완벽하게 복원되었습니다. 텍스트 변환 과정이 없으므로 **정밀도 손실도 전혀 없습니다**.\n\n만약 `hp`가 `3.14159265358979`라면, `fprintf`로 `\"%.2f\"`를 쓰면 `\"3.14\"`만 저장되어 정밀도가 손실되지만, `fwrite`는 8바이트 비트 패턴 그대로 저장하므로 정밀도가 완벽히 보존됩니다.\n\n바이너리 I/O의 장점을 요약하면: 텍스트 변환이 없어 **빠르고**, 부동소수점 비트가 그대로 유지되어 **정밀하고**, 구조체 전체를 한 번에 처리할 수 있어 **간결하고**, 큰 숫자일수록 파일 크기가 **작습니다**.\n\n예를 들어 `1000000000`은 텍스트로 10바이트이지만, 바이너리(`int`)로는 4바이트입니다.",
+        "explanation": "**`printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);`** — 출력 결과는 `\"Loaded ID: 1, HP: 99.5\"`입니다. `saved`에 넣었던 값이 파일을 거쳐 `loaded`에 완벽하게 복원되었습니다.",
         "visualizationType": "cMemory",
         "code": "fread(&loaded, sizeof(struct Player), 1, fp);",
         "stack": [
@@ -106,7 +106,7 @@
       },
       {
         "title": "읽기 후 파일 닫기 및 종료",
-        "explanation": "**`fclose(fp);`**과 **`return 0;`** — 모든 파일 작업을 마치고 프로그램을 종료합니다.\n\n바이너리 파일의 치명적인 단점은 **이식성(Portability)**입니다. 같은 시스템에서는 완벽하지만, 다른 시스템에서는 깨질 수 있습니다. **엔디안** 차이(Intel x86은 리틀 엔디안, 일부 ARM은 빅 엔디안)로 바이트 순서가 반대이고, 컴파일러마다 **패딩** 크기가 다를 수 있고, 시스템마다 **타입 크기**가 다를 수 있기 때문입니다.\n\n같은 플랫폼 내에서만 쓴다면 `fread`/`fwrite`가 가장 빠르고 간편합니다. 다른 시스템과 데이터를 교환해야 한다면 JSON(텍스트 기반) 또는 Protocol Buffers(플랫폼 독립적 바이너리) 같은 직렬화 방식을 사용하세요.\n\n이 레슨의 핵심은 `fread`/`fwrite`가 메모리를 가장 빠르게 파일로 저장하는 방법이지만, 플랫폼 간 호환성에는 주의가 필요하다는 것입니다.",
+        "explanation": "**`fclose(fp);`**과 **`return 0;`** — 모든 파일 작업을 마치고 프로그램을 종료합니다.\n\n바이너리 파일의 치명적인 단점은 **이식성(Portability)**입니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);",
         "highlightOffset": [

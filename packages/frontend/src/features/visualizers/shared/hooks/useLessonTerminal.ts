@@ -44,8 +44,8 @@ export function useLessonTerminal({
       ? steps[currentStepIndex - 1]
       : null;
 
-    // C: step.stdout (누적 문자열)
-    if (languageId === 'c') {
+    // C/C++: step.stdout (누적 문자열)
+    if (languageId === 'c' || languageId === 'cpp') {
       if (!currentStep.stdout) return [];
       const currentLines = currentStep.stdout.split('\n').filter(Boolean);
       if (!diffMode) {
