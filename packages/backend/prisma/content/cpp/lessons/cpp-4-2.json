@@ -1,0 +1,68 @@
+{
+  "lessonId": "cpp-4-2",
+  "title": "메모리 누수",
+  "concept": "delete를 빠뜨리면 프로그램이 끝날 때까지 힙 메모리가 해제되지 않는다",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nvoid leaky() {\n    int* p = new int(999);\n    cout << *p << endl;\n    // delete p; 를 빠뜨림!\n}\n\nint main() {\n    leaky();\n    cout << \"leaky 종료\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "leaky 함수 진입",
+        "explanation": "`leaky()` 함수가 호출되어 새로운 스택 프레임이 생성됩니다.",
+        "visualizationType": "cMemory",
+        "code": "void leaky() {",
+        "stack": [
+          { "type": "frame", "func": "main", "name": "main" },
+          { "type": "frame", "func": "leaky", "name": "leaky" }
+        ],
+        "heap": []
+      },
+      {
+        "title": "힙 할당",
+        "explanation": "`new int(999)`로 힙에 메모리를 할당하고 포인터 `p`에 주소를 저장합니다.",
+        "visualizationType": "cMemory",
+        "code": "int* p = new int(999);",
+        "stack": [
+          { "type": "frame", "func": "main", "name": "main" },
+          { "type": "frame", "func": "leaky", "name": "leaky" },
+          { "name": "p", "value": "0x9000", "type": "int*", "address": "0x2000", "frame": "leaky", "points_to": "*p" }
+        ],
+        "heap": [
+          { "name": "*p", "value": "999", "type": "int", "address": "0x9000" }
+        ]
+      },
+      {
+        "title": "함수 종료 — 누수 발생!",
+        "explanation": "`leaky()`가 끝나면 스택 프레임과 함께 포인터 `p`가 사라집니다.\n\n하지만 `delete`를 호출하지 않았으므로 **힙의 999는 남아있습니다**. 이 메모리에 접근할 방법이 없어졌습니다 — 이것이 **메모리 누수**입니다.",
+        "visualizationType": "cMemory",
+        "code": "cout << \"leaky 종료\" << endl;",
+        "stack": [
+          { "type": "frame", "func": "main", "name": "main" }
+        ],
+        "heap": [
+          { "name": "???", "value": "999", "type": "int", "address": "0x9000", "highlight": true }
+        ],
+        "stdout": "leaky 종료"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "메모리 누수(memory leak)가 발생하는 원인은?",
+    "options": [
+      "new 없이 delete를 호출해서",
+      "힙에 할당한 메모리를 delete하지 않고 포인터를 잃어서",
+      "스택 변수를 너무 많이 만들어서",
+      "프로그램이 비정상 종료되어서"
+    ],
+    "correctIndex": 1,
+    "explanation": "힙에 할당된 메모리는 delete로 명시적으로 해제해야 합니다. 포인터가 스코프를 벗어나면 그 메모리에 접근할 방법이 사라집니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "프로그램이 끝나면 모든 메모리가 자동 해제된다",
+      "correct": "운영체제가 프로세스 종료 시 회수하지만, 장시간 실행되는 서버에서는 누수가 치명적입니다.",
+      "why": "누수가 반복되면 사용 가능한 메모리가 점점 줄어들어 시스템이 느려지거나 크래시합니다."
+    }
+  ],
+  "keyTakeaway": "new로 할당하면 반드시 delete로 해제하라. 더 좋은 방법은 스마트 포인터를 쓰는 것이다."
+}

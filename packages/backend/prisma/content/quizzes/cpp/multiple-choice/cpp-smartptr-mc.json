@@ -1,0 +1,108 @@
+{
+  "language": "cpp",
+  "quizType": "multiple-choice",
+  "chapterId": "cpp-smartptr-mc",
+  "chapterTitle": "스마트 포인터/RAII 객관식",
+  "quizzes": [
+    {
+      "id": "mc-cpp-sp-q1",
+      "question": "단독 소유(sole ownership)에 가장 적합한 스마트 포인터는?",
+      "options": ["std::weak_ptr", "std::shared_ptr", "std::unique_ptr", "raw pointer"],
+      "answer": "2",
+      "explanation": "unique_ptr는 단독 소유 모델입니다.",
+      "concepts": ["unique_ptr", "ownership"],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "mc-cpp-sp-q2",
+      "question": "shared_ptr의 use_count가 1이라는 의미는?",
+      "options": ["객체가 1바이트", "소유자가 1개", "참조가 무효", "삭제 예약됨"],
+      "answer": "1",
+      "explanation": "현재 객체를 소유하는 shared_ptr 인스턴스 수입니다.",
+      "concepts": ["shared_ptr", "use_count"],
+      "difficulty": "easy",
+      "orderNum": 2
+    },
+    {
+      "id": "mc-cpp-sp-q3",
+      "question": "shared_ptr 순환 참조를 해결하는 일반적 방법은?",
+      "options": ["raw pointer로 전부 교체", "delete 직접 호출", "한쪽 링크를 weak_ptr로 변경", "use_count를 수동 감소"],
+      "answer": "2",
+      "explanation": "weak_ptr는 소유권 증가 없이 관찰만 하므로 cycle 해소에 적합합니다.",
+      "concepts": ["weak_ptr", "cycle", "shared_ptr"],
+      "difficulty": "medium",
+      "orderNum": 3
+    },
+    {
+      "id": "mc-cpp-sp-q4",
+      "question": "RAII에서 자원 해제가 일어나는 기본 시점은?",
+      "options": ["GC가 돌 때", "프로그램 종료 시", "객체 스코프 종료 시", "메모리 부족 시"],
+      "answer": "2",
+      "explanation": "C++ 객체는 스코프 종료 시 소멸되어 자원을 정리합니다.",
+      "concepts": ["RAII", "scope", "destructor"],
+      "difficulty": "easy",
+      "orderNum": 4
+    },
+    {
+      "id": "mc-cpp-sp-q5",
+      "question": "`make_shared<T>()`의 장점으로 옳은 것은?",
+      "options": ["항상 lock-free", "제어 블록과 객체 할당 최적화 가능", "copy 금지", "delete 불필요"],
+      "answer": "1",
+      "explanation": "일반적으로 할당 횟수/지역성 측면 이점을 가질 수 있습니다.",
+      "concepts": ["make_shared", "allocation", "control block"],
+      "difficulty": "medium",
+      "orderNum": 5
+    },
+    {
+      "id": "mc-cpp-sp-q6",
+      "question": "다음 중 스마트 포인터 사용 시 부적절한 습관은?",
+      "options": ["소유권 모델 문서화", "get()으로 얻은 raw pointer를 임의 delete", "make_unique 사용", "순환 구조에 weak_ptr 고려"],
+      "answer": "1",
+      "explanation": "스마트 포인터가 관리하는 객체를 외부에서 delete하면 이중 해제 위험이 큽니다.",
+      "concepts": ["ownership", "double free", "get"],
+      "difficulty": "hard",
+      "orderNum": 6
+    },
+    {
+      "id": "mc-cpp-sp-q7",
+      "question": "`unique_ptr<T> p;`에서 소유권 이전의 올바른 방식은?",
+      "options": ["p2 = p;", "p2 = std::move(p);", "p2 = p.get();", "p2.reset(p);"],
+      "answer": "1",
+      "explanation": "unique_ptr는 move로만 소유권 이전이 가능합니다.",
+      "concepts": ["unique_ptr", "move", "ownership transfer"],
+      "difficulty": "easy",
+      "orderNum": 7
+    },
+    {
+      "id": "mc-cpp-sp-q8",
+      "question": "예외 발생 시에도 자원 누수를 줄이는 핵심 C++ 설계 원칙은?",
+      "options": ["manual free only", "RAII", "global variables", "macro cleanup"],
+      "answer": "1",
+      "explanation": "RAII는 소멸자 기반 정리로 예외 경로에서도 일관성을 제공합니다.",
+      "concepts": ["RAII", "exception safety"],
+      "difficulty": "easy",
+      "orderNum": 8
+    },
+    {
+      "id": "mc-cpp-sp-q9",
+      "question": "weak_ptr에서 managed 객체 접근 전 확인해야 할 것은?",
+      "options": ["delete 여부", "mutex 상태", "lock() 결과가 유효한지", "use_count가 0인지"],
+      "answer": "2",
+      "explanation": "lock()으로 shared_ptr를 얻고 null 여부를 확인해야 안전합니다.",
+      "concepts": ["weak_ptr", "lock", "null check"],
+      "difficulty": "medium",
+      "orderNum": 9
+    },
+    {
+      "id": "mc-cpp-sp-q10",
+      "question": "raw pointer가 여전히 유용한 경우로 가장 적절한 것은?",
+      "options": ["소유권 표현", "비소유 관찰(non-owning view)", "자동 수명 관리", "스레드 동기화"],
+      "answer": "1",
+      "explanation": "소유권 없는 참조/관찰 용도로는 raw pointer도 명확하게 쓸 수 있습니다.",
+      "concepts": ["raw pointer", "non-owning", "view"],
+      "difficulty": "medium",
+      "orderNum": 10
+    }
+  ]
+}

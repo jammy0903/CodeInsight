@@ -1,0 +1,70 @@
+{
+  "lessonId": "cpp-5-2",
+  "title": "shared_ptr과 참조 카운팅",
+  "concept": "shared_ptr은 여러 소유자가 같은 메모리를 공유하며, 마지막 소유자가 사라질 때 해제한다",
+  "content": {
+    "code": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nint main() {\n    shared_ptr<int> a = make_shared<int>(100);\n    cout << \"count: \" << a.use_count() << endl;\n\n    {\n        shared_ptr<int> b = a;\n        cout << \"count: \" << a.use_count() << endl;\n    }\n\n    cout << \"count: \" << a.use_count() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "shared_ptr 생성",
+        "explanation": "`make_shared<int>(100)`은 힙에 int와 참조 카운터를 함께 할당합니다.\n\n현재 소유자는 `a` 하나이므로 `use_count() = 1`입니다.",
+        "visualizationType": "cMemory",
+        "code": "shared_ptr<int> a = make_shared<int>(100);",
+        "stack": [
+          { "name": "a", "value": "0xB000", "type": "shared_ptr<int>", "address": "0x1000", "points_to": "*a" }
+        ],
+        "heap": [
+          { "name": "*a", "value": "100", "type": "int", "address": "0xB000" }
+        ],
+        "stdout": "count: 1"
+      },
+      {
+        "title": "공유 — 참조 카운트 증가",
+        "explanation": "`shared_ptr<int> b = a`로 `b`도 같은 메모리의 소유자가 됩니다.\n\n참조 카운트가 2로 증가합니다. `a`와 `b` 모두 같은 힙 데이터를 가리킵니다.",
+        "visualizationType": "cMemory",
+        "code": "shared_ptr<int> b = a;",
+        "stack": [
+          { "name": "a", "value": "0xB000", "type": "shared_ptr<int>", "address": "0x1000", "points_to": "*a" },
+          { "name": "b", "value": "0xB000", "type": "shared_ptr<int>", "address": "0x1008", "points_to": "*a", "highlight": true }
+        ],
+        "heap": [
+          { "name": "*a", "value": "100", "type": "int", "address": "0xB000" }
+        ],
+        "stdout": "count: 2"
+      },
+      {
+        "title": "b 소멸 — 카운트 감소",
+        "explanation": "블록 `{}`이 끝나면서 `b`가 소멸됩니다. 참조 카운트가 1로 줄어듭니다.\n\n카운트가 0이 아니므로 힙 메모리는 아직 해제되지 않습니다. `a`가 여전히 소유 중입니다.",
+        "visualizationType": "cMemory",
+        "code": "cout << \"count: \" << a.use_count() << endl;",
+        "stack": [
+          { "name": "a", "value": "0xB000", "type": "shared_ptr<int>", "address": "0x1000", "points_to": "*a" }
+        ],
+        "heap": [
+          { "name": "*a", "value": "100", "type": "int", "address": "0xB000" }
+        ],
+        "stdout": "count: 1"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "shared_ptr의 메모리가 해제되는 시점은?",
+    "options": [
+      "첫 번째 shared_ptr이 소멸될 때",
+      "마지막 shared_ptr이 소멸되어 use_count가 0이 될 때",
+      "프로그램이 종료될 때",
+      "delete를 수동으로 호출할 때"
+    ],
+    "correctIndex": 1,
+    "explanation": "shared_ptr은 참조 카운트가 0이 되는 순간 자동으로 메모리를 해제합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "shared_ptr은 순환 참조 문제가 없다",
+      "correct": "A→B, B→A로 shared_ptr이 서로를 참조하면 카운트가 절대 0이 되지 않아 메모리 누수가 발생합니다.",
+      "why": "이를 해결하려면 한쪽을 weak_ptr로 바꿔야 합니다."
+    }
+  ],
+  "keyTakeaway": "shared_ptr은 참조 카운팅으로 공유 소유권을 관리하며, 마지막 소유자가 사라지면 자동 해제한다."
+}

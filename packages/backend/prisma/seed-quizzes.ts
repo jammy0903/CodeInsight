@@ -47,7 +47,7 @@ interface QuizData {
 
 async function seedQuizzes() {
   const quizDir = path.join(__dirname, 'content/quizzes');
-  const languages = ['c', 'javascript', 'java', 'python'];
+  const languages = ['c', 'cpp', 'javascript', 'java', 'python'];
   const types = ['ox', 'multiple-choice', 'fill-blank'];
 
   let totalQuizzes = 0;

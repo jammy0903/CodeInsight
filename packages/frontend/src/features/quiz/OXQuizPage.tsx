@@ -26,7 +26,8 @@ import { logger } from '@/utils/logger';
 
 // 언어별 정보
 const LANGUAGE_INFO: Record<string, { name: string; icon: string; color: string }> = {
-  c: { name: 'C', icon: 'C', color: '#0077B6' },
+  c: { name: 'C', icon: '🧊', color: '#3B82F6' },
+  cpp: { name: 'C++', icon: '💠', color: '#2563EB' },
   javascript: { name: 'JavaScript', icon: '⚡', color: '#F59E0B' },
   java: { name: 'Java', icon: '☕', color: '#EC4899' },
   python: { name: 'Python', icon: '🐍', color: '#3776AB' },

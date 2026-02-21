@@ -14,13 +14,14 @@ import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
 import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle, Lock } from 'lucide-react';
-import { useIsMobile, useChapter, useUserProgress } from '@/hooks';
+import { useIsMobile, useLanguageCourse, useUserProgress } from '@/hooks';
 import { getLessonFull } from '@/services/courses';
 
 // 언어별 색상 (챕터 페이지용)
 const getLanguageColor = (lang: string | undefined) => {
   switch (lang) {
     case 'c': return '#87CEEB';
+    case 'cpp': return '#818CF8';
     case 'python': return '#FFD54F';
     case 'python-practical': return '#9E9E9E';
     case 'java': return '#EC4899';
@@ -39,9 +40,13 @@ export function ChapterLessonsPage() {
   const langColor = getLanguageColor(lang);
   const isMobile = useIsMobile();
 
-  // TanStack Query: 챕터 데이터 + 진행 상태
-  const { data: chapter, isLoading, isError, error } = useChapter(chapterId);
+  // TanStack Query: 언어 코스 데이터 + 진행 상태
+  const { data: languageData, isLoading, isError, error } = useLanguageCourse(lang);
   const { data: progressList } = useUserProgress();
+  const chapter = useMemo(
+    () => languageData?.chapters?.find((ch) => ch.id === chapterId),
+    [languageData, chapterId]
+  );
 
   // 구독 시스템 제거됨 - 챕터 2 이상은 로그인만 필요
   const accessDenied = !!chapter && !appUser && chapter.order >= 2;
@@ -54,20 +59,74 @@ export function ChapterLessonsPage() {
     return map;
   }, [progressList]);
 
-  // 첫 번째 미완료 레슨 프리페치 — 챕터 진입 시 가장 클릭 가능성 높은 레슨을 미리 로드
+  // 챕터 레슨 프리페치
+  // - 1순위: 첫 미완료 레슨
+  // - 2순위: 나머지 레슨 순서대로
+  // - 동시성 제한: 2
+  // - 페이지 이탈 시 중단
   useEffect(() => {
-    if (!chapter?.lessons) return;
-    const firstIncomplete = chapter.lessons.find(
-      (l) => progressMap.get(l.id)?.status !== 'completed'
-    );
-    if (firstIncomplete) {
-      queryClient.prefetchQuery({
-        queryKey: ['lesson', firstIncomplete.id],
-        queryFn: () => getLessonFull(firstIncomplete.id),
-        staleTime: 5 * 60 * 1000,
-      });
+    if (!chapter?.lessons || chapter.lessons.length === 0 || accessDenied) return;
+
+    const lessons = [...chapter.lessons].sort((a, b) => a.order - b.order);
+    const firstIncomplete = lessons.find((l) => progressMap.get(l.id)?.status !== 'completed');
+
+    const orderedIds: string[] = [];
+    if (firstIncomplete) orderedIds.push(firstIncomplete.id);
+    for (const lesson of lessons) {
+      if (lesson.id !== firstIncomplete?.id) {
+        orderedIds.push(lesson.id);
+      }
     }
-  }, [chapter, progressMap, queryClient]);
+
+    // 중복 방지
+    const uniqueOrderedIds = Array.from(new Set(orderedIds));
+    const concurrency = Math.min(2, uniqueOrderedIds.length);
+
+    // 저우선순위: 다음 챕터의 첫 레슨 1개
+    const sortedChapters = [...(languageData?.chapters ?? [])].sort((a, b) => a.order - b.order);
+    const currentChapterIndex = sortedChapters.findIndex((ch) => ch.id === chapter.id);
+    const nextChapter = currentChapterIndex >= 0 ? sortedChapters[currentChapterIndex + 1] : undefined;
+    const nextChapterFirstLessonId = nextChapter?.lessons?.length
+      ? [...nextChapter.lessons].sort((a, b) => a.order - b.order)[0]?.id
+      : undefined;
+
+    let cancelled = false;
+    let cursor = 0;
+
+    const worker = async () => {
+      while (!cancelled && cursor < uniqueOrderedIds.length) {
+        const index = cursor;
+        cursor += 1;
+        const lessonId = uniqueOrderedIds[index];
+        if (!lessonId) continue;
+
+        await queryClient.prefetchQuery({
+          queryKey: ['lesson', lessonId],
+          queryFn: () => getLessonFull(lessonId),
+          staleTime: 5 * 60 * 1000,
+        });
+      }
+    };
+
+    const runPrefetchQueue = async () => {
+      await Promise.all(Array.from({ length: concurrency }, () => worker()));
+
+      // 현재 챕터 예열이 끝난 뒤, 다음 챕터 첫 레슨 1개만 예열
+      if (!cancelled && nextChapterFirstLessonId && !uniqueOrderedIds.includes(nextChapterFirstLessonId)) {
+        await queryClient.prefetchQuery({
+          queryKey: ['lesson', nextChapterFirstLessonId],
+          queryFn: () => getLessonFull(nextChapterFirstLessonId),
+          staleTime: 5 * 60 * 1000,
+        });
+      }
+    };
+
+    void runPrefetchQueue();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [chapter, progressMap, queryClient, accessDenied, languageData]);
 
   // hover 시 해당 레슨 프리페치
   const handlePrefetch = useCallback((lessonId: string) => {

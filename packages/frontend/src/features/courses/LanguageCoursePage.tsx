@@ -8,6 +8,7 @@ import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
 import { ChevronLeft, Lock } from 'lucide-react';
 import { useIsMobile, useLanguageCourse } from '@/hooks';
+import { CBrandIcon } from '@/components/ui/CBrandIcon';
 
 interface ChapterProgressSnapshot {
   total: number;
@@ -48,8 +49,15 @@ export function LanguageCoursePage() {
         return {
           name: t('languages.c'),
           icon: 'C',
-          color: '#87CEEB',
+          color: '#3B82F6',
           description: t('language_desc.c')
+        };
+      case 'cpp':
+        return {
+          name: t('languages.cpp'),
+          icon: 'C++',
+          color: '#2563EB',
+          description: t('language_desc.cpp')
         };
       case 'python':
         return {
@@ -167,7 +175,9 @@ export function LanguageCoursePage() {
                   border: `2px solid ${langInfo.color}`,
                 }}
               >
-                {langInfo.icon}
+                {lang === 'c' && <CBrandIcon language="c" size={63} />}
+                {lang === 'cpp' && <CBrandIcon language="cpp" size={63} />}
+                {lang !== 'c' && lang !== 'cpp' && langInfo.icon}
               </div>
               <div>
                 <h1 className="text-3xl font-bold tracking-tight text-[var(--theme-dashboard-title)]">

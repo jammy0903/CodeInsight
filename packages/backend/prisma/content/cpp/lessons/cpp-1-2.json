@@ -1,0 +1,60 @@
+{
+  "lessonId": "cpp-1-2",
+  "title": "RAII와 스코프 기반 소멸",
+  "concept": "C++ 객체는 스코프를 벗어나면 소멸자가 자동 호출되어 자원을 정리한다",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nstruct Guard {\n    const char* name;\n    Guard(const char* n) : name(n) { cout << \"acquire \" << name << endl; }\n    ~Guard() { cout << \"release \" << name << endl; }\n};\n\nint main() {\n    Guard g(\"file\");\n    cout << \"working\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Guard 객체 생성",
+        "explanation": "`g`가 생성되며 생성자가 호출됩니다. 자원 획득 시점입니다.",
+        "visualizationType": "cMemory",
+        "code": "Guard g(\"file\");",
+        "stack": [
+          {
+            "name": "g",
+            "value": "Guard{name=\"file\"}",
+            "type": "Guard",
+            "address": "0x2100"
+          }
+        ],
+        "heap": [],
+        "stdout": "acquire file"
+      },
+      {
+        "title": "작업 수행",
+        "explanation": "객체가 살아있는 동안 안전하게 자원을 사용합니다.",
+        "visualizationType": "terminal",
+        "code": "cout << \"working\" << endl;",
+        "stdout": "working"
+      },
+      {
+        "title": "스코프 종료와 자동 정리",
+        "explanation": "`main`이 끝나며 `g`의 소멸자가 자동 호출됩니다. 이게 RAII의 핵심입니다.",
+        "visualizationType": "terminal",
+        "code": "return 0;",
+        "stdout": "release file"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "RAII 패턴의 핵심 설명으로 가장 올바른 것은?",
+    "options": [
+      "자원 해제를 수동으로만 수행한다",
+      "객체 수명에 자원 관리를 묶어 자동 정리한다",
+      "힙 메모리는 절대 사용하지 않는다",
+      "소멸자는 예외 상황에서 절대 호출되지 않는다"
+    ],
+    "correctIndex": 1,
+    "explanation": "RAII는 객체 생성/소멸 시점에 자원 획득/해제를 연결해 누수를 줄입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "return 문 전에 free/delete를 꼭 직접 호출해야 한다",
+      "correct": "스택 객체는 스코프 종료 시 소멸자가 자동 호출됩니다.",
+      "why": "C++은 객체 생명주기 기반 자원 관리를 제공하기 때문입니다."
+    }
+  ],
+  "keyTakeaway": "RAII는 '객체가 살아있는 동안만 자원이 살아있다'는 규칙으로 안정성을 높인다."
+}

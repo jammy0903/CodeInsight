@@ -51,7 +51,13 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
         include: {
           lessons: {
             where: { isActive: true },
-            select: { id: true } // Key Optimization: Only fetch ID for counting
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              difficulty: true,
+              order: true,
+            }
           },
         },
       },
@@ -66,7 +72,6 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
       ...language,
       chapters: language.chapters.map((chapter: any) => ({
         ...chapter,
-        lessons: undefined, // Remove lessons from payload
         progress: {
           total: chapter.lessons.length,
           completed: 0,
@@ -102,7 +107,6 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
 
         return {
           ...chapter,
-          lessons: undefined, // Remove lessons from payload to save bandwidth
           progress: {
             total,
             completed,

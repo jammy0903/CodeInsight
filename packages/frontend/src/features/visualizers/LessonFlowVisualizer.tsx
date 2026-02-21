@@ -14,6 +14,7 @@
 import { memo, useMemo, useRef, type ComponentProps } from 'react';
 import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared';
 import { FlowVisualizer } from './c/CFlowVisualizer';
+import { CppFlowVisualizer } from './cpp/CppFlowVisualizer';
 import { ReferenceGraphView } from './shared/components/ReferenceGraphView';
 import { EventLoopView } from './javascript/components/EventLoopView';
 import { ScopeView } from './javascript/components/ScopeView';
@@ -461,7 +462,21 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     );
   }
 
-  // C 등은 기존 FlowVisualizer 사용
+  // C++ with heap data → CppFlowVisualizer (Stack/Heap 2-region)
+  if (language === 'cpp') {
+    return (
+      <div className={className}>
+        <CppFlowVisualizer
+          step={flowStepWithAnimations}
+          prevStep={prevFlowStep}
+          theme={theme}
+          onVariableClick={onVariableClick}
+        />
+      </div>
+    );
+  }
+
+  // C 등은 기존 FlowVisualizer + ArrowLayer 사용
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <FlowVisualizer

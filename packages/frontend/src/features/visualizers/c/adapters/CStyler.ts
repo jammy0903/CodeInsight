@@ -74,9 +74,21 @@ export class CStyler implements IFlowStyler {
   }
 
   /**
-   * 화살표 스타일 (포인터용)
+   * 화살표 스타일 (포인터/참조/스마트포인터용)
    */
-  getArrowStyle(_from: FlowVariable, _to: FlowVariable): ArrowStyle {
+  getArrowStyle(from: FlowVariable, _to: FlowVariable): ArrowStyle {
+    // Smart pointer styles (C++ only)
+    if (from.metadata?.isSmartPtr && from.metadata?.ownership === 'unique') {
+      return { stroke: '#f59e0b', strokeWidth: 3, headSize: 10, opacity: 0.9 };
+    }
+    if (from.metadata?.isSmartPtr && from.metadata?.ownership === 'shared') {
+      return { stroke: '#10b981', strokeWidth: 2, headSize: 8, dashArray: '4 2', opacity: 0.8 };
+    }
+    // C++ reference: blue dashed
+    if (from.isReference) {
+      return { stroke: '#60a5fa', strokeWidth: 2, headSize: 8, dashArray: '6 3', opacity: 0.8 };
+    }
+    // Default pointer: orange solid
     return {
       stroke: C_COLORS.pointer.stroke,
       strokeWidth: C_COLORS.pointer.strokeWidth,
@@ -86,10 +98,10 @@ export class CStyler implements IFlowStyler {
   }
 
   /**
-   * C 언어에서 화살표 표시 조건: 포인터이고 가리키는 대상이 있을 때
+   * 화살표 표시 조건: 포인터 또는 참조이고 가리키는 대상이 있을 때
    */
   shouldShowArrow(variable: FlowVariable): boolean {
-    return Boolean(variable.isPointer && variable.pointsTo);
+    return Boolean((variable.isPointer || variable.isReference) && variable.pointsTo);
   }
 }
 

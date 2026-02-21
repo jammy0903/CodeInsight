@@ -1,0 +1,97 @@
+{
+  "lessonId": "cpp-1-1",
+  "title": "참조(Reference) 기본",
+  "concept": "참조는 복사본이 아니라 기존 변수에 붙는 별칭(alias)이다",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 10;\n    int& ref = x;\n\n    ref = 42;\n    cout << x << \" \" << ref << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "x 변수 생성",
+        "explanation": "`x`가 스택에 생성되고 값 10이 저장됩니다.",
+        "visualizationType": "cMemory",
+        "code": "int x = 10;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "참조 ref 생성",
+        "explanation": "`ref`는 새로운 int 객체가 아니라 `x`의 별칭입니다. 같은 주소를 바라봅니다.",
+        "visualizationType": "cMemory",
+        "code": "int& ref = x;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "ref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "x"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "ref를 통한 값 수정",
+        "explanation": "`ref = 42`는 참조 대상인 `x` 자체를 수정합니다.",
+        "visualizationType": "cMemory",
+        "code": "ref = 42;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "42",
+            "type": "int",
+            "address": "0x1000",
+            "highlight": true
+          },
+          {
+            "name": "ref",
+            "value": "42",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "x"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "출력 확인",
+        "explanation": "`x`와 `ref`는 같은 값을 출력합니다. 둘은 같은 메모리 위치를 공유하기 때문입니다.",
+        "visualizationType": "terminal",
+        "code": "cout << x << \" \" << ref << endl;",
+        "stdout": "42 42"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "`int x = 1; int& r = x; r = 5;` 실행 후 x 값은?",
+    "options": [
+      "1",
+      "5",
+      "컴파일 오류",
+      "미정의 값"
+    ],
+    "correctIndex": 1,
+    "explanation": "참조 `r`은 `x`의 별칭이므로 `r = 5`는 `x`를 직접 수정합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "참조는 포인터와 똑같다",
+      "correct": "참조는 선언 시 반드시 대상이 필요하고 null이 될 수 없는 별칭입니다.",
+      "why": "문법이 비슷해 보여도 메모리 모델과 사용 제약이 다릅니다."
+    }
+  ],
+  "keyTakeaway": "참조는 복사본이 아니라 원본 변수에 대한 또 다른 이름이다."
+}

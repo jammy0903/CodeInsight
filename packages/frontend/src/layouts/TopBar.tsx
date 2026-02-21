@@ -13,12 +13,14 @@ import { LanguageBadge } from '@/components/ui/LanguageBadge';
 import { useIsMobile } from '@/hooks';
 import type { SupportedLanguage } from '@/types/simulator';
 import { useEffect } from 'react';
+import { CBrandIcon } from '@/components/ui/CBrandIcon';
 
 // 언어 정보 (LanguageCoursePage.tsx에서 가져옴)
 const getLanguageInfo = (lang: SupportedLanguage | null, t: (key: string) => string) => {
   if (!lang) return null;
   switch (lang) {
-    case 'c': return { name: t('languages.c'), icon: 'C', color: '#0077B6' };
+    case 'c': return { name: t('languages.c'), icon: 'C', color: '#3B82F6' };
+    case 'cpp': return { name: t('languages.cpp'), icon: 'C++', color: '#2563EB' };
     case 'python': return { name: 'Python', icon: '🐍', color: '#FFD54F' };
     case 'java': return { name: 'Java', icon: '☕', color: '#EC4899' };
     case 'javascript': return { name: 'JavaScript', icon: '⚡', color: '#81C784' };
@@ -112,7 +114,9 @@ export function TopBar() {
                   className="text-lg"
                   style={{ color: langInfo.color }}
                 >
-                  {langInfo.icon}
+                  {pageLanguage === 'c' && <CBrandIcon language="c" size={30} />}
+                  {pageLanguage === 'cpp' && <CBrandIcon language="cpp" size={30} />}
+                  {pageLanguage !== 'c' && pageLanguage !== 'cpp' && langInfo.icon}
                 </span>
                 <h2 className="text-base font-bold text-ellipsis whitespace-nowrap overflow-hidden" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
                   {pageTitle}

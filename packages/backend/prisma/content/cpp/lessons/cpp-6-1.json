@@ -1,0 +1,71 @@
+{
+  "lessonId": "cpp-6-1",
+  "title": "lvalue와 rvalue",
+  "concept": "lvalue는 주소가 있는 표현식, rvalue는 임시적이고 주소가 없는 표현식이다",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 10;\n    int y = x + 5;\n\n    int& lref = x;\n    // int& bad = x + 5;  // 오류! rvalue에 lvalue 참조 불가\n    int&& rref = x + 5;\n\n    cout << lref << \" \" << rref << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "lvalue: 이름이 있는 값",
+        "explanation": "`x`는 메모리 주소가 있으므로 **lvalue**입니다. `&x`로 주소를 얻을 수 있습니다.\n\n반면 `x + 5`는 연산의 결과로 잠깐만 존재하는 **rvalue**입니다.",
+        "visualizationType": "cMemory",
+        "code": "int x = 10;",
+        "stack": [
+          { "name": "x", "value": "10", "type": "int", "address": "0x1000" },
+          { "name": "y", "value": "15", "type": "int", "address": "0x1004" }
+        ],
+        "heap": []
+      },
+      {
+        "title": "lvalue 참조",
+        "explanation": "`int& lref = x`는 lvalue에 대한 참조입니다. 이미 배운 일반적인 참조가 바로 이것입니다.",
+        "visualizationType": "cMemory",
+        "code": "int& lref = x;",
+        "stack": [
+          { "name": "x", "value": "10", "type": "int", "address": "0x1000" },
+          { "name": "y", "value": "15", "type": "int", "address": "0x1004" },
+          { "name": "lref", "value": "10", "type": "int&", "address": "0x1000", "points_to": "x", "isReference": true }
+        ]
+      },
+      {
+        "title": "rvalue 참조 (&&)",
+        "explanation": "`int&& rref = x + 5`는 rvalue 참조입니다.\n\n임시 값(15)의 수명이 `rref`에 의해 연장됩니다. 이것이 이동 시맨틱스의 기반이 됩니다.",
+        "visualizationType": "cMemory",
+        "code": "int&& rref = x + 5;",
+        "stack": [
+          { "name": "x", "value": "10", "type": "int", "address": "0x1000" },
+          { "name": "y", "value": "15", "type": "int", "address": "0x1004" },
+          { "name": "lref", "value": "10", "type": "int&", "address": "0x1000", "points_to": "x", "isReference": true },
+          { "name": "rref", "value": "15", "type": "int&&", "address": "0x1008", "highlight": true }
+        ]
+      },
+      {
+        "title": "결과 확인",
+        "explanation": "`lref`는 `x`(10)를, `rref`는 임시 값(15)을 출력합니다.",
+        "visualizationType": "terminal",
+        "code": "cout << lref << \" \" << rref << endl;",
+        "stdout": "10 15"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "다음 중 rvalue인 것은?",
+    "options": [
+      "변수 x",
+      "배열 요소 arr[0]",
+      "표현식 x + 1",
+      "참조 ref"
+    ],
+    "correctIndex": 2,
+    "explanation": "x + 1은 연산의 결과로 생긴 임시 값이며, 이름이 없고 주소를 얻을 수 없으므로 rvalue입니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "rvalue 참조는 일반 참조와 같다",
+      "correct": "rvalue 참조(&&)는 임시 값에만 바인딩되며, 이동 시맨틱스를 가능하게 합니다.",
+      "why": "일반 참조(&)는 이름 있는 객체(lvalue)에만 바인딩됩니다."
+    }
+  ],
+  "keyTakeaway": "lvalue는 '주소 있는 것', rvalue는 '임시적인 것'. rvalue 참조(&&)는 이동 시맨틱스의 핵심이다."
+}

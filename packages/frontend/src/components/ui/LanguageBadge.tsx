@@ -7,6 +7,7 @@ interface LanguageBadgeProps {
 
 const languageStyles: Record<SupportedLanguage, { bg: string; text: string; border: string }> = {
   c: { bg: '#e0f2fe', text: '#0284c7', border: '#7dd3fc' },
+  cpp: { bg: '#eef2ff', text: '#4f46e5', border: '#a5b4fc' },
   python: { bg: '#dcfce7', text: '#16a34a', border: '#86efac' },
   java: { bg: '#fff7ed', text: '#f97316', border: '#fdba74' },
   javascript: { bg: '#fefce8', text: '#eab308', border: '#fde047' },
@@ -15,6 +16,7 @@ const languageStyles: Record<SupportedLanguage, { bg: string; text: string; bord
 
 export function LanguageBadge({ language }: LanguageBadgeProps) {
   const style = languageStyles[language] || languageStyles.c;
+  const label = language === 'cpp' ? 'C++' : language.toUpperCase();
 
   return (
     <span
@@ -25,7 +27,7 @@ export function LanguageBadge({ language }: LanguageBadgeProps) {
         border: `1px solid ${style.border}`,
       }}
     >
-      {language.toUpperCase()}
+      {label}
     </span>
   );
 }

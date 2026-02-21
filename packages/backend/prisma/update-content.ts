@@ -48,7 +48,7 @@ function loadLessonContent(langId: string, lessonId: string): LessonContentData 
 async function updateContent() {
   console.log('🔄 Updating lesson content (preserving user progress)...\n');
 
-  const languages = ['c', 'python', 'java', 'javascript', 'python-practical'];
+  const languages = ['c', 'cpp', 'python', 'java', 'javascript', 'python-practical'];
   let updatedCount = 0;
   let createdCount = 0;
 

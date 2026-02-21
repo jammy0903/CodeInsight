@@ -61,7 +61,7 @@ export function LessonUnifiedView({
 
   const currentStep = steps[nav.actualStepIndex];
   const isExplanationRound = nav.round === 'explanation';
-  const showMemoryTab = languageId === 'c';
+  const showMemoryTab = languageId === 'c' || languageId === 'cpp';
 
   // Visualization data
   const { memoryState, changedBlocks } = useLessonVisualization(steps, nav.actualStepIndex);
@@ -213,7 +213,7 @@ export function LessonUnifiedView({
         style={{
           ...(isMobile
             ? { height: 'calc(100svh - 64px)', minHeight: '400px', margin: '4px 0' }
-            : { border: '1px solid var(--theme-lesson-panel-border)', marginTop: '1rem' }),
+            : { height: 'calc(100vh - 80px)', border: '1px solid var(--theme-lesson-panel-border)', marginTop: '1rem' }),
         }}
       >
         {roundIndicator}

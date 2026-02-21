@@ -31,7 +31,8 @@ interface Chapter {
 
 // 언어별 테마
 const LANGUAGE_THEMES: Record<string, { color: string; bg: string; name: string; icon: string }> = {
-  c: { color: '#0077B6', bg: 'bg-sky-100', name: 'C', icon: 'C' },
+  c: { color: '#3B82F6', bg: 'bg-sky-100', name: 'C', icon: '🧊' },
+  cpp: { color: '#2563EB', bg: 'bg-indigo-100', name: 'C++', icon: '💠' },
   javascript: { color: '#F59E0B', bg: 'bg-amber-100', name: 'JavaScript', icon: '⚡' },
   java: { color: '#EC4899', bg: 'bg-pink-100', name: 'Java', icon: '☕' },
   python: { color: '#3776AB', bg: 'bg-yellow-100', name: 'Python', icon: '🐍' },

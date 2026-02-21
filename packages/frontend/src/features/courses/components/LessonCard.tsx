@@ -26,6 +26,14 @@ const LANGUAGE_THEMES: Record<string, {
     border: 'rgba(135, 206, 235, 0.5)',
     stitch: 'rgba(135, 206, 235, 0.5)',
   },
+  cpp: {
+    primary: '#4F46E5',
+    primaryLight: '#818CF8',
+    bg: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+    bgHover: 'linear-gradient(135deg, #E6EBFF 0%, #D7E0FF 100%)',
+    border: 'rgba(129, 140, 248, 0.5)',
+    stitch: 'rgba(129, 140, 248, 0.5)',
+  },
   python: {
     primary: '#F57C00',
     primaryLight: '#FFD54F',

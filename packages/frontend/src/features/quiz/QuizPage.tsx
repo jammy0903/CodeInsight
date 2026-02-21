@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { FileQuestion, CircleDot, ListChecks, Code2, Brain } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/stores/store';
+import { CBrandIcon } from '@/components/ui/CBrandIcon';
 
 interface QuizType {
   id: string;
@@ -69,7 +70,7 @@ const LANGUAGES: LanguageOption[] = [
     id: 'c',
     name: 'C',
     icon: 'C',
-    color: '#0077B6',
+    color: '#3B82F6',
     bgColor: 'bg-sky-100',
   },
   {
@@ -93,7 +94,20 @@ const LANGUAGES: LanguageOption[] = [
     color: '#3776AB',
     bgColor: 'bg-yellow-100',
   },
+  {
+    id: 'cpp',
+    name: 'C++',
+    icon: 'C++',
+    color: '#2563EB',
+    bgColor: 'bg-indigo-100',
+  },
 ];
+
+const QUIZ_LANGUAGE_MAP: Record<string, string[]> = {
+  ox: ['c', 'cpp', 'javascript', 'java', 'python'],
+  'multiple-choice': ['python', 'cpp'],
+  'fill-blank': ['c', 'javascript', 'java', 'python'],
+};
 
 export function QuizPage() {
   const navigate = useNavigate();
@@ -119,6 +133,10 @@ export function QuizPage() {
       navigate(`/quiz/${selectedQuizType}/${langId}`);
     }
   };
+
+  const availableLanguages = selectedQuizType
+    ? LANGUAGES.filter((lang) => (QUIZ_LANGUAGE_MAP[selectedQuizType] || []).includes(lang.id))
+    : [];
 
   return (
     <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--theme-quiz-page-bg)' }}>
@@ -190,7 +208,7 @@ export function QuizPage() {
             >
               <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--theme-quiz-title)' }}>{t('quiz.select_language')}</h3>
               <div className="flex flex-col md:flex-row gap-4">
-                {LANGUAGES.map((lang) => (
+                {availableLanguages.map((lang) => (
                   <motion.button
                     key={lang.id}
                     whileHover={{ scale: 1.05 }}
@@ -199,7 +217,11 @@ export function QuizPage() {
                     className={`flex-1 flex items-center justify-center gap-3 px-5 py-3 rounded-xl border-2 transition-all ${lang.bgColor} hover:shadow-md`}
                     style={{ borderColor: lang.color }}
                   >
-                    <span className="text-2xl">{lang.icon}</span>
+                    <span className="text-2xl">
+                      {lang.id === 'c' && <CBrandIcon language="c" size={42} />}
+                      {lang.id === 'cpp' && <CBrandIcon language="cpp" size={42} />}
+                      {lang.id !== 'c' && lang.id !== 'cpp' && lang.icon}
+                    </span>
                     <span className="font-bold text-lg" style={{ color: lang.color }}>
                       {lang.name}
                     </span>

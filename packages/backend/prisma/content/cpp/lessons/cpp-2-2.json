@@ -1,0 +1,58 @@
+{
+  "lessonId": "cpp-2-2",
+  "title": "string의 내부 구조",
+  "concept": "string은 힙에 데이터를 저장하며, size와 capacity를 별도로 추적한다",
+  "content": {
+    "code": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string s = \"Hi\";\n    cout << \"size: \" << s.size() << endl;\n    cout << \"capacity: \" << s.capacity() << endl;\n\n    s += \" World!\";\n    cout << \"size: \" << s.size() << endl;\n    cout << \"capacity: \" << s.capacity() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "짧은 문자열 생성",
+        "explanation": "`\"Hi\"`는 2글자로, 많은 구현에서 SSO(Small String Optimization)가 적용되어 힙 할당 없이 객체 내부에 저장됩니다.",
+        "visualizationType": "cMemory",
+        "code": "string s = \"Hi\";",
+        "stack": [
+          { "name": "s", "value": "Hi", "type": "std::string", "address": "0x3000" }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "size와 capacity",
+        "explanation": "`size`는 현재 문자 수(2), `capacity`는 재할당 없이 담을 수 있는 최대 크기입니다.\n\nSSO 범위(보통 15~22바이트) 내에서는 capacity가 고정됩니다.",
+        "visualizationType": "terminal",
+        "code": "cout << \"size: \" << s.size() << endl;",
+        "stdout": "size: 2\ncapacity: 15"
+      },
+      {
+        "title": "문자열 확장",
+        "explanation": "`s += \" World!\"`로 문자열이 길어집니다. SSO 범위를 넘으면 힙에 새 버퍼를 할당하고 데이터를 복사합니다.",
+        "visualizationType": "cMemory",
+        "code": "s += \" World!\";",
+        "stack": [
+          { "name": "s", "value": "Hi World!", "type": "std::string", "address": "0x3000", "highlight": true }
+        ],
+        "stdout": "size: 9\ncapacity: 15"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "SSO(Small String Optimization)란?",
+    "options": [
+      "문자열을 항상 힙에 저장하는 최적화",
+      "짧은 문자열을 객체 내부에 저장하여 힙 할당을 피하는 최적화",
+      "문자열 비교를 빠르게 하는 최적화",
+      "문자열을 압축 저장하는 최적화"
+    ],
+    "correctIndex": 1,
+    "explanation": "SSO는 짧은 문자열(보통 15~22바이트)을 string 객체 자체의 메모리에 저장하여 불필요한 힙 할당을 피합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "string은 항상 힙 메모리를 사용한다",
+      "correct": "SSO 덕분에 짧은 문자열은 스택(객체 내부)에 저장됩니다.",
+      "why": "힙 할당은 비용이 크므로, 짧은 문자열에는 최적화를 적용합니다."
+    }
+  ],
+  "keyTakeaway": "string은 size(현재 길이)와 capacity(할당 크기)를 구분하며, SSO로 짧은 문자열의 성능을 최적화한다."
+}

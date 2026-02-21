@@ -1,0 +1,98 @@
+{
+  "language": "cpp",
+  "quizType": "ox",
+  "chapterId": "cpp-memory",
+  "chapterTitle": "메모리 관리와 스마트 포인터",
+  "quizzes": [
+    {
+      "id": "ox-cpp-mem-q1",
+      "question": "`new`로 할당한 메모리는 대응되는 `delete`가 필요하다.",
+      "answer": "true",
+      "explanation": "수동 할당은 수동 해제가 필요합니다. 누락 시 메모리 누수로 이어집니다.",
+      "concepts": ["new", "delete", "memory leak"],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "ox-cpp-mem-q2",
+      "question": "`delete[]`는 배열이 아닌 단일 객체에도 사용해도 된다.",
+      "answer": "false",
+      "explanation": "단일 객체는 `delete`, 배열은 `delete[]`를 사용해야 합니다.",
+      "concepts": ["delete", "delete[]", "배열"],
+      "difficulty": "easy",
+      "orderNum": 2
+    },
+    {
+      "id": "ox-cpp-mem-q3",
+      "question": "`std::unique_ptr`는 복사 가능(copyable)하다.",
+      "answer": "false",
+      "explanation": "unique_ptr는 복사 불가, 이동만 가능하여 단독 소유를 보장합니다.",
+      "concepts": ["unique_ptr", "move-only", "소유권"],
+      "difficulty": "easy",
+      "orderNum": 3
+    },
+    {
+      "id": "ox-cpp-mem-q4",
+      "question": "`std::make_unique<T>()`는 예외 안전성 측면에서 직접 `new`보다 권장된다.",
+      "answer": "true",
+      "explanation": "생성과 소유권 전달을 한 번에 처리해 안전하고 간결합니다.",
+      "concepts": ["make_unique", "예외안전", "RAII"],
+      "difficulty": "medium",
+      "orderNum": 4
+    },
+    {
+      "id": "ox-cpp-mem-q5",
+      "question": "`std::shared_ptr`는 참조 카운트가 0이 되면 자동으로 해제된다.",
+      "answer": "true",
+      "explanation": "소유자가 모두 사라지면 관리 대상 객체가 파괴됩니다.",
+      "concepts": ["shared_ptr", "refcount", "자동해제"],
+      "difficulty": "easy",
+      "orderNum": 5
+    },
+    {
+      "id": "ox-cpp-mem-q6",
+      "question": "`shared_ptr` 순환 참조(cycle)는 메모리 누수를 유발할 수 있다.",
+      "answer": "true",
+      "explanation": "서로 참조 카운트를 유지해 0이 되지 않으면 해제가 안 됩니다.",
+      "concepts": ["shared_ptr", "cycle", "memory leak"],
+      "difficulty": "medium",
+      "orderNum": 6
+    },
+    {
+      "id": "ox-cpp-mem-q7",
+      "question": "순환 참조를 끊을 때 `std::weak_ptr`를 사용한다.",
+      "answer": "true",
+      "explanation": "weak_ptr는 소유권을 증가시키지 않아 cycle 해소에 사용됩니다.",
+      "concepts": ["weak_ptr", "cycle break", "observer"],
+      "difficulty": "medium",
+      "orderNum": 7
+    },
+    {
+      "id": "ox-cpp-mem-q8",
+      "question": "RAII는 가비지 컬렉션과 동일한 메모리 관리 방식이다.",
+      "answer": "false",
+      "explanation": "RAII는 스코프 기반 결정적(deterministic) 파괴 방식으로 GC와 다릅니다.",
+      "concepts": ["RAII", "GC", "deterministic destruction"],
+      "difficulty": "medium",
+      "orderNum": 8
+    },
+    {
+      "id": "ox-cpp-mem-q9",
+      "question": "스마트 포인터를 쓰면 커스텀 해제 로직(Deleter)을 지정할 수 있다.",
+      "answer": "true",
+      "explanation": "파일 핸들/소켓 등 자원에 맞는 정리 함수 연결이 가능합니다.",
+      "concepts": ["custom deleter", "resource", "smart pointer"],
+      "difficulty": "hard",
+      "orderNum": 9
+    },
+    {
+      "id": "ox-cpp-mem-q10",
+      "question": "`unique_ptr`의 raw 포인터를 `get()`으로 받아도 소유권이 이전된다.",
+      "answer": "false",
+      "explanation": "`get()`은 조회만 하며 소유권 이전은 `release()`나 move로 처리합니다.",
+      "concepts": ["unique_ptr", "get", "release", "ownership"],
+      "difficulty": "hard",
+      "orderNum": 10
+    }
+  ]
+}

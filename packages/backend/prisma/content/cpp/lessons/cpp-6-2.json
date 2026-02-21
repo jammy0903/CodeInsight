@@ -1,0 +1,58 @@
+{
+  "lessonId": "cpp-6-2",
+  "title": "std::move 실전",
+  "concept": "std::move는 객체의 자원을 복사 없이 이전하여 불필요한 오버헤드를 제거한다",
+  "content": {
+    "code": "#include <iostream>\n#include <string>\n#include <utility>\nusing namespace std;\n\nint main() {\n    string src = \"Hello, World!\";\n    cout << \"before: \" << src << endl;\n\n    string dst = std::move(src);\n    cout << \"dst: \" << dst << endl;\n    cout << \"src: [\" << src << \"]\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "원본 string 생성",
+        "explanation": "`src`가 힙에 \"Hello, World!\" 문자 데이터를 할당합니다.",
+        "visualizationType": "cMemory",
+        "code": "string src = \"Hello, World!\";",
+        "stack": [
+          { "name": "src", "value": "Hello, World!", "type": "std::string", "address": "0x1000" }
+        ],
+        "heap": [],
+        "stdout": "before: Hello, World!"
+      },
+      {
+        "title": "std::move로 소유권 이전",
+        "explanation": "`std::move(src)`는 `src`를 rvalue로 캐스팅합니다.\n\n`dst`의 이동 생성자가 호출되어 `src`의 내부 포인터를 **복사 없이 가져옵니다**.\n\n이후 `src`는 유효하지만 비어있는 상태가 됩니다(moved-from state).",
+        "visualizationType": "cMemory",
+        "code": "string dst = std::move(src);",
+        "stack": [
+          { "name": "src", "value": "", "type": "std::string", "address": "0x1000", "highlight": true },
+          { "name": "dst", "value": "Hello, World!", "type": "std::string", "address": "0x1020", "highlight": true }
+        ]
+      },
+      {
+        "title": "결과 확인",
+        "explanation": "`dst`는 원래 `src`의 데이터를 갖고, `src`는 빈 문자열입니다.\n\n**핵심**: 복사 대신 이동하여 힙 할당/복사 비용을 제거했습니다.",
+        "visualizationType": "terminal",
+        "code": "cout << \"dst: \" << dst << endl;",
+        "stdout": "dst: Hello, World!\nsrc: []"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "std::move 후 원본 객체의 상태는?",
+    "options": [
+      "삭제된다",
+      "유효하지만 값이 이전되어 비어있다(moved-from)",
+      "원래 값을 그대로 유지한다",
+      "nullptr이 된다"
+    ],
+    "correctIndex": 1,
+    "explanation": "moved-from 객체는 유효한(valid) 상태이지만, 값은 지정되지 않은(unspecified) 상태입니다. 소멸이나 새 값 대입은 안전합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "std::move는 실제로 데이터를 이동시킨다",
+      "correct": "std::move 자체는 아무것도 이동하지 않습니다. lvalue를 rvalue로 캐스팅할 뿐이며, 실제 이동은 이동 생성자/대입 연산자가 수행합니다.",
+      "why": "이름이 오해를 부르지만, std::move는 static_cast<T&&>(x)의 편의 함수일 뿐입니다."
+    }
+  ],
+  "keyTakeaway": "std::move는 복사 비용 없이 자원을 이전하는 현대 C++의 핵심 도구다."
+}

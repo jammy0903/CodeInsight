@@ -21,7 +21,20 @@ export interface CppVariable {
   type: string;
   value: string;
   address: string;
+  points_to?: string;
+  isReference?: boolean;
   children?: CppVariable[];
+  containerInfo?: {
+    containerType: 'vector' | 'string' | 'map' | 'set' | 'array';
+    size: number;
+    capacity?: number;
+    elements?: Array<{ index: number; value: string; type: string }>;
+  };
+  smartPtrInfo?: {
+    ownership: 'unique' | 'shared';
+    rawPointer: string;
+    refCount?: number;
+  };
 }
 
 export interface CppStackFrame {
@@ -123,6 +136,25 @@ function parseArgs(output: string, frameLevel: number): CppVariable[] {
     }
   }
   return variables;
+}
+
+// ============================================
+// STL 타입 감지 헬퍼
+// ============================================
+
+function isStlContainer(type: string): 'vector' | 'string' | 'map' | 'set' | 'array' | null {
+  if (type.includes('std::vector')) return 'vector';
+  if (type.includes('std::string') || type.includes('std::__cxx11::basic_string')) return 'string';
+  if (type.includes('std::map')) return 'map';
+  if (type.includes('std::set')) return 'set';
+  if (type.includes('std::array')) return 'array';
+  return null;
+}
+
+function isSmartPointer(type: string): 'unique' | 'shared' | null {
+  if (type.includes('std::unique_ptr')) return 'unique';
+  if (type.includes('std::shared_ptr')) return 'shared';
+  return null;
 }
 
 // ============================================
@@ -400,6 +432,90 @@ export class GdbClient {
                   .replace(/\\\\/g, '\\');
               }
             }
+
+            // Resolve pointer targets (type contains '*')
+            if (v.type.includes('*') && !v.type.includes('std::')) {
+              sendCommand(`-data-evaluate-expression "(void*)${v.name}"`);
+              const ptrLines = await waitForResponse();
+              const ptrOutput = ptrLines.join('\n');
+              const ptrMatch = ptrOutput.match(/value="(0x[0-9a-fA-F]+)/);
+              if (ptrMatch && ptrMatch[1] !== '0x0') {
+                v.points_to = ptrMatch[1];
+              }
+            }
+
+            // Detect C++ references (type contains '&')
+            if (v.type.includes('&')) {
+              v.isReference = true;
+              // Reference's address IS the original variable's address
+              // The address we collected above (&ref) is the address of the referent
+              v.points_to = v.address;
+            }
+
+            // STL container introspection
+            const containerType = isStlContainer(v.type);
+            if (containerType) {
+              try {
+                if (containerType === 'vector') {
+                  // Get size and capacity
+                  sendCommand(`-data-evaluate-expression "(int)${v.name}.size()"`);
+                  const sizeLine = await waitForResponse();
+                  const sizeMatch = sizeLine.join('\n').match(/value="(\d+)"/);
+                  const size = sizeMatch ? parseInt(sizeMatch[1], 10) : 0;
+
+                  sendCommand(`-data-evaluate-expression "(int)${v.name}.capacity()"`);
+                  const capLine = await waitForResponse();
+                  const capMatch = capLine.join('\n').match(/value="(\d+)"/);
+                  const capacity = capMatch ? parseInt(capMatch[1], 10) : size;
+
+                  // Get elements
+                  const elements: Array<{ index: number; value: string; type: string }> = [];
+                  for (let ei = 0; ei < Math.min(size, 20); ei++) {
+                    sendCommand(`-data-evaluate-expression "${v.name}[${ei}]"`);
+                    const elLine = await waitForResponse();
+                    const elMatch = elLine.join('\n').match(/value="([^"]*)"/);
+                    elements.push({ index: ei, value: elMatch?.[1] ?? '?', type: 'auto' });
+                  }
+
+                  v.containerInfo = { containerType: 'vector', size, capacity, elements };
+                } else if (containerType === 'string') {
+                  sendCommand(`-data-evaluate-expression "(int)${v.name}.size()"`);
+                  const sizeLine = await waitForResponse();
+                  const sizeMatch = sizeLine.join('\n').match(/value="(\d+)"/);
+                  const size = sizeMatch ? parseInt(sizeMatch[1], 10) : 0;
+                  v.containerInfo = { containerType: 'string', size };
+                }
+              } catch {
+                // STL introspection failed — continue without containerInfo
+              }
+            }
+
+            // Smart pointer detection
+            const smartType = isSmartPointer(v.type);
+            if (smartType) {
+              try {
+                sendCommand(`-data-evaluate-expression "(void*)${v.name}.get()"`);
+                const rawLine = await waitForResponse();
+                const rawMatch = rawLine.join('\n').match(/value="(0x[0-9a-fA-F]+)/);
+                const rawPointer = rawMatch?.[1] ?? '0x0';
+
+                if (rawPointer !== '0x0') {
+                  v.points_to = rawPointer;
+                  const info: CppVariable['smartPtrInfo'] = { ownership: smartType, rawPointer };
+
+                  if (smartType === 'shared') {
+                    sendCommand(`-data-evaluate-expression "(long)${v.name}.use_count()"`);
+                    const rcLine = await waitForResponse();
+                    const rcMatch = rcLine.join('\n').match(/value="(\d+)"/);
+                    if (rcMatch) info.refCount = parseInt(rcMatch[1], 10);
+                  }
+
+                  v.smartPtrInfo = info;
+                }
+              } catch {
+                // Smart pointer introspection failed — continue
+              }
+            }
           }
 
           stack.push({
@@ -415,6 +531,84 @@ export class GdbClient {
           await waitForResponse();
         }
 
+        // Heap tracking: collect heap blocks for pointer targets not on stack
+        const heap: CppHeapBlock[] = [];
+        const stackAddresses = new Set<string>();
+        for (const f of stack) {
+          for (const v of f.variables) {
+            if (v.address) stackAddresses.add(v.address);
+          }
+        }
+
+        // Gather all pointer targets (including smart pointers)
+        const pointerTargets = new Set<string>();
+        for (const f of stack) {
+          for (const v of f.variables) {
+            if (v.points_to && !stackAddresses.has(v.points_to)) {
+              pointerTargets.add(v.points_to);
+            }
+          }
+        }
+
+        // For each heap target, dereference to get value
+        for (const targetAddr of pointerTargets) {
+          // Find the variable that points to this address
+          let sourceVar: CppVariable | null = null;
+          for (const f of stack) {
+            for (const v of f.variables) {
+              if (v.points_to === targetAddr) {
+                sourceVar = v;
+                break;
+              }
+            }
+            if (sourceVar) break;
+          }
+
+          if (sourceVar) {
+            try {
+              sendCommand(`-data-evaluate-expression "*(${sourceVar.name})"`);
+              const derefLines = await waitForResponse();
+              const derefOutput = derefLines.join('\n');
+              const derefStart = derefOutput.indexOf('value="');
+              let derefValue = '?';
+              if (derefStart !== -1) {
+                let i = derefStart + 7;
+                let result = '';
+                while (i < derefOutput.length) {
+                  if (derefOutput[i] === '\\' && i + 1 < derefOutput.length) {
+                    result += derefOutput[i] + derefOutput[i + 1];
+                    i += 2;
+                  } else if (derefOutput[i] === '"') {
+                    break;
+                  } else {
+                    result += derefOutput[i];
+                    i++;
+                  }
+                }
+                derefValue = result.replace(/\\"/g, '"').replace(/\\n/g, '').replace(/\\\\/g, '\\');
+              }
+
+              // Extract pointed-to type from the pointer type
+              let heapType = sourceVar.type.replace(/\s*\*\s*$/, '').trim();
+              if (sourceVar.smartPtrInfo) {
+                // Extract inner type from smart pointer: unique_ptr<Foo> → Foo
+                const innerMatch = sourceVar.type.match(/<\s*([^,>]+)/);
+                if (innerMatch) heapType = innerMatch[1].trim();
+              }
+
+              heap.push({
+                address: targetAddr,
+                type: heapType,
+                size: 0,
+                value: derefValue,
+                name: `*${sourceVar.name}`,
+              });
+            } catch {
+              // Dereference failed — skip this heap block
+            }
+          }
+        }
+
         const code = (line >= 1 && line <= srcLines.length) ? srcLines[line - 1] : '';
         const currentStdout = await readStdout();
 
@@ -422,7 +616,7 @@ export class GdbClient {
           line,
           code: code.trim(),
           stack,
-          heap: [],
+          heap,
           stdout: currentStdout,
           events: [],
         };

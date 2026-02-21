@@ -268,30 +268,37 @@ async function seed() {
   console.log('    ✅ C');
 
   await prisma.language.upsert({
+    where: { id: 'cpp' },
+    update: { name: 'C++', description: 'C 기반에 객체지향과 제네릭을 더한 고성능 시스템 프로그래밍 언어', icon: 'C++', color: '#6366F1', order: 2 },
+    create: { id: 'cpp', name: 'C++', description: 'C 기반에 객체지향과 제네릭을 더한 고성능 시스템 프로그래밍 언어', icon: 'C++', color: '#6366F1', order: 2 },
+  });
+  console.log('    ✅ C++');
+
+  await prisma.language.upsert({
     where: { id: 'python' },
-    update: { name: 'Python', description: '간결하고 읽기 쉬운 문법의 고급 프로그래밍 언어', icon: '🐍', color: '#3776AB', order: 2 },
-    create: { id: 'python', name: 'Python', description: '간결하고 읽기 쉬운 문법의 고급 프로그래밍 언어', icon: '🐍', color: '#3776AB', order: 2 },
+    update: { name: 'Python', description: '간결하고 읽기 쉬운 문법의 고급 프로그래밍 언어', icon: '🐍', color: '#3776AB', order: 3 },
+    create: { id: 'python', name: 'Python', description: '간결하고 읽기 쉬운 문법의 고급 프로그래밍 언어', icon: '🐍', color: '#3776AB', order: 3 },
   });
   console.log('    ✅ Python');
 
   await prisma.language.upsert({
     where: { id: 'java' },
-    update: { name: 'Java', description: '객체지향 프로그래밍과 JVM 기반 언어', icon: '☕', color: '#007396', order: 3 },
-    create: { id: 'java', name: 'Java', description: '객체지향 프로그래밍과 JVM 기반 언어', icon: '☕', color: '#007396', order: 3 },
+    update: { name: 'Java', description: '객체지향 프로그래밍과 JVM 기반 언어', icon: '☕', color: '#007396', order: 4 },
+    create: { id: 'java', name: 'Java', description: '객체지향 프로그래밍과 JVM 기반 언어', icon: '☕', color: '#007396', order: 4 },
   });
   console.log('    ✅ Java');
 
   await prisma.language.upsert({
     where: { id: 'javascript' },
-    update: { name: 'JavaScript', description: '웹 개발의 핵심 언어, 비동기와 프로토타입', icon: '⚡', color: '#F7DF1E', order: 4 },
-    create: { id: 'javascript', name: 'JavaScript', description: '웹 개발의 핵심 언어, 비동기와 프로토타입', icon: '⚡', color: '#F7DF1E', order: 4 },
+    update: { name: 'JavaScript', description: '웹 개발의 핵심 언어, 비동기와 프로토타입', icon: '⚡', color: '#F7DF1E', order: 5 },
+    create: { id: 'javascript', name: 'JavaScript', description: '웹 개발의 핵심 언어, 비동기와 프로토타입', icon: '⚡', color: '#F7DF1E', order: 5 },
   });
   console.log('    ✅ JavaScript');
 
   await prisma.language.upsert({
     where: { id: 'python-practical' },
-    update: { name: 'Python (업무 자동화)', description: '급하게 배우는 파이썬 - 엑셀/PDF/PPT 자동화 & 데이터 분석', icon: '🚀', color: '#FFA500', isSequential: false, order: 5 },
-    create: { id: 'python-practical', name: 'Python (업무 자동화)', description: '급하게 배우는 파이썬 - 엑셀/PDF/PPT 자동화 & 데이터 분석', icon: '🚀', color: '#FFA500', isSequential: false, order: 5 },
+    update: { name: 'Python (업무 자동화)', description: '급하게 배우는 파이썬 - 엑셀/PDF/PPT 자동화 & 데이터 분석', icon: '🚀', color: '#FFA500', isSequential: false, order: 6 },
+    create: { id: 'python-practical', name: 'Python (업무 자동화)', description: '급하게 배우는 파이썬 - 엑셀/PDF/PPT 자동화 & 데이터 분석', icon: '🚀', color: '#FFA500', isSequential: false, order: 6 },
   });
   console.log('    ✅ Python (업무 자동화)');
 
@@ -392,7 +399,101 @@ async function seed() {
     await deactivateStaleChapters('c', cValidChapterIds);
   }
 
-  // 4. JavaScript 커리큘럼 upsert
+  // 4. C++ 커리큘럼 로드 및 생성
+  console.log('  📚 Loading C++ curriculum from JSON...');
+  const cppCurriculum = loadCurriculum('cpp');
+
+  if (cppCurriculum) {
+    let cppContentCount = 0;
+    let cppQuizCount = 0;
+    const cppValidLessonIds: string[] = [];
+    const cppValidChapterIds: string[] = [];
+
+    for (const chapterData of cppCurriculum.chapters) {
+      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
+
+      const chapterId = getChapterId(chapterData);
+      cppValidChapterIds.push(chapterId);
+      const chapterPayload = {
+        languageId: 'cpp',
+        title: chapterData.title,
+        description: chapterData.description,
+        keyQuestion: chapterData.keyQuestion,
+        part: chapterData.part,
+        partLabel: chapterData.partLabel,
+        order: chapterData.order,
+      };
+      const chapter = await prisma.chapter.upsert({
+        where: { id: chapterId },
+        update: chapterPayload,
+        create: { id: chapterId, ...chapterPayload },
+      });
+
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonItem = chapterData.lessons[lessonIdx];
+        const lessonData = typeof lessonItem === 'string' ? null : lessonItem;
+        if (!lessonData) continue;
+
+        console.log(`      ├─ Lesson ${lessonData.order}: ${lessonData.title}`);
+
+        const lessonPayload = {
+          chapterId: chapter.id,
+          title: lessonData.title,
+          description: lessonData.description,
+          difficulty: lessonData.difficulty,
+          order: lessonData.order,
+          estimatedTime: lessonData.estimatedTime,
+        };
+        const lesson = await prisma.lesson.upsert({
+          where: { id: lessonData.id },
+          update: lessonPayload,
+          create: { id: lessonData.id, ...lessonPayload },
+        });
+        cppValidLessonIds.push(lessonData.id);
+
+        const content = loadLessonContent('cpp', lessonData.id);
+        if (content) {
+          const contentPayload = {
+            lessonId: lesson.id,
+            code: content.content.code,
+            language: 'cpp',
+            steps: JSON.stringify(expandDeltaSteps(content.content.steps, content.content.deltaFormat === true)),
+          };
+          await prisma.lessonContent.upsert({
+            where: { id: `content-${lessonData.id}` },
+            update: contentPayload,
+            create: { id: `content-${lessonData.id}`, ...contentPayload },
+          });
+          cppContentCount++;
+
+          if (content.quiz) {
+            const quizPayload = {
+              lessonId: lesson.id,
+              type: 'multiple_choice',
+              question: content.quiz.question,
+              options: content.quiz.options,
+              answer: String(content.quiz.correctIndex),
+              explanation: content.quiz.explanation,
+              order: 1,
+            };
+            await prisma.quiz.upsert({
+              where: { id: `quiz-${lessonData.id}` },
+              update: quizPayload,
+              create: { id: `quiz-${lessonData.id}`, ...quizPayload },
+            });
+            cppQuizCount++;
+          }
+        }
+      }
+    }
+
+    console.log(`    📄 Loaded ${cppContentCount} lesson contents`);
+    console.log(`    ❓ Loaded ${cppQuizCount} quizzes`);
+    await deactivateStaleLessons('cpp', cppValidLessonIds);
+    await deactivateStaleChapters('cpp', cppValidChapterIds);
+  }
+
+  // 5. JavaScript 커리큘럼 upsert
   console.log('  📚 Loading JavaScript curriculum from JSON...');
   const jsCurriculum = loadCurriculum('javascript');
 
@@ -483,7 +584,7 @@ async function seed() {
     await deactivateStaleChapters('javascript', jsValidChapterIds);
   }
 
-  // 5. Java 커리큘럼 upsert
+  // 6. Java 커리큘럼 upsert
   console.log('  📚 Loading Java curriculum from JSON...');
   const javaCurriculum = loadCurriculum('java');
 
@@ -574,7 +675,7 @@ async function seed() {
     await deactivateStaleChapters('java', javaValidChapterIds);
   }
 
-  // 6. Python (기초) 커리큘럼 upsert
+  // 7. Python (기초) 커리큘럼 upsert
   console.log('  📚 Loading Python curriculum from JSON...');
   const pythonCurriculum = loadCurriculum('python');
 
@@ -665,7 +766,7 @@ async function seed() {
     await deactivateStaleChapters('python', pythonValidChapterIds);
   }
 
-  // 7. Python (업무 자동화) 커리큘럼 upsert
+  // 8. Python (업무 자동화) 커리큘럼 upsert
   console.log('  📚 Loading Python (업무 자동화) curriculum from JSON...');
   const pythonPracticalCurriculum = loadCurriculum('python-practical');
 
@@ -759,7 +860,7 @@ async function seed() {
     await deactivateStaleChapters('python-practical', ppValidChapterIds);
   }
 
-  // 8. 결과 확인
+  // 9. 결과 확인
   const stats = {
     languages: await prisma.language.count(),
     chapters: await prisma.chapter.count(),

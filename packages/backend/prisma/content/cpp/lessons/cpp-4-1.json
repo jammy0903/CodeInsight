@@ -1,0 +1,59 @@
+{
+  "lessonId": "cpp-4-1",
+  "title": "new와 delete",
+  "concept": "new는 힙에 메모리를 할당하고, delete는 해제한다",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int* p = new int(42);\n    cout << *p << endl;\n\n    delete p;\n    p = nullptr;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "힙에 메모리 할당",
+        "explanation": "`new int(42)`는 힙에 int 크기의 공간을 할당하고 42로 초기화합니다.\n\n반환된 주소가 포인터 `p`에 저장됩니다. 스택의 `p`가 힙의 데이터를 가리키는 구조입니다.",
+        "visualizationType": "cMemory",
+        "code": "int* p = new int(42);",
+        "stack": [
+          { "name": "p", "value": "0x8000", "type": "int*", "address": "0x1000", "points_to": "*p" }
+        ],
+        "heap": [
+          { "name": "*p", "value": "42", "type": "int", "address": "0x8000" }
+        ]
+      },
+      {
+        "title": "역참조로 값 사용",
+        "explanation": "`*p`로 힙에 저장된 값 42를 읽어옵니다.",
+        "visualizationType": "terminal",
+        "code": "cout << *p << endl;",
+        "stdout": "42"
+      },
+      {
+        "title": "delete로 해제",
+        "explanation": "`delete p`는 힙 메모리를 운영체제에 반환합니다.\n\n**주의**: delete 후 `p`는 여전히 이전 주소를 담고 있습니다(dangling pointer). 이를 방지하려면 `p = nullptr`로 초기화합니다.",
+        "visualizationType": "cMemory",
+        "code": "delete p;",
+        "stack": [
+          { "name": "p", "value": "nullptr", "type": "int*", "address": "0x1000", "highlight": true }
+        ],
+        "heap": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "delete 후 포인터를 nullptr로 설정하는 이유는?",
+    "options": [
+      "메모리를 다시 할당하기 위해",
+      "dangling pointer를 방지하기 위해",
+      "성능을 최적화하기 위해",
+      "컴파일러가 요구하기 때문에"
+    ],
+    "correctIndex": 1,
+    "explanation": "delete 후 포인터는 해제된 메모리를 가리키는 dangling pointer가 됩니다. nullptr로 설정하면 실수로 접근할 때 즉시 크래시가 발생하여 디버깅이 쉬워집니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "delete를 호출하면 포인터도 자동으로 nullptr이 된다",
+      "correct": "delete는 힙 메모리만 해제하며 포인터 변수의 값은 바뀌지 않습니다.",
+      "why": "C++에서 포인터는 단순한 주소값이므로, 프로그래머가 직접 nullptr로 설정해야 합니다."
+    }
+  ],
+  "keyTakeaway": "new/delete는 수동 메모리 관리의 기본이지만, 잊기 쉬우므로 스마트 포인터가 더 안전하다."
+}
