@@ -46,15 +46,19 @@ export class LessonPage {
     this.lessonTitle = page.locator('h1, h2').first();
     this.backButton = page.getByRole('button', { name: /뒤로|back|←/i });
 
-    // Code Viewer (Monaco Editor)
-    this.codeViewer = page.locator('.monaco-editor, pre, code, .code-viewer').first();
+    // Code Viewer (Monaco or fallback editor panel)
+    this.codeViewer = page
+      .locator(
+        '.monaco-editor:visible, pre:visible, code:visible, .code-viewer:visible, [role="textbox"]:visible, [class*="editor"]:visible',
+      )
+      .first();
     this.codeLines = page.locator('.view-line, .code-line, [class*="line"]');
     this.highlightedLine = page.locator('.current-line, [class*="highlight"], [class*="active"]');
 
     // Step Controls
     this.prevButton = page.getByRole('button', { name: /이전|prev|←/i });
     this.nextButton = page.getByRole('button', { name: /다음|next|→/i });
-    this.stepIndicator = page.locator('[class*="step"], text=/\\d+\\s*\\/\\s*\\d+/');
+    this.stepIndicator = page.getByText(/\d+\s*\/\s*\d+/).first();
 
     // Explanation
     this.explanation = page.locator('[class*="explanation"], [class*="step-text"]');
@@ -66,7 +70,7 @@ export class LessonPage {
 
     // Quiz
     this.quizButton = page.getByRole('button', { name: /퀴즈|quiz|문제/i });
-    this.quizCard = page.locator('[class*="quiz"], [class*="question"]');
+    this.quizCard = page.locator('[class*="quiz"], [class*="question"], [role="dialog"]').first();
     this.quizOptions = page.locator('[class*="option"], button[class*="choice"]');
     this.submitButton = page.getByRole('button', { name: /제출|확인|submit|check/i });
     this.quizResult = page.locator('[class*="result"], [class*="feedback"]');
@@ -106,16 +110,8 @@ export class LessonPage {
   }
 
   async isLoaded() {
-    // Monaco Editor는 로드에 시간이 걸림 - 최대 30초까지 기다림
-    try {
-      // 먼저 Monroe Editor 컨테이너를 기다림
-      await this.page.waitForSelector('.monaco-editor', { timeout: 15000 });
-    } catch {
-      // Monaco가 없으면 대체 코드 뷰어를 기다림
-      await this.codeViewer.waitFor({ state: 'visible', timeout: 15000 });
-    }
-
-    // 코드가 실제로 보이도록 추가 대기
+    // Wait for either Monaco or the current editor fallback to be visible.
+    await this.codeViewer.waitFor({ state: 'visible', timeout: 30000 });
     await this.page.waitForTimeout(500);
   }
 

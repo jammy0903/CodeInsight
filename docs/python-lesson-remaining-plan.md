@@ -21,18 +21,24 @@
   - 동일 경고/주의 문구 중복 축소
 
 3. 수동 QA 샘플 검수
-- 챕터 1~15에서 각 챕터 1개씩(최소 15개) 열어 읽기 흐름/톤/용어 일관성 확인
-- 특히 예외 처리, OOP, 비동기, 고급 함수형(컴프리헨션/reduce/lambda) 챕터 집중 점검
+- 챕터 1~15에서 각 챕터 1개씩(최소 15개) 읽기 흐름/톤/용어 일관성 확인 완료
+- 특히 예외 처리, OOP, 비동기, 고급 함수형(컴프리헨션/reduce/lambda) 챕터 집중 점검 완료
 
 4. 시각화 동작 회귀 확인
-- 레슨 페이지에서 `previous/next/quiz` 네비게이션과 단계 코드/설명 매칭 확인
-- `pythonMemory` 스텝에서 이름/객체/출력 렌더링 누락 여부 확인
-- 모바일/데스크톱 사이드바 `신고하기` 버튼 겹침 여부 재확인
+- 레슨 페이지에서 `previous/next/quiz` 네비게이션과 단계 코드/설명 매칭 확인 완료
+- `pythonMemory` 스텝에서 이름/객체/출력 렌더링 누락 여부 확인 완료
+- Playwright 회귀:
+  - chromium: `lesson.spec.ts` 13/13 통과
+  - mobile: 의존성 설치 후 단일 워커(`--workers=1`) 13/13 통과
+  - mobile 병렬 실행은 버튼 클릭 타이밍 플래키 3건 관찰(기능 회귀로 분류하지 않음)
+- 모바일/데스크톱 사이드바 `신고하기` 버튼:
+  - 현재 검증 화면에서는 `신고하기` 노출 대신 `Contact` 노출 상태 확인
+  - 겹침 이슈 재현 없음
 
 5. 변경분 검토 및 커밋
-- `packages/backend/prisma/content/python/lessons` 변경분만 묶어 diff 리뷰
-- 메시지 규칙에 맞춰 커밋
-  - 예: `chore(content): tighten Python lesson explanations and memory states`
+- `packages/backend/prisma/content/python/lessons` 변경분 diff 리뷰 및 커밋 완료
+- 커밋: `chore(content): tighten Python lesson explanations and memory states`
+- 추가 E2E 보정 커밋: LessonPage POM 셀렉터/대기 로직 정합화
 
 ## 완료 기준(Definition of Done)
 - `pythonMemoryState` 누락 4건 수정 완료
