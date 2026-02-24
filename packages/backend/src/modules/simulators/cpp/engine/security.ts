@@ -43,6 +43,12 @@ const FORBIDDEN_PATTERNS: RegExp[] = [
   /mprotect\s*\(/,
   /mmap\s*\([^)]*PROT_EXEC/,
 
+  // === 환경변수/시크릿 접근 ===
+  /getenv\s*\(/,                // getenv("DATABASE_URL") 등
+  /\bextern\s+char\s*\*\*\s*environ\b/,  // extern char **environ
+  /\/proc\/self\/environ/,      // /proc/self/environ 파일 읽기
+  /\/proc\/\d+\/environ/,       // /proc/<pid>/environ
+
   // === 위험한 C 헤더 ===
   /#\s*include\s*<\s*unistd\.h/,
   /#\s*include\s*<\s*sys\//,

@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
+import { pythonSafeEnv } from '../../safe-env';
 
 export interface PythonSnapshot {
   line: number;
@@ -47,11 +48,7 @@ export class PythonDebuggerClient {
 
     const child = spawn('python3', [this.AGENT_PATH, sourcePath], {
       cwd: projectPath,
-      env: {
-        ...process.env,
-        PYTHONUNBUFFERED: '1', // Disable output buffering
-        PYTHONIOENCODING: 'utf-8',
-      },
+      env: pythonSafeEnv(),
     });
 
     const timeout = setTimeout(() => {

@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
+import { javaSafeEnv } from '../../safe-env';
 
 const execAsync = promisify(exec);
 
@@ -18,7 +19,7 @@ export class JavaCompiler {
     const command = `javac -g -encoding UTF-8 -d "${projectPath}" "${sourceFile}"`;
 
     try {
-      await execAsync(command);
+      await execAsync(command, { env: javaSafeEnv() });
     } catch (error: any) {
       // 컴파일 에러 발생 시 stderr 내용을 추출하여 사용자에게 보여줄 메시지로 변환
       const errorMessage = error.stderr || error.message;

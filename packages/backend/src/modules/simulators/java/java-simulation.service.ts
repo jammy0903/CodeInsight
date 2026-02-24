@@ -27,6 +27,7 @@ import { FileManager } from './engine/file-manager';
 import { JavaCompiler } from './engine/compiler';
 import { DebuggerClient } from './engine/debugger-client';
 import { normalizeJavaEvents } from './normalizer';
+import { checkCodeSecurity } from './engine/security';
 
 /**
  * Java 시뮬레이션 서비스 메인 클래스
@@ -108,6 +109,17 @@ export class JavaSimulationService {
         let projectPath: string | null = null;
 
         try {
+            // ═══════════════════════════════════════════════════════
+            // 0️⃣ Security: 보안 검증
+            // ═══════════════════════════════════════════════════════
+            const security = checkCodeSecurity(sourceCode);
+            if (!security.safe) {
+                return {
+                    success: false,
+                    error: security.reason || 'Code contains potentially dangerous operations',
+                };
+            }
+
             // ═══════════════════════════════════════════════════════
             // 1️⃣ Setup: 임시 프로젝트 생성
             // ═══════════════════════════════════════════════════════

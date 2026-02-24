@@ -41,6 +41,12 @@ export const FORBIDDEN_PATTERNS = [
   /mprotect\s*\(/,        // 메모리 보호 변경
   /mmap\s*\([^)]*PROT_EXEC/,  // 실행 가능 메모리
 
+  // === 환경변수/시크릿 접근 ===
+  /getenv\s*\(/,                // getenv("DATABASE_URL") 등
+  /\bextern\s+char\s*\*\*\s*environ\b/,  // extern char **environ
+  /\/proc\/self\/environ/,      // /proc/self/environ 파일 읽기
+  /\/proc\/\d+\/environ/,       // /proc/<pid>/environ
+
   // === 위험한 헤더 ===
   /#\s*include\s*<\s*unistd\.h/,
   /#\s*include\s*<\s*sys\//,

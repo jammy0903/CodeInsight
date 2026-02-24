@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
+import { nodeSafeEnv } from '../../safe-env';
 
 export interface JavaScriptSnapshot {
   line: number;
@@ -41,10 +42,7 @@ export class JavaScriptDebuggerClient {
 
     const child = spawn('node', [this.AGENT_PATH, sourcePath], {
       cwd: projectPath,
-      env: {
-        ...process.env,
-        NODE_OPTIONS: '--no-warnings',
-      },
+      env: nodeSafeEnv(),
     });
 
     const timeout = setTimeout(() => {

@@ -199,6 +199,27 @@ export class PythonSimulationService {
       /\bos\.remove\s*\(/,              // os.remove('file')
       /\bos\.unlink\s*\(/,              // os.unlink('file')
       /\bshutil\.rmtree\s*\(/,          // shutil.rmtree('dir')
+
+      // 환경변수/시크릿 접근 차단
+      /\bos\.environ\b/,                // os.environ → 전체 환경변수 노출
+      /\/proc\/self\/environ/,          // /proc/self/environ 파일 읽기
+      /\/proc\/\d+\/environ/,           // /proc/<pid>/environ
+      /\bos\.getenv\s*\(/,              // os.getenv('DATABASE_URL')
+
+      // 네트워크 접근 차단
+      /\bimport\s+socket\b/,            // import socket
+      /\bfrom\s+socket\b/,              // from socket import ...
+      /\bimport\s+http/,                // import http, http.client 등
+      /\bfrom\s+http/,                  // from http import ...
+      /\bimport\s+urllib/,              // import urllib
+      /\bfrom\s+urllib/,                // from urllib import ...
+      /\bimport\s+requests\b/,          // import requests
+
+      // 추가 위험 패턴
+      /\bimport\s+ctypes\b/,            // ctypes로 C 함수 호출
+      /\bfrom\s+ctypes\b/,              // from ctypes import ...
+      /\bimport\s+signal\b/,            // signal 핸들러 조작
+      /\bimport\s+multiprocessing\b/,   // 프로세스 생성
     ];
 
     // 🔍 코드 검사: 위험 패턴이 하나라도 있으면 차단

@@ -7,6 +7,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
+import { cSafeEnv } from '../../safe-env';
 
 const execAsync = promisify(exec);
 
@@ -31,7 +32,7 @@ export class CppCompiler {
     const command = `g++ -std=c++20 -g -O0 -fno-omit-frame-pointer -o "${outputFile}" "${sourceFile}" 2>&1`;
 
     try {
-      await execAsync(command, { timeout: 30_000 });
+      await execAsync(command, { timeout: 30_000, env: cSafeEnv() });
       return { success: true, outputPath: outputFile };
     } catch (error: any) {
       const errorOutput = error.stdout || error.stderr || error.message;

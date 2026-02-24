@@ -20,6 +20,7 @@ import * as crypto from 'crypto';
 import { config } from '../../../../config';
 import type { ExecutionResult, IExecutor, JudgeResult } from '../../../executors/types';
 import { checkCodeSecurity } from './security';
+import { cSafeEnv } from '../../safe-env';
 
 const execAsync = promisify(exec);
 
@@ -85,12 +86,14 @@ export class CExecutor implements IExecutor {
 
       // 4. gcc 컴파일
       const compileCmd = `gcc -o "${binPath}" "${srcPath}" 2>&1`;
+      const safeEnv = cSafeEnv();
 
       let compileOutput = '';
       try {
         const { stdout } = await execAsync(compileCmd, {
           timeout: 30000, // 30초
-          maxBuffer: config.execution.bufferSize
+          maxBuffer: config.execution.bufferSize,
+          env: safeEnv,
         });
         compileOutput = stdout;
       } catch (error: unknown) {
@@ -113,7 +116,8 @@ export class CExecutor implements IExecutor {
       try {
         const { stdout, stderr } = await execAsync(runCmd, {
           timeout: (timeout + 5) * 1000,
-          maxBuffer: config.execution.bufferSize
+          maxBuffer: config.execution.bufferSize,
+          env: safeEnv,
         });
 
         return {

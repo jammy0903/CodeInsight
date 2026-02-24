@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
+import { javaSafeEnv } from '../../safe-env';
 
 export class DebuggerClient {
   // 빌드된 Java Agent의 JAR 파일 경로 (경로는 프로젝트 구조에 따라 조정 필요)
@@ -24,6 +25,7 @@ export class DebuggerClient {
       mainClass
     ], {
       cwd: projectPath,
+      env: javaSafeEnv(),
     });
 
     const timeout = setTimeout(() => {

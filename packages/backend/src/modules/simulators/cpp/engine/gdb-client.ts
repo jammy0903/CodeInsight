@@ -11,6 +11,7 @@
 import { spawn } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { gdbSafeEnv } from '../../safe-env';
 
 // ============================================
 // 타입 정의
@@ -174,7 +175,7 @@ export class GdbClient {
         '--quiet',
         '--nx',
         './a.out',
-      ], { cwd: projectPath });
+      ], { cwd: projectPath, env: gdbSafeEnv() });
 
       const snapshots: CppSnapshot[] = [];
       let buffer = '';
