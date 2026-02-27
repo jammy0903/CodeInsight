@@ -1,0 +1,90 @@
+{
+  "lessonId": "js-8-3",
+  "title": "Task Splitting",
+  "concept": "Breaking long tasks into small pieces and yielding control periodically is essential for maintaining UI responsiveness.",
+  "content": {
+    "code": "// 1. Blocking Task (나쁜 예)\nfunction heavy() {\n  // 10억 번 루프: 메인 스레드를 완전히 차단함\n  for (let i = 0; i < 1000000000; i++) {}\n}\n\n// 2. Chunking & Yielding (좋은 예)\nlet i = 0;\nfunction heavyChunk() {\n  // 100만 번만 수행 (Chunk)\n  const end = i + 1000000;\n  while (i < end) { i++; }\n\n  // \"잠깐 쉴게\" -> 렌더링 기회 제공 (Yield)\n  if (i < 1000000000) {\n    setTimeout(heavyChunk, 0);\n  }\n}",
+    "steps": [
+      {
+        "title": "Defining a Blocking Task",
+        "explanation": "The `heavy()` function defines a long task that completely blocks the main thread.\nWhile it runs, the browser's UI freezes until all one billion iterations complete.\nThis is called 'UI freezing'.",
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [
+            "heavy()  ⚠️ 10억 루프 블로킹"
+          ],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": []
+        },
+        "code": "function heavy() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "Defining Chunking: splitting the work",
+        "explanation": "The `heavyChunk()` function is designed to break the long task into small pieces (Chunks).\nEach call only does one million iterations, so the main thread isn't held for too long.",
+        "keyInsight": "The technique of breaking a huge task into pieces to reduce the time each execution takes.",
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [
+            "heavyChunk()  (100만 번만)"
+          ],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": []
+        },
+        "code": "function heavyChunk() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "title": "Defining Yielding: handing back control",
+        "explanation": "After each chunk, `heavyChunk()` calls `setTimeout(heavyChunk, 0)` to send the next chunk to the Task Queue.\nThis intentionally empties the Call Stack, giving the browser a chance to handle rendering and user input (Yield).",
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [],
+          "taskQueue": [
+            "heavyChunk()"
+          ],
+          "microtaskQueue": []
+        },
+        "code": "if (i < 1000000000) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Which of the following is NOT a valid API for yielding during long tasks?",
+    "options": [
+      "setTimeout(fn, 0)",
+      "scheduler.yield() (modern browsers)",
+      "requestIdleCallback()",
+      "while(true) loop"
+    ],
+    "correctIndex": 3,
+    "explanation": "A synchronous loop like `while(true)` never empties the main thread — it holds it indefinitely."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Breaking tasks with Promises prevents the screen from freezing",
+      "correct": "Not exactly.\nPromises have higher priority than rendering.",
+      "why": "If Promises (microtasks) keep chaining, the browser never gets to the rendering step.\nTo yield to rendering, use setTimeout (macrotask) or a scheduler API."
+    }
+  ],
+  "keyTakeaway": "Break huge tasks into small chunks and yield frequently."
+}

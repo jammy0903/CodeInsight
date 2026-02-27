@@ -1,0 +1,85 @@
+{
+  "lessonId": "js-8-2",
+  "title": "requestAnimationFrame (V-Sync)",
+  "concept": "requestAnimationFrame (rAF) runs your code in sync with the browser's screen refresh cycle (V-Sync).",
+  "content": {
+    "code": "// 1. setTimeout (렌더링 주기 무시)\nfunction badAni() {\n  // 10ms마다 실행하려 하지만 실제 프레임 생성 시점과 어긋남\n  moveBox();\n  setTimeout(badAni, 10);\n}\n\n// 2. requestAnimationFrame (렌더링 주기 동기화)\nfunction goodAni() {\n  moveBox();\n  // 브라우저: \"다음 Paint 직전에 실행시켜 줄게\"\n  requestAnimationFrame(goodAni);\n}\n\nrequestAnimationFrame(goodAni);",
+    "steps": [
+      {
+        "title": "Starting the animation",
+        "explanation": "Calling `requestAnimationFrame(goodAni)` to start the animation loop.\nThis is like telling the browser: \"Run `goodAni` right before you draw the next frame.\"",
+        "keyInsight": "rAF aligns work to the browser's rendering cycle, not a fixed time interval.",
+        "visualizationType": "eventLoop",
+        "code": "requestAnimationFrame(goodAni);",
+        "occurrence": 2,
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [
+            {
+              "name": "rAF(goodAni)"
+            }
+          ],
+          "taskQueue": [],
+          "microtaskQueue": []
+        }
+      },
+      {
+        "title": "Scheduling the next frame",
+        "explanation": "Inside `goodAni`, we call `requestAnimationFrame(goodAni)` again to schedule the next frame.\nThis is the 'rAF loop' — the key to smooth animations.",
+        "visualizationType": "eventLoop",
+        "code": "requestAnimationFrame(goodAni);",
+        "eventLoopState": {
+          "callStack": [
+            "goodAni()",
+            "moveBox()"
+          ],
+          "webApis": [
+            {
+              "name": "rAF(goodAni)"
+            }
+          ],
+          "taskQueue": [],
+          "microtaskQueue": []
+        }
+      },
+      {
+        "title": "Note: the wrong way — using setTimeout",
+        "explanation": "Using `setTimeout` like in `badAni` can misalign JS execution with the browser's rendering cycle.\nFor example, if `moveBox` runs right after a render finishes, the result won't appear until the next frame 16ms later — causing the choppy 'Jank' effect.",
+        "keyInsight": "For JS animations, always use `requestAnimationFrame` instead of `setTimeout`.",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(badAni, 10);",
+        "eventLoopState": {
+          "callStack": [
+            "badAni()",
+            "moveBox()"
+          ],
+          "webApis": [],
+          "taskQueue": [
+            "setTimeout(badAni, 10)"
+          ],
+          "microtaskQueue": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following is NOT a key feature of requestAnimationFrame?",
+    "options": [
+      "It pauses in background tabs to save battery",
+      "Call frequency automatically adjusts to the monitor's refresh rate (Hz)",
+      "It always executes exactly 1ms later",
+      "It's effective at reducing frame drops (Jank)"
+    ],
+    "correctIndex": 2,
+    "explanation": "rAF follows the screen refresh cycle, not a fixed time.\nThe interval varies dynamically based on the display environment."
+  },
+  "misconceptions": [
+    {
+      "wrong": "JS animations (rAF) are always faster than CSS animations",
+      "correct": "It depends on the situation.",
+      "why": "For simple movements, CSS can be faster because it runs off the main thread on the Compositor Thread.\nrAF is for cases that need complex calculations, like physics engines."
+    }
+  ],
+  "keyTakeaway": "JS animations must use rAF to stay in sync with V-Sync for smooth rendering."
+}

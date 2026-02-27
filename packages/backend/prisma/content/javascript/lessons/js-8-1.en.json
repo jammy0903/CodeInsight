@@ -1,0 +1,437 @@
+{
+  "lessonId": "js-8-1",
+  "title": "The Main Thread and Blocking",
+  "concept": "JavaScript runs on a single thread — when a heavy task blocks the main thread, the UI freezes.",
+  "content": {
+    "code": "const tasks = [];\nlet uiBlocked = false;\n\nfunction heavyTask(name) {\n  uiBlocked = true;\n  let result = 0;\n  for (let i = 0; i < 5; i++) {\n    result += i;\n  }\n  tasks.push({ name: name, result: result });\n  uiBlocked = false;\n  return result;\n}\n\nconst result1 = heavyTask('Task A');\nconst result2 = heavyTask('Task B');\nconst total = result1 + result2;\n\nconsole.log(tasks);\nconsole.log(total);",
+    "steps": [
+      {
+        "title": "Initializing the task array",
+        "explanation": "Creating the `tasks` array.\nWe'll store completed task records in this array.",
+        "keyInsight": "In JavaScript, arrays are reference types stored on the Heap.",
+        "visualizationType": "scope",
+        "code": "const tasks = [];",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "tasks"
+        }
+      },
+      {
+        "title": "UI blocking state flag",
+        "explanation": "We use the `uiBlocked` variable to track whether a heavy task is currently running.\nIn a real browser, clicks, scrolls, and other events won't respond while this flag is true.",
+        "keyInsight": "Single thread = only one task can run at a time",
+        "visualizationType": "scope",
+        "code": "let uiBlocked = false;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": false,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "uiBlocked"
+        }
+      },
+      {
+        "title": "Starting the first heavy task",
+        "explanation": "Calling `heavyTask('Task A')`.\nNo other code can run until this function returns.",
+        "keyInsight": "Function call = adding a new frame to the call stack",
+        "analogy": "Like a bank with only one teller — if the person in front has a complex transaction, everyone else has to wait.",
+        "visualizationType": "scope",
+        "code": "const result1 = heavyTask('Task A');",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": false,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "heavyTask()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "name",
+                  "value": "'Task A'",
+                  "keyword": "param"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "heavyTask()",
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "Blocking state begins",
+        "explanation": "Setting `uiBlocked = true`.\nUI events like clicks and scrolls are now unresponsive.",
+        "keyInsight": "When the main thread is busy, tasks in the event queue have to wait.",
+        "visualizationType": "scope",
+        "code": "uiBlocked = true;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": true,
+                  "keyword": "let",
+                  "changed": true
+                }
+              ]
+            },
+            {
+              "name": "heavyTask()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "name",
+                  "value": "'Task A'",
+                  "keyword": "param"
+                },
+                {
+                  "name": "result",
+                  "value": 0,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "uiBlocked"
+        }
+      },
+      {
+        "title": "Performing a CPU-intensive task",
+        "explanation": "The for loop executes.\nIn a real app, millions of iterations can freeze the UI for several seconds.",
+        "tip": "Tasks like this should be offloaded to a Web Worker or split into chunks.",
+        "visualizationType": "scope",
+        "code": "for (let i = 0; i < 5; i++) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": true,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "heavyTask()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "name",
+                  "value": "'Task A'",
+                  "keyword": "param"
+                },
+                {
+                  "name": "result",
+                  "value": "0→10",
+                  "keyword": "let",
+                  "changed": true
+                },
+                {
+                  "name": "i",
+                  "value": "0→4",
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "heavyTask()",
+          "highlightVariable": "result"
+        }
+      },
+      {
+        "title": "Saving the result",
+        "explanation": "Storing the computed result into the `tasks` array as an object.\n`{ name: 'Task A', result: 10 }`",
+        "keyInsight": "Pushing an object creates a new heap object and the array holds a reference to it.",
+        "visualizationType": "scope",
+        "code": "tasks.push({ name: name, result: result });",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}]",
+                  "keyword": "const",
+                  "changed": true
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": true,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "heavyTask()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "name",
+                  "value": "'Task A'",
+                  "keyword": "param"
+                },
+                {
+                  "name": "result",
+                  "value": 10,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "tasks"
+        }
+      },
+      {
+        "title": "Blocking state released",
+        "explanation": "Setting `uiBlocked = false`.\nThe UI can respond again.",
+        "visualizationType": "scope",
+        "code": "uiBlocked = false;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": false,
+                  "keyword": "let",
+                  "changed": true
+                },
+                {
+                  "name": "result1",
+                  "value": 10,
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "uiBlocked"
+        }
+      },
+      {
+        "title": "Starting the second task",
+        "explanation": "Calling `heavyTask('Task B')`.\nThe main thread is blocked again.",
+        "keyInsight": "Synchronous code executes sequentially. Task B can't start until Task A finishes.",
+        "visualizationType": "scope",
+        "code": "const result2 = heavyTask('Task B');",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}, {Task B: 10}]",
+                  "keyword": "const",
+                  "changed": true
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": false,
+                  "keyword": "let"
+                },
+                {
+                  "name": "result1",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "result2",
+                  "value": 10,
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "result2"
+        }
+      },
+      {
+        "title": "Summing the results",
+        "explanation": "Adding the results of both tasks.\n`result1(10) + result2(10) = 20`",
+        "visualizationType": "scope",
+        "code": "const total = result1 + result2;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}, {Task B: 10}]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "result1",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "result2",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "total",
+                  "value": 20,
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "total"
+        }
+      },
+      {
+        "title": "Checking the final results",
+        "explanation": "Printing the tasks array and total.\nWe can confirm both tasks completed sequentially.",
+        "keyInsight": "Only after all synchronous work finishes can the event loop process other tasks.",
+        "visualizationType": "scope",
+        "code": "console.log(tasks);",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}, {Task B: 10}]",
+                  "keyword": "const",
+                  "accessed": true
+                },
+                {
+                  "name": "result1",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "result2",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "total",
+                  "value": 20,
+                  "keyword": "const",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "[{name:'Task A',result:10},{name:'Task B',result:10}]",
+            "20"
+          ],
+          "highlightScope": null,
+          "highlightVariable": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What problem occurs when a heavy synchronous task runs?",
+    "options": [
+      "A memory leak occurs",
+      "The UI becomes unresponsive (freezing)",
+      "Network requests are cancelled",
+      "Variables are reset"
+    ],
+    "correctIndex": 1,
+    "explanation": "JavaScript is single-threaded — when a heavy synchronous task holds the main thread, UI events (clicks, scrolls) can't be processed and the screen appears frozen."
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript is multi-threaded and processes multiple tasks simultaneously",
+      "correct": "JavaScript has one main thread.\nYou need Web Workers to run code on a separate thread.",
+      "why": "Browsers have separate threads for rendering, networking, etc., but JS code only runs on the main thread."
+    },
+    {
+      "wrong": "A fast-running for loop won't affect the UI",
+      "correct": "With a large number of iterations, the UI can freeze for several seconds.",
+      "why": "Loops with more than a million iterations cause noticeable lag.\nSuch work should be split into chunks or moved to a Worker."
+    }
+  ],
+  "keyTakeaway": "Single thread = one task at a time. Heavy synchronous work blocks the UI — use chunking or Web Workers."
+}
