@@ -123,6 +123,6 @@ describe('FORBIDDEN_PATTERNS', () => {
 describe('패턴 커버리지', () => {
   it('FORBIDDEN_PATTERNS 개수 확인', () => {
     // 패턴 추가/삭제 시 이 테스트가 실패하면 위 테스트도 업데이트 필요
-    expect(FORBIDDEN_PATTERNS.length).toBe(28);
+    expect(FORBIDDEN_PATTERNS.length).toBe(32);
   });
 });

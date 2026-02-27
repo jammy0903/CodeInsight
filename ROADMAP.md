@@ -19,7 +19,9 @@
   - `WeekdayChart.tsx` (import 0개)
   - `stories/` 폴더 전체 (Storybook 미사용, 27파일 849줄)
 - [x] `.env.example` 최신화 (Firebase Client 변수, CORS 추가) — 2026-02-27
-- [ ] 로컬 실행 테스트 (새 클론 기준으로 Getting Started 검증)
+- [x] 로컬 실행 테스트 — 2026-02-27
+  - pnpm install ✅ / shared build ✅ / backend build ✅ / frontend build ✅
+  - 75/75 테스트 통과 (FORBIDDEN_PATTERNS 카운트 수정)
 
 ### 법적 준비
 - [x] LICENSE 파일 확인 (MIT) — 2026-02-27
