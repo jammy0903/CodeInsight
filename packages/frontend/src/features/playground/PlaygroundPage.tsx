@@ -4,10 +4,10 @@
  * Right 50%: Memory Visualization
  */
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks';
-import { Play, Layers } from 'lucide-react';
+import { Play, Layers, ChevronDown, ChevronRight as ChevronRightIcon, Terminal } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
 import { CodeMirrorEditor } from '@/features/visualizers/shared/components/CodeMirrorEditor';
 import { StepControls } from './components/StepControls';
@@ -29,7 +29,7 @@ const MAX_EDITOR_HEIGHT = 500;
 
 export function PlaygroundPage() {
   const { t } = useTranslation();
-  const { steps, currentStepIndex, error, language, setCode } = usePlaygroundStore();
+  const { steps, currentStepIndex, error, language, setCode, stdins, setStdin } = usePlaygroundStore();
   const code = useCurrentCode();
   const setPageTitle = useStore((s) => s.setPageTitle);
   const currentTheme = useThemeStore((s) => s.theme);
@@ -39,6 +39,13 @@ export function PlaygroundPage() {
 
   const currentStep = steps[currentStepIndex];
   const hasSteps = steps.length > 0;
+
+  // stdin 접이식 상태
+  const [stdinOpen, setStdinOpen] = useState(false);
+  const currentStdin = stdins[language] || '';
+  const handleStdinChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setStdin(e.target.value);
+  }, [setStdin]);
 
   // Flow/Memory 탭 상태
   const [activeTab, setActiveTab] = useState<'flow' | 'memory'>('flow');
@@ -88,21 +95,16 @@ export function PlaygroundPage() {
       <div style={{ backgroundColor: colors.pageBg, minHeight: '100vh', display: 'flex', flexDirection: 'column', padding: '16px' }}>
         {/* Code Section */}
         <div style={{ backgroundColor: colors.panelBg, flexShrink: 0 }}>
-          {/* Header */}
-          <div
-            style={{
-              height: '40px',
-              padding: '0 8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              borderBottom: `1px solid ${colors.border}`,
-              backgroundColor: colors.headerBg,
-              gap: '4px',
-            }}
-          >
+          {/* Header: 모바일 2줄 — 탭 꽉 채움 + 컨트롤 */}
+          <div style={{
+            backgroundColor: colors.headerBg,
+            borderBottom: `1px solid ${colors.border}`,
+            padding: '8px 10px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+          }}>
             <LanguageTabs isMobile={true} />
-            {/* Run + Reset + Navigation 버튼 (하단에도 추가로 표시) */}
             <StepControls isMobile={true} showRun={true} showReset={true} showNavigation={true} />
           </div>
 
@@ -125,6 +127,55 @@ export function PlaygroundPage() {
               />
             )}
           </div>
+
+          {/* stdin 입력 (접이식) */}
+          {language === 'c' && (
+            <div style={{ borderTop: `1px solid ${colors.border}` }}>
+              <button
+                onClick={() => setStdinOpen(!stdinOpen)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '6px 8px',
+                  fontSize: '10px',
+                  fontWeight: 600,
+                  color: currentStdin ? colors.accent : colors.textMuted,
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                {stdinOpen ? <ChevronDown size={10} /> : <ChevronRightIcon size={10} />}
+                <Terminal size={10} />
+                Input (stdin)
+                {currentStdin && <span style={{ fontSize: '9px', opacity: 0.7 }}>*</span>}
+              </button>
+              {stdinOpen && (
+                <textarea
+                  value={currentStdin}
+                  onChange={handleStdinChange}
+                  placeholder="Enter input values, one per line..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '6px 8px',
+                    fontSize: '11px',
+                    fontFamily: 'monospace',
+                    backgroundColor: colors.panelBg,
+                    color: colors.textMuted,
+                    border: 'none',
+                    borderTop: `1px solid ${colors.border}`,
+                    outline: 'none',
+                    resize: 'vertical',
+                    minHeight: '48px',
+                    maxHeight: '120px',
+                  }}
+                />
+              )}
+            </div>
+          )}
         </div>
 
         {/* Visualization Section - Flow Only */}
@@ -314,22 +365,19 @@ export function PlaygroundPage() {
             minHeight: '133px',
           }}
         >
-          {/* Code Header */}
-          <div
-            style={{
-              height: '48px',
-              padding: '0 16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              borderBottom: `1px solid ${colors.border}`,
-              backgroundColor: colors.headerBg,
-              flexShrink: 0,
-              gap: '8px',
-            }}
-          >
+          {/* Code Header: flex-wrap — 넓으면 1줄, 좁으면 자연스럽게 줄바꿈 */}
+          <div style={{
+            backgroundColor: colors.headerBg,
+            borderBottom: `1px solid ${colors.border}`,
+            flexShrink: 0,
+            padding: '10px 16px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '10px',
+          }}>
             <LanguageTabs />
-            {/* Run + Reset + Navigation 버튼 (헤더) */}
+            <div style={{ width: '1px', height: '22px', background: colors.border, flexShrink: 0 }} />
             <StepControls showRun={true} showReset={true} showNavigation={true} />
           </div>
 
@@ -353,6 +401,55 @@ export function PlaygroundPage() {
             )}
           </div>
 
+          {/* stdin 입력 (접이식) */}
+          {language === 'c' && (
+            <div style={{ borderTop: `1px solid ${colors.border}`, flexShrink: 0 }}>
+              <button
+                onClick={() => setStdinOpen(!stdinOpen)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: currentStdin ? colors.accent : colors.textMuted,
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'color 0.15s',
+                }}
+              >
+                {stdinOpen ? <ChevronDown size={12} /> : <ChevronRightIcon size={12} />}
+                <Terminal size={12} />
+                Input (stdin)
+                {currentStdin && <span style={{ fontSize: '10px', opacity: 0.7 }}>*</span>}
+              </button>
+              {stdinOpen && (
+                <textarea
+                  value={currentStdin}
+                  onChange={handleStdinChange}
+                  placeholder="Enter input values, one per line..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '8px 16px',
+                    fontSize: '12px',
+                    fontFamily: 'monospace',
+                    backgroundColor: colors.panelBg,
+                    color: colors.textMuted,
+                    border: 'none',
+                    borderTop: `1px solid ${colors.border}`,
+                    outline: 'none',
+                    resize: 'vertical',
+                    minHeight: '60px',
+                    maxHeight: '150px',
+                  }}
+                />
+              )}
+            </div>
+          )}
         </div>
 
         {/* ===== Right Panel: Flow + Memory Tabs - 컨텐츠에 따라 늘어남 ===== */}

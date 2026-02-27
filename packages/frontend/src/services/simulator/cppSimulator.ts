@@ -100,9 +100,11 @@ function toSteps(cppSteps: Array<Record<string, unknown>>): LessonStep[] {
 
 export async function simulateCpp(request: SimulateRequest): Promise<SimulateResult> {
   try {
-    const response = await api.post<CppSimulateResponse>('/simulators/cpp/simulate', {
-      code: request.code,
-    });
+    const response = await api.post<CppSimulateResponse>(
+      '/simulators/cpp/simulate',
+      { code: request.code },
+      request.signal ? { signal: request.signal } : undefined,
+    );
 
     const data = response.data;
 

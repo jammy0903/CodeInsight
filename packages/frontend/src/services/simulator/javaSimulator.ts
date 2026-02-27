@@ -32,9 +32,11 @@ function toSteps(javaSteps: Array<Record<string, unknown>>): LessonStep[] {
 
 export async function simulateJava(request: SimulateRequest): Promise<SimulateResult> {
   try {
-    const response = await api.post<JavaSimulateResponse>('/simulators/java/simulate', {
-      sourceCode: request.code,
-    });
+    const response = await api.post<JavaSimulateResponse>(
+      '/simulators/java/simulate',
+      { sourceCode: request.code },
+      request.signal ? { signal: request.signal } : undefined,
+    );
 
     const data = response.data;
 

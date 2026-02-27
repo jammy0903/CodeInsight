@@ -72,9 +72,11 @@ function toMemoryBlocks(raw: unknown): LessonMemoryBlock[] {
 
 export async function simulateJavaScript(request: SimulateRequest): Promise<SimulateResult> {
   try {
-    const response = await api.post<JSSimulateResponse>('/simulators/javascript/simulate', {
-      code: request.code,
-    });
+    const response = await api.post<JSSimulateResponse>(
+      '/simulators/javascript/simulate',
+      { code: request.code },
+      request.signal ? { signal: request.signal } : undefined,
+    );
 
     const data = response.data;
 

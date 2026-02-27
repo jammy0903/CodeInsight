@@ -7,6 +7,8 @@ import type { LessonStep } from '@/types';
 // 시뮬레이션 요청
 export interface SimulateRequest {
   code: string;
+  stdin?: string;
+  signal?: AbortSignal;
 }
 
 // 시뮬레이션 결과

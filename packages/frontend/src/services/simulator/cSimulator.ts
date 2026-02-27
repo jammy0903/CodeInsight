@@ -67,9 +67,14 @@ function toSteps(backendSteps: BackendStep[]): LessonStep[] {
 
 export async function simulateC(request: SimulateRequest): Promise<SimulateResult> {
   try {
-    const response = await api.post<BackendTraceResponse>('/simulators/c/trace', {
-      code: request.code,
-    });
+    const response = await api.post<BackendTraceResponse>(
+      '/simulators/c/trace',
+      {
+        code: request.code,
+        ...(request.stdin ? { stdin: request.stdin } : {}),
+      },
+      request.signal ? { signal: request.signal } : undefined,
+    );
 
     const data = response.data;
 

@@ -61,9 +61,11 @@ function toSteps(pySteps: PyStep[]): LessonStep[] {
 
 export async function simulatePython(request: SimulateRequest): Promise<SimulateResult> {
   try {
-    const response = await api.post<PySimulateResult>('/simulators/python/simulate', {
-      code: request.code,
-    });
+    const response = await api.post<PySimulateResult>(
+      '/simulators/python/simulate',
+      { code: request.code },
+      request.signal ? { signal: request.signal } : undefined,
+    );
 
     const data = response.data;
 

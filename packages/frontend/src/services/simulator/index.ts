@@ -36,6 +36,7 @@ export const simulatorService = {
       return errorResult(`${language.toUpperCase()} 시뮬레이션은 아직 지원되지 않습니다`);
     }
 
+    // stdin은 현재 C만 지원 — 다른 언어는 무시됨
     if (lang === 'python' || lang === 'py') return simulatePython(request);
     if (lang === 'javascript' || lang === 'js') return simulateJavaScript(request);
     if (lang === 'java') return simulateJava(request);

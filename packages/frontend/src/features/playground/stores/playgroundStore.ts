@@ -6,6 +6,7 @@
  */
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { LessonStep } from '@/types';
 import type { SupportedLanguage } from '@/types/simulator';
 import type { StackRegisters } from '@/features/visualizers/c';
@@ -23,6 +24,10 @@ interface PlaygroundState {
   codes: Record<SupportedLanguage, string>;
   setCode: (code: string) => void;
 
+  // === stdin (언어별 분리) ===
+  stdins: Record<SupportedLanguage, string>;
+  setStdin: (stdin: string) => void;
+
   // === 시뮬레이션 상태 ===
   steps: LessonStep[];
   setSteps: (steps: LessonStep[], stepRegisters?: StackRegisters[]) => void;
@@ -36,6 +41,8 @@ interface PlaygroundState {
   setIsSimulating: (simulating: boolean) => void;
   error: string | null;
   setError: (error: string | null) => void;
+  abortController: AbortController | null;
+  setAbortController: (controller: AbortController | null) => void;
 
   // === 액션 ===
   nextStep: () => void;
@@ -137,77 +144,109 @@ name = "CodeInsight Rocks!";
 // 스토어 생성
 // ============================================================
 
-export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
-  // === 언어 선택 ===
-  language: 'c',
-  setLanguage: (lang) => {
-    set({ language: lang, steps: [], currentStepIndex: 0, error: null });
-  },
+const DEFAULT_STDINS: Record<SupportedLanguage, string> = {
+  c: '',
+  cpp: '',
+  python: '',
+  java: '',
+  javascript: '',
+  'python-practical': '',
+};
 
-  // === 코드 (언어별 분리) ===
-  codes: {
-    c: DEFAULT_C_CODE,
-    cpp: DEFAULT_CPP_CODE,
-    python: DEFAULT_PYTHON_CODE,
-    java: DEFAULT_JAVA_CODE,
-    javascript: DEFAULT_JAVASCRIPT_CODE,
-    'python-practical': DEFAULT_PYTHON_CODE,
-  },
-  setCode: (code) => {
-    const { language, codes } = get();
-    set({
-      codes: { ...codes, [language]: code },
-      // 코드 변경 시 시뮬레이션 리셋
+export const usePlaygroundStore = create<PlaygroundState>()(
+  persist(
+    (set, get) => ({
+      // === 언어 선택 ===
+      language: 'c',
+      setLanguage: (lang) => {
+        set({ language: lang, steps: [], currentStepIndex: 0, error: null });
+      },
+
+      // === 코드 (언어별 분리) ===
+      codes: {
+        c: DEFAULT_C_CODE,
+        cpp: DEFAULT_CPP_CODE,
+        python: DEFAULT_PYTHON_CODE,
+        java: DEFAULT_JAVA_CODE,
+        javascript: DEFAULT_JAVASCRIPT_CODE,
+        'python-practical': DEFAULT_PYTHON_CODE,
+      },
+      setCode: (code) => {
+        const { language, codes } = get();
+        set({
+          codes: { ...codes, [language]: code },
+          // 코드 변경 시 시뮬레이션 리셋
+          steps: [],
+          currentStepIndex: 0,
+          error: null,
+        });
+      },
+
+      // === stdin (언어별 분리) ===
+      stdins: { ...DEFAULT_STDINS },
+      setStdin: (stdin) => {
+        const { language, stdins } = get();
+        set({ stdins: { ...stdins, [language]: stdin } });
+      },
+
+      // === 시뮬레이션 상태 ===
       steps: [],
+      setSteps: (steps, stepRegisters = []) =>
+        set({
+          steps,
+          stepRegisters,
+          currentStepIndex: 0,
+          error: null,
+        }),
       currentStepIndex: 0,
-      error: null,
-    });
-  },
 
-  // === 시뮬레이션 상태 ===
-  steps: [],
-  setSteps: (steps, stepRegisters = []) =>
-    set({
-      steps,
-      stepRegisters,
-      currentStepIndex: 0,
-      error: null,
-    }),
-  currentStepIndex: 0,
-
-  // === 레지스터 (RSP/RBP) ===
-  stepRegisters: [],
-
-  // === 실행 상태 ===
-  isSimulating: false,
-  setIsSimulating: (simulating) => set({ isSimulating: simulating }),
-  error: null,
-  setError: (error) => set({ error }),
-
-  // === 액션 ===
-  nextStep: () => {
-    const { steps, currentStepIndex } = get();
-    if (currentStepIndex < steps.length - 1) {
-      set({ currentStepIndex: currentStepIndex + 1 });
-    }
-  },
-  prevStep: () => {
-    const { currentStepIndex } = get();
-    if (currentStepIndex > 0) {
-      set({ currentStepIndex: currentStepIndex - 1 });
-    }
-  },
-  reset: () => {
-    set({
-      steps: [],
+      // === 레지스터 (RSP/RBP) ===
       stepRegisters: [],
-      currentStepIndex: 0,
-      isSimulating: false,
-      error: null,
-    });
-  },
 
-}));
+      // === 실행 상태 ===
+      isSimulating: false,
+      setIsSimulating: (simulating) => set({ isSimulating: simulating }),
+      error: null,
+      setError: (error) => set({ error }),
+      abortController: null,
+      setAbortController: (controller) => set({ abortController: controller }),
+
+      // === 액션 ===
+      nextStep: () => {
+        const { steps, currentStepIndex } = get();
+        if (currentStepIndex < steps.length - 1) {
+          set({ currentStepIndex: currentStepIndex + 1 });
+        }
+      },
+      prevStep: () => {
+        const { currentStepIndex } = get();
+        if (currentStepIndex > 0) {
+          set({ currentStepIndex: currentStepIndex - 1 });
+        }
+      },
+      reset: () => {
+        const { abortController } = get();
+        if (abortController) abortController.abort();
+        set({
+          steps: [],
+          stepRegisters: [],
+          currentStepIndex: 0,
+          isSimulating: false,
+          error: null,
+          abortController: null,
+        });
+      },
+    }),
+    {
+      name: 'codeinsight-playground',
+      partialize: (state) => ({
+        codes: state.codes,
+        stdins: state.stdins,
+        language: state.language,
+      }),
+    }
+  )
+);
 
 // ============================================================
 // 셀렉터 (성능 최적화용)
