@@ -1,0 +1,379 @@
+{
+  "lessonId": "js-5-2",
+  "title": "Shallow Copy vs Deep Copy",
+  "concept": "Shallow copy duplicates only the top level, while deep copy duplicates all nested objects",
+  "content": {
+    "code": "const original = {\n  name: 'Alice',\n  address: { city: 'Seoul' }\n};\n\n// 얕은 복사\nconst shallow = { ...original };\nshallow.name = 'Bob';\nshallow.address.city = 'Busan';\n\nconsole.log(original.name);\nconsole.log(original.address.city);\n\n// 깊은 복사\nconst deep = JSON.parse(JSON.stringify(original));\ndeep.address.city = 'Incheon';\n\nconsole.log(original.address.city);",
+    "steps": [
+      {
+        "title": "Creating a nested object",
+        "explanation": "The `original` object has another object called `address` as a property.\nThe `original` variable holds a reference to the object on the heap.",
+        "visualizationType": "memory",
+        "code": "const original = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Seoul' }"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Shallow Copy (Spread)",
+        "explanation": "The spread operator `{ ...original }` creates a new `shallow` object by copying only the top-level properties of `original`.\n\n**Analogy**: Imagine buying a new TV (new object) but still using the old TV's remote control.\nIf you change the channel with the remote, the old TV's channel changes too.",
+        "keyInsight": "Shallow copy = top-level only, nested objects share references",
+        "visualizationType": "memory",
+        "code": "const shallow = { ...original };",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Seoul' }",
+              "shared": true
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Alice', address: → 0x002 }",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Changing a primitive property",
+        "explanation": "Changing `shallow.name`.\nSince `name` is a copied primitive, only the `shallow` object changes — `original` is unaffected.",
+        "visualizationType": "memory",
+        "code": "shallow.name = 'Bob';",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Seoul' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Changing a reference property (Side Effect!)",
+        "explanation": "Changing `shallow.address.city`.\nSince `address` is a shared object between `original` and `shallow`, this change affects both.\nThis is the classic side effect of shallow copying.",
+        "keyInsight": "The trap of shallow copy: surface copied, internals shared",
+        "visualizationType": "memory",
+        "code": "shallow.address.city = 'Busan';",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }",
+              "changed": true,
+              "warning": true
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking original.name",
+        "explanation": "`original.name` was not affected by the shallow copy, so 'Alice' is still printed.",
+        "visualizationType": "memory",
+        "code": "console.log(original.name);",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }",
+              "warning": true
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            }
+          ],
+          "output": [
+            "Alice"
+          ]
+        }
+      },
+      {
+        "title": "Checking original.address.city",
+        "explanation": "Because of the shared reference, `original.address.city` reflects the change made through `shallow`, printing 'Busan'.",
+        "visualizationType": "memory",
+        "code": "console.log(original.address.city);",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            }
+          ],
+          "output": [
+            "Alice",
+            "Busan"
+          ]
+        }
+      },
+      {
+        "title": "Deep Copy (JSON trick)",
+        "explanation": "First, `JSON.stringify` converts the object to a string, then `JSON.parse` recreates it as a new object.\nIn this process, all nested structures are serialized and then rebuilt from scratch, resulting in a completely independent copy.\n\n**Analogy**: It's like converting a building into blueprints, shipping them to the other side of the world, and constructing a brand-new building with identical materials.\nA perfect clone.",
+        "keyInsight": "Deep copy = all levels copied, completely independent",
+        "visualizationType": "memory",
+        "code": "const deep = JSON.parse(JSON.stringify(original));",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            },
+            {
+              "name": "deep",
+              "value": "→ 0x004"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            },
+            {
+              "address": "0x004",
+              "content": "{ name: 'Alice', address: → 0x005 }",
+              "new": true
+            },
+            {
+              "address": "0x005",
+              "content": "{ city: 'Busan' }",
+              "new": true
+            }
+          ],
+          "output": null
+        }
+      },
+      {
+        "title": "Modifying the deep-copied object",
+        "explanation": "Changing `address.city` on the `deep` object.\nSince `deep` is completely independent of `original`, the original is unaffected.",
+        "visualizationType": "memory",
+        "code": "deep.address.city = 'Incheon';",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            },
+            {
+              "name": "deep",
+              "value": "→ 0x004"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            },
+            {
+              "address": "0x004",
+              "content": "{ name: 'Alice', address: → 0x005 }"
+            },
+            {
+              "address": "0x005",
+              "content": "{ city: 'Incheon' }",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Final check of the original",
+        "explanation": "Even after modifying the `deep` object, `original.address.city` still holds 'Busan' — the value set during the shallow copy operation.",
+        "visualizationType": "memory",
+        "code": "console.log(original.address.city);",
+        "occurrence": 2,
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            },
+            {
+              "name": "deep",
+              "value": "→ 0x004"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            },
+            {
+              "address": "0x004",
+              "content": "{ name: 'Alice', address: → 0x005 }"
+            },
+            {
+              "address": "0x005",
+              "content": "{ city: 'Incheon' }",
+              "changed": true
+            }
+          ],
+          "output": [
+            "Alice",
+            "Busan",
+            "Busan"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the advantage of structuredClone()?",
+    "options": [
+      "It's the fastest",
+      "It can handle circular references, Map, Set, Date, etc.",
+      "It only supports shallow copying",
+      "It works in Internet Explorer"
+    ],
+    "correctIndex": 1,
+    "explanation": "structuredClone() can handle circular references, Map, Set, Date, and more.\nThe JSON method cannot handle these types."
+  },
+  "misconceptions": [
+    {
+      "wrong": "The spread operator makes a complete copy",
+      "correct": "spread is a **Shallow Copy**.\nIt only copies the top level (depth 1), and nested objects are copied by reference.",
+      "why": "For a true deep clone, you need `structuredClone()` or a recursive copy."
+    }
+  ],
+  "keyTakeaway": "Shallow copy: spread, Object.assign / Deep copy: JSON, structuredClone"
+}

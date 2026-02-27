@@ -1,0 +1,223 @@
+{
+  "lessonId": "js-5-1",
+  "title": "Primitive vs Reference Values",
+  "concept": "Primitives are copied by value, while reference values (objects) are copied by memory address",
+  "content": {
+    "code": "// 원시값 (Primitive)\nlet a = 10;\nlet b = a;\nb = 20;\nconsole.log(a, b);\n\n// 참조값 (Reference)\nlet obj1 = { value: 10 };\nlet obj2 = obj1;\nobj2.value = 20;\nconsole.log(obj1.value, obj2.value);",
+    "steps": [
+      {
+        "title": "Primitive a = 10",
+        "explanation": "The number 10 is stored in memory, and a holds that value.",
+        "keyInsight": "Primitives: number, string, boolean, null, undefined, symbol, bigint",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            }
+          ],
+          "heap": []
+        },
+        "code": "let a = 10;"
+      },
+      {
+        "title": "b = a (value copy)",
+        "explanation": "The value 10 from a is copied and stored in b.\na and b are independent values.\n\n**Analogy**: It's like copying a number written on one piece of paper onto another.\nEven if you tear the original paper, the copy is unaffected.",
+        "keyInsight": "Primitives are copied by value.",
+        "analogy": "It's like copying a number written on one piece of paper onto another.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 10,
+              "type": "primitive",
+              "copied": true
+            }
+          ],
+          "heap": []
+        },
+        "code": "let b = a;"
+      },
+      {
+        "title": "b = 20 (independent change)",
+        "explanation": "Changing b to 20 doesn't affect a at all.\nThey occupy separate memory spaces.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 20,
+              "type": "primitive",
+              "changed": true
+            }
+          ],
+          "heap": []
+        },
+        "code": "b = 20;"
+      },
+      {
+        "title": "Printing primitive values",
+        "explanation": "a is 10 and b is 20.\nPrimitives exist independently.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 20,
+              "type": "primitive"
+            }
+          ],
+          "output": [
+            "10 20"
+          ]
+        },
+        "code": "console.log(a, b);"
+      },
+      {
+        "title": "Reference obj1 = { value: 10 }",
+        "explanation": "Objects are stored in Heap memory.\nobj1 holds the address (reference) of that object.",
+        "keyInsight": "Reference values: object, array, function",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ value: 10 }"
+            }
+          ]
+        },
+        "code": "let obj1 = { value: 10 };"
+      },
+      {
+        "title": "obj2 = obj1 (reference copy)",
+        "explanation": "The reference (address) of obj1 is copied.\nobj1 and obj2 point to the same object!\n\n**Analogy**: It's like two people writing the same home address in their notebooks.\nIf one person paints the house, the other will also see the painted house when they visit.",
+        "keyInsight": "Reference values copy the address. There's only one object!",
+        "analogy": "It's like two people writing the same home address in their notebooks.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001",
+              "type": "reference",
+              "sameRef": true
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ value: 10 }",
+              "refCount": 2
+            }
+          ]
+        },
+        "code": "let obj2 = obj1;"
+      },
+      {
+        "title": "obj2.value = 20 (modifying the same object)",
+        "explanation": "When you modify the object through obj2, the change is also visible through obj1!",
+        "keyInsight": "Same reference = same object = modifying one affects both",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001",
+              "type": "reference"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ value: 20 }",
+              "changed": true
+            }
+          ]
+        },
+        "code": "obj2.value = 20;"
+      },
+      {
+        "title": "Printing reference values",
+        "explanation": "Both obj1.value and obj2.value are 20.\nThat's because they both point to the same object.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "obj1",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ value: 20 }"
+            }
+          ],
+          "output": [
+            "10 20",
+            "20 20"
+          ]
+        },
+        "code": "console.log(obj1.value, obj2.value);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What does the following code output?\n\nlet arr1 = [1, 2, 3];\nlet arr2 = arr1;\narr2.push(4);\nconsole.log(arr1.length);",
+    "options": [
+      "3",
+      "4",
+      "undefined",
+      "Error"
+    ],
+    "correctIndex": 1,
+    "explanation": "Arrays are also reference values.\narr2 = arr1 makes them point to the same array.\narr2.push(4) modifies the original array."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Assigning an object to a variable copies it",
+      "correct": "Only the reference (address) is copied.\nThere's only one object.",
+      "why": "Objects are stored in the Heap, and variables only hold their addresses."
+    }
+  ],
+  "keyTakeaway": "Primitives = copy by value, Reference values = copy by address (same object shared)"
+}

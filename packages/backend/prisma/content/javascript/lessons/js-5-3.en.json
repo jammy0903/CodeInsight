@@ -1,0 +1,217 @@
+{
+  "lessonId": "js-5-3",
+  "title": "Immutability",
+  "concept": "Immutability is the pattern of creating a new copy instead of directly modifying data",
+  "content": {
+    "code": "// 가변 (Mutable) - 직접 수정\nconst user = { name: 'Alice', age: 25 };\nuser.age = 26;\n\n// 불변 (Immutable) - 새 객체 생성\nconst user2 = { name: 'Alice', age: 25 };\nconst updated = { ...user2, age: 26 };\n\nconsole.log(user2.age);\nconsole.log(updated.age);\n\n// 배열 불변 패턴\nconst nums = [1, 2, 3];\nconst added = [...nums, 4];\nconst removed = nums.filter(n => n !== 2);\nconst mapped = nums.map(n => n * 2);",
+    "steps": [
+      {
+        "title": "Mutable approach: creating an object",
+        "explanation": "Creating the user object.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "user",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', age: 25 }"
+            }
+          ]
+        },
+        "code": "const user = { name: 'Alice', age: 25 };"
+      },
+      {
+        "title": "Mutable approach: direct mutation",
+        "explanation": "Directly modifying user.age.\nThe original object is changed.",
+        "keyInsight": "Mutable = directly modifying the original",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "user",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', age: 26 }",
+              "changed": true
+            }
+          ],
+          "warning": "Original modified!"
+        },
+        "code": "user.age = 26;"
+      },
+      {
+        "title": "Immutable approach: preserving the original",
+        "explanation": "Creating the user2 object.\nThis object will not be modified.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "user2",
+              "value": "→ 0x002"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x002",
+              "content": "{ name: 'Alice', age: 25 }"
+            }
+          ]
+        },
+        "code": "const user2 = { name: 'Alice', age: 25 };"
+      },
+      {
+        "title": "Immutable approach: creating a new object",
+        "explanation": "Spread to copy, then override just age.\nThe original `user2` is untouched — a **New Identity** object is created on the Heap.",
+        "keyInsight": "Immutability = no mutation, use replacement",
+        "analogy": "Instead of using correction fluid on the original document, you copy it to a new sheet, make your changes, and submit the new version.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "user2",
+              "value": "→ 0x002"
+            },
+            {
+              "name": "updated",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x002",
+              "content": "{ name: 'Alice', age: 25 }",
+              "preserved": true
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Alice', age: 26 }",
+              "new": true
+            }
+          ]
+        },
+        "code": "const updated = { ...user2, age: 26 };"
+      },
+      {
+        "title": "Checking the original",
+        "explanation": "user2.age is still 25.\nThe original has been preserved!",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "25",
+            "26"
+          ]
+        },
+        "code": "console.log(user2.age);",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "Array immutability pattern: original",
+        "explanation": "Creating the nums array.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "[1, 2, 3]"
+            }
+          ]
+        },
+        "code": "const nums = [1, 2, 3];"
+      },
+      {
+        "title": "Add: spread + new element",
+        "explanation": "[...nums, 4] copies the original and creates a new array with 4 appended.",
+        "keyInsight": "Use [...arr, item] instead of push()",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "[1, 2, 3]",
+              "preserved": true
+            },
+            {
+              "name": "added",
+              "value": "[1, 2, 3, 4]",
+              "new": true
+            }
+          ]
+        },
+        "code": "const added = [...nums, 4];"
+      },
+      {
+        "title": "Remove: filter()",
+        "explanation": "filter() returns a new array containing only elements that match the condition.",
+        "keyInsight": "Use filter() instead of splice()",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "[1, 2, 3]",
+              "preserved": true
+            },
+            {
+              "name": "removed",
+              "value": "[1, 3]",
+              "new": true
+            }
+          ]
+        },
+        "code": "const removed = nums.filter(n => n !== 2);"
+      },
+      {
+        "title": "Transform: map()",
+        "explanation": "map() returns a new array with each element transformed.",
+        "keyInsight": "Use map() instead of modifying with a for loop",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "[1, 2, 3]",
+              "preserved": true
+            },
+            {
+              "name": "mapped",
+              "value": "[2, 4, 6]",
+              "new": true
+            }
+          ]
+        },
+        "code": "const mapped = nums.map(n => n * 2);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Why is immutability important in React?",
+    "options": [
+      "The code is shorter",
+      "It uses less memory",
+      "It makes change detection easy (reference comparison)",
+      "It's a JavaScript standard"
+    ],
+    "correctIndex": 2,
+    "explanation": "With immutability, you can detect changes by comparing references alone.\nIf you mutate objects directly, you lose track of the previous state and must compare everything."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Immutability is slow (because it copies every time)",
+      "correct": "Shallow copying is fast, and the optimization gained from change detection can improve overall performance.",
+      "why": "Libraries like React leverage immutability to render efficiently."
+    }
+  ],
+  "keyTakeaway": "Immutability = copy instead of mutate, essential pattern for React/Redux"
+}
