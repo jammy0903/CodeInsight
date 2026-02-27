@@ -1,0 +1,123 @@
+{
+  "lessonId": "js-7-1",
+  "title": "V8 Hidden Classes (Shapes)",
+  "concept": "The V8 engine uses an internal map called a 'Hidden Class' to speed up property access on objects.",
+  "content": {
+    "code": "function Point(x, y) {\n  this.x = x;\n  this.y = y;\n}\n\nconst p1 = new Point(1, 2);\nconst p2 = new Point(3, 4);\n\n// p1에 새로운 속성 추가 (히든 클래스 변경 발생!)\np1.z = 5;\n\nconsole.log(p1.x, p1.z);\nconsole.log(p2.x);",
+    "steps": [
+      {
+        "title": "Creating p1: hidden class creation",
+        "explanation": "When `new Point(1, 2)` runs, the V8 engine creates a `Hidden Class` to remember the 'shape' of this object.\nEach time a property is added, the object transitions to a new hidden class.\n1. A hidden class C0 is created for the empty object\n2. `this.x = 1` causes a transition from C0 to C1 (x added)\n3. `this.y = 2` causes a transition from C1 to C2 (y added)\n`p1` ends up with hidden class C2.",
+        "keyInsight": "Adding a property isn't just 'storing a value' — it triggers an internal structure change (Transition).",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ x: 1, y: 2 }",
+              "label": "HiddenClass: C2"
+            }
+          ]
+        },
+        "code": "const p1 = new Point(1, 2);"
+      },
+      {
+        "title": "Creating p2: reusing the hidden class",
+        "explanation": "When creating `p2`, V8 notices that the property addition order and structure are identical to `p1`.\nSo instead of creating a new hidden class, it reuses the C2 hidden class that `p1` already established.\nThis makes property access very fast.",
+        "keyInsight": "Initializing properties in the same order lets the engine treat objects as the 'same type' and optimize them.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "p2",
+              "value": "→ 0x002"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ x: 1, y: 2 }",
+              "label": "HiddenClass: C2"
+            },
+            {
+              "address": "0x002",
+              "content": "{ x: 3, y: 4 }",
+              "label": "HiddenClass: C2 (Shared)"
+            }
+          ]
+        },
+        "code": "const p2 = new Point(3, 4);"
+      },
+      {
+        "title": "Adding a property: hidden class branch",
+        "explanation": "After object creation, we dynamically add the `z` property to `p1` only.\nSince the existing C2 hidden class has no information about `z`, V8 creates a new hidden class C3 (C2 + z) and transitions `p1` to C3.\nNow `p1` and `p2` have different hidden classes, reducing optimization efficiency.",
+        "keyInsight": "Dynamically adding properties after object creation is the main culprit for breaking optimization.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ x: 1, y: 2, z: 5 }",
+              "label": "HiddenClass: C3",
+              "warning": "Shape Changed"
+            },
+            {
+              "address": "0x002",
+              "content": "{ x: 3, y: 4 }",
+              "label": "HiddenClass: C2"
+            }
+          ]
+        },
+        "code": "p1.z = 5;"
+      },
+      {
+        "title": "Printing p1 properties",
+        "explanation": "Printing `p1`'s `x` and `z` properties.\n`p1` uses the new hidden class C3 to locate the values.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "1 5"
+          ]
+        },
+        "code": "console.log(p1.x, p1.z);"
+      },
+      {
+        "title": "Printing p2 properties",
+        "explanation": "Printing `p2`'s `x` property.\n`p2` still uses the original hidden class C2.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "1 5",
+            "3"
+          ]
+        },
+        "code": "console.log(p2.x);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What is the best practice for maintaining V8's Hidden Class optimization?",
+    "options": [
+      "Initialize all properties in order inside the constructor",
+      "Add properties on the fly whenever needed (obj.newProp = 1)",
+      "Change the property initialization order each time (x, y → y, x)",
+      "Frequently delete properties with the delete operator"
+    ],
+    "correctIndex": 0,
+    "explanation": "Defining properties in order inside the constructor ensures all created objects share the same hidden class, giving you the best performance."
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript objects are HashMaps, so they're slow",
+      "correct": "V8 uses hidden classes to access properties as fast as **array offsets**.",
+      "why": "Early JS engines used hash maps, but modern V8 introduced hidden classes to achieve property access speeds comparable to statically typed languages like C++ and Java."
+    }
+  ],
+  "keyTakeaway": "Keep your objects' 'shape' consistent. Consistency is speed."
+}

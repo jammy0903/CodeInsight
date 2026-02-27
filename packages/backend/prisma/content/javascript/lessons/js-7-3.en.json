@@ -1,0 +1,215 @@
+{
+  "lessonId": "js-7-3",
+  "title": "Deoptimization",
+  "concept": "Code that breaks the engine's assumptions triggers 'deoptimization (Deopt)', degrading performance.",
+  "content": {
+    "code": "function add(a, b) {\n  return a + b;\n}\n\nconst results = [];\n\nresults.push(add(1, 2));\nresults.push(add(3, 4));\nresults.push(add(5, 6));\n\nconst optimized = results.slice();\n\nresults.push(add('Hello', 'World'));\n\nconst afterDeopt = results.slice();\n\nconsole.log(optimized);\nconsole.log(afterDeopt);",
+    "steps": [
+      {
+        "title": "Defining the add function",
+        "explanation": "Defining the `add` function.\nAt this point, it can accept any type.",
+        "keyInsight": "JavaScript functions have no type information. Any type can come in at runtime.",
+        "visualizationType": "memory",
+        "code": "function add(a, b) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Creating the results array",
+        "explanation": "Creating the `results` array.\nIt will store the results of function calls.",
+        "visualizationType": "memory",
+        "code": "const results = [];",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "First numeric addition",
+        "explanation": "`add(1, 2)` = 3. The engine starts learning: \"Ah, this function takes numbers.\"",
+        "keyInsight": "V8 observes function call patterns and 'profiles' them.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "profiling": "add() called with (Number, Number)",
+          "results": [
+            3
+          ]
+        },
+        "code": "results.push(add(1, 2));"
+      },
+      {
+        "title": "Second numeric addition",
+        "explanation": "`add(3, 4)` = 7. Numbers again! The engine's confidence grows.\n\"This function is for numbers!\"",
+        "keyInsight": "When called with the same type repeatedly, the engine decides to 'optimize'.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "profiling": "Consistent (Number, Number) pattern",
+          "results": [
+            3,
+            7
+          ]
+        },
+        "code": "results.push(add(3, 4));"
+      },
+      {
+        "title": "Third numeric addition + optimization",
+        "explanation": "`add(5, 6)` = 11. The pattern is confirmed — V8 generates optimized machine code.",
+        "keyInsight": "The JIT compiler creates machine code specialized for number addition. No type checks — straight to addition!",
+        "analogy": "Like ordering 'the usual' at your favorite restaurant — it comes out fast because they know exactly what you want.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "status": "OPTIMIZED",
+          "optimizedFor": "(Number, Number) → Number",
+          "results": [
+            3,
+            7,
+            11
+          ]
+        },
+        "code": "results.push(add(5, 6));"
+      },
+      {
+        "title": "Saving the optimized state",
+        "explanation": "Copying the results so far [3, 7, 11] into `optimized`.\nAt this point, the function is in an optimized state.",
+        "visualizationType": "memory",
+        "code": "const optimized = results.slice();",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Type change — Deoptimization!",
+        "explanation": "`add('Hello', 'World')` = 'HelloWorld'.\nStrings suddenly arrived! The engine's prediction is shattered.",
+        "keyInsight": "When the type changes, the optimized machine code is discarded and execution falls back to interpreter mode (Bailout).",
+        "analogy": "Like walking into your favorite restaurant and ordering something not on the menu — it takes much longer.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "status": "DEOPTIMIZED",
+          "reason": "Type mismatch: expected Number, got String",
+          "warning": "Performance hit!",
+          "results": [
+            3,
+            7,
+            11,
+            "HelloWorld"
+          ]
+        },
+        "code": "results.push(add('Hello', 'World'));"
+      },
+      {
+        "title": "Saving state after Deopt",
+        "explanation": "Saving the post-deoptimization results into `afterDeopt`.\nThe results are still correct, but performance has taken a hit.",
+        "keyInsight": "Functionally correct, but the same function is now slower.",
+        "visualizationType": "memory",
+        "code": "const afterDeopt = results.slice();",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          },
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "afterDeopt",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Comparing results",
+        "explanation": "optimized = [3, 7, 11], afterDeopt = [3, 7, 11, 'HelloWorld'].\nThe string result is correct, but there's a hidden performance cost internally.",
+        "keyInsight": "Deopt is invisible in the output but impacts performance. You can see it in the DevTools Performance tab.",
+        "visualizationType": "memory",
+        "code": "console.log(optimized);",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "afterDeopt",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          }
+        ],
+        "heap": [],
+        "stdout": "[3, 7, 11, ...]\n[3, 7, 11, ..., NaN]"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "How do you keep the JIT compiler's optimizations in place?",
+    "options": [
+      "Use as many different types as possible in variables",
+      "Keep function argument types consistent (Monomorphic)",
+      "Write very long functions",
+      "Use eval() frequently"
+    ],
+    "correctIndex": 1,
+    "explanation": "V8 is fastest when a function always receives the same argument types (Monomorphic).\nAlternating between numbers, strings, and objects (Polymorphic) causes V8 to give up on optimization."
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript doesn't compile",
+      "correct": "It compiles in real-time at runtime (JIT).",
+      "why": "The JIT (Just-In-Time) compiler translates code to machine code at runtime, so for consistent patterns it can reach performance comparable to statically typed languages like C++ and Java."
+    },
+    {
+      "wrong": "Results are fine as long as they're correct, even if types change",
+      "correct": "The results are correct, but performance degrades.",
+      "why": "The engine discards the optimized code and falls back to the slower interpreter mode.\nFor performance-critical code, type consistency matters a lot."
+    }
+  ],
+  "keyTakeaway": "Don't change a function's input types (Signature). Keeping the engine's assumptions intact is the core of performance optimization."
+}
