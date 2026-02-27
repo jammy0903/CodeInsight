@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { MainLayout } from './MainLayout';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { initializeAuthListener } from '@/services/firebase';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -19,10 +20,12 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
 export function RootLayout() {
   return (
-    <AuthProvider>
-      <MainLayout>
-        <Outlet />
-      </MainLayout>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <MainLayout>
+          <Outlet />
+        </MainLayout>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

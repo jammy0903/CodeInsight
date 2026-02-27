@@ -16,6 +16,7 @@ import { DashboardPage } from './features/dashboard';
 import { ReportPage } from './features/report';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { CoursesPage } from './features/courses/CoursesPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 /**
  * 라우터 설정
@@ -77,6 +78,7 @@ export const router = createBrowserRouter([
           return { Component: TermsPage };
         }
       },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ]);

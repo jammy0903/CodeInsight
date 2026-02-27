@@ -39,29 +39,29 @@ Remaining: 233
 - [x] js-4-4.en.json
 
 ### Chapter 5: Memory & Immutability (js-5)
-- [ ] js-5-1.en.json
-- [ ] js-5-2.en.json
-- [ ] js-5-3.en.json
+- [x] js-5-1.en.json ✅
+- [x] js-5-2.en.json ✅
+- [x] js-5-3.en.json ✅
 
 ### Chapter 6: Prototypes & Classes (js-6)
-- [ ] js-6-1.en.json
-- [ ] js-6-2.en.json
-- [ ] js-6-3.en.json
+- [x] js-6-1.en.json ✅
+- [x] js-6-2.en.json ✅
+- [x] js-6-3.en.json ✅
 
 ### Chapter 7: V8 Internals (js-7)
-- [ ] js-7-1.en.json
-- [ ] js-7-2.en.json
-- [ ] js-7-3.en.json
+- [x] js-7-1.en.json ✅
+- [x] js-7-2.en.json ✅
+- [x] js-7-3.en.json ✅
 
 ### Chapter 8: Rendering Performance (js-8)
-- [ ] js-8-1.en.json
-- [ ] js-8-2.en.json
-- [ ] js-8-3.en.json
+- [x] js-8-1.en.json ✅
+- [x] js-8-2.en.json ✅
+- [x] js-8-3.en.json ✅
 
 ### Chapter 9: Metaprogramming (js-9)
-- [ ] js-9-1.en.json
-- [ ] js-9-2.en.json
-- [ ] js-9-3.en.json
+- [x] js-9-1.en.json ✅
+- [x] js-9-2.en.json ✅
+- [x] js-9-3.en.json ✅
 
 ---
 

@@ -13,6 +13,7 @@ import axios from 'axios';
 import { config } from '../../config';
 import { logger } from '@/utils/logger';
 import { getAuthToken } from './tokenManager';
+import { handleAPIError } from '@/components/common/Toast/notifications';
 
 // API 기본 URL (버전 포함)
 const BASE_URL = config.api.baseUrl;
@@ -42,11 +43,15 @@ api.interceptors.request.use(
   }
 );
 
-// Response Interceptor: 에러 처리는 errors.ts에서
+// Response Interceptor: 에러 시 toast 표시 + errors.ts로 위임
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // errors.ts의 handleError로 위임
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status ?? 0;
+      const message = error.response?.data?.message;
+      handleAPIError(status, message);
+    }
     return Promise.reject(error);
   }
 );

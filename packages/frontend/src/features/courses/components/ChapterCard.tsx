@@ -6,7 +6,18 @@
 
 import { useNavigate } from 'react-router-dom';
 import type { Chapter } from '@/types';
-import { Star, Target, Lock, ChevronRight, BookOpen } from 'lucide-react';
+import { Star, Target, Lock, ChevronRight, BookOpen, BookMarked } from 'lucide-react';
+
+/**
+ * Chapters where Playground simulator cannot fully support the topic.
+ * These chapters work perfectly in Lesson mode (pre-scripted JSON),
+ * but user code in Playground will produce incomplete/incorrect visualization.
+ */
+const LESSON_ONLY_CHAPTERS: Record<string, Set<string>> = {
+  javascript: new Set(['js-7', 'js-8', 'js-9']),
+  python: new Set(['py-8', 'py-9', 'py-10']),
+  java: new Set(['java-7', 'java-8', 'java-9', 'java-10']),
+};
 
 // 언어별 색상 테마 (밝은 파스텔 톤)
 const LANGUAGE_THEMES: Record<string, {
@@ -89,6 +100,7 @@ export function ChapterCard({
 }: ChapterCardProps) {
   const navigate = useNavigate();
   const theme = LANGUAGE_THEMES[languageId] || DEFAULT_THEME;
+  const isLessonOnly = LESSON_ONLY_CHAPTERS[languageId]?.has(chapter.id) ?? false;
 
   const progressPercent = lessonCount > 0 ? Math.round((completedCount / lessonCount) * 100) : 0;
   const isComplete = completedCount === lessonCount && lessonCount > 0;
@@ -197,6 +209,12 @@ export function ChapterCard({
           <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 border border-gray-200">
             <Lock className="w-2.5 h-2.5 md:w-3 md:h-3" />
             Login
+          </span>
+        )}
+        {isLessonOnly && (
+          <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200">
+            <BookMarked className="w-2.5 h-2.5 md:w-3 md:h-3" />
+            Lesson Only
           </span>
         )}
       </div>
