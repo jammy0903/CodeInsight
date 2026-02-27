@@ -1,0 +1,118 @@
+{
+  "lessonId": "js-3-1",
+  "title": "this in Global Context",
+  "concept": "In the global context, this refers to the global object (window/global)",
+  "content": {
+    "code": "var globalValue = 100;\n\nfunction getGlobalValue() {\n  return this.globalValue;\n}\n\nfunction strictGetValue() {\n  'use strict';\n  return this;\n}\n\nvar result1 = getGlobalValue();\nvar result2 = strictGetValue();\nvar isUndefined = result2 === undefined;\n\nconsole.log(result1, isUndefined);",
+    "steps": [
+      {
+        "title": "Global Variable Declaration",
+        "explanation": "`var globalValue = 100` is declared at the global level.\nA global variable declared with var becomes a **property of the global object (window)**.",
+        "keyInsight": "var globalValue = 100 is the same as window.globalValue = 100.",
+        "visualizationType": "thisBinding",
+        "code": "var globalValue = 100;",
+        "thisState": {
+          "context": "global",
+          "thisValue": "window",
+          "globalProperties": {
+            "globalValue": 100
+          }
+        }
+      },
+      {
+        "title": "Call getGlobalValue()",
+        "explanation": "Call the `getGlobalValue()` function.\nThis is a regular function call, so this is the global object (window).",
+        "keyInsight": "In a regular function call, this = global object (window)",
+        "visualizationType": "thisBinding",
+        "code": "var result1 = getGlobalValue();",
+        "thisState": {
+          "context": "function call",
+          "globalProperties": null
+        }
+      },
+      {
+        "title": "Return this.globalValue",
+        "explanation": "Inside the function, `this.globalValue` is returned.\nSince this is window, window.globalValue = 100 is returned.\n\n**Analogy**: It's like an employee (function) at a company (window) looking up 'this company's (this) asset (globalValue)'.",
+        "keyInsight": "this.globalValue = window.globalValue = 100",
+        "analogy": "It's like an employee (function) at a company (window) looking up 'this company's (this) asset (globalValue)'.",
+        "visualizationType": "thisBinding",
+        "code": "return this.globalValue;",
+        "thisState": {
+          "accessing": "this.globalValue → 100"
+        }
+      },
+      {
+        "title": "Call strictGetValue()",
+        "explanation": "Call the `strictGetValue()` function.\nThis function has `'use strict';` declared inside.",
+        "keyInsight": "In strict mode, this is undefined for regular function calls",
+        "visualizationType": "thisBinding",
+        "code": "var result2 = strictGetValue();",
+        "thisState": {
+          "context": "strict function call",
+          "thisValue": "undefined",
+          "isStrict": true,
+          "accessing": null
+        }
+      },
+      {
+        "title": "Return this in Strict Mode",
+        "explanation": "Return `this` in strict mode.\nIn strict mode, this is **undefined** for a regular function call.",
+        "keyInsight": "Strict mode prevents accidentally modifying the global object.",
+        "tip": "ES6 modules and classes are in strict mode by default.",
+        "visualizationType": "thisBinding",
+        "code": "return this;"
+      },
+      {
+        "title": "Check for undefined",
+        "explanation": "Check `result2 === undefined`.\nSince the this returned from the strict mode function is undefined, `isUndefined = true`.",
+        "keyInsight": "How strict mode prevents global object pollution",
+        "visualizationType": "thisBinding",
+        "code": "var isUndefined = result2 === undefined;",
+        "thisState": {
+          "context": "comparison",
+          "result": "result2 === undefined → true",
+          "thisValue": null,
+          "isStrict": null
+        }
+      },
+      {
+        "title": "Print the Result",
+        "explanation": "Execute `console.log(result1, isUndefined)`.\nresult1 is 100 and isUndefined is true.",
+        "visualizationType": "thisBinding",
+        "code": "console.log(result1, isUndefined);",
+        "thisState": {
+          "output": [
+            "100 true"
+          ],
+          "context": null,
+          "result": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is this in strict mode for the following code?\n\n'use strict';\nfunction test() {\n  return this;\n}\ntest();",
+    "options": [
+      "window",
+      "global",
+      "undefined",
+      "null"
+    ],
+    "correctIndex": 2,
+    "explanation": "In strict mode, this is undefined for a regular function call.\nThis prevents accidentally modifying the global object."
+  },
+  "misconceptions": [
+    {
+      "wrong": "this refers to the function itself",
+      "correct": "Absolutely not.\nthis is a property of the execution context determined by **how (and where) the function is called (the call site)**.",
+      "why": "this is determined at the time of function execution (not definition).\n(Arrow functions are the exception.)"
+    },
+    {
+      "wrong": "this inside a function is always the same value",
+      "correct": "No.\nThe same function can have a completely different this depending on whether it's called as `obj.method()` or just `method()`.",
+      "why": "Who (which object) called the function determines what this is."
+    }
+  ],
+  "keyTakeaway": "Global this = window, regular function this = window (strict mode: undefined)"
+}

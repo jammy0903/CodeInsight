@@ -1,0 +1,196 @@
+{
+  "lessonId": "js-3-4",
+  "title": "call, apply, bind",
+  "concept": "call, apply, and bind let you explicitly specify what this should be",
+  "content": {
+    "code": "function greet(greeting, punctuation) {\n  console.log(`${greeting}, ${this.name}${punctuation}`);\n}\n\nconst user = { name: 'Alice' };\nconst admin = { name: 'Bob' };\n\ngreet.call(user, 'Hello', '!');\ngreet.apply(admin, ['Hi', '?']);\n\nconst boundGreet = greet.bind(user, 'Hey');\nboundGreet('~');",
+    "steps": [
+      {
+        "title": "Define the greet Function",
+        "explanation": "Define a greet function that uses this.name.\nThis function takes two arguments.",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "function definition",
+          "functions": [
+            {
+              "name": "greet",
+              "params": [
+                "greeting",
+                "punctuation"
+              ],
+              "usesThis": true
+            }
+          ]
+        },
+        "code": "function greet(greeting, punctuation) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "Create Objects",
+        "explanation": "Create two objects: user and admin.\nWe'll use these objects as this.",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "object creation",
+          "objects": [
+            {
+              "name": "user",
+              "properties": [
+                {
+                  "key": "name",
+                  "value": "'Alice'"
+                }
+              ]
+            },
+            {
+              "name": "admin",
+              "properties": [
+                {
+                  "key": "name",
+                  "value": "'Bob'"
+                }
+              ]
+            }
+          ]
+        },
+        "code": "const user = { name: 'Alice' };",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "call() — Pass this and Arguments Individually",
+        "explanation": "The call() method **immediately executes** the function, forcing the first argument to be used as **this**.",
+        "keyInsight": "call(this, args) = \"Execute right now using this object as this!\"",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "call()",
+          "thisValue": "user",
+          "callStack": [
+            "<global>",
+            "greet.call(user, ...)"
+          ],
+          "binding": {
+            "method": "call",
+            "thisArg": "user",
+            "args": [
+              "'Hello'",
+              "'!'"
+            ]
+          },
+          "output": [
+            "Hello, Alice!"
+          ]
+        },
+        "code": "greet.call(user, 'Hello', '!');"
+      },
+      {
+        "title": "apply() — Pass this and Arguments as an Array",
+        "explanation": "apply() takes this as the first argument and an array of arguments as the second.",
+        "keyInsight": "apply(thisArg, [arg1, arg2, ...]) — pass arguments as an array",
+        "analogy": "The difference between call and apply: call = Comma, apply = Array",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "apply()",
+          "thisValue": "admin",
+          "callStack": [
+            "<global>",
+            "greet.apply(admin, ...)"
+          ],
+          "binding": {
+            "method": "apply",
+            "thisArg": "admin",
+            "args": "['Hi', '?']"
+          },
+          "output": [
+            "Hello, Alice!",
+            "Hi, Bob?"
+          ]
+        },
+        "code": "greet.apply(admin, ['Hi', '?']);"
+      },
+      {
+        "title": "bind() — Return a New Function",
+        "explanation": "bind() returns a new function with this fixed to the specified object.\nIt does not execute immediately!",
+        "keyInsight": "bind(thisArg, arg1, ...) — returns a new function (does NOT execute immediately)",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "bind()",
+          "thisValue": "user (bound)",
+          "binding": {
+            "method": "bind",
+            "thisArg": "user",
+            "partialArgs": [
+              "'Hey'"
+            ],
+            "returns": "new function"
+          },
+          "variables": [
+            {
+              "name": "boundGreet",
+              "value": "function (this=user, greeting='Hey')"
+            }
+          ]
+        },
+        "code": "const boundGreet = greet.bind(user, 'Hey');"
+      },
+      {
+        "title": "Call the Bound Function",
+        "explanation": "Call boundGreet.\nthis is already fixed to user, and greeting is already fixed to 'Hey'.",
+        "keyInsight": "bind also supports partial application!",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "bound function call",
+          "thisValue": "user (bound)",
+          "callStack": [
+            "<global>",
+            "boundGreet('~')"
+          ],
+          "binding": {
+            "boundThis": "user",
+            "boundArgs": [
+              "'Hey'"
+            ],
+            "newArgs": [
+              "'~'"
+            ]
+          },
+          "output": [
+            "Hello, Alice!",
+            "Hi, Bob?",
+            "Hey, Alice~"
+          ]
+        },
+        "code": "boundGreet('~');"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What is the output of the following code?\n\nconst obj = { value: 10 };\nfunction double() { return this.value * 2; }\nconst bound = double.bind(obj);\nconst other = { value: 100, fn: bound };\nconsole.log(other.fn());",
+    "options": [
+      "20",
+      "200",
+      "undefined",
+      "An error occurs"
+    ],
+    "correctIndex": 0,
+    "explanation": "bind() has locked this to obj.\nEven when called as a method on another object, this does not change.\nTherefore obj.value * 2 = 20."
+  },
+  "misconceptions": [
+    {
+      "wrong": "bind() modifies the original function",
+      "correct": "bind() returns a new function.\nThe original function is unchanged.",
+      "why": "bind() creates and returns a new function without modifying the original."
+    },
+    {
+      "wrong": "call() and apply() produce different results",
+      "correct": "call() and apply() produce the same result.\nOnly the way arguments are passed differs.",
+      "why": "call passes arguments individually, apply passes them as an array.\nThe result is identical."
+    }
+  ],
+  "keyTakeaway": "call(this, a, b), apply(this, [a, b]), bind(this) → returns a new function"
+}

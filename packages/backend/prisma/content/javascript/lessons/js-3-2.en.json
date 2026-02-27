@@ -1,0 +1,173 @@
+{
+  "lessonId": "js-3-2",
+  "title": "this in Methods",
+  "concept": "When called as a method, this refers to the object that owns the method",
+  "content": {
+    "code": "const user = {\n  name: 'Alice',\n  greet() {\n    console.log(`Hello, ${this.name}`);\n  }\n};\n\nuser.greet();\n\nconst greetFn = user.greet;\ngreetFn();",
+    "steps": [
+      {
+        "title": "Create user Object",
+        "explanation": "Create a user object with a name property and a greet method.",
+        "visualizationType": "thisBinding",
+        "code": "const user = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "thisState": {
+          "context": "object creation",
+          "objects": [
+            {
+              "name": "user",
+              "properties": [
+                {
+                  "key": "name",
+                  "value": "'Alice'"
+                },
+                {
+                  "key": "greet",
+                  "value": "function"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "title": "Call user.greet()",
+        "explanation": "Call greet as a method of the user object.\nThe object before the dot (.) becomes this!",
+        "keyInsight": "When called as obj.method(), this = obj",
+        "analogy": "The object before the dot becomes the owner of the function.",
+        "visualizationType": "thisBinding",
+        "code": "user.greet();",
+        "thisState": {
+          "context": "method call",
+          "thisValue": "user",
+          "callStack": [
+            "<global>",
+            "user.greet()"
+          ],
+          "binding": {
+            "method": "greet",
+            "object": "user",
+            "thisIs": "user"
+          },
+          "objects": null
+        }
+      },
+      {
+        "title": "Access this.name",
+        "explanation": "Since this points to user, this.name is 'Alice'.",
+        "visualizationType": "thisBinding",
+        "code": "console.log(`Hello, ${this.name}`);",
+        "thisState": {
+          "output": [
+            "Hello, Alice"
+          ],
+          "thisAccess": "this.name → 'Alice'",
+          "binding": null
+        }
+      },
+      {
+        "title": "Copy the Function Reference",
+        "explanation": "Assign user.greet to the greetFn variable.\nOnly the function itself is copied — the connection to the object is severed!",
+        "keyInsight": "Storing a function in a variable breaks its connection to the object.",
+        "visualizationType": "thisBinding",
+        "code": "const greetFn = user.greet;",
+        "thisState": {
+          "context": "reference copy",
+          "objects": [
+            {
+              "name": "user",
+              "properties": [
+                {
+                  "key": "name",
+                  "value": "'Alice'"
+                },
+                {
+                  "key": "greet",
+                  "value": "function"
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "greetFn",
+              "value": "function (same as user.greet)"
+            }
+          ],
+          "warning": "객체와의 연결 끊어짐!",
+          "thisValue": null,
+          "callStack": null,
+          "output": null,
+          "thisAccess": null
+        }
+      },
+      {
+        "title": "Call greetFn() — this Lost!",
+        "explanation": "greetFn() is a regular function call.\nThere's no object before the dot, so this is the global object (or undefined)!",
+        "keyInsight": "Storing a method in a variable and calling it loses this!",
+        "misconception": "It's easy to assume this is still user since greetFn was originally user.greet.",
+        "visualizationType": "thisBinding",
+        "code": "greetFn();",
+        "thisState": {
+          "context": "function call (lost this)",
+          "thisValue": "window (or undefined in strict)",
+          "callStack": [
+            "<global>",
+            "greetFn()"
+          ],
+          "objects": null,
+          "variables": null,
+          "warning": null
+        }
+      },
+      {
+        "title": "Access this.name (this Lost)",
+        "explanation": "Inside greetFn, we access `this.name`.\nBut this is window (or undefined), so `this.name` is **undefined**!",
+        "keyInsight": "The same code (line 4), but this is different, so the result is different.",
+        "visualizationType": "thisBinding",
+        "code": "console.log(`Hello, ${this.name}`);",
+        "thisState": {
+          "thisValue": "window",
+          "output": [
+            "Hello, Alice",
+            "Hello, undefined"
+          ],
+          "thisAccess": "this.name → undefined",
+          "warning": "this가 window라서 name이 없음!"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the output of the following code?\n\nconst obj = {\n  value: 42,\n  getValue() { return this.value; }\n};\nconst fn = obj.getValue;\nconsole.log(fn());",
+    "options": [
+      "42",
+      "undefined",
+      "null",
+      "An error occurs"
+    ],
+    "correctIndex": 1,
+    "explanation": "fn() is a regular function call.\nthis becomes the global object, and since there's no value on the global object, undefined is returned."
+  },
+  "misconceptions": [
+    {
+      "wrong": "this is preserved even after assigning a method to a variable",
+      "correct": "It's not.\nThe moment you put `obj.method` into a variable, it loses its connection to `obj` and becomes a plain function.",
+      "why": "In JavaScript, functions are **not bound** to objects.\nThe object is only 'borrowed' temporarily when you call through the dot notation."
+    },
+    {
+      "wrong": "this refers to the object in which the function was defined",
+      "correct": "this refers to the object that called the function (the object before the dot).",
+      "why": "The same function can have a different this depending on how it's called."
+    }
+  ],
+  "keyTakeaway": "obj.method() → this = obj, fn() → this = global (this lost)"
+}

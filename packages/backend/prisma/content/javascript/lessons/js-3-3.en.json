@@ -1,0 +1,106 @@
+{
+  "lessonId": "js-3-3",
+  "title": "this in Arrow Functions",
+  "concept": "Arrow functions don't have their own this — they use the this from their enclosing scope",
+  "content": {
+    "code": "const user = {\n  name: 'Alice',\n  greetRegular() {\n    setTimeout(function() {\n      console.log(`Regular: ${this.name}`);\n    }, 100);\n  },\n  greetArrow() {\n    setTimeout(() => {\n      console.log(`Arrow: ${this.name}`);\n    }, 100);\n  }\n};\n\nuser.greetRegular();\nuser.greetArrow();",
+    "steps": [
+      {
+        "title": "Call user.greetRegular()",
+        "explanation": "Call the `greetRegular` method on the `user` object.\nAt this moment, `this` inside `greetRegular` is `user`.\nHowever, the `setTimeout` callback (a regular function) inside it will lose `this` when the Web API runs it 100ms later.",
+        "visualizationType": "thisBinding",
+        "code": "user.greetRegular();",
+        "thisState": {
+          "context": "method call",
+          "thisValue": "user",
+          "webApis": [
+            {
+              "name": "regular callback",
+              "delay": 100
+            }
+          ]
+        }
+      },
+      {
+        "title": "Call user.greetArrow()",
+        "explanation": "Call the `greetArrow` method.\nAt this moment, `this` inside `greetArrow` is also `user`.\nThe `setTimeout` callback (an arrow function) inside it will 'remember' this `this` value when it runs 100ms later.",
+        "visualizationType": "thisBinding",
+        "code": "user.greetArrow();",
+        "thisState": {
+          "webApis": [
+            {
+              "name": "regular callback"
+            },
+            {
+              "name": "arrow callback",
+              "delay": 100
+            }
+          ]
+        }
+      },
+      {
+        "title": "Callback Executes (Regular Function)",
+        "explanation": "After 100ms, the callback from `greetRegular` runs.\nThis callback is a 'regular function', so it gets its own `this` when called.\nThe `this` of a callback called by `setTimeout` points to the global object (`window`), so `this.name` is `undefined`.",
+        "keyInsight": "A regular function callback's this is the global object.",
+        "visualizationType": "thisBinding",
+        "code": "setTimeout(function() {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "thisState": {
+          "context": "callback (regular function)",
+          "thisValue": "window",
+          "output": [
+            "Regular: undefined"
+          ],
+          "webApis": null
+        }
+      },
+      {
+        "title": "Callback Executes (Arrow Function)",
+        "explanation": "Next, the callback from `greetArrow` runs.\nAn 'arrow function' doesn't create its own `this` — it uses the `this` from its lexical scope (where it was defined).\nHere it refers to the `user` object, which is `greetArrow` method's `this`.",
+        "keyInsight": "Arrow function's this = my parent's this (inherited)",
+        "visualizationType": "thisBinding",
+        "code": "setTimeout(() => {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "thisState": {
+          "context": "callback (arrow function)",
+          "thisValue": "user",
+          "output": [
+            "Regular: undefined",
+            "Arrow: Alice"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When the button is clicked in the following code, what is this?\n\nconst obj = {\n  name: 'MyObj',\n  handleClick: () => {\n    console.log(this.name);\n  }\n};\nbutton.addEventListener('click', obj.handleClick);",
+    "options": [
+      "'MyObj'",
+      "The button element",
+      "undefined (this from global scope)",
+      "An error occurs"
+    ],
+    "correctIndex": 2,
+    "explanation": "Arrow functions use the this from their enclosing scope at the time of definition.\nEven though it's defined as a method of obj, obj is not a scope, so the global this is used."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Arrow function's this refers to the parent object",
+      "correct": "No.\nIt refers to the enclosing **function** scope.\nAn object literal `{}` is not a scope.",
+      "why": "Objects don't act as scopes.\nSo an arrow function inside an object literal ends up pointing to the global (window)."
+    },
+    {
+      "wrong": "You can change arrow function's this with call/apply/bind",
+      "correct": "Arrow function's this cannot be changed.\ncall/apply/bind are ignored.",
+      "why": "Arrow functions use lexical this, so their binding is fixed."
+    }
+  ],
+  "keyTakeaway": "Arrow function = no own this, uses the this from enclosing scope (lexical)"
+}
