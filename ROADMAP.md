@@ -7,7 +7,7 @@
 ## Phase 1 — 공개 준비 (2주)
 
 ### GitHub 정리
-- [ ] README 데모 GIF 교체 (최적화본으로)
+- [x] README 데모 GIF 교체 (9.9MB 최적화본으로) — 2026-02-27
 - [ ] CONTRIBUTING.md 작성 (기여 방법 안내)
 - [ ] GitHub Issues 템플릿 추가 (bug report, feature request)
 - [ ] GitHub Discussions 활성화
@@ -15,12 +15,14 @@
 - [ ] Repository Description 한/영 작성
 
 ### 코드 정리
-- [ ] `packages/frontend/src/features/simulator/` 죽은 코드 삭제
+- [x] 죽은 코드 삭제 — 2026-02-27
+  - `WeekdayChart.tsx` (import 0개)
+  - `stories/` 폴더 전체 (Storybook 미사용, 27파일 849줄)
 - [ ] `.env.example` 최신화 (모든 필수 변수 설명 포함)
 - [ ] 로컬 실행 테스트 (새 클론 기준으로 Getting Started 검증)
 
 ### 법적 준비
-- [ ] LICENSE 파일 확인 (MIT)
+- [x] LICENSE 파일 확인 (MIT) — 2026-02-27
 - [ ] 서드파티 라이브러리 라이센스 충돌 없는지 확인
 
 ---
@@ -109,7 +111,7 @@
 
 | 날짜 | GitHub Stars | MAU | 이벤트 |
 |------|-------------|-----|--------|
-| 2026-02 | - | - | 로드맵 시작 |
+| 2026-02-27 | - | - | 로드맵 시작, README 개편, 데모 GIF 추가, 죽은 코드 삭제 |
 
 ---
 
