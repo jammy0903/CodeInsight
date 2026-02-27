@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '@/stores/store';
 import { motion } from 'framer-motion';
 import {
@@ -93,6 +94,7 @@ interface ReportStats {
 }
 
 export function AdminPage() {
+  const { t } = useTranslation();
   const appUser = useStore((s) => s.appUser);
   const authLoading = useStore((s) => s.authLoading);
   const setPageTitle = useStore((s) => s.setPageTitle);
@@ -107,7 +109,7 @@ export function AdminPage() {
 
   // 페이지 제목 설정
   useEffect(() => {
-    setPageTitle('관리자 페이지', `관리자: ${appUser?.nickname || ''}`);
+    setPageTitle(t('admin.page_title'), t('admin.page_subtitle', { name: appUser?.nickname || '' }));
   }, [setPageTitle, appUser]);
 
   // 인증 상태가 복원된 후에만 데이터 fetch
@@ -184,7 +186,7 @@ export function AdminPage() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-[var(--theme-dashboard-text-muted)]">인증 확인 중...</div>
+        <div className="text-lg text-[var(--theme-dashboard-text-muted)]">{t('admin.checking_auth')}</div>
       </div>
     );
   }
@@ -215,13 +217,13 @@ export function AdminPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <StatCard
                 icon={<Users className="w-8 h-8" />}
-                label="전체 사용자"
+                label={t('admin.total_users')}
                 value={stats.totalUsers}
                 color="bg-blue-500"
               />
               <StatCard
                 icon={<Activity className="w-8 h-8" />}
-                label="오늘 활동 유저"
+                label={t('admin.active_today')}
                 value={stats.activeUsersToday}
                 color="bg-orange-500"
               />
@@ -235,7 +237,7 @@ export function AdminPage() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-[var(--theme-dashboard-title)] flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
-                언어별 학습 진도율
+                {t('admin.language_progress')}
               </h3>
 
               {/* 토글 버튼 */}
@@ -248,7 +250,7 @@ export function AdminPage() {
                       : 'bg-transparent text-[var(--theme-dashboard-title)] hover:bg-[var(--theme-dashboard-section-header-bg)]'
                   }`}
                 >
-                  전체 평균
+                  {t('admin.all_average')}
                 </button>
                 <button
                   onClick={() => setProgressMode('active')}
@@ -258,7 +260,7 @@ export function AdminPage() {
                       : 'bg-transparent text-[var(--theme-dashboard-title)] hover:bg-[var(--theme-dashboard-section-header-bg)]'
                   }`}
                 >
-                  학습자 평균
+                  {t('admin.learner_average')}
                 </button>
               </div>
             </div>
@@ -311,26 +313,26 @@ export function AdminPage() {
           <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
             <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4 flex items-center gap-3">
               <AlertTriangle className="w-6 h-6 text-red-500" />
-              신고/문의 현황
+              {t('admin.reports_title')}
             </h2>
 
             {/* 요약 카드 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <StatCard
                 icon={<AlertTriangle className="w-8 h-8" />}
-                label="전체 신고"
+                label={t('admin.total_reports')}
                 value={reportStats.summary.total}
                 color="bg-red-500"
               />
               <StatCard
                 icon={<Zap className="w-8 h-8" />}
-                label="오늘 신고"
+                label={t('admin.today_reports')}
                 value={reportStats.summary.todayCount}
                 color="bg-yellow-500"
               />
               <StatCard
                 icon={<Clock className="w-8 h-8" />}
-                label="미처리"
+                label={t('admin.unresolved')}
                 value={reportStats.summary.openCount}
                 color="bg-orange-500"
               />
@@ -340,7 +342,7 @@ export function AdminPage() {
             {Object.keys(reportStats.summary.byLanguage).length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-semibold text-[var(--theme-dashboard-text-muted)] mb-3">
-                  언어별 신고 분포
+                  {t('admin.reports_by_language')}
                 </h3>
                 <div className="space-y-2">
                   {Object.entries(reportStats.summary.byLanguage)
@@ -378,19 +380,19 @@ export function AdminPage() {
             {/* 최근 신고 테이블 */}
             <div>
               <h3 className="text-sm font-semibold text-[var(--theme-dashboard-text-muted)] mb-3">
-                최근 신고 목록
+                {t('admin.recent_reports')}
               </h3>
               <div className="overflow-x-auto max-h-72 overflow-y-auto">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-[var(--theme-dashboard-card-bg)]">
                     <tr className="border-b border-[var(--theme-dashboard-card-border)]">
-                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">닉네임</th>
-                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">유형</th>
-                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">카테고리</th>
-                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">레슨</th>
-                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">상태</th>
-                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">시각</th>
-                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">작업</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_nickname')}</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_type')}</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_category')}</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_lesson')}</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_status')}</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_time')}</th>
+                      <th className="text-left py-2 px-2 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_action')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -406,7 +408,7 @@ export function AdminPage() {
                           <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                             report.type === 'lesson' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
                           }`}>
-                            {report.type === 'lesson' ? '레슨' : '일반'}
+                            {report.type === 'lesson' ? t('admin.type_lesson') : t('admin.type_general')}
                           </span>
                         </td>
                         <td className="py-2 px-2 truncate max-w-[150px]">{report.category}</td>
@@ -417,7 +419,7 @@ export function AdminPage() {
                               ? 'bg-red-100 text-red-700'
                               : 'bg-green-100 text-green-700'
                           }`}>
-                            {report.status === 'open' ? '미처리' : '해결'}
+                            {report.status === 'open' ? t('admin.status_open') : t('admin.status_resolved')}
                           </span>
                         </td>
                         <td className="py-2 px-2 text-[var(--theme-dashboard-text-muted)] whitespace-nowrap">
@@ -430,7 +432,7 @@ export function AdminPage() {
                               className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded hover:bg-green-200 transition-colors"
                             >
                               <CheckCircle className="w-3 h-3" />
-                              해결
+                              {t('admin.resolve')}
                             </button>
                           )}
                         </td>
@@ -448,27 +450,27 @@ export function AdminPage() {
           <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
             <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4 flex items-center gap-3">
               <Database className="w-6 h-6" />
-              시스템 상태
+              {t('admin.system_status')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="flex items-center gap-4">
                 <div className={`w-4 h-4 rounded-full ${system.database === 'healthy' ? 'bg-green-500' : 'bg-red-500'}`} />
                 <div>
-                  <div className="text-sm text-[var(--theme-dashboard-text-muted)]">데이터베이스</div>
-                  <div className="font-semibold">{system.database === 'healthy' ? '정상' : '오류'}</div>
+                  <div className="text-sm text-[var(--theme-dashboard-text-muted)]">{t('admin.database')}</div>
+                  <div className="font-semibold">{system.database === 'healthy' ? t('admin.db_healthy') : t('admin.db_unhealthy')}</div>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <Clock className="w-6 h-6 text-blue-500" />
                 <div>
-                  <div className="text-sm text-[var(--theme-dashboard-text-muted)]">업타임</div>
+                  <div className="text-sm text-[var(--theme-dashboard-text-muted)]">{t('admin.uptime')}</div>
                   <div className="font-semibold">{formatUptime(system.uptime)}</div>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <HardDrive className="w-6 h-6 text-purple-500" />
                 <div>
-                  <div className="text-sm text-[var(--theme-dashboard-text-muted)]">메모리 사용</div>
+                  <div className="text-sm text-[var(--theme-dashboard-text-muted)]">{t('admin.memory_usage')}</div>
                   <div className="font-semibold">
                     {system.memoryUsage.used}MB / {system.memoryUsage.total}MB ({system.memoryUsage.percentage}%)
                   </div>
@@ -481,17 +483,17 @@ export function AdminPage() {
         {/* Users Table */}
         {users && (
           <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
-            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4">사용자 목록</h2>
+            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4">{t('admin.user_list')}</h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b-2 border-[var(--theme-dashboard-card-border)]">
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">닉네임</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">역할</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">OAuth</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">공부한 날짜 수</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">완료 레슨 수</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">가입일</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_nickname')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_role')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_oauth')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_study_days')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_completed_lessons')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_joined')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -519,8 +521,8 @@ export function AdminPage() {
                           ))}
                         </div>
                       </td>
-                      <td className="py-3 px-4">{user.studyDays}일</td>
-                      <td className="py-3 px-4">{user.completedLessons}개</td>
+                      <td className="py-3 px-4">{user.studyDays}{t('admin.days_suffix')}</td>
+                      <td className="py-3 px-4">{user.completedLessons}{t('admin.count_suffix')}</td>
                       <td className="py-3 px-4">{new Date(user.createdAt).toLocaleDateString()}</td>
                     </tr>
                   ))}
@@ -528,7 +530,7 @@ export function AdminPage() {
               </table>
             </div>
             <div className="mt-4 text-sm text-[var(--theme-dashboard-text-muted)]">
-              페이지 {users.page} / {users.totalPages} (전체 {users.total}명)
+              {t('admin.page_info', { page: users.page, totalPages: users.totalPages, total: users.total })}
             </div>
           </div>
         )}
@@ -536,16 +538,16 @@ export function AdminPage() {
         {/* Recent Submissions */}
         {submissions.length > 0 && (
           <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border-2 border-[var(--theme-dashboard-card-border)] p-6">
-            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4">최근 제출 내역</h2>
+            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-4">{t('admin.recent_submissions')}</h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b-2 border-[var(--theme-dashboard-card-border)]">
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">ID</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">닉네임</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">문제</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">결과</th>
-                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">제출 시각</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_id')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_nickname')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_problem')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_result')}</th>
+                    <th className="text-left py-3 px-4 font-semibold text-[var(--theme-dashboard-text-muted)]">{t('admin.col_submitted_at')}</th>
                   </tr>
                 </thead>
                 <tbody>

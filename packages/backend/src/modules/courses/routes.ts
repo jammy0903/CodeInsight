@@ -49,6 +49,7 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/lessons/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
+      const { locale } = request.query as { locale?: string };
       const lesson = await courseService.getLessonFull(id);
 
       if (!lesson) {
@@ -57,7 +58,8 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
 
       // JSON 파일에서 콘텐츠 로드 (없으면 null)
       // Lazy Loading: await 필수
-      const jsonContent = await lessonContentLoader.getContent(id);
+      // locale이 있으면 해당 언어 파일을 먼저 시도 (e.g., c-1-1.en.json)
+      const jsonContent = await lessonContentLoader.getContent(id, locale);
 
       // 하이브리드 응답: DB 메타데이터 + JSON 콘텐츠
       // JSON 구조가 Flat한 경우(code, steps가 최상위)와 Nested된 경우(content 내부) 모두 지원

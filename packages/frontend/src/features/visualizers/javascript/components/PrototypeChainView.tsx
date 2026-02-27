@@ -9,6 +9,7 @@
 
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -63,6 +64,7 @@ const ProtoObjectCard = memo(function ProtoObjectCard({
   isFoundTarget,
   isInLookupPath,
 }: ProtoObjectCardProps) {
+  const { t } = useTranslation();
   const colors = OBJ_COLORS[colorIndex % OBJ_COLORS.length];
 
   return (
@@ -110,7 +112,7 @@ const ProtoObjectCard = memo(function ProtoObjectCard({
             );
           })
         ) : (
-          <span className="text-xs text-gray-400 italic">(속성 없음)</span>
+          <span className="text-xs text-gray-400 italic">{t('visualizer.no_properties')}</span>
         )}
       </div>
     </motion.div>
@@ -144,6 +146,7 @@ const ChainArrow = memo(function ChainArrow({ isActive }: { isActive: boolean })
 export const PrototypeChainView = memo(function PrototypeChainView({
   prototypeState,
 }: PrototypeChainViewProps) {
+  const { t } = useTranslation();
   const objects = prototypeState?.objects;
 
   // Build ordered chain: object → proto → proto → ... → null
@@ -187,7 +190,7 @@ export const PrototypeChainView = memo(function PrototypeChainView({
     return (
       <div className="p-4 text-center text-gray-400">
         <span className="text-4xl mb-2 block">🔗</span>
-        <p>프로토타입 데이터가 없습니다</p>
+        <p>{t('visualizer.no_data')}</p>
       </div>
     );
   }
@@ -197,7 +200,7 @@ export const PrototypeChainView = memo(function PrototypeChainView({
       {/* Header */}
       <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
         <span>🔗</span>
-        <span>JavaScript 프로토타입: 객체들이 체인으로 연결되어 있습니다</span>
+        <span>{t('visualizer.prototype_desc')}</span>
       </div>
 
       {/* Chains */}
@@ -239,10 +242,10 @@ export const PrototypeChainView = memo(function PrototypeChainView({
               <span className="text-blue-600 font-mono font-bold">{prototypeState.lookupProp}</span>
               {prototypeState.foundAt ? (
                 <span className="text-blue-800">
-                  {' '}→ <span className="font-bold">{prototypeState.foundAt}</span>에서 발견!
+                  {' '}→ {t('visualizer.found_at', { name: prototypeState.foundAt })}
                 </span>
               ) : (
-                <span className="text-gray-500"> 탐색 중...</span>
+                <span className="text-gray-500"> {t('visualizer.searching')}</span>
               )}
             </motion.div>
           )}
@@ -255,11 +258,11 @@ export const PrototypeChainView = memo(function PrototypeChainView({
           <div className="flex items-center gap-1">
             <div className="h-0.5 w-4 bg-gray-300" />
             <span className="mr-1">→</span>
-            <span>[[Prototype]] 연결</span>
+            <span>{t('visualizer.prototype_link')}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-amber-50 border border-amber-400" />
-            <span>속성 발견 위치</span>
+            <span>{t('visualizer.found_location')}</span>
           </div>
         </div>
       </div>

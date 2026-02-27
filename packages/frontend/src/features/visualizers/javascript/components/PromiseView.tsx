@@ -10,6 +10,7 @@
 
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -154,6 +155,7 @@ export const PromiseView = memo(function PromiseView({
   promiseState,
   prevPromiseState,
 }: PromiseViewProps) {
+  const { t } = useTranslation();
   // All hooks called unconditionally (React rules of hooks)
   const prevIds = useMemo(
     () => new Set((prevPromiseState?.promises || []).map((p) => p.id)),
@@ -164,7 +166,7 @@ export const PromiseView = memo(function PromiseView({
     return (
       <div className="p-4 text-center text-gray-400">
         <span className="text-4xl mb-2 block">🤝</span>
-        <p>Promise 데이터가 없습니다</p>
+        <p>{t('visualizer.promise_no_data')}</p>
       </div>
     );
   }
@@ -174,7 +176,7 @@ export const PromiseView = memo(function PromiseView({
       {/* Header */}
       <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
         <span>🤝</span>
-        <span>JavaScript Promise: 비동기 작업의 상태를 추적합니다</span>
+        <span>{t('visualizer.promise_desc')}</span>
       </div>
 
       {/* Phase indicator */}
@@ -184,7 +186,7 @@ export const PromiseView = memo(function PromiseView({
           animate={{ opacity: 1 }}
           className="mb-4 px-3 py-2 rounded-lg bg-indigo-50 border border-indigo-200 text-sm text-indigo-700 font-medium"
         >
-          📍 현재 단계: {promiseState.phase}
+          📍 {t('visualizer.current_phase')}: {promiseState.phase}
         </motion.div>
       )}
 
@@ -243,7 +245,7 @@ export const PromiseView = memo(function PromiseView({
                 {task}
               </motion.div>
             ))}
-            <div className="flex-shrink-0 text-gray-400 text-xs px-1">{'\u2192'} 실행 순서</div>
+            <div className="flex-shrink-0 text-gray-400 text-xs px-1">{'\u2192'} {t('visualizer.execution_order')}</div>
           </div>
         </motion.div>
       )}

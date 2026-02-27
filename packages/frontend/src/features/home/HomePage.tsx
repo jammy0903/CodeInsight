@@ -26,6 +26,7 @@ interface StoryPanelProps {
 }
 
 const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
+  const { t } = useTranslation();
   // 테마별 SVG 색상
   const svgColors = theme === 'dark'
     ? { bg: '#27272a', text: '#e4e4e7', subtext: '#a1a1aa', border: '#3f3f46', accent: '#22d3ee' }
@@ -40,7 +41,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
         {/* 제목 */}
         <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          1. 코드 작성 ✏️
+          {t('home.svg_panel1_title')}
         </text>
 
         {/* 에디터 창 */}
@@ -79,7 +80,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <ellipse cx="220" cy="250" rx="65" ry="28" fill="white" stroke={svgColors.border} strokeWidth="2" />
         <circle cx="175" cy="230" r="5" fill="white" />
         <circle cx="165" cy="220" r="3" fill="white" />
-        <text x="220" y="255" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">코드를 써볼까?</text>
+        <text x="220" y="255" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">{t('home.svg_panel1_bubble')}</text>
       </svg>
     ),
 
@@ -89,7 +90,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <rect width="300" height="300" fill={svgColors.bg} />
 
         <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          2. 실행! ▶️
+          {t('home.svg_panel2_title')}
         </text>
 
         {/* 큰 재생 버튼 */}
@@ -112,7 +113,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
         {/* 말풍선 */}
         <ellipse cx="150" cy="270" rx="60" ry="22" fill="white" stroke={svgColors.border} strokeWidth="2" />
-        <text x="150" y="275" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">클릭해서 실행!</text>
+        <text x="150" y="275" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">{t('home.svg_panel2_bubble')}</text>
       </svg>
     ),
 
@@ -122,7 +123,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <rect width="300" height="300" fill={svgColors.bg} />
 
         <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          3. 한 줄씩 실행 👀
+          {t('home.svg_panel3_title')}
         </text>
 
         {/* 코드 박스 */}
@@ -158,7 +159,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
         {/* 말풍선 */}
         <ellipse cx="150" cy="270" rx="70" ry="22" fill="white" stroke={svgColors.border} strokeWidth="2" />
-        <text x="150" y="275" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">지금 이 줄 실행중!</text>
+        <text x="150" y="275" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">{t('home.svg_panel3_bubble')}</text>
       </svg>
     ),
 
@@ -168,7 +169,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <rect width="300" height="300" fill={svgColors.bg} />
 
         <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          4. 메모리 변화 🧠
+          {t('home.svg_panel4_title')}
         </text>
 
         {/* Stack 라벨 */}
@@ -195,7 +196,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
         {/* Heap 영역 */}
         <rect x="160" y="90" width="100" height="120" rx="8" fill="white" stroke={svgColors.border} strokeWidth="2" />
-        <text x="210" y="155" textAnchor="middle" fontSize="12" fill={svgColors.accent}>(비어있음)</text>
+        <text x="210" y="155" textAnchor="middle" fontSize="12" fill={svgColors.accent}>{t('home.svg_panel4_heap_empty')}</text>
 
         {/* 화살표 애니메이션 */}
         <path d="M 90 225 L 90 195" stroke="#ff6b6b" strokeWidth="3" fill="none" markerEnd="url(#arrowhead)" />
@@ -209,7 +210,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <ellipse cx="200" cy="255" rx="75" ry="28" fill="white" stroke={svgColors.border} strokeWidth="2" />
         <circle cx="140" cy="235" r="5" fill="white" />
         <circle cx="125" cy="225" r="3" fill="white" />
-        <text x="200" y="260" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">메모리가 보여요!</text>
+        <text x="200" y="260" textAnchor="middle" fontSize="14" fill={svgColors.text} fontFamily="var(--font-handwriting)">{t('home.svg_panel4_bubble')}</text>
       </svg>
     ),
 
@@ -219,7 +220,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <rect width="300" height="300" fill={svgColors.bg} />
 
         <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          5. AI가 설명해줘요 🤖
+          {t('home.svg_panel5_title')}
         </text>
 
         {/* AI 로봇 얼굴 */}
@@ -251,10 +252,10 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <rect x="100" y="183" width="32" height="5" fill="white" />
 
         <text x="150" y="210" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          x+3을 계산해서
+          {t('home.svg_panel5_line1')}
         </text>
         <text x="150" y="230" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          y에 저장했어요! 💡
+          {t('home.svg_panel5_line2')}
         </text>
 
         {/* 반짝이 */}
@@ -270,13 +271,13 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <rect width="300" height="300" fill={svgColors.bg} />
 
         <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          6. 퀴즈 타임! 📝
+          {t('home.svg_panel6_title')}
         </text>
 
         {/* 질문 박스 */}
         <rect x="30" y="50" width="240" height="60" rx="12" fill="white" stroke="#c4a574" strokeWidth="2" />
         <text x="150" y="75" textAnchor="middle" fontSize="15" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          Q. y의 최종 값은?
+          {t('home.svg_panel6_question')}
         </text>
         <text x="150" y="98" textAnchor="middle" fontSize="13" fill={svgColors.subtext} fontFamily="monospace">
           int x=5; int y=x+3;
@@ -300,7 +301,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
         {/* 말풍선 */}
         <ellipse cx="230" cy="265" rx="55" ry="22" fill="white" stroke={svgColors.border} strokeWidth="2" />
-        <text x="230" y="270" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">음... 뭘까?</text>
+        <text x="230" y="270" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">{t('home.svg_panel6_bubble')}</text>
       </svg>
     ),
 
@@ -310,7 +311,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <rect width="300" height="300" fill={svgColors.bg} />
 
         <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          7. 정답! ✅
+          {t('home.svg_panel7_title')}
         </text>
 
         {/* 큰 체크 원 */}
@@ -323,13 +324,13 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
         {/* 정답 텍스트 */}
         <text x="150" y="215" textAnchor="middle" fontSize="24" fill="#28a745" fontWeight="bold" fontFamily="var(--font-handwriting)">
-          정답은 8!
+          {t('home.svg_panel7_answer')}
         </text>
 
         {/* 설명 */}
         <rect x="40" y="235" width="220" height="40" rx="10" fill="white" stroke="#28a745" strokeWidth="2" />
         <text x="150" y="260" textAnchor="middle" fontSize="13" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          x(5) + 3 = 8 이에요!
+          {t('home.svg_panel7_explanation')}
         </text>
 
         {/* 축하 이펙트 */}
@@ -348,7 +349,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
         <rect width="300" height="300" fill={svgColors.bg} />
 
         <text x="150" y="35" textAnchor="middle" fontSize="18" fontWeight="bold" fill={svgColors.text} fontFamily="var(--font-handwriting)">
-          8. 학습 완료! 🎓
+          {t('home.svg_panel8_title')}
         </text>
 
         {/* 트로피 */}
@@ -373,7 +374,7 @@ const StoryPanel = memo(({ num, theme }: StoryPanelProps) => {
 
         {/* 완료 메시지 */}
         <text x="150" y="260" textAnchor="middle" fontSize="20" fill={svgColors.text} fontWeight="bold" fontFamily="var(--font-handwriting)">
-          Day 1 완료!
+          {t('home.svg_panel8_done')}
         </text>
 
         {/* 축하 이펙트 */}

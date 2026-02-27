@@ -119,25 +119,59 @@ class LessonContentLoader {
    * 레슨 콘텐츠 조회 (Async Lazy Loading)
    * 1. 캐시에 있으면 즉시 반환
    * 2. 없으면 파일 읽어서 캐싱 후 반환
+   *
+   * locale 지원: locale='en'이면 'c-1-1.en.json'을 먼저 시도, 없으면 기본 파일로 fallback
    */
-  async getContent(lessonId: string): Promise<LessonContentData | null> {
+  async getContent(lessonId: string, locale?: string): Promise<LessonContentData | null> {
     if (!this.isScanned) {
       throw new Error(
         'LessonContentLoader not initialized. Call scanFilePaths() first.'
       );
     }
 
+    // locale-aware cache key
+    const cacheKey = locale && locale !== 'ko' ? `${lessonId}.${locale}` : lessonId;
+
     // 1. Memory Cache Hit
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey)!;
+    }
+
+    // 2. Try locale-specific file first (e.g., c-1-1.en.json)
+    if (locale && locale !== 'ko') {
+      const baseFilePath = this.fileMap.get(lessonId);
+      if (baseFilePath) {
+        const dir = path.dirname(baseFilePath);
+        const localeFilePath = path.join(dir, `${lessonId}.${locale}.json`);
+        const localeContent = await this.loadFile(localeFilePath, lessonId);
+        if (localeContent) {
+          this.cache.set(cacheKey, localeContent);
+          return localeContent;
+        }
+      }
+    }
+
+    // 3. Fallback to default file
     if (this.cache.has(lessonId)) {
       return this.cache.get(lessonId)!;
     }
 
-    // 2. Cache Miss - Load from Disk
     const filePath = this.fileMap.get(lessonId);
     if (!filePath) {
       return null;
     }
 
+    const content = await this.loadFile(filePath, lessonId);
+    if (content) {
+      this.cache.set(lessonId, content);
+    }
+    return content;
+  }
+
+  /**
+   * 파일에서 레슨 콘텐츠를 로드하는 내부 헬퍼
+   */
+  private async loadFile(filePath: string, lessonId: string): Promise<LessonContentData | null> {
     try {
       const content = await fs.readFile(filePath, 'utf-8');
       const data = JSON.parse(content);
@@ -154,11 +188,8 @@ class LessonContentLoader {
         logger.warn(`Lesson ID mismatch in file ${filePath}: expected ${lessonId}, found ${typedData.lessonId}`);
       }
 
-      // Store in Cache
-      this.cache.set(lessonId, typedData);
       return typedData;
-    } catch (err) {
-      logger.error(`Failed to load lesson file: ${filePath}`, err);
+    } catch {
       return null;
     }
   }

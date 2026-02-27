@@ -1,0 +1,287 @@
+{
+  "lessonId": "c-1-5",
+  "title": "Loops (for)",
+  "concept": "The for loop expresses initialization, condition, and increment in a single line. It's ideal for repetitions with a known count.",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int sum = 0;\n\n    for (int i = 1; i <= 5; i++) {\n        sum = sum + i;\n        printf(\"i=%d, sum=%d\\n\", i, sum);\n    }\n\n    printf(\"Final sum: %d\\n\", sum);\n\n    return 0;\n}\n",
+    "steps": [
+      {
+        "title": "Starting main Function",
+        "explanation": "Program starts. A main stack frame is created. In this lesson, we learn the **for loop** which executes the same code multiple times.\n\nWhat if you need the sum from 1 to 1000? Hardcoding is impossible — you need a loop. Think of it as placing a calculator on your desk — now you're ready to add numbers one by one.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Initializing the Sum Variable",
+        "explanation": "`sum` must start at 0 for the accumulated result to be correct.\n\nWithout initialization, the calculation would start from a previous garbage value, corrupting the result.",
+        "code": "int sum = 0;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "0",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Entering the for Loop (i = 1)",
+        "explanation": "`for (int i = 1; i <= 5; i++)` packs initialization (i=1), condition (i<=5), and increment (i++) into one line.\n\nIf the condition is true, the body executes. When it becomes false, the loop terminates immediately.",
+        "code": "for (int i = 1; i <= 5; i++) {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "0",
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "1",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "Iteration 1: Adding i to sum",
+        "explanation": "`sum = sum + i;` is the basic accumulation pattern.\n\nIn iteration 1, `sum = 0 + 1`, so `sum` becomes 1.",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "1",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "1",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "Iteration 1: Printing Current Values",
+        "explanation": "Output: ```i=1, sum=1```. Printing values each iteration enables **step-by-step debugging** to verify the program works as intended.\n\nIteration 1 complete: added ```i=1``` to ```sum```, changing it from 0→1. Now the increment (```i++```) executes making ```i``` become 2, and the condition (```i <= 5```) is checked again.",
+        "code": "printf(\"i=%d, sum=%d\\n\", i, sum);",
+        "stdout": "i=1, sum=1"
+      },
+      {
+        "title": "Iteration 2: i Increments (i = 2)",
+        "explanation": "The increment expression makes `i` become 2. In a for loop, the increment runs automatically after the body.\n\nThe flow is always the same: check condition → execute body → increment → check condition again.",
+        "code": "for (int i = 1; i <= 5; i++) {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "1",
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "2",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "Iteration 2: sum += i",
+        "explanation": "In iteration 2, `i=2` so `sum` increases from `1 → 3`.\n\nThis is the accumulation pattern at work: each iteration adds the current i to build the final sum.",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "3",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "2",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "Iteration 2: Output",
+        "explanation": "The current state shows `i=2, sum=3`.\n\nHaving intermediate output makes it very useful for debugging the loop flow and accumulation process.",
+        "code": "printf(\"i=%d, sum=%d\\n\", i, sum);",
+        "stdout": "i=1, sum=1\ni=2, sum=3"
+      },
+      {
+        "title": "Iteration 3: i = 3, sum = 6",
+        "explanation": "In iteration 3, `sum = 3 + 3` makes `sum=6`.\n\nThe loop repeatedly applies the same rule to progressively build the result.",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "6",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "3",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "i=1, sum=1\ni=2, sum=3\ni=3, sum=6"
+      },
+      {
+        "title": "Iteration 4: i = 4, sum = 10",
+        "explanation": "In iteration 4, `sum = 6 + 4` makes `sum=10`.\n\nLoops build the final value through these step-by-step state changes.",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "10",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "4",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "i=1, sum=1\ni=2, sum=3\ni=3, sum=6\ni=4, sum=10"
+      },
+      {
+        "title": "Iteration 5 (Final): i = 5, sum = 15",
+        "explanation": "In the final iteration, `i=5` is added to make `sum=15`.\n\nAfter the next increment, `i=6` fails the condition `i <= 5`, so the loop ends.",
+        "code": "sum = sum + i;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "15",
+            "highlight": true,
+            "address": "0x1000"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "5",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "i=1, sum=1\ni=2, sum=3\ni=3, sum=6\ni=4, sum=10\ni=5, sum=15"
+      },
+      {
+        "title": "Loop Termination (Condition False)",
+        "explanation": "When `i=6`, the condition `i <= 5` is false, so the loop terminates.\n\nA for loop exits the moment the condition becomes false, skipping the body entirely.",
+        "code": "for (int i = 1; i <= 5; i++) {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "15",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Printing the Final Sum",
+        "explanation": "`printf` outputs the final sum `15`.\n\nThis is a classic pattern of accumulating intermediate states through repetition to produce the final result.",
+        "code": "printf(\"Final sum: %d\\n\", sum);",
+        "stdout": "i=1, sum=1\ni=2, sum=3\ni=3, sum=6\ni=4, sum=10\ni=5, sum=15\nFinal sum: 15"
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "`return 0;` terminates the program normally.\n\nThe key takeaway is simple: the for loop is the most readable and safe choice for repetitions with a relatively clear count.",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How many times does for (int i = 0; i < 3; i++) iterate?",
+    "options": [
+      "2 times",
+      "3 times",
+      "4 times",
+      "Infinite loop"
+    ],
+    "correctIndex": 1,
+    "explanation": "Values of i: 0 → 1 → 2 → (3 fails i < 3, terminates)\n\ni values executed: 0, 1, 2 → 3 iterations total"
+  },
+  "misconceptions": [
+    {
+      "wrong": "The loop variable i can be used after the loop ends",
+      "correct": "When declared as for (int i = ...), the scope of i is limited to the for block.",
+      "why": "Once the loop ends, i is removed from the stack.\nTo use i outside the loop, you must declare it before the for statement."
+    }
+  ],
+  "keyTakeaway": "The for loop packs 'init; condition; increment' into one line — the best choice when the iteration count is clear!"
+}

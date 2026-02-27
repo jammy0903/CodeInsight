@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '@/stores/store';
 import { checkNickname, registerUser } from '@/services/user';
 import { logout } from '@/services/firebase';
@@ -21,6 +22,7 @@ const NICKNAME_REGEX = /^[a-zA-Z0-9가-힣_]{2,20}$/;
 type ValidationStatus = 'idle' | 'checking' | 'valid' | 'invalid';
 
 export function NicknameModal() {
+  const { t } = useTranslation();
   const needsRegistration = useStore((s) => s.needsRegistration);
   const firebaseUser = useStore((s) => s.firebaseUser);
   const setAppUser = useStore((s) => s.setAppUser);
@@ -44,7 +46,7 @@ export function NicknameModal() {
     // 형식 검사
     if (!NICKNAME_REGEX.test(value)) {
       setStatus('invalid');
-      setMessage('2-20자의 영문, 숫자, 한글, 언더스코어만 사용 가능합니다');
+      setMessage(t('profile.nickname_format'));
       return;
     }
 
@@ -54,14 +56,14 @@ export function NicknameModal() {
       const result = await checkNickname(value);
       if (result.available) {
         setStatus('valid');
-        setMessage('사용 가능한 닉네임입니다');
+        setMessage(t('profile.nickname_available'));
       } else {
         setStatus('invalid');
-        setMessage(result.error || '이미 사용 중인 닉네임입니다');
+        setMessage(result.error || t('profile.nickname_taken'));
       }
     } catch (_error) {
       setStatus('invalid');
-      setMessage('닉네임 확인 중 오류가 발생했습니다');
+      setMessage(t('profile.nickname_error'));
     }
   }, []);
 
@@ -91,7 +93,7 @@ export function NicknameModal() {
       setNeedsRegistration(false);
     } catch (error) {
       setStatus('invalid');
-      setMessage(error instanceof Error ? error.message : '등록에 실패했습니다');
+      setMessage(error instanceof Error ? error.message : t('auth.registration_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -118,9 +120,9 @@ export function NicknameModal() {
         >
           {/* Header */}
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">환영합니다!</h2>
+            <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">{t('welcome_message')}</h2>
             <p className="text-[var(--theme-dashboard-text-muted)] mt-2">
-              CodeInsight에서 사용할 닉네임을 설정해주세요
+              {t('auth.set_nickname_desc')}
             </p>
           </div>
 
@@ -131,7 +133,7 @@ export function NicknameModal() {
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="닉네임 입력"
+                placeholder={t('profile.nickname_placeholder')}
                 className={`
                   w-full px-4 py-3 rounded-lg border-2 transition-colors
                   focus:outline-none focus:ring-2 focus:ring-offset-2
@@ -173,7 +175,7 @@ export function NicknameModal() {
 
             {/* Hint */}
             <p className="text-xs text-[var(--theme-dashboard-text-muted)]">
-              2-20자 / 영문, 숫자, 한글, 언더스코어(_) 사용 가능
+              {t('auth.nickname_hint')}
             </p>
           </div>
 
@@ -185,7 +187,7 @@ export function NicknameModal() {
               onClick={handleCancel}
               className="flex-1 px-4 py-3 text-[var(--theme-dashboard-text-muted)] border-2 border-[var(--theme-dashboard-card-border)] rounded-lg font-medium hover:bg-[var(--theme-dashboard-section-header-bg)] transition-colors"
             >
-              취소
+              {t('common.cancel')}
             </motion.button>
             <motion.button
               whileHover={{ scale: status === 'valid' ? 1.02 : 1 }}
@@ -203,10 +205,10 @@ export function NicknameModal() {
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  등록 중...
+                  {t('auth.registering')}
                 </span>
               ) : (
-                '시작하기'
+                t('home.start_learning')
               )}
             </motion.button>
           </div>

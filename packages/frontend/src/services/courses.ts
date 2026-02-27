@@ -5,6 +5,7 @@
  * DB 기반 새 코스 구조용 API 서비스
  */
 
+import i18n from 'i18next';
 import { api } from './api/axios';
 import { handleError } from './api/errors';
 import type {
@@ -162,7 +163,9 @@ export async function getChapterProgress(chapterId: string): Promise<ChapterWith
  */
 export async function getLessonFull(lessonId: string): Promise<LessonFull> {
   try {
-    const response = await api.get<LessonFull>(ENDPOINTS.lesson(lessonId));
+    const locale = i18n.language;
+    const params = locale && locale !== 'ko' ? { locale } : undefined;
+    const response = await api.get<LessonFull>(ENDPOINTS.lesson(lessonId), { params });
 
     // step.code → step.line 런타임 계산 (Zod 검증 전에 수행)
     const data = response.data;

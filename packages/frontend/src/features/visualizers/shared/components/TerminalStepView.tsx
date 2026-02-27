@@ -8,6 +8,7 @@
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -28,12 +29,13 @@ export const TerminalStepView = memo(function TerminalStepView({
   stdout,
   className = '',
 }: TerminalStepViewProps) {
+  const { t } = useTranslation();
   return (
     <div className={`terminal-step-view p-4 ${className}`}>
       {/* Header */}
       <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
         <span>💻</span>
-        <span>코드 실행 결과를 확인하세요</span>
+        <span>{t('visualizer.terminal_desc')}</span>
       </div>
 
       {/* Terminal output */}
@@ -69,8 +71,8 @@ export const TerminalStepView = memo(function TerminalStepView({
       {!stdout && !explanation && (
         <div className="text-center py-12 text-gray-400">
           <span className="text-4xl mb-2 block">💻</span>
-          <p>아직 출력이 없습니다</p>
-          <p className="text-sm">코드가 실행되면 결과가 여기에 나타납니다</p>
+          <p>{t('visualizer.no_output_yet')}</p>
+          <p className="text-sm">{t('visualizer.output_will_appear')}</p>
         </div>
       )}
 

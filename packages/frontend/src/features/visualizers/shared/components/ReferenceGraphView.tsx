@@ -11,6 +11,7 @@
 
 import { memo, useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import type { FlowStep, FlowVariable } from '@codeinsight/shared';
 
 // ============================================
@@ -51,7 +52,7 @@ const LANG_THEMES: Record<string, LanguageTheme> = {
   python: {
     icon: '🐍',
     label: 'Python',
-    description: '이름표(포스트잇)가 값에 붙어있어요',
+    description: 'visualizer.ref_desc_python',
     globalFrameName: 'global',
     showMutability: true,
     frameColors: {
@@ -78,7 +79,7 @@ const LANG_THEMES: Record<string, LanguageTheme> = {
   java: {
     icon: '☕',
     label: 'Java',
-    description: '같은 객체면 이름표가 함께 붙어요',
+    description: 'visualizer.ref_desc_java',
     globalFrameName: 'main',
     frameColors: {
       global: { bg: '#eff6ff', border: '#3b82f6', header: '#dbeafe', headerText: '#1d4ed8' },
@@ -101,7 +102,7 @@ const LANG_THEMES: Record<string, LanguageTheme> = {
   javascript: {
     icon: '🟨',
     label: 'JavaScript',
-    description: '마우스를 올려 연결 관계를 확인하세요',
+    description: 'visualizer.ref_desc_javascript',
     globalFrameName: '__main__',
     frameColors: {
       global: { bg: '#fffbeb', border: '#f59e0b', header: '#fef3c7', headerText: '#b45309' },
@@ -314,6 +315,7 @@ const FrameSection = memo(function FrameSection({
   prevVariableIds,
   prevVariableValues,
 }: FrameSectionProps) {
+  const { t } = useTranslation();
   const isGlobal = name === theme.globalFrameName || name === 'global' || name === '__main__' || name === 'main';
   const isStringPool = name === 'String Pool';
   const isHeapSection = name === 'Heap';
@@ -347,7 +349,7 @@ const FrameSection = memo(function FrameSection({
         </span>
         {isActive && !isHeapSection && (
           <span className="ml-auto text-[11px] px-1.5 py-0.5 rounded-md bg-blue-500 text-white font-medium">
-            실행 중
+            {t('visualizer.running')}
           </span>
         )}
       </div>
@@ -377,7 +379,7 @@ const FrameSection = memo(function FrameSection({
             })}
           </AnimatePresence>
         ) : (
-          <span className="text-sm text-gray-400 italic">(비어 있음)</span>
+          <span className="text-sm text-gray-400 italic">{t('visualizer.empty')}</span>
         )}
       </div>
     </motion.div>
@@ -394,6 +396,7 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
   language,
   className = '',
 }: ReferenceGraphViewProps) {
+  const { t } = useTranslation();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const handleHover = useCallback((id: string | null) => setHoveredId(id), []);
 
@@ -549,7 +552,7 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
       {/* Header */}
       <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
         <span>{theme.icon}</span>
-        <span>{theme.label}: {theme.description}</span>
+        <span>{theme.label}: {t(theme.description)}</span>
       </div>
 
       {/* Frames (reversed — latest call on top, Heap always at bottom) */}
@@ -594,8 +597,8 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
       {frameData.length === 0 && (
         <div className="text-center py-12 text-gray-400">
           <span className="text-4xl mb-2 block">{theme.icon}</span>
-          <p>아직 생성된 변수가 없어요</p>
-          <p className="text-sm">코드가 실행되면 여기에 변수들이 나타납니다</p>
+          <p>{t('visualizer.no_variables')}</p>
+          <p className="text-sm">{t('visualizer.output_will_appear')}</p>
         </div>
       )}
 
@@ -611,19 +614,19 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
                 border: `1px solid ${theme.nameTagColor.border}`,
               }}
             >
-              이름
+              {t('visualizer.name_label')}
             </div>
-            <span>변수 이름표</span>
+            <span>{t('visualizer.variable_name_tag')}</span>
           </div>
           {language === 'python' && (
             <>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ backgroundColor: '#fef3c7', border: '1px solid #fbbf24' }} />
-                <span>불변 (int, str...)</span>
+                <span>{t('visualizer.immutable_types')}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ffedd5', border: '1px solid #fb923c' }} />
-                <span>가변 (list, dict...)</span>
+                <span>{t('visualizer.mutable_types')}</span>
               </div>
             </>
           )}
@@ -631,19 +634,19 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
             <>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ backgroundColor: '#fef9c3', border: '1px solid #facc15' }} />
-                <span>숫자</span>
+                <span>{t('visualizer.number_type')}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ backgroundColor: '#d1fae5', border: '1px solid #34d399' }} />
-                <span>문자열</span>
+                <span>{t('visualizer.string_type')}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ffedd5', border: '1px solid #fb923c' }} />
-                <span>배열</span>
+                <span>{t('visualizer.array_type')}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded" style={{ backgroundColor: '#f3e8ff', border: '1px solid #c084fc' }} />
-                <span>객체</span>
+                <span>{t('visualizer.object_type')}</span>
               </div>
             </>
           )}

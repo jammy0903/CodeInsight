@@ -1,0 +1,74 @@
+{
+  "lessonId": "c-1-1",
+  "title": "Declaration and Memory Allocation",
+  "concept": "The moment you declare a variable, memory space is reserved (but not initialized)",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a;\n\n    printf(\"Value of a: %d\\n\", a);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including the Header File",
+        "explanation": "`#include <stdio.h>` imports declarations for standard I/O functions like `printf`.\n\nJust remember this: without this line, using `printf` will cause a compilation error.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Defining the main Function",
+        "explanation": "`int main()` is the program's entry point. When execution begins, a main stack frame is created, and local variables are stored in this frame.\n\nAt this stage, no local variables have been declared yet, so only the frame exists.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Variable Declaration",
+        "explanation": "`int a;` only reserves memory space without assigning a value.\n\nSo `a` contains a garbage value, and reading it can produce unpredictable results. It's generally safer to initialize at declaration, like `int a = 0;`.",
+        "visualizationType": "cMemory",
+        "code": "int a;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "??? (Garbage)",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "Garbage Value",
+        "explanation": "Printing uninitialized `a` produces different results depending on the execution environment.\n\nThis is Undefined Behavior, and it causes bugs that are extremely hard to debug. The takeaway is simple: always initialize local variables at declaration.",
+        "visualizationType": "terminal",
+        "code": "printf(\"Value of a: %d\\n\", a);",
+        "stdout": "Value of a: 21845 (example, varies per execution)"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When you only declare a variable in C (without initialization), what value does it contain?",
+    "options": [
+      "Always 0",
+      "Always NULL",
+      "Unknown (Garbage Value)",
+      "1"
+    ],
+    "correctIndex": 2,
+    "explanation": "Automatic initialization to zero only happens for global variables and static variables.\nLocal variables inside functions contain garbage values if not explicitly initialized."
+  },
+  "misconceptions": [
+    {
+      "wrong": "All variables start at 0",
+      "correct": "Local variables are never automatically initialized to 0.",
+      "why": "C considers initializing every variable to 0 a waste of performance (C prioritizes performance above all)."
+    }
+  ],
+  "keyTakeaway": "Declaring a variable creates memory space. But the value must be set by you."
+}

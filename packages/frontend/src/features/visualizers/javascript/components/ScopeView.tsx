@@ -9,6 +9,7 @@
 
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -87,6 +88,7 @@ interface VariableChipProps {
 }
 
 const VariableChip = memo(function VariableChip({ variable, isHighlighted }: VariableChipProps) {
+  const { t } = useTranslation();
   const keyword = variable.keyword || 'let';
   const kwColor = KEYWORD_COLORS[keyword] || KEYWORD_COLORS.let;
 
@@ -132,7 +134,7 @@ const VariableChip = memo(function VariableChip({ variable, isHighlighted }: Var
 
       {/* Hoisted indicator */}
       {variable.hoisted && (
-        <span className="text-[10px] text-amber-600 font-medium">↑호이스팅</span>
+        <span className="text-[10px] text-amber-600 font-medium">↑{t('visualizer.hoisting')}</span>
       )}
     </motion.div>
   );
@@ -155,6 +157,7 @@ const ScopeBlock = memo(function ScopeBlock({
   highlightVariable,
   depth,
 }: ScopeBlockProps) {
+  const { t } = useTranslation();
   const colors = SCOPE_COLORS[scope.type] || SCOPE_COLORS.block;
   const isHighlighted = highlightScope === scope.name;
 
@@ -210,7 +213,7 @@ const ScopeBlock = memo(function ScopeBlock({
           </div>
         ) : (
           !scope.children?.length && (
-            <span className="text-xs text-gray-400 italic">(변수 없음)</span>
+            <span className="text-xs text-gray-400 italic">{t('visualizer.no_properties')}</span>
           )
         )}
 
@@ -240,6 +243,7 @@ const ScopeBlock = memo(function ScopeBlock({
 export const ScopeView = memo(function ScopeView({
   scopeState,
 }: ScopeViewProps) {
+  const { t } = useTranslation();
   // Build nested scope tree from flat array
   const scopeTree = useMemo(() => {
     if (!scopeState?.scopes || scopeState.scopes.length === 0) return [];
@@ -267,7 +271,7 @@ export const ScopeView = memo(function ScopeView({
     return (
       <div className="p-4 text-center text-gray-400">
         <span className="text-4xl mb-2 block">🔍</span>
-        <p>스코프 데이터가 없습니다</p>
+        <p>{t('visualizer.scope_no_data')}</p>
       </div>
     );
   }
@@ -277,7 +281,7 @@ export const ScopeView = memo(function ScopeView({
       {/* Header */}
       <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
         <span>🔍</span>
-        <span>JavaScript 스코프: 변수가 어디서 보이는지 확인하세요</span>
+        <span>{t('visualizer.scope_desc')}</span>
       </div>
 
       {/* Scope tree */}
@@ -305,7 +309,7 @@ export const ScopeView = memo(function ScopeView({
                 {kw}
               </span>
               <span>
-                {kw === 'var' ? '함수 스코프' : kw === 'let' ? '블록 스코프' : kw === 'const' ? '블록 스코프 (불변)' : '함수'}
+                {kw === 'var' ? t('visualizer.scope_function') : kw === 'let' ? t('visualizer.scope_block') : kw === 'const' ? t('visualizer.scope_block_immutable') : t('visualizer.scope_function_type')}
               </span>
             </div>
           ))}
