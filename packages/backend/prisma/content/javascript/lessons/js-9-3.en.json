@@ -1,0 +1,93 @@
+{
+  "lessonId": "js-9-3",
+  "title": "WeakMap and Preventing Memory Leaks",
+  "concept": "WeakMap uses 'weak references' to objects, allowing the garbage collector to reclaim them and preventing memory leaks.",
+  "content": {
+    "code": "let user = { name: 'Alice' };\n\n// 1. Regular Map (strong reference)\nconst strongMap = new Map();\nstrongMap.set(user, 'Data');\n\n// 2. WeakMap (weak reference)\nconst weakMap = new WeakMap();\nweakMap.set(user, 'Secret');\n\n// Deleting the user object (breaking the reference)\nuser = null;\n\n// Result:\n// strongMap still holds Alice (memory not freed)\n// weakMap releases Alice (collected by GC)",
+    "steps": [
+      {
+        "title": "Creating the object",
+        "explanation": "The `{ name: 'Alice' }` object is created on the Heap, and the `user` variable points to it.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 1
+            }
+          ]
+        },
+        "code": "let user = { name: 'Alice' };"
+      },
+      {
+        "title": "Strong Map: strong reference",
+        "explanation": "Alice is registered as a key in a regular `Map`.\nThis is a **Strong Reference**.\n\n**What is a strong reference?**\nIt tells the GC: \"I'm watching this — don't ever remove it!\"\nSo even if the `user` variable goes away, Alice stays in memory as long as the Map is alive.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 2,
+              "note": "Ref by user & strongMap"
+            }
+          ]
+        },
+        "code": "strongMap.set(user, 'Data');",
+        "highlightOffset": [
+          -1,
+          0
+        ]
+      },
+      {
+        "title": "WeakMap: weak reference",
+        "explanation": "Alice is also registered in a `WeakMap`.\nBut this uses a **Weak Reference**.\n\n**What is a weak reference?**\nIt says: \"I can see this object, but don't keep it alive just for me.\"\nIf no other variable references Alice, the WeakMap's reference is ignored and GC can collect it.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "weakMap added ref, but it doesn't count for GC"
+        },
+        "code": "weakMap.set(user, 'Secret');",
+        "highlightOffset": [
+          -1,
+          0
+        ]
+      },
+      {
+        "title": "Breaking the reference (user = null)",
+        "explanation": "Setting `user = null` severs the variable's connection to Alice.\nNow only the Maps hold a reference to her.\n\n*   **strongMap**: Holds on tightly — Alice stays in memory.\n(Leak)\n*   **weakMap**: Weak reference only — GC can collect Alice.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 1,
+              "note": "Only strongMap holds it. If strongMap dies, Alice dies."
+            }
+          ]
+        },
+        "code": "user = null;"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Which of the following CANNOT be used as a key in a WeakMap?",
+    "options": [
+      "A DOM element (document.body)",
+      "An empty object ({})",
+      "A string (\"hello\")",
+      "A function (function() {})"
+    ],
+    "correctIndex": 2,
+    "explanation": "WeakMap keys must be reference types (objects).\nPrimitive types like strings and numbers are not managed by GC (Reference Counting), so they cannot serve as weak keys."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can check the size of a WeakMap with WeakMap.size",
+      "correct": "You cannot — there is no size property.",
+      "why": "Because it's impossible to predict when GC will run and collect objects (non-deterministic), counting how many entries remain is not feasible."
+    }
+  ],
+  "keyTakeaway": "Use WeakMap when storing cache or temporary data — it prevents memory leaks by letting GC clean up automatically."
+}

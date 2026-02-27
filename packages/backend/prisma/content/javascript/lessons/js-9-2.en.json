@@ -1,0 +1,136 @@
+{
+  "lessonId": "js-9-2",
+  "title": "Generators",
+  "concept": "A generator is a special function that can pause execution in the middle (Yield) and resume it later (Resume).",
+  "content": {
+    "code": "function* counter() {\n  console.log('Start!');\n  yield 1; // Pause execution (return value 1)\n  console.log('Resumed!');\n  yield 2; // Pause execution (return value 2)\n  console.log('Done!');\n}\n\n// Calling the function doesn't run it — it returns an Iterator (control object)\nconst gen = counter();\n\nconsole.log(gen.next()); // { value: 1, done: false }\nconsole.log(gen.next()); // { value: 2, done: false }\nconsole.log(gen.next()); // { value: undefined, done: true }",
+    "steps": [
+      {
+        "title": "Defining a generator function",
+        "explanation": "The `function*` syntax marks this as a generator function.\n\n**What is a generator?**\nA regular function runs to completion once called (Run-to-completion), but a generator can pause partway through and resume later.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "counter",
+              "value": "GeneratorFunction"
+            }
+          ]
+        },
+        "code": "function* counter() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "title": "Creating the generator object",
+        "explanation": "Calling `counter()` does not run the function body — instead, it returns a **Generator object (Iterator)**.\nThis object gives you control over when the function executes.",
+        "keyInsight": "Calling a generator function = creating an Iterator, not running the function",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "gen",
+              "value": "Generator { status: 'suspended' }"
+            }
+          ]
+        },
+        "code": "const gen = counter();"
+      },
+      {
+        "title": "First next() call",
+        "explanation": "Calling `gen.next()` starts the function for the first time.\n'Start!' is logged, then execution pauses at `yield 1`.\n\n**What is Yield?**\nA keyword that pauses execution — handing control and a value back to the caller while keeping the execution context intact.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "시작!",
+            "{ value: 1, done: false }"
+          ],
+          "heap": [
+            {
+              "address": "0xGen",
+              "content": "Generator { suspended at line 3 }"
+            }
+          ]
+        },
+        "code": "console.log(gen.next()); // { value: 1, done: false }",
+        "highlightOffset": [
+          0,
+          -10,
+          -9
+        ]
+      },
+      {
+        "title": "Second next() call",
+        "explanation": "Calling `gen.next()` again resumes from just after `yield 1`.\n'Resumed!' is logged, then execution pauses again at `yield 2`.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "재개!",
+            "{ value: 2, done: false }"
+          ],
+          "heap": [
+            {
+              "address": "0xGen",
+              "content": "Generator { suspended at line 5 }"
+            }
+          ]
+        },
+        "code": "console.log(gen.next()); // { value: 2, done: false }",
+        "highlightOffset": [
+          0,
+          -9,
+          -8
+        ]
+      },
+      {
+        "title": "Third next() call — completion",
+        "explanation": "The final `gen.next()` call.\n'Done!' is logged, and since there are no more yields, `done: true` is returned.",
+        "keyInsight": "done: true = the generator has finished executing completely",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "끝!",
+            "{ value: undefined, done: true }"
+          ],
+          "heap": [
+            {
+              "address": "0xGen",
+              "content": "Generator { closed }"
+            }
+          ]
+        },
+        "code": "console.log(gen.next()); // { value: undefined, done: true }",
+        "highlightOffset": [
+          0,
+          -8
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What signal indicates that a generator function has fully finished executing?",
+    "options": [
+      "value: null",
+      "done: true",
+      "status: finished",
+      "yield: undefined"
+    ],
+    "correctIndex": 1,
+    "explanation": "When the IteratorResult object `{ value: ..., done: true }` is returned, it means there is no more code left to run."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Generators run concurrently like multiple threads",
+      "correct": "No — they still run on a single thread.",
+      "why": "Generators only pass execution control back and forth (Cooperative Multitasking) — they don't run simultaneously.\nOnly one thing executes at a time."
+    }
+  ],
+  "keyTakeaway": "Because you can pause and resume function execution, generators are useful for writing asynchronous code that reads like synchronous code (e.g., Redux-Saga)."
+}

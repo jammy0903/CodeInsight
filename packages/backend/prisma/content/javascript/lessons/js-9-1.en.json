@@ -1,0 +1,109 @@
+{
+  "lessonId": "js-9-1",
+  "title": "Proxy & Reflect (Metaprogramming)",
+  "concept": "A Proxy acts as an 'Interceptor' that sits in front of a target object, trapping and redefining its fundamental operations.",
+  "content": {
+    "code": "const target = { \n  secret: 'shhh',\n  public: 'hello'\n};\n\nconst handler = {\n  // 1. Trap that intercepts read (Get) operations\n  get(obj, prop) {\n    if (prop === 'secret') {\n      return 'Access Denied!';\n    }\n    // 2. Forward the rest to the original object (Forwarding)\n    return Reflect.get(obj, prop);\n  }\n};\n\n// Creating a Proxy that wraps the original (Target)\nconst proxy = new Proxy(target, handler);\n\nconsole.log(proxy.public); // hello\nconsole.log(proxy.secret); // Access Denied!",
+    "steps": [
+      {
+        "title": "Creating the Target object",
+        "explanation": "This is the original object `target` that will be proxied.\nIt holds the actual data (the Real Subject) that the Proxy will wrap.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xTarget",
+              "content": "{ secret: '...', public: '...' }"
+            }
+          ]
+        },
+        "code": "const target = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "Defining the Handler and Traps",
+        "explanation": "The `handler` object defines the rules of behavior for the Proxy.\nHere, the `get` method is a **Trap**.\n\n**What is a Trap?**\nA method that intercepts a fundamental object operation (read, write, call, etc.) and runs in its place.\nIn this case, it intercepts 'property reads'.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "Handler prepared with 'get' trap"
+        },
+        "code": "const handler = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "title": "Creating the Proxy instance",
+        "explanation": "`new Proxy(target, handler)` creates a proxy that wraps the original object.\nFrom now on, all access goes through this `proxy` object and follows the handler's rules.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "proxy",
+              "value": "→ 0xProxy"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xTarget",
+              "content": "{ ... }"
+            },
+            {
+              "address": "0xProxy",
+              "content": "Proxy(Target, Handler)",
+              "label": "Interceptor"
+            }
+          ]
+        },
+        "code": "const proxy = new Proxy(target, handler);"
+      },
+      {
+        "title": "Accessing properties through the proxy",
+        "explanation": "We access `proxy.public` and `proxy.secret`.\nThe `get` trap intercepts both.\nThe 'public' property is forwarded to the original via Reflect.get (returns 'hello'), while 'secret' returns 'Access Denied!'.\n\n**What is Forwarding?**\nPassing the intercepted operation back to the original object through the `Reflect` API.",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "hello",
+            "Access Denied!"
+          ]
+        },
+        "code": "console.log(proxy.public); // hello",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Which of the following is NOT a valid Trap that can be defined in a Proxy handler?",
+    "options": [
+      "get (property read)",
+      "set (property write)",
+      "construct (new call)",
+      "Direct access to private (#) fields"
+    ],
+    "correctIndex": 3,
+    "explanation": "A Proxy can only intercept public operations on an object (Public Interception).\nIt cannot directly intervene with internal Private (#) fields or internal slots."
+  },
+  "misconceptions": [
+    {
+      "wrong": "A Proxy copies the original object and works on the copy",
+      "correct": "No — it holds a reference to the original and acts as a middleman.",
+      "why": "The Proxy itself stores no data.\nIt's a wrapper that either forwards requests to the original (Target) through the handler, or blocks them."
+    }
+  ],
+  "keyTakeaway": "The 'magic' of modern libraries like Vue 3's reactivity system is built on Proxy."
+}
