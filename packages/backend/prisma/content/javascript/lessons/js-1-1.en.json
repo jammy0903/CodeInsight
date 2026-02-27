@@ -1,0 +1,178 @@
+{
+  "lessonId": "js-1-1",
+  "title": "The Call Stack and Synchronous Execution",
+  "concept": "JavaScript is a single-threaded language that manages function execution through the call stack",
+  "content": {
+    "code": "const log = [];\n\nfunction first() {\n  log.push('first start');\n  second();\n  log.push('first end');\n}\n\nfunction second() {\n  log.push('second');\n}\n\nfirst();\nlog.push('done');\n\nconsole.log(log);",
+    "steps": [
+      {
+        "title": "Initialize Log Array",
+        "explanation": "Create the `log` array.\nWe'll use this array to record the order in which functions execute.",
+        "keyInsight": "The array is stored in the Heap, and the variable holds a reference to that array's address.",
+        "visualizationType": "eventLoop",
+        "code": "const log = [];",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": [],
+          "currentPhase": "idle",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "title": "Call first() — Create Stack Frame",
+        "explanation": "When first() is called, a **stack frame** is created and pushed onto the call stack.\nThis frame holds the function's parameters, local variables, and the **return address**.\n\n**Analogy**: It's like opening a 'first project' folder on your desk.\nOther work is paused for now.",
+        "keyInsight": "Calling a function = creating a stack frame (allocating memory)",
+        "analogy": "It's like opening a 'first project' folder on your desk. Other work is paused for now.",
+        "tip": "If too many frames pile up, you get a **Stack Overflow** error.",
+        "visualizationType": "eventLoop",
+        "code": "first();",
+        "eventLoopState": {
+          "callStack": [
+            "first()"
+          ],
+          "currentPhase": "executing"
+        }
+      },
+      {
+        "title": "Execute log.push('first start')",
+        "explanation": "We've entered the first() function body.\nAdd 'first start' to the `log` array.\nNow log = ['first start'].",
+        "keyInsight": "Array's push() mutates the original array in place.",
+        "visualizationType": "eventLoop",
+        "code": "log.push('first start');",
+        "eventLoopState": {
+          "callStack": [
+            "first()",
+            "log.push()"
+          ]
+        }
+      },
+      {
+        "title": "Call second() — Pushed onto Call Stack",
+        "explanation": "While first() is executing, second() gets called.\nsecond() is pushed on top of the call stack.",
+        "keyInsight": "When a function calls another function, the new function is stacked on top. **The last function called finishes first.**",
+        "analogy": "Imagine a plate for first() with a plate for second() stacked on top. You have to remove the second() plate before you can access the first() plate.",
+        "tip": "**LIFO (Last In First Out)**: The last thing in is the first thing out. This is the fundamental principle of a stack.",
+        "misconception": "Watch out for the parallel execution misconception! second() must completely finish before first() resumes.",
+        "visualizationType": "eventLoop",
+        "code": "second();",
+        "eventLoopState": {
+          "callStack": [
+            "first()",
+            "second()"
+          ]
+        }
+      },
+      {
+        "title": "Execute log.push('second')",
+        "explanation": "Inside second(), log.push('second') executes.\nNow log = ['first start', 'second'].",
+        "keyInsight": "Only the function at the top of the call stack executes. The first() below it is 'waiting'.",
+        "visualizationType": "eventLoop",
+        "code": "log.push('second');",
+        "eventLoopState": {
+          "callStack": [
+            "first()",
+            "second()",
+            "log.push()"
+          ]
+        }
+      },
+      {
+        "title": "second() Ends — Removed from Call Stack",
+        "explanation": "second() has finished and is popped off the call stack.\nfirst() is back on top.",
+        "keyInsight": "When a function ends, it's removed from the call stack. The function below it then resumes execution.",
+        "analogy": "We've removed the second() plate, so now we can access the first() plate.",
+        "tip": "**pop**: removing the top item from a stack. The opposite (adding) is **push**.",
+        "visualizationType": "eventLoop",
+        "code": "}",
+        "occurrence": 2,
+        "eventLoopState": {
+          "callStack": [
+            "first()"
+          ]
+        }
+      },
+      {
+        "title": "Return to first() — log.push('first end')",
+        "explanation": "second() has finished, so first() resumes from where it **left off**.\nlog becomes ['first start', 'second', 'first end'].",
+        "keyInsight": "The call stack remembers where to return after a function call. This is why it's called a 'call stack'.",
+        "tip": "**Return address**: the call stack also stores 'where to go back to' after each call.",
+        "visualizationType": "eventLoop",
+        "code": "log.push('first end');",
+        "eventLoopState": {
+          "callStack": [
+            "first()",
+            "log.push()"
+          ]
+        }
+      },
+      {
+        "title": "first() Ends",
+        "explanation": "first() has also reached its end.\nfirst() is removed from the call stack.\nThe call stack is now empty.",
+        "keyInsight": "Empty call stack = no function executing = program moves on to the next code",
+        "visualizationType": "eventLoop",
+        "code": "}",
+        "eventLoopState": {
+          "callStack": [],
+          "currentPhase": "idle"
+        }
+      },
+      {
+        "title": "log.push('done') — Execute Global Code",
+        "explanation": "The first() call has finished, so the next line executes.\nlog = ['first start', 'second', 'first end', 'done']",
+        "keyInsight": "Synchronous code runs top to bottom, sequentially. If a function is called, execution waits until that function completely finishes.",
+        "analogy": "Like a cooking recipe — one step must finish before moving to the next. You can't do multiple steps at the same time.",
+        "visualizationType": "eventLoop",
+        "code": "log.push('done');",
+        "eventLoopState": {
+          "callStack": [
+            "log.push()"
+          ],
+          "currentPhase": "executing"
+        }
+      },
+      {
+        "title": "Check the Final Result",
+        "explanation": "Print the log array.\nIt's recorded as ['first start', 'second', 'first end', 'done'].\nThis order proves the LIFO behavior of the call stack.",
+        "keyInsight": "'second' was recorded before 'first end' because second() had to completely finish before first() could resume.",
+        "visualizationType": "eventLoop",
+        "code": "console.log(log);",
+        "eventLoopState": {
+          "callStack": [
+            "console.log()"
+          ],
+          "output": [
+            "['first start', 'second', 'first end', 'done']"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "After executing the code below, what is in the log array?\n\nconst log = [];\nfunction a() { log.push(1); b(); log.push(3); }\nfunction b() { log.push(2); }\na();",
+    "options": [
+      "[1, 3, 2]",
+      "[1, 2, 3]",
+      "[2, 1, 3]",
+      "[1, 2, 3] added simultaneously"
+    ],
+    "correctIndex": 1,
+    "explanation": "a() executes and adds 1 → b() is called and pushed onto the call stack → 2 is added → b() ends and a() resumes → 3 is added.\nJavaScript is single-threaded, so 'simultaneously' is impossible."
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript can execute multiple functions at the same time",
+      "correct": "JavaScript is **single-threaded**.\nOnly the function at the top of the call stack executes at any given moment.",
+      "why": "There is only one main thread in the browser.\nWhat looks like simultaneous execution is made possible by the 'event loop', which you'll learn about in the next lesson."
+    },
+    {
+      "wrong": "Calling a function inside a function runs them in parallel",
+      "correct": "No.\nIt's just a 'nested call' — they still execute one at a time, in order.",
+      "why": "The call stack is a **LIFO (Last In First Out)** structure.\nThe function stacked on top (called last) must finish and be removed from the stack before the function below can continue."
+    }
+  ],
+  "keyTakeaway": "Call stack = tracks currently executing functions, single-threaded = one at a time, LIFO = last in first out"
+}

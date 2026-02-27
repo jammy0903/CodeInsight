@@ -1,0 +1,128 @@
+{
+  "lessonId": "js-1-4",
+  "title": "Event Loop: The Full Picture",
+  "concept": "Even in complex async code, you can precisely predict the execution order",
+  "content": {
+    "code": "console.log('1');\n\nsetTimeout(() => console.log('2'), 0);\n\nPromise.resolve()\n  .then(() => console.log('3'))\n  .then(() => console.log('4'));\n\nconsole.log('5');",
+    "steps": [
+      {
+        "title": "Synchronous Code #1",
+        "explanation": "The first synchronous line `console.log('1')` executes.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('1');",
+        "eventLoopState": {
+          "output": [
+            "1"
+          ]
+        }
+      },
+      {
+        "title": "Register setTimeout",
+        "explanation": "The `setTimeout` callback is delegated to the Web API and then moves to the **Task Queue** to wait.",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(() => console.log('2'), 0);",
+        "eventLoopState": {
+          "taskQueue": [
+            "() => log('2')"
+          ]
+        }
+      },
+      {
+        "title": "Register the First .then",
+        "explanation": "The callback from the first `.then()` is added to the **Microtask Queue**.",
+        "visualizationType": "eventLoop",
+        "code": "Promise.resolve()",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "eventLoopState": {
+          "microtaskQueue": [
+            "() => log('3')"
+          ]
+        }
+      },
+      {
+        "title": "Synchronous Code #2",
+        "explanation": "The last synchronous line `console.log('5')` executes.\nAll synchronous code is now complete and the call stack is empty.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('5');",
+        "eventLoopState": {
+          "output": [
+            "1",
+            "5"
+          ]
+        }
+      },
+      {
+        "title": "Microtask #1 Executes",
+        "explanation": "With the call stack empty, the event loop checks the Microtask Queue first.\nThe first callback runs and prints '3'. The Promise it returns causes the next `.then` callback to be **newly added** to the Microtask Queue.",
+        "keyInsight": "Promise chaining adds new Microtasks to the queue.",
+        "visualizationType": "eventLoop",
+        "code": ".then(() => console.log('3'))",
+        "eventLoopState": {
+          "microtaskQueue": [
+            "() => log('4')"
+          ],
+          "output": [
+            "1",
+            "5",
+            "3"
+          ]
+        }
+      },
+      {
+        "title": "Microtask #2 Executes",
+        "explanation": "The event loop keeps checking the Microtask Queue until it's completely empty.\nThe newly added second callback runs and prints '4'.",
+        "visualizationType": "eventLoop",
+        "code": ".then(() => console.log('4'));",
+        "eventLoopState": {
+          "microtaskQueue": [],
+          "output": [
+            "1",
+            "5",
+            "3",
+            "4"
+          ]
+        }
+      },
+      {
+        "title": "Task Executes",
+        "explanation": "Only once the Microtask Queue is finally empty does the event loop check the Task Queue.\nThe `setTimeout` callback runs and prints '2' last.",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(() => console.log('2'), 0);",
+        "eventLoopState": {
+          "taskQueue": [],
+          "output": [
+            "1",
+            "5",
+            "3",
+            "4",
+            "2"
+          ],
+          "microtaskQueue": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the output order of the following code?\n\nsetTimeout(() => console.log('A'), 0);\nPromise.resolve().then(() => {\n  console.log('B');\n  Promise.resolve().then(() => console.log('C'));\n});\nconsole.log('D');",
+    "options": [
+      "D → B → A → C",
+      "D → B → C → A",
+      "D → A → B → C",
+      "A → D → B → C"
+    ],
+    "correctIndex": 1,
+    "explanation": "1) Synchronous: print D\n2) Microtask: print B, add new Microtask (C)\n3) New Microtask: print C (keeps running until Microtask Queue is empty)\n4) Task: print A"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Microtasks run one at a time and then hand off to Tasks",
+      "correct": "The event loop keeps running Microtasks until the Microtask Queue is **completely empty (0 items)**.",
+      "why": "While you're in line, a new friend (Promise chaining) can jump right behind you in that same line.\nOnly when that entire line is gone can the process move on to the next stage (Rendering, Task Queue, etc.)."
+    }
+  ],
+  "keyTakeaway": "Execution priority: synchronous code > Microtask (Promise) > Task (setTimeout)"
+}

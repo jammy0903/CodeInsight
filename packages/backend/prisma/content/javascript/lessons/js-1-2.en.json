@@ -1,0 +1,104 @@
+{
+  "lessonId": "js-1-2",
+  "title": "setTimeout and the Task Queue",
+  "concept": "Even setTimeout(fn, 0) doesn't run immediately. It passes through the Web API into the Task Queue",
+  "content": {
+    "code": "console.log('start');\n\nsetTimeout(() => {\n  console.log('timeout');\n}, 0);\n\nconsole.log('end');",
+    "steps": [
+      {
+        "title": "Execute console.log('start')",
+        "explanation": "The program starts and the first synchronous line, `console.log('start')`, is added to the call stack and immediately executes.\n'start' is printed.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('start');",
+        "eventLoopState": {
+          "callStack": [
+            "console.log('start')"
+          ],
+          "output": [
+            "start"
+          ]
+        }
+      },
+      {
+        "title": "Delegating setTimeout",
+        "explanation": "When the JS engine encounters `setTimeout`, it delegates the timer setup and the callback function to the browser's Web API.\nThe JS engine doesn't wait for the timer — it moves on to the next line immediately.\n\n**Analogy**: It's like placing an order at a restaurant (setTimeout), getting a buzzer (callback), and sitting down to do other things (executing the next code) while the kitchen (Web API) prepares your food. The buzzer rings when the food is ready.",
+        "keyInsight": "The JavaScript engine doesn't count the timer itself — it hands that off to the browser.",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(() => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [
+            {
+              "name": "setTimeout callback",
+              "delay": 0
+            }
+          ]
+        }
+      },
+      {
+        "title": "Execute console.log('end')",
+        "explanation": "Because `setTimeout` was handed off to the Web API, the main thread doesn't block — it immediately executes the next synchronous line, `console.log('end')`.\n'end' is printed.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('end');",
+        "eventLoopState": {
+          "callStack": [
+            "console.log('end')"
+          ],
+          "webApis": [],
+          "taskQueue": [
+            "setTimeout callback"
+          ],
+          "output": [
+            "start",
+            "end"
+          ]
+        }
+      },
+      {
+        "title": "Execute the Callback",
+        "explanation": "Once all synchronous code has run and the call stack is empty, the event loop picks up the `setTimeout` callback from the Task Queue and pushes it onto the call stack.\nOnly now does `console.log('timeout')` inside the callback execute.",
+        "keyInsight": "Async callbacks always run after all synchronous code has finished.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('timeout');",
+        "eventLoopState": {
+          "callStack": [
+            "() => { ... }",
+            "console.log('timeout')"
+          ],
+          "taskQueue": [],
+          "output": [
+            "start",
+            "end",
+            "timeout"
+          ],
+          "webApis": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the output order of setTimeout(() => console.log('A'), 0) and console.log('B')?",
+    "options": [
+      "A → B (setTimeout is 0ms so it goes first)",
+      "B → A (synchronous code goes first)",
+      "Printed at the same time",
+      "Random order"
+    ],
+    "correctIndex": 1,
+    "explanation": "Even setTimeout(fn, 0) goes through the Web API → Task Queue pipeline.\nOnly after all synchronous code (console.log('B')) has run does the Task Queue callback execute."
+  },
+  "misconceptions": [
+    {
+      "wrong": "setTimeout(fn, 0) executes immediately",
+      "correct": "No.\nAfter 0ms it simply enters the 'Task Queue' — it still has to wait.",
+      "why": "**Run-to-Completion**: The event loop cannot push any new work onto the stack until every piece of code currently on the stack has **completely finished**.\nEven 0ms means 'later'."
+    }
+  ],
+  "keyTakeaway": "setTimeout = registered with Web API → goes to Task Queue when timer fires → runs when call stack is empty"
+}
