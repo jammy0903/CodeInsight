@@ -8,17 +8,17 @@
 
 ### GitHub 정리
 - [x] README 데모 GIF 교체 (9.9MB 최적화본으로) — 2026-02-27
-- [ ] CONTRIBUTING.md 작성 (기여 방법 안내)
-- [ ] GitHub Issues 템플릿 추가 (bug report, feature request)
-- [ ] GitHub Discussions 활성화
-- [ ] Topics 태그 추가: `education`, `visualization`, `code-learning`, `c`, `python`, `javascript`, `java`
-- [ ] Repository Description 한/영 작성
+- [x] CONTRIBUTING.md 작성 (기여 방법 안내) — 이미 존재
+- [x] GitHub Issues 템플릿 추가 (bug report, feature request) — 이미 존재
+- [x] GitHub Discussions 활성화 — 2026-02-27
+- [x] Topics 태그 추가 (education, visualization, code-learning, python, java 등 10개) — 2026-02-27
+- [x] Repository Description 영문 작성 — 2026-02-27
 
 ### 코드 정리
 - [x] 죽은 코드 삭제 — 2026-02-27
   - `WeekdayChart.tsx` (import 0개)
   - `stories/` 폴더 전체 (Storybook 미사용, 27파일 849줄)
-- [ ] `.env.example` 최신화 (모든 필수 변수 설명 포함)
+- [x] `.env.example` 최신화 (Firebase Client 변수, CORS 추가) — 2026-02-27
 - [ ] 로컬 실행 테스트 (새 클론 기준으로 Getting Started 검증)
 
 ### 법적 준비
