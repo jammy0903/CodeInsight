@@ -1,0 +1,304 @@
+{
+  "lessonId": "js-2-3",
+  "title": "Hoisting",
+  "concept": "JavaScript pulls variable and function declarations to the top of their scope (hoisting)",
+  "content": {
+    "code": "var message = 'Hello';\n\nfunction greet() {\n  console.log(inner);\n  var inner = 'World';\n  console.log(inner);\n  return message + ' ' + inner;\n}\n\nvar result = greet();\nconsole.log(result);",
+    "steps": [
+      {
+        "title": "Global Variable Declaration",
+        "explanation": "`var message = 'Hello'` executes.\nvar has **function scope** and is hoisted.",
+        "keyInsight": "Before running your code, the JS engine pulls all var declarations to the top of their scope.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "message"
+        },
+        "code": "var message = 'Hello';"
+      },
+      {
+        "title": "Call the greet() Function",
+        "explanation": "Call the `greet()` function.\nA function scope is created and the var declarations inside the function are **hoisted**.",
+        "keyInsight": "When a function is called, all var variables inside it are first initialized to undefined.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                },
+                {
+                  "name": "result",
+                  "value": "undefined",
+                  "keyword": "var"
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "undefined",
+                  "keyword": "var",
+                  "hoisted": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "greet()"
+        },
+        "code": "var result = greet();"
+      },
+      {
+        "title": "Verify Hoisting — Output undefined",
+        "explanation": "`console.log(inner)` executes.\ninner hasn't been assigned yet, but thanks to **hoisting**, it outputs `undefined` without an error.",
+        "keyInsight": "var hoists only the declaration; the assignment runs at its original location. That's why it's undefined!",
+        "analogy": "It's like putting a name tag 'inner' on a desk first (declaration), then putting contents in later (assignment).",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "undefined",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "undefined"
+          ]
+        },
+        "code": "console.log(inner);"
+      },
+      {
+        "title": "Execute the Actual Assignment",
+        "explanation": "The assignment part of `var inner = 'World'` executes.\nNow inner = 'World'.",
+        "keyInsight": "Hoisting only lifts the declaration. The assignment (= 'World') runs at its original location.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "'World'",
+                  "keyword": "var",
+                  "changed": true
+                }
+              ]
+            }
+          ]
+        },
+        "code": "var inner = 'World';"
+      },
+      {
+        "title": "Check the Value After Assignment",
+        "explanation": "`console.log(inner)` executes.\nThis time, 'World' is printed.",
+        "keyInsight": "The same variable has different values depending on where in the code you access it. That's the hoisting trap!",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "'World'",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "undefined",
+            "'World'"
+          ]
+        },
+        "code": "console.log(inner);",
+        "occurrence": 2
+      },
+      {
+        "title": "Return the Result",
+        "explanation": "Returns `message + ' ' + inner`.\nThis becomes 'Hello World'.",
+        "keyInsight": "message comes from the global scope, inner comes from the function scope (scope chain).",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "'World'",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            }
+          ]
+        },
+        "code": "return message + ' ' + inner;"
+      },
+      {
+        "title": "Assign to result",
+        "explanation": "'Hello World' returned by greet() is stored in the result variable.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                },
+                {
+                  "name": "result",
+                  "value": "'Hello World'",
+                  "keyword": "var",
+                  "changed": true
+                }
+              ]
+            }
+          ]
+        },
+        "code": "var result = greet();"
+      },
+      {
+        "title": "Print the Final Result",
+        "explanation": "Print result.\n'Hello World' is output.",
+        "keyInsight": "Because of hoisting, the first console.log printed undefined, and the second printed 'World'.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                },
+                {
+                  "name": "result",
+                  "value": "'Hello World'",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "undefined",
+            "'World'",
+            "'Hello World'"
+          ]
+        },
+        "code": "console.log(result);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What does the first console.log print in the following code?\n\nfunction test() {\n  console.log(x);\n  var x = 10;\n}\ntest();",
+    "options": [
+      "10",
+      "undefined",
+      "A ReferenceError occurs",
+      "null"
+    ],
+    "correctIndex": 1,
+    "explanation": "The declaration of var x is hoisted to the top of the function and initialized to undefined.\nThe assignment (= 10) runs at its original position, so the first console.log prints undefined."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Hoisting physically moves code to the top of the file",
+      "correct": "The code doesn't actually move.\nThe JS engine simply processes declarations first before executing.",
+      "why": "During the compilation phase, declarations are registered in memory. During the execution phase, assignments are performed.\nThe code itself doesn't change."
+    },
+    {
+      "wrong": "let and const are hoisted just like var",
+      "correct": "let/const are also hoisted, but the TDZ (Temporal Dead Zone) causes an error if you access them before their declaration.",
+      "why": "Accessing let/const before their declaration throws a ReferenceError.\nThis is a key difference from var."
+    }
+  ],
+  "keyTakeaway": "var: only the declaration is hoisted (undefined), assignment runs at original location. let/const: TDZ causes an error on access before declaration."
+}

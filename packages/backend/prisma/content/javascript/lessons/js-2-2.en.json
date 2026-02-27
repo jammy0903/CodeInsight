@@ -1,0 +1,322 @@
+{
+  "lessonId": "js-2-2",
+  "title": "Function Scope vs Block Scope",
+  "concept": "var only recognizes functions as scope boundaries, while let/const recognize every block",
+  "content": {
+    "code": "function example() {\n  var x = 1;\n  let y = 2;\n\n  if (true) {\n    var x = 10;\n    let y = 20;\n    console.log('inside:', x, y);\n  }\n\n  console.log('outside:', x, y);\n}\n\nexample();",
+    "steps": [
+      {
+        "title": "Call example() Function",
+        "explanation": "When the example function is called, a new function scope is created.",
+        "keyInsight": "Calling a function = creating a new scope",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": []
+            },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": []
+            }
+          ],
+          "highlightScope": "example()"
+        },
+        "code": "example();"
+      },
+      {
+        "title": "var x = 1",
+        "explanation": "x declared with var is registered in the function scope.",
+        "keyInsight": "var registers the variable in the nearest function scope.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": []
+            },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "x",
+                  "value": 1,
+                  "keyword": "var"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "example()",
+          "highlightVariable": "x"
+        },
+        "code": "var x = 1;"
+      },
+      {
+        "title": "let y = 2",
+        "explanation": "y declared with let is also registered in the current block (the function block).",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": []
+            },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "x",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "y",
+                  "value": 2,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "example()",
+          "highlightVariable": "y"
+        },
+        "code": "let y = 2;"
+      },
+      {
+        "title": "Enter if Block",
+        "explanation": "We enter the if block.\nA new block scope is created.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": []
+            },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "x",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "y",
+                  "value": 2,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": []
+            }
+          ],
+          "highlightScope": "if Block"
+        },
+        "code": "if (true) {"
+      },
+      {
+        "title": "var x = 10 (Rises to Function Scope)",
+        "explanation": "var ignores blocks! It overwrites x in the function scope, not the if block.\n\n**Analogy**: var is like an elevator — it ignores the block floors and shoots straight up to the function floor.",
+        "keyInsight": "var punches through the block and reaches the function scope.",
+        "analogy": "var is like an elevator — it ignores block floors and shoots straight up to the function floor.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": []
+            },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "x",
+                  "value": 10,
+                  "keyword": "var",
+                  "changed": true
+                },
+                {
+                  "name": "y",
+                  "value": 2,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": []
+            }
+          ],
+          "highlightScope": "example()",
+          "highlightVariable": "x"
+        },
+        "code": "var x = 10;"
+      },
+      {
+        "title": "let y = 20 (New Variable in Block Scope)",
+        "explanation": "let is block-scoped.\nA new y is created inside the if block.",
+        "keyInsight": "let uses the stairs — it stays in the current block.",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": []
+            },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "x",
+                  "value": 10,
+                  "keyword": "var"
+                },
+                {
+                  "name": "y",
+                  "value": 2,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [
+                {
+                  "name": "y",
+                  "value": 20,
+                  "keyword": "let",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "if Block",
+          "highlightVariable": "y"
+        },
+        "code": "let y = 20;"
+      },
+      {
+        "title": "Print Inside Block",
+        "explanation": "x references the function scope (10), y references the block scope (20).",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": []
+            },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "x",
+                  "value": 10,
+                  "keyword": "var",
+                  "accessed": true
+                },
+                {
+                  "name": "y",
+                  "value": 2,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [
+                {
+                  "name": "y",
+                  "value": 20,
+                  "keyword": "let",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "inside: 10 20"
+          ]
+        },
+        "code": "console.log('inside:', x, y);"
+      },
+      {
+        "title": "Print After Block Ends",
+        "explanation": "When the if block ends, the block-scoped y (20) is gone.\nOnly the function-scoped variables remain.",
+        "keyInsight": "x is 10 (var overwrote it), y is 2 (the block's y is gone)",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": []
+            },
+            {
+              "name": "example()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "x",
+                  "value": 10,
+                  "keyword": "var",
+                  "accessed": true
+                },
+                {
+                  "name": "y",
+                  "value": 2,
+                  "keyword": "let",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "inside: 10 20",
+            "outside: 10 2"
+          ]
+        },
+        "code": "console.log('outside:', x, y);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What is the output of the following code?\n\nfunction test() {\n  if (true) {\n    var a = 1;\n    let b = 2;\n  }\n  console.log(a);\n  console.log(b);\n}",
+    "options": [
+      "1, 2",
+      "1, ReferenceError",
+      "ReferenceError, 2",
+      "ReferenceError, ReferenceError"
+    ],
+    "correctIndex": 1,
+    "explanation": "var a has function scope, so it can be accessed outside the block (prints 1).\nlet b has block scope, so accessing it outside the block throws a ReferenceError."
+  },
+  "misconceptions": [
+    {
+      "wrong": "var declared inside a block is only valid inside that block",
+      "correct": "var ignores blocks and registers itself in the nearest **function environment**.",
+      "why": "Before executing code (during the creation phase), the JS engine finds all var declarations and registers them at the top of the function scope (hoisting)."
+    }
+  ],
+  "keyTakeaway": "var = climbs up to the function, let/const = stays in the current block"
+}

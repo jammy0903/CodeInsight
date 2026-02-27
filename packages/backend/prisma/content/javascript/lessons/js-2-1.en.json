@@ -1,0 +1,392 @@
+{
+  "lessonId": "js-2-1",
+  "title": "var vs let vs const",
+  "concept": "var, let, and const each follow different scope rules",
+  "content": {
+    "code": "var a = 1;\nlet b = 2;\nconst c = 3;\n\nif (true) {\n  var a = 10;\n  let b = 20;\n  const c = 30;\n  console.log(a, b, c);\n}\n\nconsole.log(a, b, c);",
+    "steps": [
+      {
+        "title": "var a = 1 (Global Declaration)",
+        "explanation": "A variable declared with var has function scope.\nSince we're at the global level here, it becomes a global variable.",
+        "keyInsight": "var is function-scoped. It ignores blocks ({}).",
+        "visualizationType": "scope",
+        "code": "var a = 1;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "a"
+        }
+      },
+      {
+        "title": "let b = 2 (Global Declaration)",
+        "explanation": "A variable declared with let has block scope.\nWe're currently in the global block.",
+        "keyInsight": "let is block-scoped. It's only valid within the nearest enclosing {}.",
+        "visualizationType": "scope",
+        "code": "let b = 2;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "b"
+        }
+      },
+      {
+        "title": "const c = 3 (Global Declaration)",
+        "explanation": "const is also block-scoped.\nIt behaves like let but cannot be reassigned.",
+        "keyInsight": "const = let + no reassignment",
+        "visualizationType": "scope",
+        "code": "const c = 3;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "c"
+        }
+      },
+      {
+        "title": "Enter if Block",
+        "explanation": "We enter the if block.\nA new block scope is created.",
+        "keyInsight": "Every {} creates a new block scope.",
+        "visualizationType": "scope",
+        "code": "if (true) {",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": []
+            }
+          ],
+          "highlightScope": "if Block",
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "var a = 10 (The Limit of Function Scope)",
+        "explanation": "var treats blocks ({}) as invisible.\nIt registers the variable in the nearest **function scope** or **global scope** that wraps it.\n\n**Analogy**: Imagine smoking (var) inside a hotel room (block) — the smoke seeps through the walls all the way into the hotel lobby (global scope).",
+        "keyInsight": "var ignores block boundaries and climbs upward (related to Hoisting).",
+        "analogy": "Imagine smoking (var) inside a hotel room (block) — the smoke seeps through the walls all the way into the hotel lobby (global scope).",
+        "visualizationType": "scope",
+        "code": "var a = 10;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "changed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": []
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "a"
+        }
+      },
+      {
+        "title": "let b = 20 (Inside the Block)",
+        "explanation": "let is block-scoped.\nA new b is created inside the if block.\nThis is a completely different variable from the global b!",
+        "keyInsight": "The let b inside the block and the let b in global scope are entirely different variables.",
+        "visualizationType": "scope",
+        "code": "let b = 20;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "if Block",
+          "highlightVariable": "b"
+        }
+      },
+      {
+        "title": "const c = 30 (Inside the Block)",
+        "explanation": "const is also block-scoped.\nA new c is created inside the if block.",
+        "visualizationType": "scope",
+        "code": "const c = 30;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 30,
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "c"
+        }
+      },
+      {
+        "title": "console.log Inside the Block",
+        "explanation": "Print a, b, c from inside the block.\na comes from the global scope (10), while b and c come from the block scope (20, 30).",
+        "keyInsight": "JavaScript looks for a variable in the nearest scope first.",
+        "visualizationType": "scope",
+        "code": "console.log(a, b, c);",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "accessed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let",
+                  "accessed": true
+                },
+                {
+                  "name": "c",
+                  "value": 30,
+                  "keyword": "const",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "10 20 30"
+          ],
+          "highlightScope": null,
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "console.log After the Block Ends",
+        "explanation": "When the block ends, the block-scoped variables (let b, const c) are gone.\nOnly global variables remain.",
+        "keyInsight": "a is 10 (var overwrote the global), b is 2, c is 3 (block variables are gone)",
+        "misconception": "It's easy to assume var a would only be 10 inside the block. In reality, the global a itself was changed!",
+        "visualizationType": "scope",
+        "code": "console.log(a, b, c);",
+        "occurrence": 2,
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "accessed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let",
+                  "accessed": true
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "10 20 30",
+            "10 2 3"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the output of the following code?\n\nlet x = 1;\nif (true) {\n  var x = 2;\n}\nconsole.log(x);",
+    "options": [
+      "1",
+      "2",
+      "An error occurs",
+      "undefined"
+    ],
+    "correctIndex": 2,
+    "explanation": "Declaring var x in the same scope where let x is already declared causes a SyntaxError.\nBecause var ignores the block, it tries to redeclare x in the global scope, which conflicts with the let declaration."
+  },
+  "misconceptions": [
+    {
+      "wrong": "var is also only valid inside its block",
+      "correct": "var only follows **function scope**.\nIt ignores if/for blocks and can accidentally behave like a global variable.",
+      "why": "It's a relic from the early days of JavaScript design.\nBecause it's the main culprit of unintended global variable overwrites, modern JS avoids it."
+    },
+    {
+      "wrong": "let and const are the same thing",
+      "correct": "Both are block-scoped, but const cannot be reassigned.",
+      "why": "const is the keyword for constants.\nHowever, the properties of an object declared with const can still be changed."
+    }
+  ],
+  "keyTakeaway": "var = function scope (ignores blocks), let/const = block scope"
+}
