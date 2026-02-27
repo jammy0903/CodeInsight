@@ -15,7 +15,7 @@ import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarCha
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '@/stores/store';
-import { logout, loginWithGoogle, loginWithKakao } from '@/services/firebase';
+import { logout, loginWithGoogle } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
 import { ReportModal } from '@/components/ReportModal';
 import { logger } from '@/utils/logger';
@@ -65,13 +65,6 @@ export function Sidebar() {
     }
   };
 
-  const handleKakaoLogin = async () => {
-    try {
-      await loginWithKakao();
-    } catch (error) {
-      logger.error('Kakao login failed:', error);
-    }
-  };
 
   return (
     <AnimatePresence>
@@ -400,34 +393,6 @@ export function Sidebar() {
                       />
                     </svg>
                     {t('auth.login_google')}
-                  </motion.button>
-
-                  {/* 카카오 로그인 */}
-                  <motion.button
-                    onClick={handleKakaoLogin}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border rounded-lg transition-colors"
-                    style={{
-                      color: 'var(--theme-sidebar-kakao-btn-text)',
-                      backgroundColor: 'var(--theme-sidebar-kakao-btn-bg)',
-                      borderColor: 'var(--theme-sidebar-kakao-btn-border)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-kakao-btn-hover-bg)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-kakao-btn-bg)';
-                    }}
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path
-                        fill="var(--theme-sidebar-kakao-btn-text)"
-                        d="M12 3C6.477 3 2 6.463 2 10.691c0 2.693 1.775 5.063 4.445 6.412-.144.523-.926 3.369-.963 3.592 0 0-.02.166.088.229.108.063.235.015.235.015.31-.043 3.593-2.363 4.159-2.771.339.047.686.071 1.036.071 5.523 0 10-3.463 10-7.548C22 6.463 17.523 3 12 3z"
-                      />
-                    </svg>
-                    {t('auth.login_kakao')}
                   </motion.button>
 
                   <p className="text-xs text-center pt-1" style={{ color: 'var(--theme-sidebar-copyright-text)' }}>

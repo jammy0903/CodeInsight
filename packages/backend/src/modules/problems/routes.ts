@@ -43,9 +43,17 @@ export const problemRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
   }, async (request, reply) => {
+    const { id } = request.params;
+
+    // Validate UUID format to avoid Prisma throwing on invalid UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return reply.status(400).send({ error: 'Invalid problem ID format' });
+    }
+
     try {
       const problem = await prisma.problem.findUnique({
-        where: { id: request.params.id }
+        where: { id }
       });
 
       if (!problem) {
