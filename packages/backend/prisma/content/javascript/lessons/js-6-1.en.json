@@ -1,0 +1,176 @@
+{
+  "lessonId": "js-6-1",
+  "title": "Prototype Chain",
+  "concept": "Objects are linked via [[Prototype]], and property lookups traverse the chain upward",
+  "content": {
+    "code": "const animal = {\n  eat() { return 'eating'; }\n};\n\nconst dog = {\n  bark() { return 'woof!'; }\n};\n\nObject.setPrototypeOf(dog, animal);\n\nconsole.log(dog.bark());\nconsole.log(dog.eat());\nconsole.log(dog.toString());",
+    "steps": [
+      {
+        "title": "animal object (shared method)",
+        "explanation": "Creating the animal object.\nThe `eat` method here will be borrowed later by `dog`.\nInstead of each object copying the method, they **share** one instance to save memory.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ]
+        },
+        "code": "const animal = {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "Creating the dog object",
+        "explanation": "Creating the dog object with a bark method.\nNot yet connected to animal.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            },
+            {
+              "name": "dog",
+              "props": [
+                "bark()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ]
+        },
+        "code": "const dog = {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "Linking the prototype",
+        "explanation": "Setting dog's [[Prototype]] to animal.\nNow the chain dog → animal → Object.prototype is established.",
+        "keyInsight": "[[Prototype]] = the inheritance link between objects",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "dog",
+              "props": [
+                "bark()"
+              ],
+              "proto": "animal"
+            },
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            },
+            {
+              "name": "Object.prototype",
+              "props": [
+                "toString()"
+              ],
+              "proto": "null"
+            }
+          ],
+          "chain": [
+            "dog",
+            "animal",
+            "Object.prototype",
+            "null"
+          ]
+        },
+        "code": "Object.setPrototypeOf(dog, animal);"
+      },
+      {
+        "title": "Calling its own method",
+        "explanation": "dog.bark() is found directly on dog itself, so it's returned immediately.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": {
+            "property": "bark",
+            "found": "dog",
+            "steps": 1
+          },
+          "output": [
+            "woof!"
+          ]
+        },
+        "code": "console.log(dog.bark());"
+      },
+      {
+        "title": "Searching up the prototype chain",
+        "explanation": "dog.eat() isn't on dog, so the chain is traversed and eat is found on animal.",
+        "keyInsight": "If a property isn't found, the lookup walks up the [[Prototype]] chain",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": {
+            "property": "eat",
+            "found": "animal",
+            "steps": 2
+          },
+          "output": [
+            "woof!",
+            "eating"
+          ]
+        },
+        "code": "console.log(dog.eat());"
+      },
+      {
+        "title": "Searching all the way to Object.prototype",
+        "explanation": "toString() isn't on dog or animal, so it's found at Object.prototype.",
+        "keyInsight": "Every object ultimately inherits from Object.prototype",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": {
+            "property": "toString",
+            "found": "Object.prototype",
+            "steps": 3
+          },
+          "output": [
+            "woof!",
+            "eating",
+            "[object Object]"
+          ]
+        },
+        "code": "console.log(dog.toString());"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What happens when you call dog.fly()?",
+    "options": [
+      "Returns undefined",
+      "Returns null",
+      "TypeError: dog.fly is not a function",
+      "Returns an empty string"
+    ],
+    "correctIndex": 2,
+    "explanation": "Searching to the end of the chain (null) without finding fly yields undefined.\nCalling undefined() throws a TypeError."
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript is class-based like Java or C++",
+      "correct": "Even with the ES6 class keyword, JavaScript works internally through **prototypes (links between objects)**.",
+      "why": "Where classes stamp out copies from a blueprint, prototypes delegate to a parent object."
+    },
+    {
+      "wrong": "__proto__ is a standard property",
+      "correct": "Most browsers support it, but the official recommendation is to use `Object.getPrototypeOf()`.",
+      "why": "__proto__ should be avoided due to performance concerns and compatibility issues."
+    }
+  ],
+  "keyTakeaway": "Prototype chain = property lookup path; if not found, walk up the chain"
+}

@@ -1,0 +1,206 @@
+{
+  "lessonId": "js-6-2",
+  "title": "Constructor Functions and Inheritance",
+  "concept": "A constructor function's prototype property becomes the [[Prototype]] of objects created with new",
+  "content": {
+    "code": "function Animal(name) {\n  this.name = name;\n}\nAnimal.prototype.eat = function() {\n  return this.name + ' eats';\n};\n\nfunction Dog(name) {\n  Animal.call(this, name);\n}\nDog.prototype = Object.create(Animal.prototype);\nDog.prototype.constructor = Dog;\nDog.prototype.bark = function() {\n  return 'Woof!';\n};\n\nconst buddy = new Dog('Buddy');\nconsole.log(buddy.name);\nconsole.log(buddy.eat());\nconsole.log(buddy.bark());",
+    "steps": [
+      {
+        "title": "Adding a method to Animal.prototype",
+        "explanation": "Adding the `eat` method to `Animal.prototype`.\nAll instances of `Animal` will share this `eat` method through the prototype chain.",
+        "keyInsight": "Adding a method to prototype = all instances share it",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "constructor",
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ]
+        },
+        "code": "Animal.prototype.eat = function() {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "Dog constructor + calling the parent constructor",
+        "explanation": "Inside the `Dog` constructor, we call `Animal.call(this, name)`.\nThis passes the new object (`this`) to the `Animal` constructor, initializing the `name` property — the same role as `super()` in a class.",
+        "keyInsight": "Animal.call(this) = running the parent constructor (acts like super())",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "functions": [
+            {
+              "name": "Animal",
+              "prototype": "Animal.prototype"
+            },
+            {
+              "name": "Dog",
+              "prototype": "Dog.prototype"
+            }
+          ]
+        },
+        "code": "function Dog(name) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "Connecting the prototype chain",
+        "explanation": "`Object.create(Animal.prototype)` creates a new empty object whose prototype is `Animal.prototype`, and assigns it to `Dog.prototype`.\nThis establishes the inheritance relationship between `Dog` and `Animal`.",
+        "keyInsight": "Object.create(Parent.prototype) = connecting the inheritance chain",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "Dog.prototype",
+              "props": [],
+              "proto": "Animal.prototype"
+            },
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ],
+          "chain": [
+            "Dog.prototype",
+            "Animal.prototype",
+            "Object.prototype"
+          ]
+        },
+        "code": "Dog.prototype = Object.create(Animal.prototype);",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "Adding a method to Dog.prototype",
+        "explanation": "Adding the `bark` method to `Dog.prototype`.\nNow instances of `Dog` can use both `bark` and `eat`.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "Dog.prototype",
+              "props": [
+                "constructor",
+                "bark()"
+              ],
+              "proto": "Animal.prototype"
+            }
+          ]
+        },
+        "code": "Dog.prototype.bark = function() {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "Creating an instance",
+        "explanation": "Creating the `buddy` instance with `new Dog('Buddy')`.\nDuring creation, `Animal.call` runs so `buddy.name` is set to 'Buddy', and `buddy`'s `[[Prototype]]` points to `Dog.prototype`.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "buddy",
+              "props": [
+                "name: 'Buddy'"
+              ],
+              "proto": "Dog.prototype"
+            },
+            {
+              "name": "Dog.prototype",
+              "props": [
+                "constructor",
+                "bark()"
+              ],
+              "proto": "Animal.prototype"
+            },
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ],
+          "chain": [
+            "buddy",
+            "Dog.prototype",
+            "Animal.prototype",
+            "Object.prototype"
+          ]
+        },
+        "code": "const buddy = new Dog('Buddy');"
+      },
+      {
+        "title": "Accessing its own property",
+        "explanation": "Looking up `buddy.name`.\nThe `name` property exists directly on `buddy`, so 'Buddy' is returned immediately.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy"
+          ]
+        },
+        "code": "console.log(buddy.name);"
+      },
+      {
+        "title": "Calling a parent prototype method",
+        "explanation": "Looking up `buddy.eat()`.\nIt's not on `buddy` itself, so the chain is traversed and `eat` is found on `Animal.prototype`.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats"
+          ]
+        },
+        "code": "console.log(buddy.eat());"
+      },
+      {
+        "title": "Calling a child prototype method",
+        "explanation": "Looking up `buddy.bark()`.\nIt's not on `buddy`, but `bark` is found on `Dog.prototype` (the next step in the chain).",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats",
+            "Woof!"
+          ]
+        },
+        "code": "console.log(buddy.bark());"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What happens if you leave out Dog.prototype.constructor = Dog;?",
+    "options": [
+      "An error is thrown",
+      "buddy.constructor points to Animal",
+      "Inheritance stops working",
+      "No effect at all"
+    ],
+    "correctIndex": 1,
+    "explanation": "When you create a new object with Object.create(), it has no constructor property.\nThe chain is then traversed to find Animal.prototype.constructor (= Animal)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Setting Dog.prototype = Animal.prototype achieves inheritance",
+      "correct": "This makes Dog.prototype and Animal.prototype the same object.\nAny method added to Dog also gets added to Animal.",
+      "why": "You must use Object.create() to create a new intermediate object and link it."
+    }
+  ],
+  "keyTakeaway": "Constructor inheritance = Animal.call(this) + Object.create(Animal.prototype)"
+}

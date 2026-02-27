@@ -1,0 +1,149 @@
+{
+  "lessonId": "js-6-3",
+  "title": "ES6 Classes",
+  "concept": "The class syntax is syntactic sugar over prototype-based inheritance — it works the same way internally",
+  "content": {
+    "code": "class Animal {\n  constructor(name) {\n    this.name = name;\n  }\n  eat() {\n    return this.name + ' eats';\n  }\n}\n\nclass Dog extends Animal {\n  constructor(name, breed) {\n    super(name);\n    this.breed = breed;\n  }\n  bark() {\n    return 'Woof!';\n  }\n}\n\nconst buddy = new Dog('Buddy', 'Golden');\nconsole.log(buddy.name);\nconsole.log(buddy.eat());\nconsole.log(buddy.bark());",
+    "steps": [
+      {
+        "title": "Defining the Animal class",
+        "explanation": "The `class` keyword is syntactic sugar that sets up a constructor function and prototype in one go.\nThe `constructor` becomes the constructor function, and methods like `eat` are added to `Animal.prototype`.",
+        "keyInsight": "class = syntactic sugar for constructor function + prototype",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "classes": [
+            {
+              "name": "Animal",
+              "methods": [
+                "constructor",
+                "eat()"
+              ]
+            }
+          ]
+        },
+        "code": "class Animal {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "title": "Dog class inheriting from Animal",
+        "explanation": "The `extends` keyword automatically sets `Dog.prototype`'s prototype to `Animal.prototype`, creating the inheritance chain.",
+        "keyInsight": "extends = automatic prototype chain setup",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "classes": [
+            {
+              "name": "Dog",
+              "extends": "Animal",
+              "methods": [
+                "constructor",
+                "bark()"
+              ]
+            }
+          ],
+          "chain": [
+            "Dog.prototype",
+            "Animal.prototype"
+          ]
+        },
+        "code": "class Dog extends Animal {"
+      },
+      {
+        "title": "Calling super()",
+        "explanation": "In a child class `constructor`, you must call `super()` to run the parent's `constructor`.\nThis initializes `this.name`.\nYou cannot use `this` before calling `super()`.",
+        "keyInsight": "super() = calling the parent constructor (initializes this)",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "note": "super()는 Animal.call(this, name)과 유사"
+        },
+        "code": "super(name);"
+      },
+      {
+        "title": "Creating an instance",
+        "explanation": "Creating the `buddy` instance with `new Dog()`.\n`super('Buddy')` is called to set `name`, and `this.breed` is set to 'Golden'.\n`buddy`'s prototype points to `Dog.prototype`.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "buddy",
+              "props": [
+                "name: 'Buddy'",
+                "breed: 'Golden'"
+              ],
+              "proto": "Dog.prototype"
+            }
+          ],
+          "chain": [
+            "buddy",
+            "Dog.prototype",
+            "Animal.prototype"
+          ]
+        },
+        "code": "const buddy = new Dog('Buddy', 'Golden');"
+      },
+      {
+        "title": "Accessing its own property",
+        "explanation": "Looking up `buddy.name`.\nThe property exists directly on `buddy`, so 'Buddy' is returned immediately.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy"
+          ]
+        },
+        "code": "console.log(buddy.name);"
+      },
+      {
+        "title": "Calling a parent prototype method",
+        "explanation": "Looking up `buddy.eat()`.\nNot found on `buddy` or `Dog.prototype`, so the chain is traversed and `eat` is found on `Animal.prototype`.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats"
+          ]
+        },
+        "code": "console.log(buddy.eat());"
+      },
+      {
+        "title": "Calling a child prototype method",
+        "explanation": "Looking up `buddy.bark()`.\nNot on `buddy` itself, but `bark` is found on `Dog.prototype`.",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats",
+            "Woof!"
+          ]
+        },
+        "code": "console.log(buddy.bark());"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What is a difference between class syntax and constructor functions?",
+    "options": [
+      "class is not hoisted",
+      "class can be called without new",
+      "class methods are enumerable",
+      "class does not use prototype"
+    ],
+    "correctIndex": 0,
+    "explanation": "class is subject to the TDZ, so it can't be used before its declaration.\nCalling it without new throws a TypeError.\nMethods are non-enumerable.\nInternally it still uses prototype."
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript classes work the same as classes in other languages",
+      "correct": "JavaScript class is prototype-based.\nIt works differently from class-based inheritance in C++ or Java.",
+      "why": "The syntax looks similar, but internally it still operates through the prototype chain."
+    }
+  ],
+  "keyTakeaway": "class = syntactic sugar for prototype inheritance, extends = sets up the chain, super = calls the parent"
+}
