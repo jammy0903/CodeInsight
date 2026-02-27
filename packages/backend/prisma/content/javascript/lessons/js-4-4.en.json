@@ -1,0 +1,94 @@
+{
+  "lessonId": "js-4-4",
+  "title": "Error Handling",
+  "concept": "Handle async/await errors with try/catch and Promise errors with .catch()",
+  "content": {
+    "code": "async function riskyOperation() {\n  throw new Error('Something went wrong!');\n}\n\n// try/catch 방식\nasync function handleWithTryCatch() {\n  try {\n    const result = await riskyOperation();\n    console.log(result);\n  } catch (error) {\n    console.log('Caught:', error.message);\n  }\n}\n\n// .catch() 방식\nriskyOperation()\n  .then(result => console.log(result))\n  .catch(error => console.log('Caught:', error.message));\n\nhandleWithTryCatch();",
+    "steps": [
+      {
+        "title": "Call handleWithTryCatch()",
+        "explanation": "Program execution starts by calling `handleWithTryCatch()`.",
+        "visualizationType": "promise",
+        "promiseState": {
+          "callStack": [
+            "handleWithTryCatch()"
+          ]
+        },
+        "code": "handleWithTryCatch();"
+      },
+      {
+        "title": "Promise Rejection at await",
+        "explanation": "`await` calls `riskyOperation()`.\nThis function throws an error, so the returned Promise becomes 'rejected'.\n`await` treats this rejected Promise like a regular `throw` statement.",
+        "keyInsight": "rejected Promise at await = same as throw",
+        "visualizationType": "promise",
+        "promiseState": {
+          "promises": [
+            {
+              "id": "riskyOp",
+              "state": "rejected",
+              "error": "Error"
+            }
+          ]
+        },
+        "code": "const result = await riskyOperation();"
+      },
+      {
+        "title": "catch Block Executes",
+        "explanation": "The error thrown by `await` is caught by the nearest `catch` block.\nThe rest of the `try` block (line 9) is skipped.",
+        "visualizationType": "promise",
+        "promiseState": {
+          "callStack": [
+            "handleWithTryCatch() - catch"
+          ],
+          "note": "Error caught!"
+        },
+        "code": "} catch (error) {"
+      },
+      {
+        "title": "Print the Error Message",
+        "explanation": "The `catch` block executes and prints the error object's message to the console.\nThe program continues without crashing.",
+        "visualizationType": "promise",
+        "promiseState": {
+          "output": [
+            "Caught: Something went wrong!"
+          ]
+        },
+        "code": "console.log('Caught:', error.message);"
+      },
+      {
+        "title": "Alternative: .catch() Chaining",
+        "explanation": "This code doesn't actually run here, but it shows another way to handle Promise errors without `async/await`.\nAttaching `.catch()` at the end of a chain catches rejections from anywhere in that chain.",
+        "keyInsight": "async/await with try/catch is syntactic sugar for Promise with .catch().",
+        "visualizationType": "promise",
+        "promiseState": {
+          "note": "This part of code is not executed in this run."
+        },
+        "code": "riskyOperation()",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Why isn't the error caught in the following code?\n\ntry {\n  setTimeout(() => {\n    throw new Error('Oops!');\n  }, 1000);\n} catch (e) {\n  console.log('Caught!');\n}",
+    "options": [
+      "No error occurs inside setTimeout",
+      "The callback runs after try/catch has already finished",
+      "throw is used incorrectly",
+      "The Error constructor is wrong"
+    ],
+    "correctIndex": 1,
+    "explanation": "try/catch only catches synchronous code.\nThe setTimeout callback runs from the Task Queue after try/catch has already finished, so it can't be caught."
+  },
+  "misconceptions": [
+    {
+      "wrong": "try/catch catches all errors",
+      "correct": "try/catch only catches synchronous code and **awaited Promises**.\nFloating callback errors are not caught.",
+      "why": "try/catch catches errors that are on the call stack at the time of execution, but callbacks run later in a separate stack (Queue)."
+    }
+  ],
+  "keyTakeaway": "async/await → try/catch, Promise → .catch(), callback errors require separate handling"
+}

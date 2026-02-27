@@ -1,0 +1,211 @@
+{
+  "lessonId": "js-4-3",
+  "title": "async/await",
+  "concept": "async/await is syntax that lets you write Promises in a synchronous style",
+  "content": {
+    "code": "function delay(ms) {\n  return new Promise(resolve => setTimeout(resolve, ms));\n}\n\nasync function fetchUser() {\n  console.log('Fetching...');\n  await delay(1000);\n  console.log('User loaded');\n  return { name: 'Alice' };\n}\n\nasync function main() {\n  console.log('Start');\n  const user = await fetchUser();\n  console.log('Got:', user.name);\n  console.log('End');\n}\n\nmain();",
+    "steps": [
+      {
+        "title": "Call main()",
+        "explanation": "Call `main()`.\nSince it's an async function, it immediately returns a Promise and begins executing internally.",
+        "visualizationType": "eventLoop",
+        "code": "main();",
+        "eventLoopState": {
+          "callStack": [
+            "main()"
+          ],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Print 'Start'",
+        "explanation": "`console.log('Start')` is executed synchronously.\n'Start' is printed to the console.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('Start');",
+        "eventLoopState": {
+          "callStack": [
+            "main()",
+            "console.log('Start')"
+          ],
+          "output": [
+            "Start"
+          ]
+        }
+      },
+      {
+        "title": "Call await fetchUser()",
+        "explanation": "Call `fetchUser()` and await the result.\nThe main function pauses here.",
+        "keyInsight": "await = pause the function's execution until the Promise resolves",
+        "visualizationType": "eventLoop",
+        "code": "const user = await fetchUser();",
+        "eventLoopState": {
+          "callStack": [
+            "fetchUser()"
+          ],
+          "microtaskQueue": [
+            "main() (suspended)"
+          ],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "title": "Print 'Fetching...'",
+        "explanation": "Inside the `fetchUser` function, `console.log('Fetching...')` runs.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('Fetching...');",
+        "eventLoopState": {
+          "callStack": [
+            "fetchUser()",
+            "console.log('Fetching...')"
+          ],
+          "output": [
+            "Start",
+            "Fetching..."
+          ],
+          "currentPhase": null,
+          "highlightArea": null
+        }
+      },
+      {
+        "title": "await delay(1000)",
+        "explanation": "Call `delay(1000)` and await it.\nA 1-second timer starts and fetchUser also pauses.",
+        "visualizationType": "eventLoop",
+        "code": "await delay(1000);",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [
+            {
+              "name": "setTimeout(1000ms)",
+              "delay": 1000
+            }
+          ],
+          "microtaskQueue": [
+            "main() (suspended)",
+            "fetchUser() (suspended)"
+          ],
+          "currentPhase": "waiting",
+          "highlightArea": "webApis"
+        }
+      },
+      {
+        "title": "Create Promise (inside delay)",
+        "explanation": "Inside the `delay` function, `new Promise` is created and setTimeout is registered as a Web API.",
+        "visualizationType": "eventLoop",
+        "code": "return new Promise(resolve => setTimeout(resolve, ms));",
+        "eventLoopState": {
+          "webApis": [
+            {
+              "name": "setTimeout(1000ms)",
+              "delay": 1000,
+              "status": "resolving"
+            }
+          ],
+          "microtaskQueue": [
+            "fetchUser() (suspended)"
+          ]
+        }
+      },
+      {
+        "title": "Print 'User loaded'",
+        "explanation": "After 1 second, the delay Promise resolves and fetchUser resumes.\n'User loaded' is printed.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('User loaded');",
+        "eventLoopState": {
+          "callStack": [
+            "fetchUser()",
+            "console.log('User loaded')"
+          ],
+          "webApis": [],
+          "microtaskQueue": [
+            "main() (suspended)"
+          ],
+          "output": [
+            "Start",
+            "Fetching...",
+            "User loaded"
+          ],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "title": "Return the Object",
+        "explanation": "Return the object with `return { name: 'Alice' }`.\nfetchUser's Promise resolves with this value.",
+        "visualizationType": "eventLoop",
+        "code": "return { name: 'Alice' };",
+        "eventLoopState": {
+          "callStack": [
+            "fetchUser()"
+          ],
+          "microtaskQueue": [
+            "main() → user = { name: 'Alice' }"
+          ],
+          "highlightArea": "microtaskQueue"
+        }
+      },
+      {
+        "title": "Print 'Got: Alice'",
+        "explanation": "The main function resumes, `{ name: 'Alice' }` is assigned to `user`, and 'Got: Alice' is printed.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('Got:', user.name);",
+        "eventLoopState": {
+          "callStack": [
+            "main()",
+            "console.log('Got:', user.name)"
+          ],
+          "microtaskQueue": [],
+          "output": [
+            "Start",
+            "Fetching...",
+            "User loaded",
+            "Got: Alice"
+          ],
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "title": "Print 'End'",
+        "explanation": "`console.log('End')` executes and 'End' is printed.\nThe main function completes.",
+        "visualizationType": "eventLoop",
+        "code": "console.log('End');",
+        "eventLoopState": {
+          "callStack": [
+            "main()",
+            "console.log('End')"
+          ],
+          "output": [
+            "Start",
+            "Fetching...",
+            "User loaded",
+            "Got: Alice",
+            "End"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What does await do?",
+    "options": [
+      "Completely blocks the main thread",
+      "Pauses the async function and waits for the Promise to complete",
+      "Immediately terminates the function",
+      "Has no effect"
+    ],
+    "correctIndex": 1,
+    "explanation": "await pauses the execution of the async function and waits until the Promise resolves.\nThe main thread is not blocked and can continue processing other tasks."
+  },
+  "misconceptions": [
+    {
+      "wrong": "await blocks the main thread",
+      "correct": "await only pauses the specific async function.\nThe main thread can continue processing other tasks.",
+      "why": "async/await is Promise-based, so the event loop keeps running and can handle other events."
+    }
+  ],
+  "keyTakeaway": "async/await = syntax for writing Promises like synchronous code. await pauses the function but does not block the main thread."
+}

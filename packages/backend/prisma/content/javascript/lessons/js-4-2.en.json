@@ -1,0 +1,164 @@
+{
+  "lessonId": "js-4-2",
+  "title": "Promise Creation and Chaining",
+  "concept": "A Promise is an object representing the result of an asynchronous operation, which can be chained with then/catch",
+  "content": {
+    "code": "const promise = new Promise((resolve, reject) => {\n  setTimeout(() => {\n    const success = true;\n    if (success) {\n      resolve('Data loaded!');\n    } else {\n      reject('Error occurred');\n    }\n  }, 0);\n});\n\npromise\n  .then(result => {\n    console.log(result);\n    return 'Processed: ' + result;\n  })\n  .then(processed => {\n    console.log(processed);\n  })\n  .catch(error => {\n    console.log('Error:', error);\n  });",
+    "steps": [
+      {
+        "title": "Create a Promise",
+        "explanation": "Create a Promise object with new Promise().\nThe executor function is called immediately.",
+        "keyInsight": "Promise = an object representing a future value",
+        "visualizationType": "promise",
+        "code": "const promise = new Promise((resolve, reject) => {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "promiseState": {
+          "promises": [
+            {
+              "id": "promise",
+              "state": "pending",
+              "value": null
+            }
+          ],
+          "phase": "executor running"
+        }
+      },
+      {
+        "title": "Register setTimeout",
+        "explanation": "An asynchronous operation (setTimeout) is started.\nThe Promise is still in pending state.",
+        "visualizationType": "promise",
+        "code": "setTimeout(() => {",
+        "promiseState": {
+          "timer": {
+            "delay": 0,
+            "status": "waiting"
+          },
+          "phase": null
+        }
+      },
+      {
+        "title": "Register .then()",
+        "explanation": "Register success handlers with .then().\nThese handlers are scheduled in the **Microtask Queue**.",
+        "keyInsight": "Promise is VIP in the event loop (Microtask Priority).",
+        "visualizationType": "promise",
+        "code": "promise",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "promiseState": {
+          "promises": [
+            {
+              "id": "promise",
+              "state": "pending",
+              "handlers": [
+                ".then(result => ...)",
+                ".then(processed => ...)",
+                ".catch(error => ...)"
+              ]
+            }
+          ],
+          "timer": null
+        }
+      },
+      {
+        "title": "Call resolve()",
+        "explanation": "After a moment, resolve('Data loaded!') is called.\nThe Promise transitions to fulfilled state.",
+        "keyInsight": "resolve() = change the Promise to a successful state",
+        "visualizationType": "promise",
+        "code": "resolve('Data loaded!');",
+        "promiseState": {
+          "promises": [
+            {
+              "id": "promise",
+              "state": "fulfilled",
+              "value": "'Data loaded!'"
+            }
+          ]
+        }
+      },
+      {
+        "title": "First then Executes",
+        "explanation": "The Promise is fulfilled, so the callback of the first .then() runs.",
+        "visualizationType": "promise",
+        "code": ".then(result => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "promiseState": {
+          "output": [
+            "Data loaded!"
+          ],
+          "returnValue": "'Processed: Data loaded!'"
+        }
+      },
+      {
+        "title": "Second then Executes (Chaining)",
+        "explanation": "The return value of the first then is passed to the next then.\nThis is Promise chaining!",
+        "keyInsight": "The return value of .then() = the argument of the next .then()",
+        "visualizationType": "promise",
+        "code": ".then(processed => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "promiseState": {
+          "promises": [
+            {
+              "id": "promise",
+              "state": "fulfilled"
+            }
+          ],
+          "output": [
+            "Data loaded!",
+            "Processed: Data loaded!"
+          ],
+          "chaining": true,
+          "returnValue": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the output of the following code?\n\nPromise.resolve(1)\n  .then(x => x + 1)\n  .then(x => x * 2)\n  .then(x => console.log(x));",
+    "options": [
+      "1",
+      "2",
+      "4",
+      "undefined"
+    ],
+    "correctIndex": 2,
+    "explanation": "1 → +1 → 2 → *2 → 4. The return value of each then is passed to the next."
+  },
+  "misconceptions": [
+    {
+      "wrong": ".then() executes immediately",
+      "correct": "It doesn't run right after the Promise resolves — it waits until the current call stack is empty and the **Microtask Queue** has its turn.",
+      "why": "The JS engine never interrupts what it's currently doing (Call Stack).\nIt only checks the queue once the stack is clear."
+    },
+    {
+      "wrong": "The code inside new Promise() is asynchronous",
+      "correct": "No.\nThe executor function `(resolve, reject) => { ... }` runs **synchronously and immediately**.",
+      "why": "The Promise constructor itself is synchronous.\nOnly things like setTimeout inside it are asynchronous."
+    }
+  ],
+  "keyTakeaway": "Promise = future value object, sequential processing via .then() chaining"
+}

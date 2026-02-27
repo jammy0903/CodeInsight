@@ -1,0 +1,544 @@
+{
+  "lessonId": "js-4-1",
+  "title": "Callback Pattern",
+  "concept": "A callback is a function passed as an argument to another function, to be executed later",
+  "content": {
+    "code": "function processArray(arr, callback) {\n  const results = [];\n  for (let i = 0; i < arr.length; i++) {\n    const processed = callback(arr[i], i);\n    results.push(processed);\n  }\n  return results;\n}\n\nfunction double(value, index) {\n  return value * 2;\n}\n\nfunction addIndex(value, index) {\n  return value + index;\n}\n\nconst numbers = [1, 2, 3];\nconst doubled = processArray(numbers, double);\nconst indexed = processArray(numbers, addIndex);\n\nconsole.log(doubled);\nconsole.log(indexed);",
+    "steps": [
+      {
+        "title": "Create the numbers Array",
+        "explanation": "Create an array with `const numbers = [1, 2, 3]`.",
+        "visualizationType": "scope",
+        "code": "const numbers = [1, 2, 3];",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "processArray",
+                  "value": "fn(arr, callback)",
+                  "keyword": "function"
+                },
+                {
+                  "name": "double",
+                  "value": "fn(value, index)",
+                  "keyword": "function"
+                },
+                {
+                  "name": "addIndex",
+                  "value": "fn(value, index)",
+                  "keyword": "function"
+                },
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "numbers"
+        }
+      },
+      {
+        "title": "Call processArray(numbers, double)",
+        "explanation": "Call the `processArray` function, passing the `double` function as a callback.\nFunctions can be passed just like values!",
+        "keyInsight": "In JavaScript, functions are 'First-class Objects'. They can be assigned to variables and passed as arguments.",
+        "visualizationType": "scope",
+        "code": "const doubled = processArray(numbers, double);",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "processArray",
+                  "value": "fn(arr, callback)",
+                  "keyword": "function"
+                },
+                {
+                  "name": "double",
+                  "value": "fn(value, index)",
+                  "keyword": "function"
+                },
+                {
+                  "name": "addIndex",
+                  "value": "fn(value, index)",
+                  "keyword": "function"
+                },
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "processArray()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "arr",
+                  "value": "[1, 2, 3]",
+                  "keyword": "param"
+                },
+                {
+                  "name": "callback",
+                  "value": "fn(double)",
+                  "keyword": "param",
+                  "highlight": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "processArray()",
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "Initialize the Results Array",
+        "explanation": "Inside the processArray function, create an empty `results` array.\nProcessed values will be stored here.",
+        "visualizationType": "scope",
+        "code": "const results = [];",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "processArray()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "arr",
+                  "value": "[1, 2, 3]",
+                  "keyword": "param"
+                },
+                {
+                  "name": "callback",
+                  "value": "fn(double)",
+                  "keyword": "param"
+                },
+                {
+                  "name": "results",
+                  "value": "[]",
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "results"
+        }
+      },
+      {
+        "title": "Execute Callback (1st)",
+        "explanation": "`callback(arr[0], 0)` = `double(1, 0)` is executed.\nThe double function runs and returns 1 * 2 = 2.",
+        "keyInsight": "`callback` is just a variable name — the `double` function is what actually runs.",
+        "visualizationType": "scope",
+        "code": "const processed = callback(arr[i], i);",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "processArray()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "arr",
+                  "value": "[1, 2, 3]",
+                  "keyword": "param"
+                },
+                {
+                  "name": "callback",
+                  "value": "fn(double)",
+                  "keyword": "param"
+                },
+                {
+                  "name": "results",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "i",
+                  "value": 0,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "double()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "value",
+                  "value": 1,
+                  "keyword": "param",
+                  "highlight": true
+                },
+                {
+                  "name": "index",
+                  "value": 0,
+                  "keyword": "param"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "double()",
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "Execute the double Function",
+        "explanation": "double(1, 0) runs and returns value * 2 = 1 * 2 = 2.",
+        "keyInsight": "The callback function receives its arguments at call time.",
+        "visualizationType": "scope",
+        "code": "return value * 2;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "processArray()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "callback",
+                  "value": "fn(double)",
+                  "keyword": "param"
+                },
+                {
+                  "name": "results",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "i",
+                  "value": 0,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "double()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "value",
+                  "value": 1,
+                  "keyword": "param"
+                },
+                {
+                  "name": "return",
+                  "value": 2,
+                  "keyword": "return",
+                  "highlight": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "return"
+        }
+      },
+      {
+        "title": "Store the Result",
+        "explanation": "Push the return value 2 into the results array.\nresults = [2]",
+        "visualizationType": "scope",
+        "code": "results.push(processed);",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "processArray()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "callback",
+                  "value": "fn(double)",
+                  "keyword": "param"
+                },
+                {
+                  "name": "results",
+                  "value": "[2]",
+                  "keyword": "const",
+                  "changed": true
+                },
+                {
+                  "name": "i",
+                  "value": 0,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "processArray()",
+          "highlightVariable": "results"
+        }
+      },
+      {
+        "title": "Execute Callback (2nd)",
+        "explanation": "`callback(arr[1], 1)` = `double(2, 1)` is executed.\nReturns 2 * 2 = 4.",
+        "visualizationType": "scope",
+        "code": "const processed = callback(arr[i], i);",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "processArray()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "callback",
+                  "value": "fn(double)",
+                  "keyword": "param"
+                },
+                {
+                  "name": "results",
+                  "value": "[2, 4]",
+                  "keyword": "const",
+                  "changed": true
+                },
+                {
+                  "name": "i",
+                  "value": 1,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "Execute Callback (3rd)",
+        "explanation": "`callback(arr[2], 2)` = `double(3, 2)` is executed.\nReturns 3 * 2 = 6.\nresults = [2, 4, 6]",
+        "visualizationType": "scope",
+        "code": "const processed = callback(arr[i], i);",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "processArray()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "callback",
+                  "value": "fn(double)",
+                  "keyword": "param"
+                },
+                {
+                  "name": "results",
+                  "value": "[2, 4, 6]",
+                  "keyword": "const",
+                  "changed": true
+                },
+                {
+                  "name": "i",
+                  "value": 2,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "title": "Return the Result",
+        "explanation": "Return the completed results array [2, 4, 6].\ndoubled = [2, 4, 6]",
+        "keyInsight": "The original array numbers was not modified (immutability).",
+        "visualizationType": "scope",
+        "code": "return results;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "doubled",
+                  "value": "[2, 4, 6]",
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "doubled"
+        }
+      },
+      {
+        "title": "Process with a Different Callback",
+        "explanation": "This time, pass the `addIndex` function as the callback.\nThe same processArray function is used in a completely different way.",
+        "keyInsight": "Changing the callback changes the behavior. This is the power of the callback pattern.",
+        "visualizationType": "scope",
+        "code": "const indexed = processArray(numbers, addIndex);",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "doubled",
+                  "value": "[2, 4, 6]",
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "processArray()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "arr",
+                  "value": "[1, 2, 3]",
+                  "keyword": "param"
+                },
+                {
+                  "name": "callback",
+                  "value": "fn(addIndex)",
+                  "keyword": "param",
+                  "highlight": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "processArray()",
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "Execute addIndex Callback",
+        "explanation": "addIndex(1, 0) = 1, addIndex(2, 1) = 3, addIndex(3, 2) = 5. indexed = [1, 3, 5]",
+        "keyInsight": "value + index: different logic that adds the index to the value",
+        "visualizationType": "scope",
+        "code": "return value + index;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "numbers",
+                  "value": "[1, 2, 3]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "doubled",
+                  "value": "[2, 4, 6]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "indexed",
+                  "value": "[1, 3, 5]",
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "indexed"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the output of the following code?\n\nfunction apply(x, fn) { return fn(x); }\nfunction square(n) { return n * n; }\nconsole.log(apply(5, square));",
+    "options": [
+      "5",
+      "10",
+      "25",
+      "undefined"
+    ],
+    "correctIndex": 2,
+    "explanation": "In apply(5, square), fn is the square function.\nfn(x) = square(5) = 5 * 5 = 25 is returned."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Callbacks are always executed asynchronously",
+      "correct": "Not at all.\nCallbacks can be executed synchronously.",
+      "why": "Array.map(), Array.filter() etc. use synchronous callbacks.\nOnly setTimeout, fetch, etc. use asynchronous callbacks."
+    },
+    {
+      "wrong": "Callback functions require special syntax",
+      "correct": "A callback is just a regular function.\nIt's simply a function passed as an argument to another function.",
+      "why": "In JavaScript, functions are first-class objects, so they can be passed and stored just like values."
+    }
+  ],
+  "keyTakeaway": "Callback = a function passed as an argument. It's a core pattern for separating logic and improving reusability."
+}
