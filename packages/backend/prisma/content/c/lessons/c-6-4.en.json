@@ -1,0 +1,201 @@
+{
+  "lessonId": "c-6-4",
+  "title": "Struct Pointers (->)",
+  "concept": "The convenient arrow operator for accessing struct members through a pointer",
+  "content": {
+    "code": "#include <stdio.h>\n\nstruct Player {\n    char name[10];\n    int hp;\n};\n\nvoid heal(struct Player *p) {\n    (*p).hp += 10;\n    p->hp += 10;\n}\n\nint main() {\n    struct Player warrior = {\"Conan\", 50};\n\n    printf(\"HP: %d\\n\", warrior.hp);\n    heal(&warrior);\n    printf(\"HP: %d\\n\", warrior.hp);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Include stdio.h header",
+        "explanation": "This header is for using `printf`.\n\nThis lesson covers how to pass a struct by pointer to modify the original.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Define Player struct",
+        "explanation": "`Player` is a struct type that bundles a name and health points.\n\nIt serves as the basic unit for treating related data as a single object.",
+        "visualizationType": "cMemory",
+        "code": "struct Player {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "Define heal function (uses pointer)",
+        "explanation": "`heal(struct Player *p)` receives the address of a Player struct.\n\nReceiving the address allows the function to directly modify the original's members.",
+        "visualizationType": "cMemory",
+        "code": "void heal(struct Player *p) {"
+      },
+      {
+        "title": "Start main function",
+        "explanation": "The main frame is created, preparing a player instance.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Create struct variable",
+        "explanation": "We set the initial name and health for the `warrior` variable.\n\nThis value becomes the baseline state before the function call.",
+        "visualizationType": "cMemory",
+        "code": "struct Player warrior = {\"Conan\", 50};",
+        "stack": [
+          {
+            "name": "warrior",
+            "type": "struct Player",
+            "value": "{name: \"Conan\", hp: 50}",
+            "address": "0x1000",
+            "structMembers": [
+              { "key": "name", "value": "Conan" },
+              { "key": "hp", "value": "50" }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Print initial health",
+        "explanation": "We print the health before the call to record the pre-change state.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"HP: %d\\n\", warrior.hp);",
+        "stdout": "HP: 50"
+      },
+      {
+        "title": "Call heal function (pass address)",
+        "explanation": "We pass the struct's address with `heal(&warrior)`.\n\nInstead of a copy, we pass the original's location so modifications are reflected.",
+        "visualizationType": "cMemory",
+        "code": "heal(&warrior);",
+        "stack": [
+          {
+            "name": "warrior",
+            "type": "struct Player",
+            "address": "0x1000",
+            "value": "{name: \"Conan\", hp: 50}",
+            "highlight": true,
+            "structMembers": [
+              { "key": "name", "value": "Conan" },
+              { "key": "hp", "value": "50" }
+            ]
+          },
+          {
+            "name": "p",
+            "type": "struct Player*",
+            "frame": "heal",
+            "value": "0x1000",
+            "points_to": "warrior"
+          }
+        ]
+      },
+      {
+        "title": "Method 1: Dereference then dot operator",
+        "explanation": "We can access a member with `(*p).hp` by dereferencing first, then using the dot operator.",
+        "visualizationType": "cMemory",
+        "code": "(*p).hp += 10;",
+        "stack": [
+          {
+            "name": "warrior",
+            "type": "struct Player",
+            "address": "0x1000",
+            "value": "{name: \"Conan\", hp: 60}",
+            "highlight": true,
+            "structMembers": [
+              { "key": "name", "value": "Conan" },
+              { "key": "hp", "value": "60" }
+            ]
+          },
+          {
+            "name": "p",
+            "type": "struct Player*",
+            "frame": "heal",
+            "value": "0x1000",
+            "points_to": "warrior"
+          }
+        ]
+      },
+      {
+        "title": "Method 2: Arrow operator (->)",
+        "explanation": "`p->hp` is shorthand for `(*p).hp` -- they mean the same thing.\n\nThe arrow notation is the standard way to access members through a pointer.",
+        "visualizationType": "cMemory",
+        "code": "p->hp += 10;",
+        "stack": [
+          {
+            "name": "warrior",
+            "type": "struct Player",
+            "address": "0x1000",
+            "value": "{name: \"Conan\", hp: 70}",
+            "highlight": true,
+            "structMembers": [
+              { "key": "name", "value": "Conan" },
+              { "key": "hp", "value": "70" }
+            ]
+          },
+          {
+            "name": "p",
+            "type": "struct Player*",
+            "frame": "heal",
+            "value": "0x1000",
+            "points_to": "warrior"
+          }
+        ]
+      },
+      {
+        "title": "Verify changed health",
+        "explanation": "Checking the health after the function call shows the original value was actually modified.\n\nThis demonstrates that passing by pointer leads to modification of the original.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"HP: %d\\n\", warrior.hp);",
+        "occurrence": 2,
+        "stack": [
+          {
+            "name": "warrior",
+            "type": "struct Player",
+            "value": "{name: \"Conan\", hp: 70}",
+            "address": "0x1000",
+            "structMembers": [
+              { "key": "name", "value": "Conan" },
+              { "key": "hp", "value": "70" }
+            ]
+          }
+        ],
+        "stdout": "HP: 50\nHP: 70"
+      },
+      {
+        "title": "Program terminates",
+        "explanation": "The program exits with `return 0;`.\n\nKey point: when passing a struct pointer, use `->` for member access.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Given struct A *ptr; what is the correct way to access member x?",
+    "options": [
+      "ptr.x",
+      "ptr->x",
+      "*ptr.x",
+      "&ptr.x"
+    ],
+    "correctIndex": 1,
+    "explanation": "Since it is a pointer, you must use the arrow (`->`).\n`ptr.x` is only used when ptr is a struct variable.\n`*ptr.x` becomes `*(ptr.x)` due to operator precedence, which is incorrect syntax."
+  },
+  "misconceptions": [
+    {
+      "wrong": "`->` is a C++ feature",
+      "correct": "It is a fundamental C language feature.",
+      "why": "It was created as a shortcut because struct pointer access is so common."
+    }
+  ],
+  "keyTakeaway": "For struct pointers, use `->` instead of `.`."
+}

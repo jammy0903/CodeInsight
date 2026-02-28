@@ -107,6 +107,15 @@ export const VariableBox = memo(function VariableBox({
   isDeleting = false,
   onClick,
 }: VariableBoxProps) {
+  // C-specific metadata
+  const isDangling = variable.metadata?.dangling === true;
+  const structMembers = variable.metadata?.structMembers as
+    | Array<{ key: string; value: string }>
+    | undefined;
+  const charElements = variable.metadata?.charElements as
+    | Array<{ value: string; highlight?: boolean }>
+    | undefined;
+
   // 상태 결정
   const state = getState(isNew, isUpdated, isDeleting, variable.state);
   const style = useMemo(() => getBoxStyle(theme, state), [theme, state]);
@@ -118,7 +127,7 @@ export const VariableBox = memo(function VariableBox({
       : { scale: 1, opacity: 1, y: 0 },
     animate: {
       scale: 1,
-      opacity: 1,
+      opacity: isDangling ? 0.7 : 1,
       y: 0,
       transition: {
         type: 'spring',
@@ -153,22 +162,24 @@ export const VariableBox = memo(function VariableBox({
     exit: { y: 20, opacity: 0 },
   } as const;
 
+  const hasExtra = !!(structMembers?.length || charElements?.length);
+
   return (
     <motion.div
       className="variable-box relative flex flex-col items-center justify-center cursor-pointer select-none"
       data-variable-id={variable.id}
       style={{
-        width: 'auto', // 내용에 맞게 자동 조절
+        width: 'auto',
         maxWidth: '260px',
         minWidth: cssVar.boxMinWidth,
         height: 'auto',
         minHeight: cssVar.boxMinHeight,
         padding: `${cssVar.boxPaddingV} ${cssVar.boxPaddingH}`,
         borderRadius: FLOW_SIZES.box.borderRadius,
-        borderWidth: FLOW_SIZES.box.borderWidth,
-        borderStyle: 'solid',
+        borderWidth: isDangling ? '2px' : FLOW_SIZES.box.borderWidth,
+        borderStyle: isDangling ? 'dashed' : 'solid',
         backgroundColor: style.background,
-        borderColor: style.border,
+        borderColor: isDangling ? '#ef4444' : style.border,
         boxShadow: state !== 'idle' ? `0 0 8px ${style.glow}` : 'none',
       }}
       variants={boxVariants}
@@ -176,10 +187,20 @@ export const VariableBox = memo(function VariableBox({
       animate={isUpdated ? 'highlight' : 'animate'}
       exit="exit"
       onClick={onClick}
-      layout // 위치 변경 시 자동 애니메이션
+      layout
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >
+      {/* dangling 배지 */}
+      {isDangling && (
+        <span
+          className="absolute -top-3 -right-2 px-1 rounded text-[9px] font-bold text-white"
+          style={{ backgroundColor: '#ef4444' }}
+        >
+          dangling
+        </span>
+      )}
+
       {/* 변수명 (라벨) */}
       <span
         className="absolute -top-2 left-1/2 -translate-x-1/2 px-1 rounded text-xs font-medium whitespace-nowrap"
@@ -213,13 +234,55 @@ export const VariableBox = memo(function VariableBox({
         </motion.span>
       </AnimatePresence>
 
-      {/* 타입 (하단) */}
+      {/* structMembers 칩 */}
+      {structMembers && structMembers.length > 0 && (
+        <div className="flex flex-wrap gap-0.5 mt-1 justify-center">
+          {structMembers.map((m) => (
+            <span
+              key={m.key}
+              className="px-1 rounded text-[9px] font-mono"
+              style={{
+                backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                color: theme === 'dark' ? '#d1d5db' : '#374151',
+              }}
+            >
+              .{m.key}={m.value}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* charElements 셀 */}
+      {charElements && charElements.length > 0 && (
+        <div className="flex gap-px mt-1 justify-center">
+          {charElements.map((el, i) => (
+            <span
+              key={i}
+              className="w-4 h-4 flex items-center justify-center text-[9px] font-mono border"
+              style={{
+                backgroundColor: el.highlight
+                  ? '#fef08a'
+                  : theme === 'dark'
+                    ? '#1f2937'
+                    : '#f9fafb',
+                borderColor: theme === 'dark' ? '#4b5563' : '#d1d5db',
+                color: theme === 'dark' ? '#e5e7eb' : '#1f2937',
+              }}
+            >
+              {el.value}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* 타입 (하단) — shift down if extra content exists */}
       <span
-        className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-1 rounded text-xs whitespace-nowrap"
+        className="absolute left-1/2 -translate-x-1/2 px-1 rounded text-xs whitespace-nowrap"
         style={{
           fontSize: cssVar.fontType,
           color: style.type,
           backgroundColor: style.background,
+          bottom: hasExtra ? '-10px' : '-8px',
         }}
       >
         {variable.type}
@@ -228,10 +291,11 @@ export const VariableBox = memo(function VariableBox({
       {/* 주소 (C언어, 선택적) */}
       {variable.address && (
         <span
-          className="absolute -bottom-5 left-1/2 -translate-x-1/2 font-mono opacity-50"
+          className="absolute left-1/2 -translate-x-1/2 font-mono opacity-50"
           style={{
             fontSize: cssVar.fontAddress,
             color: style.type,
+            bottom: hasExtra ? '-18px' : '-16px',
           }}
         >
           {variable.address}
@@ -239,7 +303,7 @@ export const VariableBox = memo(function VariableBox({
       )}
 
       {/* 포인터 표시 */}
-      {variable.isPointer && (
+      {variable.isPointer && !isDangling && (
         <span
           className="absolute top-0 right-0 w-2 h-2 rounded-full"
           style={{ backgroundColor: style.border }}

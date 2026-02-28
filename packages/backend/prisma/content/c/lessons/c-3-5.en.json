@@ -1,0 +1,226 @@
+{
+  "lessonId": "c-3-5",
+  "title": "Traversing with Pointers",
+  "concept": "Instead of an index (i), you can move a pointer (p) to traverse an array",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[] = {10, 20, 30, -1};\n    int *p = arr;\n\n    while (*p != -1) {\n        printf(\"%d \", *p);\n        p++;\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Include header",
+        "explanation": "`#include <stdio.h>` provides access to output functions.\n\nThis lesson covers the pattern of traversing an array using pointer movement (`p++`) instead of an index.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Start of main function",
+        "explanation": "After creating the main frame, the array and pointer are prepared.\n\nNext, `p` will be moved one slot at a time to read values.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Array declaration",
+        "explanation": "The `-1` at the end of `arr` is a sentinel value that signals the end of traversal.\n\nUsing a sentinel lets you determine the end without needing a separate length variable.",
+        "visualizationType": "cMemory",
+        "code": "int arr[] = {10, 20, 30, -1};",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Pointer initialization",
+        "explanation": "`p = arr` makes `p` point to the first element.\n\nNow in the loop, we can read `*p` and move to the next element with `p++`.",
+        "visualizationType": "cMemory",
+        "code": "int *p = arr;",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1010",
+            "points_to": "arr"
+          }
+        ]
+      },
+      {
+        "title": "Condition check: *p is 10 (not -1)",
+        "explanation": "`*p` is 10, which is not `-1`, so the loop body executes.\n\nThe pointer starts at `arr[0]` (address `0x1000`).",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1010",
+            "highlight": true,
+            "points_to": "arr"
+          }
+        ]
+      },
+      {
+        "title": "Iteration 1: Print *p (10)",
+        "explanation": "`*p` dereferences the pointer to read the value at `0x1000`, which is `10`.\n\nThe pointer reads the value without modifying the array.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d \", *p);",
+        "stdout": "10 "
+      },
+      {
+        "title": "Iteration 1: p++ moves to next element",
+        "explanation": "`p++` advances the pointer by `sizeof(int)` (4 bytes): `0x1000` -> `0x1004`.\n\nNow `p` points to `arr[1]` which holds `20`.",
+        "visualizationType": "cMemory",
+        "code": "p++;",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1004",
+            "type": "int*",
+            "address": "0x1010",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Condition check: *p is 20 (not -1)",
+        "explanation": "`*p` is now `20`, so the loop continues.\n\nEach iteration: check condition -> print -> advance pointer.",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "occurrence": 2
+      },
+      {
+        "title": "Iteration 2: Print *p (20)",
+        "explanation": "Prints the value at `0x1004`, which is `20`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d \", *p);",
+        "occurrence": 2,
+        "stdout": "10 20 "
+      },
+      {
+        "title": "Iteration 2: p++ moves to next element",
+        "explanation": "`p++` advances from `0x1004` to `0x1008`.\n\nNow `p` points to `arr[2]` which holds `30`.",
+        "visualizationType": "cMemory",
+        "code": "p++;",
+        "occurrence": 2,
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1008",
+            "type": "int*",
+            "address": "0x1010",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Condition check: *p is 30 (not -1)",
+        "explanation": "`*p` is `30`, so the loop continues for one more iteration.",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "occurrence": 3
+      },
+      {
+        "title": "Iteration 3: Print *p (30)",
+        "explanation": "Prints the value at `0x1008`, which is `30`. This is the last valid element.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d \", *p);",
+        "occurrence": 3,
+        "stdout": "10 20 30 "
+      },
+      {
+        "title": "Iteration 3: p++ moves past last element",
+        "explanation": "`p++` advances from `0x1008` to `0x100c`.\n\nNow `p` points to `arr[3]` which holds the sentinel value `-1`.",
+        "visualizationType": "cMemory",
+        "code": "p++;",
+        "occurrence": 3,
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x100c",
+            "type": "int*",
+            "address": "0x1010",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Loop exits: *p is -1 (sentinel found)",
+        "explanation": "`*p` is now `-1`, so `*p != -1` is false and the loop terminates.\n\nThe sentinel value successfully stopped the traversal at the right point.",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "occurrence": 4
+      },
+      {
+        "title": "Program exit",
+        "explanation": "`return 0;` terminates the program.\n\nThe key pattern: read (`*p`) + move (`p++`) + sentinel termination condition.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What should you watch out for when traversing an array with a pointer p?",
+    "options": [
+      "It's slower than using an index",
+      "There's a risk of going out of bounds",
+      "p++ only moves by 1 byte",
+      "It cannot be used"
+    ],
+    "correctIndex": 1,
+    "explanation": "Pointers have no brakes.\nIf you get the termination condition wrong (reaching `length` or `NULL` character), it keeps reading past the end of the array, causing memory errors."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Modern compilers make pointer traversal (p++) much faster than indexing (arr[i])",
+      "correct": "That used to be true, but nowadays compiler optimizations make them about the same.",
+      "why": "For readability, using indexing (`arr[i]`) is often the better choice.\nThere's no need to force pointer usage."
+    }
+  ],
+  "keyTakeaway": "Traversing an array with `p++` is a classic C pattern. But beware of the cliff (out-of-bounds access)."
+}

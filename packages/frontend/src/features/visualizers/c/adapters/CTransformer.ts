@@ -21,6 +21,9 @@ interface CStepBlock {
   points_to?: string | null;
   pointsTo?: string | null;
   highlight?: boolean;
+  structMembers?: Array<{ key: string; value: string }>;
+  charElements?: Array<{ value: string; highlight?: boolean }>;
+  dangling?: boolean;
 }
 
 /**
@@ -135,20 +138,33 @@ export class CTransformer implements IFlowTransformer {
     let varIdx = 0; // ID 충돌 방지용 카운터
 
     // 1. Stack 변수 처리
+    let currentFrame = 'main'; // 위치 기반 프레임 추적
+
     if (step.stack) {
       (step.stack as CStepBlock[]).forEach((block) => {
-        // type: "frame" 마커는 변수가 아닌 프레임 구분자
-        if (block.type === 'frame') {
-          const frameName = block.func || block.name;
-          if (frameName && !framesMap.has(frameName)) {
-            framesMap.set(frameName, []);
+        // 프레임 마커 감지 (두 가지 포맷):
+        // 1) 새 포맷: {type: "frame", func: "main", value: "frame"}
+        // 2) 기존 포맷: {name: "main", value: "main"} (frame/func는 Zod strip)
+        //    → type 없음 + 유효 address 없음 + value===name 으로 감지
+        const noRealAddress = !block.address || block.address === '???';
+        const isFrameMarker =
+          block.type === 'frame' ||
+          (!block.type && noRealAddress && block.name != null && String(block.value) === block.name);
+
+        if (isFrameMarker) {
+          const frameName = block.func || block.frame || block.name;
+          if (frameName) {
+            currentFrame = frameName;
+            if (!framesMap.has(frameName)) {
+              framesMap.set(frameName, []);
+            }
           }
           return;
         }
 
-        // 프레임 결정: Lesson JSON의 frame 필드 우선, 없으면 dot-format 파싱
+        // 프레임 결정: block.frame 우선 → 위치 기반 currentFrame → dot-format 파싱
         const dotParsed = parseVariableName(block.name ?? '');
-        const frame = block.frame || dotParsed.frame;
+        const frame = block.frame || currentFrame || dotParsed.frame;
         const name = dotParsed.name;
 
         const variable = this.toVariable(
@@ -160,6 +176,9 @@ export class CTransformer implements IFlowTransformer {
             points_to: block.points_to || block.pointsTo,
             highlight: block.highlight,
             segment: 'stack',
+            structMembers: block.structMembers,
+            charElements: block.charElements,
+            dangling: block.dangling,
           },
           frame,
           varIdx++,
@@ -187,6 +206,9 @@ export class CTransformer implements IFlowTransformer {
             points_to: block.points_to || block.pointsTo,
             highlight: block.highlight,
             segment: 'heap',
+            structMembers: block.structMembers,
+            charElements: block.charElements,
+            dangling: block.dangling,
           },
           'heap',
           varIdx++,
@@ -319,6 +341,9 @@ export class CTransformer implements IFlowTransformer {
       points_to?: string | null;
       highlight?: boolean;
       segment?: string;
+      structMembers?: Array<{ key: string; value: string }>;
+      charElements?: Array<{ value: string; highlight?: boolean }>;
+      dangling?: boolean;
     },
     scope: string,
     idx: number = 0,
@@ -326,6 +351,17 @@ export class CTransformer implements IFlowTransformer {
     const isPointer = block.type?.includes('*') || false;
     const parsedValue = parseComplexValue(block.value);
     const addr = block.address || `auto-${idx}`;
+
+    const metadata: Record<string, unknown> = {};
+    if (block.structMembers?.length) {
+      metadata.structMembers = block.structMembers;
+    }
+    if (block.charElements?.length) {
+      metadata.charElements = block.charElements;
+    }
+    if (block.dangling) {
+      metadata.dangling = true;
+    }
 
     return {
       id: `${scope}-${block.name}-${addr}`,
@@ -337,6 +373,7 @@ export class CTransformer implements IFlowTransformer {
       isPointer,
       pointsTo: block.points_to || undefined,
       address: block.address,
+      ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
     };
   }
 }

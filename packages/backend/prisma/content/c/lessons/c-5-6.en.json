@@ -1,0 +1,191 @@
+{
+  "lessonId": "c-5-6",
+  "title": "Dynamic Arrays",
+  "concept": "Arrays whose size is determined at runtime (based on user input)",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int size;\n    printf(\"How many numbers? \");\n    size = 5;\n\n    int *arr = (int*)malloc(sizeof(int) * size);\n\n    for(int i=0; i<size; i++) {\n        arr[i] = i * 10;\n        printf(\"%d \", arr[i]);\n    }\n\n    free(arr);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Include header files",
+        "explanation": "We include `stdio.h` and `stdlib.h` for output and dynamic memory functions.\n\nThis lesson covers dynamic arrays whose size is determined at runtime.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Start main function",
+        "explanation": "The main frame is created.\n\nUnlike static arrays, dynamic arrays are allocated on the heap with a runtime-determined size.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Declare size variable",
+        "explanation": "We declare a `size` variable to hold the array length.\n\nThis value will be used later to calculate the malloc size.",
+        "visualizationType": "cMemory",
+        "code": "int size;",
+        "stack": [
+          {
+            "name": "size",
+            "value": "???",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Print input prompt",
+        "explanation": "We print a prompt asking for the array length.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"How many numbers? \");",
+        "stdout": "How many numbers? "
+      },
+      {
+        "title": "Set size (simulated input)",
+        "explanation": "In this example, we set the length with `size = 5`.\n\nIn practice, this is where user input would be received.",
+        "visualizationType": "cMemory",
+        "code": "size = 5;",
+        "stack": [
+          {
+            "name": "size",
+            "value": "5",
+            "type": "int",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Dynamic memory allocation (malloc)",
+        "explanation": "`malloc(sizeof(int) * size)` creates a heap array that can store `size` integers.\n\nThe returned starting address is stored in pointer `arr` and used like an array.",
+        "visualizationType": "cMemory",
+        "code": "int *arr = (int*)malloc(sizeof(int) * size);",
+        "stack": [
+          {
+            "name": "size",
+            "value": "5",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "arr",
+            "value": "0xHEAP",
+            "type": "int*",
+            "address": "0x0ffc"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP",
+            "size": "20 bytes",
+            "value": "??? ??? ??? ??? ???"
+          }
+        ],
+        "stdout": ""
+      },
+      {
+        "title": "Initialize and print array with for loop",
+        "explanation": "We fill in and print values using `arr[i]` syntax.\n\nDynamic arrays use the same index access method as static arrays.",
+        "visualizationType": "cMemory",
+        "code": "for(int i=0; i<size; i++) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "stack": [
+          {
+            "name": "size",
+            "value": "5",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "arr",
+            "value": "0xHEAP",
+            "type": "int*",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "i",
+            "value": "0→1→2→3→4",
+            "type": "int",
+            "address": "0x0ff8"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP",
+            "size": "20 bytes",
+            "value": "{0, 10, 20, 30, 40}"
+          }
+        ],
+        "stdout": "How many numbers? \n0 10 20 30 40 "
+      },
+      {
+        "title": "Free memory (free)",
+        "explanation": "`free(arr)` returns the entire heap block at once.\n\nAfter free, the heap memory is released but `arr` still holds the old address (dangling pointer). The dynamic array pattern is: allocate, use, then free at the end.",
+        "visualizationType": "cMemory",
+        "code": "free(arr);",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "size",
+            "value": "5",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "arr",
+            "value": "0xHEAP",
+            "type": "int*",
+            "address": "0x0ffc",
+            "dangling": true,
+            "highlight": true
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which function is used to resize a dynamic array?",
+    "options": [
+      "malloc_more",
+      "extend",
+      "realloc",
+      "resize"
+    ],
+    "correctIndex": 2,
+    "explanation": "The `realloc(ptr, new_size)` function adjusts the memory size while preserving existing data (it even relocates if there is no room)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "A dynamic array requires multiple calls to free",
+      "correct": "You only need to free once.",
+      "why": "Since you borrowed the entire block with a single `malloc` call, you return the entire block with a single `free` call."
+    }
+  ],
+  "keyTakeaway": "When the size is unknown, use `malloc`. You can use array syntax ([]) on it just as conveniently."
+}

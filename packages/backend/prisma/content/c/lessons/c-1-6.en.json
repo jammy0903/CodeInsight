@@ -1,0 +1,151 @@
+{
+  "lessonId": "c-1-6",
+  "title": "Loops (while)",
+  "concept": "The while loop repeats as long as the condition is true. It's ideal when the number of iterations isn't predetermined.",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int n = 1;\n\n    while (n <= 4) {\n        printf(\"n = %d\\n\", n);\n        n = n * 2;\n    }\n\n    printf(\"Final n = %d\\n\", n);\n\n    return 0;\n}\n",
+    "steps": [
+      {
+        "title": "Starting the main Function",
+        "explanation": "The main stack frame is created when the program starts.\n\nThis lesson focuses on understanding how a while loop progresses and terminates through condition checks and value updates.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Setting the Initial Value",
+        "explanation": "`int n = 1;` prepares the variable for the while loop outside the loop body.\n\nSince while requires you to manually write initialization and updates, it's important to clearly set the starting value.",
+        "code": "int n = 1;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "n",
+            "type": "int",
+            "value": "1",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "while Condition Check (n = 1)",
+        "explanation": "First checks whether `n <= 4` is true, then executes the body if it is.\n\nSince while is a condition-driven loop, forgetting to update the condition variable easily leads to an infinite loop.",
+        "code": "while (n <= 4) {"
+      },
+      {
+        "title": "Iteration 1: Print Current Value",
+        "explanation": "Prints the current value of `n` to track the loop's progress.\n\nIn while loops, these intermediate outputs are useful for debugging the flow.",
+        "code": "printf(\"n = %d\\n\", n);",
+        "stdout": "n = 1"
+      },
+      {
+        "title": "Iteration 1: Double n",
+        "explanation": "`n = n * 2;` changes n from 1 to 2. In a while loop, this kind of update code is essential.\n\nWithout the update, the condition stays true forever and creates an infinite loop.",
+        "code": "n = n * 2;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "n",
+            "type": "int",
+            "value": "2",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Iteration 2: Condition Check (n = 2)",
+        "explanation": "After the update, `n=2` so the condition is still true and the next iteration proceeds.\n\nThe flow repeats: `condition check -> execute body -> update value`.",
+        "code": "n = n * 2;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "n",
+            "type": "int",
+            "value": "4",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "n = 1\nn = 2"
+      },
+      {
+        "title": "Iteration 3: Condition Check (n = 4)",
+        "explanation": "At `n=4`, `n <= 4` is still true so the body executes one more time.\n\nAfter this update, n becomes 8, which will terminate the loop at the next check.",
+        "code": "n = n * 2;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "n",
+            "type": "int",
+            "value": "8",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "n = 1\nn = 2\nn = 4"
+      },
+      {
+        "title": "Loop Terminates (n = 8)",
+        "explanation": "When `n=8`, `8 <= 4` is false so the while loop exits.\n\nNote that upon loop exit, the variable's value may not be the \"last executed value\" but rather the \"value that broke the condition\".",
+        "code": "while (n <= 4) {"
+      },
+      {
+        "title": "Printing Final n",
+        "explanation": "Prints the final value of `n` after the loop ends.\n\nThis confirms that the exit value isn't the last printed value, but rather the value after the condition was broken.",
+        "code": "printf(\"Final n = %d\\n\", n);",
+        "stdout": "n = 1\nn = 2\nn = 4\nFinal n = 8"
+      },
+      {
+        "title": "Program Exit",
+        "explanation": "`return 0;` terminates the program normally.\n\nThe key takeaway from this example is that in a while loop, you must manage the condition and update yourself.",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How does while (1) { ... } behave?",
+    "options": [
+      "Executes once",
+      "Does not execute",
+      "Infinite loop",
+      "Compilation error"
+    ],
+    "correctIndex": 2,
+    "explanation": "In C, 1 is true and 0 is false.\n\n`while (1)` means the condition is always true, so it loops infinitely.\nYou need a `break` statement to exit."
+  },
+  "misconceptions": [
+    {
+      "wrong": "A while loop executes at least once even if the condition is false",
+      "correct": "If the condition is false from the start, while never executes.",
+      "why": "The loop that guarantees at least one execution is do-while.\nwhile checks the condition before entering the body."
+    }
+  ],
+  "keyTakeaway": "The while loop is for 'when you don't know when it will end' — it keeps repeating as long as the condition is true!"
+}
