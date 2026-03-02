@@ -124,6 +124,9 @@ const LANG_THEMES: Record<string, LanguageTheme> = {
   },
 };
 
+// Mutable Python types (keep in sync with PyTransformer MUTABLE_TYPE_SET)
+const PYTHON_MUTABLE_TYPES = new Set(['list', 'dict', 'set', 'object', 'instance', 'bytearray']);
+
 // ============================================
 // 유틸리티
 // ============================================
@@ -169,6 +172,7 @@ interface ValueCardProps {
   onHover: (id: string | null) => void;
   isNew: boolean;
   isUpdated: boolean;
+  nameCount: number;
 }
 
 const ValueCard = memo(function ValueCard({
@@ -180,12 +184,23 @@ const ValueCard = memo(function ValueCard({
   onHover,
   isNew,
   isUpdated,
+  nameCount,
 }: ValueCardProps) {
   const [showType, setShowType] = useState(false);
   const colors = getTypeColor(object.type, theme);
   const emoji = getTypeEmoji(object.type, language);
   const displayValue = String(object.value ?? 'null');
   const meta = object.metadata as Record<string, unknown> | undefined;
+
+  // Mutability badge (Python objects only)
+  const isMutable = meta?.mutable === true || (meta?.mutable === undefined && PYTHON_MUTABLE_TYPES.has(object.type));
+  const showMutabilityBadge = language === 'python' && object.scope === 'objects';
+  const hideBadge = object.type === 'function' || object.type === 'class' || object.type === 'NoneType';
+
+  // Shared object (multiple names pointing to same object)
+  const isShared = nameCount > 1;
+  const refCountDisplay = meta?.refCount != null ? String(meta.refCount) : String(nameCount);
+  const showRefCount = nameCount > 0;
 
   return (
     <motion.div
@@ -196,16 +211,26 @@ const ValueCard = memo(function ValueCard({
       className={`
         relative px-3.5 py-2.5 rounded-xl border-2 cursor-pointer select-none
         transition-shadow duration-150
-        ${isHighlighted ? 'shadow-lg ring-2 ring-amber-300' : 'shadow-sm hover:shadow-md'}
+        ${isHighlighted ? 'shadow-lg ring-2 ring-amber-300' : isShared ? 'shadow-sm hover:shadow-md ring-2 ring-violet-300' : 'shadow-sm hover:shadow-md'}
       `}
       style={{
         backgroundColor: isHighlighted ? '#fefce8' : colors.bg,
-        borderColor: isHighlighted ? '#fbbf24' : meta?.isNew ? '#22c55e' : colors.border,
+        borderColor: isHighlighted ? '#fbbf24' : meta?.isNew ? '#22c55e' : isShared ? '#a78bfa' : colors.border,
       }}
       onMouseEnter={() => { onHover(object.id); setShowType(true); }}
       onMouseLeave={() => { onHover(null); setShowType(false); }}
       onClick={() => setShowType((prev) => !prev)}
     >
+      {/* Mutability badge (Python objects) */}
+      {showMutabilityBadge && !hideBadge && (
+        <span
+          className="absolute -top-2 -right-2 text-xs z-20"
+          title={isMutable ? 'Mutable' : 'Immutable'}
+        >
+          {isMutable ? '✏️' : '🔒'}
+        </span>
+      )}
+
       {/* NEW badge - top left corner */}
       {meta?.isNew && (
         <span
@@ -271,13 +296,17 @@ const ValueCard = memo(function ValueCard({
         </motion.div>
       )}
 
-      {/* refCount badge - bottom left */}
-      {meta?.refCount != null && (
+      {/* ref count badge - bottom left */}
+      {showRefCount && (
         <span
           className="absolute -bottom-2 left-2 px-1.5 py-0.5 rounded text-[10px] font-mono"
-          style={{ background: '#dbeafe', color: '#1e40af', border: '1px solid #60a5fa' }}
+          style={{
+            background: isShared ? '#ede9fe' : '#dbeafe',
+            color: isShared ? '#6d28d9' : '#1e40af',
+            border: `1px solid ${isShared ? '#a78bfa' : '#60a5fa'}`,
+          }}
         >
-          refs: {String(meta.refCount)}
+          refs: {refCountDisplay}
         </span>
       )}
     </motion.div>
@@ -300,6 +329,7 @@ interface FrameSectionProps {
   isNew: boolean;
   prevVariableIds: Set<string>;
   prevVariableValues: Map<string, unknown>;
+  globalNameCountMap: Map<string, number>;
 }
 
 const FrameSection = memo(function FrameSection({
@@ -314,6 +344,7 @@ const FrameSection = memo(function FrameSection({
   isNew,
   prevVariableIds,
   prevVariableValues,
+  globalNameCountMap,
 }: FrameSectionProps) {
   const { t } = useTranslation();
   const isGlobal = name === theme.globalFrameName || name === 'global' || name === '__main__' || name === 'main';
@@ -374,6 +405,7 @@ const FrameSection = memo(function FrameSection({
                   onHover={onHover}
                   isNew={isObjNew}
                   isUpdated={isUpdated}
+                  nameCount={globalNameCountMap.get(object.id) ?? 0}
                 />
               );
             })}
@@ -403,7 +435,7 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
   const theme = LANG_THEMES[language] || LANG_THEMES.javascript;
 
   // Build frame data: group objects by frame, attach name tags
-  const { frameData, connectionMap } = useMemo(() => {
+  const { frameData, connectionMap, globalNameCountMap } = useMemo(() => {
     const variableMap = new Map<string, FlowVariable>();
     step.variables.forEach((v) => variableMap.set(v.id, v));
 
@@ -432,6 +464,12 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
         names.push(v);
         namesByObject.set(v.pointsTo, names);
       }
+    });
+
+    // Global ref count map (total references to each object across all frames)
+    const globalNameCountMap = new Map<string, number>();
+    namesByObject.forEach((names, objId) => {
+      globalNameCountMap.set(objId, names.length);
     });
 
     // Build frames
@@ -515,7 +553,7 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
       }
     }
 
-    return { frameData: frames, connectionMap: connMap };
+    return { frameData: frames, connectionMap: connMap, globalNameCountMap };
   }, [step, theme.globalFrameName]);
 
   // Hover highlight connected IDs
@@ -572,6 +610,7 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
               isNew={!prevFrameNames.has(name)}
               prevVariableIds={prevVariableIds}
               prevVariableValues={prevVariableValues}
+              globalNameCountMap={globalNameCountMap}
             />
           ))}
           {frameData.filter(f => f.name === 'Heap').map(({ name, objects }) => (
@@ -588,6 +627,7 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
               isNew={!prevFrameNames.has(name)}
               prevVariableIds={prevVariableIds}
               prevVariableValues={prevVariableValues}
+              globalNameCountMap={globalNameCountMap}
             />
           ))}
         </AnimatePresence>
@@ -630,6 +670,10 @@ export const ReferenceGraphView = memo(function ReferenceGraphView({
               </div>
             </>
           )}
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded border-2" style={{ borderColor: '#a78bfa', backgroundColor: '#ede9fe' }} />
+            <span>{t('visualizer.shared_object')}</span>
+          </div>
           {language !== 'python' && (
             <>
               <div className="flex items-center gap-1">

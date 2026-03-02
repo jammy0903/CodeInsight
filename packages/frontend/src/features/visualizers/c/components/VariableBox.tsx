@@ -81,6 +81,52 @@ function formatValue(value: unknown): string {
 }
 
 /**
+ * 타입 문자열에서 바이트 크기를 추출/계산
+ * C/C++ 타입에만 적용 (VariableBox는 C/C++ 전용)
+ */
+function parseByteSize(typeStr: string): number | null {
+  // 1. Already contains "(NB)" → extract N (prevent double-annotation)
+  const alreadyMatch = typeStr.match(/\((\d+)B\)/);
+  if (alreadyMatch) return parseInt(alreadyMatch[1], 10);
+
+  // 2. C++ reference (&, &&) → null
+  if (/&&?/.test(typeStr)) return null;
+
+  // 3. Pointer (*) / function pointer ((*)) → 8
+  if (typeStr.includes('*') || typeStr.includes('(*)')) return 8;
+
+  // 4. Array "T[N]" → parseByteSize(T) × N
+  const arrayMatch = typeStr.match(/^(.+?)\[(\d+)\]$/);
+  if (arrayMatch) {
+    const elemSize = parseByteSize(arrayMatch[1].trim());
+    const n = parseInt(arrayMatch[2], 10);
+    if (elemSize !== null && !isNaN(n)) return elemSize * n;
+    return null;
+  }
+
+  // 5. Fixed primitives (remove unsigned/signed prefix)
+  const normalized = typeStr.replace(/^(unsigned|signed)\s+/, '').trim().toLowerCase();
+  const primitiveMap: Record<string, number> = {
+    'char': 1,
+    'bool': 1,
+    '_bool': 1,
+    'short': 2,
+    'short int': 2,
+    'int': 4,
+    'float': 4,
+    'long': 8,
+    'double': 8,
+    'long int': 8,
+    'long long': 8,
+    'long double': 16,
+  };
+  if (primitiveMap[normalized] !== undefined) return primitiveMap[normalized];
+
+  // 6. struct/unknown → null
+  return null;
+}
+
+/**
  * 상태에 따른 박스 스타일 결정
  */
 function getState(
@@ -107,6 +153,11 @@ export const VariableBox = memo(function VariableBox({
   isDeleting = false,
   onClick,
 }: VariableBoxProps) {
+  // C/C++ type label with byte size
+  const type = variable.type || '';
+  const byteSize = parseByteSize(type);
+  const typeLabel = type.includes('B)') ? type : (byteSize !== null ? `${type} (${byteSize}B)` : type);
+
   // C-specific metadata
   const isDangling = variable.metadata?.dangling === true;
   const structMembers = variable.metadata?.structMembers as
@@ -285,7 +336,7 @@ export const VariableBox = memo(function VariableBox({
           bottom: hasExtra ? '-10px' : '-8px',
         }}
       >
-        {variable.type}
+        {typeLabel}
       </span>
 
       {/* 주소 (C언어, 선택적) */}

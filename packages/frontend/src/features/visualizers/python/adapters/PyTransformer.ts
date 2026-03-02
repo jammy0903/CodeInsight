@@ -186,6 +186,9 @@ function formatValue(value: unknown, type: string): string {
   return String(value);
 }
 
+// Mutable Python types (keep in sync with ReferenceGraphView PYTHON_MUTABLE_TYPES)
+const MUTABLE_TYPE_SET = new Set(['list', 'dict', 'set', 'object', 'instance', 'bytearray']);
+
 export class PyTransformer implements IFlowTransformer {
   /**
    * LessonStep → FlowStep 변환
@@ -223,6 +226,8 @@ export class PyTransformer implements IFlowTransformer {
 
     // 1. 객체들을 FlowVariable로 변환 (참조 대상)
     objectsArray.forEach((obj) => {
+      const isMutableByType = MUTABLE_TYPE_SET.has(obj.type);
+      const mutableValue = obj.mutable !== undefined ? obj.mutable : isMutableByType;
       const variable: FlowVariable = {
         id: `obj-${obj.id}`,
         name: obj.type,
@@ -230,6 +235,7 @@ export class PyTransformer implements IFlowTransformer {
         type: obj.type,
         state: obj.highlight ? 'updating' : 'idle',
         scope: 'objects',
+        metadata: { mutable: mutableValue },
       };
       variables.push(variable);
     });
