@@ -47,7 +47,8 @@ class LessonContentLoader {
 
         try {
           const files = await fs.readdir(lessonsDir);
-          const jsonFiles = files.filter((f) => f.endsWith('.json'));
+          // locale 파일(*.en.json 등)은 제외 — getContent()에서 locale 경로를 직접 조합하므로
+          const jsonFiles = files.filter((f) => f.endsWith('.json') && !f.match(/\.\w{2}\.json$/));
 
           for (const file of jsonFiles) {
             const filePath = path.join(lessonsDir, file);
@@ -90,7 +91,19 @@ class LessonContentLoader {
     const watcher = watch(dir, (eventType, filename) => {
       if (!filename || !filename.endsWith('.json')) return;
 
-      const lessonId = path.basename(filename, '.json');
+      // locale 파일 변경 시 base lessonId 기준으로 캐시 무효화
+      const baseName = path.basename(filename, '.json');
+      const localeMatch = baseName.match(/^(.+)\.\w{2}$/);
+      const lessonId = localeMatch ? localeMatch[1] : baseName;
+
+      // locale 버전 캐시도 함께 무효화
+      if (localeMatch) {
+        const cacheKey = baseName; // e.g., 'js-9-1.en'
+        if (this.cache.has(cacheKey)) {
+          this.cache.delete(cacheKey);
+          logger.info(`[HMR] Cache invalidated: ${cacheKey}`);
+        }
+      }
 
       // 캐시 무효화 (Invalidate Cache)
       if (this.cache.has(lessonId)) {
