@@ -110,12 +110,11 @@ packages/backend/src/modules/simulators/c/handlers/
 
 ---
 
-### Bug 5: LOW — Python 레슨: 빈 pythonMemoryState (잔여)
+### Bug 5: ~~LOW~~ RESOLVED — Python 레슨: 빈 pythonMemoryState
 
-**심각 케이스 수정 완료**: py-1-5, py-1-8, py-2-1 등 전체 비어있던 레슨은 해결됨.
-
-**잔여**: 다수 Python 레슨의 중간 step에 빈 `pythonMemoryState` 산재 (py-1-1 4/7, py-1-2 5/10 등).
-콘텐츠 작업으로 `names[]`/`objects[]` 채우거나 해당 step을 `visualizationType: "terminal"`로 변경 필요.
+**수정 완료 (2026-03-03)**: print/output step에서 이전 변수 상태가 누락되던 문제.
+30개 파일 60개 step에 이전 step의 `names[]`/`objects[]`를 propagate하여 해결.
+남은 빈 step 3개는 변수가 아직 없는 최초 step이므로 정상.
 
 ---
 
