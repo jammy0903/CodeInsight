@@ -1,11 +1,8 @@
 # Memory Viewer / Visualizer 한계 및 현황 종합
 
-> 메모리 뷰어 관련 제한사항, 알려진 버그, 언어별 지원 현황을 한 문서에 정리.
+> 메모리 뷰어 관련 제한사항, 언어별 지원 현황, 해결된 버그 이력을 한 문서에 정리.
 >
-> **관련 원본 문서** (이 문서로 통합됨):
-> - `packages/backend/prisma/content/c/C_LESSON_SCAN_PLAN.md` — C 시뮬레이터 지원 범위 & 레슨 스캔 결과
-> - `docs/buglist.md` — 시각화 관련 버그 5건
-> - `.claude/plans/wasm-hybrid-c-simulator.md` — 미래 아키텍처 계획
+> **최종 업데이트**: 2026-03-03
 
 ---
 
@@ -28,12 +25,12 @@
 |------|:-----------:|:---------:|------|
 | **C** | O | O | 가장 완성도 높음. 핸들러 10개 |
 | **Java** | O | O | javaMemoryState 기반 |
-| **JavaScript** | X | 부분 | memoryState 라우팅이 Java 핸들러로 빠짐 (Bug 3) |
-| **Python** | X | 부분 | pythonMemoryState 빈 데이터 다수 (Bug 5) |
+| **JavaScript** | O | O | memoryState 기반 (Bug 3 수정 완료) |
+| **Python** | X | O | pythonMemoryState 기반 (Bug 5 수정 완료) |
 
-**코드 레벨 제한:**
-- `LessonMemoryVisualizer.tsx` — Java, C만 지원. Python/JS memory는 null 반환
-- `LessonFlowVisualizer.tsx` — `if (memoryState && !isJavaScript)` → JS 명시적 제외
+**코드 레벨 참고:**
+- `LessonMemoryVisualizer.tsx` — Java, C만 Memory View 탭 지원. Python/JS는 Flow View로 시각화
+- `LessonFlowVisualizer.tsx` — 모든 언어의 memoryState enrichment 지원
 
 ---
 
@@ -82,39 +79,17 @@ packages/backend/src/modules/simulators/c/handlers/
 
 ---
 
-## 4. 알려진 버그 (시각화 관련)
+## 4. 해결된 버그 이력
 
-### Bug 1: ~~CRITICAL~~ RESOLVED — C 레슨 c-5-1~c-5-6 Zod 검증 실패
+> 5건 모두 RESOLVED (2026-03-03 기준)
 
-**수정 완료**: schema를 `size: z.union([z.number(), z.string()]).optional()`로 변경하여 해결.
-
----
-
-### Bug 2: ~~CRITICAL~~ RESOLVED — 47/49 C 레슨: 시뮬레이터가 수제 JSON 덮어씀
-
-**수정 완료**: `allStepsHaveViz` 체크에서 `visualizationType === 'terminal'` step 제외 처리.
-
----
-
-### Bug 3: ~~HIGH~~ RESOLVED — 9 JS 레슨: memory 타입 시각화 안됨
-
-**수정 완료 (2026-03-03)**:
-1. `useLessonVisualization.ts` — 일반 memoryState 전용 핸들러 추가 (Java 핸들러와 분리)
-2. `LessonFlowVisualizer.tsx` — JS에서 memoryState enrichment 제외하던 `!isJavaScript` 조건 제거
-
----
-
-### Bug 4: ~~MEDIUM~~ RESOLVED — 3 JS 레슨: EventLoopView 빈 렌더링
-
-**수정 완료**: `hasEventLoopNoteOnly` 분기 추가하여 note/warning 텍스트를 렌더링.
-
----
-
-### Bug 5: ~~LOW~~ RESOLVED — Python 레슨: 빈 pythonMemoryState
-
-**수정 완료 (2026-03-03)**: print/output step에서 이전 변수 상태가 누락되던 문제.
-30개 파일 60개 step에 이전 step의 `names[]`/`objects[]`를 propagate하여 해결.
-남은 빈 step 3개는 변수가 아직 없는 최초 step이므로 정상.
+| Bug | 심각도 | 내용 | 수정 방법 |
+|-----|--------|------|-----------|
+| 1 | CRITICAL | C 레슨 c-5-1~c-5-6 Zod 검증 실패 (`heap[].size` 타입) | schema를 `z.union([z.number(), z.string()])` 으로 변경 |
+| 2 | CRITICAL | 47/49 C 레슨: 시뮬레이터가 수제 JSON 덮어씀 | `allStepsHaveViz`에서 terminal step 제외 |
+| 3 | HIGH | 9 JS 레슨: memory 타입 시각화 안됨 | 일반 memoryState 핸들러 분리 + `!isJavaScript` 조건 제거 |
+| 4 | MEDIUM | 3 JS 레슨: EventLoopView 빈 렌더링 | `hasEventLoopNoteOnly` 분기 추가 |
+| 5 | LOW | Python 30개 레슨 60 step: 빈 pythonMemoryState | 이전 step의 `names[]`/`objects[]` propagate |
 
 ---
 
@@ -144,4 +119,4 @@ C 코드 → Emscripten 검증 (emcc -fsyntax-only) → 통과 시 인터프리�
 - 현재 인터프리터의 메모리 시각화 유지
 - 함수 포인터, 이중 포인터 등 점진적 확장
 
-**상태**: 계획 단계 (`.claude/plans/wasm-hybrid-c-simulator.md` 참고)
+**상태**: 계획 단계
