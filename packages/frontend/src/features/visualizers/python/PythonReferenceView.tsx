@@ -3,14 +3,15 @@
  *
  * 2분할 레이아웃:
  * - 왼쪽 (Stack): 프레임 + 변수 (원시값은 인라인, 참조는 → 아이콘)
- * - 오른쪽 (Objects): 힙 객체 카드
- * - SVG 오버레이: 베지어 곡선 화살표로 참조 관계 표시
+ * - 오른쪽 (Objects): 힙 객체 카드 — 스택 참조 순서대로 단일 컬럼 배치
+ * - SVG 오버레이: 베지어 곡선 화살표
  *
- * 원시값(int, float, str, bool 등)은 스택에 인라인 표시.
- * 참조 타입(list, dict, set, tuple, instance...)은 → 아이콘 + 화살표.
+ * 호버 동작:
+ * - → 아이콘 or 힙 카드 호버 → 연결된 화살표 + 상대 요소 하이라이트
+ * - 무관한 화살표는 fade out
  */
 
-import { memo, useMemo, useRef, useState, useEffect } from 'react';
+import { memo, useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FlowStep, FlowVariable } from '@codeinsight/shared';
 
@@ -18,7 +19,7 @@ import type { FlowStep, FlowVariable } from '@codeinsight/shared';
 // 상수
 // ============================================
 
-/** 스택에 값을 인라인으로 표시하는 타입 (힙 카드 없음, 화살표 없음) */
+/** 스택에 값을 인라인으로 표시하는 타입 (힙 카드/화살표 없음) */
 const INLINE_TYPES = new Set(['int', 'float', 'str', 'bool', 'NoneType', 'bytes', 'complex']);
 
 /** Mutable Python types */
@@ -51,7 +52,6 @@ const TYPE_EMOJI: Record<string, string> = {
   function: '⚙️', class: '🏛️', instance: '🧩',
 };
 
-/** 프레임 헤더 색상 */
 const FRAME_COLORS = {
   global:   { bg: '#f8fafc', border: '#cbd5e1', header: '#e2e8f0', headerText: '#475569' },
   function: { bg: '#eff6ff', border: '#60a5fa', header: '#dbeafe', headerText: '#1d4ed8' },
@@ -75,6 +75,8 @@ function isGlobalFrame(name: string): boolean {
 
 interface ArrowInfo {
   id: string;
+  fromId: string;
+  toId: string;
   sx: number;
   sy: number;
   tx: number;
@@ -102,9 +104,14 @@ interface HeapCardProps {
   nameCount: number;
   isNew: boolean;
   isUpdated: boolean;
+  isHighlighted: boolean;
+  onHoverStart: (id: string) => void;
+  onHoverEnd: () => void;
 }
 
-const HeapCard = memo(function HeapCard({ object, nameCount, isNew, isUpdated }: HeapCardProps) {
+const HeapCard = memo(function HeapCard({
+  object, nameCount, isNew, isUpdated, isHighlighted, onHoverStart, onHoverEnd,
+}: HeapCardProps) {
   const colors = getTypeColor(object.type);
   const emoji = getTypeEmoji(object.type);
   const isShared = nameCount > 1;
@@ -124,11 +131,18 @@ const HeapCard = memo(function HeapCard({ object, nameCount, isNew, isUpdated }:
       exit={{ opacity: 0, scale: 0.85 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       data-variable-id={object.id}
-      className="relative px-3.5 py-2.5 rounded-xl border-2 shadow-sm cursor-default select-none"
+      onMouseEnter={() => onHoverStart(object.id)}
+      onMouseLeave={onHoverEnd}
+      className="relative px-3.5 py-2.5 rounded-xl border-2 cursor-pointer select-none"
       style={{
-        backgroundColor: colors.bg,
-        borderColor: isShared ? '#a78bfa' : colors.border,
-        boxShadow: isShared ? '0 0 0 2px #a78bfa40' : undefined,
+        backgroundColor: isHighlighted ? '#fefce8' : colors.bg,
+        borderColor: isHighlighted ? '#fbbf24' : isShared ? '#a78bfa' : colors.border,
+        boxShadow: isHighlighted
+          ? '0 0 0 3px #fbbf2466, 0 4px 12px rgba(0,0,0,0.12)'
+          : isShared
+          ? '0 0 0 2px #a78bfa40'
+          : '0 1px 3px rgba(0,0,0,0.08)',
+        transition: 'box-shadow 0.15s, border-color 0.15s, background-color 0.15s',
       }}
     >
       {/* Mutability badge */}
@@ -176,7 +190,16 @@ const HeapCard = memo(function HeapCard({ object, nameCount, isNew, isUpdated }:
 // StackVariable 컴포넌트
 // ============================================
 
-const StackVariable = memo(function StackVariable({ variable }: { variable: FlowVariable }) {
+interface StackVariableProps {
+  variable: FlowVariable;
+  isHighlighted: boolean;
+  onHoverStart: (id: string) => void;
+  onHoverEnd: () => void;
+}
+
+const StackVariable = memo(function StackVariable({
+  variable, isHighlighted, onHoverStart, onHoverEnd,
+}: StackVariableProps) {
   const isInline = INLINE_TYPES.has(variable.type);
   const typeColor = getTypeColor(variable.type);
 
@@ -190,7 +213,7 @@ const StackVariable = memo(function StackVariable({ variable }: { variable: Flow
         {variable.name}
       </span>
 
-      {/* Inline value or reference → indicator */}
+      {/* Inline value (primitives) or → reference indicator */}
       {isInline ? (
         <span
           className="px-2 py-0.5 rounded text-xs font-mono font-semibold whitespace-nowrap"
@@ -205,11 +228,15 @@ const StackVariable = memo(function StackVariable({ variable }: { variable: Flow
       ) : (
         <span
           data-var-id={variable.id}
-          className="px-2 py-0.5 rounded text-xs font-mono font-semibold"
+          onMouseEnter={() => onHoverStart(variable.id)}
+          onMouseLeave={onHoverEnd}
+          className="px-2 py-0.5 rounded text-xs font-mono font-semibold cursor-pointer"
           style={{
-            backgroundColor: '#e0e7ff',
-            color: '#4338ca',
-            border: '1px solid #818cf8',
+            backgroundColor: isHighlighted ? '#fef08a' : '#e0e7ff',
+            color: isHighlighted ? '#b45309' : '#4338ca',
+            border: `1px solid ${isHighlighted ? '#fbbf24' : '#818cf8'}`,
+            boxShadow: isHighlighted ? '0 0 0 2px #fbbf2466' : undefined,
+            transition: 'background-color 0.15s, border-color 0.15s, box-shadow 0.15s',
           }}
         >
           →
@@ -223,13 +250,17 @@ const StackVariable = memo(function StackVariable({ variable }: { variable: Flow
 // StackFrame 컴포넌트
 // ============================================
 
-const StackFrame = memo(function StackFrame({
-  frame,
-  isActive,
-}: {
+interface StackFrameProps {
   frame: StackFrameData;
   isActive: boolean;
-}) {
+  highlightedIds: Set<string>;
+  onHoverStart: (id: string) => void;
+  onHoverEnd: () => void;
+}
+
+const StackFrame = memo(function StackFrame({
+  frame, isActive, highlightedIds, onHoverStart, onHoverEnd,
+}: StackFrameProps) {
   const isGlobal = isGlobalFrame(frame.name);
   const colors = isGlobal ? FRAME_COLORS.global : FRAME_COLORS.function;
   const displayName = isGlobal ? 'global' : `${frame.name}()`;
@@ -246,16 +277,12 @@ const StackFrame = memo(function StackFrame({
       }`}
       style={{ backgroundColor: colors.bg, borderColor: colors.border }}
     >
-      {/* Frame header */}
       <div
         className="flex items-center gap-2 px-3 py-2"
         style={{ backgroundColor: colors.header }}
       >
         <span className="text-sm">{isGlobal ? '🐍' : '→'}</span>
-        <span
-          className="font-mono text-sm font-semibold"
-          style={{ color: colors.headerText }}
-        >
+        <span className="font-mono text-sm font-semibold" style={{ color: colors.headerText }}>
           {displayName}
         </span>
         {isActive && !isGlobal && (
@@ -265,12 +292,19 @@ const StackFrame = memo(function StackFrame({
         )}
       </div>
 
-      {/* Variables */}
       <div className="p-3 flex flex-col gap-2 min-h-[40px]">
         {frame.variables.length === 0 ? (
           <span className="text-sm text-gray-400 italic">empty</span>
         ) : (
-          frame.variables.map((v) => <StackVariable key={v.id} variable={v} />)
+          frame.variables.map((v) => (
+            <StackVariable
+              key={v.id}
+              variable={v}
+              isHighlighted={highlightedIds.has(v.id)}
+              onHoverStart={onHoverStart}
+              onHoverEnd={onHoverEnd}
+            />
+          ))
         )}
       </div>
     </motion.div>
@@ -288,6 +322,10 @@ export const PythonReferenceView = memo(function PythonReferenceView({
 }: PythonReferenceViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [arrows, setArrows] = useState<ArrowInfo[]>([]);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  const handleHoverStart = useCallback((id: string) => setHoveredId(id), []);
+  const handleHoverEnd = useCallback(() => setHoveredId(null), []);
 
   // Variable lookup map
   const variableMap = useMemo(() => {
@@ -300,12 +338,7 @@ export const PythonReferenceView = memo(function PythonReferenceView({
   const stackFrames = useMemo<StackFrameData[]>(
     () =>
       (step.frames ?? [])
-        .filter(
-          (f) =>
-            f.name !== 'objects' &&
-            f.name !== 'heap' &&
-            f.name !== 'Objects (Heap)'
-        )
+        .filter((f) => f.name !== 'objects' && f.name !== 'heap' && f.name !== 'Objects (Heap)')
         .map((f) => ({
           name: f.name,
           variables: f.variableIds
@@ -315,27 +348,72 @@ export const PythonReferenceView = memo(function PythonReferenceView({
     [step.frames, variableMap]
   );
 
-  // Heap objects (non-primitive only — primitives shown inline in stack)
+  // Heap objects (non-primitive only)
   const heapObjects = useMemo(
-    () =>
-      step.variables.filter(
-        (v) => v.scope === 'objects' && !INLINE_TYPES.has(v.type)
-      ),
+    () => step.variables.filter((v) => v.scope === 'objects' && !INLINE_TYPES.has(v.type)),
     [step.variables]
   );
 
-  // Reference count per heap object (for shared detection)
+  // Reference count per heap object
   const nameCountMap = useMemo(() => {
     const map = new Map<string, number>();
     step.variables.forEach((v) => {
+      if (v.pointsTo) map.set(v.pointsTo, (map.get(v.pointsTo) ?? 0) + 1);
+    });
+    return map;
+  }, [step.variables]);
+
+  // Connection map: heapObjId → [varIds that point to it]
+  const connectionMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    step.variables.forEach((v) => {
       if (v.pointsTo) {
-        map.set(v.pointsTo, (map.get(v.pointsTo) ?? 0) + 1);
+        const arr = map.get(v.pointsTo) ?? [];
+        arr.push(v.id);
+        map.set(v.pointsTo, arr);
       }
     });
     return map;
   }, [step.variables]);
 
-  // Arrow pairs: only non-inline reference variables get arrows
+  // Highlighted IDs: hovered element + all connected elements
+  const highlightedIds = useMemo((): Set<string> => {
+    if (!hoveredId) return new Set();
+    const set = new Set<string>([hoveredId]);
+    // If hovering a stack var → also highlight the heap obj it points to
+    const hv = variableMap.get(hoveredId);
+    if (hv?.pointsTo) set.add(hv.pointsTo);
+    // If hovering a heap obj → also highlight all vars pointing to it
+    (connectionMap.get(hoveredId) ?? []).forEach((id) => set.add(id));
+    return set;
+  }, [hoveredId, variableMap, connectionMap]);
+
+  // Heap objects ordered by stack reference order (top frame first)
+  // → minimises arrow crossing, makes arrows roughly horizontal
+  const orderedHeapObjects = useMemo(() => {
+    const placed = new Set<string>();
+    const ordered: FlowVariable[] = [];
+
+    const displayOrder = stackFrames.slice().reverse(); // most recent frame first
+    for (const frame of displayOrder) {
+      for (const v of frame.variables) {
+        if (v.pointsTo && !INLINE_TYPES.has(v.type)) {
+          const obj = heapObjects.find((h) => h.id === v.pointsTo);
+          if (obj && !placed.has(obj.id)) {
+            ordered.push(obj);
+            placed.add(obj.id);
+          }
+        }
+      }
+    }
+    // Orphaned heap objects (not directly referenced from any frame)
+    for (const h of heapObjects) {
+      if (!placed.has(h.id)) ordered.push(h);
+    }
+    return ordered;
+  }, [stackFrames, heapObjects]);
+
+  // Arrow pairs: only non-inline reference variables
   const arrowPairs = useMemo(
     () =>
       step.variables
@@ -345,7 +423,6 @@ export const PythonReferenceView = memo(function PythonReferenceView({
   );
 
   // Measure DOM positions and compute arrow coordinates
-  // Double rAF + 150ms to wait for Framer Motion layout animations to settle
   useEffect(() => {
     let cancelled = false;
 
@@ -355,18 +432,16 @@ export const PythonReferenceView = memo(function PythonReferenceView({
       const newArrows: ArrowInfo[] = [];
 
       for (const { fromId, toId } of arrowPairs) {
-        const fromEl = containerRef.current.querySelector(
-          `[data-var-id="${fromId}"]`
-        );
-        const toEl = containerRef.current.querySelector(
-          `[data-variable-id="${toId}"]`
-        );
+        const fromEl = containerRef.current.querySelector(`[data-var-id="${fromId}"]`);
+        const toEl = containerRef.current.querySelector(`[data-variable-id="${toId}"]`);
         if (!fromEl || !toEl) continue;
 
         const fr = fromEl.getBoundingClientRect();
         const tr = toEl.getBoundingClientRect();
         newArrows.push({
           id: `${fromId}->${toId}`,
+          fromId,
+          toId,
           sx: fr.right - containerRect.left,
           sy: fr.top + fr.height / 2 - containerRect.top,
           tx: tr.left - containerRect.left,
@@ -384,12 +459,10 @@ export const PythonReferenceView = memo(function PythonReferenceView({
       })
     );
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [arrowPairs, nameCountMap]);
 
-  // Previous step data for diff animations
+  // Previous step diff
   const prevObjectIds = useMemo(
     () => new Set(prevStep?.variables.map((v) => v.id) ?? []),
     [prevStep]
@@ -399,20 +472,20 @@ export const PythonReferenceView = memo(function PythonReferenceView({
     [prevStep]
   );
 
-  // Active frame = last non-global frame (most recent call)
+  // Active frame = last non-global frame
   const activeFrameName = useMemo(() => {
     const nonGlobal = stackFrames.filter((f) => !isGlobalFrame(f.name));
     return nonGlobal.length > 0 ? nonGlobal[nonGlobal.length - 1].name : null;
   }, [stackFrames]);
+
+  const anyHovered = hoveredId !== null;
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <div className="flex gap-6 p-4 min-h-[120px]">
         {/* Stack Column (2/5 width) */}
         <div className="w-2/5 flex-shrink-0 flex flex-col gap-3">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            Stack
-          </div>
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Stack</div>
           <AnimatePresence mode="popLayout">
             {stackFrames
               .slice()
@@ -422,6 +495,9 @@ export const PythonReferenceView = memo(function PythonReferenceView({
                   key={frame.name}
                   frame={frame}
                   isActive={frame.name === activeFrameName}
+                  highlightedIds={highlightedIds}
+                  onHoverStart={handleHoverStart}
+                  onHoverEnd={handleHoverEnd}
                 />
               ))}
           </AnimatePresence>
@@ -430,28 +506,26 @@ export const PythonReferenceView = memo(function PythonReferenceView({
           )}
         </div>
 
-        {/* Objects Column (remaining width) */}
+        {/* Objects Column — single column, ordered to align with stack */}
         <div className="flex-1 flex flex-col gap-3">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            Objects
-          </div>
-          <div className="flex flex-wrap gap-5 pt-1">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Objects</div>
+          <div className="flex flex-col gap-5 pt-1 pb-3">
             <AnimatePresence mode="popLayout">
-              {heapObjects.map((obj) => (
+              {orderedHeapObjects.map((obj) => (
                 <HeapCard
                   key={obj.id}
                   object={obj}
                   nameCount={nameCountMap.get(obj.id) ?? 0}
                   isNew={!prevObjectIds.has(obj.id)}
-                  isUpdated={
-                    prevObjectIds.has(obj.id) &&
-                    prevObjectValues.get(obj.id) !== obj.value
-                  }
+                  isUpdated={prevObjectIds.has(obj.id) && prevObjectValues.get(obj.id) !== obj.value}
+                  isHighlighted={highlightedIds.has(obj.id)}
+                  onHoverStart={handleHoverStart}
+                  onHoverEnd={handleHoverEnd}
                 />
               ))}
             </AnimatePresence>
           </div>
-          {heapObjects.length === 0 && (
+          {orderedHeapObjects.length === 0 && (
             <span className="text-sm text-gray-400 italic">No objects</span>
           )}
         </div>
@@ -464,41 +538,37 @@ export const PythonReferenceView = memo(function PythonReferenceView({
           style={{ zIndex: 5, overflow: 'visible' }}
         >
           <defs>
-            <marker
-              id="py-arrow-default"
-              markerWidth="8"
-              markerHeight="8"
-              refX="7"
-              refY="3"
-              orient="auto"
-            >
+            <marker id="py-arr-def" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
               <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8" />
             </marker>
-            <marker
-              id="py-arrow-shared"
-              markerWidth="8"
-              markerHeight="8"
-              refX="7"
-              refY="3"
-              orient="auto"
-            >
+            <marker id="py-arr-shr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
               <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa" />
             </marker>
+            <marker id="py-arr-hi" markerWidth="9" markerHeight="9" refX="8" refY="3.5" orient="auto">
+              <path d="M0,0 L0,7 L9,3.5 z" fill="#f59e0b" />
+            </marker>
           </defs>
-          {arrows.map(({ id, sx, sy, tx, ty, isShared }) => {
-            const span = Math.max(40, (tx - sx) * 0.45);
+
+          {arrows.map(({ id, fromId, toId, sx, sy, tx, ty, isShared }) => {
+            const span = Math.max(40, Math.abs(tx - sx) * 0.45);
             const d = `M ${sx} ${sy} C ${sx + span} ${sy} ${tx - span} ${ty} ${tx} ${ty}`;
-            const stroke = isShared ? '#a78bfa' : '#94a3b8';
-            const markerId = isShared ? 'py-arrow-shared' : 'py-arrow-default';
+
+            const isActive = anyHovered && (highlightedIds.has(fromId) || highlightedIds.has(toId));
+            const opacity = anyHovered ? (isActive ? 1 : 0.07) : 0.75;
+            const strokeWidth = isActive ? 2.5 : 1.5;
+            const stroke = isActive ? '#f59e0b' : isShared ? '#a78bfa' : '#94a3b8';
+            const markerId = isActive ? 'py-arr-hi' : isShared ? 'py-arr-shr' : 'py-arr-def';
+
             return (
               <path
                 key={id}
                 d={d}
                 fill="none"
                 stroke={stroke}
-                strokeWidth={1.5}
+                strokeWidth={strokeWidth}
                 markerEnd={`url(#${markerId})`}
-                opacity={0.85}
+                opacity={opacity}
+                style={{ transition: 'opacity 0.12s ease, stroke-width 0.12s ease' }}
               />
             );
           })}
