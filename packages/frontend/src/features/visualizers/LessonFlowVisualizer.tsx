@@ -23,6 +23,7 @@ import { PrototypeChainView } from './javascript/components/PrototypeChainView';
 import { PromiseView } from './javascript/components/PromiseView';
 import { AlgorithmView } from './algorithm/AlgorithmView';
 import { ArrowLayer } from './c/components/ArrowLayer';
+import { PythonReferenceView } from './python/PythonReferenceView';
 import { createAdapter } from './shared/adapters/registry';
 import type { FlowTheme } from './shared/styles';
 
@@ -317,14 +318,13 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     return <div className={className} />;
   }
 
-  // Python → ReferenceGraphView
+  // Python → PythonReferenceView (Python Tutor 스타일: Stack / Objects 2분할 + SVG 화살표)
   if (language === 'python') {
     return (
       <div className={className}>
-        <ReferenceGraphView
+        <PythonReferenceView
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
-          language="python"
         />
       </div>
     );

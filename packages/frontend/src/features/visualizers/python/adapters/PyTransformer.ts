@@ -117,6 +117,12 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
       if (!ref?.objectId) return String(ref);
       const obj = objects.get(ref.objectId);
       if (!obj) return '?';
+      // 중첩 컬렉션: placeholder로 표시 (→ [object Object] 방지)
+      if (obj.type === 'list') return '[…]';
+      if (obj.type === 'tuple') return '(…)';
+      if (obj.type === 'dict') return '{…}';
+      if (obj.type === 'set') return '{…}';
+      if (obj.type === 'instance') return `<${(obj.value as { className?: string })?.className || obj.type}>`;
       return formatValue(obj.value, obj.type);
     });
     if (type === 'list') return `[${elements.join(', ')}]`;
@@ -132,7 +138,14 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
       const keyObj = objects.get(entry.key.objectId);
       const valObj = objects.get(entry.value.objectId);
       const keyStr = keyObj ? formatValue(keyObj.value, keyObj.type) : '?';
-      const valStr = valObj ? formatValue(valObj.value, valObj.type) : '?';
+      // 중첩 컬렉션 value: placeholder로 표시
+      const valStr = valObj
+        ? (['list', 'tuple', 'dict', 'set'].includes(valObj.type)
+          ? (valObj.type === 'list' ? '[…]' : valObj.type === 'tuple' ? '(…)' : '{…}')
+          : valObj.type === 'instance'
+            ? `<${(valObj.value as { className?: string })?.className || valObj.type}>`
+            : formatValue(valObj.value, valObj.type))
+        : '?';
       return `${keyStr}: ${valStr}`;
     });
     return `{${pairs.join(', ')}}`;
