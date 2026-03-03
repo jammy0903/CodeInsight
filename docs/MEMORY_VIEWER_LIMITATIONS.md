@@ -2,7 +2,7 @@
 
 > 메모리 뷰어 관련 제한사항, 언어별 지원 현황, 해결된 버그 이력을 한 문서에 정리.
 >
-> **최종 업데이트**: 2026-03-03
+> **최종 업데이트**: 2026-03-04
 
 ---
 
@@ -79,7 +79,96 @@ packages/backend/src/modules/simulators/c/handlers/
 
 ---
 
-## 4. 해결된 버그 이력
+## 4. Java 시각화 현황
+
+### 레슨 규모
+
+45개 레슨, 10개 챕터. 모든 레슨 `deltaFormat: true` 사용.
+
+| Ch | 주제 | 레슨 수 |
+|----|------|---------|
+| 1 | String/Integer 비교 | 8 |
+| 2 | Null 처리 | 4 |
+| 3 | Pass by value/reference | 4 |
+| 4 | String 불변성 | 4 |
+| 5 | final 키워드 | 4 |
+| 6 | 예외 처리 | 5 |
+| 7 | Generics | 4 |
+| 8 | Collections (ArrayList, HashMap) | 4 |
+| 9 | GC, JVM 구조 | 4 |
+| 10 | Threading, 동기화 | 4 |
+
+### 시각화 타입별 스텝 수
+
+| 타입 | 스텝 수 | 설명 |
+|------|---------|------|
+| `javaMemory` | 249 | Java 전용 메모리 뷰 |
+| `memory` | 17 | 범용 메모리 뷰 (fallback) |
+
+### 시각화 구성 요소
+
+**1. Stack-Heap 다이어그램** (핵심)
+- **Stack**: 함수 프레임, 변수명/타입/값, 참조 화살표 (`→ 0x001`)
+- **Heap**: 메모리 주소, 객체 타입/내용
+- **인터랙션**: 참조 변수 hover → 힙 객체 하이라이트 (파란색 glow)
+- **변경 표시**: 수정된 변수/객체 노란색 배경
+- **타입 컬러코딩**: 노랑(primitive), 초록(String), 주황(배열), 분홍(객체), 회색(null)
+
+**2. Integer Cache 시각화** (5개 레슨)
+- -128~127 캐시 범위 시각적 표시
+- 현재 참조 값 하이라이트, 참조 카운트 표시
+
+**3. HashSet Bucket 시각화** (2개 레슨)
+- 내부 버킷 구조, 버킷 인덱스/내용
+- 검색/활성 버킷 초록색 하이라이트
+
+**4. 배너/메타 정보**
+
+| 배너 | 색상 | 용도 | 스텝 수 |
+|------|------|------|---------|
+| comparison | 파랑 | 주소 비교 (`0x001 != 0x002`) | 8 |
+| warning | 주황 | 위험 패턴 안내 | 46 |
+| note | 하늘 | 추가 설명 | — |
+| output | — | `System.out.println()` 결과 | 129 |
+
+### javaMemoryState 데이터 구조
+
+```json
+{
+  "stack": [{ "name": "str", "value": "→ 0x001", "type": "String", "isFinal": false }],
+  "heap": [{ "address": "0x001", "content": "String(hello)", "type": "String", "new": true }],
+  "cache": { "name": "Integer Cache", "range": "-128 ~ 127", "highlight": 127, "refCount": 2 },
+  "hashSet": { "buckets": [{ "index": "bucket[3]", "content": "Person[Alice]", "searched": true }] },
+  "comparison": "0x001 == 0x001",
+  "warning": "캐시 범위 내라서 true, 하지만 이에 의존하면 안 됨!",
+  "output": ["hello", "world"]
+}
+```
+
+### 렌더링 파이프라인
+
+```
+useLessonVisualization.ts (javaMemoryState 파싱)
+  → LessonFlowVisualizer.tsx (ReferenceGraphView + 배너 렌더링)
+  → LessonMemoryVisualizer.tsx (Memory View 탭 — JavaMemoryView)
+```
+
+### 지원 O vs 미지원 X
+
+| 지원됨 | 미지원 |
+|--------|--------|
+| Stack 변수 (primitive, 참조) | static/클래스 레벨 변수 |
+| Heap 객체 (String, 배열, 사용자 정의) | GC 시각화 (마킹, 수거 이벤트) |
+| 참조 화살표 + hover 하이라이트 | JVM 내부 영역 (PermGen, MetaSpace) |
+| 타입별 컬러코딩 | 스레드 상태 시각화 |
+| 변경 하이라이트 | WeakReference/SoftReference |
+| Integer Cache 시각화 | 메서드 호출 애니메이션 |
+| HashSet Bucket 시각화 | volatile 변수 마커 |
+| 복수 스택 프레임 | 커스텀 toString() 표현 |
+
+---
+
+## 5. 해결된 버그 이력 (전체)
 
 > 5건 모두 RESOLVED (2026-03-03 기준)
 
@@ -93,7 +182,7 @@ packages/backend/src/modules/simulators/c/handlers/
 
 ---
 
-## 5. C 레슨 스캔 결과 (46개 전수조사)
+## 6. C 레슨 스캔 결과 (46개 전수조사)
 
 | Phase | 대상 | 레슨 수 | 결과 |
 |-------|------|---------|------|
@@ -106,7 +195,7 @@ packages/backend/src/modules/simulators/c/handlers/
 
 ---
 
-## 6. 미래 계획: Wasm 하이브리드 시뮬레이터
+## 7. 미래 계획: Wasm 하이브리드 시뮬레이터
 
 **전략**: "컴파일은 Emscripten, 실행은 인터프리터"
 
