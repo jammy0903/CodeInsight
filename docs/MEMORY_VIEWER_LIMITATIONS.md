@@ -84,75 +84,38 @@ packages/backend/src/modules/simulators/c/handlers/
 
 ## 4. 알려진 버그 (시각화 관련)
 
-### Bug 1: CRITICAL — C 레슨 c-5-1~c-5-6 Zod 검증 실패
+### Bug 1: ~~CRITICAL~~ RESOLVED — C 레슨 c-5-1~c-5-6 Zod 검증 실패
 
-**증상**: "Invalid lesson data from server" 에러로 레슨 로드 불가
-
-**원인**: `MemoryBlockSchema`에서 `size: z.number()` 인데 JSON에 `"40MB"`, `"4 bytes"` 등 string 값
-
-**경로**: `getLessonFull() → LessonFullSchema.safeParse() → FAIL`
-
-**파일**:
-- Schema: `packages/shared/src/schemas/course.ts` (MemoryBlockSchema)
-- Data: `packages/backend/prisma/content/c/lessons/c-5-{1..6}.json`
+**수정 완료**: schema를 `size: z.union([z.number(), z.string()]).optional()`로 변경하여 해결.
 
 ---
 
-### Bug 2: CRITICAL — 47/49 C 레슨: 시뮬레이터가 수제 JSON 덮어씀
+### Bug 2: ~~CRITICAL~~ RESOLVED — 47/49 C 레슨: 시뮬레이터가 수제 JSON 덮어씀
 
-**증상**: 풍부한 수제 시각화 데이터 대신 빈약한 시뮬레이터 결과 표시
-
-**원인**: `useLessonSimulation.ts`의 `allStepsHaveViz` 체크에서 `visualizationType: "terminal"` step에 VIZ_FIELDS가 없으면 false → 시뮬레이터 호출 → 수제 데이터 덮어씀
-
-**수정 옵션**:
-1. terminal step에 `stack: []` 추가 (데이터 수정)
-2. terminal step을 체크에서 제외 (코드 수정)
-
-**파일**: `packages/frontend/src/features/courses/hooks/useLessonSimulation.ts` (lines 175-184)
+**수정 완료**: `allStepsHaveViz` 체크에서 `visualizationType === 'terminal'` step 제외 처리.
 
 ---
 
-### Bug 3: HIGH — 9 JS 레슨: memory 타입이 Java 핸들러로 라우팅
+### Bug 3: ~~HIGH~~ RESOLVED — 9 JS 레슨: memory 타입 시각화 안됨
 
-**영향**: js-5-1~5-3, js-7-1~7-3, js-9-1~9-3
-
-**증상**: Flow 탭에 "No variables" 또는 빈 시각화
-
-**원인 (2단계)**:
-1. `useLessonVisualization.ts` — `resolvedStep.memoryState` 조건이 JS 레슨을 Java 핸들러로 보냄
-2. `LessonFlowVisualizer.tsx` — `if (memoryState && !isJavaScript)` → JS는 memoryState enrichment 제외
-
-**수정 옵션**:
-1. JS memory 전용 핸들러 추가
-2. `visualizationType: "jsMemory"` 도입
-3. JS 네이티브 `stack[]` 포맷으로 데이터 변환
-
-**파일**:
-- `packages/frontend/src/features/courses/hooks/useLessonVisualization.ts` (line 185)
-- `packages/frontend/src/features/visualizers/flow/LessonFlowVisualizer.tsx` (line 96)
+**수정 완료 (2026-03-03)**:
+1. `useLessonVisualization.ts` — 일반 memoryState 전용 핸들러 추가 (Java 핸들러와 분리)
+2. `LessonFlowVisualizer.tsx` — JS에서 memoryState enrichment 제외하던 `!isJavaScript` 조건 제거
 
 ---
 
-### Bug 4: MEDIUM — 3 JS 레슨: EventLoopView 빈 렌더링
+### Bug 4: ~~MEDIUM~~ RESOLVED — 3 JS 레슨: EventLoopView 빈 렌더링
 
-**영향**: js-8-2 (2/3 steps), js-8-3 (3/3 steps), js-1-4 (2/7 steps)
-
-**증상**: EventLoop 시각화 빈 패널
-
-**원인**: `eventLoopState`에 `note`/`warning`만 있고 `callStack`/`webApis`/`taskQueue` 없음 → `hasStandardEventLoop = false` → 빈 div
-
-**파일**: `packages/frontend/src/features/visualizers/flow/LessonFlowVisualizer.tsx` (line 75)
+**수정 완료**: `hasEventLoopNoteOnly` 분기 추가하여 note/warning 텍스트를 렌더링.
 
 ---
 
-### Bug 5: LOW — Python 레슨: 빈 pythonMemoryState
+### Bug 5: LOW — Python 레슨: 빈 pythonMemoryState (잔여)
 
-**전체 비어있음**: py-1-5 (5/5), py-1-8 (6/6)
-**대부분 비어있음**: py-2-1, py-2-4, py-4-4, py-4-5, py-9-3, py-9-4
+**심각 케이스 수정 완료**: py-1-5, py-1-8, py-2-1 등 전체 비어있던 레슨은 해결됨.
 
-**증상**: Flow 탭 "no variables" 표시
-
-**수정**: `names[]`/`objects[]` 채우거나 `visualizationType: "terminal"`로 변경
+**잔여**: 다수 Python 레슨의 중간 step에 빈 `pythonMemoryState` 산재 (py-1-1 4/7, py-1-2 5/10 등).
+콘텐츠 작업으로 `names[]`/`objects[]` 채우거나 해당 step을 `visualizationType: "terminal"`로 변경 필요.
 
 ---
 

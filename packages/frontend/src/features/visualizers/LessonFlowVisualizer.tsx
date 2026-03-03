@@ -156,7 +156,7 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   const enrichedStep = useMemo(() => {
     if (isNonMemoryType) return step;
     const enriched = { ...step };
-    if (memoryState && !isJavaScript) {
+    if (memoryState) {
       enriched.stack = memoryState.stack as LessonStep['stack'];
       enriched.heap = memoryState.heap as LessonStep['heap'];
     }
@@ -164,19 +164,18 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
       enriched.stdout = stdout;
     }
     return enriched;
-  }, [step, memoryState, stdout, isJavaScript, isNonMemoryType]);
+  }, [step, memoryState, stdout, isNonMemoryType]);
 
   const enrichedPrevStep = useMemo(() => {
     if (isNonMemoryType) return prevStep;
     if (!prevStep) return null;
     if (!prevMemoryState) return prevStep;
-    if (isJavaScript) return prevStep;
     return {
       ...prevStep,
       stack: prevMemoryState.stack as LessonStep['stack'],
       heap: prevMemoryState.heap as LessonStep['heap'],
     };
-  }, [prevStep, prevMemoryState, isJavaScript, isNonMemoryType]);
+  }, [prevStep, prevMemoryState, isNonMemoryType]);
 
   const flowStep = useMemo(() => {
     if (isNonMemoryType) return null;
