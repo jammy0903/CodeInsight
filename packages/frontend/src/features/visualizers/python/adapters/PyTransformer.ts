@@ -110,12 +110,20 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
     return value;
   }
 
-  // list, tuple, set — 원소는 {objectId} 참조 배열 (재귀 해석 + 길이 제한)
+  // list, tuple, set — 원소는 {objectId} 참조 배열
+  // 중첩 컬렉션은 placeholder로 표시 (힙 카드 + 화살표로 관계 표현)
   if (type === 'list' || type === 'tuple' || type === 'set') {
     if (!Array.isArray(value)) return String(value);
     const elements = (value as PyObjectRef[]).map((ref) => {
       if (!ref?.objectId) return String(ref);
-      return resolveRef(ref.objectId, objects, 4);
+      const obj = objects.get(ref.objectId);
+      if (!obj) return '?';
+      if (obj.type === 'list') return '[…]';
+      if (obj.type === 'tuple') return '(…)';
+      if (obj.type === 'dict') return '{…}';
+      if (obj.type === 'set') return '{…}';
+      if (obj.type === 'instance') return `<${(obj.value as { className?: string })?.className || obj.type}>`;
+      return formatValue(obj.value, obj.type);
     });
     let result: string;
     if (type === 'list') result = `[${elements.join(', ')}]`;
@@ -124,13 +132,25 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
     return truncateDisplay(result);
   }
 
-  // dict — {key: {objectId}, value: {objectId}} 배열 (재귀 해석 + 길이 제한)
+  // dict — {key: {objectId}, value: {objectId}} 배열
+  // 중첩 컬렉션은 placeholder로 표시
   if (type === 'dict') {
     if (!Array.isArray(value)) return String(value);
     const entries = value as PyDictEntry[];
     const pairs = entries.map((entry) => {
-      const keyStr = entry?.key?.objectId ? resolveRef(entry.key.objectId, objects, 3) : '?';
-      const valStr = entry?.value?.objectId ? resolveRef(entry.value.objectId, objects, 3) : '?';
+      const keyObj = entry?.key?.objectId ? objects.get(entry.key.objectId) : null;
+      const valObj = entry?.value?.objectId ? objects.get(entry.value.objectId) : null;
+      const COLL_TYPES = new Set(['list', 'tuple', 'dict', 'set']);
+      const keyStr = keyObj
+        ? (COLL_TYPES.has(keyObj.type)
+            ? (keyObj.type === 'list' ? '[…]' : keyObj.type === 'tuple' ? '(…)' : '{…}')
+            : formatValue(keyObj.value, keyObj.type))
+        : '?';
+      const valStr = valObj
+        ? (COLL_TYPES.has(valObj.type)
+            ? (valObj.type === 'list' ? '[…]' : valObj.type === 'tuple' ? '(…)' : '{…}')
+            : formatValue(valObj.value, valObj.type))
+        : '?';
       return `${keyStr}: ${valStr}`;
     });
     return truncateDisplay(`{${pairs.join(', ')}}`);
@@ -159,43 +179,6 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
   }
 
   return String(value);
-}
-
-/**
- * 중첩 참조 재귀 해석 — [object Object] 방지용 내부 헬퍼
- * depth가 0이 되면 '…' 반환 (무한 재귀 방지)
- */
-function resolveRef(objectId: string, objects: Map<string, PyObject>, depth: number): string {
-  if (depth <= 0) return '…';
-  const obj = objects.get(objectId);
-  if (!obj) return '?';
-
-  if (obj.type === 'list' || obj.type === 'tuple' || obj.type === 'set') {
-    if (!Array.isArray(obj.value)) return String(obj.value);
-    const els = (obj.value as PyObjectRef[]).map((r) =>
-      r?.objectId ? resolveRef(r.objectId, objects, depth - 1) : String(r)
-    );
-    const inner = els.join(', ');
-    if (obj.type === 'list') return `[${inner}]`;
-    if (obj.type === 'tuple') return `(${inner})`;
-    return `{${inner}}`;
-  }
-
-  if (obj.type === 'dict') {
-    if (!Array.isArray(obj.value)) return String(obj.value);
-    const entries = (obj.value as PyDictEntry[]).map((e) => {
-      const k = e?.key?.objectId ? resolveRef(e.key.objectId, objects, depth - 1) : '?';
-      const v = e?.value?.objectId ? resolveRef(e.value.objectId, objects, depth - 1) : '?';
-      return `${k}: ${v}`;
-    });
-    return `{${entries.join(', ')}}`;
-  }
-
-  if (obj.type === 'instance') {
-    return `<${(obj.value as { className?: string })?.className || obj.type}>`;
-  }
-
-  return formatValue(obj.value, obj.type);
 }
 
 /** 40자 초과 시 말줄임표 */
