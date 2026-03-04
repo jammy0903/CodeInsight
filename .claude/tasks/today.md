@@ -26,7 +26,7 @@
 ### 1) 보안 정리
 - [x] `.claude/deployment_info.md` 내 토큰/키 문자열 마스킹
 - [x] `.claude/settings.local.json` 내 노출 토큰 문자열 마스킹
-- [ ] Git 히스토리 포함 완전 제거 필요 여부 검토
+- [x] Git 히스토리 포함 완전 제거 필요 여부 검토 (과거 커밋 노출 확인, rewrite 별도 필요)
 
 ### 2) 운영 문서 최신화
 - [x] `today.md`를 현재 기준 상태로 업데이트
