@@ -1,46 +1,38 @@
 # CSTA Community Post
 
-## Post Location
+## Recommended Post Location
 - CSTA Community → Discussion Thread
 - Grade Band: 9-12 (High School)
 - Category: Teaching Methods / Resources
 
-## Title
-Free tool that visualizes code execution step by step — built for CS classrooms
+## Final Title
+Free classroom tool: visualize code execution step by step (AP CSA / AP CSP)
 
-## Body
+## Final Body (Ready to Paste)
+Hi CSTA educators,
 
-Hi everyone,
+I built a free, open-source web tool called **CodeInsight** to help students understand what code is doing at runtime.
 
-I built a free, open-source tool called **CodeInsight** that lets students step through code line by line and watch memory, variables, and call stacks update in real time.
+Students can step through code line by line and see variables, memory, and function calls update in real time.
 
-I originally built it for university intro CS courses, but it works great for **AP CS A** and **AP CS Principles** too.
+How it maps to common HS CS use cases:
+- **AP CS A (Java):** object references, method calls, and memory behavior
+- **AP CS Principles / Python units:** variable updates and scope flow
+- **JavaScript lessons:** event loop and async behavior
+- **C / systems intro:** stack-heap memory model and pointers
 
-**What students see:**
-- **Java (AP CS A):** JVM memory model — object creation, references, method calls visualized step by step
-- **Python (AP CSP):** Variable tracking with scope visualization
-- **C:** Stack, Heap, BSS, DATA, TEXT segment layout with pointer visualization
-- **JavaScript:** Event loop, scope chain, prototype chain, Promise flow
+It has two modes:
+- **Lesson mode:** guided, structured walkthroughs
+- **Playground mode:** students run and inspect their own code
 
-**Two modes:**
-- **Lesson mode** — guided curriculum where students follow step-by-step lessons
-- **Playground mode** — students paste their own code and see it visualized
+It is fully free, browser-based, and MIT licensed.
 
-It's completely free, web-based (no install needed), and MIT licensed.
+- Live demo: https://codeinsight.online
+- GitHub: https://github.com/jammy0903/CodeInsight
 
-**Live demo:** https://codeinsight.online
-**GitHub:** https://github.com/jammy0903/CodeInsight
+If you teach AP CS A, AP CSP, or intro CS, I would really value practical feedback:
+- What concepts do your students struggle with most?
+- What would make this genuinely useful in your classroom?
+- What feature would you want first?
 
-I'd love feedback from anyone teaching CS — what's missing? What would make this more useful in your classroom?
-
-Thanks for checking it out!
-
----
-
-## How to Post
-
-1. Go to https://csteachers.org → Sign up for a free account
-2. Go to Community → CSTA Grade Bands → 9-12
-3. Click "Create" → "Discussion Thread"
-4. Paste title and body above
-5. Optionally upload a screenshot of the tool in action
+Thank you for taking the time to read this.

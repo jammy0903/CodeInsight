@@ -3,6 +3,12 @@
 ## 브랜치
 `2026-03-03/marketing-outreach`
 
+## 2026-03-03 추가 업데이트
+
+- `docs/marketing/csta-post.md`를 단일 최종본(1안)으로 확정함
+- CSTA 가입 시도 중 reCAPTCHA 반복 만료로 가입 완료 전 단계에서 중단됨
+- 사용자 결정으로 CSTA 커뮤니티 가입/포스팅 작업은 당분간 보류
+
 ## 발송 현황 (총 395명, 전원 sent)
 
 | 국가 | 발송 | ID 범위 |
@@ -20,7 +26,7 @@
 | `scripts/send-outreach-email.mjs` | 이메일 발송 스크립트 (nodemailer) |
 | `docs/marketing/email-template.md` | 이메일 템플릿 (EN/KR, 두괄식) |
 | `docs/marketing/professor-search-guide.md` | 교수 탐색 가이드 (위임용) |
-| `docs/marketing/csta-post.md` | CSTA 커뮤니티 포스팅 초안 |
+| `docs/marketing/csta-post.md` | CSTA 커뮤니티 포스팅 최종본 (1안 확정) |
 | `docs/marketing/professor-outreach-list.csv` | 초기 CSV (JSON으로 대체됨) |
 
 ## 발송 방법
@@ -50,10 +56,11 @@ node scripts/send-outreach-email.mjs --list
 
 ## 남은 작업
 
-### 1. CSTA 커뮤니티 포스팅
-- `docs/marketing/csta-post.md`에 초안 완성
-- https://csteachers.org → 무료 계정 가입 → Grade Band 9-12 → Discussion Thread
-- AP CS A (Java) + AP CS Principles (Python) 교사 타깃
+### 1. CSTA 커뮤니티 포스팅 (현재 보류)
+- 상태: 사용자 지시로 보류
+- 포스트 본문은 `docs/marketing/csta-post.md` 최종본 사용
+- 가입은 `https://my.csteachers.org/s/newuser?startURL=%2Fs%2F` 단계까지 시도했으나 완료하지 않음
+- 재개 시: CSTA 가입 완료 → Grade Band 9-12 Discussion Thread 게시
 
 ### 2. 추가 커뮤니티 홍보 (미진행)
 - Reddit r/CSEducation
