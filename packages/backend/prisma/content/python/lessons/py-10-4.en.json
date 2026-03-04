@@ -1,0 +1,306 @@
+{
+  "lessonId": "py-10-4",
+  "title": "asyncio Pattern: Gathering Results (gather)",
+  "concept": "Using `asyncio.gather` to run multiple async tasks concurrently and collect all results at once when they're ready.",
+  "content": {
+    "code": "import asyncio\nimport time\n\nasync def fetch_data(id, delay):\n    print(f\"Fetching data {id}...\")\n    await asyncio.sleep(delay)\n    print(f\"Data {id} fetched!\")\n    return {\"id\": id, \"data\": f\"Sample data {id}\"}\n\nasync def main():\n    start = time.time()\n    \n    results = await asyncio.gather(\n        fetch_data(1, 2),\n        fetch_data(2, 1),\n        fetch_data(3, 3)\n    )\n\n    print(f\"\\nResults: {results}\")\n    print(f\"Total time: {time.time() - start:.4f}s\")\n\nasyncio.run(main())",
+    "steps": [
+      {
+        "title": "Importing Modules",
+        "explanation": "**`import asyncio` / `import time`** -- We import the async I/O framework and time measurement tools.\n\nIn the previous lesson, we learned to schedule and await tasks one at a time using `create_task()` and `await`. This time, we'll learn a more powerful tool: `asyncio.gather()`. gather runs multiple tasks at once and **returns all results as a list**.\n\nThink of the previous lesson as a restaurant server delivering order slips to the kitchen one at a time, while this time we **hand over multiple order slips at once and say \"bring them all when they're done\"**. The kitchen (event loop) cooks multiple dishes simultaneously, and when the last dish is ready, delivers them all on one tray.\n\n**Real-world use case**: In web applications, when you need to call multiple APIs simultaneously to render a single page, gather is the most natural pattern. Example: calling the user info API + order history API + recommended products API simultaneously.",
+        "visualizationType": "pythonMemory",
+        "code": "import asyncio",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "asyncio ready.",
+          "names": [
+            {
+              "name": "asyncio",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the Async Task Function",
+        "explanation": "**`async def fetch_data(id, delay):`** -- A coroutine function that simulates real I/O operations (API calls, DB queries, etc.).\n\nThis function performs three things in order:\n1. `print(f\"Fetching data {id}...\")` -- Announces task start\n2. `await asyncio.sleep(delay)` -- Simulates I/O wait for delay seconds\n3. `return {\"id\": id, \"data\": ...}` -- Returns a result as a dictionary\n\nUnlike the previous lesson's `say_after()` which didn't return a value, `fetch_data()` **returns a dictionary**. This return value is what `gather()` collects. In real web development, this return value would be an API response JSON or DB query result.\n\nThink of this function as a **recipe for a food order**. Each order has a different cooking time (delay), and when done, the dish (dictionary) is placed on a plate and returned.\n\n**Under the hood**: When `await asyncio.sleep(delay)` is reached, a timer callback saying \"wake me up after delay seconds\" is registered with the event loop. In the meantime, the event loop runs other coroutines. In real code, `asyncio.sleep()` would be replaced with actual I/O operations like `aiohttp.get()` or `asyncpg.fetch()`.\n\n**Common mistake**: Using `time.sleep(delay)` blocks the entire thread, breaking concurrency. In async code, you must use async versions like `asyncio.sleep()`.",
+        "visualizationType": "pythonMemory",
+        "code": "async def fetch_data(id, delay):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pythonMemoryState": {
+          "note": "Coroutine function fetch_data defined.",
+          "names": [
+            {
+              "name": "fetch_data",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "coroutine function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the Main Coroutine",
+        "explanation": "**`async def main():`** -- Defines the entry point coroutine for the async program.\n\nInside this main() function, we'll use `asyncio.gather()` to run 3 fetch_data tasks concurrently. `time.time()` records the start time to measure whether concurrent execution actually saves time.\n\nIn the previous lesson, we created individual Tasks with `create_task()` and awaited each one:\n```python\ntask1 = asyncio.create_task(work1())\ntask2 = asyncio.create_task(work2())\nawait task1\nawait task2\n```\nThis pattern works fine with 2-3 tasks, but becomes very cumbersome with 10 or 100 tasks. `gather()` is a **high-level API** that reduces this process to a single line.\n\nThink of the previous approach as the server delivering order slips one at a time and checking each one, while `gather()` is **handing over a bundle of order slips at once and saying \"let me know when they're all done\"**.\n\n**Design philosophy**: asyncio provides both low-level APIs (`create_task`, `Future`) and high-level APIs (`gather`, `wait`, `TaskGroup`). In most cases, using high-level APIs results in cleaner code and easier error handling.",
+        "visualizationType": "pythonMemory",
+        "code": "async def main():",
+        "pythonMemoryState": {
+          "note": "main coroutine defined.",
+          "names": [
+            {
+              "name": "main",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "coroutine function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Concurrent Execution and Result Collection (gather)",
+        "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** -- **Runs 3 coroutines concurrently** and **collects all results into a list**.\n\nLet's trace gather()'s operation step by step:\n1. `fetch_data(1, 2)` is called -> coroutine object created (not yet running)\n2. `fetch_data(2, 1)` is called -> coroutine object created\n3. `fetch_data(3, 3)` is called -> coroutine object created\n4. `gather()` wraps the three coroutines into Tasks and registers them with the event loop\n5. `await` is hit, main() is paused -> all three Tasks start running concurrently\n\n**Two key features of gather()**:\n- **Concurrent execution**: Schedules all passed coroutines at once\n- **Result order guaranteed**: Returns the result list in the order coroutines were passed. Even if task_2 finishes first, results[0] is the result of fetch_data(1,2)\n\nThink of a restaurant cooking orders for 3 tables simultaneously, but placing the finished dishes **in table number order** on the tray. Even if table 2's dish finishes first, table 1's dish goes in position 1.\n\n**Note**: If you pass a non-coroutine regular value to gather, that value is included as-is in the results.",
+        "visualizationType": "pythonMemory",
+        "code": "results = await asyncio.gather(",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pythonMemoryState": {
+          "note": "3 tasks running concurrently.",
+          "names": [
+            {
+              "name": "task_1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "task_2",
+              "pointsTo": "instance2",
+              "highlight": true
+            },
+            {
+              "name": "task_3",
+              "pointsTo": "instance3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Task(2s)",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Task(1s)",
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "instance3",
+              "type": "instance",
+              "value": "Task(3s)",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "gather in Action (After 1 Second)",
+        "explanation": "**gather internal execution** -- The 3 `fetch_data` tasks are **progressing concurrently** in the event loop.\n\nLet's trace the execution flow over time:\n- **0.0s**: All three tasks start. Each prints \"Fetching data N...\"\n- **0.0s**: All three hit `await asyncio.sleep(delay)` -> all yield\n- **1.0s**: task_2 (1s wait) wakes up -> prints \"Data 2 fetched!\" -> returns result\n- task_1 (2s wait) and task_3 (3s wait) are still sleeping\n\nNotice that the shortest task (task_2, 1s) **completes first**. But gather doesn't return yet -- because it waits for **all tasks to finish** before returning results.\n\nThink of cooking 3 dishes simultaneously: the salad (1 min) finishes first. But we don't serve it yet -- we keep it warm because the steak and pasta must also be ready before we can carry the tray to the table.\n\n**Under the hood**: gather maintains an internal counter. Each time a Task completes, the counter decrements, and when it reaches 0 (all Tasks done), gather's Future is resolved. task_2's result is already ready but temporarily stored at position [1] in the results list, waiting.\n\n**Error handling**: What if task_2 raised an exception? By default, gather immediately cancels the remaining tasks and propagates the exception. Setting `return_exceptions=True` includes exceptions in the result list instead.",
+        "visualizationType": "pythonMemory",
+        "code": "results = await asyncio.gather(",
+        "pythonMemoryState": {
+          "output": [
+            "Fetching data 1...",
+            "Fetching data 2...",
+            "Fetching data 3...",
+            "Data 2 fetched!"
+          ],
+          "note": "1 second elapsed: Task 2 complete.",
+          "names": [
+            {
+              "name": "task_1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "task_2",
+              "pointsTo": "instance2",
+              "highlight": true
+            },
+            {
+              "name": "task_3",
+              "pointsTo": "instance3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Task(pending)",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Task(Finished!)",
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "instance3",
+              "type": "instance",
+              "value": "Task(pending)",
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Results (After 3 Seconds)",
+        "explanation": "**`print(f\"\\nResults: {results}\")`** -- Prints the result list returned by gather.\n\nRemaining timeline:\n- **2s**: task_1 (2s wait) completes -> prints \"Data 1 fetched!\"\n- **3s**: task_3 (3s wait) completes -> prints \"Data 3 fetched!\"\n- **3s**: All Tasks complete -> gather returns the result list!\n\nThink of it as the salad finishing first in the kitchen, then the steak, and finally the dessert. But on the tray, they're placed in the order written on the order slip -- steak, salad, dessert.\n\n**Practical tip**: If you want to manage results as a dictionary, you can use the pattern `results = dict(zip(ids, await asyncio.gather(*tasks)))`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"\\nResults: {results}\")",
+        "pythonMemoryState": {
+          "output": [
+            "...",
+            "Data 1 fetched!",
+            "Data 3 fetched!"
+          ],
+          "note": "All tasks complete. Results collected into a list.",
+          "names": [
+            {
+              "name": "results",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{id:1}, {id:2}, {id:3}]",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Total Elapsed Time",
+        "explanation": "**`print(f\"Total time: {time.time() - start:.4f}s\")`** -- The total time is approximately **3 seconds**.\n\nTime analysis:\n- Sequential execution: 2s + 1s + 3s = **6 seconds**\n- gather concurrent execution: max(2s, 1s, 3s) = **3 seconds**\n- Time saved: **3 seconds (50% reduction!)**\n\nThe total time for concurrent execution always equals **the time of the longest task**. The remaining tasks complete within that time. Even as the number of tasks grows, it only takes as long as the slowest task.\n\nThink of 100 people taking an exam simultaneously: the total time equals the slowest student's time. Having them take it one at a time would take 100x longer.\n\n**gather vs create_task comparison summary**:\n- `create_task()`: Register tasks one by one and await each individually. Use when fine-grained control is needed\n- `gather()`: Register multiple tasks at once and await all together. Returns results as a list. Cleaner code\n- `TaskGroup()` (Python 3.11+): Improved version of gather. Supports structured error handling and automatic cancellation\n\n**Selection criteria in practice**: For most \"call multiple APIs simultaneously\" scenarios, gather is the best fit. If you need different error handling per task, consider create_task. For Python 3.11+, consider TaskGroup.\n\n**Note**: asyncio is only effective for I/O-bound tasks. For CPU-bound tasks (number crunching, etc.), asyncio doesn't help because the GIL prevents parallel execution. Use `multiprocessing` for CPU-bound work.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Total time: {time.time() - start:.4f}s\")",
+        "pythonMemoryState": {
+          "output": [
+            "...",
+            "Results: ...",
+            "Total time: 3.0012s"
+          ],
+          "note": "Total: 3 seconds.",
+          "names": [
+            {
+              "name": "time",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.0012,
+              "pyId": "1008"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Running the Event Loop",
+        "explanation": "**`asyncio.run(main())`** -- Creates an event loop and runs the `main` coroutine.\n\nThis line is the **start point** and **end point** of the entire program. When `asyncio.run()` is called:\n1. A new event loop is created\n2. The `main()` coroutine runs in the event loop\n3. Inside main(), gather() runs 3 tasks concurrently\n4. When all tasks complete, main() returns\n5. The event loop is cleaned up and closed\n\nTracing the code execution order: the Python interpreter proceeds top to bottom, encountering import -> function definition -> function definition -> `asyncio.run()`. Function definitions only create function objects without executing them. All logic actually runs when `asyncio.run(main())` is reached.\n\nThink of it as preparing all the recipes (function definitions) and then finally pressing the \"open for business!\" (asyncio.run) button. From that moment, the kitchen starts running and all orders are processed.\n\n**Full lesson summary**: asyncio.gather() is the **most common and powerful pattern** for running multiple async tasks concurrently and collecting results in order. For I/O-heavy programs, it provides dramatic performance improvements compared to sequential execution.\n\n**Next steps**: In real projects, gather is used with asyncio-compatible libraries like `aiohttp` (HTTP client), `asyncpg` (PostgreSQL), and `aiofiles` (file I/O).",
+        "visualizationType": "pythonMemory",
+        "code": "asyncio.run(main())",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Program entry.",
+          "names": [
+            {
+              "name": "time",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.0012,
+              "pyId": "1008"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When does `asyncio.gather(task1, task2)` return?",
+    "options": [
+      "When task1 finishes",
+      "When task2 finishes",
+      "When either one finishes",
+      "When both task1 and task2 have finished"
+    ],
+    "correctIndex": 3,
+    "explanation": "`gather` waits until all passed awaitable objects complete, then returns their results collected into a list."
+  },
+  "misconceptions": [
+    {
+      "wrong": "`gather` works using multithreading.",
+      "correct": "No. `asyncio` and `gather` operate within a single thread.",
+      "why": "Instead of using multiple threads, it achieves concurrency by efficiently switching between tasks within a single thread, utilizing I/O wait times."
+    }
+  ],
+  "keyTakeaway": "`gather` is extremely useful for running multiple async I/O tasks in parallel and collecting their results."
+}

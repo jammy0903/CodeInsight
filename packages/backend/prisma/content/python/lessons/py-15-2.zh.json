@@ -1,0 +1,168 @@
+{
+  "lessonId": "py-15-2",
+  "title": "with语句与文件写入",
+  "concept": "with语句是自动关闭文件的安全方法。用write()向文件写入内容，用'a'模式在现有内容后追加。",
+  "content": {
+    "code": "with open(\"output.txt\", \"w\") as f:\n    f.write(\"Hello, File!\\n\")\n    f.write(\"Second line\\n\")\n\nwith open(\"output.txt\", \"r\") as f:\n    content = f.read()\n    print(content)\n\nwith open(\"output.txt\", \"a\") as f:\n    f.write(\"Appended line\\n\")",
+    "steps": [
+      {
+        "title": "用with语句打开文件（写入模式）",
+        "explanation": "**`with open(\"notes.txt\", \"w\") as file:`** 是文件写入的标准起始模式。\n\n核心：\n- `with` 在代码块结束时自动关闭文件\n- 即使发生异常也能减少清理（close）遗漏的风险\n\n**类比**：就像自动门一样，进去工作完出来后自动锁门的结构。\n\n实际推荐：\n- 文件I/O几乎总是使用 `with ... open ...` 形式\n- 依赖手动 `close()` 容易产生遗漏bug",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"w\") as f:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "with语句打开文件并赋值给f。代码块结束时自动关闭。",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='w')",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "向文件写入内容（write）",
+        "explanation": "**`write()`** 将字符串记录到文件中。\n\n这一步的重点是换行管理。\n`write(\"hello\")` 不会自动添加换行，需要时必须手动加 `\\n`。\n\n**类比**：就像在笔记本上写字时必须手动换行一样。\n\n要点：\n- 写入多行时使用 `write(... + \"\\n\")` 或 `writelines()` 模式\n- 非字符串值先用 `str()` 转换后再写入是安全的习惯",
+        "visualizationType": "pythonMemory",
+        "code": "    f.write(\"Hello, File!\\n\")",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "文件中已写入两行。with代码块结束时自动close()。",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='w') [written: 2 lines]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "重新读取文件内容",
+        "explanation": "**`with open(\"output.txt\", \"r\") as f:`**\n**`    content = f.read()`**\n**`    print(content)`** -- 前一个 `with` 代码块结束，文件自动关闭。现在用**读取模式（\"r\"）**重新打开同一文件确认内容。\n\n这是检查刚才写入的内容是否真正保存到文件的模式。新的 `with` 代码块以读取模式打开文件，`read()` 获取全部内容。\n\n**类比：** 就像写完信（write）后封好信封（close），再重新打开信封（open \"r\"）确认内容是否写对了（read）。\n\n**注意：** `\"r\"` 模式下文件不存在会引发 `FileNotFoundError`。但因为刚才用 `\"w\"` 模式创建了文件，这里是安全的。",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"r\") as f:",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Hello, File!",
+            "Second line",
+            ""
+          ],
+          "note": "写入模式记录的内容已正常读取。",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file2",
+              "highlight": true
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='r')",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello, File!\nSecond line\n",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "以追加模式打开文件",
+        "explanation": "**追加模式（`\"a\"`）**在现有文件末尾\"添加\"内容。\n\n核心区别：\n- `\"w\"`：删除现有内容，重新开始\n- `\"a\"`：保留现有内容 + 在后面追加\n\n日志、记录累积、历史存储用 `a` 是默认选择。\n\n**类比**：`w` 是换一个新笔记本，`a` 是在现有笔记本最后一页的下一行继续写。\n\n注意：\n- 漏掉换行符（`\\n`）的话，新内容会粘在现有行后面，影响可读性",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"a\") as f:",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "'a'模式保留现有内容并在末尾追加。",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file3",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='a') [appended: 1 line]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "使用with语句最重要的原因是？",
+    "options": [
+      "可以更快地读取文件",
+      "代码块结束后自动关闭文件，更安全",
+      "可以同时打开多个文件",
+      "也可以读取二进制文件"
+    ],
+    "correctIndex": 1,
+    "explanation": "with语句的核心优势是代码块结束或发生错误时都会自动调用close()。\n防止忘记close()或因异常而未执行的问题。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "\"w\"模式在现有内容后追加",
+      "correct": "\"w\"模式删除所有现有内容并重新写入。要追加请使用\"a\"模式",
+      "why": "\"w\"是write（覆盖写入），\"a\"是append（追加写入）。误用\"w\"可能导致数据丢失。"
+    },
+    {
+      "wrong": "write()像print()一样自动添加换行",
+      "correct": "write()原样写入传入的字符串，需要换行时必须自己加\\n",
+      "why": "print()默认添加end='\\n'，而write()将原始字符串直接写入文件。"
+    }
+  ],
+  "keyTakeaway": "with语句是安全自动关闭文件的方法。\"w\"是覆盖写入，\"a\"是追加写入，write()不会自动添加换行。"
+}

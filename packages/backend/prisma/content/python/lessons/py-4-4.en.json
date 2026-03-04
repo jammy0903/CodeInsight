@@ -1,0 +1,325 @@
+{
+  "lessonId": "py-4-4",
+  "title": "Modules & Imports",
+  "concept": "Bring in code from other files and use it (Libraries)",
+  "content": {
+    "code": "import math\n\n# 1. 모듈 전체 가져오기\nprint(math.pi)\nprint(math.sqrt(16))\n\n# 2. 특정 함수만 가져오기\nfrom random import randint\nprint(randint(1, 10))\n\n# 3. 별명 붙이기 (Alias)\nimport datetime as dt\nnow = dt.datetime.now()\nprint(now)",
+    "steps": [
+      {
+        "title": "Importing a Module (import)",
+        "explanation": "**`import math`**\n\nPython executes code from top to bottom.\nThe `import` keyword loads the `math` module -- a collection of **math-related functions and constants** -- in its **entirety**.\n\n**What is a Module?** A **code library** that lets you reuse functions, classes, and variables defined in other Python files (`.py`). Think of it as borrowing someone else's **toolbox**. `math` is a math toolbox, `random` is a randomness toolbox.\n\n**How to use**: Access items with `math.function_name` or `math.variable_name` format. The `math.` prefix is **required**! This prefix makes it clear that \"this function came from the math module\".\n\n**Python internals**: When `import math` executes:\n1. Python searches for the `math` module in paths registered in `sys.path`\n2. Once found, the module file is loaded and executed **only once** (subsequent imports use the cache)\n3. A module object is created and bound to the name `math` in the current namespace\n4. Cached in `sys.modules['math']`\n\n**Caution**: It's convention to place `import` statements at the **top of the file** (PEP 8). Placing them mid-code works but hurts readability.\n\n**Execution order**: import math -> search + load math module -> register in namespace -> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "import math",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "math module loaded",
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Using a Module's Constant",
+        "explanation": "**`print(math.pi)`**\n\nAccesses and prints the constant `pi` (the ratio of a circle's circumference to its diameter, approximately 3.141592653589793) defined inside the `math` module.\n\n**Why `math.pi`?** Because `pi` exists inside the `math` module's **namespace**, you must include the `math.` prefix.\n\nAnalogy: To take a specific tool (pi) from the toolbox (math module), you must specify \"take pi from the math box\". If you just say `pi`, Python looks for `pi` in the current scope and raises `NameError` if not found.\n\n**Advantage of namespaces**: What if your code also has `pi = 3.14`? `math.pi` and `pi` are in **different namespaces** so they don't conflict! This is a major advantage of the `import math` approach.\n\n**Python internals**: When accessing `math.pi`, Python looks up the `'pi'` key in the `math` module object's `__dict__` dictionary and returns its value. `math.pi` is a `float` constant defined in a C extension module.\n\n**Execution order**: access math.pi -> read 3.141592653589793 -> print executed -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "print(math.pi)",
+        "pythonMemoryState": {
+          "output": [
+            "3.141592653589793"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Using a Module's Function",
+        "explanation": "**`print(math.sqrt(16))`**\n\nCalls the `sqrt` function (Square Root) from the `math` module to compute the square root of 16, which is `4.0`, and prints it.\n\n**Why `4.0` instead of `4`?** `math.sqrt()` always returns a **float** type. Even when the result is a whole number, it comes with a decimal point like `4.0`.\n\n**Useful functions in the `math` module:**\n- `math.sqrt(x)` -> square root of x\n- `math.ceil(x)` -> ceiling (e.g., `math.ceil(3.1)` -> `4`)\n- `math.floor(x)` -> floor (e.g., `math.floor(3.9)` -> `3`)\n- `math.pow(x, y)` -> x to the power of y\n- `math.log(x)` -> natural logarithm\n\n**Python internals**: `math.sqrt` is actually implemented in C. Python's `math` module wraps C standard library math functions, so it's **much faster** than pure Python.\n\n**Caution**: `math.sqrt(-1)` raises `ValueError`! For square roots of negative numbers, use the `cmath` (complex math) module.\n\n**Execution order**: math.sqrt(16) called -> computed in C library -> 4.0 returned -> print(4.0) -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "print(math.sqrt(16))",
+        "pythonMemoryState": {
+          "output": [
+            "4.0"
+          ],
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Importing a Specific Function (from)",
+        "explanation": "**`from random import randint`**\n\n**from ... import ... syntax**: Selectively imports **only the `randint` function** from the `random` module directly into the current namespace.\n\n**Key difference -- `import` vs `from import`:**\n- `import math` -> `math.sqrt()` (module name prefix **required**)\n- `from math import sqrt` -> `sqrt()` (prefix **not needed**, use directly)\n\nAnalogy: `import math` is like bringing the entire toolbox (math) and saying \"take it from the math box\" every time. `from random import randint` is like taking **just one specific tool (randint) out** and placing it on your workbench. Now it's within arm's reach, so no prefix needed.\n\n**Caution**: Using `from random import *` with an asterisk (`*`) imports **everything** from the module. It looks convenient but risks name collisions and is **strongly discouraged**!",
+        "visualizationType": "pythonMemory",
+        "code": "from random import randint",
+        "pythonMemoryState": {
+          "note": "Only randint function directly imported",
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Using the Imported Function Directly",
+        "explanation": "**`print(randint(1, 10))`**\n\n**Advantage of from import confirmed**: Instead of `random.randint(1, 10)`, we can call `randint(1, 10)` directly without a prefix! This is because we imported it directly with `from random import randint`.\n\n**What `randint(1, 10)` means**: Returns a random integer from 1 to 10 **inclusive**. The result changes every time you run it! (Here we assume 7 was returned as an example.)\n\n**Caution -- `randint`'s range**: `randint(a, b)` **includes both** `a` and `b`. So `randint(1, 10)` returns one of 1, 2, 3, ..., 10. Note this differs from Python's `range(1, 10)` which does NOT include 10!\n\n**Python internals**: `randint()` internally uses a pseudorandom number generator (Mersenne Twister algorithm). It's not truly random but a sequence determined by a seed value -- sufficient for general use. For cryptographic security, use the `secrets` module.\n\n**Execution order**: randint(1, 10) called -> random integer returned (e.g., 7) -> print(7) executed -> line 12",
+        "visualizationType": "pythonMemory",
+        "code": "print(randint(1, 10))",
+        "pythonMemoryState": {
+          "output": [
+            "7"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Importing with an Alias (as)",
+        "explanation": "**`import datetime as dt`**\n\nUses the `as` keyword to import the `datetime` module with a **short alias `dt`**.\n\n**What is an Alias?** An **alternative name** you can use instead of the original. Analogy: Your friend's name is \"Alexander\" but it's too long to say every time, so you call them \"Alex\". `datetime` is too long, so we'll call it `dt`.\n\n**Caution**: Once an alias is set, **the original name cannot be used!** `dt.datetime` works, but `datetime.datetime` raises `NameError`. The alias **completely replaces** the original name.\n\n**When to use?**\n- When the module name is **long**: `datetime` -> `dt` (8 chars -> 2!)\n- Following **industry conventions**: `import numpy as np`, `import pandas as pd`, `import matplotlib.pyplot as plt`\n- **Avoiding name conflicts**: When your code already has a variable with the same name",
+        "visualizationType": "pythonMemory",
+        "code": "import datetime as dt",
+        "pythonMemoryState": {
+          "note": "datetime module aliased as dt",
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "dt",
+              "pointsTo": "module2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "module2",
+              "type": "module",
+              "value": "<module 'datetime'>",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Using the Module via Alias",
+        "explanation": "**`now = dt.datetime.now()`**\n\nUses the alias `dt` to call the `now()` method of the `datetime` class inside the `datetime` module. A `datetime` object containing the computer's **current date and time** is created and assigned to the `now` variable.\n\nAnalogy: Like \"Seoul City Seoul Station\" -- the city (module) name and the station (class) name are the same. That's why `from datetime import datetime` to directly import just the class is also common.\n\n**Caution**: `dt.datetime.now()` returns **local time**. For UTC time, use `dt.datetime.utcnow()` or `dt.datetime.now(dt.timezone.utc)`.\n\n**Why `dt.datetime`?** This is a confusing part in Python! There are **two `datetime`s** here:\n- `dt` = `datetime` **module** (file/package)\n- `dt.datetime` = the `datetime` **class** defined inside the module\n- In other words, the `datetime` module contains a class with the same name `datetime`!",
+        "visualizationType": "pythonMemory",
+        "code": "now = dt.datetime.now()",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "dt",
+              "pointsTo": "module2"
+            },
+            {
+              "name": "now",
+              "pointsTo": "datetime1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "module2",
+              "type": "module",
+              "value": "<module 'datetime'>",
+              "pyId": "1003"
+            },
+            {
+              "id": "datetime1",
+              "type": "datetime",
+              "value": "2024-01-15 10:30:00",
+              "pyId": "1004"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Printing the Result",
+        "explanation": "**`print(now)`**\n\nPrints the current time object stored in the `now` variable. It displays in a format like `2024-01-15 10:30:00`.\n\n**Why does it print so neatly?** The `datetime` object has a **`__str__` magic method** defined, so when printed with `print()`, it automatically converts to a `YYYY-MM-DD HH:MM:SS` format string. This is a powerful feature of Python objects.\n\n**Want a different format?** Use the `strftime()` method:\n- `now.strftime(\"%Y-%m-%d\")` -> \"2024-01-15\"\n- `now.strftime(\"%H:%M\")` -> \"10:30\"\n\n**Key takeaways -- 3 import styles:**\n- `import math` -> `math.pi`, `math.sqrt()` (module name prefix required)\n- `from random import randint` -> `randint()` (use directly, no prefix)\n- `import datetime as dt` -> `dt.datetime.now()` (use short alias)\n\n**Which style to use?**\n- When using multiple features of a module -> `import module` or `import module as alias`\n- When using only 1-2 specific features -> `from module import feature`\n- **Never** use `from module import *`! (name collision risk)\n\n**Execution order**: read now -> now.__str__() auto-called -> \"2024-01-15 10:30:00\" string created -> print executed -> program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(now)",
+        "pythonMemoryState": {
+          "output": [
+            "2024-01-15 10:30:00"
+          ],
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "dt",
+              "pointsTo": "module2"
+            },
+            {
+              "name": "now",
+              "pointsTo": "datetime1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "module2",
+              "type": "module",
+              "value": "<module 'datetime'>",
+              "pyId": "1003"
+            },
+            {
+              "id": "datetime1",
+              "type": "datetime",
+              "value": "2024-01-15 10:30:00",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How do you import your own `my_lib.py` in another file?",
+    "options": [
+      "include my_lib",
+      "import my_lib.py",
+      "import my_lib",
+      "require my_lib"
+    ],
+    "correctIndex": 2,
+    "explanation": "Just `import` the file name without the `.py` extension.\n(The file must be in the same folder or the path must be configured)"
+  },
+  "misconceptions": [
+    {
+      "wrong": "from import * is convenient and good",
+      "correct": "Avoid it if possible (Wildcard Import).",
+      "why": "Importing all names from a module can cause name collisions with your own variable names, and makes it hard to trace where things come from."
+    }
+  ],
+  "keyTakeaway": "Use `import` to leverage other people's wheels (libraries). Leave out `*.py` and just use the name!"
+}

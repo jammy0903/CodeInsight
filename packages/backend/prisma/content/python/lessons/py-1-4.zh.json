@@ -1,0 +1,385 @@
+{
+  "lessonId": "py-1-4",
+  "title": "布尔值与类型转换",
+  "concept": "可以显式地改变数据的类型（Casting）",
+  "content": {
+    "code": "# 1. 숫자 변환\ns = \"100\"\nn = int(s)\nf = float(s)\n\nprint(n + 50)\nprint(f + 0.5)\n\n# 2. 문자 변환\nage = 20\n# msg = \"Age: \" + age # 에러 발생!\nmsg = \"Age: \" + str(age)\nprint(msg)",
+    "steps": [
+      {
+        "title": "创建字符串变量 's'",
+        "explanation": "**`s = \"100\"`** -- 看起来像数字，但因为被**引号包裹所以是字符串**对象。\n\n`\"100\"` 和数字 `100` 是完全不同的类型！有引号（`\"\"`）就是字符串（str），没引号就是整数（int）：\n- `\"100\"` -> `str` 类型（字符 '1'、'0'、'0' 的序列）\n- `100` -> `int` 类型（数学上的数字）\n\n**类比：** 纸上写的 '100' 这几个字（字符串）和实际可以数的 100 颗糖果（数字）是不同的。字 '100' 不能做加法，100 颗糖果不能组成句子。\n\n**为什么这个区分重要？** 从网页获取的用户输入总是字符串。`input()` 函数的结果也是字符串。要用它们进行数值计算，必须进行类型转换。\n\n**Python 内部原理：** `\"100\"` 是由 3 个 Unicode 字符（'1'、'0'、'0'）组成的 `str` 对象。对这个对象使用 `+` 等算术运算会执行字符串连接，而非数字加法。",
+        "visualizationType": "pythonMemory",
+        "code": "s = \"100\"",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "字符串 -> 整数类型转换",
+        "explanation": "**`n = int(s)`** -- 使用 `int()` 函数将字符串 `\"100\"` **转换为整数 `100`**。\n\n`int()` 函数读取字符串中的数字，创建并返回**新的整数对象**。原始字符串 `s` 不会改变（字符串是不可变的）。\n\n**类比：** 就像看到纸上写的 '100' 这几个字，然后数出 100 颗糖果。纸（字符串）保持不变，100 颗糖果（整数）是新准备的。\n\n**转换失败怎么办？** 转换非数字字符串会引发错误：\n- `int(\"abc\")` -> `ValueError: invalid literal for int() with base 10: 'abc'`\n- `int(\"3.14\")` -> `ValueError`（含小数点的字符串必须先用 `float()` 转换）\n\n**Python 内部原理：** `int(s)` 调用 `int.__new__(int, s)`。内部逐个读取字符串的字符，转换为十进制数字。空格会自动忽略（`int(\" 100 \")` = `100`）。\n\n**实用技巧：** `int()` 还支持进制转换：`int(\"FF\", 16)` = `255`（十六进制），`int(\"1010\", 2)` = `10`（二进制）。",
+        "visualizationType": "pythonMemory",
+        "code": "n = int(s)",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "字符串 -> 浮点数类型转换",
+        "explanation": "**`f = float(s)`** -- 使用 `float()` 函数将字符串 `\"100\"` **转换为浮点数 `100.0`**。\n\n`float()` 函数读取字符串，创建并返回新的浮点数（float）对象。`\"100\"` 变成 `100.0`。\n\n**int() 和 float() 的区别：**\n- `int(\"100\")` = `100`（整数）\n- `float(\"100\")` = `100.0`（浮点数）\n- `float(\"3.14\")` = `3.14`（可以转换含小数点的字符串！）\n- `int(\"3.14\")` = `ValueError`（int 无法转换含小数点的字符串）\n\n**类比：** `int()` 是"整数转换器"，`float()` 是"小数转换器"。整数转换器不接受带小数点的，但小数转换器既能处理整数也能处理小数。\n\n**Python 内部原理：** `float(s)` 内部调用 C 的 `strtod()` 函数，将字符串解析为 IEEE 754 64 位浮点值。新的 `float` 对象在堆上创建，标签 `f` 贴上去。\n\n**注意：** `float(\"inf\")` 表示正无穷，`float(\"nan\")` 表示"非数字（Not a Number）"。这些也是有效的 float 值！",
+        "visualizationType": "pythonMemory",
+        "code": "f = float(s)",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出整数运算结果",
+        "explanation": "**`print(n + 50)`** -- 将转换后的整数 `n`（100）和 `50` 相加，输出结果 `150`。\n\n现在 `n` 是 `int` 类型，可以进行数值运算了！`100 + 50 = 150` 被计算并输出。\n\n**如果不转换直接用 `s + 50` 会怎样？** 会引发 `TypeError: can only concatenate str (not \"int\") to str`。字符串的 `+` 是"连接（concatenation）"，整数的 `+` 是"加法（addition）"，类型混用时 Python 不知道该执行哪种运算。\n\n**类比：** 纸上写的 '100'（字符串）不能加 50，但 100 颗糖果（整数）可以加 50 颗。类型转换就是把文字变成实际物品的过程。\n\n**Python 内部原理：** `n + 50` 调用 `n.__add__(50)`。两个 `int` 对象的值相加，创建新的 `int` 对象 `150`，传递给 `print()`。中间结果 `150` 在 `print()` 调用后失去引用，被垃圾回收器回收。",
+        "visualizationType": "pythonMemory",
+        "code": "print(n + 50)",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            }
+          ],
+          "output": [
+            "150"
+          ]
+        }
+      },
+      {
+        "title": "输出浮点数运算结果",
+        "explanation": "**`print(f + 0.5)`** -- 将转换后的浮点数 `f`（100.0）和 `0.5` 相加，输出结果 `100.5`。\n\n`f` 是 `float` 类型，执行 `float` + `float` = `float` 运算。`100.0 + 0.5 = 100.5`。\n\n**int 和 float 运算的区别：**\n- `int + int` = `int`（100 + 50 = 150）\n- `float + float` = `float`（100.0 + 0.5 = 100.5）\n- `int + float` = `float`（100 + 0.5 = 100.5，自动转换！）\n\n混用 `int` 和 `float` 时，Python 会自动将 `int` 转换为 `float`。这称为**隐式类型转换（Implicit Coercion）**。但 `str` 和 `int` 之间不会发生这种自动转换！\n\n**Python 内部原理：** 调用 `f.__add__(0.5)`，在 C 层面执行浮点数加法。新的 `float` 对象 `100.5` 被创建并输出。\n\n**注意：** 像 `f + 0.1` 这样的浮点运算可能产生微小的舍入误差。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f + 0.5)",
+        "pythonMemoryState": {
+          "output": [
+            "100.5"
+          ],
+          "names": [],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建整数变量 'age'",
+        "explanation": "**`age = 20`** -- 创建整数对象 `20`，贴上标签 `age`。\n\n现在开始反向类型转换的示例——将数字转换为字符串。首先准备一个整数变量。\n\n**为什么是这个顺序？** 下一行将展示将 `age` 与字符串结合的尝试。为此，`age` 必须先被定义。\n\n**类比：** 标签 `age` 指向整数对象 `20`。这个对象的类型是 `int`，数值运算可以，但与字符串的 `+` 运算不行。\n\n**Python 内部原理：** `20` 在小整数缓存范围（-5~256）内，复用程序启动时预创建的对象。不会发生新的内存分配。\n\n**注意：** 变量名 `age` 不是 Python 关键字，可以自由使用。但要注意不要用 `int`、`str`、`print` 等内置函数名作变量名——会覆盖原有功能！",
+        "visualizationType": "pythonMemory",
+        "code": "age = 20",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "20",
+              "pyId": "4004",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "TypeError 情况",
+        "explanation": "**`# msg = \"Age: \" + age  # 报错！`** -- 尝试用 `+` 直接将字符串和整数相加。\n\n如果取消这行注释，会引发 `TypeError: can only concatenate str (not \"int\") to str`。Python 不允许用 `+` 连接字符串（`\"Age: \"`）和整数（`20`）。\n\n**为什么不自动转换？** 像 JavaScript 那样 `\"Age: \" + 20` 自动变成 `\"Age: 20\"` 似乎很方便，但 Python 的设计哲学不同：\n> \"显式优于隐式（Explicit is better than implicit）\" -- The Zen of Python\n\n自动转换虽然方便，但可能产生意料之外的 bug。例如 `\"1\" + 2` 是 `\"12\"`（字符串连接）还是 `3`（数字加法）就会变得模糊。\n\n**类比：** 就像不能在一个句子中混用中文和英文语法一样，字符串和数字是不同的"语言"。要混用就必须先翻译（类型转换）。\n\n**Python 内部原理：** 调用 `\"Age: \".__add__(age)`，但 `str.__add__` 在右操作数不是 `str` 时返回 `NotImplemented`。然后尝试 `age.__radd__(\"Age: \")`，但 `int.__radd__` 也无法处理 `str`，最终引发 `TypeError`。",
+        "visualizationType": "pythonMemory",
+        "code": "# msg = \"Age: \" + age # 에러 발생!",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "20",
+              "pyId": "4004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "整数 -> 字符串类型转换",
+        "explanation": "**`msg = \"Age: \" + str(age)`** -- 用 `str()` 函数将整数转换为字符串后再连接。\n\n解决错误的方法：用 `str(age)` 将整数 `20` 转换为字符串 `\"20\"`，然后用 `+` 连接两个字符串。\n\n执行过程：\n1. `str(age)` -> `str(20)` -> `\"20\"`（整数转字符串）\n2. `\"Age: \" + \"20\"` -> `\"Age: 20\"`（两个字符串连接）\n3. `msg` 指向新的字符串对象 `\"Age: 20\"`\n\n**更简便的方法——f-string：** 写 `msg = f\"Age: {age}\"` 会自动将 `age` 的值转换为字符串并插入。Python 3.6+ 可用，比 `str()` + `+` 更易读且性能更好。\n\n**类比：** 把数字 `20` 写在纸上（str 转换），然后把它贴到字符串 `\"Age: \"` 后面（+ 连接）。\n\n**Python 内部原理：** `str(age)` 调用 `age.__str__()`。`int.__str__` 方法将整数转换为十进制字符串。然后 `str.__add__` 创建合并两个字符串的新 `str` 对象。\n\n**注意：** `str()` 几乎可以用于所有 Python 对象。列表也可以：`str([1,2,3])` = `\"[1, 2, 3]\"`。",
+        "visualizationType": "pythonMemory",
+        "code": "msg = \"Age: \" + str(age)",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "msg",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "20",
+              "pyId": "4004"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Age: 20\"",
+              "pyId": "4005",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出最终结果",
+        "explanation": "**`print(msg)`** -- 输出 `msg` 变量指向的最终字符串 `\"Age: 20\"`。\n\n通过类型转换，成功将整数和字符串结合，得到了想要的结果。\n\n**核心总结——Python 类型转换三剑客：**\n- `int()`：字符串/浮点数 -> 整数（`int(\"100\")` = `100`，`int(3.7)` = `3`）\n- `float()`：字符串/整数 -> 浮点数（`float(\"3.14\")` = `3.14`，`float(100)` = `100.0`）\n- `str()`：任何东西 -> 字符串（`str(100)` = `\"100\"`，`str(3.14)` = `\"3.14\"`）\n\n**Python 内部原理：** 这三个函数实际上不是"函数"而是**类的构造器**。`int(\"100\")` 是创建 `int` 类的新实例，`str(20)` 是创建 `str` 类的新实例。\n\n**实用技巧：** 处理用户输入的典型模式是 `age = int(input(\"年龄：\"))`。由于 `input()` 返回字符串，用 `int()` 包裹可以立即转换为整数。",
+        "visualizationType": "pythonMemory",
+        "code": "print(msg)",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "20",
+              "pyId": "4004"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Age: 20\"",
+              "pyId": "4005"
+            }
+          ],
+          "output": [
+            "Age: 20"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪段代码会引发错误？",
+    "options": [
+      "int(\"123\")",
+      "str(123)",
+      "\"Number \" + 5",
+      "float(\"3.14\")"
+    ],
+    "correctIndex": 2,
+    "explanation": "Python 不太会进行自动类型转换（隐式转换）。\n字符串和数字相加会引发 TypeError。\n必须写成 `\"Number \" + str(5)`。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "像 JavaScript 一样，'1' + 1 会变成 '11'",
+      "correct": "在 Python 中会引发 TypeError。",
+      "why": "Python 的哲学："显式优于隐式（Explicit is better than implicit）。""
+    }
+  ],
+  "keyTakeaway": "转换类型时，明确使用 `int()`、`str()`、`float()`。"
+}

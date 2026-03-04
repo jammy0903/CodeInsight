@@ -1,0 +1,334 @@
+{
+  "lessonId": "py-13-3",
+  "title": "Advanced String Slicing",
+  "concept": "Slicing is [start:stop:step] -- an extension of indexing",
+  "content": {
+    "code": "text = \"Hello, Python!\"\n\nfirst_five = text[:5]\nprint(first_five)\n\nevery_other = text[::2]\nprint(every_other)\n\nreversed_text = text[::-1]\nprint(reversed_text)\n\nmiddle = text[7:13]\nprint(middle)",
+    "steps": [
+      {
+        "title": "String Creation and Understanding Indices",
+        "explanation": "**`text = \"Hello, Python!\"`** -- A 14-character string object is created in heap memory, and the label `text` is attached.\n\nPython executes from top to bottom in order. Each character in this string is assigned both a **positive index** and a **negative index**.\n\n**Slicing basic syntax:** `text[start:stop:step]`\n- `start`: Start position (**inclusive**)\n- `stop`: End position (**exclusive!** -- this is the key)\n- `step`: Interval (default: 1)\n\n**Analogy:** Like apartment unit numbers. You can count from the front as unit 101 (index 0), unit 102 (index 1)..., or from the back as the last unit (index -1), second to last (-2)... The same unit has two numbers!\n\n**Note:** Python indices always start at **0**. The first character is `text[0]`, not `text[1]`! This is the same as C, Java, and most other languages.",
+        "visualizationType": "pythonMemory",
+        "code": "text = \"Hello, Python!\"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Index: H=0, e=1, l=2, ..., !=13",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\" (length: 14)",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First 5 Characters ([:5])",
+        "explanation": "**`first_five = text[:5]`** -- Extracts from the beginning of the string up to index 4 (5 is excluded!) and returns a **new string**.\n\n`text[:5]` is shorthand for `text[0:5:1]`.\n\n**Key rule:** The `stop` index is **always excluded**! `[:5]` means indices 0, 1, 2, 3, 4. Thanks to this rule, `len(text[:5])` == `5` holds true (length = stop - start).\n\n**Analogy:** Like cutting a roll cake (string) with a knife (slicing) at the 5cm mark (index 0-4) from the beginning. The original roll cake stays intact, and only the cut piece (new string) is taken.\n\n**Note:** `text[:5]` and `text[5]` are completely different! `text[:5]` returns the string `\"Hello\"`, while `text[5]` returns the single character `\",\"`.\n\n**Let's visualize the extraction:**\n```\n H  e  l  l  o  ,     P  y  t  h  o  n  !\n[0][1][2][3][4] 5\n ^^^^^^^^^^^^^^\n   extraction range (0-4)\n```\nResult: `\"Hello\"`",
+        "visualizationType": "pythonMemory",
+        "code": "first_five = text[:5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "[:5] = extract indices 0-4 (5 is excluded)",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Every Other Character ([::2])",
+        "explanation": "**`every_other = text[::2]`** -- Extracts characters from start to end at **2-character intervals**.\n\n`text[::2]` is equivalent to `text[0:14:2]`.\n\n**Analogy:** Like jumping rope (string) with two steps (step=2) instead of one step (step=1). Every other character is skipped, so only characters at even indices (0, 2, 4...) are collected.\n\n**Note:** The larger the step, the shorter the result string. `text[::len(text)]` returns only the first character.\n\n**Let's visualize the extraction:**\n```\n H  e  l  l  o  ,     P  y  t  h  o  n  !\n[0]   [2]   [4]   [6]   [8]   [10]  [12]\n H     l     o        y     h     n\n```\nResult: `\"Hlo yhn\"`",
+        "visualizationType": "pythonMemory",
+        "code": "every_other = text[::2]",
+        "pythonMemoryState": {
+          "output": [
+            "Hello"
+          ],
+          "note": "[::2] = extract even indices only with step 2",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "every_other",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Hlo yhn\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Reversing a String ([::-1])",
+        "explanation": "**`text[::-1]`** is the go-to pattern for reversing a string quickly.\n\nMeaning:\n- Start/end omitted\n- Step set to `-1` to read from back to front\n\nThe result is a reversed version of the original string.\n\n**Analogy**: Like reading a sentence from the last letter backwards to create a new sentence.\n\nKey points:\n- The original string stays the same\n- A new string is returned\n\nShort and powerful, frequently used in both coding tests and practice.",
+        "visualizationType": "pythonMemory",
+        "code": "reversed_text = text[::-1]",
+        "pythonMemoryState": {
+          "output": [
+            "Hlo yhn"
+          ],
+          "note": "[::-1] = reverse with step -1 (string reversal)",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "every_other",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "reversed_text",
+              "pointsTo": "str4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Hlo yhn\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"!nohtyP ,olleH\"",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Extracting the Middle ([7:13])",
+        "explanation": "**`middle = text[7:13]`** extracts from index 7 to 12.\n(End index 13 is not included)\n\nSo the result is exactly `\"Python\"`.\n\nQuick way to remember:\n- Slice length = `stop - start`\n- Here it's `13 - 7 = 6` characters\n\n**Analogy**: The start of the range is included, but the end acts as a boundary and is excluded.\n\nAdditional points:\n- `text[7]` is a single character\n- `text[7:8]` also results in a single character, but it uses \"slice\" syntax\n\nSlicing is the most frequently used fundamental skill for string manipulation.",
+        "visualizationType": "pythonMemory",
+        "code": "middle = text[7:13]",
+        "pythonMemoryState": {
+          "output": [
+            "!nohtyP ,olleH"
+          ],
+          "note": "[7:13] = extract indices 7-12 (\"Python\")",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "every_other",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "reversed_text",
+              "pointsTo": "str4"
+            },
+            {
+              "name": "middle",
+              "pointsTo": "str5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Hlo yhn\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"!nohtyP ,olleH\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "str5",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Final Output",
+        "explanation": "**`print(middle)`** -- Prints `\"Python\"` that `middle` points to.\n\n**Let's summarize all execution results:**\n```\nHello          <- text[:5]    (first 5 chars)\nHlo yhn        <- text[::2]   (even indices)\n!nohtyP ,olleH <- text[::-1]  (reverse)\nPython         <- text[7:13]  (middle extraction)\n```\n\n**Analogy:** Like a Swiss Army knife (slicing), `[start:stop:step]` alone lets you manipulate strings freely. Cut from the front, cut from the back, skip characters, reverse -- all in one!\n\n**Python internals:** The key characteristic of slicing is **safety**. Going out of bounds doesn't cause errors:\n- `text[0:100]` -> `\"Hello, Python!\"` (returns as much as exists)\n- `text[100:200]` -> `\"\"` (empty string, no error)\n- `text[-100:5]` -> `\"Hello\"` (negative values below 0 are adjusted to 0)\n\nHowever, **indexing** does raise errors for out-of-bounds access: `text[100]` -> `IndexError`!\n\n**Slicing pattern summary:**\n\n**Execution order (complete summary):**\n1. `text = \"Hello, Python!\"` -> string created\n2. `text[:5]` -> `\"Hello\"` (first 5 chars)\n3. `text[::2]` -> `\"Hlo yhn\"` (even indices)\n4. `text[::-1]` -> `\"!nohtyP ,olleH\"` (reverse)\n5. `text[7:13]` -> `\"Python\"` (middle extraction)",
+        "visualizationType": "pythonMemory",
+        "code": "print(middle)",
+        "pythonMemoryState": {
+          "output": [
+            "Python"
+          ],
+          "note": "Slicing doesn't error on out-of-bounds (safe!)",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "every_other",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "reversed_text",
+              "pointsTo": "str4"
+            },
+            {
+              "name": "middle",
+              "pointsTo": "str5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Hlo yhn\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"!nohtyP ,olleH\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "str5",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the result of \"abcdef\"[::-1]?",
+    "options": [
+      "\"abcdef\"",
+      "\"fedcba\"",
+      "\"ace\"",
+      "Error occurs"
+    ],
+    "correctIndex": 1,
+    "explanation": "[::-1] is a slice that reads the string in reverse.\nSince step is -1, it reads from end to beginning one character at a time, resulting in \"fedcba\"."
+  },
+  "misconceptions": [
+    {
+      "wrong": "The character at the stop index is also included in slicing",
+      "correct": "The stop index is always excluded. text[0:5] covers indices 0-4.",
+      "why": "Thanks to this rule, len(text[a:b]) == b - a holds true.\nAlso, text[:n] + text[n:] always equals the original text."
+    }
+  ],
+  "keyTakeaway": "[start:stop:step] -- freely extract strings with just these three! [::-1] is the essential reversal pattern!"
+}

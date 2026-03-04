@@ -1,0 +1,227 @@
+{
+  "lessonId": "py-6-1",
+  "title": "Class Definition",
+  "concept": "A class is a blueprint for creating objects, and the class itself is also an object!",
+  "content": {
+    "code": "class Dog:\n    species = \"Canis familiaris\"\n    \n    def bark(self):\n        print(\"멍멍!\")\n\nprint(type(Dog))\nprint(Dog.species)\n\nmy_dog = Dog()\nprint(type(my_dog))",
+    "steps": [
+      {
+        "title": "Class Definition (Creating a Blueprint)",
+        "explanation": "**`class Dog:`**\n\nPython executes code from top to bottom in order. The `class` keyword defines a **new type (class)** named `Dog`.\n\n**Goal of this lesson**: Deeply understand the nature of classes. A class is not just a \"blueprint\" -- in Python, **it is itself an object**, an instance of the metaclass `type`!\n\n**Three roles of a class:**\n1. **Blueprint**: Use this blueprint to create multiple objects (instances)\n2. **Type definition**: A new data type called `Dog` is born (just like int, str, list!)\n3. **Object**: The class itself is an **object** that exists in memory!\n\n**Python internals**: When Python encounters `class Dog:`, it executes the class body from top to bottom. Variables encountered (`species`) become class variables, and functions (`bark`) become methods. Once all processing is done, a Dog class object is created and bound to the name `Dog`.\n\n**Analogy**: The act of drawing an architectural blueprint itself creates a \"thing\" called a blueprint. The blueprint (class) contains design information, and you can build multiple houses (instances) from it.\n\n**Why this order?** The class must be defined first before objects can be created from it.\n\n**Execution order**: Execute class Dog -> Begin creating Dog class object -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Dog:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Class definition begins (the class is also an object!)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Class Variable Definition",
+        "explanation": "**`species = \"Canis familiaris\"`**\n\nThis is a **class variable**. A variable defined directly in the class body without `self`, it is data **shared by all instances**.\n\n**Class variable vs Instance variable -- Key difference:**\n- **Class variable** (`species`): Belongs to the Dog class itself, all Dog instances **share the same value**\n- **Instance variable** (`self.name`, etc.): Each instance **independently** owns its own\n\n**Python internals**: When the class body executes, `species = \"Canis familiaris\"` is stored in the Dog class object's `__dict__`. That is, `Dog.__dict__['species'] = \"Canis familiaris\"`. Later, when accessed via `my_dog.species` on an instance, Python first looks in the instance's `__dict__`, and if not found, looks in the class's `__dict__`.\n\n**When to use class variables?** When all instances should have the same value. Example: Every Dog's species is \"Canis familiaris\". But beware -- using **mutable objects (lists, dictionaries)** as class variables can be a trap (you'll learn about this in py-6-4!).\n\n**Analogy**: A school's \"motto\" exists once on the school (class) and is shared by all students (instances). But each student's \"name\" is an instance variable and differs for each.\n\n**Why this order?** Executed sequentially within the class body.\n\n**Execution order**: species = \"Canis familiaris\" -> Add species to Dog.__dict__ -> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "species = \"Canis familiaris\"",
+        "pythonMemoryState": {
+          "note": "Class variable added (shared by all instances)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class, species='Canis familiaris'>",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "bark Method Definition",
+        "explanation": "**`def bark(self):`**\n\nDefines an instance method called `bark`. A function defined with `def` inside a class body automatically becomes a **method** of that class.\n\n**Methods are also function objects**: Executing `def bark(self):` creates a **function object** named bark. This function object is stored in Dog's `__dict__`. That is, `Dog.__dict__['bark'] = <function bark>`.\n\n**The self parameter**: The first parameter of every instance method is `self`. When `my_dog.bark()` is called, Python automatically passes `my_dog` to `self`.\n\n**State of Dog class at this point**: `Dog.__dict__` contains two entries: `species` (class variable) and `bark` (method). Once all class body execution is complete, the Dog class definition is finalized.\n\n**Note**: At this point we are only **defining** the method. `print(\"Woof!\")` is not being executed! It only runs later when called like `my_dog.bark()`.\n\n**Why this order?** After defining the class variable, methods are defined in order.\n\n**Execution order**: Execute def bark -> Create bark function object -> Register in Dog.__dict__ -> Dog class definition complete -> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "def bark(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "bark method defined",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class, species='...', bark>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "A Class Is Also an Object! (type check)",
+        "explanation": "**`print(type(Dog))`**\n\nThis code reveals an amazing property of Python. We check **what type** the class `Dog` itself is.\n\n**Result: `<class 'type'>`**\n\nDog is an instance of the **metaclass** called `type`! In other words, the \"class of the class\" that created \"the class Dog\" is `type`.\n\n**Python's core philosophy -- \"Everything is an object\":**\n- `42` is an instance of `int` (numbers are objects!)\n- `\"hello\"` is an instance of `str` (strings are objects!)\n- `Dog` is an instance of `type` (**classes are objects too!!!**)\n\n**Why does this matter?** The fact that classes are objects means you can assign them to variables, pass them as function arguments, and store them in lists! This property is what makes Python such a dynamic and flexible language.\n\n```python\n# Store a class in a variable\nMyClass = Dog\nmy_dog = MyClass()  # Same as Dog()!\n\n# Store classes in a list\nclasses = [Dog, Cat, Bird]\nfor cls in classes:\n    obj = cls()  # Create an instance of each class\n```\n\n**Analogy**: Normally a \"blueprint\" is just a drawing on paper, but in Python, the blueprint (class) itself is a **tangible thing (object)**. You can pass it around, inspect it, and modify it.\n\n**Why this order?** After class definition completes, the next line executes in order.\n\n**Execution order**: Call type(Dog) -> Return <class 'type'> -> Execute print -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "print(type(Dog))",
+        "pythonMemoryState": {
+          "output": [
+            "<class 'type'>"
+          ],
+          "note": "Dog is an instance of type (classes are objects!)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class, type=type>",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Accessing a Class Variable",
+        "explanation": "**`print(Dog.species)`**\n\nAccesses the class variable directly using the `ClassName.variableName` format. You can access it even without creating an instance!\n\n**Why is it accessible without an instance?** Because class variables belong to the **class object itself**. Since `'species': 'Canis familiaris'` is stored in Dog's `__dict__`, it can be read directly with `Dog.species`.\n\n**Three ways to access a class variable:**\n```python\nDog.species        # Direct access from class -> \"Canis familiaris\"\nmy_dog.species     # Access through instance -> \"Canis familiaris\" (same value!)\ndog2.species       # Access through another instance -> \"Canis familiaris\" (same value!)\n```\nAll return the **same value**. Because if an instance doesn't have species, Python looks for it in the class.\n\n**Python's Attribute Lookup Order:**\n1. Look in instance's `__dict__` -> if not found\n2. Look in class's `__dict__` -> if not found\n3. Look in parent class's `__dict__` -> ... -> if not found, AttributeError\n\nThis lookup order is the most fundamental mechanism of Python OOP!\n\n**Why this order?** After the previous print completes, the next line executes in order.\n\n**Execution order**: Read Dog.__dict__['species'] -> \"Canis familiaris\" -> Execute print -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "print(Dog.species)",
+        "pythonMemoryState": {
+          "output": [
+            "Canis familiaris"
+          ],
+          "note": "Class variables are accessible without an instance",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class, species='Canis familiaris'>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating an Instance (Object)",
+        "explanation": "**`my_dog = Dog()`**\n\nCalling `Dog()` creates an **instance (object)** of the Dog class. Now an \"actual product\" is made from the \"blueprint.\"\n\n**Relationship between two objects:**\n- `Dog` (class object, 0x1000): **Blueprint** -- instance of type\n- `my_dog` (instance object, 0x2000): **Product** -- instance of Dog\n\n**Python internals:**\n1. `Dog.__new__(Dog)` called -> Allocate empty Dog object space at memory 0x2000\n2. `Dog.__init__(new_object)` called -> No `__init__` exists, so only default initialization\n3. Bind reference (0x2000) of initialized object to `my_dog` variable\n\n**State of my_dog**: `my_dog.__dict__` is an empty dictionary `{}`. No instance variables yet. But accessing `my_dog.species` will find the class variable \"Canis familiaris\" through Python's attribute lookup order.\n\n**Analogy**: A house (my_dog) was built from the blueprint (Dog). The house is empty, but common information written on the blueprint (species) can be referenced.\n\n**Why this order?** After the previous print completes, the next line executes in order.\n\n**Execution order**: Call Dog() -> Create new object 0x2000 via __new__ -> Assign reference 0x2000 to my_dog -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "my_dog = Dog()",
+        "pythonMemoryState": {
+          "note": "Dog instance created (product made from blueprint)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class, species='Canis familiaris'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Instance Type",
+        "explanation": "**`print(type(my_dog))`**\n\nChecks the type (class) of the `my_dog` object.\n\n**Let's organize Python's type hierarchy:**\n```python\ntype(my_dog)       # <class 'Dog'>    - my_dog is an instance of Dog\ntype(Dog)          # <class 'type'>   - Dog is an instance of type\ntype(type)         # <class 'type'>   - type is an instance of itself!\n```\n\n**Result: `<class '__main__.Dog'>`**\n- `my_dog` is an instance of the `Dog` class\n- `__main__` is the name of the currently executing module (file)\n\n`type` is the most fundamental object in Python, with the unique property of being **an instance of itself**. This structure is the root of Python's \"everything is an object\" system.",
+        "visualizationType": "pythonMemory",
+        "code": "print(type(my_dog))",
+        "pythonMemoryState": {
+          "output": [
+            "<class '__main__.Dog'>"
+          ],
+          "note": "my_dog is an instance of Dog",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class, type=type>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, type=Dog>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the difference between class variables and instance variables?",
+    "options": [
+      "No difference",
+      "Class variables are shared by all instances; instance variables are owned individually",
+      "Instance variables are faster",
+      "Class variables can only be used inside methods"
+    ],
+    "correctIndex": 1,
+    "explanation": "Class variables belong to the class and are shared by all instances.\nInstance variables (self.xxx) are independent for each instance."
+  },
+  "misconceptions": [
+    {
+      "wrong": "class is executable code like a function",
+      "correct": "class defines a new type (object template)",
+      "why": "The class statement creates a class object and binds it to a name."
+    },
+    {
+      "wrong": "self is a special keyword",
+      "correct": "self is just a conventional parameter name",
+      "why": "this would also work, but the Python community uses self.\nFollow the convention!"
+    }
+  ],
+  "keyTakeaway": "A class is a blueprint for creating objects, and it is itself also an object! Everything is an object!"
+}

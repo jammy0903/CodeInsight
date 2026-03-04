@@ -1,0 +1,332 @@
+{
+  "lessonId": "py-14-3",
+  "title": "map, filter, reduce",
+  "concept": "The big three of functional programming! map (transform), filter (select), reduce (accumulate)",
+  "content": {
+    "code": "numbers = [1, 2, 3, 4, 5]\n\ndoubled = list(map(lambda x: x * 2, numbers))\nprint(doubled)\n\nevens = list(filter(lambda x: x % 2 == 0, numbers))\nprint(evens)\n\nfrom functools import reduce\ntotal = reduce(lambda a, b: a + b, numbers)\nprint(total)",
+    "steps": [
+      {
+        "title": "Creating the Source List",
+        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- Creates the source list to be used with `map`, `filter`, and `reduce`.\n\nIn this lesson, we'll learn 3 core tools of **Functional Programming (FP)**. Functional programming is a programming style that treats functions **as values**. Just as you can put numbers or strings into variables, you can **put functions in variables, pass them to other functions, and use them as return values**.\n\n**Analogy:** If regular programming is \"a chef personally preparing ingredients,\" functional programming is \"putting ingredients and a recipe (function) into an automated kitchen machine that handles everything.\" `map` is \"apply the same cooking method to all ingredients,\" `filter` is \"select only ingredients that meet the criteria,\" and `reduce` is \"combine all ingredients into one dish.\"\n\n**What is lambda?** A nameless one-line function.\n```python\nlambda x: x * 2  # A function that takes x and returns x*2\n```\nThis is identical to `def double(x): return x * 2`, but it can be defined on the spot without giving it a name.\n\n**Python internals:** In Python, functions are **first-class objects**. Like `int`, `str`, and `list`, functions exist as objects in memory and can be assigned to variables or passed as arguments to other functions. Functions created with `lambda` are the same `function` type objects as regular `def` functions.\n\n**Execution order:**\n1. List literal evaluation -> `list` object allocated on heap.\n2. `numbers -> list` binding created in global namespace.",
+        "visualizationType": "pythonMemory",
+        "code": "numbers = [1, 2, 3, 4, 5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Source list for map/filter/reduce",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "map() -- Transform All Elements",
+        "explanation": "**`mapped = list(map(lambda x: x * 2, numbers))`** transforms all elements with the same rule.\n\nHere, each number is multiplied by 2 to create a new list.\nResult: `[2, 4, 6, 8, 10]`\n\nKey points:\n- `map` means \"transform everything\"\n- The original list stays unchanged and the result is created separately\n\n**Analogy**: Like applying batch editing (2x scaling) to a copy only.\n\nPractical tip:\n- For simple cases, list comprehension (`[x*2 for x in numbers]`) is often more readable",
+        "visualizationType": "pythonMemory",
+        "code": "doubled = list(map(lambda x: x * 2, numbers))",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "map(function, list) -> apply function to all elements",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "doubled",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[2, 4, 6, 8, 10]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "filter() -- Filter by Condition",
+        "explanation": "**`filtered = list(filter(lambda x: x % 2 == 0, numbers))`** keeps only even numbers.\n\nThe flow is simple:\n- Pass each element to the condition function\n- True means pass, False means exclude\n\nResult: `[2, 4]`\n\n**Analogy**: Like a gate that checks the entry condition (even number) and only lets those who pass stay in line.\n\nNote:\n- `filter(...)` itself doesn't return a list immediately but an iterator\n- To display or reuse the result, wrapping it with `list(...)` is the safe practice",
+        "visualizationType": "pythonMemory",
+        "code": "evens = list(filter(lambda x: x % 2 == 0, numbers))",
+        "pythonMemoryState": {
+          "output": [
+            "[2, 4, 6, 8, 10]"
+          ],
+          "note": "filter(function, list) -> select only True elements",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "doubled",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[2, 4, 6, 8, 10]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Importing reduce",
+        "explanation": "**`from functools import reduce`** -- Imports the `reduce` function from the `functools` module.\n\n`reduce` was a built-in function in Python 2, but was moved to the `functools` module in Python 3. Therefore, you must import it before using it.\n\n**Analogy:** `reduce` being moved from built-ins to a module is like taking an infrequently used tool out of the toolbox (built-in) and storing it in the shed (module). When you need it, you just grab it from the shed.\n\n**Note:** Writing `import reduce` (without the module) will raise a `ModuleNotFoundError`. You must write `from functools import reduce`.\n\n**Why was it removed from built-ins?** Python's creator Guido van Rossum judged that `reduce` \"hurts readability in most cases.\" While `map` and `filter` are intuitive, `reduce` requires mentally simulating its operation to understand it. In practice, `reduce(lambda a, b: a + b, numbers)` can be expressed more simply as `sum(numbers)`.",
+        "visualizationType": "pythonMemory",
+        "code": "from functools import reduce",
+        "pythonMemoryState": {
+          "output": [
+            "[2, 4]"
+          ],
+          "note": "reduce needs to be imported from functools",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "doubled",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "reduce",
+              "pointsTo": "func1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[2, 4, 6, 8, 10]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function reduce>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "reduce() -- Accumulate List into a Single Value",
+        "explanation": "**`reduce(lambda a, b: a + b, numbers)`** folds multiple values into one.\n\nThe operation is \"accumulation\":\n- Combine the first two values\n- Combine that result with the next value\n- Repeat until the end to produce a single final value\n\nExample: `[1,2,3,4,5]` -> 3 -> 6 -> 10 -> 15\n\n**Analogy**: Like continuously adding numbers to a calculator's memory to produce a final total.\n\nPractical tip:\n- For simple sums, `sum(numbers)` is more readable than `reduce`\n- `reduce` shines when you have a \"custom accumulation rule\"",
+        "visualizationType": "pythonMemory",
+        "code": "total = reduce(lambda a, b: a + b, numbers)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "reduce: 1+2=3, 3+3=6, 6+4=10, 10+5=15",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "doubled",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "reduce",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "total",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[2, 4, 6, 8, 10]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function reduce>",
+              "pyId": "1004"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "15",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Final Output and Summary",
+        "explanation": "**`print(total)`** -- Prints the integer `15` that `total` points to. All elements of the list `[1, 2, 3, 4, 5]` were accumulated into a single value.\n\n**Functional Big Three comparison summary:**\n\n**Analogy:** In cooking terms, `map` is \"cut all ingredients to the same size,\" `filter` is \"remove spoiled ingredients,\" and `reduce` is \"put all ingredients in and make one soup.\"\n\n**Note:** If you forget to wrap `map` and `filter` results with `list()`, an iterator object is returned. An iterator that has been traversed once is exhausted and cannot be reused, so if the data will be used multiple times, always convert with `list()`.\n\n**Python style guide (when to use what?):**\n- **Simple transform/filter:** Comprehension recommended (more Pythonic and readable)\n- **Using existing functions:** `map(str, nums)`, `map(int, input_list)` -- `map` is clean when using pre-existing functions\n- **Accumulation operations:** Prefer built-in functions like `sum()`, `max()`, `min()` first, use `reduce` only for complex cases",
+        "visualizationType": "pythonMemory",
+        "code": "print(total)",
+        "pythonMemoryState": {
+          "output": [
+            "15"
+          ],
+          "note": "map(transform) + filter(select) + reduce(accumulate) = functional big three",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "doubled",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "reduce",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "total",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[2, 4, 6, 8, 10]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function reduce>",
+              "pyId": "1004"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "15",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the result of list(map(lambda x: x+1, [1, 2, 3]))?",
+    "options": [
+      "[1, 2, 3]",
+      "[2, 3, 4]",
+      "[2, 4, 6]",
+      "Error occurs"
+    ],
+    "correctIndex": 1,
+    "explanation": "map() applies the function to every element.\nlambda x: x+1 adds 1 to each element, so\n[1+1, 2+1, 3+1] = [2, 3, 4]."
+  },
+  "misconceptions": [
+    {
+      "wrong": "map() and filter() return lists",
+      "correct": "map() and filter() return iterators. If you need a list, you must wrap them with list().",
+      "why": "In Python 3, iterators are returned for memory efficiency.\nYou need to convert with list(map(...)) to get a list."
+    }
+  ],
+  "keyTakeaway": "map (transform), filter (select), reduce (accumulate) -- the functional big three! But in Python, comprehensions are more Pythonic!"
+}

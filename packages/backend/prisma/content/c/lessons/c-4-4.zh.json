@@ -1,0 +1,149 @@
+{
+  "lessonId": "c-4-4",
+  "title": "数组参数",
+  "concept": "数组体积太大无法完整传递，所以只发送"首地址"给函数",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid printArr(int arr[], int len) {\n    for (int i = 0; i < len; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    int data[3] = {10, 20, 30};\n\n    printArr(data, 3);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含头文件",
+        "explanation": "`#include <stdio.h>` 启用输出函数。\n\n本课讲解数组作为函数参数传递时衰减为地址的行为。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "printArr 函数定义",
+        "explanation": "在 `printArr(int arr[], int len)` 中，`arr[]` 在函数参数中作为指针运作。\n\n因此必须另外接收长度 `len` 才能安全遍历。",
+        "visualizationType": "cMemory",
+        "code": "void printArr(int arr[], int len) {"
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 帧并准备数组 `data`。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "数组声明与初始化",
+        "explanation": "`data` 数组在连续内存中存储 10、20、30。\n\n数组名充当表示首元素地址的起始点。",
+        "visualizationType": "cMemory",
+        "code": "int data[3] = {10, 20, 30};",
+        "stack": [
+          {
+            "name": "data",
+            "value": "{10, 20, 30}",
+            "type": "int[3]",
+            "frame": "main",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "传递数组（Array Decay）",
+        "explanation": "调用 `printArr(data, 3);` 时，`data` 衰减为起始地址进行传递。\n\n函数基于原始位置进行访问，而非数组副本。",
+        "visualizationType": "cMemory",
+        "code": "printArr(data, 3);",
+        "highlightOffset": [
+          0,
+          -10
+        ],
+        "stack": [
+          {
+            "name": "data",
+            "value": "{10, 20, 30}",
+            "type": "int[3]",
+            "frame": "main"
+          },
+          {
+            "name": "arr",
+            "value": "0x1000",
+            "type": "int*",
+            "frame": "printArr"
+          },
+          {
+            "name": "len",
+            "value": "3",
+            "type": "int",
+            "frame": "printArr"
+          }
+        ]
+      },
+      {
+        "title": "for 循环遍历",
+        "explanation": "`arr[i]` 按顺序输出元素。\n\n内部来说等同于指针访问 `*(arr+i)`。",
+        "visualizationType": "cMemory",
+        "code": "for (int i = 0; i < len; i++) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "stack": [
+          {
+            "name": "data",
+            "value": "{10, 20, 30}",
+            "type": "int[3]",
+            "frame": "main"
+          },
+          {
+            "name": "arr",
+            "value": "Address(data)",
+            "type": "int*",
+            "frame": "printArr"
+          },
+          {
+            "name": "len",
+            "value": "3",
+            "type": "int",
+            "frame": "printArr"
+          },
+          {
+            "name": "i",
+            "value": "0→1→2",
+            "type": "int",
+            "frame": "printArr"
+          }
+        ],
+        "stdout": "10 20 30 "
+      },
+      {
+        "title": "程序结束",
+        "explanation": "`return 0;` 结束程序。\n\n要点：传递数组参数时必须同时管理地址和长度。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "声明 void func(int a[100]) 时编译器如何解释？",
+    "options": [
+      "复制一个 100 个元素的数组",
+      "解释为 void func(int *a)（指针）",
+      "报错",
+      "分配 100 字节内存"
+    ],
+    "correctIndex": 1,
+    "explanation": "方括号中的数字被忽略。\n函数参数中的数组声明始终等同于指针声明。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "数组可以通过值传递（Call by Value）",
+      "correct": "数组本身不行。",
+      "why": "如果确实想复制，可以将数组放入结构体（struct）中传递，这样会产生副本（小技巧）。"
+    }
+  ],
+  "keyTakeaway": "数组参数实质上是指针。所以原始数据可被修改，长度必须另外传递。"
+}

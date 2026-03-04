@@ -1,0 +1,138 @@
+{
+  "lessonId": "c-2-4",
+  "title": "Dereferencing (Writing)",
+  "concept": "If you know the address, you can change the original value from anywhere (remote control)",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int energy = 50;\n    int *remote = &energy;\n\n    printf(\"Before: %d\\n\", energy);\n\n    *remote = 100;\n\n    printf(\"After:  %d\\n\", energy);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h Header",
+        "explanation": "Header for I/O functions like ```printf```.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The program starts — ```main```'s **stack frame** is created on the stack, and ```energy``` and ```remote``` are placed inside.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Declaring the Variable and Pointer",
+        "explanation": "We store 50 in `energy` and store `energy`'s address in `remote`.\n\nThis means `remote` is a pointer pointing to `energy`, and through dereferencing we can change the original value.",
+        "visualizationType": "cMemory",
+        "code": "int energy = 50;",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [
+          {
+            "name": "energy",
+            "value": "50",
+            "type": "int",
+            "address": "0x3000"
+          },
+          {
+            "name": "remote",
+            "value": "0x3000",
+            "type": "int*",
+            "address": "0x3004",
+            "points_to": "energy"
+          }
+        ]
+      },
+      {
+        "title": "Checking the Value Before Modification",
+        "explanation": "We print ```energy```'s current value ```50``` — a snapshot **before** modifying via pointer.\n\nRemember this value. After the next step, printing ```energy``` again will show a different value. How is that possible if we never wrote ```energy = 100;```?",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Before: %d\\n\", energy);",
+        "stdout": "Before: 50"
+      },
+      {
+        "title": "Modifying the Value via Dereferencing",
+        "explanation": "`*remote = 100;` stores 100 at the location remote points to (energy).\n\nWriting through a pointer directly changes the original data, not a copy.",
+        "keyInsight": "`*pointer = value` means \"store the value at the pointed-to address.\"",
+        "visualizationType": "cMemory",
+        "code": "*remote = 100;",
+        "stack": [
+          {
+            "name": "energy",
+            "value": "100",
+            "type": "int",
+            "address": "0x3000",
+            "highlight": true
+          },
+          {
+            "name": "remote",
+            "value": "0x3000",
+            "type": "int*",
+            "address": "0x3004",
+            "points_to": "energy"
+          }
+        ]
+      },
+      {
+        "title": "Checking the Value After Modification",
+        "explanation": "Printing `energy` again shows 100, confirming the original was actually changed.\n\nThe key point is: `*p` on the right side means read, `*p` on the left side means write.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"After:  %d\\n\", energy);",
+        "stack": [
+          {
+            "name": "energy",
+            "value": "100",
+            "type": "int",
+            "address": "0x3000"
+          },
+          {
+            "name": "remote",
+            "value": "0x3000",
+            "type": "int*",
+            "address": "0x3004",
+            "points_to": "energy"
+          }
+        ],
+        "stdout": "Before: 50\nAfter:  100"
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "```return 0``` — the stack frame is removed and both ```energy``` and ```remote``` disappear.\n\nKey takeaway: ```*p``` on the right = read the value, ```*p``` on the left = store a value. Modification through a pointer directly changes the **original data**.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "stdout": ""
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the value of a after this code?\nint a = 10;\nint *p = &a;\n*p = 20;\na = 30;",
+    "options": [
+      "10",
+      "20",
+      "30",
+      "Error occurs"
+    ],
+    "correctIndex": 2,
+    "explanation": "The statements execute in order.\n10 -> (via *p) 20 -> (via direct assignment) 30. The final value is 30."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Changing a value through a pointer only changes a copy",
+      "correct": "It changes the original.",
+      "why": "A pointer holds the **address** of the original, so writing to that address naturally modifies the original data."
+    }
+  ],
+  "keyTakeaway": "`*p` on the left means 'store a value at that location.' You can manipulate the original!"
+}

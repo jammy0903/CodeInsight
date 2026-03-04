@@ -1,0 +1,142 @@
+{
+  "lessonId": "js-1-3",
+  "title": "Promise 与微任务队列",
+  "concept": "Promise 的 then 回调进入微任务队列，其优先级高于任务队列",
+  "content": {
+    "code": "console.log('start');\n\nsetTimeout(() => {\n  console.log('timeout');\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log('promise');\n});\n\nconsole.log('end');",
+    "steps": [
+      {
+        "title": "console.log('start')",
+        "explanation": "第一行同步代码 `console.log('start')` 被压入调用栈并立即执行。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('start');",
+        "eventLoopState": {
+          "callStack": [
+            "console.log('start')"
+          ],
+          "output": [
+            "start"
+          ]
+        }
+      },
+      {
+        "title": "注册 setTimeout",
+        "explanation": "`setTimeout` 回调被委托给 Web API。当计时器（0ms）完成后，它会进入**任务队列**等待。",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(() => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "eventLoopState": {
+          "webApis": [
+            {
+              "name": "setTimeout callback"
+            }
+          ],
+          "callStack": null
+        }
+      },
+      {
+        "title": "注册 Promise.then",
+        "explanation": "`.then()` 回调进入**微任务队列**等待。\n这是一个独立的队列，优先级高于任务队列。",
+        "visualizationType": "eventLoop",
+        "code": "Promise.resolve().then(() => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "eventLoopState": {
+          "microtaskQueue": [
+            "promise then"
+          ],
+          "webApis": null
+        }
+      },
+      {
+        "title": "console.log('end')",
+        "explanation": "最后一行同步代码 `console.log('end')` 执行。\n调用栈即将被清空。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('end');",
+        "eventLoopState": {
+          "callStack": [
+            "console.log('end')"
+          ],
+          "taskQueue": [
+            "setTimeout callback"
+          ],
+          "output": [
+            "start",
+            "end"
+          ]
+        }
+      },
+      {
+        "title": "处理微任务（Promise）",
+        "explanation": "调用栈清空后，事件循环会先检查微任务队列，再检查任务队列。\n等待中的 Promise 回调被移入调用栈并执行。",
+        "keyInsight": "微任务队列的优先级始终高于任务队列。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('promise');",
+        "eventLoopState": {
+          "callStack": [
+            "() => { ... }",
+            "console.log('promise')"
+          ],
+          "microtaskQueue": [],
+          "output": [
+            "start",
+            "end",
+            "promise"
+          ],
+          "taskQueue": null
+        }
+      },
+      {
+        "title": "处理任务（setTimeout）",
+        "explanation": "只有当微任务队列完全清空后，事件循环才会检查任务队列。\n等待中的 `setTimeout` 回调被移入调用栈，最后执行。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('timeout');",
+        "eventLoopState": {
+          "callStack": [
+            "() => { ... }",
+            "console.log('timeout')"
+          ],
+          "output": [
+            "start",
+            "end",
+            "promise",
+            "timeout"
+          ],
+          "microtaskQueue": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下代码的输出顺序是什么？\n\nsetTimeout(() => console.log('A'), 0);\nPromise.resolve().then(() => console.log('B'));\nconsole.log('C');",
+    "options": [
+      "A → B → C",
+      "C → A → B",
+      "C → B → A",
+      "B → C → A"
+    ],
+    "correctIndex": 2,
+    "explanation": "同步代码（C）→ 微任务（B）→ 任务（A）。\nPromise 的 then 回调进入微任务队列，setTimeout 进入任务队列，微任务优先级更高。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "setTimeout(fn, 0) 和 Promise.then() 使用同一个队列",
+      "correct": "setTimeout 使用任务队列（宏任务队列），而 Promise.then() 使用微任务队列。",
+      "why": "微任务队列始终在任务队列之前被处理。"
+    },
+    {
+      "wrong": "0ms 更短，所以 setTimeout 先执行",
+      "correct": "时间长短不重要。\n**你在哪个队列排队**才是关键。",
+      "why": "根据事件循环规范，在微任务队列完全清空之前，任务队列永远不会被执行。\n如果微任务陷入无限循环，任务可能永远无法执行（饥饿现象）。"
+    }
+  ],
+  "keyTakeaway": "执行优先级：同步代码 > 微任务（Promise）> 任务（setTimeout）"
+}

@@ -1,0 +1,123 @@
+{
+  "lessonId": "js-7-1",
+  "title": "V8 隐藏类（Shapes）",
+  "concept": "V8 引擎使用一种称为「隐藏类」的内部映射来加速对象的属性访问。",
+  "content": {
+    "code": "function Point(x, y) {\n  this.x = x;\n  this.y = y;\n}\n\nconst p1 = new Point(1, 2);\nconst p2 = new Point(3, 4);\n\n// p1에 새로운 속성 추가 (히든 클래스 변경 발생!)\np1.z = 5;\n\nconsole.log(p1.x, p1.z);\nconsole.log(p2.x);",
+    "steps": [
+      {
+        "title": "创建 p1：隐藏类的创建",
+        "explanation": "当 `new Point(1, 2)` 执行时，V8 引擎会创建一个 `隐藏类` 来记住这个对象的「形状」。\n每次添加属性时，对象会转换到新的隐藏类。\n1. 为空对象创建隐藏类 C0\n2. `this.x = 1` 导致从 C0 转换到 C1（添加了 x）\n3. `this.y = 2` 导致从 C1 转换到 C2（添加了 y）\n`p1` 最终使用隐藏类 C2。",
+        "keyInsight": "添加属性不仅仅是「存储值」——它会触发内部结构变化（Transition）。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ x: 1, y: 2 }",
+              "label": "HiddenClass: C2"
+            }
+          ]
+        },
+        "code": "const p1 = new Point(1, 2);"
+      },
+      {
+        "title": "创建 p2：复用隐藏类",
+        "explanation": "创建 `p2` 时，V8 注意到属性添加的顺序和结构与 `p1` 完全相同。\n因此不会创建新的隐藏类，而是复用 `p1` 已经建立的 C2 隐藏类。\n这使得属性访问非常快。",
+        "keyInsight": "以相同顺序初始化属性可以让引擎将对象视为「同一类型」并进行优化。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "p2",
+              "value": "→ 0x002"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ x: 1, y: 2 }",
+              "label": "HiddenClass: C2"
+            },
+            {
+              "address": "0x002",
+              "content": "{ x: 3, y: 4 }",
+              "label": "HiddenClass: C2 (Shared)"
+            }
+          ]
+        },
+        "code": "const p2 = new Point(3, 4);"
+      },
+      {
+        "title": "添加属性：隐藏类分支",
+        "explanation": "在对象创建之后，我们动态地仅给 `p1` 添加了 `z` 属性。\n由于现有的 C2 隐藏类没有 `z` 的信息，V8 创建了新的隐藏类 C3（C2 + z）并将 `p1` 转换到 C3。\n现在 `p1` 和 `p2` 拥有不同的隐藏类，降低了优化效率。",
+        "keyInsight": "在对象创建后动态添加属性是破坏优化的主要原因。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ x: 1, y: 2, z: 5 }",
+              "label": "HiddenClass: C3",
+              "warning": "Shape Changed"
+            },
+            {
+              "address": "0x002",
+              "content": "{ x: 3, y: 4 }",
+              "label": "HiddenClass: C2"
+            }
+          ]
+        },
+        "code": "p1.z = 5;"
+      },
+      {
+        "title": "打印 p1 的属性",
+        "explanation": "打印 `p1` 的 `x` 和 `z` 属性。\n`p1` 使用新的隐藏类 C3 来定位值。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "1 5"
+          ]
+        },
+        "code": "console.log(p1.x, p1.z);"
+      },
+      {
+        "title": "打印 p2 的属性",
+        "explanation": "打印 `p2` 的 `x` 属性。\n`p2` 仍然使用原始的隐藏类 C2。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "1 5",
+            "3"
+          ]
+        },
+        "code": "console.log(p2.x);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "保持 V8 隐藏类优化的最佳实践是什么？",
+    "options": [
+      "在构造函数中按顺序初始化所有属性",
+      "随时动态添加属性（obj.newProp = 1）",
+      "每次改变属性初始化的顺序（x, y → y, x）",
+      "频繁使用 delete 运算符删除属性"
+    ],
+    "correctIndex": 0,
+    "explanation": "在构造函数中按顺序定义属性可以确保所有创建的对象共享同一个隐藏类，获得最佳性能。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript 对象是 HashMap，所以很慢",
+      "correct": "V8 使用隐藏类来达到和**数组偏移量**一样快的属性访问速度。",
+      "why": "早期 JS 引擎使用哈希表，但现代 V8 引入了隐藏类，实现了与 C++ 和 Java 等静态类型语言相当的属性访问速度。"
+    }
+  ],
+  "keyTakeaway": "保持对象的「形状」一致。一致性就是速度。"
+}

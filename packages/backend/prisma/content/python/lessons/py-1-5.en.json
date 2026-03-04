@@ -1,0 +1,162 @@
+{
+  "lessonId": "py-1-5",
+  "title": "Defining and Calling Functions",
+  "concept": "Functions are reusable blocks of code. Define them with the def keyword and call them with functionName().",
+  "content": {
+    "code": "def greet(name):\n    message = f\"Hello, {name}!\"\n    return message\n\nresult = greet(\"Python\")\nprint(f\"결과: {result}\")\n",
+    "steps": [
+      {
+        "title": "Function Definition",
+        "explanation": "**`def greet(name):`** -- Defines a function named `greet` using the `def` keyword.\n\nWhen this line is executed, Python **registers the code block in memory**. The code inside the function is not executed yet! It merely creates a blueprint that says 'run this code when called later.'\n\n**Structure breakdown:**\n- `def`: Short for 'define.' Declares that we're creating a function\n- `greet`: The function's name. We'll call it using this name later\n- `name`: A **parameter**. A variable that holds the value passed from outside\n- `:`: The colon -- the indented code starting from the next line is the function body\n\n**Analogy:** It's like writing a recipe on paper. Writing the recipe (def) and actually cooking (calling) are different things. The 'ingredients' section of the recipe corresponds to the parameter (name).\n\n**How Python works internally:** When the `def` statement executes, Python creates a `function` type object and registers it in the global namespace under the name `greet`. The function object stores bytecode, parameter information, default values, etc.\n\n**Note:** A function name is a **label** just like variables. You can assign it to another variable like `f = greet` and call it as `f(\"World\")`.",
+        "visualizationType": "pythonMemory",
+        "code": "def greet(name):",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Line 1 executed",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "greet",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Function Body",
+        "explanation": "**`message = f\"Hello, {name}!\"`** -- Function body: creates a greeting string using an f-string.\n\nThis code is executed **when** `greet()` is called. At this point where only `def` has been executed, it has not run yet.\n\n**f-string syntax:** In `f\"Hello, {name}!\"`, the variable inside curly braces `{name}` is replaced with its actual value. When `greet(\"Python\")` is called later, `name` becomes `\"Python\"`, producing `\"Hello, Python!\"`.\n\n**Local variable:** `message` is a local variable that only exists inside the function. Trying to use `message` outside the function raises a `NameError`.\n\n**Analogy:** It's like writing the first step in the recipe's 'cooking instructions.' This step is performed when you actually cook (call the function). It's an instruction that says 'take the ingredient (name) and make the dough (message).'\n\n**How Python works internally:** When the function is called, a new **local namespace** is created. `name` and `message` are registered in this local namespace. When the function ends, this namespace is destroyed along with all local variables.",
+        "visualizationType": "pythonMemory",
+        "code": "message = f\"Hello, {name}!\"",
+        "pythonMemoryState": {
+          "note": "Line 2 executed",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "message",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "The return Statement",
+        "explanation": "**`return message`** -- **Returns** the function's result to the caller.\n\nWhen `return` is executed, two things happen:\n1. The value that `message` points to (`\"Hello, Python!\"`) is **passed back to the caller**\n2. The function's execution **terminates immediately** (code below return won't execute)\n\n**Analogy:** The last step of the recipe -- 'plate the finished dish and serve.' You deliver the dish (computed result) to the guest (calling code) and clean up the kitchen (function).\n\n**What if there's no return?** If there's no `return` statement or just a bare `return`, the function returns `None`. `None` is a special object in Python that represents 'no value.'\n\n**How Python works internally:** When `return` executes, the function's local namespace is destroyed. Local variables like `name` and `message` all disappear. But the returned object (`\"Hello, Python!\"`) survives because it's being referenced by the caller.\n\n**Note:** To return multiple values from a function, use tuples: `return x, y` is actually `return (x, y)`.",
+        "visualizationType": "pythonMemory",
+        "code": "return message",
+        "pythonMemoryState": {
+          "note": "Line 3 executed",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "result",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "greet",
+              "pyId": "1001"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling the Function",
+        "explanation": "**`result = greet(\"Python\")`** -- **Calls** the defined function `greet`.\n\nAdding parentheses `()` after the function name executes the function. `\"Python\"` inside the parentheses is the **argument**, which is passed to the function's parameter `name`.\n\n**Following the execution flow in detail:**\n1. `greet(\"Python\")` is called -> `\"Python\"` is assigned to parameter `name`\n2. Function body line 2 executes: `message = f\"Hello, Python!\"`\n3. `return message` executes: returns `\"Hello, Python!\"` and function ends\n4. The return value `\"Hello, Python!\"` is assigned to `result`\n\n**Terminology distinction:**\n- **Parameter:** The variable name used in the function definition (`name`)\n- **Argument:** The actual value passed when calling the function (`\"Python\"`)\n\n**Analogy:** It's like inserting a coin (argument) into a vending machine (function) and getting a drink (return value). When designing the machine, you create a 'coin slot' (parameter), and when using it, you insert an actual coin (argument).\n\n**How Python works internally:** When a function is called, Python pushes a new **frame** onto the call stack. Local variables are stored in this frame. When `return` executes, the frame is popped and local variables are cleaned up.",
+        "visualizationType": "pythonMemory",
+        "code": "result = greet(\"Python\")",
+        "pythonMemoryState": {
+          "note": "Line 5 executed",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Result",
+        "explanation": "**`print(f\"Result: {result}\")`** -- Prints `result`, which holds the function's return value, using an f-string.\n\n`result` points to `\"Hello, Python!\"`, the return value of `greet(\"Python\")`. The f-string inserts this value, printing `\"Result: Hello, Python!\"`.\n\n**Complete execution flow summary:**\n1. **Lines 1-3:** Function definition (code registration only, no execution)\n2. **Line 5:** Function call -> internal code execution -> value returned -> stored in `result`\n3. **Line 6:** Result printed\n\n**Why use functions?**\n- **Reuse:** `greet(\"Alice\")`, `greet(\"Bob\")` -- use the same code multiple times\n- **Abstraction:** Hide complex logic behind a single name\n- **Maintainability:** When modifying, only fix one place -- the function\n\n**How Python works internally:** After the function terminates, local variables `name` and `message` are no longer accessible. But since `result` references the `\"Hello, Python!\"` object, it remains in memory.\n\n**Note:** `greet` still exists in the global namespace and can be called again at any time. Calling `greet(\"World\")` returns `\"Hello, World!\"`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"결과: {result}\")",
+        "pythonMemoryState": {
+          "output": [
+            "결과: Hello, Python!"
+          ],
+          "note": "Line 6 executed",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "result",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "greet",
+              "pyId": "1001"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": null,
+  "keyTakeaway": ""
+}

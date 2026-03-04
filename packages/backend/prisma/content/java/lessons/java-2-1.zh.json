@@ -1,0 +1,121 @@
+{
+  "lessonId": "java-2-1",
+  "title": "理解 NullPointerException",
+  "concept": "对 null 引用调用方法会导致 NullPointerException",
+  "content": {
+    "code": "String str = null;\n\nint len = str.length();\n\nString text = null;\nboolean result = text.equals(\"hello\");\n\nboolean safe = \"hello\".equals(text);",
+    "steps": [
+      {
+        "title": "赋值 null",
+        "explanation": "**执行顺序：**\n1. 在栈（Stack）上创建 `str` 变量空间。\n2. 赋值 `null`（0x0）。\n\n**内存中发生了什么：**\n在栈上创建了名为 `str` 的空间，并放入了 `null` 这个特殊值。\n\n**什么是 null？**\n它是一个表示"不指向任何东西"的标记。\n就像一个没有写地址的"空信封"。\n在内部通常表示为 0x0 这样的无效地址。",
+        "keyInsight": "null = 没有引用（地址 0x0）",
+        "visualizationType": "javaMemory",
+        "code": "String str = null;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "在 null 上调用方法（NPE 发生）",
+        "explanation": "**执行顺序：**\n1. 尝试解引用 `str`。\n2. 发现值为 `null`。\n3. 抛出 **`NullPointerException`**。\n\n要调用 `str.length()`，程序需要**沿着 `str` 指向的地址前进（解引用）**。\n但地址是 `null`（空信封），所以立即抛出错误"无处可去！"并终止程序。\n\n**什么是解引用（Dereference）？**\n沿着地址访问该位置实际对象的行为（`.` 运算符）。",
+        "keyInsight": "null.方法() = NullPointerException",
+        "visualizationType": "javaMemory",
+        "code": "int len = str.length();",
+        "javaMemoryState": {
+          "output": [
+            "Exception in thread \"main\" java.lang.NullPointerException"
+          ],
+          "error": "NullPointerException: Cannot invoke \"String.length()\" because \"str\" is null"
+        }
+      },
+      {
+        "title": "另一个 null 变量",
+        "explanation": "**执行顺序：**\n1. 创建 `text` 变量。\n2. 赋值 `null`。\n\n`text` 变量同样被初始化为不指向任何对象的状态（`null`）。\n这是 Java 开发者最常遇到的错误的起点。",
+        "visualizationType": "javaMemory",
+        "code": "String text = null;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "text",
+              "value": "null",
+              "type": "String"
+            }
+          ],
+          "output": [],
+          "error": null
+        }
+      },
+      {
+        "title": "调用 null.equals()（危险！）",
+        "explanation": "**执行顺序：**\n1. 尝试解引用 `text`（text.equals...）。\n2. `text` 为 `null`，因此**发生 NPE**。\n\n由于 `text` 为 `null`，通过 `text` 尝试做任何事情（`.equals`）都会失败。\n\n**警告：**\n如果变量有哪怕 0.1% 的可能为 `null`，绝对不要先调用其方法。",
+        "keyInsight": "null.equals(x) = NPE！",
+        "visualizationType": "javaMemory",
+        "code": "boolean result = text.equals(\"hello\");",
+        "javaMemoryState": {
+          "output": [
+            "Exception in thread \"main\" java.lang.NullPointerException"
+          ],
+          "error": "NullPointerException"
+        }
+      },
+      {
+        "title": "安全的比较方式（Yoda 条件）",
+        "explanation": "**执行顺序：**\n1. 引用 `\"hello\"` 字面量（String Pool）。\n2. 调用 `\"hello\".equals(null)`。\n3. 接收 `null` 作为参数并安全地返回 **false**。\n4. 将 false 存储到 `safe` 变量。\n\n**只是交换了顺序而已？**\n`\"hello\"` 是字面量，所以它是**存在于字符串常量池中的真实对象**。\n（它永远不会是 null）\n`equals` 方法被设计为当传入 `null` 参数时优雅地返回 `false`。\n这种模式有时被称为"Yoda 条件（Yoda Conditions）"。",
+        "keyInsight": "\"字面量\".equals(变量) = null 安全",
+        "visualizationType": "javaMemory",
+        "code": "boolean safe = \"hello\".equals(text);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "safe",
+              "value": "false",
+              "type": "boolean"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "note": "\"hello\" 不是 null，因此可以安全地调用方法",
+          "output": [],
+          "error": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪个不会抛出 NullPointerException？",
+    "options": [
+      "null.toString()",
+      "((String)null).length()",
+      "\"test\".equals(null)",
+      "null.equals(\"test\")"
+    ],
+    "correctIndex": 2,
+    "explanation": "\"test\".equals(null) 是在 \"test\" 这个"活着的对象"上调用方法，所以是安全的。\n其余都是在 null 上调用方法，会导致错误。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "不做 null 检查也可以调用方法",
+      "correct": "外部数据和返回值**必须**进行 null 检查。",
+      "why": "NPE 是编译器无法捕获的**运行时错误（Runtime Error）**。\n它是导致用户在使用应用时突然看到"应用已停止"的罪魁祸首。"
+    },
+    {
+      "wrong": "null 和 '0' 或 '空字符串' 相同",
+      "correct": "完全不同。\n0 是数字，空字符串是字符串，但 null 是**"不存在"本身**。",
+      "why": "初始化为 0 的 int 在内存中有值 0，但初始化为 null 的引用变量根本没有指向的目标。"
+    }
+  ],
+  "keyTakeaway": "null.方法() 是一颗炸弹。始终使用 \"字面量\".equals(变量) 的顺序。"
+}

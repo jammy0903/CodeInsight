@@ -1,0 +1,306 @@
+{
+  "lessonId": "py-10-4",
+  "title": "asyncio 模式：并发收集结果 (gather)",
+  "concept": "使用 `asyncio.gather` 同时运行多个异步任务，在所有结果准备好时一次性收集。",
+  "content": {
+    "code": "import asyncio\nimport time\n\nasync def fetch_data(id, delay):\n    print(f\"Fetching data {id}...\")\n    await asyncio.sleep(delay)\n    print(f\"Data {id} fetched!\")\n    return {\"id\": id, \"data\": f\"Sample data {id}\"}\n\nasync def main():\n    start = time.time()\n    \n    results = await asyncio.gather(\n        fetch_data(1, 2),\n        fetch_data(2, 1),\n        fetch_data(3, 3)\n    )\n\n    print(f\"\\nResults: {results}\")\n    print(f\"Total time: {time.time() - start:.4f}s\")\n\nasyncio.run(main())",
+    "steps": [
+      {
+        "title": "导入模块",
+        "explanation": "**`import asyncio` / `import time`** -- 导入异步I/O框架和时间测量工具。\n\n在上一课中，我们学习了使用 `create_task()` 和 `await` 逐个调度和等待任务的方法。这次，我们将学习一个更强大的工具：`asyncio.gather()`。gather同时运行多个任务，并将**所有结果收集到列表中**返回。\n\n可以这样理解：上一课中，餐厅服务员一张一张地将点菜单递给厨房，而这次是**一次性递上多张点菜单，说"都做好了一起端上来"**。厨房（事件循环）同时做多道菜，最后一道做好时，用一个托盘一起端出来。\n\n**实际应用**：在Web应用中，当需要同时调用多个API来渲染一个页面时，gather是最自然的模式。例如：同时调用用户信息API + 订单历史API + 推荐商品API。",
+        "visualizationType": "pythonMemory",
+        "code": "import asyncio",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "asyncio 准备就绪。",
+          "names": [
+            {
+              "name": "asyncio",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义异步任务函数",
+        "explanation": "**`async def fetch_data(id, delay):`** -- 模拟实际I/O操作（API调用、数据库查询等）的协程函数。\n\n这个函数按顺序执行三件事：\n1. `print(f\"Fetching data {id}...\")` -- 通知任务开始\n2. `await asyncio.sleep(delay)` -- 模拟delay秒的I/O等待\n3. `return {\"id\": id, \"data\": ...}` -- 以字典形式返回结果\n\n与上一课的 `say_after()` 不同，`fetch_data()` 会**返回一个字典**。这个返回值就是 `gather()` 收集的结果。在实际Web开发中，这个返回值会是API响应JSON或数据库查询结果。\n\n可以把这个函数想象成**一张菜单上的食谱**。每份菜单有不同的烹饪时间（delay），做好后把菜（字典）放到盘子里返回。\n\n**内部原理**：遇到 `await asyncio.sleep(delay)` 时，会在事件循环中注册一个"delay秒后叫醒我"的定时器回调。在此期间，事件循环运行其他协程。在实际代码中，`asyncio.sleep()` 会被替换为 `aiohttp.get()`、`asyncpg.fetch()` 等实际I/O操作。\n\n**常见错误**：使用 `time.sleep(delay)` 会阻塞整个线程，破坏并发性。在异步代码中必须使用 `asyncio.sleep()` 等异步版本。",
+        "visualizationType": "pythonMemory",
+        "code": "async def fetch_data(id, delay):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pythonMemoryState": {
+          "note": "协程函数 fetch_data 已定义。",
+          "names": [
+            {
+              "name": "fetch_data",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "coroutine function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义主协程",
+        "explanation": "**`async def main():`** -- 定义异步程序的入口点协程。\n\n在这个 main() 函数中，我们将使用 `asyncio.gather()` 同时运行3个 fetch_data 任务。`time.time()` 记录开始时间，用于测量并发执行是否真正节省了时间。\n\n在上一课中，我们用 `create_task()` 创建单个Task，然后逐个 `await`：\n```python\ntask1 = asyncio.create_task(work1())\ntask2 = asyncio.create_task(work2())\nawait task1\nawait task2\n```\n这种模式在2-3个任务时还好，但到10个、100个时代码会非常繁琐。`gather()` 是一个**高级API**，将这个过程简化为一行。\n\n可以理解为：以前的方式是服务员一张一张递点菜单然后一个一个确认，而 `gather()` 是**一次性递上一叠点菜单说"全部做好了告诉我"**。\n\n**设计哲学**：asyncio同时提供低级API（`create_task`、`Future`）和高级API（`gather`、`wait`、`TaskGroup`）。大多数情况下，使用高级API代码更简洁，错误处理也更容易。",
+        "visualizationType": "pythonMemory",
+        "code": "async def main():",
+        "pythonMemoryState": {
+          "note": "main 协程已定义。",
+          "names": [
+            {
+              "name": "main",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "coroutine function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "并发执行与结果收集 (gather)",
+        "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** -- **同时运行3个协程**，并将所有结果**收集到列表中**。\n\n让我们逐步追踪 gather() 的操作过程：\n1. 调用 `fetch_data(1, 2)` -> 创建协程对象（尚未运行）\n2. 调用 `fetch_data(2, 1)` -> 创建协程对象\n3. 调用 `fetch_data(3, 3)` -> 创建协程对象\n4. `gather()` 将三个协程分别包装成Task并注册到事件循环\n5. 遇到 `await`，main()暂停 -> 三个Task同时开始运行\n\n**gather() 的两个核心特征**：\n- **并发执行**：一次性调度所有传入的协程\n- **结果顺序保证**：按照协程传入的顺序返回结果列表。即使task_2最先完成，results[0] 仍然是 fetch_data(1,2) 的结果\n\n就像餐厅同时做3桌的菜，但将做好的菜**按桌号顺序**放到托盘上。即使2号桌的菜先做好，1号位置放的仍是1号桌的菜。\n\n**注意**：如果向gather传递非协程的普通值，该值会原样包含在结果中。",
+        "visualizationType": "pythonMemory",
+        "code": "results = await asyncio.gather(",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pythonMemoryState": {
+          "note": "3个任务同时运行。",
+          "names": [
+            {
+              "name": "task_1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "task_2",
+              "pointsTo": "instance2",
+              "highlight": true
+            },
+            {
+              "name": "task_3",
+              "pointsTo": "instance3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Task(2s)",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Task(1s)",
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "instance3",
+              "type": "instance",
+              "value": "Task(3s)",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "gather 运行中（1秒后）",
+        "explanation": "**gather 内部执行中** -- 3个 `fetch_data` 任务在事件循环中**同时进行**。\n\n让我们详细追踪随时间的执行流程：\n- **0.0秒**：三个任务全部开始。各自打印 \"Fetching data N...\"\n- **0.0秒**：三个任务都遇到 `await asyncio.sleep(delay)` -> 全部让出\n- **1.0秒**：task_2（等待1秒）醒来 -> 打印 \"Data 2 fetched!\" -> 返回结果\n- task_1（等待2秒）和 task_3（等待3秒）仍在sleep中\n\n注意，最短的任务（task_2，1秒）**最先完成**。但gather还不会返回——因为它要等**所有任务都完成**才返回结果。\n\n就像同时做3道菜，沙拉（1分钟）先做好了。但不立即上菜，而是放在保温柜里——因为牛排和意面也要做好才能端托盘上桌。\n\n**内部原理**：gather内部维护一个计数器。每个Task完成时计数器减一，当计数器归零（所有Task完成）时，gather的Future被resolve。task_2的结果已经准备好，但临时存储在结果列表的[1]位置等待。\n\n**错误处理**：如果task_2抛出异常怎么办？默认情况下，gather会立即取消剩余任务并传播异常。设置 `return_exceptions=True` 可以将异常也包含在结果列表中返回。",
+        "visualizationType": "pythonMemory",
+        "code": "results = await asyncio.gather(",
+        "pythonMemoryState": {
+          "output": [
+            "Fetching data 1...",
+            "Fetching data 2...",
+            "Fetching data 3...",
+            "Data 2 fetched!"
+          ],
+          "note": "1秒经过：Task 2 完成。",
+          "names": [
+            {
+              "name": "task_1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "task_2",
+              "pointsTo": "instance2",
+              "highlight": true
+            },
+            {
+              "name": "task_3",
+              "pointsTo": "instance3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Task(pending)",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Task(Finished!)",
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "instance3",
+              "type": "instance",
+              "value": "Task(pending)",
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "查看结果（3秒后）",
+        "explanation": "**`print(f\"\\nResults: {results}\")`** -- 打印gather返回的结果列表。\n\n剩余时间线：\n- **2秒**：task_1（等待2秒）完成 -> 打印 \"Data 1 fetched!\"\n- **3秒**：task_3（等待3秒）完成 -> 打印 \"Data 3 fetched!\"\n- **3秒**：所有Task完成 -> gather返回结果列表！\n\n就像厨房里沙拉先做好，然后是牛排，最后是甜点。但托盘上按照点菜单的顺序摆放——牛排、沙拉、甜点。\n\n**实用技巧**：如果想以字典管理结果，可以使用 `results = dict(zip(ids, await asyncio.gather(*tasks)))` 模式。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"\\nResults: {results}\")",
+        "pythonMemoryState": {
+          "output": [
+            "...",
+            "Data 1 fetched!",
+            "Data 3 fetched!"
+          ],
+          "note": "所有任务完成。结果已收集到列表中。",
+          "names": [
+            {
+              "name": "results",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{id:1}, {id:2}, {id:3}]",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "查看总耗时",
+        "explanation": "**`print(f\"Total time: {time.time() - start:.4f}s\")`** -- 总耗时约为**3秒**。\n\n时间分析：\n- 顺序执行：2秒 + 1秒 + 3秒 = **6秒**\n- gather并发执行：max(2秒, 1秒, 3秒) = **3秒**\n- 节省时间：**3秒（减少50%！）**\n\n并发执行的总时间始终等于**最长任务的时间**。其余任务在这段时间内一起完成。即使任务数量增加，也只需要最慢任务的时间。\n\n就像100个人同时考试，总时间等于最慢的学生的时间。让他们一个接一个考试则要慢100倍。\n\n**gather vs create_task 对比总结**：\n- `create_task()`：逐个注册任务，逐个await。需要精细控制时使用\n- `gather()`：一次注册多个任务，一次await全部。将结果作为列表返回。代码更简洁\n- `TaskGroup()`（Python 3.11+）：gather的改进版。支持结构化错误处理和自动取消\n\n**实际选择标准**：对于大多数"同时调用多个API"的场景，gather最合适。如果需要按任务进行不同的错误处理，考虑create_task；如果是Python 3.11+，考虑TaskGroup。\n\n**注意**：asyncio仅对I/O密集型任务有效。对于CPU密集型任务（数值计算等），由于GIL的存在，即使使用asyncio也不会并行执行。CPU密集型任务应使用 `multiprocessing`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Total time: {time.time() - start:.4f}s\")",
+        "pythonMemoryState": {
+          "output": [
+            "...",
+            "Results: ...",
+            "Total time: 3.0012s"
+          ],
+          "note": "总耗时3秒。",
+          "names": [
+            {
+              "name": "time",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.0012,
+              "pyId": "1008"
+            }
+          ]
+        }
+      },
+      {
+        "title": "运行事件循环",
+        "explanation": "**`asyncio.run(main())`** -- 创建事件循环并运行 `main` 协程。\n\n这一行是整个程序的**起点**也是**终点**。调用 `asyncio.run()` 时：\n1. 创建新的事件循环\n2. 在事件循环中运行 `main()` 协程\n3. main() 内部通过 gather() 同时运行3个任务\n4. 所有任务完成后 main() 返回\n5. 事件循环被清理并关闭\n\n追踪代码执行顺序：Python解释器从上到下执行，依次遇到 import -> 函数定义 -> 函数定义 -> `asyncio.run()`。函数定义只创建函数对象而不执行。所有逻辑真正执行是在到达 `asyncio.run(main())` 时。\n\n就像准备好所有食谱（函数定义），然后终于按下"开始营业！"（asyncio.run）按钮。从这一刻起，厨房开始运转，所有订单被处理。\n\n**本课总结**：asyncio.gather() 是**最常用、最强大的模式**，用于同时运行多个异步任务并按顺序收集结果。对于I/O密集型程序，与顺序执行相比能提供显著的性能提升。\n\n**后续学习**：在实际项目中，gather与asyncio兼容的库配合使用，如 `aiohttp`（HTTP客户端）、`asyncpg`（PostgreSQL）、`aiofiles`（文件I/O）。",
+        "visualizationType": "pythonMemory",
+        "code": "asyncio.run(main())",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "程序入口。",
+          "names": [
+            {
+              "name": "time",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.0012,
+              "pyId": "1008"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "`asyncio.gather(task1, task2)` 什么时候返回？",
+    "options": [
+      "当task1完成时",
+      "当task2完成时",
+      "当其中任何一个完成时",
+      "当task1和task2都完成时"
+    ],
+    "correctIndex": 3,
+    "explanation": "`gather` 等待所有传入的可等待对象完成后，将它们的结果收集到列表中返回。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "`gather` 使用多线程工作。",
+      "correct": "不是的。`asyncio` 和 `gather` 在单线程中运行。",
+      "why": "不是使用多个线程，而是在单线程内利用多个任务的I/O等待时间高效切换，实现并发。"
+    }
+  ],
+  "keyTakeaway": "`gather` 在并行运行多个异步I/O任务并收集结果时非常有用。"
+}

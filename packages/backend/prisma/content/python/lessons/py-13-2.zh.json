@@ -1,0 +1,384 @@
+{
+  "lessonId": "py-13-2",
+  "title": "f-string和format()",
+  "concept": "f-string是Python 3.6+中最强大的字符串格式化方法",
+  "content": {
+    "code": "name = \"Alice\"\nage = 25\n\ngreeting = f\"Hello, {name}! You are {age} years old.\"\nprint(greeting)\n\npi = 3.14159265\nformatted = f\"Pi is {pi:.2f}\"\nprint(formatted)\n\ntemplate = \"Name: {}, Age: {}\".format(name, age)\nprint(template)",
+    "steps": [
+      {
+        "title": "准备变量",
+        "explanation": "**`name = \"Alice\"`**\n**`age = 25`**\n\nPython从上到下按顺序执行。创建两个用于字符串格式化的变量。\n\n- `name`：给 `str` 类型对象 `\"Alice\"` 贴上标签\n- `age`：给 `int` 类型对象 `25` 贴上标签\n\n**类比：** 就像写信（字符串）前准备好信息卡片（变量）。制作"收件人：Alice"、"年龄：25"的卡片，之后就可以将这些信息插入信件模板（f-string）中。\n\n**Python内部机制：** `\"Alice\"` 字符串对象和 `25` 整数对象分别存在于堆内存中。全局命名空间字典中注册了 `{\"name\": <\"Alice\"的地址>, \"age\": <25的地址>}`。在Python中，变量没有类型，**对象才有类型**（动态类型）。\n\n**什么是格式化？** 就是将变量的值插入字符串中，生成完整的字符串。要创建像 `\"Hello, Alice! You are 25 years old.\"` 这样包含变量值的字符串，就需要格式化。\n\n**执行顺序：** `name = \"Alice\"` -> `age = 25` -> 移到下一行",
+        "visualizationType": "pythonMemory",
+        "code": "age = 25",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "准备用于格式化的变量",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用f-string插入变量",
+        "explanation": "**f-string**是将变量直接插入字符串中最易读的方式。\n\n格式：\n- `f\"... {expr} ...\"`\n\n`{ }` 里面不仅可以放简单变量，还可以放表达式。\n例如：`{price * qty}`\n\n**类比：** 就像立即在句子模板的空白处填入值。\n\n优点：\n- 比 `+` 拼接或 `.format()` 更短更直观\n- 大大提高打印语句/日志的可读性\n\n注意：\n- 如果忘了加前缀 `f`，占位符不会被替换，会原样输出",
+        "visualizationType": "pythonMemory",
+        "code": "greeting = f\"Hello, {name}! You are {age} years old.\"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "f-string：{变量}被替换为实际值",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出f-string结果",
+        "explanation": "**`print(greeting)`** -- 输出 `greeting` 指向的字符串 `\"Hello, Alice! You are 25 years old.\"`。\n\n可以看到 `{name}` 被替换为 `\"Alice\"`，`{age}` 被替换为 `\"25\"`。f-string在执行时读取变量值，所以之后修改变量不会影响已创建的字符串。\n\n**类比：** 已经印好的名片（greeting字符串）不会因为修改原始信息（name、age变量）而改变。想要新名片需要重新印刷（重新求值f-string）。\n\n**注意：** f-string只在Python **3.6及以上**版本可用。之前的版本需要使用 `format()` 或 `%` 运算符。\n\n**Python内部机制：** `greeting` 是f-string求值结果创建的独立 `str` 对象。之后修改 `name` 或 `age` 不会影响 `greeting`。因为已创建的字符串是不可变的（Immutable）。",
+        "visualizationType": "pythonMemory",
+        "code": "print(greeting)",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, Alice! You are 25 years old."
+          ],
+          "note": "输出f-string生成的字符串",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "f-string格式说明符（小数位数）",
+        "explanation": "使用**f-string格式说明符**可以将数字/日期固定为想要的显示格式。\n\n例如：`{price:.2f}` -> 显示到小数点后两位\n\n核心效果：\n- 确保输出一致性\n- 改善用户界面/日志的可读性\n\n**类比：** 就像在金额标记中匹配位数和逗号规则来提高报告质量的工作。\n\n实际工作中，格式说明负责的是"表现质量"而非"计算"。",
+        "visualizationType": "pythonMemory",
+        "code": "formatted = f\"Pi is {pi:.2f}\"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": ":.2f = 小数点后2位固定格式",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1",
+              "highlight": true
+            },
+            {
+              "name": "formatted",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14159265",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Pi is 3.14\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": ".format()方法",
+        "explanation": "**`template = \"Name: {}, Age: {}\".format(name, age)`** -- 这是f-string之前（Python 2.6+）就有的字符串格式化方法。\n\n**format()方法的工作过程：**\n1. 字符串中的 `{}` 充当**占位符**\n2. 传给 `.format()` 的参数按**顺序**插入 `{}`\n3. 第一个 `{}` -> 插入 `name` = `\"Alice\"`\n4. 第二个 `{}` -> `age` = `25` -> 转换为 `\"25\"` 后插入\n5. 结果：`\"Name: Alice, Age: 25\"`\n\n**类比：** 就像填空考试题（template）。`{}` 是空白处，`.format()` 的参数是答案。第一个答案填第一个空，第二个答案填第二个空。\n\n**注意：** 如果 `{}` 的数量和 `.format()` 参数的数量不匹配，会引发 `IndexError`！",
+        "visualizationType": "pythonMemory",
+        "code": "template = \"Name: {}, Age: {}\".format(name, age)",
+        "pythonMemoryState": {
+          "output": [
+            "Pi is 3.14"
+          ],
+          "note": ".format()按顺序将参数插入{}",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "formatted",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "template",
+              "pointsTo": "str4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14159265",
+              "pyId": "1004"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Pi is 3.14\"",
+              "pyId": "1005"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"Name: Alice, Age: 25\"",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "最终结果输出",
+        "explanation": "**`print(template)`** -- 输出通过 `.format()` 方法生成的字符串 `\"Name: Alice, Age: 25\"`。\n\n**让我们总结Python字符串格式化的历史和3种方法：**\n\n**类比：** `%` 运算符像打字机时代，`format()` 像早期文字处理器，f-string像最新的云文档编辑器。随着功能的发展，变得更直观更强大。\n\n**Python内部机制：** 三种方法最终都会创建新的 `str` 对象。但f-string可以在编译时优化，所以比需要在运行时解析字符串的 `format()` 快约20-30%。\n\n**注意：** 无论使用哪种方法，**一致性**很重要。在一个项目中混用多种方法会让代码变得混乱。Python 3.6以上强烈推荐**统一使用f-string**。\n\n**执行顺序（完整总结）：**\n1. `name = \"Alice\"`, `age = 25` -> 准备变量\n2. `greeting = f\"Hello, {name}!...\"` -> 用f-string插入变量\n3. `print(greeting)` -> 输出结果\n4. `pi = 3.14159265` -> float变量\n5. `formatted = f\"Pi is {pi:.2f}\"` -> 用格式说明符控制小数位\n6. `print(formatted)` -> 输出 `\"Pi is 3.14\"`\n7. `template = \"...\".format(name, age)` -> 使用format()方法\n8. `print(template)` -> 输出 `\"Name: Alice, Age: 25\"`",
+        "visualizationType": "pythonMemory",
+        "code": "print(template)",
+        "pythonMemoryState": {
+          "output": [
+            "Name: Alice, Age: 25"
+          ],
+          "note": "3种格式化方法中f-string最为推荐",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "formatted",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "template",
+              "pointsTo": "str4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14159265",
+              "pyId": "1004"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Pi is 3.14\"",
+              "pyId": "1005"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"Name: Alice, Age: 25\"",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "f\"{3.14159:.1f}\"的结果是？",
+    "options": [
+      "\"3.14159\"",
+      "\"3.1\"",
+      "\"3.14\"",
+      "\"3\""
+    ],
+    "correctIndex": 1,
+    "explanation": ":.1f是显示小数点后1位的格式说明符。\n将3.14159四舍五入到1位小数就是3.1。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "f-string里面只能放变量",
+      "correct": "f-string的{}里面可以放任何Python表达式。",
+      "why": "f\"{2+3}\"的结果是\"5\"，f\"{name.upper()}\"的结果是\"ALICE\"，f\"{len([1,2,3])}\"的结果是\"3\"。"
+    }
+  ],
+  "keyTakeaway": "f-string是Python 3.6+中最强大的格式化方式！{变量}、{表达式}、{值:格式}都可以！"
+}

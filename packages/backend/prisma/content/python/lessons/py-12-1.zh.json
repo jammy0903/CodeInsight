@@ -1,0 +1,227 @@
+{
+  "lessonId": "py-12-1",
+  "title": "try-except 基础",
+  "concept": "即使发生错误也能让程序不崩溃的方法！",
+  "content": {
+    "code": "num = 10\ndivisor = 0\n\ntry:\n    result = num / divisor\n    print(f\"Result: {result}\")\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero!\")\n\nprint(\"Program continues!\")",
+    "steps": [
+      {
+        "title": "变量初始化",
+        "explanation": "**`num = 10`** -- 在内存中创建整数对象 `10`，并给它贴上 `num` 标签。\n\nPython从上到下按顺序执行。首先给被除数 `num` 赋值 **10**。\n\n**Python内部原理：** `int` 类型对象 `10` 存在于堆（heap）内存中，全局命名空间字典中添加了 `{\"num\": <10对象的地址>}`。在CPython中，-5到256范围内的整数在解释器启动时就预先创建（interning），所以不是创建新对象，而是给已有对象贴上标签。\n\n目前只是普通的变量赋值。错误要到后面才会发生！此时一切正常运行。\n\n**执行顺序：** `num = 10` 执行完毕 → 移到下一行",
+        "visualizationType": "pythonMemory",
+        "code": "num = 10",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "设置除数 (0!)",
+        "explanation": "**`divisor = 0`** -- 给整数对象 `0` 贴上 `divisor` 标签。\n\n给除数 `divisor` 赋值 **0**。在数学中，任何数除以0是未定义的（趋向无穷大）。Python也一样——除以0会引发 **ZeroDivisionError** 异常。\n\n**类比：** 就像在路上埋地雷。埋地雷本身没有问题，但当有人踩上去的那一刻（执行除法的那一刻），就会爆炸！\n\n**Python内部原理：** 全局命名空间中添加了 `{\"divisor\": <0对象的地址>}`。`0` 也是驻留整数，所以复用已有对象。此时 `num` 和 `divisor` 各自指向独立的 `int` 对象。\n\n**注意：** 在变量中存储0本身完全没有问题！错误只在**执行除以0的运算时**才会发生。存储值和使用值是完全不同的步骤。\n\n**执行顺序：** `divisor = 0` 执行完毕 → 移到下一行（try块）",
+        "visualizationType": "pythonMemory",
+        "code": "divisor = 0",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "进入 try 块",
+        "explanation": "**`try:`** -- 进入异常监控块。意思是"监视这里面的错误！"\n\n`try` 是Python异常处理（Exception Handling）机制的起点。`try` 块中的代码是执行过程中可能引发错误的**危险代码**。\n\n**类比：** 就像在游乐园走钢丝表演时在下面装**安全网**。走钢丝（try块中的代码）时即使掉下来（发生错误），安全网（except块）也能接住你。没有安全网（没有try-except），掉下来的那一刻表演就结束了（程序终止）。\n\n**Python内部原理：** 进入 `try` 块时，Python解释器会在调用栈上注册一个**异常处理器（exception handler）**。这个处理器包含"如果发生错误应该跳转到哪里"的信息。原理类似于C语言的 `setjmp/longjmp`。\n\n**try-except 基本结构：**\n```python\ntry:\n    # 可能出错的代码（危险区域）\nexcept 错误类型:\n    # 出错时执行的代码（安全网）\n```\n\n**注意：** 最好在 `try` 块中只放**最少量的可能出错的代码**。放太多代码会难以判断错误发生在哪里。\n\n**执行顺序：** 进入 `try:` → 开始逐行执行try块内的代码",
+        "visualizationType": "pythonMemory",
+        "code": "try:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "进入try块 - 开始错误监控",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "ZeroDivisionError 发生！",
+        "explanation": "**`result = num / divisor`** -- 尝试计算 `10 / 0`。但**除以零在数学上是不可能的**！\n\nPython执行 `/` 运算符的那一刻，检测到除数为 `0`，于是创建并抛出（raise）**ZeroDivisionError** 异常对象。\n\n**类比：** 就像厨师按照食谱（代码）做菜时遇到一个不可能的指示："用0升水来除"。厨师立即停下来喊"这不可能！"（异常抛出）。\n\n**注意：** 如果没有 `try-except` 会怎样？程序会输出错误信息并**立即终止**！`try-except` 阻止了这个悲剧。\n\n**Python内部原理：** 在CPython中，`/` 运算符内部调用 `__truediv__` 方法。执行 `int.__truediv__(10, 0)` 时，在C层面检查除数是否为0，如果是则调用 `PyErr_SetString(PyExc_ZeroDivisionError, \"division by zero\")`。此时在堆上创建 `ZeroDivisionError` 异常对象，解释器的错误标志被设置。",
+        "visualizationType": "pythonMemory",
+        "code": "    result = num / divisor",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "ZeroDivisionError 发生！跳转到except块",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            },
+            {
+              "id": "err1",
+              "type": "ZeroDivisionError",
+              "value": "\"division by zero\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "except块捕获了错误！",
+        "explanation": "**`except ZeroDivisionError:`** -- 检查try块中抛出的异常类型，如果匹配则执行此块。\n\ntry块中抛出了 **ZeroDivisionError**，而except恰好指定了这个错误类型，所以执行这个except块。\n\n**`print(\"Cannot divide by zero!\")`** -- 不是终止程序，而是向用户输出友好的错误信息。\n\n**类比：** 就像医院急诊室的分诊系统。当病人（错误）进来时，先分类是什么类型的病人，然后送到对应的专科（except块）。就像"骨折病人去骨科！"一样，`ZeroDivisionError` 被送到 `except ZeroDivisionError:` 块。\n\n**Python内部原理（except匹配过程）：**\n1. try块中发生错误 → 解释器检查已注册的异常处理器\n2. 用 `isinstance()` 检查比较抛出异常的类型（`ZeroDivisionError`）和except的类型\n3. `isinstance(错误, ZeroDivisionError)` 为 `True` → 执行此except块\n4. 如果类型不匹配，错误会沿调用栈**向上传播**\n\n**注意：** 像 `except Exception:` 这样范围太广的捕获会吞掉所有意外错误，使调试困难。最好始终指定**具体的异常类型**。\n\n**执行顺序：** except类型匹配 → 匹配成功！ → 执行 `print(\"Cannot divide by zero!\")` → except块完成",
+        "visualizationType": "pythonMemory",
+        "code": "    print(\"Cannot divide by zero!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Cannot divide by zero!"
+          ],
+          "note": "ZeroDivisionError 处理完毕！",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "程序继续运行！",
+        "explanation": "关键在于 **`print(\"Program continues!\")`** 被执行了。\n\n即使发生了错误，用 `except` 处理后程序流程不会中断。\n\n**类比**：就像路被堵了走绕行路线一样——仍然可以到达目的地。\n\n这个模式之所以重要，是因为：\n- 用户输入错误\n- 文件不存在\n- 临时网络故障\n在这些情况下，可以防止整个应用崩溃。\n\n总结来说，try-except不是"消除错误的技术"，\n而是"控制错误让程序继续运行的技术"。",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Program continues!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Program continues!"
+          ],
+          "note": "错误处理后正常执行继续！",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "当try块中发生错误时会怎样？",
+    "options": [
+      "执行完try块中所有剩余代码后再去except",
+      "在发生错误的那一行立即停止并跳转到except块",
+      "程序立即终止",
+      "忽略错误并执行下一行"
+    ],
+    "correctIndex": 1,
+    "explanation": "当try块中发生错误时，在出错的那一行立即停止执行，跳转到能处理该错误的except块。出错行之后的try块代码不会被执行。"
+  },
+  "keyTakeaway": "try-except是即使发生错误也能防止程序崩溃的安全网。错误发生时立即跳转到except块！"
+}

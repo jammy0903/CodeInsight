@@ -1,0 +1,281 @@
+{
+  "lessonId": "c-12-3",
+  "title": "Recursion vs Loops",
+  "concept": "When solving the same problem with recursion and loops, memory usage is completely different",
+  "content": {
+    "code": "#include <stdio.h>\n\nint sum_recursive(int n) {\n    if (n <= 0) return 0;\n    return n + sum_recursive(n - 1);\n}\n\nint sum_loop(int n) {\n    int total = 0;\n    for (int i = 1; i <= n; i++) {\n        total += i;\n    }\n    return total;\n}\n\nint main() {\n    printf(\"Recursive: %d\\n\", sum_recursive(5));\n    printf(\"Loop: %d\\n\", sum_loop(5));\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including header file",
+        "explanation": "We include the standard I/O library with **`#include <stdio.h>`** to use `printf`.\n\nThis lesson answers an important question: **\"What's the difference between solving the same problem with recursion vs a loop?\"** We implement the sum from 1 to n in both ways and compare **memory usage**.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Calling sum_recursive(5) from main",
+        "explanation": "**`printf(\"Recursive: %d\\n\", sum_recursive(5));`** -- Computes 1+2+3+4+5 **recursively**. `sum_recursive(5) = 5 + sum_recursive(4)`, breaking the problem down as \"sum up to 5 = 5 + sum up to 4\".",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Recursive: %d\\n\", sum_recursive(5));",
+        "highlightOffset": [
+          0,
+          -14
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "5",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "sum_recursive"
+          }
+        ]
+      },
+      {
+        "title": "Recursion: stack frames pile up to 6 layers",
+        "explanation": "**`return n + sum_recursive(n - 1);`** -- From sum_recursive(5) to sum_recursive(0), a total of 6 calls are made, so including main, **7 frames** exist simultaneously. Each frame uses approximately 16-32 bytes of memory.",
+        "visualizationType": "cMemory",
+        "code": "return n + sum_recursive(n - 1);",
+        "highlightOffset": [
+          0,
+          -2
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "5",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x1010",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "1",
+            "type": "int",
+            "address": "0x1014",
+            "frame": "sum_recursive"
+          },
+          {
+            "name": "sum_recursive",
+            "type": "frame",
+            "func": "sum_recursive",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "0",
+            "type": "int",
+            "address": "0x1018",
+            "frame": "sum_recursive"
+          }
+        ]
+      },
+      {
+        "title": "Recursive result: 15",
+        "explanation": "Starting from the base case, return values propagate in reverse: sum_recursive(0)=**0** -> (1)=1+0=**1** -> (2)=2+1=**3** -> (3)=3+3=**6** -> (4)=4+6=**10** -> (5)=5+10=**15**. All frames are popped and the final result `15` is returned to main.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Recursive: %d\\n\", sum_recursive(5));",
+        "occurrence": 2,
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ],
+        "stdout": "Recursive: 15"
+      },
+      {
+        "title": "Loop: calling sum_loop(5)",
+        "explanation": "**`printf(\"Loop: %d\\n\", sum_loop(5));`** -- Now we solve the same problem with a **loop (for loop)**. Only **one** sum_loop frame is created, and since it does not call itself, no additional frames are pushed.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Loop: %d\\n\", sum_loop(5));",
+        "highlightOffset": [
+          0,
+          -10
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "sum_loop",
+            "type": "frame",
+            "func": "sum_loop",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "5",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "sum_loop"
+          },
+          {
+            "name": "total",
+            "value": "0",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "sum_loop"
+          },
+          {
+            "name": "i",
+            "value": "1",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "sum_loop"
+          }
+        ],
+        "stdout": "Recursive: 15"
+      },
+      {
+        "title": "Loop: variable values change and accumulate",
+        "explanation": "**`total += i;`** -- Instead of creating new frames, it computes by **changing variable values within the same frame**: when i=1 total=1, i=2 total=3, i=3 total=6, i=4 total=10, i=5 total=15. When `i` becomes 6, the condition `i <= n` (6 <= 5) is false and the loop ends.",
+        "visualizationType": "cMemory",
+        "code": "total += i;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "sum_loop",
+            "type": "frame",
+            "func": "sum_loop",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "5",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "sum_loop"
+          },
+          {
+            "name": "total",
+            "value": "15",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "sum_loop"
+          },
+          {
+            "name": "i",
+            "value": "5",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "sum_loop"
+          }
+        ]
+      },
+      {
+        "title": "Final comparison: recursion vs loop",
+        "explanation": "Both methods produce the same result of `15`, but memory usage is **worlds apart**. Recursion uses **n+1 frames** (O(n)), while the loop uses just **1 frame** (O(1)).",
+        "visualizationType": "terminal",
+        "code": "printf(\"Loop: %d\\n\", sum_loop(5));",
+        "stdout": "Recursive: 15\nLoop: 15"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What problem is most likely to occur when calling sum_recursive(10000)?",
+    "options": [
+      "The result becomes 0",
+      "Stack Overflow (stack memory exceeded)",
+      "Heap Overflow (heap memory exceeded)",
+      "It works fine without any issues"
+    ],
+    "correctIndex": 1,
+    "explanation": "sum_recursive(10000) creates 10,001 stack frames.\nWith a typical stack size (1-8MB), handling this many frames may be difficult, causing a Stack Overflow.\nIn contrast, sum_loop(10000) uses only 1 frame and works without any issues."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Recursion and loops use the same amount of memory",
+      "correct": "Recursion uses memory proportional to the call depth, while loops use a fixed amount of memory.",
+      "why": "Recursion creates a new stack frame per call requiring O(n) memory, but loops reuse the same variables requiring only O(1)."
+    },
+    {
+      "wrong": "What loops can do, recursion cannot",
+      "correct": "Every loop can be converted to recursion, and every recursion can be converted to a loop.",
+      "why": "Mathematically, both approaches have equivalent expressive power. The difference lies in code readability and efficiency."
+    }
+  ],
+  "keyTakeaway": "Recursion is concise but piles up stack frames using more memory. A loop needs only one frame. Choose the method that fits the nature of the problem."
+}

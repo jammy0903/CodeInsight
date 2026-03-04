@@ -1,0 +1,561 @@
+{
+  "lessonId": "py-6-5",
+  "title": "Method Binding",
+  "concept": "obj.method() is a bound method where self is automatically passed!",
+  "content": {
+    "code": "class Dog:\n    def bark(self):\n        print(f\"멍멍! (id: {id(self)})\")\n\nmy_dog = Dog()\n\n# 방법 1: 바운드 메서드\nmy_dog.bark()\n\n# 방법 2: 언바운드 호출\nDog.bark(my_dog)\n\n# 메서드도 객체!\nmethod = my_dog.bark\nprint(type(method))\nmethod()  # self 없이 호출 가능!",
+    "steps": [
+      {
+        "title": "Dog Class Definition",
+        "explanation": "**`class Dog:`**\n\nPython executes code from top to bottom in order. We define the `Dog` class.\n\n**Goal of this lesson**: Deeply understand what actually happens inside Python when `my_dog.bark()` is called. `obj.method()` is not just a simple \"function call\" -- Python creates a **Bound Method** object and automatically passes self through an elegant mechanism! We'll compare 3 calling methods (bound, unbound, and stored bound method).\n\n**Why this order?** The class must be defined first before methods can be added.\n\n**Execution order**: Execute class Dog --> Begin creating Dog class object --> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Dog:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Class definition begins",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "bark Method Definition",
+        "explanation": "**`def bark(self):`**\n\nDefines the bark method. The body is `print(f\"Woof! (id: {id(self)})\")`, which prints `id(self)` so we can verify **which object is self**.\n\n**Key concept -- Methods are function objects**: Executing `def bark(self):` creates a **function object** (0x1100) named bark in memory. This function object is stored in Dog's `__dict__`. That is, `Dog.__dict__['bark']` is a **regular function object**!\n\n**The important question here**: But when `my_dog.bark()` is called, how does Python automatically pass `my_dog` to `self`? The secret behind this magic is the **Bound Method**, and this lesson will uncover that mechanism.\n\n**The id() function**: Returns the unique identifier (usually a memory address) of an object as an integer. Since it always returns the same id for the same object, it's useful for checking whether self really is the same object.\n\n**Why this order?** Methods are defined sequentially within the class body.\n\n**Execution order**: Execute def bark --> Create bark function object 0x1100 --> Dog.__dict__['bark'] = 0x1100 --> Dog class definition complete --> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def bark(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "bark method (function object) defined",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog.bark",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a Dog Instance",
+        "explanation": "**`my_dog = Dog()`**\n\nCalls the Dog class to create a new instance (object).\n\n**The 3-step process inside Python**:\n1. `Dog.__new__(Dog)` -- Allocates an empty object 0x2000 in memory\n2. `Dog.__init__(0x2000)` -- Calls the initialization method (this class has no `__init__`, so it's skipped)\n3. `my_dog = 0x2000` -- Stores the reference to the created object in the variable\n\n**Analogy**: `Dog()` is the command \"make one actual dog from the Dog blueprint.\" The blueprint (class) is one, but you can make multiple dogs (instances).\n\n**Key point -- Why do we need an instance?** `Dog.bark` is just a **regular function object** stored in the class. To pass `self` to this function, an instance must exist. Without an instance, a bound method cannot be created!\n\n**Why this order?** The class definition must be complete before instances can be created. The name `Dog` must be registered in the namespace before `Dog()` can be called.\n\n**Execution order**: Call Dog() --> Create object 0x2000 --> my_dog = 0x2000 --> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "my_dog = Dog()",
+        "pythonMemoryState": {
+          "note": "my_dog instance created",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog.bark",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Bound Method Call",
+        "explanation": "**`my_dog.bark()`**\n\nThis is the **key moment** of this lesson! When you write `my_dog.bark()`, an amazing transformation happens inside Python.\n\n**What Python actually does (Descriptor Protocol)**:\n1. The moment you access `my_dog.bark`, Python first looks for `bark` in `my_dog.__dict__` --> Not found!\n2. Then it looks in `Dog.__dict__` --> bark function object (0x1100) found!\n3. Since this function object has a `__get__` method (functions are descriptors), Python calls `bark.__get__(my_dog, Dog)`\n4. This call returns a **bound method object** (0x2100) -- a new object combining the function (0x1100) and the instance (0x2000)!\n5. Calling with `()`, the bound method automatically passes the stored `my_dog` as `self`\n\n**Analogy**: When you order \"Chef Kim's pasta\" at a restaurant, the head waiter automatically connects you to Chef Kim. `my_dog.bark()` requests \"my_dog's bark\" and Python automatically connects `self=my_dog`.\n\n**Ultimately identical to**:\n`my_dog.bark()` == `Dog.bark(my_dog)` -- but the former is much more convenient!\n\n**Why this order?** After my_dog creation completes, the next line executes in order.\n\n**Execution order**: Access my_dog.bark --> Descriptor protocol --> Create bound method 0x2100 --> Call with () --> Jump to line 3 --> self=my_dog",
+        "visualizationType": "pythonMemory",
+        "code": "my_dog.bark()",
+        "pythonMemoryState": {
+          "note": "Bound method call --> self automatically passed",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog.bark",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "my_dog.bark",
+              "pointsTo": "bound_method1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "bound_method1",
+              "type": "bound_method",
+              "value": "<bound method (my_dog + bark)>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "bark Method Execution (1st time)",
+        "explanation": "**`print(f\"Woof! (id: {id(self)})\")`**\n\nThe bark method body executes. Since the bound method automatically passed `my_dog` to `self`, `self` is now `my_dog` (0x2000).\n\n**Execution process inside f-string**:\n1. `self` --> `my_dog` object (0x2000)\n2. `id(self)` --> `id(my_dog)` --> 8192 (in CPython, returns the memory address as an integer)\n3. The f-string replaces `{id(self)}` with `8192`\n4. Final string: `\"Woof! (id: 8192)\"`\n\n**Meaning of id()**: `id()` returns the **unique identifier** of an object. In the CPython implementation, it uses the memory address. It always returns the same id for the same object, so we can check in the 2nd and 3rd calls whether the same number appears. This is the method to prove \"is self really the same object?\"\n\n**Note -- The id value differs between runs**: 8192 is an example; running the program again may produce a different number. What matters is not the value itself but that **the same value** appears across all 3 calls.\n\n**Why this order?** Jumped from the method call (line 8) to the bark function body (line 3).\n\n**Execution order**: id(self) --> id(my_dog) --> 8192 --> Evaluate f-string --> Execute print --> bark ends --> Return to line 8 --> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"멍멍! (id: {id(self)})\")",
+        "pythonMemoryState": {
+          "output": [
+            "멍멍! (id: 8192)"
+          ],
+          "note": "self = my_dog (bound method auto-passed)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog.bark",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ my_dog (0x2000)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Unbound Call",
+        "explanation": "**`Dog.bark(my_dog)`**\n\nThis is an **Unbound Call**. Instead of going through a bound method, it directly calls the function object from the class while explicitly passing `self`.\n\n**Difference from bound call**:\n- `my_dog.bark()` -- Access through instance --> Descriptor protocol triggers --> Bound method object created --> self auto-passed\n- `Dog.bark(my_dog)` -- Access through class --> Gets the **regular function object** directly from `Dog.__dict__['bark']` --> self passed manually\n\n**Why does this approach exist?** Since `my_dog.bark()` internally works the same as `Dog.bark(my_dog)`, the unbound call is a way to **transparently show Python's method binding mechanism**. It's also used when calling parent class methods directly without super(), or in metaprogramming.\n\n**Analogy**: A bound call is like telling \"Buddy, bark!\" and Buddy knows what to do; an unbound call is manually specifying \"take the bark function from the Dog blueprint and run it with Buddy as input.\" The result is identical!\n\n**In practice**: Most of the time you use the `obj.method()` form. However, in inheritance hierarchies, when you want to explicitly call a specific parent class's method, you might use `ParentClass.method(self)`.\n\n**Why this order?** After the previous method call completes and returns to line 8, line 11 executes in order.\n\n**Execution order**: Call Dog.bark(my_dog) --> Jump to line 3 --> self=my_dog",
+        "visualizationType": "pythonMemory",
+        "code": "Dog.bark(my_dog)",
+        "pythonMemoryState": {
+          "note": "Unbound call --> self explicitly passed",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog.bark",
+              "pointsTo": "function1",
+              "highlight": true
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "bark Method Execution (2nd time)",
+        "explanation": "**`print(f\"Woof! (id: {id(self)})\")`**\n\nThe same bark function executes again. This time it jumped from the unbound call `Dog.bark(my_dog)`.\n\n**Key verification -- Is self the same object?**\n- `self` = `my_dog` (0x2000) -- this time it was **explicitly passed**!\n- `id(self)` --> 8192 -- **exactly the same number** as the 1st call!\n\nWhat this proves: Whether it's a bound call (`my_dog.bark()`) or an unbound call (`Dog.bark(my_dog)`), the `self` passed to the bark function is the **same my_dog object**. Only the passing method differs; from the function's perspective, they are indistinguishable.\n\n**Syntactic Sugar**: Bound methods are \"sweet wrapping\" for programmer convenience. Writing `my_dog.bark()` has Python automatically convert it to `Dog.bark(my_dog)`, so you don't have to repeat the class name each time. This is called \"syntactic sugar.\"\n\n**Why this order?** Jumped from the unbound call (line 11) to the bark function body (line 3).\n\n**Execution order**: id(self) --> 8192 --> Evaluate f-string --> Execute print --> bark ends --> Return to line 11 --> line 14",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"멍멍! (id: {id(self)})\")",
+        "pythonMemoryState": {
+          "output": [
+            "멍멍! (id: 8192)"
+          ],
+          "note": "self = my_dog (unbound call produces the same result!)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog.bark",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ my_dog (0x2000)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Assigning a Bound Method to a Variable",
+        "explanation": "**`method = my_dog.bark`**\n\nIn Python, **everything is an object** -- functions and methods are no exception! Without the parentheses `()`, we **reference the method without calling it**.\n\n**The difference parentheses make -- A distinction you must understand**:\n- `my_dog.bark()` -- With parentheses --> **Executes** the method (\"Woof!\" is printed)\n- `my_dog.bark` -- Without parentheses --> **References** the method object itself (does not execute!)\n\n**What is actually stored in the variable**:\n1. When accessing `my_dog.bark`, the descriptor protocol triggers again\n2. A bound method object (0x2100) is created -- a combination of the `Dog.bark` function (0x1100) + the `my_dog` instance (0x2000)\n3. The `method` variable points to this bound method object\n\n**Analogy**: It's like saving a phone number. `my_dog.bark()` is \"call right now,\" while `method = my_dog.bark` is \"save this number to favorites.\" Once saved, you can call anytime later with `method()`!\n\n**Key point**: Since `method` already has `my_dog` bound to it, there's no need to pass self when calling `method()` later. This is the power of bound methods -- the object and function are already tied together!\n\n**Why this order?** After the previous method call completes, the next line executes in order.\n\n**Execution order**: Access my_dog.bark --> Descriptor protocol --> Create bound method 0x2100 --> method = 0x2100 --> line 15",
+        "visualizationType": "pythonMemory",
+        "code": "method = my_dog.bark",
+        "pythonMemoryState": {
+          "note": "Bound method object stored in variable!",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog.bark",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "method",
+              "pointsTo": "bound_method1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "bound_method1",
+              "type": "bound_method",
+              "value": "<bound method (my_dog + bark)>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Method Type",
+        "explanation": "**`print(type(method))`**\n\nChecks the type of the object stored in the `method` variable. The result is `<class 'method'>`.\n\n**Difference between function and method -- Two types Python distinguishes**:\n- `type(Dog.bark)` --> `<class 'function'>` -- When accessed directly from the class, it's a **regular function object**\n- `type(my_dog.bark)` --> `<class 'method'>` -- When accessed through an instance, it's a **bound method object**\n\nThe same bark, but the type changes depending on where you access it! This is the magic of the descriptor protocol. When accessed through an instance, `__get__` triggers and wraps the function as a bound method; when accessed through the class, it returns the function as-is without wrapping.\n\n**Internal attributes of a bound method object**:\n- `method.__func__` --> `Dog.bark` (reference to the original function object)\n- `method.__self__` --> `my_dog` (reference to the bound instance)\n- That is, when `method()` is called, internally `method.__func__(method.__self__)` is executed!\n\n**Analogy**: A regular function is a \"generic instruction sheet anyone can follow,\" while a bound method is a \"Buddy-specific instruction sheet.\" The specific sheet already has \"target: Buddy\" written on it, so you don't need to specify the target when executing.\n\n**Why this order?** After bound method assignment completes, the next line executes in order.\n\n**Execution order**: Call type(method) --> Return <class 'method'> --> Execute print --> line 16",
+        "visualizationType": "pythonMemory",
+        "code": "print(type(method))",
+        "pythonMemoryState": {
+          "output": [
+            "<class 'method'>"
+          ],
+          "note": "method is type 'method', not 'function'!",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "bound_method1",
+              "type": "bound_method",
+              "value": "<bound method>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling the Stored Bound Method",
+        "explanation": "**`method()`**\n\nSurprisingly, calling just `method()` without passing `self` works perfectly! It looks like calling a regular function, but internally `my_dog` is automatically passed as `self`.\n\n**Practical use -- Callback pattern**: This feature is frequently used in GUI programming and event handlers. For example, storing a bound method like `button.on_click = my_dog.bark` means that when the button is clicked, `my_dog.bark()` is automatically executed. No need to manage self separately -- very convenient!\n\n**Why does it work without self?**\n- `method` is a bound method object (0x2100)\n- Inside this object, `__func__` = `Dog.bark` (original function) and `__self__` = `my_dog` (bound instance) are stored\n- When `method()` is called, Python internally executes `method.__func__(method.__self__)`\n- That is, it's exactly the same as `Dog.bark(my_dog)`!",
+        "visualizationType": "pythonMemory",
+        "code": "method()  # self 없이 호출 가능!",
+        "pythonMemoryState": {
+          "note": "method() called --> stored my_dog passed as self!",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "bound_method1",
+              "type": "bound_method",
+              "value": "<bound method (my_dog + bark)>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "bark Method Execution (3rd time)",
+        "explanation": "**`print(f\"Woof! (id: {id(self)})\")`**\n\nThe 3rd and final bark execution. Once again `id(self)` --> 8192, meaning all 3 calls produced **exactly identical results**!\n\n**Key summary of this lesson**:\n1. Methods defined in a class are essentially **function objects**\n2. When accessed through an instance, they are converted to **bound methods** and self is automatically passed\n3. Bound methods store `__func__` (original function) and `__self__` (bound instance) internally\n4. function and method are **different types** of objects in Python\n\n**Final comparison of the 3 calling methods**:\n- Method 1 -- `my_dog.bark()` (Bound Method): When accessed through an instance, the descriptor protocol triggers and self is automatically passed. The most common and recommended approach.\n- Method 2 -- `Dog.bark(my_dog)` (Unbound Call): Directly calls the class's function and explicitly passes self. Used for understanding internal mechanics or calling specific parent methods in inheritance hierarchies.\n- Method 3 -- `method()` (Stored Bound Method): Storing a bound method in a variable allows calling without self later. Useful for callbacks, event handlers, and decorator patterns.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"멍멍! (id: {id(self)})\")",
+        "pythonMemoryState": {
+          "output": [
+            "멍멍! (id: 8192)"
+          ],
+          "note": "self = my_dog (object stored in bound method!)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog.bark",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "method",
+              "pointsTo": "bound_method1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "bound_method1",
+              "type": "bound_method",
+              "value": "<bound method>",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ my_dog (0x2000)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the difference between obj.method() and Class.method(obj)?",
+    "options": [
+      "They produce different results",
+      "They produce the same result - the former auto-passes self",
+      "Only the latter works",
+      "Only the former works"
+    ],
+    "correctIndex": 1,
+    "explanation": "obj.method() is a bound method call that auto-passes self.\nClass.method(obj) is an unbound call that explicitly passes self.\nThe result is identical!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "A method is something different from a function",
+      "correct": "A method is a function bound to an instance",
+      "why": "obj.method is a 'bound method' object that combines a function + an instance."
+    },
+    {
+      "wrong": "self is automatically defined as a keyword",
+      "correct": "self is just the name of the first parameter (by convention)",
+      "why": "Python simply passes the instance as the first argument when calling."
+    }
+  ],
+  "keyTakeaway": "obj.method() is a bound method! self is automatically passed for convenient calling!"
+}

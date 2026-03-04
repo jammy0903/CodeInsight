@@ -1,0 +1,42 @@
+{
+  "lessonId": "c-10-2",
+  "title": "File Modes",
+  "concept": "File modes determine read, write, and append behavior, directly affecting the outcome of file operations",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    FILE *fp;\n\n    fp = fopen(\"data.txt\", \"w\");\n    if (fp) {\n        fprintf(fp, \"Hello File!\");\n        fclose(fp);\n    }\n\n    fp = fopen(\"data.txt\", \"a\");\n    if (fp) {\n        fprintf(fp, \" Append me.\");\n        fclose(fp);\n    }\n\n    fp = fopen(\"data.txt\", \"r\");\n    char buffer[50];\n    if (fp) {\n        fgets(buffer, 50, fp);\n        printf(\"Read: %s\\n\", buffer);\n        fclose(fp);\n    }\n\n    return 0;\n}",
+    "steps": [
+      {"title":"Including stdio.h header","explanation":"**`#include <stdio.h>`** -- Header defining `FILE`, `fopen`, `fclose`, `fprintf`, `fgets` and other file I/O essentials.","visualizationType":"cMemory","code":"#include <stdio.h>","stack":[],"heap":[],"stdout":""},
+      {"title":"main function and FILE pointer","explanation":"**`FILE *fp;`** -- A pointer variable to a **`FILE` struct** that holds file information. The `FILE` struct contains the current read/write position, open mode, internal buffer, error state, and other data the OS needs to manage the file.","visualizationType":"cMemory","code":"int main() {","highlightOffset":[0,1],"stack":[{"name":"fp","type":"FILE*","value":"???","address":"0x1000"}]},
+      {"title":"1. Opening file in write mode (\"w\")","explanation":"**`fp = fopen(\"data.txt\", \"w\");`** -- Opens the file in **write mode (`\"w\"`)**. If the file does not exist, it creates a new one. If it already exists, it **erases all existing content (truncate)** and opens it empty.","visualizationType":"cMemory","code":"fp = fopen(\"data.txt\", \"w\");","stack":[{"name":"fp","type":"FILE*","value":"0xFILE","address":"0x1000"}]},
+      {"title":"Writing to the file","explanation":"**`fprintf(fp, \"Hello File!\");`** -- Writes a string to the file (`data.txt`) pointed to by `fp`. This is the same function we used earlier with `fprintf(stdout, ...)` to print to the screen -- just with `fp` instead of `stdout`.","visualizationType":"cMemory","code":"fprintf(fp, \"Hello File!\");"},
+      {"title":"Closing the file","explanation":"**`fclose(fp);`** -- Must be called after finishing file operations. `fclose` does three things: writes any remaining buffer data to disk (flush), returns the file handle to the OS, and frees the `FILE` struct memory.","visualizationType":"cMemory","code":"fclose(fp);","stack":[{"name":"fp","type":"FILE*","value":"closed","address":"0x1000"}]},
+      {"title":"2. Opening file in append mode (\"a\")","explanation":"**`fp = fopen(\"data.txt\", \"a\");`** -- Opens the same file in **append mode (`\"a\"`)**. If the file does not exist, it creates a new one (same as `\"w\"`). If it exists, the existing content is **preserved** and writing starts from the end.","visualizationType":"cMemory","code":"fp = fopen(\"data.txt\", \"a\");","stack":[{"name":"fp","type":"FILE*","value":"0xFILE","address":"0x1000"}]},
+      {"title":"Appending content to the file","explanation":"**`fprintf(fp, \" Append me.\");`** -- Since the file was opened in `\"a\"` mode, the new string is written **after** the existing content. After `\"w\"` mode it was `\"Hello File!\"`, and after appending it becomes `\"Hello File! Append me.\"`.","visualizationType":"cMemory","code":"fprintf(fp, \" Append me.\");"},
+      {"title":"Closing the file","explanation":"**`fclose(fp);`** -- Ensures the appended content is saved to disk and closes the file. The final content of `data.txt` at this point is `\"Hello File! Append me.\"`.","visualizationType":"cMemory","code":"fclose(fp);","occurrence":2,"stack":[{"name":"fp","type":"FILE*","value":"closed","address":"0x1000"}]},
+      {"title":"3. Opening file in read mode (\"r\")","explanation":"**`fp = fopen(\"data.txt\", \"r\");`** -- Opens the file in **read mode (`\"r\"`)**. If the file exists, it opens read-only with the cursor at the beginning. If the file does not exist, it returns `NULL`.","visualizationType":"cMemory","code":"fp = fopen(\"data.txt\", \"r\");","stack":[{"name":"fp","type":"FILE*","value":"0xFILE","address":"0x1000"}]},
+      {"title":"Preparing buffer and reading file","explanation":"**`char buffer[50];`** and **`fgets(buffer, 50, fp);`** -- Declares a character array to store data read from the file, then uses `fgets` to read the content. The format is `fgets(destination, max_size, stream)`, reading up to **49** characters -- the last slot is reserved for `\\0`.","visualizationType":"cMemory","code":"char buffer[50];","highlightOffset":[0,2],"stack":[{"name":"fp","type":"FILE*","value":"0xFILE","address":"0x1000"},{"name":"buffer","type":"char[50]","value":"\"Hello File! Append me.\"","address":"0x0ffc"}]},
+      {"title":"Printing the read content","explanation":"**`printf(\"Read: %s\\n\", buffer);`** -- Prints the string read from the file to the screen. The result is `\"Read: Hello File! Append me.\"`.","visualizationType":"cMemory","code":"printf(\"Read: %s\\n\", buffer);","stdout":"Read: Hello File! Append me."},
+      {"title":"Final file close and termination","explanation":"**`fclose(fp);`** and **`return 0;`** -- Completes all file operations and terminates the program.\n\nThe basic pattern for file I/O is always the same: open with `fopen` -> check for `NULL` errors -> read/write operations -> close with `fclose`.","visualizationType":"cMemory","code":"fclose(fp);","occurrence":3,"highlightOffset":[0,3],"stack":[]}
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the difference between \"w\" mode and \"r+\" mode in fopen?",
+    "options": [
+      "r+ does not create a file but w does.",
+      "w erases existing content (Truncate), but r+ overwrites without erasing.",
+      "w cannot read but r+ can do both.",
+      "All of the above"
+    ],
+    "correctIndex": 3,
+    "explanation": "\"w\" is destructive (create + clear), while \"r+\" is preserving (modify).\n\"w\" cannot read, but \"r+\" supports both reading and writing."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Even without fclose, data is saved when the program exits.",
+      "correct": "Usually true, but not guaranteed.\nData remaining in the buffer might not be written to disk.",
+      "why": "You must explicitly release resources and flush the buffer with `fclose`."
+    }
+  ],
+  "keyTakeaway": "Understanding the differences between file modes (r, w, a, r+, w+, a+) and choosing the right one for each purpose prevents data loss."
+}

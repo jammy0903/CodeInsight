@@ -1,0 +1,174 @@
+{
+  "lessonId": "py-12-2",
+  "title": "Handling Multiple Exceptions",
+  "concept": "Handle different error types differently! Using multiple except blocks",
+  "content": {
+    "code": "data = [1, 2, 3]\n\ntry:\n    index = int(\"abc\")\n    value = data[index]\nexcept ValueError:\n    print(\"Invalid number format!\")\nexcept IndexError:\n    print(\"Index out of range!\")\nexcept Exception as e:\n    print(f\"Unexpected error: {e}\")",
+    "steps": [
+      {
+        "title": "Creating a List",
+        "explanation": "**`data = [1, 2, 3]`** -- A list object is created in heap memory, and the label `data` is attached to it.\n\nPython executes from top to bottom. First, we create a list `data` containing three integers.\n\n**Analogy:** It's like setting up a 3-slot locker. Slot 0 has 1, slot 1 has 2, and slot 2 has 3. The locker has the label `data`.\n\n**Python internals:** The `list` object is allocated in heap memory. Internally, a list is a **pointer array that holds memory addresses** of each element object. The `int` objects `1`, `2`, `3` exist separately, and the list manages the list of their addresses. `{\"data\": <list object address>}` is registered in the global namespace.\n\nValid indices for this list are **0, 1, 2**. `data[0]` is 1, `data[1]` is 2, `data[2]` is 3. Accessing a non-existent index like `data[10]` raises **IndexError**. But another error might occur first!\n\n**Execution order:** `data = [1, 2, 3]` completed -> move to next line (try block)",
+        "visualizationType": "pythonMemory",
+        "code": "data = [1, 2, 3]",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Entering the try Block",
+        "explanation": "**`try:`** -- We enter the exception monitoring block. This time, **multiple types of errors** can occur.\n\nThe try block contains two risky lines:\n1. **`int(\"abc\")`** -- Attempting string to number conversion -> **ValueError** possible\n2. **`data[index]`** -- List index access -> **IndexError** possible\n\n**Analogy:** It's like crossing a minefield with different types of mines. Anti-personnel mines (ValueError), anti-tank mines (IndexError), unknown mines (Exception)... Each mine type needs its own removal method (except block).\n\n**Python internals:** When entering the `try` block, the interpreter sets up an exception handler chain. This chain registers 3 except block entries in order: ValueError -> IndexError -> Exception. When an error occurs, this chain is searched **from top to bottom**.\n\nThe key lesson: You can use multiple except blocks, and handle **different types of errors differently**!\n\n**Execution order:** Enter `try:` -> start executing the first line inside the try block",
+        "visualizationType": "pythonMemory",
+        "code": "try:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Entering try block - monitoring for multiple errors",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "ValueError Raised!",
+        "explanation": "**`index = int(\"abc\")`** -- The `int()` function converts a string to an integer. But `\"abc\"` is not a number, so **conversion is impossible**!\n\n`int(\"123\")` becomes integer `123`, but `int(\"abc\")` cannot be converted to any integer. Python raises a **ValueError** exception.\n\n**Analogy:** It's like putting paper (string of letters) into a vending machine (int() function) that only accepts coins (numeric strings). The machine spits it back out saying \"This is not a coin!\" (ValueError raised).\n\n**Note:** Strings that `int()` can accept are only those that **represent integers**: `\"123\"`, `\"-45\"`, `\"0\"`, etc. `\"3.14\"` also fails (it's a float format). You need to use `float(\"3.14\")`.",
+        "visualizationType": "pythonMemory",
+        "code": "    index = int(\"abc\")",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "ValueError raised! Searching for matching except block...",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            },
+            {
+              "id": "err1",
+              "type": "ValueError",
+              "value": "\"invalid literal for int()\"",
+              "pyId": "2002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "The First except Caught It!",
+        "explanation": "**`except ValueError:`** -- Python checks except blocks **from top to bottom** in order, and executes the first block that matches the raised error.\n\nLet's follow the matching process:\n1. `except ValueError:` -- Is the raised error a ValueError? **YES!** Execute this block!\n2. `except IndexError:` -- (Not checked, already caught, skipped)\n3. `except Exception as e:` -- (Not checked, already caught, skipped)\n\n**Analogy:** It's like a post office sorting system. When a letter (error) arrives, it checks the first sorting bin (except ValueError) first. \"Going to Seoul?\" -> Yes! -> Put in the Seoul bin. The rest (Busan bin, other) are skipped.\n\n**Important (except matching rules):**\n- Checked **in order** from top to bottom\n- **Only** the **first** matching except block is executed\n- All remaining except blocks are skipped\n- Multiple excepts will **never** execute for a single error",
+        "visualizationType": "pythonMemory",
+        "code": "    print(\"Invalid number format!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Invalid number format!"
+          ],
+          "note": "ValueError handled by the first except!",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "What If It Were an IndexError?",
+        "explanation": "**`except IndexError:`** -- In this execution, because ValueError occurred first, this block is **not executed**.\n\nBut **what if the scenario were different?** Imagine `int(\"100\")` instead of `int(\"abc\")`:\n- `index = int(\"100\")` -> Success! Integer `100` is assigned to `index`\n- `value = data[100]` -> **IndexError raised!** The valid indices for list `data` are 0~2, but we tried to access index 100\n- First `except ValueError:` -> Is it ValueError? **NO!** Skip\n- Second `except IndexError:` -> Is it IndexError? **YES!** Execute this block!\n\n**Analogy:** It's a hospital triage system. Today's patient (ValueError) was treated by internal medicine (first except). If a different patient (IndexError) came, they'd be treated by orthopedics (second except). Each patient has their own specialist!\n\n**Python internals:** `IndexError` is raised when `data.__getitem__(100)` is called. The list's internal array size (3) is compared with the requested index (100), and if out of range, an `IndexError: list index out of range` exception is created.\n\n**This is the key to multiple excepts**: You can provide **appropriate responses** depending on the type of error! Instead of lumping all errors into one except, you can handle each situation differently.\n\n**Execution order (this run):** This block is skipped (ValueError was already handled above)",
+        "visualizationType": "pythonMemory",
+        "code": "except IndexError:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Not executed this time (ValueError was caught first)",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Exception: The Catch-All Safety Net",
+        "explanation": "**`except Exception as e:`** is the \"last safety net.\"\n\nWhy last? Because `Exception` covers most general exceptions.\nSo you should handle more specific exceptions (e.g., `ValueError`, `IndexError`) first,\nand place this block at the very end for it to work as intended.\n\n**Analogy**: It's like having department-specific help desks (specific excepts) first,\nthen a general information desk (Exception) at the end.\n\nUsing `as e` lets you capture the error object for message output or logging.\n\nImportant note:\n- Placing `except Exception` at the top effectively disables all specific excepts below it",
+        "visualizationType": "pythonMemory",
+        "code": "except Exception as e:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Exception is the parent class of all errors (last safety net)",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "When there are multiple except blocks, in what order does Python check them?",
+    "options": [
+      "It checks all except blocks simultaneously",
+      "It checks the most general one (Exception) first",
+      "It checks from top to bottom in order, executing only the first match",
+      "It randomly selects one"
+    ],
+    "correctIndex": 2,
+    "explanation": "Python checks except blocks from top to bottom in order. Only the first matching except block is executed, and the rest are skipped. That's why specific errors should be placed above, and the general Exception should be placed at the bottom."
+  },
+  "keyTakeaway": "Using multiple except blocks lets you handle different error types differently. Put specific errors on top, and the general Exception last!"
+}

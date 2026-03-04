@@ -1,0 +1,233 @@
+{
+  "lessonId": "java-3-3",
+  "title": "数组传递（Array Passing）",
+  "concept": "数组也是对象。引用值被复制，元素修改会反映到原始数组。",
+  "content": {
+    "code": "void modifyElement(int[] arr) {\n    arr[0] = 100;\n}\n\nvoid reassignArray(int[] arr) {\n    arr = new int[]{999, 888, 777};\n}\n\nint[] nums = {1, 2, 3};\nSystem.out.println(Arrays.toString(nums));\n\nmodifyElement(nums);\nSystem.out.println(Arrays.toString(nums));\n\nreassignArray(nums);\nSystem.out.println(Arrays.toString(nums));",
+    "steps": [
+      {
+        "title": "创建数组",
+        "explanation": "**执行顺序：**\n1. 在堆上创建 `int` 类型数组对象 `{1, 2, 3}`（0x100）。\n2. 将地址 `0x100` 赋给栈上的 `nums` 变量。\n\n**核心：**\n在 Java 中数组是**对象（Object）**。\n因此 `nums` 不是数组本身，而是保存着数组所在位置的**地址**。\n\n**比喻**：`nums` 就像操控本体（堆上的数组）的遥控器。",
+        "visualizationType": "javaMemory",
+        "code": "int[] nums = {1, 2, 3};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "int[]"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "输出初始数组",
+        "explanation": "**执行顺序：**\n1. 引用 `nums`。\n2. 输出内容 `[1, 2, 3]`。\n\n显示的是 `0x100` 地址处的当前内容。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.toString(nums));",
+        "javaMemoryState": {
+          "output": [
+            "[1, 2, 3]"
+          ]
+        }
+      },
+      {
+        "title": "调用 modifyElement(nums)",
+        "explanation": "**执行顺序：**\n1. 复制 `nums` 的值（地址 `0x100`）。\n2. 传递给 `modifyElement` 的参数 `arr`。\n\n现在 `nums` 和 `arr` 共享同一个数组（`0x100`）。",
+        "visualizationType": "javaMemory",
+        "code": "modifyElement(nums);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "arr",
+              "value": "-> 0x100",
+              "frame": "modifyElement",
+              "copied": true,
+              "type": "int[]"
+            }
+          ]
+        }
+      },
+      {
+        "title": "修改数组元素（副作用）",
+        "explanation": "**执行顺序：**\n1. 跳转到 `arr` 指向的 `0x100` 地址。\n2. 将索引 0 的值覆盖为 `100`。\n\n**结果：**\n原始数组本身被修改了。\n因为 `nums` 也指向同一位置，所以也受到了影响。",
+        "keyInsight": "修改数组内容 = 改变原始值",
+        "visualizationType": "javaMemory",
+        "code": "arr[0] = 100;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "arr",
+              "value": "-> 0x100",
+              "frame": "modifyElement",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[100, 2, 3]",
+              "type": "int[]",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "修改后确认",
+        "explanation": "**执行顺序：**\n1. `modifyElement` 结束。\n2. 输出 `nums`。\n\n可以确认第一个元素已变为 `100`。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.toString(nums));",
+        "occurrence": 2,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[100, 2, 3]",
+              "type": "int[]"
+            }
+          ],
+          "output": [
+            "[100, 2, 3]"
+          ]
+        }
+      },
+      {
+        "title": "调用 reassignArray(nums)",
+        "explanation": "**执行顺序：**\n1. 再次复制 `nums` 的地址（`0x100`）。\n2. 传递给 `reassignArray` 的 `arr`。\n\n地址再次被复制并传递。",
+        "visualizationType": "javaMemory",
+        "code": "reassignArray(nums);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "arr",
+              "value": "-> 0x100",
+              "frame": "reassignArray",
+              "copied": true,
+              "type": "int[]"
+            }
+          ]
+        }
+      },
+      {
+        "title": "变量重新赋值（新数组）",
+        "explanation": "**执行顺序：**\n1. 在堆上创建新数组 `{999, 888, 777}`（0x300）。\n2. 将地址 `0x300` 赋给变量 `arr`。\n\n**结果：**\n只有局部变量 `arr` 指向了新数组。\n`main` 中的 `nums` 仍然紧紧握住地址 `0x100`。",
+        "keyInsight": "变量重新赋值 = 只改变局部引用",
+        "visualizationType": "javaMemory",
+        "code": "arr = new int[]{999, 888, 777};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "arr",
+              "value": "-> 0x300",
+              "frame": "reassignArray",
+              "changed": true,
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[100, 2, 3]",
+              "type": "int[]"
+            },
+            {
+              "address": "0x300",
+              "content": "[999, 888, 777]",
+              "type": "int[]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "最终确认",
+        "explanation": "**执行顺序：**\n1. `reassignArray` 结束。\n2. 输出 `nums`。\n\n重新赋值只影响了局部变量（`arr`），所以 `nums` 仍然是 `[100, 2, 3]`。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.toString(nums));",
+        "occurrence": 3,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[100, 2, 3]",
+              "type": "int[]"
+            }
+          ],
+          "output": [
+            "[100, 2, 3]"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如果想在方法内修改数组内容同时保护原始数组，应该怎么做？",
+    "options": [
+      "使用 final 关键字。",
+      "直接传递就是安全的。",
+      "克隆（clone）数组后传递副本。",
+      "使用 static 方法。"
+    ],
+    "correctIndex": 2,
+    "explanation": "当数组的引用（地址）被传递时，原始数组也可能被修改。\n要防止这种情况，需要使用 `Arrays.copyOf()` 或 `.clone()` 创建一个副本（深拷贝）传递（防御性复制）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "数组是变量，所以像基本类型一样被复制。",
+      "correct": "数组是用 `new` 创建的对象。\n复制的是地址。",
+      "why": "与 C 语言不同，Java 中的数组被视为一等对象（First-class Object）。"
+    }
+  ],
+  "keyTakeaway": "修改数组元素会影响原始值。变量重新赋值则不会。"
+}

@@ -1,0 +1,216 @@
+{
+  "lessonId": "java-7-1",
+  "title": "Generics Basics: Type Safety",
+  "concept": "Core concept for Generics Basics",
+  "content": {
+    "code": "// 1. Generic Class Definition\nclass Box<T> {\n    private T value;\n\n    public void set(T value) {\n        this.value = value;\n    }\n\n    public T get() {\n        return value;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // 2. Type Inference (Diamond Operator)\n        Box<String> stringBox = new Box<>();\n        stringBox.set(\"Hello Generics\");\n\n        // 3. Compile-time Type Safety\n        // stringBox.set(123); // Compile Error!\n\n        System.out.println(stringBox.get());\n        \n        Box<Integer> intBox = new Box<>();\n        intBox.set(42);\n        System.out.println(intBox.get());\n    }\n}",
+    "steps": [
+      {
+        "title": "Generic Class Declaration",
+        "explanation": "**Execution flow:**\n1. The `Box<T>` class definition is loaded.\n2. The generic type `T` represents a type to be determined later.\n\n**Building a universal box:**\n`Box<T>` is like a blueprint for a magic box that can hold anything.\nYou attach a label called `T`, and when you actually create a box, you specify \"this is a box for apples\" or \"this is a box for pears\"!",
+        "visualizationType": "javaMemory",
+        "code": "class Box<T> {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [
+            {
+              "name": "Box<T>",
+              "value": "Class Definition"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThis is the entry point of the program.\nIt's where we open the door to our generics lab.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "metaspace": []
+        }
+      },
+      {
+        "title": "Creating a String Box",
+        "explanation": "**Execution flow:**\n1. `new Box<>()` executes and creates a `Box` object in heap memory.\n2. At this point, `T` is determined to be `String`.\n3. The `stringBox` variable is created on the stack, pointing to this object.\n\n**Type is locked in:**\nNow this box can only hold `String` values.\nThe compiler strictly enforces this, so you can rest easy!",
+        "visualizationType": "javaMemory",
+        "code": "Box<String> stringBox = new Box<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "stringBox",
+              "value": "0x100",
+              "frame": "main",
+              "type": "Box<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: null",
+              "type": "Box<String>",
+              "new": true
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "Storing a Value (String)",
+        "explanation": "**Execution flow:**\n1. `stringBox.set(\"Hello Generics\")` is called.\n2. The string is stored in the `value` field of the `0x100` object in heap memory.\n\n**Perfect type match:**\nWe're putting in a `String` value, so it fits right in without any issues.",
+        "visualizationType": "javaMemory",
+        "code": "stringBox.set(\"Hello Generics\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Value",
+        "explanation": "**Execution flow:**\n1. The value is retrieved using `stringBox.get()`.\n2. It is printed to the screen with `System.out.println`.\n\n**No casting needed:**\nSince we know the output is a `String`, there's no need to force-cast it with `(String)`.\nThe code is much cleaner this way!",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(stringBox.get());",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>"
+            }
+          ],
+          "output": [
+            "Hello Generics"
+          ]
+        }
+      },
+      {
+        "title": "Creating an Integer Box",
+        "explanation": "**Execution flow:**\n1. This time, a `Box` object for `Integer` types is created on the heap (`0x200`).\n2. The `intBox` variable on the stack points to it.\n\n**A box for a different purpose:**\nIt's the same `Box` class, but this time it's born to hold numbers.\nThe reusability is truly remarkable!",
+        "visualizationType": "javaMemory",
+        "code": "Box<Integer> intBox = new Box<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "stringBox",
+              "value": "0x100",
+              "frame": "main",
+              "type": "Box<String>"
+            },
+            {
+              "name": "intBox",
+              "value": "0x200",
+              "frame": "main",
+              "type": "Box<Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>"
+            },
+            {
+              "address": "0x200",
+              "content": "value: null",
+              "type": "Box<Integer>",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Storing a Value (Integer)",
+        "explanation": "**Execution flow:**\n1. `intBox.set(42)` is called.\n2. The value 42 is stored in the `0x200` object.\n\n**Auto-boxing:**\nThe primitive `int` 42 is automatically wrapped into an `Integer` object before being stored.",
+        "visualizationType": "javaMemory",
+        "code": "intBox.set(42);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>"
+            },
+            {
+              "address": "0x200",
+              "content": "value: 42",
+              "type": "Box<Integer>",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Integer Value",
+        "explanation": "**Execution flow:**\n1. The value 42 is retrieved using `intBox.get()` and printed.\n\n**Wrapping up:**\nThanks to generics, we can write code safely without worrying about type issues.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(intBox.get());",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "value: \"Hello Generics\"",
+              "type": "Box<String>"
+            },
+            {
+              "address": "0x200",
+              "content": "value: 42",
+              "type": "Box<Integer>"
+            }
+          ],
+          "output": [
+            "42"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which type CANNOT be used for T in Java generics?",
+    "options": [
+      "String",
+      "Object",
+      "int (primitive type)",
+      "List<String>"
+    ],
+    "correctIndex": 2,
+    "explanation": "Only reference types can be used as generic type parameters.\nInstead of `int`, you must use the `Integer` wrapper class."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Using generics makes the program run faster.",
+      "correct": "Generics have no effect on runtime performance.\nThe compiler automatically inserts casting code, so runtime performance remains the same.",
+      "why": "Generics are a tool for 'type safety', not for performance optimization."
+    }
+  ],
+  "keyTakeaway": "By using generics, you get strong type checking without writing explicit casting code, preventing runtime errors like ClassCastException."
+}

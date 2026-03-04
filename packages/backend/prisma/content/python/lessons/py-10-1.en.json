@@ -1,0 +1,260 @@
+{
+  "lessonId": "py-10-1",
+  "title": "Global Interpreter Lock (GIL)",
+  "concept": "The GIL is a constraint that ensures only one thread can execute Python code at any given moment, even when multiple threads exist.",
+  "content": {
+    "code": "import threading\n\nshared_counter = 0\n\ndef increment():\n    global shared_counter\n    for i in range(5):\n        shared_counter += 1\n        print(f\"Thread {threading.current_thread().name}: counter = {shared_counter}\")\n\n# 두 개의 스레드 생성\nt1 = threading.Thread(target=increment, name=\"A\")\nt2 = threading.Thread(target=increment, name=\"B\")\n\n# 스레드 시작\nt1.start()\nt2.start()\n\n# 스레드 종료 대기\nt1.join()\nt2.join()\n\nprint(f\"\\nFinal counter: {shared_counter}\")",
+    "steps": [
+      {
+        "title": "Importing the threading Module",
+        "explanation": "**`import threading`**\n\n**We import the `threading` module to create and manage threads.**\n\n**What is a Thread?**\n- A thread is a unit of execution that allows multiple tasks to run concurrently within a single program\n- Think of it as multiple employees working simultaneously in the same office\n- Threads share the same memory space (this is both an advantage and a risk!)\n\n**Analogy**: It's like setting up the HR system (threading module) for hiring employees (threads) at a company (program).\n\n**Under the hood**: When the `threading` module is loaded, various concurrency management tools such as `Thread`, `Lock`, `Event`, etc. become available.\n\n**Why this order?** You need to import the tools (module) before you can use threads.\n\n**Note**: Python's `threading` uses real OS-level threads, but with a special constraint called the GIL. In this lesson, we'll see that constraint in action.",
+        "visualizationType": "pythonMemory",
+        "code": "import threading",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "threading module ready.",
+          "names": [
+            {
+              "name": "threading",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Declaring a Shared Variable",
+        "explanation": "**`shared_counter = 0`**\n\n**We declare a global variable that multiple threads will access concurrently.** `shared_counter` is initialized to 0.\n\n**Why is this variable important?**\n- Two threads will access and modify this variable simultaneously\n- Without the GIL, both threads could read and write the same value at the same time, causing a 'race condition'\n- Example: both read 0 -> both write 1 -> result is 1 (should be 2)\n\n**Analogy**: It's a number written on a whiteboard in the office. Two employees are trying to change the number on the whiteboard at the same time. Without order, chaos ensues!\n\n**Under the hood**: `shared_counter` is created in the global namespace, pointing to the integer `0`.\n\n**Why this order?** Shared resources must be prepared before threads start.\n\n**Note**: Without the `global` keyword, you cannot modify this variable inside a function. That's why `global shared_counter` is declared inside the `increment` function.",
+        "visualizationType": "pythonMemory",
+        "code": "shared_counter = 0",
+        "pythonMemoryState": {
+          "note": "Shared variable shared_counter initialized to 0.",
+          "names": [
+            {
+              "name": "shared_counter",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the Counter Increment Function",
+        "explanation": "**`def increment():`**\n\n**We define the task function that each thread will execute.** This function increments the global variable `shared_counter` five times and prints the current thread name and counter value at each step.\n\n**Function body analysis:**\n- `global shared_counter`: Declares intent to modify the global variable inside the function\n- `for i in range(5)`: Repeat 5 times\n- `shared_counter += 1`: Increment counter by 1\n- `print(...)`: Print current thread name and counter value\n\n**Analogy**: It's the employee's task instructions. \"Increase the number on the whiteboard 5 times. Each time you increase it, report your name and the current number.\"\n\n**Under the hood**: The `increment` function object (0x1100) is created. Due to the `global` declaration, `shared_counter` inside this function directly references the variable in the global namespace.\n\n**Why this order?** We need to define the task for the threads. This function will be passed as the `target` when creating threads.\n\n**Note**: `threading.current_thread().name` returns the name of the currently executing thread. This lets us track which thread runs when.",
+        "visualizationType": "pythonMemory",
+        "code": "def increment():",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pythonMemoryState": {
+          "note": "increment function defined.",
+          "names": [
+            {
+              "name": "increment",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating Two Threads",
+        "explanation": "**`t1 = threading.Thread(target=increment, name=\"A\")`**\n**`t2 = threading.Thread(target=increment, name=\"B\")`**\n\n**We create two thread objects.** Each thread will execute the `increment` function, with names \"A\" and \"B\" respectively.\n\n**`Thread` constructor arguments:**\n- `target`: The function the thread will execute (pass a reference, not a call!)\n- `name`: A name to identify the thread (useful for debugging)\n\n**Analogy**: It's like hiring two employees and giving each the same task instructions (increment).\n- Employee A (t1): \"I'm A. I'll perform increment.\"\n- Employee B (t2): \"I'm B. I'll perform increment.\"\nThey haven't started working yet. They're in a Ready state.\n\n**Under the hood**: `Thread` instances are created, but the OS threads haven't been created yet. You must call `start()` for the actual OS threads to be created.\n\n**Why this order?** Create threads first, start them later. Separating creation and start allows you to prepare multiple threads and start them all at once.\n\n**Note**: In `target=increment`, don't add parentheses! Writing `target=increment()` would immediately execute the function, and its result (None) would become the target.",
+        "visualizationType": "pythonMemory",
+        "code": "# 두 개의 스레드 생성",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "Two threads created (Ready state).",
+          "names": [
+            {
+              "name": "t1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "t2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Thread(name='A')",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Thread(name='B')",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Starting Threads Concurrently",
+        "explanation": "**`t1.start()` / `t2.start()`**\n\n**We transition both threads to Running state.** From this moment, both threads execute 'concurrently'.\n\n**But do they really run simultaneously? Enter the GIL!**\n- CPython has something called the GIL (Global Interpreter Lock)\n- The GIL ensures that only **one thread at a time** can execute Python bytecode\n- So the two threads run 'alternately' (not truly in parallel!)\n\n**Analogy**: There's only one computer (GIL) in the office, so two employees must take turns using it.\nA works briefly -> hands it to B -> B works briefly -> hands it to A...\n\n**Under the hood**: When `start()` is called, OS-level threads are created. The OS scheduler manages the execution order of both threads, but because of the GIL, only one thread actually executes Python code at a time.\n\n**Why this order?** Starting two threads in quick succession lets the OS interleave their execution.\n\n**Note**: The output order may vary between runs. Which thread runs first is decided by the OS scheduler.",
+        "visualizationType": "pythonMemory",
+        "code": "# 스레드 시작",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Thread A: counter = 1",
+            "Thread B: counter = 2",
+            "Thread A: counter = 3",
+            "..."
+          ],
+          "note": "Threads started. They take turns executing due to the GIL.",
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "started",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "started",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Waiting for Threads to Finish",
+        "explanation": "**`t1.join()` / `t2.join()`**\n\n**The main thread waits until all child threads have finished.** `join()` means \"I (the main thread) will stop here until this thread completes.\"\n\n**What happens without `join()`?**\n- The main thread might finish first\n- The program could terminate while child threads are still working\n- The final result (`shared_counter`) might be printed before it reaches 10\n\n**Analogy**: The team leader (main thread) says \"I won't leave until A and B have finished their work.\" All employees must complete their tasks before the final report can be written.\n\n**Under the hood**: `join()` internally uses a Condition Variable to block the current thread until the target thread terminates.\n\n**Why this order?** We need both threads to finish before checking the final result.\n\n**Note**: Regardless of the order `join()` is called, it waits for all threads to finish. Since t2 is already running during `t1.join()`, the total wait time equals the time of the longest-running thread.",
+        "visualizationType": "pythonMemory",
+        "code": "# 스레드 종료 대기",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "...",
+            "Thread B: counter = 9",
+            "Thread A: counter = 10"
+          ],
+          "note": "All thread tasks completed.",
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "stopped",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "stopped",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Final Result",
+        "explanation": "**`print(f\"\\nFinal counter: {shared_counter}\")`**\n\n**We check the final counter value.** The result is **10** (each thread incremented 5 times).\n\n**What the GIL guarantees:**\n- Since only one thread executes at a time, the `shared_counter += 1` operation behaves nearly 'atomically'\n- Therefore, no race condition occurs in this example, and the result is exactly 10\n\n**The two faces of the GIL:**\n- **Advantage**: It guarantees memory safety. Python's reference-counting garbage collection works safely\n- **Disadvantage**: CPU-intensive tasks cannot leverage multiple cores. No matter how many threads you create, only one CPU is used\n\n**Analogy**: Since there's only one computer, the two employees took turns using it. The total work is accurate, but the time taken isn't much different from one person doing it alone.\n\n**Why this order?** This is the final step where we verify the result after all threads have terminated.\n\n**Note**: The GIL doesn't always guarantee safety! With more complex operations (e.g., `counter = counter + 1` split into multiple bytecodes), race conditions can still occur. For safe concurrency, use `Lock`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"\\nFinal counter: {shared_counter}\")",
+        "pythonMemoryState": {
+          "output": [
+            "...",
+            "Final counter: 10"
+          ],
+          "note": "Final result is 10.",
+          "names": [
+            {
+              "name": "shared_counter",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 10,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which statement correctly describes the execution result of the code above?",
+    "options": [
+      "Threads A and B run completely simultaneously, mixing their output",
+      "Due to the GIL, only one thread runs at a time, producing alternating output",
+      "shared_counter ends up less than 10 due to a race condition",
+      "Thread A finishes completely before Thread B starts"
+    ],
+    "correctIndex": 1,
+    "explanation": "Because of the GIL (Global Interpreter Lock), only one thread can execute Python code at any given moment, even with multiple threads.\nSo the two threads execute alternately, and since the GIL ensures memory consistency, the final value is always 10."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Python threads run completely in parallel",
+      "correct": "Due to the GIL, only one thread executes Python code at any given moment",
+      "why": "The GIL exists to ensure the safety of Python's memory management.\nFor true parallel processing, you should use the multiprocessing module."
+    },
+    {
+      "wrong": "Multithreading is pointless in Python",
+      "correct": "Threading is still useful for I/O-bound tasks",
+      "why": "For operations like network requests and file reading, the GIL is released during I/O wait time, allowing other threads to run.\nOnly CPU-bound work is difficult to parallelize."
+    }
+  ],
+  "keyTakeaway": "The GIL restricts only one thread to execute Python code at a time. CPU-bound tasks are not parallelized, but I/O-bound tasks can still benefit from threading."
+}

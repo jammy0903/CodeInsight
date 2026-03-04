@@ -1,0 +1,406 @@
+{
+  "lessonId": "py-4-3",
+  "title": "Lambda Functions",
+  "concept": "没有名字的一行函数（匿名函数）",
+  "content": {
+    "code": "# 일반 함수\ndef add(x, y):\n    return x + y\n\n# 람다 함수 (동일한 기능)\nadd_lambda = lambda x, y: x + y\n\nprint(add(2, 3))\nprint(add_lambda(2, 3))\n\n# 활용: 정렬 키\npairs = [(1, 'one'), (3, 'three'), (2, 'two')]\npairs.sort(key=lambda p: p[1]) # 두 번째 요소(글자)로 정렬\nprint(pairs)",
+    "steps": [
+      {
+        "title": "定义普通函数",
+        "explanation": "**`def add(x, y):`**\n\nPython 从上到下按顺序执行。\n定义一个将两个数相加的简单函数 `add`。\n\n**为什么先展示普通函数？** 为了与本课的主角——**Lambda 函数**进行对比。我们将展示普通函数能做的事情，用 Lambda 可以更简洁地表达。\n\n**普通函数的特征**：由 `def` 关键字 + 名称（`add`）+ 参数 + 冒号以及缩进的函数体组成。可以包含多行复杂逻辑，用 `return` 返回值。\n\n类比：普通函数（`def`）就像有名字的\"正式菜谱\"。有标题，也有空间写详细的烹饪步骤。而即将学习的 Lambda 函数则像\"一行便签\"——简单简洁。\n\n**Python 内部机制**：执行 `def` 时创建 `function` 类型对象，`add.__name__` 中存储 `'add'` 这个名称。该名称在错误消息和调试中很有用。\n\n**执行顺序**：执行 def -> 创建 add 函数对象 + 注册 -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "def add(x, y):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Lambda 函数",
+        "explanation": "**`add_lambda = lambda x, y: x + y`**\n\n**Lambda 函数**：用 `lambda` 关键字创建**没有名字的匿名函数（anonymous function）**。\n\n类比：如果用 `def` 创建的普通函数是\"有名字的正式菜品\"，那么 Lambda 就是\"没有名字的一口小吃\"。只能装简单的东西，但快速简洁。\n\n**注意**：Lambda 中只能有**一个表达式（expression）**！不能使用 `if-else`、`for`、`while` 等**语句（statement）**。（但三元表达式 `a if cond else b` 可以使用。）\n\n**Lambda 语法**：`lambda 参数: 表达式`\n- `lambda` 关键字：\"现在创建一个匿名函数\"\n- 参数：`x, y`（冒号左边）\n- 表达式：`x + y`（冒号右边，**自动返回**——不需要 `return` 关键字！）",
+        "visualizationType": "pythonMemory",
+        "code": "add_lambda = lambda x, y: x + y",
+        "pythonMemoryState": {
+          "note": "Lambda 函数对象已创建",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "add_lambda",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<lambda>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用普通函数",
+        "explanation": "**`print(add(2, 3))`**\n\n首先调用**普通函数** `add` 来确认结果。执行 `add(2, 3)` 时跳转到函数内部（line 3）。\n\n**嵌套调用顺序**：`print(add(2, 3))` 从内到外执行。\n1. `add(2, 3)` -> 跳转到函数内部 -> `return 5`\n2. `print(5)` -> 在屏幕上输出 `5`\n\n**为什么先调用普通函数？** 为了在下一行以相同方式调用 Lambda 函数，证明两种方式的结果**完全相同**。\n\n**Python 内部机制**：`add` 是用 `def` 创建的函数对象。调用时创建新的局部帧，绑定 `x=2, y=3`。\n\n**执行顺序**：line 8 -> 调用 add(2, 3) -> 跳转到 line 3 -> x=2, y=3",
+        "visualizationType": "pythonMemory",
+        "code": "print(add(2, 3))",
+        "pythonMemoryState": {
+          "note": null,
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "add_lambda",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<lambda>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 add 函数",
+        "explanation": "**`return x + y`**\n\n`x=2`，`y=3` 已绑定，计算 `2 + 3 = 5` 并返回。返回的 `5` 传给 `print()` 输出到屏幕。\n\n**普通函数的 return**：用 `def` 定义的函数必须用 `return` 关键字才能返回值。这是与即将看到的 Lambda 函数的区别——Lambda 不用 `return` 也会自动返回表达式结果。\n\n**记住**：普通函数和 Lambda 函数产生的结果是相同的。返回的是 int 对象 `5`。\n\n**Python 内部机制**：执行 `return` 语句时，当前帧从调用栈中移除，返回值（5）传递给上一帧（调用者）。\n\n**执行顺序**：x=2, y=3 -> 计算 2+3 -> 返回 5 -> 回到 line 8 -> 执行 print(5) -> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "return x + y",
+        "pythonMemoryState": {
+          "output": [
+            "5"
+          ],
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "add_lambda",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "x",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "y",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<lambda>",
+              "pyId": "1002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 Lambda 函数",
+        "explanation": "**`print(add_lambda(2, 3))`**\n\n这次调用的是 **Lambda 函数**。调用方式与普通函数**完全相同**——在变量名后加括号 `()` 和实参即可。\n\n**核心要点**：Lambda 函数本质上也是函数对象，因此可以用 `变量名(实参)` 调用。从 Python 角度看，`add(2, 3)` 还是 `add_lambda(2, 3)`，都是**调用函数对象**。\n\n类比：普通函数是\"有标签的工具\"，Lambda 是\"没有标签放在抽屉里的工具\"。拿出来使用的方式完全一样。\n\n**Python 内部机制**：调用 `add_lambda` 引用的函数对象的 `__call__` 方法，创建新的局部帧。无论是 Lambda 还是 def，内部机制完全相同。\n\n**执行顺序**：line 9 -> 调用 add_lambda(2, 3) -> Lambda 函数执行 -> x=2, y=3",
+        "visualizationType": "pythonMemory",
+        "code": "print(add_lambda(2, 3))",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "add_lambda",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<lambda>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 Lambda 函数",
+        "explanation": "**`lambda x, y: x + y`**\n\nLambda 函数体中的**表达式 `x + y`** 被执行。\n`x=2`，`y=3`，计算 `2 + 3 = 5`。\n\n**Lambda 的隐式返回（Implicit Return）**：这是 Lambda 函数最大的特点！冒号（`:`）后面的表达式结果会**自动返回**。不需要写 `return`（实际上也不能写——会报 `SyntaxError`！）。\n\n**普通函数 vs Lambda——完整对比：**\n- `def add(x, y): return x + y` -> 需要显式 `return`\n- `lambda x, y: x + y` -> 自动返回（不能写 `return`）\n- 结果：都返回 `5` -> **完全相同！**\n\n**那为什么要用 Lambda？** 像这样赋值给变量来使用时，其实 `def` 更好（PEP 8 编码风格指南也这样建议）。Lambda 真正的用武之地是**作为另一个函数的实参传递时**。马上就会在 `sort(key=lambda ...)` 中看到它的威力！\n\n**Python 内部机制**：Lambda 和普通函数一样创建局部帧。绑定 `x=2, y=3` 后计算表达式，返回结果，然后删除帧。\n\n**执行顺序**：x=2, y=3 -> 计算 2+3 -> 自动返回 5 -> 回到 line 9 -> 执行 print(5) -> line 12",
+        "visualizationType": "pythonMemory",
+        "code": "add_lambda = lambda x, y: x + y",
+        "pythonMemoryState": {
+          "output": [
+            "5"
+          ],
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "add_lambda",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "x",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "y",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<lambda>",
+              "pyId": "1002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "准备排序列表",
+        "explanation": "**`pairs = [(1, 'one'), (3, 'three'), (2, 'two')]`**\n\n创建一个以（数字，字符串）形式的**元组（tuple）**为元素的列表。\n\n**数据结构说明：**\n- `(1, 'one')` -> 数字 1 和英文单词 'one' 的配对（元组）\n- `(3, 'three')` -> 数字 3 和 'three' 的配对\n- `(2, 'two')` -> 数字 2 和 'two' 的配对\n- 每个元组的 `p[0]` 是数字，`p[1]` 是字符串\n\n**为什么需要这个数据？** 为了展示 Lambda 真正的用武之地——**`sort(key=...)` 模式**。\"按什么标准排序？\"可以用 Lambda 简洁地指定。\n\n类比：排序学生名册时，\"按姓名排序？还是按成绩排序？\"这个\"标准\"就是 `key` 参数，而用一行表达该标准的就是 Lambda。\n\n**Python 内部机制**：列表字面量 `[...]` 被计算时，在堆内存中创建新的 `list` 对象，每个元组对象也分别创建。`pairs` 变量持有该列表对象的引用。\n\n**执行顺序**：创建列表 + 元组对象 -> 赋值给 pairs 变量 -> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "pairs = [(1, 'one'), (3, 'three'), (2, 'two')]",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "add_lambda",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "pairs",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<lambda>",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[(1, 'one'), (3, 'three'), (2, 'two')]",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "用 Lambda 排序",
+        "explanation": "**用 Lambda 作排序键**可以简洁地直接传递\"排序标准函数\"。\n\n核心结构：\n- `key=lambda x: ...`\n- 从每个元素中提取比较值进行排序\n\n这种方式好的原因：\n- 无需单独 `def`，标准一目了然\n- 特别适合只用一次的简单规则\n\n**类比**：就像给整理员递一行便签\"按这个标准排队\"。\n\n注意：\n- 当标准逻辑变长时，命名函数（`def`）比 Lambda 更有利于可读性",
+        "visualizationType": "pythonMemory",
+        "code": "pairs.sort(key=lambda p: p[1]) # 두 번째 요소(글자)로 정렬",
+        "pythonMemoryState": {
+          "note": "排序完成（字母顺序：one < three < two）",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "add_lambda",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "pairs",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<lambda>",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[(1, 'one'), (3, 'three'), (2, 'two')]",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出排序结果",
+        "explanation": "**`print(pairs)`**\n\n输出排序后的列表。按字符串（字母顺序）排序后，顺序与原来不同。\n\n**结果分析**：原来 `[(1, 'one'), (3, 'three'), (2, 'two')]` -> 排序后 `[(1, 'one'), (3, 'three'), (2, 'two')]`\n- 不是按数字顺序（1, 3, 2），而是按**字符串字母顺序**（one, three, two）排序\n- `'one'` < `'three'` < `'two'`（字母顺序 o, t, t，相同则比较下一个字符）\n\n**Lambda 优点总结：**\n- 简洁：一行表达排序标准\n- 一次性：只用一次的函数无需命名\n- 与高阶函数完美搭配：用于 `sort()`、`filter()`、`map()`、`max()`、`min()` 等的 `key` 参数\n\n**不应使用 Lambda 的情况：**\n- 需要多行复杂逻辑时 -> 用 `def`\n- 函数需要在多处复用时 -> 用 `def`（需要名字才能复用）\n- 错误追踪（调试）重要时 -> 用 `def`（有名字的函数错误消息更清晰）\n\n**实际应用示例：**\n- `sorted(students, key=lambda s: s['grade'])` -> 按成绩排序\n- `filter(lambda x: x > 0, numbers)` -> 只过滤正数\n- `map(lambda x: x**2, numbers)` -> 对每个元素求平方\n\n**执行顺序**：读取 pairs -> 执行 print -> 输出排序后的列表 -> 程序结束",
+        "visualizationType": "pythonMemory",
+        "code": "print(pairs)",
+        "pythonMemoryState": {
+          "output": [
+            "[(1, 'one'), (3, 'three'), (2, 'two')]"
+          ],
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "add_lambda",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "pairs",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<lambda>",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[(1, 'one'), (3, 'three'), (2, 'two')]",
+              "pyId": "1005"
+            }
+          ],
+          "note": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "关于 Lambda 函数，哪个说法是错误的？",
+    "options": [
+      "没有名字（匿名函数）",
+      "可以包含多行复杂逻辑",
+      "只能包含一个表达式（Expression）",
+      "可以赋值给变量使用"
+    ],
+    "correctIndex": 1,
+    "explanation": "Lambda 只能有一个表达式。\n`if-else` 也必须写成一行（`True if cond else False`），多行语句（`for`、`while`）不能使用。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Lambda 比普通函数更快",
+      "correct": "速度没有差异。",
+      "why": "只是让代码更简洁的语法糖（Syntactic Sugar），内部是完全相同的 Function 对象。"
+    }
+  ],
+  "keyTakeaway": "简单函数用 `lambda` 一行搞定！在排序和过滤中非常实用。"
+}

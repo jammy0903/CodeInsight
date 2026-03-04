@@ -1,0 +1,282 @@
+{
+  "lessonId": "c-12-1",
+  "title": "递归函数的原理",
+  "concept": "函数调用自身时，每次都会压入一个新的栈帧",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid countdown(int n) {\n    if (n <= 0) {\n        printf(\"Launch!\\n\");\n        return;\n    }\n    printf(\"%d...\\n\", n);\n    countdown(n - 1);\n}\n\nint main() {\n    countdown(3);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含头文件",
+        "explanation": "通过 **`#include <stdio.h>`** 包含标准输入输出库以使用 `printf`。\n\n本课的主题是**递归函数（Recursive Function）**——函数调用自身的结构。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "**`int main()`** -- 程序的入口点。为 main 创建专用的**栈帧**。\n\n上方定义的 `countdown` 函数尚未被调用，所以还未执行。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "调用 countdown(3) - 第一个递归帧",
+        "explanation": "**`countdown(3);`** -- 为 `countdown` 创建一个**新的栈帧**压在 main 之上，参数 `n` 接收 `3` 的副本。main 在此处暂停，等待 countdown(3) 完成。",
+        "visualizationType": "cMemory",
+        "code": "countdown(3);",
+        "highlightOffset": [
+          0,
+          -10
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "countdown"
+          }
+        ]
+      },
+      {
+        "title": "n=3：检查终止条件后输出",
+        "explanation": "进入 countdown 后首先检查 `if (n <= 0)`。由于 `3 <= 0` 为假，跳过 if 块，**`printf(\"%d...\\n\", n)`** 输出 `\"3...\"`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d...\\n\", n);",
+        "stdout": "3..."
+      },
+      {
+        "title": "调用 countdown(2) - 第二个递归帧",
+        "explanation": "**`countdown(n - 1);`** -- 在 `countdown(3)` 内部调用 `countdown(2)`。又一个新的栈帧压在上方，现在共有 **3 个帧**：main（等待）-> countdown(n=3，等待）-> countdown(n=2，活跃）。",
+        "visualizationType": "cMemory",
+        "code": "countdown(n - 1);",
+        "highlightOffset": [
+          0,
+          -6
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "countdown"
+          }
+        ],
+        "stdout": "3..."
+      },
+      {
+        "title": "调用 countdown(1) - 第三个递归帧",
+        "explanation": "在 countdown(2) 中，`n <= 0` 同样为假 -> 输出 `\"2...\"` -> 调用 **`countdown(1)`**，重复同样的过程。栈已增长到 **4 层**。查看每个帧中的 `n`：第 2 层 `n=3`(0x1004)，第 3 层 `n=2`(0x1008)，第 4 层 `n=1`(0x100c)——每个都有独立的副本。",
+        "visualizationType": "cMemory",
+        "code": "countdown(n - 1);",
+        "occurrence": 2,
+        "highlightOffset": [
+          0,
+          -6
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "1",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "countdown"
+          }
+        ],
+        "stdout": "3...\n2..."
+      },
+      {
+        "title": "countdown(0) - 到达终止条件！",
+        "explanation": "countdown(1) 输出 `\"1...\"` 后调用 `countdown(0)`。这次 `0 <= 0` 为**真**——终于到达了**终止条件（Base Case）**！",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Launch!\\n\");",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "1",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "countdown"
+          },
+          {
+            "name": "countdown",
+            "type": "frame",
+            "func": "countdown",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "0",
+            "type": "int",
+            "address": "0x1010",
+            "frame": "countdown"
+          }
+        ],
+        "stdout": "3...\n2...\n1...\nLaunch!"
+      },
+      {
+        "title": "栈帧释放（Unwinding）",
+        "explanation": "countdown(0) 返回时其帧被 **Pop**，等待中的 countdown(1) 恢复执行。由于没有剩余代码，countdown(1) 也返回，以同样方式 countdown(2) -> countdown(3) -> main 依次返回。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ],
+        "stdout": "3...\n2...\n1...\nLaunch!"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "执行 countdown(3) 时，栈上同时存在的 countdown 帧最多有几个？",
+    "options": [
+      "1 个",
+      "3 个",
+      "4 个（countdown(3)、countdown(2)、countdown(1)、countdown(0)）",
+      "无限个"
+    ],
+    "correctIndex": 2,
+    "explanation": "countdown(3) -> countdown(2) -> countdown(1) -> countdown(0) 共调用 4 次。\n当 countdown(0) 到达终止条件时，栈上同时存在 4 个 countdown 帧。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "递归调用时因为是同一个函数，会复用同一个栈帧",
+      "correct": "每次调用都会创建一个全新的栈帧。",
+      "why": "即使是同一个函数，每次调用都会分配独立的内存空间（帧），因此每个帧中的 n 变量持有独立的值。"
+    },
+    {
+      "wrong": "没有终止条件（Base Case）递归也会自动停止",
+      "correct": "没有终止条件会无限调用，导致栈溢出（Stack Overflow）。",
+      "why": "栈内存是有限的（通常 1~8MB），没有终止条件持续压入帧会耗尽内存。"
+    }
+  ],
+  "keyTakeaway": "递归函数每次调用都压入新的栈帧，到达终止条件（Base Case）后按逆序展开。"
+}

@@ -1,0 +1,379 @@
+{
+  "lessonId": "js-5-2",
+  "title": "浅拷贝与深拷贝",
+  "concept": "浅拷贝只复制顶层，而深拷贝复制所有嵌套对象",
+  "content": {
+    "code": "const original = {\n  name: 'Alice',\n  address: { city: 'Seoul' }\n};\n\n// 얕은 복사\nconst shallow = { ...original };\nshallow.name = 'Bob';\nshallow.address.city = 'Busan';\n\nconsole.log(original.name);\nconsole.log(original.address.city);\n\n// 깊은 복사\nconst deep = JSON.parse(JSON.stringify(original));\ndeep.address.city = 'Incheon';\n\nconsole.log(original.address.city);",
+    "steps": [
+      {
+        "title": "创建嵌套对象",
+        "explanation": "`original` 对象包含另一个名为 `address` 的对象作为属性。\n`original` 变量持有堆上该对象的引用。",
+        "visualizationType": "memory",
+        "code": "const original = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Seoul' }"
+            }
+          ]
+        }
+      },
+      {
+        "title": "浅拷贝（展开运算符）",
+        "explanation": "展开运算符 `{ ...original }` 只复制 `original` 的顶层属性来创建新的 `shallow` 对象。\n\n**类比**：想象你买了一台新电视（新对象），但仍然使用旧电视的遥控器。\n如果你用遥控器换台，旧电视的频道也会跟着变。",
+        "keyInsight": "浅拷贝 = 仅顶层复制，嵌套对象共享引用",
+        "visualizationType": "memory",
+        "code": "const shallow = { ...original };",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Seoul' }",
+              "shared": true
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Alice', address: → 0x002 }",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "修改原始类型属性",
+        "explanation": "修改 `shallow.name`。\n由于 `name` 是被复制的原始值，只有 `shallow` 对象发生变化——`original` 不受影响。",
+        "visualizationType": "memory",
+        "code": "shallow.name = 'Bob';",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Seoul' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "修改引用类型属性（副作用！）",
+        "explanation": "修改 `shallow.address.city`。\n由于 `address` 是 `original` 和 `shallow` 共享的对象，这个修改会同时影响两者。\n这就是浅拷贝的经典副作用。",
+        "keyInsight": "浅拷贝的陷阱：表面复制了，内部仍然共享",
+        "visualizationType": "memory",
+        "code": "shallow.address.city = 'Busan';",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }",
+              "changed": true,
+              "warning": true
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查 original.name",
+        "explanation": "`original.name` 没有受到浅拷贝的影响，所以仍然输出 'Alice'。",
+        "visualizationType": "memory",
+        "code": "console.log(original.name);",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }",
+              "warning": true
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            }
+          ],
+          "output": [
+            "Alice"
+          ]
+        }
+      },
+      {
+        "title": "检查 original.address.city",
+        "explanation": "由于共享引用，`original.address.city` 反映了通过 `shallow` 所做的修改，输出 'Busan'。",
+        "visualizationType": "memory",
+        "code": "console.log(original.address.city);",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            }
+          ],
+          "output": [
+            "Alice",
+            "Busan"
+          ]
+        }
+      },
+      {
+        "title": "深拷贝（JSON 技巧）",
+        "explanation": "首先，`JSON.stringify` 将对象转换为字符串，然后 `JSON.parse` 将其重新创建为新对象。\n在这个过程中，所有嵌套结构都被序列化然后从头重建，得到一个完全独立的副本。\n\n**类比**：就像把一栋建筑转换成蓝图，运送到世界的另一端，然后用相同的材料建造一栋全新的建筑。\n一个完美的克隆。",
+        "keyInsight": "深拷贝 = 所有层级都被复制，完全独立",
+        "visualizationType": "memory",
+        "code": "const deep = JSON.parse(JSON.stringify(original));",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            },
+            {
+              "name": "deep",
+              "value": "→ 0x004"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            },
+            {
+              "address": "0x004",
+              "content": "{ name: 'Alice', address: → 0x005 }",
+              "new": true
+            },
+            {
+              "address": "0x005",
+              "content": "{ city: 'Busan' }",
+              "new": true
+            }
+          ],
+          "output": null
+        }
+      },
+      {
+        "title": "修改深拷贝的对象",
+        "explanation": "修改 `deep` 对象的 `address.city`。\n由于 `deep` 与 `original` 完全独立，原对象不受影响。",
+        "visualizationType": "memory",
+        "code": "deep.address.city = 'Incheon';",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            },
+            {
+              "name": "deep",
+              "value": "→ 0x004"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            },
+            {
+              "address": "0x004",
+              "content": "{ name: 'Alice', address: → 0x005 }"
+            },
+            {
+              "address": "0x005",
+              "content": "{ city: 'Incheon' }",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "最终检查原始对象",
+        "explanation": "即使修改了 `deep` 对象，`original.address.city` 仍然是 'Busan'——这是在浅拷贝操作时设置的值。",
+        "visualizationType": "memory",
+        "code": "console.log(original.address.city);",
+        "occurrence": 2,
+        "memoryState": {
+          "stack": [
+            {
+              "name": "original",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "shallow",
+              "value": "→ 0x003"
+            },
+            {
+              "name": "deep",
+              "value": "→ 0x004"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', address: → 0x002 }"
+            },
+            {
+              "address": "0x002",
+              "content": "{ city: 'Busan' }"
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Bob', address: → 0x002 }"
+            },
+            {
+              "address": "0x004",
+              "content": "{ name: 'Alice', address: → 0x005 }"
+            },
+            {
+              "address": "0x005",
+              "content": "{ city: 'Incheon' }",
+              "changed": true
+            }
+          ],
+          "output": [
+            "Alice",
+            "Busan",
+            "Busan"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "structuredClone() 的优势是什么？",
+    "options": [
+      "速度最快",
+      "能处理循环引用、Map、Set、Date 等",
+      "只支持浅拷贝",
+      "兼容 Internet Explorer"
+    ],
+    "correctIndex": 1,
+    "explanation": "structuredClone() 能处理循环引用、Map、Set、Date 等类型。\nJSON 方法无法处理这些类型。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "展开运算符可以完整复制对象",
+      "correct": "spread 是**浅拷贝**。\n它只复制顶层（深度 1），嵌套对象通过引用复制。",
+      "why": "要实现真正的深克隆，需要使用 `structuredClone()` 或递归复制。"
+    }
+  ],
+  "keyTakeaway": "浅拷贝：spread、Object.assign / 深拷贝：JSON、structuredClone"
+}

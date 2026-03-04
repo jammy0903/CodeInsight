@@ -1,0 +1,178 @@
+{
+  "lessonId": "c-13-4",
+  "title": "位运算符",
+  "concept": "位运算符在二进制位级别操作整数，是标志管理和性能优化的核心。",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    unsigned char a = 0b11001010;\n    unsigned char b = 0b10110101;\n\n    printf(\"a & b = %d\\n\", a & b);\n    printf(\"a | b = %d\\n\", a | b);\n    printf(\"a ^ b = %d\\n\", a ^ b);\n    printf(\"~a = %d\\n\", (unsigned char)~a);\n\n    int flags = 0;\n    flags |= (1 << 2);\n    printf(\"Set bit 2: %d\\n\", flags);\n    printf(\"Check bit 2: %d\\n\", (flags >> 2) & 1);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "通过 **`#include <stdio.h>`** 包含标准输入输出头文件以使用 `printf`。\n\n本课学习直接操作计算机最基本数据单位——**位（Bit）**的**位运算符**。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "**`int main()`** -- 程序的入口点，创建 main 栈帧。\n\n位运算是计算机处理数据的**最底层（low-level）**运算。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "用二进制初始化变量",
+        "explanation": "**`unsigned char a = 0b11001010;`**，**`unsigned char b = 0b10110101;`** -- `0b` 前缀表示**二进制字面量**。`unsigned char` 是**无符号 8 位整数**（0~255）。",
+        "visualizationType": "cMemory",
+        "code": "unsigned char a = 0b11001010;",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [
+          {
+            "name": "a",
+            "value": "202 (11001010)",
+            "type": "unsigned char",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "181 (10110101)",
+            "type": "unsigned char",
+            "address": "0x1001"
+          }
+        ]
+      },
+      {
+        "title": "AND 运算（&）- 两个都为 1 才为 1",
+        "explanation": "**`a & b`** -- **AND 运算**只有在两个位**都为 1** 时结果才为 1。`a: 11001010`，`b: 10110101` -> `a&b: 10000000` = **128**。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"a & b = %d\\n\", a & b);",
+        "stdout": "a & b = 128"
+      },
+      {
+        "title": "OR 运算（|）- 任一为 1 则为 1",
+        "explanation": "**`a | b`** -- **OR 运算**只要两个位中**有一个为 1**，结果就为 1。`a: 11001010`，`b: 10110101` -> `a|b: 11111111` = **255**。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"a | b = %d\\n\", a | b);",
+        "stdout": "a & b = 128\na | b = 255"
+      },
+      {
+        "title": "XOR 运算（^）- 不同则为 1",
+        "explanation": "**`a ^ b`** -- **XOR（异或）运算**在两个位**不同**时为 1，相同时为 0。`a: 11001010`，`b: 10110101` -> `a^b: 01111111` = **127**。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"a ^ b = %d\\n\", a ^ b);",
+        "stdout": "a & b = 128\na | b = 255\na ^ b = 127"
+      },
+      {
+        "title": "NOT 运算（~）- 位取反",
+        "explanation": "**`(unsigned char)~a`** -- **NOT 运算**将所有位取反。`a: 11001010` -> `~a: 00110101` = **53**。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"~a = %d\\n\", (unsigned char)~a);",
+        "stdout": "a & b = 128\na | b = 255\na ^ b = 127\n~a = 53"
+      },
+      {
+        "title": "初始化位标志",
+        "explanation": "**`int flags = 0;`** -- 现在来看位运算的实战应用——**位标志（Bit Flags）**。将 `flags` 初始化为 0 意味着所有 32 个位都处于关闭状态。",
+        "visualizationType": "cMemory",
+        "code": "int flags = 0;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "202 (11001010)",
+            "type": "unsigned char",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "181 (10110101)",
+            "type": "unsigned char",
+            "address": "0x1001"
+          },
+          {
+            "name": "flags",
+            "value": "0 (00000000)",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "用左移设置特定位",
+        "explanation": "**`flags |= (1 << 2);`** -- 这是"打开第 2 位"的命令。`1 << 2` 将 `00000001` 左移 2 位得到 `00000100`（=4），`flags |= 4` 进行 OR 赋值得到 `00000000 | 00000100 = 00000100`。",
+        "visualizationType": "cMemory",
+        "code": "flags |= (1 << 2);",
+        "stack": [
+          {
+            "name": "a",
+            "value": "202 (11001010)",
+            "type": "unsigned char",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "181 (10110101)",
+            "type": "unsigned char",
+            "address": "0x1001"
+          },
+          {
+            "name": "flags",
+            "value": "4 (00000100)",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "输出位设置结果",
+        "explanation": "**`printf(\"Set bit 2: %d\\n\", flags);`** -- `flags` 值 `4` 被输出。二进制 `00000100` 中只有第 2 位（从右边数第三个）是开启的。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Set bit 2: %d\\n\", flags);",
+        "stdout": "a & b = 128\na | b = 255\na ^ b = 127\n~a = 53\nSet bit 2: 4"
+      },
+      {
+        "title": "用右移检查特定位",
+        "explanation": "**`(flags >> 2) & 1`** -- 用于**检查**特定位是否开启的实用模式。`flags >> 2` 将位右移 2 位（`00000100` -> `00000001`），将目标位移到第 0 位，`& 1` 提取最后一位。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Check bit 2: %d\\n\", (flags >> 2) & 1);",
+        "stdout": "a & b = 128\na | b = 255\na ^ b = 127\n~a = 53\nSet bit 2: 4\nCheck bit 2: 1"
+      },
+      {
+        "title": "程序终止",
+        "explanation": "**`return 0;`** -- 程序正常终止，随着 main 栈帧的释放，所有局部变量从内存中回收。\n\n位运算符总结：`&`（AND，两个都为 1 才为 1）、`|`（OR，任一为 1 则为 1）、`^`（XOR，不同则为 1）、`~`（NOT，位取反）、`<<`（左移）、`>>`（右移）。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "执行 `flags |= (1 << 3);` 后 `flags` 的值是多少？（初始值：flags = 0）",
+    "options": [
+      "3",
+      "6",
+      "8",
+      "16"
+    ],
+    "correctIndex": 2,
+    "explanation": "`1 << 3` 将 1 左移 3 位得到 `00001000`（= 8）。\n`0 | 8 = 8`，所以 flags 的值为 8。\n左移 n 位等于乘以 2^n：1 x 2^3 = 8。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "位运算只在系统编程中使用。",
+      "correct": "位运算在权限管理、网络协议、游戏状态管理、图形学等多个领域都有应用。",
+      "why": "用一个整数就能高效管理多个状态，在内存和速度方面都有优势。"
+    }
+  ],
+  "keyTakeaway": "位运算符（&、|、^、~、<<、>>）在二进制位级别直接操作整数，是标志管理和性能优化的核心。"
+}

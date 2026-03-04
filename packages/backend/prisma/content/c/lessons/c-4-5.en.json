@@ -1,0 +1,109 @@
+{
+  "lessonId": "c-4-5",
+  "title": "Returning Stack Addresses",
+  "concept": "Never hand out the key to a room that will disappear when the function ends (a fatal bug)",
+  "content": {
+    "code": "#include <stdio.h>\n\nint* dangerousFunc() {\n    int x = 100;\n    return &x;\n}\n\nint main() {\n    int *p = dangerousFunc();\n\n    printf(\"%d\\n\", *p);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including Header",
+        "explanation": "`#include <stdio.h>` enables the output functions.\n\nThis example demonstrates why returning a local variable's address is dangerous.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The main frame is created and prepares to call `dangerousFunc`.\n\nThe key question is: \"Is a local variable's address valid after the function returns?\"",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Calling dangerousFunc",
+        "explanation": "The call creates a new frame with local variable `x=100` inside it.\n\nmain's `p` will receive the pointer value returned by the function.",
+        "visualizationType": "cMemory",
+        "code": "int *p = dangerousFunc();",
+        "highlightOffset": [
+          0,
+          -6
+        ],
+        "stack": [
+          {
+            "name": "p",
+            "value": "???",
+            "type": "int*",
+            "frame": "main"
+          },
+          {
+            "name": "x",
+            "value": "100",
+            "type": "int",
+            "frame": "dangerousFunc",
+            "address": "0x2000"
+          }
+        ]
+      },
+      {
+        "title": "Dangerous Return - Address of a Local Variable",
+        "explanation": "`return &x;` returns the address of a local variable that is about to be destroyed.\n\nAfter the function ends, that address becomes a dangling pointer with no valid target.",
+        "visualizationType": "cMemory",
+        "code": "return &x;",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0x2000",
+            "type": "int*",
+            "frame": "main",
+            "dangling": true
+          }
+        ]
+      },
+      {
+        "title": "Dereferencing a Dangling Pointer - Undefined Behavior",
+        "explanation": "Reading `*p` at this point is Undefined Behavior.\n\nThe value might appear correct by chance, could be garbage, or might crash the program — it cannot be trusted.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d\\n\", *p);",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0x2000",
+            "type": "int*",
+            "dangling": true,
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "??? (could be 100, garbage, or a crash)"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the safe way to return data created inside a function?",
+    "options": [
+      "Return the address of a local variable",
+      "Use a global variable",
+      "Return the address of a static variable or malloc (dynamically allocated) memory",
+      "Just printf inside the function and be done"
+    ],
+    "correctIndex": 2,
+    "explanation": "`static` variables are stored in the data segment, and `malloc` allocates in the heap — both persist after the function ends."
+  },
+  "misconceptions": [
+    {
+      "wrong": "C doesn't give a compile error for return &x",
+      "correct": "Most compilers only give a warning and let it pass.",
+      "why": "This is one of the most common mistakes beginners make.\nNever ignore the warning: \"Address of stack memory associated with local variable 'x' returned.\""
+    }
+  ],
+  "keyTakeaway": "Never return the address of a local variable (&local) outside the function."
+}

@@ -162,9 +162,13 @@ export class CTransformer implements IFlowTransformer {
           return;
         }
 
-        // 프레임 결정: block.frame 우선 → 위치 기반 currentFrame → dot-format 파싱
+        // 프레임 결정:
+        // 1) block.frame 필드 (명시적)
+        // 2) dot-format "swap.a" → frame: "swap" (시뮬레이터 출력)
+        // 3) 위치 기반 currentFrame (프레임 마커 이후 변수들)
         const dotParsed = parseVariableName(block.name ?? '');
-        const frame = block.frame || currentFrame || dotParsed.frame;
+        const hasDotPrefix = (block.name ?? '').includes('.');
+        const frame = block.frame || (hasDotPrefix ? dotParsed.frame : currentFrame);
         const name = dotParsed.name;
 
         const variable = this.toVariable(

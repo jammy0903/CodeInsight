@@ -264,8 +264,10 @@ export class PyTransformer implements IFlowTransformer {
     });
 
     // 2. 이름들을 FlowVariable로 변환 (참조 변수)
+    // Python dunder 변수 필터링 (__name__, __builtins__ 등 교육적 가치 없음)
+    const filteredNames = names.filter((n) => !(n.name.startsWith('__') && n.name.endsWith('__')));
     const nameVarMap = new Map<string, FlowVariable>();
-    names.forEach((name) => {
+    filteredNames.forEach((name) => {
       const obj = objectsMap.get(name.pointsTo);
       const variable = this.nameToVariable(name, obj);
       variables.push(variable);
@@ -281,7 +283,7 @@ export class PyTransformer implements IFlowTransformer {
 
       // 3-1. 글로벌 프레임
       const globalVarIds: string[] = [];
-      names.forEach((name) => {
+      filteredNames.forEach((name) => {
         if (name.scope === 'global' || !name.scope) {
           const varKey = `${name.scope || 'global'}-${name.name}`;
           const variable = nameVarMap.get(varKey);
@@ -318,7 +320,7 @@ export class PyTransformer implements IFlowTransformer {
       // === 정적 프레임 생성 (레슨 JSON 호환) ===
       const framesMap = new Map<string, string[]>();
 
-      names.forEach((name) => {
+      filteredNames.forEach((name) => {
         const scope = name.scope || 'global';
         const frameName = scope === 'global' ? 'global' : scope;
         const varKey = `${scope}-${name.name}`;

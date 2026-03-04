@@ -1,0 +1,626 @@
+{
+  "lessonId": "py-8-2",
+  "title": "Generator Functions: Easy Iterators",
+  "concept": "Use the `yield` keyword to conveniently create iterators without writing an iterator class.",
+  "content": {
+    "code": "def counter_generator(start, end):\n    print(\"제너레이터 시작!\")\n    current = start\n    while current < end:\n        yield current\n        current += 1\n    print(\"제너레이터 종료!\")\n\n# 제너레이터 객체 생성\ncounter = counter_generator(0, 3)\nprint(type(counter))\n\n# for loop은 제너레이터와도 동일하게 동작\nfor num in counter:\n    print(f\"Got: {num}\")",
+    "steps": [
+      {
+        "title": "Defining a Generator Function",
+        "explanation": "**`def counter_generator(start, end):`**\n\nWe define a function that contains the `yield` keyword. When Python sees `yield` in a function body, it recognizes the function as a **generator function**.\n\n**What is a generator function?**\nIn the previous lesson, creating an iterator required writing an **entire class** with `__iter__` and `__next__`.\nA generator function replaces all that complexity with **a single yield statement**!\n\n**Analogy: Regular function vs Generator function**\n- Regular function: A buffet that serves all dishes at once (return -> done in one go)\n- Generator function: A course meal that serves one dish per order (yield -> delivered one at a time)\n\n**Key difference**: A regular function's `return` **terminates** the function, but a generator's `yield` **suspends** it.\nOn the next call, execution resumes from where it left off!\n\n**Why this order?** The function must be defined before it can be used. At this point, only the function object is created; the body is not executed.\n\n**Execution order**: counter_generator function object (0x1100) created -> registered in global namespace",
+        "visualizationType": "pythonMemory",
+        "code": "def counter_generator(start, end):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "counter_generator function (0x1100) has been defined.",
+          "names": [
+            {
+              "name": "counter_generator",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a Generator Object",
+        "explanation": "**`counter = counter_generator(0, 3)`**\n\nWe call the generator function. **But something surprising happens!**\nNone of the code inside the function is executed. Instead, only a **generator object** is created and returned.\n\n**This is the most important characteristic of generators!**\nRegular function: `my_func()` -> function body executes immediately, result returned\nGenerator: `my_gen()` -> body does NOT execute! Only a generator object is returned\n\n**Notice that \"Generator started!\" has NOT been printed yet!**\nEven though the print statement is on the first line of the function, it hasn't executed.\nGenerators use **lazy** execution -- they do nothing until a value is actually needed.\n\n**Analogy**: You've only made a reservation (= function call) at a course meal restaurant. The chef hasn't started cooking yet. Only when the guest says \"bring me the first course\" (= next() call) does cooking actually begin.\n\n**Beginner note**: The result of `counter_generator(0, 3)` is NOT a list of numbers [0, 1, 2]! It's a generator **object**.\n\n**Execution order**: counter_generator(0, 3) called -> generator object (0x2000) created -> assigned to counter variable (body NOT executed!)",
+        "visualizationType": "pythonMemory",
+        "code": "counter = counter_generator(0, 3)",
+        "pythonMemoryState": {
+          "note": "Generator object (0x2000) has been created. (Internal code not yet executed)",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Type",
+        "explanation": "**`print(type(counter))`**\n\nWe check the type of counter. The output is `<class 'generator'>` -- a **generator object**!\n\n**Checking the type makes it even clearer:**\n- Result of calling a regular function: `int`, `str`, `list`, etc. -- actual values\n- Result of calling a generator function: a `generator` object (not a value!)\n\n**A generator object IS an iterator!**\nThe `__iter__` and `__next__` methods are automatically implemented, so it can be used directly in a for loop.\nWhat we manually implemented in the Counter class in the previous lesson, Python does automatically!\n\n**Why this order?** This is an educational step to confirm that calling a generator function produces an object, not a value.\n\n**Execution order**: type(counter) called -> 'generator' type confirmed -> printed",
+        "visualizationType": "pythonMemory",
+        "code": "print(type(counter))",
+        "pythonMemoryState": {
+          "output": [
+            "<class 'generator'>"
+          ],
+          "note": "Confirmed that the type is 'generator'.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "The for Loop Begins",
+        "explanation": "**`for num in counter:`**\n\nThe for loop starts iterating over the generator object!\n\n**Here's where the connection to the previous lesson becomes clear:**\nThe for loop uses the iterator protocol:\n1. Calls `counter.__iter__()` -> returns itself (a generator is also an iterator)\n2. Calls `counter.__next__()` -> **at this moment!** the function body finally starts executing!\n\n**Key point**: When the for loop calls __next__, the generator function's code begins executing from the start, progressing until it hits the first `yield`.\n\n**Analogy**: The guest has ordered \"bring me the first course.\" Now the chef finally starts cooking!\n\n**Why this order?** The generator object is ready, so we use a for loop to extract values one by one.\n\n**Execution order**: counter.__iter__() called -> returns itself -> first __next__() call -> function body starts executing!",
+        "visualizationType": "pythonMemory",
+        "code": "for num in counter:",
+        "pythonMemoryState": {
+          "note": "The for loop has started and requests the first value.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Generator Code First Execution",
+        "explanation": "**`print(\"Generator started!\")`**\n\n**The function body finally executes!** A long time after `counter_generator(0, 3)` was called, the print finally runs.\n\n**Let's clarify the execution timing:**\n- `counter = counter_generator(0, 3)` -> nothing executed\n- `print(type(counter))` -> still nothing executed\n- `for num in counter:` -> first __next__() call -> **NOW execution starts from here!**\n\nThis is the essence of **lazy evaluation**.\nExecution begins not when the function is defined, but at the point when a value is **actually needed**.\n\n**Analogy**: The chef finally enters the kitchen and announces \"Let's begin!\"\n\n**Why this order?** When __next__() is called, execution starts from the first line of the function body.\n\n**Execution order**: Generator execution context activated -> print statement executes -> \"Generator started!\" output",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"제너레이터 시작!\")",
+        "pythonMemoryState": {
+          "output": [
+            "제너레이터 시작!"
+          ],
+          "note": "The generator's internal code executes for the first time.",
+          "names": [
+            {
+              "name": "start",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Initializing current",
+        "explanation": "**`current = start`**\n\nInitializes the local variable `current` to start (0).\n\n**The amazing thing about generators: local variables stay alive!**\nIn regular functions, local variables disappear after return.\nBut in generators, **all local variable states are preserved** when suspended by yield!\nVariables like current, start, and end remain intact even after yield, and can be used when execution resumes.\n\n**Comparison with the previous lesson**:\n- Counter class: `self.current = start` (stored in instance variable)\n- Generator: `current = start` (just a local variable -> Python preserves it automatically!)\n\nCan you feel how much more concise generators are?\n\n**Execution order**: Assign start (0) value to current -> current = 0",
+        "visualizationType": "pythonMemory",
+        "code": "current = start",
+        "pythonMemoryState": {
+          "note": "Local variable current has been initialized to 0.",
+          "names": [
+            {
+              "name": "start",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "current",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 0,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "While Condition Check (1)",
+        "explanation": "**`while current < end:`**\n\ncurrent (0) < end (3)? **True!** We enter the while loop.\n\n**Comparison with the Counter class from the previous lesson:**\n- Counter: `if self.current >= self.end: raise StopIteration` (manual check every time)\n- Generator: `while current < end:` (natural loop -> automatic StopIteration when done)\n\n**The convenience of generators**: When the while loop ends (condition becomes False), the function terminates and Python **automatically raises StopIteration**.\nNo need to write `raise StopIteration` yourself like in the Counter class!\n\n**Execution flow**: Inside this while loop, when yield is encountered, execution suspends. On the next __next__ call, it resumes from the line after yield (current += 1).\n\n**Execution order**: Check 0 < 3 -> True -> enter while loop body",
+        "visualizationType": "pythonMemory",
+        "code": "while current < end:",
+        "pythonMemoryState": {
+          "note": "The condition 0 < 3 is true.",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 0,
+              "pyId": "1005"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Value Yield",
+        "explanation": "**`yield current`**\n\n**This is the generator's core keyword: `yield`!**\nIt returns the current value **0** to the for loop and **suspends** the function's execution.\n\n**The critical difference between yield and return:**\n- `return`: Returns a value + **terminates** the function (local variables are destroyed)\n- `yield`: Returns a value + **suspends** the function (local variables are preserved!)\n\n**What is preserved when yield suspends:**\n1. All local variables (current=0, start=0, end=3)\n2. The current execution position (the line with yield)\n3. The while loop's state\n\nWhen __next__ is called next, all this state is restored and execution resumes from **the line right after yield** (`current += 1`).\n\n**Analogy**: It's like placing a bookmark in a book and closing it. The next time you open it, you continue reading from the bookmark.\n\n**At this point**: 0 is assigned to num in the for loop, and the generator is asleep.\n\n**Execution order**: Return current (0) -> save execution position -> generator suspends -> control passes to the for loop",
+        "visualizationType": "pythonMemory",
+        "code": "yield current",
+        "pythonMemoryState": {
+          "note": "Yields value 0 and execution is suspended. Control passes to the for loop.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            },
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Value Output",
+        "explanation": "**`print(f\"Got: {num}\")`**\n\nSince the value **0** returned by yield is in `num`, it prints \"Got: 0\".\n\n**Current state of the program:**\n- Generator: suspended at yield (current=0, next execution starts at current += 1)\n- for loop: executing loop body with num=0\n- Output: \"Generator started!\", \"<class 'generator'>\", \"Got: 0\"\n\n**One cycle of the for loop**:\n1. __next__() called -> generator wakes up\n2. Value (0) received from yield -> num = 0\n3. Loop body (print) executes\n4. __next__() called again -> generator resumes...\n\n**Execution order**: print(\"Got: 0\") executes -> back to top of loop -> __next__() called -> generator resumes",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Got: {num}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Got: 0"
+          ],
+          "note": "Got: 0 has been printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Incrementing current (1)",
+        "explanation": "**`current += 1`**\n\nThe for loop requested the next value (__next__()), so **the generator wakes up!**\nExecution resumes from the very next line after where it paused at yield: `current += 1`.\n\n**The resumption process in detail:**\n1. The for loop calls __next__()\n2. The generator finds the next line after where it last stopped (yield current)\n3. Preserved local variables are restored (current=0, start=0, end=3)\n4. `current += 1` executes -> current = 1\n\n**This is the magic of yield!** The function continues executing \"from the middle.\"\nThis behavior is absolutely impossible with regular functions.\n\n**Analogy**: Opening a bookmarked book again and starting to read from the sentence after where you stopped.\n\n**Execution order**: Generator resumes -> executes the line after yield -> current 0 -> 1 incremented",
+        "visualizationType": "pythonMemory",
+        "code": "current += 1",
+        "pythonMemoryState": {
+          "note": "Execution resumes and current has increased to 1.",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 1,
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "While Condition Check (2)",
+        "explanation": "**`while current < end:`**\n\nAfter current += 1, we return to the top of the while loop and check the condition again.\ncurrent (1) < end (3)? **True!** There are still values to yield, so the loop continues.\n\n**Execution flow inside the generator**:\nyield -> (suspend) -> (resume) -> current += 1 -> **while condition check** -> yield -> (suspend) -> ...\n\nThis repetition continues until current >= end.\nThe while loop inside the generator and the for loop outside alternate execution!\n\n**Execution order**: Check 1 < 3 -> True -> enter while loop body -> move to next yield",
+        "visualizationType": "pythonMemory",
+        "code": "while current < end:",
+        "pythonMemoryState": {
+          "note": "The condition 1 < 3 is true.",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int5"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 1,
+              "pyId": "1007"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Second Value Yield",
+        "explanation": "**`yield current`**\n\nReturns the second value **1** to the for loop and suspends again.\n\n**What happens each time yield executes**:\n1. Passes current's value (1) to the for loop\n2. Preserves all local variable states (current=1, start=0, end=3)\n3. Saves the execution position (this yield line)\n4. Passes control to the for loop\n\nThe exact same process as the first yield, but current has changed from 0 to 1.\n\n**Pattern summary**: Each time the while loop completes one iteration, it encounters yield once, returning one value each time.\nThis is the principle behind how generators \"produce values one at a time\"!\n\n**Execution order**: yield current (1) -> suspend -> num = 1 in for loop",
+        "visualizationType": "pythonMemory",
+        "code": "yield current",
+        "pythonMemoryState": {
+          "note": "Yields value 1 and suspends.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int6",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 1,
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Second Value Output",
+        "explanation": "**`print(f\"Got: {num}\")`**\n\nPrints the value **1** returned by yield. \"Got: 1\" appears on the screen.\n\n**Output so far**:\n1. \"Generator started!\" (print inside the generator)\n2. \"<class 'generator'>\" (type check)\n3. \"Got: 0\" (first yield value)\n4. \"Got: 1\" (second yield value) <- now!\n\nRemaining value: 2 (one more yield when current is 2)\n\n**Execution order**: print(\"Got: 1\") executes -> back to top of for loop -> __next__() called -> generator resumes",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Got: {num}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Got: 1"
+          ],
+          "note": "Got: 1 has been printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 1,
+              "pyId": "1008"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Incrementing current (2)",
+        "explanation": "**`current += 1`**\n\nThe generator resumes again and executes from the line after yield. current increases from 1 to **2**.\n\n**State change tracking**:\n- 1st: yield 0 -> current 0->1\n- 2nd: yield 1 -> current 1->2 <- now!\n- 3rd: yield 2 -> current 2->3 (equals end -> exit while)\n\n**On the next while condition check**: current (2) < end (3) -> True -> one more yield possible!\n\n**Execution order**: Generator resumes -> current 1 -> 2 incremented",
+        "visualizationType": "pythonMemory",
+        "code": "current += 1",
+        "pythonMemoryState": {
+          "note": "Execution resumes and current has increased to 2.",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int7",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 2,
+              "pyId": "1009",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "While Condition Check (3)",
+        "explanation": "**`while current < end:`**\n\ncurrent (2) < end (3)? **True!** We enter the while loop body one last time.\n\n**This is the last yield!** After yielding current=2 and current increasing to 3, the next while condition check becomes 3 < 3 -> **False**, breaking out of the while loop.\n\n**Full yield flow preview**: yield 0 -> yield 1 -> yield **2** (now) -> exit while -> function ends -> StopIteration\n\n**Execution order**: Check 2 < 3 -> True -> enter while loop body for the last time",
+        "visualizationType": "pythonMemory",
+        "code": "while current < end:",
+        "pythonMemoryState": {
+          "note": "The condition 2 < 3 is true.",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int7"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 2,
+              "pyId": "1009"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Third Value Yield",
+        "explanation": "**`yield current`**\n\nReturns the **last value 2** to the for loop and suspends.\n\n**What will happen after this yield**:\n1. In the for loop: num = 2, print(\"Got: 2\") executes\n2. The for loop calls __next__() again\n3. Generator resumes -> current += 1 -> current = 3\n4. while 3 < 3 -> **False** -> exit while loop!\n5. print(\"Generator finished!\") executes\n6. Function reaches the end -> **automatic StopIteration raised**\n7. The for loop detects StopIteration and terminates\n\n**This is the natural termination process of a generator.** No need to write raise StopIteration like in the Counter class!\n\n**Execution order**: yield current (2) -> suspend -> num = 2 in for loop",
+        "visualizationType": "pythonMemory",
+        "code": "yield current",
+        "pythonMemoryState": {
+          "note": "Yields value 2 and suspends.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int8",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            },
+            {
+              "id": "int8",
+              "type": "int",
+              "value": 2,
+              "pyId": "1010",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Third Value Output",
+        "explanation": "**`print(f\"Got: {num}\")`**\n\nPrints the generator's last value **2**. \"Got: 2\" appears on the screen.\n\n**Complete Got output**: Got: 0, Got: 1, Got: 2 -- the same result as Counter(0, 3)!\n\n**Comparison: Counter class from the previous lesson vs Generator:**\n- Counter class: 15 lines (class + __init__ + __iter__ + __next__ + raise StopIteration)\n- Generator: 6 lines (def + print + current = start + while + yield + current += 1)\n\nThe same result with **far less code**!\n\n**Execution order**: print(\"Got: 2\") executes -> back to top of for loop -> __next__() called -> generator's final resumption",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Got: {num}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Got: 2"
+          ],
+          "note": "Got: 2 has been printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int8"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int8",
+              "type": "int",
+              "value": 2,
+              "pyId": "1010"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Incrementing current (3)",
+        "explanation": "**`current += 1`**\n\nThe generator resumes for the last time. current increases from 2 to **3**.\n\n**Now current (3) == end (3)!**\nOn the next while condition check, 3 < 3 -> **False**, causing the while loop to exit.\n\n**Final state change summary**:\n- Start: current=0 -> yield 0\n- After 1st: current=1 -> yield 1\n- After 2nd: current=2 -> yield 2\n- After 3rd: current=3 -> exit while -> function ends!\n\n**Execution order**: Generator resumes -> current 2 -> 3 incremented -> move to while condition check",
+        "visualizationType": "pythonMemory",
+        "code": "current += 1",
+        "pythonMemoryState": {
+          "note": "Execution resumes and current has increased to 3.",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int9",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 3,
+              "pyId": "1011",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "While Condition Check (4) - Exit",
+        "explanation": "**`while current < end:`**\n\ncurrent (3) < end (3)? **False!** The while loop finally **exits**!\n\n**Why is this moment important?**\nSince yield only existed inside the while loop, exiting the loop means there are no more values to yield.\nThe remaining code (print statement) executes, then the function terminates.\n\n**What happens when a generator function terminates?**\nPython automatically raises a `StopIteration` exception!\nWhat we had to manually write with `raise StopIteration` in the Counter class, Python handles for us.\n\n**Key point**: In generators, \"function termination = StopIteration\". There's no need to explicitly raise the exception.\n\n**Execution order**: Check 3 < 3 -> False -> exit while loop -> move to code after while (print statement)",
+        "visualizationType": "pythonMemory",
+        "code": "while current < end:",
+        "pythonMemoryState": {
+          "note": "The condition 3 < 3 is false, so the loop exits.",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int9"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 3,
+              "pyId": "1011"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Generator Termination",
+        "explanation": "**`print(\"Generator finished!\")`**\n\nAfter exiting the while loop, the last line of the function -- the print statement -- executes.\n\"Generator finished!\" is printed.\n\n**Then the function reaches its end!**\nWhen a generator function reaches its end (or encounters return), Python **automatically raises StopIteration**.\nThe for loop detects this StopIteration and silently terminates.\n\n**Complete execution flow summary:**\n1. `counter_generator(0, 3)` called -> only generator object created (no code executed)\n2. `for num in counter:` -> __next__() called -> function body starts executing\n3. First yield 0 -> suspend -> Got: 0 printed\n4. Resume -> current 1 -> yield 1 -> suspend -> Got: 1 printed\n5. Resume -> current 2 -> yield 2 -> suspend -> Got: 2 printed\n6. Resume -> current 3 -> exit while -> \"Generator finished!\" -> function ends -> StopIteration -> for loop terminates\n\n**Key lesson**: A generator function automatically handles the complex iterator protocol with just a single yield!\n\n**Execution order**: \"Generator finished!\" printed -> function end reached -> StopIteration automatically raised -> for loop terminates",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"제너레이터 종료!\")",
+        "pythonMemoryState": {
+          "output": [
+            "제너레이터 종료!"
+          ],
+          "note": "The function terminates, StopIteration is raised, and the for loop ends.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the most accurate description of the `yield` keyword's role?",
+    "options": [
+      "It terminates the function immediately.",
+      "It returns a value and suspends the function's execution.",
+      "It raises an error.",
+      "It returns a value but the function continues executing."
+    ],
+    "correctIndex": 1,
+    "explanation": "`yield` is the core of generators. It sends a value out, saves the current state, and pauses execution."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Calling a generator function immediately executes its code.",
+      "correct": "At the time of the call, only a generator object is created. The code only executes when `next()` is called.",
+      "why": "Generators are designed for 'lazy' execution.\nThey only compute values when needed, saving memory."
+    }
+  ],
+  "keyTakeaway": "`yield` returns a value and 'suspends' execution right there. On the next call, it resumes from where it left off."
+}

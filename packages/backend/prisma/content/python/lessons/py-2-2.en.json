@@ -1,0 +1,324 @@
+{
+  "lessonId": "py-2-2",
+  "title": "While Loop: Repeat Until the Condition Is Met",
+  "concept": "Keeps repeating as long as the condition is True (watch out for infinite loops)",
+  "content": {
+    "code": "count = 3\n\nwhile count > 0:\n    print(f\"Count: {count}\")\n    count = count - 1\n\nprint(\"Liftoff!\")",
+    "steps": [
+      {
+        "title": "Initializing the Counter Variable",
+        "explanation": "**`count = 3`** -- Initializes the counter variable to the integer `3`.\n\nPython executes from top to bottom. The label `count` is attached to the integer object `3`.\n\n**Why this order?** Since `count` is used in the loop (line 3), the variable must be created first. A `NameError` occurs if the variable referenced in the `while` condition doesn't exist.\n\n**Analogy:** It's like setting the counter to 3 before starting a rocket launch countdown. \"3, 2, 1, Liftoff!\" We'll repeat until this counter reaches 0.\n\n**How Python works internally:** `3` is within the Small Integer Cache range, so the pre-cached object is reused. Each time `count` is decremented in the while loop, a new integer object (2, 1, 0) is bound to `count`. Since integers are immutable, `3` itself doesn't change to `2`.\n\n**Note:** The initial value of the counter variable in a while loop determines how many times the loop iterates. Starting with `count = 0` would make the condition False from the start, and the loop would never execute.",
+        "visualizationType": "pythonMemory",
+        "code": "count = 3",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Loop Condition (1st time)",
+        "explanation": "**`while count > 0:`** -- Checks the while loop condition: is `count` greater than 0?\n\nThe condition `count > 0` is evaluated. Since `count` is `3`, `3 > 0` is **True**. Since the condition is true, the indented block (lines 4-5) is executed.\n\n**Difference between while and if:** `if` executes the block **only once** when the condition is True. `while` **keeps repeating** as long as the condition is True. After the block finishes, it checks the condition again, and if True, executes again.\n\n**Analogy:** If `if` means 'pass through once if the door is open,' `while` means 'keep going back and forth as long as the door is open.'\n\n**How Python works internally:** The while loop is implemented in bytecode as a cycle: condition evaluation -> conditional jump -> block execution -> unconditional jump (back to condition).\n\n**Note:** If the condition stays True forever, you'll enter an **infinite loop**! `while True: print(\"infinite\")` will never end. You must force-quit with `Ctrl+C`.",
+        "visualizationType": "pythonMemory",
+        "code": "while count > 0:",
+        "pythonMemoryState": {
+          "note": "Condition True -> line 4 will execute",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Current Count (1st time)",
+        "explanation": "**`print(f\"Count: {count}\")`** -- Prints the current count value using an f-string.\n\nSince the while condition was True, the code inside the indented block executes in order. In the f-string, `{count}` is replaced with the current value `3`, printing `\"Count: 3\"`.\n\n**Analogy:** This is the step of calling out the current number in a rocket launch countdown. \"Count: 3!\" After this, we'll decrease the counter by 1 and check again.\n\n**How Python works internally:** The f-string internally calls `count.__format__('')` to get the string `\"3\"`, combines it with the `\"Count: \"` literal, and creates a new string object `\"Count: 3\"`. This string is passed to `print()` and output to `sys.stdout`.\n\n**Note:** Code inside the block is delimited by **indentation** (typically 4 spaces). Inconsistent indentation causes an `IndentationError`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Count: {count}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Count: 3"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Decrementing the Counter (1st time)",
+        "explanation": "**`count = count - 1`** -- Subtracts 1 from the current value of `count` and reassigns the result to `count`.\n\nThe right side `count - 1` is evaluated first. Since `count` is `3`, `3 - 1 = 2`. A new integer object `2` is created, and the `count` label is moved from the old `3` to the new `2`.\n\n**Why is this line essential?** Without it, `count` would forever be `3`, `3 > 0` would forever be `True`, resulting in an **infinite loop**. A while loop **must** contain code that can eventually make the condition False.\n\n**Analogy:** It's the act of decreasing the countdown number by 1. After shouting \"3!\", you turn the counter to 2. Without this line, it would repeat \"3! 3! 3!...\" forever.\n\n**How Python works internally:** `count - 1` internally calls `count.__sub__(1)`. Since integers are immutable, the `3` object doesn't change to `2` -- a **completely new integer object `2`** is created. Only the `count` label moves to the new object. (You can also write `count -= 1`.)\n\n**Note:** Python does **not** have `count--` or `--count` increment/decrement operators! You must use `count = count - 1` or `count -= 1`.",
+        "visualizationType": "pythonMemory",
+        "code": "count = count - 1",
+        "pythonMemoryState": {
+          "note": "count changed -> return to line 3",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Loop Condition (2nd time)",
+        "explanation": "**`while count > 0:`** -- Automatically returned to the condition from the end of the block. This is the 2nd condition check.\n\n**Why did we return to line 3?** This is the core mechanism of the while loop. When the last line of the block (lines 4-5) is executed, Python **automatically jumps back to the condition (line 3)**. The programmer doesn't need to write \"go to line 3.\"\n\nCurrently `count` is `2` (we just subtracted 1 from 3). `2 > 0` is **True**, so the block executes again.\n\n**Analogy:** This is the second round of the countdown. \"Is the counter still greater than 0?\" -> \"It's 2, still positive!\" -> Execute the block again.",
+        "visualizationType": "pythonMemory",
+        "code": "while count > 0:",
+        "pythonMemoryState": {
+          "note": "2nd iteration begins",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Current Count (2nd time)",
+        "explanation": "**`print(f\"Count: {count}\")`** -- Prints the current count value in the 2nd iteration.\n\nSince the while condition was True, the code inside the block executes again. In the f-string, `{count}` is replaced with the current value `2`, printing `\"Count: 2\"`.\n\n**Pattern recognition:** Looking at the output so far, values are decreasing: `Count: 3` -> `Count: 2`. This pattern repeats in the while loop as the counter decreases until the condition becomes False.\n\n**Analogy:** The second call of the countdown. \"Count: 2!\" After this, we'll decrease the counter by 1 again.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Count: {count}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Count: 2"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Decrementing the Counter (2nd time)",
+        "explanation": "**`count = count - 1`** -- Decreases `count` by 1 again, making it `1`.\n\nSubtracts 1 from `count`'s current value `2`, creates a new integer object `1`, and moves the `count` label to it.\n\n**Pattern recognition:** The same action repeats every iteration: print -> decrement -> check condition. This is the typical while loop pattern. The counter is decreasing `3 -> 2 -> 1`, and when it becomes `1 -> 0` in the next iteration, the condition will be False.\n\n**How Python works internally:** `count.__sub__(1)` is called again, creating a new integer object `1`. The previous `2` object is no longer referenced. `1` is also within the Small Integer Cache range, so the cached object is reused.",
+        "visualizationType": "pythonMemory",
+        "code": "count = count - 1",
+        "pythonMemoryState": {
+          "note": "count changed -> return to line 3",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 1,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Loop Condition (3rd time)",
+        "explanation": "**`while count > 0:`** -- 3rd condition check. Automatically jumped back to the condition from the end of the block.\n\nCurrently `count` is `1`. `1 > 0` is **True**, so the block executes one more time.\n\n**Analogy:** The final round of the countdown. \"Still greater than 0?\" -> \"It's 1, still positive!\" -> Execute the block one last time. After this iteration, count will become 0 and the loop will end at the next condition check.\n\n**Full iteration tracking:** 1st (count=3, True) -> 2nd (count=2, True) -> **3rd (count=1, True)** -> next when count=0, terminates with False",
+        "visualizationType": "pythonMemory",
+        "code": "while count > 0:",
+        "pythonMemoryState": {
+          "note": "3rd iteration begins",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 1,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Current Count (3rd time)",
+        "explanation": "**`print(f\"Count: {count}\")`** -- Prints the current count value in the 3rd (final) iteration.\n\nIn the f-string, `{count}` is replaced with the current value `1`, printing `\"Count: 1\"`. This is the last output from the loop.\n\n**Full output tracking:** `Count: 3` -> `Count: 2` -> **`Count: 1`** -> `Liftoff!` will be printed next.\n\n**Analogy:** The final call of the countdown. \"Count: 1!\" When the counter becomes 0 next, \"Liftoff!\" will be shouted.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Count: {count}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Count: 1"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 1,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Decrementing the Counter (3rd time)",
+        "explanation": "**`count = count - 1`** -- Decreases `count` by 1, finally making it `0`.\n\nSubtracts 1 from `count`'s current value `1`, creates a new integer object `0`, and moves the `count` label to it.\n\n**Critical moment!** `count` has finally become `0`. At the next condition check, `0 > 0` will be **False** and the while loop will terminate. This is the **termination condition**.\n\n**Analogy:** The moment of turning the counter to 0 after calling out the last number in the countdown. Now when asked \"Is it greater than 0?\" the answer is \"No!\" and the countdown ends.\n\n**Counter history:** 3 -> 2 -> 1 -> **0** (termination point)",
+        "visualizationType": "pythonMemory",
+        "code": "count = count - 1",
+        "pythonMemoryState": {
+          "note": "count is now 0 -> next condition check will be False",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Loop Condition (Termination)",
+        "explanation": "**`while count > 0:`** -- 4th condition check. This time the condition is **False** and the loop terminates.\n\nAutomatically jumped back to the condition from the end of the block. Currently `count` is `0`. `0 > 0` is **False**, so Python skips the while block and exits to the first line of code outside the loop (line 7).\n\n**Why does it terminate?** Because we decreased `count` by 1 on every iteration. It went from `3 -> 2 -> 1 -> 0`, and the condition finally became False. This is the normal termination mechanism of a while loop.\n\n**Analogy:** In the countdown, \"Still greater than 0?\" -> \"It's 0, so no!\" -> Countdown over, now we launch!\n\n**Full condition check log:** 1st (3>0=True) -> 2nd (2>0=True) -> 3rd (1>0=True) -> **4th (0>0=False, terminates)**\n\n**Note:** When a while loop's condition becomes False, it **does not execute the code inside the block** and immediately exits the loop.",
+        "visualizationType": "pythonMemory",
+        "code": "while count > 0:",
+        "pythonMemoryState": {
+          "note": "Condition False -> loop ends -> jump to line 7",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "After the Loop Ends",
+        "explanation": "**`print(\"Liftoff!\")`** -- Code outside the while loop that executes after the loop terminates.\n\n**Why does it execute now?** This `print` statement has no indentation, so it's **outside** the while loop. While the loop was iterating, this line couldn't be reached. Only now, after the condition became False and the loop was exited, does it execute.\n\n`Liftoff!` is printed to the screen, and since there's no more code to execute, the program ends.\n\n**Full output:** `Count: 3` -> `Count: 2` -> `Count: 1` -> **`Liftoff!`**\n\n**Analogy:** After the countdown (3, 2, 1) is complete, the rocket finally launches! The countdown (while loop) is over, and the launch (code outside the loop) executes.\n\n**The importance of indentation:** If this `print` were indented and **inside** the while block, it would execute on every iteration: `Count: 3`, `Liftoff!`, `Count: 2`, `Liftoff!`, ... A single indentation change completely alters the program's behavior!",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Liftoff!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Liftoff!"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following while statements will never stop (infinite loop)?",
+    "options": [
+      "while False: print(1)",
+      "i=5\nwhile i > 0: i -= 1",
+      "while True: print('Run')",
+      "while 1 == 0: pass"
+    ],
+    "correctIndex": 2,
+    "explanation": "`while True:` runs forever if there's no termination condition.\nYou must force-quit with `Ctrl + C`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Python has count--",
+      "correct": "Python does NOT have `++` or `--` operators.",
+      "why": "You must use `i += 1` or `i -= 1`."
+    }
+  ],
+  "keyTakeaway": "while loops run as long as the condition is true. You must change a variable to eventually make it stop."
+}

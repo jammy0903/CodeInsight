@@ -19,7 +19,6 @@ export interface MemoryBlockCardProps {
   isHovered: boolean;
   frameColor: FrameColor;
   frameName: string;
-  registerLabel?: 'rsp' | 'rbp';
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 }
@@ -30,7 +29,6 @@ export function MemoryBlockCard({
   isHovered,
   frameColor,
   frameName,
-  registerLabel,
   onMouseEnter,
   onMouseLeave,
 }: MemoryBlockCardProps) {
@@ -167,24 +165,6 @@ export function MemoryBlockCard({
           />
         )}
 
-        {/* RSP/RBP 레지스터 인디케이터 */}
-        {registerLabel && (
-          <div className="absolute -right-16 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            <svg width="32" height="12" viewBox="0 0 32 12" className="flex-shrink-0">
-              <line x1="8" y1="6" x2="32" y2="6" stroke={COLORS.register[registerLabel].border} strokeWidth="2" />
-            </svg>
-            <div
-              className="px-2 py-0.5 rounded text-[10px] font-bold"
-              style={{
-                backgroundColor: COLORS.register[registerLabel].bg,
-                color: COLORS.register[registerLabel].text,
-                border: `1px solid ${COLORS.register[registerLabel].border}`,
-              }}
-            >
-              {registerLabel.toUpperCase()}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Dangling 뱃지 */}

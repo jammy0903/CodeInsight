@@ -1,0 +1,136 @@
+{
+  "lessonId": "js-9-2",
+  "title": "生成器",
+  "concept": "生成器是一种特殊函数，可以在执行中途暂停（Yield）并在之后恢复（Resume）。",
+  "content": {
+    "code": "function* counter() {\n  console.log('Start!');\n  yield 1; // Pause execution (return value 1)\n  console.log('Resumed!');\n  yield 2; // Pause execution (return value 2)\n  console.log('Done!');\n}\n\n// Calling the function doesn't run it — it returns an Iterator (control object)\nconst gen = counter();\n\nconsole.log(gen.next()); // { value: 1, done: false }\nconsole.log(gen.next()); // { value: 2, done: false }\nconsole.log(gen.next()); // { value: undefined, done: true }",
+    "steps": [
+      {
+        "title": "定义生成器函数",
+        "explanation": "`function*` 语法表示这是一个生成器函数。\n\n**什么是生成器？**\n普通函数一旦调用就会执行到底（Run-to-completion），但生成器可以在中途暂停并在之后恢复。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "counter",
+              "value": "GeneratorFunction"
+            }
+          ]
+        },
+        "code": "function* counter() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "title": "创建生成器对象",
+        "explanation": "调用 `counter()` 不会运行函数体——而是返回一个**生成器对象（Iterator）**。\n这个对象让你可以控制函数何时执行。",
+        "keyInsight": "调用生成器函数 = 创建迭代器，而非运行函数",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "gen",
+              "value": "Generator { status: 'suspended' }"
+            }
+          ]
+        },
+        "code": "const gen = counter();"
+      },
+      {
+        "title": "第一次 next() 调用",
+        "explanation": "调用 `gen.next()` 首次启动函数。\n输出 'Start!'，然后在 `yield 1` 处暂停执行。\n\n**什么是 Yield？**\n一个暂停执行的关键字——将控制权和值交还给调用者，同时保持执行上下文完整。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "시작!",
+            "{ value: 1, done: false }"
+          ],
+          "heap": [
+            {
+              "address": "0xGen",
+              "content": "Generator { suspended at line 3 }"
+            }
+          ]
+        },
+        "code": "console.log(gen.next()); // { value: 1, done: false }",
+        "highlightOffset": [
+          0,
+          -10,
+          -9
+        ]
+      },
+      {
+        "title": "第二次 next() 调用",
+        "explanation": "再次调用 `gen.next()` 从 `yield 1` 之后的位置恢复。\n输出 'Resumed!'，然后在 `yield 2` 处再次暂停。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "재개!",
+            "{ value: 2, done: false }"
+          ],
+          "heap": [
+            {
+              "address": "0xGen",
+              "content": "Generator { suspended at line 5 }"
+            }
+          ]
+        },
+        "code": "console.log(gen.next()); // { value: 2, done: false }",
+        "highlightOffset": [
+          0,
+          -9,
+          -8
+        ]
+      },
+      {
+        "title": "第三次 next() 调用——完成",
+        "explanation": "最后一次 `gen.next()` 调用。\n输出 'Done!'，由于没有更多的 yield，返回 `done: true`。",
+        "keyInsight": "done: true = 生成器已完全执行完毕",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "끝!",
+            "{ value: undefined, done: true }"
+          ],
+          "heap": [
+            {
+              "address": "0xGen",
+              "content": "Generator { closed }"
+            }
+          ]
+        },
+        "code": "console.log(gen.next()); // { value: undefined, done: true }",
+        "highlightOffset": [
+          0,
+          -8
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "什么信号表示生成器函数已完全执行完毕？",
+    "options": [
+      "value: null",
+      "done: true",
+      "status: finished",
+      "yield: undefined"
+    ],
+    "correctIndex": 1,
+    "explanation": "当返回 IteratorResult 对象 `{ value: ..., done: true }` 时，表示没有更多代码可以运行了。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "生成器像多线程一样并发运行",
+      "correct": "不是——它们仍然在单线程上运行。",
+      "why": "生成器只是来回传递执行控制权（协作式多任务），它们不会同时运行。\n任何时候都只有一件事在执行。"
+    }
+  ],
+  "keyTakeaway": "因为可以暂停和恢复函数执行，生成器对于编写看起来像同步代码的异步代码很有用（例如 Redux-Saga）。"
+}

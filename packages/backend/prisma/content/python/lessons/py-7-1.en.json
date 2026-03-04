@@ -1,0 +1,379 @@
+{
+  "lessonId": "py-7-1",
+  "title": "Reference Counting",
+  "concept": "Objects are automatically deleted when their reference count reaches 0! Check with sys.getrefcount()!",
+  "content": {
+    "code": "import sys\n\na = [1, 2, 3]\nprint(f\"a만 참조: {sys.getrefcount(a)}\")\n\nb = a  # 같은 객체 참조\nprint(f\"a, b 참조: {sys.getrefcount(a)}\")\n\nc = a  # 또 참조\nprint(f\"a, b, c 참조: {sys.getrefcount(a)}\")\n\ndel b  # 참조 제거\nprint(f\"del b 후: {sys.getrefcount(a)}\")",
+    "steps": [
+      {
+        "title": "Importing the sys Module",
+        "explanation": "**`import sys`**\n\nLoads Python's **built-in system module `sys`** into memory.\nThe `sys` module contains various utility functions related to the Python interpreter.\n\n**What this line does**: It prepares us to use a special function called `sys.getrefcount()`.\nThis function tells us **how many names are currently referencing a specific object** as a number.\n\n**Analogy: Turning on a library system**\nJust like you need to turn on the checkout system at a library before you can ask \"How many people have borrowed this book?\",\nyou need to import the `sys` module first to check reference counts.\n\n**Why this order?** Python executes code from top to bottom, one line at a time.\nTo use `sys.getrefcount()` later, `import sys` must be executed first.\n\n**Note**: `import` only needs to be executed once at the start of the program. Even if you import the same module multiple times, only the first one actually loads it.\n\n**Execution order**: import sys -> sys module loaded -> 'sys' name registered in global namespace -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "import sys",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "sys module import complete",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'sys'>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a List Object and First Reference",
+        "explanation": "**`a = [1, 2, 3]`**\n\n**Creating a list object**: Python creates a new list object `[1, 2, 3]` in memory (0x2000) and connects the variable `a` to point to (reference) this object.\n\n**What is Reference Counting?**\nPython internally manages a number for every object: \"How many names are pointing to this object?\"\nThis number is called the **Reference Count (refcount)**.\nCurrently, the only name pointing to the `[1, 2, 3]` object is `a`, so refcount = 1.\n\n**Analogy: Library checkout card**\nImagine a checkout card attached to a book (object).\nEvery time someone borrows the book, their name is added to the card.\nRight now, only `a` has borrowed it, so there's 1 name on the card.\nWhat if there are 0 names on the card? Nobody's reading the book, so the library discards it!\n\n**Why this order?** After the sys module import is done, the next line executes in sequence.\n\n**Memory model**: Variable `a` is not the object itself, but a **label (tag)** that points to the object.\nThink of the label `a` as being attached to the list at memory location 0x2000.\n\n**Execution order**: [1, 2, 3] list created (0x2000) -> a = 0x2000 (refcount=1) -> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "a = [1, 2, 3]",
+        "pythonMemoryState": {
+          "note": "List object created, refcount=1",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3] (refcount=1)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Reference Count (getrefcount)",
+        "explanation": "**`print(f\"a만 참조: {sys.getrefcount(a)}\")`**\n\nCalls `sys.getrefcount(a)` to check the **reference count** of the list object (0x2000) that `a` points to.\n\n**Why does it output 2? (Key point!)**\nSince only `a` references this object, you'd expect 1, but **2** is printed.\nThe reason is that when calling `getrefcount(a)`, **a temporary reference is added (+1)** to pass it as the function's parameter.\n\n1. Actual reference: `a` (1)\n2. Temporary reference: `getrefcount()` function parameter (only +1 during the call)\n3. Total: 1 + 1 = **2**\n\n**Analogy: Looking up a book at the library**\nWhen you ask the librarian \"How many people have borrowed this book?\", the librarian has to hold the book briefly while checking.\nSo the displayed number = actual borrowers + librarian (temporary).\n\n**Caution (a common point of confusion for beginners)**: The result of `getrefcount()` is always **1 greater than the actual reference count**!\nActual refcount = getrefcount() result - 1\n\n**Why this order?** Right after creating the list, it's natural to check whether the reference count is really 1.\n\n**Execution order**: sys.getrefcount(a) called -> refcount read (2) -> f-string evaluated -> print executed -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a만 참조: {sys.getrefcount(a)}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a만 참조: 2"
+          ],
+          "note": "getrefcount() = actual(1) + temporary(1) = 2",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3] (refcount=1)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding a Second Reference (b = a)",
+        "explanation": "**`b = a`**\n\n**Key concept**: This line does **not** create a new list!\nIt connects variable `b` to point to the **exact same list object (0x2000)** as `a`.\n\n**Reference count change**:\n- Before: `a` alone references it -> refcount = 1\n- Now: `a` and `b` both reference it -> refcount = 2\n\n**Analogy: Two nameplates on one house**\nThere's only one house (object 0x2000), but two nameplates (`a`, `b`) are hung on the front door.\nWhether you visit via `a` or `b`, you arrive at the same house.\n\n**Why not a copy?**\nIn Python, `b = a` does not copy the object. They share the same memory address.\nIf you do `b.append(4)`, checking via `a` will also show `[1, 2, 3, 4]`!\nIf you want a real copy, use `b = a.copy()` or `b = a[:]`.\n\n**Why this order?** After the previous print completes, the next line executes in sequence.\n\n**Execution order**: b = a -> b points to 0x2000 -> refcount increases 1->2 -> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "b = a  # 같은 객체 참조",
+        "pythonMemoryState": {
+          "note": "b = a executed, refcount increased 1->2",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3] (refcount=2)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Increased Reference Count (2 references)",
+        "explanation": "**`print(f\"a, b 참조: {sys.getrefcount(a)}\")`**\n\nNow we check the reference count of the object (0x2000) that `a` points to again.\nSince we added a reference with `b = a`, the result should be different.\n\n**Calculation**:\n1. Actual references: `a`, `b` (2)\n2. Temporary reference: +1 when `getrefcount(a)` is called as a parameter\n3. Result: 2 + 1 = **3**\n\n**Fun fact**: Both `sys.getrefcount(a)` and `sys.getrefcount(b)` return **the same result (3)**.\nBecause `a` and `b` point to **the same object**!\nThe refcount belongs to the **object**, not the variable.\n\n**Analogy**: Earlier the checkout card only had `a` on it, but now `b` has been added too.\nWhen the librarian checks, they say \"2 borrowers + I'm briefly holding it = 3\".\n\n**Why this order?** After b = a completes, it's natural to check whether the reference count increased.\n\n**Execution order**: sys.getrefcount(a) called -> refcount read (3) -> f-string evaluated -> print executed -> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a, b 참조: {sys.getrefcount(a)}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a, b 참조: 3"
+          ],
+          "note": "getrefcount() = actual(2) + temporary(1) = 3",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3] (refcount=2)",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding a Third Reference (c = a)",
+        "explanation": "**`c = a`**\n\nVariable `c` is also connected to point to the **same list object (0x2000)**.\nNow one list object can be accessed through three names: `a`, `b`, `c`.\n\n**Reference count change**:\n- Before: `a`, `b` (2) -> refcount = 2\n- Now: `a`, `b`, `c` (3) -> refcount = 3\n\n**Key point: There is still only ONE list!**\nNo matter how many variables there are, the list `[1, 2, 3]` in memory is **just one**.\nThe variables are all just labels pointing to the same memory address (0x2000).\n\n**Analogy: Nicknames for one person**\n\"John\", \"Johnny\", \"Big J\" all refer to the same person.\nHaving 3 names doesn't mean there are 3 people!\n\n**Memory efficiency**: Having multiple variables share the same object saves memory.\nHowever, be careful -- if you modify the object through one variable, the change is visible through all other variables.\n\n**Why this order?** After the previous output completes, the next line executes in sequence.\n\n**Execution order**: c = a -> c points to 0x2000 -> refcount increases 2->3 -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "c = a  # 또 참조",
+        "pythonMemoryState": {
+          "note": "c = a executed, refcount increased 2->3",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "c",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3] (refcount=3)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Further Increased Reference Count (3 references)",
+        "explanation": "**`print(f\"a, b, c 참조: {sys.getrefcount(a)}\")`**\n\nNow we check the reference count of the object (0x2000) that `a` points to once more.\nSince the third reference `c` was added, the number should have gone up again.\n\n**Calculation**:\n1. Actual references: `a`, `b`, `c` (3)\n2. Temporary reference: +1 when `getrefcount(a)` is called\n3. Result: 3 + 1 = **4**\n\n**Summary of reference count progression**:\n```\na = [1, 2, 3]  -> actual refcount = 1 (getrefcount output: 2)\nb = a          -> actual refcount = 2 (getrefcount output: 3)\nc = a          -> actual refcount = 3 (getrefcount output: 4)\n```\nSee the pattern? Every time a reference is added, the output increases by exactly 1.\n\n**Analogy**: We're observing names being added to the checkout card one by one.\n\n**Why this order?** After c = a completes, we verify the reference count went up again.\n\n**Execution order**: sys.getrefcount(a) called -> refcount read (4) -> f-string evaluated -> print executed -> line 12",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a, b, c 참조: {sys.getrefcount(a)}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a, b, c 참조: 4"
+          ],
+          "note": "getrefcount() = actual(3) + temporary(1) = 4",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "c",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3] (refcount=3)",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Removing a Reference (del b)",
+        "explanation": "**`del b`**\n\nDeletes variable `b` using the `del` keyword. But there's a very important distinction here!\n\n**What del does (precise understanding)**:\n- Completely removes the name `b` from the namespace.\n- Attempting to use `b` afterwards will raise a `NameError`.\n\n**What del does NOT do (a common misconception among beginners)**:\n- It does **not** delete the list object `[1, 2, 3]` itself!\n- The object is still in memory, referenced by `a` and `c`.\n\n**Reference count change**:\n1. The connection between `b` and the object it pointed to (0x2000) is severed\n2. refcount decreases: 3 -> 2\n3. refcount is not 0, so the object survives (a and c are still referencing it)\n\n**Analogy: Erasing a name from the checkout card**\n`b` returned the book. `b`'s name was erased from the checkout card, but `a` and `c` are still borrowing it, so the book is not discarded.\n\n**What if all references disappear?**\nIf `del a`, `del b`, and `del c` are all executed, refcount becomes 0, and CPython **immediately** frees the memory!\n\n**Why this order?** After confirming references increasing, this flow now demonstrates them decreasing.\n\n**Execution order**: del b -> remove b from namespace -> refcount decreases 3->2 -> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "del b  # 참조 제거",
+        "pythonMemoryState": {
+          "note": "del b executed, refcount decreased 3->2 (object is still alive!)",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            },
+            {
+              "name": "c",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3] (refcount=2)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Decreased Reference Count",
+        "explanation": "**`print(f\"del b 후: {sys.getrefcount(a)}\")`**\n\nFinal check to see if the reference count actually decreased after `del b`.\n\n**Calculation**:\n1. Actual references: `a`, `c` (2) - `b` was deleted and no longer exists!\n2. Temporary reference: +1 when `getrefcount(a)` is called\n3. Result: 2 + 1 = **3**\n\n**Full reference counting flow summary**:\n```python\na = [1, 2, 3]  # refcount = 1 (getrefcount output: 2)\nb = a          # refcount = 2 (getrefcount output: 3)\nc = a          # refcount = 3 (getrefcount output: 4)\ndel b          # refcount = 2 (getrefcount output: 3) <- decreased!\n```\n\n**Core principle of Python memory management**:\n- Python (CPython) tracks the reference count of each object in **real-time**.\n- Memory is freed **immediately** when refcount reaches 0 (unlike GC in other languages!).\n- This approach is fast and predictable, but has the circular reference problem (covered in the next lesson).\n\n**Comparison with other languages**: Java and C# have garbage collectors that handle things **later in bulk**,\nbut CPython cleans up **immediately** when refcount reaches 0. This is why the timing of `__del__` destructor calls is predictable.\n\n**Execution order**: sys.getrefcount(a) called -> refcount read (3) -> f-string evaluated -> print executed -> program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"del b 후: {sys.getrefcount(a)}\")",
+        "pythonMemoryState": {
+          "output": [
+            "del b 후: 3"
+          ],
+          "note": "getrefcount() = actual(2) + temporary(1) = 3",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "c",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3] (refcount=2)",
+              "pyId": "1002"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens when the reference count reaches 0?",
+    "options": [
+      "Nothing happens",
+      "The object is immediately deleted from memory",
+      "An error occurs",
+      "The garbage collector deletes it later"
+    ],
+    "correctIndex": 1,
+    "explanation": "In CPython, when the reference count reaches 0, the object is immediately freed from memory.\nThis is the advantage of reference counting -- cleanup happens instantly with no delay!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "del deletes the object",
+      "correct": "del only deletes the name (reference); the object is deleted when refcount=0",
+      "why": "If other variables point to the same object, the object stays alive even after del."
+    },
+    {
+      "wrong": "getrefcount() shows the exact reference count",
+      "correct": "A temporary reference of +1 is added during the function call, so the result is always 1 higher",
+      "why": "A temporary reference is created when passed as an argument.\nActual value = output value - 1"
+    }
+  ],
+  "keyTakeaway": "Python manages memory with reference counting! If refcount=0, the object is immediately deleted!"
+}

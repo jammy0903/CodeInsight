@@ -1,0 +1,206 @@
+{
+  "lessonId": "js-6-2",
+  "title": "构造函数与继承",
+  "concept": "构造函数的 prototype 属性成为通过 new 创建的对象的 [[Prototype]]",
+  "content": {
+    "code": "function Animal(name) {\n  this.name = name;\n}\nAnimal.prototype.eat = function() {\n  return this.name + ' eats';\n};\n\nfunction Dog(name) {\n  Animal.call(this, name);\n}\nDog.prototype = Object.create(Animal.prototype);\nDog.prototype.constructor = Dog;\nDog.prototype.bark = function() {\n  return 'Woof!';\n};\n\nconst buddy = new Dog('Buddy');\nconsole.log(buddy.name);\nconsole.log(buddy.eat());\nconsole.log(buddy.bark());",
+    "steps": [
+      {
+        "title": "向 Animal.prototype 添加方法",
+        "explanation": "将 `eat` 方法添加到 `Animal.prototype`。\n所有 `Animal` 的实例都会通过原型链共享这个 `eat` 方法。",
+        "keyInsight": "向 prototype 添加方法 = 所有实例共享",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "constructor",
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ]
+        },
+        "code": "Animal.prototype.eat = function() {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "Dog 构造函数 + 调用父构造函数",
+        "explanation": "在 `Dog` 构造函数内部，我们调用 `Animal.call(this, name)`。\n这将新对象（`this`）传递给 `Animal` 构造函数，初始化 `name` 属性——与类中的 `super()` 作用相同。",
+        "keyInsight": "Animal.call(this) = 运行父构造函数（相当于 super()）",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "functions": [
+            {
+              "name": "Animal",
+              "prototype": "Animal.prototype"
+            },
+            {
+              "name": "Dog",
+              "prototype": "Dog.prototype"
+            }
+          ]
+        },
+        "code": "function Dog(name) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "连接原型链",
+        "explanation": "`Object.create(Animal.prototype)` 创建一个新的空对象，其原型指向 `Animal.prototype`，然后将其赋值给 `Dog.prototype`。\n这建立了 `Dog` 和 `Animal` 之间的继承关系。",
+        "keyInsight": "Object.create(Parent.prototype) = 连接继承链",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "Dog.prototype",
+              "props": [],
+              "proto": "Animal.prototype"
+            },
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ],
+          "chain": [
+            "Dog.prototype",
+            "Animal.prototype",
+            "Object.prototype"
+          ]
+        },
+        "code": "Dog.prototype = Object.create(Animal.prototype);",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "向 Dog.prototype 添加方法",
+        "explanation": "将 `bark` 方法添加到 `Dog.prototype`。\n现在 `Dog` 的实例可以同时使用 `bark` 和 `eat`。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "Dog.prototype",
+              "props": [
+                "constructor",
+                "bark()"
+              ],
+              "proto": "Animal.prototype"
+            }
+          ]
+        },
+        "code": "Dog.prototype.bark = function() {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "创建实例",
+        "explanation": "使用 `new Dog('Buddy')` 创建 `buddy` 实例。\n在创建过程中，`Animal.call` 运行使 `buddy.name` 被设置为 'Buddy'，且 `buddy` 的 `[[Prototype]]` 指向 `Dog.prototype`。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "buddy",
+              "props": [
+                "name: 'Buddy'"
+              ],
+              "proto": "Dog.prototype"
+            },
+            {
+              "name": "Dog.prototype",
+              "props": [
+                "constructor",
+                "bark()"
+              ],
+              "proto": "Animal.prototype"
+            },
+            {
+              "name": "Animal.prototype",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ],
+          "chain": [
+            "buddy",
+            "Dog.prototype",
+            "Animal.prototype",
+            "Object.prototype"
+          ]
+        },
+        "code": "const buddy = new Dog('Buddy');"
+      },
+      {
+        "title": "访问自身属性",
+        "explanation": "查找 `buddy.name`。\n`name` 属性直接存在于 `buddy` 上，所以立即返回 'Buddy'。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy"
+          ]
+        },
+        "code": "console.log(buddy.name);"
+      },
+      {
+        "title": "调用父原型方法",
+        "explanation": "查找 `buddy.eat()`。\n在 `buddy` 自身找不到，所以沿着链向上遍历，在 `Animal.prototype` 上找到了 `eat`。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats"
+          ]
+        },
+        "code": "console.log(buddy.eat());"
+      },
+      {
+        "title": "调用子原型方法",
+        "explanation": "查找 `buddy.bark()`。\n不在 `buddy` 自身，但在 `Dog.prototype`（链中的下一步）上找到了 `bark`。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats",
+            "Woof!"
+          ]
+        },
+        "code": "console.log(buddy.bark());"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "如果省略 Dog.prototype.constructor = Dog; 会发生什么？",
+    "options": [
+      "抛出错误",
+      "buddy.constructor 指向 Animal",
+      "继承失效",
+      "完全没有影响"
+    ],
+    "correctIndex": 1,
+    "explanation": "使用 Object.create() 创建新对象时，它没有 constructor 属性。\n然后沿着链查找到 Animal.prototype.constructor（= Animal）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "设置 Dog.prototype = Animal.prototype 可以实现继承",
+      "correct": "这会让 Dog.prototype 和 Animal.prototype 成为同一个对象。\n添加到 Dog 的任何方法也会被添加到 Animal 上。",
+      "why": "必须使用 Object.create() 创建一个新的中间对象来进行链接。"
+    }
+  ],
+  "keyTakeaway": "构造函数继承 = Animal.call(this) + Object.create(Animal.prototype)"
+}

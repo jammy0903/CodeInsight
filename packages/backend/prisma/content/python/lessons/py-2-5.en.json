@@ -1,0 +1,436 @@
+{
+  "lessonId": "py-2-5",
+  "title": "String Interning",
+  "concept": "Python reuses some string objects automatically for performance!",
+  "content": {
+    "code": "a = \"hello\"\nb = \"hello\"\nprint(f\"a is b: {a is b}\")\n\nx = \"hello world\"\ny = \"hello world\"\nprint(f\"x is y: {x is y}\")\n\ns1 = \"hello\" + \" \" + \"world\"\ns2 = \"hello world\"\nprint(f\"s1 is s2: {s1 is s2}\")",
+    "steps": [
+      {
+        "title": "Creating a Short String",
+        "explanation": "**`a = \"hello\"`** -- Creates a short, space-free string object `\"hello\"` and attaches the label `a`.\n\nPython executes from top to bottom in order. The string object `\"hello\"` is created in memory, and the label `a` is attached to this object.\n\n**The key topic of this lesson -- What is String Interning?** Python **stores short, frequently used strings only once** in memory and **reuses** them for performance optimization. Even if you use the same string content multiple times, only 1 object exists in memory. This is called **String Interning**.\n\n**Which strings are interning candidates?** Generally, strings that meet these criteria are interned:\n- Short strings without spaces (e.g., `\"hello\"`, `\"abc\"`, `\"x\"`)\n- Strings that look like variable names or keywords (containing only letters, digits, and underscores)\n\n`\"hello\"` is a short string without spaces, so it's an interning candidate.\n\n**Analogy:** It's like a library that doesn't buy multiple copies of a popular book -- they keep just 1 copy and let multiple people share it.\n\n**How Python works internally:** The CPython interpreter stores string literals in an internal dictionary (intern table) during code compilation. When the same string appears again, it looks up the existing object in this dictionary and reuses it.\n\n**Execution order**: line 1 -> string object created (id: 0x1000) -> a = 0x1000 -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "a = \"hello\"",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Reusing the Same String",
+        "explanation": "**`b = \"hello\"`** -- Instead of creating a new object, it points to the **exact same object (0x1000)** as `a`.\n\n**Why isn't a new object created?** When Python compiles the code, if it finds the same string literal (`\"hello\"`), it **reuses the object already registered in the intern table**. So `b` doesn't create a new `\"hello\"` object -- it points to the **same memory address (0x1000)** that `a` points to.\n\n**This is the essence of String Interning:** Only **1** `\"hello\"` object exists in memory, and both labels `a` and `b` share the same object. This not only saves memory but also speeds up string comparison (since only addresses need to be compared).\n\n**Analogy:** Two library cards (a, b) pointing to the same book (\"hello\") in the library. There's only 1 physical copy of the book.\n\n**How Python works internally:** When the compiler encounters the `\"hello\"` literal, it searches the intern table for an identical string. Since it was already registered from `a = \"hello\"`, it returns a reference to that object. Only the reference count increases from 1 to 2.\n\n**Execution order**: line 2 -> found \"hello\" in intern table (0x1000) -> b = 0x1000 -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "b = \"hello\"",
+        "pythonMemoryState": {
+          "note": "a and b point to the same object (0x1000)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Identity Check (is)",
+        "explanation": "**`print(f\"a is b: {a is b}\")`** -- Checks if `a` and `b` are the **same object**. The result is `True`.\n\n**`is` vs `==` -- One of the most important distinctions in Python:**\n- **`==`**: Are the **values (contents)** the same? -> `\"hello\" == \"hello\"` is always True\n- **`is`**: Are they the **same object (memory address)**? -> Same meaning as `id(a) == id(b)`\n\nSince `a` and `b` both point to the same object (0x1000) thanks to String Interning, `a is b` is **True**. In this case, `a == b` is of course also True.\n\n**Analogy:** Checking if two people (a, b) live in the same house (0x1000). If they live in the same house, `is` is True. If they live in different houses but have identical furniture, only `==` is True.\n\n**How Python works internally:** The `is` operator compares the **memory addresses (id)** of the objects the two variables point to. At the C level, it's a simple pointer comparison, so it's very fast. `==` calls the `__eq__` method to compare contents character by character, so it can be slower.\n\n**Note:** The fact that this result is True is **thanks to the String Interning optimization**, not something that's always guaranteed. In the next step, we'll look at cases where interning doesn't happen.\n\n**Execution order**: is check (id(a)==id(b), 0x1000==0x1000) -> True -> f-string evaluated -> output",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a is b: {a is b}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a is b: True"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Creating a String with Spaces",
+        "explanation": "**`x = \"hello world\"`** -- Creates a string object containing a space. Interning is **not guaranteed** for strings like this.\n\nAfter the previous code finishes executing, execution proceeds to the next line in order. This time, a `\"hello world\"` string containing a space (` `) is created.\n\n**Why isn't interning guaranteed for this string?** Python's String Interning primarily applies to **strings that look like identifiers**. That is, strings composed only of letters, digits, and underscores (`_`). `\"hello world\"` contains a space, so it doesn't match identifier rules, and interning is not guaranteed.\n\n**Analogy:** Popular books (\"hello\") in a library are automatically added to the sharing list, but books with special titles (\"hello world\") are not automatic candidates. Whether they're registered depends on the librarian's (CPython's) judgment.\n\n**How Python works internally:** When CPython compiles to a `.pyc` file, identical string literals within the same module may be merged (constant folding). However, this is a different mechanism from interning, and results can vary depending on the execution environment (REPL vs script).\n\n**Execution order**: line 5 -> string object created (id: 0x2000) -> x = 0x2000 -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "x = \"hello world\"",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Same Long String Again",
+        "explanation": "**`y = \"hello world\"`** -- Creates a string with the same content as `x` again. Whether it points to the same object is **unpredictable**.\n\nA string with the exact same content as `x` (`\"hello world\"`) is created again. In this case, `y` might share the same object as `x`, or a separate new object might be created.\n\n**Why is it unpredictable?**\n- In CPython, constant strings from the same module can be merged (constant folding), but this is **not guaranteed by the language specification**\n- In the REPL (interactive mode), each line is compiled separately, so they're more likely to be different objects\n- In .py scripts, literals from the same file may be merged, so they could be the same object\n\nIn this example, we assume they are **different objects (0x2001)**.\n\n**Analogy:** When you write the same letter twice, the paper (object) can be different. The content is the same, but they're physically different sheets of paper.\n\n**How Python works internally:** Since this string is not an interning candidate, the intern table is not searched, and a new `str` object may be allocated on the heap. However, the compiler's constant folding optimization may result in the same object, which is an implementation detail.\n\n**Execution order**: line 6 -> new string object created (id: 0x2001) -> y = 0x2001 -> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "y = \"hello world\"",
+        "pythonMemoryState": {
+          "note": "x and y may be different objects (unpredictable)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Long String Identity Check",
+        "explanation": "**`print(f\"x is y: {x is y}\")`** -- Checks if `x` and `y` are the same object. In this example, the result is **False**.\n\n`x` (0x2000) and `y` (0x2001) have **the same content but are different objects**, so the `is` comparison returns `False`.\n\n**Key lesson:** **Never use `is` for string content comparison!** `is` compares object identity (memory address), and String Interning is **just an optimization, not something guaranteed by the language specification**.\n\n**The correct way to compare:**\n- `x == y` -> **True** (because the contents are the same) -- always use this!\n- `x is y` -> **Unpredictable** (True or False depending on whether interning occurred)\n\n**Analogy:** Checking if two letters have the same content (==) vs checking if they're the same piece of paper (is) are different things. To compare content, use `==`.\n\n**How Python works internally:** The `is` operator is identical to `id(x) == id(y)`. Since the addresses are different (0x2000 != 0x2001), False is returned. In contrast, `==` calls `x.__eq__(y)` to compare each character of the strings, so it returns True.\n\n**Execution order**: is check (id(x)!=id(y), 0x2000!=0x2001) -> False -> f-string evaluated -> output",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"x is y: {x is y}\")",
+        "pythonMemoryState": {
+          "output": [
+            "x is y: False"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Creating a String via Concatenation",
+        "explanation": "**`s1 = \"hello\" + \" \" + \"world\"`** -- Dynamically assembles a new string object **at runtime** using the `+` operator.\n\nThree string literals (`\"hello\"`, `\" \"`, `\"world\"`) are concatenated with the `+` operator. First `\"hello\" + \" \"` = `\"hello \"` is created, then `\"hello \" + \"world\"` = `\"hello world\"` is created.\n\n**Analogy:** Pre-printed books (literals) can be shared through the library, but handwritten copies (results of + operations) are not registered in the library system.\n\n**Performance tip:** Using `+` repeatedly to concatenate many strings is inefficient because a new object is created each time. Using `\"\".join(list)` or f-strings is much faster.\n\n**How Python works internally:** The `+` operator calls the `str.__add__()` method. The first `+` creates the intermediate string `\"hello \"`, and the second `+` creates the final string `\"hello world\"`. The intermediate string immediately becomes a candidate for garbage collection.",
+        "visualizationType": "pythonMemory",
+        "code": "s1 = \"hello\" + \" \" + \"world\"",
+        "pythonMemoryState": {
+          "note": "s1 is dynamically created (+ operation) -> not interned",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "str4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a String as a Literal",
+        "explanation": "**`s2 = \"hello world\"`** -- Created directly as a **string literal**. Same content as `s1`, but created differently.\n\n`s2` is a string literal written directly in the code. Since this string is the same literal as `y`, it may share the same object (0x2001) with `y` through the compiler's constant folding.\n\n**Key difference between s1 and s2:**\n- `s1`: **Dynamically created at runtime** via `+` operation (0x3000) -- not interned\n- `s2`: A **literal** written directly in the code (0x2001) -- can be shared with other literals\n\nBoth have the content `\"hello world\"`, but they are **different objects because they were created differently**.\n\n**Analogy:** One copy was made with a copier (s1, + operation), the other is a printed original (s2, literal). Same content, but physically different paper.\n\n**How Python works internally:** Since `s2` is a literal, it's processed at compile time. If a `\"hello world\"` literal already exists in the same module (used in y), the same constant object can be reused. However, `s1` was created at runtime with `+`, so it's unrelated to this constant pool.\n\n**Execution order**: line 10 -> reuse literal \"hello world\" (id: 0x2001) -> s2 = 0x2001 -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "s2 = \"hello world\"",
+        "pythonMemoryState": {
+          "note": "s2 may be the same object as y (literal)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "str4"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Comparing Strings Created Differently",
+        "explanation": "**`print(f\"s1 is s2: {s1 is s2}\")`** -- Checks if `s1` (created with `+`) and `s2` (literal) are the same object. The result is **False**.\n\n`s1` (0x3000, dynamically created at runtime) and `s2` (0x2001, compile-time literal) have the same content but are **different objects**, so the result is `False`.\n\n**Full comparison summary:**\n- `a is b` -> **True** (short literal, interned)\n- `x is y` -> **False** (string with spaces, interning not guaranteed)\n- `s1 is s2` -> **False** (dynamically created vs literal, different objects)\n- `a == b`, `x == y`, `s1 == s2` -> **All True** (because the contents are the same)\n\n**Analogy:** When comparing letters with the same content, don't ask if they're the same piece of paper (`is`) -- ask if the content is the same (`==`)!",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"s1 is s2: {s1 is s2}\")",
+        "pythonMemoryState": {
+          "output": [
+            "s1 is s2: False"
+          ],
+          "note": "s1 == s2 is True, but s1 is s2 is False!",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "str4"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "str3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is always the correct way to compare two strings?",
+    "options": [
+      "a is b",
+      "a == b",
+      "id(a) == id(b)",
+      "a is b or a == b"
+    ],
+    "correctIndex": 1,
+    "explanation": "Always use `==` for string comparison! `is` checks if they're the same object (memory address), which depends on Python's internal optimizations.\nTwo strings with the same content can be different objects."
+  },
+  "misconceptions": [
+    {
+      "wrong": "`is` and `==` do the same thing for strings",
+      "correct": "`is` checks object identity (memory address), `==` checks value equality (content).",
+      "why": "String interning is unpredictable.\nAlways use `==` for string comparison."
+    },
+    {
+      "wrong": "Strings with the same content are always the same object",
+      "correct": "Only some strings are interned, and the rules are complex.",
+      "why": "Whether interning occurs depends on the string content, creation method, and Python version."
+    }
+  ],
+  "keyTakeaway": "String interning is just an optimization, not a guarantee. Always use `==` for string comparison!"
+}

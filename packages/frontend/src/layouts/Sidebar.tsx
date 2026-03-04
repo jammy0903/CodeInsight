@@ -19,6 +19,7 @@ import { logout, loginWithGoogle } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
 import { ReportModal } from '@/components/ReportModal';
 import { logger } from '@/utils/logger';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 const SIDEBAR_WIDTH = 224; // 14rem
 
@@ -406,6 +407,11 @@ export function Sidebar() {
                   항상 사이드바 한 곳에서만 노출한다.
                   이유: 하단 고정 Next/Previous 네비와의 충돌/겹침을 방지하고
                   신고 액션 위치를 일관되게 유지하기 위함. */}
+              {/* 한/영 전환 */}
+              <div className="mt-3 flex justify-center">
+                <LanguageToggle />
+              </div>
+
               <motion.button
                 type="button"
                 whileHover={{ scale: 1.02, y: -2 }}

@@ -1,0 +1,96 @@
+{
+  "lessonId": "c-3-1",
+  "title": "数组的内存布局",
+  "concept": "数组就像内存中紧密相连的公寓楼",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n\n    printf(\"arr[0] Address: %p\\n\", &arr[0]);\n    printf(\"arr[1] Address: %p\\n\", &arr[1]);\n    printf(\"arr[2] Address: %p\\n\", &arr[2]);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "使用 `printf` 的标准输入输出头文件。\n\n本课通过输出地址来验证数组元素在内存中是连续存储的。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧，数组 `arr` 被放置其中。\n\n数组一次性分配"元素个数 x 类型大小"的连续空间。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "数组声明与内存分配",
+        "explanation": "`int arr[3] = {10, 20, 30};` 将 3 个整数存储在连续内存中。\n\n关键在于元素间距始终为 `sizeof(int)`，这一规律是指针运算的基础。",
+        "visualizationType": "cMemory",
+        "code": "int arr[3] = {10, 20, 30};",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "int[3]",
+            "address": "0x1000",
+            "value": "{10, 20, 30}"
+          }
+        ]
+      },
+      {
+        "title": "第一个元素的地址",
+        "explanation": "`&arr[0]` 输出数组的起始地址。\n\n数组名 `arr` 在大多数表达式中等同于 `&arr[0]`，因此可以从这里计算其他元素的地址。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"arr[0] Address: %p\\n\", &arr[0]);",
+        "stdout": "arr[0] Address: 0x1000"
+      },
+      {
+        "title": "第二个元素的地址",
+        "explanation": "`&arr[1]` 比 `&arr[0]` 大 `sizeof(int)` 个字节。\n\n即遵循规则：`&arr[n] = &arr[0] + n * sizeof(int)`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"arr[1] Address: %p\\n\", &arr[1]);",
+        "stdout": "arr[0] Address: 0x1000\narr[1] Address: 0x1004"
+      },
+      {
+        "title": "第三个元素的地址",
+        "explanation": "`&arr[2]` 也是按同一规则计算的连续地址。\n\n由于数组是连续存储结构，越界访问索引非常危险。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"arr[2] Address: %p\\n\", &arr[2]);",
+        "stdout": "arr[0] Address: 0x1000\narr[1] Address: 0x1004\narr[2] Address: 0x1008"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "`return 0;` 终止程序，栈上的数组内存被清理。\n\n要点：数组元素连续排列，地址间隔等于类型大小。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "stdout": ""
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "double arr[2]; 中如果 &arr[0] 在地址 100，那 &arr[1] 在哪里？",
+    "options": [
+      "地址 101",
+      "地址 104",
+      "地址 108",
+      "地址 116"
+    ],
+    "correctIndex": 2,
+    "explanation": "`double` 通常为 8 字节。\n数组紧密排列，所以下一个元素在 100 + 8 = 地址 108。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "可以之后改变数组大小",
+      "correct": "C 语言的基本数组是**固定大小**的。",
+      "why": "声明时栈上只分配那么多空间。\n要扩展需要使用 `malloc` 和 `realloc`。"
+    }
+  ],
+  "keyTakeaway": "数组元素紧密相连。地址差值等于类型大小（sizeof）。"
+}

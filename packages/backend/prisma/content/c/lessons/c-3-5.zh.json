@@ -1,0 +1,226 @@
+{
+  "lessonId": "c-3-5",
+  "title": "用指针遍历",
+  "concept": "不使用索引 (i)，而是通过移动指针 (p) 来遍历数组",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[] = {10, 20, 30, -1};\n    int *p = arr;\n\n    while (*p != -1) {\n        printf(\"%d \", *p);\n        p++;\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含头文件",
+        "explanation": "`#include <stdio.h>` 提供了输出函数的访问。\n\n本课讲解使用指针移动 (`p++`) 而非索引来遍历数组的模式。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧后，准备好数组和指针。\n\n接下来，`p` 将每次移动一个位置来读取值。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "数组声明",
+        "explanation": "`arr` 末尾的 `-1` 是一个哨兵值，用于标记遍历的终点。\n\n使用哨兵值可以在不需要额外长度变量的情况下确定终点。",
+        "visualizationType": "cMemory",
+        "code": "int arr[] = {10, 20, 30, -1};",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "指针初始化",
+        "explanation": "`p = arr` 使 `p` 指向第一个元素。\n\n现在在循环中，我们可以读取 `*p` 并通过 `p++` 移动到下一个元素。",
+        "visualizationType": "cMemory",
+        "code": "int *p = arr;",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1010",
+            "points_to": "arr"
+          }
+        ]
+      },
+      {
+        "title": "条件检查：*p 为 10（不是 -1）",
+        "explanation": "`*p` 为 10，不等于 `-1`，所以执行循环体。\n\n指针从 `arr[0]`（地址 `0x1000`）开始。",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1010",
+            "highlight": true,
+            "points_to": "arr"
+          }
+        ]
+      },
+      {
+        "title": "第 1 次迭代：打印 *p (10)",
+        "explanation": "`*p` 解引用指针，读取地址 `0x1000` 处的值，即 `10`。\n\n指针只读取值，不修改数组。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d \", *p);",
+        "stdout": "10 "
+      },
+      {
+        "title": "第 1 次迭代：p++ 移动到下一个元素",
+        "explanation": "`p++` 将指针前移 `sizeof(int)`（4 字节）：`0x1000` -> `0x1004`。\n\n现在 `p` 指向 `arr[1]`，其值为 `20`。",
+        "visualizationType": "cMemory",
+        "code": "p++;",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1004",
+            "type": "int*",
+            "address": "0x1010",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "条件检查：*p 为 20（不是 -1）",
+        "explanation": "`*p` 现在为 `20`，所以循环继续。\n\n每次迭代的流程：检查条件 -> 打印 -> 移动指针。",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "occurrence": 2
+      },
+      {
+        "title": "第 2 次迭代：打印 *p (20)",
+        "explanation": "打印地址 `0x1004` 处的值，即 `20`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d \", *p);",
+        "occurrence": 2,
+        "stdout": "10 20 "
+      },
+      {
+        "title": "第 2 次迭代：p++ 移动到下一个元素",
+        "explanation": "`p++` 从 `0x1004` 前进到 `0x1008`。\n\n现在 `p` 指向 `arr[2]`，其值为 `30`。",
+        "visualizationType": "cMemory",
+        "code": "p++;",
+        "occurrence": 2,
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1008",
+            "type": "int*",
+            "address": "0x1010",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "条件检查：*p 为 30（不是 -1）",
+        "explanation": "`*p` 为 `30`，循环再执行一次迭代。",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "occurrence": 3
+      },
+      {
+        "title": "第 3 次迭代：打印 *p (30)",
+        "explanation": "打印地址 `0x1008` 处的值，即 `30`。这是最后一个有效元素。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d \", *p);",
+        "occurrence": 3,
+        "stdout": "10 20 30 "
+      },
+      {
+        "title": "第 3 次迭代：p++ 移过最后一个元素",
+        "explanation": "`p++` 从 `0x1008` 前进到 `0x100c`。\n\n现在 `p` 指向 `arr[3]`，其中存储着哨兵值 `-1`。",
+        "visualizationType": "cMemory",
+        "code": "p++;",
+        "occurrence": 3,
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x100c",
+            "type": "int*",
+            "address": "0x1010",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "循环退出：*p 为 -1（发现哨兵值）",
+        "explanation": "`*p` 现在为 `-1`，所以 `*p != -1` 为假，循环终止。\n\n哨兵值成功地在正确的位置停止了遍历。",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "occurrence": 4
+      },
+      {
+        "title": "程序退出",
+        "explanation": "`return 0;` 终止程序。\n\n关键模式：读取 (`*p`) + 移动 (`p++`) + 哨兵终止条件。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "使用指针 p 遍历数组时需要注意什么？",
+    "options": [
+      "比使用索引更慢",
+      "有越界访问的风险",
+      "p++ 每次只移动 1 个字节",
+      "无法使用"
+    ],
+    "correctIndex": 1,
+    "explanation": "指针没有刹车。\n如果终止条件设置错误（未正确到达 `length` 或 `NULL` 字符），指针会继续读取数组末尾之后的内存，导致内存错误。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "现代编译器使指针遍历 (p++) 比索引访问 (arr[i]) 快得多",
+      "correct": "过去确实如此，但如今编译器优化使两者性能基本相同。",
+      "why": "从可读性角度来看，使用索引 (`arr[i]`) 通常是更好的选择。\n没有必要强行使用指针。"
+    }
+  ],
+  "keyTakeaway": "使用 `p++` 遍历数组是经典的 C 语言模式。但要小心悬崖（越界访问）。"
+}

@@ -1,0 +1,138 @@
+{
+  "lessonId": "c-6-2",
+  "title": "Char Array vs Char Pointer",
+  "concept": "A modifiable chalkboard (array) vs an immutable stone tablet (pointer)",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    char arr[] = \"Hello\";\n    arr[0] = 'B';\n    printf(\"%s\\n\", arr);\n\n    char *ptr = \"World\";\n    printf(\"%s\\n\", ptr);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "This header is needed to use `printf`.\n\nThis lesson covers the difference in mutability between `char arrays` and `char pointers`.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "The main frame is created.\n\nWe will compare how the same string representation differs in storage location and mutability.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Method 1: Char array declaration (modifiable)",
+        "explanation": "`char arr[] = \"Hello\";` copies the string into the array.\n\nArray elements can be modified just like regular memory.",
+        "visualizationType": "cMemory",
+        "code": "char arr[] = \"Hello\";",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Hello\\0",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Modifying array contents",
+        "explanation": "Changing an element with `arr[0] = ...` actually modifies the string content.\n\nThis is because arrays are writable storage.",
+        "visualizationType": "cMemory",
+        "code": "arr[0] = 'B';",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0",
+            "highlightIndex": 0,
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Printing the modified array",
+        "explanation": "The modified array string is printed, confirming the change took effect.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%s\\n\", arr);",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0",
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "Bello"
+      },
+      {
+        "title": "Method 2: Char pointer declaration (read-only)",
+        "explanation": "`char *ptr = \"World\";` points to a string literal's address.\n\nLiterals reside in read-only memory and cannot be modified.",
+        "visualizationType": "cMemory",
+        "code": "char *ptr = \"World\";",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0",
+            "address": "0x1000"
+          },
+          {
+            "name": "ptr",
+            "type": "char*",
+            "value": "0xRODATA",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "Printing the pointer's string",
+        "explanation": "Read-only strings can still be printed normally.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%s\\n\", ptr);",
+        "stdout": "Bello\nWorld"
+      },
+      {
+        "title": "What if you try to modify it? (Crash!)",
+        "explanation": "Attempting to write to a string literal can cause a runtime error.\n\nPointer strings should always be treated as read-only.",
+        "highlight": [],
+        "visualizationType": "cMemory",
+        "code": "printf(\"%s\\n\", ptr);"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "The program ends with `return 0;`.\n\nSummary: Array strings are modifiable; literal pointer strings are not.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "If you need to modify a string's contents, how should you declare it?",
+    "options": [
+      "char *str = \"...\"",
+      "const char *str = \"...\"",
+      "char str[] = \"...\"",
+      "#define STR \"...\""
+    ],
+    "correctIndex": 2,
+    "explanation": "Declaring with brackets (`[]`) creates a modifiable copy on the stack (or data segment).\nPointing to a string constant with (`*`) means you cannot modify it."
+  },
+  "misconceptions": [
+    {
+      "wrong": "char *s = \"A\"; is stored on the heap",
+      "correct": "It is stored in the code (text) segment, not the heap.",
+      "why": "Unless you use `malloc`, it is not on the heap.\nIt is a constant stored alongside the program code."
+    }
+  ],
+  "keyTakeaway": "Need to modify? Use `[]` (array). Read-only? Use `*` (pointer). Know the difference."
+}

@@ -1,0 +1,168 @@
+{
+  "lessonId": "py-15-2",
+  "title": "The with Statement and File Writing",
+  "concept": "The with statement is a safe way to automatically close files. Use write() to write content to files, and 'a' mode to append after existing content.",
+  "content": {
+    "code": "with open(\"output.txt\", \"w\") as f:\n    f.write(\"Hello, File!\\n\")\n    f.write(\"Second line\\n\")\n\nwith open(\"output.txt\", \"r\") as f:\n    content = f.read()\n    print(content)\n\nwith open(\"output.txt\", \"a\") as f:\n    f.write(\"Appended line\\n\")",
+    "steps": [
+      {
+        "title": "Opening a File with the with Statement (Write Mode)",
+        "explanation": "**`with open(\"notes.txt\", \"w\") as file:`** is the standard starting pattern for writing files.\n\nKey points:\n- `with` automatically closes the file when the block ends\n- Reduces the risk of missing cleanup (close) even if an exception occurs\n\n**Analogy**: Like an automatic door that locks automatically when you enter, do your work, and leave.\n\nBest practice:\n- File I/O should almost always use the `with ... open ...` pattern\n- Relying on manual `close()` is prone to bugs from missing it",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"w\") as f:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "with statement opened the file and assigned it to f. Auto-closes when block ends.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='w')",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Writing Content to a File (write)",
+        "explanation": "**`write()`** records a string to the file.\n\nThe important thing at this step is newline management.\n`write(\"hello\")` does not automatically add a newline, so you must append `\\n` yourself if needed.\n\n**Analogy**: Like writing in a notebook where you must manually move to the next line.\n\nKey points:\n- For writing multiple lines, use `write(... + \"\\n\")` or `writelines()` pattern\n- Converting non-string values with `str()` before writing is a safe habit",
+        "visualizationType": "pythonMemory",
+        "code": "    f.write(\"Hello, File!\\n\")",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Two lines written to file. Auto close() when with block ends.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='w') [written: 2 lines]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Reading the File Content Back",
+        "explanation": "**`with open(\"output.txt\", \"r\") as f:`**\n**`    content = f.read()`**\n**`    print(content)`** -- The previous `with` block ended, and the file was automatically closed. Now we reopen the same file in **read mode (\"r\")** to verify the contents.\n\nThis is a pattern for checking whether what we just wrote was actually saved to the file. A new `with` block opens the file in read mode, and `read()` retrieves all the content.\n\n**Analogy:** Like writing a letter (write), sealing the envelope (close), then reopening the envelope (open \"r\") to check that the content was written correctly (read).\n\n**Note:** In `\"r\"` mode, if the file doesn't exist, a `FileNotFoundError` is raised. However, since we just created it with `\"w\"` mode, it's safe here.",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"r\") as f:",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Hello, File!",
+            "Second line",
+            ""
+          ],
+          "note": "Content written in write mode was read back successfully.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file2",
+              "highlight": true
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='r')",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello, File!\nSecond line\n",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Opening a File in Append Mode",
+        "explanation": "**Append mode (`\"a\"`)** \"adds\" content to the end of an existing file.\n\nKey difference:\n- `\"w\"`: Erases existing content and starts fresh\n- `\"a\"`: Keeps existing content + adds after it\n\nFor logs, record accumulation, and history storage, `a` is the default choice.\n\n**Analogy**: `w` is like switching to a new notebook, `a` is like continuing to write on the next line of the last page in the existing notebook.\n\nNote:\n- If you forget the newline (`\\n`), new content sticks to the existing line, breaking readability",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"output.txt\", \"a\") as f:",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "'a' mode keeps existing content and appends to the end.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file3",
+              "type": "instance",
+              "value": "TextIOWrapper('output.txt', mode='a') [appended: 1 line]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the most important reason for using the with statement?",
+    "options": [
+      "It reads files faster",
+      "It automatically closes the file when the block ends, making it safe",
+      "It allows opening multiple files at once",
+      "It can also read binary files"
+    ],
+    "correctIndex": 1,
+    "explanation": "The key advantage of the with statement is that it automatically calls close() when the block ends or an error occurs.\nIt prevents the problem of forgetting close() or it not executing due to exceptions."
+  },
+  "misconceptions": [
+    {
+      "wrong": "\"w\" mode appends after existing content",
+      "correct": "\"w\" mode deletes all existing content and writes fresh. To append, use \"a\" mode",
+      "why": "\"w\" is write (overwrite), \"a\" is append (continue writing). Accidentally using \"w\" can result in data loss."
+    },
+    {
+      "wrong": "write() automatically adds a newline like print()",
+      "correct": "write() writes the string exactly as given; you must add \\n yourself if you need a newline",
+      "why": "print() adds end='\\n' by default, but write() records the raw string directly to the file."
+    }
+  ],
+  "keyTakeaway": "The with statement safely auto-closes files. \"w\" overwrites, \"a\" appends, and write() does not auto-add newlines."
+}

@@ -1,0 +1,178 @@
+{
+  "lessonId": "c-13-4",
+  "title": "Bitwise Operators",
+  "concept": "Bitwise operators manipulate integers at the binary bit level, and are essential for flag management and optimization.",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    unsigned char a = 0b11001010;\n    unsigned char b = 0b10110101;\n\n    printf(\"a & b = %d\\n\", a & b);\n    printf(\"a | b = %d\\n\", a | b);\n    printf(\"a ^ b = %d\\n\", a ^ b);\n    printf(\"~a = %d\\n\", (unsigned char)~a);\n\n    int flags = 0;\n    flags |= (1 << 2);\n    printf(\"Set bit 2: %d\\n\", flags);\n    printf(\"Check bit 2: %d\\n\", (flags >> 2) & 1);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "We include the standard I/O header with **`#include <stdio.h>`** to use `printf`.\n\nIn this lesson, we learn **bitwise operators** that directly manipulate **bits**, the most fundamental data unit of a computer.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "**`int main()`** -- The entry point of the program, a main stack frame is created.\n\nBitwise operations are the **lowest-level** operations that computers perform on data.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Initializing variables with binary values",
+        "explanation": "**`unsigned char a = 0b11001010;`**, **`unsigned char b = 0b10110101;`** -- The `0b` prefix denotes a **binary literal**. `unsigned char` is an **unsigned 8-bit integer** (0-255).",
+        "visualizationType": "cMemory",
+        "code": "unsigned char a = 0b11001010;",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [
+          {
+            "name": "a",
+            "value": "202 (11001010)",
+            "type": "unsigned char",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "181 (10110101)",
+            "type": "unsigned char",
+            "address": "0x1001"
+          }
+        ]
+      },
+      {
+        "title": "AND operation (&) - 1 only if both are 1",
+        "explanation": "**`a & b`** -- The **AND operation** results in 1 only when **both bits are 1**. `a: 11001010`, `b: 10110101` -> `a&b: 10000000` = **128**.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"a & b = %d\\n\", a & b);",
+        "stdout": "a & b = 128"
+      },
+      {
+        "title": "OR operation (|) - 1 if at least one is 1",
+        "explanation": "**`a | b`** -- The **OR operation** results in 1 when **at least one** of the two bits is 1. `a: 11001010`, `b: 10110101` -> `a|b: 11111111` = **255**.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"a | b = %d\\n\", a | b);",
+        "stdout": "a & b = 128\na | b = 255"
+      },
+      {
+        "title": "XOR operation (^) - 1 if they differ",
+        "explanation": "**`a ^ b`** -- The **XOR (eXclusive OR) operation** results in 1 when the two bits are **different**, and 0 when they are the same. `a: 11001010`, `b: 10110101` -> `a^b: 01111111` = **127**.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"a ^ b = %d\\n\", a ^ b);",
+        "stdout": "a & b = 128\na | b = 255\na ^ b = 127"
+      },
+      {
+        "title": "NOT operation (~) - bit inversion",
+        "explanation": "**`(unsigned char)~a`** -- The **NOT operation** inverts all bits. `a: 11001010` -> `~a: 00110101` = **53**.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"~a = %d\\n\", (unsigned char)~a);",
+        "stdout": "a & b = 128\na | b = 255\na ^ b = 127\n~a = 53"
+      },
+      {
+        "title": "Initializing bit flags",
+        "explanation": "**`int flags = 0;`** -- Now let's look at a practical application of bitwise operations: **bit flags**. Initializing `flags` to 0 means all 32 bits are in the off state.",
+        "visualizationType": "cMemory",
+        "code": "int flags = 0;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "202 (11001010)",
+            "type": "unsigned char",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "181 (10110101)",
+            "type": "unsigned char",
+            "address": "0x1001"
+          },
+          {
+            "name": "flags",
+            "value": "0 (00000000)",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "Setting a specific bit with left shift",
+        "explanation": "**`flags |= (1 << 2);`** -- This is the command to \"turn on bit 2\". `1 << 2` shifts `00000001` left by 2 positions to get `00000100` (=4), and `flags |= 4` OR-assigns to get `00000000 | 00000100 = 00000100`.",
+        "visualizationType": "cMemory",
+        "code": "flags |= (1 << 2);",
+        "stack": [
+          {
+            "name": "a",
+            "value": "202 (11001010)",
+            "type": "unsigned char",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "181 (10110101)",
+            "type": "unsigned char",
+            "address": "0x1001"
+          },
+          {
+            "name": "flags",
+            "value": "4 (00000100)",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "Printing the bit set result",
+        "explanation": "**`printf(\"Set bit 2: %d\\n\", flags);`** -- The value `4` is printed for `flags`. In binary `00000100`, only bit 2 (the third from the right) is on.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Set bit 2: %d\\n\", flags);",
+        "stdout": "a & b = 128\na | b = 255\na ^ b = 127\n~a = 53\nSet bit 2: 4"
+      },
+      {
+        "title": "Checking a specific bit with right shift",
+        "explanation": "**`(flags >> 2) & 1`** -- A practical pattern for **checking** whether a specific bit is on. `flags >> 2` shifts the bits right by 2 positions (`00000100` -> `00000001`), moving the target bit to position 0, and `& 1` extracts just the last bit.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Check bit 2: %d\\n\", (flags >> 2) & 1);",
+        "stdout": "a & b = 128\na | b = 255\na ^ b = 127\n~a = 53\nSet bit 2: 4\nCheck bit 2: 1"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "**`return 0;`** -- The program terminates normally, and as main's stack frame is deallocated, all local variables are returned to memory.\n\nBitwise operator summary: `&` (AND, 1 if both are 1), `|` (OR, 1 if at least one is 1), `^` (XOR, 1 if they differ), `~` (NOT, bit inversion), `<<` (left shift), `>>` (right shift).",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the value of `flags` after executing `flags |= (1 << 3);`? (Initial value: flags = 0)",
+    "options": [
+      "3",
+      "6",
+      "8",
+      "16"
+    ],
+    "correctIndex": 2,
+    "explanation": "`1 << 3` shifts 1 left by 3 positions to get `00001000` (= 8).\n`0 | 8 = 8`, so flags becomes 8.\nLeft shifting by n positions is equivalent to multiplying by 2^n: 1 x 2^3 = 8."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Bitwise operations are only used in systems programming.",
+      "correct": "Bitwise operations are used in various fields including permission management, network protocols, game state management, and graphics.",
+      "why": "A single integer can efficiently manage multiple states, providing advantages in both memory and speed."
+    }
+  ],
+  "keyTakeaway": "Bitwise operators (&, |, ^, ~, <<, >>) directly manipulate integers at the binary bit level, and are essential for flag management and performance optimization."
+}

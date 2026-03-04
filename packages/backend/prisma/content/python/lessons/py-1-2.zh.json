@@ -1,0 +1,451 @@
+{
+  "lessonId": "py-1-2",
+  "title": "数值类型：/ 和 // 的区别",
+  "concept": "整数（int）和浮点数（float）行为不同，且都是不可变对象",
+  "content": {
+    "code": "a = 10\nb = 3\n\nprint(a + b)\nprint(a / b)\nprint(a // b)\nprint(a % b)\n\npi = 3.14\nradius = 2.0\narea = pi * (radius ** 2)\nprint(area)",
+    "steps": [
+      {
+        "title": "创建整数变量 'a'",
+        "explanation": "**`a = 10`** -- 在内存中创建整数对象 `10`，并贴上标签 `a`。\n\n在 Python 中，即使数字 `10` 也是一个**对象**。在 C 语言中，`int a = 10;` 会分配 4 字节内存空间并在其中存储 10，但 Python 是在堆内存上创建 `int` 类型对象，`a` 只是指向该对象的标签。\n\n**Python 内部原理（小整数缓存）：** Python 在程序启动时预先创建 -5 到 256 之间的整数。所以执行 `a = 10` 时，不会创建新对象，而是复用已创建的 `10` 对象。这种优化可以节省内存和时间。\n\n**类比：** 就像在图书馆已有的书（10 这个对象）上贴一个"我借了"的标记（标签 a）。\n\n**注意：** Python 的整数没有大小限制！C 的 `int` 最多约 21 亿，但 Python 可以毫无问题地处理 `10**1000` 这样的超大数。",
+        "visualizationType": "pythonMemory",
+        "code": "a = 10",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "创建整数变量 'b'",
+        "explanation": "**`b = 3`** -- 在内存中创建整数对象 `3`，并贴上标签 `b`。\n\n`a` 和 `b` 是指向不同整数对象的两个独立标签。从内存可视化中可以看到，`a` 指向 `10` 对象，`b` 指向 `3` 对象。\n\n**为什么是这个顺序？** 要在下面（第 4-7 行）使用 `a` 和 `b` 进行运算，必须先定义这两个变量。Python 从上到下逐行执行，所以变量定义必须在使用之前。\n\n**Python 内部原理：** `3` 也在小整数缓存范围（-5~256）内，所以会复用预创建的对象。全局命名空间字典中现在注册了两个条目：`{\"a\": <10 的地址>, \"b\": <3 的地址>}`。\n\n**注意：** 变量名只能包含字母、数字和下划线（`_`），且不能以数字开头。`2b = 3` 会引发 `SyntaxError`。",
+        "visualizationType": "pythonMemory",
+        "code": "b = 3",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "加法运算",
+        "explanation": "**`print(a + b)`** -- 将 `a`（10）和 `b`（3）相加，输出结果 `13`。\n\n当 `+` 运算符执行时，Python 读取 `a` 和 `b` 指向的两个整数对象的值，相加后创建一个**新的整数对象 `13`**。这个新对象传递给 `print()` 并显示在屏幕上。\n\n**为什么会创建新对象？** 因为整数（int）是**不可变（Immutable）**对象。你不能把 `10` 对象的值改成 `13`。运算结果总是创建新对象。\n\n**类比：** 把一枚 10 分硬币和一枚 3 分硬币放在一起，原来的硬币不会改变。而是产生了"13 分"这个新的结果。\n\n**Python 内部原理：** `a + b` 在内部调用 `a.__add__(b)`。`int.__add__` 方法在 C 层面将两个值相加并返回新的 `int` 对象。由于 `13` 在小整数缓存范围内，会复用缓存对象。",
+        "visualizationType": "pythonMemory",
+        "code": "print(a + b)",
+        "pythonMemoryState": {
+          "output": [
+            "13"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "除法运算（/）",
+        "explanation": "**`print(a / b)`** -- 使用 `/` 运算符执行"真除法（true division）"。\n\n`10 / 3` 的结果是 `3.3333333333333335`。**关键点：** `/` 运算符即使两个操作数都是整数，也**总是返回 float（浮点数）结果**。甚至 `10 / 2` 也会变成 `5.0` 而不是 `5`！\n\n**为什么末位是 5？** `3.333...` 是无限小数，计算机无法精确表示。以 64 位浮点数（IEEE 754）格式存储最接近的值时，最后一位会产生微小的舍入误差。\n\n**与 Python 2 的区别：** 在 Python 2 中，`10 / 3` 是 `3`（整数除法）。Python 3 改变了行为，请注意。\n\n**Python 内部原理：** `/` 运算调用 `a.__truediv__(b)`。`int.__truediv__` 将两个整数转换为浮点数后执行除法，返回新的 `float` 对象。\n\n**注意：** 如果 `b` 为 `0`，会引发 `ZeroDivisionError`。养成除法前检查除数是否为零的习惯。",
+        "visualizationType": "pythonMemory",
+        "code": "print(a / b)",
+        "pythonMemoryState": {
+          "output": [
+            "3.3333333333333335"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "整数除法（//）",
+        "explanation": "**`print(a // b)`** -- 使用 `//` 运算符执行"地板除法（floor division）"，即求**商**。\n\n`10 // 3` 的结果是 `3`。它**丢弃（向下取整）**除法结果的小数部分，只返回整数部分。\n\n**类比：** 把 10 个苹果分给 3 个人，不切开，计算每人能分到几个完整的苹果（商）。每人 3 个，剩余 1 个。\n\n**`/` 和 `//` 的区别：**\n- `10 / 3` = `3.3333...`（浮点数，精确除法）\n- `10 // 3` = `3`（整数，地板除法）\n\n**负数要注意！** `//` 不是"截断"而是"向下取整（floor）"。`-10 // 3` 是 **`-4`** 而不是 `-3`！因为是向负无穷方向取整。\n\n**Python 内部原理：** `//` 运算调用 `a.__floordiv__(b)`。数学上计算 `floor(a/b)`。如果两个操作数都是 `int`，结果也是 `int`；如果有一个是 `float`，结果也是 `float`（`10 // 3.0` = `3.0`）。\n\n**实用技巧：** `//` 和 `%` 一起使用就是 divmod 运算：`divmod(10, 3)` = `(3, 1)`（同时返回商和余数）。",
+        "visualizationType": "pythonMemory",
+        "code": "print(a // b)",
+        "pythonMemoryState": {
+          "output": [
+            "3"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "取余运算（%）",
+        "explanation": "**`print(a % b)`** -- 使用 `%` 运算符（取模）求除法后的**余数**。\n\n`10 % 3` 的结果是 `1`。10 除以 3，商为 3，余数为 1（10 = 3 x 3 + **1**）。\n\n**类比：** 从上面苹果的比喻来看，给 3 个人每人分了 3 个后，**剩下的 1 个**就是余数。\n\n**为什么重要？** 取余运算在编程中使用非常频繁：\n- **奇偶判断：** `n % 2 == 0` 则为偶数\n- **循环遍历：** `index % length` 实现数组的环形遍历\n- **倍数检查：** `n % N == 0` 则为 N 的倍数\n\n**`//` 和 `%` 的关系：** `a == (a // b) * b + (a % b)` 恒成立。即 `10 == 3 * 3 + 1`。\n\n**Python 内部原理：** `%` 运算调用 `a.__mod__(b)`。Python 的 `%` 总是返回与除数（b）同号的结果。`-10 % 3` 是 `2`（在 C 语言中是 `-1`）。\n\n**注意：** 如果 `b` 为 `0`，`%` 也会引发 `ZeroDivisionError`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(a % b)",
+        "pythonMemoryState": {
+          "output": [
+            "1"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建浮点数变量 'pi'",
+        "explanation": "**`pi = 3.14`** -- 在内存中创建浮点数（float）对象 `3.14`，并贴上标签 `pi`。\n\n包含小数点的数字字面量会自动成为 `float` 类型对象。`int` 和 `float` 是不同类型的对象。\n\n**int 和 float 的区别：**\n- `int`：精确的整数（无大小限制）\n- `float`：近似的实数（64 位，约 15~17 位精度）\n\n**类比：** `int` 像精确计数自然数的算盘，`float` 像带小数点的计算器。计算器可以处理小数，但能显示的位数有限。\n\n**Python 内部原理：** `float` 对象以 C 的 `double` 类型（IEEE 754 64 位浮点数）存储。`3.14` 无法用二进制精确表示，实际存储的值约为 `3.1400000000000001...`。\n\n**注意：** 如需精确的小数运算，请使用 `decimal.Decimal` 模块。在金融计算中使用 `float` 可能会出现一分钱的误差！",
+        "visualizationType": "pythonMemory",
+        "code": "pi = 3.14",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建浮点数变量 'radius'",
+        "explanation": "**`radius = 2.0`** -- 在内存中创建浮点数对象 `2.0`，并贴上标签 `radius`。\n\n写 `2.0` 而不是 `2`，是明确表示这是 `float` 类型。`2` 是 `int`，`2.0` 是 `float` —— 值看起来一样但类型不同。\n\n**为什么区分很重要？** 大多数情况下 Python 会自动在 `int` 和 `float` 之间转换，但用 `type()` 函数检查可以看出它们是不同类型：\n- `type(2)` -> `<class 'int'>`\n- `type(2.0)` -> `<class 'float'>`\n\n**Python 内部原理：** 当 `int` 和 `float` 进行运算时，Python 会自动将 `int` 转换为 `float`。这称为**隐式类型转换（Implicit Coercion）**。`3 + 2.0` 会先将 `3` 转换为 `3.0`，然后得到 `5.0`。\n\n**类比：** 这是计算圆面积（pi * r^2）的准备步骤。就像数学课上使用公式前先确定数值一样。",
+        "visualizationType": "pythonMemory",
+        "code": "radius = 2.0",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "radius",
+              "pointsTo": "float2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14",
+              "pyId": "2001"
+            },
+            {
+              "id": "float2",
+              "type": "float",
+              "value": "2.0",
+              "pyId": "2002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "计算圆的面积",
+        "explanation": "**`area = pi * (radius ** 2)`** -- 使用幂运算符 `**` 和乘法计算圆的面积。\n\nPython 遵循数学运算顺序（优先级）：\n1. 先算 `radius ** 2` = `2.0 ** 2` = `4.0`（幂运算优先于乘法）\n2. 再算 `pi * 4.0` = `3.14 * 4.0` = `12.56`\n3. 创建新的 `float` 对象 `12.56`，并贴上标签 `area`。\n\n**`**` 运算符：** 在 Python 中，幂运算是 `**` 而不是 `^`！`^` 是按位异或运算符，结果完全不同。`2 ^ 3` = `1`（异或），`2 ** 3` = `8`（幂运算）。\n\n**类比：** 这就是把数学课上圆面积 = pi x r^2 的公式直接转换成代码。使用括号明确了运算顺序。\n\n**Python 内部原理：** 中间计算结果（`4.0`）作为临时 `float` 对象创建。当最终结果（`12.56`）产生后，临时对象的引用计数降为 0，被垃圾回收器回收。由于是不可变对象，每次运算都会产生新对象。",
+        "visualizationType": "pythonMemory",
+        "code": "area = pi * (radius ** 2)",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "radius",
+              "pointsTo": "float2"
+            },
+            {
+              "name": "area",
+              "pointsTo": "float3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14",
+              "pyId": "2001"
+            },
+            {
+              "id": "float2",
+              "type": "float",
+              "value": "2.0",
+              "pyId": "2002"
+            },
+            {
+              "id": "float3",
+              "type": "float",
+              "value": "12.56",
+              "pyId": "2003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出结果",
+        "explanation": "**`print(area)`** -- 输出 `area` 指向的对象值 `12.56`。\n\n至此圆面积计算完成。半径为 2.0 的圆面积约为 12.56。\n\n**核心总结：**\n- `/`（真除法）：总是返回 `float`（`10/2` = `5.0`）\n- `//`（地板除法）：只返回商（丢弃小数部分）\n- `%`（取模）：返回余数\n- `**`（幂运算）：注意不是 `^`！\n\n**Python 内部原理：** `print()` 调用 `area` 对象的 `__repr__()` 生成字符串 `\"12.56\"` 并输出。`float` 的 `__repr__` 只显示能精确还原该值的最少位数。\n\n**实用技巧：** 如需更精确的 pi 值，可以使用 `import math; math.pi`。`math.pi` 提供 `3.141592653589793`，具有 15 位精度。",
+        "visualizationType": "pythonMemory",
+        "code": "print(area)",
+        "pythonMemoryState": {
+          "output": [
+            "12.56"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "radius",
+              "pointsTo": "float2"
+            },
+            {
+              "name": "area",
+              "pointsTo": "float3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14",
+              "pyId": "2001"
+            },
+            {
+              "id": "float2",
+              "type": "float",
+              "value": "2.0",
+              "pyId": "2002"
+            },
+            {
+              "id": "float3",
+              "type": "float",
+              "value": "12.56",
+              "pyId": "2003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Python 中 `5 / 2` 的结果是什么？",
+    "options": [
+      "2（整数）",
+      "2.5（浮点数）",
+      "2.0（浮点数）",
+      "报错"
+    ],
+    "correctIndex": 1,
+    "explanation": "从 Python 3 开始，`/` 运算符总是返回精确的浮点数结果（2.5）。\n如需整数商，请使用 `//`。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "a^b 是幂运算",
+      "correct": "不是！`^` 是按位异或运算符。\n幂运算使用 `**`。",
+      "why": "由于其他语言（如 C）和数学符号的影响，这是一个常见错误。"
+    },
+    {
+      "wrong": "0.1 + 0.2 == 0.3",
+      "correct": "结果为 False。\n由于浮点数误差，结果是 `0.30000000000000004`。",
+      "why": "计算机用二进制表示实数，有时无法完美存储十进制小数。"
+    }
+  ],
+  "keyTakeaway": "除法 `/` 总是返回 float。幂运算使用 `**`。"
+}

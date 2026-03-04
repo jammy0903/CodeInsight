@@ -1,0 +1,42 @@
+{
+  "lessonId": "c-10-2",
+  "title": "File Modes",
+  "concept": "文件模式决定读、写、追加行为，直接影响文件处理结果",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    FILE *fp;\n\n    fp = fopen(\"data.txt\", \"w\");\n    if (fp) {\n        fprintf(fp, \"Hello File!\");\n        fclose(fp);\n    }\n\n    fp = fopen(\"data.txt\", \"a\");\n    if (fp) {\n        fprintf(fp, \" Append me.\");\n        fclose(fp);\n    }\n\n    fp = fopen(\"data.txt\", \"r\");\n    char buffer[50];\n    if (fp) {\n        fgets(buffer, 50, fp);\n        printf(\"Read: %s\\n\", buffer);\n        fclose(fp);\n    }\n\n    return 0;\n}",
+    "steps": [
+      {"title":"包含 stdio.h 头文件","explanation":"**`#include <stdio.h>`** -- 定义了文件 I/O 所需的 `FILE`、`fopen`、`fclose`、`fprintf`、`fgets` 等的头文件。","visualizationType":"cMemory","code":"#include <stdio.h>","stack":[],"heap":[],"stdout":""},
+      {"title":"main 函数与 FILE 指针","explanation":"**`FILE *fp;`** -- 一个指向 **`FILE` 结构体**的指针变量，用于保存文件信息。`FILE` 结构体包含当前读写位置、打开模式、内部缓冲区、错误状态等操作系统管理文件所需的信息。","visualizationType":"cMemory","code":"int main() {","highlightOffset":[0,1],"stack":[{"name":"fp","type":"FILE*","value":"???","address":"0x1000"}]},
+      {"title":"1. 以写入模式（\"w\"）打开文件","explanation":"**`fp = fopen(\"data.txt\", \"w\");`** -- 以**写入模式（`\"w\"`）**打开文件。文件不存在则新建，已存在则**清除所有现有内容（truncate）**后以空状态打开。","visualizationType":"cMemory","code":"fp = fopen(\"data.txt\", \"w\");","stack":[{"name":"fp","type":"FILE*","value":"0xFILE","address":"0x1000"}]},
+      {"title":"写入文件","explanation":"**`fprintf(fp, \"Hello File!\");`** -- 向 `fp` 指向的文件（`data.txt`）写入字符串。这与之前用 `fprintf(stdout, ...)` 输出到屏幕是同一个函数，只是将 `stdout` 换成了文件指针 `fp`。","visualizationType":"cMemory","code":"fprintf(fp, \"Hello File!\");"},
+      {"title":"关闭文件","explanation":"**`fclose(fp);`** -- 文件操作完成后**必须**调用。`fclose` 做三件事：将缓冲区剩余数据写入磁盘（flush）、归还文件句柄给操作系统、释放 `FILE` 结构体内存。","visualizationType":"cMemory","code":"fclose(fp);","stack":[{"name":"fp","type":"FILE*","value":"closed","address":"0x1000"}]},
+      {"title":"2. 以追加模式（\"a\"）打开文件","explanation":"**`fp = fopen(\"data.txt\", \"a\");`** -- 以**追加模式（`\"a\"`）**打开同一文件。文件不存在则新建（同 `\"w\"`），已存在则**保留现有内容**，从文件末尾开始写入。","visualizationType":"cMemory","code":"fp = fopen(\"data.txt\", \"a\");","stack":[{"name":"fp","type":"FILE*","value":"0xFILE","address":"0x1000"}]},
+      {"title":"向文件追加内容","explanation":"**`fprintf(fp, \" Append me.\");`** -- 因为以 `\"a\"` 模式打开，新字符串会**接在**现有内容**之后**写入。`\"w\"` 模式后是 `\"Hello File!\"`，追加后变为 `\"Hello File! Append me.\"`。","visualizationType":"cMemory","code":"fprintf(fp, \" Append me.\");"},
+      {"title":"关闭文件","explanation":"**`fclose(fp);`** -- 确保追加的内容保存到磁盘并关闭文件。此时 `data.txt` 的最终内容是 `\"Hello File! Append me.\"`。","visualizationType":"cMemory","code":"fclose(fp);","occurrence":2,"stack":[{"name":"fp","type":"FILE*","value":"closed","address":"0x1000"}]},
+      {"title":"3. 以读取模式（\"r\"）打开文件","explanation":"**`fp = fopen(\"data.txt\", \"r\");`** -- 以**读取模式（`\"r\"`）**打开文件。文件存在则以只读方式打开，光标在开头；文件不存在则返回 `NULL`。","visualizationType":"cMemory","code":"fp = fopen(\"data.txt\", \"r\");","stack":[{"name":"fp","type":"FILE*","value":"0xFILE","address":"0x1000"}]},
+      {"title":"准备缓冲区并读取文件","explanation":"**`char buffer[50];`** 和 **`fgets(buffer, 50, fp);`** -- 声明字符数组存放从文件读取的数据，用 `fgets` 读取内容。格式为 `fgets(目标, 最大大小, 流)`，最多读取 **49** 个字符——最后一个位置留给 `\\0`。","visualizationType":"cMemory","code":"char buffer[50];","highlightOffset":[0,2],"stack":[{"name":"fp","type":"FILE*","value":"0xFILE","address":"0x1000"},{"name":"buffer","type":"char[50]","value":"\"Hello File! Append me.\"","address":"0x0ffc"}]},
+      {"title":"输出读取的内容","explanation":"**`printf(\"Read: %s\\n\", buffer);`** -- 将从文件读取的字符串输出到屏幕。结果为 `\"Read: Hello File! Append me.\"`。","visualizationType":"cMemory","code":"printf(\"Read: %s\\n\", buffer);","stdout":"Read: Hello File! Append me."},
+      {"title":"最后关闭文件并终止","explanation":"**`fclose(fp);`** 和 **`return 0;`** -- 完成所有文件操作并终止程序。\n\n文件 I/O 的基本模式始终相同：用 `fopen` 打开 -> `NULL` 检查错误 -> 读/写操作 -> 用 `fclose` 关闭。","visualizationType":"cMemory","code":"fclose(fp);","occurrence":3,"highlightOffset":[0,3],"stack":[]}
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "fopen 中 \"w\" 模式和 \"r+\" 模式的区别是什么？",
+    "options": [
+      "r+ 不创建文件但 w 会创建。",
+      "w 会清除现有内容（Truncate），但 r+ 不清除直接覆写。",
+      "w 不能读取但 r+ 可以读写。",
+      "以上全部"
+    ],
+    "correctIndex": 3,
+    "explanation": "\"w\" 是破坏性的（创建+清空），而 \"r+\" 是保留性的（修改）。\n\"w\" 不能读取，但 \"r+\" 支持读写。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "不调用 fclose 程序退出时数据也会保存。",
+      "correct": "大多数情况如此，但不能保证。\n缓冲区中残留的数据可能不会写入磁盘。",
+      "why": "必须用 `fclose` 显式释放资源并刷新缓冲区（Flush）。"
+    }
+  ],
+  "keyTakeaway": "准确了解文件模式（r、w、a、r+、w+、a+）的区别并根据用途正确选择，才能防止数据丢失。"
+}

@@ -1,0 +1,290 @@
+{
+  "lessonId": "py-3-4",
+  "title": "Sets (Unique)",
+  "concept": "不允许重复且无序的集合",
+  "content": {
+    "code": "# 1. 세트 생성\nnums = {1, 2, 2, 3, 3, 3}\nprint(nums)  # {1, 2, 3} (중복 제거됨)\n\n# 2. 추가/삭제\nnums.add(4)\nnums.remove(1)\n\n# 3. 집합 연산\na = {1, 2, 3}\nb = {3, 4, 5}\n\nprint(a & b) # 교집합 {3}\nprint(a | b) # 합집합 {1, 2, 3, 4, 5}",
+    "steps": [
+      {
+        "title": "创建集合",
+        "explanation": "**`nums = {1, 2, 2, 3, 3, 3}`** -- 使用花括号 `{}` 创建集合（Set）对象。**重复元素会自动去除！**\n\nPython 从上到下按顺序执行代码。虽然放入了6个值，但集合**不允许重复元素**，因此重复值被自动去除：\n- 输入：`{1, 2, 2, 3, 3, 3}`（6个）\n- 结果：`{1, 2, 3}`（3个 -- 重复已去除）\n\n**集合的4个核心特征：**\n- **不允许重复（Unique）：** 相同值只保留1个。这就是集合存在的意义！\n- **无序（Unordered）：** 不支持 `s[0]` 这样的索引访问。需要顺序请用列表。\n- **可变（Mutable）：** 内容可修改（`add`、`remove` 等）\n- **哈希表：** O(1) 平均查找时间 -- `3 in nums` 非常快\n\n**类比：** 集合就像一张**签到表**。同一个名字被点了多次，签到表上也只记录一次。\n\n**注意与字典的混淆：** 集合和字典都使用花括号 `{}`！\n- `{1, 2, 3}` -> **集合**（只有值）\n- `{\"a\": 1}` -> **字典**（键值对）\n- `{}` -> **空字典**（不是空集合！）\n- `set()` -> **空集合**（只能这样创建）",
+        "visualizationType": "pythonMemory",
+        "code": "nums = {1, 2, 2, 3, 3, 3}",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "重复自动去除（2和3的重复已删除）",
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "确认重复去除",
+        "explanation": "**`print(nums)`** -- 输出去重后的集合。结果是 `{1, 2, 3}`。\n\n放入了6个值，但去重后只剩下3个。\n\n**关于顺序的重要提示：** 集合内部使用哈希表，因此输出顺序可能与插入顺序不同。可能输出为 `{2, 1, 3}` 或 `{3, 1, 2}`。（CPython 中小整数恰好经常按顺序出现，但不应依赖这一点。）\n\n**列表 vs 集合 -- 何时用哪个？**\n- **列表：** 当顺序重要、需要重复值或需要索引访问时\n- **集合：** 当需要去重、快速检查成员资格或执行集合运算时\n\n**类比：** 列表是**排队的人**（有序，同一人可出现多次），集合是**签到表**（无序，同一名字只出现一次）。\n\n**Python 内部机制：** `print(nums)` 调用 `set.__repr__()`。遍历哈希表收集每个元素，生成 `{1, 2, 3}` 格式的字符串并输出。\n\n**执行顺序**：读取 nums -> 执行 print({1, 2, 3}) -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "print(nums)  # {1, 2, 3} (중복 제거됨)",
+        "pythonMemoryState": {
+          "output": [
+            "{1, 2, 3}"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "添加元素（add）",
+        "explanation": "**`nums.add(4)`** -- 向集合添加新元素 `4`。直接修改现有对象。\n\n集合 `nums` 添加 `4` 后变为 `{1, 2, 3, 4}`。\n\n**Mutable 的含义：** 和列表一样，集合**不会创建新对象**，而是直接修改现有对象（0x1000）的**内容**。\n\n**如果添加已存在的值？** 什么都不会发生！也不会报错：\n```python\nnums.add(2)  # 2 已存在，不会变化，也不会报错\n```\n\n**与列表的区别：**\n- 列表：`append(4)` -> 添加到**末尾**（顺序保证）\n- 集合：`add(4)` -> 添加到哈希表的适当位置（**无序**）\n\n**类比：** 在签到表上添加新名字（4）。如果再次点到已存在的名字（2），则忽略。\n\n**Python 内部机制：** `add(4)` 计算 `4` 的哈希值（`hash(4)`），在哈希表中找到空槽位存储。如果已有相同哈希值和相同值的元素，则忽略。\n\n**注意：** `append()` 是列表专用，`add()` 是集合专用。`nums.append(4)` 会引发 `AttributeError`。\n\n**执行顺序**：执行 add(4) -> 0x1000 对象内容更改 -> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "nums.add(4)",
+        "pythonMemoryState": {
+          "note": "添加4（修改同一对象 0x1000）",
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{1, 2, 3, 4}",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "删除元素（remove）",
+        "explanation": "**`nums.remove(1)`** -- 从集合中移除 `1`。\n\n集合 `nums` 移除 `1` 后变为 `{2, 3, 4}`。\n\n**如果删除不存在的值？** 会引发 `KeyError`：\n```python\nnums.remove(999)  # KeyError: 999\n```\n\n**安全删除 -- `discard()` 方法：** 值不存在也不会报错，静默忽略：\n```python\nnums.discard(999)  # 不报错，什么都不发生\n```\n\n**remove vs discard：**\n- `remove(x)`：x 不存在时引发 **KeyError**（严格）\n- `discard(x)`：x 不存在时**什么都不做**（宽容）\n\n**类比：** 从签到表上划掉名字1。`remove` 会说"这个名字不在上面！"生气，而 `discard` 会说"不在？没事，继续。"\n\n**Python 内部机制：** `remove(1)` 通过 `1` 的哈希值在哈希表中查找位置并移除对应条目。找不到则引发 `KeyError`。\n\n**执行顺序**：执行 remove(1) -> 从哈希表中移除1 -> 0x1000 内容更改 -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "nums.remove(1)",
+        "pythonMemoryState": {
+          "note": "移除1",
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "为集合运算创建集合 'a'",
+        "explanation": "**`a = {1, 2, 3}`** -- 创建第一个集合用于演示集合运算。\n\n前面的操作（修改 `nums`）完成后，按顺序执行下一行。集合 `a` 包含 1, 2, 3。\n\n**为什么创建新集合？** 为了演示集合最强大的功能：**集合运算**（交集、并集、差集）。需要两个集合来比较。我们可以用代码实现数学集合论中的维恩图。\n\n**类比：** 准备两个班级的学生名单（集合）。接下来将找出同时在两个班的学生（交集）和所有学生的总名单（并集）。\n\n**执行顺序**：line 10 -> 创建集合（id: 0x2000）-> a = 0x2000 -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "a = {1, 2, 3}",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "set2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001"
+            },
+            {
+              "id": "set2",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1002"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "为集合运算创建集合 'b'",
+        "explanation": "**`b = {3, 4, 5}`** -- 创建第二个集合用于演示集合运算。\n\n`a = {1, 2, 3}` 和 `b = {3, 4, 5}` 之间唯一的公共元素是 `3`。所有元素合起来是 `{1, 2, 3, 4, 5}`。\n\n**类比：** 第二个班级的名单准备好了。两个班都有的学生只有3号。\n\n**执行顺序**：line 11 -> 创建集合（id: 0x3000）-> b = 0x3000 -> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "b = {3, 4, 5}",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "set2"
+            },
+            {
+              "name": "b",
+              "pointsTo": "set3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001"
+            },
+            {
+              "id": "set2",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1002"
+            },
+            {
+              "id": "set3",
+              "type": "set",
+              "value": "{3, 4, 5}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "交集运算（&）",
+        "explanation": "**`print(a & b)`** -- **交集（Intersection）**运算。收集两个集合中**都包含**的元素。\n\n- `a = {1, 2, 3}`\n- `b = {3, 4, 5}`\n- `a & b = {3}` -- 公共元素只有3\n\n`&` 运算**创建一个新的集合对象**。原始的 `a` 和 `b` 不变。\n\n**Python 的4种集合运算：**\n\n**类比：** 将两个班的签到表重叠，只挑出**两张都出现的名字**。\n\n**Python 内部机制：** `a & b` 调用 `a.__and__(b)`。较小集合的每个元素以 O(1) 检查是否在较大集合中，构建新集合。总时间复杂度为 O(min(len(a), len(b)))。\n\n**执行顺序**：计算 a & b -> 创建新集合 {3} -> 执行 print -> line 14",
+        "visualizationType": "pythonMemory",
+        "code": "print(a & b) # 교집합 {3}",
+        "pythonMemoryState": {
+          "output": [
+            "{3}"
+          ],
+          "note": "a & b = {3}（交集，新集合）",
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "set2"
+            },
+            {
+              "name": "b",
+              "pointsTo": "set3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001"
+            },
+            {
+              "id": "set2",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1002"
+            },
+            {
+              "id": "set3",
+              "type": "set",
+              "value": "{3, 4, 5}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "并集运算（|）",
+        "explanation": "**`print(a | b)`** -- **并集（Union）**运算。**合并两个集合的所有元素**。重复元素自动去除。\n\n- `a = {1, 2, 3}`\n- `b = {3, 4, 5}`\n- `a | b = {1, 2, 3, 4, 5}` -- 合并所有元素（3只出现一次）\n\n**类比：** 将两个班的签到表合并成**一张完整名单**。同一个学生只列一次。\n\n**注意：** 集合运算（`&`、`|`、`-`、`^`）**返回新集合**，不会修改原集合。要就地修改，使用复合赋值：`a &= b`、`a |= b` 等。\n\n**实用示例：**\n```python\n# 从列表去除重复\nnumbers = [1, 2, 2, 3, 3, 3]\nunique = list(set(numbers))  # [1, 2, 3]",
+        "visualizationType": "pythonMemory",
+        "code": "print(a | b) # 합집합 {1, 2, 3, 4, 5}",
+        "pythonMemoryState": {
+          "output": [
+            "{1, 2, 3, 4, 5}"
+          ],
+          "note": "a | b = {1, 2, 3, 4, 5}（并集，去重）",
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "set2"
+            },
+            {
+              "name": "b",
+              "pointsTo": "set3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001"
+            },
+            {
+              "id": "set2",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1002"
+            },
+            {
+              "id": "set3",
+              "type": "set",
+              "value": "{3, 4, 5}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "创建空集合的正确方法是？",
+    "options": [
+      "{}",
+      "set()",
+      "[]",
+      "(,)"
+    ],
+    "correctIndex": 1,
+    "explanation": "`{}` 创建的是空字典。\n空集合必须用 `set()` 来创建。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "集合是有序的（s[0] 可用）",
+      "correct": "集合是无序的（Unordered）。\n不支持索引！",
+      "why": "因为内部使用哈希表，数据存储的顺序看起来是随机的。"
+    }
+  ],
+  "keyTakeaway": "需要去重或进行集合运算时用 Set。顺序不保证。"
+}

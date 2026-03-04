@@ -1,0 +1,138 @@
+{
+  "lessonId": "java-6-5",
+  "title": "Try-with-resources（自动资源清理）",
+  "concept": "学习使用 Java 7 引入的 try-with-resources 语法，无需显式调用 close() 即可安全释放资源。",
+  "content": {
+    "code": "import java.io.*;\n\n// 实现 AutoCloseable 接口\nclass Box implements AutoCloseable {\n    public void close() {\n        System.out.println(\"Box closed!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // 在 try (...) 括号中声明资源\n        try (Box box = new Box()) {\n            System.out.println(\"Using Box...\");\n            throw new RuntimeException(\"Boom!\");\n        } catch (Exception e) {\n            System.out.println(\"Caught: \" + e.getMessage());\n        }\n    }\n}",
+    "steps": [
+      {
+        "title": "包导入",
+        "explanation": "**`import java.io.*;`**\n\n导入输入/输出（Input/Output）相关类。\n`AutoCloseable` 在 `java.lang` 中会自动导入，但由于 I/O 操作中经常使用，这个包会频繁出现。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        },
+        "code": "import java.io.*;"
+      },
+      {
+        "title": "资源创建（Open）",
+        "explanation": "**执行流程：**\n1. 在 `try` 后面的括号 `(...)` 中创建了 `Box` 对象。\n2. `box` 变量引用堆内存上的对象。\n\n**说明：**\n在这个括号中创建的对象与 JVM 有一个约定："离开时会自动关闭。"\n但前提是该对象必须实现 `AutoCloseable` 接口。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "box",
+              "value": "-> 0x888",
+              "frame": "try-resource",
+              "new": true,
+              "type": "Box"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x888",
+              "content": "Box Instance",
+              "type": "Box",
+              "new": true
+            }
+          ],
+          "output": []
+        },
+        "code": "public class Main {"
+      },
+      {
+        "title": "资源使用与异常发生",
+        "explanation": "**执行流程：**\n1. 输出 \"Using Box...\"。\n2. 突然发生了 `RuntimeException`（\"Boom!\"）。\n\n**说明：**\n工作中出了事故！如果是普通的 `try-catch`，会直接跳到 `catch` 块，但 `try-with-resources` 不同。\n它会**先收拾干净再离开**。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "box",
+              "value": "-> 0x888",
+              "frame": "try-resource",
+              "type": "Box"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x888",
+              "content": "Box Instance",
+              "type": "Box"
+            },
+            {
+              "address": "0x999",
+              "content": "NumEx: Boom!",
+              "type": "RuntimeException",
+              "new": true
+            }
+          ],
+          "output": [
+            "Using Box..."
+          ],
+          "error": "Exception Occurred!"
+        },
+        "code": "public static void main(String[] args) {",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "自动调用 close()",
+        "explanation": "**执行流程：**\n1. 在因异常即将退出块的那一刻，JVM 悄悄调用了 `box.close()`。\n2. 输出 \"Box closed!\"。\n\n**说明：**\n**核心要点！** 开发者不需要在 `finally` 块中写繁琐的 `close()` 调用——JVM 会自动处理。\n无论是否发生异常，都会关闭。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "output": [
+            "Box closed!"
+          ],
+          "note": "JVM 自动调用 close()"
+        },
+        "code": "System.out.println(\"Box closed!\");"
+      },
+      {
+        "title": "异常处理（Catch）",
+        "explanation": "**执行流程：**\n1. 资源清理完成后，之前发生的异常（\"Boom!\"）被传递到 `catch` 块。\n2. 输出异常消息。\n\n**说明：**\n记住，资源清理发生在异常处理**之前**。\n先安全关门，然后才报告事故。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "e",
+              "value": "-> 0x999",
+              "frame": "catch",
+              "type": "Exception"
+            }
+          ],
+          "output": [
+            "Caught: Boom!"
+          ]
+        },
+        "code": "try (Box box = new Box()) {",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "要使用 try-with-resources，资源类必须实现哪个接口？",
+    "options": [
+      "Serializable",
+      "Cloneable",
+      "AutoCloseable",
+      "Runnable"
+    ],
+    "correctIndex": 2,
+    "explanation": "类必须实现 `java.lang.AutoCloseable` 并定义 `close()` 方法，这样 JVM 才能在 `try` 块结束时自动调用 `close()`。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "try-with-resources 只在没有异常发生时才调用 close()。",
+      "correct": "不是。\n无论是否发生异常，离开块时都会无条件调用 `close()`。",
+      "why": "编译器代替了传统 `finally` 块的角色。"
+    }
+  ],
+  "keyTakeaway": "`try-with-resources` 从语法层面安全地防止了文件 I/O、套接字、数据库连接等资源泄漏（Leak）。"
+}

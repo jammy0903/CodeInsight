@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { Code2, Sparkles, Menu } from 'lucide-react';
+import { Code2, Sparkles, Menu, UserRound } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import { useIsMobile } from '@/hooks';
 import type { SupportedLanguage } from '@/types/simulator';
 import { useEffect } from 'react';
 import { CBrandIcon } from '@/components/ui/CBrandIcon';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 // 언어 정보 (LanguageCoursePage.tsx에서 가져옴)
 const getLanguageInfo = (lang: SupportedLanguage | null, t: (key: string) => string) => {
@@ -144,12 +145,25 @@ export function TopBar() {
           </div>
         )}
 
-        {/* Right: Actions Area - 스트릭 표시 */}
+        {/* Right: Actions Area - 언어 토글 + 스트릭 또는 로그인 버튼 */}
         <div className="flex items-center gap-3 shrink-0">
+          <LanguageToggle />
           {/* 로그인 상태일 때 스트릭 표시 */}
-          {appUser && (
+          {appUser ? (
             <Link to="/dashboard" title={t('nav.view_status')}>
               <StreakCard streak={streak} variant="compact" loading={streakLoading} />
+            </Link>
+          ) : (
+            /* 미로그인 상태일 때 로그인 버튼 */
+            <Link
+              to="/login"
+              className="p-2 rounded-md transition-colors border hover:bg-[var(--theme-layout-top-bar-button-hover)]"
+              style={{
+                borderColor: 'var(--theme-layout-top-bar-border)',
+              }}
+              title={t('nav.login')}
+            >
+              <UserRound className="w-5 h-5" style={{ color: 'var(--theme-layout-top-bar-text)' }} />
             </Link>
           )}
         </div>

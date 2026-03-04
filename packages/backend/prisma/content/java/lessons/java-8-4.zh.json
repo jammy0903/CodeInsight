@@ -1,0 +1,149 @@
+{
+  "lessonId": "java-8-4",
+  "title": "LinkedList：数据的火车游戏",
+  "concept": "LinkedList 是数据节点互相牵手连接起来的"火车"结构。",
+  "content": {
+    "code": "import java.util.LinkedList;\n\npublic class Main {\n    public static void main(String[] args) {\n        LinkedList<String> train = new LinkedList<>();\n        \n        train.add(\"기관차\");\n        train.add(\"객차1\");\n        train.add(\"객차2\");\n        \n        train.add(1, \"새 객차\"); // 중간에 끼워넣기!\n    }\n}",
+    "steps": [
+      {
+        "title": "包导入",
+        "explanation": "**`import java.util.LinkedList;`**\n\n导入链表数据结构。",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.LinkedList;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n让我们开始数据火车游戏吧？",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建 LinkedList",
+        "explanation": "**执行流程：**\n1. 创建 `LinkedList` 对象。\n2. 准备好指向头部（Head）和尾部（Tail）的指针。\n\n**火车启动：**\n目前还是一列没有车厢的空火车。",
+        "visualizationType": "javaMemory",
+        "code": "LinkedList<String> train = new LinkedList<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "train",
+              "value": "0x001",
+              "frame": "main",
+              "type": "LinkedList<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 0, head: null",
+              "type": "LinkedList",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "添加第一个节点",
+        "explanation": "**执行流程：**\n1. 创建"火车头"节点。\n2. 链表的 Head 指向该节点。\n\n**第一节车厢：**\n火车的最前端诞生了。",
+        "visualizationType": "javaMemory",
+        "code": "train.add(\"기관차\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "(기관차)",
+              "type": "LinkedList",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "添加第二个节点",
+        "explanation": "**执行流程：**\n1. 创建"客车1"节点。\n2. 将"火车头"与"客车1"连接起来（Link）。\n\n**已连接：**\n前面的车厢牵住了后面车厢的手。",
+        "visualizationType": "javaMemory",
+        "code": "train.add(\"객차1\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "(기관차) -> (객차1)",
+              "type": "LinkedList",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "添加第三个节点",
+        "explanation": "**执行流程：**\n1. 创建"客车2"。\n2. 连接到"客车1"的后面。\n\n**火车越来越长：**\n只需不断往后连接就行，非常简单。",
+        "visualizationType": "javaMemory",
+        "code": "train.add(\"객차2\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "(기관차) -> (객차1) -> (객차2)",
+              "type": "LinkedList",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "在中间插入节点",
+        "explanation": "**执行流程：**\n1. 创建"新客车"。\n2. 断开"火车头"和"客车1"之间的连接。\n3. 重新连接顺序："火车头" -> "新客车" -> "客车1"。\n\n**插入高手：**\n要在火车中间插入新车厢怎么办？只需暂时解开前后车厢的连接，把新车厢插进去就完成了。\n其他车厢完全不需要移动！",
+        "visualizationType": "javaMemory",
+        "code": "train.add(1, \"새 객차\"); // 중간에 끼워넣기!",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "(기관차) -> (새 객차) -> (객차1) -> (객차2)",
+              "type": "LinkedList",
+              "changed": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "数据检索频繁时，哪种数据结构更有优势？",
+    "options": [
+      "ArrayList",
+      "LinkedList",
+      "两者一样",
+      "如果有顺序就选 LinkedList"
+    ],
+    "correctIndex": 0,
+    "explanation": "ArrayList 可以通过索引立即访问，但 LinkedList 需要从头开始一个一个遍历，查找速度慢得多。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "LinkedList 总是比 ArrayList 好。",
+      "correct": "不是的！在数据查找方面，ArrayList 具有压倒性的速度优势。",
+      "why": "LinkedList 要到达最后一节车厢，必须经过前面所有的车厢（不支持随机访问）。"
+    }
+  ],
+  "keyTakeaway": "如果需要频繁在中间插入和删除，选择 LinkedList；如果查找操作多，选择 ArrayList！"
+}

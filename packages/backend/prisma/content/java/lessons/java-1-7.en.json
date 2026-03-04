@@ -1,0 +1,179 @@
+{
+  "lessonId": "java-1-7",
+  "title": "Methods and Parameters",
+  "concept": "Java uses pass by value. Primitive types are copied, and reference types have their references copied.",
+  "content": {
+    "code": "int a = 10;\nint b = 20;\nSystem.out.println(\"swap 전: a=\" + a + \", b=\" + b);\n\nint temp = a;\na = b;\nb = temp;\nSystem.out.println(\"swap 후: a=\" + a + \", b=\" + b);\n",
+    "steps": [
+      {
+        "title": "Variable Declaration",
+        "explanation": "**`int a = 10;`** / **`int b = 20;`**\n\nDeclare two variables to be swapped.\n\n**Java's Memory**:\n- Primitive types store their values directly on the **stack**\n- `a = 10`, `b = 20` are stored on the stack\n",
+        "visualizationType": "javaMemory",
+        "code": "int a = 10;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "10",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 1 executed"
+        }
+      },
+      {
+        "title": "Output Before Swap",
+        "explanation": "**`System.out.println(\"swap 전: a=\" + a + \", b=\" + b);`**\n\n**Output**: `swap 전: a=10, b=20`\n",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"swap 전: a=\" + a + \", b=\" + b);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "20",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 3 executed"
+        }
+      },
+      {
+        "title": "Storing in a Temporary Variable",
+        "explanation": "**`int temp = a;`**\n\nStores a's value (10) in the temporary variable temp.\n\n**Why do we need temp?**\nIf we execute `a = b` first, a's original value (10) would be lost!\n",
+        "visualizationType": "javaMemory",
+        "code": "int temp = a;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:temp",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "20",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 5 executed"
+        }
+      },
+      {
+        "title": "Assigning b to a",
+        "explanation": "**`a = b;`**\n\na = 20 (b's value)\n\n**Current state**: a=20, b=20, temp=10\n",
+        "visualizationType": "javaMemory",
+        "code": "a = b;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "20",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:temp",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "20",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 6 executed"
+        }
+      },
+      {
+        "title": "Assigning temp to b",
+        "explanation": "**`b = temp;`**\n\nb = 10 (a's original value stored in temp)\n\n**Swap complete!** a=20, b=10\n",
+        "visualizationType": "javaMemory",
+        "code": "b = temp;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:a",
+              "value": "20",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:temp",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:b",
+              "value": "10",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 7 executed"
+        }
+      },
+      {
+        "title": "Output After Swap",
+        "explanation": "**`System.out.println(\"swap 후: a=\" + a + \", b=\" + b);`**\n\n**Output**: `swap 후: a=20, b=10`\n\n**Note**: In C, you can create a swap function using pointers,\nbut in Java, primitive types cannot be passed by reference, making it difficult to swap via a method.\n",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"swap 후: a=\" + a + \", b=\" + b);",
+        "javaMemoryState": {
+          "note": "Line 8 executed"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens when you pass a primitive type (int) to a method in Java?",
+    "options": [
+      "The reference is passed",
+      "The value is copied and passed",
+      "The address is passed",
+      "It cannot be passed"
+    ],
+    "correctIndex": 1,
+    "explanation": "Java always uses pass by value.\n\n- Primitive types: The value itself is copied (modifications in the method don't affect the original)\n- Reference types: The reference (address) is copied (they point to the same object)\n"
+  }
+}

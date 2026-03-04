@@ -1,7 +1,6 @@
 /**
  * StackSection - 스택 메모리 영역
  *
- * 2열 레이아웃: 메모리 블록 리스트 + RSP/RBP 인디케이터
  * 프레임별 색상 매핑, 배열 그룹핑, 호버 하이라이팅
  */
 
@@ -19,20 +18,15 @@ interface StackSectionProps {
   blocks: MemoryBlock[];
   changedBlocks: ChangedBlocksType;
   frames: Array<{ name: string }>;
-  showRegisters: boolean;
 }
 
 export function StackSection({
   blocks,
   changedBlocks,
   frames,
-  showRegisters,
 }: StackSectionProps) {
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [expandedArrays, setExpandedArrays] = useState<Set<string>>(new Set());
-
-  // 현재 실행 중인 프레임 (frames 배열의 마지막)
-  const currentFrame = frames[frames.length - 1]?.name || 'main';
 
   // 주소순 정렬 (높은 주소 → 낮은 주소), NaN 방어
   const sortedBlocks = useMemo(() => {
@@ -57,7 +51,7 @@ export function StackSection({
     return map;
   }, [sortedBlocks, frames]);
 
-  // 프레임별 색상 매핑 (실제 존재하는 프레임들로 자동 생성)
+  // 프레임별 색상 매핑
   const frameColorMap = useMemo(() => {
     const map = new Map<string, FrameColor>();
 
@@ -80,7 +74,7 @@ export function StackSection({
     return map;
   }, [frames, sortedBlocks]);
 
-  // 배열 그룹핑 (arr[0], arr[1], ... → arr)
+  // 배열 그룹핑
   const { arrays, regularBlocks } = useMemo(() => {
     const arrayMap = new Map<string, MemoryBlock[]>();
     const regular: MemoryBlock[] = [];
@@ -97,7 +91,6 @@ export function StackSection({
       }
     });
 
-    // 각 배열을 인덱스 순으로 정렬
     arrayMap.forEach((elements) => {
       elements.sort((a, b) => getArrayIndex(a.name) - getArrayIndex(b.name));
     });
@@ -159,9 +152,8 @@ export function StackSection({
         </span>
       </div>
 
-      {/* 2열 레이아웃: 블록 리스트 + RSP/RBP */}
       <div className="flex gap-4 relative">
-        <div className="flex-1 space-y-2 relative" style={{ paddingRight: showRegisters ? '80px' : '0' }}>
+        <div className="flex-1 space-y-2 relative">
           {(() => {
             const items: Array<{ type: 'block' | 'array'; data: MemoryBlock | [string, MemoryBlock[]] }> = [];
 
@@ -173,7 +165,7 @@ export function StackSection({
               items.push({ type: 'block', data: block });
             });
 
-            // 주소순 정렬 (첫 번째 요소 주소 기준), NaN 방어
+            // 주소순 정렬
             items.sort((a, b) => {
               const addrA = a.type === 'array'
                 ? parseInt((a.data as [string, MemoryBlock[]])[1][0].address, 16)
@@ -187,38 +179,12 @@ export function StackSection({
               return addrB - addrA;
             });
 
-            return items.map((item, index) => {
-              const isLast = index === items.length - 1;
-
+            return items.map((item) => {
               if (item.type === 'array') {
                 const [arrayName, elements] = item.data as [string, MemoryBlock[]];
                 const frameName = blockFrameMap.get(elements[0].name) || 'main';
                 const frameColor = frameColorMap.get(frameName) || COLORS.frame[0];
                 const isChanged = elements.some((el) => changedBlocks.stack.includes(el.name) || changedBlocks.heap.includes(el.name));
-
-                const isFirstOfCurrentFrame = (() => {
-                  for (let j = 0; j < items.length; j++) {
-                    const checkItem = items[j];
-                    let checkFrameName: string;
-                    if (checkItem.type === 'array') {
-                      const [, checkElements] = checkItem.data as [string, MemoryBlock[]];
-                      checkFrameName = blockFrameMap.get(checkElements[0].name) || 'main';
-                    } else {
-                      const checkBlock = checkItem.data as MemoryBlock;
-                      checkFrameName = blockFrameMap.get(checkBlock.name) || 'main';
-                    }
-                    if (checkFrameName === currentFrame) {
-                      return j === index;
-                    }
-                  }
-                  return false;
-                })();
-
-                let arrayRegisterLabel: 'rsp' | 'rbp' | undefined = undefined;
-                if (showRegisters) {
-                  if (isFirstOfCurrentFrame) arrayRegisterLabel = 'rbp';
-                  else if (isLast) arrayRegisterLabel = 'rsp';
-                }
 
                 return (
                   <ArrayBlock
@@ -232,7 +198,6 @@ export function StackSection({
                     onToggle={() => toggleArray(arrayName)}
                     onMouseEnter={() => setHoveredFrame(frameName)}
                     onMouseLeave={() => setHoveredFrame(null)}
-                    registerLabel={arrayRegisterLabel}
                   />
                 );
               } else {
@@ -240,30 +205,6 @@ export function StackSection({
                 const frameName = blockFrameMap.get(block.name) || 'main';
                 const frameColor = frameColorMap.get(frameName) || COLORS.frame[0];
                 const isHovered = hoveredFrame === frameName;
-
-                const isFirstOfCurrentFrame = (() => {
-                  for (let j = 0; j < items.length; j++) {
-                    const checkItem = items[j];
-                    let checkFrameName: string;
-                    if (checkItem.type === 'array') {
-                      const [, checkElements] = checkItem.data as [string, MemoryBlock[]];
-                      checkFrameName = blockFrameMap.get(checkElements[0].name) || 'main';
-                    } else {
-                      const checkBlock = checkItem.data as MemoryBlock;
-                      checkFrameName = blockFrameMap.get(checkBlock.name) || 'main';
-                    }
-                    if (checkFrameName === currentFrame) {
-                      return j === index;
-                    }
-                  }
-                  return false;
-                })();
-
-                let registerLabel: 'rsp' | 'rbp' | undefined = undefined;
-                if (showRegisters) {
-                  if (isFirstOfCurrentFrame) registerLabel = 'rbp';
-                  else if (isLast) registerLabel = 'rsp';
-                }
 
                 return (
                   <MemoryBlockCard
@@ -273,7 +214,6 @@ export function StackSection({
                     isHovered={isHovered}
                     frameColor={frameColor}
                     frameName={frameName}
-                    registerLabel={registerLabel}
                     onMouseEnter={() => setHoveredFrame(frameName)}
                     onMouseLeave={() => setHoveredFrame(null)}
                   />

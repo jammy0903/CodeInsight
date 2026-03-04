@@ -1,0 +1,37 @@
+{
+  "lessonId": "c-10-3",
+  "title": "Buffered I/O",
+  "concept": "缓冲 I/O 通过减少系统调用提高性能，但需要理解刷新时机",
+  "content": {
+    "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    printf(\"Example 1... \");\n\n    fflush(stdout);\n    printf(\"Printed immediately!\\n\");\n\n    printf(\"Example 2 with newline\\n\");\n\n    return 0;\n}",
+    "steps": [
+      {"title":"包含 stdio.h 头文件","explanation":"**`#include <stdio.h>`** -- 使用 `printf`、`fflush` 等标准输入输出函数的头文件。\n\n本课学习**缓冲（Buffering）**。","visualizationType":"cMemory","code":"#include <stdio.h>","stack":[],"heap":[],"stdout":""},
+      {"title":"main 函数开始","explanation":"**`int main() {`** -- 程序启动时，操作系统打开标准流并为每个设置**缓冲模式**。\n\nC 有 3 种缓冲模式。","visualizationType":"cMemory","code":"int main() {","stack":[{"name":"main","type":"frame","func":"main","value":"frame"}]},
+      {"title":"数据存入缓冲区","explanation":"**`printf(\"Example 1... \");`** -- 调用了 `printf` 但字符串末尾**没有 `\\n`**。\n\n数据当前在内存中 `stdout` 的内部缓冲区中。","visualizationType":"cMemory","code":"printf(\"Example 1... \");","stack":[]},
+      {"title":"强制刷新缓冲区（Flush）","explanation":"**`fflush(stdout);`** -- **强制清空**指定流的缓冲区，立即将所有积累的数据发送到目的地。此时缓冲的 `\"Example 1... \"` 被发送到终端。","visualizationType":"cMemory","code":"fflush(stdout);","stdout":"Example 1... "},
+      {"title":"带换行符的输出","explanation":"**`printf(\"Printed immediately!\\n\");`** -- 这个 `printf` 末尾包含 **`\\n`**。在行缓冲中遇到 `\\n` 会**自动刷新**缓冲区，无需 `fflush` 就能立即显示在屏幕上。","visualizationType":"cMemory","code":"printf(\"Printed immediately!\\n\");","stdout":"Example 1... Printed immediately!"},
+      {"title":"确认自动刷新","explanation":"**`printf(\"Example 2 with newline\\n\");`** -- 包含 `\\n`，行缓冲自动刷新，立即显示在屏幕上。","visualizationType":"cMemory","code":"printf(\"Example 2 with newline\\n\");","stdout":"Example 1... Printed immediately!\nExample 2 with newline"},
+      {"title":"程序结束","explanation":"**`return 0;`** -- 正常终止时，C 运行时自动刷新所有打开流的缓冲区。即使是没有 `\\n` 的 `printf` 数据也会在此时输出。","visualizationType":"cMemory","code":"return 0;"}
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "程序崩溃（Crash）终止时，为什么 printf 的内容可能不会显示在屏幕上？",
+    "options": [
+      "操作系统 bug",
+      "输出缓冲区未刷新就进程终止了",
+      "printf 函数太慢",
+      "内存不足"
+    ],
+    "correctIndex": 1,
+    "explanation": "如果没有换行（\\n）或 fflush，数据只在缓冲区中，崩溃时这些数据无法到达屏幕就消失了。\n调试时需要注意。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "所有 I/O 都是立即处理的。",
+      "correct": "为了减少磁盘 I/O 和系统调用开销，几乎总是涉及缓冲（完全缓冲、行缓冲、无缓冲）。",
+      "why": "系统调用是昂贵的操作。"
+    }
+  ],
+  "keyTakeaway": "缓冲提高了性能，但当需要实时输出或调试时，理解 fflush 的重要性至关重要。"
+}

@@ -1,0 +1,392 @@
+{
+  "lessonId": "js-2-1",
+  "title": "var vs let vs const",
+  "concept": "var、let 和 const 各自遵循不同的作用域规则",
+  "content": {
+    "code": "var a = 1;\nlet b = 2;\nconst c = 3;\n\nif (true) {\n  var a = 10;\n  let b = 20;\n  const c = 30;\n  console.log(a, b, c);\n}\n\nconsole.log(a, b, c);",
+    "steps": [
+      {
+        "title": "var a = 1（全局声明）",
+        "explanation": "用 var 声明的变量具有函数作用域。\n因为这里处于全局层级，它成为一个全局变量。",
+        "keyInsight": "var 是函数作用域的。它会忽略块（{}）。",
+        "visualizationType": "scope",
+        "code": "var a = 1;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "a"
+        }
+      },
+      {
+        "title": "let b = 2（全局声明）",
+        "explanation": "用 let 声明的变量具有块级作用域。\n当前处于全局块中。",
+        "keyInsight": "let 是块级作用域的。它只在最近的 {} 内有效。",
+        "visualizationType": "scope",
+        "code": "let b = 2;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "b"
+        }
+      },
+      {
+        "title": "const c = 3（全局声明）",
+        "explanation": "const 也是块级作用域的。\n它的行为类似 let，但不能被重新赋值。",
+        "keyInsight": "const = let + 不可重新赋值",
+        "visualizationType": "scope",
+        "code": "const c = 3;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "c"
+        }
+      },
+      {
+        "title": "进入 if 块",
+        "explanation": "我们进入 if 块。\n一个新的块级作用域被创建。",
+        "keyInsight": "每个 {} 都会创建一个新的块级作用域。",
+        "visualizationType": "scope",
+        "code": "if (true) {",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 1,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": []
+            }
+          ],
+          "highlightScope": "if Block",
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "var a = 10（函数作用域的局限）",
+        "explanation": "var 把块（{}）当作透明的。\n它会将变量注册到最近的**函数作用域**或包裹它的**全局作用域**中。\n\n**类比**：想象在酒店房间（块）里吸烟（var）——烟雾会穿透墙壁一直飘到酒店大堂（全局作用域）。",
+        "keyInsight": "var 忽略块的边界，向上层攀升（与变量提升相关）。",
+        "analogy": "想象在酒店房间（块）里吸烟（var）——烟雾会穿透墙壁一直飘到酒店大堂（全局作用域）。",
+        "visualizationType": "scope",
+        "code": "var a = 10;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "changed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": []
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "a"
+        }
+      },
+      {
+        "title": "let b = 20（块内部）",
+        "explanation": "let 是块级作用域的。\n在 if 块内部创建了一个新的 b。\n这和全局的 b 是完全不同的变量！",
+        "keyInsight": "块内的 let b 和全局作用域的 let b 是完全不同的变量。",
+        "visualizationType": "scope",
+        "code": "let b = 20;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "if Block",
+          "highlightVariable": "b"
+        }
+      },
+      {
+        "title": "const c = 30（块内部）",
+        "explanation": "const 也是块级作用域的。\n在 if 块内部创建了一个新的 c。",
+        "visualizationType": "scope",
+        "code": "const c = 30;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var"
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 30,
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "c"
+        }
+      },
+      {
+        "title": "块内的 console.log",
+        "explanation": "在块内打印 a、b、c。\na 来自全局作用域（10），而 b 和 c 来自块级作用域（20、30）。",
+        "keyInsight": "JavaScript 会首先在最近的作用域中查找变量。",
+        "visualizationType": "scope",
+        "code": "console.log(a, b, c);",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "accessed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let"
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const"
+                }
+              ]
+            },
+            {
+              "name": "if Block",
+              "type": "block",
+              "variables": [
+                {
+                  "name": "b",
+                  "value": 20,
+                  "keyword": "let",
+                  "accessed": true
+                },
+                {
+                  "name": "c",
+                  "value": 30,
+                  "keyword": "const",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "10 20 30"
+          ],
+          "highlightScope": null,
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "块结束后的 console.log",
+        "explanation": "当块结束时，块级作用域的变量（let b、const c）消失了。\n只剩下全局变量。",
+        "keyInsight": "a 是 10（var 覆盖了全局值），b 是 2，c 是 3（块级变量已消失）",
+        "misconception": "很容易以为 var a 只在块内是 10。实际上，全局的 a 本身就被修改了！",
+        "visualizationType": "scope",
+        "code": "console.log(a, b, c);",
+        "occurrence": 2,
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "a",
+                  "value": 10,
+                  "keyword": "var",
+                  "accessed": true
+                },
+                {
+                  "name": "b",
+                  "value": 2,
+                  "keyword": "let",
+                  "accessed": true
+                },
+                {
+                  "name": "c",
+                  "value": 3,
+                  "keyword": "const",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "10 20 30",
+            "10 2 3"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下代码的输出是什么？\n\nlet x = 1;\nif (true) {\n  var x = 2;\n}\nconsole.log(x);",
+    "options": [
+      "1",
+      "2",
+      "发生错误",
+      "undefined"
+    ],
+    "correctIndex": 2,
+    "explanation": "在已经声明了 let x 的同一作用域中再声明 var x 会导致 SyntaxError。\n因为 var 忽略块，它试图在全局作用域中重新声明 x，这与 let 声明冲突。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "var 也只在块内有效",
+      "correct": "var 只遵循**函数作用域**。\n它忽略 if/for 块，可能意外地表现为全局变量。",
+      "why": "这是 JavaScript 早期设计的遗留问题。\n因为它是无意中覆盖全局变量的主要元凶，现代 JS 避免使用它。"
+    },
+    {
+      "wrong": "let 和 const 是一样的",
+      "correct": "两者都是块级作用域的，但 const 不能被重新赋值。",
+      "why": "const 是用于常量的关键字。\n但是，用 const 声明的对象的属性仍然可以被修改。"
+    }
+  ],
+  "keyTakeaway": "var = 函数作用域（忽略块），let/const = 块级作用域"
+}

@@ -1,0 +1,323 @@
+{
+  "lessonId": "py-9-2",
+  "title": "装饰器：增强其他函数的函数",
+  "concept": "一种基于闭包的模式，使用 `@` 语法在不修改原有函数代码的情况下为其添加额外功能。",
+  "content": {
+    "code": "def logger(func):\n    def wrapper(*args, **kwargs):\n        print(f\"--- {func.__name__} 시작 ---\")\n        result = func(*args, **kwargs)\n        print(f\"--- {func.__name__} 종료 ---\")\n        return result\n    return wrapper\n\n@logger\ndef say_hello(name):\n    print(f\"안녕하세요, {name}님!\")\n\nsay_hello(\"앨리스\")",
+    "steps": [
+      {
+        "title": "定义 logger 函数",
+        "explanation": "**`def logger(func):`**\n\n**定义装饰器函数。** 这个函数接受另一个函数作为参数 `func`。\n\n**类比**：想象一个礼物包装服务。\n- `logger` 是"包装服务"本身\n- `func` 是要包装的"原始礼物"\n- 包装服务接收礼物，用漂亮的包装纸（开始/结束日志）包好后归还\n- 原始礼物本身完全不会被改变\n\n**内部机制**：当 Python 遇到 `def logger(func):` 时，会创建一个函数对象（0x1100）。由于这个函数还没有被调用，内部的 `wrapper` 函数也还没有被创建。\n\n**为什么是这个顺序？** 要使用 `@logger` 装饰器，`logger` 必须先被定义。因为 Python 从上到下读取代码，装饰器函数必须在使用之前出现。\n\n**注意**：装饰器函数的参数名 `func` 是一种惯例，但使用任何名称都可以。重要的是它接收"要装饰的函数"。",
+        "visualizationType": "pythonMemory",
+        "code": "def logger(func):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "logger 函数（0x1100）已被定义。",
+          "names": [
+            {
+              "name": "logger",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "应用 @logger 装饰器并定义 say_hello",
+        "explanation": "**`@logger` + `def say_hello(name):`**\n\n**`@logger` 是 Python 的装饰器语法。** 这一行在内部与 `say_hello = logger(say_hello)` 完全等价。\n\n详细的执行顺序如下：\n1. 首先，`def say_hello(name):` 创建原始的 `say_hello` 函数对象（0x1200）\n2. 紧接着调用 `logger(say_hello)`——原始函数被传递给 `func` 参数\n3. `logger` 的返回值重新赋值给 `say_hello` 这个名称\n\n**类比**：想象一个快递接收流程。\n- 创建原始商品（say_hello）\n- 立即送到包装服务（logger）\n- 包装好的商品带着相同的标签（say_hello）回来了\n\n**内部机制**：当 `logger` 被调用时，创建一个新的执行帧，局部变量 `func` 绑定到原始的 `say_hello` 函数。\n\n**为什么是这个顺序？** `@` 语法在函数定义后立即自动应用。Python 替你执行 `say_hello = logger(say_hello)`，无需手动编写。\n\n**注意**：`@logger` 之后的 `say_hello` 已经不再是原始函数了！名称相同，但实际对象已经改变。",
+        "visualizationType": "pythonMemory",
+        "code": "def say_hello(name):",
+        "highlightOffset": [
+          -1,
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "logger 已被调用。原始 say_hello 作为 func 传入。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义 wrapper 函数",
+        "explanation": "**`def wrapper(*args, **kwargs):`**\n\n**在 `logger` 函数内部定义 `wrapper`（包装器）函数。** 这个函数充当包装原始 `say_hello` 的"包装纸"角色。\n\n**`*args, **kwargs` 的含义：**\n- `*args`：可以接收任意数量的位置参数（如 `(\"Alice\")`、`(1, 2, 3)`）\n- `**kwargs`：可以接收任意数量的关键字参数（如 `(name=\"Alice\")`）\n- 这样可以将装饰器应用于任何函数\n\n**类比**：包装纸必须能包裹任何大小的礼物。\n`*args, **kwargs` 就是"万能尺寸包装纸"。\n\n**内部机制**：`wrapper` 是一个闭包。它通过 Cell 引用 `func` 变量（原始 `say_hello`），因此即使 `logger` 执行结束后也能访问原始函数。\n\n**为什么是这个顺序？** 当调用 `logger(func)` 时必须定义 `wrapper`。这个 `wrapper` 将成为以后以 `say_hello` 名义被调用的"新函数"。\n\n**注意**：`wrapper` 这个名称是一种惯例。可以使用任何名称，但表示"包装函数"含义的 `wrapper` 最为常用。",
+        "visualizationType": "pythonMemory",
+        "code": "def wrapper(*args, **kwargs):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pythonMemoryState": {
+          "note": "wrapper（0x2000）已创建。它记住了原始函数。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "wrapper",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1002"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "返回 wrapper",
+        "explanation": "**`return wrapper`**\n\n**`logger` 函数返回 `wrapper` 函数。** 这个返回值被赋值给全局变量 `say_hello`。\n\n此刻发生的最重要变化：\n- **变更前**：`say_hello` -> 原始函数（0x1200）\n- **变更后**：`say_hello` -> `wrapper` 函数（0x2000）\n\n也就是说，`say_hello` 这个名称没变，但它指向的对象变了！\n\n**类比**：同一个快递标签，但里面多了一层包装纸。\n收件人看到标签觉得"哦，是 say_hello"，但实际打开后，先看到包装（wrapper），里面才是原物（func）。\n\n**内部机制**：`logger` 的执行帧终止。但 `wrapper` 的 `__closure__` 保持着对 `func`（原始 say_hello）的引用，所以原始函数不会从内存中消失。\n\n**为什么是这个顺序？** `logger` 的职责是创建并返回 `wrapper`。现在当调用 `say_hello` 时，实际运行的是 `wrapper`。\n\n**注意**：原始函数的 `__name__` 等元信息会丢失。为防止这种情况，应该在 `wrapper` 上应用 `functools.wraps` 装饰器。",
+        "visualizationType": "pythonMemory",
+        "code": "return wrapper",
+        "pythonMemoryState": {
+          "note": "现在 say_hello 就是 wrapper（0x2000）。",
+          "names": [
+            {
+              "name": "say_hello",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "wrapper",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 say_hello（调用 wrapper）",
+        "explanation": "**`say_hello(\"Alice\")`**\n\n**我们调用 `say_hello`，但实际执行的是 `wrapper` 函数。**\n\n因为在上一步中 `say_hello` 已经被替换成了 `wrapper`。\n`say_hello(\"Alice\")` 实际上就是 `wrapper(\"Alice\")`。\n\n由于 `wrapper` 通过 `*args` 接收参数，所以 `args = (\"Alice\",)` 成为一个元组。\n\n**类比**：打开快递包裹（say_hello），首先看到的是包装纸（wrapper）。\n拆开包装纸的过程就是 wrapper 的执行过程。\n\n**内部机制**：Python 调用 `say_hello` 指向的对象的 `__call__` 方法。由于 `say_hello` 现在是 `wrapper` 函数对象，所以执行的是 `wrapper.__call__(\"Alice\")`。\n\n**为什么是这个顺序？** 装饰器的核心是"透明性"。用户只需像平常一样调用 `say_hello`。装饰器在幕后自动执行附加功能。\n\n**注意**：调用代码（`say_hello(\"Alice\")`）在应用装饰器前后完全不变。这就是装饰器的优雅之处。",
+        "visualizationType": "pythonMemory",
+        "code": "say_hello(\"앨리스\")",
+        "pythonMemoryState": {
+          "note": "wrapper 函数正在执行。",
+          "names": [
+            {
+              "name": "say_hello",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "wrapper",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "wrapper 执行 - 开始日志",
+        "explanation": "**`print(f\"--- {func.__name__} 开始 ---\")`**\n\n**使用原始函数的名称输出"开始"日志。**\n\n`func` 是通过闭包引用的原始 `say_hello` 函数。\n`func.__name__` 是函数对象的名称属性，返回字符串 `\"say_hello\"`。\n因此输出 `\"--- say_hello 开始 ---\"`。\n\n**类比**：开始拆包装时宣布"现在要打开 say_hello 礼物了！"\n\n**这就是装饰器的核心价值：**\n- 我们没有改动原始函数（`say_hello`）的任何代码\n- 但函数执行"之前"自动执行了额外操作（日志记录）\n\n**为什么是这个顺序？** `wrapper` 按照"原始函数执行前 -> 执行原始函数 -> 原始函数执行后"的顺序运行。现在处于"执行前"阶段。\n\n**实际应用**：在实际项目中，这种日志装饰器对调试和性能监控非常有用。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"--- {func.__name__} 시작 ---\")",
+        "pythonMemoryState": {
+          "output": [
+            "--- say_hello 시작 ---"
+          ],
+          "note": "开始日志已输出。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用原始函数",
+        "explanation": "**`result = func(*args, **kwargs)`**\n\n**调用存储在闭包中的原始 `say_hello` 函数。** 通过 `*args` 接收到的参数 `\"Alice\"` 原样传递给原始函数。\n\n展开来写就是 `result = func(\"Alice\")`，这与调用原始的 `say_hello(\"Alice\")` 完全相同。\n\n**类比**：打开包装后，终于取出原始礼物（func）。\n礼物完整地执行其原本的功能。\n\n**内部机制**：\n1. `func` 从 Cell 中获取原始的 `say_hello`（0x1200）\n2. `*args` 将 `(\"Alice\",)` 元组解包为位置参数传递\n3. `\"Alice\"` 绑定到原始 `say_hello` 的 `name` 参数\n\n**为什么是这个顺序？** 输出开始日志后，轮到执行原始函数的实际工作了。返回值存储在 `result` 中，因为 `wrapper` 之后也需要返回这个值。\n\n**注意**：`func(*args, **kwargs)` 这种形式会将原始函数的任何参数原样传递。这保证了装饰器的通用性。",
+        "visualizationType": "pythonMemory",
+        "code": "result = func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "原始 say_hello（0x1200）正在执行。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "name",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1002"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"앨리스\"",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 say_hello 函数体",
+        "explanation": "**`print(f\"你好，{name}！\")`**\n\n**原始 `say_hello` 函数的函数体执行，打印问候消息。**\n\n由于 `name` 是 `\"Alice\"`，所以输出 `\"你好，Alice！\"`。\n\n此时控制台已经输出了两行：\n1. `--- say_hello 开始 ---`（wrapper 输出的）\n2. `你好，Alice！`（原始函数输出的）\n\n**关键要点**：原始函数完全不知道自己被装饰器包装了。\n它只是像平常一样做自己的事。这正是"关注点分离（Separation of Concerns）"。\n\n**类比**：礼物（原始函数）无论是否被包装，都以同样的方式工作。\n包装不会影响礼物的功能。\n\n**为什么是这个顺序？** 在 `wrapper` 内部调用 `func(*args, **kwargs)` 的结果就是原始函数的函数体被执行。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"안녕하세요, {name}님!\")",
+        "pythonMemoryState": {
+          "output": [
+            "안녕하세요, 앨리스님!"
+          ],
+          "note": "原始函数的功能已执行。",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"앨리스\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "wrapper 执行 - 结束日志",
+        "explanation": "**`print(f\"--- {func.__name__} 结束 ---\")`**\n\n**原始函数执行完毕后，输出"结束"日志。**\n\n输出 `\"--- say_hello 结束 ---\"`。\n\n至此，`wrapper` 的三阶段执行流程完成：\n1. **前置处理**：输出 `\"--- say_hello 开始 ---\"`\n2. **主处理**：执行原始 `func` -> 输出 `\"你好，Alice！\"`\n3. **后置处理**：输出 `\"--- say_hello 结束 ---\"`\n\n**类比**：礼物全部打开后，宣布"say_hello 礼物已打开完毕！"\n\n**内部机制**：原始函数 `say_hello` 没有显式的 `return`，所以返回 `None`。这个值存储在 `result` 变量中。\n\n**为什么是这个顺序？** 这是装饰器模式的核心结构：可以在原始函数的"前后"添加任何代码。\n\n**实际应用**：这种前后处理模式广泛应用于执行时间测量、权限检查、缓存、事务管理等场景。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"--- {func.__name__} 종료 ---\")",
+        "pythonMemoryState": {
+          "output": [
+            "--- say_hello 종료 ---"
+          ],
+          "note": "函数执行完毕，结束日志已输出。",
+          "names": [
+            {
+              "name": "result",
+              "pointsTo": "none1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "none1",
+              "type": "nonetype",
+              "value": null,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "返回结果",
+        "explanation": "**`return result`**\n\n**原样返回原始函数的返回值（`None`）。**\n\n想想为什么这一步很重要：\n- 如果原始函数返回了一个值，比如 `return 42` 呢？\n- `wrapper` 也必须返回那个 `42`\n- 这样才能保证应用装饰器前后的行为一致\n\n目前 `say_hello` 不返回任何值（`None`），所以 `result` 也是 `None`。\n\n**类比**：包装服务结束后，必须将原始礼物提供的东西（返回值）原样交给顾客。包装服务不能截留返回值！\n\n**为什么是这个顺序？** `wrapper` 的最后一个职责是将原始函数的返回值透明地传递给调用者。这样装饰器才能"透明地"工作。\n\n**注意**：如果忘记 `return result`，`wrapper` 将始终返回 `None`。当原始函数返回有意义的值时，这会导致 bug。编写装饰器时一定不要忘记转发返回值！",
+        "visualizationType": "pythonMemory",
+        "code": "return result",
+        "pythonMemoryState": {
+          "note": "返回最终结果。",
+          "names": [
+            {
+              "name": "result",
+              "pointsTo": "none1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "none1",
+              "type": "nonetype",
+              "value": null,
+              "pyId": "1005"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "`@my_decorator` 等价于什么？",
+    "options": [
+      "`my_decorator.run()`",
+      "`func = my_decorator(func)`",
+      "`func(my_decorator)`",
+      "这是语法错误。"
+    ],
+    "correctIndex": 1,
+    "explanation": "装饰器语法 `@` 将紧接在下方定义的函数作为参数传递给装饰器函数，并将结果重新赋值给原始函数名。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "装饰器会修改函数的内容。",
+      "correct": "不是的。\n装饰器保持函数不变，通过创建新的包装函数来添加功能。",
+      "why": "装饰器最大的优点在于无需修改原始函数即可添加或修改功能。"
+    }
+  ],
+  "keyTakeaway": "装饰器（`@decorator`）是包装其他函数的函数。它是减少代码重复、提高可复用性的强大工具。"
+}

@@ -1,0 +1,127 @@
+{
+  "lessonId": "java-8-3",
+  "title": "HashSet: Absolutely No Duplicates!",
+  "concept": "HashSet is like a bag that doesn't allow duplicates. If you try to add something that's already there, it refuses.",
+  "content": {
+    "code": "import java.util.HashSet;\n\npublic class Main {\n    public static void main(String[] args) {\n        HashSet<String> set = new HashSet<>();\n        \n        set.add(\"Java\");\n        set.add(\"Java\"); // 중복! \n        \n        System.out.println(\"크기: \" + set.size()); // 1\n    }\n}",
+    "steps": [
+      {
+        "title": "Package Import",
+        "explanation": "**`import java.util.HashSet;`**\n\nImporting `HashSet`, a collection that does not allow duplicates.",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.HashSet;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the HashSet",
+        "explanation": "**Execution flow:**\n1. A `HashSet` object is created.\n2. Internally, it secretly creates a `HashMap` and uses it under the hood.\n\n**No duplicates allowed:**\nA `Set` is like a bag that cannot hold two identical items.",
+        "visualizationType": "javaMemory",
+        "code": "HashSet<String> set = new HashSet<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "set",
+              "value": "0x001",
+              "frame": "main",
+              "type": "HashSet<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 0",
+              "type": "HashSet",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding the First Element",
+        "explanation": "**Execution flow:**\n1. Checks if `Java` already exists in the `set`.\n2. It doesn't exist, so it's stored.\n\n**First appearance:**\nIt goes right in without any issues.",
+        "visualizationType": "javaMemory",
+        "code": "set.add(\"Java\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[\"Java\"]",
+              "type": "HashSet",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Attempting to Add a Duplicate",
+        "explanation": "**Execution flow:**\n1. Tries to add `Java`, but it's already there!\n2. After thorough checking with `hashCode()` and `equals()`, it says \"Oh, this already exists\" and refuses to store it.\n3. `false` is returned.\n\n**Ironclad defense:**\nA `Set` absolutely never allows duplicates.",
+        "visualizationType": "javaMemory",
+        "code": "set.add(\"Java\"); // 중복!",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[\"Java\"]",
+              "type": "HashSet"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Size",
+        "explanation": "**Execution flow:**\n1. Counts the number of elements currently stored.\n2. Since the previous attempt was rejected, the count is still `1`.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"크기: \" + set.size()); // 1",
+        "javaMemoryState": {
+          "output": [
+            "크기: 1"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which pair of methods does HashSet use to check for duplicates?",
+    "options": [
+      "toString() & equals()",
+      "hashCode() & equals()",
+      "clone() & hashCode()",
+      "compareTo() & equals()"
+    ],
+    "correctIndex": 1,
+    "explanation": "First it checks with hashCode() whether they're in the same bucket, and if so, it uses equals() to verify the contents are identical, ultimately determining duplicates."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can retrieve elements by index (get(0)) like a List.",
+      "correct": "No! A Set has no order, so there are no index numbers.\nYou must use an Iterator or an enhanced for-loop to access elements.",
+      "why": "There is no defined order for where data is stored."
+    }
+  ],
+  "keyTakeaway": "When you want to manage unique items or remove duplicates, use a Set!"
+}

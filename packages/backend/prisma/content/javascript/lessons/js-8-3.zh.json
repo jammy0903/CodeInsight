@@ -1,0 +1,90 @@
+{
+  "lessonId": "js-8-3",
+  "title": "任务拆分",
+  "concept": "将长任务分解成小块并定期让出控制权，对于保持 UI 响应性至关重要。",
+  "content": {
+    "code": "// 1. Blocking Task (나쁜 예)\nfunction heavy() {\n  // 10억 번 루프: 메인 스레드를 완전히 차단함\n  for (let i = 0; i < 1000000000; i++) {}\n}\n\n// 2. Chunking & Yielding (좋은 예)\nlet i = 0;\nfunction heavyChunk() {\n  // 100만 번만 수행 (Chunk)\n  const end = i + 1000000;\n  while (i < end) { i++; }\n\n  // \"잠깐 쉴게\" -> 렌더링 기회 제공 (Yield)\n  if (i < 1000000000) {\n    setTimeout(heavyChunk, 0);\n  }\n}",
+    "steps": [
+      {
+        "title": "定义阻塞任务",
+        "explanation": "`heavy()` 函数定义了一个完全阻塞主线程的长任务。\n运行时，浏览器的 UI 会冻结，直到所有十亿次迭代完成。\n这被称为「UI 冻结」。",
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [
+            "heavy()  ⚠️ 10억 루프 블로킹"
+          ],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": []
+        },
+        "code": "function heavy() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "定义分块：拆分工作",
+        "explanation": "`heavyChunk()` 函数被设计为将长任务分解成小块（Chunks）。\n每次调用只执行一百万次迭代，因此主线程不会被占用太久。",
+        "keyInsight": "将巨大任务分解成小块以减少每次执行时间的技术。",
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [
+            "heavyChunk()  (100만 번만)"
+          ],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": []
+        },
+        "code": "function heavyChunk() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "title": "定义让步：交还控制权",
+        "explanation": "每个块执行完后，`heavyChunk()` 调用 `setTimeout(heavyChunk, 0)` 将下一个块发送到任务队列。\n这会有意清空调用栈，给浏览器处理渲染和用户输入的机会（Yield）。",
+        "visualizationType": "eventLoop",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [],
+          "taskQueue": [
+            "heavyChunk()"
+          ],
+          "microtaskQueue": []
+        },
+        "code": "if (i < 1000000000) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "以下哪个不是在长任务中让步的有效 API？",
+    "options": [
+      "setTimeout(fn, 0)",
+      "scheduler.yield()（现代浏览器）",
+      "requestIdleCallback()",
+      "while(true) 循环"
+    ],
+    "correctIndex": 3,
+    "explanation": "像 `while(true)` 这样的同步循环永远不会清空主线程——它会无限期占据主线程。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "用 Promise 拆分任务可以防止画面冻结",
+      "correct": "不完全正确。\nPromise 的优先级比渲染更高。",
+      "why": "如果 Promise（微任务）不断链式调用，浏览器永远无法进入渲染步骤。\n要让步给渲染，需要使用 setTimeout（宏任务）或调度器 API。"
+    }
+  ],
+  "keyTakeaway": "将巨大任务分解成小块并频繁让步。"
+}

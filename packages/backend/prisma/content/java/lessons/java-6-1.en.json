@@ -1,0 +1,142 @@
+{
+  "lessonId": "java-6-1",
+  "title": "Stack Traces and Exception Hierarchy",
+  "concept": "Understanding the difference between Exception and Error, and the exception hierarchy in Java.",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. Error (serious system-level problem)\n        // Error error = new StackOverflowError();\n        \n        // 2. RuntimeException (Unchecked - programmer mistake)\n        RuntimeException bug = new NullPointerException(\"null reference!\");\n        \n        // 3. Exception (Checked - external environment issue)\n        Exception failure = new java.io.IOException(\"File not found\");\n        \n        System.out.println(\"Hierarchy loaded\");\n    }\n}",
+    "steps": [
+      {
+        "title": "main Method Execution",
+        "explanation": "**`public static void main(String[] args)`**\n\nThis is the entry point of a Java application.\nThe program begins when the JVM invokes this method.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Creating a RuntimeException",
+        "explanation": "**Execution flow:**\n1. The `main` stack frame is created.\n2. A `NullPointerException` object is created at address `0x100` on the Heap.\n3. The `bug` variable references this object.\n\n**Explanation:**\nAll exceptions in Java are ultimately **objects**.\n`RuntimeException` typically occurs when the programmer writes buggy code.\nFor example, trying to use a variable that is `null`.\nThe compiler doesn't enforce handling, so they're called 'Unchecked'.",
+        "visualizationType": "javaMemory",
+        "code": "RuntimeException bug = new NullPointerException(\"null reference!\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "bug",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "RuntimeException"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: null reference!",
+              "type": "NullPointerException",
+              "new": true
+            }
+          ],
+          "metaspace": [
+            {
+              "name": "Main.class",
+              "value": "loaded"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a Checked Exception",
+        "explanation": "**Execution flow:**\n1. An `IOException` object is created at address `0x200` on the Heap.\n2. The `failure` variable references this object.\n\n**Explanation:**\nChecked Exceptions like `IOException` occur due to **external environment** issues such as missing files or network disconnections.\nSince these are common scenarios, Java **forces** you to write handling code (try-catch).\nThat's why they're called 'Checked'.",
+        "visualizationType": "javaMemory",
+        "code": "Exception failure = new java.io.IOException(\"File not found\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "bug",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "RuntimeException"
+            },
+            {
+              "name": "failure",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "Exception"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: null reference!",
+              "type": "NullPointerException"
+            },
+            {
+              "address": "0x200",
+              "content": "IOException: File not found",
+              "type": "IOException",
+              "new": true
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "Execution Complete",
+        "explanation": "**Execution flow:**\n1. `System.out.println` is called and prints a message to the console.\n2. The `main` method terminates normally.\n\n**Explanation:**\nHere, we only created exception objects with `new` but never `throw`-ed them.\nThat's why the program didn't crash and ran to completion.\nAn exception only disrupts the program when it's thrown!",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"Hierarchy loaded\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: null reference!",
+              "type": "NullPointerException"
+            },
+            {
+              "address": "0x200",
+              "content": "IOException: File not found",
+              "type": "IOException"
+            }
+          ],
+          "output": [
+            "Hierarchy loaded"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following is a Checked Exception that the compiler forces you to handle?",
+    "options": [
+      "NullPointerException",
+      "ArrayIndexOutOfBoundsException",
+      "IOException",
+      "ArithmeticException"
+    ],
+    "correctIndex": 2,
+    "explanation": "`IOException` is related to external resources (files, network) and requires mandatory exception handling.\nThe rest are subclasses of `RuntimeException` -- programmer mistakes that don't require mandatory handling (Unchecked)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Error and Exception are the same thing.",
+      "correct": "They are different.\n`Error` (e.g., StackOverflow) represents serious system-level problems that the application cannot recover from, while `Exception` represents incidents that developers can handle in code.",
+      "why": "It's like the difference between a building collapsing due to fire (Error) and burning your hand while cooking (Exception)."
+    }
+  ],
+  "keyTakeaway": "Java's exceptions are divided under `Throwable` into `Error` (severe) and `Exception` (recoverable). `Exception` is further split into `Checked` (mandatory handling) and `Unchecked` (optional handling)."
+}

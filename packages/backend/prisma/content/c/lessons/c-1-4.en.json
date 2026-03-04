@@ -1,0 +1,150 @@
+{
+  "lessonId": "c-1-4",
+  "title": "Lifecycle of Stack Memory",
+  "concept": "Variables created inside a function (local variables) are destroyed when the function ends",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid func() {\n    int a = 10;\n    printf(\"Inside func: %d, Addr: %p\\n\", a, &a);\n}\n\nint main() {\n    func();\n\n\n    printf(\"Back in main\\n\");\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h Header",
+        "explanation": "The standard I/O header for using ```printf```. In this lesson, we'll cover **function lifecycle and local variable lifetime** — we'll observe what gets created when a function is called and what disappears when it ends.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "func Function Blueprint",
+        "explanation": "`func` is not executed here — this is the function definition (blueprint) stage.\n\nThe actual stack frame creation and execution happen when `func();` is called.",
+        "visualizationType": "cMemory",
+        "code": "void func() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "Program Execution Begins",
+        "explanation": "When the program starts, the main stack frame is created first.\n\nStack frames are pushed on function calls and popped on function returns, following a LIFO (Last In, First Out) structure.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          }
+        ]
+      },
+      {
+        "title": "Calling func() (Push)",
+        "explanation": "When `func();` is called, `func`'s stack frame is pushed on top of main.\n\nEach function call creates a separate frame, so each function's local variables are stored in different memory spaces.",
+        "visualizationType": "cMemory",
+        "code": "func();",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          },
+          {
+            "frame": "func",
+            "highlight": true,
+            "value": "func",
+            "name": "func"
+          }
+        ]
+      },
+      {
+        "title": "Creating func's Local Variable",
+        "explanation": "Local variable `a` is created inside `func`'s frame. This variable is only valid within `func`.\n\nmain cannot directly access `a`.",
+        "visualizationType": "cMemory",
+        "code": "int a = 10;",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          },
+          {
+            "frame": "func",
+            "variables": [
+              {
+                "name": "a",
+                "type": "int",
+                "value": "10"
+              }
+            ],
+            "value": "func",
+            "name": "func"
+          }
+        ]
+      },
+      {
+        "title": "Printing Inside func",
+        "explanation": "`printf` displays the value and address of func's local variable.\n\nThis address is only valid while func's frame is alive — it should not be trusted after the function returns.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Inside func: %d, Addr: %p\\n\", a, &a);",
+        "stdout": "Inside func: 10, Addr: 0x..."
+      },
+      {
+        "title": "func() Returns (Pop)",
+        "explanation": "When func ends, its stack frame is popped and local variables lose their scope.\n\nUsing the address of a function's local variable outside the function is dangerous.",
+        "visualizationType": "cMemory",
+        "code": "}",
+        "stack": [
+          {
+            "frame": "main",
+            "highlight": true,
+            "value": "main",
+            "name": "main"
+          }
+        ]
+      },
+      {
+        "title": "Returning to main",
+        "explanation": "After `func` ends, the `func` frame is popped and control returns to main.\n\nAt this point, `func`'s local variables are destroyed, and only main's variables remain.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Back in main\\n\");",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          }
+        ],
+        "stdout": "Inside func: 10, Addr: 0x...\nBack in main"
+      },
+      {
+        "title": "main Function Ends",
+        "explanation": "`return 0;` terminates main and cleans up the remaining stack frame.\n\nThe key concept is the stack frame flow: push on call, pop on return.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "In which memory region are local variables inside a function stored?",
+    "options": [
+      "Heap",
+      "Stack",
+      "Code Segment",
+      "Data Segment"
+    ],
+    "correctIndex": 1,
+    "explanation": "Local variables and parameters are stored in the Stack region.\nThey are created (pushed) with the function call and destroyed (popped) when the function ends."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Variable values remain in memory even after the function ends",
+      "correct": "They become inaccessible and are soon overwritten.",
+      "why": "As the stack pointer moves back, that space is treated as 'free'.\nIt gets reused by the next function call."
+    }
+  ],
+  "keyTakeaway": "A local variable's lifetime equals the function's lifetime. When the function ends, the room is vacated."
+}

@@ -49,18 +49,6 @@ export const COLORS = {
       hover: 'var(--theme-memory-frame-indigo-hover)',
     },
   ],
-  register: {
-    rsp: {
-      bg: 'var(--theme-memory-register-rsp-bg)',
-      border: 'var(--theme-memory-register-rsp-border)',
-      text: 'var(--theme-memory-register-rsp-text)',
-    },
-    rbp: {
-      bg: 'var(--theme-memory-register-rbp-bg)',
-      border: 'var(--theme-memory-register-rbp-border)',
-      text: 'var(--theme-memory-register-rbp-text)',
-    },
-  },
   changed: {
     bg: 'var(--theme-memory-changed-bg)',
     border: 'var(--theme-memory-changed-border)',

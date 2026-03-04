@@ -1,0 +1,90 @@
+{
+  "lessonId": "java-10-3",
+  "title": "Race Condition: Who Gets There First?",
+  "concept": "A Race Condition occurs when two or more workers try to modify the same data simultaneously, resulting in corrupted outcomes.",
+  "content": {
+    "code": "public class Counter {\n    int count = 0;\n    public void increment() {\n        count = count + 1;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Counter c = new Counter();\n        // 두 쓰레드가 동시에 c.increment()를 호출한다면?\n        // 예상치 못한 결과가 발생합니다.\n    }\n}",
+    "steps": [
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nWe create a counter object that will be shared.",
+        "visualizationType": "memory",
+        "code": "public class Main {",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "frame": "main",
+              "value": "main"
+            }
+          ],
+          "note": "Main starts",
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "The True Nature of count + 1",
+        "explanation": "**`count = count + 1;`**\n\nThe CPU processes this single line in 3 steps:\n1. Read: Fetch the current value\n2. Modify: Add 1\n3. Write: Store the result\n\nThis gap between steps is exactly where accidents happen.",
+        "visualizationType": "memory",
+        "code": "count = count + 1;",
+        "memoryState": {
+          "cpu": [
+            {
+              "step": "1. READ",
+              "value": "0"
+            },
+            {
+              "step": "2. ADD",
+              "value": "1"
+            },
+            {
+              "step": "3. WRITE",
+              "value": "1"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Accident Scenario",
+        "explanation": "Imagine **Worker A** is in the middle of step 1 (reading), when **Worker B** suddenly jumps in and also does step 1 (reading).\n\nBoth think 'the current value is 0!' and each adds 1 and saves.\nThe result should be 2, but it ends up as 1.\nThe data has vanished!",
+        "keyInsight": "Accessing the same data concurrently causes lost updates",
+        "visualizationType": "memory",
+        "code": "}",
+        "memoryState": {
+          "threadA": {
+            "read": "0",
+            "willWrite": "1"
+          },
+          "threadB": {
+            "read": "0",
+            "willWrite": "1"
+          },
+          "finalCount": "1 (Error! Expect 2)",
+          "cpu": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following is NOT a way to solve a race condition?",
+    "options": [
+      "Using the synchronized keyword",
+      "Using the AtomicInteger class",
+      "Using only local variables",
+      "Using static variables"
+    ],
+    "correctIndex": 3,
+    "explanation": "Static variables are shared resources accessible by all instances, making race conditions more likely without proper protection."
+  },
+  "misconceptions": [
+    {
+      "wrong": "count++ is a single operation, so it's safe.",
+      "correct": "No! count++ is internally split into three steps: read-modify-write.",
+      "why": "This is described as 'not atomic'.\nThere's plenty of room for other threads to intervene between steps."
+    }
+  ],
+  "keyTakeaway": "When multiple threads access shared data, you must ensure 'atomicity' through proper synchronization."
+}

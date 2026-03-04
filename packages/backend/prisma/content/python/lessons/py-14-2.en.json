@@ -1,0 +1,290 @@
+{
+  "lessonId": "py-14-2",
+  "title": "Conditional Comprehension and Nesting",
+  "concept": "if-else expressions go before for, filter if goes after for -- the position matters!",
+  "content": {
+    "code": "numbers = [1, 2, 3, 4, 5]\n\nlabels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]\nprint(labels)\n\nmatrix = [[1, 2], [3, 4], [5, 6]]\nflat = [num for row in matrix for num in row]\nprint(flat)",
+    "steps": [
+      {
+        "title": "Creating the Source List",
+        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- Creates a list containing 5 integers and attaches the label `numbers`.\n\nIn this lesson, we'll learn **two advanced comprehension patterns**:\n1. **Conditional expression (if-else)** comprehension -- choosing different values based on conditions when transforming\n2. **Nested comprehension** -- flattening a 2D list into 1D\n\n**Analogy:** If the comprehensions from the previous lesson were a \"simple factory line,\" this time we're adding a **sorting device** and a **multi-stage conveyor belt**. When items come in, different labels are applied based on conditions, and items from multiple boxes can be spread out into a single line.\n\n**Key warning:** The `if` filter from the previous lesson and the `if-else` conditional expression we learn here are **positioned differently!**\n- Filter: `[x for x in nums **if condition**]` -- after the for\n- Conditional: `[**valueA if condition else valueB** for x in nums]` -- before the for\nConfusing these two is the most common mistake beginners make.\n\n**Python internals:** The list `[1, 2, 3, 4, 5]` is allocated in heap memory. In CPython, small integers from -5 to 256 are pre-cached, so they are not newly created but reuse existing integer objects.\n\n**Execution order:**\n1. List literal evaluation -> `list` object allocated on heap.\n2. `numbers -> list` binding created in global namespace.",
+        "visualizationType": "pythonMemory",
+        "code": "numbers = [1, 2, 3, 4, 5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Ready to learn conditional expressions and nested comprehensions",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "if-else Conditional Expression Comprehension",
+        "explanation": "**`labels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]`**\n\nThis statement is a \"check each element and assign a label\" pattern.\n- Even numbers get `even`\n- Odd numbers get `odd`\n\nAs a result, the element count stays the same, and only the values change to label strings.\n\n**Analogy**: Like applying A/B stickers to every product on a production line.\nNo products are discarded -- all are categorized.\n\nImportant distinction:\n- `... if ... else ... for ...` : **Select/transform** values\n- `... for ... if ...` : **Filter** only matching items\n\nNailing this difference greatly improves comprehension readability.",
+        "visualizationType": "pythonMemory",
+        "code": "labels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "if-else goes before for (for value selection)",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Labels Result",
+        "explanation": "**`print(labels)`** -- Prints `[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]` that `labels` points to.\n\nLooking at the result, the original 5 numbers were **1:1 transformed** into 5 strings. Not a single one was excluded! This is the decisive difference between `if-else` before for (value selection) and `if` after for (filtering).\n\n**Analogy:** Like stamping \"pass\" for scores 60 and above and \"fail\" for below on a school exam. Every student receives exactly one stamp. In contrast, `if` after for is like \"only list students scoring 60 and above\" -- some students are excluded.\n\n**Note:** Nesting ternary expressions drastically reduces readability. `\"A\" if x > 90 else \"B\" if x > 80 else \"C\"` works but is hard to read. In such cases, use `if-elif-else` statements or dictionary mapping.",
+        "visualizationType": "pythonMemory",
+        "code": "print(labels)",
+        "pythonMemoryState": {
+          "output": [
+            "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]"
+          ],
+          "note": "Every element gets an even or odd label",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a 2D List (Matrix)",
+        "explanation": "**`matrix = [[1, 2], [3, 4], [5, 6]]`** -- Creates a **2D list** where lists are nested inside a list. This structure is also called a matrix.\n\n**Analogy:** Imagine an apartment building. The building (matrix) has multiple floors (rows), and each floor has multiple units (elements). `matrix[0]` is the entire first floor ([1, 2]), and `matrix[0][1]` is unit 2 on the first floor (2).\n\n**Structure:**\n```\nmatrix = [\n    [1, 2],    -- row 0 (first row)\n    [3, 4],    -- row 1 (second row)\n    [5, 6]     -- row 2 (third row)\n]\n```\n\n**Access methods:**\n- `matrix[0]` -> `[1, 2]` (entire first row)\n- `matrix[0][1]` -> `2` (second element of first row)\n- `matrix[2][0]` -> `5` (first element of third row)\n\n**Python internals:** A 2D list is actually a \"list of lists.\" The outer list stores **references (memory addresses)** to 3 inner lists, and each inner list stores references to 2 integer objects. A total of 4 list objects and 6 integer objects exist on the heap.\n\nIn the next step, we'll **flatten** this 2D list into 1D.\n\n**Execution order:**\n1. Inner lists `[1, 2]`, `[3, 4]`, `[5, 6]` -- 3 created.\n2. Outer list created -> stores references to inner lists.\n3. `matrix` binding created in global namespace.",
+        "visualizationType": "pythonMemory",
+        "code": "matrix = [[1, 2], [3, 4], [5, 6]]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "2D list (3-row, 2-column matrix)",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "matrix",
+              "pointsTo": "list3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[[1, 2], [3, 4], [5, 6]]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Flattening with Nested Comprehension",
+        "explanation": "**Nested comprehension (flatten)** is the syntax for spreading a 2-level structure into a single line.\n\nKey pattern:\n- Outer `for`: iterates over rows\n- Inner `for`: iterates over elements in each row\n\nIn other words, \"iterate over rows, and pull out each element into a single list.\"\n\n**Analogy**: Like opening a 2-drawer cabinet from the top drawer and moving all items into one large basket.\n\nNotes:\n- Swapping the for order completely changes the meaning or causes errors\n- If readability suffers, writing it out as a regular nested for loop is better",
+        "visualizationType": "pythonMemory",
+        "code": "flat = [num for row in matrix for num in row]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Nested for: outer(row) -> inner(num) order",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "matrix",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "flat",
+              "pointsTo": "list4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[[1, 2], [3, 4], [5, 6]]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5, 6]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Flattened Result",
+        "explanation": "**`print(flat)`** -- Prints `[1, 2, 3, 4, 5, 6]` that `flat` points to. The 2D matrix was successfully converted to a 1D list.\n\n**Flatten** is an operation that spreads multi-dimensional data into 1 dimension, and it's a very commonly seen pattern in coding tests and data processing.\n\n**Analogy:** Like taking all books from a 3-story bookshelf and laying them out in a single line on the floor. Books from the 1st floor first, then the 2nd floor, then the 3rd floor in order.\n\n**This lesson's key summary:**\n\n**Python internals:** Another way to flatten is `itertools.chain.from_iterable(matrix)`. This returns an iterator, so it's more memory efficient. However, for simple cases, comprehensions are the most readable.\n\n**Note:** If nested comprehensions go **3 levels or deeper**, readability drops dramatically. Code like `[x for a in A for b in a for x in b]` is very hard to understand. Use comprehensions only up to 2 levels, and use regular for loops or `itertools` beyond that.\n\n**Execution order:**\n1. `flat` name -> resolve list object reference.\n2. `print()` -> `list.__repr__()` called.\n3. `[1, 2, 3, 4, 5, 6]` output to `sys.stdout`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(flat)",
+        "pythonMemoryState": {
+          "output": [
+            "[1, 2, 3, 4, 5, 6]"
+          ],
+          "note": "2D -> 1D flattening complete",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "matrix",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "flat",
+              "pointsTo": "list4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[[1, 2], [3, 4], [5, 6]]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5, 6]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "In [\"even\" if x % 2 == 0 else \"odd\" for x in [1, 2, 3]], where is the if-else positioned?",
+    "options": [
+      "After for (filtering)",
+      "Before for (value selection)",
+      "Outside the list",
+      "Position doesn't matter"
+    ],
+    "correctIndex": 1,
+    "explanation": "The if-else conditional expression is positioned **before** for to select the value for each element.\nThe if **after** for is for filtering (including/excluding) elements.\nDistinguishing the position and purpose of these two types of if is crucial!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "The inner for executes first in nested comprehensions",
+      "correct": "Nested comprehensions execute from the left for first (same order as regular nested for loops).",
+      "why": "In [num for row in matrix for num in row],\nfirst row is iterated, then for each row, num is iterated."
+    }
+  ],
+  "keyTakeaway": "if-else goes before for (value selection), if alone goes after for (filter)! Position determines purpose!"
+}

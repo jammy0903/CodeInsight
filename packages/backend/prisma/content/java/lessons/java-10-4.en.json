@@ -1,0 +1,90 @@
+{
+  "lessonId": "java-10-4",
+  "title": "Thread Pool: The Worker Staffing Agency",
+  "concept": "Creating threads every time is expensive. We need a 'staffing agency' that keeps workers on standby and just hands them tasks.",
+  "content": {
+    "code": "import java.util.concurrent.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // 1. 일꾼 3명이 대기하는 사무소 건설\n        ExecutorService office = Executors.newFixedThreadPool(3);\n\n        // 2. 사무소에 일감을 던짐\n        office.execute(() -> System.out.println(\"A 작업 처리 중...\"));\n        office.execute(() -> System.out.println(\"B 작업 처리 중...\"));\n\n        // 3. 사무소 문을 닫음\n        office.shutdown();\n    }\n}",
+    "steps": [
+      {
+        "title": "Importing Required Classes",
+        "explanation": "**`import java.util.concurrent.*;`**\n\nImporting `ExecutorService` and related classes for managing thread pools.",
+        "visualizationType": "memory",
+        "code": "import java.util.concurrent.*;",
+        "memoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Opening the Staffing Agency (ThreadPool)",
+        "explanation": "**`Executors.newFixedThreadPool(3)`**\n\nSets up an agency with 3 workers on standby.\nWhen tasks come in, these 3 workers take turns handling them.\nNo need to hire new temp workers (create threads) every time.\n\n**Analogy**: It's like a 'delivery dispatch office' with 3 riders waiting.\nWhen an order (Task) comes in, an available rider immediately heads out.",
+        "visualizationType": "memory",
+        "code": "ExecutorService office = Executors.newFixedThreadPool(3);",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "pool",
+              "content": "ThreadPool (3 workers, Waiting)",
+              "type": "ExecutorService"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Submitting the First Task",
+        "explanation": "The first task (lambda function) is submitted to the thread pool via `execute()`.\nOne of the waiting threads picks up and executes this task.",
+        "keyInsight": "Reusability = Efficient resource management",
+        "visualizationType": "memory",
+        "code": "office.execute(() -> System.out.println(\"A 작업 처리 중...\"));",
+        "memoryState": {
+          "worker1": "Executing task A",
+          "worker2": "IDLE",
+          "worker3": "IDLE"
+        }
+      },
+      {
+        "title": "Submitting the Second Task",
+        "explanation": "The second task is submitted next.\nAnother idle thread immediately picks up this task.\nIf all threads are busy, this task waits in a queue.",
+        "visualizationType": "memory",
+        "code": "office.execute(() -> System.out.println(\"B 작업 처리 중...\"));",
+        "memoryState": {
+          "worker2": "Executing task B"
+        }
+      },
+      {
+        "title": "Shutting Down the Thread Pool",
+        "explanation": "`shutdown()` is called to shut down the thread pool.\nNo new tasks are accepted, and once all current tasks complete, the threads are safely terminated.\nForgetting this call means the program won't exit.",
+        "visualizationType": "memory",
+        "code": "office.shutdown();",
+        "memoryState": {
+          "threadPool": "SHUTTING_DOWN",
+          "note": "Once all tasks finish, the threads are safely destroyed.",
+          "worker1": null,
+          "worker2": null,
+          "worker3": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which is NOT a primary reason for using a thread pool?",
+    "options": [
+      "Reducing the cost of creating and destroying threads",
+      "Handling sudden bursts of tasks",
+      "Improving overall program shutdown speed",
+      "Efficient use of resources (memory and CPU)"
+    ],
+    "correctIndex": 2,
+    "explanation": "In fact, failing to properly close a thread pool can keep the process alive indefinitely.\nIt has no direct relation to shutdown speed."
+  },
+  "misconceptions": [
+    {
+      "wrong": "More threads always means faster performance.",
+      "correct": "No! If there are too many threads relative to CPU cores, they spend more time 'deciding who goes first' (context switching) instead of working, making things slower.",
+      "why": "Thread pools are used to maintain the right number of workers matched to system specifications."
+    }
+  ],
+  "keyTakeaway": "ExecutorService is the core of modern Java concurrency programming. Use a pool instead of creating threads directly!"
+}

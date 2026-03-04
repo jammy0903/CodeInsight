@@ -1,0 +1,114 @@
+{
+  "lessonId": "java-9-4",
+  "title": "内存泄漏：抓住逃跑的对象",
+  "concept": "内存泄漏（Memory Leak）是指不再使用的对象因为误留了引用（箭头），导致 GC 无法清理的现象。",
+  "content": {
+    "code": "import java.util.*;\n\npublic class MemoryLeak {\n    static List<Object> list = new ArrayList<>(); // static 변수는 위험해요!\n\n    public static void main(String[] args) {\n        while(true) {\n            list.add(new byte[1024 * 1024]); // 1MB씩 무한 추가\n        }\n    }\n}",
+    "steps": [
+      {
+        "title": "包导入",
+        "explanation": "**`import java.util.*;`**\n\n导入 `List` 和 `ArrayList` 所需的包。",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.*;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n即将运行会导致内存泄漏的危险代码。",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {"
+      },
+      {
+        "title": "创建 static 列表",
+        "explanation": "由于 `static` 关键字，这个 `list` 在程序启动时创建，一直保留在内存中直到程序结束。\n存储在这里的对象很难被 GC 回收。",
+        "keyInsight": "static 变量容易逃脱 GC 的监控。",
+        "visualizationType": "javaMemory",
+        "code": "static List<Object> list = new ArrayList<>(); // static 변수는 위험해요!",
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "MemoryLeak.list",
+              "value": "-> ArrayList"
+            }
+          ],
+          "heap": [
+            {
+              "address": "ArrayList",
+              "content": "size: 0",
+              "type": "ArrayList"
+            }
+          ]
+        }
+      },
+      {
+        "title": "无限循环开始",
+        "explanation": "通过 `while(true)` 进入永不停止的无限循环。",
+        "visualizationType": "javaMemory",
+        "code": "while(true) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "Loop start..."
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "批量制造僵尸对象（内存泄漏）",
+        "explanation": "每次循环都会向 `list` 中不断添加 1MB 大小的 `byte` 数组。\n因为列表是 `static` 的，它紧紧抓住这些对象不放。GC 认为"还在使用"而无法回收。\n最终堆被填满并崩溃（OutOfMemoryError）。",
+        "keyInsight": "泄漏 = 不再使用但引用未断开",
+        "visualizationType": "javaMemory",
+        "code": "list.add(new byte[1024 * 1024]); // 1MB씩 무한 추가",
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "MemoryLeak.list",
+              "value": "-> ArrayList"
+            }
+          ],
+          "heap": [
+            {
+              "address": "ArrayList",
+              "content": "[byte[], byte[], ...]",
+              "size": "FULL!",
+              "changed": true
+            }
+          ],
+          "error": "java.lang.OutOfMemoryError: Java heap space",
+          "output": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Java 中内存泄漏最常见的原因是？",
+    "options": [
+      "过多使用 new 关键字",
+      "保持对不再使用的对象的引用",
+      "GC 算法不够完善",
+      "RAM 容量太小"
+    ],
+    "correctIndex": 1,
+    "explanation": "GC 只能清理不可达（无引用）的对象。\n如果将不用的对象放在集合中，GC 就无法介入。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "有 GC 在就不用担心内存释放。",
+      "correct": "不对！必须确保断开不用对象的引用（设为 null）或让它们超出作用域。",
+      "why": "无意中保持引用是内存泄漏的主要元凶。"
+    }
+  ],
+  "keyTakeaway": "尽量减少引用，尤其要注意 static 变量的使用！"
+}

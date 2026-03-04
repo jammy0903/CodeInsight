@@ -1,0 +1,221 @@
+{
+  "lessonId": "py-1-8",
+  "title": "字符串方法",
+  "concept": "字符串提供了丰富的内置方法。",
+  "content": {
+    "code": "text = \"Hello Python\"\nprint(f\"원본: {text}\")\n\nupper = text.upper()\nprint(f\"대문자: {upper}\")\n\nwords = text.split()\nprint(f\"단어 분리: {words}\")\n",
+    "steps": [
+      {
+        "title": "创建字符串",
+        "explanation": "**`text = \"Hello Python\"`** -- 在内存中创建字符串对象 `\"Hello Python\"`，并贴上标签 `text`。\n\n字符串（str）是**不可变（Immutable）**类型。本课将学习的 `upper()`、`split()` 等方法不会修改原始字符串，而是始终**创建并返回新对象**。\n\n**类比：** `text` 是原始文档。把文档放进复印机，生成大写版本、按单词分割的版本等。原始文档本身绝不会改变。\n\n**为什么是方法？** Python 中一切都是对象，对象拥有称为**方法（method）**的内置功能。在 `text.upper()` 中，`.`（点）的意思是"我要使用这个对象的功能"。\n\n**Python 内部原理：** `\"Hello Python\"` 字符串对象在堆内存中创建。该对象是 `str` 类的实例，可以使用 `str` 类定义的数十种方法（`upper`、`lower`、`split`、`replace`、`strip`、`find` 等）。\n\n**实用技巧：** 运行 `dir(text)` 可以查看字符串对象拥有的所有方法列表。",
+        "visualizationType": "pythonMemory",
+        "code": "text = \"Hello Python\"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Line 1 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出原文",
+        "explanation": "**`print(f\"原文: {text}\")`** -- 使用 f-string 查看原始字符串的内容。\n\n输出结果：`原文: Hello Python`\n\n**为什么先输出？** 作为基准点，用于在使用 `upper()` 和 `split()` 方法后证明原文没有改变。记录"变更前"的状态。\n\n**f-string 复习：** 在 `f\"...\"` 中，花括号 `{text}` 内的变量会被替换为实际值。`f\"原文: {text}\"` -> `\"原文: Hello Python\"`\n\n**Python 内部原理：** f-string 在内部调用 `text.__format__('')` 获取字符串表示，与其余文字部分组合生成新字符串。这个过程中 `text` 对象本身完全不变。\n\n**类比：** 就像在把原始文档放入复印机之前先拍张照片。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"원본: {text}\")",
+        "pythonMemoryState": {
+          "output": [
+            "원본: Hello Python"
+          ],
+          "note": "Line 2 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "转换为大写",
+        "explanation": "**`upper = text.upper()`** -- `upper()` 方法返回将所有字符转为大写的**新字符串**。\n\n调用 `text.upper()` 时：\n1. 将 `\"Hello Python\"` 对象中的每个字符转换为大写\n2. 创建**全新的字符串对象** `\"HELLO PYTHON\"`\n3. 标签 `upper` 指向这个新对象\n\n**关键点：** 原始 `text` **完全没有改变！** `text` 仍然指向 `\"Hello Python\"`。因为字符串是不可变的。\n\n**类比：** 把原始文档（text）放入复印机，按"大写转换"按钮，出来一份新的复印件（upper）。原件不变。\n\n**相关方法：**\n- `lower()`：将所有字符转为小写\n- `capitalize()`：仅首字母大写，其余小写\n- `title()`：每个单词的首字母大写\n- `swapcase()`：大小写互换\n\n**Python 内部原理：** `str.upper()` 在 C 层面使用 Unicode 字符映射表查找每个字符的大写版本。在堆上分配新的 `str` 对象，将转换后的字符复制进去。\n\n**注意：** 只调用 `text.upper()` 而不将结果存入变量，返回值就会丢失！必须像 `upper = text.upper()` 这样保存。",
+        "visualizationType": "pythonMemory",
+        "code": "upper = text.upper()",
+        "pythonMemoryState": {
+          "note": "Line 4 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出大写结果",
+        "explanation": "**`print(f\"大写: {upper}\")`** -- 输出转换为大写的新字符串。\n\n输出结果：`大写: HELLO PYTHON`\n\n输出 `upper` 指向的 `\"HELLO PYTHON\"` 对象的内容。`text`（原文）和 `upper`（转换结果）是不同的对象，各自独立存在。\n\n**不可变性确认：** `text` 仍然是 `\"Hello Python\"`。`upper()` 调用没有修改原文。\n\n**常见问题：** "为什么不写 `text = text.upper()`？"——当然可以这样写。那样 `text` 标签会指向新对象（`\"HELLO PYTHON\"`），原始的 `\"Hello Python\"` 对象引用计数降为 0，被垃圾回收器回收。\n\n**Python 内部原理：** 内存中存在两个独立的字符串对象：`str1`（\"Hello Python\"）和 `str2`（\"HELLO PYTHON\"）。各自的引用计数都是 1。\n\n**实用技巧：** 对忽略大小写的字符串比较很有用：`\"Hello\".lower() == \"hello\".lower()` -> `True`",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"대문자: {upper}\")",
+        "pythonMemoryState": {
+          "output": [
+            "대문자: HELLO PYTHON"
+          ],
+          "note": "Line 5 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "分割字符串",
+        "explanation": "**`words = text.split()`** -- `split()` 方法按空格分割字符串，返回**列表**。\n\n调用 `text.split()` 时：\n1. 将 `\"Hello Python\"` 字符串按空格分隔\n2. 创建以每个片段为元素的**列表对象** `[\"Hello\", \"Python\"]`\n3. 标签 `words` 指向这个列表\n\n**注意返回类型！** `upper()` 返回字符串，但 `split()` 返回**列表（list）**。不同方法可能返回不同类型，要注意。\n\n**根据参数的不同行为：**\n- `text.split()` -- 按空白字符（空格、制表符、换行符）分割，连续空白视为一个\n- `text.split(\",\")` -- 按逗号分割\n- `text.split(\" \", 1)` -- 按空格分割但最多分 1 次（结果 2 个）\n\n**类比：** 就像用刀（分隔符）切长面包（字符串），把切片放在盘子（列表）上。每个切割点（空格）都会产生一个切片。\n\n**Python 内部原理：** `split()` 方法遍历字符串查找空格位置，将每个区间创建为新的 `str` 对象添加到列表中。返回的列表对象及其中的字符串对象都是新创建的。\n\n**反向操作：** `\" \".join([\"Hello\", \"Python\"])` = `\"Hello Python\"` -- 是 `split()` 的逆运算。",
+        "visualizationType": "pythonMemory",
+        "code": "words = text.split()",
+        "pythonMemoryState": {
+          "note": "Line 7 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 2}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出分割结果",
+        "explanation": "**`print(f\"分词: {words}\")`** -- 输出分割后的结果列表。\n\n输出结果：`分词: ['Hello', 'Python']`\n\n`words` 是包含 2 个字符串的列表。`words[0]` 是 `\"Hello\"`，`words[1]` 是 `\"Python\"`。\n\n**核心总结——字符串方法的规则：**\n- 字符串是**不可变的（Immutable）** -> 方法总是返回新对象\n- `upper()`、`lower()` 等 -> 返回**新字符串**\n- `split()` -> 返回**列表**\n- 原文**永远不会被修改！**\n\n**类比：** 字符串方法就像"不碰原件的复印机"。无论做什么变换，原件都不变，只有变换结果作为新的输出。\n\n**Python 内部原理：** 在 f-string 中求值 `{words}` 时，调用 `words.__repr__()`。列表的 `__repr__` 调用每个元素的 `__repr__`，生成 `['Hello', 'Python']` 形式的字符串。\n\n**实用技巧：** 解析 CSV 数据时经常使用 `line.split(\",\")`。更复杂的解析请使用 `csv` 模块。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"단어 분리: {words}\")",
+        "pythonMemoryState": {
+          "output": [
+            "단어 분리: ['Hello', 'Python']"
+          ],
+          "note": "Line 8 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 2}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": null,
+  "keyTakeaway": ""
+}

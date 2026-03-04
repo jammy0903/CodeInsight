@@ -1,0 +1,193 @@
+{
+  "lessonId": "java-4-2",
+  "title": "String vs StringBuilder",
+  "concept": "需要频繁修改字符串时，应使用可变（Mutable）对象 StringBuilder。",
+  "content": {
+    "code": "// 反面示例：String 拼接（产生垃圾）\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// 正面示例：StringBuilder（对象复用）\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
+    "steps": [
+      {
+        "title": "创建空字符串",
+        "explanation": "**执行流程：**\n1. 在 String Pool 中创建 `\"\"`（空字符串）。\n2. 变量 `bad` 引用它。\n\n接下来我们将尝试不断向 `bad` 追加内容。",
+        "visualizationType": "javaMemory",
+        "code": "String bad = \"\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "bad",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "循环开始（String）",
+        "explanation": "**执行流程：**\n1. 初始化 `i = 0`。\n2. 检查循环条件。\n\n准备进入循环。",
+        "visualizationType": "javaMemory",
+        "code": "for (int i = 0; i < 3; i++) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "bad",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "i",
+              "value": "0",
+              "frame": "main",
+              "type": "int"
+            }
+          ]
+        }
+      },
+      {
+        "title": "低效的拼接（产生垃圾）",
+        "explanation": "**执行流程（每次迭代）：**\n1. `bad` + `i` -> 创建新对象。\n2. `bad` 指向新对象。\n3. 旧对象变成**垃圾（Garbage）**。\n\n**问题所在：**\n每次循环迭代都会创建一个一次性使用就丢弃的 String 对象。\n如果循环执行 1 万次，就会产生 1 万个垃圾对象。",
+        "keyInsight": "循环中拼接 String = 内存浪费（O(N^2)）",
+        "visualizationType": "javaMemory",
+        "code": "bad = bad + i;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "bad",
+              "value": "-> Obj_2",
+              "frame": "main",
+              "changed": true,
+              "type": "String"
+            },
+            {
+              "name": "i",
+              "value": "2",
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Obj_0",
+              "content": "\"0\"",
+              "type": "String",
+              "garbage": true
+            },
+            {
+              "address": "Obj_1",
+              "content": "\"01\"",
+              "type": "String",
+              "garbage": true
+            },
+            {
+              "address": "Obj_2",
+              "content": "\"012\"",
+              "type": "String",
+              "new": true
+            }
+          ],
+          "warning": "中间对象不断被丢弃！",
+          "stringPool": null
+        }
+      },
+      {
+        "title": "创建 StringBuilder",
+        "explanation": "**执行流程：**\n1. 在堆上创建 `StringBuilder` 对象（0x100）。\n2. 内部包含一个容量充足的字符数组（Buffer）。\n\n`StringBuilder` 是一个**可变（Mutable）**对象。\n可以把它想象成一块可以随意擦写的"白板"。",
+        "keyInsight": "StringBuilder = 可擦写的白板",
+        "visualizationType": "javaMemory",
+        "code": "StringBuilder good = new StringBuilder();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "good",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "StringBuilder"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "sb_buffer[]",
+              "type": "StringBuilder"
+            }
+          ],
+          "warning": null
+        }
+      },
+      {
+        "title": "高效的 append()",
+        "explanation": "**执行流程（每次迭代）：**\n1. 调用 `good.append(i)`。\n2. 在 `0x100` 对象内部数组的空位上填入数字。\n\n**优势：**\n不创建新对象，而是在**同一个对象**内持续更新内容。\n完全不会产生垃圾。",
+        "keyInsight": "对象复用 = 速度快 + 节省内存",
+        "visualizationType": "javaMemory",
+        "code": "good.append(i);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "['0', '1', '2', ...]",
+              "type": "StringBuilder",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用 toString() 完成转换",
+        "explanation": "**执行流程：**\n1. 调用 `good.toString()`。\n2. 基于当前完成的内容**仅创建一次** String 对象。\n3. 存储到 `result` 中。\n\n所有操作（修改）都在白板（StringBuilder）上完成，最后才把成品放到盘子（String）里端出来。",
+        "visualizationType": "javaMemory",
+        "code": "String result = good.toString();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "result",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "['0', '1', '2']",
+              "type": "StringBuilder"
+            },
+            {
+              "address": "0x200",
+              "content": "\"012\"",
+              "type": "String",
+              "new": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在循环中需要反复拼接字符串时，最好的做法是什么？",
+    "options": [
+      "直接使用 + 运算符。",
+      "使用 String.concat() 方法。",
+      "使用 StringBuilder 或 StringBuffer。",
+      "不断调用 new String()。"
+    ],
+    "correctIndex": 2,
+    "explanation": "在循环内使用 `+` 运算符会创建大量临时对象（垃圾），导致性能极差。\n应使用 `StringBuilder` 在单个对象内进行修改。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "现代 Java 会自动优化 + 运算符，所以没关系。",
+      "correct": "编译器会优化简单的一次性拼接，但在**循环**中有局限性。",
+      "why": "在循环中，往往会被转换为每次迭代都创建和丢弃一个 `new StringBuilder`，仍然很慢。\n在循环中请显式使用 `StringBuilder`。"
+    }
+  ],
+  "keyTakeaway": "在循环中拼接字符串时，务必使用 `StringBuilder`！性能差距可达 100 倍以上。"
+}

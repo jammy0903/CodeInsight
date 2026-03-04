@@ -1,0 +1,178 @@
+{
+  "lessonId": "java-2-4",
+  "title": "空值安全的集合",
+  "concept": "每种集合对 null 的处理策略不同",
+  "content": {
+    "code": "Map<String, Integer> hashMap = new HashMap<>();\nhashMap.put(\"key\", null);\nhashMap.put(null, 100);\n\nMap<String, Integer> concurrentMap = new ConcurrentHashMap<>();\nconcurrentMap.put(\"key\", null);\n\nList<String> list = List.of(\"a\", \"b\", \"c\");\nlist.contains(null);\n\nInteger value = hashMap.getOrDefault(\"missing\", 0);",
+    "steps": [
+      {
+        "title": "创建 HashMap",
+        "explanation": "**执行顺序：**\n1. 调用 `new HashMap<>()`。\n2. 在堆上创建 HashMap 对象。\n\n**HashMap 的策略：** "来者不拒。"\n可以存储 `null` 键和 `null` 值——一个宽容的伙伴。\n它是最常用的 Map 实现类。",
+        "visualizationType": "javaMemory",
+        "code": "Map<String, Integer> hashMap = new HashMap<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "hashMap",
+              "value": "-> 0xMap1",
+              "type": "Map<String, Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xMap1",
+              "content": "HashMap{}",
+              "type": "HashMap"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "存储 null 值",
+        "explanation": "**执行顺序：**\n1. 调用 `hashMap.put(\"key\", null)`。\n2. 计算 \"key\" 的哈希码。\n3. 将 (key, null) 存储到桶中。\n\n值被存储为 `null`。\n当你想表示"此键没有数据"时可以使用，但 `get()` 时可能会困惑"是键不存在还是值为 null"。",
+        "visualizationType": "javaMemory",
+        "code": "hashMap.put(\"key\", null);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0xMap1",
+              "content": "{\"key\": null}",
+              "type": "HashMap"
+            }
+          ],
+          "note": "HashMap: null 值允许"
+        }
+      },
+      {
+        "title": "存储 null 键",
+        "explanation": "**执行顺序：**\n1. 调用 `hashMap.put(null, 100)`。\n2. 检测到键为 `null`。\n3. 将 (null, 100) 存储在 0 号桶（专用位置）。\n\n**特别之处：** 键为 `null` 也可以存储！\n由于内部无法计算哈希值，会将其放在专用的 0 号桶中。\n当然，键必须唯一，所以只能有一个 `null` 键。",
+        "keyInsight": "HashMap：允许 1 个 null 键，无限个 null 值",
+        "visualizationType": "javaMemory",
+        "code": "hashMap.put(null, 100);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0xMap1",
+              "content": "{\"key\": null, null: 100}",
+              "type": "HashMap"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "创建 ConcurrentHashMap",
+        "explanation": "**执行顺序：**\n1. 调用 `new ConcurrentHashMap<>()`。\n2. 在堆上创建对象。\n\n**ConcurrentHashMap 的策略：** "绝对不接受 null！"\n这个为多线程环境设计的 Map 非常严格。\n它被设计为即使多个线程同时访问也是安全的。",
+        "visualizationType": "javaMemory",
+        "code": "Map<String, Integer> concurrentMap = new ConcurrentHashMap<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "concurrentMap",
+              "value": "-> 0xCMap",
+              "type": "Map<String, Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xCMap",
+              "content": "ConcurrentHashMap{}",
+              "type": "ConcurrentHashMap"
+            }
+          ]
+        }
+      },
+      {
+        "title": "向 ConcurrentHashMap 放入 null（NPE！）",
+        "explanation": "**执行顺序：**\n1. 进入 `put` 方法。\n2. 对键/值进行 null 检查。\n3. 检测到 `null` -> **抛出 NPE**。\n\n**为什么这么严格？**\n在多线程环境中，当 `get(key)` 返回 `null` 时会产生歧义。\n是刚被 `remove` 掉不存在了，还是原本就是 `null`？如果不确定，就容易产生并发 bug。",
+        "keyInsight": "ConcurrentHashMap：绝对不允许 null！",
+        "visualizationType": "javaMemory",
+        "code": "concurrentMap.put(\"key\", null);",
+        "javaMemoryState": {
+          "error": "NullPointerException",
+          "warning": "ConcurrentHashMap 不允许 null 键/值"
+        }
+      },
+      {
+        "title": "List.of() 不可变列表",
+        "explanation": "**执行顺序：**\n1. 调用 `List.of(...)` 工厂方法。\n2. 内部检查所有元素是否为 null。\n3. 创建不可变列表对象。\n\nJava 9 的 `List.of()` 同样不允许 `null`。\n这源于现代 Java 的理念："不可变对象应该是干净且完整的。"",
+        "keyInsight": "List.of()：不可变列表，不允许 null",
+        "visualizationType": "javaMemory",
+        "code": "List<String> list = List.of(\"a\", \"b\", \"c\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "list",
+              "value": "-> 0xList",
+              "type": "List<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xList",
+              "content": "[\"a\", \"b\", \"c\"]",
+              "type": "ImmutableList"
+            }
+          ],
+          "note": "List.of()：不可变，不允许 null",
+          "error": null,
+          "warning": null
+        }
+      },
+      {
+        "title": "调用 contains(null)（NPE！）",
+        "explanation": "**执行顺序：**\n1. 调用 `list.contains(null)`。\n2. 检测到参数为 `null`。\n3. **抛出 NPE**。\n\n甚至连询问"包含 `null` 吗？"（`contains`）都不允许，直接抛出 NPE。",
+        "visualizationType": "javaMemory",
+        "code": "list.contains(null);",
+        "javaMemoryState": {
+          "error": "NullPointerException",
+          "note": null
+        }
+      },
+      {
+        "title": "getOrDefault() - 空值安全查询",
+        "explanation": "**执行顺序：**\n1. 调用 `hashMap.getOrDefault(\"missing\", 0)`。\n2. 尝试查找 \"missing\" 键。\n3. 确认未找到（null）。\n4. 返回默认值 `0`。\n\n**推荐方法：**\n"如果键不存在，给我 0 而不是 `null`。"\n这是每次都懒得写 `if` 语句处理 `null` 时的"作弊码"。",
+        "keyInsight": "getOrDefault() = 获取默认值而非 null",
+        "visualizationType": "javaMemory",
+        "code": "Integer value = hashMap.getOrDefault(\"missing\", 0);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "value",
+              "value": "0",
+              "type": "Integer"
+            }
+          ],
+          "note": "\"missing\" 键未找到所以返回 0",
+          "error": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "哪种 Map 允许 null 键？",
+    "options": [
+      "HashMap",
+      "TreeMap",
+      "ConcurrentHashMap",
+      "Hashtable"
+    ],
+    "correctIndex": 0,
+    "explanation": "只有 HashMap 允许 null 键。\nTreeMap 需要排序，ConcurrentHashMap 和 Hashtable 在设计上就不允许。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "所有 Map 都允许 null",
+      "correct": "取决于具体实现！",
+      "why": "`HashMap` 和 `LinkedHashMap` 允许，但 `TreeMap`、`Hashtable`、`ConcurrentHashMap` 不允许键或值为 null。\n一定要查看 API 文档。"
+    },
+    {
+      "wrong": "List.of(null) 会创建 [null]",
+      "correct": "会直接抛出 `NullPointerException`。",
+      "why": "Java 9+ 的工厂方法（`List.of`、`Set.of`、`Map.of`）强烈拒绝 null。"
+    }
+  ],
+  "keyTakeaway": "HashMap 很宽容，但现代集合和并发集合对 null 非常严格。"
+}

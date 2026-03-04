@@ -1,0 +1,190 @@
+{
+  "lessonId": "c-7-1",
+  "title": "Double Pointers (int **)",
+  "concept": "A double pointer stores a pointer's address and accesses the original value through an extra level of indirection",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p = &a;\n    int **pp = &p;\n\n    printf(\"a = %d\\n\", a);\n\n    **pp = 20;\n\n    printf(\"a = %d\\n\", a);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "Standard I/O header for using `printf`.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "The main frame is created.\n\nNext we build the reference chain `a -> p -> pp`.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "1. Declaring an integer variable",
+        "explanation": "`int a = 10;` prepares the original integer value.\n\nThis variable is the final target of the pointer chain.",
+        "visualizationType": "cMemory",
+        "code": "int a = 10;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "address": "0x100",
+            "value": "10"
+          }
+        ]
+      },
+      {
+        "title": "2. Declaring a single pointer",
+        "explanation": "`p` stores the address of `a`, making it point to `a`.\n\n`p` is a variable that holds location information, not the value itself.",
+        "visualizationType": "cMemory",
+        "code": "int *p = &a;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "address": "0x100",
+            "value": "10"
+          },
+          {
+            "name": "p",
+            "type": "int*",
+            "address": "0x108",
+            "value": "0x100",
+            "points_to": "a"
+          }
+        ]
+      },
+      {
+        "title": "3. Declaring a double pointer",
+        "explanation": "`pp` stores the address of `p`, making it point to a pointer.\n\nThis completes the two-level chain: `pp -> p -> a`.",
+        "visualizationType": "cMemory",
+        "code": "int **pp = &p;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "address": "0x100",
+            "value": "10"
+          },
+          {
+            "name": "p",
+            "type": "int*",
+            "address": "0x108",
+            "value": "0x100",
+            "points_to": "a"
+          },
+          {
+            "name": "pp",
+            "type": "int**",
+            "address": "0x110",
+            "value": "0x108",
+            "points_to": "p"
+          }
+        ]
+      },
+      {
+        "title": "Printing the initial value",
+        "explanation": "We print `a` before modification to establish a baseline for comparison.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"a = %d\\n\", a);",
+        "stdout": "a = 10"
+      },
+      {
+        "title": "Changing a value through double dereference",
+        "explanation": "`**pp = 20;` follows the chain to change the final target `a`.\n\nThe intermediate addresses (values of `p` and `pp`) remain unchanged -- only the original data is modified.",
+        "keyInsight": "`**pp` follows the pointer chain to reach the final original data.",
+        "visualizationType": "cMemory",
+        "code": "**pp = 20;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "address": "0x100",
+            "value": "20",
+            "highlight": true
+          },
+          {
+            "name": "p",
+            "type": "int*",
+            "address": "0x108",
+            "value": "0x100",
+            "points_to": "a"
+          },
+          {
+            "name": "pp",
+            "type": "int**",
+            "address": "0x110",
+            "value": "0x108",
+            "points_to": "p"
+          }
+        ]
+      },
+      {
+        "title": "Verifying the changed value",
+        "explanation": "Printing again confirms that `a` has changed to 20.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"a = %d\\n\", a);",
+        "occurrence": 2,
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "address": "0x100",
+            "value": "20"
+          },
+          {
+            "name": "p",
+            "type": "int*",
+            "address": "0x108",
+            "value": "0x100",
+            "points_to": "a"
+          },
+          {
+            "name": "pp",
+            "type": "int**",
+            "address": "0x110",
+            "value": "0x108",
+            "points_to": "p"
+          }
+        ],
+        "stdout": "a = 10\na = 20"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "The program ends with `return 0;`.\n\nKey point: Double pointers are useful when you need to indirectly control a pointer itself.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Given int val = 5; int *p = &val; int **pp = &p; which does NOT read the value of val?",
+    "options": [
+      "val",
+      "*p",
+      "**pp",
+      "&p"
+    ],
+    "correctIndex": 3,
+    "explanation": "&p is the address of pointer p (the value of pp), so it is not 5.\nval == *p == **pp."
+  },
+  "misconceptions": [
+    {
+      "wrong": "A pointer to a pointer is a special hardware feature.",
+      "correct": "It is simply a variable holding the address of a variable that holds an address.",
+      "why": "From a memory perspective, all pointers are integer variables of the same size (32/64 bit)."
+    }
+  ],
+  "keyTakeaway": "A double pointer is used when you want to change a pointer variable's value through a reference."
+}

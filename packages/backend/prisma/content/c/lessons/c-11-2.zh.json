@@ -1,0 +1,120 @@
+{
+  "lessonId": "c-11-2",
+  "title": "switch-case 语句",
+  "concept": "switch 语句将一个值与多个情况进行比较来分支，以及 break 的作用",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int day = 3;\n\n    switch (day) {\n        case 1:\n            printf(\"Monday\\n\");\n            break;\n        case 2:\n            printf(\"Tuesday\\n\");\n            break;\n        case 3:\n            printf(\"Wednesday\\n\");\n            break;\n        default:\n            printf(\"Other day\\n\");\n            break;\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "main 函数开始",
+        "explanation": "**`int main() {`** -- 程序的入口点，栈上创建 main 栈帧。\n\n本课学习 **switch-case 语句**。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "初始化日期变量",
+        "explanation": "**`int day = 3;`** -- 声明整型变量 `day` 并初始化为 **3**。按照约定，1 表示星期一，2 表示星期二，3 表示星期三。",
+        "code": "int day = 3;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "day",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "进入 switch 语句",
+        "explanation": "**`switch (day) {`** -- 将括号内的值（`day = 3`）与每个 case 的值从上到下进行比较。找到匹配的 case 后，从该点开始执行代码。",
+        "code": "switch (day) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "day",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "case 3 匹配 - 输出",
+        "explanation": "**`printf(\"Wednesday\\n\");`** -- `day` 的值 **3** 与 `case 3:` 匹配，因此 switch 跳转到此处执行代码。屏幕上输出 `Wednesday`。",
+        "visualizationType": "terminal",
+        "code": "printf(\"Wednesday\\n\");",
+        "stdout": "Wednesday"
+      },
+      {
+        "title": "用 break 退出 switch",
+        "explanation": "**`break;`** -- **立即退出** switch 语句的跳出命令。遇到 break 后，执行直接跳转到 switch 的右花括号 `}` 之后的下一行。",
+        "visualizationType": "cMemory",
+        "code": "break;",
+        "occurrence": 3,
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "day",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "stdout": "Wednesday"
+      },
+      {
+        "title": "程序终止",
+        "explanation": "**`return 0;`** -- 退出 switch 后程序正常终止。随着 main 的栈帧被释放，`day` 也从内存中消失。",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如果删除以下代码中的所有 break，当 day=1 时输出结果是什么？\n\nswitch (day) {\n  case 1: printf(\"A\");\n  case 2: printf(\"B\");\n  case 3: printf(\"C\");\n  default: printf(\"D\");\n}",
+    "options": [
+      "A",
+      "AB",
+      "ABCD",
+      "D"
+    ],
+    "correctIndex": 2,
+    "explanation": "没有 break 时会发生贯穿（fall-through）。\n从 case 1 开始，下面所有代码（case 2、case 3、default）都会连续执行。\n因此 A、B、C、D 全部被输出。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "switch 只执行匹配的 case",
+      "correct": "没有 break 时，从匹配的 case 开始，下面所有代码都会连续执行（贯穿/fall-through）。",
+      "why": "switch 只是"跳转"到匹配的 case，不会自动停止。break 才是显式的终止信号。"
+    }
+  ],
+  "keyTakeaway": "switch 跳转到匹配的 case，没有 break 时会贯穿（fall-through）到下面所有 case。"
+}

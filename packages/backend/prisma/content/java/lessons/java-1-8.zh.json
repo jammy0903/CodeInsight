@@ -1,0 +1,101 @@
+{
+  "lessonId": "java-1-8",
+  "title": "String 方法",
+  "concept": "String 是不可变（immutable）对象。调用方法会返回一个新的 String。",
+  "content": {
+    "code": "String text = \"Hello, World!\";\nSystem.out.println(\"길이: \" + text.length());\nSystem.out.println(\"대문자: \" + text.toUpperCase());\nSystem.out.println(\"부분: \" + text.substring(0, 5));\nSystem.out.println(\"포함: \" + text.contains(\"World\"));\nSystem.out.println(\"원본: \" + text);\n",
+    "steps": [
+      {
+        "title": "String 变量声明",
+        "explanation": "**`String text = \"Hello, World!\";`**\n\n**String**：Java 的字符串类\n\n- 必须用双引号（`\" \"`）包裹\n- **不可变（immutable）**：一旦创建，值就不能被修改\n",
+        "visualizationType": "javaMemory",
+        "code": "String text = \"Hello, World!\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:text",
+              "value": "0x037",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x037",
+              "content": "\"Hello, World!\"",
+              "type": "String"
+            },
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 1 executed"
+        }
+      },
+      {
+        "title": "length() - 长度",
+        "explanation": "**`text.length()`**\n\n返回字符串的**长度（字符数）**。\n\n**输出**：`长度: 13`\n\n**注意**：数组用 `arr.length`（字段），String 用 `str.length()`（方法）！\n",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"길이: \" + text.length());",
+        "javaMemoryState": {
+          "note": "Line 2 executed"
+        }
+      },
+      {
+        "title": "toUpperCase() - 转换为大写",
+        "explanation": "**`text.toUpperCase()`**\n\n返回一个将所有字符转换为**大写**的**新 String**。\n\n**输出**：`大写: HELLO, WORLD!`\n\n**原始字符串不会改变！**（不可变性）\n",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"대문자: \" + text.toUpperCase());",
+        "javaMemoryState": {
+          "note": "Line 3 executed"
+        }
+      },
+      {
+        "title": "substring() - 子字符串",
+        "explanation": "**`text.substring(0, 5)`**\n\n返回从索引 0 到索引 5（**不包含**）的子字符串。\n\n- 从 `\"Hello, World!\"` 中取索引 0~4 -> `\"Hello\"`\n\n**输出**：`子串: Hello`\n",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"부분: \" + text.substring(0, 5));",
+        "javaMemoryState": {
+          "note": "Line 4 executed"
+        }
+      },
+      {
+        "title": "contains() - 包含检查",
+        "explanation": "**`text.contains(\"World\")`**\n\n返回一个 **boolean** 值，表示是否包含指定的字符串。\n\n**输出**：`包含: true`\n",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"포함: \" + text.contains(\"World\"));",
+        "javaMemoryState": {
+          "note": "Line 5 executed"
+        }
+      },
+      {
+        "title": "检查原始字符串",
+        "explanation": "**`System.out.println(\"원본: \" + text);`**\n\n**输出**：`原始: Hello, World!`\n\n即使调用了 toUpperCase()，**原始字符串也没有改变！**\n因为 String 是不可变的，所有方法都返回新的 String。\n",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"원본: \" + text);",
+        "javaMemoryState": {
+          "note": "Line 6 executed"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "执行 String s = \"abc\"; s.toUpperCase(); 后 s 的值是什么？",
+    "options": [
+      "\"ABC\"",
+      "\"abc\"",
+      "null",
+      "编译错误"
+    ],
+    "correctIndex": 1,
+    "explanation": "String 是不可变的（immutable）。\n\n`s.toUpperCase()` 返回新的 String `\"ABC\"`，\n但由于没有重新赋值给 s，s 仍然是 \"abc\"。\n\n要修改的话：`s = s.toUpperCase();`\n"
+  }
+}

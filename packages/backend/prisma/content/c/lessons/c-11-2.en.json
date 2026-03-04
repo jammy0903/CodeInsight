@@ -1,0 +1,120 @@
+{
+  "lessonId": "c-11-2",
+  "title": "switch-case Statement",
+  "concept": "The switch statement compares one value against multiple cases to branch, and the role of break",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int day = 3;\n\n    switch (day) {\n        case 1:\n            printf(\"Monday\\n\");\n            break;\n        case 2:\n            printf(\"Tuesday\\n\");\n            break;\n        case 3:\n            printf(\"Wednesday\\n\");\n            break;\n        default:\n            printf(\"Other day\\n\");\n            break;\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Starting main function",
+        "explanation": "**`int main() {`** -- The entry point of the program, and a main stack frame is created on the stack.\n\nIn this lesson, we learn the **switch-case statement**.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Initializing the day variable",
+        "explanation": "**`int day = 3;`** -- Declares an integer variable `day` and initializes it to **3**. By convention, 1 means Monday, 2 means Tuesday, and 3 means Wednesday.",
+        "code": "int day = 3;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "day",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Entering the switch statement",
+        "explanation": "**`switch (day) {`** -- Compares the value inside the parentheses (`day = 3`) with each case value from top to bottom. When a matching case is found, execution starts from that point.",
+        "code": "switch (day) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "day",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "case 3 matches - output",
+        "explanation": "**`printf(\"Wednesday\\n\");`** -- The value of `day` (**3**) matched `case 3:`, so switch jumps to this point and executes the code. `Wednesday` is printed to the screen.",
+        "visualizationType": "terminal",
+        "code": "printf(\"Wednesday\\n\");",
+        "stdout": "Wednesday"
+      },
+      {
+        "title": "Exiting switch with break",
+        "explanation": "**`break;`** -- The escape command that **immediately exits** the switch statement. When break is encountered, execution jumps directly to the line after switch's closing `}`.",
+        "visualizationType": "cMemory",
+        "code": "break;",
+        "occurrence": 3,
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "day",
+            "value": "3",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "stdout": "Wednesday"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "**`return 0;`** -- After exiting the switch, the program terminates normally. As main's stack frame is deallocated, `day` also disappears from memory.",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "If all break statements are removed from the following code, what is the output when day=1?\n\nswitch (day) {\n  case 1: printf(\"A\");\n  case 2: printf(\"B\");\n  case 3: printf(\"C\");\n  default: printf(\"D\");\n}",
+    "options": [
+      "A",
+      "AB",
+      "ABCD",
+      "D"
+    ],
+    "correctIndex": 2,
+    "explanation": "Without break, fall-through occurs.\nExecution starts at case 1 and continues through all code below (case 2, case 3, default) consecutively.\nTherefore A, B, C, and D are all printed."
+  },
+  "misconceptions": [
+    {
+      "wrong": "switch only executes the matching case",
+      "correct": "Without break, execution continues from the matched case through all code below (fall-through).",
+      "why": "switch only 'jumps' to the matching case; it does not stop automatically. break is the explicit termination signal."
+    }
+  ],
+  "keyTakeaway": "switch jumps to the matching case, and without break it falls through to all cases below."
+}

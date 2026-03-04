@@ -1,0 +1,228 @@
+{
+  "lessonId": "java-7-3",
+  "title": "Generic Methods and Type Inference",
+  "concept": "Core concept for Generic Methods",
+  "content": {
+    "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
+    "steps": [
+      {
+        "title": "Generic Method Definition",
+        "explanation": "**Execution flow:**\n1. The `printArray` method is defined.\n2. `<T>` means the type will be determined when this method is called.\n\n**Independent generics:**\nYou can make just this one method generic without making the entire class generic.\nPerfect for creating utility functions!",
+        "visualizationType": "javaMemory",
+        "code": "public static <T> void printArray(T[] array) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [
+            {
+              "name": "printArray<T>",
+              "value": "Method Definition"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "metaspace": null
+        }
+      },
+      {
+        "title": "Creating Arrays (Integer, String)",
+        "explanation": "**`Integer[] intArray = {1, 2, 3};`**\n\nAn `Integer` array and a `String` array are created on the heap.\nThe `intArray` and `strArray` variables reference them respectively.\n\n**Analogy**: `intArray` is like preparing a 'number block box', and `strArray` is like preparing a 'letter block box'.",
+        "visualizationType": "javaMemory",
+        "code": "Integer[] intArray = {1, 2, 3};",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main",
+              "type": "Integer[]"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main",
+              "type": "String[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "Integer[]",
+              "new": true
+            },
+            {
+              "address": "0x200",
+              "content": "[\"A\", \"B\", \"C\"]",
+              "type": "String[]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Method Call (T = Integer)",
+        "explanation": "**`printArray(intArray);`**\n\n`printArray` is called.\nThe compiler looks at the type of `intArray` and infers `T` as `Integer` (Type Inference).\n\n**Analogy**: It's like feeding 'number paper' into a 'universal printer' (`printArray`), and the printer automatically recognizes \"Oh, these are numbers\" and switches to number mode.",
+        "visualizationType": "javaMemory",
+        "code": "printArray(intArray); // T inferred as Integer",
+        "highlightOffset": [
+          0,
+          -12,
+          -11,
+          -10,
+          -9,
+          -8
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main",
+              "type": "Integer[]"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "array",
+              "value": "0x100",
+              "frame": "printArray",
+              "isFinal": true,
+              "type": "T[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "Integer[]"
+            },
+            {
+              "address": "0x200",
+              "content": "[\"A\", \"B\", \"C\"]",
+              "type": "String[]"
+            }
+          ],
+          "output": [
+            "Integer Array: 1 2 3 "
+          ]
+        }
+      },
+      {
+        "title": "Method Call (T = String)",
+        "explanation": "**Execution flow:**\n1. `printArray(strArray)` is called.\n2. This time the argument is `String[]`, so `T` is determined to be `String`.\n3. A new stack frame is created and execution proceeds.\n\n**Reusability:**\nOne piece of code prints both number arrays and string arrays! This is the power of generics.",
+        "visualizationType": "javaMemory",
+        "code": "printArray(strArray); // T inferred as String",
+        "highlightOffset": [
+          0,
+          -15,
+          -14,
+          -13,
+          -12,
+          -11
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main",
+              "type": "Integer[]"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "array",
+              "value": "0x200",
+              "frame": "printArray",
+              "isFinal": true,
+              "type": "T[]"
+            }
+          ],
+          "output": [
+            "String Array: A B C "
+          ]
+        }
+      },
+      {
+        "title": "Primitive Type Restriction",
+        "explanation": "**Execution flow:**\n1. Uncommenting this line would cause a compile error.\n\n**Important note:**\n`int[]` is a primitive type array, not an object array, so it cannot be assigned to `T[]`.\nRemember: generics only work with reference types (Objects)!",
+        "visualizationType": "javaMemory",
+        "code": "// printArray(new int[]{1, 2}); // Error! int is not T",
+        "javaMemoryState": {
+          "error": "Compile Error: int[] cannot be converted to T[]",
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the scope of the type parameter <T> in a generic method?",
+    "options": [
+      "The entire class",
+      "The entire package",
+      "Within that method only",
+      "The entire program"
+    ],
+    "correctIndex": 2,
+    "explanation": "A generic method's `<T>` is only valid during the execution of that method. Even if it has the same name as the class-level generic type `<T>`, they are completely separate entities (Shadowing)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "A static method can use the class's generic type T.",
+      "correct": "It cannot.\nStatic methods are loaded into memory before any objects are created, but the class's T is determined at object creation time (e.g., `new Box<Integer>`).\nThat's why you need to declare a separate generic method.",
+      "why": "The static context (class level) and the instance context (object level) have different lifecycles."
+    }
+  ],
+  "keyTakeaway": "You don't need to make the entire class generic -- you can make specific methods flexible using `<T>`. Static methods can also use generics without any issues!"
+}

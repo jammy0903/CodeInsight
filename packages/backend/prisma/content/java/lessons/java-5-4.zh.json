@@ -1,0 +1,115 @@
+{
+  "lessonId": "java-5-4",
+  "title": "static 方法",
+  "concept": "static 方法是无需创建对象即可调用的"工具函数"。",
+  "content": {
+    "code": "class MathUtil {\n    static int add(int a, int b) {\n        return a + b;\n    }\n    \n    int instanceValue = 10;\n    \n    static void tryAccess() {\n        // System.out.println(instanceValue); // 错误！\n    }\n}\n\nint result = MathUtil.add(3, 5);\nSystem.out.println(result);",
+    "steps": [
+      {
+        "title": "使用 static 方法",
+        "explanation": "**执行流程：**\n1. 调用 `MathUtil.add(3, 5)`。\n2. 栈上为 `add` 方法创建一个新的栈帧。\n3. `a=3`、`b=5` 存储在该栈帧中。\n\n**工具箱：**\n不需要创建 `MathUtil` 对象（`new`）。\n就像从工具箱（`MathUtil`）中直接取出工具（`add`）来使用。",
+        "visualizationType": "javaMemory",
+        "code": "static int add(int a, int b) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          11
+        ],
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "MathUtil.add",
+              "value": "Method"
+            }
+          ],
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "a",
+              "value": "3",
+              "frame": "add",
+              "type": "int"
+            },
+            {
+              "name": "b",
+              "value": "5",
+              "frame": "add",
+              "type": "int"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "返回结果并输出",
+        "explanation": "**执行流程：**\n1. 返回 `8`，`add` 栈帧被销毁。\n2. 值 `8` 存储到 `main` 栈帧的 `result` 变量中。\n3. 输出到屏幕。\n\n**干净退场：**\n因为不涉及任何对象状态，用完之后不留痕迹地消失。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(result);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "result",
+              "value": "8",
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "8"
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "访问限制（static -> instance）",
+        "explanation": "**执行流程：**\n1. 取消此行注释将导致编译错误。\n\n**存在的矛盾：**\n`tryAccess()` 不需要 `new` 就能运行，但 `instanceValue` 必须 `new` 之后才会存在。\n就像试图呼唤一个还没出生的朋友——不可能的事。",
+        "visualizationType": "javaMemory",
+        "code": "static void tryAccess() {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "error": "Cannot access instance member from static context",
+          "output": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "什么时候最适合使用 static 方法？",
+    "options": [
+      "需要修改每个对象的状态（字段）时。",
+      "仅基于输入值进行计算的工具函数。",
+      "通过重写（Overriding）实现多态时。",
+      "代替构造函数来初始化对象时。"
+    ],
+    "correctIndex": 1,
+    "explanation": "像 `Math.max()`、`Arrays.sort()` 这样不依赖对象状态、仅基于输入值运行的函数，用 `static` 最为高效。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "在 static 方法中可以使用 this。",
+      "correct": "绝对不行。",
+      "why": "`this` 指的是"当前对象"，但在 `static` 方法执行时，可能根本就没有"当前对象"这个概念。"
+    },
+    {
+      "wrong": "static 方法可以被重写（Override）。",
+      "correct": "不能。\n只能被"隐藏（Hiding）"。",
+      "why": "重写依赖于运行时查看对象的实际类型，而 static 方法在编译时就根据变量的声明类型确定了。"
+    }
+  ],
+  "keyTakeaway": "static 方法是"独立的工具"。没有 this，也不能访问实例变量。"
+}

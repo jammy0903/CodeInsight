@@ -1,0 +1,255 @@
+{
+  "lessonId": "py-15-3",
+  "title": "CSV与JSON文件处理",
+  "concept": "使用csv模块和json模块可以将结构化数据保存到文件并从文件加载。",
+  "content": {
+    "code": "import csv\nimport json\n\ndata = [\n    {\"name\": \"Alice\", \"score\": 95},\n    {\"name\": \"Bob\", \"score\": 87},\n]\n\nwith open(\"data.json\", \"w\") as f:\n    json.dump(data, f, indent=2)\n\njson_str = json.dumps(data[0])\nprint(json_str)\n\nparsed = json.loads(json_str)\nprint(f\"Name: {parsed['name']}\")",
+    "steps": [
+      {
+        "title": "导入csv和json模块",
+        "explanation": "**`import csv, json`** 加载文件数据处理的基本工具。\n\n角色区分：\n- `csv`：表格形式（行/列）数据\n- `json`：嵌套结构（dict/list）数据\n\n**类比**：CSV是处理电子表格的工具，JSON是处理对象箱子的工具。\n\n核心是\"用与数据形状匹配的模块\"。\n这样解析和保存的代码才能保持简洁。",
+        "visualizationType": "pythonMemory",
+        "code": "import csv",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "csv和json标准库已加载。",
+          "names": [
+            {
+              "name": "csv",
+              "pointsTo": "module1",
+              "highlight": true
+            },
+            {
+              "name": "json",
+              "pointsTo": "module2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            },
+            {
+              "id": "module2",
+              "type": "module",
+              "value": "module",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "准备数据（字典列表）",
+        "explanation": "**`data = [{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]`** -- 创建由2个字典组成的列表。这种结构是与JSON最自然对应的Python数据结构。\n\n**类比：** 这就像学生名单表。每个学生（字典）的信息写在卡片上，收集成一捆（列表）。将这个名单表保存为JSON格式，即使关闭程序再打开，名单也会保留。\n\n**Python数据结构与JSON的一一对应：**\n\n正因为这种对应很自然，Python是处理JSON非常方便的语言。\n\n**Python内部机制：** 这段代码中，堆上创建了2个 `dict` 对象、2个 `str` 键对象（`\"name\"`、`\"score\"`）、2个 `str` 值对象（`\"Alice\"`、`\"Bob\"`）、2个 `int` 值对象（`95`、`87`）和1个 `list` 对象。Python的字典用哈希表实现，通过键查找值的时间复杂度为O(1)。\n\n**为什么是这种结构？** 实际工作中，数据库查询结果、REST API响应等大多是这种\"记录列表\"的形式。一个字典代表一条记录（行）。\n\n**执行顺序：**\n1. 创建2个字典对象（各初始化哈希表）。\n2. 创建列表对象 -> 存储字典的引用。\n3. 全局命名空间中创建 `data -> list` 绑定。",
+        "visualizationType": "pythonMemory",
+        "code": "data = [",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "字典列表与JSON自然互转。",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用json.dump()保存到文件",
+        "explanation": "**`json.dump(data, f, indent=2)`** 将Python对象转换为JSON并保存到文件。\n\n一句话总结：\n- `dump` = 保存到文件\n- `dumps` = 转换为字符串\n\n**类比**：把内存中的数据转换成\"存档包装\"（JSON），放入文件箱子的过程。\n\n`indent=2` 会格式化成人类易读的形式。\n实际调试时非常有用。\n\n注意事项：\n- `set`、`datetime` 等类型默认可能无法直接保存\n- 这种情况需要添加转换规则（`default`）\n\n也就是说，这一步是\"内存数据持久化存储\"的起点。",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"data.json\", \"w\") as f:",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "json.dump()将Python对象转换为JSON并保存到文件。",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]",
+              "pyId": "1003"
+            },
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.json', mode='w') [JSON saved]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用json.dumps()转换为字符串",
+        "explanation": "**`json.dumps()`** 将Python对象转换为JSON\"字符串\"。\n\n只要记住区分就不会混淆：\n- `dump` = 文件\n- `dumps` = 字符串\n\n转换为字符串后可以直接用于网络传输、日志记录、消息队列发送。\n\n**类比**：将对象转换为可快递的标准包装（JSON文本）的步骤。\n\n注意：\n- 要直接看到中文，考虑使用 `ensure_ascii=False` 选项",
+        "visualizationType": "pythonMemory",
+        "code": "json_str = json.dumps(data[0])",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "{\"name\": \"Alice\", \"score\": 95}"
+          ],
+          "note": "json.dumps()将Python对象转换为JSON字符串。",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "json_str",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]",
+              "pyId": "1003"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "{\"name\": \"Alice\", \"score\": 95}",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用json.loads()解析字符串",
+        "explanation": "**`parsed = json.loads(json_str)`** 将JSON字符串转回Python对象。\n\n一句话总结：\n- `loads` = 从字符串读取\n- `load` = 从文件读取\n\n转换结果通常是 `dict`/`list`。\n之后就像操作普通Python数据结构一样使用即可。\n\n**类比**：打开快递箱（JSON），取出实际物品（Python对象）的过程。\n\n注意事项：\n- 字符串格式不符合JSON规则会引发 `JSONDecodeError`\n- 转换后的对象即使\"内容相同\"也是与原始对象不同的独立对象",
+        "visualizationType": "pythonMemory",
+        "code": "parsed = json.loads(json_str)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "json.loads()将JSON字符串转换为Python字典。",
+          "names": [
+            {
+              "name": "json_str",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "parsed",
+              "pointsTo": "dict1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "{\"name\": \"Alice\", \"score\": 95}",
+              "pyId": "1005"
+            },
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"score\": 95}",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "使用解析后的数据",
+        "explanation": "**`parsed['name']`** 取值的那一刻，数据就完全像普通Python字典一样运作。\n\n也就是说JSON是用于存储/传输的格式，\n经过 `load/loads` 后就可以用平时的代码风格来操作了。\n\n**类比**：就像解压文件后，像普通文件夹一样使用。\n\n这里：\n- 查找键 `name` -> `\"Alice\"`\n- f-string输出 `Name: Alice`\n\n实际要点：\n- API响应、配置文件、日志存储都是同样的模式\n- 只要准确区分保存（`dump/dumps`）和恢复（`load/loads`）就不会混淆",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Name: {parsed['name']}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Name: Alice"
+          ],
+          "note": "转换为JSON再转回Python对象使用。",
+          "names": [
+            {
+              "name": "parsed",
+              "pointsTo": "dict1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"score\": 95}",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "json.dumps()和json.dump()的区别是？",
+    "options": [
+      "dumps()保存到文件，dump()转换为字符串",
+      "dumps()将Python对象转换为字符串，dump()直接保存到文件",
+      "dumps()只能处理列表，dump()只能处理字典",
+      "dumps()用于读取，dump()用于写入"
+    ],
+    "correctIndex": 1,
+    "explanation": "json.dumps()的s代表string。将Python对象转换为JSON字符串。\njson.dump()将Python对象转换为JSON并直接保存到文件对象。\n同样的规则适用于loads()/load()。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "json.dumps()和json.dump()是同一个函数",
+      "correct": "dumps()返回字符串，dump()直接保存到文件。s是string的缩写",
+      "why": "dump() -> 文件，dumps() -> 字符串 / load() -> 文件，loads() -> 字符串。通过s的有无来区分。"
+    },
+    {
+      "wrong": "JSON文件只能在Python中使用",
+      "correct": "JSON是语言无关的通用数据格式",
+      "why": "JSON被JavaScript、Java、C#、Go等几乎所有编程语言支持。也是Web API的标准数据格式。"
+    }
+  ],
+  "keyTakeaway": "json模块的dump/dumps是Python->JSON转换，load/loads是JSON->Python转换。带s表示字符串目标，不带s表示文件目标。"
+}

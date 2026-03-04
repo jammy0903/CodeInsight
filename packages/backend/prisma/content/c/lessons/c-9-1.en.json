@@ -1,0 +1,116 @@
+{
+  "lessonId": "c-9-1",
+  "title": "Preprocessor Phases",
+  "concept": "The preprocessor expands macros and directives before compilation to produce the actual code that gets compiled",
+  "content": {
+    "code": "#include <stdio.h>\n#define PI 3.14159\n#define HELLO \"Hello, World!\"\n\nint main() {\n    printf(\"%s\\n\", HELLO);\n\n    double r = 10.0;\n    double area = PI * r * r;\n\n    printf(\"Area: %.2f\\n\", area);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Preprocessor directive: #include",
+        "explanation": "**`#include <stdio.h>`** -- Code starting with `#` is a directive for the **preprocessor**. Preprocessing happens **before** compilation: it finds `stdio.h` in the system path and copies its **entire contents (thousands of lines)** into this location.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Preprocessor directive: #define (macro constant)",
+        "explanation": "**`#define PI 3.14159`** -- Defines a **macro constant** called `PI`. The preprocessor performs a **simple text substitution**, replacing every occurrence of `PI` in the subsequent code with `3.14159`.",
+        "visualizationType": "cMemory",
+        "code": "#define PI 3.14159",
+        "highlightOffset": [0, 1]
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "**`int main() {`** -- The program entry point where the compiler begins reading code after preprocessing is complete. At this point, the contents of `stdio.h` are already inserted, and all `PI` and `HELLO` tokens have been replaced with their actual values.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Execution after macro substitution (string)",
+        "explanation": "**`printf(\"%s\\n\", HELLO);`** -- When the compiler sees this code, `HELLO` has already been replaced with `\"Hello, World!\"`, so it is 100% identical to `printf(\"%s\\n\", \"Hello, World!\");`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%s\\n\", HELLO);",
+        "stack": [],
+        "stdout": "Hello, World!"
+      },
+      {
+        "title": "Variable declaration",
+        "explanation": "**`double r = 10.0;`** -- Creates the radius `r` in **stack memory** and initializes it to `10.0`. `double` is an 8-byte floating-point type that can represent approximately 15 decimal digits.",
+        "visualizationType": "cMemory",
+        "code": "double r = 10.0;",
+        "stack": [
+          {
+            "name": "r",
+            "type": "double",
+            "value": "10.0",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Execution after macro substitution (number)",
+        "explanation": "**`double area = PI * r * r;`** -- To the compiler, this appears as `double area = 3.14159 * r * r;`. The result `3.14159 * 10.0 * 10.0` = `314.159` is stored in the new variable `area`.",
+        "visualizationType": "cMemory",
+        "code": "double area = PI * r * r;",
+        "stack": [
+          {
+            "name": "r",
+            "type": "double",
+            "value": "10.0",
+            "address": "0x1000"
+          },
+          {
+            "name": "area",
+            "type": "double",
+            "value": "314.159",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "Printing the result",
+        "explanation": "**`printf(\"Area: %.2f\\n\", area);`** -- Prints the circle's area to **two decimal places**. In `%.2f`, `.2` means display only 2 digits after the decimal point. The third digit `9` is rounded up, outputting `314.16`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Area: %.2f\\n\", area);",
+        "stdout": "Hello, World!\nArea: 314.16"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "**`return 0;`** -- An exit code telling the OS \"completed successfully\".\n\nThe key takeaway of this lesson is that **the preprocessor is a separate entity from the compiler**.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Can you get the memory address of a constant defined with #define MAX 100 using &MAX?",
+    "options": [
+      "Yes. It is the same as a global variable.",
+      "No. It is replaced with the number before compilation, so it has no address.",
+      "It is possible with a specific option enabled.",
+      "The address exists in the stack area."
+    ],
+    "correctIndex": 1,
+    "explanation": "The macro constant `#define` is text replacement of source code during the preprocessor stage, so it does not exist as a variable at runtime."
+  },
+  "misconceptions": [
+    {
+      "wrong": "#define is the same as defining a variable.",
+      "correct": "They are completely different.\nA variable occupies memory space, but a macro is just text substitution in source code.",
+      "why": "It does not perform type checking and unconditionally replaces text."
+    }
+  ],
+  "keyTakeaway": "The preprocessor transforms the 'code text' itself before the compiler ever sees it."
+}

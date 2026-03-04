@@ -1,0 +1,196 @@
+{
+  "lessonId": "js-3-4",
+  "title": "call、apply、bind",
+  "concept": "call、apply 和 bind 允许你显式指定 this 的值",
+  "content": {
+    "code": "function greet(greeting, punctuation) {\n  console.log(`${greeting}, ${this.name}${punctuation}`);\n}\n\nconst user = { name: 'Alice' };\nconst admin = { name: 'Bob' };\n\ngreet.call(user, 'Hello', '!');\ngreet.apply(admin, ['Hi', '?']);\n\nconst boundGreet = greet.bind(user, 'Hey');\nboundGreet('~');",
+    "steps": [
+      {
+        "title": "定义 greet 函数",
+        "explanation": "定义一个使用 this.name 的 greet 函数。\n这个函数接受两个参数。",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "function definition",
+          "functions": [
+            {
+              "name": "greet",
+              "params": [
+                "greeting",
+                "punctuation"
+              ],
+              "usesThis": true
+            }
+          ]
+        },
+        "code": "function greet(greeting, punctuation) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "创建对象",
+        "explanation": "创建两个对象：user 和 admin。\n我们将把这些对象用作 this。",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "object creation",
+          "objects": [
+            {
+              "name": "user",
+              "properties": [
+                {
+                  "key": "name",
+                  "value": "'Alice'"
+                }
+              ]
+            },
+            {
+              "name": "admin",
+              "properties": [
+                {
+                  "key": "name",
+                  "value": "'Bob'"
+                }
+              ]
+            }
+          ]
+        },
+        "code": "const user = { name: 'Alice' };",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "call() — 逐个传递 this 和参数",
+        "explanation": "call() 方法**立即执行**函数，强制将第一个参数用作 **this**。",
+        "keyInsight": "call(this, args) = \"立即使用这个对象作为 this 来执行！\"",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "call()",
+          "thisValue": "user",
+          "callStack": [
+            "<global>",
+            "greet.call(user, ...)"
+          ],
+          "binding": {
+            "method": "call",
+            "thisArg": "user",
+            "args": [
+              "'Hello'",
+              "'!'"
+            ]
+          },
+          "output": [
+            "Hello, Alice!"
+          ]
+        },
+        "code": "greet.call(user, 'Hello', '!');"
+      },
+      {
+        "title": "apply() — 以数组形式传递 this 和参数",
+        "explanation": "apply() 将 this 作为第一个参数，参数数组作为第二个参数。",
+        "keyInsight": "apply(thisArg, [arg1, arg2, ...]) — 以数组形式传递参数",
+        "analogy": "call 和 apply 的区别：call = 逗号（Comma），apply = 数组（Array）",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "apply()",
+          "thisValue": "admin",
+          "callStack": [
+            "<global>",
+            "greet.apply(admin, ...)"
+          ],
+          "binding": {
+            "method": "apply",
+            "thisArg": "admin",
+            "args": "['Hi', '?']"
+          },
+          "output": [
+            "Hello, Alice!",
+            "Hi, Bob?"
+          ]
+        },
+        "code": "greet.apply(admin, ['Hi', '?']);"
+      },
+      {
+        "title": "bind() — 返回一个新函数",
+        "explanation": "bind() 返回一个将 this 固定为指定对象的新函数。\n它不会立即执行！",
+        "keyInsight": "bind(thisArg, arg1, ...) — 返回一个新函数（不会立即执行）",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "bind()",
+          "thisValue": "user (bound)",
+          "binding": {
+            "method": "bind",
+            "thisArg": "user",
+            "partialArgs": [
+              "'Hey'"
+            ],
+            "returns": "new function"
+          },
+          "variables": [
+            {
+              "name": "boundGreet",
+              "value": "function (this=user, greeting='Hey')"
+            }
+          ]
+        },
+        "code": "const boundGreet = greet.bind(user, 'Hey');"
+      },
+      {
+        "title": "调用绑定函数",
+        "explanation": "调用 boundGreet。\nthis 已经固定为 user，greeting 已经固定为 'Hey'。",
+        "keyInsight": "bind 还支持偏函数应用！",
+        "visualizationType": "thisBinding",
+        "thisState": {
+          "context": "bound function call",
+          "thisValue": "user (bound)",
+          "callStack": [
+            "<global>",
+            "boundGreet('~')"
+          ],
+          "binding": {
+            "boundThis": "user",
+            "boundArgs": [
+              "'Hey'"
+            ],
+            "newArgs": [
+              "'~'"
+            ]
+          },
+          "output": [
+            "Hello, Alice!",
+            "Hi, Bob?",
+            "Hey, Alice~"
+          ]
+        },
+        "code": "boundGreet('~');"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "以下代码的输出是什么？\n\nconst obj = { value: 10 };\nfunction double() { return this.value * 2; }\nconst bound = double.bind(obj);\nconst other = { value: 100, fn: bound };\nconsole.log(other.fn());",
+    "options": [
+      "20",
+      "200",
+      "undefined",
+      "发生错误"
+    ],
+    "correctIndex": 0,
+    "explanation": "bind() 已经将 this 锁定为 obj。\n即使作为其他对象的方法调用，this 也不会改变。\n因此 obj.value * 2 = 20。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "bind() 会修改原函数",
+      "correct": "bind() 返回一个新函数。\n原函数不会被修改。",
+      "why": "bind() 创建并返回一个新函数，不会修改原函数。"
+    },
+    {
+      "wrong": "call() 和 apply() 产生不同的结果",
+      "correct": "call() 和 apply() 产生相同的结果。\n只是传递参数的方式不同。",
+      "why": "call 逐个传递参数，apply 以数组形式传递。\n结果是一样的。"
+    }
+  ],
+  "keyTakeaway": "call(this, a, b)，apply(this, [a, b])，bind(this) → 返回新函数"
+}

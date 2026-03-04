@@ -1,0 +1,512 @@
+{
+  "lessonId": "py-9-4",
+  "title": "Class Decorators: Decorators That Remember State",
+  "concept": "By implementing the `__call__` method in a class, you can create decorators that maintain state.",
+  "content": {
+    "code": "class Counter:\n    def __init__(self, func):\n        self.func = func\n        self.count = 0\n\n    def __call__(self, *args, **kwargs):\n        self.count += 1\n        print(f\"'{self.func.__name__}' was called {self.count} time(s)\")\n        return self.func(*args, **kwargs)\n\n@Counter\ndef say_hello():\n    print(\"Hello!\")\n\nsay_hello()\nsay_hello()",
+    "steps": [
+      {
+        "title": "Starting the Counter class definition",
+        "explanation": "**`class Counter:`**\n\n**We define a class to be used as a decorator.** In previous lessons we made decorators with functions, but classes can also serve as decorators.\n\n**Why use a class decorator?**\n- Function decorators must manage state through closures\n- Class decorators can manage state more intuitively using instance variables (`self.count`)\n- Suitable for decorators that 'need state', such as tracking call counts or caching results\n\n**Analogy**: If a function decorator is like 'jotting notes on a memo pad', a class decorator is like 'having a dedicated secretary with their own notebook'. The secretary (instance) records and manages information in their own notebook (instance variables).\n\n**Under the hood**: When Python encounters the `class` statement, it creates a class object (0x1000) and registers it in the global namespace under the name `Counter`.\n\n**Why this order?** The class must be defined before it can be used with `@Counter`.\n\n**Note**: Since the class itself is callable, `@Counter` becomes `say_hello = Counter(say_hello)`. In other words, it creates an instance.",
+        "visualizationType": "pythonMemory",
+        "code": "class Counter:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "The Counter class (0x1000) has been defined.",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Entering the class body",
+        "explanation": "**`class Counter:` (body)**\n\n**We enter the class body to define methods.** Python executes the class body from top to bottom, registering methods.\n\nThis class has two special methods (magic methods):\n- `__init__`: Automatically called when an instance is created (initialization)\n- `__call__`: Executed when the instance is called like a function using `()`\n\n**Analogy**: This is the process of hiring a secretary.\n- `__init__` is the secretary's 'onboarding training' (which function to handle, start counter at 0)\n- `__call__` is 'how to give the secretary work' (increment count and execute original function each time)\n\n**Under the hood**: Python executes the class body in a separate namespace. Functions defined here are registered as attributes of the class.\n\n**Why this order?** As part of the class definition, internal methods are being registered.\n\n**Note**: Without `__call__`, the instance cannot be called like a function, and thus cannot be used as a decorator.",
+        "visualizationType": "pythonMemory",
+        "code": "class Counter:",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8
+        ],
+        "pythonMemoryState": {
+          "note": "Methods of the Counter class are being defined.",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the __init__ method",
+        "explanation": "**`def __init__(self, func):`**\n\n**We define the initialization method.** It's automatically called when an instance is created, like `Counter(say_hello)`.\n\n**Parameter explanation:**\n- `self`: The newly created instance itself\n- `func`: The original function that the decorator will wrap\n\n**What happens in the body:**\n- `self.func = func` -> Stores the original function in the instance\n- `self.count = 0` -> Initializes the call counter to 0\n\n**Analogy**: It's the secretary's first day on the job.\n- \"The task you'll be responsible for is this function (func)\"\n- \"Start recording the task count (count) from 0\"\n\n**Under the hood**: The `__init__` function object (0x1100) is created and registered as the `__init__` attribute of the `Counter` class.\n\n**Why this order?** Methods are registered in the order the class body is executed. `__init__` is defined first.\n\n**Note**: `__init__` is the method that 'initializes' the instance, not the one that 'creates' it. The actual creation is handled by `__new__`, but in most cases you only need to define `__init__`.",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, func):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "__init__ method defined.",
+          "names": [
+            {
+              "name": "__init__",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the __call__ method",
+        "explanation": "**`def __call__(self, *args, **kwargs):`**\n\n**We define the method that runs when the instance is called like a function.** This is the core of the class decorator.\n\n**Why is `__call__` important?**\n- Normally, you can't call an object with parentheses like `obj()`\n- But if you define the `__call__` method, you can!\n- `say_hello()` gets translated to `Counter.__call__(say_hello)`\n\n**What happens in the body:**\n- `self.count += 1` -> Increment the call count\n- `print(...)` -> Print the call count log\n- `return self.func(...)` -> Execute the original function and return the result\n\n**Analogy**: Defining the way to 'give the secretary work'. When given work, the secretary automatically records the count and performs the actual task.\n\n**Under the hood**: The `__call__` function object (0x1200) is created and registered as the `__call__` attribute of the `Counter` class.\n\n**Why this order?** `__call__` is defined after `__init__`.\n\n**Note**: The pattern of receiving `*args, **kwargs` and passing them to `self.func(*args, **kwargs)` is identical to the `wrapper` in previous function decorators.",
+        "visualizationType": "pythonMemory",
+        "code": "def __call__(self, *args, **kwargs):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "__call__ method defined.",
+          "names": [
+            {
+              "name": "__call__",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Applying the @Counter decorator",
+        "explanation": "**`@Counter` + `def say_hello():`**\n\n**`@Counter` is equivalent to `say_hello = Counter(say_hello)`.** The syntax is the same as function decorators, but the mechanism is different.\n\n**Function decorator vs. Class decorator:**\n- Function decorator: `logger(say_hello)` -> returns a wrapper function\n- Class decorator: `Counter(say_hello)` -> returns a Counter instance\n\nIn other words, `say_hello` is now not a function but a **Counter class instance**!\n\nExecution process:\n1. The original `say_hello` function object (0x2000) is created\n2. `Counter(0x2000)` is called -> `__init__` executes\n3. The original function is passed to the `func` parameter\n\n**Analogy**: Hiring a secretary (creating an instance) and instructing them \"please handle the say_hello task.\"\n\n**Under the hood**: `Counter.__init__` is called to initialize the instance. The original function is stored in `self.func`.\n\n**Why this order?** At the point of decorator application, the instance is created and the original function is stored in it.\n\n**Note**: After `@Counter`, the type of `say_hello` is not `function` but `Counter`! If you print `type(say_hello)`, it shows `<class 'Counter'>`.",
+        "visualizationType": "pythonMemory",
+        "code": "@Counter",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "Starting Counter instance creation.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ execution (1)",
+        "explanation": "**`self.func = func`**\n\n**Stores the original `say_hello` function in the instance variable `self.func`.**\n\nThis plays the same role as a closure storing `func` in a Cell in function decorators.\nThe difference is that it uses an instance variable instead of a closure.\n\n**Analogy**: The secretary says \"I've registered say_hello in my task list.\"\nThe original function is recorded in the secretary's notebook (instance).\n\n**Under the hood**:\n1. A new Counter instance (0x3000) is created by `__new__`\n2. `__init__` is called, and `self` points to this new instance\n3. The original `say_hello` function object is assigned to `self.func`\n\n**Why this order?** The first task of `__init__` is storing the original function. The `__call__` method needs to be able to call this function later.\n\n**Note**: `self.func` is an 'attribute' of the instance. Unlike a closure's Cell, it can be directly accessed externally via `say_hello.func`.",
+        "visualizationType": "pythonMemory",
+        "code": "self.func = func",
+        "pythonMemoryState": {
+          "note": "The instance (0x3000) stores the original function.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self.func",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter instance",
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ execution (2)",
+        "explanation": "**`self.count = 0`**\n\n**Initializes the call counter to 0.** This is the 'state' that is the core of class decorators.\n\n**Why is state important?**\n- To count calls in a function decorator, you'd need nonlocal variables or mutable objects (inconvenient)\n- In a class decorator, you manage state simply with `self.count`\n\nWhen `__init__` completes:\n- `self.func` = the original say_hello function\n- `self.count` = 0\n- This instance gets assigned to the name `say_hello`\n\n**Analogy**: The secretary opens a new task log and records starting from 0.\n\n**Under the hood**: `count: 0` is stored in the instance's `__dict__`. When `__init__` completes, the instance is returned and bound to the name `say_hello`.\n\n**Why this order?** After all initialization is complete, `say_hello` now points to this Counter instance.\n\n**Note**: `say_hello` is now not a function but a Counter instance. However, since `__call__` is defined, it can still be called like `say_hello()`.",
+        "visualizationType": "pythonMemory",
+        "code": "self.count = 0",
+        "pythonMemoryState": {
+          "note": "say_hello is now a Counter instance, not a function.",
+          "names": [
+            {
+              "name": "self.count",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "say_hello",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1006",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter instance",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First say_hello() call",
+        "explanation": "**`say_hello()`**\n\n**We call `say_hello`.** But since `say_hello` is a Counter instance, Python automatically executes the `__call__` method.\n\n**What happens internally:**\n- `say_hello()` -> `Counter.__call__(say_hello)` -> `say_hello.__call__()`\n- `self` points to `say_hello` (the Counter instance)\n\n**Analogy**: Telling the secretary \"Do the work!\" The secretary knows what to do: count the number and perform the original task.\n\n**Under the hood**: Python checks whether `say_hello` is callable. Since the Counter class has a `__call__` method, `say_hello.__call__()` is invoked.\n\n**Why this order?** After the decorator setup is complete, this is the stage where the decorated function is actually used.\n\n**Note**: The caller doesn't need to know whether `say_hello()` is a function call or an instance call. This is Python's duck typing philosophy -- \"if it's callable, use it like a function.\"",
+        "visualizationType": "pythonMemory",
+        "code": "say_hello()",
+        "pythonMemoryState": {
+          "note": "The instance is called, triggering __call__.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter instance",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__call__ execution - incrementing count (1)",
+        "explanation": "**`self.count += 1`**\n\n**Increments the call count by 1.** `self.count` goes from 0 to 1.\n\nThis is the core advantage of class decorators:\n- State is stored in instance variables (`self.count`)\n- This state is updated with each call\n- The state persists permanently with the instance\n\n**Analogy**: The secretary makes a check mark in the log. \"Task performed for the 1st time!\"\n\n**Under the hood**: `self.count += 1` is actually `self.count = self.count + 1`. Since Python's int is immutable, a new integer object `1` is created and `self.count` now points to it.\n\n**Why this order?** The call count is recorded before executing the original function.\n\n**Note**: To implement the same functionality in a function decorator, you'd need `nonlocal count`, making the code more complex. Class decorators manage this intuitively with `self.count`.",
+        "visualizationType": "pythonMemory",
+        "code": "self.count += 1",
+        "pythonMemoryState": {
+          "note": "count has been incremented to 1.",
+          "names": [
+            {
+              "name": "self.count",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__call__ execution - message output (1)",
+        "explanation": "**`print(f\"'{self.func.__name__}' was called {self.count} time(s)\")`**\n\n**Prints a log message along with the call count.** `\"'say_hello' was called 1 time(s)\"` is output.\n\nInstance variables used:\n- `self.func.__name__` -> `\"say_hello\"` (the original function's name)\n- `self.count` -> `1` (the current call count)\n\n**Analogy**: The secretary reports \"Performing the say_hello task for the 1st time!\"\n\n**Under the hood**: The original function object is retrieved from `self.func`, and the function name string is obtained from its `.__name__` attribute. The f-string combines these values for output.\n\n**Why this order?** After incrementing the call count, the log is printed. This records the information before executing the original function.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"'{self.func.__name__}' was called {self.count} time(s)\")",
+        "pythonMemoryState": {
+          "output": [
+            "'say_hello' was called 1 time(s)"
+          ],
+          "note": "Call count printed.",
+          "names": [
+            {
+              "name": "self.count",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__call__ execution - calling original function (1)",
+        "explanation": "**`return self.func(*args, **kwargs)`**\n\n**Calls the original `say_hello` function stored in the instance.**\n\n`self.func` is the original function saved during `__init__`.\nArguments passed at call time are forwarded to the original function via `*args, **kwargs`.\n(In this case there are no arguments, so it's equivalent to `self.func()`)\n\n**Analogy**: After recording the count, the secretary performs the actual task (original function).\n\n**Under the hood**: The function object (0x2000) is retrieved from `self.func` and called. A new execution frame is created and the body of the original `say_hello` runs.\n\n**Why this order?** After logging, the original function's actual work is performed. The result is transparently returned via `return`.\n\n**Note**: If you omit `return`, the original function's return value is lost. Always use `return self.func(...)` to pass the result through.",
+        "visualizationType": "pythonMemory",
+        "code": "return self.func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "Executing the original function.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing say_hello body (1)",
+        "explanation": "**`print(\"Hello!\")`**\n\n**The original `say_hello` function prints `\"Hello!\"`.**\n\nComplete output from the first call:\n1. `'say_hello' was called 1 time(s)` (from __call__)\n2. `Hello!` (from the original function)\n\n**Key point**: The decorator's added functionality (call count tracking) and the original function's functionality work together.\n\n**Analogy**: The secretary recorded the count (decorator feature) and performed the actual task (original feature).\n\n**Under the hood**: The body of the original `say_hello` executes, and its return value (`None`) is passed to the caller through `__call__`.\n\n**Why this order?** This is the result of the `self.func()` call executing the original function body.",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Hello!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello!"
+          ],
+          "note": "First call complete.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Second say_hello() call",
+        "explanation": "**`say_hello()`** (second call)\n\n**The `__call__` of the same Counter instance is called again.** The key is that it's the **same instance**.\n\n**How state persistence works:**\n- In the first call, `self.count` went from 0 -> 1\n- In the second call, `self.count` starts at 1 (not 0)\n- As long as the instance is alive, the state (`self.count`) persists\n\n**Analogy**: Giving the same secretary work again. The secretary's log already records that they worked 1 time. When they work again, it becomes 2.\n\n**Under the hood**: `say_hello` still points to the same Counter instance (0x3000). `__call__` is invoked, and `self` references the same instance.\n\n**Why this order?** This is the stage where we actually verify the class decorator's 'state persistence' capability.\n\n**Note**: If you apply `@Counter` to a different function, that function would have its own separate Counter instance, so counts are managed independently.",
+        "visualizationType": "pythonMemory",
+        "code": "say_hello()",
+        "occurrence": 2,
+        "pythonMemoryState": {
+          "note": "The same instance (0x3000) is called again.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter instance",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__call__ execution - incrementing count (2)",
+        "explanation": "**`self.count += 1`**\n\n**`self.count` increases from 1 to 2.** Since the state from the previous call is preserved, it starts at 1 instead of 0.\n\n**This is the core value of class decorators:**\n- State is preserved between function calls\n- Instance variables live for the lifetime of the instance\n- They don't reset with each call -- they accumulate\n\n**Analogy**: The secretary makes a second check mark in the log. \"Task performed for the 2nd time!\"\nThe log isn't recreated each time -- entries keep accumulating in the same log.\n\n**Under the hood**: `self.count = self.count + 1` -> `self.count = 1 + 1` -> `self.count = 2`. A new integer object `2` is created and bound to `self.count`.\n\n**Why this order?** Same pattern as before: increment call count -> print log -> call original function.",
+        "visualizationType": "pythonMemory",
+        "code": "self.count += 1",
+        "pythonMemoryState": {
+          "output": [
+            "..."
+          ],
+          "note": "The existing state is preserved, count is now 2.",
+          "names": [
+            {
+              "name": "self.count",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__call__ execution - message output (2)",
+        "explanation": "**`print(f\"'{self.func.__name__}' was called {self.count} time(s)\")`**\n\n**Prints `\"'say_hello' was called 2 time(s)\"`.** Since `self.count` is 2, it accurately records that it's been called twice.\n\nThis output confirms that state persistence is actually working.\n\n**Analogy**: The secretary reports \"Performing the say_hello task for the 2nd time!\"\n\n**Under the hood**: Same f-string creation and output process as before. However, since `self.count` has changed to 2, the output is different.\n\n**Why this order?** Log is printed after incrementing the count.\n\n**Practical use**: This pattern is useful for API rate limiting, function usage statistics, memoization, and more.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"'{self.func.__name__}' was called {self.count} time(s)\")",
+        "pythonMemoryState": {
+          "output": [
+            "'say_hello' was called 2 time(s)"
+          ],
+          "note": "2nd call log.",
+          "names": [
+            {
+              "name": "self.count",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__call__ execution - calling original function (2)",
+        "explanation": "**`return self.func(*args, **kwargs)`**\n\n**Calls the original `say_hello` function for the second time.** Each time it uses the same original function stored in `self.func`.\n\n**Analogy**: The secretary performs the actual task again. It's the same task, but the count record is accumulating.\n\n**Under the hood**: The original function object is retrieved from `self.func` and called. A new execution frame is created.\n\n**Why this order?** The final step of the same pattern: call the original function and return the result.",
+        "visualizationType": "pythonMemory",
+        "code": "return self.func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "Executing the original function again.",
+          "names": [
+            {
+              "name": "self.count",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing say_hello body (2)",
+        "explanation": "**`print(\"Hello!\")`**\n\n**The original function prints `\"Hello!\"`.** The second call is complete.\n\n**Final complete output:**\n1. `'say_hello' was called 1 time(s)` (1st __call__)\n2. `Hello!` (1st original function)\n3. `'say_hello' was called 2 time(s)` (2nd __call__)\n4. `Hello!` (2nd original function)\n\n**Summary - Advantages of class decorators:**\n- **Intuitive state management**: Track call count with `self.count`\n- **Multiple states at once**: Can use multiple instance variables like `self.func`, `self.count`, etc.\n- **External state access**: Can check the current call count with `say_hello.count`\n\n**Practical use**: Class decorators are especially useful when complex state management is needed. Examples: result caching, execution time statistics, access control, etc.\n\n**Note**: Class decorators cannot use `functools.wraps`, so the original function's metadata (`__name__`, `__doc__`, etc.) is not automatically preserved.",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Hello!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello!"
+          ],
+          "note": "All execution is complete.",
+          "names": [
+            {
+              "name": "self.count",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What method must you implement to use a class as a decorator?",
+    "options": [
+      "__init__",
+      "__decorator__",
+      "__call__",
+      "__wrapper__"
+    ],
+    "correctIndex": 2,
+    "explanation": "The `__call__` method allows class instances to be called like functions using `()`.\nCalling a decorated function is essentially calling this `__call__` method."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Decorators must always be functions.",
+      "correct": "Classes can also be decorators.",
+      "why": "Any callable object -- that is, an instance of a class that has a `__call__` method -- can function as a decorator."
+    }
+  ],
+  "keyTakeaway": "Class decorators are useful for creating decorators that need 'state', such as counting function call counts."
+}

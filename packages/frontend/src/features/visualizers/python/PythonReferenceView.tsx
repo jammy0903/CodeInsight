@@ -202,19 +202,30 @@ const StackVariable = memo(function StackVariable({
 }: StackVariableProps) {
   const isInline = INLINE_TYPES.has(variable.type);
   const typeColor = getTypeColor(variable.type);
+  const isReference = !isInline;
 
   return (
-    <div className="flex items-center gap-2 min-h-[28px]">
+    <div
+      className="flex items-center gap-2 min-h-[28px] rounded-md px-1 -mx-1"
+      data-var-id={isReference ? variable.id : undefined}
+      onMouseEnter={isReference ? () => onHoverStart(variable.id) : undefined}
+      onMouseLeave={isReference ? onHoverEnd : undefined}
+      style={{
+        cursor: isReference ? 'pointer' : undefined,
+        backgroundColor: isHighlighted ? '#fef9c3' : undefined,
+        transition: 'background-color 0.15s',
+      }}
+    >
       {/* Variable name */}
       <span
-        className="font-mono text-sm font-semibold text-slate-700 truncate"
+        className="font-mono text-sm font-bold text-slate-900 truncate"
         style={{ minWidth: '56px', maxWidth: '100px' }}
       >
         {variable.name}
       </span>
 
-      {/* Inline value (primitives) or → reference indicator */}
-      {isInline ? (
+      {/* Inline value (primitives only) */}
+      {isInline && (
         <span
           className="px-2 py-0.5 rounded text-xs font-mono font-semibold whitespace-nowrap"
           style={{
@@ -224,22 +235,6 @@ const StackVariable = memo(function StackVariable({
           }}
         >
           {String(variable.value)}
-        </span>
-      ) : (
-        <span
-          data-var-id={variable.id}
-          onMouseEnter={() => onHoverStart(variable.id)}
-          onMouseLeave={onHoverEnd}
-          className="px-2 py-0.5 rounded text-xs font-mono font-semibold cursor-pointer"
-          style={{
-            backgroundColor: isHighlighted ? '#fef08a' : '#e0e7ff',
-            color: isHighlighted ? '#b45309' : '#4338ca',
-            border: `1px solid ${isHighlighted ? '#fbbf24' : '#818cf8'}`,
-            boxShadow: isHighlighted ? '0 0 0 2px #fbbf2466' : undefined,
-            transition: 'background-color 0.15s, border-color 0.15s, box-shadow 0.15s',
-          }}
-        >
-          →
         </span>
       )}
     </div>

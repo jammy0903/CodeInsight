@@ -1,0 +1,138 @@
+{
+  "lessonId": "java-6-5",
+  "title": "Try-with-resources (Automatic Resource Cleanup)",
+  "concept": "Learn how to safely release resources without explicit close() calls using the try-with-resources syntax introduced in Java 7.",
+  "content": {
+    "code": "import java.io.*;\n\n// Implements AutoCloseable interface\nclass Box implements AutoCloseable {\n    public void close() {\n        System.out.println(\"Box closed!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // Declare resource inside try (...) parentheses\n        try (Box box = new Box()) {\n            System.out.println(\"Using Box...\");\n            throw new RuntimeException(\"Boom!\");\n        } catch (Exception e) {\n            System.out.println(\"Caught: \" + e.getMessage());\n        }\n    }\n}",
+    "steps": [
+      {
+        "title": "Package Import",
+        "explanation": "**`import java.io.*;`**\n\nImports Input/Output related classes.\n`AutoCloseable` is in `java.lang` so it's auto-imported, but this package frequently appears since it's commonly used in I/O operations.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        },
+        "code": "import java.io.*;"
+      },
+      {
+        "title": "Resource Creation (Open)",
+        "explanation": "**Execution flow:**\n1. A `Box` object is created inside the `try` parentheses `(...)`.\n2. The `box` variable references the object on the heap.\n\n**Explanation:**\nAn object created inside these parentheses has a promise with the JVM: \"I'll be automatically closed when we leave.\"\nThe object must implement the `AutoCloseable` interface for this to work.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "box",
+              "value": "-> 0x888",
+              "frame": "try-resource",
+              "new": true,
+              "type": "Box"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x888",
+              "content": "Box Instance",
+              "type": "Box",
+              "new": true
+            }
+          ],
+          "output": []
+        },
+        "code": "public class Main {"
+      },
+      {
+        "title": "Resource Usage and Exception",
+        "explanation": "**Execution flow:**\n1. Prints \"Using Box...\".\n2. A `RuntimeException`(\"Boom!\") suddenly occurs.\n\n**Explanation:**\nAn accident happened while working! With a regular `try-catch`, it would jump straight to the `catch` block, but `try-with-resources` is different.\nIt **cleans up before escaping**.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "box",
+              "value": "-> 0x888",
+              "frame": "try-resource",
+              "type": "Box"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x888",
+              "content": "Box Instance",
+              "type": "Box"
+            },
+            {
+              "address": "0x999",
+              "content": "NumEx: Boom!",
+              "type": "RuntimeException",
+              "new": true
+            }
+          ],
+          "output": [
+            "Using Box..."
+          ],
+          "error": "Exception Occurred!"
+        },
+        "code": "public static void main(String[] args) {",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "Automatic close() Call",
+        "explanation": "**Execution flow:**\n1. The moment the block is about to be exited due to the exception, the JVM silently calls `box.close()`.\n2. \"Box closed!\" is printed.\n\n**Explanation:**\n**Key point!** The developer doesn't need to write messy `close()` calls in a `finally` block -- the JVM handles it automatically.\nIt closes regardless of whether an exception occurred or not.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "output": [
+            "Box closed!"
+          ],
+          "note": "JVM automatically calls close()"
+        },
+        "code": "System.out.println(\"Box closed!\");"
+      },
+      {
+        "title": "Exception Handling (Catch)",
+        "explanation": "**Execution flow:**\n1. After resource cleanup is complete, the earlier exception (\"Boom!\") is passed to the `catch` block.\n2. Prints the exception message.\n\n**Explanation:**\nRemember that resource cleanup happens **before** exception handling.\nThe door is safely closed first, then the incident is reported.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "e",
+              "value": "-> 0x999",
+              "frame": "catch",
+              "type": "Exception"
+            }
+          ],
+          "output": [
+            "Caught: Boom!"
+          ]
+        },
+        "code": "try (Box box = new Box()) {",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What interface must a resource class implement to use try-with-resources?",
+    "options": [
+      "Serializable",
+      "Cloneable",
+      "AutoCloseable",
+      "Runnable"
+    ],
+    "correctIndex": 2,
+    "explanation": "The class must implement `java.lang.AutoCloseable` and define a `close()` method so the JVM can automatically call `close()` when the `try` block ends."
+  },
+  "misconceptions": [
+    {
+      "wrong": "try-with-resources only calls close() when no exception occurs.",
+      "correct": "No.\n`close()` is called unconditionally when leaving the block, regardless of whether an exception occurred.",
+      "why": "The compiler takes over the role of the traditional `finally` block."
+    }
+  ],
+  "keyTakeaway": "`try-with-resources` syntactically prevents resource leaks for file I/O, sockets, DB connections, and similar resources."
+}

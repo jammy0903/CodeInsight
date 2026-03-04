@@ -1,0 +1,217 @@
+{
+  "lessonId": "js-5-3",
+  "title": "不可变性",
+  "concept": "不可变性是指创建新副本而非直接修改数据的模式",
+  "content": {
+    "code": "// 가변 (Mutable) - 직접 수정\nconst user = { name: 'Alice', age: 25 };\nuser.age = 26;\n\n// 불변 (Immutable) - 새 객체 생성\nconst user2 = { name: 'Alice', age: 25 };\nconst updated = { ...user2, age: 26 };\n\nconsole.log(user2.age);\nconsole.log(updated.age);\n\n// 배열 불변 패턴\nconst nums = [1, 2, 3];\nconst added = [...nums, 4];\nconst removed = nums.filter(n => n !== 2);\nconst mapped = nums.map(n => n * 2);",
+    "steps": [
+      {
+        "title": "可变方式：创建对象",
+        "explanation": "创建 user 对象。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "user",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', age: 25 }"
+            }
+          ]
+        },
+        "code": "const user = { name: 'Alice', age: 25 };"
+      },
+      {
+        "title": "可变方式：直接修改",
+        "explanation": "直接修改 user.age。\n原始对象被改变了。",
+        "keyInsight": "可变 = 直接修改原始对象",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "user",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ name: 'Alice', age: 26 }",
+              "changed": true
+            }
+          ],
+          "warning": "Original modified!"
+        },
+        "code": "user.age = 26;"
+      },
+      {
+        "title": "不可变方式：保留原始对象",
+        "explanation": "创建 user2 对象。\n这个对象不会被修改。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "user2",
+              "value": "→ 0x002"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x002",
+              "content": "{ name: 'Alice', age: 25 }"
+            }
+          ]
+        },
+        "code": "const user2 = { name: 'Alice', age: 25 };"
+      },
+      {
+        "title": "不可变方式：创建新对象",
+        "explanation": "使用展开运算符复制，然后只覆盖 age。\n原始的 `user2` 保持不变——在堆上创建了一个**全新的**对象。",
+        "keyInsight": "不可变性 = 不修改，用替换代替",
+        "analogy": "就像不在原始文件上使用涂改液，而是复制到新纸上，做好修改后提交新版本。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "user2",
+              "value": "→ 0x002"
+            },
+            {
+              "name": "updated",
+              "value": "→ 0x003"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x002",
+              "content": "{ name: 'Alice', age: 25 }",
+              "preserved": true
+            },
+            {
+              "address": "0x003",
+              "content": "{ name: 'Alice', age: 26 }",
+              "new": true
+            }
+          ]
+        },
+        "code": "const updated = { ...user2, age: 26 };"
+      },
+      {
+        "title": "检查原始对象",
+        "explanation": "user2.age 仍然是 25。\n原始对象被保留了！",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "25",
+            "26"
+          ]
+        },
+        "code": "console.log(user2.age);",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "数组不可变模式：原始数组",
+        "explanation": "创建 nums 数组。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "[1, 2, 3]"
+            }
+          ]
+        },
+        "code": "const nums = [1, 2, 3];"
+      },
+      {
+        "title": "添加：展开 + 新元素",
+        "explanation": "[...nums, 4] 复制原数组并创建一个追加了 4 的新数组。",
+        "keyInsight": "使用 [...arr, item] 代替 push()",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "[1, 2, 3]",
+              "preserved": true
+            },
+            {
+              "name": "added",
+              "value": "[1, 2, 3, 4]",
+              "new": true
+            }
+          ]
+        },
+        "code": "const added = [...nums, 4];"
+      },
+      {
+        "title": "删除：filter()",
+        "explanation": "filter() 返回一个只包含满足条件的元素的新数组。",
+        "keyInsight": "使用 filter() 代替 splice()",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "[1, 2, 3]",
+              "preserved": true
+            },
+            {
+              "name": "removed",
+              "value": "[1, 3]",
+              "new": true
+            }
+          ]
+        },
+        "code": "const removed = nums.filter(n => n !== 2);"
+      },
+      {
+        "title": "转换：map()",
+        "explanation": "map() 返回一个每个元素都经过转换的新数组。",
+        "keyInsight": "使用 map() 代替 for 循环修改",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "[1, 2, 3]",
+              "preserved": true
+            },
+            {
+              "name": "mapped",
+              "value": "[2, 4, 6]",
+              "new": true
+            }
+          ]
+        },
+        "code": "const mapped = nums.map(n => n * 2);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "为什么不可变性在 React 中很重要？",
+    "options": [
+      "代码更短",
+      "使用更少的内存",
+      "使变化检测变得容易（引用比较）",
+      "它是 JavaScript 标准"
+    ],
+    "correctIndex": 2,
+    "explanation": "使用不可变性，仅通过比较引用就能检测变化。\n如果直接修改对象，就会丢失之前的状态，必须逐一比较所有内容。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "不可变性很慢（因为每次都要复制）",
+      "correct": "浅拷贝速度很快，而且通过变化检测获得的优化可以提升整体性能。",
+      "why": "像 React 这样的库利用不可变性来高效渲染。"
+    }
+  ],
+  "keyTakeaway": "不可变性 = 用复制代替修改，React/Redux 的核心模式"
+}

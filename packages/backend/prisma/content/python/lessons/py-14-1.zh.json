@@ -1,0 +1,312 @@
+{
+  "lessonId": "py-14-1",
+  "title": "列表推导式",
+  "concept": "列表推导式是将for循环压缩成一行的Python核心语法",
+  "content": {
+    "code": "numbers = [1, 2, 3, 4, 5]\n\nsquares = [x**2 for x in numbers]\nprint(squares)\n\nevens = [x for x in numbers if x % 2 == 0]\nprint(evens)\n\nwords = [\"hello\", \"world\"]\nupper = [w.upper() for w in words]\nprint(upper)",
+    "steps": [
+      {
+        "title": "创建源列表",
+        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- 创建一个包含5个整数的列表对象，并贴上 `numbers` 标签。\n\n这个列表将作为接下来学习的**列表推导式**的源数据。列表推导式是Python特有的简洁语法，用于**转换或过滤**现有列表来创建**新列表**。\n\n**类比：** 就像工厂的原材料仓库。把原材料（numbers）放进去，传送带（推导式）逐个取出每种材料进行加工，生产出新产品（新列表）。\n\n**为什么要学推导式？** 用普通的for循环创建新列表需要4行代码：\n```python\nresult = []\nfor x in numbers:\n    result.append(x**2)\n```\n推导式将这个模式压缩为**仅1行**：`[x**2 for x in numbers]`\n\n**Python内部机制：** 当 `[1, 2, 3, 4, 5]` 字面量被求值时，堆（heap）内存中分配了一个 `list` 对象。内部来说，列表是一个存储各整数对象内存地址的数组。`numbers` 这个名称注册在全局命名空间字典中，指向这个列表对象。\n\n**执行顺序：**\n1. 整数对象 `1`、`2`、`3`、`4`、`5` 存在于内存中（小整数被缓存）。\n2. `list` 对象在堆上分配，存储每个整数的引用。\n3. 在全局命名空间中创建 `numbers -> list对象` 绑定。",
+        "visualizationType": "pythonMemory",
+        "code": "numbers = [1, 2, 3, 4, 5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "推导式的源列表",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "基本推导式 -- 平方列表",
+        "explanation": "**`squares = [x**2 for x in numbers]`** -- 将 `numbers` 的每个元素取平方，创建一个新列表。\n\n**列表推导式语法：** `[表达式 for 变量 in 可迭代对象]`\n\n**类比：** 数字一个接一个地出现在传送带上，每个数字通过**平方机器**后，转换后的值被放入新箱子。原来的传送带（numbers）保持不变，只创建了新箱子（squares）。\n\n**注意：** `x` 是推导式内部的临时变量。在Python 3中，列表推导式有**自己的作用域**，即使外部有同名变量也不会受影响。\n\n**执行过程**（内部像for循环一样顺序执行）：\n1. `x = 1` -> `1**2` = `1`\n2. `x = 2` -> `2**2` = `4`\n3. `x = 3` -> `3**2` = `9`\n4. `x = 4` -> `4**2` = `16`\n5. `x = 5` -> `5**2` = `25`\n6. 结果：`[1, 4, 9, 16, 25]`",
+        "visualizationType": "pythonMemory",
+        "code": "squares = [x**2 for x in numbers]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "[x**2 for x in numbers] -> 对每个元素取平方",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "打印平方列表",
+        "explanation": "**`print(squares)`** -- 打印 `squares` 指向的列表对象 `[1, 4, 9, 16, 25]`。\n\n这里需要理解的关键点是**原始列表完全没有被修改**。\n- `numbers`：`[1, 2, 3, 4, 5]` -- 保持原样\n- `squares`：`[1, 4, 9, 16, 25]` -- 一个全新的列表对象\n\n**类比：** 就像用复印机复印文档后只在副本上修改。原文档完全没有被触碰。\n\n**Python内部机制：** `print()` 调用 `squares` 列表的 `__repr__()` 方法。`list.__repr__()` 对每个元素调用 `repr()`，用逗号分隔并用方括号包裹生成字符串。这个字符串输出到 `sys.stdout`。\n\n**推导式的4个优点：**\n1. **简洁** -- 将4行for循环压缩为1行\n2. **可读性** -- 清楚地展示\"要创建什么\"\n3. **性能** -- 比普通for循环 + `append` 略快\n4. **函数式风格** -- 声明式地描述结果\n\n**注意：** 推导式并非总是更好。当逻辑变得复杂时，普通for循环反而更易读。以\"一眼能否理解？\"为判断标准。\n\n**执行顺序：**\n1. `squares` 名称 -> 解析列表对象引用。\n2. `print()` 调用 -> `__repr__()` -> 字符串生成。\n3. 输出到 `sys.stdout`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(squares)",
+        "pythonMemoryState": {
+          "output": [
+            "[1, 4, 9, 16, 25]"
+          ],
+          "note": "原始numbers未被修改",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "条件推导式 -- 过滤偶数",
+        "explanation": "**`evens = [x for x in numbers if x % 2 == 0]`** -- 从 `numbers` 中只选择偶数元素创建新列表。\n\n**条件推导式语法：** `[表达式 for 变量 in 可迭代对象 if 条件]`\n\n**类比：** 就像用筛子筛米。将所有米（所有元素）倒入筛子，只有通过筛孔（条件）的才会落下来聚集。只有通过 `x % 2 == 0` 筛子的偶数才会进入新列表。\n\n**注意：** 条件推导式的 `if` 位于for**之后**。下一课将学习的 `if-else` 位于for**之前**，混淆这两者会导致 `SyntaxError`。\n\n**执行过程：**\n1. `x = 1` -> `1 % 2 == 0`？`False` -> 排除\n2. `x = 2` -> `2 % 2 == 0`？`True` -> **包含**\n3. `x = 3` -> `3 % 2 == 0`？`False` -> 排除\n4. `x = 4` -> `4 % 2 == 0`？`True` -> **包含**\n5. `x = 5` -> `5 % 2 == 0`？`False` -> 排除\n6. 结果：`[2, 4]`",
+        "visualizationType": "pythonMemory",
+        "code": "evens = [x for x in numbers if x % 2 == 0]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "用if条件只过滤偶数",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "对字符串列表应用方法",
+        "explanation": "对字符串列表应用方法时，关键视角是\"用同一规则转换每个元素\"。\n\n通常用推导式来处理。\n例如：`[s.upper() for s in words]`\n\n**类比**：就像批量操作，对所有标签盖上大写印章。\n\n要点：\n- 保持原始列表\n- 创建转换后的新列表\n- 规则越清晰，代码可读性越高",
+        "visualizationType": "pythonMemory",
+        "code": "upper = [w.upper() for w in words]",
+        "pythonMemoryState": {
+          "output": [
+            "[2, 4]"
+          ],
+          "note": "方法调用也可以作为表达式使用",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list4"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "list5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[\"hello\", \"world\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "list5",
+              "type": "list",
+              "value": "[\"HELLO\", \"WORLD\"]",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "最终结果输出",
+        "explanation": "**`print(upper)`** -- 打印 `upper` 指向的列表 `[\"HELLO\", \"WORLD\"]`。\n\n在这节课中，我们学习了列表推导式的**三种核心模式**。\n\n**列表推导式模式总结：**\n\n**类比：** 推导式类似于SQL的 `SELECT` 语句。`SELECT x**2 FROM numbers WHERE x > 0` -- 转换（SELECT）、源（FROM）和过滤（WHERE）都包含在一条语句中。\n\n**Python内部机制：** 推导式在字节码层面经过特别优化。用 `dis` 模块查看字节码可以看到直接使用 `LIST_APPEND` 指令，避免了 `list.append()` 方法查找的开销。\n\n**注意：** 推导式虽强大但不应滥用。\n- 一行超过80个字符时，可读性会下降\n- 如果复杂到需要超过2行，请使用普通for循环\n- \"可读的代码\"永远比\"短的代码\"更重要！\n\n**执行顺序：**\n1. 通过 `upper` 名称获取列表对象引用。\n2. `print()` -> `list.__repr__()` -> 字符串转换。\n3. 输出到 `sys.stdout` 并添加换行。",
+        "visualizationType": "pythonMemory",
+        "code": "print(upper)",
+        "pythonMemoryState": {
+          "output": [
+            "[\"HELLO\", \"WORLD\"]"
+          ],
+          "note": "推导式3种模式：转换、过滤、转换+过滤",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list4"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "list5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[\"hello\", \"world\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "list5",
+              "type": "list",
+              "value": "[\"HELLO\", \"WORLD\"]",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "[x*2 for x in [1,2,3] if x > 1]的结果是？",
+    "options": [
+      "[2, 4, 6]",
+      "[4, 6]",
+      "[2, 4]",
+      "[1, 4, 6]"
+    ],
+    "correctIndex": 1,
+    "explanation": "先用if x > 1条件过滤，剩下[2, 3]，\n然后对每个元素应用x*2得到[4, 6]。\nx=1不满足条件（x > 1）所以被排除。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "列表推导式总是比for循环好",
+      "correct": "简单的转换/过滤用推导式好，但复杂逻辑用for循环可读性更好。",
+      "why": "当嵌套for循环 + 条件 + 复杂表达式组合在一起时，\n一行代码太长反而更难阅读。"
+    }
+  ],
+  "keyTakeaway": "[表达式 for x in 列表 if 条件] -- 一行搞定转换和过滤！Python的核心语法！"
+}

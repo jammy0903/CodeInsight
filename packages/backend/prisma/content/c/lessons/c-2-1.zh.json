@@ -1,0 +1,88 @@
+{
+  "lessonId": "c-2-1",
+  "title": "取址运算符（&）：找到变量的地址",
+  "concept": "内存地址就像"家庭住址"。用 &变量名 来获取。",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 100;\n\n    printf(\"Value of a: %d\\n\", a);\n\n    printf(\"Address of a: %p\\n\", &a);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "要使用 ```printf```、```scanf``` 等输入输出函数，必须先引入**头文件**。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "定义 main 函数",
+        "explanation": "程序启动 — 这是操作系统最先调用的**入口点**。\n\n此时栈上创建了 ```main``` 的**栈帧**，之后声明的变量将被放置在这个空间中。就像新员工入职后被分配到自己的办公桌一样。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "变量的声明与赋值",
+        "explanation": "`int a = 100;` 将值 100 存储到变量中。\n\n重要的是，变量同时拥有值和地址。`a` 指的是值，`&a` 指的是地址。",
+        "visualizationType": "cMemory",
+        "code": "int a = 100;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "100",
+            "type": "int",
+            "address": "0x1FF0"
+          }
+        ]
+      },
+      {
+        "title": "输出变量的值",
+        "explanation": "```%d``` 是**格式说明符**，指示 printf 以十进制输出整数。```printf``` 将 ```a``` 的值（100）插入 ```%d``` 的位置。\n\n此步骤只使用变量的**值**。下一步我们将输出同一变量的**地址**，请对比两者的区别。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Value of a: %d\\n\", a);",
+        "stdout": "Value of a: 100"
+      },
+      {
+        "title": "查看变量的地址（& 运算符）",
+        "explanation": "`&a` 返回变量 `a` 的内存起始地址。输出地址使用 `%p`。\n\n也就是说，`a` 是数据本身，而 `&a` 是数据所在的位置。存储这个位置信息的变量就叫做指针。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Address of a: %p\\n\", &a);",
+        "stdout": "Value of a: 100\nAddress of a: 0x1FF0"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "```return 0``` — 正常退出信号。```main``` 的栈帧被移除时，变量 ```a``` 也从内存中消失。函数结束时自动清理是**栈内存**的特点。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如何获取 `int money = 500;` 的地址？",
+    "options": [
+      "money",
+      "*money",
+      "&money",
+      "address(money)"
+    ],
+    "correctIndex": 2,
+    "explanation": "`&`（Ampersand）是"取址"运算符。\n助记法：Ampersand = Address。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "地址值总是相同的",
+      "correct": "每次运行都会变化（因为 ASLR 等安全机制）。",
+      "why": "操作系统每次都会动态分配可用的内存空间。"
+    }
+  ],
+  "keyTakeaway": "每个变量都有地址。用 `&` 即可查看。"
+}

@@ -1,0 +1,176 @@
+{
+  "lessonId": "js-6-1",
+  "title": "原型链",
+  "concept": "对象通过 [[Prototype]] 链接，属性查找会沿着链向上遍历",
+  "content": {
+    "code": "const animal = {\n  eat() { return 'eating'; }\n};\n\nconst dog = {\n  bark() { return 'woof!'; }\n};\n\nObject.setPrototypeOf(dog, animal);\n\nconsole.log(dog.bark());\nconsole.log(dog.eat());\nconsole.log(dog.toString());",
+    "steps": [
+      {
+        "title": "animal 对象（共享方法）",
+        "explanation": "创建 animal 对象。\n这里的 `eat` 方法稍后会被 `dog` 借用。\n不需要每个对象都复制一份方法，而是**共享**一个实例来节省内存。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ]
+        },
+        "code": "const animal = {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "创建 dog 对象",
+        "explanation": "创建带有 bark 方法的 dog 对象。\n目前还没有连接到 animal。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            },
+            {
+              "name": "dog",
+              "props": [
+                "bark()"
+              ],
+              "proto": "Object.prototype"
+            }
+          ]
+        },
+        "code": "const dog = {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "title": "链接原型",
+        "explanation": "将 dog 的 [[Prototype]] 设置为 animal。\n现在建立了 dog → animal → Object.prototype 的链。",
+        "keyInsight": "[[Prototype]] = 对象之间的继承链接",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "dog",
+              "props": [
+                "bark()"
+              ],
+              "proto": "animal"
+            },
+            {
+              "name": "animal",
+              "props": [
+                "eat()"
+              ],
+              "proto": "Object.prototype"
+            },
+            {
+              "name": "Object.prototype",
+              "props": [
+                "toString()"
+              ],
+              "proto": "null"
+            }
+          ],
+          "chain": [
+            "dog",
+            "animal",
+            "Object.prototype",
+            "null"
+          ]
+        },
+        "code": "Object.setPrototypeOf(dog, animal);"
+      },
+      {
+        "title": "调用自身的方法",
+        "explanation": "dog.bark() 直接在 dog 自身找到，所以立即返回。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": {
+            "property": "bark",
+            "found": "dog",
+            "steps": 1
+          },
+          "output": [
+            "woof!"
+          ]
+        },
+        "code": "console.log(dog.bark());"
+      },
+      {
+        "title": "沿原型链向上查找",
+        "explanation": "dog.eat() 不在 dog 上，所以沿着链向上遍历，在 animal 上找到了 eat。",
+        "keyInsight": "如果属性未找到，查找会沿 [[Prototype]] 链向上进行",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": {
+            "property": "eat",
+            "found": "animal",
+            "steps": 2
+          },
+          "output": [
+            "woof!",
+            "eating"
+          ]
+        },
+        "code": "console.log(dog.eat());"
+      },
+      {
+        "title": "一直查找到 Object.prototype",
+        "explanation": "toString() 不在 dog 或 animal 上，所以在 Object.prototype 上找到了。",
+        "keyInsight": "每个对象最终都继承自 Object.prototype",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "lookup": {
+            "property": "toString",
+            "found": "Object.prototype",
+            "steps": 3
+          },
+          "output": [
+            "woof!",
+            "eating",
+            "[object Object]"
+          ]
+        },
+        "code": "console.log(dog.toString());"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "调用 dog.fly() 时会发生什么？",
+    "options": [
+      "返回 undefined",
+      "返回 null",
+      "TypeError: dog.fly is not a function",
+      "返回空字符串"
+    ],
+    "correctIndex": 2,
+    "explanation": "沿着链查找到末端（null）仍未找到 fly，得到 undefined。\n调用 undefined() 会抛出 TypeError。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript 像 Java 或 C++ 一样是基于类的",
+      "correct": "即使使用了 ES6 的 class 关键字，JavaScript 内部仍然通过**原型（对象之间的链接）**工作。",
+      "why": "类是从蓝图中制造副本，而原型是委托给父对象。"
+    },
+    {
+      "wrong": "__proto__ 是一个标准属性",
+      "correct": "大多数浏览器支持它，但官方建议使用 `Object.getPrototypeOf()`。",
+      "why": "由于性能问题和兼容性问题，应避免使用 __proto__。"
+    }
+  ],
+  "keyTakeaway": "原型链 = 属性查找路径；如果未找到，沿链向上查找"
+}

@@ -1,0 +1,408 @@
+{
+  "lessonId": "py-11-1",
+  "title": "Coin 0 (Baekjoon 11047)",
+  "concept": "Greedy: Using the largest coins first always yields the optimal solution",
+  "content": {
+    "code": "# 백준 11047 - 동전 0 (Greedy)\ncoins = [500, 100, 50, 10]\ntarget = 1260\ncount = 0\n\nfor coin in coins:\n    count += target // coin\n    target %= coin\n\nprint(count)",
+    "steps": [
+      {
+        "title": "Understanding the Problem",
+        "explanation": "**Coin 0 (Baekjoon 11047)**\n\nGiven a set of coin denominations, find the **minimum number of coins** to make the target amount.\n\n**Input**: coins = [500, 100, 50, 10], target = 1260 won\n**Output**: Minimum number of coins\n\n**Greedy strategy**: Use the largest coins as much as possible.\nWhy? Since 1 large coin = several small coins, using the largest first is always optimal.\n\n**Note**: Greedy doesn't work for every problem. This problem works with greedy because the coin values are multiples of each other.",
+        "visualizationType": "algorithm",
+        "code": "coins = [500, 100, 50, 10]",
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coins",
+                "value": "[500, 100, 50, 10]"
+              },
+              {
+                "name": "target",
+                "value": 1260
+              },
+              {
+                "name": "count",
+                "value": 0
+              }
+            ],
+            "note": "Use largest coins first -> minimum coin count"
+          }
+        }
+      },
+      {
+        "title": "Variable Initialization",
+        "explanation": "**`target = 1260`** -- The amount we need to make\n**`count = 0`** -- Number of coins used (the goal is to minimize this)\n\nNow we iterate through `coins` from largest to smallest, reducing `target` along the way.\nThe coin list is already sorted in **descending order**, so we just need a for loop.",
+        "visualizationType": "algorithm",
+        "code": "count = 0",
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coins",
+                "value": "[500, 100, 50, 10]"
+              },
+              {
+                "name": "target",
+                "value": 1260
+              },
+              {
+                "name": "count",
+                "value": 0
+              },
+              {
+                "name": "coin",
+                "value": "-"
+              }
+            ],
+            "history": [
+              {
+                "step": "Initial",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "title": "[500 won] Greedy Choice",
+        "explanation": "**`coin = 500`** (first iteration)\n\n**`target // coin`** = 1260 // 500 = **2 coins** (2 x 500 won = 1000 won)\n**`target %= coin`** = 1260 % 500 = **260** (remainder)\n\n**Greedy key insight**: Use `//` (quotient) to find the maximum number of coins usable, and `%` (remainder) to find the remaining amount.\n\nWe use 2 coins of 500 won, and pass the remaining 260 won to the next coin.",
+        "visualizationType": "algorithm",
+        "code": "    target %= coin",
+        "occurrence": 1,
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coin",
+                "value": 500,
+                "highlight": true
+              },
+              {
+                "name": "target",
+                "value": 260,
+                "highlight": true,
+                "prev": 1260
+              },
+              {
+                "name": "count",
+                "value": 2,
+                "highlight": true,
+                "prev": 0
+              }
+            ],
+            "history": [
+              {
+                "step": "Initial",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500 won",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                },
+                "highlight": true
+              }
+            ],
+            "note": "Used 500 won x 2 -> Remaining: 260 won"
+          }
+        }
+      },
+      {
+        "title": "[100 won] Greedy Choice",
+        "explanation": "**`coin = 100`** (second iteration)\n\n**`target // coin`** = 260 // 100 = **2 coins**\n**`target %= coin`** = 260 % 100 = **60**\n\ncount: 2 + 2 = **4 coins**\nRemaining: **60 won**\n\nSee the pattern? Each iteration uses the same two lines.\nThe greedy algorithm is implemented with just the `//` and `%` operators.",
+        "visualizationType": "algorithm",
+        "code": "    target %= coin",
+        "occurrence": 1,
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coin",
+                "value": 100,
+                "highlight": true
+              },
+              {
+                "name": "target",
+                "value": 60,
+                "highlight": true,
+                "prev": 260
+              },
+              {
+                "name": "count",
+                "value": 4,
+                "highlight": true,
+                "prev": 2
+              }
+            ],
+            "history": [
+              {
+                "step": "Initial",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500 won",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                }
+              },
+              {
+                "step": "100 won",
+                "values": {
+                  "target": 60,
+                  "count": 4,
+                  "coin": 100
+                },
+                "highlight": true
+              }
+            ],
+            "note": "Used 100 won x 2 -> Remaining: 60 won"
+          }
+        }
+      },
+      {
+        "title": "[50 won] Greedy Choice",
+        "explanation": "At the **`coin = 50`** step, we process the remaining 60 won.\n\nCalculation:\n- `60 // 50 = 1` -> Use 1 coin of 50 won\n- `60 % 50 = 10` -> Amount passed to the next step is 10 won\n\nCumulative coin count becomes `4 + 1 = 5`.\n\nThe key pattern is the same as previous steps.\nTake the maximum count using quotient (`//`) from the largest coin, and pass the remainder (`%`) to the next coin.",
+        "visualizationType": "algorithm",
+        "code": "    target %= coin",
+        "occurrence": 1,
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coin",
+                "value": 50,
+                "highlight": true
+              },
+              {
+                "name": "target",
+                "value": 10,
+                "highlight": true,
+                "prev": 60
+              },
+              {
+                "name": "count",
+                "value": 5,
+                "highlight": true,
+                "prev": 4
+              }
+            ],
+            "history": [
+              {
+                "step": "Initial",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500 won",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                }
+              },
+              {
+                "step": "100 won",
+                "values": {
+                  "target": 60,
+                  "count": 4,
+                  "coin": 100
+                }
+              },
+              {
+                "step": "50 won",
+                "values": {
+                  "target": 10,
+                  "count": 5,
+                  "coin": 50
+                },
+                "highlight": true
+              }
+            ],
+            "note": "Used 50 won x 1 -> Remaining: 10 won"
+          }
+        }
+      },
+      {
+        "title": "[10 won] Greedy Choice -- Done!",
+        "explanation": "**`coin = 10`** (fourth iteration)\n\n- `10 // 10 = 1` -> Use 1 coin of 10 won\n- `10 % 10 = 0` -> Remaining amount is 0 won\n\nCumulative count becomes `5 + 1 = 6`.\n\nKey summary:\n- Each step adds the count using quotient (`//`)\n- Updates the remaining amount using remainder (`%`)\n- When target becomes 0, we're done, and the current count is the answer",
+        "visualizationType": "algorithm",
+        "code": "    target %= coin",
+        "occurrence": 1,
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coin",
+                "value": 10,
+                "highlight": true
+              },
+              {
+                "name": "target",
+                "value": 0,
+                "highlight": true,
+                "prev": 10
+              },
+              {
+                "name": "count",
+                "value": 6,
+                "highlight": true,
+                "prev": 5
+              }
+            ],
+            "history": [
+              {
+                "step": "Initial",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500 won",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                }
+              },
+              {
+                "step": "100 won",
+                "values": {
+                  "target": 60,
+                  "count": 4,
+                  "coin": 100
+                }
+              },
+              {
+                "step": "50 won",
+                "values": {
+                  "target": 10,
+                  "count": 5,
+                  "coin": 50
+                }
+              },
+              {
+                "step": "10 won",
+                "values": {
+                  "target": 0,
+                  "count": 6,
+                  "coin": 10
+                },
+                "highlight": true
+              }
+            ],
+            "note": "Used 10 won x 1 -> Remaining: 0 won (Done!)"
+          }
+        }
+      },
+      {
+        "title": "Output Result",
+        "explanation": "**`print(count)`** -> **6**\n\nThe minimum number of coins to make 1260 won is **6**.\n\n**Why does the greedy algorithm work here?**\nIn this problem, the coin values have a **multiple relationship** (10, 50, 100, 500),\nso using the largest coin is always beneficial.\n\n**When greedy fails**: If coins are [1, 7, 10] and target is 14 won?\n- Greedy: 10+1+1+1+1 = 5 coins\n- Optimal: 7+7 = 2 coins\n-> When values aren't multiples of each other, you need DP (Dynamic Programming).",
+        "visualizationType": "algorithm",
+        "code": "print(count)",
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "count",
+                "value": 6,
+                "highlight": true
+              }
+            ],
+            "history": [
+              {
+                "step": "Initial",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500 won",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                }
+              },
+              {
+                "step": "100 won",
+                "values": {
+                  "target": 60,
+                  "count": 4,
+                  "coin": 100
+                }
+              },
+              {
+                "step": "50 won",
+                "values": {
+                  "target": 10,
+                  "count": 5,
+                  "coin": 50
+                }
+              },
+              {
+                "step": "10 won",
+                "values": {
+                  "target": 0,
+                  "count": 6,
+                  "coin": 10
+                }
+              }
+            ],
+            "note": "Minimum coin count: 6 (500x2 + 100x2 + 50x1 + 10x1)"
+          }
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "If coins are [1, 7, 10] and the target amount is 14 won, what are the greedy result and the actual optimal solution?",
+    "options": [
+      "Greedy: 5 coins (10+1+1+1+1), Optimal: 2 coins (7+7)",
+      "Greedy: 2 coins (7+7), Optimal: 2 coins (7+7)",
+      "Greedy: 5 coins, Optimal: 5 coins (same)",
+      "Greedy always guarantees the optimal solution"
+    ],
+    "correctIndex": 0,
+    "explanation": "When coin values aren't multiples of each other, greedy doesn't guarantee the optimal solution.\nGreedy picks 1 coin of 10 + 4 coins of 1 = 5 coins,\nbut the actual optimal solution is 2 coins of 7 = 2 coins.\nIn such cases, DP (Dynamic Programming) should be used."
+  },
+  "misconceptions": [
+    {
+      "wrong": "The greedy algorithm always guarantees the optimal solution",
+      "correct": "Greedy guarantees optimal solutions only when the 'greedy choice property' and 'optimal substructure' hold.",
+      "why": "This coin problem works with greedy because the coin values are multiples of each other, but not all coin problems have this property."
+    }
+  ],
+  "keyTakeaway": "Greedy = make the best choice at each moment. However, you must always prove that 'using the largest first is always beneficial.'"
+}

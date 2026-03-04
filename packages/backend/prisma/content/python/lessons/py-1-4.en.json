@@ -1,0 +1,385 @@
+{
+  "lessonId": "py-1-4",
+  "title": "Booleans and Type Casting",
+  "concept": "You can explicitly change data types (Casting)",
+  "content": {
+    "code": "# 1. 숫자 변환\ns = \"100\"\nn = int(s)\nf = float(s)\n\nprint(n + 50)\nprint(f + 0.5)\n\n# 2. 문자 변환\nage = 20\n# msg = \"Age: \" + age # 에러 발생!\nmsg = \"Age: \" + str(age)\nprint(msg)",
+    "steps": [
+      {
+        "title": "Creating String Variable 's'",
+        "explanation": "**`s = \"100\"`** -- It looks like a number, but since it's wrapped in **quotes, it is a string** object.\n\n`\"100\"` is a completely different type from the number `100`! With quotes (`\"\"`), it's a string (str); without quotes, it's an integer (int):\n- `\"100\"` -> `str` type (a sequence of characters '1', '0', '0')\n- `100` -> `int` type (a mathematical number)\n\n**Analogy:** The characters '100' written on paper (string) and 100 actual candies you can count (number) are different. You can't do arithmetic with the characters '100', and you can't form sentences with 100 candies.\n\n**Why does this distinction matter?** User input from the web always comes as strings. The result of `input()` is also a string. To perform numerical calculations, type casting is required.\n\n**How Python works internally:** `\"100\"` is a `str` object composed of 3 Unicode characters ('1', '0', '0'). If you use the `+` operator on this object, it performs string concatenation, not numeric addition.",
+        "visualizationType": "pythonMemory",
+        "code": "s = \"100\"",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Casting String to Integer",
+        "explanation": "**`n = int(s)`** -- Uses the `int()` function to **convert the string `\"100\"` to the integer `100`**.\n\nThe `int()` function reads the number from the string and creates a **new integer object**. The original string `s` remains unchanged (strings are immutable).\n\n**Analogy:** It's like reading the characters '100' on paper and then counting out 100 candies. The paper (string) stays as-is, and 100 candies (integer) are newly prepared.\n\n**What if conversion fails?** Converting a non-numeric string raises an error:\n- `int(\"abc\")` -> `ValueError: invalid literal for int() with base 10: 'abc'`\n- `int(\"3.14\")` -> `ValueError` (strings with decimal points must be converted with `float()` first)\n\n**How Python works internally:** `int(s)` calls `int.__new__(int, s)`. Internally, it reads each character of the string sequentially and converts it to a base-10 number. Whitespace is automatically ignored (`int(\" 100 \")` = `100`).\n\n**Practical tip:** `int()` also supports base conversion: `int(\"FF\", 16)` = `255` (hexadecimal), `int(\"1010\", 2)` = `10` (binary).",
+        "visualizationType": "pythonMemory",
+        "code": "n = int(s)",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Casting String to Float",
+        "explanation": "**`f = float(s)`** -- Uses `float()` to **convert the string `\"100\"` to the float `100.0`**.\n\nThe `float()` function reads the string and creates a new floating-point object. `\"100\"` becomes `100.0`.\n\n**Difference between int() and float():**\n- `int(\"100\")` = `100` (integer)\n- `float(\"100\")` = `100.0` (float)\n- `float(\"3.14\")` = `3.14` (can convert decimal strings!)\n- `int(\"3.14\")` = `ValueError` (int cannot convert decimal strings)\n\n**Analogy:** `int()` is an 'integer converter' and `float()` is a 'decimal converter.' The integer converter won't accept anything with a decimal point, but the decimal converter can handle both integers and decimals.\n\n**How Python works internally:** `float(s)` internally calls C's `strtod()` function to parse the string into an IEEE 754 64-bit floating-point value. A new `float` object is created on the heap, and the label `f` is attached.\n\n**Note:** `float(\"inf\")` represents positive infinity, and `float(\"nan\")` represents 'Not a Number.' These are valid float values!",
+        "visualizationType": "pythonMemory",
+        "code": "f = float(s)",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Integer Arithmetic Result",
+        "explanation": "**`print(n + 50)`** -- Adds the cast integer `n` (100) and `50`, printing the result `150`.\n\nNow that `n` is an `int` type, numeric operations are possible! `100 + 50 = 150` is computed and printed.\n\n**What if we did `s + 50` without casting?** `TypeError: can only concatenate str (not \"int\") to str` would be raised. The `+` for strings means 'concatenation', while `+` for integers means 'addition', so when types are mixed, Python doesn't know which operation to perform.\n\n**Analogy:** You can't add 50 to the characters '100' on paper (string), but you can add 50 to 100 candies (integer). Type casting is the process of turning text into actual objects.\n\n**How Python works internally:** `n + 50` calls `n.__add__(50)`. The values of both `int` objects are added to create a new `int` object `150`, which is then passed to `print()`. The intermediate result `150` loses its reference after the `print()` call and is reclaimed by the garbage collector.",
+        "visualizationType": "pythonMemory",
+        "code": "print(n + 50)",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            }
+          ],
+          "output": [
+            "150"
+          ]
+        }
+      },
+      {
+        "title": "Printing Float Arithmetic Result",
+        "explanation": "**`print(f + 0.5)`** -- Adds the cast float `f` (100.0) and `0.5`, printing the result `100.5`.\n\nSince `f` is a `float` type, a `float` + `float` = `float` operation is performed. `100.0 + 0.5 = 100.5`.\n\n**Difference between int and float arithmetic:**\n- `int + int` = `int` (100 + 50 = 150)\n- `float + float` = `float` (100.0 + 0.5 = 100.5)\n- `int + float` = `float` (100 + 0.5 = 100.5, automatic casting!)\n\nWhen mixing `int` and `float`, Python automatically converts the `int` to `float`. This is called **implicit coercion**. However, this automatic conversion does NOT happen between `str` and `int`!\n\n**How Python works internally:** `f.__add__(0.5)` is called, and floating-point addition is performed at the C level. A new `float` object `100.5` is created and printed.\n\n**Note:** Floating-point operations like `f + 0.1` may produce tiny rounding errors.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f + 0.5)",
+        "pythonMemoryState": {
+          "output": [
+            "100.5"
+          ],
+          "names": [],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating Integer Variable 'age'",
+        "explanation": "**`age = 20`** -- Creates an integer object `20` and attaches the label `age`.\n\nNow we begin an example of the opposite direction of casting -- converting a number to a string. First, we prepare an integer variable.\n\n**Why this order?** The next line will show an attempt to combine `age` with a string. For that, `age` must be defined first.\n\n**Analogy:** The label `age` points to the integer object `20`. This object's type is `int`, so numeric operations work, but `+` with a string will not.\n\n**How Python works internally:** `20` is within the Small Integer Cache range (-5 to 256), so the pre-created object is reused. No new memory allocation occurs.\n\n**Note:** The variable name `age` is not a Python keyword, so it can be used freely. However, be careful not to use built-in function names like `int`, `str`, `print` as variable names -- it would override their original functionality!",
+        "visualizationType": "pythonMemory",
+        "code": "age = 20",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "20",
+              "pyId": "4004",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "TypeError Situation",
+        "explanation": "**`# msg = \"Age: \" + age  # Error!`** -- An attempt to directly add a string and an integer with `+`.\n\nIf this line were uncommented, it would raise `TypeError: can only concatenate str (not \"int\") to str`. Python does not allow concatenating a string (`\"Age: \"`) with an integer (`20`) using `+`.\n\n**Why doesn't Python auto-convert?** It might seem convenient if `\"Age: \" + 20` automatically became `\"Age: 20\"` like in JavaScript, but Python's design philosophy is different:\n> \"Explicit is better than implicit\" -- The Zen of Python\n\nAutomatic conversion is convenient but can create unexpected bugs. For example, it becomes ambiguous whether `\"1\" + 2` should be `\"12\"` (string concatenation) or `3` (numeric addition).\n\n**Analogy:** Just as you can't mix Korean and English grammar in a single sentence without translation, strings and numbers are different 'languages.' To mix them, you must first translate (cast).\n\n**How Python works internally:** `\"Age: \".__add__(age)` is called, but `str.__add__` returns `NotImplemented` when the right operand is not `str`. Then `age.__radd__(\"Age: \")` is attempted, but `int.__radd__` can't handle `str` either, so `TypeError` is raised.",
+        "visualizationType": "pythonMemory",
+        "code": "# msg = \"Age: \" + age # 에러 발생!",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "20",
+              "pyId": "4004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Casting Integer to String",
+        "explanation": "**`msg = \"Age: \" + str(age)`** -- Converts the integer to a string using `str()`, then concatenates.\n\nThe solution to the error: convert the integer `20` to the string `\"20\"` using `str(age)`, then concatenate the two strings with `+`.\n\nExecution steps:\n1. `str(age)` -> `str(20)` -> `\"20\"` (integer to string)\n2. `\"Age: \" + \"20\"` -> `\"Age: 20\"` (string concatenation)\n3. `msg` points to the new string object `\"Age: 20\"`\n\n**An easier way -- f-strings:** Writing `msg = f\"Age: {age}\"` automatically converts `age`'s value to a string and inserts it. Available in Python 3.6+, it's more readable and performant than `str()` + `+`.\n\n**Analogy:** Writing the number `20` on paper (str conversion), then taping it to the string `\"Age: \"` (+ concatenation).\n\n**How Python works internally:** `str(age)` calls `age.__str__()`. The `int.__str__` method converts the integer to a base-10 string. Then `str.__add__` creates a new `str` object combining both strings.\n\n**Note:** `str()` can be used on almost any Python object. Even lists: `str([1,2,3])` = `\"[1, 2, 3]\"`.",
+        "visualizationType": "pythonMemory",
+        "code": "msg = \"Age: \" + str(age)",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "msg",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "20",
+              "pyId": "4004"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Age: 20\"",
+              "pyId": "4005",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Final Result",
+        "explanation": "**`print(msg)`** -- Prints the final string `\"Age: 20\"` that `msg` points to.\n\nThrough type casting, we successfully combined an integer and a string to get the desired result.\n\n**Key summary -- Python's type casting trio:**\n- `int()`: string/float -> integer (`int(\"100\")` = `100`, `int(3.7)` = `3`)\n- `float()`: string/integer -> float (`float(\"3.14\")` = `3.14`, `float(100)` = `100.0`)\n- `str()`: anything -> string (`str(100)` = `\"100\"`, `str(3.14)` = `\"3.14\"`)\n\n**How Python works internally:** These three functions are actually not 'functions' but **class constructors**. `int(\"100\")` creates a new instance of the `int` class, and `str(20)` creates a new instance of the `str` class.\n\n**Practical tip:** The typical pattern for processing user input is `age = int(input(\"Age: \"))`. Since `input()` returns a string, wrapping it with `int()` immediately converts it to an integer.",
+        "visualizationType": "pythonMemory",
+        "code": "print(msg)",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"100\"",
+              "pyId": "4001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "100",
+              "pyId": "4002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "100.0",
+              "pyId": "4003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "20",
+              "pyId": "4004"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Age: 20\"",
+              "pyId": "4005"
+            }
+          ],
+          "output": [
+            "Age: 20"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following code will raise an error?",
+    "options": [
+      "int(\"123\")",
+      "str(123)",
+      "\"Number \" + 5",
+      "float(\"3.14\")"
+    ],
+    "correctIndex": 2,
+    "explanation": "Python does not perform automatic type conversion (implicit casting).\nAdding a string and a number raises a TypeError.\nYou must write `\"Number \" + str(5)`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Like JavaScript, '1' + 1 becomes '11'",
+      "correct": "In Python, this raises a TypeError.",
+      "why": "Python's philosophy: \"Explicit is better than implicit.\""
+    }
+  ],
+  "keyTakeaway": "When changing types, explicitly use `int()`, `str()`, or `float()`."
+}

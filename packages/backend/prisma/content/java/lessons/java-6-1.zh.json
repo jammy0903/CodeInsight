@@ -1,0 +1,142 @@
+{
+  "lessonId": "java-6-1",
+  "title": "栈追踪与异常层次结构",
+  "concept": "理解异常（Exception）和错误（Error）的区别，以及异常的层次结构（Hierarchy）。",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        // 1. Error（系统级严重问题）\n        // Error error = new StackOverflowError();\n        \n        // 2. RuntimeException（Unchecked - 程序员的失误）\n        RuntimeException bug = new NullPointerException(\"空引用！\");\n        \n        // 3. Exception（Checked - 外部环境问题）\n        Exception failure = new java.io.IOException(\"文件不存在\");\n        \n        System.out.println(\"Hierarchy loaded\");\n    }\n}",
+    "steps": [
+      {
+        "title": "main 方法执行",
+        "explanation": "**`public static void main(String[] args)`**\n\n这是 Java 应用程序的入口点（Entry Point）。\nJVM 调用此方法时程序开始运行。",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "创建 RuntimeException",
+        "explanation": "**执行流程：**\n1. 创建 `main` 栈帧。\n2. 在堆内存的 `0x100` 地址创建 `NullPointerException` 对象。\n3. 变量 `bug` 引用该对象。\n\n**说明：**\nJava 中所有异常归根结底都是**对象（Object）**。\n`RuntimeException` 通常在程序员编写了有缺陷的代码（bug）时发生。\n例如，试图使用一个值为 `null` 的变量。\n因为编译器不强制处理，所以称为"Unchecked"。",
+        "visualizationType": "javaMemory",
+        "code": "RuntimeException bug = new NullPointerException(\"空引用！\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "bug",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "RuntimeException"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: 空引用！",
+              "type": "NullPointerException",
+              "new": true
+            }
+          ],
+          "metaspace": [
+            {
+              "name": "Main.class",
+              "value": "loaded"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建 Checked Exception",
+        "explanation": "**执行流程：**\n1. 在堆内存的 `0x200` 地址创建 `IOException` 对象。\n2. 变量 `failure` 引用该对象。\n\n**说明：**\n像 `IOException` 这样的 Checked Exception 是由文件不存在或网络断开等**外部环境**问题引起的。\n由于这些情况很常见，Java **强制**要求你编写处理代码（try-catch）。\n所以称为"Checked"。",
+        "visualizationType": "javaMemory",
+        "code": "Exception failure = new java.io.IOException(\"文件不存在\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "bug",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "RuntimeException"
+            },
+            {
+              "name": "failure",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "Exception"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: 空引用！",
+              "type": "NullPointerException"
+            },
+            {
+              "address": "0x200",
+              "content": "IOException: 文件不存在",
+              "type": "IOException",
+              "new": true
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "执行完成",
+        "explanation": "**执行流程：**\n1. 调用 `System.out.println` 在控制台输出消息。\n2. `main` 方法正常结束。\n\n**说明：**\n这里我们只是用 `new` 创建了异常对象，并没有 `throw` 抛出。\n所以程序没有崩溃，一直运行到了最后。\n异常只有被抛出才会产生影响！",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"Hierarchy loaded\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "NPE: 空引用！",
+              "type": "NullPointerException"
+            },
+            {
+              "address": "0x200",
+              "content": "IOException: 文件不存在",
+              "type": "IOException"
+            }
+          ],
+          "output": [
+            "Hierarchy loaded"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪个是编译器强制处理的 Checked Exception？",
+    "options": [
+      "NullPointerException",
+      "ArrayIndexOutOfBoundsException",
+      "IOException",
+      "ArithmeticException"
+    ],
+    "correctIndex": 2,
+    "explanation": "`IOException` 与外部资源（文件、网络）相关，因此异常处理是强制性的。\n其余都是 `RuntimeException` 的子类，属于程序员失误，不强制处理（Unchecked）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Error 和 Exception 是同一回事。",
+      "correct": "不同。\n`Error`（如 StackOverflow）是系统级的严重问题，应用程序无法恢复；而 `Exception` 是开发者可以在代码中处理的事故。",
+      "why": "就像建筑物因火灾倒塌（Error）和做饭时烫伤手（Exception）的区别。"
+    }
+  ],
+  "keyTakeaway": "Java 的异常在 `Throwable` 下分为 `Error`（严重）和 `Exception`（可恢复），`Exception` 又分为 `Checked`（必须处理）和 `Unchecked`（可选处理）。"
+}

@@ -1,0 +1,89 @@
+{
+  "lessonId": "py-3-5",
+  "title": "Dictionary Mutability",
+  "concept": "Dictionaries are mutable -- additions, modifications, and deletions all change the same object!",
+  "content": {
+    "code": "person = {\"name\": \"Alice\", \"age\": 25}\nprint(f\"id = {id(person)}\")\n\nperson[\"age\"] = 26\nperson[\"city\"] = \"Seoul\"\nprint(f\"After changes: {person}\")\nprint(f\"id = {id(person)}\")\n\nref = person\nref[\"name\"] = \"Bob\"\nprint(f\"person: {person}\")",
+    "steps": [
+      {
+        "title": "Creating a Dictionary",
+        "explanation": "**`person = {\"name\": \"Alice\", \"age\": 25}`** -- Creates a dictionary object with two key-value pairs and assigns it to the `person` variable.\n\nPython executes code from top to bottom. Creates a dictionary literal using curly braces `{}`.\n\n**The core topic of this lesson:** We will prove that dictionaries are **Mutable**. We'll verify that the object's `id()` doesn't change even after modifications, and also learn about the dangers of **aliasing**.\n\n**Analogy:** A new cabinet (0x1000) with labeled drawers has been created. The \"name\" drawer holds \"Alice\", the \"age\" drawer holds 25. We'll remember this cabinet's serial number (id) and check if it's still the same cabinet after modifications.\n\n**Python internals:** A dictionary object is allocated in heap memory, and key-value pairs are stored in a hash table structure. The `person` name points to this object's memory address.\n\n**Execution order**: line 1 -> dictionary created (id: 0x1000) -> person = 0x1000 -> line 2",
+        "visualizationType": "terminal",
+        "code": "person = {\"name\": \"Alice\", \"age\": 25}"
+      },
+      {
+        "title": "Checking the Object ID",
+        "explanation": "**`print(f\"id = {id(person)}\")`** -- Uses the `id()` function to print the **unique ID (memory address)** of the `person` object.\n\nThe `id()` function returns the **unique identifier** of a Python object. In CPython, this value is the object's memory address. We'll remember this ID and **check if it's the same ID** after modifying the dictionary.\n\n**Why check the id?** Mutable objects keep the **same object** (id unchanged) after modification. Immutable objects (strings, integers) create a **new object** (id changes) when \"modified\". We print the id to verify this difference in practice.\n\n**Analogy:** Writing down the serial number of the cabinet. We plan to check if it's the same serial number after changing the contents.\n\n**Python internals:** `id(person)` returns the C-level pointer value of the `person` object as an integer. In CPython, this value doesn't change as long as the object exists in memory.\n\n**Execution order**: id(person) computed -> f-string evaluated -> print executed -> line 4",
+        "visualizationType": "terminal",
+        "code": "print(f\"id = {id(person)}\")"
+      },
+      {
+        "title": "Modifying an Existing Key's Value",
+        "explanation": "**`person[\"age\"] = 26`** -- **Modifies** the value of existing key `\"age\"` from 25 to 26. Directly changes the same object.\n\nDictionaries are Mutable, so they **don't create a new object**; they directly change the value inside the existing object (0x1000).\n\nBefore: `{\"name\": \"Alice\", \"age\": 25}`\nAfter: `{\"name\": \"Alice\", \"age\": 26}`\n\n**Difference from strings (Immutable):**\n```python\n# String: new object created (id changes)\ns = \"hello\"\ns = s + \"!\"  # New object \"hello!\" created, s's id changes\n\n# Dictionary: same object modified (id unchanged)\nperson[\"age\"] = 26  # Only internal content changes, id stays the same\n```\n\n**Python internals:** The hash table finds the position of the `\"age\"` key and changes the value reference from the `25` object to the `26` object. The memory address (id) of the dictionary object itself doesn't change.\n\n**Execution order**: person[\"age\"] position found -> value reference changed (25->26) -> line 5",
+        "visualizationType": "terminal",
+        "code": "person[\"age\"] = 26"
+      },
+      {
+        "title": "Adding a New Key-Value Pair",
+        "explanation": "**`person[\"city\"] = \"Seoul\"`** -- Assigns a value to the non-existent key `\"city\"`, **adding a new entry**.\n\nSince `\"city\"` doesn't exist in the dictionary, a new key-value pair `\"city\": \"Seoul\"` is automatically added. This operation also **directly modifies the existing object (0x1000)**.\n\nAfter: `{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}`\n\n**Convenient dictionary behavior:** The same `dict[key] = value` syntax:\n- Key **exists** -> Modify value (previous step)\n- Key **doesn't exist** -> Add new entry (this step)\n\n**Analogy:** A new drawer labeled \"city\" is added to the cabinet (0x1000) with \"Seoul\" inside. The cabinet itself remains the same.\n\n**Python internals:** The hash value of `\"city\"` is computed and a new entry is added to the hash table. If usage is high, the table automatically resizes. The object's id doesn't change.\n\n**Execution order**: person[\"city\"] hash search -> not found -> new entry added -> line 6",
+        "visualizationType": "terminal",
+        "code": "person[\"city\"] = \"Seoul\""
+      },
+      {
+        "title": "Checking Contents After Changes",
+        "explanation": "**`print(f\"After changes: {person}\")`** -- Prints the current contents of the dictionary with all modifications and additions applied.\n\nOutput: `After changes: {'name': 'Alice', 'age': 26, 'city': 'Seoul'}`\n\n**Summary of changes:**\n1. Created: `{\"name\": \"Alice\", \"age\": 25}` (2 entries)\n2. Modified: `\"age\"` value 25 -> 26\n3. Added: `\"city\": \"Seoul\"` new entry\n\nAll these changes were made on the **same object (0x1000)**. The next line will verify this by checking the id again.\n\n**Execution order**: f-string evaluated (person contents inserted) -> print executed -> line 7",
+        "visualizationType": "terminal",
+        "code": "print(f\"After changes: {person}\")"
+      },
+      {
+        "title": "Confirming ID is Unchanged",
+        "explanation": "**`print(f\"id = {id(person)}\")`** -- Checks the id again after modifying the dictionary. **The same id as before** is printed!\n\nThis is the **core proof of Mutable objects**. Values were modified and new entries were added, but `person` is still the **same object (0x1000)**. The id hasn't changed.\n\n**Mutable vs Immutable -- comparing by id:**\n- **Mutable** (list, dict, set): id **unchanged** after modification -> same object modified\n- **Immutable** (int, str, tuple): id **changes** on \"modification\" -> new object created\n\n**Analogy:** We changed the cabinet's contents and added drawers, but checking the serial number again shows it's **identical to what we noted before**. It's confirmed to be the same cabinet!\n\n**Python internals:** The C struct pointer of the dictionary object is not changed by modification operations. Even if the internal hash table resizes, the dictionary object's own address is preserved.\n\n**Execution order**: id(person) computed (0x1000) -> f-string evaluated -> print executed -> line 9",
+        "visualizationType": "terminal",
+        "code": "print(f\"id = {id(person)}\")",
+        "occurrence": 2
+      },
+      {
+        "title": "Creating an Alias",
+        "explanation": "**`ref = person`** -- Attaches a new name `ref` to the **same object (0x1000)** that `person` points to. **This is NOT a copy!**\n\nThis is Python's **Aliasing**. The object was not copied; an additional name tag was simply added to the same dictionary object.\n\n`person` --> {name: Alice, age: 26, city: Seoul} (0x1000)\n`ref` -----> (same object)\n\n`id(person) == id(ref)` -> **True** (exact same object)\n\n**Why is this dangerous?** If you modify the dictionary through `ref`, the changes are visible through `person` too. They **share the same object**. We'll confirm this in the next step.\n\n**Analogy:** Two keys (person, ref) to the same house (0x1000). No matter which key you use to enter and rearrange furniture, the changes are visible with the other key.\n\n**Python internals:** `ref = person` only copies the **reference (memory address)** that `person` points to into `ref`. The object's contents are not copied. The dictionary object's reference count increases from 1 to 2.\n\n**Execution order**: Read person's reference (0x1000) -> assign same reference to ref -> line 10",
+        "visualizationType": "terminal",
+        "code": "ref = person"
+      },
+      {
+        "title": "Modifying Through the Alias",
+        "explanation": "**`ref[\"name\"] = \"Bob\"`** -- Modifies the value of key `\"name\"` from `\"Alice\"` to `\"Bob\"` through `ref`.\n\nSince `ref` and `person` point to the **same object (0x1000)**, modifications through `ref` are **immediately reflected** in `person` too.\n\nBefore: `{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}`\nAfter: `{\"name\": \"Bob\", \"age\": 26, \"city\": \"Seoul\"}`\n\n**Key point:** We modified through `ref`, but accessing through `person` also shows `\"name\"` changed to `\"Bob\"`! Because both variables **share the same object**.\n\n**This is the danger of Aliasing.** Modifying one side (ref) affects the other side (person). This can be the cause of unintended data changes.\n\n**Analogy:** You entered the house with the ref key and changed the wallpaper. Entering with the person key also shows the changed wallpaper. It's the same house!\n\n**To create an independent copy:**\n```python\nref = person.copy()     # Shallow copy (1 level only)\nref = copy.deepcopy(person)  # Deep copy (including nested objects)\n```\n\n**Python internals:** `ref[\"name\"]` finds the `\"name\"` key in the object (0x1000) that `ref` points to and changes the value reference. Since `person` also points to the same object (0x1000), the change is directly visible.\n\n**Execution order**: ref[\"name\"] position found (0x1000) -> value reference changed (\"Alice\"->\"Bob\") -> line 11",
+        "visualizationType": "terminal",
+        "code": "ref[\"name\"] = \"Bob\""
+      },
+      {
+        "title": "Checking if the Original Also Changed",
+        "explanation": "**`print(f\"person: {person}\")`** -- We modified `ref`, but printing `person` also shows the changed content (`'name': 'Bob'`)!\n\nOutput: `person: {'name': 'Bob', 'age': 26, 'city': 'Seoul'}`\n\n**3 key lessons from this lesson:**\n1. **Dictionaries are Mutable** -- `id()` doesn't change after modifications (same object modified)\n2. **`=` assignment is an alias, not a copy** -- `ref = person` adds another name tag to the same object\n3. **Modifying through an alias reflects on the original** -- Since `ref` and `person` share the same object\n\n**Analogy:** Two keys (person, ref) access the same house (0x1000). If you enter with one key and change the furniture, entering with the other key shows the changed furniture.",
+        "visualizationType": "terminal",
+        "code": "print(f\"person: {person}\")"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "How do you create an independent copy of dictionary d?",
+    "options": [
+      "e = d",
+      "e = d.copy()",
+      "e = dict(d)",
+      "Both B and C"
+    ],
+    "correctIndex": 3,
+    "explanation": "Both `d.copy()` and `dict(d)` create a shallow copy.\n`e = d` just creates an alias.\nFor nested dictionaries, use `copy.deepcopy()`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "`d2 = d1` copies the dictionary",
+      "correct": "`d2 = d1` only creates an alias -- both point to the same object.",
+      "why": "Assignment (=) attaches a name tag to an object; it does not copy the object."
+    },
+    {
+      "wrong": "You can use a list as a dictionary key",
+      "correct": "Dictionary keys must be immutable types (strings, numbers, tuples).",
+      "why": "Mutable objects don't have a stable hash value, so they can't be used as keys."
+    }
+  ],
+  "keyTakeaway": "Dictionaries are Mutable like lists! `d[key] = value` modifies in place. Watch out for aliasing!"
+}

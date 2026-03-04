@@ -1,0 +1,145 @@
+{
+  "lessonId": "java-6-4",
+  "title": "Creating Custom Exceptions",
+  "concept": "Learn how to define and use custom exceptions tailored to your business logic.",
+  "content": {
+    "code": "class BankException extends Exception {\n    public BankException(String msg) { super(msg); }\n}\n\n// 1. Define custom exception\nclass NoMoneyException extends BankException {\n    public NoMoneyException(int lack) {\n        // Call parent constructor\n        super(\"Insufficient amount: \" + lack);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        try {\n            withdraw(1000);\n        } catch (NoMoneyException e) {\n            System.out.println(e.getMessage());\n        } catch (BankException e) {\n            System.out.println(\"Bank error\");\n        }\n    }\n\n    static void withdraw(int money) throws BankException {\n        int balance = 500;\n        if (money > balance) {\n            // 2. Throw exception\n            throw new NoMoneyException(money - balance);\n        }\n    }\n}",
+    "steps": [
+      {
+        "title": "main Method Start",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's starting point.\n\n**Analogy**: We're simulating a scenario where a customer attempts a withdrawal at a bank counter (main).",
+        "visualizationType": "javaMemory",
+        "code": "public class Main {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Custom Exception Class Definition",
+        "explanation": "**Execution flow:**\n1. The `NoMoneyException` class, which extends `BankException`, is loaded.\n\n**Explanation:**\nJava's built-in exceptions aren't descriptive enough for specific situations like \"insufficient balance\" or \"duplicate ID\".\nCreating our own exception classes makes the code much more readable.",
+        "visualizationType": "javaMemory",
+        "code": "class NoMoneyException extends BankException {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "NoMoneyEx.class",
+              "value": "loaded"
+            },
+            {
+              "name": "Main.class",
+              "value": "loaded"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Method Call",
+        "explanation": "**Execution flow:**\n1. `main` calls `withdraw(1000)`.\n2. The `balance` variable is created in the stack frame.\n\n**Explanation:**\nThe withdrawal amount (1000) exceeds the balance (500).\nTrouble is about to happen.",
+        "visualizationType": "javaMemory",
+        "code": "try {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "money",
+              "value": "1000",
+              "frame": "withdraw",
+              "type": "int"
+            },
+            {
+              "name": "balance",
+              "value": "500",
+              "frame": "withdraw",
+              "type": "int"
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "Custom Exception Thrown",
+        "explanation": "**Execution flow:**\n1. The condition `money > balance` is true, entering the `if` block.\n2. A `NoMoneyException` object is created on the Heap.\nThe message becomes \"Insufficient amount: 500\".\n3. The exception is thrown with `throw`.\n\n**Explanation:**\nInstead of a generic `throw new Exception()`, using `throw new NoMoneyException(...)` makes it immediately clear: \"Ah, it failed because of insufficient funds!\"",
+        "visualizationType": "javaMemory",
+        "code": "}",
+        "occurrence": 4,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "money",
+              "value": "1000",
+              "frame": "withdraw",
+              "type": "int"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x777",
+              "content": "NoMoneyEx: Insufficient amount: 500",
+              "type": "NoMoneyException",
+              "new": true
+            }
+          ],
+          "error": "NoMoneyException thrown!"
+        }
+      },
+      {
+        "title": "Specific Catch",
+        "explanation": "**Execution flow:**\n1. Returns to `main` and the `catch (NoMoneyException e)` block executes.\n2. Prints the exception message.\n\n**Explanation:**\nThe child `NoMoneyException` catch block must come before the parent `BankException`.\n(Specific first!) This way we can see the exact error message.",
+        "visualizationType": "javaMemory",
+        "code": "withdraw(1000);",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "e",
+              "value": "-> 0x777",
+              "frame": "catch",
+              "type": "NoMoneyException"
+            }
+          ],
+          "output": [
+            "Insufficient amount: 500"
+          ],
+          "error": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens when you create a custom exception by extending RuntimeException?",
+    "options": [
+      "The compiler forces exception handling (Checked).",
+      "The compiler does NOT force exception handling (Unchecked).",
+      "All methods automatically get a throws clause.",
+      "Performance doubles."
+    ],
+    "correctIndex": 1,
+    "explanation": "Extending `RuntimeException` makes it an Unchecked Exception, meaning the caller doesn't need `try-catch` to avoid compile errors.\nThis is typically used for truly unrecoverable errors in business logic."
+  },
+  "misconceptions": [
+    {
+      "wrong": "The more custom exceptions, the better.",
+      "correct": "No.\nIf standard exceptions (like IllegalArgumentException) are sufficient, prefer using them.",
+      "why": "Too many custom exceptions cause class explosion, increasing maintenance costs."
+    }
+  ],
+  "keyTakeaway": "Custom exceptions let you clearly communicate error meaning, and inheritance enables hierarchical exception management."
+}

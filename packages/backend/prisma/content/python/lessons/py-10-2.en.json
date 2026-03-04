@@ -1,0 +1,279 @@
+{
+  "lessonId": "py-10-2",
+  "title": "Threading vs Multiprocessing: Bypassing the GIL",
+  "concept": "To improve CPU-bound performance, you should use multiprocessing, which creates separate processes with their own memory, instead of threading which is constrained by the GIL.",
+  "content": {
+    "code": "import multiprocessing\nimport time\n\nCOUNT = 50_000_000\n\ndef countdown():\n    n = COUNT\n    while n > 0:\n        n -= 1\n\nif __name__ == '__main__':\n    # 1. 싱글 프로세스로 실행\n    start = time.time()\n    countdown()\n    duration = time.time() - start\n    print(f\"Single process: {duration:.4f}s\")\n\n    # 2. 두 개의 프로세스로 실행\n    p1 = multiprocessing.Process(target=countdown)\n    p2 = multiprocessing.Process(target=countdown)\n\n    start = time.time()\n    p1.start()\n    p2.start()\n    p1.join()\n    p2.join()\n    duration = time.time() - start\n    print(f\"Two processes: {duration:.4f}s\")",
+    "steps": [
+      {
+        "title": "Importing Modules",
+        "explanation": "**`import multiprocessing` / `import time`**\n\n**We import modules for multiprocessing and time measurement.**\n\n**Key difference between `multiprocessing` and `threading`:**\n- `threading`: Multiple threads within a single process **share** memory (GIL constraint)\n- `multiprocessing`: Creates completely separate processes, each with **independent memory** and an **independent GIL**\n\n**Analogy**: If `threading` is \"multiple employees in the same office,\" `multiprocessing` is \"employees working in completely separate offices.\"\n- Threads: Share the same whiteboard (memory) -> risk of conflicts, but fast communication\n- Processes: Each uses their own whiteboard -> safe, but communication (IPC) is slow\n\n**Under the hood**: When the `multiprocessing` module is loaded, classes like `Process`, `Pool`, `Queue` needed for process creation become available.\n\n**Why this order?** You must import tools (modules) before you can use them.\n\n**Note**: `multiprocessing` creates an entirely new Python interpreter, so the creation cost is much higher than `threading`.",
+        "visualizationType": "pythonMemory",
+        "code": "import multiprocessing",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "multiprocessing module ready.",
+          "names": [
+            {
+              "name": "multiprocessing",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining a CPU-Intensive Function",
+        "explanation": "**`def countdown():`**\n\n**We define a CPU-intensive task function.** It's a simple but time-consuming task that counts down from 50 million (50,000,000) to 0.\n\n**Why use this kind of function?**\n- It's a pure CPU task, not an I/O operation (file reading, network)\n- This is the type of task most affected by the GIL\n- It clearly demonstrates the performance difference between threading and multiprocessing\n\n**Analogy**: It's like counting 50 million stones one by one. This task uses nothing but brainpower (CPU), with no waiting time.\n\n**Under the hood**: The `countdown` function object (0x1100) is created. The `n -= 1` inside the `while` loop executes Python bytecode each time, so it's directly constrained by the GIL.\n\n**Why this order?** We define the 'unit of work' first to compare performance.\n\n**Note**: The underscore (`_`) in `COUNT = 50_000_000` is for readability only and doesn't affect the value. It's identical to `50000000`.",
+        "visualizationType": "pythonMemory",
+        "code": "def countdown():",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "countdown function defined.",
+          "names": [
+            {
+              "name": "countdown",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "`if __name__ == '__main__'`",
+        "explanation": "**`if __name__ == '__main__':`**\n\n**This is a required guard for multiprocessing code.**\n\n**Why is this needed?**\n- `multiprocessing` **re-imports** the current Python file when creating a new process\n- Without this guard, the child process would import the code and create more processes...\n- Resulting in an **infinite process creation bomb**!\n\n**Analogy**: It's like putting a note on the copier saying \"only copy the original.\" Without the note, you'd copy copies of copies in an infinite loop.\n\n**Under the hood**: `__name__` becomes `'__main__'` when the module is run directly, and the module name when it's imported. When child processes import this file, `__name__` is not `'__main__'`, so this block is skipped.\n\n**Why this order?** This is the safe entry point for executing multiprocessing code.\n\n**Note**: On Windows and macOS, this guard is **mandatory**. On Linux, it may work without it thanks to the fork method, but it's always best practice to include it.",
+        "visualizationType": "pythonMemory",
+        "code": "if __name__ == '__main__':",
+        "pythonMemoryState": {
+          "note": "Main process entry point verified.",
+          "names": [
+            {
+              "name": "countdown",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Single Process Execution",
+        "explanation": "**`start = time.time()` ~ `print(...)`**\n\n**First, we run `countdown` in a single process and measure the elapsed time.** This becomes the 'baseline.'\n\nResult: approximately 2.5 seconds.\n\n**Why this time matters:**\n- This is the 'benchmark'\n- Running the same task with 2 threads simultaneously? -> About 5 seconds due to the GIL (actually slower!)\n- With multiprocessing? -> About 2.5 seconds (cut in half!)\n\n**Analogy**: Counting 50 million stones alone takes 2.5 seconds. This is the baseline.\n\n**Under the hood**: `time.time()` records the current time (epoch seconds), then after running `countdown()`, measures the time again to calculate the difference.\n\n**Why this order?** We must measure single-process performance first to compare with multiprocessing.\n\n**Note**: The time varies depending on the environment (CPU speed, system load). What matters is the relative comparison, not the absolute time.",
+        "visualizationType": "pythonMemory",
+        "code": "start = time.time()",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Single process: 2.5123s"
+          ],
+          "note": "Single process execution complete.",
+          "names": [
+            {
+              "name": "duration",
+              "pointsTo": "float1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 2.5123,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Preparing Multiple Processes",
+        "explanation": "**`p1 = multiprocessing.Process(target=countdown)`**\n**`p2 = multiprocessing.Process(target=countdown)`**\n\n**We create two `Process` objects.** The syntax is nearly identical to `threading.Thread`!\n\n**Difference between `Thread` and `Process`:**\n\n**Analogy**: If threading is employees in the same office, multiprocessing is running completely independent offices. Each office has its own computer (GIL), so they can work simultaneously!\n\n**Under the hood**: `Process` instances are created, but the actual OS processes haven't been created yet. They are fork/spawned when `start()` is called.\n\n**Why this order?** Create (prepare) the processes first, then start them simultaneously after beginning time measurement.\n\n**Note**: In `multiprocessing`, the `target` function and arguments must be **serializable (picklable)**. Lambda functions or local functions may not be serializable.",
+        "visualizationType": "pythonMemory",
+        "code": "p1 = multiprocessing.Process(target=countdown)",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Two process objects created (not yet started).",
+          "names": [
+            {
+              "name": "p1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "p2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Process",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Process",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Starting Both Processes Simultaneously",
+        "explanation": "**`p1.start()` / `p2.start()`**\n\n**We start both processes.** This is where the magic happens!\n\n**How GIL bypass works:**\n- Each process runs a completely independent Python interpreter\n- Each has its own GIL\n- Therefore, they are not affected by each other's GIL and can achieve **true parallel processing**\n\n**Analogy**: Two independent offices are simultaneously counting stones with their own computers. Neither needs to wait for the other's computer!\n\n**Under the hood:**\n1. Requests the OS to create new processes (fork/spawn)\n2. Each child process initializes a new Python interpreter\n3. Each process independently executes `countdown()`\n4. With dual cores or more, they actually run simultaneously on two CPU cores\n\n**Why this order?** After starting time measurement, we start both processes in quick succession to maximize concurrent execution.\n\n**Note**: Process creation itself takes time (typically tens to hundreds of milliseconds). Due to this overhead, multiprocessing can actually be slower for very short tasks.",
+        "visualizationType": "pythonMemory",
+        "code": "start = time.time()",
+        "occurrence": 2,
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "p1 and p2 running in separate memory spaces. (GIL bypassed)",
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "started",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "started",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Waiting for Process Completion (join)",
+        "explanation": "**`p1.join()` / `p2.join()`**\n\n**The main process waits for both child processes to complete.** Same concept as `join()` in `threading`.\n\n**Difference from thread `join()`:**\n- Thread `join()`: Waits for another thread within the same process\n- Process `join()`: Waits for another process (different PID) to terminate\n\n**Analogy**: The headquarters (main process) is waiting for the two branch offices (child processes) to report task completion.\n\n**Under the hood**: The main process uses the `waitpid()` system call to detect child process termination. When a child process terminates, its resources are reclaimed along with the exit code.\n\n**Why this order?** Both processes must complete `countdown()` before we can measure the final elapsed time.\n\n**Note**: If you don't call `join()`, child processes can become 'zombie processes.' Always clean up with `join()`.",
+        "visualizationType": "pythonMemory",
+        "code": "p2.start()",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "All process tasks completed.",
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "stopped",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "stopped",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Result: True Parallel Processing",
+        "explanation": "**`print(f\"Two processes: {duration:.4f}s\")`**\n\n**Let's check the results.** The multiprocessing execution time is about **1.3 seconds**, roughly **half** the single process time (2.5 seconds)!\n\n**Performance comparison summary:**\n\n**Why not exactly half?**\n- There's overhead from process creation/destruction\n- OS process scheduling also takes time\n- So it takes slightly longer than the theoretical half (1.25 seconds)\n\n**Analogy**: Two independent offices counted stones simultaneously, cutting the time nearly in half. The slight extra time is the cost of setting up the offices.\n\n**Key conclusion:**\n- **I/O tasks** (file, network, DB) -> Use `threading` (effective since GIL is released)\n- **CPU tasks** (computation, data processing) -> Use `multiprocessing` (bypasses GIL)\n\n**Why this order?** This is the final step of the experiment, where we check and interpret the results.",
+        "visualizationType": "pythonMemory",
+        "code": "duration = time.time() - start",
+        "occurrence": 2,
+        "pythonMemoryState": {
+          "output": [
+            "Two processes: 1.3045s"
+          ],
+          "note": "Time reduced! (True parallel processing)",
+          "names": [
+            {
+              "name": "duration",
+              "pointsTo": "float2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "float2",
+              "type": "float",
+              "value": 1.3045,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What should you use when you want to parallelize CPU-intensive tasks for better performance?",
+    "options": [
+      "threading",
+      "multiprocessing",
+      "asyncio",
+      "GIL"
+    ],
+    "correctIndex": 1,
+    "explanation": "multiprocessing gives each process its own memory and GIL, enabling multiple CPU cores to be used simultaneously for parallel processing of CPU-intensive tasks."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Multiprocessing is always better than threading.",
+      "correct": "No. Processes are more expensive to create than threads and use more memory.",
+      "why": "Inter-process communication (IPC) is more complex and slower than sharing memory between threads.\nTherefore, threading may be more suitable for I/O-bound tasks."
+    }
+  ],
+  "keyTakeaway": "Use threading for I/O-bound tasks (waiting), and multiprocessing for CPU-bound tasks (computation)."
+}

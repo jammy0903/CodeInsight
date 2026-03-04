@@ -1,0 +1,242 @@
+{
+  "lessonId": "java-7-4",
+  "title": "Wildcards and Type Bounds",
+  "concept": "Core concept for Wildcards & Bounds",
+  "content": {
+    "code": "import java.util.List;\nimport java.util.ArrayList;\n\npublic class Main {\n    // Upper Bounded Wildcard: accept Number or its subclasses (Integer, Double...)\n    public static double sum(List<? extends Number> list) {\n        double sum = 0;\n        for (Number n : list) {\n            sum += n.doubleValue();\n        }\n        // list.add(10); // Error! Read-only (mostly)\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        List<Integer> ints = new ArrayList<>();\n        ints.add(1);\n        ints.add(2);\n        \n        List<Double> doubles = new ArrayList<>();\n        doubles.add(3.5);\n        \n        // Both work thanks to wildcard\n        System.out.println(\"Sum Ints: \" + sum(ints));\n        System.out.println(\"Sum Doubles: \" + sum(doubles));\n    }\n}",
+    "steps": [
+      {
+        "title": "Package Imports",
+        "explanation": "**`import java.util.*;`**\n\nPackage declarations for using `List` and `ArrayList`.",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.List;",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Execution",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {"
+      },
+      {
+        "title": "Wildcard Method Definition",
+        "explanation": "**Execution flow:**\n1. The `sum` method is loaded into memory.\n2. `List<? extends Number>` declares that it only accepts `Number` and its subclasses.\n\n**Gatekeeper role:**\nIt's like putting a sign on the door that says \"Number family only!\"\nTypes like String can never get in.",
+        "visualizationType": "javaMemory",
+        "code": "public static double sum(List<? extends Number> list) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "sum",
+              "value": "Method Definition"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating an Integer List",
+        "explanation": "**Execution flow:**\n1. An `ArrayList<Integer>` object is created on the heap.\n2. The `ints` variable references it.\n",
+        "visualizationType": "javaMemory",
+        "code": "List<Integer> ints = new ArrayList<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main",
+              "type": "List<Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "size: 0",
+              "type": "ArrayList<Integer>",
+              "new": true
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "Adding Data (1, 2)",
+        "explanation": "**Execution flow:**\n1. Adds 1 and 2 to the `ints` list.\n\n**Preparing data:**\nFilling in integers for the addition test.",
+        "visualizationType": "javaMemory",
+        "code": "ints.add(2);",
+        "highlightOffset": [
+          -1,
+          0
+        ],
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a Double List",
+        "explanation": "**Execution flow:**\n1. This time, an `ArrayList<Double>` object is created on the heap.\n2. The `doubles` variable references it.\n",
+        "visualizationType": "javaMemory",
+        "code": "List<Double> doubles = new ArrayList<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main",
+              "type": "List<Integer>"
+            },
+            {
+              "name": "doubles",
+              "value": "0x200",
+              "frame": "main",
+              "type": "List<Double>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "size: 0",
+              "type": "ArrayList<Double>",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding Data (3.5)",
+        "explanation": "**Execution flow:**\n1. Adds 3.5 to the `doubles` list.\n",
+        "visualizationType": "javaMemory",
+        "code": "doubles.add(3.5);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "[3.5]",
+              "type": "ArrayList<Double>",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling sum(ints)",
+        "explanation": "**Execution flow:**\n1. `sum(ints)` is called.\n2. `ints` is an `Integer` list, but since `Integer` is a subclass of `Number`, it passes the wildcard check (`? extends Number`).\n3. The sum 3.0 is returned and printed.\n\n**Flexibility:**\n`List<Integer>` works, `List<Double>` works too.\nThis is why programmers love wildcards!",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"Sum Ints: \" + sum(ints));",
+        "highlightOffset": [
+          0,
+          -18,
+          -17,
+          -16,
+          -15,
+          -14,
+          -13,
+          -12,
+          -11
+        ],
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "[3.5]",
+              "type": "ArrayList<Double>"
+            }
+          ],
+          "output": [
+            "Sum Ints: 3.0"
+          ]
+        }
+      },
+      {
+        "title": "Calling sum(doubles)",
+        "explanation": "**Execution flow:**\n1. `sum(doubles)` is called.\n2. `Double` is also part of the `Number` family, so it's welcomed.\n3. The sum 3.5 is printed.\n\n**Wrapping up:**\nThanks to upper bounded wildcards (`? extends`), we've created a flexible, read-only method.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"Sum Doubles: \" + sum(doubles));",
+        "highlightOffset": [
+          0,
+          -19,
+          -18,
+          -17,
+          -16,
+          -15,
+          -14,
+          -13,
+          -12
+        ],
+        "javaMemoryState": {
+          "output": [
+            "Sum Doubles: 3.5"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What does List<? super Integer> mean?",
+    "options": [
+      "All classes that extend Integer",
+      "Integer or its ancestor (parent) classes",
+      "Any type is allowed",
+      "Only Integer is allowed"
+    ],
+    "correctIndex": 1,
+    "explanation": "`super` sets a lower bound.\nIt means a list of Integer itself or its parent types (Number, Object, etc.), and is primarily used when storing (writing/consuming) data."
+  },
+  "misconceptions": [
+    {
+      "wrong": "List<Object> is a parent of List<String>.",
+      "correct": "No! Generics are invariant.\nYou cannot assign a `List<String>` to a `List<Object>` variable.\nThat's why wildcards (`? extends Object`) are needed.",
+      "why": "If such assignment were allowed, you could accidentally put an Integer into a String list."
+    }
+  ],
+  "keyTakeaway": "To create flexible APIs, you need wildcards. Remember the formula: use `extends` when reading data, and `super` when writing data."
+}

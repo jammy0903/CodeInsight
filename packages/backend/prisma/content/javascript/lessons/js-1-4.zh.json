@@ -1,0 +1,128 @@
+{
+  "lessonId": "js-1-4",
+  "title": "事件循环：全貌",
+  "concept": "即使在复杂的异步代码中，你也能精确预测执行顺序",
+  "content": {
+    "code": "console.log('1');\n\nsetTimeout(() => console.log('2'), 0);\n\nPromise.resolve()\n  .then(() => console.log('3'))\n  .then(() => console.log('4'));\n\nconsole.log('5');",
+    "steps": [
+      {
+        "title": "同步代码 #1",
+        "explanation": "第一行同步代码 `console.log('1')` 执行。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('1');",
+        "eventLoopState": {
+          "output": [
+            "1"
+          ]
+        }
+      },
+      {
+        "title": "注册 setTimeout",
+        "explanation": "`setTimeout` 回调被委托给 Web API，然后移入**任务队列**等待。",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(() => console.log('2'), 0);",
+        "eventLoopState": {
+          "taskQueue": [
+            "() => log('2')"
+          ]
+        }
+      },
+      {
+        "title": "注册第一个 .then",
+        "explanation": "第一个 `.then()` 的回调被添加到**微任务队列**。",
+        "visualizationType": "eventLoop",
+        "code": "Promise.resolve()",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "eventLoopState": {
+          "microtaskQueue": [
+            "() => log('3')"
+          ]
+        }
+      },
+      {
+        "title": "同步代码 #2",
+        "explanation": "最后一行同步代码 `console.log('5')` 执行。\n所有同步代码已执行完毕，调用栈为空。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('5');",
+        "eventLoopState": {
+          "output": [
+            "1",
+            "5"
+          ]
+        }
+      },
+      {
+        "title": "微任务 #1 执行",
+        "explanation": "调用栈为空后，事件循环首先检查微任务队列。\n第一个回调执行并打印 '3'。它返回的 Promise 导致下一个 `.then` 回调被**新添加**到微任务队列。",
+        "keyInsight": "Promise 链式调用会向队列中添加新的微任务。",
+        "visualizationType": "eventLoop",
+        "code": ".then(() => console.log('3'))",
+        "eventLoopState": {
+          "microtaskQueue": [
+            "() => log('4')"
+          ],
+          "output": [
+            "1",
+            "5",
+            "3"
+          ]
+        }
+      },
+      {
+        "title": "微任务 #2 执行",
+        "explanation": "事件循环会持续检查微任务队列直到它完全清空。\n新添加的第二个回调执行并打印 '4'。",
+        "visualizationType": "eventLoop",
+        "code": ".then(() => console.log('4'));",
+        "eventLoopState": {
+          "microtaskQueue": [],
+          "output": [
+            "1",
+            "5",
+            "3",
+            "4"
+          ]
+        }
+      },
+      {
+        "title": "任务执行",
+        "explanation": "只有当微任务队列最终清空后，事件循环才会检查任务队列。\n`setTimeout` 回调执行并最后打印 '2'。",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(() => console.log('2'), 0);",
+        "eventLoopState": {
+          "taskQueue": [],
+          "output": [
+            "1",
+            "5",
+            "3",
+            "4",
+            "2"
+          ],
+          "microtaskQueue": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下代码的输出顺序是什么？\n\nsetTimeout(() => console.log('A'), 0);\nPromise.resolve().then(() => {\n  console.log('B');\n  Promise.resolve().then(() => console.log('C'));\n});\nconsole.log('D');",
+    "options": [
+      "D → B → A → C",
+      "D → B → C → A",
+      "D → A → B → C",
+      "A → D → B → C"
+    ],
+    "correctIndex": 1,
+    "explanation": "1) 同步代码：打印 D\n2) 微任务：打印 B，添加新微任务（C）\n3) 新微任务：打印 C（持续运行直到微任务队列为空）\n4) 任务：打印 A"
+  },
+  "misconceptions": [
+    {
+      "wrong": "微任务逐个执行，然后交给任务",
+      "correct": "事件循环会持续执行微任务，直到微任务队列**完全清空（0 个元素）**。",
+      "why": "当你在排队时，新来的朋友（Promise 链式调用）可以直接插到你后面的同一队列中。\n只有当整个队列清空后，流程才会进入下一阶段（渲染、任务队列等）。"
+    }
+  ],
+  "keyTakeaway": "执行优先级：同步代码 > 微任务（Promise）> 任务（setTimeout）"
+}

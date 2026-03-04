@@ -1,0 +1,100 @@
+{
+  "lessonId": "java-9-1",
+  "title": "GC: The Reliable Janitor of the Heap",
+  "concept": "The Garbage Collector (GC) automatically finds and cleans up objects in the Heap that are no longer referenced by anyone.",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        String temp = new String(\"임시 데이터\");\n        temp = null; // 이제 \"임시 데이터\" 객체는 주인을 잃었습니다.\n        \n        // 이 시점에 GC가 작동하면 화살표가 없는 객체를 수거해갑니다.\n    }\n}",
+    "steps": [
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nLet's experiment with how garbage collection works.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Object Creation (Reference Established)",
+        "explanation": "A `\"Temporary Data\"` object is created on the Heap, and the `temp` variable on the Stack points to it.\nThis object is currently in an 'alive' state.",
+        "visualizationType": "javaMemory",
+        "code": "String temp = new String(\"임시 데이터\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "temp",
+              "value": "0x001",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "value: \"임시 데이터\"",
+              "type": "String",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Breaking the Reference (Garbage Created)",
+        "explanation": "The moment `temp = null;` executes, the arrow between Stack and Heap is severed.\nNow the object at address 0x01 has become an orphan in space.\nNo one can find this object anymore.\n\n**Analogy:** It's like abandoned trash left in a factory with no owner.",
+        "keyInsight": "Unreachable = Garbage",
+        "visualizationType": "javaMemory",
+        "code": "temp = null; // 이제 \"임시 데이터\" 객체는 주인을 잃었습니다.",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "temp",
+              "value": "null",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "value: \"임시 데이터\"",
+              "type": "String",
+              "note": "Unreachable (Garbage)"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When does garbage collection (GC) occur in Java?",
+    "options": [
+      "Immediately when null is assigned to an object",
+      "Always when a function ends",
+      "When the JVM determines memory is running low",
+      "At regular intervals every minute"
+    ],
+    "correctIndex": 2,
+    "explanation": "GC runs when the JVM decides to execute it.\nAssigning `null` doesn't immediately remove the object -- it just becomes a 'garbage candidate'."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Calling System.gc() immediately cleans up memory.",
+      "correct": "No! It's merely a 'request' to the JVM to clean up. Whether it actually does is up to the JVM.",
+      "why": "GC has a significant impact on system performance, so it may not execute immediately upon request."
+    }
+  ],
+  "keyTakeaway": "Thanks to GC, Java developers can focus on business logic without worrying about freeing memory (free)."
+}

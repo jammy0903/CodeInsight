@@ -1,0 +1,218 @@
+{
+  "lessonId": "java-1-4",
+  "title": "数组比较的陷阱",
+  "concept": "数组的 .equals() 使用 Object.equals()，因此必须使用 Arrays.equals()",
+  "content": {
+    "code": "int[] arr1 = {1, 2, 3};\nint[] arr2 = {1, 2, 3};\n\nSystem.out.println(arr1 == arr2);\nSystem.out.println(arr1.equals(arr2));\nSystem.out.println(Arrays.equals(arr1, arr2));\n\nint[][] deep1 = {{1, 2}, {3, 4}};\nint[][] deep2 = {{1, 2}, {3, 4}};\nSystem.out.println(Arrays.equals(deep1, deep2));\nSystem.out.println(Arrays.deepEquals(deep1, deep2));",
+    "steps": [
+      {
+        "title": "创建第一个数组",
+        "explanation": "**执行顺序：**\n1. 在堆上创建数组 `[1, 2, 3]`。\n2. 将地址（0x001）存储到 `arr1`。\n\n**数组也是对象吗？**\n是的，在 Java 中数组是**特殊的对象**。\n但它是一种"不友好"的对象，像 `equals` 这样的便利功能并没有被正确实现。",
+        "visualizationType": "javaMemory",
+        "code": "int[] arr1 = {1, 2, 3};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "arr1",
+              "value": "-> 0x001",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[1, 2, 3]"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "创建第二个数组",
+        "explanation": "**执行顺序：**\n1. 在堆上创建新数组 `[1, 2, 3]`。\n2. 将地址（0x002）存储到 `arr2`。\n\n内容相同都是 `[1, 2, 3]`，但在堆的**不同空间**创建了新的数组。",
+        "visualizationType": "javaMemory",
+        "code": "int[] arr2 = {1, 2, 3};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "arr1",
+              "value": "-> 0x001",
+              "type": "int[]"
+            },
+            {
+              "name": "arr2",
+              "value": "-> 0x002",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[1, 2, 3]"
+            },
+            {
+              "address": "0x002",
+              "content": "[1, 2, 3]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "== 比较（引用比较）",
+        "explanation": "**执行顺序：**\n1. 比较 arr1(0x001) == arr2(0x002)。\n2. 地址不同，所以是 **false**。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(arr1 == arr2);",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ]
+        }
+      },
+      {
+        "title": ".equals() 比较（数组的陷阱！）",
+        "explanation": "**执行顺序：**\n1. 调用 `arr1.equals(arr2)`。\n2. 内部执行 `==`（地址比较）。\n3. 返回 **false**。\n\n很多人在这里被坑！\n数组的 `.equals()` 不会检查内容。\n它直接使用 `Object.equals()`，只进行**地址比较**。",
+        "keyInsight": "数组.equals() = Object.equals() = 引用比较！",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(arr1.equals(arr2));",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ],
+          "warning": ".equals() 也是 false！数组使用的是 Object.equals()"
+        }
+      },
+      {
+        "title": "使用 Arrays.equals()",
+        "explanation": "**执行顺序：**\n1. 调用 `Arrays.equals(arr1, arr2)`。\n2. 长度比较 -> 通过。\n3. 内容比较（1==1, 2==2, 3==3）。\n4. 全部匹配，所以是 **true**。",
+        "keyInsight": "数组比较 = 使用 Arrays.equals()",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.equals(arr1, arr2));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "warning": null
+        }
+      },
+      {
+        "title": "创建第一个二维数组",
+        "explanation": "**执行顺序：**\n1. 创建二维数组（外壳）（0x010）。\n2. 创建内部数组（行）（0x011, 0x012）。\n3. 连接地址后赋值给 `deep1`。\n\n二维数组是**"指向数组的数组"**。",
+        "visualizationType": "javaMemory",
+        "code": "int[][] deep1 = {{1, 2}, {3, 4}};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "deep1",
+              "value": "-> 0x010",
+              "type": "int[][]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x010",
+              "content": "[-> 0x011, -> 0x012]"
+            },
+            {
+              "address": "0x011",
+              "content": "[1, 2]"
+            },
+            {
+              "address": "0x012",
+              "content": "[3, 4]"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "创建第二个二维数组",
+        "explanation": "**执行顺序：**\n1. 创建新的二维数组（0x020）。\n2. 创建新的内部数组（0x021, 0x022）。\n3. 赋值给 `deep2`。\n\n虽然内容与第一个二维数组相同，但这是一个全新的对象结构。",
+        "visualizationType": "javaMemory",
+        "code": "int[][] deep2 = {{1, 2}, {3, 4}};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "deep1",
+              "value": "-> 0x010",
+              "type": "int[][]"
+            },
+            {
+              "name": "deep2",
+              "value": "-> 0x020",
+              "type": "int[][]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x010",
+              "content": "[-> 0x011, -> 0x012]"
+            },
+            {
+              "address": "0x011",
+              "content": "[1, 2]"
+            },
+            {
+              "address": "0x012",
+              "content": "[3, 4]"
+            },
+            {
+              "address": "0x020",
+              "content": "[-> 0x021, -> 0x022]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "对二维数组使用 Arrays.equals()（陷阱！）",
+        "explanation": "**执行顺序：**\n1. 调用 `Arrays.equals`。\n2. 比较外层（一维）元素。\n3. deep1[0](0x011) != deep2[0](0x021)。\n4. 地址不同，所以是 **false**。\n\n`Arrays.equals` 只比较**第一维**。\n不会检查内部内容（`[1, 2]`）是否相同。",
+        "keyInsight": "Arrays.equals() 只比较一维",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.equals(deep1, deep2));",
+        "javaMemoryState": {
+          "output": [
+            "false",
+            "false",
+            "true",
+            "false"
+          ],
+          "warning": "因为内部数组地址不同所以是 false！"
+        }
+      },
+      {
+        "title": "使用 Arrays.deepEquals()",
+        "explanation": "**执行顺序：**\n1. 调用 `Arrays.deepEquals`。\n2. 检测到元素是数组 -> 递归进入。\n3. 比较内部数组内容（`[1,2]`, `[3,4]`）。\n4. 全部匹配 -> **true**。",
+        "keyInsight": "多维数组 = 使用 Arrays.deepEquals()",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.deepEquals(deep1, deep2));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "warning": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如何比较 String[] 数组？",
+    "options": [
+      "arr1 == arr2",
+      "arr1.equals(arr2)",
+      "Arrays.equals(arr1, arr2)",
+      "arr1.toString().equals(arr2.toString())"
+    ],
+    "correctIndex": 2,
+    "explanation": "Arrays.equals() 会遍历每个元素并调用 .equals()。\n由于 String 的 equals() 实现良好，因此可以正确工作。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "可以用 .equals() 比较数组",
+      "correct": "数组必须用 `Arrays.equals()` 来比较。",
+      "why": "数组自身的 `.equals()` 与地址比较（==）完全相同。\n这是 Java 设计中令人遗憾的一点。"
+    }
+  ],
+  "keyTakeaway": "一维数组：Arrays.equals()，多维数组：Arrays.deepEquals()"
+}

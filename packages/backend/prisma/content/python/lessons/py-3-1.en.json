@@ -1,0 +1,140 @@
+{
+  "lessonId": "py-3-1",
+  "title": "Lists (Mutable)",
+  "concept": "An ordered, modifiable collection of data",
+  "content": {
+    "code": "# 1. 리스트 생성\nfruits = [\"Apple\", \"Banana\"]\n\n# 2. 추가/수정 (Mutable)\nfruits.append(\"Orange\")\nfruits[0] = \"Grape\"\n\n# 3. 삭제\ndel fruits[1] # Banana 삭제\n\nprint(fruits)",
+    "steps": [
+      {
+        "title": "Creating a List",
+        "explanation": "**`fruits = [\"Apple\", \"Banana\"]`** -- Creates a list object using square brackets `[]` and assigns the name `fruits` to it.\n\nPython executes code from top to bottom. Square brackets `[]` are the syntax for creating a list. A list object containing 2 string items is created in heap memory, and the name `fruits` points to this object.\n\n**3 Key Characteristics of Lists:**\n- **Ordered:** Accessible by index (0, 1, 2...). `fruits[0]` is `\"Apple\"`, `fruits[1]` is `\"Banana\"`\n- **Mutable:** Items can be added, modified, or deleted after creation. The **exact opposite** of strings (Immutable)!\n- **Allows duplicates:** Can hold the same value multiple times, like `[1, 1, 1]`\n\n**Analogy:** A list is like a **bag with numbered compartments**. Compartment 0 holds \"Apple\", compartment 1 holds \"Banana\". You can swap the contents of a compartment, add new compartments, or remove existing ones.\n\n**Python internals:** A `list` object is internally implemented as an **array of pointers**. Each slot stores a **reference (pointer)** to the actual string object, not the value itself. `fruits[0]` holds the memory address of the `\"Apple\"` object.\n\n**Why this order?** We must create the list first before we can modify it below with `append`, index assignment, `del`, etc.\n\n**Execution order**: line 2 -> list object created (id: 0x1000) -> fruits = 0x1000 -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "fruits = [\"Apple\", \"Banana\"]",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding an Item (append)",
+        "explanation": "**`fruits.append(\"Orange\")`** -- Adds `\"Orange\"` to the **end** of the list. It directly modifies the same object.\n\n**What Mutable means:** Lists **don't create a new object**; they directly modify the **contents of the existing object** (0x1000). `fruits` still points to the same object (0x1000), but its item count grew from 2 to 3.\n\n**Key difference from strings (Immutable):**\n- String: `\"hello\" + \"!\"` -> A **new object** `\"hello!\"` is created (original unchanged)\n- List: `fruits.append(\"Orange\")` -> The **existing object** is modified directly (no new object created)\n\n**Analogy:** It's like putting a new item into a bag. The bag itself (0x1000) is the same, but there's one more item inside. You're not buying a new bag!\n\n**Caution:** `append()` **returns None**. If you write `fruits = fruits.append(\"Orange\")`, `fruits` becomes `None`! Always use `fruits.append(\"Orange\")` on its own.\n\n**Python internals:** `list.append()` adds a new reference to the end of the internal array. If there's not enough space, it automatically **allocates a larger array** and copies existing pointers over (dynamic array).",
+        "visualizationType": "pythonMemory",
+        "code": "fruits.append(\"Orange\")",
+        "pythonMemoryState": {
+          "note": "Contents of the same object (0x1000) changed (Mutable)",
+          "names": [
+            {
+              "name": "fruits",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\", \"Orange\"]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Modifying an Item (Index Assignment)",
+        "explanation": "**`fruits[0] = \"Grape\"`** -- **Replaces** `\"Apple\"` at index 0 (the first item) with `\"Grape\"`.\n\n**Index assignment:** Place an index inside square brackets and assign with `=`, and the item at that position gets overwritten.\n\nBefore: `[\"Apple\", \"Banana\", \"Orange\"]`\nAfter: `[\"Grape\", \"Banana\", \"Orange\"]`\n\n**Difference from append:**\n- **append**: Adds to the **end** of the list (length increases: 2 -> 3)\n- **Index assignment**: **Replaces** an existing item (length unchanged: 3 -> 3)\n\n**Why doesn't it create a new list?** Since lists are Mutable, it just swaps the reference at slot 0 in the internal pointer array from `\"Apple\"` to `\"Grape\"` -- all within the same object (0x1000).\n\n**Analogy:** Taking Apple out of compartment 0 in the bag and putting Grape in. The bag itself stays the same.\n\n**Python internals:** `fruits[0] = \"Grape\"` changes the reference at index 0 of the internal pointer array from the `\"Apple\"` object to the `\"Grape\"` object. The reference count of `\"Apple\"` decreases by 1, and if nothing else references it, the garbage collector reclaims it.\n\n**Caution:** Assigning to a non-existent index raises `IndexError`. `fruits[10] = \"Mango\"` is an error! To add new items, always use `append()`.\n\n**Execution order**: Reference at index 0 changed (\"Apple\" -> \"Grape\") -> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "fruits[0] = \"Grape\"",
+        "pythonMemoryState": {
+          "note": "Index 0 replaced: \"Apple\" -> \"Grape\"",
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Grape\", \"Banana\", \"Orange\"]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Deleting an Item (del)",
+        "explanation": "**`del fruits[1]`** -- The `del` keyword **removes** `\"Banana\"` at index 1 from the list.\n\n**What del does:** Removes the item at a specific index from the list. The current list is `[\"Grape\", \"Banana\", \"Orange\"]`, so `\"Banana\"` at index 1 is deleted.\n\n**Index reordering (important!):** After deletion, items behind it **automatically shift forward:**\n- Before: `[\"Grape\"(0), \"Banana\"(1), \"Orange\"(2)]` (length 3)\n- After: `[\"Grape\"(0), \"Orange\"(1)]` (length 2)\n\n`\"Orange\"` moved from index 2 to index 1!\n\n**Analogy:** If you remove person #1 from a line, everyone from #2 onward shifts forward by one spot.\n\n**Other deletion methods:**\n- `del fruits[1]`: Delete by **index**\n- `fruits.remove(\"Banana\")`: Delete by **value** (first matching item only)\n- `fruits.pop(1)`: Delete by index and **return the deleted value**\n- `fruits.pop()`: Delete and return the **last item**\n\n**Python internals:** The reference at index 1 is removed from the internal pointer array, and all references from index 2 onward are shifted forward by one slot. This process takes O(n) time. The reference count of `\"Banana\"` decreases.\n\n**Execution order**: del executed -> index 1 removed -> items shifted forward -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "del fruits[1] # Banana 삭제",
+        "pythonMemoryState": {
+          "note": "Index 1 deleted -> Orange moved from index 2 to 1",
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Grape\", \"Orange\"]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Final List",
+        "explanation": "**`print(fruits)`** -- Prints the final list after all additions, modifications, and deletions.\n\nOutput: `['Grape', 'Orange']`\n\n**Summary of all changes:**\n1. Created: `[\"Apple\", \"Banana\"]` (2 items)\n2. append: `[\"Apple\", \"Banana\", \"Orange\"]` (3 items)\n3. Index assignment: `[\"Grape\", \"Banana\", \"Orange\"]` (Apple -> Grape)\n4. del: `[\"Grape\", \"Orange\"]` (Banana deleted, 2 items)\n\n**Analogy:** We put items in (append), swapped items (index assignment), and took items out (del) of the same bag (0x1000). We never bought a new bag!\n\n**Caution:** An assignment like `b = fruits` is **not a copy** -- it's **sharing the same object**! If you do `b.append(\"Mango\")`, it's reflected in `fruits` too. To create an independent copy, use `b = fruits[:]` or `b = list(fruits)`.\n\n**Python internals:** `print(fruits)` calls `list.__repr__()` to produce the string `\"['Grape', 'Orange']\"`. During this process, each item's `__repr__` is also called. You can verify that the `id()` of `fruits` never changed throughout the entire program.",
+        "visualizationType": "pythonMemory",
+        "code": "print(fruits)",
+        "pythonMemoryState": {
+          "output": [
+            "['Grape', 'Orange']"
+          ],
+          "note": "The same object (0x1000) was modified from start to finish",
+          "names": [
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Grape\", \"Orange\"]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following is NOT a characteristic of lists?",
+    "options": [
+      "They are ordered (Ordered)",
+      "Their contents can be changed (Mutable)",
+      "They do not allow duplicate values",
+      "They can hold mixed types"
+    ],
+    "correctIndex": 2,
+    "explanation": "Lists do allow duplicates (`[1, 1, 1]` is valid).\nThe data structure that does not allow duplicates is the Set."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Copying a list with b=a gives you a separate copy",
+      "correct": "Simple assignment is not even a 'shallow copy' -- it's just sharing the same address.",
+      "why": "To create a real copy, use `b = a[:]` or `b = list(a)`."
+    }
+  ],
+  "keyTakeaway": "A list is a versatile bag you can freely modify, grow, and shrink."
+}

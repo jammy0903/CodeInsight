@@ -7,13 +7,11 @@
  * 1. Non-memory viz types (scope, thisBinding, prototype, promise, terminal, eventLoop)
  *    → 각 전용 뷰어로 직접 전달 (Transformer 불필요)
  * 2. Memory viz types (memory, jsMemory, pythonMemory, python, javaMemory, javascript)
- *    → 언어별 어댑터 → FlowStep → ReferenceGraphView (Python/Java/JS)
- *    → 기존 FlowVisualizer + ArrowLayer (C)
+ *    → 언어별 어댑터 → FlowStep → 언어별 ReferenceView (C/Python/Java/JS)
  */
 
-import { memo, useMemo, useRef, type ComponentProps } from 'react';
+import { memo, useMemo, type ComponentProps } from 'react';
 import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared';
-import { FlowVisualizer } from './c/CFlowVisualizer';
 import { CppFlowVisualizer } from './cpp/CppFlowVisualizer';
 import { ReferenceGraphView } from './shared/components/ReferenceGraphView';
 import { EventLoopView } from './javascript/components/EventLoopView';
@@ -22,8 +20,9 @@ import { ThisBindingView } from './javascript/components/ThisBindingView';
 import { PrototypeChainView } from './javascript/components/PrototypeChainView';
 import { PromiseView } from './javascript/components/PromiseView';
 import { AlgorithmView } from './algorithm/AlgorithmView';
-import { ArrowLayer } from './c/components/ArrowLayer';
 import { PythonReferenceView } from './python/PythonReferenceView';
+import { JavaReferenceView } from './java/JavaReferenceView';
+import { CReferenceView } from './c/CReferenceView';
 import { createAdapter } from './shared/adapters/registry';
 import type { FlowTheme } from './shared/styles';
 
@@ -45,7 +44,6 @@ interface LessonFlowVisualizerProps {
   theme?: FlowTheme;
   onVariableClick?: (variable: FlowVariable) => void;
   className?: string;
-  showArrows?: boolean;
   memoryState?: MemoryState;
   prevMemoryState?: MemoryState;
   stdout?: string;
@@ -94,12 +92,10 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   theme = 'light',
   onVariableClick,
   className = '',
-  showArrows = true,
   memoryState,
   prevMemoryState,
   stdout,
 }: LessonFlowVisualizerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const stepRecord = step as StepRecord;
   const prevStepRecord = prevStep ? (prevStep as StepRecord) : undefined;
   const vizType = asString(stepRecord.visualizationType);
@@ -379,10 +375,9 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
             <span>{error}</span>
           </div>
         )}
-        <ReferenceGraphView
+        <JavaReferenceView
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
-          language="java"
         />
         {/* Integer Cache visualization */}
         {cache && (
@@ -475,24 +470,13 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     );
   }
 
-  // C 등은 기존 FlowVisualizer + ArrowLayer 사용
+  // C → CReferenceView (2-column + SVG 화살표)
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
-      <FlowVisualizer
+    <div className={className}>
+      <CReferenceView
         step={flowStepWithAnimations}
         prevStep={prevFlowStep}
-        theme={theme}
-        onVariableClick={onVariableClick}
       />
-
-      {/* 포인터 화살표 (C 전용) */}
-      {showArrows && (
-        <ArrowLayer
-          variables={flowStepWithAnimations.variables}
-          styler={adapter.styler}
-          containerRef={containerRef}
-        />
-      )}
     </div>
   );
 });

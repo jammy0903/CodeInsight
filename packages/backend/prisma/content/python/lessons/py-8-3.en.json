@@ -1,0 +1,489 @@
+{
+  "lessonId": "py-8-3",
+  "title": "Generator Expressions: Memory-Efficient One-Liner Loops",
+  "concept": "Similar to list comprehensions, but using parentheses `()` instead of brackets `[]` to create memory-efficient generators.",
+  "content": {
+    "code": "import sys\n\n# 리스트 컴프리헨션: 모든 값을 메모리에 올림\nlist_comp = [i * i for i in range(5)]\nprint(f\"List: {list_comp}\")\nprint(f\"Size: {sys.getsizeof(list_comp)}\")\n\n# 제너레이터 표현식: 객체만 생성\ngen_exp = (i * i for i in range(5))\nprint(f\"Generator: {gen_exp}\")\nprint(f\"Size: {sys.getsizeof(gen_exp)}\")\n\n# 제너레이터는 필요할 때 값을 계산\nfor num in gen_exp:\n    print(num, end=' ')",
+    "steps": [
+      {
+        "title": "Importing the sys Module",
+        "explanation": "**`import sys`**\n\nWe import the `sys` module to use the `sys.getsizeof()` function for measuring memory size.\n\n**Why does memory size matter?**\nThe key topic of this lesson is the **memory difference between list comprehensions and generator expressions**.\nUsing `sys.getsizeof()` to compare actual memory usage lets us see the difference with our own eyes!\n\n**What is sys.getsizeof()?**\nA function that tells you how many bytes an object occupies in memory.\nExample: `sys.getsizeof([1, 2, 3])` -> approximately 120 bytes (list structure + 3 references)\n\n**Why this order?** You must import a module before using its functions.\n\n**Execution order**: sys module (0x1500) loaded -> 'sys' name registered in global namespace",
+        "visualizationType": "pythonMemory",
+        "code": "import sys",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "sys module (0x1500) has been loaded.",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "List Comprehension",
+        "explanation": "**`list_comp = [i * i for i in range(5)]`**\n\nThis is a **list comprehension** using **brackets `[]`**. This single line creates a list of squared values from 0 to 4.\n\n**What is eager evaluation?**\nA list comprehension immediately **computes all values at once** and loads them into memory:\n- i=0: 0*0 = 0\n- i=1: 1*1 = 1\n- i=2: 2*2 = 4\n- i=3: 3*3 = 9\n- i=4: 4*4 = 16\nResult: [0, 1, 4, 9, 16] -- all 5 values are stored in memory **at once**.\n\n**Analogy**: It's like a buffet restaurant where all dishes are placed on the table at once.\n5 items is fine, but what about range(1000000)? A million values all in memory!\n\n**Why this order?** We first observe how list comprehensions work, then compare with generator expressions.\n\n**Execution order**: List object (0x2000) created -> squared values 0-4 computed -> [0, 1, 4, 9, 16] stored",
+        "visualizationType": "pythonMemory",
+        "code": "list_comp = [i * i for i in range(5)]",
+        "pythonMemoryState": {
+          "note": "List (0x2000) is created with all values immediately stored in memory.",
+          "names": [
+            {
+              "name": "list_comp",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[0, 1, 4, 9, 16]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing List Contents",
+        "explanation": "**`print(f\"List: {list_comp}\")`**\n\nPrints the **entire contents** of the list: `[0, 1, 4, 9, 16]`.\n\n**Lists can show all their values!**\nBecause all values have already been computed and stored in memory.\nIndex access (list_comp[3] = 9) and length checking (len = 5) are both possible.\n\n**What happens when we print the generator expression later?** Instead of values, only `<generator object ...>` object information appears.\nSince the values haven't been computed yet, there's nothing to show!\n\n**Execution order**: Convert list_comp to string -> print \"List: [0, 1, 4, 9, 16]\"",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"List: {list_comp}\")",
+        "pythonMemoryState": {
+          "output": [
+            "List: [0, 1, 4, 9, 16]"
+          ],
+          "note": "The entire list contents have been printed.",
+          "names": [
+            {
+              "name": "list_comp",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[0, 1, 4, 9, 16]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "List Memory Size",
+        "explanation": "**`print(f\"Size: {sys.getsizeof(list_comp)}\")`**\n\nPrints the **memory size (in bytes)** the list occupies. Approximately 120 bytes.\n\n**What makes up 120 bytes:**\nList object overhead (56 bytes) + pointers for 5 elements (8 bytes each = 40 bytes) + slack space\nWith only 5 elements it's 120 bytes, but with range(1000000)? It would take up **approximately 8MB** of memory!\n\n**The key question**: \"Do all values really need to be in memory at once?\"\nIf we're processing them one at a time with a for loop, we actually only need one value at a time.\nThis is why generator expressions exist!\n\n**Execution order**: Call sys.getsizeof(list_comp) -> measure memory size -> print",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Size: {sys.getsizeof(list_comp)}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Size: 120"
+          ],
+          "note": "The list size is printed. (The value may vary by system)",
+          "names": [
+            {
+              "name": "list_comp",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[0, 1, 4, 9, 16]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Generator Expression",
+        "explanation": "**`gen_exp = (i * i for i in range(5))`**\n\nThis is a **generator expression** using **parentheses `()`**!\nThe syntax is nearly identical to a list comprehension, except **brackets `[]` are replaced with parentheses `()`**.\n\n**The critical difference: Lazy Evaluation**\n- List comprehension `[...]`: Immediately computes all values -> stores everything in memory\n- Generator expression `(...)`: **Computes nothing!** Only creates a generator object\n\nAt this point, none of the computations 0*0, 1*1, 2*2... have been performed!\nOnly a **recipe (computation formula)** saying \"I plan to do these calculations\" has been stored.\n\n**Analogy**: List = a buffet table with all dishes served, Generator = a course meal menu card that's still empty\nThe menu card (recipe) is lightweight, but the buffet table is heavy with food!\n\n**Why this order?** We compare generator expression behavior against the list comprehension.\n\n**Execution order**: Generator object (0x3000) created -> only the computation formula stored internally (no values computed!)",
+        "visualizationType": "pythonMemory",
+        "code": "gen_exp = (i * i for i in range(5))",
+        "pythonMemoryState": {
+          "note": "Generator object (0x3000) is created, but no internal values have been computed.",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Generator Object",
+        "explanation": "**`print(f\"Generator: {gen_exp}\")`**\n\nPrinting the generator object outputs `<generator object <genexpr> at 0x...>`.\nIt does **NOT** show `[0, 1, 4, 9, 16]` like the list!\n\n**Why doesn't it show values?**\nBecause the values **haven't been computed yet**!\nThe generator does no computation until a value is needed (next() call or for loop).\nThe values simply don't exist yet to be shown.\n\n**Key difference from lists:**\n- `print([0, 1, 4, 9, 16])` -> all values visible (already computed)\n- `print(gen_exp)` -> only object info visible (not yet computed)\n\n**Beginner note**: If you try to check the generator's contents by converting with `list(gen_exp)`, all values are computed at once and turned into a list. But this defeats the generator's memory advantage!\n\n**Execution order**: Call repr of gen_exp -> print \"Generator: <generator object ...>\"",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Generator: {gen_exp}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Generator: <generator object ...>"
+          ],
+          "note": "The generator prints object info instead of showing its contents.",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Generator Memory Size",
+        "explanation": "**`print(f\"Size: {sys.getsizeof(gen_exp)}\")`**\n\nPrints the generator object's memory size. Approximately **112 bytes** -- looks similar to the list (120 bytes), but...\n\n**The real difference shows up when data gets large!**\n- `[i*i for i in range(5)]` -> 120 bytes\n- `(i*i for i in range(5))` -> 112 bytes\n- `[i*i for i in range(1000000)]` -> **approximately 8,000,000 bytes** (8MB!)\n- `(i*i for i in range(1000000))` -> **still just 112 bytes!**\n\n**Why is the generator always small?**\nGenerators don't store data! They only hold the \"recipe\" of how to compute values, so whether there are 1 million or 1 billion items, the generator object size stays the same.\n\n**Analogy**: A cookbook (recipe) is always just one book, but pre-cooking all the dishes fills up the refrigerator!\n\n**Execution order**: Call sys.getsizeof(gen_exp) -> measure generator object size -> print 112 bytes",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Size: {sys.getsizeof(gen_exp)}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Size: 112"
+          ],
+          "note": "Uses a constant (small) amount of memory regardless of data count.",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop Start - First Value",
+        "explanation": "**`for num in gen_exp:`**\n\nThe for loop begins iterating over the generator. **Values are finally being computed!**\nWhen __next__() is called, the generator computes the first value: i=0 -> 0*0 = **0**\n\n**\"Compute when needed\" -- this is exactly it!**\nThe list comprehension computed all 5 values at creation time, but the generator computes **exactly one** each time the for loop requests it.\n\n**From a memory perspective:**\n- List: [0, 1, 4, 9, 16] -- all 5 values exist in memory simultaneously\n- Generator: only 0 exists in memory, the rest haven't even been computed yet\n\n**Analogy**: A list is like writing all exam answers in advance, while a generator is like solving each problem as you encounter it.\n\n**Execution order**: gen_exp.__iter__() -> __next__() called -> i=0, 0*0 computed -> num = 0",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "note": "The first value has been computed and assigned to num.",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Value Output (0)",
+        "explanation": "**`print(num, end=' ')`**\n\nPrints the first computed value **0**. `end=' '` puts a space instead of a newline, lining up values on one row.\n\n**Values computed by the generator at this point**: 0 (just one!)\nThe remaining 1, 4, 9, 16 don't even exist yet.\n\n**Feel the meaning of \"one at a time\":**\nRight now only 0 is in memory. After printing it, 1 will be computed on the next __next__() call.\nThe maximum number of values in memory at any given time is always **just 1**!\n\n**Execution order**: print(0, end=' ') executed -> \"0 \" printed -> back to top of loop",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "0"
+          ],
+          "note": "0 printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop - Second Value",
+        "explanation": "**`for num in gen_exp:`** (second iteration)\n\n__next__() is called and the second value is computed: i=1 -> 1*1 = **1**\n\n**The generator's internal state advances:**\nThe generator that was paused at i=0 resumes and processes i=1.\nThe value 1 is computed and assigned to num, then it suspends again.\n\n**Execution order**: __next__() called -> i=1, 1*1 computed -> num = 1",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "output": [
+            "..."
+          ],
+          "note": "The second value has been computed.",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Second Value Output (1)",
+        "explanation": "**`print(num, end=' ')`**\n\nPrints the second value **1** (= 1*1).\n\n**Output so far**: \"0 1 \" (space-separated)\n**Remaining values**: 4(=2*2), 9(=3*3), 16(=4*4) -- not yet computed!\n\n**Execution order**: print(1, end=' ') executed -> \"1 \" printed",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "0",
+            "1"
+          ],
+          "note": "1 printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop - Third Value",
+        "explanation": "**`for num in gen_exp:`** (third iteration)\n\nThe third value is computed: i=2 -> 2*2 = **4**\n\n**The squares are getting larger:** 0, 1, 4, ...\nIf it were range(1000000), it would go up to 999999*999999 = 999998000001, but the generator doesn't precompute this -- it calculates one at a time only when needed.\n\n**Execution order**: __next__() called -> i=2, 2*2 computed -> num = 4",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "note": "Third value 4 has been generated.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 4,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Third Value Output (4)",
+        "explanation": "**`print(num, end=' ')`**\n\nPrints the third value **4** (= 2*2).\n\n**Output so far**: \"0 1 4 \"\n**Remaining values**: 9(=3*3), 16(=4*4)\n\n**Execution order**: print(4, end=' ') executed -> \"4 \" printed",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "4"
+          ],
+          "note": "4 printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 4,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop - Fourth Value",
+        "explanation": "**`for num in gen_exp:`** (fourth iteration)\n\nThe fourth value is computed: i=3 -> 3*3 = **9**\n\nEach time the for loop calls __next__(), the generator wakes up and computes the square of the next i value.\nThis process continues until all values in range(5) are exhausted.\n\n**Execution order**: __next__() called -> i=3, 3*3 computed -> num = 9",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "note": "Fourth value 9 has been generated.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 9,
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Fourth Value Output (9)",
+        "explanation": "**`print(num, end=' ')`**\n\nPrints the fourth value **9** (= 3*3).\n\n**Output so far**: \"0 1 4 9 \"\n**Remaining value**: 16(=4*4) -- the last one!\n\n**Execution order**: print(9, end=' ') executed -> \"9 \" printed",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "9"
+          ],
+          "note": "9 printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 9,
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop - Fifth Value",
+        "explanation": "**`for num in gen_exp:`** (fifth iteration -- the last!)\n\nThe final value is computed: i=4 -> 4*4 = **16**\n\nThe last value i=4 from range(5) has been processed. On the next __next__() call, range(5) will be exhausted and StopIteration will be raised.\n\n**Full computation order of the generator expression**:\n- for iteration 1: i=0, yield 0 -> print \"0\"\n- for iteration 2: i=1, yield 1 -> print \"1\"\n- for iteration 3: i=2, yield 4 -> print \"4\"\n- for iteration 4: i=3, yield 9 -> print \"9\"\n- for iteration 5: i=4, yield 16 -> print \"16\"\n- for iteration 6: StopIteration -> loop ends\n\n**Execution order**: __next__() called -> i=4, 4*4 computed -> num = 16",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "note": "Fifth value 16 has been generated.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 16,
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Fifth Value Output (16)",
+        "explanation": "**`print(num, end=' ')`**\n\nPrints the final value **16** (= 4*4). The generator is now **exhausted**!\n\n**Final output**: \"0 1 4 9 16 \" -- the same result as the list comprehension [0, 1, 4, 9, 16]!\n\n**Same result, different process:**\n- List: Computes all 5 values **at once**, stores in memory -> prints one by one\n- Generator: Computes values **one at a time** and prints immediately -> computes next value\n\n**Important note after generator exhaustion:**\nAn exhausted generator **cannot be reused**!\nRunning `for num in gen_exp:` again would produce nothing.\nIf you need new values, you must create a new generator expression.\n\n**Key lesson**: Use `()` for iterating over large datasets, and `[]` when you need index access or reuse.\n\n**Execution order**: print(16) executed -> for loop calls __next__() -> StopIteration raised -> loop ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "16"
+          ],
+          "note": "16 printed and the loop ends. The generator (0x3000) is now empty.",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the biggest reason to use a generator expression instead of a list comprehension?",
+    "options": [
+      "The code is shorter",
+      "It runs faster",
+      "To use memory efficiently",
+      "It provides more features"
+    ],
+    "correctIndex": 2,
+    "explanation": "Generator expressions don't create all values upfront -- they generate one at a time as needed, dramatically reducing memory usage when working with large datasets."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Generator expressions are always faster than lists.",
+      "correct": "For small datasets, lists can actually be faster.\nGenerators have call overhead.",
+      "why": "The true value of generators lies in memory savings when dealing with 'large' datasets."
+    }
+  ],
+  "keyTakeaway": "When working with large datasets, use generator expressions `()` instead of list comprehensions `[]` to save memory."
+}

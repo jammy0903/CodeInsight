@@ -1,0 +1,334 @@
+{
+  "lessonId": "py-13-3",
+  "title": "字符串切片进阶",
+  "concept": "切片是[start:stop:step] -- 索引的扩展版",
+  "content": {
+    "code": "text = \"Hello, Python!\"\n\nfirst_five = text[:5]\nprint(first_five)\n\nevery_other = text[::2]\nprint(every_other)\n\nreversed_text = text[::-1]\nprint(reversed_text)\n\nmiddle = text[7:13]\nprint(middle)",
+    "steps": [
+      {
+        "title": "字符串创建与索引理解",
+        "explanation": "**`text = \"Hello, Python!\"`** -- 14个字符的字符串对象在堆（heap）内存中创建，`text` 标签被附加上去。\n\nPython从上到下按顺序执行。这个字符串的每个字符都有**正数索引**和**负数索引**两种。\n\n**切片基本语法：** `text[start:stop:step]`\n- `start`：开始位置（**包含**）\n- `stop`：结束位置（**不包含！** -- 这是关键）\n- `step`：间隔（默认值：1）\n\n**类比：** 就像公寓门牌号。可以从前面数101号（第0个）、102号（第1个）...，也可以从后面数最后一个（-1）、倒数第二个（-2）...。同一个房间有两个编号！\n\n**注意：** Python的索引总是从**0**开始。第一个字符是 `text[0]`，不是 `text[1]`！这与C、Java等大多数语言相同。",
+        "visualizationType": "pythonMemory",
+        "code": "text = \"Hello, Python!\"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "索引：H=0, e=1, l=2, ..., !=13",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"（长度：14）",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "前5个字符（[:5]）",
+        "explanation": "**`first_five = text[:5]`** -- 从字符串开头提取到索引4（5不包含！），返回一个**新字符串**。\n\n`text[:5]` 是 `text[0:5:1]` 的缩写。\n\n**核心规则：** `stop` 索引**始终不包含**！`[:5]` 表示索引0、1、2、3、4。正因为这个规则，`len(text[:5])` == `5` 成立（长度 = stop - start）。\n\n**类比：** 就像用刀（切片）从开头到5cm处（索引0~4）切蛋糕卷（字符串）。原始蛋糕卷保持不变，只取走切下的部分（新字符串）。\n\n**注意：** `text[:5]` 和 `text[5]` 完全不同！`text[:5]` 返回字符串 `\"Hello\"`，而 `text[5]` 返回单个字符 `\",\"`。\n\n**让我们可视化提取过程：**\n```\n H  e  l  l  o  ,     P  y  t  h  o  n  !\n[0][1][2][3][4] 5\n ^^^^^^^^^^^^^^\n   提取范围（0~4）\n```\n结果：`\"Hello\"`",
+        "visualizationType": "pythonMemory",
+        "code": "first_five = text[:5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "[:5] = 提取索引0~4（5不包含）",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "隔一个取一个（[::2]）",
+        "explanation": "**`every_other = text[::2]`** -- 从头到尾每隔**2个字符**提取一次。\n\n`text[::2]` 等同于 `text[0:14:2]`。\n\n**类比：** 就像跳绳（字符串）时不是跳一步（step=1）而是跳两步（step=2）。每次跳过一个字符，所以只收集偶数索引（0、2、4...）的字符。\n\n**注意：** step越大，结果字符串越短。`text[::len(text)]` 只返回第一个字符。\n\n**让我们可视化提取过程：**\n```\n H  e  l  l  o  ,     P  y  t  h  o  n  !\n[0]   [2]   [4]   [6]   [8]   [10]  [12]\n H     l     o        y     h     n\n```\n结果：`\"Hlo yhn\"`",
+        "visualizationType": "pythonMemory",
+        "code": "every_other = text[::2]",
+        "pythonMemoryState": {
+          "output": [
+            "Hello"
+          ],
+          "note": "[::2] = 步长2只提取偶数索引",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "every_other",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Hlo yhn\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "字符串反转（[::-1]）",
+        "explanation": "**`text[::-1]`** 是最快速反转字符串的基本模式。\n\n含义：\n- 省略开始/结束\n- step设为 `-1`，从后往前读取\n\n结果就是原始字符串的反序字符串。\n\n**类比：** 就像从最后一个字母开始倒着读句子，生成新句子。\n\n要点：\n- 原始字符串不变\n- 返回新字符串\n\n简短而强大，在编程考试和实际工作中都经常使用。",
+        "visualizationType": "pythonMemory",
+        "code": "reversed_text = text[::-1]",
+        "pythonMemoryState": {
+          "output": [
+            "Hlo yhn"
+          ],
+          "note": "[::-1] = 步长-1反序（字符串反转）",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "every_other",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "reversed_text",
+              "pointsTo": "str4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Hlo yhn\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"!nohtyP ,olleH\"",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "提取中间部分（[7:13]）",
+        "explanation": "**`middle = text[7:13]`** 从索引7截取到12。\n（结束索引13不包含）\n\n所以结果正好是 `\"Python\"`。\n\n快速记忆法：\n- 切片长度 = `stop - start`\n- 这里是 `13 - 7 = 6` 个字符\n\n**类比：** 截取区间的起点包含在内，终点作为边界线被排除。\n\n补充要点：\n- `text[7]` 是单个字符\n- `text[7:8]` 结果也是单个字符，但使用的是\"切片\"语法\n\n切片是字符串切割中最常用的基本功。",
+        "visualizationType": "pythonMemory",
+        "code": "middle = text[7:13]",
+        "pythonMemoryState": {
+          "output": [
+            "!nohtyP ,olleH"
+          ],
+          "note": "[7:13] = 提取索引7~12（\"Python\"）",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "every_other",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "reversed_text",
+              "pointsTo": "str4"
+            },
+            {
+              "name": "middle",
+              "pointsTo": "str5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Hlo yhn\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"!nohtyP ,olleH\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "str5",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "最终结果输出",
+        "explanation": "**`print(middle)`** -- 输出 `middle` 指向的 `\"Python\"`。\n\n**让我们整理全部执行结果：**\n```\nHello          <- text[:5]    （前5个字符）\nHlo yhn        <- text[::2]   （偶数索引）\n!nohtyP ,olleH <- text[::-1]  （反转）\nPython         <- text[7:13]  （中间提取）\n```\n\n**类比：** 就像瑞士军刀（切片），仅用 `[start:stop:step]` 就能自如地操作字符串。从前面切、从后面切、跳着取、反转——全都行！\n\n**Python内部机制：** 切片的核心特性是**安全性**。越界也不会报错：\n- `text[0:100]` -> `\"Hello, Python!\"`（返回已有的部分）\n- `text[100:200]` -> `\"\"`（空字符串，无错误）\n- `text[-100:5]` -> `\"Hello\"`（小于0的负数调整为0）\n\n但是，**索引**在越界时会报错：`text[100]` -> `IndexError`！\n\n**切片模式总结：**\n\n**执行顺序（完整总结）：**\n1. `text = \"Hello, Python!\"` -> 创建字符串\n2. `text[:5]` -> `\"Hello\"`（前5个字符）\n3. `text[::2]` -> `\"Hlo yhn\"`（偶数索引）\n4. `text[::-1]` -> `\"!nohtyP ,olleH\"`（反转）\n5. `text[7:13]` -> `\"Python\"`（中间提取）",
+        "visualizationType": "pythonMemory",
+        "code": "print(middle)",
+        "pythonMemoryState": {
+          "output": [
+            "Python"
+          ],
+          "note": "切片越界也不报错（安全！）",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "first_five",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "every_other",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "reversed_text",
+              "pointsTo": "str4"
+            },
+            {
+              "name": "middle",
+              "pointsTo": "str5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Hlo yhn\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"!nohtyP ,olleH\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "str5",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "\"abcdef\"[::-1]的结果是？",
+    "options": [
+      "\"abcdef\"",
+      "\"fedcba\"",
+      "\"ace\"",
+      "发生错误"
+    ],
+    "correctIndex": 1,
+    "explanation": "[::-1]是反向读取字符串的切片。\n因为step为-1，所以从末尾到开头逐个字符读取，结果为\"fedcba\"。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "切片中stop索引的字符也会被包含",
+      "correct": "stop索引始终不包含。text[0:5]表示索引0~4。",
+      "why": "正因为这个规则，len(text[a:b]) == b - a 成立。\n同时 text[:n] + text[n:] 总是等于原始text。"
+    }
+  ],
+  "keyTakeaway": "[start:stop:step]三个参数自由提取字符串！[::-1]是反转的必备模式！"
+}

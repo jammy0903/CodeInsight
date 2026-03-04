@@ -1,0 +1,111 @@
+{
+  "lessonId": "java-9-3",
+  "title": "Stop-the-World: The Janitor's Method",
+  "concept": "When GC runs, the program pauses briefly. This is called 'Stop-the-World', and minimizing this pause time is the core goal of GC algorithms.",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"열심히 일하는 중...\");\n        \n        // GC가 발동하면?\n        // 모든 스레드가 일시 정지(Stop)합니다.\n        \n        System.out.println(\"다시 일하는 중!\");\n    }\n}",
+    "steps": [
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nWe'll observe the 'pause phenomenon' that occurs when GC runs.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        },
+        "code": "public static void main(String[] args) {"
+      },
+      {
+        "title": "Normal Execution",
+        "explanation": "The program is running normally.\nThe CPU is busy doing work.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "열심히 일하는 중..."
+          ],
+          "heap": []
+        },
+        "code": "System.out.println(\"열심히 일하는 중...\");"
+      },
+      {
+        "title": "Freeze! (Stop-the-World)",
+        "explanation": "For memory cleanup (GC), **all threads freeze and stop.**\nIt's like when the janitor is waxing the floor -- nobody is allowed to walk through.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "STOPPED",
+              "frame": "main"
+            },
+            {
+              "name": "GC",
+              "value": "Cleaning...",
+              "frame": "system"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap",
+              "content": "Cleaning Garbage...",
+              "note": "Reclaiming Memory"
+            }
+          ],
+          "warning": "All threads stopped (STW)",
+          "output": []
+        },
+        "code": "// 모든 스레드가 일시 정지(Stop)합니다.",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "Unfreeze! (Execution Resumes)",
+        "explanation": "Once cleanup is done, the frozen tasks resume and continue running.\nIf this pause lasts too long, users perceive it as \"lag\".",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "다시 일하는 중!"
+          ],
+          "heap": []
+        },
+        "code": "}"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What is the phenomenon called when the JVM pauses application execution for GC?",
+    "options": [
+      "Wait-and-See",
+      "Stop-the-World",
+      "Halt-Process",
+      "GC-Freeze"
+    ],
+    "correctIndex": 1,
+    "explanation": "The phenomenon where all threads except the GC thread are paused is called Stop-the-World (STW)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "With GC, you don't need to worry about memory at all.",
+      "correct": "Not true! For GC to clean up properly, you need to make objects 'unreferenced'.",
+      "why": "If you unknowingly keep references to unused objects, even the janitor can't clean them up."
+    }
+  ],
+  "keyTakeaway": "The evolution of GC algorithms has been driven by the goal of minimizing STW pause times."
+}

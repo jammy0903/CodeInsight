@@ -1,0 +1,688 @@
+{
+  "lessonId": "py-6-3",
+  "title": "Instance Variables",
+  "concept": "Each instance owns its own variables - completely independent!",
+  "content": {
+    "code": "class Counter:\n    def __init__(self):\n        self.count = 0\n    \n    def increment(self):\n        self.count += 1\n\nc1 = Counter()\nc2 = Counter()\n\nc1.increment()\nc1.increment()\nc2.increment()\n\nprint(f\"c1: {c1.count}\")  # 2\nprint(f\"c2: {c2.count}\")  # 1",
+    "steps": [
+      {
+        "title": "Counter Class Definition",
+        "explanation": "**`class Counter:`**\n\nPython executes code from top to bottom in order. We define the `Counter` class (counter blueprint).\n\n**Goal of this lesson**: Visually confirm that instance variables (`self.count`) are **completely independent for each object**. We'll create two Counter objects, c1 and c2, call increment() different numbers of times on each, and prove that they don't affect each other.\n\n**Analogy**: The Counter class is a blueprint for a \"counting device factory.\" This factory can produce multiple counters, and each counter has its own **independent display**. Pressing the button on one counter doesn't change the number on any other counter.\n\n**Why this order?** The class must be defined first before methods can be added and objects created.\n\n**Execution order**: Execute class Counter --> Begin creating Counter class object --> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Counter:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Class definition begins",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ Method Definition",
+        "explanation": "**`def __init__(self):`**\n\nDefines the **initialization method**. When Counter() is called, Python **automatically** executes this method.\n\n**Meaning of `self.count = 0`**: Creates an independent `count` attribute for **each object** and initializes it to 0. When c1 = Counter() is called, c1's count is set to 0; when c2 = Counter() is called, c2's count is set to 0. The two counts are **completely separate variables**!\n\n**When the only parameter is self**: This __init__ has no additional parameters besides `self`. This means it's called with no arguments as `Counter()`. Unlike the previous lesson's `User(\"Alice\", 20)`, no additional data is needed.\n\n**Note**: At this point, we are only **defining** the method. `self.count = 0` is not being executed! It only runs later when `Counter()` is called.\n\n**Why this order?** Methods are defined sequentially within the class body.\n\n**Execution order**: Execute def __init__ --> Create __init__ function object --> Register in Counter class --> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "__init__ method defined (not yet called)",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with __init__>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "increment Method Definition",
+        "explanation": "**`def increment(self):`**\n\nDefines a method that increases the calling object's `count` by 1. The body is a single line: `self.count += 1`.\n\n**What does `self.count += 1` mean?** It's shorthand for `self.count = self.count + 1`. That is:\n1. Read the current value of `self.count` (e.g., 0)\n2. Add 1 to it (0 + 1 = 1)\n3. Store the result back in `self.count` (self.count = 1)\n\n**The decisive role of self**: Which object the same increment code executes on depends entirely on `self`.\n- When `c1.increment()` is called: self = c1 --> only c1.count increases\n- When `c2.increment()` is called: self = c2 --> only c2.count increases\n- It is **impossible** for c1's increment to touch c2's count!\n\n**Analogy**: There are two independent counters. Pressing the left counter's (c1) button only increases the left number, and pressing the right counter's (c2) button only increases the right number.\n\n**Note**: At this point, we are only **defining** the method.\n\n**Why this order?** After defining __init__, the next method is defined in order.\n\n**Execution order**: Execute def increment --> Create increment function object --> Register in Counter class --> Counter class definition complete --> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "def increment(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "increment method defined",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with __init__, increment>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the First Counter (__init__ Auto-Called)",
+        "explanation": "**`c1 = Counter()`**\n\n**Object creation with automatic __init__ call!**\n\n**Python internals**:\n1. Allocate new object space (0x2000)\n2. **Auto-call** `__init__(c1)` --> Jump to line 3\n3. After initialization completes, assign the object reference to `c1`\n\n**Why this order?** After class definition completes, the next line executes in order.\n\n**Execution order**: Call Counter() --> Create object 0x2000 --> Auto-call __init__ --> Jump to line 3",
+        "visualizationType": "pythonMemory",
+        "code": "c1 = Counter()",
+        "pythonMemoryState": {
+          "note": "c1 object created --> __init__ about to be auto-called",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object (empty)>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "c1 Instance Variable Initialization",
+        "explanation": "**`self.count = 0`**\n\n**Instance variable creation**: Adds a `count` attribute to `self` (c1 object, 0x2000) and assigns `0`.\n\n**Meaning of self.count**:\n- `self` --> c1 object (0x2000)\n- `.count` --> The count attribute of this object (creating it now!)\n- `= 0` --> Initialize to 0\n\n**Why this order?** Object creation (line 8) auto-called __init__, which jumped here.\n\n**Execution order**: self.count = 0 --> Add count=0 to c1 object --> __init__ ends --> Return to line 8 --> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "self.count = 0",
+        "pythonMemoryState": {
+          "note": "c1 object initialization complete (count=0)",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ c1 (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Second Counter (__init__ Auto-Called)",
+        "explanation": "**`c2 = Counter()`**\n\n**A new independent object is created!**\n\n**Python internals**:\n1. Allocate a **new** object space (0x3000) <-- different from c1 (0x2000)!\n2. **Auto-call** `__init__(c2)` --> Jump to line 3\n3. After initialization completes, assign the object reference to `c2`\n\n**Important**: c1 and c2 are **completely separate objects**!\n\n**Why this order?** After c1 initialization completes, the next line executes in order.\n\n**Execution order**: Call Counter() --> Create object 0x3000 --> Auto-call __init__ --> Jump to line 3",
+        "visualizationType": "pythonMemory",
+        "code": "c2 = Counter()",
+        "pythonMemoryState": {
+          "note": "c2 object created --> __init__ about to be auto-called",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object (empty)>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "c2 Instance Variable Initialization",
+        "explanation": "**`self.count = 0`**\n\n**Instance variable creation**: Adds a `count` attribute to `self` (c2 object, 0x3000) and assigns `0`.\n\n**Key concept**: c1.count and c2.count are **completely different variables**!\n- c1.count --> count of the 0x2000 object\n- c2.count --> count of the 0x3000 object\n- Same name but **different memory spaces**!\n\n**Why this order?** Object creation (line 9) auto-called __init__, which jumped here.\n\n**Execution order**: self.count = 0 --> Add count=0 to c2 object --> __init__ ends --> Return to line 9 --> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "self.count = 0",
+        "pythonMemoryState": {
+          "note": "c2 object initialization complete (independent from c1!)",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "→ c2 (0x3000)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "c1.increment() Call (1st time)",
+        "explanation": "**`c1.increment()`**\n\nCalls the increment method on the c1 object.\n\n**Python internal conversion**:\n```python\nc1.increment()  # What the user writes\n↓\nCounter.increment(c1)  # What Python internally converts to\n```\n\n**What goes into self?**\n- `self` = `c1` (0x2000 object)\n\n**Why this order?** After c2 initialization completes, the next line executes in order.\n\n**Execution order**: Call c1.increment() --> Jump to line 6 --> self=c1",
+        "visualizationType": "pythonMemory",
+        "code": "c1.increment()",
+        "pythonMemoryState": {
+          "note": "c1.increment() called --> about to jump to line 6",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "c1.count Incremented (1st time)",
+        "explanation": "**`self.count += 1`**\n\nIncrements the `count` of `self` (c1 object, 0x2000) by 1.\n\n**Execution flow**:\n1. Read `self.count` --> c1.count --> 0\n2. Calculate `0 + 1` --> 1\n3. Assign `self.count = 1` --> c1.count = 1\n\n**Important**: c2.count is still 0! Each object's instance variables are **completely independent**.\n\n**Why this order?** Jumped here from the method call (line 11).\n\n**Execution order**: self.count += 1 --> c1.count goes from 0 to 1 --> increment ends --> Return to line 11 --> line 12",
+        "visualizationType": "pythonMemory",
+        "code": "self.count += 1",
+        "pythonMemoryState": {
+          "note": "c1.count incremented 0-->1 (c2 unaffected!)",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=1>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ c1 (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "c1.increment() Call (2nd time)",
+        "explanation": "**`c1.increment()`**\n\n**Calling the same object's method again**.\n\n**What goes into self?**\n- `self` = `c1` (0x2000 object) <-- the same object as the 1st call!\n\n**Why this order?** After the previous method call completes, the next line executes in order.\n\n**Execution order**: Call c1.increment() --> Jump to line 6 --> self=c1",
+        "visualizationType": "pythonMemory",
+        "code": "c1.increment()",
+        "occurrence": 2,
+        "pythonMemoryState": {
+          "note": "c1.increment() called again --> about to jump to line 6",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=1>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "c1.count Incremented (2nd time)",
+        "explanation": "**`self.count += 1`**\n\nIncrements the `count` of `self` (c1 object, 0x2000) by 1 **again**.\n\n**Execution flow**:\n1. Read `self.count` --> c1.count --> 1 (the value increased by the previous call!)\n2. Calculate `1 + 1` --> 2\n3. Assign `self.count = 2` --> c1.count = 2\n\n**Persistence of instance variables**: Because the result of the previous method call is **stored on the object**, calling it again **accumulates** the value!\n\n**Why this order?** Jumped here from the method call (line 12).\n\n**Execution order**: self.count += 1 --> c1.count goes from 1 to 2 --> increment ends --> Return to line 12 --> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "self.count += 1",
+        "pythonMemoryState": {
+          "note": "c1.count incremented 1-->2 (accumulated!)",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=2>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ c1 (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "c2.increment() Call",
+        "explanation": "**`c2.increment()`**\n\n**Calling a different object's method!**\n\n**Python internal conversion**:\n```python\nc2.increment()  # What the user writes\n↓\nCounter.increment(c2)  # What Python internally converts to\n```\n\n**What goes into self?**\n- `self` = `c2` (0x3000 object) <-- not c1 (0x2000)!\n\n**Important**: The same method code (`line 6`) is executed, but since **self is different**, a different object's count will be modified!\n\n**Why this order?** After the previous method call completes, the next line executes in order.\n\n**Execution order**: Call c2.increment() --> Jump to line 6 --> self=c2",
+        "visualizationType": "pythonMemory",
+        "code": "c2.increment()",
+        "pythonMemoryState": {
+          "note": "c2.increment() called --> about to jump to line 6",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=2>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=0>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "c2.count Incremented",
+        "explanation": "**`self.count += 1`**\n\nIncrements the `count` of `self` (c2 object, 0x3000) by 1.\n\n**Execution flow**:\n1. Read `self.count` --> c2.count --> 0\n2. Calculate `0 + 1` --> 1\n3. Assign `self.count = 1` --> c2.count = 1\n\n**Key concept -- Independence of instance variables**:\n- c1.count = 2 (c1 object, 0x2000)\n- c2.count = 1 (c2 object, 0x3000)\n- **Same code, different self, different results!**\n\n**Why this order?** Jumped here from the method call (line 13).\n\n**Execution order**: self.count += 1 --> c2.count goes from 0 to 1 --> increment ends --> Return to line 13 --> line 15",
+        "visualizationType": "pythonMemory",
+        "code": "self.count += 1",
+        "pythonMemoryState": {
+          "note": "c2.count incremented 0-->1 (c1 is still 2!)",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=2>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=1>",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "→ c2 (0x3000)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing c1's Final Value",
+        "explanation": "**`print(f\"c1: {c1.count}\")`**\n\nAccesses the count attribute of the c1 object and prints it. \"c1: 2\" is printed to the screen.\n\n**Execution flow:**\n1. Read `c1.count` --> c1.__dict__['count'] --> 2 (result of two increments)\n2. Evaluate f-string --> \"c1: 2\"\n3. Execute print --> Output to screen\n\n**Why 2?** Because c1.increment() was called **twice**:\n- line 11: c1.count 0 --> 1 (first increment)\n- line 12: c1.count 1 --> 2 (second increment)\n\n**Persistence of instance variables**: Even after method calls end, the value of `self.count` is **permanently stored** on the object. So the next call remembers the previous value and can add 1 to it. This is the fundamental difference between instance variables and local variables.\n\n**What if we used a local variable instead of an instance variable?**\n```python\ndef increment(self):\n    count = 0     # Local variable! Starts at 0 every time\n    count += 1    # Becomes 1, but...\n    # count disappears when function ends! Cannot accumulate!\n```\n\n**Why this order?** After all method calls complete, the next line executes in order.\n\n**Execution order**: Read c1.count (2) --> Evaluate f-string --> Execute print --> line 16",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"c1: {c1.count}\")  # 2",
+        "pythonMemoryState": {
+          "output": [
+            "c1: 2"
+          ],
+          "note": "c1 was incremented twice, so it's 2",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=2>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=1>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing c2's Final Value",
+        "explanation": "**`print(f\"c2: {c2.count}\")`**\n\nAccesses the count attribute of the c2 object and prints it. \"c2: 1\" is printed to the screen.\n\n**Why 1?** Because c2.increment() was called **only once** (line 13 only). It is **completely unrelated** to c1 being called twice.\n\n**Final summary of this lesson -- Complete independence of instance variables:**\n\n```\nc1 (0x2000)          c2 (0x3000)\n+-----------+        +-----------+\n+-----------+        +-----------+\n  (incremented 2x)     (incremented 1x)\n```\n\n- Same class (Counter) -- shared blueprint\n- Same method code (increment) -- shared code\n- But **each object owns an independent count** -- data separation!\n- c1.increment() **never** affects c2.count\n\n**Why is this structure beneficial?**\n1. **Predictability**: A state change in one object doesn't affect other objects\n2. **Safety**: Each object can be managed independently even in multi-threaded environments\n3. **Code reuse**: Write method code only once, separate data per object\n\n**Core principle**: In OOP, methods (behavior) are shared from the class, while instance variables (data) are independently owned by each object. This separation is the most fundamental design principle of object-oriented programming.\n\n**Execution order**: Read c2.count (1) --> Evaluate f-string --> Execute print --> Program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"c2: {c2.count}\")  # 1",
+        "pythonMemoryState": {
+          "output": [
+            "c2: 1"
+          ],
+          "note": "c2 was incremented once, so it's 1 (completely independent!)",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "c1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Counter object, count=2>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Counter object, count=1>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What about c1.count and c2.count?",
+    "options": [
+      "They share the same variable",
+      "They are completely different variables",
+      "c1 has higher priority because it was created first",
+      "They are copies of a class variable"
+    ],
+    "correctIndex": 1,
+    "explanation": "Instance variables are independently owned by each object.\nc1.count and c2.count only share the same name -- they are completely different variables."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Instances of the same class share variables",
+      "correct": "Instance variables (self.x) are independent for each object",
+      "why": "Only class variables are shared.\nInstance variables are owned individually."
+    },
+    {
+      "wrong": "Methods are also copied for each instance",
+      "correct": "Methods exist only once in the class and use self to distinguish instances",
+      "why": "For memory efficiency, methods are shared; only data (instance variables) is separated."
+    }
+  ],
+  "keyTakeaway": "Instance variables (self.x) are independently owned by each object! They don't affect each other!"
+}

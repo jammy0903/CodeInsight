@@ -1,0 +1,413 @@
+{
+  "lessonId": "py-4-5",
+  "title": "Return & Reference",
+  "concept": "What a function returns is not a value, but a reference to an object!",
+  "content": {
+    "code": "def get_list():\n    data = [1, 2, 3]\n    return data\n\na = get_list()\nb = get_list()\n\nprint(f\"a: {a}\")\nprint(f\"b: {b}\")\nprint(f\"a is b: {a is b}\")",
+    "steps": [
+      {
+        "title": "Defining a Function That Returns a List",
+        "explanation": "**`def get_list():`**\n\nPython executes code from top to bottom.\nDefines a function named `get_list`. This function's role is to **create a list object and return it**.\n\n**The core question of this lesson**: \"Does `return` send back a **copy of the value**, or a **reference to the object itself**?\"\nUnderstanding the answer means you understand Python's memory model!\n\nAnalogy: This function is like a **bread factory**. Each time you call it, it bakes a **new loaf of bread (list object)** and sends it out. Call it twice and you get two independent loaves.\n\n**Python internals**: When Python encounters `def`:\n1. Compiles the function body code into a **code object**\n2. Creates a **function object** wrapping this code object\n3. Binds it to the name `get_list` in the current namespace\n4. Does **not execute** the function body (lines 2-3) yet -- waits until called!\n\n**Why this order?** The function must be defined (registered) first so it can be called below. Calling before defining causes `NameError`.\n\n**Execution order**: def get_list executed -> function object created -> registered in namespace -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def get_list():",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Function defined (code not executed yet)",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Function Call",
+        "explanation": "**`a = get_list()`**\n\nCalls the defined `get_list` function **for the first time**. The `()` means \"execute this function\".\n\n**Execution flow jump**: At the moment of the call, program flow **moves into the function body (line 2)**. Analogy: Like reading a book and hitting \"see Appendix A\" -- you flip to the appendix page.\n\n**Python internals**: When a function is called, Python:\n1. **Pushes a new local frame** onto the call stack\n2. Moves execution flow to the first line of the function body (line 2)\n3. When the function finishes (return), pops the frame and **returns to the call site (line 5)**\n4. The returned value (object reference) is assigned to variable `a` on the left side of `=`\n\n**Caution**: Writing `a = get_list` without parentheses does **not call** the function -- it assigns the function object itself to `a`! You must use `()` to call it.\n\n**Execution order**: line 5 -> get_list() called -> new frame pushed onto call stack -> jump to line 2",
+        "visualizationType": "pythonMemory",
+        "code": "a = get_list()",
+        "pythonMemoryState": {
+          "note": "get_list() called -> about to jump to line 2",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the List (First Time)",
+        "explanation": "**`data = [1, 2, 3]`**\n\nInside the function, a **new list object `[1, 2, 3]`** is created. This object is stored at a specific location in memory (heap area), e.g., 0x2000.\n\n**Why create a new object every time?** In Python, the list literal `[1, 2, 3]` **always creates a new object every time it's evaluated**. This differs from integers (`42`) or strings (`\"hello\"`) -- those are immutable so the same value can be reused, but lists are mutable so an independent new object is always needed.\n\nAnalogy: Like a bread factory **baking a fresh new loaf**. The contents are the same as the previous loaf, but they are physically **separate loaves**.\n\n**Function Scope**: `data` is a **local variable** that exists only inside the function. When the function ends, this name disappears. But the name disappearing doesn't mean the object disappears! (If the reference is returned via return, the object survives.)\n\n**Execution order**: line 2 -> list object [1, 2, 3] created in heap (0x2000) -> data name bound to 0x2000 -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "data = [1, 2, 3]",
+        "pythonMemoryState": {
+          "note": "New list object 0x2000 created",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "data",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Returning the List (First Time)",
+        "explanation": "**`return data`**\n\nReturns a **reference** to the created list object (0x2000). This is the **most critical concept** of this lesson!\n\n**return passes a reference, not a copy!**\n1. Returns the **memory address (reference)** of the object that `data` points to\n2. Does **NOT copy** the list contents `[1, 2, 3]`!\n3. Returns to **line 5** after the function ends\n\nAnalogy: It's like telling a friend \"my home address\". You're not copying the entire house and giving it to them -- you're giving them the **address to find the same house**. The returned reference (address) is assigned to `a`, so `a` also **points to the same list object at 0x2000**.\n\n**Why does the object survive even after the data name disappears?** Python manages memory with **Reference Counting**. The `data` name disappears when the function ends, but since `a` references this object, the reference count doesn't reach 0 and the **garbage collector preserves the object**.\n\n**Python internals**: When return executes, the function's local frame is popped from the call stack, and the `data` local variable is destroyed. The returned reference value is assigned to `a` at the call site (line 5).\n\n**Execution order**: return data -> reference 0x2000 returned -> local frame released -> back to line 5 -> a = 0x2000 -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "return data",
+        "pythonMemoryState": {
+          "note": "a = 0x2000 (reference to first list)",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Second Function Call",
+        "explanation": "**`b = get_list()`**\n\n**Calls the same function a second time**. Again, execution flow moves to the **function body (line 2)**.\n\n**Critically important concept**: This call is a **completely independent new execution** from the previous one! It has **nothing to do** with the list (0x2000) created in the first call. Analogy: Placing a second order at the bread factory -- a **new loaf** is baked independently of the first one.\n\n**Python internals**: Every time a function is called:\n1. A **new local frame** is created on the call stack\n2. The previous call's local variables (`data`) have already been destroyed\n3. The function body is **executed from scratch**\n4. A new list object is created **independently**\n\n**Caution**: If the function modifies a **module-level variable (global variable)**, effects from previous calls could linger. But this function only uses local variables, so it's completely independent.\n\n**Execution order**: line 6 -> get_list() called -> new local frame created -> jump to line 2",
+        "visualizationType": "pythonMemory",
+        "code": "b = get_list()",
+        "pythonMemoryState": {
+          "note": "get_list() called again -> about to jump to line 2",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the List (Second Time)",
+        "explanation": "**`data = [1, 2, 3]`**\n\nCreates **yet another new** list object. This one is stored at a different memory location (e.g., 0x3000).\n\n**Why is it always a new object?** This is Python's **list creation rule**:\n- The list literal `[1, 2, 3]` **always creates a new object every time it's evaluated**\n- It is a **completely different object** (0x3000) from the first call's list (0x2000)\n- Even though the **contents are the same** (`[1, 2, 3]`), the **memory addresses are different**\n\nAnalogy: Baking bread with the same recipe twice produces two loaves that taste and look the same but are **physically different loaves**. Spreading jam on one doesn't put jam on the other!\n\n**Independent scope per function call**: Each function call has **its own local frame**, so this call's `data` and the previous call's `data` are completely different variables. They just share the same name.\n\n**Execution order**: line 2 -> new list object [1, 2, 3] created in heap (0x3000) -> data = 0x3000 -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "data = [1, 2, 3]",
+        "pythonMemoryState": {
+          "note": "New list object 0x3000 created (different from 0x2000!)",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "data",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Returning the List (Second Time)",
+        "explanation": "**`return data`**\n\nReturns a **reference** to the newly created list object (0x3000). The returned reference is assigned to `b`, so **`b` points to the 0x3000 object**.\n\n**Now let's confirm the critical difference**:\n- `a` -> **0x2000** (list created in the first call)\n- `b` -> **0x3000** (list created in the second call)\n- The two variables point to **different objects**!\n\nAnalogy: `a` was given a \"Gangnam district address\" and `b` a \"Seocho district address\". The houses at both addresses may have the same layout (contents), but they are **physically different houses**.\n\n**Python internals**: When return executes, the second call's local frame is popped from the call stack. The `data` local variable is destroyed, but the 0x3000 object is preserved because `b` references it. At this point, two independent list objects (0x2000, 0x3000) exist in memory.\n\n**What if we execute `a.append(4)`?** Only the list at 0x2000 that `a` points to becomes `[1, 2, 3, 4]`, while the list at 0x3000 that `b` points to remains `[1, 2, 3]`!\n\n**Execution order**: return data -> reference 0x3000 returned -> local frame released -> back to line 6 -> b = 0x3000 -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "return data",
+        "pythonMemoryState": {
+          "note": "b = 0x3000 (reference to second list, different from a)",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Variable a's Contents",
+        "explanation": "**`print(f\"a: {a}\")`**\n\nPrints the contents of the list (0x2000) that variable `a` points to. The result is `a: [1, 2, 3]`.\n\n**How the f-string works**: When `{a}` is evaluated, Python calls the `__repr__()` method of the list object `a` points to, producing the string representation `[1, 2, 3]`. This shows the list's **contents (value)**, not its **memory address**.\n\n**Visually, a and b look the same**: Both contain `[1, 2, 3]`. But looking the same doesn't mean they're the same object! Like twins who look identical but are different people, `a` and `b` have **the same contents but are separate objects**.\n\n**Execution order**: read a (0x2000 reference) -> call list's __repr__() -> evaluate f-string -> print executed -> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a: {a}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a: [1, 2, 3]"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Variable b's Contents",
+        "explanation": "**`print(f\"b: {b}\")`**\n\nPrints the contents of the list (0x3000) that variable `b` points to. The result is `b: [1, 2, 3]`.\n\n**The output of `a` and `b` is identical!** Both print `[1, 2, 3]`. But this just means **the two lists have the same contents (value)** -- in memory they are **completely different objects**.\n\n**Same value vs same object**:\n- **Same value (equality)**: `a == b` -> `True` (identical contents)\n- **Same object (identity)**: `a is b` -> `False` (different memory addresses)\n\nUnderstanding this difference is crucial in Python programming. Let's verify with the `is` operator in the next step.\n\n**Execution order**: read b (0x3000 reference) -> call list's __repr__() -> evaluate f-string -> print executed -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"b: {b}\")",
+        "pythonMemoryState": {
+          "output": [
+            "b: [1, 2, 3]"
+          ],
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Object Identity Check (is)",
+        "explanation": "**`print(f\"a is b: {a is b}\")`**\n\n**The `is` operator**: Checks whether two variables point to the **exact same object (same memory address)**.\n\n**How it works**:\n- `a is b` -> `0x2000 is 0x3000` -> **`False`**\n- `a` and `b` point to objects at **different memory addresses**\n\n**`is` vs `==` -- Two operators you must distinguish:**\n- `is`: Object **identity** -- \"Is it the same object?\" (compares memory addresses)\n- `==`: Object **equality** -- \"Are the contents the same?\" (compares values)\n- `a is b` -> `False` (different objects)\n- `a == b` -> `True` (same contents)\n\nAnalogy: Asking twin brothers \"Are you the same person?\" (is) -> \"No\" / \"Do you look the same?\" (==) -> \"Yes\"\n\n**Why `False`?** The `get_list()` function **re-evaluates** the `[1, 2, 3]` list literal each time it's called, creating an independent object. So `a` and `b` have the same contents but point to **different objects**.\n\n**Final conclusion of this lesson**: In Python, `return` returns a **reference (address)** to an object. It does not copy the value! But since list literals create new objects each time they're evaluated, calling the same function twice produces **two different objects**.\n\n**Execution order**: evaluate a is b -> id(a) != id(b) -> False -> evaluate f-string -> print executed -> program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a is b: {a is b}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a is b: False"
+          ],
+          "note": "a and b are different objects (0x2000 != 0x3000)",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the result?\n\ndef get_data():\n    return [1, 2, 3]\n\nx = get_data()\ny = get_data()\nx.append(4)\nprint(y)",
+    "options": [
+      "[1, 2, 3, 4]",
+      "[1, 2, 3]",
+      "[4]",
+      "Error"
+    ],
+    "correctIndex": 1,
+    "explanation": "get_data() creates a new list every time it's called.\nx and y point to different objects, so modifying x doesn't affect y."
+  },
+  "misconceptions": [
+    {
+      "wrong": "return copies the value and returns it",
+      "correct": "return returns a reference to the object",
+      "why": "In Python, all passing is reference passing.\nNo copying occurs."
+    },
+    {
+      "wrong": "Objects created inside a function disappear when the function ends",
+      "correct": "Objects continue to exist as long as they have references",
+      "why": "Python manages memory with reference counting.\nAs long as something references the object, it stays alive."
+    }
+  ],
+  "keyTakeaway": "return sends back a reference to the object! Not a copy, but making another name point to the same object!"
+}

@@ -1,0 +1,325 @@
+{
+  "lessonId": "py-4-4",
+  "title": "Modules & Imports",
+  "concept": "导入其他文件中的代码来使用（库）",
+  "content": {
+    "code": "import math\n\n# 1. 모듈 전체 가져오기\nprint(math.pi)\nprint(math.sqrt(16))\n\n# 2. 특정 함수만 가져오기\nfrom random import randint\nprint(randint(1, 10))\n\n# 3. 별명 붙이기 (Alias)\nimport datetime as dt\nnow = dt.datetime.now()\nprint(now)",
+    "steps": [
+      {
+        "title": "导入模块（import）",
+        "explanation": "**`import math`**\n\nPython 从上到下按顺序执行。\n用 `import` 关键字将包含**数学相关函数和常量**的 `math` 模块**整个**导入。\n\n**什么是模块（Module）？** 允许复用其他 Python 文件（`.py`）中定义的函数、类、变量的**代码库**。类比：借用别人做好的**工具箱**。`math` 是数学工具箱，`random` 是随机数工具箱。\n\n**使用方法**：以 `math.函数名` 或 `math.变量名` 的格式访问。`math.` 前缀是**必须的**！这个前缀明确了\"这个函数来自 math 模块\"。\n\n**Python 内部机制**：执行 `import math` 时：\n1. Python 在 `sys.path` 注册的路径中搜索 `math` 模块\n2. 找到后**只加载和执行一次**（之后的 import 使用缓存）\n3. 创建模块对象并在当前命名空间中绑定为 `math`\n4. 缓存在 `sys.modules['math']` 中\n\n**注意**：`import` 通常放在**文件最上方**（PEP 8 惯例）。放在代码中间也能运行，但会降低可读性。\n\n**执行顺序**：import math -> 搜索 + 加载 math 模块 -> 注册到命名空间 -> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "import math",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "math 模块已加载",
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "使用模块的常量",
+        "explanation": "**`print(math.pi)`**\n\n访问并输出 `math` 模块中定义的常量 `pi`（圆周率，约 3.141592653589793）。\n\n**为什么是 `math.pi`？** 因为 `pi` 存在于 `math` 模块的**命名空间（namespace）**中，必须加 `math.` 前缀。\n\n类比：要从工具箱（math 模块）中取特定工具（pi），必须明确指定\"从 math 箱子里取 pi\"。只说 `pi` 的话，Python 会在当前作用域查找，找不到就报 `NameError`。\n\n**命名空间的优点**：如果你的代码中也有 `pi = 3.14`？`math.pi` 和 `pi` 在**不同的命名空间**中，不会冲突！这是 `import math` 方式的一大优点。\n\n**Python 内部机制**：访问 `math.pi` 时，Python 在 `math` 模块对象的 `__dict__` 字典中查找 `'pi'` 键并返回其值。`math.pi` 是在 C 扩展模块中定义的 `float` 常量。\n\n**执行顺序**：访问 math.pi -> 读取 3.141592653589793 -> 执行 print -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "print(math.pi)",
+        "pythonMemoryState": {
+          "output": [
+            "3.141592653589793"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "使用模块的函数",
+        "explanation": "**`print(math.sqrt(16))`**\n\n调用 `math` 模块的 `sqrt` 函数（Square Root，平方根），计算 16 的平方根 `4.0` 并输出。\n\n**为什么结果是 `4.0` 而不是 `4`？** `math.sqrt()` 总是返回 **float（浮点数）**类型。即使结果是整数，也会带小数点如 `4.0`。\n\n**`math` 模块的常用函数：**\n- `math.sqrt(x)` -> x 的平方根\n- `math.ceil(x)` -> 向上取整（如 `math.ceil(3.1)` -> `4`）\n- `math.floor(x)` -> 向下取整（如 `math.floor(3.9)` -> `3`）\n- `math.pow(x, y)` -> x 的 y 次方\n- `math.log(x)` -> 自然对数\n\n**Python 内部机制**：`math.sqrt` 实际上是用 C 语言实现的函数。Python 的 `math` 模块是对 C 标准库数学函数的封装（wrapping），因此比纯 Python **快得多**。\n\n**注意**：`math.sqrt(-1)` 会引发 `ValueError`！需要负数的平方根请使用 `cmath`（复数数学）模块。\n\n**执行顺序**：调用 math.sqrt(16) -> 在 C 库中计算 -> 返回 4.0 -> print(4.0) -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "print(math.sqrt(16))",
+        "pythonMemoryState": {
+          "output": [
+            "4.0"
+          ],
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "只导入特定函数（from）",
+        "explanation": "**`from random import randint`**\n\n**from ... import ... 语法**：从 `random` 模块中**只选择 `randint` 函数**直接导入到当前命名空间。\n\n**核心区别——`import` vs `from import`：**\n- `import math` -> `math.sqrt()`（**需要**模块名前缀）\n- `from math import sqrt` -> `sqrt()`（**不需要**前缀，直接使用）\n\n类比：`import math` 是把整个工具箱（math）搬来，每次用时说\"从 math 箱子里拿\"。`from random import randint` 是**只把特定工具（randint）取出**放到自己的工作台上。现在伸手就能拿到，所以不需要前缀。\n\n**注意**：用 `from random import *` 星号（`*`）会导入模块的**所有内容**。看起来方便但有名称冲突风险，**强烈不建议使用**！",
+        "visualizationType": "pythonMemory",
+        "code": "from random import randint",
+        "pythonMemoryState": {
+          "note": "只直接导入了 randint 函数",
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "直接使用导入的函数",
+        "explanation": "**`print(randint(1, 10))`**\n\n**确认 from import 的优势**：不是 `random.randint(1, 10)`，而是直接用 `randint(1, 10)` 调用，无需前缀！因为我们用 `from random import randint` 直接导入了。\n\n**`randint(1, 10)` 的含义**：返回 1 到 10（**含两端**）的随机整数。每次运行结果不同！（这里假设返回了 7。）\n\n**注意——`randint` 的范围**：`randint(a, b)` **包含** `a` 和 `b`。即 `randint(1, 10)` 返回 1, 2, 3, ..., 10 中的一个。注意这与 Python 的 `range(1, 10)` 不包含 10 不同！\n\n**Python 内部机制**：`randint()` 内部使用伪随机数生成器（Mersenne Twister 算法）。不是完全随机，而是由种子（seed）值决定的数列，但对一般用途足够。需要加密安全性请使用 `secrets` 模块。\n\n**执行顺序**：调用 randint(1, 10) -> 返回随机整数（如 7）-> 执行 print(7) -> line 12",
+        "visualizationType": "pythonMemory",
+        "code": "print(randint(1, 10))",
+        "pythonMemoryState": {
+          "output": [
+            "7"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "用别名导入（as）",
+        "explanation": "**`import datetime as dt`**\n\n用 `as` 关键字给 `datetime` 模块设置**短别名 `dt`**。\n\n**什么是别名（Alias）？** 可以代替原名使用的**替代名称**。类比：朋友名字叫\"亚历山大\"，每次叫太长了所以叫\"小亚\"。`datetime` 太长了，我们就叫它 `dt`。\n\n**注意**：设置别名后**不能再使用原名**！`dt.datetime` 可以，但 `datetime.datetime` 会报 `NameError`。别名**完全替代**原名。\n\n**什么时候使用？**\n- 模块名**很长**时：`datetime` -> `dt`（8个字符 -> 2个！）\n- 遵循**行业惯例**时：`import numpy as np`、`import pandas as pd`、`import matplotlib.pyplot as plt`\n- **避免名称冲突**时：代码中已有同名变量",
+        "visualizationType": "pythonMemory",
+        "code": "import datetime as dt",
+        "pythonMemoryState": {
+          "note": "datetime 模块设置别名为 dt",
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "dt",
+              "pointsTo": "module2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "module2",
+              "type": "module",
+              "value": "<module 'datetime'>",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "通过别名使用模块",
+        "explanation": "**`now = dt.datetime.now()`**\n\n用别名 `dt` 调用 `datetime` 模块中 `datetime` 类的 `now()` 方法。创建包含计算机**当前日期和时间信息**的 `datetime` 对象，赋值给 `now` 变量。\n\n类比：就像\"北京市北京站\"——市（模块）名和站（类）名相同。所以也常用 `from datetime import datetime` 直接导入类。\n\n**注意**：`dt.datetime.now()` 返回**本地时间**。需要 UTC 时间请用 `dt.datetime.utcnow()` 或 `dt.datetime.now(dt.timezone.utc)`。\n\n**为什么是 `dt.datetime`？** 这是 Python 中容易混淆的部分！这里出现了**两个 `datetime`**：\n- `dt` = `datetime` **模块**（文件/包）\n- `dt.datetime` = 模块内定义的 `datetime` **类**\n- 也就是说，`datetime` 模块中有一个同名的 `datetime` 类！",
+        "visualizationType": "pythonMemory",
+        "code": "now = dt.datetime.now()",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "dt",
+              "pointsTo": "module2"
+            },
+            {
+              "name": "now",
+              "pointsTo": "datetime1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "module2",
+              "type": "module",
+              "value": "<module 'datetime'>",
+              "pyId": "1003"
+            },
+            {
+              "id": "datetime1",
+              "type": "datetime",
+              "value": "2024-01-15 10:30:00",
+              "pyId": "1004"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "输出结果",
+        "explanation": "**`print(now)`**\n\n输出 `now` 变量中存储的当前时间对象。以 `2024-01-15 10:30:00` 格式显示。\n\n**为什么输出这么整齐？** `datetime` 对象定义了 **`__str__` 魔术方法**，用 `print()` 输出时自动转换为 `YYYY-MM-DD HH:MM:SS` 格式字符串。这是 Python 对象的强大功能。\n\n**想用其他格式输出？** 使用 `strftime()` 方法：\n- `now.strftime(\"%Y-%m-%d\")` -> \"2024-01-15\"\n- `now.strftime(\"%H:%M\")` -> \"10:30\"\n\n**本课核心总结——3种 import 方式：**\n- `import math` -> `math.pi`、`math.sqrt()`（需要模块名前缀）\n- `from random import randint` -> `randint()`（直接使用，无需前缀）\n- `import datetime as dt` -> `dt.datetime.now()`（使用短别名）\n\n**用哪种方式？**\n- 使用模块的多个功能时 -> `import 模块` 或 `import 模块 as 别名`\n- 只用特定 1-2 个功能时 -> `from 模块 import 功能`\n- **绝对不要**用 `from 模块 import *`！（名称冲突风险）\n\n**执行顺序**：读取 now -> 自动调用 now.__str__() -> 创建 \"2024-01-15 10:30:00\" 字符串 -> 执行 print -> 程序结束",
+        "visualizationType": "pythonMemory",
+        "code": "print(now)",
+        "pythonMemoryState": {
+          "output": [
+            "2024-01-15 10:30:00"
+          ],
+          "names": [
+            {
+              "name": "math",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "randint",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "dt",
+              "pointsTo": "module2"
+            },
+            {
+              "name": "now",
+              "pointsTo": "datetime1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "<module 'math'>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "module2",
+              "type": "module",
+              "value": "<module 'datetime'>",
+              "pyId": "1003"
+            },
+            {
+              "id": "datetime1",
+              "type": "datetime",
+              "value": "2024-01-15 10:30:00",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如何在其他文件中导入自己写的 `my_lib.py`？",
+    "options": [
+      "include my_lib",
+      "import my_lib.py",
+      "import my_lib",
+      "require my_lib"
+    ],
+    "correctIndex": 2,
+    "explanation": "去掉 `.py` 扩展名，只用文件名 `import` 即可。\n（但文件必须在同一文件夹中或路径已配置）"
+  },
+  "misconceptions": [
+    {
+      "wrong": "from import * 方便又好用",
+      "correct": "尽量不要使用（通配符导入）。",
+      "why": "导入模块中的所有名称可能与你的变量名冲突（名称冲突），而且难以追溯来源。"
+    }
+  ],
+  "keyTakeaway": "用 `import` 借用别人造好的轮子（库）。去掉 `*.py` 只用名字！"
+}

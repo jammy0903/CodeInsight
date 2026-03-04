@@ -1,0 +1,104 @@
+{
+  "lessonId": "js-1-2",
+  "title": "setTimeout 与任务队列",
+  "concept": "即使 setTimeout(fn, 0) 也不会立即执行。它会通过 Web API 进入任务队列",
+  "content": {
+    "code": "console.log('start');\n\nsetTimeout(() => {\n  console.log('timeout');\n}, 0);\n\nconsole.log('end');",
+    "steps": [
+      {
+        "title": "执行 console.log('start')",
+        "explanation": "程序开始运行，第一行同步代码 `console.log('start')` 被压入调用栈并立即执行。\n输出 'start'。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('start');",
+        "eventLoopState": {
+          "callStack": [
+            "console.log('start')"
+          ],
+          "output": [
+            "start"
+          ]
+        }
+      },
+      {
+        "title": "委托 setTimeout",
+        "explanation": "当 JS 引擎遇到 `setTimeout` 时，它会将计时器的设置和回调函数委托给浏览器的 Web API。\nJS 引擎不会等待计时器——它会立即执行下一行代码。\n\n**类比**：就像在餐厅点餐（setTimeout），拿到叫号器（回调函数），然后坐下来做其他事情（执行后续代码），同时厨房（Web API）准备你的食物。食物做好时叫号器会响。",
+        "keyInsight": "JavaScript 引擎自身不计时——它将这个工作交给浏览器。",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(() => {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [
+            {
+              "name": "setTimeout callback",
+              "delay": 0
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 console.log('end')",
+        "explanation": "因为 `setTimeout` 已经交给了 Web API，主线程不会阻塞——它立即执行下一行同步代码 `console.log('end')`。\n输出 'end'。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('end');",
+        "eventLoopState": {
+          "callStack": [
+            "console.log('end')"
+          ],
+          "webApis": [],
+          "taskQueue": [
+            "setTimeout callback"
+          ],
+          "output": [
+            "start",
+            "end"
+          ]
+        }
+      },
+      {
+        "title": "执行回调函数",
+        "explanation": "当所有同步代码执行完毕且调用栈为空时，事件循环从任务队列中取出 `setTimeout` 回调函数并压入调用栈。\n此时回调内的 `console.log('timeout')` 才会执行。",
+        "keyInsight": "异步回调总是在所有同步代码执行完毕之后才运行。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('timeout');",
+        "eventLoopState": {
+          "callStack": [
+            "() => { ... }",
+            "console.log('timeout')"
+          ],
+          "taskQueue": [],
+          "output": [
+            "start",
+            "end",
+            "timeout"
+          ],
+          "webApis": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "setTimeout(() => console.log('A'), 0) 和 console.log('B') 的输出顺序是什么？",
+    "options": [
+      "A → B（setTimeout 是 0ms 所以先执行）",
+      "B → A（同步代码先执行）",
+      "同时打印",
+      "随机顺序"
+    ],
+    "correctIndex": 1,
+    "explanation": "即使 setTimeout(fn, 0) 也需要经过 Web API → 任务队列的流程。\n只有当所有同步代码（console.log('B')）执行完毕后，任务队列中的回调才会执行。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "setTimeout(fn, 0) 会立即执行",
+      "correct": "不会。\n0ms 之后它只是进入了"任务队列"——它还需要等待。",
+      "why": "**运行至完成（Run-to-Completion）**：在调用栈上的所有代码**完全执行完毕**之前，事件循环无法将任何新任务压入栈中。\n即使是 0ms 也意味着"稍后执行"。"
+    }
+  ],
+  "keyTakeaway": "setTimeout = 注册到 Web API → 计时器触发后进入任务队列 → 调用栈为空时执行"
+}

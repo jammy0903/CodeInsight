@@ -1,0 +1,402 @@
+{
+  "lessonId": "py-9-1",
+  "title": "Closures: Functions That Remember Their Parent's Variables",
+  "concept": "When a function inside another function references variables from the enclosing (outer) function, a 'closure' is created.",
+  "content": {
+    "code": "def outer_func(x):\n    # 바깥 함수의 지역 변수\n    def inner_func(y):\n        # 바깥 함수의 변수 x를 참조\n        return x * y\n    return inner_func\n\n# 클로저 생성\ntimes_2 = outer_func(2)\ntimes_3 = outer_func(3)\n\n# 클로저는 바깥 함수의 변수를 기억\nprint(f\"times_2(5) = {times_2(5)}\")\nprint(f\"times_3(5) = {times_3(5)}\")",
+    "steps": [
+      {
+        "title": "Defining outer_func",
+        "explanation": "**`def outer_func(x):`**\n\n**We define the outer function.**\nThis function contains another function (`inner_func`) inside it, forming a 'nested function' structure.\n\n**Analogy**: Think of a Russian nesting doll (matryoshka).\n- The outer doll is `outer_func`, and the smaller doll `inner_func` is inside it\n- You have to open (call) the outer doll to get the inner one out\n\n**Under the hood**: When Python encounters this `def` statement, it creates a function object (0x1100) in memory and registers the name `outer_func` in the global namespace.\nThe function body is not executed yet -- it's merely registered as 'this function exists'.\n\n**Why this order?** Since the program executes from top to bottom, functions must be defined before they can be used.\n\n**Note**: `def` 'defines' a function, not 'executes' it. The code inside the function only runs later when you call it like `outer_func(2)`.",
+        "visualizationType": "pythonMemory",
+        "code": "def outer_func(x):",
+        "highlightOffset": [
+          0,
+          2,
+          4,
+          5
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "outer_func (0x1100) has been defined.",
+          "names": [
+            {
+              "name": "outer_func",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling outer_func(2)",
+        "explanation": "**`times_2 = outer_func(2)`**\n\n**We call `outer_func` and pass the value `2` to parameter `x`.**\n\nTwo things happen in this single line:\n1. **Right side**: `outer_func(2)` is called and the function body executes\n2. **Left side**: The result (return value) gets stored in `times_2`\n\n**Analogy**: It's like submitting an order form (x=2) to a factory.\n- The factory (`outer_func`) starts up and creates a specialized machine (`inner_func`) that remembers the number 2 from the order form, then returns it\n\n**Under the hood**: When Python encounters `outer_func(2)`, a new **local scope** is created. Within this scope, the variable `x` is bound to the integer `2`.\n\n**Why this order?** To create a closure, you must 'call' the outer function. Only when called does `inner_func` get defined, and only then does it capture the current value of `x`.\n\n**Note**: `times_2` hasn't been assigned yet. It will only be assigned when `outer_func(2)` finishes executing and `return`s.",
+        "visualizationType": "pythonMemory",
+        "code": "times_2 = outer_func(2)",
+        "pythonMemoryState": {
+          "note": "outer_func is executing with x=2.",
+          "names": [
+            {
+              "name": "x",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining inner_func (x=2 environment)",
+        "explanation": "**`def inner_func(y):`**\n\n**While `outer_func(2)` is executing, the inner function `inner_func` is defined.**\n\nThis is where the core of closures happens:\n- `inner_func`'s body contains `return x * y`, but `x` is not its own variable\n- `x` is a parameter of the outer function `outer_func`\n- Python detects this situation and stores `x` in a special container called a **Cell object (0x3000)**\n\n**Analogy**: It's like writing \"x=2\" on a sticky note and putting it in `inner_func`'s bag.\nNo matter where `inner_func` runs later, it can check the sticky note in its bag to know that `x` is 2.\n\n**Under the hood**: Python already identifies at compile time that `inner_func` references the outer variable `x`. So it wraps `x` in a Cell object and stores a reference to this Cell in `inner_func.__closure__`.\n\n**Why this order?** The `def` statement creates a new function object each time the function runs. The `inner_func` created during the `outer_func(2)` call is specific to the `x=2` environment.\n\n**Note**: Even though it's the same `def inner_func(y):` code, each time `outer_func` is called, a **different** function object is created. This is what makes it different from a regular function.",
+        "visualizationType": "pythonMemory",
+        "code": "def inner_func(y):",
+        "highlightOffset": [
+          0,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "inner_func (0x2000) is created. x=2 is stored in Cell (0x3000).",
+          "names": [
+            {
+              "name": "x",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "inner_func",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Returning the Closure (1)",
+        "explanation": "**`return inner_func`**\n\n**We return the `inner_func` function object itself.** Not a call (`inner_func()`), but the function itself.\n\nThis is the moment the closure is complete:\n- When `outer_func(2)` finishes executing, its local scope is destroyed\n- However, `inner_func` still references `x=2` through the Cell object\n- A function that **remembers variables from outside its own scope** like this is called a 'closure'\n\n**Analogy**: Even after the factory (`outer_func`) closes its doors, the machine (`inner_func`) built there can still operate outside because it carries the factory's blueprint (x=2) with it.\n\n**Under the hood**: When `return inner_func` executes, this function object is assigned to `times_2` at the call site `times_2 = outer_func(2)`. Now `times_2` is a closure that remembers `x=2`.\n\n**Why this order?** The purpose of the outer function is to 'create and export a closure'. The inner function must be returned via `return` to be usable externally.\n\n**Note**: `return inner_func` and `return inner_func()` are completely different! Without parentheses, you return the function itself; with parentheses, you return the function's execution result.",
+        "visualizationType": "pythonMemory",
+        "code": "return inner_func",
+        "pythonMemoryState": {
+          "note": "The variable times_2 now points to the closure (0x2000).",
+          "names": [
+            {
+              "name": "times_2",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "closure",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling outer_func(3)",
+        "explanation": "**`times_3 = outer_func(3)`**\n\n**We call the same `outer_func`, this time with `x=3`.**\n\nThis is a completely independent new call from the previous `outer_func(2)`.\nA new local scope is created, and within this scope, `x` is `3`.\n\n**Analogy**: It's like submitting a new order form \"x=3\" to the same factory.\n- A completely new machine is built, separate from the previous one (x=2) that produced `times_2`\n\n**Under the hood**: Python creates a completely independent execution frame from the previous `outer_func(2)` call. The Cell for `times_2` and the Cell that will be created here have different memory addresses.\n\n**Why this order?** This demonstrates the power of closures. When you call the same function with different arguments, each call creates a separate closure that remembers different values.\n\n**Note**: `times_2` and `times_3` are based on the same code (`inner_func`), but they are completely separate function objects that remember different `x` values.",
+        "visualizationType": "pythonMemory",
+        "code": "times_3 = outer_func(3)",
+        "pythonMemoryState": {
+          "note": "This time outer_func is executing with x=3.",
+          "names": [
+            {
+              "name": "times_2",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "x",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "closure",
+              "pyId": "1003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining inner_func (x=3 environment)",
+        "explanation": "**`def inner_func(y):`**\n\n**This time, a completely new `inner_func` is defined that remembers the `x=3` environment.**\n\nThis is the core mechanism of closures:\n- The `inner_func` created in the first call (`outer_func(2)`) stores `x=2` in Cell (0x3000)\n- The `inner_func` created in this call (`outer_func(3)`) stores `x=3` in a **separate** Cell (0x3100)\n- The two Cells exist in completely different memory regions\n\n**Analogy**: It's like two cars built from the same blueprint but painted in different colors (x=2 is blue, x=3 is red).\n\n**Under the hood**: A new function object (0x2100) is created and a new `__closure__` tuple is assigned. The Cell inside this tuple references `x=3`.\n\n**Why this order?** The `def` statement creates a new function object each time it's executed. The previous `inner_func` (0x2000) and this `inner_func` (0x2100) are different objects.",
+        "visualizationType": "pythonMemory",
+        "code": "def inner_func(y):",
+        "highlightOffset": [
+          0,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "A new inner_func (0x2100) is created. x=3 is stored in a separate Cell (0x3100).",
+          "names": [
+            {
+              "name": "x",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "inner_func",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "function",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Returning the Closure (2)",
+        "explanation": "**`return inner_func`**\n\n**We return the second closure (the `inner_func` that remembers `x=3`).**\nThis return value gets stored in `times_3`.\n\nNow there are two independent closures in memory:\n- `times_2` -> `inner_func` (0x2000), Cell stores `x=2`\n- `times_3` -> `inner_func` (0x2100), Cell stores `x=3`\n\n**Analogy**: Two machines from the same factory, but with different settings.\n- Machine A (`times_2`): whatever material you put in, it always multiplies by 2\n- Machine B (`times_3`): whatever material you put in, it always multiplies by 3\n\n**Under the hood**: The execution frame of `outer_func(3)` terminates, but Cell (0x3100) is not garbage collected because it's still referenced through `times_3.__closure__`.\n\n**Why this order?** By returning the second closure, both `times_2` and `times_3` are now ready to use.",
+        "visualizationType": "pythonMemory",
+        "code": "return inner_func",
+        "pythonMemoryState": {
+          "note": "times_3 points to 0x2100. times_2 and times_3 are different objects.",
+          "names": [
+            {
+              "name": "times_2",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "times_3",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "closure(x=2)",
+              "pyId": "1003"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "closure(x=3)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling times_2(5)",
+        "explanation": "**`print(f\"times_2(5) = {times_2(5)}\")`**\n\n**We call the closure `times_2` with `y=5`.**\n\nSince `times_2` is actually `inner_func`, this is the same as calling `inner_func(5)`.\nThe parameter `y` of `inner_func` receives the value `5`.\n\n**The key thing to remember**: `inner_func`'s body is `return x * y`, and here `x` is retrieved from the Cell where the value `2` is stored.\n- `x` = value from Cell = **2** (the value the closure remembers)\n- `y` = the value just passed = **5** (the argument given at call time)\n\n**Analogy**: This is the moment we feed material 5 into the 2x machine (`times_2`).\nThe machine uses its internally stored setting (x=2) to perform the calculation.\n\n**Why this order?** The purpose of creating a closure is ultimately to 'use it'. Now we verify that the closure works correctly.\n\n**Note**: Even though the `outer_func(2)` call has already ended, the value `x=2` is still alive. This is the magic of closures!",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"times_2(5) = {times_2(5)}\")",
+        "pythonMemoryState": {
+          "note": "Executing times_2: uses x=2 stored in the Cell.",
+          "names": [
+            {
+              "name": "x",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "y",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing times_2 (2 * 5)",
+        "explanation": "**`return x * y`**\n\n**Multiplies `x=2` (from the Cell) and `y=5` (the parameter) to return `10`.**\n\nStep-by-step calculation:\n1. Reference `x` -> retrieve value `2` from Cell (0x3000)\n2. Reference `y` -> retrieve value `5` from local variable\n3. Compute `2 * 5 = 10`\n4. Return `10`\n\nThe returned `10` is converted to a string inside the f-string of `print`, outputting `\"times_2(5) = 10\"`.\n\n**Analogy**: The 2x machine received material 5 and produced 10. The machine's internal setting (x=2) remains unchanged.\n\n**Under the hood**: Python uses the `LOAD_DEREF` bytecode to retrieve the value of `x` from the Cell object. This is a different mechanism from regular local variable access (`LOAD_FAST`).\n\n**Note**: What a closure remembers is not a 'value' but a 'reference to a variable'. If `x` pointed to a mutable object, it could be modified from within the closure.",
+        "visualizationType": "pythonMemory",
+        "code": "return x * y",
+        "pythonMemoryState": {
+          "output": [
+            "times_2(5) = 10"
+          ],
+          "note": "The result 10 has been printed.",
+          "names": [
+            {
+              "name": "x",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "y",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling times_3(5)",
+        "explanation": "**`print(f\"times_3(5) = {times_3(5)}\")`**\n\n**This time we call the closure `times_3` with `y=5`.**\n\nSince `times_3` was created by `outer_func(3)`, its Cell (0x3100) stores `x=3`.\nEven though we pass the same `y=5`, the result will be different because the remembered `x` value is different.\n\n**Analogy**: This time we're feeding the same material 5 into the 3x machine (`times_3`).\nSame material, but since the machine's setting is different, it produces a different result.\n\n**Key point**: `times_2` and `times_3` each have their own independent Cell, so calling one does not change the other's `x` value.\n\n**Why this order?** Having verified the closure's behavior with `times_2(5)`, we now prove with `times_3(5)` that different closures operate independently.\n\n**Note**: `times_2`'s `x` is 2 and `times_3`'s `x` is 3. They don't interfere with each other. This is 'state isolation' in closures.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"times_3(5) = {times_3(5)}\")",
+        "pythonMemoryState": {
+          "note": "Executing times_3: uses x=3 stored in Cell 0x3100.",
+          "names": [
+            {
+              "name": "x",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing times_3 (3 * 5)",
+        "explanation": "**`return x * y`**\n\n**Multiplies `x=3` (from the Cell) and `y=5` (the parameter) to return `15`.**\n\nCalculation:\n1. Reference `x` -> retrieve value `3` from Cell (0x3100)\n2. Reference `y` -> retrieve value `5` from local variable\n3. Compute `3 * 5 = 15`\n4. Return `15`\n\nFinal output: `\"times_3(5) = 15\"`\n\n**In summary**: Two closures born from the same `outer_func` produced different results.\n- `times_2(5)` = 2 * 5 = **10** (remembers x=2)\n- `times_3(5)` = 3 * 5 = **15** (remembers x=3)\n\nThis is the core value of closures. **They allow functions to have 'state'.**\n\n**Practical use**: Closures are widely used in decorators, callback functions, event handlers, and more. They are the foundational technique for the decorator pattern you'll learn in the next lesson.\n\n**Note**: Overusing closures can cause memory leaks. Since Cell objects maintain references, the referenced variables won't be garbage collected as long as the closure is alive.",
+        "visualizationType": "pythonMemory",
+        "code": "return x * y",
+        "pythonMemoryState": {
+          "output": [
+            "times_3(5) = 15"
+          ],
+          "note": "The result 15 has been printed.",
+          "names": [
+            {
+              "name": "x",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What does a closure remember?",
+    "options": [
+      "Global variables at the time of the call",
+      "Variables from the enclosing scope at the time it was defined",
+      "Only its own local variables",
+      "It doesn't remember anything"
+    ],
+    "correctIndex": 1,
+    "explanation": "The essence of a closure is that it remembers the environment (scope) where it was 'defined', and uses that memory even when 'called' from a different location."
+  },
+  "misconceptions": [
+    {
+      "wrong": "All nested functions are closures.",
+      "correct": "A nested function becomes a closure only when it references variables from its enclosing (non-global) scope.",
+      "why": "If it doesn't reference any outer variables, there's no need to remember the environment."
+    }
+  ],
+  "keyTakeaway": "A closure 'remembers' the environment (scope) where it was defined. This allows you to create functions that carry state."
+}

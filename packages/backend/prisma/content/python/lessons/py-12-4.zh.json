@@ -1,0 +1,284 @@
+{
+  "lessonId": "py-12-4",
+  "title": "raise和自定义异常",
+  "concept": "创建自己的错误并主动抛出！raise和自定义Exception类",
+  "content": {
+    "code": "class AgeError(Exception):\n    def __init__(self, age):\n        self.age = age\n        super().__init__(f\"Invalid age: {age}\")\n\ndef check_age(age):\n    if age < 0 or age > 150:\n        raise AgeError(age)\n    return f\"Age {age} is valid\"\n\ntry:\n    result = check_age(200)\nexcept AgeError as e:\n    print(f\"Caught: {e}\")\n    print(f\"Invalid value was: {e.age}\")",
+    "steps": [
+      {
+        "title": "自定义异常类",
+        "explanation": "**`class AgeError(Exception):`** 声明了一个专用于年龄验证的自定义异常。\n\n核心要点：\n- 比通用的 `ValueError` 更有明确的含义\n- 可以用 `except AgeError` 精确捕获\n- 可以在异常对象中携带错误的值（如age）\n\n**类比：** 贴上"年龄规则违反"而不是"发现问题"的标签，处理速度会快得多。\n\n实践要点：\n- 有领域规则的验证（年龄、权限、状态转换）使用自定义异常更有利于维护\n- 异常类通常通过继承 `Exception` 来编写",
+        "visualizationType": "pythonMemory",
+        "code": "class AgeError(Exception):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "自定义异常类已定义",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义验证函数",
+        "explanation": "**`def check_age(age):`** -- 定义一个验证年龄的函数。创建一个 `function` 对象并贴上 `check_age` 标签。\n\n这个函数的核心逻辑是**输入值验证（validation）**：\n- 如果 `age < 0` 或 `age > 150` -> **抛出AgeError**\n- 如果年龄有效 -> 返回成功消息\n\n**什么是`raise`？** 如果except是**捕获（catch）**错误，那么raise就是**故意抛出（throw）**错误。\n```python\nraise 错误类(参数)  # 直接抛出错误\n```\n\n**类比：** raise就像足球裁判的**红牌**。当球员（代码）犯规（错误输入）时，裁判（raise）立即停止比赛并将其罚下（抛出错误）。没有裁判的话，犯规就会被放过，比赛（程序）就会变得混乱。\n\n**Python内部机制：** 当 `def` 语句执行时，函数的字节码会被编译成代码对象。`raise` 语句被编译为 `RAISE_VARARGS` 字节码指令。此时函数只是被定义，内部代码并未执行。\n\n**为什么要用raise？** 如果错误输入被默默忽略，以后可能在意想不到的地方出现更大的问题。**立即、明确地告知"这个值不行！"**能提高程序的稳定性。这就是所谓的**"快速失败（Fail Fast）"**原则。\n\n**执行顺序：** `def check_age(age):` -> 创建函数对象 -> 移到下一行（try块）",
+        "visualizationType": "pythonMemory",
+        "code": "def check_age(age):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "check_age函数已定义",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "函数调用 -- 年龄验证开始",
+        "explanation": "**`result = check_age(200)`** -- 在try块内以参数**200**调用 `check_age`。\n\n跳转到函数内部。创建新的栈帧，参数 `age` 绑定到整数 `200`。\n\n**`if age < 0 or age > 150:`** -- 评估条件：\n- `200 < 0` -> **False**（200大于0）\n- `200 > 150` -> **True**（200大于150）\n- `False or True` -> **True**（`or` 运算：只要有一个为True，整体就为True）\n\n**类比：** 就像机场安检。检查护照（年龄值）："是否过期（< 0）或伪造（> 150）？"200岁的护照明显是伪造的，不会放行！\n\n**Python内部机制：** `or` 运算符使用**短路求值（short-circuit evaluation）**。如果左边为 `True`，则不检查右边。但这里左边（`200 < 0`）为 `False`，所以右边（`200 > 150`）也会被评估。条件为 `True`，所以执行if块的代码。\n\n**注意：** 200岁在现实中是不可能的年龄。这种**业务逻辑验证**必须由程序员自己实现。Python不会自动判断"年龄太大"。\n\n**执行顺序：** 调用 `check_age(200)` -> 绑定 `age=200` -> `if 200 < 0 or 200 > 150:` -> True! -> 进入if块",
+        "visualizationType": "pythonMemory",
+        "code": "    if age < 0 or age > 150:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "age=200, 200 > 150 -> 条件为True！",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 200,
+              "pyId": "4003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "raise -- 直接抛出错误！",
+        "explanation": "**`raise AgeError(age)`** -- **raise**关键字直接抛出 `AgeError(200)` 异常！\n\n这一行会按顺序发生多件事：\n1. `AgeError(200)` -> 调用类的 `__init__` 方法\n2. `self.age = 200` -> 将错误的年龄值存入错误对象\n3. `super().__init__(\"Invalid age: 200\")` -> 设置错误消息为 `\"Invalid age: 200\"`\n4. **raise** -> 抛出这个错误对象！\n\n**类比：** 就像消防员亲自按下火警报警器（raise）。不是自动检测到的火灾（如ZeroDivisionError），而是消防员（程序员）亲自发现危险情况（错误输入）并拉响警报。\n\n**Python内部机制：** 当 `raise` 语句执行时：\n1. `AgeError(200)` 调用在堆上创建异常对象\n2. 解释器的错误标志被设置\n3. 当前函数的剩余代码（`return f\"Age {age} is valid\"`）**不会被执行**\n4. 错误从函数传播到**调用方（try块）**\n5. try块寻找能捕获此错误的except\n\n**注意：** 也可以在 `raise` 后只写**异常类**而不写异常对象：`raise AgeError`（无参数）。这种情况会默认构造为 `AgeError()`。但建议传入参数以携带信息。\n\n**执行顺序：** 创建 `AgeError(200)` 对象 -> 执行 `raise` -> 跳过函数剩余代码 -> 错误传播到调用方的try块",
+        "visualizationType": "pythonMemory",
+        "code": "        raise AgeError(age)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "raise AgeError(200) - 抛出错误！",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 200,
+              "pyId": "4003"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\"",
+              "pyId": "4004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "except捕获了自定义异常！",
+        "explanation": "**`except AgeError as e:`** -- 从 `check_age` 函数抛出的AgeError被这个except块捕获了！\n\n**`as e`**：将抛出的 `AgeError` 对象绑定到变量 `e`。`e` 现在是指向这个错误对象的标签。\n\n**类比：** 就像逮捕嫌疑人（错误）后写调查报告（e）。报告中包含嫌疑人的名字（错误类型）、犯罪细节（错误消息）和证据（e.age）。\n\n**注意：** 当 `except` 块结束时，通过 `as e` 绑定的变量 `e` 在Python 3中会被**自动删除**！如果需要在except块外使用 `e`，必须保存到单独的变量中：`saved = e`\n\n**`print(f\"Caught: {e}\")`** -- 将 `e` 转换为字符串（`str(e)` 或 `f\"{e}\"`）时，会返回在 `__init__` 中传给 `super().__init__()` 的消息：`\"Invalid age: 200\"`",
+        "visualizationType": "pythonMemory",
+        "code": "    print(f\"Caught: {e}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Caught: Invalid age: 200"
+          ],
+          "note": "AgeError被捕获！可通过e访问错误信息",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "e",
+              "pointsTo": "err1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\"",
+              "pyId": "4004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "访问错误对象的属性",
+        "explanation": "**`print(f\"Invalid value was: {e.age}\")`** -- 通过点（`.`）运算符访问自定义异常类中存储的**`age` 属性**。\n\n`e.age` 是**200**。因为我们在 `__init__` 中用 `self.age = age` 存储了它。这就是自定义异常的核心价值！\n\n**执行顺序（完整总结）：**\n1. `class AgeError` -> 定义自定义异常类\n2. `def check_age` -> 定义验证函数\n3. `try:` -> 开始异常监控\n4. `check_age(200)` -> 函数调用，`age=200`\n5. `if 200 > 150:` -> 条件为True！\n6. `raise AgeError(200)` -> **直接抛出错误！**\n7. `except AgeError as e:` -> 匹配成功，绑定到 `e`\n8. `print(f\"Caught: {e}\")` -> 输出错误消息\n9. `print(f\"Invalid value was: {e.age}\")` -> 访问自定义属性\n\n**类比：** 写交通事故报告（错误对象）时，写"超速（200km/h）导致的事故"（AgeError with age=200）比只写"发生事故"（通用Exception）要有用得多。通过报告的详细字段（e.age）可以了解确切情况。\n\n**注意：** 不要在自定义异常中放太多逻辑。",
+        "visualizationType": "pythonMemory",
+        "code": "    print(f\"Invalid value was: {e.age}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Invalid value was: 200"
+          ],
+          "note": "e.age = 200（访问自定义属性）",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "e",
+              "pointsTo": "err1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\" (age=200)",
+              "pyId": "4004"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "raise关键字的作用是什么？",
+    "options": [
+      "捕获并处理错误",
+      "忽略错误并继续执行",
+      "直接抛出错误",
+      "打印错误消息"
+    ],
+    "correctIndex": 2,
+    "explanation": "raise是直接抛出（引发）异常的关键字。如果except是"捕获"错误，那么raise就是"抛出"错误。当输入值不合法等情况下，程序员可以用它来故意抛出错误。"
+  },
+  "keyTakeaway": "用raise主动抛出错误，继承Exception创建自己的错误类，可以实现更有意义、信息更丰富的错误处理！"
+}

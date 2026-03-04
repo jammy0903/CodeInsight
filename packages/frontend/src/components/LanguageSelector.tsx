@@ -19,8 +19,9 @@ interface Language {
 }
 
 const LANGUAGES: Language[] = [
-  { code: 'ko', label: '한국어', flag: '🇰🇷' },
   { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'ko', label: '한국어', flag: '🇰🇷' },
+  { code: 'zh', label: '中文', flag: '🇨🇳' },
 ];
 
 export function LanguageSelector() {
@@ -32,7 +33,7 @@ export function LanguageSelector() {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-3 gap-3">
       {LANGUAGES.map((lang) => {
         const isSelected = currentLang === lang.code;
 

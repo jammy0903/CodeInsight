@@ -1,0 +1,300 @@
+{
+  "lessonId": "py-10-3",
+  "title": "asyncio: Concurrency with a Single Thread",
+  "concept": "Using `async`/`await` syntax, we implement cooperative multitasking that performs other work while waiting for I/O operations to complete.",
+  "content": {
+    "code": "import asyncio\nimport time\n\nasync def say_after(delay, what):\n    print(f\"'{what}' 작업 시작\")\n    await asyncio.sleep(delay)\n    print(what)\n\nasync def main():\n    start = time.time()\n\n    task1 = asyncio.create_task(say_after(1, 'hello'))\n    task2 = asyncio.create_task(say_after(2, 'world'))\n\n    print(\"--- 작업 예약 완료 ---\")\n    await task1\n    await task2\n    print(f\"총 소요 시간: {time.time() - start:.4f}s\")\n\nasyncio.run(main())",
+    "steps": [
+      {
+        "title": "Importing Modules",
+        "explanation": "**`import asyncio` / `import time`** -- We import the async I/O library and the time measurement module.\n\n`asyncio` is an **asynchronous I/O framework** included in Python's standard library since Python 3.4. The core idea is \"don't waste waiting time.\" For example, when you send a request to a web server and wait for a response, the CPU sits idle doing nothing. asyncio fills these 'idle moments' with other tasks to maximize efficiency.\n\nThink of asyncio as **a skilled chef cooking multiple dishes at once**. Instead of standing idly waiting for the pasta water to boil, the chef slices the salad and makes the sauce during that time. There's only one chef (1 thread), but by utilizing wait times, it appears as if multiple people are working.\n\nThe `time` module is imported to later measure whether concurrent execution actually saves time.\n\n**Under the hood**: When `import asyncio` is executed, dozens of submodules including the event loop implementation, coroutine scheduler, and Future/Task classes are loaded at once. These are all tools for implementing asynchronous concurrency within a single thread.\n\n**Difference from threading**: threading uses preemptive switching where the OS forcibly switches threads, while asyncio uses cooperative switching where code voluntarily says \"I'll take a break now.\" This allows implementing concurrency without worrying about race conditions.",
+        "visualizationType": "pythonMemory",
+        "code": "import asyncio",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "asyncio module ready.",
+          "names": [
+            {
+              "name": "asyncio",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining a Coroutine Function",
+        "explanation": "**`async def say_after(delay, what):`** -- We create a **coroutine function** defined with `async def`.\n\nThe biggest difference between a regular function (`def`) and a coroutine function (`async def`) is that a coroutine function **doesn't execute immediately when called**. Calling `say_after(1, 'hello')` doesn't run the function -- instead, it creates a 'coroutine object,' which is essentially an execution plan. Actual execution begins only when the event loop schedules it.\n\nLooking at the function body, there's `await asyncio.sleep(delay)`. `await` is a signal that says \"I'll rest until this operation is done.\" Regular `time.sleep()` blocks the entire thread, but `asyncio.sleep()` only pauses the current coroutine, allowing other coroutines to run.\n\nThink of a coroutine function as a **recipe**. Writing a recipe doesn't start the cooking. The chef (event loop) must read and execute the recipe for the dish to be made.\n\n**Under the hood**: When the Python compiler encounters `async def`, it sets the `CO_COROUTINE` flag (0x100) in the function object's `co_flags`. With this flag, calling the function returns a coroutine object instead of executing normally.\n\n**Common mistake**: If you write `result = say_after(1, 'hello')`, result contains a coroutine object instead of the execution result, and Python prints a 'coroutine was never awaited' warning. Coroutines must be `await`ed or scheduled with `create_task()`.",
+        "visualizationType": "pythonMemory",
+        "code": "async def say_after(delay, what):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "Coroutine function defined.",
+          "names": [
+            {
+              "name": "say_after",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "coroutine function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the Main Coroutine",
+        "explanation": "**`async def main():`** -- We define the main coroutine that serves as the **entry point** for the async program.\n\nAsync programs typically use a single `main()` coroutine as the top-level entry point. Inside this `main()`, we create other coroutines, run them, and collect results -- orchestrating the entire flow.\n\nThink of `main()` as the **head chef in a kitchen**. Just as the head chef decides the cooking order for the entire menu and manages the start and completion of each dish, `main()` oversees the creation, scheduling, and completion of async tasks.\n\nInside this function, we record the start time with `time.time()`, create tasks with `create_task()`, wait for completion with `await`, and print the total elapsed time. This entire process happens within a single coroutine.\n\n**Under the hood**: `async def main():` is also a coroutine function, so calling `main()` returns a coroutine object. This coroutine object is passed to `asyncio.run()` for execution in the event loop.\n\n**Design pattern**: In async programs, it's important to clearly separate synchronous code (regular functions) from async code (coroutines). `asyncio.run(main())` serves exactly this boundary role -- it's the single door from the synchronous world into the asynchronous world.",
+        "visualizationType": "pythonMemory",
+        "code": "async def main():",
+        "pythonMemoryState": {
+          "note": "Main coroutine defined.",
+          "names": [
+            {
+              "name": "main",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "coroutine function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Running the Event Loop",
+        "explanation": "**`asyncio.run(main())`** -- Creates an event loop and runs the `main` coroutine. This is the **start switch** for the async program.\n\n`asyncio.run()` performs these three steps in order:\n1. Creates a new event loop\n2. Runs the `main()` coroutine in the event loop\n3. Cleans up and closes the event loop when all tasks are done\n\n**What is an event loop?** The event loop is a continuously running **infinite loop**. \"Is there a task to run? If so, run it. Has any pending I/O completed? If so, wake up the corresponding coroutine.\" This repeats until there's nothing left to do.\n\nThink of `asyncio.run()` as **opening a restaurant**. You open the doors (create event loop), start serving customers (run coroutines), keep operating until the last customer leaves (all tasks complete), then close the doors (close event loop).\n\n**Under the hood**: `asyncio.run()` internally calls `loop = asyncio.new_event_loop()` -> `loop.run_until_complete(main())` -> `loop.close()`. Before Python 3.7, you had to write these three lines manually.\n\n**Note**: `asyncio.run()` should be called **only once** in a program. Calling `asyncio.run()` again inside an already running event loop raises a RuntimeError. This is a common issue in Jupyter Notebooks.",
+        "visualizationType": "pythonMemory",
+        "code": "asyncio.run(main())",
+        "pythonMemoryState": {
+          "note": "Event loop started.",
+          "names": [
+            {
+              "name": "main",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "coroutine function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating Concurrent Tasks",
+        "explanation": "**`task1 = asyncio.create_task(say_after(1, 'hello'))`** -- Wraps a coroutine in a **Task object** and immediately schedules it on the event loop.\n\nTwo things happen simultaneously on this line:\n1. `say_after(1, 'hello')` is called, creating a coroutine object\n2. `create_task()` wraps this coroutine in a Task and registers it with the event loop\n\nThe key is that **create_task() is non-blocking**. When this line executes, it just says \"run this task later\" to the event loop and immediately moves to the next line without pausing.\n\nThink of it as **posting an order slip in the kitchen**. Posting the slip doesn't mean the food comes out immediately. The kitchen starts cooking when the time comes. Meanwhile, the server (our code) can continue taking orders from other tables.",
+        "visualizationType": "pythonMemory",
+        "code": "task1 = asyncio.create_task(say_after(1, 'hello'))",
+        "pythonMemoryState": {
+          "note": "task1 scheduled (not yet running).",
+          "names": [
+            {
+              "name": "task1",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Task(pending)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Second Task",
+        "explanation": "**`task2 = asyncio.create_task(say_after(2, 'world'))`** -- The second coroutine is also made into a Task and registered with the event loop.\n\nNow the event loop's ready queue has **two tasks waiting: task1 and task2**. Neither has started executing yet -- because the `main()` coroutine currently holds the CPU. In asyncio, the currently running coroutine must voluntarily yield (`await`) before other coroutines can run.\n\nThink of it as two order slips posted on the kitchen board. The head chef (event loop) is currently busy with something else and hasn't started cooking yet. Soon, when the server (main coroutine) says \"I'll take a break,\" the head chef starts processing both orders.\n\n**Important point**: task1 takes 1 second and task2 takes 2 seconds. If executed sequentially, it would take 1+2=3 seconds, but starting them concurrently takes only 2 seconds -- the duration of the longest task. This is the core benefit of async programming.\n\n**Under the hood**: Both Task objects have a status of `PENDING`. They're in the event loop's `_ready` deque, and execution begins only when they're popped in order after the current coroutine awaits.\n\n**Note**: `create_task()` can only be called **while the event loop is running**. Calling it outside the event loop raises a RuntimeError.",
+        "visualizationType": "pythonMemory",
+        "code": "task2 = asyncio.create_task(say_after(2, 'world'))",
+        "pythonMemoryState": {
+          "note": "task2 scheduled.",
+          "names": [
+            {
+              "name": "task1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "task2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Task(pending)",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Task(pending)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Awaiting Tasks",
+        "explanation": "**`await task1`** -- Pauses the `main` coroutine until task1 completes, handing control to the event loop.\n\nThis is the exact moment where **the magic of concurrency begins**! When `await` is reached:\n1. The `main()` coroutine is paused\n2. The event loop takes control\n3. The event loop starts running **both** task1 and task2 from the ready queue\n4. When task1 hits `asyncio.sleep(1)`, it yields -> task2 runs\n5. When task2 hits `asyncio.sleep(2)`, it also yields -> the event loop manages the timers\n\nLooking at the output, three lines appear almost simultaneously:\n- \"--- 작업 예약 완료 ---\" (the print statement before await)\n- \"'hello' 작업 시작\" (task1's first print)\n- \"'world' 작업 시작\" (task2's first print)\n\nThink of it as the server (main) saying \"I'll take a break\" -- at that moment, the head chef (event loop) starts cooking both orders simultaneously. The chef puts the pasta water on (task1) and immediately starts grilling the steak (task2).\n\n**Under the hood**: `await` transfers control to the event loop via the coroutine's `__await__()` or `send(None)` method. The event loop monitors I/O events and timers using `select()` or `epoll()` system calls, executing callbacks for completed tasks.\n\n**Key insight**: `await task1` means \"I need task1's result.\" But while waiting, task2 also progresses. This is the critical difference from `time.sleep()`.",
+        "visualizationType": "pythonMemory",
+        "code": "await task1",
+        "pythonMemoryState": {
+          "output": [
+            "--- 작업 예약 완료 ---",
+            "'hello' 작업 시작",
+            "'world' 작업 시작"
+          ],
+          "note": "Awaiting... task1 and task2 are progressing concurrently.",
+          "names": [
+            {
+              "name": "task1",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Task(running)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Awaiting the Second Task",
+        "explanation": "**`await task2`** -- After task1 completes, we wait for task2 to finish.\n\nLet's trace the timeline:\n- **0 sec**: task1 (1s) and task2 (2s) start simultaneously\n- **1 sec**: task1 completes -> `print('hello')` output. task2 still has 1 second left\n- **2 sec**: task2 completes -> `print('world')` output\n\nWhen task1 completes, `await task1` returns and the code moves to `await task2`. At this point, task2 has already been running for 1 second, so **we only need to wait about 1 more second**.\n\nThis is the essence of concurrent execution. Because task2 was also progressing while we waited for task1, the total time for both tasks is not 1+2=3 seconds, but max(1,2)=**2 seconds**.\n\nThink of it like cooking pasta (1 min) and steak (2 min) simultaneously -- the pasta finishes first and you only need to wait 1 more minute for the steak. Total is 2 minutes, not 3.\n\n**If it were sequential?**: If we used `await say_after(1, 'hello')` -> `await say_after(2, 'world')` without create_task, it would take 3 seconds total. Using `create_task()` to pre-schedule was the key.\n\n**Under the hood**: If task2 is already complete, `await task2` returns immediately, fetching the result stored in the Task object's `_result` attribute. If still running, the event loop registers a completion callback and waits.",
+        "visualizationType": "pythonMemory",
+        "code": "await task2",
+        "pythonMemoryState": {
+          "output": [
+            "hello"
+          ],
+          "note": "task1 complete. Waiting for task2...",
+          "names": [
+            {
+              "name": "task1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "task2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Task(done)",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Task(running)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Total Elapsed Time",
+        "explanation": "**`print(f\"총 소요 시간: {time.time() - start:.4f}s\")`** -- The total elapsed time is printed. The result is approximately **2 seconds**.\n\nThis result demonstrates the power of asyncio:\n- Sequential execution: 1s + 2s = **3 seconds**\n- Concurrent execution: max(1s, 2s) = **2 seconds**\n- Time saved: 1 second (33% reduction!)\n\nWith more tasks, the effect is even more dramatic. For example, sending 100 API requests that each take 1 second sequentially would take 100 seconds, but with asyncio, it takes about 1 second.\n\nThink of sending 100 table orders to the kitchen at once -- the cooking time is only as long as the longest dish. Sending them one by one would take 100x longer.\n\n**Important caveat**: asyncio is not magic. It can only save **I/O wait time**. For CPU-intensive tasks (e.g., matrix multiplication, image processing), asyncio provides no help at all because there's no \"wait time.\" Use multiprocessing for CPU-intensive tasks.\n\n**Real-world applications**: For tasks with lots of waiting time like web scraping, API calls, database queries, and file I/O, asyncio provides dramatic performance improvements. Popular web frameworks like FastAPI and aiohttp are all built on asyncio.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"총 소요 시간: {time.time() - start:.4f}s\")",
+        "pythonMemoryState": {
+          "output": [
+            "...",
+            "hello",
+            "world",
+            "총 소요 시간: 2.0012s"
+          ],
+          "note": "All tasks complete. 2 seconds elapsed.",
+          "names": [
+            {
+              "name": "task2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Task(done)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the role of the `await` keyword?",
+    "options": [
+      "It immediately terminates the function.",
+      "It blocks the entire program until a long-running task finishes.",
+      "It yields control to the event loop until a long-running task finishes, allowing other tasks to run.",
+      "It creates a new thread."
+    ],
+    "correctIndex": 2,
+    "explanation": "`await` pauses the current task and allows the `asyncio` event loop to run other tasks until the awaited task completes."
+  },
+  "misconceptions": [
+    {
+      "wrong": "`async`/`await` works like multithreading.",
+      "correct": "No. `asyncio` fundamentally operates within **a single thread**.",
+      "why": "Instead of using multiple threads, it achieves concurrency through 'cooperative multitasking' that efficiently switches between tasks within a single thread."
+    }
+  ],
+  "keyTakeaway": "`asyncio` operates within a single thread and is optimized for efficiently handling other tasks during I/O wait time."
+}

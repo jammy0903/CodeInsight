@@ -1,0 +1,408 @@
+{
+  "lessonId": "py-11-1",
+  "title": "硬币 0 (Baekjoon 11047)",
+  "concept": "贪心算法（Greedy）：从最大面值的硬币开始尽量多地使用，即可得到最优解",
+  "content": {
+    "code": "# 백준 11047 - 동전 0 (Greedy)\ncoins = [500, 100, 50, 10]\ntarget = 1260\ncount = 0\n\nfor coin in coins:\n    count += target // coin\n    target %= coin\n\nprint(count)",
+    "steps": [
+      {
+        "title": "理解问题",
+        "explanation": "**硬币 0 (Baekjoon 11047)**\n\n给定一组硬币面值，求凑出目标金额所需的**最少硬币数量**。\n\n**输入**：硬币 = [500, 100, 50, 10]，目标 = 1260韩元\n**输出**：最少硬币数量\n\n**贪心策略**：尽可能多地使用大面值硬币。\n为什么？因为1个大硬币 = 多个小硬币，所以从大的开始用总是最优的。\n\n**注意**：贪心算法不是对所有问题都有效。这个问题之所以能用贪心，是因为硬币面值之间存在倍数关系。",
+        "visualizationType": "algorithm",
+        "code": "coins = [500, 100, 50, 10]",
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coins",
+                "value": "[500, 100, 50, 10]"
+              },
+              {
+                "name": "target",
+                "value": 1260
+              },
+              {
+                "name": "count",
+                "value": 0
+              }
+            ],
+            "note": "从大面值硬币开始使用 → 最少硬币数量"
+          }
+        }
+      },
+      {
+        "title": "变量初始化",
+        "explanation": "**`target = 1260`** -- 需要凑出的金额\n**`count = 0`** -- 已使用的硬币数量（目标是将其最小化）\n\n现在从最大到最小遍历 `coins`，逐步减少 `target`。\n硬币列表已按**降序**排列，直接用for循环即可。",
+        "visualizationType": "algorithm",
+        "code": "count = 0",
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coins",
+                "value": "[500, 100, 50, 10]"
+              },
+              {
+                "name": "target",
+                "value": 1260
+              },
+              {
+                "name": "count",
+                "value": 0
+              },
+              {
+                "name": "coin",
+                "value": "-"
+              }
+            ],
+            "history": [
+              {
+                "step": "初始值",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "title": "[500韩元] 贪心选择",
+        "explanation": "**`coin = 500`**（第一次迭代）\n\n**`target // coin`** = 1260 // 500 = **2个**（2个500韩元 = 1000韩元）\n**`target %= coin`** = 1260 % 500 = **260**（余数）\n\n**贪心核心**：用 `//`（商）求最多能用多少个，用 `%`（余数）求剩余金额。\n\n使用2个500韩元硬币，将剩余的260韩元交给下一种硬币处理。",
+        "visualizationType": "algorithm",
+        "code": "    target %= coin",
+        "occurrence": 1,
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coin",
+                "value": 500,
+                "highlight": true
+              },
+              {
+                "name": "target",
+                "value": 260,
+                "highlight": true,
+                "prev": 1260
+              },
+              {
+                "name": "count",
+                "value": 2,
+                "highlight": true,
+                "prev": 0
+              }
+            ],
+            "history": [
+              {
+                "step": "初始值",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500韩元",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                },
+                "highlight": true
+              }
+            ],
+            "note": "使用500韩元 x 2个 → 剩余：260韩元"
+          }
+        }
+      },
+      {
+        "title": "[100韩元] 贪心选择",
+        "explanation": "**`coin = 100`**（第二次迭代）\n\n**`target // coin`** = 260 // 100 = **2个**\n**`target %= coin`** = 260 % 100 = **60**\n\ncount：2 + 2 = **4个**\n剩余：**60韩元**\n\n看到规律了吗？每次迭代都用同样的两行代码处理。\n贪心算法仅用 `//` 和 `%` 运算符就实现了。",
+        "visualizationType": "algorithm",
+        "code": "    target %= coin",
+        "occurrence": 1,
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coin",
+                "value": 100,
+                "highlight": true
+              },
+              {
+                "name": "target",
+                "value": 60,
+                "highlight": true,
+                "prev": 260
+              },
+              {
+                "name": "count",
+                "value": 4,
+                "highlight": true,
+                "prev": 2
+              }
+            ],
+            "history": [
+              {
+                "step": "初始值",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500韩元",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                }
+              },
+              {
+                "step": "100韩元",
+                "values": {
+                  "target": 60,
+                  "count": 4,
+                  "coin": 100
+                },
+                "highlight": true
+              }
+            ],
+            "note": "使用100韩元 x 2个 → 剩余：60韩元"
+          }
+        }
+      },
+      {
+        "title": "[50韩元] 贪心选择",
+        "explanation": "在 **`coin = 50`** 步骤中，处理剩余的60韩元。\n\n计算：\n- `60 // 50 = 1` → 使用1个50韩元硬币\n- `60 % 50 = 10` → 传给下一步的金额为10韩元\n\n累计硬币数变为 `4 + 1 = 5` 个。\n\n核心模式与前面的步骤相同。\n从最大硬币开始，用商（`//`）取最大数量，用余数（`%`）传给下一种硬币。",
+        "visualizationType": "algorithm",
+        "code": "    target %= coin",
+        "occurrence": 1,
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coin",
+                "value": 50,
+                "highlight": true
+              },
+              {
+                "name": "target",
+                "value": 10,
+                "highlight": true,
+                "prev": 60
+              },
+              {
+                "name": "count",
+                "value": 5,
+                "highlight": true,
+                "prev": 4
+              }
+            ],
+            "history": [
+              {
+                "step": "初始值",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500韩元",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                }
+              },
+              {
+                "step": "100韩元",
+                "values": {
+                  "target": 60,
+                  "count": 4,
+                  "coin": 100
+                }
+              },
+              {
+                "step": "50韩元",
+                "values": {
+                  "target": 10,
+                  "count": 5,
+                  "coin": 50
+                },
+                "highlight": true
+              }
+            ],
+            "note": "使用50韩元 x 1个 → 剩余：10韩元"
+          }
+        }
+      },
+      {
+        "title": "[10韩元] 贪心选择 -- 完成！",
+        "explanation": "**`coin = 10`**（第四次迭代）\n\n- `10 // 10 = 1` → 使用1个10韩元硬币\n- `10 % 10 = 0` → 剩余金额为0韩元\n\n累计数量变为 `5 + 1 = 6` 个。\n\n核心总结：\n- 每一步用商（`//`）增加数量\n- 用余数（`%`）更新剩余金额\n- 当target变为0时结束，此时的count就是答案",
+        "visualizationType": "algorithm",
+        "code": "    target %= coin",
+        "occurrence": 1,
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "coin",
+                "value": 10,
+                "highlight": true
+              },
+              {
+                "name": "target",
+                "value": 0,
+                "highlight": true,
+                "prev": 10
+              },
+              {
+                "name": "count",
+                "value": 6,
+                "highlight": true,
+                "prev": 5
+              }
+            ],
+            "history": [
+              {
+                "step": "初始值",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500韩元",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                }
+              },
+              {
+                "step": "100韩元",
+                "values": {
+                  "target": 60,
+                  "count": 4,
+                  "coin": 100
+                }
+              },
+              {
+                "step": "50韩元",
+                "values": {
+                  "target": 10,
+                  "count": 5,
+                  "coin": 50
+                }
+              },
+              {
+                "step": "10韩元",
+                "values": {
+                  "target": 0,
+                  "count": 6,
+                  "coin": 10
+                },
+                "highlight": true
+              }
+            ],
+            "note": "使用10韩元 x 1个 → 剩余：0韩元（完成！）"
+          }
+        }
+      },
+      {
+        "title": "输出结果",
+        "explanation": "**`print(count)`** -> **6**\n\n凑出1260韩元所需的最少硬币数量为 **6个**。\n\n**为什么贪心算法在这里有效？**\n在这个问题中，硬币面值存在**倍数关系**（10, 50, 100, 500），\n所以使用大面值硬币总是有利的。\n\n**贪心失效的情况**：如果硬币是[1, 7, 10]且目标是14韩元？\n- 贪心：10+1+1+1+1 = 5个\n- 最优：7+7 = 2个\n→ 当面值之间不是倍数关系时，需要用DP（动态规划）来解决。",
+        "visualizationType": "algorithm",
+        "code": "print(count)",
+        "algorithmState": {
+          "subType": "tracker",
+          "tracker": {
+            "variables": [
+              {
+                "name": "count",
+                "value": 6,
+                "highlight": true
+              }
+            ],
+            "history": [
+              {
+                "step": "初始值",
+                "values": {
+                  "target": 1260,
+                  "count": 0,
+                  "coin": "-"
+                }
+              },
+              {
+                "step": "500韩元",
+                "values": {
+                  "target": 260,
+                  "count": 2,
+                  "coin": 500
+                }
+              },
+              {
+                "step": "100韩元",
+                "values": {
+                  "target": 60,
+                  "count": 4,
+                  "coin": 100
+                }
+              },
+              {
+                "step": "50韩元",
+                "values": {
+                  "target": 10,
+                  "count": 5,
+                  "coin": 50
+                }
+              },
+              {
+                "step": "10韩元",
+                "values": {
+                  "target": 0,
+                  "count": 6,
+                  "coin": 10
+                }
+              }
+            ],
+            "note": "最少硬币数量：6个（500x2 + 100x2 + 50x1 + 10x1）"
+          }
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如果硬币是[1, 7, 10]，目标金额为14韩元，贪心算法的结果和实际最优解分别是什么？",
+    "options": [
+      "贪心：5个（10+1+1+1+1），最优：2个（7+7）",
+      "贪心：2个（7+7），最优：2个（7+7）",
+      "贪心：5个，最优：5个（相同）",
+      "贪心总是保证最优解"
+    ],
+    "correctIndex": 0,
+    "explanation": "当硬币面值之间不是倍数关系时，贪心不能保证最优解。\n贪心选择10韩元1个 + 1韩元4个 = 5个，\n但实际最优解是7韩元2个 = 2个。\n这种情况需要使用DP（动态规划）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "贪心算法总是保证最优解",
+      "correct": "贪心只有在满足"贪心选择性质"和"最优子结构"时才能保证最优解。",
+      "why": "这个硬币问题因为面值之间存在倍数关系所以贪心成立，但并非所有硬币问题都是如此。"
+    }
+  ],
+  "keyTakeaway": "贪心 = 每一刻做最好的选择。但必须证明"从大的开始用总是有利的"。"
+}

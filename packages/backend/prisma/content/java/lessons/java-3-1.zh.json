@@ -1,0 +1,154 @@
+{
+  "lessonId": "java-3-1",
+  "title": "基本类型传递（Primitive Passing）",
+  "concept": "将基本类型（int、boolean 等）传递给方法时，只复制"值"。",
+  "content": {
+    "code": "void increment(int x) {\n    x = x + 1;\n    System.out.println(\"inside: \" + x);\n}\n\nint a = 10;\nSystem.out.println(\"before: \" + a);\nincrement(a);\nSystem.out.println(\"after: \" + a);",
+    "steps": [
+      {
+        "title": "声明变量 a",
+        "explanation": "**执行顺序：**\n1. 在栈内存中创建 `main` 帧。\n2. 分配 `int` 类型变量 `a` 的空间。\n3. 存储值 `10`。\n\n**内存中发生了什么：**\n在名为 `main` 的工作空间（栈帧）中创建了一个标记为 `a` 的盒子，并将数字 `10` 放入其中。",
+        "visualizationType": "javaMemory",
+        "code": "int a = 10;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "方法调用前输出",
+        "explanation": "**执行顺序：**\n1. 查找 `a` 的当前值。\n2. 调用 `System.out.println`。\n\n将 `a` 盒子中当前的值 `10` 输出到屏幕。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"before: \" + a);",
+        "javaMemoryState": {
+          "output": [
+            "before: 10"
+          ]
+        }
+      },
+      {
+        "title": "调用 increment(a) - 值的复制",
+        "explanation": "**执行顺序：**\n1. 为 `increment` 方法创建新的栈帧。\n2. 创建参数 `x` 的变量空间。\n3. 读取 `a` 的值 `10` 并**复制**到 `x`。\n\n**核心（值传递 Call by Value）：**\n传递的不是 `a` 本身。\n而是将 `a` 中的值 `10` 复制后放入名为 `x` 的新盒子中。\n现在 `a` 和 `x` 完全是互不相干的。",
+        "keyInsight": "复制的只是"值"，而不是变量本身",
+        "visualizationType": "javaMemory",
+        "code": "increment(a);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            },
+            {
+              "name": "x",
+              "value": "10",
+              "frame": "increment",
+              "copied": true,
+              "type": "int"
+            }
+          ],
+          "note": "a 的值（10）被复制到 x"
+        }
+      },
+      {
+        "title": "修改参数 x 的值",
+        "explanation": "**执行顺序：**\n1. 读取 `x` 的值 `10`。\n2. 加 `1` 得到 `11`。\n3. 将 `11` 重新存入 `x` 盒子。\n\n**原始值呢？**\n`x` 是 `increment` 帧中的独立盒子。\n无论在这里做什么，`main` 帧中的 `a` 盒子都不受影响。",
+        "keyInsight": "修改副本（x）不影响原始值（a）",
+        "visualizationType": "javaMemory",
+        "code": "x = x + 1;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            },
+            {
+              "name": "x",
+              "value": "11",
+              "frame": "increment",
+              "changed": true,
+              "type": "int"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "函数内部输出",
+        "explanation": "**执行顺序：**\n1. 查找 `x` 的值 `11`。\n2. 输出。\n\n在函数内部可以看到修改后的值 `11`。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"inside: \" + x);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            },
+            {
+              "name": "x",
+              "value": "11",
+              "frame": "increment",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "inside: 11"
+          ]
+        }
+      },
+      {
+        "title": "函数返回和结果确认",
+        "explanation": "**执行顺序：**\n1. `increment` 方法结束。\n2. `increment` 栈帧（包括 x）被删除。\n3. 返回 `main`。\n4. 输出 `a` 的值。\n\n**结果：**\n`a` 仍然是 `10`。\n副本（`x`）已经消失了，但原始值（`a`）从未被触碰过。",
+        "keyInsight": "方法结束时副本被销毁",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"after: \" + a);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "after: 10"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在 Java 中将基本类型（int）传递给方法时，正确的行为是？",
+    "options": [
+      "传递变量的内存地址。",
+      "复制变量的值后传递。",
+      "变量本身被移动。",
+      "什么都不发生。"
+    ],
+    "correctIndex": 1,
+    "explanation": "Java 传递基本类型时只复制其值（Value）进行传递（Call by Value）。\n因此在方法内修改值不会影响原始值。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "将变量传给函数后它们保持连接。",
+      "correct": "基本类型就像发送一个克隆体。",
+      "why": "就像复制一个 Excel 文件给朋友一样——朋友修改了内容，你的原始文件不会改变，原理完全相同。"
+    }
+  ],
+  "keyTakeaway": "基本类型是"值的复制"。无论在方法内如何修改，原始值都是安全的。"
+}

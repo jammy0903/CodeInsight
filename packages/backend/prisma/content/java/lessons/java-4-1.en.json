@@ -1,0 +1,172 @@
+{
+  "lessonId": "java-4-1",
+  "title": "String Immutability",
+  "concept": "Once a String object is created, it never changes. Modification means creating a new object.",
+  "content": {
+    "code": "String s1 = \"Hello\";\nString s2 = s1;\n\ns1 = s1 + \" World\";\n\nSystem.out.println(s1);\nSystem.out.println(s2);\nSystem.out.println(s1 == s2);",
+    "steps": [
+      {
+        "title": "Creating a String Literal",
+        "explanation": "**Execution flow:**\n1. JVM encounters the `\"Hello\"` literal.\n2. Registers/searches for `\"Hello\"` in the String Pool.\n3. Variable `s1` references the Pool address (assume `Pool[0]`).\n\n**Key point:**\nThe String Pool is a 'recycling center' to save memory.\nIdentical strings are created only once and shared.",
+        "visualizationType": "javaMemory",
+        "code": "String s1 = \"Hello\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Copying a Reference (Alias)",
+        "explanation": "**Execution flow:**\n1. Reads the address of `s1` (`Pool[0]`).\n2. Copies it into variable `s2`.\n\n**State:**\n`s1` and `s2` are now two remote controls pointing at the exact same object (TV).\nThis is called 'Aliasing'.",
+        "keyInsight": "Simple assignment = address copy (both point to the same location)",
+        "visualizationType": "javaMemory",
+        "code": "String s2 = s1;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "sameRef": true,
+              "type": "String"
+            }
+          ]
+        }
+      },
+      {
+        "title": "String Concatenation - Immutability in Action!",
+        "explanation": "**Execution flow:**\n1. Concatenates `s1`(\"Hello\") and \" World\" -> creates \"Hello World\".\n2. A **new object** `\"Hello World\"` is allocated on the Heap (not the Pool).\n3. `s1` is updated to point to this **new address** (`Heap[0]`).\n\n**Important:**\nThe original \"Hello\" object was NOT modified! A new piece of paper was written and handed to `s1`.\n`s2` is still holding the old \"Hello\".",
+        "keyInsight": "String modification = New Object creation (Rebinding)",
+        "visualizationType": "javaMemory",
+        "code": "s1 = s1 + \" World\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Heap[0]",
+              "frame": "main",
+              "changed": true,
+              "type": "String"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello World\"",
+              "type": "String",
+              "new": true
+            }
+          ],
+          "note": "Only s1's arrow changed! (s2 remains the same)"
+        }
+      },
+      {
+        "title": "Printing s1 (New Value)",
+        "explanation": "**Execution flow:**\n1. Prints `\"Hello World\"` that `s1` points to.\n\nSince `s1` now references the new object, the updated value is printed.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Heap[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello World\"",
+              "type": "String"
+            }
+          ],
+          "output": [
+            "Hello World"
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Printing s2 (Original Preserved)",
+        "explanation": "**Execution flow:**\n1. Prints `\"Hello\"` that `s2` points to.\n\n**The power of immutability:**\nEven though `s1` moved on to a new object, the original `\"Hello\"` that `s2` holds never changed.\nThis is the **safety** that immutable objects provide.",
+        "keyInsight": "No corruption of the original = side-effect prevention",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s2);",
+        "javaMemoryState": {
+          "output": [
+            "Hello"
+          ]
+        }
+      },
+      {
+        "title": "Reference Comparison",
+        "explanation": "**Execution flow:**\n1. Compares `s1`'s address (Heap[0]) vs `s2`'s address (Pool[0]).\n2. They differ -> prints `false`.\n\nSince they are different objects, their addresses are naturally different.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1 == s2);",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following is NOT a consequence of String being immutable in Java?",
+    "options": [
+      "Modifying a string creates a new object.",
+      "Multiple variables can safely share the same string.",
+      "No synchronization is needed in multithreaded environments.",
+      "Frequent modifications use less memory."
+    ],
+    "correctIndex": 3,
+    "explanation": "Every time a string is modified, a new object is created, so frequent modifications waste memory and degrade performance.\nIn such cases, you should use `StringBuilder`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Doing s1 = s1 + \"world\" changes the content of s1.",
+      "correct": "Only the **reference** that the variable `s1` points to changes; the original \"Hello\" object remains intact.",
+      "why": "A String object's value is fixed at creation and can never be changed (read-only)."
+    },
+    {
+      "wrong": "Isn't immutability wasteful in terms of memory?",
+      "correct": "Modifications do create waste, but **reading** benefits enormously.",
+      "why": "Since the value is guaranteed not to change, a single `\"Hello\"` can be safely shared (Sharing) across thousands of variables.\nThis is the principle behind the **String Pool**."
+    }
+  ],
+  "keyTakeaway": "A String is like text carved in stone. You can't edit it -- you have to carve a new stone."
+}

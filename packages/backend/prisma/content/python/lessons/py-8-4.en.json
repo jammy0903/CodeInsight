@@ -1,0 +1,498 @@
+{
+  "lessonId": "py-8-4",
+  "title": "itertools: An Efficient Iteration Toolbox",
+  "concept": "Learn about `itertools` functions that handle complex iteration patterns like infinite counting, cycling, and chaining concisely.",
+  "content": {
+    "code": "import itertools\n\n# 1. count: 무한 카운터\ncounter = itertools.count(start=10, step=2)\nprint(next(counter))\nprint(next(counter))\n\n# 2. cycle: 무한 순환\ncycler = itertools.cycle(['A', 'B', 'C'])\nprint(next(cycler))\nprint(next(cycler))\nprint(next(cycler))\nprint(next(cycler))\n\n# 3. chain: 여러 이터러블 연결\nchained = itertools.chain([1, 2], ['a', 'b'])\nfor item in chained:\n    print(item, end=' ')",
+    "steps": [
+      {
+        "title": "Importing the itertools Module",
+        "explanation": "**`import itertools`**\n\nWe import the **itertools** module from Python's standard library.\n\n**What is itertools?**\nAs the name suggests, it's a collection of \"iterator tools.\"\nIn previous lessons we built iterators and generators ourselves. itertools is a **pre-built toolbox** of commonly used iteration patterns.\n\n**3 core tools from itertools (what we'll learn in this lesson):**\n1. `count()`: An infinite counter that counts without end!\n2. `cycle()`: A cycler that repeats a list infinitely\n3. `chain()`: A connector that joins multiple lists into one\n\n**They all return iterators!** Not lists. So they don't precompute values -- they generate one at a time when needed (Lazy Evaluation).\n\n**Analogy**: Opening a toolbox and getting ready to pull out the 3 tools we'll use today.\n\n**Execution order**: itertools module (0x1500) loaded -> registered in global namespace",
+        "visualizationType": "pythonMemory",
+        "code": "import itertools",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "itertools module (0x1500) loaded.",
+          "names": [
+            {
+              "name": "itertools",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating an Infinite Counter (count)",
+        "explanation": "**`counter = itertools.count(start=10, step=2)`**\n\nCreates an **infinite counter**! An iterator that starts at 10 and increments by 2.\n10, 12, 14, 16, 18, 20, ... **it never ends!**\n\n**Difference from range():**\n- `range(10, 100, 2)`: Has a defined end (100), **finite**\n- `itertools.count(10, 2)`: No end, **infinite**!\n\n**Why is infinity possible?**\ncount() is an iterator, so it doesn't precompute values.\nEach time next() is called, it simply computes \"current value + step\" and returns one.\nOnly the current value (10) and step (2) are stored in memory, so even infinite generation keeps memory constant!\n\n**Caution**: Using it directly in a for loop creates an infinite loop! `for n in itertools.count(10, 2):` -> never ends!\nSo you must either use next() to extract only as many as you want, or always include a break condition.\n\n**Execution order**: count iterator object (0x2000) created -> internal state: current=10, step=2",
+        "visualizationType": "pythonMemory",
+        "code": "counter = itertools.count(start=10, step=2)",
+        "pythonMemoryState": {
+          "note": "count iterator (0x2000) has been created. (Starting at 10, incrementing by 2)",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "iterator1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator1",
+              "type": "iterator",
+              "value": "count(10, 2)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "count First Value (10)",
+        "explanation": "**`print(next(counter))`**\n\nWe extract the first value from the counter using `next()`. The starting value **10** is printed.\n\n**What is the next() function?**\n`next(counter)` is the same as `counter.__next__()`.\nIt's doing manually, just once, what the for loop does internally.\n\n**Internal operation of the count iterator:**\n1. Returns the current value (10)\n2. Updates internal state: current = 10 + 2 = 12\n3. Ready to return 12 on the next next() call\n\n**Analogy**: Pulling the first ticket (number 10) from an infinite ticket dispenser. The next ticket (number 12) is already prepared.\n\n**Execution order**: next(counter) called -> 10 returned -> internal state updated 10 -> 12 -> print(10)",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(counter))",
+        "pythonMemoryState": {
+          "output": [
+            "10"
+          ],
+          "note": "After printing 10, the next value will be 12.",
+          "objects": [
+            {
+              "id": "iterator1",
+              "type": "iterator",
+              "value": "count(12, 2)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "count Second Value (12)",
+        "explanation": "**`print(next(counter))`**\n\nThis is the second next() call. **12**, incremented by step (2), is printed.\n\n**State changes of the count iterator:**\n- Initial: current = 10\n- 1st call: Returns 10 -> current = 12\n- 2nd call: Returns 12 -> current = 14 <- now!\n- 3rd call: Returns 14 -> current = 16 (continues endlessly if you keep calling)\n\n**Practical uses of infinite iterators:**\ncount() is commonly used with `zip()` to add indices, or with `islice()` to slice a desired number of items.\nExample: `zip(itertools.count(1), ['a', 'b', 'c'])` -> [(1, 'a'), (2, 'b'), (3, 'c')]\n\n**Execution order**: next(counter) called -> 12 returned -> internal state updated 12 -> 14 -> print(12)",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(counter))",
+        "occurrence": 2,
+        "pythonMemoryState": {
+          "output": [
+            "12"
+          ],
+          "note": "After printing 12, the next value will be 14.",
+          "objects": [
+            {
+              "id": "iterator1",
+              "type": "iterator",
+              "value": "count(14, 2)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating an Infinite Cycling Iterator (cycle)",
+        "explanation": "**`cycler = itertools.cycle(['A', 'B', 'C'])`**\n\nThe second tool: **cycle** -- creates an iterator that **infinitely cycles** through a list's items!\nA -> B -> C -> A -> B -> C -> A -> B -> C -> ... repeating forever.\n\n**Difference between count() and cycle():**\n- count(): Numbers **keep increasing** (10, 12, 14, 16, ...)\n- cycle(): List **repeats cyclically** (A, B, C, A, B, C, ...)\n\n**When is cycle used?**\n- Repeating weekdays: `cycle(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])`\n- Alternating colors: `cycle(['red', 'blue', 'green'])`\n- Round robin: Distributing requests evenly across multiple servers\n\n**Caution**: Like count(), this is an infinite iterator -- using it directly in a for loop means an infinite loop!\n\n**Analogy**: Like a revolving door that automatically returns to the beginning when it reaches the end.\n\n**Execution order**: cycle iterator object (0x3000) created -> ['A', 'B', 'C'] stored internally",
+        "visualizationType": "pythonMemory",
+        "code": "cycler = itertools.cycle(['A', 'B', 'C'])",
+        "pythonMemoryState": {
+          "note": "cycle iterator (0x3000) has been created.",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle(['A', 'B', 'C'])",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "cycle First Value (A)",
+        "explanation": "**`print(next(cycler))`**\n\nExtracts the first value from the cycle iterator. The first element of the list **'A'** is printed.\n\n**cycle's internal pointer:**\ncycle internally remembers \"where it's currently pointing.\"\nCurrent: [**A**, B, C] <- pointing at A\nAfter next() call: [A, **B**, C] <- moves to B\n\n**Analogy**: The revolving door passes through the first panel (A). Next comes the second panel (B).\n\n**Execution order**: next(cycler) called -> 'A' returned -> internal pointer moves to B -> print('A')",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "pythonMemoryState": {
+          "output": [
+            "A"
+          ],
+          "note": "First element 'A' has been returned.",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "cycle Second Value (B)",
+        "explanation": "**`print(next(cycler))`**\n\nThe second value **'B'** is printed. The internal pointer moves to C.\n\n**cycle state**: [A, **B**, C] -> 'B' returned -> [A, B, **C**]\n\n**Tracking the cycle:**\n- 1st call: A returned (pointer -> B)\n- 2nd call: B returned (pointer -> C) <- now!\n- 3rd call: C returned (pointer -> ???)\n\nOn the next call, after C is returned, we reach the end of the list. What happens then?\n\n**Execution order**: next(cycler) called -> 'B' returned -> internal pointer moves to C",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 2,
+        "pythonMemoryState": {
+          "output": [
+            "B"
+          ],
+          "note": "'B' printed.",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "cycle Third Value (C)",
+        "explanation": "**`print(next(cycler))`**\n\nThe third value **'C'** is printed. We've reached the **last element** of the list!\n\n**cycle state**: [A, B, **C**] -> 'C' returned -> reached the end!\n\n**With a normal iterator?** StopIteration would be raised and it would end.\nBut cycle is different! When it reaches the end, it **automatically wraps back to the beginning**.\nThe next next() call will produce 'A' again!\n\n**This is why it's called \"cycle.\"**\n\n**Execution order**: next(cycler) called -> 'C' returned -> internal pointer reaches end of list -> wraps back to beginning",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 3,
+        "pythonMemoryState": {
+          "output": [
+            "C"
+          ],
+          "note": "'C' printed. Reached the end of the list.",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "cycle Fourth Value - Wrapping Around (A)",
+        "explanation": "**`print(next(cycler))`**\n\n**Cycling occurs!** After the end of the list (C), it wraps back to the beginning and **'A'** is printed!\n\n**Full cycling pattern:**\nA -> B -> C -> **A** (now!) -> B -> C -> A -> B -> C -> ...\nOn the 4th call, A appears again. This is infinite cycling.\n\n**cycle's memory behavior:**\ncycle holds an internal copy of the original list ['A', 'B', 'C'].\nWhen it reaches the end, it simply wraps back to the beginning of this copy, enabling infinite repetition without additional memory.\n\n**Practical example:**\n```python\ncolors = itertools.cycle(['red', 'blue'])\nfor item in ['apple', 'banana', 'grape', 'orange']:\n    print(f\"{item}: {next(colors)}\")\n# apple: red, banana: blue, grape: red, orange: blue\n```\n\n**Execution order**: next(cycler) called -> pointer resets to beginning -> 'A' returned",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 4,
+        "pythonMemoryState": {
+          "output": [
+            "A"
+          ],
+          "note": "Wraps back to the beginning, 'A' is printed again.",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Chaining Iterables (chain)",
+        "explanation": "**`chained = itertools.chain([1, 2], ['a', 'b'])`**\n\nThe third tool: **chain** -- creates an iterator that **joins multiple iterables into one**!\nIt connects [1, 2] and ['a', 'b'] so you can iterate through them as if they were [1, 2, 'a', 'b'].\n\n**Difference from list concatenation (+):**\n- `[1, 2] + ['a', 'b']`: **Creates a new list** stored in memory -> O(n) memory\n- `chain([1, 2], ['a', 'b'])`: **Only remembers the connection**, doesn't create a new list -> O(1) memory\n\nchain automatically transitions to the second iterable when the first is exhausted.\nIt **logically connects** without copying data, saving memory!\n\n**Analogy**: Merging two lines of people into one line. Instead of actually moving people, you just announce \"when this line is done, it's that line's turn.\"\n\n**Execution order**: chain iterator object (0x4000) created -> stores references to [1, 2] and ['a', 'b']",
+        "visualizationType": "pythonMemory",
+        "code": "chained = itertools.chain([1, 2], ['a', 'b'])",
+        "pythonMemoryState": {
+          "output": [
+            "..."
+          ],
+          "note": "chain iterator (0x4000) has been created. Connected in order: [1, 2] -> ['a', 'b'].",
+          "names": [
+            {
+              "name": "chained",
+              "pointsTo": "iterator3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator3",
+              "type": "iterator",
+              "value": "chain object",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop - First Value (1)",
+        "explanation": "**`for item in chained:`**\n\nThe for loop starts iterating over the chain iterator.\nchain iterates through the first iterable [1, 2] first, so the first value **1** is assigned to item.\n\n**chain's iteration order:**\n[**1**, 2] -> ['a', 'b']\nStarts from the first element of the first list.\n\n**What chain does internally:**\n1. Gets the iterator for the first iterable ([1, 2])\n2. Calls next() on that iterator to extract values one by one\n3. When the first is exhausted, automatically switches to the second iterable (['a', 'b'])\n4. When all are exhausted, StopIteration\n\n**Execution order**: chain.__next__() -> gets 1 from the first list -> item = 1",
+        "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
+        "pythonMemoryState": {
+          "note": "Retrieved 1 from the first list.",
+          "names": [
+            {
+              "name": "chained",
+              "pointsTo": "iterator3"
+            },
+            {
+              "name": "item",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator3",
+              "type": "iterator",
+              "value": "chain object",
+              "pyId": "1004"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 1,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Output (1)",
+        "explanation": "**`print(item, end=' ')`**\n\nPrints chain's first value **1**. Separated by spaces using `end=' '`.\n\n**Progress**: [**1** done, 2] -> ['a', 'b'] -- first element of the first list processed\n\n**Execution order**: print(1, end=' ') executed -> \"1 \" printed",
+        "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "1"
+          ],
+          "note": "1 printed.",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 1,
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop - Second Value (2)",
+        "explanation": "**`for item in chained:`** (second iteration)\n\nThe second value **2** from the first list [1, 2] is assigned to item.\nThis is the **last element** of the first list.\n\n**Progress**: [1 done, **2**] -> ['a', 'b']\nOn the next next() call, the first list will be exhausted, and chain will automatically switch to the second list.\n\n**Execution order**: chain.__next__() -> gets 2 from the first list -> item = 2",
+        "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
+        "pythonMemoryState": {
+          "note": "Retrieved 2 from the first list.",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Output (2)",
+        "explanation": "**`print(item, end=' ')`**\n\nPrints the last value **2** from the first list.\n\n**Progress**: [1 done, 2 done] -> ['a', 'b'] -- first list exhausted! Next: switch to second list\n\n**This switch is chain's core behavior.** The user (the for loop) is completely unaware that the list changed -- it just receives continuous values.\n\n**Execution order**: print(2, end=' ') executed -> \"2 \" printed",
+        "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "2"
+          ],
+          "note": "2 printed. First list finished.",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop - Third Value (a)",
+        "explanation": "**`for item in chained:`** (third iteration -- list switch!)\n\n**Automatic switch occurs!** Since the first list [1, 2] is exhausted, chain moves to the second list ['a', 'b'].\nThe first element of the second list **'a'** is assigned to item.\n\n**Progress**: [1 done, 2 done] -> [**'a'**, 'b']\n\n**The essence of chain**: This switch is fully automatic and transparent.\nFrom the for loop's perspective, it just looks like 1, 2, 'a', 'b' come out in order.\nIt's the same experience as iterating through a single list [1, 2, 'a', 'b']!\n\n**But internally**: The two separate lists remain in their original places, and chain only moved its pointer. No new list was created.\n\n**Execution order**: First list StopIteration -> switch to second list -> get 'a' -> item = 'a'",
+        "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
+        "pythonMemoryState": {
+          "note": "Switched to the second list and retrieved 'a'.",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "'a'",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Output (a)",
+        "explanation": "**`print(item, end=' ')`**\n\nPrints the first value **'a'** from the second list.\n\n**Output so far**: \"1 2 a \" -- numbers and strings are mixed, but thanks to chain, they flow naturally as if from a single sequence.\n\n**Progress**: [1 done, 2 done] -> ['a' done, 'b'] -- one left!\n\n**Execution order**: print('a', end=' ') executed -> \"a \" printed",
+        "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "a"
+          ],
+          "note": "'a' printed.",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "'a'",
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For Loop - Fourth Value (b)",
+        "explanation": "**`for item in chained:`** (fourth iteration -- the last!)\n\nThe last element **'b'** from the second list is assigned to item.\n\n**Progress**: [1 done, 2 done] -> ['a' done, **'b'**] -- this is the last value!\n\nOn the next next() call, the second list will also be exhausted, meaning all iterables connected by chain are depleted.\nStopIteration is raised and the for loop terminates.\n\n**Execution order**: chain.__next__() -> gets 'b' from the second list -> item = 'b'",
+        "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
+        "pythonMemoryState": {
+          "note": "'b' assigned.",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "'b'",
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Output (b) - Loop Ends",
+        "explanation": "**`print(item, end=' ')`**\n\nPrints the last value **'b'** and the loop terminates.\n\n**Final output**: \"1 2 a b \" -- the two lists are printed as one continuous sequence!\n\n**Summary of the three tools from this lesson:**\n\n**Key lesson**: All itertools functions return **iterators (generators)**.\nThey don't precompute values -- they calculate on demand, making them memory-efficient even with large datasets.\n\n**More itertools tools**: `islice()` (slicing), `takewhile()` (conditional extraction), `groupby()` (grouping), `product()` (combinations), and many more!\n\n**Execution order**: print('b') executed -> all iterables in chain exhausted -> StopIteration -> for loop terminates",
+        "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "b"
+          ],
+          "note": "All connected data has been iterated and the loop has ended.",
+          "names": [
+            {
+              "name": "chained",
+              "pointsTo": "iterator3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator3",
+              "type": "iterator",
+              "value": "chain object",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the 4th value produced by the `itertools.cycle('XYZ')` iterator?",
+    "options": [
+      "X",
+      "Y",
+      "Z",
+      "An error is raised"
+    ],
+    "correctIndex": 0,
+    "explanation": "`cycle` wraps back to the beginning when it reaches the end of the sequence.\nThe order is X -> Y -> Z -> X, so the 4th value is X."
+  },
+  "misconceptions": [
+    {
+      "wrong": "`itertools` returns lists.",
+      "correct": "No.\nIt returns iterators (generators).",
+      "why": "The core of `itertools` is saving memory through a 'lazy' approach -- computing values one at a time as needed, rather than creating all values upfront."
+    }
+  ],
+  "keyTakeaway": "`itertools` is the best tool for fast, memory-efficient iteration. When facing complex `for` loops, first consider whether `itertools` can solve it."
+}

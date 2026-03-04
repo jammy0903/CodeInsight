@@ -1,0 +1,133 @@
+{
+  "lessonId": "java-8-1",
+  "title": "ArrayList: The Secret of a Growing Array",
+  "concept": "ArrayList internally uses an array, but when space runs out, it automatically grows -- making it a 'flexible array'.",
+  "content": {
+    "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<Integer> list = new ArrayList<>(2); // 초기 용량 2\n        \n        list.add(10);\n        list.add(20);\n        list.add(30); // 앗! 공간이 부족해요. 무슨 일이 일어날까요?\n    }\n}",
+    "steps": [
+      {
+        "title": "Package Import",
+        "explanation": "**`import java.util.ArrayList;`**\n\nImporting `ArrayList`, a resizable array implementation.",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.ArrayList;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Setting Initial Capacity",
+        "explanation": "**Execution flow:**\n1. `new ArrayList<>(2)` is executed.\n2. Internally, an array of size 2 (`Object[2]`) is created.\n\n**Ready to move in:**\nWe start with a small house with only 2 rooms.",
+        "visualizationType": "javaMemory",
+        "code": "ArrayList<Integer> list = new ArrayList<>(2); // 초기 용량 2",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "list",
+              "value": "0x001",
+              "frame": "main",
+              "type": "ArrayList<Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 0, elementData: [null, null]",
+              "type": "ArrayList",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding the First Element",
+        "explanation": "**Execution flow:**\n1. `10` is stored at index 0.\n2. `size` increases to 1.\n\n**Welcome aboard:**\nThe first guest has moved into room 0.",
+        "visualizationType": "javaMemory",
+        "code": "list.add(10);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 1, elementData: [10, null]",
+              "type": "ArrayList",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding the Second Element",
+        "explanation": "**Execution flow:**\n1. `20` is stored at index 1.\n2. `size` increases to 2.\n\n**Full house:**\nAll rooms are now occupied.",
+        "visualizationType": "javaMemory",
+        "code": "list.add(20);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 2, elementData: [10, 20]",
+              "type": "ArrayList",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Capacity Exceeded & Resizing",
+        "explanation": "**Execution flow:**\n1. The array is full, so a new, larger array (typically 1.5x the size) is created.\n2. All existing data is copied (moved) to the new array.\n3. `30` is added to the new array.\n\n**Auto-expansion:**\nThe secret to ArrayList 'growing on its own' is this resizing process.\nHowever, moving has a cost (performance overhead), so it's important to set an appropriate initial size!",
+        "visualizationType": "javaMemory",
+        "code": "list.add(30); // 앗! 공간이 부족해요. 무슨 일이 일어날까요?",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 3, elementData: [10, 20, 30, null]",
+              "type": "ArrayList",
+              "changed": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When is the overhead greatest while adding data to an ArrayList?",
+    "options": [
+      "When the list is empty",
+      "When there are gaps in the middle",
+      "When the internal array's capacity is full",
+      "It is always constant"
+    ],
+    "correctIndex": 2,
+    "explanation": "When the array is full, a new larger array must be created and all data must be copied over, requiring a temporarily large number of operations.\nThis is called Resizing."
+  },
+  "misconceptions": [
+    {
+      "wrong": "ArrayList grows memory one slot at a time as data comes in.",
+      "correct": "No! Expanding one at a time would be too slow, so it grows generously by 1.5x or 2x at once.",
+      "why": "Frequent array copying is a major cause of performance degradation."
+    }
+  ],
+  "keyTakeaway": "ArrayList is a versatile tool that combines the search speed of arrays (fast) with flexibility (resizable)!"
+}

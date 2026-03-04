@@ -1,0 +1,285 @@
+{
+  "lessonId": "py-14-4",
+  "title": "lambda函数进阶",
+  "concept": "lambda是没有名字的一行函数！最常用作sorted的key",
+  "content": {
+    "code": "students = [\n    {\"name\": \"Alice\", \"score\": 85},\n    {\"name\": \"Bob\", \"score\": 92},\n    {\"name\": \"Charlie\", \"score\": 78},\n]\n\nsorted_students = sorted(students, key=lambda s: s[\"score\"], reverse=True)\n\nfor s in sorted_students:\n    print(f\"{s['name']}: {s['score']}\")\n\nmultiply = lambda x, y: x * y\nprint(multiply(3, 4))",
+    "steps": [
+      {
+        "title": "创建学生数据列表",
+        "explanation": "**`students = [{\"name\": \"Alice\", \"score\": 85}, ...]`** -- 创建由3个字典组成的列表。每个字典包含学生的姓名和分数。\n\n**类比：** 想象在学校管理学生名单。每个学生的信息写在卡片（字典）上，这些卡片被收集成一捆（列表）。卡片上写有姓名和分数，但还没有排序。\n\n**数据结构：**\n```\nstudents = [\n    {\"name\": \"Alice\",   \"score\": 85},  -- 索引0\n    {\"name\": \"Bob\",     \"score\": 92},  -- 索引1\n    {\"name\": \"Charlie\", \"score\": 78},  -- 索引2\n]\n```",
+        "visualizationType": "pythonMemory",
+        "code": "students = [",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "字典列表 -- 需要排序标准",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用sorted() + lambda排序",
+        "explanation": "**`sorted_students = sorted(students, key=lambda s: s[\"score\"], reverse=True)`**\n\n核心很简单。\n- `key=...`：定义\"用什么来比较\"\n- `reverse=True`：翻转使大值排前面\n\n这里从每个学生字典中取出 `score` 进行排序。\n也就是按分数从高到低创建新列表的代码。\n\n**类比**：就像把试卷堆不按姓名而按\"分数\"重新排列的感觉。\n\n示例流程：\n- Alice(85)、Bob(92)、Charlie(78)\n- 结果：Bob(92) -> Alice(85) -> Charlie(78)\n\n注意事项：\n- `sorted(...)` **不修改原始列表，返回新列表**\n- 要原地修改请使用 `.sort(...)`",
+        "visualizationType": "pythonMemory",
+        "code": "sorted_students = sorted(students, key=lambda s: s[\"score\"], reverse=True)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "key=lambda按score降序排序",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "遍历输出排序结果（1）",
+        "explanation": "**`for s in sorted_students:`**\n**`    print(f\"{s['name']}: {s['score']}\")`** -- 遍历排序后的列表，用f-string输出每个学生的姓名和分数。\n\n**第一次迭代：** `s = {\"name\": \"Bob\", \"score\": 92}` -> 输出：`Bob: 92`\n\n**类比：** 就像颁奖典礼上宣布获奖者。从第一名（Bob, 92）到第三名（Charlie, 78）依次宣布。\n\n**注意：** `s` 是循环变量，每次迭代指向不同的字典对象。循环结束后，`s` 仍然引用最后指向的字典（Charlie）。\n\n**f-string中字典访问技巧：** `f\"{s['name']}\"` 中，外层引号使用 `\"`，所以内层字典键必须用 `'`（单引号）来区分。使用相同的引号会导致 `SyntaxError`。",
+        "visualizationType": "pythonMemory",
+        "code": "    print(f\"{s['name']}: {s['score']}\")",
+        "occurrence": 1,
+        "pythonMemoryState": {
+          "output": [
+            "Bob: 92"
+          ],
+          "note": "第1名：Bob（92分）",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "s",
+              "pointsTo": "dict1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002"
+            },
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Bob\", \"score\": 92}",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "排序结果全部输出完成",
+        "explanation": "打印排序结果可以**立即验证顺序是否符合标准**。\n\n这里标准是按分数降序，所以\n分数高的学生应该先出现。\n\n核心：\n- 排序代码是\"创建\"和\"验证\"配套的\n- 有输出/检查步骤才能快速发现错误\n\n**类比**：就像排完卡片后实际展开来，用眼睛确认数字是否从大到小排列的最后检查。",
+        "visualizationType": "pythonMemory",
+        "code": "    print(f\"{s['name']}: {s['score']}\")",
+        "occurrence": 1,
+        "pythonMemoryState": {
+          "output": [
+            "Alice: 85",
+            "Charlie: 78"
+          ],
+          "note": "按分数降序全部输出完成",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "s",
+              "pointsTo": "dict2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002"
+            },
+            {
+              "id": "dict2",
+              "type": "dict",
+              "value": "{\"name\": \"Charlie\", \"score\": 78}",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "将lambda存入变量",
+        "explanation": "**将lambda存入变量**可以在多个地方重复使用同一个标准函数。\n\n例如在排序、过滤、测试中重复相同逻辑时，\n定义一次匿名函数就能减少重复。\n\n**类比**：就像注册常用的快捷键，需要时随时按的感觉。\n\n注意：\n- 逻辑变长时，用 `def` 命名比lambda可读性更好",
+        "visualizationType": "pythonMemory",
+        "code": "multiply = lambda x, y: x * y",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "将lambda存入变量（可以但不推荐）",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "multiply",
+              "pointsTo": "func1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<lambda (x, y) -> x * y>",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用lambda函数",
+        "explanation": "**`print(multiply(3, 4))`** -- 将参数3和4传给 `multiply` 函数调用，并输出结果。\n\n`multiply` 是 `lambda x, y: x * y`，所以计算 `3 * 4 = 12` 并返回。\n\n**类比：** 就像往计算器（multiply函数）中输入两个数字（3, 4），按下乘法键得到结果（12）显示在屏幕上。\n\n**lambda使用指南总结：**\n\n**Python内部机制：** 函数调用时创建新的**帧（frame）**对象。帧的局部命名空间中绑定 `x=3, y=4`，然后求值 `x * y` 表达式。结果 `12` 返回后帧被销毁。lambda函数和def函数使用相同的调用机制。\n\n**注意：** lambda只能使用**表达式（expression）**，不能使用**语句（statement）**。即 `lambda x: print(x)`（print是函数调用，属于表达式）可以，但 `lambda x: x = 5`（赋值是语句）或 `lambda x: if x > 0: return x`（if语句）会导致 `SyntaxError`。需要多行或条件语句时必须使用 `def`。\n\n**执行顺序：**\n1. `multiply` -> 解析函数对象引用。\n2. `multiply(3, 4)` 调用 -> 创建帧，绑定 `x=3, y=4`。\n3. `x * y` = `3 * 4` = `12` 计算。\n4. 结果 `12` 返回 -> 帧销毁。\n5. `print(12)` -> 输出到 `sys.stdout`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(multiply(3, 4))",
+        "pythonMemoryState": {
+          "output": [
+            "12"
+          ],
+          "note": "lambda(3, 4) -> 3 * 4 = 12",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "multiply",
+              "pointsTo": "func1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<lambda (x, y) -> x * y>",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "sorted([3,1,2], key=lambda x: -x)的结果是？",
+    "options": [
+      "[1, 2, 3]",
+      "[3, 2, 1]",
+      "[-3, -1, -2]",
+      "发生错误"
+    ],
+    "correctIndex": 1,
+    "explanation": "key=lambda x: -x将每个值取反后比较。\n因为-3 < -2 < -1的顺序排列，所以原始值为[3, 2, 1]（降序）。\n在key中取反也是替代reverse=True的降序排序方法！"
+  },
+  "misconceptions": [
+    {
+      "wrong": "lambda比def快",
+      "correct": "lambda和def的执行速度完全相同。lambda只是语法上更简洁。",
+      "why": "Python内部lambda也创建普通函数对象。\n没有性能差异，根据可读性和用途选择即可。"
+    }
+  ],
+  "keyTakeaway": "lambda用作sorted的key、map/filter的参数时最闪光！复杂了就用def！"
+}

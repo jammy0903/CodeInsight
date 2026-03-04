@@ -1,0 +1,149 @@
+{
+  "lessonId": "js-6-3",
+  "title": "ES6 类",
+  "concept": "class 语法是基于原型继承的语法糖——内部工作方式完全相同",
+  "content": {
+    "code": "class Animal {\n  constructor(name) {\n    this.name = name;\n  }\n  eat() {\n    return this.name + ' eats';\n  }\n}\n\nclass Dog extends Animal {\n  constructor(name, breed) {\n    super(name);\n    this.breed = breed;\n  }\n  bark() {\n    return 'Woof!';\n  }\n}\n\nconst buddy = new Dog('Buddy', 'Golden');\nconsole.log(buddy.name);\nconsole.log(buddy.eat());\nconsole.log(buddy.bark());",
+    "steps": [
+      {
+        "title": "定义 Animal 类",
+        "explanation": "`class` 关键字是语法糖，可以一次性设置构造函数和原型。\n`constructor` 成为构造函数，`eat` 等方法被添加到 `Animal.prototype`。",
+        "keyInsight": "class = 构造函数 + prototype 的语法糖",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "classes": [
+            {
+              "name": "Animal",
+              "methods": [
+                "constructor",
+                "eat()"
+              ]
+            }
+          ]
+        },
+        "code": "class Animal {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "title": "Dog 类继承 Animal",
+        "explanation": "`extends` 关键字自动将 `Dog.prototype` 的原型设置为 `Animal.prototype`，创建继承链。",
+        "keyInsight": "extends = 自动设置原型链",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "classes": [
+            {
+              "name": "Dog",
+              "extends": "Animal",
+              "methods": [
+                "constructor",
+                "bark()"
+              ]
+            }
+          ],
+          "chain": [
+            "Dog.prototype",
+            "Animal.prototype"
+          ]
+        },
+        "code": "class Dog extends Animal {"
+      },
+      {
+        "title": "调用 super()",
+        "explanation": "在子类的 `constructor` 中，必须调用 `super()` 来运行父类的 `constructor`。\n这会初始化 `this.name`。\n在调用 `super()` 之前不能使用 `this`。",
+        "keyInsight": "super() = 调用父构造函数（初始化 this）",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "note": "super()는 Animal.call(this, name)과 유사"
+        },
+        "code": "super(name);"
+      },
+      {
+        "title": "创建实例",
+        "explanation": "使用 `new Dog()` 创建 `buddy` 实例。\n调用 `super('Buddy')` 设置 `name`，`this.breed` 被设置为 'Golden'。\n`buddy` 的原型指向 `Dog.prototype`。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "objects": [
+            {
+              "name": "buddy",
+              "props": [
+                "name: 'Buddy'",
+                "breed: 'Golden'"
+              ],
+              "proto": "Dog.prototype"
+            }
+          ],
+          "chain": [
+            "buddy",
+            "Dog.prototype",
+            "Animal.prototype"
+          ]
+        },
+        "code": "const buddy = new Dog('Buddy', 'Golden');"
+      },
+      {
+        "title": "访问自身属性",
+        "explanation": "查找 `buddy.name`。\n属性直接存在于 `buddy` 上，所以立即返回 'Buddy'。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy"
+          ]
+        },
+        "code": "console.log(buddy.name);"
+      },
+      {
+        "title": "调用父原型方法",
+        "explanation": "查找 `buddy.eat()`。\n在 `buddy` 或 `Dog.prototype` 上找不到，所以沿着链向上遍历，在 `Animal.prototype` 上找到了 `eat`。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats"
+          ]
+        },
+        "code": "console.log(buddy.eat());"
+      },
+      {
+        "title": "调用子原型方法",
+        "explanation": "查找 `buddy.bark()`。\n不在 `buddy` 自身，但在 `Dog.prototype` 上找到了 `bark`。",
+        "visualizationType": "prototype",
+        "prototypeState": {
+          "output": [
+            "Buddy",
+            "Buddy eats",
+            "Woof!"
+          ]
+        },
+        "code": "console.log(buddy.bark());"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "class 语法和构造函数有什么区别？",
+    "options": [
+      "class 不会被提升",
+      "class 可以不使用 new 调用",
+      "class 的方法是可枚举的",
+      "class 不使用 prototype"
+    ],
+    "correctIndex": 0,
+    "explanation": "class 受 TDZ（暂时性死区）限制，不能在声明之前使用。\n不使用 new 调用会抛出 TypeError。\n方法是不可枚举的。\n内部仍然使用 prototype。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript 的类与其他语言的类工作方式相同",
+      "correct": "JavaScript 的 class 是基于原型的。\n它与 C++ 或 Java 中基于类的继承工作方式不同。",
+      "why": "语法看起来相似，但内部仍然通过原型链运作。"
+    }
+  ],
+  "keyTakeaway": "class = 原型继承的语法糖，extends = 建立链，super = 调用父类"
+}

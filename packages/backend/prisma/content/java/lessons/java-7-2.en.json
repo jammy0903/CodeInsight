@@ -1,0 +1,252 @@
+{
+  "lessonId": "java-7-2",
+  "title": "The Secret of Type Erasure",
+  "concept": "Core concept for Type Erasure",
+  "content": {
+    "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<String> list = new ArrayList<>();\n        list.add(\"Hello\");\n        \n        // 1. Compile-time Check\n        // list.add(123); // Error\n        \n        // 2. Runtime Reality (Type Erasure)\n        // Inside JVM, it is just ArrayList (raw type)\n        String s = list.get(0); \n        // Compiler inserts: (String) list.get(0)\n        \n        System.out.println(s);\n        \n        // Proof: getClass() is same for all generic types\n        ArrayList<Integer> intList = new ArrayList<>();\n        boolean sameClass = list.getClass() == intList.getClass();\n        System.out.println(\"Same Class? \" + sameClass);\n    }\n}",
+    "steps": [
+      {
+        "title": "Package Import",
+        "explanation": "**`import java.util.ArrayList;`**\n\nImporting the `ArrayList` class, a resizable array implementation.",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.ArrayList;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nHere we'll witness the phenomenon of 'type erasure' in generics.",
+        "visualizationType": "javaMemory",
+        "code": "public class Main {"
+      },
+      {
+        "title": "Creating a Generic List",
+        "explanation": "**Execution flow:**\n1. An `ArrayList<String>` object is created on the heap.\n2. The `list` variable references it.\n\n**Compile-time vs Runtime:**\nIn the code, we explicitly wrote `ArrayList<String>`, but after compilation, the JVM treats it as just `ArrayList` (Type Erasure).\nHowever, the compiler strictly enforces \"only Strings go in here!\"",
+        "visualizationType": "javaMemory",
+        "code": "ArrayList<String> list = new ArrayList<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "list",
+              "value": "0x100",
+              "frame": "main",
+              "type": "ArrayList<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "size: 0",
+              "type": "ArrayList<String>",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding an Element",
+        "explanation": "**Execution flow:**\n1. `list.add(\"Hello\")` is called.\n2. \"Hello\" is stored inside the list.\n\n**Invisible casting:**\nInternally it's stored as an `Object` type, but since we declared it as `String`, it goes in safely.",
+        "visualizationType": "javaMemory",
+        "code": "list.add(\"Hello\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[\"Hello\"]",
+              "type": "ArrayList<String>",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Retrieving a Value (Type Erasure)",
+        "explanation": "**Execution flow:**\n1. The value is retrieved using `list.get(0)`.\n2. The cast `(String)` that the compiler secretly inserted is executed.\n3. \"Hello\" is stored in the variable `s`.\n\n**The magic moment:**\nIt's not in the source code, but the compiler transforms it to `String s = (String) list.get(0);`.\nThis is the secret behind generics!",
+        "visualizationType": "javaMemory",
+        "code": "String s = list.get(0);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "list",
+              "value": "0x100",
+              "frame": "main",
+              "type": "ArrayList<String>"
+            },
+            {
+              "name": "s",
+              "value": "\"Hello\"",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[\"Hello\"]",
+              "type": "ArrayList<String>"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Output",
+        "explanation": "**Execution flow:**\n1. The value of `s` is printed.\n\n**Result:**\n\"Hello\" is displayed.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s);",
+        "javaMemoryState": {
+          "output": [
+            "Hello"
+          ]
+        }
+      },
+      {
+        "title": "Creating an Integer List",
+        "explanation": "**Execution flow:**\n1. This time, an `ArrayList<Integer>` is created on the heap (`0x200`).\n2. The `intList` variable references it.\n\n**They look different, but:**\nA `String` list and an `Integer` list -- they seem like completely different types in the code, right?",
+        "visualizationType": "javaMemory",
+        "code": "ArrayList<Integer> intList = new ArrayList<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "list",
+              "value": "0x100",
+              "frame": "main",
+              "type": "ArrayList<String>"
+            },
+            {
+              "name": "s",
+              "value": "\"Hello\"",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "intList",
+              "value": "0x200",
+              "frame": "main",
+              "type": "ArrayList<Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[\"Hello\"]",
+              "type": "ArrayList<String>"
+            },
+            {
+              "address": "0x200",
+              "content": "size: 0",
+              "type": "ArrayList<Integer>",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Comparing Class Information",
+        "explanation": "**Execution flow:**\n1. `list.getClass()` is called -> returns `ArrayList.class`.\n2. `intList.getClass()` is called -> returns `ArrayList.class`.\n3. The two class objects are compared using `==`.\n\n**The shocking truth:**\nGeneric type information (`String`, `Integer`) is **completely erased** at runtime.\nSo both are just `ArrayList` classes, and the result is `true`!",
+        "visualizationType": "javaMemory",
+        "code": "boolean sameClass = list.getClass() == intList.getClass();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "list",
+              "value": "0x100",
+              "frame": "main",
+              "type": "ArrayList<String>"
+            },
+            {
+              "name": "s",
+              "value": "\"Hello\"",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "intList",
+              "value": "0x200",
+              "frame": "main",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "name": "sameClass",
+              "value": "true",
+              "frame": "main",
+              "type": "boolean"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[\"Hello\"]",
+              "type": "ArrayList<String>"
+            },
+            {
+              "address": "0x200",
+              "content": "size: 0",
+              "type": "ArrayList<Integer>"
+            }
+          ],
+          "metaspace": [
+            {
+              "name": "ArrayList.class",
+              "value": "Shared Class Object"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Comparison Result",
+        "explanation": "**Execution flow:**\n1. The result is printed.\n\n**Remember:**\nGenerics are just a contract with the compiler, not baggage carried into runtime.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"Same Class? \" + sameClass);",
+        "javaMemoryState": {
+          "output": [
+            "Same Class? true"
+          ],
+          "metaspace": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which operation is impossible at runtime due to Type Erasure?",
+    "options": [
+      "new T() (creating an instance of a generic type)",
+      "Calling list.get(0)",
+      "Null check",
+      "Calling object methods"
+    ],
+    "correctIndex": 0,
+    "explanation": "At runtime, the JVM doesn't know what type T is (it treats it as Object), so calling constructors like `new T()` or creating arrays like `new T[10]` is impossible."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Using generics creates multiple classes.",
+      "correct": "No, it doesn't.\nUnlike C++ templates, Java generics generate only a single class file. Internally, the type information is erased and casts are added.",
+      "why": "This is to prevent code bloat."
+    }
+  ],
+  "keyTakeaway": "Generics are a 'compile-time' safety mechanism -- understanding that type information is erased at runtime helps you avoid confusion when working with reflection or method overloading."
+}

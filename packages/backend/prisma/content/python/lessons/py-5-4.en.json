@@ -1,0 +1,616 @@
+{
+  "lessonId": "py-5-4",
+  "title": "Inheritance",
+  "concept": "Inherit functionality from a parent class and reuse it",
+  "content": {
+    "code": "class Animal:\n    def speak(self):\n        print(\"...\")\n\nclass Dog(Animal):\n    def speak(self):\n        print(\"Bark!\")\n\nclass Cat(Animal):\n    pass\n\nd = Dog()\nc = Cat()\n\nd.speak() # Bark! (오버라이딩)\nc.speak() # ... (부모 꺼 그대로)",
+    "steps": [
+      {
+        "title": "Parent Class Definition (Animal)",
+        "explanation": "**`class Animal:`**\n\nPython executes code from top to bottom in order. We define a **parent class (also called base class)** named `Animal`.\n\n**Goal of this lesson -- Inheritance**: To **inherit and reuse** functionality from an already-created class, and only **add or modify** what's needed. This is one of the most powerful code reuse techniques in programming.\n\n**Analogy**: It's similar to inheriting genes from your parents. You inherit basic traits (Animal's speak) while being able to have your own personality (Dog says \"Bark!\", Cat keeps the parent's default).\n\n**Python internals**: When Python encounters `class Animal:`, it creates an Animal class object. This class will later serve as the **parent** of Dog and Cat. When no parent class is specified, Python 3 automatically inherits from the `object` class (i.e., `class Animal:` = `class Animal(object):`).\n\n**Why this order?** The parent class must be defined first so child classes can inherit from it later. Trying to inherit from a nonexistent class would raise a `NameError`.\n\n**Execution order**: Execute class Animal -> Begin creating Animal class object -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Animal:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Parent class definition begins",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Parent Method Definition (speak)",
+        "explanation": "**`def speak(self):`**\n\nDefines a `speak` method on the parent class `Animal`. This method outputs a basic sound (\"...\") using `print(\"...\")`.\n\n**Two possible fates for a parent method**: In a child class, this method can be:\n1. **Inherited as-is** -- If not redefined, the parent's speak is used as-is (Cat does this)\n2. **Overridden (redefined)** -- If redefined with the same name, the child's version takes priority (Dog does this)\n\n**Analogy**: Animal.speak is the **default design** that \"animals make sounds.\" Since each specific animal has a different sound, child classes can redefine it if needed. Animals that don't redefine it make the default sound \"...\".\n\n**Python internals**: The `def speak(self):` statement creates a function object named speak and registers it in Animal's `__dict__`. That is, `Animal.__dict__['speak'] = <function>`.\n\n**Why this order?** Methods are defined sequentially within the class body.\n\n**Execution order**: Execute def speak -> Create speak function object -> Register as Animal.speak -> Animal class definition complete -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def speak(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Animal.speak method defined",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with speak>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Child Class Definition (Dog)",
+        "explanation": "**`class Dog(Animal):`**\n\nThis is the **inheritance syntax**! By writing the **parent class name** inside the parentheses `(Animal)`, we declare that Dog inherits from Animal.\n\n**With this single line, Dog:**\n- Becomes a **child class (also called derived class)** of Animal\n- **Automatically inherits** all methods and attributes from Animal (without writing a single line of code!)\n- Can **add** new methods if needed\n- Can **override** parent methods by redefining them with the same name\n\n**Python internals**: When `class Dog(Animal):` executes, Python creates the Dog class object and stores `(Animal,)` tuple in Dog's `__bases__` attribute. This information enables \"if not found in Dog, look in Animal\" during method lookup.\n\n**Why use inheritance?**\n- **Code reuse**: Write common functionality (speak) once in Animal, and multiple children inherit it\n- **Extensibility**: Can add new features on top of parent features\n- **Polymorphism**: d.speak() and c.speak() share the same name but can perform different actions\n\n**Analogy**: Creating a specific species called dog (Dog) under the broad category of animal (Animal). Basic animal traits are automatically inherited while dog-specific traits are added.\n\n**Why this order?** The parent class must exist first before it can be inherited.\n\n**Execution order**: Execute class Dog(Animal) -> Create Dog class object (inherits Animal) -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "class Dog(Animal):",
+        "pythonMemoryState": {
+          "note": "Dog class definition begins (inherits Animal)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent: Animal>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Method Overriding (Dog.speak)",
+        "explanation": "**`def speak(self):`** (inside Dog class)\n\nThis is **method overriding**! The parent class Animal already has a `speak` method, and the child class Dog **redefines it with the same name**, **overwriting** the original behavior.\n\n**Why override?** The parent's default behavior (\"...\") is too generic. Dogs should bark \"Bark!\", so the Dog class redefines speak to fit its needs. The key point is that you can change behavior **without modifying the parent's code**!\n\n**Analogy**: Your parents taught you to \"bow when greeting,\" but growing up in America, you changed it to \"shake hands when greeting.\" You received the basic education but chose your own approach.\n\n**Note**: Even after overriding, Animal.speak still exists. It's not deleted -- it's just **deprioritized** when called on Dog instances.",
+        "visualizationType": "pythonMemory",
+        "code": "def speak(self):",
+        "occurrence": 2,
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Dog.speak defined (overrides Animal.speak)",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with speak>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class with speak (overridden)>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Child Class Definition (Cat)",
+        "explanation": "**`class Cat(Animal):`**\n\nDefines another child class `Cat`. Like Dog, we declare inheritance by writing `Animal` inside the parentheses.\n\n**Cat vs Dog -- Same parent, different strategies:**\n- Dog: **Overrides** the speak method to implement its own behavior\n- Cat: Does **not** override the speak method -- uses the parent's behavior as-is!\n\n**Python internals**: The Cat class object is created and `Cat.__bases__` = `(Animal,)` is set. When looking for speak in Cat, if it's not found in Cat itself, Python follows this `__bases__` information to find it in Animal.\n\n**Analogy**: Dog is the child who changed the parent's ways, Cat is the child who follows the parent's ways exactly. Both approaches are valid and can be chosen based on the situation.\n\n**Why this order?** After Dog class definition completes, the next class is defined in order.\n\n**Execution order**: Execute class Cat(Animal) -> Create Cat class object (inherits Animal) -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "class Cat(Animal):",
+        "pythonMemoryState": {
+          "note": "Cat class definition begins (inherits Animal)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Cat",
+              "pointsTo": "class3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent: Animal>",
+              "pyId": "1002"
+            },
+            {
+              "id": "class3",
+              "type": "class",
+              "value": "<class, parent: Animal>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "pass (Using Parent Method As-Is)",
+        "explanation": "**`pass`**\n\n`pass` is Python's **no-op (empty statement)**. It does nothing. When the Cat class body is empty, `pass` fills the syntactic requirement for at least one line.\n\n**What if Cat only has pass?** It has **no self-defined methods**, but it **inherits everything** from Animal! That means Cat instances can also use the `speak()` method -- Animal's speak as-is.\n\n**Dog vs Cat comparison:**\n- `Dog`: **Overrides** speak -> `d.speak()` = \"Bark!\" (Dog's new version)\n- `Cat`: Does **not** override speak -> `c.speak()` = \"...\" (Animal's original version)\n\n**This is the flexibility of inheritance:** Override only what's needed, and use the parent's version for everything else. If Animal.speak's default behavior (\"...\") is appropriate for Cat, there's no need to rewrite the code.\n\n**Analogy**: Two children inherited a recipe (parent class). One (Dog) modified the recipe to their taste, while the other (Cat) cooks with the original recipe.\n\n**Note**: Instead of `pass`, `...` (Ellipsis) can also be used for the same purpose: `class Cat(Animal): ...`\n\n**Execution order**: Execute pass (nothing happens) -> Cat class definition complete -> line 12",
+        "visualizationType": "pythonMemory",
+        "code": "pass",
+        "pythonMemoryState": {
+          "note": "Cat inherits Animal.speak as-is",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with speak>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class with speak (overridden)>",
+              "pyId": "1002"
+            },
+            {
+              "id": "class3",
+              "type": "class",
+              "value": "<class, inherits Animal.speak>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a Dog Object",
+        "explanation": "**`d = Dog()`**\n\nCreates an instance of the `Dog` class. Calling `Dog()` creates a new Dog object in memory.\n\n**Identity of this object**: The `d` object (0x4000) is an instance of the Dog class and also an object with Animal's capabilities. Both `isinstance(d, Dog)` = True and `isinstance(d, Animal)` = True hold!\n\n**Methods available to the d object:**\n- `d.speak()` -> Executes Dog.speak (overridden version, prints \"Bark!\")\n- If Animal had other methods, those would also be available\n\n**Python internals**: Since `__init__` is not defined in the Dog class, Python searches the parent class (Animal) for `__init__`. It's not there either, so ultimately `object.__init__` is called for default initialization only.\n\n**Why this order?** After all class definitions are complete, the next line executes in order.\n\n**Execution order**: Call Dog() -> Create new object 0x4000 via __new__ -> Assign reference 0x4000 to d -> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "d = Dog()",
+        "pythonMemoryState": {
+          "note": "Dog instance created",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Cat",
+              "pointsTo": "class3"
+            },
+            {
+              "name": "d",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1002"
+            },
+            {
+              "id": "class3",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a Cat Object",
+        "explanation": "**`c = Cat()`**\n\nCreates an instance of the `Cat` class.\n\n**Differences between d and c:**\n- `d` = Dog instance (0x4000) -> d.speak() executes **Dog.speak** (overridden)\n- `c` = Cat instance (0x5000) -> c.speak() executes **Animal.speak** (inherited)\n\n**Why does c.speak() execute Animal.speak?** The Cat class has no speak method defined (only `pass`). During method lookup, when Python can't find speak in Cat, it searches the parent Animal. Since Animal has speak, that's what gets used.\n\n**isinstance check:**\n```python\nisinstance(c, Cat)     # True - instance of Cat\nisinstance(c, Animal)  # True - descendant of Animal, so also an Animal!\nisinstance(c, Dog)     # False - no relation to Dog\n```\n\n**Why this order?** After d is created, the next line executes in order.\n\n**Execution order**: Call Cat() -> Create new object 0x5000 via __new__ -> Assign reference 0x5000 to c -> line 15",
+        "visualizationType": "pythonMemory",
+        "code": "c = Cat()",
+        "pythonMemoryState": {
+          "note": "Cat instance created",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Cat",
+              "pointsTo": "class3"
+            },
+            {
+              "name": "d",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1002"
+            },
+            {
+              "id": "class3",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling d.speak()",
+        "explanation": "**`d.speak()`**\n\nCalls the `speak` method on the Dog object `d`. This is where Python's **Method Resolution Order (MRO)** comes into play.\n\n**Order in which Python searches for the method:**\n1. Does the d object itself have speak? -> No (methods live on classes)\n2. Does d's class **Dog** have speak? -> **Yes! (the overridden version)** -> Search stops here!\n3. Parent class **Animal** is not searched (already found)\n\n**Result**: Dog.speak executes. `print(\"Bark!\")` will be called.\n\n**How to check MRO**: Printing `Dog.__mro__` shows `(<class 'Dog'>, <class 'Animal'>, <class 'object'>)`. Python searches for methods in this order.\n\n**Analogy**: When you have a question at school, you first ask your homeroom teacher (Dog). If the teacher knows the answer (has speak), that's it! If not, you go to the vice principal (Animal), then the principal (object).\n\n**Why this order?** After c is created, the next line executes in order.\n\n**Execution order**: line 15 -> Call d.speak() -> speak found in Dog -> Execute Dog.speak -> Jump to line 7",
+        "visualizationType": "pythonMemory",
+        "code": "d.speak() # Bark! (오버라이딩)",
+        "pythonMemoryState": {
+          "note": "d.speak() called -> About to jump to Dog.speak",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Cat",
+              "pointsTo": "class3"
+            },
+            {
+              "name": "d",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1002"
+            },
+            {
+              "id": "class3",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing Dog.speak (Overridden Version)",
+        "explanation": "**`print(\"Bark!\")`**\n\n**The overridden Dog.speak method executes!** \"Bark!\" is printed to the screen.\n\n**Why not Animal.speak's \"...\"?** Because the Dog class **overrode** speak. According to Python's MRO, Dog.speak has **higher priority** than Animal.speak. The moment speak is found in Dog, the search stops, so Animal.speak is never executed.\n\n**The essence of overriding**: You can change behavior in a child class **without modifying the parent's code**. The Animal class hasn't changed at all. Dog simply defined its own speak. This is the foundation of the **Open-Closed Principle** -- open for extension, closed for modification.\n\n**Note**: If Dog also wanted to call the parent's speak, it could use `super().speak()`. But in this example, we completely replaced it with different behavior.\n\n**Execution order**: Execute print(\"Bark!\") -> Print \"Bark!\" to screen -> Dog.speak ends -> Return to line 16",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Bark!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Bark!"
+          ],
+          "note": "Dog's overridden speak executed",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Cat",
+              "pointsTo": "class3"
+            },
+            {
+              "name": "d",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1002"
+            },
+            {
+              "id": "class3",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> d (0x4000)",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling c.speak()",
+        "explanation": "**`c.speak()`**\n\nCalls the `speak` method on the Cat object `c`. This time, the MRO produces a different result!\n\n**Order in which Python searches for the method:**\n1. Does the c object itself have speak? -> No\n2. Does c's class **Cat** have speak? -> **No!** (only pass)\n3. Does the parent class **Animal** have speak? -> **Yes!** -> Execute Animal.speak!\n\n**Comparing d.speak() vs c.speak() results:**\n- `d.speak()`: speak found in Dog -> Execute Dog.speak -> Print \"Bark!\"\n- `c.speak()`: speak not found in Cat -> speak found in Animal -> Execute Animal.speak -> Print \"...\"\n\n**This is Polymorphism!** Calling a method with the same name (`speak`), but **different behavior executes depending on the object's type**. Dog outputs \"Bark!\", Cat outputs \"...\". From the outside, both just call `.speak()`, but internally different code runs.\n\n**Analogy**: The \"power\" button on a TV remote is the same for any TV, but Samsung and LG TVs turn on in their own different ways. The user doesn't need to know the difference.\n\n**Why this order?** After d.speak() completes, the next line executes in order.\n\n**Execution order**: line 16 -> Call c.speak() -> speak not found in Cat -> speak found in Animal -> Execute Animal.speak -> Jump to line 3",
+        "visualizationType": "pythonMemory",
+        "code": "c.speak() # ... (부모 꺼 그대로)",
+        "pythonMemoryState": {
+          "note": "c.speak() called -> Not in Cat -> About to jump to Animal.speak",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Cat",
+              "pointsTo": "class3"
+            },
+            {
+              "name": "d",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1002"
+            },
+            {
+              "id": "class3",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing Animal.speak (Parent Version)",
+        "explanation": "**`print(\"...\")`**\n\nThe **original speak method from parent class Animal** executes. \"...\" is printed to the screen.\n\n**Final summary of this lesson -- Core of inheritance:**\n- `d.speak()` -> Execute Dog.speak -> Print \"Bark!\" (**Override**: child redefines)\n- `c.speak()` -> Execute Animal.speak -> Print \"...\" (**Inheritance**: uses parent's as-is)\n\n**Three core concepts of inheritance:**\n1. **Code reuse**: Cat wrote zero lines of code but can use the speak method\n2. **Method overriding**: Dog redefined the parent's speak to fit its needs\n3. **Polymorphism**: Same name `.speak()` is called, but different results depending on object type\n\n**Why is polymorphism important?** Even if new animals like Bird, Fish are added later, they just need to inherit Animal and override speak. No need to modify existing code (Animal, Dog, Cat)!\n\n**Preview of next steps**: This lesson covered simple inheritance. In practice, using the `super()` function to call parent methods or calling parent initialization in `__init__` is very important. We'll learn more deeply in Chapter 6.\n\n**Execution order**: Execute print(\"...\") -> Print \"...\" to screen -> Animal.speak ends -> Program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"...\")",
+        "pythonMemoryState": {
+          "output": [
+            "..."
+          ],
+          "note": "Cat executes parent (Animal) speak",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Cat",
+              "pointsTo": "class3"
+            },
+            {
+              "name": "d",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "c",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1002"
+            },
+            {
+              "id": "class3",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005"
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "-> c (0x5000)",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How do you call a parent class method from a child class?",
+    "options": [
+      "parent.method()",
+      "super().method()",
+      "Animal.method()",
+      "this.parent.method()"
+    ],
+    "correctIndex": 1,
+    "explanation": "The `super()` function returns the parent object.\nIt's very commonly used to call the parent constructor, like `super().__init__()`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Python doesn't support multiple inheritance",
+      "correct": "It does! `class Child(Mom, Dad):`",
+      "why": "Java doesn't allow it, but Python and C++ do.\nHowever, it can get complicated (diamond problem), so use it carefully."
+    }
+  ],
+  "keyTakeaway": "Use parentheses `(Parent)` to inherit. Makes code reuse and extension easy."
+}

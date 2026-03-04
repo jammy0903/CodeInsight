@@ -1,0 +1,172 @@
+{
+  "lessonId": "java-4-1",
+  "title": "String 不可变性 (Immutability)",
+  "concept": "String 对象一旦创建就永远不会改变。修改意味着创建新对象。",
+  "content": {
+    "code": "String s1 = \"Hello\";\nString s2 = s1;\n\ns1 = s1 + \" World\";\n\nSystem.out.println(s1);\nSystem.out.println(s2);\nSystem.out.println(s1 == s2);",
+    "steps": [
+      {
+        "title": "创建 String 字面量",
+        "explanation": "**执行流程：**\n1. JVM 发现 `\"Hello\"` 字面量。\n2. 在 String Pool 中注册/查找 `\"Hello\"`。\n3. 变量 `s1` 引用 Pool 中的地址（假设为 `Pool[0]`）。\n\n**关键点：**\nString Pool 是一个节省内存的"回收中心"。\n相同的字符串只创建一份并共享使用。",
+        "visualizationType": "javaMemory",
+        "code": "String s1 = \"Hello\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "引用复制（别名）",
+        "explanation": "**执行流程：**\n1. 读取 `s1` 的地址（`Pool[0]`）。\n2. 将其复制到变量 `s2` 中。\n\n**状态：**\n`s1` 和 `s2` 现在就像两个遥控器指向同一台电视。\n这被称为"别名（Aliasing）"。",
+        "keyInsight": "简单赋值 = 地址复制（指向同一位置）",
+        "visualizationType": "javaMemory",
+        "code": "String s2 = s1;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "sameRef": true,
+              "type": "String"
+            }
+          ]
+        }
+      },
+      {
+        "title": "字符串拼接 - 不可变性生效！",
+        "explanation": "**执行流程：**\n1. 将 `s1`（\"Hello\"）和 \" World\" 拼接 -> 生成 \"Hello World\"。\n2. 在堆（Heap）上分配一个**新对象** `\"Hello World\"`（不在 Pool 中）。\n3. `s1` 被更新为指向这个**新地址**（`Heap[0]`）。\n\n**重要：**\n并没有修改原来的 \"Hello\" 对象！而是写了一张新纸条交给 `s1`。\n`s2` 仍然持有旧的 \"Hello\"。",
+        "keyInsight": "修改 String = 创建新对象（重新绑定）",
+        "visualizationType": "javaMemory",
+        "code": "s1 = s1 + \" World\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Heap[0]",
+              "frame": "main",
+              "changed": true,
+              "type": "String"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello World\"",
+              "type": "String",
+              "new": true
+            }
+          ],
+          "note": "只有 s1 的箭头改变了！（s2 不变）"
+        }
+      },
+      {
+        "title": "输出 s1（新值）",
+        "explanation": "**执行流程：**\n1. 输出 `s1` 指向的 `\"Hello World\"`。\n\n因为 `s1` 现在引用新对象，所以输出的是更新后的值。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Heap[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello World\"",
+              "type": "String"
+            }
+          ],
+          "output": [
+            "Hello World"
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "输出 s2（原始值保持不变）",
+        "explanation": "**执行流程：**\n1. 输出 `s2` 指向的 `\"Hello\"`。\n\n**不可变性的力量：**\n即使 `s1` 已经指向了新对象，`s2` 持有的原始 `\"Hello\"` 从未改变。\n这就是不可变对象带来的**安全性（Safety）**。",
+        "keyInsight": "原始值不受影响 = 防止副作用",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s2);",
+        "javaMemoryState": {
+          "output": [
+            "Hello"
+          ]
+        }
+      },
+      {
+        "title": "引用比较",
+        "explanation": "**执行流程：**\n1. 比较 `s1` 的地址（Heap[0]）和 `s2` 的地址（Pool[0]）。\n2. 不同 -> 输出 `false`。\n\n因为是不同的对象，地址自然不同。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1 == s2);",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下关于 Java 中 String 不可变性的说法，哪一项是错误的？",
+    "options": [
+      "修改字符串会创建新对象。",
+      "多个变量可以安全地共享同一个字符串。",
+      "在多线程环境中不需要额外的同步。",
+      "频繁修改也不会占用太多内存。"
+    ],
+    "correctIndex": 3,
+    "explanation": "每次修改字符串都会创建新对象，因此频繁修改会导致内存浪费和性能下降。\n这种情况下应该使用 `StringBuilder`。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "执行 s1 = s1 + \"world\" 会改变 s1 的内容。",
+      "correct": "只是变量 `s1` 指向的**引用**发生了变化，原来的 \"Hello\" 对象保持不变。",
+      "why": "String 对象的值在创建时就已确定，之后永远无法更改（只读）。"
+    },
+    {
+      "wrong": "不可变性岂不是浪费内存？",
+      "correct": "修改时确实会产生浪费，但在**读取**方面有巨大优势。",
+      "why": "由于值保证不会改变，一个 `\"Hello\"` 可以被数千个变量安全共享（Sharing）。\n这就是 **String Pool** 的工作原理。"
+    }
+  ],
+  "keyTakeaway": "String 就像刻在石头上的文字。你无法修改它——只能刻一块新的石头。"
+}

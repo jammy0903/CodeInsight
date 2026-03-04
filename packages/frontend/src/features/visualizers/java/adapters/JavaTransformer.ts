@@ -199,7 +199,9 @@ export class JavaTransformer implements IFlowTransformer {
         const frameVariables = item.variables;
 
         if (frameVariables) {
-          Object.entries(frameVariables).forEach(([varName, val]) => {
+          Object.entries(frameVariables)
+          .filter(([varName]) => varName !== 'args')
+          .forEach(([varName, val]) => {
             let value: string | number | boolean | null = null;
             let type = 'unknown';
             let pointsToAddr: string | undefined = undefined;

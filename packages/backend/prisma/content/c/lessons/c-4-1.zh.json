@@ -1,0 +1,244 @@
+{
+  "lessonId": "c-4-1",
+  "title": "栈帧",
+  "concept": "每次函数调用时，栈上都会创建一个"属于自己的房间"",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid funcB(int x) {\n    int b = x + 1;\n    printf(\"Inside funcB: b=%d\\n\", b);\n}\n\nvoid funcA() {\n    int a = 10;\n    funcB(a);\n}\n\nint main() {\n    funcA();\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含头文件",
+        "explanation": "`#include <stdio.h>` 启用输出函数。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "程序启动时创建 main 栈帧。\n\n本课的核心是确认函数调用时帧被 push、结束时被 pop 的 LIFO 结构。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "调用 funcA（栈 Push）",
+        "explanation": "`funcA();` 调用将 funcA 的帧 push 到 main 上方。\n\n被调用的函数结束后控制权才会返回 main。",
+        "visualizationType": "cMemory",
+        "code": "funcA();",
+        "highlightOffset": [
+          0,
+          -6
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "funcA",
+            "type": "frame",
+            "func": "funcA",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "funcA 内部：创建变量 a",
+        "explanation": "在 funcA 的帧中创建局部变量 `a=10`。\n\n局部变量仅在其所属函数帧中有效。",
+        "visualizationType": "cMemory",
+        "code": "int a = 10;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "funcA",
+            "type": "frame",
+            "func": "funcA",
+            "value": "frame"
+          },
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "frame": "funcA"
+          }
+        ]
+      },
+      {
+        "title": "调用 funcB（栈 Push）",
+        "explanation": "`funcB(a);` 调用时额外 push funcB 的帧。\n\n`a` 的值 10 被复制到参数 `x`。",
+        "visualizationType": "cMemory",
+        "code": "funcB(a);",
+        "highlightOffset": [
+          0,
+          -7
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "funcA",
+            "type": "frame",
+            "func": "funcA",
+            "value": "frame"
+          },
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "frame": "funcA"
+          },
+          {
+            "name": "funcB",
+            "type": "frame",
+            "func": "funcB",
+            "value": "frame"
+          },
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "frame": "funcB"
+          }
+        ]
+      },
+      {
+        "title": "funcB 内部：创建变量 b",
+        "explanation": "计算 `b = x + 1` 存储 `b=11`。\n\n当前 funcB 帧中有 `x` 和 `b`。",
+        "visualizationType": "cMemory",
+        "code": "int b = x + 1;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "funcA",
+            "type": "frame",
+            "func": "funcA",
+            "value": "frame"
+          },
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "frame": "funcA"
+          },
+          {
+            "name": "funcB",
+            "type": "frame",
+            "func": "funcB",
+            "value": "frame"
+          },
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "frame": "funcB"
+          },
+          {
+            "name": "b",
+            "value": "11",
+            "type": "int",
+            "frame": "funcB"
+          }
+        ]
+      },
+      {
+        "title": "funcB：输出结果",
+        "explanation": "`printf` 输出 `b` 的值 11。\n\n输出发送到标准输出，与帧无关。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Inside funcB: b=%d\\n\", b);",
+        "stdout": "Inside funcB: b=11"
+      },
+      {
+        "title": "funcB 结束（栈 Pop）",
+        "explanation": "funcB 结束时其帧被 pop，`x` 和 `b` 随之销毁。\n\n控制权返回调用者 funcA。",
+        "visualizationType": "cMemory",
+        "code": "}",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "funcA",
+            "type": "frame",
+            "func": "funcA",
+            "value": "frame"
+          },
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "frame": "funcA"
+          }
+        ]
+      },
+      {
+        "title": "funcA 结束（栈 Pop）",
+        "explanation": "funcA 结束时其帧被 pop，`a` 也一起销毁。\n\n之后返回 main。",
+        "visualizationType": "cMemory",
+        "code": "}",
+        "occurrence": 2,
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "程序结束",
+        "explanation": "`return 0;` 终止 main，最后的帧被清理。\n\n总结：函数调用 = push，函数返回 = pop。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如果函数递归调用 10,000 次导致栈空间耗尽，会发生什么错误？",
+    "options": [
+      "Heap Overflow",
+      "Stack Overflow",
+      "Memory Leak",
+      "Segmentation Fault"
+    ],
+    "correctIndex": 1,
+    "explanation": "超出栈空间（通常 1MB-8MB）时无法再 push 新帧，导致 Stack Overflow 错误。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "funcA 的变量 a 可以在 funcB 中使用",
+      "correct": "看不到（作用域限制）。",
+      "why": "`funcB` 只能看到自己帧中的变量。\n`funcA` 的帧在不同层，无法访问。"
+    }
+  ],
+  "keyTakeaway": "函数调用 = 栈帧 Push，返回 = Pop。每个函数只使用自己房间（帧）中的数据。"
+}

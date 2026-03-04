@@ -1,0 +1,177 @@
+{
+  "lessonId": "py-1-1",
+  "title": "Getting Started with Python: Variables Are Labels",
+  "concept": "Python variables are not boxes — they are 'labels'",
+  "content": {
+    "code": "print(\"Hello, Python!\")\n\n# 변수 정의: 이름표 붙이기\nmessage = \"Python is fun\"\nprint(message)\n\n# 같은 객체에 다른 이름표 붙이기\na = [1, 2, 3]\nb = a\n\nprint(id(a))\nprint(id(b))",
+    "steps": [
+      {
+        "title": "Hello World",
+        "explanation": "**`print(\"Hello, Python!\")`** -- Calls Python's built-in function `print()`.\n\nThis single line is your first Python program. It outputs the string `\"Hello, Python!\"` inside the parentheses to the screen (console).\n\n**Why is it so simple?** In C, you need `#include <stdio.h>` and a `main()` function. In Java, you need `public class` and `public static void main`. But Python **runs from the very first line** without any boilerplate. This simplicity is Python's greatest strength.\n\n**How Python works internally:** The `print()` function internally calls the argument's `__str__()` method to convert it to a string, then writes it to `sys.stdout` (the standard output stream). Since a string is already a string, it is printed directly without conversion.\n\n**Note:** `print` is a function, so you must use parentheses `()`. `print \"hello\"` is Python 2 syntax, and in Python 3 it raises a `SyntaxError`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Hello, Python!\")",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": [],
+          "output": [
+            "Hello, Python!"
+          ]
+        }
+      },
+      {
+        "title": "Variables Are Labels",
+        "explanation": "**`message = \"Python is fun\"`** -- Creates a variable and binds it to a string object.\n\nWhen this code runs, two things happen in order:\n1. First, a string object `\"Python is fun\"` is created in memory.\n2. Then a **label** called `message` is attached to that object.\n\n**Analogy:** Think of it like attaching a price tag (variable) to a product (object) on a store shelf. The price tag itself is not the product! Even if you remove the tag, the product still exists, and you can attach a different tag to it.\n\n**How Python works internally:** Python first allocates a `str` type object on the heap memory. This object's reference count is set to 1. Then, an entry `{\"message\": <object address>}` is added to the current namespace dictionary (here, the global namespace).\n\n**Difference from other languages:** In C or Java, you must declare a type first like `int a = 10;`, but Python requires no type declaration. This is because the type belongs to the **object**, not the variable (dynamic typing).",
+        "visualizationType": "pythonMemory",
+        "code": "message = \"Python is fun\"",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "message",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python is fun\"",
+              "pyId": "1001"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Printing a Variable's Value",
+        "explanation": "**`print(message)`** -- Outputs the value of the object that the `message` label points to.\n\nWhen you pass the variable name `message` to `print()`, Python first follows `message` to find the object it refers to. This is called **dereferencing**. It's the process of following the label to find the actual product (object).\n\n**Why no quotes?** If you write `print(\"message\")`, the literal string `message` is printed as-is. But `print(message)` prints `Python is fun` — the **value of the object** that the variable `message` points to. The presence or absence of quotes completely changes the result.\n\n**How Python works internally:** The Python interpreter looks up the key `\"message\"` in the namespace dictionary and retrieves the object's memory address. It then outputs the content of the `str` object at that address to `sys.stdout`.\n\n**Note:** Using an undefined variable raises `NameError: name 'xxx' is not defined`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(message)",
+        "pythonMemoryState": {
+          "output": [
+            "Python is fun"
+          ],
+          "names": [
+            {
+              "name": "message",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python is fun\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating a List",
+        "explanation": "**`a = [1, 2, 3]`** -- Creates a list object and binds it to the variable `a`.\n\nUsing square brackets `[]`, a list object containing three integers is created in memory, and the label `a` is attached to it.\n\n**Analogy:** Think of a list as a drawer unit with numbered compartments. Compartment 0 holds 1, compartment 1 holds 2, and compartment 2 holds 3. And the label `a` is attached to this drawer unit.\n\n**Why is this important?** Python variables are not 'boxes that hold values' like in C. Variables are like **pointers (references)** that point to objects. The label `a` simply knows the memory address where the list object is stored — it does not 'contain' the list itself.\n\n**How Python works internally:** The list `[1, 2, 3]` is allocated on the heap memory. Internally, a list is **an array that holds the memory addresses** of each element. That is, the integer objects 1, 2, and 3 each exist separately, and the list manages a collection of their addresses.",
+        "visualizationType": "pythonMemory",
+        "code": "a = [1, 2, 3]",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2002"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Sharing Labels (Aliasing)",
+        "explanation": "**`b = a`** -- Attaches a new label `b` to the same list object that `a` points to.\n\nThis line does **not** copy the list! `b` points to **exactly the same list object** as `a`. One list has two labels — `a` and `b` — attached to it. This is called **aliasing**.\n\n**Analogy:** It's like a person having both a real name and a nickname. Whether you call them \"John Smith\" or \"Johnny,\" they're the same person. `a` and `b` are simply different names for the same object.\n\n**Why is this dangerous?** If you modify the list through `b`, the change is visible through `a` too! For example, if you do `b.append(4)`, then `a` also becomes `[1, 2, 3, 4]` — because they're the same object.\n\n**How Python works internally:** When `b = a` is executed, Python increments the reference count of the object that `a` points to (1 -> 2). No new memory allocation happens at all. Only `{\"b\": <same address>}` is added to the namespace.\n\n**Note:** To create an independent copy, use `b = a[:]`, `b = list(a)`, or `b = a.copy()`.",
+        "keyInsight": "Variable assignment = attaching a label",
+        "visualizationType": "pythonMemory",
+        "code": "b = a",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Object ID of a",
+        "explanation": "**`print(id(a))`** -- Prints the unique ID (memory address) of the object `a` points to.\n\n`id()` is a Python built-in function that returns the **unique identifier** of an object. In CPython (the standard Python implementation), this value is the actual **memory address**.\n\n**Analogy:** Just as every person has a unique social security number, every Python object has a unique ID. Even if names (variable names) differ, if the IDs match, it's the same person (same object).\n\n**Why this order?** To prove that `a` and `b` point to the same object, we first check `a`'s ID, then in the next step we check `b`'s ID to compare them.\n\n**How Python works internally:** The `id()` function returns the value of the object pointer cast to an integer at the C level. This value never changes while the object is alive, and no two objects that exist simultaneously can have the same ID.",
+        "visualizationType": "pythonMemory",
+        "code": "print(id(a))",
+        "pythonMemoryState": {
+          "output": [
+            "2002"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": []
+        }
+      },
+      {
+        "title": "Checking the Object ID of b",
+        "explanation": "**`print(id(b))`** -- Prints the unique ID of the object `b` points to.\n\n**The result is the same!** The IDs of `a` and `b` are printed as the same value (`2002`). This is definitive proof that `a` and `b` point to **exactly the same object at the same memory address**.\n\n**Key summary:**\n- `b = a` does not copy the object — it **attaches one more label** to the same object.\n- If `id(a) == id(b)`, the two variables point to the same object.\n- A simpler way to check this is by using `a is b` (returns `True`).\n\n**How Python works internally:** The `is` operator internally compares the `id()` values of two objects. `a is b` is completely equivalent to `id(a) == id(b)`.\n\n**Note:** `==` checks if values are equal, while `is` checks if they are the same object. `[1,2,3] == [1,2,3]` is `True`, but `[1,2,3] is [1,2,3]` is `False` (they are two different objects).",
+        "visualizationType": "pythonMemory",
+        "code": "print(id(b))",
+        "pythonMemoryState": {
+          "output": [
+            "2002"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the best analogy for `a = 10` in Python?",
+    "options": [
+      "Putting the number 10 into a box called variable a",
+      "Declaring variable a and reserving memory space",
+      "Attaching a label called a to the integer object 10",
+      "a is the hard disk location where 10 is stored"
+    ],
+    "correctIndex": 2,
+    "explanation": "In Python, a variable is a reference that points to an object.\nThe 'label' analogy is the most accurate."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You must declare variables (int a;)",
+      "correct": "Python has no type declarations.\nJust assign a value and the variable is created.",
+      "why": "Because Python is a dynamically typed language.\nThe type belongs to the 'object', not the variable."
+    }
+  ],
+  "keyTakeaway": "Python is simple. Variables are not boxes that hold values — they are labels that point to objects."
+}

@@ -1,0 +1,191 @@
+{
+  "lessonId": "java-1-2",
+  "title": "字符串常量池的秘密",
+  "concept": "字符串字面量存储在字符串常量池中并被复用",
+  "content": {
+    "code": "String a = \"hello\";\nString b = \"hello\";\nSystem.out.println(a == b);\n\nString c = new String(\"hello\");\nSystem.out.println(a == c);\n\nString d = c.intern();\nSystem.out.println(a == d);",
+    "steps": [
+      {
+        "title": "用字面量创建 String",
+        "explanation": "**执行顺序：**\n1. JVM 搜索 **字符串常量池（String Pool）**。\n2. 未找到 \"hello\"，因此在池中创建。\n3. 将地址（Pool:0x100）赋值给 `a`。\n\n**什么是字符串常量池？**\n它是一个收集常用字符串的"回收利用中心"。\n为了节省内存，Java 只创建一份相同的字符串字面量并共享使用。\n\n**什么是字面量（Literal）？**\n就是你在代码中直接书写的值（如 `\"hello\"`）。",
+        "keyInsight": "用引号（\"\"）创建的字符串存储在常量池中",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "heap": [],
+          "output": []
+        },
+        "code": "String a = \"hello\";"
+      },
+      {
+        "title": "复用相同的字面量",
+        "explanation": "**执行顺序：**\n1. 搜索字符串常量池。\n2. 找到 \"hello\"（复用）。\n3. 将已有地址（Pool:0x100）赋值给 `b`。\n\n又要创建 \"hello\"？\nJVM 搜索常量池后说："哦，之前已经创建过了！"然后**复用已有地址**。\n因此 `b` 也和 `a` 一样指向 **Pool:0x100**。\n\n**享元模式（Flyweight Pattern）：**\n一种设计模式，通过共享相同的对象来节省内存，而不是创建大量副本。\n字符串常量池正是这种模式的体现。",
+        "keyInsight": "相同的字面量 = 复用相同的地址",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "b",
+              "value": "-> Pool:0x100",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100",
+              "refCount": 2
+            }
+          ],
+          "heap": [],
+          "output": []
+        },
+        "code": "String b = \"hello\";"
+      },
+      {
+        "title": "字面量之间的 == 比较",
+        "explanation": "**执行顺序：**\n1. 比较 a(Pool:0x100) == b(Pool:0x100)。\n2. 地址相同，所以是 **true**。\n\n`a` 和 `b` 指向**相同的地址**，所以 `==`（地址比较）结果为 **true**。\n但要注意！这不是因为字符串内容相等，而是因为它们**恰好共享了同一个对象**。",
+        "keyInsight": "字面量之间 == 为 true（但推荐使用 .equals）",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "comparison": "Pool:0x100 == Pool:0x100",
+          "output": [
+            "true"
+          ],
+          "warning": "字面量之间 == 为 true！但不应依赖此行为"
+        },
+        "code": "System.out.println(a == b);"
+      },
+      {
+        "title": "用 new 创建 String",
+        "explanation": "**执行顺序：**\n1. 检测到 `new` 关键字 -> 无条件创建新对象。\n2. 在堆上分配地址 0x200。\n\n`new` 关键字的含义是**"不要回收利用，给我一个全新的！"**\n不管常量池中是否存在 \"hello\"，它都会在普通的**堆（Heap）**区域创建新对象。\n\n**堆字符串 vs 池字符串：**\n- `new`：专属私有对象（不复用）\n- `\"...\"`：共享对象（可复用）",
+        "keyInsight": "new = 拒绝复用，始终创建新对象",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "c",
+              "value": "-> 0x200",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x200",
+              "content": "\"hello\"",
+              "new": true
+            }
+          ],
+          "output": []
+        },
+        "code": "String c = new String(\"hello\");"
+      },
+      {
+        "title": "字面量 vs new 的比较",
+        "explanation": "**执行顺序：**\n1. 比较 a(Pool:0x100) == c(0x200)。\n2. 地址不同，所以是 **false**。\n\n`a` 来自回收利用中心（Pool），\n而 `c` 是从工厂（Heap）刚生产的新品。\n来源不同，地址自然也不同。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "comparison": "Pool:0x100 != 0x200",
+          "output": [
+            "false"
+          ]
+        },
+        "code": "System.out.println(a == c);"
+      },
+      {
+        "title": "使用 intern() 注册到常量池",
+        "explanation": "**执行顺序：**\n1. 调用 `c.intern()`。\n2. 在字符串常量池中找到相同内容（\"hello\"）。\n3. 返回找到的池对象地址（Pool:0x100）。\n\n`intern()` 方法就像在请求**"让我也加入常量池吧。"**\n最终 `d` 获得了与 `a` 相同的地址。",
+        "keyInsight": "intern() = 将堆字符串转换为常量池地址",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "d",
+              "value": "-> Pool:0x100",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "heap": [],
+          "output": []
+        },
+        "code": "String d = c.intern();"
+      },
+      {
+        "title": "比较 intern() 的结果",
+        "explanation": "**执行顺序：**\n1. 比较 a(Pool:0x100) == d(Pool:0x100)。\n2. 地址相同，所以是 **true**。\n\n`a` 和 `d` 现在指向相同的常量池对象。\n**true**！\n\n**实用技巧：**\n当需要处理数百万个重复字符串时，使用 `intern()` 可以大幅减少内存使用。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ]
+        },
+        "code": "System.out.println(a == d);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "字符串常量池的目的是什么？",
+    "options": [
+      "增强安全性",
+      "节省内存",
+      "提升速度",
+      "优化垃圾回收"
+    ],
+    "correctIndex": 1,
+    "explanation": "即使相同的字符串字面量被多次使用，也只创建一个对象，从而节省内存。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "字符串总是可以用 == 来比较",
+      "correct": "字符串比较必须使用 `.equals()`。",
+      "why": "由于常量池的存在，字面量可能侥幸通过 `==` 比较，但来自用户输入或文件读取的字符串会被当作 `new` 对象处理，导致 `==` 失败。"
+    },
+    {
+      "wrong": "字符串常量池即使内存满了也不会被清理",
+      "correct": "字符串常量池也是 GC（垃圾回收）的对象。",
+      "why": "Java 7 之前，它位于 PermGen 区域，可能导致内存不足问题，但从 Java 7 开始已移至普通堆中，没有引用时会被自动清理。"
+    }
+  ],
+  "keyTakeaway": "字面量在常量池中被复用，new 始终创建新对象。比较请使用 .equals()！"
+}

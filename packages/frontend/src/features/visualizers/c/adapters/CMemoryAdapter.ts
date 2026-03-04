@@ -19,7 +19,6 @@ export class CMemoryAdapter implements MemoryAdapter {
       heap: memoryState?.heap || [],
       changedBlocks: changedBlocks || { stack: [], heap: [] },
       frames: memoryState?.frames,
-      showRegisters: true,
     };
   }
 }

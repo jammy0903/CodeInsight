@@ -1,0 +1,101 @@
+{
+  "lessonId": "c-9-3",
+  "title": "Conditional Compilation",
+  "concept": "Conditional compilation selectively includes or excludes code depending on the build environment",
+  "content": {
+    "code": "#include <stdio.h>\n\n#define DEBUG_MODE 1\n\nint main() {\n    printf(\"Program Start\\n\");\n\n#ifdef DEBUG_MODE\n    printf(\"[DEBUG] Variable x checking...\\n\");\n#endif\n\n#if DEBUG_MODE == 0\n    printf(\"Release Mode\\n\");\n#endif\n\n    printf(\"Program End\\n\");\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "**`#include <stdio.h>`** -- Includes the header for `printf`.\n\nIn this lesson we learn **Conditional Compilation**.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Defining the compilation switch",
+        "explanation": "**`#define DEBUG_MODE 1`** -- A macro that acts as a **switch** for the `#ifdef` and `#if` directives below, determining which code to include. Changing this value or removing the line entirely excludes debug code from compilation.",
+        "visualizationType": "cMemory",
+        "code": "#define DEBUG_MODE 1"
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "**`int main() {`** -- The program entry point. At this point, the preprocessor has already completed header insertion, macro definitions, and code inclusion/removal based on `#ifdef`/`#if` conditions.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "First output",
+        "explanation": "**`printf(\"Program Start\\n\");`** -- This is not inside any `#ifdef` or `#if` block, so it is **always** compiled and executed regardless of conditions. `\"Program Start\"` is printed.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Program Start\\n\");",
+        "stack": [],
+        "stdout": "Program Start"
+      },
+      {
+        "title": "Conditional compilation 1: #ifdef",
+        "explanation": "**`#ifdef DEBUG_MODE`** -- Checks whether `DEBUG_MODE` is **defined**. If it has been `#define`d with any value, the condition is true; if not defined, it is false.",
+        "visualizationType": "cMemory",
+        "code": "#ifdef DEBUG_MODE",
+        "highlightOffset": [0, 2]
+      },
+      {
+        "title": "Debug code execution",
+        "explanation": "**`printf(\"[DEBUG] Variable x checking...\\n\");`** -- Since the `#ifdef` condition was true, the preprocessor kept this line, and it is compiled and executed. `\"[DEBUG] Variable x checking...\"` is printed.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"[DEBUG] Variable x checking...\\n\");",
+        "stdout": "Program Start\n[DEBUG] Variable x checking..."
+      },
+      {
+        "title": "Conditional compilation 2: #if",
+        "explanation": "**`#if DEBUG_MODE == 0`** -- Unlike `#ifdef`, this **directly compares the macro's value**. `#ifdef` only checks existence, but `#if` evaluates the expression to determine true/false.",
+        "visualizationType": "cMemory",
+        "code": "#if DEBUG_MODE == 0",
+        "highlightOffset": [0, 2]
+      },
+      {
+        "title": "Final output",
+        "explanation": "**`printf(\"Program End\\n\");`** -- Outside any conditional block, so it always executes.\n\nAnalyzing the final output: `\"Program Start\"` -- unconditional, `\"[DEBUG]...\"` -- included because `#ifdef` was true, `\"Release Mode\"` -- excluded because `#if` was false.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Program End\\n\");",
+        "stdout": "Program Start\n[DEBUG] Variable x checking...\nProgram End"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "**`return 0;`** -- The program terminates.\n\nPractical uses of conditional compilation: separating debug/release builds (`#ifdef DEBUG`), platform-specific code (`#ifdef _WIN32`, `#ifdef __linux__`), and more.",
+        "visualizationType": "cMemory",
+        "code": "return 0;"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the main reason for using Header Guards (#ifndef HEADER_H ...)?",
+    "options": [
+      "Improving compilation speed",
+      "Preventing duplicate header inclusion (avoiding redefinition errors)",
+      "Checking permissions for external libraries",
+      "Reducing memory usage"
+    ],
+    "correctIndex": 1,
+    "explanation": "If the same header is included multiple times in a source file (directly or indirectly), structs or functions get redefined, causing compilation errors.\nHeader guards prevent this."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Code excluded by #ifdef is checked at runtime like an if statement.",
+      "correct": "There is no condition check at runtime at all.\nDuring preprocessing, the code is either removed or kept -- one or the other.",
+      "why": "This affects the actual executable file size."
+    }
+  ],
+  "keyTakeaway": "With conditional compilation, a single source code can produce separate executables for debug, release, and different OS targets (Windows/Linux)."
+}

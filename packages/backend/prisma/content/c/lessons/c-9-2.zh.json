@@ -1,0 +1,129 @@
+{
+  "lessonId": "c-9-2",
+  "title": "Macro Pitfalls",
+  "concept": "宏虽然强大，但括号遗漏和副作用可能产生意想不到的 bug",
+  "content": {
+    "code": "#include <stdio.h>\n\n#define SQUARE_BAD(x) x * x\n\n#define SQUARE_SAFE(x) ((x) * (x))\n\nint main() {\n    int a = 5;\n\n    printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));\n\n    printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));\n\n    int n = 3;\n    printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "**`#include <stdio.h>`** -- 包含使用 `printf` 所需的标准输入输出头文件。\n\n本课将学习**宏函数**的两个危险陷阱：省略括号导致的**运算符优先级问题**，以及 `n++` 这类参数被多次求值的问题。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "定义有缺陷的宏",
+        "explanation": "**`#define SQUARE_BAD(x) x * x`** -- 看起来是计算平方的宏。`SQUARE_BAD(5)` 得到 `5 * 5 = 25` 看似没问题，但有个致命缺陷：**参数 `x` 没有加括号**。",
+        "visualizationType": "cMemory",
+        "code": "#define SQUARE_BAD(x) x * x"
+      },
+      {
+        "title": "定义安全的宏",
+        "explanation": "**`#define SQUARE_SAFE(x) ((x) * (x))`** -- 同样的平方宏，但应用了**双层括号保护**。内层 `(x)` 即使参数是复杂表达式也作为一个整体处理，外层 `((...) * (...))` 保护宏结果不受周围运算符干扰。",
+        "visualizationType": "cMemory",
+        "code": "#define SQUARE_SAFE(x) ((x) * (x))"
+      },
+      {
+        "title": "main 函数与变量声明",
+        "explanation": "**`int a = 5;`** -- 声明用于测试宏陷阱的变量。栈上 4 字节，值为 `5`。\n\n`a` 是有内存地址和类型的真正**变量**，而 `SQUARE_BAD` 和 `SQUARE_SAFE` 在预处理阶段已经被文本替换。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "highlightOffset": [0, 1],
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "5",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "陷阱 1：运算符优先级",
+        "explanation": "**`printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));`** -- 预处理器将 `x` 替换为 `a + 1` **文本**，结果变成 `a + 1 * a + 1`。乘法先计算：`1 * 5 = 5`，然后 `5 + 5 + 1 = 11`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));",
+        "stdout": "Bad: 11"
+      },
+      {
+        "title": "正确使用括号",
+        "explanation": "**`printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));`** -- 这次使用安全宏。替换结果为 `((a + 1) * (a + 1))`，得到 `(6) * (6) = 36`，结果正确。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));",
+        "stdout": "Bad: 11\nSafe: 36"
+      },
+      {
+        "title": "陷阱 2：副作用的双重求值",
+        "explanation": "**`int n = 3;`** -- 用于测试第二个陷阱的变量。这表明**即使括号完美的 `SQUARE_SAFE`，也不应该传入有副作用的参数**。",
+        "visualizationType": "cMemory",
+        "code": "int n = 3;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "5",
+            "address": "0x1000"
+          },
+          {
+            "name": "n",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "自增运算符的双重调用",
+        "explanation": "**`printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));`** -- 替换结果为 `((n++) * (n++))`。第一个 `n++` 使用 `3` 并将 `n` 增为 `4`；第二个 `n++` 使用 `4` 并将 `n` 增为 `5`。结果为 `3 * 4 = 12`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "5",
+            "address": "0x1000"
+          },
+          {
+            "name": "n",
+            "type": "int",
+            "value": "5",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "Bad: 11\nSafe: 36\nSide Effect: 12"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "**`return 0;`** -- 程序终止。\n\n宏函数陷阱总结 -- 陷阱 1 是参数缺少括号导致的**运算符优先级问题**。陷阱 2 是有副作用的参数被双重求值。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "给定 #define MUL(a, b) (a * b)，MUL(2 + 3, 4) 的结果是？",
+    "options": [
+      "20",
+      "14",
+      "24",
+      "编译错误"
+    ],
+    "correctIndex": 1,
+    "explanation": "替换结果为 `(2 + 3 * 4)`。\n先计算 3 * 4 = 12，再加 2 得 14。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "宏函数和普通函数的行为完全一样。",
+      "correct": "由于是文本替换，参数可能被多次求值或运算顺序混乱，危险得多。",
+      "why": "使用 inline 函数在类型安全和防止副作用方面要好得多。"
+    }
+  ],
+  "keyTakeaway": "宏虽然方便，但必须遵守严格的规则：'括号必须加'和'禁止传入有副作用的参数'。"
+}

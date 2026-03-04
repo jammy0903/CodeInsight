@@ -1,0 +1,211 @@
+{
+  "lessonId": "js-4-3",
+  "title": "async/await",
+  "concept": "async/await 是一种语法，让你可以用同步风格编写 Promise 代码",
+  "content": {
+    "code": "function delay(ms) {\n  return new Promise(resolve => setTimeout(resolve, ms));\n}\n\nasync function fetchUser() {\n  console.log('Fetching...');\n  await delay(1000);\n  console.log('User loaded');\n  return { name: 'Alice' };\n}\n\nasync function main() {\n  console.log('Start');\n  const user = await fetchUser();\n  console.log('Got:', user.name);\n  console.log('End');\n}\n\nmain();",
+    "steps": [
+      {
+        "title": "调用 main()",
+        "explanation": "调用 `main()`。\n因为它是 async 函数，它会立即返回一个 Promise 并开始内部执行。",
+        "visualizationType": "eventLoop",
+        "code": "main();",
+        "eventLoopState": {
+          "callStack": [
+            "main()"
+          ],
+          "webApis": [],
+          "taskQueue": [],
+          "microtaskQueue": [],
+          "output": []
+        }
+      },
+      {
+        "title": "打印 'Start'",
+        "explanation": "`console.log('Start')` 同步执行。\n'Start' 被打印到控制台。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('Start');",
+        "eventLoopState": {
+          "callStack": [
+            "main()",
+            "console.log('Start')"
+          ],
+          "output": [
+            "Start"
+          ]
+        }
+      },
+      {
+        "title": "调用 await fetchUser()",
+        "explanation": "调用 `fetchUser()` 并等待结果。\nmain 函数在这里暂停。",
+        "keyInsight": "await = 暂停函数的执行，直到 Promise 解决",
+        "visualizationType": "eventLoop",
+        "code": "const user = await fetchUser();",
+        "eventLoopState": {
+          "callStack": [
+            "fetchUser()"
+          ],
+          "microtaskQueue": [
+            "main() (suspended)"
+          ],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "title": "打印 'Fetching...'",
+        "explanation": "在 `fetchUser` 函数内部，`console.log('Fetching...')` 执行。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('Fetching...');",
+        "eventLoopState": {
+          "callStack": [
+            "fetchUser()",
+            "console.log('Fetching...')"
+          ],
+          "output": [
+            "Start",
+            "Fetching..."
+          ],
+          "currentPhase": null,
+          "highlightArea": null
+        }
+      },
+      {
+        "title": "await delay(1000)",
+        "explanation": "调用 `delay(1000)` 并等待它。\n一个 1 秒的计时器启动，fetchUser 也暂停了。",
+        "visualizationType": "eventLoop",
+        "code": "await delay(1000);",
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [
+            {
+              "name": "setTimeout(1000ms)",
+              "delay": 1000
+            }
+          ],
+          "microtaskQueue": [
+            "main() (suspended)",
+            "fetchUser() (suspended)"
+          ],
+          "currentPhase": "waiting",
+          "highlightArea": "webApis"
+        }
+      },
+      {
+        "title": "创建 Promise（delay 内部）",
+        "explanation": "在 `delay` 函数内部，`new Promise` 被创建，setTimeout 被注册为 Web API。",
+        "visualizationType": "eventLoop",
+        "code": "return new Promise(resolve => setTimeout(resolve, ms));",
+        "eventLoopState": {
+          "webApis": [
+            {
+              "name": "setTimeout(1000ms)",
+              "delay": 1000,
+              "status": "resolving"
+            }
+          ],
+          "microtaskQueue": [
+            "fetchUser() (suspended)"
+          ]
+        }
+      },
+      {
+        "title": "打印 'User loaded'",
+        "explanation": "1 秒后，delay 的 Promise 解决，fetchUser 恢复执行。\n'User loaded' 被打印。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('User loaded');",
+        "eventLoopState": {
+          "callStack": [
+            "fetchUser()",
+            "console.log('User loaded')"
+          ],
+          "webApis": [],
+          "microtaskQueue": [
+            "main() (suspended)"
+          ],
+          "output": [
+            "Start",
+            "Fetching...",
+            "User loaded"
+          ],
+          "currentPhase": "executing",
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "title": "返回对象",
+        "explanation": "使用 `return { name: 'Alice' }` 返回对象。\nfetchUser 的 Promise 以此值解决。",
+        "visualizationType": "eventLoop",
+        "code": "return { name: 'Alice' };",
+        "eventLoopState": {
+          "callStack": [
+            "fetchUser()"
+          ],
+          "microtaskQueue": [
+            "main() → user = { name: 'Alice' }"
+          ],
+          "highlightArea": "microtaskQueue"
+        }
+      },
+      {
+        "title": "打印 'Got: Alice'",
+        "explanation": "main 函数恢复执行，`{ name: 'Alice' }` 被赋值给 `user`，打印 'Got: Alice'。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('Got:', user.name);",
+        "eventLoopState": {
+          "callStack": [
+            "main()",
+            "console.log('Got:', user.name)"
+          ],
+          "microtaskQueue": [],
+          "output": [
+            "Start",
+            "Fetching...",
+            "User loaded",
+            "Got: Alice"
+          ],
+          "highlightArea": "callStack"
+        }
+      },
+      {
+        "title": "打印 'End'",
+        "explanation": "`console.log('End')` 执行，打印 'End'。\nmain 函数执行完毕。",
+        "visualizationType": "eventLoop",
+        "code": "console.log('End');",
+        "eventLoopState": {
+          "callStack": [
+            "main()",
+            "console.log('End')"
+          ],
+          "output": [
+            "Start",
+            "Fetching...",
+            "User loaded",
+            "Got: Alice",
+            "End"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "await 做了什么？",
+    "options": [
+      "完全阻塞主线程",
+      "暂停 async 函数并等待 Promise 完成",
+      "立即终止函数",
+      "没有任何效果"
+    ],
+    "correctIndex": 1,
+    "explanation": "await 暂停 async 函数的执行，等待 Promise 解决。\n主线程不会被阻塞，可以继续处理其他任务。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "await 会阻塞主线程",
+      "correct": "await 只会暂停特定的 async 函数。\n主线程可以继续处理其他任务。",
+      "why": "async/await 基于 Promise，所以事件循环会继续运行并处理其他事件。"
+    }
+  ],
+  "keyTakeaway": "async/await = 用同步风格编写 Promise 的语法。await 暂停函数但不阻塞主线程。"
+}

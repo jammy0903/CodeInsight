@@ -1,0 +1,90 @@
+{
+  "lessonId": "java-10-3",
+  "title": "竞态条件：谁先到达？",
+  "concept": "竞态条件（Race Condition）是两个或更多工人同时修改同一数据时，导致结果混乱的现象。",
+  "content": {
+    "code": "public class Counter {\n    int count = 0;\n    public void increment() {\n        count = count + 1;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Counter c = new Counter();\n        // 두 쓰레드가 동시에 c.increment()를 호출한다면?\n        // 예상치 못한 결과가 발생합니다.\n    }\n}",
+    "steps": [
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n创建一个将被共享的计数器对象。",
+        "visualizationType": "memory",
+        "code": "public class Main {",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "frame": "main",
+              "value": "main"
+            }
+          ],
+          "note": "Main 启动",
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "count + 1 的真面目",
+        "explanation": "**`count = count + 1;`**\n\nCPU 将这一行分为 3 个步骤处理：\n1. 读取（Read）：获取当前值\n2. 修改（Modify）：加 1\n3. 写入（Write）：存储结果\n\n这些步骤之间的间隙正是事故发生的地方。",
+        "visualizationType": "memory",
+        "code": "count = count + 1;",
+        "memoryState": {
+          "cpu": [
+            {
+              "step": "1. READ",
+              "value": "0"
+            },
+            {
+              "step": "2. ADD",
+              "value": "1"
+            },
+            {
+              "step": "3. WRITE",
+              "value": "1"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "事故发生场景",
+        "explanation": "想象 **工人 A** 正在执行第 1 步（读取），突然 **工人 B** 插入进来也执行了第 1 步（读取）。\n\n两人都认为"当前值是 0！"，然后各自加 1 并保存。\n结果应该是 2，但实际变成了 1。\n数据凭空消失了！",
+        "keyInsight": "同时访问相同数据会导致更新丢失",
+        "visualizationType": "memory",
+        "code": "}",
+        "memoryState": {
+          "threadA": {
+            "read": "0",
+            "willWrite": "1"
+          },
+          "threadB": {
+            "read": "0",
+            "willWrite": "1"
+          },
+          "finalCount": "1 (Error! Expect 2)",
+          "cpu": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪种不是解决竞态条件的方法？",
+    "options": [
+      "使用 synchronized 关键字",
+      "使用 AtomicInteger 类",
+      "只使用局部变量（Local Variable）",
+      "使用 static 变量"
+    ],
+    "correctIndex": 3,
+    "explanation": "static 变量是所有实例共享的资源，没有适当的保护措施反而更容易发生竞态条件。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "count++ 是一次运算，所以是安全的。",
+      "correct": "不是的！count++ 在内部也分为读取-修改-写入三个步骤。",
+      "why": "这被称为"非原子性（not Atomic）"。\n中间有足够的空隙让其他线程介入。"
+    }
+  ],
+  "keyTakeaway": "当多个线程访问共享数据时，必须采取措施保证"原子性"。"
+}

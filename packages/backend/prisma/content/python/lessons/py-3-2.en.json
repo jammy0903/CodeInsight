@@ -1,0 +1,194 @@
+{
+  "lessonId": "py-3-2",
+  "title": "Tuples (Immutable)",
+  "concept": "Similar to lists, but once created, they cannot be modified",
+  "content": {
+    "code": "# 1. 튜플 생성 (소괄호)\npoint = (10, 20)\n\n# 2. 읽기는 가능\nprint(point[0])\n\n# 3. 수정은 불가능!\n# point[0] = 99  # TypeError!\n\n# 4. 언패킹 (Unpacking)\nx, y = point\nprint(f\"x={x}, y={y}\")",
+    "steps": [
+      {
+        "title": "Creating a Tuple",
+        "explanation": "**`point = (10, 20)`** -- Creates a tuple object using parentheses `()` and assigns the name `point` to it.\n\nPython executes code from top to bottom. Parentheses `()` are the syntax for creating a tuple. A tuple object containing 2 integer items (10, 20) is created, and the name `point` points to this object.\n\n**Key characteristics of tuples -- Comparison with lists:**\n\n**Analogy:** If a list is a 'memo written in pencil', a tuple is an 'inscription etched in metal'. Once etched, it cannot be erased or changed.\n\n**Why do we need Immutable?**\n1. **Safety:** Prevents accidental data modification, avoiding bugs\n2. **Performance:** Immutability allows Python to optimize more aggressively\n3. **Dictionary keys:** Lists cannot be used as keys, but tuples can\n4. **Intent expression:** Communicates through code that \"this data must not change\"\n\n**Python internals:** Tuple objects are implemented similarly to lists with pointer arrays, but with a fixed size. After creation, methods that modify the internal array (`append`, `__setitem__`, etc.) simply don't exist. Additionally, small tuples (length 0-20) are cached in a **free list** for reuse.\n\n**Caution:** A single-element tuple must include a **trailing comma**: `(10,)`. `(10)` is just the number 10 in mathematical parentheses!\n\n**Execution order**: line 2 -> tuple object created (id: 0x1000) -> point = 0x1000 -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "point = (10, 20)",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Reading an Item (Indexing)",
+        "explanation": "**`print(point[0])`** -- Reads and prints the value `10` at index 0 of the tuple.\n\n**Reading is allowed:** Tuples are Immutable (cannot be modified), but **reading values by index is permitted**. Only modification is forbidden; access (reading) works exactly like lists.\n\n- `point[0]` -> `10` (first item)\n- `point[1]` -> `20` (second item)\n- `point[-1]` -> `20` (last item, negative indexing)\n\n**Analogy:** You can **read** the text etched in a metal plate. You just can't change it.\n\n**What Immutable restricts:**\n- `point[0] = 99` -- TypeError!\n- `point.append(30)` -- AttributeError! (the method doesn't even exist)\n- `del point[0]` -- TypeError!\n\n**What Immutable allows:**\n- `point[0]` -- Reading OK\n- `len(point)` -- Checking length OK\n- `10 in point` -- Membership check OK\n- `for x in point:` -- Iteration OK\n\n**Python internals:** `point[0]` calls `point.__getitem__(0)`. Tuples have `__getitem__` (read) but not `__setitem__` (write), so only reading is possible.\n\n**Execution order**: point[0] accessed -> 10 read -> print(10) executed -> line 8 (comment)",
+        "visualizationType": "pythonMemory",
+        "code": "print(point[0])",
+        "pythonMemoryState": {
+          "output": [
+            "10"
+          ],
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Attempting Modification (Error)",
+        "explanation": "**`# point[0] = 99  # TypeError!`** -- This is commented-out code. If this code were executed, it would raise a TypeError.\n\n**Experiencing Immutability:** If you remove the comment (`#`) and run this line:\n```\nTypeError: 'tuple' object does not support item assignment\n```\nAn error occurs. Tuples **absolutely cannot have their contents changed** after creation.\n\n**Difference from lists -- Same code, different results:**\n- `fruits[0] = \"Grape\"` -> Works fine (lists are Mutable)\n- `point[0] = 99` -> **TypeError** (tuples are Immutable)\n\n**Analogy:** A list is a whiteboard (you can erase and rewrite), a tuple is a stone inscription (it never changes).\n\n**Python internals:** `point[0] = 99` attempts to call `point.__setitem__(0, 99)`. However, the `tuple` class **does not define** a `__setitem__` method, so a TypeError is raised. This is a runtime error (occurs during execution), not a syntax error (SyntaxError).\n\n**Practical use cases:** Use tuples for **data that must not change**: coordinates `(x, y)`, RGB colors `(255, 128, 0)`, database records, etc.\n\n**Execution order**: This is a comment, so it is not actually executed -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "# point[0] = 99  # TypeError!",
+        "pythonMemoryState": {
+          "note": "Commented out, not actually executed (no error)",
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Tuple Unpacking",
+        "explanation": "**`x, y = point`** -- Assigns each item of the tuple to individual variables in order. This is called **Unpacking**.\n\n**How Unpacking works:** Each item of the tuple `point` is assigned to the left-hand variables **in order**:\n- `point[0]` (= 10) -> assigned to `x`\n- `point[1]` (= 20) -> assigned to `y`\n\n**Analogy:** Opening a gift box (tuple) and placing each item (10, 20) in different spots (x, y).\n\nThis is equivalent to writing `x = point[0]; y = point[1]` in a single line.\n\n**Why is this convenient?** Especially useful when returning multiple values from a function:\n```python\ndef get_position():\n    return (10, 20)  # return a tuple (parentheses optional)\nx, y = get_position()  # unpack immediately\n```",
+        "visualizationType": "pythonMemory",
+        "code": "x, y = point",
+        "pythonMemoryState": {
+          "note": "Unpacking: point[0]->x, point[1]->y",
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "y",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 20,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Unpacked Result",
+        "explanation": "**`print(f\"x={x}, y={y}\")`** -- Prints the unpacked variables `x` (10) and `y` (20) using an f-string.\n\nOutput: `x=10, y=20`\n\nThanks to unpacking, we can use intuitive names (`x`, `y`) instead of accessing values through `point[0]`, `point[1]`.\n\n**Key takeaways from this lesson:**\n1. **Tuples are Immutable** -- Cannot be modified after creation (`point[0] = 99` -> TypeError)\n2. **Reading is allowed** -- Access values with `point[0]`, iterate with `for x in point`\n3. **Unpacking** -- Conveniently split values with `x, y = point`\n4. **Can be used as dictionary keys** -- `d = {(0, 0): \"origin\"}` (lists cannot)\n5. **Lighter and faster than lists** -- Less memory usage, faster creation/access\n\n**Analogy:** A tuple is vacuum-sealed food. You can take it out and read (eat) it, but you can't put it back or swap it. Ideal for data that must not change (coordinates, color values, configuration values, etc.).\n\n**Python internals:** Tuples use less memory than lists. Lists pre-allocate extra space for dynamic resizing, but tuples allocate exactly the amount needed. In CPython, `sys.getsizeof((1,2))` < `sys.getsizeof([1,2])`.\n\n**Execution order**: f-string evaluated (x->10, y->20) -> print executed -> program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"x={x}, y={y}\")",
+        "pythonMemoryState": {
+          "output": [
+            "x=10, y=20"
+          ],
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "y",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1002"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 20,
+              "pyId": "1003"
+            }
+          ],
+          "note": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the correct way to create a tuple with a single element?",
+    "options": [
+      "(1)",
+      "[1]",
+      "(1,)",
+      "tuple(1)"
+    ],
+    "correctIndex": 2,
+    "explanation": "`(1)` is interpreted as mathematical parentheses, resulting in the integer 1.\nTo indicate it's a tuple, you must include a trailing comma: `(1,)`"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Tuples are worse than lists because they have fewer features",
+      "correct": "On the contrary, they are **faster, lighter, and safer**.",
+      "why": "When data is guaranteed not to change, optimization becomes possible.\nThey can also be used as dictionary keys (lists cannot)."
+    }
+  ],
+  "keyTakeaway": "Use tuples for data that should never change! Watch out for the `(val,)` comma."
+}

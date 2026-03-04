@@ -1,0 +1,100 @@
+{
+  "lessonId": "java-9-1",
+  "title": "GC：堆区域的可靠清洁工",
+  "concept": "垃圾回收器（GC）会自动在堆（Heap）区域中查找不再被任何人引用的对象并清理它们。",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        String temp = new String(\"임시 데이터\");\n        temp = null; // 이제 \"임시 데이터\" 객체는 주인을 잃었습니다.\n        \n        // 이 시점에 GC가 작동하면 화살표가 없는 객체를 수거해갑니다.\n    }\n}",
+    "steps": [
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n让我们来实验一下垃圾回收的原理。",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "对象创建（产生引用）",
+        "explanation": "在堆中创建了 `\"临时数据\"` 对象，栈中的 `temp` 变量指向它。\n当前该对象处于"存活（Alive）"状态。",
+        "visualizationType": "javaMemory",
+        "code": "String temp = new String(\"임시 데이터\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "temp",
+              "value": "0x001",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "value: \"임시 데이터\"",
+              "type": "String",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "断开引用（产生垃圾）",
+        "explanation": "当 `temp = null;` 执行的瞬间，栈和堆之间的箭头被切断了。\n现在 0x01 地址的对象变成了太空中的流浪者。\n再也没有人能找到这个对象了。\n\n**类比：** 就像工厂里被丢弃的无主垃圾。",
+        "keyInsight": "不可达 = 垃圾（Garbage）",
+        "visualizationType": "javaMemory",
+        "code": "temp = null; // 이제 \"임시 데이터\" 객체는 주인을 잃었습니다.",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "temp",
+              "value": "null",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "value: \"임시 데이터\"",
+              "type": "String",
+              "note": "Unreachable (Garbage)"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Java 中垃圾回收（GC）发生的时机是？",
+    "options": [
+      "给对象赋 null 的瞬间",
+      "函数结束时必定执行",
+      "JVM 判断内存不足时",
+      "每分钟定期执行"
+    ],
+    "correctIndex": 2,
+    "explanation": "GC 由 JVM 自行判断并执行。\n赋值 `null` 并不会立即删除对象，只是使其成为"垃圾候选"。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "调用 System.gc() 就会立即清理内存。",
+      "correct": "不是的！这只是向 JVM '请求'清理，实际是否执行取决于 JVM。",
+      "why": "GC 对系统性能影响很大，因此可能不会在请求后立即执行。"
+    }
+  ],
+  "keyTakeaway": "多亏了 GC，Java 开发者可以不用担心内存释放（free），专注于业务逻辑。"
+}

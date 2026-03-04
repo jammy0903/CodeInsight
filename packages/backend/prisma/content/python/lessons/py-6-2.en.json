@@ -1,0 +1,365 @@
+{
+  "lessonId": "py-6-2",
+  "title": "__init__ and self",
+  "concept": "__init__ is not a constructor but an initializer! self is the object itself!",
+  "content": {
+    "code": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n        print(f\"{name} 객체 초기화!\")\n\nalice = Person(\"Alice\", 25)\nprint(f\"이름: {alice.name}\")\nprint(f\"나이: {alice.age}\")",
+    "steps": [
+      {
+        "title": "Class Definition (Person)",
+        "explanation": "**`class Person:`**\n\nPython executes code from top to bottom in order. We define a `Person` class (person blueprint).\n\n**Goal of this lesson**: Understand the true identity of `__init__`. Many tutorials call `__init__` a \"constructor,\" but strictly speaking it's an **initializer**! The one that **creates** the object is `__new__`, while `__init__` **initializes** an already-created object. We'll also dig deep into exactly what `self` is and how it gets passed.\n\n**Python internals**: When Python encounters `class Person:`, it executes the class body, registers the methods, and creates a Person class object.\n\n**Why this order?** The class must be defined first before methods can be added and objects created.\n\n**Execution order**: Execute class Person -> Begin creating Person class object -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Person:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Class definition begins",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ Initializer Definition",
+        "explanation": "**`__init__`** is an initialization method that runs automatically right after object creation.\n\nIts role is clear:\n- Set up the essential initial state of an object in one place\n- Reduce \"incomplete state after creation\" for better stability\n\n**Analogy**: It's like the onboarding step when creating a new account, where the default profile is automatically registered.\n\nPractical points:\n- Guarantee required attributes in `__init__`\n- Handle optional attributes with default values for better usability",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name, age):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "__init__ method defined (initializer)",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with __init__>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Object Creation and __init__ Auto-Call",
+        "explanation": "**`alice = Person(\"Alice\", 25)`**\n\n**Object creation and initialization**:\n\n**Python internals**:\n```python\n# 1. Create empty object with __new__\nalice = object.__new__(Person)  # Memory 0x2000\n\n# 2. Initialize object with __init__ (auto-called!)\nalice.__init__(\"Alice\", 25)\n\n# 3. Return initialized object\n```\n\n**Parameter passing**:\n- `self` = `alice` (object at 0x2000, **automatically passed**)\n- `name` = `\"Alice\"`\n- `age` = `25`\n\n**Why this order?** After class definition completes, the next line executes in order.\n\n**Execution order**: Call Person(\"Alice\", 25) -> Create empty object 0x2000 -> Auto-call __init__ -> Jump to line 3",
+        "visualizationType": "pythonMemory",
+        "code": "alice = Person(\"Alice\", 25)",
+        "pythonMemoryState": {
+          "note": "Empty object created -> __init__ about to be auto-called",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object (empty)>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating Instance Variable (name)",
+        "explanation": "**`self.name = name`**\n\n**Instance variable creation**: Adds a `name` attribute to `self` (alice object, 0x2000) and assigns `\"Alice\"`.\n\n**Meaning of self.name**:\n- `self` -> alice object (0x2000)\n- `.name` -> The name attribute of this object (doesn't exist yet -- creating it now!)\n- `= name` -> Assign the parameter name (\"Alice\")\n\n**Important rule**: You must prefix with `self.` for it to become an **instance variable**!\n\n**Wrong example**:\n```python\nname = name  # Wrong! Local variable! Disappears when function ends\nself.name = name  # Correct! Instance variable! Permanently stored on object\n```\n\n**Why this order?** Object creation (line 7) auto-called __init__, which jumped here.\n\n**Execution order**: self.name = name -> Add name=\"Alice\" to alice object -> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "name attribute added to alice object (self.name)",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "age",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice'>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> alice (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "25",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating Instance Variable (age)",
+        "explanation": "**`self.age = age`**\n\nAdds an instance variable `age` to `self` (alice object, 0x2000) and assigns the value of parameter `age`, which is `25`.\n\n**State of alice object at this point**: `alice.__dict__` = `{'name': 'Alice', 'age': 25}`. Both name and age attributes are set.\n\n**Characteristics of instance variables:**\n- **Independent per object**: `alice.age` and another Person object's age are separate variables\n- **Permanently stored**: Remains on the object even after __init__ ends (parameter `age` disappears, but `self.age` persists)\n- **Accessible anywhere**: Via `alice.age` from outside, via `self.age` from inside methods\n\n**Why self.age = age?** The `self.age` on the left is an instance variable (permanent), the `age` on the right is a parameter (temporary). They share the same name but are completely different things. You could use a different name (e.g., `self.user_age = age`), but using the same name is Python convention.\n\n**Why this order?** Executes sequentially within the __init__ body.\n\n**Execution order**: self.age = age -> Add age=25 to alice.__dict__ -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "self.age = age",
+        "pythonMemoryState": {
+          "note": "age attribute added to alice object (self.age)",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice', age=25>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> alice (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "25",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Output During Initialization",
+        "explanation": "**`print(f\"{name} object initialized!\")`**\n\nInside the `__init__` method, you can run **any code** besides setting attributes. Here we print a confirmation message during initialization.\n\n**Why can we use `name`?** Because `name` is a parameter of `__init__`, it's accessible anywhere in the function body. Both `self.name` (instance variable) and `name` (parameter) point to \"Alice\" at this point, but they are different things.\n\n**Things you can do inside __init__:**\n- Set instance variables (self.name = name)\n- Validate data (if age < 0: raise ValueError)\n- Print logs/messages (what we're doing now!)\n- Open files, connect to databases, etc.\n\n**When this line executes**, \"Alice object initialized!\" is printed to the screen. Then, since all code in `__init__` is finished, Python automatically exits `__init__` and returns to the original call site (line 7).\n\n**Return value of __init__**: `__init__` must always return `None`. Writing `return \"something\"` causes a `TypeError`! Returning the object is `__new__`'s job.\n\n**Execution order**: Read name=\"Alice\" -> Evaluate f-string -> Execute print -> __init__ ends -> Return to line 7 -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"{name} 객체 초기화!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Alice 객체 초기화!"
+          ],
+          "note": "__init__ executing (just before initialization complete)",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1"
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "age",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice', age=25>",
+              "pyId": "1002"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> alice (0x2000)",
+              "pyId": "1003"
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "25",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Accessing Instance Variable (name)",
+        "explanation": "**`print(f\"Name: {alice.name}\")`**\n\nAccesses the `name` attribute of the fully initialized `alice` object.\n\n**Why is it accessible?** Because we created the instance variable with `self.name = name` on line 3!\n\n**What if we forgot `self.`?**\n```python\ndef __init__(self, name, age):\n    name = name  # Wrong! Local variable\n    age = age    # Wrong! Local variable\n\nalice = Person(\"Alice\", 25)\nprint(alice.name)  # AttributeError!\n```\n\n**Why this order?** After object creation and initialization complete, the next line executes in order.\n\n**Execution order**: Read alice.name (\"Alice\") -> Evaluate f-string -> Execute print -> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"이름: {alice.name}\")",
+        "pythonMemoryState": {
+          "output": [
+            "이름: Alice"
+          ],
+          "note": "Using name attribute set in __init__",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice', age=25>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Accessing Instance Variable (age)",
+        "explanation": "**`print(f\"Age: {alice.age}\")`**\n\nAccesses the `age` attribute of the `alice` object and prints it. \"Age: 25\" is printed to the screen.\n\n**Final summary of this lesson -- Core of __init__ and self:**\n\n**Caution -- The most common mistake (once more!):**\n```python\ndef __init__(self, name):\n    name = name      # Forgot self.! Just a local variable, not stored on the object!\n```\n**You must prefix with `self.`** for it to become an instance variable!\n\n**How __init__ works:**\n1. Python **auto-calls** it during object creation (even without us calling it!)\n2. **Creates** instance variables with **self.varname = value** (permanent storage)\n3. After creation, you can **access** them via **obj.varname** from anywhere",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"나이: {alice.age}\")",
+        "pythonMemoryState": {
+          "output": [
+            "나이: 25"
+          ],
+          "note": "Using age attribute set in __init__",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice', age=25>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What's wrong with this code?\n\nclass Cat:\n    def __init__(self, name):\n        name = name\n\nc = Cat(\"Mimi\")\nprint(c.name)",
+    "options": [
+      "Works correctly, prints Mimi",
+      "AttributeError: 'Cat' object has no attribute 'name'",
+      "NameError",
+      "SyntaxError"
+    ],
+    "correctIndex": 1,
+    "explanation": "name = name is just a local variable assignment! It should be self.name = name to create an instance variable.\nWithout self., c.name doesn't exist."
+  },
+  "misconceptions": [
+    {
+      "wrong": "__init__ creates the object",
+      "correct": "__init__ initializes an already-created object",
+      "why": "Object creation is handled by __new__.\n__init__ only sets initial values."
+    },
+    {
+      "wrong": "Without self.x = x, x still becomes an instance variable",
+      "correct": "You must use self. for it to be an instance variable",
+      "why": "Without self, x = value is just a local variable.\nIt disappears when the function ends."
+    }
+  ],
+  "keyTakeaway": "__init__ is an initialization method! You must use self.varname to create instance variables!"
+}

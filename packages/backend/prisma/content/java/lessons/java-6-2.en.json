@@ -1,0 +1,187 @@
+{
+  "lessonId": "java-6-2",
+  "title": "Types of Exceptions: Checked vs Unchecked",
+  "concept": "Using try-catch blocks to control exception flow, and understanding the handling differences between Checked and Unchecked exceptions.",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            System.out.println(\"1. Start\");\n            String s = null;\n            System.out.println(s.length()); // NPE occurs here\n            System.out.println(\"2. Skipped\");\n            \n        } catch (NullPointerException e) {\n            System.out.println(\"3. Caught NPE!\");\n            \n        } catch (Exception e) {\n            System.out.println(\"4. General Handler\");\n        }\n        System.out.println(\"5. Continues\");\n    }\n}",
+    "steps": [
+      {
+        "title": "main Method Execution",
+        "explanation": "**`public static void main(String[] args)`**\n\nThis is the program entry point.\nOur exception handling exercise begins here.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Entering the try Block",
+        "explanation": "**Execution flow:**\n1. The `try` block begins.\n2. The first line executes and prints \"1. Start\".\n\n**Explanation:**\n**The bomb squad enters!** A `try` block declares a safety zone: \"Something might explode (an exception) here, so keep watch.\"",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"1. Start\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            }
+          ],
+          "output": [
+            "1. Start"
+          ]
+        }
+      },
+      {
+        "title": "Variable Declaration (Null)",
+        "explanation": "**Execution flow:**\n1. A String variable `s` is created on the stack.\n2. It is assigned the value `null`.\n\n**Explanation:**\n`s` is an empty shell pointing to nothing.\nLike holding a remote control with no TV connected.",
+        "visualizationType": "javaMemory",
+        "code": "String s = null;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "s",
+              "value": "null",
+              "frame": "main",
+              "new": true,
+              "type": "String"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Exception Thrown",
+        "explanation": "**Execution flow:**\n1. While attempting to call `s.length()`, there's no referenced object, so a `NullPointerException` is **thrown**.\n2. An exception object (`0x999`) is created on the Heap.\n3. The JVM immediately stops the current execution flow and searches for a `catch` block.\n\n**Explanation:**\n**Boom!** The bomb went off.\nThe next line \"2. Skipped\" never executes, and control is transferred away.\nThis is the beginning of **Stack Unwinding**.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s.length()); // NPE occurs here",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "s",
+              "value": "null",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x999",
+              "content": "NPE: null",
+              "type": "NullPointerException",
+              "new": true
+            }
+          ],
+          "error": "NullPointerException thrown!"
+        }
+      },
+      {
+        "title": "Exception Caught",
+        "explanation": "**Execution flow:**\n1. Found a `catch` block that exactly matches the thrown `NullPointerException`.\n2. The exception object (`0x999`) is passed to the parameter `e`.\n\n**Explanation:**\n**Nice catch!** The right bomb disposal expert (handler) was found.\nThe exception is safely handled here.",
+        "visualizationType": "javaMemory",
+        "code": "} catch (NullPointerException e) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "s",
+              "value": "null",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "e",
+              "value": "-> 0x999",
+              "frame": "catch",
+              "new": true,
+              "type": "NullPointerException"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x999",
+              "content": "NPE: null",
+              "type": "NullPointerException"
+            }
+          ],
+          "error": null
+        }
+      },
+      {
+        "title": "Exception Handling and Flow Recovery",
+        "explanation": "**Execution flow:**\n1. Code inside the `catch` block executes.\n2. \"3. Caught NPE!\" is printed.\n3. Exits the `catch` block and returns to normal flow.\n\n**Explanation:**\nSince the exception was handled, the program doesn't die.\nWithout `catch`, the program would have terminated abnormally (crashed).",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"3. Caught NPE!\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "s",
+              "value": "null",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "output": [
+            "3. Caught NPE!"
+          ]
+        }
+      },
+      {
+        "title": "Program Continues Executing",
+        "explanation": "**Execution flow:**\n1. Completely exits the `try-catch` block.\n2. Continues executing the remaining code.\n\n**Explanation:**\nThis is exactly why we handle exceptions.\n**Resilience!** Even when one part fails, the entire system keeps running.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"5. Continues\");",
+        "javaMemoryState": {
+          "output": [
+            "5. Continues"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Why does the order of catch blocks matter?",
+    "options": [
+      "For code readability.",
+      "If specific (child) exceptions aren't caught first, the general (parent) exception intercepts everything.",
+      "For JVM performance optimization.",
+      "They must be in alphabetical order to compile."
+    ],
+    "correctIndex": 1,
+    "explanation": "Due to polymorphism, a parent type (`Exception`) can catch all child exceptions.\nTherefore, specific exceptions (`NullPointerException`) must be listed first to avoid 'unreachable code' errors and ensure proper handling."
+  },
+  "misconceptions": [
+    {
+      "wrong": "When an exception occurs, the program always terminates.",
+      "correct": "No.\nIf properly handled with a `catch` block, the program continues without terminating.",
+      "why": "Exception handling is a mechanism to prevent 'abnormal termination' and enable 'graceful recovery'."
+    }
+  ],
+  "keyTakeaway": "Using try-catch prevents program termination when exceptions occur. Always catch specific exceptions first, considering the inheritance hierarchy."
+}

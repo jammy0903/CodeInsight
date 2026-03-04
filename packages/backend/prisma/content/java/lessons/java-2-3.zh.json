@@ -1,0 +1,175 @@
+{
+  "lessonId": "java-2-3",
+  "title": "Optional 使用方法",
+  "concept": "Optional 用来明确表示"值可能不存在"，替代 null",
+  "content": {
+    "code": "Optional<String> opt1 = Optional.of(\"hello\");\nOptional<String> opt2 = Optional.empty();\nOptional<String> opt3 = Optional.ofNullable(null);\n\nString value = opt1.get();\n\nif (opt2.isPresent()) {\n    System.out.println(opt2.get());\n}\n\nString result = opt3.orElse(\"default\");\n\nopt1.ifPresent(s -> System.out.println(s));",
+    "steps": [
+      {
+        "title": "Optional.of() - 创建盒子",
+        "explanation": "**执行顺序：**\n1. 调用 `Optional.of(\"hello\")`。\n2. 在堆上创建 `Optional` 对象（盒子）。\n3. 将 \"hello\" 值存储在内部。\n\n**内存中发生了什么：**\n在堆上创建了一个叫 `Optional` 的**坚固盒子（Wrapper）**，并将 \"hello\" 字符串安全地放入其中。\n\n**警告：** `of()` 绝对不允许 `null`。\n如果传入 null，盒子还没创建就会抛出 NPE。",
+        "keyInsight": "of() = 绝对不允许 null",
+        "visualizationType": "javaMemory",
+        "code": "Optional<String> opt1 = Optional.of(\"hello\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "opt1",
+              "value": "-> 0xOPT1",
+              "type": "Optional<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xOPT1",
+              "content": "Optional[\"hello\"]",
+              "type": "Optional"
+            },
+            {
+              "address": "Pool:hello",
+              "content": "\"hello\"",
+              "type": "String"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Optional.empty() - 空盒子",
+        "explanation": "**执行顺序：**\n1. 调用 `Optional.empty()`。\n2. 返回一个空的 `Optional` 对象。\n\n创建一个没有内容物的"空盒子"对象。\n这是一种替代使用 `null` 变量的方式，明确表示"盒子存在但里面是空的"。\n当方法返回 `Optional` 时，你立刻就能知道"哦，可能没有值"。",
+        "keyInsight": "empty() = 明确表示值不存在",
+        "visualizationType": "javaMemory",
+        "code": "Optional<String> opt2 = Optional.empty();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "opt1",
+              "value": "-> 0xOPT1",
+              "type": "Optional<String>"
+            },
+            {
+              "name": "opt2",
+              "value": "-> 0xEMPTY",
+              "type": "Optional<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xOPT1",
+              "content": "Optional[\"hello\"]"
+            },
+            {
+              "address": "0xEMPTY",
+              "content": "Optional.empty",
+              "type": "Optional"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Optional.ofNullable() - 灵活的盒子",
+        "explanation": "**执行顺序：**\n1. 调用 `Optional.ofNullable(null)`。\n2. 检测到参数为 `null`。\n3. 内部返回 `Optional.empty()`。\n\n如果有值就放入盒子（`of`），如果为 `null` 就创建空盒子（`empty`）。\n这是实际开发中最常用的创建方式。",
+        "visualizationType": "javaMemory",
+        "code": "Optional<String> opt3 = Optional.ofNullable(null);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "opt3",
+              "value": "-> 0xEMPTY",
+              "type": "Optional<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xEMPTY",
+              "content": "Optional.empty",
+              "refCount": 2
+            }
+          ],
+          "note": "传入 null 会变成 empty()"
+        }
+      },
+      {
+        "title": "get() - 强制取出（危险！！）",
+        "explanation": "**执行顺序：**\n1. 调用 `opt1.get()`。\n2. 确认值存在。\n3. 返回 \"hello\"。\n\n强行打开盒子。\n现在因为有值所以没问题，但如果对空盒子调用 `get()`，会爆出 **`NoSuchElementException`** 异常。\n\n**警告：** `get()` 是最后手段。\n尽量不要使用。",
+        "keyInsight": "推荐使用 orElse() 代替 get()",
+        "visualizationType": "javaMemory",
+        "code": "String value = opt1.get();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "value",
+              "value": "\"hello\"",
+              "type": "String"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "isPresent() - 检查",
+        "explanation": "**执行顺序：**\n1. 调用 `opt2.isPresent()`。\n2. `opt2` 为空，返回 **false**。\n3. 跳过 `if` 代码块。\n\n询问"盒子里有值吗？"（`isPresent`）。\n`opt2` 为空，所以返回 `false`，`if` 代码块不会执行。",
+        "visualizationType": "javaMemory",
+        "code": "if (opt2.isPresent()) {",
+        "javaMemoryState": {
+          "note": "opt2 为空所以返回 false，代码块不执行"
+        }
+      },
+      {
+        "title": "orElse() - 安全的默认值",
+        "explanation": "**执行顺序：**\n1. 调用 `opt3.orElse(\"default\")`。\n2. 确认 `opt3` 为空。\n3. 返回参数 `\"default\"`。\n\n**最推荐的方式：** "打开盒子。\n有值就用它，**空的话就用 'default' 代替。**"\n一行代码就能简洁安全地获取值。",
+        "keyInsight": "orElse() = 安全的默认值模式",
+        "visualizationType": "javaMemory",
+        "code": "String result = opt3.orElse(\"default\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "result",
+              "value": "\"default\"",
+              "type": "String"
+            }
+          ],
+          "note": "opt3 为空所以返回 \"default\""
+        }
+      },
+      {
+        "title": "ifPresent() - 函数式风格",
+        "explanation": "**执行顺序：**\n1. 调用 `opt1.ifPresent(...)`。\n2. 确认 `opt1` 有值。\n3. 执行 lambda 函数 `s -> println(s)`。\n4. 输出 \"hello\"。\n\n"如果有值就执行这个函数（lambda）。\n没有的话就算了。"\n这是一种优雅的方式，不取出值，而是让盒子内部处理工作。",
+        "keyInsight": "ifPresent() = 有值时才执行",
+        "visualizationType": "javaMemory",
+        "code": "opt1.ifPresent(s -> System.out.println(s));",
+        "javaMemoryState": {
+          "output": [
+            "hello"
+          ],
+          "note": "opt1 有值所以 lambda 被执行"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Optional 不应该在哪里使用？",
+    "options": [
+      "方法返回类型",
+      "类字段（成员变量）",
+      "局部变量",
+      "流（Stream）管道"
+    ],
+    "correctIndex": 1,
+    "explanation": "Optional 仅为方法返回类型设计。\n用作字段会浪费内存并导致序列化（Serialization）问题。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Optional 完全替代了 null 处理",
+      "correct": "不是的。\nOptional 变量本身也可能是 null（最糟糕的情况）。",
+      "why": "使用 Optional 时，绝对不要写 `Optional<String> opt = null;`。必须始终用 `Optional.empty()` 初始化。"
+    },
+    {
+      "wrong": "isPresent() + get() 是标准模式",
+      "correct": "使用 `orElse()` 或 `ifPresent()` 等方法才是 'Optional 式' 的用法。",
+      "why": "`if (opt.isPresent()) { ... get() }` 与 `if (x != null)` 没有区别，代码会变得冗长。\nOptional 的真正价值在于函数式风格。"
+    }
+  ],
+  "keyTakeaway": "返回类型用 Optional，取值时用 orElse()！"
+}

@@ -1,0 +1,137 @@
+{
+  "lessonId": "c-1-2",
+  "title": "Initialization and Garbage Values",
+  "concept": "Variables must be initialized before use to avoid unpredictable behavior",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int score = 100;\n\n    int level;\n    level = 1;\n\n    printf(\"Score: %d, Level: %d\\n\", score, level);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h Header",
+        "explanation": "We import the standard I/O library (```stdio.h```) to use ```printf```. As we learned in the previous lesson, without this line the compiler won't recognize ```printf``` and will throw an error.\n\nThis is because the C compiler needs to know the signature (parameters and return type) of a function **before** it is used.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The program entry point. A **main stack frame** (dedicated workspace) is created on the stack. As we learned previously, local variables are stored inside this space.\n\nRight now it's like being assigned an empty locker — soon the two variables ```score``` and ```level``` will go in here.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Declaration with Initialization",
+        "explanation": "`int score = 100;` is the safest pattern — it declares and initializes in one step.\n\nIf you delay initialization, there's a danger zone until the value is actually assigned. That's why the best habit is to use the form `type variable = initialValue;`.",
+        "visualizationType": "cMemory",
+        "code": "int score = 100;",
+        "stack": [
+          {
+            "name": "score",
+            "value": "100",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "Declaration Only (Garbage Value)",
+        "explanation": "`int level;` only allocates space without storing a value.\n\nReading `level` in this state can lead to undefined behavior, so it's safer to initialize immediately like `int level = 1;`.",
+        "visualizationType": "cMemory",
+        "code": "int level;",
+        "stack": [
+          {
+            "name": "score",
+            "value": "100",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "level",
+            "value": "???",
+            "type": "int",
+            "address": "0x1000",
+            "note": "Contains a garbage value."
+          }
+        ]
+      },
+      {
+        "title": "Assignment",
+        "explanation": "`level = 1;` overwrites the previous garbage state with an actual value.\n\n`=` is the assignment operator, not a comparison — it stores the result of the right side into the variable on the left.",
+        "visualizationType": "cMemory",
+        "code": "level = 1;",
+        "stack": [
+          {
+            "name": "score",
+            "value": "100",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "level",
+            "value": "1",
+            "type": "int",
+            "address": "0x1000",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Printing Variable Values",
+        "explanation": "In `printf(\"Score: %d, Level: %d\\n\", score, level);`, the two `%d` placeholders are filled with values in order.\n\nIf the number of format specifiers doesn't match the number of arguments, you'll get incorrect output or bugs.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Score: %d, Level: %d\\n\", score, level);",
+        "stack": [
+          {
+            "name": "score",
+            "value": "100",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "level",
+            "value": "1",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "Score: 100, Level: 1"
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "`return 0;` terminates the program normally and cleans up main's local variables.\n\nIn summary, initializing variables at the time of declaration is the most basic safety measure in C.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What problem occurs when you forget to initialize a variable?",
+    "options": [
+      "A compile error prevents execution",
+      "It always computes as 0",
+      "Garbage values cause unexpected results or bugs",
+      "The computer reboots"
+    ],
+    "correctIndex": 2,
+    "explanation": "Most modern compilers will give a warning, but the code still compiles and runs.\nThis can cause unpredictable behavior (Undefined Behavior)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "I'll assign a value later, so just declaring is fine",
+      "correct": "Whenever possible, initialize with a default like `int a = 0;`.",
+      "why": "As code gets longer, it's easy to forget where (or whether) you initialized a variable."
+    }
+  ],
+  "keyTakeaway": "Initialize at declaration. That's the safest approach."
+}

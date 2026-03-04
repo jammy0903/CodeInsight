@@ -1,0 +1,261 @@
+{
+  "lessonId": "c-1-7",
+  "title": "函数定义",
+  "concept": "函数将代码分离为可复用的代码块。必须指定返回类型、函数名和参数。",
+  "content": {
+    "code": "#include <stdio.h>\n\nint add(int a, int b) {\n    int result = a + b;\n    return result;\n}\n\nint main() {\n    int x = 3;\n    int y = 7;\n    int sum = add(x, y);\n    printf(\"%d + %d = %d\\n\", x, y, sum);\n\n    return 0;\n}\n",
+    "steps": [
+      {
+        "title": "add 函数蓝图",
+        "explanation": "`int add(int a, int b)` 是一个接收两个整数并返回它们之和的函数定义。\n\n这一步是定义而非执行。实际执行发生在调用处（`add(x, y)`）。",
+        "visualizationType": "cMemory",
+        "code": "int add(int a, int b) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "程序启动，main 栈帧被创建。\n\n本课通过函数定义、调用和返回来观察值传递和栈帧变化。",
+        "code": "int main() {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          }
+        ]
+      },
+      {
+        "title": "声明变量 x",
+        "explanation": "`int x = 3;` 准备第一个参数值。\n\n重要的是，调用时传递的是值的副本，而非变量本身。",
+        "code": "int x = 3;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "highlight": true,
+            "address": "0x1008"
+          }
+        ]
+      },
+      {
+        "title": "声明变量 y",
+        "explanation": "`int y = 7;` 准备第二个参数。\n\n调用函数时，此值将被复制传递给 add 的参数。",
+        "code": "int y = 7;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "highlight": true,
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "调用 add(x, y)（Push）",
+        "explanation": "调用 `add(x, y)` 时，值 3 和 7 被复制到参数 `a` 和 `b`，add 栈帧被 push。\n\nC 的默认传递方式是值传递（pass by value），因此在 add 内部修改 `a`、`b` 不会影响 main 中的 `x`、`y`。",
+        "code": "int sum = add(x, y);",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "address": "0x1004"
+          },
+          {
+            "frame": "add",
+            "name": "add",
+            "value": "add",
+            "highlight": true
+          },
+          {
+            "name": "a",
+            "type": "int",
+            "value": "3",
+            "highlight": true,
+            "address": "0x0ff8"
+          },
+          {
+            "name": "b",
+            "type": "int",
+            "value": "7",
+            "highlight": true,
+            "address": "0x0ff4"
+          }
+        ]
+      },
+      {
+        "title": "函数内部运算",
+        "explanation": "在 add 内部计算 `result = a + b`，准备返回值。\n\n此变量是 add 的局部变量，函数结束时会一起清理。",
+        "code": "int result = a + b;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "address": "0x1004"
+          },
+          {
+            "frame": "add",
+            "name": "add",
+            "value": "add"
+          },
+          {
+            "name": "a",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ff8"
+          },
+          {
+            "name": "b",
+            "type": "int",
+            "value": "7",
+            "address": "0x0ff4"
+          },
+          {
+            "name": "result",
+            "type": "int",
+            "value": "10",
+            "highlight": true,
+            "address": "0x0ff0"
+          }
+        ]
+      },
+      {
+        "title": "返回值（return）",
+        "explanation": "`return result;` 将计算值返回给调用者（main）并结束 add 函数。\n\n函数结束时，add 的局部变量和栈帧会被移除。",
+        "code": "return result;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main",
+            "highlight": true
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "存储返回值",
+        "explanation": "返回的值 10 被存储到 main 的 `sum` 中。\n\n也就是说，即使函数内部的变量已经消失，返回值仍可被调用方继续使用。",
+        "code": "int sum = add(x, y);",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "address": "0x1004"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "10",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "输出结果",
+        "explanation": "`printf` 输出 `3 + 7 = 10`。\n\nx 和 y 保持原始值的原因就是值传递（pass by value）。",
+        "code": "printf(\"%d + %d = %d\\n\", x, y, sum);",
+        "stdout": "3 + 7 = 10"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "`return 0;` 终止 main 并清理局部变量。\n\n函数调用的核心流程是：值传递 -> 计算 -> return 返回结果。",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "返回类型为 void 的函数中 return 怎么处理？",
+    "options": [
+      "必须写 return 值;",
+      "写 return; 或省略都可以",
+      "编译错误",
+      "必须写 return 0;"
+    ],
+    "correctIndex": 1,
+    "explanation": "void：没有返回值的函数。\n\n- 用 `return;` 退出函数，或\n- 不写 return，在函数末尾自动结束\n\n如果尝试返回值，会产生编译器警告。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "将变量传递给函数会改变原始值",
+      "correct": "C 的默认传递方式是值传递（pass by value）。\n原始值不会改变。",
+      "why": "要修改原始值，需要传递指针（&地址）。"
+    }
+  ],
+  "keyTakeaway": "函数是代码复用的基本单位：输入（参数）-> 处理 -> 输出（return）！"
+}

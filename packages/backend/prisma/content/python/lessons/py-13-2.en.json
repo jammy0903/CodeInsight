@@ -1,0 +1,384 @@
+{
+  "lessonId": "py-13-2",
+  "title": "f-strings and format()",
+  "concept": "f-strings are the most powerful string formatting method in Python 3.6+",
+  "content": {
+    "code": "name = \"Alice\"\nage = 25\n\ngreeting = f\"Hello, {name}! You are {age} years old.\"\nprint(greeting)\n\npi = 3.14159265\nformatted = f\"Pi is {pi:.2f}\"\nprint(formatted)\n\ntemplate = \"Name: {}, Age: {}\".format(name, age)\nprint(template)",
+    "steps": [
+      {
+        "title": "Preparing Variables",
+        "explanation": "**`name = \"Alice\"`**\n**`age = 25`**\n\nPython executes from top to bottom in order. We create two variables to use for string formatting.\n\n- `name`: Attaches a label to the `str` type object `\"Alice\"`\n- `age`: Attaches a label to the `int` type object `25`\n\n**Analogy:** Like preparing information cards (variables) before writing a letter (string). Create cards saying \"Recipient: Alice\" and \"Age: 25\", then later insert this information into the letter template (f-string).\n\n**Python internals:** The `\"Alice\"` string object and `25` integer object each exist in heap memory. `{\"name\": <address of \"Alice\">, \"age\": <address of 25>}` is registered in the global namespace dictionary. In Python, variables don't have types -- **objects have types** (dynamic typing).\n\n**What is formatting?** It's inserting variable values into a string to create a complete string. To make a string like `\"Hello, Alice! You are 25 years old.\"` with variable values included, you need formatting.\n\n**Execution order:** `name = \"Alice\"` -> `age = 25` -> move to next line",
+        "visualizationType": "pythonMemory",
+        "code": "age = 25",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Preparing variables for formatting",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Variable Insertion with f-strings",
+        "explanation": "**f-strings** are the most readable way to insert variables directly into strings.\n\nFormat:\n- `f\"... {expr} ...\"`\n\nInside `{ }`, you can use not just simple variables but also expressions.\nExample: `{price * qty}`\n\n**Analogy**: Like immediately filling in blanks in a sentence template with values.\n\nAdvantages:\n- Shorter and more intuitive than `+` concatenation or `.format()`\n- Greatly improves readability of print/log statements\n\nNote:\n- If you forget the `f` prefix, the placeholders won't be substituted and will print literally",
+        "visualizationType": "pythonMemory",
+        "code": "greeting = f\"Hello, {name}! You are {age} years old.\"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "f-string: {variable} is replaced with actual values",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the f-string Result",
+        "explanation": "**`print(greeting)`** -- Prints the string `\"Hello, Alice! You are 25 years old.\"` that `greeting` points to.\n\nYou can see that `{name}` was replaced with `\"Alice\"` and `{age}` with `\"25\"`. Since f-strings read variable values at execution time, changing variables later won't affect already-created strings.\n\n**Analogy:** Business cards that are already printed (greeting string) won't change even if you update the original information (name, age variables). If you want new cards, you need to reprint (re-evaluate the f-string).\n\n**Note:** f-strings are only available in Python **3.6 and above**. For earlier versions, you must use `format()` or the `%` operator.\n\n**Python internals:** `greeting` is an independent `str` object created as the result of f-string evaluation. Changing `name` or `age` later won't affect `greeting`. This is because already-created strings are immutable.",
+        "visualizationType": "pythonMemory",
+        "code": "print(greeting)",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, Alice! You are 25 years old."
+          ],
+          "note": "String created with f-string printed",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "f-string Format Specifiers (Decimal Places)",
+        "explanation": "**f-string format specifiers** let you fix the display format of numbers/dates.\n\nExample: `{price:.2f}` -> Display up to 2 decimal places\n\nKey effects:\n- Ensures output consistency\n- Improves readability of user screens/logs\n\n**Analogy**: Like matching the digit and comma conventions in financial reports to improve report quality.\n\nIn practice, format specifiers handle \"presentation quality\" rather than \"calculation\".",
+        "visualizationType": "pythonMemory",
+        "code": "formatted = f\"Pi is {pi:.2f}\"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": ":.2f = fixed-point format with 2 decimal places",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1",
+              "highlight": true
+            },
+            {
+              "name": "formatted",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14159265",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Pi is 3.14\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": ".format() Method",
+        "explanation": "**`template = \"Name: {}, Age: {}\".format(name, age)`** -- A string formatting method available since Python 2.6+, before f-strings.\n\n**How the format() method works:**\n1. `{}` in the string acts as **placeholders**\n2. Arguments passed to `.format()` are inserted into `{}` **in order**\n3. First `{}` -> `name` = `\"Alice\"` inserted\n4. Second `{}` -> `age` = `25` -> converted to `\"25\"` then inserted\n5. Result: `\"Name: Alice, Age: 25\"`\n\n**Analogy:** Like a fill-in-the-blank test (template). `{}` are the blanks, and `.format()` arguments are the answers. The first answer goes in the first blank, the second answer in the second blank.\n\n**Note:** If the number of `{}` and `.format()` arguments don't match, an `IndexError` is raised!",
+        "visualizationType": "pythonMemory",
+        "code": "template = \"Name: {}, Age: {}\".format(name, age)",
+        "pythonMemoryState": {
+          "output": [
+            "Pi is 3.14"
+          ],
+          "note": ".format() inserts arguments into {} in order",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "formatted",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "template",
+              "pointsTo": "str4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14159265",
+              "pyId": "1004"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Pi is 3.14\"",
+              "pyId": "1005"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"Name: Alice, Age: 25\"",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Final Output",
+        "explanation": "**`print(template)`** -- Prints the string `\"Name: Alice, Age: 25\"` created with the `.format()` method.\n\n**Let's summarize the history and 3 methods of Python string formatting:**\n\n**Analogy:** The `%` operator is like the typewriter era, `format()` is like early word processors, and f-strings are like modern cloud document editors. As functionality evolved, it became more intuitive and powerful.\n\n**Python internals:** All three methods ultimately create a new `str` object. However, f-strings can be optimized at compile time, making them about 20-30% faster than `format()`, which requires runtime string parsing.\n\n**Note:** Regardless of which method you use, **consistency** is important. Mixing multiple methods in a single project makes code messy. For Python 3.6+, **unifying with f-strings** is strongly recommended.\n\n**Execution order (complete summary):**\n1. `name = \"Alice\"`, `age = 25` -> variables prepared\n2. `greeting = f\"Hello, {name}!...\"` -> variable insertion with f-string\n3. `print(greeting)` -> output result\n4. `pi = 3.14159265` -> float variable\n5. `formatted = f\"Pi is {pi:.2f}\"` -> decimal control with format specifier\n6. `print(formatted)` -> `\"Pi is 3.14\"` output\n7. `template = \"...\".format(name, age)` -> format() method usage\n8. `print(template)` -> `\"Name: Alice, Age: 25\"` output",
+        "visualizationType": "pythonMemory",
+        "code": "print(template)",
+        "pythonMemoryState": {
+          "output": [
+            "Name: Alice, Age: 25"
+          ],
+          "note": "Among the 3 formatting methods, f-strings are most recommended",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "greeting",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "formatted",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "template",
+              "pointsTo": "str4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "25",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Alice! You are 25 years old.\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14159265",
+              "pyId": "1004"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"Pi is 3.14\"",
+              "pyId": "1005"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"Name: Alice, Age: 25\"",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the result of f\"{3.14159:.1f}\"?",
+    "options": [
+      "\"3.14159\"",
+      "\"3.1\"",
+      "\"3.14\"",
+      "\"3\""
+    ],
+    "correctIndex": 1,
+    "explanation": ":.1f is a format specifier that displays up to 1 decimal place.\nRounding 3.14159 to 1 decimal place gives 3.1."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Only variables can be placed inside f-strings",
+      "correct": "Any Python expression can be placed inside {} in f-strings.",
+      "why": "f\"{2+3}\" becomes \"5\", f\"{name.upper()}\" becomes \"ALICE\", f\"{len([1,2,3])}\" becomes \"3\"."
+    }
+  ],
+  "keyTakeaway": "f-strings are the most powerful formatting in Python 3.6+! {variable}, {expression}, {value:format} are all possible!"
+}

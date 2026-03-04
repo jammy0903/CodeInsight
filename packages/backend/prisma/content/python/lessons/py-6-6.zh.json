@@ -1,0 +1,739 @@
+{
+  "lessonId": "py-6-6",
+  "title": "继承基础",
+  "concept": "子类继承父类的属性和方法! 用 super() 调用父类!",
+  "content": {
+    "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n    \n    def speak(self):\n        print(\"...\")\n\nclass Dog(Animal):\n    def __init__(self, name, breed):\n        super().__init__(name)  # 부모 초기화!\n        self.breed = breed\n    \n    def speak(self):\n        print(f\"{self.name}: 멍멍!\")\n\ndog = Dog(\"바둑이\", \"진돗개\")\ndog.speak()\nprint(dog.name, dog.breed)",
+    "steps": [
+      {
+        "title": "Animal 类定义(父类)",
+        "explanation": "**`class Animal:`**\n\nPython 从上到下按顺序执行代码。定义 Animal 类(父类, Parent Class)。\n\n**本课目标**: 理解继承(Inheritance)的三个核心概念。(1) 子类继承父类的属性和方法，(2) 用 `super().__init__()` 调用父类的初始化方法，(3) 通过方法重写(overriding)重新定义父类方法。\n\n**什么是父类?** 是其他类可以**继承的基础蓝图**。打个比方，Animal 定义了"动物"这个大分类的公共属性(名字)和公共行为(发出声音)的**原始蓝图**。之后 Dog、Cat 等具体动物会继承这个蓝图并添加自己的特性。\n\n**Python 内部操作**: 执行 `class Animal:` 语句时，Python (1) 在内存中创建新的类对象，(2) 按顺序执行类体内的代码来注册方法，(3) 绑定到命名空间中的 `Animal` 名称。此时 `Animal.__bases__` 是 `(object,)` -- 所有类都隐式继承 `object`。\n\n**为什么是这个顺序?** 必须先定义父类，之后在 `class Dog(Animal):` 中才能引用它。不能继承尚未定义的类!\n\n**执行顺序**: 执行 class Animal --> 开始创建 Animal 类对象 --> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Animal:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "父类定义开始",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Animal.__init__ 方法定义",
+        "explanation": "**`def __init__(self, name):`**\n\n定义 Animal 类的初始化方法(`__init__`)。方法体包含 `self.name = name`，在创建对象时自动设置名字属性。\n\n**参数的作用**:\n- `self` -- 对正在创建的对象自身的引用。Python 自动传递，调用时不需要传递。\n- `name` -- 动物的名字。像 `Animal(\"小黄\")` 这样调用时，`\"小黄\"` 会传给 `name`。\n\n**父类 __init__ 的重要性**: 这个 `__init__` 之后也会**被子类调用**。Dog 类使用 `super().__init__(name)` 时，正是这个 Animal 的 `__init__` 执行来设置 `self.name`。也就是说，子类**复用**了父类的初始化代码!\n\n**注意 -- 与 Java 的不同**: Java 中子构造函数会自动调用父构造函数，但 Python 中**没有自动调用**! 如果子类定义了 `__init__`，父类的 `__init__` 会被**完全覆盖**。所以必须显式调用 `super().__init__()`。\n\n**为什么是这个顺序?** 在类体内从上到下按顺序定义方法。\n\n**执行顺序**: 执行 def __init__ --> 创建 __init__ 函数对象 0x1100 --> 注册到 Animal.__dict__['__init__'] --> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Animal 初始化方法已定义",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Animal.__init__",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Animal.speak 方法定义",
+        "explanation": "**`def speak(self):`**\n\n定义 Animal 类的 speak 方法。方法体是 `print(\"...\")`，表示动物默认声音的抽象输出。\n\n**方法重写(Method Overriding)的核心原理**: Python 在调用方法时按 **MRO(Method Resolution Order)** 顺序查找。按子类 --> 父类的顺序搜索，所以如果子类有同名方法，会先于父类的被发现。\n\n**类比**: Animal.speak 是"动物会发出声音"这个**默认规则**。Dog 将这个规则具体化为"汪汪!"，Cat 具体化为"喵喵!"。这就是面向对象编程中所说的**多态性(Polymorphism)**的开始。\n\n**为什么输出 \"...\"?** Animal 是"动物"这个抽象概念。具体发出什么声音由 Dog(汪汪)、Cat(喵喵)等**子类决定**。父类的 speak 只定义了"能发出声音"的能力，实际实现交给子类。",
+        "visualizationType": "pythonMemory",
+        "code": "def speak(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Animal.speak 方法已定义",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Animal.__init__",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "Animal.speak",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with __init__, speak>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog 类定义(子类)",
+        "explanation": "**`class Dog(Animal):`**\n\n这是继承(Inheritance)的核心语法! 在括号中放入父类，子类就会**自动继承父类的所有属性和方法**。\n\n**用类比来理解**: Animal 是"动物通用手册"，Dog 是"狗专用手册"。狗专用手册中没有写的内容会自动参照动物通用手册。但如果狗专用手册中有同样的条目，则优先使用它(重写)。\n\n**括号 `(Animal)` 的作用**:\n- Dog 类的 `__bases__` 属性设为 `(Animal,)`\n- 在 Dog 中查找任何属性/方法时，如果 Dog 中没有，会**自动到 Animal 中搜索**\n- 这就是 MRO(Method Resolution Order)的基本原理: `Dog --> Animal --> object`",
+        "visualizationType": "pythonMemory",
+        "code": "class Dog(Animal):",
+        "pythonMemoryState": {
+          "note": "Dog 类定义开始(继承 Animal)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog.__init__ 方法定义",
+        "explanation": "**`def __init__(self, name, breed):`**\n\n定义 Dog 类的初始化方法。方法体包含 `super().__init__(name)` 和 `self.breed = breed` 两行。\n\n**这就是继承的核心模式 -- 共享 + 扩展**:\n- `name` 是所有动物都有的**公共属性** --> 父类处理\n- `breed` 是只有狗才有的**独有属性** --> 子类处理\n\n**类比**: 填写出生登记时，从父母继承的姓(name)从父母栏获取，自己的名(breed)直接填写。\n\n**参数设计的含义**:\n- `self` -- 正在创建的 Dog 对象自身(Python 自动传递)\n- `name` -- 父类 Animal 也需要的公共属性。通过 `super().__init__(name)` 传给父类\n- `breed` -- Dog 独有的属性(品种)。父类 Animal 没有的扩展功能",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name, breed):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "Dog.__init__ 已定义(替代 Animal.__init__)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Dog.__init__",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog.speak 方法定义(重写)",
+        "explanation": "**方法重写(Method Overriding)**是保留父类方法名但在子类中改变行为的技术。\n\n即接口相同，实现不同。\n这样调用方可以通过相同的方法名获得多态性。\n\n**类比**: 按同一个按钮(\"speak\")，根据设备型号(Dog/Cat)发出不同的声音。\n\n关键:\n- 可以复用父类的默认行为\n- 只有需要的类选择性地重新定义\n\n注意:\n- 过度改变方法签名可能破坏调用兼容性",
+        "visualizationType": "pythonMemory",
+        "code": "def speak(self):",
+        "occurrence": 2,
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Dog.speak 已定义(重写 Animal.speak)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Animal.speak",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Dog.__init__",
+              "pointsTo": "function3"
+            },
+            {
+              "name": "Dog.speak",
+              "pointsTo": "function4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1003"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1005"
+            },
+            {
+              "id": "function4",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog 对象创建(__init__ 自动调用)",
+        "explanation": "**`dog = Dog(\"小黄\", \"柴犬\")`**\n\n调用 Dog 类创建实例。这一行发生了很多事!\n\n**类比**: 出生时婴儿(Dog 对象)是一张白纸。Dog.__init__ 执行时就像填写出生证明 -- 父母信息(name)从父母栏(`super().__init__`)获取，个人信息(breed)直接填写。\n\n**Python 内部的 3 步过程**:\n1. `Dog.__new__(Dog)` -- 在内存中分配空的 Dog 对象(0x3000)。此时对象完全是空的(`__dict__` 为空)\n2. `Dog.__init__(0x3000, \"小黄\", \"柴犬\")` -- 自动调用初始化方法。这里 self=0x3000, name=\"小黄\", breed=\"柴犬\"\n3. `dog = 0x3000` -- 将初始化完成的对象引用存储到 `dog` 变量",
+        "visualizationType": "pythonMemory",
+        "code": "dog = Dog(\"바둑이\", \"진돗개\")",
+        "pythonMemoryState": {
+          "note": "dog 对象已创建 --> Dog.__init__ 即将自动调用",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object (empty)>",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "super().__init__(name) 调用",
+        "explanation": "**`super().__init__(name)`** 调用父类的初始化逻辑。\n\n这一行重要的原因:\n- 正确设置父类负责的公共属性(如 `name`)\n- 子类只需额外处理自己的独有属性(如 `breed`)\n\n**类比**: 就像先完成基本注册(父表单)，然后再填写补充信息(子表单)。\n\n实际要点:\n- 在子类 `__init__` 中忘记父类初始化经常导致属性缺失 bug\n- 继承结构越大，使用 `super()` 对可维护性越有利",
+        "visualizationType": "pythonMemory",
+        "code": "super().__init__(name)  # 부모 초기화!",
+        "pythonMemoryState": {
+          "note": "super() 调用父类 __init__ --> 跳转到 line 3",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "breed",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object (empty)>",
+              "pyId": "1007"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ dog (0x3000)",
+              "pyId": "1008",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"바둑이\"",
+              "pyId": "1009"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "\"진돗개\"",
+              "pyId": "1010"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Animal.__init__ 执行(父类初始化)",
+        "explanation": "**`self.name = name`**\n\n父类 Animal 的 `__init__` 方法体执行。`self.name = name` 向 dog 对象(0x3000)添加 `name` 属性。\n\n**类比**: 就像银行总行(Animal)制定的"开户流程"被分行(Dog)直接使用。分行不需要重新制定流程，调用总行的流程即可。\n\n**这里的 self 是谁?** 是 Dog 对象(0x3000)! 虽然 Animal.__init__ 在执行，但 `self` 指向的是最初创建的 **Dog 实例**。在继承结构中，即使父类代码在运行，self 始终指向**实际创建的对象**。\n\n**代码复用的实际体现**: `self.name = name` 这行代码只在 Animal 类中**写了一次**。但 Dog、Cat、Bird 等所有子类调用 `super().__init__(name)` 时都会复用这段代码。即使有 10 个子类，名字初始化代码也只存在于**一个地方**!",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "父类 Animal.__init__ 添加 name 属性",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이'>",
+              "pyId": "1007",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ dog (0x3000)",
+              "pyId": "1008",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"바둑이\"",
+              "pyId": "1009"
+            }
+          ]
+        }
+      },
+      {
+        "title": "添加 Dog 独有属性(breed)",
+        "explanation": "**`self.breed = breed`**\n\n父类 `__init__` 调用完成，回到 Dog.__init__。现在添加 Dog 独有的属性 `breed`。\n\n**类比**: 建房时先做地基工程(父类初始化)，然后做室内装修(子类扩展)。\n\n**继承的模式 -- 共享属性 + 扩展属性**:\n- `self.name` = \"小黄\" -- 由父类 Animal.__init__ 设置(共享属性，所有动物都有)\n- `self.breed` = \"柴犬\" -- 由子类 Dog.__init__ 设置(扩展属性，只有狗才有)\n- 两个属性都存储在**同一个 dog 对象**(0x3000)的 `__dict__` 中!\n\n**dog.__dict__ 的最终状态**: `{'name': '小黄', 'breed': '柴犬'}` -- 父类设置的和子类设置的**共存于一个对象中**。无法区分是谁设置的 -- 它们都是 dog 对象的属性。",
+        "visualizationType": "pythonMemory",
+        "code": "self.breed = breed",
+        "pythonMemoryState": {
+          "note": "dog 对象初始化完成!(name + breed)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "breed",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이', breed='진돗개'>",
+              "pyId": "1007",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ dog (0x3000)",
+              "pyId": "1008",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"바둑이\"",
+              "pyId": "1009"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "\"진돗개\"",
+              "pyId": "1010"
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 dog.speak()(被重写的方法)",
+        "explanation": "**`dog.speak()`**\n\n现在直接观察重写的效果! 在 dog 对象上调用 speak 方法。\n\n**Python 的方法查找过程(MRO 实际运作)**:\n1. 在 dog 对象(0x3000)的 `__dict__` 中查找 speak --> **没找到!**(实例属性只有 name、breed)\n2. 在 dog 的类 **Dog** 的 `__dict__` 中查找 speak --> **找到了!** Dog.speak(0x2200)\n3. 找到了，**立即停止搜索**。不会检查 Animal 类!\n\n**如果 Dog 没有 speak 呢?** 搜索会沿着 MRO 移动到下一个类 Animal，然后 Animal.speak(\"...\")会被执行。这就是继承的核心 -- 子类中没有就自动到父类中查找。\n\n**重写的工作原理**: 由于 Dog 类中定义了同名的 speak，在 MRO 搜索中 Dog.speak **先于** Animal.speak 被发现。先发现的会被执行，所以父类的 speak 被完全忽略。这就是"覆盖"的实质!\n\n**绑定方法创建**: 访问 `dog.speak` 的瞬间，Python 创建将 Dog.speak 函数和 dog 实例绑定的绑定方法，自动传递 self=dog。\n\n**为什么是这个顺序?** 对象创建和初始化完成后，按顺序执行下一行。\n\n**执行顺序**: 访问 dog.speak --> MRO 搜索: Dog.__dict__['speak'] 找到 --> 创建绑定方法 --> 执行 Dog.speak(dog) --> 跳转到 line 14",
+        "visualizationType": "pythonMemory",
+        "code": "dog.speak()",
+        "pythonMemoryState": {
+          "note": "dog.speak() --> Dog.speak 执行(重写!)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Animal.speak",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Dog.speak",
+              "pointsTo": "function4",
+              "highlight": true
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1003"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "function4",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1006",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이', breed='진돗개'>",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog.speak 方法执行",
+        "explanation": "**`print(f\"{self.name}: 汪汪!\")`**\n\n被重写的 Dog.speak 方法执行。不是父类的 `print(\"...\")`，而是子类的 `print(f\"{self.name}: 汪汪!\")` 在运行!\n\n**继承的美妙在此刻展现**: Dog.speak 代码中使用了 `self.name`，而这个属性是由**父类 Animal.__init__ 设置的**! 子类可以自由使用父类创建的属性。这就是继承的核心价值 -- 子类在父类提供的基础上构建自己的功能。\n\n**f-string 计算过程**:\n1. `self` --> dog 对象(0x3000)\n2. `self.name` --> dog.__dict__['name'] --> \"小黄\"(由父类 Animal.__init__ 设置的属性!)\n3. f-string 将 `{self.name}` 替换为 `\"小黄\"`\n4. 最终字符串: `\"小黄: 汪汪!\"`\n5. 通过 print 输出",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"{self.name}: 멍멍!\")",
+        "pythonMemoryState": {
+          "output": [
+            "바둑이: 멍멍!"
+          ],
+          "note": "Dog.speak 执行(可以使用父类属性 name!)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이', breed='진돗개'>",
+              "pyId": "1007"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ dog (0x3000)",
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查继承属性和独有属性",
+        "explanation": "**`print(dog.name, dog.breed)`**\n\n最后访问 dog 对象的两个属性并输出。输出结果是 `\"小黄 柴犬\"`。\n\n**本课的三个关键点**:\n\n**注意 -- 常见错误**:\n- 忘记 `super().__init__()` --> AttributeError\n- 像 `super().__init__(self, name)` 这样重复传递 self --> TypeError(self 传递了两次)\n- 给父类 __init__ 传错参数 --> TypeError\n\n**两个属性的来源不同!**\n- `dog.name` = \"小黄\" -- 由**父类** Animal.__init__ 通过 `super().__init__(name)` 设置\n- `dog.breed` = \"柴犬\" -- 由**子类** Dog.__init__ 直接设置",
+        "visualizationType": "pythonMemory",
+        "code": "print(dog.name, dog.breed)",
+        "pythonMemoryState": {
+          "output": [
+            "바둑이 진돗개"
+          ],
+          "note": "父类属性(name)和子类属性(breed)都可使用!",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이', breed='진돗개'>",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如果忘记 super().__init__(name) 会怎样?",
+    "options": [
+      "正常运行",
+      "因为 self.name 不存在而 AttributeError",
+      "父类 __init__ 会自动调用",
+      "SyntaxError"
+    ],
+    "correctIndex": 1,
+    "explanation": "Python 不会自动调用父类 __init__! 必须在子类 __init__ 中显式调用 super().__init__()，父类的初始化才会执行。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "在子类定义 __init__ 会自动调用父类 __init__",
+      "correct": "必须显式调用 super().__init__()",
+      "why": "与 Java 不同，Python 不会自动调用! 必须自己使用 super()。"
+    },
+    {
+      "wrong": "继承后不能修改父类方法",
+      "correct": "可以通过重写(overriding)重新定义",
+      "why": "在子类中定义同名方法就会覆盖父类的版本。"
+    }
+  ],
+  "keyTakeaway": "继承 = 从父类继承! 用 super() 调用父类，用重写来重新定义!"
+}

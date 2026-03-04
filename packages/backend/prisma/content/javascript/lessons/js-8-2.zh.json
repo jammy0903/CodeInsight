@@ -1,0 +1,85 @@
+{
+  "lessonId": "js-8-2",
+  "title": "requestAnimationFrame（垂直同步）",
+  "concept": "requestAnimationFrame (rAF) 将代码执行与浏览器的屏幕刷新周期（V-Sync）同步。",
+  "content": {
+    "code": "// 1. setTimeout (렌더링 주기 무시)\nfunction badAni() {\n  // 10ms마다 실행하려 하지만 실제 프레임 생성 시점과 어긋남\n  moveBox();\n  setTimeout(badAni, 10);\n}\n\n// 2. requestAnimationFrame (렌더링 주기 동기화)\nfunction goodAni() {\n  moveBox();\n  // 브라우저: \"다음 Paint 직전에 실행시켜 줄게\"\n  requestAnimationFrame(goodAni);\n}\n\nrequestAnimationFrame(goodAni);",
+    "steps": [
+      {
+        "title": "启动动画",
+        "explanation": "调用 `requestAnimationFrame(goodAni)` 启动动画循环。\n这相当于告诉浏览器：「在绘制下一帧之前运行 `goodAni`。」",
+        "keyInsight": "rAF 将工作对齐到浏览器的渲染周期，而不是固定的时间间隔。",
+        "visualizationType": "eventLoop",
+        "code": "requestAnimationFrame(goodAni);",
+        "occurrence": 2,
+        "eventLoopState": {
+          "callStack": [],
+          "webApis": [
+            {
+              "name": "rAF(goodAni)"
+            }
+          ],
+          "taskQueue": [],
+          "microtaskQueue": []
+        }
+      },
+      {
+        "title": "安排下一帧",
+        "explanation": "在 `goodAni` 内部，我们再次调用 `requestAnimationFrame(goodAni)` 来安排下一帧。\n这就是「rAF 循环」——流畅动画的关键。",
+        "visualizationType": "eventLoop",
+        "code": "requestAnimationFrame(goodAni);",
+        "eventLoopState": {
+          "callStack": [
+            "goodAni()",
+            "moveBox()"
+          ],
+          "webApis": [
+            {
+              "name": "rAF(goodAni)"
+            }
+          ],
+          "taskQueue": [],
+          "microtaskQueue": []
+        }
+      },
+      {
+        "title": "注意：错误的方式——使用 setTimeout",
+        "explanation": "像 `badAni` 那样使用 `setTimeout` 可能导致 JS 执行与浏览器渲染周期不同步。\n例如，如果 `moveBox` 在一次渲染完成后立即运行，结果要到 16ms 后的下一帧才会显示——产生卡顿的「Jank」效果。",
+        "keyInsight": "JS 动画应该始终使用 `requestAnimationFrame` 而不是 `setTimeout`。",
+        "visualizationType": "eventLoop",
+        "code": "setTimeout(badAni, 10);",
+        "eventLoopState": {
+          "callStack": [
+            "badAni()",
+            "moveBox()"
+          ],
+          "webApis": [],
+          "taskQueue": [
+            "setTimeout(badAni, 10)"
+          ],
+          "microtaskQueue": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪个不是 requestAnimationFrame 的关键特性？",
+    "options": [
+      "在后台标签页中暂停以节省电量",
+      "调用频率自动适配显示器刷新率（Hz）",
+      "总是在精确 1ms 后执行",
+      "能有效减少掉帧（Jank）"
+    ],
+    "correctIndex": 2,
+    "explanation": "rAF 跟随屏幕刷新周期，而不是固定时间。\n间隔会根据显示环境动态变化。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "JS 动画（rAF）总是比 CSS 动画更快",
+      "correct": "取决于具体情况。",
+      "why": "对于简单的移动，CSS 可能更快，因为它在主线程之外的合成器线程上运行。\nrAF 适用于需要复杂计算的场景，如物理引擎。"
+    }
+  ],
+  "keyTakeaway": "JS 动画必须使用 rAF 与 V-Sync 保持同步，以实现流畅渲染。"
+}

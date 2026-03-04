@@ -1,0 +1,266 @@
+{
+  "lessonId": "py-12-3",
+  "title": "finally和else",
+  "concept": "无论是否发生错误都必须执行的finally，只有没有错误时才执行的else！",
+  "content": {
+    "code": "def safe_divide(a, b):\n    try:\n        result = a / b\n    except ZeroDivisionError:\n        print(\"Error: division by zero\")\n        return None\n    else:\n        print(f\"Success: {a}/{b} = {result}\")\n        return result\n    finally:\n        print(\"Calculation attempt finished\")\n\nanswer = safe_divide(10, 3)\nprint(f\"Answer: {answer}\")",
+    "steps": [
+      {
+        "title": "函数定义",
+        "explanation": "**`def safe_divide(a, b):`** -- 创建 `function` 对象并贴上 `safe_divide` 标签。\n\nPython从上到下按顺序执行。用 `def` 关键字定义函数时，Python将函数体编译为**代码对象（code object）**存储在内存中，然后创建包装该代码对象的 `function` 对象。\n\n这个函数展示了try-except-else-finally的**完整四段结构**：\n```\ntry:      可能出错的代码（危险区域）\nexcept:   出错时执行（紧急处理）\nelse:     没出错时执行（成功庆祝）\nfinally:  无条件执行（收尾整理）\n```\n\n**类比：** 就像手术室的规程。尝试手术（try），出问题就紧急处理（except），成功则庆祝（else），然后**无论成功还是失败都必须**整理手术室（finally）。\n\n**Python内部原理：** 执行 `def` 语句时，`function` 对象在堆上创建，全局命名空间中注册 `{\"safe_divide\": <function对象地址>}`。函数体尚未执行，实际执行从调用 `safe_divide(10, 3)` 时开始。\n\n**注意：** `def` 只是**定义**，函数内的代码**直到被调用才会执行**。函数内的运行时错误在此时不会被发现。\n\n**执行顺序：** `def safe_divide(a, b):` → 创建函数对象 → 移到下一行（函数调用）",
+        "visualizationType": "pythonMemory",
+        "code": "def safe_divide(a, b):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "函数已定义（尚未执行）",
+          "names": [
+            {
+              "name": "safe_divide",
+              "pointsTo": "func1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function safe_divide>",
+              "pyId": "3001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "函数调用 - 进入try块",
+        "explanation": "**`answer = safe_divide(10, 3)`** -- 调用函数时创建新的**局部命名空间**，参数绑定到形参。\n\n用 `a=10`, `b=3` 调用 `safe_divide`。跳入函数内部，进入 `try` 块。\n\n**`result = a / b`** -- `10 / 3` = **3.3333333333333335**（Python的 `/` 运算符总是返回 `float`）\n\n**类比：** 就像给厨师（函数）下单：把10人份的意面分给3个人。厨师尝试除法（try），因为不是除以0，成功得出结果。\n\n**Python内部原理：** 函数调用时创建新的栈帧。该帧包含局部变量（`a`、`b`、`result`）的命名空间。`10 / 3` 调用 `int.__truediv__(10, 3)` 返回float对象 `3.3333333333333335`。\n\n因为不是除以零，**没有发生错误！** 没有错误时跳过except块，执行 **else块**。这是关键点！\n\n**执行顺序：** 函数调用 → 创建栈帧 → `a=10, b=3` 绑定 → 进入 `try:` → `result = 10 / 3` 成功！→ 跳过except → 移到else",
+        "visualizationType": "pythonMemory",
+        "code": "        result = a / b",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "10 / 3 = 3.333... 没有错误！",
+          "names": [
+            {
+              "name": "safe_divide",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2",
+              "highlight": true
+            },
+            {
+              "name": "result",
+              "pointsTo": "float1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function safe_divide>",
+              "pyId": "3001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "3002"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "3003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.3333333333333335,
+              "pyId": "3004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "else块执行（只有没错误时！）",
+        "explanation": "**`else:`** 块执行了！这是**只有try块中没有发生任何错误时**才执行的特殊块。\n\n**`print(f\"Success: {a}/{b} = {result}\")`** -- 打印成功消息：`Success: 10/3 = 3.3333333333333335`\n\n**Python内部原理：** 当try块中所有代码无异常地执行完毕后，解释器跳过所有except块，将控制流移到else块。else块中发生的错误**不会被**这个try-except捕获！这是与把成功代码放在try内的关键区别。\n\n**类比：** 考试（try）时，如果考试中出问题（错误）由监考官（except）处理，如果顺利完成考试（没有错误）就举办合格庆祝派对（else）。在考试过程中举办庆祝派对就奇怪了！\n\n**注意：** else块是可选的。不需要的话可以省略。但有了它代码可读性会大大提升。",
+        "visualizationType": "pythonMemory",
+        "code": "        print(f\"Success: {a}/{b} = {result}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Success: 10/3 = 3.3333333333333335"
+          ],
+          "note": "else块：因为没有错误所以执行了！",
+          "names": [
+            {
+              "name": "safe_divide",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "result",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function safe_divide>",
+              "pyId": "3001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "3002"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "3003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.3333333333333335,
+              "pyId": "3004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "finally块执行（无条件！）",
+        "explanation": "**`finally:`** 块无论是否发生异常都会执行。\n\n也就是说，无论成功还是失败，这里是放收尾整理代码的地方。\n典型用于关闭文件、断开连接、释放锁等资源清理。\n\n**类比**：无论会议结局好坏，关灯锁门的程序总是要做的。\n\n实务要点：\n- 清理代码遗漏会导致泄露和故障\n- 所以清理逻辑应放在 `finally` 而不是 `try` 中",
+        "visualizationType": "pythonMemory",
+        "code": "        print(\"Calculation attempt finished\")",
+        "pythonMemoryState": {
+          "output": [
+            "Calculation attempt finished"
+          ],
+          "note": "finally块：无条件执行！（甚至在return之前）",
+          "names": [
+            {
+              "name": "safe_divide",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "result",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function safe_divide>",
+              "pyId": "3001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "3002"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "3003"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.3333333333333335,
+              "pyId": "3004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查返回值",
+        "explanation": "检查返回值是验证异常处理后最终状态的最后步骤。\n\n经过try/except/finally之后，\n需要确认调用方收到了期望的值，整个流程才算安全。\n\n**类比**：修理后不只是发动引擎试试，还要实际路测做最终检查。\n\n实务要点：\n- 不要只打印错误信息就完事\n- 验证返回值/状态值才能减少回归",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Answer: {answer}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Answer: 3.3333333333333335"
+          ],
+          "note": "函数返回完成！",
+          "names": [
+            {
+              "name": "safe_divide",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "answer",
+              "pointsTo": "float1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function safe_divide>",
+              "pyId": "3001"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.3333333333333335,
+              "pyId": "3004",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "finally块什么时候执行？",
+    "options": [
+      "只有发生错误时才执行",
+      "只有没发生错误时才执行",
+      "无论是否发生错误都会执行",
+      "有return语句时不执行"
+    ],
+    "correctIndex": 2,
+    "explanation": "finally块无论是否发生错误、有没有return都会执行。它甚至在return语句之前执行！用于文件关闭、数据库连接断开等清理工作。"
+  },
+  "keyTakeaway": "else只在没有错误时执行，finally无条件执行。finally甚至在return之前执行，所以用于必须执行的清理任务！"
+}

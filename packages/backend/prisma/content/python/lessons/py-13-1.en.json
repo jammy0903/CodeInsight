@@ -1,0 +1,300 @@
+{
+  "lessonId": "py-13-1",
+  "title": "String Methods (split, join, strip, replace)",
+  "concept": "Strings are Immutable! Methods always return a new string",
+  "content": {
+    "code": "text = \"  Hello, World!  \"\nstripped = text.strip()\nprint(stripped)\n\nwords = \"apple,banana,cherry\".split(\",\")\nprint(words)\n\njoined = \" - \".join(words)\nprint(joined)\n\nreplaced = \"Hello World\".replace(\"World\", \"Python\")\nprint(replaced)",
+    "steps": [
+      {
+        "title": "Creating a String with Whitespace",
+        "explanation": "**`text = \"  Hello, World!  \"`** -- A string object `\"  Hello, World!  \"` is created in heap memory, and the label `text` points to this object.\n\nPython executes from top to bottom in order. This string contains **2 spaces on each side**.\n\n**Analogy:** Like newly bought clothes (string) that still have price tags and labels (unnecessary whitespace) attached. You need to remove the tags (strip) before wearing the clothes!\n\n**Why is this whitespace a problem?** In practice, user input or data read from files often contains unintended whitespace. For example, `\"  alice  \" == \"alice\"` is `False`! Whitespace can cause problems in comparison, search, and storage operations.\n\n**Python internals (string immutability):** Python's `str` objects are **immutable**. Once created, a string can **never be modified**. Code like `text[0] = \"X\"` raises a `TypeError`. All string methods **do not modify the original but create and return a new string object**.\n\n**Note:** `text` is merely a label pointing to the string object with whitespace. The label itself doesn't \"contain\" the string; it **references** the string object in memory.\n\n**Execution order:** `str` object `\"  Hello, World!  \"` created -> `text` label attached -> move to next line",
+        "visualizationType": "pythonMemory",
+        "code": "text = \"  Hello, World!  \"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "String created with leading/trailing whitespace",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Removing Whitespace with strip()",
+        "explanation": "**`stripped = text.strip()`** -- Calls the `strip()` method on the string object that `text` points to, and receives a **new** string object with whitespace removed from both sides.\n\n**strip() method:** Removes all whitespace characters (spaces, tabs `\\t`, newlines `\\n`, carriage returns `\\r`) from **both ends** of the string and returns a **new string**. Whitespace in the middle of the string is not affected.\n\n**Python internals (key to immutability):** `text.strip()` **never modifies** the original string `\"  Hello, World!  \"`. Instead, it creates a new `str` object `\"Hello, World!\"` on the heap and returns its reference. `stripped` is a label pointing to this new object, while `text` still points to the original object with whitespace. The two variables point to **different objects**.\n\n**Analogy:** Like dusting off the front and back covers (both ends) of a book (string). The book's content (middle whitespace) stays the same. And the original book is untouched -- a **clean copy (new string)** is made and returned.\n\n**Note:** The most common beginner mistake: calling `text.strip()` without saving the result to a variable! If you just write `text.strip()`, the new string is created and immediately discarded.",
+        "visualizationType": "pythonMemory",
+        "code": "stripped = text.strip()",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "strip() returns a new string (original unchanged)",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the strip Result",
+        "explanation": "**`print(stripped)`** -- Prints the value `\"Hello, World!\"` of the string object that `stripped` points to.\n\nYou can see that the unnecessary whitespace on both sides has been cleanly removed. The original `text` is still `\"  Hello, World!  \"` (with whitespace).\n\n**Analogy:** You sent your clothes (string) to the dry cleaner (strip), and they kept the original and returned a clean copy. The original clothes (text) are still dirty (with whitespace).\n\n**Python internals:** The `print()` function internally calls `stripped.__str__()` to get the string representation and writes it to standard output via `sys.stdout.write()`. The `__str__` of a `str` object returns itself.\n\n**Essential practical pattern:** `strip()` is almost mandatory when processing user input:\n```python\nusername = input(\"Name: \").strip()  # Remove whitespace right after input\nemail = input(\"Email: \").strip().lower()  # Remove whitespace + convert to lowercase\n```\nWithout this pattern, bugs like login failures due to `\" alice \"` != `\"alice\"` can occur.\n\n**Execution order:** `print(stripped)` -> `\"Hello, World!\"` output -> move to next line",
+        "visualizationType": "pythonMemory",
+        "code": "print(stripped)",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, World!"
+          ],
+          "note": "Whitespace removed from both sides",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Splitting Strings with split() -> List",
+        "explanation": "**`words = \"apple,banana,cherry\".split(\",\")`** -- Splits the string by the delimiter `\",\"` and returns a **list object**.\n\n**split() method:** Splits a string by the specified delimiter and creates a **list** of the separated substrings. The original string is not modified.\n\n**Analogy:** Like cutting a string of linked sausages (string) with scissors (split) at the connection points (delimiter) to make individual sausages (each element in the list).\n\n**Note:** `\",,\".split(\",\")` returns `[\"\", \"\", \"\"]` (3 empty strings). If there's nothing between delimiters, empty strings are included!\n\n**Let's trace the process:**\n1. Find `\",\"` (comma) in the string `\"apple,banana,cherry\"`\n2. First comma -> `\"apple\"` separated\n3. Second comma -> `\"banana\"` separated\n4. Remainder -> `\"cherry\"` separated\n5. Result: `[\"apple\", \"banana\", \"cherry\"]` list returned",
+        "visualizationType": "pythonMemory",
+        "code": "words = \"apple,banana,cherry\".split(\",\")",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "split(\",\") splits by comma -> list",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"apple\", \"banana\", \"cherry\"]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Joining List -> String with join()",
+        "explanation": "**`joined = \" - \".join(words)`** -- Joins each element of the list with the **separator string** `\" - \"` to create a single string.\n\n**join() method:** Inserts the separator between each element of an iterable (list, tuple, etc.) and combines them into a single string.\n\n**Analogy:** Like threading beads (each element in the list) onto a string (separator) to make a necklace (one string). \"What string to use\" comes first (separator.join), and \"what beads to thread\" comes as the argument (list).\n\n**Note (the syntax is not intuitive!):**\n- `\" - \".join(words)` (O) -- It's **separator**.join(**list**) format!\n- `words.join(\" - \")` (X) -- This gives `AttributeError`! Lists don't have a `join` method\n\n**Process:**\n1. `words` = `[\"apple\", \"banana\", \"cherry\"]`\n2. First element: `\"apple\"`\n3. Insert separator: `\" - \"`\n4. Second element: `\"banana\"`\n5. Insert separator: `\" - \"`\n6. Third element: `\"cherry\"`\n7. Result: `\"apple - banana - cherry\"`",
+        "visualizationType": "pythonMemory",
+        "code": "joined = \" - \".join(words)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "join() uses separator.join(list) format",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "joined",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"apple\", \"banana\", \"cherry\"]",
+              "pyId": "1003"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"apple - banana - cherry\"",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "String Substitution with replace()",
+        "explanation": "**`replace()`** finds part of a string and replaces it with a new string, returning the result.\n\nKey points:\n- The original string doesn't change (immutable)\n- You must assign the result to a new variable or reassign it for the change to take effect\n\n**Analogy**: Instead of editing the original document directly, it's like replacing words in a copy.\n\nPractical points:\n- Commonly used for log/message cleanup, whitespace formatting, and masking operations",
+        "visualizationType": "pythonMemory",
+        "code": "replaced = \"Hello World\".replace(\"World\", \"Python\")",
+        "pythonMemoryState": {
+          "output": [
+            "apple - banana - cherry"
+          ],
+          "note": "replace() substitutes part of a string",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "joined",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "replaced",
+              "pointsTo": "str4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"apple\", \"banana\", \"cherry\"]",
+              "pyId": "1003"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"apple - banana - cherry\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the result of \"hello,world\".split(\",\")?",
+    "options": [
+      "\"hello world\"",
+      "[\"hello\", \"world\"]",
+      "(\"hello\", \"world\")",
+      "[\"hello,world\"]"
+    ],
+    "correctIndex": 1,
+    "explanation": "split() splits a string by the delimiter and returns a **list**.\nSplitting by comma gives the list [\"hello\", \"world\"]."
+  },
+  "misconceptions": [
+    {
+      "wrong": "strip() modifies the original string",
+      "correct": "Strings are immutable, so strip() returns a new string.",
+      "why": "Even after calling text.strip(), the value of the text variable doesn't change.\nTo use the result, you must save it to a new variable like stripped = text.strip()."
+    }
+  ],
+  "keyTakeaway": "strip/split/join/replace are the 4 essential string methods! They all return a new string (or list)."
+}

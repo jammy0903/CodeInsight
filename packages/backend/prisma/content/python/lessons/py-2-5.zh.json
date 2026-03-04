@@ -1,0 +1,436 @@
+{
+  "lessonId": "py-2-5",
+  "title": "字符串驻留（String Interning）",
+  "concept": "Python 为了性能会自动复用某些字符串对象！",
+  "content": {
+    "code": "a = \"hello\"\nb = \"hello\"\nprint(f\"a is b: {a is b}\")\n\nx = \"hello world\"\ny = \"hello world\"\nprint(f\"x is y: {x is y}\")\n\ns1 = \"hello\" + \" \" + \"world\"\ns2 = \"hello world\"\nprint(f\"s1 is s2: {s1 is s2}\")",
+    "steps": [
+      {
+        "title": "创建短字符串",
+        "explanation": "**`a = \"hello\"`** -- 创建一个短的、不含空格的字符串对象 `\"hello\"`，并贴上标签 `a`。\n\nPython 从上到下按顺序执行。字符串对象 `\"hello\"` 在内存中被创建，标签 `a` 被贴到这个对象上。\n\n**本课核心主题——什么是 String Interning（字符串驻留）？** Python 为了性能优化，会将**短的、常用的字符串**在内存中**只存储一次并复用**。即使多次使用相同内容的字符串，内存中也只存在 1 个对象。这就是**字符串驻留（String Interning）**。\n\n**哪些字符串会被驻留？** 通常满足以下条件的字符串会被驻留：\n- 不含空格的短字符串（如 `\"hello\"`、`\"abc\"`、`\"x\"`）\n- 看起来像变量名或关键字的字符串（只包含字母、数字和下划线）\n\n`\"hello\"` 是不含空格的短字符串，因此是驻留候选。\n\n**类比：** 就像图书馆不会购买多本热门书——只保留 1 本，让多人共享。\n\n**Python 内部原理：** CPython 解释器在编译代码时，将字符串字面量存储在内部字典（intern table）中。当再次出现相同的字符串时，从这个字典中查找已有的对象并复用。\n\n**执行顺序**: 第 1 行 → 创建字符串对象(id: 0x1000) → a = 0x1000 → 第 2 行",
+        "visualizationType": "pythonMemory",
+        "code": "a = \"hello\"",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "复用相同的字符串",
+        "explanation": "**`b = \"hello\"`** -- 不创建新对象，而是指向与 `a` **完全相同的对象(0x1000)**。\n\n**为什么不创建新对象？** Python 在编译代码时，如果发现相同的字符串字面量（`\"hello\"`），会**复用 intern table 中已注册的对象**。因此 `b` 不会创建新的 `\"hello\"` 对象，而是指向 `a` 所指向的**相同内存地址(0x1000)**。\n\n**这就是字符串驻留的核心：** 内存中只存在 **1 个** `\"hello\"` 对象，`a` 和 `b` 两个标签共享同一个对象。不仅节省内存，还能加速字符串比较（因为只需比较地址）。\n\n**类比：** 同一本书（\"hello\"）有 2 张借书卡（a, b）。书本身只有 1 本。\n\n**Python 内部原理：** 编译器遇到 `\"hello\"` 字面量时，在 intern table 中搜索是否有相同的字符串。由于 `a = \"hello\"` 时已经注册，所以返回该对象的引用。引用计数从 1 增加到 2。\n\n**执行顺序**: 第 2 行 → 在 intern table 中找到 \"hello\"(0x1000) → b = 0x1000 → 第 3 行",
+        "visualizationType": "pythonMemory",
+        "code": "b = \"hello\"",
+        "pythonMemoryState": {
+          "note": "a 和 b 指向同一个对象(0x1000)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "同一性检查 (is)",
+        "explanation": "**`print(f\"a is b: {a is b}\")`** -- 检查 `a` 和 `b` 是否是**同一个对象**。结果为 `True`。\n\n**`is` 与 `==`——Python 中最重要的区分之一：**\n- **`==`**：**值（内容）**是否相同？→ `\"hello\" == \"hello\"` 始终为 True\n- **`is`**：是否是**同一个对象（内存地址）**？→ 与 `id(a) == id(b)` 含义相同\n\n由于字符串驻留，`a` 和 `b` 都指向同一个对象(0x1000)，所以 `a is b` 为 **True**。此时 `a == b` 当然也是 True。\n\n**类比：** 检查两个人（a, b）是否住在同一栋房子（0x1000）。住在同一栋房子里 `is` 为 True，住在不同房子但家具一模一样则只有 `==` 为 True。\n\n**Python 内部原理：** `is` 运算符比较两个变量所指向对象的**内存地址(id)**。在 C 层面是简单的指针比较，因此非常快。`==` 调用 `__eq__` 方法逐字符比较内容，可能更慢。\n\n**注意：** 此结果为 True 是**得益于字符串驻留优化**，并不是始终保证的。接下来将看到驻留不生效的情况。\n\n**执行顺序**: is 检查(id(a)==id(b), 0x1000==0x1000) → True → f-string 求值 → 输出",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a is b: {a is b}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a is b: True"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "创建含空格的字符串",
+        "explanation": "**`x = \"hello world\"`** -- 创建一个包含空格的字符串对象。这类字符串的驻留**不被保证**。\n\n前面的代码执行完毕后，按顺序进入下一行。这次创建的是包含空格（` `）的 `\"hello world\"` 字符串。\n\n**为什么这个字符串的驻留不被保证？** Python 的字符串驻留主要适用于**看起来像标识符的字符串**。即只包含字母、数字和下划线（`_`）的字符串。`\"hello world\"` 包含空格，不符合标识符规则，因此驻留不被保证。\n\n**类比：** 图书馆的热门书（\"hello\"）会自动加入共享名单，但特殊书名的书（\"hello world\"）不在自动登记范围内。是否登记取决于管理员（CPython）的判断。\n\n**Python 内部原理：** CPython 编译为 `.pyc` 文件时，同一模块内相同的字符串字面量可能被合并（常量折叠）。但这与驻留是不同的机制，结果可能因执行环境（REPL 与脚本）而异。\n\n**执行顺序**: 第 5 行 → 创建字符串对象(id: 0x2000) → x = 0x2000 → 第 6 行",
+        "visualizationType": "pythonMemory",
+        "code": "x = \"hello world\"",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "再次创建相同的长字符串",
+        "explanation": "**`y = \"hello world\"`** -- 再次创建与 `x` 相同内容的字符串。是否指向同一个对象**无法预测**。\n\n再次创建与 `x` 完全相同内容（`\"hello world\"`）的字符串。此时 `y` 可能与 `x` 共享同一个对象，也可能创建新的独立对象。\n\n**为什么无法预测？**\n- CPython 实现中，同一模块的常量字符串可能被合并（常量折叠），但**语言规范不保证**\n- 在 REPL（交互模式）中，每行单独编译，更可能是不同对象\n- 在 .py 脚本中，同一文件的字面量可能被合并，可能是同一个对象\n\n本例中假设是**不同的对象(0x2001)**。\n\n**类比：** 写了两封内容相同的信时，纸张（对象）可能不同。内容相同但物理上是不同的纸。\n\n**Python 内部原理：** 由于这个字符串不是驻留候选，不会搜索 intern table，可能在堆上分配新的 `str` 对象。但编译器的常量折叠优化可能导致使用同一个对象，这属于实现细节。\n\n**执行顺序**: 第 6 行 → 创建新字符串对象(id: 0x2001) → y = 0x2001 → 第 7 行",
+        "visualizationType": "pythonMemory",
+        "code": "y = \"hello world\"",
+        "pythonMemoryState": {
+          "note": "x 和 y 可能是不同的对象（无法预测）",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "长字符串同一性检查",
+        "explanation": "**`print(f\"x is y: {x is y}\")`** -- 检查 `x` 和 `y` 是否是同一个对象。本例中结果为 **False**。\n\n`x`(0x2000) 和 `y`(0x2001) **内容相同但是不同的对象**，所以 `is` 运算结果为 `False`。\n\n**核心教训：** 字符串**内容比较**时**绝对不要使用 `is`！** `is` 比较的是对象同一性（内存地址），而字符串驻留**只是一种优化，不是语言规范的保证**。\n\n**正确的比较方法：**\n- `x == y` → **True**（因为内容相同）——始终使用这个！\n- `x is y` → **无法预测**（根据是否驻留可能为 True 或 False）\n\n**类比：** 检查两封信的内容是否相同（==）和检查是否是同一张纸（is）是不同的事情。要比较内容请用 `==`。\n\n**Python 内部原理：** `is` 运算符等同于 `id(x) == id(y)`。由于地址不同(0x2000 != 0x2001)，返回 False。而 `==` 调用 `x.__eq__(y)` 逐字符比较字符串，因此返回 True。\n\n**执行顺序**: is 检查(id(x)!=id(y), 0x2000!=0x2001) → False → f-string 求值 → 输出",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"x is y: {x is y}\")",
+        "pythonMemoryState": {
+          "output": [
+            "x is y: False"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "通过拼接创建字符串",
+        "explanation": "**`s1 = \"hello\" + \" \" + \"world\"`** -- 使用 `+` 运算符在**运行时动态**拼接生成新的字符串对象。\n\n三个字符串字面量（`\"hello\"`、`\" \"`、`\"world\"`）通过 `+` 运算符连接。首先 `\"hello\" + \" \"` = `\"hello \"` 被创建，然后 `\"hello \" + \"world\"` = `\"hello world\"` 被创建。\n\n**类比：** 已印刷的书（字面量）可以通过图书馆共享，但手抄的副本（+ 运算结果）不会被登记到图书馆系统中。\n\n**性能提示：** 反复使用 `+` 拼接大量字符串效率很低，因为每次都会创建新对象。使用 `\"\".join(list)` 或 f-string 要快得多。\n\n**Python 内部原理：** `+` 运算符调用 `str.__add__()` 方法。第一个 `+` 创建中间字符串 `\"hello \"`，第二个 `+` 创建最终字符串 `\"hello world\"`。中间字符串会立即成为垃圾回收的候选对象。",
+        "visualizationType": "pythonMemory",
+        "code": "s1 = \"hello\" + \" \" + \"world\"",
+        "pythonMemoryState": {
+          "note": "s1 是动态创建的（+ 运算）→ 不会被驻留",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "str4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "通过字面量创建字符串",
+        "explanation": "**`s2 = \"hello world\"`** -- 直接作为**字符串字面量**创建。与 `s1` 内容相同，但创建方式不同。\n\n`s2` 是直接写在代码中的字符串字面量。由于这个字符串与 `y` 是相同的字面量，可能通过编译器的常量折叠与 `y` 共享同一个对象(0x2001)。\n\n**s1 和 s2 的核心区别：**\n- `s1`：通过 `+` 运算在**运行时动态创建**(0x3000)——不会被驻留\n- `s2`：直接写在代码中的**字面量**(0x2001)——可以与其他字面量共享\n\n两者内容都是 `\"hello world\"`，但**由于创建方式不同，是不同的对象**。\n\n**类比：** 一份是复印机做的副本（s1，+ 运算），另一份是印刷原件（s2，字面量）。内容相同但物理上是不同的纸张。\n\n**Python 内部原理：** `s2` 是字面量，在编译时处理。如果同一模块中已存在 `\"hello world\"` 字面量（在 y 中使用过），可以复用同一个常量对象。但 `s1` 是运行时通过 `+` 创建的，与这个常量池无关。\n\n**执行顺序**: 第 10 行 → 复用字面量 \"hello world\"(id: 0x2001) → s2 = 0x2001 → 第 11 行",
+        "visualizationType": "pythonMemory",
+        "code": "s2 = \"hello world\"",
+        "pythonMemoryState": {
+          "note": "s2 可能与 y 是同一个对象（字面量）",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "str4"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "比较不同创建方式的字符串",
+        "explanation": "**`print(f\"s1 is s2: {s1 is s2}\")`** -- 检查用 `+` 创建的 `s1` 和字面量 `s2` 是否是同一个对象。结果为 **False**。\n\n创建方式不同的 `s1`(0x3000, 运行时动态创建) 和 `s2`(0x2001, 编译时字面量) 内容相同但是**不同的对象**，所以结果为 `False`。\n\n**完整比较结果总结：**\n- `a is b` → **True**（短字面量，已驻留）\n- `x is y` → **False**（含空格的字符串，驻留不保证）\n- `s1 is s2` → **False**（动态创建 vs 字面量，不同对象）\n- `a == b`、`x == y`、`s1 == s2` → **全部 True**（因为内容相同）\n\n**类比：** 比较内容相同的信件时，不要问是不是同一张纸（`is`），要问内容是否相同（`==`）！",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"s1 is s2: {s1 is s2}\")",
+        "pythonMemoryState": {
+          "output": [
+            "s1 is s2: False"
+          ],
+          "note": "s1 == s2 为 True，但 s1 is s2 为 False！",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "y",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "str4"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "str3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"hello\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1003"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"hello world\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "比较两个字符串时始终正确的方法是？",
+    "options": [
+      "a is b",
+      "a == b",
+      "id(a) == id(b)",
+      "a is b or a == b"
+    ],
+    "correctIndex": 1,
+    "explanation": "字符串比较请始终使用 `==`！`is` 检查的是是否是同一个对象（内存地址），这取决于 Python 内部优化。\n内容相同的两个字符串可能是不同的对象。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "`is` 和 `==` 对字符串的作用相同",
+      "correct": "`is` 是同一对象检查（内存地址），`==` 是值比较（内容）。",
+      "why": "字符串驻留是不可预测的。\n字符串比较请始终使用 `==`。"
+    },
+    {
+      "wrong": "内容相同的字符串一定是同一个对象",
+      "correct": "只有部分字符串会被驻留，其规则很复杂。",
+      "why": "是否驻留取决于字符串内容、创建方式和 Python 版本。"
+    }
+  ],
+  "keyTakeaway": "字符串驻留只是优化手段，不是保证。字符串比较请始终使用 `==`！"
+}

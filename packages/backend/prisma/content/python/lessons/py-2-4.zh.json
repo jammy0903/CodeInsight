@@ -1,0 +1,631 @@
+{
+  "lessonId": "py-2-4",
+  "title": "Break 和 Continue：循环的控制",
+  "concept": "在循环中途停止或跳过某次迭代",
+  "content": {
+    "code": "for i in range(10):\n    if i == 2:\n        print(\"Skip 2\")\n        continue  # 이번 턴은 여기서 끝! 위로 올라가\n    \n    if i == 5:\n        print(\"Stop!\")\n        break     # 반복문 전체 종료!\n        \n    print(i)",
+    "steps": [
+      {
+        "title": "for 循环开始 (i=0)",
+        "explanation": "**`for i in range(10):`** -- 开始一个从 0 到 9 的 for 循环。\n\nPython 从上到下按顺序执行。`range(10)` 是一个逐个生成 0 到 9 数字的迭代器。获取第一个值 `0` 并赋值给 `i`。\n\n**本课核心：** 在这个 for 循环中，我们将学习两个控制关键字：`continue` 和 `break`。`continue` 只跳过当前迭代，而 `break` 终止整个循环。\n\n**类比：** 想象 10 个人排队（编号 0~9），一个一个进行审查。2 号将被跳过（continue），在 5 号时审查完全停止（break）。\n\n**Python 内部原理：** 从 `range(10)` 对象创建迭代器，`next()` 返回第一个值 `0`。然后执行 for 循环代码块。\n\n**执行顺序**: 创建 range(10) 迭代器 → next() 获取 0 → i = 0 → 第 2 行",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "第 1 次迭代开始",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一个条件检查 (i=0)",
+        "explanation": "**`if i == 2:`** -- 检查 `i` 是否等于 2。如果是，将执行 `continue`。\n\n当前 `i` 是 `0`，所以 `0 == 2` 为 **False**。跳过缩进块（print 和 continue），移动到下一个条件（第 6 行）。\n\n**为什么有这个条件？** 这是为了在 `i` 等于 2 时使用 `continue` 跳过该次迭代的检查。当不是 2 时，什么都不发生，继续执行后面的代码。\n\n**执行顺序**: 检查条件(0 == 2 = False) → 跳过代码块 → 第 6 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "note": "条件 False → 跳过第 3-4 行",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "第二个条件检查 (i=0)",
+        "explanation": "**`if i == 5:`** -- 检查 `i` 是否等于 5。如果是，将执行 `break` 终止整个循环。\n\n当前 `i` 是 `0`，所以 `0 == 5` 为 **False**。跳过缩进块（print 和 break），移动到下一段代码（第 10 行）。\n\n**for 循环中的两个检查站：** 这个循环有 2 个 if 语句：\n1. `if i == 2`：用 continue **只跳过本次迭代**\n2. `if i == 5`：用 break **终止整个循环**\n\n两个条件都为 False 时，最后的 `print(i)` 正常执行。\n\n**执行顺序**: 检查条件(0 == 5 = False) → 跳过代码块 → 第 10 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "note": "条件 False → 跳过第 7-8 行",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出值 (i=0)",
+        "explanation": "**`print(i)`** -- 两个条件都通过了，所以输出当前 `i` 的值（0）。\n\n**为什么这段代码被执行了？** 第一个 if(i==2) 和第二个 if(i==5) 都为 False，所以 `continue` 和 `break` 都没有执行。因此按顺序到达了 `print(i)`。\n\n**类比：** 0 号通过了两个检查站（是 2 号吗？是 5 号吗？），安全到达输出阶段。\n\n**核心模式：** 当 continue 和 break 都没有执行时，代码块中的所有代码按顺序执行。这是**正常流程**。\n\n**执行顺序**: print(0) 执行 → 代码块结束 → 跳转到第 1 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(i)",
+        "pythonMemoryState": {
+          "output": [
+            "0"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "下一次迭代 (i=1)",
+        "explanation": "**`for i in range(10):`** -- 代码块结束后自动跳转到循环起点。这是第 2 次迭代。\n\nfor 循环在代码块结束时会自动跳转回循环起点。从 `range(10)` 迭代器获取下一个值 `1` 并重新赋值给 `i`。\n\n本次迭代中两个条件（`i==2`、`i==5`）同样都为 False，所以 `print(1)` 将正常执行。\n\n**执行顺序**: 代码块结束 → 跳转到第 1 行 → i = 1 → 第 2 行",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "第 2 次迭代开始",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一个条件检查 (i=1)",
+        "explanation": "**`if i == 2:`** -- `1 == 2` 为 **False**，跳过 continue 代码块。\n\ni=1 不是 2，所以 continue 不执行，继续到下一个条件。\n\n**执行顺序**: 检查条件(1 == 2 = False) → 跳过代码块 → 第 6 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "第二个条件检查 (i=1)",
+        "explanation": "**`if i == 5:`** -- `1 == 5` 为 **False**，跳过 break 代码块。\n\ni=1 不是 5，所以 break 不执行，继续到 `print(i)`。\n\n**执行顺序**: 检查条件(1 == 5 = False) → 跳过代码块 → 第 10 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "输出值 (i=1)",
+        "explanation": "**`print(i)`** -- 输出当前 `i` 的值（1）。\n\n两个条件都通过了，正常输出。\n\n**输出追踪：** `0` → **`1`** → 下一次 i=2 时将被 continue 跳过。\n\n**执行顺序**: print(1) 执行 → 代码块结束 → 跳转到第 1 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(i)",
+        "pythonMemoryState": {
+          "output": [
+            "1"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "下一次迭代 (i=2)",
+        "explanation": "**`for i in range(10):`** -- 第 3 次迭代。这次 `continue` 将被执行！\n\n从代码块末尾跳回第 1 行。从 `range(10)` 迭代器获取下一个值 `2` 并重新赋值给 `i`。\n\n**重要：** 本次迭代中 `i == 2` 将为 True，所以 `continue` 将执行。`print(i)` 将**不会**被执行。\n\n**执行顺序**: 代码块结束 → 跳转到第 1 行 → i = 2 → 第 2 行（continue 测试！）",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "第 3 次迭代开始（continue 测试）",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一个条件检查 (i=2)",
+        "explanation": "**`if i == 2:`** -- 终于，`2 == 2` 为 **True**！continue 代码块将被执行。\n\n在之前的迭代（i=0, i=1）中这个条件都是 False，但这次是 True。进入缩进块（print 和 continue）。\n\n**类比：** 2 号在第一个检查站被拦下了！这个人将被跳过（continue）处理。\n\n**执行顺序**: 检查条件(2 == 2 = True) → 进入代码块 → 第 3 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "note": "条件 True → 第 3 行将执行",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出消息",
+        "explanation": "**`print(\"Skip 2\")`** -- 在 continue 执行之前输出消息。\n\nif 条件为 True，所以按顺序执行代码块内的代码。首先输出 \"Skip 2\"，然后下一行的 `continue` 将被执行。\n\n**注意：** 这个 print 在 continue **之前**，所以会执行。如果在 continue **之后**，就不会执行。因为 continue 执行后，后面的所有代码都会被跳过。\n\n**执行顺序**: 输出 \"Skip 2\" → 第 4 行(continue)",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Skip 2\")",
+        "pythonMemoryState": {
+          "output": [
+            "Skip 2"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "continue 执行",
+        "explanation": "**`continue`** -- **跳过当前迭代的所有剩余代码**，直接跳转到下一次迭代。\n\ncontinue 执行的瞬间，代码块的剩余部分（第 6、7、8、10 行的 `if i == 5`、`print(\"Stop!\")`、`break`、`print(i)`）**全部被忽略**，直接跳转到 for 循环的起点（第 1 行）。\n\n**为什么 print(i) 没有执行？** 因为 `print(i)` 在 continue 下面。当 continue 执行时，它下面的代码不会运行。所以输出中没有 `2`。\n\n**break 与 continue 的核心区别：**\n- **continue：** 只跳过本次迭代，**下一次迭代正常进行**（"这次跳过！"）\n- **break：** **终止整个循环**，不再有任何迭代（"全部结束！"）\n\n**类比：** 跳绳时绊了一次，continue 是"这次跳过，继续！"，而 break 是"不跳了！"\n\n**Python 内部原理：** continue 在字节码中通过 `JUMP_ABSOLUTE` 指令实现。直接跳转到 for 循环的 `next()` 调用点来获取下一个值。\n\n**注意：** continue 只能在**循环（for/while）内部**使用。在循环外使用会引发 `SyntaxError`。\n\n**执行顺序**: continue 执行 → 跳过第 6-10 行 → 跳转到第 1 行 → 获取下一个值(3)",
+        "visualizationType": "pythonMemory",
+        "code": "continue  # 이번 턴은 여기서 끝! 위로 올라가",
+        "pythonMemoryState": {
+          "note": "continue → 跳过第 6-10 行 → 跳转到第 1 行",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "下一次迭代 (i=3)",
+        "explanation": "**`for i in range(10):`** -- 由于 continue，直接跳到了下一次迭代。i=3。\n\n**为什么到这里了？** 上一次迭代（i=2）中 `continue` 被执行，跳过了 `print(i)` 并直接跳转到 for 循环起点。从 `range(10)` 迭代器获取下一个值 `3` 并重新赋值给 `i`。\n\n**确认 continue 的效果：** 查看输出结果，`0`、`1` 之后 `2` **缺失**，直接跳到了 `3`。这就是 continue 的效果——2 被跳过了。\n\n**执行顺序**: continue → 跳转到第 1 行 → i = 3 → 第 2 行",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "第 4 次迭代开始（由于 continue，2 未被输出）",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一个条件检查 (i=3)",
+        "explanation": "**`if i == 2:`** 检查当前值 `i=3`。\n\n条件结果为 `False`。因此 `continue` 代码块不执行，流程正常进入下一个条件（`if i == 5`）。\n\n关键点：\n- `continue` 只在条件为 True 时跳过当前迭代\n- 为 False 时保持正常迭代流程\n\n**执行顺序**: `3 == 2` 判定(False) → continue 未执行 → 移动到第 6 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "第二个条件检查 (i=3)",
+        "explanation": "**`if i == 5:`** -- `3 == 5` 为 **False**，跳过 break 代码块。\n\ni=3 不是 5，所以 break 不执行，继续到 `print(i)`。\n\n**执行顺序**: 检查条件(3 == 5 = False) → 跳过代码块 → 第 10 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "输出值 (i=3)",
+        "explanation": "**`print(i)`** -- 输出当前 `i` 的值（3）。\n\n两个条件都为 False，正常输出。\n\n**输出追踪：** `0`、`1`、`Skip 2`（continue 跳过了 2）、**`3`** → 接下来 4 也将正常输出。\n\n**执行顺序**: print(3) 执行 → 代码块结束 → 跳转到第 1 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(i)",
+        "pythonMemoryState": {
+          "output": [
+            "3"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "下一次迭代 (i=4)",
+        "explanation": "**`for i in range(10):`** -- 第 5 次迭代。i=4，又是正常流程。\n\n从代码块末尾跳回第 1 行。从 `range(10)` 迭代器获取下一个值 `4` 并重新赋值给 `i`。\n\ni=4 既不是 2 也不是 5，所以 `print(4)` 将正常执行。\n\n**执行顺序**: 代码块结束 → 跳转到第 1 行 → i = 4 → 第 2 行",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "第 5 次迭代开始",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 4,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一个条件检查 (i=4)",
+        "explanation": "**`if i == 2:`** 检查当前值 `i=4`。\n\n条件同样为 `False`。所以 `continue` 不会触发，本次迭代也沿正常路径进行。\n\n关键点：\n- 没有 `continue` 时，后面的代码（第二个 if、print）正常执行\n- 唯一被跳过的迭代是 `i==2` 时\n\n**执行顺序**: `4 == 2` 判定(False) → continue 未执行 → 移动到第 6 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int5"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 4,
+              "pyId": "1005"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "第二个条件检查 (i=4)",
+        "explanation": "**`if i == 5:`** -- `4 == 5` 为 **False**，跳过 break 代码块。\n\ni=4 不是 5，所以 break 不执行，继续到 `print(i)`。下一次迭代（i=5）中 break 终于会执行。\n\n**执行顺序**: 检查条件(4 == 5 = False) → 跳过代码块 → 第 10 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int5"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 4,
+              "pyId": "1005"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "输出值 (i=4)",
+        "explanation": "**`print(i)`** -- 输出当前 `i` 的值（4）。这是 break 之前的最后一次正常输出。\n\n两个条件都为 False，正常输出。\n\n**输出追踪：** `0`、`1`、`Skip 2`、`3`、**`4`** → 下一次 i=5 时 break 将完全终止循环。\n\n**执行顺序**: print(4) 执行 → 代码块结束 → 跳转到第 1 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(i)",
+        "pythonMemoryState": {
+          "output": [
+            "4"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int5"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 4,
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "下一次迭代 (i=5)",
+        "explanation": "**`for i in range(10):`** -- 第 6 次迭代。这次 `break` 将执行，循环将完全终止！\n\n从代码块末尾跳回第 1 行。从 `range(10)` 迭代器获取下一个值 `5` 并重新赋值给 `i`。\n\n**重要：** 本次迭代中 `if i == 5` 将为 True，`break` 将执行。整个循环终止，i=6、7、8、9 将**永远不会被处理**。\n\n**执行顺序**: 代码块结束 → 跳转到第 1 行 → i = 5 → 第 2 行（break 测试！）",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "第 6 次迭代开始（break 测试）",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一个条件检查 (i=5)",
+        "explanation": "**`if i == 2:`** -- `5 == 2` 为 **False**，跳过 continue 代码块。\n\ni=5 不是 2，所以 continue 不执行。移动到下一个条件（if i == 5）。\n\n**执行顺序**: 检查条件(5 == 2 = False) → 跳过代码块 → 第 6 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "第二个条件检查 (i=5)",
+        "explanation": "**`if i == 5:`** -- 终于，`5 == 5` 为 **True**！break 代码块将被执行。\n\n在之前的迭代中这个条件一直为 False，但这次第一次变成了 True。进入缩进块（print 和 break）。\n\n**类比：** 5 号在第二个检查站被拦下了！这次不是跳过（continue），而是完全停止审查（break）。\n\n**执行顺序**: 检查条件(5 == 5 = True) → 进入代码块 → 第 7 行",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "note": "条件 True → 第 7 行将执行",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出消息",
+        "explanation": "**`print(\"Stop!\")`** -- 在 break 执行之前输出终止消息。\n\nif 条件为 True，所以按顺序执行代码块内的代码。输出 \"Stop!\" 后，下一行的 `break` 将执行，循环完全终止。\n\n**注意：** 和 continue 一样，这个 print 在 break **之前**，所以会执行。即使 break 后面有代码也不会运行。\n\n**执行顺序**: 输出 \"Stop!\" → 第 8 行(break)",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Stop!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Stop!"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "break 执行",
+        "explanation": "**`break`** -- **立即终止整个循环。** 完全退出循环。\n\nbreak 执行的瞬间，for 循环彻底结束。尽管 `range(10)` 中还剩余 6、7、8、9，但**不再向迭代器请求 `next()`**。直接跳转到循环外的下一段代码（在这个程序中，循环外没有代码，所以程序结束）。\n\n**continue 和 break 的最终对比：**\n- **continue**（在 i=2 时执行）：只跳过本次迭代，**下一次迭代继续** → 从 i=3 正常进行\n- **break**（在 i=5 时执行）：**终止整个循环** → i=6、7、8、9 永远不会被处理\n\n**完整输出结果：** `0`、`1`、`Skip 2`、`3`、`4`、`Stop!`（2 被跳过，在 5 停止，6~9 未被处理）\n\n**类比：** 在 10 人的队列中，2 号被跳过（continue），在 5 号时审查完全中断（break）。6~9 号没有接受审查。\n\n**Python 内部原理：** break 在字节码中通过 `BREAK_LOOP`（Python 3.8 之前）或 `JUMP_FORWARD`（Python 3.8+）指令实现。直接跳转到 for 循环结束之后的位置。\n\n**注意：** break 只终止它所在的**最内层循环**。在嵌套循环（`for` 中的 `for`）中，要退出外层循环，需要使用单独的标志变量或函数的 `return`。\n\n**执行顺序**: break 执行 → 完全退出 for 循环 → 程序结束",
+        "visualizationType": "pythonMemory",
+        "code": "break     # 반복문 전체 종료!",
+        "pythonMemoryState": {
+          "note": "break → 循环终止（i=6~9 不会执行）",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "遇到 break 时会发生什么？",
+    "options": [
+      "整个程序完全终止",
+      "退出当前所在的循环",
+      "跳到下一行",
+      "返回到循环的开头"
+    ],
+    "correctIndex": 1,
+    "explanation": "break 会立即终止它所在的最近的循环（for/while）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "在嵌套循环中使用 break 会退出所有循环",
+      "correct": "不是的。\n只会退出最内层的循环。",
+      "why": "要一次退出多个循环，需要使用单独的标志（flag）变量。"
+    }
+  ],
+  "keyTakeaway": "continue 是"跳到下一个"，break 是"停下来"。"
+}

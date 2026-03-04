@@ -1,0 +1,209 @@
+{
+  "lessonId": "java-1-5",
+  "title": "The equals/hashCode Contract",
+  "concept": "If you override equals(), you must also override hashCode()",
+  "content": {
+    "code": "class Person {\n    String name;\n    Person(String name) { this.name = name; }\n\n    @Override\n    public boolean equals(Object obj) {\n        if (!(obj instanceof Person)) return false;\n        return name.equals(((Person) obj).name);\n    }\n    // hashCode() missing!\n}\n\nPerson p1 = new Person(\"Alice\");\nPerson p2 = new Person(\"Alice\");\n\nSystem.out.println(p1.equals(p2));\n\nSet<Person> set = new HashSet<>();\nset.add(p1);\nSystem.out.println(set.contains(p2));",
+    "steps": [
+      {
+        "title": "Defining the Person Class",
+        "explanation": "**Execution order:**\n1. Person class is loaded.\n2. `equals` override detected.\n3. `hashCode` missing detected (warning).\n\n`equals()` is overridden, but `hashCode()` is missing -- it's a 'half-baked' class.\nIf you use this class in a `HashSet` or `HashMap`, it will cause **major problems**.",
+        "visualizationType": "javaMemory",
+        "code": "class Person {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "javaMemoryState": {
+          "note": "equals() overridden, hashCode() missing (dangerous!)",
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Creating the First Person Object",
+        "explanation": "**Execution order:**\n1. `new Person(\"Alice\")` is called.\n2. Heap allocation (0x001).\n3. Default `hashCode` (e.g., 123) is generated.\n\nThis object has a unique memory address (0x001) and a default hash code (123) based on it.",
+        "visualizationType": "javaMemory",
+        "code": "Person p1 = new Person(\"Alice\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "-> 0x001",
+              "type": "Person"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Creating the Second Person Object",
+        "explanation": "**Execution order:**\n1. `new Person(\"Alice\")` is called.\n2. New Heap allocation (0x002).\n3. A new default `hashCode` (e.g., 456) is generated.\n\n`p2` gets a different hash code from `p1`, even though the contents are the same.\nThis is because `hashCode()` was not overridden.",
+        "visualizationType": "javaMemory",
+        "code": "Person p2 = new Person(\"Alice\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "-> 0x001",
+              "type": "Person"
+            },
+            {
+              "name": "p2",
+              "value": "-> 0x002",
+              "type": "Person"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            },
+            {
+              "address": "0x002",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 456",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "equals() Comparison",
+        "explanation": "**Execution order:**\n1. `p1.equals(p2)` is called.\n2. Names (\"Alice\") are compared.\n3. They match, so **true**.\n\nEverything looks fine up to this point.",
+        "keyInsight": "equals() override = value comparison works",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(p1.equals(p2));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "note": "equals() works correctly"
+        }
+      },
+      {
+        "title": "Creating a HashSet",
+        "explanation": "**Execution order:**\n1. `new HashSet<>()` is called.\n2. Initial buckets (array) are created.\n\nHash-based data structures use `hashCode()` when storing and searching for objects.",
+        "visualizationType": "javaMemory",
+        "code": "Set<Person> set = new HashSet<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "p1",
+              "value": "-> 0x001",
+              "type": "Person"
+            },
+            {
+              "name": "p2",
+              "value": "-> 0x002",
+              "type": "Person"
+            },
+            {
+              "name": "set",
+              "value": "-> 0x100",
+              "type": "Set<Person>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 123"
+            },
+            {
+              "address": "0x002",
+              "content": "Person(Alice)",
+              "hashCode": "hash: 456"
+            },
+            {
+              "address": "0x100",
+              "content": "HashSet"
+            }
+          ],
+          "output": [],
+          "note": null
+        }
+      },
+      {
+        "title": "Adding p1 to the HashSet",
+        "explanation": "**Execution order:**\n1. `set.add(p1)` is called.\n2. `p1.hashCode()` is calculated -> **123**.\n3. `p1` is stored in bucket 123.",
+        "keyInsight": "HashSet/HashMap = room assignment via hashCode()",
+        "visualizationType": "javaMemory",
+        "code": "set.add(p1);",
+        "javaMemoryState": {
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "hash(123)",
+                "content": "p1"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "title": "contains(p2) Call (Search Failure)",
+        "explanation": "**Execution order:**\n1. `set.contains(p2)` is called.\n2. `p2.hashCode()` is calculated -> **456**.\n3. Checks bucket 456.\n4. **Empty** -> returns **false**.\n\nEven though `equals()` returns `true`, `hashCode()` is different, so it looked in a completely different bucket.\nOf course it can't find it.",
+        "keyInsight": "Different hashCode = different bucket = search failure",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(set.contains(p2));",
+        "javaMemoryState": {
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "hash(123)",
+                "content": "p1"
+              },
+              {
+                "index": "hash(456)",
+                "content": "search location",
+                "searched": true
+              }
+            ]
+          },
+          "output": [
+            "false"
+          ],
+          "warning": "equals() is true but contains() is false!"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the equals/hashCode contract?",
+    "options": [
+      "If equals() is true, hashCode() must also be the same",
+      "If hashCode() is the same, equals() must also be true",
+      "Both must always return the same value",
+      "You only need to override one of them"
+    ],
+    "correctIndex": 0,
+    "explanation": "Remember this rule: if equals() returns true, hashCode() must also be the same! (The reverse doesn't have to hold.)"
+  },
+  "misconceptions": [
+    {
+      "wrong": "You only need to override equals()",
+      "correct": "You must override `hashCode()` as well.",
+      "why": "Data structures like HashMap and HashSet use `hashCode` for primary classification (district), then `equals` for secondary verification (address) within that bucket.\nIf the district is wrong, the house can never be found."
+    }
+  ],
+  "keyTakeaway": "When overriding equals(), hashCode() is also mandatory. Use your IDE's auto-generation feature."
+}

@@ -1,0 +1,109 @@
+{
+  "lessonId": "c-4-5",
+  "title": "返回栈地址",
+  "concept": "不要把即将消失的房间钥匙交出去（致命 bug）",
+  "content": {
+    "code": "#include <stdio.h>\n\nint* dangerousFunc() {\n    int x = 100;\n    return &x;\n}\n\nint main() {\n    int *p = dangerousFunc();\n\n    printf(\"%d\\n\", *p);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含头文件",
+        "explanation": "`#include <stdio.h>` 启用输出函数。\n\n本例演示为什么返回局部变量的地址是危险的。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 帧并准备调用 `dangerousFunc`。\n\n核心问题是："函数返回后局部变量的地址还有效吗？"",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "调用 dangerousFunc",
+        "explanation": "调用创建新帧，内部局部变量 `x=100` 被创建。\n\nmain 的 `p` 将接收函数返回的指针值。",
+        "visualizationType": "cMemory",
+        "code": "int *p = dangerousFunc();",
+        "highlightOffset": [
+          0,
+          -6
+        ],
+        "stack": [
+          {
+            "name": "p",
+            "value": "???",
+            "type": "int*",
+            "frame": "main"
+          },
+          {
+            "name": "x",
+            "value": "100",
+            "type": "int",
+            "frame": "dangerousFunc",
+            "address": "0x2000"
+          }
+        ]
+      },
+      {
+        "title": "危险的返回 - 局部变量的地址",
+        "explanation": "`return &x;` 返回了即将销毁的局部变量的地址。\n\n函数结束后该地址变成无效目标的悬空指针（dangling pointer）。",
+        "visualizationType": "cMemory",
+        "code": "return &x;",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0x2000",
+            "type": "int*",
+            "frame": "main",
+            "dangling": true
+          }
+        ]
+      },
+      {
+        "title": "解引用悬空指针 - 未定义行为",
+        "explanation": "此时读取 `*p` 属于未定义行为（Undefined Behavior）。\n\n值可能碰巧正确，也可能是垃圾值，甚至可能导致崩溃 — 完全不可信赖。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d\\n\", *p);",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0x2000",
+            "type": "int*",
+            "dangling": true,
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "???（可能是 100、垃圾值或崩溃）"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "想从函数中返回创建的数据，安全的方法是什么？",
+    "options": [
+      "返回局部变量的地址",
+      "使用全局变量",
+      "返回 static 变量或 malloc（动态分配）的地址",
+      "在函数内用 printf 输出就行了"
+    ],
+    "correctIndex": 2,
+    "explanation": "`static` 变量存储在数据段，`malloc` 分配在堆上 — 两者在函数结束后都不会消失。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "C 语言 return &x 不会报编译错误",
+      "correct": "大多数编译器只给警告（Warning）就放过了。",
+      "why": "这是初学者最常犯的错误之一。\n绝对不要忽视警告："Address of stack memory associated with local variable 'x' returned"。"
+    }
+  ],
+  "keyTakeaway": "绝对不要将局部变量的地址（&local）返回到函数外部。"
+}

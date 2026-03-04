@@ -1,0 +1,304 @@
+{
+  "lessonId": "js-2-3",
+  "title": "变量提升（Hoisting）",
+  "concept": "JavaScript 会将变量和函数声明提升到其作用域的顶部（变量提升）",
+  "content": {
+    "code": "var message = 'Hello';\n\nfunction greet() {\n  console.log(inner);\n  var inner = 'World';\n  console.log(inner);\n  return message + ' ' + inner;\n}\n\nvar result = greet();\nconsole.log(result);",
+    "steps": [
+      {
+        "title": "全局变量声明",
+        "explanation": "`var message = 'Hello'` 执行。\nvar 具有**函数作用域**且会被提升。",
+        "keyInsight": "在运行代码之前，JS 引擎会将所有 var 声明提升到其作用域的顶部。",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "message"
+        },
+        "code": "var message = 'Hello';"
+      },
+      {
+        "title": "调用 greet() 函数",
+        "explanation": "调用 `greet()` 函数。\n函数作用域被创建，函数内的 var 声明被**提升**。",
+        "keyInsight": "当函数被调用时，其内部所有的 var 变量首先被初始化为 undefined。",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                },
+                {
+                  "name": "result",
+                  "value": "undefined",
+                  "keyword": "var"
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "undefined",
+                  "keyword": "var",
+                  "hoisted": true
+                }
+              ]
+            }
+          ],
+          "highlightScope": "greet()"
+        },
+        "code": "var result = greet();"
+      },
+      {
+        "title": "验证提升 — 输出 undefined",
+        "explanation": "`console.log(inner)` 执行。\ninner 还没有被赋值，但由于**变量提升**，它输出 `undefined` 而不是报错。",
+        "keyInsight": "var 只提升声明；赋值在原来的位置执行。这就是为什么是 undefined！",
+        "analogy": "就像先在桌上放一个写着 'inner' 的名牌（声明），然后稍后再放入内容（赋值）。",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "undefined",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "undefined"
+          ]
+        },
+        "code": "console.log(inner);"
+      },
+      {
+        "title": "执行实际赋值",
+        "explanation": "`var inner = 'World'` 的赋值部分执行。\n现在 inner = 'World'。",
+        "keyInsight": "提升只提升声明。赋值（= 'World'）在原来的位置执行。",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "'World'",
+                  "keyword": "var",
+                  "changed": true
+                }
+              ]
+            }
+          ]
+        },
+        "code": "var inner = 'World';"
+      },
+      {
+        "title": "检查赋值后的值",
+        "explanation": "`console.log(inner)` 执行。\n这次打印的是 'World'。",
+        "keyInsight": "同一个变量在代码的不同位置访问时有不同的值。这就是提升的陷阱！",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "'World'",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "undefined",
+            "'World'"
+          ]
+        },
+        "code": "console.log(inner);",
+        "occurrence": 2
+      },
+      {
+        "title": "返回结果",
+        "explanation": "返回 `message + ' ' + inner`。\n结果为 'Hello World'。",
+        "keyInsight": "message 来自全局作用域，inner 来自函数作用域（作用域链）。",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            },
+            {
+              "name": "greet()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "inner",
+                  "value": "'World'",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            }
+          ]
+        },
+        "code": "return message + ' ' + inner;"
+      },
+      {
+        "title": "赋值给 result",
+        "explanation": "greet() 返回的 'Hello World' 被存储在 result 变量中。",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                },
+                {
+                  "name": "result",
+                  "value": "'Hello World'",
+                  "keyword": "var",
+                  "changed": true
+                }
+              ]
+            }
+          ]
+        },
+        "code": "var result = greet();"
+      },
+      {
+        "title": "打印最终结果",
+        "explanation": "打印 result。\n输出 'Hello World'。",
+        "keyInsight": "因为变量提升，第一个 console.log 打印了 undefined，第二个打印了 'World'。",
+        "visualizationType": "scope",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "message",
+                  "value": "'Hello'",
+                  "keyword": "var"
+                },
+                {
+                  "name": "result",
+                  "value": "'Hello World'",
+                  "keyword": "var",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "undefined",
+            "'World'",
+            "'Hello World'"
+          ]
+        },
+        "code": "console.log(result);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "以下代码中第一个 console.log 打印什么？\n\nfunction test() {\n  console.log(x);\n  var x = 10;\n}\ntest();",
+    "options": [
+      "10",
+      "undefined",
+      "发生 ReferenceError",
+      "null"
+    ],
+    "correctIndex": 1,
+    "explanation": "var x 的声明被提升到函数顶部并初始化为 undefined。\n赋值（= 10）在原来的位置执行，所以第一个 console.log 打印 undefined。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "提升会将代码物理地移动到文件顶部",
+      "correct": "代码实际上不会移动。\nJS 引擎只是在执行前先处理声明。",
+      "why": "在编译阶段，声明被注册到内存中。在执行阶段，赋值被执行。\n代码本身不会改变。"
+    },
+    {
+      "wrong": "let 和 const 的提升方式和 var 一样",
+      "correct": "let/const 也会被提升，但 TDZ（暂时性死区）会在声明之前访问时导致错误。",
+      "why": "在声明之前访问 let/const 会抛出 ReferenceError。\n这是与 var 的关键区别。"
+    }
+  ],
+  "keyTakeaway": "var：只提升声明（undefined），赋值在原位执行。let/const：TDZ 导致声明前访问报错。"
+}

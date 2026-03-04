@@ -1,0 +1,324 @@
+{
+  "lessonId": "py-2-2",
+  "title": "While 循环：满足条件就继续",
+  "concept": "条件为 True 时持续重复（注意无限循环）",
+  "content": {
+    "code": "count = 3\n\nwhile count > 0:\n    print(f\"Count: {count}\")\n    count = count - 1\n\nprint(\"Liftoff!\")",
+    "steps": [
+      {
+        "title": "初始化计数器变量",
+        "explanation": "**`count = 3`** -- 将计数器变量初始化为整数 `3`。\n\nPython 从上到下按顺序执行。将标签 `count` 贴到整数对象 `3` 上。\n\n**为什么是这个顺序？** 因为循环（第 3 行）中要使用 `count`，必须先创建变量。如果 `while` 条件引用不存在的变量会引发 `NameError`。\n\n**类比：** 就像在火箭发射倒计时开始前将计数器设为 3。\"3, 2, 1, 发射！\" 我们将重复直到计数器到达 0。\n\n**Python 内部原理：** `3` 在小整数缓存范围内，复用预缓存的对象。while 循环中每次减少 `count` 时，都会有新的整数对象（2、1、0）绑定到 `count`。因为整数是不可变的，`3` 本身不会变成 `2`。\n\n**注意：** while 循环中计数器变量的初始值决定了循环迭代次数。如果 `count = 0` 开始，条件从一开始就为 False，循环一次都不会执行。",
+        "visualizationType": "pythonMemory",
+        "code": "count = 3",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查循环条件（第 1 次）",
+        "explanation": "**`while count > 0:`** -- 检查 while 循环条件：`count` 是否大于 0？\n\n计算条件表达式 `count > 0`。当前 `count` 是 `3`，所以 `3 > 0` 为 **True**。条件为真，执行缩进块（第 4-5 行）。\n\n**while 和 if 的区别：** `if` 在条件为 True 时**只执行一次**。`while` 在条件为 True 的**期间持续重复**。块执行完后会再次检查条件，如果仍为 True 就再次执行。\n\n**类比：** 如果 `if` 是"门开着就通过一次"，`while` 就是"门开着就一直来回走"。\n\n**Python 内部原理：** while 循环在字节码中实现为循环结构：条件计算 -> 条件跳转 -> 块执行 -> 无条件跳转（回到条件）。\n\n**注意：** 如果条件永远为 True，就会进入**无限循环**！`while True: print(\"无限\")` 程序永远不会结束。必须用 `Ctrl+C` 强制终止。",
+        "visualizationType": "pythonMemory",
+        "code": "while count > 0:",
+        "pythonMemoryState": {
+          "note": "条件 True -> 第 4 行将执行",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出当前计数（第 1 次）",
+        "explanation": "**`print(f\"Count: {count}\")`** -- 使用 f-string 输出当前计数值。\n\nwhile 条件为 True，所以缩进块内的代码按顺序执行。f-string 中 `{count}` 被替换为当前值 `3`，输出 `\"Count: 3\"`。\n\n**类比：** 火箭发射倒计时中喊出当前数字的步骤。\"Count: 3!\" 之后将计数器减 1，再次检查。\n\n**Python 内部原理：** f-string 内部调用 `count.__format__('')` 获取字符串 `\"3\"`，与 `\"Count: \"` 字面量组合创建新字符串对象 `\"Count: 3\"`。此字符串传递给 `print()` 输出到 `sys.stdout`。\n\n**注意：** 块内的代码通过**缩进**（通常 4 个空格）来界定。缩进不一致会引发 `IndentationError`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Count: {count}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Count: 3"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "计数器递减（第 1 次）",
+        "explanation": "**`count = count - 1`** -- 将 `count` 的当前值减 1 后重新赋值给 `count`。\n\n右侧 `count - 1` 先计算。当前 `count` 是 `3`，所以 `3 - 1 = 2`。创建新的整数对象 `2`，`count` 标签从旧的 `3` 移到新的 `2`。\n\n**为什么这行是必须的？** 没有它，`count` 永远是 `3`，`3 > 0` 永远为 `True`，导致**无限循环**。while 循环中**必须**有能让条件最终变为 False 的代码。\n\n**类比：** 倒计时中将数字减 1 的动作。喊完 \"3!\" 后把计数器拨到 2。没有这行就会永远重复 \"3! 3! 3!...\"。\n\n**Python 内部原理：** `count - 1` 内部调用 `count.__sub__(1)`。整数是不可变的，`3` 对象本身不会变成 `2`——而是创建**全新的整数对象 `2`**。只有 `count` 标签移到新对象。（也可以写成 `count -= 1`。）\n\n**注意：** Python **没有** `count--` 或 `--count` 自增自减运算符！必须使用 `count = count - 1` 或 `count -= 1`。",
+        "visualizationType": "pythonMemory",
+        "code": "count = count - 1",
+        "pythonMemoryState": {
+          "note": "count 已改变 -> 回到第 3 行",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查循环条件（第 2 次）",
+        "explanation": "**`while count > 0:`** -- 从块末尾自动返回条件语句。第 2 次条件检查。\n\n当前 `count` 是 `2`（刚从 3 减了 1）。`2 > 0` 为 **True**，所以再次执行块。\n\n**类比：** 倒计时的第二轮。\"计数器还大于 0 吗？\" -> \"是 2，还是正数！\" -> 再次执行块。",
+        "visualizationType": "pythonMemory",
+        "code": "while count > 0:",
+        "pythonMemoryState": {
+          "note": "第 2 次迭代开始",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出当前计数（第 2 次）",
+        "explanation": "**`print(f\"Count: {count}\")`** -- 第 2 次迭代中输出当前计数值。\n\nf-string 中 `{count}` 被替换为当前值 `2`，输出 `\"Count: 2\"`。\n\n**模式识别：** 看目前的输出，值在递减：`Count: 3` -> `Count: 2`。while 循环中计数器递减，直到条件变为 False，这个模式会重复。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Count: {count}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Count: 2"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "计数器递减（第 2 次）",
+        "explanation": "**`count = count - 1`** -- 将 `count` 再减 1，变为 `1`。\n\n从 `count` 当前值 `2` 减 1，创建新整数对象 `1`，`count` 标签移过去。\n\n**模式识别：** 每次迭代都重复相同操作：输出 -> 递减 -> 检查条件。这是 while 循环的典型模式。计数器 `3 -> 2 -> 1` 在递减，下一次 `1 -> 0` 时条件将变为 False。",
+        "visualizationType": "pythonMemory",
+        "code": "count = count - 1",
+        "pythonMemoryState": {
+          "note": "count 已改变 -> 回到第 3 行",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 1,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查循环条件（第 3 次）",
+        "explanation": "**`while count > 0:`** -- 第 3 次条件检查。\n\n当前 `count` 是 `1`。`1 > 0` 为 **True**，再执行一次块。\n\n**类比：** 倒计时的最后一轮。\"还大于 0 吗？\" -> \"是 1，还是正数！\" -> 最后一次执行块。这次迭代结束后 count 将变为 0，下次检查条件时循环终止。",
+        "visualizationType": "pythonMemory",
+        "code": "while count > 0:",
+        "pythonMemoryState": {
+          "note": "第 3 次迭代开始",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 1,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出当前计数（第 3 次）",
+        "explanation": "**`print(f\"Count: {count}\")`** -- 第 3 次（最后）迭代中输出当前计数值。\n\nf-string 中 `{count}` 被替换为当前值 `1`，输出 `\"Count: 1\"`。这是循环的最后一次输出。\n\n**完整输出追踪：** `Count: 3` -> `Count: 2` -> **`Count: 1`** -> 接下来将输出 `Liftoff!`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Count: {count}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Count: 1"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 1,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "计数器递减（第 3 次）",
+        "explanation": "**`count = count - 1`** -- 将 `count` 减 1，终于变为 `0`。\n\n从 `count` 当前值 `1` 减 1，创建新整数对象 `0`，`count` 标签移过去。\n\n**关键时刻！** `count` 终于变成 `0`。下次条件检查 `0 > 0` 将为 **False**，while 循环终止。这就是**终止条件**。\n\n**计数器变化全程：** 3 -> 2 -> 1 -> **0**（终止点）",
+        "visualizationType": "pythonMemory",
+        "code": "count = count - 1",
+        "pythonMemoryState": {
+          "note": "count 变为 0 -> 下次条件检查为 False",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查循环条件（终止）",
+        "explanation": "**`while count > 0:`** -- 第 4 次条件检查。这次条件为 **False**，循环终止。\n\n当前 `count` 是 `0`。`0 > 0` 为 **False**，Python 跳过 while 块，退出到循环外的第一行代码（第 7 行）。\n\n**为什么终止了？** 因为每次迭代都将 `count` 减 1。从 `3 -> 2 -> 1 -> 0`，条件终于变为 False。这是 while 循环的正常终止机制。\n\n**完整条件检查记录：** 第 1 次（3>0=True） -> 第 2 次（2>0=True） -> 第 3 次（1>0=True） -> **第 4 次（0>0=False，终止）**",
+        "visualizationType": "pythonMemory",
+        "code": "while count > 0:",
+        "pythonMemoryState": {
+          "note": "条件 False -> 循环结束 -> 跳到第 7 行",
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "循环结束后执行",
+        "explanation": "**`print(\"Liftoff!\")`** -- while 循环结束后执行的循环外代码。\n\n**为什么现在才执行？** 这个 `print` 语句没有缩进，在 while 循环**外面**。循环迭代期间无法到达这一行，只有条件变为 False 退出循环后才执行。\n\n屏幕输出 `Liftoff!`，没有更多代码要执行，程序结束。\n\n**完整输出结果：** `Count: 3` -> `Count: 2` -> `Count: 1` -> **`Liftoff!`**\n\n**类比：** 倒计时（3, 2, 1）结束后火箭终于发射！倒计时（while 循环）结束了，发射（循环外代码）执行了。\n\n**缩进的重要性：** 如果这个 `print` 有缩进在 while 块**里面**，它会每次迭代都执行：`Count: 3`、`Liftoff!`、`Count: 2`、`Liftoff!`…… 一个缩进就能完全改变程序行为！",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Liftoff!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Liftoff!"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "count",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪个 while 语句永远不会停止（无限循环）？",
+    "options": [
+      "while False: print(1)",
+      "i=5\nwhile i > 0: i -= 1",
+      "while True: print('Run')",
+      "while 1 == 0: pass"
+    ],
+    "correctIndex": 2,
+    "explanation": "`while True:` 如果没有终止条件会永远运行。\n必须用 `Ctrl + C` 强制终止。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Python 有 count--",
+      "correct": "Python **没有** `++`、`--` 运算符。",
+      "why": "必须使用 `i += 1` 或 `i -= 1`。"
+    }
+  ],
+  "keyTakeaway": "while 在条件为真时循环。必须改变变量值使其最终停止。"
+}

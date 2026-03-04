@@ -1,0 +1,83 @@
+{
+  "lessonId": "py-3-6",
+  "title": "Set Mutability",
+  "concept": "Sets are mutable -- add, remove, and discard all change the same object!",
+  "content": {
+    "code": "fruits = {\"apple\", \"banana\"}\nprint(f\"id = {id(fruits)}\")\n\nfruits.add(\"cherry\")\nfruits.discard(\"banana\")\nprint(f\"After changes: {fruits}\")\nprint(f\"id = {id(fruits)}\")\n\n# frozenset is the immutable version\nfrozen = frozenset([1, 2, 3])\n# frozen.add(4)  # AttributeError!",
+    "steps": [
+      {
+        "title": "Creating a Set",
+        "explanation": "**`fruits = {\"apple\", \"banana\"}`** -- Creates a set object using curly braces `{}` and assigns the name `fruits` to it.\n\nPython executes code from top to bottom. When values are listed inside curly braces `{}` without key:value pairs, it creates a **set**. A set object with 2 string items (\"apple\", \"banana\") is created in heap memory, and the name `fruits` points to this object.\n\n**3 Key characteristics of Sets:**\n\n**Analogy:** A set is like 'marbles in a pouch'. You can put marbles in (`add`) and take them out (`discard`), but you can't say \"the third marble\" (no order). And only one marble of each color is kept (no duplicates).\n\n**Caution -- `{}` vs `set()`:** Using `{}` for an empty set creates an **empty dictionary** instead! An empty set must be created with `set()`.\n```python\nempty_dict = {}      # type: dict (dictionary!)\nempty_set = set()    # type: set (set)\n```\n\n**Python internals:** Sets use the same **hash table** structure as dictionaries. The difference is that dictionaries store key-value pairs while sets store only keys. Since each element's `hash()` value determines its storage position, the `in` operation (membership check) is **O(1)** -- very fast. List's `in` is O(n), so sets are much better for frequent membership checks on large data.\n\n**Execution order**: line 1 -> set object created (hash table, id: 0x7000) -> fruits = 0x7000 -> line 2",
+        "visualizationType": "terminal",
+        "code": "fruits = {\"apple\", \"banana\"}"
+      },
+      {
+        "title": "Checking the Object ID",
+        "explanation": "**`print(f\"id = {id(fruits)}\")`** -- Prints the unique ID (memory address) of the `fruits` set object.\n\nThe `id()` function returns the object's **unique identifier**. In CPython, this value is the same as the object's memory address. By recording this ID now, we can later **verify whether the modified set is the same object or a different one**.\n\n**Why check the ID?** To visually prove the difference between Mutable and Immutable:\n- **Mutable objects** (list, dict, set): Contents change but **id stays the same** -> same object was modified\n- **Immutable objects** (int, str, tuple): Changing a value **changes the id** -> a new object was created\n\n**Analogy:** id is like a house's 'address'. Even if you change the furniture (contents) inside the house, the house address (id) doesn't change. But if you move to a new house (new object), the address changes. A set is a house where you can change furniture (Mutable), so the address should stay the same after modifying contents.\n\n**Python internals:** `id(fruits)` returns the C struct pointer value of the `fruits` object as an integer in CPython. This value never changes while the object is alive, and no two simultaneously existing objects can share the same id. However, after an object is destroyed, a new object allocated at the same memory location may reuse the same id.\n\n**Execution order**: id(fruits) called -> memory address returned (e.g., 140234567890) -> f-string assembled -> print output -> line 4",
+        "visualizationType": "terminal",
+        "code": "print(f\"id = {id(fruits)}\")"
+      },
+      {
+        "title": "Adding an Element (add)",
+        "explanation": "**`add()`** adds an element to the set.\n\nDue to the nature of sets, duplicate values are automatically kept as one.\nIn other words, calling `add` with the same value multiple times has no effect.\n\n**Analogy**: Even if you write someone's name on the guest list again, the list only records it once.\n\nKey points:\n- Sets are strong at \"deduplication + fast membership checking\"\n- As a mutable collection, modifications happen in place",
+        "visualizationType": "terminal",
+        "code": "fruits.add(\"cherry\")"
+      },
+      {
+        "title": "Removing an Element (discard)",
+        "explanation": "**`fruits.discard(\"banana\")`** -- Removes `\"banana\"` from the set. **Directly modifies** the existing set object.\n\nThe `.discard()` method removes the specified element from the set. Like `.add()`, it modifies the existing object in place without creating a new one.\n\n**discard() vs remove() -- key difference:**\n\n**Analogy:** `discard()` is like asking 'if it's there, please remove it', while `remove()` is like commanding 'you must remove it! If it's not there, I'll be upset!'\n\n```python\nfruits.discard(\"grape\")  # Not there? OK -> no error\nfruits.remove(\"grape\")   # Not there? -> KeyError: 'grape'\n```\n\nTherefore, **when you're unsure if an element exists**, `discard()` is safer. Use `remove()` when deleting elements that \"must exist\" (if absent, it's a bug, so an error is actually preferred).",
+        "visualizationType": "terminal",
+        "code": "fruits.discard(\"banana\")"
+      },
+      {
+        "title": "Checking Contents After Changes",
+        "explanation": "**`print(f\"After changes: {fruits}\")`** -- Prints the current contents of the set after `add(\"cherry\")` and `discard(\"banana\")`.\n\nExample output: `After changes: {'cherry', 'apple'}` (order may vary)\n\nThe set that was originally `{\"apple\", \"banana\"}` had cherry added via `add(\"cherry\")` and banana removed via `discard(\"banana\")`, resulting in `{\"apple\", \"cherry\"}`. All these changes were made on the **same object**.\n\n**Set output order -- why can it differ each time?**\nSets are **hash table** based, so element storage positions are determined by hash values. When printing, elements come out in hash table slot order, so it could be `{\"apple\", \"cherry\"}` or `{\"cherry\", \"apple\"}`. This is not a bug -- it's **normal set behavior**.\n\n**Caution -- data structures with guaranteed order:**\n\nOnly sets do not guarantee order. Use lists if you need ordering.\n\n**Analogy:** The output order of a set is like pulling marbles from a pouch. Which marble comes out first may differ each time.\n\n**Execution order**: f-string assembled (fruits contents inserted) -> print output -> line 7",
+        "visualizationType": "terminal",
+        "code": "print(f\"After changes: {fruits}\")"
+      },
+      {
+        "title": "Confirming ID is Unchanged",
+        "explanation": "**The fact that the id is unchanged** proves that \"the same object was modified in place\".\n\nIf `id(fruits)` remains the same after adding/removing elements,\nit means we didn't create a new object but changed the internals of the existing one.\n\nKey points:\n- Mutable objects (set/list/dict): id typically stays the same after modification\n- Immutable objects (int/str/tuple): value changes commonly create new objects\n\n**Analogy**: The house address (id) is the same, only the furniture (contents) has changed.\n\nWith this perspective, you can clearly distinguish between \"reassignment\" and \"in-place modification\".",
+        "visualizationType": "terminal",
+        "code": "print(f\"id = {id(fruits)}\")",
+        "occurrence": 2
+      },
+      {
+        "title": "frozenset: The Immutable Set",
+        "explanation": "**`frozen = frozenset([1, 2, 3])`** -- Creates an **immutable set** using `frozenset()`.\n\n`frozenset` is the **Immutable version** of a set. All read-only features of regular sets (membership checking, intersection, union, etc.) are available, but methods that change contents (`add`, `remove`, `discard`, `clear`, etc.) **do not exist**.\n\n**Analogy:** Just as a tuple is the Immutable version of a list, a frozenset is the Immutable version of a set.\n\n**set vs frozenset:**\n\n**Why do we need frozenset?**\n1. **Dictionary keys:** Dictionary keys must be Immutable (hashable). Regular sets are Mutable so they can't be keys, but frozensets can.\n2. **Sets inside sets:** Set elements must also be hashable. `{frozenset([1,2]), frozenset([3,4])}` -- possible!\n3. **Safe sharing:** No risk of changes even when referenced from multiple places.",
+        "visualizationType": "terminal",
+        "code": "frozen = frozenset([1, 2, 3])"
+      },
+      {
+        "title": "Attempting to Modify frozenset (Error)",
+        "explanation": "**`# frozen.add(4)`** Uncommenting this will raise an `AttributeError`.\n\nThe reason is clear: `frozenset` is immutable,\nso \"modification methods\" like `add` and `remove` simply don't exist.\n\n**Analogy**: It's a sealed box -- you can't take out or add contents.\n\nKey comparison:\n- `set` = mutable\n- `frozenset` = immutable\n\nThat's why `frozenset` is especially useful for purposes\nwhere \"things must not change\", like dictionary keys.",
+        "visualizationType": "terminal",
+        "code": "# frozen.add(4)  # AttributeError!"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "Which of these can be used as a dictionary key?",
+    "options": [
+      "{1, 2, 3}",
+      "[1, 2, 3]",
+      "frozenset([1, 2, 3])",
+      "{'a': 1}"
+    ],
+    "correctIndex": 2,
+    "explanation": "Only immutable objects can be used as dictionary keys.\n`frozenset` is immutable.\nRegular sets, lists, and dictionaries are mutable and cannot be used as keys."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can put a list inside a set",
+      "correct": "Sets can only contain immutable (hashable) objects.",
+      "why": "Lists are mutable and thus cannot be hashed.\nUse tuples instead."
+    },
+    {
+      "wrong": "`set()` and `{}` are the same",
+      "correct": "`{}` creates an empty dictionary, and `set()` creates an empty set.",
+      "why": "Python uses `{}` for both dictionaries and sets, so empty sets must be created with `set()`."
+    }
+  ],
+  "keyTakeaway": "Sets are Mutable -- add/remove modify in place. Use frozenset when you need an immutable set!"
+}

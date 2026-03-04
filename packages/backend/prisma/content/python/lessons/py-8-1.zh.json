@@ -1,0 +1,916 @@
+{
+  "lessonId": "py-8-1",
+  "title": "迭代器协议：for循环的核心",
+  "concept": "理解`for`循环背后的工作原理——`__iter__`和`__next__`。",
+  "content": {
+    "code": "# for loop의 동작 원리: Iterator Protocol\nclass Counter:\n    def __init__(self, start, end):\n        self.current = start\n        self.end = end\n\n    def __iter__(self):\n        return self\n\n    def __next__(self):\n        if self.current >= self.end:\n            raise StopIteration\n        value = self.current\n        self.current += 1\n        return value\n\ncounter = Counter(0, 3)\n\nfor num in counter:\n    print(num)",
+    "steps": [
+      {
+        "title": "定义Counter类",
+        "explanation": "**`class Counter:`**\n\n定义一个直接实现**迭代器协议（Iterator Protocol）**的`Counter`类。\n\n**什么是迭代器协议？**\n它是Python的`for`循环在遍历对象时使用的**约定规则**。\n任何遵循这些规则的对象都可以在`for`循环中使用！\n规则只需要实现两个方法：\n- `__iter__()`：返回迭代器对象（\"准备好开始遍历了\"）\n- `__next__()`：返回下一个值（\"给我下一个值\"）\n\n**类比：制造自动售货机**\nCounter类是一个自动售货机的蓝图，每次按下按钮（__next__）就会吐出一个数字。\n从0开始逐个递增，当到达终止数字时，显示\"售罄！\"（StopIteration）。\n\n**为什么要学这个？** 理解Python的`for`循环内部如何工作，能让你更深入地理解`for`，并创建自定义可迭代对象。\n\n**为什么是这个顺序？** 程序启动时，必须先读取类定义并加载到内存中。\n\n**执行顺序**：创建Counter类对象(0x1000) → 注册到全局命名空间",
+        "visualizationType": "pythonMemory",
+        "code": "class Counter:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Counter类(0x1000)已被定义。",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "进入类主体",
+        "explanation": "**`class Counter:`（整个主体）**\n\nPython读取类主体并注册**三个方法**：\n- `__init__`：对象初始化（设置start和end值）\n- `__iter__`：for循环调用（返回迭代器）\n- `__next__`：for循环每次迭代时调用（返回下一个值）\n\n**这三个方法是for循环的核心！**\n当`for num in counter:`执行时，Python内部会：\n1. 调用`counter.__iter__()` → 获取迭代器\n2. 重复调用`counter.__next__()` → 逐个获取值\n3. 抛出`StopIteration`异常 → 循环终止\n\n**类比**：这是设计自动售货机内部电路的过程。\n\n**为什么是这个顺序？** 遇到`class`关键字后，注册主体中的所有方法。\n\n**执行顺序**：进入类内部作用域 → 确认三个方法定义",
+        "visualizationType": "pythonMemory",
+        "code": "class Counter:",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "pythonMemoryState": {
+          "note": "准备定义类内部的方法。",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义__init__方法",
+        "explanation": "**`def __init__(self, start, end):`**\n\n定义Counter对象的**初始化方法**。\n当像`Counter(0, 3)`这样调用时，start=0和end=3被传入，用于设置计数器的范围。\n\n**这个方法设置的内容**：\n- `self.current = start`：当前值（初始为起始值）\n- `self.end = end`：终止值（到达此值时停止迭代）\n\n**类比**：设置自动售货机\"从第0号开始，到第3号之前结束。\"\n\n**为什么是这个顺序？** 在创建对象时首先定义构造函数是Python的惯例。\n\n**执行顺序**：创建__init__函数对象 → 注册为Counter类的方法",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, start, end):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "__init__函数(0x1100)已被定义。",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "__init__",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义__iter__方法",
+        "explanation": "**`def __iter__(self):`**\n\n定义迭代器协议的**第一个约定**：`__iter__`方法。\n这个方法通过`return self`返回自身。\n\n**为什么返回自身？**\nPython的迭代器有两个角色：\n1. **可迭代对象（Iterable）**：有`__iter__`表示\"我可以被遍历\"\n2. **迭代器（Iterator）**：有`__next__`表示实际上可以逐个提供值\n\nCounter类**由一个对象同时承担两个角色**，所以`__iter__`返回自身。\n\n**类比**：告诉别人\"这台售货机的按钮(next)就在自己身上。\"\n\n**for循环内部做的事情**：\n```python\n# for num in counter: 实际上等同于这个！\nit = counter.__iter__()  # 获取迭代器\nwhile True:\n    try:\n        num = it.__next__()  # 获取下一个值\n    except StopIteration:\n        break  # 结束！\n```\n\n**为什么是这个顺序？** 在__init__之后定义迭代器协议的核心方法。\n\n**执行顺序**：创建__iter__函数对象 → 注册到Counter类",
+        "visualizationType": "pythonMemory",
+        "code": "def __iter__(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "__iter__函数(0x1200)已被定义。",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "__iter__",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义__next__方法",
+        "explanation": "**`def __next__(self):`**\n\n定义迭代器协议的**第二个约定**：`__next__`方法。\nfor循环**每次迭代**都会调用这个方法来获取下一个值。\n\n**这个方法的核心逻辑**：\n1. 如果`current >= end` → 抛出`StopIteration`异常（\"没有更多值了！\"）\n2. 否则 → 保存当前值，current加1，然后返回保存的值\n\n**什么是StopIteration？**\n一个特殊的异常，用于向for循环发出\"迭代结束！\"的信号。\nfor循环会自动捕获这个异常并静默终止。\n它不是错误——它是正常的终止信号！\n\n**类比**：按下售货机的按钮(next)时，一个数字弹出来，当库存为空时，会显示\"售罄\"(StopIteration)标志。\n\n**为什么是这个顺序？** 实现迭代器的核心行为——'获取下一个值'。\n\n**执行顺序**：创建__next__函数对象 → 注册到Counter类",
+        "visualizationType": "pythonMemory",
+        "code": "def __next__(self):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "pythonMemoryState": {
+          "note": "__next__函数(0x1300)已被定义。",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "__next__",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "function",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建Counter对象",
+        "explanation": "**`counter = Counter(0, 3)`**\n\n调用Counter类创建一个**从0计数到3（不包含3）的计数器对象**。\n`__init__(self, 0, 3)`被自动调用，初始化current=0，end=3。\n\n**这个对象将产生的值的顺序**：0, 1, 2（不包含3——和range(3)相同）\n\n**类比**：制造了一台\"能从第0号开始出货到第2号的自动售货机。\"\n每次按按钮：0 → 1 → 2 → \"售罄！\"的顺序。\n\n**为什么是这个顺序？** 类定义完成后，创建实际实例以在for循环中使用。\n\n**执行顺序**：调用Counter(0, 3) → 分配实例(0x2000)内存 → 自动调用__init__",
+        "visualizationType": "pythonMemory",
+        "code": "counter = Counter(0, 3)",
+        "pythonMemoryState": {
+          "note": "Counter实例(0x2000)已创建，初始化开始。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行__init__ (1)",
+        "explanation": "**`self.current = start`**\n\n将计数器的**当前位置**设置为起始值(0)。\n`self.current`是一个**状态变量**，用于跟踪\"现在应该给出第几个值。\"\n\n**迭代器的关键特征：它们会记住状态！**\n普通函数在调用结束后内部变量会消失，但迭代器对象将当前位置存储在`self.current`中，因此下次调用时可以从上次停止的地方继续。\n\n**类比**：将自动售货机的\"当前库存编号\"显示器设为0。\n\n**为什么是这个顺序？** 对象创建后，需要立即设置计数器的起始位置。\n\n**执行顺序**：将start(0)保存到self.current → 在实例上创建current属性",
+        "visualizationType": "pythonMemory",
+        "code": "self.current = start",
+        "pythonMemoryState": {
+          "note": "self.current已初始化为0。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "start",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1006"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行__init__ (2)",
+        "explanation": "**`self.end = end`**\n\n将计数器的**终止点**设置为end(3)。\n当`self.current`达到这个值时，将抛出StopIteration来停止迭代。\n\n**初始化完成后Counter实例的状态**：\n- `self.current = 0`（当前位置：起点）\n- `self.end = 3`（终止点：在此停止）\n- 将产生的值：0, 1, 2（共3个）\n\n**为什么要单独存储end？** 每次调用__next__时，都需要检查\"current是否已经到达end？\"，所以end值必须存储在对象中。\n\n**类比**：在售货机上设置限制，\"3号以上的不会出来。\"\n\n**为什么是这个顺序？** 设置start之后，也设置end以完成初始化。\n\n**执行顺序**：将end(3)保存到self.end → 初始化完成 → 返回实例",
+        "visualizationType": "pythonMemory",
+        "code": "self.end = end",
+        "pythonMemoryState": {
+          "note": "self.end已初始化为3。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "self.end",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 3,
+              "pyId": "1008"
+            },
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1009",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环开始",
+        "explanation": "**`for num in counter:`**\n\nfor循环开始了！Python内部调用`counter.__iter__()`来请求迭代器。\n\n**for循环的隐藏机制（这是关键！）**：\nPython的`for num in counter:`实际上等同于：\n```python\n_iterator = counter.__iter__()  # 第1步：获取迭代器\nwhile True:\n    try:\n        num = _iterator.__next__()  # 第2步：获取下一个值\n    except StopIteration:           # 第3步：捕获终止信号\n        break\n    print(num)  # 执行循环体\n```\nfor循环是**语法糖（Syntax Sugar）**，让你用**一行代码**就能简洁地写出这个复杂的过程！\n\n**类比**：对着售货机说\"一直按按钮直到售罄为止。\"\n\n**为什么是这个顺序？** Counter实例已经准备好了，用for循环开始遍历。\n\n**执行顺序**：调用counter.__iter__() → 返回迭代器（自身） → 准备第一次__next__()调用",
+        "visualizationType": "pythonMemory",
+        "code": "for num in counter:",
+        "pythonMemoryState": {
+          "note": "for循环调用counter.__iter__()。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行__iter__",
+        "explanation": "**`return self`**\n\n`__iter__`方法返回**自身(self)**。\n由于Counter对象既是可迭代对象又是迭代器，所以直接返回自身即可。\n\n**为什么这很重要？**\nfor循环接收这个返回值，并将其作为后续重复调用`__next__()`的目标。\n由于返回了自身，所以`counter.__next__()`会被反复调用。\n\n**参考**：对于列表，返回的不是自身而是一个单独的迭代器对象。\n`list.__iter__()`会创建并返回一个叫做`list_iterator`的不同对象。\n\n**类比**：告诉别人\"这台机器的按钮就在自己身上（自身）。\"\n\n**为什么是这个顺序？** for循环调用了__iter__，所以我们返回迭代器。\n\n**执行顺序**：返回self(0x2000) → for循环准备对这个对象调用__next__",
+        "visualizationType": "pythonMemory",
+        "code": "return self",
+        "pythonMemoryState": {
+          "note": "将自身(self)作为迭代器返回。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第一次（条件检查）",
+        "explanation": "**`if self.current >= self.end:`**\n\n这是`__next__`的**第一次调用**！for循环请求\"给我下一个值！\"\n首先检查**终止条件**：current(0) >= end(3)？**False！** 还有值可以给出。\n\n**为什么先检查终止条件？**\n在返回值之前先确认\"还有没有值可以给\"更安全。\n如果已经到达终点，就必须抛出StopIteration而不是返回值。\n\n**类比**：在售货机上按按钮时，首先检查\"有没有库存？\"有的话就出货，没有就显示\"售罄。\"\n\n**为什么是这个顺序？** 调用__next__时总是先检查终止条件。\n\n**执行顺序**：比较self.current(0)和self.end(3) → 0 < 3所以跳过if块 → 进入值返回逻辑",
+        "visualizationType": "pythonMemory",
+        "code": "if self.current >= self.end:",
+        "pythonMemoryState": {
+          "note": "条件0 >= 3为假。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第一次（保存值）",
+        "explanation": "**`value = self.current`**\n\n将当前值(0)**保存到临时变量`value`中**。\n为什么不直接返回而要临时保存？\n\n**顺序很重要**：\n1. 先将当前值保存到value（value = 0）\n2. 然后将current加1（current: 0 → 1）\n3. 最后返回value(0)\n\n如果顺序反了呢？如果先增加current，就会返回1而不是0——这是一个bug！\n\n**类比**：售货机先取出商品（保存到value），然后减少库存计数器（增加current），最后送出商品（return）。\n\n**为什么是这个顺序？** 在递增之前先确保要返回的值。\n\n**执行顺序**：将self.current(0)复制到value → value = 0",
+        "visualizationType": "pythonMemory",
+        "code": "value = self.current",
+        "pythonMemoryState": {
+          "note": "将要返回的值0保存到value中。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "value",
+              "pointsTo": "int5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 0,
+              "pyId": "1010",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第一次（递增）",
+        "explanation": "**`self.current += 1`**\n\n将current从0增加到**1**。\n这是迭代器的**状态更新**。下次调用__next__时，将从current=1开始。\n\n**迭代器与普通函数的关键区别**：\n普通函数在调用结束后所有局部变量都会消失。\n但迭代器对象将状态存储在`self.current`中，所以它记得\"上次到哪里了\"！\n\n**类比**：将售货机的库存计数器向前拨一格。下次按按钮时，下一个编号就会出来。\n\n**为什么是这个顺序？** 将当前值保存到value后，为下次调用递增current。\n\n**执行顺序**：self.current增加1（0 → 1）",
+        "visualizationType": "pythonMemory",
+        "code": "self.current += 1",
+        "pythonMemoryState": {
+          "note": "self.current增加到了1。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int6",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(1, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 1,
+              "pyId": "1011",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第一次（返回）",
+        "explanation": "**`return value`**\n\n将之前保存的值**0**返回给for循环。\n这个值会被赋给`for num in counter:`中的变量`num`！\n\n**__next__的一个完整周期已完成：**\n1. 终止检查：0 >= 3？否 → 继续\n2. 保存值：value = 0\n3. 状态更新：current 0 → 1\n4. 返回值：return 0 → num = 0\n\n**这就是for循环的一次迭代！** 现在循环体(print(num))执行，然后再次调用__next__重复相同的过程。\n\n**类比**：售货机送出了0号商品。下次按按钮，1号就会出来。\n\n**为什么是这个顺序？** 作为__next__的最后一步，将计算好的值返回给调用者（for循环）。\n\n**执行顺序**：返回value(0) → num = 0 → 进入循环体执行",
+        "visualizationType": "pythonMemory",
+        "code": "return value",
+        "pythonMemoryState": {
+          "note": "for循环变量num被赋值为0。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int7",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(1, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 0,
+              "pyId": "1012",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第一个值",
+        "explanation": "**`print(num)`**\n\n由于__next__返回的值**0**存储在`num`中，将其打印到屏幕上。\n\n**for循环第一次迭代总结**：\n- 调用__iter__() → 返回self\n- 调用__next__() → 返回0\n- num = 0\n- 执行print(0)\n- 返回循环顶部再次调用__next__()...\n\n**这个输出的意义**：我们自己创建的Counter类在for循环中正常工作了！\n这是因为我们正确实现了迭代器协议（__iter__ + __next__）。\n\n**为什么是这个顺序？** 值被赋给num后，执行循环体。\n\n**执行顺序**：执行print(0) → 屏幕输出0 → 返回循环顶部再次调用__next__",
+        "visualizationType": "pythonMemory",
+        "code": "print(num)",
+        "pythonMemoryState": {
+          "output": [
+            "0"
+          ],
+          "note": "已输出0。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int7"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 0,
+              "pyId": "1012"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第二次（条件检查）",
+        "explanation": "**`if self.current >= self.end:`**\n\n**第二次__next__调用！** 执行print(0)后，for循环再次请求\"给我下一个值！\"\n检查终止条件：current(1) >= end(3)？**False！** 还有值剩余。\n\n**确认重复模式**：与第一次调用完全相同的过程在重复。\n每次调用__next__：(1) 检查终止 → (2) 保存值 → (3) 递增current → (4) 返回值\n这4个步骤一直持续到StopIteration被抛出。\n\n**跟踪迭代器的状态**：在第一次调用中current从0增加到了1，所以这次从1开始。\n这就是迭代器的本质——对象记住了\"上次到哪里了\"！\n\n**执行顺序**：比较self.current(1)和self.end(3) → 1 < 3所以跳过if块 → 进入值返回逻辑",
+        "visualizationType": "pythonMemory",
+        "code": "if self.current >= self.end:",
+        "pythonMemoryState": {
+          "note": "条件1 >= 3为假。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(1, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 1,
+              "pyId": "1011"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第二次（保存值）",
+        "explanation": "**`value = self.current`**\n\n将当前值**1**保存到临时变量`value`中。\n与第一次调用相同的模式——在递增current之前先确保要返回的值。\n\n**为什么每次都需要临时保存？** 因为下一行current会变成2，所以必须先把要返回的值1取出来。\n如果没有`value = self.current`直接递增current，就会返回2而不是1——这是bug！\n\n**执行顺序**：将self.current(1)复制到value → value = 1",
+        "visualizationType": "pythonMemory",
+        "code": "value = self.current",
+        "pythonMemoryState": {
+          "note": "保存要返回的值1。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "value",
+              "pointsTo": "int8",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(1, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int8",
+              "type": "int",
+              "value": 1,
+              "pyId": "1013",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第二次（递增）",
+        "explanation": "**`self.current += 1`**\n\n将current从1增加到**2**。迭代器的内部状态被更新。\n\n**状态变化跟踪**：\n- 第1次后：current = 1（从0增加）\n- 第2次后：current = 2（从1增加）← 现在！\n- 第3次后：current = 3（等于end → 终止）\n\ncurrent正在接近end(3)。在下一次调用中，由于2 < 3，还能再给出一个值。\n\n**执行顺序**：self.current增加1（1 → 2）",
+        "visualizationType": "pythonMemory",
+        "code": "self.current += 1",
+        "pythonMemoryState": {
+          "note": "self.current增加到了2。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int9",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(2, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 2,
+              "pyId": "1014",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第二次（返回）",
+        "explanation": "**`return value`**\n\n将之前保存的值**1**返回给for循环。`num = 1`。\n\n**第二次__next__周期完成**：\n1. 终止检查：1 >= 3？否 → 继续\n2. 保存值：value = 1\n3. 状态更新：current 1 → 2\n4. 返回值：return 1 → num = 1\n\n与第一次周期完全相同的4个步骤。这个模式一直重复到StopIteration。\n\n**执行顺序**：返回value(1) → num = 1 → 进入循环体(print)执行",
+        "visualizationType": "pythonMemory",
+        "code": "return value",
+        "pythonMemoryState": {
+          "note": "num被赋值为1。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int10",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(2, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int10",
+              "type": "int",
+              "value": 1,
+              "pyId": "1015",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第二个值",
+        "explanation": "**`print(num)`**\n\n将__next__返回的值**1**打印到屏幕上。\n\n**到目前为止的输出**：0, 1\n**剩余值**：2（current=2, end=3，还能再来一次）\n\n执行print后，for循环返回顶部再次调用__next__。\n这种自动重复就是for循环的便利之处！\n\n**执行顺序**：执行print(1) → 屏幕输出1 → 返回循环顶部再次调用__next__",
+        "visualizationType": "pythonMemory",
+        "code": "print(num)",
+        "pythonMemoryState": {
+          "output": [
+            "1"
+          ],
+          "note": "已输出1。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int10"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int10",
+              "type": "int",
+              "value": 1,
+              "pyId": "1015"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第三次（条件检查）",
+        "explanation": "**`if self.current >= self.end:`**\n\n**第三次（最后一次）__next__调用！** current(2) >= end(3)？**False！** 最后一个值还在。\n\n**这是返回值的最后机会！**\n当前current=2，如果在这个周期中current增加到3，下次调用时3 >= 3将为True，抛出StopIteration。\n也就是说，2是这个迭代器将返回的**最后一个值**。\n\n**完整流程预览**：0 → 1 → **2**（现在）→ StopIteration（下次）\n\n**执行顺序**：比较self.current(2)和self.end(3) → 2 < 3所以跳过if块 → 准备返回最后一个值",
+        "visualizationType": "pythonMemory",
+        "code": "if self.current >= self.end:",
+        "pythonMemoryState": {
+          "note": "条件2 >= 3为假。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int9"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(2, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 2,
+              "pyId": "1014"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第三次（保存值）",
+        "explanation": "**`value = self.current`**\n\n将迭代器的**最后一个值**2保存到临时变量`value`中。\n下一行current将增加到3等于end，所以这是最后一个被返回的值。\n\n**比较三次值保存**：\n- 第1次：value = 0（current 0 → 1）\n- 第2次：value = 1（current 1 → 2）\n- 第3次：value = 2（current 2 → 3）← 现在！最后一次！\n\n**执行顺序**：将self.current(2)复制到value → value = 2",
+        "visualizationType": "pythonMemory",
+        "code": "value = self.current",
+        "pythonMemoryState": {
+          "note": "保存要返回的值2。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "value",
+              "pointsTo": "int11",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(2, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int11",
+              "type": "int",
+              "value": 2,
+              "pyId": "1016",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第三次（递增）",
+        "explanation": "**`self.current += 1`**\n\n将current从2增加到**3**。**现在current(3) == end(3)了！**\n\n**这个时刻至关重要！** 由于current现在等于end，下次调用__next__时：\n`if self.current >= self.end:` → `3 >= 3` → **True** → 抛出StopIteration！\n这次递增使迭代器进入了\"耗尽（exhausted）\"状态。\n\n**完整状态变化总结**：\n- 初始：current=0, end=3 → 可以提供3个值（0, 1, 2）\n- 第1次后：current=1\n- 第2次后：current=2\n- 第3次后：current=3 ← 现在！（等于end = 准备终止）\n\n**执行顺序**：self.current增加1（2 → 3） → 现在等于end，下次调用时终止",
+        "visualizationType": "pythonMemory",
+        "code": "self.current += 1",
+        "pythonMemoryState": {
+          "note": "self.current增加到了3。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int12",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(3, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int12",
+              "type": "int",
+              "value": 3,
+              "pyId": "1017",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第三次（返回）",
+        "explanation": "**`return value`**\n\n将迭代器的**最后一个值2**返回给for循环。`num = 2`。\n\n**第三次（最后一次）__next__周期完成**：\n1. 终止检查：2 >= 3？否 → 继续\n2. 保存值：value = 2\n3. 状态更新：current 2 → 3（现在等于end了！）\n4. 返回值：return 2 → num = 2\n\n执行print(2)后，for循环会再次调用__next__，但3 >= 3将为True，抛出StopIteration。\n\n**执行顺序**：返回value(2) → num = 2 → 进入循环体(print)执行",
+        "visualizationType": "pythonMemory",
+        "code": "return value",
+        "pythonMemoryState": {
+          "note": "num被赋值为2。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int13",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(3, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int13",
+              "type": "int",
+              "value": 2,
+              "pyId": "1018",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第三个值",
+        "explanation": "**`print(num)`**\n\n将迭代器的最后一个值**2**打印到屏幕上。\n\n**完整输出**：0, 1, 2——Counter(0, 3)产生的所有值都已输出！\n这和range(3)的结果一样。实际上，range()内部也实现了迭代器协议。\n\n执行print后，for循环再次调用__next__，但这次会抛出StopIteration，循环终止。\n\n**执行顺序**：执行print(2) → 屏幕输出2 → 返回循环顶部 → 调用__next__ → StopIteration！",
+        "visualizationType": "pythonMemory",
+        "code": "print(num)",
+        "pythonMemoryState": {
+          "output": [
+            "2"
+          ],
+          "note": "已输出2。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int13"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int13",
+              "type": "int",
+              "value": 2,
+              "pyId": "1018"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__执行 - 第四次（StopIteration）",
+        "explanation": "**`if self.current >= self.end:`**\n\n**第四次__next__调用！** current(3) >= end(3)？**True！** 终于到达了终止条件！\n\n**为什么3 >= 3为True？**\n我们已经送出了所有三个值：0, 1, 2。current已变为3，现在等于end(3)。\n没有更多的值可以给出了，所以进入if块准备抛出StopIteration。\n\n**类比**：售货机的库存耗尽了。该显示\"售罄\"了。\n\n**为什么是这个顺序？** 作为__next__的第一步检查终止条件，这次结果为True。\n\n**执行顺序**：比较self.current(3)和self.end(3) → 3 >= 3为True → 进入if块",
+        "visualizationType": "pythonMemory",
+        "code": "if self.current >= self.end:",
+        "pythonMemoryState": {
+          "note": "条件3 >= 3为真，准备终止。",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int12"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(3, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int12",
+              "type": "int",
+              "value": 3,
+              "pyId": "1017"
+            }
+          ]
+        }
+      },
+      {
+        "title": "循环终止",
+        "explanation": "**`raise StopIteration`**\n\n**\"没有更多的值了！\"**——抛出`StopIteration`异常。\nfor循环**自动捕获并静默**终止。\n\n**StopIteration不是错误！**\n与普通错误（TypeError、ValueError等）不同，StopIteration是一个**正常的终止信号**。\nfor循环期待这个异常，收到后就\"啊，结束了\"然后干净利落地终止。\n程序不会崩溃，也不会显示错误消息！\n\n**完整for循环操作总结**：\n```\n第1次迭代：__next__() → 返回0 → print(0)\n第2次迭代：__next__() → 返回1 → print(1)\n第3次迭代：__next__() → 返回2 → print(2)\n第4次迭代：__next__() → 抛出StopIteration → 循环结束！\n```\n\n**类比**：售货机挂出了\"售罄\"标志。for循环看到这个标志后停止按按钮。\n\n**核心要点**：for循环是调用对象的`__iter__`和`__next__`方法的\"语法糖\"！\n列表、元组、字符串等所有可迭代对象都遵循这个协议。\n\n**执行顺序**：抛出StopIteration异常 → for循环检测到异常 → 循环正常终止 → 程序继续",
+        "visualizationType": "pythonMemory",
+        "code": "raise StopIteration",
+        "pythonMemoryState": {
+          "note": "抛出StopIteration异常！循环终止。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(3, 3)",
+              "pyId": "1005"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "`for`循环为了从对象获取下一个值，内部调用的方法是什么？",
+    "options": [
+      "__init__",
+      "__iter__",
+      "__next__",
+      "__stop__"
+    ],
+    "correctIndex": 2,
+    "explanation": "`for`循环首先调用`__iter__`获取迭代器对象，然后在每次迭代时调用`__next__`来获取下一个值。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "只有列表才能在`for`循环中使用。",
+      "correct": "任何实现了`__iter__`和`__next__`的对象都可以在`for`循环中使用。",
+      "why": "`for`循环不关心对象的类型是什么，它只检查对象是否遵循'迭代器协议'。\n（鸭子类型）"
+    }
+  ],
+  "keyTakeaway": "`for`循环是调用对象的`__iter__`和`__next__`方法的'语法糖（Syntax Sugar）'。"
+}

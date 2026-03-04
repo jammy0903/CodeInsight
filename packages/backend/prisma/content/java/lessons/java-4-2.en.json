@@ -1,0 +1,193 @@
+{
+  "lessonId": "java-4-2",
+  "title": "String vs StringBuilder",
+  "concept": "When frequent string modifications are needed, use the mutable StringBuilder object.",
+  "content": {
+    "code": "// Bad example: String concatenation (creates garbage)\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// Good example: StringBuilder (reuses object)\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
+    "steps": [
+      {
+        "title": "Creating an Empty String",
+        "explanation": "**Execution flow:**\n1. Creates `\"\"` (empty string) in the String Pool.\n2. Variable `bad` references it.\n\nFrom here, we'll attempt to keep appending to `bad`.",
+        "visualizationType": "javaMemory",
+        "code": "String bad = \"\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "bad",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Loop Begins (String)",
+        "explanation": "**Execution flow:**\n1. Initialize `i = 0`.\n2. Check loop condition.\n\nPreparing to enter the loop.",
+        "visualizationType": "javaMemory",
+        "code": "for (int i = 0; i < 3; i++) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "bad",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "i",
+              "value": "0",
+              "frame": "main",
+              "type": "int"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Inefficient Concatenation (Garbage Creation)",
+        "explanation": "**Execution flow (per iteration):**\n1. `bad` + `i` -> creates a new object.\n2. `bad` points to the new object.\n3. The previous object becomes **garbage**.\n\n**The problem:**\nEvery loop iteration creates a String object that's used once and discarded.\nIf the loop runs 10,000 times, it creates 10,000 pieces of garbage.",
+        "keyInsight": "String loop concatenation = memory waste (O(N^2))",
+        "visualizationType": "javaMemory",
+        "code": "bad = bad + i;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "bad",
+              "value": "-> Obj_2",
+              "frame": "main",
+              "changed": true,
+              "type": "String"
+            },
+            {
+              "name": "i",
+              "value": "2",
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Obj_0",
+              "content": "\"0\"",
+              "type": "String",
+              "garbage": true
+            },
+            {
+              "address": "Obj_1",
+              "content": "\"01\"",
+              "type": "String",
+              "garbage": true
+            },
+            {
+              "address": "Obj_2",
+              "content": "\"012\"",
+              "type": "String",
+              "new": true
+            }
+          ],
+          "warning": "Intermediate objects keep getting discarded!",
+          "stringPool": null
+        }
+      },
+      {
+        "title": "Creating a StringBuilder",
+        "explanation": "**Execution flow:**\n1. Creates a `StringBuilder` object (0x100) on the Heap.\n2. Contains a character array (buffer) with generous capacity.\n\n`StringBuilder` is a **mutable** object.\nThink of it as a 'whiteboard' where you can freely write and erase.",
+        "keyInsight": "StringBuilder = a rewritable whiteboard",
+        "visualizationType": "javaMemory",
+        "code": "StringBuilder good = new StringBuilder();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "good",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "StringBuilder"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "sb_buffer[]",
+              "type": "StringBuilder"
+            }
+          ],
+          "warning": null
+        }
+      },
+      {
+        "title": "Efficient append()",
+        "explanation": "**Execution flow (per iteration):**\n1. Calls `good.append(i)`.\n2. Fills in the next empty slot in the internal array of object `0x100`.\n\n**Advantage:**\nInstead of creating new objects, it keeps updating content **within a single object**.\nNo garbage is generated at all.",
+        "keyInsight": "Object reuse = faster speed + memory savings",
+        "visualizationType": "javaMemory",
+        "code": "good.append(i);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "['0', '1', '2', ...]",
+              "type": "StringBuilder",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Finalizing with toString()",
+        "explanation": "**Execution flow:**\n1. Calls `good.toString()`.\n2. Creates a String object **just once** from the completed content.\n3. Stores it in `result`.\n\nDo all the work (modifications) on the whiteboard (StringBuilder), then serve the finished dish on a plate (String) at the very end.",
+        "visualizationType": "javaMemory",
+        "code": "String result = good.toString();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "result",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "['0', '1', '2']",
+              "type": "StringBuilder"
+            },
+            {
+              "address": "0x200",
+              "content": "\"012\"",
+              "type": "String",
+              "new": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the best approach when you need to repeatedly concatenate strings inside a loop?",
+    "options": [
+      "Just use the + operator.",
+      "Use the String.concat() method.",
+      "Use StringBuilder or StringBuffer.",
+      "Keep calling new String()."
+    ],
+    "correctIndex": 2,
+    "explanation": "Using the `+` operator inside a loop creates numerous temporary objects (garbage), resulting in terrible performance.\nUse `StringBuilder` to modify content within a single object."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Modern Java optimizes the + operator anyway, so it doesn't matter.",
+      "correct": "The compiler optimizes simple one-off concatenations, but has limitations inside **loops**.",
+      "why": "Inside loops, it often translates to creating and discarding a `new StringBuilder` each iteration, which is still slow.\nAlways use `StringBuilder` explicitly in loops."
+    }
+  ],
+  "keyTakeaway": "Always use `StringBuilder` when building strings in a loop! The performance difference can be 100x or more."
+}

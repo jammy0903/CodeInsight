@@ -1,0 +1,744 @@
+{
+  "lessonId": "py-7-4",
+  "title": "垃圾收集器",
+  "concept": "gc模块查找并清理循环引用！引用计数 + gc = 完美的内存管理！",
+  "content": {
+    "code": "import gc\n\nclass Node:\n    def __init__(self, name):\n        self.name = name\n        self.next = None\n\na = Node(\"A\")\nb = Node(\"B\")\na.next = b\nb.next = a  # 순환 참조\n\ndel a\ndel b\n\nprint(f\"정리 전 쓰레기: {gc.get_count()}\")\nnum = gc.collect()  # 가비지 컬렉션 실행!\nprint(f\"정리된 객체 수: {num}\")",
+    "steps": [
+      {
+        "title": "导入gc模块",
+        "explanation": "**`import gc`**\n\n将Python的**垃圾收集器(Garbage Collector)模块**加载到内存中。\n`gc`是Python的内置模块，提供**检测和移除循环引用**的功能，这些是仅靠引用计数无法处理的。\n\n**gc模块的主要函数**：\n- `gc.collect()`：手动检测并移除循环引用\n- `gc.get_count()`：查看每代(generation)追踪的对象数量\n- `gc.disable()` / `gc.enable()`：关闭/开启自动垃圾收集\n\n**类比：请专业清洁公司**\n如果引用计数是"每个人自己清理垃圾"，那gc模块就是**专业清洁公司**。\n通常每个人可以自己清理，但缠在一起的垃圾（循环引用）需要专业人员来处理。\n\n**为什么是这个顺序？** 要使用gc.collect()和gc.get_count()，必须先导入gc模块。\n\n**执行顺序**：加载gc模块 -> 在全局命名空间注册'gc'名称 -> gc函数准备就绪",
+        "visualizationType": "pythonMemory",
+        "code": "import gc",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "gc模块导入完成",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node类定义开始",
+        "explanation": "**`class Node:`**\n\n定义与上一课(py-7-3)**相同的Node类**。\n每个节点有名字(`name`)和指向下一个节点的指针(`next`)。\n\n**本课的目标不同！**\n上一课展示了循环引用的**问题**，本课展示如何用**gc.collect()解决**。\n我们创建同样的循环引用，但这次观察gc如何清理它。\n\n**类比**：上一课展示了"这种垃圾会堆积"，本课展示"清洁公司这样处理"。\n\n**为什么是这个顺序？** 导入gc模块后，定义创建循环引用所需的类。\n\n**执行顺序**：class关键字 -> 准备创建Node类对象 -> 等待执行类体",
+        "visualizationType": "pythonMemory",
+        "code": "class Node:",
+        "pythonMemoryState": {
+          "note": "Node类定义开始",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "进入类体",
+        "explanation": "**`class Node:`（整个类体）**\n\nPython执行类体来完成Node类。\n定义了`__init__`方法，使其能够初始化`name`和`next`属性。\n\n**还没有创建任何实例！**\n只准备好了蓝图。实际的Node对象(A, B)稍后会用`Node(\"A\")`和`Node(\"B\")`创建。\n\n**为什么是这个顺序？** 遇到class关键字后，注册类体中所有方法来完成类。\n\n**执行顺序**：开始执行类体 -> 定义并注册__init__方法",
+        "visualizationType": "pythonMemory",
+        "code": "class Node:",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "正在执行类体",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__方法定义",
+        "explanation": "**`def __init__(self, name):`**\n\n定义Node类的**初始化方法（构造函数）**。\n以`Node(\"A\")`形式调用时，这个`__init__`会自动执行来设置实例。\n\n**此方法设置的两个属性**：\n- `self.name = name`：节点的名字（\"A\"或\"B\"）\n- `self.next = None`：指向下一个节点的指针（初始无连接）\n\n**类比**：这是火车车厢的制造工序。给车厢贴上名牌(name)，连接器留空(next=None)。\n\n**为什么是这个顺序？** 在类体内定义__init__方法来完成Node类。\n\n**执行顺序**：创建__init__函数对象 -> 作为方法注册到Node类 -> Node类完成 (ID: 0x1000)",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "Node类定义完成 (ID: 0x1000)",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建第一个节点",
+        "explanation": "**`a = Node(\"A\")`**\n\n调用Node类在内存(0x2000)中创建**名为\"A\"的第一个节点**。\n`__init__(self, \"A\")`被自动调用来设置name和next属性。\n\n**与上一课(py-7-3)相同的过程。**\n创建循环引用需要两个节点，这是创建第一个的步骤。\n\n**创建后的状态**：Node A = {name: \"A\", next: None}，refcount = 1（只有变量a引用）\n\n**为什么是这个顺序？** 类定义完成后，创建实际的实例。\n\n**执行顺序**：调用Node(\"A\") -> 创建实例0x2000 -> 调用__init__(self, \"A\") -> 初始化进行中...",
+        "visualizationType": "pythonMemory",
+        "code": "a = Node(\"A\")",
+        "pythonMemoryState": {
+          "note": "调用Node(\"A\") -> 创建实例0x2000",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node A初始化（1）",
+        "explanation": "**`self.name = name`**\n\n将字符串`\"A\"`存储到新创建的实例(0x2000)的`name`属性中。\n`self`指向正在创建的对象0x2000。\n\n**为什么需要这个属性？** 后面创建循环引用时，用于区分Node A和Node B。\n\n**类比**：给火车车厢贴上名牌。"这节车厢是A！"\n\n**为什么是这个顺序？** 在__init__内部，先设置name，然后设置next。\n\n**执行顺序**：给self(0x2000)添加name属性 -> 赋值\"A\" -> 0x2000.name = \"A\"完成",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "设置Node A的name = 'A'",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a (初始化中)",
+              "pointsTo": "node1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A')",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node A初始化（2）",
+        "explanation": "**`self.next = None`**\n\n将Node A(0x2000)的`next`属性初始化为`None`。\n`next`作为指向下一个节点的指针。初始时没有连接任何东西(None)。\n\n**Node A完成状态**：name=\"A\"，next=None，refcount=1（只有变量a引用）\n\n**类比**：火车车厢A的连接器(next)还是空的。之后会用`a.next = b`连接到车厢B。\n\n**为什么是这个顺序？** __init__完成后，完成的Node A对象连接到变量`a`。\n\n**执行顺序**：给self(0x2000)添加next属性 -> 赋值None -> __init__完成 -> a -> 0x2000 (refcount=1)",
+        "visualizationType": "pythonMemory",
+        "code": "self.next = None",
+        "pythonMemoryState": {
+          "note": "Node A完成！refcount=1",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建第二个节点",
+        "explanation": "**`b = Node(\"B\")`**\n\n在内存(0x3000)中创建名为\"B\"的**第二个节点对象**。\n创建循环引用需要两个互相指向的节点，所以创建第二个。\n\n**当前状态**：Node A(0x2000)和Node B(0x3000)各自独立存在。\n它们还没有互相连接。\n\n**类比**：两节火车车厢并排放置，但挂钩还没有钩上。\n\n**为什么是这个顺序？** 创建Node A之后，创建Node B为循环引用做准备。\n\n**执行顺序**：调用Node(\"B\") -> 创建实例0x3000 -> 调用__init__(self, \"B\") -> 初始化进行中...",
+        "visualizationType": "pythonMemory",
+        "code": "b = Node(\"B\")",
+        "pythonMemoryState": {
+          "note": "调用Node(\"B\") -> 创建实例0x3000",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node B初始化（1）",
+        "explanation": "**`self.name = name`**\n\n将Node B(0x3000)的`name`属性设为`\"B\"`。\n是同一个`__init__`方法，但这次`self`指向0x3000(Node B)。\n\n**同一个类，不同的实例**：Node A时self=0x2000，name=\"A\"。现在self=0x3000，name=\"B\"。\n\n**为什么是这个顺序？** 在Node B的__init__内部，先设置name。\n\n**执行顺序**：给self(0x3000)添加name属性 -> 赋值\"B\" -> 0x3000.name = \"B\"完成",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "设置Node B的name = 'B'",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b (初始化中)",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1003"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B')",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node B初始化（2）",
+        "explanation": "**`self.next = None`**\n\n将Node B(0x3000)的`next`属性初始化为`None`。\n现在**两个独立的节点都准备好了**。\n\n**当前状态总结**：\n- a -> Node A(0x2000)：name=\"A\"，next=None，refcount=1\n- b -> Node B(0x3000)：name=\"B\"，next=None，refcount=1\n\n**下一步**：我们将用`a.next = b`和`b.next = a`将两个节点互相连接来创建循环引用。\n过程与上一课相同，但这次的目标是用gc.collect()清理。\n\n**为什么是这个顺序？** Node B的__init__完成后，准备好连接两个节点。\n\n**执行顺序**：给self(0x3000)添加next属性 -> 赋值None -> __init__完成 -> b -> 0x3000 (refcount=1)",
+        "visualizationType": "pythonMemory",
+        "code": "self.next = None",
+        "pythonMemoryState": {
+          "note": "Node B完成！两个节点已准备就绪",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1003"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=None)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "连接引用（A -> B）",
+        "explanation": "**`a.next = b`**\n\n将Node A的`next`指针连接为指向Node B(0x3000)。**A -> B**方向的连接完成。\n\n**引用计数变化（重要！）**：\n- Node B(0x3000)的refcount：1 -> **2**（变量`b` + `a.next`）\n- 现在即使删除变量`b`，`a.next`仍然引用着Node B，所以不会被删除。\n\n**类比**：火车车厢A的后方挂钩钩住了车厢B。\n\n**为什么是这个顺序？** 创建循环引用的第一个方向(A->B)。\n\n**执行顺序**：访问a(0x2000)的next -> 赋值b(0x3000) -> 0x3000的refcount 1->2",
+        "visualizationType": "pythonMemory",
+        "code": "a.next = b",
+        "pythonMemoryState": {
+          "note": "A -> B已连接！0x3000 refcount=2",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=0x3000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=None)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "循环引用完成（B -> A）",
+        "explanation": "**`b.next = a`**\n\nNode B的`next`现在指向Node A(0x2000)，**循环引用完成**！\n现在是A -> B -> A -> B -> ...无限循环结构。\n\n**两边都变成了refcount = 2**：\n- Node A(0x2000)：变量`a` + `b.next` = 2\n- Node B(0x3000)：变量`b` + `a.next` = 2\n\n**这就是需要gc的情况！**\n仅靠引用计数无法打破这个循环。\n即使`del a`、`del b`，refcount也不会变为0，需要gc.collect()的帮助。\n\n**类比：两个人互相拉手**\n即使外面的手（变量）松开了，它们仍然互相拉着手。\n\n**为什么是这个顺序？** A->B连接后，添加B->A完成循环。\n\n**执行顺序**：访问b(0x3000)的next -> 赋值a(0x2000) -> 循环引用完成：A <-> B（各refcount=2）",
+        "visualizationType": "pythonMemory",
+        "code": "b.next = a  # 순환 참조",
+        "pythonMemoryState": {
+          "note": "循环引用完成！A <-> B（各refcount=2）",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=0x3000)",
+              "pyId": "1003"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=0x2000)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "删除变量'a'",
+        "explanation": "**`del a`**\n\n删除变量`a`。Node A(0x2000)的refcount从2减少到1，但由于`b.next`仍在引用它，**对象存活了下来**。\n\n**引用变化**：0x2000的refcount = 2(变量a + b.next) -> **1**(只剩b.next)\n由于refcount > 0，不会从内存中移除。\n\n**此时如何访问Node A？**\n变量`a`已消失，但可以通过`b.next`间接访问。\n\n**为什么是这个顺序？** 循环引用完成后，逐个移除外部引用（变量）来创建"孤立的循环引用"情况。\n\n**执行顺序**：从命名空间移除变量a -> 0x2000的refcount 2->1 (只剩b.next) -> 对象保留",
+        "visualizationType": "pythonMemory",
+        "code": "del a",
+        "pythonMemoryState": {
+          "note": "变量a已删除！0x2000仍被b.next引用 (refcount=1)",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=0x2000)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "删除变量'b'",
+        "explanation": "**`del b`**\n\n也删除了变量`b`。现在**没有任何变量可以访问这两个Node对象了！**\n但它们互相引用着，refcount不会变为0。\n\n**孤立的循环引用状态（内存泄漏！）**：\n```\nNode A(0x2000)：refcount=1（Node B的next在引用）\nNode B(0x3000)：refcount=1（Node A的next在引用）\n```\n两个对象都无法从外部访问，但互相抓着对方无法被删除。\n\n**正是在这种情况下需要gc.collect()！**\n引用计数解决不了，但gc可以检测"从外部不可达的对象组"并一次性移除。\n\n**类比**：两个人在海上互相拉着手。与救生艇（变量）的连接已被切断，但互相拉着手不会沉下去。gc是发现这种情况并进行救援（清理）的海岸警卫队。\n\n**为什么是这个顺序？** 两个变量都删除来创建孤立的循环引用，接下来用gc清理。\n\n**执行顺序**：从命名空间移除变量b -> 0x3000的refcount 2->1 -> 两个对象都孤立 + 循环引用状态",
+        "visualizationType": "pythonMemory",
+        "code": "del b",
+        "pythonMemoryState": {
+          "note": "变量a、b都已删除！0x2000 <-> 0x3000孤立的循环引用（各refcount=1）",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查垃圾收集状态",
+        "explanation": "**`print(f\"정리 전 쓰레기: {gc.get_count()}\")`**\n\n调用`gc.get_count()`来查看**垃圾收集器当前追踪的对象数量**。\n该函数返回**(gen0, gen1, gen2)**形式的元组。\n\n**什么是代(Generation)？**\nPython的gc将对象分为3代来管理：\n- **gen0（第0代）**：最近创建的对象。检查最频繁\n- **gen1（第1代）**：在gen0检查中存活的对象\n- **gen2（第2代）**：长期存活的对象。检查最不频繁\n\n**为什么用分代方式？**\n大多数对象在创建后很快就会消失（如临时变量）。\n老对象很可能会活更久。\n所以频繁检查新对象、不频繁检查老对象更高效！\n\n**此时循环引用对象(0x2000, 0x3000)包含在gen0中。**\n\n**类比**：有3个垃圾桶(gen0, gen1, gen2)，新垃圾先进gen0。\n\n**为什么是这个顺序？** 在运行gc.collect()之前，先检查"目前有多少垃圾"。\n\n**执行顺序**：调用gc.get_count() -> 返回(gen0数量, gen1数量, gen2数量) -> 输出",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"정리 전 쓰레기: {gc.get_count()}\")",
+        "pythonMemoryState": {
+          "output": [
+            "정리 전 쓰레기: (10, 5, 2)"
+          ],
+          "note": "gc状态检查 - 循环引用对象在gen0中",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "运行手动垃圾收集",
+        "explanation": "**`num = gc.collect()`**\n\n这是本课**最核心的一行**！\n调用`gc.collect()`来**检测循环引用并从内存中移除**。\n\n**gc.collect()的内部工作原理（标记清除算法）**：\n1. **标记阶段**：从所有全局变量和栈开始，标记所有可达的对象。\n2. **检测**：未标记的对象 = 从外部不可达的对象！\n3. **清除阶段**：发现不可达的循环引用组(0x2000 <-> 0x3000)并从内存中释放。\n4. 返回释放的对象数 -> num = **2**\n\n**类比：海岸警卫队搜索行动**\n在海上（内存）中找到与陆地（变量）断开连接后漂浮的人（循环引用对象），进行救援（清理）。\n\n**引用计数与gc的区别**：\n- **引用计数**：refcount=0时立即删除（快速但无法捕获循环引用）\n- **gc.collect()**：分析可达性来找到循环引用（较慢但彻底）\n\n**注意**：通常gc会**自动**周期性运行，手动调用只在特殊情况下需要。\n\n**为什么是这个顺序？** 孤立的循环引用创建后，gc.collect()清理它来展示gc的作用。\n\n**执行顺序**：调用gc.collect() -> 检测不可达对象 -> 释放0x2000, 0x3000 -> 返回清理数量(2) -> num = 2",
+        "visualizationType": "pythonMemory",
+        "code": "num = gc.collect()  # 가비지 컬렉션 실행!",
+        "pythonMemoryState": {
+          "note": "gc.collect()完成！0x2000, 0x3000已移除（清理了2个）",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "确认清理的对象数量",
+        "explanation": "**`print(f\"정리된 객체 수: {num}\")`**\n\n打印gc.collect()清理的对象数量。由于**num = 2**，组成循环引用的Node A(0x2000)和Node B(0x3000)两个对象已成功从内存中移除！\n\n**Python完整内存管理系统总结**：\n```\n第1步：引用计数（即时处理）\n   -> refcount=0时立即释放内存\n   -> 快速且可预测，处理大多数对象\n\n第2步：垃圾收集器（处理循环引用）\n   -> 检测引用计数遗漏的循环引用\n   -> 自动周期性运行（也可手动调用）\n   -> 使用标记-清除(Mark-and-Sweep)清理不可达对象\n```\n\n**实际中何时需要手动调用gc**：\n- 处理大量数据后需要立即释放内存时\n- 进行内存分析(profiling)时\n- 在性能关键的代码中控制gc时机时\n\n**注意**：过于频繁地调用`gc.collect()`反而会**降低性能**！因为执行期间程序会短暂暂停(Stop-the-World)。\n\n**为什么是这个顺序？** 检查gc.collect()的结果，展示循环引用已被成功清理。\n\n**执行顺序**：计算f-string中的{num} -> 2 -> 输出\"정리된 객체 수: 2\" -> 程序结束",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"정리된 객체 수: {num}\")",
+        "pythonMemoryState": {
+          "output": [
+            "정리된 객체 수: 2"
+          ],
+          "note": "完成！2个循环引用已清理 - 引用计数 + gc = 完美的内存管理",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "需要显式调用gc.collect()吗？",
+    "options": [
+      "必须每次都调用",
+      "通常自动运行，无需显式调用",
+      "没有循环引用时需要调用",
+      "调用会导致错误"
+    ],
+    "correctIndex": 1,
+    "explanation": "Python的gc会自动周期性运行。\n显式调用只在内存不足或清理大量对象后等特殊情况下才需要。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "频繁调用gc.collect()是好的",
+      "correct": "反而会降低性能！只在需要时调用",
+      "why": "gc执行期间程序会短暂暂停(Stop-the-World)。\n自动执行就足够了。"
+    },
+    {
+      "wrong": "禁用gc会导致内存泄漏",
+      "correct": "引用计数处理大多数情况，只有循环引用才有问题",
+      "why": "即使gc.disable()，refcount=0的对象也会立即删除。\n只有循环引用会累积。"
+    }
+  ],
+  "keyTakeaway": "引用计数（即时）+ gc（循环引用）= Python的完美内存管理！"
+}

@@ -1,0 +1,276 @@
+{
+  "lessonId": "c-7-3",
+  "title": "Dynamic 2D Arrays",
+  "concept": "A dynamic 2D array is built by allocating row pointer arrays and each row's data in stages",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int rows = 2, cols = 3;\n\n    int **matrix = (int **)malloc(rows * sizeof(int *));\n\n    for (int i = 0; i < rows; i++) {\n        matrix[i] = (int *)malloc(cols * sizeof(int));\n    }\n\n    matrix[0][1] = 99;\n    printf(\"matrix[0][1] = %d\\n\", matrix[0][1]);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including required headers",
+        "explanation": "We include `stdio.h` and `stdlib.h` for output and dynamic memory functions.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "The main frame is created.\n\nActual data goes on the heap; control pointers stay on the stack.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Defining array dimensions",
+        "explanation": "`rows` and `cols` set the runtime dimensions.\n\nThe dynamic array's allocation size is determined by these values.",
+        "visualizationType": "cMemory",
+        "code": "int rows = 2, cols = 3;",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "Step 1: Allocating the row pointer array",
+        "explanation": "We first allocate space in `matrix` to hold the row pointers.\n\nThe actual data space for each row does not exist yet.",
+        "visualizationType": "cMemory",
+        "code": "int **matrix = (int **)malloc(rows * sizeof(int *));",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1",
+            "address": "0x0ff8"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "Row pointer array",
+            "value": "{???, ???}"
+          }
+        ]
+      },
+      {
+        "title": "Step 2: Allocating data space for each row (loop start)",
+        "explanation": "A loop allocates `cols` int spaces individually for each row.\n\nThis process completes the 2D structure.",
+        "visualizationType": "cMemory",
+        "code": "for (int i = 0; i < rows; i++) {",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1",
+            "address": "0x0ff8"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "0",
+            "address": "0x0ff4"
+          }
+        ]
+      },
+      {
+        "title": "Allocating first row (row 0)",
+        "explanation": "The first row data block is allocated and its address is stored in `matrix[0]`.",
+        "visualizationType": "cMemory",
+        "code": "matrix[i] = (int *)malloc(cols * sizeof(int));",
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "Row pointer array",
+            "value": "{0xHEAP2, ???}"
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 data",
+            "value": "{?, ?, ?}"
+          }
+        ]
+      },
+      {
+        "title": "Allocating second row (row 1)",
+        "explanation": "The second row is allocated the same way and linked to `matrix[1]`.",
+        "visualizationType": "cMemory",
+        "code": "matrix[i] = (int *)malloc(cols * sizeof(int));",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1",
+            "address": "0x0ff8"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "1",
+            "address": "0x0ff4"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "Row pointer array",
+            "value": "{0xHEAP2, 0xHEAP3}"
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 data",
+            "value": "{?, ?, ?}"
+          },
+          {
+            "address": "0xHEAP3",
+            "label": "Row 1 data",
+            "value": "{?, ?, ?}"
+          }
+        ]
+      },
+      {
+        "title": "Assigning and accessing a value",
+        "explanation": "You can access values using standard 2D array syntax like `matrix[0][1] = 99;`.",
+        "visualizationType": "cMemory",
+        "code": "matrix[0][1] = 99;",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1",
+            "address": "0x0ff8"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "Row pointer array",
+            "value": "{0xHEAP2, 0xHEAP3}"
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 data",
+            "value": "{?, 99, ?}"
+          },
+          {
+            "address": "0xHEAP3",
+            "label": "Row 1 data",
+            "value": "{?, ?, ?}"
+          }
+        ]
+      },
+      {
+        "title": "Printing the value",
+        "explanation": "We print the stored value to confirm that access works correctly.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"matrix[0][1] = %d\\n\", matrix[0][1]);",
+        "stdout": "matrix[0][1] = 99"
+      },
+      {
+        "title": "Freeing memory (important!)",
+        "explanation": "In practice, you must `free` each row first, then call `free(matrix)` last.\n\nReversing the order causes memory leaks.",
+        "highlight": [],
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Program termination",
+        "explanation": "The program ends with `return 0;`.\n\nKey point: A dynamic 2D array has a two-level structure: \"row pointers + each row's data\".",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stdout": "matrix[0][1] = 99"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the correct order for freeing a dynamically allocated 2D array (double pointer approach)?",
+    "options": [
+      "Free the row pointer array first",
+      "Free each row's contents first, then free the row pointer array last",
+      "Free both at the same time",
+      "Not necessary since the OS handles it"
+    ],
+    "correctIndex": 1,
+    "explanation": "If you free the row pointer array (`matrix`) first, you lose access to each row's address (`matrix[i]`), causing a memory leak."
+  },
+  "misconceptions": [
+    {
+      "wrong": "A dynamic 2D array is always contiguous in memory.",
+      "correct": "Each row is allocated separately with malloc, so they may be at distant addresses.",
+      "why": "Unless you allocate one large block of `rows * cols` at once, the memory is non-contiguous."
+    }
+  ],
+  "keyTakeaway": "You need two levels of malloc (pointer array + each row) to create a dynamic 2D array, and freeing must be done in reverse order."
+}

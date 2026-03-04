@@ -16,6 +16,7 @@ import { OnboardingModal } from '@/components/OnboardingModal';
 import { ReportModal } from '@/components/ReportModal';
 import { Github, Mail } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LanguageToggle } from '@/components/LanguageToggle';
 import { useStore } from '@/stores/store';
 
 interface MainLayoutProps {
@@ -96,6 +97,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
                 {/* 오른쪽: 테마 토글 + Stay in touch + 소셜 */}
                 <div className="flex items-center gap-3">
+                  <LanguageToggle />
                   <ThemeToggle />
                   <p className="text-sm font-medium whitespace-nowrap" style={{ color: 'var(--theme-layout-footer-text)' }}>Stay in touch</p>
                   <div className="flex gap-3">

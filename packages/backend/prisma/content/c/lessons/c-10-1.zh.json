@@ -1,0 +1,120 @@
+{
+  "lessonId": "c-10-1",
+  "title": "Standard Streams",
+  "concept": "标准流 stdin、stdout、stderr 是控制台输入输出的默认通道",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    fprintf(stdout, \"This uses stdout\\n\");\n    printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");\n\n    fprintf(stderr, \"Error: Something went wrong!\\n\");\n\n    int n;\n    fprintf(stdout, \"Enter a number: \");\n    n = 5;\n\n    fprintf(stdout, \"You entered: %d\\n\", n);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "**`#include <stdio.h>`** -- 标准输入输出函数的头文件。\n\n每个 C 程序启动时都会自动从操作系统获得 **3 个数据通道（流）**。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "**`int main() {`** -- 程序启动时，操作系统自动打开 `stdin`、`stdout`、`stderr` 三个流。\n\n这三个都是 **`FILE *` 类型的指针**。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "写入标准输出（stdout）",
+        "explanation": "**`fprintf(stdout, \"This uses stdout\\n\");`** -- `fprintf` 向**指定的流**写入格式化字符串。结构为 `fprintf(流, 格式字符串, 值...)`，第一个参数指定输出目标。",
+        "visualizationType": "cMemory",
+        "code": "fprintf(stdout, \"This uses stdout\\n\");",
+        "stack": [],
+        "stdout": "This uses stdout"
+      },
+      {
+        "title": "printf 是 stdout 的快捷方式",
+        "explanation": "**`printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");`** -- 我们一直使用的 `printf(...)` 实际上是内部调用 `fprintf(stdout, ...)` 的**快捷函数**。也就是说 `printf(\"Hello\\n\")` 与 `fprintf(stdout, \"Hello\\n\")` 完全相同。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");",
+        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)"
+      },
+      {
+        "title": "写入标准错误（stderr）",
+        "explanation": "**`fprintf(stderr, \"Error: Something went wrong!\\n\");`** -- 这次向 **`stderr`（标准错误流）** 而非 `stdout` 发送消息。默认情况下 `stderr` 也连接到终端，所以视觉上与 `stdout` 没有区别。",
+        "visualizationType": "cMemory",
+        "code": "fprintf(stderr, \"Error: Something went wrong!\\n\");",
+        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!"
+      },
+      {
+        "title": "变量声明与输入提示",
+        "explanation": "**`int n;`** 和 **`fprintf(stdout, \"Enter a number: \");`** -- 声明用于接收用户输入的整型变量 `n`，并输出提示信息。只声明未初始化，所以 `n` 中是**垃圾值**，可视化中用 `???` 表示。",
+        "visualizationType": "cMemory",
+        "code": "int n;",
+        "highlightOffset": [0, 1],
+        "stack": [
+          {
+            "name": "n",
+            "type": "int",
+            "value": "???",
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: "
+      },
+      {
+        "title": "模拟输入",
+        "explanation": "**`n = 5;`** -- 实际上会用 `scanf(\"%d\", &n);` 从 **`stdin`**（连接键盘的标准输入）读取值，这里假设用户输入了 `5`。",
+        "visualizationType": "cMemory",
+        "code": "n = 5;",
+        "stack": [
+          {
+            "name": "n",
+            "type": "int",
+            "value": "5",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "输出输入值",
+        "explanation": "**`fprintf(stdout, \"You entered: %d\\n\", n);`** -- 通过 `stdout` 在屏幕上显示赋值的值。`%d` 被 `n` 的整数值 `5` 替换，输出 `\"You entered: 5\"`。",
+        "visualizationType": "cMemory",
+        "code": "fprintf(stdout, \"You entered: %d\\n\", n);",
+        "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: \nYou entered: 5"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "**`return 0;`** -- 程序正常终止时，三个标准流自动关闭，`stdout` 缓冲区中残留的数据也会全部输出（flush）。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "stdout": ""
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在终端执行 ./app > log.txt 时，屏幕上会显示什么？",
+    "options": [
+      "所有输出",
+      "通过 stdout 输出的内容",
+      "通过 stderr 输出的内容",
+      "什么都不显示"
+    ],
+    "correctIndex": 2,
+    "explanation": "`>` 运算符只将 stdout 重定向到文件。\nstderr 仍然输出到屏幕（终端），所以可以立即看到错误消息。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "有 printf 就够了，没必要用 fprintf。",
+      "correct": "学习文件 I/O 时需要 `fprintf(file, ...)` 的形式，区分 stdout/stderr 是系统编程的基础。",
+      "why": "要遵循 Unix 哲学（管道），流的分离是必不可少的。"
+    }
+  ],
+  "keyTakeaway": "stdin、stdout、stderr 是程序启动时自动打开的文件指针，通过它们与操作系统进行通信。"
+}

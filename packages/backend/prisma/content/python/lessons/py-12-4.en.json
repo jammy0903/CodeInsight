@@ -1,0 +1,284 @@
+{
+  "lessonId": "py-12-4",
+  "title": "raise and Custom Exceptions",
+  "concept": "Create your own errors and raise them yourself! raise and custom Exception classes",
+  "content": {
+    "code": "class AgeError(Exception):\n    def __init__(self, age):\n        self.age = age\n        super().__init__(f\"Invalid age: {age}\")\n\ndef check_age(age):\n    if age < 0 or age > 150:\n        raise AgeError(age)\n    return f\"Age {age} is valid\"\n\ntry:\n    result = check_age(200)\nexcept AgeError as e:\n    print(f\"Caught: {e}\")\n    print(f\"Invalid value was: {e.age}\")",
+    "steps": [
+      {
+        "title": "Custom Exception Class",
+        "explanation": "**`class AgeError(Exception):`** declares a custom exception specifically for age validation.\n\nKey points:\n- More meaningful than a generic `ValueError`\n- Can be caught precisely with `except AgeError`\n- Can carry the invalid value (e.g., age) within the exception object\n\n**Analogy**: Labeling a problem as \"age rule violation\" instead of just \"problem found\" makes handling much faster.\n\nPractical points:\n- Custom exceptions are useful for domain-specific validations (age, permissions, state transitions) and improve maintainability\n- Exception classes are typically written by inheriting from `Exception`",
+        "visualizationType": "pythonMemory",
+        "code": "class AgeError(Exception):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Custom exception class defined",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the Validation Function",
+        "explanation": "**`def check_age(age):`** -- Defines a function that validates age. A `function` object is created and labeled `check_age`.\n\nThe core logic of this function is **input validation**:\n- If `age < 0` or `age > 150` -> **raises AgeError**\n- If the age is valid -> returns a success message\n\n**What is `raise`?** If except **catches** errors, raise **intentionally throws** them.\n```python\nraise ErrorClass(args)  # Raise an error directly\n```\n\n**Analogy:** raise is like a referee's **red card** in soccer. When a player (code) commits a foul (bad input), the referee (raise) immediately stops the game and ejects the player (raises an error). Without the referee, fouls go unpunished and the game (program) becomes chaotic.\n\n**Python internals:** When a `def` statement executes, the function's bytecode is compiled into a code object. The `raise` statement compiles to the `RAISE_VARARGS` bytecode instruction. At this point, the function is only defined; its internal code is not executed.\n\n**Why use raise?** If bad input is silently ignored, bigger problems can occur later in unexpected places. **Immediately and clearly saying \"this value is not acceptable!\"** improves program stability. This is called the **\"Fail Fast\"** principle.\n\n**Execution order:** `def check_age(age):` -> function object created -> move to next line (try block)",
+        "visualizationType": "pythonMemory",
+        "code": "def check_age(age):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "check_age function defined",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Function Call -- Age Validation Begins",
+        "explanation": "**`result = check_age(200)`** -- Calls `check_age` with the argument **200** inside the try block.\n\nJumps into the function body. A new stack frame is created, and the parameter `age` is bound to the integer `200`.\n\n**`if age < 0 or age > 150:`** -- Evaluates the condition:\n- `200 < 0` -> **False** (200 is greater than 0)\n- `200 > 150` -> **True** (200 is greater than 150)\n- `False or True` -> **True** (`or` operation: if any operand is True, the whole expression is True)\n\n**Analogy:** Like an airport security checkpoint. The passport (age value) is checked: \"Is it expired (< 0) or forged (> 150)?\" A passport showing age 200 is clearly forged, so it won't pass!\n\n**Python internals:** The `or` operator uses **short-circuit evaluation**. If the left side is `True`, the right side isn't checked. In this case, the left side (`200 < 0`) is `False`, so the right side (`200 > 150`) is also evaluated. Since the condition is `True`, the if block's code executes.\n\n**Note:** Age 200 is realistically impossible. Such **business logic validation** must be implemented by the programmer. Python won't automatically determine that \"the age is too high.\"\n\n**Execution order:** `check_age(200)` called -> `age=200` bound -> `if 200 < 0 or 200 > 150:` -> True! -> enter if block",
+        "visualizationType": "pythonMemory",
+        "code": "    if age < 0 or age > 150:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "age=200, 200 > 150 -> condition True!",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 200,
+              "pyId": "4003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "raise -- Throwing an Error Directly!",
+        "explanation": "**`raise AgeError(age)`** -- The **raise** keyword directly raises an `AgeError(200)` exception!\n\nSeveral things happen in sequence on this single line:\n1. `AgeError(200)` -> calls the class's `__init__` method\n2. `self.age = 200` -> stores the invalid age value in the error object\n3. `super().__init__(\"Invalid age: 200\")` -> sets the error message to `\"Invalid age: 200\"`\n4. **raise** -> throws this error object!\n\n**Analogy:** It's like a firefighter pressing the fire alarm (raise) manually. Instead of an automatically detected fire (like ZeroDivisionError), the firefighter (programmer) personally discovers a dangerous situation (bad input) and sounds the alarm.\n\n**Python internals:** When the `raise` statement executes:\n1. `AgeError(200)` call creates an exception object on the heap\n2. The interpreter's error flag is set\n3. The remaining code in the current function (`return f\"Age {age} is valid\"`) is **not executed**\n4. The error propagates out of the function to **the caller (try block)**\n5. The try block searches for an except that can catch this error\n\n**Note:** You can also write just the **exception class** instead of an exception object after `raise`: `raise AgeError` (without arguments). In this case, it's default-constructed as `AgeError()`. However, passing arguments to carry information is recommended.\n\n**Execution order:** `AgeError(200)` object created -> `raise` executes -> skip remaining function code -> error propagates to caller's try block",
+        "visualizationType": "pythonMemory",
+        "code": "        raise AgeError(age)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "raise AgeError(200) - error raised!",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "age",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 200,
+              "pyId": "4003"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\"",
+              "pyId": "4004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "except Caught the Custom Exception!",
+        "explanation": "**`except AgeError as e:`** -- The AgeError raised from the `check_age` function is caught by this except block!\n\n**`as e`**: Binds the raised `AgeError` object to the variable `e`. `e` is now a label pointing to this error object.\n\n**Analogy:** It's like arresting a suspect (error) and writing a report (e). The report contains the suspect's name (error type), crime description (error message), and evidence (e.age).\n\n**Note:** When the `except` block ends, the variable `e` bound with `as e` is **automatically deleted** in Python 3! If you need to use `e` outside the except block, save it to a separate variable: `saved = e`\n\n**`print(f\"Caught: {e}\")`** -- When `e` is converted to string (`str(e)` or `f\"{e}\"`), the message passed to `super().__init__()` in `__init__` is returned: `\"Invalid age: 200\"`",
+        "visualizationType": "pythonMemory",
+        "code": "    print(f\"Caught: {e}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Caught: Invalid age: 200"
+          ],
+          "note": "AgeError caught! Error info accessible via e",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "e",
+              "pointsTo": "err1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\"",
+              "pyId": "4004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Accessing Error Object Attributes",
+        "explanation": "**`print(f\"Invalid value was: {e.age}\")`** -- Accesses the **`age` attribute** stored in the custom exception class using the dot (`.`) operator.\n\n`e.age` is **200**. This is because we stored it with `self.age = age` in `__init__`. This is the core value of custom exceptions!\n\n**Execution order (complete summary):**\n1. `class AgeError` -> custom exception class defined\n2. `def check_age` -> validation function defined\n3. `try:` -> exception monitoring starts\n4. `check_age(200)` -> function call, `age=200`\n5. `if 200 > 150:` -> condition True!\n6. `raise AgeError(200)` -> **error raised directly!**\n7. `except AgeError as e:` -> match success, bound to `e`\n8. `print(f\"Caught: {e}\")` -> error message output\n9. `print(f\"Invalid value was: {e.age}\")` -> custom attribute access\n\n**Analogy:** When writing a traffic accident report (error object), writing \"speeding accident at 200km/h\" (AgeError with age=200) is far more useful than just \"accident occurred\" (generic Exception). The detailed fields (e.age) in the report let you understand the exact situation.\n\n**Note:** Don't put too much logic in custom exceptions.",
+        "visualizationType": "pythonMemory",
+        "code": "    print(f\"Invalid value was: {e.age}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Invalid value was: 200"
+          ],
+          "note": "e.age = 200 (custom attribute access)",
+          "names": [
+            {
+              "name": "AgeError",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "check_age",
+              "pointsTo": "func1"
+            },
+            {
+              "name": "e",
+              "pointsTo": "err1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "<class AgeError(Exception)>",
+              "pyId": "4001"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<function check_age>",
+              "pyId": "4002"
+            },
+            {
+              "id": "err1",
+              "type": "AgeError",
+              "value": "\"Invalid age: 200\" (age=200)",
+              "pyId": "4004"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What is the role of the raise keyword?",
+    "options": [
+      "It catches and handles errors",
+      "It ignores errors and moves on",
+      "It directly raises an error",
+      "It prints an error message"
+    ],
+    "correctIndex": 2,
+    "explanation": "raise is a keyword that directly raises (throws) an exception. If except \"catches\" errors, raise \"throws\" them. It is used when the programmer intentionally wants to raise an error, such as when input values are invalid."
+  },
+  "keyTakeaway": "Use raise to throw errors yourself, and inherit from Exception to create custom error classes for more meaningful and information-rich error handling!"
+}

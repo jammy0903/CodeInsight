@@ -1,0 +1,498 @@
+{
+  "lessonId": "py-8-4",
+  "title": "itertools：高效迭代工具箱",
+  "concept": "学习`itertools`中的函数，简洁地处理无限计数、循环、连接等复杂迭代模式。",
+  "content": {
+    "code": "import itertools\n\n# 1. count: 무한 카운터\ncounter = itertools.count(start=10, step=2)\nprint(next(counter))\nprint(next(counter))\n\n# 2. cycle: 무한 순환\ncycler = itertools.cycle(['A', 'B', 'C'])\nprint(next(cycler))\nprint(next(cycler))\nprint(next(cycler))\nprint(next(cycler))\n\n# 3. chain: 여러 이터러블 연결\nchained = itertools.chain([1, 2], ['a', 'b'])\nfor item in chained:\n    print(item, end=' ')",
+    "steps": [
+      {
+        "title": "导入itertools模块",
+        "explanation": "**`import itertools`**\n\n从Python标准库导入**itertools**模块。\n\n**什么是itertools？**\n顾名思义，它是\"迭代器工具（iterator tools）\"的集合。\n在之前的课程中我们亲自构建了迭代器和生成器，itertools是常用迭代模式的**预制工具箱**。\n\n**itertools的3个核心工具（本课将学习的）：**\n1. `count()`：无限计数的计数器（没有尽头！）\n2. `cycle()`：无限循环列表的循环器\n3. `chain()`：将多个列表连接为一个的连接器\n\n**它们都返回迭代器！** 不是列表。因此不会预先计算值，需要时才逐个生成（惰性求值）。\n\n**类比**：打开工具箱，准备取出今天要用的3种工具。\n\n**执行顺序**：加载itertools模块(0x1500) → 注册到全局命名空间",
+        "visualizationType": "pythonMemory",
+        "code": "import itertools",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "itertools模块(0x1500)加载完成。",
+          "names": [
+            {
+              "name": "itertools",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建无限计数器 (count)",
+        "explanation": "**`counter = itertools.count(start=10, step=2)`**\n\n创建一个**无限计数器**！从10开始，每次递增2的迭代器。\n10, 12, 14, 16, 18, 20, ... **永不结束！**\n\n**与range()的区别：**\n- `range(10, 100, 2)`：有确定的终点(100)，**有限的**\n- `itertools.count(10, 2)`：没有终点，**无限的**！\n\n**为什么无限是可能的？**\ncount()是迭代器，所以不会预先创建值。\n每次调用next()时，只是计算\"当前值 + step\"并返回一个。\n内存中只存储了当前值(10)和步长(2)，所以即使无限生成，内存使用量也是恒定的！\n\n**注意**：在for循环中直接使用会导致无限循环！`for n in itertools.count(10, 2):` → 永远不会结束！\n所以必须用next()只取出需要的数量，或者一定要加入break条件。\n\n**执行顺序**：创建count迭代器对象(0x2000) → 内部状态：current=10, step=2",
+        "visualizationType": "pythonMemory",
+        "code": "counter = itertools.count(start=10, step=2)",
+        "pythonMemoryState": {
+          "note": "count迭代器(0x2000)已创建。（从10开始，每次加2）",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "iterator1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator1",
+              "type": "iterator",
+              "value": "count(10, 2)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "count第一个值 (10)",
+        "explanation": "**`print(next(counter))`**\n\n用`next()`函数从计数器中取出第一个值。起始值**10**被输出。\n\n**什么是next()函数？**\n`next(counter)`与`counter.__next__()`相同。\n它手动执行一次for循环内部自动做的事情。\n\n**count迭代器的内部操作：**\n1. 返回当前值(10)\n2. 更新内部状态：current = 10 + 2 = 12\n3. 准备好在下次next()调用时返回12\n\n**类比**：从无限取号机上取出第一张号码牌（10号）。下一张号码牌（12号）已经准备好了。\n\n**执行顺序**：调用next(counter) → 返回10 → 内部状态更新10 → 12 → print(10)",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(counter))",
+        "pythonMemoryState": {
+          "output": [
+            "10"
+          ],
+          "note": "输出10后，下一个值将是12。",
+          "objects": [
+            {
+              "id": "iterator1",
+              "type": "iterator",
+              "value": "count(12, 2)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "count第二个值 (12)",
+        "explanation": "**`print(next(counter))`**\n\n第二次next()调用。递增了step(2)后的**12**被输出。\n\n**count迭代器的状态变化：**\n- 初始：current = 10\n- 第1次：返回10 → current = 12\n- 第2次：返回12 → current = 14 ← 现在！\n- 第3次：返回14 → current = 16（继续调用就永远不会停）\n\n**无限迭代器的实用用法：**\ncount()通常与`zip()`一起用来添加索引，或用`islice()`来截取需要的数量。\n例如：`zip(itertools.count(1), ['a', 'b', 'c'])` → [(1, 'a'), (2, 'b'), (3, 'c')]\n\n**执行顺序**：调用next(counter) → 返回12 → 内部状态更新12 → 14 → print(12)",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(counter))",
+        "occurrence": 2,
+        "pythonMemoryState": {
+          "output": [
+            "12"
+          ],
+          "note": "输出12后，下一个值将是14。",
+          "objects": [
+            {
+              "id": "iterator1",
+              "type": "iterator",
+              "value": "count(14, 2)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建无限循环迭代器 (cycle)",
+        "explanation": "**`cycler = itertools.cycle(['A', 'B', 'C'])`**\n\n第二个工具：**cycle**——创建一个**无限循环**列表项的迭代器！\nA → B → C → A → B → C → A → B → C → ... 永远重复。\n\n**count()和cycle()的区别：**\n- count()：数字**持续增长**（10, 12, 14, 16, ...）\n- cycle()：列表**循环重复**（A, B, C, A, B, C, ...）\n\n**什么时候使用cycle？**\n- 重复星期几：`cycle(['周一', '周二', '周三', '周四', '周五', '周六', '周日'])`\n- 交替颜色：`cycle(['红色', '蓝色', '绿色'])`\n- 轮询调度：在多台服务器之间均匀分配请求\n\n**注意**：和count()一样是无限迭代器，在for循环中直接使用会导致无限循环！\n\n**类比**：像旋转门一样，到达末尾时自动回到开头。\n\n**执行顺序**：创建cycle迭代器对象(0x3000) → 内部存储['A', 'B', 'C']",
+        "visualizationType": "pythonMemory",
+        "code": "cycler = itertools.cycle(['A', 'B', 'C'])",
+        "pythonMemoryState": {
+          "note": "cycle迭代器(0x3000)已创建。",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle(['A', 'B', 'C'])",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "cycle第一个值 (A)",
+        "explanation": "**`print(next(cycler))`**\n\n从cycle迭代器中取出第一个值。列表的第一个元素**'A'**被输出。\n\n**cycle的内部指针：**\ncycle内部记住了\"当前指向哪里。\"\n当前：[**A**, B, C] ← 指向A\nnext()调用后：[A, **B**, C] ← 移动到B\n\n**类比**：旋转门经过第一个格（A）。下一个就是第二格（B）。\n\n**执行顺序**：调用next(cycler) → 返回'A' → 内部指针移向B → print('A')",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "pythonMemoryState": {
+          "output": [
+            "A"
+          ],
+          "note": "第一个元素'A'已返回。",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "cycle第二个值 (B)",
+        "explanation": "**`print(next(cycler))`**\n\n第二个值**'B'**被输出。内部指针移向C。\n\n**cycle状态**：[A, **B**, C] → 返回'B' → [A, B, **C**]\n\n**循环过程跟踪：**\n- 第1次：返回A（指针 → B）\n- 第2次：返回B（指针 → C）← 现在！\n- 第3次：返回C（指针 → ???）\n\n下次调用返回C后就到达列表末尾了。接下来会怎样呢？\n\n**执行顺序**：调用next(cycler) → 返回'B' → 内部指针移向C",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 2,
+        "pythonMemoryState": {
+          "output": [
+            "B"
+          ],
+          "note": "已输出'B'。",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "cycle第三个值 (C)",
+        "explanation": "**`print(next(cycler))`**\n\n第三个值**'C'**被输出。已到达列表的**最后一个元素**！\n\n**cycle状态**：[A, B, **C**] → 返回'C' → 到达末尾！\n\n**如果是普通迭代器呢？** 会抛出StopIteration然后结束。\n但cycle不一样！到达末尾时，它会**自动回到开头**。\n下次next()调用会再次产生'A'！\n\n**这就是它被叫做\"cycle（循环）\"的原因。**\n\n**执行顺序**：调用next(cycler) → 返回'C' → 内部指针到达列表末尾 → 回到开头",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 3,
+        "pythonMemoryState": {
+          "output": [
+            "C"
+          ],
+          "note": "已输出'C'。到达列表末尾。",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "cycle第四个值 - 循环 (A)",
+        "explanation": "**`print(next(cycler))`**\n\n**循环发生了！** 在列表末尾(C)之后，回到开头，**'A'**再次被输出！\n\n**完整循环模式：**\nA → B → C → **A**（现在！）→ B → C → A → B → C → ...\n第4次调用又出现了A。这就是无限循环。\n\n**cycle的内存行为：**\ncycle内部持有原始列表['A', 'B', 'C']的副本。\n到达末尾时只是回到这个副本的开头，因此无需额外内存就能实现无限重复。\n\n**实际应用示例：**\n```python\ncolors = itertools.cycle(['红色', '蓝色'])\nfor item in ['苹果', '香蕉', '葡萄', '橙子']:\n    print(f\"{item}: {next(colors)}\")\n# 苹果: 红色, 香蕉: 蓝色, 葡萄: 红色, 橙子: 蓝色\n```\n\n**执行顺序**：调用next(cycler) → 指针重置到开头 → 返回'A'",
+        "visualizationType": "pythonMemory",
+        "code": "print(next(cycler))",
+        "occurrence": 4,
+        "pythonMemoryState": {
+          "output": [
+            "A"
+          ],
+          "note": "回到开头，再次输出'A'。",
+          "names": [
+            {
+              "name": "cycler",
+              "pointsTo": "iterator2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator2",
+              "type": "iterator",
+              "value": "cycle object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "连接可迭代对象 (chain)",
+        "explanation": "**`chained = itertools.chain([1, 2], ['a', 'b'])`**\n\n第三个工具：**chain**——创建一个将**多个可迭代对象连接为一个**的迭代器！\n将[1, 2]和['a', 'b']连接起来，可以像遍历[1, 2, 'a', 'b']一样进行遍历。\n\n**与列表拼接(+)的区别：**\n- `[1, 2] + ['a', 'b']`：**创建新列表**存储在内存中 → O(n)内存\n- `chain([1, 2], ['a', 'b'])`：**只记住连接关系**，不创建新列表 → O(1)内存\n\nchain在第一个可迭代对象耗尽后自动切换到第二个。\n不复制数据，只是**逻辑上连接**，从而节省内存！\n\n**类比**：把两队人合并成一队。不用真的移动人，只需宣布\"这队走完了轮到那队。\"\n\n**执行顺序**：创建chain迭代器对象(0x4000) → 存储对[1, 2]和['a', 'b']的引用",
+        "visualizationType": "pythonMemory",
+        "code": "chained = itertools.chain([1, 2], ['a', 'b'])",
+        "pythonMemoryState": {
+          "output": [
+            "..."
+          ],
+          "note": "chain迭代器(0x4000)已创建。按[1, 2] -> ['a', 'b']的顺序连接。",
+          "names": [
+            {
+              "name": "chained",
+              "pointsTo": "iterator3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator3",
+              "type": "iterator",
+              "value": "chain object",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环 - 第一个值 (1)",
+        "explanation": "**`for item in chained:`**\n\nfor循环开始遍历chain迭代器。\nchain从第一个可迭代对象[1, 2]开始遍历，所以第一个值**1**被赋给item。\n\n**chain的遍历顺序：**\n[**1**, 2] → ['a', 'b']\n从第一个列表的第一个元素开始。\n\n**chain内部做的事情：**\n1. 获取第一个可迭代对象([1, 2])的迭代器\n2. 对该迭代器调用next()逐个取出值\n3. 第一个耗尽后自动切换到第二个可迭代对象(['a', 'b'])\n4. 全部耗尽后抛出StopIteration\n\n**执行顺序**：chain.__next__() → 从第一个列表取出1 → item = 1",
+        "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
+        "pythonMemoryState": {
+          "note": "从第一个列表取出了1。",
+          "names": [
+            {
+              "name": "chained",
+              "pointsTo": "iterator3"
+            },
+            {
+              "name": "item",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator3",
+              "type": "iterator",
+              "value": "chain object",
+              "pyId": "1004"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 1,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出 (1)",
+        "explanation": "**`print(item, end=' ')`**\n\n打印chain的第一个值**1**。使用`end=' '`用空格分隔。\n\n**进度**：[**1** 完成, 2] → ['a', 'b']——第一个列表的第一个元素处理完毕\n\n**执行顺序**：执行print(1, end=' ') → 输出\"1 \"",
+        "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "1"
+          ],
+          "note": "已输出1。",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 1,
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环 - 第二个值 (2)",
+        "explanation": "**`for item in chained:`**（第二次迭代）\n\n第一个列表[1, 2]的第二个值**2**被赋给item。\n这是第一个列表的**最后一个元素**。\n\n**进度**：[1 完成, **2**] → ['a', 'b']\n下次next()调用时，第一个列表将被耗尽，chain会自动切换到第二个列表。\n\n**执行顺序**：chain.__next__() → 从第一个列表取出2 → item = 2",
+        "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
+        "pythonMemoryState": {
+          "note": "从第一个列表取出了2。",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出 (2)",
+        "explanation": "**`print(item, end=' ')`**\n\n打印第一个列表的最后一个值**2**。\n\n**进度**：[1 完成, 2 完成] → ['a', 'b']——第一个列表耗尽！接下来：切换到第二个列表\n\n**这个切换是chain的核心行为。** 用户（for循环）完全不知道列表发生了切换，只是不断接收连续的值。\n\n**执行顺序**：执行print(2, end=' ') → 输出\"2 \"",
+        "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "2"
+          ],
+          "note": "已输出2。第一个列表结束。",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 2,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环 - 第三个值 (a)",
+        "explanation": "**`for item in chained:`**（第三次迭代——列表切换！）\n\n**自动切换发生！** 由于第一个列表[1, 2]已耗尽，chain切换到第二个列表['a', 'b']。\n第二个列表的第一个元素**'a'**被赋给item。\n\n**进度**：[1 完成, 2 完成] → [**'a'**, 'b']\n\n**chain的精髓**：这个切换是完全自动且透明的。\n从for循环的角度来看，就像1, 2, 'a', 'b'按顺序出来一样。\n就像遍历一个单独的列表[1, 2, 'a', 'b']一样的体验！\n\n**但在内部**：两个独立的列表保持在原位，chain只是移动了指针。没有创建新列表。\n\n**执行顺序**：第一个列表StopIteration → 切换到第二个列表 → 取出'a' → item = 'a'",
+        "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
+        "pythonMemoryState": {
+          "note": "切换到第二个列表，取出了'a'。",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "'a'",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出 (a)",
+        "explanation": "**`print(item, end=' ')`**\n\n打印第二个列表的第一个值**'a'**。\n\n**到目前为止的输出**：\"1 2 a \"——数字和字符串混在一起，但由于chain的作用，它们像来自一个序列一样自然地连接在一起。\n\n**进度**：[1 完成, 2 完成] → ['a' 完成, 'b']——还剩一个！\n\n**执行顺序**：执行print('a', end=' ') → 输出\"a \"",
+        "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "a"
+          ],
+          "note": "已输出'a'。",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "'a'",
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环 - 第四个值 (b)",
+        "explanation": "**`for item in chained:`**（第四次迭代——最后一次！）\n\n第二个列表的最后一个元素**'b'**被赋给item。\n\n**进度**：[1 完成, 2 完成] → ['a' 完成, **'b'**]——这是最后一个值！\n\n下次next()调用时，第二个列表也将耗尽，chain中连接的所有可迭代对象都被用完。\n抛出StopIteration，for循环终止。\n\n**执行顺序**：chain.__next__() → 从第二个列表取出'b' → item = 'b'",
+        "visualizationType": "pythonMemory",
+        "code": "for item in chained:",
+        "pythonMemoryState": {
+          "note": "'b'已赋值。",
+          "names": [
+            {
+              "name": "item",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "'b'",
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出 (b) - 循环结束",
+        "explanation": "**`print(item, end=' ')`**\n\n打印最后一个值**'b'**，循环终止。\n\n**最终输出**：\"1 2 a b \"——两个列表被连接为一个连续的序列输出！\n\n**本课三个工具的总结：**\n\n**核心要点**：itertools的所有函数都返回**迭代器（生成器）**。\n它们不预先创建值，而是按需计算，即使处理大量数据也保持内存高效。\n\n**更多itertools工具**：`islice()`（切片）、`takewhile()`（条件提取）、`groupby()`（分组）、`product()`（组合）等众多工具！\n\n**执行顺序**：执行print('b') → chain中所有可迭代对象耗尽 → StopIteration → for循环终止",
+        "visualizationType": "pythonMemory",
+        "code": "print(item, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "b"
+          ],
+          "note": "所有连接的数据已遍历完毕，循环结束。",
+          "names": [
+            {
+              "name": "chained",
+              "pointsTo": "iterator3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "iterator3",
+              "type": "iterator",
+              "value": "chain object",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "`itertools.cycle('XYZ')`迭代器第4次产生的值是什么？",
+    "options": [
+      "X",
+      "Y",
+      "Z",
+      "报错"
+    ],
+    "correctIndex": 0,
+    "explanation": "`cycle`到达序列末尾后会回到开头。\n顺序是X -> Y -> Z -> X，所以第4个值是X。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "`itertools`返回列表。",
+      "correct": "不是的。\n它返回迭代器（生成器）。",
+      "why": "`itertools`的核心是通过'惰性（lazy）'方式节省内存——不预先创建所有值，而是在需要时逐个计算。"
+    }
+  ],
+  "keyTakeaway": "`itertools`是实现快速、内存高效迭代的最佳工具。遇到复杂的`for`循环时，先想想`itertools`能否解决。"
+}

@@ -1,0 +1,671 @@
+{
+  "lessonId": "py-6-4",
+  "title": "Class Variable Sharing Trap",
+  "concept": "Class variables are shared by all instances - mutable objects lead to disaster!",
+  "content": {
+    "code": "class Student:\n    grades = []  # 클래스 변수 - 함정!\n    \n    def add_grade(self, grade):\n        self.grades.append(grade)\n\ns1 = Student()\ns2 = Student()\n\ns1.add_grade(90)\ns2.add_grade(80)\n\nprint(f\"s1: {s1.grades}\")\nprint(f\"s2: {s2.grades}\")\nprint(f\"같은 객체? {s1.grades is s2.grades}\")",
+    "steps": [
+      {
+        "title": "Student Class Definition",
+        "explanation": "**`class Student:`**\n\nPython executes code from top to bottom in order. We define the `Student` class (student blueprint).\n\n**Goal of this lesson -- Discovering the dangerous trap of class variables!** In the previous lesson, we learned that instance variables (`self.count`) are independent for each object. But if you misuse **class variables**, all instances share the same data, causing serious bugs! Especially when using **mutable objects (lists, dictionaries)** as class variables, disaster strikes.\n\n**Analogy**: This lesson shows \"what happens when everyone writes their grades on a shared whiteboard.\" If you write on the communal whiteboard (class variable) instead of your own notebook (instance variable), everyone's grades get mixed together -- a total disaster!\n\n**Why this order?** The class must be defined first before class variables and methods can be added.\n\n**Execution order**: Execute class Student --> Begin creating Student class object --> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Student:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Class definition begins",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Class Variable Definition (Warning: Trap!)",
+        "explanation": "**`grades = []`**\n\nThis is the **trap**! `grades = []` defined in the class body without `self` is a **class variable**. All Student instances **share this single list**!\n\n**The core of the problem:**\n- When this line executes, only **one** empty list object is created (memory address 0x1500)\n- This list is stored in `Student.__dict__['grades']`\n- Later, whether s1.grades or s2.grades, **they all point to the same 0x1500 list**\n- When one student adds a grade, **it's visible to all other students!**\n\n**Why is this dangerous?** An **immutable string** like `species = \"Canis familiaris\"` is safe as a class variable. Because changing the value creates a new object. But **mutable objects** like **lists and dictionaries** can be **directly modified in place** with `.append()`, `[key] = val`, etc., affecting all places that share them!\n\n**The correct approach (preview):**\n```python\ndef __init__(self):\n    self.grades = []  # Independent list for each instance!\n```\n\n**Why this order?** Executed sequentially within the class body.\n\n**Execution order**: Execute grades = [] --> Create empty list object 0x1500 --> Student.__dict__['grades'] = 0x1500 --> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "grades = []  # 클래스 변수 - 함정!",
+        "pythonMemoryState": {
+          "note": "Warning: List created as class variable (only one exists!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "add_grade Method Definition",
+        "explanation": "**`def add_grade(self, grade):`**\n\nDefines a method to add grades.\n\n**Meaning of `self.grades.append(grade)`**:\n1. Look up `self.grades` --> Search in the instance\n2. If not in the instance --> **Search in class variable** (0x1500)\n3. `append(grade)` --> **Modifies the same list**\n\n**Core problem**: Since `self.grades` points to the class variable, **all instances modify the same list**!\n\n**Why this order?** After defining the class variable, methods are defined in order.\n\n**Execution order**: Execute def add_grade --> Register add_grade method --> Student class definition complete --> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "def add_grade(self, grade):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "add_grade method defined",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with grades, add_grade>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the First Student",
+        "explanation": "**`s1 = Student()`**\n\nCreates the first Student object.\n\n**Important**: Since there is no `__init__` method, only the object is created and **no instance variables are added**.\n\n**Where does s1.grades point to?**\n- The s1 object itself has no grades attribute\n- Python finds the **class variable** `Student.grades` (0x1500)\n- Therefore `s1.grades` --> 0x1500 list\n\n**Why this order?** After class definition completes, the next line executes in order.\n\n**Execution order**: Call Student() --> Create object 0x2000 (no grades) --> s1 = 0x2000 --> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "s1 = Student()",
+        "pythonMemoryState": {
+          "note": "s1 created (grades references class variable 0x1500)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object (no instance vars)>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Second Student",
+        "explanation": "**`s2 = Student()`**\n\nCreates the second Student object.\n\n**Where does s2.grades point to?**\n- The s2 object itself also has no grades attribute\n- Python finds the **same class variable** `Student.grades` (0x1500)\n- Therefore `s2.grades` --> **0x1500 list** (same as s1!)\n\n**Key point**:\n- s1 object: 0x2000\n- s2 object: 0x3000 (different from s1)\n- But `s1.grades` and `s2.grades` **point to the same 0x1500**!\n\n**Why this order?** After s1 creation completes, the next line executes in order.\n\n**Execution order**: Call Student() --> Create object 0x3000 (no grades) --> s2 = 0x3000 --> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "s2 = Student()",
+        "pythonMemoryState": {
+          "note": "s2 created (both s1 and s2 reference the same 0x1500!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "s1.add_grade(90) Call",
+        "explanation": "**`s1.add_grade(90)`**\n\nCalls the add_grade method on the s1 object.\n\n**What goes into self?**\n- `self` = `s1` (0x2000 object)\n\n**Why this order?** After s2 creation completes, the next line executes in order.\n\n**Execution order**: Call s1.add_grade(90) --> Jump to line 5 --> self=s1, grade=90",
+        "visualizationType": "pythonMemory",
+        "code": "s1.add_grade(90)",
+        "pythonMemoryState": {
+          "note": "s1.add_grade(90) called --> about to jump to line 5",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Warning: 90 Added to Class Variable List",
+        "explanation": "**`self.grades.append(grade)`**\n\n**Attribute lookup order** (important!):\n1. Try to find `self.grades`\n2. Search in s1 (0x2000) object --> **Not found!**\n3. **Search in class Student** --> Student.grades (0x1500) found!\n4. Execute `0x1500.append(90)`\n\n**Result**: The class variable list is changed to `[90]`.\n\n**Problem**: We didn't modify an s1-only list -- we modified a **list shared by all instances**!\n\n**Why this order?** Jumped here from the method call (line 10).\n\n**Execution order**: self.grades --> Student.grades (0x1500) --> append(90) --> [90] --> Return to line 10 --> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "self.grades.append(grade)",
+        "pythonMemoryState": {
+          "note": "Warning: Class variable changed to [90] (affects all instances!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1"
+            },
+            {
+              "name": "grade",
+              "pointsTo": "parameter2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ s1 (0x2000)",
+              "pyId": "1005"
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "90",
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "s2.add_grade(80) Call",
+        "explanation": "**`s2.add_grade(80)`**\n\nCalls the add_grade method on the s2 object.\n\n**What goes into self?**\n- `self` = `s2` (0x3000 object)\n\n**Why this order?** After the previous method call completes, the next line executes in order.\n\n**Execution order**: Call s2.add_grade(80) --> Jump to line 5 --> self=s2, grade=80",
+        "visualizationType": "pythonMemory",
+        "code": "s2.add_grade(80)",
+        "pythonMemoryState": {
+          "note": "s2.add_grade(80) called --> about to jump to line 5",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90]",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Warning: 80 Added to the Same Class Variable List",
+        "explanation": "**`self.grades.append(grade)`**\n\n**Attribute lookup order** (again!):\n1. Try to find `self.grades`\n2. Search in s2 (0x3000) object --> **Not found!**\n3. **Search in class Student** --> Student.grades (0x1500) found!\n4. Execute `0x1500.append(80)`\n\n**Result**: The **same** class variable list is changed to `[90, 80]`.\n\n**Critical problem**:\n- Contains the 90 that s1 added\n- Not s2-only -- modified a **list shared by all instances**\n- s1.grades also becomes [90, 80]!\n\n**Why this order?** Jumped here from the method call (line 11).\n\n**Execution order**: self.grades --> Student.grades (0x1500) --> append(80) --> [90, 80] --> Return to line 11 --> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "self.grades.append(grade)",
+        "pythonMemoryState": {
+          "note": "Warning: Class variable changed to [90, 80] (s1 also affected!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter3"
+            },
+            {
+              "name": "grade",
+              "pointsTo": "parameter4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90, 80]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "→ s2 (0x3000)",
+              "pyId": "1007"
+            },
+            {
+              "id": "parameter4",
+              "type": "parameter",
+              "value": "80",
+              "pyId": "1008"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Warning: Checking s1's Grades (Surprising Result!)",
+        "explanation": "**`print(f\"s1: {s1.grades}\")`**\n\nAccesses the grades attribute of the s1 object and prints it.\n\n**Attribute lookup**:\n1. Search for grades in s1 (0x2000) object --> **Not found!**\n2. Find in class Student.grades (0x1500) --> **Found!**\n3. Return `0x1500` list --> `[90, 80]`\n\n**Surprising result**: s1 only added 90, but it **also contains the 80 that s2 added**!\n\n**Why did this happen?**\n- s1.grades and s2.grades **point to the same 0x1500**\n- When s2 adds 80, it becomes visible to s1 too!\n\n**Why this order?** After all method calls complete, the next line executes in order.\n\n**Execution order**: s1.grades --> Student.grades (0x1500) --> Read [90, 80] --> Evaluate f-string --> Execute print --> line 14",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"s1: {s1.grades}\")",
+        "pythonMemoryState": {
+          "output": [
+            "s1: [90, 80]"
+          ],
+          "note": "Warning: s1 only added 90 but 80 is also there! (class variable sharing)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90, 80]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Warning: Checking s2's Grades (Same Result!)",
+        "explanation": "**`print(f\"s2: {s2.grades}\")`**\n\nAccesses the grades attribute of the s2 object and prints it.\n\n**Attribute lookup**:\n1. Search for grades in s2 (0x3000) object --> **Not found!**\n2. Find in class Student.grades (0x1500) --> **Found!**\n3. Return `0x1500` list --> `[90, 80]`\n\n**Same result**: s2 also only added 80, but it **also contains the 90 that s1 added**!\n\n**Key problem**:\n- s1.grades = 0x1500\n- s2.grades = 0x1500 <-- **the exact same object!**\n- One student's grades are shared with the other student!\n\n**Why this order?** After the previous print completes, the next line executes in order.\n\n**Execution order**: s2.grades --> Student.grades (0x1500) --> Read [90, 80] --> Evaluate f-string --> Execute print --> line 15",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"s2: {s2.grades}\")",
+        "pythonMemoryState": {
+          "output": [
+            "s2: [90, 80]"
+          ],
+          "note": "Warning: s2 also has the same [90, 80]! (same class variable reference)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90, 80]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Object Identity Check (Proof!)",
+        "explanation": "Object identity checking is about distinguishing between `==` and `is`.\n\n- `==`: Are the values equal?\n- `is`: Are they the same object (same reference)?\n\n**Analogy**: Think of two chairs with the same design (== True, is False) versus the same chair referred to by two names (is True).\n\nWhen debugging, `is` is especially powerful for finding aliasing problems (unintended object sharing).",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"같은 객체? {s1.grades is s2.grades}\")",
+        "pythonMemoryState": {
+          "output": [
+            "같은 객체? True"
+          ],
+          "note": "s1.grades is s2.grades --> True (the exact same 0x1500!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90, 80]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens when you use a list as a class variable?",
+    "options": [
+      "Each instance gets its own independent list",
+      "All instances share the same list",
+      "An error occurs",
+      "It gets automatically copied"
+    ],
+    "correctIndex": 1,
+    "explanation": "Class variables exist only once on the class and are shared by all instances.\nWith mutable objects (lists, dictionaries), unintended sharing occurs!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Defining inside a class means each instance owns it",
+      "correct": "Definitions at the class level (outside methods) become shared class variables",
+      "why": "Instance variables must be created with self.x = inside __init__."
+    },
+    {
+      "wrong": "Class variables should never be used",
+      "correct": "They are useful for constants or shared configuration; just be careful with mutable objects",
+      "why": "Immutable values like species = 'Dog' are fine.\nJust avoid [] and {}."
+    }
+  ],
+  "keyTakeaway": "Don't use [] or {} as class variables! Use self.x = [] in __init__ to make them instance variables!"
+}

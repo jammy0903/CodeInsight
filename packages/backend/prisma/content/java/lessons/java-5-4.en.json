@@ -1,0 +1,115 @@
+{
+  "lessonId": "java-5-4",
+  "title": "static Methods",
+  "concept": "A static method is a 'utility function' that can be called without an object.",
+  "content": {
+    "code": "class MathUtil {\n    static int add(int a, int b) {\n        return a + b;\n    }\n    \n    int instanceValue = 10;\n    \n    static void tryAccess() {\n        // System.out.println(instanceValue); // Error!\n    }\n}\n\nint result = MathUtil.add(3, 5);\nSystem.out.println(result);",
+    "steps": [
+      {
+        "title": "Using a static Method",
+        "explanation": "**Execution flow:**\n1. Calls `MathUtil.add(3, 5)`.\n2. A new frame for the `add` method is created on the Stack.\n3. `a=3` and `b=5` are stored in that frame.\n\n**Toolbox:**\nNo need to create a `MathUtil` object (`new`).\nIt feels like grabbing a tool (`add`) straight from the toolbox (`MathUtil`).",
+        "visualizationType": "javaMemory",
+        "code": "static int add(int a, int b) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          11
+        ],
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "MathUtil.add",
+              "value": "Method"
+            }
+          ],
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "a",
+              "value": "3",
+              "frame": "add",
+              "type": "int"
+            },
+            {
+              "name": "b",
+              "value": "5",
+              "frame": "add",
+              "type": "int"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Returning the Result and Printing",
+        "explanation": "**Execution flow:**\n1. Returns `8` and the `add` stack frame is removed.\n2. The value `8` is stored in the `result` variable in the `main` frame.\n3. Prints to the screen.\n\n**Clean exit:**\nSince it doesn't touch any object state, it vanishes without a trace after use.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(result);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "result",
+              "value": "8",
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "8"
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "Access Restriction (static -> instance)",
+        "explanation": "**Execution flow:**\n1. Uncommenting this line would cause a compile error.\n\n**An existential paradox:**\n`tryAccess()` can run without `new`, but `instanceValue` only comes into existence when `new` is called.\nIt's like trying to call a friend who hasn't been born yet -- impossible.",
+        "visualizationType": "javaMemory",
+        "code": "static void tryAccess() {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "error": "Cannot access instance member from static context",
+          "output": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When is using a static method most appropriate?",
+    "options": [
+      "When you need to modify each object's state (fields).",
+      "When it's a utility function that operates only on input values.",
+      "When implementing polymorphism through overriding.",
+      "When initializing objects instead of using constructors."
+    ],
+    "correctIndex": 1,
+    "explanation": "Functions like `Math.max()` or `Arrays.sort()` that operate purely on input values without relying on object state are best made `static`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can use 'this' inside a static method.",
+      "correct": "Absolutely not.",
+      "why": "`this` refers to 'the current object', but at the time a `static` method runs, there may be no 'current object' at all."
+    },
+    {
+      "wrong": "static methods can be overridden.",
+      "correct": "They cannot.\nOnly 'hiding' is possible.",
+      "why": "Overriding relies on looking at the object's runtime type, but static methods are resolved at compile time based on the variable's declared type."
+    }
+  ],
+  "keyTakeaway": "A static method is an 'independent tool'. It has no 'this' and cannot access instance variables."
+}

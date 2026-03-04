@@ -1,0 +1,125 @@
+{
+  "lessonId": "java-5-2",
+  "title": "final 类与方法",
+  "concept": "final 类禁止继承，final 方法禁止重写。",
+  "content": {
+    "code": "final class ImmutablePoint {\n    private final int x, y;\n    \n    public ImmutablePoint(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n    \n    public final int getX() { return x; }\n}\n\n// class ExtendedPoint extends ImmutablePoint {}  // 错误！\n\nclass Parent {\n    public final void cannotOverride() {\n        System.out.println(\"Cannot override this!\");\n    }\n}\n\nclass Child extends Parent {\n    // public void cannotOverride() {}  // 错误！\n}",
+    "steps": [
+      {
+        "title": "声明 final 类",
+        "explanation": "**执行流程：**\n1. `ImmutablePoint` 类被加载。\n2. 类的元数据被标记为"禁止继承（final）"。\n\n**到此为止：**\n`final class` 不能有子类。\n`String` 和 `System` 就是典型的例子。",
+        "visualizationType": "javaMemory",
+        "code": "final class ImmutablePoint {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [
+            {
+              "name": "ImmutablePoint",
+              "value": "Class (final)"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "初始化 final 字段",
+        "explanation": "**执行流程：**\n1. 创建对象（`new`）并调用构造函数。\n2. 在构造函数内部为字段 `x` 和 `y` 赋值。\n3. 构造函数结束的那一刻，这些字段就被"冻结"了，再也无法更改。\n\n**类比**：用铅笔写在纸上的（普通变量）可以用橡皮擦掉，但刻在石头上的（final）无法修改。\n\n**完美的不可变性：**\n没有 setter，所有字段都是 `final`，这个对象会永远保持创建时的状态。",
+        "visualizationType": "javaMemory",
+        "code": "private final int x, y;",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "x: 10, y: 20",
+              "type": "ImmutablePoint",
+              "new": true
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "声明 final 方法",
+        "explanation": "**执行流程：**\n1. 加载方法信息时，标记为"禁止重写（final）"。\n\n**固执的方法：**\n"我的逻辑是完美的——别动它！"子类虽然继承了这个方法，但不能修改其实现。",
+        "visualizationType": "javaMemory",
+        "code": "public final int getX() { return x; }",
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "ImmutablePoint.getX()",
+              "value": "Method (final)"
+            }
+          ]
+        }
+      },
+      {
+        "title": "普通类中的 final 方法",
+        "explanation": "**执行流程：**\n1. `Parent` 是普通类，允许继承。\n2. 但 `cannotOverride` 方法是 `final` 的，子类无法更改其实现。\n\n**选择性保护：**\n不需要锁定整个类——当你只想保护特定核心功能时使用。",
+        "visualizationType": "javaMemory",
+        "code": "class Parent {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "Parent",
+              "value": "Class"
+            },
+            {
+              "name": "Parent.cannotOverride()",
+              "value": "Method (final)"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Java 中如何阻止继承？",
+    "options": [
+      "将类声明为 private。",
+      "将类声明为 final。",
+      "将类声明为 static。",
+      "将类声明为 abstract。"
+    ],
+    "correctIndex": 1,
+    "explanation": "在类前面加上 `final` 意味着它是"最后一个类"——不能再有子类了。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "final 方法也不能重载（Overloading）。",
+      "correct": "重载是可以的！",
+      "why": "只是禁止了重写（Override，即覆盖相同方法签名），创建同名但参数不同的新方法（重载 Overloading）完全没问题。"
+    },
+    {
+      "wrong": "abstract 方法也可以加 final。",
+      "correct": "绝对不行。\n这是矛盾的。",
+      "why": "`abstract` 意味着"子类必须实现（重写）"，而 `final` 意味着"不要重写"。它们是完全相反的概念。"
+    }
+  ],
+  "keyTakeaway": "final 类断绝了继承关系，final 方法防止逻辑被修改。"
+}

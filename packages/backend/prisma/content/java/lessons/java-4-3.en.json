@@ -1,0 +1,172 @@
+{
+  "lessonId": "java-4-3",
+  "title": "String Pool and intern()",
+  "concept": "The String Pool is a memory region that caches frequently used strings.",
+  "content": {
+    "code": "String s1 = \"Hello\";\nString s2 = \"Hello\";\nString s3 = new String(\"Hello\");\nString s4 = s3.intern();\n\nSystem.out.println(s1 == s2);\nSystem.out.println(s1 == s3);\nSystem.out.println(s1 == s4);",
+    "steps": [
+      {
+        "title": "First Literal (\"Hello\")",
+        "explanation": "**Execution flow:**\n1. JVM encounters the `\"Hello\"` literal.\n2. Checks if \"Hello\" exists in the String Pool (it doesn't).\n3. Creates and registers a \"Hello\" object in the Pool.\n4. `s1` points to that address (assume `Pool[0]`).\n\n**Role of the Pool:**\nIt's a 'shared warehouse' that stores frequently used strings.",
+        "visualizationType": "javaMemory",
+        "code": "String s1 = \"Hello\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Literal Reuse",
+        "explanation": "**Execution flow:**\n1. JVM encounters another `\"Hello\"` literal.\n2. Checks the Pool -> \"Oh, we already have one!\"\n3. Instead of creating a new one, gives the existing `Pool[0]` address to `s2`.\n\n**Key point:**\nWhen you use literals (`\"...\"`), the JVM always checks the Pool first and reuses existing entries.\nThis is the #1 contributor to memory savings.",
+        "keyInsight": "Same literal = same address (reuse)",
+        "visualizationType": "javaMemory",
+        "code": "String s2 = \"Hello\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "note": "s1 == s2 (same address)"
+        }
+      },
+      {
+        "title": "new String() - Forced Creation",
+        "explanation": "**Execution flow:**\n1. `new String(...)` is executed.\n2. Bypasses the Pool and **unconditionally creates a new object** (`Heap[0]`) on the Heap.\n3. `s3` points to this new object.\n\n**Analogy:**\nIf the Pool is a 'shared water fountain', then `new String` is 'buying expensive bottled water'.\nThe water (content) tastes the same, but it's a completely different bottle.",
+        "keyInsight": "new String() = no reuse (Heap allocation)",
+        "visualizationType": "javaMemory",
+        "code": "String s3 = new String(\"Hello\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "s3",
+              "value": "-> Heap[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello\"",
+              "type": "String",
+              "new": true
+            }
+          ],
+          "note": "Not in the Pool! Created separately on the Heap",
+          "stringPool": null
+        }
+      },
+      {
+        "title": "intern() - Finding the Pool Entry",
+        "explanation": "**Execution flow:**\n1. Takes the content of `s3` (\"Hello\") and goes to the Pool.\n2. \"Is there an entry with the same content in the Pool?\"\n3. \"Yes, at `Pool[0]`.\"\n4. Returns that address (`Pool[0]`) and stores it in `s4`.\n\n`intern()` checks if the Pool already has a string with the same content as the Heap string -- if so, it returns the Pool address (if not, it registers it in the Pool and returns the new address).",
+        "keyInsight": "intern() = convert to Pool address",
+        "visualizationType": "javaMemory",
+        "code": "String s4 = s3.intern();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s4",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "note": "s4 now points to the same location as s1"
+        }
+      },
+      {
+        "title": "s1 == s2 Comparison",
+        "explanation": "Both come from the Pool.\nThey share the same address.\n-> `true`",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1 == s2);",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "stringPool": null,
+          "note": null
+        }
+      },
+      {
+        "title": "s1 == s3 Comparison",
+        "explanation": "`s1` (Pool) and `s3` (Heap) live in different neighborhoods.\nAddress mismatch.\n-> `false`",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1 == s3);",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ]
+        }
+      },
+      {
+        "title": "s1 == s4 Comparison",
+        "explanation": "Thanks to `intern()`, `s4` also obtained a Pool address.\nIt matches `s1`'s address.\n-> `true`",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1 == s4);",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which code could potentially create 2 String objects in memory?",
+    "options": [
+      "String s = \"A\";",
+      "String s = \"A\" + \"B\";",
+      "String s = new String(\"A\");",
+      "String s = s1;"
+    ],
+    "correctIndex": 2,
+    "explanation": "`new String(\"A\")` first creates a Pool entry for the literal \"A\" (if it doesn't exist), then copies that value to create another object on the Heap.\nSo it can create up to 2 objects -- an inefficient pattern."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Is the String Pool also part of Heap memory?",
+      "correct": "Yes, it is.\n(Since Java 7)",
+      "why": "Before Java 7, it was in a special area called PermGen, which frequently ran out of space causing errors. It was moved to the regular Heap.\nNow unused strings can be collected by the GC (garbage collector)."
+    }
+  ],
+  "keyTakeaway": "Use literals (\"...\") to benefit from the Pool. Avoid new String()."
+}

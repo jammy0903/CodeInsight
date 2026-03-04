@@ -1,0 +1,279 @@
+{
+  "lessonId": "py-10-2",
+  "title": "线程 vs 多进程：绕过GIL",
+  "concept": "要提升CPU密集型任务的性能，应该使用多进程（multiprocessing），它创建独立的进程和内存空间，而不是受GIL约束的线程。",
+  "content": {
+    "code": "import multiprocessing\nimport time\n\nCOUNT = 50_000_000\n\ndef countdown():\n    n = COUNT\n    while n > 0:\n        n -= 1\n\nif __name__ == '__main__':\n    # 1. 싱글 프로세스로 실행\n    start = time.time()\n    countdown()\n    duration = time.time() - start\n    print(f\"Single process: {duration:.4f}s\")\n\n    # 2. 두 개의 프로세스로 실행\n    p1 = multiprocessing.Process(target=countdown)\n    p2 = multiprocessing.Process(target=countdown)\n\n    start = time.time()\n    p1.start()\n    p2.start()\n    p1.join()\n    p2.join()\n    duration = time.time() - start\n    print(f\"Two processes: {duration:.4f}s\")",
+    "steps": [
+      {
+        "title": "导入模块",
+        "explanation": "**`import multiprocessing` / `import time`**\n\n**导入用于多进程和时间测量的模块。**\n\n**`multiprocessing` 与 `threading` 的核心区别：**\n- `threading`：一个进程内多个线程**共享**内存（受GIL约束）\n- `multiprocessing`：创建完全独立的进程，每个进程拥有**独立的内存**和**独立的GIL**\n\n**类比**：如果 `threading` 是"同一办公室的多个员工"，那么 `multiprocessing` 就是"在各自独立办公室工作的员工"。\n- 线程：共享同一块白板（内存）-> 有冲突风险，但沟通快\n- 进程：各自使用自己的白板 -> 安全，但通信（IPC）慢\n\n**内部原理**：`multiprocessing` 模块加载后，`Process`、`Pool`、`Queue` 等用于进程创建的类变得可用。\n\n**为什么是这个顺序？** 必须先导入工具（模块）才能使用。\n\n**注意**：`multiprocessing` 会创建全新的Python解释器，因此创建成本比 `threading` 高得多。",
+        "visualizationType": "pythonMemory",
+        "code": "import multiprocessing",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "multiprocessing 模块准备就绪。",
+          "names": [
+            {
+              "name": "multiprocessing",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义CPU密集型函数",
+        "explanation": "**`def countdown():`**\n\n**定义一个CPU密集型的任务函数。** 从5000万（50,000,000）倒数到0，这是一个简单但耗时的任务。\n\n**为什么使用这种函数？**\n- 这是纯CPU任务，不是I/O操作（文件读取、网络）\n- 这是受GIL影响最大的任务类型\n- 可以清楚地展示线程和多进程之间的性能差异\n\n**类比**：就像一个一个地数5000万颗石头。这项工作没有等待时间，纯粹只使用大脑（CPU）。\n\n**内部原理**：`countdown` 函数对象（0x1100）被创建。`while` 循环中的 `n -= 1` 每次都执行Python字节码，因此直接受GIL约束。\n\n**为什么是这个顺序？** 先定义用于性能比较的"工作单元"。\n\n**注意**：`COUNT = 50_000_000` 中的下划线（`_`）仅用于提高可读性，不影响值。与 `50000000` 完全相同。",
+        "visualizationType": "pythonMemory",
+        "code": "def countdown():",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "countdown 函数已定义。",
+          "names": [
+            {
+              "name": "countdown",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "`if __name__ == '__main__'`",
+        "explanation": "**`if __name__ == '__main__':`**\n\n**这是保护多进程代码的必要语句。**\n\n**为什么需要这个？**\n- `multiprocessing` 创建新进程时会**重新导入**当前Python文件\n- 如果没有这个保护语句，子进程导入代码时又会创建进程...\n- 导致**无限进程创建炸弹**！\n\n**类比**：就像在复印机上贴一张纸条写着"只复印原件"。没有这张纸条，就会复印复印件的复印件，陷入无限循环。\n\n**内部原理**：`__name__` 在模块直接运行时为 `'__main__'`，被导入时为模块名。子进程导入此文件时，`__name__` 不是 `'__main__'`，因此这个代码块不会执行。\n\n**为什么是这个顺序？** 这是多进程代码执行的安全入口点。\n\n**注意**：在Windows和macOS上，这个语句是**必需的**。在Linux上，由于fork方式，没有它也可能运行，但始终建议加上。",
+        "visualizationType": "pythonMemory",
+        "code": "if __name__ == '__main__':",
+        "pythonMemoryState": {
+          "note": "主进程入口点已验证。",
+          "names": [
+            {
+              "name": "countdown",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "单进程执行",
+        "explanation": "**`start = time.time()` ~ `print(...)`**\n\n**首先在单个进程中运行 `countdown`，并测量耗时。** 这将成为"基准线（baseline）"。\n\n结果：约2.5秒。\n\n**为什么这个时间很重要：**\n- 这是"比较对象"\n- 用2个线程同时执行相同任务？-> 由于GIL，约5秒（反而更慢！）\n- 用多进程？-> 约2.5秒（减少一半！）\n\n**类比**：一个人数5000万颗石头需要2.5秒。这是基准。\n\n**内部原理**：`time.time()` 记录当前时间（epoch秒），运行 `countdown()` 后再次测量时间，计算差值。\n\n**为什么是这个顺序？** 必须先测量单进程性能，才能与多进程进行比较。\n\n**注意**：执行时间因环境（CPU速度、系统负载）而异。重要的不是绝对时间，而是相对比较。",
+        "visualizationType": "pythonMemory",
+        "code": "start = time.time()",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Single process: 2.5123s"
+          ],
+          "note": "单进程执行完成。",
+          "names": [
+            {
+              "name": "duration",
+              "pointsTo": "float1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 2.5123,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "准备多进程",
+        "explanation": "**`p1 = multiprocessing.Process(target=countdown)`**\n**`p2 = multiprocessing.Process(target=countdown)`**\n\n**创建两个 `Process` 对象。** 语法与 `threading.Thread` 几乎相同！\n\n**`Thread` 和 `Process` 的区别：**\n\n**类比**：如果线程是同一办公室的员工，那么多进程就是运营完全独立的办公室。每个办公室都有自己的电脑（GIL），所以可以同时工作！\n\n**内部原理**：`Process` 实例已创建，但实际的操作系统进程尚未创建。调用 `start()` 时才会 fork/spawn。\n\n**为什么是这个顺序？** 先创建（准备）进程，然后在开始时间测量后同时启动。\n\n**注意**：在 `multiprocessing` 中，`target` 函数和参数必须是**可序列化的（picklable）**。Lambda函数或局部函数可能无法序列化。",
+        "visualizationType": "pythonMemory",
+        "code": "p1 = multiprocessing.Process(target=countdown)",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "已创建两个进程对象（尚未启动）。",
+          "names": [
+            {
+              "name": "p1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "p2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Process",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "Process",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "同时启动两个进程",
+        "explanation": "**`p1.start()` / `p2.start()`**\n\n**启动两个进程。** 魔法就在这里发生！\n\n**GIL绕过的原理：**\n- 每个进程运行完全独立的Python解释器\n- 各自拥有自己的GIL\n- 因此不受彼此GIL的影响，可以实现**真正的并行处理**\n\n**类比**：两个独立的办公室同时用各自的电脑数石头。双方都不需要等待对方的电脑！\n\n**内部原理：**\n1. 向操作系统请求创建新进程（fork/spawn）\n2. 每个子进程初始化新的Python解释器\n3. 每个进程独立执行 `countdown()`\n4. 如果有双核或更多核心，实际上会在两个CPU核心上同时执行\n\n**为什么是这个顺序？** 开始时间测量后，快速连续启动两个进程，以最大化并发执行。\n\n**注意**：进程创建本身也需要时间（通常几十到几百毫秒）。由于这个开销，对于非常短的任务，多进程反而可能更慢。",
+        "visualizationType": "pythonMemory",
+        "code": "start = time.time()",
+        "occurrence": 2,
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "p1、p2在独立的内存空间中运行。（绕过GIL）",
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "started",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "started",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "等待进程结束 (join)",
+        "explanation": "**`p1.join()` / `p2.join()`**\n\n**主进程等待两个子进程完成。** 与 `threading` 的 `join()` 概念相同。\n\n**与线程 `join()` 的区别：**\n- 线程 `join()`：在同一进程内等待另一个线程\n- 进程 `join()`：等待另一个进程（不同的PID）终止\n\n**类比**：总部（主进程）等待两个分公司（子进程）报告任务完成。\n\n**内部原理**：主进程使用 `waitpid()` 系统调用来检测子进程的终止。子进程终止后，其资源连同退出码一起被回收。\n\n**为什么是这个顺序？** 两个进程都必须完成 `countdown()` 后，才能测量最终耗时。\n\n**注意**：如果不调用 `join()`，子进程可能成为"僵尸进程"。务必使用 `join()` 进行清理。",
+        "visualizationType": "pythonMemory",
+        "code": "p2.start()",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "所有进程任务已完成。",
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "stopped",
+              "pyId": "1004",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "stopped",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "结果确认：真正的并行处理",
+        "explanation": "**`print(f\"Two processes: {duration:.4f}s\")`**\n\n**查看结果。** 多进程执行时间约为 **1.3秒**，大约是单进程（2.5秒）的**一半**！\n\n**性能对比总结：**\n\n**为什么不是精确的一半？**\n- 进程创建/销毁存在开销\n- 操作系统的进程调度也需要时间\n- 所以比理论上的一半（1.25秒）略长\n\n**类比**：两个独立的办公室同时数石头，时间几乎减半。略多出的时间是搭建办公室的成本。\n\n**核心结论：**\n- **I/O任务**（文件、网络、数据库）-> 使用 `threading`（GIL会被释放，所以有效）\n- **CPU任务**（计算、数据处理）-> 使用 `multiprocessing`（绕过GIL）\n\n**为什么是这个顺序？** 这是实验的最后一步，检查并解读结果。",
+        "visualizationType": "pythonMemory",
+        "code": "duration = time.time() - start",
+        "occurrence": 2,
+        "pythonMemoryState": {
+          "output": [
+            "Two processes: 1.3045s"
+          ],
+          "note": "时间缩短了！（真正的并行处理）",
+          "names": [
+            {
+              "name": "duration",
+              "pointsTo": "float2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "float2",
+              "type": "float",
+              "value": 1.3045,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "当你想并行处理CPU密集型任务以提升性能时，应该使用什么？",
+    "options": [
+      "threading",
+      "multiprocessing",
+      "asyncio",
+      "GIL"
+    ],
+    "correctIndex": 1,
+    "explanation": "multiprocessing 让每个进程拥有独立的内存和GIL，因此可以同时利用多个CPU核心来并行处理CPU密集型任务。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "多进程总是比线程好。",
+      "correct": "不是的。进程的创建成本比线程高，而且使用更多内存。",
+      "why": "进程间通信（IPC）比线程间共享内存更复杂、更慢。\n因此对于I/O密集型任务，线程可能更合适。"
+    }
+  ],
+  "keyTakeaway": "I/O任务（等待）使用线程，CPU任务（计算）使用多进程。"
+}

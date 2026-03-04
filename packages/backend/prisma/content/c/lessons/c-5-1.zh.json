@@ -1,0 +1,142 @@
+{
+  "lessonId": "c-5-1",
+  "title": "Stack vs Heap",
+  "concept": "栈是自动但空间小，堆是手动但空间大",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int stackErr[1000];\n\n    int *heapArr = (int*)malloc(sizeof(int) * 10000000);\n\n    if (heapArr != NULL) {\n        printf(\"Heap allocation success!\\n\");\n        free(heapArr);\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "包含 `#include <stdio.h>` 以使用 `printf`。\n\n本课将比较栈和堆的不同作用。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "包含 stdlib.h 头文件",
+        "explanation": "包含 `#include <stdlib.h>` 以使用 `malloc`/`free`。\n\n堆内存通过该头文件中的函数直接管理。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdlib.h>"
+      },
+      {
+        "title": "定义 main 函数",
+        "explanation": "创建 main 栈帧。\n\n接下来我们将在同一段代码中比较栈数组和堆分配。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "在栈上声明数组",
+        "explanation": "在栈上创建了一个整型数组。\n\n栈内存速度快且自动释放，但大小有限。",
+        "visualizationType": "cMemory",
+        "code": "int stackErr[1000];",
+        "stack": [
+          {
+            "name": "stackArr",
+            "type": "int[1000]",
+            "value": "[...]",
+            "address": "0x..."
+          }
+        ]
+      },
+      {
+        "title": "在堆上分配内存（malloc）",
+        "explanation": "`malloc` 在堆上申请一大块连续内存，并将起始地址存储在指针中。\n\n实际数据在堆上，栈上只保留存放地址的指针。",
+        "visualizationType": "cMemory",
+        "code": "int *heapArr = (int*)malloc(sizeof(int) * 10000000);",
+        "stack": [
+          {
+            "name": "stackArr",
+            "type": "int[1000]",
+            "value": "[...]",
+            "address": "0x..."
+          },
+          {
+            "name": "heapArr",
+            "type": "int*",
+            "value": "0x5000",
+            "address": "0x..."
+          }
+        ],
+        "heap": [
+          {
+            "address": "0x5000",
+            "size": "40MB",
+            "value": "[...]"
+          }
+        ]
+      },
+      {
+        "title": "检查堆分配是否成功",
+        "explanation": "通过 `heapArr != NULL` 检查分配是否成功。\n\n如果分配失败就解引用，会很危险，因此使用前必须检查。",
+        "visualizationType": "cMemory",
+        "code": "if (heapArr != NULL) {"
+      },
+      {
+        "title": "输出成功消息",
+        "explanation": "输出堆分配成功的状态。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Heap allocation success!\\n\");",
+        "stdout": "Heap allocation success!"
+      },
+      {
+        "title": "释放堆内存（free）",
+        "explanation": "`free(heapArr)` 将堆内存归还给系统。\n\n动态分配必须始终与相应的释放配对。",
+        "visualizationType": "cMemory",
+        "code": "free(heapArr);",
+        "stack": [
+          {
+            "name": "stackArr",
+            "type": "int[1000]",
+            "value": "[...]",
+            "address": "0x..."
+          },
+          {
+            "name": "heapArr",
+            "type": "int*",
+            "value": "0x5000",
+            "address": "0x...",
+            "dangling": true
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "程序结束",
+        "explanation": "通过 `return 0;` 结束程序。\n\n要点：栈是自动管理的，堆需要手动管理。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪种情况需要使用堆（Heap）？",
+    "options": [
+      "只存储一个变量（int）时",
+      "函数结束后可以消失的临时变量",
+      "需要创建运行时动态确定大小的大数组时",
+      "需要最快速度时"
+    ],
+    "correctIndex": 2,
+    "explanation": "当数组大小在编译时无法确定（动态），或需要处理非常大的数据时，应该使用堆。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "堆比栈更快",
+      "correct": "栈要快得多。",
+      "why": "栈是由 CPU 直接管理的简单结构，而堆需要复杂的算法来寻找空闲空间。"
+    }
+  ],
+  "keyTakeaway": "小而快用栈，大而持久用堆。"
+}

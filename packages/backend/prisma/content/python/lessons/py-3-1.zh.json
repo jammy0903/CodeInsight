@@ -1,0 +1,140 @@
+{
+  "lessonId": "py-3-1",
+  "title": "Lists (Mutable)",
+  "concept": "有序且可修改的数据集合",
+  "content": {
+    "code": "# 1. 리스트 생성\nfruits = [\"Apple\", \"Banana\"]\n\n# 2. 추가/수정 (Mutable)\nfruits.append(\"Orange\")\nfruits[0] = \"Grape\"\n\n# 3. 삭제\ndel fruits[1] # Banana 삭제\n\nprint(fruits)",
+    "steps": [
+      {
+        "title": "创建列表",
+        "explanation": "**`fruits = [\"Apple\", \"Banana\"]`** -- 使用方括号 `[]` 创建列表对象，并将名称 `fruits` 绑定到它。\n\nPython 从上到下按顺序执行代码。方括号 `[]` 是创建列表的语法。一个包含 2 个字符串元素的列表对象被创建在堆内存中，`fruits` 这个名称指向该对象。\n\n**列表的3个核心特征：**\n- **有序（Ordered）：** 可通过索引（0, 1, 2...）访问。`fruits[0]` 是 `\"Apple\"`，`fruits[1]` 是 `\"Banana\"`\n- **可变（Mutable）：** 创建后可以添加、修改、删除内容。与字符串（Immutable）**完全相反**！\n- **允许重复：** 可以包含相同的值，如 `[1, 1, 1]`\n\n**类比：** 列表就像一个**有编号隔间的包**。0号隔间放着\"Apple\"，1号隔间放着\"Banana\"。你可以更换隔间里的东西、添加新隔间或移除现有隔间。\n\n**Python 内部机制：** `list` 对象内部实现为**指针数组（array of pointers）**。每个槽位存储的是指向实际字符串对象的**引用（指针）**，而非值本身。`fruits[0]` 存储的是 `\"Apple\"` 对象的内存地址。\n\n**为什么是这个顺序？** 必须先创建列表，才能在下面通过 `append`、索引赋值、`del` 等操作来修改它。\n\n**执行顺序**：line 2 -> 创建列表对象（id: 0x1000）-> fruits = 0x1000 -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "fruits = [\"Apple\", \"Banana\"]",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "添加元素（append）",
+        "explanation": "**`fruits.append(\"Orange\")`** -- 将 `\"Orange\"` 添加到列表的**末尾**。直接修改同一个对象。\n\n**Mutable（可变）的含义：** 列表**不会创建新对象**，而是直接修改现有对象（0x1000）的**内容**。`fruits` 仍然指向同一个对象（0x1000），但其中的元素从2个增加到了3个。\n\n**与字符串（Immutable）的核心区别：**\n- 字符串：`\"hello\" + \"!\"` -> 创建**新对象** `\"hello!\"`（原始对象不变）\n- 列表：`fruits.append(\"Orange\")` -> 直接修改**现有对象**（不创建新对象）\n\n**类比：** 就像往包里放一件新东西。包本身（0x1000）没变，但里面多了一件物品。不是买了一个新包！\n\n**注意：** `append()` 的**返回值是 None**。如果写成 `fruits = fruits.append(\"Orange\")`，`fruits` 会变成 `None`！始终单独使用 `fruits.append(\"Orange\")`。\n\n**Python 内部机制：** `list.append()` 在内部数组末尾添加一个新引用。如果空间不足，会自动**分配更大的数组**并复制现有指针（动态数组）。",
+        "visualizationType": "pythonMemory",
+        "code": "fruits.append(\"Orange\")",
+        "pythonMemoryState": {
+          "note": "同一对象（0x1000）的内容已更改（Mutable）",
+          "names": [
+            {
+              "name": "fruits",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\", \"Orange\"]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "修改元素（索引赋值）",
+        "explanation": "**`fruits[0] = \"Grape\"`** -- 将索引0（第一个元素）的 `\"Apple\"` **替换**为 `\"Grape\"`。\n\n**索引赋值：** 在方括号中放入索引并用 `=` 赋值，该位置的元素就会被覆盖。\n\n替换前：`[\"Apple\", \"Banana\", \"Orange\"]`\n替换后：`[\"Grape\", \"Banana\", \"Orange\"]`\n\n**与 append 的区别：**\n- **append**：在列表**末尾添加**（长度增加：2 -> 3）\n- **索引赋值**：**替换**现有元素（长度不变：3 -> 3）\n\n**为什么不创建新列表？** 因为列表是 Mutable 的，它只是在同一对象（0x1000）的内部指针数组中，将0号槽的引用从 `\"Apple\"` 换成了 `\"Grape\"`。\n\n**类比：** 从包的0号隔间取出 Apple，放入 Grape。包本身不变。\n\n**Python 内部机制：** `fruits[0] = \"Grape\"` 将内部指针数组索引0处的引用从 `\"Apple\"` 对象更改为 `\"Grape\"` 对象。`\"Apple\"` 对象的引用计数减1，如果没有其他地方引用它，垃圾回收器会将其回收。\n\n**注意：** 对不存在的索引赋值会引发 `IndexError`。`fruits[10] = \"Mango\"` 会报错！要添加新元素，必须使用 `append()`。\n\n**执行顺序**：索引0的引用更改（\"Apple\" -> \"Grape\"）-> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "fruits[0] = \"Grape\"",
+        "pythonMemoryState": {
+          "note": "索引0处替换：\"Apple\" -> \"Grape\"",
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Grape\", \"Banana\", \"Orange\"]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "删除元素（del）",
+        "explanation": "**`del fruits[1]`** -- 使用 `del` 关键字从列表中**移除**索引1处的 `\"Banana\"`。\n\n**del 的作用：** 从列表中移除指定索引处的元素。当前列表是 `[\"Grape\", \"Banana\", \"Orange\"]`，所以索引1处的 `\"Banana\"` 被删除。\n\n**索引重排（重要！）：** 删除后，后面的元素**自动向前移动：**\n- 删除前：`[\"Grape\"(0), \"Banana\"(1), \"Orange\"(2)]`（长度3）\n- 删除后：`[\"Grape\"(0), \"Orange\"(1)]`（长度2）\n\n`\"Orange\"` 的索引从2变成了1！\n\n**类比：** 就像排队时把1号移走，从2号开始后面的人都向前移一位。\n\n**其他删除方法：**\n- `del fruits[1]`：按**索引**删除\n- `fruits.remove(\"Banana\")`：按**值**删除（仅删除第一个匹配项）\n- `fruits.pop(1)`：按索引删除并**返回被删除的值**\n- `fruits.pop()`：删除并返回**最后一个元素**\n\n**Python 内部机制：** 从内部指针数组中移除索引1处的引用，索引2及之后的所有引用都向前移动一位。此过程耗时 O(n)。`\"Banana\"` 对象的引用计数减少。\n\n**执行顺序**：执行 del -> 移除索引1 -> 后续元素前移 -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "del fruits[1] # Banana 삭제",
+        "pythonMemoryState": {
+          "note": "删除索引1 -> Orange 从索引2移至索引1",
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Grape\", \"Orange\"]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出最终列表",
+        "explanation": "**`print(fruits)`** -- 输出经过所有添加、修改和删除操作后的最终列表。\n\n输出结果：`['Grape', 'Orange']`\n\n**完整变更过程回顾：**\n1. 创建：`[\"Apple\", \"Banana\"]`（2个元素）\n2. append：`[\"Apple\", \"Banana\", \"Orange\"]`（3个元素）\n3. 索引赋值：`[\"Grape\", \"Banana\", \"Orange\"]`（Apple -> Grape）\n4. del：`[\"Grape\", \"Orange\"]`（Banana 被删除，2个元素）\n\n**类比：** 我们在同一个包（0x1000）里放入东西（append）、替换东西（索引赋值）、取出东西（del）。从头到尾没有换过新包！\n\n**注意：** 像 `b = fruits` 这样的赋值**不是复制**，而是**共享同一个对象**！如果执行 `b.append(\"Mango\")`，`fruits` 也会受影响。要创建独立副本，使用 `b = fruits[:]` 或 `b = list(fruits)`。\n\n**Python 内部机制：** `print(fruits)` 调用 `list.__repr__()` 生成字符串 `\"['Grape', 'Orange']\"`。在此过程中，每个元素的 `__repr__` 也会被调用。你可以验证 `fruits` 对象的 `id()` 在整个程序中从未改变。",
+        "visualizationType": "pythonMemory",
+        "code": "print(fruits)",
+        "pythonMemoryState": {
+          "output": [
+            "['Grape', 'Orange']"
+          ],
+          "note": "从始至终修改的都是同一个对象（0x1000）",
+          "names": [
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Grape\", \"Orange\"]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪项不是列表的特征？",
+    "options": [
+      "有序（Ordered）",
+      "内容可更改（Mutable）",
+      "不允许重复值",
+      "可以混合存放任何类型"
+    ],
+    "correctIndex": 2,
+    "explanation": "列表允许重复（`[1, 1, 1]` 是合法的）。\n不允许重复的数据结构是集合（Set）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "用 b=a 复制列表后可以独立使用",
+      "correct": "简单赋值连'浅拷贝'都不是，只是共享同一个地址。",
+      "why": "要创建真正的副本，请使用 `b = a[:]` 或 `b = list(a)`。"
+    }
+  ],
+  "keyTakeaway": "列表是一个可以随意修改、扩展和缩减的万能容器。"
+}

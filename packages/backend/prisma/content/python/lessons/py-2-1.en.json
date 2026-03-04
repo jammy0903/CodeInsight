@@ -1,0 +1,151 @@
+{
+  "lessonId": "py-2-1",
+  "title": "Conditionals: Making Choices",
+  "concept": "Execute different code based on conditions (indentation is essential!)",
+  "content": {
+    "code": "score = 85\n\nif score >= 90:\n    print(\"A Rank\")\nelif score >= 80:\n    print(\"B Rank\")\nelse:\n    print(\"C Rank\")\n\nprint(\"End\")",
+    "steps": [
+      {
+        "title": "Initializing the Score Variable",
+        "explanation": "**`score = 85`** -- Creates an integer object `85` and attaches the label `score`.\n\nPython executes from top to bottom in order. On the first line, the label `score` is attached to the integer object `85`.\n\n**Why this order?** The variable must be created first so it can be used in the conditional below. Using an undefined variable in an if condition raises a `NameError`.\n\n**Analogy:** It's like preparing a graded exam paper (85 points). We'll use this paper to determine the grade (A/B/C) below.\n\n**How Python works internally:** `85` is within the Small Integer Cache range (-5 to 256), so the pre-cached integer object is reused. `{\"score\": <address of 85 object>}` is registered in the global namespace.\n\n**Note:** In Python, `=` means **'assignment'**, not 'equals.' 'Equals' is written as `==`. This is the most common point of confusion for beginners!",
+        "visualizationType": "pythonMemory",
+        "code": "score = 85",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "score",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 85,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the First Condition (if)",
+        "explanation": "**`if score >= 90:`** -- Checks the first condition: is `score` greater than or equal to 90?\n\nThe condition `score >= 90` is evaluated. Since `score` is `85`, `85 >= 90` is **False**. Since the condition is false, the indented block (`print(\"A Rank\")`) is skipped and execution moves to the next condition (`elif`).\n\n**Analogy:** It's like a height restriction at an amusement park. For a ride that requires 'height 90cm or above,' a person who is 85cm tall can't ride and moves on to the next ride (elif).\n\n**How Python works internally:** The `>=` operator calls `score.__ge__(90)`. It compares the two integers and returns a `bool` type `False` object. Since the result is `False`, Python executes a JUMP bytecode that skips the indented block.\n\n**Note:** Forgetting the colon (`:`) causes a `SyntaxError`. It must be `if score >= 90:`, not `if score >= 90`!",
+        "visualizationType": "pythonMemory",
+        "code": "if score >= 90:",
+        "pythonMemoryState": {
+          "note": "if condition False -> line 4 not executed",
+          "names": [
+            {
+              "name": "score",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 85,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Second Condition (elif)",
+        "explanation": "**`elif score >= 80:`** -- Checks the second condition: is `score` greater than or equal to 80?\n\n**Why is elif checked?** Because the previous `if` condition was `False`. If `if` had been `True`, this line would not be executed at all.\n\nEvaluating `score >= 80` gives `85 >= 80`, which is **True**! The indented block will now be executed.\n\n**What is elif?** `elif` is short for `else if`. It's an additional condition that is only checked when the previous condition was false. In an `if/elif/else` structure, **exactly one** block is executed.\n\n**Analogy:** It's like checking a grade chart from top to bottom. If '90+ = A' doesn't apply, check the next line '80+ = B.' 85 matches this condition!\n\n**How Python works internally:** At the bytecode level, `elif` is equivalent to an `if` nested inside an `else` block. However, syntactically it reduces indentation levels, making the code much cleaner.\n\n**Note:** It's `elif`, not `else if`! This is a common mistake for people coming from other languages.",
+        "visualizationType": "pythonMemory",
+        "code": "elif score >= 80:",
+        "pythonMemoryState": {
+          "note": "elif condition True -> line 6 will execute",
+          "names": [
+            {
+              "name": "score",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 85,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Condition Met, Code Executes",
+        "explanation": "**`print(\"B Rank\")`** -- Since the elif condition was `True`, this code block executes and prints \"B Rank\".\n\nBecause `elif score >= 80` was `True`, the indented code block is executed. `B Rank` is printed to the screen.\n\n**Why isn't else executed?** In an `if/elif/else` structure, once **any condition is met**, all remaining blocks are skipped. Since elif was already `True`, the `else` block (line 8) is not even checked, and the entire conditional is exited.\n\n**Analogy:** When looking for an emergency exit, the first door (if) was locked, so you tried the second door (elif) and it opened. Since you've already exited, there's no need to try the third door (else).\n\n**What if score were 75?** `if` (75 >= 90 = False) -> `elif` (75 >= 80 = False) -> the `else` block executes, printing \"C Rank\".\n\n**How Python works internally:** After the code in the True condition's block executes, Python executes a JUMP bytecode that skips the entire `if/elif/else` structure.\n\n**Note:** Multiple independent `if` statements are ALL checked! You must use `if/elif/else` to ensure only one block executes.",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"B Rank\")",
+        "pythonMemoryState": {
+          "output": [
+            "B Rank"
+          ],
+          "note": "Conditional ends -> else skipped -> jump to line 10",
+          "names": [
+            {
+              "name": "score",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 85,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "After the Conditional",
+        "explanation": "**`print(\"End\")`** -- This code is outside the conditional, so it **always executes**.\n\n**Why does it always execute?** This `print` statement has no indentation, so it's **outside** the `if/elif/else` conditional. Regardless of the conditional's result, Python executes this line in order.\n\n**Analogy:** After announcing exam results (A/B/C), the message \"Good work, everyone\" is delivered to all students regardless of their score. This is code outside the conditional.\n\n**The importance of indentation:** In Python, indentation is not just for readability -- it's **syntax**!\n- Indented code: **belongs to** a conditional/loop (executes conditionally)\n- Non-indented code: **outside** the conditional/loop (always executes)\n\n**How Python works internally:** After the conditional block ends, the interpreter continues sequential execution from the next line (the line where indentation returns to the original level).\n\n**Note:** If you accidentally indent this line, it becomes part of the `else` block and only executes conditionally. A single space difference can completely change your program's behavior!",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"End\")",
+        "pythonMemoryState": {
+          "output": [
+            "End"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "score",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 85,
+              "pyId": "1001"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following causes a syntax error in Python's if statement?",
+    "options": [
+      "if x > 0: print(x)",
+      "if x > 0 print(x)",
+      "if True:\n    pass",
+      "if x == 10:\n    print(10)"
+    ],
+    "correctIndex": 1,
+    "explanation": "The colon (:) is missing after the condition.\nIn Python syntax, the colon is mandatory."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Indentation is just for aesthetics",
+      "correct": "In Python, indentation is **syntax**.",
+      "why": "Inconsistent indentation causes an `IndentationError`, preventing the program from running at all.\n(4 spaces recommended)"
+    }
+  ],
+  "keyTakeaway": "Don't forget the colon (:) and indentation. It's `elif`, not `else if`."
+}

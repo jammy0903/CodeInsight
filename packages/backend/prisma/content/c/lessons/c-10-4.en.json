@@ -1,0 +1,38 @@
+{
+  "lessonId": "c-10-4",
+  "title": "Binary Input/Output",
+  "concept": "Binary I/O stores and reads data as its raw memory representation, handling structured data quickly",
+  "content": {
+    "code": "#include <stdio.h>\n\nstruct Player {\n    int id;\n    double hp;\n};\n\nint main() {\n    struct Player saved = {1, 99.5};\n    struct Player loaded;\n\n    FILE *fp = fopen(\"save.bin\", \"wb\");\n    if (fp) {\n        fwrite(&saved, sizeof(struct Player), 1, fp);\n        fclose(fp);\n    }\n\n    fp = fopen(\"save.bin\", \"rb\");\n    if (fp) {\n        fread(&loaded, sizeof(struct Player), 1, fp);\n        printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);\n        fclose(fp);\n    }\n\n    return 0;\n}",
+    "steps": [
+      {"title":"Including stdio.h header","explanation":"**`#include <stdio.h>`** -- Header for binary file I/O functions (`fwrite`, `fread`, `fopen`, `fclose`).","visualizationType":"cMemory","code":"#include <stdio.h>","stack":[],"heap":[],"stdout":""},
+      {"title":"Defining the data structure to save","explanation":"**`struct Player { int id; double hp; };`** -- Defines the `Player` struct as the template for data to save and load. It consists of `int id` (4 bytes) and `double hp` (8 bytes), with possible **padding** inserted by the compiler for memory alignment.","visualizationType":"cMemory","code":"struct Player {","highlightOffset":[0,1,2,3]},
+      {"title":"main function and variable preparation","explanation":"**`struct Player saved = {1, 99.5};`** and **`struct Player loaded;`** -- Two `Player` structs on the stack. `saved` is the original data to write (`id: 1, hp: 99.5`), and `loaded` is where the restored data from the file will go.","visualizationType":"cMemory","code":"int main() {","highlightOffset":[0,1],"stack":[{"name":"saved","type":"struct Player","value":"{id: 1, hp: 99.5}","address":"0x1000"},{"name":"loaded","type":"struct Player","value":"{id: ???, hp: ???}","address":"0x0ffc"}]},
+      {"title":"Writing memory contents to file (fwrite)","explanation":"**`fwrite(&saved, sizeof(struct Player), 1, fp);`** -- 'Dumps' the raw memory bytes of the `saved` struct directly into the file. The 4 arguments are: `&saved` (starting address of data), `sizeof(struct Player)` (size of one chunk), `1` (number of chunks), `fp` (destination file).","visualizationType":"cMemory","code":"fwrite(&saved, sizeof(struct Player), 1, fp);"},
+      {"title":"Closing file after write","explanation":"**`fclose(fp);`** -- Finishes writing the binary data and closes the file. `save.bin` now contains the byte-level memory contents of `struct Player`.","visualizationType":"cMemory","code":"fwrite(&saved, sizeof(struct Player), 1, fp);"},
+      {"title":"Reading file contents into memory (fread)","explanation":"**`fread(&loaded, sizeof(struct Player), 1, fp);`** -- Reads bytes from the file and overwrites them directly into the `loaded` struct's memory space. This is the reverse operation of `fwrite`.","visualizationType":"cMemory","code":"fread(&loaded, sizeof(struct Player), 1, fp);","stack":[{"name":"saved","type":"struct Player","value":"{id: 1, hp: 99.5}","address":"0x1000"},{"name":"loaded","type":"struct Player","value":"{id: 1, hp: 99.5}","highlight":true,"address":"0x0ffc"}]},
+      {"title":"Verifying restored data","explanation":"**`printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);`** -- The output is `\"Loaded ID: 1, HP: 99.5\"`. The values originally placed in `saved` have been perfectly restored into `loaded` through the file.","visualizationType":"cMemory","code":"fread(&loaded, sizeof(struct Player), 1, fp);","stack":[{"name":"saved","type":"struct Player","value":"{id: 1, hp: 99.5}","address":"0x1000"},{"name":"loaded","type":"struct Player","value":"{id: 1, hp: 99.5}","address":"0x0ffc"}],"stdout":"Loaded ID: 1, HP: 99.5"},
+      {"title":"Closing file and termination","explanation":"**`fclose(fp);`** and **`return 0;`** -- Completes all file operations and terminates the program.\n\nThe critical downside of binary files is **portability**.","visualizationType":"cMemory","code":"printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);","highlightOffset":[0,3],"stack":[]}
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the biggest difference between text file (\"w\") and binary file (\"wb\") I/O?",
+    "options": [
+      "File extension name",
+      "Data storage format (whether conversion occurs)",
+      "Maximum storage capacity",
+      "File access permissions"
+    ],
+    "correctIndex": 1,
+    "explanation": "Text mode converts numbers to strings (\"123\"), but binary mode stores the raw bit pattern from memory as-is."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Binary files can always be read correctly on other computers.",
+      "correct": "Systems with different endianness (little/big endian) or padding schemes may produce corrupted data.",
+      "why": "For portability, you should use serialization protocols or text formats (JSON)."
+    }
+  ],
+  "keyTakeaway": "fread/fwrite are the fastest and simplest way to save data, but cross-platform compatibility requires caution."
+}

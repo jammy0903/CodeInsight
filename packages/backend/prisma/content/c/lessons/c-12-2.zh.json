@@ -1,0 +1,283 @@
+{
+  "lessonId": "c-12-2",
+  "title": "阶乘递归与返回值传播",
+  "concept": "递归函数的返回值沿着调用栈逆序传递",
+  "content": {
+    "code": "#include <stdio.h>\n\nint factorial(int n) {\n    if (n <= 1) {\n        return 1;\n    }\n    return n * factorial(n - 1);\n}\n\nint main() {\n    int result = factorial(4);\n    printf(\"4! = %d\\n\", result);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含头文件",
+        "explanation": "通过 **`#include <stdio.h>`** 包含标准输入输出库以使用 `printf`。\n\n本课学习递归的第二个核心——**返回值的传播**。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始 - 调用 factorial(4)",
+        "explanation": "**`int result = factorial(4);`** -- `result` 的声明、调用 `factorial(4)` 和存储返回值都在一行中，但实际上 `result` 要等到 `factorial(4)` 执行完才会被赋值。",
+        "visualizationType": "cMemory",
+        "code": "int result = factorial(4);",
+        "highlightOffset": [
+          0,
+          -8
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "???（等待中）",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "factorial"
+          }
+        ]
+      },
+      {
+        "title": "factorial(4) -> factorial(3) -> factorial(2) 调用",
+        "explanation": "**`return n * factorial(n - 1);`** -- factorial(4) 试图计算 `return 4 * factorial(3)`，但还不知道 factorial(3) 的结果。factorial(3) 也试图计算 `return 3 * factorial(2)`，同样需要等待 factorial(2) 的结果。这条延迟计算的链不断将栈推高。",
+        "visualizationType": "cMemory",
+        "code": "return n * factorial(n - 1);",
+        "highlightOffset": [
+          0,
+          -4
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "???（等待中）",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "factorial"
+          }
+        ]
+      },
+      {
+        "title": "factorial(1) - 到达终止条件（Base Case）！",
+        "explanation": "当 factorial(2) 调用 factorial(1) 时，`n <= 1` 变为**真**——终于到达了**终止条件**！不再调用自身，直接返回值 `1`。",
+        "visualizationType": "cMemory",
+        "code": "return 1;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "???（等待中）",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "1",
+            "type": "int",
+            "address": "0x1010",
+            "frame": "factorial"
+          }
+        ]
+      },
+      {
+        "title": "返回值传播：1 -> 2 -> 6",
+        "explanation": "返回值逆序传播——这是递归最优美的部分。当 factorial(1) 返回 **1** 时，factorial(2) 计算 `2 * 1 = 2`，factorial(3) 计算 `3 * 2 = 6`，帧逐个被 Pop。",
+        "visualizationType": "cMemory",
+        "code": "return n * factorial(n - 1);",
+        "occurrence": 2,
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "???（等待中）",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "factorial"
+          }
+        ]
+      },
+      {
+        "title": "最终返回：factorial(4) = 24",
+        "explanation": "factorial(4) 返回 `4 * 6` = **24**，值被存储到 main 的 `result` 中。\n\n递归通常分两个阶段理解：向下拆分问题的阶段（Winding），和从终止条件带着值向上合成的阶段（Unwinding）。",
+        "visualizationType": "cMemory",
+        "code": "return n * factorial(n - 1);",
+        "occurrence": 3,
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "24",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          }
+        ]
+      },
+      {
+        "title": "输出结果",
+        "explanation": "**`printf(\"4! = %d\\n\", result);`** -- 用 `%d` 输出 `result` 的值 `24`，屏幕显示 `4! = 24`。\n\n总结递归返回值的传递过程：进入时将大问题逐步拆小（4!->3!->2!->1!），返回时将小答案合成大答案。",
+        "visualizationType": "terminal",
+        "code": "printf(\"4! = %d\\n\", result);",
+        "stdout": "4! = 24"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "调用 factorial(5) 时，factorial 函数总共被调用几次？",
+    "options": [
+      "4 次",
+      "5 次（factorial(5)、factorial(4)、factorial(3)、factorial(2)、factorial(1)）",
+      "6 次",
+      "无限次"
+    ],
+    "correctIndex": 1,
+    "explanation": "factorial(5) -> factorial(4) -> factorial(3) -> factorial(2) -> factorial(1) 共调用 5 次。\n在 factorial(1) 处到达终止条件，不再继续调用。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "递归函数会立即计算出结果",
+      "correct": "它将计算推迟到终止条件，然后在返回时逐层合并结果。",
+      "why": "factorial(4) 需要知道 factorial(3) 的结果才能计算，因此所有调用完成后结果才逆序传播。"
+    },
+    {
+      "wrong": "递归总是比循环慢",
+      "correct": "简单递归有函数调用开销，但如果应用了尾递归优化，性能与循环相同。",
+      "why": "编译器检测到尾递归（Tail Recursion）时可以将其转换为循环。但这个 factorial 使用 n*factorial(n-1) 的形式，不是尾递归。"
+    }
+  ],
+  "keyTakeaway": "递归的返回值从终止条件开始，沿着调用栈逆序传递。"
+}

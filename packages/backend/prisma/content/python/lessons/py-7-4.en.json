@@ -1,0 +1,744 @@
+{
+  "lessonId": "py-7-4",
+  "title": "Garbage Collector",
+  "concept": "The gc module finds and cleans up circular references! Reference counting + gc = perfect memory management!",
+  "content": {
+    "code": "import gc\n\nclass Node:\n    def __init__(self, name):\n        self.name = name\n        self.next = None\n\na = Node(\"A\")\nb = Node(\"B\")\na.next = b\nb.next = a  # 순환 참조\n\ndel a\ndel b\n\nprint(f\"정리 전 쓰레기: {gc.get_count()}\")\nnum = gc.collect()  # 가비지 컬렉션 실행!\nprint(f\"정리된 객체 수: {num}\")",
+    "steps": [
+      {
+        "title": "Importing the gc Module",
+        "explanation": "**`import gc`**\n\nLoads Python's **Garbage Collector module** into memory.\n`gc` is a built-in Python module that provides the ability to **detect and remove circular references** that cannot be handled by reference counting alone.\n\n**Key functions of the gc module**:\n- `gc.collect()`: Manually detect and remove circular references\n- `gc.get_count()`: Check the number of tracked objects per generation\n- `gc.disable()` / `gc.enable()`: Turn automatic garbage collection off/on\n\n**Analogy: Calling a professional cleaning service**\nIf reference counting is \"everyone cleaning up their own trash,\" the gc module is a **professional cleaning service**.\nNormally everyone can clean up after themselves, but tangled trash (circular references) needs a professional.\n\n**Why this order?** To use gc.collect() and gc.get_count(), we must first import the gc module.\n\n**Execution order**: Load gc module -> register 'gc' name in global namespace -> gc functions ready to use",
+        "visualizationType": "pythonMemory",
+        "code": "import gc",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "gc module import complete",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node Class Definition Begins",
+        "explanation": "**`class Node:`**\n\nDefines the **same Node class** as in the previous lesson (py-7-3).\nEach node has a name (`name`) and a pointer to the next node (`next`).\n\n**This lesson has a different goal!**\nThe previous lesson showed the **problem** of circular references, and this lesson shows how to **solve it with gc.collect()**.\nWe create the same circular reference, but this time we observe how gc cleans it up.\n\n**Analogy**: The previous lesson showed \"this kind of trash piles up,\" and this lesson shows \"the cleaning service handles it like this.\"\n\n**Why this order?** After importing the gc module, we define the class needed to create a circular reference.\n\n**Execution order**: class keyword -> prepare to create Node class object -> await body execution",
+        "visualizationType": "pythonMemory",
+        "code": "class Node:",
+        "pythonMemoryState": {
+          "note": "Node class definition begins",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Entering the Class Body",
+        "explanation": "**`class Node:` (entire body)**\n\nPython executes the class body to complete the Node class.\nThe `__init__` method is defined, enabling initialization of `name` and `next` attributes.\n\n**No instances have been created yet!**\nOnly the blueprint is prepared. Actual Node objects (A, B) will be created later with `Node(\"A\")` and `Node(\"B\")`.\n\n**Why this order?** After encountering the class keyword, all methods in the body are registered to complete the class.\n\n**Execution order**: Begin class body execution -> define and register __init__ method",
+        "visualizationType": "pythonMemory",
+        "code": "class Node:",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "Executing class body",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ Method Definition",
+        "explanation": "**`def __init__(self, name):`**\n\nDefines the **initialization method (constructor)** of the Node class.\nWhen called like `Node(\"A\")`, this `__init__` automatically executes to set up the instance.\n\n**Two attributes this method sets**:\n- `self.name = name`: The node's name (\"A\" or \"B\")\n- `self.next = None`: A pointer to the next node (initially no connection)\n\n**Analogy**: This is the manufacturing process for a train car. Attaching a nameplate (name) and leaving the connector empty (next=None).\n\n**Why this order?** Defining the __init__ method inside the class body completes the Node class.\n\n**Execution order**: __init__ function object created -> registered as method in Node class -> Node class complete (ID: 0x1000)",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "Node class definition complete (ID: 0x1000)",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the First Node",
+        "explanation": "**`a = Node(\"A\")`**\n\nCalls the Node class to create the **first node named \"A\"** in memory (0x2000).\n`__init__(self, \"A\")` is automatically called to set the name and next attributes.\n\n**This is the same process as the previous lesson (py-7-3).**\nTwo nodes are needed to create a circular reference, and this is the step of creating the first one.\n\n**State after creation**: Node A = {name: \"A\", next: None}, refcount = 1 (only variable a references it)\n\n**Why this order?** Now that the class definition is done, we create actual instances.\n\n**Execution order**: Node(\"A\") called -> instance 0x2000 created -> __init__(self, \"A\") called -> initialization in progress...",
+        "visualizationType": "pythonMemory",
+        "code": "a = Node(\"A\")",
+        "pythonMemoryState": {
+          "note": "Node(\"A\") called -> instance 0x2000 created",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node A Initialization (1)",
+        "explanation": "**`self.name = name`**\n\nStores the string `\"A\"` in the `name` attribute of the newly created instance (0x2000).\n`self` points to the object 0x2000 currently being created.\n\n**Why is this attribute needed?** To distinguish between Node A and Node B when the circular reference is created later.\n\n**Analogy**: Attaching a nameplate to the train car. \"This car is Car A!\"\n\n**Why this order?** Inside __init__, name is set first, then next.\n\n**Execution order**: Add name attribute to self(0x2000) -> assign \"A\" -> 0x2000.name = \"A\" complete",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "Node A's name = 'A' set",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a (initializing)",
+              "pointsTo": "node1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A')",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node A Initialization (2)",
+        "explanation": "**`self.next = None`**\n\nInitializes the `next` attribute of Node A (0x2000) to `None`.\n`next` serves as a pointer to the next node. Initially, nothing is connected (None).\n\n**Node A complete state**: name=\"A\", next=None, refcount=1 (only variable a references it)\n\n**Analogy**: The connector (next) on train car A is still empty. It will be connected to car B later with `a.next = b`.\n\n**Why this order?** After __init__ completes, the finished Node A object is connected to variable `a`.\n\n**Execution order**: Add next attribute to self(0x2000) -> assign None -> __init__ complete -> a -> 0x2000 (refcount=1)",
+        "visualizationType": "pythonMemory",
+        "code": "self.next = None",
+        "pythonMemoryState": {
+          "note": "Node A complete! refcount=1",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Second Node",
+        "explanation": "**`b = Node(\"B\")`**\n\nCreates a **second node object** named \"B\" in memory (0x3000).\nTwo nodes are needed to point to each other for a circular reference, so we create the second one.\n\n**Current state**: Node A (0x2000) and Node B (0x3000) exist independently.\nThey are not yet connected to each other.\n\n**Analogy**: Two train cars are placed side by side, but the couplers haven't been hooked yet.\n\n**Why this order?** After Node A, we create Node B to prepare for the circular reference.\n\n**Execution order**: Node(\"B\") called -> instance 0x3000 created -> __init__(self, \"B\") called -> initialization in progress...",
+        "visualizationType": "pythonMemory",
+        "code": "b = Node(\"B\")",
+        "pythonMemoryState": {
+          "note": "Node(\"B\") called -> instance 0x3000 created",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node B Initialization (1)",
+        "explanation": "**`self.name = name`**\n\nSets the `name` attribute of Node B (0x3000) to `\"B\"`.\nIt's the same `__init__` method, but this time `self` points to 0x3000 (Node B).\n\n**Same class, different instances**: During Node A, self=0x2000, name=\"A\". Now self=0x3000, name=\"B\".\n\n**Why this order?** Inside Node B's __init__, name is set first.\n\n**Execution order**: Add name attribute to self(0x3000) -> assign \"B\" -> 0x3000.name = \"B\" complete",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "Node B's name = 'B' set",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b (initializing)",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1003"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B')",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node B Initialization (2)",
+        "explanation": "**`self.next = None`**\n\nInitializes the `next` attribute of Node B (0x3000) to `None`.\nNow **both independent nodes are ready**.\n\n**Current state summary**:\n- a -> Node A(0x2000): name=\"A\", next=None, refcount=1\n- b -> Node B(0x3000): name=\"B\", next=None, refcount=1\n\n**Next step**: We'll connect the two nodes to each other with `a.next = b` and `b.next = a` to create a circular reference.\nThe process is the same as the previous lesson, but this time the goal is to clean up with gc.collect().\n\n**Why this order?** After Node B's __init__ completes, we're ready to connect the two nodes.\n\n**Execution order**: Add next attribute to self(0x3000) -> assign None -> __init__ complete -> b -> 0x3000 (refcount=1)",
+        "visualizationType": "pythonMemory",
+        "code": "self.next = None",
+        "pythonMemoryState": {
+          "note": "Node B complete! Both nodes ready",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1003"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=None)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Connecting Reference (A -> B)",
+        "explanation": "**`a.next = b`**\n\nConnects Node A's `next` pointer to point to Node B (0x3000). The **A -> B** directional connection is now complete.\n\n**Reference count change (important!)**:\n- Node B (0x3000) refcount: 1 -> **2** (variable `b` + `a.next`)\n- Now even if variable `b` is deleted, `a.next` still references Node B, so it won't be deleted.\n\n**Analogy**: The rear coupler of train car A has been hooked to car B.\n\n**Why this order?** Creating the first direction (A->B) of the circular reference.\n\n**Execution order**: Access next on a(0x2000) -> assign b(0x3000) -> 0x3000's refcount 1->2",
+        "visualizationType": "pythonMemory",
+        "code": "a.next = b",
+        "pythonMemoryState": {
+          "note": "A -> B connected! 0x3000 refcount=2",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=0x3000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=None)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Circular Reference Complete (B -> A)",
+        "explanation": "**`b.next = a`**\n\nNode B's `next` now points to Node A (0x2000), completing the **circular reference**!\nNow it's an A -> B -> A -> B -> ... infinite loop structure.\n\n**Both now have refcount = 2**:\n- Node A (0x2000): variable `a` + `b.next` = 2\n- Node B (0x3000): variable `b` + `a.next` = 2\n\n**This is the situation where gc is needed!**\nReference counting alone cannot break this circular loop.\nEven after `del a` and `del b`, the refcount won't reach 0, so gc.collect() is needed.\n\n**Analogy: Two people holding each other's hands**\nEven if the external hands (variables) let go, they're still holding each other's hands.\n\n**Why this order?** After the A->B connection, adding B->A completes the circular loop.\n\n**Execution order**: Access next on b(0x3000) -> assign a(0x2000) -> circular reference complete: A <-> B (each refcount=2)",
+        "visualizationType": "pythonMemory",
+        "code": "b.next = a  # 순환 참조",
+        "pythonMemoryState": {
+          "note": "Circular reference complete! A <-> B (each refcount=2)",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=0x3000)",
+              "pyId": "1003"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=0x2000)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Deleting Variable 'a'",
+        "explanation": "**`del a`**\n\nDeletes variable `a`. Node A (0x2000)'s refcount decreases from 2 -> 1, but since `b.next` is still referencing it, **the object survives**.\n\n**Reference change**: 0x2000's refcount = 2 (variable a + b.next) -> **1** (only b.next remains)\nSince refcount > 0, it is not removed from memory.\n\n**How to access Node A at this point?**\nVariable `a` is gone, but you can still access it indirectly through `b.next`.\n\n**Why this order?** After the circular reference is complete, we remove external references (variables) one by one to create an \"isolated circular reference\" situation.\n\n**Execution order**: Remove variable a from namespace -> 0x2000's refcount 2->1 (only b.next remains) -> object persists",
+        "visualizationType": "pythonMemory",
+        "code": "del a",
+        "pythonMemoryState": {
+          "note": "Variable a deleted! 0x2000 is still referenced by b.next (refcount=1)",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=0x2000)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Deleting Variable 'b'",
+        "explanation": "**`del b`**\n\nDeletes variable `b` as well. Now **there are no variables that can access either Node object!**\nBut they reference each other, so the refcount doesn't reach 0.\n\n**Isolated circular reference state (memory leak!)**:\n```\nNode A(0x2000): refcount=1 (Node B's next references it)\nNode B(0x3000): refcount=1 (Node A's next references it)\n```\nBoth objects are inaccessible from outside, yet they hold onto each other and can't be deleted.\n\n**This is exactly the situation where gc.collect() is needed!**\nReference counting can't solve this, but gc can detect \"groups of objects unreachable from outside\" and remove them all at once.\n\n**Analogy**: Two people are holding each other's hands while floating in the ocean. Their connection to the lifeboat (variables) has been severed, but they're holding each other and won't sink. gc is the coast guard that finds these situations and rescues (cleans up).\n\n**Why this order?** Both variables are deleted to create an isolated circular reference, which will be cleaned up by gc next.\n\n**Execution order**: Remove variable b from namespace -> 0x3000's refcount 2->1 -> both objects isolated + circular reference state",
+        "visualizationType": "pythonMemory",
+        "code": "del b",
+        "pythonMemoryState": {
+          "note": "Variables a, b both deleted! 0x2000 <-> 0x3000 isolated circular reference (each refcount=1)",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Garbage Collection Status",
+        "explanation": "**`print(f\"정리 전 쓰레기: {gc.get_count()}\")`**\n\nCalls `gc.get_count()` to check the **number of objects currently tracked by the garbage collector**.\nThis function returns a tuple in the form **(gen0, gen1, gen2)**.\n\n**What are Generations?**\nPython's gc manages objects by dividing them into 3 generations:\n- **gen0 (generation 0)**: Recently created objects. Checked most frequently\n- **gen1 (generation 1)**: Objects that survived gen0 checks\n- **gen2 (generation 2)**: Long-lived objects. Checked least frequently\n\n**Why use the generational approach?**\nMost objects disappear shortly after creation (e.g., temporary variables).\nOld objects are likely to live even longer.\nSo checking new objects frequently and old objects rarely is efficient!\n\n**At this point, the circular reference objects (0x2000, 0x3000) are included in gen0.**\n\n**Analogy**: There are 3 trash bins (gen0, gen1, gen2), and new trash goes into gen0 first.\n\n**Why this order?** Before running gc.collect(), we first check \"how much trash exists right now.\"\n\n**Execution order**: gc.get_count() called -> returns (gen0 count, gen1 count, gen2 count) -> output",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"정리 전 쓰레기: {gc.get_count()}\")",
+        "pythonMemoryState": {
+          "output": [
+            "정리 전 쓰레기: (10, 5, 2)"
+          ],
+          "note": "gc status check - circular reference objects are in gen0",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Running Manual Garbage Collection",
+        "explanation": "**`num = gc.collect()`**\n\nThis is the **most critical line** of this lesson!\nCalls `gc.collect()` to **detect circular references and remove them from memory**.\n\n**Internal workings of gc.collect() (Mark and Sweep algorithm)**:\n1. **Mark phase**: Starting from all global variables and the stack, mark all reachable objects.\n2. **Detection**: Unmarked objects = objects unreachable from outside!\n3. **Sweep phase**: Find unreachable circular reference groups (0x2000 <-> 0x3000) and free them from memory.\n4. Returns the number of freed objects -> num = **2**\n\n**Analogy: Coast guard search operation**\nFinds people (circular reference objects) floating in the ocean (memory) with their connection to land (variables) severed, and rescues (cleans up) them.\n\n**Difference between reference counting and gc**:\n- **Reference counting**: Immediately deletes when refcount=0 (fast but can't catch circular references)\n- **gc.collect()**: Analyzes reachability to find circular references too (slower but thorough)\n\n**Note**: Normally gc runs **automatically** on a periodic basis, so manual calls are only needed in special situations.\n\n**Why this order?** After the isolated circular reference is created, gc.collect() cleans it up to demonstrate gc's role.\n\n**Execution order**: gc.collect() called -> detect unreachable objects -> free 0x2000, 0x3000 -> return cleaned count (2) -> num = 2",
+        "visualizationType": "pythonMemory",
+        "code": "num = gc.collect()  # 가비지 컬렉션 실행!",
+        "pythonMemoryState": {
+          "note": "gc.collect() complete! 0x2000, 0x3000 removed (2 cleaned)",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking the Number of Cleaned Objects",
+        "explanation": "**`print(f\"정리된 객체 수: {num}\")`**\n\nPrints the number of objects cleaned up by gc.collect(). Since **num = 2**, the two objects that formed the circular reference -- Node A (0x2000) and Node B (0x3000) -- were successfully removed from memory!\n\n**Summary of Python's complete memory management system**:\n```\nStep 1: Reference Counting (immediate)\n   -> Frees memory immediately when refcount=0\n   -> Fast and predictable, handles most objects\n\nStep 2: Garbage Collector (circular reference handling)\n   -> Detects circular references that reference counting misses\n   -> Runs automatically on a periodic basis (manual calls also possible)\n   -> Cleans unreachable objects using Mark-and-Sweep\n```\n\n**When to manually call gc in practice**:\n- When you need to immediately free memory after processing large data\n- When doing memory profiling\n- When controlling gc timing in performance-critical code\n\n**Caution**: Calling `gc.collect()` too frequently actually **degrades performance**! The program briefly pauses during execution (Stop-the-World).\n\n**Why this order?** Checking the gc.collect() result to show that the circular reference was successfully cleaned up.\n\n**Execution order**: Evaluate {num} in f-string -> 2 -> output \"정리된 객체 수: 2\" -> program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"정리된 객체 수: {num}\")",
+        "pythonMemoryState": {
+          "output": [
+            "정리된 객체 수: 2"
+          ],
+          "note": "Done! 2 circular references cleaned - reference counting + gc = perfect memory management",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Do you need to call gc.collect() explicitly?",
+    "options": [
+      "You must call it every time",
+      "Usually it runs automatically, so explicit calls are unnecessary",
+      "You need to call it when there are no circular references",
+      "Calling it causes an error"
+    ],
+    "correctIndex": 1,
+    "explanation": "Python's gc runs automatically on a periodic basis.\nExplicit calls are only needed in special cases like when memory is low or after cleaning up large objects."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Calling gc.collect() frequently is good",
+      "correct": "It actually degrades performance! Only call when necessary",
+      "why": "The program briefly pauses during gc execution (Stop-the-World).\nAutomatic execution is sufficient."
+    },
+    {
+      "wrong": "Disabling gc causes memory leaks",
+      "correct": "Reference counting handles most cases; only circular references are problematic",
+      "why": "Even with gc.disable(), objects with refcount=0 are immediately deleted.\nOnly circular references accumulate."
+    }
+  ],
+  "keyTakeaway": "Reference counting (immediate) + gc (circular references) = Python's perfect memory management!"
+}

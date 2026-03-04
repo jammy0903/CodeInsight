@@ -1,0 +1,261 @@
+{
+  "lessonId": "c-1-7",
+  "title": "Function Definitions",
+  "concept": "Functions separate code into reusable blocks. You must specify the return type, name, and parameters.",
+  "content": {
+    "code": "#include <stdio.h>\n\nint add(int a, int b) {\n    int result = a + b;\n    return result;\n}\n\nint main() {\n    int x = 3;\n    int y = 7;\n    int sum = add(x, y);\n    printf(\"%d + %d = %d\\n\", x, y, sum);\n\n    return 0;\n}\n",
+    "steps": [
+      {
+        "title": "add Function Blueprint",
+        "explanation": "`int add(int a, int b)` is a function definition that takes two integers and returns their sum.\n\nThis step is the definition, not execution. The actual execution happens at the call site (`add(x, y)`).",
+        "visualizationType": "cMemory",
+        "code": "int add(int a, int b) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The program starts and the main frame is created.\n\nThis lesson covers function definition, calling, and returning to observe value passing and stack frame changes.",
+        "code": "int main() {",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          }
+        ]
+      },
+      {
+        "title": "Declaring Variable x",
+        "explanation": "`int x = 3;` prepares the first argument value.\n\nNote that what gets passed during the call is a copy of the value, not the variable itself.",
+        "code": "int x = 3;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "highlight": true,
+            "address": "0x1008"
+          }
+        ]
+      },
+      {
+        "title": "Declaring Variable y",
+        "explanation": "`int y = 7;` prepares the second argument.\n\nThis value will be copied to add's parameter when the function is called.",
+        "code": "int y = 7;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "highlight": true,
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "Calling add(x, y) (Push)",
+        "explanation": "When `add(x, y)` is called, the values 3 and 7 are copied to parameters `a` and `b`, and add's frame is pushed.\n\nC's default passing mechanism is pass by value, so modifying `a` or `b` inside add does not affect `x` or `y` in main.",
+        "code": "int sum = add(x, y);",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "address": "0x1004"
+          },
+          {
+            "frame": "add",
+            "name": "add",
+            "value": "add",
+            "highlight": true
+          },
+          {
+            "name": "a",
+            "type": "int",
+            "value": "3",
+            "highlight": true,
+            "address": "0x0ff8"
+          },
+          {
+            "name": "b",
+            "type": "int",
+            "value": "7",
+            "highlight": true,
+            "address": "0x0ff4"
+          }
+        ]
+      },
+      {
+        "title": "Computation Inside the Function",
+        "explanation": "Inside add, `result = a + b` is computed, preparing the value to return.\n\nThis variable is local to add and will be cleaned up when the function ends.",
+        "code": "int result = a + b;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "address": "0x1004"
+          },
+          {
+            "frame": "add",
+            "name": "add",
+            "value": "add"
+          },
+          {
+            "name": "a",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ff8"
+          },
+          {
+            "name": "b",
+            "type": "int",
+            "value": "7",
+            "address": "0x0ff4"
+          },
+          {
+            "name": "result",
+            "type": "int",
+            "value": "10",
+            "highlight": true,
+            "address": "0x0ff0"
+          }
+        ]
+      },
+      {
+        "title": "Returning the Value (return)",
+        "explanation": "`return result;` sends the computed value back to the caller (main) and ends the add function.\n\nWhen the function ends, add's local variables and frame are removed.",
+        "code": "return result;",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main",
+            "highlight": true
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "Storing the Return Value",
+        "explanation": "The returned value 10 is stored in main's `sum`.\n\nIn other words, even though the function's internal variables are gone, the return value can still be used by the caller.",
+        "code": "int sum = add(x, y);",
+        "stack": [
+          {
+            "frame": "main",
+            "name": "main",
+            "value": "main"
+          },
+          {
+            "name": "x",
+            "type": "int",
+            "value": "3",
+            "address": "0x1008"
+          },
+          {
+            "name": "y",
+            "type": "int",
+            "value": "7",
+            "address": "0x1004"
+          },
+          {
+            "name": "sum",
+            "type": "int",
+            "value": "10",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Printing the Result",
+        "explanation": "`printf` outputs `3 + 7 = 10`.\n\nThe reason x and y retain their original values is pass by value.",
+        "code": "printf(\"%d + %d = %d\\n\", x, y, sum);",
+        "stdout": "3 + 7 = 10"
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "`return 0;` terminates main and cleans up its local variables.\n\nThe key flow of a function call is: pass by value -> compute -> return the result.",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What about return in a function with void return type?",
+    "options": [
+      "return value; is required",
+      "return; or omitting it is fine",
+      "Compile error",
+      "return 0; is required"
+    ],
+    "correctIndex": 1,
+    "explanation": "void: a function with no return value.\n\n- Use `return;` to exit the function, or\n- Let it exit automatically at the end without return\n\nTrying to return a value will cause a compiler warning."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Passing a variable to a function changes the original",
+      "correct": "C's default passing mechanism is pass by value.\nThe original is not changed.",
+      "why": "To modify the original, you need to pass a pointer (&address)."
+    }
+  ],
+  "keyTakeaway": "Functions are the basic unit of code reuse: input (parameters) -> process -> output (return)!"
+}

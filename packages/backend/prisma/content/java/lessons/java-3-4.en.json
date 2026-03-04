@@ -1,0 +1,273 @@
+{
+  "lessonId": "java-3-4",
+  "title": "Why Swap Doesn't Work",
+  "concept": "Java doesn't support Call by Reference, so a general Swap function cannot be implemented.",
+  "content": {
+    "code": "void swap(Integer a, Integer b) {\n    Integer temp = a;\n    a = b;\n    b = temp;\n    System.out.println(\"inside: a=\" + a + \", b=\" + b);\n}\n\nInteger x = 1;\nInteger y = 2;\nSystem.out.println(\"before: x=\" + x + \", y=\" + y);\nswap(x, y);\nSystem.out.println(\"after: x=\" + x + \", y=\" + y);",
+    "steps": [
+      {
+        "title": "Variable Creation (Boxing)",
+        "explanation": "**Execution order:**\n1. `Integer(1)` object created (0x100, Auto-boxing).\n2. `Integer(2)` object created (0x200).\n3. `0x100` stored in `x`, `0x200` stored in `y`.\n\n**Memory state:**\nVariables `x` and `y` are on the `Stack`, each pointing to an Integer object on the `Heap`.",
+        "visualizationType": "javaMemory",
+        "code": "Integer x = 1;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Integer"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Integer(1)",
+              "type": "Integer"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Creating Variable y",
+        "explanation": "**Execution order:**\n1. Variable `y` is created and initialized.\n\nNow two objects are ready.",
+        "visualizationType": "javaMemory",
+        "code": "Integer y = 2;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Integer"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "Integer"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Integer(1)",
+              "type": "Integer"
+            },
+            {
+              "address": "0x200",
+              "content": "Integer(2)",
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Initial State",
+        "explanation": "**Execution order:**\n1. Print `x`, `y` values.\n\n\"before: x=1, y=2\" is printed.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"before: x=\" + x + \", y=\" + y);",
+        "javaMemoryState": {
+          "output": [
+            "before: x=1, y=2"
+          ]
+        }
+      },
+      {
+        "title": "Calling swap(x, y) - Address Copy",
+        "explanation": "**Execution order:**\n1. `x`'s address (`0x100`) -> copied to `a`.\n2. `y`'s address (`0x200`) -> copied to `b`.\n\n**Key point:**\n`a` and `b` are **copy remote controls** of `x` and `y`.",
+        "keyInsight": "Parameter passing = remote control copy",
+        "visualizationType": "javaMemory",
+        "code": "swap(x, y);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Integer"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "Integer"
+            },
+            {
+              "name": "a",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "copied": true,
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "copied": true,
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "temp = a",
+        "explanation": "**Execution order:**\n1. Store the address `0x100` that `a` points to into `temp`.\n\nThe swap operation begins inside the `swap` method.",
+        "visualizationType": "javaMemory",
+        "code": "Integer temp = a;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "temp",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "a = b",
+        "explanation": "**Execution order:**\n1. Assign `b`'s address `0x200` to `a`.\n\nNow `a` points to TV number `0x200`.\n(The original `x` in `main` is still `0x100`!)",
+        "visualizationType": "javaMemory",
+        "code": "a = b;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "changed": true,
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "temp",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "b = temp",
+        "explanation": "**Execution order:**\n1. Assign `temp`'s address `0x100` to `b`.\n\n**State:**\nInside the `swap` function, `a` and `b` have successfully swapped their addresses.\nSwap successful!",
+        "visualizationType": "javaMemory",
+        "code": "b = temp;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "changed": true,
+              "type": "Integer"
+            },
+            {
+              "name": "temp",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Internal Verification",
+        "explanation": "**Execution order:**\n1. Print `a`, `b`.\n\nInside the function, it appears that \"a=2, b=1\" -- the swap looks successful.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"inside: a=\" + a + \", b=\" + b);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            }
+          ],
+          "output": [
+            "inside: a=2, b=1"
+          ]
+        }
+      },
+      {
+        "title": "Method Exit and Final Check",
+        "explanation": "**Execution order:**\n1. `swap` ends -> `a`, `b`, `temp` are all deleted.\n2. Return to `main`.\n3. Print `x`, `y`.\n\n**Shocking result:**\n`x` and `y` have no idea what their copies (`a`, `b`) did.\nThey're still holding onto their original addresses (`0x100`, `0x200`).",
+        "keyInsight": "Swap failed! Only the remote controls were swapped.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"after: x=\" + x + \", y=\" + y);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Integer"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "Integer"
+            }
+          ],
+          "output": [
+            "after: x=1, y=2"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the correct way to swap two variables in Java?",
+    "options": [
+      "Create a swap(a, b) function.",
+      "Use pointers like in C.",
+      "Use a wrapper class or array to hold the values.",
+      "It's impossible."
+    ],
+    "correctIndex": 2,
+    "explanation": "You can't swap the variables themselves, but you can put values inside an array (`int[]`) or object (`MyObj`) and create a function that swaps the 'contents'."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Since Integer is an object, its contents should be modifiable, right?",
+      "correct": "The `Integer` class is **immutable**.",
+      "why": "Java designers made `Integer`, `String`, etc. so that their values can never be changed.\nThere's no way to set internal values either."
+    }
+  ],
+  "keyTakeaway": "A variable swap function is impossible in Java. (The limitation of Call by Value)"
+}

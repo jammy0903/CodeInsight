@@ -1,0 +1,139 @@
+{
+  "lessonId": "c-3-3",
+  "title": "数组名 vs 指针",
+  "concept": "数组名用起来像指针，但它并不是真正的指针变量",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[5];\n    int *p = arr;\n\n    printf(\"sizeof(arr): %zu\\n\", sizeof(arr));\n    printf(\"sizeof(p):   %zu\\n\", sizeof(p));\n\n    p = arr;\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "用于 `printf` 和输出 `sizeof` 结果的头文件。\n\n本次目标是确认数组名和指针变量虽然看起来相似，但本质不同。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "程序入口点。栈上准备了数组 `arr`（20字节）和指针 `p`（指针大小）。\n\n关键在于两者虽然都"与地址有关"，但身份不同：`arr` 是数据块本身，`p` 是存储地址的变量。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "数组声明",
+        "explanation": "`int arr[5];` 创建 5 个 int 的连续空间。\n\n数组名 `arr` 代表数据块本身，而不像指针变量那样是独立的存储空间。",
+        "visualizationType": "cMemory",
+        "code": "int arr[5];",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "[?,?,?,?,?]",
+            "type": "int[5]",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "将数组名赋给指针",
+        "explanation": "在 `int *p = arr;` 中，`arr` 被转换为 `&arr[0]` 并存储到 `p` 中。\n\n用法看起来相似，但在 `sizeof` 和能否重新赋值方面，类型属性会产生差异。",
+        "visualizationType": "cMemory",
+        "code": "int *p = arr;",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "[?,?,?,?,?]",
+            "type": "int[5]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1014",
+            "points_to": "arr"
+          }
+        ]
+      },
+      {
+        "title": "差异 1：sizeof 结果",
+        "explanation": "`sizeof(arr)` 返回整个数组的字节数，`sizeof(p)` 返回指针变量的大小。\n\n这个差异是数组和指针属于不同类型的最明确证据。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"sizeof(arr): %zu\\n\", sizeof(arr));",
+        "stdout": "sizeof(arr): 20"
+      },
+      {
+        "title": "指针变量的大小",
+        "explanation": "`sizeof(p)` 返回的是**指针变量本身的大小**。这个值可能因环境（32/64位）而异，与 `p` 指向的目标大小无关。\n\n所以 `sizeof(arr)` 和 `sizeof(p)` 结果不同是正常的，这一差异是数组和指针类型不同的核心证据。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"sizeof(p):   %zu\\n\", sizeof(p));",
+        "stdout": "sizeof(arr): 20\nsizeof(p):   8"
+      },
+      {
+        "title": "差异 2：能否重新赋值",
+        "explanation": "指针 `p` 是变量，可以重新赋值为不同的地址。\n\n而数组名不是可赋值的目标，无法以同样方式更改。",
+        "visualizationType": "cMemory",
+        "code": "p = arr;",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "[?,?,?,?,?]",
+            "type": "int[5]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1014",
+            "highlight": true,
+            "points_to": "arr"
+          }
+        ],
+        "stdout": ""
+      },
+      {
+        "title": "数组名是常量",
+        "explanation": "`arr = p;` 会产生编译错误。数组名不是可修改的指针变量。\n\n准确的说法是："数组名根据上下文会衰减（decay）为指针。"",
+        "highlight": [],
+        "visualizationType": "cMemory",
+        "code": "p = arr;",
+        "stack": []
+      },
+      {
+        "title": "程序结束",
+        "explanation": "`return 0;` 结束程序。\n\n总结：`sizeof` 结果和能否重新赋值是区分数组和指针的关键。",
+        "visualizationType": "cMemory",
+        "code": "return 0;"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "数组名 `arr` 和指针 `p` 的共同点是什么？",
+    "options": [
+      "sizeof 结果相同",
+      "都可以重新赋值（Mutable）",
+      "都可以作为表示地址的表达式使用",
+      "没有任何共同点"
+    ],
+    "correctIndex": 2,
+    "explanation": "两者都可以像 `*arr`、`*p` 一样解引用，或像 `arr[i]`、`p[i]` 一样索引（因为 Decay 特性）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "数组就是指针",
+      "correct": "数组是数组，指针是指针。",
+      "why": "数组名只是在表达式中使用时会"变身（Decay）"为指针。\n用 `sizeof` 一看就暴露真正身份了。"
+    }
+  ],
+  "keyTakeaway": "数组名是常量地址，指针是变量地址。`sizeof` 结果不同！"
+}

@@ -30,8 +30,6 @@ export interface MemoryPanelProps {
   changedBlocks: ChangedBlocksType;
   /** 스택 프레임 정보 (함수별 구분용) */
   frames?: Array<{ name: string }>;
-  /** RSP/RBP 레지스터 표시 */
-  showRegisters?: boolean;
   /** Data 영역 (문자열 리터럴, 초기화된 전역변수) */
   dataSection?: DataItem[];
   /** Text 영역 (함수들) */

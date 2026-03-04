@@ -1,0 +1,167 @@
+{
+  "lessonId": "java-5-1",
+  "title": "final Variables",
+  "concept": "A final variable cannot be reassigned, but the internal state of the referenced object can still be modified.",
+  "content": {
+    "code": "final int x = 10;\n// x = 20;  // Compile error!\n\nfinal int[] arr = {1, 2, 3};\narr[0] = 100;  // OK!\n// arr = new int[]{4, 5, 6};  // Compile error!\n\nfinal StringBuilder sb = new StringBuilder(\"Hello\");\nsb.append(\" World\");  // OK!\n// sb = new StringBuilder();  // Compile error!",
+    "steps": [
+      {
+        "title": "final Primitive Type",
+        "explanation": "**Execution flow:**\n1. Encounters the declaration `final int x = 10;`.\n2. Allocates space for variable `x` on the stack.\n3. Stores the value `10` and marks it as 'read-only'.\n\n**A welded box:**\nIt's like putting `10` into a box labeled `x` and then **welding the lid shut**.\nThe contents can never be changed.",
+        "visualizationType": "javaMemory",
+        "code": "final int x = 10;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "10",
+              "isFinal": true,
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "final Array Reference",
+        "explanation": "**Execution flow:**\n1. Creates the `final int[] arr` variable on the stack.\n2. Creates the array object `{1, 2, 3}` (`0x001`) on the heap.\n3. Sets `arr` to point to `0x001` and locks this 'arrow' in place.\n\n**A locked arrow:**\nNow `arr` can only ever point to that one object (`0x001`).",
+        "visualizationType": "javaMemory",
+        "code": "final int[] arr = {1, 2, 3};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "10",
+              "isFinal": true,
+              "frame": "main",
+              "type": "int"
+            },
+            {
+              "name": "arr",
+              "value": "0x001",
+              "isFinal": true,
+              "frame": "main",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[1, 2, 3]",
+              "type": "int[]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Modifying Array Elements (OK!)",
+        "explanation": "**Execution flow:**\n1. Follows `arr`'s reference to heap address `0x001`.\n2. Changes the value at index 0 to `100`.\n\n**Internals are free:**\nYou can't change the 'arrow', but you can freely modify the **contents of the object** the arrow points to.\nYou can't move to a new house, but you can renovate the interior!",
+        "visualizationType": "javaMemory",
+        "code": "arr[0] = 100;  // OK!",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[100, 2, 3]",
+              "type": "int[]",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "final StringBuilder",
+        "explanation": "**Execution flow:**\n1. Creates a `StringBuilder` object (`0x002`) on the heap.\n2. Sets the stack variable `sb` to point to it and locks the arrow.",
+        "visualizationType": "javaMemory",
+        "code": "final StringBuilder sb = new StringBuilder(\"Hello\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "10",
+              "isFinal": true,
+              "frame": "main",
+              "type": "int"
+            },
+            {
+              "name": "arr",
+              "value": "0x001",
+              "isFinal": true,
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "sb",
+              "value": "0x002",
+              "isFinal": true,
+              "frame": "main",
+              "type": "StringBuilder"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[100, 2, 3]",
+              "type": "int[]"
+            },
+            {
+              "address": "0x002",
+              "content": "value: \"Hello\"",
+              "type": "StringBuilder",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Modifying Content (OK!)",
+        "explanation": "**Execution flow:**\n1. Calls the `append` method on the object at `0x002`.\n2. The internal string changes to \"Hello World\".\n\n**Key point:**\nThe arrow `sb` stays the same, but the state of the destination can change freely.",
+        "visualizationType": "javaMemory",
+        "code": "sb.append(\" World\");  // OK!",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[100, 2, 3]",
+              "type": "int[]"
+            },
+            {
+              "address": "0x002",
+              "content": "value: \"Hello World\"",
+              "type": "StringBuilder",
+              "changed": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Given `final List list = new ArrayList();`, which code is allowed?",
+    "options": [
+      "list = new ArrayList()",
+      "list.add(\"item\")",
+      "list = null",
+      "list = List.of()"
+    ],
+    "correctIndex": 1,
+    "explanation": "final only prohibits 'reassignment' of the variable.\nModifying the internals of the referenced object (`list.add()`) is perfectly fine."
+  },
+  "misconceptions": [
+    {
+      "wrong": "The object referenced by a final variable is immutable.",
+      "correct": "No! Only the variable (the container) is fixed; the content (the object) can still change.",
+      "why": "For true immutability, you need a `final` class with all fields marked `final` and no setters (e.g., String)."
+    },
+    {
+      "wrong": "Adding final to a method parameter prevents changing the value.",
+      "correct": "True, but if the parameter is a reference type, you can still modify the object's properties.",
+      "why": "In `void func(final int[] a)`, `a = new...` is forbidden but `a[0] = 99` is allowed."
+    }
+  ],
+  "keyTakeaway": "final means 'the arrow is locked'. It doesn't freeze the internals of what it points to."
+}

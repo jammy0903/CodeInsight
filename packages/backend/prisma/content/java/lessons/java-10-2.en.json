@@ -1,0 +1,104 @@
+{
+  "lessonId": "java-10-2",
+  "title": "Synchronization: One at a Time, Please!",
+  "concept": "When multiple threads access a shared resource (like a single-stall restroom) at the same time, accidents happen. That's when you need a 'lock (synchronized)'.",
+  "content": {
+    "code": "class BankAccount {\n    private int balance = 1000;\n\n    public synchronized void withdraw(int amount) {\n        balance -= amount;\n        System.out.println(\"출금 완료! 잔액: \" + balance);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        BankAccount account = new BankAccount();\n        // 두 일꾼이 동시에 돈을 뽑으려 한다고 가정합시다.\n    }\n}",
+    "steps": [
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nWe create a bank account and begin the mission.",
+        "visualizationType": "memory",
+        "code": "public static void main(String[] args) {",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running"
+            }
+          ],
+          "note": "Main thread starts",
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Creating the Account Object",
+        "explanation": "A `BankAccount` object is created to serve as the shared resource.\nThis object internally holds an invisible 'monitor lock (key)'.",
+        "visualizationType": "memory",
+        "code": "BankAccount account = new BankAccount();",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "account",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "BankAccount{balance: 1000}",
+              "hasLock": true
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Synchronized Method",
+        "explanation": "When `synchronized` is placed before a method, any thread that wants to execute this method must first acquire the key (lock) of that object (`account`).\nOnly one thread at a time can execute this method.",
+        "visualizationType": "memory",
+        "code": "public synchronized void withdraw(int amount) {",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "locked by Thread-A"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Critical Section",
+        "explanation": "Only the thread holding the key can safely modify `balance`.\nOther threads must wait outside until this operation completes.\nA code region where only one thread can execute at a time is called a 'Critical Section'.",
+        "keyInsight": "Synchronization = Protecting data integrity",
+        "visualizationType": "memory",
+        "code": "balance -= amount;",
+        "memoryState": {
+          "threadPool": [
+            {
+              "name": "Thread-A",
+              "action": "Working in method",
+              "hasKey": true
+            },
+            {
+              "name": "Thread-B",
+              "action": "WAITING (Blocked)",
+              "hasKey": false
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How many locks can a Java object have?",
+    "options": [
+      "1",
+      "2",
+      "As many as the number of threads",
+      "Unlimited"
+    ],
+    "correctIndex": 0,
+    "explanation": "Every Java object has exactly one 'monitor lock'.\nThat's why only one thread at a time can enter a synchronized region."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Using more synchronized makes the program faster.",
+      "correct": "No! Synchronization forces threads to line up, which actually degrades performance.",
+      "why": "Waiting time is introduced.\nUse it minimally and only on shared resources that truly need protection."
+    }
+  ],
+  "keyTakeaway": "synchronized is a 'shield that protects data from corruption'. Remember: there's only one key per object!"
+}

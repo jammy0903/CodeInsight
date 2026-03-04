@@ -1,0 +1,230 @@
+{
+  "lessonId": "py-1-3",
+  "title": "Strings: A Sequence of Data",
+  "concept": "Strings are sequences of characters, and indexing and slicing are powerful tools",
+  "content": {
+    "code": "s = \"Python\"\n\n# 1. 인덱싱 (Indexing)\nprint(s[0])\nprint(s[-1])\n\n# 2. 슬라이싱 (Slicing)\nprint(s[0:2])\nprint(s[2:])\n\n# 3. 불변성 (Immutability)\n# s[0] = 'J'  # 에러 발생!\ns = \"J\" + s[1:]\nprint(s)",
+    "steps": [
+      {
+        "title": "Creating String Variable 's'",
+        "explanation": "**`s = \"Python\"`** -- Creates a string object `\"Python\"` in memory and attaches the label `s` to it.\n\nA string (str) is an **ordered sequence of characters**. `\"Python\"` is 6 characters — `P`, `y`, `t`, `h`, `o`, `n` — arranged in order.\n\n**Analogy:** A string is like 'train cars.' Each car (character) has a number (index), so you can find any character by its position.\n\n**Index structure:** `P`=0, `y`=1, `t`=2, `h`=3, `o`=4, `n`=5. Python indices always start from **0**!\n\n**How Python works internally:** A string object is created on the heap and internally stored as an array of Unicode characters. In Python 3, all strings support Unicode (UTF-8), so Korean characters (`\"hello\"`) and emojis work without issues.\n\n**Note:** Python has no separate 'char' type. The result of `s[0]` is also a string of length 1.",
+        "visualizationType": "pythonMemory",
+        "code": "s = \"Python\"",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Indexing: Accessing the First Element",
+        "explanation": "**`print(s[0])`** -- Accesses index 0 of string `s`, the **first character**, and prints it.\n\nPutting a number inside square brackets `[]` retrieves the character at that position. `s[0]` is `\"P\"`.\n\n**Why start from 0?** This is a long-standing convention in programming. Internally, an index represents the 'offset from the start.' The first element is at distance 0 from the start, so its index is 0.\n\n**Analogy:** It's like how in the UK, the first floor is called 'Ground Floor (floor 0).' The starting point is 0.\n\n**How Python works internally:** `s[0]` internally calls `s.__getitem__(0)`. It reads the character at position 0 from the string's internal array and creates a **new string object of length 1** to return.\n\n**Note:** Using an out-of-range index (e.g., `s[10]`) raises `IndexError: string index out of range`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(s[0])",
+        "pythonMemoryState": {
+          "output": [
+            "P"
+          ],
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Indexing: Accessing the Last Element",
+        "explanation": "**`print(s[-1])`** -- Uses a **negative index** to access the last character of the string.\n\n`s[-1]` is the first character from the end, which is `\"n\"`. Negative indices count from the end:\n- `s[-1]` = `\"n\"` (1st from end)\n- `s[-2]` = `\"o\"` (2nd from end)\n- `s[-6]` = `\"P\"` (6th from end = 1st from start)\n\n**Why is this useful?** When you don't know the length of a string and want to access the last character, you can simply write `s[-1]` instead of `s[len(s)-1]`. This is a convenient Python-specific feature!\n\n**Analogy:** It's like saying 'the first person from the back of the line.' `s[-1]` means '1st from the end.'\n\n**How Python works internally:** The negative index `-1` is internally converted to `len(s) + (-1)` = `6 - 1` = `5`. So `s[-1]` is equivalent to `s[5]`.\n\n**Note:** Going out of range like `s[-7]` also raises an `IndexError`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(s[-1])",
+        "pythonMemoryState": {
+          "output": [
+            "n"
+          ],
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Slicing: Extracting a Substring",
+        "explanation": "**`print(s[0:2])`** -- Uses **slicing** to extract a substring from index 0 up to (but not including) index 2.\n\nIn `s[0:2]`, the start index 0 is **included**, but the end index 2 is **excluded (exclusive)**. So only index 0 (`P`) and 1 (`y`) are extracted, outputting `\"Py\"`.\n\n**Why is the end index excluded?** This way, the length of `s[0:2]` is exactly `2 - 0 = 2`. Using the half-open interval `[start, end)` makes length calculations simple and allows convenient concatenation like `s[0:3] + s[3:6]` = `s[0:6]`.\n\n**Analogy:** When cutting a cake, you take the piece 'between cut mark 0 and cut mark 2.' You take the slices between the marks, not the marks themselves.\n\n**How Python works internally:** Slicing copies the characters in the specified range from the original string and creates an **entirely new string object**. The original `s` is not modified at all.\n\n**Note:** Slicing does not raise an error for out-of-range indices. `s[0:100]` simply returns `\"Python\"` (unlike indexing!).",
+        "visualizationType": "pythonMemory",
+        "code": "print(s[0:2])",
+        "pythonMemoryState": {
+          "output": [
+            "Py"
+          ],
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Slicing: From a Point to the End",
+        "explanation": "**`print(s[2:])`** -- Extracts everything from index 2 to the **end** of the string.\n\nWhen the end point is omitted like `s[2:]`, it takes from the start point to the very end. Characters from index 2 (`t`) onward are extracted, outputting `\"thon\"`.\n\n**Various omission patterns:**\n- `s[:3]` = `\"Pyt\"` (from start up to but not including 3)\n- `s[2:]` = `\"thon\"` (from 2 to end)\n- `s[:]` = `\"Python\"` (full copy)\n- `s[::2]` = `\"Pto\"` (every 2nd character)\n- `s[::-1]` = `\"nohtyP\"` (reversed!)\n\n**Analogy:** `s[2:]` is like ordering 'everything from slot 2 to the last slot.'\n\n**How Python works internally:** `s[2:]` is equivalent to `s[2:len(s)]`. Python automatically fills in the omitted end value with the string's length. A new string object is created here as well.\n\n**Practical tip:** Reversing a string with `s[::-1]` is the most commonly used slicing trick in Python. It frequently appears in coding challenges!",
+        "visualizationType": "pythonMemory",
+        "code": "print(s[2:])",
+        "pythonMemoryState": {
+          "output": [
+            "thon"
+          ],
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Error Due to Immutability",
+        "explanation": "**`# s[0] = 'J'  # Error!`** -- Commented-out code: an attempt to directly modify part of a string.\n\nStrings are **immutable** objects, so you cannot change the internal characters of a string once it is created. If you uncomment this line:\n```\nTypeError: 'str' object does not support item assignment\n```\nan error will be raised.\n\n**Why immutable?** Immutability has several benefits:\n1. **Safety:** No unexpected changes when multiple variables share the same string\n2. **Hashable:** Can be used as dictionary keys or set elements\n3. **String Interning:** Strings with the same content can share memory\n\n**Analogy:** A string is like 'text carved in stone.' Once carved, you can't erase it. If you want different text, you must carve a new stone.\n\n**How Python works internally:** The `str` type does not implement a `__setitem__` method. Therefore, `s[0] = 'J'` tries to call `s.__setitem__(0, 'J')` which doesn't exist, raising a `TypeError`.\n\n**Note:** Lists are mutable, so `lst[0] = 'J'` works. But strings and tuples are immutable!",
+        "visualizationType": "pythonMemory",
+        "code": "# s[0] = 'J'  # 에러 발생!",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            }
+          ],
+          "note": "주석 코드라 실행 상태 변화 없음"
+        }
+      },
+      {
+        "title": "Creating a New String and Reassigning",
+        "explanation": "**`s = \"J\" + s[1:]`** -- Instead of modifying the existing string, **creates a new string** and reassigns it to `s`.\n\nIf strings are immutable, how do you change the first character? The answer is to **compose a new string**:\n1. `\"J\"` -- the new first character we want\n2. `s[1:]` -- from the 2nd character to the end of the existing string = `\"ython\"`\n3. `\"J\" + \"ython\"` = `\"Jython\"` -- a new string object is created!\n4. The label `s` is moved to point to the new object (`\"Jython\"`)\n\n**Analogy:** Since you can't fix text carved in stone, you carve the desired content on a new stone and move the label to the new one. The old stone (`\"Python\"`) still exists in memory, but if nothing points to it, the garbage collector will reclaim it soon.\n\n**How Python works internally:** The `+` operator allocates a new `str` object on the heap that combines the contents of both strings. The reference count of the old `\"Python\"` object decreases by 1, and the new `\"Jython\"` object gets a reference count of 1. The old object is freed from memory when its reference count reaches 0.\n\n**Note:** Repeatedly concatenating strings with `+` in a loop creates a new object each time, degrading performance. For large-scale string concatenation, use the `\"\".join(list)` pattern.",
+        "visualizationType": "pythonMemory",
+        "code": "s = \"J\" + s[1:]",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "s",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Jython\"",
+              "pyId": "3002",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Result",
+        "explanation": "**`print(s)`** -- Now `s` points to the new `\"Jython\"` object, and its value is printed.\n\nIn the previous step, the label `s` was moved from `\"Python\"` to `\"Jython\"`. Looking at the memory visualization, both objects `\"Python\"` (str1) and `\"Jython\"` (str2) exist, but `s` only points to `str2`.\n\n**Key summary:**\n- Strings are **immutable** -- internal modification is impossible\n- When changes are needed, **create a new string and reassign**\n- Indexing: `s[0]`, `s[-1]` -- access a single character\n- Slicing: `s[start:end]` -- extract a substring (end is excluded)\n\n**How Python works internally:** The old `\"Python\"` object is no longer pointed to by any label, so its reference count becomes 0. CPython's reference-counting garbage collector immediately detects this and reclaims the memory.\n\n**Practical tip:** In practice, string methods like `s.replace(\"P\", \"J\")` are used more often. These methods also return a new string -- they do not modify the original!",
+        "visualizationType": "pythonMemory",
+        "code": "print(s)",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "3001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Jython\"",
+              "pyId": "3002"
+            }
+          ],
+          "output": [
+            "Jython"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Given s = \"Hello\", which slice extracts \"ell\"?",
+    "options": [
+      "s[1:3]",
+      "s[1:4]",
+      "s[2:4]",
+      "s[1:-1]"
+    ],
+    "correctIndex": 1,
+    "explanation": "'e' is at index 1.\nTo extract up to just before 'o', the end index must be 4 (0:H, 1:e, 2:l, 3:l, 4:o).\nSo it's from 1 up to (but not including) 4."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can change a single character of a string",
+      "correct": "Absolutely not.\nStrings are **immutable**.",
+      "why": "Lists are mutable, but tuples and strings are immutable."
+    }
+  ],
+  "keyTakeaway": "Master negative indexing (-1) and slicing (:). But remember — strings cannot be modified in place."
+}

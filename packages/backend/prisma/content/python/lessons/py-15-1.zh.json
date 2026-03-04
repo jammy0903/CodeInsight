@@ -1,0 +1,273 @@
+{
+  "lessonId": "py-15-1",
+  "title": "文件读取（open、read、readlines）",
+  "concept": "用open()函数打开文件，用read()或readlines()读取内容，使用完毕后必须用close()关闭。",
+  "content": {
+    "code": "f = open(\"data.txt\", \"r\")\ncontent = f.read()\nprint(content)\nf.close()\n\nf2 = open(\"data.txt\", \"r\")\nlines = f2.readlines()\nprint(f\"Total lines: {len(lines)}\")\nfor line in lines:\n    print(line.strip())\nf2.close()",
+    "steps": [
+      {
+        "title": "打开文件（open）",
+        "explanation": "**`open(path, mode)`** 是获取文件对象的基本函数。\n\n常用模式：\n- `r`：读取\n- `w`：新写入（覆盖现有内容）\n- `a`：追加到末尾\n\n**类比**：文件是抽屉，模式是选择\"只读/覆盖写入/追加写入\"权限。\n\n实用提示：\n- 文本文件指定 `encoding=\"utf-8\"` 可以减少中文乱码问题",
+        "visualizationType": "pythonMemory",
+        "code": "f = open(\"data.txt\", \"r\")",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "文件对象已创建并赋值给f。",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "读取文件全部内容（read）",
+        "explanation": "**`content = f.read()`** -- 将文件的**全部内容**作为一个字符串读取，存入 `content` 变量。\n\n`read()` 方法从头到尾读取所有字符，返回一个 `str` 对象。换行符（`\\n`）也原样包含在字符串中。\n\n**类比：** 就像用复印机**一次性复印整本书从第一页到最后一页**。结果是所有页面连接在一起的一张长卷轴（字符串）。\n\n**注意：** 对非常大的文件（数GB）使用 `read()` 会将整个文件加载到内存，可能导致 `MemoryError`。大文件应使用 `readline()` 或 `for line in f:` 逐行处理更安全。\n\n**read() vs readline() vs readlines()：**\n- `read()` -- 将文件全部内容作为**一个字符串**返回\n- `readline()` -- 只读取**一行**，返回字符串\n- `readlines()` -- 将所有行作为**列表**返回（每行是一个元素）",
+        "visualizationType": "pythonMemory",
+        "code": "content = f.read()",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "文件全部内容已作为一个字符串读取。",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1"
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1001"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello World\nPython File I/O\nThird Line",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出内容并关闭文件",
+        "explanation": "**`print(content)`** -- 输出用 `read()` 读取的整个字符串。\n**`f.close()`** -- 文件使用完毕，关闭文件。\n\n`content` 包含换行符（`\\n`），所以 `print()` 调用时会以多行形式输出。\n\n**类比：** 从图书馆借来的书（文件对象）读完后必须归还（close）。不归还的话，其他人（其他程序）就借不到那本书，而且可能会超过图书馆（OS）的借阅限额。\n\n**注意：** 忘记 `close()` 是非常常见的错误，Python为此提供了 `with` 语句来解决这个问题（下一课学习）。\n\n**为什么close()绝对必要？**\n- 操作系统对同时打开的文件数有**限制**（通常1024个）\n- 不调用 `close()` 会导致**文件描述符泄漏（file descriptor leak）**\n- 写入模式下，`close()` 之前数据可能只在缓冲区中，未实际写入磁盘\n- 可能产生其他进程无法访问文件的**文件锁定（file lock）**问题",
+        "visualizationType": "pythonMemory",
+        "code": "print(content)",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Hello World",
+            "Python File I/O",
+            "Third Line"
+          ],
+          "note": "文件内容已输出，并用close()关闭了文件。",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1"
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', CLOSED)",
+              "pyId": "1001",
+              "highlight": true
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello World\nPython File I/O\nThird Line",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "用readlines()按行读取",
+        "explanation": "**`readlines()`** 将文件的所有行读取为列表。\n\n所以结果通常是：\n- `[\"line1\\n\", \"line2\\n\", ...]` 的形式。\n\n**类比**：就像一次性把书的每一页都做成单独的备忘卡片。\n\n注意：\n- 大文件使用 `readlines()` 会占用大量内存\n- 大量数据用 `for line in file:` 逐行处理更安全",
+        "visualizationType": "pythonMemory",
+        "code": "f2 = open(\"data.txt\", \"r\")",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "readlines()将文件每一行作为列表元素返回。",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2",
+              "highlight": true
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出行数并循环输出",
+        "explanation": "确认行数并用循环输出，可以\"结构化地\"检查文件内容。\n\n核心：\n- 先了解总共有多少行\n- 然后按顺序逐行输出/处理\n\n**类比**：文档审查中先确认页数，然后逐页阅读的流程。\n\n实用提示：\n- 处理行时用 `strip()` 清理末尾换行，输出更整洁",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Total lines: {len(lines)}\")",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Total lines: 3",
+            "Hello World",
+            "Python File I/O",
+            "Third Line"
+          ],
+          "note": "用strip()去除换行后整洁输出。",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2"
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "line",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "Third Line",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "关闭文件（close）",
+        "explanation": "**`f2.close()`** -- 第二个文件对象 `f2` 也使用完毕，将其关闭。\n\n**类比：** 从图书馆借的第二本书也读完了，所以要归还。为了遵守图书馆（OS）的借阅限额，借的书必须归还。\n\n**总结：文件处理基本模式（open-操作-close）**\n```\nf = open(\"文件\", \"模式\")   # 第1步：打开\n# ... 读写操作 ...          # 第2步：操作\nf.close()                    # 第3步：关闭\n```\n\n**这个模式的致命问题：**\n- 第2步（操作）中**发生错误**的话，`close()` 不会执行！\n- 例如：`content = f.read()` 发生 `UnicodeDecodeError` 时，程序到不了 `f.close()` 那行\n- 每次打开文件都要记住 `close()` 的负担\n- 代码变长时容易遗漏 `close()`\n\n**Python内部机制：** CPython基于引用计数的垃圾回收器在文件对象引用为0时会自动调用 `close()`。但依赖这个是**不好的习惯**。其他Python实现（PyPy、Jython）的垃圾回收时机不同。\n\n**解决方案：** 下一课将学习的 **`with` 语句**优雅地解决了所有这些问题！`with` 语句即使发生错误也能保证自动 `close()`。\n\n**执行顺序：**\n1. `f2.close()` -> 文件描述符归还给OS。\n2. `f2` 对象状态变更为CLOSED。\n3. 程序结束。",
+        "visualizationType": "pythonMemory",
+        "code": "f2.close()",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "所有文件对象已关闭。下一课学习with语句！",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2"
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', CLOSED)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "关于read()和readlines()的区别，正确的是？",
+    "options": [
+      "read()返回列表，readlines()返回字符串",
+      "read()将文件全部内容作为一个字符串返回，readlines()将每行作为列表返回",
+      "read()只读第一行，readlines()读所有行",
+      "read()只能在二进制模式使用，readlines()只能在文本模式使用"
+    ],
+    "correctIndex": 1,
+    "explanation": "read()将文件全部内容作为一个字符串（str）返回。\nreadlines()返回以每行为元素的列表（list）。\n每个元素末尾包含换行符（\\n）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "打开文件后会自动关闭",
+      "correct": "用open()打开后必须调用close()或使用with语句",
+      "why": "不关闭文件可能导致内存泄漏、数据丢失、文件锁定等问题。"
+    },
+    {
+      "wrong": "调用两次read()会再次返回相同内容",
+      "correct": "read()后光标移动到文件末尾，第二次read()返回空字符串",
+      "why": "要重新读取需要用f.seek(0)将光标重置到开头。"
+    }
+  ],
+  "keyTakeaway": "用open()打开文件，read()返回全部字符串，readlines()返回按行的列表。使用后必须用close()关闭文件。"
+}

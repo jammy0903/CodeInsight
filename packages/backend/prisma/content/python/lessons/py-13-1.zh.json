@@ -1,0 +1,300 @@
+{
+  "lessonId": "py-13-1",
+  "title": "字符串方法（split、join、strip、replace）",
+  "concept": "字符串是不可变的（Immutable）！方法总是返回新的字符串",
+  "content": {
+    "code": "text = \"  Hello, World!  \"\nstripped = text.strip()\nprint(stripped)\n\nwords = \"apple,banana,cherry\".split(\",\")\nprint(words)\n\njoined = \" - \".join(words)\nprint(joined)\n\nreplaced = \"Hello World\".replace(\"World\", \"Python\")\nprint(replaced)",
+    "steps": [
+      {
+        "title": "创建包含空格的字符串",
+        "explanation": "**`text = \"  Hello, World!  \"`** -- 字符串对象 `\"  Hello, World!  \"` 在堆（heap）内存中创建，`text` 标签指向该对象。\n\nPython从上到下按顺序执行。这个字符串前后各有**2个空格**。\n\n**类比：** 就像新买的衣服（字符串）上还挂着价格标签和吊牌（不必要的空格）。穿之前需要先把标签摘掉（strip）！\n\n**为什么空格会是问题？** 实际工作中，用户输入或从文件读取的数据经常包含意外的空格。例如 `\"  alice  \" == \"alice\"` 是 `False`！空格可能导致比较、搜索、存储等方面的问题。\n\n**Python内部机制（字符串不可变性）：** Python的 `str` 对象是**不可变的（Immutable）**。一旦创建，字符串**绝对不能被修改**。像 `text[0] = \"X\"` 这样的代码会引发 `TypeError`。所有字符串方法都**不会修改原始字符串，而是创建并返回新的字符串对象**。\n\n**注意：** `text` 只是指向包含空格的字符串对象的标签。标签本身并不\"包含\"字符串，而是**引用（reference）**内存中的字符串对象。\n\n**执行顺序：** 创建 `str` 对象 `\"  Hello, World!  \"` -> 贴上 `text` 标签 -> 移到下一行",
+        "visualizationType": "pythonMemory",
+        "code": "text = \"  Hello, World!  \"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "创建了包含前后空格的字符串",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用strip()去除两侧空格",
+        "explanation": "**`stripped = text.strip()`** -- 调用 `text` 指向的字符串对象的 `strip()` 方法，返回一个去除两侧空格的**新**字符串对象。\n\n**strip()方法：** 去除字符串**两端**的所有空白字符（空格、制表符 `\\t`、换行符 `\\n`、回车符 `\\r`），返回一个**新字符串**。字符串中间的空格不受影响。\n\n**Python内部机制（不可变性的关键）：** `text.strip()` **绝不会修改**原始字符串 `\"  Hello, World!  \"`。它会在堆上创建一个新的 `str` 对象 `\"Hello, World!\"`，并返回其引用。`stripped` 是指向这个新对象的标签，而 `text` 仍然指向包含空格的原始对象。两个变量指向**不同的对象**。\n\n**类比：** 就像擦掉书（字符串）的封面和封底（两端）上的灰尘（空格）。书的内容（中间的空格）保持不变。而且不碰原书，制作一份**干净的副本（新字符串）**返回。\n\n**注意：** 初学者最常犯的错误：调用 `text.strip()` 但不把结果保存到变量中！如果只写 `text.strip()`，新字符串创建后会立即被丢弃。",
+        "visualizationType": "pythonMemory",
+        "code": "stripped = text.strip()",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "strip()返回新字符串（原始不变）",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出strip结果",
+        "explanation": "**`print(stripped)`** -- 输出 `stripped` 指向的字符串对象的值 `\"Hello, World!\"`。\n\n可以看到两侧多余的空格已被干净地去除。原始 `text` 仍然是 `\"  Hello, World!  \"`（包含空格）。\n\n**类比：** 把衣服（字符串）送到干洗店（strip），他们保留原件并返回一份干净的副本。原始衣服（text）仍然是脏的（包含空格）。\n\n**Python内部机制：** `print()` 函数内部调用 `stripped.__str__()` 获取字符串表示，通过 `sys.stdout.write()` 写入标准输出。`str` 对象的 `__str__` 返回自身。\n\n**实战必备模式：** 处理用户输入时 `strip()` 几乎是必须的：\n```python\nusername = input(\"姓名: \").strip()  # 输入后立即去除空格\nemail = input(\"邮箱: \").strip().lower()  # 去除空格 + 转小写\n```\n不使用这个模式可能因为 `\" alice \"` != `\"alice\"` 而导致登录失败等bug。\n\n**执行顺序：** `print(stripped)` -> 输出 `\"Hello, World!\"` -> 移到下一行",
+        "visualizationType": "pythonMemory",
+        "code": "print(stripped)",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, World!"
+          ],
+          "note": "两侧空格去除完成",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用split()分割字符串 -> 列表",
+        "explanation": "**`words = \"apple,banana,cherry\".split(\",\")`** -- 按分隔符 `\",\"` 将字符串分割，返回一个**列表（list）对象**。\n\n**split()方法：** 按指定分隔符将字符串分割，创建包含各个子字符串的**列表**并返回。原始字符串不会被修改。\n\n**类比：** 就像用剪刀（split）在连接处（分隔符）剪断一串香肠链（字符串），变成一个个独立的香肠（列表的每个元素）。\n\n**注意：** `\",,\".split(\",\")` 返回 `[\"\", \"\", \"\"]`（3个空字符串）。如果分隔符之间没有内容，会包含空字符串！\n\n**让我们跟踪处理过程：**\n1. 在字符串 `\"apple,banana,cherry\"` 中查找 `\",\"`（逗号）\n2. 第一个逗号 -> 分离出 `\"apple\"`\n3. 第二个逗号 -> 分离出 `\"banana\"`\n4. 剩余部分 -> 分离出 `\"cherry\"`\n5. 结果：返回列表 `[\"apple\", \"banana\", \"cherry\"]`",
+        "visualizationType": "pythonMemory",
+        "code": "words = \"apple,banana,cherry\".split(\",\")",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "split(\",\")按逗号分割 -> 列表",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"apple\", \"banana\", \"cherry\"]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用join()将列表 -> 字符串合并",
+        "explanation": "**`joined = \" - \".join(words)`** -- 用**分隔符字符串** `\" - \"` 连接列表的每个元素，合并成一个字符串。\n\n**join()方法：** 在可迭代对象（列表、元组等）的每个元素之间插入分隔符，合并成一个字符串。\n\n**类比：** 就像用线（分隔符）把珠子（列表的每个元素）串成项链（一个字符串）。\"用什么线串\"先出现（分隔符.join），\"串什么珠子\"作为参数传入（列表）。\n\n**注意（语法不太直观！）：**\n- `\" - \".join(words)` (O) -- 是**分隔符**.join(**列表**) 的形式！\n- `words.join(\" - \")` (X) -- 这样写会报 `AttributeError`！列表没有 `join` 方法\n\n**处理过程：**\n1. `words` = `[\"apple\", \"banana\", \"cherry\"]`\n2. 第一个元素：`\"apple\"`\n3. 插入分隔符：`\" - \"`\n4. 第二个元素：`\"banana\"`\n5. 插入分隔符：`\" - \"`\n6. 第三个元素：`\"cherry\"`\n7. 结果：`\"apple - banana - cherry\"`",
+        "visualizationType": "pythonMemory",
+        "code": "joined = \" - \".join(words)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "join()使用 分隔符.join(列表) 的形式",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "joined",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"apple\", \"banana\", \"cherry\"]",
+              "pyId": "1003"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"apple - banana - cherry\"",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用replace()替换字符串",
+        "explanation": "**`replace()`** 查找字符串中的一部分并替换为新字符串返回。\n\n核心要点：\n- 原始字符串不变（immutable）\n- 必须将结果赋给新变量或重新赋值才能生效\n\n**类比：** 不是直接修改原始文档，而是在副本中替换词语的方式。\n\n实践要点：\n- 常用于日志/消息清理、空格整理、数据脱敏等操作",
+        "visualizationType": "pythonMemory",
+        "code": "replaced = \"Hello World\".replace(\"World\", \"Python\")",
+        "pythonMemoryState": {
+          "output": [
+            "apple - banana - cherry"
+          ],
+          "note": "replace()替换部分字符串",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "stripped",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "joined",
+              "pointsTo": "str3"
+            },
+            {
+              "name": "replaced",
+              "pointsTo": "str4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"  Hello, World!  \"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, World!\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"apple\", \"banana\", \"cherry\"]",
+              "pyId": "1003"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "\"apple - banana - cherry\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "str4",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "\"hello,world\".split(\",\")的结果是？",
+    "options": [
+      "\"hello world\"",
+      "[\"hello\", \"world\"]",
+      "(\"hello\", \"world\")",
+      "[\"hello,world\"]"
+    ],
+    "correctIndex": 1,
+    "explanation": "split()按分隔符将字符串分割，返回一个**列表**。\n按逗号分割后得到 [\"hello\", \"world\"] 列表。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "strip()会修改原始字符串",
+      "correct": "字符串是不可变的（Immutable），所以strip()返回一个新字符串。",
+      "why": "即使调用了text.strip()，text变量的值也不会改变。\n要使用结果，必须像 stripped = text.strip() 这样保存到新变量中。"
+    }
+  ],
+  "keyTakeaway": "strip/split/join/replace是字符串处理的四大方法！它们都返回新的字符串（或列表）。"
+}

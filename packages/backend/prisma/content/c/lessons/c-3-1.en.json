@@ -1,0 +1,96 @@
+{
+  "lessonId": "c-3-1",
+  "title": "Array Memory Layout",
+  "concept": "An array is like an apartment building with units packed tightly together in memory",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n\n    printf(\"arr[0] Address: %p\\n\", &arr[0]);\n    printf(\"arr[1] Address: %p\\n\", &arr[1]);\n    printf(\"arr[2] Address: %p\\n\", &arr[2]);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h Header",
+        "explanation": "Standard I/O header for using `printf`.\n\nThis lesson verifies through address printing that array elements are stored contiguously in memory.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The main stack frame is created and the array `arr` is placed inside it.\n\nAn array allocates a contiguous block of \"element count x type size\" bytes all at once.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Array Declaration and Memory Allocation",
+        "explanation": "`int arr[3] = {10, 20, 30};` stores 3 integers in contiguous memory.\n\nThe key point is that the spacing between elements is always `sizeof(int)`, and this regularity is the foundation for pointer arithmetic.",
+        "visualizationType": "cMemory",
+        "code": "int arr[3] = {10, 20, 30};",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "int[3]",
+            "address": "0x1000",
+            "value": "{10, 20, 30}"
+          }
+        ]
+      },
+      {
+        "title": "Address of the First Element",
+        "explanation": "`&arr[0]` prints the starting address of the array.\n\nThe array name `arr` behaves like `&arr[0]` in most expressions, so you can calculate the remaining element addresses from here.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"arr[0] Address: %p\\n\", &arr[0]);",
+        "stdout": "arr[0] Address: 0x1000"
+      },
+      {
+        "title": "Address of the Second Element",
+        "explanation": "`&arr[1]` is `sizeof(int)` bytes greater than `&arr[0]`.\n\nThis follows the rule: `&arr[n] = &arr[0] + n * sizeof(int)`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"arr[1] Address: %p\\n\", &arr[1]);",
+        "stdout": "arr[0] Address: 0x1000\narr[1] Address: 0x1004"
+      },
+      {
+        "title": "Address of the Third Element",
+        "explanation": "`&arr[2]` is also a contiguous address calculated by the same rule.\n\nSince arrays are stored contiguously, accessing an index out of bounds is very dangerous.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"arr[2] Address: %p\\n\", &arr[2]);",
+        "stdout": "arr[0] Address: 0x1000\narr[1] Address: 0x1004\narr[2] Address: 0x1008"
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "`return 0;` terminates the program and the array memory on the stack is cleaned up.\n\nKey point: array elements are laid out contiguously, with address gaps equal to the type size.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "stdout": ""
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "For double arr[2]; if &arr[0] is at address 100, where is &arr[1]?",
+    "options": [
+      "Address 101",
+      "Address 104",
+      "Address 108",
+      "Address 116"
+    ],
+    "correctIndex": 2,
+    "explanation": "`double` is typically 8 bytes.\nSince arrays are packed tightly, the next element is at 100 + 8 = address 108."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can change the array size later",
+      "correct": "Basic arrays in C have a **fixed size**.",
+      "why": "At declaration, exactly that much space is allocated on the stack.\nTo resize, you need `malloc` and `realloc`."
+    }
+  ],
+  "keyTakeaway": "Array elements are packed tightly together. The address difference between elements equals the type size (sizeof)."
+}

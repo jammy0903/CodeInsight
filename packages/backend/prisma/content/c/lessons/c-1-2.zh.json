@@ -1,0 +1,137 @@
+{
+  "lessonId": "c-1-2",
+  "title": "初始化与垃圾值",
+  "concept": "变量使用前必须进行初始化，以避免不可预测的行为",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int score = 100;\n\n    int level;\n    level = 1;\n\n    printf(\"Score: %d, Level: %d\\n\", score, level);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "为了使用 ```printf```，我们引入标准输入输出库（```stdio.h```）。正如上节课所学，如果没有这一行，编译器将无法识别 ```printf``` 并报错。\n\n这是因为 C 编译器需要在使用函数**之前**知道该函数的签名（参数和返回类型）。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "程序的入口点。栈上会创建一个 **main 栈帧**（专用工作空间）。正如之前所学，局部变量存储在这个空间中。\n\n目前就像分配了一个空柜子 — 稍后 ```score``` 和 ```level``` 两个变量将存入其中。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "声明并同时初始化",
+        "explanation": "`int score = 100;` 是最安全的模式 — 一步完成声明和初始化。\n\n如果延迟初始化，在实际赋值之前会存在一个危险区间。因此最好养成使用 `类型 变量 = 初始值;` 形式的习惯。",
+        "visualizationType": "cMemory",
+        "code": "int score = 100;",
+        "stack": [
+          {
+            "name": "score",
+            "value": "100",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "仅声明（垃圾值）",
+        "explanation": "`int level;` 只分配了空间而没有存入值。\n\n在这种状态下读取 `level` 可能导致未定义行为，因此像 `int level = 1;` 这样立即初始化会更安全。",
+        "visualizationType": "cMemory",
+        "code": "int level;",
+        "stack": [
+          {
+            "name": "score",
+            "value": "100",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "level",
+            "value": "???",
+            "type": "int",
+            "address": "0x1000",
+            "note": "包含垃圾值。"
+          }
+        ]
+      },
+      {
+        "title": "赋值（Assignment）",
+        "explanation": "`level = 1;` 用实际值覆盖之前的垃圾状态。\n\n`=` 是赋值运算符而非比较运算符，它将右侧的计算结果存储到左侧的变量中。",
+        "visualizationType": "cMemory",
+        "code": "level = 1;",
+        "stack": [
+          {
+            "name": "score",
+            "value": "100",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "level",
+            "value": "1",
+            "type": "int",
+            "address": "0x1000",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "输出变量值",
+        "explanation": "在 `printf(\"Score: %d, Level: %d\\n\", score, level);` 中，两个 `%d` 占位符按顺序填入对应的值。\n\n如果格式说明符的数量与参数数量不匹配，会产生错误的输出或 bug。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Score: %d, Level: %d\\n\", score, level);",
+        "stack": [
+          {
+            "name": "score",
+            "value": "100",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "level",
+            "value": "1",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "Score: 100, Level: 1"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "`return 0;` 正常终止程序，同时清理 main 的局部变量。\n\n总结来说，在声明时就初始化变量是 C 语言中最基本的安全措施。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "忘记初始化变量会导致什么问题？",
+    "options": [
+      "编译错误导致无法运行",
+      "总是按 0 来计算",
+      "垃圾值导致意外结果或 bug",
+      "计算机会重启"
+    ],
+    "correctIndex": 2,
+    "explanation": "大多数现代编译器会发出警告（Warning），但代码仍会编译运行。\n这可能导致不可预测的行为（Undefined Behavior）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "反正之后会赋值，先声明就行了",
+      "correct": "尽可能用默认值初始化，例如 `int a = 0;`。",
+      "why": "随着代码变长，很容易忘记在哪里（或是否）初始化了变量。"
+    }
+  ],
+  "keyTakeaway": "声明时就初始化。这是最安全的做法。"
+}

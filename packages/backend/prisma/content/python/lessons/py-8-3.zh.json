@@ -1,0 +1,489 @@
+{
+  "lessonId": "py-8-3",
+  "title": "生成器表达式：内存高效的单行循环",
+  "concept": "与列表推导式类似，但使用小括号`()`代替方括号`[]`来创建节省内存的生成器。",
+  "content": {
+    "code": "import sys\n\n# 리스트 컴프리헨션: 모든 값을 메모리에 올림\nlist_comp = [i * i for i in range(5)]\nprint(f\"List: {list_comp}\")\nprint(f\"Size: {sys.getsizeof(list_comp)}\")\n\n# 제너레이터 표현식: 객체만 생성\ngen_exp = (i * i for i in range(5))\nprint(f\"Generator: {gen_exp}\")\nprint(f\"Size: {sys.getsizeof(gen_exp)}\")\n\n# 제너레이터는 필요할 때 값을 계산\nfor num in gen_exp:\n    print(num, end=' ')",
+    "steps": [
+      {
+        "title": "导入sys模块",
+        "explanation": "**`import sys`**\n\n为了使用测量内存大小的`sys.getsizeof()`函数，我们导入`sys`模块。\n\n**为什么内存大小很重要？**\n本课的核心主题是**列表推导式与生成器表达式的内存差异**。\n使用`sys.getsizeof()`比较实际内存使用量，可以亲眼看到差异！\n\n**什么是sys.getsizeof()？**\n一个告诉你对象在内存中占用多少字节的函数。\n例如：`sys.getsizeof([1, 2, 3])` → 大约120字节（列表结构 + 3个引用）\n\n**为什么是这个顺序？** 使用模块的函数之前必须先import。\n\n**执行顺序**：加载sys模块(0x1500) → 在全局命名空间中注册'sys'名称",
+        "visualizationType": "pythonMemory",
+        "code": "import sys",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "sys模块(0x1500)已加载。",
+          "names": [
+            {
+              "name": "sys",
+              "pointsTo": "module1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "列表推导式",
+        "explanation": "**`list_comp = [i * i for i in range(5)]`**\n\n这是使用**方括号`[]`**的**列表推导式**。这一行就能创建一个包含0到4的平方值的列表。\n\n**什么是即时求值（Eager Evaluation）？**\n列表推导式会立即**一次性计算所有值**并加载到内存中：\n- i=0: 0*0 = 0\n- i=1: 1*1 = 1\n- i=2: 2*2 = 4\n- i=3: 3*3 = 9\n- i=4: 4*4 = 16\n结果：[0, 1, 4, 9, 16]——5个值**全部**存储在内存中。\n\n**类比**：就像自助餐厅把所有菜一次性全摆在桌上。\n5个没问题，但如果是range(1000000)呢？一百万个值全在内存里！\n\n**为什么是这个顺序？** 先观察列表推导式的行为，然后与生成器表达式进行比较。\n\n**执行顺序**：创建列表对象(0x2000) → 计算0~4的平方值 → 存储[0, 1, 4, 9, 16]",
+        "visualizationType": "pythonMemory",
+        "code": "list_comp = [i * i for i in range(5)]",
+        "pythonMemoryState": {
+          "note": "列表(0x2000)已创建，所有值立即存储在内存中。",
+          "names": [
+            {
+              "name": "list_comp",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[0, 1, 4, 9, 16]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "打印列表内容",
+        "explanation": "**`print(f\"List: {list_comp}\")`**\n\n打印列表的**全部内容**`[0, 1, 4, 9, 16]`。\n\n**列表可以显示所有值！**\n因为所有值已经被计算并存储在内存中了。\n可以通过索引访问（list_comp[3] = 9），也可以检查长度（len = 5）。\n\n**之后打印生成器表达式会怎样？** 不会显示值，只会显示`<generator object ...>`这样的对象信息。\n因为值还没有被计算，没有内容可以显示！\n\n**执行顺序**：将list_comp转换为字符串 → 输出\"List: [0, 1, 4, 9, 16]\"",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"List: {list_comp}\")",
+        "pythonMemoryState": {
+          "output": [
+            "List: [0, 1, 4, 9, 16]"
+          ],
+          "note": "已输出列表的全部内容。",
+          "names": [
+            {
+              "name": "list_comp",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[0, 1, 4, 9, 16]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "列表内存大小",
+        "explanation": "**`print(f\"Size: {sys.getsizeof(list_comp)}\")`**\n\n打印列表占用的**内存大小（字节）**。大约120字节。\n\n**120字节的构成：**\n列表对象本身的开销（56字节）+ 5个元素的指针（每个8字节 = 40字节）+ 预留空间\n只有5个元素时是120字节，但如果是range(1000000)呢？会占用**大约8MB**的内存！\n\n**核心问题**：\"所有值真的需要同时在内存中吗？\"\n如果用for循环逐个处理，实际上一次只需要一个值。\n这就是生成器表达式存在的原因！\n\n**执行顺序**：调用sys.getsizeof(list_comp) → 测量内存大小 → 输出",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Size: {sys.getsizeof(list_comp)}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Size: 120"
+          ],
+          "note": "列表大小已输出。（值可能因系统而异）",
+          "names": [
+            {
+              "name": "list_comp",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[0, 1, 4, 9, 16]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "生成器表达式",
+        "explanation": "**`gen_exp = (i * i for i in range(5))`**\n\n这是使用**小括号`()`**的**生成器表达式**！\n语法与列表推导式几乎相同，唯一的区别是**方括号`[]`换成了小括号`()`**。\n\n**关键区别：惰性求值（Lazy Evaluation）**\n- 列表推导式`[...]`：立即计算所有值 → 全部存储在内存中\n- 生成器表达式`(...)`：**什么都不计算！** 只创建一个生成器对象\n\n此时0*0、1*1、2*2...这些计算一个都没有执行！\n只是存储了一个\"打算做这些计算\"的**配方（计算公式）**。\n\n**类比**：列表 = 所有菜都上齐的自助餐桌，生成器 = 还是空白的套餐菜单\n菜单（配方）很轻，但自助餐桌上满是食物很重！\n\n**为什么是这个顺序？** 将生成器表达式的行为与列表推导式进行对比。\n\n**执行顺序**：创建生成器对象(0x3000) → 内部只存储计算公式（不计算任何值！）",
+        "visualizationType": "pythonMemory",
+        "code": "gen_exp = (i * i for i in range(5))",
+        "pythonMemoryState": {
+          "note": "生成器对象(0x3000)已创建，但没有计算任何内部值。",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "打印生成器对象",
+        "explanation": "**`print(f\"Generator: {gen_exp}\")`**\n\n打印生成器对象会输出`<generator object <genexpr> at 0x...>`。\n**不会**像列表那样显示`[0, 1, 4, 9, 16]`！\n\n**为什么不显示值？**\n因为值**还没有被计算**！\n生成器在值被需要之前（next()调用或for循环）不做任何计算。\n根本就没有值可以显示。\n\n**与列表的关键区别：**\n- `print([0, 1, 4, 9, 16])` → 所有值可见（已计算）\n- `print(gen_exp)` → 只显示对象信息（尚未计算）\n\n**初学者注意**：如果你尝试用`list(gen_exp)`转换来查看生成器的内容，所有值会被一次性计算并转换为列表。但这样就失去了生成器的内存优势！\n\n**执行顺序**：调用gen_exp的repr → 输出\"Generator: <generator object ...>\"",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Generator: {gen_exp}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Generator: <generator object ...>"
+          ],
+          "note": "生成器输出对象信息而非显示内容。",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "生成器内存大小",
+        "explanation": "**`print(f\"Size: {sys.getsizeof(gen_exp)}\")`**\n\n打印生成器对象的内存大小。大约**112字节**——看起来和列表（120字节）差不多，但是...\n\n**真正的差异在数据变大时才会显现！**\n- `[i*i for i in range(5)]` → 120字节\n- `(i*i for i in range(5))` → 112字节\n- `[i*i for i in range(1000000)]` → **大约8,000,000字节**（8MB！）\n- `(i*i for i in range(1000000))` → **仍然只有112字节！**\n\n**为什么生成器总是这么小？**\n生成器不存储数据！它只保存\"如何计算\"的配方，所以无论数据是100万个还是10亿个，生成器对象的大小始终不变。\n\n**类比**：食谱（配方）永远只有一本书，但把所有菜都提前做好的话，冰箱就会被塞满！\n\n**执行顺序**：调用sys.getsizeof(gen_exp) → 测量生成器对象大小 → 输出112字节",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Size: {sys.getsizeof(gen_exp)}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Size: 112"
+          ],
+          "note": "无论数据数量多少，都只使用恒定（少量）的内存。",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环开始 - 第一个值",
+        "explanation": "**`for num in gen_exp:`**\n\nfor循环开始遍历生成器。**值终于被计算了！**\n当__next__()被调用时，生成器计算第一个值：i=0 → 0*0 = **0**\n\n**\"需要时才计算\"就是这个意思！**\n列表推导式在创建时就计算了全部5个值，而生成器在for循环每次请求时才**逐个**计算。\n\n**从内存角度来看：**\n- 列表：[0, 1, 4, 9, 16] 5个值同时存在于内存中\n- 生成器：内存中只有0一个值，其余的甚至还没被计算\n\n**类比**：列表就像考试前把所有答案预先写好，生成器就像遇到每道题时再解答。\n\n**执行顺序**：gen_exp.__iter__() → 调用__next__() → i=0, 计算0*0 → num = 0",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "note": "第一个值已计算并赋值给num。",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第一个值 (0)",
+        "explanation": "**`print(num, end=' ')`**\n\n打印第一个计算出的值**0**。`end=' '`用空格代替换行，让值排列在一行。\n\n**此时生成器已计算的值**：0（只有一个！）\n剩下的1、4、9、16还不存在。\n\n**感受\"逐个计算\"的含义：**\n现在内存中只有0一个值，打印后，下次__next__()调用时才会计算1。\n同一时刻内存中存在的值最多只有**1个**！\n\n**执行顺序**：执行print(0, end=' ') → 输出\"0 \" → 回到循环顶部",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "0"
+          ],
+          "note": "已输出0。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环 - 第二个值",
+        "explanation": "**`for num in gen_exp:`**（第二次迭代）\n\n调用__next__()计算第二个值：i=1 → 1*1 = **1**\n\n**生成器的内部状态在推进：**\n之前在i=0处暂停的生成器恢复执行，处理i=1。\n值1被计算并赋给num，然后再次暂停。\n\n**执行顺序**：调用__next__() → i=1, 计算1*1 → num = 1",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "output": [
+            "..."
+          ],
+          "note": "第二个值已计算。",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第二个值 (1)",
+        "explanation": "**`print(num, end=' ')`**\n\n打印第二个值**1**（= 1*1）。\n\n**到目前为止的输出**：\"0 1 \"（空格分隔）\n**剩余值**：4(=2*2), 9(=3*3), 16(=4*4)——尚未计算！\n\n**执行顺序**：执行print(1, end=' ') → 输出\"1 \"",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "0",
+            "1"
+          ],
+          "note": "已输出1。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环 - 第三个值",
+        "explanation": "**`for num in gen_exp:`**（第三次迭代）\n\n计算第三个值：i=2 → 2*2 = **4**\n\n**平方运算的结果在变大：** 0, 1, 4, ...\n如果是range(1000000)，会一直到999999*999999 = 999998000001，但生成器不会预先计算，只在需要时逐个计算。\n\n**执行顺序**：调用__next__() → i=2, 计算2*2 → num = 4",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "note": "第三个值4已生成。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 4,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第三个值 (4)",
+        "explanation": "**`print(num, end=' ')`**\n\n打印第三个值**4**（= 2*2）。\n\n**到目前为止的输出**：\"0 1 4 \"\n**剩余值**：9(=3*3), 16(=4*4)\n\n**执行顺序**：执行print(4, end=' ') → 输出\"4 \"",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "4"
+          ],
+          "note": "已输出4。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 4,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环 - 第四个值",
+        "explanation": "**`for num in gen_exp:`**（第四次迭代）\n\n计算第四个值：i=3 → 3*3 = **9**\n\n每次for循环调用__next__()时，生成器就会醒来计算下一个i值的平方。\n这个过程一直持续到range(5)的所有值被耗尽。\n\n**执行顺序**：调用__next__() → i=3, 计算3*3 → num = 9",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "note": "第四个值9已生成。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 9,
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第四个值 (9)",
+        "explanation": "**`print(num, end=' ')`**\n\n打印第四个值**9**（= 3*3）。\n\n**到目前为止的输出**：\"0 1 4 9 \"\n**剩余值**：16(=4*4)——最后一个！\n\n**执行顺序**：执行print(9, end=' ') → 输出\"9 \"",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "9"
+          ],
+          "note": "已输出9。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 9,
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环 - 第五个值",
+        "explanation": "**`for num in gen_exp:`**（第五次迭代——最后一次！）\n\n计算最后一个值：i=4 → 4*4 = **16**\n\nrange(5)的最后一个值i=4已处理完毕。下次__next__()调用时，range(5)将被耗尽并抛出StopIteration。\n\n**生成器表达式的完整计算顺序**：\n- for第1次：i=0, yield 0 → 输出\"0\"\n- for第2次：i=1, yield 1 → 输出\"1\"\n- for第3次：i=2, yield 4 → 输出\"4\"\n- for第4次：i=3, yield 9 → 输出\"9\"\n- for第5次：i=4, yield 16 → 输出\"16\"\n- for第6次：StopIteration → 循环结束\n\n**执行顺序**：调用__next__() → i=4, 计算4*4 → num = 16",
+        "visualizationType": "pythonMemory",
+        "code": "for num in gen_exp:",
+        "pythonMemoryState": {
+          "note": "第五个值16已生成。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 16,
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第五个值 (16)",
+        "explanation": "**`print(num, end=' ')`**\n\n打印最后一个值**16**（= 4*4）。生成器现在已**耗尽（exhausted）**！\n\n**最终输出**：\"0 1 4 9 16 \"——与列表推导式[0, 1, 4, 9, 16]的结果完全相同！\n\n**相同结果，不同过程：**\n- 列表：**一次性**计算全部5个值并存储在内存中 → 逐个输出\n- 生成器：**逐个**计算值并立即输出 → 计算下一个值\n\n**生成器耗尽后的注意事项：**\n已耗尽的生成器**不能重复使用**！\n再次运行`for num in gen_exp:`不会产生任何输出。\n如果需要新的值，必须重新创建生成器表达式。\n\n**核心要点**：只需遍历大数据集时用`()`，需要索引访问或重复使用时用`[]`。\n\n**执行顺序**：执行print(16) → for循环调用__next__() → 抛出StopIteration → 循环结束",
+        "visualizationType": "pythonMemory",
+        "code": "print(num, end=' ')",
+        "pythonMemoryState": {
+          "output": [
+            "16"
+          ],
+          "note": "输出16，循环结束。生成器(0x3000)现在已空。",
+          "names": [
+            {
+              "name": "gen_exp",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "使用生成器表达式代替列表推导式的最大原因是什么？",
+    "options": [
+      "代码更短",
+      "执行速度更快",
+      "为了高效使用内存",
+      "提供更多功能"
+    ],
+    "correctIndex": 2,
+    "explanation": "生成器表达式不会预先创建所有值，而是在需要时逐个生成，因此在处理大量数据时可以大幅减少内存使用量。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "生成器表达式总是比列表快。",
+      "correct": "对于小数据集，列表可能更快。\n生成器有调用开销。",
+      "why": "生成器的真正价值在于处理'大量'数据时的内存节省。"
+    }
+  ],
+  "keyTakeaway": "处理大量数据时，使用生成器表达式`()`代替列表推导式`[]`来节省内存。"
+}

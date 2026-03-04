@@ -1,0 +1,255 @@
+{
+  "lessonId": "py-15-3",
+  "title": "Working with CSV and JSON Files",
+  "concept": "Using the csv and json modules, you can save and load structured data to and from files.",
+  "content": {
+    "code": "import csv\nimport json\n\ndata = [\n    {\"name\": \"Alice\", \"score\": 95},\n    {\"name\": \"Bob\", \"score\": 87},\n]\n\nwith open(\"data.json\", \"w\") as f:\n    json.dump(data, f, indent=2)\n\njson_str = json.dumps(data[0])\nprint(json_str)\n\nparsed = json.loads(json_str)\nprint(f\"Name: {parsed['name']}\")",
+    "steps": [
+      {
+        "title": "Importing csv and json Modules",
+        "explanation": "**`import csv, json`** loads the basic tools for file data processing.\n\nRole distinction:\n- `csv`: Tabular data (rows/columns)\n- `json`: Nested structure data (dict/list)\n\n**Analogy**: CSV is a tool for handling spreadsheet tables, JSON is a tool for handling object boxes.\n\nThe key is \"using the module that matches your data shape.\"\nThis keeps parsing and saving code simple.",
+        "visualizationType": "pythonMemory",
+        "code": "import csv",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "csv and json standard libraries loaded.",
+          "names": [
+            {
+              "name": "csv",
+              "pointsTo": "module1",
+              "highlight": true
+            },
+            {
+              "name": "json",
+              "pointsTo": "module2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001",
+              "highlight": true
+            },
+            {
+              "id": "module2",
+              "type": "module",
+              "value": "module",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Preparing Data (List of Dictionaries)",
+        "explanation": "**`data = [{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]`** -- Creates a list of 2 dictionaries. This structure maps most naturally to JSON as a Python data structure.\n\n**Analogy:** This is like a student roster. Cards (dictionaries) with each student's information are collected in a bundle (list). Saving this roster in JSON format means it persists even when the program is closed and reopened.\n\n**Python data structures and JSON 1:1 correspondence:**\n\nThis natural correspondence is why Python is very convenient for working with JSON.\n\n**Python internals:** In this code, 2 `dict` objects, 2 `str` key objects (`\"name\"`, `\"score\"`), 2 `str` value objects (`\"Alice\"`, `\"Bob\"`), 2 `int` value objects (`95`, `87`), and 1 `list` object are created on the heap. Python's dictionaries are implemented as hash tables, providing O(1) key lookup.\n\n**Why this structure?** In practice, database query results, REST API responses, etc. are mostly in this \"list of records\" format. Each dictionary represents one record (row).\n\n**Execution order:**\n1. 2 dictionary objects created (each hash table initialized).\n2. List object created -> stores references to dictionaries.\n3. `data -> list` binding in global namespace.",
+        "visualizationType": "pythonMemory",
+        "code": "data = [",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Dictionary lists convert naturally to and from JSON.",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Saving to File with json.dump()",
+        "explanation": "**`json.dump(data, f, indent=2)`** converts a Python object to JSON and saves it to a file.\n\nOne-line summary:\n- `dump` = save to file\n- `dumps` = convert to string\n\n**Analogy**: Like converting in-memory data into \"archival packaging\" (JSON) and placing it in a file box.\n\n`indent=2` formats it in a human-readable way.\nVery useful for debugging in practice.\n\nImportant notes:\n- Types like `set` and `datetime` may not be directly serializable by default\n- In such cases, you need to add conversion rules (`default`)\n\nIn other words, this step is the starting point for \"persisting in-memory data.\"",
+        "visualizationType": "pythonMemory",
+        "code": "with open(\"data.json\", \"w\") as f:",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "json.dump() converts Python objects to JSON and saves to file.",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]",
+              "pyId": "1003"
+            },
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.json', mode='w') [JSON saved]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Converting to String with json.dumps()",
+        "explanation": "**`json.dumps()`** converts a Python object to a JSON \"string.\"\n\nJust remember the distinction:\n- `dump` = file\n- `dumps` = string\n\nConverting to a string makes it immediately usable for network transmission, log recording, and message queue delivery.\n\n**Analogy**: Like converting an object into a standard shipping package (JSON text) ready for delivery.\n\nNote:\n- To see Chinese/Korean characters as-is, consider using the `ensure_ascii=False` option",
+        "visualizationType": "pythonMemory",
+        "code": "json_str = json.dumps(data[0])",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "{\"name\": \"Alice\", \"score\": 95}"
+          ],
+          "note": "json.dumps() converts Python objects to JSON strings.",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "json_str",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]",
+              "pyId": "1003"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "{\"name\": \"Alice\", \"score\": 95}",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Parsing a String with json.loads()",
+        "explanation": "**`parsed = json.loads(json_str)`** converts a JSON string back into a Python object.\n\nOne-line summary:\n- `loads` = read from string\n- `load` = read from file\n\nThe conversion result is usually `dict`/`list`.\nSo afterward, you work with it like a normal Python data structure.\n\n**Analogy**: Like opening a delivery box (JSON) and taking out the actual items (Python objects).\n\nImportant notes:\n- If the string format doesn't follow JSON rules, `JSONDecodeError` is raised\n- The converted object is a separate object from the original, even if the \"content is the same\"",
+        "visualizationType": "pythonMemory",
+        "code": "parsed = json.loads(json_str)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "json.loads() converts JSON strings to Python dictionaries.",
+          "names": [
+            {
+              "name": "json_str",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "parsed",
+              "pointsTo": "dict1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "{\"name\": \"Alice\", \"score\": 95}",
+              "pyId": "1005"
+            },
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"score\": 95}",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Using the Parsed Data",
+        "explanation": "**`parsed['name']`** -- The moment you retrieve a value, the data behaves exactly like a normal Python dictionary.\n\nIn other words, JSON is a format for storage/transmission,\nand after going through `load/loads`, you work with it using your regular coding style.\n\n**Analogy**: Like using files normally after extracting a compressed archive.\n\nHere:\n- Key `name` lookup -> `\"Alice\"`\n- f-string outputs `Name: Alice`\n\nPractical points:\n- API responses, config files, and log storage all follow the same pattern\n- If you clearly distinguish save (`dump/dumps`) from restore (`load/loads`), you won't get confused",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Name: {parsed['name']}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Name: Alice"
+          ],
+          "note": "Convert to JSON and back to Python object for use.",
+          "names": [
+            {
+              "name": "parsed",
+              "pointsTo": "dict1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"score\": 95}",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the difference between json.dumps() and json.dump()?",
+    "options": [
+      "dumps() saves to a file, dump() converts to a string",
+      "dumps() converts a Python object to a string, dump() saves directly to a file",
+      "dumps() can only handle lists, dump() can only handle dictionaries",
+      "dumps() is for reading, dump() is for writing"
+    ],
+    "correctIndex": 1,
+    "explanation": "The s in json.dumps() stands for string. It converts Python objects to JSON strings.\njson.dump() converts Python objects to JSON and saves directly to a file object.\nThe same rule applies to loads()/load()."
+  },
+  "misconceptions": [
+    {
+      "wrong": "json.dumps() and json.dump() are the same function",
+      "correct": "dumps() returns a string, dump() saves directly to a file. The s stands for string",
+      "why": "dump() -> file, dumps() -> string / load() -> file, loads() -> string. Distinguish by the presence of s."
+    },
+    {
+      "wrong": "JSON files can only be used in Python",
+      "correct": "JSON is a language-independent universal data format",
+      "why": "JSON is supported by virtually all programming languages including JavaScript, Java, C#, and Go. It is also the standard data format for web APIs."
+    }
+  ],
+  "keyTakeaway": "The json module's dump/dumps converts Python to JSON, load/loads converts JSON to Python. With s means string target, without s means file target."
+}

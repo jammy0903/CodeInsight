@@ -1,0 +1,276 @@
+{
+  "lessonId": "c-7-3",
+  "title": "Dynamic 2D Arrays",
+  "concept": "动态二维数组通过分阶段分配行指针数组和每行数据来构建",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int rows = 2, cols = 3;\n\n    int **matrix = (int **)malloc(rows * sizeof(int *));\n\n    for (int i = 0; i < rows; i++) {\n        matrix[i] = (int *)malloc(cols * sizeof(int));\n    }\n\n    matrix[0][1] = 99;\n    printf(\"matrix[0][1] = %d\\n\", matrix[0][1]);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含所需头文件",
+        "explanation": "包含 `stdio.h` 和 `stdlib.h` 以使用输出和动态内存函数。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧。\n\n实际数据放在堆上，控制指针放在栈上。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "定义数组维度",
+        "explanation": "`rows`、`cols` 设置运行时大小。\n\n动态数组的分配大小由这些值决定。",
+        "visualizationType": "cMemory",
+        "code": "int rows = 2, cols = 3;",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "第 1 步：分配行指针数组",
+        "explanation": "首先为 `matrix` 分配存放行指针的空间。\n\n每行的实际数据空间还不存在。",
+        "visualizationType": "cMemory",
+        "code": "int **matrix = (int **)malloc(rows * sizeof(int *));",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1",
+            "address": "0x0ff8"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "行指针数组",
+            "value": "{???, ???}"
+          }
+        ]
+      },
+      {
+        "title": "第 2 步：为每行分配数据空间（循环开始）",
+        "explanation": "循环为每行分别分配 `cols` 个 int 空间。\n\n这个过程完成二维结构的构建。",
+        "visualizationType": "cMemory",
+        "code": "for (int i = 0; i < rows; i++) {",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1",
+            "address": "0x0ff8"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "0",
+            "address": "0x0ff4"
+          }
+        ]
+      },
+      {
+        "title": "分配第一行（row 0）",
+        "explanation": "分配第一行的数据块，并将地址存入 `matrix[0]`。",
+        "visualizationType": "cMemory",
+        "code": "matrix[i] = (int *)malloc(cols * sizeof(int));",
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "行指针数组",
+            "value": "{0xHEAP2, ???}"
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 数据",
+            "value": "{?, ?, ?}"
+          }
+        ]
+      },
+      {
+        "title": "分配第二行（row 1）",
+        "explanation": "第二行以同样方式分配，并连接到 `matrix[1]`。",
+        "visualizationType": "cMemory",
+        "code": "matrix[i] = (int *)malloc(cols * sizeof(int));",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1",
+            "address": "0x0ff8"
+          },
+          {
+            "name": "i",
+            "type": "int",
+            "value": "1",
+            "address": "0x0ff4"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "行指针数组",
+            "value": "{0xHEAP2, 0xHEAP3}"
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 数据",
+            "value": "{?, ?, ?}"
+          },
+          {
+            "address": "0xHEAP3",
+            "label": "Row 1 数据",
+            "value": "{?, ?, ?}"
+          }
+        ]
+      },
+      {
+        "title": "赋值和访问",
+        "explanation": "可以使用标准的二维数组语法如 `matrix[0][1] = 99;` 来访问值。",
+        "visualizationType": "cMemory",
+        "code": "matrix[0][1] = 99;",
+        "stack": [
+          {
+            "name": "rows",
+            "type": "int",
+            "value": "2",
+            "address": "0x1000"
+          },
+          {
+            "name": "cols",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          },
+          {
+            "name": "matrix",
+            "type": "int**",
+            "value": "0xHEAP1",
+            "address": "0x0ff8"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP1",
+            "label": "行指针数组",
+            "value": "{0xHEAP2, 0xHEAP3}"
+          },
+          {
+            "address": "0xHEAP2",
+            "label": "Row 0 数据",
+            "value": "{?, 99, ?}"
+          },
+          {
+            "address": "0xHEAP3",
+            "label": "Row 1 数据",
+            "value": "{?, ?, ?}"
+          }
+        ]
+      },
+      {
+        "title": "输出值",
+        "explanation": "输出存储的值，确认访问正常工作。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"matrix[0][1] = %d\\n\", matrix[0][1]);",
+        "stdout": "matrix[0][1] = 99"
+      },
+      {
+        "title": "释放内存（重要！）",
+        "explanation": "实际中必须先 `free` 每一行，最后再调用 `free(matrix)`。\n\n顺序搞反会导致内存泄漏。",
+        "highlight": [],
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "程序结束",
+        "explanation": "通过 `return 0;` 结束程序。\n\n要点：动态二维数组是"行指针 + 每行数据"的两级结构。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stdout": "matrix[0][1] = 99"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "释放动态分配的二维数组（双指针方式）的正确顺序是？",
+    "options": [
+      "先释放行指针数组",
+      "先释放每行的内容，最后释放行指针数组",
+      "同时释放",
+      "操作系统会自动处理，不需要"
+    ],
+    "correctIndex": 1,
+    "explanation": "如果先释放行指针数组（`matrix`），就会丢失每行（`matrix[i]`）的地址，从而导致内存泄漏。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "动态二维数组在内存中总是连续的。",
+      "correct": "每行是单独用 malloc 分配的，所以可能位于不同的地址。",
+      "why": "除非一次性分配 `rows * cols` 大小的整块内存，否则是不连续的。"
+    }
+  ],
+  "keyTakeaway": "需要两层 malloc（指针数组 + 每行）才能创建动态二维数组，释放时必须按相反顺序进行。"
+}

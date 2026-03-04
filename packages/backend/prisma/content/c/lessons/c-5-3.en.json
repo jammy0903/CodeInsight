@@ -1,0 +1,131 @@
+{
+  "lessonId": "c-5-3",
+  "title": "free usage",
+  "concept": "free: \"I'm done, here it is back!\"",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 100;\n\n    printf(\"Using memory...\\n\");\n\n    free(p);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "This header is needed to use `printf`.\n\nThis lesson focuses on how `free` works and its pitfalls.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Including stdlib.h header",
+        "explanation": "This header provides `malloc`/`free`.\n\nOnly dynamically allocated addresses can be freed.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdlib.h>"
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "The main frame is created.\n\nWe will follow the allocate -> use -> free flow.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Allocating heap memory",
+        "explanation": "We allocate space for one integer on the heap and store the address in pointer `p`.",
+        "visualizationType": "cMemory",
+        "code": "int *p = (int*)malloc(sizeof(int));",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0xHEAP",
+            "type": "int*",
+            "address": "0x1000"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP",
+            "size": "4 bytes",
+            "value": "???"
+          }
+        ]
+      },
+      {
+        "title": "Storing a value in heap memory",
+        "explanation": "`*p = 100;` initializes the heap memory.",
+        "visualizationType": "cMemory",
+        "code": "*p = 100;",
+        "heap": [
+          {
+            "address": "0xHEAP",
+            "size": "4 bytes",
+            "value": "100",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Printing during memory usage",
+        "explanation": "We print that the allocated memory is being used.\n\nThis is the valid usage period between malloc and free.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Using memory...\\n\");",
+        "heap": [
+          {
+            "address": "0xHEAP",
+            "size": "4 bytes",
+            "value": "100"
+          }
+        ],
+        "stdout": "Using memory..."
+      },
+      {
+        "title": "Freeing heap memory",
+        "explanation": "`free(p)` returns the heap memory, but does not erase the pointer variable itself.\n\nAfter freeing, `p` becomes a dangling pointer, so use it with caution.",
+        "visualizationType": "cMemory",
+        "code": "free(p);",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0xHEAP",
+            "type": "int*",
+            "address": "0x1000",
+            "dangling": true
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Program termination",
+        "explanation": "The program ends with `return 0;`.\n\nKey point: malloc and free must be used as a matched pair (1:1).",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens if you call free() on a stack variable (local variable) address?",
+    "options": [
+      "It is successfully cleared",
+      "Nothing happens",
+      "The program crashes",
+      "A compile error occurs"
+    ],
+    "correctIndex": 2,
+    "explanation": "`free` can only handle addresses allocated by `malloc/calloc/realloc`.\nPassing an invalid address confuses the memory manager and causes a program crash."
+  },
+  "misconceptions": [
+    {
+      "wrong": "free(p) destroys the variable p itself",
+      "correct": "The variable p still exists.",
+      "why": "It is just the 'house' that p pointed to that got demolished.\np still holds the address of the demolished house (Dangling Pointer)."
+    }
+  ],
+  "keyTakeaway": "Always return what you borrow with `free`. `malloc` and `free` are a pair."
+}

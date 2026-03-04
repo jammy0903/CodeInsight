@@ -1,0 +1,129 @@
+{
+  "lessonId": "c-9-2",
+  "title": "Macro Pitfalls",
+  "concept": "Macros are powerful but can create unexpected bugs through missing parentheses and side effects",
+  "content": {
+    "code": "#include <stdio.h>\n\n#define SQUARE_BAD(x) x * x\n\n#define SQUARE_SAFE(x) ((x) * (x))\n\nint main() {\n    int a = 5;\n\n    printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));\n\n    printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));\n\n    int n = 3;\n    printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "**`#include <stdio.h>`** -- Includes the standard I/O header for `printf`.\n\nIn this lesson we learn two dangerous traps of **macro functions**: **operator precedence issues** from omitting parentheses, and arguments with side effects like `n++` being evaluated multiple times.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Defining a flawed macro",
+        "explanation": "**`#define SQUARE_BAD(x) x * x`** -- A macro that appears to compute the square. `SQUARE_BAD(5)` gives `5 * 5 = 25` and seems fine, but it has a critical flaw: **no parentheses around the parameter `x`**.",
+        "visualizationType": "cMemory",
+        "code": "#define SQUARE_BAD(x) x * x"
+      },
+      {
+        "title": "Defining a safe macro",
+        "explanation": "**`#define SQUARE_SAFE(x) ((x) * (x))`** -- The same square macro but with **double parenthesis protection**. The inner `(x)` groups the argument as a single unit even for complex expressions, and the outer `((...) * (...))` protects the result from interference with surrounding operators.",
+        "visualizationType": "cMemory",
+        "code": "#define SQUARE_SAFE(x) ((x) * (x))"
+      },
+      {
+        "title": "main function and variable declaration",
+        "explanation": "**`int a = 5;`** -- Declares a variable to test the macro traps. 4 bytes on the stack, value `5`.\n\n`a` is a real **variable** with a memory address and type, while `SQUARE_BAD` and `SQUARE_SAFE` have already been text-replaced during preprocessing.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "highlightOffset": [0, 1],
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "5",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Trap 1: Operator precedence",
+        "explanation": "**`printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));`** -- The preprocessor substitutes `x` with the `a + 1` **text**, resulting in `a + 1 * a + 1`. Multiplication executes first: `1 * 5 = 5`, then `5 + 5 + 1 = 11`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Bad: %d\\n\", SQUARE_BAD(a + 1));",
+        "stdout": "Bad: 11"
+      },
+      {
+        "title": "Correct parentheses usage",
+        "explanation": "**`printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));`** -- Now using the safe macro. The substitution result is `((a + 1) * (a + 1))`, giving `(6) * (6) = 36`, which is correct.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Safe: %d\\n\", SQUARE_SAFE(a + 1));",
+        "stdout": "Bad: 11\nSafe: 36"
+      },
+      {
+        "title": "Trap 2: Double evaluation of side effects",
+        "explanation": "**`int n = 3;`** -- A variable for testing the second trap. This shows that **even with perfectly parenthesized `SQUARE_SAFE`, you must not pass arguments with side effects**.",
+        "visualizationType": "cMemory",
+        "code": "int n = 3;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "5",
+            "address": "0x1000"
+          },
+          {
+            "name": "n",
+            "type": "int",
+            "value": "3",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "Double invocation of increment operator",
+        "explanation": "**`printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));`** -- The substitution result is `((n++) * (n++))`. The first `n++` uses `3` and increments `n` to `4`; the second `n++` uses `4` and increments `n` to `5`. The result is `3 * 4 = 12`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Side Effect: %d\\n\", SQUARE_SAFE(n++));",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "5",
+            "address": "0x1000"
+          },
+          {
+            "name": "n",
+            "type": "int",
+            "value": "5",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "Bad: 11\nSafe: 36\nSide Effect: 12"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "**`return 0;`** -- The program terminates.\n\nSummary of macro function traps -- Trap 1 is the **operator precedence problem** from missing parentheses on parameters. Trap 2 is double evaluation of side-effect arguments.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Given #define MUL(a, b) (a * b), what is the result of MUL(2 + 3, 4)?",
+    "options": [
+      "20",
+      "14",
+      "24",
+      "Compile error"
+    ],
+    "correctIndex": 1,
+    "explanation": "The substitution result is `(2 + 3 * 4)`.\n3 * 4 is calculated first giving 12, then adding 2 gives 14."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Macro functions behave exactly like regular functions.",
+      "correct": "Since it is text substitution, arguments may be evaluated multiple times or operator order can get tangled, making it much more dangerous.",
+      "why": "Using inline functions is far better for type safety and side-effect prevention."
+    }
+  ],
+  "keyTakeaway": "Macros are convenient but require strict rules: 'always use parentheses' and 'never pass arguments with side effects'."
+}

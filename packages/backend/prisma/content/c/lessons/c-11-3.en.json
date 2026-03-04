@@ -1,0 +1,185 @@
+{
+  "lessonId": "c-11-3",
+  "title": "Ternary Operator and Logical Operations",
+  "concept": "Concise conditional expressions with the ternary operator (?:), and short-circuit evaluation with && and ||",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int age = 20;\n    int has_id = 1;\n\n    char *status = (age >= 18) ? \"Adult\" : \"Minor\";\n    printf(\"Status: %s\\n\", status);\n\n    if (age >= 18 && has_id) {\n        printf(\"Entry allowed\\n\");\n    }\n\n    int result = (age > 0) || (10 / 0);\n    printf(\"Short-circuit: %d\\n\", result);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Starting main and initializing variables",
+        "explanation": "**`int age = 20;`** and **`int has_id = 1;`** -- Two integer variables are created in the stack frame. `age` is the age (20), and `has_id` indicates whether an ID is held (1 = yes).",
+        "visualizationType": "cMemory",
+        "code": "int has_id = 1;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "age",
+            "value": "20",
+            "type": "int",
+            "address": "0x1008"
+          },
+          {
+            "name": "has_id",
+            "value": "1",
+            "type": "int",
+            "address": "0x1004",
+            "highlight": true
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Conditional assignment with ternary operator",
+        "explanation": "**`char *status = (age >= 18) ? \"Adult\" : \"Minor\";`** -- The **ternary operator** compresses if-else into **a single line**.",
+        "code": "char *status = (age >= 18) ? \"Adult\" : \"Minor\";",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "age",
+            "value": "20",
+            "type": "int",
+            "address": "0x1008"
+          },
+          {
+            "name": "has_id",
+            "value": "1",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "status",
+            "value": "\"Adult\"",
+            "type": "char*",
+            "address": "0x1000",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Printing status",
+        "explanation": "**`printf(\"Status: %s\\n\", status);`** -- `%s` is the string format specifier. It reads `\"Adult\"` that `status` points to and prints `Status: Adult`.",
+        "visualizationType": "terminal",
+        "code": "printf(\"Status: %s\\n\", status);",
+        "stdout": "Status: Adult"
+      },
+      {
+        "title": "&& (Logical AND) - both conditions true",
+        "explanation": "**`if (age >= 18 && has_id) {`** -- The **`&&` (logical AND)** operator evaluates to true only when **both** conditions are true. `20 >= 18` (true) && `has_id` (1, true) -> true, so the if block executes.",
+        "visualizationType": "cMemory",
+        "code": "if (age >= 18 && has_id) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "age",
+            "value": "20",
+            "type": "int",
+            "address": "0x1008"
+          },
+          {
+            "name": "has_id",
+            "value": "1",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "status",
+            "value": "\"Adult\"",
+            "type": "char*",
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "Status: Adult"
+      },
+      {
+        "title": "AND condition passed - entry allowed output",
+        "explanation": "**`printf(\"Entry allowed\\n\");`** -- Since both conditions are true, `\"Entry allowed\"` is printed. This expresses the requirement \"must be at least 18 years old AND have an ID to enter\" in code.",
+        "visualizationType": "terminal",
+        "code": "printf(\"Entry allowed\\n\");",
+        "stdout": "Status: Adult\nEntry allowed"
+      },
+      {
+        "title": "|| (Logical OR) short-circuit evaluation",
+        "explanation": "**`int result = (age > 0) || (10 / 0);`** -- `||` (logical OR) evaluates to true if **at least one** side is true. However, `(10 / 0)` is division by zero, which would **crash** the program if executed!",
+        "visualizationType": "cMemory",
+        "code": "int result = (age > 0) || (10 / 0);",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "age",
+            "value": "20",
+            "type": "int",
+            "address": "0x1008"
+          },
+          {
+            "name": "has_id",
+            "value": "1",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "status",
+            "value": "\"Adult\"",
+            "type": "char*",
+            "address": "0x1000"
+          },
+          {
+            "name": "result",
+            "value": "1",
+            "type": "int",
+            "address": "0x0ffc",
+            "highlight": true
+          }
+        ],
+        "stdout": "Status: Adult\nEntry allowed"
+      },
+      {
+        "title": "Short-circuit result output and termination",
+        "explanation": "**`printf(\"Short-circuit: %d\\n\", result);`** -- `result = 1` is printed. Thanks to short-circuit evaluation, the division by zero was completely avoided.",
+        "visualizationType": "terminal",
+        "code": "printf(\"Short-circuit: %d\\n\", result);",
+        "stdout": "Status: Adult\nEntry allowed\nShort-circuit: 1"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "In the following code, will func() be executed?\n\nint x = 5;\nint y = (x > 0) || func();",
+    "options": [
+      "Yes - || evaluates both sides",
+      "No - since x > 0 is true, it is skipped by short-circuit evaluation",
+      "It causes a compilation error",
+      "It depends on the value of x"
+    ],
+    "correctIndex": 1,
+    "explanation": "The || operator does not evaluate the right side if the left side is true (short-circuit evaluation).\nSince x = 5, (x > 0) is true. Therefore func() is never called.\nIf x were -1, then (x > 0) would be false and func() would be executed."
+  },
+  "misconceptions": [
+    {
+      "wrong": "&& and || always evaluate both sides",
+      "correct": "C's logical operators use short-circuit evaluation. Once the result is determined, the rest is ignored.",
+      "why": "For &&, if the left side is false the entire expression is false; for ||, if the left side is true the entire expression is true -- so the result is already determined."
+    }
+  ],
+  "keyTakeaway": "The ternary operator provides concise conditional expressions, and short-circuit evaluation with &&/|| skips unnecessary operations for safer code."
+}

@@ -1,0 +1,116 @@
+{
+  "lessonId": "c-8-4",
+  "title": "Jump Tables",
+  "concept": "跳转表通过函数指针数组索引实现无分支的 O(1) 调用",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid item() { printf(\"Item Used\\n\"); }\nvoid map()  { printf(\"Map Opened\\n\"); }\nvoid save() { printf(\"Game Saved\\n\"); }\n\nint main() {\n    int choice = 1;\n\n    void (*actions[3])() = {item, map, save};\n\n    if (choice >= 0 && choice < 3) {\n        actions[choice]();\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "使用 `printf` 所需的标准头文件。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "定义动作函数",
+        "explanation": "准备具有相同签名的动作函数。\n\n必须是相同签名才能放入同一个指针数组。",
+        "visualizationType": "cMemory",
+        "code": "void item() { printf(\"Item Used\\n\"); }",
+        "highlightOffset": [0, 1, 2]
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧，准备跳转表调用流程。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "声明选择变量",
+        "explanation": "`choice` 表示要调用的函数索引。\n\n实际中会由用户输入或状态值决定。",
+        "visualizationType": "cMemory",
+        "code": "int choice = 1;",
+        "stack": [
+          {
+            "name": "choice",
+            "value": "1",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "函数指针数组（跳转表）",
+        "explanation": "将函数地址按顺序存入 `actions` 数组。\n\n通过索引可以立即找到目标函数。",
+        "keyInsight": "函数名本身就是函数的地址。",
+        "visualizationType": "cMemory",
+        "code": "void (*actions[3])() = {item, map, save};",
+        "stack": [
+          {
+            "name": "choice",
+            "value": "1",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "actions",
+            "value": "[&item, &map, &save]",
+            "type": "void (*[3])()",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "边界检查",
+        "explanation": "验证索引是否在数组范围内。\n\n不检查就调用有访问无效地址的风险。",
+        "visualizationType": "cMemory",
+        "code": "if (choice >= 0 && choice < 3) {"
+      },
+      {
+        "title": "通过跳转表调用函数",
+        "explanation": "`actions[choice]();` 立即调用选中的函数。\n\n无需冗长的 if-else 链即可处理分支。",
+        "keyInsight": "一次数组索引查找就能选择要执行的函数。",
+        "visualizationType": "cMemory",
+        "code": "actions[choice]();",
+        "stdout": "Map Opened"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "通过 `return 0;` 结束程序。\n\n要点：跳转表是一种快速且易于扩展的分支模式。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "跳转表（函数指针数组）最大的优势是什么？",
+    "options": [
+      "节省内存",
+      "O(1) 时间复杂度的分支处理",
+      "所有函数可以有相同的名字",
+      "编译器自动生成"
+    ],
+    "correctIndex": 1,
+    "explanation": "即使有 100 个分支，也只需一次数组索引就能找到要调用的函数，比 if-else 的顺序比较（O(N)）快得多。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "函数指针数组可以存放不同签名（参数/返回值）的函数。",
+      "correct": "不行。数组只能存放相同类型，所以所有函数的签名必须一致。",
+      "why": "这与不能将 float 放入 int 数组是同样的道理。"
+    }
+  ],
+  "keyTakeaway": "跳转表是在状态机（FSM）、命令处理器等场景中优化分支逻辑的标准模式。"
+}

@@ -1,0 +1,109 @@
+{
+  "lessonId": "js-9-1",
+  "title": "Proxy 与 Reflect（元编程）",
+  "concept": "Proxy 充当「拦截器」，位于目标对象前面，捕获并重新定义其基本操作。",
+  "content": {
+    "code": "const target = { \n  secret: 'shhh',\n  public: 'hello'\n};\n\nconst handler = {\n  // 1. Trap that intercepts read (Get) operations\n  get(obj, prop) {\n    if (prop === 'secret') {\n      return 'Access Denied!';\n    }\n    // 2. Forward the rest to the original object (Forwarding)\n    return Reflect.get(obj, prop);\n  }\n};\n\n// Creating a Proxy that wraps the original (Target)\nconst proxy = new Proxy(target, handler);\n\nconsole.log(proxy.public); // hello\nconsole.log(proxy.secret); // Access Denied!",
+    "steps": [
+      {
+        "title": "创建目标对象",
+        "explanation": "这是将被代理的原始对象 `target`。\n它持有实际数据（真实主体），Proxy 将对其进行包装。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xTarget",
+              "content": "{ secret: '...', public: '...' }"
+            }
+          ]
+        },
+        "code": "const target = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "定义 Handler 和 Trap",
+        "explanation": "`handler` 对象定义了 Proxy 的行为规则。\n这里的 `get` 方法是一个 **Trap**。\n\n**什么是 Trap？**\n一种拦截对象基本操作（读取、写入、调用等）并替代执行的方法。\n在这里，它拦截的是「属性读取」。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "Handler prepared with 'get' trap"
+        },
+        "code": "const handler = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "title": "创建 Proxy 实例",
+        "explanation": "`new Proxy(target, handler)` 创建了一个包装原始对象的代理。\n从此以后，所有访问都通过这个 `proxy` 对象，遵循 handler 的规则。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "proxy",
+              "value": "→ 0xProxy"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0xTarget",
+              "content": "{ ... }"
+            },
+            {
+              "address": "0xProxy",
+              "content": "Proxy(Target, Handler)",
+              "label": "Interceptor"
+            }
+          ]
+        },
+        "code": "const proxy = new Proxy(target, handler);"
+      },
+      {
+        "title": "通过代理访问属性",
+        "explanation": "我们访问 `proxy.public` 和 `proxy.secret`。\n`get` trap 拦截了两者。\n'public' 属性通过 Reflect.get 转发给原始对象（返回 'hello'），而 'secret' 返回 'Access Denied!'。\n\n**什么是转发（Forwarding）？**\n通过 `Reflect` API 将拦截的操作传回原始对象。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "output": [
+            "hello",
+            "Access Denied!"
+          ]
+        },
+        "code": "console.log(proxy.public); // hello",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "以下哪个不是 Proxy handler 中可以定义的有效 Trap？",
+    "options": [
+      "get（属性读取）",
+      "set（属性写入）",
+      "construct（new 调用）",
+      "直接访问私有（#）字段"
+    ],
+    "correctIndex": 3,
+    "explanation": "Proxy 只能拦截对象的公共操作（Public Interception）。\n它无法直接干预内部的 Private (#) 字段或内部插槽。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Proxy 会复制原始对象并在副本上操作",
+      "correct": "不是——它持有原始对象的引用并充当中间人。",
+      "why": "Proxy 本身不存储数据。\n它是一个包装器，通过 handler 将请求转发给原始对象（Target）或阻止它们。"
+    }
+  ],
+  "keyTakeaway": "Vue 3 响应式系统等现代库的「魔法」就是建立在 Proxy 之上的。"
+}

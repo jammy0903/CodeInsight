@@ -1,0 +1,133 @@
+{
+  "lessonId": "c-3-4",
+  "title": "Arrays as Function Args",
+  "concept": "When passing an array to a function, only the 'address' is passed, not the entire array",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid printSize(int arr[]) {\n    printf(\"Inside func: %zu\\n\", sizeof(arr));\n    arr[0] = 999;\n}\n\nint main() {\n    int nums[5] = {1, 2, 3, 4, 5};\n\n    printf(\"Inside main: %zu\\n\", sizeof(nums));\n    printSize(nums);\n\n    printf(\"After func: %d\\n\", nums[0]);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including Header",
+        "explanation": "`#include <stdio.h>` enables the output functions.\n\nThe key lesson here is that when an array is passed as a function argument, the starting address is passed, not the entire array.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The main frame is created and we'll initialize the array next.\n\n`printSize` hasn't been called yet — the goal is to observe how data is passed during the call.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Array Initialization",
+        "explanation": "`nums` initializes 5 ints in contiguous memory.\n\nThe important point is that this entire block is NOT copied when calling the function.",
+        "visualizationType": "cMemory",
+        "code": "int nums[5] = {1, 2, 3, 4, 5};",
+        "stack": [
+          {
+            "name": "nums",
+            "value": "{1, 2, 3, 4, 5}",
+            "type": "int[5]",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "sizeof in main",
+        "explanation": "In main, `sizeof(nums)` returns the total size of the entire array.\n\nCompare this value with the `sizeof(arr)` result inside the function to see the decay difference.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Inside main: %zu\\n\", sizeof(nums));",
+        "stdout": "Inside main: 20"
+      },
+      {
+        "title": "Function Call and Array Decay",
+        "explanation": "When calling `printSize(nums);`, `nums` decays to the `&nums[0]` address.\n\nThe function receives the starting location of the original array, not a copy.",
+        "visualizationType": "cMemory",
+        "code": "printSize(nums);",
+        "highlightOffset": [
+          0,
+          -9
+        ],
+        "stack": [
+          {
+            "name": "nums",
+            "value": "{1,2...}",
+            "type": "int[5]",
+            "frame": "main"
+          },
+          {
+            "name": "arr",
+            "value": "0x1000",
+            "type": "int*",
+            "frame": "printSize"
+          }
+        ]
+      },
+      {
+        "title": "The sizeof Surprise",
+        "explanation": "Since the parameter `arr` acts as a pointer, `sizeof(arr)` returns the pointer variable's size.\n\nThis is why you can't determine the original array length from inside the function alone — you must pass the length as a separate argument.",
+        "visualizationType": "terminal",
+        "code": "printf(\"Inside func: %zu\\n\", sizeof(arr));",
+        "stdout": "Inside main: 20\nInside func: 8"
+      },
+      {
+        "title": "Original Data Can Be Modified",
+        "explanation": "`arr[0] = 999;` directly modifies main's original `nums[0]` through the passed address.\n\nTo prevent modification of the original, use a read-only parameter like `const int arr[]`.",
+        "visualizationType": "terminal",
+        "code": "arr[0] = 999;",
+        "highlightOffset": [
+          0,
+          5
+        ],
+        "stdout": "Inside main: 20\nInside func: 8\nAfter func: 999"
+      },
+      {
+        "title": "Verifying the Original Was Changed",
+        "explanation": "Printing `nums[0]` in main shows the modified value.\n\nIn summary, passing an array to a function is \"passing an address,\" and managing the length and mutability is key.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"After func: %d\\n\", nums[0]);",
+        "stack": [
+          {
+            "name": "nums",
+            "value": "{999, 2, 3, 4, 5}",
+            "type": "int[5]",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ],
+        "heap": [],
+        "stdout": "Inside main: 20\nInside func: 8\nAfter func: 999"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How do you find the number of elements in an array inside a function?",
+    "options": [
+      "Use sizeof(arr) / sizeof(int)",
+      "Use arr.length",
+      "Pass the length as a separate argument",
+      "There's no way to know"
+    ],
+    "correctIndex": 2,
+    "explanation": "Inside a function, the array has decayed into a pointer, so the `sizeof` trick doesn't work.\nYou must always pass the count (`int size`) as an additional argument."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Writing `int arr[10]` in the parameter copies a 10-element array",
+      "correct": "The number 10 is ignored and it becomes just `int *arr`.",
+      "why": "C does not automatically copy arrays.\nThe number only serves as a hint/comment for the programmer."
+    }
+  ],
+  "keyTakeaway": "When passing an array to a function, only the 'address' goes. Always send the length along with it."
+}

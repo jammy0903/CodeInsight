@@ -1,0 +1,100 @@
+{
+  "lessonId": "c-2-5",
+  "title": "The NULL Pointer",
+  "concept": "When there's nothing to point to, set it to NULL for safety",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int *ptr = NULL;\n\n    if (ptr != NULL) {\n        printf(\"Value: %d\\n\", *ptr);\n    } else {\n        printf(\"Pointer is NULL! Safe.\\n\");\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h Header",
+        "explanation": "Header for the ```printf``` function and the **```NULL```** macro. ```NULL``` is typically defined as ```(void *)0```.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The program starts — ```main```'s **stack frame** is created on the stack. In this lesson, we learn how to safely handle a pointer that doesn't point to anything.\n\nDereferencing a pointer with an invalid address causes the program to **crash**. It's like pressing 'Start Navigation' on a GPS with no destination set — you'll get an error.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Initializing the Pointer to NULL",
+        "explanation": "`int *ptr = NULL;` explicitly indicates \"there is no target to point to right now.\"\n\nThis is much safer than an uninitialized pointer, and should be used together with a `NULL` check before dereferencing.",
+        "visualizationType": "cMemory",
+        "code": "int *ptr = NULL;",
+        "stack": [
+          {
+            "name": "ptr",
+            "value": "NULL",
+            "type": "int*",
+            "address": "0x5000"
+          }
+        ]
+      },
+      {
+        "title": "NULL Pointer Check",
+        "explanation": "Checking `ptr != NULL` before dereferencing prevents invalid memory access.\n\nCurrently `ptr` is NULL, so the condition is false and execution moves to the `else` branch.",
+        "visualizationType": "cMemory",
+        "code": "if (ptr != NULL) {"
+      },
+      {
+        "title": "Code That Doesn't Execute",
+        "explanation": "Since the condition is false, this line is not executed.\n\nIf NULL were dereferenced, the program could terminate with a runtime error (e.g., segfault).",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Value: %d\\n\", *ptr);"
+      },
+      {
+        "title": "Executing the else Block",
+        "explanation": "Since ```ptr != NULL``` was false, we enter the ```else``` block.\n\n```if``` branch = pointer is valid -> safe to dereference, ```else``` branch = pointer is ```NULL``` -> alternative action (error message, return default value, etc.). This pattern lets the program **run without crashing in any situation**.",
+        "visualizationType": "cMemory",
+        "code": "} else {"
+      },
+      {
+        "title": "Printing via the Safe Path",
+        "explanation": "The `else` path handles it safely, allowing the program to continue running.\n\nThe key habit is to follow the order: \"initialize -> check -> use.\"",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Pointer is NULL! Safe.\\n\");",
+        "stdout": "Pointer is NULL! Safe."
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "```return 0``` — thanks to the ```NULL``` check, the program exits safely without errors.\n\nKey takeaway: ```NULL``` is a value that explicitly says 'points to nothing' and is **much safer** than a garbage address. **Always** check for ```NULL``` before dereferencing.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "stdout": ""
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What value should a pointer be set to when it doesn't point to anything?",
+    "options": [
+      "0",
+      "void",
+      "NULL",
+      "undefined"
+    ],
+    "correctIndex": 2,
+    "explanation": "The C standard uses the `NULL` macro (typically defined as 0).\nIt's an explicit marker meaning \"no address.\""
+  },
+  "misconceptions": [
+    {
+      "wrong": "NULL pointer is still an address, so it can be read",
+      "correct": "Both reading and writing are illegal.",
+      "why": "Address 0 (and its surrounding range) is a protected region by the OS.\nAccessing it causes a `Segmentation Fault` (segfault) error."
+    }
+  ],
+  "keyTakeaway": "A safety-locked gun (NULL) is better than a loaded one with no safety (uninitialized pointer). Always check before using!"
+}

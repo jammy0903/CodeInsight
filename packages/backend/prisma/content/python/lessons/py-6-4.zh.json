@@ -1,0 +1,671 @@
+{
+  "lessonId": "py-6-4",
+  "title": "类变量共享陷阱",
+  "concept": "类变量被所有实例共享 - 可变对象会引发灾难!",
+  "content": {
+    "code": "class Student:\n    grades = []  # 클래스 변수 - 함정!\n    \n    def add_grade(self, grade):\n        self.grades.append(grade)\n\ns1 = Student()\ns2 = Student()\n\ns1.add_grade(90)\ns2.add_grade(80)\n\nprint(f\"s1: {s1.grades}\")\nprint(f\"s2: {s2.grades}\")\nprint(f\"같은 객체? {s1.grades is s2.grades}\")",
+    "steps": [
+      {
+        "title": "Student 类定义",
+        "explanation": "**`class Student:`**\n\nPython 从上到下按顺序执行代码。定义 `Student` 类(学生蓝图)。\n\n**本课目标 -- 发现类变量的危险陷阱!** 在上一课中，我们学到实例变量(`self.count`)对每个对象是独立的。但如果错误使用**类变量**，所有实例会共享相同的数据，导致严重的 bug! 特别是将**可变对象(列表、字典)**作为类变量使用时，灾难就会降临。\n\n**类比**: 本课展示的是"如果每个人都在共用白板上写成绩会怎样"。如果不在自己的笔记本(实例变量)上写，而是在公共白板(类变量)上写，所有人的成绩都会混在一起 -- 彻底的灾难!\n\n**为什么是这个顺序?** 必须先定义类，之后才能添加类变量和方法。\n\n**执行顺序**: 执行 class Student --> 开始创建 Student 类对象 --> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Student:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "类定义开始",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "类变量定义(警告: 陷阱!)",
+        "explanation": "**`grades = []`**\n\n这就是**陷阱**! 在类体中不带 `self` 定义的 `grades = []` 是**类变量**。所有 Student 实例**共享这一个列表**!\n\n**问题的核心:**\n- 执行这行时，只创建了**一个**空列表对象(内存地址 0x1500)\n- 这个列表存储在 `Student.__dict__['grades']` 中\n- 之后无论 s1.grades 还是 s2.grades，**都指向同一个 0x1500 列表**\n- 一个学生添加成绩后，**其他所有学生都能看到**!\n\n**为什么这很危险?** 像 `species = \"Canis familiaris\"` 这样的**不可变字符串**作为类变量是安全的。因为修改值会创建新对象。但**列表、字典**等**可变对象**可以通过 `.append()`、`[key] = val` 等方式**直接原地修改**，影响所有共享它的地方!\n\n**正确做法(预览):**\n```python\ndef __init__(self):\n    self.grades = []  # 每个实例独立的列表!\n```\n\n**为什么是这个顺序?** 在类体内按顺序执行。\n\n**执行顺序**: 执行 grades = [] --> 创建空列表对象 0x1500 --> Student.__dict__['grades'] = 0x1500 --> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "grades = []  # 클래스 변수 - 함정!",
+        "pythonMemoryState": {
+          "note": "警告: 列表作为类变量创建(只存在一个!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "add_grade 方法定义",
+        "explanation": "**`def add_grade(self, grade):`**\n\n定义添加成绩的方法。\n\n**`self.grades.append(grade)` 的含义**:\n1. 查找 `self.grades` --> 在实例中查找\n2. 实例中没有 --> **在类变量中查找**(0x1500)\n3. `append(grade)` --> **修改同一个列表**\n\n**核心问题**: 由于 `self.grades` 指向类变量，**所有实例都在修改同一个列表**!\n\n**为什么是这个顺序?** 定义完类变量后，按顺序定义方法。\n\n**执行顺序**: 执行 def add_grade --> 注册 add_grade 方法 --> Student 类定义完成 --> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "def add_grade(self, grade):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "add_grade 方法已定义",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with grades, add_grade>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建第一个学生",
+        "explanation": "**`s1 = Student()`**\n\n创建第一个 Student 对象。\n\n**重要**: 由于没有 `__init__` 方法，只创建对象，**不会添加实例变量**。\n\n**s1.grades 指向哪里?**\n- s1 对象本身没有 grades 属性\n- Python 找到**类变量** `Student.grades`(0x1500)\n- 因此 `s1.grades` --> 0x1500 列表\n\n**为什么是这个顺序?** 类定义完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 Student() --> 创建对象 0x2000(没有 grades) --> s1 = 0x2000 --> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "s1 = Student()",
+        "pythonMemoryState": {
+          "note": "s1 已创建(grades 引用类变量 0x1500)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object (no instance vars)>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建第二个学生",
+        "explanation": "**`s2 = Student()`**\n\n创建第二个 Student 对象。\n\n**s2.grades 指向哪里?**\n- s2 对象本身也没有 grades 属性\n- Python 找到**同一个类变量** `Student.grades`(0x1500)\n- 因此 `s2.grades` --> **0x1500 列表**(和 s1 一样!)\n\n**关键**:\n- s1 对象: 0x2000\n- s2 对象: 0x3000(和 s1 不同)\n- 但 `s1.grades` 和 `s2.grades` **指向同一个 0x1500**!\n\n**为什么是这个顺序?** s1 创建完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 Student() --> 创建对象 0x3000(没有 grades) --> s2 = 0x3000 --> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "s2 = Student()",
+        "pythonMemoryState": {
+          "note": "s2 已创建(s1 和 s2 都引用同一个 0x1500!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 s1.add_grade(90)",
+        "explanation": "**`s1.add_grade(90)`**\n\n调用 s1 对象的 add_grade 方法。\n\n**self 接收什么?**\n- `self` = `s1`(0x2000 对象)\n\n**为什么是这个顺序?** s2 创建完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 s1.add_grade(90) --> 跳转到 line 5 --> self=s1, grade=90",
+        "visualizationType": "pythonMemory",
+        "code": "s1.add_grade(90)",
+        "pythonMemoryState": {
+          "note": "调用 s1.add_grade(90) --> 即将跳转到 line 5",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[]",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "警告: 90 被添加到类变量列表",
+        "explanation": "**`self.grades.append(grade)`**\n\n**属性查找顺序**(重要!):\n1. 尝试查找 `self.grades`\n2. 在 s1(0x2000)对象中查找 --> **没找到!**\n3. **在类 Student 中查找** --> Student.grades(0x1500)找到了!\n4. 执行 `0x1500.append(90)`\n\n**结果**: 类变量列表变为 `[90]`。\n\n**问题**: 修改的不是 s1 专用的列表，而是**所有实例共享的列表**!\n\n**为什么是这个顺序?** 从方法调用(line 10)跳转到这里。\n\n**执行顺序**: self.grades --> Student.grades(0x1500) --> append(90) --> [90] --> 返回 line 10 --> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "self.grades.append(grade)",
+        "pythonMemoryState": {
+          "note": "警告: 类变量变为 [90](影响所有实例!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1"
+            },
+            {
+              "name": "grade",
+              "pointsTo": "parameter2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ s1 (0x2000)",
+              "pyId": "1005"
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "90",
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 s2.add_grade(80)",
+        "explanation": "**`s2.add_grade(80)`**\n\n调用 s2 对象的 add_grade 方法。\n\n**self 接收什么?**\n- `self` = `s2`(0x3000 对象)\n\n**为什么是这个顺序?** 上一次方法调用完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 s2.add_grade(80) --> 跳转到 line 5 --> self=s2, grade=80",
+        "visualizationType": "pythonMemory",
+        "code": "s2.add_grade(80)",
+        "pythonMemoryState": {
+          "note": "调用 s2.add_grade(80) --> 即将跳转到 line 5",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1"
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90]",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "警告: 80 被添加到同一个类变量列表",
+        "explanation": "**`self.grades.append(grade)`**\n\n**属性查找顺序**(再次!):\n1. 尝试查找 `self.grades`\n2. 在 s2(0x3000)对象中查找 --> **没找到!**\n3. **在类 Student 中查找** --> Student.grades(0x1500)找到了!\n4. 执行 `0x1500.append(80)`\n\n**结果**: **同一个**类变量列表变为 `[90, 80]`。\n\n**致命问题**:\n- 包含了 s1 添加的 90\n- 不是 s2 专用的 -- 修改了**所有实例共享的列表**\n- s1.grades 也变成了 [90, 80]!\n\n**为什么是这个顺序?** 从方法调用(line 11)跳转到这里。\n\n**执行顺序**: self.grades --> Student.grades(0x1500) --> append(80) --> [90, 80] --> 返回 line 11 --> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "self.grades.append(grade)",
+        "pythonMemoryState": {
+          "note": "警告: 类变量变为 [90, 80](s1 也受影响!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter3"
+            },
+            {
+              "name": "grade",
+              "pointsTo": "parameter4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90, 80]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "→ s2 (0x3000)",
+              "pyId": "1007"
+            },
+            {
+              "id": "parameter4",
+              "type": "parameter",
+              "value": "80",
+              "pyId": "1008"
+            }
+          ]
+        }
+      },
+      {
+        "title": "警告: 查看 s1 的成绩(令人惊讶的结果!)",
+        "explanation": "**`print(f\"s1: {s1.grades}\")`**\n\n访问 s1 对象的 grades 属性并输出。\n\n**属性查找**:\n1. 在 s1(0x2000)对象中查找 grades --> **没找到!**\n2. 在类 Student.grades(0x1500)中查找 --> **找到了!**\n3. 返回 `0x1500` 列表 --> `[90, 80]`\n\n**令人惊讶的结果**: s1 只添加了 90，但**也包含了 s2 添加的 80**!\n\n**为什么会这样?**\n- s1.grades 和 s2.grades **指向同一个 0x1500**\n- s2 添加 80 后，s1 也能看到!\n\n**为什么是这个顺序?** 所有方法调用完成后，按顺序执行下一行。\n\n**执行顺序**: s1.grades --> Student.grades(0x1500) --> 读取 [90, 80] --> 计算 f-string --> 执行 print --> line 14",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"s1: {s1.grades}\")",
+        "pythonMemoryState": {
+          "output": [
+            "s1: [90, 80]"
+          ],
+          "note": "警告: s1 只添加了 90 但 80 也在里面!(类变量共享)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90, 80]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "警告: 查看 s2 的成绩(完全一样的结果!)",
+        "explanation": "**`print(f\"s2: {s2.grades}\")`**\n\n访问 s2 对象的 grades 属性并输出。\n\n**属性查找**:\n1. 在 s2(0x3000)对象中查找 grades --> **没找到!**\n2. 在类 Student.grades(0x1500)中查找 --> **找到了!**\n3. 返回 `0x1500` 列表 --> `[90, 80]`\n\n**完全一样的结果**: s2 也只添加了 80，但**也包含了 s1 添加的 90**!\n\n**核心问题**:\n- s1.grades = 0x1500\n- s2.grades = 0x1500 <-- **完全相同的对象!**\n- 一个学生的成绩被共享给了另一个学生!\n\n**为什么是这个顺序?** 上一次输出完成后，按顺序执行下一行。\n\n**执行顺序**: s2.grades --> Student.grades(0x1500) --> 读取 [90, 80] --> 计算 f-string --> 执行 print --> line 15",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"s2: {s2.grades}\")",
+        "pythonMemoryState": {
+          "output": [
+            "s2: [90, 80]"
+          ],
+          "note": "警告: s2 也是同样的 [90, 80]!(引用同一个类变量)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90, 80]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "对象同一性检查(证明!)",
+        "explanation": "对象同一性检查的关键是区分 `==` 和 `is`。\n\n- `==`: 值是否相同\n- `is`: 是否是同一个对象(同一个引用)\n\n**类比**: 两把设计相同的椅子(== True, is False)和用两个名字称呼同一把椅子(is True)的区别。\n\n在调试时，`is` 对于发现别名(aliasing)问题(意外的对象共享)特别有用。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"같은 객체? {s1.grades is s2.grades}\")",
+        "pythonMemoryState": {
+          "output": [
+            "같은 객체? True"
+          ],
+          "note": "s1.grades is s2.grades --> True(完全相同的 0x1500!)",
+          "names": [
+            {
+              "name": "Student",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Student.grades",
+              "pointsTo": "class_var1",
+              "highlight": true
+            },
+            {
+              "name": "s1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "s2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class_var1",
+              "type": "class_var",
+              "value": "[90, 80]",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1003"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Student object>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "用列表作为类变量会怎样?",
+    "options": [
+      "每个实例获得独立的列表",
+      "所有实例共享同一个列表",
+      "会产生错误",
+      "会自动复制"
+    ],
+    "correctIndex": 1,
+    "explanation": "类变量在类中只存在一个，被所有实例共享。\n如果是可变对象(列表、字典)，就会发生意外的共享!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "在类中定义就意味着每个实例都拥有它",
+      "correct": "类级别(方法外)的定义会成为共享的类变量",
+      "why": "实例变量必须在 __init__ 中用 self.x = 来创建。"
+    },
+    {
+      "wrong": "类变量永远不应该使用",
+      "correct": "对于常量或共享配置很有用，只需注意可变对象",
+      "why": "像 species = 'Dog' 这样的不可变值没问题。\n只需避免 [] 和 {}。"
+    }
+  ],
+  "keyTakeaway": "不要用 [] 或 {} 作为类变量! 在 __init__ 中用 self.x = [] 作为实例变量!"
+}

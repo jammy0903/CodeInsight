@@ -1,0 +1,88 @@
+{
+  "lessonId": "c-8-2",
+  "title": "Implementing Callbacks",
+  "concept": "The callback pattern delegates execution timing by passing a function pointer as an argument",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid greet() {\n    printf(\"Hello!\\n\");\n}\n\nvoid execute(void (*func)()) {\n    printf(\"Executing callback...\\n\");\n    func();\n}\n\nint main() {\n    execute(greet);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "Standard header for output functions like `printf`.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Defining the callback target function",
+        "explanation": "`greet` is the callback target function that will be called from another function.\n\nThe key is passing the function address, not calling it directly.",
+        "visualizationType": "cMemory",
+        "code": "void greet() {",
+        "highlightOffset": [0, 1, 2]
+      },
+      {
+        "title": "Defining the function that accepts a callback",
+        "explanation": "`execute` takes a function pointer argument and calls `func()` after its internal logic.\n\nThe behavior can change depending on which function is passed.",
+        "visualizationType": "cMemory",
+        "code": "void execute(void (*func)()) {",
+        "highlightOffset": [0, 1, 2]
+      },
+      {
+        "title": "Calling execute from main - passing a function as an argument",
+        "explanation": "When `execute(greet)` is called, the address of the `greet` function is passed as execute's parameter.\n\nMain does not decide when to execute the callback -- it delegates to execute, which calls it when needed internally.",
+        "visualizationType": "cMemory",
+        "code": "execute(greet);",
+        "stack": [
+          {
+            "name": "func",
+            "type": "void (*)()",
+            "value": "0xCODE1",
+            "frame": "execute"
+          }
+        ]
+      },
+      {
+        "title": "Preparing for callback execution",
+        "explanation": "This is the pre-processing step that prints a message before executing the callback.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Executing callback...\\n\");",
+        "stdout": "Executing callback..."
+      },
+      {
+        "title": "Calling the callback function!",
+        "explanation": "`func();` calls the actual function that was passed (greet).\n\nThis is the core execution point of the callback pattern.",
+        "visualizationType": "cMemory",
+        "code": "func();",
+        "stdout": "Executing callback...\nHello!"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "The program ends with `return 0;`.\n\nKey point: A callback is a pattern that injects behavior as a function argument.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What advantage does passing a function as an argument to another function provide?",
+    "options": [
+      "It makes code execution faster.",
+      "It increases flexibility by injecting behavior from outside.",
+      "It reduces memory usage by half.",
+      "All variables become global variables."
+    ],
+    "correctIndex": 1,
+    "explanation": "This can be seen as similar to Dependency Injection.\nYou can change behavior without modifying the internal logic of the function."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Callbacks are only used in event listeners (clicks, etc.).",
+      "correct": "Any 'parameterization of behavior' is a callback.\nThey are essential for general-purpose algorithms like sorting, filtering, and tree traversal.",
+      "why": "Due to the influence of web development, it is easy to think only asynchronous event handlers are callbacks."
+    }
+  ],
+  "keyTakeaway": "Implementing callbacks -- passing 'code addresses' like data -- is a core technique for dynamically composing execution logic."
+}

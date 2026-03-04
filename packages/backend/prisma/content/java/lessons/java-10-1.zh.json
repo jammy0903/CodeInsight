@@ -1,0 +1,120 @@
+{
+  "lessonId": "java-10-1",
+  "title": "线程：工厂里的新工人",
+  "concept": "线程（Thread）就像一个程序（工厂）内同时工作的"工人"。",
+  "content": {
+    "code": "class MyWorker extends Thread {\n    public void run() {\n        System.out.println(\"새로운 일꾼이 일을 시작합니다!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        MyWorker worker = new MyWorker();\n        worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.\n        \n        System.out.println(\"메인 일꾼도 자기 일을 합니다.\");\n    }\n}",
+    "steps": [
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n在这里我们将雇佣一个新工人（线程）并分配任务。",
+        "visualizationType": "memory",
+        "code": "public static void main(String[] args) {",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running"
+            }
+          ],
+          "note": "主线程启动",
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "继承 Thread 类",
+        "explanation": "在 Java 中创建新工人（线程）最简单的方法是继承 `Thread` 类，并在 `run` 方法中定义实际要做的工作。",
+        "visualizationType": "memory",
+        "code": "class MyWorker extends Thread {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "memoryState": {
+          "note": "MyWorker 蓝图已定义"
+        }
+      },
+      {
+        "title": "创建工人对象",
+        "explanation": "根据蓝图创建实际的 `MyWorker` 工人对象。\n还没有开始工作，处于"准备"状态（NEW）。",
+        "keyInsight": "new Thread() = 工人准备就绪 (Ready)",
+        "visualizationType": "memory",
+        "code": "MyWorker worker = new MyWorker();",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "worker",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "MyWorker",
+              "state": "NEW"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "开始工作（start）",
+        "explanation": "调用 `start()` 会请求 JVM 创建一个新的执行流。\nJVM 会创建新线程，分配独立的栈空间，然后在其上运行 `run()` 方法。",
+        "keyInsight": "start() 会创建新的栈帧",
+        "visualizationType": "memory",
+        "code": "worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "main thread stack",
+              "value": "main()"
+            },
+            {
+              "name": "MyWorker stack",
+              "new": true,
+              "value": "run()"
+            }
+          ],
+          "note": "两个任务开始同时执行！"
+        }
+      },
+      {
+        "title": "主线程继续执行",
+        "explanation": "`start()` 只是"请求"任务然后立即返回。\n因此 `main` 线程不会停止，继续做自己的工作。\n哪条消息先输出取决于操作系统的调度，每次运行的结果可能不同。",
+        "keyInsight": "两个线程不会互相等待，各自独立运行。",
+        "visualizationType": "memory",
+        "code": "System.out.println(\"메인 일꾼도 자기 일을 합니다.\");",
+        "memoryState": {
+          "output": [
+            "（输出顺序每次可能不同）"
+          ],
+          "note": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "要执行线程，必须调用哪个方法？",
+    "options": [
+      "run()",
+      "start()",
+      "execute()",
+      "begin()"
+    ],
+    "correctIndex": 1,
+    "explanation": "直接调用 run() 只是在当前线程中执行该方法。\n要创建新的执行流，必须使用 start()。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "调用 run() 就能实现多线程运行。",
+      "correct": "不是的！run() 只是普通的方法调用。\n只有 start() 才能创建新线程。",
+      "why": "start() 方法内部会调用本地代码来创建操作系统级别的线程。"
+    }
+  ],
+  "keyTakeaway": "Thread 是拥有独立栈的执行单位。用 start() 来启动引擎吧！"
+}

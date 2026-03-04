@@ -1,0 +1,138 @@
+{
+  "lessonId": "c-6-2",
+  "title": "Char Array vs Char Pointer",
+  "concept": "可修改的黑板（数组） vs 不可修改的石碑（指针）",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    char arr[] = \"Hello\";\n    arr[0] = 'B';\n    printf(\"%s\\n\", arr);\n\n    char *ptr = \"World\";\n    printf(\"%s\\n\", ptr);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "使用 `printf` 所需的头文件。\n\n本课讲解 `char 数组` 和 `char 指针` 字符串在可修改性上的区别。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧。\n\n我们将比较相同的字符串表示在存储位置和可修改性上的差异。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "方式 1：字符数组声明（可修改）",
+        "explanation": "`char arr[] = \"Hello\";` 将字符串复制到数组中。\n\n数组元素可以像普通内存一样修改。",
+        "visualizationType": "cMemory",
+        "code": "char arr[] = \"Hello\";",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Hello\\0",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "修改数组内容",
+        "explanation": "通过 `arr[0] = ...` 修改元素，字符串内容会真正改变。\n\n因为数组是可写的存储空间。",
+        "visualizationType": "cMemory",
+        "code": "arr[0] = 'B';",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0",
+            "highlightIndex": 0,
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "输出修改后的数组",
+        "explanation": "输出修改后的数组字符串，确认修改已生效。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%s\\n\", arr);",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0",
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "Bello"
+      },
+      {
+        "title": "方式 2：字符指针声明（只读）",
+        "explanation": "`char *ptr = \"World\";` 指向字符串字面量的地址。\n\n字面量位于只读内存区域，不能被修改。",
+        "visualizationType": "cMemory",
+        "code": "char *ptr = \"World\";",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "char[6]",
+            "value": "Bello\\0",
+            "address": "0x1000"
+          },
+          {
+            "name": "ptr",
+            "type": "char*",
+            "value": "0xRODATA",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "输出指针指向的字符串",
+        "explanation": "只读字符串也可以正常输出。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%s\\n\", ptr);",
+        "stdout": "Bello\nWorld"
+      },
+      {
+        "title": "如果尝试修改会怎样？（崩溃！）",
+        "explanation": "尝试写入字符串字面量可能导致运行时错误。\n\n指针字符串应始终作为只读处理。",
+        "highlight": [],
+        "visualizationType": "cMemory",
+        "code": "printf(\"%s\\n\", ptr);"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "通过 `return 0;` 结束程序。\n\n总结：数组字符串可修改，字面量指针字符串不可修改。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如果需要修改字符串内容，应该如何声明？",
+    "options": [
+      "char *str = \"...\"",
+      "const char *str = \"...\"",
+      "char str[] = \"...\"",
+      "#define STR \"...\""
+    ],
+    "correctIndex": 2,
+    "explanation": "用方括号（`[]`）声明会在栈（或数据段）上创建可修改的副本。\n用指针（`*`）指向字符串常量则无法修改。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "char *s = \"A\"; 存储在堆上",
+      "correct": "不是在堆上，而是存储在代码（文本）段。",
+      "why": "除非使用 `malloc`，否则不在堆上。\n它是与程序代码一起存储的常量。"
+    }
+  ],
+  "keyTakeaway": "需要修改用 `[]`（数组），只读用 `*`（指针）。要区分使用。"
+}

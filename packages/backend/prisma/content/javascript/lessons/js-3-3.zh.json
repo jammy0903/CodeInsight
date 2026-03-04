@@ -1,0 +1,106 @@
+{
+  "lessonId": "js-3-3",
+  "title": "箭头函数中的 this",
+  "concept": "箭头函数没有自己的 this——它使用外层作用域的 this",
+  "content": {
+    "code": "const user = {\n  name: 'Alice',\n  greetRegular() {\n    setTimeout(function() {\n      console.log(`Regular: ${this.name}`);\n    }, 100);\n  },\n  greetArrow() {\n    setTimeout(() => {\n      console.log(`Arrow: ${this.name}`);\n    }, 100);\n  }\n};\n\nuser.greetRegular();\nuser.greetArrow();",
+    "steps": [
+      {
+        "title": "调用 user.greetRegular()",
+        "explanation": "调用 `user` 对象的 `greetRegular` 方法。\n此时 `greetRegular` 内部的 `this` 是 `user`。\n但是，其内部的 `setTimeout` 回调（普通函数）在 Web API 100ms 后运行时会丢失 `this`。",
+        "visualizationType": "thisBinding",
+        "code": "user.greetRegular();",
+        "thisState": {
+          "context": "method call",
+          "thisValue": "user",
+          "webApis": [
+            {
+              "name": "regular callback",
+              "delay": 100
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 user.greetArrow()",
+        "explanation": "调用 `greetArrow` 方法。\n此时 `greetArrow` 内部的 `this` 也是 `user`。\n其内部的 `setTimeout` 回调（箭头函数）在 100ms 后运行时会"记住"这个 `this` 值。",
+        "visualizationType": "thisBinding",
+        "code": "user.greetArrow();",
+        "thisState": {
+          "webApis": [
+            {
+              "name": "regular callback"
+            },
+            {
+              "name": "arrow callback",
+              "delay": 100
+            }
+          ]
+        }
+      },
+      {
+        "title": "回调执行（普通函数）",
+        "explanation": "100ms 后，`greetRegular` 的回调执行。\n这个回调是"普通函数"，所以它在被调用时获得自己的 `this`。\n由 `setTimeout` 调用的回调，其 `this` 指向全局对象（`window`），所以 `this.name` 是 `undefined`。",
+        "keyInsight": "普通函数回调的 this 是全局对象。",
+        "visualizationType": "thisBinding",
+        "code": "setTimeout(function() {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "thisState": {
+          "context": "callback (regular function)",
+          "thisValue": "window",
+          "output": [
+            "Regular: undefined"
+          ],
+          "webApis": null
+        }
+      },
+      {
+        "title": "回调执行（箭头函数）",
+        "explanation": "接着，`greetArrow` 的回调执行。\n"箭头函数"不会创建自己的 `this`——它使用词法作用域（定义位置）的 `this`。\n这里它引用的是 `greetArrow` 方法的 `this`，即 `user` 对象。",
+        "keyInsight": "箭头函数的 this = 父级的 this（继承）",
+        "visualizationType": "thisBinding",
+        "code": "setTimeout(() => {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "thisState": {
+          "context": "callback (arrow function)",
+          "thisValue": "user",
+          "output": [
+            "Regular: undefined",
+            "Arrow: Alice"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下代码中按钮被点击时，this 是什么？\n\nconst obj = {\n  name: 'MyObj',\n  handleClick: () => {\n    console.log(this.name);\n  }\n};\nbutton.addEventListener('click', obj.handleClick);",
+    "options": [
+      "'MyObj'",
+      "按钮元素",
+      "undefined（来自全局作用域的 this）",
+      "发生错误"
+    ],
+    "correctIndex": 2,
+    "explanation": "箭头函数使用定义时外层作用域的 this。\n虽然它被定义为 obj 的方法，但 obj 不是一个作用域，所以使用的是全局的 this。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "箭头函数的 this 指向父对象",
+      "correct": "不是。\n它指向外层的**函数**作用域。\n对象字面量 `{}` 不是一个作用域。",
+      "why": "对象不充当作用域。\n所以在对象字面量中定义的箭头函数，其 this 最终指向全局（window）。"
+    },
+    {
+      "wrong": "可以通过 call/apply/bind 改变箭头函数的 this",
+      "correct": "箭头函数的 this 无法被改变。\ncall/apply/bind 会被忽略。",
+      "why": "箭头函数使用词法 this，所以其绑定是固定的。"
+    }
+  ],
+  "keyTakeaway": "箭头函数 = 没有自己的 this，使用外层作用域的 this（词法绑定）"
+}

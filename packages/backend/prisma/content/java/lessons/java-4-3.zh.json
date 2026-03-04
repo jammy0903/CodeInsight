@@ -1,0 +1,172 @@
+{
+  "lessonId": "java-4-3",
+  "title": "String Pool 与 intern()",
+  "concept": "String Pool 是一个缓存常用字符串的内存区域。",
+  "content": {
+    "code": "String s1 = \"Hello\";\nString s2 = \"Hello\";\nString s3 = new String(\"Hello\");\nString s4 = s3.intern();\n\nSystem.out.println(s1 == s2);\nSystem.out.println(s1 == s3);\nSystem.out.println(s1 == s4);",
+    "steps": [
+      {
+        "title": "第一个字面量（\"Hello\"）",
+        "explanation": "**执行流程：**\n1. JVM 遇到 `\"Hello\"` 字面量。\n2. 检查 String Pool 中是否存在 \"Hello\"（不存在）。\n3. 在 Pool 中创建并注册 \"Hello\" 对象。\n4. `s1` 指向该地址（假设为 `Pool[0]`）。\n\n**Pool 的作用：**\n它是存放常用字符串的"公共仓库"。",
+        "visualizationType": "javaMemory",
+        "code": "String s1 = \"Hello\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "字面量复用",
+        "explanation": "**执行流程：**\n1. JVM 再次遇到 `\"Hello\"` 字面量。\n2. 检查 Pool -> "已经有了！"\n3. 不再新建，直接把现有的 `Pool[0]` 地址给 `s2`。\n\n**关键点：**\n使用字面量（`\"...\"`）时，JVM 会先搜索 Pool 并复用已有的条目。\n这是节省内存的首要功臣。",
+        "keyInsight": "相同的字面量 = 相同的地址（复用）",
+        "visualizationType": "javaMemory",
+        "code": "String s2 = \"Hello\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "s2",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "note": "s1 == s2（地址相同）"
+        }
+      },
+      {
+        "title": "new String() - 强制创建",
+        "explanation": "**执行流程：**\n1. 执行 `new String(...)`。\n2. 绕过 Pool，**直接在堆内存上创建新对象**（`Heap[0]`）。\n3. `s3` 指向这个新对象。\n\n**类比：**\n如果 Pool 是"公共饮水机"，那 `new String` 就是"花钱买瓶装水"。\n水的味道（内容）一样，但完全是不同的瓶子。",
+        "keyInsight": "new String() = 不复用（堆分配）",
+        "visualizationType": "javaMemory",
+        "code": "String s3 = new String(\"Hello\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s1",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "s3",
+              "value": "-> Heap[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello\"",
+              "type": "String",
+              "new": true
+            }
+          ],
+          "note": "不在 Pool 中！在堆上单独创建",
+          "stringPool": null
+        }
+      },
+      {
+        "title": "intern() - 查找 Pool 条目",
+        "explanation": "**执行流程：**\n1. 拿着 `s3` 的内容（\"Hello\"）去 Pool 查找。\n2. "Pool 里有没有相同内容的条目？"\n3. "有，在 `Pool[0]`。"\n4. 返回该地址（`Pool[0]`）并存储到 `s4` 中。\n\n`intern()` 会检查 Pool 中是否已存在与堆中字符串内容相同的条目——如果有，返回 Pool 地址（如果没有，则注册到 Pool 后返回新地址）。",
+        "keyInsight": "intern() = 转换为 Pool 地址",
+        "visualizationType": "javaMemory",
+        "code": "String s4 = s3.intern();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "s4",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "note": "s4 现在指向与 s1 相同的位置"
+        }
+      },
+      {
+        "title": "s1 == s2 比较",
+        "explanation": "两者都来自 Pool。\n地址相同。\n-> `true`",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1 == s2);",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "stringPool": null,
+          "note": null
+        }
+      },
+      {
+        "title": "s1 == s3 比较",
+        "explanation": "`s1`（Pool）和 `s3`（Heap）位于不同的区域。\n地址不匹配。\n-> `false`",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1 == s3);",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ]
+        }
+      },
+      {
+        "title": "s1 == s4 比较",
+        "explanation": "得益于 `intern()`，`s4` 也获得了 Pool 地址。\n与 `s1` 的地址相同。\n-> `true`",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s1 == s4);",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪段代码可能在内存中创建 2 个 String 对象？",
+    "options": [
+      "String s = \"A\";",
+      "String s = \"A\" + \"B\";",
+      "String s = new String(\"A\");",
+      "String s = s1;"
+    ],
+    "correctIndex": 2,
+    "explanation": "`new String(\"A\")` 首先会在 Pool 中为字面量 \"A\" 创建一个条目（如果不存在），然后复制该值在堆上再创建一个对象。\n因此最多可能创建 2 个对象——这是一种低效的模式。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "String Pool 也属于堆内存吗？",
+      "correct": "是的。\n（从 Java 7 开始）",
+      "why": "Java 7 之前，Pool 位于一个叫 PermGen 的特殊区域，经常因空间不足而报错，后来被移到了普通堆区域。\n现在不再使用的字符串可以被 GC（垃圾回收器）回收。"
+    }
+  ],
+  "keyTakeaway": "使用字面量（\"...\"）才能享受 Pool 的优势。避免使用 new String()。"
+}

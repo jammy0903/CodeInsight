@@ -1,0 +1,123 @@
+{
+  "lessonId": "c-1-3",
+  "title": "Address Operator (&) and sizeof",
+  "concept": "Every variable lives somewhere in memory and has its own size",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int num = 42;\n    char ch = 'A';\n\n    printf(\"Address of num: %p\\n\", &num);\n    printf(\"Address of ch:  %p\\n\", &ch);\n\n    printf(\"Size of num: %zu bytes\\n\", sizeof(num));\n    printf(\"Size of ch:  %zu bytes\\n\", sizeof(ch));\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h Header",
+        "explanation": "The standard I/O header for using ```printf```. In this lesson, we'll directly examine a variable's **memory address** and **size** — essential foundations for learning **pointers** later.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The program entry point. A main stack frame is created, and the variables declared inside it will each be assigned a unique **address**.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Declaring an Integer Variable",
+        "explanation": "`int num = 42;` creates an integer variable num and stores a value.\n\nThe key point is that every variable has a memory address, and in the next step we'll check it with `&num`.",
+        "visualizationType": "cMemory",
+        "code": "int num = 42;",
+        "stack": [
+          {
+            "name": "num",
+            "value": "42",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "Declaring a Character Variable",
+        "explanation": "`char ch = 'A';` creates a 1-byte character variable.\n\nCharacters are stored internally as numeric codes. Note that `'A'` (a character) and `\"A\"` (a string) are different types.",
+        "visualizationType": "cMemory",
+        "code": "char ch = 'A';",
+        "stack": [
+          {
+            "name": "num",
+            "value": "42",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "ch",
+            "value": "'A'",
+            "type": "char",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Printing num's Address",
+        "explanation": "`&num` gives the memory address of num, not its value.\n\nThe `%p` format specifier is used for printing addresses. This concept is the starting point for learning pointers.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Address of num: %p\\n\", &num);",
+        "stdout": "Address of num: 0x1004"
+      },
+      {
+        "title": "Printing ch's Address",
+        "explanation": "`&ch` returns the memory address of the character variable `ch`.\n\nPrinting the address with `%p` shows that it's stored at a different location than `num`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Address of ch:  %p\\n\", &ch);",
+        "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000"
+      },
+      {
+        "title": "Printing num's Size (sizeof)",
+        "explanation": "`sizeof` returns the size in bytes of a type or variable. Since `num` is an `int`, it typically prints 4 bytes.\n\nThe return type of `sizeof` is `size_t`, so the correct format specifier is `%zu`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Size of num: %zu bytes\\n\", sizeof(num));",
+        "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000\nSize of num: 4 bytes"
+      },
+      {
+        "title": "Printing ch's Size (sizeof)",
+        "explanation": "`sizeof(ch)` returns 1. In C, `char` is the baseline type for bytes, so it always has a size of 1.\n\nTo summarize: `&variable` gives the address, `sizeof(variable)` gives the size. Make sure to distinguish these before learning pointers.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Size of ch:  %zu bytes\\n\", sizeof(ch));",
+        "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000\nSize of num: 4 bytes\nSize of ch:  1 bytes"
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "`return 0;` terminates the program normally.\n\nThe key takeaway of this lesson is distinguishing the roles of `&` (address) and `sizeof` (size).",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "stdout": ""
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the sizeof a char type variable?",
+    "options": [
+      "It varies by compiler",
+      "Always 1 byte",
+      "Always 4 bytes",
+      "It depends on the operating system"
+    ],
+    "correctIndex": 1,
+    "explanation": "The C standard defines `char` as always being 1 byte (the minimum storage unit).\n`int` and `long` may vary across systems."
+  },
+  "misconceptions": [
+    {
+      "wrong": "&variable changes the variable's value",
+      "correct": "& only 'reads' the address — it doesn't change the value.",
+      "why": "To change a value, you need the assignment operator (=)."
+    }
+  ],
+  "keyTakeaway": "`&` is the address (where does it live?), `sizeof` is the size (how many bytes does it occupy?)."
+}

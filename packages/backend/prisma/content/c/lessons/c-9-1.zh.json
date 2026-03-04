@@ -1,0 +1,116 @@
+{
+  "lessonId": "c-9-1",
+  "title": "Preprocessor Phases",
+  "concept": "预处理器在编译前展开宏和指令，生成实际被编译的代码",
+  "content": {
+    "code": "#include <stdio.h>\n#define PI 3.14159\n#define HELLO \"Hello, World!\"\n\nint main() {\n    printf(\"%s\\n\", HELLO);\n\n    double r = 10.0;\n    double area = PI * r * r;\n\n    printf(\"Area: %.2f\\n\", area);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "预处理器指令：#include",
+        "explanation": "**`#include <stdio.h>`** -- 以 `#` 开头的代码是给**预处理器（Preprocessor）**的指令。预处理在编译**之前**最先执行，从系统路径找到 `stdio.h` 文件并将其**全部内容（数千行）**复制到此位置。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "预处理器指令：#define（宏常量）",
+        "explanation": "**`#define PI 3.14159`** -- 定义一个名为 `PI` 的**宏常量**。预处理器在之后的代码中每次遇到 `PI` 都会进行**简单的文本替换**为 `3.14159`。",
+        "visualizationType": "cMemory",
+        "code": "#define PI 3.14159",
+        "highlightOffset": [0, 1]
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "**`int main() {`** -- 预处理完成后编译器开始读取代码的程序入口点。此时 `stdio.h` 的内容已插入，所有 `PI` 和 `HELLO` 已被替换为实际值。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "宏替换后执行（字符串）",
+        "explanation": "**`printf(\"%s\\n\", HELLO);`** -- 编译器看到这段代码时，`HELLO` 已经被替换为 `\"Hello, World!\"`，所以实际上与 `printf(\"%s\\n\", \"Hello, World!\");` 100% 相同。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%s\\n\", HELLO);",
+        "stack": [],
+        "stdout": "Hello, World!"
+      },
+      {
+        "title": "变量声明",
+        "explanation": "**`double r = 10.0;`** -- 在**栈内存**中创建半径 `r` 并初始化为 `10.0`。`double` 是可以表示约 15 位小数的 8 字节浮点类型。",
+        "visualizationType": "cMemory",
+        "code": "double r = 10.0;",
+        "stack": [
+          {
+            "name": "r",
+            "type": "double",
+            "value": "10.0",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "宏替换后执行（数值）",
+        "explanation": "**`double area = PI * r * r;`** -- 对编译器来说这是 `double area = 3.14159 * r * r;`。计算结果 `3.14159 * 10.0 * 10.0` = `314.159` 存入新变量 `area`。",
+        "visualizationType": "cMemory",
+        "code": "double area = PI * r * r;",
+        "stack": [
+          {
+            "name": "r",
+            "type": "double",
+            "value": "10.0",
+            "address": "0x1000"
+          },
+          {
+            "name": "area",
+            "type": "double",
+            "value": "314.159",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "输出结果",
+        "explanation": "**`printf(\"Area: %.2f\\n\", area);`** -- 将圆的面积输出到**小数点后两位**。`%.2f` 中的 `.2` 表示只显示小数点后 2 位，第三位 `9` 四舍五入，输出 `314.16`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Area: %.2f\\n\", area);",
+        "stdout": "Hello, World!\nArea: 314.16"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "**`return 0;`** -- 告诉操作系统"正常完成"的退出码。\n\n本课的核心要点是**预处理器与编译器是独立的存在**。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "用 #define MAX 100 定义的常量可以通过 &MAX 获取内存地址吗？",
+    "options": [
+      "可以。和全局变量一样。",
+      "不可以。编译前就被替换为数字了，所以没有地址。",
+      "开启特定选项后可以。",
+      "地址在栈区域。"
+    ],
+    "correctIndex": 1,
+    "explanation": "宏常量 `#define` 是在预处理阶段对源代码的文本替换，因此在运行时不作为变量存在。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "#define 和定义变量是一样的。",
+      "correct": "完全不同。\n变量占用内存空间，而宏只是源代码中的文本替换。",
+      "why": "它不进行类型检查，无条件地替换文本。"
+    }
+  ],
+  "keyTakeaway": "预处理器在编译器看到代码之前，对"代码文本"本身进行变换。"
+}

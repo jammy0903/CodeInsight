@@ -1,0 +1,250 @@
+{
+  "lessonId": "py-7-2",
+  "title": "The del Keyword",
+  "concept": "del deletes the name (reference), not the object! This is an easily confused point!",
+  "content": {
+    "code": "a = [1, 2, 3]\nb = a  # 같은 객체\n\nprint(f\"b 삭제 전: {a}\")\n\ndel b  # b 참조만 삭제!\n\nprint(f\"a는 여전히: {a}\")\n\ntry:\n    print(b)  # NameError!\nexcept NameError:\n    print(\"b는 더 이상 존재하지 않음\")",
+    "steps": [
+      {
+        "title": "Object Creation",
+        "explanation": "**`a = [1, 2, 3]`**\n\nPython creates a new **list object `[1, 2, 3]`** in memory (0x2000) and makes variable `a` point to this object.\n\n**Understanding the relationship between variables and objects is the key to this lesson!**\n- **Object**: The actual data that exists in memory (the list `[1, 2, 3]`, at address 0x2000)\n- **Variable**: A label that points to the object (think of it as an arrow)\n\n**Analogy: A house and its address**\nA house (object) is located at 123 Main Street (0x2000), and `a` is a note with that address written on it.\nEven if you tear up the note (`del a`), the house is still there!\n\n**Why this order?** This is the first line of the program, so Python executes it first.\nWe're preparing the object first to demonstrate the effect of `del` later.\n\n**Memory state**: Object 0x2000's refcount = 1 (only a references it)\n\n**Execution order**: Create list [1, 2, 3] object in memory (ID: 0x2000) -> variable a references 0x2000 -> refcount = 1 -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "a = [1, 2, 3]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Variable a references list object 0x2000 (refcount=1)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating an Alias (Reference)",
+        "explanation": "**`b = a`**\n\nConnects variable `b` to point to the **same object (0x2000)** as `a`.\nThis is called an **alias**.\n\n**A new list is NOT being created!**\n`a` and `b` are different names, but they both point to the same location in memory (0x2000).\nTwo labels are attached to a single object.\n\n**Analogy: A second key to the same house**\n`a` is the original key, and `b = a` is a copy of that key.\nBoth keys open the same door.\nEven if you throw away one key (`del b`), you can still get in with the other key (`a`).\n\n**Reference count change**: refcount 1 -> 2 (variable `a` + variable `b`)\n\n**Note**: After `b = a`, modifying the list through `b` will be visible through `a` as well.\nExample: `b.append(99)` -> `a` also becomes `[1, 2, 3, 99]`!\n\n**Why this order?** To demonstrate the effect of `del`, we first need a second variable pointing to the same object.\n\n**Execution order**: Check the object 0x2000 that variable a points to -> set b to also reference 0x2000 -> refcount increases 1 -> 2 -> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "b = a  # 같은 객체",
+        "pythonMemoryState": {
+          "note": "a and b reference the same object 0x2000 (refcount=2)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking State Before Deletion",
+        "explanation": "**`print(f\"b 삭제 전: {a}\")`**\n\nChecks the state **before** executing `del b`.\nShows that the list object can be accessed normally through `a`.\n\n**Why print the state before deletion?**\nWhen conducting an experiment, comparing \"before\" and \"after\" the change makes the difference clear.\nThis serves as the **control group** in a scientific experiment.\n\n**Current memory state summary**:\n- Object `[1, 2, 3]` is in memory at 0x2000\n- `a` -> 0x2000 (accessible)\n- `b` -> 0x2000 (accessible)\n- refcount = 2\n\n**Output**: `b 삭제 전: [1, 2, 3]` - the list is accessed normally through a\n\n**Why this order?** Before executing `del b`, we first confirm that \"both a and b are working normally now\", so we can compare with the state after deletion.\n\n**Execution order**: Evaluate {a} inside f-string -> get value [1, 2, 3] from 0x2000 -> output \"b 삭제 전: [1, 2, 3]\" -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"b 삭제 전: {a}\")",
+        "pythonMemoryState": {
+          "output": [
+            "b 삭제 전: [1, 2, 3]"
+          ],
+          "note": "Accessing object 0x2000 through a and printing it",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Deleting a Reference (del)",
+        "explanation": "**`del b`**\n\nThis is the **key point** of this lesson!\n`del b` completely removes the **name (reference) `b` itself** from Python's namespace.\n\n**What del does (precise behavior)**:\n1. Removes the name `b` from the namespace\n2. Decreases the refcount of object 0x2000 by 1 (2 -> 1)\n3. Using `b` afterwards will raise a NameError\n\n**What del does NOT do (a common beginner misconception!)**:\n- It does **not** delete the list object `[1, 2, 3]`!\n- The object is still in memory, and since `a` references it, refcount = 1 > 0, so it is not deleted.\n\n**Analogy: Erasing a name from a roster**\nThe student name `b` has been erased from the school's attendance roster (namespace).\nBut the textbook (object) that `b` was using isn't collected because `a` is also using it.\nThe textbook is only returned when nobody is using it (refcount=0).\n\n**Difference between del and None assignment**: `del b` eliminates the variable itself (NameError). `b = None` keeps the variable but makes it point to None.\n\n**Why this order?** After confirming the \"before deletion\" state, we now actually execute `del` to observe the effect.\n\n**Execution order**: Remove variable b from namespace -> decrease refcount of 0x2000 from 2 -> 1 -> refcount > 0 so object persists -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "del b  # b 참조만 삭제!",
+        "pythonMemoryState": {
+          "note": "Variable b is deleted! But object 0x2000 is still referenced by a (refcount=1)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Confirming Object Survival",
+        "explanation": "**`print(f\"a는 여전히: {a}\")`**\n\n**Proves** that `a` can still access the list even after `del b`.\n\n**This is the key evidence!**\nIf `del b` had deleted the object, access through `a` should also fail.\nBut `a` outputs `[1, 2, 3]` without any problem.\nThis clearly shows that **`del` only deletes the name and does not touch the object**.\n\n**Analogy**: One of the two nameplates (`b`) on the same house was removed, but you can still visit the same house using the remaining nameplate (`a`).\nThe house (object) itself hasn't changed at all.\n\n**Verification points**:\n- Object 0x2000 is intact in memory\n- `a` -> 0x2000 access is normal\n- Output: `a는 여전히: [1, 2, 3]`\n\n**Why this order?** Right after `del b`, we immediately confirm the object is still alive to clearly understand del's behavior.\n\n**Execution order**: Evaluate {a} inside f-string -> get value [1, 2, 3] from 0x2000 -> output \"a는 여전히: [1, 2, 3]\" -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a는 여전히: {a}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a는 여전히: [1, 2, 3]"
+          ],
+          "note": "Object 0x2000 is alive and accessible through a!",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Attempting to Trigger an Error (try)",
+        "explanation": "**`try:`**\n\nStarts a `try...except` block for **exception handling**.\nWhy do we need exception handling? Because variable `b` was completely deleted by `del b`, using `b` will cause an error.\n\n**Role of the try block**: \"Execute the code inside this block, but if an error occurs, don't stop the program -- pass it to the except block instead.\"\n\n**Analogy: Setting up a safety net**\nIt's like laying a safety net (try) on the ground before performing on a trapeze at the circus.\nEven if you fall (an error occurs), the safety net catches you, so the show (program) continues.\n\n**What if there's no try?**\nIf `print(b)` were executed without try, a `NameError` would occur and the entire program would **immediately stop**.\nUsing try...except lets you handle errors gracefully and keep the program running.\n\n**Why this order?** Since the name was deleted with `del b`, we now check whether accessing the deleted name really causes an error.\n\n**Execution order**: Enter try block -> begin executing code inside try block -> if error occurs, prepare to jump to except",
+        "visualizationType": "pythonMemory",
+        "code": "try:",
+        "pythonMemoryState": {
+          "note": "Entering try block - b is already deleted",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "NameError Occurs",
+        "explanation": "**`print(b)`**\n\nAttempts to use the deleted variable `b`.\nPython looks for the name `b` in the namespace, but since it was already removed by `del b`, it cannot be found!\n\n**Error raised**: `NameError: name 'b' is not defined`\n\n**This demonstrates the second effect of `del`**:\n1. Decreased reference count (confirmed in previous step)\n2. The variable name itself disappears (confirmed in this step) <-- this one!\n\n**Analogy: Looking up a name in a phone book**\nYou tried to look up `b` in the phone book (namespace), but the name `b` isn't in the phone book at all.\nYou get the answer \"No such person\" (NameError).\n\n**The difference between `del` and `None` becomes clear here**:\n- `del b`: b completely disappears -> `print(b)` -> **NameError**\n- `b = None`: b remains but points to None -> `print(b)` -> `None` is printed\n\n**Why this order?** When an error occurs inside a try block, the remaining try code is skipped and execution immediately jumps to except.\n\n**Execution order**: print() tries to evaluate argument b -> searches for 'b' in namespace -> not found -> NameError raised -> control moves to except block",
+        "visualizationType": "pythonMemory",
+        "code": "print(b)  # NameError!",
+        "pythonMemoryState": {
+          "note": "NameError raised! The name 'b' does not exist",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Catching the Error (except)",
+        "explanation": "**`except NameError:`**\n\nSince a **`NameError`** exception was raised in the try block, Python transfers control to this except block.\n\n**How except works**:\n1. An exception occurs in the try block\n2. Python checks the except clauses from top to bottom\n3. The raised exception type (NameError) matches the type specified in except (NameError)!\n4. Execution enters this except block\n\n**Analogy: The safety net activates**\nThe person who fell (error occurred) during the circus trapeze act has been caught by the safety net (except).\nThanks to the safety net, the show (program) can continue without being interrupted.\n\n**What if we wrote `except TypeError:` instead?**\nThe error that occurred is a NameError, but except only catches TypeError, so they don't match and the program would crash.\nYou must specify the correct exception type!\n\n**Why this order?** Since a NameError was raised, Python's exception handling mechanism automatically moves to the except block.\n\n**Execution order**: Check the raised exception type (NameError) -> compare with except clause type (NameError) -> match! -> enter except block",
+        "visualizationType": "pythonMemory",
+        "code": "except NameError:",
+        "pythonMemoryState": {
+          "note": "Entering except block - preparing to handle NameError",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Error Handling Message Output",
+        "explanation": "**`print(\"b는 더 이상 존재하지 않음\")`**\n\nThe code inside the except block executes, printing a message that `b` no longer exists.\n\n**Summary of the entire lesson's takeaway:**\n\n1. **`del b` only deletes the name**: Variable `b` has completely disappeared from the namespace, but the object `[1, 2, 3]` is perfectly fine.\n2. **Objects are only deleted when refcount=0**: Since `a` is still referencing it, refcount=1, so the object remains in memory.\n3. **Accessing a deleted variable raises NameError**: Since the name `b` itself is gone, any code using `b` will cause an error.\n\n**Analogy: A number deleted from a phone book**\nYou deleted `b`'s number from the phone book (del). Trying to call `b` gives you \"number not registered\" (NameError).\nBut the restaurant (object) that `b` had recommended is still open, and `a` also knows its address, so you can still go there.\n\n**Thanks to try-except**, the program finishes normally even though an error occurred.\n\n**Execution order**: print() executes -> output \"b는 더 이상 존재하지 않음\" -> try-except block ends -> program terminates normally",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"b는 더 이상 존재하지 않음\")",
+        "pythonMemoryState": {
+          "output": [
+            "b는 더 이상 존재하지 않음"
+          ],
+          "note": "Error handling complete! Object 0x2000 is accessible through a",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "After executing del x, what if y also references the same object?",
+    "options": [
+      "y also gets a NameError",
+      "y can still access the object",
+      "The object becomes corrupted",
+      "y becomes None"
+    ],
+    "correctIndex": 1,
+    "explanation": "del only deletes the name x.\ny is still pointing to the same object, so it can access it normally!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "del x deletes the object that x points to",
+      "correct": "del x only deletes the name (reference) x",
+      "why": "Objects are only deleted when refcount=0.\nIf other names exist, the object stays alive!"
+    },
+    {
+      "wrong": "After del, the variable becomes None",
+      "correct": "After del, the variable completely disappears (NameError)",
+      "why": "x = None makes x point to None.\ndel x removes x entirely!"
+    }
+  ],
+  "keyTakeaway": "del only deletes the name (reference)! The object is automatically deleted when refcount=0!"
+}

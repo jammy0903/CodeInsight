@@ -1,0 +1,129 @@
+{
+  "lessonId": "java-1-6",
+  "title": "方法定义",
+  "concept": "方法是可重用的代码块。需要指定返回类型、名称和参数。",
+  "content": {
+    "code": "public class Main {\n    public static int add(int a, int b) {\n        int sum = a + b;\n        return sum;\n    }\n\n    public static int square(int n) {\n        return n * n;\n    }\n\n    public static void main(String[] args) {\n        int result = add(3, 7);\n        System.out.println(\"3 + 7 = \" + result);\n\n        int squared = square(5);\n        System.out.println(\"5^2 = \" + squared);\n    }\n}\n",
+    "steps": [
+      {
+        "title": "方法体",
+        "explanation": "**`int sum = a + b;`**\n\n将参数 a 和 b 相加，结果存储到 sum 中。\na=3, b=7, 所以 sum=10\n",
+        "visualizationType": "javaMemory",
+        "code": "int sum = a + b;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "add:a",
+              "value": "3",
+              "type": "Main.add()"
+            },
+            {
+              "name": "add:b",
+              "value": "7",
+              "type": "Main.add()"
+            },
+            {
+              "name": "add:sum",
+              "value": "10",
+              "type": "Main.add()"
+            },
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 3 executed"
+        }
+      },
+      {
+        "title": "return 语句",
+        "explanation": "**`return sum;`**\n\n**return**：将方法的结果**返回**给调用者。\n\nsum（10）被返回到方法调用的位置。\n",
+        "visualizationType": "javaMemory",
+        "code": "return sum;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 4 executed"
+        }
+      },
+      {
+        "title": "输出结果",
+        "explanation": "**`System.out.println(\"3 + 7 = \" + result);`**\n\n**输出**：`3 + 7 = 10`\n",
+        "visualizationType": "javaMemory",
+        "code": "int result = add(3, 7);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "add:a",
+              "value": "3",
+              "type": "Main.add()"
+            },
+            {
+              "name": "add:b",
+              "value": "7",
+              "type": "Main.add()"
+            },
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 12 executed"
+        }
+      },
+      {
+        "title": "输出平方结果",
+        "explanation": "**`System.out.println(\"5^2 = \" + squared);`**\n\n**输出**：`5^2 = 25`\n",
+        "visualizationType": "javaMemory",
+        "code": "int squared = square(5);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "square:n",
+              "value": "5",
+              "type": "Main.square()"
+            },
+            {
+              "name": "main:result",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 15 executed"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在 void 方法中返回一个值会怎样？",
+    "options": [
+      "正常运行",
+      "编译错误",
+      "运行时错误",
+      "值被忽略"
+    ],
+    "correctIndex": 1,
+    "explanation": "void：没有返回值的方法。\n\n像 `return 5;` 这样返回值会导致编译错误！\n在 void 方法中只能使用 `return;` 或者省略不写。\n"
+  }
+}

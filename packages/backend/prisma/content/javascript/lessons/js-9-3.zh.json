@@ -1,0 +1,93 @@
+{
+  "lessonId": "js-9-3",
+  "title": "WeakMap 与防止内存泄漏",
+  "concept": "WeakMap 对对象使用「弱引用」，允许垃圾回收器回收它们，从而防止内存泄漏。",
+  "content": {
+    "code": "let user = { name: 'Alice' };\n\n// 1. Regular Map (strong reference)\nconst strongMap = new Map();\nstrongMap.set(user, 'Data');\n\n// 2. WeakMap (weak reference)\nconst weakMap = new WeakMap();\nweakMap.set(user, 'Secret');\n\n// Deleting the user object (breaking the reference)\nuser = null;\n\n// Result:\n// strongMap still holds Alice (memory not freed)\n// weakMap releases Alice (collected by GC)",
+    "steps": [
+      {
+        "title": "创建对象",
+        "explanation": "`{ name: 'Alice' }` 对象在堆上创建，`user` 变量指向它。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 1
+            }
+          ]
+        },
+        "code": "let user = { name: 'Alice' };"
+      },
+      {
+        "title": "强引用 Map：强引用",
+        "explanation": "Alice 被注册为普通 `Map` 的键。\n这是一个**强引用**。\n\n**什么是强引用？**\n它告诉 GC：「我在关注这个——永远不要删除它！」\n所以即使 `user` 变量消失了，只要 Map 还活着，Alice 就留在内存中。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 2,
+              "note": "Ref by user & strongMap"
+            }
+          ]
+        },
+        "code": "strongMap.set(user, 'Data');",
+        "highlightOffset": [
+          -1,
+          0
+        ]
+      },
+      {
+        "title": "WeakMap：弱引用",
+        "explanation": "Alice 也被注册到 `WeakMap` 中。\n但这使用的是**弱引用**。\n\n**什么是弱引用？**\n它说：「我能看到这个对象，但不要仅仅为了我而让它活着。」\n如果没有其他变量引用 Alice，WeakMap 的引用会被忽略，GC 可以回收它。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "note": "weakMap added ref, but it doesn't count for GC"
+        },
+        "code": "weakMap.set(user, 'Secret');",
+        "highlightOffset": [
+          -1,
+          0
+        ]
+      },
+      {
+        "title": "断开引用（user = null）",
+        "explanation": "设置 `user = null` 切断了变量与 Alice 的连接。\n现在只有 Map 持有对她的引用。\n\n*   **strongMap**：紧紧抓住——Alice 留在内存中。\n（泄漏）\n*   **weakMap**：只有弱引用——GC 可以回收 Alice。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "0xAlice",
+              "content": "{ name: 'Alice' }",
+              "refCount": 1,
+              "note": "Only strongMap holds it. If strongMap dies, Alice dies."
+            }
+          ]
+        },
+        "code": "user = null;"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "以下哪个不能用作 WeakMap 的键？",
+    "options": [
+      "DOM 元素（document.body）",
+      "空对象（{}）",
+      "字符串（\"hello\"）",
+      "函数（function() {}）"
+    ],
+    "correctIndex": 2,
+    "explanation": "WeakMap 的键必须是引用类型（对象）。\n字符串和数字等原始类型不由 GC（引用计数）管理，因此不能用作弱键。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "可以用 WeakMap.size 检查 WeakMap 的大小",
+      "correct": "不能——没有 size 属性。",
+      "why": "因为无法预测 GC 何时运行和回收对象（非确定性），所以无法计算还剩多少条目。"
+    }
+  ],
+  "keyTakeaway": "存储缓存或临时数据时使用 WeakMap——它通过让 GC 自动清理来防止内存泄漏。"
+}

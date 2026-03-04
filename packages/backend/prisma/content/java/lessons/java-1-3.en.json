@@ -1,0 +1,181 @@
+{
+  "lessonId": "java-1-3",
+  "title": "The Integer Caching Trap",
+  "concept": "Integer caches the range -128 to 127, reusing the same objects",
+  "content": {
+    "code": "Integer a = 127;\nInteger b = 127;\nSystem.out.println(a == b);\n\nInteger x = 128;\nInteger y = 128;\nSystem.out.println(x == y);\n\nSystem.out.println(x.equals(y));",
+    "steps": [
+      {
+        "title": "Creating Integer 127 (Auto-boxing)",
+        "explanation": "**Execution order:**\n1. `Integer.valueOf(127)` is automatically called.\n2. Checks if 127 is within the cache range (-128~127).\n3. Returns the cached object.\n\nYou wrote `Integer a = 127;`, but the compiler secretly converts it to `Integer.valueOf(127)`.\n\n**What is Auto-boxing?**\nIt's a feature that automatically wraps a primitive type (int) into an object (Wrapper Class).",
+        "keyInsight": "Small numbers (-128~127) use pre-created objects",
+        "visualizationType": "javaMemory",
+        "code": "Integer a = 127;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "type": "Integer",
+              "value": "-> Cache[127]"
+            }
+          ],
+          "cache": {
+            "name": "Integer Cache",
+            "range": "-128 ~ 127",
+            "highlight": 127
+          },
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Creating the Same Value 127 Again",
+        "explanation": "**Execution order:**\n1. `Integer.valueOf(127)` is called.\n2. The same object is reused from the cache.\n3. `b` also points to the same address.\n\n127 is a number within the cache range.\nThe JVM pulls out the exact same object from that **cache box** again.\nAs a result, `a` and `b` point to the **same object**.",
+        "visualizationType": "javaMemory",
+        "code": "Integer b = 127;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "type": "Integer",
+              "value": "-> Cache[127]"
+            },
+            {
+              "name": "b",
+              "type": "Integer",
+              "value": "-> Cache[127]",
+              "sameRef": true
+            }
+          ],
+          "cache": {
+            "highlight": 127,
+            "refCount": 2
+          }
+        }
+      },
+      {
+        "title": "== Comparison Within Cache Range",
+        "explanation": "**Execution order:**\n1. Address comparison (Cache[127] == Cache[127]).\n2. Returns **true**.\n\n**Warning:**\nThis is the problem! Developers mistakenly think, \"Oh, I can compare Integers with `==` too.\"",
+        "keyInsight": "Within the cache range, == is true (dangerous!)",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a == b);",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "warning": "true because it's within cache range, but don't rely on this!",
+          "cache": {
+            "highlight": 127,
+            "refCount": 2
+          }
+        }
+      },
+      {
+        "title": "Creating Integer 128 (Out of Range)",
+        "explanation": "**Execution order:**\n1. `Integer.valueOf(128)` is called.\n2. Detects it exceeds the range (127).\n3. Creates a **new object** with `new Integer(128)`.\n\nNow it's 128.\nIt exceeds the cache range (127), right?\nEven with auto-boxing, if it's outside the range, `new` is called to create a **truly new object** on the Heap.",
+        "keyInsight": "From 128 onward, a new object is created every time",
+        "visualizationType": "javaMemory",
+        "code": "Integer x = 128;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "type": "Integer",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Integer(128)"
+            }
+          ],
+          "cache": {
+            "range": "-128 ~ 127",
+            "note": "128 is out of range!"
+          },
+          "output": [],
+          "warning": null
+        }
+      },
+      {
+        "title": "Creating the Same Value 128 Again",
+        "explanation": "**Execution order:**\n1. `Integer.valueOf(128)` is called.\n2. Out of range -> new object (0x002) created.\n3. Assigned to `y`.\n\n128 gets no special treatment.\nEvery time it's requested, a **brand new object** is created on the Heap.",
+        "visualizationType": "javaMemory",
+        "code": "Integer y = 128;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "type": "Integer",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "y",
+              "type": "Integer",
+              "value": "-> 0x002"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Integer(128)"
+            },
+            {
+              "address": "0x002",
+              "content": "Integer(128)",
+              "new": true
+            }
+          ],
+          "cache": null
+        }
+      },
+      {
+        "title": "== Comparison Outside Cache Range",
+        "explanation": "**Execution order:**\n1. Compare x(0x001) == y(0x002).\n2. Addresses are different, so **false**.\n\n**Shocking reality:**\nSame `Integer` type, but 127 gives `true` and 128 gives `false`.\nThis **inconsistent behavior** is exactly why you should never use `==` for Integer comparison.",
+        "keyInsight": "Outside the cache range, == is false",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(x == y);",
+        "javaMemoryState": {
+          "comparison": "0x001 != 0x002",
+          "output": [
+            "false"
+          ]
+        }
+      },
+      {
+        "title": "Safe Comparison with equals()",
+        "explanation": "**Execution order:**\n1. x.equals(y) is called.\n2. Compares internal values (128).\n3. They match -> **true**.\n\n`.equals()` extracts and compares the **actual value** inside the object.\n**Conclusion:** Always use `.equals()` for object comparison! No exceptions.",
+        "keyInsight": "Always use .equals() for safety",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(x.equals(y));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "comparison": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "In which case does == return true?",
+    "options": [
+      "Integer a = 200; Integer b = 200; a == b",
+      "Integer a = 100; Integer b = 100; a == b",
+      "Integer a = new Integer(100); Integer b = 100; a == b",
+      "Integer a = -200; Integer b = -200; a == b"
+    ],
+    "correctIndex": 1,
+    "explanation": "100 is within the cache range (-128~127) and uses auto-boxing, so they reference the same cached object.\n200 and -200 are out of range, and new always creates a new object."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can always compare Integer with ==",
+      "correct": "Absolutely not.\nUse only .equals().",
+      "why": "Within the cache range (-128~127), `==` works, but it fails for numbers outside that range.\nYour code would be relying on luck."
+    }
+  ],
+  "keyTakeaway": "Integer Cache: only -128~127 are reused. Always use .equals()."
+}

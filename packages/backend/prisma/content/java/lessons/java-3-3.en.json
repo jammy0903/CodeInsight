@@ -1,0 +1,233 @@
+{
+  "lessonId": "java-3-3",
+  "title": "Array Passing",
+  "concept": "Arrays are objects too. The reference value is copied, and element modifications are reflected in the original.",
+  "content": {
+    "code": "void modifyElement(int[] arr) {\n    arr[0] = 100;\n}\n\nvoid reassignArray(int[] arr) {\n    arr = new int[]{999, 888, 777};\n}\n\nint[] nums = {1, 2, 3};\nSystem.out.println(Arrays.toString(nums));\n\nmodifyElement(nums);\nSystem.out.println(Arrays.toString(nums));\n\nreassignArray(nums);\nSystem.out.println(Arrays.toString(nums));",
+    "steps": [
+      {
+        "title": "Creating an Array",
+        "explanation": "**Execution order:**\n1. An `int` array object `{1, 2, 3}` is created on the Heap (0x100).\n2. Address `0x100` is assigned to the `nums` variable on the Stack.\n\n**Key point:**\nIn Java, arrays are **objects**.\nTherefore, `nums` doesn't contain the array itself but holds the **address** of where the array is located.\n\n**Analogy**: `nums` is like a remote control for the actual device (the array on the Heap).",
+        "visualizationType": "javaMemory",
+        "code": "int[] nums = {1, 2, 3};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "int[]"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Printing the Initial Array",
+        "explanation": "**Execution order:**\n1. Dereference `nums`.\n2. Print contents `[1, 2, 3]`.\n\nShows the current contents at address `0x100`.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.toString(nums));",
+        "javaMemoryState": {
+          "output": [
+            "[1, 2, 3]"
+          ]
+        }
+      },
+      {
+        "title": "Calling modifyElement(nums)",
+        "explanation": "**Execution order:**\n1. Copy `nums`'s value (address `0x100`).\n2. Pass it to `modifyElement`'s parameter `arr`.\n\nNow `nums` and `arr` share the same array (`0x100`).",
+        "visualizationType": "javaMemory",
+        "code": "modifyElement(nums);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "arr",
+              "value": "-> 0x100",
+              "frame": "modifyElement",
+              "copied": true,
+              "type": "int[]"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Modifying Array Elements (Side Effect)",
+        "explanation": "**Execution order:**\n1. Navigate to address `0x100` that `arr` points to.\n2. Overwrite the value at index 0 with `100`.\n\n**Result:**\nThe original array itself has been modified.\nSince `nums` is also looking at the same location, it is affected.",
+        "keyInsight": "Modifying array contents = changes the original",
+        "visualizationType": "javaMemory",
+        "code": "arr[0] = 100;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "arr",
+              "value": "-> 0x100",
+              "frame": "modifyElement",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[100, 2, 3]",
+              "type": "int[]",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking After Modification",
+        "explanation": "**Execution order:**\n1. `modifyElement` ends.\n2. Print `nums`.\n\nYou can confirm that the first element has changed to `100`.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.toString(nums));",
+        "occurrence": 2,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[100, 2, 3]",
+              "type": "int[]"
+            }
+          ],
+          "output": [
+            "[100, 2, 3]"
+          ]
+        }
+      },
+      {
+        "title": "Calling reassignArray(nums)",
+        "explanation": "**Execution order:**\n1. Copy `nums`'s address (`0x100`) again.\n2. Pass it to `reassignArray`'s `arr`.\n\nOnce again, the address is copied and passed.",
+        "visualizationType": "javaMemory",
+        "code": "reassignArray(nums);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "arr",
+              "value": "-> 0x100",
+              "frame": "reassignArray",
+              "copied": true,
+              "type": "int[]"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Variable Reassignment (New Array)",
+        "explanation": "**Execution order:**\n1. A new array `{999, 888, 777}` is created on the Heap (0x300).\n2. Address `0x300` is assigned to variable `arr`.\n\n**Result:**\nOnly the local variable `arr` points to the new array.\n`nums` in `main` still holds firmly to address `0x100`.",
+        "keyInsight": "Variable reassignment = only the local reference is changed",
+        "visualizationType": "javaMemory",
+        "code": "arr = new int[]{999, 888, 777};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            },
+            {
+              "name": "arr",
+              "value": "-> 0x300",
+              "frame": "reassignArray",
+              "changed": true,
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[100, 2, 3]",
+              "type": "int[]"
+            },
+            {
+              "address": "0x300",
+              "content": "[999, 888, 777]",
+              "type": "int[]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Final Check",
+        "explanation": "**Execution order:**\n1. `reassignArray` ends.\n2. Print `nums`.\n\nSince the reassignment only affected the local variable (`arr`), `nums` remains `[100, 2, 3]`.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.toString(nums));",
+        "occurrence": 3,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "nums",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[100, 2, 3]",
+              "type": "int[]"
+            }
+          ],
+          "output": [
+            "[100, 2, 3]"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "If you want to modify array contents inside a method while protecting the original array, what should you do?",
+    "options": [
+      "Use the final keyword.",
+      "It's safe to pass as-is.",
+      "Clone the array and pass the copy.",
+      "Use a static method."
+    ],
+    "correctIndex": 2,
+    "explanation": "When a reference (address) to the array is passed, the original can also be modified.\nTo prevent this, you need to create a copy using `Arrays.copyOf()` or `.clone()` (Deep Copy) and pass that instead (defensive copy)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Arrays are variables, so they're copied like primitive types.",
+      "correct": "Arrays are objects created with `new`.\nThe address is what gets copied.",
+      "why": "Unlike C, arrays in Java are treated as first-class objects."
+    }
+  ],
+  "keyTakeaway": "Modifying array elements affects the original. Variable reassignment does not."
+}

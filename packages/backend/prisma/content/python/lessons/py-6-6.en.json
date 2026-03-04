@@ -1,0 +1,739 @@
+{
+  "lessonId": "py-6-6",
+  "title": "Inheritance Basics",
+  "concept": "A child class inherits attributes and methods from the parent! Use super() to call the parent!",
+  "content": {
+    "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n    \n    def speak(self):\n        print(\"...\")\n\nclass Dog(Animal):\n    def __init__(self, name, breed):\n        super().__init__(name)  # 부모 초기화!\n        self.breed = breed\n    \n    def speak(self):\n        print(f\"{self.name}: 멍멍!\")\n\ndog = Dog(\"바둑이\", \"진돗개\")\ndog.speak()\nprint(dog.name, dog.breed)",
+    "steps": [
+      {
+        "title": "Animal Class Definition (Parent Class)",
+        "explanation": "**`class Animal:`**\n\nPython executes code from top to bottom in order. We define the Animal class (Parent Class).\n\n**Goal of this lesson**: Understand the three core concepts of Inheritance. (1) A child class inheriting attributes and methods from the parent, (2) calling the parent's initialization method with `super().__init__()`, (3) redefining parent methods through method overriding.\n\n**What is a parent class?** It is a **base blueprint** that other classes can **inherit from**. By analogy, Animal defines common attributes (name) and common behavior (making sounds) for the broad category of \"animals.\" Later, specific animals like Dog and Cat will inherit this blueprint and add their own characteristics.\n\n**Python internals**: When the `class Animal:` statement executes, Python (1) creates a new class object in memory, (2) executes the code within the class body sequentially to register methods, and (3) binds it to the name `Animal` in the namespace. At this point, `Animal.__bases__` is `(object,)` -- all classes implicitly inherit from `object`.\n\n**Why this order?** The parent class must be defined first so it can be referenced later in `class Dog(Animal):`. You cannot inherit from a class that hasn't been defined yet!\n\n**Execution order**: Execute class Animal --> Begin creating Animal class object --> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Animal:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Parent class definition begins",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Animal.__init__ Method Definition",
+        "explanation": "**`def __init__(self, name):`**\n\nDefines the Animal class's initialization method (`__init__`). The body contains `self.name = name`, which automatically sets the name attribute during object creation.\n\n**Role of parameters**:\n- `self` -- A reference to the object being created itself. Python passes it automatically, so you don't pass it when calling.\n- `name` -- The animal's name. Calling `Animal(\"Buddy\")` passes `\"Buddy\"` to `name`.\n\n**Importance of the parent __init__**: This `__init__` will later be **called from child classes too**. When the Dog class uses `super().__init__(name)`, this very Animal `__init__` executes to set `self.name`. In other words, the child **reuses** the parent's initialization code!\n\n**Note -- Difference from Java**: In Java, child constructors automatically call the parent constructor, but in Python there is **no automatic call**! When a child class defines `__init__`, the parent's `__init__` is **completely overridden**. That's why you must explicitly call `super().__init__()`.\n\n**Why this order?** Methods are defined sequentially from top to bottom within the class body.\n\n**Execution order**: Execute def __init__ --> Create __init__ function object 0x1100 --> Register in Animal.__dict__['__init__'] --> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Animal initialization method defined",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Animal.__init__",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Animal.speak Method Definition",
+        "explanation": "**`def speak(self):`**\n\nDefines the Animal class's speak method. The body is `print(\"...\")`, an abstract output representing an animal's default sound.\n\n**Core principle of Method Overriding**: Python searches for methods in **MRO (Method Resolution Order)** order. It searches child class --> parent class, so if the child has a method with the same name, it is found before the parent's.\n\n**Analogy**: Animal.speak is the **default rule** that \"animals make sounds.\" Dog concretizes this rule as \"Woof!\" and Cat as \"Meow!\". This is the beginning of what object-oriented programming calls **Polymorphism**.\n\n**Why print \"...\"?** Animal is an abstract concept of \"animal.\" What specific sound it makes is **determined by child classes** like Dog (Woof), Cat (Meow). The parent class's speak only defines the ability to \"make a sound\" and leaves the actual implementation to children.",
+        "visualizationType": "pythonMemory",
+        "code": "def speak(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Animal.speak method defined",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Animal.__init__",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "Animal.speak",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with __init__, speak>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1002"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog Class Definition (Child Class)",
+        "explanation": "**`class Dog(Animal):`**\n\nThis is the core syntax of Inheritance! Putting a parent class inside the parentheses means the child class **automatically inherits all attributes and methods** from the parent.\n\n**Understanding through analogy**: Animal is the \"common animal manual\" and Dog is the \"dog-specific manual.\" Anything not written in the dog-specific manual automatically refers to the common animal manual. But if the dog-specific manual has the same entry, that takes priority (overriding).\n\n**What the parentheses `(Animal)` do**:\n- Dog's `__bases__` attribute is set to `(Animal,)`\n- When looking up any attribute/method on Dog, if not found in Dog, it **automatically searches in Animal**\n- This is the basic principle of MRO (Method Resolution Order): `Dog --> Animal --> object`",
+        "visualizationType": "pythonMemory",
+        "code": "class Dog(Animal):",
+        "pythonMemoryState": {
+          "note": "Dog class definition begins (inherits from Animal)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog.__init__ Method Definition",
+        "explanation": "**`def __init__(self, name, breed):`**\n\nDefines the Dog class's initialization method. The body contains two lines: `super().__init__(name)` and `self.breed = breed`.\n\n**This is the core pattern of inheritance -- Sharing + Extension**:\n- `name` is a **common attribute** that all animals have --> handled by the parent\n- `breed` is a **unique attribute** only dogs have --> handled by the child\n\n**Analogy**: When filling out a birth certificate, the family name (name) inherited from parents comes from the parent section, while the given name (breed) is filled in directly.\n\n**Parameter design meaning**:\n- `self` -- The Dog object being created (Python auto-passes it)\n- `name` -- A common attribute that parent Animal also needs. Passed to the parent via `super().__init__(name)`\n- `breed` -- Dog's unique attribute (breed). An extension not found in parent Animal",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name, breed):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "Dog.__init__ defined (replaces Animal.__init__)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Dog.__init__",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog.speak Method Definition (Overriding)",
+        "explanation": "**Method Overriding** is a technique where you keep the parent method's name but change the behavior in the child.\n\nIn other words, the interface stays the same while the implementation differs.\nThis way, the caller gets polymorphism through the same method name.\n\n**Analogy**: Pressing the same button (\"speak\") produces different sounds depending on the device model (Dog/Cat).\n\nKey points:\n- Can reuse parent's default behavior\n- Only the necessary classes selectively override\n\nCaution:\n- Changing the method signature too much may break call compatibility",
+        "visualizationType": "pythonMemory",
+        "code": "def speak(self):",
+        "occurrence": 2,
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "Dog.speak defined (overrides Animal.speak)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Animal.speak",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Dog.__init__",
+              "pointsTo": "function3"
+            },
+            {
+              "name": "Dog.speak",
+              "pointsTo": "function4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1003"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1005"
+            },
+            {
+              "id": "function4",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog Object Creation (__init__ Auto-Called)",
+        "explanation": "**`dog = Dog(\"Buddy\", \"Jindo\")`**\n\nCalls the Dog class to create an instance. A lot happens in this single line!\n\n**Analogy**: At birth, the baby (Dog object) is a blank slate. When Dog.__init__ runs, it fills out the birth certificate -- parent information (name) comes from the parent section (`super().__init__`), while personal information (breed) is filled in directly.\n\n**The 3-step process inside Python**:\n1. `Dog.__new__(Dog)` -- Allocates an empty Dog object (0x3000) in memory. At this point the object is completely empty (`__dict__` is empty)\n2. `Dog.__init__(0x3000, \"Buddy\", \"Jindo\")` -- Auto-calls the initialization method. Here self=0x3000, name=\"Buddy\", breed=\"Jindo\"\n3. `dog = 0x3000` -- Stores the reference to the initialized object in the `dog` variable",
+        "visualizationType": "pythonMemory",
+        "code": "dog = Dog(\"바둑이\", \"진돗개\")",
+        "pythonMemoryState": {
+          "note": "dog object created --> Dog.__init__ about to be auto-called",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object (empty)>",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "super().__init__(name) Call",
+        "explanation": "**`super().__init__(name)`** calls the parent's initialization logic.\n\nWhy this single line matters:\n- It correctly sets up common attributes (e.g., `name`) that the parent is responsible for\n- The child only needs to additionally handle its own unique attributes (e.g., `breed`)\n\n**Analogy**: It's like completing the basic registration (parent form) first, then filling in additional information (child form) afterward.\n\nPractical points:\n- Forgetting the parent initialization in the child's `__init__` frequently causes missing attribute bugs\n- As inheritance hierarchies grow, using `super()` is advantageous for maintainability",
+        "visualizationType": "pythonMemory",
+        "code": "super().__init__(name)  # 부모 초기화!",
+        "pythonMemoryState": {
+          "note": "super() calls parent __init__ --> jumps to line 3",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "breed",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object (empty)>",
+              "pyId": "1007"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ dog (0x3000)",
+              "pyId": "1008",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"바둑이\"",
+              "pyId": "1009"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "\"진돗개\"",
+              "pyId": "1010"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Animal.__init__ Execution (Parent Initialization)",
+        "explanation": "**`self.name = name`**\n\nThe body of parent Animal's `__init__` method executes. `self.name = name` adds a `name` attribute to the dog object (0x3000).\n\n**Analogy**: It's like a bank headquarters (Animal) creating an \"account opening procedure\" that branches (Dog) use as-is. The branch doesn't need to create the procedure again -- it just calls the headquarters procedure.\n\n**Who is self here?** The Dog object (0x3000)! Even though Animal.__init__ is executing, `self` points to the **actually created Dog instance**. In inheritance hierarchies, even when parent code runs, self always points to the **actually created object**.\n\n**Code reuse in action**: The code `self.name = name` is written **only once** in the Animal class. But all child classes -- Dog, Cat, Bird, etc. -- reuse this code when they call `super().__init__(name)`. Even with 10 child classes, the name initialization code exists in **only one place**!",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "Parent Animal.__init__ adds name attribute",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이'>",
+              "pyId": "1007",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ dog (0x3000)",
+              "pyId": "1008",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"바둑이\"",
+              "pyId": "1009"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding Dog's Unique Attribute (breed)",
+        "explanation": "**`self.breed = breed`**\n\nThe parent `__init__` call is complete and we're back in Dog.__init__. Now we add Dog's unique attribute `breed`.\n\n**Analogy**: When building a house, you do the foundation work (parent initialization) first, then the interior finishing (child extension) afterwards.\n\n**The inheritance pattern -- Shared attributes + Extended attributes**:\n- `self.name` = \"Buddy\" -- Set by parent Animal.__init__ (shared attribute, all animals have it)\n- `self.breed` = \"Jindo\" -- Set by child Dog.__init__ (extended attribute, only dogs have it)\n- Both attributes are stored in `__dict__` of the **same dog object** (0x3000)!\n\n**Final state of dog.__dict__**: `{'name': 'Buddy', 'breed': 'Jindo'}` -- What the parent set and what the child set **coexist in one object**. There is no distinction of who set what -- they are all attributes of the dog object.",
+        "visualizationType": "pythonMemory",
+        "code": "self.breed = breed",
+        "pythonMemoryState": {
+          "note": "dog object initialization complete! (name + breed)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "breed",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이', breed='진돗개'>",
+              "pyId": "1007",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ dog (0x3000)",
+              "pyId": "1008",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"바둑이\"",
+              "pyId": "1009"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "\"진돗개\"",
+              "pyId": "1010"
+            }
+          ]
+        }
+      },
+      {
+        "title": "dog.speak() Call (Overridden Method)",
+        "explanation": "**`dog.speak()`**\n\nNow we directly observe the effect of overriding! We call the speak method on the dog object.\n\n**Python's method lookup process (MRO in action)**:\n1. Search for speak in the dog object's (0x3000) `__dict__` --> **Not found!** (Instance attributes only contain name, breed)\n2. Search for speak in dog's class **Dog**'s `__dict__` --> **Found!** Dog.speak (0x2200)\n3. Found, so **search stops immediately**. The Animal class is not checked!\n\n**What if Dog didn't have speak?** The search would follow the MRO to the next class, Animal, and Animal.speak (\"...\") would execute. This is the core of inheritance -- if not found in the child, it automatically looks in the parent.\n\n**How overriding works**: Since the Dog class has a method with the same name speak, Dog.speak is **discovered before** Animal.speak in the MRO search. The one found first gets executed, so the parent's speak is completely ignored. This is the reality of \"overwriting\"!\n\n**Bound method creation**: The moment `dog.speak` is accessed, Python creates a bound method combining the Dog.speak function and the dog instance, automatically passing self=dog.\n\n**Why this order?** After object creation and initialization complete, the next line executes in order.\n\n**Execution order**: Access dog.speak --> MRO search: Dog.__dict__['speak'] found --> Create bound method --> Execute Dog.speak(dog) --> Jump to line 14",
+        "visualizationType": "pythonMemory",
+        "code": "dog.speak()",
+        "pythonMemoryState": {
+          "note": "dog.speak() --> Dog.speak executes (overriding!)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Animal.speak",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "Dog.speak",
+              "pointsTo": "function4",
+              "highlight": true
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1003"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "function4",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1006",
+              "highlight": true
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이', breed='진돗개'>",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dog.speak Method Execution",
+        "explanation": "**`print(f\"{self.name}: Woof!\")`**\n\nThe overridden Dog.speak method executes. Not the parent's `print(\"...\")`, but the child's `print(f\"{self.name}: Woof!\")` runs!\n\n**The beauty of inheritance shines here**: Inside Dog.speak, `self.name` is being used, and this attribute was **set by the parent Animal.__init__**! The child can freely use attributes created by the parent. This is the core value of inheritance -- the child builds its own functionality on the foundation the parent provides.\n\n**f-string evaluation process**:\n1. `self` --> dog object (0x3000)\n2. `self.name` --> dog.__dict__['name'] --> \"Buddy\" (attribute set by parent Animal.__init__!)\n3. f-string replaces `{self.name}` with `\"Buddy\"`\n4. Final string: `\"Buddy: Woof!\"`\n5. Printed with print",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"{self.name}: 멍멍!\")",
+        "pythonMemoryState": {
+          "output": [
+            "바둑이: 멍멍!"
+          ],
+          "note": "Dog.speak executes (can use parent attribute name!)",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이', breed='진돗개'>",
+              "pyId": "1007"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ dog (0x3000)",
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Inherited and Unique Attributes",
+        "explanation": "**`print(dog.name, dog.breed)`**\n\nFinally, we access the dog object's two attributes and print them. The output is `\"Buddy Jindo\"`.\n\n**Three key points of this lesson**:\n\n**Caution -- Common mistakes**:\n- Forgetting `super().__init__()` --> AttributeError\n- Passing self redundantly like `super().__init__(self, name)` --> TypeError (self passed twice)\n- Passing wrong parameters for parent __init__ --> TypeError\n\n**The two attributes have different origins!**\n- `dog.name` = \"Buddy\" -- Set by **parent** Animal.__init__ through `super().__init__(name)`\n- `dog.breed` = \"Jindo\" -- Set directly by **child** Dog.__init__",
+        "visualizationType": "pythonMemory",
+        "code": "print(dog.name, dog.breed)",
+        "pythonMemoryState": {
+          "output": [
+            "바둑이 진돗개"
+          ],
+          "note": "Both parent attribute (name) and child attribute (breed) usable!",
+          "names": [
+            {
+              "name": "Animal",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "Dog",
+              "pointsTo": "class2"
+            },
+            {
+              "name": "dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "class2",
+              "type": "class",
+              "value": "<class, parent=Animal>",
+              "pyId": "1004"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='바둑이', breed='진돗개'>",
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens if you forget super().__init__(name)?",
+    "options": [
+      "It works normally",
+      "AttributeError because self.name doesn't exist",
+      "The parent __init__ is called automatically",
+      "SyntaxError"
+    ],
+    "correctIndex": 1,
+    "explanation": "Python does NOT automatically call the parent __init__! You must explicitly call super().__init__() in the child __init__ for the parent initialization to execute."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Defining __init__ in the child auto-calls the parent __init__",
+      "correct": "You must explicitly call super().__init__()",
+      "why": "Unlike Java, Python does NOT auto-call it! You must use super() yourself."
+    },
+    {
+      "wrong": "Inheriting means you can't modify parent methods",
+      "correct": "You can redefine them with overriding",
+      "why": "Defining a method with the same name in the child overrides the parent's version."
+    }
+  ],
+  "keyTakeaway": "Inheritance = inheriting from parent! Use super() to call parent, overriding to redefine!"
+}

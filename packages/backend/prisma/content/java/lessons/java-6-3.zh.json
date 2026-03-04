@@ -1,0 +1,187 @@
+{
+  "lessonId": "java-6-3",
+  "title": "Finally 与异常委托（throws）",
+  "concept": "学习无条件执行的 finally 块，以及通过 throws 关键字将异常处理委托给调用者。",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            dangerousTask();\n        } catch (InterruptedException e) {\n            System.out.println(\"Caught!\");\n        }\n    }\n\n    // throws：\"我处理不了，你来！\"\n    static void dangerousTask() throws InterruptedException {\n        System.out.println(\"Task Start\");\n        try {\n            Thread.sleep(1000);\n            throw new InterruptedException(); // Force Error\n        } finally {\n            System.out.println(\"Cleanup\");\n        }\n    }\n}",
+    "steps": [
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的起点。\n\n**类比**：`main` 就像最终必须处理所有事故的"现场负责人"。",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "调用危险方法",
+        "explanation": "**执行流程：**\n1. `main` 调用 `dangerousTask()`。\n2. 创建新的栈帧。\n\n**说明：**\n该方法声明了 `throws InterruptedException`。\n相当于发出警告："要调用我，就必须准备好处理这个异常！"",
+        "visualizationType": "javaMemory",
+        "code": "dangerousTask();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "void",
+              "value": "running",
+              "frame": "dangerousTask",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "异常抛出（Throw）",
+        "explanation": "**执行流程：**\n1. `dangerousTask` 执行过程中发生了 `InterruptedException`。\n2. 方法内部的 `try` 块停止执行。\n\n**说明：**\n轰！异常发生了。\n但还不能马上离开。\n因为**清理精灵 `finally`** 还在等着。",
+        "visualizationType": "javaMemory",
+        "code": "try {",
+        "occurrence": 2,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "void",
+              "value": "exception!",
+              "frame": "dangerousTask"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x500",
+              "content": "InterruptedException",
+              "type": "Exception",
+              "new": true
+            }
+          ],
+          "output": [
+            "Task Start"
+          ]
+        }
+      },
+      {
+        "title": "Finally 执行",
+        "explanation": "**执行流程：**\n1. 尽管发生了异常，在退出方法之前会先执行 `finally` 块。\n2. 输出 \"Cleanup\"。\n\n**说明：**\n**绝对规则：** 无论成功还是失败（异常发生），`finally` **必定**执行。\n主要用于关闭资源或清理工作。",
+        "visualizationType": "javaMemory",
+        "code": "Thread.sleep(1000);",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "void",
+              "value": "cleaning",
+              "frame": "dangerousTask"
+            }
+          ],
+          "output": [
+            "Cleanup"
+          ]
+        }
+      },
+      {
+        "title": "异常传播（Propagation）",
+        "explanation": "**执行流程：**\n1. `finally` 执行完毕后，未被捕获的异常（`0x500`）被抛给调用者（`main`）。\n2. `dangerousTask` 栈帧被销毁（弹出）。\n\n**说明：**\n`dangerousTask` 内部没有 catch。\n所以异常"不关我事！"地飞回了调用它的 `main`。\n这就是**异常传播（Propagation）**。",
+        "visualizationType": "javaMemory",
+        "code": "// throws：\"我处理不了，你来！\"",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x500",
+              "content": "InterruptedException",
+              "type": "Exception"
+            }
+          ],
+          "error": "Exception Propagated to Main"
+        }
+      },
+      {
+        "title": "在 Main 中捕获",
+        "explanation": "**执行流程：**\n1. `main` 的 `catch` 块捕获了传播过来的异常。\n2. 输出 \"Caught!\" 并处理了情况。\n\n**说明：**\n"击鼓传花"结束，`main` 最终处理了它。\nChecked Exception 必须由某人来处理。",
+        "visualizationType": "javaMemory",
+        "code": "} catch (InterruptedException e) {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "e",
+              "value": "-> 0x500",
+              "frame": "catch",
+              "new": true,
+              "type": "InterruptedException"
+            }
+          ],
+          "output": [
+            "Caught!"
+          ],
+          "heap": [
+            {
+              "address": "0x500",
+              "content": "InterruptedException",
+              "type": "InterruptedException",
+              "new": true
+            }
+          ],
+          "error": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪种情况是 finally 块唯一不会执行的情况？",
+    "options": [
+      "在 try 块中遇到 return 语句时。",
+      "异常未被捕获时。",
+      "调用了 System.exit(0) 时。",
+      "try 块中存在无限循环时。"
+    ],
+    "correctIndex": 2,
+    "explanation": "`System.exit(0)` 会强制终止 JVM 本身，因此包括 `finally` 在内的任何代码都不会再执行。\n即使遇到 `return`，`finally` 也会在返回值之前执行。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "如果在 try 块中 return，finally 会被跳过。",
+      "correct": "不会。\n在返回值交付之前，`finally` 块会先执行。",
+      "why": "`finally` 是 JVM 保证的最后防线。"
+    }
+  ],
+  "keyTakeaway": "`finally` 对资源清理至关重要，`throws` 可以将异常处理委托给调用者。"
+}

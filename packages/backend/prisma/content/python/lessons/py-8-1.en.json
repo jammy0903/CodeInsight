@@ -1,0 +1,916 @@
+{
+  "lessonId": "py-8-1",
+  "title": "Iterator Protocol: The Heart of the for Loop",
+  "concept": "Understand `__iter__` and `__next__`, the mechanism behind how `for` loops work.",
+  "content": {
+    "code": "# for loop의 동작 원리: Iterator Protocol\nclass Counter:\n    def __init__(self, start, end):\n        self.current = start\n        self.end = end\n\n    def __iter__(self):\n        return self\n\n    def __next__(self):\n        if self.current >= self.end:\n            raise StopIteration\n        value = self.current\n        self.current += 1\n        return value\n\ncounter = Counter(0, 3)\n\nfor num in counter:\n    print(num)",
+    "steps": [
+      {
+        "title": "Defining the Counter Class",
+        "explanation": "**`class Counter:`**\n\nWe define a `Counter` class that directly implements the **Iterator Protocol**.\n\n**What is the Iterator Protocol?**\nIt is the **agreed-upon set of rules** that Python's `for` loop uses when iterating over an object.\nAny object that follows these rules can be used in a `for` loop!\nThe rules require implementing just two methods:\n- `__iter__()`: Returns the iterator object (\"I'm ready to be iterated\")\n- `__next__()`: Returns the next value (\"Give me the next value\")\n\n**Analogy: Building a Vending Machine**\nThe Counter class is the blueprint for a vending machine that dispenses one number each time you press the button (__next__).\nStarting from 0 and incrementing by one, when it reaches the end number, it displays \"Sold out!\" (StopIteration).\n\n**Why learn this?** Understanding how Python's `for` loop works internally lets you use `for` at a deeper level and create custom iterable objects.\n\n**Why this order?** When the program starts, it must first read the class definition and load it into memory.\n\n**Execution order**: Counter class object (0x1000) created -> registered in global namespace",
+        "visualizationType": "pythonMemory",
+        "code": "class Counter:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Counter class (0x1000) has been defined.",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Entering the Class Body",
+        "explanation": "**`class Counter:` (entire body)**\n\nPython reads the class body and registers **three methods**:\n- `__init__`: Object initialization (sets start and end values)\n- `__iter__`: Called by the for loop (returns the iterator)\n- `__next__`: Called by the for loop on each iteration (returns the next value)\n\n**These three methods are the heart of the for loop!**\nWhen `for num in counter:` executes, Python internally:\n1. Calls `counter.__iter__()` -> obtains the iterator\n2. Repeatedly calls `counter.__next__()` -> gets one value at a time\n3. `StopIteration` exception is raised -> loop terminates\n\n**Analogy**: This is the process of designing the internal circuitry of the vending machine.\n\n**Why this order?** Since the `class` keyword was encountered, all methods in the body are registered.\n\n**Execution order**: Enter class internal scope -> confirm three method definitions",
+        "visualizationType": "pythonMemory",
+        "code": "class Counter:",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "pythonMemoryState": {
+          "note": "Preparing to define the methods inside the class.",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the __init__ Method",
+        "explanation": "**`def __init__(self, start, end):`**\n\nDefines the **initialization method** for Counter objects.\nWhen called like `Counter(0, 3)`, start=0 and end=3 are passed to set the counter's range.\n\n**What this method sets up**:\n- `self.current = start`: The current value (initially the start value)\n- `self.end = end`: The end value (iteration stops when this value is reached)\n\n**Analogy**: Setting the vending machine to \"start from number 0 and go up to just before number 3.\"\n\n**Why this order?** Defining the constructor first when an object is created is a Python convention.\n\n**Execution order**: __init__ function object created -> registered as a method in the Counter class",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, start, end):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "__init__ function (0x1100) has been defined.",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "__init__",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the __iter__ Method",
+        "explanation": "**`def __iter__(self):`**\n\nDefines the **first promise** of the Iterator Protocol: the `__iter__` method.\nThis method returns itself with `return self`.\n\n**Why does it return itself?**\nPython iterators have two roles:\n1. **Iterable**: Having `__iter__` signals \"I can be iterated over\"\n2. **Iterator**: Having `__next__` means it can actually yield values one at a time\n\nThe Counter class has **one object fulfilling both roles**, so `__iter__` returns itself.\n\n**Analogy**: Saying \"This vending machine has the button (next) right on itself.\"\n\n**What the for loop does internally**:\n```python\n# for num in counter: is actually equivalent to this!\nit = counter.__iter__()  # Get the iterator\nwhile True:\n    try:\n        num = it.__next__()  # Get next value\n    except StopIteration:\n        break  # Done!\n```\n\n**Why this order?** After __init__, we define the core methods of the iterator protocol.\n\n**Execution order**: __iter__ function object created -> registered in Counter class",
+        "visualizationType": "pythonMemory",
+        "code": "def __iter__(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "__iter__ function (0x1200) has been defined.",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "__iter__",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the __next__ Method",
+        "explanation": "**`def __next__(self):`**\n\nDefines the **second promise** of the Iterator Protocol: the `__next__` method.\nThe for loop calls this method **on every iteration** to receive the next value.\n\n**The core logic of this method**:\n1. If `current >= end` -> raise `StopIteration` exception (\"No more values!\")\n2. Otherwise -> save the current value, increment current by 1, then return the saved value\n\n**What is StopIteration?**\nA special exception that signals \"iteration complete!\" to the for loop.\nThe for loop automatically catches this exception and silently terminates.\nIt is not an error -- it is a normal termination signal!\n\n**Analogy**: When you press the button (next) on the vending machine, a number comes out, and when the stock is empty, a \"Sold out\" (StopIteration) sign appears.\n\n**Why this order?** We implement the iterator's core behavior of 'fetching the next value'.\n\n**Execution order**: __next__ function object created -> registered in Counter class",
+        "visualizationType": "pythonMemory",
+        "code": "def __next__(self):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "pythonMemoryState": {
+          "note": "__next__ function (0x1300) has been defined.",
+          "names": [
+            {
+              "name": "Counter",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "__next__",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "function",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Counter Object",
+        "explanation": "**`counter = Counter(0, 3)`**\n\nWe call the Counter class to create **a counter object that counts from 0 up to (but not including) 3**.\n`__init__(self, 0, 3)` is automatically called, initializing current=0 and end=3.\n\n**The sequence of values this object will produce**: 0, 1, 2 (3 is not included -- same as range(3))\n\n**Analogy**: We've built a \"vending machine that can dispense from number 0 up to number 2.\"\nEach time you press the button: 0 -> 1 -> 2 -> \"Sold out!\" in that order.\n\n**Why this order?** Now that the class definition is complete, we create an actual instance to use in the for loop.\n\n**Execution order**: Counter(0, 3) called -> instance (0x2000) memory allocated -> __init__ automatically called",
+        "visualizationType": "pythonMemory",
+        "code": "counter = Counter(0, 3)",
+        "pythonMemoryState": {
+          "note": "Counter instance (0x2000) has been created and initialization begins.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing __init__ (1)",
+        "explanation": "**`self.current = start`**\n\nSets the counter's **current position** to the start value (0).\n`self.current` is a **state variable** that tracks \"which value should be given next.\"\n\n**A key characteristic of iterators: they remember state!**\nRegular functions lose their internal variables when the call ends, but iterator objects store the current position in `self.current`, so they can continue from where they left off on the next call.\n\n**Analogy**: Setting the vending machine's \"current stock number\" display to 0.\n\n**Why this order?** Immediately after object creation, we need to set the counter's starting position.\n\n**Execution order**: Save start (0) to self.current -> create current attribute on the instance",
+        "visualizationType": "pythonMemory",
+        "code": "self.current = start",
+        "pythonMemoryState": {
+          "note": "self.current has been initialized to 0.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "start",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1006"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing __init__ (2)",
+        "explanation": "**`self.end = end`**\n\nSets the counter's **end point** to end (3).\nWhen `self.current` reaches this value, it will raise StopIteration to stop the iteration.\n\n**State of the Counter instance after initialization**:\n- `self.current = 0` (current position: start)\n- `self.end = 3` (end point: stops here)\n- Values to produce: 0, 1, 2 (3 in total)\n\n**Why store end separately?** Every time __next__ is called, it needs to check \"has current reached end yet?\", so the end value must be stored in the object.\n\n**Analogy**: Setting a limit on the vending machine so \"nothing beyond number 3 comes out.\"\n\n**Why this order?** After setting start, we also set end to complete initialization.\n\n**Execution order**: Save end (3) to self.end -> initialization complete -> return instance",
+        "visualizationType": "pythonMemory",
+        "code": "self.end = end",
+        "pythonMemoryState": {
+          "note": "self.end has been initialized to 3.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "self.end",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 3,
+              "pyId": "1008"
+            },
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1009",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "The for Loop Begins",
+        "explanation": "**`for num in counter:`**\n\nThe for loop starts! Python internally calls `counter.__iter__()` to request the iterator.\n\n**The hidden mechanism of the for loop (this is the key!)**:\nPython's `for num in counter:` is actually equivalent to:\n```python\n_iterator = counter.__iter__()  # Step 1: Get the iterator\nwhile True:\n    try:\n        num = _iterator.__next__()  # Step 2: Get next value\n    except StopIteration:           # Step 3: Catch termination signal\n        break\n    print(num)  # Execute loop body\n```\nThe for loop is **syntactic sugar** that lets you write this complex process in **a single line**!\n\n**Analogy**: Telling the vending machine \"keep pressing the button until it's sold out.\"\n\n**Why this order?** The Counter instance is ready, so we begin iterating with the for loop.\n\n**Execution order**: counter.__iter__() called -> iterator (itself) returned -> ready for first __next__() call",
+        "visualizationType": "pythonMemory",
+        "code": "for num in counter:",
+        "pythonMemoryState": {
+          "note": "The for loop calls counter.__iter__().",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing __iter__",
+        "explanation": "**`return self`**\n\nThe `__iter__` method returns **itself (self)**.\nSince the Counter object is both an iterable and an iterator, it simply returns itself.\n\n**Why is this important?**\nThe for loop takes this return value and uses it as the target for repeated `__next__()` calls.\nSince it returned itself, `counter.__next__()` will be called repeatedly.\n\n**Note**: For lists, a separate iterator object is returned instead of itself.\n`list.__iter__()` creates and returns a different object called `list_iterator`.\n\n**Analogy**: Saying \"The button for this machine is right here (on itself).\"\n\n**Why this order?** The for loop called __iter__, so we return the iterator.\n\n**Execution order**: Return self (0x2000) -> for loop prepares to call __next__ on this object",
+        "visualizationType": "pythonMemory",
+        "code": "return self",
+        "pythonMemoryState": {
+          "note": "Returns itself (self) as the iterator.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - First Call (Condition Check)",
+        "explanation": "**`if self.current >= self.end:`**\n\nThis is the **first call** to `__next__`! The for loop requested \"Give me the next value!\"\nFirst, the **termination condition** is checked: current (0) >= end (3)? **False!** There are still values left to give.\n\n**Why check the termination condition first?**\nIt is safer to check \"are there still values left?\" before returning a value.\nIf we've already reached the end, we must raise StopIteration instead of returning a value.\n\n**Analogy**: When you press the button on the vending machine, it first checks \"is there stock?\" If yes, it dispenses the product; if not, it shows \"Sold out.\"\n\n**Why this order?** When __next__ is called, it always checks the termination condition first.\n\n**Execution order**: Compare self.current (0) with self.end (3) -> 0 < 3, so skip the if block -> proceed to value return logic",
+        "visualizationType": "pythonMemory",
+        "code": "if self.current >= self.end:",
+        "pythonMemoryState": {
+          "note": "The condition 0 >= 3 is false.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - First Call (Save Value)",
+        "explanation": "**`value = self.current`**\n\nThe current value (0) is **saved to the temporary variable `value`**.\nWhy not return it directly? Why save it temporarily?\n\n**The order matters**:\n1. First, save the current value to value (value = 0)\n2. Then increment current by 1 (current: 0 -> 1)\n3. Finally, return value (0)\n\nWhat if the order were reversed? If we increment current first, we'd return 1 instead of 0 -- a bug!\n\n**Analogy**: The vending machine takes the product out (save to value), reduces the stock counter (increment current), then dispenses it (return).\n\n**Why this order?** We secure the value to return before incrementing.\n\n**Execution order**: Copy self.current (0) to value -> value = 0",
+        "visualizationType": "pythonMemory",
+        "code": "value = self.current",
+        "pythonMemoryState": {
+          "note": "Saves the value 0 to be returned in value.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "value",
+              "pointsTo": "int5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(0, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 0,
+              "pyId": "1010",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - First Call (Increment)",
+        "explanation": "**`self.current += 1`**\n\nIncrements current from 0 to **1**.\nThis is the iterator's **state update**. The next time __next__ is called, it will start from current=1.\n\n**The key difference between iterators and regular functions**:\nRegular functions lose all local variables when the call ends.\nBut iterator objects store their state in `self.current`, so they remember \"where they left off\" on the next call!\n\n**Analogy**: Advancing the vending machine's stock counter by one. The next time you press the button, the next number comes out.\n\n**Why this order?** After saving the current value to value, we increment current for the next call.\n\n**Execution order**: Increment self.current by 1 (0 -> 1)",
+        "visualizationType": "pythonMemory",
+        "code": "self.current += 1",
+        "pythonMemoryState": {
+          "note": "self.current has increased to 1.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int6",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(1, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 1,
+              "pyId": "1011",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - First Call (Return)",
+        "explanation": "**`return value`**\n\nReturns the previously saved value **0** to the for loop.\nThis value goes into the variable `num` in `for num in counter:`!\n\n**One cycle of __next__ is complete:**\n1. Termination check: 0 >= 3? No -> continue\n2. Save value: value = 0\n3. State update: current 0 -> 1\n4. Return value: return 0 -> num = 0\n\n**This is one iteration of the for loop!** Now the loop body (print(num)) executes, and __next__ is called again to repeat the same process.\n\n**Analogy**: The vending machine has dispensed product #0. Next time you press the button, #1 comes out.\n\n**Why this order?** As the final step of __next__, the computed value is returned to the caller (the for loop).\n\n**Execution order**: Return value (0) -> num = 0 -> move to loop body execution",
+        "visualizationType": "pythonMemory",
+        "code": "return value",
+        "pythonMemoryState": {
+          "note": "The for loop variable num is assigned 0.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int7",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(1, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 0,
+              "pyId": "1012",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Value Output",
+        "explanation": "**`print(num)`**\n\nSince the value **0** returned by __next__ is in `num`, it is printed to the screen.\n\n**Summary of the for loop's first iteration**:\n- __iter__() called -> self returned\n- __next__() called -> 0 returned\n- num = 0\n- print(0) executed\n- Back to the top of the loop to call __next__() again...\n\n**What this output means**: The Counter class we built ourselves is working correctly in a for loop!\nThis is because we properly implemented the iterator protocol (__iter__ + __next__).\n\n**Why this order?** After a value is assigned to num, the loop body executes.\n\n**Execution order**: print(0) executed -> 0 printed to screen -> return to top of loop to call __next__ again",
+        "visualizationType": "pythonMemory",
+        "code": "print(num)",
+        "pythonMemoryState": {
+          "output": [
+            "0"
+          ],
+          "note": "0 has been printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int7"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 0,
+              "pyId": "1012"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Second Call (Condition Check)",
+        "explanation": "**`if self.current >= self.end:`**\n\n**Second __next__ call!** After executing print(0), the for loop requests \"Give me the next value!\" again.\nThe termination condition is checked: current (1) >= end (3)? **False!** There are still values remaining.\n\n**Confirming the repetition pattern**: The same process repeats as the first call.\nEvery time __next__ is called: (1) Check termination -> (2) Save value -> (3) Increment current -> (4) Return value\nThese 4 steps continue until StopIteration is raised.\n\n**Tracking the iterator's state**: Since current was incremented from 0 to 1 in the first call, this time it starts from 1.\nThis is the essence of iterators -- the object remembers \"where it left off\"!\n\n**Execution order**: Compare self.current (1) with self.end (3) -> 1 < 3, so skip the if block -> proceed to value return logic",
+        "visualizationType": "pythonMemory",
+        "code": "if self.current >= self.end:",
+        "pythonMemoryState": {
+          "note": "The condition 1 >= 3 is false.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(1, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 1,
+              "pyId": "1011"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Second Call (Save Value)",
+        "explanation": "**`value = self.current`**\n\nSaves the current value **1** to the temporary variable `value`.\nThe same pattern as the first call -- we secure the value to return before incrementing current.\n\n**Why is temporary storage needed every time?** Since current will change to 2 on the next line, we must extract the value 1 to return now.\nWithout `value = self.current`, if we increment current directly, we'd return 2 instead of 1 -- a bug!\n\n**Execution order**: Copy self.current (1) to value -> value = 1",
+        "visualizationType": "pythonMemory",
+        "code": "value = self.current",
+        "pythonMemoryState": {
+          "note": "Saves the value 1 to be returned.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "value",
+              "pointsTo": "int8",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(1, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int8",
+              "type": "int",
+              "value": 1,
+              "pyId": "1013",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Second Call (Increment)",
+        "explanation": "**`self.current += 1`**\n\nIncrements current from 1 to **2**. The iterator's internal state is updated.\n\n**State change tracking**:\n- After 1st call: current = 1 (incremented from 0)\n- After 2nd call: current = 2 (incremented from 1) <- now!\n- After 3rd call: current = 3 (equals end -> termination)\n\ncurrent is approaching end (3). In the next call, since 2 < 3, it can still yield one more value.\n\n**Execution order**: Increment self.current by 1 (1 -> 2)",
+        "visualizationType": "pythonMemory",
+        "code": "self.current += 1",
+        "pythonMemoryState": {
+          "note": "self.current has increased to 2.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int9",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(2, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 2,
+              "pyId": "1014",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Second Call (Return)",
+        "explanation": "**`return value`**\n\nReturns the previously saved value **1** to the for loop. `num = 1`.\n\n**Second __next__ cycle complete**:\n1. Termination check: 1 >= 3? No -> continue\n2. Save value: value = 1\n3. State update: current 1 -> 2\n4. Return value: return 1 -> num = 1\n\nThe exact same 4 steps as the first cycle. This pattern repeats until StopIteration.\n\n**Execution order**: Return value (1) -> num = 1 -> move to loop body (print) execution",
+        "visualizationType": "pythonMemory",
+        "code": "return value",
+        "pythonMemoryState": {
+          "note": "num is assigned 1.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int10",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(2, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int10",
+              "type": "int",
+              "value": 1,
+              "pyId": "1015",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Second Value Output",
+        "explanation": "**`print(num)`**\n\nPrints the value **1** returned by __next__ to the screen.\n\n**Output so far**: 0, 1\n**Remaining value**: 2 (current=2, end=3, so one more is possible)\n\nAfter executing print, the for loop goes back to the top and calls __next__ again.\nThis automatic repetition is the convenience of the for loop!\n\n**Execution order**: print(1) executed -> 1 printed to screen -> return to top of loop to call __next__ again",
+        "visualizationType": "pythonMemory",
+        "code": "print(num)",
+        "pythonMemoryState": {
+          "output": [
+            "1"
+          ],
+          "note": "1 has been printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int10"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int10",
+              "type": "int",
+              "value": 1,
+              "pyId": "1015"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Third Call (Condition Check)",
+        "explanation": "**`if self.current >= self.end:`**\n\n**Third (last) __next__ call!** current (2) >= end (3)? **False!** The last value still remains.\n\n**This is the last chance to return a value!**\nCurrently current=2, and if current increases to 3 in this cycle, the next call will see 3 >= 3 as True, raising StopIteration.\nIn other words, 2 is the **last value** this iterator will return.\n\n**Full flow preview**: 0 -> 1 -> **2** (now) -> StopIteration (next)\n\n**Execution order**: Compare self.current (2) with self.end (3) -> 2 < 3, so skip the if block -> prepare to return the last value",
+        "visualizationType": "pythonMemory",
+        "code": "if self.current >= self.end:",
+        "pythonMemoryState": {
+          "note": "The condition 2 >= 3 is false.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int9"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(2, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 2,
+              "pyId": "1014"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Third Call (Save Value)",
+        "explanation": "**`value = self.current`**\n\nSaves the iterator's **last value** 2 to the temporary variable `value`.\nWhen current increases to 3 on the next line, it will equal end, so this is the last value to be returned.\n\n**Comparing the three value saves**:\n- 1st call: value = 0 (current 0 -> 1)\n- 2nd call: value = 1 (current 1 -> 2)\n- 3rd call: value = 2 (current 2 -> 3) <- now! The last one!\n\n**Execution order**: Copy self.current (2) to value -> value = 2",
+        "visualizationType": "pythonMemory",
+        "code": "value = self.current",
+        "pythonMemoryState": {
+          "note": "Saves the value 2 to be returned.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "value",
+              "pointsTo": "int11",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(2, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int11",
+              "type": "int",
+              "value": 2,
+              "pyId": "1016",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Third Call (Increment)",
+        "explanation": "**`self.current += 1`**\n\nIncrements current from 2 to **3**. **Now current (3) == end (3)!**\n\n**This moment is crucial!** Since current now equals end, the next time __next__ is called:\n`if self.current >= self.end:` -> `3 >= 3` -> **True** -> StopIteration is raised!\nThis increment puts the iterator into an \"exhausted\" state.\n\n**Complete state change summary**:\n- Initial: current=0, end=3 -> can provide 3 values (0, 1, 2)\n- After 1st call: current=1\n- After 2nd call: current=2\n- After 3rd call: current=3 <- now! (equals end = ready to terminate)\n\n**Execution order**: Increment self.current by 1 (2 -> 3) -> now equals end, so termination on next call",
+        "visualizationType": "pythonMemory",
+        "code": "self.current += 1",
+        "pythonMemoryState": {
+          "note": "self.current has increased to 3.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int12",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(3, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int12",
+              "type": "int",
+              "value": 3,
+              "pyId": "1017",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Third Call (Return)",
+        "explanation": "**`return value`**\n\nReturns the iterator's **last value 2** to the for loop. `num = 2`.\n\n**Third (last) __next__ cycle complete**:\n1. Termination check: 2 >= 3? No -> continue\n2. Save value: value = 2\n3. State update: current 2 -> 3 (now equals end!)\n4. Return value: return 2 -> num = 2\n\nAfter print(2) executes, the for loop will call __next__ again, but 3 >= 3 will be True, raising StopIteration.\n\n**Execution order**: Return value (2) -> num = 2 -> move to loop body (print) execution",
+        "visualizationType": "pythonMemory",
+        "code": "return value",
+        "pythonMemoryState": {
+          "note": "num is assigned 2.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int13",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(3, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int13",
+              "type": "int",
+              "value": 2,
+              "pyId": "1018",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Third Value Output",
+        "explanation": "**`print(num)`**\n\nPrints the iterator's last value **2** to the screen.\n\n**Complete output**: 0, 1, 2 -- all values produced by Counter(0, 3) have been printed!\nThis is the same result as range(3). In fact, range() also internally implements the iterator protocol.\n\nAfter print executes, the for loop calls __next__ again, but this time StopIteration is raised and the loop terminates.\n\n**Execution order**: print(2) executed -> 2 printed to screen -> return to top of loop -> __next__ called -> StopIteration!",
+        "visualizationType": "pythonMemory",
+        "code": "print(num)",
+        "pythonMemoryState": {
+          "output": [
+            "2"
+          ],
+          "note": "2 has been printed.",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int13"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int13",
+              "type": "int",
+              "value": 2,
+              "pyId": "1018"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__next__ Execution - Fourth Call (StopIteration)",
+        "explanation": "**`if self.current >= self.end:`**\n\n**Fourth __next__ call!** current (3) >= end (3)? **True!** The termination condition has finally been reached!\n\n**Why is 3 >= 3 True?**\nWe have already dispensed all three values: 0, 1, 2. Since current has become 3, it now equals end (3).\nThere are no more values to give, so we enter the if block to prepare to raise StopIteration.\n\n**Analogy**: The vending machine has run out of stock. It's time to display \"Sold out.\"\n\n**Why this order?** As the first step of __next__, the termination condition is checked, and this time it is True.\n\n**Execution order**: Compare self.current (3) with self.end (3) -> 3 >= 3 is True -> enter the if block",
+        "visualizationType": "pythonMemory",
+        "code": "if self.current >= self.end:",
+        "pythonMemoryState": {
+          "note": "The condition 3 >= 3 is true, preparing to terminate.",
+          "names": [
+            {
+              "name": "self",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self.current",
+              "pointsTo": "int12"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(3, 3)",
+              "pyId": "1005"
+            },
+            {
+              "id": "int12",
+              "type": "int",
+              "value": 3,
+              "pyId": "1017"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Loop Termination",
+        "explanation": "**`raise StopIteration`**\n\n**\"There are no more values!\"** -- a `StopIteration` exception is raised.\nThe for loop **automatically catches this and silently** terminates.\n\n**StopIteration is not an error!**\nUnlike regular errors (TypeError, ValueError, etc.), StopIteration is a **normal termination signal**.\nThe for loop expects this exception, and upon receiving it, cleanly terminates with an \"ah, it's done\" response.\nThe program does not crash, and no error message is displayed!\n\n**Complete for loop operation summary**:\n```\n1st iteration: __next__() -> returns 0 -> print(0)\n2nd iteration: __next__() -> returns 1 -> print(1)\n3rd iteration: __next__() -> returns 2 -> print(2)\n4th iteration: __next__() -> StopIteration raised -> loop ends!\n```\n\n**Analogy**: The vending machine has put up a \"Sold out\" sign. The for loop sees this sign and stops pressing the button.\n\n**Key lesson**: The for loop is \"syntactic sugar\" that calls an object's `__iter__` and `__next__` methods!\nAll iterable objects like lists, tuples, and strings follow this protocol.\n\n**Execution order**: StopIteration exception raised -> for loop detects exception -> loop terminates normally -> program continues",
+        "visualizationType": "pythonMemory",
+        "code": "raise StopIteration",
+        "pythonMemoryState": {
+          "note": "StopIteration exception raised! The loop terminates.",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "Counter(3, 3)",
+              "pyId": "1005"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What method does the `for` loop internally call to get the next value from an object?",
+    "options": [
+      "__init__",
+      "__iter__",
+      "__next__",
+      "__stop__"
+    ],
+    "correctIndex": 2,
+    "explanation": "The `for` loop first calls `__iter__` to obtain the iterator object, then calls `__next__` on each iteration to get the next value."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Only lists can be used in `for` loops.",
+      "correct": "Any object that implements `__iter__` and `__next__` can be used in a `for` loop.",
+      "why": "The `for` loop doesn't care about the object's type -- it only checks whether the object follows the 'iterator protocol.'\n(Duck typing)"
+    }
+  ],
+  "keyTakeaway": "The `for` loop is 'syntactic sugar' that calls an object's `__iter__` and `__next__` methods."
+}

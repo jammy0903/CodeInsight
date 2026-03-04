@@ -1,0 +1,273 @@
+{
+  "lessonId": "java-3-4",
+  "title": "为什么 Swap 不起作用",
+  "concept": "Java 不支持引用传递（Call by Reference），因此无法实现通用的 Swap 函数。",
+  "content": {
+    "code": "void swap(Integer a, Integer b) {\n    Integer temp = a;\n    a = b;\n    b = temp;\n    System.out.println(\"inside: a=\" + a + \", b=\" + b);\n}\n\nInteger x = 1;\nInteger y = 2;\nSystem.out.println(\"before: x=\" + x + \", y=\" + y);\nswap(x, y);\nSystem.out.println(\"after: x=\" + x + \", y=\" + y);",
+    "steps": [
+      {
+        "title": "创建变量（装箱）",
+        "explanation": "**执行顺序：**\n1. 创建 `Integer(1)` 对象（0x100，自动装箱）。\n2. 创建 `Integer(2)` 对象（0x200）。\n3. 将 `0x100` 存入 `x`，`0x200` 存入 `y`。\n\n**内存状态：**\n`栈` 上有 `x`、`y` 变量，分别指向 `堆` 上的 Integer 对象。",
+        "visualizationType": "javaMemory",
+        "code": "Integer x = 1;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Integer"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Integer(1)",
+              "type": "Integer"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "创建变量 y",
+        "explanation": "**执行顺序：**\n1. 创建并初始化变量 `y`。\n\n现在两个对象准备就绪。",
+        "visualizationType": "javaMemory",
+        "code": "Integer y = 2;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Integer"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "Integer"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Integer(1)",
+              "type": "Integer"
+            },
+            {
+              "address": "0x200",
+              "content": "Integer(2)",
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出初始状态",
+        "explanation": "**执行顺序：**\n1. 输出 `x`、`y` 的值。\n\n输出 \"before: x=1, y=2\"。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"before: x=\" + x + \", y=\" + y);",
+        "javaMemoryState": {
+          "output": [
+            "before: x=1, y=2"
+          ]
+        }
+      },
+      {
+        "title": "调用 swap(x, y) - 地址复制",
+        "explanation": "**执行顺序：**\n1. `x` 的地址（`0x100`）-> 复制到 `a`。\n2. `y` 的地址（`0x200`）-> 复制到 `b`。\n\n**核心：**\n`a` 和 `b` 是 `x`、`y` 的**复制遥控器**。",
+        "keyInsight": "参数传递 = 遥控器复制",
+        "visualizationType": "javaMemory",
+        "code": "swap(x, y);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Integer"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "Integer"
+            },
+            {
+              "name": "a",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "copied": true,
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "copied": true,
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "temp = a",
+        "explanation": "**执行顺序：**\n1. 将 `a` 指向的地址 `0x100` 存储到 `temp`。\n\n在 `swap` 方法内部开始交换操作。",
+        "visualizationType": "javaMemory",
+        "code": "Integer temp = a;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "temp",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "a = b",
+        "explanation": "**执行顺序：**\n1. 将 `b` 的地址 `0x200` 赋给 `a`。\n\n现在 `a` 指向了 `0x200` 号电视。\n（`main` 中原来的 `x` 仍然是 `0x100`！）",
+        "visualizationType": "javaMemory",
+        "code": "a = b;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "changed": true,
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "temp",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "b = temp",
+        "explanation": "**执行顺序：**\n1. 将 `temp` 的地址 `0x100` 赋给 `b`。\n\n**状态：**\n在 `swap` 函数内部，`a` 和 `b` 成功交换了地址。\n交换成功！",
+        "visualizationType": "javaMemory",
+        "code": "b = temp;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "changed": true,
+              "type": "Integer"
+            },
+            {
+              "name": "temp",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "内部验证",
+        "explanation": "**执行顺序：**\n1. 输出 `a`、`b`。\n\n在函数内部看起来是 \"a=2, b=1\"——交换似乎成功了。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"inside: a=\" + a + \", b=\" + b);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x200",
+              "frame": "swap",
+              "type": "Integer"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x100",
+              "frame": "swap",
+              "type": "Integer"
+            }
+          ],
+          "output": [
+            "inside: a=2, b=1"
+          ]
+        }
+      },
+      {
+        "title": "方法结束和最终确认",
+        "explanation": "**执行顺序：**\n1. `swap` 结束 -> `a`、`b`、`temp` 全部删除。\n2. 返回 `main`。\n3. 输出 `x`、`y`。\n\n**令人震惊的结果：**\n`x`、`y` 完全不知道它们的副本（`a`、`b`）做了什么。\n它们仍然握着原来的地址（`0x100`、`0x200`）。",
+        "keyInsight": "Swap 失败！只交换了遥控器而已。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"after: x=\" + x + \", y=\" + y);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Integer"
+            },
+            {
+              "name": "y",
+              "value": "-> 0x200",
+              "frame": "main",
+              "type": "Integer"
+            }
+          ],
+          "output": [
+            "after: x=1, y=2"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在 Java 中交换两个变量值（Swap）的正确方法是？",
+    "options": [
+      "创建 swap(a, b) 函数。",
+      "像 C 语言一样使用指针。",
+      "使用包装类或数组来包含值。",
+      "不可能。"
+    ],
+    "correctIndex": 2,
+    "explanation": "虽然无法交换变量本身，但可以将值放入数组（`int[]`）或对象（`MyObj`）中，然后创建交换"内容"的函数。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Integer 是对象，所以内容应该可以修改，对吧？",
+      "correct": "`Integer` 类是**不可变（Immutable）**的。",
+      "why": "Java 设计者将 `Integer`、`String` 等设计为值永远不可更改。\n也没有方法可以设置内部值。"
+    }
+  ],
+  "keyTakeaway": "在 Java 中无法实现变量交换（Swap）函数。（值传递 Call by Value 的局限性）"
+}

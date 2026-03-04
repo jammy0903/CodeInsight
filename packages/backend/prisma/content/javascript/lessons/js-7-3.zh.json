@@ -1,0 +1,215 @@
+{
+  "lessonId": "js-7-3",
+  "title": "去优化",
+  "concept": "破坏引擎假设的代码会触发「去优化（Deopt）」，导致性能下降。",
+  "content": {
+    "code": "function add(a, b) {\n  return a + b;\n}\n\nconst results = [];\n\nresults.push(add(1, 2));\nresults.push(add(3, 4));\nresults.push(add(5, 6));\n\nconst optimized = results.slice();\n\nresults.push(add('Hello', 'World'));\n\nconst afterDeopt = results.slice();\n\nconsole.log(optimized);\nconsole.log(afterDeopt);",
+    "steps": [
+      {
+        "title": "定义 add 函数",
+        "explanation": "定义 `add` 函数。\n此时它可以接受任何类型。",
+        "keyInsight": "JavaScript 函数没有类型信息。运行时可以传入任何类型。",
+        "visualizationType": "memory",
+        "code": "function add(a, b) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "创建 results 数组",
+        "explanation": "创建 `results` 数组。\n它将存储函数调用的结果。",
+        "visualizationType": "memory",
+        "code": "const results = [];",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "第一次数字加法",
+        "explanation": "`add(1, 2)` = 3。引擎开始学习：「啊，这个函数接收数字。」",
+        "keyInsight": "V8 观察函数调用模式并对其进行「分析」。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "profiling": "add() called with (Number, Number)",
+          "results": [
+            3
+          ]
+        },
+        "code": "results.push(add(1, 2));"
+      },
+      {
+        "title": "第二次数字加法",
+        "explanation": "`add(3, 4)` = 7。又是数字！引擎的信心增强了。\n「这个函数就是用来算数字的！」",
+        "keyInsight": "当反复使用相同类型调用时，引擎决定进行「优化」。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "profiling": "Consistent (Number, Number) pattern",
+          "results": [
+            3,
+            7
+          ]
+        },
+        "code": "results.push(add(3, 4));"
+      },
+      {
+        "title": "第三次数字加法 + 优化",
+        "explanation": "`add(5, 6)` = 11。模式确认——V8 生成优化的机器码。",
+        "keyInsight": "JIT 编译器创建专门用于数字加法的机器码。无需类型检查——直接进行加法！",
+        "analogy": "就像在常去的餐厅点「老样子」——因为他们完全知道你要什么，所以出菜很快。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "status": "OPTIMIZED",
+          "optimizedFor": "(Number, Number) → Number",
+          "results": [
+            3,
+            7,
+            11
+          ]
+        },
+        "code": "results.push(add(5, 6));"
+      },
+      {
+        "title": "保存优化状态",
+        "explanation": "将目前的结果 [3, 7, 11] 复制到 `optimized` 中。\n此时函数处于优化状态。",
+        "visualizationType": "memory",
+        "code": "const optimized = results.slice();",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "类型变化——去优化！",
+        "explanation": "`add('Hello', 'World')` = 'HelloWorld'。\n字符串突然出现了！引擎的预测被打破了。",
+        "keyInsight": "当类型变化时，优化的机器码被丢弃，执行回退到解释器模式（Bailout）。",
+        "analogy": "就像走进常去的餐厅却点了菜单上没有的东西——需要等更长时间。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "status": "DEOPTIMIZED",
+          "reason": "Type mismatch: expected Number, got String",
+          "warning": "Performance hit!",
+          "results": [
+            3,
+            7,
+            11,
+            "HelloWorld"
+          ]
+        },
+        "code": "results.push(add('Hello', 'World'));"
+      },
+      {
+        "title": "保存去优化后的状态",
+        "explanation": "将去优化后的结果保存到 `afterDeopt` 中。\n结果仍然正确，但性能已经受到影响。",
+        "keyInsight": "功能上正确，但同一个函数现在变慢了。",
+        "visualizationType": "memory",
+        "code": "const afterDeopt = results.slice();",
+        "stack": [
+          {
+            "name": "add",
+            "value": "fn(a, b)",
+            "type": "Function"
+          },
+          {
+            "name": "results",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          },
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "afterDeopt",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "比较结果",
+        "explanation": "optimized = [3, 7, 11]，afterDeopt = [3, 7, 11, 'HelloWorld']。\n字符串结果是正确的，但内部有隐藏的性能损失。",
+        "keyInsight": "去优化在输出中不可见，但会影响性能。你可以在 DevTools 的 Performance 面板中看到它。",
+        "visualizationType": "memory",
+        "code": "console.log(optimized);",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [
+          {
+            "name": "optimized",
+            "value": "[3, 7, 11, ...]",
+            "type": "Array"
+          },
+          {
+            "name": "afterDeopt",
+            "value": "[3, 7, 11, ..., NaN]",
+            "type": "Array"
+          }
+        ],
+        "heap": [],
+        "stdout": "[3, 7, 11, ...]\n[3, 7, 11, ..., NaN]"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "如何保持 JIT 编译器的优化？",
+    "options": [
+      "在变量中使用尽可能多的不同类型",
+      "保持函数参数类型一致（Monomorphic）",
+      "编写非常长的函数",
+      "频繁使用 eval()"
+    ],
+    "correctIndex": 1,
+    "explanation": "当函数始终接收相同的参数类型时（Monomorphic），V8 最快。\n在数字、字符串和对象之间交替使用（Polymorphic）会导致 V8 放弃优化。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript 不会编译",
+      "correct": "它在运行时实时编译（JIT）。",
+      "why": "JIT（即时编译）编译器在运行时将代码转换为机器码，因此对于一致的模式，可以达到与 C++ 和 Java 等静态类型语言相当的性能。"
+    },
+    {
+      "wrong": "只要结果正确，类型变化也没关系",
+      "correct": "结果是正确的，但性能会下降。",
+      "why": "引擎丢弃优化的代码并回退到较慢的解释器模式。\n对于性能关键的代码，类型一致性非常重要。"
+    }
+  ],
+  "keyTakeaway": "不要改变函数的输入类型（签名）。保持引擎的假设不变是性能优化的核心。"
+}

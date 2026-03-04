@@ -1,0 +1,454 @@
+{
+  "lessonId": "py-7-3",
+  "title": "Circular References",
+  "concept": "When objects reference each other, refcount never reaches 0! The limitation of reference counting!",
+  "content": {
+    "code": "class Node:\n    def __init__(self, name):\n        self.name = name\n        self.next = None\n\na = Node(\"A\")\nb = Node(\"B\")\n\n# 순환 참조 만들기\na.next = b  # A → B\nb.next = a  # B → A (순환!)\n\ndel a  # a 삭제\ndel b  # b 삭제\n\n# 객체들은 아직 메모리에 있다!\n# 서로를 참조해서 refcount > 0",
+    "steps": [
+      {
+        "title": "Node Class Definition Begins",
+        "explanation": "**`class Node:`**\n\n**Defines the Node class** -- a blueprint for creating \"linked nodes\".\nA Node has a `next` attribute that can point to another Node, allowing them to be **linked together like a chain**.\n\n**Why do we need a Node class?**\nThe goal of this lesson is to demonstrate the problem of **Circular References**.\nA circular reference is a situation where two objects **point to each other**.\nWhen A -> B and simultaneously B -> A, it's like two people holding each other's hands.\n\n**Analogy: Train cars**\nThink of a Node as a single car of a train.\nEach car (Node) has a name (`name`) and a connector to the next car (`next`).\nNormally they connect in a line like A -> B -> C, but what if the last car points back to the first?\nAn endlessly circling train is created -- that's a **circular reference**!\n\n**Why this order?** In Python, a class must be defined before it can be used.\nWe prepare the blueprint before creating Node objects.\n\n**Execution order**: class keyword -> prepare to create Node class object -> await class body execution",
+        "visualizationType": "pythonMemory",
+        "code": "class Node:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Node class definition begins",
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "title": "Entering the Class Body",
+        "explanation": "**`class Node:` (entire body)**\n\nPython reads the entire class body to complete the **Node class object**.\nThe class body contains a defined `__init__` method.\n\n**What does class body execution mean?**\nPython executes all the code under `class Node:` once to identify what methods and attributes exist.\nDuring this process, a function object called `__init__` is created and registered with the Node class.\n\n**At this point, no Node objects (instances) have been created yet!**\nRight now, only the **blueprint (class)** that says \"you can create objects of this shape\" has been prepared.\n\n**Analogy: Making a cookie cutter**\nWe haven't baked any cookies (instances) yet -- we've just made the cookie cutter (class).\nWe can stamp out multiple cookies using this cutter.\n\n**Why this order?** After encountering the class definition keyword (`class Node:`), the body is executed to complete the class.\n\n**Execution order**: Class body execution -> __init__ method registered -> Node class completed",
+        "visualizationType": "pythonMemory",
+        "code": "class Node:",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "Executing class body"
+        }
+      },
+      {
+        "title": "__init__ Method Definition",
+        "explanation": "**`def __init__(self, name):`**\n\nDefines the **initialization method** of the Node class.\nWhen we create an object in the form `Node(\"A\")`, this `__init__` is automatically called.\n\n**What the method does (body preview)**:\n- `self.name = name`: Gives the node a name (e.g., \"A\", \"B\")\n- `self.next = None`: A pointer to the next node (initially None = points to nothing)\n\n**What is `self`?**\n`self` refers to \"the instance being created right now.\"\nWhen you call `Node(\"A\")`, Python creates a new object and passes that object as `self`.\n\n**Meaning of next = None**: The train car doesn't have a next car connected yet.\nYou can connect one later with `a.next = b`.\n\n**Why this order?** Defining methods inside the class body completes the class.\nOnce the Node class is complete, it's registered in the global namespace under the name 'Node'.\n\n**Execution order**: __init__ function object created -> registered as method in Node class -> Node class complete (ID: 0x1000)",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "Node class definition complete (ID: 0x1000)",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the First Node",
+        "explanation": "**`a = Node(\"A\")`**\n\nCalls the Node class to create the **first node object (instance)**.\nA node named \"A\" is created in memory (0x2000).\n\n**Creation process (internal workings)**:\n1. Python allocates a new empty object in memory (0x2000)\n2. `__init__(self, \"A\")` is automatically called\n3. `self.name = \"A\"` -> sets the node's name\n4. `self.next = None` -> no next node yet\n5. The completed object is connected to variable `a`\n\n**Analogy: Building the first train car**\nA train car with a nameplate reading \"A\" has been built.\nNo car is connected behind it yet (next = None).\n\n**Reference state**: 0x2000's refcount = 1 (only variable `a` references it)\n\n**Why this order?** Now that the class definition is done, it's time to create actual instances.\nAt least two objects are needed to create a circular reference, so we make the first one first.\n\n**Execution order**: Node(\"A\") called -> instance 0x2000 created -> __init__ called -> initialization in progress...",
+        "visualizationType": "pythonMemory",
+        "code": "a = Node(\"A\")",
+        "pythonMemoryState": {
+          "note": "Node(\"A\") called -> instance 0x2000 created, __init__ call preparing",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node A Initialization (1)",
+        "explanation": "**`self.name = name`**\n\nExecuted inside the `__init__` method.\nStores the string `\"A\"` received as the parameter `name` into the `name` attribute of the instance (0x2000).\n\n**What self points to**: The newly created object 0x2000.\n`self.name = name` means \"add an attribute called name to the 0x2000 object and put \"A\" in it.\"\n\n**Analogy**: Attaching a nameplate to the train car. \"This car is named A!\"\n\n**Why is a name needed?** Later, when circular references are created, we need to distinguish which node points to which.\n\n**Why this order?** Inside __init__, self.name is set first, then self.next is set.\n\n**Execution order**: Add name attribute to self(0x2000) -> assign \"A\" -> 0x2000.name = \"A\" complete",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "Node A's name attribute = 'A' set",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a (initializing)",
+              "pointsTo": "node1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A')",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node A Initialization (2)",
+        "explanation": "**`self.next = None`**\n\nSets the `next` attribute of the instance (0x2000) to `None`.\n`next` serves as a **pointer to the next node**.\n`None` means \"not pointing to anything yet.\"\n\n**Analogy: The train car's connector**\nThe rear connector (next) of the train car (Node A) is empty.\nLater, another car can be connected with `a.next = b`.\n\n**Complete state of Node A at this point**:\n- name = \"A\" (the node's name)\n- next = None (not yet connected)\n- refcount = 1 (only variable `a` references it)\n\n**Why initialize to None?** Not every node needs to be connected to another node at creation time.\nYou can connect them later when needed.\n\n**Why this order?** After __init__ completes, variable `a` references the completed Node A object.\n\n**Execution order**: Add next attribute to self(0x2000) -> assign None -> __init__ complete -> a -> 0x2000 (refcount=1)",
+        "visualizationType": "pythonMemory",
+        "code": "self.next = None",
+        "pythonMemoryState": {
+          "note": "Node A complete! a -> 0x2000 (refcount=1)",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Second Node",
+        "explanation": "**`b = Node(\"B\")`**\n\nCreates a **second node object** named \"B\" in memory (0x3000).\nAt least **two objects** are needed to create a circular reference, so we create the second node.\n\n**The situation so far**:\n- Node A (0x2000): name=\"A\", next=None, refcount=1 (variable a)\n- Node B (0x3000): being created now... refcount=1 (variable b)\n- The two nodes are still **independent** (not connected to each other)\n\n**Analogy**: Two train cars are placed side by side, but they haven't been connected by a coupler yet.\n\n**Why this order?** After creating Node A, it's time to create its counterpart Node B for the circular reference.\nIn the next step, we'll connect A and B to each other.\n\n**Execution order**: Node(\"B\") called -> instance 0x3000 created -> __init__(self, \"B\") called -> initialization in progress...",
+        "visualizationType": "pythonMemory",
+        "code": "b = Node(\"B\")",
+        "pythonMemoryState": {
+          "note": "Node(\"B\") called -> instance 0x3000 created, __init__ call preparing",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node B Initialization (1)",
+        "explanation": "**`self.name = name`**\n\nThis time, sets the `name` attribute of Node B (0x3000) to `\"B\"`.\nIt's the same `__init__` method, but this time `self` points to 0x3000 (Node B).\n\n**Same class, different instances**:\n- During Node A's __init__: self = 0x2000, name = \"A\"\n- During Node B's __init__: self = 0x3000, name = \"B\" <-- this one now!\n\nThe class is a single blueprint, but each instance created from it holds independent data.\n\n**Analogy**: Train cars made in the same factory (class), but each car has a different nameplate.\n\n**Why this order?** Inside Node B's __init__, the name attribute is set first.\n\n**Execution order**: Add name attribute to self(0x3000) -> assign \"B\" -> 0x3000.name = \"B\" complete",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "Node B's name attribute = 'B' set",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b (initializing)",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1002"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B')",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Node B Initialization (2)",
+        "explanation": "**`self.next = None`**\n\nInitializes the `next` attribute of Node B (0x3000) to `None`.\nJust like Node A, it's not connected to any other node at creation time.\n\n**Two independent nodes are now ready:**\n```\na -> Node A (0x2000): name=\"A\", next=None, refcount=1\nb -> Node B (0x3000): name=\"B\", next=None, refcount=1\n```\nBoth nodes have `next` as `None`, so they don't know about each other yet.\n\n**Preview of next step**: Now we'll connect the two nodes to each other with `a.next = b` and `b.next = a` to create a circular structure!\n\n**Analogy**: Train cars A and B are standing side by side, but their connectors are still empty.\nIn the next step, we'll hook them together.\n\n**Why this order?** Completing Node B's __init__.\n\n**Execution order**: Add next attribute to self(0x3000) -> assign None -> __init__ complete -> b -> 0x3000 (refcount=1)",
+        "visualizationType": "pythonMemory",
+        "code": "self.next = None",
+        "pythonMemoryState": {
+          "note": "Node B complete! a -> 0x2000, b -> 0x3000 (each refcount=1)",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=None)",
+              "pyId": "1002"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=None)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Connecting Reference from A to B",
+        "explanation": "**`a.next = b`**\n\nSets Node A's `next` attribute to point to the Node B object (0x3000).\nNow the **A -> B** directional connection is established!\n\n**Reference count change (key!)**:\n- Node B (0x3000) refcount: 1 -> **2**\n  - Existing reference: variable `b` (1)\n  - New reference: `a.next` (1 added!)\n  - Total: 2\n\n**Why this matters**: Now even if we delete variable `b` with `del`, `a.next` still references Node B, so its refcount becomes 1. Since it's not 0, it won't be deleted!\n\n**Analogy: Connecting train cars**\nThe rear coupler (next) of train car A has been hooked to car B.\nNow you can travel from A to B: `a.next.name` -> \"B\"\n\n**Memory structure**: a -> Node A(next -> Node B) / b -> Node B\n\n**Why this order?** Creating the first direction (A -> B) of the circular reference. The next line will create the opposite direction (B -> A) too.\n\n**Execution order**: Access next attribute of a(0x2000) -> assign b(0x3000) -> 0x3000's refcount 1->2 (variable b + a.next)",
+        "visualizationType": "pythonMemory",
+        "code": "a.next = b  # A → B",
+        "pythonMemoryState": {
+          "note": "A -> B connected! 0x3000 refcount=2 (variable b + a.next)",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=0x3000)",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=None)",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Circular Reference Complete",
+        "explanation": "**`b.next = a`**\n\nSets Node B's `next` attribute to point to the Node A object (0x2000).\nNow the **B -> A** directional connection is also established, and the **circular reference is complete**!\n\n**This is what a circular reference looks like:**\n```\nA.next -> B\nB.next -> A\n(A -> B -> A -> B -> A -> ... infinite loop!)\n```\n\n**Reference count changes**:\n- Node A (0x2000) refcount: 1 -> **2** (variable `a` + `b.next`)\n- Node B (0x3000) refcount: already **2** (variable `b` + `a.next`)\n\n**Analogy: Two people holding each other's hands**\nA grabs B's hand (a.next=b), and B also grabs A's hand (b.next=a).\nNo matter how much you yell \"let go!\" from outside (del a, del b), the two are holding each other's hands and can't be fully separated.\nThis is exactly the problem with circular references!\n\n**Why is this a problem?** In the next steps, even after `del a` and `del b`, the objects reference each other so the refcount never reaches 0.\n\n**Why this order?** After connecting A->B, adding B->A completes the circular loop.\n\n**Execution order**: Access next attribute of b(0x3000) -> assign a(0x2000) -> circular reference complete: A <-> B (each refcount=2)",
+        "visualizationType": "pythonMemory",
+        "code": "b.next = a  # B → A (순환!)",
+        "pythonMemoryState": {
+          "note": "Circular reference complete! A <-> B (each refcount=2)",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "node1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "node1",
+              "type": "node",
+              "value": "Node(name='A', next=0x3000)",
+              "pyId": "1002"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Deleting Variable 'a'",
+        "explanation": "**`del a`**\n\nDeletes variable `a`. But **Node A object (0x2000) survives!**\n\n**refcount change**:\n- Node A (0x2000) refcount: 2 -> **1**\n  - Deleted reference: variable `a` (-1)\n  - Remaining reference: `b.next` (still pointing to 0x2000!)\n- refcount = 1 > 0, so **object is not deleted**\n\n**The problem starts becoming visible here!**\nEven though we deleted variable `a`, Node A object survives because Node B's `next` attribute is still referencing Node A.\n\n**Analogy: Letting go with one hand**\nThe external hand (variable a) that was holding A has let go, but B is still holding A's hand, so A doesn't fall.\n\n**How to directly access Node A at this point**: Only through `b.next`.\nSince variable `a` is gone, direct access like `a.name` results in a NameError!\n\n**Why this order?** After the circular reference is complete, we delete variables with del to create the problem scenario.\n\n**Execution order**: Remove variable a from namespace -> 0x2000's refcount 2->1 (only b.next remains) -> object persists",
+        "visualizationType": "pythonMemory",
+        "code": "del a  # a 삭제",
+        "pythonMemoryState": {
+          "note": "Variable a deleted! But 0x2000 is still referenced by b.next (refcount=1)",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "node2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            },
+            {
+              "id": "node2",
+              "type": "node",
+              "value": "Node(name='B', next=0x2000)",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Deleting Variable 'b' and Memory Leak",
+        "explanation": "**`del b`**\n\nDeletes variable `b` as well. Now **there is absolutely no way to access either Node object!**\nBut both objects are still in memory. This is a **Memory Leak**!\n\n**refcount analysis (key!)**:\n- Node A (0x2000): refcount = 1 (Node B's next references it)\n- Node B (0x3000): refcount = 1 (Node A's next references it)\n- Both objects have refcount > 0, so neither is deleted!\n\n**The moment the limitation of reference counting is revealed:**\n```\n0x2000(A).next -> 0x3000(B) (+1 to B's refcount)\n0x3000(B).next -> 0x2000(A) (+1 to A's refcount)\n```\nThe two objects reference each other, so reference counting alone cannot break this cycle!\nThere's no way to access them from outside, but they're holding onto each other and can't be deleted.\n\n**Analogy: Two people floating in the ocean**\nTwo people (A, B) are holding each other's hands in the ocean.\nTheir connections to the lifeboat (variables a, b) have been severed (del), but since they're holding onto each other, they neither sink (get deleted) nor can be rescued.\nNobody can reach them, and they keep floating in the ocean (memory).\n\n**Solution**: Python's **garbage collector (gc module)** periodically detects these circular references and cleans up the memory.\nWe'll learn about the gc module in the next lesson (py-7-4)!\n\n**Execution order**: Remove variable b from namespace -> 0x3000's refcount 2->1 -> both objects inaccessible but exist in memory -> program ends",
+        "visualizationType": "pythonMemory",
+        "code": "del b  # b 삭제",
+        "pythonMemoryState": {
+          "note": "Memory leak! 0x2000 <-> 0x3000 referencing each other (each refcount=1), inaccessible but not deleted!",
+          "names": [
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1001"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the problem with circular references?",
+    "options": [
+      "An error occurs",
+      "The program freezes",
+      "Objects can't be deleted, causing a memory leak",
+      "Objects get deleted twice"
+    ],
+    "correctIndex": 2,
+    "explanation": "Circularly referenced objects reference each other, so their refcount never reaches 0.\nThey can't be accessed but also can't be deleted, causing a memory leak!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Python can't handle circular references",
+      "correct": "Python's garbage collector (gc) detects and cleans up circular references",
+      "why": "Reference counting alone can't catch them, so a separate gc module periodically finds and cleans up circular references."
+    },
+    {
+      "wrong": "Circular references are always a problem",
+      "correct": "gc handles them, but they can be problematic if __del__ methods are present",
+      "why": "Since Python 3.4, most cases are handled automatically, but weakref is recommended for special cases."
+    }
+  ],
+  "keyTakeaway": "Circular references = the limitation of reference counting! The gc module handles them separately!"
+}

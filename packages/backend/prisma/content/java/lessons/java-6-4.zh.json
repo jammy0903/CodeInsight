@@ -1,0 +1,145 @@
+{
+  "lessonId": "java-6-4",
+  "title": "创建自定义异常",
+  "concept": "学习如何定义和使用符合业务逻辑的自定义异常（Custom Exception）。",
+  "content": {
+    "code": "class BankException extends Exception {\n    public BankException(String msg) { super(msg); }\n}\n\n// 1. 定义自定义异常\nclass NoMoneyException extends BankException {\n    public NoMoneyException(int lack) {\n        // 调用父类构造函数\n        super(\"余额不足: \" + lack);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        try {\n            withdraw(1000);\n        } catch (NoMoneyException e) {\n            System.out.println(e.getMessage());\n        } catch (BankException e) {\n            System.out.println(\"银行错误\");\n        }\n    }\n\n    static void withdraw(int money) throws BankException {\n        int balance = 500;\n        if (money > balance) {\n            // 2. 抛出异常\n            throw new NoMoneyException(money - balance);\n        }\n    }\n}",
+    "steps": [
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的起点。\n\n**类比**：模拟客户在银行柜台（main）尝试取款的场景。",
+        "visualizationType": "javaMemory",
+        "code": "public class Main {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [],
+          "output": []
+        }
+      },
+      {
+        "title": "自定义异常类定义",
+        "explanation": "**执行流程：**\n1. 继承自 `BankException` 的 `NoMoneyException` 类被加载。\n\n**说明：**\nJava 提供的内置异常不足以描述"余额不足"、"ID 重复"等具体场景。\n这时候创建自己的异常类，代码可读性会大幅提升。",
+        "visualizationType": "javaMemory",
+        "code": "class NoMoneyException extends BankException {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "NoMoneyEx.class",
+              "value": "loaded"
+            },
+            {
+              "name": "Main.class",
+              "value": "loaded"
+            }
+          ]
+        }
+      },
+      {
+        "title": "方法调用",
+        "explanation": "**执行流程：**\n1. `main` 调用 `withdraw(1000)`。\n2. `balance` 变量在栈帧中创建。\n\n**说明：**\n取款金额（1000）超过了余额（500）。\n问题即将爆发。",
+        "visualizationType": "javaMemory",
+        "code": "try {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "money",
+              "value": "1000",
+              "frame": "withdraw",
+              "type": "int"
+            },
+            {
+              "name": "balance",
+              "value": "500",
+              "frame": "withdraw",
+              "type": "int"
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "自定义异常抛出",
+        "explanation": "**执行流程：**\n1. `money > balance` 条件为真，进入 `if` 块。\n2. 在堆上创建 `NoMoneyException` 对象。\n消息为 \"余额不足: 500\"。\n3. 用 `throw` 抛出异常。\n\n**说明：**\n比起简单的 `throw new Exception()`，使用 `throw new NoMoneyException(...)` 能让人一目了然："原来是因为钱不够才出错的！"",
+        "visualizationType": "javaMemory",
+        "code": "}",
+        "occurrence": 4,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "money",
+              "value": "1000",
+              "frame": "withdraw",
+              "type": "int"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x777",
+              "content": "NoMoneyEx: 余额不足: 500",
+              "type": "NoMoneyException",
+              "new": true
+            }
+          ],
+          "error": "NoMoneyException 已抛出！"
+        }
+      },
+      {
+        "title": "具体的 Catch",
+        "explanation": "**执行流程：**\n1. 返回 `main`，执行 `catch (NoMoneyException e)` 块。\n2. 输出异常消息。\n\n**说明：**\n子类 `NoMoneyException` 的 catch 块必须在父类 `BankException` 之前。\n（具体的在先！）这样我们才能看到准确的错误消息。",
+        "visualizationType": "javaMemory",
+        "code": "withdraw(1000);",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "e",
+              "value": "-> 0x777",
+              "frame": "catch",
+              "type": "NoMoneyException"
+            }
+          ],
+          "output": [
+            "余额不足: 500"
+          ],
+          "error": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "继承 RuntimeException 创建自定义异常会有什么效果？",
+    "options": [
+      "编译器会强制异常处理（Checked）。",
+      "编译器不会强制异常处理（Unchecked）。",
+      "所有方法都会自动添加 throws。",
+      "性能提升 2 倍。"
+    ],
+    "correctIndex": 1,
+    "explanation": "继承 `RuntimeException` 会使其成为 Unchecked Exception，调用方不需要 `try-catch` 也不会出现编译错误。\n通常用于业务逻辑中真正不可恢复的错误。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "自定义异常越多越好。",
+      "correct": "不是。\n如果标准异常（如 IllegalArgumentException）足够用，就应该使用标准异常。",
+      "why": "过多的自定义异常会导致类爆炸（Class Explosion），增加维护成本。"
+    }
+  ],
+  "keyTakeaway": "自定义异常可以清晰传达错误含义，通过继承可以层次化地管理异常。"
+}

@@ -1,0 +1,147 @@
+{
+  "lessonId": "java-4-4",
+  "title": "String Comparison - Complete Guide",
+  "concept": "Always use equals() for string content comparison. == is a landmine.",
+  "content": {
+    "code": "String a = \"Hello\";\nString b = new String(\"Hello\");\nString c = \"hello\";\n\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));\nSystem.out.println(a.equalsIgnoreCase(c));\nSystem.out.println(a.compareTo(\"Apple\"));\nSystem.out.println(\"Hello\".equals(a));",
+    "steps": [
+      {
+        "title": "Literal Variable a",
+        "explanation": "**Execution flow:**\n1. Registers `\"Hello\"` in the String Pool.\n2. `a` references it.\n\n`a` points to the object in the Pool.",
+        "visualizationType": "javaMemory",
+        "code": "String a = \"Hello\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"Hello\"",
+              "address": "Pool[0]"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "new String Variable b",
+        "explanation": "**Execution flow:**\n1. Creates a new `\"Hello\"` object on the Heap.\n2. `b` references it.\n\nThe content is the same, but `a` and `b` exist at different physical locations (addresses).",
+        "visualizationType": "javaMemory",
+        "code": "String b = new String(\"Hello\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool[0]",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "b",
+              "value": "-> Heap[0]",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap[0]",
+              "content": "\"Hello\"",
+              "type": "String"
+            }
+          ],
+          "stringPool": null
+        }
+      },
+      {
+        "title": "== Comparison (Dangerous!)",
+        "explanation": "**Execution flow:**\n1. Compares `a`'s address (Pool[0]) with `b`'s address (Heap[0]).\n2. Different -> `false`.\n\nThe `==` operator doesn't check the 'content' -- it only checks whether the memory addresses are the same.\nEven if they're identical twins, it doesn't matter.\nTheir IDs (addresses) are different.",
+        "keyInsight": "== compares addresses (never use for strings)",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a == b);",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ],
+          "warning": "Using == for string comparison causes bugs!"
+        }
+      },
+      {
+        "title": "equals() Comparison (Standard)",
+        "explanation": "**Execution flow:**\n1. Reads the string content that `a` points to.\n2. Reads the string content that `b` points to.\n3. Compares character by character -> match -> `true`.\n\n`equals()` compares the **actual content**, not the address.\nThis is the comparison we typically want.",
+        "keyInsight": "equals() = content comparison",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a.equals(b));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "note": "Content comparison successful",
+          "warning": null
+        }
+      },
+      {
+        "title": "equalsIgnoreCase()",
+        "explanation": "**Execution flow:**\n1. Compares `a` (\"Hello\") with `c` (\"hello\").\n2. Case-insensitive mode enabled.\n3. H == h, E == e... -> `true`.\n\nVery useful when comparing user IDs or email addresses.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a.equalsIgnoreCase(c));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "compareTo() - Lexicographic Ordering",
+        "explanation": "**Execution flow:**\n1. Compares \"Hello\" and \"Apple\" from the first character.\n2. 'H'(72) - 'A'(65) = 7.\n3. Positive value means \"Hello\" comes after \"Apple\".\n\nPrimarily used in sorting algorithms.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a.compareTo(\"Apple\"));",
+        "javaMemoryState": {
+          "output": [
+            "7"
+          ]
+        }
+      },
+      {
+        "title": "Null-safe Comparison (Yoda Condition)",
+        "explanation": "**Comparison tip:**\nUse `\"constant\".equals(variable)` instead of `variable.equals(\"constant\")`.\n\nWhat if `a` were `null`?\n- `a.equals(...)` -> **NullPointerException** (crash)\n- `\"Hello\".equals(a)` -> `false` (safe)",
+        "keyInsight": "\"literal\".equals(variable) = null-safe",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"Hello\".equals(a));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "note": "No error even if the variable is null"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which is the safest string comparison code?",
+    "options": [
+      "if (input == \"EXIT\")",
+      "if (input.equals(\"EXIT\"))",
+      "if (\"EXIT\".equals(input))",
+      "if (input.compareTo(\"EXIT\") == 0)"
+    ],
+    "correctIndex": 2,
+    "explanation": "Option 3, `\"EXIT\".equals(input)`, is the safest because it returns `false` without throwing an error even when `input` is `null` (null-safe)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "== worked fine in my tests though?",
+      "correct": "You were just lucky.\nYou were comparing literals or benefiting from the String Pool.",
+      "why": "Strings created from user input, file reading, or database queries may be allocated on the Heap rather than the Pool, so `==` returns `false` even when the content is identical."
+    }
+  ],
+  "keyTakeaway": "Always use equals() for String content comparison! Never use address comparison (==)!"
+}

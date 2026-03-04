@@ -1,0 +1,261 @@
+{
+  "lessonId": "c-5-4",
+  "title": "Memory Leaks",
+  "concept": "Memory leak: borrowing memory and never returning it, eventually exhausting available memory",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nvoid leak() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 10;\n}\n\nint main() {\n    for(int i=0; i<3; i++) {\n        leak();\n        printf(\"Memory leaked %d times\\n\", i+1);\n    }\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "This header is needed to use `printf`.\n\nThis example intentionally causes memory leaks as a counter-example.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Including stdlib.h header",
+        "explanation": "This header is needed to use `malloc`.\n\nOmitting `free` causes leaks to accumulate.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdlib.h>"
+      },
+      {
+        "title": "Defining the leak function",
+        "explanation": "The `leak` function allocates heap memory but never frees it.\n\nEven after the function ends and the pointer disappears, the heap block remains -- causing a leak.",
+        "visualizationType": "cMemory",
+        "code": "void leak() {"
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "The main frame is created, preparing to call `leak` repeatedly.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Loop begins (i=0)",
+        "explanation": "Repeated calls create an accumulating leak scenario.\n\nThe number of unrecoverable heap blocks grows with each iteration.",
+        "visualizationType": "cMemory",
+        "code": "for(int i=0; i<3; i++) {",
+        "stack": [
+          {
+            "name": "i",
+            "value": "0",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "leak() function call #1",
+        "explanation": "The first call allocates a new heap block.\n\nIt is still accessible through the pointer inside the function.",
+        "visualizationType": "cMemory",
+        "code": "leak();",
+        "stack": [
+          {
+            "name": "i",
+            "value": "0",
+            "type": "int",
+            "frame": "main"
+          },
+          {
+            "name": "p",
+            "value": "0xA000",
+            "type": "int*",
+            "frame": "leak"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xA000",
+            "size": "4",
+            "value": "10"
+          }
+        ]
+      },
+      {
+        "title": "leak() function returns #1",
+        "explanation": "The function ends without freeing, confirming the first leak.\n\nThe pointer that pointed to that heap block is now gone.",
+        "visualizationType": "cMemory",
+        "code": "}",
+        "stack": [
+          {
+            "name": "i",
+            "value": "0",
+            "type": "int",
+            "frame": "main"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xA000",
+            "size": "4",
+            "value": "10",
+            "status": "LEAKED"
+          }
+        ]
+      },
+      {
+        "title": "Leak message output #1",
+        "explanation": "Prints the status of the first leak occurrence.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Memory leaked %d times\\n\", i+1);",
+        "stdout": "Memory leaked 1 times"
+      },
+      {
+        "title": "Loop continues (i=1)",
+        "explanation": "Entering the second iteration.\n\nThe previous leak remains unresolved.",
+        "visualizationType": "cMemory",
+        "code": "for(int i=0; i<3; i++) {",
+        "stack": [
+          {
+            "name": "i",
+            "value": "1",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "leak() function call #2",
+        "explanation": "A second heap block is additionally allocated.",
+        "visualizationType": "cMemory",
+        "code": "leak();",
+        "stack": [
+          {
+            "name": "i",
+            "value": "1",
+            "type": "int",
+            "frame": "main"
+          },
+          {
+            "name": "p",
+            "value": "0xB000",
+            "type": "int*",
+            "frame": "leak"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xA000",
+            "size": "4",
+            "value": "10",
+            "status": "LEAKED"
+          },
+          {
+            "address": "0xB000",
+            "size": "4",
+            "value": "10"
+          }
+        ],
+        "stdout": ""
+      },
+      {
+        "title": "leak() function returns #2",
+        "explanation": "Again it exits without freeing, confirming the second leak.\n\nThe total leaked memory accumulates.",
+        "visualizationType": "cMemory",
+        "code": "}",
+        "stack": [
+          {
+            "name": "i",
+            "value": "1",
+            "type": "int",
+            "frame": "main"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xA000",
+            "size": "4",
+            "value": "10",
+            "status": "LEAKED"
+          },
+          {
+            "address": "0xB000",
+            "size": "4",
+            "value": "10",
+            "status": "LEAKED"
+          }
+        ]
+      },
+      {
+        "title": "Leak message output #2",
+        "explanation": "Prints the accumulated leak status for the second time.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Memory leaked %d times\\n\", i+1);",
+        "stdout": "Memory leaked 1 times\nMemory leaked 2 times"
+      },
+      {
+        "title": "Loop continues (i=2) ...",
+        "explanation": "The same pattern repeats, continuously increasing the leaked memory.\n\nFor long-running processes, such accumulation can be fatal.",
+        "visualizationType": "cMemory",
+        "code": "for(int i=0; i<3; i++) {",
+        "stack": [
+          {
+            "name": "i",
+            "value": "2",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xA000",
+            "size": "4",
+            "status": "LEAKED",
+            "value": "???"
+          },
+          {
+            "address": "0xB000",
+            "size": "4",
+            "status": "LEAKED",
+            "value": "???"
+          },
+          {
+            "address": "0xC000",
+            "size": "4",
+            "status": "LEAKED",
+            "value": "???"
+          }
+        ],
+        "stdout": "Memory leaked 1 times\nMemory leaked 2 times\nMemory leaked 3 times"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "Even though the OS reclaims memory when the program ends, leaks during execution cause major performance and stability issues.\n\nThe rule is simple: if you `malloc`, you must `free`.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "heap": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How do you prevent memory leaks?",
+    "options": [
+      "Only use the stack",
+      "Use short variable names",
+      "Always call free for every malloc",
+      "Hope that the OS handles it"
+    ],
+    "correctIndex": 2,
+    "explanation": "Java and Python have a garbage collector (GC), but C and C++ do not.\nThe programmer bears 100% of the responsibility."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Leaked memory is never recovered even after the program terminates",
+      "correct": "The OS reclaims all memory when the program ends.",
+      "why": "However, for programs that run 24/7 like servers, or long-running games, leaks can be fatal."
+    }
+  ],
+  "keyTakeaway": "A lost address can never be found again. If you `malloc`, take responsibility until the end."
+}

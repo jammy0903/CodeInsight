@@ -1,0 +1,437 @@
+{
+  "lessonId": "js-8-1",
+  "title": "主线程与阻塞",
+  "concept": "JavaScript 在单线程上运行——当繁重任务阻塞主线程时，UI 会冻结。",
+  "content": {
+    "code": "const tasks = [];\nlet uiBlocked = false;\n\nfunction heavyTask(name) {\n  uiBlocked = true;\n  let result = 0;\n  for (let i = 0; i < 5; i++) {\n    result += i;\n  }\n  tasks.push({ name: name, result: result });\n  uiBlocked = false;\n  return result;\n}\n\nconst result1 = heavyTask('Task A');\nconst result2 = heavyTask('Task B');\nconst total = result1 + result2;\n\nconsole.log(tasks);\nconsole.log(total);",
+    "steps": [
+      {
+        "title": "初始化任务数组",
+        "explanation": "创建 `tasks` 数组。\n我们将把完成的任务记录存储在这个数组中。",
+        "keyInsight": "在 JavaScript 中，数组是存储在堆上的引用类型。",
+        "visualizationType": "scope",
+        "code": "const tasks = [];",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "tasks"
+        }
+      },
+      {
+        "title": "UI 阻塞状态标志",
+        "explanation": "我们使用 `uiBlocked` 变量来跟踪是否正在运行繁重任务。\n在真实浏览器中，当此标志为 true 时，点击、滚动等事件将无法响应。",
+        "keyInsight": "单线程 = 同一时间只能运行一个任务",
+        "visualizationType": "scope",
+        "code": "let uiBlocked = false;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": false,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "uiBlocked"
+        }
+      },
+      {
+        "title": "开始第一个繁重任务",
+        "explanation": "调用 `heavyTask('Task A')`。\n在此函数返回之前，其他代码无法运行。",
+        "keyInsight": "函数调用 = 向调用栈添加新的栈帧",
+        "analogy": "就像一家只有一个柜员的银行——如果前面的人有复杂的业务，其他人都必须等待。",
+        "visualizationType": "scope",
+        "code": "const result1 = heavyTask('Task A');",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": false,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "heavyTask()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "name",
+                  "value": "'Task A'",
+                  "keyword": "param"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "heavyTask()",
+          "highlightVariable": null
+        }
+      },
+      {
+        "title": "阻塞状态开始",
+        "explanation": "设置 `uiBlocked = true`。\n点击、滚动等 UI 事件现在无法响应。",
+        "keyInsight": "当主线程忙碌时，事件队列中的任务必须等待。",
+        "visualizationType": "scope",
+        "code": "uiBlocked = true;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": true,
+                  "keyword": "let",
+                  "changed": true
+                }
+              ]
+            },
+            {
+              "name": "heavyTask()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "name",
+                  "value": "'Task A'",
+                  "keyword": "param"
+                },
+                {
+                  "name": "result",
+                  "value": 0,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "uiBlocked"
+        }
+      },
+      {
+        "title": "执行 CPU 密集型任务",
+        "explanation": "for 循环开始执行。\n在实际应用中，数百万次迭代可能会导致 UI 冻结数秒。",
+        "tip": "这样的任务应该交给 Web Worker 处理或拆分成小块。",
+        "visualizationType": "scope",
+        "code": "for (let i = 0; i < 5; i++) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": true,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "heavyTask()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "name",
+                  "value": "'Task A'",
+                  "keyword": "param"
+                },
+                {
+                  "name": "result",
+                  "value": "0→10",
+                  "keyword": "let",
+                  "changed": true
+                },
+                {
+                  "name": "i",
+                  "value": "0→4",
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "heavyTask()",
+          "highlightVariable": "result"
+        }
+      },
+      {
+        "title": "保存结果",
+        "explanation": "将计算结果作为对象存储到 `tasks` 数组中。\n`{ name: 'Task A', result: 10 }`",
+        "keyInsight": "push 一个对象会在堆上创建新对象，数组持有对它的引用。",
+        "visualizationType": "scope",
+        "code": "tasks.push({ name: name, result: result });",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}]",
+                  "keyword": "const",
+                  "changed": true
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": true,
+                  "keyword": "let"
+                }
+              ]
+            },
+            {
+              "name": "heavyTask()",
+              "type": "function",
+              "variables": [
+                {
+                  "name": "name",
+                  "value": "'Task A'",
+                  "keyword": "param"
+                },
+                {
+                  "name": "result",
+                  "value": 10,
+                  "keyword": "let"
+                }
+              ]
+            }
+          ],
+          "highlightScope": "Global",
+          "highlightVariable": "tasks"
+        }
+      },
+      {
+        "title": "阻塞状态解除",
+        "explanation": "设置 `uiBlocked = false`。\nUI 可以重新响应了。",
+        "visualizationType": "scope",
+        "code": "uiBlocked = false;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": false,
+                  "keyword": "let",
+                  "changed": true
+                },
+                {
+                  "name": "result1",
+                  "value": 10,
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "uiBlocked"
+        }
+      },
+      {
+        "title": "开始第二个任务",
+        "explanation": "调用 `heavyTask('Task B')`。\n主线程再次被阻塞。",
+        "keyInsight": "同步代码按顺序执行。任务 A 完成后任务 B 才能开始。",
+        "visualizationType": "scope",
+        "code": "const result2 = heavyTask('Task B');",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}, {Task B: 10}]",
+                  "keyword": "const",
+                  "changed": true
+                },
+                {
+                  "name": "uiBlocked",
+                  "value": false,
+                  "keyword": "let"
+                },
+                {
+                  "name": "result1",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "result2",
+                  "value": 10,
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "result2"
+        }
+      },
+      {
+        "title": "汇总结果",
+        "explanation": "将两个任务的结果相加。\n`result1(10) + result2(10) = 20`",
+        "visualizationType": "scope",
+        "code": "const total = result1 + result2;",
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}, {Task B: 10}]",
+                  "keyword": "const"
+                },
+                {
+                  "name": "result1",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "result2",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "total",
+                  "value": 20,
+                  "keyword": "const",
+                  "new": true
+                }
+              ]
+            }
+          ],
+          "highlightVariable": "total"
+        }
+      },
+      {
+        "title": "检查最终结果",
+        "explanation": "打印 tasks 数组和 total。\n我们可以确认两个任务按顺序完成了。",
+        "keyInsight": "只有所有同步工作完成后，事件循环才能处理其他任务。",
+        "visualizationType": "scope",
+        "code": "console.log(tasks);",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "scopeState": {
+          "scopes": [
+            {
+              "name": "Global",
+              "type": "global",
+              "variables": [
+                {
+                  "name": "tasks",
+                  "value": "[{Task A: 10}, {Task B: 10}]",
+                  "keyword": "const",
+                  "accessed": true
+                },
+                {
+                  "name": "result1",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "result2",
+                  "value": 10,
+                  "keyword": "const"
+                },
+                {
+                  "name": "total",
+                  "value": 20,
+                  "keyword": "const",
+                  "accessed": true
+                }
+              ]
+            }
+          ],
+          "output": [
+            "[{name:'Task A',result:10},{name:'Task B',result:10}]",
+            "20"
+          ],
+          "highlightScope": null,
+          "highlightVariable": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "当繁重的同步任务运行时会出现什么问题？",
+    "options": [
+      "发生内存泄漏",
+      "UI 变得无响应（冻结）",
+      "网络请求被取消",
+      "变量被重置"
+    ],
+    "correctIndex": 1,
+    "explanation": "JavaScript 是单线程的——当繁重的同步任务占据主线程时，UI 事件（点击、滚动）无法被处理，屏幕看起来像冻结了一样。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "JavaScript 是多线程的，可以同时处理多个任务",
+      "correct": "JavaScript 只有一个主线程。\n需要使用 Web Workers 才能在单独的线程上运行代码。",
+      "why": "浏览器有专门的渲染线程、网络线程等，但 JS 代码只在主线程上运行。"
+    },
+    {
+      "wrong": "运行速度快的 for 循环不会影响 UI",
+      "correct": "大量迭代时，UI 可能冻结数秒。",
+      "why": "超过百万次迭代的循环会导致明显的卡顿。\n这样的工作应该拆分成小块或交给 Worker 处理。"
+    }
+  ],
+  "keyTakeaway": "单线程 = 同一时间只能做一件事。繁重的同步工作会阻塞 UI——使用分块或 Web Workers。"
+}

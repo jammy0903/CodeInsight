@@ -1,0 +1,135 @@
+{
+  "lessonId": "java-2-2",
+  "title": "Null Check Patterns",
+  "concept": "There are several patterns for safely handling null",
+  "content": {
+    "code": "String str = getValueMaybeNull();\n\nif (str != null && str.length() > 0) {\n    System.out.println(str);\n}\n\nObjects.requireNonNull(str, \"str must not be null\");\n\nString result = (str != null) ? str : \"default\";\n\nString value = Objects.requireNonNullElse(str, \"default\");",
+    "steps": [
+      {
+        "title": "Receiving a Possibly Null Value",
+        "explanation": "**Execution order:**\n1. `getValueMaybeNull()` is called.\n2. Returns a value (or `null`).\n3. Stored in the `str` variable.\n\n**Situation:** When receiving values from external sources (DB, API, user input), you must always suspect they could be `null`.\nThis `str` is like a time bomb that could go off at any moment.",
+        "visualizationType": "javaMemory",
+        "code": "String str = getValueMaybeNull();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            }
+          ],
+          "note": "Always consider the possibility of null from external input",
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Short-circuit Evaluation",
+        "explanation": "**Execution order:**\n1. Check `str != null` -> **false** (if it's null).\n2. **Immediately stops** (the subsequent `str.length()` is not executed).\n\n**The magic of logical operators:** The `&&` (AND) operator doesn't even check the right side if the left condition is `false`.\nBy checking `str != null` first, if it's `null`, the subsequent `str.length()` is never executed, safely avoiding a `NullPointerException`.",
+        "keyInsight": "&& short-circuit: if the left is false, the right is not executed",
+        "visualizationType": "javaMemory",
+        "code": "if (str != null && str.length() > 0) {",
+        "javaMemoryState": {
+          "evaluation": "str != null -> false -> code after && is not executed",
+          "note": "Order matters! Null check comes first"
+        }
+      },
+      {
+        "title": "Conditional Execution",
+        "explanation": "**Execution order:**\n1. If the preceding `if` condition is `true`...\n2. Execute `println(str)`.\n\nThis line is only executed when the entire `if` condition (`str != null && str.length() > 0`) is `true`.\nIt safely prints the output, guaranteed that `str` is a valid string.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(str);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "str",
+              "value": "\"hello\"",
+              "type": "String"
+            }
+          ],
+          "note": "This line is only reachable when str is safe",
+          "evaluation": null
+        }
+      },
+      {
+        "title": "Objects.requireNonNull (Fail-fast)",
+        "explanation": "**Execution order:**\n1. `Objects.requireNonNull(str, ...)` is called.\n2. Checks if `str` is `null`.\n3. If `null`, throws an exception immediately.\n\n**Fail-fast strategy:** \"If there's a problem, don't let it cause weird issues later -- crash clearly right now!\" If `str` is `null`, it immediately throws a `NullPointerException` with a clear message, making debugging easier.",
+        "keyInsight": "Fail-fast pattern",
+        "visualizationType": "javaMemory",
+        "code": "Objects.requireNonNull(str, \"str must not be null\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            }
+          ],
+          "output": [
+            "Exception: str must not be null"
+          ],
+          "note": "If null, fails immediately with a clear error message"
+        }
+      },
+      {
+        "title": "Providing a Default with Ternary Operator",
+        "explanation": "**Execution order:**\n1. Check `str != null`.\n2. If true, select `str`; if false, select `\"default\"`.\n3. Assign the result to `result`.\n\nIf `str` is not `null`, it assigns `str` itself; if `null`, it assigns the default value `\"default\"` to the `result` variable.",
+        "visualizationType": "javaMemory",
+        "code": "String result = (str != null) ? str : \"default\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            },
+            {
+              "name": "result",
+              "value": "\"default\"",
+              "type": "String"
+            }
+          ],
+          "output": [],
+          "note": null
+        }
+      },
+      {
+        "title": "Objects.requireNonNullElse",
+        "explanation": "**Execution order:**\n1. `Objects.requireNonNullElse` is called.\n2. Internally performs a null check.\n3. If `null`, returns `\"default\"`.\n4. Assigns to `value`.\n\nA more readable approach available since Java 9.\nFunctionality is the same as the ternary operator, but the intent of \"if not null use this, otherwise use that\" is made clearly explicit.",
+        "keyInsight": "Java 9+: use requireNonNullElse",
+        "visualizationType": "javaMemory",
+        "code": "String value = Objects.requireNonNullElse(str, \"default\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "value",
+              "value": "\"default\"",
+              "type": "String"
+            }
+          ],
+          "note": "More readable code (Java 9+)"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the problem with if (str.length() > 0 && str != null)?",
+    "options": [
+      "Syntax error",
+      "NPE occurs if str is null",
+      "Always returns false",
+      "No problem"
+    ],
+    "correctIndex": 1,
+    "explanation": "The order is wrong.\nSince str.length() is executed first, if str is null, an NPE occurs.\nThe null check must always come first."
+  },
+  "misconceptions": [
+    {
+      "wrong": "The order of null checks doesn't matter",
+      "correct": "Order is critical.\nThe `null` check must always come first (leftmost).",
+      "why": "If you check from the right first, `null.method()` has already been executed, causing an NPE.\n`&&` reads from left to right and stops immediately when it encounters `false` (short-circuit evaluation)."
+    }
+  ],
+  "keyTakeaway": "Always put null checks first. Using Objects utility methods makes code cleaner."
+}

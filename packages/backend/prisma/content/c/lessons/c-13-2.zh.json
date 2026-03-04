@@ -1,0 +1,178 @@
+{
+  "lessonId": "c-13-2",
+  "title": "浮点数（float vs double）",
+  "concept": "计算机以近似值存储实数，double 比 float 更精确，但也不是完美的。",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    float f = 0.1f;\n    double d = 0.1;\n\n    printf(\"float:  %.20f\\n\", f);\n    printf(\"double: %.20f\\n\", d);\n\n    float sum = 0.0f;\n    for (int i = 0; i < 10; i++) {\n        sum += 0.1f;\n    }\n    printf(\"0.1 * 10 = %.20f\\n\", sum);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "通过 **`#include <stdio.h>`** 包含标准输入输出头文件以使用 `printf`。\n\n本课将学习一个令人震惊的事实：**计算机无法精确存储 0.1。**整数（int、long）可以完全精确地存储，但浮点数始终是近似值。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "**`int main()`** -- 程序的入口点，创建 main 栈帧。\n\n本课比较处理实数的两种类型：`float`（4 字节，6~7 位精度）和 `double`（8 字节，15~16 位精度），并探索**浮点误差**。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "声明 float 变量 - 4 字节实数",
+        "explanation": "**`float f = 0.1f;`** -- `float` 是 4 字节（32 位）浮点类型，通常提供 6~7 位精度。\n\n关键在于 `0.1` 在二进制中是无限循环小数，因此**无法精确存储**。",
+        "visualizationType": "cMemory",
+        "code": "float f = 0.1f;",
+        "stack": [
+          {
+            "name": "f",
+            "value": "0.1（近似值）",
+            "type": "float (4B)",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "声明 double 变量 - 8 字节实数",
+        "explanation": "**`double d = 0.1;`** -- `double` 为 8 字节（64 位），比 float 精确得多（约 15~16 位）。\n\n不过它同样无法完美存储 `0.1`，只是存储了更接近的近似值。",
+        "visualizationType": "cMemory",
+        "code": "double d = 0.1;",
+        "stack": [
+          {
+            "name": "f",
+            "value": "0.1（近似值）",
+            "type": "float (4B)",
+            "address": "0x1000"
+          },
+          {
+            "name": "d",
+            "value": "0.1（近似值）",
+            "type": "double (8B)",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "查看 float 的实际存储值",
+        "explanation": "**`printf(\"float:  %.20f\\n\", f);`** -- `%.20f` 表示"输出小数点后 20 位"。结果：`0.10000000149011611938`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"float:  %.20f\\n\", f);",
+        "stdout": "float:  0.10000000149011611938"
+      },
+      {
+        "title": "查看 double 的实际存储值",
+        "explanation": "**`printf(\"double: %.20f\\n\", d);`** -- double 存储的 0.1 的实际值：`0.10000000000000000555`。比 float（0.1000000014...）更接近 0.1，但第 16 位之后出现了 `555` 这样的误差。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"double: %.20f\\n\", d);",
+        "stdout": "float:  0.10000000149011611938\ndouble: 0.10000000000000000555"
+      },
+      {
+        "title": "误差的累积 - 循环开始",
+        "explanation": "**`float sum = 0.0f;`** -- 实验浮点误差在实际中会造成什么问题。将 `0.1` 加 10 次，能精确得到 `1.0` 吗？",
+        "visualizationType": "cMemory",
+        "code": "float sum = 0.0f;",
+        "stack": [
+          {
+            "name": "f",
+            "value": "0.1（近似值）",
+            "type": "float (4B)",
+            "address": "0x1000"
+          },
+          {
+            "name": "d",
+            "value": "0.1（近似值）",
+            "type": "double (8B)",
+            "address": "0x1004"
+          },
+          {
+            "name": "sum",
+            "value": "0.0",
+            "type": "float (4B)",
+            "address": "0x100C"
+          }
+        ]
+      },
+      {
+        "title": "将 0.1 加 10 次",
+        "explanation": "**`for (int i = 0; i < 10; i++) { sum += 0.1f; }`** -- 将 `0.1f` 加 10 次。每次相加时，近似值的误差都会一点点累积。",
+        "visualizationType": "cMemory",
+        "code": "for (int i = 0; i < 10; i++) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "stack": [
+          {
+            "name": "f",
+            "value": "0.1（近似值）",
+            "type": "float (4B)",
+            "address": "0x1000"
+          },
+          {
+            "name": "d",
+            "value": "0.1（近似值）",
+            "type": "double (8B)",
+            "address": "0x1004"
+          },
+          {
+            "name": "sum",
+            "value": "1.0000001（近似值）",
+            "type": "float (4B)",
+            "address": "0x100C"
+          },
+          {
+            "name": "i",
+            "value": "10",
+            "type": "int (4B)",
+            "address": "0x1010"
+          }
+        ]
+      },
+      {
+        "title": "查看累积结果",
+        "explanation": "**`printf(\"0.1 * 10 = %.20f\\n\", sum);`** -- 结果可能不是精确的 1.0。因为 `0.1f` 的近似误差在 10 次加法中不断累积。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"0.1 * 10 = %.20f\\n\", sum);",
+        "stdout": "float:  0.10000000149011611938\ndouble: 0.10000000000000000555\n0.1 * 10 = 1.00000011920928955078"
+      },
+      {
+        "title": "程序终止",
+        "explanation": "**`return 0;`** -- 程序正常终止，随着 main 栈帧的释放，所有变量从内存中消失。\n\n本课核心：计算机中的实数始终是**近似值**，double（8B，15 位）比 float（4B，7 位）更精确。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下代码的结果是什么？`float x = 0.1f; if (x == 0.1f) printf(\"相等\"); else printf(\"不相等\");`",
+    "options": [
+      "始终输出'相等'",
+      "始终输出'不相等'",
+      "输出'相等'，但 0.1f 和数学上的 0.1 并不完全相同",
+      "产生编译错误"
+    ],
+    "correctIndex": 2,
+    "explanation": "由于比较的是相同的近似值，所以输出'相等'。\n但内存中存储的值并非精确的 0.1，而是近似值。\n将 `0.1f` 与 `0.1`（double）进行比较可能得到不同的结果。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "double 可以精确存储实数。",
+      "correct": "double 也存储近似值，只是比 float 更精确，并非没有误差。",
+      "why": "将十进制小数用二进制表示时经常产生无限循环小数，有限的位数无法容纳精确值。"
+    }
+  ],
+  "keyTakeaway": "float（4B）和 double（8B）都存储近似值；比较浮点数时应使用误差范围（epsilon）而非 ==。"
+}

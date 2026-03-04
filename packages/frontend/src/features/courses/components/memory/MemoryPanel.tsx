@@ -2,7 +2,7 @@
  * MemoryPanel - 레슨용 메모리 시각화 (오케스트레이터)
  *
  * 구조:
- * - Stack: 스택 프레임별 색상, 배열 그룹핑, RSP/RBP 표시
+ * - Stack: 스택 프레임별 색상, 배열 그룹핑
  * - Heap: 동적 할당 영역
  * - Lower: BSS / Data / Text 섹션
  */
@@ -19,7 +19,6 @@ export function MemoryPanel({
   heap,
   changedBlocks = INITIAL_CHANGED_BLOCKS,
   frames = [{ name: 'main' }],
-  showRegisters = true,
   dataSection = [],
   textSection = [],
 }: MemoryPanelProps) {
@@ -40,7 +39,6 @@ export function MemoryPanel({
             blocks={stack}
             changedBlocks={changedBlocks}
             frames={frames}
-            showRegisters={showRegisters}
           />
           <HeapSection
             blocks={heap}

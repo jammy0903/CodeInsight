@@ -1,0 +1,248 @@
+{
+  "lessonId": "py-5-1",
+  "title": "Class & Object",
+  "concept": "A class is a blueprint, an object is the product",
+  "content": {
+    "code": "# 1. 클래스 정의 (설계도)\nclass Dog:\n    pass\n\n# 2. 객체 생성 (제품)\nmy_dog = Dog()\nyour_dog = Dog()\n\n# 3. 속성 추가 (파이썬만의 특징)\nmy_dog.name = \"Buddy\"\n# your_dog에도 name이 있을까요?\n\nprint(my_dog.name)",
+    "steps": [
+      {
+        "title": "Class Definition (Blueprint)",
+        "explanation": "**`class Dog:`**\n\nPython executes code from top to bottom in order.\nThe `class` keyword defines a **class (blueprint)** named `Dog`.\n\n**What is a class?** A class is a **blueprint** for creating objects. Think of it like a cookie cutter -- the cutter itself isn't a cookie, but you can use it to **stamp out multiple cookies (objects) of the same shape**. The `Dog` class is a blueprint for the concept of \"dog,\" and you can create actual dog objects from this blueprint.\n\n**Python internals**: When Python encounters the `class Dog:` statement:\n1. It **executes the class body** (indented code) from top to bottom\n2. Collects the results to create a **class object**\n3. Binds it to the name `Dog` in the current namespace\n4. Fun fact: In Python, **a class itself is also an object**! (An instance of the `type` metaclass)\n\n**Class naming convention (PEP 8)**: Class names should use **PascalCase** (capitalize the first letter). Like `Dog`, `MyClass`, `StudentGrade`. Variables and functions use `snake_case`.\n\n**Why this order?** The class must be defined (registered) first so that later we can use this blueprint to create objects. Calling `Dog()` before the definition would raise a `NameError`.\n\n**Execution order**: Execute class Dog -> Execute class body -> Create Dog class object -> Register in namespace -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "class Dog:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Class definition begins",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "pass (Empty Body)",
+        "explanation": "**`pass`**\n\n`pass` is Python's **\"do nothing\"** keyword. As the word \"pass\" suggests, it simply **passes through without doing anything**.\n\n**Why is `pass` needed?** Python uses indentation to define code blocks. After `class Dog:`, there **must be at least one** indented line in the body. If the body is empty, Python raises an `IndentationError`! `pass` prevents this error while communicating \"I'll add code here later.\"\n\nAnalogy: It's like marking an empty room on a building blueprint. \"There's a room here, but no furniture has been placed yet.\"\n\n**Other places where `pass` is used**:\n- Empty function: `def todo(): pass`\n- Empty conditional: `if condition: pass`\n- Empty loop: `for i in range(10): pass`\n- Empty exception handler: `except: pass` (but this is discouraged!)\n\n**Class definition complete**: The `Dog` class is now registered in memory. Currently this class has no attributes and no methods -- it's an **empty blueprint**. But even this empty blueprint can create objects!\n\n**Execution order**: Execute pass (nothing happens) -> Dog class body execution complete -> Class registration complete -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "pass",
+        "pythonMemoryState": {
+          "note": "Class body execution complete (pass)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the First Object",
+        "explanation": "**`my_dog = Dog()`**\n\n**Instantiation**: Calling `Dog()` creates a **new Dog object (instance)**. The parentheses `()` are **very important** here!\n\n**`Dog` vs `Dog()` -- The difference parentheses make**:\n- `Dog` (no parentheses): References the class object itself (looking at the blueprint)\n- `Dog()` (with parentheses): **Calls** the class to **create** a new instance (making a product from the blueprint)\n\n**Blueprint vs Product**:\n- `Dog` (class, 0x1000): The cookie cutter -- the blueprint for making products\n- `my_dog` (instance, 0x2000): The **first cookie** stamped from this cutter\n\n**Python internals**: When `Dog()` is called:\n1. `Dog.__new__(Dog)` is called -> Allocates a **blank object** (0x2000) in memory\n2. `Dog.__init__(new_object)` is called -> Initializes the object (here, no `__init__` exists so only default initialization)\n3. Returns the **reference (address 0x2000)** of the initialized object\n4. The variable `my_dog` receives and binds to this reference\n\n**Note**: What's stored in `my_dog` is not the object itself but a **reference (address) pointing to the object**. All variables in Python store references.\n\n**Execution order**: Call Dog() -> Create object 0x2000 via __new__ -> Execute __init__ (pass) -> Assign reference 0x2000 to my_dog -> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "my_dog = Dog()",
+        "pythonMemoryState": {
+          "note": "First Dog object created (0x2000)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Second Object",
+        "explanation": "**`your_dog = Dog()`**\n\nCalling `Dog()` creates **yet another new Dog object**.\n\n**Key concept -- Same blueprint, different products**:\n- `my_dog` -> 0x2000 (first dog object)\n- `your_dog` -> 0x3000 (second dog object)\n- These two are **completely separate, independent objects**!\n\nAnalogy: If you stamp two cookies from the same cookie cutter (Dog class), they look the same but are **physically two different cookies**. Eating one cookie doesn't affect the other.\n\n**One class, unlimited objects**: You can create as many objects (products) as you want from the same class (blueprint). 10, 100, 1000 -- no limit! This is one of the biggest advantages of classes.\n\n**Python internals**: When `Dog()` is called, the same `__new__` + `__init__` process creates a **completely new memory space (0x3000)** for the object. It is entirely independent from the previous object (0x2000).\n\n**What about `my_dog is your_dog`?** It returns `False`! They point to different memory addresses.\n\n**Execution order**: Call Dog() -> Create new object 0x3000 via __new__ -> Assign reference 0x3000 to your_dog -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "your_dog = Dog()",
+        "pythonMemoryState": {
+          "note": "Second Dog object created (0x3000, different from my_dog)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "your_dog",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dynamic Attribute Addition (Python Feature)",
+        "explanation": "**`my_dog.name = \"Buddy\"`**\n\n**Dynamic Attribute**: This is a special feature unique to Python! You can freely add attributes to an object **even after** it has been created.\n\nAnalogy: It's like sticking a \"Name: Buddy\" label on an empty box (object). Since we only put the label on the `my_dog` box, the `your_dog` box does not have this label!\n\n**Comparison with other languages**:\n- **Java/C++**: Only attributes declared in the class can be used (static typing)\n- **Python**: New attributes can be added to an object **at any time** (dynamic typing)\n- However, in practice, defining attributes in `__init__` is **strongly recommended**!\n\n**The dot (`.`) operator**: Used to access an object's attributes:\n- `object.attribute = value` -> **Add or modify** an attribute (write)\n- `object.attribute` -> **Read** the attribute value",
+        "visualizationType": "pythonMemory",
+        "code": "my_dog.name = \"Buddy\"",
+        "pythonMemoryState": {
+          "note": "name attribute added only to my_dog (your_dog has none)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "your_dog",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='Buddy'>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Accessing Attributes and Output",
+        "explanation": "**`print(my_dog.name)`**\n\nUsing the dot (`.`) operator, we access the `name` attribute of the `my_dog` object to read its value (`\"Buddy\"`) and print it.\n\n**Why does it work?** Because we added the `name` attribute with `my_dog.name = \"Buddy\"` on line 10. Python looks up the key `'name'` in `my_dog`'s `__dict__` and returns `\"Buddy\"`.\n\n**What if we ran `print(your_dog.name)`?** We'd get `AttributeError: 'Dog' object has no attribute 'name'`! The `name` attribute **doesn't exist** on the `your_dog` object. This is the **danger of dynamic attribute addition** -- some objects may have an attribute while others don't.\n\n**Python internals -- Attribute lookup order**:\n1. First, search `my_dog.__dict__` (instance dictionary) for `'name'`\n2. If not found, search `Dog.__dict__` (class dictionary)\n3. If not found, search parent classes (inheritance chain)\n4. If not found anywhere, raise `AttributeError`!\n\n**Key takeaways from this lesson**:\n- Use `class` to create a blueprint, and `()` to create a product (object)\n- You can create multiple independent objects from the same blueprint\n- In Python, attributes can be dynamically added to objects (but using `__init__` is recommended!)\n- Each object's attributes are **completely independent**\n\n**Execution order**: Search my_dog.__dict__ for name -> Return \"Buddy\" -> Execute print -> Program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(my_dog.name)",
+        "pythonMemoryState": {
+          "output": [
+            "Buddy"
+          ],
+          "note": "my_dog.name access succeeds (your_dog.name would error!)",
+          "names": [
+            {
+              "name": "Dog",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "my_dog",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "your_dog",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Dog object, name='Buddy'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Dog object>",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the recommended naming convention for classes?",
+    "options": [
+      "snake_case (my_class)",
+      "camelCase (myClass)",
+      "PascalCase (MyClass)",
+      "UPPER_CASE (MY_CLASS)"
+    ],
+    "correctIndex": 2,
+    "explanation": "Class names use PascalCase with the first letter capitalized.\nFunctions and variables use snake_case."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You must declare all variables inside the class first",
+      "correct": "In Python, that's not required.",
+      "why": "However, it's generally recommended to define attributes in the `__init__` method.\nAdding them haphazardly can get confusing later."
+    }
+  ],
+  "keyTakeaway": "Use `class` for the blueprint and `()` to create objects. Attributes can even be added later."
+}

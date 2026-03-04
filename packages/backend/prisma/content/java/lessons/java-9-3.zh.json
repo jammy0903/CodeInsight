@@ -1,0 +1,111 @@
+{
+  "lessonId": "java-9-3",
+  "title": "Stop-the-World：清洁工的方式",
+  "concept": "当 GC 运行时，程序会暂时停顿。这被称为"Stop-the-World"，减少这个停顿时间是 GC 算法的核心目标。",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"열심히 일하는 중...\");\n        \n        // GC가 발동하면?\n        // 모든 스레드가 일시 정지(Stop)합니다.\n        \n        System.out.println(\"다시 일하는 중!\");\n    }\n}",
+    "steps": [
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n观察 GC 执行时发生的"停顿现象"。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        },
+        "code": "public static void main(String[] args) {"
+      },
+      {
+        "title": "正常执行",
+        "explanation": "程序正在正常运行。\nCPU 正在忙碌地工作。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "열심히 일하는 중..."
+          ],
+          "heap": []
+        },
+        "code": "System.out.println(\"열심히 일하는 중...\");"
+      },
+      {
+        "title": "冻结！（Stop-the-World）",
+        "explanation": "为了内存清理（GC），**所有线程都"冻结"并停止。**\n就像清洁工在给地板打蜡时，谁都不能走过一样。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "STOPPED",
+              "frame": "main"
+            },
+            {
+              "name": "GC",
+              "value": "Cleaning...",
+              "frame": "system"
+            }
+          ],
+          "heap": [
+            {
+              "address": "Heap",
+              "content": "Cleaning Garbage...",
+              "note": "Reclaiming Memory"
+            }
+          ],
+          "warning": "所有线程已停止 (STW)",
+          "output": []
+        },
+        "code": "// 모든 스레드가 일시 정지(Stop)합니다.",
+        "highlightOffset": [
+          0,
+          1
+        ]
+      },
+      {
+        "title": "解冻！（恢复执行）",
+        "explanation": "清理结束后，之前冻结的任务继续运行。\n如果这个停顿时间太长，用户就会感觉到"卡顿"。",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "다시 일하는 중!"
+          ],
+          "heap": []
+        },
+        "code": "}"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "JVM 为执行 GC 而暂停应用程序运行的现象叫什么？",
+    "options": [
+      "Wait-and-See",
+      "Stop-the-World",
+      "Halt-Process",
+      "GC-Freeze"
+    ],
+    "correctIndex": 1,
+    "explanation": "除了执行 GC 的线程外，所有线程都停止的现象被称为 Stop-the-World（STW）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "有了 GC 就完全不用担心内存问题。",
+      "correct": "不是的！要让 GC 正常清理，必须使对象处于"无人使用"的状态。",
+      "why": "如果不知不觉地在角落堆积东西（保持引用），清洁工也无法清理。"
+    }
+  ],
+  "keyTakeaway": "GC 算法的发展一直朝着最小化 STW 停顿时间的方向前进。"
+}

@@ -1,0 +1,250 @@
+{
+  "lessonId": "py-7-2",
+  "title": "del关键字",
+  "concept": "del删除的是名称（引用），不是对象！这是容易混淆的重点！",
+  "content": {
+    "code": "a = [1, 2, 3]\nb = a  # 같은 객체\n\nprint(f\"b 삭제 전: {a}\")\n\ndel b  # b 참조만 삭제!\n\nprint(f\"a는 여전히: {a}\")\n\ntry:\n    print(b)  # NameError!\nexcept NameError:\n    print(\"b는 더 이상 존재하지 않음\")",
+    "steps": [
+      {
+        "title": "创建对象",
+        "explanation": "**`a = [1, 2, 3]`**\n\nPython在内存(0x2000)中创建一个新的**列表对象`[1, 2, 3]`**，并让变量`a`指向该对象。\n\n**理解变量和对象的关系是本课的核心！**\n- **对象**：实际存在于内存中的数据（列表`[1, 2, 3]`，地址0x2000）\n- **变量**：指向对象的标签（可以想象成箭头）\n\n**类比：房子和地址**\n房子（对象）位于某某路123号(0x2000)，`a`是一张写着该地址的便条。\n即使撕掉便条（`del a`），房子依然在那里！\n\n**为什么是这个顺序？** 这是程序的第一行，Python最先执行它。\n我们先准备好对象，以便后面演示`del`的效果。\n\n**内存状态**：对象0x2000的refcount = 1（只有a引用它）\n\n**执行顺序**：在内存中创建列表[1, 2, 3]对象(ID: 0x2000) -> 变量a引用0x2000 -> refcount = 1 -> 第2行",
+        "visualizationType": "pythonMemory",
+        "code": "a = [1, 2, 3]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "变量a引用列表对象0x2000 (refcount=1)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建别名（引用）",
+        "explanation": "**`b = a`**\n\n将变量`b`连接为指向与`a`**相同的对象(0x2000)**。\n这称为**别名(alias)**。\n\n**并没有创建新的列表！**\n`a`和`b`是不同的名称，但它们都指向内存中相同的位置(0x2000)。\n一个对象上贴了两个标签。\n\n**类比：同一栋房子的第二把钥匙**\n`a`是原来的钥匙，`b = a`是复制的那把钥匙。\n两把钥匙都能打开同一扇门。\n即使扔掉一把钥匙（`del b`），你仍然可以用另一把钥匙（`a`）进去。\n\n**引用计数变化**：refcount 1 -> 2（变量`a` + 变量`b`）\n\n**注意**：`b = a`之后，通过`b`修改列表也会在`a`中看到。\n例如：`b.append(99)` -> `a`也变成`[1, 2, 3, 99]`！\n\n**为什么是这个顺序？** 要演示`del`的效果，首先需要一个指向同一对象的第二个变量。\n\n**执行顺序**：确认变量a指向的对象0x2000 -> 设置b也引用0x2000 -> refcount从1增加到2 -> 第4行",
+        "visualizationType": "pythonMemory",
+        "code": "b = a  # 같은 객체",
+        "pythonMemoryState": {
+          "note": "a和b引用相同的对象0x2000 (refcount=2)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查删除前的状态",
+        "explanation": "**`print(f\"b 삭제 전: {a}\")`**\n\n在执行`del b`**之前**检查当前状态。\n展示通过`a`可以正常访问列表对象。\n\n**为什么要先打印删除前的状态？**\n做实验时，比较"变更前"和"变更后"可以清楚地看到差异。\n这起到了科学实验中**对照组**的作用。\n\n**当前内存状态总结**：\n- 对象`[1, 2, 3]`位于内存0x2000处\n- `a` -> 0x2000（可访问）\n- `b` -> 0x2000（可访问）\n- refcount = 2\n\n**输出结果**：`b 삭제 전: [1, 2, 3]` - 通过a正常访问了列表\n\n**为什么是这个顺序？** 在执行`del b`之前，先确认"现在a和b都正常"，以便与删除后的状态进行比较。\n\n**执行顺序**：计算f-string内部的{a} -> 从0x2000获取值[1, 2, 3] -> 输出\"b 삭제 전: [1, 2, 3]\" -> 第6行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"b 삭제 전: {a}\")",
+        "pythonMemoryState": {
+          "output": [
+            "b 삭제 전: [1, 2, 3]"
+          ],
+          "note": "通过a访问对象0x2000并打印",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ]
+        }
+      },
+      {
+        "title": "删除引用（del）",
+        "explanation": "**`del b`**\n\n这是本课的**核心要点**！\n`del b`从Python的命名空间中完全移除**名称（引用）`b`本身**。\n\n**del做了什么（精确行为）**：\n1. 从命名空间中移除名称`b`\n2. 将对象0x2000的refcount减少1（2 -> 1）\n3. 之后使用`b`会引发NameError\n\n**del没有做什么（初学者常见的误解！）**：\n- 它**没有**删除列表对象`[1, 2, 3]`！\n- 对象仍在内存中，由于`a`在引用它，refcount = 1 > 0，所以不会被删除。\n\n**类比：从名册上擦除名字**\n学校的出勤名册（命名空间）上`b`这个学生的名字被擦掉了。\n但`b`使用的教科书（对象）不会被回收，因为`a`也在使用它。\n教科书只有在没人使用时（refcount=0）才会被归还。\n\n**del与None赋值的区别**：`del b`消除变量本身（NameError）。`b = None`保留变量但使其指向None。\n\n**为什么是这个顺序？** 确认了"删除前"的状态后，现在实际执行`del`来观察效果。\n\n**执行顺序**：从命名空间移除变量b -> 0x2000的refcount从2减少到1 -> refcount > 0所以对象保留 -> 第8行",
+        "visualizationType": "pythonMemory",
+        "code": "del b  # b 참조만 삭제!",
+        "pythonMemoryState": {
+          "note": "变量b已删除！但对象0x2000仍被a引用 (refcount=1)",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "确认对象存活",
+        "explanation": "**`print(f\"a는 여전히: {a}\")`**\n\n**证明**即使在`del b`之后，`a`仍然可以访问列表。\n\n**这是关键证据！**\n如果`del b`删除了对象，通过`a`也应该无法访问。\n但`a`毫无问题地输出了`[1, 2, 3]`。\n这清楚地表明**`del`只删除了名称，没有触及对象**。\n\n**类比**：同一栋房子上的两块门牌中，一块（`b`）被取下了，但你仍然可以用剩下的门牌（`a`）访问同一栋房子。\n房子（对象）本身没有任何变化。\n\n**验证要点**：\n- 对象0x2000完好地存在于内存中\n- `a` -> 0x2000 访问正常\n- 输出：`a는 여전히: [1, 2, 3]`\n\n**为什么是这个顺序？** `del b`后立即确认对象仍然存活，以清楚地理解del的行为。\n\n**执行顺序**：计算f-string内部的{a} -> 从0x2000获取值[1, 2, 3] -> 输出\"a는 여전히: [1, 2, 3]\" -> 第10行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a는 여전히: {a}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a는 여전히: [1, 2, 3]"
+          ],
+          "note": "对象0x2000存活着，可通过a访问！",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "尝试触发错误（try）",
+        "explanation": "**`try:`**\n\n使用`try...except`语句进行**异常处理**。\n为什么需要异常处理？因为`del b`已经完全删除了变量`b`，使用`b`会导致错误。\n\n**try块的作用**："执行这里面的代码，但如果出错，不要停止程序，而是交给except块处理。"\n\n**类比：安装安全网**\n就像在马戏团表演空中飞人前在地面铺设安全网(try)一样。\n即使掉下来（发生错误），安全网会接住你，表演（程序）可以继续。\n\n**如果没有try？**\n如果不用try直接执行`print(b)`，会发生`NameError`，整个程序会**立即停止**。\n使用try...except可以优雅地处理错误并继续运行程序。\n\n**为什么是这个顺序？** 既然名称已被`del b`删除，现在检查访问被删除的名称是否真的会出错。\n\n**执行顺序**：进入try块 -> 开始执行try块内的代码 -> 如果发生错误，准备跳转到except",
+        "visualizationType": "pythonMemory",
+        "code": "try:",
+        "pythonMemoryState": {
+          "note": "进入try块 - b已被删除",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "发生NameError",
+        "explanation": "**`print(b)`**\n\n尝试使用已删除的变量`b`。\nPython在命名空间中查找名称`b`，但由于`del b`已将其移除，找不到了！\n\n**引发的错误**：`NameError: name 'b' is not defined`\n\n**这展示了`del`的第二个效果**：\n1. 减少引用计数（在前一步已确认）\n2. 变量名本身消失（在这一步确认）<-- 就是这个！\n\n**类比：在电话簿中查找名字**\n你在电话簿（命名空间）中试图查找`b`，但`b`这个名字根本不在电话簿里。\n你得到的回答是"查无此人"（NameError）。\n\n**`del`和`None`的区别在这里变得清楚**：\n- `del b`：b完全消失 -> `print(b)` -> **NameError**\n- `b = None`：b保留但指向None -> `print(b)` -> 打印`None`\n\n**为什么是这个顺序？** 当try块内发生错误时，跳过剩余的try代码，立即跳转到except。\n\n**执行顺序**：print()尝试计算参数b -> 在命名空间中搜索'b' -> 未找到 -> 引发NameError -> 控制流转移到except块",
+        "visualizationType": "pythonMemory",
+        "code": "print(b)  # NameError!",
+        "pythonMemoryState": {
+          "note": "发生NameError！名称'b'不存在",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "捕获错误（except）",
+        "explanation": "**`except NameError:`**\n\n由于try块中引发了**`NameError`**异常，Python将控制转移到这个except块。\n\n**except的工作原理**：\n1. try块中发生了异常\n2. Python从上到下检查except子句\n3. 引发的异常类型(NameError)与except中指定的类型(NameError)匹配！\n4. 进入该except块内部\n\n**类比：安全网启动的瞬间**\n在马戏团空中飞人表演中掉下来的人（发生错误）被安全网（except）接住了。\n多亏了安全网，表演（程序）可以继续而不会中断。\n\n**如果写的是`except TypeError:`呢？**\n发生的错误是NameError，但except只捕获TypeError，不匹配，程序就会崩溃。\n必须指定正确的异常类型！\n\n**为什么是这个顺序？** 由于引发了NameError，Python的异常处理机制自动移动到except块。\n\n**执行顺序**：确认引发的异常类型(NameError) -> 与except子句的类型(NameError)比较 -> 匹配！-> 进入except块",
+        "visualizationType": "pythonMemory",
+        "code": "except NameError:",
+        "pythonMemoryState": {
+          "note": "进入except块 - 准备处理NameError",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出错误处理消息",
+        "explanation": "**`print(\"b는 더 이상 존재하지 않음\")`**\n\nexcept块内的代码执行，打印出`b`不再存在的消息。\n\n**本课的全部教训总结：**\n\n1. **`del b`只删除名称**：变量`b`从命名空间中完全消失了，但对象`[1, 2, 3]`完好无损。\n2. **对象只在refcount=0时才被删除**：由于`a`仍在引用，refcount=1，对象留在内存中。\n3. **访问已删除的变量会引发NameError**：名称`b`本身已消失，所有使用`b`的代码都会出错。\n\n**类比：从电话簿中删除的号码**\n你从电话簿中删除了`b`的号码(del)。试着给`b`打电话会得到"号码未注册"(NameError)。\n但`b`推荐的那家餐厅（对象）仍在营业，`a`也知道那家餐厅的地址，所以还可以去。\n\n**多亏了try-except**，即使发生了错误，程序也正常结束了。\n\n**执行顺序**：执行print() -> 输出\"b는 더 이상 존재하지 않음\" -> try-except块结束 -> 程序正常终止",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"b는 더 이상 존재하지 않음\")",
+        "pythonMemoryState": {
+          "output": [
+            "b는 더 이상 존재하지 않음"
+          ],
+          "note": "错误处理完成！对象0x2000可通过a访问",
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1001"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "执行del x后，如果y也引用了同一个对象会怎样？",
+    "options": [
+      "y也会发生NameError",
+      "y仍然可以访问对象",
+      "对象会损坏",
+      "y变成None"
+    ],
+    "correctIndex": 1,
+    "explanation": "del只删除名称x。\ny仍然指向同一个对象，所以可以正常访问！"
+  },
+  "misconceptions": [
+    {
+      "wrong": "del x会删除x指向的对象",
+      "correct": "del x只删除名称（引用）x",
+      "why": "对象只在refcount=0时才会被删除。\n如果还有其他名称指向它，对象就会存活！"
+    },
+    {
+      "wrong": "del后变量变成None",
+      "correct": "del后变量完全消失（NameError）",
+      "why": "x = None让x指向None。\ndel x则完全移除x！"
+    }
+  ],
+  "keyTakeaway": "del只删除名称（引用）！对象在refcount=0时自动删除！"
+}

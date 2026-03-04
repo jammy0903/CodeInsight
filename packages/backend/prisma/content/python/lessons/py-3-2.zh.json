@@ -1,0 +1,194 @@
+{
+  "lessonId": "py-3-2",
+  "title": "Tuples (Immutable)",
+  "concept": "和列表类似，但一旦创建就无法修改",
+  "content": {
+    "code": "# 1. 튜플 생성 (소괄호)\npoint = (10, 20)\n\n# 2. 읽기는 가능\nprint(point[0])\n\n# 3. 수정은 불가능!\n# point[0] = 99  # TypeError!\n\n# 4. 언패킹 (Unpacking)\nx, y = point\nprint(f\"x={x}, y={y}\")",
+    "steps": [
+      {
+        "title": "创建元组",
+        "explanation": "**`point = (10, 20)`** -- 使用小括号 `()` 创建元组对象，并将名称 `point` 绑定到它。\n\nPython 从上到下按顺序执行代码。小括号 `()` 是创建元组的语法。一个包含2个整数元素（10, 20）的元组对象被创建，`point` 这个名称指向该对象。\n\n**元组的核心特征 -- 与列表的比较：**\n\n**类比：** 如果列表是'用铅笔写的便条'，那么元组就是'刻在金属板上的铭文'。一旦刻上，就无法擦除或修改。\n\n**为什么需要 Immutable？**\n1. **安全性：** 防止意外修改数据，避免 bug\n2. **性能：** 不可变 -> Python 可以更高效地优化\n3. **字典键：** 列表不能用作键，但元组可以\n4. **意图表达：** 通过代码传达"此数据不应更改"的意图\n\n**Python 内部机制：** 元组对象的实现类似于列表的指针数组，但大小固定。创建后，修改内部数组的方法（`append`、`__setitem__` 等）根本不存在。此外，小元组（长度0-20）会被缓存在**空闲列表（free list）**中供复用。\n\n**注意：** 只有一个元素的元组必须加上**尾随逗号**：`(10,)`。`(10)` 只是括号里的数字10！\n\n**执行顺序**：line 2 -> 创建元组对象（id: 0x1000）-> point = 0x1000 -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "point = (10, 20)",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "读取元素（索引）",
+        "explanation": "**`print(point[0])`** -- 读取并输出元组索引0处的值 `10`。\n\n**读取是允许的：** 元组是 Immutable（不可修改），但**通过索引读取值是允许的**。只是不能修改，访问（读取）方式与列表完全相同。\n\n- `point[0]` -> `10`（第一个元素）\n- `point[1]` -> `20`（第二个元素）\n- `point[-1]` -> `20`（最后一个元素，负数索引）\n\n**类比：** 你可以**阅读**刻在金属板上的文字。只是不能修改它。\n\n**Immutable 限制的操作：**\n- `point[0] = 99` -- TypeError！\n- `point.append(30)` -- AttributeError！（方法本身不存在）\n- `del point[0]` -- TypeError！\n\n**Immutable 允许的操作：**\n- `point[0]` -- 读取 OK\n- `len(point)` -- 检查长度 OK\n- `10 in point` -- 成员检查 OK\n- `for x in point:` -- 遍历 OK\n\n**Python 内部机制：** `point[0]` 调用 `point.__getitem__(0)`。元组有 `__getitem__`（读取），但没有 `__setitem__`（写入），因此只能读取。\n\n**执行顺序**：访问 point[0] -> 读取 10 -> 执行 print(10) -> line 8（注释）",
+        "visualizationType": "pythonMemory",
+        "code": "print(point[0])",
+        "pythonMemoryState": {
+          "output": [
+            "10"
+          ],
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "尝试修改（报错）",
+        "explanation": "**`# point[0] = 99  # TypeError!`** -- 这是被注释掉的代码。如果执行此代码，将引发 TypeError。\n\n**感受 Immutable 的含义：** 如果移除注释（`#`）并执行这行：\n```\nTypeError: 'tuple' object does not support item assignment\n```\n会产生错误。元组在创建后**绝对不能更改内容**。\n\n**与列表的区别 -- 相同代码，不同结果：**\n- `fruits[0] = \"Grape\"` -> 正常运行（列表是 Mutable）\n- `point[0] = 99` -> **TypeError**（元组是 Immutable）\n\n**类比：** 列表是白板（可以擦除重写），元组是刻在石头上的碑文（永远不变）。\n\n**Python 内部机制：** `point[0] = 99` 试图调用 `point.__setitem__(0, 99)`。但 `tuple` 类**没有定义** `__setitem__` 方法，因此引发 TypeError。这是运行时错误（执行时发生），不是语法错误（SyntaxError）。\n\n**实际使用场景：** 对于**不应更改的数据**使用元组：坐标 `(x, y)`、RGB 颜色 `(255, 128, 0)`、数据库记录等。\n\n**执行顺序**：这是注释，不会实际执行 -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "# point[0] = 99  # TypeError!",
+        "pythonMemoryState": {
+          "note": "已注释，不会实际执行（不会报错）",
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "元组解包（Unpacking）",
+        "explanation": "**`x, y = point`** -- 按顺序将元组的各元素分配给各个变量。这被称为**解包（Unpacking）**。\n\n**解包的原理：** 将元组 `point` 的各元素**按顺序**分配给左侧的变量：\n- `point[0]`（= 10）-> 分配给 `x`\n- `point[1]`（= 20）-> 分配给 `y`\n\n**类比：** 打开礼物盒（元组），将里面的物品（10, 20）分别放在不同的地方（x, y）。\n\n这等价于将 `x = point[0]; y = point[1]` 写在一行中。\n\n**为什么方便？** 在函数返回多个值时特别有用：\n```python\ndef get_position():\n    return (10, 20)  # 返回元组（括号可省略）\nx, y = get_position()  # 解包直接分离\n```",
+        "visualizationType": "pythonMemory",
+        "code": "x, y = point",
+        "pythonMemoryState": {
+          "note": "Unpacking: point[0]->x, point[1]->y",
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "y",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 20,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出解包结果",
+        "explanation": "**`print(f\"x={x}, y={y}\")`** -- 使用 f-string 输出解包后的变量 `x`（10）和 `y`（20）。\n\n输出结果：`x=10, y=20`\n\n得益于解包，我们可以使用直观的名称（`x`、`y`）而不是通过 `point[0]`、`point[1]` 来访问值。\n\n**本课核心总结：**\n1. **元组是 Immutable** -- 创建后不可修改（`point[0] = 99` -> TypeError）\n2. **可以读取** -- 用 `point[0]` 访问值，用 `for x in point` 遍历\n3. **解包（Unpacking）** -- 用 `x, y = point` 方便地分离值\n4. **可用作字典键** -- `d = {(0, 0): \"origin\"}`（列表不行）\n5. **比列表更轻量更快** -- 内存占用更少，创建/访问速度更快\n\n**类比：** 元组是真空包装的食品。你可以取出来阅读（食用），但不能放回去或替换。适合不应更改的数据（坐标、颜色值、配置值等）。\n\n**Python 内部机制：** 元组比列表使用更少的内存。列表为动态大小调整预先分配额外空间，而元组只分配恰好需要的量。在 CPython 中，`sys.getsizeof((1,2))` < `sys.getsizeof([1,2])`。\n\n**执行顺序**：计算 f-string（x->10, y->20）-> 执行 print -> 程序结束",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"x={x}, y={y}\")",
+        "pythonMemoryState": {
+          "output": [
+            "x=10, y=20"
+          ],
+          "names": [
+            {
+              "name": "point",
+              "pointsTo": "tuple1"
+            },
+            {
+              "name": "x",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "y",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "tuple1",
+              "type": "tuple",
+              "value": "(10, 20)",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1002"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 20,
+              "pyId": "1003"
+            }
+          ],
+          "note": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "创建只有一个元素的元组，正确的写法是？",
+    "options": [
+      "(1)",
+      "[1]",
+      "(1,)",
+      "tuple(1)"
+    ],
+    "correctIndex": 2,
+    "explanation": "`(1)` 会被当作数学括号，结果是整数 1。\n要表明它是元组，必须加上逗号：`(1,)`"
+  },
+  "misconceptions": [
+    {
+      "wrong": "元组因为功能比列表少所以不好用",
+      "correct": "恰恰相反，它**更快、更轻量、更安全**。",
+      "why": "当数据保证不会改变时，就可以进行优化。\n还能用作字典的键（Key）（列表不行）。"
+    }
+  ],
+  "keyTakeaway": "不应改变的数据用元组！注意 `(val,)` 中的逗号。"
+}

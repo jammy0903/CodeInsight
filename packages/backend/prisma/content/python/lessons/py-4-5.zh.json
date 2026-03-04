@@ -1,0 +1,413 @@
+{
+  "lessonId": "py-4-5",
+  "title": "Return & Reference",
+  "concept": "函数返回的不是值，而是对象的引用！",
+  "content": {
+    "code": "def get_list():\n    data = [1, 2, 3]\n    return data\n\na = get_list()\nb = get_list()\n\nprint(f\"a: {a}\")\nprint(f\"b: {b}\")\nprint(f\"a is b: {a is b}\")",
+    "steps": [
+      {
+        "title": "定义返回列表的函数",
+        "explanation": "**`def get_list():`**\n\nPython 从上到下按顺序执行。\n定义名为 `get_list` 的函数。该函数的作用是**创建列表对象并返回**。\n\n**本课的核心问题**：\"函数 return 返回的是**值的副本**，还是**对象本身的引用**？\"\n理解了这个答案，就理解了 Python 的内存模型！\n\n类比：这个函数就像一个**面包工厂**。每次调用都会烤出**新的面包（列表对象）**。调用两次就会得到两个独立的面包。\n\n**Python 内部机制**：遇到 `def` 关键字时 Python 会：\n1. 将函数体代码编译为**代码对象（code object）**\n2. 创建包装该代码对象的**函数对象（function object）**\n3. 在当前命名空间中绑定为 `get_list`\n4. 函数体（line 2~3）**还不会执行**——等待被调用！\n\n**为什么这个顺序？** 必须先定义（注册）函数，才能在下面调用。定义前调用会引发 `NameError`。\n\n**执行顺序**：执行 def get_list -> 创建函数对象 -> 注册到命名空间 -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def get_list():",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "函数已定义（代码未执行）",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一次函数调用",
+        "explanation": "**`a = get_list()`**\n\n**首次调用**已定义的 `get_list` 函数。加 `()` 表示\"执行这个函数\"。\n\n**执行流跳转**：调用瞬间程序执行流**移动到函数内部（line 2）**。类比：读书时遇到\"请参阅附录 A\"，翻到附录页面。\n\n**Python 内部机制**：函数调用时 Python 会：\n1. 将**新的局部帧（local frame）**压入调用栈\n2. 将执行流移到函数体第一行（line 2）\n3. 函数结束（return）时弹出帧并**返回到调用位置（line 5）**\n4. 返回值（对象引用）赋给 `=` 左边的 `a` 变量\n\n**注意**：写 `a = get_list` 不加括号的话**不会调用**函数，而是将函数对象本身赋给 `a`！必须加 `()` 才能调用。\n\n**执行顺序**：line 5 -> 调用 get_list() -> 在调用栈中创建新帧 -> 跳转到 line 2",
+        "visualizationType": "pythonMemory",
+        "code": "a = get_list()",
+        "pythonMemoryState": {
+          "note": "调用 get_list() -> 即将跳转到 line 2",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建列表（第一次）",
+        "explanation": "**`data = [1, 2, 3]`**\n\n进入函数内部，创建**新的列表对象 `[1, 2, 3]`**。该对象存储在内存（堆区）的特定位置（如 0x2000）。\n\n**为什么每次都创建新对象？** 在 Python 中，列表字面量 `[1, 2, 3]` **每次被求值时都会创建新对象**。这与整数（`42`）或字符串（`\"hello\"`）不同——它们是不可变的所以可以复用相同的值，但列表是可变的所以必须创建独立的新对象。\n\n类比：就像面包工厂**新烤一个面包**。与之前烤的面包内容相同，但物理上是**完全不同的面包**。\n\n**函数作用域（Function Scope）**：`data` 是只在函数内部存在的**局部变量（local variable）**。函数结束时这个名称消失。但名称消失不代表对象消失！（通过 return 返回引用的话对象会继续存活。）\n\n**执行顺序**：line 2 -> 在堆中创建列表对象 [1, 2, 3]（0x2000）-> data 名称绑定到 0x2000 -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "data = [1, 2, 3]",
+        "pythonMemoryState": {
+          "note": "新列表对象 0x2000 已创建",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "data",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "返回列表（第一次）",
+        "explanation": "**`return data`**\n\n返回已创建的列表对象（0x2000）的**引用（reference）**。这是本课**最核心的概念**！\n\n**return 传递的是引用，不是副本！**\n1. 返回 `data` 所指对象的**内存地址（引用）**\n2. **不复制**列表内容 `[1, 2, 3]`！\n3. 函数结束后**返回到 line 5**\n\n类比：就像告诉朋友\"我家的地址\"。不是把整栋房子复制一份给他，而是给他**找到同一栋房子的地址**。返回的引用（地址）赋给 `a`，所以 `a` 也**指向 0x2000 处的同一个列表对象**。\n\n**为什么 data 名称消失后对象还活着？** Python 用**引用计数（Reference Counting）**管理内存。函数结束时 `data` 名称消失，但 `a` 引用着该对象，引用计数不为 0，**垃圾回收器会保留该对象**。\n\n**Python 内部机制**：return 执行时函数的局部帧从调用栈弹出，`data` 局部变量销毁。返回的引用值赋给调用点（line 5）的 `a`。\n\n**执行顺序**：return data -> 返回引用 0x2000 -> 释放局部帧 -> 回到 line 5 -> a = 0x2000 -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "return data",
+        "pythonMemoryState": {
+          "note": "a = 0x2000（第一个列表的引用）",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "第二次函数调用",
+        "explanation": "**`b = get_list()`**\n\n**第二次调用同一个函数**。执行流再次移动到**函数内部（line 2）**。\n\n**非常重要的概念**：这次调用是与上次**完全独立的新执行**！与第一次调用创建的列表（0x2000）**毫无关系**。类比：第二次向面包工厂下单——与第一个面包无关，会烤出**新的面包**。\n\n**Python 内部机制**：每次函数调用时：\n1. 在调用栈上创建**新的局部帧**\n2. 上次调用的局部变量（`data`）已经销毁\n3. 函数体**从头重新执行**\n4. **独立**创建新的列表对象\n\n**注意**：如果函数修改了**模块级变量（全局变量）**，之前调用的影响可能残留。但这个函数只使用局部变量，所以完全独立。\n\n**执行顺序**：line 6 -> 调用 get_list() -> 创建新局部帧 -> 跳转到 line 2",
+        "visualizationType": "pythonMemory",
+        "code": "b = get_list()",
+        "pythonMemoryState": {
+          "note": "再次调用 get_list() -> 即将跳转到 line 2",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建列表（第二次）",
+        "explanation": "**`data = [1, 2, 3]`**\n\n创建**又一个新的**列表对象。这次存储在不同的内存位置（如 0x3000）。\n\n**为什么一定是新对象？** 这是 Python 的**列表创建规则**：\n- 列表字面量 `[1, 2, 3]` **每次求值都会创建新对象**\n- 与第一次调用的列表（0x2000）是**完全不同的对象**（0x3000）\n- **内容相同**（`[1, 2, 3]`），但**内存地址不同**\n\n类比：用同一个食谱烤两次面包，味道和外形一样，但是**物理上不同的两个面包**。在一个面包上抹果酱，另一个面包不会自动出现果酱！\n\n**每次函数调用的独立作用域**：每次函数调用有**自己的局部帧**，所以这次的 `data` 和上次的 `data` 是完全不同的变量。只是名字相同而已。\n\n**执行顺序**：line 2 -> 在堆中创建新列表对象 [1, 2, 3]（0x3000）-> data = 0x3000 -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "data = [1, 2, 3]",
+        "pythonMemoryState": {
+          "note": "新列表对象 0x3000 已创建（与 0x2000 不同！）",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "data",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "返回列表（第二次）",
+        "explanation": "**`return data`**\n\n返回这次新创建的列表对象（0x3000）的**引用**。返回的引用赋给 `b`，所以 **`b` 指向 0x3000 对象**。\n\n**现在来确认关键的区别**：\n- `a` -> **0x2000**（第一次调用创建的列表）\n- `b` -> **0x3000**（第二次调用创建的列表）\n- 两个变量指向**不同的对象**！\n\n类比：给 `a` 的是\"江南区地址\"，给 `b` 的是\"瑞草区地址\"。两个地址的房子结构（内容）可能相同，但是**物理上不同的房子**。\n\n**Python 内部机制**：return 执行时第二次调用的局部帧从调用栈弹出。`data` 局部变量销毁，但 0x3000 对象因 `b` 引用而保留。此时内存中存在两个独立的列表对象（0x2000、0x3000）。\n\n**如果执行 `a.append(4)` 会怎样？** 只有 `a` 指向的 0x2000 列表变为 `[1, 2, 3, 4]`，`b` 指向的 0x3000 列表仍然是 `[1, 2, 3]`！\n\n**执行顺序**：return data -> 返回引用 0x3000 -> 释放局部帧 -> 回到 line 6 -> b = 0x3000 -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "return data",
+        "pythonMemoryState": {
+          "note": "b = 0x3000（第二个列表的引用，与 a 不同）",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出变量 a 的内容",
+        "explanation": "**`print(f\"a: {a}\")`**\n\n输出变量 `a` 指向的列表（0x2000）的内容。结果是 `a: [1, 2, 3]`。\n\n**f-string 的工作方式**：求值 `{a}` 时，Python 调用 `a` 指向的列表对象的 `__repr__()` 方法，得到字符串表示 `[1, 2, 3]`。这显示的是列表的**内容（值）**，而不是**内存地址**。\n\n**看起来 a 和 b 一模一样**：两者都包含 `[1, 2, 3]`。但外表相同不代表是同一个对象！就像双胞胎外貌相同但是不同的人，`a` 和 `b` **内容相同但是不同的对象**。\n\n**执行顺序**：读取 a（0x2000 引用）-> 调用列表的 __repr__() -> 求值 f-string -> 执行 print -> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a: {a}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a: [1, 2, 3]"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出变量 b 的内容",
+        "explanation": "**`print(f\"b: {b}\")`**\n\n输出变量 `b` 指向的列表（0x3000）的内容。结果是 `b: [1, 2, 3]`。\n\n**`a` 和 `b` 的输出完全相同！** 都输出 `[1, 2, 3]`。但这只说明**两个列表的内容（值）相同**，在内存中是**完全不同的对象**。\n\n**值相同 vs 对象相同**：\n- **值相同（equality）**：`a == b` -> `True`（内容相同）\n- **对象相同（identity）**：`a is b` -> `False`（内存地址不同）\n\n理解这个区别在 Python 编程中非常重要。下一步用 `is` 运算符来验证。\n\n**执行顺序**：读取 b（0x3000 引用）-> 调用列表的 __repr__() -> 求值 f-string -> 执行 print -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"b: {b}\")",
+        "pythonMemoryState": {
+          "output": [
+            "b: [1, 2, 3]"
+          ],
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "对象同一性检查（is）",
+        "explanation": "**`print(f\"a is b: {a is b}\")`**\n\n**`is` 运算符**：检查两个变量是否指向**完全相同的对象（相同的内存地址）**。\n\n**工作原理**：\n- `a is b` -> `0x2000 is 0x3000` -> **`False`**\n- `a` 和 `b` 指向**不同内存地址**的对象\n\n**`is` vs `==`——必须区分的两个运算符：**\n- `is`：对象的**同一性（identity）**——\"是同一个对象吗？\"（比较内存地址）\n- `==`：对象的**等价性（equality）**——\"内容一样吗？\"（比较值）\n- `a is b` -> `False`（不同对象）\n- `a == b` -> `True`（相同内容）\n\n类比：问双胞胎兄弟\"你们是同一个人吗？\"（is）-> \"不是\" / \"你们长得一样吗？\"（==）-> \"是的\"\n\n**为什么是 `False`？** `get_list()` 函数每次调用都**重新求值** `[1, 2, 3]` 列表字面量，创建独立的对象。所以 `a` 和 `b` 内容相同但指向**不同对象**。\n\n**本课最终结论**：Python 中函数的 `return` 返回的是对象的**引用（地址）**。不是复制值！但列表字面量每次求值都创建新对象，所以同一函数调用两次会产生**两个不同的对象**。\n\n**执行顺序**：求值 a is b -> id(a) != id(b) -> False -> 求值 f-string -> 执行 print -> 程序结束",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"a is b: {a is b}\")",
+        "pythonMemoryState": {
+          "output": [
+            "a is b: False"
+          ],
+          "note": "a 和 b 是不同对象（0x2000 != 0x3000）",
+          "names": [
+            {
+              "name": "get_list",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "结果是？\n\ndef get_data():\n    return [1, 2, 3]\n\nx = get_data()\ny = get_data()\nx.append(4)\nprint(y)",
+    "options": [
+      "[1, 2, 3, 4]",
+      "[1, 2, 3]",
+      "[4]",
+      "报错"
+    ],
+    "correctIndex": 1,
+    "explanation": "get_data() 每次调用都创建新列表。\nx 和 y 指向不同对象，所以修改 x 不会影响 y。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "return 复制值并返回",
+      "correct": "return 返回的是对象的引用",
+      "why": "Python 中所有传递都是引用传递。\n不会发生复制。"
+    },
+    {
+      "wrong": "函数内创建的对象在函数结束时消失",
+      "correct": "只要有引用，对象就继续存在",
+      "why": "Python 用引用计数管理内存。\n有人引用就继续存活。"
+    }
+  ],
+  "keyTakeaway": "return 返回的是对象的引用！不是复制，而是让另一个名称指向同一个对象！"
+}

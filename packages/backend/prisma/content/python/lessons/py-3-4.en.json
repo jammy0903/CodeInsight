@@ -1,0 +1,290 @@
+{
+  "lessonId": "py-3-4",
+  "title": "Sets (Unique)",
+  "concept": "A collection that does not allow duplicates and has no order",
+  "content": {
+    "code": "# 1. 세트 생성\nnums = {1, 2, 2, 3, 3, 3}\nprint(nums)  # {1, 2, 3} (중복 제거됨)\n\n# 2. 추가/삭제\nnums.add(4)\nnums.remove(1)\n\n# 3. 집합 연산\na = {1, 2, 3}\nb = {3, 4, 5}\n\nprint(a & b) # 교집합 {3}\nprint(a | b) # 합집합 {1, 2, 3, 4, 5}",
+    "steps": [
+      {
+        "title": "Creating a Set",
+        "explanation": "**`nums = {1, 2, 2, 3, 3, 3}`** -- Creates a Set object using curly braces `{}`. **Duplicates are automatically removed!**\n\nPython executes code from top to bottom. Although 6 values were provided, sets **do not allow duplicate elements**, so duplicates are automatically removed:\n- Input: `{1, 2, 2, 3, 3, 3}` (6 items)\n- Result: `{1, 2, 3}` (3 items -- duplicates removed)\n\n**4 Key characteristics of Sets:**\n- **No duplicates (Unique):** Only one of each value is kept. This is the entire reason sets exist!\n- **Unordered:** Indexing like `s[0]` is not possible. Use a list if you need order.\n- **Mutable:** Contents can be modified (`add`, `remove`, etc.)\n- **Hash table:** O(1) average lookup time -- `3 in nums` is very fast\n\n**Analogy:** A set is like an **attendance sheet**. Even if the same name is called multiple times, it only gets recorded once.\n\n**Beware of confusion with dictionaries:** Both sets and dictionaries use curly braces `{}`!\n- `{1, 2, 3}` -> **Set** (values only)\n- `{\"a\": 1}` -> **Dictionary** (key: value pairs)\n- `{}` -> **Empty dictionary** (NOT an empty set!)\n- `set()` -> **Empty set** (this is the only way to create one)",
+        "visualizationType": "pythonMemory",
+        "code": "nums = {1, 2, 2, 3, 3, 3}",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Duplicates auto-removed (duplicates of 2, 3 eliminated)",
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Confirming Duplicate Removal",
+        "explanation": "**`print(nums)`** -- Prints the set with duplicates removed. The result is `{1, 2, 3}`.\n\n6 values were inserted but only 3 remain after duplicate removal.\n\n**Important note about order:** Since sets internally use a hash table, the output order may differ from the insertion order. It could print as `{2, 1, 3}` or `{3, 1, 2}`. (In CPython, small integers often happen to appear in order, but you should not rely on this.)\n\n**List vs Set -- when to use which?**\n- **List:** When order matters, duplicates are needed, or you need index access\n- **Set:** When eliminating duplicates, quickly checking membership, or performing set operations\n\n**Analogy:** A list is like **people standing in line** (ordered, same person can appear multiple times), a set is like an **attendance sheet** (unordered, each name only once).\n\n**Python internals:** `print(nums)` calls `set.__repr__()`. It traverses the hash table to collect each element and produces a string in the format `{1, 2, 3}`.\n\n**Execution order**: read nums -> print({1, 2, 3}) executed -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "print(nums)  # {1, 2, 3} (중복 제거됨)",
+        "pythonMemoryState": {
+          "output": [
+            "{1, 2, 3}"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding an Element (add)",
+        "explanation": "**`nums.add(4)`** -- Adds the new element `4` to the set. It directly modifies the existing object.\n\nThe set `nums` now becomes `{1, 2, 3, 4}` with `4` added.\n\n**What Mutable means:** Like lists, sets **don't create a new object**; they directly modify the **contents of the existing object** (0x1000).\n\n**What if you add an existing value?** Nothing happens! No error either:\n```python\nnums.add(2)  # 2 already exists, so no change, no error\n```\n\n**Difference from lists:**\n- List: `append(4)` -> Added to the **end** (order guaranteed)\n- Set: `add(4)` -> Added to an appropriate position in the hash table (**no order**)\n\n**Analogy:** Adding a new name (4) to the attendance sheet. If you call an existing name (2) again, it's ignored.\n\n**Python internals:** `add(4)` computes the hash value of `4` (`hash(4)`) and finds an empty slot in the hash table to store it. If an element with the same hash and same value already exists, it's ignored.\n\n**Caution:** `append()` is for lists only, `add()` is for sets only. `nums.append(4)` raises `AttributeError`.\n\n**Execution order**: add(4) executed -> 0x1000 object contents changed -> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "nums.add(4)",
+        "pythonMemoryState": {
+          "note": "4 added (same object 0x1000 modified)",
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{1, 2, 3, 4}",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Removing an Element (remove)",
+        "explanation": "**`nums.remove(1)`** -- Removes `1` from the set.\n\nThe set `nums` now becomes `{2, 3, 4}` with `1` removed.\n\n**What if you remove a non-existent value?** A `KeyError` is raised:\n```python\nnums.remove(999)  # KeyError: 999\n```\n\n**Safe deletion -- the `discard()` method:** Silently ignores if the value doesn't exist:\n```python\nnums.discard(999)  # No error, nothing happens\n```\n\n**remove vs discard:**\n- `remove(x)`: Raises **KeyError** if x doesn't exist (strict)\n- `discard(x)`: Does **nothing** if x doesn't exist (lenient)\n\n**Analogy:** Crossing out name 1 from the attendance sheet. `remove` gets angry saying \"That name isn't here!\", while `discard` says \"Not here? No worries, moving on.\"\n\n**Python internals:** `remove(1)` looks up the hash value of `1` in the hash table and removes the corresponding entry. If not found, it raises `KeyError`.\n\n**Execution order**: remove(1) executed -> 1 removed from hash table -> 0x1000 contents changed -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "nums.remove(1)",
+        "pythonMemoryState": {
+          "note": "1 removed",
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating Set 'a' for Set Operations",
+        "explanation": "**`a = {1, 2, 3}`** -- Creates the first set to demonstrate set operations.\n\nAfter the previous work (modifying `nums`) is done, the next line is executed in order. Set `a` holds 1, 2, 3.\n\n**Why create a new set?** To demonstrate the most powerful feature of sets: **set operations** (intersection, union, difference). We need two sets to compare. We can implement the Venn diagrams from set theory in code.\n\n**Analogy:** Preparing student rosters (sets) for two classes. We'll soon find students in both classes (intersection) and all students combined (union).\n\n**Execution order**: line 10 -> set created (id: 0x2000) -> a = 0x2000 -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "a = {1, 2, 3}",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "set2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001"
+            },
+            {
+              "id": "set2",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1002"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Creating Set 'b' for Set Operations",
+        "explanation": "**`b = {3, 4, 5}`** -- Creates the second set to demonstrate set operations.\n\nBetween `a = {1, 2, 3}` and `b = {3, 4, 5}`, the only common element is `3`. The combined elements are `{1, 2, 3, 4, 5}`.\n\n**Analogy:** The second class roster is ready. The only student in both classes is student #3.\n\n**Execution order**: line 11 -> set created (id: 0x3000) -> b = 0x3000 -> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "b = {3, 4, 5}",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "set2"
+            },
+            {
+              "name": "b",
+              "pointsTo": "set3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001"
+            },
+            {
+              "id": "set2",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1002"
+            },
+            {
+              "id": "set3",
+              "type": "set",
+              "value": "{3, 4, 5}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Intersection (&)",
+        "explanation": "**`print(a & b)`** -- **Intersection** operation. Collects only elements that are **in both** sets.\n\n- `a = {1, 2, 3}`\n- `b = {3, 4, 5}`\n- `a & b = {3}` -- The only common element is 3\n\nThe `&` operation **creates a new set object**. The originals `a` and `b` remain unchanged.\n\n**Python's 4 set operations:**\n\n**Analogy:** Overlapping two class attendance sheets and picking out only the **names that appear on both**.\n\n**Python internals:** `a & b` calls `a.__and__(b)`. Each element of the smaller set is checked against the larger set in O(1), constructing a new set. Total time complexity is O(min(len(a), len(b))).\n\n**Execution order**: a & b computed -> new set {3} created -> print executed -> line 14",
+        "visualizationType": "pythonMemory",
+        "code": "print(a & b) # 교집합 {3}",
+        "pythonMemoryState": {
+          "output": [
+            "{3}"
+          ],
+          "note": "a & b = {3} (intersection, new set)",
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "set2"
+            },
+            {
+              "name": "b",
+              "pointsTo": "set3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001"
+            },
+            {
+              "id": "set2",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1002"
+            },
+            {
+              "id": "set3",
+              "type": "set",
+              "value": "{3, 4, 5}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Union (|)",
+        "explanation": "**`print(a | b)`** -- **Union** operation. **Combines all elements** from both sets. Duplicates are automatically removed.\n\n- `a = {1, 2, 3}`\n- `b = {3, 4, 5}`\n- `a | b = {1, 2, 3, 4, 5}` -- All elements combined (3 appears only once)\n\n**Analogy:** Merging two class attendance sheets into **one complete roster**. The same student is only listed once.\n\n**Note:** Set operations (`&`, `|`, `-`, `^`) **return new sets** and do not modify the originals. To modify in place, use compound assignment: `a &= b`, `a |= b`, etc.\n\n**Practical example:**\n```python\n# Remove duplicates from a list\nnumbers = [1, 2, 2, 3, 3, 3]\nunique = list(set(numbers))  # [1, 2, 3]",
+        "visualizationType": "pythonMemory",
+        "code": "print(a | b) # 합집합 {1, 2, 3, 4, 5}",
+        "pythonMemoryState": {
+          "output": [
+            "{1, 2, 3, 4, 5}"
+          ],
+          "note": "a | b = {1, 2, 3, 4, 5} (union, duplicates removed)",
+          "names": [
+            {
+              "name": "nums",
+              "pointsTo": "set1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "set2"
+            },
+            {
+              "name": "b",
+              "pointsTo": "set3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "set1",
+              "type": "set",
+              "value": "{2, 3, 4}",
+              "pyId": "1001"
+            },
+            {
+              "id": "set2",
+              "type": "set",
+              "value": "{1, 2, 3}",
+              "pyId": "1002"
+            },
+            {
+              "id": "set3",
+              "type": "set",
+              "value": "{3, 4, 5}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the correct way to create an empty set?",
+    "options": [
+      "{}",
+      "set()",
+      "[]",
+      "(,)"
+    ],
+    "correctIndex": 1,
+    "explanation": "`{}` creates an empty dictionary.\nAn empty set must be created with `set()`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Sets are ordered (s[0] is possible)",
+      "correct": "Sets are unordered.\nIndexing is not possible!",
+      "why": "Because they internally use a hash table, data is stored in what appears to be a random order."
+    }
+  ],
+  "keyTakeaway": "Use Sets when you need to eliminate duplicates or perform set operations. Order is not guaranteed."
+}

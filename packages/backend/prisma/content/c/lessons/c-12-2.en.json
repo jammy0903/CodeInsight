@@ -1,0 +1,283 @@
+{
+  "lessonId": "c-12-2",
+  "title": "Factorial Recursion and Return Value Propagation",
+  "concept": "The return value of a recursive function propagates in reverse order through the call stack",
+  "content": {
+    "code": "#include <stdio.h>\n\nint factorial(int n) {\n    if (n <= 1) {\n        return 1;\n    }\n    return n * factorial(n - 1);\n}\n\nint main() {\n    int result = factorial(4);\n    printf(\"4! = %d\\n\", result);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including header file",
+        "explanation": "We include the standard I/O library with **`#include <stdio.h>`** to use `printf`.\n\nIn this lesson, we learn the second key aspect of recursion -- **return value propagation**.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting main - calling factorial(4)",
+        "explanation": "**`int result = factorial(4);`** -- The declaration of `result`, calling `factorial(4)`, and storing the return value are all on one line, but in reality `result` is not filled until `factorial(4)` finishes.",
+        "visualizationType": "cMemory",
+        "code": "int result = factorial(4);",
+        "highlightOffset": [
+          0,
+          -8
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "??? (waiting)",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "factorial"
+          }
+        ]
+      },
+      {
+        "title": "factorial(4) -> factorial(3) -> factorial(2) calls",
+        "explanation": "**`return n * factorial(n - 1);`** -- factorial(4) tries to compute `return 4 * factorial(3)` but does not yet know the result of factorial(3). factorial(3) also tries to compute `return 3 * factorial(2)` but needs factorial(2)'s result first. This chain of deferred computations keeps building up the stack.",
+        "visualizationType": "cMemory",
+        "code": "return n * factorial(n - 1);",
+        "highlightOffset": [
+          0,
+          -4
+        ],
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "??? (waiting)",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "factorial"
+          }
+        ]
+      },
+      {
+        "title": "factorial(1) - base case reached!",
+        "explanation": "When factorial(2) calls factorial(1), `n <= 1` becomes **true** -- the **base case** has finally been reached! It no longer calls itself and immediately returns the value `1`.",
+        "visualizationType": "cMemory",
+        "code": "return 1;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "??? (waiting)",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "3",
+            "type": "int",
+            "address": "0x1008",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "2",
+            "type": "int",
+            "address": "0x100c",
+            "frame": "factorial"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "1",
+            "type": "int",
+            "address": "0x1010",
+            "frame": "factorial"
+          }
+        ]
+      },
+      {
+        "title": "Return value propagation: 1 -> 2 -> 6",
+        "explanation": "Return values propagate in reverse order -- the most elegant part of recursion. When factorial(1) returns **1**, factorial(2) computes `2 * 1 = 2`, then factorial(3) computes `3 * 2 = 6`, with frames being popped one by one.",
+        "visualizationType": "cMemory",
+        "code": "return n * factorial(n - 1);",
+        "occurrence": 2,
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "??? (waiting)",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          },
+          {
+            "name": "factorial",
+            "type": "frame",
+            "func": "factorial",
+            "value": "frame"
+          },
+          {
+            "name": "n",
+            "value": "4",
+            "type": "int",
+            "address": "0x1004",
+            "frame": "factorial"
+          }
+        ]
+      },
+      {
+        "title": "Final return: factorial(4) = 24",
+        "explanation": "factorial(4) returns `4 * 6` = **24**, and the value is stored in main's `result`.\n\nRecursion is usually understood in two phases: the winding phase where the problem is broken down going in, and the unwinding phase where the value obtained at the base case is combined going back out.",
+        "visualizationType": "cMemory",
+        "code": "return n * factorial(n - 1);",
+        "occurrence": 3,
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "result",
+            "value": "24",
+            "type": "int",
+            "address": "0x1000",
+            "frame": "main"
+          }
+        ]
+      },
+      {
+        "title": "Printing the result",
+        "explanation": "**`printf(\"4! = %d\\n\", result);`** -- Prints the value `24` from `result` using `%d`, displaying `4! = 24` on screen.\n\nTo summarize how recursion propagates return values: going in, the big problem is split into smaller ones (4!->3!->2!->1!); coming out, small answers are combined to build the big answer.",
+        "visualizationType": "terminal",
+        "code": "printf(\"4! = %d\\n\", result);",
+        "stdout": "4! = 24"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How many times is the factorial function called in total when factorial(5) is invoked?",
+    "options": [
+      "4 times",
+      "5 times (factorial(5), factorial(4), factorial(3), factorial(2), factorial(1))",
+      "6 times",
+      "Infinite times"
+    ],
+    "correctIndex": 1,
+    "explanation": "factorial(5) -> factorial(4) -> factorial(3) -> factorial(2) -> factorial(1) results in a total of 5 calls.\nAt factorial(1), the base case is reached and no further calls are made."
+  },
+  "misconceptions": [
+    {
+      "wrong": "A recursive function computes its result immediately",
+      "correct": "It defers computation until the base case is reached, then combines results on the way back.",
+      "why": "factorial(4) needs the result of factorial(3) to compute, so results propagate in reverse order only after all calls have completed."
+    },
+    {
+      "wrong": "Recursion is always slower than loops",
+      "correct": "Simple recursion has function call overhead, but with tail recursion optimization it can achieve the same performance as a loop.",
+      "why": "When the compiler detects tail recursion, it can transform it into a loop. However, this factorial uses the form n*factorial(n-1), which is not tail recursive."
+    }
+  ],
+  "keyTakeaway": "The return value of recursion starts at the base case and propagates in reverse order through the call stack."
+}

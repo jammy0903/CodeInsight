@@ -1,0 +1,187 @@
+{
+  "lessonId": "java-6-2",
+  "title": "异常的类型：Checked vs Unchecked",
+  "concept": "使用 try-catch 块控制异常流程，理解 Checked 和 Unchecked 异常的处理方式。",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            System.out.println(\"1. Start\");\n            String s = null;\n            System.out.println(s.length()); // NPE occurs here\n            System.out.println(\"2. Skipped\");\n            \n        } catch (NullPointerException e) {\n            System.out.println(\"3. Caught NPE!\");\n            \n        } catch (Exception e) {\n            System.out.println(\"4. General Handler\");\n        }\n        System.out.println(\"5. Continues\");\n    }\n}",
+    "steps": [
+      {
+        "title": "main 方法执行",
+        "explanation": "**`public static void main(String[] args)`**\n\n这是程序的入口点。\n异常处理的实践从这里开始。",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "进入 try 块",
+        "explanation": "**执行流程：**\n1. `try` 块开始。\n2. 执行第一行，输出 \"1. Start\"。\n\n**说明：**\n**拆弹小组进场！** `try` 块声明了一个安全区域："这里可能会有炸弹（异常）爆炸，请保持监视。"",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"1. Start\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            }
+          ],
+          "output": [
+            "1. Start"
+          ]
+        }
+      },
+      {
+        "title": "变量声明（Null）",
+        "explanation": "**执行流程：**\n1. 在栈上创建 String 变量 `s`。\n2. 赋值为 `null`。\n\n**说明：**\n`s` 是一个空壳，什么都没指向。\n就像手里拿着遥控器，但没有连接任何电视。",
+        "visualizationType": "javaMemory",
+        "code": "String s = null;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "s",
+              "value": "null",
+              "frame": "main",
+              "new": true,
+              "type": "String"
+            }
+          ]
+        }
+      },
+      {
+        "title": "异常抛出（Throw）",
+        "explanation": "**执行流程：**\n1. 尝试调用 `s.length()` 时，由于没有引用对象，**抛出** `NullPointerException`。\n2. 异常对象（`0x999`）在堆上创建。\n3. JVM 立即停止当前执行流程，开始搜索 `catch` 块。\n\n**说明：**\n**轰！** 炸弹爆炸了。\n下一行 \"2. Skipped\" 无法执行，控制权被弹出。\n这就是 **Stack Unwinding（栈回退）** 的开始。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(s.length()); // NPE occurs here",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "s",
+              "value": "null",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x999",
+              "content": "NPE: null",
+              "type": "NullPointerException",
+              "new": true
+            }
+          ],
+          "error": "NullPointerException 已抛出！"
+        }
+      },
+      {
+        "title": "异常捕获（Catch）",
+        "explanation": "**执行流程：**\n1. 找到了与抛出的 `NullPointerException` 精确匹配的 `catch` 块。\n2. 异常对象（`0x999`）传递给参数 `e`。\n\n**说明：**\n**漂亮接住！** 找到了合适的拆弹专家（处理器）。\n在这里安全地处理异常。",
+        "visualizationType": "javaMemory",
+        "code": "} catch (NullPointerException e) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "s",
+              "value": "null",
+              "frame": "main",
+              "type": "String"
+            },
+            {
+              "name": "e",
+              "value": "-> 0x999",
+              "frame": "catch",
+              "new": true,
+              "type": "NullPointerException"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x999",
+              "content": "NPE: null",
+              "type": "NullPointerException"
+            }
+          ],
+          "error": null
+        }
+      },
+      {
+        "title": "异常处理与流程恢复",
+        "explanation": "**执行流程：**\n1. 执行 `catch` 块内部的代码。\n2. 输出 \"3. Caught NPE!\"。\n3. 退出 `catch` 块，恢复正常流程。\n\n**说明：**\n由于异常已被处理，程序不会终止。\n如果没有 `catch`，程序将会异常终止（崩溃）。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"3. Caught NPE!\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "s",
+              "value": "null",
+              "frame": "main",
+              "type": "String"
+            }
+          ],
+          "output": [
+            "3. Caught NPE!"
+          ]
+        }
+      },
+      {
+        "title": "程序继续执行",
+        "explanation": "**执行流程：**\n1. 完全退出 `try-catch` 块。\n2. 继续执行剩余代码。\n\n**说明：**\n这正是我们进行异常处理的原因。\n**弹性恢复（Resilience）！** 即使某个部分出了问题，整个系统也能继续运行。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"5. Continues\");",
+        "javaMemoryState": {
+          "output": [
+            "5. Continues"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "为什么 catch 块的顺序很重要？",
+    "options": [
+      "为了代码可读性。",
+      "如果不先捕获子异常（具体的），父异常（通用的）会拦截一切。",
+      "为了 JVM 的性能优化。",
+      "必须按字母顺序排列才能编译。"
+    ],
+    "correctIndex": 1,
+    "explanation": "由于多态性，父类型（`Exception`）可以捕获所有子异常。\n因此必须先编写具体异常（`NullPointerException`）的处理，才能避免"不可达代码"错误并按预期处理。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "异常发生时程序一定会终止。",
+      "correct": "不是。\n用 `catch` 块适当处理后，程序不会终止，会继续执行。",
+      "why": "异常处理是防止"异常终止"并实现"优雅恢复"的机制。"
+    }
+  ],
+  "keyTakeaway": "使用 try-catch 可以在异常发生时防止程序中断。应考虑继承关系，从具体异常开始捕获。"
+}

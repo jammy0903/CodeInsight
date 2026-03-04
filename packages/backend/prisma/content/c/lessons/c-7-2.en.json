@@ -1,0 +1,156 @@
+{
+  "lessonId": "c-7-2",
+  "title": "Pointers to Arrays",
+  "concept": "Array pointers and pointer arrays differ in meaning and operation unit just by the position of parentheses",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n\n    int (*p)[3] = &arr;\n\n    int *ptrArr[3];\n    ptrArr[0] = &arr[0];\n\n    printf(\"*(*p + 1) = %d\\n\", *(*p + 1));\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "Standard I/O header for using `printf`.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "The main frame is created, preparing for array/pointer comparison.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Declaring an integer array",
+        "explanation": "`arr` stores 3 integers in contiguous memory.\n\nWe will compare two types using this array as a reference.",
+        "visualizationType": "cMemory",
+        "code": "int arr[3] = {10, 20, 30};",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "int[3]",
+            "address": "0x100",
+            "value": "{10, 20, 30}"
+          }
+        ]
+      },
+      {
+        "title": "Concept 1: A pointer to an array",
+        "explanation": "`int (*p)[3]` is a pointer that points to \"the entire array of size 3\".\n\nWhen doing pointer arithmetic, the movement unit is the entire array size.",
+        "visualizationType": "cMemory",
+        "code": "int (*p)[3] = &arr;",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "int[3]",
+            "address": "0x100",
+            "value": "{10, 20, 30}"
+          },
+          {
+            "name": "p",
+            "type": "int (*)[3]",
+            "address": "0x110",
+            "value": "0x100",
+            "points_to": "arr"
+          }
+        ]
+      },
+      {
+        "title": "Concept 2: An array of pointers",
+        "explanation": "`int *ptrArr[3]` is an array that holds 3 pointers.\n\nEach element can independently point to a different address.",
+        "visualizationType": "cMemory",
+        "code": "int *ptrArr[3];",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "int[3]",
+            "address": "0x100",
+            "value": "{10, 20, 30}"
+          },
+          {
+            "name": "p",
+            "type": "int (*)[3]",
+            "address": "0x110",
+            "value": "0x100",
+            "points_to": "arr"
+          },
+          {
+            "name": "ptrArr",
+            "type": "int*[3]",
+            "address": "0x120",
+            "value": "{???, ???, ???}"
+          }
+        ]
+      },
+      {
+        "title": "Assigning an address to a pointer array element",
+        "explanation": "`ptrArr[0] = &arr[0];` connects the pointer array element to an actual address.",
+        "visualizationType": "cMemory",
+        "code": "ptrArr[0] = &arr[0];",
+        "stack": [
+          {
+            "name": "arr",
+            "type": "int[3]",
+            "address": "0x100",
+            "value": "{10, 20, 30}"
+          },
+          {
+            "name": "p",
+            "type": "int (*)[3]",
+            "address": "0x110",
+            "value": "0x100",
+            "points_to": "arr"
+          },
+          {
+            "name": "ptrArr",
+            "type": "int*[3]",
+            "address": "0x120",
+            "value": "{0x100, ???, ???}"
+          }
+        ]
+      },
+      {
+        "title": "Dereferencing the array pointer",
+        "explanation": "`*(*p + 1)` reads the second element, demonstrating array pointer access rules.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"*(*p + 1) = %d\\n\", *(*p + 1));",
+        "stdout": "*(*p + 1) = 20"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "The program ends with `return 0;`.\n\nKey point: `int (*p)[N]` and `int *p[N]` are completely different types.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which correctly declares 'a pointer to an int array of size 5'?",
+    "options": [
+      "int *p[5];",
+      "int (*p)[5];",
+      "int *p(5);",
+      "int **p;"
+    ],
+    "correctIndex": 1,
+    "explanation": "Without parentheses, it becomes a 'pointer array' holding 5 pointers.\nTo point to an entire array, wrap with parentheses like `(*p)`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "int *p[3] and int (*p)[3] are the same.",
+      "correct": "The former is an 'array of pointers'; the latter is a 'pointer to an array'.",
+      "why": "Due to operator precedence, `[]` binds before `*`, so parentheses completely change the meaning."
+    }
+  ],
+  "keyTakeaway": "When you want to point to an entire array as one unit, use an array pointer: `TYPE (*NAME)[SIZE]`."
+}

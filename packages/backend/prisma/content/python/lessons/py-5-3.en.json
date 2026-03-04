@@ -1,0 +1,392 @@
+{
+  "lessonId": "py-5-3",
+  "title": "Constructor (__init__)",
+  "concept": "An initialization method that is automatically called when an object is created",
+  "content": {
+    "code": "class User:\n    # 생성자 (Constructor)\n    def __init__(self, name, age):\n        print(f\"Creating user {name}...\")\n        self.name = name\n        self.age = age\n\n    def introduce(self):\n        print(f\"I am {self.name}, {self.age} years old.\")\n\n# 객체 생성 시 __init__ 자동 호출\nu = User(\"Alice\", 20)\nu.introduce()",
+    "steps": [
+      {
+        "title": "Class Definition (User)",
+        "explanation": "**`class User:`**\n\nPython executes code from top to bottom in order. The `class` keyword defines a new class (user blueprint) named `User`.\n\n**Goal of this lesson**: In the previous lesson, attributes were only added when we **manually** called methods like `set_name()`. If we forgot to call them, an `AttributeError` would occur. This time, we'll learn how to use the **`__init__` constructor** to **automatically** initialize attributes at the **exact moment** an object is created.\n\n**Python internals**: When Python encounters `class User:`, it executes the class body from top to bottom, creates method objects, and registers them in the User class object. The class itself is an object -- an instance of `type`.\n\n**PascalCase convention**: Class names use **capitalized first letters** for each word, like `User`, `Dog`, `Counter`. This is a strong Python community convention to distinguish them from variable and function names like `my_dog` and `set_name`.\n\n**Why this order?** The class must be defined first before we can create objects from this blueprint.\n\n**Execution order**: Execute class User -> Begin creating User class object -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "class User:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Class definition begins",
+          "names": [
+            {
+              "name": "User",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Constructor (__init__) Definition",
+        "explanation": "**`def __init__(self, name, age):`**\n\nThis is the **`__init__` method** -- the most important special method in Python! Python calls it **automatically** when an object is created.\n\n**Three key roles of __init__:**\n1. **Automatic invocation** on object creation -- We just write `User(\"Alice\", 20)` and Python calls `__init__` on its own\n2. **Sets initial attributes** of the object -- Sets up `self.name`, `self.age`, etc. all at once\n3. **Enforces required data via parameters** -- You can't create a User object without name and age!\n\n**Analogy**: It's like how a birth certificate **must** have a name and date of birth filled in. `__init__` is the \"birth registration\" of an object.\n\n**Note**: At this point, we are only **defining** the method. The actual execution happens later when `User(\"Alice\", 20)` is called.",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name, age):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "__init__ method defined (not yet called)",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with __init__>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "introduce Method Definition",
+        "explanation": "**`def introduce(self):`**\n\nDefines a regular instance method that performs a self-introduction. This method uses `self.name` and `self.age` to print user information.\n\n**Relationship with __init__**: The `introduce` method accesses `self.name` and `self.age`. Since these attributes are **always** set in `__init__`, there's absolutely no risk of an error from missing attributes when calling introduce! This is the biggest advantage of `__init__`.\n\n**Comparison with previous lesson**: In the previous Cat class, calling meow() without first calling set_name() would cause an `AttributeError`. But with `__init__`, attributes are initialized at the same time as object creation, so other methods can **safely** access self.attributes.\n\n**Note**: At this point, we are only **defining** the method. The actual execution happens later when `u.introduce()` is called.\n\n**Why this order?** After defining the constructor (__init__), we define the next method in order.\n\n**Execution order**: Execute def introduce -> Create introduce function object -> Register in User class -> User class definition complete -> line 12",
+        "visualizationType": "pythonMemory",
+        "code": "def introduce(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "introduce method defined",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with __init__, introduce>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Object Creation (__init__ Auto-Called)",
+        "explanation": "**`u = User(\"Alice\", 20)`**\n\nFinally, we create a User object! **A tremendous amount happens automatically** in this single line.\n\n**Key point**: We only wrote `User(\"Alice\", 20)`, but Python automatically calls `__init__`! In the previous lesson's Cat class, we had to separately call `cat1.set_name(\"Kitty\")` after `cat1 = Cat()`, but with `__init__`, **creation and initialization happen all at once**.\n\n**Analogy**: It's like a factory where a blank mold is created (__new__) and immediately sent to the assembly line for completion (__init__). The consumer (us) just needs to order \"make me one User.\"\n\n**Code we write vs what Python does:**\n```python\nu = User(\"Alice\", 20)  # Code we write (just one line!)\n```",
+        "visualizationType": "pythonMemory",
+        "code": "u = User(\"Alice\", 20)",
+        "pythonMemoryState": {
+          "note": "Object created -> __init__ about to be auto-called",
+          "names": [
+            {
+              "name": "User",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "u",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<User object>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ Execution (1/3)",
+        "explanation": "**`print(f\"Creating user {name}...\")`**\n\nWe've entered the `__init__` method body! Python automatically called this method when `User(\"Alice\", 20)` was invoked.\n\n**Current parameter bindings:**\n- `self` = `u` (object at 0x2000) -- **automatically passed by Python**\n- `name` = `\"Alice\"` -- **passed by us as the first argument**\n- `age` = `20` -- **passed by us as the second argument**\n\n**Role of this line**: Prints a message for debugging or logging purposes during object initialization. Inside `__init__`, you can run **any code** -- print, open files, validate data, etc.\n\n**Important note**: Here `name` is the **parameter** `name`, not `self.name`. Since `self.name = name` hasn't been executed yet, `self.name` does not exist at this point. The parameter name and the instance variable self.name are **different things**!\n\n**Analogy**: Before filling out a birth certificate, it's like announcing \"We're about to register a person named Alice.\"\n\n**Why this order?** Object creation (line 12) auto-called __init__, which jumped to this line.\n\n**Execution order**: Read name=\"Alice\" -> Evaluate f-string -> Print \"Creating user Alice...\" -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Creating user {name}...\")",
+        "pythonMemoryState": {
+          "output": [
+            "Creating user Alice..."
+          ],
+          "note": "__init__ executing (self = u)",
+          "names": [
+            {
+              "name": "User",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "u",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "age",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<User object>",
+              "pyId": "1002"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> u (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "20",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ Execution (2/3)",
+        "explanation": "**`self.name = name`**\n\nAdds an instance attribute `name` to `self` (the u object at 0x2000) and assigns the value of parameter `name`, which is `\"Alice\"`.\n\n**Easy to confuse -- The same name `name` appears twice!**\n- **Left** side of `=`, `self.name`: An **instance attribute** created on the object (0x2000) (permanently stored!)\n- **Right** side of `=`, `name`: A **parameter** of __init__ (disappears when the function ends)\n- In other words, we are **permanently copying** the temporary parameter's value onto the object.\n\n**Python internals**: This is equivalent to `u.__dict__['name'] = \"Alice\"`. The u object's `__dict__` changes from `{}` to `{'name': 'Alice'}`.\n\n**Why set attributes in __init__?**\n- **Consistency**: Guarantees that every User object has both name and age attributes\n- **Convenience**: Object creation and initialization complete in a single line\n- **Safety**: Since a User object can't be created without name and age, other methods can safely use self.name\n\n**Caution -- A common mistake:**\n```python\ndef __init__(self, name, age):\n    name = name   # WRONG! This is just a local variable assignment\n    self.name = name  # CORRECT! This creates an instance attribute\n```\nYou must include `self.` to store it on the object!\n\n**Execution order**: self.name = name -> Add name=\"Alice\" to u.__dict__ -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "name attribute added to u object",
+          "names": [
+            {
+              "name": "User",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "u",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "age",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<User object, name='Alice'>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> u (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "20",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ Execution (3/3)",
+        "explanation": "**`self.age = age`**\n\nAdds an instance attribute `age` to `self` (the u object at 0x2000) and assigns the value of parameter `age`, which is `20`.\n\n**State of the u object at this point**: `u.__dict__` = `{'name': 'Alice', 'age': 20}`. The `u` object is now a **fully initialized User object** with both name and age attributes!\n\n**Comparison: Using __init__ vs manual setup:**\n```python\n# Method 1: Using __init__ (recommended!)\nu = User(\"Alice\", 20)  # One line for creation + initialization!\n\n# Method 2: Manual setup (not recommended)\nu = User()        # Error! name and age arguments required!\nu.name = \"Alice\"  # Forgetting this line causes errors later\nu.age = 20        # Forgetting this line causes errors later\n```\n\n**Three major advantages of __init__:**\n1. **Enforcement**: If name and age aren't provided, you get `TypeError: __init__() missing 2 required positional arguments`! Prevents data omission at the source\n2. **One-line completion**: Creation and initialization happen at once, keeping code concise\n3. **Safety**: Once __init__ completes, other methods can safely use self.name and self.age\n\n**What happens when __init__ finishes?** Python automatically returns the reference to the initialized object. This reference is bound to the variable `u`.\n\n**Execution order**: self.age = age -> Add age=20 to u.__dict__ -> __init__ ends -> Return to line 12 -> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "self.age = age",
+        "pythonMemoryState": {
+          "note": "u object initialization complete! (name and age both set)",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<User object, name='Alice', age=20>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> u (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "20",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling the introduce Method",
+        "explanation": "**`u.introduce()`**\n\nCalls the `introduce` method on the fully initialized `u` object.\n\n**Python's automatic conversion:**\n```python\nu.introduce()           # Code we write (0 arguments)\n  |\nUser.introduce(u)       # Python's internal conversion (1 argument = self!)\n```\n\n**Parameter binding:**\n- `self` = `u` (object at 0x2000) -- **automatically passed by Python**\n\n**Why this call is safe**: The introduce method accesses `self.name` and `self.age` internally. Since `__init__` already set both attributes, there's no worry about an `AttributeError`! This is the greatest advantage of `__init__`.\n\n**Analogy**: It's like how only someone whose birth registration (init) is complete can get an ID card (introduce). You can't get an ID without a birth registration.\n\n**Why this order?** After object creation and initialization are complete, the next line executes in order.\n\n**Execution order**: line 13 -> Create u.introduce bound method -> Call -> Jump to line 9 -> self=u",
+        "visualizationType": "pythonMemory",
+        "code": "u.introduce()",
+        "pythonMemoryState": {
+          "note": "introduce called -> About to jump to line 9",
+          "names": [
+            {
+              "name": "User",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "u",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<User object, name='Alice', age=20>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing introduce",
+        "explanation": "**`print(f\"Hello, I am {self.name} and I am {self.age} years old.\")`**\n\nThis line reads two instance attributes (`name`, `age`) and prints them as a single sentence.\nThis is a typical pattern of expressing an object's stored state as a user-facing message.\n\nKey points:\n- `self.name` and `self.age` are the current object's data\n- f-strings immediately embed values into the string for easy readability\n\n**Analogy**: It's like automatically generating a self-introduction sentence by looking at the name tag (name) and age (age).\n\nCaution:\n- If attributes aren't initialized, an error could occur before printing, so the state must be guaranteed by a constructor/setter first",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"I am {self.name}, {self.age} years old.\")",
+        "pythonMemoryState": {
+          "output": [
+            "I am Alice, 20 years old."
+          ],
+          "note": "Using attributes set in __init__",
+          "names": [
+            {
+              "name": "User",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "u",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<User object, name='Alice', age=20>",
+              "pyId": "1002"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> u (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the exact name of Python's constructor?",
+    "options": [
+      "User()",
+      "__create__",
+      "__init__",
+      "constructor"
+    ],
+    "correctIndex": 2,
+    "explanation": "It's `__init__`, short for initialize.\nIt has double underscores (`__`) on both sides.\n(Also known as 'dunder init')"
+  },
+  "misconceptions": [
+    {
+      "wrong": "__init__ can return a value",
+      "correct": "The constructor must return `None`.",
+      "why": "Returning the object itself is the job of the `__new__` method. `__init__` is only responsible for initialization."
+    }
+  ],
+  "keyTakeaway": "Use `__init__` to receive and set required data when creating an object."
+}

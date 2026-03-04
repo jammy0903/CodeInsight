@@ -1,0 +1,150 @@
+{
+  "lessonId": "c-1-4",
+  "title": "栈内存的生命周期",
+  "concept": "在函数内创建的变量（局部变量）会在函数结束时销毁",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid func() {\n    int a = 10;\n    printf(\"Inside func: %d, Addr: %p\\n\", a, &a);\n}\n\nint main() {\n    func();\n\n\n    printf(\"Back in main\\n\");\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "用于使用 ```printf``` 的标准输入输出头文件。本课将介绍**函数的生命周期和局部变量的生存期** — 我们将观察函数被调用时创建了什么，结束时又消失了什么。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "func 函数蓝图",
+        "explanation": "`func` 在这里并不执行 — 这是函数定义（蓝图）阶段。\n\n实际的栈帧创建和执行发生在调用 `func();` 的时候。",
+        "visualizationType": "cMemory",
+        "code": "void func() {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "程序开始执行",
+        "explanation": "程序启动时，首先创建 main 栈帧。\n\n函数调用时栈帧被 push，函数返回时被 pop，遵循 LIFO（后进先出）结构。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          }
+        ]
+      },
+      {
+        "title": "调用 func()（Push）",
+        "explanation": "调用 `func();` 时，`func` 的栈帧被 push 到 main 上方。\n\n每次函数调用都会创建独立的栈帧，因此每个函数的局部变量存储在不同的内存空间中。",
+        "visualizationType": "cMemory",
+        "code": "func();",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          },
+          {
+            "frame": "func",
+            "highlight": true,
+            "value": "func",
+            "name": "func"
+          }
+        ]
+      },
+      {
+        "title": "创建 func 的局部变量",
+        "explanation": "在 `func` 的栈帧中创建局部变量 `a`。此变量仅在 `func` 内部有效。\n\nmain 无法直接访问 `a`。",
+        "visualizationType": "cMemory",
+        "code": "int a = 10;",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          },
+          {
+            "frame": "func",
+            "variables": [
+              {
+                "name": "a",
+                "type": "int",
+                "value": "10"
+              }
+            ],
+            "value": "func",
+            "name": "func"
+          }
+        ]
+      },
+      {
+        "title": "在 func 内部输出",
+        "explanation": "`printf` 显示 func 局部变量的值和地址。\n\n此地址仅在 func 的栈帧存活期间有效，函数返回后不应再信任该地址。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Inside func: %d, Addr: %p\\n\", a, &a);",
+        "stdout": "Inside func: 10, Addr: 0x..."
+      },
+      {
+        "title": "func() 函数返回（Pop）",
+        "explanation": "func 结束时，其栈帧被 pop，局部变量也随之失去作用域。\n\n在函数外部使用函数内局部变量的地址是很危险的。",
+        "visualizationType": "cMemory",
+        "code": "}",
+        "stack": [
+          {
+            "frame": "main",
+            "highlight": true,
+            "value": "main",
+            "name": "main"
+          }
+        ]
+      },
+      {
+        "title": "返回 main",
+        "explanation": "`func` 结束后，`func` 栈帧被 pop，控制权返回 main。\n\n此时 `func` 的局部变量已销毁，只剩下 main 的变量。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Back in main\\n\");",
+        "stack": [
+          {
+            "frame": "main",
+            "value": "main",
+            "name": "main"
+          }
+        ],
+        "stdout": "Inside func: 10, Addr: 0x...\nBack in main"
+      },
+      {
+        "title": "main 函数结束",
+        "explanation": "`return 0;` 终止 main 并清理剩余的栈帧。\n\n核心概念是栈帧的流动：调用时 push，返回时 pop。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "函数内的局部变量存储在哪个内存区域？",
+    "options": [
+      "Heap",
+      "Stack",
+      "Code Segment",
+      "Data Segment"
+    ],
+    "correctIndex": 1,
+    "explanation": "局部变量和参数存储在 Stack 区域。\n随函数调用创建（Push），函数结束时销毁（Pop）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "函数结束后变量值仍留在内存中",
+      "correct": "它们变得不可访问，很快会被覆盖。",
+      "why": "随着栈指针回退，那块空间被视为"空闲"。\n下一次函数调用时会被重新使用。"
+    }
+  ],
+  "keyTakeaway": "局部变量的生存期等于函数的生存期。函数结束，就得腾出空间。"
+}

@@ -1,0 +1,221 @@
+{
+  "lessonId": "py-1-8",
+  "title": "String Methods",
+  "concept": "Strings provide a variety of built-in methods.",
+  "content": {
+    "code": "text = \"Hello Python\"\nprint(f\"원본: {text}\")\n\nupper = text.upper()\nprint(f\"대문자: {upper}\")\n\nwords = text.split()\nprint(f\"단어 분리: {words}\")\n",
+    "steps": [
+      {
+        "title": "Creating a String",
+        "explanation": "**`text = \"Hello Python\"`** -- Creates a string object `\"Hello Python\"` in memory and attaches the label `text`.\n\nStrings (str) are an **immutable** type. The methods we'll learn in this lesson, like `upper()` and `split()`, do not modify the original string -- they always **create and return a new object**.\n\n**Analogy:** `text` is the original document. You put this document into a copy machine and produce an uppercase version, a word-separated version, etc. The original document itself never changes.\n\n**Why methods?** Everything in Python is an object, and objects have built-in capabilities called **methods**. In `text.upper()`, the `.` (dot) means 'I want to use a capability of this object.'\n\n**How Python works internally:** The `\"Hello Python\"` string object is created on the heap. This object is an instance of the `str` class and can use all dozens of methods defined on `str` (`upper`, `lower`, `split`, `replace`, `strip`, `find`, etc.).\n\n**Practical tip:** Running `dir(text)` shows a list of all methods available on the string object.",
+        "visualizationType": "pythonMemory",
+        "code": "text = \"Hello Python\"",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Line 1 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Original",
+        "explanation": "**`print(f\"Original: {text}\")`** -- Uses an f-string to check the content of the original string.\n\nOutput: `Original: Hello Python`\n\n**Why print first?** This serves as a reference point to prove that the original hasn't changed after using `upper()` and `split()`. We're recording the 'before' state.\n\n**f-string review:** In `f\"...\"`, the variable inside curly braces `{text}` is replaced with its actual value. `f\"Original: {text}\"` -> `\"Original: Hello Python\"`\n\n**How Python works internally:** The f-string internally calls `text.__format__('')` to get the string representation, combines it with the literal parts, and creates a new string. The `text` object itself is not changed at all during this process.\n\n**Analogy:** It's like taking a photo of the original document before putting it into the copy machine.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"원본: {text}\")",
+        "pythonMemoryState": {
+          "output": [
+            "원본: Hello Python"
+          ],
+          "note": "Line 2 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Converting to Uppercase",
+        "explanation": "**`upper = text.upper()`** -- The `upper()` method returns a **new string** with all characters converted to uppercase.\n\nWhen `text.upper()` is called:\n1. Each character in the `\"Hello Python\"` object is converted to uppercase\n2. A **completely new string object** `\"HELLO PYTHON\"` is created\n3. The `upper` label points to this new object\n\n**Key point:** The original `text` is **not changed at all!** `text` still points to `\"Hello Python\"` because strings are immutable.\n\n**Analogy:** Putting the original document (text) into a copy machine and pressing the 'uppercase conversion' button produces a new copy (upper). The original stays the same.\n\n**Related methods:**\n- `lower()`: Converts all characters to lowercase\n- `capitalize()`: Uppercases only the first letter, lowercases the rest\n- `title()`: Uppercases the first letter of each word\n- `swapcase()`: Swaps uppercase and lowercase\n\n**How Python works internally:** `str.upper()` uses Unicode character mapping tables at the C level to find the uppercase version of each character. A new `str` object is allocated on the heap and the converted characters are copied into it.\n\n**Note:** If you call `text.upper()` without storing the result in a variable, the return value is lost! You must save it like `upper = text.upper()`.",
+        "visualizationType": "pythonMemory",
+        "code": "upper = text.upper()",
+        "pythonMemoryState": {
+          "note": "Line 4 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Uppercase Result",
+        "explanation": "**`print(f\"Uppercase: {upper}\")`** -- Prints the new uppercase string.\n\nOutput: `Uppercase: HELLO PYTHON`\n\nThe content of the `\"HELLO PYTHON\"` object that `upper` points to is printed. `text` (original) and `upper` (converted result) are different objects and exist independently.\n\n**Immutability confirmed:** `text` is still `\"Hello Python\"`. The `upper()` call did not modify the original.\n\n**FAQ:** \"Why not write `text = text.upper()`?\" -- You certainly can. Then the `text` label would point to the new object (`\"HELLO PYTHON\"`), and the original `\"Hello Python\"` object would have its reference count drop to 0 and be reclaimed by the garbage collector.\n\n**How Python works internally:** Two independent string objects exist in memory: `str1` (\"Hello Python\") and `str2` (\"HELLO PYTHON\"). Each has a reference count of 1.\n\n**Practical tip:** Useful for case-insensitive string comparison: `\"Hello\".lower() == \"hello\".lower()` -> `True`",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"대문자: {upper}\")",
+        "pythonMemoryState": {
+          "output": [
+            "대문자: HELLO PYTHON"
+          ],
+          "note": "Line 5 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Splitting the String",
+        "explanation": "**`words = text.split()`** -- The `split()` method splits the string by whitespace and returns a **list**.\n\nWhen `text.split()` is called:\n1. The string `\"Hello Python\"` is split at whitespace boundaries\n2. A **list object** `[\"Hello\", \"Python\"]` containing each piece as an element is created\n3. The `words` label points to this list\n\n**Notice the return type!** `upper()` returned a string, but `split()` returns a **list**. Different methods can return different types, so be careful.\n\n**Behavior with parameters:**\n- `text.split()` -- splits on whitespace (spaces, tabs, newlines), consecutive whitespace treated as one\n- `text.split(\",\")` -- splits on commas\n- `text.split(\" \", 1)` -- splits on spaces but at most once (gives 2 results)\n\n**Analogy:** It's like cutting a long loaf of bread (string) with a knife (delimiter) and placing the pieces on a plate (list). A piece is made at each cutting point (whitespace).\n\n**How Python works internally:** The `split()` method iterates through the string, finds whitespace positions, and creates a new `str` object for each segment, adding it to the list. Both the returned list object and the string objects inside it are all newly created.\n\n**Reverse operation:** `\" \".join([\"Hello\", \"Python\"])` = `\"Hello Python\"` -- the inverse of `split()`.",
+        "visualizationType": "pythonMemory",
+        "code": "words = text.split()",
+        "pythonMemoryState": {
+          "note": "Line 7 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 2}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Split Result",
+        "explanation": "**`print(f\"Words: {words}\")`** -- Prints the resulting list of split words.\n\nOutput: `Words: ['Hello', 'Python']`\n\n`words` is a list containing 2 strings. `words[0]` is `\"Hello\"`, `words[1]` is `\"Python\"`.\n\n**Key summary -- Rules of string methods:**\n- Strings are **immutable** -> methods always return new objects\n- `upper()`, `lower()`, etc. -> return **new strings**\n- `split()` -> returns a **list**\n- The original is **never modified!**\n\n**Analogy:** String methods are like 'copy machines that don't touch the original.' No matter what transformation you apply, the original stays the same, and only the transformed result comes out as new.\n\n**How Python works internally:** When evaluating `{words}` inside the f-string, `words.__repr__()` is called. The list's `__repr__` calls `__repr__` on each element, producing a string in the form `['Hello', 'Python']`.\n\n**Practical tip:** When parsing CSV data, `line.split(\",\")` is frequently used. For more complex parsing, use the `csv` module.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"단어 분리: {words}\")",
+        "pythonMemoryState": {
+          "output": [
+            "단어 분리: ['Hello', 'Python']"
+          ],
+          "note": "Line 8 executed",
+          "names": [
+            {
+              "name": "text",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "str2"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Hello Python\"",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"HELLO PYTHON\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "{type: \"Array\", id: \"0x003\", class: \"list\", length: 2}",
+              "pyId": "1003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": null,
+  "keyTakeaway": ""
+}

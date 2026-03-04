@@ -1,0 +1,181 @@
+{
+  "lessonId": "py-3-3",
+  "title": "Dictionaries",
+  "concept": "A hash map that stores data as Key-Value pairs",
+  "content": {
+    "code": "# 1. 딕셔너리 생성\nuser = {\n    \"name\": \"Alice\",\n    \"age\": 25\n}\n\n# 2. 접근 및 수정\nprint(user[\"name\"])\nuser[\"age\"] = 26      # 수정\nuser[\"city\"] = \"Seoul\" # 추가\n\n# 3. 키 확인\nif \"job\" in user:\n    print(user[\"job\"])",
+    "steps": [
+      {
+        "title": "Dictionary First Entry",
+        "explanation": "**`\"name\": \"Alice\"`** -- Creates the first key-value pair in the dictionary. The key is `\"name\"`, the value is `\"Alice\"`.\n\nPython executes code from top to bottom. When creating a dictionary literal with curly braces `{}`, each key-value pair is **evaluated in order** and added to the dictionary.\n\n**What is a dictionary?** While lists look up values by **index (number)**, dictionaries look up values by **key (name)**. It's like finding a phone number by name in a phone book.\n\n**Key-value pair syntax:** Written as `key: value`. The colon (`:`) separates the key from the value.\n- Key: `\"name\"` -- The name used to look up data\n- Value: `\"Alice\"` -- The actual stored data\n\n**Analogy:** A cabinet with labeled drawers. Open the drawer labeled \"name\" and you'll find \"Alice\" inside.\n\n**Python internals:** Dictionaries are implemented as **hash tables**. The hash value of key `\"name\"` is computed to determine a specific position in an internal array where the key-value pair is stored. This allows O(1) (constant time) lookups by key, which is very fast.\n\n**Execution order**: line 2 starts -> line 3 evaluated -> \"name\": \"Alice\" added -> line 4",
+        "visualizationType": "pythonMemory",
+        "code": "\"name\": \"Alice\",",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Dictionary being created (1/2)",
+          "names": [
+            {
+              "name": "user",
+              "pointsTo": "dict1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\"}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dictionary Second Entry",
+        "explanation": "**`\"age\": 25`** -- Adds the second key-value pair to the dictionary. The key is `\"age\"`, the value is the integer `25`.\n\n**Various value types:** Dictionary values can be **any type**. Strings (`\"Alice\"`), integers (`25`), lists, other dictionaries -- anything. However, keys must be **Immutable types only** (strings, numbers, tuples).\n\n**Current dictionary state:** `{\"name\": \"Alice\", \"age\": 25}` -- 2 key-value pairs registered.\n\n**Analogy:** Another drawer labeled \"age\" has been added to the cabinet, containing the number 25.\n\n**Python internals:** The hash value of the `\"age\"` key is computed and stored at the appropriate position in the hash table. Since Python 3.7+, dictionaries **preserve insertion order**, so key-value pairs are maintained in the order they were written.\n\n**Execution order**: line 4 evaluated -> \"age\": 25 added -> line 5 (closing brace)",
+        "visualizationType": "pythonMemory",
+        "code": "\"age\": 25",
+        "pythonMemoryState": {
+          "note": "Dictionary being created (2/2)",
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"age\": 25}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Dictionary Creation Complete",
+        "explanation": "**`user = {...}`** -- After all key-value pairs are evaluated, the dictionary object is complete and assigned to the `user` variable.\n\nOnce the closing curly brace `}` of the dictionary literal is reached, object creation is complete. The `user` name now points to this dictionary object (id: 0x1000).\n\n**Key characteristics of dictionaries:**\n- **Key-Value pairs:** Look up values by name (Key) -- `user[\"name\"]` -> `\"Alice\"`\n- **Mutable:** Like lists, contents can be added, modified, and deleted\n- **Hash table:** O(1) average lookup time -- fast lookups regardless of data size\n- **Order preserved:** Insertion order maintained since Python 3.7+\n- **Keys must be Immutable:** Only strings, numbers, and tuples can be keys (not lists or dictionaries)\n\n**Analogy:** A dictionary is a cabinet with labeled drawers. You can add new drawers, change contents inside drawers, or remove drawers entirely.\n\n**Python internals:** In CPython, dictionaries are implemented as a **compact dict** structure. The hash value of a key is used to find a position in an index table, and key-value pairs are stored sequentially in a separate entry array. This structure achieves both O(1) lookups and insertion order preservation.\n\n**Execution order**: line 5 closes -> dictionary complete -> user = 0x1000 -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "user = {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": null,
+          "names": [],
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"age\": 25}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Accessing a Value",
+        "explanation": "**`print(user[\"name\"])`** -- Looks up the value `\"Alice\"` for key `\"name\"` in the dictionary and prints it.\n\n**Dictionary lookup syntax:** Place a **key** inside square brackets `[]` to access its value. Lists use numeric indices (`fruits[0]`), while dictionaries use keys (usually strings).\n\n`user[\"name\"]` -> internally computes hash of `\"name\"` -> finds position in hash table -> returns value `\"Alice\"`\n\n**Analogy:** Opening the drawer labeled \"name\" in the cabinet and taking out the item (\"Alice\") inside.\n\n**What if you look up a non-existent key?** A `KeyError` is raised!\n```python\nuser[\"email\"]  # KeyError: 'email'\n```\n\n**Safe lookup -- the `get()` method:**\n```python\nuser.get(\"email\")        # Returns None (no error)\nuser.get(\"email\", \"N/A\") # Returns \"N/A\" (with default)\n```\n\n**Python internals:** `user[\"name\"]` calls `user.__getitem__(\"name\")`. It computes the hash of the `\"name\"` string (`hash(\"name\")`) and finds the corresponding position in O(1) in the hash table. This is the same speed as list index access (`O(1)`).\n\n**Execution order**: user[\"name\"] lookup (hash search) -> \"Alice\" returned -> print executed -> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "print(user[\"name\"])",
+        "pythonMemoryState": {
+          "output": [
+            "Alice"
+          ],
+          "names": [],
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"age\": 25}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Modifying a Value",
+        "explanation": "**`user[\"age\"] = 26`** -- **Modifies** the value of the existing key `\"age\"` from 25 to 26.\n\n**Assigning to an existing key = modification:** Since `\"age\"` already exists in the dictionary, the old value (25) is **overwritten** with the new value (26). Same principle as `fruits[0] = \"Grape\"` in lists.\n\nBefore: `{\"name\": \"Alice\", \"age\": 25}`\nAfter: `{\"name\": \"Alice\", \"age\": 26}`\n\n**What Mutable means:** Like lists, dictionaries **don't create a new object**; they directly modify the **contents of the existing object** (0x1000). `user` still points to the same object (0x1000).\n\n**Analogy:** Opening the \"age\" drawer in the cabinet, taking out 25, and putting in 26. The cabinet itself stays the same.\n\n**Python internals:** The hash value of `\"age\"` is used to find its position in the hash table, and the value reference at that position is changed from the `25` object to the `26` object. The reference count of `25` decreases.\n\n**Execution order**: user[\"age\"] position found -> value reference changed (25->26) -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "user[\"age\"] = 26      # 수정",
+        "pythonMemoryState": {
+          "note": "Existing key modified (25 -> 26)",
+          "names": [
+            {
+              "name": "user",
+              "pointsTo": "dict1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"age\": 26}",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding a New Entry",
+        "explanation": "**`user[\"city\"] = \"Seoul\"`** -- Assigns a value to the new key `\"city\"` that doesn't exist yet. The dictionary automatically expands.\n\n**Assigning to a new key = addition:** Since `\"city\"` doesn't exist in the dictionary, a **new key-value pair is automatically added**. Similar to using `append()` on a list, but dictionaries just use `[]` assignment for addition.\n\nBefore: `{\"name\": \"Alice\", \"age\": 26}` (2 entries)\nAfter: `{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}` (3 entries)\n\n**Convenient dictionary behavior -- same syntax for modify and add:**\n- `user[\"age\"] = 26` -> If the key **exists**: modify\n- `user[\"city\"] = \"Seoul\"` -> If the key **doesn't exist**: add\n\nIn lists, `fruits[10] = x` for a non-existent index raises `IndexError`, but dictionaries **automatically create new entries**.\n\n**Analogy:** A new drawer labeled \"city\" appears in the cabinet, with \"Seoul\" inside.\n\n**Python internals:** The hash value of `\"city\"` is computed to find a position in the hash table. If that position is empty, a new entry is added. If the hash table's usage exceeds 2/3, it automatically resizes.\n\n**Execution order**: user[\"city\"] hash search -> not found -> new key-value added -> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "user[\"city\"] = \"Seoul\" # 추가",
+        "pythonMemoryState": {
+          "note": "New key-value pair added",
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Checking Key Existence",
+        "explanation": "Checking for key existence is a fundamental habit for preventing dictionary errors.\n\nPattern:\n- Check with `if key in d:` first\n- If a key may not exist, use `d.get(key, default)`\n\n**Analogy**: It's the process of checking the label before opening a drawer.\n\nThis single habit can greatly reduce `KeyError` occurrences\nand keep exception handling code simple.",
+        "visualizationType": "pythonMemory",
+        "code": "if \"job\" in user:",
+        "pythonMemoryState": {
+          "note": "\"job\" in user -> False (key not found)",
+          "names": [
+            {
+              "name": "user",
+              "pointsTo": "dict1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}",
+              "pyId": "1001"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How can you avoid a KeyError when looking up a key that might not exist?",
+    "options": [
+      "user[key]",
+      "user.get(key)",
+      "user.find(key)",
+      "user.search(key)"
+    ],
+    "correctIndex": 1,
+    "explanation": "Using `user.get(\"job\")` returns `None` instead of raising an error when the key doesn't exist.\nYou can also provide a default: `user.get(\"job\", \"Unknown\")`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can use a list as a dictionary key",
+      "correct": "This is not possible.\nKeys must be **immutable (Immutable)** types.",
+      "why": "If a mutable object's value changes, its hash value would also need to change, which would break the dictionary.\nTuples, however, can be used."
+    }
+  ],
+  "keyTakeaway": "Use dictionaries when you need to look up data by name. Use `get()` for safe lookups."
+}

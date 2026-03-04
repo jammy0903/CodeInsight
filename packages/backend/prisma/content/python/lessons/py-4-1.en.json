@@ -1,0 +1,299 @@
+{
+  "lessonId": "py-4-1",
+  "title": "Function Basics",
+  "concept": "Bundle reusable code with the def keyword",
+  "content": {
+    "code": "# 1. 함수 정의\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\n# 2. 함수 호출\ngreet(\"Alice\")\ngreet(\"Bob\")\n\n# 3. Docstring (문서화)\ndef square(n):\n    \"\"\"숫자를 받아서 제곱을 반환합니다\"\"\"\n    return n * n\n\nprint(square(5))",
+    "steps": [
+      {
+        "title": "Defining a Function (greet)",
+        "explanation": "**`def greet(name):`**\n\nPython executes code from top to bottom.\nWhen Python encounters the `def` keyword, it creates a **function object** named `greet` in memory and registers it in the global namespace.\n\n**Why isn't the inner code (`print(...)`) executed now?**\n`def` only **stores the code like a 'recipe'**. Think of it as writing a recipe in a cookbook -- not actually cooking yet. To actually execute it, you must **call it with parentheses `()`** like `greet(\"Alice\")`.\n\n**Note**: Calling a function **before** it's defined causes a `NameError`. The `def` must be executed first!\n\n**Function Definition vs Call (distinguish these precisely!):**\n- **Definition**: `def greet(name):` -> Creates function object + registers name (code NOT executed)\n- **Call**: `greet(\"Alice\")` -> Stored code is actually executed",
+        "visualizationType": "pythonMemory",
+        "code": "def greet(name):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Function defined (code not executed)",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Function Call",
+        "explanation": "**`greet(\"Alice\")`**\n\n**Function Call**: Calls the previously registered `greet` function with the **argument** `\"Alice\"`.\n\nAnalogy: Taking out the recipe (function definition) and actually starting to cook. `\"Alice\"` is the ingredient (argument) for the recipe.\n\n**Parameter vs Argument (know the precise terminology!):**\n- **Parameter**: The variable name declared in the function definition -> `name`\n- **Argument**: The actual value passed during the function call -> `\"Alice\"`\n\n**Execution flow jump**: At the moment of the call, the program saves the current position (line 6) on the **call stack** and moves to **inside the function (line 3)**. The argument `\"Alice\"` is bound to the parameter `name`.\n\n**Python internals**: Python creates a new **local frame** on the call stack. Inside this frame, the binding `name = \"Alice\"` is created. When the function ends, this frame is automatically removed.\n\n**Note**: You need parentheses like `greet()` for a call, not just `greet`. Without parentheses, `greet` alone just references the function object without executing it!\n\n**Execution order**: line 6 -> greet called -> return address saved on call stack -> jump to line 3 -> name = \"Alice\"",
+        "visualizationType": "pythonMemory",
+        "code": "greet(\"Alice\")",
+        "pythonMemoryState": {
+          "note": "greet called -> about to jump to line 3",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing greet (Alice)",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\nExecution has entered the function body.\nSince parameter `name` is bound to `\"Alice\"`, the **f-string** evaluates to `\"Hello, Alice!\"` and is printed to the screen.\n\n**f-string behavior**: In `f\"Hello, {name}!\"`, the `{name}` part is substituted with the actual value of variable `name` (`\"Alice\"`). This string formatting method is available in Python 3.6+.\n\n**Function Scope**: `name` is a **local variable** that exists only inside the function. Think of the function as a 'room' and `name` as an item you can only use inside that room. When you leave the room (function), the item (variable) is automatically cleaned up (garbage collected).\n\n**Python internals**: `print()` is a Python built-in function that converts its argument to a string and writes it to standard output (stdout). It automatically adds a newline (`\\n`) after output.\n\n**Why this order?** We jumped here from the function call (line 6). Since this is the last line of the function body, the function automatically terminates after execution.\n\n**Note**: This function has no `return` statement, so Python automatically returns `None`.\n\n**Execution order**: name = \"Alice\" -> f-string evaluated -> print executed -> function ends (None returned) -> return address popped from call stack -> returns to line 7",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, Alice!"
+          ],
+          "note": "Function executing (name is a local variable)",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "name",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Second Function Call",
+        "explanation": "**`greet(\"Bob\")`**\n\nCalls the same function again with a **different argument** `\"Bob\"`. This is the core advantage of functions -- **reusing the same code with different data**!\n\n**Why is the previous `name = \"Alice\"` gone?** When the first call ended, the local frame created at that time (the space where local variables were stored) was **entirely deleted**. The `name = \"Alice\"` binding was destroyed along with it.\n\nAnalogy: When the first customer's (Alice) order is complete, the order slip is discarded, and a new order slip is written for the second customer (Bob). The first order slip's contents are completely gone.\n\n**Python internals**: Python creates a new local frame on the call stack again, this time creating a `name = \"Bob\"` binding. This is a **completely independent execution environment** from the previous call.\n\n**Note**: There's no limit on how many times you can call a function, but too-deep recursion (a function calling itself) can cause `RecursionError` (default limit: 1000).\n\n**Execution order**: line 7 -> greet called -> new local frame created -> jump to line 3 -> name = \"Bob\"",
+        "visualizationType": "pythonMemory",
+        "code": "greet(\"Bob\")",
+        "pythonMemoryState": {
+          "note": "Previous name is gone -> new call",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing greet (Bob)",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\nThis time, parameter `name` is bound to `\"Bob\"`, so the f-string evaluates to `\"Hello, Bob!\"` and is printed.\n\n**Same code, different result**: The function body code is exactly the same `print(f\"Hello, {name}!\")`, but the output differs because the value bound to `name` is different. This is the **power of parameters**!\n\nAnalogy: Like filling in different names in the same letter template (\"Hello, ___!\"). One template, different letters depending on the recipient.\n\n**Without functions?** You'd have to write similar code repeatedly: `print(f\"Hello, Alice!\")`, `print(f\"Hello, Bob!\")`. Functions reduce code duplication and make maintenance easier.\n\n**Note**: When the function ends, the `name = \"Bob\"` binding also disappears. Trying `print(name)` outside the function causes `NameError`.\n\n**Execution order**: name = \"Bob\" -> f-string evaluated -> print executed -> function ends (None returned) -> local frame deleted -> moves to line 10",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, Bob!"
+          ],
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "name",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Bob\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Defining a Function (square)",
+        "explanation": "**`def square(n):`**\n\nDefines the `square` function that takes a number and returns its square. The difference from `greet` is that it **returns a value with `return`**.\n\n**Docstring**: The `\"\"\"Takes a number and returns its square\"\"\"` part is the function's **official documentation**. It's wrapped in triple quotes (`\"\"\"`) and must be the **first line** of the function body.\n- Doesn't affect code execution, but appears when you run `help(square)`\n- Also accessible via `square.__doc__`\n- Analogy: Like a product manual. Works without it, but easier for users to understand with it\n\n**Python internals**: The docstring is stored as a string in the function object's `__doc__` attribute. Python's built-in `help()` function and IDE auto-completion features read this attribute.\n\n**Difference between greet and square:**\n- `greet`: Only prints to screen with `print()` -> No return value (`None`)\n- `square`: **Returns** the calculated result with `return` -> Has a return value (number)\n\n**Note**: Functions with `return` are much more flexible because results can be stored in variables or passed to other functions!\n\n**Execution order**: def executed -> square function object created + registered -> line 14",
+        "visualizationType": "pythonMemory",
+        "code": "def square(n):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "square function defined (code not executed)",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "square",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling square",
+        "explanation": "**`print(square(5))`**\n\nThis line contains **2 nested function calls**: `square(5)` and `print()`.\n\n**Nested call execution order (innermost first!):**\n1. **First** `square(5)` is called -> jumps to function body (line 12)\n2. `square` **returns** `25`\n3. Return value `25` is passed as argument to `print()`\n4. `print(25)` executes -> `25` displayed on screen\n\nAnalogy: Like gift wrapping. First wrap (execute) the inner box (`square(5)`), then put the result (25) into the outer box (`print()`) for final processing.\n\n**Python internals**: Python evaluates expressions starting from **innermost expressions first**. In `print(square(5))`, `square(5)` executes first and is replaced by `25`, then `print(25)` executes.\n\n**Difference from greet**: `greet(\"Alice\")` returns `None`, so `print(greet(\"Alice\"))` would print `None` as well. But `square(5)` returns `25`, which is usefully passed to `print()`.\n\n**Note**: Don't confuse `print()` and `return`! `print()` shows text on screen, while `return` sends a value back to the caller.\n\n**Execution order**: line 14 -> square(5) called -> return address saved on call stack -> jump to line 12 -> n = 5",
+        "visualizationType": "pythonMemory",
+        "code": "print(square(5))",
+        "pythonMemoryState": {
+          "note": "square(5) called -> about to jump to line 12",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "square",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing square",
+        "explanation": "**`return n * n`**\n\nParameter `n` is bound to `5`, so `5 * 5 = 25` is calculated and **returned**.\n\nAnalogy: `return` is like shipping a package. Send the product (25) to the orderer (line 14's `print`), and close the workshop (function).\n\n**Two roles of the `return` statement:**\n1. **Return value**: Returns the computed value (25) to **where it was called (line 14)**. In `print(square(5))`, the `square(5)` part is replaced by `25`.\n2. **Immediately end function**: When `return` is encountered, function execution **stops immediately** and returns to the caller. Any code below `return` won't execute!\n\n**Without `return`?** Python functions that have no `return` statement or a `return` with no value automatically return `None`. The `greet` function is exactly this case.",
+        "visualizationType": "pythonMemory",
+        "code": "return n * n",
+        "pythonMemoryState": {
+          "output": [
+            "25"
+          ],
+          "note": "n * n = 25 returned -> to line 14",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "square",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1004"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 5,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What value does a function without a return statement return by default?",
+    "options": [
+      "0",
+      "False",
+      "Undefined",
+      "None"
+    ],
+    "correctIndex": 3,
+    "explanation": "When there is no return statement or a return without a value, Python functions always return `None`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Defining a function runs it immediately",
+      "correct": "Definition (`def`) and execution (`call`) are different.",
+      "why": "Definition just registers 'this functionality exists'; to actually use it, you must call it with parentheses `()`."
+    }
+  ],
+  "keyTakeaway": "Bundle repeating code with `def`. Indentation and colon are required!"
+}

@@ -1,0 +1,578 @@
+{
+  "lessonId": "py-5-2",
+  "title": "Instance Attributes",
+  "concept": "Not shared by all objects -- each has its own data",
+  "content": {
+    "code": "class Cat:\n    def set_name(self, n):\n        self.name = n\n\n    def meow(self):\n        print(f\"{self.name} says Meow!\")\n\ncat1 = Cat()\ncat1.set_name(\"Kitty\")\n\ncat2 = Cat()\ncat2.set_name(\"Nabi\")\n\ncat1.meow()\ncat2.meow()",
+    "steps": [
+      {
+        "title": "Class Definition (Cat)",
+        "explanation": "**`class Cat:`**\n\nPython executes code from top to bottom in order.\nWe define a class (cat blueprint) named `Cat`.\n\n**Goal of this lesson**: In the previous lesson, we added attributes from **outside** the object like `my_dog.name = \"Buddy\"`. This time, we'll learn how to add attributes **inside a method using `self.attribute`**. This is far more organized and is the approach used in practice.\n\n**Python internals**: When Python encounters `class Cat:`, it executes the class body to register the methods, then creates the `Cat` class object. This class will have two methods defined: `set_name` and `meow`.\n\n**Why this order?** The class must be defined first so we can later add methods and create objects from the blueprint.\n\n**Execution order**: Execute class Cat -> Begin class body execution -> Start registering Cat class -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "class Cat:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Class definition begins",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Method Definition (set_name)",
+        "explanation": "**`def set_name(self, n):`**\n\n**Method**: A function defined inside a class is called a **method**. It's almost the same as a regular function, but with one special rule.\n\n**The self parameter -- The core of Python OOP!**\nThe **first parameter** of every instance method must be `self`.\n- `self`: A reference pointing to **\"myself (the object)\"** that called the method\n- When a method is called, Python **automatically** passes the calling object to `self`\n\n**Python's automatic conversion (very important!):**\n```python\ncat1.set_name(\"Kitty\")     # Code we write\n  |\nCat.set_name(cat1, \"Kitty\") # Python's internal conversion\n```\nThat is, `cat1` is automatically inserted into the `self` position!\n\n**Why is self needed?** Because multiple objects share the same method code. `self` is needed to distinguish **which object** this method is currently operating on. cat1 and cat2 use the same `set_name` code, but since `self` differs, each produces different results.\n\n**Note**: `self` is not a reserved word but a **convention**. You could change it to `this` or `me` and it would still work, but the Python community **always uses `self`**.\n\n**Execution order**: Execute def set_name -> Create set_name function object -> Register in Cat class -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def set_name(self, n):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "set_name method defined (not executed yet)",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with set_name>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Method Definition (meow)",
+        "explanation": "**`def meow(self):`**\n\nWe define another method `meow`. This method implements the behavior of a cat making a sound.\n\n**A method with only self**: `meow(self)` has no additional parameters beyond `self`. This means it operates using only **the object's own data (self.name)**, without needing any external data.\n\n**Key point about the method body `print(f\"{self.name} says Meow!\")`**: It accesses the `name` attribute of the calling object via `self.name`. When cat1 calls it, it reads cat1's name; when cat2 calls it, it reads cat2's name. The same code producing **different results** is the beauty of OOP!\n\n**Caution**: What if `meow()` is called before `set_name()`? Since `self.name` doesn't exist yet, an `AttributeError` would occur! To prevent this, it's better to initialize attributes in the `__init__` constructor (we'll learn this in the next lesson).\n\n**Execution order**: Execute def meow -> Create meow function object -> Register in Cat class -> Cat class definition complete -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "def meow(self):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "meow method defined (not executed yet)",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with set_name, meow>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the First Object",
+        "explanation": "**`cat1 = Cat()`**\n\nCalling `Cat()` creates the **first Cat object (instance)**.\n\n**What happens inside Python during object creation**:\n1. `Cat.__new__(Cat)` is called -> Allocates **empty Cat object** space in memory (0x2000)\n2. `Cat.__init__(new_object)` is called -> Initializes the object (no `__init__` exists, so only default initialization)\n3. Returns the **reference (address 0x2000)** of the initialized object\n4. The variable `cat1` receives and binds to this reference\n\n**State of cat1 at this point**: It's a **blank object** with no attributes! `cat1.__dict__` is an empty dictionary `{}`. The `name` attribute doesn't exist yet -- it will be added when the `set_name()` method is called.\n\nAnalogy: A cat has been born with a blank name tag. Its name hasn't been decided yet.\n\n**Why this order?** Objects can only be created after the class definition is complete.\n\n**Execution order**: Call Cat() -> Create object 0x2000 via __new__ -> Assign reference 0x2000 to cat1 -> line 9",
+        "visualizationType": "pythonMemory",
+        "code": "cat1 = Cat()",
+        "pythonMemoryState": {
+          "note": "First Cat object created (0x2000)",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling cat1.set_name",
+        "explanation": "**`cat1.set_name(\"Kitty\")`**\n\nWe call the `set_name` method on the `cat1` object. Python **automatically passes cat1 to self**.\n\n**Python's automatic conversion (once more!):**\n```python\ncat1.set_name(\"Kitty\")       # Code we write (1 argument)\n  |\nCat.set_name(cat1, \"Kitty\")  # Python's internal conversion (2 arguments!)\n```\nWe only passed 1 argument (`\"Kitty\"`), but Python internally puts `cat1` as the **first argument (self)** automatically!\n\n**Parameter binding**:\n- `self` = `cat1` (object at 0x2000) -- **automatically passed**\n- `n` = `\"Kitty\"` -- **passed by us**\n\nAnalogy: It's like telling a delivery person (method) \"Put this name tag (Kitty) on this cat (cat1).\" The delivery person automatically knows which cat (self) to work on.\n\n**Execution flow**: At this line, execution **jumps into the function body (line 3)**. When the method finishes, it returns here.\n\n**Execution order**: line 9 -> Create cat1.set_name bound method -> Call -> Jump to line 3 -> self=cat1, n=\"Kitty\"",
+        "visualizationType": "pythonMemory",
+        "code": "cat1.set_name(\"Kitty\")",
+        "pythonMemoryState": {
+          "note": "set_name called -> About to jump to line 3",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing set_name (cat1)",
+        "explanation": "**`self.name = n`**\n\nThis line is the key code that creates an **instance attribute**! It adds a new attribute `name` to `self` (currently the cat1 object at 0x2000) and assigns the value of parameter `n`, which is `\"Kitty\"`.\n\n**Instance attribute vs Class attribute**: Instance attributes are **individually owned** by each object. cat1's name and cat2's name (to be created later) are completely different variables. It's like student IDs with the same form -- each student writes their own name.\n\n**Caution**: `self.name` and `name` are different! Using just `name` creates a local variable, while `self.name` permanently stores the value on the object. If you forget `self.`, the value disappears when the function ends!",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = n",
+        "pythonMemoryState": {
+          "note": "name attribute added only to cat1 object",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "n",
+              "pointsTo": "parameter2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> cat1 (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Kitty\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the Second Object",
+        "explanation": "**`cat2 = Cat()`**\n\nNow we create a **second Cat object**. Every time `Cat()` is called, Python creates a **completely new object** in memory.\n\n**Key concept -- Object independence**: cat1 (0x2000) and cat2 (0x3000) are **completely separate objects**. Although created from the same blueprint (Cat class), they have different memory addresses and independent internal data.\n\n**Analogy**: Think of them as two dolls made in the same factory (Cat class). Putting a name tag on one doll (cat1.name = \"Kitty\") doesn't automatically put a name tag on the other.\n\n**State of cat2 at this point**: `cat2.__dict__` is an empty dictionary `{}`! The name attribute added to cat1 has absolutely no effect on cat2. cat2 still has no name.\n\n**Python internals**: Again `Cat.__new__(Cat)` -> allocate new memory (0x3000) -> default `__init__` (does nothing) -> bind reference 0x3000 to cat2. Each time `Cat()` is called, this process repeats and a new object is born.\n\n**Why this order?** After the previous set_name method call completes and returns to line 10, the next line (line 11) executes in order.\n\n**Execution order**: Call Cat() -> Create new object 0x3000 via __new__ -> Assign reference 0x3000 to cat2 -> line 12",
+        "visualizationType": "pythonMemory",
+        "code": "cat2 = Cat()",
+        "pythonMemoryState": {
+          "note": "Second Cat object created (cat2 has no name yet)",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling cat2.set_name",
+        "explanation": "**`cat2.set_name(\"Nabi\")`**\n\nThis time we call the `set_name` method on the `cat2` object. Python performs the automatic conversion again.\n\n**Python's automatic conversion:**\n```python\ncat2.set_name(\"Nabi\")       # Code we write (1 argument)\n  |\nCat.set_name(cat2, \"Nabi\")  # Python's internal conversion (2 arguments!)\n```\n\n**Parameter binding:**\n- `self` = `cat2` (object at 0x3000) -- **automatically passed** (cat2, not cat1!)\n- `n` = `\"Nabi\"` -- **passed by us**\n\n**Same method, different self**: The **exact same code (line 3)** executes as when `cat1.set_name(\"Kitty\")` was called. But this time, since self points to cat2, the result is stored on the cat2 object. This is why `self` is so important in OOP!\n\n**Analogy**: Using the same name-tagging machine (set_name method), but this time tagging the second cat (cat2).\n\n**Why this order?** After the second object is created, the next line executes in order.\n\n**Execution order**: line 12 -> Create cat2.set_name bound method -> Call -> Jump to line 3 -> self=cat2, n=\"Nabi\"",
+        "visualizationType": "pythonMemory",
+        "code": "cat2.set_name(\"Nabi\")",
+        "pythonMemoryState": {
+          "note": "set_name called -> About to jump to line 3",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object>",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing set_name (cat2)",
+        "explanation": "**`self.name = n`**\n\nThe **exact same line of code** as before, but this time `self` points to cat2 (0x3000), so the result is different. It adds a `name` attribute to the cat2 object and assigns `\"Nabi\"`.\n\n**Python internals**: This is equivalent to `cat2.__dict__['name'] = \"Nabi\"`. cat2's `__dict__` changes from `{}` to `{'name': 'Nabi'}`.\n\n**Let's compare the state of both objects at this point:**\n- cat1 (0x2000): `__dict__` = `{'name': 'Kitty'}` -- its own name\n- cat2 (0x3000): `__dict__` = `{'name': 'Nabi'}` -- its own name\n- Cat class: Has `set_name`, `meow` methods -- **code is shared**\n\n**Key insight**: The method code (set_name) exists as **only one copy** in the Cat class, shared by all objects. But because `self` points to the calling object, the same code can store **independent data** in each object. Sharing code while separating data is the core principle of OOP!\n\n**Analogy**: There's only one stamping machine (set_name) in the factory, but it stamps different dolls depending on which one you bring.\n\n**Why does it work this way?** `self` points to the **object that called the method**. When cat2.set_name() is called, self becomes cat2.\n\n**Execution order**: self.name = n -> Add name=\"Nabi\" to cat2.__dict__ -> Function ends -> Return to line 14",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = n",
+        "pythonMemoryState": {
+          "note": "name attribute added only to cat2 (independent of cat1)",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter3",
+              "highlight": true
+            },
+            {
+              "name": "n",
+              "pointsTo": "parameter4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "-> cat2 (0x3000)",
+              "pyId": "1006",
+              "highlight": true
+            },
+            {
+              "id": "parameter4",
+              "type": "parameter",
+              "value": "\"Nabi\"",
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling cat1.meow",
+        "explanation": "**`cat1.meow()`**\n\nWe call the `meow` method on the `cat1` object. Now that both cats have their names set, the meow method can produce each cat's sound with their own name.\n\n**Python's automatic conversion:**\n```python\ncat1.meow()       # Code we write (0 arguments)\n  |\nCat.meow(cat1)    # Python's internal conversion (1 argument = self!)\n```\n\n**Parameter binding:**\n- `self` = `cat1` (object at 0x2000) -- **automatically passed**\n\n**Execution preview**: Inside the meow method, `self.name` will be read. Since self is cat1, it will read cat1's name, \"Kitty\". cat2's name \"Nabi\" is completely unrelated.\n\n**Python's attribute lookup order**: When accessing `self.name`, Python first checks cat1's `__dict__`. It finds name in `{'name': 'Kitty'}` and returns \"Kitty\".\n\n**Why this order?** After all objects' names are set, the next line executes in order.\n\n**Execution order**: line 14 -> Create cat1.meow bound method -> Call -> Jump to line 6 -> self=cat1",
+        "visualizationType": "pythonMemory",
+        "code": "cat1.meow()",
+        "pythonMemoryState": {
+          "note": "meow called -> About to jump to line 6",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing meow (cat1)",
+        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\nThe meow method body executes. It accesses `self` (cat1)'s `name` attribute, combines it with an f-string, and prints the result.\n\n**Let's follow the execution step by step:**\n1. `self` -> cat1 object (0x2000)\n2. `self.name` -> cat1.__dict__['name'] -> \"Kitty\"\n3. f-string evaluation: `f\"{self.name} says Meow!\"` -> `\"Kitty says Meow!\"`\n4. `print(\"Kitty says Meow!\")` executes -> Output to screen!\n\n**Why does \"Kitty\" appear?** Because self points to cat1 (0x2000), and cat1's `__dict__` contains `'name': 'Kitty'`. cat2's name \"Nabi\" lives in cat2 (0x3000)'s `__dict__`, so it's completely unrelated.\n\n**f-string review**: `f\"...{expression}...\"` replaces the expression inside curly braces with its **evaluated result**. Here `{self.name}` is replaced with `\"Kitty\"`.\n\n**This is the essence of OOP!** When cat1 calls the same meow code, it prints \"Kitty says Meow!\"; when cat2 calls it, \"Nabi says Meow!\". **One code, different results per object** -- this is the essence of object-oriented programming.\n\n**Execution order**: Read self.name (\"Kitty\") -> Evaluate f-string -> Execute print -> meow function ends -> Return to line 15",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"{self.name} says Meow!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Kitty says Meow!"
+          ],
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "-> cat1 (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Calling cat2.meow",
+        "explanation": "**`cat2.meow()`**\n\nThis time we call the `meow` method on the `cat2` object. In the previous step, cat1.meow() printed \"Kitty says Meow!\" -- what result will we get this time?\n\n**Python's automatic conversion:**\n```python\ncat2.meow()       # Code we write\n  |\nCat.meow(cat2)    # Python's internal conversion\n```\n\n**Parameter binding:**\n- `self` = `cat2` (object at 0x3000) -- not cat1 (0x2000)!\n\n**Let's predict**: Inside the meow method, `self.name` will be read. This time self is cat2, so it finds name in cat2's `__dict__` and reads \"Nabi\". Therefore the output will be \"Nabi says Meow!\".\n\n**Key point**: `cat1.meow()` and `cat2.meow()` execute the **same function code (Cat.meow)**. The only difference is which object goes into self. Thanks to self, one piece of code can behave differently for different objects.\n\n**Why this order?** After the previous cat1.meow() call completes, the next line executes in order.\n\n**Execution order**: line 15 -> Create cat2.meow bound method -> Call -> Jump to line 6 -> self=cat2",
+        "visualizationType": "pythonMemory",
+        "code": "cat2.meow()",
+        "pythonMemoryState": {
+          "note": "meow called -> About to jump to line 6",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing meow (cat2)",
+        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\nThe key here is who `self` is.\nIn this call, `self = cat2`, so `self.name` is `\"Nabi\"`.\nTherefore the output is `Nabi says Meow!`.\n\nKey summary:\n- Method code exists once in the class\n- Data differs per instance\n- `self` points to the current calling object, making the same code behave differently\n\n**Analogy**: Even reading the same script, if the actor (instance) is different, the delivery changes.\n\nCaution:\n- If you don't set `name` beforehand, you may get an `AttributeError`",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"{self.name} says Meow!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Nabi says Meow!"
+          ],
+          "note": "Each object prints its own name",
+          "names": [
+            {
+              "name": "Cat",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "cat1",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "cat2",
+              "pointsTo": "instance2"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Cat object, name='Kitty'>",
+              "pyId": "1002"
+            },
+            {
+              "id": "instance2",
+              "type": "instance",
+              "value": "<Cat object, name='Nabi'>",
+              "pyId": "1005"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "-> cat2 (0x3000)",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens if you don't include `self` as the first parameter of a method?",
+    "options": [
+      "It is added automatically",
+      "An error occurs (TypeError)",
+      "It references a global variable",
+      "It becomes a class method"
+    ],
+    "correctIndex": 1,
+    "explanation": "When a method is called, Python automatically passes the object itself as the first argument. If there's no parameter (`self`) to receive it, a TypeError occurs saying the argument count doesn't match."
+  },
+  "misconceptions": [
+    {
+      "wrong": "self is a reserved keyword",
+      "correct": "Actually, you can rename `self` to anything (`this`, `me`) and it will still work.",
+      "why": "However, it's a **strong convention** in the Python community, so you should always use `self`.\nNot following this convention will make your code very hard for others to read."
+    }
+  ],
+  "keyTakeaway": "The first parameter of a method is always `self`. Use `self.variable` to store each object's own data."
+}

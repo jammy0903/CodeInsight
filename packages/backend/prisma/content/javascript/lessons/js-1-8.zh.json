@@ -1,0 +1,150 @@
+{
+  "lessonId": "js-1-8",
+  "title": "函数声明",
+  "concept": "函数是可复用的代码块。可以使用 function 关键字或箭头函数来声明。",
+  "content": {
+    "code": "function add(a, b) {\n    let result = a + b;\n    return result;\n}\n\nlet sum = add(3, 7);\nconsole.log(\"3 + 7 =\", sum);\n\nlet double = add(sum, sum);\nconsole.log(\"sum * 2 =\", double);\n",
+    "steps": [
+      {
+        "title": "函数声明",
+        "explanation": "**`function add(a, b) {`**\n\n使用 `function` 关键字声明函数。\n此时函数不会执行——它只是被**注册**到内存中。\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "Line 1 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "function add(a, b) {"
+      },
+      {
+        "title": "进入函数体",
+        "explanation": "**`let result = a + b;`**\n\n调用 `add(3, 7)` **使执行跳转到函数体内部**。\n`a = 3`，`b = 7` → `result = 10`\n\n`result` 是一个**局部变量**，只在函数内部存在。\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "Line 2 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "let result = a + b;"
+      },
+      {
+        "title": "返回值",
+        "explanation": "**`return result;`**\n\n将 `result` 的值（`10`）**返回给调用者**。\n函数结束，执行返回到第 6 行。\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "Line 3 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "return result;"
+      },
+      {
+        "title": "保存返回值",
+        "explanation": "**`let sum = add(3, 7);`**\n\n函数返回的 `10` 被存储在 `sum` 中。\n\n记住这个流程：函数调用 → 内部执行 → 返回 → 存储值！\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [],
+          "note": "Line 6 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "let sum = add(3, 7);"
+      },
+      {
+        "title": "打印结果",
+        "explanation": "**`console.log(\"3 + 7 =\", sum);`**\n\n**输出**：`3 + 7 = 10`\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "3 + 7 = 10"
+          ],
+          "note": "Line 7 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "console.log(\"3 + 7 =\", sum);"
+      },
+      {
+        "title": "再次调用函数 — 进入函数体",
+        "explanation": "**`let result = a + b;`**\n\n调用 `add(sum, sum)`，即 `add(10, 10)`！\n执行再次跳转到函数体内部。\n\n`a = 10`，`b = 10` → `result = 20`\n上一次调用的 `result` 已经不存在了。\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "3 + 7 = 10"
+          ],
+          "note": "Line 2 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "let result = a + b;"
+      },
+      {
+        "title": "返回值（第二次调用）",
+        "explanation": "**`return result;`**\n\n返回 `result` 的值（`20`）。\n执行返回到第 9 行。\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "3 + 7 = 10"
+          ],
+          "note": "Line 3 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "return result;"
+      },
+      {
+        "title": "保存返回值（第二次调用）",
+        "explanation": "**`let double = add(sum, sum);`**\n\n函数返回的 `20` 被存储在 `double` 中。\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "3 + 7 = 10"
+          ],
+          "note": "Line 9 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "let double = add(sum, sum);"
+      },
+      {
+        "title": "最终输出",
+        "explanation": "**`console.log(\"sum * 2 =\", double);`**\n\n**输出**：`sum * 2 = 20`\n\n函数的核心价值：**一次编写，多次使用！**\n",
+        "visualizationType": "jsMemory",
+        "jsMemoryState": {
+          "variables": [],
+          "output": [
+            "3 + 7 = 10",
+            "sum * 2 = 20"
+          ],
+          "note": "Line 10 executed",
+          "names": [],
+          "objects": []
+        },
+        "code": "console.log(\"sum * 2 =\", double);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "调用 function f() {} 时的返回值是什么？",
+    "options": [
+      "0",
+      "null",
+      "undefined",
+      "Error"
+    ],
+    "correctIndex": 2,
+    "explanation": "没有 return 语句的函数返回 undefined。\n\n- `return`：返回 undefined\n- `return value`：返回该值\n- 无 return：返回 undefined\n"
+  },
+  "keyTakeaway": ""
+}

@@ -1,0 +1,181 @@
+{
+  "lessonId": "java-1-3",
+  "title": "Integer 缓存陷阱",
+  "concept": "Integer 缓存 -128~127 范围内的值，复用相同的对象",
+  "content": {
+    "code": "Integer a = 127;\nInteger b = 127;\nSystem.out.println(a == b);\n\nInteger x = 128;\nInteger y = 128;\nSystem.out.println(x == y);\n\nSystem.out.println(x.equals(y));",
+    "steps": [
+      {
+        "title": "创建 Integer 127（自动装箱）",
+        "explanation": "**执行顺序：**\n1. 自动调用 `Integer.valueOf(127)`。\n2. 检查 127 是否在缓存范围（-128~127）内。\n3. 返回缓存的对象。\n\n你写的是 `Integer a = 127;`，但编译器会悄悄将其转换为 `Integer.valueOf(127)`。\n\n**什么是自动装箱（Auto-boxing）？**\n将基本类型（int）自动包装成对象（包装类）的功能。",
+        "keyInsight": "小数字（-128~127）使用预创建的对象",
+        "visualizationType": "javaMemory",
+        "code": "Integer a = 127;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "type": "Integer",
+              "value": "-> Cache[127]"
+            }
+          ],
+          "cache": {
+            "name": "Integer Cache",
+            "range": "-128 ~ 127",
+            "highlight": 127
+          },
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "再次创建相同的值 127",
+        "explanation": "**执行顺序：**\n1. 调用 `Integer.valueOf(127)`。\n2. 从缓存中复用相同的对象。\n3. `b` 也指向相同的地址。\n\n127 是缓存范围内的数字。\nJVM 从那个**缓存盒子**中取出完全相同的对象。\n最终 `a` 和 `b` 指向**同一个对象**。",
+        "visualizationType": "javaMemory",
+        "code": "Integer b = 127;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "type": "Integer",
+              "value": "-> Cache[127]"
+            },
+            {
+              "name": "b",
+              "type": "Integer",
+              "value": "-> Cache[127]",
+              "sameRef": true
+            }
+          ],
+          "cache": {
+            "highlight": 127,
+            "refCount": 2
+          }
+        }
+      },
+      {
+        "title": "缓存范围内的 == 比较",
+        "explanation": "**执行顺序：**\n1. 地址比较（Cache[127] == Cache[127]）。\n2. 返回 **true**。\n\n**警告：**\n这就是问题所在！开发者会误以为"哦，Integer 之间也可以用 `==` 比较"。",
+        "keyInsight": "在缓存范围内 == 为 true（危险！）",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a == b);",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "warning": "因为在缓存范围内所以为 true，但不要依赖此行为！",
+          "cache": {
+            "highlight": 127,
+            "refCount": 2
+          }
+        }
+      },
+      {
+        "title": "创建 Integer 128（超出范围）",
+        "explanation": "**执行顺序：**\n1. 调用 `Integer.valueOf(128)`。\n2. 检测到超出范围（127）。\n3. 通过 `new Integer(128)` 创建**新对象**。\n\n现在是 128。\n超出了缓存范围（127），对吧？\n即使是自动装箱，超出范围也会调用 `new` 在堆上创建**全新的对象**。",
+        "keyInsight": "从 128 开始，每次都会创建新对象",
+        "visualizationType": "javaMemory",
+        "code": "Integer x = 128;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "type": "Integer",
+              "value": "-> 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Integer(128)"
+            }
+          ],
+          "cache": {
+            "range": "-128 ~ 127",
+            "note": "128 超出范围！"
+          },
+          "output": [],
+          "warning": null
+        }
+      },
+      {
+        "title": "再次创建相同的值 128",
+        "explanation": "**执行顺序：**\n1. 调用 `Integer.valueOf(128)`。\n2. 超出范围 -> 创建新对象（0x002）。\n3. 赋值给 `y`。\n\n128 没有特殊待遇。\n每次请求都会在堆上创建**全新的对象**。",
+        "visualizationType": "javaMemory",
+        "code": "Integer y = 128;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "x",
+              "type": "Integer",
+              "value": "-> 0x001"
+            },
+            {
+              "name": "y",
+              "type": "Integer",
+              "value": "-> 0x002"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "Integer(128)"
+            },
+            {
+              "address": "0x002",
+              "content": "Integer(128)",
+              "new": true
+            }
+          ],
+          "cache": null
+        }
+      },
+      {
+        "title": "缓存范围外的 == 比较",
+        "explanation": "**执行顺序：**\n1. 比较 x(0x001) == y(0x002)。\n2. 地址不同，所以是 **false**。\n\n**令人震惊的事实：**\n同样是 `Integer` 类型，127 返回 `true`，128 却返回 `false`。\n正是这种**不一致的行为**，所以绝对不能用 `==` 比较 Integer。",
+        "keyInsight": "缓存范围外 == 为 false",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(x == y);",
+        "javaMemoryState": {
+          "comparison": "0x001 != 0x002",
+          "output": [
+            "false"
+          ]
+        }
+      },
+      {
+        "title": "使用 equals() 进行安全比较",
+        "explanation": "**执行顺序：**\n1. 调用 x.equals(y)。\n2. 比较内部值（128）。\n3. 一致 -> **true**。\n\n`.equals()` 会取出并比较对象内部的**实际值（value）**。\n**结论：** 对象比较务必使用 `.equals()`！没有例外。",
+        "keyInsight": "始终使用 .equals() 才安全",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(x.equals(y));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "comparison": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪种情况 == 返回 true？",
+    "options": [
+      "Integer a = 200; Integer b = 200; a == b",
+      "Integer a = 100; Integer b = 100; a == b",
+      "Integer a = new Integer(100); Integer b = 100; a == b",
+      "Integer a = -200; Integer b = -200; a == b"
+    ],
+    "correctIndex": 1,
+    "explanation": "100 在缓存范围（-128~127）内且使用自动装箱，因此引用相同的缓存对象。\n200 和 -200 超出范围，new 始终创建新对象。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Integer 总是可以用 == 比较",
+      "correct": "绝对不行。\n只能使用 .equals()。",
+      "why": "在缓存范围（-128~127）内 `==` 可以工作，但超出该范围就会失败。\n这样的代码就是在靠运气。"
+    }
+  ],
+  "keyTakeaway": "Integer 缓存：仅 -128~127 被复用。始终使用 .equals()。"
+}

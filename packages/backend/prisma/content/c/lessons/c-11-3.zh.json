@@ -1,0 +1,185 @@
+{
+  "lessonId": "c-11-3",
+  "title": "三元运算符与逻辑运算",
+  "concept": "用三元运算符(?:)实现简洁的条件表达式，以及 && 和 || 的短路求值（short-circuit evaluation）",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int age = 20;\n    int has_id = 1;\n\n    char *status = (age >= 18) ? \"Adult\" : \"Minor\";\n    printf(\"Status: %s\\n\", status);\n\n    if (age >= 18 && has_id) {\n        printf(\"Entry allowed\\n\");\n    }\n\n    int result = (age > 0) || (10 / 0);\n    printf(\"Short-circuit: %d\\n\", result);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "main 函数开始与变量初始化",
+        "explanation": "**`int age = 20;`** 和 **`int has_id = 1;`** -- 栈帧中创建两个整型变量。`age` 是年龄（20），`has_id` 表示是否持有身份证（1 = 有）。",
+        "visualizationType": "cMemory",
+        "code": "int has_id = 1;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "age",
+            "value": "20",
+            "type": "int",
+            "address": "0x1008"
+          },
+          {
+            "name": "has_id",
+            "value": "1",
+            "type": "int",
+            "address": "0x1004",
+            "highlight": true
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "用三元运算符进行条件赋值",
+        "explanation": "**`char *status = (age >= 18) ? \"Adult\" : \"Minor\";`** -- **三元运算符（Ternary Operator）**将 if-else 压缩为**一行**。",
+        "code": "char *status = (age >= 18) ? \"Adult\" : \"Minor\";",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "age",
+            "value": "20",
+            "type": "int",
+            "address": "0x1008"
+          },
+          {
+            "name": "has_id",
+            "value": "1",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "status",
+            "value": "\"Adult\"",
+            "type": "char*",
+            "address": "0x1000",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "输出 status",
+        "explanation": "**`printf(\"Status: %s\\n\", status);`** -- `%s` 是字符串格式说明符。读取 `status` 指向的 `\"Adult\"` 并输出 `Status: Adult`。",
+        "visualizationType": "terminal",
+        "code": "printf(\"Status: %s\\n\", status);",
+        "stdout": "Status: Adult"
+      },
+      {
+        "title": "&&（逻辑与）- 两个条件都为真",
+        "explanation": "**`if (age >= 18 && has_id) {`** -- **`&&`（逻辑与）**运算符只有在**两侧条件都为真**时整体才为真。`20 >= 18`（真）&& `has_id`（1，真）→ 真，所以 if 块被执行。",
+        "visualizationType": "cMemory",
+        "code": "if (age >= 18 && has_id) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "age",
+            "value": "20",
+            "type": "int",
+            "address": "0x1008"
+          },
+          {
+            "name": "has_id",
+            "value": "1",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "status",
+            "value": "\"Adult\"",
+            "type": "char*",
+            "address": "0x1000"
+          }
+        ],
+        "stdout": "Status: Adult"
+      },
+      {
+        "title": "AND 条件通过 - 输出允许入场",
+        "explanation": "**`printf(\"Entry allowed\\n\");`** -- 两个条件都为真，因此输出 `\"Entry allowed\"`。这是用代码表达"年满 18 岁且持有身份证才能入场"这一条件。",
+        "visualizationType": "terminal",
+        "code": "printf(\"Entry allowed\\n\");",
+        "stdout": "Status: Adult\nEntry allowed"
+      },
+      {
+        "title": "||（逻辑或）短路求值",
+        "explanation": "**`int result = (age > 0) || (10 / 0);`** -- `||`（逻辑或）只要**有一侧为真**，整体就为真。但是 `(10 / 0)` 是除以零，如果被执行的话程序会**崩溃**！",
+        "visualizationType": "cMemory",
+        "code": "int result = (age > 0) || (10 / 0);",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "age",
+            "value": "20",
+            "type": "int",
+            "address": "0x1008"
+          },
+          {
+            "name": "has_id",
+            "value": "1",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "status",
+            "value": "\"Adult\"",
+            "type": "char*",
+            "address": "0x1000"
+          },
+          {
+            "name": "result",
+            "value": "1",
+            "type": "int",
+            "address": "0x0ffc",
+            "highlight": true
+          }
+        ],
+        "stdout": "Status: Adult\nEntry allowed"
+      },
+      {
+        "title": "短路求值结果输出及终止",
+        "explanation": "**`printf(\"Short-circuit: %d\\n\", result);`** -- 输出 `result = 1`。得益于短路求值，除以零被完全避免了。",
+        "visualizationType": "terminal",
+        "code": "printf(\"Short-circuit: %d\\n\", result);",
+        "stdout": "Status: Adult\nEntry allowed\nShort-circuit: 1"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在以下代码中，func() 会被执行吗？\n\nint x = 5;\nint y = (x > 0) || func();",
+    "options": [
+      "会执行 - || 会对两侧都进行求值",
+      "不会执行 - 因为 x > 0 为真，短路求值会跳过",
+      "会产生编译错误",
+      "取决于 x 的值"
+    ],
+    "correctIndex": 1,
+    "explanation": "|| 运算符在左侧为真时不会对右侧求值（短路求值）。\n因为 x = 5，所以 (x > 0) 为真。因此 func() 不会被调用。\n如果 x = -1，那么 (x > 0) 为假，func() 就会被执行。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "&& 和 || 总是对两侧都进行求值",
+      "correct": "C 的逻辑运算符使用短路求值（short-circuit）。一旦结果确定，就忽略剩余部分。",
+      "why": "对于 &&，左侧为假则整体为假；对于 ||，左侧为真则整体为真——结果已经确定。"
+    }
+  ],
+  "keyTakeaway": "三元运算符提供简洁的条件表达式，&&/|| 的短路求值跳过不必要的运算，写出更安全的代码。"
+}

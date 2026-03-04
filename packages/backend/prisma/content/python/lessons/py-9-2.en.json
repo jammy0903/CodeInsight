@@ -1,0 +1,323 @@
+{
+  "lessonId": "py-9-2",
+  "title": "Decorators: Functions That Enhance Other Functions",
+  "concept": "A closure-based pattern that adds extra functionality to existing functions without modifying their code, using the `@` syntax.",
+  "content": {
+    "code": "def logger(func):\n    def wrapper(*args, **kwargs):\n        print(f\"--- {func.__name__} 시작 ---\")\n        result = func(*args, **kwargs)\n        print(f\"--- {func.__name__} 종료 ---\")\n        return result\n    return wrapper\n\n@logger\ndef say_hello(name):\n    print(f\"안녕하세요, {name}님!\")\n\nsay_hello(\"앨리스\")",
+    "steps": [
+      {
+        "title": "Defining the logger function",
+        "explanation": "**`def logger(func):`**\n\n**We define the decorator function.** This function accepts another function as the parameter `func`.\n\n**Analogy**: Think of a gift wrapping service.\n- `logger` is the 'wrapping service' itself\n- `func` is the 'original gift' to be wrapped\n- The wrapping service takes the gift, wraps it in decorative paper (start/end logs), and returns it\n- The original gift itself is not changed at all\n\n**Under the hood**: When Python encounters `def logger(func):`, it creates a function object (0x1100). Since this function hasn't been called yet, the inner `wrapper` function hasn't been created either.\n\n**Why this order?** To use the decorator with `@logger`, `logger` must be defined first. Since Python reads code top to bottom, the decorator function must appear before it's used.\n\n**Note**: The parameter name `func` is a convention for decorator functions, but any name will work. What matters is that it receives 'the function to decorate'.",
+        "visualizationType": "pythonMemory",
+        "code": "def logger(func):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "The logger function (0x1100) has been defined.",
+          "names": [
+            {
+              "name": "logger",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Applying @logger decorator and defining say_hello",
+        "explanation": "**`@logger` + `def say_hello(name):`**\n\n**`@logger` is Python's decorator syntax.** This single line is internally identical to `say_hello = logger(say_hello)`.\n\nHere's the detailed execution order:\n1. First, `def say_hello(name):` creates the original `say_hello` function object (0x1200)\n2. Immediately, `logger(say_hello)` is called -- the original function is passed to the `func` parameter\n3. The return value of `logger` is assigned back to the name `say_hello`\n\n**Analogy**: Imagine a package pickup process.\n- The original product (say_hello) is created\n- It's immediately sent to the wrapping service (logger)\n- The wrapped product comes back with the same label (say_hello)\n\n**Under the hood**: When `logger` is called, a new execution frame is created, and the local variable `func` is bound to the original `say_hello` function.\n\n**Why this order?** The `@` syntax is automatically applied right after the function definition. Python does `say_hello = logger(say_hello)` for you so you don't have to write it manually.\n\n**Note**: After `@logger`, `say_hello` is no longer the original function! The name is the same, but the underlying object has changed.",
+        "visualizationType": "pythonMemory",
+        "code": "def say_hello(name):",
+        "highlightOffset": [
+          -1,
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "logger has been called. The original say_hello is passed as func.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the wrapper function",
+        "explanation": "**`def wrapper(*args, **kwargs):`**\n\n**Inside the `logger` function, we define the `wrapper` function.** This function acts as the 'wrapping paper' that wraps the original `say_hello`.\n\n**What `*args, **kwargs` means:**\n- `*args`: Can accept any number of positional arguments (e.g., `(\"Alice\")`, `(1, 2, 3)`)\n- `**kwargs`: Can accept any number of keyword arguments (e.g., `(name=\"Alice\")`)\n- This allows the decorator to be applied to any function\n\n**Analogy**: The wrapping paper must be able to wrap gifts of any size.\n`*args, **kwargs` is the 'universal-size wrapping paper'.\n\n**Under the hood**: `wrapper` is a closure. It references the `func` variable (the original `say_hello`) through a Cell, so it can access the original function even after `logger` finishes executing.\n\n**Why this order?** `wrapper` must be defined when `logger(func)` is called. This `wrapper` will become the 'new function' that gets called under the name `say_hello`.\n\n**Note**: The name `wrapper` is a convention. Any name would work, but `wrapper` (meaning 'a function that wraps') is the most commonly used.",
+        "visualizationType": "pythonMemory",
+        "code": "def wrapper(*args, **kwargs):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "pythonMemoryState": {
+          "note": "wrapper (0x2000) has been created. It remembers the original function.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "wrapper",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1002"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Returning wrapper",
+        "explanation": "**`return wrapper`**\n\n**The `logger` function returns the `wrapper` function.** This return value gets assigned to the global variable `say_hello`.\n\nThe most important change at this moment:\n- **Before**: `say_hello` -> original function (0x1200)\n- **After**: `say_hello` -> `wrapper` function (0x2000)\n\nThe name `say_hello` stays the same, but the object it points to has changed!\n\n**Analogy**: It's the same package label, but an extra layer of wrapping paper has been added inside.\nThe recipient sees the label and thinks \"Oh, it's say_hello,\" but when they actually open it, there's wrapping (wrapper) first, and the original (func) is inside.\n\n**Under the hood**: The execution frame of `logger` terminates. However, `wrapper`'s `__closure__` maintains a reference to `func` (the original say_hello), so the original function doesn't disappear from memory.\n\n**Why this order?** The role of `logger` is to create and return `wrapper`. Now when `say_hello` is called, `wrapper` runs instead.\n\n**Note**: The original function's metadata like `__name__` is lost. To prevent this, you should apply the `functools.wraps` decorator to `wrapper`.",
+        "visualizationType": "pythonMemory",
+        "code": "return wrapper",
+        "pythonMemoryState": {
+          "note": "Now say_hello is wrapper (0x2000).",
+          "names": [
+            {
+              "name": "say_hello",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "wrapper",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling say_hello (calling wrapper)",
+        "explanation": "**`say_hello(\"Alice\")`**\n\n**We call `say_hello`, but what actually runs is the `wrapper` function.**\n\nThis is because `say_hello` was replaced with `wrapper` in the previous step.\n`say_hello(\"Alice\")` is effectively `wrapper(\"Alice\")`.\n\nSince `wrapper` receives arguments via `*args`, it becomes `args = (\"Alice\",)` as a tuple.\n\n**Analogy**: When you open the package (say_hello), the first thing you encounter is the wrapping paper (wrapper).\nUnwrapping that paper is the execution of wrapper.\n\n**Under the hood**: Python calls the `__call__` method of the object that `say_hello` points to. Since `say_hello` is now the `wrapper` function object, `wrapper.__call__(\"Alice\")` is executed.\n\n**Why this order?** The core of decorators is 'transparency'. Users just call `say_hello` as usual. The decorator handles the extra functionality behind the scenes.\n\n**Note**: The calling code (`say_hello(\"Alice\")`) doesn't change at all before or after applying the decorator. This is the elegance of decorators.",
+        "visualizationType": "pythonMemory",
+        "code": "say_hello(\"앨리스\")",
+        "pythonMemoryState": {
+          "note": "The wrapper function is executing.",
+          "names": [
+            {
+              "name": "say_hello",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "wrapper",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Wrapper execution - start log",
+        "explanation": "**`print(f\"--- {func.__name__} start ---\")`**\n\n**Prints a \"start\" log using the original function's name.**\n\n`func` is the original `say_hello` function referenced through the closure.\n`func.__name__` is the name attribute of the function object, returning the string `\"say_hello\"`.\nThus `\"--- say_hello start ---\"` is printed.\n\n**Analogy**: As you start unwrapping, you announce \"Now opening the say_hello gift!\"\n\n**This is the core value of decorators:**\n- We didn't change a single character of the original function (`say_hello`) code\n- Yet an extra action (logging) is automatically performed 'before' the function runs\n\n**Why this order?** `wrapper` operates in the order: 'before original function -> execute original function -> after original function'. We're currently in the 'before' phase.\n\n**Practical use**: In real projects, logging decorators like this are extremely useful for debugging and performance monitoring.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"--- {func.__name__} 시작 ---\")",
+        "pythonMemoryState": {
+          "output": [
+            "--- say_hello 시작 ---"
+          ],
+          "note": "Start log printed.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling the original function",
+        "explanation": "**`result = func(*args, **kwargs)`**\n\n**Calls the original `say_hello` function stored in the closure.** The argument `\"Alice\"` received through `*args` is passed to the original function as-is.\n\nExpanded, this is `result = func(\"Alice\")`, which is identical to calling the original `say_hello(\"Alice\")`.\n\n**Analogy**: After unwrapping, you finally take out the original gift (func).\nThe gift performs its original function intact.\n\n**Under the hood**:\n1. `func` retrieves the original `say_hello` (0x1200) from the Cell\n2. `*args` unpacks the `(\"Alice\",)` tuple and passes it as positional arguments\n3. `\"Alice\"` gets bound to the `name` parameter of the original `say_hello`\n\n**Why this order?** After printing the start log, it's time to perform the original function's actual work. The return value is stored in `result` because `wrapper` needs to return this value later.\n\n**Note**: The `func(*args, **kwargs)` pattern passes any arguments to the original function as-is. This ensures the decorator's versatility.",
+        "visualizationType": "pythonMemory",
+        "code": "result = func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "The original say_hello (0x1200) is executing.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "name",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "say_hello (original)",
+              "pyId": "1002"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"앨리스\"",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing say_hello's body",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n**The original `say_hello` function's body executes and prints the greeting message.**\n\nSince `name` is `\"Alice\"`, `\"Hello, Alice!\"` is printed.\n\nAt this point, two lines have been printed to the console:\n1. `--- say_hello start ---` (printed by wrapper)\n2. `Hello, Alice!` (printed by the original function)\n\n**Key point**: The original function has no idea it's been wrapped by a decorator.\nIt just does its job as usual. This is exactly 'Separation of Concerns'.\n\n**Analogy**: The gift (original function) works the same whether it's wrapped or not.\nThe wrapping doesn't affect the gift's functionality.\n\n**Why this order?** Inside `wrapper`, calling `func(*args, **kwargs)` causes the original function's body to execute.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"안녕하세요, {name}님!\")",
+        "pythonMemoryState": {
+          "output": [
+            "안녕하세요, 앨리스님!"
+          ],
+          "note": "The original function's functionality has been executed.",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"앨리스\"",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Wrapper execution - end log",
+        "explanation": "**`print(f\"--- {func.__name__} end ---\")`**\n\n**After the original function finishes executing, prints the \"end\" log.**\n\n`\"--- say_hello end ---\"` is printed.\n\nThis completes the 3-phase execution flow of `wrapper`:\n1. **Pre-processing**: Print `\"--- say_hello start ---\"`\n2. **Main processing**: Execute the original `func` -> Print `\"Hello, Alice!\"`\n3. **Post-processing**: Print `\"--- say_hello end ---\"`\n\n**Analogy**: After fully opening the gift, you announce \"Finished opening the say_hello gift!\"\n\n**Under the hood**: The original function `say_hello` has no explicit `return`, so it returns `None`. This value is stored in the `result` variable.\n\n**Why this order?** This is the core structure of the decorator pattern: you can add any code 'before and after' the original function.\n\n**Practical use**: This pre/post-processing pattern is used in many places including execution time measurement, permission checks, caching, and transaction management.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"--- {func.__name__} 종료 ---\")",
+        "pythonMemoryState": {
+          "output": [
+            "--- say_hello 종료 ---"
+          ],
+          "note": "Function execution complete, end log printed.",
+          "names": [
+            {
+              "name": "result",
+              "pointsTo": "none1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "none1",
+              "type": "nonetype",
+              "value": null,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Returning the result",
+        "explanation": "**`return result`**\n\n**Returns the original function's return value (`None`) as-is.**\n\nThink about why this step is important:\n- What if the original function returned a value like `return 42`?\n- `wrapper` must also return that `42`\n- This ensures behavior is identical before and after applying the decorator\n\nRight now, `say_hello` returns nothing (`None`), so `result` is also `None`.\n\n**Analogy**: When the wrapping service is done, it must pass along whatever the original gift provides (the return value) to the customer. The wrapping service must not intercept the return value!\n\n**Why this order?** The final role of `wrapper` is to transparently pass the original function's return value to the caller. This is what makes the decorator work 'transparently'.\n\n**Note**: If you forget `return result`, `wrapper` will always return `None`. This causes bugs when the original function returns a meaningful value. Always remember to forward the return value when writing decorators!",
+        "visualizationType": "pythonMemory",
+        "code": "return result",
+        "pythonMemoryState": {
+          "note": "Returning the final result.",
+          "names": [
+            {
+              "name": "result",
+              "pointsTo": "none1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "none1",
+              "type": "nonetype",
+              "value": null,
+              "pyId": "1005"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is `@my_decorator` equivalent to?",
+    "options": [
+      "`my_decorator.run()`",
+      "`func = my_decorator(func)`",
+      "`func(my_decorator)`",
+      "It's a syntax error."
+    ],
+    "correctIndex": 1,
+    "explanation": "The decorator syntax `@` passes the function defined immediately below to the decorator function as an argument, and assigns the result back to the original function name."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Decorators modify the content of the function.",
+      "correct": "No.\nDecorators leave the function as-is and create a new wrapping function that adds functionality.",
+      "why": "The biggest advantage of decorators is that they can add or modify functionality without modifying the original function."
+    }
+  ],
+  "keyTakeaway": "A decorator (`@decorator`) is a function that wraps another function. It's a powerful tool that reduces code duplication and increases reusability."
+}

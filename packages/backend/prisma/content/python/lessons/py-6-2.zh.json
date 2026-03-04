@@ -1,0 +1,365 @@
+{
+  "lessonId": "py-6-2",
+  "title": "__init__ 和 self",
+  "concept": "__init__ 不是构造函数而是初始化器！self 就是自身！",
+  "content": {
+    "code": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n        print(f\"{name} 객체 초기화!\")\n\nalice = Person(\"Alice\", 25)\nprint(f\"이름: {alice.name}\")\nprint(f\"나이: {alice.age}\")",
+    "steps": [
+      {
+        "title": "类定义（Person）",
+        "explanation": "**`class Person:`**\n\nPython 从上到下顺序执行代码。定义一个 `Person` 类（人的设计图）。\n\n**本课目标**：理解 `__init__` 的真正身份。很多入门教程把 `__init__` 称为"构造函数"，但严格来说它是**初始化器（Initializer）**！**创建**对象的是 `__new__`，而 `__init__` 是**初始化**已创建的对象。我们还将深入探究 `self` 到底是什么以及它是如何被传递的。\n\n**Python 内部机制**：当 Python 遇到 `class Person:` 时，它会执行类体来注册方法，并创建 Person 类对象。\n\n**为什么是这个顺序？** 必须先定义类，之后才能添加方法和创建对象。\n\n**执行顺序**：执行 class Person → 开始创建 Person 类对象 → 第2行",
+        "visualizationType": "pythonMemory",
+        "code": "class Person:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "类定义开始",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "__init__ 初始化器定义",
+        "explanation": "**`__init__`** 是对象创建后立即自动执行的初始化方法。\n\n它的作用很明确：\n- 在一个地方设置对象启动所需的必要状态\n- 减少"创建后未完成的状态"以确保稳定性\n\n**比喻**：就像创建新账户时自动注册默认配置文件的引导步骤。\n\n实用要点：\n- 必要属性在 `__init__` 中保证\n- 可选属性用默认值处理可以提高易用性",
+        "visualizationType": "pythonMemory",
+        "code": "def __init__(self, name, age):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "__init__ 方法已定义（初始化器）",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class with __init__>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "对象创建及 __init__ 自动调用",
+        "explanation": "**`alice = Person(\"Alice\", 25)`**\n\n**对象创建与初始化**：\n\n**Python 内部机制**：\n```python\n# 1. 用 __new__ 创建空对象\nalice = object.__new__(Person)  # 内存 0x2000\n\n# 2. 用 __init__ 初始化对象（自动调用！）\nalice.__init__(\"Alice\", 25)\n\n# 3. 返回已初始化的对象\n```\n\n**参数传递**：\n- `self` = `alice`（0x2000 对象，**自动传递**）\n- `name` = `\"Alice\"`\n- `age` = `25`\n\n**为什么是这个顺序？** 类定义完成后，按顺序执行下一行。\n\n**执行顺序**：调用 Person(\"Alice\", 25) → 创建空对象 0x2000 → 自动调用 __init__ → 跳转到第3行",
+        "visualizationType": "pythonMemory",
+        "code": "alice = Person(\"Alice\", 25)",
+        "pythonMemoryState": {
+          "note": "空对象已创建 → __init__ 即将自动调用",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object (empty)>",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建实例变量（name）",
+        "explanation": "**`self.name = name`**\n\n**创建实例变量**：在 `self`（alice 对象，0x2000）上添加 `name` 属性并赋值 `\"Alice\"`。\n\n**self.name 的含义**：\n- `self` → alice 对象（0x2000）\n- `.name` → 该对象的 name 属性（还不存在，现在创建！）\n- `= name` → 赋值参数 name（\"Alice\"）\n\n**重要规则**：必须加 `self.` 才能成为**实例变量**！\n\n**错误示例**：\n```python\nname = name  # 错误！局部变量！函数结束就消失\nself.name = name  # 正确！实例变量！永久存储在对象上\n```\n\n**为什么是这个顺序？** 对象创建（第7行）自动调用了 __init__，跳转到了这里。\n\n**执行顺序**：self.name = name → 向 alice 对象添加 name=\"Alice\" → 第4行",
+        "visualizationType": "pythonMemory",
+        "code": "self.name = name",
+        "pythonMemoryState": {
+          "note": "给 alice 对象添加 name 属性（self.name）",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1",
+              "highlight": true
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1",
+              "highlight": true
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "age",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice'>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ alice (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "25",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建实例变量（age）",
+        "explanation": "**`self.age = age`**\n\n在 `self`（alice 对象，0x2000）上添加一个名为 `age` 的实例变量，并赋值为参数 `age` 的值 `25`。\n\n**此时 alice 对象的状态**：`alice.__dict__` = `{'name': 'Alice', 'age': 25}`。name 和 age 两个属性都已设置。\n\n**实例变量的特征：**\n- **每个对象独立**：`alice.age` 和其他 Person 对象的 age 是不同的变量\n- **永久存储**：即使 __init__ 结束后仍保留在对象上（参数 `age` 会消失，但 `self.age` 永久保留）\n- **任何地方都可访问**：从外部通过 `alice.age`，从方法内部通过 `self.age` 访问\n\n**为什么是 self.age = age？** 等号左边的 `self.age` 是实例变量（永久），右边的 `age` 是参数（临时）。名字相同但完全不同。也可以用不同的名字（如 `self.user_age = age`），但使用相同的名字是 Python 的惯例。\n\n**为什么是这个顺序？** 在 __init__ 方法体内按顺序执行。\n\n**执行顺序**：self.age = age → 向 alice.__dict__ 添加 age=25 → 第5行",
+        "visualizationType": "pythonMemory",
+        "code": "self.age = age",
+        "pythonMemoryState": {
+          "note": "给 alice 对象添加 age 属性（self.age）",
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice', age=25>",
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ alice (0x2000)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "25",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "初始化过程中的输出",
+        "explanation": "**`print(f\"{name} 对象初始化!\")`**\n\n在 `__init__` 方法内部，除了设置属性外还可以执行**任何代码**。这里输出了初始化确认消息。\n\n**为什么可以使用 `name`？** 因为 `name` 是 `__init__` 的参数，在函数体内任何地方都可以访问。`self.name`（实例变量）和 `name`（参数）此时都指向 \"Alice\"，但它们是不同的东西。\n\n**在 __init__ 中可以做的事情：**\n- 设置实例变量（self.name = name）\n- 数据验证（if age < 0: raise ValueError）\n- 输出日志/消息（现在正在做的！）\n- 打开文件、连接数据库等\n\n**这行执行后**，\"Alice 对象初始化!\" 输出到屏幕。然后，由于 `__init__` 中的所有代码都执行完了，Python 自动从 `__init__` 退出并返回到原始调用点（第7行）。\n\n**__init__ 的返回值**：`__init__` 必须始终返回 `None`。写 `return \"某值\"` 会导致 `TypeError`！返回对象是 `__new__` 的职责。\n\n**执行顺序**：读取 name=\"Alice\" → 求值 f-string → 执行 print → __init__ 结束 → 返回第7行 → 第8行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"{name} 객체 초기화!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Alice 객체 초기화!"
+          ],
+          "note": "__init__ 执行中（即将完成初始化）",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1"
+            },
+            {
+              "name": "self",
+              "pointsTo": "parameter1"
+            },
+            {
+              "name": "name",
+              "pointsTo": "parameter2"
+            },
+            {
+              "name": "age",
+              "pointsTo": "parameter3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice', age=25>",
+              "pyId": "1002"
+            },
+            {
+              "id": "parameter1",
+              "type": "parameter",
+              "value": "→ alice (0x2000)",
+              "pyId": "1003"
+            },
+            {
+              "id": "parameter2",
+              "type": "parameter",
+              "value": "\"Alice\"",
+              "pyId": "1004"
+            },
+            {
+              "id": "parameter3",
+              "type": "parameter",
+              "value": "25",
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "访问实例变量（name）",
+        "explanation": "**`print(f\"姓名: {alice.name}\")`**\n\n访问已完成初始化的 `alice` 对象的 `name` 属性。\n\n**为什么可以访问？** 因为在第3行通过 `self.name = name` 创建了实例变量！\n\n**如果忘了写 `self.` 会怎样？**\n```python\ndef __init__(self, name, age):\n    name = name  # 错误！局部变量\n    age = age    # 错误！局部变量\n\nalice = Person(\"Alice\", 25)\nprint(alice.name)  # AttributeError!\n```\n\n**为什么是这个顺序？** 对象创建和初始化完成后，按顺序执行下一行。\n\n**执行顺序**：读取 alice.name（\"Alice\"）→ 求值 f-string → 执行 print → 第9行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"이름: {alice.name}\")",
+        "pythonMemoryState": {
+          "output": [
+            "이름: Alice"
+          ],
+          "note": "使用在 __init__ 中设置的 name 属性",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice', age=25>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "访问实例变量（age）",
+        "explanation": "**`print(f\"年龄: {alice.age}\")`**\n\n访问 `alice` 对象的 `age` 属性并输出。\"年龄: 25\" 输出到屏幕。\n\n**本课最终总结—— __init__ 和 self 的核心：**\n\n**注意——最常见的错误（再强调一次！）：**\n```python\ndef __init__(self, name):\n    name = name      # 忘了 self.！只是局部变量，没有存储到对象上！\n```\n**必须加 `self.`** 才能成为实例变量！\n\n**__init__ 的工作原理：**\n1. 对象创建时 Python **自动调用**（不需要我们手动调用！）\n2. 通过 **self.变量名 = 值** **创建**实例变量（永久存储）\n3. 创建后可以通过 **obj.变量名** 从任何地方**访问**",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"나이: {alice.age}\")",
+        "pythonMemoryState": {
+          "output": [
+            "나이: 25"
+          ],
+          "note": "使用在 __init__ 中设置的 age 属性",
+          "names": [
+            {
+              "name": "Person",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "alice",
+              "pointsTo": "instance1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "class1",
+              "type": "class",
+              "value": "<class>",
+              "pyId": "1001"
+            },
+            {
+              "id": "instance1",
+              "type": "instance",
+              "value": "<Person object, name='Alice', age=25>",
+              "pyId": "1002"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "这段代码有什么问题？\n\nclass Cat:\n    def __init__(self, name):\n        name = name\n\nc = Cat(\"Mimi\")\nprint(c.name)",
+    "options": [
+      "正常运行，输出 Mimi",
+      "AttributeError: 'Cat' object has no attribute 'name'",
+      "NameError",
+      "SyntaxError"
+    ],
+    "correctIndex": 1,
+    "explanation": "name = name 只是局部变量赋值！必须写 self.name = name 才能创建实例变量。\n没有 self.，c.name 就不存在。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "__init__ 创建对象",
+      "correct": "__init__ 初始化已创建的对象",
+      "why": "对象创建由 __new__ 负责。\n__init__ 只负责设置初始值。"
+    },
+    {
+      "wrong": "不写 self.x = x，x 也会成为实例变量",
+      "correct": "必须加 self. 才能成为实例变量",
+      "why": "没有 self 的 x = 值只是局部变量。\n函数结束就消失了。"
+    }
+  ],
+  "keyTakeaway": "__init__ 是初始化方法！必须用 self.变量名 来创建实例变量！"
+}

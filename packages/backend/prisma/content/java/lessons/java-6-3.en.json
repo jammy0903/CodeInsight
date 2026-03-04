@@ -1,0 +1,187 @@
+{
+  "lessonId": "java-6-3",
+  "title": "Finally and Exception Delegation (throws)",
+  "concept": "Learn about the finally block that always executes, and the throws keyword that delegates exception handling to the caller.",
+  "content": {
+    "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            dangerousTask();\n        } catch (InterruptedException e) {\n            System.out.println(\"Caught!\");\n        }\n    }\n\n    // throws: \"I can't handle this, you deal with it!\"\n    static void dangerousTask() throws InterruptedException {\n        System.out.println(\"Task Start\");\n        try {\n            Thread.sleep(1000);\n            throw new InterruptedException(); // Force Error\n        } finally {\n            System.out.println(\"Cleanup\");\n        }\n    }\n}",
+    "steps": [
+      {
+        "title": "main Method Start",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's starting point.\n\n**Analogy**: `main` is like the 'on-site manager' who must ultimately handle all incidents.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Calling the Dangerous Method",
+        "explanation": "**Execution flow:**\n1. `main` calls `dangerousTask()`.\n2. A new stack frame is created.\n\n**Explanation:**\nThis method is declared with `throws InterruptedException`.\nIt's basically a warning: \"If you want to call me, you must be prepared to handle that exception!\"",
+        "visualizationType": "javaMemory",
+        "code": "dangerousTask();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "void",
+              "value": "running",
+              "frame": "dangerousTask",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Exception Thrown",
+        "explanation": "**Execution flow:**\n1. An `InterruptedException` occurs during `dangerousTask` execution.\n2. The `try` block inside the method stops executing.\n\n**Explanation:**\nBoom! An exception occurred.\nBut we can't escape just yet.\nBecause the **cleanup fairy `finally`** is waiting.",
+        "visualizationType": "javaMemory",
+        "code": "try {",
+        "occurrence": 2,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "void",
+              "value": "exception!",
+              "frame": "dangerousTask"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x500",
+              "content": "InterruptedException",
+              "type": "Exception",
+              "new": true
+            }
+          ],
+          "output": [
+            "Task Start"
+          ]
+        }
+      },
+      {
+        "title": "Finally Executes",
+        "explanation": "**Execution flow:**\n1. Despite the exception, execution moves to the `finally` block before exiting the method.\n2. Prints \"Cleanup\".\n\n**Explanation:**\n**The absolute rule:** `finally` executes **no matter what** -- whether the code succeeded or failed (exception thrown).\nIt's primarily used for closing resources or cleaning up.",
+        "visualizationType": "javaMemory",
+        "code": "Thread.sleep(1000);",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "void",
+              "value": "cleaning",
+              "frame": "dangerousTask"
+            }
+          ],
+          "output": [
+            "Cleanup"
+          ]
+        }
+      },
+      {
+        "title": "Exception Propagation",
+        "explanation": "**Execution flow:**\n1. After `finally` completes, the uncaught exception (`0x500`) is thrown to the caller (`main`).\n2. The `dangerousTask` stack frame is destroyed (popped).\n\n**Explanation:**\nThere was no `catch` inside `dangerousTask`.\nSo the exception says \"Not my problem!\" and flies back to `main` which called it.\nThis is **Exception Propagation**.",
+        "visualizationType": "javaMemory",
+        "code": "// throws: \"I can't handle this, you deal with it!\"",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x500",
+              "content": "InterruptedException",
+              "type": "Exception"
+            }
+          ],
+          "error": "Exception Propagated to Main"
+        }
+      },
+      {
+        "title": "Caught in Main",
+        "explanation": "**Execution flow:**\n1. The `catch` block in `main` catches the propagated exception.\n2. Prints \"Caught!\" and resolves the situation.\n\n**Explanation:**\nAfter the hot potato game, `main` finally handles it.\nChecked Exceptions must be handled by someone.",
+        "visualizationType": "javaMemory",
+        "code": "} catch (InterruptedException e) {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "args",
+              "value": "[]",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "e",
+              "value": "-> 0x500",
+              "frame": "catch",
+              "new": true,
+              "type": "InterruptedException"
+            }
+          ],
+          "output": [
+            "Caught!"
+          ],
+          "heap": [
+            {
+              "address": "0x500",
+              "content": "InterruptedException",
+              "type": "InterruptedException",
+              "new": true
+            }
+          ],
+          "error": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the ONLY case where a finally block does NOT execute?",
+    "options": [
+      "When a return statement is encountered inside the try block.",
+      "When the exception is not caught.",
+      "When System.exit(0) is called.",
+      "When an infinite loop runs inside the try block."
+    ],
+    "correctIndex": 2,
+    "explanation": "`System.exit(0)` forcibly terminates the JVM itself, so no code -- including `finally` -- executes afterward.\nEven when a `return` is encountered, `finally` still runs before the method returns."
+  },
+  "misconceptions": [
+    {
+      "wrong": "If you return from a try block, finally is skipped.",
+      "correct": "No.\nThe `finally` block runs just before the return value is delivered.",
+      "why": "`finally` is the last line of defense guaranteed by the JVM."
+    }
+  ],
+  "keyTakeaway": "`finally` is essential for resource cleanup, and `throws` lets you delegate exception handling to the caller."
+}

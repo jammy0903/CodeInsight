@@ -1,0 +1,299 @@
+{
+  "lessonId": "py-4-1",
+  "title": "Function Basics",
+  "concept": "用 def 关键字将重复代码封装为可复用的函数",
+  "content": {
+    "code": "# 1. 함수 정의\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\n# 2. 함수 호출\ngreet(\"Alice\")\ngreet(\"Bob\")\n\n# 3. Docstring (문서화)\ndef square(n):\n    \"\"\"숫자를 받아서 제곱을 반환합니다\"\"\"\n    return n * n\n\nprint(square(5))",
+    "steps": [
+      {
+        "title": "定义函数（greet）",
+        "explanation": "**`def greet(name):`**\n\nPython 从上到下按顺序执行代码。\n遇到 `def` 关键字时，Python 在内存中创建名为 `greet` 的**函数对象（function object）**并注册到全局命名空间。\n\n**为什么内部代码（`print(...)`）现在不执行？**\n`def` 只是**像'菜谱'一样存储代码**。就像把菜谱写在书上——并不是开始做菜。要实际执行，必须像 `greet(\"Alice\")` 一样**用括号 `()` 调用**。\n\n**注意**：在**定义之前**调用函数会引发 `NameError`。`def` 必须先被执行！\n\n**函数定义 vs 调用（请准确区分！）：**\n- **定义（Definition）**：`def greet(name):` -> 创建函数对象 + 注册名称（代码不执行）\n- **调用（Call）**：`greet(\"Alice\")` -> 存储的代码实际执行",
+        "visualizationType": "pythonMemory",
+        "code": "def greet(name):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "函数已定义（代码未执行）",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一次函数调用",
+        "explanation": "**`greet(\"Alice\")`**\n\n**函数调用（Function Call）**：使用**实参（Argument）** `\"Alice\"` 调用之前注册的 `greet` 函数。\n\n类比：取出菜谱（函数定义）实际开始做菜。`\"Alice\"` 是菜谱的食材（实参）。\n\n**形参 vs 实参（准确区分术语！）：**\n- **形参（Parameter）**：函数定义时声明的变量名 -> `name`\n- **实参（Argument）**：函数调用时实际传递的值 -> `\"Alice\"`\n\n**执行流跳转**：调用时，程序将当前位置（line 6）保存到**调用栈（Call Stack）**中，然后跳转到**函数内部（line 3）**。实参 `\"Alice\"` 绑定到形参 `name`。\n\n**Python 内部机制**：Python 在调用栈上创建新的**局部帧（local frame）**。在此帧中创建 `name = \"Alice\"` 绑定。函数结束时此帧自动移除。\n\n**注意**：必须像 `greet()` 一样有括号才是调用。没有括号只写 `greet` 只是引用函数对象，不会执行！\n\n**执行顺序**：line 6 -> 调用 greet -> 在调用栈保存返回地址 -> 跳转到 line 3 -> name = \"Alice\"",
+        "visualizationType": "pythonMemory",
+        "code": "greet(\"Alice\")",
+        "pythonMemoryState": {
+          "note": "调用 greet -> 即将跳转到 line 3",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 greet（Alice）",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n进入函数内部执行函数体代码。\n形参 `name` 绑定了实参 `\"Alice\"`，所以 **f-string** 计算为 `\"Hello, Alice!\"` 并输出到屏幕。\n\n**f-string 工作原理**：在 `f\"Hello, {name}!\"` 中，`{name}` 部分被替换为变量 `name` 的实际值（`\"Alice\"`）。这是 Python 3.6+ 可用的字符串格式化方法。\n\n**函数作用域（Scope）**：`name` 是只存在于函数内部的**局部变量（Local Variable）**。把函数想象成一个'房间'，`name` 是只能在房间里使用的物品。离开房间（函数）后，物品（变量）会被自动清理（垃圾回收）。\n\n**Python 内部机制**：`print()` 是 Python 内置函数，将参数转换为字符串后写入标准输出（stdout）。输出后自动添加换行符（`\\n`）。\n\n**为什么是这个顺序？** 从函数调用（line 6）跳转到这里。由于这是函数体的最后一行，执行后函数自动终止。\n\n**注意**：此函数没有 `return` 语句，所以 Python 自动返回 `None`。\n\n**执行顺序**：name = \"Alice\" -> 计算 f-string -> 执行 print -> 函数结束（返回 None）-> 从调用栈弹出返回地址 -> 返回 line 7",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, Alice!"
+          ],
+          "note": "函数执行中（name 是局部变量）",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "name",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Alice\"",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "第二次函数调用",
+        "explanation": "**`greet(\"Bob\")`**\n\n使用**不同实参** `\"Bob\"` 再次调用同一函数。这正是函数的核心优势——**用不同数据复用相同代码**！\n\n**为什么之前的 `name = \"Alice\"` 不见了？** 第一次调用结束时，当时创建的局部帧（存储局部变量的空间）被**整体删除**。`name = \"Alice\"` 绑定也随之消失。\n\n类比：第一位顾客（Alice）的订单完成后销毁订单，为第二位顾客（Bob）写新订单。之前订单的内容完全消失了。\n\n**Python 内部机制**：Python 再次在调用栈上创建新的局部帧，这次创建 `name = \"Bob\"` 绑定。这是与上次调用**完全独立的新执行环境**。\n\n**注意**：函数调用次数没有限制，但过深的递归（函数调用自身）可能导致 `RecursionError`（默认限制：1000次）。\n\n**执行顺序**：line 7 -> 调用 greet -> 创建新局部帧 -> 跳转到 line 3 -> name = \"Bob\"",
+        "visualizationType": "pythonMemory",
+        "code": "greet(\"Bob\")",
+        "pythonMemoryState": {
+          "note": "之前的 name 已消失 -> 新调用",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 greet（Bob）",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n这次形参 `name` 绑定了实参 `\"Bob\"`，所以 f-string 计算为 `\"Hello, Bob!\"` 并输出。\n\n**相同代码，不同结果**：函数体代码完全相同 `print(f\"Hello, {name}!\")`，但因为 `name` 绑定的值不同，输出也不同。这就是**形参的力量**！\n\n类比：在同一封信模板（\"Hello, ___!\"）中填入不同名字。一个模板，根据收件人产生不同的信件。\n\n**如果不使用函数？** 需要重复写类似代码：`print(f\"Hello, Alice!\")`、`print(f\"Hello, Bob!\")`。函数减少代码重复，使维护更容易。\n\n**注意**：函数结束时 `name = \"Bob\"` 绑定也会消失。在函数外尝试 `print(name)` 会引发 `NameError`。\n\n**执行顺序**：name = \"Bob\" -> 计算 f-string -> 执行 print -> 函数结束（返回 None）-> 删除局部帧 -> 移至 line 10",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, Bob!"
+          ],
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "name",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Bob\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "定义函数（square）",
+        "explanation": "**`def square(n):`**\n\n定义接收数字并返回其平方的 `square` 函数。与 `greet` 不同的是它**通过 `return` 返回值**。\n\n**文档字符串（Docstring）**：`\"\"\"숫자를 받아서 제곱을 반환합니다\"\"\"` 部分是函数的**官方说明文档**。用三引号（`\"\"\"`）包裹，必须位于函数体的**第一行**。\n- 不影响代码执行，但运行 `help(square)` 时会显示\n- 也可通过 `square.__doc__` 访问\n- 类比：像产品说明书。没有也能用，但有了用户更容易理解\n\n**Python 内部机制**：docstring 作为字符串存储在函数对象的 `__doc__` 属性中。Python 内置的 `help()` 函数和 IDE 的自动补全功能会读取此属性。\n\n**greet 和 square 的区别：**\n- `greet`：只用 `print()` 输出到屏幕 -> 无返回值（`None`）\n- `square`：通过 `return` **返回**计算结果 -> 有返回值（数字）\n\n**注意**：有 `return` 的函数更灵活，因为结果可以存储到变量或传递给其他函数！\n\n**执行顺序**：执行 def -> 创建 square 函数对象 + 注册 -> line 14",
+        "visualizationType": "pythonMemory",
+        "code": "def square(n):",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "note": "square 函数已定义（代码未执行）",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "square",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 square",
+        "explanation": "**`print(square(5))`**\n\n这行包含**2个嵌套函数调用**：`square(5)` 和 `print()`。\n\n**嵌套调用的执行顺序（从内到外！）：**\n1. **先**调用 `square(5)` -> 跳转到函数体（line 12）\n2. `square` **返回** `25`\n3. 返回值 `25` 作为实参传给 `print()`\n4. 执行 `print(25)` -> 屏幕显示 `25`\n\n类比：像包装礼物。先包装（执行）内盒（`square(5)`），然后将结果（25）放入外盒（`print()`）做最终处理。\n\n**Python 内部机制**：Python 计算表达式时**从最内层表达式开始**。`print(square(5))` 中 `square(5)` 先执行被替换为 `25`，然后执行 `print(25)`。\n\n**与 greet 的区别**：`greet(\"Alice\")` 返回 `None`，所以 `print(greet(\"Alice\"))` 会额外输出 `None`。而 `square(5)` 返回 `25`，可以有用地传递给 `print()`。\n\n**注意**：不要混淆 `print()` 和 `return`！`print()` 是在屏幕上显示文字，`return` 是将值返回给调用者。\n\n**执行顺序**：line 14 -> 调用 square(5) -> 在调用栈保存返回地址 -> 跳转到 line 12 -> n = 5",
+        "visualizationType": "pythonMemory",
+        "code": "print(square(5))",
+        "pythonMemoryState": {
+          "note": "调用 square(5) -> 即将跳转到 line 12",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "square",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 square",
+        "explanation": "**`return n * n`**\n\n形参 `n` 绑定了实参 `5`，所以计算 `5 * 5 = 25` 并**返回**。\n\n类比：`return` 就像发快递。将产品（25）寄给订购者（line 14 的 `print`），并关闭车间（函数）。\n\n**`return` 语句的两个作用：**\n1. **返回值**：将计算结果（25）返回给**调用处（line 14）**。`print(square(5))` 中 `square(5)` 部分被替换为 `25`。\n2. **立即结束函数**：遇到 `return` 时函数执行**立即停止**并返回调用处。`return` 下面的代码不会执行！\n\n**没有 `return`？** Python 函数如果没有 `return` 语句或 `return` 后面没有值，自动返回 `None`。`greet` 函数就是这种情况。",
+        "visualizationType": "pythonMemory",
+        "code": "return n * n",
+        "pythonMemoryState": {
+          "output": [
+            "25"
+          ],
+          "note": "n * n = 25 返回 -> 回到 line 14",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "square",
+              "pointsTo": "function2"
+            },
+            {
+              "name": "n",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1001"
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "<function>",
+              "pyId": "1004"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 5,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "没有 return 语句的函数默认返回什么值？",
+    "options": [
+      "0",
+      "False",
+      "Undefined",
+      "None"
+    ],
+    "correctIndex": 3,
+    "explanation": "当没有 return 语句或 return 后面没有值时，Python 函数总是返回 `None`。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "定义函数就会立即执行",
+      "correct": "定义（`def`）和执行（`call`）是不同的。",
+      "why": "定义只是注册'有这个功能'，实际使用需要用括号 `()` 调用。"
+    }
+  ],
+  "keyTakeaway": "重复的代码用 `def` 封装。缩进和冒号必不可少！"
+}

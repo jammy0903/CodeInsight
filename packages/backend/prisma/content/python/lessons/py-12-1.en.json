@@ -1,0 +1,227 @@
+{
+  "lessonId": "py-12-1",
+  "title": "try-except Basics",
+  "concept": "How to prevent your program from crashing when an error occurs!",
+  "content": {
+    "code": "num = 10\ndivisor = 0\n\ntry:\n    result = num / divisor\n    print(f\"Result: {result}\")\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero!\")\n\nprint(\"Program continues!\")",
+    "steps": [
+      {
+        "title": "Variable Initialization",
+        "explanation": "**`num = 10`** -- Creates an integer object `10` in memory and attaches the label `num` to it.\n\nPython executes from top to bottom in order. First, we assign **10** to `num`, the number to be divided.\n\n**Python internals:** An `int` type object `10` exists in heap memory, and `{\"num\": <address of 10 object>}` is added to the global namespace dictionary. In CPython, integers in the range -5 to 256 are pre-created (interned) at interpreter startup, so we're attaching a label to an existing object rather than creating a new one.\n\nThis is still just a regular variable assignment. The error will come later! At this point, everything works normally.\n\n**Execution order:** `num = 10` completed -> move to next line",
+        "visualizationType": "pythonMemory",
+        "code": "num = 10",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Setting the Divisor (0!)",
+        "explanation": "**`divisor = 0`** -- Attaches the label `divisor` to the integer object `0`.\n\nWe assign **0** to `divisor`. In mathematics, dividing any number by 0 is undefined (diverges to infinity). Python behaves the same way -- dividing by 0 raises a **ZeroDivisionError** exception.\n\n**Analogy:** It's like planting a landmine on a road. Placing the mine itself causes no problem, but the moment someone steps on it (when the division is executed), it explodes!\n\n**Python internals:** `{\"divisor\": <address of 0 object>}` is added to the global namespace. `0` is also an interned integer, so the existing object is reused. At this point, `num` and `divisor` each point to independent `int` objects.\n\n**Note:** Storing 0 in a variable itself is completely fine! The error occurs only **when you execute the operation of dividing by 0**. Storing a value and using a value are entirely different steps.\n\n**Execution order:** `divisor = 0` completed -> move to next line (try block)",
+        "visualizationType": "pythonMemory",
+        "code": "divisor = 0",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Entering the try Block",
+        "explanation": "**`try:`** -- We enter an exception monitoring block. It means \"Watch for errors inside this block!\"\n\n`try` is the starting point of Python's Exception Handling mechanism. The code inside the `try` block is **risky code** that might raise an error during execution.\n\n**Analogy:** It's like setting up a **safety net** below a tightrope performance at an amusement park. If you fall while walking the tightrope (code in the try block) (error occurs), the safety net (except block) catches you. Without the safety net (without try-except), the show ends the moment you fall (program termination).\n\n**Python internals:** When entering the `try` block, the Python interpreter internally registers an **exception handler** on the call stack. This handler contains information about \"where to jump if an error occurs.\" It works on a similar principle to `setjmp/longjmp` in C.\n\n**try-except basic structure:**\n```python\ntry:\n    # Code that might raise errors (danger zone)\nexcept ErrorType:\n    # Code to run if error occurs (safety net)\n```\n\n**Note:** It's best to put only the **minimum amount of code** that might raise errors in the `try` block. Putting too much code makes it hard to identify where the error occurred.\n\n**Execution order:** Enter `try:` -> start executing code inside try block line by line",
+        "visualizationType": "pythonMemory",
+        "code": "try:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Entering try block - error monitoring started",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "ZeroDivisionError Raised!",
+        "explanation": "**`result = num / divisor`** -- Attempts to calculate `10 / 0`. But **dividing by zero is mathematically impossible**!\n\nThe moment Python executes the `/` operator, it detects that the divisor is `0` and creates and raises a **ZeroDivisionError** exception object.\n\n**Analogy:** It's like a chef following a recipe (code) and encountering an impossible instruction: \"divide by 0 liters of water.\" The chef stops immediately and shouts \"This is impossible!\" (exception raised).\n\n**Note:** What if there were no `try-except`? The program would print an error message and **terminate immediately**! `try-except` prevents this tragedy.\n\n**Python internals:** In CPython, the `/` operator internally calls the `__truediv__` method. When `int.__truediv__(10, 0)` is executed, at the C level it checks if the divisor is 0, and if so, calls `PyErr_SetString(PyExc_ZeroDivisionError, \"division by zero\")`. At this point, a `ZeroDivisionError` exception object is created on the heap, and the interpreter's error flag is set.",
+        "visualizationType": "pythonMemory",
+        "code": "    result = num / divisor",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "ZeroDivisionError raised! Jumping to except block",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            },
+            {
+              "id": "err1",
+              "type": "ZeroDivisionError",
+              "value": "\"division by zero\"",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "The except Block Caught the Error!",
+        "explanation": "**`except ZeroDivisionError:`** -- Checks the type of the exception raised in the try block, and if it matches, executes this block.\n\nA **ZeroDivisionError** was raised in the try block, and since except specifies exactly this error type, this except block is executed.\n\n**`print(\"Cannot divide by zero!\")`** -- Instead of killing the program, we print a friendly error message to the user.\n\n**Analogy:** It's like a hospital emergency room triage system. When a patient (error) comes in, it's classified by type and sent to the appropriate department (except block). Just as \"fracture patients go to orthopedics!\", `ZeroDivisionError` is sent to the `except ZeroDivisionError:` block.\n\n**Python internals (except matching process):**\n1. Error occurs in try block -> interpreter checks registered exception handlers\n2. Compares the type of the raised exception (`ZeroDivisionError`) with the except's type using `isinstance()` check\n3. `isinstance(error, ZeroDivisionError)` is `True` -> this except block executes\n4. If the types don't match, the error **propagates up** through the call stack\n\n**Note:** Catching too broadly like `except Exception:` can swallow unintended errors, making debugging difficult. Always specify **specific exception types**.\n\n**Execution order:** except type matching -> match! -> execute `print(\"Cannot divide by zero!\")` -> except block complete",
+        "visualizationType": "pythonMemory",
+        "code": "    print(\"Cannot divide by zero!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Cannot divide by zero!"
+          ],
+          "note": "ZeroDivisionError handled!",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "The Program Continues!",
+        "explanation": "The key point is that **`print(\"Program continues!\")`** gets executed.\n\nEven though an error occurred, handling it with `except` means the program flow isn't interrupted.\n\n**Analogy**: It's like taking a detour when the road is blocked -- you can still reach your destination.\n\nThis pattern is important because:\n- User input errors\n- File not found\n- Temporary network failures\nIn all these situations, you can prevent the entire app from crashing.\n\nIn summary, try-except is not a \"technique for eliminating errors\" but a\n\"technique for controlling errors so the program keeps running.\"",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Program continues!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Program continues!"
+          ],
+          "note": "Normal execution continues after error handling!",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "divisor",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 10,
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 0,
+              "pyId": "1002"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What happens when an error occurs in the try block?",
+    "options": [
+      "It executes all remaining code in the try block, then goes to except",
+      "It stops immediately at the line where the error occurred and jumps to the except block",
+      "The program terminates immediately",
+      "It ignores the error and executes the next line"
+    ],
+    "correctIndex": 1,
+    "explanation": "When an error occurs in the try block, execution stops immediately at the line where the error occurred and jumps to the except block that can handle that error. Code after the error line in the try block is not executed."
+  },
+  "keyTakeaway": "try-except is a safety net that prevents the program from crashing when an error occurs. When an error happens, it immediately jumps to the except block!"
+}

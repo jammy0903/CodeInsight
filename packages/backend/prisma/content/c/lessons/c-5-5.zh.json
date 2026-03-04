@@ -1,0 +1,131 @@
+{
+  "lessonId": "c-5-5",
+  "title": "Dangling Pointers",
+  "concept": "拿着已归还内存的凭证（指针）不放，最终引发事故",
+  "content": {
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 10;\n\n    free(p);\n\n\n    p = NULL;\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "标准输入输出头文件。\n\n本课讲解悬空指针问题——指针仍然指向已释放的内存。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "包含 stdlib.h 头文件",
+        "explanation": "使用 `malloc`/`free` 所需的头文件。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdlib.h>"
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧。我们将遵循 分配 -> 释放 -> 安全处理 的流程。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "分配堆内存",
+        "explanation": "在堆上分配一个整型大小的空间，将地址存储在指针 `p` 中。",
+        "visualizationType": "cMemory",
+        "code": "int *p = (int*)malloc(sizeof(int));",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0xHEAP",
+            "type": "int*",
+            "address": "0x1000"
+          }
+        ],
+        "heap": [
+          {
+            "address": "0xHEAP",
+            "size": "4 bytes",
+            "value": "???"
+          }
+        ]
+      },
+      {
+        "title": "在堆内存中存储值",
+        "explanation": "`*p = 10;` 完成堆值的初始化。",
+        "visualizationType": "cMemory",
+        "code": "*p = 10;",
+        "heap": [
+          {
+            "address": "0xHEAP",
+            "size": "4 bytes",
+            "value": "10",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "释放内存并产生悬空指针",
+        "explanation": "`free(p)` 后堆块被释放，但 `p` 的值保持不变，变成悬空状态。\n\n解引用这个指针会导致未定义行为。",
+        "visualizationType": "cMemory",
+        "code": "free(p);",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0xHEAP",
+            "type": "int*",
+            "address": "0x1000",
+            "dangling": true
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "防止悬空指针（解决方案）",
+        "explanation": "`p = NULL;` 使指针无效化，降低被误用的风险。\n\n释放后立即赋值 NULL 是最基本的防御习惯。",
+        "visualizationType": "cMemory",
+        "code": "p = NULL;",
+        "stack": [
+          {
+            "name": "p",
+            "value": "NULL",
+            "type": "int*",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "程序结束",
+        "explanation": "通过 `return 0;` 结束程序。\n\n要点：free 后立即将指针设为 NULL。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "什么是悬空指针（Dangling Pointer）？",
+    "options": [
+      "未初始化的指针",
+      "NULL 指针",
+      "仍然指向已释放（无效）内存的指针",
+      "void 指针"
+    ],
+    "correctIndex": 2,
+    "explanation": "\"Dangling\" 意为悬挂。\n指的是失去有效目标的指针。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "free(p) 后 p 会自动变成 NULL",
+      "correct": "C 语言没有那么贴心。",
+      "why": "手动写 `p = NULL;` 既是 C 程序员的素养，也是生存技能。"
+    }
+  ],
+  "keyTakeaway": "`free` 之后，把手中的凭证（`p`）也撕掉——设为 `NULL`。"
+}

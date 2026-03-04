@@ -1,0 +1,223 @@
+{
+  "lessonId": "js-5-1",
+  "title": "原始值与引用值",
+  "concept": "原始值按值复制，而引用值（对象）按内存地址复制",
+  "content": {
+    "code": "// 원시값 (Primitive)\nlet a = 10;\nlet b = a;\nb = 20;\nconsole.log(a, b);\n\n// 참조값 (Reference)\nlet obj1 = { value: 10 };\nlet obj2 = obj1;\nobj2.value = 20;\nconsole.log(obj1.value, obj2.value);",
+    "steps": [
+      {
+        "title": "原始值 a = 10",
+        "explanation": "数字 10 被存储在内存中，a 持有该值。",
+        "keyInsight": "原始类型：number、string、boolean、null、undefined、symbol、bigint",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            }
+          ],
+          "heap": []
+        },
+        "code": "let a = 10;"
+      },
+      {
+        "title": "b = a（值复制）",
+        "explanation": "a 中的值 10 被复制并存储到 b 中。\na 和 b 是相互独立的值。\n\n**类比**：就像把一张纸上写的数字抄到另一张纸上。\n即使撕掉原来的纸，副本也不受影响。",
+        "keyInsight": "原始值按值复制。",
+        "analogy": "就像把一张纸上写的数字抄到另一张纸上。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 10,
+              "type": "primitive",
+              "copied": true
+            }
+          ],
+          "heap": []
+        },
+        "code": "let b = a;"
+      },
+      {
+        "title": "b = 20（独立修改）",
+        "explanation": "将 b 改为 20 不会影响 a。\n它们占用不同的内存空间。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 20,
+              "type": "primitive",
+              "changed": true
+            }
+          ],
+          "heap": []
+        },
+        "code": "b = 20;"
+      },
+      {
+        "title": "打印原始值",
+        "explanation": "a 是 10，b 是 20。\n原始值是相互独立的。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": 10,
+              "type": "primitive"
+            },
+            {
+              "name": "b",
+              "value": 20,
+              "type": "primitive"
+            }
+          ],
+          "output": [
+            "10 20"
+          ]
+        },
+        "code": "console.log(a, b);"
+      },
+      {
+        "title": "引用值 obj1 = { value: 10 }",
+        "explanation": "对象存储在堆（Heap）内存中。\nobj1 持有该对象的地址（引用）。",
+        "keyInsight": "引用类型：object、array、function",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ value: 10 }"
+            }
+          ]
+        },
+        "code": "let obj1 = { value: 10 };"
+      },
+      {
+        "title": "obj2 = obj1（引用复制）",
+        "explanation": "obj1 的引用（地址）被复制了。\nobj1 和 obj2 指向同一个对象！\n\n**类比**：就像两个人在各自的笔记本上写下同一个家庭住址。\n如果一个人把房子刷了漆，另一个人去的时候也会看到刷过漆的房子。",
+        "keyInsight": "引用值复制的是地址，对象只有一个！",
+        "analogy": "就像两个人在各自的笔记本上写下同一个家庭住址。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001",
+              "type": "reference",
+              "sameRef": true
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ value: 10 }",
+              "refCount": 2
+            }
+          ]
+        },
+        "code": "let obj2 = obj1;"
+      },
+      {
+        "title": "obj2.value = 20（修改同一个对象）",
+        "explanation": "通过 obj2 修改对象时，通过 obj1 也能看到变化！",
+        "keyInsight": "相同引用 = 相同对象 = 修改一个会影响两个",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "obj1",
+              "value": "→ 0x001",
+              "type": "reference"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001",
+              "type": "reference"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ value: 20 }",
+              "changed": true
+            }
+          ]
+        },
+        "code": "obj2.value = 20;"
+      },
+      {
+        "title": "打印引用值",
+        "explanation": "obj1.value 和 obj2.value 都是 20。\n因为它们指向同一个对象。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "stack": [
+            {
+              "name": "obj1",
+              "value": "→ 0x001"
+            },
+            {
+              "name": "obj2",
+              "value": "→ 0x001"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{ value: 20 }"
+            }
+          ],
+          "output": [
+            "10 20",
+            "20 20"
+          ]
+        },
+        "code": "console.log(obj1.value, obj2.value);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "以下代码的输出是什么？\n\nlet arr1 = [1, 2, 3];\nlet arr2 = arr1;\narr2.push(4);\nconsole.log(arr1.length);",
+    "options": [
+      "3",
+      "4",
+      "undefined",
+      "Error"
+    ],
+    "correctIndex": 1,
+    "explanation": "数组也是引用值。\narr2 = arr1 使它们指向同一个数组。\narr2.push(4) 修改了原数组。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "将对象赋值给变量会复制对象",
+      "correct": "只有引用（地址）被复制了。\n对象只有一个。",
+      "why": "对象存储在堆（Heap）中，变量只持有它们的地址。"
+    }
+  ],
+  "keyTakeaway": "原始值 = 按值复制，引用值 = 按地址复制（共享同一个对象）"
+}

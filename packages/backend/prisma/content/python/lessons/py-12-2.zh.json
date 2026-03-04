@@ -1,0 +1,174 @@
+{
+  "lessonId": "py-12-2",
+  "title": "处理多种异常",
+  "concept": "针对不同错误类型做不同处理！多个except块的使用方法",
+  "content": {
+    "code": "data = [1, 2, 3]\n\ntry:\n    index = int(\"abc\")\n    value = data[index]\nexcept ValueError:\n    print(\"Invalid number format!\")\nexcept IndexError:\n    print(\"Index out of range!\")\nexcept Exception as e:\n    print(f\"Unexpected error: {e}\")",
+    "steps": [
+      {
+        "title": "创建列表",
+        "explanation": "**`data = [1, 2, 3]`** -- 在堆（heap）内存中创建列表对象，并贴上 `data` 标签。\n\nPython从上到下按顺序执行。首先创建一个包含三个整数的列表 `data`。\n\n**类比：** 就像设置一个3格的储物柜。0号格放1，1号格放2，2号格放3。储物柜上贴着 `data` 标签。\n\n**Python内部原理：** `list` 对象分配在堆内存中。内部列表是一个**存放各元素对象内存地址的指针数组**。`int` 对象 `1`、`2`、`3` 各自独立存在，列表管理它们的地址列表。全局命名空间中注册了 `{\"data\": <列表对象地址>}`。\n\n该列表的有效索引是 **0, 1, 2**。`data[0]` 是1，`data[1]` 是2，`data[2]` 是3。访问不存在的索引如 `data[10]` 会引发 **IndexError**。但也可能先出现其他错误！\n\n**执行顺序：** `data = [1, 2, 3]` 执行完毕 → 移到下一行（try块）",
+        "visualizationType": "pythonMemory",
+        "code": "data = [1, 2, 3]",
+        "pythonMemoryState": {
+          "output": [],
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "进入try块",
+        "explanation": "**`try:`** -- 进入异常监控块。这次可能发生**多种类型的错误**。\n\ntry块中有两行危险代码：\n1. **`int(\"abc\")`** -- 尝试将字符串转为数字 → 可能引发 **ValueError**\n2. **`data[index]`** -- 访问列表索引 → 可能引发 **IndexError**\n\n**类比：** 就像穿越一个有多种地雷的雷区。反步兵地雷（ValueError）、反坦克地雷（IndexError）、未知地雷（Exception）...每种地雷都需要对应的排除方法（except块）。\n\n**Python内部原理：** 进入 `try` 块时，解释器建立异常处理器链。这条链按顺序注册了3个except块信息：ValueError → IndexError → Exception。发生错误时**从上到下**搜索这条链。\n\n本课核心：可以使用多个except块，根据错误种类**做不同处理**！\n\n**执行顺序：** 进入 `try:` → 开始执行try块内第一行",
+        "visualizationType": "pythonMemory",
+        "code": "try:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "进入try块 - 开始监控多种错误",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "ValueError 发生！",
+        "explanation": "**`index = int(\"abc\")`** -- `int()` 函数将字符串转为整数。但 `\"abc\"` 不是数字，**无法转换**！\n\n`int(\"123\")` 变成整数 `123`，但 `int(\"abc\")` 无法转为任何整数。Python引发 **ValueError** 异常。\n\n**类比：** 就像往自动售货机（int()函数）里塞纸片（字母字符串），而不是硬币（数字字符串）。机器吐出来说这不是硬币！（ValueError引发）。\n\n**注意：** `int()` 能接受的字符串只有**表示整数的字符串**：`\"123\"`、`\"-45\"`、`\"0\"` 等。`\"3.14\"` 也会失败（是float格式）。需要使用 `float(\"3.14\")`。",
+        "visualizationType": "pythonMemory",
+        "code": "    index = int(\"abc\")",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "ValueError 发生！正在搜索匹配的except块...",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            },
+            {
+              "id": "err1",
+              "type": "ValueError",
+              "value": "\"invalid literal for int()\"",
+              "pyId": "2002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一个except捕获了！",
+        "explanation": "**`except ValueError:`** -- Python**从上到下**按顺序检查except块，执行第一个与发生错误匹配的块。\n\n让我们跟踪匹配过程：\n1. `except ValueError:` -- 发生的错误是ValueError吗？**是！** 执行此块！\n2. `except IndexError:` -- （不检查，已被捕获，跳过）\n3. `except Exception as e:` -- （不检查，已被捕获，跳过）\n\n**类比：** 就像邮局的信件分拣系统。信件（错误）进来后，先检查第一个分拣箱（except ValueError）。寄往首尔？ → 是！→ 放入首尔分拣箱。其余分拣箱（釜山、其他）无需检查直接跳过。\n\n**重要（except匹配规则）：**\n- **按顺序**从上到下检查\n- **只有第一个**匹配的except块被执行\n- 其余except块全部跳过\n- 一个错误**绝不会**触发多个except",
+        "visualizationType": "pythonMemory",
+        "code": "    print(\"Invalid number format!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Invalid number format!"
+          ],
+          "note": "ValueError被第一个except处理！",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "如果是IndexError呢？",
+        "explanation": "**`except IndexError:`** -- 在本次执行中，因为ValueError先发生了，所以这个块**不会执行**。\n\n但**如果场景不同呢？**假设是 `int(\"100\")` 而不是 `int(\"abc\")`：\n- `index = int(\"100\")` → 成功！整数 `100` 赋给 `index`\n- `value = data[100]` → **IndexError发生！** 列表 `data` 的有效索引是0~2，但试图访问索引100\n- 第一个 `except ValueError:` → 是ValueError吗？**不是！** 跳过\n- 第二个 `except IndexError:` → 是IndexError吗？**是！** 执行此块！\n\n**类比：** 医院的分诊系统。今天的患者（ValueError）在内科（第一个except）治疗了。如果来了另一个患者（IndexError），就会在骨科（第二个except）治疗。每个患者有对应的专科医生！\n\n**这就是多个except的关键**：根据发生的错误种类可以做出**恰当的应对**！不是用一个except搞定所有错误，而是可以按情况定制处理。\n\n**执行顺序（本次执行）：** 此块被跳过（ValueError已在上面处理了）",
+        "visualizationType": "pythonMemory",
+        "code": "except IndexError:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "本次未执行（ValueError先被捕获了）",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Exception：万能安全网",
+        "explanation": "**`except Exception as e:`** 是最后的安全网。\n\n为什么是最后？因为 `Exception` 涵盖了大多数一般异常。\n所以应该先在上面处理更具体的异常（如 `ValueError`、`IndexError`），\n最后再放这个块才能按预期工作。\n\n**类比**：就像先设置各部门专用服务台（具体except），\n然后在最后设一个综合服务台（Exception）的结构。\n\n使用 `as e` 可以捕获错误对象，用于消息输出或日志记录。\n\n注意事项：\n- 把 `except Exception` 放在最上面会实质性地使下面的具体except失效",
+        "visualizationType": "pythonMemory",
+        "code": "except Exception as e:",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Exception是所有错误的父类（最后的安全网）",
+          "names": [
+            {
+              "name": "data",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2001"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "quiz": {
+    "question": "当有多个except块时，Python按什么顺序检查？",
+    "options": [
+      "同时检查所有except块",
+      "从最通用的（Exception）开始检查",
+      "从上到下按顺序检查，只执行第一个匹配的",
+      "随机选择一个"
+    ],
+    "correctIndex": 2,
+    "explanation": "Python从上到下按顺序检查except块。只执行第一个匹配的except块，其余跳过。所以应该把具体的错误放在上面，通用的Exception放在最下面。"
+  },
+  "keyTakeaway": "使用多个except可以针对不同错误类型做不同处理。具体错误放上面，通用Exception放最后！"
+}

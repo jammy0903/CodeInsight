@@ -7,7 +7,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks';
-import { Play, Layers, ChevronDown, ChevronRight as ChevronRightIcon, Terminal } from 'lucide-react';
+import { Play, Layers, ChevronDown, ChevronRight as ChevronRightIcon, ChevronLeft, ChevronRight, Terminal } from 'lucide-react';
 import { LanguageTabs } from './components/LanguageTabs';
 import { CodeMirrorEditor } from '@/features/visualizers/shared/components/CodeMirrorEditor';
 import { StepControls } from './components/StepControls';
@@ -573,6 +573,85 @@ export function PlaygroundPage() {
           </div>
         </div>
       </div>
+
+      {/* Floating step nav: 화면 하단 중앙 < > 버튼 */}
+      {hasSteps && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 50,
+            display: 'flex',
+            gap: '8px',
+          }}
+        >
+          <button
+            onClick={prevStep}
+            disabled={!canGoPrev}
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: canGoPrev ? 'pointer' : 'default',
+              backgroundColor: currentTheme === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : 'rgba(0,0,0,0.10)',
+              color: currentTheme === 'dark'
+                ? (canGoPrev ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)')
+                : (canGoPrev ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.15)'),
+              backdropFilter: 'blur(8px)',
+              transition: 'all 0.15s',
+            }}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <span
+            style={{
+              fontSize: '11px',
+              fontFamily: 'monospace',
+              fontWeight: 600,
+              color: currentTheme === 'dark'
+                ? 'rgba(255,255,255,0.35)'
+                : 'rgba(0,0,0,0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              userSelect: 'none',
+            }}
+          >
+            {currentStepIndex + 1}/{steps.length}
+          </span>
+          <button
+            onClick={nextStep}
+            disabled={!canGoNext}
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: canGoNext ? 'pointer' : 'default',
+              backgroundColor: currentTheme === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : 'rgba(0,0,0,0.10)',
+              color: currentTheme === 'dark'
+                ? (canGoNext ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)')
+                : (canGoNext ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.15)'),
+              backdropFilter: 'blur(8px)',
+              transition: 'all 0.15s',
+            }}
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      )}
 
       {/* Footer */}
       <PlaygroundFooter colors={colors} />

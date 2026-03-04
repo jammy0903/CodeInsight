@@ -1,0 +1,94 @@
+{
+  "lessonId": "js-4-4",
+  "title": "错误处理",
+  "concept": "使用 try/catch 处理 async/await 错误，使用 .catch() 处理 Promise 错误",
+  "content": {
+    "code": "async function riskyOperation() {\n  throw new Error('Something went wrong!');\n}\n\n// try/catch 방식\nasync function handleWithTryCatch() {\n  try {\n    const result = await riskyOperation();\n    console.log(result);\n  } catch (error) {\n    console.log('Caught:', error.message);\n  }\n}\n\n// .catch() 방식\nriskyOperation()\n  .then(result => console.log(result))\n  .catch(error => console.log('Caught:', error.message));\n\nhandleWithTryCatch();",
+    "steps": [
+      {
+        "title": "调用 handleWithTryCatch()",
+        "explanation": "程序开始执行，调用 `handleWithTryCatch()`。",
+        "visualizationType": "promise",
+        "promiseState": {
+          "callStack": [
+            "handleWithTryCatch()"
+          ]
+        },
+        "code": "handleWithTryCatch();"
+      },
+      {
+        "title": "await 处的 Promise 拒绝",
+        "explanation": "`await` 调用 `riskyOperation()`。\n这个函数抛出错误，所以返回的 Promise 变为 'rejected'（被拒绝）。\n`await` 将这个被拒绝的 Promise 当作普通的 `throw` 语句处理。",
+        "keyInsight": "await 处被拒绝的 Promise = 等同于 throw",
+        "visualizationType": "promise",
+        "promiseState": {
+          "promises": [
+            {
+              "id": "riskyOp",
+              "state": "rejected",
+              "error": "Error"
+            }
+          ]
+        },
+        "code": "const result = await riskyOperation();"
+      },
+      {
+        "title": "catch 块执行",
+        "explanation": "`await` 抛出的错误被最近的 `catch` 块捕获。\n`try` 块的剩余部分（第 9 行）被跳过。",
+        "visualizationType": "promise",
+        "promiseState": {
+          "callStack": [
+            "handleWithTryCatch() - catch"
+          ],
+          "note": "错误已捕获！"
+        },
+        "code": "} catch (error) {"
+      },
+      {
+        "title": "打印错误信息",
+        "explanation": "`catch` 块执行，将错误对象的 message 打印到控制台。\n程序继续运行而不会崩溃。",
+        "visualizationType": "promise",
+        "promiseState": {
+          "output": [
+            "Caught: Something went wrong!"
+          ]
+        },
+        "code": "console.log('Caught:', error.message);"
+      },
+      {
+        "title": "替代方式：.catch() 链式调用",
+        "explanation": "这段代码在这里并未实际运行，但展示了不使用 `async/await` 处理 Promise 错误的另一种方式。\n在链的末尾添加 `.catch()` 可以捕获链中任何位置的拒绝。",
+        "keyInsight": "async/await 配合 try/catch 是 Promise 配合 .catch() 的语法糖。",
+        "visualizationType": "promise",
+        "promiseState": {
+          "note": "这部分代码在本次运行中未被执行。"
+        },
+        "code": "riskyOperation()",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "question": "为什么以下代码中的错误没有被捕获？\n\ntry {\n  setTimeout(() => {\n    throw new Error('Oops!');\n  }, 1000);\n} catch (e) {\n  console.log('Caught!');\n}",
+    "options": [
+      "setTimeout 内部没有发生错误",
+      "回调在 try/catch 已经结束后才运行",
+      "throw 使用不正确",
+      "Error 构造函数有误"
+    ],
+    "correctIndex": 1,
+    "explanation": "try/catch 只能捕获同步代码的错误。\nsetTimeout 回调从任务队列运行时，try/catch 已经执行完毕了，所以无法被捕获。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "try/catch 可以捕获所有错误",
+      "correct": "try/catch 只能捕获同步代码和 **await 的 Promise** 的错误。\n浮动的回调错误无法被捕获。",
+      "why": "try/catch 捕获的是执行时位于调用栈上的错误，但回调稍后在单独的栈中运行（队列）。"
+    }
+  ],
+  "keyTakeaway": "async/await → try/catch，Promise → .catch()，回调错误需要单独处理"
+}

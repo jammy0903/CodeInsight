@@ -1,0 +1,543 @@
+{
+  "lessonId": "py-9-3",
+  "title": "带参数的装饰器：重复执行",
+  "concept": "要向装饰器传递参数，需要再包裹一层函数，创建三层嵌套结构。",
+  "content": {
+    "code": "def repeat(n):\n    def decorator(func):\n        def wrapper(*args, **kwargs):\n            print(f\"{n}번 반복합니다:\")\n            for _ in range(n):\n                func(*args, **kwargs)\n        return wrapper\n    return decorator\n\n@repeat(3)\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"World\")",
+    "steps": [
+      {
+        "title": "定义 repeat 函数",
+        "explanation": "**`def repeat(n):`**\n\n**定义三层嵌套结构的最外层函数。** 这个函数不是装饰器本身，而是一个"制造装饰器的工厂（factory）"。\n\n**为什么需要三层结构？**\n- 上一课的 `@logger` 只需 `@函数名` 即可，无需参数\n- 但如果想像 `@repeat(3)` 这样传递参数呢？\n- `repeat(3)` 先被调用返回"真正的装饰器"，然后该装饰器包装函数\n\n**三层结构整理：**\n1. `repeat(n)` -- 接收参数 `n` 的工厂函数（最外层）\n2. `decorator(func)` -- 实际的装饰器（接收函数）\n3. `wrapper(*args, **kwargs)` -- 包装函数（负责实际执行）\n\n**类比**：想象一个定制包装服务。\n- `repeat(3)` 是"请包装3次"的订单\n- 下单后（调用 repeat），一位3次包装专家（decorator）被分配\n- 专家进行实际的包装工作（wrapper）\n\n**内部机制**：Python 创建 `repeat` 函数对象（0x1100）并注册到全局命名空间。内部的 `decorator`、`wrapper` 还没有被创建。\n\n**注意**：`repeat` 不是装饰器！它是一个"返回装饰器的函数"。这个区别很重要。",
+        "visualizationType": "pythonMemory",
+        "code": "def repeat(n):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "最外层的 repeat 函数（0x1100）已被定义。",
+          "names": [
+            {
+              "name": "repeat",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "应用 @repeat(3)",
+        "explanation": "**`@repeat(3)`**\n\n**当 Python 遇到 `@repeat(3)` 时，首先调用 `repeat(3)`。** 关键在于 `@` 后面的表达式会先被"求值"。\n\n逐步执行顺序：\n1. 调用 `repeat(3)` -> `n=3` 绑定到参数\n2. 在 `repeat` 内部定义 `decorator` 函数\n3. `n=3` 存储在 Cell 对象中（用于闭包）\n4. 返回 `decorator` 函数（0x2000）\n5. 这个返回的 `decorator` 被用作实际的 `@` 装饰器\n\n**类比**：在餐厅点单"请给我3份"（repeat(3)），厨师回答"好的，我派一位3份专家给您"。那位专家就是 `decorator`。\n\n**内部机制**：调用 `repeat(3)` 时创建新的执行帧。`n` 被包装在 Cell 对象中，可以通过 `decorator` 的 `__closure__` 访问。\n\n**为什么是这个顺序？** `@repeat(3)` 是 `@` 和 `repeat(3)` 的组合。Python 先求值 `repeat(3)` 获得装饰器，然后应用到下面的函数。\n\n**注意**：`@repeat`（无括号）和 `@repeat(3)`（有括号）完全不同！前者将 `repeat` 本身用作装饰器，后者将 `repeat(3)` 的返回值用作装饰器。",
+        "visualizationType": "pythonMemory",
+        "code": "@repeat(3)",
+        "pythonMemoryState": {
+          "note": "记住 n=3 的 decorator 函数（0x2000）已创建并返回。",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "decorator",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义 decorator 函数",
+        "explanation": "**`def decorator(func):`**\n\n**在 `repeat` 内部定义了 `decorator` 函数。** 这才是"真正的装饰器"。\n\n这个函数通过闭包记住了 `n=3`。\n`func` 参数将在之后接收要装饰的目标函数。\n\n**在三层结构中的位置：**\n- `repeat(n)` -- 已被调用，`n=3` 已存储\n- **`decorator(func)`** -- 就是这一层！充当实际的装饰器\n- `wrapper(*args, **kwargs)` -- 还没有创建\n\n**类比**：3份专家（decorator）登场了。这位专家已经知道订单内容"重复3次"（n=3），即将接收某道菜（func）来制作3次。\n\n**内部机制**：`decorator` 函数对象的 `__closure__` 中有对 `n` 的 Cell 引用。之后当调用 `decorator(greet)` 时，它将创建一个能访问 `func` 和 `n` 的 `wrapper`。\n\n**为什么是这个顺序？** `decorator` 作为 `repeat(n)` 执行的一部分被定义。这个函数将通过 `return decorator` 返回。",
+        "visualizationType": "pythonMemory",
+        "code": "def decorator(func):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "pythonMemoryState": {
+          "note": "这是中间层的 decorator 函数。",
+          "names": [
+            {
+              "name": "decorator",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "返回 decorator",
+        "explanation": "**`return decorator`**\n\n**`repeat(3)` 执行完毕，返回 `decorator` 函数。** 这个返回的函数在 `@` 语法背后充当实际的装饰器。\n\n整理完整流程：\n- `@repeat(3)` -> 调用 `repeat(3)` -> 返回 `decorator`\n- 这个 `decorator` 被应用到下面的 `def greet`\n- 即 `greet = decorator(greet)`\n\n**类比**：订单处理完毕，3份专家（decorator）已就位厨房。现在无论送来什么菜（函数），都准备好制作3次了。\n\n**内部机制**：`repeat` 的执行帧终止，但包含 `n=3` 的 Cell 通过 `decorator` 的 `__closure__` 继续存活。不会被垃圾回收。\n\n**为什么是这个顺序？** `repeat` 的唯一目的是创建并返回一个记住 `n` 的 `decorator`。这是工厂模式的典型流程。\n\n**注意**：`decorator` 返回后，Python 自动将其用作 `@` 装饰器。程序员无需额外操作。",
+        "visualizationType": "pythonMemory",
+        "code": "return decorator",
+        "pythonMemoryState": {
+          "note": "decorator 已返回，成为 @ 语法的目标。",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义并装饰 greet 函数",
+        "explanation": "**`def greet(name):`**\n\n**`greet` 函数被定义，随即调用 `decorator(greet)`。**\n\n由 `@repeat(3)` 返回的 `decorator` 现在作为装饰器工作：\n1. 创建原始 `greet` 函数对象（0x1200）\n2. 调用 `decorator(greet)` -- 原始函数传递给 `func` 参数\n3. 在 `decorator` 内部定义 `wrapper` 并返回\n4. `greet` 名称现在指向 `wrapper`\n\n**类比**：菜（greet 函数）被送到3份专家（decorator）手中。专家建立了一个制作这道菜3次的系统（wrapper）。\n\n**内部机制**：`decorator(greet)` 调用创建新的执行帧，`func` 绑定到原始 `greet`。由于 `decorator` 已通过闭包知道 `n=3`，`wrapper` 可以同时访问 `n` 和 `func`。\n\n**为什么是这个顺序？** 这是 `@` 语法的标准行为。函数定义 -> 装饰器应用 -> 名称重绑定自动完成。\n\n**注意**：此时起 `greet` 不再是原始函数，而是 `wrapper`。",
+        "visualizationType": "pythonMemory",
+        "code": "def greet(name):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "原始 greet 已传递给 decorator。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "定义 wrapper 函数",
+        "explanation": "**`def wrapper(*args, **kwargs):`**\n\n**三层结构的最内层函数 `wrapper` 被定义。** 这个函数最终将替代 `greet` 这个名称。\n\n`wrapper` 通过闭包记住的内容：\n- `n = 3`（repeat 的参数 -> 通过 Cell 访问）\n- `func = greet (original)`（decorator 的参数 -> 通过 Cell 访问）\n\n**类比**：一份包含3份订单表（n=3）和原始食谱（func=greet）的"完整烹饪手册"已制作完成。按照这份手册（wrapper）执行，将调用 greet 3次。\n\n**内部机制**：创建了 `wrapper` 函数对象（0x3000）。其 `__closure__` 元组包含对 `n` 和 `func` 的两个 Cell 引用。至此，一个能访问三层嵌套所有变量的闭包完成了。\n\n**为什么是这个顺序？** `wrapper` 作为 `decorator(func)` 执行的一部分被定义。这是创建记住 `n` 和 `func` 的最终包装函数的时刻。\n\n**注意**：`wrapper` 引用了上面两层的变量（`n`）。Python 的闭包可以引用任意层级的上级作用域变量。",
+        "visualizationType": "pythonMemory",
+        "code": "def wrapper(*args, **kwargs):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "wrapper（0x3000）已创建，记住了 n 和 func。",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            },
+            {
+              "name": "wrapper",
+              "pointsTo": "function4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            },
+            {
+              "id": "function4",
+              "type": "function",
+              "value": "function",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "返回 wrapper",
+        "explanation": "**`return wrapper`**\n\n**`decorator` 函数返回 `wrapper`。** 这个返回值被赋值给全局变量 `greet`。\n\n替换过程整理：\n- `greet` -> 原始函数（0x1200）[替换前]\n- `greet` -> `wrapper`（0x3000）[替换后]\n\n`wrapper` 同时记住了 `n=3` 和原始 `greet`，所以之后被调用时能将原始 `greet` 执行3次。\n\n**类比**：完成的烹饪手册（wrapper）取代了原始食谱（greet）的位置。现在谁说"做greet这道菜"，就按手册做3次。\n\n**内部机制**：`decorator` 的执行帧终止，`wrapper` 被返回。`@` 语法自动执行 `greet = wrapper`。\n\n**为什么是这个顺序？** `decorator` 的职责是创建并返回 `wrapper`，最终绑定到 `greet` 名称上。",
+        "visualizationType": "pythonMemory",
+        "code": "return wrapper",
+        "pythonMemoryState": {
+          "note": "现在 greet 就是 wrapper（0x3000）。",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function4",
+              "type": "function",
+              "value": "wrapper",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 greet（调用 wrapper）",
+        "explanation": "**`greet(\"World\")`**\n\n**调用 `greet` 时，实际执行的是 `wrapper(\"World\")`。**\n\n因为 `greet` 已被替换为 `wrapper`。\n`(\"World\",)` 元组传递给 `wrapper` 的 `*args`。\n\n`wrapper` 执行时：\n1. 从闭包获取 `n=3`\n2. 从闭包获取 `func=greet (original)`\n3. 使用这些信息将原始函数重复调用3次\n\n**类比**：顾客点了"一份 greet"。厨房按照烹饪手册（wrapper）开始制作3份。\n\n**内部机制**：Python 调用 `greet` 的 `__call__`，由于 `greet` 是 `wrapper` 函数对象，所以执行 `wrapper` 的代码。\n\n**为什么是这个顺序？** 所有装饰器设置完成后，这是实际使用被装饰函数的阶段。\n\n**注意**：调用 `greet(\"World\")` 的一方完全不需要知道装饰器的存在。这就是装饰器模式的"透明性"。",
+        "visualizationType": "pythonMemory",
+        "code": "greet(\"World\")",
+        "pythonMemoryState": {
+          "note": "执行 wrapper：使用记住的 n=3 和原始函数。",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "wrapper 执行 - 输出消息",
+        "explanation": "**`print(f\"{n} 次重复：\")`**\n\n**从闭包获取 `n=3`，输出"3次重复："。**\n\n`n` 不是 `wrapper` 的局部变量。它是从上面两层的 `repeat(3)` 调用时创建的 Cell 中获取的值。闭包记住了这个值所以才可能。\n\n**类比**：查看订单上写的"3份"，宣布"现在开始制作3份！"\n\n**内部机制**：`LOAD_DEREF` 字节码从 Cell 对象中获取 `n` 的值。f-string 将其转换为字符串，`print` 输出。\n\n**为什么是这个顺序？** 在开始重复执行之前，先输出一条说明将重复多少次的消息。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"{n}번 반복합니다:\")",
+        "pythonMemoryState": {
+          "output": [
+            "3번 반복합니다:"
+          ],
+          "note": "提示消息已输出。",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for 循环开始 - 第一次",
+        "explanation": "**`for _ in range(n):`**\n\n**使用 `range(3)` 开始一个重复3次的 `for` 循环。**\n\n`_`（下划线）是 Python 的惯例表达，意思是"我不会使用这个变量"。循环变量的值（0、1、2）本身不需要，重要的只是重复3次。\n\n`range(n)` 中的 `n` 同样是从闭包获取的 `3`。\n\n**类比**：厨师开始准备第一盘。总共需要做3盘。\n\n**内部机制**：`range(3)` 创建一个迭代器对象，`for` 循环从迭代器中逐个取值进行迭代。第一次迭代（1/3）开始。\n\n**为什么是这个顺序？** 执行装饰器核心功能"重复执行"的循环开始的时刻。\n\n**注意**：`range(n)` 生成从 0 到 n-1 的值。这里是 0、1、2，共3次迭代。",
+        "visualizationType": "pythonMemory",
+        "code": "for _ in range(n):",
+        "pythonMemoryState": {
+          "note": "第1次迭代。",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用原始函数（1）",
+        "explanation": "**`func(*args, **kwargs)`**\n\n**调用存储在闭包中的原始 `greet` 函数。** 通过 `*args` 将 `\"World\"` 传递给原始函数的 `name` 参数。\n\n展开来写就是 `func(\"World\")`，与原始的 `greet(\"World\")` 完全相同。\n\n**类比**：开始烹饪第一盘。使用原始食谱（func）加入材料（\"World\"）。\n\n**内部机制**：`LOAD_DEREF` 从 Cell 中获取 `func`（原始 greet），然后解包 `*args` 作为参数传递。为原始 `greet` 创建新的执行帧。\n\n**为什么是这个顺序？** 这是 `for` 循环第一次迭代中调用原始函数的时刻。这是3次重复中的第1次。\n\n**注意**：每次迭代都通过 `func(*args, **kwargs)` 传递相同的参数。原始函数每次产生相同的结果。",
+        "visualizationType": "pythonMemory",
+        "code": "func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "调用原始函数。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 greet 函数体（1）",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n**原始 `greet` 函数执行，输出 `\"Hello, World!\"`。** 这是第一次迭代的结果。\n\n到目前为止的全部输出：\n1. `3次重复：`（wrapper 输出的）\n2. `Hello, World!`（原始 greet 输出的 - 第1次）\n\n**类比**：第一盘完成了！还剩两盘。\n\n**内部机制**：`\"World\"` 绑定到 `name` 参数后 `print` 执行。函数执行完毕后，控制权返回 `wrapper` 的 `for` 循环。\n\n**为什么是这个顺序？** 这是 `func(*args, **kwargs)` 调用执行原始函数体的结果。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, World!"
+          ],
+          "note": "第一次输出完成。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for 循环 - 第二次",
+        "explanation": "**`for _ in range(n):`**（第2次迭代）\n\n**`for` 循环的第二次迭代开始。** 从 `range(3)` 迭代器取出下一个值（1），再次执行循环体。\n\n**类比**：开始准备第二盘。同样的食谱（func）和同样的材料（\"World\"）制作同样的菜。\n\n**内部机制**：`for` 循环调用迭代器的 `__next__()` 方法获取下一个值。由于没有引发 `StopIteration`，循环继续。\n\n**为什么是这个顺序？** 第2/3次迭代——装饰器按照指示重复执行原始函数。",
+        "visualizationType": "pythonMemory",
+        "code": "for _ in range(n):",
+        "pythonMemoryState": {
+          "note": "第2次迭代。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用原始函数（2）",
+        "explanation": "**`func(*args, **kwargs)`**\n\n**第二次调用原始 `greet` 函数。** 同样传递 `\"World\"` 作为参数。\n\n每次迭代都创建新的执行帧，原始函数独立执行。\n\n**类比**：用同样的食谱烹饪第二盘。每次都使用干净的新锅（新执行帧）。\n\n**为什么是这个顺序？** 在 `for` 循环的第二次迭代中调用原始函数。",
+        "visualizationType": "pythonMemory",
+        "code": "func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "再次调用原始函数。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 greet 函数体（2）",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n**`\"Hello, World!\"` 第二次被输出。**\n\n到目前为止的全部输出：\n1. `3次重复：`\n2. `Hello, World!`（第1次）\n3. `Hello, World!`（第2次）\n\n**类比**：第二盘也完成了！只剩最后一盘。\n\n**为什么是这个顺序？** 这是第2/3次迭代的执行结果。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, World!"
+          ],
+          "note": "第二次输出完成。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for 循环 - 第三次",
+        "explanation": "**`for _ in range(n):`**（第3次迭代）\n\n**第三次也是最后一次迭代。** 从 `range(3)` 迭代器取出最后一个值（2）。\n\n**类比**：准备最后一盘。这盘完成后订单就全部完成了。\n\n**内部机制**：从迭代器取出值 `2`。下一次 `__next__()` 调用将引发 `StopIteration`，循环将终止。\n\n**为什么是这个顺序？** 第3/3次迭代——根据闭包中存储的 `n=3` 开始最后一次迭代。",
+        "visualizationType": "pythonMemory",
+        "code": "for _ in range(n):",
+        "pythonMemoryState": {
+          "output": [
+            "..."
+          ],
+          "note": "第3次迭代。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用原始函数（3）",
+        "explanation": "**`func(*args, **kwargs)`**\n\n**第三次也是最后一次调用原始 `greet` 函数。**\n\n这是最后一次调用，执行完毕后 `for` 循环也将结束。\n\n**类比**：开始烹饪最后一盘。完成后3份订单就全部完成了。\n\n**为什么是这个顺序？** 装饰器承诺的3次重复中的最后一次调用。",
+        "visualizationType": "pythonMemory",
+        "code": "func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "再次调用原始函数。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行 greet 函数体（3）",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n**`\"Hello, World!\"` 第三次被输出，`for` 循环终止。**\n\n最终完整输出：\n1. `3次重复：`\n2. `Hello, World!`\n3. `Hello, World!`\n4. `Hello, World!`\n\n**总结**：仅通过一行装饰器 `@repeat(3)`，在完全不修改原始函数代码的情况下，添加了3次重复执行的功能。\n\n**三层结构的角色总结：**\n- `repeat(3)`：创建记住 `n=3` 的 `decorator`\n- `decorator(greet)`：创建记住 `func=greet` 的 `wrapper`\n- `wrapper(\"World\")`：调用 `func` `n` 次\n\n**实际应用**：这种模式广泛用于重试（retry）装饰器、缓存、权限检查（只允许特定角色）等需要参数的装饰器。\n\n**为什么是这个顺序？** 第三次迭代完成，`wrapper` 函数执行结束。",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "3번 반복합니다:",
+            "Hello, World!",
+            "Hello, World!",
+            "Hello, World!"
+          ],
+          "note": "第三次输出完成。所有工作结束。",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "带参数的装饰器 `@deco(arg)` 在内部是如何工作的？",
+    "options": [
+      "func = func(deco(arg))",
+      "deco = func(deco(arg))",
+      "func = deco(arg)(func)",
+      "deco(arg, func)"
+    ],
+    "correctIndex": 2,
+    "explanation": "`deco(arg)` 先被调用返回一个装饰器函数，然后该返回的函数成为 `@` 的目标，接收 `func` 作为参数。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "装饰器只能用于类。",
+      "correct": "不是的。\n装饰器可以同时应用于函数和类。",
+      "why": "类装饰器将类本身作为参数接收，可以对其进行修改或替换为其他类。"
+    }
+  ],
+  "keyTakeaway": "带参数的装饰器是"返回装饰器的函数"。`@repeat(3)` 先调用 `repeat(3)`，然后将结果（装饰器）应用于函数。"
+}

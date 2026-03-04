@@ -1,0 +1,149 @@
+{
+  "lessonId": "java-8-4",
+  "title": "LinkedList: A Train of Data",
+  "concept": "LinkedList is a structure where data nodes hold hands with each other, forming a 'train'.",
+  "content": {
+    "code": "import java.util.LinkedList;\n\npublic class Main {\n    public static void main(String[] args) {\n        LinkedList<String> train = new LinkedList<>();\n        \n        train.add(\"기관차\");\n        train.add(\"객차1\");\n        train.add(\"객차2\");\n        \n        train.add(1, \"새 객차\"); // 중간에 끼워넣기!\n    }\n}",
+    "steps": [
+      {
+        "title": "Package Import",
+        "explanation": "**`import java.util.LinkedList;`**\n\nImporting the linked list data structure.",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.LinkedList;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nShall we start playing with our data train?",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the LinkedList",
+        "explanation": "**Execution flow:**\n1. A `LinkedList` object is created.\n2. Pointers to the head and tail are prepared.\n\n**Starting the train:**\nIt's an empty train with no cars yet.",
+        "visualizationType": "javaMemory",
+        "code": "LinkedList<String> train = new LinkedList<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "train",
+              "value": "0x001",
+              "frame": "main",
+              "type": "LinkedList<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 0, head: null",
+              "type": "LinkedList",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding the First Node",
+        "explanation": "**Execution flow:**\n1. A node for \"Engine\" is created.\n2. The list's Head now points to this node.\n\n**First car:**\nThe very front of the train has been created.",
+        "visualizationType": "javaMemory",
+        "code": "train.add(\"기관차\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "(기관차)",
+              "type": "LinkedList",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding the Second Node",
+        "explanation": "**Execution flow:**\n1. A node for \"Car 1\" is created.\n2. \"Engine\" is linked to \"Car 1\".\n\n**Connected:**\nThe front car has grabbed the hand of the car behind it.",
+        "visualizationType": "javaMemory",
+        "code": "train.add(\"객차1\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "(기관차) -> (객차1)",
+              "type": "LinkedList",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Adding the Third Node",
+        "explanation": "**Execution flow:**\n1. \"Car 2\" is created.\n2. It's linked after \"Car 1\".\n\n**Growing train:**\nJust keep linking to the back -- it's super easy.",
+        "visualizationType": "javaMemory",
+        "code": "train.add(\"객차2\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "(기관차) -> (객차1) -> (객차2)",
+              "type": "LinkedList",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Inserting a Node in the Middle",
+        "explanation": "**Execution flow:**\n1. A \"New Car\" is created.\n2. The link between \"Engine\" and \"Car 1\" is broken.\n3. The links are reconnected: \"Engine\" -> \"New Car\" -> \"Car 1\".\n\n**Master of insertion:**\nHow do you insert a new car in the middle of a train? Just briefly unlink the cars in front and behind, slip the new car in, and you're done.\nThe other cars don't need to move at all!",
+        "visualizationType": "javaMemory",
+        "code": "train.add(1, \"새 객차\"); // 중간에 끼워넣기!",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "(기관차) -> (새 객차) -> (객차1) -> (객차2)",
+              "type": "LinkedList",
+              "changed": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which data structure is more advantageous when data searching is frequent?",
+    "options": [
+      "ArrayList",
+      "LinkedList",
+      "Both are the same",
+      "LinkedList if there's an order"
+    ],
+    "correctIndex": 0,
+    "explanation": "ArrayList allows instant access by index, but LinkedList has to traverse nodes one by one from the beginning, making searches much slower."
+  },
+  "misconceptions": [
+    {
+      "wrong": "LinkedList is always better than ArrayList.",
+      "correct": "No! ArrayList is overwhelmingly faster for searching data.",
+      "why": "To get to the last car of a LinkedList, you have to go through every car before it (no Random Access)."
+    }
+  ],
+  "keyTakeaway": "If you need frequent insertions and deletions in the middle, choose LinkedList. If you need frequent lookups, choose ArrayList!"
+}

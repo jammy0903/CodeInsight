@@ -1,0 +1,631 @@
+{
+  "lessonId": "py-2-4",
+  "title": "Break and Continue: Controlling Loops",
+  "concept": "Stop a loop early or skip an iteration",
+  "content": {
+    "code": "for i in range(10):\n    if i == 2:\n        print(\"Skip 2\")\n        continue  # 이번 턴은 여기서 끝! 위로 올라가\n    \n    if i == 5:\n        print(\"Stop!\")\n        break     # 반복문 전체 종료!\n        \n    print(i)",
+    "steps": [
+      {
+        "title": "for Loop Starts (i=0)",
+        "explanation": "**`for i in range(10):`** -- Starts a for loop that iterates from 0 to 9.\n\nPython executes from top to bottom in order. `range(10)` is an iterator that generates numbers from 0 to 9 one at a time. The first value `0` is fetched and assigned to `i`.\n\n**The focus of this lesson:** Inside this for loop, we'll learn two control keywords: `continue` and `break`. `continue` skips only the current iteration, while `break` terminates the entire loop.\n\n**Analogy:** Imagine 10 people standing in a line (numbered 0-9), and you're reviewing them one by one. Number 2 will be skipped (continue), and at number 5, the review stops entirely (break).\n\n**How Python works internally:** An iterator is created from the `range(10)` object, and `next()` returns the first value `0`. The for loop block then executes.\n\n**Execution order**: range(10) iterator created -> next() fetches 0 -> i = 0 -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Iteration 1 starts",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Condition Check (i=0)",
+        "explanation": "**`if i == 2:`** -- Checks if `i` is 2. If so, `continue` will be executed.\n\nCurrently `i` is `0`, so `0 == 2` is **False**. The indented block (print and continue) is skipped, and execution moves to the next condition (line 6).\n\n**Why is this condition here?** It's a check to use `continue` to skip the iteration when `i` is 2. When it's not 2, nothing happens and execution proceeds to the next code.\n\n**Execution order**: check condition (0 == 2 = False) -> skip block -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "note": "Condition False -> lines 3-4 skipped",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Second Condition Check (i=0)",
+        "explanation": "**`if i == 5:`** -- Checks if `i` is 5. If so, `break` will be executed to terminate the entire loop.\n\nCurrently `i` is `0`, so `0 == 5` is **False**. The indented block (print and break) is skipped, and execution moves to the next code (line 10).\n\n**Two checkpoints inside the for loop:** This loop has 2 if statements:\n1. `if i == 2`: **skip only this iteration** with continue\n2. `if i == 5`: **terminate the entire loop** with break\n\nWhen both conditions are False, the final `print(i)` executes normally.\n\n**Execution order**: check condition (0 == 5 = False) -> skip block -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "note": "Condition False -> lines 7-8 skipped",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Print Value (i=0)",
+        "explanation": "**`print(i)`** -- Both conditions passed, so the current value of `i` (0) is printed.\n\n**Why did this code execute?** Both the first if (i==2) and second if (i==5) were False, so neither `continue` nor `break` was executed. That's why execution reached `print(i)` in order.\n\n**Analogy:** Person number 0 passed both checkpoints (is it number 2? is it number 5?) and safely reached the output stage.\n\n**Key pattern:** When neither continue nor break executes, all code in the block runs in order. This is the **normal flow**.\n\n**Execution order**: print(0) executes -> block ends -> jump to line 1",
+        "visualizationType": "pythonMemory",
+        "code": "print(i)",
+        "pythonMemoryState": {
+          "output": [
+            "0"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Next Iteration (i=1)",
+        "explanation": "**`for i in range(10):`** -- Automatically jumped to the loop start from the end of the block. This is the 2nd iteration.\n\nThe for loop automatically jumps back to the loop start when the block ends. The next value `1` is fetched from the `range(10)` iterator and reassigned to `i`.\n\nIn this iteration too, both conditions (`i==2`, `i==5`) are False, so `print(1)` will execute normally.\n\n**Execution order**: block ends -> jump to line 1 -> i = 1 -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "Iteration 2 starts",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Condition Check (i=1)",
+        "explanation": "**`if i == 2:`** -- `1 == 2` is **False**, so the continue block is skipped.\n\ni=1 is not 2, so continue is not executed, and execution proceeds to the next condition.\n\n**Execution order**: check condition (1 == 2 = False) -> skip block -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Second Condition Check (i=1)",
+        "explanation": "**`if i == 5:`** -- `1 == 5` is **False**, so the break block is skipped.\n\ni=1 is not 5, so break is not executed, and execution moves on to `print(i)`.\n\n**Execution order**: check condition (1 == 5 = False) -> skip block -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Print Value (i=1)",
+        "explanation": "**`print(i)`** -- Prints the current value of `i` (1).\n\nBoth conditions passed, so the value is printed normally.\n\n**Output trace:** `0` -> **`1`** -> when i=2 next, continue will skip it.\n\n**Execution order**: print(1) executes -> block ends -> jump to line 1",
+        "visualizationType": "pythonMemory",
+        "code": "print(i)",
+        "pythonMemoryState": {
+          "output": [
+            "1"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Next Iteration (i=2)",
+        "explanation": "**`for i in range(10):`** -- This is the 3rd iteration. This time `continue` will be executed!\n\nJumped back to line 1 from the end of the block. The next value `2` is fetched from the `range(10)` iterator and reassigned to `i`.\n\n**Important:** In this iteration, `i == 2` will be True, so `continue` will execute. `print(i)` will **not** be executed.\n\n**Execution order**: block ends -> jump to line 1 -> i = 2 -> line 2 (continue test!)",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "Iteration 3 starts (continue test)",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Condition Check (i=2)",
+        "explanation": "**`if i == 2:`** -- Finally, `2 == 2` is **True**! The continue block will execute.\n\nIn previous iterations (i=0, i=1), this condition was False, but this time it's True. Execution enters the indented block (print and continue).\n\n**Analogy:** Person number 2 has been caught at the first checkpoint! This person will be skipped (continue).\n\n**Execution order**: check condition (2 == 2 = True) -> enter block -> line 3",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "note": "Condition True -> line 3 will execute",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Print Message",
+        "explanation": "**`print(\"Skip 2\")`** -- Prints a message just before continue executes.\n\nSince the if condition was True, the code inside the block executes in order. First \"Skip 2\" is printed, then the `continue` on the next line will execute.\n\n**Note:** This print is **before** continue, so it executes. If it were **after** continue, it would not execute. Once continue runs, all code after it is skipped.\n\n**Execution order**: print \"Skip 2\" -> line 4 (continue)",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Skip 2\")",
+        "pythonMemoryState": {
+          "output": [
+            "Skip 2"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "continue Executes",
+        "explanation": "**`continue`** -- **Skips all remaining code** in the current iteration and jumps directly to the next iteration.\n\nThe moment continue executes, all the remaining code in the block (lines 6, 7, 8, 10: `if i == 5`, `print(\"Stop!\")`, `break`, `print(i)`) is **completely ignored**, and execution jumps directly to the for loop's start (line 1).\n\n**Why doesn't print(i) execute?** Because `print(i)` is below continue. When continue executes, code below it doesn't run. That's why `2` doesn't appear in the output.\n\n**Key difference from break:**\n- **continue:** Skips only this iteration, **next iteration proceeds normally** (\"pass this one!\")\n- **break:** **Terminates the entire loop**, no more iterations (\"stop everything!\")\n\n**Analogy:** In jump rope, when you trip once, continue means \"skip this one and keep going!\" while break means \"stop playing jump rope!\"\n\n**How Python works internally:** continue is implemented as a `JUMP_ABSOLUTE` instruction in bytecode. It jumps directly to the for loop's `next()` call point to fetch the next value.\n\n**Note:** continue can only be used **inside a loop (for/while)**. Using it outside a loop causes a `SyntaxError`.\n\n**Execution order**: continue executes -> lines 6-10 skipped -> jump to line 1 -> fetch next value (3)",
+        "visualizationType": "pythonMemory",
+        "code": "continue  # 이번 턴은 여기서 끝! 위로 올라가",
+        "pythonMemoryState": {
+          "note": "continue -> lines 6-10 skipped -> jump to line 1",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Next Iteration (i=3)",
+        "explanation": "**`for i in range(10):`** -- Jumped straight to the next iteration due to continue. i=3.\n\n**Why are we here?** In the previous iteration (i=2), `continue` was executed, skipping `print(i)` and jumping directly to the for loop start. The next value `3` is fetched from the `range(10)` iterator and reassigned to `i`.\n\n**Confirming continue's effect:** Looking at the output, after `0` and `1`, `2` is **missing** and it jumps straight to `3`. This is the effect of continue -- 2 was skipped.\n\n**Execution order**: continue -> jump to line 1 -> i = 3 -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "Iteration 4 starts (2 was not printed due to continue)",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Condition Check (i=3)",
+        "explanation": "**`if i == 2:`** checks the current value `i=3`.\n\nThe condition is `False`. Therefore, the `continue` block is not executed, and the flow proceeds normally to the next condition (`if i == 5`).\n\nKey points:\n- `continue` only skips the current iteration when the condition is True\n- When False, the normal iteration flow is maintained\n\n**Execution order**: `3 == 2` evaluated (False) -> continue not executed -> move to line 6",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Second Condition Check (i=3)",
+        "explanation": "**`if i == 5:`** -- `3 == 5` is **False**, so the break block is skipped.\n\ni=3 is not 5, so break is not executed, and execution moves on to `print(i)`.\n\n**Execution order**: check condition (3 == 5 = False) -> skip block -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Print Value (i=3)",
+        "explanation": "**`print(i)`** -- Prints the current value of `i` (3).\n\nBoth conditions were False, so it prints normally.\n\n**Output trace:** `0`, `1`, `Skip 2` (2 skipped by continue), **`3`** -> 4 will also print normally next.\n\n**Execution order**: print(3) executes -> block ends -> jump to line 1",
+        "visualizationType": "pythonMemory",
+        "code": "print(i)",
+        "pythonMemoryState": {
+          "output": [
+            "3"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Next Iteration (i=4)",
+        "explanation": "**`for i in range(10):`** -- This is the 5th iteration. i=4, normal flow again.\n\nJumped back to line 1 from the end of the block. The next value `4` is fetched from the `range(10)` iterator and reassigned to `i`.\n\ni=4 is neither 2 nor 5, so `print(4)` will execute normally.\n\n**Execution order**: block ends -> jump to line 1 -> i = 4 -> line 2",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "Iteration 5 starts",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 4,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Condition Check (i=4)",
+        "explanation": "**`if i == 2:`** checks the current value `i=4`.\n\nThe condition is `False` again. So `continue` is not triggered, and this iteration proceeds along the normal path.\n\nKey point:\n- Without `continue`, the code below (second if, print) runs as normal\n- The only iteration that gets skipped is when `i==2`\n\n**Execution order**: `4 == 2` evaluated (False) -> continue not executed -> move to line 6",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int5"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 4,
+              "pyId": "1005"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Second Condition Check (i=4)",
+        "explanation": "**`if i == 5:`** -- `4 == 5` is **False**, so the break block is skipped.\n\ni=4 is not 5, so break is not executed, and execution moves on to `print(i)`. In the next iteration (i=5), break will finally execute.\n\n**Execution order**: check condition (4 == 5 = False) -> skip block -> line 10",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int5"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 4,
+              "pyId": "1005"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Print Value (i=4)",
+        "explanation": "**`print(i)`** -- Prints the current value of `i` (4). This is the last normal output before break.\n\nBoth conditions were False, so it prints normally.\n\n**Output trace:** `0`, `1`, `Skip 2`, `3`, **`4`** -> when i=5 next, break will completely terminate the loop.\n\n**Execution order**: print(4) executes -> block ends -> jump to line 1",
+        "visualizationType": "pythonMemory",
+        "code": "print(i)",
+        "pythonMemoryState": {
+          "output": [
+            "4"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int5"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 4,
+              "pyId": "1005"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Next Iteration (i=5)",
+        "explanation": "**`for i in range(10):`** -- This is the 6th iteration. This time `break` will execute and completely terminate the loop!\n\nJumped back to line 1 from the end of the block. The next value `5` is fetched from the `range(10)` iterator and reassigned to `i`.\n\n**Important:** In this iteration, `if i == 5` will be True, and `break` will execute. The entire loop terminates, so i=6, 7, 8, 9 will **never be processed**.\n\n**Execution order**: block ends -> jump to line 1 -> i = 5 -> line 2 (break test!)",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(10):",
+        "pythonMemoryState": {
+          "note": "Iteration 6 starts (break test)",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "First Condition Check (i=5)",
+        "explanation": "**`if i == 2:`** -- `5 == 2` is **False**, so the continue block is skipped.\n\ni=5 is not 2, so continue is not executed. Execution moves to the next condition (if i == 5).\n\n**Execution order**: check condition (5 == 2 = False) -> skip block -> line 6",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 2:",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Second Condition Check (i=5)",
+        "explanation": "**`if i == 5:`** -- Finally, `5 == 5` is **True**! The break block will execute.\n\nIn previous iterations, this condition was always False, but this time it's True for the first time. Execution enters the indented block (print and break).\n\n**Analogy:** Person number 5 has been caught at the second checkpoint! This time it's not a skip (continue) but a complete halt (break).\n\n**Execution order**: check condition (5 == 5 = True) -> enter block -> line 7",
+        "visualizationType": "pythonMemory",
+        "code": "if i == 5:",
+        "pythonMemoryState": {
+          "note": "Condition True -> line 7 will execute",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Print Message",
+        "explanation": "**`print(\"Stop!\")`** -- Prints a termination message just before break executes.\n\nSince the if condition was True, the code inside the block executes in order. After printing \"Stop!\", the `break` on the next line will execute, completely terminating the loop.\n\n**Note:** Just like with continue, this print is **before** break, so it executes. Even if there were code after break, it would not run.\n\n**Execution order**: print \"Stop!\" -> line 8 (break)",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Stop!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Stop!"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "break Executes",
+        "explanation": "**`break`** -- **Immediately terminates the entire loop.** Completely exits the loop.\n\nThe moment break executes, the for loop ends completely. Even though `range(10)` still has 6, 7, 8, 9 remaining, **no more `next()` calls are made to the iterator**. Execution jumps directly to the next code outside the loop (in this program, there's no code outside the loop, so the program ends).\n\n**Final comparison of continue and break:**\n- **continue** (executed at i=2): Skips only this iteration, **next iteration continues** -> normal execution from i=3\n- **break** (executed at i=5): **Terminates the entire loop** -> i=6, 7, 8, 9 are never processed\n\n**Full output:** `0`, `1`, `Skip 2`, `3`, `4`, `Stop!` (2 was skipped, stopped at 5, 6-9 were never processed)\n\n**Analogy:** In a line of 10, number 2 was skipped (continue), and at number 5 the review was completely halted (break). Numbers 6-9 never got reviewed.\n\n**How Python works internally:** break is implemented as `BREAK_LOOP` (before Python 3.8) or `JUMP_FORWARD` (Python 3.8+) in bytecode. It jumps directly to the position after the end of the for loop.\n\n**Note:** break only terminates the **innermost loop** it's contained in. In nested loops (`for` inside `for`), to exit the outer loop too, you need a separate flag variable or a function's `return`.\n\n**Execution order**: break executes -> completely exit for loop -> program ends",
+        "visualizationType": "pythonMemory",
+        "code": "break     # 반복문 전체 종료!",
+        "pythonMemoryState": {
+          "note": "break -> loop terminates (i=6~9 not executed)",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens when break is encountered?",
+    "options": [
+      "The entire program terminates",
+      "The current loop is completely exited",
+      "Execution moves to the next line",
+      "Execution returns to the beginning of the loop"
+    ],
+    "correctIndex": 1,
+    "explanation": "break immediately terminates the nearest enclosing loop (for/while) it's contained in."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Using break in nested loops exits all of them",
+      "correct": "No.\nIt only exits the innermost loop.",
+      "why": "To exit multiple loops at once, you need a separate flag variable."
+    }
+  ],
+  "keyTakeaway": "continue means 'move on to the next one,' break means 'stop entirely.'"
+}

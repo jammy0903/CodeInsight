@@ -1,0 +1,273 @@
+{
+  "lessonId": "py-15-1",
+  "title": "File Reading (open, read, readlines)",
+  "concept": "Open a file with open(), read contents with read() or readlines(), and always close with close().",
+  "content": {
+    "code": "f = open(\"data.txt\", \"r\")\ncontent = f.read()\nprint(content)\nf.close()\n\nf2 = open(\"data.txt\", \"r\")\nlines = f2.readlines()\nprint(f\"Total lines: {len(lines)}\")\nfor line in lines:\n    print(line.strip())\nf2.close()",
+    "steps": [
+      {
+        "title": "Opening a File (open)",
+        "explanation": "**`open(path, mode)`** is the basic function to get a file object.\n\nCommon modes:\n- `r`: Read\n- `w`: Write (overwrites existing content)\n- `a`: Append to end\n\n**Analogy**: A file is a drawer, and the mode is choosing between \"read only / overwrite / append\" permissions.\n\nPractical tip:\n- For text files, specifying `encoding=\"utf-8\"` can reduce character encoding issues",
+        "visualizationType": "pythonMemory",
+        "code": "f = open(\"data.txt\", \"r\")",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "File object created and assigned to f.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Reading the Entire File (read)",
+        "explanation": "**`content = f.read()`** -- Reads the **entire content** of the file into a single string and stores it in the `content` variable.\n\nThe `read()` method reads all characters from beginning to end and returns them as a single `str` object. Newline characters (`\\n`) are included as-is in the string.\n\n**Analogy:** Like using a copier to **copy the entire book from first to last page at once**. The result is one long scroll (string) with all pages joined together.\n\n**Note:** Using `read()` on very large files (several GB) loads the entire file into memory, which can cause `MemoryError`. For large files, it's safer to process line by line using `readline()` or `for line in f:`.\n\n**read() vs readline() vs readlines():**\n- `read()` -- returns the entire file as **one string**\n- `readline()` -- reads **one line** and returns it as a string\n- `readlines()` -- returns all lines as a **list** (each line is one element)",
+        "visualizationType": "pythonMemory",
+        "code": "content = f.read()",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Entire file content read as a single string.",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1"
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1001"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello World\nPython File I/O\nThird Line",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Content and Closing the File",
+        "explanation": "**`print(content)`** -- Prints the entire string read with `read()`.\n**`f.close()`** -- Closes the file since we're done using it.\n\n`content` contains newline characters (`\\n`), so when `print()` is called, it outputs as multiple lines.\n\n**Analogy:** When you're done reading a book (file object) borrowed from the library, you must return it (close). If you don't return it, others (other programs) can't borrow that book, and you might hit the library's (OS) borrowing limit.\n\n**Note:** Forgetting `close()` is such a common mistake that Python provides the `with` statement to solve this problem (learned in the next lesson).\n\n**Why is close() absolutely necessary?**\n- The OS has a **limit** on how many files can be open simultaneously (usually 1024)\n- Not calling `close()` causes **file descriptor leaks**\n- In write mode, data may only be in the buffer and not actually written to disk until `close()`\n- **File lock** issues can prevent other processes from accessing the file",
+        "visualizationType": "pythonMemory",
+        "code": "print(content)",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Hello World",
+            "Python File I/O",
+            "Third Line"
+          ],
+          "note": "File content printed and file closed with close().",
+          "names": [
+            {
+              "name": "f",
+              "pointsTo": "file1"
+            },
+            {
+              "name": "content",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "file1",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', CLOSED)",
+              "pyId": "1001",
+              "highlight": true
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "Hello World\nPython File I/O\nThird Line",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Reading Lines with readlines()",
+        "explanation": "**`readlines()`** reads all lines of the file as a list.\n\nSo the result is typically:\n- `[\"line1\\n\", \"line2\\n\", ...]` format.\n\n**Analogy**: Like pulling out all pages of a book as individual memo cards at once.\n\nNote:\n- `readlines()` on large files uses a lot of memory\n- For large volumes, processing one line at a time with `for line in file:` is safer",
+        "visualizationType": "pythonMemory",
+        "code": "f2 = open(\"data.txt\", \"r\")",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "readlines() returns each line of the file as a list element.",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2",
+              "highlight": true
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing Line Count and Iterating Output",
+        "explanation": "Checking the line count and printing with a loop lets you \"structurally\" inspect the file contents.\n\nKey points:\n- First check how many lines there are\n- Then print/process each line in order\n\n**Analogy**: Like reviewing a document by first checking the page count, then reading through page by page.\n\nPractical tip:\n- Using `strip()` when processing lines cleans up trailing newlines for cleaner output",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Total lines: {len(lines)}\")",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "pythonMemoryState": {
+          "output": [
+            "Total lines: 3",
+            "Hello World",
+            "Python File I/O",
+            "Third Line"
+          ],
+          "note": "strip() removes newlines for clean output.",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2"
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "line",
+              "pointsTo": "str3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', mode='r')",
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "str3",
+              "type": "str",
+              "value": "Third Line",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Closing the File (close)",
+        "explanation": "**`f2.close()`** -- Closes the second file object `f2` since we're done using it.\n\n**Analogy:** Returning the second book borrowed from the library. To respect the library's (OS) borrowing limit, borrowed books must always be returned.\n\n**Summary: The basic file handling pattern (open-work-close)**\n```\nf = open(\"file\", \"mode\")   # Step 1: Open\n# ... read/write operations ...  # Step 2: Work\nf.close()                    # Step 3: Close\n```\n\n**The fatal problem with this pattern:**\n- If an **error occurs** during step 2, `close()` won't execute!\n- Example: If `UnicodeDecodeError` occurs in `content = f.read()`, it never reaches the `f.close()` line\n- The burden of never forgetting `close()` every time you open a file\n- Easy to miss `close()` as code gets longer\n\n**Python internals:** CPython's reference-counting garbage collector automatically calls `close()` when a file object's reference count drops to 0. However, relying on this is **bad practice**. Other Python implementations (PyPy, Jython) have different garbage collection timing.\n\n**Solution:** The **`with` statement** you'll learn in the next lesson elegantly solves all these problems! The `with` statement guarantees automatic `close()` even when errors occur.\n\n**Execution order:**\n1. `f2.close()` -> file descriptor returned to OS.\n2. `f2` object state changed to CLOSED.\n3. Program ends.",
+        "visualizationType": "pythonMemory",
+        "code": "f2.close()",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "All file objects closed. Learn the with statement in the next lesson!",
+          "names": [
+            {
+              "name": "f2",
+              "pointsTo": "file2"
+            },
+            {
+              "name": "lines",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "file2",
+              "type": "instance",
+              "value": "TextIOWrapper('data.txt', CLOSED)",
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Hello World\\n\", \"Python File I/O\\n\", \"Third Line\"]",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which is the correct difference between read() and readlines()?",
+    "options": [
+      "read() returns a list, readlines() returns a string",
+      "read() returns the entire file as one string, readlines() returns each line as a list",
+      "read() reads only the first line, readlines() reads all lines",
+      "read() is only for binary mode, readlines() is only for text mode"
+    ],
+    "correctIndex": 1,
+    "explanation": "read() returns the entire file content as a single string (str).\nreadlines() returns a list (list) with each line as an element.\nEach element ends with a newline character (\\n)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Files close automatically when opened",
+      "correct": "When opened with open(), you must call close() or use a with statement",
+      "why": "Not closing files can cause memory leaks, data loss, file locks, and other problems."
+    },
+    {
+      "wrong": "Calling read() twice returns the same content again",
+      "correct": "After read(), the cursor moves to the end of the file, so the second read() returns an empty string",
+      "why": "To read again, you must reset the cursor to the beginning with f.seek(0)."
+    }
+  ],
+  "keyTakeaway": "Open files with open(), read() returns the entire string, readlines() returns a line-by-line list. Always close with close() after use."
+}

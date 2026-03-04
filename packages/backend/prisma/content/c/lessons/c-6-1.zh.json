@@ -1,0 +1,99 @@
+{
+  "lessonId": "c-6-1",
+  "title": "String Memory Structure",
+  "concept": "C 语言没有"字符串类型"。只是在字符数组末尾加个 0 来使用。",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    char str[] = \"Code\";\n\n    printf(\"String: %s\\n\", str);\n    printf(\"Size:   %zu\\n\", sizeof(str));\n\n    printf(\"[%c] [%c] [%c] [%c] [%d]\\n\",\n           str[0], str[1], str[2], str[3], str[4]);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "使用 `printf` 所需的标准输入输出头文件。\n\n本课将了解字符串如何以 `char` 数组的形式存储。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧。\n\n我们将逐步观察字符串字面量如何放入数组。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "用字符数组声明字符串",
+        "explanation": "`char str[] = \"Code\";` 创建一个包含 4 个字符加上终止符 `\\0` 的数组。\n\n因此实际数组大小是 5。",
+        "visualizationType": "cMemory",
+        "code": "char str[] = \"Code\";",
+        "stack": [
+          {
+            "name": "str",
+            "type": "char[5]",
+            "address": "0x1000",
+            "value": "{'C', 'o', 'd', 'e', '\\0'}"
+          }
+        ]
+      },
+      {
+        "title": "输出字符串（%s）",
+        "explanation": "`%s` 会一直输出字符直到遇到 `\\0`。\n\n所以只有 `str` 的文本部分会显示为正常字符串。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"String: %s\\n\", str);",
+        "stdout": "String: Code"
+      },
+      {
+        "title": "查看数组总大小（sizeof）",
+        "explanation": "`sizeof(str)` 返回数组的总字节数。\n\n由于返回类型是 `size_t`，输出格式使用 `%zu`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Size:   %zu\\n\", sizeof(str));",
+        "stdout": "String: Code\nSize:   5"
+      },
+      {
+        "title": "直接查看数组内容",
+        "explanation": "通过索引逐个输出每个元素，可以看到末尾的终止符值（0）。\n\n关键点是字符串以不可见的 `\\0` 结尾。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"[%c] [%c] [%c] [%c] [%d]\\n\",",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stdout": "String: Code\nSize:   5\n[C] [o] [d] [e] [0]"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "通过 `return 0;` 结束程序。\n\n要点：字符串字面量复制到数组时，终止符也会包含在内。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "char buf[5] = \"Hello\"; 为什么危险？",
+    "options": [
+      "浪费内存",
+      "没有 \\0 的空间，无法被识别为字符串",
+      "编译报错",
+      "没有任何问题"
+    ],
+    "correctIndex": 1,
+    "explanation": "\"Hello\" 有 5 个字符，但包含 `\\0` 需要 6 个位置。\n强行放入 `buf[5]` 意味着没有结束标记，输出时会读取缓冲区之后的内存（缓冲区溢出的起点）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "可以用 `sizeof` 获取字符串长度",
+      "correct": "大多数情况下应该使用 `strlen`。",
+      "why": "`sizeof` 返回容器（数组）的总大小，而 `strlen` 返回实际内容长度（到 `\\0` 之前）。"
+    }
+  ],
+  "keyTakeaway": "在 C 中，字符串是以 `0` 结尾的 `char` 数组。始终记住 `+1` 的空间。"
+}

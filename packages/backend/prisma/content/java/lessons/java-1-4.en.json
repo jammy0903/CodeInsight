@@ -1,0 +1,218 @@
+{
+  "lessonId": "java-1-4",
+  "title": "The Array Comparison Trap",
+  "concept": "Array's .equals() uses Object.equals(), so you must use Arrays.equals()",
+  "content": {
+    "code": "int[] arr1 = {1, 2, 3};\nint[] arr2 = {1, 2, 3};\n\nSystem.out.println(arr1 == arr2);\nSystem.out.println(arr1.equals(arr2));\nSystem.out.println(Arrays.equals(arr1, arr2));\n\nint[][] deep1 = {{1, 2}, {3, 4}};\nint[][] deep2 = {{1, 2}, {3, 4}};\nSystem.out.println(Arrays.equals(deep1, deep2));\nSystem.out.println(Arrays.deepEquals(deep1, deep2));",
+    "steps": [
+      {
+        "title": "Creating the First Array",
+        "explanation": "**Execution order:**\n1. Array `[1, 2, 3]` is created on the Heap.\n2. Address (0x001) is stored in `arr1`.\n\n**Are arrays objects too?**\nYes, in Java, arrays are **special objects**.\nHowever, they are 'unfriendly' objects whose convenience features like `equals` aren't properly implemented.",
+        "visualizationType": "javaMemory",
+        "code": "int[] arr1 = {1, 2, 3};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "arr1",
+              "value": "-> 0x001",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[1, 2, 3]"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Creating the Second Array",
+        "explanation": "**Execution order:**\n1. A new array `[1, 2, 3]` is created on the Heap.\n2. Address (0x002) is stored in `arr2`.\n\nThe contents are identical `[1, 2, 3]`, but a new array is created in a **different space** on the Heap.",
+        "visualizationType": "javaMemory",
+        "code": "int[] arr2 = {1, 2, 3};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "arr1",
+              "value": "-> 0x001",
+              "type": "int[]"
+            },
+            {
+              "name": "arr2",
+              "value": "-> 0x002",
+              "type": "int[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[1, 2, 3]"
+            },
+            {
+              "address": "0x002",
+              "content": "[1, 2, 3]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "== Comparison (Reference Comparison)",
+        "explanation": "**Execution order:**\n1. Compare arr1(0x001) == arr2(0x002).\n2. Addresses are different, so **false**.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(arr1 == arr2);",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ]
+        }
+      },
+      {
+        "title": ".equals() Comparison (The Array Trap!)",
+        "explanation": "**Execution order:**\n1. `arr1.equals(arr2)` is called.\n2. Internally performs `==` (address comparison).\n3. Returns **false**.\n\nThis is where many get tricked!\nArray's `.equals()` does not check the contents.\nIt uses `Object.equals()` directly, which only **compares addresses**.",
+        "keyInsight": "array.equals() = Object.equals() = reference comparison!",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(arr1.equals(arr2));",
+        "javaMemoryState": {
+          "output": [
+            "false"
+          ],
+          "warning": ".equals() is also false! Arrays use Object.equals()"
+        }
+      },
+      {
+        "title": "Using Arrays.equals()",
+        "explanation": "**Execution order:**\n1. `Arrays.equals(arr1, arr2)` is called.\n2. Length comparison -> passes.\n3. Content comparison (1==1, 2==2, 3==3).\n4. All match, so **true**.",
+        "keyInsight": "Array comparison = use Arrays.equals()",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.equals(arr1, arr2));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "warning": null
+        }
+      },
+      {
+        "title": "Creating the First 2D Array",
+        "explanation": "**Execution order:**\n1. The outer 2D array (shell) is created (0x010).\n2. Inner arrays (rows) are created (0x011, 0x012).\n3. Addresses are linked, then assigned to `deep1`.\n\nA 2D array is an **'array of references to arrays'**.",
+        "visualizationType": "javaMemory",
+        "code": "int[][] deep1 = {{1, 2}, {3, 4}};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "deep1",
+              "value": "-> 0x010",
+              "type": "int[][]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x010",
+              "content": "[-> 0x011, -> 0x012]"
+            },
+            {
+              "address": "0x011",
+              "content": "[1, 2]"
+            },
+            {
+              "address": "0x012",
+              "content": "[3, 4]"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Creating the Second 2D Array",
+        "explanation": "**Execution order:**\n1. A new 2D array is created (0x020).\n2. New inner arrays are created (0x021, 0x022).\n3. Assigned to `deep2`.\n\nThe contents are the same as the first 2D array, but it's an entirely new object structure.",
+        "visualizationType": "javaMemory",
+        "code": "int[][] deep2 = {{1, 2}, {3, 4}};",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "deep1",
+              "value": "-> 0x010",
+              "type": "int[][]"
+            },
+            {
+              "name": "deep2",
+              "value": "-> 0x020",
+              "type": "int[][]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x010",
+              "content": "[-> 0x011, -> 0x012]"
+            },
+            {
+              "address": "0x011",
+              "content": "[1, 2]"
+            },
+            {
+              "address": "0x012",
+              "content": "[3, 4]"
+            },
+            {
+              "address": "0x020",
+              "content": "[-> 0x021, -> 0x022]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Arrays.equals() on 2D Arrays (The Trap!)",
+        "explanation": "**Execution order:**\n1. `Arrays.equals` is called.\n2. Compares the outer (1D) elements.\n3. deep1[0](0x011) != deep2[0](0x021).\n4. Addresses are different, so **false**.\n\n`Arrays.equals` only compares the **first dimension**.\nIt doesn't check whether the inner contents (`[1, 2]`) are the same.",
+        "keyInsight": "Arrays.equals() only compares one dimension",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.equals(deep1, deep2));",
+        "javaMemoryState": {
+          "output": [
+            "false",
+            "false",
+            "true",
+            "false"
+          ],
+          "warning": "false because inner array addresses are different!"
+        }
+      },
+      {
+        "title": "Using Arrays.deepEquals()",
+        "explanation": "**Execution order:**\n1. `Arrays.deepEquals` is called.\n2. Detects that elements are arrays -> recursively enters.\n3. Compares inner array contents (`[1,2]`, `[3,4]`).\n4. All match -> **true**.",
+        "keyInsight": "Multidimensional arrays = use Arrays.deepEquals()",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(Arrays.deepEquals(deep1, deep2));",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ],
+          "warning": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How should you compare String[] arrays?",
+    "options": [
+      "arr1 == arr2",
+      "arr1.equals(arr2)",
+      "Arrays.equals(arr1, arr2)",
+      "arr1.toString().equals(arr2.toString())"
+    ],
+    "correctIndex": 2,
+    "explanation": "Arrays.equals() iterates through each element and calls .equals() on them.\nSince String has a well-implemented equals(), it works correctly."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can compare arrays with .equals()",
+      "correct": "Arrays must be compared with `Arrays.equals()`.",
+      "why": "Array's own `.equals()` is identical to address comparison (==).\nThis is one of the unfortunate aspects of Java's design."
+    }
+  ],
+  "keyTakeaway": "1D arrays: Arrays.equals(), Multidimensional arrays: Arrays.deepEquals()"
+}

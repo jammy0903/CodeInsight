@@ -1,0 +1,149 @@
+{
+  "lessonId": "c-4-4",
+  "title": "Array Parameters",
+  "concept": "Arrays are too large to pass whole, so only the 'first address' is sent to the function",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid printArr(int arr[], int len) {\n    for (int i = 0; i < len; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    int data[3] = {10, 20, 30};\n\n    printArr(data, 3);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including Header",
+        "explanation": "`#include <stdio.h>` enables the output functions.\n\nThis lesson covers how arrays decay into addresses when passed as function arguments.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "printArr Function Definition",
+        "explanation": "In `printArr(int arr[], int len)`, `arr[]` acts as a pointer in the function parameter.\n\nThat's why we must receive the length `len` separately to iterate safely.",
+        "visualizationType": "cMemory",
+        "code": "void printArr(int arr[], int len) {"
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The main frame is created and the array `data` is prepared.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Array Declaration and Initialization",
+        "explanation": "Array `data` stores 10, 20, 30 in contiguous memory.\n\nThe array name serves as a starting point representing the first element's address.",
+        "visualizationType": "cMemory",
+        "code": "int data[3] = {10, 20, 30};",
+        "stack": [
+          {
+            "name": "data",
+            "value": "{10, 20, 30}",
+            "type": "int[3]",
+            "frame": "main",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Passing the Array (Array Decay)",
+        "explanation": "When `printArr(data, 3);` is called, `data` decays to its starting address.\n\nThe function accesses the original location, not a copy of the array.",
+        "visualizationType": "cMemory",
+        "code": "printArr(data, 3);",
+        "highlightOffset": [
+          0,
+          -10
+        ],
+        "stack": [
+          {
+            "name": "data",
+            "value": "{10, 20, 30}",
+            "type": "int[3]",
+            "frame": "main"
+          },
+          {
+            "name": "arr",
+            "value": "0x1000",
+            "type": "int*",
+            "frame": "printArr"
+          },
+          {
+            "name": "len",
+            "value": "3",
+            "type": "int",
+            "frame": "printArr"
+          }
+        ]
+      },
+      {
+        "title": "Iterating with a for Loop",
+        "explanation": "`arr[i]` prints the elements in order.\n\nInternally, this is equivalent to pointer access `*(arr+i)`.",
+        "visualizationType": "cMemory",
+        "code": "for (int i = 0; i < len; i++) {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "stack": [
+          {
+            "name": "data",
+            "value": "{10, 20, 30}",
+            "type": "int[3]",
+            "frame": "main"
+          },
+          {
+            "name": "arr",
+            "value": "Address(data)",
+            "type": "int*",
+            "frame": "printArr"
+          },
+          {
+            "name": "len",
+            "value": "3",
+            "type": "int",
+            "frame": "printArr"
+          },
+          {
+            "name": "i",
+            "value": "0→1→2",
+            "type": "int",
+            "frame": "printArr"
+          }
+        ],
+        "stdout": "10 20 30 "
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "`return 0;` ends the program.\n\nKey point: when passing arrays as arguments, you must manage both the address and the length together.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When you declare void func(int a[100]), how does the compiler interpret it?",
+    "options": [
+      "It copies a 100-element array",
+      "It interprets it as void func(int *a) (Pointer)",
+      "It throws an error",
+      "It allocates 100 bytes of memory"
+    ],
+    "correctIndex": 1,
+    "explanation": "The number inside the brackets is ignored.\nAn array declaration in a function parameter is always equivalent to a pointer declaration."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Arrays can be passed by Call by Value",
+      "correct": "The array itself cannot.",
+      "why": "If you really want to, you can wrap the array in a struct and pass the struct, which will create a copy (tip)."
+    }
+  ],
+  "keyTakeaway": "Array parameters are essentially pointers. That's why the original can be modified, and the length must be passed separately."
+}

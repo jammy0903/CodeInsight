@@ -1,0 +1,285 @@
+{
+  "lessonId": "py-14-4",
+  "title": "Lambda Functions Advanced",
+  "concept": "Lambda is a nameless one-line function! Most commonly used as sorted's key",
+  "content": {
+    "code": "students = [\n    {\"name\": \"Alice\", \"score\": 85},\n    {\"name\": \"Bob\", \"score\": 92},\n    {\"name\": \"Charlie\", \"score\": 78},\n]\n\nsorted_students = sorted(students, key=lambda s: s[\"score\"], reverse=True)\n\nfor s in sorted_students:\n    print(f\"{s['name']}: {s['score']}\")\n\nmultiply = lambda x, y: x * y\nprint(multiply(3, 4))",
+    "steps": [
+      {
+        "title": "Creating the Student Data List",
+        "explanation": "**`students = [{\"name\": \"Alice\", \"score\": 85}, ...]`** -- Creates a list of 3 dictionaries. Each dictionary contains a student's name and score.\n\n**Analogy:** Imagine managing a student roster at school. There are cards (dictionaries) with each student's information, and these cards are collected in a bundle (list). The cards have names and scores written on them, but they're not sorted yet.\n\n**Data structure:**\n```\nstudents = [\n    {\"name\": \"Alice\",   \"score\": 85},  -- index 0\n    {\"name\": \"Bob\",     \"score\": 92},  -- index 1\n    {\"name\": \"Charlie\", \"score\": 78},  -- index 2\n]\n```",
+        "visualizationType": "pythonMemory",
+        "code": "students = [",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Dictionary list -- needs a sorting criterion",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Sorting with sorted() + lambda",
+        "explanation": "**`sorted_students = sorted(students, key=lambda s: s[\"score\"], reverse=True)`**\n\nThe key is simple.\n- `key=...`: Defines \"what to compare by\"\n- `reverse=True`: Reverses so larger values come first\n\nHere, the `score` is extracted from each student dictionary for sorting.\nIn other words, this code creates a new list sorted by score in descending order.\n\n**Analogy**: Like re-stacking a pile of exam papers not by name but by \"score.\"\n\nExample flow:\n- Alice(85), Bob(92), Charlie(78)\n- Result: Bob(92) -> Alice(85) -> Charlie(78)\n\nImportant note:\n- `sorted(...)` **does not modify the original and returns a new list**\n- To modify in-place, use `.sort(...)`",
+        "visualizationType": "pythonMemory",
+        "code": "sorted_students = sorted(students, key=lambda s: s[\"score\"], reverse=True)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "key=lambda sorts by score in descending order",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Iterating and Printing Sorted Results (1)",
+        "explanation": "**`for s in sorted_students:`**\n**`    print(f\"{s['name']}: {s['score']}\")`** -- Iterates over the sorted list and prints each student's name and score using f-strings.\n\n**First iteration:** `s = {\"name\": \"Bob\", \"score\": 92}` -> Output: `Bob: 92`\n\n**Analogy:** Like announcing award recipients at a ceremony. From 1st place (Bob, 92) to 3rd place (Charlie, 78) in order.\n\n**Note:** `s` is a loop variable that points to a different dictionary object with each iteration. After the loop ends, `s` still references the last dictionary it pointed to (Charlie).\n\n**f-string dictionary access tip:** In `f\"{s['name']}\"`, since the outer quotes use `\"`, the inner dictionary key must use `'` (single quotes) to differentiate. Using the same quotes causes a `SyntaxError`.",
+        "visualizationType": "pythonMemory",
+        "code": "    print(f\"{s['name']}: {s['score']}\")",
+        "occurrence": 1,
+        "pythonMemoryState": {
+          "output": [
+            "Bob: 92"
+          ],
+          "note": "1st place: Bob (92 points)",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "s",
+              "pointsTo": "dict1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002"
+            },
+            {
+              "id": "dict1",
+              "type": "dict",
+              "value": "{\"name\": \"Bob\", \"score\": 92}",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Complete Sorted Output",
+        "explanation": "Printing sorted results lets you **immediately verify the order matches the criterion**.\n\nHere the criterion is descending by score, so\nhigher-scoring students should appear first.\n\nKey points:\n- Sorting code is a set of \"creation\" and \"verification\"\n- Having an output/check step helps catch mistakes early\n\n**Analogy**: Like the final check after sorting cards -- spreading them out and visually confirming they're in order from largest to smallest.",
+        "visualizationType": "pythonMemory",
+        "code": "    print(f\"{s['name']}: {s['score']}\")",
+        "occurrence": 1,
+        "pythonMemoryState": {
+          "output": [
+            "Alice: 85",
+            "Charlie: 78"
+          ],
+          "note": "Full output in descending score order complete",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "s",
+              "pointsTo": "dict2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002"
+            },
+            {
+              "id": "dict2",
+              "type": "dict",
+              "value": "{\"name\": \"Charlie\", \"score\": 78}",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Storing Lambda in a Variable",
+        "explanation": "**Storing a lambda in a variable** allows reusing the same criterion function in multiple places.\n\nFor example, if the same logic repeats across sorting, filtering, and testing,\ndefining an anonymous function once reduces duplication.\n\n**Analogy**: Like registering a frequently used shortcut and pressing it whenever needed.\n\nNote:\n- If the logic gets long, naming it with `def` is better for readability",
+        "visualizationType": "pythonMemory",
+        "code": "multiply = lambda x, y: x * y",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Storing lambda in variable (possible but not recommended)",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "multiply",
+              "pointsTo": "func1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<lambda (x, y) -> x * y>",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling the Lambda Function",
+        "explanation": "**`print(multiply(3, 4))`** -- Calls the `multiply` function with arguments 3 and 4, and prints the result.\n\n`multiply` is `lambda x, y: x * y`, so `3 * 4 = 12` is calculated and returned.\n\n**Analogy:** Like putting two numbers (3, 4) into a calculator (multiply function) and pressing the multiply button to get the result (12) on screen.\n\n**Lambda usage guide summary:**\n\n**Python internals:** When a function is called, a new **frame** object is created. `x=3, y=4` are bound in the frame's local namespace, and the `x * y` expression is evaluated. When the result `12` is returned, the frame is destroyed. Lambda functions use the same call mechanism as def functions.\n\n**Note:** Lambda can only use **expressions**, not **statements**. That is, `lambda x: print(x)` (print is a function call, which is an expression) works, but `lambda x: x = 5` (assignment is a statement) or `lambda x: if x > 0: return x` (if statement) cause `SyntaxError`. If you need multiple lines or conditionals, use `def`.\n\n**Execution order:**\n1. `multiply` -> resolve function object reference.\n2. `multiply(3, 4)` call -> frame created, `x=3, y=4` bound.\n3. `x * y` = `3 * 4` = `12` calculated.\n4. Result `12` returned -> frame destroyed.\n5. `print(12)` -> output to `sys.stdout`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(multiply(3, 4))",
+        "pythonMemoryState": {
+          "output": [
+            "12"
+          ],
+          "note": "lambda(3, 4) -> 3 * 4 = 12",
+          "names": [
+            {
+              "name": "students",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "sorted_students",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "multiply",
+              "pointsTo": "func1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[{Alice:85}, {Bob:92}, {Charlie:78}]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[{Bob:92}, {Alice:85}, {Charlie:78}]",
+              "pyId": "1002"
+            },
+            {
+              "id": "func1",
+              "type": "function",
+              "value": "<lambda (x, y) -> x * y>",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the result of sorted([3,1,2], key=lambda x: -x)?",
+    "options": [
+      "[1, 2, 3]",
+      "[3, 2, 1]",
+      "[-3, -1, -2]",
+      "Error occurs"
+    ],
+    "correctIndex": 1,
+    "explanation": "key=lambda x: -x flips the sign of each value for comparison.\nSince -3 < -2 < -1, sorting gives the original values as [3, 2, 1] (descending).\nFlipping signs in the key is another way to sort in descending order instead of using reverse=True!"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Lambda is faster than def",
+      "correct": "Lambda and def have identical execution speed. Lambda is simply more syntactically concise.",
+      "why": "Internally in Python, lambda also creates a regular function object.\nThere's no performance difference -- choose based on readability and purpose."
+    }
+  ],
+  "keyTakeaway": "Lambda shines as sorted's key and as arguments for map/filter! Use def when it gets complex!"
+}

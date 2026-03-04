@@ -1,0 +1,290 @@
+{
+  "lessonId": "py-14-2",
+  "title": "条件推导式与嵌套",
+  "concept": "if-else表达式放在for前面，过滤if放在for后面 -- 位置不同！",
+  "content": {
+    "code": "numbers = [1, 2, 3, 4, 5]\n\nlabels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]\nprint(labels)\n\nmatrix = [[1, 2], [3, 4], [5, 6]]\nflat = [num for row in matrix for num in row]\nprint(flat)",
+    "steps": [
+      {
+        "title": "创建源列表",
+        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- 创建包含5个整数的列表，并贴上 `numbers` 标签。\n\n本课将学习推导式的**两种进阶模式**：\n1. **条件表达式（if-else）**推导式 -- 转换时根据条件选择不同的值\n2. **嵌套推导式** -- 将二维列表展平（flatten）为一维\n\n**类比：** 如果上一课的推导式是\"简单的工厂生产线\"，那么这次是添加了**分类装置**和**多级传送带**。物品进来后根据条件贴上不同标签，还能将多个箱子里的物品展开成一行。\n\n**核心注意事项：** 上一课学的 `if` 过滤和本课学的 `if-else` 条件表达式，**位置不同！**\n- 过滤：`[x for x in nums **if 条件**]` -- 位于for**之后**\n- 条件式：`[**值A if 条件 else 值B** for x in nums]` -- 位于for**之前**\n混淆这两者是初学者最常犯的错误。\n\n**Python内部机制：** 列表 `[1, 2, 3, 4, 5]` 在堆内存中分配，CPython中-5到256之间的小整数预先缓存，不会重新创建而是复用现有的整数对象。\n\n**执行顺序：**\n1. 列表字面量求值 -> `list` 对象分配到堆。\n2. 全局命名空间创建 `numbers -> list` 绑定。",
+        "visualizationType": "pythonMemory",
+        "code": "numbers = [1, 2, 3, 4, 5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "准备学习条件表达式和嵌套推导式",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "if-else条件表达式推导式",
+        "explanation": "**`labels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]`**\n\n这条语句是\"检查每个元素并贴标签\"的模式。\n- 偶数得到 `even`\n- 奇数得到 `odd`\n\n结果是元素数量保持不变，只是值变成了标签字符串。\n\n**类比**：就像在生产线上给每个产品贴A/B贴纸的工作。\n没有丢弃的产品，全部被分类。\n\n重要区分：\n- `... if ... else ... for ...`：**选择/转换**值\n- `... for ... if ...`：只**过滤**符合条件的项\n\n只要抓住这个区别，推导式的可读性就会大幅提升。",
+        "visualizationType": "pythonMemory",
+        "code": "labels = [\"even\" if x % 2 == 0 else \"odd\" for x in numbers]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "if-else位于for前面（用于值选择）",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "打印labels结果",
+        "explanation": "**`print(labels)`** -- 打印 `labels` 指向的 `[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]`。\n\n看结果可以发现，原来的5个数字被**一对一转换**成了5个字符串。一个都没少！这就是for前的 `if-else`（值选择）和for后的 `if`（过滤）的决定性区别。\n\n**类比：** 就像学校考试中，60分及以上盖\"合格\"章，不及格盖\"不合格\"章。每个学生都会得到一个章。而for后的 `if` 就像\"只把60分以上的学生列入名单\"，部分学生会被排除。\n\n**注意：** 嵌套三元表达式会急剧降低可读性。`\"A\" if x > 90 else \"B\" if x > 80 else \"C\"` 虽然可行但很难阅读。这种情况请使用 `if-elif-else` 语句或字典映射。",
+        "visualizationType": "pythonMemory",
+        "code": "print(labels)",
+        "pythonMemoryState": {
+          "output": [
+            "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]"
+          ],
+          "note": "每个元素都被赋予even或odd标签",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建二维列表（矩阵）",
+        "explanation": "**`matrix = [[1, 2], [3, 4], [5, 6]]`** -- 创建一个列表中包含列表的**二维列表**。这种结构也称为矩阵（matrix）。\n\n**类比：** 想象一栋公寓楼。楼（matrix）里有多层（row），每层有多个房间（元素）。`matrix[0]` 是整个一楼（[1, 2]），`matrix[0][1]` 是一楼2号房（2）。\n\n**结构：**\n```\nmatrix = [\n    [1, 2],    -- 第0行（第一行）\n    [3, 4],    -- 第1行（第二行）\n    [5, 6]     -- 第2行（第三行）\n]\n```\n\n**访问方法：**\n- `matrix[0]` -> `[1, 2]`（整个第一行）\n- `matrix[0][1]` -> `2`（第一行的第二个元素）\n- `matrix[2][0]` -> `5`（第三行的第一个元素）\n\n**Python内部机制：** 二维列表实际上是\"列表的列表\"。外层列表存储3个内层列表的**引用（内存地址）**，每个内层列表存储2个整数对象的引用。堆上共有4个列表对象和6个整数对象。\n\n下一步我们将把这个二维列表**展平（flatten）为一维**。\n\n**执行顺序：**\n1. 创建内部列表 `[1, 2]`、`[3, 4]`、`[5, 6]` 共3个。\n2. 创建外部列表 -> 存储内部列表的引用。\n3. 在全局命名空间创建 `matrix` 绑定。",
+        "visualizationType": "pythonMemory",
+        "code": "matrix = [[1, 2], [3, 4], [5, 6]]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "二维列表（3行2列矩阵）",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "matrix",
+              "pointsTo": "list3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[[1, 2], [3, 4], [5, 6]]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "用嵌套推导式展平（flatten）",
+        "explanation": "**嵌套推导式（flatten）**是将二层结构展平成一行的语法。\n\n核心模式：\n- 外层 `for`：遍历行（row）\n- 内层 `for`：遍历每行的元素\n\n即\"遍历行，然后取出其中的元素放入一个列表\"。\n\n**类比**：就像打开二层抽屉柜，从上面的格子开始，把每个格子里的东西都移到一个大篮子里。\n\n注意：\n- 交换for的顺序会完全改变含义或导致错误\n- 如果可读性变差，用普通嵌套for循环展开写反而更好",
+        "visualizationType": "pythonMemory",
+        "code": "flat = [num for row in matrix for num in row]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "嵌套for：外层(row) -> 内层(num)顺序",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "matrix",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "flat",
+              "pointsTo": "list4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[[1, 2], [3, 4], [5, 6]]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5, 6]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "打印展平结果",
+        "explanation": "**`print(flat)`** -- 打印 `flat` 指向的 `[1, 2, 3, 4, 5, 6]`。二维矩阵成功转换为一维列表。\n\n**展平（Flatten）**是将多维数据展开为一维的操作，在编程测试和数据处理中非常常见。\n\n**类比：** 就像把三层书架上的所有书铺在地板上排成一行。先排第一层的书，然后第二层，最后第三层。\n\n**本课核心总结：**\n\n**Python内部机制：** 展平的另一种方法是 `itertools.chain.from_iterable(matrix)`。它返回迭代器，内存效率更高。但在简单情况下，推导式最易读。\n\n**注意：** 嵌套推导式达到**3层或更深**时，可读性急剧下降。像 `[x for a in A for b in a for x in b]` 这样的代码非常难理解。推导式只用到2层，超过2层请用普通for循环或 `itertools`。\n\n**执行顺序：**\n1. `flat` 名称 -> 解析列表对象引用。\n2. `print()` -> 调用 `list.__repr__()`。\n3. `[1, 2, 3, 4, 5, 6]` 输出到 `sys.stdout`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(flat)",
+        "pythonMemoryState": {
+          "output": [
+            "[1, 2, 3, 4, 5, 6]"
+          ],
+          "note": "二维 -> 一维展平完成",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "labels",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "matrix",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "flat",
+              "pointsTo": "list4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[\"odd\", \"even\", \"odd\", \"even\", \"odd\"]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[[1, 2], [3, 4], [5, 6]]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5, 6]",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在 [\"even\" if x % 2 == 0 else \"odd\" for x in [1, 2, 3]] 中，if-else位于什么位置？",
+    "options": [
+      "for后面（过滤）",
+      "for前面（值选择）",
+      "列表外面",
+      "位置无所谓"
+    ],
+    "correctIndex": 1,
+    "explanation": "if-else条件表达式位于for**前面**，用于选择每个元素的值。\nfor**后面**的if是用来过滤（包含/排除）元素的。\n区分这两种if的位置和用途非常重要！"
+  },
+  "misconceptions": [
+    {
+      "wrong": "嵌套推导式中内层for先执行",
+      "correct": "嵌套推导式从左边的for开始执行（与普通嵌套for循环顺序相同）。",
+      "why": "在 [num for row in matrix for num in row] 中，\n先遍历row，然后对每个row遍历num。"
+    }
+  ],
+  "keyTakeaway": "if-else放for前面（值选择），单独if放for后面（过滤）！位置决定用途！"
+}

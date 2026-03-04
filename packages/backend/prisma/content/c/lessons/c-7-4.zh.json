@@ -1,0 +1,178 @@
+{
+  "lessonId": "c-7-4",
+  "title": "Void Pointers",
+  "concept": "void 指针独立于类型存储地址，但使用时必须进行正确的类型转换",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 65;\n    float b = 3.14;\n\n    void *ptr;\n\n    ptr = &a;\n    printf(\"int: %d\\n\", *(int *)ptr);\n\n    ptr = &b;\n    printf(\"float: %.2f\\n\", *(float *)ptr);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "使用 `printf` 所需的标准输入输出头文件。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧。\n\n本课将同时了解 `void*` 的通用性和限制。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "声明变量",
+        "explanation": "准备不同类型的值：`int a` 和 `float b`。\n\n同一个 void 指针将交替指向这两种类型。",
+        "visualizationType": "cMemory",
+        "code": "int a = 65;",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "65",
+            "address": "0x100"
+          },
+          {
+            "name": "b",
+            "type": "float",
+            "value": "3.14",
+            "address": "0x104"
+          }
+        ]
+      },
+      {
+        "title": "声明 void 指针",
+        "explanation": "`void *ptr` 是一个保存未指定类型地址的通用指针。\n\n不能直接解引用，需要进行类型转换。",
+        "visualizationType": "cMemory",
+        "code": "void *ptr;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "65",
+            "address": "0x100"
+          },
+          {
+            "name": "b",
+            "type": "float",
+            "value": "3.14",
+            "address": "0x104"
+          },
+          {
+            "name": "ptr",
+            "type": "void*",
+            "value": "???",
+            "address": "0x108"
+          }
+        ]
+      },
+      {
+        "title": "存储 int 变量的地址",
+        "explanation": "`ptr = &a;` 存储 int 的地址。\n\nvoid 指针可以接受各种类型的地址。",
+        "visualizationType": "cMemory",
+        "code": "ptr = &a;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "65",
+            "address": "0x100"
+          },
+          {
+            "name": "b",
+            "type": "float",
+            "value": "3.14",
+            "address": "0x104"
+          },
+          {
+            "name": "ptr",
+            "type": "void*",
+            "value": "0x100",
+            "address": "0x108",
+            "points_to": "a"
+          }
+        ]
+      },
+      {
+        "title": "类型转换后解引用（int）",
+        "explanation": "`(int*)ptr` 指定类型后，解引用读取 int 值。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"int: %d\\n\", *(int *)ptr);",
+        "stdout": "int: 65"
+      },
+      {
+        "title": "存储 float 变量的地址",
+        "explanation": "同一个 `ptr` 现在存储 `b` 的地址，切换了目标类型。",
+        "visualizationType": "cMemory",
+        "code": "ptr = &b;",
+        "stack": [
+          {
+            "name": "a",
+            "type": "int",
+            "value": "65",
+            "address": "0x100"
+          },
+          {
+            "name": "b",
+            "type": "float",
+            "value": "3.14",
+            "address": "0x104"
+          },
+          {
+            "name": "ptr",
+            "type": "void*",
+            "value": "0x104",
+            "address": "0x108",
+            "points_to": "b"
+          }
+        ]
+      },
+      {
+        "title": "类型转换后解引用（float）",
+        "explanation": "`(float*)ptr` 进行类型转换后，解引用读取 float 值。\n\n转换为错误的类型会产生不正确的结果。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"float: %.2f\\n\", *(float *)ptr);",
+        "stdout": "int: 65\nfloat: 3.14"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "通过 `return 0;` 结束程序。\n\n要点：void 指针存储灵活，但读写时需要准确的类型信息。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "对 void 指针 ptr 不可能进行哪个操作？",
+    "options": [
+      "ptr = &num;",
+      "ptr = malloc(10);",
+      "*ptr = 10;",
+      "(int *)ptr"
+    ],
+    "correctIndex": 2,
+    "explanation": "void 指针不知道目标的字节大小，因此不能在没有类型转换的情况下直接解引用（*ptr）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "可以往 void* 中放任何值（如 int、float 值本身）。",
+      "correct": "它只能保存地址。\n直接放入值会被解释为地址。",
+      "why": "指针变量不是存放值的容器——而是指向位置的箭头。"
+    }
+  ],
+  "keyTakeaway": "Void 指针通过隐藏数据类型，在编写类型通用代码（如 memcpy、qsort）时必不可少。"
+}

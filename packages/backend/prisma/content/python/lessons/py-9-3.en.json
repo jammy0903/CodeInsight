@@ -1,0 +1,543 @@
+{
+  "lessonId": "py-9-3",
+  "title": "Decorators with Arguments: Repeating Execution",
+  "concept": "To pass arguments to a decorator, you wrap it in one more layer, creating a 3-level nested structure.",
+  "content": {
+    "code": "def repeat(n):\n    def decorator(func):\n        def wrapper(*args, **kwargs):\n            print(f\"{n}번 반복합니다:\")\n            for _ in range(n):\n                func(*args, **kwargs)\n        return wrapper\n    return decorator\n\n@repeat(3)\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"World\")",
+    "steps": [
+      {
+        "title": "Defining the repeat function",
+        "explanation": "**`def repeat(n):`**\n\n**We define the outermost function in the 3-level nested structure.** This function is not the decorator itself, but a 'factory' that creates decorators.\n\n**Why do we need 3 levels?**\n- In the previous lesson, `@logger` worked with just `@function_name` without arguments\n- But what if you want to pass arguments like `@repeat(3)`?\n- `repeat(3)` is called first to return the 'real decorator', and then that decorator wraps the function\n\n**The 3-level structure:**\n1. `repeat(n)` -- Factory function that takes argument `n` (outermost)\n2. `decorator(func)` -- The actual decorator (receives the function)\n3. `wrapper(*args, **kwargs)` -- The wrapper function (handles actual execution)\n\n**Analogy**: Think of a custom wrapping service.\n- `repeat(3)` is the order \"please wrap it 3 times\"\n- When the order is placed (repeat is called), a specialist in 3-time wrapping (decorator) is assigned\n- The specialist does the actual wrapping work (wrapper)\n\n**Under the hood**: Python creates the `repeat` function object (0x1100) and registers it in the global namespace. The inner `decorator` and `wrapper` haven't been created yet.\n\n**Note**: `repeat` is NOT a decorator! It's a function that 'returns a decorator'. This distinction is important.",
+        "visualizationType": "pythonMemory",
+        "code": "def repeat(n):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "The outermost repeat function (0x1100) has been defined.",
+          "names": [
+            {
+              "name": "repeat",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Applying @repeat(3)",
+        "explanation": "**`@repeat(3)`**\n\n**When Python encounters `@repeat(3)`, it first calls `repeat(3)`.** The key here is that the expression after `@` is 'evaluated' first.\n\nStep-by-step execution order:\n1. `repeat(3)` is called -> `n=3` is bound to the parameter\n2. Inside `repeat`, the `decorator` function is defined\n3. `n=3` is stored in a Cell object (for the closure)\n4. The `decorator` function (0x2000) is returned\n5. This returned `decorator` is used as the actual `@` decorator\n\n**Analogy**: At a restaurant, you order \"3 servings please\" (repeat(3)), and the chef replies \"Got it, I'll send the 3-serving specialist.\" That specialist is the `decorator`.\n\n**Under the hood**: When `repeat(3)` is called, a new execution frame is created. `n` is wrapped in a Cell object and becomes accessible through `decorator`'s `__closure__`.\n\n**Why this order?** `@repeat(3)` is a combination of `@` and `repeat(3)`. Python first evaluates `repeat(3)` to get the decorator, then applies it to the function below.\n\n**Note**: `@repeat` (without parentheses) and `@repeat(3)` (with parentheses) are completely different! The former uses `repeat` itself as the decorator, while the latter uses the return value of `repeat(3)` as the decorator.",
+        "visualizationType": "pythonMemory",
+        "code": "@repeat(3)",
+        "pythonMemoryState": {
+          "note": "A decorator function (0x2000) that remembers n=3 has been created and returned.",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "decorator",
+              "pointsTo": "function2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "The decorator function is defined",
+        "explanation": "**`def decorator(func):`**\n\n**Inside `repeat`, the `decorator` function is defined.** This is the 'real decorator'.\n\nThis function remembers `n=3` through the closure.\nThe `func` parameter will later receive the target function to be decorated.\n\n**Position in the 3-level structure:**\n- `repeat(n)` -- already called, `n=3` stored\n- **`decorator(func)`** -- this stage! Acts as the actual decorator\n- `wrapper(*args, **kwargs)` -- not created yet\n\n**Analogy**: The 3-serving specialist (decorator) has arrived. This specialist already knows the order content \"repeat 3 times\" (n=3), and will soon receive a dish (func) to make 3 times.\n\n**Under the hood**: The `decorator` function object has a Cell reference to `n` in its `__closure__`. Later, when `decorator(greet)` is called, it will create a `wrapper` that can access both `func` and `n`.\n\n**Why this order?** `decorator` is defined as part of the `repeat(n)` execution. This function will be returned via `return decorator`.",
+        "visualizationType": "pythonMemory",
+        "code": "def decorator(func):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "pythonMemoryState": {
+          "note": "This is the intermediate decorator function.",
+          "names": [
+            {
+              "name": "decorator",
+              "pointsTo": "function2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function2",
+              "type": "function",
+              "value": "function",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Returning decorator",
+        "explanation": "**`return decorator`**\n\n**`repeat(3)` finishes executing and returns the `decorator` function.** This returned function acts as the actual decorator behind the `@` syntax.\n\nSummarizing the full flow:\n- `@repeat(3)` -> calls `repeat(3)` -> returns `decorator`\n- This `decorator` is applied to the `def greet` below\n- That is, `greet = decorator(greet)`\n\n**Analogy**: The order has been processed, and the 3-serving specialist (decorator) is stationed in the kitchen. Now whatever dish (function) is brought, they're ready to make it 3 times.\n\n**Under the hood**: The execution frame of `repeat` terminates, but the Cell containing `n=3` stays alive through `decorator`'s `__closure__`. It's not eligible for garbage collection.\n\n**Why this order?** The sole purpose of `repeat` is to create and return a `decorator` that remembers `n`. This is the typical flow of the factory pattern.\n\n**Note**: After `decorator` is returned, Python automatically uses it as the `@` decorator. There's nothing more the programmer needs to do.",
+        "visualizationType": "pythonMemory",
+        "code": "return decorator",
+        "pythonMemoryState": {
+          "note": "decorator has been returned and becomes the target of the @ syntax.",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining and decorating the greet function",
+        "explanation": "**`def greet(name):`**\n\n**The `greet` function is defined, and `decorator(greet)` is immediately called.**\n\nThe `decorator` returned by `@repeat(3)` now acts as a decorator:\n1. The original `greet` function object (0x1200) is created\n2. `decorator(greet)` is called -- the original function is passed to the `func` parameter\n3. Inside `decorator`, `wrapper` is defined and returned\n4. The `greet` name now points to `wrapper`\n\n**Analogy**: The dish (greet function) has been delivered to the 3-serving specialist (decorator). The specialist sets up a system (wrapper) to make this dish 3 times.\n\n**Under the hood**: The `decorator(greet)` call creates a new execution frame, and `func` is bound to the original `greet`. Since `decorator` already knows `n=3` through its closure, `wrapper` can access both `n` and `func`.\n\n**Why this order?** This is the standard behavior of the `@` syntax. Function definition -> decorator application -> name rebinding happens automatically.\n\n**Note**: After this point, `greet` is no longer the original function but `wrapper`.",
+        "visualizationType": "pythonMemory",
+        "code": "def greet(name):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "note": "The original greet has been passed to decorator.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Defining the wrapper function",
+        "explanation": "**`def wrapper(*args, **kwargs):`**\n\n**The innermost function of the 3-level structure, `wrapper`, is defined.** This function will ultimately replace the name `greet`.\n\nWhat `wrapper` remembers through closures:\n- `n = 3` (argument from repeat -> accessed via Cell)\n- `func = greet (original)` (parameter from decorator -> accessed via Cell)\n\n**Analogy**: A 'completed cooking manual' has been created that includes both the order form (n=3) and the original recipe (func=greet). Following this manual (wrapper) will call greet 3 times.\n\n**Under the hood**: The `wrapper` function object (0x3000) is created. Its `__closure__` tuple contains Cell references to both `n` and `func`. This completes a closure that can access all variables across the 3-level nesting.\n\n**Why this order?** `wrapper` is defined as part of the `decorator(func)` execution. This is the moment the final wrapper is created that remembers both `n` and `func`.\n\n**Note**: `wrapper` references a variable (`n`) two levels above. Python closures can reference variables from any number of enclosing scopes.",
+        "visualizationType": "pythonMemory",
+        "code": "def wrapper(*args, **kwargs):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "pythonMemoryState": {
+          "note": "wrapper (0x3000) has been created, remembering both n and func.",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            },
+            {
+              "name": "wrapper",
+              "pointsTo": "function4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            },
+            {
+              "id": "function4",
+              "type": "function",
+              "value": "function",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Returning wrapper",
+        "explanation": "**`return wrapper`**\n\n**The `decorator` function returns `wrapper`.** This return value is assigned to the global variable `greet`.\n\nSummarizing the replacement process:\n- `greet` -> original function (0x1200) [before]\n- `greet` -> `wrapper` (0x3000) [after]\n\nSince `wrapper` remembers both `n=3` and the original `greet`, when called later it can execute the original `greet` 3 times.\n\n**Analogy**: The completed cooking manual (wrapper) takes the place of the original recipe (greet). Now when someone says \"make the greet dish\", it follows the manual and makes it 3 times.\n\n**Under the hood**: The execution frame of `decorator` terminates and `wrapper` is returned. The `@` syntax automatically executes `greet = wrapper`.\n\n**Why this order?** The role of `decorator` is to create and return `wrapper`, which ultimately gets bound to the `greet` name.",
+        "visualizationType": "pythonMemory",
+        "code": "return wrapper",
+        "pythonMemoryState": {
+          "note": "Now greet is wrapper (0x3000).",
+          "names": [
+            {
+              "name": "greet",
+              "pointsTo": "function4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function4",
+              "type": "function",
+              "value": "wrapper",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling greet (calling wrapper)",
+        "explanation": "**`greet(\"World\")`**\n\n**When we call `greet`, what actually runs is `wrapper(\"World\")`.**\n\nThis is because `greet` has been replaced with `wrapper`.\nThe tuple `(\"World\",)` is passed to `wrapper`'s `*args`.\n\nWhen `wrapper` executes:\n1. It retrieves `n=3` from the closure\n2. It retrieves `func=greet (original)` from the closure\n3. It uses this information to call the original function 3 times\n\n**Analogy**: A customer orders \"one greet dish please.\" In the kitchen, they start making 3 servings according to the cooking manual (wrapper).\n\n**Under the hood**: Python calls `greet`'s `__call__`, and since `greet` is the `wrapper` function object, `wrapper`'s code executes.\n\n**Why this order?** After all decorator setup is complete, this is the stage where the decorated function is actually used.\n\n**Note**: The caller of `greet(\"World\")` doesn't need to know about the decorator at all. This is the 'transparency' of the decorator pattern.",
+        "visualizationType": "pythonMemory",
+        "code": "greet(\"World\")",
+        "pythonMemoryState": {
+          "note": "Executing wrapper: using the remembered n=3 and original function.",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            },
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Wrapper execution - message output",
+        "explanation": "**`print(f\"{n} times repeating:\")`**\n\n**Retrieves `n=3` from the closure and prints \"3 times repeating:\".**\n\n`n` is not a local variable of `wrapper`. It's a value retrieved from the Cell created when `repeat(3)` was called two levels above. This is possible because the closure remembers this value.\n\n**Analogy**: Checking the order form that says \"3 servings\" and announcing \"Now making 3 servings!\"\n\n**Under the hood**: The `LOAD_DEREF` bytecode retrieves the value of `n` from the Cell object. The f-string converts it to a string, and `print` outputs it.\n\n**Why this order?** Before starting the repeated execution, we first print a message announcing how many times it will repeat.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"{n}번 반복합니다:\")",
+        "pythonMemoryState": {
+          "output": [
+            "3번 반복합니다:"
+          ],
+          "note": "Information message printed.",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For loop starts - first iteration",
+        "explanation": "**`for _ in range(n):`**\n\n**A `for` loop starts that repeats 3 times using `range(3)`.**\n\n`_` (underscore) is a Python convention meaning \"I won't use this variable.\" The loop variable values (0, 1, 2) themselves aren't needed; what matters is simply repeating 3 times.\n\n`n` in `range(n)` is again the value `3` retrieved from the closure.\n\n**Analogy**: The chef begins preparing the first plate. A total of 3 plates need to be made.\n\n**Under the hood**: `range(3)` creates an iterator object, and the `for` loop pulls values one by one from this iterator. The first iteration (1/3) begins.\n\n**Why this order?** This is the moment the loop begins that performs the decorator's core functionality: 'repeated execution'.\n\n**Note**: `range(n)` generates values from 0 to n-1. Here it's 0, 1, 2 for a total of 3 iterations.",
+        "visualizationType": "pythonMemory",
+        "code": "for _ in range(n):",
+        "pythonMemoryState": {
+          "note": "Iteration 1.",
+          "names": [
+            {
+              "name": "n",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 3,
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling the original function (1)",
+        "explanation": "**`func(*args, **kwargs)`**\n\n**Calls the original `greet` function stored in the closure.** `\"World\"` is passed to the original function's `name` parameter through `*args`.\n\nExpanded, this is `func(\"World\")`, identical to the original `greet(\"World\")`.\n\n**Analogy**: Cooking the first plate begins. The original recipe (func) with the ingredient (\"World\") is used.\n\n**Under the hood**: `LOAD_DEREF` retrieves `func` (the original greet) from the Cell, then unpacks `*args` to pass as arguments. A new execution frame is created for the original `greet`.\n\n**Why this order?** This is the moment the original function is called in the first iteration of the `for` loop. This is the first of 3 repetitions.\n\n**Note**: Each iteration passes the same arguments via `func(*args, **kwargs)`. The original function produces the same result each time.",
+        "visualizationType": "pythonMemory",
+        "code": "func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "Calling the original function.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing greet body (1)",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n**The original `greet` function executes and prints `\"Hello, World!\"`.** This is the result of the first iteration.\n\nTotal output so far:\n1. `3 times repeating:` (printed by wrapper)\n2. `Hello, World!` (printed by original greet - iteration 1)\n\n**Analogy**: The first plate is done! Two more to go.\n\n**Under the hood**: With `\"World\"` bound to the `name` parameter, `print` executes. When the function execution completes, control returns to `wrapper`'s `for` loop.\n\n**Why this order?** This is the result of the `func(*args, **kwargs)` call executing the original function body.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, World!"
+          ],
+          "note": "First output complete.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For loop - second iteration",
+        "explanation": "**`for _ in range(n):`** (iteration 2)\n\n**The second iteration of the `for` loop begins.** The next value (1) is pulled from the `range(3)` iterator, and the loop body executes again.\n\n**Analogy**: Starting to prepare the second plate. Same recipe (func) and same ingredients (\"World\") to make the same dish.\n\n**Under the hood**: The `for` loop calls the iterator's `__next__()` method to get the next value. Since `StopIteration` is not raised, the loop continues.\n\n**Why this order?** Iteration 2/3 -- the decorator is executing the original function repeatedly as instructed.",
+        "visualizationType": "pythonMemory",
+        "code": "for _ in range(n):",
+        "pythonMemoryState": {
+          "note": "Iteration 2.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling the original function (2)",
+        "explanation": "**`func(*args, **kwargs)`**\n\n**The original `greet` function is called for the second time.** Again, `\"World\"` is passed as the argument.\n\nEach iteration creates a new execution frame, running the original function independently.\n\n**Analogy**: Cooking the second plate with the same recipe. A clean new pan (new execution frame) is used each time.\n\n**Why this order?** The original function is called in the second iteration of the `for` loop.",
+        "visualizationType": "pythonMemory",
+        "code": "func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "Calling the original function again.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing greet body (2)",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n**`\"Hello, World!\"` is printed for the second time.**\n\nTotal output so far:\n1. `3 times repeating:`\n2. `Hello, World!` (iteration 1)\n3. `Hello, World!` (iteration 2)\n\n**Analogy**: The second plate is done! Just one more to go.\n\n**Why this order?** This is the execution result of iteration 2/3.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "Hello, World!"
+          ],
+          "note": "Second output complete.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "For loop - third iteration",
+        "explanation": "**`for _ in range(n):`** (iteration 3)\n\n**The third and final iteration.** The last value (2) is pulled from the `range(3)` iterator.\n\n**Analogy**: Preparing the last plate. Once this one is done, the order is complete.\n\n**Under the hood**: Value `2` is pulled from the iterator. The next `__next__()` call will raise `StopIteration`, ending the loop.\n\n**Why this order?** Iteration 3/3 -- the final iteration begins according to the `n=3` stored in the closure.",
+        "visualizationType": "pythonMemory",
+        "code": "for _ in range(n):",
+        "pythonMemoryState": {
+          "output": [
+            "..."
+          ],
+          "note": "Iteration 3.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling the original function (3)",
+        "explanation": "**`func(*args, **kwargs)`**\n\n**The original `greet` function is called for the third and final time.**\n\nSince this is the last call, the `for` loop will end after this execution completes.\n\n**Analogy**: Cooking the last plate begins. Once this is done, the 3-serving order is complete.\n\n**Why this order?** This is the final call of the 3 repetitions promised by the decorator.",
+        "visualizationType": "pythonMemory",
+        "code": "func(*args, **kwargs)",
+        "pythonMemoryState": {
+          "note": "Calling the original function again.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing greet body (3)",
+        "explanation": "**`print(f\"Hello, {name}!\")`**\n\n**`\"Hello, World!\"` is printed for the third time, and the `for` loop terminates.**\n\nFinal complete output:\n1. `3 times repeating:`\n2. `Hello, World!`\n3. `Hello, World!`\n4. `Hello, World!`\n\n**Summary**: With just one line of decorator `@repeat(3)`, we added 3-time repetition functionality without modifying the original function's code at all.\n\n**Role summary of the 3-level structure:**\n- `repeat(3)`: Creates a `decorator` that remembers `n=3`\n- `decorator(greet)`: Creates a `wrapper` that remembers `func=greet`\n- `wrapper(\"World\")`: Calls `func` `n` times\n\n**Practical use**: This pattern is widely used for retry decorators, caching, permission checks (allowing only certain roles), and other decorators that require arguments.\n\n**Why this order?** The third iteration is complete, and the `wrapper` function execution is now finished.",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Hello, {name}!\")",
+        "pythonMemoryState": {
+          "output": [
+            "3번 반복합니다:",
+            "Hello, World!",
+            "Hello, World!",
+            "Hello, World!"
+          ],
+          "note": "Third output complete. All work is done.",
+          "names": [
+            {
+              "name": "func",
+              "pointsTo": "function3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function3",
+              "type": "function",
+              "value": "greet (original)",
+              "pyId": "1004"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How does a decorator with arguments `@deco(arg)` work internally?",
+    "options": [
+      "func = func(deco(arg))",
+      "deco = func(deco(arg))",
+      "func = deco(arg)(func)",
+      "deco(arg, func)"
+    ],
+    "correctIndex": 2,
+    "explanation": "`deco(arg)` is called first to return a decorator function, and that returned function becomes the target of `@`, receiving `func` as its argument."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Decorators can only be used with classes.",
+      "correct": "No.\nDecorators can be applied to both functions and classes.",
+      "why": "Class decorators receive the class itself as an argument and can modify it or replace it with another class."
+    }
+  ],
+  "keyTakeaway": "A decorator with arguments is 'a function that returns a decorator'. `@repeat(3)` first calls `repeat(3)`, then applies the result (the decorator) to the function."
+}

@@ -1,0 +1,114 @@
+{
+  "lessonId": "java-9-4",
+  "title": "Memory Leak: Catch the Escaped Objects",
+  "concept": "A memory leak occurs when you accidentally leave a reference (arrow) to an object you no longer use, preventing GC from cleaning it up.",
+  "content": {
+    "code": "import java.util.*;\n\npublic class MemoryLeak {\n    static List<Object> list = new ArrayList<>(); // static 변수는 위험해요!\n\n    public static void main(String[] args) {\n        while(true) {\n            list.add(new byte[1024 * 1024]); // 1MB씩 무한 추가\n        }\n    }\n}",
+    "steps": [
+      {
+        "title": "Package Import",
+        "explanation": "**`import java.util.*;`**\n\nImporting packages for `List` and `ArrayList`.",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.*;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nWe're about to run dangerous code that causes a memory leak.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {"
+      },
+      {
+        "title": "Static List Creation",
+        "explanation": "Because of the `static` keyword, this `list` is created when the program starts and stays in memory until the program ends.\nObjects stored here are very difficult for GC to collect.",
+        "keyInsight": "Static variables easily escape GC's watch.",
+        "visualizationType": "javaMemory",
+        "code": "static List<Object> list = new ArrayList<>(); // static 변수는 위험해요!",
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "MemoryLeak.list",
+              "value": "-> ArrayList"
+            }
+          ],
+          "heap": [
+            {
+              "address": "ArrayList",
+              "content": "size: 0",
+              "type": "ArrayList"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Infinite Loop Begins",
+        "explanation": "Entering an endless loop with `while(true)` that never stops.",
+        "visualizationType": "javaMemory",
+        "code": "while(true) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": [
+            "Loop start..."
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "Mass-Producing Zombie Objects (Memory Leak)",
+        "explanation": "With each loop iteration, a 1MB `byte` array is continuously added to the `list`.\nSince the list is `static`, it holds onto these objects tightly and never lets go. From GC's perspective, it thinks \"they're still being used\" and can't discard them.\nEventually the Heap fills up and crashes (OutOfMemoryError).",
+        "keyInsight": "Leak = not being used but reference isn't broken",
+        "visualizationType": "javaMemory",
+        "code": "list.add(new byte[1024 * 1024]); // 1MB씩 무한 추가",
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "MemoryLeak.list",
+              "value": "-> ArrayList"
+            }
+          ],
+          "heap": [
+            {
+              "address": "ArrayList",
+              "content": "[byte[], byte[], ...]",
+              "size": "FULL!",
+              "changed": true
+            }
+          ],
+          "error": "java.lang.OutOfMemoryError: Java heap space",
+          "output": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the most common cause of memory leaks in Java?",
+    "options": [
+      "Using the new keyword too much",
+      "Maintaining references to objects that are no longer used",
+      "Because the GC algorithm is weak",
+      "Because RAM capacity is too small"
+    ],
+    "correctIndex": 1,
+    "explanation": "GC can only clean up Unreachable (unreferenced) objects.\nIf you keep unused objects in collections, GC cannot intervene."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Since GC exists, I don't need to worry about freeing memory.",
+      "correct": "Wrong! You need to make sure to break references to unused objects (set to null) or let them go out of scope.",
+      "why": "Unintentional reference retention is the main culprit behind leaks."
+    }
+  ],
+  "keyTakeaway": "Keep references to a minimum, and be especially careful with static variables!"
+}

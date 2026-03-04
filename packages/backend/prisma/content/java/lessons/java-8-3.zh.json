@@ -1,0 +1,127 @@
+{
+  "lessonId": "java-8-3",
+  "title": "HashSet：绝对不允许重复！",
+  "concept": "HashSet 就像一个不允许重复的口袋。如果你试图放入已有的物品，它会拒绝。",
+  "content": {
+    "code": "import java.util.HashSet;\n\npublic class Main {\n    public static void main(String[] args) {\n        HashSet<String> set = new HashSet<>();\n        \n        set.add(\"Java\");\n        set.add(\"Java\"); // 중복! \n        \n        System.out.println(\"크기: \" + set.size()); // 1\n    }\n}",
+    "steps": [
+      {
+        "title": "包导入",
+        "explanation": "**`import java.util.HashSet;`**\n\n导入不允许重复的集合 `HashSet`。",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.HashSet;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建 HashSet",
+        "explanation": "**执行流程：**\n1. 创建 `HashSet` 对象。\n2. 实际上内部偷偷创建了一个 `HashMap` 来使用。\n\n**禁止重复：**\n`Set` 就像一个不能装两个相同物品的口袋。",
+        "visualizationType": "javaMemory",
+        "code": "HashSet<String> set = new HashSet<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "set",
+              "value": "0x001",
+              "frame": "main",
+              "type": "HashSet<String>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 0",
+              "type": "HashSet",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "添加第一个元素",
+        "explanation": "**执行流程：**\n1. 检查 `Java` 是否已存在于 `set` 中。\n2. 不存在，所以存入。\n\n**首次出现：**\n顺利存入，没有问题。",
+        "visualizationType": "javaMemory",
+        "code": "set.add(\"Java\");",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[\"Java\"]",
+              "type": "HashSet",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "尝试添加重复元素",
+        "explanation": "**执行流程：**\n1. 尝试添加 `Java`，但它已经存在了！\n2. 通过 `hashCode()` 和 `equals()` 仔细检查后，"哦，已经有了"，拒绝存储。\n3. 返回 `false`。\n\n**铜墙铁壁：**\n`Set` 绝对不允许重复。",
+        "visualizationType": "javaMemory",
+        "code": "set.add(\"Java\"); // 중복!",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "[\"Java\"]",
+              "type": "HashSet"
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查大小",
+        "explanation": "**执行流程：**\n1. 统计当前存储的数据个数。\n2. 刚才的尝试失败了，所以仍然是 `1` 个。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"크기: \" + set.size()); // 1",
+        "javaMemoryState": {
+          "output": [
+            "크기: 1"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "HashSet 用来检查重复的方法对是？",
+    "options": [
+      "toString() 和 equals()",
+      "hashCode() 和 equals()",
+      "clone() 和 hashCode()",
+      "compareTo() 和 equals()"
+    ],
+    "correctIndex": 1,
+    "explanation": "首先用 hashCode() 确认是否在同一个桶中，如果是，再用 equals() 确认内容是否相同，最终判定是否重复。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "可以像 List 一样通过索引（get(0)）获取元素。",
+      "correct": "不可以！Set 没有顺序，所以没有索引号。\n必须使用 Iterator 或增强 for 循环来获取元素。",
+      "why": "数据存储的位置没有确定的顺序。"
+    }
+  ],
+  "keyTakeaway": "当你想管理唯一项目或去除重复时，请使用 Set！"
+}

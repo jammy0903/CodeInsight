@@ -1,0 +1,119 @@
+{
+  "lessonId": "c-11-1",
+  "title": "if-else Conditionals",
+  "concept": "A basic branching statement that executes different code depending on conditions",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int temperature = 35;\n\n    if (temperature >= 30) {\n        printf(\"It's hot!\\n\");\n    } else if (temperature >= 20) {\n        printf(\"Nice weather!\\n\");\n    } else {\n        printf(\"It's cold!\\n\");\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Starting main function",
+        "explanation": "**`int main() {`** -- The entry point of the program. When `main` is called, a **stack frame** is created on the stack.\n\nIn this lesson, we use a single `temperature` variable to learn how to **branch program flow based on conditions**.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Initializing the temperature variable",
+        "explanation": "**`int temperature = 35;`** -- Declares an integer variable `temperature` and initializes it to **35**. In this single line, 4 bytes of space are allocated within the stack frame, and `35` is stored in that space.",
+        "code": "int temperature = 35;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Evaluating the if condition (true)",
+        "explanation": "**`if (temperature >= 30) {`** -- Here comes the core of this lesson: the **if statement**. If the condition inside the parentheses is **true (a non-zero value)**, the code inside the curly braces executes; if it is **false (0)**, it is skipped.",
+        "code": "if (temperature >= 30) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "Executing the true branch (output)",
+        "explanation": "**`printf(\"It's hot!\\n\");`** -- Since the condition was true, this line executes and `It's hot!` is printed to the screen.\n\nThe most important rule of an if-else if-else chain is that once a condition is true, only that block executes and all remaining `else if` and `else` blocks are **entirely skipped**.",
+        "visualizationType": "terminal",
+        "code": "printf(\"It's hot!\\n\");",
+        "stdout": "It's hot!"
+      },
+      {
+        "title": "Skipping else if / else",
+        "explanation": "**`} else if (temperature >= 20) {`** -- Since the preceding `if` condition was already true, this `else if` and the `else` block below are **skipped entirely without even being evaluated**. The expression `temperature >= 20` is never executed.",
+        "visualizationType": "cMemory",
+        "code": "} else if (temperature >= 20) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "stdout": "It's hot!"
+      },
+      {
+        "title": "Program termination",
+        "explanation": "**`return 0;`** -- After the conditional branching is done, the program terminates normally. `return 0` signals to the operating system that \"everything ended without problems\", and as main's stack frame is deallocated, `temperature` disappears from memory.",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When temperature is 20, what is the output of the following code?\n\nif (temperature >= 30) printf(\"A\");\nelse if (temperature >= 20) printf(\"B\");\nelse if (temperature >= 10) printf(\"C\");",
+    "options": [
+      "A",
+      "B",
+      "BC",
+      "ABC"
+    ],
+    "correctIndex": 1,
+    "explanation": "An if-else if chain checks conditions from top to bottom and executes only the block of the first condition that is true.\nWhen temperature = 20, the first condition (>= 30) is false, and the second (>= 20) is true, so only B is printed.\nThe third (>= 10) is also true, but since the second already matched, it is never executed."
+  },
+  "misconceptions": [
+    {
+      "wrong": "else if conditions are always checked",
+      "correct": "If any preceding if or else if is true, all subsequent else if / else blocks are skipped.",
+      "why": "if-else if-else forms a 'chain', so once the first true block is found, the rest are ignored."
+    }
+  ],
+  "keyTakeaway": "An if-else if-else chain checks conditions from top to bottom and executes only the first block whose condition is true."
+}

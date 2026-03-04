@@ -1,0 +1,626 @@
+{
+  "lessonId": "py-8-2",
+  "title": "生成器函数：简易迭代器",
+  "concept": "使用`yield`关键字，无需编写迭代器类就能轻松创建迭代器。",
+  "content": {
+    "code": "def counter_generator(start, end):\n    print(\"제너레이터 시작!\")\n    current = start\n    while current < end:\n        yield current\n        current += 1\n    print(\"제너레이터 종료!\")\n\n# 제너레이터 객체 생성\ncounter = counter_generator(0, 3)\nprint(type(counter))\n\n# for loop은 제너레이터와도 동일하게 동작\nfor num in counter:\n    print(f\"Got: {num}\")",
+    "steps": [
+      {
+        "title": "定义生成器函数",
+        "explanation": "**`def counter_generator(start, end):`**\n\n定义一个包含`yield`关键字的函数。当Python发现函数体中有`yield`时，就会将该函数识别为**生成器函数**。\n\n**什么是生成器函数？**\n在上一课中，创建迭代器需要编写一个包含`__iter__`和`__next__`的**完整类**。\n生成器函数用**一个yield语句**就替代了这个复杂的过程！\n\n**类比：普通函数 vs 生成器函数**\n- 普通函数：餐厅一次性端上所有菜的自助餐（return → 一次性完成）\n- 生成器函数：每次点单上一道菜的套餐（yield → 逐个递送）\n\n**关键区别**：普通函数的`return`会**终止**函数，而生成器的`yield`会**暂停**函数。\n下次调用时，从暂停的地方继续执行！\n\n**为什么是这个顺序？** 函数必须先定义才能使用。此时只创建了函数对象，函数体不会被执行。\n\n**执行顺序**：创建counter_generator函数对象(0x1100) → 注册到全局命名空间",
+        "visualizationType": "pythonMemory",
+        "code": "def counter_generator(start, end):",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "counter_generator函数(0x1100)已被定义。",
+          "names": [
+            {
+              "name": "counter_generator",
+              "pointsTo": "function1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "function",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建生成器对象",
+        "explanation": "**`counter = counter_generator(0, 3)`**\n\n调用生成器函数。**但令人惊讶的事情发生了！**\n函数内部的代码完全没有执行，取而代之的是只创建并返回了一个**生成器对象**。\n\n**这是生成器最重要的特征！**\n普通函数：`my_func()` → 函数体立即执行，返回结果\n生成器：`my_gen()` → 函数体不执行！只返回一个生成器对象\n\n**注意\"生成器启动！\"还没有被打印出来！**\n即使print语句在函数的第一行，它也还没有执行。\n生成器使用**惰性（Lazy）**执行——在值真正被需要之前什么都不做。\n\n**类比**：你只是在套餐餐厅做了预约（= 函数调用）。厨师还没有开始做菜。只有当客人说\"请上第一道菜\"（= next()调用）时，烹饪才会真正开始。\n\n**初学者注意**：`counter_generator(0, 3)`的结果不是数字列表[0, 1, 2]！它是一个生成器**对象**。\n\n**执行顺序**：调用counter_generator(0, 3) → 创建生成器对象(0x2000) → 赋值给counter变量（函数体未执行！）",
+        "visualizationType": "pythonMemory",
+        "code": "counter = counter_generator(0, 3)",
+        "pythonMemoryState": {
+          "note": "生成器对象(0x2000)已创建。（内部代码尚未执行）",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "检查类型",
+        "explanation": "**`print(type(counter))`**\n\n检查counter的类型。输出结果是`<class 'generator'>`——**生成器对象**！\n\n**检查类型后更加明确了：**\n- 普通函数调用的结果：`int`、`str`、`list`等实际值\n- 生成器函数调用的结果：`generator`对象（不是值！）\n\n**生成器对象就是迭代器！**\n`__iter__`和`__next__`方法已经自动实现了，所以可以直接在for循环中使用。\n上一课中我们在Counter类中手动实现的东西，Python自动帮我们完成了！\n\n**为什么是这个顺序？** 这是一个教学步骤，用于确认调用生成器函数的结果是对象而不是值。\n\n**执行顺序**：调用type(counter) → 确认'generator'类型 → 输出",
+        "visualizationType": "pythonMemory",
+        "code": "print(type(counter))",
+        "pythonMemoryState": {
+          "output": [
+            "<class 'generator'>"
+          ],
+          "note": "确认类型为'generator'。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for循环开始",
+        "explanation": "**`for num in counter:`**\n\nfor循环开始遍历生成器对象！\n\n**这里可以看到与上一课的联系：**\nfor循环使用迭代器协议：\n1. 调用`counter.__iter__()` → 返回自身（生成器也是迭代器）\n2. 调用`counter.__next__()` → **就在这一刻！**函数体终于开始执行了！\n\n**关键点**：当for循环调用__next__时，生成器函数的代码从头开始执行，一直到遇到第一个`yield`为止。\n\n**类比**：客人点了\"请上第一道菜。\"现在厨师终于开始做菜了！\n\n**为什么是这个顺序？** 生成器对象准备好了，用for循环逐个取出值。\n\n**执行顺序**：调用counter.__iter__() → 返回自身 → 第一次__next__()调用 → 函数体开始执行！",
+        "visualizationType": "pythonMemory",
+        "code": "for num in counter:",
+        "pythonMemoryState": {
+          "note": "for循环已启动，请求第一个值。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "生成器代码首次执行",
+        "explanation": "**`print(\"生成器启动!\")`**\n\n**函数体终于执行了！**在`counter_generator(0, 3)`调用很久之后，print才终于执行了。\n\n**整理一下执行时机：**\n- `counter = counter_generator(0, 3)` → 什么都没执行\n- `print(type(counter))` → 还是什么都没执行\n- `for num in counter:` → 第一次__next__()调用 → **现在才从这里开始执行！**\n\n这就是**惰性求值（Lazy Evaluation）**的核心。\n不是在函数定义时，而是在值**真正被需要时**才开始执行。\n\n**类比**：厨师终于走进厨房喊道\"开始做菜！\"\n\n**为什么是这个顺序？** 当__next__()被调用时，从函数体的第一行开始执行。\n\n**执行顺序**：激活生成器执行上下文 → 执行print语句 → 输出\"生成器启动！\"",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"제너레이터 시작!\")",
+        "pythonMemoryState": {
+          "output": [
+            "제너레이터 시작!"
+          ],
+          "note": "生成器内部代码首次执行。",
+          "names": [
+            {
+              "name": "start",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "初始化current",
+        "explanation": "**`current = start`**\n\n将局部变量`current`初始化为start(0)。\n\n**生成器的神奇之处：局部变量保持存活！**\n普通函数在return后，局部变量会全部消失。\n但生成器在被yield暂停时，**所有局部变量的状态都被保留**！\ncurrent、start、end这些变量在yield之后依然存在，在下次调用时可以继续使用。\n\n**与上一课的比较**：\n- Counter类：`self.current = start`（存储在实例变量中）\n- 生成器：`current = start`（只是局部变量 → Python自动保留！）\n\n能感受到生成器有多简洁吗？\n\n**执行顺序**：将start(0)的值赋给current → current = 0",
+        "visualizationType": "pythonMemory",
+        "code": "current = start",
+        "pythonMemoryState": {
+          "note": "局部变量current已初始化为0。",
+          "names": [
+            {
+              "name": "start",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "current",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1003"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 0,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "while条件检查 (1)",
+        "explanation": "**`while current < end:`**\n\ncurrent(0) < end(3)？**True！** 进入while循环。\n\n**与上一课Counter类的比较：**\n- Counter：`if self.current >= self.end: raise StopIteration`（每次手动检查）\n- 生成器：`while current < end:`（自然的循环 → 结束时自动StopIteration）\n\n**生成器的便利之处**：当while循环结束时（条件变为False），函数终止，Python**自动抛出StopIteration**。\n不需要像Counter类那样自己写`raise StopIteration`！\n\n**执行流程**：在这个while循环中，遇到yield时暂停，下次__next__调用时从yield的下一行（current += 1）恢复。\n\n**执行顺序**：检查0 < 3 → True → 进入while循环体",
+        "visualizationType": "pythonMemory",
+        "code": "while current < end:",
+        "pythonMemoryState": {
+          "note": "条件0 < 3为真。",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 0,
+              "pyId": "1005"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "第一个值yield",
+        "explanation": "**`yield current`**\n\n**这就是生成器的核心关键字`yield`！**\n将当前值**0**返回给for循环，并**暂停（Suspend）**函数的执行。\n\n**yield与return的关键区别：**\n- `return`：返回值 + **终止**函数（局部变量销毁）\n- `yield`：返回值 + **暂停**函数（局部变量保留！）\n\n**yield暂停时保留的内容：**\n1. 所有局部变量（current=0, start=0, end=3）\n2. 当前执行位置（yield所在的行）\n3. while循环的状态\n\n下次调用__next__时，所有这些状态都会被恢复，从**yield的下一行**（`current += 1`）继续执行。\n\n**类比**：就像读书时夹一个书签然后合上书。下次打开时从书签的位置继续读。\n\n**此时**：0被赋给for循环的num，生成器处于休眠状态。\n\n**执行顺序**：返回current(0) → 保存执行位置 → 生成器暂停 → 控制权交给for循环",
+        "visualizationType": "pythonMemory",
+        "code": "yield current",
+        "pythonMemoryState": {
+          "note": "yield值0，执行被暂停。控制权交给for循环。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int4",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            },
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第一个值",
+        "explanation": "**`print(f\"Got: {num}\")`**\n\n由于yield返回的值**0**在`num`中，所以打印\"Got: 0\"。\n\n**当前程序状态：**\n- 生成器：在yield处暂停中（current=0，下次从current += 1开始执行）\n- for循环：以num=0执行循环体中\n- 输出：\"生成器启动！\"、\"<class 'generator'>\"、\"Got: 0\"\n\n**for循环的一个周期**：\n1. 调用__next__() → 生成器唤醒\n2. 从yield接收值(0) → num = 0\n3. 执行循环体(print)\n4. 再次调用__next__() → 生成器恢复...\n\n**执行顺序**：执行print(\"Got: 0\") → 回到循环顶部 → 调用__next__() → 生成器恢复",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Got: {num}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Got: 0"
+          ],
+          "note": "已输出Got: 0。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int4"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 0,
+              "pyId": "1006"
+            }
+          ]
+        }
+      },
+      {
+        "title": "递增current (1)",
+        "explanation": "**`current += 1`**\n\nfor循环请求了下一个值（__next__()），所以**生成器从休眠中醒来！**\n从yield暂停的下一行`current += 1`开始恢复执行。\n\n**详细的恢复过程：**\n1. for循环调用__next__()\n2. 生成器找到上次停止的地方(yield current)的下一行\n3. 恢复保留的局部变量（current=0, start=0, end=3）\n4. 执行`current += 1` → current = 1\n\n**这就是yield的魔法！**函数从\"中间\"继续执行。\n这在普通函数中是绝对不可能的行为。\n\n**类比**：重新打开夹了书签的书，从停下来的地方的下一句话开始读。\n\n**执行顺序**：生成器恢复 → 执行yield的下一行 → current 0 → 1递增",
+        "visualizationType": "pythonMemory",
+        "code": "current += 1",
+        "pythonMemoryState": {
+          "note": "执行恢复，current增加到1。",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 1,
+              "pyId": "1007",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "while条件检查 (2)",
+        "explanation": "**`while current < end:`**\n\ncurrent += 1执行后，回到while循环顶部重新检查条件。\ncurrent(1) < end(3)？**True！** 还有值要yield，所以循环继续。\n\n**生成器内部的执行流程**：\nyield → （暂停）→（恢复）→ current += 1 → **while条件检查** → yield →（暂停）→ ...\n\n这个重复一直持续到current >= end。\n生成器内部的while循环和外部的for循环交替执行！\n\n**执行顺序**：检查1 < 3 → True → 进入while循环体 → 移向下一个yield",
+        "visualizationType": "pythonMemory",
+        "code": "while current < end:",
+        "pythonMemoryState": {
+          "note": "条件1 < 3为真。",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int5"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 1,
+              "pyId": "1007"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "第二个值yield",
+        "explanation": "**`yield current`**\n\n将第二个值**1**返回给for循环并再次暂停。\n\n**每次yield执行时发生的事情**：\n1. 将current的当前值(1)传递给for循环\n2. 保留所有局部变量状态（current=1, start=0, end=3）\n3. 保存执行位置（这个yield行）\n4. 将控制权交给for循环\n\n与第一次yield完全相同的过程，但current从0变成了1。\n\n**模式总结**：while循环每转一圈就遇到一次yield，每次返回一个值。\n这就是生成器\"逐个产生值\"的原理！\n\n**执行顺序**：yield current(1) → 暂停 → for循环中num = 1",
+        "visualizationType": "pythonMemory",
+        "code": "yield current",
+        "pythonMemoryState": {
+          "note": "yield值1并暂停。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int6",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 1,
+              "pyId": "1008",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第二个值",
+        "explanation": "**`print(f\"Got: {num}\")`**\n\n打印yield返回的值**1**。屏幕上显示\"Got: 1\"。\n\n**到目前为止的输出顺序**：\n1. \"生成器启动！\"（生成器内部print）\n2. \"<class 'generator'>\"（类型检查）\n3. \"Got: 0\"（第一个yield值）\n4. \"Got: 1\"（第二个yield值）← 现在！\n\n剩余值：2（current为2时还能再yield一次）\n\n**执行顺序**：执行print(\"Got: 1\") → 回到for循环顶部 → 调用__next__() → 生成器恢复",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Got: {num}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Got: 1"
+          ],
+          "note": "已输出Got: 1。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 1,
+              "pyId": "1008"
+            }
+          ]
+        }
+      },
+      {
+        "title": "递增current (2)",
+        "explanation": "**`current += 1`**\n\n生成器再次恢复，从yield的下一行开始执行。current从1增加到**2**。\n\n**状态变化跟踪**：\n- 第1次：yield 0 → current 0→1\n- 第2次：yield 1 → current 1→2 ← 现在！\n- 第3次：yield 2 → current 2→3（等于end → 退出while）\n\n**下一次while条件检查**：current(2) < end(3) → True → 还能再yield一次！\n\n**执行顺序**：生成器恢复 → current 1 → 2递增",
+        "visualizationType": "pythonMemory",
+        "code": "current += 1",
+        "pythonMemoryState": {
+          "note": "执行恢复，current增加到2。",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int7",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 2,
+              "pyId": "1009",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "while条件检查 (3)",
+        "explanation": "**`while current < end:`**\n\ncurrent(2) < end(3)？**True！** 最后一次进入while循环体。\n\n**这是最后一次yield！** yield current=2后，current增加到3，下次while条件检查变为3 < 3 → **False**，退出while循环。\n\n**完整yield流程预览**：yield 0 → yield 1 → yield **2**（现在）→ 退出while → 函数结束 → StopIteration\n\n**执行顺序**：检查2 < 3 → True → 最后一次进入while循环体",
+        "visualizationType": "pythonMemory",
+        "code": "while current < end:",
+        "pythonMemoryState": {
+          "note": "条件2 < 3为真。",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int7"
+            },
+            {
+              "name": "end",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 2,
+              "pyId": "1009"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "第三个值yield",
+        "explanation": "**`yield current`**\n\n将**最后一个值2**返回给for循环并暂停。\n\n**这次yield之后会发生的事情**：\n1. for循环中num = 2，执行print(\"Got: 2\")\n2. for循环再次调用__next__()\n3. 生成器恢复 → current += 1 → current = 3\n4. while 3 < 3 → **False** → 退出while循环！\n5. 执行print(\"生成器结束！\")\n6. 函数到达末尾 → **自动抛出StopIteration**\n7. for循环检测到StopIteration并终止\n\n**这就是生成器的自然终止过程。**不需要像Counter类那样写raise StopIteration！\n\n**执行顺序**：yield current(2) → 暂停 → for循环中num = 2",
+        "visualizationType": "pythonMemory",
+        "code": "yield current",
+        "pythonMemoryState": {
+          "note": "yield值2并暂停。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int8",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            },
+            {
+              "id": "int8",
+              "type": "int",
+              "value": 2,
+              "pyId": "1010",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出第三个值",
+        "explanation": "**`print(f\"Got: {num}\")`**\n\n打印生成器的最后一个值**2**。屏幕上显示\"Got: 2\"。\n\n**完整Got输出**：Got: 0, Got: 1, Got: 2——和Counter(0, 3)的结果一样！\n\n**上一课Counter类 vs 生成器的比较：**\n- Counter类：15行（class + __init__ + __iter__ + __next__ + raise StopIteration）\n- 生成器：6行（def + print + current = start + while + yield + current += 1）\n\n用**少得多的代码**就能得到同样的结果！\n\n**执行顺序**：执行print(\"Got: 2\") → 回到for循环顶部 → 调用__next__() → 生成器最后一次恢复",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Got: {num}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Got: 2"
+          ],
+          "note": "已输出Got: 2。",
+          "names": [
+            {
+              "name": "num",
+              "pointsTo": "int8"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int8",
+              "type": "int",
+              "value": 2,
+              "pyId": "1010"
+            }
+          ]
+        }
+      },
+      {
+        "title": "递增current (3)",
+        "explanation": "**`current += 1`**\n\n生成器最后一次恢复。current从2增加到**3**。\n\n**现在current(3) == end(3)了！**\n下次while条件检查时，3 < 3 → **False**，while循环将退出。\n\n**最终状态变化总结**：\n- 开始：current=0 → yield 0\n- 第1次后：current=1 → yield 1\n- 第2次后：current=2 → yield 2\n- 第3次后：current=3 → 退出while → 函数结束！\n\n**执行顺序**：生成器恢复 → current 2 → 3递增 → 移向while条件检查",
+        "visualizationType": "pythonMemory",
+        "code": "current += 1",
+        "pythonMemoryState": {
+          "note": "执行恢复，current增加到3。",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int9",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 3,
+              "pyId": "1011",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "while条件检查 (4) - 退出",
+        "explanation": "**`while current < end:`**\n\ncurrent(3) < end(3)？**False！** while循环终于**退出**了！\n\n**为什么这个时刻很重要？**\n因为yield只存在于while循环内部，退出循环意味着没有更多的值可以yield了。\n执行完剩余的代码（print语句）后，函数将终止。\n\n**生成器函数终止时会怎样？**\nPython自动抛出`StopIteration`异常！\n我们在Counter类中手动写的`raise StopIteration`，Python代替我们完成了。\n\n**关键点**：在生成器中，\"函数终止 = StopIteration\"。不需要显式抛出异常。\n\n**执行顺序**：检查3 < 3 → False → 退出while循环 → 移向while之后的代码（print语句）",
+        "visualizationType": "pythonMemory",
+        "code": "while current < end:",
+        "pythonMemoryState": {
+          "note": "条件3 < 3为假，退出循环。",
+          "names": [
+            {
+              "name": "current",
+              "pointsTo": "int9"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 3,
+              "pyId": "1011"
+            }
+          ]
+        }
+      },
+      {
+        "title": "生成器终止",
+        "explanation": "**`print(\"生成器结束!\")`**\n\n退出while循环后，执行函数的最后一行——print语句。\n输出\"生成器结束！\"。\n\n**然后函数到达末尾！**\n当生成器函数到达末尾（或遇到return）时，Python**自动抛出StopIteration**。\nfor循环检测到这个StopIteration并静默终止。\n\n**完整执行流程总结：**\n1. 调用`counter_generator(0, 3)` → 只创建生成器对象（不执行代码）\n2. `for num in counter:` → 调用__next__() → 函数体开始执行\n3. 第一次yield 0 → 暂停 → 输出Got: 0\n4. 恢复 → current 1 → yield 1 → 暂停 → 输出Got: 1\n5. 恢复 → current 2 → yield 2 → 暂停 → 输出Got: 2\n6. 恢复 → current 3 → 退出while → \"生成器结束！\" → 函数结束 → StopIteration → for循环终止\n\n**核心要点**：生成器函数仅凭一个yield就自动处理了复杂的迭代器协议！\n\n**执行顺序**：输出\"生成器结束！\" → 到达函数末尾 → 自动抛出StopIteration → for循环终止",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"제너레이터 종료!\")",
+        "pythonMemoryState": {
+          "output": [
+            "제너레이터 종료!"
+          ],
+          "note": "函数终止，抛出StopIteration，for循环结束。",
+          "names": [
+            {
+              "name": "counter",
+              "pointsTo": "generator1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "generator1",
+              "type": "generator",
+              "value": "generator object",
+              "pyId": "1002"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪个最准确地描述了`yield`关键字的作用？",
+    "options": [
+      "立即终止函数。",
+      "返回一个值并暂停函数的执行。",
+      "引发一个错误。",
+      "返回一个值但函数继续执行。"
+    ],
+    "correctIndex": 1,
+    "explanation": "`yield`是生成器的核心，它将值发送出去，保存当前状态，并暂停执行。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "调用生成器函数会立即执行其中的代码。",
+      "correct": "调用时只会创建一个生成器对象，只有在调用`next()`时代码才会执行。",
+      "why": "生成器被设计为'惰性（lazy）'执行。\n只在需要时才计算值，从而节省内存。"
+    }
+  ],
+  "keyTakeaway": "`yield`返回一个值并在原地'暂停'执行。下次调用时从暂停的地方重新开始。"
+}

@@ -1,0 +1,242 @@
+{
+  "lessonId": "java-7-4",
+  "title": "通配符与类型限定",
+  "concept": "Core concept for Wildcards & Bounds",
+  "content": {
+    "code": "import java.util.List;\nimport java.util.ArrayList;\n\npublic class Main {\n    // Upper Bounded Wildcard: accept Number or its subclasses (Integer, Double...)\n    public static double sum(List<? extends Number> list) {\n        double sum = 0;\n        for (Number n : list) {\n            sum += n.doubleValue();\n        }\n        // list.add(10); // Error! Read-only (mostly)\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        List<Integer> ints = new ArrayList<>();\n        ints.add(1);\n        ints.add(2);\n        \n        List<Double> doubles = new ArrayList<>();\n        doubles.add(3.5);\n        \n        // Both work thanks to wildcard\n        System.out.println(\"Sum Ints: \" + sum(ints));\n        System.out.println(\"Sum Doubles: \" + sum(doubles));\n    }\n}",
+    "steps": [
+      {
+        "title": "包导入",
+        "explanation": "**`import java.util.*;`**\n\n用于使用 `List` 和 `ArrayList` 的包声明。",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.List;",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main 方法执行",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {"
+      },
+      {
+        "title": "通配符方法定义",
+        "explanation": "**执行流程：**\n1. `sum` 方法被加载到内存中。\n2. `List<? extends Number>` 声明只接受 `Number` 及其子类。\n\n**守门人角色：**\n就像在门上贴了一个"仅限 Number 家族入内！"的牌子。\n像 String 这样的类型绝对进不来。",
+        "visualizationType": "javaMemory",
+        "code": "public static double sum(List<? extends Number> list) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "sum",
+              "value": "Method Definition"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建 Integer 列表",
+        "explanation": "**执行流程：**\n1. 在堆中创建 `ArrayList<Integer>` 对象。\n2. `ints` 变量引用该对象。\n",
+        "visualizationType": "javaMemory",
+        "code": "List<Integer> ints = new ArrayList<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main",
+              "type": "List<Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "size: 0",
+              "type": "ArrayList<Integer>",
+              "new": true
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "添加数据（1, 2）",
+        "explanation": "**执行流程：**\n1. 向 `ints` 列表中添加 1 和 2。\n\n**准备数据：**\n为加法测试填入整数。",
+        "visualizationType": "javaMemory",
+        "code": "ints.add(2);",
+        "highlightOffset": [
+          -1,
+          0
+        ],
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建 Double 列表",
+        "explanation": "**执行流程：**\n1. 这次在堆中创建 `ArrayList<Double>` 对象。\n2. `doubles` 变量引用该对象。\n",
+        "visualizationType": "javaMemory",
+        "code": "List<Double> doubles = new ArrayList<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "ints",
+              "value": "0x100",
+              "frame": "main",
+              "type": "List<Integer>"
+            },
+            {
+              "name": "doubles",
+              "value": "0x200",
+              "frame": "main",
+              "type": "List<Double>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "size: 0",
+              "type": "ArrayList<Double>",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "添加数据（3.5）",
+        "explanation": "**执行流程：**\n1. 向 `doubles` 列表中添加 3.5。\n",
+        "visualizationType": "javaMemory",
+        "code": "doubles.add(3.5);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "[3.5]",
+              "type": "ArrayList<Double>",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "调用 sum(ints)",
+        "explanation": "**执行流程：**\n1. 调用 `sum(ints)`。\n2. `ints` 是 `Integer` 列表，但由于 `Integer` 是 `Number` 的子类，所以通过了通配符检查（`? extends Number`）。\n3. 返回总和 3.0 并输出。\n\n**灵活性：**\n`List<Integer>` 可以，`List<Double>` 也可以。\n这就是程序员喜爱通配符的原因！",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"Sum Ints: \" + sum(ints));",
+        "highlightOffset": [
+          0,
+          -18,
+          -17,
+          -16,
+          -15,
+          -14,
+          -13,
+          -12,
+          -11
+        ],
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2]",
+              "type": "ArrayList<Integer>"
+            },
+            {
+              "address": "0x200",
+              "content": "[3.5]",
+              "type": "ArrayList<Double>"
+            }
+          ],
+          "output": [
+            "Sum Ints: 3.0"
+          ]
+        }
+      },
+      {
+        "title": "调用 sum(doubles)",
+        "explanation": "**执行流程：**\n1. 调用 `sum(doubles)`。\n2. `Double` 也属于 `Number` 家族，所以被接受。\n3. 输出总和 3.5。\n\n**总结：**\n借助上界通配符（`? extends`），我们创建了一个灵活的只读方法。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"Sum Doubles: \" + sum(doubles));",
+        "highlightOffset": [
+          0,
+          -19,
+          -18,
+          -17,
+          -16,
+          -15,
+          -14,
+          -13,
+          -12
+        ],
+        "javaMemoryState": {
+          "output": [
+            "Sum Doubles: 3.5"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "List<? super Integer> 的含义是？",
+    "options": [
+      "所有继承 Integer 的类",
+      "Integer 或其祖先（父）类",
+      "任何类型都可以",
+      "只能是 Integer"
+    ],
+    "correctIndex": 1,
+    "explanation": "`super` 设置下界（Lower Bound）。\n表示 Integer 本身或其上层父类（Number、Object 等）类型的列表，主要在存储（写入/消费）数据时使用。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "List<Object> 是 List<String> 的父类型。",
+      "correct": "不是！泛型是不变的（Invariant）。\n不能将 `List<String>` 赋值给 `List<Object>` 变量。\n这就是为什么需要通配符（`? extends Object`）。",
+      "why": "如果允许这样赋值，就可能出现将 Integer 放入 String 列表的事故。"
+    }
+  ],
+  "keyTakeaway": "要创建灵活的 API，就需要使用通配符。请记住公式：读取数据用 `extends`，写入数据用 `super`。"
+}

@@ -1,0 +1,222 @@
+{
+  "lessonId": "java-3-2",
+  "title": "对象引用传递（Reference Passing）",
+  "concept": "传递对象变量时，复制的是"地址值"。（Call by Value of Reference）",
+  "content": {
+    "code": "class Dog {\n    String name;\n    Dog(String name) { this.name = name; }\n}\n\nvoid changeName(Dog d) {\n    d.name = \"Max\";\n}\n\nvoid reassign(Dog d) {\n    d = new Dog(\"Rex\");\n}\n\nDog myDog = new Dog(\"Buddy\");\nchangeName(myDog);\nSystem.out.println(myDog.name);\n\nreassign(myDog);\nSystem.out.println(myDog.name);",
+    "steps": [
+      {
+        "title": "创建 Dog 对象",
+        "explanation": "**执行顺序：**\n1. 在堆内存上创建 `Dog` 对象（\"Buddy\"）。\n2. 生成地址值（假设为 `0x100`）。\n3. 将地址 `0x100` 存储到栈上的 `myDog` 变量中。\n\n**内存状态：**\n`myDog` 是一个遥控器。\n它指向位于 0x100 地址的电视机（对象）。",
+        "visualizationType": "javaMemory",
+        "code": "Dog myDog = new Dog(\"Buddy\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Buddy\"}",
+              "type": "Dog"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "调用 changeName(myDog) - 复制遥控器",
+        "explanation": "**执行顺序：**\n1. 读取 `myDog` 的值（地址 `0x100`）。\n2. 复制到 `changeName` 的参数 `d`。\n\n**核心：**\n复制的不是对象，而是**指向对象的地址**。\n现在 `myDog` 和 `d` 是可以操控同一台电视的**两个遥控器**。",
+        "keyInsight": "复制地址 = 多了一个遥控器",
+        "visualizationType": "javaMemory",
+        "code": "changeName(myDog);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x100",
+              "frame": "changeName",
+              "copied": true,
+              "type": "Dog"
+            }
+          ]
+        }
+      },
+      {
+        "title": "修改对象内部（副作用）",
+        "explanation": "**执行顺序：**\n1. 用遥控器 `d` 访问 `0x100` 号对象（解引用）。\n2. 将 `name` 字段修改为 \"Max\"。\n\n**内存变化：**\n两个遥控器都在看同一台电视，所以用 `d` 换频道后，`myDog` 看到的画面也会改变。",
+        "keyInsight": "修改共享对象 = 原始值受到影响",
+        "visualizationType": "javaMemory",
+        "code": "d.name = \"Max\";",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x100",
+              "frame": "changeName",
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "type": "Dog",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "查看第一次结果",
+        "explanation": "**执行顺序：**\n1. `changeName` 结束（d 被销毁）。\n2. 输出 `myDog.name`。\n\n因为电视频道被改变了，所以输出 \"Max\"。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(myDog.name);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "type": "Dog"
+            }
+          ],
+          "output": [
+            "Max"
+          ]
+        }
+      },
+      {
+        "title": "调用 reassign(myDog)",
+        "explanation": "**执行顺序：**\n1. 再次读取 `myDog` 的地址 `0x100`。\n2. 复制到 `reassign` 方法的 `d`。\n\n又一次创建了指向同一台电视的复制遥控器 `d`。",
+        "visualizationType": "javaMemory",
+        "code": "reassign(myDog);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x100",
+              "frame": "reassign",
+              "copied": true,
+              "type": "Dog"
+            }
+          ]
+        }
+      },
+      {
+        "title": "变量重新赋值（新对象）",
+        "explanation": "**执行顺序：**\n1. 执行 `new Dog(\"Rex\")` -> 创建新对象（0x200）。\n2. 将新地址 `0x200` 赋值给变量 `d`。\n\n**重要：**\n遥控器 `d` 现在只是指向了一台**新电视**（`0x200`）。\n家里的原始遥控器（`myDog`）仍然指向旧电视（`0x100`）。",
+        "keyInsight": "变量重新赋值 = 只改变自己的连接（不影响原始值）",
+        "visualizationType": "javaMemory",
+        "code": "d = new Dog(\"Rex\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            },
+            {
+              "name": "d",
+              "value": "-> 0x200",
+              "frame": "reassign",
+              "changed": true,
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "type": "Dog"
+            },
+            {
+              "address": "0x200",
+              "content": "Dog{name: \"Rex\"}",
+              "type": "Dog",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "查看最终结果",
+        "explanation": "**执行顺序：**\n1. `reassign` 结束（d 被销毁）。\n2. 输出 `myDog.name`。\n\n`myDog` 仍然在看 `0x100` 号电视。\n因此输出 \"Max\"。",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(myDog.name);",
+        "occurrence": 2,
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "myDog",
+              "value": "-> 0x100",
+              "frame": "main",
+              "type": "Dog"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "Dog{name: \"Max\"}",
+              "type": "Dog"
+            }
+          ],
+          "output": [
+            "Max"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在 Java 中将对象作为参数传递时，实际传递的是什么？",
+    "options": [
+      "对象本身（创建副本）",
+      "对象所在内存的地址值（引用）",
+      "对象的第一个属性值",
+      "什么都不传递"
+    ],
+    "correctIndex": 1,
+    "explanation": "Java 始终是值传递（Call by Value）。\n对于对象，复制并传递的是变量持有的"地址值（Reference）"。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Java 使用引用传递（Call by Reference）。",
+      "correct": "不是的。\n因为是"复制""地址值"，所以是**值传递（Call by Value）**。",
+      "why": "如果真的是引用传递，执行 `d = new Dog()` 时 `myDog` 也应该变成新的狗。\nJava 不会给你改变变量本身连接的权限。"
+    }
+  ],
+  "keyTakeaway": "对象参数是"遥控器的复制"。可以改变内部（频道），但不能替换遥控器本身（连接）。"
+}

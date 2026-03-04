@@ -1,0 +1,414 @@
+{
+  "lessonId": "py-4-2",
+  "title": "Arguments & Return",
+  "concept": "Pass values to functions (Arguments) and receive results back (Return)",
+  "content": {
+    "code": "def add(a, b=10):\n    return a + b\n\n# 1. 위치 인자 (Positional)\nres1 = add(5, 3) # 5+3\n\n# 2. 키워드 인자 (Keyword)\nres2 = add(b=5, a=3) # 순서 바꿔도 OK\n\n# 3. 디폴트 인자 (Default)\nres3 = add(7) # 7+10 (b는 기본값)\n\nprint(res1, res2, res3)",
+    "steps": [
+      {
+        "title": "Parameters and Default Values",
+        "explanation": "**`def add(a, b=10):`**\n\nPython executes code from top to bottom.\nDefines the `add` function. This function introduces **Default Parameters**.\n\n**What are Default Parameters?** Setting a **default value** for a parameter like `b=10`. If `b` is omitted during the call, `10` is automatically used. Like ordering coffee without specifying a size -- you get 'regular' by default.\n\n**Important rule -- Default parameters must come after regular parameters!**\n- `def func(a, b=10):` -> OK (regular `a` first, default `b` after)\n- `def func(a=5, b):` -> `SyntaxError`! (default cannot come first)\n- Reason: Ambiguity arises when Python tries to match arguments in order.\n\n**Python internals**: The default value (`10`) is evaluated **only once when the function is defined**. This is why you should never use mutable objects (like lists) as defaults! Stored as `(10,)` tuple in the function object's `__defaults__` attribute.\n\n**Caution -- The most common pitfall**: `def func(a, b=[]):` means all calls **share the same list**, causing bugs. Use `b=None` instead and handle it inside the function with `if b is None: b = []`!\n\n**Execution order**: def executed -> add function object created (with default b=10) -> registered globally -> line 5",
+        "visualizationType": "pythonMemory",
+        "code": "def add(a, b=10):",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Function defined (b default: 10)",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling with Positional Arguments",
+        "explanation": "**`res1 = add(5, 3)`**\n\n**Positional Arguments**: Values are matched to parameters **left to right, in order**.\n- First value `5` -> first parameter `a`\n- Second value `3` -> second parameter `b`\n\nAnalogy: People in line (arguments) are assigned to counters (parameters) in order. Person #1 (5) goes to counter #1 (a), person #2 (3) goes to counter #2 (b).\n\n**`b=10` default is ignored**: Since the second argument `3` is explicitly passed, the default value `10` is not used and `3` is bound to `b`.\n\n**What `res1 = ...` means**: The **return value** of `add(5, 3)` will be stored in the `res1` variable. The function is still executing, so we're waiting for the return value.\n\n**Python internals**: Positional arguments are internally passed as an `args` tuple. When `add(5, 3)` is called, `args = (5, 3)` and they are bound in order as `a=5, b=3`.\n\n**Caution**: If you pass more or fewer arguments than parameters, a `TypeError` is raised! (Parameters with defaults can be omitted)\n\n**Execution order**: line 5 -> add(5, 3) called -> new local frame created -> jump to line 2 -> a=5, b=3",
+        "visualizationType": "pythonMemory",
+        "code": "res1 = add(5, 3) # 5+3",
+        "pythonMemoryState": {
+          "note": "add(5, 3) called -> about to jump to line 2",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing add (5+3)",
+        "explanation": "**`return a + b`**\n\nThe arguments are bound to parameters: `a=5`, `b=3`.\nPython evaluates the expression `a + b` to compute `5 + 3 = 8`, and **returns the result** to the caller.\n\n**How return works:**\n1. Evaluate `a + b` expression -> `5 + 3` -> `8` (new int object created)\n2. Pass result `8` to the caller (line 5)\n3. Function ends -> local frame (a, b bindings) deleted\n4. Back at line 5: `res1 = 8` assigned\n\n**Python internals**: When `a + b` executes, Python internally calls `a.__add__(b)`. The int type's `__add__` method creates and returns a new int object from the sum of two integers.\n\n**Complete flow of `res1 = add(5, 3)`:**\n- `add(5, 3)` called -> function body executed -> `8` returned -> `res1` bound to `8`\n- Now `res1` is a global variable that persists until the program ends\n\n**Caution**: If a function ends without `return`, `None` is returned and `res1 = None`!\n\n**Execution order**: a=5, b=3 -> 5+3 computed -> 8 returned -> back to line 5 -> res1=8 -> line 8",
+        "visualizationType": "pythonMemory",
+        "code": "return a + b",
+        "pythonMemoryState": {
+          "note": "a=5, b=3 -> return 8 -> res1=8",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "int1",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2",
+              "highlight": true
+            },
+            {
+              "name": "res1",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 5,
+              "pyId": "1002",
+              "highlight": true
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 3,
+              "pyId": "1003",
+              "highlight": true
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calling with Keyword Arguments",
+        "explanation": "**`res2 = add(b=5, a=3)`**\n\n**Keyword Arguments**: Values are passed by **explicitly specifying the parameter name**. Since matching is by name, **order does not matter**!\n- `b=5` -> `b` parameter gets 5 (second parameter)\n- `a=3` -> `a` parameter gets 3 (first parameter)\n\nAnalogy: If positional arguments are like 'lining up and getting assigned to counters in order', keyword arguments are like 'reserved seating'. No matter what order you arrive in, you sit in the right seat because you have a name tag.\n\n**When to use keyword arguments?**\n- When there are many parameters and order is hard to remember (improves readability)\n- When you want to selectively pass only some parameters\n- When you want to clearly convey intent to the code reader\n\n**Python internals**: Keyword arguments are passed as a `kwargs` dictionary. `add(b=5, a=3)` is internally processed as `{'b': 5, 'a': 3}`, and values are bound based on the key (parameter name).\n\n**Rule -- When mixing positional and keyword arguments:** Positional arguments must come **first**!\n- `add(3, b=5)` -> OK\n- `add(a=3, 5)` -> `SyntaxError`!\n\n**Execution order**: line 8 -> add(b=5, a=3) called -> jump to line 2 -> a=3, b=5",
+        "visualizationType": "pythonMemory",
+        "code": "res2 = add(b=5, a=3) # 순서 바꿔도 OK",
+        "pythonMemoryState": {
+          "note": "Keyword args -> order irrelevant (b=5, a=3)",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "res1",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing add (3+5)",
+        "explanation": "**`return a + b`**\n\nThe keyword arguments are bound: `a=3`, `b=5`.\nComputes `3 + 5 = 8` and returns.\n\n**Key point**: We passed `b=5, a=3` (different order), but **name matching** ensures `a` gets `3` and `b` gets `5` correctly. Changing the order still works!\n\n**Positional vs keyword argument result comparison:**\n- `add(5, 3)` -> a=5, b=3 -> 8\n- `add(b=5, a=3)` -> a=3, b=5 -> 8 (same value but different bindings!)\n- In this example, addition gives the same result, but if it were subtraction (`a - b`), we'd get 2 vs -2 -- completely different!\n\n**Python internals**: When the function frame is created, keyword arguments are first matched to parameter names and then bound to the local namespace. After matching, they are processed identically to positional arguments.\n\n**Caution**: Passing both a positional and keyword argument to the same parameter causes `TypeError`! E.g., `add(3, a=5)` -> both 3 and 5 try to bind to `a` -> error\n\n**Execution order**: a=3, b=5 -> 3+5 computed -> 8 returned -> back to line 8 -> res2=8 -> line 11",
+        "visualizationType": "pythonMemory",
+        "code": "return a + b",
+        "pythonMemoryState": {
+          "note": "a=3, b=5 -> return 8 -> res2=8",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "int4",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "int5",
+              "highlight": true
+            },
+            {
+              "name": "res1",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "res2",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int4",
+              "type": "int",
+              "value": 3,
+              "pyId": "1005",
+              "highlight": true
+            },
+            {
+              "id": "int5",
+              "type": "int",
+              "value": 5,
+              "pyId": "1006",
+              "highlight": true
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 8,
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Using Default Arguments",
+        "explanation": "**`res3 = add(7)`**\n\n**Default value in action!** Only `7` is passed to `a`, and `b` is **completely omitted**. Python detects that no argument was passed for `b` and automatically uses the **default value `10`** set during function definition.\n\nAnalogy: Ordering coffee and just saying \"one Americano\" (omitting size) -- you get the default size (regular). No need to say \"regular size\" every time.\n\n**When default parameters are useful in practice:**\n- Most calls use the same value, but occasionally a different one is needed\n- E.g., `def connect(host, port=80):` -> usually port 80, but `connect(\"example.com\", 443)` for HTTPS\n\n**Python internals**: During argument binding, if fewer arguments are passed than parameters, Python fills in from the `__defaults__` tuple. Checking `add.__defaults__` shows `(10,)` stored.\n\n**Caution -- When default values are evaluated**: Defaults are NOT created fresh on **every call**, but **only once at definition time**. This is fine for immutable objects (int, str), but using mutable objects (list, dict) as defaults creates a dangerous bug where all calls share the same object!\n\n**Execution order**: line 11 -> add(7) called -> no argument for b -> default 10 used -> jump to line 2 -> a=7, b=10",
+        "visualizationType": "pythonMemory",
+        "code": "res3 = add(7) # 7+10 (b는 기본값)",
+        "pythonMemoryState": {
+          "note": "b omitted -> default 10 used",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "res1",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "res2",
+              "pointsTo": "int6"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 8,
+              "pyId": "1007"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Executing add (7+10)",
+        "explanation": "**`return a + b`**\n\n`a=7`, `b=10` (default value) are bound.\nComputes `7 + 10 = 17` and returns.\n\n**What's special about this third call**: This time, `b` is not a user-supplied value but the **default value `10`** set at function definition. However, inside the function there's no way to distinguish. `a + b` executes identically.\n\n**Summary of three calling styles:**\n- Positional: `add(5, 3)` -> a=5, b=3 -> **8**\n- Keyword: `add(b=5, a=3)` -> a=3, b=5 -> **8**\n- Default: `add(7)` -> a=7, b=10 (default) -> **17**\n\n**Python internals**: At this point, all three variables `res1`, `res2`, `res3` exist in the global namespace. Each references an independent int object (8, 8, 17). Note that Python caches small integers (-5 to 256), so the `8` referenced by `res1` and `res2` may actually be the **same object** (integer caching).\n\n**Caution**: When using default values, unintended results can occur, so always check the function signature (`def add(a, b=10)`) carefully!\n\n**Execution order**: a=7, b=10 -> 7+10 computed -> 17 returned -> back to line 11 -> res3=17 -> line 13",
+        "visualizationType": "pythonMemory",
+        "code": "return a + b",
+        "pythonMemoryState": {
+          "note": "a=7, b=10(default) -> return 17 -> res3=17",
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "a",
+              "pointsTo": "int7",
+              "highlight": true
+            },
+            {
+              "name": "b",
+              "pointsTo": "int8",
+              "highlight": true
+            },
+            {
+              "name": "res1",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "res2",
+              "pointsTo": "int6"
+            },
+            {
+              "name": "res3",
+              "pointsTo": "int9"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int7",
+              "type": "int",
+              "value": 7,
+              "pyId": "1008",
+              "highlight": true
+            },
+            {
+              "id": "int8",
+              "type": "int",
+              "value": 10,
+              "pyId": "1009",
+              "highlight": true
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 8,
+              "pyId": "1007"
+            },
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 17,
+              "pyId": "1010"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Final Results",
+        "explanation": "**`print(res1, res2, res3)`**\n\nPrints all three values at once: `8 8 17`\n\n**Passing multiple arguments to `print()`**: `print()` accepts multiple values separated by commas (`,`), and by default separates them with **spaces**. The `sep` parameter can change the separator (e.g., `print(1, 2, 3, sep=\"-\")` -> `1-2-3`).\n\n**Key takeaways from this lesson:**\n- **Positional arguments**: `add(5, 3)` -> matched by order, a=5, b=3 -> result 8\n- **Keyword arguments**: `add(b=5, a=3)` -> matched by name, order irrelevant -> result 8\n- **Default arguments**: `add(7)` -> b omitted, default 10 auto-used -> result 17\n\n**Practical tips -- Combine all three styles:**\n- Required parameters as positional for brevity: `add(5, 3)`\n- Optional parameters as keyword for clarity: `connect(\"server\", timeout=30)`\n- Common values as defaults for convenience: `def log(msg, level=\"INFO\")`\n\n**Python internals**: `print()` is itself a function that uses `*args` (variable positional args) and `**kwargs` (variable keyword args). This is why it can accept any number of values without restriction.\n\n**Execution order**: read res1(8), res2(8), res3(17) -> print executed -> \"8 8 17\" output -> program ends",
+        "visualizationType": "pythonMemory",
+        "code": "print(res1, res2, res3)",
+        "pythonMemoryState": {
+          "output": [
+            "8 8 17"
+          ],
+          "names": [
+            {
+              "name": "add",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "res1",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "res2",
+              "pointsTo": "int6"
+            },
+            {
+              "name": "res3",
+              "pointsTo": "int9"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "<function(a, b=10)>",
+              "pyId": "1001"
+            },
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 8,
+              "pyId": "1004"
+            },
+            {
+              "id": "int6",
+              "type": "int",
+              "value": 8,
+              "pyId": "1007"
+            },
+            {
+              "id": "int9",
+              "type": "int",
+              "value": 17,
+              "pyId": "1010"
+            }
+          ],
+          "note": null
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the problem with def func(a, b=[]): ...?",
+    "options": [
+      "It's a syntax error",
+      "The default list b is shared across all calls (Mutable Default Argument)",
+      "Lists can't be used as default arguments",
+      "No problem"
+    ],
+    "correctIndex": 1,
+    "explanation": "When a mutable object like a list is used as a default, the same list is reused every function call.\nThis creates a terrible bug where data accumulates! (Use `b=None` instead)"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Python uses Call by Value",
+      "correct": "Python uses **Call by Object Reference** (or Call by Assignment).",
+      "why": "When you pass an object to a function, the name tag (reference) is copied.\nIf you pass a list and `append` to it inside, the original is also changed!"
+    }
+  ],
+  "keyTakeaway": "Use keyword arguments for clarity! Never use mutable objects (List) as default values."
+}

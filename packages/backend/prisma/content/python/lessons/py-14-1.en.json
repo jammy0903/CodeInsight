@@ -1,0 +1,312 @@
+{
+  "lessonId": "py-14-1",
+  "title": "List Comprehension",
+  "concept": "List comprehension is Python's core syntax that compresses a for loop into one line",
+  "content": {
+    "code": "numbers = [1, 2, 3, 4, 5]\n\nsquares = [x**2 for x in numbers]\nprint(squares)\n\nevens = [x for x in numbers if x % 2 == 0]\nprint(evens)\n\nwords = [\"hello\", \"world\"]\nupper = [w.upper() for w in words]\nprint(upper)",
+    "steps": [
+      {
+        "title": "Creating the Source List",
+        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- Creates a list object containing 5 integers and attaches the label `numbers`.\n\nThis list will serve as the source data for the **list comprehension** we'll learn. List comprehension is Python's unique concise syntax for **transforming or filtering** an existing list to create a **new list**.\n\n**Analogy:** Like a factory's raw material warehouse. When you put raw materials (numbers) in, a conveyor belt (comprehension) takes out each material one by one, processes it, and produces new products (new list).\n\n**Why learn comprehensions?** Creating a new list with a regular for loop requires 4 lines:\n```python\nresult = []\nfor x in numbers:\n    result.append(x**2)\n```\nComprehension reduces this pattern to **just 1 line**: `[x**2 for x in numbers]`\n\n**Python internals:** When the `[1, 2, 3, 4, 5]` literal is evaluated, a `list` object is allocated in heap memory. Internally, a list is an array that stores memory addresses of each integer object. The name `numbers` is registered in the global namespace dictionary pointing to this list object.\n\n**Execution order:**\n1. Integer objects `1`, `2`, `3`, `4`, `5` exist in memory (small integers are cached).\n2. `list` object allocated on heap, storing references to each integer.\n3. `numbers -> list object` binding created in global namespace.",
+        "visualizationType": "pythonMemory",
+        "code": "numbers = [1, 2, 3, 4, 5]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "The source list for comprehension",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Basic Comprehension -- Squares List",
+        "explanation": "**`squares = [x**2 for x in numbers]`** -- Squares each element of `numbers` to create a new list.\n\n**List comprehension syntax:** `[expression for variable in iterable]`\n\n**Analogy:** Numbers come one by one on a conveyor belt, and each passes through a **squaring machine** to produce transformed values that go into a new box. The original belt (numbers) stays the same, and only the new box (squares) is created.\n\n**Note:** `x` is a temporary variable inside the comprehension. In Python 3, list comprehensions have their **own scope**, so even if a variable with the same name exists outside, it won't be affected.\n\n**Process** (internally executes sequentially like a for loop):\n1. `x = 1` -> `1**2` = `1`\n2. `x = 2` -> `2**2` = `4`\n3. `x = 3` -> `3**2` = `9`\n4. `x = 4` -> `4**2` = `16`\n5. `x = 5` -> `5**2` = `25`\n6. Result: `[1, 4, 9, 16, 25]`",
+        "visualizationType": "pythonMemory",
+        "code": "squares = [x**2 for x in numbers]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "[x**2 for x in numbers] -> square each element",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Squares List",
+        "explanation": "**`print(squares)`** -- Prints the list object `[1, 4, 9, 16, 25]` that `squares` points to.\n\nThe key thing to understand here is that **the original list was not modified at all**.\n- `numbers`: `[1, 2, 3, 4, 5]` -- unchanged\n- `squares`: `[1, 4, 9, 16, 25]` -- a completely new list object\n\n**Analogy:** Like copying a document and making edits only on the copy. The original document was not touched.\n\n**Python internals:** `print()` calls the `__repr__()` method of the `squares` list. `list.__repr__()` calls `repr()` on each element, joins them with commas, and wraps them in brackets. This string is output to `sys.stdout`.\n\n**Four advantages of comprehensions:**\n1. **Conciseness** -- compresses 4-line for loops into 1 line\n2. **Readability** -- \"what to create\" is clearly visible\n3. **Performance** -- slightly faster than regular for loop + `append`\n4. **Functional style** -- declaratively describes the result\n\n**Note:** Comprehensions aren't always better. When logic gets complex, regular for loops are easier to read. Use the criterion: \"Can I understand it at a glance?\"\n\n**Execution order:**\n1. `squares` name -> resolve list object reference.\n2. `print()` call -> `__repr__()` -> string generation.\n3. Output to `sys.stdout`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(squares)",
+        "pythonMemoryState": {
+          "output": [
+            "[1, 4, 9, 16, 25]"
+          ],
+          "note": "Original numbers is unchanged",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Conditional Comprehension -- Filtering Even Numbers",
+        "explanation": "**`evens = [x for x in numbers if x % 2 == 0]`** -- Selects only even elements from `numbers` to create a new list.\n\n**Conditional comprehension syntax:** `[expression for variable in iterable if condition]`\n\n**Analogy:** Like sifting rice through a sieve. Pour all the rice (all elements) into the sieve, and only what passes through the holes (condition) falls through and collects. Only even numbers that pass through the `x % 2 == 0` sieve go into the new list.\n\n**Note:** The `if` in conditional comprehension is placed **after** the for. The `if-else` you'll learn in the next lesson is placed **before** the for. Confusing these two causes `SyntaxError`.\n\n**Process:**\n1. `x = 1` -> `1 % 2 == 0`? `False` -> excluded\n2. `x = 2` -> `2 % 2 == 0`? `True` -> **included**\n3. `x = 3` -> `3 % 2 == 0`? `False` -> excluded\n4. `x = 4` -> `4 % 2 == 0`? `True` -> **included**\n5. `x = 5` -> `5 % 2 == 0`? `False` -> excluded\n6. Result: `[2, 4]`",
+        "visualizationType": "pythonMemory",
+        "code": "evens = [x for x in numbers if x % 2 == 0]",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Filter only even numbers with if condition",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Applying Methods to String Lists",
+        "explanation": "When applying methods to a string list, the key perspective is \"transforming each element with the same rule.\"\n\nTypically handled with comprehension.\nExample: `[s.upper() for s in words]`\n\n**Analogy**: Like a batch operation of stamping all labels with an uppercase stamp.\n\nKey points:\n- Original list preserved\n- New transformed list created\n- The clearer the rule, the more readable the code",
+        "visualizationType": "pythonMemory",
+        "code": "upper = [w.upper() for w in words]",
+        "pythonMemoryState": {
+          "output": [
+            "[2, 4]"
+          ],
+          "note": "Method calls can also be used as expressions",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list4"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "list5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[\"hello\", \"world\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "list5",
+              "type": "list",
+              "value": "[\"HELLO\", \"WORLD\"]",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Final Output",
+        "explanation": "**`print(upper)`** -- Prints the list `[\"HELLO\", \"WORLD\"]` that `upper` points to.\n\nIn this lesson we learned all **three core patterns** of list comprehension.\n\n**List comprehension pattern summary:**\n\n**Analogy:** Comprehension is similar to SQL's `SELECT` statement. `SELECT x**2 FROM numbers WHERE x > 0` -- transformation (SELECT), source (FROM), and filter (WHERE) are all contained in one statement.\n\n**Python internals:** Comprehensions are specially optimized at the bytecode level. Checking with the `dis` module shows that the `LIST_APPEND` instruction is used directly, avoiding the overhead of `list.append()` method lookup.\n\n**Note:** Comprehensions are powerful but shouldn't be overused.\n- If a line exceeds 80 characters, readability suffers\n- If complexity requires more than 2 lines, use a regular for loop\n- \"Readable code\" is always more important than \"short code\"!\n\n**Execution order:**\n1. Get list object reference via `upper` name.\n2. `print()` -> `list.__repr__()` -> string conversion.\n3. Output to `sys.stdout` with newline.",
+        "visualizationType": "pythonMemory",
+        "code": "print(upper)",
+        "pythonMemoryState": {
+          "output": [
+            "[\"HELLO\", \"WORLD\"]"
+          ],
+          "note": "3 comprehension patterns: transform, filter, transform+filter",
+          "names": [
+            {
+              "name": "numbers",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "squares",
+              "pointsTo": "list2"
+            },
+            {
+              "name": "evens",
+              "pointsTo": "list3"
+            },
+            {
+              "name": "words",
+              "pointsTo": "list4"
+            },
+            {
+              "name": "upper",
+              "pointsTo": "list5",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3, 4, 5]",
+              "pyId": "1001"
+            },
+            {
+              "id": "list2",
+              "type": "list",
+              "value": "[1, 4, 9, 16, 25]",
+              "pyId": "1002"
+            },
+            {
+              "id": "list3",
+              "type": "list",
+              "value": "[2, 4]",
+              "pyId": "1003"
+            },
+            {
+              "id": "list4",
+              "type": "list",
+              "value": "[\"hello\", \"world\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "list5",
+              "type": "list",
+              "value": "[\"HELLO\", \"WORLD\"]",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the result of [x*2 for x in [1,2,3] if x > 1]?",
+    "options": [
+      "[2, 4, 6]",
+      "[4, 6]",
+      "[2, 4]",
+      "[1, 4, 6]"
+    ],
+    "correctIndex": 1,
+    "explanation": "Filtering with if x > 1 first leaves [2, 3],\nthen applying x*2 to each gives [4, 6].\nx=1 doesn't satisfy the condition (x > 1) so it's excluded."
+  },
+  "misconceptions": [
+    {
+      "wrong": "List comprehension is always better than for loops",
+      "correct": "Comprehension is good for simple transformations/filtering, but for complex logic, for loops are more readable.",
+      "why": "When nested for loops + conditions + complex expressions combine,\na single line becomes too long and actually harder to read."
+    }
+  ],
+  "keyTakeaway": "[expression for x in list if condition] -- transform and filter in one line! Python's core syntax!"
+}

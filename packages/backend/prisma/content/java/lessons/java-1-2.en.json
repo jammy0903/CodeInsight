@@ -1,0 +1,191 @@
+{
+  "lessonId": "java-1-2",
+  "title": "The Secret of the String Pool",
+  "concept": "String literals are stored in the String Pool and reused",
+  "content": {
+    "code": "String a = \"hello\";\nString b = \"hello\";\nSystem.out.println(a == b);\n\nString c = new String(\"hello\");\nSystem.out.println(a == c);\n\nString d = c.intern();\nSystem.out.println(a == d);",
+    "steps": [
+      {
+        "title": "Creating a String with a Literal",
+        "explanation": "**Execution order:**\n1. The JVM searches the **String Pool**.\n2. \"hello\" is not found, so it's created in the Pool.\n3. The address (Pool:0x100) is assigned to `a`.\n\n**What is the String Pool?**\nIt's a 'recycling center' that collects frequently used strings.\nTo save memory, Java creates only one copy of identical string literals and shares them.\n\n**What is a Literal?**\nValues that you type directly in your code (like `\"hello\"`).",
+        "keyInsight": "Strings created with quotes (\"\") are stored in the Pool",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "heap": [],
+          "output": []
+        },
+        "code": "String a = \"hello\";"
+      },
+      {
+        "title": "Reusing the Same Literal",
+        "explanation": "**Execution order:**\n1. Search the String Pool.\n2. \"hello\" is found (reuse it).\n3. The existing address (Pool:0x100) is assigned to `b`.\n\nTrying to create \"hello\" again?\nThe JVM searches the Pool and says, \"Oh, I already made one!\" and **reuses the existing address**.\nSo `b` also points to the same **Pool:0x100** as `a`.\n\n**Flyweight Pattern:**\nA design pattern that saves memory by sharing identical objects instead of creating many copies.\nThe String Pool is exactly this pattern.",
+        "keyInsight": "Same literal = same address reused",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "b",
+              "value": "-> Pool:0x100",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100",
+              "refCount": 2
+            }
+          ],
+          "heap": [],
+          "output": []
+        },
+        "code": "String b = \"hello\";"
+      },
+      {
+        "title": "Comparing Literals with ==",
+        "explanation": "**Execution order:**\n1. Compare a(Pool:0x100) == b(Pool:0x100).\n2. Addresses are the same, so **true**.\n\n`a` and `b` point to the **same address**, so the `==` (address comparison) result is **true**.\nBut be careful! This isn't because the strings are equal -- it's because they **happen to share the same object**.",
+        "keyInsight": "Literals compare as true with == (but .equals is recommended)",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "comparison": "Pool:0x100 == Pool:0x100",
+          "output": [
+            "true"
+          ],
+          "warning": "Literals return true with ==! But you shouldn't rely on this"
+        },
+        "code": "System.out.println(a == b);"
+      },
+      {
+        "title": "Creating a String with new",
+        "explanation": "**Execution order:**\n1. `new` keyword detected -> always creates a new object.\n2. Address 0x200 allocated on the Heap.\n\nThe `new` keyword means **\"Don't recycle -- give me a brand new one!\"**\nIt doesn't care whether \"hello\" exists in the Pool or not. It creates a new object in the regular **Heap** area.\n\n**Heap String vs Pooled String:**\n- `new`: A private, dedicated object (no reuse)\n- `\"...\"`: A shared object (reusable)",
+        "keyInsight": "new = refuses recycling, always creates a new object",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "c",
+              "value": "-> 0x200",
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x200",
+              "content": "\"hello\"",
+              "new": true
+            }
+          ],
+          "output": []
+        },
+        "code": "String c = new String(\"hello\");"
+      },
+      {
+        "title": "Literal vs new Comparison",
+        "explanation": "**Execution order:**\n1. Compare a(Pool:0x100) == c(0x200).\n2. Addresses are different, so **false**.\n\n`a` comes from the recycling center (Pool),\nwhile `c` was freshly manufactured at the factory (Heap).\nSince they come from different origins, their addresses are different.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "comparison": "Pool:0x100 != 0x200",
+          "output": [
+            "false"
+          ]
+        },
+        "code": "System.out.println(a == c);"
+      },
+      {
+        "title": "Registering in the Pool with intern()",
+        "explanation": "**Execution order:**\n1. `c.intern()` is called.\n2. The String Pool finds the same content (\"hello\").\n3. Returns the address of the found Pool object (Pool:0x100).\n\nThe `intern()` method is like requesting **\"Let me join the Pool group too.\"**\nAs a result, `d` ends up with the same address as `a`.",
+        "keyInsight": "intern() = converts a Heap string to a Pool address",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "d",
+              "value": "-> Pool:0x100",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
+          ],
+          "heap": [],
+          "output": []
+        },
+        "code": "String d = c.intern();"
+      },
+      {
+        "title": "Comparing the intern() Result",
+        "explanation": "**Execution order:**\n1. Compare a(Pool:0x100) == d(Pool:0x100).\n2. Addresses are the same, so **true**.\n\n`a` and `d` now point to the same Pool object.\n**true**!\n\n**Practical tip:**\nWhen dealing with millions of duplicate strings, using `intern()` can dramatically reduce memory usage.",
+        "visualizationType": "javaMemory",
+        "javaMemoryState": {
+          "output": [
+            "true"
+          ]
+        },
+        "code": "System.out.println(a == d);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "What is the purpose of the String Pool?",
+    "options": [
+      "Enhanced security",
+      "Memory savings",
+      "Speed improvement",
+      "Garbage collection optimization"
+    ],
+    "correctIndex": 1,
+    "explanation": "Even when the same string literal is used multiple times, only one object is created, saving memory."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You can always compare strings with ==",
+      "correct": "String comparison must always use `.equals()`.",
+      "why": "Literals may luckily pass `==` due to the Pool, but strings from user input or file reads are treated like `new` objects, causing `==` to fail."
+    },
+    {
+      "wrong": "The String Pool is never cleaned up even when memory is full",
+      "correct": "The String Pool is also subject to GC (Garbage Collection).",
+      "why": "Before Java 7, it was in the PermGen area which could cause memory issues, but since Java 7, it has been moved to the regular Heap and is automatically cleaned up when there are no references."
+    }
+  ],
+  "keyTakeaway": "Literals are reused from the Pool, and new always creates a new object. Always compare with .equals()!"
+}

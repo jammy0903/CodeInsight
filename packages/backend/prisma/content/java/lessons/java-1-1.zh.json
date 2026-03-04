@@ -1,0 +1,165 @@
+{
+  "lessonId": "java-1-1",
+  "title": "== 与 .equals() 基础",
+  "concept": "== 比较引用（内存地址），而 .equals() 比较值",
+  "content": {
+    "code": "String a = new String(\"hello\");\nString b = new String(\"hello\");\n\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));\n\nString c = a;\nSystem.out.println(a == c);",
+    "steps": [
+      {
+        "title": "创建第一个 String 对象",
+        "explanation": "**执行顺序：**\n1. 调用 `new String(...)`（在堆上创建 \"hello\"）。\n2. 将对象地址（0x001）赋值给 `a`。\n\n**什么是堆（Heap）？**\n堆是程序运行期间可以自由存储数据的大型内存空间。\n所有通过 `new` 创建的对象都存放在这里。\n\n**什么是引用变量（a）？**\n它不保存对象本身，而只保存对象**所在位置**的地址（就像一个路标）。",
+        "keyInsight": "new = 始终在堆上创建新对象",
+        "visualizationType": "javaMemory",
+        "code": "String a = new String(\"hello\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x001",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "\"hello\""
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "创建第二个 String 对象",
+        "explanation": "**执行顺序：**\n1. 再次调用 `new String(...)`。\n2. 在堆上创建新对象（0x002）。\n3. 将地址赋值给 `b`。\n\nJVM 不会重用已有对象，而是无条件创建一个**全新的对象**。\n虽然两者的内容都是 \"hello\"，但它们的**地址（住所）**完全不同。\n就像一对双胞胎住在不同的房子里。",
+        "keyInsight": "内容相同但对象不同 = 地址不同",
+        "visualizationType": "javaMemory",
+        "code": "String b = new String(\"hello\");",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x001",
+              "type": "String"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x002",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "\"hello\""
+            },
+            {
+              "address": "0x002",
+              "content": "\"hello\"",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "== 比较（引用比较）",
+        "explanation": "**执行顺序：**\n1. 查找 a 的值（0x001）。\n2. 查找 b 的值（0x002）。\n3. 比较 `0x001 == 0x002` -> **false**。\n\n`==` 运算符非常简单直接。\n它只比较**变量中存储的值（地址）**。\n\n**什么是引用比较？**\n它只检查"包装纸（地址）"是否相同，而不会打开查看里面的"内容"。",
+        "keyInsight": "== 比较的是地址值",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a == b);",
+        "javaMemoryState": {
+          "comparison": "0x001 != 0x002",
+          "output": [
+            "false"
+          ]
+        }
+      },
+      {
+        "title": ".equals() 比较（值比较）",
+        "explanation": "**执行顺序：**\n1. 跳转到 a 指向的对象。\n2. 将其内容（\"hello\"）与 b 指向的对象进行比较。\n3. 内容一致 -> **true**。\n\n`.equals()` 非常细致。\n它会沿着地址找到对象，并检查其中的**实际内容**（\"hello\"）。\n\n**什么是值比较？**\n即使对象的内存位置不同，也会检查它们在逻辑上包含的数据是否相同。",
+        "keyInsight": ".equals() 比较的是实际内容",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a.equals(b));",
+        "javaMemoryState": {
+          "comparison": "\"hello\" == \"hello\"",
+          "output": [
+            "true"
+          ]
+        }
+      },
+      {
+        "title": "赋值相同的引用",
+        "explanation": "**执行顺序：**\n1. 将 a 的值（0x001）复制给 c。\n2. c 现在也指向 0x001。\n\n`String c = a;`\n这段代码并不是复制对象。\n它只是将 `a` 持有的**地址（0x001）**复制给了 `c`。\n现在 `a` 和 `c` 指向**同一个房子**。\n\n**什么是别名（Aliasing）？**\n多个变量同时指向同一个对象的情况。\n`c` 只不过是 `a` 的另一个名字。",
+        "visualizationType": "javaMemory",
+        "code": "String c = a;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> 0x001",
+              "type": "String"
+            },
+            {
+              "name": "b",
+              "value": "-> 0x002",
+              "type": "String"
+            },
+            {
+              "name": "c",
+              "value": "-> 0x001",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "\"hello\"",
+              "refCount": 2
+            },
+            {
+              "address": "0x002",
+              "content": "\"hello\""
+            }
+          ],
+          "output": [],
+          "comparison": null
+        }
+      },
+      {
+        "title": "比较相同的引用",
+        "explanation": "**执行顺序：**\n1. 比较 a(0x001) == c(0x001)。\n2. 相同 -> **true**。\n\n**总结：**\n- `==`：你们住在**同一栋房子**吗？（地址比较）\n- `.equals()`：你们**长得一样（内容相同）**吗？（值比较）",
+        "keyInsight": "指向同一个对象时，== 也返回 true",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(a == c);",
+        "javaMemoryState": {
+          "comparison": "0x001 == 0x001",
+          "output": [
+            "false",
+            "true",
+            "true"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下代码的输出是什么？\n\nInteger x = new Integer(100);\nInteger y = new Integer(100);\nSystem.out.println(x == y);",
+    "options": [
+      "true",
+      "false",
+      "编译错误",
+      "运行时错误"
+    ],
+    "correctIndex": 1,
+    "explanation": "new 关键字总是创建新的内存地址（新对象）。\n由于地址不同，== 返回 false。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "== 比较的是内容",
+      "correct": "== 比较的是引用（内存地址）。\n内容比较请使用 .equals()。",
+      "why": "容易与 C++ 的运算符重载或 Python 的 == 混淆，但在 Java 中，== 对对象只比较地址。"
+    }
+  ],
+  "keyTakeaway": "比较对象时务必使用 .equals()。== 仅用于基本类型（int、boolean 等）。"
+}

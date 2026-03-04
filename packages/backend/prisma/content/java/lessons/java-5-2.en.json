@@ -1,0 +1,125 @@
+{
+  "lessonId": "java-5-2",
+  "title": "final Classes and Methods",
+  "concept": "A final class prohibits inheritance, and a final method prohibits overriding.",
+  "content": {
+    "code": "final class ImmutablePoint {\n    private final int x, y;\n    \n    public ImmutablePoint(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n    \n    public final int getX() { return x; }\n}\n\n// class ExtendedPoint extends ImmutablePoint {}  // Error!\n\nclass Parent {\n    public final void cannotOverride() {\n        System.out.println(\"Cannot override this!\");\n    }\n}\n\nclass Child extends Parent {\n    // public void cannotOverride() {}  // Error!\n}",
+    "steps": [
+      {
+        "title": "Declaring a final Class",
+        "explanation": "**Execution flow:**\n1. The `ImmutablePoint` class is loaded.\n2. The class metadata is tagged with 'no inheritance (final)'.\n\n**The line ends here:**\nA `final class` cannot have children (subclasses).\n`String` and `System` are classic examples.",
+        "visualizationType": "javaMemory",
+        "code": "final class ImmutablePoint {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [
+            {
+              "name": "ImmutablePoint",
+              "value": "Class (final)"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Initializing final Fields",
+        "explanation": "**Execution flow:**\n1. An object is created (`new`) and the constructor is called.\n2. Inside the constructor, values are assigned to fields `x` and `y`.\n3. The moment the constructor finishes, these fields are 'frozen' and can never be changed.\n\n**Analogy**: Writing with pencil on paper (regular variable) can be erased, but carving into stone (final) cannot be undone.\n\n**Perfect immutability:**\nWith no setters and all fields marked `final`, this object preserves its creation-time state forever.",
+        "visualizationType": "javaMemory",
+        "code": "private final int x, y;",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "x: 10, y: 20",
+              "type": "ImmutablePoint",
+              "new": true
+            }
+          ],
+          "metaspace": null
+        }
+      },
+      {
+        "title": "Declaring a final Method",
+        "explanation": "**Execution flow:**\n1. When the method information is loaded, it is tagged with 'no Override (final)'.\n\n**A stubborn method:**\n\"My logic is perfect -- don't touch it!\" Subclasses inherit this method but cannot redefine its behavior.",
+        "visualizationType": "javaMemory",
+        "code": "public final int getX() { return x; }",
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "ImmutablePoint.getX()",
+              "value": "Method (final)"
+            }
+          ]
+        }
+      },
+      {
+        "title": "final Method in a Regular Class",
+        "explanation": "**Execution flow:**\n1. `Parent` is a regular class, so inheritance is allowed.\n2. However, the `cannotOverride` method is `final`, so subclasses cannot change its implementation.\n\n**Selective protection:**\nYou don't need to lock down the entire class -- use this when you want to protect only specific core functionality.",
+        "visualizationType": "javaMemory",
+        "code": "class Parent {",
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ],
+        "javaMemoryState": {
+          "metaspace": [
+            {
+              "name": "Parent",
+              "value": "Class"
+            },
+            {
+              "name": "Parent.cannotOverride()",
+              "value": "Method (final)"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How do you prevent inheritance in Java?",
+    "options": [
+      "Declare the class as private.",
+      "Declare the class as final.",
+      "Declare the class as static.",
+      "Declare the class as abstract."
+    ],
+    "correctIndex": 1,
+    "explanation": "Adding `final` before a class means it's the 'last class in the line' -- no more children (subclasses) can be created."
+  },
+  "misconceptions": [
+    {
+      "wrong": "A final method can't be overloaded either.",
+      "correct": "Overloading is allowed!",
+      "why": "Only overriding (redefining the same method signature) is prohibited. Creating a new method with the same name but different parameters (overloading) is perfectly fine."
+    },
+    {
+      "wrong": "You can add final to an abstract method.",
+      "correct": "Absolutely not.\nIt's a contradiction.",
+      "why": "`abstract` means \"the subclass must implement (override) this\", while `final` means \"do not override\". They are diametrically opposite concepts."
+    }
+  ],
+  "keyTakeaway": "A final class cuts off the family tree, and a final method prevents logic modification."
+}

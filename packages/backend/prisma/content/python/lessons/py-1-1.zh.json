@@ -1,0 +1,177 @@
+{
+  "lessonId": "py-1-1",
+  "title": "Python 入门：变量是标签",
+  "concept": "Python 变量不是盒子，而是'标签（Label）'",
+  "content": {
+    "code": "print(\"Hello, Python!\")\n\n# 변수 정의: 이름표 붙이기\nmessage = \"Python is fun\"\nprint(message)\n\n# 같은 객체에 다른 이름표 붙이기\na = [1, 2, 3]\nb = a\n\nprint(id(a))\nprint(id(b))",
+    "steps": [
+      {
+        "title": "Hello World",
+        "explanation": "**`print(\"Hello, Python!\")`** -- 调用 Python 的内置函数 `print()`。\n\n这一行就是你的第一个 Python 程序。它将括号内的字符串 `\"Hello, Python!\"` 输出到屏幕（控制台）。\n\n**为什么这么简单？** C 语言需要 `#include <stdio.h>` 和 `main()` 函数，Java 需要 `public class` 和 `public static void main`。但 Python **从第一行就可以直接执行**，不需要任何样板代码。这种简洁性是 Python 最大的优势。\n\n**Python 内部原理：** `print()` 函数在内部调用参数的 `__str__()` 方法将其转换为字符串，然后写入 `sys.stdout`（标准输出流）。由于字符串已经是字符串，所以无需转换直接输出。\n\n**注意：** `print` 是一个函数，必须使用括号 `()`。`print \"hello\"` 是 Python 2 的语法，在 Python 3 中会引发 `SyntaxError`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(\"Hello, Python!\")",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": [],
+          "output": [
+            "Hello, Python!"
+          ]
+        }
+      },
+      {
+        "title": "变量是标签",
+        "explanation": "**`message = \"Python is fun\"`** -- 创建一个变量并将其绑定到字符串对象。\n\n当这段代码执行时，会依次发生两件事：\n1. 首先，在内存中创建字符串对象 `\"Python is fun\"`。\n2. 然后，将名为 `message` 的**标签**贴到该对象上。\n\n**类比：** 就像在超市货架上的商品（对象）上贴价格标签（变量）一样。价格标签本身不是商品！即使你撕掉标签，商品仍然存在，你也可以贴上其他标签。\n\n**Python 内部原理：** Python 首先在堆（heap）内存中分配一个 `str` 类型的对象，该对象的引用计数（reference count）被设置为 1。然后，在当前命名空间（此处为全局命名空间）的字典中添加条目 `{\"message\": <对象地址>}`。\n\n**与其他语言的区别：** 在 C 或 Java 中，必须先声明类型，如 `int a = 10;`，但 Python 不需要类型声明。因为类型属于**对象**而非变量（动态类型）。",
+        "visualizationType": "pythonMemory",
+        "code": "message = \"Python is fun\"",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "message",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python is fun\"",
+              "pyId": "1001"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "打印变量的值",
+        "explanation": "**`print(message)`** -- 输出 `message` 标签所指向的对象的值。\n\n当你将变量名 `message` 传递给 `print()` 时，Python 首先找到 `message` 所指向的对象。这称为**解引用（Dereference）**。就是沿着标签找到实际商品（对象）的过程。\n\n**为什么不加引号？** 如果写 `print(\"message\")`，会原样打印字符串字面量 `message`。而 `print(message)` 打印的是变量 `message` 指向的**对象的值** `Python is fun`。引号的有无会完全改变结果。\n\n**Python 内部原理：** Python 解释器在命名空间字典中查找键 `\"message\"`，获取该对象的内存地址，然后将该地址处的 `str` 对象内容输出到 `sys.stdout`。\n\n**注意：** 使用未定义的变量会引发 `NameError: name 'xxx' is not defined`。",
+        "visualizationType": "pythonMemory",
+        "code": "print(message)",
+        "pythonMemoryState": {
+          "output": [
+            "Python is fun"
+          ],
+          "names": [
+            {
+              "name": "message",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python is fun\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "创建列表",
+        "explanation": "**`a = [1, 2, 3]`** -- 创建一个列表对象并将其绑定到变量 `a`。\n\n使用方括号 `[]` 在内存中创建一个包含三个整数的列表对象，并将标签 `a` 贴上去。\n\n**类比：** 把列表想象成一个带编号隔间的抽屉柜。0 号隔间放着 1，1 号隔间放着 2，2 号隔间放着 3。标签 `a` 贴在这个抽屉柜上。\n\n**为什么重要？** Python 的变量不像 C 语言那样是"装值的盒子"。变量更像是**指向对象的指针（引用）**。标签 `a` 只是知道列表对象存储的内存地址，它并不"包含"列表本身。\n\n**Python 内部原理：** 列表 `[1, 2, 3]` 在堆内存中分配。在内部，列表是**存储各元素内存地址的数组**。也就是说，整数对象 1、2、3 各自独立存在，列表管理的是它们地址的集合。",
+        "visualizationType": "pythonMemory",
+        "code": "a = [1, 2, 3]",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[1, 2, 3]",
+              "pyId": "2002"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "共享标签（别名）",
+        "explanation": "**`b = a`** -- 在 `a` 所指向的同一个列表对象上再贴一个标签 `b`。\n\n这一行**不会**复制列表！`b` 指向与 `a` **完全相同的列表对象**。一个列表上贴着 `a` 和 `b` 两个标签。这称为**别名（Aliasing）**。\n\n**类比：** 就像一个人既有本名又有昵称。叫"张三"或叫"小三"都是同一个人。`a` 和 `b` 只是同一个对象的不同名称。\n\n**为什么危险？** 如果通过 `b` 修改列表，通过 `a` 也能看到变化！例如执行 `b.append(4)` 后，`a` 也变成 `[1, 2, 3, 4]`——因为它们是同一个对象。\n\n**Python 内部原理：** 执行 `b = a` 时，Python 将 `a` 指向的对象的引用计数加 1（1 -> 2）。完全不会发生新的内存分配。只是在命名空间中添加 `{\"b\": <相同地址>}`。\n\n**注意：** 要创建独立副本，请使用 `b = a[:]`、`b = list(a)` 或 `b = a.copy()`。",
+        "keyInsight": "变量赋值 = 贴标签",
+        "visualizationType": "pythonMemory",
+        "code": "b = a",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ]
+        }
+      },
+      {
+        "title": "查看 a 的对象 ID",
+        "explanation": "**`print(id(a))`** -- 打印 `a` 所指向对象的唯一 ID（内存地址）。\n\n`id()` 是 Python 的内置函数，返回对象的**唯一标识符**。在 CPython（标准 Python 实现）中，这个值就是实际的**内存地址**。\n\n**类比：** 就像每个人都有唯一的身份证号一样，Python 中的每个对象都有唯一的 ID。即使名称（变量名）不同，如果 ID 相同，就是同一个人（同一个对象）。\n\n**为什么按这个顺序？** 为了证明 `a` 和 `b` 指向同一个对象，我们先检查 `a` 的 ID，在下一步中检查 `b` 的 ID 进行对比。\n\n**Python 内部原理：** `id()` 函数在 C 层面返回对象指针转换为整数的值。只要对象存活，这个值就永远不变，同时存在的两个对象不可能拥有相同的 ID。",
+        "visualizationType": "pythonMemory",
+        "code": "print(id(a))",
+        "pythonMemoryState": {
+          "output": [
+            "2002"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": []
+        }
+      },
+      {
+        "title": "查看 b 的对象 ID",
+        "explanation": "**`print(id(b))`** -- 打印 `b` 所指向对象的唯一 ID。\n\n**结果相同！** `a` 和 `b` 的 ID 打印出相同的值（`2002`）。这确切地证明了 `a` 和 `b` 指向**同一内存地址的同一个对象**。\n\n**核心总结：**\n- `b = a` 不是复制对象，而是在同一个对象上**再贴一个标签**。\n- 如果 `id(a) == id(b)`，两个变量指向同一个对象。\n- 更简单的检查方法是使用 `a is b`（返回 `True`）。\n\n**Python 内部原理：** `is` 运算符在内部比较两个对象的 `id()` 值。`a is b` 与 `id(a) == id(b)` 完全等价。\n\n**注意：** `==` 检查值是否相等，`is` 检查是否是同一个对象。`[1,2,3] == [1,2,3]` 为 `True`，但 `[1,2,3] is [1,2,3]` 为 `False`（它们是两个不同的对象）。",
+        "visualizationType": "pythonMemory",
+        "code": "print(id(b))",
+        "pythonMemoryState": {
+          "output": [
+            "2002"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在 Python 中，`a = 10` 最恰当的比喻是什么？",
+    "options": [
+      "把数字 10 放进名为变量 a 的盒子里",
+      "声明变量 a 并分配内存空间",
+      "在整数对象 10 上贴一个名为 a 的标签",
+      "a 是存储 10 的硬盘位置"
+    ],
+    "correctIndex": 2,
+    "explanation": "在 Python 中，变量是指向对象的引用（Reference）。\n"标签"的比喻最为准确。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "必须声明变量（int a;）",
+      "correct": "Python 没有类型声明。\n只需赋值，变量就会自动创建。",
+      "why": "因为 Python 是动态类型（Dynamic Typing）语言。\n类型属于"对象"而非变量。"
+    }
+  ],
+  "keyTakeaway": "Python 很简洁。变量不是装值的盒子，而是指向对象的标签。"
+}

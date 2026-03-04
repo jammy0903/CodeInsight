@@ -1,0 +1,131 @@
+{
+  "lessonId": "c-8-1",
+  "title": "Function Pointer Syntax",
+  "concept": "函数指针将函数地址存入变量，在运行时切换要执行的函数",
+  "content": {
+    "code": "#include <stdio.h>\n\nint add(int a, int b) {\n    return a + b;\n}\n\nint sub(int a, int b) {\n    return a - b;\n}\n\nint main() {\n    int (*op)(int, int);\n\n    op = add;\n    printf(\"add: %d\\n\", op(10, 20));\n\n    op = sub;\n    printf(\"sub: %d\\n\", op(10, 20));\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含 stdio.h 头文件",
+        "explanation": "使用 `printf` 所需的标准输入输出头文件。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "定义 add 函数",
+        "explanation": "`add` 将两个整数相加并返回结果。\n\n函数名可以像代码段中函数起始地址一样使用。",
+        "visualizationType": "cMemory",
+        "code": "int add(int a, int b) {",
+        "highlightOffset": [0, 1, 2]
+      },
+      {
+        "title": "定义 sub 函数",
+        "explanation": "`sub` 以相同的签名执行减法。\n\n由于与 `add` 签名相同，可以赋给同一个函数指针。",
+        "visualizationType": "cMemory",
+        "code": "int sub(int a, int b) {",
+        "highlightOffset": [0, 1, 2]
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧。\n\n接下来声明函数指针并交替调用目标函数。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "声明函数指针",
+        "explanation": "`int (*op)(int, int)` 是一个接收两个 int 并返回 int 的函数指针。\n\n括号位置不同会变成完全不同的声明，需要注意。",
+        "visualizationType": "cMemory",
+        "code": "int (*op)(int, int);",
+        "stack": [
+          {
+            "name": "op",
+            "type": "int (*)(int, int)",
+            "value": "???",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "赋值 add 函数的地址",
+        "explanation": "`op = add;` 使 `op` 指向 add 函数。",
+        "visualizationType": "cMemory",
+        "code": "op = add;",
+        "stack": [
+          {
+            "name": "op",
+            "type": "int (*)(int, int)",
+            "value": "0xCODE1",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "通过指针调用 add 函数",
+        "explanation": "`op(10,20)` 当前连接到 add，返回结果 30。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"add: %d\\n\", op(10, 20));",
+        "stdout": "add: 30"
+      },
+      {
+        "title": "重新赋值为 sub 函数的地址",
+        "explanation": "`op = sub;` 将不同的函数地址重新赋给同一个指针。",
+        "visualizationType": "cMemory",
+        "code": "op = sub;",
+        "stack": [
+          {
+            "name": "op",
+            "type": "int (*)(int, int)",
+            "value": "0xCODE2",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "通过指针调用 sub 函数",
+        "explanation": "同样的 `op(10,20)` 调用这次执行 sub，返回 -10。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"sub: %d\\n\", op(10, 20));",
+        "stdout": "add: 30\nsub: -10",
+        "keyInsight": "相同的调用表达式会因指针指向的函数不同而产生不同的行为。"
+      },
+      {
+        "title": "程序结束",
+        "explanation": "通过 `return 0;` 结束程序。\n\n要点：函数指针是在运行时切换执行目标的工具。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪个正确声明了指向 void func(int x) 的指针？",
+    "options": [
+      "void *p(int);",
+      "void (*p)(int);",
+      "void *p(int x);",
+      "void (p*)(int);"
+    ],
+    "correctIndex": 1,
+    "explanation": "格式为：返回类型 (*变量名)(参数类型)。\n`(*p)` 括号是关键。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "函数指针与变量指针的内存结构不同。",
+      "correct": "它们同样是保存 32/64 位地址值的变量。\n唯一的区别是指向代码段而非数据段。",
+      "why": "从 CPU 的角度来看，数据地址和代码地址都只是数字。"
+    }
+  ],
+  "keyTakeaway": "函数指针通过在运行时切换执行的函数，实现灵活的设计。"
+}

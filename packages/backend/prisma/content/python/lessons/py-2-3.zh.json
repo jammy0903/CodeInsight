@@ -1,0 +1,463 @@
+{
+  "lessonId": "py-2-3",
+  "title": "For 循环：重复固定次数",
+  "concept": "重复固定次数或遍历集合中的元素",
+  "content": {
+    "code": "# 1. range() 사용\nfor i in range(3):  # 0, 1, 2 (3번)\n    print(f\"Loop {i}\")\n\n# 2. 리스트 순회 (For-each)\nfruits = [\"Apple\", \"Banana\"]\nfor f in fruits:\n    print(f)",
+    "steps": [
+      {
+        "title": "for 循环开始 (range)",
+        "explanation": "**`for i in range(3):`** -- 将 `range(3)` 生成的数字（0, 1, 2）逐个赋值给 `i` 进行迭代。\n\nPython 从上到下按顺序执行。`range(3)` 是一个按顺序生成 `0, 1, 2` 的**迭代器（iterator）**对象。`range(3)` 实际上不会创建列表 `[0, 1, 2]`，而是在需要时逐个生成数字（内存高效）。\n\nfor 循环开始时，获取第一个值 `0` 并赋值给变量 `i`。\n\n**为什么从 0 开始？** `range(3)` 的意思是"从 0 开始到 3（不包含）"。在编程中，从 0 开始计数是惯例（0-indexed）。可以像 `range(1, 4)` 这样指定起始值从 1 开始。\n\n**与 while 的区别：** while 是"条件为真时重复"，而 for 是"遍历预定的项目"。for 会自动获取下一个值，不需要手动递增计数器。\n\n**类比：** 就像盘子上放了 3 个水果（编号 0、1、2），一个一个拿起来。拿起了第一个水果（0）。\n\n**Python 内部原理：** `range(3)` 返回一个 `range` 类型的对象。for 循环内部通过 `iter(range(3))` 创建迭代器，每次迭代调用 `next()` 获取下一个值。当值耗尽时，会抛出 `StopIteration` 异常，循环终止。\n\n**执行顺序**: 创建 range(3) 迭代器 → next() 获取 0 → i = 0 → 执行代码块",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(3):  # 0, 1, 2 (3번)",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "第 1 次迭代开始",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行循环体（第 1 次）",
+        "explanation": "**`print(f\"Loop {i}\")`** -- 这是 for 循环代码块内的代码。输出当前 `i` 的值（0）。\n\n缩进块被执行。f-string 中的 `{i}` 被替换为当前值 `0`，因此输出 `\"Loop 0\"`。\n\n**类比：** 拿起第一个水果（编号 0）并喊出它的名字。\"Loop 0!\"\n\n**Python 内部原理：** f-string 调用 `i.__format__('')` 获取字符串 `\"0\"`，与字面量 `\"Loop \"` 组合生成新字符串 `\"Loop 0\"`。这个字符串被传递给 `print()` 并输出到 `sys.stdout`。\n\n**注意：** 与 while 循环不同，这段代码**不需要**递增计数器的代码（`i += 1`）。for 循环会自动获取下一个值。\n\n**执行顺序**: f-string 求值({i}→0) → print 执行 → 代码块结束 → 跳转到第 2 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Loop {i}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Loop 0"
+          ],
+          "note": null,
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 0,
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "进入下一次迭代（第 2 次）",
+        "explanation": "**`for i in range(3):`** -- 代码块结束后自动返回循环起点。这是第 2 次迭代。\n\n**为什么回到第 2 行？** 和 while 一样，for 循环在代码块结束时会自动跳转回循环起点。通过 `next()` 向 `range(3)` 迭代器请求下一个数字，得到 `1` 并重新赋值给 `i`。\n\n**与 while 的核心区别：** while 每次都需要手动检查条件（`count > 0`）并递减计数器（`count -= 1`）。而 for **自动获取下一项**并更新 `i`。完全不需要 `i += 1` 这样的代码。\n\n**类比：** 盘子上的第二个水果（编号 1）被自动拿起。你不需要自己伸手——传送带会把下一个水果送到你面前。\n\n**Python 内部原理：** for 循环的迭代器协议在工作。调用 `next(iterator)` 返回 `1`，绑定到 `i`。`i` 对之前整数对象 `0` 的引用被释放。\n\n**执行顺序**: 代码块结束 → 跳转到第 2 行 → next() 获取 1 → i = 1 → 执行代码块",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(3):  # 0, 1, 2 (3번)",
+        "pythonMemoryState": {
+          "note": "第 2 次迭代开始",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行循环体（第 2 次）",
+        "explanation": "**`print(f\"Loop {i}\")`** -- 在第 2 次迭代中，使用当前 `i` 的值（1）输出 \"Loop 1\"。\n\nf-string 中的 `{i}` 被替换为当前值 `1`，因此输出 `\"Loop 1\"`。\n\n**输出追踪：** `Loop 0` → **`Loop 1`** → 接下来将输出 `Loop 2`。\n\n**执行顺序**: f-string 求值({i}→1) → print 执行 → 代码块结束 → 跳转到第 2 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Loop {i}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Loop 1"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int2",
+              "type": "int",
+              "value": 1,
+              "pyId": "1002"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "进入下一次迭代（第 3 次）",
+        "explanation": "**`for i in range(3):`** -- 这是第 3 次（最后一次）迭代。从代码块末尾跳回第 2 行。\n\n通过 `next()` 向 `range(3)` 迭代器请求下一个数字，得到最后一个值 `2` 并重新赋值给 `i`。\n\n**为什么 2 是最后一个？** `range(3)` 生成 `0, 1, 2`，不包含 `3`。因为是"小于 3"。下次调用 `next()` 时将抛出 `StopIteration`，循环终止。\n\n**类比：** 拿起盘子上最后一个水果（编号 2）。处理完这个水果后，盘子就空了，循环结束。\n\n**执行顺序**: 代码块结束 → 跳转到第 2 行 → next() 获取 2 → i = 2 → 执行代码块",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(3):  # 0, 1, 2 (3번)",
+        "pythonMemoryState": {
+          "note": "第 3 次迭代开始（最后一次）",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "执行循环体（第 3 次）",
+        "explanation": "**`print(f\"Loop {i}\")`** -- 在第 3 次（最后一次）迭代中，使用当前 `i` 的值（2）输出 \"Loop 2\"。\n\n这是 range(3) 循环的最后一次输出。接下来迭代器将耗尽，循环终止。\n\n**完整输出追踪：** `Loop 0` → `Loop 1` → **`Loop 2`**（共 3 次迭代，因为 range(3)）\n\n**执行顺序**: f-string 求值({i}→2) → print 执行 → 代码块结束 → 跳转到第 2 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f\"Loop {i}\")",
+        "pythonMemoryState": {
+          "output": [
+            "Loop 2"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "for 循环结束",
+        "explanation": "**`for i in range(3):`** -- 迭代器耗尽，for 循环终止。\n\n从代码块末尾跳回第 2 行。通过 `next()` 向 `range(3)` 迭代器请求下一个数字，但 0、1、2 已全部耗尽，因此抛出 **`StopIteration` 异常**。for 循环自动捕获这个异常并终止循环。\n\n**为什么不包含 3？** `range(3)` 表示"从 0 开始到 3（不包含）"。Python 的 range 总是**不包含结束值（exclusive）**。这是 Python 的一致规则，切片（`s[0:3]`）也是如此。\n\n**类比：** 盘子上没有更多水果了。传送带停止，进入下一项任务。\n\n**循环结束后 i 的值：** 重要的是，循环结束后 `i` 仍然保持最后的值 `2`。在 Python 中，for 循环变量在循环结束后不会消失。\n\n**Python 内部原理：** 当 `next(iterator)` 抛出 `StopIteration` 时，for 循环内部的 `try/except` 机制捕获它并跳出循环字节码。\n\n**执行顺序**: 代码块结束 → 跳转到第 2 行 → 调用 next() → StopIteration → 退出循环 → 第 6 行",
+        "visualizationType": "pythonMemory",
+        "code": "for i in range(3):  # 0, 1, 2 (3번)",
+        "pythonMemoryState": {
+          "note": "range 耗尽 → 循环终止 → 跳到第 6 行",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "初始化列表变量",
+        "explanation": "**`fruits = [\"Apple\", \"Banana\"]`** -- 创建包含 2 个字符串的列表对象，并贴上标签 `fruits`。\n\n前一个 for 循环结束后，Python 按顺序继续执行下一行。方括号 `[]` 创建一个列表对象。\n\n**为什么是这个顺序？** 要在下面的 for-each 循环中遍历 `fruits`，必须先创建列表。\n\n**range 和列表的区别：** `range(3)` 只生成数字，而列表可以包含**任何类型**——字符串、数字、布尔值等。for 循环可以遍历所有这些类型。\n\n**Python 内部原理：** 列表字面量 `[\"Apple\", \"Banana\"]` 在堆内存中分配一个新的 list 对象。这个列表对象内部按顺序存储了两个字符串对象的**引用（指针）**。`fruits` 标签指向这个列表对象。\n\n**注意：** 前一个 for 循环的变量 `i` 仍然保持值 `2`。在 Python 中，for 循环变量在循环结束后不会消失，它们留在全局命名空间中。\n\n**执行顺序**: 前一个循环终止 → 执行第 6 行 → 创建列表 → 赋值给 fruits → 第 7 行",
+        "visualizationType": "pythonMemory",
+        "code": "fruits = [\"Apple\", \"Banana\"]",
+        "pythonMemoryState": {
+          "note": "之前的 i 保持不变（Python 中变量在被覆盖前一直存在）",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]",
+              "pyId": "1004"
+            }
+          ]
+        }
+      },
+      {
+        "title": "for-each 循环开始",
+        "explanation": "**`for f in fruits:`** -- 逐个将列表中的每个元素赋值给 `f` 进行迭代（for-each 方式）。\n\n**与 range 的区别：** `range()` 按顺序生成数字，而这里是遍历**列表中的元素本身**。for 循环开始时，从 `fruits` 中获取第一个元素 `\"Apple\"` 并赋值给变量 `f`。\n\n**为什么不需要索引（0, 1）也能遍历？** Python 的 for 与其他语言的 `for(int i=0; i<n; i++)` 不同。Python 使用 for-each 方式，**直接将元素赋值给变量**。如果需要索引，可以使用 `for i, f in enumerate(fruits):`。\n\n**类比：** 就像从篮子里一个一个拿水果。首先拿出了 \"Apple\"，拿在手里（f = \"Apple\"）。直接处理水果本身，而不是编号。\n\n**Python 内部原理：** 调用列表的 `__iter__()` 方法创建列表迭代器。`next(iterator)` 返回第一个元素 `\"Apple\"`，`f` 标签指向这个字符串对象。\n\n**注意：** 变量名 `f` 可以使用任何名称。建议使用有意义的名称，如 `for fruit in fruits:` 或 `for item in fruits:`。\n\n**执行顺序**: 创建 fruits 迭代器 → next() 获取 \"Apple\" → f = \"Apple\" → 执行代码块",
+        "visualizationType": "pythonMemory",
+        "code": "for f in fruits:",
+        "pythonMemoryState": {
+          "note": "第 1 次遍历开始",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "str1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Apple\"",
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出列表元素（第 1 个）",
+        "explanation": "**`print(f)`** -- 输出当前 `f` 指向的值 `\"Apple\"`。\n\n这是 for 循环代码块内的代码。`f` 当前指向字符串对象 `\"Apple\"`，因此屏幕上输出 `Apple`。\n\n**为什么不是 f-string？** 这里的 `f` 是变量名，不是 f-string 的 `f`。`print(f)` 只是简单地输出变量 `f` 的值。f-string 是在引号前加 `f`，如 `f\"...\"`。\n\n**类比：** 喊出从篮子里拿出的水果（Apple）的名字。\n\n**Python 内部原理：** `print(f)` 内部调用 `f.__str__()` 获取字符串表示，并输出到 `sys.stdout`。字符串的 `__str__` 返回自身。\n\n**执行顺序**: 读取 f 的值(\"Apple\") → print 执行 → 代码块结束 → 跳转到第 7 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f)",
+        "pythonMemoryState": {
+          "output": [
+            "Apple"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Apple\"",
+              "pyId": "1005"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "遍历下一个元素（第 2 个）",
+        "explanation": "**`for f in fruits:`** -- 代码块结束后自动返回循环起点。这是第 2 次（最后一次）遍历。\n\n**为什么回到第 7 行？** for 循环在代码块结束时会自动跳转回循环起点。对 `fruits` 列表的迭代器调用 `next()`，获取下一个元素 `\"Banana\"` 并重新赋值给 `f`。\n\n`f` 标签从之前的 `\"Apple\"` 移动到 `\"Banana\"`。`\"Apple\"` 对象本身仍然存在于 `fruits` 列表中。\n\n**类比：** 从篮子里拿出第二个水果（Banana）。第一个水果（Apple）仍然在篮子里。\n\n**执行顺序**: 代码块结束 → 跳转到第 7 行 → next() 获取 \"Banana\" → f = \"Banana\" → 执行代码块",
+        "visualizationType": "pythonMemory",
+        "code": "for f in fruits:",
+        "pythonMemoryState": {
+          "note": "第 2 次遍历开始（最后一次）",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "str2",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Banana\"",
+              "pyId": "1006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "输出列表元素（第 2 个）",
+        "explanation": "**`print(f)`** -- 输出当前 `f` 指向的值 `\"Banana\"`。\n\n这是 for-each 循环的最后一次输出。列表中只有 2 个元素，所以接下来迭代器将耗尽。\n\n**完整输出：** `Apple` → **`Banana`**（已遍历列表中的所有元素）\n\n**执行顺序**: 读取 f 的值(\"Banana\") → print 执行 → 代码块结束 → 跳转到第 7 行",
+        "visualizationType": "pythonMemory",
+        "code": "print(f)",
+        "pythonMemoryState": {
+          "output": [
+            "Banana"
+          ],
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Banana\"",
+              "pyId": "1006"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "for-each 循环结束",
+        "explanation": "**`for f in fruits:`** -- 列表中的所有元素已耗尽，for-each 循环终止。\n\n从代码块末尾跳回第 7 行。对 `fruits` 列表的迭代器调用 `next()`，但 `\"Apple\"`、`\"Banana\"` 2 个元素已全部遍历完毕，因此抛出 **`StopIteration`** 异常。for 循环捕获该异常并终止。\n\n**for 循环核心总结：**\n1. **`range()` 遍历：** `for i in range(n)` -- 按固定次数遍历数字（从 0 到 n-1）\n2. **列表遍历：** `for item in list` -- 直接遍历每个元素（for-each）\n3. **共同点：** 都使用迭代器协议，元素耗尽时自动终止\n\n**Python 内部原理：** 当 `StopIteration` 异常被抛出时，for 循环的字节码捕获它并跳出循环。循环结束后，`f` 仍然保持最后的值 `\"Banana\"`。\n\n**注意：** 如果对空列表（`[]`）使用 for 循环，代码块**一次都不会执行**。因为第一次调用 `next()` 就会立即抛出 `StopIteration`。\n\n**执行顺序**: 代码块结束 → 跳转到第 7 行 → 调用 next() → StopIteration → 退出循环 → 程序结束",
+        "visualizationType": "pythonMemory",
+        "code": "for f in fruits:",
+        "pythonMemoryState": {
+          "note": "列表耗尽 → 循环终止",
+          "names": [
+            {
+              "name": "i",
+              "pointsTo": "int3"
+            },
+            {
+              "name": "fruits",
+              "pointsTo": "list1"
+            },
+            {
+              "name": "f",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int3",
+              "type": "int",
+              "value": 2,
+              "pyId": "1003"
+            },
+            {
+              "id": "list1",
+              "type": "list",
+              "value": "[\"Apple\", \"Banana\"]",
+              "pyId": "1004"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Banana\"",
+              "pyId": "1006"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "range(1, 4) 生成的数字是什么？",
+    "options": [
+      "1, 2, 3, 4",
+      "0, 1, 2, 3",
+      "1, 2, 3",
+      "1, 2, 3, 4, 5"
+    ],
+    "correctIndex": 2,
+    "explanation": "起始值是 1（包含），结束值是 4（不包含）。\n所以生成 1, 2, 3。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "可以写 for i in 5:",
+      "correct": "数字（int）本身是不可迭代的（not iterable）。",
+      "why": "必须写成 `range(5)`。\n`for` 后面需要列表、字符串、range 等"可迭代对象"。"
+    }
+  ],
+  "keyTakeaway": "按次数重复用 `range()`，遍历列表直接用 `in 列表`。"
+}

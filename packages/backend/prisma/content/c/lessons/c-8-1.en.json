@@ -1,0 +1,131 @@
+{
+  "lessonId": "c-8-1",
+  "title": "Function Pointer Syntax",
+  "concept": "A function pointer stores a function's address in a variable to switch which function runs at runtime",
+  "content": {
+    "code": "#include <stdio.h>\n\nint add(int a, int b) {\n    return a + b;\n}\n\nint sub(int a, int b) {\n    return a - b;\n}\n\nint main() {\n    int (*op)(int, int);\n\n    op = add;\n    printf(\"add: %d\\n\", op(10, 20));\n\n    op = sub;\n    printf(\"sub: %d\\n\", op(10, 20));\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h header",
+        "explanation": "Standard I/O header for using `printf`.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Defining the add function",
+        "explanation": "`add` adds two integers and returns the result.\n\nA function name can be used like the starting address of the function in the code segment.",
+        "visualizationType": "cMemory",
+        "code": "int add(int a, int b) {",
+        "highlightOffset": [0, 1, 2]
+      },
+      {
+        "title": "Defining the sub function",
+        "explanation": "`sub` performs subtraction with the same signature.\n\nSince it shares the same signature as `add`, it can be assigned to the same function pointer.",
+        "visualizationType": "cMemory",
+        "code": "int sub(int a, int b) {",
+        "highlightOffset": [0, 1, 2]
+      },
+      {
+        "title": "Starting main function",
+        "explanation": "The main frame is created.\n\nNow we declare a function pointer and swap the target function.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Declaring a function pointer",
+        "explanation": "`int (*op)(int, int)` is a function pointer that takes two ints and returns an int.\n\nIf the parentheses are misplaced, it becomes an entirely different declaration.",
+        "visualizationType": "cMemory",
+        "code": "int (*op)(int, int);",
+        "stack": [
+          {
+            "name": "op",
+            "type": "int (*)(int, int)",
+            "value": "???",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Assigning the add function's address",
+        "explanation": "`op = add;` makes `op` point to the add function.",
+        "visualizationType": "cMemory",
+        "code": "op = add;",
+        "stack": [
+          {
+            "name": "op",
+            "type": "int (*)(int, int)",
+            "value": "0xCODE1",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Calling add through the pointer",
+        "explanation": "`op(10,20)` is currently linked to add, so it returns 30.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"add: %d\\n\", op(10, 20));",
+        "stdout": "add: 30"
+      },
+      {
+        "title": "Reassigning to the sub function's address",
+        "explanation": "`op = sub;` reassigns a different function address to the same pointer.",
+        "visualizationType": "cMemory",
+        "code": "op = sub;",
+        "stack": [
+          {
+            "name": "op",
+            "type": "int (*)(int, int)",
+            "value": "0xCODE2",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "Calling sub through the pointer",
+        "explanation": "The same `op(10,20)` call now executes sub and returns -10.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"sub: %d\\n\", op(10, 20));",
+        "stdout": "add: 30\nsub: -10",
+        "keyInsight": "The same call expression behaves differently depending on which function the pointer targets."
+      },
+      {
+        "title": "Program termination",
+        "explanation": "The program ends with `return 0;`.\n\nKey point: Function pointers are a tool for swapping the execution target at runtime.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which correctly declares a pointer to void func(int x)?",
+    "options": [
+      "void *p(int);",
+      "void (*p)(int);",
+      "void *p(int x);",
+      "void (p*)(int);"
+    ],
+    "correctIndex": 1,
+    "explanation": "The format is: return_type (*variable_name)(parameter_types).\nThe `(*p)` parentheses are the key."
+  },
+  "misconceptions": [
+    {
+      "wrong": "Function pointers have a different memory structure than variable pointers.",
+      "correct": "They are variables holding 32/64-bit address values just the same.\nThe only difference is they point to the code segment instead of the data segment.",
+      "why": "From the CPU's perspective, data addresses and code addresses are all just numbers."
+    }
+  ],
+  "keyTakeaway": "Function pointers enable flexible design by allowing you to switch which function executes at runtime."
+}

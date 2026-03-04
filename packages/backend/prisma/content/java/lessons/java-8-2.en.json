@@ -1,0 +1,135 @@
+{
+  "lessonId": "java-8-2",
+  "title": "HashMap: The Magic of Hash Functions",
+  "concept": "HashMap is like a magic dictionary that instantly finds a 'Value' when you provide a 'Key'.",
+  "content": {
+    "code": "import java.util.HashMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        HashMap<String, Integer> scores = new HashMap<>();\n        \n        scores.put(\"Alice\", 90);\n        scores.put(\"Bob\", 85);\n        \n        System.out.println(scores.get(\"Alice\")); // 90\n    }\n}",
+    "steps": [
+      {
+        "title": "Package Import",
+        "explanation": "**`import java.util.HashMap;`**\n\nImporting `HashMap`, which stores data as key-value pairs.",
+        "visualizationType": "javaMemory",
+        "code": "import java.util.HashMap;",
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "main Method Starts",
+        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nLet's try using the magic dictionary `HashMap`.",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating the HashMap",
+        "explanation": "**Execution flow:**\n1. A `HashMap` object is created on the heap.\n2. Internally, a 'bucket' array is prepared for storing data.\n\n**Magic box:**\nIt's a magic dictionary that instantly finds the Value when you give it a Key.",
+        "visualizationType": "javaMemory",
+        "code": "HashMap<String, Integer> scores = new HashMap<>();",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "scores",
+              "value": "0x001",
+              "frame": "main",
+              "type": "HashMap<String, Integer>"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "size: 0, buckets: []",
+              "type": "HashMap",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Storing Alice's Score",
+        "explanation": "**Execution flow:**\n1. The hash code (ID) for `Alice` is computed.\n2. This ID determines which drawer (Bucket) to place it in.\n3. The pair `{Key:'Alice', Value:90}` is stored in that drawer.\n\n**Instant placement:**\nJust by looking at the label (Key), we immediately know where to put it.",
+        "visualizationType": "javaMemory",
+        "code": "scores.put(\"Alice\", 90);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{\"Alice\": 90}",
+              "type": "HashMap",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Storing Bob's Score",
+        "explanation": "**Execution flow:**\n1. `Bob`'s hash code is computed and it finds its own spot.\n2. The pair `{Key:'Bob', Value:85}` is stored in the assigned drawer.\n\n**Separate rooms:**\nDifferent keys are usually assigned to different rooms.",
+        "visualizationType": "javaMemory",
+        "code": "scores.put(\"Bob\", 85);",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{\"Alice\": 90, \"Bob\": 85}",
+              "type": "HashMap",
+              "changed": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "Looking Up Alice (get)",
+        "explanation": "**Execution flow:**\n1. The hash code for `Alice` is computed again.\n2. It instantly jumps to the drawer where it was stored.\n3. The value `90` is retrieved.\n\n**Lightning-fast lookup (O(1)):**\nEven with a million entries, knowing the hash code means knowing the location instantly -- making it incredibly fast!",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(scores.get(\"Alice\")); // 90",
+        "javaMemoryState": {
+          "heap": [
+            {
+              "address": "0x001",
+              "content": "{\"Alice\": 90, \"Bob\": 85}",
+              "type": "HashMap"
+            }
+          ],
+          "output": [
+            "90"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens when you put() data with the same Key in a HashMap?",
+    "options": [
+      "An error occurs",
+      "The existing data is overwritten with the new data",
+      "Both entries are stored as a list",
+      "It is ignored"
+    ],
+    "correctIndex": 1,
+    "explanation": "Keys must be unique in a Map.\nWhen you store data with an existing Key, the old Value is replaced with the new one."
+  },
+  "misconceptions": [
+    {
+      "wrong": "HashMap stores data in the order it was inserted.",
+      "correct": "No! HashMap does not guarantee order.",
+      "why": "Data is distributed across arbitrary positions (Buckets) based on the hash function result.\nIf order matters, use LinkedHashMap."
+    }
+  ],
+  "keyTakeaway": "When you want to find data at lightning speed using Key-Value pairs, HashMap is the answer!"
+}

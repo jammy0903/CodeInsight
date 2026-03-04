@@ -1,0 +1,129 @@
+{
+  "lessonId": "java-1-6",
+  "title": "Method Definition",
+  "concept": "A method is a reusable block of code. You must specify a return type, name, and parameters.",
+  "content": {
+    "code": "public class Main {\n    public static int add(int a, int b) {\n        int sum = a + b;\n        return sum;\n    }\n\n    public static int square(int n) {\n        return n * n;\n    }\n\n    public static void main(String[] args) {\n        int result = add(3, 7);\n        System.out.println(\"3 + 7 = \" + result);\n\n        int squared = square(5);\n        System.out.println(\"5^2 = \" + squared);\n    }\n}\n",
+    "steps": [
+      {
+        "title": "Method Body",
+        "explanation": "**`int sum = a + b;`**\n\nAdds parameters a and b, then stores the result in sum.\na=3, b=7, so sum=10\n",
+        "visualizationType": "javaMemory",
+        "code": "int sum = a + b;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "add:a",
+              "value": "3",
+              "type": "Main.add()"
+            },
+            {
+              "name": "add:b",
+              "value": "7",
+              "type": "Main.add()"
+            },
+            {
+              "name": "add:sum",
+              "value": "10",
+              "type": "Main.add()"
+            },
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x036",
+              "content": "[]",
+              "type": "java.lang.String[]"
+            }
+          ],
+          "output": [],
+          "note": "Line 3 executed"
+        }
+      },
+      {
+        "title": "The return Statement",
+        "explanation": "**`return sum;`**\n\n**return**: Sends the method's result **back** to the caller.\n\nsum (10) is returned to where the method was called.\n",
+        "visualizationType": "javaMemory",
+        "code": "return sum;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 4 executed"
+        }
+      },
+      {
+        "title": "Printing the Result",
+        "explanation": "**`System.out.println(\"3 + 7 = \" + result);`**\n\n**Output**: `3 + 7 = 10`\n",
+        "visualizationType": "javaMemory",
+        "code": "int result = add(3, 7);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "add:a",
+              "value": "3",
+              "type": "Main.add()"
+            },
+            {
+              "name": "add:b",
+              "value": "7",
+              "type": "Main.add()"
+            },
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 12 executed"
+        }
+      },
+      {
+        "title": "Printing the Square Result",
+        "explanation": "**`System.out.println(\"5^2 = \" + squared);`**\n\n**Output**: `5^2 = 25`\n",
+        "visualizationType": "javaMemory",
+        "code": "int squared = square(5);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "square:n",
+              "value": "5",
+              "type": "Main.square()"
+            },
+            {
+              "name": "main:result",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "note": "Line 15 executed"
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What happens if you return a value from a void method?",
+    "options": [
+      "It works normally",
+      "Compilation error",
+      "Runtime error",
+      "The value is ignored"
+    ],
+    "correctIndex": 1,
+    "explanation": "void: A method with no return value.\n\nReturning a value like `return 5;` causes a compilation error!\nIn a void method, you can only use `return;` or omit it entirely.\n"
+  }
+}

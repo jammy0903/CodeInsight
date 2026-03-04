@@ -1,0 +1,116 @@
+{
+  "lessonId": "js-7-2",
+  "title": "V8 内存结构（分代）",
+  "concept": "V8 将对象分为「新生代（新对象）」和「老生代（长期存活的对象）」以高效管理内存。",
+  "content": {
+    "code": "// 1. Young Generation (단명 객체)\nfunction createTemp() {\n  const temp = { id: Math.random() };\n  // 함수 종료 시 참조가 끊기며 GC 대상이 됨\n}\n\n// 2. Old Generation (장수 객체)\nconst cache = [];\nfunction save(data) {\n  cache.push(data); // 전역 배열이 참조를 유지함\n}\n\ncreateTemp(); // Young 영역에 할당되었다가 금방 수거됨\ncreateTemp();\n\nsave({ type: 'important' }); // GC를 여러 번 버티면 Old 영역으로 승격됨",
+    "steps": [
+      {
+        "title": "对象创建（新生代）",
+        "explanation": "当 `createTemp()` 被调用时，内部的 `temp` 对象被分配在 V8 堆的**新生代**区域。\n大多数对象在这里只会短暂存活。",
+        "keyInsight": "新生代是「新生」对象居住的地方——这里的 GC 非常快。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "content": "{id: ...}",
+              "address": "Young"
+            }
+          ]
+        },
+        "code": "createTemp(); // Young 영역에 할당되었다가 금방 수거됨",
+        "highlightOffset": [
+          0,
+          -11,
+          -10
+        ]
+      },
+      {
+        "title": "Minor GC（Scavenge）",
+        "explanation": "当 `createTemp()` 执行完毕后，`temp` 对象不再被引用，成为「垃圾」。\n清扫新生代的 **Minor GC（Scavenge）** 会非常快速地回收它。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "content": "empty (collected)",
+              "address": "Young"
+            }
+          ]
+        },
+        "code": "createTemp(); // Young 영역에 할당되었다가 금방 수거됨",
+        "highlightOffset": [
+          0,
+          -9
+        ]
+      },
+      {
+        "title": "重复创建和回收",
+        "explanation": "再次调用 `createTemp()`。\n和之前一样，`temp` 对象在新生代创建，函数结束时很快消失。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "note": "Object created and collected again",
+              "address": "Young",
+              "content": "note: Object created and collected again"
+            }
+          ]
+        },
+        "code": "createTemp();"
+      },
+      {
+        "title": "创建长期存活的对象",
+        "explanation": "调用 `save` 函数，创建 `{ type: 'important' }` 对象并将其添加到 `cache` 数组中。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "content": "{type: 'important'}",
+              "address": "Young"
+            }
+          ]
+        },
+        "code": "save({ type: 'important' }); // GC를 여러 번 버티면 Old 영역으로 승격됨"
+      },
+      {
+        "title": "引用保持存活（晋升候选）",
+        "explanation": "`cache` 数组是全局变量，因此在整个程序生命周期内存活。\n被 `cache` 引用的任何对象都会持续通过 Minor GC 周期而存活。\n多次通过 GC 周期存活的对象最终会被「晋升」到**老生代**。",
+        "keyInsight": "长期存活的对象会被移动到「安全存储区（Old Space）」以便更高效地管理。",
+        "visualizationType": "memory",
+        "memoryState": {
+          "heap": [
+            {
+              "address": "Young",
+              "content": "???"
+            },
+            {
+              "content": "{type: 'important'}",
+              "note": "Promoted",
+              "address": "Old"
+            }
+          ]
+        },
+        "code": "cache.push(data); // 전역 배열이 참조를 유지함"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "关于 V8 垃圾回收策略，以下哪项说法是正确的？",
+    "options": [
+      "所有对象最初都分配到老生代",
+      "新生代空间很大，GC 很慢",
+      "大多数对象在新生代创建并很快被回收",
+      "GC 必须由开发者手动触发"
+    ],
+    "correctIndex": 2,
+    "explanation": "大多数对象在创建后很快就变得无用（例如函数返回时），因此在小的新生代空间中快速分配和回收是高效的。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "GC 运行时程序不会暂停",
+      "correct": "确实会暂停（Stop-the-world）。\n但时间极短，用户根本察觉不到。",
+      "why": "在内存重新整理期间程序必须暂停以避免冲突。\nV8 将这项工作分解为最小 1ms 的增量（Incremental Marking），因此卡顿几乎不可察觉。"
+    }
+  ],
+  "keyTakeaway": "内存区域按对象生命周期划分。减少不必要的全局变量以防止内存泄漏。"
+}

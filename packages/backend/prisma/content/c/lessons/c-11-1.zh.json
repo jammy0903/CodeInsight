@@ -1,0 +1,119 @@
+{
+  "lessonId": "c-11-1",
+  "title": "if-else 条件语句",
+  "concept": "根据条件执行不同代码的基本分支语句",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int temperature = 35;\n\n    if (temperature >= 30) {\n        printf(\"It's hot!\\n\");\n    } else if (temperature >= 20) {\n        printf(\"Nice weather!\\n\");\n    } else {\n        printf(\"It's cold!\\n\");\n    }\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "main 函数开始",
+        "explanation": "**`int main() {`** -- 程序的入口点。当 `main` 被调用时，栈上会创建一个**栈帧（Stack Frame）**。\n\n本课使用一个 `temperature` 变量来学习如何**根据条件进行程序流程分支**。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "初始化温度变量",
+        "explanation": "**`int temperature = 35;`** -- 声明整型变量 `temperature` 并初始化为 **35**。这一行在栈帧中分配了 4 字节空间，并将 `35` 存入其中。",
+        "code": "int temperature = 35;",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "评估 if 条件（真）",
+        "explanation": "**`if (temperature >= 30) {`** -- 本课的核心：**if 语句**。如果括号内的条件为**真（非零值）**，则执行大括号内的代码；如果为**假（0）**，则跳过。",
+        "code": "if (temperature >= 30) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ]
+      },
+      {
+        "title": "执行真分支（输出）",
+        "explanation": "**`printf(\"It's hot!\\n\");`** -- 由于条件为真，这行被执行，屏幕上输出 `It's hot!`。\n\nif-else if-else 链最重要的规则是：一旦某个条件为真，只执行该块，其余的 `else if` 和 `else` **全部跳过**。",
+        "visualizationType": "terminal",
+        "code": "printf(\"It's hot!\\n\");",
+        "stdout": "It's hot!"
+      },
+      {
+        "title": "跳过 else if / else",
+        "explanation": "**`} else if (temperature >= 20) {`** -- 由于前面的 `if` 条件已经为真，这个 `else if` 和下面的 `else` 块被**完全跳过，甚至不会被评估**。表达式 `temperature >= 20` 不会被执行。",
+        "visualizationType": "cMemory",
+        "code": "} else if (temperature >= 20) {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
+            "name": "temperature",
+            "value": "35",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "stdout": "It's hot!"
+      },
+      {
+        "title": "程序终止",
+        "explanation": "**`return 0;`** -- 条件分支结束后程序正常终止。`return 0` 向操作系统发出"一切正常结束"的信号，随着 main 的栈帧被释放，`temperature` 也从内存中消失。",
+        "code": "return 0;",
+        "stack": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "当 temperature 为 20 时，以下代码的输出结果是什么？\n\nif (temperature >= 30) printf(\"A\");\nelse if (temperature >= 20) printf(\"B\");\nelse if (temperature >= 10) printf(\"C\");",
+    "options": [
+      "A",
+      "B",
+      "BC",
+      "ABC"
+    ],
+    "correctIndex": 1,
+    "explanation": "if-else if 链从上到下依次检查条件，只执行第一个为真的条件所对应的块。\n当 temperature = 20 时，第一个条件（>= 30）为假，第二个（>= 20）为真，所以只输出 B。\n第三个（>= 10）虽然也为真，但因为第二个已经匹配，所以不会执行。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "else if 的条件总是会被检查",
+      "correct": "如果前面的 if 或 else if 中有一个为真，后面所有的 else if / else 都会被跳过。",
+      "why": "if-else if-else 形成一个"链"，找到第一个为真的块后，其余全部忽略。"
+    }
+  ],
+  "keyTakeaway": "if-else if-else 链从上到下检查条件，只执行第一个条件为真的块。"
+}

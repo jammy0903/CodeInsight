@@ -1,0 +1,228 @@
+{
+  "lessonId": "java-7-3",
+  "title": "泛型方法与类型推断",
+  "concept": "Core concept for Generic Methods",
+  "content": {
+    "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
+    "steps": [
+      {
+        "title": "泛型方法定义",
+        "explanation": "**执行流程：**\n1. 定义 `printArray` 方法。\n2. `<T>` 表示该方法被调用时才确定类型。\n\n**独立的泛型：**\n不需要将整个类都设为泛型，只让这一个方法使用泛型就行。\n非常适合创建工具函数！",
+        "visualizationType": "javaMemory",
+        "code": "public static <T> void printArray(T[] array) {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "javaMemoryState": {
+          "stack": [],
+          "heap": [],
+          "metaspace": [
+            {
+              "name": "printArray<T>",
+              "value": "Method Definition"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "main 方法开始",
+        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。",
+        "visualizationType": "javaMemory",
+        "code": "public static void main(String[] args) {",
+        "javaMemoryState": {
+          "metaspace": null
+        }
+      },
+      {
+        "title": "创建数组（Integer、String）",
+        "explanation": "**`Integer[] intArray = {1, 2, 3};`**\n\n在堆中创建 `Integer` 数组和 `String` 数组。\n`intArray` 和 `strArray` 变量分别引用它们。\n\n**类比**：`intArray` 就像准备一个"数字积木箱"，`strArray` 就像准备一个"字母积木箱"。",
+        "visualizationType": "javaMemory",
+        "code": "Integer[] intArray = {1, 2, 3};",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main",
+              "type": "Integer[]"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main",
+              "type": "String[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "Integer[]",
+              "new": true
+            },
+            {
+              "address": "0x200",
+              "content": "[\"A\", \"B\", \"C\"]",
+              "type": "String[]",
+              "new": true
+            }
+          ]
+        }
+      },
+      {
+        "title": "方法调用（T = Integer）",
+        "explanation": "**`printArray(intArray);`**\n\n调用 `printArray`。\n编译器查看 `intArray` 的类型，将 `T` 推断为 `Integer`（类型推断）。\n\n**类比**：就像把"数字纸"放进"万能打印机"（`printArray`），打印机自动识别"哦，这是数字"并切换到数字模式。",
+        "visualizationType": "javaMemory",
+        "code": "printArray(intArray); // T inferred as Integer",
+        "highlightOffset": [
+          0,
+          -12,
+          -11,
+          -10,
+          -9,
+          -8
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main",
+              "type": "Integer[]"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "array",
+              "value": "0x100",
+              "frame": "printArray",
+              "isFinal": true,
+              "type": "T[]"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x100",
+              "content": "[1, 2, 3]",
+              "type": "Integer[]"
+            },
+            {
+              "address": "0x200",
+              "content": "[\"A\", \"B\", \"C\"]",
+              "type": "String[]"
+            }
+          ],
+          "output": [
+            "Integer Array: 1 2 3 "
+          ]
+        }
+      },
+      {
+        "title": "方法调用（T = String）",
+        "explanation": "**执行流程：**\n1. 调用 `printArray(strArray)`。\n2. 这次参数是 `String[]`，所以 `T` 被确定为 `String`。\n3. 创建新的栈帧并执行。\n\n**复用性：**\n一段代码既能打印数字数组，也能打印字符串数组！这就是泛型的力量。",
+        "visualizationType": "javaMemory",
+        "code": "printArray(strArray); // T inferred as String",
+        "highlightOffset": [
+          0,
+          -15,
+          -14,
+          -13,
+          -12,
+          -11
+        ],
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            },
+            {
+              "name": "intArray",
+              "value": "0x100",
+              "frame": "main",
+              "type": "Integer[]"
+            },
+            {
+              "name": "strArray",
+              "value": "0x200",
+              "frame": "main",
+              "type": "String[]"
+            },
+            {
+              "name": "array",
+              "value": "0x200",
+              "frame": "printArray",
+              "isFinal": true,
+              "type": "T[]"
+            }
+          ],
+          "output": [
+            "String Array: A B C "
+          ]
+        }
+      },
+      {
+        "title": "基本类型限制",
+        "explanation": "**执行流程：**\n1. 如果取消这行注释，将会产生编译错误。\n\n**注意事项：**\n`int[]` 是基本类型数组，不是对象数组，因此无法赋值给 `T[]`。\n请记住：泛型只能处理引用类型（Object）！",
+        "visualizationType": "javaMemory",
+        "code": "// printArray(new int[]{1, 2}); // Error! int is not T",
+        "javaMemoryState": {
+          "error": "Compile Error: int[] cannot be converted to T[]",
+          "stack": [
+            {
+              "name": "main",
+              "value": "running",
+              "frame": "main"
+            }
+          ],
+          "output": []
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "泛型方法的类型参数 <T> 的作用域（有效范围）是？",
+    "options": [
+      "整个类",
+      "整个包",
+      "该方法内部",
+      "整个程序"
+    ],
+    "correctIndex": 2,
+    "explanation": "泛型方法的 `<T>` 仅在该方法执行期间有效，即使与类的泛型类型 `<T>` 同名，它们也是完全不同的独立存在（遮蔽/Shadowing）。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "static 方法可以使用类的泛型类型 T。",
+      "correct": "不可以。\nstatic 方法在对象创建之前就加载到内存中，而类的 T 是在对象创建时（如 `new Box<Integer>`）才确定的。\n因此需要单独声明泛型方法。",
+      "why": "static 上下文（类级别）和实例上下文（对象级别）的生命周期不同。"
+    }
+  ],
+  "keyTakeaway": "不需要将整个类都设为泛型，可以通过 `<T>` 只让特定方法变得灵活。static 方法同样可以毫无问题地使用泛型！"
+}

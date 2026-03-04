@@ -1,0 +1,154 @@
+{
+  "lessonId": "java-3-1",
+  "title": "Primitive Type Passing",
+  "concept": "When passing primitive types (int, boolean, etc.) to a method, only the 'value' is copied.",
+  "content": {
+    "code": "void increment(int x) {\n    x = x + 1;\n    System.out.println(\"inside: \" + x);\n}\n\nint a = 10;\nSystem.out.println(\"before: \" + a);\nincrement(a);\nSystem.out.println(\"after: \" + a);",
+    "steps": [
+      {
+        "title": "Declaring Variable a",
+        "explanation": "**Execution order:**\n1. The `main` frame is created in Stack memory.\n2. Space for `int` variable `a` is allocated.\n3. The value `10` is stored.\n\n**What happens in memory:**\nA box labeled `a` is created in the workspace (Stack Frame) called `main`, and the number `10` is placed inside.",
+        "visualizationType": "javaMemory",
+        "code": "int a = 10;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "heap": [],
+          "output": []
+        }
+      },
+      {
+        "title": "Output Before Method Call",
+        "explanation": "**Execution order:**\n1. Look up the current value of `a`.\n2. Call `System.out.println`.\n\nPrints `10`, the value currently inside the `a` box, to the screen.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"before: \" + a);",
+        "javaMemoryState": {
+          "output": [
+            "before: 10"
+          ]
+        }
+      },
+      {
+        "title": "Calling increment(a) - Value Copying",
+        "explanation": "**Execution order:**\n1. A new Stack Frame is created for the `increment` method.\n2. Space for parameter `x` is created.\n3. The value `10` from `a` is read and **copied** into `x`.\n\n**Key point (Call by Value):**\n`a` itself is not passed.\nThe value `10` inside `a` is copied and placed into a new box called `x`.\nNow `a` and `x` are completely independent of each other.",
+        "keyInsight": "Only the 'value' is copied, not the variable itself",
+        "visualizationType": "javaMemory",
+        "code": "increment(a);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            },
+            {
+              "name": "x",
+              "value": "10",
+              "frame": "increment",
+              "copied": true,
+              "type": "int"
+            }
+          ],
+          "note": "The value of a (10) is copied to x"
+        }
+      },
+      {
+        "title": "Modifying Parameter x",
+        "explanation": "**Execution order:**\n1. Read `x`'s value `10`.\n2. Add `1` to produce `11`.\n3. Store `11` back into the `x` box.\n\n**What about the original?**\n`x` is a separate box in the `increment` frame.\nNo matter what you do here, the `a` box in the `main` frame is unaffected.",
+        "keyInsight": "Modifying the copy (x) leaves the original (a) unchanged",
+        "visualizationType": "javaMemory",
+        "code": "x = x + 1;",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            },
+            {
+              "name": "x",
+              "value": "11",
+              "frame": "increment",
+              "changed": true,
+              "type": "int"
+            }
+          ],
+          "note": null
+        }
+      },
+      {
+        "title": "Output Inside the Function",
+        "explanation": "**Execution order:**\n1. Look up `x`'s value `11`.\n2. Print it.\n\nInside the function, the modified value `11` is visible.",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"inside: \" + x);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            },
+            {
+              "name": "x",
+              "value": "11",
+              "frame": "increment",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "inside: 11"
+          ]
+        }
+      },
+      {
+        "title": "Function Return and Result Check",
+        "explanation": "**Execution order:**\n1. `increment` method ends.\n2. `increment` stack frame (including x) is deleted.\n3. Returns to `main`.\n4. Prints `a`'s value.\n\n**Result:**\n`a` is still `10`.\nThe copy (`x`) was destroyed, but the original (`a`) was never touched.",
+        "keyInsight": "When the method ends, the copy is destroyed",
+        "visualizationType": "javaMemory",
+        "code": "System.out.println(\"after: \" + a);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "a",
+              "value": "10",
+              "frame": "main",
+              "type": "int"
+            }
+          ],
+          "output": [
+            "after: 10"
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the correct behavior when passing a primitive type (int) to a method in Java?",
+    "options": [
+      "The variable's memory address is passed.",
+      "The variable's value is copied and passed.",
+      "The variable itself is moved.",
+      "Nothing happens."
+    ],
+    "correctIndex": 1,
+    "explanation": "When Java passes a primitive type, it copies only the value and passes it (Call by Value).\nTherefore, changing the value inside the method has no effect on the original."
+  },
+  "misconceptions": [
+    {
+      "wrong": "When you pass a variable to a function, they stay connected.",
+      "correct": "For primitive types, it's like sending a clone.",
+      "why": "It's the same principle as copying an Excel file and giving it to a friend -- if your friend edits the content, your original file remains unchanged."
+    }
+  ],
+  "keyTakeaway": "Primitive types are 'value copies'. No matter what you do inside the method, the original is safe."
+}

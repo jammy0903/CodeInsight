@@ -1,0 +1,133 @@
+{
+  "lessonId": "c-3-4",
+  "title": "数组作为函数参数",
+  "concept": "将数组传给函数时，实际上传的不是整个数组，而只是"地址"",
+  "content": {
+    "code": "#include <stdio.h>\n\nvoid printSize(int arr[]) {\n    printf(\"Inside func: %zu\\n\", sizeof(arr));\n    arr[0] = 999;\n}\n\nint main() {\n    int nums[5] = {1, 2, 3, 4, 5};\n\n    printf(\"Inside main: %zu\\n\", sizeof(nums));\n    printSize(nums);\n\n    printf(\"After func: %d\\n\", nums[0]);\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "包含头文件",
+        "explanation": "`#include <stdio.h>` 启用输出函数。\n\n本课核心是：数组作为函数参数传递时，传递的是起始地址而非整个数组。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "main 函数开始",
+        "explanation": "创建 main 栈帧，之后初始化数组。\n\n`printSize` 尚未调用，目标是观察调用时数据的传递形式。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "数组初始化",
+        "explanation": "`nums` 在连续内存中初始化 5 个 int。\n\n重要的是，函数调用时这整个块并不会被复制。",
+        "visualizationType": "cMemory",
+        "code": "int nums[5] = {1, 2, 3, 4, 5};",
+        "stack": [
+          {
+            "name": "nums",
+            "value": "{1, 2, 3, 4, 5}",
+            "type": "int[5]",
+            "address": "0x1000"
+          }
+        ]
+      },
+      {
+        "title": "main 中的 sizeof 输出",
+        "explanation": "在 main 中 `sizeof(nums)` 返回整个数组的大小。\n\n将此值与函数内部 `sizeof(arr)` 的结果比较，就能看出 decay 的差异。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Inside main: %zu\\n\", sizeof(nums));",
+        "stdout": "Inside main: 20"
+      },
+      {
+        "title": "函数调用与数组衰减（Array Decay）",
+        "explanation": "调用 `printSize(nums);` 时，`nums` 衰减为 `&nums[0]` 地址进行传递。\n\n函数接收的是原始数组的起始位置，不是副本。",
+        "visualizationType": "cMemory",
+        "code": "printSize(nums);",
+        "highlightOffset": [
+          0,
+          -9
+        ],
+        "stack": [
+          {
+            "name": "nums",
+            "value": "{1,2...}",
+            "type": "int[5]",
+            "frame": "main"
+          },
+          {
+            "name": "arr",
+            "value": "0x1000",
+            "type": "int*",
+            "frame": "printSize"
+          }
+        ]
+      },
+      {
+        "title": "sizeof 的"背叛"",
+        "explanation": "函数参数 `arr` 作为指针运作，所以 `sizeof(arr)` 返回的是指针变量的大小。\n\n因此仅靠函数内部无法得知原始数组长度，必须将长度作为额外参数传入。",
+        "visualizationType": "terminal",
+        "code": "printf(\"Inside func: %zu\\n\", sizeof(arr));",
+        "stdout": "Inside main: 20\nInside func: 8"
+      },
+      {
+        "title": "可以修改原始数据",
+        "explanation": "`arr[0] = 999;` 通过传入的地址直接修改 main 中的原始 `nums[0]`。\n\n如果不想修改原始数据，可以使用只读参数 `const int arr[]`。",
+        "visualizationType": "terminal",
+        "code": "arr[0] = 999;",
+        "highlightOffset": [
+          0,
+          5
+        ],
+        "stdout": "Inside main: 20\nInside func: 8\nAfter func: 999"
+      },
+      {
+        "title": "确认原始数据已被修改",
+        "explanation": "在 main 中输出 `nums[0]` 可以看到修改后的值。\n\n总结：将数组传给函数就是"传递地址"，管理长度和可变性是关键。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"After func: %d\\n\", nums[0]);",
+        "stack": [
+          {
+            "name": "nums",
+            "value": "{999, 2, 3, 4, 5}",
+            "type": "int[5]",
+            "highlight": true,
+            "address": "0x1000"
+          }
+        ],
+        "heap": [],
+        "stdout": "Inside main: 20\nInside func: 8\nAfter func: 999"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "在函数中如何知道数组的元素个数？",
+    "options": [
+      "用 sizeof(arr) / sizeof(int)",
+      "用 arr.length",
+      "另外传入长度参数",
+      "没有办法知道"
+    ],
+    "correctIndex": 2,
+    "explanation": "在函数内部数组已经衰减为指针，`sizeof` 技巧不再适用。\n必须将元素个数（`int size`）作为额外参数传入。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "参数写 `int arr[10]` 就会复制一个10个元素的数组",
+      "correct": "数字 10 被忽略，实际上就是 `int *arr`。",
+      "why": "C 语言不会自动复制数组。\n这个数字只是给程序员的提示/注释。"
+    }
+  ],
+  "keyTakeaway": "将数组传给函数时只传"地址"。务必同时传递长度（Length）。"
+}

@@ -1,0 +1,110 @@
+{
+  "lessonId": "c-2-3",
+  "title": "Dereferencing: Following an Address to Read a Value",
+  "concept": "Follow an address to retrieve the actual value (like a treasure map)",
+  "content": {
+    "code": "#include <stdio.h>\n\nint main() {\n    int money = 1000;\n    int *p = &money;\n\n    printf(\"Money: %d\\n\", money);\n\n    printf(\"Money via *p: %d\\n\", *p);\n\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Including stdio.h Header",
+        "explanation": "Header for I/O functions like ```printf```. It's processed during the preprocessing stage before compilation.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Starting the main Function",
+        "explanation": "The program starts — ```main```'s **stack frame** is created on the stack, and ```money``` and ```p``` are getting ready to be placed inside.",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "Variable Declaration",
+        "explanation": "A 4-byte space (address ```0x2000```) is allocated in the stack frame, and the integer ```1000``` is stored.\n\nThink of the treasure (1000) being kept in safe number ```0x2000```. If you know the safe number (address), you can retrieve the treasure anytime. In the next step, we'll give this number to a pointer.",
+        "visualizationType": "cMemory",
+        "code": "int money = 1000;",
+        "stack": [
+          {
+            "name": "money",
+            "value": "1000",
+            "type": "int",
+            "address": "0x2000"
+          }
+        ]
+      },
+      {
+        "title": "Assigning an Address to a Pointer",
+        "explanation": "`int *p = &money;` makes `p` store `money`'s address.\n\nFrom now on, using `*p` allows you to follow the address and access `money`'s actual value.",
+        "visualizationType": "cMemory",
+        "code": "int *p = &money;",
+        "stack": [
+          {
+            "name": "money",
+            "value": "1000",
+            "type": "int",
+            "address": "0x2000"
+          },
+          {
+            "name": "p",
+            "value": "0x2000",
+            "type": "int*",
+            "address": "0x2004",
+            "points_to": "money"
+          }
+        ]
+      },
+      {
+        "title": "Printing the Value Directly",
+        "explanation": "Writing ```money``` reads the value ```1000``` directly from address ```0x2000``` — this is **direct access** possible because we know the variable name.\n\nBut what if you don't know the variable name and only have the address? That's when the **dereferencing** in the next step is needed. Compare this output (```1000```) with the next step.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Money: %d\\n\", money);",
+        "stdout": "Money: 1000"
+      },
+      {
+        "title": "Printing Value Indirectly via Pointer (Dereferencing)",
+        "explanation": "`*p` means \"go to the address stored in p and read the value there.\"\n\nThat's why printing `money` directly and printing via `*p` give the same result.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Money via *p: %d\\n\", *p);",
+        "stdout": "Money: 1000\nMoney via *p: 1000"
+      },
+      {
+        "title": "Program Termination",
+        "explanation": "```return 0``` — the stack frame is removed and both ```money``` and ```p``` disappear.\n\nKey summary: ```p``` -> the target's address, ```*p``` -> the target's actual value. In the next lesson, we'll learn not only to read via ```*p``` but also to **modify** values!",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "stdout": ""
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Given `int *ptr = &a;`, what has the same value as `*ptr`?",
+    "options": [
+      "&a",
+      "ptr",
+      "a",
+      "&ptr"
+    ],
+    "correctIndex": 2,
+    "explanation": "`*ptr` means \"go to the location ptr points to (a's address) and fetch the contents\", so it equals the value of `a`."
+  },
+  "misconceptions": [
+    {
+      "wrong": "*p refers to the pointer variable p itself",
+      "correct": "It actually refers to the **target** that p points to.",
+      "why": "`p` is the address (0x100...), `*p` is the value living there (1000).\nThey are completely different."
+    }
+  ],
+  "keyTakeaway": "`*p` is the 'go there' command. It lets you read the value."
+}

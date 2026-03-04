@@ -1,0 +1,451 @@
+{
+  "lessonId": "py-1-2",
+  "title": "Numeric Types: The Difference Between / and //",
+  "concept": "Integers (int) and floats (float) behave differently, and both are immutable objects",
+  "content": {
+    "code": "a = 10\nb = 3\n\nprint(a + b)\nprint(a / b)\nprint(a // b)\nprint(a % b)\n\npi = 3.14\nradius = 2.0\narea = pi * (radius ** 2)\nprint(area)",
+    "steps": [
+      {
+        "title": "Creating Integer Variable 'a'",
+        "explanation": "**`a = 10`** -- Creates an integer object `10` in memory and attaches the label `a` to it.\n\nIn Python, even the number `10` is an **object**. In C, `int a = 10;` reserves 4 bytes of memory and stores 10 inside, but Python creates an `int` type object on the heap, and `a` is simply a label pointing to that object.\n\n**How Python works internally (Small Integer Caching):** Python pre-creates integers from -5 to 256 when the program starts. So when `a = 10` is executed, instead of creating a new object, the already-created `10` object is reused. This optimization saves both memory and time.\n\n**Analogy:** It's like putting a 'checked out by me' tag (label a) on a book (the object 10) that's already on the library shelf.\n\n**Note:** Python integers have no size limit! C's `int` can only go up to about 2.1 billion, but Python can handle huge numbers like `10**1000` without any problem.",
+        "visualizationType": "pythonMemory",
+        "code": "a = 10",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            }
+          ],
+          "output": []
+        }
+      },
+      {
+        "title": "Creating Integer Variable 'b'",
+        "explanation": "**`b = 3`** -- Creates an integer object `3` in memory and attaches the label `b` to it.\n\n`a` and `b` are separate labels pointing to different integer objects. Looking at the memory visualization, `a` points to the `10` object and `b` points to the `3` object.\n\n**Why this order?** To perform operations using `a` and `b` below (lines 4-7), both variables must be defined first. Python executes line by line from top to bottom, so variable definitions must come before their usage.\n\n**How Python works internally:** `3` is also within the Small Integer Cache range (-5 to 256), so the pre-created object is reused. The global namespace dictionary now has two entries: `{\"a\": <address of 10>, \"b\": <address of 3>}`.\n\n**Note:** Variable names can only contain letters, digits, and underscores (`_`), and cannot start with a digit. `2b = 3` is a `SyntaxError`.",
+        "visualizationType": "pythonMemory",
+        "code": "b = 3",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Addition",
+        "explanation": "**`print(a + b)`** -- Adds `a` (10) and `b` (3) and prints the result `13`.\n\nWhen the `+` operator is executed, Python reads the values of the two integer objects that `a` and `b` point to, adds them, and creates a **new integer object `13`**. This new object is passed to `print()` and displayed on screen.\n\n**Why is a new object created?** Because integers (int) are **immutable** objects. You cannot change the value of the object `10` to `13`. The result of an operation is always a newly created object.\n\n**Analogy:** Combining a 10-cent coin and a 3-cent coin doesn't change the original coins. Instead, a new result of '13 cents' is produced.\n\n**How Python works internally:** `a + b` internally calls `a.__add__(b)`. The `int.__add__` method adds the two values at the C level and returns a new `int` object. Since `13` is within the Small Integer Cache range, the cached object is reused.",
+        "visualizationType": "pythonMemory",
+        "code": "print(a + b)",
+        "pythonMemoryState": {
+          "output": [
+            "13"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Division (/)",
+        "explanation": "**`print(a / b)`** -- Performs 'true division' using the `/` operator.\n\nThe result of `10 / 3` is `3.3333333333333335`. **Key point:** The `/` operator **always returns a float result**, even when both operands are integers. Even `10 / 2` becomes `5.0`, not `5`!\n\n**Why does it end in 5?** `3.333...` is an infinite decimal, so a computer cannot represent it exactly. When stored in 64-bit floating-point (IEEE 754) format as the closest possible value, a tiny rounding error appears in the last digit.\n\n**Difference from Python 2:** In Python 2, `10 / 3` was `3` (integer division). The behavior changed in Python 3, so be careful.\n\n**How Python works internally:** The `/` operation calls `a.__truediv__(b)`. `int.__truediv__` converts both integers to floating-point, performs the division, and returns a new `float` object.\n\n**Note:** If `b` is `0`, a `ZeroDivisionError` is raised. Always check that the divisor is non-zero before dividing.",
+        "visualizationType": "pythonMemory",
+        "code": "print(a / b)",
+        "pythonMemoryState": {
+          "output": [
+            "3.3333333333333335"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Floor Division (//)",
+        "explanation": "**`print(a // b)`** -- Performs 'floor division' using the `//` operator to get the **quotient**.\n\nThe result of `10 // 3` is `3`. It **discards (floors)** the decimal part of the division result and returns only the integer portion.\n\n**Analogy:** When distributing 10 apples among 3 people, this calculates how many whole apples (quotient) each person gets without splitting any. Each person gets 3, with 1 left over.\n\n**Difference between `/` and `//`:**\n- `10 / 3` = `3.3333...` (float, exact division)\n- `10 // 3` = `3` (integer, floor division)\n\n**Watch out with negatives!** `//` is 'floor' (round toward negative infinity), not 'truncate'. `-10 // 3` is **`-4`**, not `-3`! It rounds down toward the more negative direction.\n\n**How Python works internally:** The `//` operation calls `a.__floordiv__(b)`. Mathematically, it computes `floor(a/b)`. If both operands are `int`, the result is `int`; if either is `float`, the result is `float` (`10 // 3.0` = `3.0`).\n\n**Practical tip:** Using `//` and `%` together gives a divmod operation: `divmod(10, 3)` = `(3, 1)` (returns both quotient and remainder simultaneously).",
+        "visualizationType": "pythonMemory",
+        "code": "print(a // b)",
+        "pythonMemoryState": {
+          "output": [
+            "3"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Modulo Operation (%)",
+        "explanation": "**`print(a % b)`** -- Uses the `%` operator (modulo) to get the **remainder** after division.\n\nThe result of `10 % 3` is `1`. Dividing 10 by 3 gives a quotient of 3 with a remainder of 1 (10 = 3 x 3 + **1**).\n\n**Analogy:** From the apple example above, after giving 3 apples to each of 3 people, the **1 apple left over** is the remainder.\n\n**Why is this important?** The modulo operation is used very frequently in programming:\n- **Even/odd check:** If `n % 2 == 0`, it's even\n- **Circular traversal:** `index % length` to cycle through an array\n- **Multiple check:** If `n % N == 0`, it's a multiple of N\n\n**Relationship between `//` and `%`:** `a == (a // b) * b + (a % b)` always holds true. That is, `10 == 3 * 3 + 1`.\n\n**How Python works internally:** The `%` operation calls `a.__mod__(b)`. Python's `%` always returns a result with the same sign as the divisor (b). `-10 % 3` is `2` (in C it would be `-1`).\n\n**Note:** If `b` is `0`, `%` also raises a `ZeroDivisionError`.",
+        "visualizationType": "pythonMemory",
+        "code": "print(a % b)",
+        "pythonMemoryState": {
+          "output": [
+            "1"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating Float Variable 'pi'",
+        "explanation": "**`pi = 3.14`** -- Creates a float object `3.14` in memory and attaches the label `pi` to it.\n\nA numeric literal containing a decimal point automatically becomes a `float` type object. `int` and `float` are different types of objects.\n\n**Difference between int and float:**\n- `int`: Exact integers (no size limit)\n- `float`: Approximate real numbers (64-bit, about 15-17 digits of precision)\n\n**Analogy:** `int` is like an abacus that counts natural numbers exactly, and `float` is like a calculator with a decimal point. The calculator can handle decimals, but it has a limit on how many digits it can display.\n\n**How Python works internally:** A `float` object is stored as C's `double` type (IEEE 754 64-bit floating-point). `3.14` cannot be represented exactly in binary, so the actual stored value is approximately `3.1400000000000001...`.\n\n**Note:** If you need precise decimal calculations, use the `decimal.Decimal` module. Using `float` in financial calculations can cause discrepancies of a single cent!",
+        "visualizationType": "pythonMemory",
+        "code": "pi = 3.14",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14",
+              "pyId": "2001"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Creating Float Variable 'radius'",
+        "explanation": "**`radius = 2.0`** -- Creates a float object `2.0` in memory and attaches the label `radius` to it.\n\nBy writing `2.0` instead of `2`, we explicitly indicate that it is a `float` type. `2` is an `int`, `2.0` is a `float` -- the values look the same but the types are different.\n\n**Why does the distinction matter?** In most cases, Python automatically converts between `int` and `float`, but using `type()` reveals they are different types:\n- `type(2)` -> `<class 'int'>`\n- `type(2.0)` -> `<class 'float'>`\n\n**How Python works internally:** When performing an operation between `int` and `float`, Python automatically converts the `int` to `float`. This is called **implicit coercion**. `3 + 2.0` first converts `3` to `3.0`, then produces `5.0`.\n\n**Analogy:** This is a preparatory step for calculating the area of a circle (pi * r^2). Like defining values before using a formula in math class.",
+        "visualizationType": "pythonMemory",
+        "code": "radius = 2.0",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "radius",
+              "pointsTo": "float2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14",
+              "pyId": "2001"
+            },
+            {
+              "id": "float2",
+              "type": "float",
+              "value": "2.0",
+              "pyId": "2002"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Calculating the Area of a Circle",
+        "explanation": "**`area = pi * (radius ** 2)`** -- Calculates the area of a circle using the exponentiation operator `**` and multiplication.\n\nPython follows mathematical order of operations (precedence):\n1. First `radius ** 2` = `2.0 ** 2` = `4.0` (exponentiation before multiplication)\n2. Then `pi * 4.0` = `3.14 * 4.0` = `12.56`\n3. A new `float` object `12.56` is created and the label `area` is attached to it.\n\n**The `**` operator:** In Python, exponentiation is `**`, not `^`! `^` is the bitwise XOR operator, which gives a completely different result. `2 ^ 3` = `1` (XOR), `2 ** 3` = `8` (exponentiation).\n\n**Analogy:** This is the math class formula for circle area = pi x r^2 translated directly into code. Parentheses are used to make the order of operations explicit.\n\n**How Python works internally:** The intermediate result (`4.0`) is created as a temporary `float` object. Once the final result (`12.56`) is produced, the temporary object's reference count drops to 0 and is reclaimed by the garbage collector. Since these are immutable objects, every operation produces a new object.",
+        "visualizationType": "pythonMemory",
+        "code": "area = pi * (radius ** 2)",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "radius",
+              "pointsTo": "float2"
+            },
+            {
+              "name": "area",
+              "pointsTo": "float3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14",
+              "pyId": "2001"
+            },
+            {
+              "id": "float2",
+              "type": "float",
+              "value": "2.0",
+              "pyId": "2002"
+            },
+            {
+              "id": "float3",
+              "type": "float",
+              "value": "12.56",
+              "pyId": "2003"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Printing the Result",
+        "explanation": "**`print(area)`** -- Prints the value `12.56` of the object `area` points to.\n\nThis completes the circle area calculation. The area of a circle with radius 2.0 is approximately 12.56.\n\n**Key summary:**\n- `/` (true division): Always returns a `float` (`10/2` = `5.0`)\n- `//` (floor division): Returns only the quotient (decimal part discarded)\n- `%` (modulo): Returns the remainder\n- `**` (exponentiation): Note that it's not `^`!\n\n**How Python works internally:** `print()` calls the `__repr__()` of the `area` object to create the string `\"12.56\"` and outputs it. The `__repr__` of `float` displays only the minimum number of digits needed to exactly reconstruct the value.\n\n**Practical tip:** For a more precise value of pi, use `import math; math.pi`. `math.pi` provides `3.141592653589793` with 15-digit precision.",
+        "visualizationType": "pythonMemory",
+        "code": "print(area)",
+        "pythonMemoryState": {
+          "output": [
+            "12.56"
+          ],
+          "names": [
+            {
+              "name": "a",
+              "pointsTo": "int1"
+            },
+            {
+              "name": "b",
+              "pointsTo": "int2"
+            },
+            {
+              "name": "pi",
+              "pointsTo": "float1"
+            },
+            {
+              "name": "radius",
+              "pointsTo": "float2"
+            },
+            {
+              "name": "area",
+              "pointsTo": "float3"
+            }
+          ],
+          "objects": [
+            {
+              "id": "int1",
+              "type": "int",
+              "value": "10",
+              "pyId": "1001"
+            },
+            {
+              "id": "int2",
+              "type": "int",
+              "value": "3",
+              "pyId": "1002"
+            },
+            {
+              "id": "float1",
+              "type": "float",
+              "value": "3.14",
+              "pyId": "2001"
+            },
+            {
+              "id": "float2",
+              "type": "float",
+              "value": "2.0",
+              "pyId": "2002"
+            },
+            {
+              "id": "float3",
+              "type": "float",
+              "value": "12.56",
+              "pyId": "2003"
+            }
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the result of `5 / 2` in Python?",
+    "options": [
+      "2 (integer)",
+      "2.5 (float)",
+      "2.0 (float)",
+      "Error"
+    ],
+    "correctIndex": 1,
+    "explanation": "Starting from Python 3, the `/` operator always returns an exact float result (2.5).\nUse `//` if you want the integer quotient."
+  },
+  "misconceptions": [
+    {
+      "wrong": "a^b is exponentiation",
+      "correct": "No! `^` is the bitwise XOR operator.\nExponentiation uses `**`.",
+      "why": "This is a common mistake due to other languages (like C) and mathematical notation."
+    },
+    {
+      "wrong": "0.1 + 0.2 == 0.3",
+      "correct": "This is False.\nDue to floating-point error, the result is `0.30000000000000004`.",
+      "why": "Computers represent real numbers in binary, so they sometimes cannot perfectly store decimal fractions."
+    }
+  ],
+  "keyTakeaway": "Division `/` always returns a float. Exponentiation uses `**`."
+}
