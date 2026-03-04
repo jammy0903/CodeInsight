@@ -37,7 +37,7 @@
       },
       {
         "title": "검증 함수 정의",
-        "explanation": "**`def check_age(age):`** -- 나이를 검증하는 함수를 정의합니다. `function` 객체가 생성되고 `check_age`라는 이름표가 붙습니다.\n\n이 함수의 핵심 로직은 **입력값 검증(validation)**입니다:\n- `age < 0` 또는 `age > 150`이면 → **AgeError를 raise**합니다\n- 유효한 나이이면 → 성공 메시지를 return합니다\n\n**`raise`란?** except가 에러를 **잡는(catch)** 것이라면, raise는 에러를 **일부러 발생시키는(throw)** 것입니다.\n```python\nraise 에러클래스(인자)  # 에러를 직접 발생시킴\n```\n\n**비유:** raise는 축구 심판의 **레드카드**와 같습니다. 선수(코드)가 반칙(잘못된 입력)을 하면, 심판(raise)이 경기를 즉시 중단시키고 퇴장(에러 발생)시킵니다. 심판이 없으면 반칙이 그냥 넘어가서 경기(프로그램)가 엉망이 될 수 있습니다.\n\n**Python 내부 동작:** `def` 문이 실행되면 함수의 바이트코드가 코드 객체로 컴파일됩니다. `raise` 문은 `RAISE_VARARGS` 바이트코드 명령어로 컴파일됩니다. 이 시점에서는 함수가 정의만 되고, 내부 코드는 실행되지 않습니다.\n\n**왜 raise를 쓸까?** 잘못된 입력이 들어왔을 때 그냥 넘어가면, 나중에 예상치 못한 곳에서 더 큰 문제가 발생할 수 있습니다. \"이 값은 안 돼!\"라고 **즉시, 명확하게 알려주는 것**이 프로그램의 안정성을 높입니다. 이것을 **\"빠르게 실패하기(Fail Fast)\"** 원칙이라고 합니다.\n\n**실행 순서:** `def check_age(age):` → 함수 객체 생성 → 다음 줄(try 블록)으로 이동",
+        "explanation": "**`def check_age(age):`** -- 나이를 검증하는 함수를 정의합니다. `function` 객체가 생성되고 `check_age`라는 이름표가 붙습니다.\n\n이 함수의 핵심 로직은 **입력값 검증(validation)**입니다:\n- `age < 0` 또는 `age > 150`이면 → **AgeError를 raise**합니다\n- 유효한 나이이면 → 성공 메시지를 return합니다",
         "visualizationType": "pythonMemory",
         "code": "def check_age(age):",
         "highlightOffset": [
@@ -78,7 +78,7 @@
       },
       {
         "title": "함수 호출 - 나이 검증 시작",
-        "explanation": "**`result = check_age(200)`** -- try 블록 안에서 `check_age`를 **200**이라는 인자로 호출합니다.\n\n함수 내부로 점프합니다. 새로운 스택 프레임이 생성되고, 매개변수 `age`에 정수 `200`이 바인딩됩니다.\n\n**`if age < 0 or age > 150:`** -- 조건을 평가합니다:\n- `200 < 0` → **False** (200은 0보다 큽니다)\n- `200 > 150` → **True** (200은 150보다 큽니다)\n- `False or True` → **True** (`or` 연산: 하나라도 True면 전체 True)\n\n**비유:** 공항 보안 검색대와 같습니다. 여권(나이값)을 확인하는데, \"만료됐거나(< 0) 위조된(> 150) 여권인가?\"를 검사합니다. 200살짜리 여권은 명백히 위조이므로 통과시키지 않습니다!\n\n**Python 내부 동작:** `or` 연산자는 **단락 평가(short-circuit evaluation)**를 사용합니다. 왼쪽이 `True`면 오른쪽을 확인하지 않습니다. 하지만 이 경우 왼쪽(`200 < 0`)이 `False`이므로 오른쪽(`200 > 150`)도 평가됩니다. 조건이 `True`이므로 if 블록의 코드가 실행됩니다.\n\n**주의:** 200살은 현실적으로 불가능한 나이입니다. 이런 **비즈니스 로직 검증**은 프로그래머가 직접 구현해야 합니다. Python이 알아서 \"나이가 너무 크다\"고 판단해주지 않습니다.\n\n**실행 순서:** `check_age(200)` 호출 → `age=200` 바인딩 → `if 200 < 0 or 200 > 150:` → True! → if 블록 진입",
+        "explanation": "**`result = check_age(200)`** -- try 블록 안에서 `check_age`를 **200**이라는 인자로 호출합니다.\n\n함수 내부로 점프합니다. 새로운 스택 프레임이 생성되고, 매개변수 `age`에 정수 `200`이 바인딩됩니다.",
         "visualizationType": "pythonMemory",
         "code": "    if age < 0 or age > 150:",
         "pythonMemoryState": {
@@ -124,7 +124,7 @@
       },
       {
         "title": "raise - 에러를 직접 발생!",
-        "explanation": "**`raise AgeError(age)`** -- **raise** 키워드가 `AgeError(200)` 예외를 직접 발생시킵니다!\n\n이 한 줄에서 여러 가지 일이 순서대로 일어납니다:\n1. `AgeError(200)` → 클래스의 `__init__` 메서드 호출\n2. `self.age = 200` → 잘못된 나이값을 에러 객체에 저장\n3. `super().__init__(\"Invalid age: 200\")` → 에러 메시지를 `\"Invalid age: 200\"`으로 설정\n4. **raise** → 이 에러 객체를 던짐(throw)!\n\n**비유:** 소방관이 화재 경보기(raise)를 직접 누르는 것과 같습니다. 자동으로 감지된 화재(ZeroDivisionError 등)가 아니라, 소방관(프로그래머)이 위험한 상황(잘못된 입력)을 직접 발견하고 경보를 울리는 것입니다.\n\n**Python 내부 동작:** `raise` 문이 실행되면:\n1. `AgeError(200)` 호출로 예외 객체가 힙에 생성됩니다\n2. 인터프리터의 에러 플래그가 설정됩니다\n3. 현재 함수의 나머지 코드(`return f\"Age {age} is valid\"`)는 **실행되지 않습니다**\n4. 에러가 함수를 빠져나와 **호출한 곳(try 블록)**으로 전파됩니다\n5. try 블록에서 이 에러를 잡을 except를 찾습니다\n\n**주의:** `raise` 뒤에 예외 객체 대신 **예외 클래스만** 쓸 수도 있습니다: `raise AgeError` (인자 없이). 이 경우 `AgeError()`로 기본 생성됩니다. 하지만 정보를 담으려면 인자를 전달하는 것이 좋습니다.\n\n**실행 순서:** `AgeError(200)` 객체 생성 → `raise` 실행 → 함수 나머지 코드 건너뜀 → 호출자의 try 블록으로 에러 전파",
+        "explanation": "**`raise AgeError(age)`** -- **raise** 키워드가 `AgeError(200)` 예외를 직접 발생시킵니다!\n\n이 한 줄에서 여러 가지 일이 순서대로 일어납니다:\n1. `AgeError(200)` → 클래스의 `__init__` 메서드 호출\n2. `self.age = 200` → 잘못된 나이값을 에러 객체에 저장\n3. `super().__init__(\"Invalid age: 200\")` → 에러 메시지를 `\"Invalid age: 200\"`으로 설정\n4. **raise** → 이 에러 객체를 던짐(throw)!",
         "visualizationType": "pythonMemory",
         "code": "        raise AgeError(age)",
         "pythonMemoryState": {
@@ -175,7 +175,7 @@
       },
       {
         "title": "except가 커스텀 예외를 잡았다!",
-        "explanation": "**`except AgeError as e:`** -- `check_age` 함수에서 발생한 AgeError가 이 except 블록에 잡혔습니다!\n\n**`as e`**: 발생한 `AgeError` 객체를 변수 `e`에 바인딩합니다. `e`는 이제 이 에러 객체를 가리키는 이름표입니다.\n\n**비유:** 범인(에러)을 체포(except)한 후 조서(e)를 작성하는 것과 같습니다. 조서에는 범인의 이름(에러 타입), 범행 내용(에러 메시지), 그리고 증거물(e.age)이 모두 기록되어 있습니다.\n\n**주의:** `except` 블록이 끝나면, `as e`로 바인딩된 변수 `e`는 Python 3에서 **자동으로 삭제**됩니다! except 블록 바깥에서 `e`를 사용하려면 별도 변수에 저장해야 합니다: `saved = e`\n\n**`print(f\"Caught: {e}\")`** -- `e`를 문자열로 변환하면(`str(e)` 또는 `f\"{e}\"`), `__init__`에서 `super().__init__()`에 전달한 메시지가 반환됩니다: `\"Invalid age: 200\"`",
+        "explanation": "**`except AgeError as e:`** -- `check_age` 함수에서 발생한 AgeError가 이 except 블록에 잡혔습니다!\n\n**`as e`**: 발생한 `AgeError` 객체를 변수 `e`에 바인딩합니다. `e`는 이제 이 에러 객체를 가리키는 이름표입니다.",
         "visualizationType": "pythonMemory",
         "code": "    print(f\"Caught: {e}\")",
         "pythonMemoryState": {
@@ -223,7 +223,7 @@
       },
       {
         "title": "에러 객체의 속성 접근",
-        "explanation": "**`print(f\"Invalid value was: {e.age}\")`** -- 커스텀 예외 클래스에 저장해둔 **`age` 속성**에 점(`.`) 연산자로 접근합니다.\n\n`e.age`는 **200**입니다. `__init__`에서 `self.age = age`로 저장했기 때문입니다. 이것이 커스텀 예외의 핵심 가치입니다!\n\n**실행 순서 (전체 정리):**\n1. `class AgeError` → 커스텀 예외 클래스 정의\n2. `def check_age` → 검증 함수 정의\n3. `try:` → 예외 감시 시작\n4. `check_age(200)` → 함수 호출, `age=200`\n5. `if 200 > 150:` → 조건 True!\n6. `raise AgeError(200)` → **에러 직접 발생!**\n7. `except AgeError as e:` → 매칭 성공, `e`에 바인딩\n8. `print(f\"Caught: {e}\")` → 에러 메시지 출력\n9. `print(f\"Invalid value was: {e.age}\")` → 커스텀 속성 접근\n\n**비유:** 교통사고 보고서(에러 객체)를 작성할 때, 단순히 \"사고 발생\"(일반 Exception)이라고만 쓰는 것보다 \"과속(200km/h)으로 인한 사고\"(AgeError with age=200)라고 쓰는 것이 훨씬 유용합니다. 보고서의 세부 항목(e.age)을 통해 정확한 상황을 파악할 수 있습니다.\n\n**주의:** 커스텀 예외에 너무 많은 로직을 넣지 마세요.",
+        "explanation": "**`print(f\"Invalid value was: {e.age}\")`** -- 커스텀 예외 클래스에 저장해둔 **`age` 속성**에 점(`.`) 연산자로 접근합니다.\n\n`e.age`는 **200**입니다. `__init__`에서 `self.age = age`로 저장했기 때문입니다. 이것이 커스텀 예외의 핵심 가치입니다!",
         "visualizationType": "pythonMemory",
         "code": "    print(f\"Invalid value was: {e.age}\")",
         "pythonMemoryState": {

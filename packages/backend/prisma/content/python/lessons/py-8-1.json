@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Counter 클래스 정의 시작",
-        "explanation": "**`class Counter:`**\n\n**이터레이터 프로토콜(Iterator Protocol)**을 직접 구현하는 `Counter` 클래스를 정의합니다.\n\n**이터레이터 프로토콜이란?**\nPython의 `for` 루프가 객체를 순회할 때 사용하는 **약속된 규칙**입니다.\n이 규칙을 따르는 객체는 어떤 것이든 `for` 루프에서 사용할 수 있습니다!\n규칙은 딱 두 가지 메서드를 구현하는 것입니다:\n- `__iter__()`: 이터레이터 객체를 반환 (\"순회를 시작하겠다\")\n- `__next__()`: 다음 값을 반환 (\"다음 값을 줘\")\n\n**비유: 자동판매기 만들기**\nCounter 클래스는 버튼을 누를 때마다(__next__) 숫자를 하나씩 내놓는 자동판매기의 설계도입니다.\n0부터 시작해서 하나씩 증가하다가, 끝 숫자에 도달하면 \"더 이상 없어요!\"(StopIteration)라고 알려줍니다.\n\n**왜 이것을 배우는가?** Python의 `for`문이 내부적으로 어떻게 동작하는지 이해하면, `for`를 더 깊이 이해하고 커스텀 반복 객체를 만들 수 있습니다.\n\n**왜 이 순서인가?** 프로그램이 시작되면 먼저 클래스 정의를 읽어 메모리에 로드해야 합니다.\n\n**실행 순서**: Counter 클래스 객체(0x1000) 생성 → 전역 네임스페이스에 등록",
+        "explanation": "**`class Counter:`**\n\n**이터레이터 프로토콜(Iterator Protocol)**을 직접 구현하는 `Counter` 클래스를 정의합니다.",
         "visualizationType": "pythonMemory",
         "code": "class Counter:",
         "pythonMemoryState": {
@@ -110,7 +110,7 @@
       },
       {
         "title": "__iter__ 메서드 정의",
-        "explanation": "**`def __iter__(self):`**\n\n이터레이터 프로토콜의 **첫 번째 약속**: `__iter__` 메서드를 정의합니다.\n이 메서드는 `return self`로 자기 자신을 반환합니다.\n\n**왜 자기 자신을 반환하는가?**\nPython의 이터레이터에는 두 가지 역할이 있습니다:\n1. **이터러블(Iterable)**: `__iter__`가 있어서 \"순회 가능\"하다고 알림\n2. **이터레이터(Iterator)**: `__next__`가 있어서 실제로 값을 하나씩 줌\n\nCounter 클래스는 두 역할을 **한 객체가 모두** 담당하므로, `__iter__`에서 자기 자신을 반환합니다.\n\n**비유**: \"이 자동판매기는 버튼(next)도 자기한테 있어요\"라고 알려주는 것입니다.\n\n**for 루프가 내부적으로 하는 일**:\n```python\n# for num in counter: 는 사실 이것과 같습니다!\nit = counter.__iter__()  # 이터레이터 얻기\nwhile True:\n    try:\n        num = it.__next__()  # 다음 값 얻기\n    except StopIteration:\n        break  # 종료!\n```\n\n**왜 이 순서인가?** __init__ 다음으로 이터레이터 프로토콜의 핵심 메서드를 정의합니다.\n\n**실행 순서**: __iter__ 함수 객체 생성 → Counter 클래스에 등록",
+        "explanation": "**`def __iter__(self):`**\n\n이터레이터 프로토콜의 **첫 번째 약속**: `__iter__` 메서드를 정의합니다.\n이 메서드는 `return self`로 자기 자신을 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "def __iter__(self):",
         "highlightOffset": [
@@ -149,7 +149,7 @@
       },
       {
         "title": "__next__ 메서드 정의",
-        "explanation": "**`def __next__(self):`**\n\n이터레이터 프로토콜의 **두 번째 약속**: `__next__` 메서드를 정의합니다.\nfor 루프가 **반복할 때마다** 이 메서드를 호출하여 다음 값을 받아갑니다.\n\n**이 메서드의 핵심 로직**:\n1. `current >= end`이면 → `StopIteration` 예외 발생 (\"더 이상 값 없어요!\")\n2. 아니면 → 현재 값을 저장하고, current를 1 증가시킨 후, 저장한 값을 반환\n\n**StopIteration이란?**\n특별한 예외로, for 루프에게 \"반복 끝!\"이라고 알려주는 신호입니다.\nfor 루프는 이 예외를 자동으로 잡아서 조용히 루프를 종료합니다.\n일반적인 에러가 아니라, 정상적인 종료 신호입니다!\n\n**비유**: 자동판매기에서 버튼을 누르면(next) 숫자가 하나 나오고, 재고가 없으면 \"품절\"(StopIteration) 표시가 나타납니다.\n\n**왜 이 순서인가?** 이터레이터의 핵심 동작인 '다음 값 가져오기'를 구현합니다.\n\n**실행 순서**: __next__ 함수 객체 생성 → Counter 클래스에 등록",
+        "explanation": "**`def __next__(self):`**\n\n이터레이터 프로토콜의 **두 번째 약속**: `__next__` 메서드를 정의합니다.\nfor 루프가 **반복할 때마다** 이 메서드를 호출하여 다음 값을 받아갑니다.",
         "visualizationType": "pythonMemory",
         "code": "def __next__(self):",
         "highlightOffset": [
@@ -307,7 +307,7 @@
       },
       {
         "title": "for 루프 시작",
-        "explanation": "**`for num in counter:`**\n\nfor 루프가 시작됩니다! Python은 내부적으로 `counter.__iter__()`를 호출하여 이터레이터를 요청합니다.\n\n**for 루프의 숨겨진 메커니즘 (이것이 핵심!)**:\nPython의 `for num in counter:`는 사실 다음과 동일합니다:\n```python\n_iterator = counter.__iter__()  # Step 1: 이터레이터 얻기\nwhile True:\n    try:\n        num = _iterator.__next__()  # Step 2: 다음 값 얻기\n    except StopIteration:           # Step 3: 종료 신호 잡기\n        break\n    print(num)  # 루프 본문 실행\n```\nfor 루프는 이 복잡한 과정을 **한 줄로** 간결하게 쓸 수 있게 해주는 **문법 설탕(Syntax Sugar)**입니다!\n\n**비유**: 자동판매기 앞에서 \"품절될 때까지 계속 버튼을 눌러줘\"라고 말한 것입니다.\n\n**왜 이 순서인가?** Counter 인스턴스가 준비되었으니, for 루프로 순회를 시작합니다.\n\n**실행 순서**: counter.__iter__() 호출 → 이터레이터(자기 자신) 반환 → __next__() 첫 호출 준비",
+        "explanation": "**`for num in counter:`**\n\nfor 루프가 시작됩니다! Python은 내부적으로 `counter.__iter__()`를 호출하여 이터레이터를 요청합니다.",
         "visualizationType": "pythonMemory",
         "code": "for num in counter:",
         "pythonMemoryState": {
@@ -870,7 +870,7 @@
       },
       {
         "title": "루프 종료",
-        "explanation": "**`raise StopIteration`**\n\n**\"더 이상 값이 없습니다!\"** 라는 의미의 `StopIteration` 예외를 발생시킵니다.\nfor 루프는 이 예외를 **자동으로 잡아서 조용히** 루프를 종료합니다.\n\n**StopIteration은 에러가 아닙니다!**\n일반적인 에러(TypeError, ValueError 등)와 달리, StopIteration은 **정상적인 종료 신호**입니다.\nfor 루프는 이 예외를 기대하고 있으며, 받으면 \"아, 끝났구나\" 하고 깔끔하게 종료합니다.\n프로그램이 중단되거나 에러 메시지가 표시되지 않습니다!\n\n**전체 for 루프 동작 요약**:\n```\n1회차: __next__() → 0 반환 → print(0)\n2회차: __next__() → 1 반환 → print(1)\n3회차: __next__() → 2 반환 → print(2)\n4회차: __next__() → StopIteration 발생 → 루프 종료!\n```\n\n**비유**: 자동판매기가 \"품절\" 표시를 올린 것입니다. for 루프는 이 표시를 보고 버튼 누르기를 멈춥니다.\n\n**핵심 교훈**: for 루프는 `__iter__`와 `__next__`를 호출하는 \"문법 설탕\"입니다!\n리스트, 튜플, 문자열 등 모든 iterable 객체가 이 프로토콜을 따릅니다.\n\n**실행 순서**: StopIteration 예외 발생 → for 루프가 예외를 감지 → 루프 정상 종료 → 프로그램 계속",
+        "explanation": "**`raise StopIteration`**\n\n**\"더 이상 값이 없습니다!\"** 라는 의미의 `StopIteration` 예외를 발생시킵니다.\nfor 루프는 이 예외를 **자동으로 잡아서 조용히** 루프를 종료합니다.",
         "visualizationType": "pythonMemory",
         "code": "raise StopIteration",
         "pythonMemoryState": {

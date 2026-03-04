@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "sys 모듈 임포트",
-        "explanation": "**`import sys`**\n\nPython의 **내장 시스템 모듈 `sys`**를 메모리에 로드합니다.\n`sys` 모듈에는 Python 인터프리터와 관련된 다양한 유틸리티 함수가 들어있습니다.\n\n**이 줄이 하는 일**: `sys.getrefcount()`라는 특별한 함수를 사용할 수 있도록 준비합니다.\n이 함수는 **특정 객체가 현재 몇 개의 이름에 의해 참조되고 있는지** 숫자로 알려줍니다.\n\n**비유: 도서관 시스템 켜기**\n도서관에서 \"이 책을 현재 몇 명이 빌려갔나요?\"를 조회하려면 먼저 대출 시스템을 켜야 하듯이,\n참조 횟수를 확인하려면 `sys` 모듈을 먼저 가져와야 합니다.\n\n**왜 이 순서인가?** Python은 위에서 아래로 한 줄씩 실행됩니다.\n`sys.getrefcount()`를 나중에 사용하려면, 반드시 먼저 `import sys`가 실행되어야 합니다.\n\n**주의**: `import`는 프로그램 시작 시 한 번만 실행하면 됩니다. 같은 모듈을 여러 번 import해도 첫 번째만 실제로 로드됩니다.\n\n**실행 순서**: import sys → sys 모듈 로드 → 전역 네임스페이스에 'sys' 이름 등록 → line 3",
+        "explanation": "**`import sys`**\n\nPython의 **내장 시스템 모듈 `sys`**를 메모리에 로드합니다.\n`sys` 모듈에는 Python 인터프리터와 관련된 다양한 유틸리티 함수가 들어있습니다.",
         "visualizationType": "pythonMemory",
         "code": "import sys",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "리스트 객체 생성과 첫 참조",
-        "explanation": "**`a = [1, 2, 3]`**\n\n**리스트 객체 생성**: Python이 메모리(0x2000)에 `[1, 2, 3]`이라는 새로운 리스트 객체를 만들고, 변수 `a`가 이 객체를 가리키도록(참조하도록) 연결합니다.\n\n**참조 카운팅(Reference Counting)이란?**\nPython은 모든 객체에 대해 \"이 객체를 몇 개의 이름이 가리키고 있는가?\"라는 숫자를 내부적으로 관리합니다.\n이 숫자를 **참조 횟수(Reference Count)**라고 합니다.\n현재 `[1, 2, 3]` 객체를 가리키는 이름은 `a` 하나뿐이므로, refcount = 1입니다.\n\n**비유: 도서관 대출 카드**\n책(객체)에 붙어있는 대출 카드를 상상해보세요.\n누군가 이 책을 빌려갈 때마다 카드에 이름이 추가됩니다.\n지금은 `a`만 빌려갔으니 카드에 이름이 1개입니다.\n만약 카드에 이름이 0개가 되면? 아무도 보지 않는 책이므로 도서관이 폐기합니다!\n\n**왜 이 순서인가?** sys 모듈 임포트가 끝난 후, 순서대로 다음 줄을 실행합니다.\n\n**메모리 모델**: 변수 `a`는 객체 자체가 아니라, 객체를 가리키는 **이름표(라벨)**입니다.\n`a`라는 이름표가 메모리 0x2000 위치의 리스트에 붙어있다고 생각하세요.\n\n**실행 순서**: [1, 2, 3] 리스트 생성 (0x2000) → a = 0x2000 (refcount=1) → line 4",
+        "explanation": "**`a = [1, 2, 3]`**\n\n**리스트 객체 생성**: Python이 메모리(0x2000)에 `[1, 2, 3]`이라는 새로운 리스트 객체를 만들고, 변수 `a`가 이 객체를 가리키도록(참조하도록) 연결합니다.",
         "visualizationType": "pythonMemory",
         "code": "a = [1, 2, 3]",
         "pythonMemoryState": {
@@ -66,7 +66,7 @@
       },
       {
         "title": "참조 횟수 확인 (getrefcount)",
-        "explanation": "**`print(f\"a만 참조: {sys.getrefcount(a)}\")`**\n\n`sys.getrefcount(a)`를 호출하여 `a`가 가리키는 리스트 객체(0x2000)의 **참조 횟수**를 확인합니다.\n\n**왜 2가 출력되는가? (핵심 포인트!)**\n실제로 `a`만 이 객체를 참조하니까 1이어야 할 것 같지만, **2**가 출력됩니다.\n그 이유는 `getrefcount(a)` 함수를 호출하는 순간, 함수의 매개변수로 전달하기 위해 **임시 참조가 1개 추가**되기 때문입니다.\n\n1. 실제 참조: `a` (1개)\n2. 임시 참조: `getrefcount()` 함수 매개변수 (호출 중에만 +1)\n3. 합계: 1 + 1 = **2**\n\n**비유: 도서관에서 책 조회하기**\n사서에게 \"이 책 몇 명이 빌렸어요?\"라고 물으면, 사서가 확인하는 동안 잠시 책을 들고 있어야 합니다.\n그래서 실제 대출자 + 사서(임시) = 표시되는 숫자가 됩니다.\n\n**주의 (초보자가 자주 헷갈리는 점)**: `getrefcount()`의 결과는 항상 **실제 참조 수보다 1 크게** 나옵니다!\n실제 refcount = getrefcount() 결과 - 1\n\n**왜 이 순서인가?** 리스트를 만든 직후, 참조 횟수가 정말 1인지 확인하는 것이 자연스러운 흐름입니다.\n\n**실행 순서**: sys.getrefcount(a) 호출 → refcount 읽기 (2) → f-string 평가 → print 실행 → line 6",
+        "explanation": "**`print(f\"a만 참조: {sys.getrefcount(a)}\")`**\n\n`sys.getrefcount(a)`를 호출하여 `a`가 가리키는 리스트 객체(0x2000)의 **참조 횟수**를 확인합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a만 참조: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
@@ -104,7 +104,7 @@
       },
       {
         "title": "두 번째 참조 추가 (b = a)",
-        "explanation": "**`b = a`**\n\n**핵심 개념**: 이 줄은 새로운 리스트를 만드는 것이 **아닙니다!**\n변수 `b`가 `a`와 **똑같은 리스트 객체(0x2000)**를 함께 가리키도록 연결하는 것입니다.\n\n**참조 횟수 변화**:\n- 이전: `a` 혼자 참조 → refcount = 1\n- 현재: `a`, `b` 둘이 참조 → refcount = 2\n\n**비유: 하나의 집에 두 개의 문패**\n집(객체 0x2000)은 하나인데, 현관에 문패(이름표)가 두 개(`a`, `b`) 걸려 있는 것과 같습니다.\n`a`로 방문하든 `b`로 방문하든 같은 집에 도착합니다.\n\n**왜 복사가 아닌가?**\nPython에서 `b = a`는 객체를 복사하지 않습니다. 같은 메모리 주소를 공유합니다.\n만약 `b.append(4)`를 하면 `a`로 확인해도 `[1, 2, 3, 4]`가 됩니다!\n진짜 복사를 원하면 `b = a.copy()` 또는 `b = a[:]`를 사용해야 합니다.\n\n**왜 이 순서인가?** 이전 print 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: b = a → b가 0x2000을 가리킴 → refcount 1→2 증가 → line 7",
+        "explanation": "**`b = a`**\n\n**핵심 개념**: 이 줄은 새로운 리스트를 만드는 것이 **아닙니다!**\n변수 `b`가 `a`와 **똑같은 리스트 객체(0x2000)**를 함께 가리키도록 연결하는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "b = a  # 같은 객체 참조",
         "pythonMemoryState": {
@@ -144,7 +144,7 @@
       },
       {
         "title": "늘어난 참조 횟수 확인 (2개)",
-        "explanation": "**`print(f\"a, b 참조: {sys.getrefcount(a)}\")`**\n\n이제 `a`가 가리키는 객체(0x2000)의 참조 횟수를 다시 확인합니다.\n`b = a`로 참조가 하나 늘었으니, 결과도 달라져야 합니다.\n\n**계산**:\n1. 실제 참조: `a`, `b` (2개)\n2. 임시 참조: `getrefcount(a)` 호출 시 매개변수로 +1\n3. 결과: 2 + 1 = **3**\n\n**재미있는 사실**: `sys.getrefcount(a)`와 `sys.getrefcount(b)` 둘 다 **같은 결과(3)**를 반환합니다.\n왜냐하면 `a`와 `b`는 **같은 객체**를 가리키고 있으니까요!\nrefcount는 변수가 아니라 **객체에 속한 속성**입니다.\n\n**비유**: 아까 대출 카드에 `a`만 있었는데, 이제 `b`도 추가되었습니다.\n사서가 확인하면 \"대출자 2명 + 제가 잠시 들고 있으니 3\"이라고 답합니다.\n\n**왜 이 순서인가?** b = a 실행 완료 후, 참조가 늘어났는지 확인하는 자연스러운 흐름입니다.\n\n**실행 순서**: sys.getrefcount(a) 호출 → refcount 읽기 (3) → f-string 평가 → print 실행 → line 9",
+        "explanation": "**`print(f\"a, b 참조: {sys.getrefcount(a)}\")`**\n\n이제 `a`가 가리키는 객체(0x2000)의 참조 횟수를 다시 확인합니다.\n`b = a`로 참조가 하나 늘었으니, 결과도 달라져야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a, b 참조: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
@@ -184,7 +184,7 @@
       },
       {
         "title": "세 번째 참조 추가 (c = a)",
-        "explanation": "**`c = a`**\n\n변수 `c`도 **같은 리스트 객체(0x2000)**를 가리키도록 연결합니다.\n이제 하나의 리스트 객체를 `a`, `b`, `c` 세 개의 이름으로 접근할 수 있습니다.\n\n**참조 횟수 변화**:\n- 이전: `a`, `b` (2개) → refcount = 2\n- 현재: `a`, `b`, `c` (3개) → refcount = 3\n\n**핵심: 리스트는 여전히 단 하나!**\n변수가 아무리 많아져도, 메모리에 있는 리스트 `[1, 2, 3]`은 **딱 하나**입니다.\n변수들은 모두 같은 메모리 주소(0x2000)를 가리키는 이름표일 뿐입니다.\n\n**비유: 한 사람의 별명**\n\"영수\", \"수야\", \"영수형\" 모두 같은 한 사람을 부르는 다른 이름인 것과 같습니다.\n이름이 3개라고 사람이 3명이 되는 것은 아닙니다!\n\n**메모리 효율성**: 같은 객체를 여러 변수가 공유하면 메모리를 절약할 수 있습니다.\n하지만 한 변수를 통해 객체를 수정하면 다른 변수에서도 변경이 보이므로 주의해야 합니다.\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: c = a → c가 0x2000을 가리킴 → refcount 2→3 증가 → line 10",
+        "explanation": "**`c = a`**\n\n변수 `c`도 **같은 리스트 객체(0x2000)**를 가리키도록 연결합니다.\n이제 하나의 리스트 객체를 `a`, `b`, `c` 세 개의 이름으로 접근할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "c = a  # 또 참조",
         "pythonMemoryState": {
@@ -228,7 +228,7 @@
       },
       {
         "title": "다시 늘어난 참조 횟수 확인 (3개)",
-        "explanation": "**`print(f\"a, b, c 참조: {sys.getrefcount(a)}\")`**\n\n이제 `a`가 가리키는 객체(0x2000)의 참조 횟수를 또 확인합니다.\n세 번째 참조 `c`가 추가되었으니, 숫자가 또 올라갔을 것입니다.\n\n**계산**:\n1. 실제 참조: `a`, `b`, `c` (3개)\n2. 임시 참조: `getrefcount(a)` 호출 시 +1\n3. 결과: 3 + 1 = **4**\n\n**참조 횟수 증가 추이를 정리하면**:\n```\na = [1, 2, 3]  → 실제 refcount = 1 (getrefcount 출력: 2)\nb = a          → 실제 refcount = 2 (getrefcount 출력: 3)\nc = a          → 실제 refcount = 3 (getrefcount 출력: 4)\n```\n패턴이 보이시나요? 참조가 하나 늘 때마다, 출력값도 정확히 1씩 증가합니다.\n\n**비유**: 대출 카드에 이름이 하나씩 추가되는 것을 확인하는 과정입니다.\n\n**왜 이 순서인가?** c = a 실행 완료 후, 참조가 또 늘었는지 확인합니다.\n\n**실행 순서**: sys.getrefcount(a) 호출 → refcount 읽기 (4) → f-string 평가 → print 실행 → line 12",
+        "explanation": "**`print(f\"a, b, c 참조: {sys.getrefcount(a)}\")`**\n\n이제 `a`가 가리키는 객체(0x2000)의 참조 횟수를 또 확인합니다.\n세 번째 참조 `c`가 추가되었으니, 숫자가 또 올라갔을 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a, b, c 참조: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
@@ -272,7 +272,7 @@
       },
       {
         "title": "참조 제거 (del b)",
-        "explanation": "**`del b`**\n\n`del` 키워드로 변수 `b`를 삭제합니다. 하지만 여기서 정말 중요한 구분이 있습니다!\n\n**del이 하는 일 (정확한 이해)**:\n- `b`라는 **이름(변수)**을 네임스페이스에서 완전히 제거합니다.\n- 이후 `b`를 사용하려 하면 `NameError`가 발생합니다.\n\n**del이 하지 않는 일 (초보자가 흔히 착각하는 점)**:\n- 리스트 객체 `[1, 2, 3]` 자체를 삭제하는 것이 **아닙니다!**\n- 객체는 여전히 메모리에 있고, `a`와 `c`가 참조하고 있습니다.\n\n**참조 횟수 변화**:\n1. `b`가 가리키던 객체(0x2000)와의 연결이 끊어짐\n2. refcount 감소: 3 → 2\n3. refcount가 0이 아니므로 객체는 살아남음 (a와 c가 아직 참조 중)\n\n**비유: 대출 카드에서 이름 지우기**\n`b`가 책을 반납한 것과 같습니다. 대출 카드에서 `b`의 이름이 지워졌지만, `a`와 `c`가 아직 빌리고 있으니 책은 폐기되지 않습니다.\n\n**만약 모든 참조가 사라지면?**\n`del a`, `del b`, `del c` 모두 실행하면 refcount = 0이 되고, CPython은 **즉시** 메모리를 해제합니다!\n\n**왜 이 순서인가?** 참조가 늘어나는 것을 확인한 후, 이번에는 줄어드는 것을 보여주기 위한 흐름입니다.\n\n**실행 순서**: del b → 네임스페이스에서 b 제거 → refcount 3→2 감소 → line 13",
+        "explanation": "**`del b`**\n\n`del` 키워드로 변수 `b`를 삭제합니다. 하지만 여기서 정말 중요한 구분이 있습니다!",
         "visualizationType": "pythonMemory",
         "code": "del b  # 참조 제거",
         "pythonMemoryState": {
@@ -311,7 +311,7 @@
       },
       {
         "title": "줄어든 참조 횟수 확인",
-        "explanation": "**`print(f\"del b 후: {sys.getrefcount(a)}\")`**\n\n`del b` 이후 참조 횟수가 실제로 줄어들었는지 최종 확인합니다.\n\n**계산**:\n1. 실제 참조: `a`, `c` (2개) - `b`는 삭제되어 더 이상 없음!\n2. 임시 참조: `getrefcount(a)` 호출 시 +1\n3. 결과: 2 + 1 = **3**\n\n**참조 카운팅 전체 흐름 정리**:\n```python\na = [1, 2, 3]  # refcount = 1 (getrefcount 출력: 2)\nb = a          # refcount = 2 (getrefcount 출력: 3)\nc = a          # refcount = 3 (getrefcount 출력: 4)\ndel b          # refcount = 2 (getrefcount 출력: 3) ← 줄어들었다!\n```\n\n**Python 메모리 관리의 핵심 원리**:\n- Python(CPython)은 각 객체의 참조 횟수를 **실시간**으로 추적합니다.\n- refcount가 0이 되는 **즉시** 메모리를 해제합니다 (다른 언어의 GC와 차이점!).\n- 이 방식은 빠르고 예측 가능하지만, 순환 참조 문제가 있습니다 (다음 레슨에서 다룸).\n\n**다른 언어와 비교**: Java나 C#은 가비지 컬렉터가 **나중에 한꺼번에** 처리하지만,\nCPython은 refcount=0이 되는 순간 **바로** 정리합니다. 그래서 `__del__` 소멸자의 호출 시점이 예측 가능합니다.\n\n**실행 순서**: sys.getrefcount(a) 호출 → refcount 읽기 (3) → f-string 평가 → print 실행 → 프로그램 종료",
+        "explanation": "**`print(f\"del b 후: {sys.getrefcount(a)}\")`**\n\n`del b` 이후 참조 횟수가 실제로 줄어들었는지 최종 확인합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"del b 후: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {

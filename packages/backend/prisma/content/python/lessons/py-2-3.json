@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "for 루프 시작 (range)",
-        "explanation": "**`for i in range(3):`** -- `range(3)`이 만들어내는 숫자들(0, 1, 2)을 하나씩 `i`에 넣으며 반복합니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `range(3)`은 `0, 1, 2`를 순서대로 만들어내는 **이터레이터(iterator)** 객체입니다. `range(3)`은 실제로 리스트 `[0, 1, 2]`를 만들지 않고, 필요할 때마다 숫자를 하나씩 생성합니다(메모리 효율적).\n\nfor 루프가 시작되면서 첫 번째 값 `0`을 가져와 변수 `i`에 할당합니다.\n\n**왜 0부터 시작하는가?** `range(3)`은 '0부터 3 미만'이라는 뜻입니다. 프로그래밍에서는 0부터 세는 것이 관례입니다(0-indexed). `range(1, 4)`처럼 시작값을 지정하면 1부터 시작할 수도 있습니다.\n\n**while과의 차이:** while은 '조건이 참인 동안' 반복하지만, for는 '정해진 항목들을 순회'합니다. for는 자동으로 다음 값을 가져오므로 카운터를 직접 증가시킬 필요가 없습니다.\n\n**비유:** 접시에 과일이 3개(0번, 1번, 2번) 놓여있고, 하나씩 집어드는 것과 같습니다. 첫 번째 과일(0)을 집었습니다.\n\n**Python 내부 동작:** `range(3)`은 `range` 타입의 객체를 반환합니다. for 루프는 내부적으로 `iter(range(3))`으로 이터레이터를 만들고, 매 반복마다 `next()`를 호출하여 다음 값을 가져옵니다. 값이 소진되면 `StopIteration` 예외가 발생하여 루프가 종료됩니다.\n\n**실행 순서**: range(3) 이터레이터 생성 → next()로 0 가져옴 → i = 0 → 블록 실행",
+        "explanation": "**`for i in range(3):`** -- `range(3)`이 만들어내는 숫자들(0, 1, 2)을 하나씩 `i`에 넣으며 반복합니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `range(3)`은 `0, 1, 2`를 순서대로 만들어내는 **이터레이터(iterator)** 객체입니다. `range(3)`은 실제로 리스트 `[0, 1, 2]`를 만들지 않고, 필요할 때마다 숫자를 하나씩 생성합니다(메모리 효율적).",
         "visualizationType": "pythonMemory",
         "code": "for i in range(3):  # 0, 1, 2 (3번)",
         "pythonMemoryState": {
@@ -57,7 +57,7 @@
       },
       {
         "title": "다음 순서 진행 (2번째)",
-        "explanation": "**`for i in range(3):`** -- 블록 끝에서 자동으로 루프 시작점으로 돌아왔습니다. 2번째 반복입니다.\n\n**왜 다시 line 2로 돌아왔는가?** for 루프는 while과 마찬가지로, 블록이 끝나면 자동으로 루프 시작점으로 점프합니다. `range(3)` 이터레이터에게 `next()`로 다음 숫자를 요청하여 `1`을 받아 `i`에 재할당합니다.\n\n**while과의 핵심 차이:** while은 매번 조건(`count > 0`)을 직접 확인하고, 카운터도 직접 줄여야(`count -= 1`) 합니다. 반면 for는 **자동으로 다음 항목을 가져와** `i`를 업데이트합니다. `i += 1` 같은 코드가 전혀 필요 없습니다.\n\n**비유:** 접시의 두 번째 과일(1번)을 자동으로 집어드는 것입니다. 직접 손을 뻗을 필요 없이 컨베이어 벨트가 다음 과일을 가져다줍니다.\n\n**Python 내부 동작:** for 루프의 이터레이터 프로토콜이 동작합니다. `next(iterator)`가 호출되어 `1`이 반환되고, 이 값이 `i`에 바인딩됩니다. 이전 정수 객체 `0`에 대한 `i`의 참조는 해제됩니다.\n\n**실행 순서**: 블록 끝 → line 2 점프 → next()로 1 가져옴 → i = 1 → 블록 실행",
+        "explanation": "**`for i in range(3):`** -- 블록 끝에서 자동으로 루프 시작점으로 돌아왔습니다. 2번째 반복입니다.\n\n**왜 다시 line 2로 돌아왔는가?** for 루프는 while과 마찬가지로, 블록이 끝나면 자동으로 루프 시작점으로 점프합니다. `range(3)` 이터레이터에게 `next()`로 다음 숫자를 요청하여 `1`을 받아 `i`에 재할당합니다.",
         "visualizationType": "pythonMemory",
         "code": "for i in range(3):  # 0, 1, 2 (3번)",
         "pythonMemoryState": {
@@ -159,7 +159,7 @@
       },
       {
         "title": "for 루프 종료",
-        "explanation": "**`for i in range(3):`** -- 이터레이터가 소진되어 for 루프가 종료됩니다.\n\n블록 끝에서 다시 line 2로 점프했습니다. `range(3)` 이터레이터에게 `next()`로 다음 숫자를 요청하지만, 0, 1, 2를 모두 소진했으므로 **`StopIteration` 예외**가 발생합니다. for 루프는 이 예외를 자동으로 잡아서 루프를 종료합니다.\n\n**왜 3은 포함 안 되는가?** `range(3)`은 '0 이상, 3 미만'의 범위입니다. 파이썬의 range는 항상 **끝값을 포함하지 않습니다(exclusive)**. 이것은 파이썬의 일관된 규칙으로, 슬라이싱(`s[0:3]`)에서도 동일합니다.\n\n**비유:** 접시에 과일이 더 이상 없습니다. 컨베이어 벨트가 멈추고 다음 작업으로 넘어갑니다.\n\n**for 루프 후 i의 값:** 중요한 점은, 루프가 끝난 후에도 `i`는 마지막 값인 `2`를 유지합니다. 파이썬에서 for 루프의 변수는 루프가 끝나도 사라지지 않습니다.\n\n**Python 내부 동작:** `next(iterator)`가 `StopIteration`을 발생시키면, for 루프의 내부 `try/except` 메커니즘이 이를 잡아서 루프 바이트코드 밖으로 점프합니다.\n\n**실행 순서**: 블록 끝 → line 2 점프 → next() 호출 → StopIteration → 루프 탈출 → line 6",
+        "explanation": "**`for i in range(3):`** -- 이터레이터가 소진되어 for 루프가 종료됩니다.\n\n블록 끝에서 다시 line 2로 점프했습니다. `range(3)` 이터레이터에게 `next()`로 다음 숫자를 요청하지만, 0, 1, 2를 모두 소진했으므로 **`StopIteration` 예외**가 발생합니다. for 루프는 이 예외를 자동으로 잡아서 루프를 종료합니다.",
         "visualizationType": "pythonMemory",
         "code": "for i in range(3):  # 0, 1, 2 (3번)",
         "pythonMemoryState": {
@@ -182,7 +182,7 @@
       },
       {
         "title": "리스트 변수 초기화",
-        "explanation": "**`fruits = [\"Apple\", \"Banana\"]`** -- 문자열 2개를 담은 리스트 객체를 만들고 `fruits` 이름표를 붙입니다.\n\n앞의 for 루프가 종료된 후, 파이썬은 순서대로 다음 줄을 실행합니다. 대괄호 `[]`로 리스트 객체를 생성합니다.\n\n**왜 이 순서인가?** 아래의 for-each 루프에서 `fruits`를 순회하려면, 먼저 리스트를 만들어야 합니다.\n\n**range와 리스트의 차이:** `range(3)`은 숫자만 만들어내지만, 리스트는 문자열, 숫자, 불리언 등 **어떤 타입이든** 담을 수 있습니다. for 루프는 이 모든 것을 순회할 수 있습니다.\n\n**Python 내부 동작:** 리스트 리터럴 `[\"Apple\", \"Banana\"]`는 힙 메모리에 새 list 객체를 할당합니다. 이 리스트 객체 안에는 두 문자열 객체의 **참조(포인터)**가 순서대로 저장됩니다. `fruits` 이름표가 이 리스트 객체를 가리킵니다.\n\n**주의:** 이전 for 루프의 변수 `i`는 여전히 값 `2`를 가지고 있습니다. 파이썬에서 for 루프 변수는 루프가 끝나도 사라지지 않고, 전역 네임스페이스에 남아있습니다.\n\n**실행 순서**: 이전 루프 종료 → line 6 실행 → 리스트 생성 → fruits 할당 → line 7",
+        "explanation": "**`fruits = [\"Apple\", \"Banana\"]`** -- 문자열 2개를 담은 리스트 객체를 만들고 `fruits` 이름표를 붙입니다.\n\n앞의 for 루프가 종료된 후, 파이썬은 순서대로 다음 줄을 실행합니다. 대괄호 `[]`로 리스트 객체를 생성합니다.",
         "visualizationType": "pythonMemory",
         "code": "fruits = [\"Apple\", \"Banana\"]",
         "pythonMemoryState": {
@@ -215,7 +215,7 @@
       },
       {
         "title": "for-each 루프 시작",
-        "explanation": "**`for f in fruits:`** -- 리스트의 각 항목을 하나씩 `f`에 넣으며 반복합니다 (for-each 방식).\n\n**range와의 차이:** `range()`는 숫자를 순서대로 만들어내지만, 여기서는 **리스트의 항목 자체**를 순회합니다. for 루프가 시작되면서 `fruits`의 첫 번째 항목 `\"Apple\"`을 가져와 변수 `f`에 할당합니다.\n\n**왜 인덱스(0, 1) 없이도 순회할 수 있는가?** 파이썬의 for는 다른 언어의 `for(int i=0; i<n; i++)`와 다릅니다. 파이썬은 **항목 자체를 직접 변수에 넣어주는** for-each 방식입니다. 인덱스가 필요하면 `for i, f in enumerate(fruits):`를 사용합니다.\n\n**비유:** 바구니에서 과일을 하나씩 꺼내는 것입니다. 첫 번째로 \"Apple\"을 꺼내 손에 들었습니다(f = \"Apple\"). 번호를 매기지 않고 과일 자체를 다룹니다.\n\n**Python 내부 동작:** 리스트의 `__iter__()` 메서드가 호출되어 리스트 이터레이터가 생성됩니다. `next(iterator)`로 첫 번째 항목 `\"Apple\"`이 반환되고, `f` 이름표가 이 문자열 객체를 가리킵니다.\n\n**주의:** `f`라는 변수명은 아무 이름이나 사용할 수 있습니다. `for fruit in fruits:`, `for item in fruits:` 등 의미 있는 이름을 쓰는 것이 좋습니다.\n\n**실행 순서**: fruits의 이터레이터 생성 → next()로 \"Apple\" 가져옴 → f = \"Apple\" → 블록 실행",
+        "explanation": "**`for f in fruits:`** -- 리스트의 각 항목을 하나씩 `f`에 넣으며 반복합니다 (for-each 방식).\n\n**range와의 차이:** `range()`는 숫자를 순서대로 만들어내지만, 여기서는 **리스트의 항목 자체**를 순회합니다. for 루프가 시작되면서 `fruits`의 첫 번째 항목 `\"Apple\"`을 가져와 변수 `f`에 할당합니다.",
         "visualizationType": "pythonMemory",
         "code": "for f in fruits:",
         "pythonMemoryState": {
@@ -397,7 +397,7 @@
       },
       {
         "title": "for-each 루프 종료",
-        "explanation": "**`for f in fruits:`** -- 리스트의 모든 항목을 소진하여 for-each 루프가 종료됩니다.\n\n블록 끝에서 다시 line 7로 점프했습니다. `fruits` 리스트의 이터레이터에서 `next()`를 호출하지만, `\"Apple\"`, `\"Banana\"` 2개를 모두 순회했으므로 **`StopIteration`** 예외가 발생합니다. for 루프가 이를 잡아서 루프를 종료합니다.\n\n**for 루프의 핵심 정리:**\n1. **`range()` 순회:** `for i in range(n)` -- 정해진 횟수만큼 숫자를 순회 (0부터 n-1까지)\n2. **리스트 순회:** `for item in list` -- 리스트의 각 항목을 직접 순회 (for-each)\n3. **공통점:** 둘 다 이터레이터 프로토콜을 사용하며, 항목이 소진되면 자동 종료\n\n**Python 내부 동작:** `StopIteration` 예외가 발생하면 for 루프의 바이트코드가 이를 포착하여 루프 밖으로 점프합니다. 루프 후에도 `f`는 마지막 값 `\"Banana\"`를 유지합니다.\n\n**주의:** 빈 리스트(`[]`)에 for 루프를 사용하면, 블록이 **한 번도 실행되지 않습니다**. 첫 `next()` 호출에서 바로 `StopIteration`이 발생하기 때문입니다.\n\n**실행 순서**: 블록 끝 → line 7 점프 → next() 호출 → StopIteration → 루프 탈출 → 프로그램 종료",
+        "explanation": "**`for f in fruits:`** -- 리스트의 모든 항목을 소진하여 for-each 루프가 종료됩니다.\n\n블록 끝에서 다시 line 7로 점프했습니다. `fruits` 리스트의 이터레이터에서 `next()`를 호출하지만, `\"Apple\"`, `\"Banana\"` 2개를 모두 순회했으므로 **`StopIteration`** 예외가 발생합니다. for 루프가 이를 잡아서 루프를 종료합니다.",
         "visualizationType": "pythonMemory",
         "code": "for f in fruits:",
         "pythonMemoryState": {

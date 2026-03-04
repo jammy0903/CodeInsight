@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "itertools 모듈 임포트",
-        "explanation": "**`import itertools`**\n\nPython 표준 라이브러리의 **itertools** 모듈을 가져옵니다.\n\n**itertools란?**\n이름 그대로 \"이터레이터 도구(iterator tools)\"의 모음입니다.\n이전 레슨에서 이터레이터와 제너레이터를 직접 만들어봤는데, itertools는 자주 사용되는 반복 패턴을 **미리 만들어놓은 도구 상자**입니다.\n\n**itertools의 3가지 핵심 도구 (이번 레슨에서 배울 것):**\n1. `count()`: 무한히 숫자를 세는 카운터 (끝이 없음!)\n2. `cycle()`: 리스트를 무한히 반복하는 순환기\n3. `chain()`: 여러 리스트를 하나로 이어붙이는 연결기\n\n**모두 이터레이터를 반환합니다!** 리스트가 아닙니다. 따라서 값을 미리 계산하지 않고 필요할 때마다 하나씩 생성합니다 (Lazy Evaluation).\n\n**비유**: 공구 상자를 열어서, 오늘 사용할 도구 3가지를 꺼내볼 준비를 합니다.\n\n**실행 순서**: itertools 모듈(0x1500) 로드 → 전역 네임스페이스에 등록",
+        "explanation": "**`import itertools`**\n\nPython 표준 라이브러리의 **itertools** 모듈을 가져옵니다.",
         "visualizationType": "pythonMemory",
         "code": "import itertools",
         "pythonMemoryState": {
@@ -33,7 +33,7 @@
       },
       {
         "title": "무한 카운터 생성 (count)",
-        "explanation": "**`counter = itertools.count(start=10, step=2)`**\n\n**무한 카운터**를 생성합니다! 10에서 시작하여 2씩 증가하는 이터레이터입니다.\n10, 12, 14, 16, 18, 20, ... **끝이 없습니다!**\n\n**range()와의 차이:**\n- `range(10, 100, 2)`: 끝(100)이 정해져 있음, **유한**\n- `itertools.count(10, 2)`: 끝이 없음, **무한**!\n\n**왜 무한이 가능한가?**\ncount()는 이터레이터이므로 값을 미리 만들지 않습니다.\nnext()를 호출할 때마다 \"현재 값 + step\"을 계산해서 하나씩 줄 뿐입니다.\n메모리에는 현재 값(10)과 증가폭(2)만 저장되어 있으므로, 무한히 생성해도 메모리는 일정합니다!\n\n**주의**: for 루프에서 직접 사용하면 무한 루프가 됩니다! `for n in itertools.count(10, 2):` → 영원히 끝나지 않음!\n따라서 next()로 원하는 만큼만 꺼내거나, break 조건을 반드시 넣어야 합니다.\n\n**실행 순서**: count 이터레이터 객체(0x2000) 생성 → 내부 상태: current=10, step=2",
+        "explanation": "**`counter = itertools.count(start=10, step=2)`**\n\n**무한 카운터**를 생성합니다! 10에서 시작하여 2씩 증가하는 이터레이터입니다.\n10, 12, 14, 16, 18, 20, ... **끝이 없습니다!**",
         "visualizationType": "pythonMemory",
         "code": "counter = itertools.count(start=10, step=2)",
         "pythonMemoryState": {
@@ -101,7 +101,7 @@
       },
       {
         "title": "무한 순환 이터레이터 생성 (cycle)",
-        "explanation": "**`cycler = itertools.cycle(['A', 'B', 'C'])`**\n\n두 번째 도구: **cycle** -- 리스트의 항목을 **무한히 순환**하는 이터레이터를 생성합니다!\nA → B → C → A → B → C → A → B → C → ... 영원히 반복됩니다.\n\n**count()와 cycle()의 차이:**\n- count(): 숫자가 **계속 증가** (10, 12, 14, 16, ...)\n- cycle(): 리스트를 **반복 순환** (A, B, C, A, B, C, ...)\n\n**cycle은 언제 사용하는가?**\n- 요일 반복: `cycle(['월', '화', '수', '목', '금', '토', '일'])`\n- 색상 교대: `cycle(['빨강', '파랑', '초록'])`\n- 라운드 로빈: 여러 서버에 요청을 골고루 분배할 때\n\n**주의**: count()와 마찬가지로 무한 이터레이터이므로, for 루프에서 직접 사용하면 무한 루프!\n\n**비유**: 회전문처럼, 끝에 도달하면 자동으로 처음으로 돌아갑니다.\n\n**실행 순서**: cycle 이터레이터 객체(0x3000) 생성 → ['A', 'B', 'C'] 내부에 저장",
+        "explanation": "**`cycler = itertools.cycle(['A', 'B', 'C'])`**\n\n두 번째 도구: **cycle** -- 리스트의 항목을 **무한히 순환**하는 이터레이터를 생성합니다!\nA → B → C → A → B → C → A → B → C → ... 영원히 반복됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cycler = itertools.cycle(['A', 'B', 'C'])",
         "pythonMemoryState": {
@@ -206,7 +206,7 @@
       },
       {
         "title": "cycle 네 번째 값 - 순환 (A)",
-        "explanation": "**`print(next(cycler))`**\n\n**순환 발생!** 리스트의 끝(C) 이후 다시 처음으로 돌아와 **'A'**가 출력됩니다!\n\n**전체 순환 패턴:**\nA → B → C → **A**(지금!) → B → C → A → B → C → ...\n4번째 호출에서 다시 A가 나왔습니다. 이것이 무한 순환입니다.\n\n**cycle의 메모리 동작:**\ncycle은 원본 리스트 ['A', 'B', 'C']의 복사본을 내부에 가지고 있습니다.\n끝에 도달하면 이 복사본의 처음으로 돌아갈 뿐이므로, 추가 메모리 없이 무한 반복이 가능합니다.\n\n**실용적인 예시:**\n```python\ncolors = itertools.cycle(['빨강', '파랑'])\nfor item in ['사과', '바나나', '포도', '오렌지']:\n    print(f\"{item}: {next(colors)}\")\n# 사과: 빨강, 바나나: 파랑, 포도: 빨강, 오렌지: 파랑\n```\n\n**실행 순서**: next(cycler) 호출 → 포인터 처음으로 리셋 → 'A' 반환",
+        "explanation": "**`print(next(cycler))`**\n\n**순환 발생!** 리스트의 끝(C) 이후 다시 처음으로 돌아와 **'A'**가 출력됩니다!",
         "visualizationType": "pythonMemory",
         "code": "print(next(cycler))",
         "occurrence": 4,
@@ -233,7 +233,7 @@
       },
       {
         "title": "이터러블 연결 (chain)",
-        "explanation": "**`chained = itertools.chain([1, 2], ['a', 'b'])`**\n\n세 번째 도구: **chain** -- 여러 이터러블을 **하나로 이어붙이는** 이터레이터를 생성합니다!\n[1, 2]와 ['a', 'b']를 연결하여 마치 [1, 2, 'a', 'b']처럼 순회할 수 있습니다.\n\n**리스트 합치기(+)와의 차이:**\n- `[1, 2] + ['a', 'b']`: **새 리스트를 만들어** 메모리에 저장 → O(n) 메모리\n- `chain([1, 2], ['a', 'b'])`: **연결만 기억**, 새 리스트 안 만듦 → O(1) 메모리\n\nchain은 첫 번째 이터러블이 끝나면 자동으로 두 번째로 넘어갑니다.\n데이터를 복사하지 않고 **논리적으로만 연결**하므로 메모리를 절약합니다!\n\n**비유**: 두 줄의 사람을 하나의 줄로 합치는 것입니다. 사람들을 실제로 옮기지 않고, \"이 줄 다 지나가면 저 줄 차례\"라고 안내만 합니다.\n\n**실행 순서**: chain 이터레이터 객체(0x4000) 생성 → [1, 2]와 ['a', 'b']에 대한 참조 저장",
+        "explanation": "**`chained = itertools.chain([1, 2], ['a', 'b'])`**\n\n세 번째 도구: **chain** -- 여러 이터러블을 **하나로 이어붙이는** 이터레이터를 생성합니다!\n[1, 2]와 ['a', 'b']를 연결하여 마치 [1, 2, 'a', 'b']처럼 순회할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "chained = itertools.chain([1, 2], ['a', 'b'])",
         "pythonMemoryState": {

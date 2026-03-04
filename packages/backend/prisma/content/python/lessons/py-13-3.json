@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "문자열 생성 및 인덱스 이해",
-        "explanation": "**`text = \"Hello, Python!\"`** -- 14글자의 문자열 객체가 힙(heap) 메모리에 생성되고, `text`라는 이름표(label)가 붙습니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 이 문자열의 각 문자에는 **양수 인덱스**와 **음수 인덱스** 두 가지가 부여됩니다.\n\n**슬라이싱 기본 문법:** `text[start:stop:step]`\n- `start`: 시작 위치 (**포함**)\n- `stop`: 끝 위치 (**미포함!** -- 이것이 핵심)\n- `step`: 간격 (기본값: 1)\n\n**비유:** 아파트 호수와 같습니다. 101호(0번), 102호(1번)... 으로 앞에서부터 세거나, 마지막 호(- 1번), 끝에서 두 번째(-2번)... 으로 뒤에서부터 셀 수 있습니다. 같은 집에 두 개의 번호가 있는 것이죠!\n\n**주의:** Python의 인덱스는 항상 **0부터** 시작합니다. 첫 번째 문자는 `text[1]`이 아니라 `text[0]`입니다! 이것은 C, Java 등 대부분의 언어와 동일합니다.",
+        "explanation": "**`text = \"Hello, Python!\"`** -- 14글자의 문자열 객체가 힙(heap) 메모리에 생성되고, `text`라는 이름표(label)가 붙습니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 이 문자열의 각 문자에는 **양수 인덱스**와 **음수 인덱스** 두 가지가 부여됩니다.",
         "visualizationType": "pythonMemory",
         "code": "text = \"Hello, Python!\"",
         "pythonMemoryState": {
@@ -33,7 +33,7 @@
       },
       {
         "title": "처음부터 5글자 ([:5])",
-        "explanation": "**`first_five = text[:5]`** -- 문자열의 처음부터 인덱스 4까지(5는 미포함!) 추출하여 **새 문자열**을 반환합니다.\n\n`text[:5]`는 `text[0:5:1]`의 축약형입니다.\n\n**핵심 규칙:** `stop` 인덱스는 **항상 미포함**! `[:5]`는 인덱스 0, 1, 2, 3, 4까지입니다. 이 규칙 덕분에 `len(text[:5])` == `5`가 성립합니다 (길이 = stop - start).\n\n**비유:** 롤케이크(문자열)를 처음부터 5cm(인덱스 0~4) 지점에서 칼(슬라이싱)로 자르는 것입니다. 원본 롤케이크는 그대로 두고, 잘린 조각(새 문자열)만 가져옵니다.\n\n**주의:** `text[:5]`와 `text[5]`는 완전히 다릅니다! `text[:5]`는 문자열 `\"Hello\"`를, `text[5]`는 단일 문자 `\",\"`를 반환합니다.\n\n**추출 과정을 시각화합시다:**\n```\n H  e  l  l  o  ,     P  y  t  h  o  n  !\n[0][1][2][3][4] 5\n ^^^^^^^^^^^^^^\n   추출 범위 (0~4)\n```\n결과: `\"Hello\"`",
+        "explanation": "**`first_five = text[:5]`** -- 문자열의 처음부터 인덱스 4까지(5는 미포함!) 추출하여 **새 문자열**을 반환합니다.\n\n`text[:5]`는 `text[0:5:1]`의 축약형입니다.",
         "visualizationType": "pythonMemory",
         "code": "first_five = text[:5]",
         "pythonMemoryState": {
@@ -243,7 +243,7 @@
       },
       {
         "title": "최종 결과 출력",
-        "explanation": "**`print(middle)`** -- `middle`이 가리키는 `\"Python\"`을 출력합니다.\n\n**전체 실행 결과를 정리합시다:**\n```\nHello          <- text[:5]    (처음 5글자)\nHlo yhn        <- text[::2]   (짝수 인덱스)\n!nohtyP ,olleH <- text[::-1]  (뒤집기)\nPython         <- text[7:13]  (중간 추출)\n```\n\n**비유:** 스위스 아미 나이프(슬라이싱)처럼, `[start:stop:step]` 하나로 문자열을 자유자재로 다룰 수 있습니다. 앞에서 자르기, 뒤에서 자르기, 건너뛰기, 뒤집기까지!\n\n**Python 내부 동작:** 슬라이싱의 핵심 특성은 **안전성**입니다. 범위를 벗어나도 에러가 나지 않습니다:\n- `text[0:100]` → `\"Hello, Python!\"` (존재하는 만큼만 반환)\n- `text[100:200]` → `\"\"` (빈 문자열, 에러 없음)\n- `text[-100:5]` → `\"Hello\"` (음수가 0보다 작으면 0으로 조정)\n\n단, **인덱싱**은 범위 초과 시 에러가 발생합니다: `text[100]` → `IndexError`!\n\n**슬라이싱 패턴 총정리:**\n\n**실행 순서 (전체 정리):**\n1. `text = \"Hello, Python!\"` → 문자열 생성\n2. `text[:5]` → `\"Hello\"` (처음 5글자)\n3. `text[::2]` → `\"Hlo yhn\"` (짝수 인덱스)\n4. `text[::-1]` → `\"!nohtyP ,olleH\"` (뒤집기)\n5. `text[7:13]` → `\"Python\"` (중간 추출)",
+        "explanation": "**`print(middle)`** -- `middle`이 가리키는 `\"Python\"`을 출력합니다.\n\n**전체 실행 결과를 정리합시다:**\n```\nHello          <- text[:5]    (처음 5글자)\nHlo yhn        <- text[::2]   (짝수 인덱스)\n!nohtyP ,olleH <- text[::-1]  (뒤집기)\nPython         <- text[7:13]  (중간 추출)\n```",
         "visualizationType": "pythonMemory",
         "code": "print(middle)",
         "pythonMemoryState": {

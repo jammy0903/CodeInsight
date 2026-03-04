@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "리스트 생성",
-        "explanation": "**`data = [1, 2, 3]`** -- 리스트 객체를 힙(heap) 메모리에 생성하고, `data`라는 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 먼저 세 개의 정수를 담은 리스트 `data`를 만듭니다.\n\n**비유:** 3칸짜리 사물함을 만들어두는 것과 같습니다. 0번 칸에 1, 1번 칸에 2, 2번 칸에 3이 들어있습니다. 이 사물함에 `data`라는 이름표가 붙어있죠.\n\n**Python 내부 동작:** `list` 객체는 힙 메모리에 할당됩니다. 내부적으로 리스트는 각 원소 객체의 **메모리 주소를 담는 포인터 배열**입니다. `1`, `2`, `3`이라는 `int` 객체들이 각각 따로 존재하고, 리스트는 그 주소들의 목록을 관리합니다. 전역 네임스페이스에 `{\"data\": <리스트 객체 주소>}`가 등록됩니다.\n\n이 리스트의 유효한 인덱스는 **0, 1, 2**입니다. `data[0]`은 1, `data[1]`은 2, `data[2]`는 3입니다. 만약 `data[10]`처럼 없는 인덱스에 접근하면 **IndexError**가 발생합니다. 하지만 그 전에 다른 에러가 먼저 터질 수도 있어요!\n\n**실행 순서:** `data = [1, 2, 3]` 실행 완료 → 다음 줄(try 블록)으로 이동",
+        "explanation": "**`data = [1, 2, 3]`** -- 리스트 객체를 힙(heap) 메모리에 생성하고, `data`라는 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 먼저 세 개의 정수를 담은 리스트 `data`를 만듭니다.",
         "visualizationType": "pythonMemory",
         "code": "data = [1, 2, 3]",
         "pythonMemoryState": {
@@ -30,7 +30,7 @@
       },
       {
         "title": "try 블록 진입",
-        "explanation": "**`try:`** -- 예외 감시 블록에 진입합니다. 이번에는 **여러 종류의 에러**가 발생할 수 있습니다.\n\ntry 블록 안에는 두 줄의 위험한 코드가 있습니다:\n1. **`int(\"abc\")`** -- 문자열을 숫자로 변환 시도 → **ValueError** 가능\n2. **`data[index]`** -- 리스트 인덱스 접근 → **IndexError** 가능\n\n**비유:** 지뢰밭을 지나가는데, 지뢰 종류가 여러 가지인 상황입니다. 대인 지뢰(ValueError), 대전차 지뢰(IndexError), 알 수 없는 지뢰(Exception)... 각 지뢰에 맞는 제거 방법(except 블록)이 따로 있어야 합니다.\n\n**Python 내부 동작:** `try` 블록 진입 시, 인터프리터는 예외 핸들러 체인을 설정합니다. 이 체인에는 3개의 except 블록 정보가 순서대로 등록됩니다: ValueError → IndexError → Exception. 에러 발생 시 이 체인을 **위에서 아래로** 탐색합니다.\n\n이번 레슨의 핵심: except 블록을 여러 개 쓸 수 있고, 에러 종류에 따라 **다른 처리**를 할 수 있습니다!\n\n**실행 순서:** `try:` 진입 → try 블록 안의 첫 번째 줄 실행 시작",
+        "explanation": "**`try:`** -- 예외 감시 블록에 진입합니다. 이번에는 **여러 종류의 에러**가 발생할 수 있습니다.\n\ntry 블록 안에는 두 줄의 위험한 코드가 있습니다:\n1. **`int(\"abc\")`** -- 문자열을 숫자로 변환 시도 → **ValueError** 가능\n2. **`data[index]`** -- 리스트 인덱스 접근 → **IndexError** 가능",
         "visualizationType": "pythonMemory",
         "code": "try:",
         "pythonMemoryState": {
@@ -85,7 +85,7 @@
       },
       {
         "title": "첫 번째 except가 잡았다!",
-        "explanation": "**`except ValueError:`** -- Python이 except 블록을 **위에서 아래로** 순서대로 확인하여, 발생한 에러와 일치하는 첫 번째 블록을 실행합니다.\n\n매칭 과정을 따라가 봅시다:\n1. `except ValueError:` -- 발생한 에러가 ValueError인가? **YES!** 이 블록 실행!\n2. `except IndexError:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)\n3. `except Exception as e:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)\n\n**비유:** 우체국의 편지 분류 시스템과 같습니다. 편지(에러)가 들어오면 첫 번째 분류함(except ValueError)부터 확인합니다. \"서울행?\" → Yes! → 서울 분류함에 넣음. 나머지 분류함(부산행, 기타)은 확인할 필요 없이 건너뜁니다.\n\n**주의 (except 매칭 규칙):**\n- 위에서 아래로 **순서대로** 확인합니다\n- **첫 번째로** 일치하는 except 블록**만** 실행합니다\n- 나머지 except 블록은 전부 건너뜁니다\n- 하나의 에러에 대해 여러 except가 실행되는 일은 **절대 없습니다**",
+        "explanation": "**`except ValueError:`** -- Python이 except 블록을 **위에서 아래로** 순서대로 확인하여, 발생한 에러와 일치하는 첫 번째 블록을 실행합니다.\n\n매칭 과정을 따라가 봅시다:\n1. `except ValueError:` -- 발생한 에러가 ValueError인가? **YES!** 이 블록 실행!\n2. `except IndexError:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)\n3. `except Exception as e:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)",
         "visualizationType": "pythonMemory",
         "code": "    print(\"Invalid number format!\")",
         "pythonMemoryState": {
@@ -111,7 +111,7 @@
       },
       {
         "title": "만약 IndexError였다면?",
-        "explanation": "**`except IndexError:`** -- 이번 실행에서는 ValueError가 먼저 발생했기 때문에 이 블록은 **실행되지 않습니다**.\n\n하지만 **만약 시나리오가 달랐다면?** `int(\"abc\")` 대신 `int(\"100\")`이었다고 상상해봅시다:\n- `index = int(\"100\")` → 성공! `index`에 정수 `100`이 할당됩니다\n- `value = data[100]` → **IndexError 발생!** 리스트 `data`의 유효 인덱스는 0~2인데, 100번 인덱스에 접근하려 했습니다\n- 첫 번째 `except ValueError:` → ValueError인가? **NO!** 건너뜀\n- 두 번째 `except IndexError:` → IndexError인가? **YES!** 이 블록 실행!\n\n**비유:** 병원의 진료 분류 시스템입니다. 오늘 환자(ValueError)는 내과(첫 번째 except)에서 치료받았습니다. 만약 다른 환자(IndexError)가 왔다면 정형외과(두 번째 except)에서 치료받았을 것입니다. 각 환자에게 맞는 전문의가 따로 있는 거죠!\n\n**Python 내부 동작:** `IndexError`는 `data.__getitem__(100)`이 호출될 때 발생합니다. 리스트의 내부 배열 크기(3)와 요청된 인덱스(100)를 비교하여, 범위를 벗어나면 `IndexError: list index out of range` 예외를 생성합니다.\n\n**이것이 여러 except의 핵심**: 발생하는 에러 종류에 따라 **적절한 대응**을 할 수 있습니다! 하나의 except로 모든 에러를 퉁치지 않고, 상황별 맞춤 처리가 가능합니다.\n\n**실행 순서 (이번 실행):** 이 블록은 건너뜀 (ValueError가 이미 위에서 처리됨)",
+        "explanation": "**`except IndexError:`** -- 이번 실행에서는 ValueError가 먼저 발생했기 때문에 이 블록은 **실행되지 않습니다**.\n\n하지만 **만약 시나리오가 달랐다면?** `int(\"abc\")` 대신 `int(\"100\")`이었다고 상상해봅시다:\n- `index = int(\"100\")` → 성공! `index`에 정수 `100`이 할당됩니다\n- `value = data[100]` → **IndexError 발생!** 리스트 `data`의 유효 인덱스는 0~2인데, 100번 인덱스에 접근하려 했습니다\n- 첫 번째 `except ValueError:` → ValueError인가? **NO!** 건너뜀\n- 두 번째 `except IndexError:` → IndexError인가? **YES!** 이 블록 실행!",
         "visualizationType": "pythonMemory",
         "code": "except IndexError:",
         "pythonMemoryState": {

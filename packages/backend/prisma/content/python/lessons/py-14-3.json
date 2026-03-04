@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "원본 리스트 생성",
-        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- `map`, `filter`, `reduce`에 사용할 원본 리스트를 생성합니다.\n\n이번 레슨에서는 **함수형 프로그래밍(Functional Programming)**의 핵심 도구 3가지를 배웁니다. 함수형 프로그래밍이란 함수를 **값처럼** 다루는 프로그래밍 스타일입니다. 숫자나 문자열을 변수에 넣듯이, **함수도 변수에 넣고, 다른 함수에 전달하고, 반환값으로 사용**할 수 있습니다.\n\n**비유:** 일반적인 프로그래밍이 \"요리사가 직접 재료를 손질하는 것\"이라면, 함수형 프로그래밍은 \"자동화된 주방 기계에 재료와 레시피(함수)를 넣으면 알아서 처리하는 것\"입니다. `map`은 \"모든 재료에 같은 조리법 적용\", `filter`는 \"기준에 맞는 재료만 선별\", `reduce`는 \"모든 재료를 하나의 요리로 합치기\"입니다.\n\n**lambda(람다)란?** 이름 없는 한 줄 함수입니다.\n```python\nlambda x: x * 2  # x를 받아 x*2를 반환하는 함수\n```\n이것은 `def double(x): return x * 2`와 동일하지만, 이름을 붙이지 않고 즉석에서 정의할 수 있습니다.\n\n**Python 내부 동작:** 파이썬에서 함수는 **일급 객체(first-class object)**입니다. `int`, `str`, `list`와 마찬가지로 함수도 메모리에 객체로 존재하며, 변수에 할당하거나 다른 함수의 인자로 전달할 수 있습니다. `lambda`로 만든 함수도 일반 `def` 함수와 동일한 `function` 타입 객체입니다.\n\n**실행 순서:**\n1. 리스트 리터럴 평가 → `list` 객체 힙에 할당.\n2. 전역 네임스페이스에 `numbers → list` 바인딩 생성.",
+        "explanation": "**`numbers = [1, 2, 3, 4, 5]`** -- `map`, `filter`, `reduce`에 사용할 원본 리스트를 생성합니다.\n\n이번 레슨에서는 **함수형 프로그래밍(Functional Programming)**의 핵심 도구 3가지를 배웁니다. 함수형 프로그래밍이란 함수를 **값처럼** 다루는 프로그래밍 스타일입니다. 숫자나 문자열을 변수에 넣듯이, **함수도 변수에 넣고, 다른 함수에 전달하고, 반환값으로 사용**할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "numbers = [1, 2, 3, 4, 5]",
         "pythonMemoryState": {
@@ -117,7 +117,7 @@
       },
       {
         "title": "reduce를 위한 import",
-        "explanation": "**`from functools import reduce`** -- `functools` 모듈에서 `reduce` 함수를 가져옵니다.\n\n`reduce`는 Python 2에서는 내장 함수였지만, Python 3에서 `functools` 모듈로 이동되었습니다. 따라서 사용하기 전에 반드시 import해야 합니다.\n\n**비유:** `reduce`가 내장 함수에서 모듈로 이동된 것은, 자주 쓰지 않는 공구를 도구함(내장)에서 빼고 창고(모듈)에 넣어둔 것과 같습니다. 필요할 때 창고에서 꺼내 쓰면 됩니다.\n\n**주의:** `import reduce`(모듈 없이)라고 쓰면 `ModuleNotFoundError`가 발생합니다. 반드시 `from functools import reduce`로 작성해야 합니다.\n\n**왜 내장에서 제거되었나?** Python의 창시자 Guido van Rossum이 `reduce`를 \"대부분의 경우 가독성이 떨어진다\"고 판단했습니다. `map`과 `filter`는 직관적이지만, `reduce`는 동작을 머릿속으로 시뮬레이션해야 이해할 수 있기 때문입니다. 실제로 `reduce(lambda a, b: a + b, numbers)`는 `sum(numbers)`로 더 쉽게 표현할 수 있습니다.",
+        "explanation": "**`from functools import reduce`** -- `functools` 모듈에서 `reduce` 함수를 가져옵니다.\n\n`reduce`는 Python 2에서는 내장 함수였지만, Python 3에서 `functools` 모듈로 이동되었습니다. 따라서 사용하기 전에 반드시 import해야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "from functools import reduce",
         "pythonMemoryState": {
@@ -241,7 +241,7 @@
       },
       {
         "title": "최종 결과 출력 및 정리",
-        "explanation": "**`print(total)`** -- `total`이 가리키는 정수 `15`를 출력합니다. 리스트 `[1, 2, 3, 4, 5]`의 모든 요소가 하나의 값으로 축약되었습니다.\n\n**함수형 3대장 비교 정리:**\n\n**비유:** 요리에 비유하면, `map`은 \"모든 재료를 같은 크기로 자르기\", `filter`는 \"상한 재료를 골라내기\", `reduce`는 \"모든 재료를 넣고 하나의 수프 만들기\"입니다.\n\n**주의:** `map`과 `filter`의 결과에 `list()`를 감싸는 것을 잊으면 이터레이터 객체가 반환됩니다. 한 번 순회한 이터레이터는 소진(exhausted)되어 다시 사용할 수 없으므로, 여러 번 사용할 데이터라면 반드시 `list()`로 변환하세요.\n\n**Python 스타일 가이드 (언제 무엇을 쓸까?):**\n- **간단한 변환/필터:** 컴프리헨션 권장 (더 Pythonic하고 읽기 쉬움)\n- **기존 함수 활용:** `map(str, nums)`, `map(int, input_list)` -- 이미 있는 함수를 쓸 때 `map`이 깔끔\n- **축약 연산:** `sum()`, `max()`, `min()` 내장 함수 우선 사용, 복잡한 경우만 `reduce`",
+        "explanation": "**`print(total)`** -- `total`이 가리키는 정수 `15`를 출력합니다. 리스트 `[1, 2, 3, 4, 5]`의 모든 요소가 하나의 값으로 축약되었습니다.\n\n**함수형 3대장 비교 정리:**",
         "visualizationType": "pythonMemory",
         "code": "print(total)",
         "pythonMemoryState": {

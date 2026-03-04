@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "함수 정의",
-        "explanation": "**`def safe_divide(a, b):`** -- `function` 객체를 생성하고 `safe_divide`라는 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `def` 키워드로 함수를 정의하면, Python은 함수 본문의 코드를 **코드 객체(code object)**로 컴파일하여 메모리에 저장하고, 그 코드 객체를 감싼 `function` 객체를 만듭니다.\n\n이 함수는 try-except-else-finally의 **완전한 4단 구조**를 보여줍니다:\n```\ntry:      에러가 날 수 있는 코드 (위험 구간)\nexcept:   에러가 났을 때 실행 (응급 처치)\nelse:     에러가 안 났을 때 실행 (성공 축하)\nfinally:  무조건 실행 (뒷정리)\n```\n\n**비유:** 수술실의 프로토콜과 같습니다. 수술(try)을 시도하고, 문제가 생기면 응급 처치(except), 성공하면 축하(else), 그리고 **성공이든 실패든 반드시** 수술실을 정리(finally)합니다.\n\n**Python 내부 동작:** `def` 문이 실행되면 `function` 객체가 힙에 생성되고, 전역 네임스페이스에 `{\"safe_divide\": <function 객체 주소>}`가 등록됩니다. 함수 본문은 아직 실행되지 않습니다. 실제 실행은 `safe_divide(10, 3)` 호출 시 시작됩니다.\n\n**주의:** `def`는 **정의만** 할 뿐, 함수 안의 코드는 **호출될 때까지 실행되지 않습니다**. 함수 안에 문법 에러가 아닌 런타임 에러가 있어도 이 시점에서는 발견되지 않습니다.\n\n**실행 순서:** `def safe_divide(a, b):` → 함수 객체 생성 → 다음 줄(함수 호출)로 이동",
+        "explanation": "**`def safe_divide(a, b):`** -- `function` 객체를 생성하고 `safe_divide`라는 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `def` 키워드로 함수를 정의하면, Python은 함수 본문의 코드를 **코드 객체(code object)**로 컴파일하여 메모리에 저장하고, 그 코드 객체를 감싼 `function` 객체를 만듭니다.",
         "visualizationType": "pythonMemory",
         "code": "def safe_divide(a, b):",
         "highlightOffset": [
@@ -43,7 +43,7 @@
       },
       {
         "title": "함수 호출 - try 블록 진입",
-        "explanation": "**`answer = safe_divide(10, 3)`** -- 함수를 호출하면 새로운 **로컬 네임스페이스**가 생성되고, 인자가 매개변수에 바인딩됩니다.\n\n`safe_divide`를 `a=10`, `b=3`으로 호출합니다. 함수 내부로 점프하여 `try` 블록에 진입합니다.\n\n**`result = a / b`** -- `10 / 3` = **3.3333333333333335** (Python의 `/` 연산자는 항상 `float`를 반환합니다)\n\n**비유:** 주방장(함수)에게 \"10인분의 파스타를 3명이 나눠 먹을 수 있게 해주세요\"라고 주문(호출)한 것입니다. 주방장은 먼저 나눗셈을 시도(try)하고, 0명이 아니므로 성공적으로 결과를 만들어냅니다.\n\n**Python 내부 동작:** 함수 호출 시 새로운 스택 프레임이 생성됩니다. 이 프레임에는 로컬 변수(`a`, `b`, `result`)를 위한 네임스페이스가 포함됩니다. `10 / 3`은 `int.__truediv__(10, 3)`을 호출하여 `float` 객체 `3.3333333333333335`를 반환합니다.\n\n0으로 나누는 게 아니므로 **에러가 발생하지 않습니다!** 에러가 없으면 except 블록은 건너뛰고, **else 블록**이 실행됩니다. 이것이 핵심입니다!\n\n**실행 순서:** 함수 호출 → 스택 프레임 생성 → `a=10, b=3` 바인딩 → `try:` 진입 → `result = 10 / 3` 성공! → except 건너뜀 → else로 이동",
+        "explanation": "**`answer = safe_divide(10, 3)`** -- 함수를 호출하면 새로운 **로컬 네임스페이스**가 생성되고, 인자가 매개변수에 바인딩됩니다.\n\n`safe_divide`를 `a=10`, `b=3`으로 호출합니다. 함수 내부로 점프하여 `try` 블록에 진입합니다.",
         "visualizationType": "pythonMemory",
         "code": "        result = a / b",
         "pythonMemoryState": {
@@ -101,7 +101,7 @@
       },
       {
         "title": "else 블록 실행 (에러 없을 때만!)",
-        "explanation": "**`else:`** 블록이 실행됩니다! try 블록에서 **에러가 하나도 발생하지 않았을 때**만 실행되는 특별한 블록입니다.\n\n**`print(f\"Success: {a}/{b} = {result}\")`** -- 성공 메시지를 출력합니다: `Success: 10/3 = 3.3333333333333335`\n\n**Python 내부 동작:** try 블록의 모든 코드가 예외 없이 실행 완료되면, 인터프리터는 except 블록들을 모두 건너뛰고 else 블록으로 제어 흐름을 이동시킵니다. else 블록에서 발생하는 에러는 이 try-except에 의해 **잡히지 않습니다!** 이것이 try 안에 성공 코드를 넣는 것과의 핵심 차이입니다.\n\n**비유:** 시험(try)을 봤을 때, 시험 중 문제가 생기면(에러) 감독관(except)이 처리하고, 시험을 무사히 마치면(에러 없음) 합격 축하 파티(else)를 합니다. 시험 도중에 축하 파티를 하면 이상하잖아요!\n\n**주의:** else 블록은 선택사항입니다. 꼭 필요하지 않다면 생략해도 됩니다. 하지만 있으면 코드 가독성이 크게 향상됩니다.",
+        "explanation": "**`else:`** 블록이 실행됩니다! try 블록에서 **에러가 하나도 발생하지 않았을 때**만 실행되는 특별한 블록입니다.\n\n**`print(f\"Success: {a}/{b} = {result}\")`** -- 성공 메시지를 출력합니다: `Success: 10/3 = 3.3333333333333335`",
         "visualizationType": "pythonMemory",
         "code": "        print(f\"Success: {a}/{b} = {result}\")",
         "pythonMemoryState": {

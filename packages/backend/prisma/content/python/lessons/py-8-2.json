@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "제너레이터 함수 정의",
-        "explanation": "**`def counter_generator(start, end):`**\n\n`yield` 키워드가 포함된 함수를 정의합니다. Python은 함수 본문에 `yield`가 있으면 이 함수를 **제너레이터 함수**로 인식합니다.\n\n**제너레이터 함수란?**\n이전 레슨에서 이터레이터를 만들려면 `__iter__`와 `__next__`가 있는 **클래스 전체**를 작성해야 했습니다.\n제너레이터 함수는 이 복잡한 과정을 **yield 한 줄**로 대체해줍니다!\n\n**비유: 일반 함수 vs 제너레이터 함수**\n- 일반 함수: 식당에서 모든 요리를 한꺼번에 내놓는 뷔페 (return → 한 번에 끝)\n- 제너레이터 함수: 주문할 때마다 한 접시씩 내오는 코스 요리 (yield → 하나씩 전달)\n\n**핵심 차이**: 일반 함수의 `return`은 함수를 **종료**하지만, 제너레이터의 `yield`는 함수를 **일시정지**합니다.\n다음 호출 시 멈춘 곳부터 이어서 실행됩니다!\n\n**왜 이 순서인가?** 함수를 사용하기 전에 먼저 정의해야 합니다. 이 시점에서는 함수 객체만 생성되고, 본문은 실행되지 않습니다.\n\n**실행 순서**: counter_generator 함수 객체(0x1100) 생성 → 전역 네임스페이스에 등록",
+        "explanation": "**`def counter_generator(start, end):`**\n\n`yield` 키워드가 포함된 함수를 정의합니다. Python은 함수 본문에 `yield`가 있으면 이 함수를 **제너레이터 함수**로 인식합니다.",
         "visualizationType": "pythonMemory",
         "code": "def counter_generator(start, end):",
         "highlightOffset": [
@@ -42,7 +42,7 @@
       },
       {
         "title": "제너레이터 객체 생성",
-        "explanation": "**`counter = counter_generator(0, 3)`**\n\n제너레이터 함수를 호출합니다. **그런데 놀라운 일이 벌어집니다!**\n함수 안의 코드가 전혀 실행되지 않고, 대신 **제너레이터 객체**만 생성되어 반환됩니다.\n\n**이것이 제너레이터의 가장 중요한 특징입니다!**\n일반 함수: `my_func()` → 함수 본문 즉시 실행, 결과 반환\n제너레이터: `my_gen()` → 본문 실행 안 함! 제너레이터 객체만 반환\n\n**\"제너레이터 시작!\"이 아직 출력되지 않은 것을 주목하세요!**\nprint문이 함수의 첫 줄에 있지만, 아직 실행되지 않았습니다.\n제너레이터는 **게으른(Lazy)** 실행을 합니다 -- 값이 실제로 필요해질 때까지 아무것도 하지 않습니다.\n\n**비유**: 코스 요리 레스토랑에 예약(= 함수 호출)만 한 상태입니다. 아직 요리사가 요리를 시작하지 않았습니다. 손님이 \"첫 번째 요리 주세요\"(= next() 호출)라고 해야 비로소 요리가 시작됩니다.\n\n**초보자 주의**: `counter_generator(0, 3)`의 결과가 숫자 리스트 [0, 1, 2]가 아닙니다! 제너레이터 **객체**입니다.\n\n**실행 순서**: counter_generator(0, 3) 호출 → 제너레이터 객체(0x2000) 생성 → counter 변수에 할당 (본문 실행 안 함!)",
+        "explanation": "**`counter = counter_generator(0, 3)`**\n\n제너레이터 함수를 호출합니다. **그런데 놀라운 일이 벌어집니다!**\n함수 안의 코드가 전혀 실행되지 않고, 대신 **제너레이터 객체**만 생성되어 반환됩니다.",
         "visualizationType": "pythonMemory",
         "code": "counter = counter_generator(0, 3)",
         "pythonMemoryState": {
@@ -116,7 +116,7 @@
       },
       {
         "title": "제너레이터 코드 첫 실행",
-        "explanation": "**`print(\"제너레이터 시작!\")`**\n\n**드디어 함수 본문이 실행됩니다!** `counter_generator(0, 3)` 호출 후 한참이 지난 지금에서야 print가 실행됩니다.\n\n**실행 타이밍을 정리하면:**\n- `counter = counter_generator(0, 3)` → 아무것도 실행 안 됨\n- `print(type(counter))` → 아직도 실행 안 됨\n- `for num in counter:` → __next__() 첫 호출 → **이제야 여기부터 실행 시작!**\n\n이것이 **지연 실행(Lazy Evaluation)**의 핵심입니다.\n함수 정의 시점이 아니라, 값이 **실제로 필요한 시점**에 실행이 시작됩니다.\n\n**비유**: 요리사가 드디어 주방에 들어와 \"시작합니다!\"라고 외치는 장면입니다.\n\n**왜 이 순서인가?** __next__()가 호출되면 함수 본문의 첫 줄부터 실행을 시작합니다.\n\n**실행 순서**: 제너레이터 실행 컨텍스트 활성화 → print문 실행 → \"제너레이터 시작!\" 출력",
+        "explanation": "**`print(\"제너레이터 시작!\")`**\n\n**드디어 함수 본문이 실행됩니다!** `counter_generator(0, 3)` 호출 후 한참이 지난 지금에서야 print가 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"제너레이터 시작!\")",
         "pythonMemoryState": {
@@ -197,7 +197,7 @@
       },
       {
         "title": "while 조건 검사 (1)",
-        "explanation": "**`while current < end:`**\n\ncurrent(0) < end(3)? **True!** while 루프에 진입합니다.\n\n**이전 레슨의 Counter 클래스와 비교:**\n- Counter: `if self.current >= self.end: raise StopIteration` (매번 직접 확인)\n- 제너레이터: `while current < end:` (자연스러운 루프 → 끝나면 자동 StopIteration)\n\n**제너레이터의 편리함**: while 루프가 끝나면(조건이 False가 되면) 함수가 종료되고, Python이 **자동으로 StopIteration을 발생**시킵니다.\nCounter 클래스처럼 직접 `raise StopIteration`을 쓸 필요가 없습니다!\n\n**실행 흐름**: 이 while 루프 안에서 yield를 만나면 일시정지되고, 다음 __next__ 호출 시 yield 다음 줄(current += 1)부터 재개됩니다.\n\n**실행 순서**: 0 < 3 확인 → True → while 루프 본문 진입",
+        "explanation": "**`while current < end:`**\n\ncurrent(0) < end(3)? **True!** while 루프에 진입합니다.",
         "visualizationType": "pythonMemory",
         "code": "while current < end:",
         "pythonMemoryState": {
@@ -230,7 +230,7 @@
       },
       {
         "title": "첫 번째 값 yield",
-        "explanation": "**`yield current`**\n\n**이것이 제너레이터의 핵심 키워드 `yield`입니다!**\n현재 값 **0**을 for 루프에 반환하고, 함수의 실행을 **일시정지(Suspend)**합니다.\n\n**yield vs return의 결정적 차이:**\n- `return`: 값 반환 + 함수 **종료** (지역 변수 소멸)\n- `yield`: 값 반환 + 함수 **일시정지** (지역 변수 보존!)\n\n**yield가 일시정지할 때 보존되는 것들:**\n1. 모든 지역 변수 (current=0, start=0, end=3)\n2. 현재 실행 위치 (yield 있는 줄)\n3. while 루프의 상태\n\n다음에 __next__가 호출되면, 이 모든 상태가 복원되어 **yield 바로 다음 줄**(`current += 1`)부터 실행을 재개합니다.\n\n**비유**: 책을 읽다가 북마크를 꽂고 책을 덮는 것입니다. 다음에 열면 북마크 위치부터 이어서 읽습니다.\n\n**이 시점에서**: 0이 for 루프의 num에 할당되고, 제너레이터는 잠들어 있습니다.\n\n**실행 순서**: current(0) 반환 → 실행 위치 저장 → 제너레이터 일시정지 → 제어권이 for 루프로 넘어감",
+        "explanation": "**`yield current`**\n\n**이것이 제너레이터의 핵심 키워드 `yield`입니다!**\n현재 값 **0**을 for 루프에 반환하고, 함수의 실행을 **일시정지(Suspend)**합니다.",
         "visualizationType": "pythonMemory",
         "code": "yield current",
         "pythonMemoryState": {
@@ -577,7 +577,7 @@
       },
       {
         "title": "제너레이터 종료",
-        "explanation": "**`print(\"제너레이터 종료!\")`**\n\nwhile 루프를 탈출한 후, 함수의 마지막 줄인 print문을 실행합니다.\n\"제너레이터 종료!\"가 출력됩니다.\n\n**그리고 함수가 끝에 도달합니다!**\n제너레이터 함수가 끝에 도달하면 (또는 return을 만나면), Python이 **자동으로 StopIteration을 발생**시킵니다.\nfor 루프는 이 StopIteration을 감지하고 조용히 종료합니다.\n\n**전체 실행 흐름 요약:**\n1. `counter_generator(0, 3)` 호출 → 제너레이터 객체만 생성 (코드 실행 안 함)\n2. `for num in counter:` → __next__() 호출 → 함수 본문 실행 시작\n3. 첫 번째 yield 0 → 일시정지 → Got: 0 출력\n4. 재개 → current 1 → yield 1 → 일시정지 → Got: 1 출력\n5. 재개 → current 2 → yield 2 → 일시정지 → Got: 2 출력\n6. 재개 → current 3 → while 탈출 → \"제너레이터 종료!\" → 함수 끝 → StopIteration → for 루프 종료\n\n**핵심 교훈**: 제너레이터 함수는 yield 하나만으로 이터레이터의 복잡한 프로토콜을 자동으로 처리해줍니다!\n\n**실행 순서**: \"제너레이터 종료!\" 출력 → 함수 끝 도달 → StopIteration 자동 발생 → for 루프 종료",
+        "explanation": "**`print(\"제너레이터 종료!\")`**\n\nwhile 루프를 탈출한 후, 함수의 마지막 줄인 print문을 실행합니다.\n\"제너레이터 종료!\"가 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"제너레이터 종료!\")",
         "pythonMemoryState": {

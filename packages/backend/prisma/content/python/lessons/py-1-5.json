@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "함수 정의",
-        "explanation": "**`def greet(name):`** -- `def` 키워드로 `greet`라는 이름의 함수를 정의합니다.\n\n이 줄이 실행되면 파이썬은 함수의 **코드 블록을 메모리에 등록**합니다. 아직 함수 내부의 코드가 실행되는 것이 아닙니다! 단지 '나중에 호출하면 이 코드를 실행하겠다'는 설계도를 만드는 것입니다.\n\n**구조 분석:**\n- `def`: '정의하다(define)'의 약자. 함수를 만들겠다는 선언\n- `greet`: 함수의 이름. 나중에 이 이름으로 호출합니다\n- `name`: **매개변수(parameter)**. 함수가 외부에서 받을 값을 담는 변수\n- `:`: 콜론 -- 다음 줄부터 들여쓰기된 코드가 함수의 본문\n\n**비유:** 레시피(요리법)를 종이에 적는 것과 같습니다. 레시피를 적는 것(def)과 실제로 요리하는 것(호출)은 다릅니다. 레시피의 '재료'란에 해당하는 것이 매개변수(name)입니다.\n\n**Python 내부 동작:** `def`문이 실행되면, 파이썬은 `function` 타입의 객체를 만들어 전역 네임스페이스에 `greet`라는 이름으로 등록합니다. 함수 객체에는 바이트코드, 매개변수 정보, 기본값 등이 저장됩니다.\n\n**주의:** 함수 이름도 변수와 마찬가지로 **이름표**입니다. `f = greet`처럼 다른 변수에 할당할 수도 있고, `f(\"World\")`로 호출할 수도 있습니다.",
+        "explanation": "**`def greet(name):`** -- `def` 키워드로 `greet`라는 이름의 함수를 정의합니다.\n\n이 줄이 실행되면 파이썬은 함수의 **코드 블록을 메모리에 등록**합니다. 아직 함수 내부의 코드가 실행되는 것이 아닙니다! 단지 '나중에 호출하면 이 코드를 실행하겠다'는 설계도를 만드는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "def greet(name):",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "함수 본문",
-        "explanation": "**`message = f\"Hello, {name}!\"`** -- 함수 본문: f-string으로 인사말 문자열을 만듭니다.\n\n이 코드는 `greet()` 함수가 **호출될 때** 실행됩니다. `def`만 실행된 지금 시점에서는 아직 실행되지 않았습니다.\n\n**f-string 문법:** `f\"Hello, {name}!\"`에서 중괄호 `{name}` 안의 변수가 실제 값으로 치환됩니다. 나중에 `greet(\"Python\")`이 호출되면, `name`이 `\"Python\"`이 되어 `\"Hello, Python!\"`이 만들어집니다.\n\n**지역 변수(Local Variable):** `message`는 함수 안에서만 존재하는 지역 변수입니다. 함수 밖에서 `message`를 사용하려고 하면 `NameError`가 발생합니다.\n\n**비유:** 레시피의 '조리 과정' 중 첫 번째 단계를 적는 것입니다. 실제로 요리할 때(호출 시) 이 단계가 수행됩니다. '재료(name)를 넣고 반죽(message)을 만든다'라는 지시사항이죠.\n\n**Python 내부 동작:** 함수가 호출되면 새로운 **지역 네임스페이스(local namespace)**가 생성됩니다. `name`과 `message`는 이 지역 네임스페이스에 등록됩니다. 함수가 끝나면 이 네임스페이스가 사라지면서 지역 변수도 함께 소멸합니다.",
+        "explanation": "**`message = f\"Hello, {name}!\"`** -- 함수 본문: f-string으로 인사말 문자열을 만듭니다.\n\n이 코드는 `greet()` 함수가 **호출될 때** 실행됩니다. `def`만 실행된 지금 시점에서는 아직 실행되지 않았습니다.",
         "visualizationType": "pythonMemory",
         "code": "message = f\"Hello, {name}!\"",
         "pythonMemoryState": {
@@ -64,7 +64,7 @@
       },
       {
         "title": "return 문",
-        "explanation": "**`return message`** -- 함수의 결과값을 호출한 곳으로 **반환(return)**합니다.\n\n`return`이 실행되면 두 가지 일이 일어납니다:\n1. `message`가 가리키는 값(`\"Hello, Python!\"`)을 **호출한 곳으로 전달**합니다\n2. 함수의 실행이 **즉시 종료**됩니다 (return 아래에 코드가 있어도 실행 안 됨)\n\n**비유:** 레시피의 마지막 단계 -- '완성된 요리를 접시에 담아 내놓는다'입니다. 요리(계산 결과)를 손님(호출한 코드)에게 전달하고 주방(함수)을 정리합니다.\n\n**return이 없으면?** `return`문이 없거나 `return`만 단독으로 쓰면, 함수는 `None`을 반환합니다. `None`은 파이썬에서 '값이 없음'을 나타내는 특별한 객체입니다.\n\n**Python 내부 동작:** `return`이 실행되면, 함수의 지역 네임스페이스가 소멸됩니다. `name`, `message` 등 지역 변수는 모두 사라집니다. 하지만 반환된 객체(`\"Hello, Python!\"`)는 호출한 곳에서 참조하고 있으므로 살아남습니다.\n\n**주의:** 함수 안에서 여러 값을 반환하려면 튜플을 사용합니다: `return x, y`는 실제로 `return (x, y)`입니다.",
+        "explanation": "**`return message`** -- 함수의 결과값을 호출한 곳으로 **반환(return)**합니다.\n\n`return`이 실행되면 두 가지 일이 일어납니다:\n1. `message`가 가리키는 값(`\"Hello, Python!\"`)을 **호출한 곳으로 전달**합니다\n2. 함수의 실행이 **즉시 종료**됩니다 (return 아래에 코드가 있어도 실행 안 됨)",
         "visualizationType": "pythonMemory",
         "code": "return message",
         "pythonMemoryState": {
@@ -97,7 +97,7 @@
       },
       {
         "title": "함수 호출",
-        "explanation": "**`result = greet(\"Python\")`** -- 정의된 함수 `greet`를 **호출(call)**합니다.\n\n함수 이름 뒤에 괄호 `()`를 붙이면 함수가 실행됩니다. 괄호 안의 `\"Python\"`은 **인자(argument)**로, 함수의 매개변수 `name`에 전달됩니다.\n\n**실행 흐름을 자세히 따라가면:**\n1. `greet(\"Python\")` 호출 -> 매개변수 `name`에 `\"Python\"` 할당\n2. 함수 본문 line 2 실행: `message = f\"Hello, Python!\"`\n3. `return message` 실행: `\"Hello, Python!\"`을 반환하며 함수 종료\n4. 반환값 `\"Hello, Python!\"`이 `result`에 할당됨\n\n**용어 구분:**\n- **매개변수(Parameter):** 함수 정의 시 사용하는 변수 이름 (`name`)\n- **인자(Argument):** 함수 호출 시 전달하는 실제 값 (`\"Python\"`)\n\n**비유:** 자판기(함수)에 동전(인자)을 넣으면 음료(반환값)가 나오는 것과 같습니다. 자판기 설계 시 '동전 투입구'(매개변수)를 만들고, 사용 시 실제 동전(인자)을 넣습니다.\n\n**Python 내부 동작:** 함수 호출 시 파이썬은 새로운 **프레임(frame)**을 콜 스택(call stack)에 push합니다. 이 프레임에 지역 변수가 저장됩니다. `return` 시 프레임이 pop되면서 지역 변수가 정리됩니다.",
+        "explanation": "**`result = greet(\"Python\")`** -- 정의된 함수 `greet`를 **호출(call)**합니다.\n\n함수 이름 뒤에 괄호 `()`를 붙이면 함수가 실행됩니다. 괄호 안의 `\"Python\"`은 **인자(argument)**로, 함수의 매개변수 `name`에 전달됩니다.",
         "visualizationType": "pythonMemory",
         "code": "result = greet(\"Python\")",
         "pythonMemoryState": {
@@ -120,7 +120,7 @@
       },
       {
         "title": "결과 출력",
-        "explanation": "**`print(f\"결과: {result}\")`** -- 함수의 반환값이 담긴 `result`를 f-string으로 출력합니다.\n\n`result`는 `greet(\"Python\")`의 반환값인 `\"Hello, Python!\"`을 가리키고 있습니다. f-string이 이 값을 삽입하여 `\"결과: Hello, Python!\"`을 출력합니다.\n\n**전체 실행 흐름 요약:**\n1. **Line 1-3:** 함수 정의 (코드 등록만, 실행 아님)\n2. **Line 5:** 함수 호출 -> 내부 코드 실행 -> 값 반환 -> `result`에 저장\n3. **Line 6:** 결과 출력\n\n**왜 함수를 쓰는가?**\n- **재사용:** `greet(\"Alice\")`, `greet(\"Bob\")` -- 같은 코드를 여러 번 활용\n- **추상화:** 복잡한 로직을 이름 하나로 감춤\n- **유지보수:** 수정할 때 함수 한 곳만 고치면 됨\n\n**Python 내부 동작:** 함수가 종료된 후, 지역 변수 `name`과 `message`는 더 이상 접근할 수 없습니다. 하지만 `result`가 `\"Hello, Python!\"` 객체를 참조하고 있으므로, 이 객체는 메모리에 유지됩니다.\n\n**주의:** `greet`는 여전히 전역 네임스페이스에 있으므로 언제든 다시 호출할 수 있습니다. `greet(\"World\")`를 호출하면 `\"Hello, World!\"`가 반환됩니다.",
+        "explanation": "**`print(f\"결과: {result}\")`** -- 함수의 반환값이 담긴 `result`를 f-string으로 출력합니다.\n\n`result`는 `greet(\"Python\")`의 반환값인 `\"Hello, Python!\"`을 가리키고 있습니다. f-string이 이 값을 삽입하여 `\"결과: Hello, Python!\"`을 출력합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"결과: {result}\")",
         "pythonMemoryState": {

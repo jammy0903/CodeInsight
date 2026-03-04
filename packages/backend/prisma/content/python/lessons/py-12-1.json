@@ -30,7 +30,7 @@
       },
       {
         "title": "나누는 수 설정 (0!)",
-        "explanation": "**`divisor = 0`** -- 정수 객체 `0`에 `divisor`라는 이름표를 붙입니다.\n\n나누는 수 `divisor`에 **0**을 할당합니다. 수학에서 어떤 수를 0으로 나누는 것은 정의되지 않습니다 (무한대로 발산). Python도 마찬가지로 0으로 나누면 **ZeroDivisionError**라는 예외(Exception)가 발생합니다.\n\n**비유:** 마치 도로 위에 지뢰를 심어두는 것과 같습니다. 지뢰를 설치하는 것 자체는 아무 문제가 없지만, 누군가 그 위를 밟는 순간(나눗셈이 실행되는 순간) 폭발합니다!\n\n**Python 내부 동작:** 전역 네임스페이스에 `{\"divisor\": <0 객체의 주소>}`가 추가됩니다. `0`도 인터닝된 정수이므로 기존 객체를 재사용합니다. 이 시점에서 `num`과 `divisor`는 각각 독립적인 `int` 객체를 가리키고 있습니다.\n\n**주의:** 변수에 0을 넣는 것 자체는 전혀 문제가 없습니다! 에러는 **0으로 나누는 연산을 실행할 때** 비로소 발생합니다. 값을 저장하는 것과 값을 사용하는 것은 완전히 다른 단계입니다.\n\n**실행 순서:** `divisor = 0` 실행 완료 → 다음 줄(try 블록)으로 이동",
+        "explanation": "**`divisor = 0`** -- 정수 객체 `0`에 `divisor`라는 이름표를 붙입니다.\n\n나누는 수 `divisor`에 **0**을 할당합니다. 수학에서 어떤 수를 0으로 나누는 것은 정의되지 않습니다 (무한대로 발산). Python도 마찬가지로 0으로 나누면 **ZeroDivisionError**라는 예외(Exception)가 발생합니다.",
         "visualizationType": "pythonMemory",
         "code": "divisor = 0",
         "pythonMemoryState": {
@@ -65,7 +65,7 @@
       },
       {
         "title": "try 블록 진입",
-        "explanation": "**`try:`** -- 예외 감시 블록에 진입합니다. \"이 안에서 에러가 발생할 수 있으니 감시해줘!\"라는 의미입니다.\n\n`try`는 Python의 예외 처리(Exception Handling) 메커니즘의 시작점입니다. `try` 블록 안에 들어가는 코드는 실행 도중 에러가 발생할 수 있는 **위험한 코드**입니다.\n\n**비유:** 놀이공원에서 줄타기 공연을 할 때 아래에 **안전망(safety net)**을 설치하는 것과 같습니다. 줄타기(try 블록의 코드)를 하다가 떨어져도(에러 발생), 안전망(except 블록)이 받아줍니다. 안전망이 없으면(try-except가 없으면) 떨어지는 순간 공연이 끝나버리죠(프로그램 종료).\n\n**Python 내부 동작:** `try` 블록에 진입하면, Python 인터프리터는 내부적으로 **예외 핸들러(exception handler)**를 호출 스택에 등록합니다. 이 핸들러는 \"만약 에러가 나면 어디로 점프해야 하는지\"에 대한 정보를 담고 있습니다. C 언어의 `setjmp/longjmp`와 비슷한 원리입니다.\n\n**try-except 기본 구조:**\n```python\ntry:\n    # 에러가 날 수 있는 코드 (위험 구간)\nexcept 에러종류:\n    # 에러가 나면 실행할 코드 (안전망)\n```\n\n**주의:** `try` 블록에는 에러가 발생할 수 있는 **최소한의 코드만** 넣는 것이 좋습니다. 너무 많은 코드를 넣으면 어디서 에러가 났는지 파악하기 어렵습니다.\n\n**실행 순서:** `try:` 진입 → try 블록 안의 코드를 한 줄씩 실행 시작",
+        "explanation": "**`try:`** -- 예외 감시 블록에 진입합니다. \"이 안에서 에러가 발생할 수 있으니 감시해줘!\"라는 의미입니다.\n\n`try`는 Python의 예외 처리(Exception Handling) 메커니즘의 시작점입니다. `try` 블록 안에 들어가는 코드는 실행 도중 에러가 발생할 수 있는 **위험한 코드**입니다.",
         "visualizationType": "pythonMemory",
         "code": "try:",
         "pythonMemoryState": {
@@ -99,7 +99,7 @@
       },
       {
         "title": "ZeroDivisionError 발생!",
-        "explanation": "**`result = num / divisor`** -- `10 / 0`을 계산하려고 시도합니다. 하지만 **0으로 나누기는 수학적으로 불가능**합니다!\n\nPython이 `/` 연산자를 실행하는 순간, 나누는 수가 `0`임을 감지하고 **ZeroDivisionError** 예외 객체를 생성하여 발생(raise)시킵니다.\n\n**비유:** 마치 요리사가 레시피(코드)를 따라가다가 \"물 0리터로 나누시오\"라는 불가능한 지시를 만난 것과 같습니다. 요리사는 즉시 멈추고 \"이건 불가능합니다!\"라고 외칩니다(예외 발생).\n\n**주의:** 만약 `try-except`가 없었다면? 프로그램이 에러 메시지를 출력하고 **즉시 종료**됩니다! `try-except`가 이 비극을 막아줍니다.\n\n**Python 내부 동작:** CPython에서 `/` 연산자는 내부적으로 `__truediv__` 메서드를 호출합니다. `int.__truediv__(10, 0)`이 실행되면, C 레벨에서 divisor가 0인지 검사하고, 0이면 `PyErr_SetString(PyExc_ZeroDivisionError, \"division by zero\")`를 호출합니다. 이때 `ZeroDivisionError` 예외 객체가 힙에 생성되고, 인터프리터의 에러 플래그가 설정됩니다.",
+        "explanation": "**`result = num / divisor`** -- `10 / 0`을 계산하려고 시도합니다. 하지만 **0으로 나누기는 수학적으로 불가능**합니다!\n\nPython이 `/` 연산자를 실행하는 순간, 나누는 수가 `0`임을 감지하고 **ZeroDivisionError** 예외 객체를 생성하여 발생(raise)시킵니다.",
         "visualizationType": "pythonMemory",
         "code": "    result = num / divisor",
         "pythonMemoryState": {
@@ -140,7 +140,7 @@
       },
       {
         "title": "except 블록이 에러를 잡았다!",
-        "explanation": "**`except ZeroDivisionError:`** -- try 블록에서 발생한 예외의 타입을 확인하고, 일치하면 이 블록을 실행합니다.\n\ntry 블록에서 **ZeroDivisionError**가 발생했고, except가 정확히 이 에러 타입을 지정하고 있으므로 이 except 블록이 실행됩니다.\n\n**`print(\"Cannot divide by zero!\")`** -- 프로그램을 죽이는 대신, 사용자에게 친절한 에러 메시지를 출력합니다.\n\n**비유:** 병원 응급실의 트리아지(triage) 시스템과 같습니다. 환자(에러)가 들어오면 어떤 종류의 환자인지 분류하고, 해당 전문과(except 블록)로 보냅니다. \"골절 환자는 정형외과로!\" 처럼, `ZeroDivisionError`는 `except ZeroDivisionError:` 블록으로 보내집니다.\n\n**Python 내부 동작 (except 매칭 과정):**\n1. try 블록에서 에러 발생 → 인터프리터가 등록된 예외 핸들러 확인\n2. 발생한 예외의 타입(`ZeroDivisionError`)과 except의 타입을 `isinstance()` 검사로 비교\n3. `isinstance(에러, ZeroDivisionError)`가 `True` → 이 except 블록 실행\n4. 타입이 일치하지 않으면 에러가 호출 스택을 타고 **상위로 전파**됨\n\n**주의:** `except Exception:`처럼 너무 넓은 범위로 잡으면, 의도하지 않은 에러까지 모두 삼켜버려서 디버깅이 어려워집니다. 항상 **구체적인 예외 타입**을 지정하는 것이 좋습니다.\n\n**실행 순서:** except 타입 매칭 → 일치! → `print(\"Cannot divide by zero!\")` 실행 → except 블록 완료",
+        "explanation": "**`except ZeroDivisionError:`** -- try 블록에서 발생한 예외의 타입을 확인하고, 일치하면 이 블록을 실행합니다.\n\ntry 블록에서 **ZeroDivisionError**가 발생했고, except가 정확히 이 에러 타입을 지정하고 있으므로 이 except 블록이 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "    print(\"Cannot divide by zero!\")",
         "pythonMemoryState": {

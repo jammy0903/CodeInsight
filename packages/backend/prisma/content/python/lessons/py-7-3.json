@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Node 클래스 정의 시작",
-        "explanation": "**`class Node:`**\n\n**Node 클래스를 정의합니다** - \"연결 노드\"를 만들기 위한 설계도입니다.\nNode는 다른 Node를 가리킬 수 있는 `next` 속성을 가지고 있어, **체인처럼 연결**할 수 있습니다.\n\n**왜 Node 클래스가 필요한가?**\n이 레슨의 목표는 **순환 참조(Circular Reference)**의 문제를 보여주는 것입니다.\n순환 참조란 두 객체가 **서로를 가리키는** 상황입니다.\nA → B이면서 동시에 B → A인 경우, 마치 두 사람이 서로의 손을 잡고 있는 것과 같습니다.\n\n**비유: 기차 연결**\nNode는 기차의 칸 하나라고 생각하세요.\n각 칸(Node)에는 이름(`name`)과 다음 칸을 연결하는 고리(`next`)가 있습니다.\n보통은 A → B → C처럼 일렬로 연결되지만, 만약 마지막 칸이 첫 번째 칸을 다시 가리키면?\n끝없이 도는 원형 기차, 즉 **순환 참조**가 만들어집니다!\n\n**왜 이 순서인가?** Python에서 클래스를 사용하려면 먼저 정의해야 합니다.\nNode 객체를 만들기 전에 설계도를 먼저 준비합니다.\n\n**실행 순서**: class 키워드 → Node 클래스 객체 생성 준비 → 클래스 본문 실행 대기",
+        "explanation": "**`class Node:`**\n\n**Node 클래스를 정의합니다** - \"연결 노드\"를 만들기 위한 설계도입니다.\nNode는 다른 Node를 가리킬 수 있는 `next` 속성을 가지고 있어, **체인처럼 연결**할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class Node:",
         "pythonMemoryState": {
@@ -19,7 +19,7 @@
       },
       {
         "title": "클래스 본문 진입",
-        "explanation": "**`class Node:` (본문 전체)**\n\nPython이 클래스 본문 전체를 읽어 **Node 클래스 객체**를 완성합니다.\n클래스 본문에는 `__init__` 메서드가 정의되어 있습니다.\n\n**클래스 본문 실행이란?**\nPython은 `class Node:` 아래의 모든 코드를 한 번 실행하여, 어떤 메서드와 속성이 있는지 파악합니다.\n이 과정에서 `__init__`이라는 함수 객체가 만들어지고, Node 클래스에 등록됩니다.\n\n**이 시점에서 Node 객체(인스턴스)는 아직 하나도 만들어지지 않았습니다!**\n지금은 \"이런 모양의 객체를 만들 수 있다\"는 **설계도(클래스)**만 준비된 상태입니다.\n\n**비유: 쿠키 틀 만들기**\n아직 쿠키(인스턴스)를 구운 것이 아니라, 쿠키 틀(클래스)을 만든 것입니다.\n이 틀로 여러 개의 쿠키를 찍어낼 수 있습니다.\n\n**왜 이 순서인가?** 클래스 정의 키워드(`class Node:`)를 만났으므로, 본문을 실행하여 클래스를 완성합니다.\n\n**실행 순서**: 클래스 본문 실행 → __init__ 메서드 등록 → Node 클래스 완성",
+        "explanation": "**`class Node:` (본문 전체)**\n\nPython이 클래스 본문 전체를 읽어 **Node 클래스 객체**를 완성합니다.\n클래스 본문에는 `__init__` 메서드가 정의되어 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class Node:",
         "highlightOffset": [
@@ -34,7 +34,7 @@
       },
       {
         "title": "__init__ 메서드 정의",
-        "explanation": "**`def __init__(self, name):`**\n\nNode 클래스의 **초기화 메서드**를 정의합니다.\n`Node(\"A\")` 형태로 객체를 만들면, 이 `__init__`이 자동으로 호출됩니다.\n\n**메서드가 하는 일 (본문 미리보기)**:\n- `self.name = name`: 노드에 이름을 붙임 (예: \"A\", \"B\")\n- `self.next = None`: 다음 노드를 가리키는 포인터 (처음에는 None = 아무것도 가리키지 않음)\n\n**`self`란?**\n`self`는 \"지금 만들어지는 인스턴스 자기 자신\"을 의미합니다.\n`Node(\"A\")`를 호출하면, Python이 새 객체를 만들고 그 객체를 `self`로 전달합니다.\n\n**next = None의 의미**: 기차 칸에 아직 다음 칸이 연결되지 않은 상태입니다.\n나중에 `a.next = b`로 연결할 수 있습니다.\n\n**왜 이 순서인가?** 클래스 본문 안에서 메서드를 정의하여 클래스를 완성합니다.\nNode 클래스가 완성되면 전역 네임스페이스에 'Node'라는 이름으로 등록됩니다.\n\n**실행 순서**: __init__ 함수 객체 생성 → Node 클래스에 메서드로 등록 → Node 클래스 완성 (ID: 0x1000)",
+        "explanation": "**`def __init__(self, name):`**\n\nNode 클래스의 **초기화 메서드**를 정의합니다.\n`Node(\"A\")` 형태로 객체를 만들면, 이 `__init__`이 자동으로 호출됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, name):",
         "highlightOffset": [
@@ -64,7 +64,7 @@
       },
       {
         "title": "첫 번째 노드 생성",
-        "explanation": "**`a = Node(\"A\")`**\n\nNode 클래스를 호출하여 **첫 번째 노드 객체(인스턴스)**를 생성합니다.\n이름이 \"A\"인 노드가 메모리(0x2000)에 만들어집니다.\n\n**생성 과정 (내부 동작)**:\n1. Python이 새 빈 객체를 메모리에 할당 (0x2000)\n2. `__init__(self, \"A\")` 자동 호출\n3. `self.name = \"A\"` → 노드에 이름 설정\n4. `self.next = None` → 다음 노드 아직 없음\n5. 완성된 객체를 변수 `a`에 연결\n\n**비유: 기차 첫 번째 칸 만들기**\n이름표에 \"A\"라고 적힌 기차 칸이 만들어졌습니다.\n아직 뒤에 연결된 칸은 없습니다(next = None).\n\n**참조 상태**: 0x2000의 refcount = 1 (변수 `a`만 참조)\n\n**왜 이 순서인가?** 클래스 정의가 끝났으니, 실제 인스턴스를 만들 차례입니다.\n순환 참조를 만들려면 최소 두 개의 객체가 필요하므로, 첫 번째를 먼저 만듭니다.\n\n**실행 순서**: Node(\"A\") 호출 → 인스턴스 0x2000 생성 → __init__ 호출 → 초기화 진행...",
+        "explanation": "**`a = Node(\"A\")`**\n\nNode 클래스를 호출하여 **첫 번째 노드 객체(인스턴스)**를 생성합니다.\n이름이 \"A\"인 노드가 메모리(0x2000)에 만들어집니다.",
         "visualizationType": "pythonMemory",
         "code": "a = Node(\"A\")",
         "pythonMemoryState": {
@@ -122,7 +122,7 @@
       },
       {
         "title": "Node A 초기화 (2)",
-        "explanation": "**`self.next = None`**\n\n인스턴스(0x2000)의 `next` 속성을 `None`으로 설정합니다.\n`next`는 **다음 노드를 가리키는 포인터** 역할을 합니다.\n`None`은 \"아직 아무것도 가리키지 않음\"을 의미합니다.\n\n**비유: 기차 칸의 연결 고리**\n기차 칸(Node A)의 뒤쪽 연결 고리(next)가 비어있는 상태입니다.\n나중에 `a.next = b`로 다른 칸을 연결할 수 있습니다.\n\n**이 시점에서 Node A의 전체 상태**:\n- name = \"A\" (노드의 이름)\n- next = None (아직 연결되지 않음)\n- refcount = 1 (변수 `a`만 참조)\n\n**왜 None으로 초기화하는가?** 모든 노드가 생성 시점에 반드시 다른 노드와 연결될 필요는 없습니다.\n나중에 필요할 때 연결하면 됩니다.\n\n**왜 이 순서인가?** __init__ 완료 후 변수 `a`가 완성된 Node A 객체를 참조하게 됩니다.\n\n**실행 순서**: self(0x2000)에 next 속성 추가 → None 할당 → __init__ 완료 → a → 0x2000 (refcount=1)",
+        "explanation": "**`self.next = None`**\n\n인스턴스(0x2000)의 `next` 속성을 `None`으로 설정합니다.\n`next`는 **다음 노드를 가리키는 포인터** 역할을 합니다.\n`None`은 \"아직 아무것도 가리키지 않음\"을 의미합니다.",
         "visualizationType": "pythonMemory",
         "code": "self.next = None",
         "pythonMemoryState": {
@@ -235,7 +235,7 @@
       },
       {
         "title": "Node B 초기화 (2)",
-        "explanation": "**`self.next = None`**\n\nNode B(0x3000)의 `next` 속성을 `None`으로 초기화합니다.\nNode A와 마찬가지로, 생성 시점에는 다른 노드와 연결되지 않습니다.\n\n**이제 두 개의 독립적인 노드가 준비되었습니다:**\n```\na → Node A (0x2000): name=\"A\", next=None, refcount=1\nb → Node B (0x3000): name=\"B\", next=None, refcount=1\n```\n두 노드 모두 `next`가 `None`이므로, 아직 서로를 알지 못합니다.\n\n**다음 단계 미리보기**: 이제 `a.next = b`와 `b.next = a`로 두 노드를 서로 연결하여 순환 구조를 만들 것입니다!\n\n**비유**: 기차 칸 A와 칸 B가 나란히 서 있지만, 아직 연결 고리가 비어있습니다.\n다음 스텝에서 고리를 걸어 연결합니다.\n\n**왜 이 순서인가?** Node B의 __init__을 마저 완료합니다.\n\n**실행 순서**: self(0x3000)에 next 속성 추가 → None 할당 → __init__ 완료 → b → 0x3000 (refcount=1)",
+        "explanation": "**`self.next = None`**\n\nNode B(0x3000)의 `next` 속성을 `None`으로 초기화합니다.\nNode A와 마찬가지로, 생성 시점에는 다른 노드와 연결되지 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "self.next = None",
         "pythonMemoryState": {
@@ -280,7 +280,7 @@
       },
       {
         "title": "A에서 B로 참조 연결",
-        "explanation": "**`a.next = b`**\n\nNode A의 `next` 속성이 Node B 객체(0x3000)를 가리키도록 설정합니다.\n이제 **A → B** 방향의 연결이 만들어졌습니다!\n\n**참조 횟수 변화 (핵심!)**:\n- Node B(0x3000)의 refcount: 1 → **2**\n  - 기존 참조: 변수 `b` (1개)\n  - 새 참조: `a.next` (1개 추가!)\n  - 합계: 2개\n\n**이것이 중요한 이유**: 이제 변수 `b`를 `del`로 삭제해도, `a.next`가 여전히 Node B를 참조하고 있으므로 refcount가 1이 됩니다. 0이 아니므로 삭제되지 않습니다!\n\n**비유: 기차 칸 연결하기**\n기차 칸 A의 뒤쪽 고리(next)를 칸 B에 걸었습니다.\n이제 A에서 B로 이동할 수 있습니다: `a.next.name` → \"B\"\n\n**메모리 구조**: a → Node A(next → Node B) / b → Node B\n\n**왜 이 순서인가?** 순환 참조의 첫 번째 방향(A → B)을 만듭니다. 다음 줄에서 반대 방향(B → A)도 만들 것입니다.\n\n**실행 순서**: a(0x2000)의 next 속성 접근 → b(0x3000) 할당 → 0x3000의 refcount 1→2 (변수 b + a.next)",
+        "explanation": "**`a.next = b`**\n\nNode A의 `next` 속성이 Node B 객체(0x3000)를 가리키도록 설정합니다.\n이제 **A → B** 방향의 연결이 만들어졌습니다!",
         "visualizationType": "pythonMemory",
         "code": "a.next = b  # A → B",
         "pythonMemoryState": {
@@ -325,7 +325,7 @@
       },
       {
         "title": "순환 참조 완성",
-        "explanation": "**`b.next = a`**\n\nNode B의 `next` 속성이 Node A 객체(0x2000)를 가리키도록 설정합니다.\n이제 **B → A** 방향의 연결도 만들어져, **순환 참조가 완성**되었습니다!\n\n**순환 참조란 이런 상태입니다:**\n```\nA.next → B\nB.next → A\n(A → B → A → B → A → ... 무한 순환!)\n```\n\n**참조 횟수 변화**:\n- Node A(0x2000)의 refcount: 1 → **2** (변수 `a` + `b.next`)\n- Node B(0x3000)의 refcount: 이전부터 **2** (변수 `b` + `a.next`)\n\n**비유: 두 사람이 서로 손을 잡음**\nA가 B의 손을 잡고(a.next=b), B도 A의 손을 잡았습니다(b.next=a).\n외부에서 아무리 \"놓아!\"라고 해도(del a, del b), 두 사람은 서로의 손을 잡고 있어서 완전히 분리되지 않습니다.\n이것이 바로 순환 참조의 문제입니다!\n\n**이것이 왜 문제인가?** 다음 스텝에서 `del a`, `del b`를 해도, 서로가 서로를 참조하고 있어 refcount가 절대 0이 되지 않습니다.\n\n**왜 이 순서인가?** A→B 연결 후, B→A 연결을 추가하여 순환 고리를 완성합니다.\n\n**실행 순서**: b(0x3000)의 next 속성 접근 → a(0x2000) 할당 → 순환 참조 완성: A ⇄ B (각 refcount=2)",
+        "explanation": "**`b.next = a`**\n\nNode B의 `next` 속성이 Node A 객체(0x2000)를 가리키도록 설정합니다.\n이제 **B → A** 방향의 연결도 만들어져, **순환 참조가 완성**되었습니다!",
         "visualizationType": "pythonMemory",
         "code": "b.next = a  # B → A (순환!)",
         "pythonMemoryState": {
@@ -370,7 +370,7 @@
       },
       {
         "title": "변수 'a' 삭제",
-        "explanation": "**`del a`**\n\n변수 `a`를 삭제합니다. 하지만 **Node A 객체(0x2000)는 살아남습니다!**\n\n**refcount 변화**:\n- Node A(0x2000)의 refcount: 2 → **1**\n  - 삭제된 참조: 변수 `a` (-1)\n  - 남은 참조: `b.next` (여전히 0x2000을 가리킴!)\n- refcount = 1 > 0이므로, **객체가 삭제되지 않음**\n\n**여기서 문제가 보이기 시작합니다!**\n변수 `a`를 삭제했는데도 Node A 객체가 살아있는 이유는, Node B의 `next` 속성이 아직 Node A를 참조하고 있기 때문입니다.\n\n**비유: 한 손 놓기**\nA를 외부에서 잡고 있던 손(변수 a)을 놓았지만, B가 여전히 A의 손을 잡고 있어서 A가 떨어지지 않습니다.\n\n**이 시점에서 Node A에 직접 접근할 방법**: `b.next`로만 가능합니다.\n변수 `a`는 사라졌으므로 `a.name` 같은 직접 접근은 NameError!\n\n**왜 이 순서인가?** 순환 참조가 완성된 후, del로 변수를 삭제하여 문제 상황을 만듭니다.\n\n**실행 순서**: 네임스페이스에서 변수 a 제거 → 0x2000의 refcount 2→1 (b.next만 남음) → 객체 유지",
+        "explanation": "**`del a`**\n\n변수 `a`를 삭제합니다. 하지만 **Node A 객체(0x2000)는 살아남습니다!**",
         "visualizationType": "pythonMemory",
         "code": "del a  # a 삭제",
         "pythonMemoryState": {
@@ -403,7 +403,7 @@
       },
       {
         "title": "변수 'b' 삭제와 메모리 누수",
-        "explanation": "**`del b`**\n\n변수 `b`도 삭제합니다. 이제 **두 Node 객체에 접근할 방법이 완전히 사라졌습니다!**\n하지만 두 객체는 여전히 메모리에 남아있습니다. 이것이 **메모리 누수(Memory Leak)**입니다!\n\n**refcount 분석 (핵심!)**:\n- Node A(0x2000): refcount = 1 (Node B의 next가 참조)\n- Node B(0x3000): refcount = 1 (Node A의 next가 참조)\n- 두 객체 모두 refcount > 0이므로 삭제되지 않음!\n\n**참조 카운팅의 한계가 드러나는 순간:**\n```\n0x2000(A).next → 0x3000(B) (B의 refcount에 +1)\n0x3000(B).next → 0x2000(A) (A의 refcount에 +1)\n```\n두 객체가 서로를 참조하고 있어, 참조 카운팅만으로는 이 고리를 끊을 수 없습니다!\n외부에서 접근할 방법은 없는데, 서로를 붙잡고 있어 삭제도 안 됩니다.\n\n**비유: 바다에 떠 있는 두 사람**\n두 사람(A, B)이 바다에서 서로의 손을 잡고 있습니다.\n구명보트(변수 a, b)와의 연결이 끊어졌는데(del), 서로 잡고 있어서 가라앉지도(삭제되지도) 않습니다.\n아무도 구하러 갈 수 없고, 그들은 바다(메모리)에 계속 떠 있습니다.\n\n**해결책**: Python의 **가비지 컬렉터(gc 모듈)**가 주기적으로 이런 순환 참조를 탐지하여 메모리를 정리합니다.\n다음 레슨(py-7-4)에서 gc 모듈을 배웁니다!\n\n**실행 순서**: 네임스페이스에서 변수 b 제거 → 0x3000의 refcount 2→1 → 두 객체 모두 접근 불가이지만 메모리에 존재 → 프로그램 종료",
+        "explanation": "**`del b`**\n\n변수 `b`도 삭제합니다. 이제 **두 Node 객체에 접근할 방법이 완전히 사라졌습니다!**\n하지만 두 객체는 여전히 메모리에 남아있습니다. 이것이 **메모리 누수(Memory Leak)**입니다!",
         "visualizationType": "pythonMemory",
         "code": "del b  # b 삭제",
         "pythonMemoryState": {
