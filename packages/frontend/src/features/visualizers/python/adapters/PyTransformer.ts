@@ -111,31 +111,49 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
   }
 
   // list, tuple, set — 원소는 {objectId} 참조 배열
+  // 중첩 컬렉션은 placeholder로 표시 (힙 카드 + 화살표로 관계 표현)
   if (type === 'list' || type === 'tuple' || type === 'set') {
     if (!Array.isArray(value)) return String(value);
     const elements = (value as PyObjectRef[]).map((ref) => {
       if (!ref?.objectId) return String(ref);
       const obj = objects.get(ref.objectId);
       if (!obj) return '?';
+      if (obj.type === 'list') return '[…]';
+      if (obj.type === 'tuple') return '(…)';
+      if (obj.type === 'dict') return '{…}';
+      if (obj.type === 'set') return '{…}';
+      if (obj.type === 'instance') return `<${(obj.value as { className?: string })?.className || obj.type}>`;
       return formatValue(obj.value, obj.type);
     });
-    if (type === 'list') return `[${elements.join(', ')}]`;
-    if (type === 'tuple') return `(${elements.join(', ')})`;
-    if (type === 'set') return `{${elements.join(', ')}}`;
+    let result: string;
+    if (type === 'list') result = `[${elements.join(', ')}]`;
+    else if (type === 'tuple') result = `(${elements.join(', ')})`;
+    else result = `{${elements.join(', ')}}`;
+    return truncateDisplay(result);
   }
 
   // dict — {key: {objectId}, value: {objectId}} 배열
+  // 중첩 컬렉션은 placeholder로 표시
   if (type === 'dict') {
     if (!Array.isArray(value)) return String(value);
     const entries = value as PyDictEntry[];
     const pairs = entries.map((entry) => {
-      const keyObj = objects.get(entry.key.objectId);
-      const valObj = objects.get(entry.value.objectId);
-      const keyStr = keyObj ? formatValue(keyObj.value, keyObj.type) : '?';
-      const valStr = valObj ? formatValue(valObj.value, valObj.type) : '?';
+      const keyObj = entry?.key?.objectId ? objects.get(entry.key.objectId) : null;
+      const valObj = entry?.value?.objectId ? objects.get(entry.value.objectId) : null;
+      const COLL_TYPES = new Set(['list', 'tuple', 'dict', 'set']);
+      const keyStr = keyObj
+        ? (COLL_TYPES.has(keyObj.type)
+            ? (keyObj.type === 'list' ? '[…]' : keyObj.type === 'tuple' ? '(…)' : '{…}')
+            : formatValue(keyObj.value, keyObj.type))
+        : '?';
+      const valStr = valObj
+        ? (COLL_TYPES.has(valObj.type)
+            ? (valObj.type === 'list' ? '[…]' : valObj.type === 'tuple' ? '(…)' : '{…}')
+            : formatValue(valObj.value, valObj.type))
+        : '?';
       return `${keyStr}: ${valStr}`;
     });
-    return `{${pairs.join(', ')}}`;
+    return truncateDisplay(`{${pairs.join(', ')}}`);
   }
 
   // function
@@ -161,6 +179,11 @@ function convertPyValue(value: unknown, type: string, objects: Map<string, PyObj
   }
 
   return String(value);
+}
+
+/** 40자 초과 시 말줄임표 */
+function truncateDisplay(s: string, max = 40): string {
+  return s.length > max ? s.slice(0, max - 3) + '...' : s;
 }
 
 /**
