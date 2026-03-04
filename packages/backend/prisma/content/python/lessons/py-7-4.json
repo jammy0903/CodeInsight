@@ -66,7 +66,21 @@
           3
         ],
         "pythonMemoryState": {
-          "note": "클래스 본문 실행 중"
+          "note": "클래스 본문 실행 중",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            }
+          ]
         }
       },
       {
@@ -580,7 +594,31 @@
           "output": [
             "정리 전 쓰레기: (10, 5, 2)"
           ],
-          "note": "gc 상태 확인 - 순환 참조 객체들이 gen0에 있음"
+          "note": "gc 상태 확인 - 순환 참조 객체들이 gen0에 있음",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            }
+          ]
         }
       },
       {
@@ -637,7 +675,43 @@
           "output": [
             "정리된 객체 수: 2"
           ],
-          "note": "완료! 순환 참조 2개 정리 완료 - 참조 카운팅 + gc = 완벽한 메모리 관리"
+          "note": "완료! 순환 참조 2개 정리 완료 - 참조 카운팅 + gc = 완벽한 메모리 관리",
+          "names": [
+            {
+              "name": "gc",
+              "pointsTo": "module1"
+            },
+            {
+              "name": "Node",
+              "pointsTo": "class1"
+            },
+            {
+              "name": "num",
+              "pointsTo": "int1",
+              "highlight": true
+            }
+          ],
+          "objects": [
+            {
+              "id": "module1",
+              "type": "module",
+              "value": "module",
+              "pyId": "1001"
+            },
+            {
+              "id": "class1",
+              "type": "type",
+              "value": "class",
+              "pyId": "1002"
+            },
+            {
+              "id": "int1",
+              "type": "int",
+              "value": 2,
+              "pyId": "1005",
+              "highlight": true
+            }
+          ]
         }
       }
     ],

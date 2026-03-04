@@ -23,6 +23,7 @@ import { PrototypeChainView } from './javascript/components/PrototypeChainView';
 import { PromiseView } from './javascript/components/PromiseView';
 import { AlgorithmView } from './algorithm/AlgorithmView';
 import { ArrowLayer } from './c/components/ArrowLayer';
+import { PythonReferenceView } from './python/PythonReferenceView';
 import { createAdapter } from './shared/adapters/registry';
 import type { FlowTheme } from './shared/styles';
 
@@ -156,7 +157,7 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   const enrichedStep = useMemo(() => {
     if (isNonMemoryType) return step;
     const enriched = { ...step };
-    if (memoryState && !isJavaScript) {
+    if (memoryState) {
       enriched.stack = memoryState.stack as LessonStep['stack'];
       enriched.heap = memoryState.heap as LessonStep['heap'];
     }
@@ -164,19 +165,18 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
       enriched.stdout = stdout;
     }
     return enriched;
-  }, [step, memoryState, stdout, isJavaScript, isNonMemoryType]);
+  }, [step, memoryState, stdout, isNonMemoryType]);
 
   const enrichedPrevStep = useMemo(() => {
     if (isNonMemoryType) return prevStep;
     if (!prevStep) return null;
     if (!prevMemoryState) return prevStep;
-    if (isJavaScript) return prevStep;
     return {
       ...prevStep,
       stack: prevMemoryState.stack as LessonStep['stack'],
       heap: prevMemoryState.heap as LessonStep['heap'],
     };
-  }, [prevStep, prevMemoryState, isJavaScript, isNonMemoryType]);
+  }, [prevStep, prevMemoryState, isNonMemoryType]);
 
   const flowStep = useMemo(() => {
     if (isNonMemoryType) return null;
@@ -318,14 +318,13 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     return <div className={className} />;
   }
 
-  // Python → ReferenceGraphView
+  // Python → PythonReferenceView (Python Tutor 스타일: Stack / Objects 2분할 + SVG 화살표)
   if (language === 'python') {
     return (
       <div className={className}>
-        <ReferenceGraphView
+        <PythonReferenceView
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
-          language="python"
         />
       </div>
     );
