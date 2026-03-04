@@ -4,12 +4,15 @@
  * 클릭할 때마다 테마 순환: soft → dark → minimal → soft
  */
 
+import { useTranslation } from 'react-i18next';
 import { Palette } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
-import { themeLabels } from '@/config/themes';
 
 export function ThemeToggle() {
+  const { t } = useTranslation();
   const { theme, cycleTheme } = useThemeStore();
+
+  const labelKey = `theme.${theme}` as const;
 
   return (
     <button
@@ -20,10 +23,10 @@ export function ThemeToggle() {
         color: theme === 'dark' ? '#e5e7eb' : '#4b5563',
         border: `1px solid ${theme === 'dark' ? '#4b5563' : '#d1d5db'}`,
       }}
-      title="테마 변경"
+      title={t('theme.change')}
     >
       <Palette size={14} />
-      <span>{themeLabels[theme]}</span>
+      <span>{t(labelKey)}</span>
     </button>
   );
 }

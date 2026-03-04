@@ -7,6 +7,7 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Code2 } from 'lucide-react';
 
 import { CodeMirrorEditor, type CodeSelection } from '@/features/visualizers/shared/components/CodeMirrorEditor';
@@ -37,6 +38,7 @@ export function LessonCodePanel({
   className,
   style,
 }: LessonCodePanelProps) {
+  const { t } = useTranslation();
   const [codeRatio, setCodeRatio] = useState(defaultRatio);
   const isDragging = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -97,7 +99,7 @@ export function LessonCodePanel({
             }}
           >
             <Code2 className="w-3 h-3 mr-1.5" />
-            에디터
+            {t('lesson.editor')}
           </div>
         )}
         <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
