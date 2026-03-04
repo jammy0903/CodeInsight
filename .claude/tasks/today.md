@@ -31,7 +31,7 @@
 ### 2) 운영 문서 최신화
 - [x] `today.md`를 현재 기준 상태로 업데이트
 - [x] `memory/2026-03-04.md`, `MEMORY.md`에 세션 요약 기록
-- [ ] `.claude`의 오래된 계획 문서 중 "완료/폐기" 태깅 정리
+- [x] `.claude`의 오래된 계획 문서 중 "완료/폐기" 태깅 정리
 
 ### 3) README 개선
 - [x] `packages/frontend/README.md`를 실제 사용 문서로 교체
