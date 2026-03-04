@@ -1,13 +1,13 @@
 {
   "lessonId": "java-3-2",
-  "title": "Object Reference Passing",
-  "concept": "When passing object variables, the 'address value' is copied. (Call by Value of Reference)",
+  "title": "Passing object references (Reference Passing)",
+  "concept": "When passing an object variable, the 'address value' is copied. (Call by Value of Reference)",
   "content": {
     "code": "class Dog {\n    String name;\n    Dog(String name) { this.name = name; }\n}\n\nvoid changeName(Dog d) {\n    d.name = \"Max\";\n}\n\nvoid reassign(Dog d) {\n    d = new Dog(\"Rex\");\n}\n\nDog myDog = new Dog(\"Buddy\");\nchangeName(myDog);\nSystem.out.println(myDog.name);\n\nreassign(myDog);\nSystem.out.println(myDog.name);",
     "steps": [
       {
-        "title": "Creating a Dog Object",
-        "explanation": "**Execution order:**\n1. A `Dog` object is created on the Heap (\"Buddy\").\n2. An address value (`0x100` assumed) is generated.\n3. This address `0x100` is stored in the `myDog` variable on the Stack.\n\n**Memory state:**\n`myDog` is a remote control.\nIt's pointing at the TV (object) located at address 0x100.",
+        "title": "Create a Dog object",
+        "explanation": "**Execution order:**\n1. Create a `Dog` object in the heap memory (“Buddy”).\n2. Generate address value (assuming `0x100`).\n3. Save this address `0x100` in the `myDog` variable of Stack.\n\n**Memory Status:**\n`myDog` is the remote control.\nIt points to the TV (object) at address 0x100.",
         "visualizationType": "javaMemory",
         "code": "Dog myDog = new Dog(\"Buddy\");",
         "javaMemoryState": {
@@ -30,9 +30,9 @@
         }
       },
       {
-        "title": "Calling changeName(myDog) - Remote Control Copy",
-        "explanation": "**Execution order:**\n1. Read `myDog`'s value (address `0x100`).\n2. Copy it to `changeName`'s parameter `d`.\n\n**Key point:**\nThe object wasn't copied -- the **address pointing to the object** was copied.\nNow `myDog` and `d` are **two remote controls** that can operate the same TV.",
-        "keyInsight": "Address copy = one more remote control is created",
+        "title": "Call changeName(myDog) - copy remote control",
+        "explanation": "**Execution order:**\n1. Reading the value of `myDog` (address `0x100`).\n2. Copy to parameter `d` of `changeName`.\n\n**Key:**\nThe object was not copied, but the **address pointing to the object** was copied.\nNow `myDog` and `d` are **two remote controls** that can operate the same TV.",
+        "keyInsight": "Copy address = Create another remote control",
         "visualizationType": "javaMemory",
         "code": "changeName(myDog);",
         "javaMemoryState": {
@@ -54,9 +54,9 @@
         }
       },
       {
-        "title": "Modifying Object Internals (Side Effect)",
-        "explanation": "**Execution order:**\n1. Use remote `d` to access the object at `0x100` (dereference).\n2. Modify the `name` field to \"Max\".\n\n**Memory change:**\nSince both remotes are looking at the same TV, changing the channel with `d` also changes what `myDog` sees.",
-        "keyInsight": "Modifying a shared object = the original is affected",
+        "title": "Change inside object (Side Effect)",
+        "explanation": "**Execution order:**\n1. Access object `0x100` using the `d` remote control (dereference).\n2. Modify the `name` field to “Max”.\n\n**Memory Change:**\nSince both remotes are watching the same TV, changing the channel with `d` will also change what `myDog` sees.",
+        "keyInsight": "Modify shared object = original affected",
         "visualizationType": "javaMemory",
         "code": "d.name = \"Max\";",
         "javaMemoryState": {
@@ -85,8 +85,8 @@
         }
       },
       {
-        "title": "Checking the First Result",
-        "explanation": "**Execution order:**\n1. `changeName` ends (d is destroyed).\n2. Print `myDog.name`.\n\nSince the TV channel was changed, \"Max\" is printed.",
+        "title": "Check the first results",
+        "explanation": "**Execution order:**\n1. `changeName` ends (d destroys).\n2. Output `myDog.name`.\n\nThe TV channel has changed, so “Max” appears.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
         "javaMemoryState": {
@@ -111,8 +111,8 @@
         }
       },
       {
-        "title": "Calling reassign(myDog)",
-        "explanation": "**Execution order:**\n1. Read `myDog`'s address `0x100` again.\n2. Copy it to `reassign` method's `d`.\n\nOnce again, a copy remote `d` pointing to the same TV is created.",
+        "title": "call reassign(myDog)",
+        "explanation": "**Execution order:**\n1. Read the address `0x100` of `myDog` again.\n2. Copy to `d` in the `reassign` method.\n\nA copy of the remote control `d` was created, again pointing to the same TV.",
         "visualizationType": "javaMemory",
         "code": "reassign(myDog);",
         "javaMemoryState": {
@@ -134,9 +134,9 @@
         }
       },
       {
-        "title": "Variable Reassignment (New Object)",
-        "explanation": "**Execution order:**\n1. Execute `new Dog(\"Rex\")` -> create a new object (0x200).\n2. Assign the new address `0x200` to variable `d`.\n\n**Important:**\nThe remote `d` is now pointing to a **new TV** (`0x200`).\nThe original remote at home (`myDog`) is still pointing to the old TV (`0x100`).",
-        "keyInsight": "Variable reassignment = only my connection changes (original unaffected)",
+        "title": "Reassign variables (New Object)",
+        "explanation": "**Execution order:**\n1. Execute `new Dog(\"Rex\")` -> Create a new object (0x200).\n2. Assign the new address `0x200` to the `d` variable.\n\n**Important:**\nThe remote control named `d` is now pointed at **new TV** (`0x200`).\nThe original remote control at home (`myDog`) is still pointing to the old TV (`0x100`).",
+        "keyInsight": "Reassigning variable = only changes my connection (regardless of origin)",
         "visualizationType": "javaMemory",
         "code": "d = new Dog(\"Rex\");",
         "javaMemoryState": {
@@ -171,8 +171,8 @@
         }
       },
       {
-        "title": "Checking the Final Result",
-        "explanation": "**Execution order:**\n1. `reassign` ends (d is destroyed).\n2. Print `myDog.name`.\n\n`myDog` is still looking at TV number `0x100`.\nTherefore \"Max\" is printed.",
+        "title": "Check the final result",
+        "explanation": "**Execution order:**\n1. `reassign` ends (d disappears).\n2. Output `myDog.name`.\n\n`myDog` is still watching TV at `0x100`.\nTherefore, \"Max\" is output.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
         "occurrence": 2,
@@ -201,22 +201,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "When passing an object as a parameter in Java, what actually gets passed?",
+    "question": "What is actually passed when passing an object as a parameter in Java?",
     "options": [
-      "The object itself (a copy is created)",
-      "The memory address value (reference) of the object",
-      "The first attribute value of the object",
-      "Nothing gets passed"
+      "the object itself (create a copy)",
+      "Address value of the memory where the object is located (reference)",
+      "the value of the object's first property",
+      "nothing goes through"
     ],
     "correctIndex": 1,
-    "explanation": "Java is always Call by Value.\nFor objects, the 'address value (Reference)' held by the variable is copied and passed."
+    "explanation": "Java is always Call by Value.\nIn the case of objects, the value called ‘address value (Reference)’ held by the variable is copied and passed."
   },
   "misconceptions": [
     {
-      "wrong": "Java uses Call by Reference.",
-      "correct": "No.\nSince the 'address value' is 'copied', it's **Call by Value**.",
-      "why": "If it were truly Call by Reference, when `d = new Dog()` is executed, `myDog` would also change to the new dog.\nJava does not give permission to change the variable's own connection."
+      "wrong": "Java is Call by Reference.",
+      "correct": "no.\nIt is **Call by Value** because the ‘address value’ is ‘copied’.",
+      "why": "If it is a true Call by Reference, when `d = new Dog()`, `myDog` should also be changed to the new dog.\nJava does not give you the power to change the association of the variable itself."
     }
   ],
-  "keyTakeaway": "Object parameters are 'remote control copies'. You can change the internals (channel), but you can't replace the remote itself (connection)."
+  "keyTakeaway": "The object parameter is ‘Copy remote control’. You can change the internals (channels), but you cannot change the remote control itself (connection)."
 }

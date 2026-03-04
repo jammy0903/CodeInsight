@@ -1,13 +1,13 @@
 {
   "lessonId": "java-3-1",
-  "title": "기본 타입 전달 (Primitive Passing)",
-  "concept": "기본 타입(int, boolean 등)을 메서드에 넘길 땐 '값'만 복사된다.",
+  "title": "原始传递",
+  "concept": "将基本类型（int、boolean 等）传递给方法时，仅复制“值”。",
   "content": {
     "code": "void increment(int x) {\n    x = x + 1;\n    System.out.println(\"inside: \" + x);\n}\n\nint a = 10;\nSystem.out.println(\"before: \" + a);\nincrement(a);\nSystem.out.println(\"after: \" + a);",
     "steps": [
       {
-        "title": "변수 a 선언",
-        "explanation": "**실행 순서:**\n1. Stack 메모리의 `main` 프레임 생성.\n2. `int`형 변수 `a` 공간 확보.\n3. 값 `10` 저장.\n\n**메모리에서 일어나는 일:**\n`main`이라는 작업 공간(Stack Frame)에 `a`라는 이름표를 붙인 상자를 만들고, 숫자 `10`을 넣습니다.",
+        "title": "声明变量a",
+        "explanation": "**执行顺序：**\n1. 在堆栈内存中创建“main”帧。\n2. 为“int”类型变量“a”预留空间。\n3. 保存值“10”。\n\n**内存中发生了什么：**\n在名为“main”的工作区（堆栈框架）中，创建一个标记为“a”的框并输入数字“10”。",
         "visualizationType": "javaMemory",
         "code": "int a = 10;",
         "javaMemoryState": {
@@ -24,8 +24,8 @@
         }
       },
       {
-        "title": "메서드 호출 전 출력",
-        "explanation": "**실행 순서:**\n1. `a`의 현재 값 조회.\n2. `System.out.println` 호출.\n\n현재 `a` 상자에 들어있는 `10`을 화면에 출력합니다.",
+        "title": "方法调用前的输出",
+        "explanation": "**执行顺序：**\n1. 检查`a`的当前值。\n2. 调用`System.out.println`。\n\n将当前包含在“a”框中的数字“10”打印到屏幕上。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"before: \" + a);",
         "javaMemoryState": {
@@ -35,9 +35,9 @@
         }
       },
       {
-        "title": "increment(a) 호출 - 값의 복사",
-        "explanation": "**실행 순서:**\n1. `increment` 메서드용 새 Stack Frame 생성.\n2. 파라미터 `x` 변수 공간 생성.\n3. `a`의 값 `10`을 읽어서 `x`에 **복사**.\n\n**핵심 (Call by Value):**\n`a` 그 자체가 넘어가는 게 아닙니다.\n`a`에 들어있는 값 `10`을 복사해서 `x`라는 새 상자에 넣어줍니다.\n이제 `a`와 `x`는 완전히 남남입니다.",
-        "keyInsight": "변수 자체가 아닌 '값'만 복사됨",
+        "title": "调用increment(a) - 复制值",
+        "explanation": "**执行顺序：**\n1. 为“increment”方法创建一个新的堆栈帧。\n2. 创建参数`x`变量空间。\n3. 读取“a”的值“10”并将其**复制**到“x”。\n\n**按值调用：**\n`a` 本身不会被忽略。\n复制“a”中的值“10”并将其放入名为“x”的新框中。\n现在‘a’和‘x’完全是南向南。",
+        "keyInsight": "仅复制“值”，而不复制变量本身",
         "visualizationType": "javaMemory",
         "code": "increment(a);",
         "javaMemoryState": {
@@ -60,9 +60,9 @@
         }
       },
       {
-        "title": "파라미터 x 값 변경",
-        "explanation": "**실행 순서:**\n1. `x`의 값 `10`을 읽음.\n2. `1`을 더해 `11` 생성.\n3. `x` 상자에 `11`을 다시 저장.\n\n**원본은?**\n`x`는 `increment` 프레임에 있는 별도의 상자입니다.\n여기서 무슨 짓을 해도 `main` 프레임에 있는 `a` 상자는 영향을 받지 않습니다.",
-        "keyInsight": "복사본(x)을 수정해도 원본(a)은 그대로",
+        "title": "更改参数 x 值",
+        "explanation": "**执行顺序：**\n1. 读取“x”的值“10”。\n2. 添加“1”以创建“11”。\n3. 再次将“11”保存到“x”框中。\n\n**原版是什么？**\n“x”是“increment”框架中的一个单独的框。\n无论你在这里做什么都不会影响“main”框架中的“a”框。",
+        "keyInsight": "即使修改副本 (x)，原始 (a) 仍保持不变。",
         "visualizationType": "javaMemory",
         "code": "x = x + 1;",
         "javaMemoryState": {
@@ -85,8 +85,8 @@
         }
       },
       {
-        "title": "함수 내부 출력",
-        "explanation": "**실행 순서:**\n1. `x`의 값 `11` 조회.\n2. 출력.\n\n함수 내부에서는 변경된 값 `11`이 보입니다.",
+        "title": "功能内部输出",
+        "explanation": "**执行顺序：**\n1. 搜索“x”的值“11”。\n2.输出。\n\n在函数内部，更改后的值“11”是可见的。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"inside: \" + x);",
         "javaMemoryState": {
@@ -110,9 +110,9 @@
         }
       },
       {
-        "title": "함수 반환 및 결과 확인",
-        "explanation": "**실행 순서:**\n1. `increment` 메서드 종료.\n2. `increment` 스택 프레임(x 포함) 삭제.\n3. `main`으로 복귀.\n4. `a` 값 출력.\n\n**결과:**\n`a`는 여전히 `10`입니다.\n복사본(`x`)이 사라졌을 뿐, 원본(`a`)은 건드린 적이 없기 때문입니다.",
-        "keyInsight": "메서드 종료 시 복사본은 소멸됨",
+        "title": "返回一个函数并检查结果",
+        "explanation": "**执行顺序：**\n1. 退出`increment`方法。\n2. 删除`increment`栈帧（包括x）。\n3.返回`main`。\n4. 打印`a`的值。\n\n**结果：**\n`a` 仍然是 `10`。\n这是因为副本 (`x`) 已经消失，而原始 (`a`) 从未被触及。",
+        "keyInsight": "当方法结束时，副本将被销毁。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"after: \" + a);",
         "javaMemoryState": {
@@ -141,14 +141,14 @@
       "什么也没发生。"
     ],
     "correctIndex": 1,
-    "explanation": "当Java传递基本类型时，它仅复制值并传递它（按值调用）。\n因此，更改方法内的值不会影响原始值。"
+    "explanation": "当Java传递基本类型时，仅复制并传递值（按值调用）。\n因此，更改方法内的值不会影响原始值。"
   },
   "misconceptions": [
     {
-      "wrong": "함수로 변수를 보내면 연결되어 있다.",
-      "correct": "기본 타입은 복사본(Clone)을 보내는 것과 같습니다.",
-      "why": "엑셀 파일을 복사해서 친구에게 주면, 친구가 내용을 수정해도 내 원본 파일은 바뀌지 않는 것과 똑같은 원리입니다."
+      "wrong": "如果将变量发送给函数，它就会被连接。",
+      "correct": "基本类型与发送克隆相同。",
+      "why": "原理就像你复制一个Excel文件交给朋友一样，即使你的朋友编辑了内容，你的原始文件也不会改变。"
     }
   ],
-  "keyTakeaway": "기본 타입은 '값의 복사'다. 메서드 안에서 지지고 볶아도 원본은 안전하다."
+  "keyTakeaway": "基本类型是“值的副本”。原汁原味即使在方法内蒸炒也是安全的。"
 }

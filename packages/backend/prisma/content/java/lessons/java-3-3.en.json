@@ -1,13 +1,13 @@
 {
   "lessonId": "java-3-3",
   "title": "Array Passing",
-  "concept": "Arrays are objects too. The reference value is copied, and element modifications are reflected in the original.",
+  "concept": "Arrays are also objects. Reference values ​​are copied, and element modifications are reflected in the original.",
   "content": {
     "code": "void modifyElement(int[] arr) {\n    arr[0] = 100;\n}\n\nvoid reassignArray(int[] arr) {\n    arr = new int[]{999, 888, 777};\n}\n\nint[] nums = {1, 2, 3};\nSystem.out.println(Arrays.toString(nums));\n\nmodifyElement(nums);\nSystem.out.println(Arrays.toString(nums));\n\nreassignArray(nums);\nSystem.out.println(Arrays.toString(nums));",
     "steps": [
       {
-        "title": "Creating an Array",
-        "explanation": "**Execution order:**\n1. An `int` array object `{1, 2, 3}` is created on the Heap (0x100).\n2. Address `0x100` is assigned to the `nums` variable on the Stack.\n\n**Key point:**\nIn Java, arrays are **objects**.\nTherefore, `nums` doesn't contain the array itself but holds the **address** of where the array is located.\n\n**Analogy**: `nums` is like a remote control for the actual device (the array on the Heap).",
+        "title": "create array",
+        "explanation": "**Execution order:**\n1. Create an `int` type array object `{1, 2, 3}` in the heap (0x100).\n2. Assign address `0x100` to `nums` variable on Stack.\n\n**Key:**\nIn Java, an array is an **Object**.\nSo `nums` contains the **address** of where the array is, not the array itself.\n\n**Analog**: `nums` is like a remote control that controls the main body (an array in the Heap).",
         "visualizationType": "javaMemory",
         "code": "int[] nums = {1, 2, 3};",
         "javaMemoryState": {
@@ -30,8 +30,8 @@
         }
       },
       {
-        "title": "Printing the Initial Array",
-        "explanation": "**Execution order:**\n1. Dereference `nums`.\n2. Print contents `[1, 2, 3]`.\n\nShows the current contents at address `0x100`.",
+        "title": "Initial array output",
+        "explanation": "**Execution order:**\n1. See `nums`.\n2. Output the contents `[1, 2, 3]`.\n\nThis is the current contents of address `0x100`.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "javaMemoryState": {
@@ -41,8 +41,8 @@
         }
       },
       {
-        "title": "Calling modifyElement(nums)",
-        "explanation": "**Execution order:**\n1. Copy `nums`'s value (address `0x100`).\n2. Pass it to `modifyElement`'s parameter `arr`.\n\nNow `nums` and `arr` share the same array (`0x100`).",
+        "title": "Call modifyElement(nums)",
+        "explanation": "**Execution order:**\n1. Copy the value of `nums` (address `0x100`).\n2. Passed to the parameter `arr` of `modifyElement`.\n\nNow `nums` and `arr` share the same array (`0x100`).",
         "visualizationType": "javaMemory",
         "code": "modifyElement(nums);",
         "javaMemoryState": {
@@ -64,9 +64,9 @@
         }
       },
       {
-        "title": "Modifying Array Elements (Side Effect)",
-        "explanation": "**Execution order:**\n1. Navigate to address `0x100` that `arr` points to.\n2. Overwrite the value at index 0 with `100`.\n\n**Result:**\nThe original array itself has been modified.\nSince `nums` is also looking at the same location, it is affected.",
-        "keyInsight": "Modifying array contents = changes the original",
+        "title": "Editing Array Elements (Side Effect)",
+        "explanation": "**Execution order:**\n1. Move to address `0x100` pointed to by `arr`.\n2. Overwrite index value 0 with `100`.\n\n**Result:**\nThe original array itself has been modified.\n`nums` is also affected because it is looking in the same place.",
+        "keyInsight": "Modify array contents = change original",
         "visualizationType": "javaMemory",
         "code": "arr[0] = 100;",
         "javaMemoryState": {
@@ -95,8 +95,8 @@
         }
       },
       {
-        "title": "Checking After Modification",
-        "explanation": "**Execution order:**\n1. `modifyElement` ends.\n2. Print `nums`.\n\nYou can confirm that the first element has changed to `100`.",
+        "title": "Confirm after editing",
+        "explanation": "**Execution order:**\n1. End `modifyElement`.\n2. Print `nums`.\n\nYou can see that the first element has been changed to `100`.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "occurrence": 2,
@@ -122,8 +122,8 @@
         }
       },
       {
-        "title": "Calling reassignArray(nums)",
-        "explanation": "**Execution order:**\n1. Copy `nums`'s address (`0x100`) again.\n2. Pass it to `reassignArray`'s `arr`.\n\nOnce again, the address is copied and passed.",
+        "title": "Call reassignArray(nums)",
+        "explanation": "**Execution order:**\n1. Copy the `nums` address (`0x100`) again.\n2. Passed to `arr` of `reassignArray`.\n\nOnce again the address is copied and forwarded.",
         "visualizationType": "javaMemory",
         "code": "reassignArray(nums);",
         "javaMemoryState": {
@@ -145,9 +145,9 @@
         }
       },
       {
-        "title": "Variable Reassignment (New Array)",
-        "explanation": "**Execution order:**\n1. A new array `{999, 888, 777}` is created on the Heap (0x300).\n2. Address `0x300` is assigned to variable `arr`.\n\n**Result:**\nOnly the local variable `arr` points to the new array.\n`nums` in `main` still holds firmly to address `0x100`.",
-        "keyInsight": "Variable reassignment = only the local reference is changed",
+        "title": "Reassign variables (New Array)",
+        "explanation": "**Execution order:**\n1. Create a new array `{999, 888, 777}` in the heap (0x300).\n2. Assign the address `0x300` to the `arr` variable.\n\n**Result:**\nOnly the local variable `arr` points to the new array.\n`nums` in `main` is still holding on to address `0x100`.",
+        "keyInsight": "Reassigning variable = only local reference changed",
         "visualizationType": "javaMemory",
         "code": "arr = new int[]{999, 888, 777};",
         "javaMemoryState": {
@@ -182,8 +182,8 @@
         }
       },
       {
-        "title": "Final Check",
-        "explanation": "**Execution order:**\n1. `reassignArray` ends.\n2. Print `nums`.\n\nSince the reassignment only affected the local variable (`arr`), `nums` remains `[100, 2, 3]`.",
+        "title": "final confirmation",
+        "explanation": "**Execution order:**\n1. End `reassignArray`.\n2. Print `nums`.\n\nSince the reallocation only affected the local variable (`arr`), `nums` remains `[100, 2, 3]`.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "occurrence": 3,
@@ -212,22 +212,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "If you want to modify array contents inside a method while protecting the original array, what should you do?",
+    "question": "What if you want to protect the original array while changing the contents of the array within a method?",
     "options": [
       "Use the final keyword.",
-      "It's safe to pass as-is.",
-      "Clone the array and pass the copy.",
-      "Use a static method."
+      "It's safe to just pass it on.",
+      "Copy and pass the array.",
+      "Use static methods."
     ],
     "correctIndex": 2,
-    "explanation": "When a reference (address) to the array is passed, the original can also be modified.\nTo prevent this, you need to create a copy using `Arrays.copyOf()` or `.clone()` (Deep Copy) and pass that instead (defensive copy)."
+    "explanation": "If the reference (address) of the array is passed, the original may also be modified.\nTo prevent this, you must create another identical array (Deep Copy) using `Arrays.copyOf()` or `.clone()` and pass it over (Defensive Copy)."
   },
   "misconceptions": [
     {
-      "wrong": "Arrays are variables, so they're copied like primitive types.",
-      "correct": "Arrays are objects created with `new`.\nThe address is what gets copied.",
-      "why": "Unlike C, arrays in Java are treated as first-class objects."
+      "wrong": "Because arrays are variables, they are copied like basic types.",
+      "correct": "Arrays are also objects created with `new`.\nThe address is copied.",
+      "why": "Unlike the C language, in Java, arrays are also treated as first-class objects."
     }
   ],
-  "keyTakeaway": "Modifying array elements affects the original. Variable reassignment does not."
+  "keyTakeaway": "Modifying array elements affects the original. Reassigning variables has no effect."
 }

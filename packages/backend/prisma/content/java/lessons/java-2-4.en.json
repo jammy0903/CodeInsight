@@ -1,13 +1,13 @@
 {
   "lessonId": "java-2-4",
-  "title": "Null-safe Collections",
-  "concept": "Each collection has different null-handling policies",
+  "title": "null-safe collection",
+  "concept": "Different collections have different nullability policies",
   "content": {
     "code": "Map<String, Integer> hashMap = new HashMap<>();\nhashMap.put(\"key\", null);\nhashMap.put(null, 100);\n\nMap<String, Integer> concurrentMap = new ConcurrentHashMap<>();\nconcurrentMap.put(\"key\", null);\n\nList<String> list = List.of(\"a\", \"b\", \"c\");\nlist.contains(null);\n\nInteger value = hashMap.getOrDefault(\"missing\", 0);",
     "steps": [
       {
-        "title": "Creating a HashMap",
-        "explanation": "**Execution order:**\n1. `new HashMap<>()` is called.\n2. A HashMap object is created on the Heap.\n\n**HashMap's policy:** \"I accept everything.\"\nIt can store both `null` keys and `null` values -- a permissive friend.\nIt's the most commonly used Map implementation.",
+        "title": "Create HashMap",
+        "explanation": "**Execution order:**\n1. Call `new HashMap<>()`.\n2. Create HashMap object in Heap.\n\n**HashMap's policy:** \"Anything is acceptable.\"\nIt is a generous friend that can store both `null` keys and `null` values.\nIt is the most commonly used Map implementation.",
         "visualizationType": "javaMemory",
         "code": "Map<String, Integer> hashMap = new HashMap<>();",
         "javaMemoryState": {
@@ -29,8 +29,8 @@
         }
       },
       {
-        "title": "Storing a null Value",
-        "explanation": "**Execution order:**\n1. `hashMap.put(\"key\", null)` is called.\n2. Hash code of \"key\" is calculated.\n3. (key, null) is stored in the bucket.\n\nThe value is stored as `null`.\nThis can be used when you want to indicate \"there's no data for this key\", but when you `get()`, it can be confusing whether \"the key doesn't exist or the value is null.\"",
+        "title": "Save null value",
+        "explanation": "**Execution order:**\n1. Call `hashMap.put(\"key\", null)`.\n2. Calculate hash code of “key”.\n3. Save (key, null) to the bucket.\n\nThe value was saved as `null`.\nIt can be used when you want to display \"There is no data for this key,\" but when you `get()`, you may be confused as to whether \"the key does not exist or the value is null.\"",
         "visualizationType": "javaMemory",
         "code": "hashMap.put(\"key\", null);",
         "javaMemoryState": {
@@ -45,9 +45,9 @@
         }
       },
       {
-        "title": "Storing a null Key",
-        "explanation": "**Execution order:**\n1. `hashMap.put(null, 100)` is called.\n2. Detects that the Key is `null`.\n3. Stores (null, 100) in bucket 0 (reserved slot).\n\n**Notable:** Even a `null` Key can be stored!\nInternally, since a hash value can't be computed, it's placed in a separate reserved bucket 0.\nOf course, keys must be unique, so you can only have one `null` Key.",
-        "keyInsight": "HashMap: 1 null key, unlimited null values allowed",
+        "title": "Save null key",
+        "explanation": "**Execution order:**\n1. Call `hashMap.put(null, 100)`.\n2. Detects that the key is `null`.\n3. Save (null, 100) in bucket 0 (reserved seat).\n\n**Special feature:** Keys of `null` are also saved!\nSince the hash value cannot be calculated internally, it is stored separately in bucket 0.\nOf course, the Key must be unique, so there can only be one `null` Key.",
+        "keyInsight": "HashMap: 1 null key, unlimited null values",
         "visualizationType": "javaMemory",
         "code": "hashMap.put(null, 100);",
         "javaMemoryState": {
@@ -62,8 +62,8 @@
         }
       },
       {
-        "title": "Creating a ConcurrentHashMap",
-        "explanation": "**Execution order:**\n1. `new ConcurrentHashMap<>()` is called.\n2. Object is created on the Heap.\n\n**ConcurrentHashMap's policy:** \"Absolutely no nulls!\"\nThis map, designed for multithreaded environments, is very strict.\nIt's designed to be safe even when multiple threads access it simultaneously.",
+        "title": "Create ConcurrentHashMap",
+        "explanation": "**Execution order:**\n1. Call `new ConcurrentHashMap<>()`.\n2. Create object in Heap.\n\n**ConcurrentHashMap's policy:** \"Never allow null!\"\nDesigned for multithreaded environments, this map is very strict.\nIt is designed to be safe even when multiple threads access it simultaneously.",
         "visualizationType": "javaMemory",
         "code": "Map<String, Integer> concurrentMap = new ConcurrentHashMap<>();",
         "javaMemoryState": {
@@ -85,8 +85,8 @@
       },
       {
         "title": "Putting null in ConcurrentHashMap (NPE!)",
-        "explanation": "**Execution order:**\n1. Enters the `put` method.\n2. Null check for Key/Value.\n3. `null` detected -> **NPE thrown**.\n\n**Why so strict?**\nIn a multithreaded environment, when `get(key)` returns `null`, it's ambiguous.\nWas the key just `remove`d and doesn't exist, or was it originally `null`? This ambiguity easily leads to concurrency bugs.",
-        "keyInsight": "ConcurrentHashMap: null absolutely not allowed!",
+        "explanation": "**Execution order:**\n1. Enter the `put` method.\n2. Check Key/Value null.\n3. `null` found -> **NPE occurs**.\n\n**Why are you so strict?**\nThis is because it is ambiguous when `get(key)` returns `null` in a multithreaded environment.\nIt's easy to run into concurrency bugs if you're not sure if it's missing because someone just `removed` it or if it was originally `null`.",
+        "keyInsight": "ConcurrentHashMap: Never null!",
         "visualizationType": "javaMemory",
         "code": "concurrentMap.put(\"key\", null);",
         "javaMemoryState": {
@@ -95,9 +95,9 @@
         }
       },
       {
-        "title": "List.of() Immutable List",
-        "explanation": "**Execution order:**\n1. `List.of(...)` factory method is called.\n2. Internally checks all elements for null.\n3. Creates an immutable list object.\n\nJava 9's `List.of()` also does not allow `null`.\nThis is because of modern Java's philosophy that \"immutable objects should be clean and complete.\"",
-        "keyInsight": "List.of(): immutable list, null not allowed",
+        "title": "List.of() immutable list",
+        "explanation": "**Execution order:**\n1. Call the `List.of(...)` factory method.\n2. Internally checks for null inclusion.\n3. Create an immutable list object.\n\n`List.of()` from Java 9 also does not allow `null`.\nThis is because of modern Java's philosophy that \"Immutable objects should be clean and complete.\"",
+        "keyInsight": "List.of(): immutable list, cannot contain null",
         "visualizationType": "javaMemory",
         "code": "List<String> list = List.of(\"a\", \"b\", \"c\");",
         "javaMemoryState": {
@@ -121,8 +121,8 @@
         }
       },
       {
-        "title": "Calling contains(null) (NPE!)",
-        "explanation": "**Execution order:**\n1. `list.contains(null)` is called.\n2. Detects the argument is `null`.\n3. **NPE thrown**.\n\nIt doesn't even allow asking \"do you contain `null`?\" (`contains`) and throws an NPE.",
+        "title": "calls contains(null) (NPE!)",
+        "explanation": "**Execution order:**\n1. Call `list.contains(null)`.\n2. Detection that the argument is `null`.\n3. **NPE occurs**.\n\nEven asking \"Does it contain `null`?\" (`contains`) is not allowed and throws an NPE.",
         "visualizationType": "javaMemory",
         "code": "list.contains(null);",
         "javaMemoryState": {
@@ -131,9 +131,9 @@
         }
       },
       {
-        "title": "getOrDefault() - Null-safe Lookup",
-        "explanation": "**Execution order:**\n1. `hashMap.getOrDefault(\"missing\", 0)` is called.\n2. Attempts to look up the \"missing\" key.\n3. Not found (null) confirmed.\n4. Returns the default value `0`.\n\n**Recommended method:**\n\"If the key doesn't exist, give me 0 instead of `null`.\"\nA 'cheat code' for when you're tired of writing `if` statements for `null` handling every time.",
-        "keyInsight": "getOrDefault() = get a default value instead of null",
+        "title": "getOrDefault() - null-safe lookup",
+        "explanation": "**Execution order:**\n1. Call `hashMap.getOrDefault(\"missing\", 0)`.\n2. Attempt to lookup the “missing” key.\n3. Check for null.\n4. Returns the default value of `0`.\n\n**Recommended Method:**\n\"If the key does not exist, give 0, not `null`.\"\nThis is a ‘cheat key’ used when it is inconvenient to handle `null` with an `if` statement every time.",
+        "keyInsight": "getOrDefault() = Get default value instead of null",
         "visualizationType": "javaMemory",
         "code": "Integer value = hashMap.getOrDefault(\"missing\", 0);",
         "javaMemoryState": {
@@ -160,19 +160,19 @@
       "Hashtable"
     ],
     "correctIndex": 0,
-    "explanation": "Only HashMap allows null keys.\nTreeMap needs to sort them, and ConcurrentHashMap and Hashtable don't allow them by design."
+    "explanation": "Only HashMap allows null keys.\nTreeMap needs to be sorted, which ConcurrentHashMap and Hashtable do not allow by design."
   },
   "misconceptions": [
     {
-      "wrong": "All Maps allow null",
-      "correct": "It depends on the implementation!",
-      "why": "`HashMap` and `LinkedHashMap` allow it, but `TreeMap`, `Hashtable`, and `ConcurrentHashMap` do not allow null for Keys or Values.\nAlways check the API documentation."
+      "wrong": "All Maps allow nulls",
+      "correct": "Each implementation is different!",
+      "why": "`HashMap` and `LinkedHashMap` allow, but `TreeMap`, `Hashtable` and `ConcurrentHashMap` do not allow nulls in Key or Value.\nBe sure to check the API documentation."
     },
     {
-      "wrong": "List.of(null) creates [null]",
-      "correct": "It immediately throws a `NullPointerException`.",
-      "why": "Java 9+ factory methods (`List.of`, `Set.of`, `Map.of`) strongly reject null."
+      "wrong": "List.of(null) becomes [null]",
+      "correct": "A `NullPointerException` occurs immediately.",
+      "why": "Factory methods (`List.of`, `Set.of`, `Map.of`) in Java 9+ are very null-averse."
     }
   ],
-  "keyTakeaway": "HashMap is permissive, but modern collections and Concurrent collections are strict with null."
+  "keyTakeaway": "HashMap is lenient, but Current and Concurrent collections are strict on nulls."
 }

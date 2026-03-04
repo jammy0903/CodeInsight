@@ -1,13 +1,13 @@
 {
   "lessonId": "java-2-4",
-  "title": "null-safe 컬렉션",
-  "concept": "컬렉션마다 null 허용 정책이 다르다",
+  "title": "空安全集合",
+  "concept": "不同的集合有不同的可空性策略",
   "content": {
     "code": "Map<String, Integer> hashMap = new HashMap<>();\nhashMap.put(\"key\", null);\nhashMap.put(null, 100);\n\nMap<String, Integer> concurrentMap = new ConcurrentHashMap<>();\nconcurrentMap.put(\"key\", null);\n\nList<String> list = List.of(\"a\", \"b\", \"c\");\nlist.contains(null);\n\nInteger value = hashMap.getOrDefault(\"missing\", 0);",
     "steps": [
       {
-        "title": "HashMap 생성",
-        "explanation": "**실행 순서:**\n1. `new HashMap<>()` 호출.\n2. Heap에 HashMap 객체 생성.\n\n**HashMap의 정책:** \"뭐든 다 받아줍니다.\"\n`null` 키도, `null` 값도 저장할 수 있는 관대한 친구입니다.\n가장 흔하게 쓰이는 Map 구현체죠.",
+        "title": "创建HashMap",
+        "explanation": "**执行顺序：**\n1. 调用`new HashMap<>()`。\n2. 在Heap中创建HashMap对象。\n\n**HashMap 的政策：**“任何事情都可以接受。”\n它是一个慷慨的朋友，可以存储“null”键和“null”值。\n它是最常用的 Map 实现。",
         "visualizationType": "javaMemory",
         "code": "Map<String, Integer> hashMap = new HashMap<>();",
         "javaMemoryState": {
@@ -29,8 +29,8 @@
         }
       },
       {
-        "title": "null value 저장",
-        "explanation": "**실행 순서:**\n1. `hashMap.put(\"key\", null)` 호출.\n2. \"key\"의 해시코드 계산.\n3. 버킷에 (key, null) 저장.\n\n값을 `null`로 저장했습니다.\n\"이 키에 대한 데이터는 없음\"을 표시하고 싶을 때 쓸 수 있지만, `get()` 했을 때 \"키가 없는 건지 값이 null인 건지\" 헷갈릴 수 있습니다.",
+        "title": "保存空值",
+        "explanation": "**执行顺序：**\n1. 调用 `hashMap.put(\"key\", null)`。\n2. 计算“key”的哈希码。\n3. 将(key, null)保存到桶中。\n\n该值被保存为“null”。\n当你想显示“该键没有数据”时可以使用它，但是当你`get()`时，你可能会困惑是否“该键不存在或值为空”。",
         "visualizationType": "javaMemory",
         "code": "hashMap.put(\"key\", null);",
         "javaMemoryState": {
@@ -45,9 +45,9 @@
         }
       },
       {
-        "title": "null key 저장",
-        "explanation": "**실행 순서:**\n1. `hashMap.put(null, 100)` 호출.\n2. Key가 `null`임을 감지.\n3. 0번 버킷(지정석)에 (null, 100) 저장.\n\n**특이점:** Key가 `null`인 것도 저장됩니다!\n내부적으로는 해시값을 계산할 수 없어서 0번 버킷에 따로 모셔둡니다.\n물론 Key는 유일해야 하므로 `null` Key는 딱 하나만 가질 수 있습니다.",
-        "keyInsight": "HashMap: null key 1개, null value 무제한 가능",
+        "title": "保存空键",
+        "explanation": "**执行顺序：**\n1. 调用 `hashMap.put(null, 100)`。\n2. 检测到键为“null”。\n3. 将(null, 100)保存到桶0（预留座位）中。\n\n**特色：** `null` 的键也被保存！\n由于内部无法计算哈希值，因此将其单独存储在桶0中。\n当然，Key必须是唯一的，所以只能有一个“null”Key。",
+        "keyInsight": "HashMap：1个空键，无限的空值",
         "visualizationType": "javaMemory",
         "code": "hashMap.put(null, 100);",
         "javaMemoryState": {
@@ -62,8 +62,8 @@
         }
       },
       {
-        "title": "ConcurrentHashMap 생성",
-        "explanation": "**실행 순서:**\n1. `new ConcurrentHashMap<>()` 호출.\n2. Heap에 객체 생성.\n\n**ConcurrentHashMap의 정책:** \"null은 절대 사절!\"\n멀티스레드 환경을 위해 설계된 이 맵은 아주 엄격합니다.\n여러 스레드가 동시에 접근해도 안전하도록 설계되었습니다.",
+        "title": "创建并发HashMap",
+        "explanation": "**执行顺序：**\n1. 调用`new ConcurrentHashMap<>()`。\n2. 在Heap中创建对象。\n\n**ConcurrentHashMap 的策略：** “绝不允许 null！”\n该映射是专为多线程环境设计的，非常严格。\n即使多个线程同时访问它，它的设计也是安全的。",
         "visualizationType": "javaMemory",
         "code": "Map<String, Integer> concurrentMap = new ConcurrentHashMap<>();",
         "javaMemoryState": {
@@ -84,9 +84,9 @@
         }
       },
       {
-        "title": "ConcurrentHashMap에 null 넣기 (NPE!)",
-        "explanation": "**실행 순서:**\n1. `put` 메서드 진입.\n2. Key/Value null 체크.\n3. `null` 발견 -> **NPE 발생**.\n\n**왜 이렇게 깐깐할까?**\n멀티스레드 환경에서 `get(key)`가 `null`을 반환했을 때 모호하기 때문입니다.\n누군가 방금 `remove`해서 없는 건지, 원래 `null`이었는지 확실하지 않으면 동시성 버그가 생기기 쉽습니다.",
-        "keyInsight": "ConcurrentHashMap: null 절대 불가!",
+        "title": "将 null 放入 ConcurrentHashMap（NPE！）",
+        "explanation": "**执行顺序：**\n1. 进入`put`方法。\n2. 检查键/值是否为空。\n3. 发现 `null` -> **发生 NPE**。\n\n**你为什么这么严格？**\n这是因为在多线程环境中，当 `get(key)` 返回 `null` 时，它是不明确的。\n如果您不确定它是否因为有人刚刚“删除”而丢失，或者它最初是否为“空”，则很容易遇到并发错误。",
+        "keyInsight": "ConcurrentHashMap：永不为空！",
         "visualizationType": "javaMemory",
         "code": "concurrentMap.put(\"key\", null);",
         "javaMemoryState": {
@@ -95,9 +95,9 @@
         }
       },
       {
-        "title": "List.of() 불변 리스트",
-        "explanation": "**실행 순서:**\n1. `List.of(...)` 팩토리 메서드 호출.\n2. 내부적으로 null 포함 여부 전수 검사.\n3. 불변 리스트 객체 생성.\n\nJava 9에 나온 `List.of()` 역시 `null`을 허용하지 않습니다.\n\"불변 객체(Immutable Object)는 깔끔하고 완전해야 한다\"는 최신 Java의 철학 때문입니다.",
-        "keyInsight": "List.of(): 불변 리스트, null 포함 불가",
+        "title": "List.of() 不可变列表",
+        "explanation": "**执行顺序：**\n1. 调用`List.of(...)`工厂方法。\n2. 内部检查是否存在空包含。\n3. 创建一个不可变的列表对象。\n\nJava 9 中的“List.of()”也不允许“null”。\n这是因为现代 Java 的哲学是“不可变对象应该是干净和完整的”。",
+        "keyInsight": "List.of()：不可变列表，不能包含 null",
         "visualizationType": "javaMemory",
         "code": "List<String> list = List.of(\"a\", \"b\", \"c\");",
         "javaMemoryState": {
@@ -121,8 +121,8 @@
         }
       },
       {
-        "title": "contains(null) 호출 (NPE!)",
-        "explanation": "**실행 순서:**\n1. `list.contains(null)` 호출.\n2. 인자가 `null`임 감지.\n3. **NPE 발생**.\n\n심지어 \"`null`이 들어있니?\"라고 물어보는 것(`contains`)조차 허용하지 않고 NPE를 던집니다.",
+        "title": "调用 contains(null) （NPE！）",
+        "explanation": "**执行顺序：**\n1. 调用`list.contains(null)`。\n2. 检测参数为“null”。\n3. **发生 NPE**。\n\n甚至问“它包含‘null’吗？” (`contains`) 是不允许的，并且会抛出 NPE。",
         "visualizationType": "javaMemory",
         "code": "list.contains(null);",
         "javaMemoryState": {
@@ -131,9 +131,9 @@
         }
       },
       {
-        "title": "getOrDefault() - null-safe 조회",
-        "explanation": "**실행 순서:**\n1. `hashMap.getOrDefault(\"missing\", 0)` 호출.\n2. \"missing\" 키 조회 시도.\n3. 없음(null) 확인.\n4. 기본값 `0` 반환.\n\n**추천 메서드:**\n\"키가 없으면 `null` 말고 0을 달라.\"\n`null` 처리를 매번 `if`문으로 하기 귀찮을 때 쓰는 '치트키'입니다.",
-        "keyInsight": "getOrDefault() = null 대신 기본값 받기",
+        "title": "getOrDefault() - 空安全查找",
+        "explanation": "**执行顺序：**\n1. 调用 `hashMap.getOrDefault(\"missing\", 0)`。\n2. 尝试查找“丢失”的密钥。\n3. 检查是否为空。\n4. 返回默认值“0”。\n\n**推荐方法：**\n“如果键不存在，则给出 0，而不是‘null’。”\n这是每次不方便用 if 语句处理 null 时使用的“作弊键”。",
+        "keyInsight": "getOrDefault() = 获取默认值而不是 null",
         "visualizationType": "javaMemory",
         "code": "Integer value = hashMap.getOrDefault(\"missing\", 0);",
         "javaMemoryState": {
@@ -164,15 +164,15 @@
   },
   "misconceptions": [
     {
-      "wrong": "모든 Map은 null을 허용한다",
-      "correct": "구현체마다 다릅니다!",
-      "why": "`HashMap`, `LinkedHashMap`은 허용하지만, `TreeMap`, `Hashtable`, `ConcurrentHashMap`은 Key 또는 Value에 null을 허용하지 않습니다.\nAPI 문서를 꼭 확인해야 합니다."
+      "wrong": "所有地图都允许空值",
+      "correct": "每个实现都不同！",
+      "why": "`HashMap` 和 `LinkedHashMap` 允许，但 `TreeMap`、`Hashtable` 和 `ConcurrentHashMap` 不允许 Key 或 Value 为空。\n请务必检查 API 文档。"
     },
     {
-      "wrong": "List.of(null)은 [null]이 된다",
-      "correct": "바로 `NullPointerException`이 발생합니다.",
-      "why": "Java 9+의 팩토리 메서드(`List.of`, `Set.of`, `Map.of`)는 null을 매우 싫어합니다."
+      "wrong": "List.of(null) 变为 [null]",
+      "correct": "立即发生“NullPointerException”。",
+      "why": "Java 9+ 中的工厂方法（“List.of”、“Set.of”、“Map.of”）非常反对 null。"
     }
   ],
-  "keyTakeaway": "HashMap은 관대하지만, 최신 컬렉션과 Concurrent 컬렉션은 null에 엄격합니다."
+  "keyTakeaway": "HashMap 很宽松，但 Current 和 Concurrent 集合对 null 很严格。"
 }
