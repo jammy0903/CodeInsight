@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Student 클래스 정의",
-        "explanation": "**`class Student:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Student` 클래스(학생 설계도)를 정의합니다.\n\n**이 레슨의 목표 -- 클래스 변수의 위험한 함정 발견!** 이전 레슨에서 인스턴스 변수(`self.count`)는 각 객체마다 독립적이라고 배웠습니다. 하지만 **클래스 변수**를 잘못 사용하면 모든 인스턴스가 같은 데이터를 공유하는 심각한 버그가 발생합니다! 특히 **가변 객체(리스트, 딕셔너리)**를 클래스 변수로 사용하면 대참사가 일어납니다.\n\n**비유**: 이 레슨은 \"함께 쓰는 화이트보드에 각자 성적을 쓰면 어떻게 되는가?\"를 보여줍니다. 각자의 노트(인스턴스 변수)가 아닌 공용 화이트보드(클래스 변수)에 쓰면, 모든 사람의 성적이 섞이는 참사가 벌어집니다!\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 클래스 변수와 메서드를 추가할 수 있습니다.\n\n**실행 순서**: class Student 실행 --> Student 클래스 객체 생성 시작 --> line 2",
+        "explanation": "**`class Student:`**\n\n`Student` 클래스를 정의합니다. 이 레슨에서는 클래스 변수로 **가변 객체(리스트)**를 사용했을 때 발생하는 함정을 확인합니다. 모든 인스턴스가 같은 리스트를 공유하는 의도치 않은 버그가 발생합니다.",
         "visualizationType": "pythonMemory",
         "code": "class Student:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "클래스 변수 정의 (⚠️ 함정!)",
-        "explanation": "**`grades = []`**\n\n이것이 바로 **함정**입니다! 클래스 본문에서 `self` 없이 정의한 `grades = []`는 **클래스 변수**입니다. 모든 Student 인스턴스가 **이 하나의 리스트를 공유**합니다!\n\n**문제의 핵심:**\n- 이 줄이 실행될 때, 빈 리스트 객체가 **딱 하나만** 생성됩니다 (메모리 주소 0x1500)\n- 이 리스트는 `Student.__dict__['grades']`에 저장됩니다\n- 나중에 s1.grades든 s2.grades든, **모두 같은 0x1500 리스트를 가리킵니다**\n- 한 학생이 성적을 추가하면 **다른 모든 학생에게도 보입니다!**\n\n**왜 이게 위험한가?** `species = \"Canis familiaris\"` 같은 **불변(immutable) 문자열**은 클래스 변수로 사용해도 안전합니다. 값을 변경하면 새 객체가 만들어지니까요. 하지만 **리스트, 딕셔너리** 같은 **가변(mutable) 객체**는 `.append()`, `[key] = val` 등으로 **원래 객체를 직접 수정**할 수 있어서, 공유된 모든 곳에 영향을 미칩니다!\n\n**올바른 방법 (미리 보기):**\n```python\ndef __init__(self):\n    self.grades = []  # 각 인스턴스마다 독립적인 리스트!\n```\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 실행됩니다.\n\n**실행 순서**: grades = [] 실행 --> 빈 리스트 객체 0x1500 생성 --> Student.__dict__['grades'] = 0x1500 --> line 4",
+        "explanation": "**`grades = []`**\n\n이것이 **함정**입니다. `self` 없이 클래스 본문에 정의하면 클래스 변수가 됩니다. 빈 리스트 객체가 **딱 하나만** 생성되어 모든 Student 인스턴스가 공유합니다. 올바른 방법은 `__init__`에서 `self.grades = []`로 정의하는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "grades = []  # 클래스 변수 - 함정!",
         "pythonMemoryState": {
@@ -66,7 +66,7 @@
       },
       {
         "title": "add_grade 메서드 정의",
-        "explanation": "**`def add_grade(self, grade):`**\n\n성적을 추가하는 메서드를 정의합니다.\n\n**`self.grades.append(grade)`의 의미**:\n1. `self.grades` 읽기 → 인스턴스에서 찾기\n2. 인스턴스에 없으면 → **클래스 변수에서 찾기** (0x1500)\n3. `append(grade)` → **같은 리스트를 수정**\n\n**문제의 핵심**: `self.grades`가 클래스 변수를 가리키므로, **모든 인스턴스가 같은 리스트를 수정**합니다!\n\n**왜 이 순서인가?** 클래스 변수 정의 후, 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def add_grade 실행 → add_grade 메서드 등록 → Student 클래스 정의 완료 → line 7",
+        "explanation": "**`def add_grade(self, grade):`**\n\n`self.grades.append(grade)` 실행 시, 인스턴스 자체에는 `grades`가 없으므로 클래스 변수 `Student.grades`를 찾아 append합니다. 이렇게 **공유된 리스트를 수정**하는 것이 문제의 원인입니다.",
         "visualizationType": "pythonMemory",
         "code": "def add_grade(self, grade):",
         "highlightOffset": [
@@ -103,7 +103,7 @@
       },
       {
         "title": "첫 번째 학생 생성",
-        "explanation": "**`s1 = Student()`**\n\n첫 번째 Student 객체를 생성합니다.\n\n**중요**: `__init__` 메서드가 없으므로 객체만 생성되고, **인스턴스 변수는 추가되지 않습니다**.\n\n**s1.grades는 어디를 가리키는가?**\n- s1 객체 자체에는 grades 속성이 없음\n- Python은 **클래스 변수** `Student.grades` (0x1500)를 찾음\n- 따라서 `s1.grades` → 0x1500 리스트\n\n**왜 이 순서인가?** 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Student() 호출 → 객체 0x2000 생성 (grades 없음) → s1 = 0x2000 → line 8",
+        "explanation": "**`s1 = Student()`**\n\ns1 객체를 생성합니다. `__init__`이 없으므로 인스턴스 변수는 추가되지 않습니다. `s1.grades`에 접근하면 자동으로 클래스 변수 `Student.grades`(공유 리스트)를 참조합니다.",
         "visualizationType": "pythonMemory",
         "code": "s1 = Student()",
         "pythonMemoryState": {
@@ -148,7 +148,7 @@
       },
       {
         "title": "두 번째 학생 생성",
-        "explanation": "**`s2 = Student()`**\n\n두 번째 Student 객체를 생성합니다.\n\n**s2.grades는 어디를 가리키는가?**\n- s2 객체 자체에도 grades 속성이 없음\n- Python은 **같은 클래스 변수** `Student.grades` (0x1500)를 찾음\n- 따라서 `s2.grades` → **0x1500 리스트** (s1과 동일!)\n\n**핵심**:\n- s1 객체: 0x2000\n- s2 객체: 0x3000 (s1과 다름)\n- 하지만 `s1.grades`와 `s2.grades`는 **같은 0x1500을 가리킴**!\n\n**왜 이 순서인가?** s1 생성 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Student() 호출 → 객체 0x3000 생성 (grades 없음) → s2 = 0x3000 → line 10",
+        "explanation": "**`s2 = Student()`**\n\ns2도 생성합니다. s1과 s2 모두 인스턴스에 `grades`가 없으므로 `s1.grades`와 `s2.grades`는 **같은 클래스 변수 리스트**를 가리킵니다.",
         "visualizationType": "pythonMemory",
         "code": "s2 = Student()",
         "pythonMemoryState": {
@@ -205,7 +205,7 @@
       },
       {
         "title": "s1.add_grade(90) 호출",
-        "explanation": "**`s1.add_grade(90)`**\n\ns1 객체의 add_grade 메서드를 호출합니다.\n\n**self에 무엇이 들어가는가?**\n- `self` = `s1` (0x2000 객체)\n\n**왜 이 순서인가?** s2 생성 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: s1.add_grade(90) 호출 → line 5로 점프 → self=s1, grade=90",
+        "explanation": "**`s1.add_grade(90)`**\n\ns1의 `add_grade` 메서드를 호출합니다. `self = s1`, `grade = 90`으로 바인딩됩니다.",
         "visualizationType": "pythonMemory",
         "code": "s1.add_grade(90)",
         "pythonMemoryState": {
@@ -260,7 +260,7 @@
       },
       {
         "title": "⚠️ 클래스 변수 리스트에 90 추가",
-        "explanation": "**`self.grades.append(grade)`**\n\n**속성 검색 순서** (중요!):\n1. `self.grades` 찾기 시도\n2. s1(0x2000) 객체에서 찾기 → **없음!**\n3. **클래스 Student에서 찾기** → Student.grades (0x1500) 발견!\n4. `0x1500.append(90)` 실행\n\n**결과**: 클래스 변수 리스트가 `[90]`으로 변경됩니다.\n\n**문제**: s1 전용 리스트가 아니라 **모든 인스턴스가 공유하는 리스트**를 수정했습니다!\n\n**왜 이 순서인가?** 메서드 호출(line 10)에서 점프해왔습니다.\n\n**실행 순서**: self.grades → Student.grades (0x1500) → append(90) → [90] → line 10로 돌아감 → line 11",
+        "explanation": "**`self.grades.append(grade)`**\n\n`self.grades` 탐색: s1 인스턴스에 없음 → 클래스 변수 `Student.grades`에서 발견 → 공유 리스트에 90 추가. 결과: `[90]`. s1 전용이 아닌 **모든 인스턴스가 공유하는 리스트**를 수정했습니다.",
         "visualizationType": "pythonMemory",
         "code": "self.grades.append(grade)",
         "pythonMemoryState": {
@@ -335,7 +335,7 @@
       },
       {
         "title": "s2.add_grade(80) 호출",
-        "explanation": "**`s2.add_grade(80)`**\n\ns2 객체의 add_grade 메서드를 호출합니다.\n\n**self에 무엇이 들어가는가?**\n- `self` = `s2` (0x3000 객체)\n\n**왜 이 순서인가?** 이전 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: s2.add_grade(80) 호출 → line 5로 점프 → self=s2, grade=80",
+        "explanation": "**`s2.add_grade(80)`**\n\ns2의 `add_grade`를 호출합니다. `self = s2`, `grade = 80`으로 바인딩됩니다.",
         "visualizationType": "pythonMemory",
         "code": "s2.add_grade(80)",
         "pythonMemoryState": {
@@ -390,7 +390,7 @@
       },
       {
         "title": "⚠️ 같은 클래스 변수 리스트에 80 추가",
-        "explanation": "**`self.grades.append(grade)`**\n\n**속성 검색 순서** (다시!):\n1. `self.grades` 찾기 시도\n2. s2(0x3000) 객체에서 찾기 → **없음!**\n3. **클래스 Student에서 찾기** → Student.grades (0x1500) 발견!\n4. `0x1500.append(80)` 실행\n\n**결과**: **같은** 클래스 변수 리스트가 `[90, 80]`으로 변경됩니다.\n\n**치명적 문제**:\n- s1이 추가한 90도 포함됨\n- s2 전용이 아니라 **모든 인스턴스가 공유하는 리스트**를 수정\n- s1.grades도 [90, 80]이 됨!\n\n**왜 이 순서인가?** 메서드 호출(line 11)에서 점프해왔습니다.\n\n**실행 순서**: self.grades → Student.grades (0x1500) → append(80) → [90, 80] → line 11로 돌아감 → line 13",
+        "explanation": "**`self.grades.append(grade)`**\n\n이번에도 같은 클래스 변수 리스트를 수정합니다. s1이 추가한 90도 이미 포함된 `[90]`에 80을 추가해 `[90, 80]`이 됩니다. s2 전용 리스트가 아닙니다.",
         "visualizationType": "pythonMemory",
         "code": "self.grades.append(grade)",
         "pythonMemoryState": {
@@ -465,7 +465,7 @@
       },
       {
         "title": "⚠️ s1의 성적 확인 (놀라운 결과!)",
-        "explanation": "**`print(f\"s1: {s1.grades}\")`**\n\ns1 객체의 grades 속성에 접근하여 출력합니다.\n\n**속성 검색**:\n1. s1(0x2000) 객체에서 grades 찾기 → **없음!**\n2. 클래스 Student.grades (0x1500) 찾기 → **발견!**\n3. `0x1500` 리스트 반환 → `[90, 80]`\n\n**놀라운 결과**: s1은 90만 추가했는데, **s2가 추가한 80까지 포함**되어 있습니다!\n\n**왜 이런 일이?**\n- s1.grades와 s2.grades가 **같은 0x1500을 가리킴**\n- s2가 80을 추가하면 s1에게도 보임!\n\n**왜 이 순서인가?** 모든 메서드 호출 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: s1.grades → Student.grades (0x1500) → [90, 80] 읽기 → f-string 평가 → print 실행 → line 14",
+        "explanation": "**`print(f\"s1: {s1.grades}\")`**\n\ns1은 90만 추가했는데 `[90, 80]`이 출력됩니다. `s1.grades`가 클래스 변수를 참조하므로, s2가 추가한 80도 함께 보입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"s1: {s1.grades}\")",
         "pythonMemoryState": {
@@ -525,7 +525,7 @@
       },
       {
         "title": "⚠️ s2의 성적 확인 (똑같은 결과!)",
-        "explanation": "**`print(f\"s2: {s2.grades}\")`**\n\ns2 객체의 grades 속성에 접근하여 출력합니다.\n\n**속성 검색**:\n1. s2(0x3000) 객체에서 grades 찾기 → **없음!**\n2. 클래스 Student.grades (0x1500) 찾기 → **발견!**\n3. `0x1500` 리스트 반환 → `[90, 80]`\n\n**똑같은 결과**: s2도 80만 추가했는데, **s1이 추가한 90까지 포함**되어 있습니다!\n\n**핵심 문제**:\n- s1.grades = 0x1500\n- s2.grades = 0x1500 ← **완전히 같은 객체!**\n- 한 학생의 성적이 다른 학생에게 공유됨!\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: s2.grades → Student.grades (0x1500) → [90, 80] 읽기 → f-string 평가 → print 실행 → line 15",
+        "explanation": "**`print(f\"s2: {s2.grades}\")`**\n\ns2도 `[90, 80]`이 출력됩니다. `s1.grades`와 `s2.grades`가 완전히 같은 객체를 가리키기 때문입니다. 이것이 가변 객체를 클래스 변수로 쓰는 위험입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"s2: {s2.grades}\")",
         "pythonMemoryState": {
@@ -585,7 +585,7 @@
       },
       {
         "title": "💡 객체 동일성 확인 (증명!)",
-        "explanation": "객체 동일성 확인은 `==`와 `is`를 구분해서 보는 게 핵심입니다.\n\n- `==`: 값이 같은가\n- `is`: 같은 객체(같은 참조)인가\n\n**비유**: 같은 디자인의 의자 두 개(== True, is False)와, 같은 의자를 두 이름으로 부르는 경우(is True)를 구분하는 느낌입니다.\n\n디버깅에서 aliasing(같은 객체 공유) 문제를 찾을 때 `is`가 특히 강력합니다.",
+        "explanation": "객체 동일성 확인은 `==`(값 비교)와 `is`(같은 객체 여부) 구분이 핵심입니다. `s1.grades is s2.grades`는 `True`를 반환하며, 두 이름이 **같은 리스트 객체**를 공유함을 증명합니다. 수정 방법: `__init__`에서 `self.grades = []`로 인스턴스 변수로 정의하세요.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"같은 객체? {s1.grades is s2.grades}\")",
         "pythonMemoryState": {

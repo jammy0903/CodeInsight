@@ -16,8 +16,8 @@
 
 | 서비스 | Key 이름 | 용도 |
 |--------|---------|------|
-| Render | `coin` | 배포 자동화 (rnd_8QlbsM81Vm9YCQe0RWeo6nwhxHnP) |
-| DeepSeek | - | AI Tutor 기능 (sk-327987f9e36648d7b394b1c98fd4e4ec) |
+| Render | `coin` | 배포 자동화 ([REDACTED_RENDER_TOKEN]) |
+| DeepSeek | - | AI Tutor 기능 ([REDACTED_DEEPSEEK_KEY]) |
 | Neon | - | PostgreSQL 데이터베이스 |
 | Firebase | - | 사용자 인증 |
 | Fal.ai | - | 이미지 생성 |

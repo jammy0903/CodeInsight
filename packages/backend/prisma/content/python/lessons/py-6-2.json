@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "클래스 정의 (Person)",
-        "explanation": "**`class Person:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `Person` 클래스(사람 설계도)를 정의합니다.\n\n**이 레슨의 목표**: `__init__`의 정확한 정체를 이해합니다. 많은 입문서에서 `__init__`을 \"생성자\"라고 부르지만, 엄밀히 말하면 **초기화자(Initializer)**입니다! 객체를 **생성**하는 것은 `__new__`이고, `__init__`은 이미 생성된 객체를 **초기화**하는 역할입니다. 그리고 `self`가 정확히 무엇이고 어떻게 전달되는지를 깊이 파헤칩니다.\n\n**Python 내부 동작**: `class Person:` 문을 만나면, Python은 클래스 본문을 실행하여 메서드들을 등록하고, Person이라는 클래스 객체를 생성합니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가하고 객체를 만들 수 있습니다.\n\n**실행 순서**: class Person 실행 --> Person 클래스 객체 생성 시작 --> line 2",
+        "explanation": "**`class Person:`**\n\n`Person` 클래스를 정의합니다. 이번 레슨에서는 `__init__`이 **초기화자(Initializer)**임을 정확히 이해합니다. 객체를 생성하는 것은 `__new__`, 이미 생성된 객체를 초기화하는 것이 `__init__`입니다.",
         "visualizationType": "pythonMemory",
         "code": "class Person:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "__init__ 초기화자 정의",
-        "explanation": "**`__init__`**은 객체 생성 직후 자동 실행되는 초기화 메서드입니다.\n\n역할은 명확합니다:\n- 객체가 시작할 필수 상태를 한 곳에서 세팅\n- \"생성 후 미완성 상태\"를 줄여 안정성 확보\n\n**비유**: 새 계정을 만들 때 기본 프로필을 자동 등록하는 온보딩 단계입니다.\n\n실무 포인트:\n- 필수 속성은 `__init__`에서 보장\n- 선택 속성은 기본값으로 처리하면 사용성이 좋아집니다",
+        "explanation": "**`def __init__(self, name, age):`**\n\n`__init__`은 객체 생성 직후 자동 실행되는 초기화 메서드입니다. 역할은 객체가 시작할 필수 상태를 한 곳에서 세팅하여 안정성을 확보하는 것입니다. 필수 속성은 `__init__`에서, 선택 속성은 기본값으로 처리합니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, name, age):",
         "highlightOffset": [
@@ -54,7 +54,7 @@
       },
       {
         "title": "객체 생성 및 __init__ 자동 호출",
-        "explanation": "**`alice = Person(\"Alice\", 25)`**\n\n**객체 생성과 초기화**:\n\n**Python 내부 동작**:\n```python\n# 1. __new__로 빈 객체 생성\nalice = object.__new__(Person)  # 메모리 0x2000\n\n# 2. __init__으로 객체 초기화 (자동 호출!)\nalice.__init__(\"Alice\", 25)\n\n# 3. 초기화된 객체 반환\n```\n\n**매개변수 전달**:\n- `self` = `alice` (0x2000 객체, **자동 전달**)\n- `name` = `\"Alice\"`\n- `age` = `25`\n\n**왜 이 순서인가?** 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Person(\"Alice\", 25) 호출 → 빈 객체 0x2000 생성 → __init__ 자동 호출 → line 3으로 점프",
+        "explanation": "**`alice = Person(\"Alice\", 25)`**\n\n객체 생성과 초기화가 한 번에 이루어집니다. Python이 내부적으로 빈 객체를 생성한 뒤 `__init__`을 자동 호출합니다. 매개변수로 `self = alice`, `name = \"Alice\"`, `age = 25`가 전달됩니다.",
         "visualizationType": "pythonMemory",
         "code": "alice = Person(\"Alice\", 25)",
         "pythonMemoryState": {
@@ -89,7 +89,7 @@
       },
       {
         "title": "인스턴스 변수 생성 (name)",
-        "explanation": "**`self.name = name`**\n\n**인스턴스 변수 생성**: `self` (alice 객체, 0x2000)에 `name` 속성을 추가하고 `\"Alice\"`를 할당합니다.\n\n**self.name의 의미**:\n- `self` → alice 객체 (0x2000)\n- `.name` → 이 객체의 name 속성 (아직 없음, 지금 만듦!)\n- `= name` → 매개변수 name(\"Alice\")을 할당\n\n**중요한 규칙**: `self.`를 붙여야만 **인스턴스 변수**가 됩니다!\n\n**잘못된 예**:\n```python\nname = name  # ❌ 로컬 변수! 함수 끝나면 사라짐\nself.name = name  # ✅ 인스턴스 변수! 객체에 영구 저장\n```\n\n**왜 이 순서인가?** 객체 생성(line 7)에서 __init__이 자동 호출되어 점프해왔습니다.\n\n**실행 순서**: self.name = name → alice 객체에 name=\"Alice\" 추가 → line 4",
+        "explanation": "**`self.name = name`**\n\n`self`(alice 객체)에 `name` 인스턴스 변수를 생성하고 `\"Alice\"`를 할당합니다. `self.`를 붙여야 인스턴스 변수가 됩니다. `name = name`처럼 `self.`를 빠뜨리면 로컬 변수일 뿐, 함수 종료 시 사라집니다.",
         "visualizationType": "pythonMemory",
         "code": "self.name = name",
         "pythonMemoryState": {
@@ -156,7 +156,7 @@
       },
       {
         "title": "인스턴스 변수 생성 (age)",
-        "explanation": "**`self.age = age`**\n\n`self`(alice 객체, 0x2000)에 `age`라는 인스턴스 변수를 추가하고, 매개변수 `age`의 값인 `25`를 할당합니다.\n\n**이 시점에서 alice 객체의 상태**: `alice.__dict__` = `{'name': 'Alice', 'age': 25}`. name과 age 두 속성이 모두 설정되었습니다.\n\n**인스턴스 변수의 특징:**\n- **각 객체마다 독립적**: `alice.age`와 다른 Person 객체의 age는 별개의 변수\n- **영구 저장**: __init__이 끝나도 객체에 남아있음 (매개변수 `age`는 사라지지만, `self.age`는 영구)\n- **어디서든 접근 가능**: `alice.age`로 외부에서, `self.age`로 메서드 내부에서 접근\n\n**왜 self.age = age인가?** 등호 왼쪽의 `self.age`는 인스턴스 변수(영구 저장), 오른쪽의 `age`는 매개변수(임시)입니다. 이름이 같지만 완전히 다른 것입니다. 다른 이름을 써도 됩니다 (예: `self.user_age = age`), 하지만 같은 이름을 쓰는 것이 Python의 관례입니다.\n\n**왜 이 순서인가?** __init__ 본문 내에서 순서대로 실행됩니다.\n\n**실행 순서**: self.age = age --> alice.__dict__에 age=25 추가 --> line 5",
+        "explanation": "**`self.age = age`**\n\n`self`(alice 객체)에 `age = 25`를 추가합니다. 이 시점에서 `alice.__dict__` = `{'name': 'Alice', 'age': 25}`. 인스턴스 변수는 각 객체마다 독립적이고, `__init__` 종료 후에도 객체에 영구 저장됩니다.",
         "visualizationType": "pythonMemory",
         "code": "self.age = age",
         "pythonMemoryState": {
@@ -199,7 +199,7 @@
       },
       {
         "title": "초기화 중 출력",
-        "explanation": "**`print(f\"{name} 객체 초기화!\")`**\n\n`__init__` 메서드 내부에서 속성 설정 외에도 **어떤 코드든** 실행할 수 있습니다. 여기서는 초기화 확인 메시지를 출력합니다.\n\n**왜 `name`을 사용할 수 있는가?** `name`은 `__init__`의 매개변수이므로 함수 본문 어디서든 접근 가능합니다. `self.name`(인스턴스 변수)과 `name`(매개변수) 모두 이 시점에서 \"Alice\"를 가리키고 있지만, 서로 다른 것입니다.\n\n**__init__ 안에서 할 수 있는 것들:**\n- 인스턴스 변수 설정 (self.name = name)\n- 유효성 검증 (if age < 0: raise ValueError)\n- 로그/메시지 출력 (지금 하는 것!)\n- 파일 열기, 데이터베이스 연결 등\n\n**이 줄이 실행되면** \"Alice 객체 초기화!\"가 화면에 출력됩니다. 그리고 `__init__`의 모든 코드가 끝났으므로, Python은 자동으로 `__init__`에서 빠져나와 원래 호출 지점(line 7)으로 돌아갑니다.\n\n**__init__의 반환값**: `__init__`은 항상 `None`을 반환해야 합니다. `return \"뭔가\"`를 쓰면 `TypeError`가 발생합니다! 객체를 반환하는 것은 `__new__`의 역할이기 때문입니다.\n\n**실행 순서**: name=\"Alice\" 읽기 --> f-string 평가 --> print 실행 --> __init__ 종료 --> line 7로 돌아감 --> line 8",
+        "explanation": "**`print(f\"{name} 객체 초기화!\")`**\n\n`__init__` 안에서 속성 설정 외에 일반 코드도 실행할 수 있습니다. 모든 코드 실행 후 `__init__`이 종료되면 Python이 자동으로 호출 지점으로 돌아옵니다. `__init__`은 항상 `None`을 반환해야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"{name} 객체 초기화!\")",
         "pythonMemoryState": {
@@ -265,7 +265,7 @@
       },
       {
         "title": "인스턴스 변수 접근 (name)",
-        "explanation": "**`print(f\"이름: {alice.name}\")`**\n\n초기화가 완료된 `alice` 객체의 `name` 속성에 접근합니다.\n\n**왜 접근 가능한가?** line 3에서 `self.name = name`으로 인스턴스 변수를 만들었기 때문입니다!\n\n**만약 `self.`를 빠뜨렸다면?**\n```python\ndef __init__(self, name, age):\n    name = name  # ❌ 로컬 변수\n    age = age    # ❌ 로컬 변수\n\nalice = Person(\"Alice\", 25)\nprint(alice.name)  # AttributeError!\n```\n\n**왜 이 순서인가?** 객체 생성 및 초기화 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: alice.name 읽기 (\"Alice\") → f-string 평가 → print 실행 → line 9",
+        "explanation": "**`print(f\"이름: {alice.name}\")`**\n\n`__init__`에서 `self.name`으로 설정했으므로 `alice.name`으로 외부에서 접근 가능합니다. 만약 `self.`를 빠뜨렸다면 이 줄에서 `AttributeError`가 발생합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"이름: {alice.name}\")",
         "pythonMemoryState": {
@@ -301,7 +301,7 @@
       },
       {
         "title": "인스턴스 변수 접근 (age)",
-        "explanation": "**`print(f\"나이: {alice.age}\")`**\n\n`alice` 객체의 `age` 속성에 접근하여 출력합니다. \"나이: 25\"가 화면에 출력됩니다.\n\n**이 레슨의 최종 정리 -- __init__과 self의 핵심:**\n\n**주의 -- 가장 흔한 실수 (다시 한번!):**\n```python\ndef __init__(self, name):\n    name = name      # self. 빠뜨림! 로컬 변수일 뿐, 객체에 저장 안 됨!\n```\n**반드시 `self.`를 붙여야** 인스턴스 변수가 됩니다!\n\n**__init__의 동작 원리:**\n1. 객체 생성 시 Python이 **자동 호출** (우리가 호출하지 않아도!)\n2. **self.변수명 = 값**으로 인스턴스 변수 **생성** (영구 저장)\n3. 생성 후 다른 곳에서 **obj.변수명**으로 **접근** 가능",
+        "explanation": "**`print(f\"나이: {alice.age}\")`**\n\n`alice.age`에 접근해 `25`를 출력합니다. `__init__`에서 `self.age`로 설정되었으므로 외부에서 안전하게 접근됩니다. `self.변수명 = 값`으로 만든 인스턴스 변수만 이렇게 접근할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"나이: {alice.age}\")",
         "pythonMemoryState": {

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "클래스 정의 (Cat)",
-        "explanation": "**`class Cat:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다.\n`Cat`이라는 이름의 클래스(고양이 설계도)를 정의합니다.\n\n**이 레슨의 목표**: 이전 레슨에서는 `my_dog.name = \"Buddy\"`처럼 객체 **외부에서** 속성을 추가했습니다. 이번에는 **메서드 내부에서 `self.속성`으로** 속성을 추가하는 방법을 배웁니다. 이것이 훨씬 더 체계적이고 실무에서 사용하는 방식입니다.\n\n**Python 내부 동작**: `class Cat:` 문을 만나면 Python은 클래스 본문을 실행하여 메서드들을 등록하고, `Cat`이라는 클래스 객체를 생성합니다. 이 클래스에는 `set_name`과 `meow` 두 개의 메서드가 정의될 예정입니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 메서드를 추가하고, 그 설계도로 객체를 만들 수 있습니다.\n\n**실행 순서**: class Cat 실행 → 클래스 본문 실행 시작 → Cat 클래스 등록 시작 → line 2",
+        "explanation": "**`class Cat:`**\n\n`Cat` 클래스를 정의합니다. 이전 레슨에서는 외부에서 속성을 추가했지만, 이번에는 **메서드 내부에서 `self.속성`으로** 속성을 설정하는 방식을 배웁니다. 더 체계적이고 실무적인 방법입니다.",
         "visualizationType": "pythonMemory",
         "code": "class Cat:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "메서드 정의 (set_name)",
-        "explanation": "**`def set_name(self, n):`**\n\n**메서드(Method)**: 클래스 안에 정의된 함수를 **메서드**라고 부릅니다. 일반 함수와 거의 같지만, 한 가지 특별한 규칙이 있습니다.\n\n**self 매개변수 -- Python OOP의 핵심!**\n모든 인스턴스 메서드의 **첫 번째 매개변수**는 반드시 `self`여야 합니다.\n- `self`: 메서드를 호출한 **\"나 자신(객체)\"**을 가리키는 참조\n- 메서드가 호출될 때, Python이 **자동으로** 호출한 객체를 `self`에 전달합니다\n\n**Python의 자동 변환 (매우 중요!):**\n```python\ncat1.set_name(\"Kitty\")     # 우리가 쓴 코드\n↓\nCat.set_name(cat1, \"Kitty\") # Python이 내부적으로 변환\n```\n즉, `cat1`이 자동으로 `self` 자리에 들어갑니다!\n\n**왜 self가 필요한가?** 같은 메서드 코드를 여러 객체가 공유하기 때문입니다. `self`가 있어야 \"지금 이 메서드는 **어떤 객체**에 대해 동작하는지\" 구분할 수 있습니다. cat1과 cat2가 같은 `set_name` 코드를 쓰지만, `self`가 다르므로 각자 다른 결과를 만듭니다.\n\n**주의**: `self`는 예약어가 아니라 **관례(convention)**입니다. `this`나 `me`로 바꿔도 동작하지만, Python 커뮤니티에서는 **무조건 `self`를 사용**합니다.\n\n**실행 순서**: def set_name 실행 → set_name 함수 객체 생성 → Cat 클래스에 등록 → line 5",
+        "explanation": "**`def set_name(self, n):`**\n\n클래스 안에 정의된 함수를 **메서드**라고 합니다. 첫 번째 매개변수 `self`는 메서드를 호출한 객체 자신을 가리킵니다. `cat1.set_name(\"Kitty\")` 호출 시 Python이 자동으로 `cat1`을 `self`에 전달합니다.",
         "visualizationType": "pythonMemory",
         "code": "def set_name(self, n):",
         "highlightOffset": [
@@ -52,7 +52,7 @@
       },
       {
         "title": "메서드 정의 (meow)",
-        "explanation": "**`def meow(self):`**\n\n또 다른 메서드 `meow`를 정의합니다. 이 메서드는 고양이가 울음소리를 내는 동작을 구현합니다.\n\n**self만 있는 메서드**: `meow(self)`는 `self` 외에 추가 매개변수가 없습니다. 이는 외부에서 별도의 데이터를 받을 필요 없이, **객체 자신의 데이터(self.name)**만 사용하여 동작한다는 뜻입니다.\n\n**메서드 본문 `print(f\"{self.name} says Meow!\")`의 핵심**: `self.name`으로 호출한 객체의 `name` 속성에 접근합니다. cat1이 호출하면 cat1의 name을, cat2가 호출하면 cat2의 name을 읽어옵니다. 같은 코드인데 **다른 결과**가 나오는 것이 OOP의 매력입니다!\n\n**주의**: 만약 `set_name()`을 호출하지 않고 `meow()`를 먼저 호출하면? `self.name`이 아직 존재하지 않으므로 `AttributeError`가 발생합니다! 이런 문제를 방지하려면 `__init__` 생성자에서 미리 속성을 초기화하는 것이 좋습니다 (다음 레슨에서 배웁니다).\n\n**실행 순서**: def meow 실행 → meow 함수 객체 생성 → Cat 클래스에 등록 → Cat 클래스 정의 완료 → line 8",
+        "explanation": "**`def meow(self):`**\n\n`meow` 메서드를 정의합니다. `self`만 있는 메서드는 외부 데이터 없이 객체 자신의 속성(`self.name`)만 사용합니다. `set_name()` 호출 전에 `meow()`를 실행하면 `self.name`이 없어 `AttributeError`가 발생합니다.",
         "visualizationType": "pythonMemory",
         "code": "def meow(self):",
         "highlightOffset": [
@@ -73,7 +73,7 @@
       },
       {
         "title": "첫 번째 객체 생성",
-        "explanation": "**`cat1 = Cat()`**\n\n`Cat()` 호출로 **첫 번째 Cat 객체(인스턴스)**를 생성합니다.\n\n**객체 생성 시 Python 내부에서 일어나는 일**:\n1. `Cat.__new__(Cat)` 호출 → 메모리에 **빈 Cat 객체** 공간 할당 (0x2000)\n2. `Cat.__init__(새_객체)` 호출 → 객체 초기화 (`__init__`이 없으므로 기본 초기화만)\n3. 초기화된 객체의 **참조(주소 0x2000)**를 반환\n4. `cat1` 변수가 이 참조를 받아 바인딩\n\n**이 시점에서 cat1 객체의 상태**: 속성이 하나도 없는 **빈 객체**입니다! `cat1.__dict__`는 빈 딕셔너리 `{}`입니다. `name` 속성은 아직 존재하지 않습니다 -- `set_name()` 메서드를 호출해야 추가됩니다.\n\n비유: 빈 명찰을 가진 고양이가 태어난 것입니다. 아직 이름이 정해지지 않았습니다.\n\n**왜 이 순서인가?** 클래스 정의가 완료된 후에야 그 설계도로 객체를 만들 수 있습니다.\n\n**실행 순서**: Cat() 호출 → __new__로 객체 0x2000 생성 → cat1 = 0x2000 참조 할당 → line 9",
+        "explanation": "**`cat1 = Cat()`**\n\n첫 번째 Cat 인스턴스를 생성합니다. 이 시점에서 cat1은 속성이 없는 빈 객체입니다. `name` 속성은 `set_name()` 호출 후에야 생성됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cat1 = Cat()",
         "pythonMemoryState": {
@@ -108,7 +108,7 @@
       },
       {
         "title": "cat1.set_name 호출",
-        "explanation": "**`cat1.set_name(\"Kitty\")`**\n\n`cat1` 객체의 `set_name` 메서드를 호출합니다. 이때 Python이 **자동으로 cat1을 self에 전달**합니다.\n\n**Python의 자동 변환 (다시 한번 확인!):**\n```python\ncat1.set_name(\"Kitty\")       # 우리가 쓴 코드 (인자 1개)\n↓\nCat.set_name(cat1, \"Kitty\")  # Python 내부 변환 (인자 2개!)\n```\n우리는 인자를 1개(`\"Kitty\"`)만 넘겼지만, Python이 내부적으로 `cat1`을 **자동으로 첫 번째 인자(self)**에 넣어줍니다!\n\n**매개변수 바인딩**:\n- `self` = `cat1` (0x2000 객체) -- **자동 전달**\n- `n` = `\"Kitty\"` -- **우리가 전달**\n\n비유: 택배 기사(메서드)에게 \"이 고양이(cat1)에게 이 이름표(Kitty)를 달아줘\"라고 요청하는 것입니다. 택배 기사는 자동으로 어떤 고양이(self)에게 작업할지 알고 있습니다.\n\n**실행 흐름**: 이 줄에서 실행 흐름이 **함수 내부(line 3)**로 점프합니다. 메서드 실행이 끝나면 다시 돌아옵니다.\n\n**실행 순서**: line 9 → cat1.set_name 바운드 메서드 생성 → 호출 → line 3으로 점프 → self=cat1, n=\"Kitty\"",
+        "explanation": "**`cat1.set_name(\"Kitty\")`**\n\n`cat1`의 `set_name` 메서드를 호출합니다. Python이 자동으로 `cat1`을 `self`에 전달하므로, `self = cat1`, `n = \"Kitty\"`로 바인딩됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cat1.set_name(\"Kitty\")",
         "pythonMemoryState": {
@@ -141,7 +141,7 @@
       },
       {
         "title": "set_name 실행 (cat1)",
-        "explanation": "**`self.name = n`**\n\n이 줄이 바로 **인스턴스 속성(Instance Attribute)**을 만드는 핵심 코드입니다! `self`(지금은 cat1 객체, 0x2000)에 `name`이라는 속성을 새로 추가하고, 매개변수 `n`의 값인 `\"Kitty\"`를 할당합니다.\n\n**인스턴스 속성 vs 클래스 속성**: 인스턴스 속성은 각 객체가 **개별적으로** 소유합니다. cat1의 name과 나중에 만들 cat2의 name은 완전히 다른 변수입니다. 비유하자면, 같은 양식의 학생증이라도 각 학생이 자기 이름을 쓰는 것과 같습니다.\n\n**주의**: `self.name`과 `name`은 다릅니다! `name`만 쓰면 로컬 변수이고, `self.name`이라고 써야 객체에 영구적으로 저장됩니다. `self.`를 빠뜨리면 함수가 끝날 때 값이 사라집니다!",
+        "explanation": "**`self.name = n`**\n\n`self`(cat1 객체)에 `name` 인스턴스 변수를 생성하고 `\"Kitty\"`를 할당합니다. `self.`를 붙여야 객체에 영구 저장되며, 빠뜨리면 함수가 끝날 때 값이 사라집니다.",
         "visualizationType": "pythonMemory",
         "code": "self.name = n",
         "pythonMemoryState": {
@@ -198,7 +198,7 @@
       },
       {
         "title": "두 번째 객체 생성",
-        "explanation": "**`cat2 = Cat()`**\n\n이제 **두 번째 Cat 객체**를 생성합니다. `Cat()`을 호출할 때마다 Python은 **완전히 새로운 객체**를 메모리에 만듭니다.\n\n**핵심 개념 -- 객체의 독립성**: cat1(0x2000)과 cat2(0x3000)는 **서로 완전히 별개의 객체**입니다. 같은 설계도(Cat 클래스)로 만들었지만, 메모리 주소도 다르고 내부 데이터도 독립적입니다.\n\n**비유**: 같은 공장(Cat 클래스)에서 만든 인형 두 개라고 생각하세요. 하나의 인형에 이름표를 붙여도(cat1.name = \"Kitty\"), 다른 인형에는 이름표가 자동으로 붙지 않습니다.\n\n**이 시점에서 cat2 객체의 상태**: `cat2.__dict__`는 빈 딕셔너리 `{}`입니다! cat1에 추가한 name 속성은 cat2에 전혀 영향을 주지 않습니다. cat2는 아직 이름이 없는 상태입니다.\n\n**Python 내부 동작**: 다시 `Cat.__new__(Cat)` --> 새 메모리 할당(0x3000) --> 기본 `__init__`(아무것도 안 함) --> cat2 변수에 0x3000 참조 바인딩. 매번 `Cat()`을 호출할 때마다 이 과정이 반복되어 새 객체가 탄생합니다.\n\n**왜 이 순서인가?** 이전 set_name 메서드 호출이 완료되어 line 10으로 돌아온 뒤, 순서대로 다음 줄(line 11)을 실행합니다.\n\n**실행 순서**: Cat() 호출 --> __new__로 새 객체 0x3000 생성 --> cat2 = 0x3000 참조 할당 --> line 12",
+        "explanation": "**`cat2 = Cat()`**\n\n두 번째 Cat 인스턴스를 생성합니다. cat1과 완전히 별개의 객체이며, cat1에 추가한 `name` 속성은 cat2에 영향을 주지 않습니다. cat2는 여전히 빈 상태입니다.",
         "visualizationType": "pythonMemory",
         "code": "cat2 = Cat()",
         "pythonMemoryState": {
@@ -243,7 +243,7 @@
       },
       {
         "title": "cat2.set_name 호출",
-        "explanation": "**`cat2.set_name(\"Nabi\")`**\n\n이번에는 `cat2` 객체의 `set_name` 메서드를 호출합니다. Python이 다시 자동 변환을 수행합니다.\n\n**Python의 자동 변환:**\n```python\ncat2.set_name(\"Nabi\")       # 우리가 쓴 코드 (인자 1개)\n  |\nCat.set_name(cat2, \"Nabi\")  # Python 내부 변환 (인자 2개!)\n```\n\n**매개변수 바인딩:**\n- `self` = `cat2` (0x3000 객체) -- **자동 전달** (cat1이 아닌 cat2!)\n- `n` = `\"Nabi\"` -- **우리가 전달**\n\n**같은 메서드, 다른 self**: 이전에 `cat1.set_name(\"Kitty\")`을 호출할 때와 **완전히 같은 코드(line 3)**가 실행됩니다. 하지만 이번에는 self가 cat2를 가리키므로, 결과가 cat2 객체에 저장됩니다. 이것이 OOP에서 `self`가 중요한 이유입니다!\n\n**비유**: 같은 이름표 찍는 기계(set_name 메서드)를 사용하지만, 이번에는 두 번째 고양이(cat2)에 이름표를 찍습니다.\n\n**왜 이 순서인가?** 두 번째 객체 생성 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 12 --> cat2.set_name 바운드 메서드 생성 --> 호출 --> line 3으로 점프 --> self=cat2, n=\"Nabi\"",
+        "explanation": "**`cat2.set_name(\"Nabi\")`**\n\n이번에는 `cat2`의 `set_name`을 호출합니다. Python이 `cat2`를 `self`에 전달하므로, 같은 코드지만 결과는 cat2 객체에 저장됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cat2.set_name(\"Nabi\")",
         "pythonMemoryState": {
@@ -286,7 +286,7 @@
       },
       {
         "title": "set_name 실행 (cat2)",
-        "explanation": "**`self.name = n`**\n\n이전과 **완전히 같은 코드 한 줄**이지만, 이번에는 `self`가 cat2(0x3000)를 가리키므로 결과가 다릅니다. cat2 객체에 `name` 속성을 추가하고 `\"Nabi\"`를 할당합니다.\n\n**Python 내부 동작**: `cat2.__dict__['name'] = \"Nabi\"`와 동일합니다. cat2의 `__dict__`가 `{}`에서 `{'name': 'Nabi'}`로 변합니다.\n\n**이 시점에서 두 객체의 상태를 비교해 봅시다:**\n- cat1 (0x2000): `__dict__` = `{'name': 'Kitty'}` -- 자기만의 name\n- cat2 (0x3000): `__dict__` = `{'name': 'Nabi'}` -- 자기만의 name\n- Cat 클래스: `set_name`, `meow` 메서드 보유 -- **코드는 공유**\n\n**핵심 이해**: 메서드 코드(set_name)는 Cat 클래스에 **한 벌만** 존재하고 모든 객체가 공유합니다. 하지만 `self`가 호출한 객체를 가리키기 때문에, 같은 코드로도 각 객체에 **독립적인 데이터**를 저장할 수 있습니다. 코드는 공유하되 데이터는 분리하는 것이 OOP의 핵심 원리입니다!\n\n**비유**: 도장 기계(set_name)는 공장에 하나뿐이지만, 어떤 인형을 가져오느냐에 따라 다른 인형에 도장이 찍힙니다.\n\n**왜 이렇게 동작하는가?** self는 **메서드를 호출한 객체**를 가리킵니다. cat2.set_name() 호출 시 self는 cat2가 됩니다.\n\n**실행 순서**: self.name = n --> cat2.__dict__에 name=\"Nabi\" 추가 --> 함수 종료 --> line 14로 돌아감",
+        "explanation": "**`self.name = n`**\n\n이번에는 `self`가 cat2(0x3000)를 가리키므로 cat2에 `name = \"Nabi\"`가 추가됩니다. 같은 코드 한 줄이지만 `self`가 달라 결과가 다른 것이 OOP의 핵심입니다.",
         "visualizationType": "pythonMemory",
         "code": "self.name = n",
         "pythonMemoryState": {
@@ -353,7 +353,7 @@
       },
       {
         "title": "cat1.meow 호출",
-        "explanation": "**`cat1.meow()`**\n\n`cat1` 객체의 `meow` 메서드를 호출합니다. 이제 두 고양이 모두 이름이 정해졌으니, meow 메서드가 각자의 이름으로 울음소리를 낼 수 있습니다.\n\n**Python의 자동 변환:**\n```python\ncat1.meow()       # 우리가 쓴 코드 (인자 0개)\n  |\nCat.meow(cat1)    # Python 내부 변환 (인자 1개 = self!)\n```\n\n**매개변수 바인딩:**\n- `self` = `cat1` (0x2000 객체) -- **자동 전달**\n\n**실행 흐름 미리보기**: meow 메서드 내부에서 `self.name`을 읽을 것입니다. self가 cat1이므로 cat1의 name인 \"Kitty\"를 읽게 됩니다. cat2의 name인 \"Nabi\"는 전혀 관계없습니다.\n\n**Python의 속성 탐색 순서**: `self.name` 접근 시 Python은 먼저 cat1 객체의 `__dict__`를 확인합니다. `{'name': 'Kitty'}`에서 name을 찾아 \"Kitty\"를 반환합니다.\n\n**왜 이 순서인가?** 모든 객체의 이름 설정이 완료된 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 14 --> cat1.meow 바운드 메서드 생성 --> 호출 --> line 6으로 점프 --> self=cat1",
+        "explanation": "**`cat1.meow()`**\n\ncat1의 `meow` 메서드를 호출합니다. 내부에서 `self.name`에 접근하는데, `self`가 cat1이므로 `\"Kitty\"`를 읽게 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cat1.meow()",
         "pythonMemoryState": {
@@ -396,7 +396,7 @@
       },
       {
         "title": "meow 실행 (cat1)",
-        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\nmeow 메서드의 본문이 실행됩니다. `self`(cat1)의 `name` 속성에 접근하여 f-string으로 조합한 뒤 출력합니다.\n\n**실행 흐름을 한 단계씩 따라가 봅시다:**\n1. `self` --> cat1 객체 (0x2000)\n2. `self.name` --> cat1.__dict__['name'] --> \"Kitty\"\n3. f-string 평가: `f\"{self.name} says Meow!\"` --> `\"Kitty says Meow!\"`\n4. `print(\"Kitty says Meow!\")` 실행 --> 화면에 출력!\n\n**왜 \"Kitty\"가 나오는가?** self는 cat1(0x2000)을 가리키고, cat1의 `__dict__`에 `'name': 'Kitty'`가 저장되어 있기 때문입니다. cat2의 name인 \"Nabi\"는 cat2(0x3000)의 `__dict__`에 있으므로 전혀 관계없습니다.\n\n**f-string 복습**: `f\"...{표현식}...\"`는 중괄호 안의 표현식을 **계산한 결과값**으로 치환합니다. 여기서 `{self.name}`은 `\"Kitty\"`로 치환됩니다.\n\n**OOP의 핵심이 여기에!** 같은 meow 코드를 cat1이 호출하면 \"Kitty says Meow!\", cat2가 호출하면 \"Nabi says Meow!\"가 나옵니다. **코드는 하나, 결과는 객체마다 다르다** -- 이것이 객체지향 프로그래밍의 본질입니다.\n\n**실행 순서**: self.name 읽기 (\"Kitty\") --> f-string 평가 --> print 실행 --> meow 함수 종료 --> line 15로 돌아감",
+        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n`self`(cat1)의 `name` 속성인 `\"Kitty\"`를 f-string으로 조합해 출력합니다. `\"Kitty says Meow!\"`가 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"{self.name} says Meow!\")",
         "pythonMemoryState": {
@@ -454,7 +454,7 @@
       },
       {
         "title": "cat2.meow 호출",
-        "explanation": "**`cat2.meow()`**\n\n이번에는 `cat2` 객체의 `meow` 메서드를 호출합니다. 이전 단계에서 cat1.meow()가 \"Kitty says Meow!\"를 출력했는데, 이번에는 어떤 결과가 나올까요?\n\n**Python의 자동 변환:**\n```python\ncat2.meow()       # 우리가 쓴 코드\n  |\nCat.meow(cat2)    # Python 내부 변환\n```\n\n**매개변수 바인딩:**\n- `self` = `cat2` (0x3000 객체) -- cat1(0x2000)이 아님!\n\n**예측해 봅시다**: meow 메서드 내부에서 `self.name`을 읽을 것입니다. 이번에 self는 cat2이므로, cat2의 `__dict__`에서 name을 찾아 \"Nabi\"를 읽게 됩니다. 따라서 출력은 \"Nabi says Meow!\"가 될 것입니다.\n\n**핵심**: `cat1.meow()`와 `cat2.meow()`는 **같은 함수 코드(Cat.meow)**를 실행합니다. 유일한 차이는 self에 어떤 객체가 들어가느냐입니다. self 덕분에 하나의 코드로 여러 객체에 대해 다른 동작을 할 수 있습니다.\n\n**왜 이 순서인가?** 이전 cat1.meow() 호출이 완료되고, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 15 --> cat2.meow 바운드 메서드 생성 --> 호출 --> line 6으로 점프 --> self=cat2",
+        "explanation": "**`cat2.meow()`**\n\ncat2의 `meow`를 호출합니다. `self`가 cat2이므로 `self.name`은 `\"Nabi\"`가 됩니다. 같은 메서드 코드가 다른 객체에서 다른 결과를 냅니다.",
         "visualizationType": "pythonMemory",
         "code": "cat2.meow()",
         "pythonMemoryState": {
@@ -497,7 +497,7 @@
       },
       {
         "title": "meow 실행 (cat2)",
-        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n여기서 중요한 건 `self`가 누구냐입니다.\n이번 호출에서는 `self = cat2`이므로 `self.name`은 `\"Nabi\"`가 됩니다.\n그래서 출력은 `Nabi says Meow!`입니다.\n\n핵심 정리:\n- 메서드 코드는 클래스에 1개\n- 데이터는 인스턴스마다 다름\n- `self`가 현재 호출 대상을 가리켜서 같은 코드가 다르게 동작\n\n**비유**: 같은 대본을 읽어도 배우(인스턴스)가 다르면 대사가 달라지는 구조입니다.\n\n주의:\n- `name`을 미리 세팅하지 않으면 `AttributeError`가 날 수 있습니다",
+        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n`self`가 cat2이므로 `self.name`은 `\"Nabi\"`이고, `\"Nabi says Meow!\"`가 출력됩니다. 메서드 코드는 클래스에 하나, 데이터는 각 인스턴스에 독립적으로 존재합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"{self.name} says Meow!\")",
         "pythonMemoryState": {

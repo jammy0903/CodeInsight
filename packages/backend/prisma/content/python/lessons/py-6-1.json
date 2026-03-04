@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "클래스 정의 (설계도 만들기)",
-        "explanation": "**`class Dog:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `class` 키워드로 `Dog`라는 **새로운 타입(클래스)**을 정의합니다.\n\n**이 레슨의 목표**: 클래스의 본질을 깊이 이해합니다. 클래스는 단순한 \"설계도\"가 아니라, Python에서는 **그 자체가 객체**이며, `type`이라는 메타클래스의 인스턴스입니다!\n\n**클래스의 3가지 역할:**\n1. **설계도**: 이 설계도로 객체(인스턴스)를 여러 개 만들 수 있습니다\n2. **타입 정의**: `Dog`라는 새로운 데이터 타입이 탄생합니다 (int, str, list처럼!)\n3. **객체**: 클래스 자체도 메모리에 존재하는 하나의 **객체**입니다!\n\n**Python 내부 동작**: `class Dog:` 문을 만나면, Python은 클래스 본문(body)을 위에서 아래로 실행합니다. 본문에서 만나는 변수(`species`)는 클래스 변수가 되고, 함수(`bark`)는 메서드가 됩니다. 모든 처리가 끝나면 Dog라는 클래스 객체가 생성되어 `Dog` 이름에 바인딩됩니다.\n\n**비유**: 건축 설계도를 그리는 행위 자체도 설계도라는 \"물건\"을 만드는 것입니다. 설계도(클래스)는 도면(설계 정보)을 담고 있고, 이 도면으로 집(인스턴스)을 여러 채 지을 수 있습니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 이 설계도로 객체를 만들 수 있습니다.\n\n**실행 순서**: class Dog 실행 --> Dog 클래스 객체 생성 시작 --> line 2",
+        "explanation": "**`class Dog:`**\n\n`class` 키워드로 `Dog`라는 새로운 타입(클래스)을 정의합니다. 클래스는 설계도 역할을 하며, 이 설계도로 여러 객체를 만들 수 있습니다. 클래스 자체도 메모리에 존재하는 하나의 객체입니다.",
         "visualizationType": "pythonMemory",
         "code": "class Dog:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "클래스 변수 정의",
-        "explanation": "**`species = \"Canis familiaris\"`**\n\n이것은 **클래스 변수(Class Variable)**입니다. 클래스 본문에서 `self` 없이 직접 정의한 변수로, **모든 인스턴스가 공유**하는 데이터입니다.\n\n**클래스 변수 vs 인스턴스 변수 -- 핵심 차이:**\n- **클래스 변수** (`species`): Dog 클래스 자체에 속함, 모든 Dog 인스턴스가 **같은 값**을 공유\n- **인스턴스 변수** (`self.name` 등): 각 인스턴스가 **독립적으로** 소유\n\n**Python 내부 동작**: 클래스 본문이 실행될 때, `species = \"Canis familiaris\"`는 Dog 클래스 객체의 `__dict__`에 저장됩니다. 즉, `Dog.__dict__['species'] = \"Canis familiaris\"`가 됩니다. 나중에 인스턴스에서 `my_dog.species`로 접근하면, 인스턴스 `__dict__`에서 먼저 찾고, 없으면 클래스 `__dict__`에서 찾습니다.\n\n**언제 클래스 변수를 사용하는가?** 모든 인스턴스가 같은 값을 가져야 할 때 적합합니다. 예: 모든 Dog의 species는 \"Canis familiaris\"입니다. 하지만 **가변 객체(리스트, 딕셔너리)**를 클래스 변수로 쓰면 함정에 빠질 수 있습니다 (py-6-4에서 배울 예정!).\n\n**비유**: 학교의 \"교훈\"은 학교(클래스)에 하나만 있고 모든 학생(인스턴스)이 공유합니다. 하지만 각 학생의 \"이름\"은 인스턴스 변수로 각자 다릅니다.\n\n**왜 이 순서인가?** 클래스 본문 내에서 순서대로 실행됩니다.\n\n**실행 순서**: species = \"Canis familiaris\" --> Dog.__dict__에 species 추가 --> line 4",
+        "explanation": "**`species = \"Canis familiaris\"`**\n\n**클래스 변수(Class Variable)**입니다. `self` 없이 클래스 본문에 정의하며, **모든 인스턴스가 같은 값을 공유**합니다. `Dog.species`로 직접 접근하거나 인스턴스를 통해 접근해도 동일한 값이 반환됩니다.",
         "visualizationType": "pythonMemory",
         "code": "species = \"Canis familiaris\"",
         "pythonMemoryState": {
@@ -56,7 +56,7 @@
       },
       {
         "title": "bark 메서드 정의",
-        "explanation": "**`def bark(self):`**\n\n`bark`라는 인스턴스 메서드를 정의합니다. 클래스 본문 안에서 `def`로 정의된 함수는 자동으로 그 클래스의 **메서드**가 됩니다.\n\n**메서드도 함수 객체**: `def bark(self):`을 실행하면 bark이라는 **함수 객체**가 생성됩니다. 이 함수 객체가 Dog 클래스의 `__dict__`에 저장됩니다. 즉, `Dog.__dict__['bark'] = <function bark>`입니다.\n\n**self 매개변수**: 모든 인스턴스 메서드의 첫 번째 매개변수는 `self`입니다. `my_dog.bark()` 호출 시 Python이 자동으로 `my_dog`를 `self`에 전달합니다.\n\n**이 시점에서 Dog 클래스의 상태**: `Dog.__dict__`에는 `species`(클래스 변수)와 `bark`(메서드) 두 항목이 있습니다. 클래스 본문의 모든 실행이 끝나면 Dog 클래스 정의가 완료됩니다.\n\n**주의**: 이 시점에서는 메서드를 **정의만** 합니다. `print(\"멍멍!\")`가 실행되는 것은 아닙니다! 나중에 `my_dog.bark()`처럼 호출해야 실행됩니다.\n\n**왜 이 순서인가?** 클래스 변수 정의 후, 순서대로 메서드를 정의합니다.\n\n**실행 순서**: def bark 실행 --> bark 함수 객체 생성 --> Dog.__dict__에 등록 --> Dog 클래스 정의 완료 --> line 7",
+        "explanation": "**`def bark(self):`**\n\n`bark` 인스턴스 메서드를 정의합니다. 정의 시점에 `print(\"멍멍!\")`은 실행되지 않으며, `my_dog.bark()` 호출 시에야 실행됩니다. 메서드 객체는 `Dog.__dict__['bark']`에 저장됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def bark(self):",
         "highlightOffset": [
@@ -83,7 +83,7 @@
       },
       {
         "title": "클래스도 객체다! (type 확인)",
-        "explanation": "**`print(type(Dog))`**\n\nPython의 놀라운 특성을 확인하는 코드입니다. 클래스 `Dog` 자체가 **무슨 타입인지** 알아봅니다.\n\n**결과: `<class 'type'>`**\n\nDog는 `type`이라는 **메타클래스(metaclass)**의 인스턴스입니다! 즉, \"Dog라는 클래스\"를 만든 \"클래스의 클래스\"가 `type`입니다.\n\n**Python의 핵심 철학 -- \"모든 것이 객체\":**\n- `42`는 `int`의 인스턴스 (숫자도 객체!)\n- `\"hello\"`는 `str`의 인스턴스 (문자열도 객체!)\n- `Dog`는 `type`의 인스턴스 (**클래스도 객체!!!**)\n\n**왜 이것이 중요한가?** 클래스가 객체라는 것은 클래스도 변수에 할당하고, 함수에 인자로 넘기고, 리스트에 저장할 수 있다는 뜻입니다! 이 특성 덕분에 Python은 매우 동적이고 유연한 언어가 됩니다.\n\n```python\n# 클래스를 변수에 저장\nMyClass = Dog\nmy_dog = MyClass()  # Dog()과 동일!\n\n# 클래스를 리스트에 저장\nclasses = [Dog, Cat, Bird]\nfor cls in classes:\n    obj = cls()  # 각 클래스의 인스턴스 생성\n```\n\n**비유**: 보통 \"설계도\"는 종이 위의 그림일 뿐이지만, Python에서는 설계도(클래스) 자체가 **만질 수 있는 물건(객체)**입니다. 이 물건을 주고받고, 검사하고, 변경할 수 있습니다.\n\n**왜 이 순서인가?** 클래스 정의 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: type(Dog) 호출 --> <class 'type'> 반환 --> print 실행 --> line 8",
+        "explanation": "**`print(type(Dog))`**\n\n클래스 `Dog` 자체의 타입을 확인합니다. 결과는 `<class 'type'>`입니다. Python에서 클래스 자체도 `type`이라는 메타클래스의 인스턴스이며, 변수에 저장하거나 함수 인자로 전달할 수 있는 일급 객체입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(type(Dog))",
         "pythonMemoryState": {
@@ -111,7 +111,7 @@
       },
       {
         "title": "클래스 변수 접근",
-        "explanation": "**`print(Dog.species)`**\n\n`클래스이름.변수이름` 형식으로 클래스 변수에 직접 접근합니다. 인스턴스를 만들지 않아도 접근 가능합니다!\n\n**왜 인스턴스 없이 접근 가능한가?** 클래스 변수는 **클래스 객체 자체**에 속하는 속성이기 때문입니다. Dog 클래스의 `__dict__`에 `'species': 'Canis familiaris'`가 저장되어 있으므로, `Dog.species`로 바로 읽을 수 있습니다.\n\n**클래스 변수 접근의 3가지 방법:**\n```python\nDog.species        # 클래스에서 직접 접근 --> \"Canis familiaris\"\nmy_dog.species     # 인스턴스를 통해 접근 --> \"Canis familiaris\" (같은 값!)\ndog2.species       # 다른 인스턴스를 통해 접근 --> \"Canis familiaris\" (같은 값!)\n```\n모두 **같은 값**을 반환합니다. 왜냐하면 인스턴스에 species가 없으면 Python이 클래스에서 찾기 때문입니다.\n\n**Python의 속성 탐색 순서 (Attribute Lookup Order):**\n1. 인스턴스의 `__dict__`에서 찾기 --> 없으면\n2. 클래스의 `__dict__`에서 찾기 --> 없으면\n3. 부모 클래스의 `__dict__`에서 찾기 --> ... --> 없으면 AttributeError\n\n이 탐색 순서는 Python OOP의 가장 핵심적인 메커니즘입니다!\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog.__dict__['species'] 읽기 --> \"Canis familiaris\" --> print 실행 --> line 10",
+        "explanation": "**`print(Dog.species)`**\n\n인스턴스 없이 클래스 이름으로 직접 클래스 변수에 접근합니다. 클래스 변수는 클래스 객체 자체에 속하므로 `Dog.species`로 바로 읽을 수 있습니다. `\"Canis familiaris\"`가 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(Dog.species)",
         "pythonMemoryState": {
@@ -137,7 +137,7 @@
       },
       {
         "title": "인스턴스(객체) 생성",
-        "explanation": "**`my_dog = Dog()`**\n\n`Dog()` 호출로 Dog 클래스의 **인스턴스(객체)**를 생성합니다. 이제 \"설계도\"에서 \"실제 제품\"이 만들어집니다.\n\n**두 가지 객체의 관계:**\n- `Dog` (클래스 객체, 0x1000): **설계도** -- type의 인스턴스\n- `my_dog` (인스턴스 객체, 0x2000): **제품** -- Dog의 인스턴스\n\n**Python 내부 동작:**\n1. `Dog.__new__(Dog)` 호출 --> 메모리 0x2000에 빈 Dog 객체 공간 할당\n2. `Dog.__init__(새_객체)` 호출 --> `__init__`이 없으므로 기본 초기화만 수행\n3. 초기화된 객체의 참조(0x2000)를 `my_dog` 변수에 바인딩\n\n**my_dog 객체의 상태**: `my_dog.__dict__`는 빈 딕셔너리 `{}`입니다. 아직 인스턴스 변수가 하나도 없습니다. 하지만 `my_dog.species`로 접근하면 Python의 속성 탐색 순서에 따라 클래스 변수 \"Canis familiaris\"를 찾을 수 있습니다.\n\n**비유**: 설계도(Dog)에서 집(my_dog)을 지었습니다. 집은 빈 상태이지만, 설계도에 적힌 공통 정보(species)는 참조할 수 있습니다.\n\n**왜 이 순서인가?** 이전 출력 완료 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: Dog() 호출 --> __new__로 새 객체 0x2000 생성 --> my_dog = 0x2000 참조 할당 --> line 11",
+        "explanation": "**`my_dog = Dog()`**\n\nDog 인스턴스를 생성합니다. `my_dog` 객체 자체에는 `species` 속성이 없지만, `my_dog.species`로 접근하면 Python이 인스턴스에서 찾지 못할 경우 자동으로 클래스 변수를 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "my_dog = Dog()",
         "pythonMemoryState": {
@@ -172,7 +172,7 @@
       },
       {
         "title": "인스턴스 타입 확인",
-        "explanation": "**`print(type(my_dog))`**\n\n`my_dog` 객체의 타입(클래스)을 확인합니다.\n\n**Python의 타입 계층을 정리해 봅시다:**\n```python\ntype(my_dog)       # <class 'Dog'>    - my_dog는 Dog의 인스턴스\ntype(Dog)          # <class 'type'>   - Dog는 type의 인스턴스\ntype(type)         # <class 'type'>   - type도 자기 자신의 인스턴스!\n```\n\n**결과: `<class '__main__.Dog'>`**\n- `my_dog`는 `Dog` 클래스의 인스턴스입니다\n- `__main__`은 현재 실행 중인 모듈(파일) 이름입니다\n\n`type`은 Python에서 가장 근본적인 객체로, **자기 자신의 인스턴스**라는 독특한 특성을 가집니다. 이 구조가 Python의 \"모든 것이 객체\" 시스템의 뿌리입니다.",
+        "explanation": "**`print(type(my_dog))`**\n\n인스턴스의 타입(소속 클래스)을 확인합니다. `<class '__main__.Dog'>`가 출력됩니다. `my_dog`는 Dog의 인스턴스, Dog는 type의 인스턴스로, Python의 타입 계층 구조를 보여줍니다.",
         "visualizationType": "pythonMemory",
         "code": "print(type(my_dog))",
         "pythonMemoryState": {

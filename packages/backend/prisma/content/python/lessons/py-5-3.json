@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "클래스 정의 (User)",
-        "explanation": "**`class User:`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. `class` 키워드로 `User`라는 새로운 클래스(사용자 설계도)를 정의합니다.\n\n**이 레슨의 목표**: 이전 레슨에서는 `set_name()` 같은 메서드를 **수동으로** 호출해야 속성이 추가되었습니다. 만약 호출을 잊으면 `AttributeError`가 발생하는 위험이 있었죠. 이번에는 **`__init__` 생성자**를 사용하여, 객체가 만들어지는 **바로 그 순간에 자동으로** 속성을 초기화하는 방법을 배웁니다.\n\n**Python 내부 동작**: `class User:` 문을 만나면, Python은 클래스 본문(body)을 위에서 아래로 실행하면서 메서드들을 함수 객체로 생성하고 User 클래스 객체에 등록합니다. 클래스 자체도 `type`의 인스턴스인 하나의 객체입니다.\n\n**PascalCase 관례**: 클래스 이름은 `User`, `Dog`, `Counter`처럼 **각 단어의 첫 글자를 대문자**로 씁니다. 변수나 함수 이름인 `my_dog`, `set_name`과 구별하기 위한 Python 커뮤니티의 강력한 약속입니다.\n\n**왜 이 순서인가?** 클래스를 먼저 정의해야 나중에 이 설계도로 객체를 만들 수 있습니다.\n\n**실행 순서**: class User 실행 --> User 클래스 객체 생성 시작 --> line 3",
+        "explanation": "**`class User:`**\n\n`User` 클래스를 정의합니다. 이번 레슨에서는 `__init__` 생성자를 사용해 객체 생성과 동시에 속성을 자동 초기화하는 방법을 배웁니다. 이전처럼 수동 메서드 호출이 필요 없어집니다.",
         "visualizationType": "pythonMemory",
         "code": "class User:",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "생성자 (__init__) 정의",
-        "explanation": "**`def __init__(self, name, age):`**\n\n이것이 바로 **`__init__` 메서드** -- Python에서 가장 중요한 특별 메서드입니다! 객체가 생성될 때 Python이 **자동으로** 호출합니다.\n\n**__init__의 3가지 핵심 역할:**\n1. 객체 생성 시 **자동 호출** -- 우리가 `User(\"Alice\", 20)`만 쓰면 Python이 알아서 `__init__`을 호출\n2. 객체의 **초기 속성 설정** -- `self.name`, `self.age` 등을 한 번에 셋업\n3. 필수 데이터를 **매개변수로 강제** -- name과 age 없이는 User 객체를 만들 수 없음!\n\n**비유**: 아기가 태어나면 출생신고서에 이름과 생년월일을 **반드시** 써야 하는 것과 같습니다. `__init__`은 \"객체의 출생신고\"입니다.\n\n**주의**: 이 시점에서는 메서드를 **정의만** 합니다. 실제 실행은 나중에 `User(\"Alice\", 20)` 호출 시 자동으로 일어납니다.",
+        "explanation": "**`def __init__(self, name, age):`**\n\n`__init__`은 객체 생성 시 Python이 **자동 호출**하는 초기화 메서드입니다. 필수 데이터를 매개변수로 받아 `self.속성`으로 설정합니다. name과 age 없이는 User 객체를 만들 수 없어 데이터 누락을 원천 차단합니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, name, age):",
         "highlightOffset": [
@@ -54,7 +54,7 @@
       },
       {
         "title": "introduce 메서드 정의",
-        "explanation": "**`def introduce(self):`**\n\n자기소개를 하는 일반 인스턴스 메서드를 정의합니다. 이 메서드는 `self.name`과 `self.age`를 사용하여 사용자 정보를 출력합니다.\n\n**__init__과의 관계**: `introduce` 메서드는 `self.name`과 `self.age`에 접근합니다. 이 속성들은 `__init__`에서 **반드시** 설정되므로, introduce를 호출할 때 속성이 없어서 에러가 나는 일은 절대 발생하지 않습니다! 이것이 `__init__`의 가장 큰 장점입니다.\n\n**이전 레슨과 비교**: 이전 Cat 클래스에서는 set_name()을 호출하지 않고 meow()를 호출하면 `AttributeError`가 발생했습니다. 하지만 `__init__`을 사용하면 객체 생성과 동시에 속성이 초기화되므로, 다른 메서드에서 **안심하고** self.속성에 접근할 수 있습니다.\n\n**주의**: 이 시점에서는 메서드를 **정의만** 합니다. 실제 실행은 나중에 `u.introduce()` 호출 시 일어납니다.\n\n**왜 이 순서인가?** 생성자(__init__) 정의 후, 순서대로 다음 메서드를 정의합니다.\n\n**실행 순서**: def introduce 실행 --> introduce 함수 객체 생성 --> User 클래스에 등록 --> User 클래스 정의 완료 --> line 12",
+        "explanation": "**`def introduce(self):`**\n\n자기소개 메서드를 정의합니다. `__init__`에서 `self.name`과 `self.age`를 반드시 설정하므로, 이 메서드는 두 속성에 안전하게 접근할 수 있습니다. 이것이 `__init__`의 핵심 장점입니다.",
         "visualizationType": "pythonMemory",
         "code": "def introduce(self):",
         "highlightOffset": [
@@ -75,7 +75,7 @@
       },
       {
         "title": "객체 생성 (__init__ 자동 호출)",
-        "explanation": "**`u = User(\"Alice\", 20)`**\n\n드디어 User 객체를 생성합니다! 이 한 줄에서 **엄청나게 많은 일**이 자동으로 일어납니다.\n\n**핵심 포인트**: 우리는 `User(\"Alice\", 20)`만 썼는데, Python이 알아서 `__init__`을 호출합니다! 이전 레슨의 Cat 클래스에서는 `cat1 = Cat()` 후에 별도로 `cat1.set_name(\"Kitty\")`을 호출해야 했지만, `__init__`이 있으면 **생성과 초기화가 한 번에** 이루어집니다.\n\n**비유**: 공장에서 제품을 만들 때, 빈 틀을 만들고(__new__) 즉시 조립라인에 넣어 완성하는 것(__init__)과 같습니다. 소비자(우리)는 \"User를 하나 만들어줘\"라고 주문만 하면 됩니다.\n\n**우리가 쓴 코드 vs Python이 하는 일:**\n```python\nu = User(\"Alice\", 20)  # 우리가 쓴 코드 (한 줄!)\n```",
+        "explanation": "**`u = User(\"Alice\", 20)`**\n\n`User(\"Alice\", 20)` 한 줄로 객체 생성과 초기화가 동시에 완료됩니다. Python이 자동으로 `__init__`을 호출하므로, `u` 객체는 즉시 `name`과 `age` 속성을 갖게 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "u = User(\"Alice\", 20)",
         "pythonMemoryState": {
@@ -110,7 +110,7 @@
       },
       {
         "title": "__init__ 실행 (1/3)",
-        "explanation": "**`print(f\"Creating user {name}...\")`**\n\n`__init__` 메서드 내부로 진입했습니다! Python이 `User(\"Alice\", 20)` 호출 시 자동으로 이 메서드를 호출했기 때문입니다.\n\n**현재 매개변수 바인딩 상태:**\n- `self` = `u` (0x2000 객체) -- **Python이 자동 전달**\n- `name` = `\"Alice\"` -- **우리가 첫 번째 인자로 전달**\n- `age` = `20` -- **우리가 두 번째 인자로 전달**\n\n**이 줄의 역할**: 객체 초기화 과정에서 디버깅이나 로깅 목적으로 메시지를 출력합니다. `__init__` 안에서는 속성 설정뿐 아니라, print, 파일 열기, 데이터 검증 등 **어떤 코드든** 실행할 수 있습니다.\n\n**주의할 점**: 여기서 `name`은 `self.name`이 아니라 **매개변수** `name`입니다. 아직 `self.name = name`을 실행하지 않았으므로, `self.name`은 이 시점에서 존재하지 않습니다. 매개변수 name과 인스턴스 변수 self.name은 **다른 것**입니다!\n\n**비유**: 출생신고서를 작성하기 전에, \"지금 Alice라는 사람을 등록하려고 합니다\"라고 안내방송을 하는 것과 같습니다.\n\n**왜 이 순서인가?** 객체 생성(line 12)에서 __init__이 자동 호출되어 이 줄로 점프해 왔습니다.\n\n**실행 순서**: name=\"Alice\" 읽기 --> f-string 평가 --> \"Creating user Alice...\" 출력 --> line 5",
+        "explanation": "**`print(f\"Creating user {name}...\")`**\n\n`__init__` 메서드 내부로 진입했습니다. 현재 매개변수는 `self = u`, `name = \"Alice\"`, `age = 20`으로 바인딩되어 있습니다. `__init__` 안에서는 속성 설정 외에 이렇게 일반 코드도 실행할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Creating user {name}...\")",
         "pythonMemoryState": {
@@ -178,7 +178,7 @@
       },
       {
         "title": "__init__ 실행 (2/3)",
-        "explanation": "**`self.name = name`**\n\n`self`(u 객체, 0x2000)에 `name`이라는 인스턴스 속성을 추가하고, 매개변수 `name`의 값인 `\"Alice\"`를 할당합니다.\n\n**헷갈리기 쉬운 부분 -- 같은 이름 `name`이 두 번 나온다!**\n- 등호 **왼쪽** `self.name`: 객체(0x2000)에 만들어지는 **인스턴스 속성** (영구 저장!)\n- 등호 **오른쪽** `name`: __init__의 **매개변수** (함수 끝나면 사라짐)\n- 즉, 일시적인 매개변수의 값을 객체에 **영구적으로 복사 저장**하는 것입니다.\n\n**Python 내부 동작**: `u.__dict__['name'] = \"Alice\"`와 동일합니다. u 객체의 `__dict__`가 `{}`에서 `{'name': 'Alice'}`로 변합니다.\n\n**왜 __init__에서 속성을 설정하는가?**\n- **일관성**: 모든 User 객체가 반드시 name과 age 속성을 가지도록 보장\n- **편리성**: 객체 생성과 동시에 한 줄로 초기화 완료\n- **안전성**: name이나 age 없이는 User 객체를 만들 수 없으므로, 다른 메서드에서 안심하고 self.name을 사용 가능\n\n**주의 -- 흔한 실수:**\n```python\ndef __init__(self, name, age):\n    name = name   # WRONG! 이건 그냥 로컬 변수 할당\n    self.name = name  # CORRECT! 이게 인스턴스 속성 생성\n```\n`self.`를 반드시 붙여야 객체에 저장됩니다!\n\n**실행 순서**: self.name = name --> u.__dict__에 name=\"Alice\" 추가 --> line 6",
+        "explanation": "**`self.name = name`**\n\n`self`(u 객체)에 `name` 인스턴스 변수를 생성하고 `\"Alice\"`를 할당합니다. 왼쪽 `self.name`은 객체에 영구 저장되는 인스턴스 변수이고, 오른쪽 `name`은 함수 종료 시 사라지는 매개변수입니다.",
         "visualizationType": "pythonMemory",
         "code": "self.name = name",
         "pythonMemoryState": {
@@ -245,7 +245,7 @@
       },
       {
         "title": "__init__ 실행 (3/3)",
-        "explanation": "**`self.age = age`**\n\n`self`(u 객체, 0x2000)에 `age`라는 인스턴스 속성을 추가하고, 매개변수 `age`의 값인 `20`을 할당합니다.\n\n**이 시점에서 u 객체의 상태**: `u.__dict__` = `{'name': 'Alice', 'age': 20}`. 이제 `u` 객체는 name과 age 속성을 모두 가진 **완전한 User 객체**가 되었습니다!\n\n**__init__ 사용 vs 수동 설정 비교:**\n```python\n# 방법 1: __init__ 사용 (권장!)\nu = User(\"Alice\", 20)  # 한 줄로 생성 + 초기화 완료!\n\n# 방법 2: 수동 설정 (비권장)\nu = User()        # 에러! name, age 인자 필수!\nu.name = \"Alice\"  # 이 줄을 깜빡하면 나중에 에러\nu.age = 20        # 이 줄을 깜빡하면 나중에 에러\n```\n\n**__init__의 3대 장점:**\n1. **강제성**: name과 age를 전달하지 않으면 `TypeError: __init__() missing 2 required positional arguments` 에러 발생! 데이터 누락 원천 차단\n2. **한 줄 완성**: 생성과 초기화가 한 번에 이루어져 코드가 간결\n3. **안전성**: __init__이 완료되면 다른 메서드에서 self.name, self.age를 안전하게 사용 가능\n\n**__init__이 끝나면?** Python이 자동으로 초기화된 객체의 참조를 반환합니다. 이 참조가 `u` 변수에 바인딩됩니다.\n\n**실행 순서**: self.age = age --> u.__dict__에 age=20 추가 --> __init__ 종료 --> line 12로 돌아감 --> line 13",
+        "explanation": "**`self.age = age`**\n\n`self`(u 객체)에 `age = 20`을 추가합니다. 이제 `u.__dict__` = `{'name': 'Alice', 'age': 20}`. `__init__`이 완료되면 다른 메서드에서 `self.name`, `self.age`를 안전하게 사용할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "self.age = age",
         "pythonMemoryState": {
@@ -288,7 +288,7 @@
       },
       {
         "title": "introduce 메서드 호출",
-        "explanation": "**`u.introduce()`**\n\n초기화가 완료된 `u` 객체의 `introduce` 메서드를 호출합니다.\n\n**Python의 자동 변환:**\n```python\nu.introduce()           # 우리가 쓴 코드 (인자 0개)\n  |\nUser.introduce(u)       # Python 내부 변환 (인자 1개 = self!)\n```\n\n**매개변수 바인딩:**\n- `self` = `u` (0x2000 객체) -- **Python이 자동 전달**\n\n**이 호출이 안전한 이유**: introduce 메서드 내부에서 `self.name`과 `self.age`에 접근합니다. `__init__`에서 이미 두 속성을 모두 설정했으므로, `AttributeError`가 발생할 걱정이 없습니다! 이것이 `__init__`의 가장 큰 장점입니다.\n\n**비유**: 출생신고(init)가 완료된 사람만 신분증(introduce)을 발급받을 수 있는 것과 같습니다. 출생신고 없이는 신분증 발급이 불가능합니다.\n\n**왜 이 순서인가?** 객체 생성 및 초기화가 완료된 후, 순서대로 다음 줄을 실행합니다.\n\n**실행 순서**: line 13 --> u.introduce 바운드 메서드 생성 --> 호출 --> line 9로 점프 --> self=u",
+        "explanation": "**`u.introduce()`**\n\n초기화가 완료된 `u` 객체의 `introduce` 메서드를 호출합니다. Python이 자동으로 `u`를 `self`에 전달합니다. `__init__`에서 두 속성을 모두 설정했으므로 `AttributeError` 걱정 없이 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "u.introduce()",
         "pythonMemoryState": {
@@ -321,7 +321,7 @@
       },
       {
         "title": "introduce 실행",
-        "explanation": "**`print(f\"Hello, I am {self.name} and I am {self.age} years old.\")`**\n\n이 줄은 인스턴스 속성 두 개(`name`, `age`)를 읽어 한 문장으로 출력합니다.\n즉, 객체 안에 저장된 상태를 사용자 메시지로 표현하는 전형적인 패턴입니다.\n\n핵심:\n- `self.name`, `self.age`는 현재 객체의 데이터\n- f-string은 값을 문자열에 즉시 끼워 넣어 읽기 좋게 만듭니다\n\n**비유**: 명찰(name)과 나이(age)를 보고 자기소개 문장을 자동 생성하는 느낌입니다.\n\n주의:\n- 속성이 초기화되지 않았다면 출력 전에 에러가 날 수 있으니 생성자/세터로 상태를 먼저 보장해야 합니다",
+        "explanation": "**`print(f\"I am {self.name}, {self.age} years old.\")`**\n\n`self.name`과 `self.age`를 읽어 한 문장으로 출력합니다. 두 속성 모두 `__init__`에서 설정되었으므로 안전하게 접근됩니다. `\"I am Alice, 20 years old.\"`가 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"I am {self.name}, {self.age} years old.\")",
         "pythonMemoryState": {

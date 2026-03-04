@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "공백이 포함된 문자열 생성",
-        "explanation": "**`text = \"  Hello, World!  \"`** -- 문자열 객체 `\"  Hello, World!  \"`가 힙(heap) 메모리에 생성되고, `text`라는 이름표(label)가 이 객체를 가리킵니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 이 문자열에는 앞뒤에 **공백 2칸씩**이 포함되어 있습니다.\n\n**비유:** 새로 산 옷(문자열)에 아직 가격표와 태그(불필요한 공백)가 달려있는 상태입니다. 옷을 입기 전에 태그를 떼어내야(strip) 하겠죠?\n\n**왜 이런 공백이 문제인가?** 실무에서 사용자 입력이나 파일에서 읽은 데이터에는 의도치 않은 공백이 자주 포함됩니다. 예를 들어 `\"  alice  \" == \"alice\"`는 `False`입니다! 공백 때문에 비교, 검색, 저장 등에서 문제가 생길 수 있습니다.\n\n**Python 내부 동작 (문자열 불변성):** Python의 `str` 객체는 **불변(Immutable)**입니다. 한번 생성된 문자열은 **절대 수정할 수 없습니다**. `text[0] = \"X\"` 같은 코드는 `TypeError`를 발생시킵니다. 모든 문자열 메서드는 **원본을 변경하지 않고 새로운 문자열 객체를 생성하여 반환**합니다.\n\n**주의:** `text`는 공백이 포함된 문자열 객체를 가리키는 이름표일 뿐입니다. 이 이름표 자체가 문자열을 \"담고\" 있는 것이 아니라, 메모리의 문자열 객체를 **참조(reference)**하고 있습니다.\n\n**실행 순서:** `str` 객체 `\"  Hello, World!  \"` 생성 → `text` 이름표 붙임 → 다음 줄로 이동",
+        "explanation": "**`text = \"  Hello, World!  \"`**\n\n앞뒤에 공백 2칸씩 포함된 문자열 객체를 생성하고 `text`에 바인딩합니다. Python의 `str`은 **불변(Immutable)**이라 한번 만들어진 문자열은 수정할 수 없고, 모든 메서드는 새 문자열을 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "text = \"  Hello, World!  \"",
         "pythonMemoryState": {
@@ -33,7 +33,7 @@
       },
       {
         "title": "strip()으로 양쪽 공백 제거",
-        "explanation": "**`stripped = text.strip()`** -- `text`가 가리키는 문자열 객체의 `strip()` 메서드를 호출하여, 양쪽 공백이 제거된 **새로운** 문자열 객체를 반환받습니다.\n\n**strip() 메서드:** 문자열 **양쪽 끝**의 공백 문자(스페이스, 탭 `\\t`, 줄바꿈 `\\n`, 캐리지리턴 `\\r`)를 모두 제거한 **새 문자열**을 반환합니다. 문자열 중간의 공백은 건드리지 않습니다.\n\n**Python 내부 동작 (불변성의 핵심):** `text.strip()`은 원본 문자열 `\"  Hello, World!  \"`를 **절대 수정하지 않습니다**. 대신 새로운 `str` 객체 `\"Hello, World!\"`를 힙에 생성하고, 그 참조를 반환합니다. `stripped`는 이 새 객체를 가리키는 이름표이고, `text`는 여전히 공백이 포함된 원본 객체를 가리킵니다. 두 변수는 **서로 다른 객체**를 가리킵니다.\n\n**비유:** 책(문자열)의 앞표지와 뒷표지(양쪽 끝)에 붙은 먼지(공백)만 털어내는 것입니다. 책 내용(중간의 공백)은 그대로 유지됩니다. 그리고 원본 책은 건드리지 않고, **깨끗한 복사본(새 문자열)**을 만들어 돌려줍니다.\n\n**주의:** 초보자가 가장 많이 하는 실수: `text.strip()` 호출만 하고 결과를 변수에 저장하지 않는 것! `text.strip()`만 쓰면 새 문자열이 만들어졌다가 바로 사라집니다.",
+        "explanation": "**`stripped = text.strip()`**\n\n문자열 양쪽 끝의 공백(스페이스·탭·줄바꿈)을 제거한 **새 문자열**을 반환합니다. 원본 `text`는 변경되지 않습니다. 결과를 쓰려면 반드시 변수에 저장해야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "stripped = text.strip()",
         "pythonMemoryState": {
@@ -69,7 +69,7 @@
       },
       {
         "title": "strip 결과 출력",
-        "explanation": "**`print(stripped)`** -- `stripped`가 가리키는 문자열 객체의 값 `\"Hello, World!\"`를 출력합니다.\n\n양쪽의 불필요한 공백이 깔끔하게 제거된 것을 확인할 수 있습니다. `text` 원본은 여전히 `\"  Hello, World!  \"` (공백 포함)입니다.\n\n**비유:** 세탁소(strip)에서 옷(문자열)을 맡겼더니, 원본은 보관하고 깨끗한 복사본을 돌려준 것입니다. 원본 옷(text)은 여전히 더러운(공백 포함) 상태입니다.\n\n**Python 내부 동작:** `print()` 함수는 내부적으로 `stripped.__str__()`을 호출하여 문자열 표현을 얻고, `sys.stdout.write()`를 통해 표준 출력에 씁니다. `str` 객체의 `__str__`은 자기 자신을 반환합니다.\n\n**실무 필수 패턴:** 사용자 입력 처리 시 `strip()`은 거의 필수입니다:\n```python\nusername = input(\"이름: \").strip()  # 입력 직후 공백 제거\nemail = input(\"이메일: \").strip().lower()  # 공백 제거 + 소문자 변환\n```\n이 패턴을 쓰지 않으면 `\" alice \"` != `\"alice\"` 때문에 로그인 실패 같은 버그가 생길 수 있습니다.\n\n**실행 순서:** `print(stripped)` → `\"Hello, World!\"` 출력 → 다음 줄로 이동",
+        "explanation": "**`print(stripped)`**\n\n`stripped`가 가리키는 `\"Hello, World!\"`를 출력합니다. 원본 `text`는 여전히 공백이 포함된 채 그대로입니다. 사용자 입력 처리 시 `strip()`은 거의 필수 패턴입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(stripped)",
         "pythonMemoryState": {
@@ -107,7 +107,7 @@
       },
       {
         "title": "split()으로 문자열 분리 → 리스트",
-        "explanation": "**`words = \"apple,banana,cherry\".split(\",\")`** -- 문자열을 구분자(delimiter) `\",\"`를 기준으로 나누어 **리스트(list) 객체**를 반환합니다.\n\n**split() 메서드:** 문자열을 지정한 구분자로 분리하여, 분리된 부분 문자열들의 **리스트**를 만들어 반환합니다. 원본 문자열은 변경되지 않습니다.\n\n**비유:** 긴 소시지 링크(문자열)를 가위(split)로 연결 부위(구분자)에서 잘라 개별 소시지(리스트의 각 요소)로 만드는 것입니다.\n\n**주의:** `\",,\".split(\",\")`는 `[\"\", \"\", \"\"]`를 반환합니다 (빈 문자열 3개). 구분자 사이에 내용이 없으면 빈 문자열이 포함됩니다!\n\n**동작 과정을 따라가 봅시다:**\n1. `\"apple,banana,cherry\"` 문자열에서 `\",\"` (쉼표)를 찾음\n2. 첫 번째 쉼표 → `\"apple\"` 분리\n3. 두 번째 쉼표 → `\"banana\"` 분리\n4. 나머지 → `\"cherry\"` 분리\n5. 결과: `[\"apple\", \"banana\", \"cherry\"]` 리스트 반환",
+        "explanation": "**`words = \"apple,banana,cherry\".split(\",\")`**\n\n구분자 `\",\"`를 기준으로 문자열을 분리해 **리스트**를 반환합니다. 결과: `[\"apple\", \"banana\", \"cherry\"]`. 구분자 사이에 내용이 없으면 빈 문자열이 포함됩니다.",
         "visualizationType": "pythonMemory",
         "code": "words = \"apple,banana,cherry\".split(\",\")",
         "pythonMemoryState": {
